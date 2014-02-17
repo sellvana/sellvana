@@ -76,19 +76,21 @@ class FeatureContext extends MinkContext
     }
 
     /**
+     * @Given /^I am not logged in admin$/
+     */
+    public function iAmNotLoggedInAdmin()
+    {
+        $this->visit( "/admin/logout" );
+    }
+
+    /**
      * Make sure not to be logged in as customer on frontend
      *
      * @Given /^I am not logged in front$/
      */
     public function iAmNotLoggedInFront()
     {
-        $page = $this->getPage();
-        if ( strpos( $page->getContent(), "My Account" ) !== false ) {
-            echo "\t Logged in front\n";
-            $this->visit( "/logout" );
-        } else {
-            echo "\tNot logged in\n";
-        }
+        $this->visit( "/logout" );
     }
 
     /**
@@ -277,9 +279,9 @@ class FeatureContext extends MinkContext
             throw new ElementNotFoundException( $this->getSession(), null, null, $productLinkPath );
         }
 
-        $this->productName = $productLink[1]->getText();
+        $this->productName = $productLink[ 1 ]->getText();
         echo "\t{$this->productName}\n";
-        $productLink[1]->click();
+        $productLink[ 1 ]->click();
     }
 
     protected $productName;
@@ -291,7 +293,7 @@ class FeatureContext extends MinkContext
      */
     public function iShouldFindCorrectProductName()
     {
-        $this->assertPageContainsText($this->productName);
+        $this->assertPageContainsText( $this->productName );
     }
 
     /**
@@ -363,6 +365,164 @@ class FeatureContext extends MinkContext
     }
 
     /**
+     * Fill in field with random css selector
+     *
+     * @When /^I fill in field "([^"]*)" with "([^"]*)"$/
+     */
+    public function iFillInFieldWith( $selector, $value )
+    {
+        $value = $this->fixStepArgument( $value );
+        $field = $this->getFieldsCss( $selector );
+        if ( $field ) {
+            $field->setValue( $value );
+        }
+    }
+
+    /**
+     * Check a field value by css selector
+     *
+     * @Given /^the "([^"]*)" css field should contain "([^"]*)"$/
+     */
+    public function theCssFieldShouldContain( $selector, $value )
+    {
+        $value = $this->fixStepArgument( $value );
+        $field = $this->getFieldsCss( $selector );
+        if ( $field ) {
+            $this->assertNodeValueMatchesValue( $value, $field );
+        }
+    }
+
+    protected $qty_input = '.f-input-qty';
+
+    /**
+     * Update qty field for first product in cart
+     *
+     * @When /^I fill in first product qty with "([^"]*)"$/
+     */
+    public function iFillInFirstProductQtyWith( $value )
+    {
+        $value    = $this->fixStepArgument( $value );
+        $selector = $this->qty_input;
+        $field    = $this->getFieldsCss( $selector );
+        if ( $field ) {
+            $field->setValue( $value );
+        } else {
+            throw new ElementNotFoundException( $this->getSession(), 'input', 'css', $selector );
+        }
+    }
+
+    /**
+     * Update qty field for second product in cart
+     *
+     * @Given /^I fill in second product qty with "([^"]*)"$/
+     */
+    public function iFillInSecondProductQtyWith( $value )
+    {
+        $value    = $this->fixStepArgument( $value );
+        $selector = $this->qty_input;
+        $fields   = $this->getFieldsCss( $selector, false );
+        if ( !empty( $fields ) && is_array( $fields ) ) {
+            if ( isset( $fields[ 1 ] ) ) {
+                /* @var $fieldInput \Behat\Mink\Element\NodeElement */
+                $fieldInput = $fields[ 1 ];
+                $fieldInput->setValue( $value );
+            } else {
+                throw new ElementNotFoundException( $this->getSession(), 'second qty input', 'css', $selector );
+            }
+        } else {
+            throw new ElementNotFoundException( $this->getSession(), 'input', 'css', $selector );
+        }
+    }
+
+    /**
+     * Assert qty for first product in cart
+     *
+     * @Given /^first product qty field should contain "([^"]*)"$/
+     */
+    public function firstProductQtyFieldShouldContain( $value )
+    {
+        $value    = $this->fixStepArgument( $value );
+        $selector = $this->qty_input;
+        $field    = $this->getFieldsCss( $selector );
+        if ( $field ) {
+            $this->assertNodeValueMatchesValue( $value, $field );
+        } else {
+            throw new ElementNotFoundException( $this->getSession(), 'input', 'css', $selector );
+        }
+    }
+
+    /**
+     * Assert qty for second product in cart
+     *
+     * @Given /^second product qty field should contain "([^"]*)"$/
+     */
+    public function secondProductQtyFieldShouldContain( $value )
+    {
+        $value    = $this->fixStepArgument( $value );
+        $selector = $this->qty_input;
+        $fields   = $this->getFieldsCss( $selector, false );
+        if ( !empty( $fields ) && is_array( $fields ) ) {
+            /* @var $fieldInput \Behat\Mink\Element\NodeElement */
+            $fieldInput = $fields[ 1 ];
+            $this->assertNodeValueMatchesValue( $value, $fieldInput );
+        } else {
+            throw new ElementNotFoundException( $this->getSession(), 'input', 'css', $selector );
+        }
+    }
+
+    /**
+     * Check remove checkbox related to first product in cart
+     *
+     * @When /^I check first product "([^"]*)"$/
+     */
+    public function iCheckFirstProduct( $checkBox )
+    {
+        $checkBox = $this->fixStepArgument( $checkBox );
+        $this->checkOption( $checkBox );
+    }
+
+    /**
+     * Assert only one product left in cart
+     *
+     * @Then /^I should see one product$/
+     */
+    public function iShouldSeeOneProduct()
+    {
+        $selector = $this->qty_input;
+        $fields   = $this->getFieldsCss( $selector, false );
+
+        if ( count( $fields ) != 1 ) {
+            throw new ExpectationException( sprintf(
+                "Expected to find exactly one product, found %d",
+                count( $fields )
+            ), $this->getSession() );
+        }
+    }
+
+    /**
+     * @param string $selector
+     * @param bool   $single
+     * @return array|\Behat\Mink\Element\NodeElement|null
+     */
+    protected function getFieldsCss( $selector, $single = true )
+    {
+        $selector = $this->fixStepArgument( $selector );
+        $fields   = $this->getPage()->findAll( 'css', $selector );
+        if ( $fields && $single ) {
+            return current( $fields );
+        }
+        return $fields;
+    }
+
+    /**
+     * @When /^I restart browser$/
+     */
+    public function iRestartBrowser()
+    {
+        $this->getSession()->restart();
+    }
+
+    /**
      * Shortcut to get page object
      *
      * @return \Behat\Mink\Element\DocumentElement
@@ -371,5 +531,21 @@ class FeatureContext extends MinkContext
     {
         return $this->getSession()->getPage();
 
+    }
+
+    /**
+     * @param                                $value
+     * @param Behat\Mink\Element\NodeElement $field
+     * @throws Behat\Mink\Exception\ExpectationException
+     */
+    public function assertNodeValueMatchesValue( $value, $field )
+    {
+        $actual = $field->getValue( $value );
+        $regex  = '/^' . preg_quote( $value, '/' ) . '/ui';
+
+        if ( !preg_match( $regex, $actual ) ) {
+            $message = sprintf( 'The field "%s" value is "%s", but "%s" expected.', $field->getTagName(), $actual, $value );
+            throw new ExpectationException( $message, $this->getSession() );
+        }
     }
 }

@@ -32,9 +32,11 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             array('name' => 'last_login', 'label'=>'Last Login', 'index'=>'c.last_login'),
             array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115,
                   'data' => array(
+                  /*
                       'custom' => array(
                           'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
                           'icon' => 'icon-time', 'type' => 'link', 'title' => $this->_('Customer history')),
+                  */
                       'edit'   => array('href' => BApp::href($this->_formHref . '?id='), 'col' => 'id'),
                       'delete' => true
                   )
