@@ -24,6 +24,8 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             array('name' => 'is_superadmin', 'label' => 'SuperAdmin', 'width' => 100, 'editable' => true,  'editor' => 'select', 'options' => FCom_Admin_Model_User::i()->fieldOptions('is_superadmin')),
             array('name' => 'status', 'label' => 'Status', 'width' => 100, 'editor' => 'select', 'editable' => true, 'mass-editable' => true,
                   'options' => FCom_Admin_Model_User::i()->fieldOptions('status')),
+            array('name' => 'create_at', 'label' => 'Created', 'width' => 100),
+            array('name' => 'update_at', 'label' => 'Updated', 'width' => 100),
             array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 85,
                   'data'=> array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)),
         );
@@ -36,6 +38,8 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             array('field' => 'email', 'type' => 'text'),
             array('field' => 'is_superadmin', 'type' => 'multiselect'),
             array('field' => 'status', 'type' => 'multiselect'),
+            array('field' => 'create_at', 'type' => 'date-range'),
+            array('field' => 'update_at', 'type' => 'date-range'),
         );
 
         return $config;
