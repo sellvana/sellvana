@@ -1,4 +1,3 @@
-@javascript
 Feature: Cart
   As a user I should be able to add product to cart
   update its quantity and remove the product from cart
@@ -7,7 +6,7 @@ Feature: Cart
     Given I am on the homepage
     When I go to first available category
     And I click first product link
-    When I press "Add to Cart"
+    And I press "Add to Cart"
     And I go to "/cart"
     Then I should find correct product name
     When I fill in field ".f-input-qty" with "2"
@@ -35,7 +34,7 @@ Feature: Cart
     And I press "Update Cart"
     Then I should see "Your cart has been updated"
     And first product qty field should contain "2"
-    And second product qty field should contain "2"
+    And second product qty field should contain "5"
     When I check first product "Remove"
     And press "Update Cart"
     Then I should see one product
