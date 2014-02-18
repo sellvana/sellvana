@@ -2037,8 +2037,6 @@ body #vakata-dragged.jstree-default .jstree-invalid:before {
   }
 .dd-list-axis-x {
     background: none;
-    display: inline-block;
-    margin-bottom: -10px;
 }
 .dd-list .dd-list { padding-left:30px; }
 .open .dd-list {
@@ -2079,7 +2077,13 @@ body #vakata-dragged.jstree-default .jstree-invalid:before {
     width: 140px;
     overflow: hidden;
     margin-right: 10px;
+    margin-bottom: 5px;
     background: white;
+}
+.dd-list-axis-x .dd3-content label {
+    width: 80px;
+    height: 15px;
+    overflow: hidden;
 }
 .dd-item:last-of-type {
   border-bottom-width:1px;
