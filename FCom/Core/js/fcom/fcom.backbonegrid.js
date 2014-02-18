@@ -2116,7 +2116,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         confirm = window.confirm("Do you really want to delete selected rows?");
 
                     if (confirm) {
-                        if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length > 0) {
+                        if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length > 0 && BackboneGrid.data_mode !== 'local') {
                             var ids = selectedRows.pluck('id').join(",");
                             $.post(BackboneGrid.edit_url, {id: ids, oper: 'mass-delete'})
                                 .done(function (data) {
