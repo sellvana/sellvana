@@ -1787,7 +1787,7 @@ class BModel extends Model
             static::$_readConnectionName ? static::$_readConnectionName : static::$_connectionName,
             static::$_writeConnectionName ? static::$_writeConnectionName : static::$_connectionName
         );
-        //$orm->table_alias('_main');
+        $orm->table_alias('_main');
         return $orm;
     }
 
@@ -1797,7 +1797,7 @@ class BModel extends Model
     * @param string $alias table alias
     * @return BORM
     */
-    public static function orm($alias='_main')
+    public static function orm($alias=null)
     {
         $orm = static::factory();
         static::_findOrm($orm);
