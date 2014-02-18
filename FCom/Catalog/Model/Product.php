@@ -132,6 +132,23 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (!$this->get('create_at'))  $this->set('create_at', BDb::now());
         $this->set('update_at', BDb::now());
 
+        // Cleanup possible bad input
+        if ($this->get('sale_price') === '') {
+            $this->set('sale_price', null);
+        }
+        if ($this->get('cost') === '') {
+            $this->set('cost', null);
+        }
+        if ($this->get('msrp') === '') {
+            $this->set('msrp', null);
+        }
+        if ($this->get('map') === '') {
+            $this->set('map', null);
+        }
+        if ($this->get('markup') === '') {
+            $this->set('markup', null);
+        }
+
         return true;
     }
 
