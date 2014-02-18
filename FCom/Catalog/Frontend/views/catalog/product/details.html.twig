@@ -80,11 +80,18 @@
                   <th class="f-price-label">Price:</th>
                   <td class="f-price">{{ 'FREE'|_ }}</td>
                 </tr>
-              {% elseif prod.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
-                <tr class="f-special-price">
-                  <th class="f-price-label">Price:</th>
-                  <td class="f-price">{{ prod.get('sale_price') | currency }}</td>
-                </tr>
+              {% elseif prod.get('base_price') != prod.get('sale_price') and prod.get('sale_price') is not null %}
+                {% if prod.get('sale_price') == 0 %}
+                  <tr class="f-reg-price">
+                    <th class="f-price-label">Price:</th>
+                    <td class="f-price">{{ 'FREE'|_ }}</td>
+                  </tr>
+                {% else %}
+                  <tr class="f-special-price">
+                    <th class="f-price-label">Price:</th>
+                    <td class="f-price">{{ prod.get('sale_price') | currency }}</td>
+                  </tr>
+                {% endif %}
                 <tr class="f-old-price">
                   <th class="f-price-label">Was:</th>
                   <td class="f-price">{{ prod.get('base_price') | currency }}</td>
