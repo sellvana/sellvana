@@ -158,8 +158,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function onAfterSave()
     {
         parent::onAfterSave();
-
-        if (self::sessionUser()) {
+        if (self::sessionUser() && BConfig::i()->get('web/base_store') != '/admin') {
             BSession::i()->data('customer_user', serialize($this));
             static::$_sessionUser = $this;
         }
