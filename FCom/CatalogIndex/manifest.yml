@@ -7,6 +7,7 @@ modules:
         auto_use: [ views, layout ]
         observe:
             - [ FCom_Catalog_Model_Product::onAfterSave, FCom_CatalogIndex_Main::onProductAfterSave ]
+            - [ FCom_Catalog_Model_Category::onAfterSave:products, FCom_CatalogIndex_Main::onCategoryAfterSave ]
             - [ FCom_CustomField_Model_Field::onAfterSave, FCom_CatalogIndex_Main::onCustomFieldAfterSave ]
         areas:
             FCom_Admin:

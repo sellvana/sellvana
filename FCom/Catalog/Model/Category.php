@@ -122,18 +122,22 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
     public function onAfterSave()
     {
         parent::onAfterSave();
-        $add_ids = explode(',', $this->get('product_ids_add'));
-        $remove_ids = explode(',', $this->get('product_ids_remove'));
+        $addIds = explode(',', $this->get('product_ids_add'));
+        $removeIds = explode(',', $this->get('product_ids_remove'));
         $hlp = FCom_Catalog_Model_CategoryProduct::i();
 
-        if (sizeof($add_ids)>0 && $add_ids[0] != '') {
-            foreach ($add_ids as $pId) {
-                $hlp->create(array('category_id' => $this->id(), 'product_id' => $pId))->save();
+        if (sizeof($addIds)>0 && $addIds[0] != '') {
+            $exists = $hlp->orm('cp')->where('category_id', $this->id())->where_in('product_id', $addIds)->find_many_assoc('product_id');
+            foreach ($addIds as $pId) {
+                if (empty($exists[$pId])) {
+                    $hlp->create(array('category_id' => $this->id(), 'product_id' => $pId))->save();
+                }
             }
         }
-        if (sizeof($remove_ids)>0 && $remove_ids[0] != '') {
-            $hlp->delete_many(array('category_id' => $this->id(), 'product_id' => $remove_ids));
+        if (sizeof($removeIds)>0 && $removeIds[0] != '') {
+            $hlp->delete_many(array('category_id' => $this->id(), 'product_id' => $removeIds));
         }
+        BEvents::i()->fire(__METHOD__.':products', array('model' => $this, 'add_ids' => $addIds, 'remove_ids' => $removeIds));
     }
 
     public function imagePath()
