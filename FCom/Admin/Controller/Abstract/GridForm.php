@@ -203,6 +203,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $class = $this->_modelClass;
             $id = $r->param('id', true);
             $model = $id ? $class::i()->load($id) : $class::i()->create();
+            if (!$model) {
+                throw new BException("This item does not exist");
+            }
             $data = $r->post('model');
             $args = array('id'=>$id, 'do'=>$r->post('do'), 'data'=>&$data, 'model'=>&$model);
             $this->formPostBefore($args);
@@ -226,6 +229,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             }
             $this->formPostAfter($args);
         } catch (Exception $e) {
+            //BDebug::exceptionHandler($e);
             $this->formPostError($args);
             $this->message($e->getMessage(), 'error');
             $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
