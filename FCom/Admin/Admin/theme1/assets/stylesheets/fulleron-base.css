@@ -3623,3 +3623,31 @@ body.error .error-container-footer a {
 .f-admin-page-header:after { 
   clear:both; 
   }
+.date-range-plugin .dropdown-menu .btn.update {
+    padding:8px 10px;
+}
+.date-range-plugin .form-control {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.date-range-plugin .dropdown-menu .dropdown-toggle {
+    box-shadow: none;
+    border: 1px solid #ddd;
+    border-right: none;
+    border-bottom-color: #ccc;
+    padding: 7px 9px;
+    background: #f8f8f8;
+    background: -moz-linear-gradient(top, #f8f8f8 0%, #f2f2f2 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f8f8f8), color-stop(100%,#f2f2f2));
+    background: -webkit-linear-gradient(top, #f8f8f8 0%,#f2f2f2 100%);
+    background: -o-linear-gradient(top, #f8f8f8 0%,#f2f2f2 100%);
+    background: -ms-linear-gradient(top, #f8f8f8 0%,#f2f2f2 100%);
+    background: linear-gradient(to bottom, #f8f8f8 0%,#f2f2f2 100%);
+}
+.date-range-plugin .filter-box {
+    right: 0px;
+    left: auto;
+}
+.f-admin-page-header .date-range-plugin.open .btn-default  {
+    border: 1px solid rgba(0,0,0,.110);
+}
