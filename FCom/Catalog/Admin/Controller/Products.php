@@ -512,14 +512,34 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
             if (!empty($data['grid'][$typeName]['rows'])) {
                 $rows = json_decode($data['grid'][$typeName]['rows'], true);
+
                 foreach($rows as $row) {
                     if (isset($row['_new'])) {
+
+                        $label    = '';
+                        $position = null;
+                        if (
+                            isset($data['product_images']) 
+                            && isset($row['id'])
+                            && isset($data['product_images'][$row['id']])
+                        ) {
+                            if (isset($data['product_images'][$row['id']]['label'])) {
+                                $label = $data['product_images'][$row['id']]['label'];
+                            }
+                            if (
+                                isset($data['product_images'][$row['id']]['position'])
+                                && is_numeric($data['product_images'][$row['id']]['position'])
+                            ) {
+                                $position = (int) $data['product_images'][$row['id']]['position'];
+                            }
+                        }
+
                         $mediaModel = $hlp->create(array(
-                            'product_id'=>$model->id,
-                            'media_type'=>$type,
-                            'file_id'=>$row['file_id'],
-                            'label'=>isset($row['label']) ? $row['label'] : '',
-                            'position'=>isset($row['position']) ? $row['position'] : '',
+                            'product_id' => $model->id,
+                            'media_type' => $type,
+                            'file_id'    => $row['file_id'],
+                            'label'      => $label,
+                            'position'   => $position,
                             //TODO remote_url and file_path can be fetched based on file_id. Beside, file_name can be changed in media libary.
                             //'remote_url' =>BApp::href('/media/grid/download?folder=media/product/attachment&file_='.$row['file_id']),
 
