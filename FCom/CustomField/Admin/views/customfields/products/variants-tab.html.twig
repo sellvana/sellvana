@@ -1,13 +1,16 @@
 {% set ctrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
 {% set fieldConfig = ctrl.variantFieldGridConfig(model) %}
 {% set variantConfig = ctrl.variantGridConfig(model) %}
-<div class="well">
-  <select id="sel_var_field" class="form-control" style="width:150px;">
-    {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').getDropdowns()) | raw }}
-  </select>
-  <button class="btn btn-primary btn-sm" id="btn_add_var_field" type="button">Add Field</button>
-    <ol id="field" class="dd-list columns dd-list-axis-x">
-    </ol>
+<div class="well clearfix">
+    <div class="pull-left" style="width: 245px">
+        <select id="sel_var_field" class="form-control" style="width:150px;">
+            {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').getDropdowns()) | raw }}
+        </select>
+        <button class="btn btn-primary btn-sm" id="btn_add_var_field" type="button">Add Field</button>
+    </div>
+    <div class="col-sm-8" style="position: relative">
+        <ol id="field" class="dd-list columns dd-list-axis-x"></ol>
+    </div>
 </div>
 <div class="hidden" id="grid-field-hidden">
     {{ THIS.view('core/backbonegrid').set('grid', fieldConfig) | raw }}
@@ -63,7 +66,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
         });
         $('#field').sortable({
             scroll: false,
-            axis:'x',
+//            axis:'x',
             update: function(event, ui) {
                 renderGrid();
             }
@@ -77,7 +80,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
 
         var variant_fields = [];
         var tmp_fields = [];
-        $('#field').find('button').each(function () {
+        $('#field').find('i.icon-remove').each(function () {
             variant_fields.push({id: $(this).attr('data-id'), name: $(this).attr('data-name')});
             tmp_fields.push($(this).attr('data-name'));
         });
