@@ -49,9 +49,10 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         #$gridHtmlUrl = BApp::href($this->_gridHref.'/grid_html');
         $gridHtmlUrl = BApp::href($this->_gridHref);
         $formUrl = BApp::href($this->_formHref);
+        $modelClass = $this->_modelClass;
         $config = array(
             'id' => static::$_origClass,
-            'orm' => $this->_modelClass,
+            'orm' => $modelClass::i()->orm($this->_mainTableAlias),
             'data_url' => $gridDataUrl,
             'edit_url' => $gridDataUrl,
             'grid_url' => $gridHtmlUrl,
