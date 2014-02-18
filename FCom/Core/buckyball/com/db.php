@@ -1787,7 +1787,7 @@ class BModel extends Model
             static::$_readConnectionName ? static::$_readConnectionName : static::$_connectionName,
             static::$_writeConnectionName ? static::$_writeConnectionName : static::$_connectionName
         );
-        $orm->table_alias('_main');
+        //$orm->table_alias('_main');
         return $orm;
     }
 
@@ -1797,13 +1797,13 @@ class BModel extends Model
     * @param string $alias table alias
     * @return BORM
     */
-    public static function orm($alias=null)
+    public static function orm($alias='_main')
     {
         $orm = static::factory();
+        static::_findOrm($orm);
         if ($alias) {
             $orm->table_alias($alias);
         }
-        static::_findOrm($orm);
         return $orm;
     }
 
@@ -1822,7 +1822,7 @@ class BModel extends Model
     *
     * @param bool $new if true returns a new instance, otherwise singleton
     * @param array $args
-    * @return BClass
+    * @return BModel
     */
     public static function i($new=false, array $args=array())
     {
@@ -2440,7 +2440,7 @@ class BModel extends Model
         $model = $this->loadInstanceCache($cacheKey);
         if (is_null($model)) {
             if (is_array($idValue)) {
-                $model = $modelClass::i()->factory()->where_complex($idValue)->find_one();
+                $model = $modelClass::i()->orm()->where_complex($idValue)->find_one();
                 if ($model) $model->afterLoad();
             } else {
                 $model = $modelClass::i()->load($idValue);
