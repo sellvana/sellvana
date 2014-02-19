@@ -6,7 +6,12 @@
     }
 </script>
 <script>
+var rows = null;
 
+function changeStatus(e) {
+    $('.grid-mass-edit').click();
+    rows = {id: $(e).parents('tr').attr('id')};
+}
 function afterModuleGridRowRendered(el, row)
 {
     if(row.migration_available) {
@@ -64,16 +69,38 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
             return;
         }
         console.log(ev.rows);
-        for (var i in ev.rows) {
-            var data = {
-                module_name: ev.rows[i].name,
-                run_level_core: ev.rows[i].run_level_core/*,
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')*/
-            };
-            $.post("{{ THIS.get('form_url') }}", data, function(response, status, xhr) {
-                //$.bootstrapGrowl("Run level has been saved", { type:'success', align:'center', width:'auto' });
-            });
+        var tmpRows =  [];
+        var data = [];
+        var tmpSelectedRows = ev.rows;
+        if (rows) {
+            if (ev.selectedRows.length > 0) {
+                ev.selectedRows.each(function (data) {
+                   if (data.id != rows.id) {
+                       ev.selectedRows.remove(data.attributes, {silent: true});
+                   }
+                });
+            } else {
+                var tmp = ev.rowsCollection.findWhere({id: rows.id});
+                ev.selectedRows.add(tmp.attributes);
+            }
+            tmpRows.push({name: ev.selectedRows.models[0].get('name'), run_level_core: ev.selectedRows.models[0].get('run_level_core')});
+        } else {
+            tmpRows = ev.rows;
         }
+
+        for (var i in tmpRows) {
+            data.push({module_name: tmpRows[i].name, run_level_core: tmpRows[i].run_level_core});
+        };
+        console.log(data);
+        $.post("{{ THIS.get('form_url') }}", {data: data}, function(response, status, xhr) {
+            rows = null;
+            ev.selectedRows.reset();
+            tmpSelectedRows.forEach(function (obj) {
+                    var tmp = ev.rowsCollection.findWhere({id: obj.id});
+                    ev.selectedRows.add(tmp);
+            })
+            //$.bootstrapGrowl("Run level has been saved", { type:'success', align:'center', width:'auto' });
+        });
     }
 
     var rowModelEx = new RowModelEx();

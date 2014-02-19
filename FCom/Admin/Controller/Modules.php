@@ -109,6 +109,10 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                         'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
                         'icon' => 'icon-check-empty', 'type' => 'link', 'title' => $this->_('On Demand')
                     ),
+                    'custom' => array(
+                        'icon' => 'glyphicon glyphicon-repeat',
+                        'event' => 'onclick="changeStatus(this)"'
+                    ),
                 )
             ),
         );
@@ -146,9 +150,13 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     {
         if (BRequest::i()->xhr()) {
             $r = BRequest::i()->post();
-            BConfig::i()->set('module_run_levels/FCom_Core/'.$r['module_name'], $r['run_level_core'], false, true);
-            FCom_Core_Main::i()->writeConfigFiles('core');
-            BResponse::i()->json(array('success'=>true));
+            if (isset($r['data'])) {
+                foreach ($r['data'] as $arr => $key) {
+                    BConfig::i()->set('module_run_levels/FCom_Core/'.$key['module_name'], $key['run_level_core'], false, true);
+                    FCom_Core_Main::i()->writeConfigFiles('core');
+                }
+                BResponse::i()->json(array('success'=>true));
+            }
         }
         try {
             $areas = array('FCom_Core', 'FCom_Admin', 'FCom_Frontend');
