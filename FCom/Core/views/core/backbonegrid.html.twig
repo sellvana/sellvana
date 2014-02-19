@@ -164,15 +164,17 @@
 <script type="template" id="{{ config.id }}-row-template"> {
   <%
     function printCustomButton (obj, id) {
+        var event = (typeof(obj.event) !== 'undefined') ? obj.event: '';
         if (obj.type === 'link') {
-            print('<a class="btn btn-link btn-custom" href="'+obj.href+id+'" title="'+(obj.title ? obj.title : '')+'">');
+
+            print('<a '+ event +' class="btn btn-link btn-custom" href="'+obj.href+id+'" title="'+(obj.title ? obj.title : '')+'">');
             if (typeof(obj.icon) !== 'undefined') {
                 print('<i class="' + obj.icon + '"></i>');
             }
             print(obj.caption);
             print('</a>');
         } else if (typeof(obj.type) === 'undefined' || obj.type === 'button') {
-            print('<button class="btn btn-link btn-custom" type="button" title="'+(obj.title ? obj.title : '')+'">');
+            print('<button '+ event +' class="btn btn-link btn-custom" type="button" title="'+(obj.title ? obj.title : '')+'">');
             if (typeof(obj.icon) !== 'undefined') {
                 print('<i class="' + obj.icon + '"></i>');
             }
