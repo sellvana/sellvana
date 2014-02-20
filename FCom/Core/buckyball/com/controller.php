@@ -372,6 +372,10 @@ class BRequest extends BClass
         $basename = basename(static::scriptName());
         $path = preg_replace('#^/.*?'.preg_quote($basename).'#', '', $path);
 
+        if (!$path) {
+            $path = '/';
+        }
+
         return $path;
     }
 
@@ -396,7 +400,7 @@ class BRequest extends BClass
         return is_null($key) ? $_GET : (isset($_GET[$key]) ? $_GET[$key] : null);
     }
 
-    public static function headers($key=null)
+    public static function server($key=null)
     {
         $key = strtoupper($key);
         return is_null($key) ? $_SERVER : (isset($_SERVER[$key]) ? $_SERVER[$key] : null);
