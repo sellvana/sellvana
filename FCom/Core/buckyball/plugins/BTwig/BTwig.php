@@ -78,6 +78,7 @@ class BTwig extends BClass
             'UTIL' => 'BUtil',
             'DEBUG' => 'BDebug',
             'MODULES' => 'BModuleRegistry',
+            'LOCALE' => 'BLocale'
         ) as $global => $class) {
             $instance = $class::i();
             static::$_fileTwig->addGlobal($global, $instance);
