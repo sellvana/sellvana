@@ -3627,13 +3627,12 @@ body.error .error-container-footer a {
     padding:8px 10px;
 }
 .date-range-plugin .form-control {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+    border-radius: 0px;
 }
 .date-range-plugin .dropdown-menu .dropdown-toggle {
     box-shadow: none;
     border: 1px solid #ddd;
-    border-right: none;
+    border-right: 0px !important;
     border-bottom-color: #ccc;
     padding: 7px 9px;
     background: #f8f8f8;
