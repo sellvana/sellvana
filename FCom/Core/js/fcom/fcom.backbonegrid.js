@@ -1179,10 +1179,19 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     if (typeof(this.model.get('filterLabel')) !== 'undefined') {
                         html = this.model.get('filterLabel') + ' ';
                         html += ('"' + this.model.get('val') + '"');
+                        html = html.charAt(0).toUpperCase() + html.slice(1);
                     } else {
                         html = this.model.get('val');
+                        if (typeof(this.model.get('options')) !== 'undefined') {
+                            var val = html.split(',');
+                            var str = '';
+                            for (var i in val) {
+                                var tmp = this.model.get('options');
+                                str += tmp[val[i]] + ',';
+                            }
+                            html = str.substring(0, str.length - 1);
+                        }
                     }
-
                     this.$el.find('span.f-grid-filter-value').html($('<div/>').text(html).html());
                 }
             });
@@ -1206,15 +1215,15 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 filter: function () {
                     var val = this.$el.find('input:first').val();
-                    this.model.set('val', val);
                     this._filter(val);
                 },
                 filterOperatorSelected: function (ev) {
                     //this.filterValChanged();
                     var operator = $(ev.target);
+                    var text = operator.html();
                     this.model.set('op', operator.attr('data-id'));
-                    this.model.set('filterLabel', operator.html());
-                    this.$el.find('button.filter-text-sub').html(operator.html() + "<span class='caret'></span>");
+                    this.model.set('filterLabel', text);
+                    this.$el.find('button.filter-text-sub').html(text.charAt(0).toUpperCase() + text.slice(1) + "<span class='caret'></span>");
                     this.$el.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
 
                     return false;
@@ -1392,7 +1401,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         var val = $(this).val();
                         var temp = self.$el.find('div.select2-container span.select2-chosen');
                         if (val !== '') {
-                            temp.html('<span class="f-grid-filter-field">' + fieldLabel + '</span>: <span class="f-grid-filter-value">' + val + '</span>');
+                            temp.html('<span class="f-grid-filter-field">' + fieldLabel + '</span>: <span class="f-grid-filter-value">' + options[val] + '</span>');
                         } else {
                             temp.html('<span class="f-grid-filter-field">' + fieldLabel + '</span>: <span class="f-grid-filter-value">All</span>');
                         }
@@ -1404,7 +1413,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                     var temp = this.$el.find('div.select2-container span.select2-chosen');
                     if (this.model.get('val') !== '') {
-                        temp.html('<span class="f-grid-filter-field">' + fieldLabel + '</span>: <span class="f-grid-filter-value">' + this.model.get('val') + '</span>');
+                        temp.html('<span class="f-grid-filter-field">' + fieldLabel + '</span>: <span class="f-grid-filter-value">' + options[this.model.get('val')] + '</span>');
                     }
 
                     return this;

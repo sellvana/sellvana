@@ -50,7 +50,7 @@ function($, Backbone) {
         headers: {
             'X-CSRF-Token': csrfToken
         }
-    })
+    });
 
     FCom._ = function (str) {
         return FCom.i18n[str] || str;

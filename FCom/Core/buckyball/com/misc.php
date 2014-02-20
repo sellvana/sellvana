@@ -2913,6 +2913,27 @@ class BLocale extends BClass
         return BUtil::sprintfn($tr, $params);
     }
 
+    public function translations($sources)
+    {
+        $results = array();
+        if(is_array($sources)){
+            foreach ( $sources as $string ) {
+                if(is_string($string)){
+                    $results[$string] = static::_($string);
+                } else if(is_array($string) && !empty($string)) {
+                    $str = (string) $string[0];
+                    $params = isset($string[1])? (array) $string[1]: array();
+                    $module = isset($string[2])? (string) $string[2]: null;
+                    $results[$str] = static::_($str, $params, $module);
+                }
+            }
+        } else {
+            $results[(string) $sources] = static::_((string) $sources);
+        }
+
+        return BUtil::toJson($results);
+    }
+
     /**
      * @param string $file filename
      * @param string $source file content
