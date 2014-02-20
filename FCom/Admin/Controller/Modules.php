@@ -150,12 +150,26 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     {
         if (BRequest::i()->xhr()) {
             $r = BRequest::i()->post();
+            if (isset($r['async'])) {
+                $allModules = BModuleRegistry::i()->getAllModules();
+                $data = array();
+                foreach ($r['data'] as $arr => $key) {
+                    $module = $allModules[$key['module_name']];
+                    $tmp = array(
+                        'module_name' => $key['module_name'],
+                        'run_status' => $module->run_status,
+                        'run_level' => $module->run_level,
+                    );
+                    array_push($data, $tmp);
+                }
+                BResponse::i()->json(array('data' => $data));
+            }
             if (isset($r['data'])) {
                 foreach ($r['data'] as $arr => $key) {
-                    BConfig::i()->set('module_run_levels/FCom_Core/'.$key['module_name'], $key['run_level_core'], false, true);
-                    FCom_Core_Main::i()->writeConfigFiles('core');
+                   BConfig::i()->set('module_run_levels/FCom_Core/'.$key['module_name'], $key['run_level_core'], false, true);
+                   FCom_Core_Main::i()->writeConfigFiles('core');
                 }
-                BResponse::i()->json(array('success'=>true));
+                BResponse::i()->json(array('success' => true));
             }
         }
         try {
