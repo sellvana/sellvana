@@ -1727,7 +1727,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 html += '<a class="js-change-url" href="#">' + mp + ' &raquo;</a>';
                 html += '</li>';
 
-
                 $('.' + BackboneGrid.id + '.pagination.page').html(html);
 
                 //update page size options
@@ -1738,7 +1737,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     pageSizeOptsRender.push(value);
                     if (BackboneGrid.currentState.c <= value) {
                         if (BackboneGrid.currentState.ps > value) { //fix current page size
-                            BackboneGrid.currentState.ps = _.last[pageSizeOptsRender];
+                            BackboneGrid.currentState.ps = _.last(pageSizeOptsRender);
                         }
                         break;
                     }
