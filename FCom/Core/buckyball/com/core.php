@@ -1604,13 +1604,6 @@ if (!class_exists($r[0])) {
 }
 
 /**
- * Alias for backwards compatibility
- *
- * @deprecated by BEvents
- */
-class BPubSub extends BEvents {}
-
-/**
 * Facility to handle session state
 */
 class BSession extends BClass
