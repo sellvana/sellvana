@@ -33,6 +33,6 @@ define(['jquery', 'jquery.validate'], function($) {
                 progressBar.parent().addClass('progress-warning');
             }
         })
-    }
+    };
     $('.has-progress-bar').strengthLevelPassword();
-})
+});
