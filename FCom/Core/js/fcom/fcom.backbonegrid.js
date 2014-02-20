@@ -1215,8 +1215,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 filter: function () {
                     var val = this.$el.find('input:first').val();
-                    console.log(val);
-                    this.model.set('val', val);
                     this._filter(val);
                 },
                 filterOperatorSelected: function (ev) {
@@ -1403,7 +1401,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         var val = $(this).val();
                         var temp = self.$el.find('div.select2-container span.select2-chosen');
                         if (val !== '') {
-                            temp.html('<span class="f-grid-filter-field">' + fieldLabel + '</span>: <span class="f-grid-filter-value">' + val + '</span>');
+                            temp.html('<span class="f-grid-filter-field">' + fieldLabel + '</span>: <span class="f-grid-filter-value">' + options[val] + '</span>');
                         } else {
                             temp.html('<span class="f-grid-filter-field">' + fieldLabel + '</span>: <span class="f-grid-filter-value">All</span>');
                         }
@@ -1415,7 +1413,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                     var temp = this.$el.find('div.select2-container span.select2-chosen');
                     if (this.model.get('val') !== '') {
-                        temp.html('<span class="f-grid-filter-field">' + fieldLabel + '</span>: <span class="f-grid-filter-value">' + this.model.get('val') + '</span>');
+                        temp.html('<span class="f-grid-filter-field">' + fieldLabel + '</span>: <span class="f-grid-filter-value">' + options[this.model.get('val')] + '</span>');
                     }
 
                     return this;
