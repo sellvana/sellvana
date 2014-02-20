@@ -1517,11 +1517,14 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 rowsCollection.each(function (rows) {
                                     if (rows.get('id') == model.get('id')) {
                                         rows.set(key, BackboneGrid.modalElementVals[key]);
-                                        rows.trigger('render');
+                                        // rows.trigger('render'); //remove trigger render of each row
                                     }
                                 })
                             }
                         });
+                        //trigger render after update each row in rowsCollection
+                        console.log('rowsCollection.trigger.render');
+                        rowsCollection.trigger('render');
                     }
 
                     if (modalForm.modalType === 'addable') {
