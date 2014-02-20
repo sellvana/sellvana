@@ -52,7 +52,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $modelClass = $this->_modelClass;
         $config = array(
             'id' => static::$_origClass,
-            'orm' => $modelClass::i()->orm($this->_mainTableAlias),
+            'orm' => $modelClass::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*'),
+            #'orm' => $modelClass,
             'data_url' => $gridDataUrl,
             'edit_url' => $gridDataUrl,
             'grid_url' => $gridHtmlUrl,
@@ -64,9 +65,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     public function simpleGridConfig()
     {
         $config = array(
-                'columns' => array(),
-                'data' => array(),
-            );
+            'columns' => array(),
+            'data' => array(),
+        );
 
         return $config;
 
