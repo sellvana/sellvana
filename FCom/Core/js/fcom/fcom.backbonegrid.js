@@ -1179,10 +1179,19 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     if (typeof(this.model.get('filterLabel')) !== 'undefined') {
                         html = this.model.get('filterLabel') + ' ';
                         html += ('"' + this.model.get('val') + '"');
+                        html = html.charAt(0).toUpperCase() + html.slice(1);
                     } else {
                         html = this.model.get('val');
+                        if (typeof(this.model.get('options')) !== 'undefined') {
+                            var val = html.split(',');
+                            var str = '';
+                            for (var i in val) {
+                                var tmp = this.model.get('options');
+                                str += tmp[val[i]] + ',';
+                            }
+                            html = str.substring(0, str.length - 1);
+                        }
                     }
-
                     this.$el.find('span.f-grid-filter-value').html($('<div/>').text(html).html());
                 }
             });
@@ -1206,15 +1215,17 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 filter: function () {
                     var val = this.$el.find('input:first').val();
+                    console.log(val);
                     this.model.set('val', val);
                     this._filter(val);
                 },
                 filterOperatorSelected: function (ev) {
                     //this.filterValChanged();
                     var operator = $(ev.target);
+                    var text = operator.html();
                     this.model.set('op', operator.attr('data-id'));
-                    this.model.set('filterLabel', operator.html());
-                    this.$el.find('button.filter-text-sub').html(operator.html() + "<span class='caret'></span>");
+                    this.model.set('filterLabel', text);
+                    this.$el.find('button.filter-text-sub').html(text.charAt(0).toUpperCase() + text.slice(1) + "<span class='caret'></span>");
                     this.$el.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
 
                     return false;
