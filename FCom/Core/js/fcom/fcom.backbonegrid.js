@@ -1491,7 +1491,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 for (var key in BackboneGrid.modalElementVals)
                                     rows[i][key] = BackboneGrid.modalElementVals[key];
                             }
-                            var evt = {grid: BackboneGrid.id, rows: rows, selectedRows: selectedRows, rowsCollection: rowsCollection};
+                            var evt = {grid: BackboneGrid.id, rows: rows, selectedRows: selectedRows, rowsCollection: rowsCollection, modalElementVals: BackboneGrid.modalElementVals};
                             g_vent.trigger('mass-edit', evt);
                         }
                         if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length > 0) {
