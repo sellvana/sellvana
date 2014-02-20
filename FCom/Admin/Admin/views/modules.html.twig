@@ -68,22 +68,16 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
         if (ev.grid !== 'FCom_Admin_Controller_Modules') {
             return;
         }
-        console.log(ev.rows);
         var tmpRows =  [];
         var data = [];
         var tmpSelectedRows = ev.rows;
         if (rows) {
-            if (ev.selectedRows.length > 0) {
-                ev.selectedRows.each(function (data) {
-                   if (data.id != rows.id) {
-                       ev.selectedRows.remove(data.attributes, {silent: true});
-                   }
-                });
-            } else {
-                var tmp = ev.rowsCollection.findWhere({id: rows.id});
-                ev.selectedRows.add(tmp.attributes);
+            ev.selectedRows.reset();
+            var tmp = ev.rowsCollection.findWhere({id: rows.id});
+            for (var key in ev.modalElementVals) {
+                tmp.set(key, ev.modalElementVals[key]);
             }
-            tmpRows.push({name: ev.selectedRows.models[0].get('name'), run_level_core: ev.selectedRows.models[0].get('run_level_core')});
+            tmpRows.push({name: tmp.get('name'), run_level_core: tmp.get('run_level_core')});
         } else {
             tmpRows = ev.rows;
         }
@@ -91,14 +85,12 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
         for (var i in tmpRows) {
             data.push({module_name: tmpRows[i].name, run_level_core: tmpRows[i].run_level_core});
         };
-        console.log(data);
         $.post("{{ THIS.get('form_url') }}", {data: data}, function(response, status, xhr) {
             rows = null;
             $.post("{{ THIS.get('form_url') }}", {async: true, data: data}, function(response, status, xhr) {
                 response.data.forEach(function (obj) {
                   var tem = ev.rowsCollection.findWhere({name: obj.module_name}).set('run_status', obj.run_status).set('run_level', obj.run_level);
                 })
-                ev.selectedRows.reset();
                 tmpSelectedRows.forEach(function (obj) {
                     var tmp = ev.rowsCollection.findWhere({id: obj.id});
                     ev.selectedRows.add(tmp);
