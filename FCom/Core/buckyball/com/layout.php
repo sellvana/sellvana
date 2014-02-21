@@ -828,7 +828,7 @@ class BLayout extends BClass
      */
     public function metaDirectiveCallback($d)
     {
-        call_user_func($d['name'], $d);
+        BUtil::call($d['name'], $d);
     }
 
     /**
