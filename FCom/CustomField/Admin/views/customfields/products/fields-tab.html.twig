@@ -132,7 +132,7 @@
       </select>
       <button class="btn btn-primary btn-sm" id="btn_add_set" type="button">{{ 'Add a Field Set'|_ }}</button>
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-6" id="field">
       <select id="sel_fields" class="select2 form-control" style="width:150px;" placeholder='{{ 'Choose field...'|_ }}'>
         {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').as_values('field_name')) | raw }}
       </select>
@@ -972,17 +972,20 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
     mainView.render();
     if (setCollection.length === 0) {
         $('#td_fields').css('display', 'none');
-        $('#btn_add_field').css('display', 'none');
+        $('#field').hide();
+//        $('#btn_add_field').css('display', 'none');
     }
     setCollection.on('add remove change', function() {
         $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
 
         if (setCollection.length === 0) {
             $('#td_fields').css('display', 'none');
-            $('#btn_add_field').css('display', 'none');
+            $('#field').hide();
+//            $('#btn_add_field').css('display', 'none');
         } else {
             $('#td_fields').css('display', 'block');
-            $('#btn_add_field').css('display', 'inline-block');
+            $('#field').show();
+//            $('#btn_add_field').css('display', 'inline-block');
         }
 
         $( ".prod-fieldset .box-content" ).sortable({
