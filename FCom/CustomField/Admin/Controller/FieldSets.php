@@ -328,6 +328,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
             if (empty($model)) {
                 $this->message('Invalid field set ID', 'error');
                 BResponse::i()->redirect('customfields/fieldsets');
+                return;
             }
         } else {
             $model = FCom_CustomField_Model_Set::i()->create();
