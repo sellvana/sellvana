@@ -1381,7 +1381,7 @@ class BResponse extends BClass
         BEvents::i()->fire(__METHOD__, array('last_method'=>$lastMethod));
         BSession::i()->close();
         BRouting::i()->stop();
-        exit;
+        //exit;
     }
 }
 
@@ -1769,6 +1769,11 @@ class BRouting extends BClass
         return $this;
     }
 
+    public function isStopped()
+    {
+        return $this->_stop;
+    }
+
     public function debug()
     {
         echo "<pre>"; print_r($this->_routes); echo "</pre>";
@@ -2129,7 +2134,7 @@ class BActionController extends BClass
 
         $this->tryDispatch($actionName, $args);
 
-        if (is_null($this->_forward)) {
+        if (is_null($this->_forward) && !BRouting::i()->isStopped()) {
             $this->afterDispatch($args);
         }
         return $this->_forward;
