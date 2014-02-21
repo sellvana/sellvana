@@ -547,7 +547,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                         ))->save();
                         if ($mediaModel->get('main_thumb')) {
                             $mediaLibModel = FCom_Core_Model_MediaLibrary::i()->load($mediaModel->get('file_id'));
-                            $model->set('thumb_url', $mediaLibModel->get('folder').'/'.$mediaLibModel->get('file_name'))->save();
+                            $thumbUrl = $mediaLibModel->get('folder').'/'.$mediaLibModel->get('file_name');
+                            $thumbUrl = preg_replace('#^media/#', '', $thumbUrl); //TODO: resolve the dir string ambiguity
+                            $model->set('thumb_url', $thumbUrl)->save();
                         }
                     }
                 }
@@ -588,7 +590,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                         $image['main_thumb'] = $main_thumb;
                         if ($main_thumb) {
                             $mediaLibModel = FCom_Core_Model_MediaLibrary::i()->load($mediaModel->get('file_id'));
-                            $model->set('thumb_url', $mediaLibModel->get('folder').'/'.$mediaLibModel->get('file_name'))->save();
+                            $thumbUrl = $mediaLibModel->get('folder').'/'.$mediaLibModel->get('file_name');
+                            $thumbUrl = preg_replace('#^media/#', '', $thumbUrl); //TODO: resolve the dir string ambiguity
+                            $model->set('thumb_url', $thumbUrl)->save();
                         }
                         $image['position'] = (int) $image['position'];
                         $mediaModel->set($image)->save();
