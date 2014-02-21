@@ -1,6 +1,11 @@
 #Header unset ETag
 #FileETag None
 
+<IfModule mod_security.c>
+SecFilterEngine Off
+SecFilterScanPOST Off
+</IfModule>
+
 <IfModule mod_expires.c>
     ExpiresActive On
     ExpiresDefault "access plus 1 months"
