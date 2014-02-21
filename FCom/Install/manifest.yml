@@ -1,0 +1,19 @@
+modules:
+    FCom_Install:
+        version: 0.1.0
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0 } }
+        description: "Initial installation wizard"
+
+        auto_use: [ views ]
+        routing:
+            - [ get, /, FCom_Install_Controller.index ]
+            - [ get, /*catchall, FCom_Install_Controller.index ]
+            - [ any, /install, FCom_Install_Controller.index ]
+            - [ any, /install/.action, FCom_Install_Controller ]
+
+        provides:
+            themes:
+                FCom_Install:
+                    layout: layout.yml
+                    views: views

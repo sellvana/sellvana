@@ -2,16 +2,7 @@
 
 class FCom_CustomField_Migrate extends BClass
 {
-    public function run()
-    {
-        BMigrate::install('0.1.0', array($this, 'install'));
-        BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
-        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
-        BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
-        BMigrate::upgrade('0.1.3', '0.1.4', array($this, 'upgrade_0_1_4'));
-    }
-
-    public function install()
+    public function install__0_1_0()
     {
         $tField = FCom_CustomField_Model_Field::table();
         BDb::run("
@@ -69,9 +60,23 @@ class FCom_CustomField_Migrate extends BClass
             CONSTRAINT `FK_{$tSetField}_set` FOREIGN KEY (`set_id`) REFERENCES {$tSet} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8;
         ");
+
+        $tProductField = FCom_CustomField_Model_ProductField::table();
+        $tProduct = FCom_Catalog_Model_Product::table();
+        BDb::run("
+            CREATE TABLE IF NOT EXISTS {$tProductField} (
+            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+            `product_id` int(10) unsigned NOT NULL,
+            `_fieldset_ids` text,
+            `_add_field_ids` text,
+            `_hide_field_ids` text,
+            PRIMARY KEY (`id`),
+            CONSTRAINT `FK_{$tProductField}_product` FOREIGN KEY (`product_id`) REFERENCES {$tProduct} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+        ");
     }
 
-    public function upgrade_0_1_1()
+    public function upgrade__0_1_0__0_1_1()
     {
         $tField = FCom_CustomField_Model_Field::table();
         $fieldName = 'frontend_show';
@@ -81,21 +86,59 @@ class FCom_CustomField_Migrate extends BClass
         BDb::run( " ALTER TABLE {$tField} ADD {$fieldName} tinyint(1) not null default 1; ");
     }
 
-    public function upgrade_0_1_2()
+    public function upgrade__0_1_1__0_1_2()
     {
         $tField = FCom_CustomField_Model_Field::table();
-        BDb::run( " ALTER TABLE {$tField} ADD `sort_order` int(11) NOT NULL DEFAULT '0'");
+        BDb::ddlTableDef($tField, array('COLUMNS'=>array('sort_order' => "int not null default '0'")));
     }
 
-    public function upgrade_0_1_3()
+    public function upgrade__0_1_2__0_1_3()
     {
         $tField = FCom_CustomField_Model_Field::table();
-        BDb::run( " ALTER TABLE {$tField} ADD `facet_select` enum('No', 'Exclusive', 'Inclusive') NOT NULL DEFAULT 'No'");
+        BDb::ddlTableDef($tField, array('COLUMNS'=>array('facet_select' => "enum('No', 'Exclusive', 'Inclusive') NOT NULL DEFAULT 'No'")));
     }
 
-    public function upgrade_0_1_4()
+    public function upgrade__0_1_3__0_1_4()
     {
         $tField = FCom_CustomField_Model_Field::table();
-        BDb::run( " ALTER TABLE {$tField} ADD `system` tinyint(1) NOT NULL DEFAULT '0'");
+        BDb::ddlTableDef($tField, array('COLUMNS'=>array('system' => "tinyint(1) NOT NULL DEFAULT '0'")));
+    }
+
+    public function upgrade__0_1_4__0_1_5()
+    {
+        $tProdField = FCom_CustomField_Model_ProductField::table();
+        BDb::ddlTableDef($tProdField, array('COLUMNS'=>array('_data_serialized' => "text null AFTER _hide_field_ids")));
+    }
+
+    public function upgrade__0_1_5__0_1_6()
+    {
+        $tProdVariant = FCom_CustomField_Model_ProductVariant::table();
+        BDb::ddlTableDef($tProdVariant, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'product_id' => 'int unsigned not null',
+                'field_values' => 'varchar(255)',
+                'variant_sku' => 'varchar(50)',
+                'variant_price' => 'decimal(12,2)',
+                'data_serialized' => 'text',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'UNQ_product' => 'UNIQUE (product_id, field_values)',
+                'IDX_sku' => '(variant_sku)',
+            ),
+        ));
+    }
+
+    public function upgrade__0_1_6__0_1_7()
+    {
+        $tProdField = FCom_CustomField_Model_Field::table();
+        BDb::ddlTableDef($tProdField, array('COLUMNS'=>array('validation' => "varchar(100) null")));
+    }
+
+    public function upgrade__0_1_7__0_1_8()
+    {
+        $tProdField = FCom_CustomField_Model_Field::table();
+        BDb::ddlTableDef($tProdField, array('COLUMNS'=>array('required' => "tinyint(1) NOT NULL DEFAULT '1'")));
     }
 }

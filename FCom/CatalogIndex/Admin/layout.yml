@@ -1,0 +1,24 @@
+base:
+    - view: admin/nav
+        do:
+            - [ addNav, catalog/index-fields, { label: Products Indexing, href: /catalogindex/fields } ]
+
+/catalogindex/fields:
+    - { include: base }
+    - { hook: main, views: admin/grid }
+    - { view: admin/nav, do: [[ setNav, catalog/index-fields ]] }
+
+/catalogindex/fields/form:
+    - { include: base }
+    - { include: form }
+    - { hook: main, views: admin/form }
+    - { view: admin/nav, do: [[ setNav, catalog/index-fields ]] }
+    - view: admin/form
+        set: { tab_view_prefix: catalogindex/fields/form/ }
+        do:
+            - [ addTab, main, { label: Index Field, pos: 10 } ]
+
+/settings:
+    - view: settings
+        do:
+            - [ addTab, FCom_CatalogIndex, { label: Catalog Index, group: catalog, async: true } ]

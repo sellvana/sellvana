@@ -1,0 +1,27 @@
+modules:
+    FCom_Cms:
+        version: 0.1.3
+        channel: beta
+        require: { module: { FCom_Core: 0.1.0, BTwig: 1.12.4 } }
+        translations: { de: de.php }
+        description: "CMS for custom pages and blocks"
+        auto_use: all
+        default_config:
+            modules/FCom_Cms/page_enable: true
+            modules/FCom_Cms/nav_enable: true
+        areas:
+            FCom_Admin:
+                routing:
+                    - [ get, /cms/nav, FCom_Cms_Admin_Controller_Nav.index ]
+                    - [ any, /cms/nav/.action, FCom_Cms_Admin_Controller_Nav ]
+
+                    - [ get, /cms/pages, FCom_Cms_Admin_Controller_Pages.index ]
+                    - [ any, /cms/pages/.action, FCom_Cms_Admin_Controller_Pages ]
+                    - [ any, /cms/pages/history/:id/grid_data, FCom_Cms_Admin_Controller_Pages.history_grid_data ]
+
+                    - [ get, /cms/blocks, FCom_Cms_Admin_Controller_Blocks.index ]
+                    - [ any, /cms/blocks/.action, FCom_Cms_Admin_Controller_Blocks ]
+                    - [ any, /cms/blocks/history/:id/grid_data, FCom_Cms_Admin_Controller_Blocks.history_grid_data ]
+
+                    - [ any, /cms/forms, FCom_Cms_Admin_Controller_Forms.index ]
+                    - [ any, /cms/forms/.action, FCom_Cms_Admin_Controller_Forms ]

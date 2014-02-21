@@ -1,0 +1,32 @@
+<!--{ title: Recover password }-->
+
+<div class='login-container'>
+  <h1 class="login-logo">Sellvana Admin</h1>
+  <div class='container'>
+    {{ THIS.view('core/messages') | raw }}
+    <h1 class='text-center title'>{{ 'Recover password'|_ }}</h1>
+    <form id="password-form" action='{{ APP.href('password/recover') }}' class="validate-form" method='post'>
+        <div class='form-group'>
+            <div class='controls with-icon-over-input'>
+                <input value="" placeholder="{{ 'E-mail or Username'|_ }}" class="required form-control" name="model[email]" type="text" />
+            </div>
+        </div>
+        <button type="submit" class='btn btn-primary btn-lg btn-block'>{{ 'Send me the instructions'|_ }}</button>
+    </form>
+    <div class='text-center'>
+        <hr class='hr-normal'>
+        <a href='{{ APP.href('login') }}'>
+            <i class='icon-chevron-left'></i>
+            {{ 'Back to Login'|_ }}
+        </a>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+require(['jquery', 'jquery.validate'], function($) {
+    $(function() {
+        $('#password-form').validate();
+    })
+})
+</script>

@@ -1,0 +1,19 @@
+base:
+  - view: admin/nav
+    do:
+      - [ addNav, catalog/stock, { label: Stock, href: /stock } ]
+
+/stock:
+  - { include: base }
+  #- { include: lib_backgrid }
+  - { hook: main, views: admin/grid }
+  - { view: admin/nav, do: [[ setNav, catalog/stock ]] }
+
+/stock/form:
+  - { include: base }
+  - { include: form }
+  #- { include: lib_backgrid }
+  #- { include: jstree }
+  #- { include: catalog_product_form_tabs }
+  - { hook: main, views: 'admin/form' }
+  - { view: admin/nav, do: [[ setNav, catalog/stock ]] }

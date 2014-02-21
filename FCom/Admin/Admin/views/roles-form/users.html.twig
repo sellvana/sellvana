@@ -1,0 +1,107 @@
+{% set m = THIS.get('model') %}
+{% set userCtrl = APP.instance('FCom_Admin_Controller_Users') %}
+<input type='hidden' name='model[user_ids_add]' id='user_ids_add'/>
+<input type='hidden' name='model[user_ids_remove]' id='user_ids_remove'/>
+
+<script>
+
+    /**Event Aggregator
+     This aggregator is for triggering silent_inject that causes main grid adding selected rows from modal grid.**/
+
+    var roleUserMng;
+    require(['jquery', 'underscore', 'fcom.backbonegrid'], function($) {
+        if(typeof(g_vent) === 'undefined') {
+            g_vent = _.extend({}, Backbone.Events);
+        }
+
+        function UserRoleMng() {
+            this.mainGridId = 'role_users_grid_{{ m.id }}';
+            this.modalGridId = 'role_all_users_grid_{{ m.id }}';
+
+            g_vent.bind('init', this._getOriginalIds);
+            g_vent.bind('add', this._addRows);
+            g_vent.bind('mass-delete', this._removeRows);
+
+            this.add_ids = [];
+            this.remove_ids = [];
+            this.original_ids = [];
+
+        }
+
+        UserRoleMng.prototype._setFormValues = function() {
+
+            this.add_ids = _.difference(this.add_ids,this.original_ids);
+            this.remove_ids = _.intersection(this.remove_ids, this.original_ids);
+            $("input[id='user_ids_add']").val(this.add_ids.join(','));
+            $("input[id='user_ids_remove']").val(this.remove_ids.join(','));
+
+            console.log(this.original_ids);
+            console.log(this.add_ids);
+            console.log(this.remove_ids);
+        }
+
+        UserRoleMng.prototype._getOriginalIds = function(ev) {
+
+            if (ev.grid === self.mainGridId) {
+                self.original_ids = ev.ids;
+            }
+        }
+
+        UserRoleMng.prototype._addRows = function(ev) {
+
+            if (ev.grid === self.mainGridId)
+                $('#btn_add_user').trigger('click');
+
+            if (ev.grid === self.modalGridId) {
+                g_vent.trigger('silent_inject', {grid: self.mainGridId, rows: ev.rows});
+                self.add_ids = _.union(_.pluck(ev.rows,'id'), self.add_ids);
+                self.remove_ids = _.difference(self.remove_ids, _.pluck(ev.rows,'id'));
+                self._setFormValues();
+                g_vent.trigger('clear_selection', {grid: self.modalGridId});
+                $('button.btn-close.role-user-modal-close').trigger('click');
+
+            }
+
+
+        }
+
+        UserRoleMng.prototype._removeRows = function(ev) {
+            if(ev.grid === self.mainGridId) {
+                self.remove_ids = _.union(_.pluck(ev.rows,'id'), self.remove_ids);
+                self.add_ids = _.difference(self.add_ids, _.pluck(ev.rows,'id'));
+                self._setFormValues();
+            }
+        }
+
+        UserRoleMng.prototype.reset = function() {
+            this.add_ids = [];
+            this.remove_ids = [];
+            $("input[id='user_ids_add']").val('');
+            $("input[id='user_ids_remove']").val('');
+        }
+        var self = new UserRoleMng();
+        roleUserMng = self;
+    });
+
+
+</script>
+
+{{ THIS.view('core/backbonegrid').set('grid', userCtrl.getRoleUsersConfig(m)) | raw }}
+
+<a role="button" href="#user-grid-add" data-toggle="modal" style='display:none;' id='btn_add_user'>{{ "Add"|_ }}</a>
+<div class='modal fade' id='user-grid-add' tabindex='-1'>
+    <div class='modal-dialog' style='width:900px;'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
+                <h4 class='modal-title' id='myModalLabel'>{{ "Add user"|_ }}</h4>
+            </div>
+            <div class='modal-body'>
+                {{ THIS.view('core/backbonegrid').set('grid', userCtrl.getAllUsersConfig(m)) | raw }}
+            </div>
+            <div class='modal-footer'>
+                <button class='btn btn-default btn-close role-user-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
+            </div>
+        </div>
+    </div>
+</div>

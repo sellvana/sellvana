@@ -1,12 +1,18 @@
 <?php
 
-require_once __DIR__.'/FCom/Core/Core.php';
+require_once __DIR__.'/FCom/Core/Main.php';
 
 BConfig::i()->set('cookie/session_disable', true);
 
 if (file_exists(__DIR__.'/cron.local.php')) {
     require_once __DIR__.'/cron.local.php';
 }
-FCom_Core::i()->run('FCom_Cron');
+
+if (PHP_SAPI === 'cli') {
+    FCom_Core_Main::i()->init('FCom_Cron');
+    FCom_Core_Cron::i()->run();
+} else {
+    FCom_Core_Main::i()->run('FCom_Cron');
+}
 
 

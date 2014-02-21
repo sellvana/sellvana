@@ -1,0 +1,5 @@
+cms_page:
+    - { include: base }
+
+cms_nav:
+    - { inlude: base }

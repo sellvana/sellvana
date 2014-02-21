@@ -1,0 +1,69 @@
+{% set c = THIS.get('model') %}
+
+<h2>{{ "FrontEnd Settings"|_}}</h2>
+
+<div class="accordion accordion-blue panel-group" id="settings-FCom_Frontend">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#">{{ "HTML"|_ }}</a>
+        </div>
+        <div class="panel-collapse accordion-body in" id="settings-FCom_Frontend-group0">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Theme"|_ }}</label>
+                    <div class="col-md-5">
+                        <select class="form-control" name="config[modules][FCom_Frontend][theme]">
+                            {{ UTIL.optionsHtml(LAYOUT.getThemes('FCom_Frontend', true), c.get('modules/FCom_Frontend/theme'))|raw }}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Additional JS Files"|_ }}</label>
+                    <div class="col-md-5">
+                        <textarea class="form-control" name="config[modules][FCom_Frontend][add_js_files]" rows="5">{{ c.get('modules/FCom_Frontend/add_js_files') }}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Additional CSS Files"|_ }}</label>
+                    <div class="col-md-5">
+                        <textarea class="form-control" name="config[modules][FCom_Frontend][add_css_files]" rows="5">{{ c.get('modules/FCom_Frontend/add_css_files') }}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Additional JS Code"|_ }}</label>
+                    <div class="col-md-5">
+                        <textarea class="form-control js-code-editor" name="config[modules][FCom_Frontend][add_js_code]" rows="5" data-mode="javascript">{{ c.get('modules/FCom_Frontend/add_js_code') }}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Additional CSS Style"|_ }}</label>
+                    <div class="col-md-5">
+                        <textarea class="form-control js-code-editor" name="config[modules][FCom_Frontend][add_css_style]" rows="5" data-mode="css"> {{ c.get('modules/FCom_Frontend/add_css_style') }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#">{{ "Area Settings"|_ }}</a>
+        </div>
+        <div class="panel-collapse accordion-body" id="settings-FCom_Frontend-group1">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "IP: Mode"|_ }}</label>
+                    <div class="col-md-5">
+                        <textarea class="form-control" name="config[mode_by_ip][FCom_Frontend]" rows="5">{{ c.get('mode_by_ip/FCom_Frontend') }}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Modules to run in RECOVERY mode"|_ }}</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="config[recovery_modules][FCom_Frontend]" value="{{ c.get('recovery_modules/FCom_Frontend') }}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

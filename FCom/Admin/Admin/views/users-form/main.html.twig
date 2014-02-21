@@ -1,0 +1,114 @@
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator', m) %}
+{% set hlp = APP.instance('FCom_Admin_Model_User') %}
+  <fieldset class="form-horizontal">
+  <div class="f-section">
+      <div class="form-group">
+          <label class="col-md-2 control-label" for="model-username">{{ 'User Name'|_ }}</label>
+          <div class="col-md-5">
+              <input type="text" id="model-username" name="model[username]" class="required form-control" value="{{ validator.fieldValue('username') }}" />
+          </div>
+      </div>
+      <div class="form-group">
+          <label class="col-md-2 control-label" for="model-superadmin">{{ 'Super Admin'|_ }}</label>
+          <div class="col-md-5">
+              <input type="hidden" name="model[is_superadmin]" value="0" />
+              <div class="make-switch switch has-switch" data-off-label="<i class='icon-remove'></i>" data-on-label="<i class='icon-ok'></i>" data-on="primary">
+                  <input type="checkbox" id="model-superadmin" name="model[is_superadmin]"
+                         value="1" {{ validator.fieldValue('is_superadmin') == 1 ? 'checked="checked"' : ''  }} />
+              </div>
+  
+          </div>
+      </div>
+      <div class="form-group">
+          <label class="col-md-2 control-label" for="model-role-id">{{ 'Role'|_ }}</label>
+          <div class="col-md-5">
+              <select id="model-role-id" name="model[role_id]" class="form-control required">
+                  <option></option>
+                  {{ UTIL.optionsHtml(APP.instance('FCom_Admin_Model_Role').options(), validator.fieldValue('role_id'))|raw }}
+              </select>
+          </div>
+      </div>
+      <div class="form-group">
+          <label class="col-md-2 control-label" for="model-status">{{ 'Status'|_ }}</label>
+          <div class="col-md-5">
+              <select id="model-status" name="model[status]" class="form-control">
+                  {{ UTIL.optionsHtml(hlp.fieldOptions('status'), validator.fieldValue('status'))|raw }}
+              </select>
+          </div>
+      </div>
+      <div class="form-group">
+          <label class="col-md-2 control-label" for="model-email">{{ 'Email'|_ }}</label>
+          <div class="col-md-5">
+              <input type="email" id="model-email" name="model[email]" class="required form-control" value="{{ validator.fieldValue('email') }}" />
+          </div>
+      </div>
+      <div class="form-group">
+          <label class="col-md-2 control-label" for="model-password">{{ 'Password'|_ }}</label>
+          <div class="col-md-5">
+              <input type="password" class="form-control has-progress-bar" id="model-password" name="model[password]" value="" />
+          </div>
+      </div>
+      <div class="form-group">
+          <label class="col-md-2 control-label" for="model-password_confirm">{{ 'Confirm Password'|_ }}</label>
+          <div class="col-md-5">
+              <input type="password" id="model-password_confirm" name="model[password_confirm]" class="form-control" equalto="#model-password" value="" />
+          </div>
+      </div>
+      <div class="form-group">
+          <label class="col-md-2 control-label" for="model-firstname">{{ 'First Name'|_ }}</label>
+          <div class="col-md-5">
+              <input type="text" id="model-firstname" name="model[firstname]" class="required form-control" value="{{ validator.fieldValue('firstname') }}" />
+          </div>
+      </div>
+      <div class="form-group">
+          <label class="col-md-2 control-label" for="model-lastname">{{ 'Last Name'|_ }}</label>
+          <div class="col-md-5">
+              <input type="text" id="model-lastname" name="model[lastname]" class="required form-control" value="{{ validator.fieldValue('lastname') }}" />
+          </div>
+      </div>
+      <div class="form-group">
+          <label class="col-md-2 control-label" for="model-api_username">{{ 'API Username'|_ }}</label>
+          <div class="col-md-5">
+              <input type="text" class="form-control" id="model-api_username" name="model[api_username]" value="{{ validator.fieldValue('api_username') }}" />
+          </div>
+      </div>
+      <div class="form-group">
+          <label class="col-md-2 control-label" for="model-api_password">{{ 'API Password'|_ }}</label>
+          <div class="col-md-5">
+              <input type="password" class="form-control" id="model-api_password" name="model[api_password]" />
+          </div>
+      </div>
+  </div>
+  </fieldset>
+
+<script>
+require(['jquery', 'jquery.validate', 'switch'], function($) {
+    $(function() {
+//        $('#users-form').validate();
+        function init () {
+            if ($('#model-superadmin').is(':checked')) {
+                $('#model-role-id').attr('disabled', 'disabled');
+            }
+        }
+
+        $('.make-switch').on('switch-change', function (e, data) {
+            var val = data.value;
+            if (val) {
+                $('#model-role-id').attr('disabled', 'disabled');
+            } else {
+                $('#model-role-id').removeAttr('disabled', 'disabled');
+            }
+        });
+        $('#model-password').parents('form').validate({
+            rules:{
+                'model[password]': {
+                    passwordSecurity: {{ CONFIG.get('modules/FCom_Admin/password_strength') ? 'true' : 'false' }}
+                }
+            }
+        });
+
+        init();
+    })
+})
+</script>

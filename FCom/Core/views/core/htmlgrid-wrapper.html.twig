@@ -1,0 +1,99 @@
+{% set gridView = THIS.view('core/htmlgrid') %}
+{% set grid = gridView.getGrid() %}
+{% set config = grid.config %}
+{% set defSel = config.selection ? config.selection|join('|') %}
+
+<div class="fcom-htmlgrid-wrapper">{{ gridView|raw }}</div>
+
+<input type="hidden" id="{{ config.id }}-selection" name="htmlgrid[{{ config.id }}][selection]" value="{{ defSel }}">
+
+<script type="template" id="{{ config.id }}-row-template">
+  <tr id="<%- id %>" class="<%- cssClass %>">
+  {% for col in config.columns %}
+
+    {% if not col.hidden %}
+        <td class="{{ col.class }}" style="{{ col.style }}">
+            {% if col.cell == 'select-row' %}
+                <input type="checkbox" name="[{{ config.id}}][checked][<%- id %>]">
+            {% elseif col.href %}
+                <a href='{{ col.href|raw }}'>
+                    <%- {{ col.name }} %>
+                </a>
+            {% else %}
+                <%- {{ col.name }} %>
+          {% endif %}
+        </td>
+    {% endif %}
+  {% endfor %}
+  </tr>
+</script>
+
+<script type='template' id="{{ config.id }}-header-template">
+    <th id="th-sort-<%- id %>" data-id="<%- name %>" style="<%- style%>" class="<%- cssClass %> sort-<%- sortState %>">
+
+        <% if(type === '' || type === 'default') { %>
+
+            <% if (no_reorder!==true) { %>
+                    <div class="draghandle" style='width:100%;height:18px;background-color:#eeeeee;'></div>
+            <% } %>
+            <span class="f-th-title">
+              <a class="js-change-url" style="cursor: pointer;">
+                <%- label %>
+              </a>
+            </span>
+        <% } else if (type === 'multiselect') { %>
+            <select class="js-sel">
+                {{ UTIL.optionsHtml(gridView.multiselectToggleOptions(), gridView.multiselectCurrent()) | raw }}
+            </select>
+        <% } %>
+    </th>
+</script>
+
+<script type='template' id="{{ config.id }}-pagination-template">
+    <li class="first <% if (p <= 1) { %> 'disabled' <%} %>">
+        <a class="js-change-url" href="#">&laquo;</a>
+    </li>
+    <li class="prev <%- s.p <= 1 ? 'disabled' : '' %>">
+        <a class="js-change-url" href="#")>&lsaquo;</a>
+    </li>
+    <% for (var i= 1; i<=2;i++) { %>
+        <li <%- i == s.p ? 'class="active"' : '' %>>
+            <a class="js-change-url" data-page="" href="#"><%- i %></a>
+        </li>
+    <% } %>
+    <li class="next <%- s.p >= s.mp ? 'disabled' : '' %>">
+        <a class="js-change-url" href="#")>&rsaquo;</a>
+    </li>
+    <li class="last <%- s.p >= s.mp ? 'disabled' : '' %>">
+        <a class="js-change-url" href="#">&raquo;</a>
+    </li>
+</script>
+
+<script>
+require(['jquery', 'fcom.htmlgrid'], function($) {
+
+    $(function() {
+        var grid = new FCom.BackboneGrid({
+            id: "{{ config.id }}",
+            personalize_url: "{{ APP.href('my_account/personalize') }}",
+            data_url: "{{ config.data_url }}",
+            data: {{ gridView.getPageRowsData() | raw }},
+            headerTemplate: "{{ config.id }}-header-template",
+            rowTemplate: "{{ config.id }}-row-template",
+            pageTemplate: "{{ config.id }}-pagination-template",
+            columns: {{ gridView.getColumnsData() | raw }}
+        });
+    });
+
+});
+  /*  require(['jquery', 'fcom.htmlgrid'], function($) {
+        $(function() {
+            var grid = new FCom.HtmlGrid({
+                id: "{{ config.id }}",
+                grid_url: "{{ config.grid_url }}",
+                personalize_url: "{{ APP.href('my_account/personalize') }}",
+                selection: {{ config.selection ? UTIL.toJson(config.selection) : '{}' }}
+            })
+        })
+    })*/
+</script>

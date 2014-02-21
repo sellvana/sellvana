@@ -1,11 +1,7 @@
 <?php
 class FCom_Wishlist_Migrate extends BClass
 {
-    public function run()
-    {
-        BMigrate::install('0.1.0', array($this, 'install'));
-    }
-    public function install()
+    public function install__0_1_0()
     {
         $tWishlist = FCom_Wishlist_Model_Wishlist::table();
         BDb::run("
@@ -27,5 +23,14 @@ class FCom_Wishlist_Migrate extends BClass
             KEY `wishlist_id` (`wishlist_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");    
+    }
+
+    public function upgrade__0_1_0__0_1_1()
+    {
+        BDb::ddlTableDef(FCom_Wishlist_Model_Wishlist::table(), array(
+            'COLUMNS' => array(
+                'user_id' => 'RENAME customer_id int(10) unsigned not null',
+            ),
+        ));
     }
 }

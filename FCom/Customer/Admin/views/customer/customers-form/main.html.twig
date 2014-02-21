@@ -1,0 +1,283 @@
+<!--{ label: Customer Info }-->
+<!--{ pos: 10 }-->
+
+{% set m = THIS.get('model') %}
+{% if APP.m('FCom_CustomerGroups').run_status == 'LOADED' %}
+    {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptions() %}
+{% endif %}
+{% set validator = THIS.get('validator') %}
+{# APP.instance('FCom_Geo_Model_Country').options() | debug #}
+{# APP.instance('FCom_Geo_Model_Region').allOptions() | debug #}
+{#<script>
+
+
+    var regions={};
+    var countries= {};
+    require(['backbone', 'underscore', 'jquery', 'jquery.validate'], function(Backbone, _, $) {
+    var addresses = {{ UTIL.toJson(APP.instance('BDb').many_as_array(m.addresses))|raw }};
+    regions = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Region').allOptions())|raw }};
+    countries = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Country').options())|raw }};
+      _.templateSettings.variable = 'rc';
+      var Customer = {
+            Models: {},
+            Collections: {},
+            Views: {}
+      };
+
+      Customer.Models.Address = Backbone.Model.extend({
+        defaults: {
+                    edit_mode: false,
+                    country: ''
+                }
+      });
+
+      Customer.Collections.Addresses = Backbone.Collection.extend({
+        model: Customer.Models.Address
+      });
+
+      Customer.Views.AddrView = Backbone.View.extend({
+        className: 'col-sm-6',
+        template: _.template($('#address-template').html()),
+        events: {
+          'change input[type="checkbox"]': '_changeEditingMode',
+          'change select.country': '_changeCountry',
+          'change select.region': '_changeRegion',
+          'click a.icon-remove': '_removeSelf',
+          'change input.form-control': '_changeVal'
+        },
+        _changeVal: function(ev) {
+            var val = $(ev.target).val();
+            var name = $(ev.target).attr('data-name');
+
+            this.model.set(name, val);
+        },
+        _removeSelf: function(ev) {
+            this.undelegateEvents();
+            this.$el.removeData().unbind();
+            this.remove();
+            addrs.remove(this.model);
+
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            return false;
+
+
+        },
+        _changeEditingMode: function(ev) {
+          this.model.set('edit_mode', !this.model.get('edit_mode'));
+          this.render();
+
+        },
+        _changeCountry: function(ev) {
+            this.model.set('country', this.$el.find('select.country').val());
+            this.render();
+        },
+        _changeRegion: function(ev) {
+            this.model.set('region', this.$el.find('select.region').val())
+        },
+        render: function() {
+
+            this.$el.html(this.template(this.model.toJSON()));
+            this.$el.find('select.country').val(this.model.get('country'));
+            this.$el.find('select.region').val(this.model.get('region'));
+
+            return this;
+        }
+      });
+
+      Customer.Views.MainView = Backbone.View.extend({
+        el: 'div.col-customer-address div.row',
+        initialize: function() {
+            this.collection.on('add', this.addAddrView, this);
+        },
+        addAddrView: function(model) {
+          var addrView = new Customer.Views.AddrView({model:model});
+          this.$el.append(addrView.render().el);
+        },
+        render: function() {
+          this.$el.html('');
+          this.collection.each(this.addAddrView, this);
+        }
+      });
+      var newId = 0;
+      var addrs = new Customer.Collections.Addresses(addresses);
+      var mainView = new Customer.Views.MainView({collection: addrs});
+      mainView.render();
+      var originIds = addrs.pluck('id');
+      $('a.add-link').click(function(ev) {
+            var addr = new Customer.Models.Address({edit_mode:true, id: --newId });
+            addrs.add(addr);
+
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            return false;
+      });
+
+      $('form:last').submit(function(ev) {
+            $('input[name="address[data_json]"]').val(JSON.stringify(addrs.toJSON()));
+            $('input[name="address[del_json]"]').val(JSON.stringify(_.difference(originIds, addrs.pluck('id'))));
+            console.log($('input[name="address[data_json]"]').val());
+            console.log($('input[name="address[del_json]"]').val());
+
+      });
+    });
+</script>#}
+
+<div class="col-md-12">
+    <fieldset class="f-fieldset-group">
+        <h3 class="f-fieldset-group-title">{{ "Personal Information"|_ }}</h3>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="model-firstname">{{ 'First Name'|_ }}</label>
+            <div class="col-md-5">
+                <input id="model-firstname" class="form-control required" type="text" name="model[firstname]" value="{{ validator.fieldValue('firstname') }}" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="model-lastname">{{ 'Last Name'|_ }}</label>
+            <div class="col-md-5">
+                <input id="model-lastname" class="form-control required" type="text" name="model[lastname]" value="{{ validator.fieldValue('lastname') }}" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="model-email">{{ 'Email'|_ }}</label>
+            <div class="col-md-5">
+                <input id="model-email" class="form-control required" type="email" name="model[email]" value="{{ validator.fieldValue('email') }}" />
+            </div>
+        </div>
+        {% if customerGroups is defined %}
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="model-group">{{ 'Customer Group'|_ }}</label>
+                <div class="col-md-5">
+                    <select class="form-control" name="model[customer_group]" id="model-group">
+                        {{ UTIL.optionsHtml(customerGroups, validator.fieldValue('customer_group'))|raw }}
+                    </select>
+                </div>
+            </div>
+        {% endif %}
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="model-phone">{{ 'Daytime Phone'|_ }}</label>
+            <div class="col-md-5">
+                <input id="model-phone" class="form-control" type="text" name="model[phone]" value="{{ validator.fieldValue('phone') }}" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="model-phone_evening">{{ 'Evening Phone'|_ }}</label>
+            <div class="col-md-5">
+                <input id="model-phone_evening" class="form-control" type="text" name="model[phone_evening]" value="{{ validator.fieldValue('phone_evening') }}" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="model-status">{{ 'Status'|_ }}</label>
+            <div class="col-md-5">
+                <select class="form-control" name="model[status]" id="model-status">
+                    {{ UTIL.optionsHtml(m.fieldOptions('status'), validator.fieldValue('status'))|raw }}
+                </select>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="f-fieldset-group">
+        <h3 class="f-fieldset-group-title">{{ 'Password Reset'|_ }}</h3>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="model-password">{{ 'New Password'|_ }}</label>
+            <div class="col-md-5">
+                <input id="model-password" type="password" class="form-control has-progress-bar" name="model[password]" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="model-password_confirm">{{ 'Confirm Password'|_ }}</label>
+            <div class="col-md-5">
+                <input id="model-password_confirm" type="password" class="form-control" name="model[password_confirm]" />
+            </div>
+        </div>
+    </fieldset>
+
+{#    <div class="col-customer-address">
+        <fieldset class="f-fieldset-group">
+            <h3 class="f-fieldset-group-title">{{ 'Addresses'|_ }}</h3>
+            <div class="row">
+              <script id="address-template" type="template">
+                <div class="f-address-card-listing">
+                  <a class="icon-remove" href="#" ></a>
+                  <label><input type="checkbox" <%= rc.edit_mode ? 'checked' : '' %> /> {{ 'Edit'|_ }}</label>
+                  <div class="adr">
+                      <div class="form-group street-address">
+                          <input data-name="street1" type="text" class="form-control" value="<%= rc.street1 %>" placeholder="{{ 'Street 1'|_ }}" style="display:<%=rc.edit_mode ? 'block' : 'none' %>;" />
+                          <span style="display:<%=rc.edit_mode ? 'none' : 'block' %>;"><%= rc.street1 %></span>
+                      </div>
+                      <div class="form-group extended-address" style='display:<%= (rc.street2 || rc.edit_mode) ? 'block' : 'none'%>'>
+                          <input data-name="street2" type="text" class="form-control" value="<%= rc.street2 %>" placeholder="{{ 'Street 2'|_ }}" style="display:<%=rc.edit_mode ? 'block' : 'none' %>;" />
+                          <span style="display:<%=rc.edit_mode ? 'none' : 'block' %>;"><%= rc.street2 %></span>
+                      </div>
+                      <div class="form-group extended-address" style='display:<%= (rc.street3 || rc.edit_mode) ? 'block' : 'none'%>'>
+                          <input data-name="street3" type="text" class="form-control" value="<%= rc.street3 %>" placeholder="{{ 'Street 3'|_ }}" style="display:<%=rc.edit_mode ? 'block' : 'none' %>;" />
+                          <span style="display:<%=rc.edit_mode ? 'none' : 'block' %>;"><%= rc.street3 %></span>
+                      </div>
+
+                      <div class="form-group locality">
+                          <input type="text" data-name="city" class="form-control" style="display:<%= rc.edit_mode ? 'block' : 'none' %>;" value="<%=rc.city%>" placeholder="{{ 'City'|_ }}" />
+                          <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;"><%= rc.city %></span>
+                      </div>
+                      <div class="form-group region">
+                          <select class="form-control region"  style="display:<%= rc.edit_mode && regions[rc.country] ? 'block' : 'none' %>;">
+                              <option></option>
+                              <%
+                                if (typeof(regions[rc.country]) !== 'undefined')
+                                for(var key in regions[rc.country]) {
+                                    var val = regions[rc.country][key];
+                                    print('<option value="'+key+'">'+val+'</option>');
+                              } %>
+                              &#123;&#35; UTIL.optionsHtml(APP.instance('FCom_Geo_Model_Region').allOptions()['US']) | raw &#35;&#125;
+                          </select>
+                          <input data-name="region" type="text" class="form-control" style="display:<%= rc.edit_mode && !regions[rc.country] ? 'block' : 'none' %>;" value="<%=rc.region%>" placeholder="{{ 'Region/State'|_ }}"/>
+                          <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;"><%=rc.region %></span>
+                      </div>
+                      <div class="form-group postal-code">
+                          <input data-name="postcode" type="text" class="form-control" style="display:<%= rc.edit_mode ? 'block' : 'none' %>;" value="<%=rc.postcode%>" size="6" placeholder="{{ 'Zip/Postal Code'|_ }}" />
+                          <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;"><%=rc.postcode%></span>
+                      </div>
+
+                      <div class="form-group country-name">
+                          <select class="form-control country" style="display:<%= rc.edit_mode ? 'block' : 'none' %>;">
+                            <option></option>
+                            {{ UTIL.optionsHtml(APP.instance('FCom_Geo_Model_Country').options()) | raw }}
+                          </select>
+                          <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;" ><%= countries[rc.country] %></span>
+                      </div>
+                      <div class="form-group phone">
+                          <input data-name="phone" class="form-control" type="text" style="display:<%= rc.edit_mode ? 'block' : 'none' %>;" value="<%=rc.phone%>" placeholder="{{ 'Phone'|_ }}" />
+                          <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;"><%=rc.phone%></span>
+                      </div>
+                      <div class="form-group fax">
+                          <input data-name="fax" class="form-control" type="text" style="display:<%= rc.edit_mode ? 'block' : 'none' %>;" value="<%=rc.fax %>" placeholder="{{ 'Fax'|_ }}" />
+                          <span style="display:<%= rc.edit_mode ? 'none' : 'block' %>;"><%=rc.fax %></span>
+                      </div>
+                      <div class="form-group default-address">
+                        <label><input type="radio" name="address[default_billing]"/>Default Billing</label>
+                        <label><input type="radio" name="address[default_shipping]"/>Default Shipping</label>
+                      </div>
+                    </div>
+                  </div>
+              </script>
+            </div><br/>
+            <a class="add-link" href="#">{{ '+ Add Address'|_ }}</a>
+            <input type="hidden" name="address[data_json]" value="" />
+            <input type="hidden" name="address[del_json]" value="" />
+        </fieldset>
+    </div>#}
+</div>
+<script>
+    require(['jquery', 'jquery.validate'], function($) {
+        $(function() {
+            $('#model-password').parents('form').validate({
+                rules:{
+                    'model[password]': {
+                        passwordSecurity: {{ CONFIG.get('modules/FCom_Customer/password_strength') ? 'true' : 'false' }}
+                    }
+                }
+            });
+        })
+    })
+</script>

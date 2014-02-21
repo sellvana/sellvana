@@ -1,0 +1,484 @@
+#main-nav-bg {
+  width: $navWidth + 1;
+  position: absolute;
+  float: left;
+  border-right: 1px solid $navBorder;
+  background: $navBackground;
+  display: block;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+
+  @include md-minus {
+    width: $navClosedWidth + 1;
+  }
+
+  @include sm-minus {
+    width: 0;
+  }
+
+  @media print {
+    display: none;
+  }
+}
+
+#main-nav {
+  width: $navWidth;
+  position: absolute;
+  left: 0;
+  top: 40px;
+
+  &.main-nav-fixed {
+    top: 40px;
+    left: 0;
+    z-index: 900;
+    
+    &.affix {
+      position: fixed;
+      top: 0;
+    }
+
+    &.affix-top {
+      top: 40px !important;
+    }
+
+    &.affix-bottom {
+      position: fixed;
+    }
+  }
+
+  @include md-minus {
+    width: $navClosedWidth;
+  }
+
+  @include sm-minus {
+    width: 0;
+    overflow: hidden;
+  }
+
+  @media print {
+    display: none;
+  }
+}
+
+.main-nav-opened {
+  #main-nav-bg {
+    width: $navWidth + 1;
+  }
+
+  #main-nav {
+    width: $navWidth;
+    overflow: visible;
+  }
+
+  #main-nav {
+    .navigation {
+      .search {
+        @include sm-minus {
+          display: block;
+        }
+      }
+
+      > .nav {
+        > li {
+          i.angle-down, span { display: inline !important; }
+
+          @include md-minus {
+            ul.in {
+              display: block !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.main-nav-closed {
+  #main-nav-bg {
+    width: $navClosedWidth + 1;
+
+    @include sm-minus {
+      width: 0;
+    }
+  }
+
+  #main-nav {
+    @include md-plus {
+      width: $navClosedWidth;
+    }
+
+    @include sm-minus {
+      width: 0;
+      overflow: hidden;
+    }
+  }
+
+  #main-nav {
+    .navigation {
+      > .nav {
+        > li {
+          > .nav {
+            display: none !important;
+
+            &.in {
+              display: none;
+            }
+          }
+
+          @include md-plus {
+            &:hover {
+              > a {
+                > span {
+                  position: absolute;
+                  top: -1px;
+                  left: $navClosedWidth;
+                  // -1px because of dropdown border
+                  width: $navWidth;
+                  // same height as a in normal state, but +2px because of borders
+                  height: 43px;
+                  line-height: 40px;
+                  background-color: $navItemHoverFocusBackground;
+                  display: block;
+                  z-index: 1000;
+                  border: 1px solid $navBorder;
+                  border-left: none;
+                }
+
+                > .angle-down {
+                  position: absolute;
+                  left: $navWidth + 20px;
+                  top: 0;
+                  display: block;
+                  z-index: 1100;
+                }
+
+                @if $showNavCaret == true {
+                  &:after {
+                    display: none;
+                  }
+                }
+              }
+
+              > ul {
+                display: block !important;
+                position: absolute;
+                z-index: 1000;
+                height: auto;
+                overflow: visible;
+                top: 42px;
+                left: $navClosedWidth + 2;
+                width: $navWidth - 2px;
+                background-color: $navSecondBackground;
+                border-bottom: 1px solid $navItemBorderBottom;
+
+                &.in {
+                  border-bottom: 1px solid $navItemBorderBottom;
+                }
+
+                li {
+                  a {
+                    span {
+                      display: inline;
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          i.angle-down, span { display: none; }
+        }
+      }
+    }
+  }
+}
+
+#main-nav {
+
+  .navigation {
+    width: 100%;
+
+    .nav {
+      margin-bottom: 0;
+    }
+
+    // zero level
+    > .nav {
+      border-bottom: 1px solid $navItemBorderTop;
+      background: $navBackground;
+
+      > li {
+        position: relative;
+        display: block;
+        margin: 0;
+
+        @if $showNavCaret == true {
+          &:nth-child(1), &:nth-child(2) {
+            > a:after {
+              border-right-color: $pageHeaderBackground;
+            }
+          }
+        }
+
+        @include md-minus {
+          span, i.angle-down {
+            display: none !important;
+          }
+        }
+
+        > a {
+          background-color: $navItemBackround;
+          height: 42px;
+          display: block;
+          line-height: 45px;
+          padding: 0 10px;
+          border-bottom: 1px solid $navItemBorderBottom;
+          border-top: 1px solid $navItemBorderTop;
+          @include clearfix;
+          overflow: visible !important;
+
+          &.in {
+            // without collapsed class is open
+            [class^="icon-"], [class*=" icon-"] {
+              color: $navIconHoverFocus;
+            }
+
+            span {
+              color: $navTextHoverFocus;
+            }
+
+            &.collapsed {
+              [class^="icon-"], [class*=" icon-"] {
+                color: $navIcon;
+              }
+
+              span {
+                color: $navText;
+              }
+            }
+          }
+
+          @if $showNavCaret == true {
+            &:after {
+              content: "";
+              z-index: 1;
+              position: absolute;
+              top: 22px;
+              right: -7px;
+              margin-top: -6px;
+              border-right: 6px solid $contentBackground;
+              border-left: 0;
+              border-top: 6px solid transparent;
+              border-bottom: 6px solid transparent;
+              @include transition(right, .1s linear);
+            }
+          }
+
+          [class^="icon-"], [class*=" icon-"] {
+            color: $navIcon;
+            font-size: 20px;
+            margin-right: 10px;
+            display: inline-block;
+            text-align: center;
+            width: 25px;
+            @include transition(all 100ms ease);
+
+            &.angle-down {
+              width: auto !important;
+            }
+          }
+
+          .icon-angle-down {
+            float: right;
+            line-height: 40px;
+            margin-right: 0;
+            @include transition(all 100ms ease);
+          }
+
+          span {
+            color: $navText;
+            text-shadow: 1px 1px 1px darken($navBackground, 3%);
+            position: relative;
+            top: -2px;
+            @include transition(all 100ms ease);
+          }
+        }
+
+        &:hover, &:focus, &.active {
+          > a {
+            background-color: $navItemHoverFocusBackground;
+
+            [class^="icon-"], [class*=" icon-"] {
+              color: $navIconHoverFocus !important;
+            }
+
+            span {
+              color: $navTextHoverFocus !important;
+              padding-left: 2px !important;
+            }
+
+            @if $showNavCaret == true {
+              &:after {
+                right: -1px;
+              }
+            }
+          }
+        }
+
+        // first and descendant levels
+        .nav {
+          background: $navSecondBackground;
+          border-bottom: 1px solid $navItemBorderBottom;
+          display: none;
+
+          // visible on tablets and larger screens
+          @include md-plus {
+            &.in {
+              display: block;
+            }
+          }
+          // hidden on mobile
+          @include md-minus {
+            &.in {
+              display: none !important;
+            }
+          }
+
+          > li {
+            > a {
+              padding: 5px;
+              border-top: 1px solid $navSecondItemBorder;
+
+              .icon-angle-down {
+                float: right;
+                margin-top: 1px;
+                margin-right: 7px;
+              }
+
+              [class^="icon-"], [class*=" icon-"] {
+                display: inline-block;
+                text-align: center;
+                width: 25px;
+
+                &.angle-down {
+                  width: auto !important;
+                }
+              }
+
+              &:hover, &:focus {
+                background-color: $navSecondItemHoverFocusBackground;
+
+                [class^="icon-"], [class*=" icon-"] {
+                  color: $navIconHoverFocus;
+                }
+              }
+            }
+
+            &.active {
+              > a {
+                //color: $contrast;
+                background-color: $navSecondItemHoverFocusBackground;
+
+                [class^="icon-"], [class*=" icon-"] {
+                  color: $navIconHoverFocus;
+                }
+              }
+            }
+          }
+        }
+
+        // second level
+        > .nav {
+          border-right: 1px solid $navSecondBorder;
+
+          > li {
+            margin: 0;
+
+            > a {
+              padding-left: 10px;
+            }
+
+            // third level
+            > .nav {
+              border-top: 1px solid $navItemBorderBottom;
+              border-bottom: none;
+
+              > li {
+                > a {
+                  padding-left: 20px;
+                }
+
+                // fourth
+                > .nav {
+                  border-top: 1px solid $navItemBorderBottom;
+                  border-bottom: none;
+
+                  > li {
+                    > a {
+                      padding-left: 30px;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .search {
+      border-bottom: 1px solid $navItemBorderBottom;
+      display: none;
+
+      form {
+        margin: 10px 0;
+
+        $inputWidth: $navWidth - 40px;
+        .search-wrapper {
+          border: 1px solid $navItemBorderTop;
+          width: $inputWidth;
+          position: relative;
+          @include center-block;
+
+          button {
+            position: absolute;
+            right: 7px;
+            top: 7px;
+            padding: 0;
+            color: $navText;
+            text-shadow: none;
+            text-decoration: none;
+            @include transition(color 100ms ease);
+
+            &:hover {
+              color: lighten($navTextHoverFocus, 5%);
+            }
+          }
+
+          input {
+            padding: 4px 7px;
+            padding-right: 25px;
+            color: $navTextHoverFocus;
+            background: lighten($navBackground, 2%);
+            border: 1px solid lighten($navItemBorderBottom, 5%);
+            @include box-shadow(none);
+            @include transition(border 100ms ease);
+            @include placeholder(darken($navText, 5%));
+
+            &:focus {
+              border: 1px solid lighten($navItemBorderBottom, 10%);
+              @include placeholder($navText);
+            }
+          }
+
+          &:hover {
+            input {
+              background: lighten($navBackground, 3%);
+            }
+          }
+        }
+      }
+    }
+  }
+}

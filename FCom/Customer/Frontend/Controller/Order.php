@@ -9,8 +9,8 @@ class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_A
 
     public function action_index()
     {
-        $customerId = FCom_Customer_Model_Customer::sessionUserId();
-        $orders = FCom_Sales_Model_Order::i()->orm()->where('user_id', $customerId)->find_many();
+        $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
+        $orders = FCom_Sales_Model_Order::i()->orm()->where('customer_id', $customerId)->find_many();
 
         $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
         $crumbs[] = array('label'=>'Orders', 'active'=>true);
@@ -22,14 +22,14 @@ class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_A
     public function action_view()
     {
         $id = BRequest::get('id');
-        $customerId = FCom_Customer_Model_Customer::sessionUserId();
+        $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $order = FCom_Sales_Model_Order::i()->orm()->where('id', $id)
-                ->where('user_id', $customerId)->find_one();
+                ->where('customer_id', $customerId)->find_one();
         if (!$order) {
-            BResponse::i()->redirect(Bapp::href('customer/order'));
+            BResponse::i()->redirect('customer/order');
         }
 
-        $orderItems = FCom_Sales_Model_OrderItem::i()->orm()->where("order_id", $order->id())->find_many();
+        $orderItems = FCom_Sales_Model_Order_Item::i()->orm()->where("order_id", $order->id())->find_many();
 
         $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
         $crumbs[] = array('label'=>'Orders', 'href'=>Bapp::href('customer/order'));

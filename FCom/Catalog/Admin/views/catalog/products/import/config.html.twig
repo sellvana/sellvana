@@ -1,0 +1,100 @@
+{% import "@FCom_Admin/formsHelper.html.twig" as formsHp %}
+{% set hlp = APP.instance('FCom_Catalog_ProductsImport') %}
+{% set info = hlp.getFileInfo(THIS.get('dir')~'/'~THIS.get('file')) %}
+{% if not info %}
+    <div class="panel-body">
+        {{ 'Invalid file format, please go back and select another file'|_ }}
+    </div>
+{% else %}
+    <div class="panel-body">
+        <form id="import-columns-form" class="form form-horizontal" method="post">
+            {{ formsHp.input('config[filename]', THIS.get('file'), 'hidden') }}
+            <fieldset>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ 'Field Delimiter'|_ }}</label>
+                    <div class="col-md-5">
+                        {{ formsHp.input('config[delim]', info.delim, 'text', 'form-control') }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ 'Skip First Lines'|_ }}</label>
+                    <div class="col-md-5">
+                        {{ formsHp.input('config[skip_first]', info.skip_first, 'text', 'form-control') }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ 'Batch Size'|_ }}</label>
+                    <div class="col-md-5">
+                        {{ formsHp.input('config[batch_size]', info.batch_size ?: 100, 'text', 'form-control') }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ 'Multi Value Delimiter'|_ }}</label>
+                    <div class="col-md-5">
+                        {{ formsHp.input('config[multivalue_separator]', info.multivalue_separator ?: ';', 'text', 'form-control') }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ 'Nesting Level Delimiter'|_ }}</label>
+                    <div class="col-md-5">
+                        {{ formsHp.input('config[nesting_separator]', info.nesting_separator ?: '>', 'text', 'form-control') }}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ 'Column Content'|_ }}</label>
+                    <label class="col-md-5 control-label" style="text-align: left;">{{ 'DB Field'|_ }}</label>
+                </div>
+                {% for i, v in info.first_row %}
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">{{ v }}</label>
+                        <div class="col-md-5">
+                            <select class="form-control" name="config[columns][{{ i }}]">
+                                <option></option>
+                                {{ UTIL.optionsHtml(hlp.getFieldOptions(), info.columns[i] ?: '') | raw }}
+                            </select>
+                        </div>
+                    </div>
+                {% endfor %}
+            </fieldset>
+
+            <fieldset>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ 'DB Field'|_ }}</label>
+                    <label class="col-md-5 control-label" style="text-align: left;">{{ 'Default'|_ }}</label>
+                </div>
+                {% for k, f in hlp.getFieldData() %}
+                    {% set _default = info.defaults[k] ? info.defaults[k] %}
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">{{ k }}</label>
+                        <div class="col-md-5">
+                            {% if f.options %}
+                                <select name="config[defaults][{{ k }}]">
+                                    <option></option>
+                                    {{ UTIL.optionsHtml(f.options, _default) | raw }}
+                                </select>
+                            {% else %}
+                                {% set _input = f.input ?: 'text' %}
+                                {% if _input == 'text' %}
+                                    <input class="form-control" type="text" name="config[defaults][{{ k }}]" value="{{ _default }}">
+                                {% elseif _input == 'textarea' %}
+                                    <textarea class="form-control" name="config[defaults][{{ k }}]" style="width:400px; height:100px">{{ _default }}</textarea>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </fieldset>
+
+            <div class="form-actions form-actions-padding-sm">
+                <div class="row">
+                    <div class="col-md-12 col-md-offset-2">
+                        <button class="btn st1 sz2 btn btn-primary" id="step2-next"type="button">{{ 'Save configuration and go to next step'|_ }}</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endif %}

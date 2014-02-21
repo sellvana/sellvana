@@ -4,10 +4,10 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 {
     public function action_category()
     {
-#echo "<pre>"; debug_print_backtrace(); print_r(BFrontController::i()->currentRoute()); exit;
+#echo "<pre>"; debug_print_backtrace(); print_r(BRouting::i()->currentRoute()); exit;
         $category = FCom_Catalog_Model_Category::i()->load(BRequest::i()->params('category'), 'url_path');
         if (!$category) {
-            $this->forward(true);
+            $this->forward(false);
             return $this;
         }
 
@@ -25,14 +25,14 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         }
 
         $productsData = FCom_IndexTank_Search::i()->search($q, $sc, $f, $v, $page, $resultPerPage);
-        BPubSub::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category.products_data', array('data'=>&$productsData));
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_data', array('data'=>&$productsData));
 
         BApp::i()
             ->set('current_category', $category)
             ->set('current_query', $q)
             ->set('products_data', $productsData);
 
-        FCom_Core::lastNav(true);
+        FCom_Core_Main::i()->lastNav(true);
 
         $head = $this->view('head');
         $crumbs = array('home');
@@ -50,7 +50,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $layout->view('catalog/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
         $layout->view('catalog/search')->index_name = FCom_IndexTank_Search::i()->indexName();
 
-        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='grid' ? 'grid' : 'list');
+        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='list' ? 'list' : 'grid');
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->category = $category;
@@ -69,7 +69,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $req = BRequest::i();
         $q = $req->get('q');
         if (!$q) {
-            BResponse::i()->redirect(BApp::href());
+            BResponse::i()->redirect('');
         }
         $sc = $req->get('sc');
         $f = $req->get('f');
@@ -82,20 +82,20 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         }
 
         $productsData = FCom_IndexTank_Search::i()->search($q, $sc, $f, $v, $page, $resultPerPage);
-        BPubSub::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search.products_data', array('data'=>&$productsData));
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', array('data'=>&$productsData));
 
         BApp::i()
             ->set('current_query', $q)
             ->set('products_data', $productsData);
 
-        FCom_Core::lastNav(true);
+        FCom_Core_Main::i()->lastNav(true);
         $layout = BLayout::i();
         $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
         $layout->view('catalog/search')->query = $q;
         $layout->view('catalog/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
         $layout->view('catalog/search')->index_name = FCom_IndexTank_Search::i()->indexName();
 
-        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='grid' ? 'grid' : 'list');
+        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='list' ? 'list' : 'grid');
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->products_data = $productsData;

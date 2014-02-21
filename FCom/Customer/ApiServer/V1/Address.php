@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Customer_ApiServer_V1_Address extends FCom_Admin_Controller_ApiServer_Abstract
+class FCom_Customer_ApiServer_V1_Address extends FCom_Api_Controller_Abstract
 {
     public function action_index()
     {
@@ -16,7 +16,7 @@ class FCom_Customer_ApiServer_V1_Address extends FCom_Admin_Controller_ApiServer
         }
 
         if ($id) {
-            $customerAddress[] = FCom_Customer_Model_Address::load($id);
+            $customerAddress[] = FCom_Customer_Model_Address::i()->load($id);
         } else if($customerId) {
             $customerAddress = FCom_Customer_Model_Address::orm()->where('customer_id', $customerId)->limit($len, $start)->find_many();
         } else {
@@ -60,7 +60,7 @@ class FCom_Customer_ApiServer_V1_Address extends FCom_Admin_Controller_ApiServer
 
         $data = FCom_Customer_Model_Address::i()->formatApiPost($post);
 
-        $address = FCom_Customer_Model_Address::load($id);
+        $address = FCom_Customer_Model_Address::i()->load($id);
         if (!$address) {
             $this->notFound("Customer address id #{$id} not found");
         }
@@ -77,7 +77,7 @@ class FCom_Customer_ApiServer_V1_Address extends FCom_Admin_Controller_ApiServer
             $this->notFound("Customer address id is required");
         }
 
-        $address = FCom_Customer_Model_Address::load($id);
+        $address = FCom_Customer_Model_Address::i()->load($id);
         if (!$address) {
             $this->notFound("Customer address id #{$id} not found");
         }

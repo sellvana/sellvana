@@ -1,0 +1,37 @@
+base:
+    - view: admin/nav
+        do:
+            - [ addNav, cms/blog, { label: Blog Posts, href: /blog/post, pos: 100 } ]
+            - [ addNav, cms/category, { label: Blog Categories, href: /blog/category, pos: 110 } ]
+
+/blog/post:
+    - { include: base }
+    - { hook: main, views: admin/grid }
+    - { view: admin/nav, do: [[ setNav, cms/blog ]] }
+
+/blog/category:
+    - { include: base }
+    - { hook: main, views: admin/grid }
+    - { view: admin/nav, do: [[ setNav, cms/category ]] }
+/blog/post/form:
+    - { include: base }
+    - { include: form }
+    - { include: lib_tokeninput }
+    - { include: lib_wysihtml5 }
+    - { hook: main, views: admin/form }
+    - { view: admin/nav, do: [[ setNav, cms/blog ]] }
+    - view: admin/form
+        set: { tab_view_prefix: blog/post-form/ }
+        do:
+            - [ addTab, main, { label: Blog Post, pos: 10 } ]
+/blog/category/form:
+    - { include: base }
+    - { include: form }
+    - { include: lib_tokeninput }
+    - { include: lib_wysihtml5 }
+    - { hook: main, views: admin/form }
+    - { view: admin/nav, do: [[ setNav, cms/category ]] }
+    - view: admin/form
+        set: { tab_view_prefix: blog/category-form/ }
+        do:
+            - [ addTab, main, { label: General Info, pos: 10 } ]

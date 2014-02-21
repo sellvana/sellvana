@@ -1,0 +1,132 @@
+{% set user = APP.instance("FCom_Admin_Model_User").sessionUser() %}
+{% set notifications = THIS.getNotifications() %}
+{% set recentActivity = THIS.getRecentActivity() %}
+{% set storeName = CONFIG.get("modules/FCom_Core/store_name") %}
+
+{% set adminChatsEnabled = MODULES.isLoaded('FCom_AdminChat') %}
+
+<header class="f-admin-header">
+  <nav class="navbar navbar-default">
+    <a class="toggle-nav btn pull-left" href="#">
+      <i class="icon-reorder"></i>
+    </a>
+    <a class="navbar-brand" href="{{ APP.href() }}">
+      <span class="logo">{{ 'Sellvana'|_ }}</span>
+      <!--
+      <img class="logo" alt="{{ storeName }}" height="20" src="{{ APP.src('@FCom_Core/img/logo.svg') }}" />
+      <img class="logo-xs" alt="{{ storeName }}" src="{{ APP.src('@FCom_Core/img/logo.svg') }}" />
+      -->
+    </a>
+    <ul class="nav">
+
+      {% if recentActivity %}
+        <li class="dropdown widget">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-rss"></i>
+            <div class="label">{{ notifications.count }}</div>
+          </a>
+          <ul class="dropdown-menu" >
+            {% for item in recentActivity %}
+              <li>
+                <a href="{{ item.href }}" title="{{ item.title }}">
+                  <div class="widget-body">
+                    <div class="pull-left icon">
+                      <i class="{{ item.class }}"></i>
+                    </div>
+                    <div class="pull-left text">
+                      {{ item.html | raw }}
+                      <small class="text-muted timeago" title="{{ item.ts }}">{{ item.ts }}</small>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="divider"></li>
+            {% endfor %}
+            <li class="widget-footer">
+              <a href="#">{{ "All activity" }}</a>
+            </li>
+          </ul>
+        </li>
+      {% endif %}
+
+      {% if notifications.count %}
+        <li class="dropdown widget">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-bell"></i>
+            <div class="label">{{ notifications.count }}</div>
+          </a>
+          <ul class="dropdown-menu">
+            {% for group, items in notifications.groups %}
+              {% for item in items %}
+                <li>
+                  <a href="{{ item.href }}" title="{{ item.title }}">
+                    <div class="widget-body">
+                      <div class="pull-left icon">
+                        <i class="{{ item.class }}"></i>
+                      </div>
+                      <div class="pull-left text">
+                        {{ item.message }}
+                        <small class="text-muted timeago" title="{{ item.ts }}">{{ item.ts }}</small>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+                <li class="divider"></li>
+              {% endfor %}
+            {% endfor %}
+            <li class="widget-footer">
+              <a href="#">{{ "All notifications" }}</a>
+            </li>
+          </ul>
+        </li>
+      {% endif %}
+
+      {{ THIS.hook('header_toolbar') | raw }}
+
+      <li class="dropdown user-menu">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+          <img width="23" height="23" alt="{{ user.fullname() }}" src="{{ UTIL.gravatar(user.get("email")) }}" />
+          <span class="user-name">{{ user.fullname() }}</span>
+          <b class="caret"></b>
+        </a>
+        <ul class="dropdown-menu">
+          <li>
+            <a href="{{ APP.href("my_account") }}">{{ "Profile" |_ }}</a>
+          </li>
+          <li>
+            <a href="{{ APP.href("settings") }}">{{ "Settings" |_ }}</a>
+          </li>
+          <li class="divider"></li>
+          <li>
+            <a href="{{ APP.href("logout") }}">{{ "Sign out" |_ }}</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <form action="search_results.html" class="navbar-form navbar-right hidden-xs" method="get">
+      <button class="btn btn-link icon-search" name="button" type="submit"></button>
+      <div class="form-group">
+        <input value="" class="form-control" placeholder="Search..." autocomplete="off" id="q_header" name="q" type="text" />
+      </div>
+    </form>
+  </nav>
+</header>
+
+<script>
+  function setModalHeight() {
+    var h = $(window).height()-200;
+    if (h>0) {
+      $('.modal-body').css('max-height', h);
+    }
+  }
+
+  $(window).resize(function(ev) {
+    setModalHeight();
+  });
+
+  var g_vent;
+  require(['jquery','underscore','backbone'], function($, _, Backbone) {
+    g_vent = _.extend({}, Backbone.Events);
+  });
+
+</script>

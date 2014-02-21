@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Customer_ApiServer_V1_Customer extends FCom_Admin_Controller_ApiServer_Abstract
+class FCom_Customer_ApiServer_V1_Customer extends FCom_Api_Controller_Abstract
 {
     public function action_index()
     {
@@ -15,7 +15,7 @@ class FCom_Customer_ApiServer_V1_Customer extends FCom_Admin_Controller_ApiServe
         }
 
         if ($id) {
-            $customers[] = FCom_Customer_Model_Customer::load($id);
+            $customers[] = FCom_Customer_Model_Customer::i()->load($id);
         } else {
             $customers = FCom_Customer_Model_Customer::orm()->limit($len, $start)->find_many();
         }
@@ -65,7 +65,7 @@ class FCom_Customer_ApiServer_V1_Customer extends FCom_Admin_Controller_ApiServe
 
         $data = FCom_Customer_Model_Customer::i()->formatApiPost($post);
 
-        $customer = FCom_Customer_Model_Customer::load($id);
+        $customer = FCom_Customer_Model_Customer::i()->load($id);
         if (!$customer) {
             $this->notFound("Customer id #{$id} not found");
         }
@@ -82,7 +82,7 @@ class FCom_Customer_ApiServer_V1_Customer extends FCom_Admin_Controller_ApiServe
             $this->notFound("Customer id is required");
         }
 
-        $customer = FCom_Customer_Model_Customer::load($id);
+        $customer = FCom_Customer_Model_Customer::i()->load($id);
         if (!$customer) {
             $this->notFound("Customer id #{$id} not found");
         }

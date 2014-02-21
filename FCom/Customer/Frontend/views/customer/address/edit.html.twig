@@ -1,0 +1,120 @@
+{% set validator = THIS.validator('address-form', THIS.get('address')) %}
+{% set address = THIS.get('address') %}
+<div class="f-site-main" role="main">
+  <div class="container">
+    <div class="row f-mb-slideout-menu">
+      <div class="col-sm-9 f-col-main">
+        <header class="f-page-header">
+          <h1 class="f-page-title">{{"Edit Address" | _ }}</h1>
+          <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">Menu</a>
+        </header>
+          {{ THIS.view('core/messages') | raw }}
+        <form action="{{ APP.href('customer/address/edit') }}{{ address.get('id') ? '?id=' ~ address.get('id') : ''}}" method="post" class="address-form" id="address-form">
+          {#{% if address.get('id') %}
+          <input type="hidden" name="id" value="{{ address.get('id') }}">
+          {% endif %}#}
+          <fieldset>
+            <div class="row">
+              <div class="form-group col-sm-6">
+                <label for="address-firstname" class="control-label required">{{ "First name" | _ }}</label>
+                <input type="text" name="firstname" id="address-firstname" value="{{ validator.fieldValue("firstname") }}"
+                       class="required {{ validator.fieldClass('firstname') }} form-control">
+                  {{ validator.errorHtml("firstname", "address-firstname") | raw }}
+              </div>
+              <div class="form-group col-sm-6">
+                <label for="address-lastname" class="control-label required">{{ "Last name" | _ }}</label>
+                <input type="text" class="form-control required" name="lastname" id="address-lastname" value="{{ validator.fieldValue("lastname") }}">
+                  {{ validator.errorHtml("lastname", "address-lastname") | raw }}
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="address-email" class="control-label">{{ "E-mail" |_ }}</label>
+              <input type="text" name="email" id="address-email" value="{{ validator.fieldValue('email') }}"
+                     class="email {{ validator.fieldClass('email') }} form-control">
+              {{ validator.errorHtml("email", "address-email") | raw }}
+            </div>
+            <div class="form-group">
+              <label for="address-street1" class="control-label required">{{ "Street 1" | _ }}</label>
+              <input type="text" name="street1" class="form-control required" id="address-street1" value="{{ validator.fieldValue("street1") }}">
+                {{ validator.errorHtml("street1", "address-street1") | raw }}
+            </div>
+            <div class="form-group">
+              <label for="address-street2" class="control-label">{{ "Street 2" | _ }}</label>
+              <input type="text" name="street2" class="form-control" id="address-street2" value="{{ validator.fieldValue("street2") }}">
+                {{ validator.errorHtml("street2", "address-street2") | raw }}
+            </div>
+            <div class="row">
+              <div class="form-group col-sm-6">
+                <label for="address-city" class="control-label required">{{ "City" | _ }}</label>
+                <input type="text" name="city" id="address-city" class="form-control required" value="{{ validator.fieldValue("city") }}">
+                  {{ validator.errorHtml("city", "address-city") | raw }}
+              </div>
+              <div class="form-group col-sm-6">
+                {{ THIS.view('geo/embed') | raw}}
+                <script>
+                    require(['jquery'], function($) {
+                        $(function() {
+                            $('.geo-country').geoCountryRegion({country:'{{ validator.fieldValue('country') }}', region:'{{ validator.fieldValue('region') }}'});
+                        })
+                    })
+                </script>
+                <label for="address-country" class="control-label required">{{ "Country" | _ }}</label>
+                {% set countries = THIS.get('countries') %}
+                {% set defC = validator.fieldValue('country') %}
+                  {#{{ dump(countries) }}#}
+                <select class="geo-country select2 form-control required" name="country" id="address-country">
+                    <option value="">{{ "Select an option" | _ }}</option>
+                    {% for iso, country in countries %}
+                    <option value="{{ iso }}" {{ defC == iso ? "selected" }}>{{ country }}</option>
+                    {% endfor %}
+                </select>
+                  {{ validator.errorHtml("country", "address-country") | raw }}
+              </div>
+            </div>
+            <div class="row">
+              <div class="form-group col-sm-6">
+                <label for="address-region" class="control-label required">{{ "State/Region" | _ }}</label>
+                <select class="geo-region required select2 form-control" name="region" id="address-region" style="display:none;">
+                    <option value="">{{ "Select an option" | _ }}</option>
+                </select>
+                <input type="text" class="geo-region form-control required" name="region" id="address-region" value="{{ validator.fieldValue("region") }}"/>
+                  {{ validator.errorHtml("region", "address-region") | raw }}
+              </div>
+              <div class="form-group col-sm-6">
+                <label for="address-postcode" class="control-label required">{{ "Zip / Postal Code" | _ }}</label>
+                <input type="text" name="postcode" id="address-postcode" class="form-control required" value="{{ validator.fieldValue("postcode") }}">
+                  {{ validator.errorHtml("postcode", "address-postcode") | raw }}
+              </div>
+            </div>
+            <div class="checkbox">
+              <label for="address_default_shipping">
+                <input type="checkbox" id="address_default_shipping" name="address_default_shipping" value="1"
+                {{ THIS.get('default_shipping') == 1 ? 'checked' }} >
+                {{ "Set as default shipping address" | _ }}
+              </label>
+            </div>
+            <div class="checkbox">
+              <label for="address_default_billing">
+                <input type="checkbox" id="address_default_billing" name="address_default_billing" value="1"
+                 {{ THIS.get('default_billing') == 1 ? 'checked' }} >
+                {{ "Set as default billing address" | _ }}
+              </label>
+            </div>
+            <div class="form-group">
+              <input type="submit" class="btn btn-primary btn-lg" value="{{ "Save address" | _ }}">
+            </div>
+          </fieldset>
+        </form>
+      </div> <!-- /.f-col-main -->
+      {{ THIS.view('customer/account/sidebar').set('current', 'addresses') | raw }}
+    </div>
+  </div>
+</div>
+<script>
+  require(['jquery', 'jquery.validate'], function($) {
+    $( "#button" ).click(function() {
+      $('.f-mb-slideout-menu .f-col-sidebar').toggleClass( "open" );
+    });
+      $('#address-form').validate();
+  });
+</script>

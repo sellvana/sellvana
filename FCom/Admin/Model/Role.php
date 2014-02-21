@@ -5,6 +5,11 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_admin_role';
 
+    protected $_validationRules = array(
+        array('role_name', '@required'),
+        //array('permissions_data', '@required'),
+    );
+
     protected static $_allPermissions = array(
         '/' => array('title'=>'All Permissions', 'level'=>0),
         'admin' => array('title'=>'Admin Tasks', 'level'=>1),
@@ -34,7 +39,7 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
             $params = array('title'=>$params);
         }
         if (empty($params['module_name'])) {
-            $params['module_name'] = BModuleRegistry::currentModuleName();
+            $params['module_name'] = BModuleRegistry::i()->currentModuleName();
         }
         static::$_allPermissions[$path] = $params;
         return $this;
@@ -95,19 +100,19 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
         return $perms;
     }
 
-    public function afterLoad()
+    public function onAfterLoad()
     {
-        parent::afterLoad();
+        parent::onAfterLoad();
         $perms = explode("\n", trim($this->permissions_data));
         $this->permissions = array_combine($perms, array_fill(0, sizeof($perms), 1));
         return $this;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
-        if (empty($this->create_dt)) $this->create_dt = BDb::now();
-        $this->update_dt = BDb::now();
+        if (!parent::onBeforeSave()) return false;
+        if (empty($this->create_at)) $this->create_at = BDb::now();
+        $this->update_at = BDb::now();
         $this->permissions_data = trim(join("\n", array_keys($this->permissions)));
         return true;
     }

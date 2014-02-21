@@ -1,0 +1,45 @@
+#orders {
+  #list {
+    @include opacity(.5);
+    @include transition(opacity .2s linear);
+
+    @media print {
+      @include opacity(1);
+    }
+
+    hr {
+      margin: 10px 0;
+
+      &:last-child {
+        display: none;
+      }
+    }
+
+    .price {
+      margin: 0;
+      margin-bottom: 10px;
+    }
+
+    &:hover {
+      @include opacity(1);
+    }
+  }
+
+  #detail {
+    .pager {
+      margin: 0;
+    }
+
+    .form-actions {
+      margin-bottom: 0;
+    }
+
+    .only-checkbox {
+      width: 10px;
+
+      input[type="checkbox"] {
+        margin: 0;
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+@import "theme/utilities";
+
+#stats-chart1, #stats-chart2, #stats-chart3, #stats-chart7, #stats-chart8 {
+  height: 200px;
+}
+
+.color-settings {
+  .color-title {
+    font-weight: bold;
+    padding-left: 10px;
+  }
+}
+
+.wysihtml5-sandbox {
+  box-sizing: border-box;
+}

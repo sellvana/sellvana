@@ -1,0 +1,163 @@
+{% set m = THIS.get('model') %}
+{% set ctrl = APP.instance('FCom_ProductReviews_Admin_Controller') %}
+
+<script>
+    var btnApprove = $('#prod-reviews-approve');
+    var btnDeny = $('#prod-reviews-deny');
+    var selectedRows = [];
+
+    if(typeof(g_vent) === 'undefined') {
+        g_vent = _.extend({}, Backbone.Events);
+    }
+    require(["jquery", "underscore", "jquery.validate", "fcom.admin", "bootstrap"], function($, _) {
+        adminForm.createSwitchButton();
+        adminForm.wysiwygInit();
+        g_vent.bind('custom_callback', function(ev) {
+            console.log(ev);
+            if(ev.grid === 'products_reviews') {
+                var review = ev.row;
+                $('#prod-review-id').val(review.id);
+                $('#prod-review-title').val(review.title);
+                CKEDITOR.instances['prod-review-text'].setData(review.text);
+                $('#prod-review-rating').val(review.rating);
+                $('#prod-review-helpful').val(review.helpful);
+
+                $('div#prod-review-modal div.col-md-5:last').html(
+                            '<input type="hidden" name="model[approved]" value="'+(review.approved === '1' ? '1' : '0')+'" />'+
+                            '<input class="switch-cbx" id="prod-review-approved" type="checkbox" name="model[approved]" value="'+(review.approved === '1' ? '1' : '0')+'" '+(review.approved === '1' ? 'checked' : '')+'/>');
+                adminForm.createSwitchButton();
+
+                $('a#btn_prod-review-modal').trigger('click');
+            }
+        }).bind('select-rows', function(ev) {
+            if (ev.rows.length > 0) {
+                btnApprove.removeClass('disabled');
+                btnDeny.removeClass('disabled');
+                selectedRows = ev.rows;
+            } else {
+                btnApprove.addClass('disabled');
+                btnDeny.addClass('disabled');
+                selectedRows = [];
+            }
+        });
+
+        $('button.btn-prod-review-save').click(function(){
+            var row = {};
+            row.id = $('#prod-review-id').val();
+            row.title = $('#prod-review-title').val();
+            row.text = CKEDITOR.instances['prod-review-text'].getData();
+            row.rating = $('#prod-review-rating').val();
+            row.helpful = $('#prod-review-helpful').val();
+            row.approved = $('#prod-review-approved').parent().hasClass('switch-on') ? '1' : '0';
+            console.log(row.approved);
+            g_vent.trigger('update_row', {grid: 'products_reviews', row: row});
+        });
+
+        btnApprove.on('click', function() {
+            updateStatus(1);
+        });
+
+        btnDeny.on('click', function() {
+            updateStatus(0);
+        });
+
+        function updateStatus(approve)
+        {
+            for (var index = 0; index < selectedRows.length; index++) {
+                selectedRows[index].approved = approve;
+                g_vent.trigger('update_row', {grid: 'products_reviews', row: selectedRows[index]});
+                //todo: implement update multi rows
+            }
+            $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
+            /*var url = '{{ APP.href('/prodreviews/approve') }}';
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {approve: approve, ids: ids},
+                success: function (data)
+                {
+                    if (data.status == 'success') {
+                        $.bootstrapGrowl(data.message, { type: 'success', align: 'center', width: 'auto' });
+                        for (var index = 0; index < selectedRows.length; index++) {
+                            selectedRows[index].approved = approve;
+                            g_vent.trigger('update_row', {grid: 'products_reviews', row: selectedRows[index]});
+                        }
+                    } else if (data.status == 'error') {
+                        $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                    } else {
+                        $.bootstrapGrowl('Dont know data status type', { type: 'warning', align: 'center', width: 'auto' });
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown)
+                {
+                    alert("[ERROR]<br>" + textStatus);
+                }
+            });*/
+        }
+
+    });
+</script>
+
+{#<div>
+    <a role="button" href="#prod-review-modal" data-toggle="modal" style='display:none;' id='btn_prod-review-modal'></a>
+    <div class='modal fade' id='prod-review-modal' tabindex='-1'>
+        <div class='modal-dialog' style='width:900px;'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
+                    <h4 class='modal-title' id='myModalLabel'>{{ THIS.get('title') }} </h4>
+                </div>
+                <div class='modal-body'>
+                    <fieldset name="adm-section-group">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label" for="prod-review-title">{{ 'Title'|_ }}</label>
+                            <div class="col-md-5">
+                                <input type="hidden" id="prod-review-id" />
+                                <input class="form-control" type="text" id="prod-review-title" name="model[title]" value="" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label" for="prod-review-text">{{ 'Text'|_ }}</label>
+                            <div class="col-md-10">
+                                <textarea class="form-control ckeditor" id="prod-review-text" name="model[text]" rows="5" cols="35"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label" for="prod-review-rating">{{ 'Rating of product'|_ }}</label>
+                            <div class="col-md-5">
+                                <input type="text" class="form-control" id="prod-review-rating" name="model[rating]" value=""/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label" for="prod-review-helpful">{{ 'Helpful points'|_ }}</label>
+                            <div class="col-md-5">
+                                <input type="text" class="form-control" id="prod-review-helpful" name="model[helpful]" value=""/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label" for="prod-review-approved">{{ 'Approved'|_ }}</label>
+                            <div class="col-md-5">
+                                <input type="hidden" name="model[approved]" value="0" />
+                                <input class="switch-cbx" id="prod-review-approved" type="checkbox" name="model[approved]" value="1" checked/>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div class='modal-footer'>
+                    <button class='btn btn-default btn-primary btn-prod-review-save' data-dismiss='modal' type='button'>{{ "Save"|_ }}</button>
+                    <button class='btn btn-default btn-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>#}
+
+
+{{ THIS.view('core/backbonegrid').set('grid', {config: ctrl.gridConfig(m)}) | raw }}
+
+

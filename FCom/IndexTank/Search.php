@@ -100,7 +100,7 @@ class FCom_IndexTank_Search extends BClass
         $productsData['state']['filter'] = $v;
         $productsData['state']['save_filter'] = BConfig::i()->get('modules/FCom_IndexTank/save_filter');
 
-        BPubSub::i()->fire(__METHOD__, array('data'=>&$productsData));
+        BEvents::i()->fire(__METHOD__, array('data'=>&$productsData));
 
         return $productsData;
     }
@@ -132,6 +132,6 @@ class FCom_IndexTank_Search extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 }

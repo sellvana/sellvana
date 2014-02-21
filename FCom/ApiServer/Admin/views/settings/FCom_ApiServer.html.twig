@@ -1,0 +1,21 @@
+{% set m = THIS.get('model') %}
+
+<h2>{{ "API Server Settings"|_}}</h2>
+
+<div class="accordion accordion-blue panel-group" id="settings-FCom_ApiServer">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#">{{ "Area Settings"|_ }}</a>
+        </div>
+        <div class="panel-collapse accordion-body in" id="settings-FCom_ApiServer-group0">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-2 label-control">{{ 'IP: Mode'|_ }}</label>
+                    <div class="col-md-5">
+                        <textarea class="form-control" name="config[mode_by_ip][FCom_ApiServer]" rows="5">{{ m.get('mode_by_ip/FCom_ApiServer') }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

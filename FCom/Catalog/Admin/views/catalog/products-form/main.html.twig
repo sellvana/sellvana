@@ -1,0 +1,395 @@
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator') %}
+
+<fieldset name="main-product">
+  <div class="f-section">
+    <div class="form-group has-multilang">
+        <label class="col-md-2 control-label" for="model-product-name">{{ 'Product Name'|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control required" type="text" id="model-product-name" name="model[product_name]" value="{{ validator.fieldValue('product_name') }}" data-rule-required="true" />
+        </div>
+    </div>
+    <div id="main-product-name-lang">
+    </div>
+
+
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-url-key">{{ 'URL Key'|_ }} ({{ 'optional'|_ }})</label>
+        <div class="col-md-5">
+            <input class="form-control" type="text" id="model-url-key" name="model[url_key]" value="{{ validator.fieldValue('url_key') }}" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-local-sku">{{ 'SKU'|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control" type="text" id="model-local-sku" name="model[local_sku]" data-rule-required="true" value="{{ validator.fieldValue('local_sku') }}" />
+        </div>
+    </div>
+
+    <div class="form-group has-multilang">
+        <label class="col-md-2 control-label" for="model-short-description">{{ 'Short Description'|_ }}</label>
+        <div class="col-md-5">
+            <textarea class="form-control" id="model-short-description" name="model[short_description]" rows="5" data-rule-required="true">{{ validator.fieldValue('short_description') }}</textarea>
+        </div>
+    </div>
+    <div id="main-product-shortdesc-lang">
+    </div>
+
+
+    <div class="form-group has-multilang">
+        <label class="col-md-2 control-label" for="model-description">{{ 'Long Description'|_ }}</label>
+        <div class="col-md-10">
+            <textarea class="form-control ckeditor js-desc-wysiwyg" id="model-description" name="model[description]" rows="5" >{{ validator.fieldValue('description') }}</textarea>
+            <textarea class="form-control js-desc-wysiwyg" id="model-description-validation" name="js-desc-wysiwyg" rows="5" style="display:none;" data-rule-required="true">{{ validator.fieldValue('description') }}</textarea>
+        </div>
+    </div>
+    <div id="main-product-desc-lang">
+    </div>
+
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-net-weight">{{ 'Net Weight'|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control" type="text" id="model-net-weight" name="model[net_weight]" value="{{ validator.fieldValue('net_weight') }}" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-shipping-weight">{{ 'Shipping Weight'|_ }}</label>
+        <div class="col-md-5">
+            <input type="text" class="form-control" id="model-shipping-weight" name="model[ship_weight]" value="{{ validator.fieldValue('ship_weight') }}" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-hide-product">{{ 'Hide Product'|_ }}</label>
+        <div class="col-md-5">
+            <input type="hidden" name="model[is_hidden]" value="0" />
+            <input id="model-hide-product" class="switch-cbx" name="model[is_hidden]" {% if validator.fieldValue('is_hidden') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
+        </div>
+    </div>
+
+    <input type='hidden' id='name_lang_fields' name='name_lang_fields'/>
+    <input type='hidden' id='short_desc_lang_fields' name='short_desc_lang_fields'/>
+    <input type='hidden' id='desc_lang_fields' name='desc_lang_fields'/>
+  </div>
+</fieldset>
+
+
+{{ THIS.hook('catalog/products/tab/main', {'model' : m}) | raw }}
+
+<script type="template" id="main-lang-view-template">
+    <div class="row multilang-field">
+        <div class="col-md-2" />
+        <div class="col-md-5">
+            <button type="button" style="margin-top: 5px;" class="btn btn-xs multilang"></button>
+        </div>
+    </div>
+
+    <a class="btn btn-success btn-show" role="button" href="#<%- rc.field_name+rc.id %>" data-toggle="modal" id="btn_show_lang" style="display:none;">show lang</a>
+    <div id="<%- rc.field_name+rc.id %>" class="modal fade in" tabindex='-1'>
+        <div class="modal-dialog" style="width:900px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
+                    <h4 class="modal-title" id="myLangLabel"><%= rc.field_name %></h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="well">
+                      <table>
+                          <tr>
+                              <td>
+                                  <select class="prod_sel_locale form-control" style="width:150px;">
+                                  <% var langs = rc.avail_langs;
+                                     for(var i in langs) {
+                                      %>
+                                          <option value="<%=langs[i] %>"><%=langs[i] %></option>
+                                      <% } %>
+                                  </select>
+                              </td>
+                              <td>
+                                  <button class="btn btn-primary save" type="button">{{ 'Add Locale' |_ }}</button>
+                              </td>
+                          </tr>
+                      </table>
+                    </div>
+                    <div class="system-lang-fields">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                   <button class="btn btn-default btn-close" data-dismiss="modal" type="button" id="btn-locale-close">{{ 'Close'|_ }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="template" id="main-lang-field-template">
+    <div class="col-md-3 control-label">
+        <span class="badge badge-default"><%- rc.lang_code %></span>
+    </div>
+    <div class="col-md-6">
+        <% switch(rc.input_type) {
+            case 'text':
+                print('<input name="'+guid()+'" value="'+rc.value+'" class="form-control" type="text" data-rule-required = "true" />');
+                break;
+            case 'textarea':
+                print('<textarea name="'+guid()+'" name="'+rc.lang_code+'" class="form-control" data-rule-required = "true" >'+rc.value+'</textarea>');
+                break;
+            case 'wysiwyg':
+                print('<textarea name="'+guid()+'" id="'+guid()+'" name="'+rc.lang_code+'" class="form-control ckeditor" rows="20" >'+rc.value+'</textarea>');
+                break;
+        } %>
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-default btn-sm field-remove">
+            <i class="icon-remove"></i>
+        </button>
+    </div>
+</script>
+
+<script>
+require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
+    var _mainForm = $('form#catalog-products-form');
+    var _submitted = false; //flag for prevent infitive loop
+
+    function checkLangField(field)
+    {
+        var invalid = 0;
+        field.langFields.each(function(langField) {
+            if (langField.wysiwyg) {
+                var w = langField.view.getWYSIWYG();
+                var val = w.getData();
+                langField.set('value', val);
+                langField.view.$el.find('textarea').val(val);//for validation show only
+            }
+
+            if (langField.get('value') === '')
+                invalid++;
+        });
+
+        field.view.$el.find('div.col-md-5:last').find('span').remove();
+        if (invalid > 0 ) {
+            field.view.$el.find('div.col-md-5:last').append('<span class="badge badge-important">'+invalid+'</span>');
+        }
+
+    }
+
+    $(_mainForm).submit(function(ev) {
+        var descWysiwyg = CKEDITOR.instances['model-description'];
+        $('textarea.js-desc-wysiwyg').val(descWysiwyg.getData());
+
+        checkLangField(nameModel);
+        checkLangField(shortDescModel);
+        checkLangField(descModel);
+
+        $('input[id="name_lang_fields"]').val(JSON.stringify(nameModel.langFields.toJSON()));
+        $('input[id="short_desc_lang_fields"]').val(JSON.stringify(shortDescModel.langFields.toJSON()));
+        $('input[id="desc_lang_fields"]').val(JSON.stringify(descModel.langFields.toJSON()));
+
+        if (!$(this).valid()) {
+            SystemFields.checkingForm = true;
+            return false;
+        } else {
+            if (SystemFields.checkingForm) {
+                SystemFields.checkingForm = false;
+                $(this).submit();
+            }
+        }
+    });
+    _.templateSettings.variable = 'rc';
+
+    var SystemFields = {
+        Models: {},
+        Collections: {},
+        Views: {},
+        Langs: ['en_US', 'de_DE', 'zh-CN', 'fr-FR', 'nl_NL']
+    };
+
+    SystemFields.Models.LangField = Backbone.Model.extend({
+        defaults: {
+            value: '',
+            lang_code: ''
+        }
+    });
+
+    SystemFields.Collections.LangFieldCollection = Backbone.Collection.extend({
+        model: SystemFields.Models.LangField
+    });
+
+    SystemFields.Models.Field = Backbone.Model.extend({
+        defaults: {
+            avail_langs: -1
+        },
+        initialize: function(config) {
+
+            var avail_langs = this.get('avail_langs');
+            if (avail_langs === -1) {
+                this.set('avail_langs', SystemFields.Langs);
+            }
+
+            if (typeof(config) === 'undefined') {
+                this.langFields = new SystemFields.Collections.LangFieldCollection();
+                return;
+            }
+            this.langFields = new SystemFields.Collections.LangFieldCollection((typeof(config.langFields) !== 'undefined') ? config.langFields : undefined);
+
+            if (typeof(config.langFields) !== 'undefined') {
+                this.set('avail_langs', _.difference( SystemFields.Langs, this.langFields.pluck('lang_code') )  );
+                delete this.attributes['langFields'];
+            }
+        }
+    });
+
+    SystemFields.Views.LangFieldView = Backbone.View.extend({
+        className: 'form-group',
+        events: {
+            'click button.field-remove': '_remove',
+            'change input[type="text"],textarea': '_changeVal'
+        },
+        template: _.template($('#main-lang-field-template').html()),
+        _changeVal: function() {
+            var val = this.$el.find('input[type="text"],textarea').val();
+            this.model.set('value', val);
+        },
+        _remove: function() {
+            //var confirm = window.confirm("Do you want to really remove?");
+            //if (confirm) {
+                this.parentSet.langFields.remove(this.model);
+                this.undelegateEvents();
+                this.$el.removeData().unbind();
+                this.remove();
+                delete this.model;
+            //}
+        },
+        getWYSIWYG: function() {
+            var id = this.$el.find('textarea').attr('id');
+            var self = this;
+            return CKEDITOR.instances[id];
+
+        },
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+            this.model.view = this;
+
+            return this;
+        }
+    });
+
+    SystemFields.Views.LangView = Backbone.View.extend({
+        template: _.template($('#main-lang-view-template').html()),
+        events: {
+                    'click button.multilang': '_showLangModal',
+                    'click button.btn-close': '_checkLangFieldVals',
+                    'click button.save': '_addLangField'
+        },
+        initialize: function() {
+            this.model.langFields.on('add', this._addLangView, this);
+            this.model.langFields.on('remove', this._removeLangView, this);
+        },
+        _showLangModal: function() {
+            var langFields = this.model.langFields;
+            var langs = _.clone(SystemFields.Langs);
+            langFields.each(function(langField) {
+                langs = _.difference(langs, [langField.get('lang_code')]);
+            });
+
+            $('#myLangLabel').html(this.model.get('field_name'));
+            this.$el.find('.btn-show').trigger('click');
+
+        },
+        _updateLangTag: function() {
+            var langs = this.model.langFields.pluck('lang_code');
+            var html = '<i class="icon icon-globe"></i>'
+            var multilang = this.$el.find('.multilang');
+            if (langs.length>0) {
+                html += ' '+langs.join(', ');
+                multilang.addClass('btn-info');
+            } else {
+                html += ' {{ 'Translate'|_ }}';
+            }
+            multilang.html(html);
+            this.$el.find('select.prod_sel_locale').select2();
+            if(this.model.langFields.length === SystemFields.Langs.length ) {
+                this.$el.find('button.save').addClass('disabled');
+            } else {
+                this.$el.find('button.save').removeClass('disabled');
+            }
+        },
+        _addLangField: function() {
+            var lang_code = this.$el.find('select.prod_sel_locale').val();
+            var langField = new SystemFields.Models.LangField({value: '', lang_code: lang_code, input_type: this.model.get('input_type')});
+
+            this.model.langFields.add(langField);
+            this.$el.find('select.prod_sel_locale option[value="'+lang_code+'"]').remove();
+            this.$el.find('select2.prod_sel_locale').select2();
+            this._updateLangTag();
+        },
+        _removeLangView: function(langField) {
+            var lang_code = langField.get('lang_code');
+            this.$el.find('select.prod_sel_locale').append('<option value="'+lang_code+'">'+lang_code+'</option>');
+            this.$el.find('select.prod_sel_locale').select2();
+            this._updateLangTag();
+        },
+        _addLangView: function(langField) {
+            var langView = new SystemFields.Views.LangFieldView({model: langField});
+            this.$el.find('div.system-lang-fields').append(langView.render().el);
+
+            if (langField.get('input_type') === 'wysiwyg') {
+                if (typeof(adminForm) !== 'undefined')
+                    adminForm.wysiwygInit();
+                langField.wysiwyg = true;
+                var p = langView.$el.find('textarea:first').parent();
+                p.append('<textarea name="'+guid()+'" data-rule-required="true" style="display:none;">'+langView.$el.find('textarea:first').val()+'</textarea>');
+
+            }
+
+            langView.parentSet = this.model;
+        },
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+            this.model.langFields.each(this._addLangView, this);
+            this.model.view = this;
+            this._updateLangTag();
+
+
+            if (typeof(adminForm) !== 'undefined')
+                    adminForm.wysiwygInit();
+
+            return this;
+        }
+    });
+
+
+    var nameModel = new SystemFields.Models.Field({
+                                                    id: 1,
+                                                    field_name: 'name',
+                                                    input_type: 'text',
+                                                    langFields: {{ m.getData('name_lang_fields') == null ? '[]' : m.getData('name_lang_fields') | raw }}
+                                                });
+    var shortDescModel = new SystemFields.Models.Field({
+                                                    id: 2,
+                                                    field_name: 'shortDesc',
+                                                    input_type: 'textarea',
+                                                    langFields: {{ m.getData('short_desc_lang_fields') == null ? '[]' : m.getData('short_desc_lang_fields') | raw }}
+                                                });
+    var descModel = new SystemFields.Models.Field({
+                                                    id: 3,
+                                                    field_name: 'desc',
+                                                    input_type: 'wysiwyg',
+                                                    langFields: {{ m.getData('desc_lang_fields') == null ? '[]' : m.getData('desc_lang_fields') | raw }}
+                                                });
+
+    var nameView = new SystemFields.Views.LangView({model: nameModel, el: '#main-product-name-lang'});
+    nameView.render();
+
+    var shortDescView = new SystemFields.Views.LangView({model: shortDescModel, el: '#main-product-shortdesc-lang'});
+    shortDescView.render();
+
+    var descView = new SystemFields.Views.LangView({model: descModel, el: '#main-product-desc-lang'});
+    descView.render();
+});
+</script>

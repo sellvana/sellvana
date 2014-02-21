@@ -1,0 +1,119 @@
+{% set loggedIn = APP.instance('FCom_Customer_Model_Customer').isLoggedIn() %}
+{% set cart = APP.instance('FCom_Sales_Model_Cart').sessionCart() %}
+{% set cartItems = cart.items() %}
+{% set shipping_estimates = SESSION.data('shipping_estimate') %}
+{% set checkout_methods = APP.instance('FCom_Sales_Main').getCheckoutMethods() %}
+<div class="f-site-main" role="main">
+  <div class="container">
+    <header class="f-page-header">
+      <h1 class="f-page-title">{{ 'Shopping Cart' }}</h1>
+    </header>
+{% if false == cartItems %}
+    {{ THIS.view('core/messages').set('messages', [{type:'info', msg:"Your cart is empty. "|_}]) | raw }}
+{% else %}
+    {{ THIS.view('core/messages') | raw }}
+    <div class="row">
+      <div class="f-widget f-widget-cart f-col-cart-content col-md-9">
+        <header class="f-widget-header">
+          <strong class="f-widget-title">Items in cart</strong>
+        </header>
+        <div class="table-responsive">
+          <form method="post" action="{{ APP.href('cart/add') }}">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th class="f-cart-col-item" colspan="2">{{ 'Item'|_ }}</th>
+                  <th class="f-cart-col-qty text-center">{{ 'Qty'|_ }}</th>
+                  <th class="f-cart-col-total text-left">{{ 'Action'|_ }}</th>
+                  <th class="f-cart-col-price text-right">{{ 'Unit Price'|_ }}</th>
+                  <th class="f-cart-col-total text-right">{{ 'Total'|_ }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in cartItems %}
+                  {% set p = item.product() %}
+                  {% if p %}
+                    {% set pUrl = p.url() %}{% set pName = p.get('product_name') %}
+                      <tr id="tr-product-{{ p.id }}">
+                        <td class="f-cart-col-img">
+                          <a href="{{ pUrl }}" class="f-prod-img">
+                            <img src="{{ p.thumbUrl(80, 80) }}" width="80" height="80" alt="{{ pName }}"/>
+                          </a>
+                        </td>
+                        <td class="f-cart-col-name">
+                            <span class="product-name"><a href="{{ pUrl }}">{{ pName }}</a></span>
+                        </td>
+                        <td class="f-cart-col-qty text-center">
+                            <input type="text" size="3" name="qty[{{ item.id() }}]" value="{{ item.get('qty')*1 }}" class="f-input-qty input-sm form-control"/>
+                        </td>
+                        <td class="f-cart-col-total text-left">
+                          <div class="checkbox">
+                            <label><input type="checkbox" name="remove[]" class="remove-checkbox" value="{{ item.id() }}"> Remove</label></div>
+                        </td>
+                        <td class="f-cart-col-price text-right">
+                          <div class="f-price-group {{ loggedIn ? 'logged-in' : 'logged-out' }}">
+                            <span class="f-reg-price">
+                              <span class="f-price">{{ p.get('base_price') | currency }}</span>
+                            </span>
+                          </div>
+                        </td>
+                        <td class="f-cart-col-total text-right">
+                          <div class="f-price-group">
+                            <span class="f-reg-price">
+                              <span class="f-price">{{ item.rowTotal() | currency }}</span>
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                  {% endif %}
+                {% endfor %}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2"></td>
+                  <td></td>
+                  <td><button type="submit" class="btn btn-default btn-xs">{{ "Update Cart" |_ }}</button></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </form>
+        </div><!-- /.table-responsive -->
+      </div>
+      <div class="f-col-cart-totals col-md-3">
+        <table class="table">
+        {% for total in cart.getTotals() %}
+          {% if not total.isHidden() %}
+            <tr class="{{ total.getRowClass() }}">
+              <td>{{ total.getLabelFormatted() }}</td>
+              <td>{{ total.getValueFormatted() }}</td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+        </table>
+        <ul class="f-cart-btn-group">
+        {% for checkout in checkout_methods %}
+          {% set button = checkout.getCartCheckoutButton() %}
+          {% if button %}
+            <li>
+              {% if button.html %}
+                  {{ button.html | raw }}
+              {% else %}
+                  <a href="{{ button.href }}" class="btn btn-primary"><span>{{ button.label |_ }}</span></a>
+              {% endif %}
+            </li>
+          {% endif %}
+        {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-9">
+        {{ THIS.hook('cart_upsell') | raw }}
+      </div>
+    </div>
+{% endif %}
+  </div>
+</div>
+

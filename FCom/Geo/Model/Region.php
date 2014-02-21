@@ -10,7 +10,7 @@ class FCom_Geo_Model_Region extends FCom_Core_Model_Abstract
 
     public static function options($country)
     {
-        if (!static::$_optionsCache[$country]) {
+        if (empty(static::$_optionsCache[$country])) {
             static::$_optionsCache[$country] = static::orm('s')
                 ->where('country', $country)->find_many_assoc('code', 'name');
         }

@@ -1,0 +1,12 @@
+.tasks {
+
+  .task {
+    @include clearfix;
+  }
+
+  > li:last-child {
+    .progress {
+      margin-bottom: 0;
+    }
+  }
+}

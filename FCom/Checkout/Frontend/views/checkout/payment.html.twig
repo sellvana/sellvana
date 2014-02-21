@@ -1,0 +1,35 @@
+{% set curMethod = THIS.get('cart').get('payment_method') %}
+{% set payment_html = THIS.get('payment_html') %}
+<h4>{{ "Payment methods" |_ }}</h4>
+<fieldset>
+  {% for method, class in THIS.get('payment_methods') %}
+    <div class="radio">
+      <label>
+        <input type="radio" class="payment_method radio" name="payment_method" value="{{ method }}" {{ method == curMethod ? 'checked' }} id="payment_method_{{ method }}">
+        {{ class.getName()|_ }}
+      </label>
+    </div>
+    {% if payment_html[method] %}
+     <div class="payment_html" id="payment_html_{{ method }}">
+         {{ payment_html[method] |raw}}
+     </div>
+    {% endif %}
+  {% endfor %}
+</fieldset>
+<script type="text/javascript">
+    require(['jquery'], function($){
+        $('.payment_method').click(function(){
+            $('.payment_html').addClass('hidden').find('input, select, textarea').prop('disabled', true);
+            $('#payment_html_' + this.value).removeClass('hidden').find('input, select, textarea').prop('disabled', false);
+        });
+        $('.payment_html').each(function(idx,el){
+            var currentMethod = '{{ curMethod }}';
+                    //{{ method != curMethod ? ' hidden' }}
+            var id = el.id;
+            var method = id.replace('payment_html_','');
+            if(method != currentMethod){
+                $(el).addClass('hidden');
+            }
+        });
+    });
+</script>

@@ -12,6 +12,8 @@ class FCom_Sales_Tests_AllTests
     {
         $suite = new PHPUnit_Framework_TestSuite('PHPUnit Sales');
 
+        $suite->addTestSuite('FCom_Checkout_Tests_Model_CartTest');
+        $suite->addTestSuite('FCom_Checkout_Tests_Model_CartAddressTest');
         $suite->addTestSuite('FCom_Sales_Tests_Model_OrderTest');
 
 

@@ -1,7 +1,7 @@
-<?php return array('"Wishlist"' => '',
-'"There are no products in wishlist"' => '',
-'"Remove"' => '',
-'"Product"' => '',
-'"Price"' => '',
-'"Update Wishlist"' => '',
-'"Add to Wishlist"' => '');
+<?php return array('Add to Wishlist' => '',
+'Wishlist' => '',
+'Remove' => '',
+'Product' => '',
+'Price' => '',
+'Update Wishlist' => '',
+'There are no products in wishlist' => '');

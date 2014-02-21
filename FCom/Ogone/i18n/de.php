@@ -1,0 +1,1 @@
+<?php return array('Secure payment by Ogone' => '');

@@ -1,0 +1,60 @@
+{% set grid = THIS.get('grid') %}
+<div class="f-admin-main-view">
+  <div class="page-header f-admin-page-header">
+      <h1 class="f-page-title">
+          <i class="icon-table"></i>
+          {{ THIS.get('title') }}
+      </h1>
+      <div class="btn-group">
+          {{ THIS.get('actions') | join(' ') | raw }}
+      </div>
+  </div>
+  
+  <div class="f-admin-main">
+      {{ THIS.view('core/backbonegrid').set('grid', {config: grid['config']}) | raw }}
+  </div>
+</div>
+<script>
+    var btnApprove = $('#prod-reviews-approve');
+    var btnDeny = $('#prod-reviews-deny');
+    var selected_row_ids = []; //todo: remove this variable, use selectedRows instead
+    var selectedRows = [];
+
+    require(["jquery", "underscore", "jquery.validate", "fcom.backbonegrid", "jquery.rateit",  "fcom.admin", "bootstrap"], function($, _) {
+        if(typeof(g_vent) === 'undefined')
+            g_vent = _.extend({}, Backbone.Events);
+        /*adminForm.createSwitchButton();
+        adminForm.wysiwygInit();*/
+        g_vent.bind('select-rows', function(ev) {
+            if (ev.rows.length > 0) {
+                btnApprove.removeClass('disabled');
+                btnDeny.removeClass('disabled');
+                selected_row_ids = _.pluck(ev.rows,'id');
+                selectedRows = ev.rows;
+            } else {
+                btnApprove.addClass('disabled');
+                btnDeny.addClass('disabled');
+                selected_row_ids = [];
+                selectedRows = [];
+            }
+        });
+
+        btnApprove.on('click', function() {
+            updateStatus(1, selected_row_ids);
+        });
+
+        btnDeny.on('click', function() {
+            updateStatus(0, selected_row_ids);
+        });
+
+        function updateStatus(approve, ids)
+        {
+            for (var index = 0; index < selectedRows.length; index++) {
+                selectedRows[index].approved = approve;
+                g_vent.trigger('update_row', {grid: '{{ grid['config']['id'] }}', row: selectedRows[index]});
+                //todo: implement update multi rows
+            }
+            $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
+        }
+    });
+</script>

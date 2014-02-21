@@ -24,6 +24,17 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         ),
     );
 
+    protected $_validationRules = array(
+        array('username', '@required'),
+        array('email', '@required'),
+        array('email', '@email'),
+        array('password', 'FCom_Admin_Model_User::validatePasswordSecurity'),
+
+        //array('is_superadmin', '@integer'),
+        array('role_id', '@integer'),
+        //array('superior_id', '@integer'),
+    );
+
     protected $_persModel;
     protected $_persData;
 
@@ -43,29 +54,58 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
-        if ($this->password) {
-            $this->password_hash = BUtil::fullSaltedHash($this->password);
+        if (!parent::onBeforeSave()) return false;
+
+        if ($this->get('password')) {
+            $this->set('password_hash', BUtil::fullSaltedHash($this->get('password')));
         }
-        if (!$this->role_id) {
-            $this->role_id = null;
+        if ($this->get('api_password')) {
+            $this->set('api_password_hash', BUtil::fullSaltedHash($this->get('api_password')));
         }
+        if (!$this->get('role_id')) {
+            $this->set('role_id', null);
+        }
+        $this->set('create_at', BDb::now(), 'IFNULL');
+        $this->set('update_at', BDb::now());
 
         return true;
     }
 
-    public function getData()
+    public function onAfterSave()
     {
-        $data = $this->as_array();
+        parent::onAfterSave();
+
+        if ($this->id()===static::sessionUserId()) {
+            BSession::i()->data('admin_user', serialize($this));
+            static::$_sessionUser = $this;
+        }
+    }
+
+    public function as_array(array $objHashes=array())
+    {
+        $data = parent::as_array();
         unset($data['password_hash']);
+        unset($data['api_password_hash']);
         return $data;
     }
 
-    public function validatePassword($password)
+    public static function validatePasswordSecurity($data, $args)
     {
-        return BUtil::validateSaltedHash($password, $this->password_hash);
+        if (!BConfig::i()->get('modules/FCom_Admin/password_strength')) {
+            return true;
+        }
+        $password = $data[$args['field']];
+        if(strlen($password) > 0 && !preg_match('/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/', $password)) {
+            return 'Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.';
+        }
+        return true;
+    }
+
+    public function validatePassword($password, $field='password_hash')
+    {
+        return BUtil::validateSaltedHash($password, $this->get($field));
     }
 
     public static function has_role($orm, $role)
@@ -101,7 +141,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     static public function sessionUserId()
     {
         $user = self::sessionUser();
-        return !empty($user) ? $user['id'] : false;
+        return !empty($user) ? $user->id() : false;
     }
 
     static public function isLoggedIn()
@@ -111,15 +151,17 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     static public function authenticate($username, $password)
     {
-        /** @var FCom_Admin_Model_User */
-        $user = static::i()->orm()
-            ->where(array('OR'=>array(
-                'username'=>$username,
-                'email'=>$username)))
-            ->find_one();
-        if (!$user || !$user->validatePassword($password)) {
+        if (empty($username) || empty($password)) {
             return false;
         }
+        BLoginThrottle::i()->init('FCom_Admin_Model_User', $username);
+        /** @var FCom_Admin_Model_User */
+        $user = static::i()->orm()->where(array('OR'=>array('username'=>$username, 'email'=>$username)))->find_one();
+        if (!$user || !$user->validatePassword($password)) {
+            BLoginThrottle::i()->failure();
+            return false;
+        }
+        BLoginThrottle::i()->success();
         return $user;
     }
 
@@ -128,14 +170,14 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if (empty($username) || empty($password)) {
             return false;
         }
+        BLoginThrottle::i()->init('FCom_Admin', $username);
         /** @var FCom_Admin_Model_User */
-        $user = static::i()->orm()
-            ->where('api_username', $username)
-            ->where('api_password', $password)
-            ->find_one();
-        if (!$user) {
+        $user = static::i()->orm()->where('api_username', $username)->find_one();
+        if (!$user || !$user->validatePassword($password, 'api_password_hash')) {
+            BLoginThrottle::i()->failure();
             return false;
         }
+        BLoginThrottle::i()->success();
         return $user;
     }
 
@@ -146,45 +188,54 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         BSession::i()->data('admin_user', serialize($this));
         static::$_sessionUser = $this;
 
-        if ($this->locale) {
-            setlocale(LC_ALL, $this->locale);
+        if ($this->get('locale')) {
+            setlocale(LC_ALL, $this->get('locale'));
         }
-        if ($this->timezone) {
-            date_default_timezone_set($this->timezone);
+        if ($this->get('timezone')) {
+            date_default_timezone_set($this->get('timezone'));
         }
-        BPubSub::i()->fire('FCom_Admin_Model_User::login.after', array('user'=>$this));
+        BEvents::i()->fire('FCom_Admin_Model_User::login:after', array('user' => $this));
 
         return $this;
     }
 
     static public function logout()
     {
+        BEvents::i()->fire(__METHOD__);
         BSession::i()->data('admin_user', null);
         static::$_sessionUser = null;
     }
 
     public function recoverPassword()
     {
-        $this->set(array('token'=>BUtil::randomString(), 'token_dt'=>BDb::now()))->save();
+        $this->set(array('token'=>BUtil::randomString(), 'token_at'=>BDb::now()))->save();
         BLayout::i()->view('email/admin/user-password-recover')->set('user', $this)->email();
         return $this;
     }
 
     public function resetPassword($password)
     {
-        $this->set(array('token'=>null, 'token_dt'=>null))->setPassword($password)->save()->login();
+        $this->set(array('token'=>null, 'token_at'=>null))->setPassword($password)->save()->login();
         BLayout::i()->view('email/admin/user-password-reset')->set('user', $this)->email();
         return $this;
     }
 
     public function tzOffset()
     {
-        return BLocale::i()->tzOffset($this->tz);
+        return BLocale::i()->tzOffset($this->get('tz'));
     }
 
     public function fullname()
     {
-        return $this->firstname.' '.$this->lastname;
+        return $this->get('firstname').' '.$this->get('lastname');
+    }
+
+    public function thumb($w, $h=null)
+    {
+        return BUtil::gravatar($this->get('email'));
+        return FCom_Core_Main::i()->resizeUrl().http_build_query(array(
+            'f' => $this->thumb_url,
+        ));
     }
 
     /**
@@ -199,16 +250,21 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function personalize($data=null)
     {
         if (!$this->orm) {
-            return $this->sessionUser()->personalize($data);
+            $user = $this->sessionUser();
+            if (!$user) {
+                return null;
+            }
+            return $user->personalize($data);
         }
         if (!$this->_persModel) {
-            $this->_persModel = FCom_Admin_Model_Personalize::i()->load($this->id, 'user_id');
+            $this->_persModel = FCom_Admin_Model_Personalize::i()->load($this->id(), 'user_id');
             if (!$this->_persModel) {
                 $this->_persModel = FCom_Admin_Model_Personalize::i()->create(array('user_id'=>$this->id));
             }
         }
         if (!$this->_persData) {
-            $this->_persData = $this->_persModel->data_json ? BUtil::fromJson($this->_persModel->data_json) : array();
+            $dataJson = $this->_persModel->get('data_json');
+            $this->_persData = $dataJson ? BUtil::fromJson($dataJson) : array();
         }
         if (is_null($data)) {
             return $this->_persData;
@@ -220,20 +276,21 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     public function getPermission($paths)
     {
-        if ($this->is_superadmin) {
+        if ($this->get('is_superadmin')) {
             return true;
         }
-        if (!$this->role_id) {
+        if (!$this->get('role_id')) {
             return false;
         }
-        if (!$this->permissions) {
-            $this->permissions = FCom_Admin_Model_Role::i()->load($this->role_id)->permissions;
+        if (!$this->get('permissions')) {
+            $this->set('permissions', FCom_Admin_Model_Role::i()->load($this->role_id)->get('permissions'));
         }
         if (is_string($paths)) {
             $paths = explode(',', $paths);
         }
         foreach ($paths as $p) {
-            if (!empty($this->permissions[$p])) {
+            $perms = $this->get('permissions');
+            if (!empty($perms[$p])) {
                 return true;
             }
         }

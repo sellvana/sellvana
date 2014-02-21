@@ -1,15 +1,7 @@
 <?php
 class FCom_CatalogIndex_Migrate extends BClass
 {
-    public function run()
-    {
-        BMigrate::install('0.1.6', array($this, 'install'));
-        BMigrate::upgrade('0.1.3', '0.1.4', array($this, 'upgrade_0_1_4'));
-        BMigrate::upgrade('0.1.4', '0.1.5', array($this, 'upgrade_0_1_5'));
-        BMigrate::upgrade('0.1.5', '0.1.6', array($this, 'upgrade_0_1_6'));
-    }
-
-    public function install()
+    public function install__0_1_7()
     {
         $tCustField = FCom_CustomField_Model_Field::table();
         $tProduct = FCom_Catalog_Model_Product::table();
@@ -44,7 +36,7 @@ class FCom_CatalogIndex_Migrate extends BClass
                 'filter_type' => "ENUM('none','exclusive','inclusive','range') NOT NULL DEFAULT 'none'",
                 //'filter_multiselect' => 'tinyint not null default 0',
                 'filter_multivalue' => 'tinyint not null default 0',
-                'filter_counts' => 'tinyint unsigned NOT NULL DEFAULT 0 AFTER filter_multivalue',
+                'filter_counts' => 'tinyint unsigned NOT NULL DEFAULT 0',
                 'filter_show_empty' => 'tinyint not null default 0',
                 'filter_order' => 'smallint unsigned',
                 'filter_custom_view' => 'varchar(255)',
@@ -79,6 +71,7 @@ class FCom_CatalogIndex_Migrate extends BClass
             'COLUMNS' => array(
                 'id' => 'int(10) unsigned not null auto_increment',
                 'last_indexed' => 'datetime not null',
+                'flag_reindex' => 'tinyint not null default 0',
                 'sort_product_name' => 'varchar(50)',
                 'sort_price' => 'decimal(12,2)',
                 'sort_rating' => 'tinyint',
@@ -86,6 +79,7 @@ class FCom_CatalogIndex_Migrate extends BClass
             'PRIMARY' => '(id)',
             'KEYS' => array(
                 'IDX_last_indexed' => '(last_indexed)',
+                'IDX_flag_reindex' => '(flag_reindex)',
                 'IDX_sort_product_name' => '(sort_product_name)',
                 'IDX_sort_price' => '(sort_price)',
                 'IDX_sort_rating' => '(sort_rating)',
@@ -127,46 +121,84 @@ class FCom_CatalogIndex_Migrate extends BClass
             ),
         ));
 
-        $this->upgrade_0_1_4();
+        $this->upgrade__0_1_3__0_1_4();
     }
 
-    public function upgrade_0_1_4()
+    public function upgrade__0_1_3__0_1_4()
     {
         //$this->install();
         BDb::run("
-replace  into `fcom_index_field`
-(`id`,`field_name`,`field_label`,`field_type`,`weight`,`fcom_field_id`,`source_type`,`source_callback`,`filter_type`,`filter_multiselect`,`filter_multivalue`,`filter_show_empty`,`filter_order`,`filter_custom_view`,`search_type`,`sort_type`,`sort_label`,`sort_order`)
-values
-(1,'product_name','Product Name','text',0,NULL,'field',NULL,'none',NULL,0,0,NULL,NULL,'terms','both','Product Name (A-Z) || Product Name (Z-A)',NULL),
-(2,'short_description','Short Description','text',0,NULL,'field',NULL,'none',NULL,0,0,NULL,NULL,'terms','none',NULL,NULL),
-(3,'description','Description','text',0,NULL,'field',NULL,'none',NULL,0,0,NULL,NULL,'terms','none',NULL,NULL),
-(4,'category','Category','category',0,NULL,'callback','FCom_CatalogIndex_Model_Field::indexCategory','exclusive',NULL,1,0,1,'catalog/category/_filter_categories','none','none',NULL,NULL),
-(6,'color','Color','varchar',0,NULL,'field',NULL,'inclusive',NULL,0,0,2,NULL,'none','none',NULL,NULL),
-(7,'size','Size','varchar',0,NULL,'field',NULL,'inclusive',NULL,0,0,3,NULL,'none','none',NULL,NULL),
-(8,'price_range','Price Range','varchar',0,NULL,'callback','FCom_CatalogIndex_Model_Field::indexPriceRange','inclusive',NULL,0,0,4,NULL,'none','none',NULL,NULL),(9,'price','Price','decimal',0,NULL,'field',NULL,'none',NULL,0,0,NULL,NULL,'none','both','Price (Min-Max) || Price (Max-Min)',NULL)
+REPLACE  INTO `fcom_index_field`
+(`id`,`field_name`,`field_label`,`field_type`,`weight`,`fcom_field_id`,`source_type`,`source_callback`,`filter_type`,`filter_multivalue`,`filter_counts`,`filter_show_empty`,`filter_order`,`filter_custom_view`,`search_type`,`sort_type`,`sort_label`,`sort_order`)
+VALUES
+(1,'product_name','Product Name','text',0,NULL,'field',NULL,'none',0,0,0,NULL,NULL,'terms','both','Product Name (A-Z) || Product Name (Z-A)',NULL),
+(2,'short_description','Short Description','text',0,NULL,'field',NULL,'none',0,0,0,NULL,NULL,'terms','none',NULL,NULL),
+(3,'description','Description','text',0,NULL,'field',NULL,'none',0,0,0,NULL,NULL,'terms','none',NULL,NULL),
+(4,'category','Category','category',0,NULL,'callback','FCom_CatalogIndex_Model_Field::indexCategory','exclusive',1,1,0,1,'catalog/category/_filter_categories','none','none',NULL,NULL),
+(6,'color','Color','varchar',0,NULL,'field',NULL,'inclusive',0,1,0,2,NULL,'none','none',NULL,NULL),
+(7,'size','Size','varchar',0,NULL,'field',NULL,'inclusive',0,1,0,3,NULL,'none','none',NULL,NULL),
+(8,'price_range','Price Range','varchar',0,NULL,'callback','FCom_CatalogIndex_Model_Field::indexPriceRange','inclusive',0,1,0,4,NULL,'none','none',NULL,NULL),
+(9,'price','Price','decimal',0,NULL,'field',NULL,'none',0,0,0,4,NULL,'none','both','Price (Min-Max) || Price (Max-Min)',NULL)
         ");
     }
-    
-    public function upgrade_0_1_5()
+
+    public function upgrade__0_1_4__0_1_5()
     {
         BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), array(
             'COLUMNS' => array(
                 'filter_counts' => 'tinyint unsigned NOT NULL DEFAULT 0 AFTER filter_multivalue',
             ),
         ));
-        
+
         FCom_CatalogIndex_Model_Field::i()->update_many(
             array('filter_custom_view' => 'catalogindex/product/_filter_categories'),
             array('field_name' => 'category')
-        );        
+        );
     }
-    
-    public function upgrade_0_1_6()
+
+    public function upgrade__0_1_5__0_1_6()
     {
         BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), array(
             'COLUMNS' => array(
                 'filter_multiselect' => 'DROP',
             ),
         ));
+    }
+
+    public function upgrade__0_1_6__0_1_7()
+    {
+        BDb::ddlTableDef(FCom_CatalogIndex_Model_Doc::table(), array(
+            'COLUMNS' => array(
+                'flag_reindex' => 'tinyint not null default 0 after last_indexed',
+            ),
+            'KEYS' => array(
+                'IDX_flag_reindex' => '(flag_reindex)',
+            ),
+        ));
+    }
+
+    public function upgrade__0_1_7__0_1_8()
+    {
+        $tDoc = FCom_CatalogIndex_Model_Doc::table();
+        $tField = FCom_CatalogIndex_Model_Field::table();
+        $tDocSort = FCom_CatalogIndex_Model_DocSort::table();
+
+        BDb::ddlTableDef($tDocSort, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'doc_id' => 'int unsigned not null',
+                'field_id' => 'int unsigned not null',
+                'value' => 'varchar(255) not null',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'IDX_field_value' => '(field_id, value)',
+            ),
+            'CONSTRAINTS' => array(
+                "FK_{$tDocSort}_doc" => "FOREIGN KEY (doc_id) REFERENCES {$tDoc} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "FK_{$tDocSort}_field" => "FOREIGN KEY (field_id) REFERENCES {$tField} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            ),
+        ));
+        //TODO: delete doc.sort_product_name
     }
 }

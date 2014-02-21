@@ -1,0 +1,10 @@
+{% if THIS.get('promoList') %}
+    <section class="col2-set sub-cart">
+        <h2>{{ "Promotions" | _ }}</h2>
+        {% for promo in THIS.get('promoList') %}
+            <a href="#"
+               onclick="window.open('{{ APP.href('promo/media') }}?id={{ promo.get('id') }}','','width=200,height=100')">{{ promo.get('description') }}</a>
+            <br/>
+        {% endfor %}
+    </section>
+{% endif %}

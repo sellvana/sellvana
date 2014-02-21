@@ -1,9 +1,72 @@
 <?php
-
+/**
+ * Model class for table "fcom_product".
+ *
+ * The followings are the available columns in table 'fcom_product':
+ * @property string  $id
+ * @property string  $local_sku
+ * @property string  $product_name
+ * @property string  $short_description
+ * @property string  $description
+ * @property string  $url_key
+ * @property string  $cost
+ * @property string  $msrp
+ * @property string  $map
+ * @property string  $markup
+ * @property string  $base_price
+ * @property string  $sale_price
+ * @property string  $net_weight
+ * @property string  $ship_weight
+ * @property integer $is_hidden
+ * @property string  $notes
+ * @property string  $uom
+ * @property string  $thumb_url
+ * @property string  $create_at
+ * @property string  $update_at
+ * @property string  $data_serialized
+ * @property string  $avg_rating
+ * @property integer $num_reviews
+ */
 class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_product';
+
+    protected static $_fieldOptions = array(
+        'stock_status' => array(
+            'in_stock' => 'In Stock',
+            'backorder' => 'On Backorder',
+            'special_order' => 'Special Order',
+            'do_not_carry' => 'Do Not Carry',
+            'temp_unavail' => 'Temporarily Unavailable',
+            'vendor_disc' => 'Supplier Discontinued',
+            'manuf_disc' => 'MFR Discontinued',
+        ),
+    );
+
+    protected $_validationRules = array(
+        array('product_name', '@required'),
+        array('base_price', '@required'),
+        array('local_sku', '@required'),
+        array('local_sku', '@string', null, array('max' => 100)),
+        array('local_sku', 'FCom_Catalog_Model_Product::validateDupSku', 'Duplicate SKU'),
+        //TODO validation fails on is_hidden field
+        /*array('is_hidden', '@required'),*/
+        /*array('uom', '@required'),*/
+
+        /*array('is_hidden', '@integer'),*/
+        array('num_reviews', '@integer'),
+
+
+        array('cost', '@numeric'),
+        array('msrp', '@numeric'),
+        array('map', '@numeric'),
+        array('markup', '@numeric'),
+        array('sale_price', '@numeric'),
+        array('net_weight', '@numeric'),
+        array('ship_weight', '@numeric'),
+        array('avg_rating', '@numeric'),
+    );
 
     private $_importErrors = null;
     private $_dataImport = array();
@@ -16,70 +79,121 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
+    }
+
+    public static function validateDupSku($data, $args)
+    {
+        if (empty($data[$args['field']])) {
+            return true;
+        }
+        $sku = $data[$args['field']];
+        $orm = static::orm('p')->where('local_sku', $data[$args['field']]);
+        if (!empty($data['id'])) {
+            $orm->where_not_equal('p.id', $data['id']);
+        }
+        return !$orm->find_one();
     }
 
     public static function stockStatusOptions($onlyAvailable=false)
     {
-        $options = array(
-            'in_stock' => 'In Stock',
-            'backorder' => 'On Backorder',
-            'special_order' => 'Special Order',
-        );
-        if (!$onlyAvailable) {
-            $options += array(
-                'do_not_carry' => 'Do Not Carry',
-                'temp_unavail' => 'Temporarily Unavailable',
-                'vendor_disc' => 'Supplier Discontinued',
-                'manuf_disc' => 'MFR Discontinued',
-            );
+        $options = static::fieldOptions('stock_status');
+        if ($onlyAvailable) {
+            return BUtil::arrayMask($options, 'in_stock,backorder,special_order');
         }
         return $options;
     }
 
     public function url($category=null)
     {
-        return BApp::href(($category ? $category->url_path.'/' : '').$this->url_key);
+        return BApp::href(($category ? $category->get('url_path').'/' : '') . $this->get('url_key'));
     }
 
     public function imageUrl($full=false)
     {
         $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media/';
         $url = $full ? BApp::href('/') : '';
-        return $url.$media.($this->image_url ? $this->image_url : 'DC642702.jpg');
+        $thumbUrl = $this->get('thumb_url');
+        return $url.$media.'/'.($thumbUrl ? $thumbUrl : 'image-not-found.jpg');
     }
 
-    public function thumbUrl($w, $h=null)
+    public function thumbUrl($w, $h=null, $full=false)
     {
-        return FCom_Core::i()->resizeUrl().'?f='.urlencode($this->imageUrl(true)).'&s='.$w.'x'.$h;
+        return FCom_Core_Main::i()->resizeUrl().'?f='.urlencode(trim($this->imageUrl($full), '/')).'&s='.$w.'x'.$h;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
+        if (!parent::onBeforeSave()) return false;
 
         //todo: check out for unique url_key before save
         if (!$this->get('url_key')) $this->generateUrlKey();
 
-        return true;
-    }
+        if (!$this->get('create_at'))  $this->set('create_at', BDb::now());
+        $this->set('update_at', BDb::now());
 
-    public function afterSave()
-    {
-        if (!parent::afterSave()) return false;
-
-        //todo: setup unique uniq_id
-        if (!$this->get('unique_id')) {
-            $this->set('unique_id', $this->id);
-            $this->save();
+        // Cleanup possible bad input
+        if ($this->get('sale_price') === '') {
+            $this->set('sale_price', null);
+        }
+        if ($this->get('cost') === '') {
+            $this->set('cost', null);
+        }
+        if ($this->get('msrp') === '') {
+            $this->set('msrp', null);
+        }
+        if ($this->get('map') === '') {
+            $this->set('map', null);
+        }
+        if ($this->get('markup') === '') {
+            $this->set('markup', null);
         }
 
         return true;
     }
 
+    public function onAfterLoad()
+    {
+        parent::onAfterLoad();
+        $thumbPath = FCom_Core_Main::i()->resizeUrl().'?f='.urlencode(trim($this->imageUrl(), '/')).'&s=48x48';
+        $this->set('thumb_path', $thumbPath);
+
+    }
+
+    public function onAfterSave()
+    {
+        if (!parent::onAfterSave()) return false;
+
+        $saveAgain = false;
+
+        //todo: setup unique uniq_id
+        if (!$this->get('local_sku')) {
+            $this->set('local_sku', $this->id);
+            $saveAgain = true;
+        }
+        if (!$this->get('position')) {
+            $this->set('position', $this->calcPosition());
+        }
+        if ($saveAgain) {
+            $this->save();
+        }
+        return true;
+    }
+
+    public function calcPosition()
+    {
+        $maxCurrentPosition = FCom_Catalog_Model_Product::i()->orm()->select_expr('max(position) as max_pos')->find_one();
+        if (!$maxCurrentPosition) {
+            $maxCurrentPosition = 1;
+        } else {
+            $maxCurrentPosition = $maxCurrentPosition->get('max_pos');
+        }
+        return $maxCurrentPosition + 1;
+    }
+
     public function generateUrlKey()
     {
-        //$key = $this->manuf()->manuf_name.'-'.$this->manuf_sku.'-'.$this->product_name;
+        //$key = $this->manuf()->manuf_name.'-'.$this->local_sku.'-'.$this->product_name;
         $key = $this->product_name;
         $this->set('url_key', BLocale::transliterate($key));
         return $this;
@@ -87,7 +201,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function isDisabled()
     {
-        return $this->disabled;
+        return $this->is_hidden;
     }
 
     public function onAssociateCategory($args)
@@ -107,7 +221,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $result[$i] = array(
                 'id'                => $product->id,
                 'product_name'      => $product->product_name,
-                'sku'               => $product->manuf_sku,
+                'sku'               => $product->local_sku,
                 'price'             => $product->base_price,
                 'url'               => $product->url_key,
                 'weight'            => $product->weight,
@@ -129,7 +243,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $data['product_name'] = $post['product_name'];
         }
         if (!empty($post['sku'])) {
-            $data['manuf_sku'] = $post['sku'];
+            $data['local_sku'] = $post['sku'];
         }
         if (!empty($post['price'])) {
             $data['base_price'] = $post['price'];
@@ -148,7 +262,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     /**
      * Find all categories which belong to product
-     * @return type
+     * @param bool $includeAscendants
+     * @return mixed
      */
     public function categories($includeAscendants=false)
     {
@@ -187,7 +302,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $fields = FCom_CustomField_Model_ProductField::i()->productFields($this);
         if ($fields) {
             foreach ($fields as $f) {
-                if ($f->frontend_show) {
+                if ($f->get('frontend_show')) {
                     $result[] = $f;
                 }
             }
@@ -208,7 +323,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $and = array();
         if ($qs) {
             foreach ($qs as $k) $and[] = array('product_name like ?', '%'.$k.'%');
-            $productsORM->where(array('OR'=>array('manuf_sku'=>$q, 'AND'=>$and)));
+            $productsORM->where(array('OR'=>array('local_sku'=>$q, 'AND'=>$and)));
         }
 
         if (!empty($filter)){
@@ -230,7 +345,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             ->where('pa.product_id', $this->id)->where('pa.media_type', $type)
             //->select(array('pa.manuf_vendor_id'))
             ->join('FCom_Core_Model_MediaLibrary', array('a.id','=','pa.file_id'), 'a')
-            ->select(array('a.id', 'a.file_name', 'a.file_size'));
+            ->select(array('a.id', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'pa.label'))
+            ->order_by_asc('position');
     }
 
     public function media($type)
@@ -309,7 +425,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $errors = array();
         foreach($data as $d) {
             //if must have fields not defined then skip the record
-            if (empty($d['product_name']) && empty($d['unique_id']) && empty($d['url_key'])) {
+            if (empty($d['product_name']) && empty($d['local_sku']) && empty($d['url_key'])) {
                 continue;
             }
 
@@ -361,8 +477,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             if ('create_or_update' == $config['import']['actions'] ||
                     'update' == $config['import']['actions']
                     ) {
-                if (isset($d['unique_id'])) {
-                    $p = $this->orm()->where("unique_id", $d['unique_id'])->find_one();
+                if (isset($d['local_sku'])) {
+                    $p = $this->orm()->where("local_sku", $d['local_sku'])->find_one();
                 }
                 if (!$p && isset($d['product_name'])) {
                     $p = $this->orm()->where("product_name", $d['product_name'])->find_one();
@@ -599,6 +715,96 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         FCom_Catalog_Model_CategoryProduct::i()->delete_many(array('product_id'=>$this->id, 'category_id'=>$categoryIds));
         return $this;
+    }
+
+    public function getAverageStars()
+    {
+        return $this->get('avg_rating')/5*100;
+    }
+
+    public function getNumReviews()
+    {
+        return $this->get('num_reviews');
+    }
+
+    public function reviews($incAvgRating = true)
+    {
+        $reviews = FCom_ProductReviews_Model_Review::i()->orm('pr')->select(array('pr.*', 'c.firstname', 'c.lastname'))
+            ->join('FCom_Customer_Model_Customer', array('pr.customer_id','=','c.id'), 'c')
+            ->where(array('pr.product_id' => $this->id(), 'approved' => 1))->order_by_expr('pr.create_at DESC')->find_many();
+
+        if ($incAvgRating) {
+            $avgRating = $this->calcAverageRating($reviews);
+        }
+        return array(
+            'items' => $reviews,
+            'avgRating' => isset($avgRating) ? $avgRating : array(),
+            'numReviews' => count($reviews),
+        );
+    }
+
+    public function calcAverageRating($reviews = array())
+    {
+        $rs = array(
+            'rating' => 0,
+            'rating1' => 0,
+            'rating2' => 0,
+            'rating3' => 0,
+        );
+        if (!empty($reviews)) {
+            $numReviews = count($reviews);
+            foreach ($reviews as $review) {
+                $rs['rating'] += $review->rating;
+                $rs['rating1'] += $review->rating1;
+                $rs['rating2'] += $review->rating2;
+                $rs['rating3'] += $review->rating3;
+            }
+
+            $rs['rating'] = number_format($rs['rating'] / $numReviews, 2);
+            $rs['rating1'] = number_format($rs['rating1'] / $numReviews, 2);
+            $rs['rating2'] = number_format($rs['rating2'] / $numReviews, 2);
+            $rs['rating3'] = number_format($rs['rating3'] / $numReviews, 2);
+        }
+
+        return $rs;
+    }
+
+    public function getRelatedProducts()
+    {
+        return array();
+    }
+
+    public function getUpsellProducts()
+    {
+        return array();
+    }
+
+    /**
+     * get options data to create options html in select
+     * @param bool $labelIncId
+     * @return array
+     */
+    public function getOptionsData($labelIncId = false)
+    {
+        $results = $this->orm('p')->find_many();
+        $data = array();
+        if (count($results)) {
+            foreach ($results as $r) {
+                $data[$r->id] = $labelIncId ? $r->id . ' - ' . $r->product_name : $r->product_name;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * check customer has already reviewed this product
+     * @param  $customerId
+     * @return boolean|FCom_ProductReviews_Model_Review
+     */
+    public function isAlreadyReviewed($customerId)
+    {
+        return FCom_ProductReviews_Model_Review::i()->load(array('product_id' => $this->id, 'customer_id' => $customerId));
     }
 }
 

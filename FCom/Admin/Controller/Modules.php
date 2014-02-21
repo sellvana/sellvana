@@ -1,16 +1,26 @@
 <?php
 
-class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
+class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected $_permission = 'system/modules';
+    protected static $_origClass = __CLASS__;
+    protected $_modelClass = 'FCom_Core_Model_Module';
+    protected $_gridHref = 'modules';
+    protected $_gridTitle = 'Modules';
+    protected $_recordName = 'Product';
+    protected $_mainTableAlias = 'm';
+    protected $_gridViewName = 'core/backbonegrid';
 
     public function getModulesData()
     {
         $config = BConfig::i();
-        $coreLevels = $config->get('modules/FCom_Core/module_run_level');
-        $adminLevels = $config->get('modules/FCom_Admin/module_run_level');
-        $frontendLevels = $config->get('modules/FCom_Frontend/module_run_level');
-        $modules = BModuleRegistry::i()->debug();
+        $coreLevels = $config->get('module_run_levels/FCom_Core');
+        $adminLevels = $config->get('module_run_levels/FCom_Admin');
+        $frontendLevels = $config->get('module_run_levels/FCom_Frontend');
+        $modules = BModuleRegistry::i()->getAllModules();
+        $autoRunLevelMods = array_flip(explode(',', 'FCom_Core,FCom_Admin,FCom_Admin_DefaultTheme,'.
+            'FCom_Frontend,FCom_Frontend_DefaultTheme,FCom_Install'));
+
 
         try {
             $schemaVersions = BDbModule::i()->orm()->find_many_assoc('module_name');
@@ -27,87 +37,144 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
         $data = array();
         $migrate = false;
         foreach ($modules as $modName=>$mod) {
-            $r = (array)$mod;
-            $deps = array();
-            foreach ($r['depends'] as $dep) {
-                $deps[] = $dep['name'];
+            $r = BUtil::arrayMask((array)$mod, 'name,description,version,run_status,run_level,require,children_copy');
+            $reqs = array();
+            if (!empty($r['require']['module'])) {
+                foreach ($r['require']['module'] as $req) {
+                    $reqs[] = $req['name'];
+                }
             }
-            $r['depends'] = join(', ', $deps);
+            $r['requires'] = join(', ', $reqs);
             $r['required_by'] = join(', ', $mod->children_copy);
-            $r['run_level_core'] = !empty($coreLevels[$modName]) ? $coreLevels[$modName] : null;
-            $r['run_level_admin'] = !empty($adminLevels[$modName]) ? $adminLevels[$modName] : null;
-            $r['run_level_frontend'] = !empty($frontendLevels[$modName]) ? $frontendLevels[$modName] : null;
-            $r['schema_version'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->schema_version : null;
+            $r['auto_run_level'] = isset($autoRunLevelMods[$r['name']]);
+            $r['run_level_core'] = $r['auto_run_level'] ? 'AUTO' : (!empty($coreLevels[$modName]) ? $coreLevels[$modName] : '');
+            //$r['run_level_admin'] = !empty($adminLevels[$modName]) ? $adminLevels[$modName] : '';
+            //$r['run_level_frontend'] = !empty($frontendLevels[$modName]) ? $frontendLevels[$modName] : '';
+            $r['schema_version'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->get('schema_version') : '';
             $r['migration_available'] = !empty($schemaModules[$modName]) && $r['schema_version']!=$r['version'];
+            $r['id'] = $r['name'];
+            $r['_selectable'] = !$r['auto_run_level'];
             $data[] = $r;
         }
+
+        $r = (array)BRequest::i()->get('s');
+
+        $gridId = 'modules';
+        $pers = FCom_Admin_Model_User::i()->personalize();
+        $s = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
+
+        //BDebug::dump($pers); exit;
+        if (!empty($s['s'])) {
+            usort($data, function($a, $b) use($s) {
+                $a1 = !empty($a[$s['s']]) ? $a[$s['s']] : '';
+                $b1 = !empty($b[$s['s']]) ? $b[$s['s']] : '';
+                $sd = empty($s['sd']) || $s['sd']==='asc' ? 1 : -1;
+                return $a1 < $b1 ? -$sd : ($a1 > $b1 ? $sd : 0);
+            });
+        }
+
         return $data;
     }
 
     public function gridConfig()
     {
-        $editMode = BRequest::i()->get('edit');
-        $coreRunLevelOptions = array(
-            BModule::ONDEMAND  => 'ONDEMAND',
-            BModule::DISABLED  => 'DISABLED',
-            BModule::REQUESTED => 'REQUESTED',
-            BModule::REQUIRED  => 'REQUIRED',
-        );
-        $areaRunLevelOptions = array(
-            ''  => '',
-            BModule::DISABLED  => 'DISABLED',
-            BModule::REQUESTED => 'REQUESTED',
-            BModule::REQUIRED  => 'REQUIRED',
-        );
-        $runStatusOptions = array(
-            BModule::IDLE    => 'IDLE',
-            BModule::LOADED  => 'LOADED',
-            BModule::ERROR   => 'ERROR'
-        );
-        $config = array(
-            'grid' => array(
-                'id'          => 'modules',
-                'datatype'    => 'local',
-                'data'        => $this->getModulesData(),
-                'editurl'     => BApp::href('/modules/grid_data'),
-                'columns'     => array(
-                    'name'        => array('label' => 'Name', 'key'=>true, 'width'=>150),
-                    'description' => array('label' => 'Description', 'width'=>250),
-                    'version'     => array('label' => 'Code Version', 'width'=>50),
-                    'schema_version' => array('label' => 'Schema Version', 'width'=>50, 'formatter'=>new BValue('fmtSchemaVersion')),
-                    'run_status'  => array('label' => 'Run Status', 'options'=>$runStatusOptions, 'formatter'=>new BValue('fmtRunStatus'), 'width'=>80),
-                    'run_level' => array('label' => 'Run Level', 'options'=>$coreRunLevelOptions, 'formatter'=>new BValue('fmtRunLevel()'), 'width'=>100),
-                    'run_level_core' => array('label' => 'Run Level (Core)', 'options'=>$areaRunLevelOptions, 'formatter'=>new BValue('fmtRunLevel("FCom_Core")'), 'width'=>120),
-                    'run_level_admin' => array('label' => 'Run Level (Admin)', 'options'=>$areaRunLevelOptions, 'formatter'=>new BValue('fmtRunLevel("FCom_Admin")'), 'width'=>120, 'hidden'=>true),
-                    'run_level_frontend' => array('label' => 'Run Level (Frontend)', 'options'=>$areaRunLevelOptions, 'formatter'=>new BValue('fmtRunLevel("FCom_Frontend")'), 'width'=>120, 'hidden'=>true),
-                    'depends'     => array('label' => 'Dependencies', 'width'=>250),
-                    'required_by' => array('label' => 'Required By', 'width'=>250),
-                ),
-                'rowNum'      => 200,
-                'sortname'    => 'name',
-                'sortorder'   => 'asc',
-                //'multiselect' => true,
+        $modules = BModuleRegistry::i()->getAllModules();
+        $moduleNames = array_keys($modules);
+        $moduleNames = array_combine($moduleNames, $moduleNames);
 
+        $coreRunLevelOptions = FCom_Core_Model_Module::i()->fieldOptions('core_run_level');
+        $areaRunLevelOptions = FCom_Core_Model_Module::i()->fieldOptions('core_run_level');
+        $runStatusOptions = FCom_Core_Model_Module::i()->fieldOptions('run_status');
+        $config = parent::gridConfig();
+
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
+            array('name' => 'name', 'label' => 'Name', 'index' => 'name', 'width' => 100, 'overflow' => true),
+            array('name' => 'description', 'label' => 'Description', 'width' => 150, 'overflow' => true),
+            array('name' => 'version', 'label' => 'Version', 'width' => 80, 'overflow' => true),
+            array('name' => 'schema_version', 'label' => 'DB Version', 'width' => 80, 'cell' => new BValue("FCom.Backgrid.SchemaVersionCell"), 'overflow' => true),
+            array('name' => 'run_status', 'label' => 'Status', 'options' => $runStatusOptions, 'width' => 80, 'cell' => new BValue("FCom.Backgrid.RunStatusCell"), 'overflow' => true),
+            array('name' => 'run_level', 'label' => 'Level', 'options' => $coreRunLevelOptions, 'width' => 100, 'cell' => new BValue("FCom.Backgrid.RunLevelCell"), 'overflow' => true),
+            array('name' => 'run_level_core', 'label' => "Run Level (Core)", 'options' => $areaRunLevelOptions, 'width' => 200, 'mass-editable-show' => true, 'mass-editable' => true, 'editor' => 'select', 'overflow' => true),
+            array('name' => 'requires', 'label' => 'Requires', 'width' => 250, 'overflow' => true),
+            array('name' => 'required_by', 'label' => 'Required By', 'width' => 300,'overflow' => true),
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115,
+                'data' => array(
+                    'required' => array(
+                        'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
+                        'icon' => 'icon-check-sign', 'type' => 'link', 'title' => $this->_('Required')
+                    ),
+                    'ondemand' => array(
+                        'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
+                        'icon' => 'icon-check-empty', 'type' => 'link', 'title' => $this->_('On Demand')
+                    ),
+                    'custom' => array(
+                        'icon' => 'glyphicon glyphicon-repeat',
+                        'event' => 'onclick="changeStatus(this)"'
+                    ),
+                )
             ),
-            'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true),
-            'custom' => array('personalize'=>true, 'autoresize'=>true),
         );
-        BPubSub::i()->fire('FCom_Admin_Controller_Modules::gridConfig', array('config'=>&$config));
+
+        $config['data'] = $this->getModulesData();
+        $config['data_mode'] = 'local';
+        $config['filters'] = array(
+            array('field' => 'name', 'type' => 'text'),
+            array('field' => 'run_status', 'type' => 'multiselect'),
+            array('field' => 'run_level', 'type' => 'multiselect'),
+            //array('field' => 'run_level_core', 'type' => 'multiselect'),
+            array('field' => 'requires', 'type' => 'multiselect', 'options' => $moduleNames),
+            array('field' => 'required_by', 'type' => 'multiselect', 'options' => $moduleNames),
+        );
+        $config['actions'] = array(
+            'edit' => array('caption'=>'Change Status')
+        );
+        $config['events'] = array('edit', 'mass-edit');
+        $config['callbacks'] = array('after_render'=>'afterModuleGridRowRendered');
+
+        //$config['state'] =array(5,6,7,8);
         return $config;
     }
 
+    /*
     public function action_index()
     {
-        $grid = BLayout::i()->view('jqgrid')->set('config', $this->gridConfig());
-        BPubSub::i()->fire('FCom_Admin_Controller_Modules::action_index', array('grid'=>$grid));
-        $this->messages('modules')->layout('/modules');
-    }
+        BLayout::i()->view('modules')->set('form_url', BApp::href('modules').(BRequest::i()->get('RECOVERY')==='' ? '?RECOVERY' : ''));
+        $grid = BLayout::i()->view('core/backgrid')->set('grid', $this->gridConfig());
+        BEvents::i()->fire('FCom_Admin_Controller_Modules::action_index', array('grid_view'=>$grid));
+        $this->layout('/modules');
+    }*/
 
     public function action_index__POST()
     {
+        if (BRequest::i()->xhr()) {
+            $r = BRequest::i()->post();
+            if (isset($r['async'])) {
+                $allModules = BModuleRegistry::i()->getAllModules();
+                $data = array();
+                foreach ($r['data'] as $arr => $key) {
+                    $module = $allModules[$key['module_name']];
+                    $tmp = array(
+                        'module_name' => $key['module_name'],
+                        'run_status' => $module->run_status,
+                        'run_level' => $module->run_level,
+                    );
+                    array_push($data, $tmp);
+                }
+                BResponse::i()->json(array('data' => $data));
+            }
+            if (isset($r['data'])) {
+                foreach ($r['data'] as $arr => $key) {
+                   BConfig::i()->set('module_run_levels/FCom_Core/'.$key['module_name'], $key['run_level_core'], false, true);
+                   FCom_Core_Main::i()->writeConfigFiles('core');
+                }
+                BResponse::i()->json(array('success' => true));
+            }
+        }
         try {
             $areas = array('FCom_Core', 'FCom_Admin', 'FCom_Frontend');
-            $levels = BRequest::i()->post('module_run_level');
+            $levels = BRequest::i()->post('module_run_levels');
             foreach ($areas as $area) {
                 if (empty($levels[$area])) {
                     continue;
@@ -117,27 +184,26 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract
                         unset($levels[$area][$modName]);
                     }
                 }
-                BConfig::i()->set('modules/'.$area.'/module_run_level', $levels[$area], false, true);
-                //BConfig::i()->add(array('modules'=>array($area=>array('module_run_level'=>$levels[$area]))), true);
+                BConfig::i()->set('module_run_levels/'.$area, $levels[$area], false, true);
             }
-            FCom_Core::i()->writeLocalConfig();
-            BSession::i()->addMessage('Run levels updated', 'success', 'admin');
+            FCom_Core_Main::i()->writeConfigFiles('core');
+            $this->message('Run levels updated');
         } catch (Exception $e) {
             BDebug::logException($e);
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            $this->message($e->getMessage(), 'error');
         }
-        BResponse::i()->redirect(BApp::href('modules'));
+        BResponse::i()->redirect('modules');
     }
 
     public function action_migrate__POST()
     {
         try {
-            BMigrate::i()->migrateModules();
-            BSession::i()->addMessage('Migration complete', 'success', 'admin');
+            BMigrate::i()->migrateModules(true);
+            $this->message('Migration complete');
         } catch (Exception $e) {
             BDebug::logException($e);
-            BSession::i()->addMessage($e->getMessage(), 'error', 'admin');
+            $this->message($e->getMessage(), 'error');
         }
-        BResponse::i()->redirect(BApp::href('modules'));
+        BResponse::i()->redirect('modules');
     }
 }

@@ -11,8 +11,8 @@ class FCom_Customer_Tests_Model_AddressTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_customer_address'), "Pre-Condition");
 
-        $cust = FCom_Customer_Model_Customer::load(1);
-        $data = array('id' => 3, 'city' => "Big city", 'country' =>'US', 'state' => 'California', 'firstname' => "Test 1");
+        $cust = FCom_Customer_Model_Customer::i()->load(1);
+        $data = array('id' => 3, 'city' => "Big city", 'country' =>'US', 'region' => 'California', 'firstname' => "Test 1");
         FCom_Customer_Model_Address::import($data, $cust, 'billing');
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_customer_address'), "Insert failed");
@@ -22,8 +22,8 @@ class FCom_Customer_Tests_Model_AddressTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_customer_address'), "Pre-Condition");
 
-        $cust = FCom_Customer_Model_Customer::load(1);
-        $data = array('id' => 3, 'city' => "Big city", 'country' =>'US', 'state' => 'California', 'firstname' => "Test 1");
+        $cust = FCom_Customer_Model_Customer::i()->load(1);
+        $data = array('id' => 3, 'city' => "Big city", 'country' =>'US', 'region' => 'California', 'firstname' => "Test 1");
         $address = FCom_Customer_Model_Address::import($data, $cust, 'billing');
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_customer_address'), "Insert failed");
@@ -34,8 +34,8 @@ class FCom_Customer_Tests_Model_AddressTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_customer_address'), "Pre-Condition");
 
-        $cust = FCom_Customer_Model_Customer::load(1);
-        $data = array('id' => 3, 'city' => "Big city", 'country' =>'US', 'state' => 'California', 'firstname' => "Test 1");
+        $cust = FCom_Customer_Model_Customer::i()->load(1);
+        $data = array('id' => 3, 'city' => "Big city", 'country' =>'US', 'region' => 'California', 'firstname' => "Test 1");
         $address = FCom_Customer_Model_Address::import($data, $cust, 'billing');
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_customer_address'), "Insert failed");
@@ -48,7 +48,7 @@ class FCom_Customer_Tests_Model_AddressTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_customer_address'), "Pre-Condition");
 
-        $address = FCom_Customer_Model_Address::load(1);
+        $address = FCom_Customer_Model_Address::i()->load(1);
         $address->delete();
 
         $this->assertEquals(1, $this->getConnection()->getRowCount('fcom_customer_address'), "Address delete failed");
@@ -58,14 +58,14 @@ class FCom_Customer_Tests_Model_AddressTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_customer_address'), "Pre-Condition");
 
-        $customer = FCom_Customer_Model_Customer::load(1);
+        $customer = FCom_Customer_Model_Customer::i()->load(1);
         $address = $customer->defaultShipping();
         $address->delete();
 
         $this->assertEquals(1, $this->getConnection()->getRowCount('fcom_customer_address'), "Address delete failed");
 
         //refresh customer cache
-        $customer = FCom_Customer_Model_Customer::load(1);
+        $customer = FCom_Customer_Model_Customer::i()->load(1);
 
 
         $this->assertTrue($customer->defaultShipping() == false);

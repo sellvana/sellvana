@@ -1,0 +1,26 @@
+modules:
+    FCom_CatalogIndex:
+        version: 0.1.8
+        channel: beta
+        require: { module: { FCom_Catalog: 0.2.1, FCom_CustomField: 0.1.4 } }
+        description: "Catalog search and facets indexing engine"
+        auto_use: [ views, layout ]
+        observe:
+            - [ FCom_Catalog_Model_Product::onAfterSave, FCom_CatalogIndex_Main::onProductAfterSave ]
+            - [ FCom_Catalog_Model_Category::onAfterSave:products, FCom_CatalogIndex_Main::onCategoryAfterSave ]
+            - [ FCom_CustomField_Model_Field::onAfterSave, FCom_CatalogIndex_Main::onCustomFieldAfterSave ]
+        areas:
+            FCom_Admin:
+                routing:
+                    - [ get, /catalogindex/fields, FCom_CatalogIndex_Admin_Controller_Fields.index ]
+                    - [ any, /catalogindex/fields/.action, FCom_CatalogIndex_Admin_Controller_Fields ]
+                    - [ any, /catalogindex/reindex, FCom_CatalogIndex_Admin_Controller.reindex ]
+
+            FCom_Frontend:
+                routing:
+                    - [ get, /catalogindex/search, FCom_CatalogIndex_Frontend_Controller.search ]
+                    - [ get, /index-test, FCom_CatalogIndex_Frontend_Controller.test ]
+                    - [ get, /index-reindex, FCom_CatalogIndex_Frontend_Controller.reindex ]
+                override:
+                    class:
+                        - [ FCom_Catalog_Frontend_Controller_Search, FCom_CatalogIndex_Frontend_Controller ]

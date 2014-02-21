@@ -14,17 +14,17 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
             if (0 === stripos($this->url_href, array('http://', 'https://'))) {
                 return $this->url_href;
             } else {
-                return FCom_Frontend::href($this->url_href);
+                return FCom_Frontend_Main::i()->href($this->url_href);
             }
         }
         $config = BConfig::i()->get('modules/FCom_Cms');
         $prefix = !empty($config['nav_url_prefix']) ? $config['nav_url_prefix'].'/' : '';
 
-        return FCom_Frontend::href($prefix . $this->url_path);
+        return FCom_Frontend_Main::i()->href($prefix . $this->url_path);
 
     }
 
-    public function validate()
+    public function validateNav()
     {
         switch ($this->node_type) {
         case 'cms_page':
@@ -50,7 +50,7 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
                 ->addView('cms_nav', array(
                     'renderer'    => 'BPHPTAL::renderer',
                     'source'      => $this->content ? $this->content : ' ',
-                    'source_name' => 'cms_nav:'.$this->url_path.':'.strtotime($this->update_dt),
+                    'source_name' => 'cms_nav:'.$this->url_path.':'.strtotime($this->update_at),
                 ))
                 ->hookView('main', 'cms_nav')
             ;

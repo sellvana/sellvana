@@ -1,0 +1,19 @@
+{% set conf = CONFIG.get('modules/FCom_Frontend/nav_top') %}
+
+{% if conf.type == 'cms' %}
+
+    {{ THIS.view('cms/nav-menu').set('root_id', conf.root_cms) | raw }}
+
+{% elseif conf.type == 'categories_root' %}
+
+    {{ THIS.view('catalog/nav') | raw }}
+
+{% elseif conf.type == 'categories_custom' %}
+
+    {{ THIS.view('catalog/nav') | raw }}
+
+{% else %}
+
+    <li>{{ 'Custom Menu' |_ }}</li>
+
+{% endif %}

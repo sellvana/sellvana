@@ -1,0 +1,65 @@
+{% set c = THIS.get('model') %}
+{% set mname = MODULES.currentModuleName() %}
+{% set baseHtmlName = "config[modules][" ~ mname ~ "]" %}
+{% set baseConfigPath = "modules/" ~ mname %}
+{% set prefix = "ideal_" %}
+
+<div class="accordion accordion-blue panel-group" id="settings-FCom_PaymentIdeal">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#">{{ "iDEAL Settings"|_ }}</a>
+        </div>
+        <div class="panel-collapse collapse in" id="settings-FCom_PaymentIdeal-group0">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="{{ prefix }}active">{{ "Enabled"|_ }}</label>
+                    <div class="col-md-5">
+                        <input type="hidden" name="{{ baseHtmlName }}[active]" value="0" />
+                        <input id ="{{ prefix }}active" type="checkbox" class="switch-cbx" name="{{ baseHtmlName }}[active]"
+                               value="1" {% if c.get(baseConfigPath ~ '/active') == 1 %}checked="checked"{% endif %} />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="{{ prefix }}title">{{ "Display Title"|_ }}</label>
+                    <div class="col-md-5">
+                        <input id ="{{ prefix }}title" type="text" class="form-control" name="{{ baseHtmlName }}[title]" value="{{ c.get(baseConfigPath ~ '/title') }}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="{{ prefix }}partner_id">{{ "Pertner ID"|_ }}</label>
+                    <div class="col-md-5">
+                        <input id ="{{ prefix }}partner_id" type="text" class="form-control" name="{{ baseHtmlName }}[partner_id]" value="{{ c.get(baseConfigPath ~ '/partner_id') }}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="{{ prefix }}profile_key">{{ "Profile Key"|_ }}</label>
+                    <div class="col-md-5">
+                        <input id ="{{ prefix }}profile_key" type="text" class="form-control" name="{{ baseHtmlName }}[profile_key]" value="{{ c.get(baseConfigPath ~ '/profile_key') }}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="{{ prefix }}sort_order">{{ "Payment Method Sort Order"|_ }}</label>
+                    <div class="col-md-5">
+                        <input id ="{{ prefix }}sort_order" type="text" class="form-control" name="{{ baseHtmlName }}[sort_order]" value="{{ c.get(baseConfigPath ~ '/sort_order') }}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="{{ prefix }}order_status">{{ "New Order Status"|_ }}</label>
+                    <div class="col-md-5">
+                        <select id="{{ prefix }}order_status" name="{{ baseHtmlName }}[order_status]">
+                            {{ UTIL.optionsHtml({'':'Select One', 'processing':'Processing'}, c.get(baseConfigPath ~ '/order_status')) }}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="{{ prefix }}test">{{ "Test Mode"|_ }}</label>
+                    <div class="col-md-5">
+                        <input type="hidden" name="{{ baseHtmlName }}[test]" value="0" />
+                        <input id ="{{ prefix }}test" type="checkbox" class="switch-cbx" name="{{ baseHtmlName }}[test]"
+                               value="1" {% if c.get(baseConfigPath ~ '/test') == 1 %}checked="checked"{% endif %} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

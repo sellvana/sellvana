@@ -1,0 +1,50 @@
+{% set c = THIS.get('model') %}
+
+<h2>{{ "Ogone Settings"|_}}</h2>
+
+<div class="accordion accordion-blue panel-group" id="settings-FCom_Ogone">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a href="#" class="accordion-toggle">{{ 'Ogone API'|_ }}</a>
+        </div>
+        <div class="panel-collapse accordion-body in" id="settings-FCom_Ogone-group0">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ 'Test/Live Mode'|_ }}</label>
+                    <div class="col-md-5">
+                        <select class="form-control" name="config[modules][FCom_Ogone][mode]">
+                            {{ UTIL.optionsHtml({0:'Test', 1:'Live'}, c.get('modules/FCom_Ogone/mode'))|raw }}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ 'PSPID'|_ }}</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="config[modules][FCom_Ogone][pspid]" value="{{ c.get('modules/FCom_Ogone/pspid') }}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ 'Feedback Message'|_ }}</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="config[modules][FCom_Ogone][feedback_message]" value="{{ c.get('modules/FCom_Ogone/feedback_message') }}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a href="#" class="accordion-toggle">{{ 'Owner Information'|_ }}</a>
+        </div>
+        <div class="panel-collapse accordion-body" id="settings-FCom_Ogone-group1">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ 'Address'|_ }}</label>
+                    <div class="col-md-5">
+                        <input class="form-control" type="text" name="config[modules][FCom_Ogone][owner_address]" value="{{ c.get('modules/FCom_Ogone/owner_address') }}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

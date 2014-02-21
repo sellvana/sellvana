@@ -1,0 +1,3 @@
+
+/settings:
+    - { view: settings, do: [[ addTab, FCom_Checkout, { label: Default Checkout, group: sales, async: true } ]] }

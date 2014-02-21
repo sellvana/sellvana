@@ -8,32 +8,27 @@
 class FCom_CustomerGroups_Migrate
     extends BClass
 {
-    public function run()
-    {
-        BMigrate::install('0.1.0', array($this, 'install'));
-        BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
-    }
-
-    public function install()
+    public function install__0_1_0()
     {
         $tableCustomerGroup = FCom_CustomerGroups_Model_Group::table();
 
         BDb::ddlTableDef($tableCustomerGroup,
             array(
                 'COLUMNS' => array(
-                  'id'    => 'int(10) unsigned primary key auto_increment',
+                  'id'    => 'int(10) unsigned auto_increment',
                   'title' => 'varchar(100) not null',
                   'code'  => 'varchar(50) not null',
                 ),
+                'PRIMARY' => '(id)',
                 'KEYS'    => array(
-                  'cg_code' => 'UNIQUE(code)'
+                  'cg_code' => 'UNIQUE (code)'
                 ),
             )
         );
 
         BDb::run("
-        INSERT INTO `{$tableCustomerGroup}` (`title`, `code`)
-        VALUES('General', 'general'), ('NOT LOGGED IN', 'guest'), ('Retailer', 'retailer')
+        replace INTO `{$tableCustomerGroup}` (`id`, `title`, `code`)
+        VALUES (1, 'General', 'general'), (2, 'NOT LOGGED IN', 'guest'), (3, 'Retailer', 'retailer')
         ");
 
         BDb::ddlTableDef(FCom_Customer_Model_Customer::table(),
@@ -48,7 +43,7 @@ class FCom_CustomerGroups_Migrate
         );
     } // end install
 
-    public function upgrade_0_1_1()
+    public function upgrade__0_1_0__0_1_1()
     {
         $tableTierPrices = FCom_CustomerGroups_Model_TierPrice::table();
 
@@ -57,13 +52,14 @@ class FCom_CustomerGroups_Migrate
         BDb::ddlTableDef($tableTierPrices,
             array(
                 'COLUMNS' => array(
-                    'id'         => 'int(10) unsigned not null auto_increment primary key',
+                    'id'         => 'int(10) unsigned not null auto_increment',
                     'product_id' => 'int(10) unsigned not null',
                     'group_id'   => 'int(10) unsigned not null',
-                    'base_price' => 'decimal(12,4) not null',
-                    'sale_price' => 'decimal(12,4) not null',
+                    'base_price' => 'decimal(12,2) not null',
+                    'sale_price' => 'decimal(12,2) not null',
                     'qty'        => 'int(10) unsigned not null default 1',
                 ),
+                'PRIMARY' => '(id)',
                 'KEYS' => array(
                     'unq_prod_group_qty' => 'UNIQUE(product_id, group_id, qty)',
                 ), // should we add unique key from product_id + group_id + qty ???
@@ -94,5 +90,14 @@ class FCom_CustomerGroups_Migrate
 //            $ins->execute($data);
 //        }
 //        $conn->commit();
+    }
+
+    public function upgrade__0_1_1__0_1_2()
+    {
+        $tableCustomerGroup = FCom_CustomerGroups_Model_Group::table();
+        BDb::run("
+        replace INTO `{$tableCustomerGroup}` (`id`, `title`, `code`)
+        VALUES (0, 'ALL', 'all')
+        ");
     }
 }

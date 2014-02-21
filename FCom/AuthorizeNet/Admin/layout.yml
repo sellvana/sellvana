@@ -1,0 +1,4 @@
+/settings:
+    - view: settings
+        do:
+            - [ addTab, FCom_AuthorizeNet, { label: Authorize.net, group: payment_methods, async: true } ]

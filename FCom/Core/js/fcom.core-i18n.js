@@ -1,5 +1,5 @@
 FCom.i18n = {
-'Search' : 'Suche'
+    'Search': 'Suche'
 };
 
 

@@ -1,0 +1,12 @@
+{% set model = THIS.get('model') %}
+{% set validator = THIS.get('validator') %}
+
+<fieldset>
+  <div class="f-section">
+    <div class="form-group row">
+        <div class="col-md-12">
+            <textarea id="model-view_contents" class="form-control col-md-10" type="text" name="model[view_contents]" style="height:400px; font-family:Consolas,monospace">{{ model.get('view_contents') }}</textarea>
+        </div>
+    </div>
+    </div>
+</fieldset>

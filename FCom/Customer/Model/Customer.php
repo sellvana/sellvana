@@ -1,15 +1,128 @@
 <?php
-
+/**
+ * Model class for table 'fcom_customer'
+ * The followings are the available columns in table 'fcom_customer':
+ * @property string $id
+ * @property string $email
+ * @property string $firstname
+ * @property string $lastname
+ * @property string $password_hash
+ * @property string $default_shipping_id
+ * @property string $default_billing_id
+ * @property string $create_at
+ * @property string $update_at
+ * @property string $last_login
+ * @property string $token
+ * @property string $payment_method
+ * @property string $payment_details
+ * @property string $customer_group
+ * @property string $status
+ *
+ * relations
+ * @property FCom_Customer_Model_Address $default_billing
+ * @property FCom_Customer_Model_Address $default_shipping
+ */
 class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_customer';
     protected static $_origClass = __CLASS__;
+
+    protected static $_fieldOptions = array(
+        'status' => array(
+            'review'   => 'Review',
+            'active'   => 'Active',
+            'disabled' => 'Disabled',
+        ),
+    );
 
     protected static $_sessionUser;
     protected $defaultShipping = null;
     protected $defaultBilling = null;
 
     private static $lastImportedCustomer = 0;
+
+    protected $_validationRules = array(
+        array('email', '@required'),
+        array('firstname', '@required'),
+        array('lastname', '@required'),
+        //array('password', '@required'),
+        array('password_confirm', '@password_confirm'),
+        /*array('payment_method', '@required'),
+        array('payment_details', '@required'),*/
+
+        array('email', '@email'),
+
+        array('default_shipping_id', '@integer'),
+        array('default_billing_id', '@integer'),
+        array('password', 'FCom_Customer_Model_Customer::validatePasswordSecurity'),
+        /*array('customer_group', '@integer'),*/
+    );
+    //todo: set rules password minimum length
+
+    /**
+     * @param bool  $new
+     * @param array $args
+     * @return FCom_Customer_Model_Customer
+     */
+    public static function i($new=false, array $args=array())
+    {
+        return parent::i($new, $args);
+    }
+
+    /**
+     * override default rules for login form
+     */
+    public function setLoginRules()
+    {
+        $this->_validationRules =  array(
+            array('email', '@required'),
+            array('password', '@required'),
+            array('email', '@email'),
+        );
+    }
+
+    /**
+     * override default rules for password recover form
+     */
+    public function setPasswordRecoverRules()
+    {
+        $this->_validationRules =  array(
+            array('email', '@required'),
+            array('email', '@email'),
+        );
+    }
+
+    public function setAccountEditRules($incChangePassword = false)
+    {
+        $this->_validationRules = array(
+            array('email', '@required'),
+            array('firstname', '@required'),
+            array('lastname', '@required'),
+        );
+
+        if ($incChangePassword) {
+            $this->_validationRules[] = array('password', '@required');
+            $this->_validationRules[] = array('password_confirm', '@password_confirm');
+        }
+    }
+
+    public function setChangePasswordRules()
+    {
+        $this->_validationRules = array(
+            array('current_password', '@required'),
+            array('password', '@required'),
+            array('password_confirm', '@password_confirm'),
+        );
+    }
+
+    public function setSimpleRegisterRules()
+    {
+        $this->_validationRules = array(
+            array('email', '@required'),
+            array('password', '@required'),
+            array('password_confirm', '@password_confirm'),
+        );
+    }
 
     public function setPassword($password)
     {
@@ -31,22 +144,22 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
-        if (!$this->create_dt) $this->create_dt = BDb::now();
-        $this->update_dt = BDb::now();
+        if (!parent::onBeforeSave()) return false;
+        if (!$this->create_at) $this->create_at = BDb::now();
+        $this->update_at = BDb::now();
         if ($this->password) {
             $this->password_hash = BUtil::fullSaltedHash($this->password);
         }
         return true;
     }
 
-    public function afterSave()
+    public function onAfterSave()
     {
-        parent::afterSave();
+        parent::onAfterSave();
 
-        if (self::sessionUser()) {
+        if (self::sessionUserId() === $this->id()) {
             BSession::i()->data('customer_user', serialize($this));
             static::$_sessionUser = $this;
         }
@@ -93,11 +206,23 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $data;
     }
 
-    public function getData()
+    public function as_array(array $objHashes=array())
     {
-        $data = $this->as_array();
+        $data = parent::as_array();
         unset($data['password_hash']);
         return $data;
+    }
+
+    public static function validatePasswordSecurity($data, $args)
+    {
+        if (!BConfig::i()->get('modules/FCom_Customer/password_strength')) {
+            return true;
+        }
+        $password = $data[$args['field']];
+        if (strlen($password) > 0 && !preg_match('/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/', $password)) {
+            return 'Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.';
+        }
+        return true;
     }
 
     public function validatePassword($password)
@@ -105,6 +230,10 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return BUtil::validateSaltedHash($password, $this->password_hash);
     }
 
+    /**
+     * @param bool $reset
+     * @return bool|FCom_Customer_Model_Customer
+     */
     static public function sessionUser($reset=false)
     {
         if ($reset || !static::$_sessionUser) {
@@ -131,11 +260,14 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     static public function authenticate($username, $password)
     {
+        BLoginThrottle::i()->init('FCom_Customer_Model_Customer', $username);
         /** @var FCom_Admin_Model_User */
         $user = static::i()->orm()->where('email', $username)->find_one();
         if (!$user || !$user->validatePassword($password)) {
+            BLoginThrottle::i()->failure();
             return false;
         }
+        BLoginThrottle::i()->success();
         return $user;
     }
 
@@ -152,13 +284,13 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         if ($this->timezone) {
             date_default_timezone_set($this->timezone);
         }
-        BPubSub::i()->fire(__METHOD__.'.after', array('user'=>$this));
+        BEvents::i()->fire(__METHOD__.'.after', array('user'=>$this));
         return $this;
     }
 
     static public function logout()
     {
-        BPubSub::i()->fire(__METHOD__.'.before', array('user'=>  self::sessionUser()));
+        BEvents::i()->fire(__METHOD__.'.before', array('user'=>  self::sessionUser()));
 
         BSession::i()->data('customer_user', false);
         static::$_sessionUser = null;
@@ -184,7 +316,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public static function import($data)
     {
-        BPubSub::i()->fire(__METHOD__.'.before', array('data'=>&$data));
+        BEvents::i()->fire(__METHOD__.'.before', array('data'=>&$data));
 
         if (!empty($data['customer']['id'])) {
             $cust = static::load($data['customer']['id']);
@@ -220,25 +352,25 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
         $result['addr'] = FCom_Customer_Model_Address::i()->import($data, $cust);
 
-        BPubSub::i()->fire(__METHOD__.'.after', array('data'=>$data, 'result'=>&$result));
+        BEvents::i()->fire(__METHOD__.'.after', array('data'=>$data, 'result'=>&$result));
 
         return $result;
     }
 
     public function defaultBilling()
     {
-        if ($this->default_billing_id && !$this->defaultBilling) {
-            $this->defaultBilling = FCom_Customer_Model_Address::i()->load($this->default_billing_id);
+        if ($this->default_billing_id && !$this->default_billing) {
+            $this->default_billing = FCom_Customer_Model_Address::i()->load($this->default_billing_id);
         }
-        return $this->defaultBilling;
+        return $this->default_billing;
     }
 
     public function defaultShipping()
     {
-        if ($this->default_shipping_id && !$this->defaultShipping) {
-            $this->defaultShipping = FCom_Customer_Model_Address::i()->load($this->default_shipping_id);
+        if ($this->default_shipping_id && !$this->default_billing) {
+            $this->default_billing = FCom_Customer_Model_Address::i()->load($this->default_shipping_id);
         }
-        return $this->defaultShipping;
+        return $this->default_billing;
     }
 
     public function addresses()
@@ -262,7 +394,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         $this->save();
     }
 
-    public function onAddProductToCart($args)
+    static public function onAddProductToCart($args)
     {
         $cart = $args['model'];
 
@@ -271,5 +403,63 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             $user->session_cart_id = $cart->id();
             $user->save();
         }
+    }
+
+    /**
+     * get options data to create options html in select
+     * @param $labelIncId
+     * @return array
+     */
+    public function getOptionsData($labelIncId = false)
+    {
+        $results = $this->orm('p')->find_many();
+        $data = array();
+        if (count($results)) {
+            foreach ($results as $r) {
+                $fullname = $r->firstname . ' ' . $r->lastname;
+                $data[$r->id] = $labelIncId ? $r->id . ' - ' . $fullname : $fullname;
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * rule email unique
+     * @param $data
+     * @param $args
+     * @return bool
+     */
+    public static function ruleEmailUnique($data, $args)
+    {
+        if (!isset($data[$args['field']])) {
+            return false;
+        }
+        $model = self::i()->orm()->where('email', $data[$args['field']])->find_one();
+        if ($model)
+            return false;
+        return true;
+    }
+
+    /**
+     * calc sales statistics
+     * @return array
+     */
+    public function saleStatistics()
+    {
+        $statistics = array(
+            'lifetime' => 0,
+            'avg'      => 0,
+        );
+        if (BModuleRegistry::i()->isLoaded('FCom_Sales_Model_Order')) {
+            $orders = FCom_Sales_Model_Order::i()->orm()->where('customer_id', $this->id)->find_many();
+            if ($orders) {
+                $cntOrders = count($orders);
+                foreach($orders as $order) {
+                    $statistics['lifetime'] += $order->grandtotal;
+                }
+                $statistics['avg'] = $statistics['lifetime'] / $cntOrders;
+            }
+        }
+        return $statistics;
     }
 }

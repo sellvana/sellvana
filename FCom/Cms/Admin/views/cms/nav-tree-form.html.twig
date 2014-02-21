@@ -1,0 +1,121 @@
+{% set tabs = THIS.sortedTabs() %}
+{% set m =THIS.get('model') %}
+{% set formUrl = APP.href('cms/nav/tree_form/' ~ m.get('id')) %}
+
+<script>
+    require(['fcom.admin', 'jquery.validate'], function() {
+        FCom.Admin.Tabs('.fcom-admin-main-container', {
+            url_get: "{{ THIS.get('form_url') }}",
+            cur_tab: "{{ THIS.get('cur_tab') }}"
+        });
+        var mainForm = $('form#cms-tree-form');
+        var elem = mainForm.find('input, textarea, select');
+        function processFlag (validator) {
+            var info = {};
+            for(key in validator.invalid) {
+                var element = jQuery('input[name="'+key+'"], textarea[name="'+key+'"], select[name="'+key+'"]');
+                if (element.length>0) {
+                    var tab = element.parents('div.tab-pane');
+                    var key = '#'+tab.attr('id');
+                    if (typeof(info[key]) === 'undefined')
+                        info[key] = 1;
+                    else
+                        info[key]++;
+                }
+            }
+            $('#cms-tree-form ul.nav-tabs').find('li a').each(function(index) {
+                var val = info[$(this).attr('href')];
+
+                if (typeof(val) !== 'undefined')
+                {
+                    if ($(this).find('i.error').length === 0) {
+                        $(this).append('<i class="icon-warning-sign error"></i>');
+                    }
+                } else {
+                    $(this).find('i.error').remove();
+                }
+            });
+
+            for (key in info) {
+                $('a[href="'+key+'"]').trigger('click');
+                break;
+            }
+        }
+        mainForm.validate({
+            ignore: [],
+            invalidHandler: function(event, validator) {
+                processFlag(validator);
+            },
+            submitHandler: function (form) {
+                processFlag({invalid: null});
+                if (CKEDITOR !== 'undefined') {
+                    for (key in CKEDITOR.instances) {
+                        $('#' + key).val(CKEDITOR.instances[key].getData());
+                    }
+                }
+                $.ajax({
+                    type: "POST",
+                    url: mainForm.attr('action'),
+                    data: mainForm.serialize(),
+                    success: function (data)
+                    {
+                        if (data.status == 'error') {
+                            $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                        } else {
+                            $.bootstrapGrowl("Saved", { type: 'success', align: 'center', width: 'auto' });
+                            var nodeSelected = $.jstree._focused().get_selected();
+                            $.jstree._focused().set_text(nodeSelected, $('#main-node_name').val());
+                            $('.page-header .f-page-title').html(data.path.replace(/\|/g, ' '));
+                        }
+
+                        console.log(self);
+                    },
+                    error: function (xhr, textStatus, errorThrown)
+                    {
+                        alert("[ERROR]<br>" + textStatus);
+                    }
+                });
+            }
+        });
+        elem.on('change', function () {
+            $('#cms-tree-form ul.nav-tabs').find('li.active').each(function () {
+                if ($(this).children('a').find('i.icon-pencil').length === 0) {
+                    if ($(this).children('a').children('i.error').length !== 0) {
+                        $('<i class="icon-pencil"></i>').insertBefore($(this).children('a').children('i.error'));
+                    } else {
+                        $(this).children('a').append('<i class="icon-pencil"></i>');
+                    }
+                }
+            })
+        })
+    });
+
+
+</script>
+
+<div class="f-admin-main-content">
+    <div class="page-header">
+        <div class="f-page-title">{{ m.get('full_name')|replace('|', ' > ') }}</div>
+        <div class="btn-group">
+            <button class="btn btn-primary btn-sm" id="cms_nav_save" type="submit">{{ 'Save'|_ }}</button>
+        </div>
+    </div>
+    <div class="nav">
+        <ul class="nav nav-tabs">
+            {% for k, tab in tabs %}
+                <li>
+                    <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab"><span class="icon"></span>{{ tab.label }} </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="tab-content f-admin-main-content">
+        {% for k, tab in tabs %}
+            {% if tab.view is not empty %}
+                <div class="tab-pane" id="tab-{{ k }}" {% if tab.async is empty %}data-loaded="true"{% endif %}>
+                    {% if tab.async is empty %}{{ THIS.view(tab.view)|raw }}{% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>

@@ -1,0 +1,15 @@
+{% set p = THIS.get('prod') %}
+{% if p.get('sale_price') == 0 %}
+    <div class="price-box">
+        FREE
+    </div>
+{% elseif p.get('base_price') != p.get('sale_price') %}
+    <div class="price-box">
+        <div class="old-price"><span class="title">{{ 'Was:' |_ }}</span><span class="price">{{ p.get('base_price') | currency }}</span></div>
+        <div class="new-price"><span class="title">{{ 'Now:' |_ }}</span><span class="price">{{ p.get('sale_price') | currency }}</span></div>
+    </div>
+{% else %}
+    <div class="price-box">
+        <span class="price">{{ p.get('base_price') }}</span>
+    </div>
+{% endif %}

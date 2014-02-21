@@ -1,0 +1,25 @@
+.faq {
+  .nav-tabs, .nav-pills {
+    margin-bottom: -1px;
+  }
+
+  .tabdrop {
+    a {
+      margin-right: 0;
+    }
+  }
+
+  .panel-default > .panel-heading {
+    background: $white;
+  }
+
+  .panel-group {
+    background: $white;
+  }
+
+  .tab-content {
+    background: $white;
+    padding: 19px;
+    border: 1px solid #ddd;
+  }
+}

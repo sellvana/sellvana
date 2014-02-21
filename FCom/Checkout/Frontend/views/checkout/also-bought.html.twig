@@ -1,0 +1,92 @@
+{% set cart = APP.instance('FCom_Sales_Model_Cart').sessionCart() %}
+{% if (cart.itemQty()) %}
+<div class="f-widget f-widget-featured-prods">
+  <header class="f-widget-header">
+    <strong class="f-widget-title">Customers who bought items in your cart also bought</strong>
+  </header>
+  <div class="f-prod-listing f-prod-listing-grid">
+    <div class="row">
+      <div class="col-lg-2 col-md-3 col-sm-3 col-xs-6">
+        <div class="thumbnail">
+          <div class="f-col-listing-prod-img">
+            <a href="#" class="f-prod-img">
+              <img alt="#" src="#"/>
+            </a>
+          </div>
+          <div class="caption">
+            <a href="#" class="f-prod-name">Product Name</a>
+            <div class="f-price-group">
+              <table>
+                <tr class="f-reg-price">
+                  <th class="f-price-label">Price:</th>
+                  <td class="f-price">$99.99</td>
+                </tr>
+              </table>
+            </div><!-- /.f-price-group -->
+          </div>
+        </div>
+      </div><!-- /.col -->
+      <div class="col-lg-2 col-md-3 col-sm-3 col-xs-6">
+        <div class="thumbnail">
+          <div class="f-col-listing-prod-img">
+            <a href="#" class="f-prod-img">
+              <img alt="#" src="#"/>
+            </a>
+          </div>
+          <div class="caption">
+            <a href="#" class="f-prod-name">Product Name</a>
+            <div class="f-price-group">
+              <table>
+                <tr class="f-reg-price">
+                  <th class="f-price-label">Price:</th>
+                  <td class="f-price">$99.99</td>
+                </tr>
+              </table>
+            </div><!-- /.f-price-group -->
+          </div>
+        </div>
+      </div><!-- /.col -->
+      <div class="col-lg-2 col-md-3 col-sm-3 col-xs-6">
+        <div class="thumbnail">
+          <div class="f-col-listing-prod-img">
+            <a href="#" class="f-prod-img">
+              <img alt="#" src="#"/>
+            </a>
+          </div>
+          <div class="caption">
+            <a href="#" class="f-prod-name">Product Name</a>
+            <div class="f-price-group">
+              <table>
+                <tr class="f-reg-price">
+                  <th class="f-price-label">Price:</th>
+                  <td class="f-price">$99.99</td>
+                </tr>
+              </table>
+            </div><!-- /.f-price-group -->
+          </div>
+        </div>
+      </div><!-- /.col -->
+      <div class="col-lg-2 col-md-3 col-sm-3 col-xs-6">
+        <div class="thumbnail">
+          <div class="f-col-listing-prod-img">
+            <a href="#" class="f-prod-img">
+              <img alt="#" src="#"/>
+            </a>
+          </div>
+          <div class="caption">
+            <a href="#" class="f-prod-name">Product Name</a>
+            <div class="f-price-group">
+              <table>
+                <tr class="f-reg-price">
+                  <th class="f-price-label">Price:</th>
+                  <td class="f-price">$99.99</td>
+                </tr>
+              </table>
+            </div><!-- /.f-price-group -->
+          </div>
+        </div>
+      </div><!-- /.col -->
+    </div>
+  </div>
+</div><!-- /.f-widget-featured-prods -->
+{% endif %}

@@ -1,0 +1,40 @@
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator') %}
+
+<fieldset name="adm-section-group">
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-title">{{ 'Title'|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control" type="text" id="model-title" name="model[title]" value="{{ validator.fieldValue('title') }}" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-text">{{ 'Text'|_ }}</label>
+        <div class="col-md-10">
+            <textarea class="form-control ckeditor" id="model-text" name="model[text]" rows="5" cols="35">{{ validator.fieldValue('text') }}</textarea>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-rating">{{ 'Rating of product'|_ }}</label>
+        <div class="col-md-5">
+            <input type="text" class="form-control" id="model-rating" name="model[rating]" value="{{ validator.fieldValue('rating') }}"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-helpful">{{ 'Helpful points'|_ }}</label>
+        <div class="col-md-5">
+            <input type="text" class="form-control" id="model-helpful" name="model[helpful]" value="{{ validator.fieldValue('helpful') }}"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-approved">{{ 'Approved'|_ }}</label>
+        <div class="col-md-5">
+            <input type="hidden" name="model[approved]" value="0" />
+            <input class="switch-cbx" id="model-approved" type="checkbox" name="model[approved]" value="1" {% if validator.fieldValue('approved') == 1 %}checked="checked" {% endif %} />
+        </div>
+    </div>
+</fieldset>

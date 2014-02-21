@@ -1,0 +1,329 @@
+@import "compass";
+@import "theme/variables";
+@import "theme/utilities";
+
+// this is used for darkening of some elements in theme. Each $themeColors item must have one item in $headerMultipliers.
+$headerMultipliers: (9, 9, 9, 10, 10, 10, 10, 15, 10, 8, 6, 10, 7, 7);
+
+@mixin theme-color($themeName, $theme, $multiplier) {
+  .contrast-#{$themeName} {
+    //#--------------------------------------------------------------------------------------------------------------
+    //# header
+    header .navbar {
+      background-color: $theme;
+
+      .toggle-nav {
+        background-color: $theme;
+
+        &:active, &.active, &:hover {
+          background-color: darken($theme, 10%);
+        }
+      }
+
+      .navbar-form {
+        button {
+          color: $theme;
+
+          &:hover {
+            color: darken($theme, 25%);
+          }
+        }
+
+        input {
+          border-color: darken($theme, 10%);
+          color: darken($theme, 25%);
+          @include placeholder(lighten($theme, 10%));
+
+          &:hover {
+            @include placeholder(lighten($theme, 20%));
+          }
+
+          &:focus {
+            border-color: darken($theme, 20%);
+            @include placeholder(lighten($theme, 15%));
+          }
+        }
+      }
+
+      > .nav {
+        > li {
+          &.light {
+            > a {
+              background: darken($theme, $multiplier);
+
+              .label {
+                color: darken($theme, $multiplier);
+              }
+
+              &:hover, &:active, &:focus {
+                background-color: darken($theme, $multiplier * 1.7);
+              }
+            }
+          }
+
+          &.medium {
+            > a {
+              background: darken($theme, $multiplier * 1.7);
+
+              .label {
+                color: darken($theme, $multiplier * 1.7);
+              }
+
+              &:hover, &:active, &:focus {
+                > a {
+                  background-color: darken($theme, $multiplier * 2);
+                }
+              }
+            }
+          }
+
+          &.dark {
+            > a {
+              background: darken($theme, $multiplier * 2.2);
+
+              .label {
+                color: darken($theme, $multiplier * 2.2);
+              }
+
+              &:hover, &:active, &:focus {
+                > a {
+                  background-color: darken($theme, $multiplier * 2.5);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .widget .dropdown-menu > li.widget-footer a:hover {
+        background-color: $theme;
+      }
+    }
+
+    header .navbar {
+      .nav {
+        li {
+          .label {
+            color: $theme;
+          }
+        }
+      }
+    }
+
+    .nav .caret, .nav a:hover .caret {
+      border-top-color: $theme;
+      border-bottom-color: $theme;
+    }
+
+    code {
+      $bg: mix($theme, $contentBackground, 10%);
+      background-color: $bg;
+      color: mix($bg, $theme, 10%);
+    }
+    //#--------------------------------------------------------------------------------------------------------------
+
+    //#--------------------------------------------------------------------------------------------------------------
+    //# navigation
+
+    #main-nav {
+      .navigation {
+        > .nav {
+          > li {
+            > a {
+              &.in {
+                [class^="icon-"], [class*=" icon-"] {
+                  color: $theme;
+                }
+              }
+            }
+
+            &:hover, &:focus, &.active {
+              > a {
+
+                [class^="icon-"], [class*=" icon-"] {
+                  color: $theme !important;
+                }
+              }
+            }
+
+            .nav {
+              > li {
+                &.active {
+                  > a {
+                    [class^="icon-"], [class*=" icon-"] {
+                      color: $theme;
+                    }
+                  }
+                }
+
+                > a {
+                  &:hover, &:focus {
+                    [class^="icon-"], [class*=" icon-"] {
+                      color: $theme;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    //#--------------------------------------------------------------------------------------------------------------
+
+    .box .box-header.contrast-background .actions .btn-link:hover {
+      color: $theme !important;
+    }
+
+    &.contrast-background, .contrast-background { background: $theme !important; }
+    .text-contrast, .contrast { color: $theme !important; }
+    .contrast-border { border-color: $theme !important; }
+
+    .accordion {
+      &.accordion-contrast {
+        .accordion-group {
+          border-color: $theme;
+          border-bottom-color: lighten($theme, 20%);
+        }
+
+        .accordion-heading {
+          .accordion-toggle {
+            color: $white;
+            background-color: $theme;
+          }
+        }
+      }
+    }
+
+    .box-quick-link {
+      &.contrast-background {
+        a:active {
+          .header {
+            background: darken($theme, 10%);
+          }
+        }
+
+        &:hover {
+          .header {
+            background: darken($theme, 5%);
+          }
+        }
+      }
+    }
+
+    .box-statistic {
+      &.contrast-background {
+        .title, small, [class*="icon-"] {
+          color: $theme !important;
+        }
+      }
+    }
+
+    .breadcrumb {
+      li:first-child {
+        > a {
+          &:hover {
+            color: $theme !important;
+          }
+        }
+      }
+    }
+
+    h1 {
+      [class^="icon-"] {
+        color: $theme;
+      }
+    }
+
+    //#--------------------------------------------------------------------------------------------------------------
+    //# dropdowns
+    .dropdown-menu > .active > a, .dropdown-menu > .active > a:hover, .dropdown-menu > .active > a:focus, .dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus, .dropdown-submenu:hover > a, .dropdown-submenu:focus > a {
+      background-color: $theme !important;
+    }
+    //#--------------------------------------------------------------------------------------------------------------
+
+    //#--------------------------------------------------------------------------------------------------------------
+    //# boxes
+
+    .box {
+      .box-header {
+        .actions {
+          .btn-link {
+            &:hover {
+              color: $theme;
+            }
+          }
+        }
+      }
+    }
+
+    //#--------------------------------------------------------------------------------------------------------------
+
+    //#--------------------------------------------------------------------------------------------------------------
+    //# wizard
+
+    .fuelux {
+      .wizard {
+        ul li {
+          &.active {
+            background-color: $theme;
+          }
+        }
+      }
+    }
+
+    //#--------------------------------------------------------------------------------------------------------------
+
+    //#--------------------------------------------------------------------------------------------------------------
+    //# plugins
+
+    .fc-event .fc-event-inner {
+      border-color: $theme;
+      background-color: $theme;
+    }
+
+    .contrast-caret { border-top-color: $theme !important; border-bottom-color: $theme !important; }
+
+    .select2-results .select2-highlighted {
+      background: $theme;
+    }
+
+    .daterangepicker {
+      .ranges li.active, .ranges li:hover {
+        background: $theme;
+      }
+
+      td.active, td.active:hover {
+        background: $theme;
+      }
+    }
+
+    .datepicker td span.active:hover, .datepicker td span.active:hover:hover, .datepicker td span.active.disabled:hover, .datepicker td span.active.disabled:hover:hover, .datepicker td span.active:active, .datepicker td span.active:hover:active, .datepicker td span.active.disabled:active, .datepicker td span.active.disabled:hover:active, .datepicker td span.active.active, .datepicker td span.active:hover.active, .datepicker td span.active.disabled.active, .datepicker td span.active.disabled:hover.active, .datepicker td span.active.disabled, .datepicker td span.active:hover.disabled, .datepicker td span.active.disabled.disabled, .datepicker td span.active.disabled:hover.disabled, .datepicker td span.active[disabled], .datepicker td span.active:hover[disabled], .datepicker td span.active.disabled[disabled], .datepicker td span.active.disabled:hover[disabled], .datepicker td.active:hover, .datepicker td.active:hover:hover, .datepicker td.active.disabled:hover, .datepicker td.active.disabled:hover:hover, .datepicker td.active:active, .datepicker td.active:hover:active, .datepicker td.active.disabled:active, .datepicker td.active.disabled:hover:active, .datepicker td.active.active, .datepicker td.active:hover.active, .datepicker td.active.disabled.active, .datepicker td.active.disabled:hover.active, .datepicker td.active.disabled, .datepicker td.active:hover.disabled, .datepicker td.active.disabled.disabled, .datepicker td.active.disabled:hover.disabled, .datepicker td.active[disabled], .datepicker td.active:hover[disabled], .datepicker td.active.disabled[disabled], .datepicker td.active.disabled:hover[disabled] {
+      background: $theme;
+    }
+
+    .dropdown-menu > .active > a, .dropdown-menu > .active > a:hover, .dropdown-menu > .active > a:focus {
+      background: $theme;
+    }
+
+    .dd-handle:hover {
+      color: $theme;
+    }
+
+    .dd-placeholder {
+      border-color: $theme;
+    }
+    //#--------------------------------------------------------------------------------------------------------------
+
+  }
+}
+
+
+@for $i from 1 through length($themeNames) {
+  $themeName: nth($themeNames, $i);
+  $theme: nth($themeColors, $i);
+  $multiplier: nth($headerMultipliers, $i);
+
+  @include theme-color($themeName, $theme, $multiplier);
+}

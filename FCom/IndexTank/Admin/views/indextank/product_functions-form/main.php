@@ -46,7 +46,9 @@
     </ul>
 </fieldset>
 <script>
-head(function() {
-adminForm.wysiwygCreate('main-content');
-});
+require(['jquery', 'fcom.admin.form'], function($) {
+    $(function() {
+        //adminForm.wysiwygCreate('main-content');
+    });
+})
 </script>

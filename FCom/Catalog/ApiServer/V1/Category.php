@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Catalog_ApiServer_V1_Category extends FCom_Admin_Controller_ApiServer_Abstract
+class FCom_Catalog_ApiServer_V1_Category extends FCom_Api_Controller_Abstract
 {
     //protected $_authorizeActionsWhitelist = array('Put');
 
@@ -17,9 +17,9 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_Admin_Controller_ApiServer
         }
 
         if ($id) {
-            $categories[] = FCom_Catalog_Model_Category::load($id);
+            $categories[] = FCom_Catalog_Model_Category::i()->load($id);
         } else {
-            $categories = FCom_Catalog_Model_Category::orm()->limit($len, $start)->find_many();
+            $categories = FCom_Catalog_Model_Category::i()->orm()->limit($len, $start)->find_many();
         }
         if (empty($categories)) {
             $this->ok();
@@ -33,9 +33,9 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_Admin_Controller_ApiServer
         $post = BUtil::fromJson(BRequest::i()->rawPost());
 
         if (!empty($post['parent_id'])) {
-            $category = FCom_Catalog_Model_Category::load($post['parent_id']);
+            $category = FCom_Catalog_Model_Category::i()->load($post['parent_id']);
         } else {
-            $category = FCom_Catalog_Model_Category::orm()->where_null('parent_id')->find_one();
+            $category = FCom_Catalog_Model_Category::i()->orm()->where_null('parent_id')->find_one();
         }
         if (!$category) {
             $this->notFound("Parent category id #{$post['parent_id']} do not found");
@@ -61,7 +61,7 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_Admin_Controller_ApiServer
             $this->badRequest("Missing parameters. Use any of the following parameters: parent_id or name to move or rename category");
         }
 
-        $category = FCom_Catalog_Model_Category::load($id);
+        $category = FCom_Catalog_Model_Category::i()->load($id);
         if (!$category) {
             $this->notFound("Category id #{$id} not found");
         }
@@ -88,7 +88,7 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_Admin_Controller_ApiServer
             $this->notFound("Category id is required");
         }
 
-        $category = FCom_Catalog_Model_Category::load($id);
+        $category = FCom_Catalog_Model_Category::i()->load($id);
         if (!$category) {
             $this->notFound("Category id #{$id} not found");
         }

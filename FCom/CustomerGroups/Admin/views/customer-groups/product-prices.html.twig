@@ -1,0 +1,36 @@
+{% set ctrl = APP.instance('FCom_CustomerGroups_Admin_Controller_TierPrices') %}
+<script>
+
+var g_vent;
+    require(['jquery','underscore','backbone'], function($, _, Backbone) {
+
+        var prices, submiting = true;
+        var json = {
+            rows: [],
+            remove_ids: []
+        }
+
+        $('#catalog-products-form').submit(function(ev) {
+            json.remove_ids = _.difference(json.remove_ids, prices.pluck('id'));
+            var rows = prices.toJSON();
+            for(var i in rows) {
+                rows[i] = _.pick(rows[i], 'id', 'group_id', 'product_id', 'qty', 'base_price', 'sale_price', '_new');
+            }
+            json.rows = rows;
+
+            $("input[id='product_price_info']").val(JSON.stringify(json));
+        });
+
+
+        g_vent.bind('init-detail', function(ev) {
+            if(ev.grid === 'tier-prices') {
+                json.remove_ids = ev.collection.pluck('id');
+                prices = ev.collection;
+            }
+        });
+    });
+</script>
+<h3>{{ 'Price Chart'|_ }}</h3>
+<input type='hidden' name='model[price_info]' id='product_price_info'/>
+
+{{ THIS.view('core/backbonegrid').set('grid', ctrl.getTierPricesGrid(model)) | raw }}

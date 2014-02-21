@@ -9,7 +9,7 @@ class FCom_IndexTank_Index_Abstract extends BClass
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public function paginate($orm, $r, $d=array())

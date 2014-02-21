@@ -1,0 +1,159 @@
+{% set m = THIS.get('model') %}
+{% set image = m.image('dir') %}
+{% set imageDir = APP.instance('FCom_Catalog_Model_Category').imagePath() %}
+{% set resizeUrl = APP.instance('FCom_Core_Main').resizeUrl() %}
+<div class="form-group">
+    <div class="col-md-2 control-label">{{ "ID: %s"|_(m.id()) }}</div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label" for="main-node_name">{{ 'Label'|_ }}</label>
+    <div class="col-md-5">
+        <input class="form-control required" id="main-node_name" type="text" name="model[node_name]" value="{{ m.get('node_name') }}" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label" for="main-url_key">{{ 'Url Key'|_ }}</label>
+    <div class="col-md-5">
+        <input class="form-control required" id="main-url_key" type="text" name="model[url_key]" value="{{ m.get('url_key') }}" />
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-2 control-label" for="model-is-top-menu">{{ 'Display In Navigation'|_ }}</label>
+    <div class="col-md-5">
+        <input type="hidden" name="model[is_top_menu]" value="0" />
+        <input id="model-is-top-menu" class="switch-cbx" name="model[is_top_menu]" {% if m.get('is_top_menu') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label" for="model-is_enabled">{{ 'Enable'|_ }}</label>
+    <div class="col-md-5">
+        <input type="hidden" name="model[is_enabled]" value="0" />
+        <input id="model-is_enabled" class="switch-cbx" name="model[is_enabled]" {% if m.get('is_enabled') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
+    </div>
+</div>
+
+<div class='form-group'>
+    <label class="col-md-2 control-label" for="model-image">{{ 'Image'|_ }}</label>
+    <div class='col-md-10'  id='cat-image-fileupload'>
+        <div class='box-content' id="content-image">
+            <div class='row fileupload-buttonbar'>
+                <div class='col-sm-12'>
+                    <span class='btn btn-primary fileinput-button'>
+                      <i class='icon-plus icon-white'></i>
+                      <span>{{ 'Add Image...'|_ }}</span>
+                      <input data-bfi-disabled='' name='upload' type='file' id="image-file">
+                    </span>
+                </div>
+                <div class='col-sm-5 fileupload-progress fade'>
+                    <div aria-valuemax='100' aria-valuemin='0' class='progress progress-success progress-striped active' role='progressbar'>
+                        <div class='bar' style='width:0%;'></div>
+                    </div>
+                    <div class='progress-extended'> </div>
+                </div>
+            </div>
+            <div class='fileupload-loading'></div>
+            <br>
+            <div id="current-image">
+                {% if image %}
+                    <img src={{ resizeUrl }}?s=150x150&f={{ image }} />
+                {% endif %}
+            </div>
+            <table class='table table-striped' role='presentation' id="table-image">
+                <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
+            </table>
+        </div>
+        {% verbatim %}
+        <script id="template-upload" type="text/x-tmpl">
+            {% for (var i=0, file; file=o.files[i]; i++) { %}
+            <tr class="template-upload fade">
+                <td class="preview"><span class="fade"></span></td>
+                <td class="name"><span>{%=file.name%}</span></td>
+                <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+                {% if (file.error) { %}
+                <td class="error" colspan="2"><span class="label label-important">Error</span> {%=file.error%}</td>
+                {% } else if (o.files.valid && !i) { %}
+                <td>
+                    <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <div class="bar" style="width:0%;"></div>
+                    </div>
+                </td>
+                <td>
+                    {% if (!o.options.autoUpload) { %}
+                    <button class="btn btn-primary start">
+                        <i class="icon-upload icon-white"></i>
+                        <span>Start</span>
+                    </button>
+                    {% } %}
+                </td>
+                {% } else { %}
+                <td colspan="2"></td>
+                {% } %}
+                <td>
+                    {% if (!i) { %}
+                    <button class="btn btn-warning cancel">
+                        <i class="icon-ban-circle icon-white"></i>
+                        <span>Cancel</span>
+                    </button>
+                    {% } %}
+                </td>
+            </tr>
+            {% } %}
+        </script>
+        <script id="template-download" type="text/x-tmpl"> </script>
+        {% endverbatim %}
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-md-2 control-label" for="model-description">{{ 'Internal Notes'|_ }}</label>
+    <div class="col-md-10">
+        <textarea id="model-description" class="form-control" rows="5" name="model[description]">{{ m.get('description') }}</textarea>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-2 control-label" for="main-page_title">{{ 'Page Title'|_ }}</label>
+    <div class="col-md-5">
+        <input class="form-control" id="main-page_title" type="text" name="model[page_title]" value="{{ m.get('page_title') }}" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label" for="main-meta_title">{{ 'Meta Title'|_ }}</label>
+    <div class="col-md-5">
+        <input class="form-control" id="main-page_title" type="text" name="model[page_title]" value="{{ m.get('page_title') }}" />
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label" for="model-meta_description">{{ 'Meta Description'|_ }}</label>
+    <div class="col-md-10">
+        <textarea id="model-meta_description" class="form-control" rows="5" name="model[meta_description]">{{ m.get('meta_description') }}</textarea>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label" for="model-meta_keywords">{{ 'Meta Keywords'|_ }}</label>
+    <div class="col-md-10">
+        <textarea id="model-meta_keywords" class="form-control" rows="5" name="model[meta_keywords]">{{ m.get('meta_keywords') }}</textarea>
+    </div>
+</div>
+
+<script>
+    require([ 'jquery', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function($) {
+
+        $('#image-file').change(function () {
+            $('#table-image').children('tbody').children('tr').remove();
+        })
+        $('#cat-image-fileupload').fileupload({
+            url: '{{ APP.href("catalog/categories/upload?id=" ~ m.id()) }}',
+            acceptFileTypes:  /(jpg)|(jpeg)(tiff)|(gif)|(png)|(bmp)$/i
+        }).bind('fileuploadalways', function(e, data) {
+            if (data.result.type == 'success') {
+                var imageTag = '<img src="{{ resizeUrl }}?s=150x150&cache=0&f={{ imageDir }}'+ data.result.filename +'" />';
+                $('#current-image').html(imageTag);
+            } else {
+                $('#current-image').append('<label class="error">'+ data.result.msg + '</label>');
+            }
+        });
+    });
+</script>

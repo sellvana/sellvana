@@ -1,0 +1,11 @@
+modules:
+    FCom_ApiTest:
+        version: 0.1.0
+        channel: beta
+        require: { module: { FCom_ApiServer: 0.1.0 } }
+        description: API Tests area
+        areas:
+            FCom_ApiServer:
+                routing:
+                    - [ get, /v1/apitest/test, FCom_ApiTest_ApiServer_V1_Test.list ]
+                    - [ any, /v1/apitest/test/.action, FCom_ApiTest_ApiServer_V1_Test ]

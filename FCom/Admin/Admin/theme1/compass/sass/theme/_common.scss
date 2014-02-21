@@ -1,0 +1,52 @@
+.background-contrast { background: $contrast !important; }
+.text-contrast, .contrast { color: $contrast !important; }
+.text-error { color: $red !important; }
+.text-success { color: $green !important; }
+.text-primary { color: $blue !important; }
+.text-warning { color: $orange !important; }
+.text-info { color: $purple !important; }
+.text-muted { color: $muted !important; }
+
+@for $i from 1 through length($colorsNames) {
+  $colorName: nth($colorsNames, $i);
+  $color: nth($colors, $i);
+
+  .text-#{$colorName}  { color: $color !important; }
+  .#{$colorName}-background { background-color: $color !important; }
+  .#{$colorName}-border { border-color: $color !important; }
+}
+
+.list-hover {
+  li:hover {
+    background-color: #f9f9f9;
+  }
+}
+
+.list-striped {
+  li:nth-child(odd) {
+    background-color: #f9f9f9;
+  }
+
+  &.list-hover {
+    li:hover {
+      background-color: #f9f9f9;
+    }
+  }
+}
+
+.pager li > a, .pager li > span {
+  border-width: 2px;
+}
+
+a.dropdown-toggle { outline: none }
+
+.nav .open > a, .nav .open > a:hover, .nav .open > a:focus {
+  border-color: transparent;
+}
+
+@import "common/buttons";
+@import "common/progress";
+@import "common/elements";
+@import "common/paginations";
+@import "common/modals";
+@import "common/dropdowns";

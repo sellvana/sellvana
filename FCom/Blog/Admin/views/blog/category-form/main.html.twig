@@ -1,0 +1,24 @@
+{% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator', m) %}
+<div class="f-section">
+<fieldset class="form-horizontal">
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-status">{{ 'Name'|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control required" id="model-title" type="text" name="model[name]" value="{{ validator.fieldValue('name') }}" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-url-key">{{ 'URL Key'|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control required" id="model-url-key" type="url_key" name="model[url_key]" value="{{ validator.fieldValue('url_key') }}" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="model-description">{{ 'Description'|_ }}</label>
+        <div class="col-md-10">
+            <textarea class="form-control ckeditor" id="model-description" name="model[description]">{{ validator.fieldValue('description')}}</textarea>
+        </div>
+    </div>
+</fieldset>
+</div>

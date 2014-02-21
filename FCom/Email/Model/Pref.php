@@ -1,9 +1,24 @@
 <?php
 
+/**
+ * Model class for table 'fcom_email_pref'
+ * The followings are the available columns in table 'fcom_email_pref':
+ * @property string $id
+ * @property string $email
+ * @property integer $unsub_all
+ * @property integer $sub_newsletter
+ * @property string $create_at
+ * @property string $update_at
+ */
 class FCom_Email_Model_Pref extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_email_pref';
+
+    protected $_validationRules = array(
+        array('email', '@required'),
+        array('email', '@email'),
+    );
 
     public static function unsubAll($email)
     {
@@ -25,20 +40,23 @@ class FCom_Email_Model_Pref extends FCom_Core_Model_Abstract
     {
         $pref = static::load($email, 'email');
         if (!$salt) $salt = BUtil::randomString(8);
-        return $salt.'_'.sha1($salt.'|'.$email.'|'.($pref ? $pref->update_dt : ''));
+        return $salt.'_'.sha1($salt.'|'.$email.'|'.($pref ? $pref->update_at : ''));
     }
 
     public static function validateToken($email, $token)
     {
-        list($salt, $hash) = explode('_', $token);
-        return static::getToken($email, $salt) === $salt.'_'.$hash;
+        if ($email && $token) {
+            list($salt, $hash) = explode('_', $token);
+            return static::getToken($email, $salt) === $salt.'_'.$hash;
+        }
+        return false;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
-        if (!$this->create_dt) $this->create_dt = BDb::now();
-        $this->update_dt = BDb::now();
+        if (!parent::onBeforeSave()) return false;
+        if (!$this->create_at) $this->create_at = BDb::now();
+        $this->update_at = BDb::now();
         return true;
     }
 }

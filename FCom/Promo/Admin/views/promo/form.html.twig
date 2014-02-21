@@ -1,0 +1,85 @@
+{% set m = THIS.get('model') %}
+{% set tabs = THIS.sortedTabs() %}
+{% set formId = THIS.get('form_id') %}
+{% set formUrl = THIS.get('form_url') %}
+{% set validator = THIS.validator(formId, THIS.get('model')) %}
+
+<script>
+require(['jquery', 'jquery.validate', 'fcom.admin.form'], function($) {
+    $(function() {
+        window.adminForm = FCom.Admin.form({
+            form:     '#{{ formId }}',
+            tabs:     '.adm-tabs-sidebar li',
+            panes:    '.adm-tabs-content',
+            url_get:  '{{ formUrl }}',
+            url_post: '{{ formUrl }}'
+        });
+        $("#{{ formId }}").validate();
+    });
+})
+</script>
+
+<form id="{{ THIS.get('form_id') }}" class="form form-horizontal" action="{{ formUrl }}" method="post">
+    <div class="row adm-page-title">
+        <div class="col-sm-12">
+            <div class="page-header">
+                <h1 class="pull-left">
+                    <i class="icon-table"></i>
+                    {{ THIS.q(THIS.get('title')) }}
+                </h1>
+                <div class="pull-right">
+                    <div class="btn-group">
+                        {{ THIS.get('actions') | join(' ') | raw }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ THIS.view('core/messages') | raw }}
+
+    <div class="row adm-content-box info-view-mode col-sm-12 box">
+        {% if m.get('id')  %}
+            <div class="adm-product-summary adm-section-group box-header blue-background">
+                <div class="title">{{ m.get('description') }}<sup>({{ m.fieldOptions('status', m.get('status')) }})</sup></div>
+                <p class="promo-summary" style="font-size: .5em; clear: both;">
+                    {{ "BUY"|_ }} <strong>{{ m.fieldOptions('buy_type', m.get('buy_type')) }}</strong>
+                    {{ "FROM"|_ }} <strong>{{ m.fieldOptions('buy_group', m.get('buy_group')) }}</strong>
+                    {{ "GET"|_ }} <strong>{{ m.fieldOptions('get_type', m.get('get_type')) }}</strong>
+                    {{ "OF"|_ }} <strong>{{ m.fieldOptions('get_group', m.get('get_group')) }}</strong>
+                </p>
+            </div>
+        {% endif %}
+        <div class="box-content">
+            <div class="tabbable tabs-left {% if THIS.get('sidebar_img') %}form-img-sidebar{% else %}adm-sidebar{% endif %}">
+                <ul class="nav nav-tabs nav-stacked adm-tabs-sidebar" id="tabs">
+                    {% if THIS.get('sidebar_img') %}
+                        <li><img src="{{ THIS.q(THIS.get('sidebar_img'))|raw}}" width="98" height="98"/></li>
+                    {% endif %}
+                    {% for k, tab in tabs %}
+                        {% if tab.disabled is empty %}
+                            <li {% if k is sameas(THIS.get('cur_tab')) %}class="active"{% endif %}>
+                                <a href="#tab-{{ THIS.q(k) }}"><span class="icon"></span>{{ THIS.q(tab.label) }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+
+                <div class="adm-main tab-content">
+
+
+
+                    {% for k, tab in tabs %}
+                        <section id="tab-{{ THIS.q(k) }}" class="adm-tabs-content"
+                                 {% if k != THIS.get('cur_tab') %}hidden{% endif %}
+                                {% if tab.async is empty %}data-loaded="true"{% endif %}
+                                >
+                            {% if tab.async is empty %} {{ THIS.view(tab.view).set('validator', validator)|raw }}{% endif %}
+                        </section>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -96,8 +96,8 @@ class UpsRate {
 		</Shipment>
         </RatingServiceSelectionRequest>";
 
-        list($result,) = BUtil::remoteHttp('POST', $this->rateApiUrl, $data);
-        
+        $result = BUtil::remoteHttp('POST', $this->rateApiUrl, $data);
+
         //echo '<!-- '. $result. ' -->'; // THIS LINE IS FOR DEBUG PURPOSES ONLY-IT WILL SHOW IN HTML COMMENTS
         $ratings = new SimpleXMLElement($result);
         $this->response = $ratings;
