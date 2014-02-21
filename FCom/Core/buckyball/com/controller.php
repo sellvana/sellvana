@@ -1381,7 +1381,7 @@ class BResponse extends BClass
         BEvents::i()->fire(__METHOD__, array('last_method'=>$lastMethod));
         BSession::i()->close();
         BRouting::i()->stop();
-        //exit;
+        exit;
     }
 }
 
