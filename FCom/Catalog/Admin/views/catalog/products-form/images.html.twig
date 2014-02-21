@@ -275,6 +275,11 @@ require(['jquery', 'unique'], function($) {
         console.log('all_images');
         console.log(g_vent);
         var prod_image_rows = [];
+        $('#product_images').find('input[type="radio"]').each(function () {
+            if ($(this).attr('name') == 'product_images[main_thumb]' && $(this).attr('data-main-thumb') == 1) {
+                $(this).prop('checked', true);
+            }
+        });
         $('#prod-image-checkbox').change(function() {
             prod_image_rows = [];
         });
