@@ -211,7 +211,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $thumb_url = FCom_Core_Main::i()->resizeUrl().'?s=100x100&f='.BConfig::i()->get('web/media_dir').'/'.'product/images/';
         $data = BDb::many_as_array($model->mediaORM('I')
                 ->order_by_expr('pa.position asc')
-                ->select(array('pa.id', 'pa.product_id', 'pa.remote_url','pa.position','pa.label','a.file_name','a.file_size','pa.create_at','pa.update_at'))
+                ->select(array('pa.id', 'pa.product_id', 'pa.remote_url','pa.position','pa.label','a.file_name','a.file_size','pa.create_at','pa.update_at', 'pa.main_thumb'))
                 ->select('a.id','file_id')
                 ->find_many());
         return array(
@@ -232,7 +232,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
                     array('name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline'),
                     array('name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true)),
-                    array('name'=>'main_thumb', 'label'=>'Thumbnail', 'width'=>50, 'editable'=>'inline', 'editor'=>'checkbox'),
+                    array('name'=>'main_thumb', 'label'=>'Thumbnail', 'width'=>50, 'print' => '"<input value=\'"+rc.row["id"]+"\' type=\'radio\' name=\'product_images[main_thumb]\' data-main-thumb=\'"+rc.row["main_thumb"] +"\'/>"'),
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
                     array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>true, 'delete'=>true))
@@ -512,16 +512,16 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
             if (!empty($data['grid'][$typeName]['rows'])) {
                 $rows = json_decode($data['grid'][$typeName]['rows'], true);
-
                 foreach($rows as $row) {
+                    $main_thumb = 0;
+                    if (isset($data['product_images']['main_thumb']) && $data['product_images']['main_thumb'] == $row['id']) {
+                        $main_thumb = 1;
+                    }
                     if (isset($row['_new'])) {
 
                         $label    = '';
                         $position = null;
-                        if (
-                            isset($data['product_images']) 
-                            && isset($row['id'])
-                            && isset($data['product_images'][$row['id']])
+                        if (isset($data['product_images']) && isset($row['id']) && isset($data['product_images'][$row['id']])
                         ) {
                             if (isset($data['product_images'][$row['id']]['label'])) {
                                 $label = $data['product_images'][$row['id']]['label'];
@@ -540,18 +540,18 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                             'file_id'    => $row['file_id'],
                             'label'      => $label,
                             'position'   => $position,
+                            'main_thumb' => $main_thumb
                             //TODO remote_url and file_path can be fetched based on file_id. Beside, file_name can be changed in media libary.
                             //'remote_url' =>BApp::href('/media/grid/download?folder=media/product/attachment&file_='.$row['file_id']),
 
                         ))->save();
-                    } else {
-                        $mediaModel = $hlp->load($row['id'])->set($row)->save();
-                    }
-                    if ($mediaModel->get('main_thumb')) {
-                        $mediaLibModel = FCom_Core_Model_MediaLibrary::i()->load($mediaModel->get('file_id'));
-                        $model->set('thumb_url', $mediaLibModel->get('folder').'/'.$mediaLibModel->get('file_name'))->save();
+                        if ($mediaModel->get('main_thumb')) {
+                            $mediaLibModel = FCom_Core_Model_MediaLibrary::i()->load($mediaModel->get('file_id'));
+                            $model->set('thumb_url', $mediaLibModel->get('folder').'/'.$mediaLibModel->get('file_name'))->save();
+                        }
                     }
                 }
+
 /*
 //echo "<pre>"; print_r($data['grid'][$typeName]['add']);
                 $oldAtt = $hlp->orm()->where('product_id', $model->id)->where('media_type', $type)
@@ -575,6 +575,25 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 }
 //echo "</pre>";
 //exit;**/
+            }
+
+            if (isset($data['product_images'])) {
+                foreach ($data['product_images'] as $key => $image) {
+                    $mediaModel =  $hlp->load($key);
+                    $main_thumb = 0;
+                    if (isset($data['product_images']['main_thumb']) && $data['product_images']['main_thumb'] == $key) {
+                        $main_thumb = 1;
+                    }
+                    if ($mediaModel) {
+                        $image['main_thumb'] = $main_thumb;
+                        if ($main_thumb) {
+                            $mediaLibModel = FCom_Core_Model_MediaLibrary::i()->load($mediaModel->get('file_id'));
+                            $model->set('thumb_url', $mediaLibModel->get('folder').'/'.$mediaLibModel->get('file_name'))->save();
+                        }
+                        $image['position'] = (int) $image['position'];
+                        $mediaModel->set($image)->save();
+                    }
+                }
             }
         }
         return $this;
