@@ -80,13 +80,13 @@
                 <table class="adm-form-subtable">
                     <tr>
                         <td>BUY</td>
-                        <td><select name="model[buy_type]"><?php echo $this->optionsHtml($promo->fieldOptions('buy_type'), $m->buy_type) ?></select></td>
+                        <td><select name="model[buy_type]"><?php echo BUtil::optionsHtml($promo->fieldOptions('buy_type'), $m->buy_type) ?></select></td>
                         <td>FROM</td>
-                        <td><select name="model[buy_group]"><?php echo $this->optionsHtml($promo->fieldOptions('buy_group'), $m->buy_group) ?></select></td>
+                        <td><select name="model[buy_group]"><?php echo BUtil::optionsHtml($promo->fieldOptions('buy_group'), $m->buy_group) ?></select></td>
                         <td>GET</td>
-                        <td><select name="model[get_type]"><?php echo $this->optionsHtml($promo->fieldOptions('get_type'), $m->get_type) ?></select></td>
+                        <td><select name="model[get_type]"><?php echo BUtil::optionsHtml($promo->fieldOptions('get_type'), $m->get_type) ?></select></td>
                         <td>OF</td>
-                        <td><select name="model[get_group]"><?php echo $this->optionsHtml($promo->fieldOptions('get_group'), $m->get_group) ?></select></td>
+                        <td><select name="model[get_group]"><?php echo BUtil::optionsHtml($promo->fieldOptions('get_group'), $m->get_group) ?></select></td>
                     </tr>
                 </table>
             <li>

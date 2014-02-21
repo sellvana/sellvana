@@ -1,0 +1,147 @@
+<!--{ title: {{ 'My Account'|_ }} }-->
+
+{% set m = THIS.get('model') %}
+{% set userHlp = APP.instance('FCom_Admin_Model_User') %}
+<div class="f-admin-main-view">
+  <div id="content-wrapper">
+    <form id="my_account-form" class="form form-horizontal" method="post">
+      <div class="page-header f-admin-page-header f-has-breadcrumbs">
+        <h1 class="f-page-title">{{ m.fullname() }}</h1>
+        <div class="btn-group">
+          <a class="btn btn-default">{{ 'Cancel'|_ }}</a>
+          <button type="submit" class="btn btn-primary">
+            {{ 'Save' |_ }}
+          </button>
+        </div>
+      </div>
+        <ul class="breadcrumb">
+          <li>
+            <a href="{{ APP.href() }}">
+              <i class="icon-home"></i>
+            </a>
+          </li>
+          <li class="separator">
+            <i class="icon-angle-right"></i>
+          </li>
+          <li class="active">{{ 'User profile' |_ }}</li>
+        </ul>
+      <div class="f-admin-main">
+        {{ THIS.view('core/messages') | raw }}
+        
+            <div class="row">
+  
+              <div class="col-lg-6">
+                <fieldset class="f-fieldset-group">
+                  <div class='lead'>
+                    {{ 'Account Information'|_ }}
+                  </div>
+                  <div class="form-group">
+                    <label class="col-md-3 control-label">{{ 'Username'|_ }}</label>
+                    <div class="col-md-7">
+                      <input class="form-control" id="username" placeholder="{{ 'Username'|_ }}" type="text" name="model[username]" value="{{ m.get('username') }}">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-md-3 control-label">{{ 'E-mail'|_ }}</label>
+                    <div class="col-md-7">
+                      <input class="form-control" id="email" placeholder="{{ 'E-mail'|_ }}" type="email" name="model[email]" value="{{ m.get('email') }}">
+                    </div>
+                    <div class="col-md-1">
+                      <img class="img-responsive" width="32" height="32" src="{{ m.thumb(32) }}" />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-md-3 control-label" for="password-current">{{ 'Current Password'|_ }}</label>
+                    <div class="col-md-7">
+                      <input class="required form-control" id="password-current" placeholder="{{ 'Current Password'|_ }}" type="password" name="model[password_current]">
+                    </div>
+                    <div class="col-md-offset-3 col-md-7">
+                      <small>{{ 'Any account updates require current password'|_ }}</small>
+                    </div>
+                  </div>
+  
+                  <div class="form-group">
+                    <div class="controls col-md-offset-3">
+                      <div class="checkbox">
+                        <label>
+                          <input data-target="#change-password" data-toggle="collapse" id="changepasswordcheck" type="checkbox" value="option1">
+                          {{ 'Change password?'|_ }}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="collapse" id="change-password">
+                    <div class="form-group">
+                      <label class="col-md-3 control-label" for="password">{{ 'New Password'|_ }}</label>
+                      <div class="col-md-7">
+                        <input class="required form-control has-progress-bar" id="password" placeholder="{{ 'New Password'|_ }}" type="password" name="model[password]">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-md-3 control-label" for="password-confirmation">{{ 'Password confirmation'|_ }}</label>
+                      <div class="col-md-7">
+                        <input class="required form-control" id="password-confirmation" placeholder="{{ 'Password confirmation'|_ }}" equalto="#password" type="password" name="model[password_confirm]">
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+  
+                <hr class="hr-normal">
+  
+                <fieldset class="f-fieldset-group">
+                  <div class="lead">
+                    {{ 'Personal info'|_ }}
+                  </div>
+                  <div class="form-group">
+                    <label class="col-md-3 control-label">{{ 'First name'|_ }}</label>
+                    <div class="col-md-7">
+                      <input class="form-control" id="firstname" placeholder="First name" type="text" name="model[firstname]" value="{{ m.get('firstname') }}">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-md-3 control-label">{{ 'Last name'|_ }}</label>
+                    <div class="col-md-7">
+                      <input class="form-control" id="lastname" placeholder="Last name" type="text" name="model[lastname]" value="{{ m.get('lastname') }}">
+                    </div>
+                  </div>
+                  <hr class="hr-normal">
+                  <div class="form-group">
+                    <label class="col-md-3 control-label">{{ 'Bio' |_ }}</label>
+                    <div class="col-md-7">
+                      <textarea class="autosize form-control" id="bio" placeholder="Bio"></textarea>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="col-lg-6">
+                <div class="lead">
+                  {{ 'Notifications Subscriptions'|_ }}
+                </div>
+            </div>
+          </div>
+        </div>
+    </form>
+  </div>
+</div>
+
+<script>
+require(['jquery', 'jquery.validate', 'fcom.password'], function($) {
+    $(function() {
+        $('#changepasswordcheck').change(function(ev) {
+          return;
+          if (this.checked) {
+            $('#change-password input').addClass('required');
+          } else {
+            $('#change-password input').removeClass('required');
+          }
+        })
+        $('#my_account-form').validate({
+            rules:{
+                'model[password]': {
+                    passwordSecurity: {{ CONFIG.get('modules/FCom_Admin/password_strength') ? 'true' : 'false' }}
+                }
+            }
+        });
+    })
+})
+</script>

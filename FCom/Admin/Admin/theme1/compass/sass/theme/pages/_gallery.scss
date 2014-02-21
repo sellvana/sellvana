@@ -1,0 +1,64 @@
+.gallery {
+  margin-left: -5px;
+
+  > ul {
+    margin-bottom: 0;
+  }
+
+  li {
+    margin-bottom: 10px !important;
+  }
+
+  .picture {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+
+    .tags {
+      position: absolute;
+      right: 2px;
+      top: 2px;
+      direction: rtl;
+
+      .label {
+        display: table;
+        margin-bottom: 2px;
+        text-align: left;
+        direction: ltr;
+      }
+    }
+
+    &:hover {
+      .actions {
+        bottom: 0;
+      }
+    }
+
+    .actions {
+      width: 100%;
+      position: absolute;
+      background-color: $galleryActionsBackground;
+      height: 35px;
+      left: 0;
+      bottom: -35px;
+      @include clearfix;
+      @include transition(bottom 100ms ease);
+
+      &.show-actions {
+        bottom: 0;
+      }
+
+      .btn-link {
+        color: $galleryActionsColor;
+        text-shadow: none;
+      }
+
+      .pull-right {
+        .btn-link {
+          position: relative;
+          top: 1px;
+        }
+      }
+    }
+  }
+}

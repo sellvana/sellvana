@@ -1,0 +1,77 @@
+{% if APP.instance('FCom_Admin_Model_User').isLoggedIn() %}
+    <script>
+        require(['fcom.adminchat'], function(AdminChat) {
+            new AdminChat({
+                state: {{ UTIL.toJson(APP.instance('FCom_AdminChat_Admin').getInitialState()) | raw }},
+                username: '{{ APP.instance('FCom_Admin_Model_User').sessionUser().get('username') }}',
+                dingPath: '{{ APP.src('@FCom_Core/sound/ding.wav') }}'
+            })
+        })
+    </script>
+
+    <div id="sound"></div>
+
+    <div id="adminChatMain"></div>
+
+    <script type="text/template" class="template" id="chatWinTemplate">
+        <div class="chat chat-fixed" style="margin-right: <%- rc.index*300 %>px">
+            <div class="col-sm-12">
+                <div class="box">
+                    <div class="box-header box-header-small contrast-background">
+                        <div class="title">
+                            <i class="icon-comments-alt"></i>
+                            <%- rc.title %> &nbsp;
+                            <span class="badge badge-inverse" style="display:<%- rc.badgeDisplay %>;">
+                                <%- rc.unreadCount %>&nbsp;unread <% if(rc.unreadCount>1) { %>s<%}%>
+                            </span>
+                        </div>
+                        <div class="actions">
+                          <a class="btn box-collapse btn-xs btn-link" href="#"><i class="icon-chevron-down"></i></a>
+                          <a class="btn box-remove btn-xs btn-link" href="#"><i class="icon-remove"></i></a>
+                        </div>
+                    </div>
+                    <div class="box-content box-no-padding">
+                        <div class="scrollable" data-scrollable-height="300" data-scrollable-start="bottom">
+                          <ul class="list-unstyled">
+
+                          </ul>
+                        </div>
+                        <form class="new-message" method="post" action="#" accept-charset="UTF-8"><input name="authenticity_token" type="hidden" />
+                            <textarea class="form-control js-message-body" name="message[body]" placeholder="Type your message here..." type="text" style="width: 232px; line-height:29px;"></textarea>
+                            <button class="btn" type="submit">
+                                <i class="icon-comment"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/template" class="template" id="chatItemTempate">
+        <div class="avatar">
+            <img width="23" height="23" src="<%- rc.avatar %>" alt="Avatar">
+        </div>
+
+        <div class="name-and-time">
+            <div class="name pull-left">
+                <small>
+                    <a href="#" class="text-contrast"><%- rc.username %></a>
+                </small>
+            </div>
+            <div class="time pull-right">
+                <small class="date pull-right text-muted">
+                    <span title="" data-placement="top" class="timeago fade has-tooltip"></span>
+                    <i class="icon-time"></i>
+                </small>
+            </div>
+        </div>
+
+        <div class="body" style="word-wrap: break-word;">
+            <%- rc.text %>
+        </div>
+    </script>
+
+{% endif %}
+
+

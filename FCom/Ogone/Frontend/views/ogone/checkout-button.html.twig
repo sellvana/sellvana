@@ -1,0 +1,6 @@
+<form method="post" id="ogone-checkout" action="{{ THIS.get('form_url') }}">
+    {% for value in THIS.get('data') %}
+        <input type="hidden" name="{{loop.index}}" value="{{value}}"/>
+    {% endfor %}
+    <input type="submit" class="btn btn-primary" value="{{'Secure payment by Ogone'|_}}"/>
+</form>

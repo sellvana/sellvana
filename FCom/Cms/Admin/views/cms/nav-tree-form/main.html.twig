@@ -1,0 +1,30 @@
+{% set m = THIS.get('model') %}
+
+<fieldset>
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="main-node_name">{{ 'Node Name'|_ }}</label>
+        <div class="col-md-5">
+            <input id="main-node_name" class="form-control required" type="text" name="model[node_name]" value="{{ m.get('node_name') }}" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="main-url_key">{{ 'URL Key'|_ }}</label>
+        <div class="col-md-5">
+            <input id="main-url_key" class="form-control required" type="text" name="model[url_key]" value="{{ m.get('url_key') }}" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="main-node_type">{{ 'Node Type'|_ }}</label>
+        <div class="col-md-5">
+            <select name="model[node_type]" class="form-control" id="main-node_type">
+                {{ UTIL.optionsHtml(THIS.node_types, m.get('node_type'))|raw }}
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="main-reference">{{ 'Reference'|_ }}</label>
+        <div class="col-md-5">
+            <input id="main-reference" class="form-control" type="text" name="model[reference]" value="{{ m.get('reference') }}" />
+        </div>
+    </div>
+</fieldset>

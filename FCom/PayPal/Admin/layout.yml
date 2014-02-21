@@ -1,0 +1,4 @@
+/settings:
+    - view: settings
+        do:
+            - [ addTab, FCom_PayPal, { label: PayPal, group: payment_methods, async: true } ]

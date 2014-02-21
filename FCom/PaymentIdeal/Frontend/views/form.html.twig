@@ -1,0 +1,14 @@
+{% set banks = THIS.get('banks') %}
+{% set key = THIS.get('key') %}
+{% set method = THIS.get('method') %}
+{% set config = method.config() %}
+<div id="{{ key }}_payment_method">
+    <h4>{{ config.get('title') }}</h4>
+    <label for="{{ key }}_bank_id">{{ "Choose your bank"| _ }}</label><span class="required"> *</span><br/>
+    <select name="payment[{{ key }}][bank_id]" id="{{ key }}_bank_id" class="required">
+        <option value="">{{ "-- Select bank --" }}</option>
+        {% for id, bank in banks %}
+            <option value="{{ id }}">{{ bank }}</option>
+        {% endfor %}
+    </select>
+</div>

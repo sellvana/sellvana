@@ -1,0 +1,36 @@
+<li class="dropdown medium only-icon widget">
+  <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+    <i class="icon-comments-alt"></i>&nbsp;<span class="badge badge-inverse" style="display:none;" id="totalUnreads"></span>
+  </a>
+    <ul class="dropdown-menu" id="adminUserList">
+      <li id="adminStatus">
+        <script type='text/template' class='template' id='statusTemplate'>
+        <div class="widget-body">
+          <div class="pull-left icon">
+            <img width="23" height="23" src="<%- rc.avatar %>" alt="<%- rc.username %>">
+          </div>
+          <div class="pull-left text">
+            <%- rc.username %>&nbsp;
+            <small class="text-muted">
+              <select class='js-adminuser-status' value='<%- rc.status %>'>
+                {{ UTIL.optionsHtml({online:'Online', away:'Away', na:'N/A', offline:'Offline'}) | raw }}
+              </select>
+            </small>
+          </div>
+        </script>
+      </li>
+      <li class="divider"></li>
+      <script type='text/template' class='template' id= 'userTemplate'>
+        <div class="widget-body">
+          <div class="pull-left icon">
+            <img width="23" height="23" src="<%- rc.avatar %>" alt="<%- rc.username %>">
+          </div>
+          <div class="pull-left text">
+            <%- rc.username %>&nbsp;
+            <small class="text-muted">-<%- rc.status %>&nbsp;
+              <span class="badge badge-inverse" style="display:none;"></span>
+            </small>
+          </div>
+      </script>
+    </ul>
+</li>

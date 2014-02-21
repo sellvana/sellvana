@@ -1,0 +1,50 @@
+{% set c = THIS.grid['config'] %}
+
+<script id="backgrid-toolbar-template" type="text/template">
+    <div class="row">
+        <div class="col-md-4">
+            <label>
+                <select>
+                    <% _.each(ps_options, function(ps) { %>
+                    <option></option>
+                    <% }) %>
+                </select>
+            </label>
+        </div>
+        <div class="col-md-4">
+            <a href="#">&laquo;</a>
+            <select>
+                <option></option>
+            </select>
+            <a href="#">&raquo;</a>
+        </div>
+        <div class="col-md-4">
+
+        </div>
+    </div>
+</script>
+
+<div id="{{ c['id'] }}"></div>
+
+<script>
+    require(['jquery', 'fcom.backbone.grid', 'jquery.dragtable'/*, 'jquery.colResizable'*/], function($) {
+        $(function() {
+            var config = {{ THIS.getBackgridConfigJson() | raw }}
+            //console.log('config', config);
+            var grid = new FCom.BackgridView(config);
+            var $container = $("#{{ c['id'] }}");
+            //console.log('grid', grid);
+            grid.render();
+            /*
+            var $thead = $container.find('.backgrid thead');
+            var $copy = $thead.clone(true).css({position:'fixed', top:0, left: $thead.offset().left});
+            $('body').append($('<table class="backgrid">').append($copy));
+
+            $(window).scroll(function(ev) {
+                var top = $(window).scrollTop();
+                console.log(top);
+            });
+            */
+        });
+    })
+</script>

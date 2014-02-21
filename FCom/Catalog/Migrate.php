@@ -2,254 +2,339 @@
 
 class FCom_Catalog_Migrate extends BClass
 {
-    public function run()
+    public function install__0_2_6()
     {
-        BMigrate::install('0.1.1', array($this, 'install'));
-        BMigrate::upgrade('0.1.0', '0.1.2', array($this, 'upgrade_0_1_2'));
-        BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
-        BMigrate::upgrade('0.1.3', '0.1.4', array($this, 'upgrade_0_1_4'));
-        BMigrate::upgrade('0.1.4', '0.1.5', array($this, 'upgrade_0_1_5'));
-        BMigrate::upgrade('0.1.5', '0.1.6', array($this, 'upgrade_0_1_6'));
-        BMigrate::upgrade('0.1.6', '0.1.7', array($this, 'upgrade_0_1_7'));
-        BMigrate::upgrade('0.1.7', '0.1.8', array($this, 'upgrade_0_1_8'));
-        BMigrate::upgrade('0.1.8', '0.1.9', array($this, 'upgrade_0_1_9'));
-        BMigrate::upgrade('0.1.9', '0.2.0', array($this, 'upgrade_0_2_0'));
-    }
-
-    public function install()
-    {
-        $tFamily = FCom_Catalog_Model_Family::table();
-        BDb::run("
-            CREATE TABLE IF NOT EXISTS {$tFamily} (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `family_name` varchar(100) NOT NULL,
-            `manuf_vendor_id` int(10) unsigned DEFAULT NULL,
-            PRIMARY KEY (`id`),
-            UNIQUE KEY `family_name` (`family_name`)
-            /*,
-            KEY `FK_a_family_manuf` (`manuf_vendor_id`),
-            CONSTRAINT `FK_a_family_manuf` FOREIGN KEY (`manuf_vendor_id`) REFERENCES `a_vendor` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-            */
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
-
         $tProduct = FCom_Catalog_Model_Product::table();
-        BDb::run("
-            CREATE TABLE IF NOT EXISTS {$tProduct} (
-            `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `company_id` INT(10) UNSIGNED DEFAULT NULL,
-            `entity_id` INT(10) UNSIGNED DEFAULT NULL,
-            `manuf_id` INT(10) UNSIGNED DEFAULT NULL,
-            `manuf_vendor_id` INT(10) UNSIGNED DEFAULT NULL,
-            `manuf_sku` VARCHAR(100) NOT NULL,
-            `product_name` VARCHAR(255) NOT NULL,
-            `description` TEXT,
-            `url_key` VARCHAR(255) DEFAULT NULL,
-            `base_price` DECIMAL(12,4) NOT NULL,
-            `notes` TEXT,
-            `uom` VARCHAR(10) NOT NULL DEFAULT 'EACH',
-            `create_dt` DATETIME DEFAULT NULL,
-            `update_dt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            `image_url` TEXT,
-            `calc_uom` VARCHAR(15) DEFAULT NULL,
-            `calc_qty` DECIMAL(12,4) UNSIGNED DEFAULT NULL,
-            `base_uom` VARCHAR(15) DEFAULT NULL,
-            `base_qty` INT(10) UNSIGNED DEFAULT NULL,
-            `pack_uom` VARCHAR(15) DEFAULT NULL,
-            PRIMARY KEY (`id`),
-            UNIQUE KEY `url_key` (`url_key`)
-            ) ENGINE=INNODB DEFAULT CHARSET=utf8;
-        ");
 
         $tMedia = FCom_Catalog_Model_ProductMedia::table();
-        $tProduct = FCom_Catalog_Model_Product::table();
         $tMediaLibrary = FCom_Core_Model_MediaLibrary::table();
 
-        BDb::run("
-            CREATE TABLE IF NOT EXISTS {$tMedia} (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `product_id` int(10) unsigned DEFAULT NULL,
-            `media_type` char(1) NOT NULL,
-            `file_id` int(11) unsigned NOT NULL,
-            PRIMARY KEY (`id`),
-            KEY `file_id` (`file_id`),
-            KEY `product_id__media_type` (`product_id`,`media_type`),
-            CONSTRAINT `FK_{$tMedia}_product` FOREIGN KEY (`product_id`) REFERENCES `{$tProduct}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-            CONSTRAINT `FK_{$tMedia}_file` FOREIGN KEY (`file_id`) REFERENCES `{$tMediaLibrary}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-        ");
-
         $tProductLink = FCom_Catalog_Model_ProductLink::table();
-        BDb::run("
-            CREATE TABLE IF NOT EXISTS {$tProductLink} (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `link_type` enum('related','similar') NOT NULL,
-            `product_id` int(10) unsigned NOT NULL,
-            `linked_product_id` int(10) unsigned NOT NULL,
-            PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
-
-        $tProductFamily = FCom_Catalog_Model_ProductFamily::table();
-        $tFamily = FCom_Catalog_Model_Family::table();
-        $tProduct = FCom_Catalog_Model_Product::table();
-        BDb::run("
-            CREATE TABLE IF NOT EXISTS {$tProductFamily} (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `product_id` int(10) unsigned NOT NULL,
-            `family_id` int(10) unsigned NOT NULL,
-            PRIMARY KEY (`id`),
-            UNIQUE KEY `family_id__product_id` (`family_id`,`product_id`),
-            KEY `product_id` (`product_id`),
-            CONSTRAINT `FK_{$tProductFamily}_family` FOREIGN KEY (`family_id`) REFERENCES `{$tFamily}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-            CONSTRAINT `FK_{$tProductFamily}_product` FOREIGN KEY (`product_id`) REFERENCES `{$tProduct}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
 
         $tCategory = FCom_Catalog_Model_Category::table();
-        BDb::run("
-            CREATE TABLE IF NOT EXISTS {$tCategory} (
-            `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `parent_id` INT(10) UNSIGNED DEFAULT NULL,
-            `id_path` VARCHAR(50) NOT NULL,
-            `sort_order` INT(10) UNSIGNED NOT NULL,
-            `node_name` VARCHAR(255) NOT NULL,
-            `full_name` VARCHAR(255) NOT NULL,
-            `url_key` VARCHAR(255) NOT NULL,
-            `url_path` VARCHAR(255) NOT NULL,
-            `num_children` INT(11) UNSIGNED DEFAULT NULL,
-            `num_descendants` INT(11) UNSIGNED DEFAULT NULL,
-            `num_products` INT(10) UNSIGNED DEFAULT NULL,
-            `is_virtual` TINYINT(3) UNSIGNED DEFAULT NULL,
-            PRIMARY KEY (`id`),
-            UNIQUE KEY `id_path` (`id_path`),
-            UNIQUE KEY `full_name` (`full_name`),
-            UNIQUE KEY `parent_id` (`parent_id`,`node_name`),
-            KEY `parent_id_2` (`parent_id`,`sort_order`),
-            CONSTRAINT `FK_{$tCategory}_parent` FOREIGN KEY (`parent_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-            ) ENGINE=INNODB DEFAULT CHARSET=utf8;
-        ");
-
         $tCategoryProduct = FCom_Catalog_Model_CategoryProduct::table();
-        $tProduct = FCom_Catalog_Model_Product::table();
-        $tCategory = FCom_Catalog_Model_Category::table();
 
-        BDb::run("
-            CREATE TABLE IF NOT EXISTS `{$tCategoryProduct}` (
-            `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `product_id` INT(10) UNSIGNED NOT NULL,
-            `category_id` INT(10) UNSIGNED NOT NULL,
-            `sort_order` INT(10) UNSIGNED DEFAULT NULL,
-            PRIMARY KEY (`id`),
-            UNIQUE KEY `product_id` (`product_id`,`category_id`),
-            KEY `category_id__product_id` (`category_id`,`product_id`),
-            KEY `category_id__sort_order` (`category_id`,`sort_order`),
-            CONSTRAINT `FK_{$tCategoryProduct}_category` FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-            CONSTRAINT `FK_{$tCategoryProduct}_product` FOREIGN KEY (`product_id`) REFERENCES `{$tProduct}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-            ) ENGINE=INNODB DEFAULT CHARSET=utf8;
-        ");
+        BDb::ddlTableDef($tProduct, array(
+            'COLUMNS' => array(
+                'id'            => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
+                'local_sku'     => 'VARCHAR(100) NOT NULL',
+                'product_name'  => 'VARCHAR(255) NOT NULL',
+                'short_description' => 'TEXT',
+                'description'   => 'TEXT',
+                'url_key'       => 'VARCHAR(255) DEFAULT NULL',
+                'cost'          => 'decimal(12,2) null default null',
+                'msrp'          => 'decimal(12,2) null default null',
+                'map'           => 'decimal(12,2) null default null',
+                'markup'        => 'decimal(12,2) null default null',
+                'base_price'    => 'DECIMAL(12,2) NOT NULL',
+                'sale_price'    => 'decimal(12,2) null default null',
+                'net_weight'    => 'decimal(12,2) null default null',
+                'ship_weight'   => 'decimal(12,2) null default null',
+                'is_hidden'     => 'tinyint(1) not null default 0',
+                'notes'         => 'TEXT',
+                'uom'           => "VARCHAR(10) NOT NULL DEFAULT 'EACH'",
+                'thumb_url'     => 'TEXT',
+                'images_data'   => 'TEXT',
+                'create_dt'     => 'DATETIME DEFAULT NULL',
+                'update_dt'     => 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+                'data_serialized' => 'mediumtext null',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'UNQ_local_sku' => 'UNIQUE (local_sku)',
+                'UNQ_url_key'   => 'UNIQUE (url_key)',
+                'UNQ_product_name' => 'UNIQUE (product_name)',
+                'is_hidden'     => '(is_hidden)',
+            ),
+        ));
 
-        $tProductField = FCom_CustomField_Model_ProductField::table();
-        $tProduct = FCom_Catalog_Model_Product::table();
-        BDb::run("
-            CREATE TABLE IF NOT EXISTS {$tProductField} (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `product_id` int(10) unsigned NOT NULL,
-            `_fieldset_ids` text,
-            `_add_field_ids` text,
-            `_hide_field_ids` text,
-            PRIMARY KEY (`id`),
-            CONSTRAINT `FK_{$tProductField}_product` FOREIGN KEY (`product_id`) REFERENCES {$tProduct} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
+        BDb::ddlTableDef($tMedia, array(
+            'COLUMNS' => array(
+                'id'            => 'int unsigned NOT NULL AUTO_INCREMENT',
+                'product_id'    => 'int(10) unsigned DEFAULT NULL',
+                'media_type'    => 'char(1) NOT NULL',
+                'file_id'       => 'int(11) unsigned NULL',
+                'file_path'     => 'text',
+                'remote_url'    => 'text',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'file_id'        => '(file_id)',
+                'product_id__media_type' => '(product_id, media_type)',
+            ),
+            'CONSTRAINTS' => array(
+                "FK_{$tMedia}_product" => "FOREIGN KEY (`product_id`) REFERENCES `{$tProduct}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tMedia}_file" => "FOREIGN KEY (`file_id`) REFERENCES `{$tMediaLibrary}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+            ),
+        ));
+
+        BDb::ddlTableDef($tProductLink, array(
+            'COLUMNS' => array(
+                'id'            => 'int unsigned NOT NULL AUTO_INCREMENT',
+                'link_type'     => "enum('related','similar') NOT NULL",
+                'product_id'    => 'int(10) unsigned NOT NULL',
+                'linked_product_id' => 'int(10) unsigned NOT NULL',
+            ),
+            'PRIMARY' => '(id)',
+        ));
+
+        BDb::ddlTableDef($tCategory, array(
+            'COLUMNS' => array(
+                'id'            => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
+                'parent_id'     => 'INT(10) UNSIGNED DEFAULT NULL',
+                'id_path'       => 'VARCHAR(50) NOT NULL',
+                'level'         => 'tinyint',
+                'sort_order'    => 'INT(10) UNSIGNED NULL',
+                'node_name'     => 'VARCHAR(255) NULL',
+                'full_name'     => 'VARCHAR(255) NULL',
+                'url_key'       => 'VARCHAR(255) NULL',
+                'url_path'      => 'VARCHAR(255) NULL',
+                'num_children'  => 'INT(11) UNSIGNED DEFAULT NULL',
+                'num_descendants' => 'INT(11) UNSIGNED DEFAULT NULL',
+                'num_products'  => 'INT(10) UNSIGNED DEFAULT NULL',
+                'is_virtual'    => 'TINYINT(3) UNSIGNED DEFAULT NULL',
+                'is_top_menu'   => 'TINYINT(3) UNSIGNED DEFAULT NULL',
+                'data_serialized' => 'mediumtext null',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'id_path'       => 'UNIQUE (`id_path`, `level`)',
+                'full_name'     => 'UNIQUE (`full_name`)',
+                'parent_id'     => 'UNIQUE (`parent_id`,`node_name`)',
+                'is_top_menu'   => '(is_top_menu)',
+            ),
+            'CONSTRAINTS' => array(
+                "FK_{$tCategory}_parent" => "FOREIGN KEY (`parent_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+            ),
+        ));
+
+        BDb::ddlTableDef($tCategoryProduct, array(
+            'COLUMNS' => array(
+                'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
+                'product_id'    => 'INT(10) UNSIGNED NOT NULL',
+                'category_id'   => 'INT(10) UNSIGNED NOT NULL',
+                'sort_order'    => 'INT(10) UNSIGNED DEFAULT NULL',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'product_id' => 'UNIQUE (`product_id`,`category_id`)',
+                'category_id__product_id' => '(`category_id`,`product_id`)',
+                'category_id__sort_order' => '(`category_id`,`sort_order`)',
+            ),
+            'CONSTRAINTS' => array(
+                "FK_{$tCategoryProduct}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tCategoryProduct}_product" => "FOREIGN KEY (`product_id`) REFERENCES `{$tProduct}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+            ),
+        ));
 
         BDb::run("REPLACE INTO {$tCategory} (id,id_path) VALUES (1,1)");
     }
 
-    public function upgrade_0_1_2()
+    public function upgrade__0_2_1__0_2_2()
     {
-        $tProduct = FCom_Catalog_Model_Product::table();
-        BDb::ddlClearCache();
-        if (BDb::ddlFieldInfo($tProduct, 'weight')) {
-            return;
-        }
-        BDb::run("
-            ALTER TABLE ".$tProduct." ADD `weight` DECIMAL( 10, 4 ) NOT NULL
-        ");
+        BDb::ddlTableDef(FCom_Catalog_Model_Product::table(), array(
+            'COLUMNS' => array(
+                'unique_id'     => 'RENAME local_sku varchar(100) not null',
+                'disabled'      => 'RENAME is_hidden tinyint not null default 0',
+                'image_url'     => 'RENAME thumb_url text',
+                'images_data'   => 'text',
+                'markup'        => 'decimal(12,2) null default null',
+            ),
+        ));
     }
 
-    public function upgrade_0_1_3()
+    public function upgrade__0_2_2__0_2_3()
     {
-        $tProduct = FCom_Catalog_Model_Product::table();
-        BDb::ddlClearCache();
-        if (BDb::ddlFieldInfo($tProduct, 'short_description')) {
-            return;
-        }
-        BDb::run("
-            ALTER TABLE ".$tProduct." ADD `short_description` TEXT after product_name
-        ");
+        BDb::ddlTableDef(FCom_Catalog_Model_Product::table(), array(
+            'COLUMNS' => array(
+                'images_data' => 'DROP',
+                'data_serialized' => 'mediumtext null',
+            ),
+        ));
+        BDb::ddlTableDef(FCom_Catalog_Model_Category::table(), array(
+            'COLUMNS' => array(
+                'data_serialized' => 'mediumtext null',
+            ),
+        ));
     }
 
-    public function upgrade_0_1_4()
+    public function upgrade__0_2_3__0_2_4()
     {
-        $tProduct = FCom_Catalog_Model_Product::table();
-        BDb::ddlClearCache();
-        if (BDb::ddlFieldInfo($tProduct, 'uniq_id')) {
-            return;
-        }
-        BDb::run("
-            ALTER TABLE ".$tProduct." ADD `uniq_id` varchar(255) NOT NULL default '' after id
-        ");
+        $table = FCom_Catalog_Model_Product::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'create_dt'      => 'RENAME create_at DATETIME DEFAULT NULL',
+                  'update_dt'      => 'RENAME update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+            ),
+        ));
     }
 
-    public function upgrade_0_1_5()
+    public function upgrade__0_2_4__0_2_5()
     {
-        $tProduct = FCom_Catalog_Model_Product::table();
-        BDb::run("
-            UPDATE ".$tProduct." SET uniq_id = id ;
-        ");
-
-
-        BDb::ddlTableColumns($tProduct, null, array('uniq_id'=>'(`uniq_id`)'));
+        BDb::ddlTableDef(FCom_Catalog_Model_Category::table(), array(
+            'COLUMNS' => array(
+                'level' => 'tinyint null after id_path',
+            ),
+            'KEYS' => array(
+                'id_path' => 'UNIQUE (`id_path`, `level`)',
+            ),
+        ));
     }
 
-    public function upgrade_0_1_6()
+    public function upgrade__0_2_5__0_2_6()
     {
-        $tProduct = FCom_Catalog_Model_Product::table();
-        BDb::run("
-            ALTER TABLE ".$tProduct." CHANGE `uniq_id` `unique_id` varchar(255) NOT NULL default '' after id
-        ");
+        $tMedia = FCom_Catalog_Model_ProductMedia::table();
+        BDb::ddlTableDef($tMedia, array(
+            'COLUMNS' => array(
+                'file_id'       => 'int(11) unsigned NULL',
+                'file_path'     => 'text',
+                'remote_url'    => 'text',
+            ),
+        ));
     }
 
-    public function upgrade_0_1_7()
+    public function upgrade__0_2_6__0_2_7()
+    {
+        $tSearchHistory = FCom_Catalog_Model_SearchHistory::table();
+        $tSearchAlias = FCom_Catalog_Model_SearchAlias::table();
+
+        BDb::ddlTableDef($tSearchHistory, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'term_type' => "char(1) not null default 'F'", // (F)ull or (W)ord
+                'query' => 'varchar(50) not null',
+                'first_at' => 'datetime not null',
+                'last_at' => 'datetime not null',
+                'num_searches' => 'int not null default 0',
+                'num_products_found_last' => 'int not null default 0',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'UNQ_query' => 'UNIQUE (term_type, query)',
+            ),
+        ));
+
+        BDb::ddlTableDef($tSearchAlias, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'alias_type' => "char(1) not null default 'F'", // (F)ull or (W)ord
+                'alias_term' => 'varchar(50) not null',
+                'target_term' => 'varchar(50) not null',
+                'num_hits' => 'int not null default 0',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'UNQ_alias' => 'UNIQUE (alias_type, alias_term)',
+                'IDX_target' => '(target_term)',
+            ),
+        ));
+    }
+
+    public function upgrade__0_2_7__0_2_8()
+    {
+        $tMedia = FCom_Catalog_Model_ProductMedia::table();
+        BDb::ddlTableDef($tMedia, array(
+            'COLUMNS' => array(
+                'data_serialized'     => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ),
+        ));
+    }
+
+    public function upgrade__0_2_8__0_2_9()
+    {
+        $tMedia = FCom_Catalog_Model_ProductMedia::table();
+        BDb::ddlTableDef($tMedia, array(
+            'COLUMNS' => array(
+                'label' => 'text',
+                'position' => 'smallint',
+            ),
+        ));
+    }
+
+    public function upgrade__0_2_9__0_2_10()
+    {
+        $tProduct = FCom_Catalog_Model_Product::table();
+        BDb::ddlTableDef($tProduct, array(
+            'COLUMNS' => array(
+                'is_featured' => 'tinyint',
+                'is_popular' => 'tinyint',
+            ),
+            'KEYS' => array(
+                'IDX_featured' => '(is_featured)',
+                'IDX_popular' => '(is_popular)',
+            ),
+        ));
+    }
+
+    public function upgrade__0_2_10__0_2_11()
     {
         $tCategory = FCom_Catalog_Model_Category::table();
-        BDb::run("
-            ALTER TABLE ".$tCategory." ADD `top_menu` tinyint(1) NOT NULL default 0
-        ");
+        BDb::ddlTableDef($tCategory, array(
+            'COLUMNS' => array(
+                'show_content'  => 'TINYINT(1) UNSIGNED DEFAULT NULL',
+                'content'       => 'TEXT',
+                'show_products' => 'TINYINT(1) UNSIGNED DEFAULT NULL',
+                'show_sub_cat'  => 'TINYINT(1) UNSIGNED DEFAULT NULL',
+                'layout_update' => 'TEXT',
+        )));
     }
 
-    public function upgrade_0_1_8()
+    public function upgrade__0_2_11__0_2_12()
     {
         $tCategory = FCom_Catalog_Model_Category::table();
-        BDb::ddlTableColumns($tCategory, null, array('top_menu'=>'(`top_menu`)'));
+        BDb::ddlTableDef($tCategory, array(
+                'COLUMNS' => array(
+                    'page_title' => 'VARCHAR(255) DEFAULT NULL',
+                    'description'  => 'TEXT DEFAULT NULL',
+                    'meta_description' => 'TEXT DEFAULT NULL',
+                    'meta_keywords' => 'TEXT DEFAULT NULL',
+                )));
     }
 
-    public function upgrade_0_1_9()
+    public function upgrade__0_2_12__0_2_13()
     {
-        $tProduct = FCom_Catalog_Model_Product::table();
-        BDb::run("
-            ALTER TABLE ".$tProduct." ADD `disabled` tinyint(1) NOT NULL default 0,
-                ADD INDEX (disabled)
-        ");
+        $tCategory = FCom_Catalog_Model_Category::table();
+        BDb::ddlTableDef($tCategory, array(
+                'COLUMNS' => array(
+                    'show_sidebar' => 'TINYINT(1) UNSIGNED DEFAULT NULL'
+                )));
     }
 
-    public function upgrade_0_2_0()
+    public function upgrade__0_2_13__0_2_14()
+    {
+        $tCategory = FCom_Catalog_Model_Category::table();
+        BDb::ddlTableDef($tCategory, array(
+            'COLUMNS' => array(
+                'is_enabled' => 'TINYINT(1) UNSIGNED DEFAULT 1 AFTER num_products',
+            ),
+            //TODO: figure out which keys are needed
+        ));
+        FCom_Catalog_Model_Category::i()->update_many(array('show_products' => 1, 'show_sidebar' => 1, 'is_enabled' => 1));
+    }
+
+    public function upgrade__0_2_14__0_2_15()
     {
         $tProduct = FCom_Catalog_Model_Product::table();
-        BDb::run("
-            ALTER TABLE ".$tProduct." ADD INDEX (product_name)
-        ");
+        BDb::ddlTableDef($tProduct, array(
+            'COLUMNS' => array(
+                'position' => 'SMALLINT(6) UNSIGNED DEFAULT NULL'
+            )
+        ));
+    }
+
+    public function upgrade__0_2_15__0_2_16()
+    {
+        $tCategory = FCom_Catalog_Model_Category::table();
+        BDb::ddlTableDef($tCategory, array(
+            'COLUMNS' => array(
+                'show_view' => 'tinyint(1) unsigned default 0',
+                'view_name' => 'varchar(255)',
+                'page_parts' => 'varchar(50)',
+            ),
+        ));
     }
 }

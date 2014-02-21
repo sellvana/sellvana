@@ -1,0 +1,57 @@
+<script>
+(function() {
+    function main($) {
+        var geoCountries = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Country').options(THIS.get('countries'))) | raw }};
+        var geoRegions = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Region').allOptions()) | raw }};
+
+        $.fn.geoCountryRegion = function(opt) {
+            opt = opt || {};
+            var $country = this;
+            var $regionSelect = $(opt.regionSelectEl || 'select.geo-region');
+            var $regionInput  = $(opt.regionInputEl || 'input.geo-region');
+            var $regionSelect2 = $('#s2id_' + $regionSelect.attr('id') );// ???
+            console.log($regionSelect2);
+            var regionLeave = $('option', $regionSelect).length;
+            var country = opt.country || '';
+            var region = opt.region || '';
+            var regionDefHtml = $regionSelect.html();
+
+            if ($country.find('option').length == 1) { // if a template with address uses this, it should still work
+                for (var i in geoCountries) {
+                    $country.append($('<option>').val(i).text(geoCountries[i]));
+                }
+            }
+            $country.val(country);
+
+            $country.change(function(ev) {
+                country = $country.val();
+                var regions = country ? geoRegions[country] : null;
+                if (regions) {
+                    $regionSelect.html(regionDefHtml);
+                    for (i in regions) {
+                        $regionSelect.append($('<option>').val(i).text(regions[i]));
+                    }
+                    $regionSelect.val(region);
+                    $regionSelect.show().removeAttr('disabled');
+                    $regionSelect2.show();
+                    $regionInput.hide().attr('disabled', 'disabled');
+                } else {
+                    $regionSelect2.hide();
+                    $regionSelect.hide().attr('disabled', 'disabled');
+                    $regionInput.show().removeAttr('disabled');
+                }
+            });
+            $country.trigger('change');
+
+            $regionSelect.change(function(ev) { region = $regionSelect.val(); });
+            $regionInput.change(function(ev) { region = $regionInput.val(); });
+            return this;
+        }
+    })
+    if (typeof require !== 'undefined') {
+        require(['jquery'], main)
+    } else {
+        $(main);
+    }
+})()
+</script>

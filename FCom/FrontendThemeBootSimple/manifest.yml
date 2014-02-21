@@ -1,0 +1,18 @@
+modules:
+    FCom_FrontendThemeBootSimple:
+        version: 0.1.0
+        channel: beta
+        description: Bootstrap 3.x simple theme
+        require: { module: { FCom_Frontend_DefaultTheme: 0.1.0 } }
+
+        areas:
+            FCom_Frontend:
+                auto_use: [ views, layout ]
+
+        provides:
+            themes:
+                FCom_FrontendThemeBootSimple:
+                    name: Simple Bootstrap Theme
+                    area: FCom_Frontend
+                    layout: Frontend/layout.yml
+                    parent: FCom_Frontend_DefaultTheme

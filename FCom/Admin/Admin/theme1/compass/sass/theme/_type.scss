@@ -1,0 +1,170 @@
+@font-face {
+  font-family: "Montserrat";
+  src: font-url("montserrat-bold-webfont.eot");
+  src: font-url("montserrat-bold-webfont.eot?#iefix") format("embedded-opentype"),
+  font-url("montserrat-bold-webfont.woff") format("woff"),
+  font-url("montserrat-bold-webfont.ttf") format("truetype"),
+  font-url("montserrat-bold-webfont.svg#montserratbold") format("svg");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: font-url("montserrat-regular-webfont.eot");
+  src: font-url("montserrat-regular-webfont.eot?#iefix") format("embedded-opentype"),
+  font-url("montserrat-regular-webfont.woff") format("woff"),
+  font-url("montserrat-regular-webfont.ttf") format("truetype"),
+  font-url("montserrat-regular-webfont.svg#montserratregular") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $headingsFontFamily;
+  font-weight: 400;
+  color: $darkest;
+}
+
+h1 { font-size: $baseFontSize * 2.0; }
+h2 { font-size: $baseFontSize * 1.75; }
+h3 { font-size: $baseFontSize * 1.5; }
+h4 { font-size: $baseFontSize * 1.25; }
+h5 { font-size: $baseFontSize; }
+h6 { font-size: $baseFontSize * 0.75; }
+
+@media (max-width: 768px) {
+  h1 { font-size: $baseFontSize * 1.75; }
+  h2 { font-size: $baseFontSize * 1.5; }
+  h3 { font-size: $baseFontSize * 1.25; }
+  h4 { font-size: $baseFontSize * 1.0; }
+  h5 { font-size: $baseFontSize; }
+  h6 { font-size: $baseFontSize * 0.5; }
+}
+
+h1 {
+  [class^="icon-"] {
+    color: $pageHeaderIconColor;
+  }
+}
+
+.page-header {
+  border-bottom-color: $pageHeaderBorder;
+  margin-left: -15px;
+  margin-right: -15px;
+  position: relative;
+  margin-top: 0;
+  margin-bottom: 30px;
+  color: $pageHeaderColor;
+  background: $pageHeaderBackground;
+  min-height: 85px;
+  padding: 20px;
+  @include clearfix;
+
+  @include sm-plus {
+    padding: 0 15px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    color: $pageHeaderColor;
+    vertical-align: middle;
+  }
+
+  .breadcrumb {
+    margin-bottom: 0;
+    line-height: 10px;
+
+    @include sm-plus {
+      padding: 10px 0;
+    }
+
+    li:first-child {
+      > a {
+        text-decoration: none;
+        @include transition(color 100ms ease);
+
+        &:hover {
+          color: $pageHeaderBreadCrumbHover;
+        }
+      }
+    }
+  }
+
+  h1.pull-left {
+    @include sm-plus {
+      margin-top: 27px;
+    }
+  }
+
+  .pull-right {
+    margin-top: 15px;
+
+    @include sm-plus {
+      margin-top: 25px;
+    }
+  }
+
+  @include sm-minus {
+    text-align: center;
+
+    > .pull-right, > .pull-left {
+      float: none !important;
+    }
+  }
+}
+
+.group-header {
+  border-top: 1px solid $hrBorder;
+  position: relative;
+  margin-left: -15px;
+  margin-right: -15px;
+  margin-bottom: 40px;
+  margin-top: 20px;
+
+  .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  > .row:first-child {
+    padding-top: 20px;
+    border-top: 1px solid $white;
+  }
+
+  &.group-header-first {
+    margin-top: 0;
+    border-top: none;
+
+    > .row:first-child {
+      padding-top: 0;
+      border-top: none;
+    }
+  }
+}
+
+hr {
+  position: relative;
+  margin-left: -15px;
+  margin-right: -15px;
+  border-top: 1px solid #eeeeee;
+  border-bottom: 1px solid white;
+
+  &.hr-normal {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  &.hr-top {
+    margin-top: 0;
+  }
+
+  &.hr-bottom {
+    margin-bottom: 0;
+  }
+
+  &.hr-double {
+    margin-top: 40px;
+    margin-bottom: 40px;
+  }
+}

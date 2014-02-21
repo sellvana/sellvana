@@ -1,5 +1,13 @@
-#Header unset ETag
-#FileETag None
+Options -Indexes +FollowSymLinks -MultiViews
+
+<FilesMatch "\.yml$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<IfModule mod_dir.c>
+    DirectoryIndex index.php
+</IfModule>
 
 <IfModule mod_security.c>
 SecFilterEngine Off
@@ -11,15 +19,30 @@ SecFilterScanPOST Off
     ExpiresDefault "access plus 1 months"
 </IfModule>
 
-#Header unset If-Modified-Since
-#Header unset If-None-Match
+<IfModule mod_header.c>
+    Header unset If-Modified-Since
+    Header unset If-None-Match
+    Header unset ETag
+    FileETag None
+</IfModule>
 
-Options +FollowSymLinks -MultiViews
+<IfModule mod_php.c>
+    php_value output_buffering Off
+    php_value zlib.output_compression Off
 
-#php_value output_buffering Off
-#php_value zlib.output_compression Off
+    # php_value memory_limit 2G
+    php_value upload_max_filesize 40M
+    php_value post_max_size 40M
+</IfModule>
 
-#php_value memory_limit 2G
+<IfModule mod_php5.c>
+    php_value output_buffering Off
+    php_value zlib.output_compression Off
+
+    # php_value memory_limit 2G
+    php_value upload_max_filesize 40M
+    php_value post_max_size 40M
+</IfModule>
 
 <IfModule mod_rewrite.c>
     SetEnv HTTP_MOD_REWRITE On

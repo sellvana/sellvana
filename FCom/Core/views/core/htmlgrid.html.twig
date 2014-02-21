@@ -1,0 +1,93 @@
+{# Logic provided by FCom_Core_View_Backgrid #}
+
+{% set data = THIS.getGridData() %}
+{% set config = THIS.grid['config'] %}
+{% set s = data.result.state %}
+{% set pageUrl = THIS.pageChangeHref() %}
+
+
+
+
+{# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
+<div class="fcom-htmlgrid responsive-table dataTables_wrapper" id="{{ config.id }}">
+  {# %form(method="get" action="#{$this->gridUrl()") #}
+  {# %fieldset #}
+  <div class="fcom-htmlgrid__toolbar btn-toolbar" style="height:45px">
+    {# %input(type="text" name="search[_quick]" value="{{ s.search._quick ? s.search._quick }}") #}
+    {# %input(type="submit" value="#{$this->_('Search')}") #}
+      <!--
+        <span class="fcom-htmlgrid__rows-status">{{ 'Rows %s - %s of %s'|_([1+s.rs, s.rs+s.rc, s.c]) }}</span>
+        -->
+        <ul class="pagination pagination-sm pagesize">
+          {% for ps in THIS.pageSizeOptions() %}
+            <li {{ ps==s.ps ? 'class="active"' }}>
+              <a class="js-change-url page-size" href="#">{{ ps }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+
+        <ul class="pagination pagination-sm page">
+          {#
+          <label>
+            {{ 'Page'|_ }}
+          </label>
+          <input class="fcom-htmlgrid__gotopage js-change-url" data-href="{{ THIS.pageChangeHref() }}" value="{{ s.p }}">
+          {{ 'of %s'|_(s.mp) }}
+          #}
+
+
+        </ul>
+
+        {% for action in THIS.gridActions() %}
+          {% if action.renderer %}
+            {{ THIS.callUserFunc(action.renderer, [action]) | raw }}
+          {% elseif action.html %}
+            {{ action.html | raw }}
+          {% endif %}
+        {% endfor %}
+        <span class="dropdown">
+            <a data-toggle="dropdown" class="dropdown-toggle showhide_columns grid-refresh" href="#">
+                Columns
+                <b class="caret"></b>
+            </a>
+
+                <ul class="dropdown-menu">
+                              {% for colId, col in config.columns %}
+
+          {% if col.type != 'multiselect' and col.hidden != true %}
+                <li calss="ui-state-default"><label>
+                    <input class="showhide_column" type="checkbox" data-id={{col.name}}>
+                        {{col.label}}</label>
+                </li>
+            {% endif %}
+                    {% endfor %}
+                </ul>
+        </span>
+  </div>
+  {% if s.description %}
+    <div class="fcom-htmlgrid__status-description">
+      {{ s.description|raw }}
+    </div>
+  {% endif %}
+  <div class="scrollable-area">
+    <table class="fcom-htmlgrid__grid table data-table table-bordered table-striped sar-table" id = {{ config.id | raw }} >
+      {#<colgroup>
+        {% foreach ($config['columns'] as $colId => $column) %}
+          <col>(width="#{!empty($column['width']) ? $column['width'] : ''}")</col>
+        {% end %}
+      </colgroup>#}
+      <thead>
+        <tr id="tr-sort-{{ config.id }}" role="row">
+
+        </tr>
+      </thead>
+      <tbody>
+        {#{ THIS.rowsHtml() | raw }#}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
+

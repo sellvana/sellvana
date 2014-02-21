@@ -1,0 +1,42 @@
+<style>
+.zoom:after { content:''; display:block; width:33px; height:33px; position:absolute; top:0; right:0;
+  background:url("{{ APP.src('@FCom_Core/img/zoom-corner.png') }}"); }
+.zoom img { display: block; }
+.zoom img::selection { background-color: transparent; }
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="f-prod-quickview" tabindex="-1" role="dialog" aria-labelledby="f-prod-quickview-label" aria-hidden="true" data-backdrop="false">
+  <div class="modal-dialog f-prod-quickview">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">{{ 'Quick View'|_ }}</h4>
+      </div>
+      <div class="modal-body">
+        <div class="f-ajax-loading" style="min-height:300px">{{ 'Please wait, loading...'|_ }}</div>
+        <div class="f-prod-quickview-container"></div>
+      </div><!-- /.modal-body -->
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+    require(['jquery', 'bootstrap'], function($) {
+        var $qv = $('#f-prod-quickview'),
+            $loader = $qv.find('.f-ajax-loading'),
+            $container = $qv.find('.f-prod-quickview-container');
+
+        $(document).on('click', '.f-prod-quickview-btn', function() {
+            var qvUrl = "{{ APP.href('catalog/quickview') }}?id=" + $(this).data('id');
+            $container.load(qvUrl, function() {
+              $loader.hide();
+              $container.show();
+            });
+        })
+        $qv.on('hidden.bs.modal', function() {
+            $container.hide();
+            $loader.show();
+        })
+    })
+</script>

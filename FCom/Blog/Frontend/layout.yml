@@ -1,0 +1,36 @@
+blog_default:
+    - { hook: main, views: blog/index }
+    - { hook: blog_sidebar, views: blog/sidebar/categories }
+    - { hook: blog_sidebar, views: blog/sidebar/tags }
+    - { view: head, do: [[ title, Blog ]] }
+
+/blog/index:
+    - { include: base }
+    - { include: blog_default }
+    - { hook: blog_main, views: blog/posts }
+
+/blog/tag:
+    - { include: base }
+    - { include: blog_default }
+    - { hook: blog_main, views: blog/posts }
+
+/blog/category:
+    - { include: base }
+    - { include: blog_default }
+    - { hook: blog_main, views: blog/posts }
+
+/blog/author:
+    - { include: base }
+    - { include: blog_default }
+    - { hook: blog_main, views: blog/posts }
+
+/blog/archive:
+    - { include: base }
+    - { include: blog_default }
+    - { hook: blog_main, views: blog/posts }
+
+/blog/post:
+    - { include: base }
+    - { include: blog_default }
+    - { hook: blog_main, views: blog/post }
+

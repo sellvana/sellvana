@@ -1,0 +1,81 @@
+html {
+  @include square(100%);
+}
+
+body.login {
+  @include square(100%);
+  position: relative;
+
+  .middle-container {
+    overflow: visible;
+    display: table;
+    position: static;
+    @include square(100%);
+
+    .middle-row {
+      display: table-cell;
+      vertical-align: middle;
+      width: 100%;
+      position: static;
+
+      .middle-wrapper {
+        position: static;
+      }
+    }
+  }
+
+  .login-container-header {
+    padding: 30px 0 40px 0;
+
+    @include sm-plus {
+      padding: 10px 0 40px 0;
+    }
+  }
+
+  .login-container {
+    background-color: $white;
+    position: relative;
+    padding: 40px 0;
+    @include box-shadow(0 1px 3px rgba(0,0,0,.3));
+
+    &:before {
+      content: "";
+      position: absolute;
+      margin-left: -10px;
+      left: 50%;
+      top: -10px;
+      border-bottom: 10px solid $white;
+      border-top: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+    }
+
+    .title {
+      margin: 0;
+      margin-bottom: 20px;
+    }
+
+    .with-icon-over-input {
+      position: relative;
+
+      [class^="icon-"] {
+        position: absolute;
+        right: 10px;
+        top: 9px;
+      }
+
+      input[type="text"] {
+        padding-right: 28px;
+      }
+    }
+  }
+
+  .login-container-footer {
+    padding: 20px 0;
+
+    a {
+      color: $white;
+      text-shadow: 1px 1px 1px rgba(0,0,0,.3);
+    }
+  }
+}

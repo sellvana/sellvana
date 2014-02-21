@@ -11,14 +11,31 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config['grid']['columns'] += array(
-            'handle' => array('label'=>'Handle', 'editable'=>true, 'formatter'=>'showlink', 'formatoptions'=>array(
-                'baseLinkUrl' => BApp::href('cms/blocks/form/'), 'idName' => 'id',
-            )),
-            'description' => array('label'=>'Description', 'editable'=>true),
-            'version' => array('label'=>'Version'),
-            'create_dt' => array('label'=>'Created', 'formatter'=>'date'),
-            'update_dt' => array('label'=>'Updated', 'formatter'=>'date'),
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'handle', 'label'=>'Handle', 'href' => BApp::href($this->_formHref . '?id=:id')),
+            array('name' => 'description', 'label'=>'Description', 'editable'=>true),
+            array('name' => 'renderer', 'label'=>'Renderer',
+                  'options' => BLayout::i()->getAllRenderers(true), 'editable' => true, 'mass-editable' => true, 'editor' => 'select'),
+            array('name' => 'version', 'label'=>'Version'),
+            array('name' => 'page_enabled', 'label'=>'Page Enable',
+                  'options' => array('1' => 'Yes', '0' => 'No'), 'editable' => true, 'mass-editable' => true, 'editor' => 'select'),
+            array('name' => 'page_url', 'label'=>'Page Url'),
+            array('name' => 'page_title', 'label'=>'Page Title'),
+            array('name' => 'meta_title', 'label'=>'Meta Title', 'hidden' => true),
+            array('name' => 'meta_description', 'label'=>'Meta Description', 'hidden' => true),
+            array('name' => 'meta_keywords', 'label'=>'Meta Keywords', 'hidden' => true),
+            array('name' => 'modified_time', 'label'=>'Modified Time', 'hidden' => true),
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+                  'data'=> array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)),
+        );
+        $config['actions'] = array(
+            'edit' => true,
+            'delete' => true
+        );
+        $config['filters'] = array(
+            array('field' => 'handle', 'type' => 'text'),
+            array('field' => 'page_enabled', 'type' => 'multiselect'),
         );
         return $config;
     }
@@ -30,6 +47,27 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
         $args['view']->set(array(
             'title' => $m->id ? 'Edit CMS Block: '.$m->handle : 'Create New CMS Block',
         ));
+    }
+
+    public function historyGridConfig($m)
+    {
+        return array(
+            'grid'=>array(
+                'id' => 'cms_blocks_form_history',
+                'url' => BApp::href('cms/blocks/history/'.$m->id.'/grid_data'),
+                'editurl' => BApp::href('cms/blocks/history/'.$m->id.'/grid_data'),
+                'columns' => array(
+                    'id' => array('label'=>'ID', 'hidden'=>true),
+                    'ts' => array('label'=>'TimeStamp', 'formatter'=>'date'),
+                    'version' => array('label'=>'Version'),
+                    'user_id' => array('label'=>'User', 'options'=>FCom_Admin_Model_User::i()->options()),
+                    'username' => array('Label'=>'User Name', 'hidden'=>true),
+                    'comments' => array('labl'=>'Comments'),
+                ),
+            ),
+            'custom'=>array('personalize'=>true),
+            'filterToolbar' => array('stringResult'=>true, 'searchOnEnter'=>true, 'defaultSearch'=>'cn'),
+        );
     }
 
     public function action_history_grid_data()

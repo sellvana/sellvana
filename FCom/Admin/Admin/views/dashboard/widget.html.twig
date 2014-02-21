@@ -1,0 +1,22 @@
+{% set widget = THIS.get('widget') %}
+
+<li class="col-sm-{{ widget.cols }}" id="dashboard-widget__{{ widget.key }}" data-id="{{ widget.key }}">
+  <div class="box {{ widget.state.collapsed ? 'box-collapsed' }}">
+    <div class="box-header js-sortable-handle {{ widget.header_class }}">
+      <div class="title"><i class="icon-{{ widget.icon }}"></i>{{ widget.title }}</div>
+      <div class="actions">
+        <a class="btn box-collapse btn-link js-collapse" href="#"><i class="icon-chevron-down"></i></a>
+        <a class="btn box-remove btn-link js-remove" href="#"><i class="icon-remove"></i></a>
+      </div>
+    </div>
+
+    <div class="widget-contents">
+      {% if widget.async %}
+      {% elseif widget.view %}
+        {{ THIS.view(widget.view) | raw }}
+      {% else %}
+        {{ widget.content | raw }}
+      {% endif %}
+    </div>
+  </div>
+</li>

@@ -1,0 +1,20 @@
+- $rowsView = $this->get('rows_view')
+- if (!$rowsView) $rowsView = $this->view('admin/grid/rows')
+- $rowsView->set($this->get())
+
+.f-datagrid
+    .f-datagrid__toolbar
+        .f-datagrid__pager
+
+        .f-datagrid__options
+
+        .f-datagrid__actions
+
+    %table.f-datagrid__grid
+        %thead
+            %tr
+                - foreach ($this->columns as $col)
+                    %th
+
+        %tbody
+            - echo $rowsView

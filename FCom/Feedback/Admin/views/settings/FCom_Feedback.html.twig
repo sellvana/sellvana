@@ -1,0 +1,40 @@
+<!--{ label: Feedback Tool }-->
+<!--{ group: other }-->
+<!--{ pos: 100 }-->
+
+{% set c = THIS.get('model') %}
+
+<h2>{{ "Feedback Tool"|_}}</h2>
+
+<div class="accordion accordion-blue panel-group" id="settings-FCom_Feedback">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#">{{ "General Settings"|_ }}</a>
+        </div>
+        <div class="panel-collapse accordion-body in" id="settings-FCom_Core-group0">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Enable for Admin"|_ }}</label>
+                    <div class="col-md-5">
+                        <input type="hidden" name="config[modules][FCom_Feedback][enable_FCom_Admin]" value="0"/>
+                        <input class="switch-cbx" name="config[modules][FCom_Feedback][enable_FCom_Admin]" {% if c.get('modules/FCom_Feedback/enable_FCom_Admin') == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Enable for Frontend"|_ }}</label>
+                    <div class="col-md-5">
+                        <input type="hidden" name="config[modules][FCom_Feedback][enable_FCom_Frontend]" value="0"/>
+                        <input class="switch-cbx" name="config[modules][FCom_Feedback][enable_FCom_Frontend]" {% if c.get('modules/FCom_Feedback/enable_FCom_Frontend') == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">{{ "Send enabled modules versions"|_ }}</label>
+                    <div class="col-md-5">
+                        <input type="hidden" name="config[modules][FCom_Feedback][send_mod_versions]" value="0"/>
+                        <input class="switch-cbx" name="config[modules][FCom_Feedback][send_mod_versions]" {% if c.get('modules/FCom_Feedback/send_mod_versions') == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

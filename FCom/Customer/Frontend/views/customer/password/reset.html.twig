@@ -1,0 +1,41 @@
+<div class="f-site-main" role="main">
+  <div class="container">
+    {{ THIS.view('core/messages') | raw }}
+    <form action="{{ APP.href('customer/password/reset') }}" method="post" id="reset-form">
+      <fieldset class="f-authentification-form">
+        <header class="f-page-header">
+          <h1 class="f-page-title">{{ 'Reset your password' |_ }}</h1>
+        </header>
+        <div class="form-group">
+            <label for="reset-password" class="control-label required">{{ "Password" | _ }}</label>
+            <div class="controls">
+              <input type="password" name="password" class="required form-control has-progress-bar" id="reset-password"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="reset-password_confirm" class="control-label required">{{ "Confirm Password" | _ }}</label>
+            <div class="controls">
+              <input type="password" name="password_confirm" class="required form-control" id="reset-password_confirm"/>
+            </div>
+        </div>
+        <div class="form-group">
+          <input type="hidden" name="token" value="{{ REQUEST.request('token') }}"/>
+          <input type="submit" class="btn btn-primary btn-lg" value="{{ "Reset Password" | _ }}"/>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>
+<script>
+require(['jquery', 'jquery.validate', 'fcom.password'], function($) {
+    $(function() {
+        $('#reset-form').validate({
+            rules:{
+                'model[password]': {
+                    passwordSecurity: {{ CONFIG.get('modules/FCom_Customer/password_strength') ? 'true' : 'false' }}
+                }
+            }
+        });
+    })
+})
+</script>

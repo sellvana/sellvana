@@ -1,0 +1,182 @@
+{% set formUrl = APP.href("settings") %}
+
+<script type="text/javascript">
+
+    require(['jquery', 'jquery.validate', 'bootstrap', 'fcom.admin', 'switch', 'jquery.bootstrap-growl'], function($) {
+        $(function() {
+            function onSortableStop(event, ui) {
+                var type = ui.item[0].nodeName.toLowerCase()=='li' ? 'tabs' : 'sections';
+                console.log(ui.item[0].id);
+                var handle = ui.item;
+                if (type=='tabs') handle = handle.children('h3');
+                handle.triggerHandler('focusout');
+
+                return; //TODO: figure out whether to personalize settings items order
+
+                var url = '{{ APP.href("my_account/personalize") }}';
+
+                switch (type) {
+                    case 'tabs':
+                        var items = [];
+                        ui.item.parent().children().each(function(idx, el) {
+                            items.push(el.id.replace(/^settings-tab-/, ''));
+                        });
+                        //$.post(url, {'do':'settings.'+type+'.order', items:items});
+                        break;
+
+                    case 'sections':
+                        var items = [];
+                        break;
+                }
+            }
+
+            // init switch buttons
+            function loadSwitchButtons() {
+                $('#settings-form').find('.switch-cbx').each(function(){
+                    if ($(this).parents('.make-switch').hasClass('make-switch') == false) {
+                        $(this).wrap("<div class='make-switch switch' data-off-label='&lt;i class=\"icon-remove\"&gt;&lt;/i&gt;' data-on-label='&lt;i class=\"icon-ok\"&gt;&lt;/i&gt;' data-on='primary'>").parent().bootstrapSwitch();
+                    }
+                });
+            }
+
+            window.adminForm = FCom.Admin.form({
+                form:     '#settings-form',
+                tabs:     '.adm-tabs-sidebar li',
+                panes:    '.adm-tabs-content',
+                url_get:  '{{ formUrl }}',
+                url_post: '{{ formUrl }}'
+                //on_tab_load: initTabs
+            });
+//            $('#settings-form').validate();
+            //initTabs.apply($('#settings-form'));
+
+            //$('.adm-tabs-sidebar > ul').sortable({axis: 'y', stop: onSortableStop, distance:5});
+            var mainForm = $('form#settings-form');
+            var elem = mainForm.find('input, textarea, select');
+            var text = '#settings-form ul.nav-tabs li.dropdown';
+            function processFlag (validator) {
+                var info = {};
+                for(key in validator.invalid) {
+                    var element = jQuery('input[name="'+key+'"], textarea[name="'+key+'"], select[name="'+key+'"]');
+                    if (element.length>0) {
+                        var tab = element.parents('div.tab-pane');
+                        var key = '#'+tab.attr('id');
+                        if (typeof(info[key]) === 'undefined')
+                            info[key] = 1;
+                        else
+                            info[key]++;
+                    }
+                }
+                $(text + ' ul.dropdown-menu').find('li a').each(function(index) {
+                    var val = info[$(this).attr('href')];
+
+                    if (typeof(val) !== 'undefined')
+                    {
+                        if ($(this).find('i.error').length === 0) {
+                            $(this).append('<i class="icon-warning-sign error"></i>');
+                        }
+                    } else {
+                        $(this).find('i.error').remove();
+                    }
+                });
+
+                for (key in info) {
+                    $('a[href="'+key+'"]').trigger('click');
+                    break;
+                }
+            }
+            mainForm.validate({
+                ignore: [],
+                invalidHandler: function(event, validator) {
+                    processFlag(validator);
+                },
+                submitHandler: function (form) {
+                    processFlag({invalid: null});
+//                    $('#settings-form').submit(function(ev) {
+//                        var $form = $(this);
+                        $.post(mainForm.attr('action'), mainForm.serializeArray(), function(data, status, xhr) {
+                            $.bootstrapGrowl(data.message, {type: data.status, align: 'center', width: 'auto'});
+                        });
+//                        return false;
+//                    })
+                }
+            });
+            $( "body" ).on('change', elem, function () {
+                $(text).find('li.active').each(function () {
+                    if ($(this).children('a').find('i.icon-pencil').length === 0) {
+                        if ($(this).children('a').children('i.error').length !== 0) {
+                            $('<i class="icon-pencil"></i>').insertBefore($(this).children('a').children('i.error'));
+                        } else {
+                            $(this).children('a').append('<i class="icon-pencil"></i>');
+                        }
+                    }
+                })
+            });
+
+            FCom.Admin.Tabs('.f-admin-main', {
+                url_get: "{{ formUrl }}",
+                cur_tab: "{{ THIS.get('cur_tab') }}",
+                tab_load_callback: function(i) {
+                    FCom.Admin.Accordion('settings-'+i);
+                    FCom.Admin.initCodeEditors();
+
+                    loadSwitchButtons();
+                }
+            });
+            $('.accordion').each(function(i, el) {
+                FCom.Admin.Accordion(el.id);
+            });
+            FCom.Admin.initCodeEditors();
+
+            // init switch buttons
+            loadSwitchButtons();
+
+
+        });
+    })
+</script>
+
+<div class="f-admin-main-view">
+  {{ THIS.view('core/messages') | raw }}
+  <form id="settings-form" class="form form-horizontal" action="{{ formUrl }}" method="post">
+      <div class="page-header f-admin-page-header">
+        <h1 class="f-page-title">
+            <i class="icon-cog"></i>
+            <span>{{ "Settings" |_ }}</span>
+        </h1>
+        <div class="btn-group">
+            <button class="btn btn-primary" type="submit">{{ "Save All" |_ }}</button>
+        </div>
+      </div>
+      <div class="f-admin-main">
+          <ul class="f-horiz-nav-tabs nav nav-tabs">
+              {% for group in THIS.tab_groups %}
+                  <li class="dropdown">
+                      <a class="dropdown-toggle" href="#" data-toggle="dropdown">{{ group.label }} <b class="caret"></b></a>
+                      <ul class="dropdown-menu" {% if group.open is empty %}hidden{% endif %}>
+                          {% for k, tab in group.tabs %}
+                              {% if tab.disabled is empty %}
+                                  <li id="settings-tab-{{ k }}">
+                                      <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab">
+                                          <span class="icon"></span>
+                                          {{ tab.label }}
+                                      </a>
+                                  </li>
+                              {% endif %}
+                          {% endfor %}
+                      </ul>
+                  </li>
+              {% endfor %}
+          </ul>
+          <div class="tab-content">
+              {% for k, tab in THIS.tabs %}
+                  <div class="tab-pane" id="tab-{{ k }}"{% if tab.async is empty %} data-loaded="true"{% endif %}>
+                      {% if tab.async is empty  %}
+                          {{ THIS.view(tab.view)|raw }}
+                      {% endif %}
+                  </div>
+              {% endfor %}
+          </div>
+      </div>
+  </form>
+</div>

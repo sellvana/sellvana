@@ -1,0 +1,15 @@
+modules:
+    FCom_Wishlist:
+        version: 0.1.1
+        channel: beta
+        translations: { de: de.php }
+        require: { module: { FCom_Catalog: 0.2.1, FCom_Customer: 0.1.3 } }
+        description: Wishlist functionality
+        auto_use: [ layout, views ]
+
+        areas:
+            FCom_Frontend:
+                routing:
+                    - [ any, /wishlist/?.action, FCom_Wishlist_Frontend_Controller ]
+                observe:
+                    - [ FCom_Catalog_Frontend_Controller::action_product:addToWishlist, FCom_Wishlist_Frontend_Controller::onAddToWishlist ]

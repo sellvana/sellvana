@@ -1,0 +1,1 @@
+<?php return array('Choose your bank' => '');

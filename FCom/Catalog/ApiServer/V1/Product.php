@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Catalog_ApiServer_V1_Product extends FCom_Admin_Controller_ApiServer_Abstract
+class FCom_Catalog_ApiServer_V1_Product extends FCom_Api_Controller_Abstract
 {
     public function action_index()
     {
@@ -15,9 +15,9 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_Admin_Controller_ApiServer_
         }
 
         if ($id) {
-            $products[] = FCom_Catalog_Model_Product::load($id);
+            $products[] = FCom_Catalog_Model_Product::i()->load($id);
         } else {
-            $products = FCom_Catalog_Model_Product::orm()->limit($len, $start)->find_many();
+            $products = FCom_Catalog_Model_Product::i()->orm()->limit($len, $start)->find_many();
         }
         if (empty($products)) {
             $this->ok();
@@ -37,7 +37,7 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_Admin_Controller_ApiServer_
         $data = FCom_Catalog_Model_Product::i()->formatApiPost($post);
         $product = false;
         try {
-            $product = FCom_Catalog_Model_Product::orm()->create($data)->save();
+            $product = FCom_Catalog_Model_Product::i()->orm()->create($data)->save();
         } catch (Exception $e) {
             if (23000 == $e->getCode()) {
                 $this->internalError("Duplicate product name");
@@ -54,7 +54,7 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_Admin_Controller_ApiServer_
                 $post['categories_id'] = array($post['categories_id']);
             }
             foreach($post['categories_id'] as $catId) {
-                FCom_Catalog_Model_CategoryProduct::orm()->create(array('category_id'=>$catId,'product_id'=>$product->id))->save();
+                FCom_Catalog_Model_CategoryProduct::i()->orm()->create(array('category_id'=>$catId,'product_id'=>$product->id))->save();
             }
         }
 
@@ -72,7 +72,7 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_Admin_Controller_ApiServer_
 
         $data = FCom_Catalog_Model_Product::i()->formatApiPost($post);
 
-        $product = FCom_Catalog_Model_Product::load($id);
+        $product = FCom_Catalog_Model_Product::i()->load($id);
         if (!$product) {
             $this->notFound("Product id #{$id} not found");
         }
@@ -97,7 +97,7 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_Admin_Controller_ApiServer_
             $this->notFound("Product id is required");
         }
 
-        $product = FCom_Catalog_Model_Product::load($id);
+        $product = FCom_Catalog_Model_Product::i()->load($id);
         if (!$product) {
             $this->notFound("Product id #{$id} not found");
         }

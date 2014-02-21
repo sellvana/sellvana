@@ -2,14 +2,7 @@
 
 class FCom_Customer_Migrate extends BClass
 {
-    public function run()
-    {
-        BMigrate::install('0.1.0', array($this, 'install'));
-        BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
-        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
-    }
-
-    public function install()
+    public function install__0_1_0()
     {
         $tCustomer = FCom_Customer_Model_Customer::table();
         BDb::run("
@@ -62,7 +55,7 @@ class FCom_Customer_Migrate extends BClass
         */
     }
 
-    public function upgrade_0_1_1()
+    public function upgrade__0_1_0__0_1_1()
     {
         $tAddress = FCom_Customer_Model_Address::table();
         BDb::ddlClearCache();
@@ -78,7 +71,7 @@ class FCom_Customer_Migrate extends BClass
         } catch (Exception $e) {}
     }
 
-    public function upgrade_0_1_2()
+    public function upgrade__0_1_1__0_1_2()
     {
         $tCustomer = FCom_Customer_Model_Customer::table();
         BDb::ddlClearCache();
@@ -94,4 +87,65 @@ class FCom_Customer_Migrate extends BClass
             ");
         } catch (Exception $e) {}
     }
+
+    public function upgrade__0_1_2__0_1_3()
+    {
+        BDb::ddlTableDef(FCom_Customer_Model_Address::table(), array(
+            'COLUMNS' => array(
+                'state' => 'RENAME region varchar(50)',
+                'zip' => 'RENAME postcode varchar(20)',
+            ),
+        ));
+    }
+
+    public function upgrade__0_1_3__0_1_4()
+    {
+        BDb::ddlTableDef(FCom_Customer_Model_Address::table(), array(
+            'COLUMNS' => array(
+                'middle_initial' => 'VARCHAR(2) NULL AFTER lastname',
+                'prefix' => 'VARCHAR(10) NULL AFTER middle_initial',
+                'suffix' => 'VARCHAR(10) NULL AFTER prefix',
+                'company' => 'VARCHAR(50) NULL AFTER suffix',
+            ),
+        ));
+    }
+
+    public function upgrade__0_1_4__0_1_5()
+    {
+        BDb::ddlTableDef(FCom_Customer_Model_Address::table(), array(
+            'COLUMNS' => array(
+                'email' => 'VARCHAR(100) NOT NULL AFTER customer_id',
+            ),
+        ));
+    }
+
+    public function upgrade__0_1_5__0_1_6()
+    {
+        $table = FCom_Customer_Model_Customer::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'create_dt'      => 'RENAME create_at datetime NOT NULL',
+                  'update_dt'      => 'RENAME update_at datetime NOT NULL',
+            ),
+          )
+        );
+        $table = FCom_Customer_Model_Address::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                  'create_dt'      => 'RENAME create_at datetime NOT NULL',
+                  'update_dt'      => 'RENAME update_at datetime NOT NULL',
+            ),
+          )
+        );
+    }
+
+    public function upgrade__0_1_6__0_1_7()
+    {
+        $table = FCom_Customer_Model_Customer::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                'status' => 'ENUM("review", "active", "disabled") NOT NULL DEFAULT "review"',
+        )));
+    }
+
 }

@@ -1,0 +1,21 @@
+{% set c = THIS.get('model') %}
+
+<h2>{{ "Unit Tests Settings"|_}}</h2>
+
+<div class="accordion accordion-blue panel-group" id="settings-FCom_Test">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<a href="#" class="accordion-toggle">{{ 'Area Settings'|_ }}</a>
+		</div>
+		<div class="panel-collapse accordion-body" id="settings-FCom_Test-group0">
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-md-2 control-label">{{ 'IP: Mode'|_ }}</label>
+					<div class="col-md-5">
+						<textarea class="form-control" name="config[modules][FCom_Test][mode_by_ip]" rows="5">{{ c.get('modules/FCom_Test/mode_by_ip') }}</textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

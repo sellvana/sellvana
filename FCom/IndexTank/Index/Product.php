@@ -10,7 +10,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     /**
      * IndexTank API object
-     * @var FCom_IndexTank_Api
+     * @var FCom_IndexTank_RemoteApi
      */
     protected $_model;
 
@@ -60,7 +60,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     */
     public static function i($new=false, array $args=array())
     {
-        return BClassRegistry::i()->instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     /**
@@ -91,7 +91,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             //init config
             $this->initFunctions();
             //init model
-            $this->_model = FCom_IndexTank_Api::i()->service()->get_index($this->_indexName);
+            $this->_model = FCom_IndexTank_RemoteApi::i()->service()->get_index($this->_indexName);
         }
         return $this->_model;
     }
@@ -303,14 +303,14 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
             //submit every N products to IndexDen - this protect from network overloading
             if ( $limit && 0 == ++$counter % $limit ) {
-                BPubSub::i()->fire(__METHOD__, array('docs'=>&$documents));
+                BEvents::i()->fire(__METHOD__, array('docs'=>&$documents));
                 $this->model()->add_documents($documents);
                 $documents = array();
             }
         }
 
         if ($documents) {
-            BPubSub::i()->fire(__METHOD__, array('docs'=>&$documents));
+            BEvents::i()->fire(__METHOD__, array('docs'=>&$documents));
             $this->model()->add_documents($documents);
         }
     }
@@ -623,7 +623,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                         $callback = array($this, $field->source_value);
                     }
                     //check callback
-                    if (!BClassRegistry::i()->isCallable($callback)) {
+                    if (!BClassRegistry::isCallable($callback)) {
                         //BDebug::warning('Invalid IndexTank custom field callback: '.$field->source_value);
                         continue;
                     }
@@ -651,7 +651,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $fieldsList = FCom_IndexTank_Model_ProductField::i()->getSearchList();
         $searches = $this->_processFields($fieldsList, $product, 'search');
         //add two special fields
-        $searches['timestamp'] = strtotime($product->update_dt);
+        $searches['timestamp'] = strtotime($product->update_at);
         $searches['match'] = "all";
 
         return $searches;
@@ -696,9 +696,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
         try {
             //create an index
-            $this->_model = FCom_IndexTank_Api::i()->service()->create_index($this->_indexName);
+            $this->_model = FCom_IndexTank_RemoteApi::i()->service()->create_index($this->_indexName);
         } catch(Exception $e) {
-            $this->_model = FCom_IndexTank_Api::i()->service()->get_index($this->_indexName);
+            $this->_model = FCom_IndexTank_RemoteApi::i()->service()->get_index($this->_indexName);
         }
 
         $this->updateFunctions();

@@ -1,0 +1,7 @@
+/email/pref:
+    - { include: base }
+    - { hook: main, views: subscription/email-pref }
+
+/email/subscribe:
+    - { include: base }
+    - { hook: main, views: subscription/email-subscribe }

@@ -1,0 +1,20 @@
+modules:
+    FCom_AdminChat:
+        version: 0.1.4
+        require: { module: { FCom_Core: 0.1.0, FCom_PushServer: 0.1.2 } }
+
+        areas:
+            FCom_Admin:
+                auto_use: [ layout, views ]
+                observe:
+                    - [ FCom_Admin_Model_User::logout, FCom_AdminChat_Admin::onAdminUserLogout ]
+                    #- [ FCom_PushServer_Model_Client::setStatus, FCom_AdminChat_Admin::onClientSetStatus ]
+
+            FCom_PushServer:
+                auto_use: [ bootstrap ]
+
+        #todo:
+            # multi user chat
+            # attach chat session to customer / order / etc
+            # send files
+            # search / export history

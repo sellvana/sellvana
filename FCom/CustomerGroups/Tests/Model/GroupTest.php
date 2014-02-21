@@ -22,7 +22,7 @@ class FCom_CustomerGroups_Tests_Model_GroupTest
      */
     public function testGetGroupsOptionsForHtml()
     {
-        $groupOptions = FCom_CustomerGroups_Model_Group::groupsOptions();
+        $groupOptions = FCom_CustomerGroups_Model_Group::i()->groupsOptions();
 
         $this->assertTrue(is_array($groupOptions));
 

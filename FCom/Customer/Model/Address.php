@@ -5,26 +5,44 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_customer_address';
     protected static $_origClass = __CLASS__;
 
-    public static function as_html($obj=null)
+    protected $_validationRules = array(
+        /*array('customer_id', '@required'),
+        array('email', '@required'),*/
+        array('firstname', '@required'),
+        array('lastname', '@required'),
+        array('street1', '@required'),
+        array('city', '@required'),
+        array('country', '@required'),
+//        array('region', '@required'),
+        array('postcode', '@required'),
+
+        array('email', '@email'),
+
+        array('customer_id', '@integer'),
+        array('lat', '@numeric'),
+        array('lng', '@numeric'),
+    );
+
+    public function as_html($obj=null)
     {
         if (is_null($obj)) {
             $obj = $this;
         }
         $countries = FCom_Geo_Model_Country::i()->options();
-        return '<div class="adr">'
-            .'<div class="street-address">'.$obj->street1.'</div>'
-            .($obj->street2 ? '<div class="extended-address">'.$obj->street2.'</div>' : '')
-            .($obj->street3 ? '<div class="extended-address">'.$obj->street3.'</div>' : '')
-            .'<span class="locality">'.$obj->city.'</span>, '
-            .'<span class="region">'.$obj->state.'</span> '
-            .'<span class="postal-code">'.$obj->postcode.'</span>'
-            .'<div class="country-name">'.(!empty($countries[$obj->country]) ? $countries[$obj->country] : $obj->country).'</div>'
-            .'</div>';
+        return '<address>'
+            .'<div class="f-street-address">'.$obj->street1.'</div>'
+            .($obj->street2 ? '<div class="f-extended-address">'.$obj->street2.'</div>' : '')
+            .($obj->street3 ? '<div class="f-extended-address">'.$obj->street3.'</div>' : '')
+            .'<span class="f-city">'.$obj->city.'</span>, '
+            .'<span class="f-region">'.$obj->region.'</span> '
+            .'<span class="f-postal-code">'.$obj->postcode.'</span>'
+            .'<div class="f-country-name">'.(!empty($countries[$obj->country]) ? $countries[$obj->country] : $obj->country).'</div>'
+            .'</address>';
 
     }
 
-    public function beforeDelete() {
-        if (!parent::beforeDelete()) return false;
+    public function onBeforeDelete() {
+        if (!parent::onBeforeDelete()) return false;
 
         $customer = $this->relatedModel("FCom_Customer_Model_Customer", $this->customer_id);
 
@@ -52,8 +70,8 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
                 'street1'           => $address->street1,
                 'street2'           => $address->street2,
                 'city'              => $address->city,
-                'state'             => $address->state,
-                'zip'               => $address->zip,
+                'region'            => $address->region,
+                'postcode'          => $address->postcode,
                 'country_code'      => $address->country,
                 'phone'             => $address->phone,
                 'fax'               => $address->fax,
@@ -81,11 +99,11 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         if (!empty($post['city'])) {
             $data['city'] = $post['city'];
         }
-        if (!empty($post['state'])) {
-            $data['state'] = $post['state'];
+        if (!empty($post['region'])) {
+            $data['region'] = $post['region'];
         }
-        if (!empty($post['zip'])) {
-            $data['zip'] = $post['zip'];
+        if (!empty($post['postcode'])) {
+            $data['postcode'] = $post['postcode'];
         }
         if (!empty($post['country_code'])) {
             $data['country'] = $post['country_code'];
@@ -99,11 +117,11 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         return $data;
     }
 
-    public function beforeSave()
+    public function onBeforeSave()
     {
-        if (!parent::beforeSave()) return false;
-        if (!$this->create_dt) $this->create_dt = BDb::now();
-        $this->update_dt = BDb::now();
+        if (!parent::onBeforeSave()) return false;
+        if (!$this->create_at) $this->create_at = BDb::now();
+        $this->update_at = BDb::now();
         return true;
     }
 

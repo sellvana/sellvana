@@ -1,0 +1,259 @@
+{% set widgets = THIS.getWidgets() %}
+{% set availWidgets = [] %}
+{% set asyncWidgets = [] %}
+
+{% for widget in widgets %}
+  {% if not widget.state.closed %}
+    {% if widget.async %}
+      {% set asyncWidgets = asyncWidgets|merge([widget.key]) %}
+    {% endif %}
+  {% else %}
+    {% set availWidgets = availWidgets|merge([widget]) %}
+  {% endif %}
+{% endfor %}
+<div class="f-admin-main-view">
+  <div class="page-header f-admin-page-header">
+    <h1 class="f-page-title">
+      <i class="icon-dashboard"></i>
+      {{ 'Dashboard'|_ }}
+    </h1>
+    <div class="btn-group">
+      <button class="btn btn-primary" data-toggle="modal" data-target="#add-widget-modal">{{ '+ Add Widget'|_ }}</button>
+    </div>
+    <div class="btn-group  dropdown  f-filter-btns date-range-plugin" id="custom">
+        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <i class="icon-calendar"></i>
+            <span>{{ 'Custom'|_ }}</span>
+            <b class="caret"></b>
+        </button>
+
+        <ul class="dropdown-menu filter-box">
+            <li>
+                <div class="input-group">
+                    <div class="input-group-btn  dropdown" >
+                        <button class='btn btn-default dropdown dropdown-toggle filter-text-sub ' data-toggle='dropdown'>
+                            {{ 'between'|_ }}
+                            <span class='caret'></span>
+                        </button>
+
+                        <ul class='dropdown-menu filter-sub'>
+                            <li>
+                                <a class='filter_op range' data-id='between' href='javascript:void()'>{{ 'between'|_ }}</a>
+                            </li>
+                            <li>
+                                <a class='filter_op not_range' data-id='from' href='javascript:void()'>{{ 'from'|_ }}</a>
+                            </li>
+                            <li>
+                                <a class='filter_op not_range' data-id='to' href='javascript:void()'>{{ 'to'|_ }}</a>
+                            </li>
+                            <li>
+                                <a  class='filter_op not_range' data-id='equal' href='javascript:void()'>{{ 'is equal to'|_ }}</a>
+                            </li>
+                            <li>
+                                <a class='filter_op range' data-id='not_in' href='javascript:void()'>{{ 'not in'|_ }}</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="input-group range"  >
+                        <input type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange" value="">
+                    <span id="daterange2" class="input-group-addon">
+                      <i class="icon-calendar"></i>
+                    </span>
+                    </div>
+                    <div class="datepicker input-group not_range">
+                        <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" class="form-control" value="">
+                  <span class="input-group-addon">
+                    <span data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></span>
+                  </span>
+                    </div>
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-primary update">
+                            <i class=" icon-check-sign"></i>
+                            {{ 'Update'|_ }}
+                        </button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="pull-right btn-group">
+      <button class="btn btn-default">{{ 'Last month'|_ }}</button>
+      <button class="btn btn-default">{{ 'Last week'|_ }}</button>
+      <button class="btn btn-default">{{ 'Today'|_ }}</button>
+    </div>
+  </div>
+
+  <div class="f-admin-main f-page-dashboard">
+    {{ THIS.view('core/messages')|raw }}
+  
+    <div class="row">
+      <ul class="js-sortable-container" id="dashboard-widgets-container">
+      {% for widget in widgets %}
+        {% if not widget.state.closed %}
+          {{ THIS.view('dashboard/widget').set('widget', widget) | raw }}
+        {% endif %}
+      {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="add-widget-modal" tabindex="-1" role="dialog" aria-labelledby="add-widget-modal-label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <form id="add-widget-form" role="form">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="add-widget-modal-label">{{ 'Add A Widget'|_ }}</h4>
+        </div>
+
+        <div class="modal-body">
+          <div class="row">
+            <div class="form-group col-sm-12">
+                <label class="control-label">{{ "Widget to add to dashboard"|_ }}</label>
+                <div class="controls">
+                  <select class="form-control required" name="widget" id="add-widget-selection">
+                    <option value="">{{ 'Select a widget...'|_ }}</option>
+                    {% for w in availWidgets %}
+                      <option value="{{ w.key }}">{{ w.title }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">{{ 'Cancel'|_ }}</button>
+          <button type="button" class="btn btn-primary" id="add-widget-submit">{{ 'Add Widget'|_ }}</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script>
+require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], function($) {
+  var dashboardUrl = "{{ APP.href('dashboard') }}", personalizeUrl = "{{ APP.href('my_account/personalize') }}";
+  //var widgetTemplate = _.template($('#dashboard-widget-template').html());
+  var select = $('#add-widget-selection');
+  function load(widgets, wrapped, add) {
+    $.get(dashboardUrl, { widgets:widgets, wrapped:wrapped||'', add:add||'' }, function(response, status, xhr) {
+      $.each(response.widgets, function(key, widget) {
+        if (wrapped) {
+          $('#dashboard-widgets-container').append(widget.html);
+        } else {
+          $('#dashboard-widget__'+widget.key+' .widget-contents').html(widget.html);
+        }
+      });
+    });
+  }
+
+  {% if asyncWidgets %}
+    load({{ UTIL.toJson(asyncWidgets)|raw }}.join(','));
+  {% endif %}
+
+  $('#add-widget-submit').click(function(ev) {
+
+    load(select.val(), true, true);
+    $('#add-widget-selection option[value="'+ select.val() +'"]').remove();
+    select.val('');
+    $('#add-widget-modal').modal('hide');
+  });
+
+  $('.js-sortable-container').sortable({
+    connectWith: '.js-sortable-container',
+    handle: '.js-sortable-handle',
+    update: function(ev, ui) {
+      //console.log(this, ev, ui);
+      var widgetIds = [];
+      $(this).children().each(function(idx, el) {
+        widgetIds.push($(el).data('id'));
+      });
+      var postData = { do:'dashboard.widget.pos', widgets:widgetIds };
+      $.post(personalizeUrl, postData, function(response, status, xhr) {
+        console.log(response);
+      })
+    }
+    //delay: 100,
+  })
+
+  $('.js-sortable-container').on('click', '.js-remove', function(idx, el) {
+    var $el = $(this);
+    var postData = { do:'dashboard.widget.close', key:$el.parents('li').data('id') };
+    $.post(personalizeUrl, postData, function(response, status, xhr) {
+        var option = '';
+        switch (response.r.key) {
+            case 'orders-list':
+                option = "<option value='orders-list'>Recent Orders</option>";
+                break;
+            case 'customers-list':
+                option = "<option value='customers-list'>Recent Customers</option>";
+                break;
+            case 'visitors-totals':
+                option = "<option value='visitors-totals'>Visitors</option>";
+                break;
+            case 'orders-totals':
+                option = "<option value='orders-totals'>Order Totals</option>";
+                break;
+            default :break;
+        }
+        console.log(option);
+        select.append(option);
+    });
+  })
+
+  $('.js-sortable-container').on('click', '.js-collapse', function(idx, el) {
+    var $el = $(this);
+    var postData = { do:'dashboard.widget.collapse', key:$el.parents('li').data('id'), 'collapsed':!$el.parents('.box-collapsed').get(0) };
+    $.post(personalizeUrl, postData, function(response, status, xhr) {
+      console.log(response);
+    });
+  })
+  $(".datepicker").datetimepicker({
+      pickTime: false
+  });
+  $("#daterange2").daterangepicker({
+    format: "YYYY-MM-DD"
+  },function (start, end) {
+    return $("#daterange2").parent().find("input").first().val(start.format("YYYY-MM-DD") + "~" + end.format("YYYY-MM-DD"));
+  });
+  $('div.daterangepicker').on('click', function (ev) {
+    ev.stopPropagation();
+    ev.preventDefault();
+    return false;
+  });
+  $('#custom').on('click', 'input', function (ev) {
+      ev.stopPropagation();
+      ev.preventDefault();
+      return false;
+  });
+  $('#custom .filter-text-sub').click(function () {
+     $(this).parents('div.dropdown:first').toggleClass('open');
+     return false;
+  });
+  $('#custom a.filter_op').click(function (ev) {
+      var custom = $('#custom');
+      if ($(ev.target).hasClass('range')) {
+          custom.find('div.range').css('display', 'table');
+          custom.find('div.not_range').css('display', 'none');
+      } else {
+          custom.find('div.range').css('display', 'none');
+          custom.find('div.not_range').css('display', 'table');
+      }
+      var operator = $(ev.target);
+      custom.find('button.filter-text-sub').html(operator.html() + "<span class='caret'></span>");
+      custom.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
+
+      return false;
+  });
+})
+</script>

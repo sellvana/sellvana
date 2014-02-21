@@ -1,0 +1,27 @@
+{% set posts = THIS.get('posts') %}
+{% if posts %}
+    {% for post in posts %}
+        {% set tags = post.getTags() %}
+        {% set categories = post.getCategories() %}
+        {% set url = post.getUrl() %}
+        <div id="post-{{ post.get('url_key') }}">
+            <h2 class="entry-title"><a href="{{ url }}">{{ post.get('title') }}</a></h2>
+            <p class="entry-headline-meta">
+                by <a class="author vcard" href="{{ APP.href('blog') ~ '/author/' ~ post.getAuthor().username }}">{{ post.getAuthorName() }}</a>
+                on <abbr class="published" title="{{ post.get('create_at') }}">{{ post.get('create_at') | date('F jS') }}</abbr>
+            </p>
+            {% if categories %}
+                <p>{{ 'Categories:'|_ }} {% for cat in categories %}<a href="{{ cat.getUrl() }}" class="label label-default">{{ cat.get('name') }}</a>{% endfor %}</p>
+            {% endif %}
+            {% if tags %}
+                <p>{{ 'Tags:'|_ }} {% for tag in post.getTags() %}<a href="{{ tag.getUrl() }}" class="label label-default">{{ tag.get('tag_name') }}</a>{% endfor %}</p>
+            {% endif %}
+            <div class="entry-preview">
+                {{ post.get('preview') | raw }}
+            </div>
+            <p><a href="{{ url }}">Read the full post &raquo;</a> <a href="{{ url }}#disqus_thread"></a></p>
+        </div>
+    {% endfor %}
+{% else %}
+    <h2>{{ 'No posts found'|_ }}</h2>
+{% endif %}

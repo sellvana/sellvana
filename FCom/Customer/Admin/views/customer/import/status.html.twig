@@ -1,0 +1,165 @@
+{% set c = APP.instance('FCom_Customer_Import').config() %}
+{% set start = THIS.get('start') %}
+
+<div class="panel-body">
+{% if start or c.status == 'running' %}
+    <div class="form-actions form-actions-padding-sm">
+        <div class="row">
+            <div class="col-md-12 col-md-offset-2">
+                <button class="btn st1 sz2 btn" id="step3-stop"type="button">{{ 'Stop Import'|_ }}</button>
+            </div>
+        </div>
+    </div>
+    {% if start %}
+        <script>
+            require(['jquery'], function ($) {
+                $.post('{{ APP.href('customers/import/start') }}', function(data) {
+                    var importReviewEle = $('#import-accordion-group3');
+                    importReviewEle.prev().find('a').trigger('click');
+                    importReviewEle.html(data);
+                });
+            })
+        </script>
+    {% else %}
+        <script>
+            require(['jquery'], function ($) {
+                setTimeout(function ()
+                {
+                    $('#import-status').load('{{APP.href('customers/import/status')}}');
+                }, 2000);
+            });
+        </script>
+    {% endif %}
+
+{% elseif c.status and c.rows_processed %}
+    {% set pct = c.rows_processed / c.rows_total*100 %}
+    <table class="data-table">
+        <tr>
+            <th>
+                {{ 'Status'|_ }}
+            </th>
+            <td>
+                {{ c.status }}
+            </td>
+        </tr>
+        <tr>
+            <th>
+                {{ 'Progress'|_ }}
+            </th>
+            <td>
+                <div style="background:#bbf4a5; overflow:visible; width:{{ pct }}%; font-weight:bold">{{ pct }}%</div>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                {{ 'Start Time'|_ }}
+            </th>
+            <td>
+                {{ c.start_time|date('Y-m-d H:i:s') }}
+            </td>
+        </tr>
+        <tr>
+            <th>
+                {{ 'Crunch Rate'|_ }}
+            </th>
+            <td>
+                {{ c.run_time ? (c.rows_processed / c.run_time)|number_format(2) : 0 }} rows/sec
+            </td>
+        </tr>
+        <tr>
+            <th>
+                {{ 'Rows Total'|_ }}
+            </th>
+            <td>
+                {{ c.rows_total }}
+            </td>
+        </tr>
+        <tr>
+            <th>
+                {{ 'Rows Processed'|_ }}
+            </th>
+            <td>
+                {{ c.rows_processed }}
+            </td>
+        </tr>
+        <tr>
+            <th>
+                {{ 'Rows Skipped'|_ }}
+            </th>
+            <td>
+                {{ c.rows_skipped }}
+            </td>
+        </tr>
+        <tr>
+            <th>
+                {{ 'Rows Warning'|_ }}
+            </th>
+            <td style="{{ c.rows_warning ? 'background:#FFFFC0"' }}">{{ c.rows_warning }}</td>
+        </tr>
+        <tr>
+            <th>
+                {{ 'Rows Error'|_ }}
+            </th>
+            <td style="{{ c.rows_error ? 'background:#fe9696"' }}">{{ c.rows_error }}</td>
+        </tr>
+        <tr>
+            <th>
+                {{ 'Rows No Change'|_ }}
+            </th>
+            <td>
+                {{ c.rows_nochange }}
+            </td>
+        </tr>
+        <tr>
+            <th>
+                {{ 'Rows Created'|_ }}
+            </th>
+            <td style="{{ c.rows_created ? 'background:#bbf4a5"' }}">{{ c.rows_created }}</td>
+        </tr>
+        <tr>
+            <th>
+                {{ 'Rows Updated'|_ }}
+            </th>
+            <td style="{{ c.rows_updated ? 'background:#bbf4a5"' }}">{{ c.rows_updated }}</td>
+        </tr>
+        <tr>
+            <th>
+                {{ 'Memory Usage'|_ }}
+            </th>
+            <td>
+                {{ c.memory_usage|number_format(0) }}
+            </td>
+        </tr>
+        <tr>
+            <th>
+                {{ 'Run Time'|_ }}
+            </th>
+            <td>
+                {{ c.run_time|number_format(4) }}
+            </td>
+        </tr>
+        {% if c.errors %}
+            <tr>
+                <th>
+                    {{ 'Errors'|_ }}
+                </th>
+                <td>
+                    {% for error in c.errors %}
+                        <p>
+                            {{ error }}
+                        </p>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endif %}
+    </table>
+{% else %}
+    <div class="form-actions form-actions-padding-sm">
+        <div class="row">
+            <div class="col-md-12 col-md-offset-2">
+                <button class="btn st1 sz2 btn btn-primary" id="step3-start"type="button">{{ 'Start Import with selected configuration'|_ }}</button>
+            </div>
+        </div>
+    </div>
+{% endif %}
+</div>

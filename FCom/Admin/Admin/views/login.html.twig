@@ -1,0 +1,48 @@
+<div class='login-container'>
+  <h1 class="login-logo">Sellvana Admin</h1>
+  <div class='container'>
+      {{ THIS.view('core/messages') | raw }}
+      <div id="login-cookie-message"></div>
+      <form id="login-form" action='{{ APP.href('login') }}' class='validate-form' method='post'>
+          <div class='form-group'>
+              <label for="login-username" class="control-label">{{ "User Name or Email" | _ }}</label>
+              <div class='controls with-icon-over-input'>
+                  <input id="login-username" value="" placeholder="{{ 'User Name or Email'|_ }}" class="required form-control"
+                          data-rule-required="true" name="login[username]" type="text" />
+              </div>
+          </div>
+          <div class='form-group'>
+              <label for="login-password" class="control-label">{{ "Password" | _ }}</label>
+              <div class='controls with-icon-over-input'>
+                  <input id="login-password" value="" placeholder="{{ 'Password'|_ }}" class="required form-control"
+                         data-rule-required="true" name="login[password]" type="password" />
+              </div>
+          </div>
+          <div class='checkbox'>
+              <label for='remember_me'>
+                  <input id='remember_me' name='remember_me' type='checkbox' value='1'>
+                  {{ 'Remember me'|_ }}
+              </label>
+          </div>
+          <button type="submit" class='btn btn-primary btn-lg btn-block'>{{ 'Sign in'|_ }}</button>
+      </form>
+      <div class='text-center'>
+          <hr class='hr-normal'>
+          <a href='{{ APP.href('password/recover') }}'>{{ 'Forgot your password?'|_ }}</a>
+      </div>
+  </div>
+</div>
+
+<script>
+require(['jquery', 'jquery.validate', 'jquery.cookie'], function($) {
+    $(function() {
+        $('#login-form').validate();
+        $('#login-username').focus();
+    });
+
+    $.cookie('check-cookies', true);
+    if (!$.cookie('check-cookies')) {
+        $("#login-cookie-message").html('<div class="alert alert-danger"><h4><i class="icon-remove-sign"></i> {{ "Warning"|_ }}</h4>{{ "Admin interface requires cookies enabled"|_ }}</div>');
+    }
+})
+</script>

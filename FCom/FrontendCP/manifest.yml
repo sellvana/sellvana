@@ -1,0 +1,15 @@
+modules:
+    FCom_FrontendCP:
+        version: 0.1.0
+        channel: beta
+        require: { module: { FCom_Frontend: 0.1.0 } }
+
+        areas:
+            FCom_Frontend:
+                auto_use: [ layout, views ]
+                views:
+                    - [ frontendcp/editable, { view_class: FCom_FrontendCP_Frontend_View_EditableAttributes } ]
+                routing:
+                    - [ post, /frontendcp/upload, FCom_FrontendCP_Frontend_Controller.upload ]
+                    - [ put, /frontendcp/update, FCom_FrontendCP_Frontend_Controller.update ]
+

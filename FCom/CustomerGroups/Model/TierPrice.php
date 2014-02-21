@@ -19,4 +19,18 @@ class FCom_CustomerGroups_Model_TierPrice
     {
         return parent::i($new, $args); // auto completion helper
     }
+
+    public static function getProductTiers($product)
+    {
+        $tiers = static::orm('tp')->where('product_id', $product->id())->find_many();
+        $salePrice = (float)$product->get('sale_price');
+        $basePrice = (float)$product->get('base_price');
+        $price = $salePrice ? $salePrice : $basePrice;
+        #BDebug::dump($tiers);
+        #var_dump($salePrice, $basePrice, $price);
+        foreach ($tiers as $tier) {
+            $tier->set('save_percent', ceil((1-$tier->get('sale_price')/$price)*100));
+        }
+        return $tiers ? BDb::many_as_array($tiers) : array();
+    }
 }

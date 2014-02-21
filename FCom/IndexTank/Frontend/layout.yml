@@ -1,0 +1,7 @@
+/catalog/category:
+    - { hook: sidebar-left, views: indextank/product/filters }
+    - { hook: catalog/product/pager.fields, views: indextank/product/_pager_fields }
+
+/catalog/search:
+    - { hook: sidebar-left, views: indextank/product/filters }
+    - { hook: catalog/product/pager.fields, views: indextank/product/_pager_fields }

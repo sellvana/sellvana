@@ -1,0 +1,7 @@
+{% set loggedIn = APP.instance("FCom_Customer_Model_Customer").isLoggedIn() %}
+{% if loggedIn %}
+    {% set prod = THIS.get('prod') %}
+    <button type="submit" title="{{ "Add to Wishlist" | _ }}" class="btn btn-primary"
+            onclick="add_wishlist({{ prod.get('id') }})" name="add2wishlist" value="{{ prod.get('id') }}"
+            >+ {{ "Add to Wishlist" | _ }}</button>
+{% endif %}

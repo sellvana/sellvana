@@ -1,0 +1,144 @@
+.form-striped {
+
+  .form-group {
+    margin-left: 0;
+    margin-right: 0;
+    padding: 15px 0;
+    border-bottom: 1px solid $formStripedBorder;
+    margin-bottom: 0;
+
+    &:nth-child(even) {
+      background-color: $formStripedBackground;
+    }
+
+    &:last-child {
+      border-bottom-color: transparent;
+    }
+  }
+
+  .form-actions {
+    margin-top: 0;
+    padding: 20px 15px;
+  }
+}
+
+.form-actions {
+  background-color: $formActionsBackground;
+  padding: 20px;
+  border-top: 1px solid #e5e5e5;
+  margin-top: 20px;
+
+  @include sm-plus {
+    padding: 20px 0;
+  }
+
+  &.form-actions-padding {
+    padding: 20px;
+  }
+
+  &.form-actions-padding-xs {
+    @include xs-only {
+      padding: 20px;
+    }
+  }
+
+  &.form-actions-padding-sm {
+    @include sm-only {
+      padding: 20px;
+    }
+  }
+
+  &.form-actions-padding-md {
+    @include md-only {
+      padding: 20px;
+    }
+  }
+
+  &.form-actions-padding-lg {
+    @include lg-plus {
+      padding: 20px;
+    }
+  }
+}
+
+.select2-container.form-control {
+  .select2-choice {
+    line-height: 32px;
+    height: auto;
+
+    .select2-arrow b {
+      margin-top: 2px;
+    }
+  }
+
+  &.input-lg {
+    .select2-choice {
+      line-height: 43px;
+      .select2-arrow b {
+        margin-top: 7px;
+      }
+    }
+  }
+
+  &.input-sm {
+    .select2-choice {
+      line-height: 28px;
+
+      .select2-arrow b {
+        margin-top: 0;
+      }
+    }
+  }
+}
+
+.select2-container.select2-container-active.form-control, .select2-container-active .select2-choice,
+.select2-container-active .select2-choices, .select2-dropdown-open.select2-drop-above .select2-choice,
+.select2-dropdown-open.select2-drop-above .select2-choices, .select2-container-multi.select2-container-active .select2-choices,
+.form-control.select2-container.select2-dropdown-open, .select2-container .select2-choice, .select2-drop-active, .select2-drop.select2-drop-above.select2-drop-active {
+  border-color: $inputFocusBorderColor !important;
+
+  &:focus {
+    border-color: $inputFocusBorderColor !important;
+    @include box-shadow(0 0 8px $inputFocusShadow !important);
+  }
+}
+
+.select2-container a {
+  &:focus {
+    outline: none;
+  }
+}
+
+.select2-container-active .select2-choice, .select2-container-active .select2-choices {
+  border-color: $inputFocusBorderColor !important;
+  @include box-shadow(0 0 8px $inputFocusShadow !important);
+}
+
+select2-container.form-control,
+.select2-container-multi .select2-choices, select,
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+.form-control,
+.uneditable-input {
+  color: $dark;
+  border-color: $inputBorder;
+  background-color: $inputBackground;
+
+  &:focus {
+    border-color: $inputFocusBorderColor;
+    @include box-shadow(0 0 8px $inputFocusShadow);
+  }
+}

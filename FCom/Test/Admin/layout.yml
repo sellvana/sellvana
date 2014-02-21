@@ -1,0 +1,13 @@
+base:
+    - view: admin/nav
+        do:
+            - [ addNav, system/dev, { label: Developers } ]
+            - [ addNav, system/dev/tests, { label: Tests, pos: 100, href: /tests/index } ]
+
+/tests/index:
+    - { include: base }
+    - { hook: main, views: tests/index }
+    - { view: admin/nav, do: [[ setNav, test/index ]] }
+
+/settings:
+    - { view: settings, do: [[ addTab, FCom_Test, { label: Unit Tests, group: areas, async: true } ]] }

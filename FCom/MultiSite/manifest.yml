@@ -1,0 +1,15 @@
+modules:
+    FCom_MultiSite:
+        version: 0.1.1
+        channel: beta
+        translations: { de: de.php }
+        description: "Enable multiple website management from the same instance"
+        before_bootstrap: { callback: FCom_MultiSite_Main::beforeBootstrap }
+        require: { module: { FCom_Core: 0.1.0 } }
+
+        areas:
+            FCom_Admin:
+                auto_use: [ layout, views ]
+                routing:
+                    - [ get, /multisite, FCom_MultiSite_Admin_Controller.index ]
+                    - [ any, /multisite/.action, FCom_MultiSite_Admin_Controller ]

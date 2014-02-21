@@ -1,0 +1,22 @@
+{% set post = THIS.get('post') %}
+{% set tags = post.getTags() %}
+{% set categories = post.getCategories() %}
+
+<h2 class="entry-title">{{ post.get('title') }}</h2>
+<p class="entry-headline-meta">
+    by <a class="author vcard" href="{{ APP.href('blog') ~ '/author/' ~ post.getAuthor().username }}">{{ post.getAuthorName() }}</a>
+    on <abbr class="published" title="{{ post.get('create_at') }}">{{ post.get('create_at') | date('F jS') }}</abbr>
+</p>
+
+{% if tags %}
+    <p><i class="fa fa-tags"></i> {{ 'Tags:'|_ }} {% for tag in tags %}<a href="{{ tag.getUrl() }}" class="label label-default">{{ tag.get('tag_name') }}</a>{% endfor %}</p>
+{% endif %}
+{% if categories %}
+    <p><i class="fa fa-categories"></i> {{ 'Categories:'|_ }} {% for cat in categories %}<a href="{{ cat.getUrl() }}" class="label label-default">{{ cat.get('name') }}</a>{% endfor %}</p>
+{% endif %}
+
+<div class="entry-content">
+    {{ post.get('content') | raw }}
+</div>
+
+{{ THIS.view('disqus/embed') | raw }}

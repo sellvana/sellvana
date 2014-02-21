@@ -7,12 +7,37 @@ class FCom_Catalog_Model_ProductMedia extends FCom_Core_Model_Abstract
 
     public function getUrl()
     {
-        $row = BORM::for_table('fcom_media_library')->where('id', $this->file_id)->find_one();
-        if (!empty($row->subfolder)) {
-            $path = BApp::baseUrl().$row->folder.$row->subfolder.'/'.$row->file_name;
-        } else {
-            $path = BApp::baseUrl().$row->folder.'/'.$row->file_name;
+        $subfolder = $this->get('subfolder');
+        $path = $this->get('folder') . '/' . ($subfolder ? $subfolder . '/' : '') . $this->get('file_name');
+        return BApp::src($path);
+    }
+
+    public function onBeforeSave()
+    {
+        if (!parent::onBeforeSave()) return false;
+
+        $this->set('create_at', BDb::now(), 'IFNULL');
+        $this->set('update_at', BDb::now());
+
+        // Add to the end?
+        if (is_int($this->get('position')) === false) {
+
+            $maxCurrentPosition = FCom_Catalog_Model_ProductMedia::i()
+                ->orm()
+                ->select_expr('max(position) as max_pos')
+                ->where('product_id', $this->get('product_id'))
+                ->find_one();
+
+            if (!$maxCurrentPosition) {
+                $maxCurrentPosition = 1;
+            } else {
+                $maxCurrentPosition = $maxCurrentPosition->get('max_pos');
+            }
+            $maxCurrentPosition++;
+
+            $this->set('position', $maxCurrentPosition);
         }
-        return $path;
+
+        return true;
     }
 }

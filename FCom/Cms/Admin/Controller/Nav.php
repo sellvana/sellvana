@@ -9,10 +9,12 @@ class FCom_Cms_Admin_Controller_Nav extends FCom_Admin_Controller_Abstract_TreeF
     protected $_formLayoutName = '/cms/nav/tree_form';
     protected $_formViewName = 'cms/nav-tree-form';
 
+    public $formId = 'cms_tree_form';
+
     protected function _prepareTreeForm($model)
     {
         $nodeTypes = array('content'=>'Text', 'cms_page'=>'CMS Page');
-        BPubSub::i()->fire(__METHOD__, array('node_types'=>&$nodeTypes));
-        $this->view('cms/nav-tree-form/main')->node_types = $nodeTypes;
+        BEvents::i()->fire(__METHOD__, array('node_types'=>&$nodeTypes));
+        $this->view('cms/nav-tree-form/main')->set('node_types', $nodeTypes);
     }
 }

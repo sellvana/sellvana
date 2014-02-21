@@ -1,0 +1,1016 @@
+{% set fieldSetModel = APP.instance('FCom_CustomField_Model_Set') %}
+{% set ctrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
+
+<div id="prod-new-field-modal">
+    <a class="btn btn-success" role="button" href="#prod-new-field-form" data-toggle="modal" id="btn_show_modal" style="display:none;">ggg</a>
+    <div id="prod-new-field-form" class="modal fade in" tabindex='-1'>
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
+                    <h4 class="modal-title" id="myModalLabel">Create Form</h4>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="field_code">Field Code</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <input name="field_code" id="field_code" class="form-control" data-rule-required="true" type="text"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="field_name">Field Name</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <input name="field_name" id="field_name" class="form-control" data-rule-required="true" type="text"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="frontend_label">Frontend Label</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <input name="frontend_label" id="frontend_label" class="form-control" data-rule-required="true" type="text"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="frontend_show">Show on frontend</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="frontend_show" id="frontend_show" class="form-control" data-rule-required="true">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="sort_order">Sort order</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <input name="sort_order" id="sort_order" class="form-control" data-rule-required="true" type="text"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="table_field_type">DB Type</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="table_field_type" id="table_field_type" class="form-control" data-rule-required="true">
+                                {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').fieldOptions('table_field_type')) | raw }}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="admin_input_type">Input Type</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="admin_input_type" id="admin_input_type" class="form-control" data-rule-required="true">
+                                {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').fieldOptions('admin_input_type')) | raw }}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="system">System field</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="system" id="system" class="form-control" data-rule-required="true">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="required">Multi Language</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="multilanguage" id="multilanguage" class="form-control" data-rule-required="true">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3">
+                            <label for="required">Required</label>
+                        </div>
+                        <div class="controls col-sm-8">
+                            <select name="required" id="required" class="form-control" data-rule-required="true">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-default" data-dismiss="modal" type="button" id="btn-newfield-close">{{ 'Close'|_ }}</button>
+                    <button class="btn btn-primary save" type="button" id="btn-newfield-save">{{ 'Save changes'|_ }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# CONFLICT START #}
+
+<div class="well">
+  <div class="row">
+    <input type="hidden" id="custom_fields" name="custom_fields"/>
+    <div class="col-sm-6">
+      <select id="sel_sets" class="select2 form-control" style="width:150px;" placeholder='{{ 'Choose fieldset...'|_ }}'>
+        {{ UTIL.optionsHtml(fieldSetModel.as_values('set_name')) | raw }}
+      </select>
+      <button class="btn btn-primary btn-sm" id="btn_add_set" type="button">{{ 'Add a Field Set'|_ }}</button>
+    </div>
+    <div class="col-sm-6" id="field">
+      <select id="sel_fields" class="select2 form-control" style="width:150px;" placeholder='{{ 'Choose field...'|_ }}'>
+        {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').as_values('field_name')) | raw }}
+      </select>
+      <button class="btn btn-primary btn-sm" type="button" id="btn_add_field">{{ 'Add a Field'|_ }}</button>
+      <button class="btn btn-sm" type="button" id="btn_new_field">{{ 'New Field'|_ }}</button>
+    </div>
+  </div>
+</div>
+<hr/>
+<div id='fields_list'/>
+<script type="template" id="fieldset-template">
+    <div class="box-header box-header-small">
+        <div class="title"><%- rc.set_name %></div>
+        <div class="actions">
+            <button class="btn box-remove btn-xs btn-link btn-remove" type="button" ><i class='icon-remove'></i>
+            </button>
+
+            <button class="btn box-collapse btn-xs btn-link btn-edit" type="button"><i class="icon-chevron-down"></i>
+            </button>
+        </div>
+    </div>
+    <div class="box-content">
+        <!-- field template here -->
+    </div>
+</script>
+
+{# CONFLICT MIDDLE
+<div class="row">
+    <div class="col-sm-10">
+        <input type="hidden" id="custom_fields" name="custom_fields"/>
+        <table>
+            <tr>
+                <td style='padding-right:20px;'>
+                    <select id="sel_sets" class="select2 form-control" style="width:150px;" placeholder='Choose fieldset...'>
+                        {{ UTIL.optionsHtml(fieldSetModel.as_values('set_name')) | raw }}
+                    </select>
+
+                </td>
+                <td style='padding-right:70px;'>
+                    <button class="btn btn-primary" id="btn_add_set" type="button">Add a Field Set</button>
+
+                </td>
+                <td style='padding-right:20px;' id='td_fields'>
+                    <select id="sel_fields" class="select2 form-control" style="width:150px;" placeholder='Choose field...'>
+                        {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').as_values('field_name')) | raw }}
+                    </select>
+
+                </td>
+                <td>
+                    <button class="btn btn-primary" type="button" id="btn_add_field">Add a Field</button>
+                </td>
+                <td width='100%' class='text-right'>
+                    <button class="btn" type="button" id="btn_new_field">New Field</button>
+                </td>
+            </tr>
+        </table>
+        <hr>
+        <div id='fields_list'/>
+        <script type="template" id="fieldset-template">
+            <div class="box-header box-header-small green-background">
+                <div class="title"><%- rc.set_name %></div>
+                <div class="actions">
+                    <button class="btn box-remove btn-xs btn-link btn-remove" type="button" ><i class='icon-remove'></i>
+                    </button>
+
+                    <button class="btn box-collapse btn-xs btn-link btn-edit" type="button"><i></i>
+                    </button>
+                </div>
+            </div>
+            <div class="box-content">
+                <!-- field template here -->
+            </div>
+        </script>
+CONFLICT END #}
+
+
+        <script type="template" id="field-template">
+        <div class="row">
+            <label class="col-md-3 control-label control-handle" for="prod-review-text"><%- (rc.field_name === -1 ? '<span class="badge badge-important">'+rc.lang_code+'</span>' : rc.field_name) %></label>
+            <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
+                <% switch(rc.admin_input_type) {
+                    case 'text':
+                        print('<input '+(rc.required === '1' ? 'data-rule-required="true"' : '') +'name="'+guid()+'" value="'+rc.value+'" class="form-control" type="text" />');
+
+                        break;
+                    case 'textarea':
+                        print('<textarea '+(rc.required === '1' ? 'data-rule-required="true"' : '') +' name="'+guid()+'" class="form-control" >'+rc.value+'</textarea>');
+
+                        break;
+                    case 'wysiwyg':
+                        print('<textarea name="'+guid()+'" id="'+guid()+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
+
+                        break;
+                    case 'select':
+                    case 'multiselect':
+                        print('<select '+(rc.required === '1' ? 'data-rule-required="true"' : '') +(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' name="'+guid()+'" class="form-control" >');
+                        print("<option value=''>&nbsp;</option>");
+                        vals = rc.value.split(',');
+                        for(key in rc.options) {
+                            print('<option value="'+key+'" '+(vals.indexOf(key) !== -1 ? 'selected' : '')+'>'+rc.options[key]+'</option>');
+                        }
+                        print('</select>');
+
+                        break;
+                    case 'boolean':
+                        print('<input type="hidden" name="'+guid()+'" name="'+guid()+'" value="'+rc.value+'" /><input class="switch-cbx" id="'+guid()+'" name="'+guid()+'" type="checkbox" value="'+rc.value+'" '+((rc.value === '' || rc.value === '1') ? 'checked' : '')+' style="margin-top: 11px;"/>');
+
+                        break;
+                } %>
+            </div>
+            <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '3' : '6'); %>">
+                <button class="btn btn-danger btn-xs field-remove"  style="margin-top: 5px;" type="button">
+                    <i class="icon-remove"></i>
+                </button>
+
+                <!--a class="btn btn-success btn-xs field-refresh" href="#" style="margin-top: 5px;">
+                    <i class="icon-refresh"></i>
+                </a-->
+            </div>
+        </div>
+        <% if (rc.multilang === '1' && (rc.admin_input_type === 'text' || rc.admin_input_type === 'textarea' || rc.admin_input_type === 'wysiwyg')) { %>
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-9">
+                <button class="btn btn-info btn-xs multilang" style="margin-top: 5px;" type="button">
+                    Set Locale Field Value
+                </button>
+            </div>
+        </div>
+        <a class="btn btn-success btn-show" role="button" href="#<%- rc.field_code+rc.id %>" data-toggle="modal" id="btn_show_lang" style="display:none;">show</a>
+        <div id="<%- rc.field_code+rc.id %>" class="modal fade in" tabindex='-1'>
+            <div class="modal-dialog" style="width:900px;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
+                        <h4 class="modal-title" id="myLangLabel"><%= rc.field_name %></h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <table>
+                            <tr>
+                                <td>
+                                    <select class="sel_locale form-control select2" style="width:150px;">
+                                    <% var langs = rc.avail_langs;
+                                    for(var i in langs) {
+                                    %>
+                                        <option value="<%=langs[i] %>"><%=langs[i] %></option>
+                                    <% } %>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary save" type="button">Add Locale</button>
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="lang_fields">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default btn-close" data-dismiss="modal" type="button" id="btn-locale-close">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } %>
+        </script>
+
+        <script type="template" id="lang-field-template">
+            <div class="col-md-3 control-label">
+                <span class="badge badge-default"><%- rc.lang_code %></span>
+            </div>
+            <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
+                <% switch(rc.admin_input_type) {
+                    case 'text':
+                        print('<input id="'+rc.lang_code+'" value="'+rc.value+'" class="form-control" type="text" />');
+                        break;
+                    case 'textarea':
+                        print('<textarea  id="'+guid()+'" name="'+rc.lang_code+'" class="form-control" >'+rc.value+'</textarea>');
+                        break;
+                    case 'wysiwyg':
+                        print('<textarea id="'+guid()+'" name="'+rc.lang_code+'" class="form-control ckeditor" rows="20" >'+rc.value+'</textarea>');
+                        break;
+                } %>
+            </div>
+            <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '3' : '6'); %>">
+                <button class="btn btn-danger btn-xs field-remove" style="margin-top: 5px;">
+                    <i class="icon-remove"></i>
+                </button>
+            </div>
+        </script>
+</div>
+
+
+<script>
+$('#fcom_append_form').append('<form id="prod-new-field-form1" class="form form-horizontal validate-form"/>');
+var html = $("#prod-new-field-modal").html();
+$("#prod-new-field-modal").remove();
+$('form#prod-new-field-form1').append(html);
+
+require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
+    var setValidateForm = function(selector) {
+        if (selector == null) {
+          selector = $(".validate-form");
+        }
+        if (jQuery().validate) {
+          return selector.each(function(i, elem) {
+            return $(elem).validate({
+              errorElement: "span",
+              errorClass: "help-block has-error",
+              errorPlacement: function(e, t) {
+                return t.parents(".controls").first().append(e);
+              },
+              highlight: function(e) {
+                    $(e).closest('.form-group').removeClass("has-error has-success").addClass('has-error');
+                    return $(e).closest('.help-block').css('display','block');
+              },
+              success: function(e) {
+
+                    e.closest(".form-group").removeClass("has-error");
+                    return e.closest(".help-block").css('display','none');
+              }
+            });
+          });
+        }
+    };
+    var currentSet = null;
+    var initialData = {{ ctrl.getInitialData(model) | raw }};
+
+    function refresh_selects()
+    {
+        $('#sel_sets').val('');
+        $('#sel_fields').val('');
+        $('#sel_sets').select2();
+        $('#sel_fields').select2();
+    }
+
+    function remove_options(set)
+    {
+        $("#sel_sets option[value='"+set.get('id')+"']").remove();
+        var fields = set.fields;
+        fields.each(function(f) {
+            $("#sel_fields option[value='"+f.get('id')+"']").remove();
+        });
+        refresh_selects();
+    }
+
+    function add_options(set)
+    {
+        if ($("#sel_sets option[value='"+set.get('id')+"']").length === 0)
+            $('#sel_sets')
+             .append($("<option></option>")
+             .attr("value",set.get('id'))
+             .text(set.get('set_name')));
+        var fields = set.fields;
+        fields.each(function(f) {
+            if ($("#sel_fields option[value='"+f.get('id')+"']").length === 0)
+                $('#sel_fields')
+                 .append($("<option></option>")
+                 .attr("value",f.get('id'))
+                 .text(f.get('field_name')));
+        });
+
+        refresh_selects();
+    }
+
+    function remove_option(field)
+    {
+        $("#sel_fields option[value='"+field.get('id')+"']").remove();
+        refresh_selects();
+    }
+
+    function add_option(field)
+    {
+        if ($("#sel_fields option[value='"+field.get('id')+"']").length === 0)
+            $('#sel_fields')
+             .append($("<option></option>")
+             .attr("value",field.get('id'))
+             .text(field.get('field_name')));
+        refresh_selects();
+    }
+    $('#btn_add_set').click(function() {
+        var setId = $('#sel_sets').val();
+        var newSet = new CustomField.Models.FieldSet();
+        newSet.url = '{{ APP.href('/customfields/products/get_fieldset?id=') | raw }}'+setId;
+        newSet.fetch({
+            success: function() {
+                setCollection.add(newSet);
+                remove_options(newSet);
+            }
+        });
+
+
+
+    });
+
+    $('#btn_add_field').click(function() {
+        var fieldId = $('#sel_fields').val();
+        var newField = new CustomField.Models.Field();
+        newField.url = '{{ APP.href('/customfields/products/get_field?id=') | raw }}'+fieldId;
+        newField.fetch({
+            success: function() {
+                var set = setCollection.at(0);
+                set.fields.add(newField);
+                remove_option(newField);
+            }
+        });
+    });
+    var _mainForm = $('form#catalog-products-form');
+
+    function checkFieldSet()
+    {
+        setCollection.each(function(set) {
+            set.fields.each(function(field) {
+                if (field.wysiwyg) {
+                    var w = field.view.getWYSIWYG();
+                    var val = w.getData();
+                    field.set('value', val);
+                    field.view.$el.find('textarea').eq(1).val(val);//for validation show only
+                }
+
+                if (field.switch) {
+                    var s = field.view.getSwitch();
+                    field.set('value', s.hasClass('switch-on') ? '1' : '0');
+                }
+                var invalid = 0;
+                field.langFields.each(function(langField) {
+                    if (langField.wysiwyg) {
+                        var w = langField.view.getWYSIWYG();
+                        var val = w.getData();
+                        langField.set('value', val);
+                        langField.view.$el.find('textarea').val(val);//for validation show only
+                    }
+                    if (field.get('required') === '1' && langField.get('value') === '')
+                            invalid++;
+                });
+
+                if (field.get('required') === '1') {
+                    field.view.$el.find('div.col-md-9:last').find('span').remove();
+                    if (invalid > 0 ) {
+                        field.view.$el.find('div.col-md-9:last').append('<span class="badge badge-important">'+invalid+'</span>');
+                        flag = true;
+                    }
+                }
+
+                var position = field.view.$el.index();
+                field.set('position', position);
+                var setId = field.view.$el.parents('.prod-fieldset:first').attr('id');
+                if (setId !== set.get('id')) {
+                    set.fields.remove(field, {silent: true});
+                    var movedSet = setCollection.get(setId);
+                    movedSet.fields.add(field, {silent: true});
+                }
+            });
+        });
+    }
+
+    function sortFieldSet()
+    {
+        setCollection.each(function(set) {
+            set.fields.sort();
+        });
+    }
+
+    $(_mainForm).submit(function(ev) {
+
+        checkFieldSet();
+        sortFieldSet();
+        $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
+
+        if(!$(this).valid()) {
+            CustomField.checkingForm = true;
+            return false;
+        } else {
+            if (CustomField.checkingForm) {
+                CustomField.checkingForm = false;
+                $(this).submit();
+            }
+
+        }
+    });
+
+    var _appendForm = $('form#prod-new-field-form1');
+    setValidateForm($(_appendForm));
+    $('#field_code').rules("add", {
+        onfocusout: false,
+        onkeyup: false,
+        remote: {
+            url: '{{ APP.href('/customfields/fields/unique_field') | raw }}',
+            type: 'post',
+             data: {
+                name: 'field_code'
+            },
+            dataFilter: function (responseString) {
+                var response = jQuery.parseJSON(responseString);
+                currentMessage = response.Message;
+                return response.unique;
+            }
+        },
+        messages: {
+            remote: "This field code is already taken place"
+        }
+    });
+    $('#btn_new_field').click(function() {
+        $('div#prod-new-field-form').find('input').val('');
+        $('div#prod-new-field-form').find('select').each(function(index) {
+            $(this).find('option').removeAttr('selected');
+            $(this).find('option:first').attr('selected','selected');
+        })
+        $('#btn_show_modal').trigger('click');
+
+    });
+
+    $('#btn-newfield-save').click(function() {
+        if (!$(_appendForm).valid())
+            return;
+
+        var hash = {};
+        $('#prod-new-field-form .form-control').each(function(index) {
+            hash[$(this).attr('id')] = $(this).val();
+        });
+        hash.oper = 'add';
+        $.post('{{ APP.href('/customfields/fieldsets/field_grid_data') | raw }}', hash, function(res) {
+            var field = new CustomField.Models.Field(res);
+            var flag = false;
+            setCollection.each(function(set) {
+                if (set.get('collapsed') === false) {
+                    set.fields.add(field);
+                    flag = true;
+                }
+            });
+
+            if (!flag)
+                add_option(field);
+            $('#btn-newfield-close').trigger('click');
+            //setCollection.trigger('change');
+        });
+    });
+
+
+    var CustomField = {
+        Models: {},
+        Collections: {},
+        Views: {},
+        Langs: ['en_US', 'de_DE', 'zh-CN', 'fr-FR', 'nl_NL']
+    };
+
+    CustomField.Models.LangField = Backbone.Model.extend({
+        defaults: {
+            value: '',
+            lang_code: ''
+        }
+    });
+
+    CustomField.Collections.LangFieldCollection = Backbone.Collection.extend({
+        model: CustomField.Models.LangField
+    });
+
+    CustomField.Models.Field = Backbone.Model.extend({
+        defaults: {
+            value: '',
+            position: 0,
+            avail_langs: -1
+        },
+        initialize: function(config) {
+
+            var avail_langs = this.get('avail_langs');
+            if (avail_langs === -1) {
+                this.set('avail_langs', CustomField.Langs);
+            }
+
+            if (typeof(config) === 'undefined') {
+                this.langFields = new CustomField.Collections.LangFieldCollection();
+                return;
+            }
+            this.langFields = new CustomField.Collections.LangFieldCollection((typeof(config.langFields) !== 'undefined') ? config.langFields : undefined);
+            if (typeof(config.langFields) !== 'undefined')
+                delete this.attributes['langFields'];
+        },
+        toJSON: function() {
+            var hash = Backbone.Model.prototype.toJSON.call(this);
+            if(typeof(this.langFields) !== 'undefined')
+                hash.langFields = this.langFields.toJSON();
+
+            return hash;
+        }
+    });
+
+    CustomField.Collections.FieldCollection = Backbone.Collection.extend({
+        model: CustomField.Models.Field,
+        comparator: function(col) {
+            return parseInt(col.get('position'));
+        }
+    });
+
+    CustomField.Models.FieldSet = Backbone.Model.extend({
+        defaults: {
+            collapsed: false
+        },
+        initialize: function(config) {
+            if (typeof(config) === 'undefined') {
+                this.fields = new CustomField.Collections.FieldCollection();
+                return;
+            }
+            this.fields = new CustomField.Collections.FieldCollection((typeof(config.fields) !== 'undefined') ? config.fields : undefined)
+            if (typeof(config.fields) !== 'undefined')
+                delete this.attributes['fields'];
+        },
+        parse: function(response) {
+            this.fields.set(response.fields);
+            delete response.fields;
+
+            return response;
+        },
+        toJSON: function() {
+            var hash = Backbone.Model.prototype.toJSON.call(this);
+            if(typeof(this.fields) !== 'undefined')
+                hash.fields = this.fields.toJSON();
+
+            return hash;
+        }
+    });
+
+    CustomField.Collections.FieldSetCollection = Backbone.Collection.extend({
+        model: CustomField.Models.FieldSet
+    });
+    CustomField.Views.LangFieldView = Backbone.View.extend({
+        className: 'row',
+        attributes: {
+            style: 'margin-top:3px; margin-bottom: 30px;'
+        },
+        events: {
+            'click button.field-remove': '_remove',
+            'change input[type="text"],textarea': '_changeVal'
+        },
+        template: _.template($('#lang-field-template').html()),
+        _changeVal: function() {
+            var val = this.$el.find('input[type="text"],textarea').val();
+            this.model.set('value', val);
+        },
+        _remove: function() {
+            var confirm = window.confirm("Do you want to really remove?");
+            if (confirm) {
+                this.parentSet.langFields.remove(this.model);
+                this.undelegateEvents();
+                this.$el.removeData().unbind();
+                this.remove();
+                delete this.model;
+
+            }
+        },
+        getWYSIWYG: function() {
+            var id = this.$el.find('textarea').attr('id');
+            var self = this;
+            return CKEDITOR.instances[id];
+
+        },
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+            this.model.view = this;
+
+            return this;
+        }
+    });
+    CustomField.Views.FieldView = Backbone.View.extend({
+        className: 'form-group',
+        attributes: function() {
+            return { id: this.model.get('id')};
+        },
+        template: _.template($('#field-template').html()),
+        events: function (){
+            var hash = {
+                    'click button.field-remove': '_remove',
+                    'click a.field-refresh': '_refresh',
+                    'click button.multilang': '_showLangModal',
+                    'click button.btn-close': '_checkLangFieldVals',
+                    'click button.save': '_addLangField'
+                };
+            switch (this.model.get('admin_input_type')) {
+                case 'multiselect':
+                case 'select':
+                    hash['change select'] = '_changeSelect2';
+                    break;
+                case 'textarea':
+                    hash['change textarea'] = '_changeVal';
+                case 'text':
+                    hash['change input[type="text"]'] = '_changeVal';
+            }
+            return hash;
+        },
+        initialize: function() {
+            this.model.langFields.on('add', this._addLangView, this);
+            this.model.langFields.on('remove', this._removeLangView, this);
+        },
+        _refresh: function() {
+            this.model.url = '{{ APP.href('/customfields/products/get_field?id=') | raw }}'+this.model.get('id');
+            var self = this;
+            this.model.fetch({
+                success: function() {
+                    self.render();
+                }
+            });
+        },
+
+        _showLangModal: function() {
+            //CustomField.currentFieldView = this;
+
+            var langFields = this.model.langFields;
+            var langs = _.clone(CustomField.Langs);
+            langFields.each(function(langField) {
+                langs = _.difference(langs, [langField.get('lang_code')]);
+            });
+
+            $('#myLangLabel').html(this.model.get('field_name'));
+            this.$el.find('.btn-show').trigger('click');
+            //adminForm.wysiwygInit();
+        },
+        _updateLangTag: function() {
+            var langs = _.difference(CustomField.Langs, this.model.get('avail_langs'));
+            var html = 'Set Locale...'
+            if(langs.length>0) {
+                html = langs.join(',');
+            }
+            this.$el.find('.multilang').html(html);
+            this.$el.find('select.sel_locale').select2();
+            if(this.model.get('avail_langs').length === 0 ) {
+                this.$el.find('button.save').addClass('disabled');
+            } else {
+                this.$el.find('button.save').removeClass('disabled');
+            }
+        },
+        _addLangField: function() {
+            var lang_code = this.$el.find('select.sel_locale').val();
+            var langField = new CustomField.Models.LangField({value: '', lang_code: lang_code, admin_input_type: this.model.get('admin_input_type')});
+
+            this.model.langFields.add(langField);
+            this.$el.find('select.sel_locale option[value="'+lang_code+'"]').remove();
+            this.model.set('avail_langs', _.difference(this.model.get('avail_langs'),[lang_code]));
+            //this.$el.find('.select2').select2();
+            //$('#btn-locale-close').trigger('click');
+            this._updateLangTag();
+        },
+        _removeLangView: function(langField) {
+            var lang_code = langField.get('lang_code');
+            var langs= this.model.get('avail_langs');
+            langs[langs.length] = lang_code;
+            this.model.set('avail_langs', langs);
+            this.$el.find('select.sel_locale').append('<option value="'+lang_code+'">'+lang_code+'</option>');
+            //this.$el.find('.select2').select2();
+            this._updateLangTag();
+        },
+        _changeCheckbox: function() {
+            var val = this.$el.find('input[type="hidden"]').val();
+        },
+        _changeSelect2: function() {
+            var val = this.$el.find('select').val();
+            if (typeof(val) === 'object')
+                val = val.join(',');
+
+            this.model.set('value', val);
+        },
+        _changeVal: function() {
+            var val = this.$el.find('input[type="text"],textarea').val();
+            this.model.set('value', val);
+        },
+        _remove: function() {
+            var confirm = window.confirm("Do you want to really remove?");
+            if (confirm) {
+                add_option(this.model);
+                this.parentSet.fields.remove(this.model);
+                this.undelegateEvents();
+                this.$el.removeData().unbind();
+                this.remove();
+                delete this.model;
+
+            }
+        },
+        _addLangView: function(langField) {
+            var langView = new CustomField.Views.LangFieldView({model: langField});
+            this.$el.find('div.lang_fields').append(langView.render().el);
+
+            if (langField.get('admin_input_type') === 'wysiwyg') {
+                adminForm.wysiwygInit();
+                langField.wysiwyg = true;
+                var p = langView.$el.find('textarea:first').parent();
+                p.append('<textarea name="'+guid()+'"' +(this.model.get('required') === '1' ? 'data-rule-required="true"' : '')+ ' style="display:none;">'+langView.$el.find('textarea:first').val()+'</textarea>');
+
+            } else if (this.model.get('required') === '1') {
+                langView.$el.find('input,textarea').attr('data-rule-required','true');
+            }
+
+            langView.parentSet = this.model;
+            setModalHeight();
+        },
+        getWYSIWYG: function() {
+            var id = this.$el.find('textarea').attr('id');
+            var self = this;
+            return CKEDITOR.instances[id];
+
+        },
+        getSwitch: function() {
+            return this.$el.find('input[type="checkbox"]').parent();
+        },
+
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+            this.model.langFields.each(this._addLangView, this);
+            this.model.view = this;
+
+            //this.$el.find('.select2').select2();
+            this._updateLangTag();
+            return this;
+        }
+    });
+
+    CustomField.Views.FieldSetView = Backbone.View.extend({
+        className: function() {
+            var name = "box box-borderd green-border box-nomargin prod-fieldset ";
+            name += (this.model.get('collapsed') === true ? 'box-collapsed' : '');
+
+            return name;
+        },
+        attributes: function() {
+            return { id: this.model.get('id')};
+        },
+        template: _.template($('#fieldset-template').html()),
+        initialize: function() {
+            //this.model.on('change', this._checkCollapse, this);
+            this.model.fields.on('add', this._addField, this);
+        },
+        events: {
+            'click a.btn-edit': '_showSelf',
+            'click button.btn-remove': '_removeSelf'
+        },
+        _removeSelf: function() {
+            var confirm = window.confirm("Do you want to really remove?");
+            if (confirm) {
+                add_options(this.model);
+                setCollection.remove(this.model);
+                this.undelegateEvents();
+                this.$el.removeData().unbind();
+                this.remove();
+                /*if (this.model.get('id') === currentSet.get('id')) {
+                    currentSet = null;
+                }*/
+
+                delete this.model;
+
+            }
+        },
+        _showSelf: function(ev) {
+            /*setCollection.each(function(set) {
+                set.set('collapsed', true);
+            });*/
+            //currentSet = this.model;
+            this.model.set('collapsed', !this.model.get('collapsed'));
+
+        },
+        _checkCollapse: function() {
+
+            if (this.model.get('collapsed')) {
+
+                this.$el.addClass('box-collapsed');
+            } else {
+                this.$el.removeClass('box-collapsed');
+            }
+        },
+        _addField: function(field) {
+            var fieldView = new CustomField.Views.FieldView({model: field});
+            this.$el.find('div.box-content').append(fieldView.render().el);
+
+            switch (field.get('admin_input_type')) {
+                case 'multiselect':
+                case 'select':
+                    this.$el.find('select:last').val(field.get('value'));
+                    this.$el.find('select:last').select2();
+                    break;
+                case 'boolean':
+                    field.switch = true;
+                    fieldView.$el.find('.switch-cbx:last').wrap("<div class='make-switch switch' data-off-label='&lt;i class=\"icon-remove\"&gt;&lt;/i&gt;' data-on-label='&lt;i class=\"icon-ok\"&gt;&lt;/i&gt;' data-on='primary'>").parent().bootstrapSwitch();
+
+                    break;
+                case 'wysiwyg':
+                    field.wysiwyg = true;
+                    adminForm.wysiwygInit();
+                    var p = fieldView.$el.find('textarea:first').parent();
+                    p.append('<textarea name="'+guid()+'" '+(field.get('required') === '1' ? 'data-rule-required="true"' : '')+' style="display:none;">'+fieldView.$el.find('textarea:first').val()+'</textarea>');
+                    break;
+            }
+
+            fieldView.parentSet = this.model;
+
+        },
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+            this.model.fields.each(this._addField, this);
+
+            return this;
+        }
+    });
+
+    CustomField.Views.MainView = Backbone.View.extend({
+        el: '#fields_list',
+        initialize: function() {
+            this.collection.on('add', this._addSetView, this);
+        },
+        _addSetView: function(set) {
+            var setView = new  CustomField.Views.FieldSetView({model: set});
+            this.$el.append(setView.render().el);
+        },
+        render: function() {
+            this.$el.html('');
+            this.collection.each(this._addSetView, this);
+            adminForm.wysiwygInit();
+            adminForm.createSwitchButton();
+        }
+    });
+
+    var setCollection = new CustomField.Collections.FieldSetCollection();
+    var setModel = null;
+    if (initialData !== -1) {
+        for(var i in initialData) {
+            var set = initialData[i];
+            //var fields = _.clone(set.fields);
+            //delete set.fields;
+            var setModel = new CustomField.Models.FieldSet(set);
+            //setModel.fields.set(fields);
+            setCollection.add(setModel);
+            remove_options(setModel);
+
+        }
+        $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
+    }
+
+    refresh_selects();
+
+    var mainView = new CustomField.Views.MainView({collection: setCollection});
+    mainView.render();
+    if (setCollection.length === 0) {
+        $('#td_fields').css('display', 'none');
+        $('#field').hide();
+//        $('#btn_add_field').css('display', 'none');
+    }
+    setCollection.on('add remove change', function() {
+        $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
+
+        if (setCollection.length === 0) {
+            $('#td_fields').css('display', 'none');
+            $('#field').hide();
+//            $('#btn_add_field').css('display', 'none');
+        } else {
+            $('#td_fields').css('display', 'block');
+            $('#field').show();
+//            $('#btn_add_field').css('display', 'inline-block');
+        }
+
+        $( ".prod-fieldset .box-content" ).sortable({
+            revert: true,
+            connectWith: ".prod-fieldset .box-content",
+            handle: '.control-handle'
+        });
+    });
+
+    $( ".prod-fieldset .box-content" ).sortable({
+        revert: true,
+        connectWith: ".prod-fieldset .box-content",
+        handle: '.control-handle'
+    });
+
+});
+
+/*$('body').on('click', 'a', function(e){
+    if( $(this).attr('href') === '#' ) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        return false;
+    }
+});*/
+
+
+</script>

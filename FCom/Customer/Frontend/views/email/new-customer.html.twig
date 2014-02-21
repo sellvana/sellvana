@@ -1,0 +1,9 @@
+{% set d = THIS.get('customer') %}
+<!--{ Content-Type: text/html; charset=UTF-8 }-->
+<!--{ To: "{{ "%s %s" | format(d.get('firstname'), d.get('lastname')) }}" <{{ d.get('email') }}> }-->
+<!--{ From: "{{ CONFIG.get('modules/FCom_Core/support_name') }}" <{{ CONFIG.get('modules/FCom_Core/support_email') }}> }-->
+<!--{ Subject: {{ "Your registration has been submitted for approval." | _ }} }-->
+
+Hello, {{ d.get('firstname') }}
+
+<p>{{ "Thank you for your registration" | _}}</p>

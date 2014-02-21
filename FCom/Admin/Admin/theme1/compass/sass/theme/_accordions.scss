@@ -1,0 +1,39 @@
+.accordion {
+  .panel {
+    margin-bottom: 0;
+    border-width: 2px;
+  }
+
+  @media print {
+    .collapse, .panel-collapse .collapse, panel-collapse.collapse, .accordion-group .accordion-body.collapse {
+      display: block !important;
+      height: auto !important;
+    }
+  }
+
+  @for $i from 1 through length($colorsNames) {
+    $colorName: nth($colorsNames, $i);
+    $color: nth($colors, $i);
+
+    &.accordion-#{$colorName} {
+      .panel {
+        border-color: $color;
+
+        > .panel-heading + .panel-collapse .panel-body {
+          border-top: 2px solid $color;
+        }
+      }
+
+      .panel-heading {
+        background-color: $color;
+        padding: 0;
+
+        .accordion-toggle {
+          color: $white;
+          padding: 10px 15px;
+          display: block;
+        }
+      }
+    }
+  }
+}

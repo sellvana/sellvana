@@ -1,0 +1,47 @@
+{% set m = THIS.get('model') %}
+
+<fieldset class="adm-section-group">
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Page Enabled"|_ }}</label>
+        <div class="col-md-5">
+            <input type="hidden" name="model[page_enabled]" value="0" />
+            <input class="switch-cbx" type="checkbox" name="model[page_enabled]" value="1" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Page URL Path"|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control" type="text" name="model[page_url]" value="{{ m.get('page_url') }}" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Window Title"|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control" type="text" name="model[page_title]" value="{{ m.get('page_title') }}" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Page Layout Update"|_ }}</label>
+        <div class="col-md-5">
+            <textarea class="form-control" name="model[layout_update]" id="main-content" rows="5">{{ m.get('layout_update') }}</textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Meta Title"|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control" type="text" name="model[meta_title]" value="{{ m.get('meta_title') }}" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Meta Description"|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control" type="text" name="model[meta_description]" value="{{ m.get('meta_description') }}" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Meta Keywords"|_ }}</label>
+        <div class="col-md-5">
+            <input class="form-control" type="text" name="model[meta_keywords]" value="{{ m.get('meta_keywords') }}" />
+        </div>
+    </div>
+</fieldset>

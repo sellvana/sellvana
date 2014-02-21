@@ -1,0 +1,25 @@
+modules:
+    FCom_Checkout:
+        version: 0.2.1
+        channel: beta
+        require: { module: { FCom_Catalog: 0.2.1, FCom_Geo: 0.1.0, FCom_Sales: 0.1.10 } }
+        translations: { de: de.php }
+        description: "Base cart and checkout functionality"
+        auto_use: [ views ]
+
+        areas:
+            FCom_Admin:
+                auto_use: [ layout ]
+
+            FCom_Frontend:
+                auto_use: [ bootstrap, layout ]
+                routing:
+                    - [ any, /cart/?.action, FCom_Checkout_Frontend_Controller_Cart ]
+                    - [ any, /checkout, FCom_Checkout_Frontend_Controller_Checkout.checkout ]
+                    - [ get, /checkout/login, FCom_Checkout_Frontend_Controller_Checkout.checkout_login ]
+                    - [ any, /checkout/payment, FCom_Checkout_Frontend_Controller_Checkout.payment ]
+                    - [ any, /checkout/shipping, FCom_Checkout_Frontend_Controller_Checkout.shipping ]
+                    - [ get, /checkout/success, FCom_Checkout_Frontend_Controller_Checkout.success ]
+                    - [ any, /checkout/address, FCom_Checkout_Frontend_Controller_Address.address ]
+                observe:
+                    - [ FCom_Catalog_Frontend_Controller::action_product:addToCart, FCom_Checkout_Frontend_Controller_Cart::onAddToCart ]

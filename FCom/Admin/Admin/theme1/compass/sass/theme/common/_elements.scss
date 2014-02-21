@@ -1,0 +1,17 @@
+.well {
+  border: 1px solid $boxBorder;
+  background: $boxBackground;
+  @include box-shadow(none);
+}
+
+code {
+  $bg: mix($contrast, $contentBackground, 10%);
+  background-color: $bg;
+  color: mix($bg, $contrast, 10%);
+}
+
+pre {
+  @include border-radius(0);
+  border-color: $boxBorder;
+  background-color: $contentBackground;
+}

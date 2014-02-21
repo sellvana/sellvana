@@ -1,0 +1,77 @@
+.invoice {
+  .invoice-header {
+    border-bottom: 1px solid $light;
+    padding-bottom: 20px;
+    margin-bottom: 40px;
+    @include clearfix;
+    
+    .invoice-title {
+      float: left;
+    }
+
+    .invoice-title {
+      font-size: 30px;
+      font-family: $headingsFontFamily;
+      
+      @media screen and (max-width: 768px) {
+        float: none;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+    }
+
+    .invoice-number {
+      float: right;
+      font-size: 30px;
+      font-family: $headingsFontFamily;
+
+      @media screen and (max-width: 768px) {
+        float: none;
+        text-align: center;
+      }
+
+      .invoice-name {
+        color: $muted;
+      }
+    }
+  }
+
+  .info {
+    .lead {
+      font-family: $headingsFontFamily;
+    }
+  }
+
+  .seller, .buyer {
+    @include clearfix;
+    
+    .icon-globe {
+      float: left;
+      font-size: 20px;
+      color: $muted;
+    }
+
+    .lead {
+      font-family: $headingsFontFamily;
+    }
+    
+    address {
+      float: left;
+      margin-left: 20px;
+      font-size: 16px;
+    }
+  }
+
+  table {
+    margin-top: 20px;
+  }
+
+  .subtotal {
+    font-family: $headingsFontFamily;
+    font-size: 30px;
+  }
+
+  .comment {
+    margin-top: 40px;
+  }
+}

@@ -5,12 +5,6 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     protected static $_origClass;
     protected $_permission;
 
-    public function messages($viewName, $namespace='admin')
-    {
-        $this->view($viewName)->messages = BSession::i()->messages($namespace);
-        return $this;
-    }
-
     public function authenticate($args=array())
     {
         return FCom_Admin_Model_User::i()->isLoggedIn();
@@ -68,15 +62,31 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         return $this;
     }
 
+    public function message($msg, $type='success', $tag='admin', $options=array())
+    {
+        if (is_array($msg)) {
+            array_walk($msg, 'BLocale::_');
+        } else {
+            $msg = BLocale::_($msg);
+        }
+        BSession::i()->addMessage($msg, $type, $tag, $options);
+        return $this;
+    }
+
     public function initFormTabs($view, $model, $mode='view', $allowed=null)
     {
+
         $r = BRequest::i();
         $layout = BLayout::i();
         $curTab = $r->request('tab');
         if (is_string($allowed)) {
             $allowed = explode(',', $allowed);
         }
-        $tabs = $view->tabs;
+        #$formId = $this->get('form_id');
+        #$validator = $this->validator($formId, $model);
+        $this->collectFormTabs($view);
+
+        $tabs = $view->tab_groups ? $view->tabs : $view->sortedTabs();
         if ($tabs) {
             foreach ($tabs as $k=>&$tab) {
                 if (!is_null($allowed) && $allowed!=='ALL' && !in_array($k, $allowed)) {
@@ -87,6 +97,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                     $curTab = $k;
                 }
                 if ($curTab===$k) {
+                    $tab['active'] = true;
                     $tab['async'] = false;
                 }
                 if (!empty($tab['view'])) {
@@ -94,6 +105,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                     if ($tabView) {
                         $tabView->set(array(
                             'model' => $model,
+                            #'validator' => $validator,
                             'mode' => $mode,
                         ));
                     } else {
@@ -103,12 +115,58 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             }
             unset($tab);
         }
+        $view->tabs = $tabs;
+
+        if ($view->tab_groups) {
+            $tabGroups = $view->sortedTabGroups();
+            foreach ($tabs as $k=>$tab) {
+                $tabGroups[$tab['group']]['tabs'][$k] = $tab;
+                if (!empty($tab['active'])) {
+                    $tabGroups[$tab['group']]['open'] = true;
+                }
+            }
+            foreach ($tabGroups as $k=>$tabGroup) {
+                if (empty($tabGroup['tabs'])) {
+                    unset($tabGroups[$k]);
+                } else {
+                    uasort($tabGroup['tabs'], function($a, $b) {
+                        return $a['pos']<$b['pos'] ? -1 : ($a['pos']>$b['pos'] ? 1 : 0);
+                    });
+                }
+            }
+            $view->tab_groups = $tabGroups;
+        }
+
         $view->set(array(
             'tabs' => $tabs,
             'model' => $model,
             'mode' => $mode,
             'cur_tab' => $curTab,
         ));
+        return $this;
+    }
+
+    public function collectFormTabs($formView)
+    {
+        $views = BLayout::i()->findViewsRegex('#^'.$formView->get('tab_view_prefix').'#');
+        foreach ($views as $viewName => $view) {
+            $id = basename($viewName);
+            if (!empty($formView->tabs[$id])) {
+                continue;
+            }
+            $view->collectMetaData();
+            $params = $view->getParam('meta_data');
+            if (!empty($params['disabled'])) {
+                continue;
+            }
+            if (!empty($params['model_new_hide'])) {
+                $model = $formView->get('model');
+                if (!$model || !$model->id()) {
+                    continue;
+                }
+            }
+            $formView->addTab($id, $params);
+        }
         return $this;
     }
 
@@ -156,7 +214,6 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
         $args = array('data'=>&$data, 'model'=>&$model);
         $this->gridPostBefore(array('data'=>&$data, 'model'=>&$model));
-
         switch ($r->post('oper')) {
         case 'add':
             $set = $model->create($data)->save();
@@ -170,21 +227,41 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             $model->load($id)->delete();
             $result = array('success'=>true);
             break;
+        case 'mass-delete':
+            $ids = explode(",",$id);
+            foreach($ids as $id) {
+                $model->load($id)->delete();
+            }
+            $result = array('success'=>true);
+            break;
+        case 'mass-edit':
+            $ids = explode(',',$id);
+            foreach($ids as $id) {
+                if (isset($data['_new'])) {
+                    unset($data['_new']);
+                    $set = $model->create($data)->save();
+                } else {
+                    $set = $model->load($id)->set($data)->save();
+                }
+            }
+            $result = array('success'=>true);
+            break;
+
         }
 
         $this->gridPostAfter(array('data'=>$data, 'model'=>$model, 'result'=>&$result));
 
-        //BResponse::i()->redirect(BApp::href('fieldsets/grid_data'));
+        //BResponse::i()->redirect('fieldsets/grid_data');
         BResponse::i()->json($result);
     }
 
     public function gridPostBefore($args)
     {
-        BPubSub::i()->fire(static::$_origClass.'::gridPostBefore', $args);
+        BEvents::i()->fire(static::$_origClass.'::gridPostBefore', $args);
     }
 
     public function gridPostAfter($args)
     {
-        BPubSub::i()->fire(static::$_origClass.'::gridPostAfter', $args);
+        BEvents::i()->fire(static::$_origClass.'::gridPostAfter', $args);
     }
 }

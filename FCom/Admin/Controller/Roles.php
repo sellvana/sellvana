@@ -9,11 +9,21 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
     protected $_gridTitle = 'Roles and Permissions';
     protected $_recordName = 'Role';
 
+
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config['grid']['columns'] += array(
-            'role_name' => array('label'=>'Role Name', 'width'=>100),
+        $config['columns'] = array(
+            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('name' => 'role_name', 'label'=>'Role Name', 'width'=>100, 'href' => BApp::href($this->_formHref.'?id=:id')),
+            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 85,
+                  'data'=> array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)),
+        );
+        $config['actions'] = array(
+            'delete' => true,
+        );
+        $config['filters'] = array(
+            array('field' => 'role_name', 'type' => 'text'),
         );
         return $config;
     }
@@ -33,6 +43,32 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
 
         if (empty($args['data']['model']['permissions'])) {
             $args['data']['model']['permissions'] = array();
+        }
+    }
+
+    public function formPostAfter($args)
+    {
+        $data = $args['data'];
+        $model = $args['model'];
+        if (!empty($data['user_ids_remove'])) {
+            $user_ids = explode(",", $data['user_ids_remove']);
+            foreach ($user_ids as $user_id) {
+                $user = FCom_Admin_Model_User::i()->load($user_id);
+                if ($user) {
+                    $user->role_id = null;
+                    $user->save();
+                }
+            }
+        }
+        if (!empty($data['user_ids_add'])) { //todo: check if can use sql executes to faster, update role_id where user_id in (user_ids_add)?
+            $user_ids = explode(",", $data['user_ids_add']);
+            foreach ($user_ids as $user_id) {
+                $user = FCom_Admin_Model_User::i()->load($user_id);
+                if ($user) {
+                    $user->role_id = $model->id;
+                    $user->save();
+                }
+            }
         }
     }
 }

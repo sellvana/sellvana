@@ -13,11 +13,14 @@ class FCom_Promo_Model_Promo extends BModel
             'one' => 'Single Group',
             'any' => 'ANY Group',
             'all' => 'ALL Groups',
+            'cat' => 'Categories',
+            'anyp'=> 'ANY Product'
         ),
         'get_type' => array(
             'qty' => 'Quantity',
             '$' => '$ AMT',
             '%' => '% OFF',
+            'free' => 'Free Shipping',
         ),
         'get_group' => array(
             'same_prod' => 'Same Product',
@@ -31,6 +34,16 @@ class FCom_Promo_Model_Promo extends BModel
             'active' => 'Active',
             'expired' => 'Expired',
         ),
+    );
+
+    protected $_validationRules = array(
+        array('description', '@required'),
+//        array('manuf_vendor_id', '@required'),
+
+        array('description', '@string', null, array('max' => 255)),
+
+        array('buy_amount', '@integer'),
+        array('get_amount', '@integer'),
     );
 
     public function getPromosByCart($cartId)
@@ -100,17 +113,45 @@ class FCom_Promo_Model_Promo extends BModel
         return $clone;
     }
 
-    public function afterCreate()
+    public function onAfterCreate()
     {
-        parent::afterCreate();
-        $this->from_date = gmdate('Y-m-d');
-        $this->to_date = gmdate('Y-m-d', time()+30*86400);
-        $this->status = 'pending';
+        parent::onAfterCreate();
+        $this->from_date = gmdate( 'Y-m-d' );
+        $this->to_date   = gmdate( 'Y-m-d', time() + 30 * 86400 );
+        $this->status    = 'pending';
     }
 
-    public function afterSave()
+    public function onBeforeSave()
     {
-        parent::afterSave();
+        parent::onBeforeSave();
+
+        $this->setDate( $this->get( "from_date" ), 'from_date' );
+        $this->setDate( $this->get( "to_date" ), 'to_date' );
+        $this->set('update_at', date('Y-m-d H:i:s'));
+        if(BUtil::isEmptyDate($this->get('create_at'))){
+            $this->set('create_at', date('Y-m-d H:i:s'));
+        }
+        return true;
+    }
+
+    /**
+     * Set date field
+     * By default dates are returned as strings, therefore we need to convert them for mysql
+     *
+     * @param $fieldDate
+     * @param $field
+     */
+    public function setDate( $fieldDate, $field )
+    {
+        $date = strtotime( $fieldDate );
+        if ( -1 != $date ) {
+            $this->set( $field, date( "Y-m-d", $date ) );
+        }
+    }
+
+    public function onAfterSave()
+    {
+        parent::onAfterSave();
 
         $groups = array();
         if (!$this->_newRecord) {

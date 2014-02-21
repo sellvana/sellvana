@@ -1,0 +1,62 @@
+.fuelux  {
+  .wizard {
+    @include border-radius(0);
+    @include box-shadow(none);
+    background-color: transparent;
+    border: none;
+
+    .actions {
+      padding: 0;
+    }
+
+    ul li {
+      background-color: $wizardStepBackground;
+      margin-right: 30px;
+      padding: 0 20px;
+      color: $wizardStepColor;
+      font-family: $headingsFontFamily;
+      font-size: 20px;
+      position: relative;
+      @include border-radius(0 !important);
+
+      &.active {
+        background-color: $wizardStepActiveBackground;
+        color: $wizardStepActiveColor;
+      }
+
+      &.complete {
+        background-color: $wizardStepCompleteBackground;
+        color: $wizardStepCompleteColor;
+
+        &:hover {
+          background-color: darken($green, 5%);
+        }
+
+        &:before {
+          background-color: $green;
+        }
+      }
+
+      &:before {
+        content: "";
+        @include size(30px, 4px);
+        background-color: $wizardStepBackground;
+        display: block;
+        position: absolute;
+        top: 50%;
+        margin-top: -2px;
+        left: -30px;
+      }
+
+      &:first-child {
+        &:before {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+@media print {
+  .fuelux .step-content .step-pane {display: block !important; opacity: 1 !important;}
+}

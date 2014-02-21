@@ -7,7 +7,7 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
 
     protected static $_indexedFields;
     protected static $_sortingArray;
-    
+
     protected static $_fieldOptions = array(
         'field_type' => array('int' => 'Integer', 'decimal' => 'Decimal', 'varchar' => 'String', 'text' => 'Text', 'category' => 'Category'),
         'source_type' => array('field' => 'Field', 'method' => 'Model Method', 'callback' => 'Callback'),
@@ -28,15 +28,17 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
             }
             $fields = $orm->order_by_asc('filter_order')->find_many();
             foreach ($fields as $f) {
-                $k = $f->field_name;
+                $k = $f->get('field_name');
                 static::$_indexedFields['all'][$k] = $f;
-                if ($f->sort_type!=='none') {
+                if ($f->get('sort_type')!=='none') {
                     static::$_indexedFields['sort'][$k] = $f;
+                    $ft = $f->get('field_type');
+                    $f->set('sort_method', $ft === 'varchar' || $ft === 'text');
                 }
-                if ($f->filter_type!=='none') {
+                if ($f->get('filter_type')!=='none') {
                     static::$_indexedFields['filter'][$k] = $f;
                 }
-                if ($f->search_type!=='none') {
+                if ($f->get('search_type')!=='none') {
                     static::$_indexedFields['search'][$k] = $f;
                 }
             }
@@ -50,16 +52,16 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
             static::$_sortingArray = array();
             $sortFields = static::getFields('sort');
             foreach ($sortFields as $fName=>$field) {
-                $sortType = $field->sort_type;
-                $labels = explode('||', $field->sort_label);
-                $l1 = !empty($labels[0]) ? trim($labels[0]) : $field->field_label;
+                $sortType = $field->get('sort_type');
+                $labels = explode('||', $field->get('sort_label'));
+                $l1 = !empty($labels[0]) ? trim($labels[0]) : $field->get('field_label');
                 $l2 = !empty($labels[1]) ? trim($labels[1]) : null;
                 $sortBoth = $sortType=='both';
                 if ($sortType=='asc' || $sortBoth) {
-                    static::$_sortingArray[$field->field_name.' asc'] = $l1 . (($sortBoth && empty($l2)) ? ' (Asc)' : '');
+                    static::$_sortingArray[$field->get('field_name').' asc'] = $l1 . (($sortBoth && empty($l2)) ? ' (Asc)' : '');
                 }
                 if ($sortType=='desc' || $sortBoth) {
-                    static::$_sortingArray[$field->field_name.' desc'] = $sortBoth ? (empty($l2) ? $l1.' (Desc)' : $l2) : $l1;
+                    static::$_sortingArray[$field->get('field_name').' desc'] = $sortBoth ? (empty($l2) ? $l1.' (Desc)' : $l2) : $l1;
                 }
             }
         }
@@ -89,35 +91,40 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         foreach ($products as $p) {
             $pIds[] = $p->id;
         }
-        // fetch category - product associations
-        $catProds = FCom_Catalog_Model_CategoryProduct::i()->orm('cp')
-            ->join('FCom_Catalog_Model_Category', array('c.id','=','cp.category_id'), 'c')
-            ->select(array('category_id', 'product_id', 'id_path'))
-            ->where_in('product_id', $pIds)
-            ->find_many();
-        // find ascendant ids of associated categories
         $catIds = array();
         $prodCatIds = array();
-        foreach ($catProds as $cp) {
-            $idPath = explode('/', $cp->id_path);
-            for ($i=sizeof($idPath)-1; $i>0; $i--) {
-                $prodCatIds[$cp->product_id][] = $idPath[$i];
-                $catIds[$idPath[$i]] = $idPath[$i];
+        if ($pIds) {
+            // fetch category - product associations
+            $catProds = FCom_Catalog_Model_CategoryProduct::i()->orm('cp')
+                ->join('FCom_Catalog_Model_Category', array('c.id','=','cp.category_id'), 'c')
+                ->select(array('category_id', 'product_id', 'id_path'))
+                ->where_in('product_id', $pIds)
+                ->find_many();
+            // find ascendant ids of associated categories
+            foreach ($catProds as $cp) {
+                $idPath = explode('/', $cp->id_path);
+                for ($i=sizeof($idPath)-1; $i>0; $i--) {
+                    $prodCatIds[$cp->product_id][] = $idPath[$i];
+                    $catIds[$idPath[$i]] = $idPath[$i];
+                }
             }
         }
-        // fetch ascendants category names
-        $categories = FCom_Catalog_Model_Category::i()->orm('c')
-            ->select(array('id', 'url_path', 'node_name'))
-            ->where_in('id', $catIds)
-            ->find_many_assoc('id');
-        // fill index data
-        foreach ($products as $p) {
-            if (empty($prodCatIds[$p->id])) {
-                continue;
-            }
-            foreach ($prodCatIds[$p->id] as $cId) {
-                $c = $categories[$cId];
-                $data[$p->id][$c->url_path] = $c->url_path.' ==> '.$c->node_name;
+
+        if ($catIds) {
+            // fetch ascendants category names
+            $categories = FCom_Catalog_Model_Category::i()->orm('c')
+                ->select(array('id', 'url_path', 'node_name'))
+                ->where_in('id', $catIds)
+                ->find_many_assoc('id');
+            // fill index data
+            foreach ($products as $p) {
+                if (empty($prodCatIds[$p->id])) {
+                    continue;
+                }
+                foreach ($prodCatIds[$p->id] as $cId) {
+                    $c = $categories[$cId];
+                    $data[$p->id][$c->url_path] = $c->url_path.' ==> '.$c->node_name;
+                }
             }
         }
         return $data;
@@ -129,7 +136,8 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         foreach ($products as $p) {
             $f = $field->source_callback ? $field->source_callback : $field->field_name;
             $m = isset($p->$f) ? $p->$f : $p->base_price;
-            if     ($m <   100) $v = '0-99      ==> $0 to $99';
+            if     ($m ===   0) $v = '0         ==> FREE';
+            elseif ($m <   100) $v = '1-99      ==> $1 to $99';
             elseif ($m <   200) $v = '100-199   ==> $100 to $199';
             elseif ($m <   300) $v = '200-299   ==> $200 to $299';
             elseif ($m <   400) $v = '300-399   ==> $300 to $399';
@@ -152,5 +160,11 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
             $data[$p->id] = $v;
         }
         return $data;
+    }
+
+    public function getSortMethod()
+    {
+        $ft = $this->get('field_type');
+        return $ft==='varchar' || $ft==='text' ? 'join' : 'column';
     }
 }

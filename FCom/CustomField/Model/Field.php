@@ -10,19 +10,22 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
             'product' => 'Products',
         ),
         'table_field_type' => array(
-            'date' => 'Date',
-            'datetime' => 'Date/Time',
-            'decimal(12,4)' => 'Decimal',
+            'varchar(255)' => 'Short Text',
+            'text' => 'Long Text',
             'int(11)' => 'Integer',
             'tinyint(3)' => 'Tiny Int',
-            'text' => 'Long Text',
-            'varchar(255)' => 'Short Text',
+            'decimal(12,2)' => 'Decimal',
+            'date' => 'Date',
+            'datetime' => 'Date/Time',
+            '_serialized' => 'Serialized',
         ),
         'admin_input_type' => array(
             'text' => 'Text Line',
             'textarea' => 'Text Area',
             'select' => 'Drop down',
+            'multiselect' => 'Multiple Select',
             'boolean' => 'Yes/No',
+            'wysiwyg' => 'WYSIWYG editor'
         ),
         'frontend_show' => array(
             '1' => 'Yes',
@@ -37,6 +40,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
     );
 
     protected $_oldTableFieldCode;
+    protected $_oldTableFieldType;
 
     protected static $_fieldsCache = array();
 
@@ -60,45 +64,80 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         return $keysOnly ? array_keys(static::$_fieldsCache[$type]) : static::$_fieldsCache[$type];
     }
 
-    public function afterLoad()
+    public function onAfterLoad()
     {
-        parent::afterLoad();
+        parent::onAfterLoad();
         $this->_oldTableFieldCode = $this->field_code;
+        $this->_oldTableFieldType = $this->table_field_type;
     }
 
-    public function beforeSave()
+    public function addField($data)
     {
-        if (!parent::beforeSave()) return false;
+        $field = static::load(BUtil::arrayMask($data, 'field_type,field_code'));
+        if (!$field) {
+            $field = static::create($data)->save();
+        } else {
+            $field->set($data)->save();
+        }
+        return $field;
+    }
+
+    public function onBeforeSave()
+    {
+        if (!parent::onBeforeSave()) return false;
+
         if (!$this->field_type) $this->field_type = 'product';
+
+        if ($this->_oldTableFieldCode !== $this->field_code &&
+            $this->field_type === '_serialized' && !empty($this->_oldTableFieldCode)
+        ) {
+            $this->field_code = $this->_oldTableFieldCode; // TODO: disallow code change in UI
+        }
         return true;
     }
 
-    public function afterSave()
+    public function onAfterSave()
     {
         $fTable = $this->tableName();
         $fCode = preg_replace('#([^0-9A-Za-z_])#', '', $this->field_code);
-        $fType = preg_replace('#([^0-9a-z\(\),])#', '', $this->table_field_type);
+        $fType = preg_replace('#([^0-9a-z\(\),])#', '', strtolower($this->table_field_type));
         $field = BDb::ddlFieldInfo($fTable, $this->field_code);
-        if (!$field && empty($this->_oldTableFieldCode)) {
-            BDb::run("ALTER TABLE {$fTable} ADD COLUMN {$fCode} {$fType}");
-        } elseif ($field->Type!=$fType || $this->_oldTableFieldCode!=$fCode && !empty($this->_oldTableFieldCode)) {
-            BDb::run("ALTER TABLE {$fTable} CHANGE COLUMN {$this->_oldTableFieldCode} {$fCode} {$fType}");
+        $columnsUpdate = array();
 
+        if ($fType==='_serialized') {
+            if ($field) {
+                $columnsUpdate[$fCode] = 'DROP';
+            } elseif ($this->_oldTableFieldCode !== $fCode) {
+                //TODO: rename key name in all records??
+            }
+        } else {
+            if (!$field) {
+                $columnsUpdate[$fCode] = $fType;
+            } elseif ($this->_oldTableFieldCode !== $fCode) {
+                $columnsUpdate[$this->_oldTableFieldCode] = "RENAME {$fCode} {$fType}";
+            }
         }
+        if ($columnsUpdate) {
+            BDb::ddlTableDef($fTable, array('COLUMNS' => $columnsUpdate));
+        }
+
+        $this->_oldTableFieldCode = $this->field_code;
+        $this->_oldTableFieldType = $this->table_field_type;
         //fix field code name
-        if($this->field_code != $fCode){
+        if ($this->field_code != $fCode) {
             $this->field_code = $fCode;
-            $this->_oldTableFieldCode = $this->field_code;
             $this->save();
         }
 
-        parent::afterSave();
+        parent::onAfterSave();
     }
 
-    public function afterDelete()
+    public function onAfterDelete()
     {
-        parent::afterDelete();
-        BDb::run("ALTER TABLE {$this->tableName()} DROP COLUMN {$this->field_code}");
+        parent::onAfterDelete();
+        if ($this->table_field_type !== '_serialized') {
+            BDb::ddlTableDef($this->tableName(), array('COLUMNS' => array($this->field_code => 'DROP')));
+        }
     }
 
     public function products()
@@ -114,5 +153,15 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
             $result[$cffield->field_code] = $cffield;
         }
         return $result;
+    }
+
+    public function getDropdowns()
+    {
+        $fields = BDb::many_as_array($this->orm()->where('admin_input_type','select')->find_many());
+        $res = array();
+        foreach($fields as $field) {
+            $res[$field['id']] = $field['field_name'];
+        }
+        return $res;
     }
 }

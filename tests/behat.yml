@@ -1,0 +1,9 @@
+# behat.yml
+default:
+  extensions:
+    Behat\MinkExtension\Extension:
+      base_url: http://fulleron.pp.com
+      javascript_session: sahi
+      browser_name: chrome
+      goutte: ~
+      sahi: ~

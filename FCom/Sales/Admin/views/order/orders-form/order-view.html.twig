@@ -1,0 +1,155 @@
+{% set m = THIS.get('model') %}
+<fieldset class="f-fieldset-group">
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Order"|_ }}</label>
+        <div class="col-md-5">
+            <label class="form-control">{{ m.get('id') }}</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Order Date"|_ }}</label>
+        <div class="col-md-5">
+            <label class="form-control">{{ m.get('create_at') }}</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Order Status"|_ }}</label>
+        <div class="col-md-5">
+            <label class="form-control">{{ m.status() ? m.status().name : m.get('status') }}</label>
+        </div>
+    </div>
+</fieldset>
+
+<fieldset class="f-fieldset-group">
+    <h3 class="f-fieldset-group-title">{{ "Account information"|_ }}</h3>
+    {% set customer = m.get('customer') %}
+    {% if customer.guest %}
+        <div class="form-group">
+            <label class="col-md-2 control-label">{{ "Purchased by"|_ }}</label>
+            <div class="col-md-5">
+                <label class="form-control">{{ "GUEST"|_ }}</label>
+            </div>
+        </div>
+    {% else %}
+        <div class="form-group">
+            <label class="col-md-2 control-label">{{ "Customer name"|_ }}</label>
+            <div class="col-md-5">
+                <label class="form-control">{{ customer.get('firstname') }} {{ customer.get('lastname') }}</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label">{{ "Email"|_ }}</label>
+            <div class="col-md-5">
+                <label class="form-control">{{ customer.get('email') }}</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <a href="{{ APP.href('customers/form?id=' ~ customer.get('id')) }}">{{ "Edit customer account"|_ }}</a>
+        </div>
+    {% endif %}
+</fieldset>
+
+<fieldset class="f-fieldset-group">
+    {#<h3 class="f-fieldset-group-title">{{ "Billing info & Shipping Info"|_ }}</h3>#}
+    <div class="row">
+        <div class="col-sm-6">
+            <h3 class="f-fieldset-group-title">{{ "Billing Address"|_ }}</h3>
+            <div class="f-address-card-listing">
+                <div class="adr">
+                    <div class="form-group name">
+                        {{ m.get('billing_name') }}
+                    </div>
+                    <div class="form-group addr">
+                        {{ m.get('billing_address')|raw }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <h3 class="f-fieldset-group-title">{{ "Shipping Address"|_ }}</h3>
+            <div class="f-address-card-listing">
+                <div class="adr">
+                    <div class="form-group name">
+                        {{ m.get('shipping_name') }}
+                    </div>
+                    <div class="form-group addr">
+                        {{ m.get('shipping_address')|raw }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</fieldset>
+
+<fieldset class="f-fieldset-group">
+    <h3 class="f-fieldset-group-title">{{ "Payment info"|_ }}</h3>
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Payment method"|_ }}</label>
+        <div class="col-md-5">
+            <label class="form-control">{{ m.get('payment_method') }}</label>
+        </div>
+    </div>
+    {% if UTIL.fromJson(m.get('payment_details')) %}
+        {% for paymentKey, paymentValue in UTIL.fromJson(m.get('payment_details')) %}
+        <div class="form-group">
+            <label class="col-md-2 control-label">{{ paymentKey }}</label>
+            <div class="col-md-5">
+                <label class="form-control">{{ paymentValue }}</label>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+</fieldset>
+
+<fieldset class="f-fieldset-group">
+    <h3 class="f-fieldset-group-title">{{ "Shipping & Handling information"|_ }}</h3>
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Shipping method"|_ }}</label>
+        <div class="col-md-5">
+            <label class="form-control">{{ m.get('shipping_method') }}</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Shipping service"|_ }}</label>
+        <div class="col-md-5">
+            <label class="form-control">{{ m.get('shipping_service_title') }}</label>
+        </div>
+    </div>
+</fieldset>
+
+<fieldset class="f-fieldset-group">
+    <h3 class="f-fieldset-group-title">{{ "Items ordered"|_ }}</h3>
+
+    {% if m.get('items') %}
+        {{ THIS.view('core/backbonegrid').set('grid', APP.instance('FCom_Sales_Admin_Controller_Orders').itemsOrderGridConfig(m))|raw }}
+    {% endif %}
+
+    {#{% if m.get('items') %}
+        <div class="row">
+        {% for item in m.get('items') %}
+            {% set product = UTIL.fromJson(item.get('product_info')) %}
+            {% set itemId = item.get('id') %}
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{ "Product"|_ }}</label>
+                <div class="col-md-5"> {{ product.product_name }} </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{ "SKU"|_ }}</label>
+                <div class="col-md-5"> {{ product.local_sku }} </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{ "Price"|_ }}</label>
+                <div class="col-md-5"> {{ product.base_price }} </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{ "Qty"|_ }}</label>
+                <div class="col-md-5">{{ item.get('qty') }}</div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">{{ "Total"|_ }}</label>
+                <div class="col-md-5">{{ item.get('total') }}</div>
+            </div>
+        {% endfor %}
+        </div>
+    {% endif %}#}
+</fieldset>

@@ -1,0 +1,28 @@
+{% set c = THIS.get('model') %}
+{% set mname = MODULES.currentModuleName() %}
+{% set baseHtmlName = "config[modules][" ~ mname ~ "]" %}
+{% set baseConfigPath = "modules/" ~ mname %}
+{% set prefix = "free_s_" %}
+
+<h2>{{ "Free shipping settings" | _}}</h2>
+
+<div class="accordion accordion-blue panel-group" id="settings-FCom_ShippingFree">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a href="#" class="accordion-toggle">{{ 'Free shipping'|_ }}</a>
+        </div>
+        <div class="panel-collapse accordion-body in" id="settings-FCom_ShippingFree-group0">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="{{ prefix }}active">{{ "Enabled"|_ }}</label>
+                    <div class="col-md-5">
+                        <input type="hidden" name="{{ baseHtmlName }}[active]" value="0" />
+                        <input type="checkbox" id="{{ prefix }}active" class="switch-cbx"
+                               name="{{ baseHtmlName }}[active]"
+                               value="1" {% if c.get( baseConfigPath ~ '/active' ) == '1' %}checked="checked"{% endif %}/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

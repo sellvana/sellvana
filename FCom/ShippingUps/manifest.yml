@@ -1,0 +1,11 @@
+modules:
+    FCom_ShippingUps:
+        version: 0.1.0
+        channel: beta
+        require: { module: { FCom_Checkout: 0.2.1 } }
+        description: "Universal post service shipping module for checkout"
+        auto_use: [ bootstrap ]
+
+        areas:
+            FCom_Admin:
+                auto_use: [ views, layout ]

@@ -2,150 +2,7 @@
 
 class FCom_IndexTank_Migrate extends BClass
 {
-    public function run()
-    {
-        BMigrate::install('0.1.0', array($this, 'install'));
-        BMigrate::upgrade('0.1.0', '0.1.1', array($this, 'upgrade_0_1_1'));
-        BMigrate::upgrade('0.1.1', '0.1.2', array($this, 'upgrade_0_1_2'));
-        BMigrate::upgrade('0.1.2', '0.1.3', array($this, 'upgrade_0_1_3'));
-        BMigrate::upgrade('0.1.3', '0.1.4', array($this, 'upgrade_0_1_4'));
-        BMigrate::upgrade('0.1.4', '0.1.5', array($this, 'upgrade_0_1_5'));
-        BMigrate::upgrade('0.1.5', '0.1.6', array($this, 'upgrade_0_1_6'));
-        BMigrate::upgrade('0.1.6', '0.1.7', array($this, 'upgrade_0_1_7'));
-        BMigrate::upgrade('0.1.7', '0.1.8', array($this, 'upgrade_0_1_8'));
-        BMigrate::upgrade('0.1.8', '0.1.9', array($this, 'upgrade_0_1_9'));
-        BMigrate::upgrade('0.1.9', '0.2.0', array($this, 'upgrade_0_2_0'));
-        BMigrate::upgrade('0.2.0', '0.2.1', array($this, 'upgrade_0_2_1'));
-    }
-
-    public function uninstall()
-    {
-        $productsTable = FCom_Catalog_Model_Product::table();
-        BDb::run( " ALTER TABLE {$productsTable} DROP indextank_indexed,
-        DROP indextank_indexed_at; ");
-
-        $pIndexHelperTable = FCom_IndexTank_Model_IndexHelper::table();
-        BDb::run( " DROP TABLE {$pIndexHelperTable}; ");
-
-        $pFieldsTable = FCom_IndexTank_Model_ProductField::table();
-        BDb::run( " DROP TABLE {$pFieldsTable}; ");
-
-        $pFunctionsTable = FCom_IndexTank_Model_ProductFunction::table();
-        BDb::run( " DROP TABLE {$pFunctionsTable}; ");
-
-    }
-
-    public function upgrade_0_1_1()
-    {
-        $productsTable = FCom_Catalog_Model_Product::table();
-        if (!BDb::ddlFieldInfo($productsTable, 'indextank_indexed')) {
-            BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0,
-            ADD indextank_indexed_at datetime not null; ");
-        }
-
-        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::run( "
-            CREATE TABLE IF NOT EXISTS {$pIndexingStatusTable} (
-            `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-            `task` VARCHAR( 255 ) NOT NULL ,
-            `info` VARCHAR( 255 ) NOT NULL ,
-            `updated_at` datetime
-            ) ENGINE = InnoDB;
-         ");
-
-    }
-
-    public function upgrade_0_1_2()
-    {
-        $pFunctionsTable = FCom_IndexTank_Model_ProductFunction::table();
-        BDb::run( " ALTER TABLE {$pFunctionsTable} MODIFY `number` int(11) NOT NULL DEFAULT '-1'");
-    }
-
-    public function upgrade_0_1_3()
-    {
-        $productsTable = FCom_Catalog_Model_Product::table();
-        if (!BDb::ddlFieldInfo($productsTable, 'indextank_indexed')) {
-            BDb::run(" ALTER TABLE {$productsTable} ADD INDEX (indextank_indexed); ");
-        }
-    }
-
-    public function upgrade_0_1_4()
-    {
-        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::ddlAddColumns($pIndexingStatusTable, array(
-            'status' => "enum('start','stop','pause') NOT NULL",
-            'percent' => "BIGINT( 11 ) NOT NULL",
-            'indexed' => "IGINT( 11 ) NOT NULL",
-        ));
-//        BDb::run( " ALTER TABLE {$pIndexingStatusTable}
-//        ADD `status` enum('start','stop','pause') NOT NULL,
-//        ADD `percent` BIGINT( 11 ) NOT NULL ,
-//        ADD `indexed` BIGINT( 11 ) NOT NULL ; ");
-    }
-
-    public function upgrade_0_1_5()
-    {
-        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::run( " ALTER TABLE {$pIndexingStatusTable}
-        MODIFY `status` ENUM( 'start', 'pause' ) NOT NULL DEFAULT 'start'; ");
-    }
-
-    public function upgrade_0_1_6()
-    {
-        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::ddlAddColumns($pIndexingStatusTable, array('to_index' =>"BIGINT( 11 ) NOT NULL"));
-//        BDb::run( " ALTER TABLE {$pIndexingStatusTable} ADD `to_index` BIGINT( 11 ) NOT NULL ;");
-    }
-
-    public function upgrade_0_1_7()
-    {
-        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::ddlAddColumns($pIndexingStatusTable, array('index_size' => "BIGINT( 11 ) NOT NULL"));
-//        BDb::run( " ALTER TABLE {$pIndexingStatusTable} ADD `index_size` BIGINT( 11 ) NOT NULL ;");
-    }
-
-    public function upgrade_0_1_8()
-    {
-        $pPFTable = FCom_IndexTank_Model_ProductFunction::table();
-        BDb::ddlAddColumns($pPFTable, array('label' => "varchar(100) NOT NULL"));
-//        BDb::run( " ALTER TABLE {$pPFTable} ADD `label` varchar(100) NOT NULL ;");
-    }
-
-    public function upgrade_0_1_9()
-    {
-        $pPFTable = FCom_IndexTank_Model_ProductFunction::table();
-        $sql = "
-        update {$pPFTable} set label = 'Newest first' where name='age';
-        update {$pPFTable} set label = 'Relevance' where name='relevance';
-        update {$pPFTable} set label = 'Price (Lower first)' where name='base_price_asc';
-        update {$pPFTable} set label = 'Price (Higher first)' where name='base_price_desc';
-        update {$pPFTable} set label = 'Product name (A-Z)' where name='product_name_asc';
-        update {$pPFTable} set label = 'Product name (Z-A)' where name='product_name_desc';
-        update {$pPFTable} set label = 'Manuf SKU (A-Z)' where name='manuf_sku_asc';
-        update {$pPFTable} set label = 'Manuf SKU (Z-A)' where name='manuf_sku_desc';
-        ";
-        BDb::run( $sql );
-    }
-
-    public function upgrade_0_2_0()
-    {
-        $pPFTable = FCom_IndexTank_Model_ProductFunction::table();
-        BDb::ddlTableColumns($pPFTable, array(
-            'field_name' => "varchar(100) NOT NULL",
-            'sort_order' => "enum('asc','desc') NOT NULL DEFAULT 'asc'",
-            'use_custom_formula' => "tinyint(1) NOT NULL DEFAULT 0",
-        ));
-    }
-
-    public function upgrade_0_2_1()
-    {
-        $pFieldsTable = FCom_IndexTank_Model_ProductField::table();
-        BDb::ddlAddColumns($pFieldsTable, array('sort_order' => "int(11) NOT NULL DEFAULT '0'"));
-//        BDb::run( " ALTER TABLE {$pFieldsTable} ADD `sort_order` int(11) NOT NULL DEFAULT '0'");
-    }
-
-
-    public function install()
+    public function install__0_1_0()
     {
         $pIndexHelperTable = FCom_IndexTank_Model_IndexHelper::table();
         BDb::run( "
@@ -201,8 +58,8 @@ class FCom_IndexTank_Migrate extends BClass
                 'base_price_desc'       => array('number' => 3, 'definition' => 'd[0]'   ),
                 'product_name_asc'        => array('number' => 4, 'definition' => '-d[1]'  ),
                 'product_name_desc'       => array('number' => 5, 'definition' => 'd[1]'   ),
-                'manuf_sku_asc'        => array('number' => 6, 'definition' => '-d[2]'  ),
-                'manuf_sku_desc'       => array('number' => 7, 'definition' => 'd[2]'   ),
+                'local_sku_asc'        => array('number' => 6, 'definition' => '-d[2]'  ),
+                'local_sku_desc'       => array('number' => 7, 'definition' => 'd[2]'   ),
         );
         $functionsList = FCom_IndexTank_Model_ProductFunction::i()->getList();
         //add initial functions
@@ -260,7 +117,7 @@ class FCom_IndexTank_Migrate extends BClass
                 $data['scoring'] = 1;
                 $data['var_number'] = 1;
             }
-            if ($f->Field == "manuf_sku") {
+            if ($f->Field == "local_sku") {
                 $data['scoring'] = 1;
                 $data['var_number'] = 2;
             }
@@ -310,5 +167,131 @@ class FCom_IndexTank_Migrate extends BClass
                 $doc->save();
             }
         }
+    }
+
+    public function uninstall()
+    {
+        $productsTable = FCom_Catalog_Model_Product::table();
+        BDb::run( " ALTER TABLE {$productsTable} DROP indextank_indexed,
+        DROP indextank_indexed_at; ");
+
+        $pIndexHelperTable = FCom_IndexTank_Model_IndexHelper::table();
+        BDb::run( " DROP TABLE {$pIndexHelperTable}; ");
+
+        $pFieldsTable = FCom_IndexTank_Model_ProductField::table();
+        BDb::run( " DROP TABLE {$pFieldsTable}; ");
+
+        $pFunctionsTable = FCom_IndexTank_Model_ProductFunction::table();
+        BDb::run( " DROP TABLE {$pFunctionsTable}; ");
+
+    }
+
+    public function upgrade__0_1_0__0_1_1()
+    {
+        $productsTable = FCom_Catalog_Model_Product::table();
+        if (!BDb::ddlFieldInfo($productsTable, 'indextank_indexed')) {
+            BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0,
+            ADD indextank_indexed_at datetime not null; ");
+        }
+
+        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
+        BDb::run( "
+            CREATE TABLE IF NOT EXISTS {$pIndexingStatusTable} (
+            `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+            `task` VARCHAR( 255 ) NOT NULL ,
+            `info` VARCHAR( 255 ) NOT NULL ,
+            `updated_at` datetime
+            ) ENGINE = InnoDB;
+         ");
+
+    }
+
+    public function upgrade__0_1_1__0_1_2()
+    {
+        $pFunctionsTable = FCom_IndexTank_Model_ProductFunction::table();
+        BDb::run( " ALTER TABLE {$pFunctionsTable} MODIFY `number` int(11) NOT NULL DEFAULT '-1'");
+    }
+
+    public function upgrade__0_1_2__0_1_3()
+    {
+        $productsTable = FCom_Catalog_Model_Product::table();
+        if (!BDb::ddlFieldInfo($productsTable, 'indextank_indexed')) {
+            BDb::run(" ALTER TABLE {$productsTable} ADD INDEX (indextank_indexed); ");
+        }
+    }
+
+    public function upgrade__0_1_3__0_1_4()
+    {
+        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
+        BDb::ddlAddColumns($pIndexingStatusTable, array(
+            'status' => "enum('start','stop','pause') NOT NULL",
+            'percent' => "BIGINT( 11 ) NOT NULL",
+            'indexed' => "BIGINT( 11 ) NOT NULL",
+        ));
+//        BDb::run( " ALTER TABLE {$pIndexingStatusTable}
+//        ADD `status` enum('start','stop','pause') NOT NULL,
+//        ADD `percent` BIGINT( 11 ) NOT NULL ,
+//        ADD `indexed` BIGINT( 11 ) NOT NULL ; ");
+    }
+
+    public function upgrade__0_1_4__0_1_5()
+    {
+        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
+        BDb::run( " ALTER TABLE {$pIndexingStatusTable}
+        MODIFY `status` ENUM( 'start', 'pause' ) NOT NULL DEFAULT 'start'; ");
+    }
+
+    public function upgrade__0_1_5__0_1_6()
+    {
+        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
+        BDb::ddlAddColumns($pIndexingStatusTable, array('to_index' =>"BIGINT( 11 ) NOT NULL"));
+//        BDb::run( " ALTER TABLE {$pIndexingStatusTable} ADD `to_index` BIGINT( 11 ) NOT NULL ;");
+    }
+
+    public function upgrade__0_1_6__0_1_7()
+    {
+        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
+        BDb::ddlAddColumns($pIndexingStatusTable, array('index_size' => "BIGINT( 11 ) NOT NULL"));
+//        BDb::run( " ALTER TABLE {$pIndexingStatusTable} ADD `index_size` BIGINT( 11 ) NOT NULL ;");
+    }
+
+    public function upgrade__0_1_7__0_1_8()
+    {
+        $pPFTable = FCom_IndexTank_Model_ProductFunction::table();
+        BDb::ddlAddColumns($pPFTable, array('label' => "varchar(100) NOT NULL"));
+//        BDb::run( " ALTER TABLE {$pPFTable} ADD `label` varchar(100) NOT NULL ;");
+    }
+
+    public function upgrade__0_1_8__0_1_9()
+    {
+        $pPFTable = FCom_IndexTank_Model_ProductFunction::table();
+        $sql = "
+        update {$pPFTable} set label = 'Newest first' where name='age';
+        update {$pPFTable} set label = 'Relevance' where name='relevance';
+        update {$pPFTable} set label = 'Price (Lower first)' where name='base_price_asc';
+        update {$pPFTable} set label = 'Price (Higher first)' where name='base_price_desc';
+        update {$pPFTable} set label = 'Product name (A-Z)' where name='product_name_asc';
+        update {$pPFTable} set label = 'Product name (Z-A)' where name='product_name_desc';
+        update {$pPFTable} set label = 'Manuf SKU (A-Z)' where name='local_sku_asc';
+        update {$pPFTable} set label = 'Manuf SKU (Z-A)' where name='local_sku_desc';
+        ";
+        BDb::run( $sql );
+    }
+
+    public function upgrade__0_1_9__0_2_0()
+    {
+        $pPFTable = FCom_IndexTank_Model_ProductFunction::table();
+        BDb::ddlTableColumns($pPFTable, array(
+            'field_name' => "varchar(100) NOT NULL",
+            'sort_order' => "enum('asc','desc') NOT NULL DEFAULT 'asc'",
+            'use_custom_formula' => "tinyint(1) NOT NULL DEFAULT 0",
+        ));
+    }
+
+    public function upgrade__0_2_0__0_2_1()
+    {
+        $pFieldsTable = FCom_IndexTank_Model_ProductField::table();
+        BDb::ddlAddColumns($pFieldsTable, array('sort_order' => "int(11) NOT NULL DEFAULT '0'"));
+//        BDb::run( " ALTER TABLE {$pFieldsTable} ADD `sort_order` int(11) NOT NULL DEFAULT '0'");
     }
 }

@@ -1,0 +1,103 @@
+{% set formUrl = APP.href('catalog/categories/tree_form/') %}
+
+<script>
+    require(['jquery', 'jstree', 'fcom.admin', 'jquery.splitter', 'jquery.equalHeights'], function($) {
+        $(function() {
+            /*
+            $('.f-admin-nav-sidebar').resizable({
+                handles: 'e',
+                resize: function(ev, ui) {
+                    $('#categories-layout').css('padding-left', ui.size.width+'px');
+                }
+            });
+            */
+            //fix for splitter
+            var categoriesLayoutEl = $('#categories-layout');
+            categoriesLayoutEl.css('min-height', $(this).height());
+            categoriesLayoutEl.split({
+                orientation: 'vertical',
+                limit: 2,
+                position: '20%'
+            });
+            $(window).resize(function(){
+                categoriesLayoutEl.trigger('spliter.resize');
+            });
+//            FCom.Admin.checkboxButton('#categories-tree-lock', {def:true,
+//                on:{icon:'icon-lock', label:'Editing Locked'},
+//                off:{icon:'icon-unlock', label:'Editing Unlocked'}
+//            });
+            $('.js-expand-all').click(function() { $('#categories').jstree('open_all', $('#1>ul>li')); return false });
+            $('.js-collapse-all').click(function() { $('#categories').jstree('close_all', $('#1>ul>li')); return false });
+
+            /*
+            var tree = new FCom.Admin.DynaTree({el:'#categories', tree: {
+                persist: true,
+                children: [ // Pass an array of nodes.
+                    {title: "Item 1"},
+                    {title: "Folder 2", isFolder: true,
+                        children: [
+                            {title: "Sub-item 2.1"},
+                            {title: "Sub-item 2.2"}
+                        ]
+                    },
+                    {title: "Item 3"}
+                ]
+            }});
+            tree.render();
+            */
+
+            FCom.Admin.tree('#categories', {
+                url:'{{ APP.href('catalog/categories/tree_data') }}',
+                on_click: function (n) { loadForm(n); } ,
+                on_select: function (n) { loadForm(n); },
+                lock_flag: '#categories-tree-lock',
+                create_lock: true
+            });
+
+            $('#categories').bind('loaded.jstree open_node.jstree create_node.jstree select_node.jstree move_node.jstree', function(e){
+                categoriesLayoutEl.equalHeights();
+                categoriesLayoutEl.css('min-height', categoriesLayoutEl.find(':first-child').height());
+            });
+
+            function loadForm(node) {
+                var id = $(node).attr('id');
+                $(node).find("a").addClass("jstree-loading");
+                var url = '{{ formUrl }}?id='+id;
+                $('#categories-form-container').load(url, function() {
+                    $('#categories-tree-form').attr('action', url);
+                    window.adminForm = FCom.Admin.form({
+                        tabs:     '.adm-tabs li',
+                        panes:    '.adm-tabs-content',
+                        url_get:  url,
+                        url_post: url
+                    });
+                    //clear instances CKEDITOR
+                    if (CKEDITOR !== 'undefined') {
+                        CKEDITOR.instances = {};
+                    }
+                    adminForm.createSwitchButton();
+                    adminForm.wysiwygInit();
+                    $(node).find("a").removeClass("jstree-loading");
+                });
+            }
+
+        })
+    })
+</script>
+
+<div class="f-admin-main-view f-sidebar-view f-tree-layout">
+    <div id="categories-layout" style="min-height: 900px;">
+        <div id="categories-wrapper" class="clearfix">
+            <div class="tree-header">{{ "Navigation" |_ }}</div>
+            <div class="text-center">
+                <a class="js-expand-all btn btn-link" href="#">{{ "Expand All"|_ }}</a>
+                <a class="js-collapse-all btn btn-link" href="#">{{ "Collapse All"|_ }}</a>
+            </div>
+            <div class="f-admin-nav-sidebar f-admin-tree-sidebar" id="categories"></div>
+        </div>
+        <form class="form form-horizontal clearfix" id="categories-tree-form" action="{{ formUrl }}" method="post">
+            <div id="categories-form-container"></div>
+        </form>
+    </div>
+</div>
+

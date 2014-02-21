@@ -1,0 +1,38 @@
+{% if THIS.get('selected_filters') %}
+    <section class="block-sub">
+            <header class="block-sub-title"><span class="title">{{ "Selected filters" | _ }}</span></header>
+            <a href="{{ REQUEST.baseUrl() ~ REQUEST.rawPath() }}">{{ "Clear filters" | _ }}</a> <br/>
+    {% for label, filterGroup in THIS.get('selected_filters') %}
+        <strong>{{ label | _ }}</strong>
+        <ul>
+            {% for filter in filterGroup %}
+                {% if is iterable(filter['value']) %}
+                    {% for fval in filter['value']  %}
+                        <li><a href="{{ UTIL.setUrlQuery(REQUEST.currentUrl(), {'f[' ~ filter['key'] ~ '][' ~ fval ~ ']': ''} ) }}"> - {{ fval }}</a></li>
+                    {% endfor %}
+                {% else: %}
+                    <li><a href="{{ UTIL.setUrlQuery(REQUEST.currentUrl(), {'f[' ~ filter['key'] ~ ']': ''} ) }}"> - {{ filter['value'] }}</a></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endfor %}
+    </section>
+{% endif %}
+
+{% if THIS.get('groups') %}
+    <section class="block-sub">
+            <header class="block-sub-title"><span class="title">{{ "Filters" | _ }}</span></header>
+    {% for label, groupValues in THIS.get('groups') %}
+        <strong>{{ label }}</strong>
+        <ul>
+            {% for gv in groupValues['values'] %}
+                {% if 'Inclusive' == groupValues['facet_select'] %}
+                    <li><a href="{{ UTIL.setUrlQuery( REQUEST.currentUrl(), { 'f[' ~ groupValues['key'] ~ '][' ~ gv ~ ']': gv} ) }}">{{ gv }}</a></li>
+                {% else %}
+                    <li><a href="{{ UTIL.setUrlQuery( REQUEST.currentUrl(), { 'f[' ~ groupValues['key'] ~ ']': gv } ) }}">{{ gv }}</a></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endfor %}
+    </section>
+{% endif %}
