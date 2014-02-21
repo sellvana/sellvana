@@ -12,6 +12,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         if (!$product) {
             //TODO: add notification
             BResponse::i()->redirect('');
+            return;
         }
 
         if (BModuleRegistry::i()->isLoaded('FCom_Customer') && false == FCom_Customer_Model_Customer::i()->sessionUser()) {
@@ -24,6 +25,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             ));
         if ($pr) {
             BResponse::i()->redirect($product->url());
+            return;
         }
         $this->formMessages($this->formId);
         $this->view('prodreviews/review-form')->set(
@@ -48,6 +50,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         $product = FCom_Catalog_Model_Product::i()->load($post['pid']);
         if (!$product || empty($post['review'])) {
             BResponse::i()->redirect('');
+            return;
         }
         if (!$pr) {
             if (BModuleRegistry::i()->isLoaded('FCom_Customer')) {
@@ -244,6 +247,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         if (!$pr) {
             $this->message('Cannot load your review, please check again', 'error', 'validator-errors:'.$this->formId);
             BResponse::i()->redirect('prodreviews/edit?pr='.$pr->id());
+            return;
         }
         //$valid = $pr->set($post['review'])->save();
         $needApprove = BConfig::i()->get('modules/FCom_ProductReviews/need_approve');

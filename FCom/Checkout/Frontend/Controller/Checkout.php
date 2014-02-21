@@ -8,8 +8,10 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $isLoggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
         if (!$isLoggedIn && $r->get('guest') != 'yes' && $r->rawPath() != '/checkout/login') {
             BResponse::i()->redirect('checkout/login');
+            return;
         } elseif ($isLoggedIn && $r->rawPath() == '/checkout/login') {
             BResponse::i()->redirect('checkout');
+            return;
         }
         return parent::authenticate($args);
     }
@@ -40,6 +42,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
         if (!$cart || !$cart->id) {
             BResponse::i()->redirect('cart');
+            return;
         }
 
         $shipAddress = $cart->getAddressByType('shipping');
@@ -54,10 +57,12 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         if (empty($shipAddress)) {
             $href = BApp::href('checkout/address?t=s');
             BResponse::i()->redirect($href);
+            return;
         }
         if (empty($billAddress)) {
             $href = BApp::href('checkout/address?t=b');
             BResponse::i()->redirect($href);
+            return;
         }
 
         if ($customer) {
@@ -68,6 +73,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         if (empty($cart->payment_method)) {
             $href = BApp::href('checkout/payment');
             BResponse::i()->redirect($href);
+            return;
         }
 
         $cart->calculateTotals();
@@ -131,6 +137,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
                     $cart->save();
                 } else {
                     BResponse::i()->redirect('checkout?guest=yes');
+                    return;
                 }
             } catch (Exception $e) {
                 //die($e->getMessage());
@@ -167,6 +174,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         if (empty($post['place_order']) && empty($post['is_ajax'])) {
             BResponse::i()->redirect('checkout');
+            return;
         }
         $order = $cart->placeOrder();
         FCom_Sales_Model_Cart::i()->sessionCartId(false);
@@ -247,6 +255,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $sData =& BSession::i()->dataToUpdate();
         if (empty($sData['last_order']['id'])) {
             BResponse::i()->redirect('checkout');
+            return;
         }
 
         $user = false;

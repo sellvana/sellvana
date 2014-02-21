@@ -9,6 +9,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
         if (!$salesOrder) {
             $href = BApp::href('cart');
             BResponse::i()->redirect($href);
+            return;
         }
 
         $baseUrl = BApp::href('paypal');
@@ -60,17 +61,20 @@ class FCom_PayPal_Frontend_Controller extends BActionController
         if (!$salesOrder) {
             $href = BApp::href('cart');
             BResponse::i()->redirect($href);
+            return;
         }
 
         $resArr = FCom_PayPal_RemoteApi::i()->call('GetExpressCheckoutDetails',  array('TOKEN' => $sData['paypal']['token']));
         if (false===$resArr) {
             $this->message(FCom_PayPal_RemoteApi::i()->getError(), 'error');
             BResponse::i()->redirect('checkout/checkout');
+            return;
         }
 
         if (empty($resArr['PAYERID'])) {
             $this->message('Payment action not initiated', 'error');
             BResponse::i()->redirect('checkout');
+            return;
         }
         /*
         $cart->set(array(

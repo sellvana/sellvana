@@ -62,6 +62,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     } else {
                         $this->message($errorMessage, 'error', 'frontend', array('title' => ''));
                         BResponse::i()->redirect('login');
+                        return;
                     }
                 } else {
                     throw new Exception($this->_('Invalid email or password.'));

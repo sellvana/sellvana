@@ -206,6 +206,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $q = $req->get('q');
         if (!$q) {
             BResponse::i()->redirect('');
+            return;
         }
         $q = BRequest::i()->get('q');
 

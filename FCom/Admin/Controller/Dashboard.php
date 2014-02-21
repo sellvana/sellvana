@@ -7,6 +7,7 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
         $r = BRequest::i();
         if (!$r->xhr()) {
             BResponse::i()->redirect('');
+            return;
         }
         $widgets = FCom_Admin_View_Dashboard::i()->getWidgets();
         $widgetKeys = explode(',', $r->get('widgets'));

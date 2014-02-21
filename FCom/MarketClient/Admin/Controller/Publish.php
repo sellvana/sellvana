@@ -32,6 +32,7 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
         $result = FCom_MarketClient_RemoteApi::i()->publishModule($data);
         if (!empty($result['error'])) {
             BResponse::i()->redirect('marketclient/publish/module?mod='.$form['mod_name']);
+            return;
         }
         */
         $hlp = FCom_MarketClient_RemoteApi::i();
