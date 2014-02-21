@@ -450,13 +450,15 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             'lifetime' => 0,
             'avg'      => 0,
         );
-        $orders = FCom_Sales_Model_Order::i()->orm()->where('customer_id', $this->id)->find_many();
-        if ($orders) {
-            $cntOrders = count($orders);
-            foreach($orders as $order) {
-                $statistics['lifetime'] += $order->grandtotal;
+        if (BModuleRegistry::i()->isLoaded('FCom_Sales_Model_Order')) {
+            $orders = FCom_Sales_Model_Order::i()->orm()->where('customer_id', $this->id)->find_many();
+            if ($orders) {
+                $cntOrders = count($orders);
+                foreach($orders as $order) {
+                    $statistics['lifetime'] += $order->grandtotal;
+                }
+                $statistics['avg'] = $statistics['lifetime'] / $cntOrders;
             }
-            $statistics['avg'] = $statistics['lifetime'] / $cntOrders;
         }
         return $statistics;
     }

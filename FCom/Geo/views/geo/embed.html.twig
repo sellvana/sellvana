@@ -1,8 +1,8 @@
 <script>
-require(['jquery'], function($) {
-    $(function(){
-        var geoCountries = <?php echo BUtil::toJson(FCom_Geo_Model_Country::i()->options($this->countries)) ?>;
-        var geoRegions = <?php echo BUtil::toJson(FCom_Geo_Model_Region::i()->allOptions()) ?>;
+(function() {
+    function main($) {
+        var geoCountries = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Country').options(THIS.get('countries'))) | raw }};
+        var geoRegions = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Region').allOptions()) | raw }};
 
         $.fn.geoCountryRegion = function(opt) {
             opt = opt || {};
@@ -47,7 +47,11 @@ require(['jquery'], function($) {
             $regionInput.change(function(ev) { region = $regionInput.val(); });
             return this;
         }
-
     })
-})
+    if (typeof require !== 'undefined') {
+        require(['jquery'], main)
+    } else {
+        $(main);
+    }
+})()
 </script>
