@@ -73,16 +73,8 @@
                 }
             });
             $('#' + mainForm).find('input, textarea, select').on('change', function () {
-                $('ul#tabs').find('li.active').each(function () {
-                    if ($(this).children('a').find('i.icon-pencil').length === 0) {
-                        if ($(this).children('a').children('i.error').length !== 0) {
-                            $('<i class="icon-pencil"></i>').insertBefore($(this).children('a').children('i.error'));
-                        } else {
-                            $(this).children('a').append('<i class="icon-pencil"></i>');
-                        }
-                    }
-                })
-            })
+                flagEdit();
+            });
             // prevent validate when delete item
             $('button[type="submit"]').click(function () {
                 if ($(this).val() == 'DELETE') {
@@ -103,6 +95,31 @@
             //init
             adminForm.createSwitchButton();
             adminForm.wysiwygInit();
+            for (var i in CKEDITOR.instances) {
+                CKEDITOR.instances[i].on('instanceReady', function () {
+                    var self = this;
+                    this.document.on('keyup', function () {
+                        var descWysiwyg = self;
+                        var idElem = $(self.element).attr('id');
+                        var elem = $('#'+ idElem).parent().find('textarea.js-desc-wysiwyg');
+                        elem.val(descWysiwyg.getData());
+                        elem.valid();
+                        flagEdit();
+                    })
+                })
+            };
+
+            function flagEdit() {
+                $('ul#tabs').find('li.active').each(function () {
+                    if ($(this).children('a').find('i.icon-pencil').length === 0) {
+                        if ($(this).children('a').children('i.error').length !== 0) {
+                            $('<i class="icon-pencil"></i>').insertBefore($(this).children('a').children('i.error'));
+                        } else {
+                            $(this).children('a').append('<i class="icon-pencil"></i>');
+                        }
+                    }
+                });
+            }
         });
     });
 </script>
