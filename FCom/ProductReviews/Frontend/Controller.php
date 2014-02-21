@@ -99,16 +99,19 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
 
         if (BModuleRegistry::i()->isLoaded('FCom_Customer') && false == FCom_Customer_Model_Customer::i()->sessionUser()) {
             BResponse::i()->json(array('redirect' => BApp::href('login')));
+            return;
         }
 
         if (empty($post['rid'])) {
             BResponse::i()->json(array('error' => 'Invalid id'));
+            return;
         }
 
         if (!empty($post['review_helpful'])) {
             $review = FCom_ProductReviews_Model_Review::i()->load($post['rid']);
             if (!$review) {
                 BResponse::i()->json(array('error' => 'Invalid id'));
+                return;
             }
             $mark = -1;
             if ($post['review_helpful'] == 'yes') {

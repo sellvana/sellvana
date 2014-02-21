@@ -207,9 +207,9 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $view->set('grid', $this->fieldSetsGridConfig());
         $data = $view->outputData();
         BResponse::i()->json(array(
-                    array('c' => $data['state']['c']),
-                    BDb::many_as_array($data['rows']),
-                ));
+            array('c' => $data['state']['c']),
+            BDb::many_as_array($data['rows']),
+        ));
     }
 
     public function action_set_field_grid_data()
@@ -221,9 +221,9 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         //TODO check when rows count is over 10.(processORM paginate)
         $data = $this->view('core/backbonegrid')->processORM($orm, __METHOD__);
         BResponse::i()->json(array(
-                    array('c' => $data['state']['c']),
-                    BDb::many_as_array($data['rows']),
-                ));
+            array('c' => $data['state']['c']),
+            BDb::many_as_array($data['rows']),
+        ));
     }
 
     public function action_field_grid_data()
@@ -232,9 +232,9 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $view->set('grid', $this->fieldsGridConfig());
         $data = $view->outputData();
         BResponse::i()->json(array(
-                    array('c' => $data['state']['c']),
-                    BDb::many_as_array($data['rows']),
-                ));
+            array('c' => $data['state']['c']),
+            BDb::many_as_array($data['rows']),
+        ));
     }
 
     public function action_field_option_grid_data()
@@ -243,9 +243,9 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
             ->where('field_id', BRequest::i()->get('field_id'));
         $data = $this->view('core/backbonegrid')->processORM($orm, __METHOD__);
         BResponse::i()->json(array(
-                    array('c' => $data['state']['c']),
-                    BDb::many_as_array($data['rows']),
-                ));
+            array('c' => $data['state']['c']),
+            BDb::many_as_array($data['rows']),
+        ));
     }
 
     public function action_options()

@@ -163,6 +163,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                     array_push($data, $tmp);
                 }
                 BResponse::i()->json(array('data' => $data));
+                return;
             }
             if (isset($r['data'])) {
                 foreach ($r['data'] as $arr => $key) {
@@ -170,6 +171,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                    FCom_Core_Main::i()->writeConfigFiles('core');
                 }
                 BResponse::i()->json(array('success' => true));
+                return;
             }
         }
         try {
