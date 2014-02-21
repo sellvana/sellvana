@@ -1215,6 +1215,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 filter: function () {
                     var val = this.$el.find('input:first').val();
+                    this.model.set('val', val);
                     this._filter(val);
                 },
                 filterOperatorSelected: function (ev) {
