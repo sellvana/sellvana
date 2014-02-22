@@ -75,6 +75,6 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
 
     public function config()
     {
-        return self::$_config;
+        return static::$_config;
     }
 }
