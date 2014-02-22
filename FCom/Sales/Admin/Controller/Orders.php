@@ -275,7 +275,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             array('field' => 'grandtotal', 'type' => 'number-range'),
             array('field' => 'status', 'type' => 'multiselect'),
         );
-        $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*')->where('customer_id', $customer->id);
+        $config['orm'] = $config['orm']->where('customer_id', $customer->id);
         $this->gridOrmConfig($config['orm']);
 
         return array('config' => $config);
