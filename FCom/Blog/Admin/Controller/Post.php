@@ -172,9 +172,9 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
 
     public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
     {
-        if ($model && $model->id) {
+        #if ($model && $model->id) {
             $view->addTab('category', array('label' => $this->_('Categories'), 'pos' => 20));
-        }
+        #}
         return parent::processFormTabs($view, $model, $mode, $allowed);
     }
 
@@ -187,16 +187,16 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             $cp = FCom_Blog_Model_PostCategory::i();
 
             $cp->delete_many(array(
-                    'post_id' => $model->id,
-                ));
+                'post_id' => $model->id,
+            ));
 
             if ($r['category-id'] != '') {
                 $tmp = explode(',', $r['category-id']);
                 foreach ($tmp as $categoryId) {
                     $cp->create(array(
-                            'post_id' => $model->id,
-                            'category_id' => $categoryId,
-                        ))->save();
+                        'post_id' => $model->id,
+                        'category_id' => $categoryId,
+                    ))->save();
                 }
             }
 
