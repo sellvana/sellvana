@@ -2,8 +2,9 @@
 ini_set( "display_errors", 1 );
 error_reporting( -1 );
 require_once __DIR__ . '/../tests/index.php';
+require_once __DIR__."/php_format.php";
 
-echo "Starting" . PHP_EOL;
+echo "<pre>Starting" . PHP_EOL;
 $modules = BModuleRegistry::i()->getAllModules();
 foreach ( $modules as $modName => $mod ) {
     //only for FCom modules
@@ -19,7 +20,7 @@ foreach ( $modules as $modName => $mod ) {
     BUtil::ensureDir( $targetFile );
 
     chmod( $targetFile, 0777 );
-    formatModulePhpFiles( $dir, realpath($targetFile) );
+    formatModulePhpFiles( $dir, str_replace('\\', '/', realpath($targetFile)) );
 }
 
 function formatModulePhpFiles( $dir, $target = null )
@@ -29,23 +30,22 @@ function formatModulePhpFiles( $dir, $target = null )
         return true;
     }
 
-    require_once "php_format.php";
     if(null == $target){
         $target = $dir; //overwrite files !!!
     }
-    $base = realpath(__DIR__ . '/../');
-
+    $base = str_replace('\\', '/', realpath(__DIR__ . '/../'));
     foreach ( $files as $file ) {
         $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
         if($ext != "php"){
             continue;
         }
         $source = formatFile($file);
-        $fileName = str_replace($base, '', $file);
+        $fileName = str_replace($base.'/', '', $file);
         $dirName = pathinfo($fileName, PATHINFO_DIRNAME);
         mkdir(rtrim($target, '/') . '/' . trim($dirName, '/'), 0775, true);
-        if(@file_put_contents($target . "/" . $fileName, $source)){
-            echo "$target/$fileName formatted\n\n";
+        $targetFile = $target . "/" . $fileName;
+        if (@file_put_contents($targetFile, $source)){
+            echo "$targetFile\n";
         }
     }
 }
