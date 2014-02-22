@@ -3580,14 +3580,32 @@ class BValidate extends BClass
         foreach ($this->_expandedRules as $r) {
             $args = !empty($r['args']) ? $r['args'] : array();
             $r['args']['field'] = $r['field']; // for callback and message vars
+
             if (is_string($r['rule']) && preg_match($this->_reRegex, $r['rule'], $m)) {
+
                 $result = empty($data[$r['field']]) || preg_match($m[0], (string)$data[$r['field']]);
+
             } elseif($r['rule'] instanceof Closure){
+
                 $result = $r['rule']($data, $r['args']);
+
             } elseif (is_callable($r['rule'])) {
-                $result = BUtil::call($r['rule'], array($data, $r['args']), true);
+
+                $result = call_user_func($r['rule'], $data, $r['args']);
+
+            } elseif (is_string($r['rule'])) {
+
+                $callback = BUtil::extCallback($r['rule']);
+                if ($callback !== $r['rule']) {
+                    $result = call_user_func($r['rule'], $data, $r['args']);
+                } else {
+                    throw new BException('Invalid rule: '.print_r($r['rule'], 1));
+                }
+
             } else {
+
                 throw new BException('Invalid rule: '.print_r($r['rule'], 1));
+
             }
 
             if (is_string($result)) {
