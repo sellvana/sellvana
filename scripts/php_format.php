@@ -28,7 +28,8 @@ class Token
     protected function loadTokenConstants()
     {
         if ( null == self::$constants ) {
-            self::$constants = array_flip( get_defined_constants( true )[ 'tokenizer' ] );
+            $constants = get_defined_constants( true );
+            self::$constants = array_flip( $constants[ 'tokenizer' ] );
 //            var_dump($this->constants);die;
         }
     }
@@ -78,7 +79,7 @@ function formatFile( $file, $j = 0 )
     foreach ( $rawTokens as $rawToken ) {
         $tokens[ ] = new Token( $rawToken );
     }
-    echo count( $tokens ) . " tokens found\n";
+    #echo count( $tokens ) . " tokens found\n";
 
     $OPERATORS = array( '=', '.', '+', '-', '*', '/', '%', '||', '&&', '+=', '-=', '*=', '/=', '.=', '%=', '==', '!=', '<=', '>=', '<', '>', '===', '!==' );
 
@@ -129,7 +130,7 @@ function formatFile( $file, $j = 0 )
                 $count           = 0;
                 $token->contents = str_replace( "\t", $sep, $token->contents, $count );
                 if ( $count ) {
-                    echo $count, " tabs converted to spaces";
+                    #echo $count, " tabs converted to spaces";
                 }
             }
         } elseif ( $token->contents == "{" ) {
@@ -197,20 +198,24 @@ function formatFile( $file, $j = 0 )
             if ( $controlNesting == 0 && $nextToken->contents != '{' && $nextToken->contents != ';' ) {
                 // single line control to be wrapped between
                 $matchingControlOneLine = true;
+                //TODO: this doesn't work correctly
+                /*
                 $filteredTokens[ ]      = new Token( '{' );
                 $level++;
                 $filteredTokens[ ] = new Token( array( T_WHITESPACE, "\n" . str_repeat( $sep, $level ) ) );
                 if ( isset( $tokens[ $i + 1 ] ) ) {
                     $tokens[ $i + 1 ]->contents = trim( $tokens[ $i + 1 ]->contents );
                 }
+                */
             }
         } elseif ( $token->contents == ";" && $matchingControlOneLine ) {
             $matchingControlOneLine = false;
             $filteredTokens[ ]      = $token;
-
+            /*
             $filteredTokens[ ] = new Token( array( T_WHITESPACE, "\n" . str_repeat( $sep, --$level ) ) );
             $filteredTokens[ ] = new Token( '}' );
             $filteredTokens[ ] = new Token( array( T_WHITESPACE, "\n" ) );
+            */
         } elseif ( $token->contents == ':' ) {
             if ( $matchingTernary ) {
                 $matchingTernary = false;

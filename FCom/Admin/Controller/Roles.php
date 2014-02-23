@@ -15,7 +15,7 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
         $config = parent::gridConfig();
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
-            array('name' => 'role_name', 'label'=>'Role Name', 'width'=>100, 'href' => BApp::href($this->_formHref.'?id=:id')),
+            array('name' => 'role_name', 'label'=>'Role Name', 'width'=>100),
             array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 85,
                   'data'=> array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)),
         );

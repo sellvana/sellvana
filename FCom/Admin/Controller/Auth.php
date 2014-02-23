@@ -40,6 +40,7 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
         if (empty($form) || empty($form['email'])) {
             $this->message('Invalid or empty email', 'error');
             BResponse::i()->redirect(BRequest::i()->referrer());
+            return;
         }
         $user = FCom_Admin_Model_User::i()->orm()
             ->where(array('OR' => array(
@@ -78,9 +79,11 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
         if (!($token && ($user = FCom_Admin_Model_User::i()->load($token, 'token')) && $user->get('token') === $token)) {
             $this->message('Invalid token', 'error');
             BResponse::i()->redirect($returnUrl);
+            return;
         } elseif (!($password && $confirm && $password === $confirm)) {
             $this->message('Invalid password or confirmation', 'error');
             BResponse::i()->redirect($returnUrl);
+            return;
         }
         $user->resetPassword($password);
         $this->message('Password has been reset');
