@@ -45,7 +45,6 @@ class FCom_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Controll
     {
         FCom_Customer_Import::i()->run();
         BResponse::i()->redirect('customers/import/status');
-        exit;
     }
 
     public function action_stop()

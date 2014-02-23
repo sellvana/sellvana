@@ -164,7 +164,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 }
 
                 $row = array('id'=>$id, 'file_name'=>$fileName, 'file_size'=>$att->file_size, 'act' => $status);
-                echo BUtil::toJson($row);
+                BResponse::i()->json($row);
 
                 //echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".BUtil::toJson($row)."); </script>";
                 // TODO: properly refresh grid after file upload
@@ -174,7 +174,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 //echo "<script>parent.\$('#$gridId').trigger( 'reloadGrid' ); </script>";
 
             }
-            exit;
+            break;
 
         case 'edit':
             $id = $r->post('id');
@@ -182,6 +182,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $att = $attModel->load($id);
             if (!$att) {
                 BResponse::i()->json(array('error'=>true));
+                return;
             }
             $oldFileName = $att->file_name;
             if (@rename($targetDir.'/'.$oldFileName, $targetDir.'/'.$fileName)) {

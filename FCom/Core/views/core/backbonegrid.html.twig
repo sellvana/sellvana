@@ -271,7 +271,7 @@
 
             else if (col.editor === 'radio') {
               if(col.editable === 'inline') {
-                print('<input type="radio" id="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}['+col.name+']" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" />');
+                print('<input value="'+rc.row['id']+'" type="radio" id="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}['+col.name+']" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" />');
               } else {
                 print(rc.row[col.name] ? 'Yes' : 'No');
               }

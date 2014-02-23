@@ -1,6 +1,6 @@
 <?php
 /**
- * FreshBooks HttpClient Class 
+ * FreshBooks HttpClient Class
  *
  *
  * @package    FreshBooks
@@ -20,9 +20,9 @@ class FreshBooks_HttpClient
 	private $_curlConn = NULL;
 /**
  * Singleton instance
- */  	
+ */
 	protected static $_instance = null;
-	
+
   /**
    * Constructor
    *
@@ -34,14 +34,14 @@ class FreshBooks_HttpClient
   {
   	//
   }
-  
+
 	/**
-	 * Enforce singleton; disallow cloning 
+	 * Enforce singleton; disallow cloning
 	 */
 	private function __clone()
 	{
 	}
-	
+
 	/**
 	 * Singleton instance
 	 *
@@ -49,24 +49,24 @@ class FreshBooks_HttpClient
 	 */
 	public static function getInstance()
 	{
-		if (null === self::$_instance) {
-			self::$_instance = new self();
+		if (null === static::$_instance) {
+			static::$_instance = new self();
 		}
-		
-		return self::$_instance;
+
+		return static::$_instance;
 	}
-	
+
 /**
  * init singleton object
- */ 
+ */
 	public static function init($url,$token)
-	{	
-		return self::getInstance()->_init($url,$token);
+	{
+		return static::getInstance()->_init($url,$token);
 	}
-	
+
 /**
  * private init parameters: url and token
- */ 	
+ */
 	private function _init($url,$token)
 	{
 		$this->_url = $url;
@@ -87,20 +87,20 @@ class FreshBooks_HttpClient
 
 /**
  * send request to the server
- */ 	
+ */
 	public function send($content)
-	{		
+	{
 		curl_setopt($this->_curlConn, CURLOPT_POSTFIELDS, $content);
 		$result = curl_exec($this->_curlConn);
 		return $result;
 	}
-	
+
 /**
  * get last error
- */ 	
+ */
 	public function getLastError()
 	{
 		return curl_error($this->_curlConn);
-	}	
-	
+	}
+
 }

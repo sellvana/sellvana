@@ -1211,9 +1211,9 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
         }
         //$('.datepicker').datepicker();
         $(document).bind('ajaxSuccess', function (event, request, settings) {
-            if (settings.dataType == 'json' && (data = $.parseJSON(request.responseText))) {
+            if (request.responseText[0]==='{' && (data = $.parseJSON(request.responseText))) {
                 if (data.error == 'login') {
-                    location.href = window.appConfig.baseHref;
+                    location.href = FCom.base_href;
                 }
             }
         });

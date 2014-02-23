@@ -17,7 +17,7 @@ abstract class FCom_Test_DatabaseTestCase extends PHPUnit_Extensions_Database_Te
                 self::$pdo = new PDO('mysql:dbname='.$config['dbname'].';host='.$config['host'], $config['username'], $config['password']);
 
             }
-            $this->conn = $this->createDefaultDBConnection(self::$pdo, $config['dbname']);
+            $this->conn = $this->createDefaultDBConnection(static::$pdo, $config['dbname']);
         }
 
         return $this->conn;

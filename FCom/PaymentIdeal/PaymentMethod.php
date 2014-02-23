@@ -267,7 +267,7 @@ class FCom_PaymentIdeal_PaymentMethod
     protected function setBankId($bank_id)
     {
         {
-            if (!is_numeric($bank_id) || (!$this->config()->get('test') && $bank_id == self::IDEAL_TEST_BANK_ID))
+            if (!is_numeric($bank_id) || (!$this->config()->get('test') && $bank_id == static::IDEAL_TEST_BANK_ID))
                 return false;
 
             return ($this->set('bank_id', $bank_id));
@@ -320,8 +320,8 @@ class FCom_PaymentIdeal_PaymentMethod
             foreach ($errors as $error) {
                 $debugError .= $this->displayXmlError($error);
             }
-            BDebug::log($debugError, self::IDEAL_LOG);
-            BDebug::log($xml, self::IDEAL_LOG);
+            BDebug::log($debugError, static::IDEAL_LOG);
+            BDebug::log($xml, static::IDEAL_LOG);
             libxml_clear_errors();
             throw new Exception($error_msg, $error_code);
         }

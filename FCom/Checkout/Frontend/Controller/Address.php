@@ -20,6 +20,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         if (!$cart->id()){
             $href = BApp::href('cart');
             BResponse::i()->redirect($href);
+            return;
         }
 
         if ('s' == $atype) {
@@ -78,6 +79,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         if (!$cart->id()){
             $href = BApp::href('cart');
             BResponse::i()->redirect($href);
+            return;
         }
         /* @var FCom_Sales_Model_Cart_Address $address */
         $address = $cart->getAddressByType($addressType);
@@ -86,6 +88,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         }
         if(!$address->validate($r, array(), 'address-form')) {
             BResponse::i()->redirect("checkout/address?t=". $atype);
+            return;
         }
 
         if ($address) {

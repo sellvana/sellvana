@@ -48,7 +48,7 @@ class FCom_Promo_Model_Promo extends BModel
 
     public function getPromosByCart($cartId)
     {
-        return self::orm('p')
+        return static::orm('p')
                 ->join(FCom_Promo_Model_Cart::table(), "p.id = pc.promo_id", "pc")
                 ->where('cart_id', $cartId)
                 ->select('p.id')
@@ -188,7 +188,7 @@ class FCom_Promo_Model_Promo extends BModel
 
     public function getActive()
     {
-        return self::orm()->where('status', 'active')
+        return static::orm()->where('status', 'active')
                 ->order_by_desc('buy_amount')
                 ->find_many();
     }
