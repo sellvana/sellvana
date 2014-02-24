@@ -1062,23 +1062,42 @@ class BUtil extends BClass
         return $path;
     }
 
-    public static function globRecursive($dir, $pattern = '*', $flags=0)
+    public static function globRecursive($dir, $pattern = null, $flags=0)
     {
+        /**/
+        if (is_null($pattern)) {
+            $pattern = '*';
+        }
         $files = glob($dir . '/' . $pattern, $flags);
         if (!$files) {
             return array();
         }
         $result = $files;
         foreach ($files as $file) {
-            if ($file === '.' || $file === '..') {
-                continue;
-            }
             if (is_dir($file)) {
                 $subFiles = static::globRecursive($file, $pattern, $flags);
                 $result = array_merge($result, $subFiles);
             }
         }
         return $result;
+        /**
+        // recursive iterator proves slower than glob + is_dir
+        $dirIte = new RecursiveDirectoryIterator($dir);
+        $flatIte = new RecursiveIteratorIterator($dirIte);
+        if (is_null($pattern)) {
+            $pattern = '#.*#';   
+        }
+        $files = new RegexIterator($flatIte, $pattern, RegexIterator::GET_MATCH);
+        $fileList = array();
+        foreach($files as $file) {
+            if (substr($file[0], -2) === '..') {
+                continue;
+            }
+            $file = preg_replace(array('#\\\\#', '#/.$#'), array('/', ''), $file[0]);
+            $fileList[] = $file;
+        }
+        return $fileList;
+        /**/
     }
 
     public static function isPathAbsolute($path)
@@ -3391,13 +3410,14 @@ class BYAML extends BCLass
 
     static public function load($filename, $cache=true)
     {
-        $filename1 = realpath($filename);
-        if (!$filename1) {
+        //$filename1 = realpath($filename);
+        //if (!$filename1) {
+        if (!file_exists($filename)) {
             BDebug::debug('BCache load: file does not exist: '.$filename);
             return false;
         }
-        $filename = $filename1;
-
+        //$filename = $filename1;
+        
         $filemtime = filemtime($filename);
 
         if ($cache) {
