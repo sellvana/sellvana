@@ -2,7 +2,8 @@
 {% set prodImagesConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
 {% set mediaLibImageConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_images', 'folder': 'media/product/images'}) %}
 <input type='hidden' name="grid[images][del]" id='prod-image-remove' />
-<input type='hidden' name="grid[images][rows]" id='prod-image-rows' />
+<input type='hidden' name="grid[product_images][rows]" id='prod-image-rows' />
+
 <script>
 require(['jquery', 'unique'], function($) {
     var prod_image_rows = [], editedRows = [], removedIds = [], originRows = [];
@@ -107,19 +108,21 @@ require(['jquery', 'unique'], function($) {
         objs = _.filter(objs, function(row) {
             return _.indexOf(originFileIds, row.id) === -1 && _.indexOf(addedFileIds, row.id) === -1;
         });
-
+        console.log(objs);
         for(var i in objs) {
             var row = objs[i];
             row.file_id = row.id;
             row.id = guid();
             row._new = true;
-            editedRows[editedRows.length] = row;
+//            editedRows[editedRows.length] = row;
+            var hidden = '<input type="hidden" name="product_images['+ row.id +'][file_id]" value="'+ row.file_id +'" />';
+            $('#tab-images').prepend(hidden);
         }
 
         g_vent.trigger('silent_inject', {grid: 'product_images', rows: prod_image_rows});
         g_vent.trigger('clear_selection', {grid: 'all_images'});
         $(this).next().trigger('click');
-        _setFormVal();
+//        _setFormVal();
     });
 });
 </script>
