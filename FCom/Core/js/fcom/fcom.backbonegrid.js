@@ -2057,7 +2057,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     $('ul.pagination.pagesize li').removeClass('active');
                     BackboneGrid.currentState.ps = parseInt($(this).html());
                     BackboneGrid.currentState.p = 1;
-                    rowsCollection.fetch({reset: true});
+                    //@Todo: fixed, but should find better solutions for backbonegrid
+                    if (typeof (config.data_url) !== 'undefined') {
+                        rowsCollection.fetch({reset: true});
+                    }
                     $(this).parents('li:first').addClass('active');
                     ev.preventDefault();
 

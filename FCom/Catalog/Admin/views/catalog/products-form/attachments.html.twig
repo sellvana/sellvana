@@ -76,16 +76,18 @@ require(['jquery', 'unique'], function($) {
             if (_.indexOf(removedIds,ev.id) !== -1)
                 return;
             removedIds[removedIds.length] = ev.id;
+            $('#all_attachments tbody').find('tr[id="'+ ev.row.file_id +'"]').show();
             _setFormVal();
         }
     });
 
     g_vent.bind('mass-delete', function(ev) {
         if(ev.grid === 'product_attachments') {
-            var ids = _.pluck(ev.rows, 'id');
-            console.log(ids);
-            for(var i in ids)
-                removedIds[removedIds.length] = ids[i];
+            for(var i in ev.rows) {
+                removedIds[removedIds.length] = ev.rows[i].id;
+                $('#all_attachments tbody').find('tr[id="'+ ev.rows[i].file_id +'"]').show();
+            }
+
             _setFormVal();
         }
     });
@@ -109,9 +111,9 @@ require(['jquery', 'unique'], function($) {
         var objs = _.clone(prod_img_rows);
         originFileIds = _.pluck(originRows, 'file_id');
         addedFileIds = _.pluck(editedRows, 'file_id');
-        objs = _.filter(objs, function(row) {
-            return _.indexOf(originFileIds, row.id) === -1 && _.indexOf(addedFileIds, row.id) === -1;
-        });
+//        objs = _.filter(objs, function(row) {
+//            return _.indexOf(originFileIds, row.id) === -1 && _.indexOf(addedFileIds, row.id) === -1;
+//        });
 
         for(var i in objs) {
             var row = objs[i];
@@ -121,6 +123,7 @@ require(['jquery', 'unique'], function($) {
 //            editedRows[editedRows.length] = row;
             var hidden = '<input type="hidden" name="product_attachments['+ row.id +'][file_id]" value="'+ row.file_id +'" />';
             $('#tab-attachments').prepend(hidden);
+            $('#all_attachments tbody').find('tr[id="'+ row.file_id +'"]').hide();
         }
 
         g_vent.trigger('silent_inject', {grid: 'product_attachments', rows: prod_img_rows});
@@ -281,6 +284,9 @@ require(['jquery', 'unique'], function($) {
         var prod_img_rows = [];
         $('#prod-attach-checkbox').change(function() {
             prod_img_rows = [];
+        });
+        $('#product_attachments tbody').find('a.file-attachments').each(function () {
+            $('#all_attachments tbody').find('tr[id="'+ $(this).attr('data-file-id') +'"]').hide();
         });
         $('#prod-attach-fileupload').fileupload({
             url: '{{ APP.href("media/grid/upload?folder=media/product/attachment") | raw}}',

@@ -60,6 +60,7 @@ require(['jquery', 'unique'], function($) {
                 addButton.addClass('disabled');
             }
             addButton.html(caption);
+            $('#all_images tbody').find('tr[id="'+ ev.rows.file_id +'"]').hide();
         }
     });
 
@@ -74,15 +75,19 @@ require(['jquery', 'unique'], function($) {
             if (_.indexOf(removedIds,ev.id) !== -1)
                 return;
             removedIds[removedIds.length] = ev.id;
+            $('#all_images tbody').find('tr[id="'+ ev.row.file_id +'"]').show();
             _setFormVal();
         }
     });
 
     g_vent.bind('mass-delete', function(ev) {
         if(ev.grid === 'product_images') {
-            var ids = _.pluck(ev.rows, 'id');
-            for(var i in ids)
-                removedIds[removedIds.length] = ids[i];
+//            var ids = _.pluck(ev.rows, 'id');
+            for(var i in ev.rows) {
+                $('#all_images tbody').find('tr[id="'+ ev.rows[i].file_id +'"]').show();
+                removedIds[removedIds.length] = ev.rows[i].id;
+            }
+
             _setFormVal();
         }
     });
@@ -103,12 +108,11 @@ require(['jquery', 'unique'], function($) {
     });
     $('button.btn-add.prod-images-modal-add').click(function() {
         var objs = _.clone(prod_image_rows);
-        originFileIds = _.pluck(originRows, 'file_id');
-        addedFileIds = _.pluck(editedRows, 'file_id');
-        objs = _.filter(objs, function(row) {
-            return _.indexOf(originFileIds, row.id) === -1 && _.indexOf(addedFileIds, row.id) === -1;
-        });
-        console.log(objs);
+//        originFileIds = _.pluck(originRows, 'file_id');
+//        addedFileIds = _.pluck(editedRows, 'file_id');
+//        objs = _.filter(objs, function(row) {
+//            return _.indexOf(originFileIds, row.id) === -1 && _.indexOf(addedFileIds, row.id) === -1;
+//        });
         for(var i in objs) {
             var row = objs[i];
             row.file_id = row.id;
@@ -116,9 +120,10 @@ require(['jquery', 'unique'], function($) {
             row._new = true;
 //            editedRows[editedRows.length] = row;
             var hidden = '<input type="hidden" name="product_images['+ row.id +'][file_id]" value="'+ row.file_id +'" />';
-            $('#tab-images').prepend(hidden);
+            $('#tab-images').append(hidden);
+            $('#all_images tbody').find('tr[id="'+ row.file_id +'"]').hide();
         }
-
+        console.log(objs);
         g_vent.trigger('silent_inject', {grid: 'product_images', rows: prod_image_rows});
         g_vent.trigger('clear_selection', {grid: 'all_images'});
         $(this).next().trigger('click');
@@ -271,6 +276,11 @@ require(['jquery', 'unique'], function($) {
     </div>
 </div>
 <script>
+    function afterRenderImageGrid(el, row) {
+        if (row.main_thumb == 1) {
+            $(el).find('input[type="radio"]').prop('checked', true);
+        }
+    }
     if (typeof(g_vent) === 'undefined') {
         g_vent = _.extend(Backbone.Event);
     }
@@ -279,9 +289,7 @@ require(['jquery', 'unique'], function($) {
         console.log(g_vent);
         var prod_image_rows = [];
         $('#product_images').find('input[type="radio"]').each(function () {
-            if ($(this).attr('name') == 'product_images[main_thumb]' && $(this).attr('data-main-thumb') == 1) {
-                $(this).prop('checked', true);
-            }
+            $('#all_images tbody').find('tr[id="'+ $(this).attr('data-file-id') +'"]').hide();
         });
         $('#prod-image-checkbox').change(function() {
             prod_image_rows = [];
