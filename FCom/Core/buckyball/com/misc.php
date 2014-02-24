@@ -1062,17 +1062,23 @@ class BUtil extends BClass
         return $path;
     }
 
-    public static function globRecursive($pattern, $flags=0)
+    public static function globRecursive($dir, $pattern = '*', $flags=0)
     {
-        $files = glob($pattern, $flags);
-        if (!$files) $files = array();
-        $dirs = glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT);
-        if ($dirs) {
-            foreach ($dirs as $dir) {
-                $files = array_merge($files, static::globRecursive($dir.'/'.basename($pattern), $flags));
+        $files = glob($dir . '/' . $pattern, $flags);
+        if (!$files) {
+            return array();
+        }
+        $result = $files;
+        foreach ($files as $file) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+            if (is_dir($file)) {
+                $subFiles = static::globRecursive($file, $pattern, $flags);
+                $result = array_merge($result, $subFiles);
             }
         }
-        return $files;
+        return $result;
     }
 
     public static function isPathAbsolute($path)
@@ -1535,7 +1541,7 @@ class BUtil extends BClass
         if (!class_exists('ZipArchive')) {
             throw new BException("Class ZipArchive doesn't exist");
         }
-        $files = BUtil::globRecursive($sourceDir.'/*');
+        $files = BUtil::globRecursive($sourceDir);
         if (!$files) {
             throw new BException('Invalid or empty source dir');
         }
