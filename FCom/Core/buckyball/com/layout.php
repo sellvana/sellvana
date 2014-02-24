@@ -271,7 +271,7 @@ class BLayout extends BClass
                 if (!$rootDir) {
                     continue;
                 }
-                $files = BUtil::globRecursive($rootDir . '/*');
+                $files = BUtil::globRecursive($rootDir);
                 if (!$files) {
                     continue;
                 }
@@ -338,7 +338,7 @@ class BLayout extends BClass
             return $this;
         }
         $this->setViewRootDir($rootDir);
-        $files = BUtil::globRecursive($rootDir . '/*');
+        $files = BUtil::globRecursive($rootDir);
         if (!$files) {
             return $this;
         }
