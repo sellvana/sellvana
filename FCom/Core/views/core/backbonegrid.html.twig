@@ -239,9 +239,18 @@
         if (typeof(col.display) === 'undefined') {
           if (typeof(col.editable) !== 'undefined') {
 
-            if (typeof(col.editor) === 'undefined' || col.editor === 'text' || col.editor === 'textarea') {
+            if (typeof(col.editor) === 'undefined' || col.editor === 'text') {
               if(col.editable === 'inline') {
                 print('<input type="text"  id="{{ config.id }}'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}['+rc.row['id']+']['+col.name+']" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" value="'+rc.row[col.name]+'">');
+                print ('<span style="display:none;">'+rc.row[col.name]+'</span>');
+              } else {
+                print(rc.row[col.name]);
+              }
+            }
+
+            else if (col.editor === 'textarea') {
+              if(col.editable === 'inline') {
+                print('<textarea id="{{ config.id }}'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}['+rc.row['id']+']['+col.name+']" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" rows="4">'+rc.row[col.name]+'</textarea>');
                 print ('<span style="display:none;">'+rc.row[col.name]+'</span>');
               } else {
                 print(rc.row[col.name]);
@@ -251,8 +260,14 @@
             else if (col.editor === 'select') {
               if(col.editable === 'inline') {
                 print('<select id="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}['+rc.row['id']+']['+col.name+']" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" >');
-                for(var key in col.options) {
-                    print('<option value="'+key+'">'+col.options[key]+'</option>');
+                if (_.isArray(col.options)) {
+                    for(var i = 0, l = col.options.length; i<l; i++) {
+                        print('<option value="'+col.options[i].value+'">'+col.options[i].label+'</option>');
+                    }
+                } else {
+                    for(var key in col.options) {
+                        print('<option value="'+key+'">'+col.options[key]+'</option>');
+                    }
                 }
                 print('</select>');
                 print ('<span style="display:none;">'+col.options[rc.row[col.name]]+'</span>')
