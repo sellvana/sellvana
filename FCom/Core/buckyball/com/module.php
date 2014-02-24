@@ -666,16 +666,16 @@ class BModule extends BClass
 
     const
         // run_level
-        DISABLED  = 'DISABLED',
-        ONDEMAND  = 'ONDEMAND',
-        REQUESTED = 'REQUESTED',
-        REQUIRED  = 'REQUIRED',
+        DISABLED  = 'DISABLED', // Do not allow the module to be loaded
+        ONDEMAND  = 'ONDEMAND', // Load this module only when required by another module
+        REQUESTED = 'REQUESTED', // Attempt to load the module, and silently ignore, if dependencies are not met.
+        REQUIRED  = 'REQUIRED', // Attempt to load the module, and fail, if dependencies are not met.
 
         // run_status
-        IDLE    = 'IDLE',
-        PENDING = 'PENDING',
-        LOADED  = 'LOADED',
-        ERROR   = 'ERROR'
+        IDLE    = 'IDLE', // The module was found, but not loaded
+        PENDING = 'PENDING', // The module is marked to be loaded, but not loaded yet. This status is currently used during internal bootstrap only.
+        LOADED  = 'LOADED', // The module has been loaded successfully
+        ERROR   = 'ERROR' // There was an error loading the module due to unmet dependencies
     ;
 
     protected static $_fieldOptions = array(

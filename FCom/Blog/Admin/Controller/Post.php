@@ -170,14 +170,6 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         return array('config'=>$config);
     }
 
-    public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
-    {
-        #if ($model && $model->id) {
-            $view->addTab('category', array('label' => $this->_('Categories'), 'pos' => 20));
-        #}
-        return parent::processFormTabs($view, $model, $mode, $allowed);
-    }
-
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
