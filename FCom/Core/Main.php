@@ -173,6 +173,7 @@ class FCom_Core_Main extends BClass
                 ->setRootView('permissions');
             BLayout::i()->view('permissions')->set('errors', $permissionErrors);
             BResponse::i()->output();
+            exit;
         }
 
 #echo "<Pre>"; print_r($config->get()); exit;
