@@ -66,7 +66,6 @@ require(['jquery', 'unique'], function($) {
 
     g_vent.bind('add', function(ev) {
         if (ev.grid === 'product_images') {
-            $('div#product_image ul.pagination.pagesize a').unbind('click');
             $('#btn_prod_image_modal').trigger('click');
         }
     });
