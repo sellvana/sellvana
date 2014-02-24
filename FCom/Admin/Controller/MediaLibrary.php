@@ -31,7 +31,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ->select(array('a.id', 'a.folder', 'a.file_name', 'a.file_size'))
                 ->order_by_expr('id asc');
             ;
-        $baseSrc = BConfig::i()->get('web/base_src');
+        $baseSrc = rtrim(BConfig::i()->get('web/base_src'), '/') . '/';
         $config = array(
             'config' => array(
                 'id' => $id,
@@ -163,7 +163,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     $status = 'ERROR';
                 }
 
-                $row = array('id'=>$id, 'file_name'=>$fileName, 'file_size'=>$att->file_size, 'act' => $status);
+                $row = array('id'=>$id, 'file_name'=>$fileName, 'file_size'=>$att->file_size, 'act' => $status, 'folder' => $folder);
                 BResponse::i()->json($row);
 
                 //echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".BUtil::toJson($row)."); </script>";
