@@ -31,7 +31,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ->select(array('a.id', 'a.folder', 'a.file_name', 'a.file_size'))
                 ->order_by_expr('id asc');
             ;
-        $baseSrc = BConfig::i()->get('web/base_src') . '/';
+        $baseSrc = BConfig::i()->get('web/base_src');
         $config = array(
             'config' => array(
                 'id' => $id,
