@@ -509,51 +509,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'id'   =>explode(',', $data['grid'][$typeName]['del']),
                 ));
             }
-
-            if (!empty($data['grid'][$typeName]['rows'])) {
-                $rows = json_decode($data['grid'][$typeName]['rows'], true);
-                foreach($rows as $row) {
-                    $main_thumb = 0;
-                    if (isset($data['product_images']['main_thumb']) && $data['product_images']['main_thumb'] == $row['id']) {
-                        $main_thumb = 1;
-                    }
-                    if (isset($row['_new'])) {
-
-                        $label    = '';
-                        $position = null;
-                        if (isset($data['product_images']) && isset($row['id']) && isset($data['product_images'][$row['id']])
-                        ) {
-                            if (isset($data['product_images'][$row['id']]['label'])) {
-                                $label = $data['product_images'][$row['id']]['label'];
-                            }
-                            if (
-                                isset($data['product_images'][$row['id']]['position'])
-                                && is_numeric($data['product_images'][$row['id']]['position'])
-                            ) {
-                                $position = (int) $data['product_images'][$row['id']]['position'];
-                            }
-                        }
-
-                        $mediaModel = $hlp->create(array(
-                            'product_id' => $model->id,
-                            'media_type' => $type,
-                            'file_id'    => $row['file_id'],
-                            'label'      => $label,
-                            'position'   => $position,
-                            'main_thumb' => $main_thumb
-                            //TODO remote_url and file_path can be fetched based on file_id. Beside, file_name can be changed in media libary.
-                            //'remote_url' =>BApp::href('/media/grid/download?folder=media/product/attachment&file_='.$row['file_id']),
-
-                        ))->save();
-                        if ($mediaModel->get('main_thumb')) {
-                            $mediaLibModel = FCom_Core_Model_MediaLibrary::i()->load($mediaModel->get('file_id'));
-                            $thumbUrl = $mediaLibModel->get('folder').'/'.$mediaLibModel->get('file_name');
-                            $thumbUrl = preg_replace('#^media/#', '', $thumbUrl); //TODO: resolve the dir string ambiguity
-                            $model->set('thumb_url', $thumbUrl)->save();
-                        }
-                    }
-                }
-
 /*
 //echo "<pre>"; print_r($data['grid'][$typeName]['add']);
                 $oldAtt = $hlp->orm()->where('product_id', $model->id)->where('media_type', $type)
@@ -577,29 +532,50 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 }
 //echo "</pre>";
 //exit;**/
-            }
-
-            if (isset($data['product_images'])) {
-                foreach ($data['product_images'] as $key => $image) {
-                    $mediaModel =  $hlp->load($key);
-                    $main_thumb = 0;
-                    if (isset($data['product_images']['main_thumb']) && $data['product_images']['main_thumb'] == $key) {
-                        $main_thumb = 1;
-                    }
-                    if ($mediaModel) {
-                        $image['main_thumb'] = $main_thumb;
-                        if ($main_thumb) {
-                            $mediaLibModel = FCom_Core_Model_MediaLibrary::i()->load($mediaModel->get('file_id'));
-                            $thumbUrl = $mediaLibModel->get('folder').'/'.$mediaLibModel->get('file_name');
-                            $thumbUrl = preg_replace('#^media/#', '', $thumbUrl); //TODO: resolve the dir string ambiguity
-                            $model->set('thumb_url', $thumbUrl)->save();
+            if (isset($data['product_'.$typeName])) {
+                foreach ($data['product_'.$typeName] as $key => $image) {
+                    if ($key != 'main_thumb') {
+                        $mediaModel =  $hlp->load($key);
+                        $main_thumb = 0;
+                        if ($type == 'I') {
+                            if (isset($data['product_'.$typeName]['main_thumb']) && $data['product_'.$typeName]['main_thumb'] == $key) {
+                                $main_thumb = 1;
+                            }
+                            $image['main_thumb'] = $main_thumb;
                         }
-                        $image['position'] = (int) $image['position'];
-                        $mediaModel->set($image)->save();
+
+                        if (isset($image['position']) && is_numeric($image['position'])) {
+                            $image['position'] = (int) $image['position'];
+                        }
+
+                        if ($mediaModel) {
+                            $mediaModel->set($image)->save();
+                        } else {
+                            if (isset($image['file_id'])) {
+                                $image['file_id'] = (int) $image['file_id'];
+                                $image['product_id'] = $model->id;
+                                $image['media_type'] = $type;
+
+                                //TODO remote_url and file_path can be fetched based on file_id. Beside, file_name can be changed in media libary.
+                                //'remote_url' =>BApp::href('/media/grid/download?folder=media/product/attachment&file_='.$row['file_id']),
+                                $hlp->create($image)->save();
+                            }
+
+                        }
                     }
+
                 }
             }
+
         }
+        $productMediaModel = $hlp->orm()->where('media_type', 'I')->where('product_id', $model->id)->where('main_thumb', 1)->find_one();
+        $thumbUrl = NULL;
+        if ($productMediaModel) {
+            $mediaLibModel = FCom_Core_Model_MediaLibrary::i()->load($productMediaModel->get('file_id'));
+            $thumbUrl = $mediaLibModel->get('folder').'/'.$mediaLibModel->get('file_name');
+            $thumbUrl = preg_replace('#^media/#', '', $thumbUrl); //TODO: resolve the dir string ambiguity
+        }
+        $model->set('thumb_url', $thumbUrl)->save();
         return $this;
     }
 
