@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Catalog_ApiServer_V1_Product extends FCom_Api_Controller_Abstract
+class FCom_Catalog_ApiServer_V1_Product extends FCom_ApiServer_Controller_Abstract
 {
     public function action_index()
     {

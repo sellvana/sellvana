@@ -1,6 +1,6 @@
 <?php
 
-class FCom_ApiTest_ApiServer_V1_Test extends FCom_Api_Controller_Abstract
+class FCom_ApiTest_ApiServer_V1_Test extends FCom_ApiServer_Controller_Abstract
 {
     protected $_authorizeActions = array('put');
 
