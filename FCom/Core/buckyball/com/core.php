@@ -1681,8 +1681,9 @@ class BSession extends BClass
             return $this;
         }
 
+        $rememberMeTtl = 86400 * (!empty($config['remember_days']) ? $config['remember_days'] : 30);
         if (BRequest::i()->cookie('remember_me')) {
-            $ttl = 86400 * (!empty($config['remember_days']) ? $config['remember_days'] : 30);
+            $ttl = $rememberMeTtl;
         } else {
             $ttl = !empty($config['timeout']) ? $config['timeout'] : 3600;
         }
@@ -1702,6 +1703,7 @@ class BSession extends BClass
             BUtil::ensureDir($dir);
             session_save_path($dir);
         }
+        ini_set('session.gc_maxlifetime', $rememberMeTtl);
 
         if (!empty($id) || ($id = BRequest::i()->get('SID'))) {
             session_id($id);

@@ -379,10 +379,11 @@ class FCom_Core_Main extends BClass
         }
 
         $config = BConfig::i();
-        $c = $config->get(null, true);
+        $c = $config->get(null, null, true);
 
         if (in_array('core', $files)) {
             // configuration necessary for core startup
+            unset($c['module_run_levels']['request']);
             $core = array(
                 'install_status' => !empty($c['install_status']) ? $c['install_status'] : null,
                 'core' => !empty($c['core']) ? $c['core'] : null,
