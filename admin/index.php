@@ -3,10 +3,11 @@
 $rootDir = dirname(__DIR__);
 require_once $rootDir.'/FCom/Core/Main.php';
 
-//$webRoot = BRequest::i()->webRoot();
+$storeRoot = BRequest::i()->webRoot(1);
 BConfig::i()
     ->set('fs/root_dir', $rootDir)
-    ->set('web/base_src', BRequest::i()->webRoot(1))
+    ->set('web/base_src', $storeRoot)
+    ->set('web/base_store', $storeRoot)
     ->set('web/base_href', BRequest::i()->webRoot())
 ;
 if (file_exists(__DIR__.'/index.local.php')) {
