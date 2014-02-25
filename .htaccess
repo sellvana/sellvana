@@ -9,6 +9,11 @@ Options -Indexes +FollowSymLinks -MultiViews
     DirectoryIndex index.php
 </IfModule>
 
+<IfModule mod_security.c>
+SecFilterEngine Off
+SecFilterScanPOST Off
+</IfModule>
+
 <IfModule mod_expires.c>
     ExpiresActive On
     ExpiresDefault "access plus 1 months"

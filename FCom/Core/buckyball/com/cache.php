@@ -63,6 +63,17 @@ class BCache extends BClass
         return $this;
     }
 
+    public function setBackend($type)
+    {
+        $this->_defaultBackend = $type;
+        return $this;
+    }
+
+    public function getAllbackends()
+    {
+        return $this->_backends;
+    }
+
     public function getBackend($type=null)
     {
         if (is_null($type)) { // type not specified
@@ -375,11 +386,15 @@ class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
 
     public function info()
     {
-        return array('available' => class_exists('Memcache', false), 'rank' => 10);
+        //TODO: explicit configuration
+        return array('available' => class_exists('Memcache', false) && $this->init(), 'rank' => 10);
     }
 
     public function init($config = array())
     {
+        if ($this->_conn) {
+            return true;
+        }
         if (empty($config['prefix'])) {
             $config['prefix'] = substr(md5(__DIR__), 0, 16).'/';
         }
@@ -392,7 +407,7 @@ class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
         $this->_config = $config;
         $this->_flags = !empty($config['compress']) ? MEMCACHE_COMPRESSED : 0;
         $this->_conn = new Memcache;
-        return $this->_conn->pconnect($config['host'], $config['port']);
+        return @$this->_conn->pconnect($config['host'], $config['port']);
     }
 
     public function load($key)
