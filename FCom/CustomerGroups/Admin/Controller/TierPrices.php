@@ -57,7 +57,8 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
                 ),
                 'events'=>array(
                     'init-detail','delete','mass-delete'
-                )
+                ),
+                'callbacks' => array('after_render' => 'addClassUnique')
             )
         );
         return $grid;
