@@ -240,7 +240,7 @@ class BLayout extends BClass
 
             return $this;
         }
-        $rootDir1 = realpath($rootDir);
+        $rootDir1 = str_replace('\\', '/', realpath($rootDir));
 
         if (!$rootDir1) {
             BDebug::warning('Invalid root view dir: '.$rootDir);
@@ -271,19 +271,20 @@ class BLayout extends BClass
                 if (!$rootDir) {
                     continue;
                 }
-                $files = BUtil::globRecursive($rootDir . '/*');
+                $files = BUtil::globRecursive($rootDir);
                 if (!$files) {
                     continue;
                 }
-                $prefix = $dirData[1]; // orefix
+                $prefix = $dirData[1]; // prefix
                 if ($prefix) {
                     $prefix = rtrim($prefix, '/') . '/';
                 }
                 $re = '#^(' . preg_quote($rootDir . '/', '#') . ')(.*)(' . static::$_extRegex . ')$#';
                 foreach ($files as $file) {
-                    if (!is_file($file)) {
+                    // highly unlikely that the folder will match template regex, but saves I/O
+                    /*if (!is_file($file)) { 
                         continue;
-                    }
+                    }*/
                     if (preg_match($re, $file, $m)) {
                         $viewName = $prefix . $m[2];
                         $viewParams = array(
@@ -338,7 +339,7 @@ class BLayout extends BClass
             return $this;
         }
         $this->setViewRootDir($rootDir);
-        $files = BUtil::globRecursive($rootDir . '/*');
+        $files = BUtil::globRecursive($rootDir);
         if (!$files) {
             return $this;
         }
@@ -348,9 +349,10 @@ class BLayout extends BClass
         }
         $re = '#^(' . preg_quote($rootDir . '/', '#') . ')(.*)(' . static::$_extRegex . ')$#';
         foreach ($files as $file) {
-            if (!is_file($file)) {
+            // highly unlikely that the folder will match template regex, but saves I/O
+            /*if (!is_file($file)) {
                 continue;
-            }
+            }*/
             if (preg_match($re, $file, $m)) {
                 //$this->view($prefix.$m[2], array('template'=>$m[2].$m[3]));
                 $viewParams = array(

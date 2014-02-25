@@ -28,9 +28,11 @@ class BTwig extends BClass
 
     public static function init($path=null)
     {
-
+        BClassAutoload::i(true, array('root_dir' => __DIR__.'/lib'));
+        /*
         require_once __DIR__.'/lib/Twig/Autoloader.php';
         Twig_Autoloader::register();
+        */
 
         $config = BConfig::i();
 
