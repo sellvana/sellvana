@@ -2,7 +2,7 @@
 <script>
 
 var g_vent;
-    require(['jquery','underscore','backbone'], function($, _, Backbone) {
+    require(['jquery','underscore','backbone', 'jquery.validate', 'unique'], function($, _, Backbone) {
 
         var prices, submiting = true;
         var json = {
@@ -12,6 +12,13 @@ var g_vent;
 
         $('#catalog-products-form').submit(function(ev) {
             json.remove_ids = _.difference(json.remove_ids, prices.pluck('id'));
+            prices.each(function (data) {
+                var tr = $('#tier-prices tbody').find('tr[id="'+ data.id  +'"]');
+                data.set('qty', tr.find('input[data-col="qty"]').val());
+                data.set('sale_price', tr.find('input[data-col="sale_price"]').val());
+                data.set('base_price', tr.find('input[data-col="base_price"]').val());
+                data.set('group_id', tr.find('select[data-col="group_id"]').val());
+            });
             var rows = prices.toJSON();
             for(var i in rows) {
                 rows[i] = _.pick(rows[i], 'id', 'group_id', 'product_id', 'qty', 'base_price', 'sale_price', '_new');
@@ -19,6 +26,7 @@ var g_vent;
             json.rows = rows;
 
             $("#product_price_info").val(JSON.stringify(json));
+            return false;
         });
 
 
