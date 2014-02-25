@@ -1,13 +1,14 @@
 {% set m = THIS.get('model') %}
 {% set prodImagesConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
-{% set mediaLibImageConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_images', 'folder': 'media/product/images'}) %}
+{% set mediaLibImageConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_images', 'folder': 'media/product/images', 'callbacks': {'after_render': 'renderImage'}}) %}
 <input type='hidden' name="grid[images][del]" id='prod-image-remove' />
 <input type='hidden' name="grid[product_images][rows]" id='prod-image-rows' />
+<input type='hidden' id='main-thumb-image' value="" />
 
 <script>
 require(['jquery', 'unique'], function($) {
     var prod_image_rows = [], editedRows = [], removedIds = [], originRows = [];
-
+    var gridAllImage = $('#all_images tbody');
     function _getAttachmentsDbFields(row) {
         var keys = ['id', 'file_id', 'label', 'position', '_new'];
         var ret = {};
@@ -60,7 +61,6 @@ require(['jquery', 'unique'], function($) {
                 addButton.addClass('disabled');
             }
             addButton.html(caption);
-            $('#all_images tbody').find('tr[id="'+ ev.rows.file_id +'"]').hide();
         }
     });
 
@@ -75,7 +75,7 @@ require(['jquery', 'unique'], function($) {
             if (_.indexOf(removedIds,ev.id) !== -1)
                 return;
             removedIds[removedIds.length] = ev.id;
-            $('#all_images tbody').find('tr[id="'+ ev.row.file_id +'"]').show();
+            gridAllImage.find('tr[id="'+ ev.row.file_id +'"]').removeClass('hidden');
             _setFormVal();
         }
     });
@@ -84,7 +84,7 @@ require(['jquery', 'unique'], function($) {
         if(ev.grid === 'product_images') {
 //            var ids = _.pluck(ev.rows, 'id');
             for(var i in ev.rows) {
-                $('#all_images tbody').find('tr[id="'+ ev.rows[i].file_id +'"]').show();
+                gridAllImage.find('tr[id="'+ ev.rows[i].file_id +'"]').removeClass('hidden');
                 removedIds[removedIds.length] = ev.rows[i].id;
             }
 
@@ -121,7 +121,7 @@ require(['jquery', 'unique'], function($) {
 //            editedRows[editedRows.length] = row;
             var hidden = '<input type="hidden" name="product_images['+ row.id +'][file_id]" value="'+ row.file_id +'" />';
             $('#tab-images').append(hidden);
-            $('#all_images tbody').find('tr[id="'+ row.file_id +'"]').hide();
+            gridAllImage.find('tr[id="'+ row.file_id +'"]').addClass('hidden');
         }
         console.log(objs);
         g_vent.trigger('silent_inject', {grid: 'product_images', rows: prod_image_rows});
@@ -276,11 +276,23 @@ require(['jquery', 'unique'], function($) {
     </div>
 </div>
 <script>
+    var mainThumb = $('#main-thumb-image');
     function afterRenderImageGrid(el, row) {
-        if (row.main_thumb == 1) {
-            $(el).find('input[type="radio"]').prop('checked', true);
+        var input = $(el).find('input[type="radio"]');
+        if (mainThumb.val() == '' && row.main_thumb == 1) {
+            input.prop('checked', true);
+        }
+        if (mainThumb.val() == row.id) {
+            input.prop('checked', true);
         }
     }
+
+    function renderImage(el, row) {
+        if ($('#product_images').find('input[data-file-id="'+ row.id+'"]').length > 0) {
+            $(el).addClass('hidden');
+        }
+    }
+
     if (typeof(g_vent) === 'undefined') {
         g_vent = _.extend(Backbone.Event);
     }
@@ -288,9 +300,7 @@ require(['jquery', 'unique'], function($) {
         console.log('all_images');
         console.log(g_vent);
         var prod_image_rows = [];
-        $('#product_images').find('input[type="radio"]').each(function () {
-            $('#all_images tbody').find('tr[id="'+ $(this).attr('data-file-id') +'"]').hide();
-        });
+
         $('#prod-image-checkbox').change(function() {
             prod_image_rows = [];
         });
@@ -316,7 +326,9 @@ require(['jquery', 'unique'], function($) {
                 }
             }
         });
-
+        $('body').on('click', '.main-thumb', function () {
+            mainThumb.val($(this).parents('tr').attr('id'));
+        });
     });
 
 
