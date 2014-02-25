@@ -55,6 +55,9 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'events' => array('add','select-rows','init')
             )
         );
+        if (isset($options['callbacks'])) {
+            $config['config']['callbacks'] = $options['callbacks'];
+        }
         if (!empty($options['config'])) {
             $config = BUtil::arrayMerge($config, $options['config']);
         }

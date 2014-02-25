@@ -232,7 +232,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
                     array('name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline'),
                     array('name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true)),
-                    array('name'=>'main_thumb', 'label'=>'Thumbnail', 'width'=>50, 'print' => '"<input value=\'"+rc.row["id"]+"\' type=\'radio\' data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"'),
+                    array('name'=>'main_thumb', 'label'=>'Thumbnail', 'width'=>50, 'print' => '"<input class=\'main-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"'),
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
                     array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>true, 'delete'=>true))
@@ -552,7 +552,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                         if ($mediaModel) {
                             $mediaModel->set($image)->save();
                         } else {
-                            if (isset($image['file_id'])) {
+                            $productMediaModel = $hlp->orm()->where('product_id', $model->id)->where('file_id', $image['file_id'])->find_one();
+                            if (!$productMediaModel) {
                                 $image['file_id'] = (int) $image['file_id'];
                                 $image['product_id'] = $model->id;
                                 $image['media_type'] = $type;
@@ -561,7 +562,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                                 //'remote_url' =>BApp::href('/media/grid/download?folder=media/product/attachment&file_='.$row['file_id']),
                                 $hlp->create($image)->save();
                             }
-
                         }
                     }
 
