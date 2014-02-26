@@ -9,7 +9,7 @@
         <button class="btn btn-primary btn-sm" id="btn_add_var_field" type="button">Add Field</button>
     </div>
     <div class="col-sm-8" style="position: relative">
-        <ol id="field" class="dd-list columns dd-list-axis-x"></ol>
+        <ol id="variants-tab-field" class="dd-list columns dd-list-axis-x"></ol>
     </div>
 </div>
 <div class="hidden" id="grid-field-hidden">
@@ -29,6 +29,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
     var vColsCollection = null;
     var vRowsCollection = null;
     var valueCurrentField = Array();
+    var vField = $('#variants-tab-field');
     var arrField = Array();
     g_vent.trigger('get_rows_collection',
                     {
@@ -51,7 +52,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
         var mapField = fieldCollection.map(function (obj) {
             return {id: obj.id, name: obj.get('name')};
         });
-        console.log(mapField.indexOf({id: 5, name: "nguyen"}));
         $('#variant-grid thead tr').find('th').each(function () {
             var self = this;
             mapField.forEach(function (obj) {
@@ -60,11 +60,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
 
                     var fields = '<li class="dd-item dd3-item"><div class="icon-ellipsis-vertical dd-handle dd3-handle"></div><div class="dd3-content">' +
                             '<label>'+ obj.name +'</label> <i data-name="'+ obj.name +'" data-id="'+ obj.id +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
-                    $('#field').append(fields);
+                    vField.append(fields);
                 }
             });
         });
-        $('#field').sortable({
+        vField.sortable({
             scroll: false,
 //            axis:'x',
             update: function(event, ui) {
@@ -80,11 +80,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
 
         var variant_fields = [];
         var tmp_fields = [];
-        $('#field').find('i.icon-remove').each(function () {
+        vField.find('i.icon-remove').each(function () {
             variant_fields.push({id: $(this).attr('data-id'), name: $(this).attr('data-name')});
             tmp_fields.push($(this).attr('data-name'));
         });
-        $('input[id="vfield_ids"]').val(JSON.stringify(variant_fields));
+        $('#vfield_ids').val(JSON.stringify(variant_fields));
         var variants = [];
         $('#variant-grid tbody').find('tr').each(function () {
             var variant = {};
@@ -112,7 +112,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
            variant.fields = fvals;
            variants.push(variant);
         });
-        $('input[id="variants"]').val(JSON.stringify(variants));
+        $('#variants').val(JSON.stringify(variants));
         return true;
     });
 
@@ -135,7 +135,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
                         vRowsCollection.each( function(row) { row.set(text, ''); } );
                         var fields = '<li class="dd-item dd3-item"><div class="icon-ellipsis-vertical dd-handle dd3-handle"></div><div class="dd3-content">' +
                                 '<label>'+ text +'</label> <i data-name="'+ text +'" data-id="'+ val +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
-                        $('#field').append(fields);
+                        vField.append(fields);
                         renderGrid();
                     }
                 }
@@ -163,7 +163,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
     function renderGrid()
     {
         arrField = Array();
-        $('#field').find('i.icon-remove').each(function () {
+        vField.find('i.icon-remove').each(function () {
             var col = vColsCollection.findWhere({name: $(this).attr('data-name')});
             removeColumn(col.attributes);
             arrField.push({id: $(this).attr('data-id'), name: $(this).attr('data-name'), options: col.get('options')});
