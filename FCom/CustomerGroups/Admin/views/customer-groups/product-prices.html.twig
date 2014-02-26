@@ -22,7 +22,7 @@ var g_vent;
             var error = true;
             json.remove_ids = _.difference(json.remove_ids, prices.pluck('id'));
             prices.each(function (data) {
-                var tr = bodyPrice.find('tr[id="'+ data.id  +'"]');
+                var tr = bodyPrice.find('#'+ data.id);
                 data.set('qty', tr.find(inputQty).val());
                 data.set('sale_price', tr.find('input[data-col="sale_price"]').val());
                 data.set('base_price', tr.find('input[data-col="base_price"]').val());

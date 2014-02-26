@@ -83,7 +83,7 @@
 <script type="template" id="main-lang-view-template">
     <div class="row multilang-field">
         <div class="col-md-2" />
-        <div class="col-md-5">
+        <div class="col-md-5" id="translate-product-<%- rc.field_name %>">
             <button type="button" style="margin-top: 5px;" class="btn btn-xs multilang"></button>
         </div>
     </div>
@@ -170,10 +170,10 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             if (langField.get('value') === '')
                 invalid++;
         });
-
-        field.view.$el.find('div.col-md-5:last').find('span').remove();
+        var field_name = field.get('field_name');
+        $('#error-translate-'+ field_name).remove();
         if (invalid > 0 ) {
-            field.view.$el.find('div.col-md-5:last').append('<span class="badge badge-important">'+invalid+'</span>');
+            $('#translate-product-' + field_name).append('<span id="error-translate-'+ field_name +'" class="badge badge-important">'+invalid+'</span>');
         }
 
     }
@@ -186,9 +186,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         checkLangField(shortDescModel);
         checkLangField(descModel);
 
-        $('input[id="name_lang_fields"]').val(JSON.stringify(nameModel.langFields.toJSON()));
-        $('input[id="short_desc_lang_fields"]').val(JSON.stringify(shortDescModel.langFields.toJSON()));
-        $('input[id="desc_lang_fields"]').val(JSON.stringify(descModel.langFields.toJSON()));
+        $("#name_lang_fields").val(JSON.stringify(nameModel.langFields.toJSON()));
+        $("#short_desc_lang_fields").val(JSON.stringify(shortDescModel.langFields.toJSON()));
+        $("#desc_lang_fields").val(JSON.stringify(descModel.langFields.toJSON()));
 
         if (!$(this).valid()) {
             SystemFields.checkingForm = true;
@@ -199,6 +199,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 $(this).submit();
             }
         }
+        return false;
     });
     _.templateSettings.variable = 'rc';
 
