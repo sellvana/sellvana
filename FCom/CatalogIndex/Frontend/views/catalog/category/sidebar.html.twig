@@ -25,7 +25,7 @@
               {% else %}
                 <li><a href="{{ hlp.getUrl({ (fKey): vKey}) }}">
                      <span class="glyphicon glyphicon-unchecked"></span> {{ value['display'] }}
-                     {% if value['cnt'] %}<span class="count">{{ "(%s)" | format(value['cnt']) | _ }}</span>{% endif %}
+                     {% if value['cnt'] %}<span class="count">{{ "(%s)" | _(value['cnt']) }}</span>{% endif %}
                      </a></li>
               {% endif %}
             {% endfor %}

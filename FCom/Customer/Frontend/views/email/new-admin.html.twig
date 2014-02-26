@@ -1,5 +1,5 @@
 {% set d = THIS.get('customer') %}
-<!--{ From: "{{ "%s %s" | format(d.get('firstname'), d.get('lastname')) }}" <{{ d.get('email') }}> }-->
+<!--{ From: "{{ d.get('firstname') ~ ' ' ~ d.get('lastname') }}" <{{ d.get('email') }}> }-->
 <!--{ To: "{{ CONFIG.get('modules/FCom_Core/support_name') }}" <{{ CONFIG.get('modules/FCom_Core/support_email') }}> }-->
 <!--{ Subject: {{ "New Customer Registration" | _ }} }-->
 
@@ -7,7 +7,7 @@ Hello,
 
 A new customer registration:
 
-Name: {{ "%s %s" | format(d.get('firstname'), d.get('lastname')) }}
+Name: {{ d.get('firstname') ~ ' ' ~ d.get('lastname')) }}
 
 Email: {{ d.get('email') }}
 
