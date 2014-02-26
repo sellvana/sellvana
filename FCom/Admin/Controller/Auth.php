@@ -16,7 +16,8 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
                 if ($user) {
                     $user->login();
                     if (!empty($r['remember_me'])) {
-                        BResponse::i()->cookie('remember_me', 1, BConfig::i()->get('cookie/remember_days', 30)*86400);
+                        $days = BConfig::i()->get('cookie/remember_days');
+                        BResponse::i()->cookie('remember_me', 1, ($days ? $days : 30)*86400);
                     }
                 } else {
                     $this->message('Invalid user name or password.', 'error');

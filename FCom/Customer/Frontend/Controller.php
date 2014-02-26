@@ -60,7 +60,8 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     if ($allowLogin) {
                         $user->login();
                         if (!empty($login['remember_me'])) {
-                            BResponse::i()->cookie('remember_me', 1, BConfig::i()->get('cookie/remember_days', 30)*86400);
+                            $days = BConfig::i()->get('cookie/remember_days');
+                            BResponse::i()->cookie('remember_me', 1, ($days ? $days : 30)*86400);
                         }
                     } else {
                         $this->message($errorMessage, 'error', 'frontend', array('title' => ''));
