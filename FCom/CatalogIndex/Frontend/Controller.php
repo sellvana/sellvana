@@ -18,7 +18,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_orm', array('data'=>$productsData['orm']));
         $r = BRequest::i()->get();
         $r['sc'] = '';
-        $paginated = $productsData['orm']->paginate($r);
+        $paginated = $productsData['orm']->paginate($r, array('ps'=>10));
         $paginated['state']['sc'] = BRequest::i()->get('sc');
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
@@ -81,7 +81,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         $productsData = FCom_CatalogIndex_Indexer::i()->searchProducts($q);
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_orm', array('data'=>$productsData['orm']));
-        $paginated = $productsData['orm']->paginate();
+        $paginated = $productsData['orm']->paginate(null, array('ps'=>10));
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', array('data'=>&$productsData));
