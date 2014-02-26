@@ -102,8 +102,7 @@ class BLayout extends BClass
     protected static $_metaDirectives = array(
         'remove'   => 'BLayout::metaDirectiveRemoveCallback',
         'callback' => 'BLayout::metaDirectiveCallback',
-        'layout'   => 'BLayout::metaDirectiveIncludeCallback',
-        'include'   => 'BLayout::metaDirectiveIncludeCallback',
+        'include'  => 'BLayout::metaDirectiveIncludeCallback',
         'root'     => 'BLayout::metaDirectiveRootCallback',
         'hook'     => 'BLayout::metaDirectiveHookCallback',
         'view'     => 'BLayout::metaDirectiveViewCallback',
@@ -282,7 +281,7 @@ class BLayout extends BClass
                 $re = '#^(' . preg_quote($rootDir . '/', '#') . ')(.*)(' . static::$_extRegex . ')$#';
                 foreach ($files as $file) {
                     // highly unlikely that the folder will match template regex, but saves I/O
-                    /*if (!is_file($file)) { 
+                    /*if (!is_file($file)) {
                         continue;
                     }*/
                     if (preg_match($re, $file, $m)) {
@@ -396,6 +395,8 @@ class BLayout extends BClass
     /**
      * Alias for getView()
      *
+     * Not sure whether to leave view() for convenience
+     *
      * @param string  $viewName
      * @return BView|BLayout
      */
@@ -405,12 +406,12 @@ class BLayout extends BClass
     }
 
     /**
-     * Not sure whether to leave view() for convenience
-     *
      * Return registered view
      *
+     * Returns BViewEmpty to avoid errors in templates or controllers, when methods are chained
+     *
      * @param mixed $viewName
-     * @return null|BView
+     * @return BView
      */
     public function getView($viewName)
     {
