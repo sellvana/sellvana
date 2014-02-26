@@ -173,6 +173,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
 
         try {
             $id = BRequest::i()->param('id', true);
+            $id = preg_replace('#^[^0-9]+#', '', $id);
             if (!$id || !($model = $class::i()->load($id))) {
                 throw new Exception('Invalid node ID');
             }
