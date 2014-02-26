@@ -1703,7 +1703,7 @@ class BSession extends BClass
             BUtil::ensureDir($dir);
             session_save_path($dir);
         }
-        ini_set('session.gc_maxlifetime', $rememberMeTtl);
+        #ini_set('session.gc_maxlifetime', $rememberMeTtl); // moved to .haccess
 
         if (!empty($id) || ($id = BRequest::i()->get('SID'))) {
             session_id($id);

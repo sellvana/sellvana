@@ -33,6 +33,11 @@ SecFilterScanPOST Off
     # php_value memory_limit 2G
     php_value upload_max_filesize 40M
     php_value post_max_size 40M
+
+    # 30 days for remember_me feature
+    php_value session.gc_maxlifetime 2592000
+    php_value session.gc_divisor 100
+    php_value session.gc_probability 1
 </IfModule>
 
 <IfModule mod_php5.c>
@@ -42,6 +47,11 @@ SecFilterScanPOST Off
     # php_value memory_limit 2G
     php_value upload_max_filesize 40M
     php_value post_max_size 40M
+
+    # 30 days for remember_me feature
+    php_value session.gc_maxlifetime 2592000
+    php_value session.gc_divisor 100
+    php_value session.gc_probability 1
 </IfModule>
 
 <IfModule mod_rewrite.c>
