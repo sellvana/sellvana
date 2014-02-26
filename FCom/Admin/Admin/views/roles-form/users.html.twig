@@ -32,8 +32,8 @@
 
             this.add_ids = _.difference(this.add_ids,this.original_ids);
             this.remove_ids = _.intersection(this.remove_ids, this.original_ids);
-            $("input[id='user_ids_add']").val(this.add_ids.join(','));
-            $("input[id='user_ids_remove']").val(this.remove_ids.join(','));
+            $('#user_ids_add').val(this.add_ids.join(','));
+            $('#user_ids_remove').val(this.remove_ids.join(','));
 
             console.log(this.original_ids);
             console.log(this.add_ids);
@@ -76,8 +76,8 @@
         UserRoleMng.prototype.reset = function() {
             this.add_ids = [];
             this.remove_ids = [];
-            $("input[id='user_ids_add']").val('');
-            $("input[id='user_ids_remove']").val('');
+            $('#user_ids_add').val('');
+            $('#user_ids_remove').val('');
         }
         var self = new UserRoleMng();
         roleUserMng = self;

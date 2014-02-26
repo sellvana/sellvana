@@ -1259,9 +1259,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
 
                     var operator = $(ev.target);
+                    var text = operator.html();
                     this.model.set('op', operator.attr('data-id'));
                     this.model.set('filterLabel', operator.html());
-                    this.$el.find('button.filter-text-sub').html(operator.html() + "<span class='caret'></span>");
+                    text = text.charAt(0).toUpperCase() + text.slice(1);
+                    this.$el.find('button.filter-text-sub').html(text + "<span class='caret'></span>");
                     this.$el.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
 
                     return false;
@@ -1285,16 +1287,17 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 render: function () {
                     BackboneGrid.Views.FilterCell.prototype.render.call(this);
                     var self = this.$el;
+                    var model = this.model;
                     this.$el.find('#daterange2').daterangepicker({
                         format: "YYYY-MM-DD"
                     }, function (start, end) {
-                        return self.find("#daterange2").parent().find("input").first().val(start.format("YYYY-MM-DD") + "~" + end.format("YYYY-MM-DD"));
+                        return $('#date-range-text-' + model.get('field')).val(start.format("YYYY-MM-DD") + "~" + end.format("YYYY-MM-DD"));
                     });
                     this.$el.find(".datepicker").datetimepicker({
                         pickTime: false
                     });
 
-                    $('div.daterangepicker').on('click', function (ev) {
+                    $('.daterangepicker').on('click', function (ev) {
                             ev.stopPropagation();
                             ev.preventDefault();
 

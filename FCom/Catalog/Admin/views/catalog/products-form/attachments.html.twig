@@ -36,8 +36,8 @@ require(['jquery', 'unique'], function($) {
             editedRows[i] = _getAttachmentsDbFields(editedRows[i]);
         }
         console.log(editedRows);
-        $("input[id='prod-attach-rows']").val(JSON.stringify(editedRows));
-        $("input[id='prod-attach-remove']").val(removedIds.join(','));
+        $('#prod-attach-rows').val(JSON.stringify(editedRows));
+        $('#prod-attach-remove').val(removedIds.join(','));
     }
 
     g_vent.bind('init-detail', function(ev) {
@@ -50,7 +50,7 @@ require(['jquery', 'unique'], function($) {
         if (ev.grid === 'all_attachments') {
             prod_img_rows = ev.rows;
             var caption = 'Add';
-            var addButton = $('button.btn-add.prod-attachments-modal-add');
+            var addButton = $('#prod-attachments-modal-add');
             if(prod_img_rows.length>0) {
                 if (prod_img_rows.length==1) {
                     caption += ' a row';
@@ -108,7 +108,7 @@ require(['jquery', 'unique'], function($) {
         }
     });
 
-    $('button.btn-add.prod-attachments-modal-add').click(function() {
+    $('#prod-attachments-modal-add').click(function() {
         var objs = _.clone(prod_img_rows);
 //        originFileIds = _.pluck(originRows, 'file_id');
 //        addedFileIds = _.pluck(editedRows, 'file_id');
@@ -272,7 +272,7 @@ require(['jquery', 'unique'], function($) {
                 </div>
             </div>
             <div class='modal-footer'>
-                <button class='btn btn-primary btn-add prod-attachments-modal-add disabled' data-dismiss='modal' type='button'>{{ "Add"|_ }}</button>
+                <button id="prod-attachments-modal-add" class='btn btn-primary btn-add  disabled' data-dismiss='modal' type='button'>{{ "Add"|_ }}</button>
                 <button class='btn btn-default btn-close prod-attachments-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
             </div>
         </div>
@@ -310,7 +310,7 @@ require(['jquery', 'unique'], function($) {
                     prod_img_rows[prod_img_rows.length] = data.result;
                     if ($('tr.template-upload').length === 0) {
                         g_vent.trigger('select-rows', {grid: 'all_attachments', rows:prod_img_rows});
-                        $('button.btn-add.prod-attachments-modal-add').trigger('click');
+                        $('#prod-attachments-modal-add').trigger('click');
                     }
                 }
             }

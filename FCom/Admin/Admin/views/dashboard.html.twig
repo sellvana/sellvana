@@ -32,7 +32,7 @@
                 <div class="input-group">
                     <div class="input-group-btn  dropdown" >
                         <button class='btn btn-default dropdown dropdown-toggle filter-text-sub ' data-toggle='dropdown'>
-                            {{ 'between'|_ }}
+                            {{ 'Between'|_ }}
                             <span class='caret'></span>
                         </button>
 
@@ -56,7 +56,7 @@
                     </div>
 
                     <div class="input-group range"  >
-                        <input type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange" value="">
+                        <input id="data-range-picker-text" type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange" value="">
                     <span id="daterange2" class="input-group-addon">
                       <i class="icon-calendar"></i>
                     </span>
@@ -224,9 +224,9 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
   $("#daterange2").daterangepicker({
     format: "YYYY-MM-DD"
   },function (start, end) {
-    return $("#daterange2").parent().find("input").first().val(start.format("YYYY-MM-DD") + "~" + end.format("YYYY-MM-DD"));
+    return $("#data-range-picker-text").val(start.format("YYYY-MM-DD") + "~" + end.format("YYYY-MM-DD"));
   });
-  $('div.daterangepicker').on('click', function (ev) {
+  $('.daterangepicker').on('click', function (ev) {
     ev.stopPropagation();
     ev.preventDefault();
     return false;
@@ -249,8 +249,9 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
           custom.find('div.range').css('display', 'none');
           custom.find('div.not_range').css('display', 'table');
       }
-      var operator = $(ev.target);
-      custom.find('button.filter-text-sub').html(operator.html() + "<span class='caret'></span>");
+      var text = $(ev.target).html();
+      text = text.charAt(0).toUpperCase() + text.slice(1);
+      custom.find('button.filter-text-sub').html(text + "<span class='caret'></span>");
       custom.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
 
       return false;
