@@ -4,7 +4,7 @@
 {% if reviews %}
     {% set prod = THIS.get('product') %}
     <a href="{{ APP.href('prodreviews/add') }}?pid={{ prod.get('id') }}">{{ "Review the product" | _ }}</a><br/><br/>
-    {{ "Total reviews: %s" | format(prod.get('num_reviews')) }}<br/>
+    {{ "Total reviews: %s" | _(prod.get('num_reviews')) }}<br/>
     {% for review in reviews  %}
         {% set id = review.get("id") %}
         {% set rating = review.get("id") %}
