@@ -64,9 +64,9 @@ print_r($args); exit;
 
     public function getAvailableViews()
     {
-        $layout = BLayout::i()->getAllViews();
         $template = array();
-        foreach ($layout as $view) {
+        $allViews = FCom_Frontend_Main::i()->getLayout()->getAllViews();
+        foreach ($allViews as $view) {
             $tmp = $view->param('view_name');
             if ($tmp !='') {
                 $template[$tmp] =  $tmp;

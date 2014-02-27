@@ -253,10 +253,13 @@ class BLayout extends BClass
         return $this;
     }
 
-    public function collectAllViewsFiles()
+    public function collectAllViewsFiles($area = null)
     {
         $t = BDebug::debug(__METHOD__);
-        $cacheKey = 'ALL_VIEWS-'.BApp::i()->get('area'); //TODO: more flexible key
+        if (is_null($area)) {
+            $area = BApp::i()->get('area');
+        }
+        $cacheKey = 'ALL_VIEWS-' . $area;
         $cacheConfig = BConfig::i()->get('core/cache/view_files');
         $useCache = !$cacheConfig && BDebug::is('STAGING,PRODUCTION') || $cacheConfig === 'enable';
         if ($useCache) {
