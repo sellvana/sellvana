@@ -27,8 +27,8 @@
         <input id="model-show_cms_page" class="switch-cbx" name="model[show_cms_page]" {% if m.get('show_cms_page') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
     </div>
     <div class="col-md-5">
-        <select name="model[cms_page]" class="form-control select2"/>
-            {{ UTIL.optionsHtml(views) | raw }}
+        <select name="model[cms_page]" class="form-control select2">
+            {{ UTIL.optionsHtml(views, m.get('cms_page')) | raw }}
         </select>
     </div>
 </div>
