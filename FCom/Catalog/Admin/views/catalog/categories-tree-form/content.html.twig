@@ -61,7 +61,20 @@
 </div>
 <script>
 require(['jquery', 'jquery-ui', 'select2'], function($) {
-    $('#category-cms-page-select2').select2();
+    $('#category-cms-page-select2').select2({
+        sortResults: function(results, container, query) {
+            for (var i = 0 ; i < results.length; i ++ ) {
+                for (var j = i+1; j < results.length; j++) {
+                   if (results[i].text.toLowerCase() > results[j].text.toLowerCase()) {
+                       var tmp = results[i];
+                       results[i] = results[j];
+                       results[j] = tmp;
+                   }
+                }
+            }
+            return results;
+        }
+    });
     $('#show-order').sortable({
         scroll: false,
         revert: true,
