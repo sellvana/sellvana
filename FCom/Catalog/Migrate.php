@@ -337,4 +337,25 @@ class FCom_Catalog_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_2_16__0_2_17()
+    {
+        $tMedia = FCom_Catalog_Model_ProductMedia::table();
+        BDb::ddlTableDef($tMedia, array(
+            'COLUMNS' => array(
+                'main_thumb' => 'tinyint(1) unsigned default 0',
+            ),
+        ));
+    }
+
+    public function upgrade__0_2_17__0_2_18()
+    {
+        $tCategory = FCom_Catalog_Model_Category::table();
+        BDb::ddlTableDef($tCategory, array(
+            'COLUMNS' => array(
+                'show_cms_page' => 'tinyint(1) unsigned default null',
+                'cms_page' => 'text default null',
+            ),
+        ));
+    }
 }

@@ -123,15 +123,18 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             //you can't change address for empty cart
             if (!$cart) {
                 BResponse::i()->redirect('cart');
+                return;
             }
             if (!$address) {
                 $this->message('Cannot find address you select, please try again', 'error');
                 BResponse::i()->redirect('customer/address/choose' . '?t=' . $type);
+                return;
             }
             //you can't choose address which is not belongs to you
             if ($customer->id() != $address->get('customer_id')) {
                 $this->message('You can\'t choose address which is not belongs to you', 'error');
                 BResponse::i()->redirect('checkout');
+                return;
             }
             if ('s' == $type) {
                 $customer->default_shipping_id = $address->id();

@@ -203,7 +203,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         $parts = explode(',', $this->get('page_parts'));
         $result = array();
         foreach ($parts as $k) {
-            $result[$k] = $allParts[$k];
+            $result[$k] = isset($allParts[$k]) ? $allParts[$k] : null;
         }
         return $result;
     }

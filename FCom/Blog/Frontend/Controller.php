@@ -95,7 +95,12 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $postKey = $m[4];
         }
         $post = FCom_Blog_Model_Post::i()->load($postKey, 'url_key');
-        if (!$post || $post->get('status')!=='published') {
+        $adminUserId = FCom_Admin_Model_User::i()->sessionUserId();
+        if (!($post && (
+            $post->get('status') === 'published'
+            || $adminUserId && $adminUserId === $post->get('author_user_id')
+            || BRequest::i()->get('preview')
+        ))) {
             $this->forward(false);
             return;
         }

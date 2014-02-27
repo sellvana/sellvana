@@ -102,8 +102,7 @@ class BLayout extends BClass
     protected static $_metaDirectives = array(
         'remove'   => 'BLayout::metaDirectiveRemoveCallback',
         'callback' => 'BLayout::metaDirectiveCallback',
-        'layout'   => 'BLayout::metaDirectiveIncludeCallback',
-        'include'   => 'BLayout::metaDirectiveIncludeCallback',
+        'include'  => 'BLayout::metaDirectiveIncludeCallback',
         'root'     => 'BLayout::metaDirectiveRootCallback',
         'hook'     => 'BLayout::metaDirectiveHookCallback',
         'view'     => 'BLayout::metaDirectiveViewCallback',
@@ -240,7 +239,7 @@ class BLayout extends BClass
 
             return $this;
         }
-        $rootDir1 = realpath($rootDir);
+        $rootDir1 = str_replace('\\', '/', realpath($rootDir));
 
         if (!$rootDir1) {
             BDebug::warning('Invalid root view dir: '.$rootDir);
@@ -254,10 +253,13 @@ class BLayout extends BClass
         return $this;
     }
 
-    public function collectAllViewsFiles()
+    public function collectAllViewsFiles($area = null)
     {
         $t = BDebug::debug(__METHOD__);
-        $cacheKey = 'ALL_VIEWS-'.BApp::i()->get('area'); //TODO: more flexible key
+        if (is_null($area)) {
+            $area = BApp::i()->get('area');
+        }
+        $cacheKey = 'ALL_VIEWS-' . $area;
         $cacheConfig = BConfig::i()->get('core/cache/view_files');
         $useCache = !$cacheConfig && BDebug::is('STAGING,PRODUCTION') || $cacheConfig === 'enable';
         if ($useCache) {
@@ -271,19 +273,20 @@ class BLayout extends BClass
                 if (!$rootDir) {
                     continue;
                 }
-                $files = BUtil::globRecursive($rootDir . '/*');
+                $files = BUtil::globRecursive($rootDir);
                 if (!$files) {
                     continue;
                 }
-                $prefix = $dirData[1]; // orefix
+                $prefix = $dirData[1]; // prefix
                 if ($prefix) {
                     $prefix = rtrim($prefix, '/') . '/';
                 }
                 $re = '#^(' . preg_quote($rootDir . '/', '#') . ')(.*)(' . static::$_extRegex . ')$#';
                 foreach ($files as $file) {
-                    if (!is_file($file)) {
+                    // highly unlikely that the folder will match template regex, but saves I/O
+                    /*if (!is_file($file)) {
                         continue;
-                    }
+                    }*/
                     if (preg_match($re, $file, $m)) {
                         $viewName = $prefix . $m[2];
                         $viewParams = array(
@@ -338,7 +341,7 @@ class BLayout extends BClass
             return $this;
         }
         $this->setViewRootDir($rootDir);
-        $files = BUtil::globRecursive($rootDir . '/*');
+        $files = BUtil::globRecursive($rootDir);
         if (!$files) {
             return $this;
         }
@@ -348,9 +351,10 @@ class BLayout extends BClass
         }
         $re = '#^(' . preg_quote($rootDir . '/', '#') . ')(.*)(' . static::$_extRegex . ')$#';
         foreach ($files as $file) {
-            if (!is_file($file)) {
+            // highly unlikely that the folder will match template regex, but saves I/O
+            /*if (!is_file($file)) {
                 continue;
-            }
+            }*/
             if (preg_match($re, $file, $m)) {
                 //$this->view($prefix.$m[2], array('template'=>$m[2].$m[3]));
                 $viewParams = array(
@@ -394,6 +398,8 @@ class BLayout extends BClass
     /**
      * Alias for getView()
      *
+     * Not sure whether to leave view() for convenience
+     *
      * @param string  $viewName
      * @return BView|BLayout
      */
@@ -403,12 +409,12 @@ class BLayout extends BClass
     }
 
     /**
-     * Not sure whether to leave view() for convenience
-     *
      * Return registered view
      *
+     * Returns BViewEmpty to avoid errors in templates or controllers, when methods are chained
+     *
      * @param mixed $viewName
-     * @return null|BView
+     * @return BView
      */
     public function getView($viewName)
     {
@@ -828,7 +834,7 @@ class BLayout extends BClass
      */
     public function metaDirectiveCallback($d)
     {
-        call_user_func($d['name'], $d);
+        BUtil::call($d['name'], $d);
     }
 
     /**

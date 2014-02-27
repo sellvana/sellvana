@@ -14,10 +14,10 @@
         'root_dir' => 'BTwig',
         'bootstrap' => array('file' => 'BTwig.php', 'callback' => 'BTwig::bootstrap' ),
     ),
-    'BReCaptcha' => array(
+    'BreCaptcha' => array(
         'version' => '1.0',
-        'root_dir' => 'BReCaptcha',
-        'bootstrap' => array('file' => 'BReCaptcha.php', 'callback' => 'BReCaptcha::bootstrap' ),
+        'root_dir' => 'BreCaptcha',
+        'bootstrap' => array('file' => 'BreCaptcha.php', 'callback' => 'BreCaptcha::bootstrap' ),
     ),
     'BHAML' => array(
         'version' => '3.2',

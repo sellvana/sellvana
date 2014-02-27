@@ -128,13 +128,13 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
     public function newShipping($address, $customer)
     {
         $data = array('address' => $address);
-        self::import($data, $customer, 'shipping');
+        static::import($data, $customer, 'shipping');
     }
 
     public function newBilling($address, $customer)
     {
         $data = array('address' => $address);
-        self::import($data, $customer, 'billing');
+        static::import($data, $customer, 'billing');
     }
 
     public static function import($data, $cust, $atype='billing')

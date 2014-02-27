@@ -230,7 +230,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     public static function createFromCart($cart, $options = array())
     {
         $cart->calculateTotals();
-        $salesOrder = self::_createFromCart($cart);
+        $salesOrder = static::_createFromCart($cart);
 
         $salesOrder->save(); // save to have valid unique_id
         if(isset($options['all_components']) && $options['all_components']){

@@ -1380,7 +1380,8 @@ class BResponse extends BClass
     {
         BEvents::i()->fire(__METHOD__, array('last_method'=>$lastMethod));
         BSession::i()->close();
-        exit;
+        BRouting::i()->stop();
+        //exit;
     }
 }
 
@@ -1425,6 +1426,13 @@ class BRouting extends BClass
     * @var string
     */
     protected $_controllerName;
+
+    /**
+     * Exit dispatch loop
+     *
+     * @var boolean
+     */
+    protected $_stop = false;
 
     /**
     * Shortcut to help with IDE autocompletion
@@ -1725,16 +1733,21 @@ class BRouting extends BClass
         $this->processRoutes();
 
         $attempts = 0;
-        $forward = false; // null: no forward, false: try next route, array: forward without new route
+        $forward = false; // null: no forward, false: try next route, true: exit loop, array: forward without new route
 #echo "<pre>"; print_r($this->_routes); exit;
-        while (($attempts++<100) && (false===$forward || is_array($forward))) {
+        while (($attempts++<100) && (false === $forward || is_array($forward))) {
             $route = $this->findRoute($requestRoute);
 #echo "<pre>"; print_r($route); echo "</pre>";
             if (!$route) {
                 $route = $this->findRoute('_ /noroute');
             }
             $this->_currentRoute = $route;
+
             $forward = $route->dispatch();
+
+            if ($this->_stop) {
+                return $this;
+            }
 #var_dump($forward); exit;
             if (is_array($forward)) {
                 list($actionName, $forwardCtrlName, $params) = $forward;
@@ -1750,18 +1763,22 @@ class BRouting extends BClass
         }
     }
 
+    public function stop($flag = true)
+    {
+        $this->_stop = $flag;
+        return $this;
+    }
+
+    public function isStopped()
+    {
+        return $this->_stop;
+    }
+
     public function debug()
     {
         echo "<pre>"; print_r($this->_routes); echo "</pre>";
     }
 }
-
-/**
-* Alias for BRouting for older implementations
-*
-* @deprecated by BRouting
-*/
-class BFrontController extends BRouting {}
 
 /**
 * Controller Route Node
@@ -2117,7 +2134,7 @@ class BActionController extends BClass
 
         $this->tryDispatch($actionName, $args);
 
-        if (is_null($this->_forward)) {
+        if (is_null($this->_forward) && !BRouting::i()->isStopped()) {
             $this->afterDispatch($args);
         }
         return $this->_forward;

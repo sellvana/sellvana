@@ -173,6 +173,7 @@ class FCom_Core_Main extends BClass
                 ->setRootView('permissions');
             BLayout::i()->view('permissions')->set('errors', $permissionErrors);
             BResponse::i()->output();
+            exit;
         }
 
 #echo "<Pre>"; print_r($config->get()); exit;
@@ -317,6 +318,18 @@ class FCom_Core_Main extends BClass
             $this->_modulesDirs[] = $dirConf['dlc_dir'].'/*/*'; // Downloaded modules
             $this->_modulesDirs[] = $dirConf['root_dir'].'/FCom/*'; // Core modules
 
+            $addModuleDirs = $config->get('core/module_dirs');
+            if ($addModuleDirs && is_array($addModuleDirs)) {
+                foreach ($addModuleDirs as $dir) {
+                    if ($dir[0]==='@') {
+                        $dir = preg_replace_callback('#^@([^/]+)#', function($m) use ($dirConf) {
+                            return $dirConf[$m[1].'_dir'];
+                        }, $dir);
+                    }
+                    $this->_modulesDirs[] = $dir;
+                }
+            }
+
             foreach ($this->_modulesDirs as $dir) {
                 $modReg->scan($dir);
             }
@@ -366,10 +379,11 @@ class FCom_Core_Main extends BClass
         }
 
         $config = BConfig::i();
-        $c = $config->get(null, true);
+        $c = $config->get(null, null, true);
 
         if (in_array('core', $files)) {
             // configuration necessary for core startup
+            unset($c['module_run_levels']['request']);
             $core = array(
                 'install_status' => !empty($c['install_status']) ? $c['install_status'] : null,
                 'core' => !empty($c['core']) ? $c['core'] : null,

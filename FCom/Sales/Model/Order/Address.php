@@ -7,7 +7,7 @@ class FCom_Sales_Model_Order_Address extends FCom_Core_Model_Abstract
 
     public function findByOrder($orderId, $atype='shipping')
     {
-        return self::i()->orm()->where("order_id",$orderId)->where('atype', $atype)->find_one();
+        return static::i()->orm()->where("order_id",$orderId)->where('atype', $atype)->find_one();
     }
 
     public static function as_html($obj=null)
@@ -55,7 +55,7 @@ class FCom_Sales_Model_Order_Address extends FCom_Core_Model_Abstract
 
         $newAddress = $this->findByOrder($orderId, $address['atype']);
         if (!$newAddress) {
-            $newAddress = self::create($address);
+            $newAddress = static::create($address);
         } else {
             $newAddress->set($address);
         }

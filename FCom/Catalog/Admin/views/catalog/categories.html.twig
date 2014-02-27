@@ -63,22 +63,24 @@
                 var id = $(node).attr('id');
                 $(node).find("a").addClass("jstree-loading");
                 var url = '{{ formUrl }}?id='+id;
-                $('#categories-form-container').load(url, function() {
-                    $('#categories-tree-form').attr('action', url);
-                    window.adminForm = FCom.Admin.form({
-                        tabs:     '.adm-tabs li',
-                        panes:    '.adm-tabs-content',
-                        url_get:  url,
-                        url_post: url
+                if (typeof (id) !== 'undefined') {
+                    $('#categories-form-container').load(url, function() {
+                        $('#categories-tree-form').attr('action', url);
+                        window.adminForm = FCom.Admin.form({
+                            tabs:     '.adm-tabs li',
+                            panes:    '.adm-tabs-content',
+                            url_get:  url,
+                            url_post: url
+                        });
+                        //clear instances CKEDITOR
+                        if (CKEDITOR !== 'undefined') {
+                            CKEDITOR.instances = {};
+                        }
+                        adminForm.createSwitchButton();
+                        adminForm.wysiwygInit();
+                        $(node).find("a").removeClass("jstree-loading");
                     });
-                    //clear instances CKEDITOR
-                    if (CKEDITOR !== 'undefined') {
-                        CKEDITOR.instances = {};
-                    }
-                    adminForm.createSwitchButton();
-                    adminForm.wysiwygInit();
-                    $(node).find("a").removeClass("jstree-loading");
-                });
+                }
             }
 
         })
