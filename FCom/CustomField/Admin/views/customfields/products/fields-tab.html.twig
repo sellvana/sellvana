@@ -211,47 +211,53 @@ CONFLICT END #}
 
         <script type="template" id="field-template">
         <div class="row">
-            <label class="col-md-3 control-label control-handle" for="prod-review-text"><%- (rc.field_name === -1 ? '<span class="badge badge-important">'+rc.lang_code+'</span>' : rc.field_name) %></label>
-            <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
-                <% switch(rc.admin_input_type) {
+            <div class="col-md-9 col-lg-push-3">
+                <label class="col-md-2 control-label dd-handle control-handle" for="prod-review-text">
+                    <div class="icon-ellipsis-vertical dd-handle dd3-handle"></div>
+                    <%- (rc.field_name === -1 ? '<span class="badge badge-important">'+rc.lang_code+'</span>' : rc.field_name) %>
+                </label>
+                <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '6' : '3'); %>">
+                    <% switch(rc.admin_input_type) {
                     case 'text':
-                        print('<input '+(rc.required === '1' ? 'data-rule-required="true"' : '') +'name="'+guid()+'" value="'+rc.value+'" class="form-control" type="text" />');
+                    print('<input '+(rc.required === '1' ? 'data-rule-required="true"' : '') +'name="'+guid()+'" value="'+rc.value+'" class="form-control" type="text" />');
 
-                        break;
+                    break;
                     case 'textarea':
-                        print('<textarea '+(rc.required === '1' ? 'data-rule-required="true"' : '') +' name="'+guid()+'" class="form-control" >'+rc.value+'</textarea>');
+                    print('<textarea '+(rc.required === '1' ? 'data-rule-required="true"' : '') +' name="'+guid()+'" class="form-control" >'+rc.value+'</textarea>');
 
-                        break;
+                    break;
                     case 'wysiwyg':
-                        print('<textarea name="'+guid()+'" id="'+guid()+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
+                    print('<textarea name="'+guid()+'" id="'+guid()+'" class="form-control ckeditor" >'+rc.value+'</textarea>');
 
-                        break;
+                    break;
                     case 'select':
                     case 'multiselect':
-                        print('<select '+(rc.required === '1' ? 'data-rule-required="true"' : '') +(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' name="'+guid()+'" class="form-control" >');
-                        print("<option value=''>&nbsp;</option>");
-                        vals = rc.value.split(',');
-                        for(key in rc.options) {
-                            print('<option value="'+key+'" '+(vals.indexOf(key) !== -1 ? 'selected' : '')+'>'+rc.options[key]+'</option>');
-                        }
-                        print('</select>');
+                    print('<select '+(rc.required === '1' ? 'data-rule-required="true"' : '') +(rc.admin_input_type ==='multiselect' ? 'multiple' : '')+' name="'+guid()+'" class="form-control" >');
+                    print("<option value=''>&nbsp;</option>");
+                    vals = rc.value.split(',');
+                    for(key in rc.options) {
+                    print('<option value="'+key+'" '+(vals.indexOf(key) !== -1 ? 'selected' : '')+'>'+rc.options[key]+'</option>');
+                    }
+                    print('</select>');
 
-                        break;
+                    break;
                     case 'boolean':
-                        print('<input type="hidden" name="'+guid()+'" name="'+guid()+'" value="'+rc.value+'" /><input class="switch-cbx" id="'+guid()+'" name="'+guid()+'" type="checkbox" value="'+rc.value+'" '+((rc.value === '' || rc.value === '1') ? 'checked' : '')+' style="margin-top: 11px;"/>');
+                    print('<input type="hidden" name="'+guid()+'" name="'+guid()+'" value="'+rc.value+'" /><input class="switch-cbx" id="'+guid()+'" name="'+guid()+'" type="checkbox" value="'+rc.value+'" '+((rc.value === '' || rc.value === '1') ? 'checked' : '')+' style="margin-top: 11px;"/>');
 
-                        break;
-                } %>
-            </div>
-            <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '3' : '6'); %>">
-                <button class="btn btn-danger btn-xs field-remove"  style="margin-top: 5px;" type="button">
-                    <i class="icon-remove"></i>
-                </button>
+                    break;
+                    } %>
+                </div>
+                <div class="col-md-<% print(rc.admin_input_type === 'wysiwyg' ? '3' : '6'); %>">
+                    <button class="btn btn-danger btn-xs field-remove"  style="margin-top: 5px;" type="button">
+                        <i class="icon-remove"></i>
+                    </button>
 
-                <!--a class="btn btn-success btn-xs field-refresh" href="#" style="margin-top: 5px;">
-                    <i class="icon-refresh"></i>
-                </a-->
+                    <!--a class="btn btn-success btn-xs field-refresh" href="#" style="margin-top: 5px;">
+                        <i class="icon-refresh"></i>
+                    </a-->
+                </div>
             </div>
+
         </div>
         <% if (rc.multilang === '1' && (rc.admin_input_type === 'text' || rc.admin_input_type === 'textarea' || rc.admin_input_type === 'wysiwyg')) { %>
         <div class="row">
@@ -330,7 +336,7 @@ CONFLICT END #}
 $('#fcom_append_form').append('<form id="prod-new-field-form1" class="form form-horizontal validate-form"/>');
 var html = $("#prod-new-field-modal").html();
 $("#prod-new-field-modal").remove();
-$('form#prod-new-field-form1').append(html);
+$('#prod-new-field-form1').append(html);
 
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
     var setValidateForm = function(selector) {
@@ -440,7 +446,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             }
         });
     });
-    var _mainForm = $('form#catalog-products-form');
+    var _mainForm = $('#catalog-products-form');
 
     function checkFieldSet()
     {
@@ -514,7 +520,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         }
     });
 
-    var _appendForm = $('form#prod-new-field-form1');
+    var _appendForm = $('#prod-new-field-form1');
     setValidateForm($(_appendForm));
     $('#field_code').rules("add", {
         onfocusout: false,
@@ -536,8 +542,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         }
     });
     $('#btn_new_field').click(function() {
-        $('div#prod-new-field-form').find('input').val('');
-        $('div#prod-new-field-form').find('select').each(function(index) {
+        $('#prod-new-field-form').find('input').val('');
+        $('#prod-new-field-form').find('select').each(function(index) {
             $(this).find('option').removeAttr('selected');
             $(this).find('option:first').attr('selected','selected');
         })
@@ -988,15 +994,17 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
 //            $('#btn_add_field').css('display', 'inline-block');
         }
 
-        $( ".prod-fieldset .box-content" ).sortable({
-            revert: true,
-            connectWith: ".prod-fieldset .box-content",
-            handle: '.control-handle'
-        });
+//        $( ".prod-fieldset .box-content" ).sortable({
+//            revert: true,
+//            axis: 'y',
+//            connectWith: ".prod-fieldset .box-content",
+//            handle: '.control-handle'
+//        });
     });
 
     $( ".prod-fieldset .box-content" ).sortable({
         revert: true,
+        axis: 'y',
         connectWith: ".prod-fieldset .box-content",
         handle: '.control-handle'
     });
