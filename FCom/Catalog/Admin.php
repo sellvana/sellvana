@@ -64,10 +64,23 @@ print_r($args); exit;
 
     public function getAvailableViews()
     {
+        $layout = BLayout::i()->getAllViews();
+        $template = array();
+        foreach ($layout as $view) {
+            $tmp = $view->param('view_name');
+            if ($tmp !='') {
+                $template[$tmp] =  $tmp;
+            }
+        }
+        $cmsBlocks = array();
+        $blocks = BDb::many_as_array(FCom_Cms_Model_Block::i()->orm()->select('id')->select('description')->find_many());
+        foreach ($blocks as $block) {
+            $cmsBlocks['cms_'.$block['id']] = $block['description'];
+        }
         return array(
             '' => '',
-            '@CMS Pages' => array(),
-            '@Templates' => array(),
+            '@CMS Pages' => $cmsBlocks,
+            '@Templates' => $template,
         );
     }
 }
