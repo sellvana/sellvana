@@ -497,7 +497,7 @@
             </div>
 
             <div class="input-group range" <%= !rc.range ? 'style="display:none;"' :'style="display:table;"' %> >
-                <input type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange" value="<%= rc.range ? rc.val : '' %>">
+                <input id="date-range-text-<%- rc.field %>" type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange" value="<%= rc.range ? rc.val : '' %>">
                 <span id="daterange2" class="input-group-addon">
                   <i class="icon-calendar"></i>
                 </span>

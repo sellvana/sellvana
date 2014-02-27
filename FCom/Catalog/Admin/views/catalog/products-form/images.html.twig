@@ -35,8 +35,8 @@ require(['jquery', 'unique'], function($) {
         for(var i in editedRows) {
             editedRows[i] = _getAttachmentsDbFields(editedRows[i]);
         }
-        $("input[id='prod-image-rows']").val(JSON.stringify(editedRows));
-        $("input[id='prod-image-remove']").val(removedIds.join(','));
+        $('#prod-image-rows').val(JSON.stringify(editedRows));
+        $('#prod-image-remove').val(removedIds.join(','));
     }
 
     g_vent.bind('init-detail', function(ev) {

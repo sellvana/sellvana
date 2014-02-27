@@ -1085,7 +1085,7 @@ class BUtil extends BClass
         $dirIte = new RecursiveDirectoryIterator($dir);
         $flatIte = new RecursiveIteratorIterator($dirIte);
         if (is_null($pattern)) {
-            $pattern = '#.*#';   
+            $pattern = '#.*#';
         }
         $files = new RegexIterator($flatIte, $pattern, RegexIterator::GET_MATCH);
         $fileList = array();
@@ -1759,6 +1759,10 @@ class BEmail extends BClass
         if ($files) {
             // $body and $headers will be updated
             $this->_addAttachments($files, $headers, $body);
+        }
+
+        if (empty($headers['content-type'])) {
+            $headers['content-type'] = 'Content-Type: text/plain; charset=utf-8';
         }
 
         $emailData = array(
@@ -3417,7 +3421,7 @@ class BYAML extends BCLass
             return false;
         }
         //$filename = $filename1;
-        
+
         $filemtime = filemtime($filename);
 
         if ($cache) {
