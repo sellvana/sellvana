@@ -27,7 +27,7 @@
         <input id="model-show_cms_page" class="switch-cbx" name="model[show_cms_page]" {% if m.get('show_cms_page') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
     </div>
     <div class="col-md-5">
-        <select name="model[cms_page]" class="form-control select2">
+        <select name="model[cms_page]" class="form-control select2" id="category-cms-page-select2">
             {{ UTIL.optionsHtml(views, m.get('cms_page')) | raw }}
         </select>
     </div>
@@ -60,7 +60,8 @@
     </div>
 </div>
 <script>
-require(['jquery', 'jquery-ui'], function($) {
+require(['jquery', 'jquery-ui', 'select2'], function($) {
+    $('#category-cms-page-select2').select2();
     $('#show-order').sortable({
         scroll: false,
         revert: true,
