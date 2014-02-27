@@ -981,7 +981,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         $('#field').hide();
 //        $('#btn_add_field').css('display', 'none');
     }
-    setCollection.on('add remove change', function() {
+    setCollection.on('add remove change', function(ev, data) {
         $('#custom_fields').val(JSON.stringify(setCollection.toJSON()));
 
         if (setCollection.length === 0) {
@@ -993,13 +993,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
             $('#field').show();
 //            $('#btn_add_field').css('display', 'inline-block');
         }
-
-//        $( ".prod-fieldset .box-content" ).sortable({
-//            revert: true,
-//            axis: 'y',
-//            connectWith: ".prod-fieldset .box-content",
-//            handle: '.control-handle'
-//        });
+        $( ".prod-fieldset .box-content" ).sortable({
+            revert: true,
+            axis: 'y',
+            connectWith: ".prod-fieldset .box-content",
+            handle: '.control-handle'
+        });
     });
 
     $( ".prod-fieldset .box-content" ).sortable({
