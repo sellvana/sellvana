@@ -1216,7 +1216,8 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
         $(document).bind('ajaxSuccess', function (event, request, settings) {
             if (request.responseText[0]==='{' && (data = $.parseJSON(request.responseText))) {
                 if (data.error == 'login') {
-                    location.href = FCom.base_href;
+//                    location.href = FCom.base_href;
+                    location.reload(true);
                 }
             }
         });
