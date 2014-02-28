@@ -794,7 +794,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['after_render']) !== 'undefined') {
                         console.log('after_render');
                         var func = BackboneGrid.callbacks['after_render'];
-                        var script = func + '(this.$el,this.model.toJSON());';
+                        var script = func + '(this.$el, this.model.toJSON(), columnsCollection);';
                         eval(script);
                     }
                     return this;
@@ -1615,7 +1615,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.formEl.validate({});
                     if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['after_modalForm_render']) !== 'undefined') {
                         var func = BackboneGrid.callbacks['after_modalForm_render'];
-                        var script = func + '(this.$el,rowsCollection.toJSON());';
+                        var script = func + '(this.$el, rowsCollection.toJSON(), BackboneGrid.currentRow);';
                         eval(script);
                     }
                     this.collection.each(function (col) {

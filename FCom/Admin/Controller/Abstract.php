@@ -217,12 +217,14 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
         switch ($args['oper']) {
         case 'add':
-            $args['model'] = $hlp->create($data)->save();
+            //fix Undefined variable: set
+            $set = $args['model'] = $hlp->create($data)->save();
             $result = $set->as_array();
             break;
 
         case 'edit':
-            $args['model'] = $hlp->load($id)->set($data)->save();
+            //fix Undefined variable: set
+            $set = $args['model'] = $hlp->load($id)->set($data)->save();
             $result = $set->as_array();
             break;
 
