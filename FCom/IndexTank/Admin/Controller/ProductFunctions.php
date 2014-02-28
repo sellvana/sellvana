@@ -6,6 +6,7 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
     protected $_gridHref = 'indextank/product_functions';
     protected $_modelClass = 'FCom_IndexTank_Model_ProductFunction';
     protected $_mainTableAlias = 'pf';
+    protected $_permission = 'index_tank/product_function';
 
     public function gridConfig()
     {

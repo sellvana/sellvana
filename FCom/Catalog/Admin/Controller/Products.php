@@ -8,6 +8,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     protected $_gridTitle = 'Products';
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'p';
+    protected $_permission = 'catalog/products';
 
     public function gridConfig()
     {

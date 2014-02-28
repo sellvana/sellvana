@@ -6,7 +6,7 @@ modules:
         translations: { de: de.php }
         description: "Product reviews by customers"
 
-        auto_use: [ layout, views ]
+        auto_use: [ bootstrap, layout, views ]
         views:
             - [ prodreviews/grid, { view_class: FCom_Core_View_BackboneGrid } ]
 

@@ -5,6 +5,7 @@ modules:
         translations: { de: de.php }
         description: "IndexTank API integration"
         require: { module: { FCom_Core: 0.1.0 } }
+        auto_use: [ bootstrap ]
         areas:
             FCom_Admin:
                 auto_use: [ bootstrap, views, layout ]

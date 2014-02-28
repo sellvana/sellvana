@@ -4,6 +4,7 @@ modules:
         channel: beta
         require: { module: { FCom_Core: 0.1.0 } }
         translations: { de: de.php }
+        auto_use: [ bootstrap ]
 
         areas:
             FCom_Frontend:

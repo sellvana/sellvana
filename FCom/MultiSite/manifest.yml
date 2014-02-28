@@ -6,6 +6,7 @@ modules:
         description: "Enable multiple website management from the same instance"
         before_bootstrap: { callback: FCom_MultiSite_Main::beforeBootstrap }
         require: { module: { FCom_Core: 0.1.0 } }
+        auto_use: [ bootstrap, layout, views ]
 
         areas:
             FCom_Admin:

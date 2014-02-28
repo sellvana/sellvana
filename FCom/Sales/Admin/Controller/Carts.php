@@ -7,6 +7,7 @@ class FCom_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstract_G
     protected $_gridTitle = 'Carts';
     protected $_recordName = 'Cart';
     protected $_mainTableAlias = 'cart';
+    protected $_permission = 'sales/carts';
 
     public function gridConfig()
     {
