@@ -37,3 +37,4 @@ __db.php
 *.log
 *.sql
 composer.*
+images/
