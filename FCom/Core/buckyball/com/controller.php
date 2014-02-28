@@ -1640,6 +1640,12 @@ class BRouting extends BClass
             $requestRoute = BRequest::i()->rawPath();
         }
 
+        // try first new route syntax, without method included
+        if (!empty($this->_routes[$requestRoute]) && $this->_routes[$requestRoute]->validObserver()) {
+            BDebug::debug('DIRECT ROUTE: '.$requestRoute);
+            return $this->_routes[$requestRoute];
+        }
+
         if (strpos($requestRoute, ' ')===false) {
             $requestRoute = BRequest::i()->method().' '.$requestRoute;
         }
@@ -1744,7 +1750,6 @@ class BRouting extends BClass
             $this->_currentRoute = $route;
 
             $forward = $route->dispatch();
-
             if ($this->_stop) {
                 return $this;
             }
@@ -1956,6 +1961,7 @@ class BRouteNode
         $attempts = 0;
         $observer = $this->validObserver();
         while ((++$attempts<100) && $observer) {
+
             $forward = $observer->dispatch();
             if (is_array($forward)) {
                 return $forward;

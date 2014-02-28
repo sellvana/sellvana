@@ -12,15 +12,11 @@ modules:
             FCom_Admin:
                 require: { module: { FCom_Admin: 0.1.0 } }
                 routing:
-                    - [ /catalog/test, FCom_Catalog_Admin_Controller_Products.test ]
                     - [ /catalog/categories, FCom_Catalog_Admin_Controller_Categories.index ]
                     - [ /catalog/categories/.action, FCom_Catalog_Admin_Controller_Categories ]
 
                     - [ /catalog/products, FCom_Catalog_Admin_Controller_Products.index ]
                     - [ /catalog/products/.action, FCom_Catalog_Admin_Controller_Products ]
-
-                    - [ /catalog/families, FCom_Catalog_Admin_Controller_Families.index ]
-                    - [ /catalog/families/.action, FCom_Catalog_Admin_Controller_Families ]
 
                     - [ /catalog/products/import/.action, FCom_Catalog_Admin_Controller_ProductsImport ]
 
@@ -30,7 +26,6 @@ modules:
                     - [ /*category, FCom_Catalog_Frontend_Controller_Search.category ]
                     - [ /catalog/search, FCom_Catalog_Frontend_Controller_Search.search ]
                     - [ /catalog/quickview, FCom_Catalog_Frontend_Controller.quickview ]
-                    - [ /*manuf, FCom_Catalog_Frontend_Controller.manuf ]
                     - [ /:product, FCom_Catalog_Frontend_Controller.product ]
                     - [ /*category/:product, FCom_Catalog_Frontend_Controller.product ]
                     - [ /catalog/compare, FCom_Catalog_Frontend_Controller.compare ]
