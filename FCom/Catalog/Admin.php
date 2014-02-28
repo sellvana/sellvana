@@ -49,6 +49,7 @@ class FCom_Catalog_Admin extends BClass
             'catalog/products' => 'Manage Products',
             'catalog/categories' => 'Manage Categories',
             'catalog/families' => 'Manage Families',
+            'catalog/stocks' => 'Manage Stocks',
         ));
     }
 

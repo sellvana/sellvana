@@ -20,8 +20,8 @@ modules:
                 auto_use: [ bootstrap, views ]
                 routing:
                     - [ route, _ /noroute, FCom_Frontend_Controller.noroute, {}, null, false ]
-                    - [ get, /, FCom_Frontend_Controller.index ]
-                    - [ get, /*view, FCom_Frontend_Controller.static ]
+                    - [ /, FCom_Frontend_Controller.index ]
+                    - [ /*view, FCom_Frontend_Controller.static ]
 
     FCom_Frontend_DefaultTheme:
         version: 0.1.0

@@ -6,6 +6,7 @@ modules:
         translations: { de: de.php }
         after: [ FCom_Customer ]
         description: "Base custom fields implementation, currently for catalog only"
+        auto_use: [ bootstrap ]
         observe:
             - [ FCom_Catalog_Model_Product::find_one:orm, FCom_CustomField_Main.productFindORM ]
             - [ FCom_Catalog_Model_Product::find_many:orm, FCom_CustomField_Main.productFindORM ]
@@ -15,11 +16,11 @@ modules:
             FCom_Admin:
                 auto_use: [ views, layout ]
                 routing:
-                    - [ get, /customfields/fieldsets, FCom_CustomField_Admin_Controller_FieldSets.fieldsets ]
-                    - [ get, /customfields/fields, FCom_CustomField_Admin_Controller_FieldSets.fields ]
-                    - [ any, /customfields/fieldsets/.action, FCom_CustomField_Admin_Controller_FieldSets ]
-                    - [ any, /customfields/fields/.action, FCom_CustomField_Admin_Controller_FieldSets ]
-                    - [ any, /customfields/products/.action, FCom_CustomField_Admin_Controller_Products ]
+                    - [ /customfields/fieldsets, FCom_CustomField_Admin_Controller_FieldSets.fieldsets ]
+                    - [ /customfields/fields, FCom_CustomField_Admin_Controller_FieldSets.fields ]
+                    - [ /customfields/fieldsets/.action, FCom_CustomField_Admin_Controller_FieldSets ]
+                    - [ /customfields/fields/.action, FCom_CustomField_Admin_Controller_FieldSets ]
+                    - [ /customfields/products/.action, FCom_CustomField_Admin_Controller_Products ]
                 observe:
                     - [ FCom_Catalog_Admin_Controller_Products::gridColumns, FCom_CustomField_Admin.productGridColumns ]
                     - [ FCom_Catalog_Admin_Controller_Products::formViewBefore, FCom_CustomField_Admin_Controller_Products.formViewBefore ]

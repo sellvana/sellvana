@@ -6,21 +6,21 @@ modules:
         translations: { de: de.php }
         description: "Product reviews by customers"
 
-        auto_use: [ layout, views ]
+        auto_use: [ bootstrap, layout, views ]
         views:
             - [ prodreviews/grid, { view_class: FCom_Core_View_BackboneGrid } ]
 
         areas:
             FCom_Admin:
                 routing:
-                    - [ get, /prodreviews, FCom_ProductReviews_Admin_Controller.index ]
-                    - [ any, /prodreviews/.action, FCom_ProductReviews_Admin_Controller ]
+                    - [ /prodreviews, FCom_ProductReviews_Admin_Controller.index ]
+                    - [ /prodreviews/.action, FCom_ProductReviews_Admin_Controller ]
                 observe:
                     - [ BLayout::hook:catalog/products/tab/main, FCom_ProductReviews_Admin.hookProductTab ]
 
             FCom_Frontend:
                 routing:
-                    - [ get, /prodreviews, FCom_ProductReviews_Frontend_Controller.index ]
-                    - [ any, /prodreviews/.action, FCom_ProductReviews_Frontend_Controller ]
+                    - [ /prodreviews, FCom_ProductReviews_Frontend_Controller.index ]
+                    - [ /prodreviews/.action, FCom_ProductReviews_Frontend_Controller ]
                 observe:
                     - [ BLayout::hook:prodreviews-reviews, FCom_ProductReviews_Frontend.hookReviews ]

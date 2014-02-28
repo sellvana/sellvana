@@ -94,4 +94,11 @@ class FCom_CatalogIndex_Main extends BClass
             }
         }
     }
+
+    static public function bootstrap()
+    {
+        FCom_Admin_Model_Role::i()->createPermission(array(
+            'catalog_index' => 'Product Indexing',
+        ));
+    }
 }

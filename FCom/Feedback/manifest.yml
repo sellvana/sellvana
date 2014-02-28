@@ -11,4 +11,4 @@ modules:
                     enable_FCom_Admin: true
                     send_mod_versions: true
         routing:
-            - [ any, /core_feedback, FCom_Feedback_Controller.index ]
+            - [ /core_feedback, FCom_Feedback_Controller.index ]

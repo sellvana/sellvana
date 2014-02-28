@@ -5,7 +5,12 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
     public function action_category()
     {
 #echo "<pre>"; debug_print_backtrace(); print_r(BRouting::i()->currentRoute()); exit;
-        $category = FCom_Catalog_Model_Category::i()->load(BRequest::i()->params('category'), 'url_path');
+        $catName = BRequest::i()->params('category');
+        if ($catName === '' || is_null($catName)) {
+            $this->forward(false);
+            return;
+        }
+        $category = FCom_Catalog_Model_Category::i()->load($catName, 'url_path');
         if (!$category) {
             $this->forward(false);
             return $this;
@@ -22,6 +27,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $paginated['state']['sc'] = BRequest::i()->get('sc');
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
+        $productsData['state']['sc'] = $req->get('sc');
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_data', array('data'=>&$productsData));
 
         BApp::i()
@@ -71,19 +77,18 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
     {
         $req = BRequest::i();
         $q = $req->get('q');
-        if (!$q) {
-            BResponse::i()->redirect('');
-            return;
+        if ($q !== '' && !is_null($q)) {
+            $q = FCom_Catalog_Model_SearchAlias::i()->processSearchQuery($q);
         }
-        $q = BRequest::i()->get('q');
-
-        $q = FCom_Catalog_Model_SearchAlias::i()->processSearchQuery($q);
 
         $productsData = FCom_CatalogIndex_Indexer::i()->searchProducts($q);
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_orm', array('data'=>$productsData['orm']));
-        $paginated = $productsData['orm']->paginate(null, array('ps'=>10));
+        $r = $req->get();
+        $r['sc'] = '';
+        $paginated = $productsData['orm']->paginate($r, array('ps'=>10));
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
+        $productsData['state']['sc'] = $req->get('sc');
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', array('data'=>&$productsData));
 
         BApp::i()

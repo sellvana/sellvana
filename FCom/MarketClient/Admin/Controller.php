@@ -12,6 +12,7 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'market';
     protected $_modelClass = 'FCom_MarketClient_Model_Modules';
+    protected $_permission = 'market_client';
     //protected $_mainTableAlias = '';
 
     public function gridConfig()

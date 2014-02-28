@@ -16,6 +16,10 @@ class FCom_MultiLanguage_Main extends BClass
         if(!empty($lang)){
             BSession::i()->set('_language', $lang);
         }
+        FCom_Admin_Model_Role::i()->createPermission(array(
+            'translations' => 'Translations',
+        ));
+
     }
 
     /**
