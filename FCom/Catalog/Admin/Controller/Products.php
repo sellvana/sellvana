@@ -13,9 +13,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
+            array('type'=>'input', 'name'=>'select-row', 'editor'=>'checkbox', 'edit'=>'inline', 'class'=>'select-row', 'width'=>40),
             array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true),
-            array('name'=>'thumb_path', 'label'=>'Thumbnail', 'width'=>48,
+            array('display'=>'eval', 'name'=>'thumb_path', 'label'=>'Thumbnail', 'width'=>48,
                 'print'=>'"<img src=\'"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["product_name"]+"\' >"', 'sortable'=>false),
             array('name'=>'product_name', 'label'=>'Name', 'width'=>250),
             array('name'=>'local_sku', 'label'=>'SKU', 'index'=>'p.local_sku', 'width'=>100),
@@ -27,8 +27,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('name' => 'position', 'label' => 'Position', 'index' => 'p.position', 'hidden' => true),
             array('name'=>'create_at', 'label'=>'Created', 'index'=>'p.create_at', 'width'=>100),
             array('name'=>'update_at', 'label'=>'Updated', 'index'=>'p.update_at', 'width'=>100),
-            array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false,
-                'data'=>array('edit'=>array('href'=>BApp::href('catalog/products/form?id='), 'col'=>'id'),'delete'=>true)),
+            array('type'=>'btn_group', 'name'=>'edit', 'href'=>BApp::href('catalog/products/form?id=')),
+            array('type'=>'btn_group', 'name'=>'delete')
         );
         $config['actions'] = array(
             'export'=>true,

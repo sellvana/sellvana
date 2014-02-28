@@ -1064,6 +1064,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 render: function () {
                     this.$el.html(this.template(this.model.toJSON()));
+
                     return this;
                 }
             });
@@ -1464,8 +1465,16 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
             BackboneGrid.Views.ModalElement = Backbone.View.extend({
                 className: 'form-group',
-                render: function () {
+                initialize: function() {
+                    if (typeof(this.model.get('element_print')) !== 'undefined') {
+                        this.model.set('editor', 'none');
+                        console.log('fwfw');
+                    }
 
+                    this.model.set('validation', validationRules(this.model.get('validation')));
+
+                },
+                render: function () {
                     this.$el.html(this.template(this.model.toJSON()));
                     return this;
                 }
@@ -1473,7 +1482,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             BackboneGrid.Views.ModalForm = Backbone.View.extend({
                 initialize: function () {
                     this.modalType = 'mass-editable';
-                    //this.collection.on('sort change reset', this.render, this);
                     this.$el.parents('div.modal-dialog:first').find('button.save').click(this._saveChanges);
                 },
                 _saveChanges: function (ev) {
@@ -1819,7 +1827,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#' + config.id + '-col-template').html());
             BackboneGrid.Views.FilterCheckView.prototype.template = _.template($('#' + config.id + '-filter-check-template').html());
             //mass edit modal view
-            BackboneGrid.Views.ModalForm.prototype.el = BackboneGrid.modalFormId + " div.modal-body";
+            BackboneGrid.Views.ModalForm.prototype.el = BackboneGrid.modalFormId + " .modal-body";
             BackboneGrid.Views.ModalElement.prototype.template = _.template($('#' + config.id + '-modal-element-template').html());
             BackboneGrid.Views.ModalMassGridElement.prototype.template = _.template($('#'+ config.id + '-add-set-fields').html());
 
@@ -1891,7 +1899,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 c.id = config.id + '-' + c.name;
                 //c.style = c['width'] ? "width:"+c['width']+"px" : '';
 
-                c.cssClass = '';
+                //c.cssClass = '';
                 if (!c['no_reorder'])
                     c.cssClass += 'js-draggable ';
 

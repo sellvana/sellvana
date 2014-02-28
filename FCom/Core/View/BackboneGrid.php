@@ -156,11 +156,43 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     {
         $grid = $this->grid;
         $pos = 0;
+
         foreach ($grid['config']['columns'] as $cId=>&$col) {
             if (empty($col['name'])) {
                 $col['name'] = $cId;
             }
-            $col['position'] = ++$pos;
+
+			if ($cId === 0) {
+				$col['cssClass'] = 'select-row';
+				$col['edit'] = 'inline';
+			}
+
+			if (!empty($col['type']) && $col['type'] === 'btn_group') {								
+				switch($col['name']) {
+					case 'edit':
+						$col['icon'] = 'icon-edit';
+						$col['caption'] = '';
+						$col['cssClass'] = ' btn-xs btn-edit ';
+						if (!empty($col['href'])) {
+							$col['cssClass'] .= ' _modal';
+							$col['btn_type'] = 'link';
+						}
+						
+						break;
+					/*case 'edit_inline':
+						$col['icon'] = 'icon-pencil';
+						
+						break;*/
+					case 'delete':
+						$col['icon'] = 'icon-remove';
+						$col['cssClass'] = ' btn-delete ';
+
+						break;					
+				}
+				
+				
+			}
+            /*$col['position'] = ++$pos;
             switch ($cId) {
                 case '_multiselect':
                     $col['type'] = 'multiselect';
@@ -169,7 +201,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                     $col['format'] = function($args) {
                         return BUtil::tagHtml('input', array(
                             'type' =>'checkbox',
-                            //'name' =>"grid[{$args['grid']['config']['id']}][sel][{$args['row']->id}]",
+                            'name' =>"grid[{$args['grid']['config']['id']}][sel][{$args['row']->id}]",
                             'class'=>'js-sel',
                         ));
                     };
@@ -193,7 +225,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         return BUtil::tagHtml('select', array('class'=>'js-actions'), BUtil::optionsHtml($options));
                     };
                     break;
-            }
+            }*/
         }
         unset($col);
         $this->grid = $grid;
