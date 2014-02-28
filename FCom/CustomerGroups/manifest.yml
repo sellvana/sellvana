@@ -9,9 +9,9 @@ modules:
             FCom_Admin:
                 auto_use: [ views, layout, bootstrap ]
                 routing:
-                    - [ get, /customer-groups, FCom_CustomerGroups_Admin_Controller_CustomerGroups.index ]
-                    - [ any, /customer-groups/.action, FCom_CustomerGroups_Admin_Controller_CustomerGroups ]
-                    - [ any, /tier-prices/.action, FCom_CustomerGroups_Admin_Controller_TierPrices ]
+                    - [ /customer-groups, FCom_CustomerGroups_Admin_Controller_CustomerGroups.index ]
+                    - [ /customer-groups/.action, FCom_CustomerGroups_Admin_Controller_CustomerGroups ]
+                    - [ /tier-prices/.action, FCom_CustomerGroups_Admin_Controller_TierPrices ]
             FCom_Frontend:
                 auto_use: [ views, layout ]
         observe:

@@ -991,13 +991,25 @@ if ($args['name']==="FCom_Referrals") {
         }
         $hlp = BRouting::i();
         foreach ($this->routing as $r) {
-            $method = strtolower($r[0]);
-            if (!isset($r[1]) || !isset($r[2])) { var_dump($this); exit; }
-            $route = $r[1];
-            $callback = $r[2];
-            $args = isset($r[3]) ? $r[3] : array();
-            $name = isset($r[4]) ? $r[4] : null;
-            $multiple = isset($r[5]) ? $r[5] : true;
+            if ($r[0][0] === '/' || $r[0][0] === '^') {
+                $method = 'route';
+                $route = $r[0];
+                $callback = $r[1];
+                $args = isset($r[2]) ? $r[2] : array();
+                $name = isset($r[3]) ? $r[3] : null;
+                $multiple = isset($r[4]) ? $r[4] : true;
+            } else {
+                $method = strtolower($r[0]);
+                if (!isset($r[1]) || !isset($r[2])) {
+                    BDebug::error('Invalid routing directive: '.print_r($r));
+                    continue;
+                }
+                $route = $r[1];
+                $callback = $r[2];
+                $args = isset($r[3]) ? $r[3] : array();
+                $name = isset($r[4]) ? $r[4] : null;
+                $multiple = isset($r[5]) ? $r[5] : true;
+            }
             $hlp->$method($route, $callback, $args, $name, $multiple);
         }
     }

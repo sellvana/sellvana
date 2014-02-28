@@ -12,5 +12,5 @@ modules:
             FCom_Admin:
                 auto_use: [ layout, views ]
                 routing:
-                    - [ get, /multisite, FCom_MultiSite_Admin_Controller.index ]
-                    - [ any, /multisite/.action, FCom_MultiSite_Admin_Controller ]
+                    - [ /multisite, FCom_MultiSite_Admin_Controller.index ]
+                    - [ /multisite/.action, FCom_MultiSite_Admin_Controller ]
