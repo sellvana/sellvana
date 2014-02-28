@@ -622,7 +622,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return this.data_url + c + append + '&gridId=' + BackboneGrid.id;
                 },
                 parse: function (response) {
-                    if (typeof(response[0].c) !== 'undefined') {
+                    if (typeof (response[0]) !== 'undefined' && typeof(response[0].c) !== 'undefined') {
                         //  if (response[0].c !== BackboneGrid.currentState.c) {
                         var mp = Math.ceil(response[0].c / BackboneGrid.currentState.ps);
                         BackboneGrid.currentState.mp = mp;
