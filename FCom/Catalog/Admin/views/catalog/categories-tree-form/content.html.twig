@@ -21,14 +21,14 @@
     </div>
 </div>
 <div class="form-group">
-    <label class="col-md-2 control-label" for="model-show_cms_page">{{ 'Show Block / Page'|_ }}</label>
+    <label class="col-md-2 control-label" for="model-show_view">{{ 'Show Block / Page'|_ }}</label>
     <div class="col-md-2">
-        <input type="hidden" name="model[show_cms_page]" value="0" />
-        <input id="model-show_cms_page" class="switch-cbx" name="model[show_cms_page]" {% if m.get('show_cms_page') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
+        <input type="hidden" name="model[show_view]" value="0" />
+        <input id="model-show_view" class="switch-cbx" name="model[show_view]" {% if m.get('show_view') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
     </div>
     <div class="col-md-5">
-        <select name="model[cms_page]" class="form-control select2" id="category-cms-page-select2">
-            {{ UTIL.optionsHtml(views, m.get('cms_page')) | raw }}
+        <select name="model[view_name]" class="form-control select2" id="category-view-name-select2">
+            {{ UTIL.optionsHtml(views, m.get('view_name')) | raw }}
         </select>
     </div>
 </div>
@@ -61,7 +61,7 @@
 </div>
 <script>
 require(['jquery', 'jquery-ui', 'select2'], function($) {
-    $('#category-cms-page-select2').select2({
+    $('#category-view-name-select2').select2({
         sortResults: function(results, container, query) {
             for (var i = 0 ; i < results.length; i ++ ) {
                 for (var j = i+1; j < results.length; j++) {

@@ -350,6 +350,7 @@ class FCom_Catalog_Migrate extends BClass
 
     public function upgrade__0_2_17__0_2_18()
     {
+        /*
         $tCategory = FCom_Catalog_Model_Category::table();
         BDb::ddlTableDef($tCategory, array(
             'COLUMNS' => array(
@@ -357,5 +358,6 @@ class FCom_Catalog_Migrate extends BClass
                 'cms_page' => 'text default null',
             ),
         ));
+        */
     }
 }
