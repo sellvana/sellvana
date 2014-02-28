@@ -1,0 +1,26 @@
+{% set c = THIS.get('model') %}
+{% set mname = MODULES.currentModuleName() %}
+{% set baseHtmlName = "config[modules][" ~ mname ~ "]" %}
+{% set baseConfigPath = "modules/" ~ mname %}
+{% set prefix = "sample_" %}
+<h2>{{ "Sample Catalog Data" | _ }}</h2>
+<div class="accordion accordion-blue panel-group" id="settings-{{ mname }}">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#">{{ "Settings" | _ }}</a>
+        </div>
+        <div class="panel-collapse collapse in" id="settings-{{ mname }}-group0">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="{{ prefix }}test">{{ "Load Sample Data"|_ }}</label>
+
+                    <div class="col-md-5">
+                        <input type="hidden" name="{{ baseHtmlName }}[load]" value="0"/>
+                        <input id="{{ prefix }}test" type="checkbox" class="switch-cbx" name="{{ baseHtmlName }}[load]"
+                               value="1" {% if c.get(baseConfigPath ~ '/load') == 1 %}checked="checked"{% endif %} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
