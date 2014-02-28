@@ -8,7 +8,12 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $q = BRequest::i()->get('q');
         $filter = BRequest::i()->get('f');
 
-        $category = FCom_Catalog_Model_Category::i()->load(BRequest::i()->params('category'), 'url_path');
+        $catName = BRequest::i()->params('category');
+        if ($catName === '' || is_null($catName)) {
+            $this->forward(false);
+            return;
+        }
+        $category = FCom_Catalog_Model_Category::i()->load($catName, 'url_path');
         if (!$category) {
             $this->forward(false);
             return $this;

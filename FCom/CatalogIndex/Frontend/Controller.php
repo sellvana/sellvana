@@ -5,7 +5,12 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
     public function action_category()
     {
 #echo "<pre>"; debug_print_backtrace(); print_r(BRouting::i()->currentRoute()); exit;
-        $category = FCom_Catalog_Model_Category::i()->load(BRequest::i()->params('category'), 'url_path');
+        $catName = BRequest::i()->params('category');
+        if ($catName === '' || is_null($catName)) {
+            $this->forward(false);
+            return;
+        }
+        $category = FCom_Catalog_Model_Category::i()->load($catName, 'url_path');
         if (!$category) {
             $this->forward(false);
             return $this;

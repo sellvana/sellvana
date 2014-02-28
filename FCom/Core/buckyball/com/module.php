@@ -200,6 +200,7 @@ class BModuleRegistry extends BClass
         $data = array();
         foreach ($this->_modules as $modName => $mod) {
             $data[$modName] = (array)$mod;
+            $data[$modName]['is_cached'] = true;
             unset($data['run_level']);
         }
         #file_put_contents($cacheFile, '<'.'?php return '.var_export($data, 1).';');
@@ -659,6 +660,8 @@ class BModule extends BClass
     public $autoload;
     public $crontab;
     public $custom;
+
+    public $is_cached;
     /**
      * @var array
      */
@@ -734,27 +737,33 @@ if ($args['name']==="FCom_Referrals") {
 */
         $this->set($args);
 
-        $args = $this->_processAreas($args);
-
         $m = $this->_getManifestData();
-        if (!empty($this->bootstrap) && empty($this->bootstrap['file'])) {
-            $this->bootstrap['file'] = null;
-        }
-        if (empty($this->root_dir)) {
-            $this->root_dir = $m['root_dir'];
-        }
-        //TODO: optimize path calculations
-        if (!BUtil::isPathAbsolute($this->root_dir)) {
-//echo "{$m['root_dir']}, {$args['root_dir']}\n";
-            if($m['root_dir'] != $this->root_dir)
-                $this->root_dir = BUtil::normalizePath($m['root_dir'].'/'.$this->root_dir);
-            else{
-                $this->root_dir = BUtil::normalizePath($this->root_dir);
+
+        if (!$this->is_cached) {
+            $args = $this->_processAreas($args);
+
+            if (!empty($this->bootstrap) && empty($this->bootstrap['file'])) {
+                $this->bootstrap['file'] = null;
+            }
+            if (empty($this->root_dir)) {
+                $this->root_dir = $m['root_dir'];
+            }
+            //TODO: optimize path calculations
+            if (!BUtil::isPathAbsolute($this->root_dir)) {
+    //echo "{$m['root_dir']}, {$args['root_dir']}\n";
+                if($m['root_dir'] != $this->root_dir)
+                    $this->root_dir = BUtil::normalizePath($m['root_dir'].'/'.$this->root_dir);
+                else{
+                    $this->root_dir = BUtil::normalizePath($this->root_dir);
+                }
+
+                //$this->root_dir = BUtil::normalizePath($this->root_dir);
+                //echo $this->root_dir."\n";
             }
 
-            //$this->root_dir = BUtil::normalizePath($this->root_dir);
-            //echo $this->root_dir."\n";
+            $this->_normalizeManifestRequireFormat();
         }
+
         $this->run_level = static::$_defaultRunLevel; // disallow declaring run_level in manifest
         /*
         if (!isset($this->run_level)) {
@@ -765,8 +774,6 @@ if ($args['name']==="FCom_Referrals") {
         if (!isset($this->run_status)) {
             $this->run_status = BModule::IDLE;
         }
-
-        $this->_normalizeManifestRequireFormat();
     }
 
     protected function _normalizeManifestRequireFormat()

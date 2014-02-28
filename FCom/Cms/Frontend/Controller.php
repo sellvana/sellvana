@@ -5,6 +5,10 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     public function action_page()
     {
         $pageUrl = BRequest::i()->params('page');
+        if ($pageUrl === '' || is_null($pageUrl)) {
+            $this->forward(false);
+            return;
+        }
         $block = FCom_Cms_Model_Block::i()->load(array('page_enabled' => 1, 'page_url' => $pageUrl));
         if (!$block || !$block->validateBlock()) {
             $this->forward(false);
