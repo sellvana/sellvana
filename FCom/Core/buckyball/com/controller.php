@@ -1650,7 +1650,7 @@ class BRouting extends BClass
         }
 
         BDebug::debug('FIND ROUTE: '.$requestRoute);
-        foreach ($this->_routes as $route) {
+        foreach ($this->_routes as $routeName => $route) {
             if ($route->match($requestRoute)) {
                 return $route;
             }
@@ -1673,8 +1673,8 @@ class BRouting extends BClass
 #echo ' ** ('.$a->route_name.'):('.$b->route_name.'): '.$res.' ** <br>';
                 return $res;
             }
-            $ap = (strpos($a->route_name, '/*') ? 10 : 0)+(strpos($a->route_name, '/.') ? 5 : 0)+(strpos($a->route_name, '/:') ? 1 : 0);
-            $bp = (strpos($b->route_name, '/*') ? 10 : 0)+(strpos($b->route_name, '/.') ? 5 : 0)+(strpos($b->route_name, '/:') ? 1 : 0);
+            $ap = (strpos($a->route_name, '/*')!==false ? 10 : 0)+(strpos($a->route_name, '/.')!==false ? 5 : 0)+(strpos($a->route_name, '/:')!==false ? 1 : 0);
+            $bp = (strpos($b->route_name, '/*')!==false ? 10 : 0)+(strpos($b->route_name, '/.')!==false ? 5 : 0)+(strpos($b->route_name, '/:')!==false ? 1 : 0);
 #echo $a->route_name.' ('.$ap.'), '.$b->route_name.'('.$bp.')<br>';
             return $ap === $bp ? 0 : ($ap < $bp ? -1 : 1 );
         });
