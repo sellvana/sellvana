@@ -1659,7 +1659,7 @@ class BRouting extends BClass
     }
 
     /**
-    * Convert collected routes into tree
+    * Sort collected routes by specificity
     *
     * @return BFrontController
     */
@@ -1822,9 +1822,14 @@ class BRouteNode
         }
         $a = explode(' ', $this->route_name);
         if (sizeof($a)<2) {
-            throw new BException('Invalid route format: '.$this->route_name);
+            $a = array(
+                'GET|POST|DELETE|PUT|HEAD',
+                $a[0],
+            );
+            $this->multi_method = true;
+        } else {
+            $this->multi_method = strpos($a[0], '|') !== false;
         }
-        $this->multi_method = strpos($a[0], '|') !== false;
         if ($a[1]==='/') {
             $this->regex = '#^('.$a[0].') (/)$#';
         } else {

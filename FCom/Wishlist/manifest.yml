@@ -10,6 +10,6 @@ modules:
         areas:
             FCom_Frontend:
                 routing:
-                    - [ any, /wishlist/?.action, FCom_Wishlist_Frontend_Controller ]
+                    - [ /wishlist/?.action, FCom_Wishlist_Frontend_Controller ]
                 observe:
                     - [ FCom_Catalog_Frontend_Controller::action_product:addToWishlist, FCom_Wishlist_Frontend_Controller::onAddToWishlist ]

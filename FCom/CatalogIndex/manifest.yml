@@ -12,14 +12,14 @@ modules:
         areas:
             FCom_Admin:
                 routing:
-                    - [ get, /catalogindex/fields, FCom_CatalogIndex_Admin_Controller_Fields.index ]
-                    - [ any, /catalogindex/fields/.action, FCom_CatalogIndex_Admin_Controller_Fields ]
-                    - [ any, /catalogindex/reindex, FCom_CatalogIndex_Admin_Controller.reindex ]
-                    - [ get, /catalogindex/test, FCom_CatalogIndex_Admin_Controller.test ]
+                    - [ /catalogindex/fields, FCom_CatalogIndex_Admin_Controller_Fields.index ]
+                    - [ /catalogindex/fields/.action, FCom_CatalogIndex_Admin_Controller_Fields ]
+                    - [ /catalogindex/reindex, FCom_CatalogIndex_Admin_Controller.reindex ]
+                    - [ /catalogindex/test, FCom_CatalogIndex_Admin_Controller.test ]
 
             FCom_Frontend:
                 routing:
-                    - [ get, /catalogindex/search, FCom_CatalogIndex_Frontend_Controller.search ]
+                    - [ /catalogindex/search, FCom_CatalogIndex_Frontend_Controller.search ]
                 override:
                     class:
                         - [ FCom_Catalog_Frontend_Controller_Search, FCom_CatalogIndex_Frontend_Controller ]

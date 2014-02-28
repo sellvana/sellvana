@@ -8,4 +8,4 @@ modules:
             FCom_Admin:
                 auto_use: [ views, layout ]
                 routing:
-                    - [ any, /stock/?.action, FCom_Stock_Admin_Controller_Stock ]
+                    - [ /stock/?.action, FCom_Stock_Admin_Controller_Stock ]

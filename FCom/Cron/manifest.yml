@@ -16,8 +16,8 @@ modules:
 
             FCom_Cron:
                 routing:
-                    - [ get, /, FCom_Cron_Controller.run ]
-                    - [ get, /*task, FCom_Cron_Controller.run ]
+                    - [ /, FCom_Cron_Controller.run ]
+                    - [ /*task, FCom_Cron_Controller.run ]
                 observe:
                     - [ BModuleRegistry::bootstrap:after, FCom_Cron_Main::onBootstrapAfter ]
 
