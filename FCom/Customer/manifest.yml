@@ -1,6 +1,6 @@
 modules:
     FCom_Customer:
-        version: 0.1.7
+        version: 0.1.8
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_Geo: 0.1.0 } }
         translations: { de: de.php }
