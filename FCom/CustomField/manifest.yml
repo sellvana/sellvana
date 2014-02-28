@@ -6,6 +6,7 @@ modules:
         translations: { de: de.php }
         after: [ FCom_Customer ]
         description: "Base custom fields implementation, currently for catalog only"
+        auto_use: [ bootstrap ]
         observe:
             - [ FCom_Catalog_Model_Product::find_one:orm, FCom_CustomField_Main.productFindORM ]
             - [ FCom_Catalog_Model_Product::find_many:orm, FCom_CustomField_Main.productFindORM ]

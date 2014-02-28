@@ -4,6 +4,7 @@ modules:
         channel: beta
         require: { module: { FCom_Core: 0.1.0 } }
         description: "Fulleron Extension Market Client"
+        auto_use: [ bootstrap, layout, views ]
 
         observe:
             - [ FCom_MarketClient_Model_Module::find_one:orm, FCom_MarketClient_Model_Module::onFindOrm ]

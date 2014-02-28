@@ -8,6 +8,7 @@ class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abst
     protected $_gridTitle = 'Orders Status';
     protected $_recordName = 'Order status';
     protected $_mainTableAlias = 'os';
+    protected $_permission = 'sales/order_status';
 
     public function gridConfig()
     {
