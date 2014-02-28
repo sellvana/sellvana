@@ -470,14 +470,18 @@ class BLayout extends BClass
             }
 
             $this->_views[$viewAlias] = BView::i()->factory($viewName, $params);
+            /*
             BEvents::i()->fire('BLayout::view:add:' . $viewAlias, array(
                 'view' => $this->_views[$viewAlias],
             ));
+            */
         } else {
             $this->_views[$viewAlias]->setParam($params);
+            /*
             BEvents::i()->fire('BLayout::view:update:' . $viewAlias, array(
                 'view' => $this->_views[$viewAlias],
             ));
+            */
         }
 
         return $this;
