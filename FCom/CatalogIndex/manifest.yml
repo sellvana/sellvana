@@ -1,6 +1,6 @@
 modules:
     FCom_CatalogIndex:
-        version: 0.1.8
+        version: 0.1.9
         channel: beta
         require: { module: { FCom_Catalog: 0.2.1, FCom_CustomField: 0.1.4 } }
         description: "Catalog search and facets indexing engine"
