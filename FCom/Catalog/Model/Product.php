@@ -354,10 +354,15 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $this->mediaORM($type)->find_many_assoc();
     }
 
+    /**
+     * @param array $data
+     * @param array $config
+     * @return array|null
+     */
     public function import($data, $config=array())
     {
         if (empty($data) || !is_array($data)) {
-            return;
+            return null;
         }
 
         //HANDLE CONFIG

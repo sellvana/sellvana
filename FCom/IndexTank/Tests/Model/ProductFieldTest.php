@@ -51,7 +51,7 @@ class FCom_IndexTank_Tests_Model_ProductFieldTest extends FCom_Test_DatabaseTest
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_indextank_product_field'), "Pre-Condition");
 
-        $list = FCom_IndexTank_Model_ProductField::i()->getVarialbesList();
+        $list = FCom_IndexTank_Model_ProductField::i()->getVariablesList();
         $this->assertEquals(1, count($list));
     }
 
