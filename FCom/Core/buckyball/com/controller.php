@@ -1538,9 +1538,11 @@ class BRouting extends BClass
     {
         if (is_null($callback)) {
             unset($this->_routes[$route]);
+            BDebug::debug('REMOVE ROUTE '.$route);
         } else {
             if (!empty($this->_routes[$route])) {
                 $this->_routes[$route]->removeObserver($callback);
+                BDebug::debug('REMOVE ROUTE CALLBACK '.$route.' : '.print_r($callback,1));
             }
         }
         return $this;
