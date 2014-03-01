@@ -1534,8 +1534,22 @@ class BRouting extends BClass
         return $this;
     }
 
+    public function removeRoute($route, $callback = null)
+    {
+        if (is_null($callback)) {
+            unset($this->_routes[$route]);
+        } else {
+            if (!empty($this->_routes[$route])) {
+                $this->_routes[$route]->removeObserver($callback);
+            }
+        }
+        return $this;
+    }
+
     /**
      * Shortcut to $this->route() for GET http verb
+     *
+     * @deprecated
      * @param mixed  $route
      * @param mixed  $callback
      * @param array  $args
@@ -1550,6 +1564,8 @@ class BRouting extends BClass
 
     /**
      * Shortcut to $this->route() for POST http verb
+     *
+     * @deprecated
      * @param mixed  $route
      * @param mixed  $callback
      * @param array  $args
@@ -1564,6 +1580,8 @@ class BRouting extends BClass
 
     /**
      * Shortcut to $this->route() for PUT http verb
+     *
+     * @deprecated
      * @param mixed $route
      * @param null  $callback
      * @param null  $args
@@ -1578,6 +1596,8 @@ class BRouting extends BClass
 
     /**
      * Shortcut to $this->route() for GET|POST|DELETE|PUT|HEAD http verbs
+     *
+     * @deprecated
      * @param mixed $route
      * @param null  $callback
      * @param null  $args
@@ -1592,6 +1612,8 @@ class BRouting extends BClass
 
     /**
      * Process shortcut methods
+     *
+     * @deprecated
      * @param mixed  $route
      * @param string $verb
      * @param null   $callback
@@ -1947,6 +1969,16 @@ class BRouteNode
             if (!$o->skip) return $o;
         }
         return null;
+    }
+
+    public function removeObserver($callback)
+    {
+        foreach ($this->_observers as $i => $o) {
+            if ($o->callback == $callback) {
+                unset($this->_observers[$i]);
+            }
+        }
+        return $this;
     }
 
     /**
