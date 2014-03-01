@@ -6,6 +6,8 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
     protected static $_table = 'fcom_category';
     protected static $_cacheAuto = true;
 
+    protected static $_urlPrefix;
+
     public function productsORM()
     {
         return FCom_Catalog_Model_Product::i()->orm('p')
@@ -18,9 +20,18 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return $this->productsORM()->find_many();
     }
 
+    static public function urlPrefix()
+    {
+        if (empty(static::$_urlPrefix)) {
+            static::$_urlPrefix = BConfig::i()->get('modules/FCom_Catalog/url_prefix');
+        }
+        return static::$_urlPrefix;
+    }
+
     public function url()
     {
-        return BApp::href($this->url_path);
+        $prefix = static::urlPrefix();
+        return BApp::href($prefix . $this->url_path);
     }
 
     public function onReorderAZ($args)
