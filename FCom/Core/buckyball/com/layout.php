@@ -800,7 +800,8 @@ class BLayout extends BClass
                     }
                 }
                 if (empty($d['type'])) {
-                    BDebug::dump($d);
+                    BDebug::error('Unknown directive: '.print_r($d, 1));
+                    continue;
                 }
             }
             $d['type'] = trim($d['type']);

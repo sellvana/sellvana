@@ -671,16 +671,16 @@ class BRequest extends BClass
     */
     public static function currentUrl()
     {
-        $webroot = rtrim(static::webRoot(), '/');
-        $scheme = static::scheme();
-        $port = static::httpPort();
-        $url = $scheme.'://'.static::httpHost();
+        $host = static::scheme().'://'.static::httpHost(true);
         if (BConfig::i()->get('web/hide_script_name') && BApp::i()->get('area')!=='FCom_Admin') {
-            $url = rtrim($url, '/') . '/' . ltrim(str_replace('//', '/', $webroot), '/');;
+            $root = static::webRoot();
         } else {
-            $url = rtrim($url, '/') . '/' . ltrim(str_replace('//', '/', static::scriptName()), '/');
+            $root = static::scriptName();
         }
-        $url .= static::rawPath().(($q = static::rawGet()) ? '?'.$q : '');
+        $root = trim($root, '/');
+        $path = ltrim(static::rawPath(), '/');
+        $get = static::rawGet();
+        $url = $host . '/' . ($root ? $root . '/' : '') . $path . ($get ? '?' . $get : '');
         return $url;
     }
 
