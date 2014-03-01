@@ -491,7 +491,10 @@ class FCom_Core_Main extends BClass
         $head->meta('csrf-token', BSession::i()->csrfToken());
         $head->js_raw('js_init', array('content'=>"
 FCom = {};
-FCom.cookie_options = ".BUtil::toJson(array('domain'=>$cookieConfig['domain'], 'path'=>$cookieConfig['path'])).";
+FCom.cookie_options = ".BUtil::toJson(array(
+    'domain' => !empty($cookieConfig['domain']) ? $cookieConfig['domain'] : null, 
+    'path' => !empty($cookieConfig['path']) ? $cookieConfig['domain'] : null,
+)).";
 FCom.base_href = '".BApp::i()->baseUrl()."';
 FCom.base_src = '".BConfig::i()->get('web/base_src')."';
         "));
