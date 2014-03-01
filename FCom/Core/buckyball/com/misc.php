@@ -3712,7 +3712,7 @@ class BValidate extends BClass
         if (!isset($data[$args['field']])) {
             return false;
         }
-        if ($data[$args['field']]===0) {
+        if (is_numeric($data[$args['field']])) {
             return true;
         }
         return !empty($data[$args['field']]);
