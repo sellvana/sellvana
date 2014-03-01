@@ -493,7 +493,7 @@ class FCom_Core_Main extends BClass
 FCom = {};
 FCom.cookie_options = ".BUtil::toJson(array(
     'domain' => !empty($cookieConfig['domain']) ? $cookieConfig['domain'] : null, 
-    'path' => !empty($cookieConfig['path']) ? $cookieConfig['domain'] : null,
+    'path' => !empty($cookieConfig['path']) ? $cookieConfig['path'] : null,
 )).";
 FCom.base_href = '".BApp::i()->baseUrl()."';
 FCom.base_src = '".BConfig::i()->get('web/base_src')."';
