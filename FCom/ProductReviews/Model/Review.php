@@ -87,6 +87,7 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
             elseif ($m >= 3) $v = '3 ==> 3 Stars & Up';
             elseif ($m >= 2) $v = '2 ==> 2 Stars & Up';
             elseif ($m >= 1) $v = '1 ==> 1 Star & Up';
+            else $v = '';
             $data[$p->id()] = $v;
         }
         return $data;
