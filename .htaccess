@@ -1,7 +1,7 @@
 Options -Indexes +FollowSymLinks -MultiViews
 
-<FilesMatch "\.yml$">
-    Order allow,deny
+Order deny,allow
+<FilesMatch "\.(yml|twig)$">
     Deny from all
 </FilesMatch>
 
@@ -10,8 +10,8 @@ Options -Indexes +FollowSymLinks -MultiViews
 </IfModule>
 
 <IfModule mod_security.c>
-SecFilterEngine Off
-SecFilterScanPOST Off
+    SecFilterEngine Off
+    SecFilterScanPOST Off
 </IfModule>
 
 <IfModule mod_expires.c>
