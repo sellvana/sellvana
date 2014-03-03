@@ -24,7 +24,7 @@ class FCom_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstract_G
         $config = parent::gridConfig();
         $config['id'] = 'customer_grid_carts_'.$customer->id;
         $config['columns'] = array(
-            array('type'=>'multiselect'),
+            array('type'=>'row_select'),
             array('name' => 'id', 'label' => 'ID', 'width' =>70, 'hidden' => true),
             array('name' => 'session_id', 'label' => 'Session ID'),
             array('name' => 'item_num', 'label' => 'Total Items'),

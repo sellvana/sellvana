@@ -48,18 +48,18 @@ function validationRules(rules) {
 }
 
 function filesizeFormat(size) {
-	var size = parseInt(size);
+    var size = parseInt(size);
     if (size/(1024*1024) > 1) {
-		size = size/(1024*1024);
-		size = size.toFixed(2)+' MB';
-	} else if (size/1024 > 1) {
-		size = size/1024;
-		size = size.toFixed(2)+' KB';
-	} else {
-		size = size+' Byte';
-	}
+        size = size/(1024*1024);
+        size = size.toFixed(2)+' MB';
+    } else if (size/1024 > 1) {
+        size = size/1024;
+        size = size.toFixed(2)+' KB';
+    } else {
+        size = size+' Byte';
+    }
     
-	return size;
+    return size;
 }
 
 define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
@@ -783,7 +783,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 },
                 _deleteRow: function (ev) {
-					
+                    
                     var confirm;
                     if ($(ev.target).closest('button').hasClass('noconfirm'))
                         confirm = true;
@@ -2030,7 +2030,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
             //showing selected rows count
             selectedRows = new Backbone.Collection;
-            var multiselectCol = columnsCollection.findWhere({type: 'multiselect'});
+            var multiselectCol = columnsCollection.findWhere({type: 'row_select'});
             selectedRows.on('add remove reset', function () {
                 multiselectCol.set('selectedCount', selectedRows.length);
                 //@todo: fix loop forever when add selected items from inside form, need check this carefully and ask Boris other solutions, or need refactor this

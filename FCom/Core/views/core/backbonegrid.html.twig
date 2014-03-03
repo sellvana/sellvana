@@ -12,7 +12,7 @@
     <div class="f-grid-top f-grid-toolbar {{ config.id | raw }} clearfix">
         <div class="f-col-filters-selection pull-left">
         <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}"
-		id="{{ config.id | raw }}-quick-search">
+        id="{{ config.id | raw }}-quick-search">
         <span class="{{ config.id }} dropdown">
             <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
                 {{ 'Filters'|_ }}
@@ -73,7 +73,7 @@
     <!-- Grid Body Start -->
     <div class="scrollable-area">
         <table class="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable"
-				id = {{ config.id | raw }}>
+                id = {{ config.id | raw }}>
             <thead>
                 <tr id="tr-sort-{{ config.id }}" role="row">
                     <!-- header template -->
@@ -144,7 +144,7 @@
                 <% break;
             case 'textarea': %>
                 <textarea name="<%= rc.name %>" id="<%= rc.name %>" class="form-control" rows="5" <%= rc.validation %>>
-				</textarea>
+                </textarea>
 
                 <%break;
             default: %>
@@ -181,44 +181,44 @@
 
 {# grid header template #}
 <script type='template' id="{{ config.id | raw }}-header-template">
-	<%if (rc.type === 'multiselect') { %>
-		<div class="{{ config.id | raw }} dropdown f-grid-display-type">
-			<button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-				<span class="icon-placeholder">
-					<% if (rc.selectedCount>0) { %>
-						<i class="glyphicon glyphicon-check"></i>
-					<% } else { %>
-						<i class="glyphicon glyphicon-list"></i>
-					<% } %>
-				</span>
-				<span class="title">
-					<% if (rc.selectedCount>0) { %>
-						<%= rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>
-					<% } else { %>
-						A
-					<% } %>
-				</span>
-				<span class="caret"></span>
-			</button>
-			<ul class="dropdown-menu js-sel">
-				{% for key, option in multiselectToggleOptions %}
-					<li><a href="#{{ key }}">{{ option }}</a></li>
-				{% endfor %}
-			</ul>
-		</div>	
-	<% } else { 
-		if (rc.sortable) { %>
-			<a class="js-change-url" style="cursor: pointer;"><%= rc.label %></a>
-		<% } else { %>
-			<%= rc.label %>
-		<% }
-	} %>
+    <%if (rc.type === 'row_select') { %>
+        <div class="{{ config.id | raw }} dropdown f-grid-display-type">
+            <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                <span class="icon-placeholder">
+                    <% if (rc.selectedCount>0) { %>
+                        <i class="glyphicon glyphicon-check"></i>
+                    <% } else { %>
+                        <i class="glyphicon glyphicon-list"></i>
+                    <% } %>
+                </span>
+                <span class="title">
+                    <% if (rc.selectedCount>0) { %>
+                        <%= rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>
+                    <% } else { %>
+                        A
+                    <% } %>
+                </span>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu js-sel">
+                {% for key, option in multiselectToggleOptions %}
+                    <li><a href="#{{ key }}">{{ option }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>  
+    <% } else { 
+        if (rc.sortable) { %>
+            <a class="js-change-url" style="cursor: pointer;"><%= rc.label %></a>
+        <% } else { %>
+            <%= rc.label %>
+        <% }
+    } %>
 </script>
 
 {# grid row template #}
 <script type="template" id="{{ config.id }}-row-template">
     <% for (var index in rc.colsInfo) {
-		console.log(col);
+        console.log(col);
         var col = rc.colsInfo[index];
         if (col.hidden || col.form_only) {
             continue;
@@ -228,129 +228,129 @@
                 overflow = ' style="overflow:hidden;"';
         }
         %><td data-col="<%= col.name %>" <%= col.overflow %> ><%
-			switch (col.type) {
-			case 'multiselect':
-				var isSelected = '';
-				if (rc.row._selectable && rc.row.selected)
-					isSelected = 'checked';
-				var isSelectable = rc.row._selectable ? '' : 'DISABLED'; 
-				%><input type="checkbox" name="{{ config.id }}[checked][<%= rc.row.id %>]" class="select-row" 
-						<%= isSelected %> <%= isSelectable %> ><%				
-				
-				break;
-            case 'input':			
-			
-				
-				if (col.editable !== 'inline') {
-					switch (col.editor) {
-					case 'checkbox':
-					case 'radio' : 
-						%><%= rc.row[col.name] ? 'Yes' : 'No' %><%
+            switch (col.type) {
+            case 'row_select':
+                var isSelected = '';
+                if (rc.row._selectable && rc.row.selected)
+                    isSelected = 'checked';
+                var isSelectable = rc.row._selectable ? '' : 'DISABLED'; 
+                %><input type="checkbox" name="{{ config.id }}[checked][<%= rc.row.id %>]" class="select-row" 
+                        <%= isSelected %> <%= isSelectable %> ><%               
+                
+                break;
+            case 'input':           
+            
+                
+                if (col.editable !== 'inline') {
+                    switch (col.editor) {
+                    case 'checkbox':
+                    case 'radio' : 
+                        %><%= rc.row[col.name] ? 'Yes' : 'No' %><%
 
-						 break;
-					case 'select': 
-						%><%= col.options[rc.row[col.name]] 
+                         break;
+                    case 'select': 
+                        %><%= col.options[rc.row[col.name]] 
 
-						%><% break;
-					default: 
-						%><%= rc.row[col.name] %><%
-					 }
+                        %><% break;
+                    default: 
+                        %><%= rc.row[col.name] %><%
+                     }
 
-					break;
-				}
-				
-				var strName = "{{ config.id }}["+rc.row['id']+"]["+col.name+"]";
-				var strId = "{{ config.id }}-"+col.name+"-"+rc.row['id'];
-				var strClass = col.cssClass ? col.cssClass + ' form-control' : ' form-control';
-				var strDisabled = (typeof(rc.row[col.name + '_disabled']) !== 'undefined' &&
-								   rc.row[col.name + '_disabled'] === true) ? 'DISABLED' : '';
-				
+                    break;
+                }
+                
+                var strName = "{{ config.id }}["+rc.row['id']+"]["+col.name+"]";
+                var strId = "{{ config.id }}-"+col.name+"-"+rc.row['id'];
+                var strClass = col.cssClass ? col.cssClass + ' form-control' : ' form-control';
+                var strDisabled = (typeof(rc.row[col.name + '_disabled']) !== 'undefined' &&
+                                   rc.row[col.name + '_disabled'] === true) ? 'DISABLED' : '';
+                
                 switch (col.editor) {
                 case 'checkbox':
                     %><input type="checkbox" id="<%= strId %> name=<%= strName %>" class="<%= strClass %>" <%= col.validation %>
-							data-col="<%= col.name %>" <%= strDisabled %> /><%
+                            data-col="<%= col.name %>" <%= strDisabled %> /><%
 
                      break;
-				case 'textarea':
-					%><textarea id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>" <%= col.validation %>
-						    data-col="<%= col.name %>" <%= strDisabled %>  rows="4">
-						<%= rc.row[col.name] %>
-					</textarea><%
+                case 'textarea':
+                    %><textarea id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>" <%= col.validation %>
+                            data-col="<%= col.name %>" <%= strDisabled %>  rows="4">
+                        <%= rc.row[col.name] %>
+                    </textarea><%
 
-					break;
-				case 'select':
-					%><select id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>" <%= col.validation %>
-							data-col="<%= col.name %>"  <%= strDisabled %> ><%
-					
-						if (_.isArray(col.options)) {
-							for(var i = 0, l = col.options.length; i<l; i++) { 
-								%><option value="<%= col.options[i].value %>"><%= col.options[i].label %></option><%
-							 }
-						} else {
-							for(var key in col.options) { 
-								%><option value="<%= key %>'">'<%= col.options[key] %></option><%
-							 }
-						}
-					
-					%></select><%
+                    break;
+                case 'select':
+                    %><select id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>" <%= col.validation %>
+                            data-col="<%= col.name %>"  <%= strDisabled %> ><%
+                    
+                        if (_.isArray(col.options)) {
+                            for(var i = 0, l = col.options.length; i<l; i++) { 
+                                %><option value="<%= col.options[i].value %>"><%= col.options[i].label %></option><%
+                             }
+                        } else {
+                            for(var key in col.options) { 
+                                %><option value="<%= key %>"><%= col.options[key] %></option><%
+                             }
+                        }
+                    
+                    %></select><%
 
-					break;
-				case 'radio': 
-					%><input type="checkbox" id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>"  
-							<%= col.validation %> data-col="<%= col.name %>"  <%= strDisabled %> /><%
+                    break;
+                case 'radio': 
+                    %><input type="checkbox" id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>"  
+                            <%= col.validation %> data-col="<%= col.name %>"  <%= strDisabled %> /><%
 
-					break;
-				default: 
-					%><input type="text"  id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>"  
-							<%= col.validation %> data-col="<%= col.name %>"  <%= strDisabled %> 
-							value="<%= rc.row[col.name] %>" /><%
+                    break;
+                default: 
+                    %><input type="text"  id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>"  
+                            <%= col.validation %> data-col="<%= col.name %>"  <%= strDisabled %> 
+                            value="<%= rc.row[col.name] %>" /><%
 
-					break;
+                    break;
                 } 
-				{# TODO why is it need in inline edit mode? #}
-				%><span style="display:none;"><%= rc.row[col.name] %></span><%
+                {# TODO why is it need in inline edit mode? #}
+                %><span style="display:none;"><%= rc.row[col.name] %></span><%
 
                  break;
             case 'btn_group':
-				%><div class="table-actions-btns-group"><%
-				for(var i in col.buttons) {
-					var btn = col.buttons[i];
-					var event = (typeof(btn.event) !== 'undefined') ? 'onclick="'+btn.event+'"': '';
-					switch(btn.type){
-					case 'link': 
-						%><a <%= event %> class="btn btn-link <%= btn.cssClass %>" href="<%= btn.href %><%= rc.row[btn.col] %>"
-								title="<%= btn.title ? btn.title : '' %>">
-							<i class="<%= btn.icon %>" ></i>
-							<%= btn.caption %>
-						</a><%
+                %><div class="table-actions-btns-group"><%
+                for(var i in col.buttons) {
+                    var btn = col.buttons[i];
+                    var event = (typeof(btn.event) !== 'undefined') ? 'onclick="'+btn.event+'"': '';
+                    switch(btn.type){
+                    case 'link': 
+                        %><a <%= event %> class="btn btn-link <%= btn.cssClass %>" href="<%= btn.href %><%= rc.row[btn.col] %>"
+                                title="<%= btn.title ? btn.title : '' %>">
+                            <i class="<%= btn.icon %>" ></i>
+                            <%= btn.caption %>
+                        </a><%
 
-						 break;
-					default: 
-						%><button <%= event %> class="btn btn-link <%= btn.cssClass %>" title="<%= btn.title ? btn.title : '' %>">
-							<i class="<%= btn.icon %>" ></i>
-							<%= btn.caption %>
-						</button><%
-					 }
-				}
-				%></div><%
+                         break;
+                    default: 
+                        %><button <%= event %> class="btn btn-link <%= btn.cssClass %>" title="<%= btn.title ? btn.title : '' %>">
+                            <i class="<%= btn.icon %>" ></i>
+                            <%= btn.caption %>
+                        </button><%
+                     }
+                }
+                %></div><%
                 break;
             default:
-				switch(col.display) {
+                switch(col.display) {
                 case 'eval':
                      eval('print('+col.print+');');
 
                      break;
-				case 'file_size': 
-					%><%= filesizeFormat(rc.row[col.name]) %><%
+                case 'file_size': 
+                    %><%= filesizeFormat(rc.row[col.name]) %><%
 
-					 break;
-				default: 
-					%><%= rc.row[col.name] %><%
-				 }
+                     break;
+                default: 
+                    %><%= rc.row[col.name] %><%
+                 }
 
-				break;
+                break;
             } 
-		%></td><%
+        %></td><%
     } %>
 </script>
 

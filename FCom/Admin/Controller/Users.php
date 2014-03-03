@@ -15,7 +15,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config = parent::gridConfig();
 
         $config['columns'] = array(
-            array('type'=>'multiselect'),
+            array('type'=>'row_select'),
             array('name' => 'id', 'label' => 'ID', 'index' => 'id', 'width' => 55, 'cell' => 'integer'),
             array('name' => 'username', 'label' => 'User Name', 'width' => 100),
             array('name' => 'email', 'label' => 'Email', 'width' => 150),
@@ -26,12 +26,12 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
                   'options' => FCom_Admin_Model_User::i()->fieldOptions('status')),
             array('name' => 'create_at', 'label' => 'Created', 'width' => 100),
             array('name' => 'update_at', 'label' => 'Updated', 'width' => 100),
-            array('type'=>'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 85,
+            array('type'=>'btn_group', 'width' => 85,
                   'buttons'=> array(
-								array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 
-								array('name'=>'delete')
-							)
-				)
+                                array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 
+                                array('name'=>'delete')
+                            )
+                )
         );
         $config['actions'] = array(
             'edit' => array('caption' => 'status'),
@@ -121,7 +121,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config            = parent::gridConfig();
         $config['id']      = 'role_all_users_grid_' . $model->id;
         $config['columns'] = array(
-            array('type'=>'multiselect'),
+            array('type'=>'row_select'),
             array('name' => 'id', 'label' => 'ID', 'index' => 'au.id', 'width' => 55, 'hidden' => true),
             array('name' => 'username', 'label' => 'Name', 'index' => 'au.username', 'width' => 250),
             array('name' => 'email', 'label' => 'Email', 'index' => 'au.email', 'width' => 100),

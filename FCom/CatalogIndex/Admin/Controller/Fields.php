@@ -14,7 +14,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
         $fieldHlp = FCom_CatalogIndex_Model_Field::i();
         $config = parent::gridConfig();
         $config['columns'] = array(
-            array('type'=>'multiselect'),
+            array('type'=>'row_select'),
             array('name' => 'id', 'label' => 'ID', 'index' => 'idxf.id'),
             array('type'=>'input', 'name' => 'field_name', 'label' => 'Name', 'index' => 'idxf.field_name', 'editable' => true, 'addable' => true,
                   'validation' => array('required' => true, 'unique' => BApp::href('catalogindex/fields/unique'), 'maxlength' => 50)),
@@ -44,11 +44,11 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
                   'editor'=>'select', 'width' => 80, 'addable' => true, 'editable' => true),
             array('name' =>'source_callback', 'label' => 'Source Callback', 'index' => 'idxf.source_callback', 'width' => 80, 'hidden' => true),
             array('type' =>'btn_group', 'name'=>'_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80, 
-					'buttons' => array(
-										array('name'=>'edit'),
-										array('name'=>'delete')
-									)
-				)
+                    'buttons' => array(
+                                        array('name'=>'edit'),
+                                        array('name'=>'delete')
+                                    )
+                )
         );
         $config['actions'] = array(
 //            'new'    => array('caption' => 'Add New Index Field', 'modal' => true),

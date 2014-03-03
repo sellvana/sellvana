@@ -12,7 +12,7 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            array('type' => 'multiselect'),
+            array('type' => 'row_select'),
             array('name' => 'handle', 'label'=>'Handle'),
             array('name' => 'description', 'label'=>'Description', 'editable'=>true),
             array('type' => 'input', 'name' => 'renderer', 'label'=>'Renderer',
@@ -26,7 +26,7 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
             array('name' => 'meta_description', 'label'=>'Meta Description', 'hidden' => true),
             array('name' => 'meta_keywords', 'label'=>'Meta Keywords', 'hidden' => true),
             array('name' => 'modified_time', 'label'=>'Modified Time', 'hidden' => true),
-            array('type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+            array('type' => 'btn_group',
                   'buttons'=> array(
 									array('name' => 'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'),
 									array('name' => 'delete')

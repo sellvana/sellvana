@@ -88,7 +88,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         $config = parent::gridConfig();
 
         $config['columns'] = array(
-            array('type'=>'multiselect'),
+            array('type'=>'row_select'),
             //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
             array('name' => 'name', 'label' => 'Name', 'index' => 'name', 'width' => 100, 'overflow' => true),
             array('name' => 'description', 'label' => 'Description', 'width' => 150, 'overflow' => true),
@@ -99,7 +99,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             array('type'=>'input','name' => 'run_level_core', 'label' => "Run Level (Core)", 'options' => $areaRunLevelOptions, 'width' => 200, 'mass-editable-show' => true, 'mass-editable' => true, 'editor' => 'select', 'overflow' => true),
             array('name' => 'requires', 'label' => 'Requires', 'width' => 250, 'overflow' => true),
             array('name' => 'required_by', 'label' => 'Required By', 'width' => 300,'overflow' => true),
-            array('type'=>'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115,
+            array('type'=>'btn_group', 'width' => 115,
                 'buttons' => array(
                     array(
 						'type'=>'link','name'=>'required',

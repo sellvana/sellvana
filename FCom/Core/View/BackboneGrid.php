@@ -177,6 +177,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 										
 					break;
 				case 'btn_group':
+                    $col['label'] = 'Actions';
+                    $col['sortable'] = false;                     
 					foreach($col['buttons'] as $bId=>&$btn) {						
 						switch($btn['name']) {
 							case 'edit':																

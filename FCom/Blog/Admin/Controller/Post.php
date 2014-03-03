@@ -15,7 +15,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         $config = parent::gridConfig();
 
         $config['columns'] = array(
-            array('type' => 'multiselect'),
+            array('type' => 'row_select'),
             array('name' => 'id', 'label' => 'ID'),
             array('name' => 'author', 'label'=>'Author'),
             array('type' => 'input', 'name' => 'status', 'label' => 'Status', 'edit_inline' => false, 'editable' => true, 'mass-editable' => true, 'editor' => 'select','mass-editable-show' => true,
@@ -30,7 +30,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             array('name' => 'create_ym', 'label'=>'Create ym' , 'hidden' => true),
             array('name' => 'create_at', 'label'=>'Created', 'cell'=>'date'),
             array('name' => 'update_at', 'label'=>'Updated', 'cell'=>'date'),
-            array('type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+            array('type' => 'btn_group',
                   'buttons' => array(
 									array('name' => 'edit', 'href' => BApp::href('blog/post/form/?id='), 'col'=>'id'),
 									array('name' => 'delete' , 'edit_inline' => false)
