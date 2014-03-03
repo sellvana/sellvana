@@ -751,6 +751,7 @@ class BUtil extends BClass
         }
         $charsLen = strlen($chars)-1;
         $str = '';
+        mt_srand();
         for ($i=0; $i<$strLen; $i++) {
             $str .= $chars[mt_rand(0, $charsLen)];
         }
