@@ -14,14 +14,18 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type' => 'multiselect'),
             array('name' => 'id', 'label' => 'ID'),
             array('name' => 'name', 'label'=>'Name'),
             array('name' => 'description', 'label'=>'Description'),
             array('name' => 'url_key', 'label'=>'URL Key'),
             array('name' => 'post', 'label'=>'Posts', 'href' => BApp::href('blog/post/?category=')),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                'data' => array('edit' => array('href' => BApp::href('blog/category/form/?id='), 'col'=>'id'),'delete' => true)),
+            array('type'=>'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+                'buttons' => array(
+								array('name'=>'edit', 'href' => BApp::href('blog/category/form/?id='), 'col'=>'id'),
+								array('name'=>'delete')
+							)
+				)
         );
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {

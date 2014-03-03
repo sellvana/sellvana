@@ -166,30 +166,50 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 				$col['cssClass'] = 'select-row';
 				$col['edit'] = 'inline';
 			}
+			
+			if (empty($col['type'])) {
+				continue;
+			}
+			switch($col['type']) {
+				case 'multiselect':
+					$col['width'] = 50;
+                    $col['no_reorder'] = true;
+										
+					break;
+				case 'btn_group':
+					foreach($col['buttons'] as $bId=>&$btn) {						
+						switch($btn['name']) {
+							case 'edit':																
+								$btn['icon'] = ' icon-edit-sign';								
+								$btn['cssClass'] = ' btn-xs btn-edit ';
+								if (!empty($btn['href'])) {								
+									$btn['type'] = 'link';
+									
+									if(empty($btn['col'])) {
+										$btn['col']= 'id';
+									}
+								}
+								
+								break;
+							/*case 'edit_inline':
+								$col['icon'] = 'icon-pencil';
+								
+								break;*/
+							case 'delete':
+								$btn['icon'] = 'icon-remove';
+								$btn['cssClass'] = ' btn-delete ';
 
-			if (!empty($col['type']) && $col['type'] === 'btn_group') {								
-				switch($col['name']) {
-					case 'edit':
-						$col['icon'] = 'icon-edit';
-						$col['caption'] = '';
-						$col['cssClass'] = ' btn-xs btn-edit ';
-						if (!empty($col['href'])) {
-							$col['cssClass'] .= ' _modal';
-							$col['btn_type'] = 'link';
+								break;					
 						}
 						
-						break;
-					/*case 'edit_inline':
-						$col['icon'] = 'icon-pencil';
-						
-						break;*/
-					case 'delete':
-						$col['icon'] = 'icon-remove';
-						$col['cssClass'] = ' btn-delete ';
-
-						break;					
-				}
-				
+						//TODO: Is it really necessary not to have default icon when button has caption?
+						if (!empty($btn['caption'])) {
+							$btn['icon'] = '';
+						}
+					}
+					
+					
+					break;
 				
 			}
             /*$col['position'] = ++$pos;

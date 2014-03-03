@@ -19,7 +19,7 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
         $config = parent::gridConfig();
         $config['id'] = 'customer_addresses_grid_' . $customer->id;
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type'=>'multiselect'),
             array('name' => 'id', 'label' => 'ID', 'index' => 'a.id', 'width' => 80, 'hidden' => true),
             array('name' => 'customer_id', 'label' => 'Customer ID', 'index' => 'a.customer_id', 'hidden' => true, 'form_hidden_label' => true,
                   'addable' => true, 'editable' => true,
