@@ -775,7 +775,7 @@ class BUtil extends BClass
 
         while (preg_match('#\{([ULD]+)([0-9]+)\}#i', $pattern, $m)) {
             for ($i=0, $c=''; $i<strlen($m[1]); $i++) $c .= $chars[$m[1][$i]];
-            $pattern = preg_replace('#'.preg_quote($m[0]).'#', BUtil::randomString($m[2], $c), $pattern, 1);
+            $pattern = preg_replace('#'.preg_quote($m[0], '#').'#', BUtil::randomString($m[2], $c), $pattern, 1);
         }
         return $pattern;
     }
@@ -1081,7 +1081,7 @@ class BUtil extends BClass
             }
         }
         return $result;
-        /**
+        /*
         // recursive iterator proves slower than glob + is_dir
         $dirIte = new RecursiveDirectoryIterator($dir);
         $flatIte = new RecursiveIteratorIterator($dirIte);
@@ -1438,6 +1438,9 @@ class BUtil extends BClass
      */
     static public function simplifyString($str, $pattern='#[^a-z0-9-]+#', $filler='-')
     {
+        if (preg_match('#e[a-zA-Z]*$#', $pattern)) {
+            throw new BException('Restricted modifier');
+        }
         return trim(preg_replace($pattern, $filler, strtolower($str)), $filler);
     }
 
