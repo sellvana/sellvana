@@ -39,7 +39,7 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
                 'columns'=>array(
                     array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
                     array('name'=>'id', 'label'=>'ID', 'hidden'=>true),
-                    array('name'=>'group_id', 'label'=>'Customer Group', 'options'=>$cgOptions,'validation'=>array('required'=>true), 'addable'=>true,'editable'=>'inline', 'addable'=>true, 'editor'=>'select', 'width'=>150, 'default'=>1),
+                    array('name'=>'group_id', 'label'=>'Customer Group', 'options'=>$cgOptions,'validation'=>array('required'=>true), 'editable'=>'inline', 'addable'=>true, 'editor'=>'select', 'width'=>150, 'default'=>1),
                     array('name'=>'qty', 'label'=>'Minimum Qty', 'editable'=>'inline', 'addable'=>true, 'width'=>150, 'validation'=>array('required'=>true, 'number'=>true)),
                     array('name'=>'base_price', 'label'=>'Regular Price','validation'=>array('required'=>true, 'number'=>true), 'editable'=>'inline', 'addable'=>true, 'width'=>150),
                     array('name'=>'sale_price', 'label'=>'Special Price','validation'=>array('required'=>true, 'number'=>true), 'editable'=>'inline', 'addable'=>true, 'width'=>150),
@@ -48,8 +48,8 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
                 'data'=>BDb::many_as_array($orm->find_many()),
                 'data_mode'=>'local',
                 'filters'=>array(
-                                    array('field'=>'name', 'type'=>'text'),
-                                    array('field'=>'group_id', 'type'=>'multiselect')
+                    array('field'=>'name', 'type'=>'text'),
+                    array('field'=>'group_id', 'type'=>'multiselect')
                 ),
                 'actions'=>array(
                     'new'=>array('caption'=>'Add New Price'),
@@ -57,7 +57,8 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
                 ),
                 'events'=>array(
                     'init-detail','delete','mass-delete'
-                )
+                ),
+                'callbacks' => array('after_render' => 'addClassUnique')
             )
         );
         return $grid;

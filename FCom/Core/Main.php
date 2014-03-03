@@ -71,6 +71,7 @@ class FCom_Core_Main extends BClass
         BDebug::debug('ROOTDIR='.$rootDir);
 
         $webRoot = $req->webRoot();
+        $webRootTrimmed = rtrim($webRoot, '/');
         $baseHref = $config->get('web/base_href');
         $baseSrc = $config->get('web/base_src');
         $baseStore = $config->get('web/base_store');
@@ -78,17 +79,17 @@ class FCom_Core_Main extends BClass
         if (!$baseHref) {
             $baseHref = $webRoot;
         } elseif (!BUtil::isPathAbsolute($baseHref)) {
-            $baseHref = $webRoot.'/'.$baseHref;
+            $baseHref = $webRootTrimmed.'/'.$baseHref;
         }
         if (!$baseSrc) {
             $baseSrc = $baseHref;
         } elseif (!BUtil::isPathAbsolute($baseSrc)) {
-            $baseSrc = $webRoot.'/'.$baseSrc;
+            $baseSrc = $webRootTrimmed.'/'.$baseSrc;
         }
         if (!$baseStore) {
             $baseStore = $baseHref;
         } elseif (!BUtil::isPathAbsolute($baseStore)) {
-            $baseStore = $webRoot.'/'.$baseStore;
+            $baseStore = $webRootTrimmed.'/'.$baseStore;
         }
         $localConfig['web']['base_href'] = $baseHref;
         $localConfig['web']['base_src'] = $baseSrc;
@@ -173,6 +174,7 @@ class FCom_Core_Main extends BClass
                 ->setRootView('permissions');
             BLayout::i()->view('permissions')->set('errors', $permissionErrors);
             BResponse::i()->output();
+            exit;
         }
 
 #echo "<Pre>"; print_r($config->get()); exit;
@@ -317,6 +319,18 @@ class FCom_Core_Main extends BClass
             $this->_modulesDirs[] = $dirConf['dlc_dir'].'/*/*'; // Downloaded modules
             $this->_modulesDirs[] = $dirConf['root_dir'].'/FCom/*'; // Core modules
 
+            $addModuleDirs = $config->get('core/module_dirs');
+            if ($addModuleDirs && is_array($addModuleDirs)) {
+                foreach ($addModuleDirs as $dir) {
+                    if ($dir[0]==='@') {
+                        $dir = preg_replace_callback('#^@([^/]+)#', function($m) use ($dirConf) {
+                            return $dirConf[$m[1].'_dir'];
+                        }, $dir);
+                    }
+                    $this->_modulesDirs[] = $dir;
+                }
+            }
+
             foreach ($this->_modulesDirs as $dir) {
                 $modReg->scan($dir);
             }
@@ -366,10 +380,11 @@ class FCom_Core_Main extends BClass
         }
 
         $config = BConfig::i();
-        $c = $config->get(null, true);
+        $c = $config->get(null, null, true);
 
         if (in_array('core', $files)) {
             // configuration necessary for core startup
+            unset($c['module_run_levels']['request']);
             $core = array(
                 'install_status' => !empty($c['install_status']) ? $c['install_status'] : null,
                 'core' => !empty($c['core']) ? $c['core'] : null,
@@ -477,7 +492,10 @@ class FCom_Core_Main extends BClass
         $head->meta('csrf-token', BSession::i()->csrfToken());
         $head->js_raw('js_init', array('content'=>"
 FCom = {};
-FCom.cookie_options = ".BUtil::toJson(array('domain'=>$cookieConfig['domain'], 'path'=>$cookieConfig['path'])).";
+FCom.cookie_options = ".BUtil::toJson(array(
+    'domain' => !empty($cookieConfig['domain']) ? $cookieConfig['domain'] : null,
+    'path' => !empty($cookieConfig['path']) ? $cookieConfig['path'] : null,
+)).";
 FCom.base_href = '".BApp::i()->baseUrl()."';
 FCom.base_src = '".BConfig::i()->get('web/base_src')."';
         "));

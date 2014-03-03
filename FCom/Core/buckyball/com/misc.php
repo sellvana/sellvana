@@ -751,6 +751,7 @@ class BUtil extends BClass
         }
         $charsLen = strlen($chars)-1;
         $str = '';
+        mt_srand();
         for ($i=0; $i<$strLen; $i++) {
             $str .= $chars[mt_rand(0, $charsLen)];
         }
@@ -774,7 +775,7 @@ class BUtil extends BClass
 
         while (preg_match('#\{([ULD]+)([0-9]+)\}#i', $pattern, $m)) {
             for ($i=0, $c=''; $i<strlen($m[1]); $i++) $c .= $chars[$m[1][$i]];
-            $pattern = preg_replace('#'.preg_quote($m[0]).'#', BUtil::randomString($m[2], $c), $pattern, 1);
+            $pattern = preg_replace('#'.preg_quote($m[0], '#').'#', BUtil::randomString($m[2], $c), $pattern, 1);
         }
         return $pattern;
     }
@@ -1062,17 +1063,42 @@ class BUtil extends BClass
         return $path;
     }
 
-    public static function globRecursive($pattern, $flags=0)
+    public static function globRecursive($dir, $pattern = null, $flags=0)
     {
-        $files = glob($pattern, $flags);
-        if (!$files) $files = array();
-        $dirs = glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT);
-        if ($dirs) {
-            foreach ($dirs as $dir) {
-                $files = array_merge($files, self::globRecursive($dir.'/'.basename($pattern), $flags));
+        /**/
+        if (is_null($pattern)) {
+            $pattern = '*';
+        }
+        $files = glob($dir . '/' . $pattern, $flags);
+        if (!$files) {
+            return array();
+        }
+        $result = $files;
+        foreach ($files as $file) {
+            if (is_dir($file)) {
+                $subFiles = static::globRecursive($file, $pattern, $flags);
+                $result = array_merge($result, $subFiles);
             }
         }
-        return $files;
+        return $result;
+        /*
+        // recursive iterator proves slower than glob + is_dir
+        $dirIte = new RecursiveDirectoryIterator($dir);
+        $flatIte = new RecursiveIteratorIterator($dirIte);
+        if (is_null($pattern)) {
+            $pattern = '#.*#';
+        }
+        $files = new RegexIterator($flatIte, $pattern, RegexIterator::GET_MATCH);
+        $fileList = array();
+        foreach($files as $file) {
+            if (substr($file[0], -2) === '..') {
+                continue;
+            }
+            $file = preg_replace(array('#\\\\#', '#/.$#'), array('/', ''), $file[0]);
+            $fileList[] = $file;
+        }
+        return $fileList;
+        /**/
     }
 
     public static function isPathAbsolute($path)
@@ -1412,6 +1438,9 @@ class BUtil extends BClass
      */
     static public function simplifyString($str, $pattern='#[^a-z0-9-]+#', $filler='-')
     {
+        if (preg_match('#e[a-zA-Z]*$#', $pattern)) {
+            throw new BException('Restricted modifier');
+        }
         return trim(preg_replace($pattern, $filler, strtolower($str)), $filler);
     }
 
@@ -1535,7 +1564,7 @@ class BUtil extends BClass
         if (!class_exists('ZipArchive')) {
             throw new BException("Class ZipArchive doesn't exist");
         }
-        $files = BUtil::globRecursive($sourceDir.'/*');
+        $files = BUtil::globRecursive($sourceDir);
         if (!$files) {
             throw new BException('Invalid or empty source dir');
         }
@@ -1734,6 +1763,10 @@ class BEmail extends BClass
         if ($files) {
             // $body and $headers will be updated
             $this->_addAttachments($files, $headers, $body);
+        }
+
+        if (empty($headers['content-type'])) {
+            $headers['content-type'] = 'Content-Type: text/plain; charset=utf-8';
         }
 
         $emailData = array(
@@ -2149,7 +2182,7 @@ class BDebug extends BClass
     */
     public function __construct()
     {
-        self::$_startTime = microtime(true);
+        static::$_startTime = microtime(true);
         BEvents::i()->on('BResponse::output:after', 'BDebug::afterOutput');
     }
 
@@ -2194,21 +2227,21 @@ class BDebug extends BClass
         if (!(error_reporting() & $code)) {
             return;
         }
-        static::trigger(self::$_phpErrorMap[$code], $message, 1);
-        //throw new BErrorException(self::$_phpErrorMap[$code], $message, $file, $line, $context);
+        static::trigger(static::$_phpErrorMap[$code], $message, 1);
+        //throw new BErrorException(static::$_phpErrorMap[$code], $message, $file, $line, $context);
     }
 
     public static function exceptionHandler($e)
     {
         //static::trigger($e->getCode(), $e->getMessage(), $e->stackPop+1);
-        static::trigger(self::ERROR, $e);
+        static::trigger(static::ERROR, $e);
     }
 
     public static function shutdownHandler()
     {
         $e = error_get_last();
         if ($e && ($e['type']===E_ERROR || $e['type']===E_PARSE || $e['type']===E_COMPILE_ERROR || $e['type']===E_COMPILE_WARNING)) {
-            static::trigger(self::CRITICAL, $e['file'].':'.$e['line'].': '.$e['message'], 1);
+            static::trigger(static::CRITICAL, $e['file'].':'.$e['line'].': '.$e['message'], 1);
         }
     }
 
@@ -2220,7 +2253,7 @@ class BDebug extends BClass
         }
         if (is_null($level)) {
             if (is_null(static::$_level)) {
-                static::$_level = static::$_levelPreset[self::$_mode];
+                static::$_level = static::$_levelPreset[static::$_mode];
             }
             return static::$_level[$type];
         }
@@ -2251,7 +2284,7 @@ class BDebug extends BClass
 
     public static function adminEmail($email)
     {
-        self::$_adminEmail = $email;
+        static::$_adminEmail = $email;
     }
 
     public static function mode($mode=null, $setLevels=true)
@@ -2259,7 +2292,7 @@ class BDebug extends BClass
         if (is_null($mode)) {
             return static::$_mode;
         }
-        self::$_mode = $mode;
+        static::$_mode = $mode;
         if ($setLevels && !empty(static::$_levelPreset[$mode])) {
             static::$_level = static::$_levelPreset[$mode];
         }
@@ -2274,6 +2307,9 @@ class BDebug extends BClass
 
     public static function trigger($level, $msg, $stackPop=0)
     {
+        if ($level !== static::DEBUG) {
+            static::$_collectedErrors[$level][] = $msg;
+        }
         if (is_scalar($msg)) {
             $e = array('msg'=>$msg);
         } elseif (is_object($msg) && $msg instanceof Exception) {
@@ -2286,14 +2322,14 @@ class BDebug extends BClass
 
         //$stackPop++;
         $bt = debug_backtrace(true);
-        $e['level'] = self::$_levelLabels[$level];
+        $e['level'] = static::$_levelLabels[$level];
         if (isset($bt[$stackPop]['file'])) $e['file'] = $bt[$stackPop]['file'];
         if (isset($bt[$stackPop]['line'])) $e['line'] = $bt[$stackPop]['line'];
         //$o = $bt[$stackPop]['object'];
         //$e['object'] = is_object($o) ? get_class($o) : $o;
 
         $e['ts'] = BDb::now();
-        $e['t'] = microtime(true)-self::$_startTime;
+        $e['t'] = microtime(true)-static::$_startTime;
         $e['d'] = null;
         $e['c'] = null;
         $e['mem'] = memory_get_usage();
@@ -2310,32 +2346,32 @@ class BDebug extends BClass
             $e['module'] = $moduleName;
         }
 
-        if (is_null(static::$_level) && !empty(static::$_levelPreset[self::$_mode])) {
-            static::$_level = static::$_levelPreset[self::$_mode];
+        if (is_null(static::$_level) && !empty(static::$_levelPreset[static::$_mode])) {
+            static::$_level = static::$_levelPreset[static::$_mode];
         }
 
-        $l = self::$_level[self::MEMORY];
+        $l = static::$_level[static::MEMORY];
         if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
             //$e['msg'] = substr($e['msg'], 0, 50); $e['file'] = ''; $e['line'] = '';
-            self::$_events[] = $e;
-            $id = sizeof(self::$_events)-1;
+            static::$_events[] = $e;
+            $id = sizeof(static::$_events)-1;
         }
 
-        $l = self::$_level[self::SYSLOG];
+        $l = static::$_level[static::SYSLOG];
         if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
-            error_log($message, 0, self::$_logDir);
+            error_log($message, 0, static::$_logDir);
         }
 
-        if (!is_null(self::$_logDir)) { // require explicit enable of file log
-            $l = self::$_level[self::FILE];
+        if (!is_null(static::$_logDir)) { // require explicit enable of file log
+            $l = static::$_level[static::FILE];
             if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
                 /*
-                if (is_null(self::$_logDir)) {
-                    self::$_logDir = sys_get_temp_dir();
+                if (is_null(static::$_logDir)) {
+                    static::$_logDir = sys_get_temp_dir();
                 }
                 */
-                $file = self::$_logDir.'/'.self::$_logFile[$level];
-                if (is_writable(self::$_logDir) || is_writable($file)) {
+                $file = static::$_logDir.'/'.static::$_logFile[$level];
+                if (is_writable(static::$_logDir) || is_writable($file)) {
                     error_log("{$e['ts']} {$e['mem']} {$e['t']} {$message}\n", 3, $file);
                 } else {
                     //TODO: anything needs to be done here?
@@ -2343,14 +2379,14 @@ class BDebug extends BClass
             }
         }
 
-        if (!is_null(self::$_adminEmail)) { // require explicit enable of email
-            $l = self::$_level[self::EMAIL];
+        if (!is_null(static::$_adminEmail)) { // require explicit enable of email
+            $l = static::$_level[static::EMAIL];
             if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
-                error_log(print_r($e, 1), 1, self::$_adminEmail);
+                error_log(print_r($e, 1), 1, static::$_adminEmail);
             }
         }
 
-        $l = self::$_level[self::OUTPUT];
+        $l = static::$_level[static::OUTPUT];
         if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
             echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
             //ob_start();
@@ -2360,7 +2396,7 @@ class BDebug extends BClass
             echo '</xmp>';
         }
 /*
-        $l = self::$_level[self::EXCEPTION];
+        $l = static::$_level[static::EXCEPTION];
         if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
             if (is_object($msg) && $msg instanceof Exception) {
                 throw $msg;
@@ -2369,7 +2405,7 @@ class BDebug extends BClass
             }
         }
 */
-        $l = self::$_level[self::STOP];
+        $l = static::$_level[static::STOP];
         if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
             static::dumpLog();
             die;
@@ -2380,75 +2416,64 @@ class BDebug extends BClass
 
     public static function alert($msg, $stackPop=0)
     {
-        self::i()->collectError($msg);
-        return self::trigger(self::ALERT, $msg, $stackPop+1);
+        return static::trigger(static::ALERT, $msg, $stackPop+1);
     }
 
     public static function critical($msg, $stackPop=0)
     {
-        self::i()->collectError($msg);
-        return self::trigger(self::CRITICAL, $msg, $stackPop+1);
+        return static::trigger(static::CRITICAL, $msg, $stackPop+1);
     }
 
     public static function error($msg, $stackPop=0)
     {
-        self::i()->collectError($msg);
-        return self::trigger(self::ERROR, $msg, $stackPop+1);
+        return static::trigger(static::ERROR, $msg, $stackPop+1);
     }
 
     public static function warning($msg, $stackPop=0)
     {
-        self::i()->collectError($msg);
-        return self::trigger(self::WARNING, $msg, $stackPop+1);
+        return static::trigger(static::WARNING, $msg, $stackPop+1);
     }
 
     public static function notice($msg, $stackPop=0)
     {
-        self::i()->collectError($msg);
-        return self::trigger(self::NOTICE, $msg, $stackPop+1);
+        return static::trigger(static::NOTICE, $msg, $stackPop+1);
     }
 
     public static function info($msg, $stackPop=0)
     {
-        self::i()->collectError($msg);
-        return self::trigger(self::INFO, $msg, $stackPop+1);
+        return static::trigger(static::INFO, $msg, $stackPop+1);
     }
 
-    public function collectError($msg, $type=self::ERROR)
+    static public function getCollectedErrors($type=self::ERROR)
     {
-        self::$_collectedErrors[$type][] = $msg;
-    }
-
-    public function getCollectedErrors($type=self::ERROR)
-    {
-        if (!empty(self::$_collectedErrors[$type])) {
-            return self::$_collectedErrors[$type];
+        if (!empty(static::$_collectedErrors[$type])) {
+            return static::$_collectedErrors[$type];
         }
     }
 
     public static function debug($msg, $stackPop=0)
     {
-        if ('DEBUG'!==self::$_mode) return; // to speed things up
-        return self::trigger(self::DEBUG, $msg, $stackPop+1);
+        if ('DEBUG'!==static::$_mode) return; // to speed things up
+        return static::trigger(static::DEBUG, $msg, $stackPop+1);
     }
 
     public static function profile($id)
     {
-        if ($id && !empty(self::$_events[$id])) {
-            self::$_events[$id]['d'] = microtime(true)-self::$_startTime-self::$_events[$id]['t'];
-            self::$_events[$id]['c']++;
+        if ($id && !empty(static::$_events[$id])) {
+            static::$_events[$id]['d'] = microtime(true)-static::$_startTime-static::$_events[$id]['t'];
+            static::$_events[$id]['c']++;
         }
     }
 
     public static function is($modes)
     {
         if (is_string($modes)) $modes = explode(',', $modes);
-        return in_array(self::$_mode, $modes);
+        return in_array(static::$_mode, $modes);
     }
 
     public static function dumpLog($return=false)
     {
-        if (!(self::$_mode===self::MODE_DEBUG || self::$_mode===self::MODE_DEVELOPMENT)
+        if (!(static::$_mode===static::MODE_DEBUG || static::$_mode===static::MODE_DEVELOPMENT)
             || BResponse::i()->contentType()!=='text/html'
             || BRequest::i()->xhr()
         ) {
@@ -2470,9 +2495,9 @@ class BDebug extends BClass
         print_r(BORM::get_query_log());
         //BEvents::i()->debug();
         echo "</pre>";
-        //print_r(self::$_events);
+        //print_r(static::$_events);
 ?><table cellspacing="0"><tr><th>Message</th><th>Rel.Time</th><th>Profile</th><th>Memory</th><th>Level</th><th>Relevant Location</th><th>Module</th></tr><?php
-        foreach (self::$_events as $e) {
+        foreach (static::$_events as $e) {
             if (empty($e['file'])) { $e['file'] = ''; $e['line'] = ''; }
             $profile = $e['d'] ? number_format($e['d'], 6).($e['c']>1 ? ' ('.$e['c'].')' : '') : '';
             echo "<tr><td>".nl2br(htmlspecialchars($e['msg']))."</td><td>".number_format($e['t'], 6)."</td><td>".$profile."</td><td>".number_format($e['mem'], 0)."</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>".(!empty($e['module'])?$e['module']:'')."</td></tr>";
@@ -2493,7 +2518,7 @@ class BDebug extends BClass
     */
     public static function delta()
     {
-        return microtime(true)-self::$_startTime;
+        return microtime(true)-static::$_startTime;
     }
 
     public static function dump($var)
@@ -2705,7 +2730,7 @@ class BLocale extends BClass
     static public function collectTranslations($rootDir, $targetFile)
     {
         //find files recursively
-        $files = self::getFilesFromDir($rootDir);
+        $files = static::getFilesFromDir($rootDir);
         if (empty($files)) {
             return true;
         }
@@ -2714,7 +2739,7 @@ class BLocale extends BClass
         $keys = array();
         foreach($files as $file) {
             $source = file_get_contents($file);
-            $source = self::getTwigSource($file, $source);
+            $source = static::getTwigSource($file, $source);
             $tokens = token_get_all($source);
             $func = 0;
             $class = 0;
@@ -2748,9 +2773,9 @@ class BLocale extends BClass
 
         //import translation from $targetFile
 
-        self::$_tr = '';
-        self::addTranslationsFile($targetFile);
-        $translations = self::getTranslations();
+        static::$_tr = '';
+        static::addTranslationsFile($targetFile);
+        $translations = static::getTranslations();
 
         //find undefined translations
         foreach ($keys as $key => $v) {
@@ -2834,7 +2859,7 @@ class BLocale extends BClass
                 if ($file != "." && $file != "..") {
                     if(is_dir($dir.'/'.$file)) {
                         $dir2 = $dir.'/'.$file;
-                        $files = array_merge($files, self::getFilesFromDir($dir2));
+                        $files = array_merge($files, static::getFilesFromDir($dir2));
                     }
                     else {
                         $files[] = $dir.'/'.$file;
@@ -2854,7 +2879,7 @@ class BLocale extends BClass
             return;
         }
         $params['extension'] = $ext;
-        self::importTranslations($file, $params);
+        static::importTranslations($file, $params);
     }
 
     protected static function addTranslation($r, $module=null)
@@ -2913,6 +2938,27 @@ class BLocale extends BClass
         return BUtil::sprintfn($tr, $params);
     }
 
+    public function translations($sources)
+    {
+        $results = array();
+        if(is_array($sources)){
+            foreach ( $sources as $string ) {
+                if(is_string($string)){
+                    $results[$string] = static::_($string);
+                } else if(is_array($string) && !empty($string)) {
+                    $str = (string) $string[0];
+                    $params = isset($string[1])? (array) $string[1]: array();
+                    $module = isset($string[2])? (string) $string[2]: null;
+                    $results[$str] = static::_($str, $params, $module);
+                }
+            }
+        } else {
+            $results[(string) $sources] = static::_((string) $sources);
+        }
+
+        return BUtil::toJson($results);
+    }
+
     /**
      * @param string $file filename
      * @param string $source file content
@@ -2920,10 +2966,10 @@ class BLocale extends BClass
      */
     protected static function getTwigSource($file, $source)
     {
-        self::initTwig();
+        static::initTwig();
         $info = pathinfo($file, PATHINFO_EXTENSION);
         if ($info == 'twig') {
-            $stringTwig = self::getTwigEnv();
+            $stringTwig = static::getTwigEnv();
             try {
                 $source = $stringTwig->compile($stringTwig->parse($stringTwig->tokenize($source)));
             } catch (Twig_Error_Syntax $e) {
@@ -2938,13 +2984,13 @@ class BLocale extends BClass
     protected static $twig;
     protected static function initTwig()
     {
-        if(!self::$twig){
+        if(!static::$twig){
             BEvents::i()->on("BTwig::init", __CLASS__ . "::setTwigEnv");
             $bDir = BModuleRegistry::i()->module("FCom_Core")->baseDir();
             echo $bDir;
             BTwig::init($bDir);
             echo "after Initing twig event\n";
-            self::$twig = 1;
+            static::$twig = 1;
         }
     }
 
@@ -2954,7 +3000,7 @@ class BLocale extends BClass
     protected static $twigEnv;
     public static function setTwigEnv($args)
     {
-        self::$twigEnv = $args['string_adapter'];
+        static::$twigEnv = $args['string_adapter'];
     }
 
     /**
@@ -2962,7 +3008,7 @@ class BLocale extends BClass
      */
     private static function getTwigEnv()
     {
-        return self::$twigEnv;
+        return static::$twigEnv;
     }
 
     /*
@@ -3099,7 +3145,7 @@ class BLocale extends BClass
 
     static public function getTranslations()
     {
-        return self::$_tr;
+        return static::$_tr;
     }
 
     static protected $_currencySymbolMap = array(
@@ -3372,12 +3418,13 @@ class BYAML extends BCLass
 
     static public function load($filename, $cache=true)
     {
-        $filename1 = realpath($filename);
-        if (!$filename1) {
+        //$filename1 = realpath($filename);
+        //if (!$filename1) {
+        if (!file_exists($filename)) {
             BDebug::debug('BCache load: file does not exist: '.$filename);
             return false;
         }
-        $filename = $filename1;
+        //$filename = $filename1;
 
         $filemtime = filemtime($filename);
 
@@ -3559,14 +3606,32 @@ class BValidate extends BClass
         foreach ($this->_expandedRules as $r) {
             $args = !empty($r['args']) ? $r['args'] : array();
             $r['args']['field'] = $r['field']; // for callback and message vars
+
             if (is_string($r['rule']) && preg_match($this->_reRegex, $r['rule'], $m)) {
+
                 $result = empty($data[$r['field']]) || preg_match($m[0], (string)$data[$r['field']]);
+
             } elseif($r['rule'] instanceof Closure){
+
                 $result = $r['rule']($data, $r['args']);
+
             } elseif (is_callable($r['rule'])) {
-                $result = BUtil::call($r['rule'], array($data, $r['args']), true);
+
+                $result = call_user_func($r['rule'], $data, $r['args']);
+
+            } elseif (is_string($r['rule'])) {
+
+                $callback = BUtil::extCallback($r['rule']);
+                if ($callback !== $r['rule']) {
+                    $result = call_user_func($r['rule'], $data, $r['args']);
+                } else {
+                    throw new BException('Invalid rule: '.print_r($r['rule'], 1));
+                }
+
             } else {
+
                 throw new BException('Invalid rule: '.print_r($r['rule'], 1));
+
             }
 
             if (is_string($result)) {
@@ -3651,7 +3716,7 @@ class BValidate extends BClass
         if (!isset($data[$args['field']])) {
             return false;
         }
-        if ($data[$args['field']]===0) {
+        if (is_numeric($data[$args['field']])) {
             return true;
         }
         return !empty($data[$args['field']]);

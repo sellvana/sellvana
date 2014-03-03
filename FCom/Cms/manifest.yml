@@ -12,16 +12,16 @@ modules:
         areas:
             FCom_Admin:
                 routing:
-                    - [ get, /cms/nav, FCom_Cms_Admin_Controller_Nav.index ]
-                    - [ any, /cms/nav/.action, FCom_Cms_Admin_Controller_Nav ]
+                    - [ /cms/nav, FCom_Cms_Admin_Controller_Nav.index ]
+                    - [ /cms/nav/.action, FCom_Cms_Admin_Controller_Nav ]
 
-                    - [ get, /cms/pages, FCom_Cms_Admin_Controller_Pages.index ]
-                    - [ any, /cms/pages/.action, FCom_Cms_Admin_Controller_Pages ]
-                    - [ any, /cms/pages/history/:id/grid_data, FCom_Cms_Admin_Controller_Pages.history_grid_data ]
+                    - [ /cms/pages, FCom_Cms_Admin_Controller_Pages.index ]
+                    - [ /cms/pages/.action, FCom_Cms_Admin_Controller_Pages ]
+                    - [ /cms/pages/history/:id/grid_data, FCom_Cms_Admin_Controller_Pages.history_grid_data ]
 
-                    - [ get, /cms/blocks, FCom_Cms_Admin_Controller_Blocks.index ]
-                    - [ any, /cms/blocks/.action, FCom_Cms_Admin_Controller_Blocks ]
-                    - [ any, /cms/blocks/history/:id/grid_data, FCom_Cms_Admin_Controller_Blocks.history_grid_data ]
+                    - [ /cms/blocks, FCom_Cms_Admin_Controller_Blocks.index ]
+                    - [ /cms/blocks/.action, FCom_Cms_Admin_Controller_Blocks ]
+                    - [ /cms/blocks/history/:id/grid_data, FCom_Cms_Admin_Controller_Blocks.history_grid_data ]
 
-                    - [ any, /cms/forms, FCom_Cms_Admin_Controller_Forms.index ]
-                    - [ any, /cms/forms/.action, FCom_Cms_Admin_Controller_Forms ]
+                    - [ /cms/forms, FCom_Cms_Admin_Controller_Forms.index ]
+                    - [ /cms/forms/.action, FCom_Cms_Admin_Controller_Forms ]

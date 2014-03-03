@@ -31,7 +31,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ->select(array('a.id', 'a.folder', 'a.file_name', 'a.file_size'))
                 ->order_by_expr('id asc');
             ;
-        $baseSrc = BConfig::i()->get('web/base_src') . '/';
+        $baseSrc = rtrim(BConfig::i()->get('web/base_src'), '/') . '/';
         $config = array(
             'config' => array(
                 'id' => $id,
@@ -55,6 +55,9 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'events' => array('add','select-rows','init')
             )
         );
+        if (isset($options['callbacks'])) {
+            $config['config']['callbacks'] = $options['callbacks'];
+        }
         if (!empty($options['config'])) {
             $config = BUtil::arrayMerge($config, $options['config']);
         }
@@ -163,8 +166,8 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     $status = 'ERROR';
                 }
 
-                $row = array('id'=>$id, 'file_name'=>$fileName, 'file_size'=>$att->file_size, 'act' => $status);
-                echo BUtil::toJson($row);
+                $row = array('id'=>$id, 'file_name'=>$fileName, 'file_size'=>$att->file_size, 'act' => $status, 'folder' => $folder);
+                BResponse::i()->json($row);
 
                 //echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".BUtil::toJson($row)."); </script>";
                 // TODO: properly refresh grid after file upload
@@ -174,7 +177,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 //echo "<script>parent.\$('#$gridId').trigger( 'reloadGrid' ); </script>";
 
             }
-            exit;
+            break;
 
         case 'edit':
             $id = $r->post('id');
@@ -182,6 +185,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $att = $attModel->load($id);
             if (!$att) {
                 BResponse::i()->json(array('error'=>true));
+                return;
             }
             $oldFileName = $att->file_name;
             if (@rename($targetDir.'/'.$oldFileName, $targetDir.'/'.$fileName)) {

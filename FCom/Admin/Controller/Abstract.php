@@ -204,52 +204,59 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         BResponse::i()->json($out);
     }
 
-    protected function _processGridDataPost($class, $defData=array())
+    protected function _processGridDataPost($class, $defData = array())
     {
         $r = BRequest::i();
         $id = $r->post('id');
         $data = $defData + $r->post();
-        $model = $class::i();
+        $hlp = $class::i();
         unset($data['id'], $data['oper']);
 
-        $args = array('data'=>&$data, 'model'=>&$model);
-        $this->gridPostBefore(array('data'=>&$data, 'model'=>&$model));
-        switch ($r->post('oper')) {
+        $args = array('data' => &$data, 'oper' => $r->post('oper'), 'helper' => $hlp);
+        $this->gridPostBefore($args);
+
+        switch ($args['oper']) {
         case 'add':
-            $set = $model->create($data)->save();
+            //fix Undefined variable: set
+            $set = $args['model'] = $hlp->create($data)->save();
             $result = $set->as_array();
             break;
+
         case 'edit':
-            $set = $model->load($id)->set($data)->save();
+            //fix Undefined variable: set
+            $set = $args['model'] = $hlp->load($id)->set($data)->save();
             $result = $set->as_array();
             break;
+
         case 'del':
-            $model->load($id)->delete();
+            $args['model'] = $hlp->load($id)->delete();
             $result = array('success'=>true);
             break;
+
         case 'mass-delete':
-            $ids = explode(",",$id);
-            foreach($ids as $id) {
-                $model->load($id)->delete();
+            $args['ids'] = explode(",", $id);
+            foreach($args['ids'] as $id) {
+                $hlp->load($id)->delete();
             }
             $result = array('success'=>true);
             break;
+
         case 'mass-edit':
-            $ids = explode(',',$id);
-            foreach($ids as $id) {
+            $args['ids'] = explode(',', $id);
+            foreach ($args['ids'] as $id) {
                 if (isset($data['_new'])) {
                     unset($data['_new']);
-                    $set = $model->create($data)->save();
+                    $args['models'][] = $hlp->create($data)->save();
                 } else {
-                    $set = $model->load($id)->set($data)->save();
+                    $args['models'][] = $hlp->load($id)->set($data)->save();
                 }
             }
             $result = array('success'=>true);
             break;
-
         }
 
-        $this->gridPostAfter(array('data'=>$data, 'model'=>$model, 'result'=>&$result));
+        $args['result'] =& $result;
+        $this->gridPostAfter($args);
 
         //BResponse::i()->redirect('fieldsets/grid_data');
         BResponse::i()->json($result);

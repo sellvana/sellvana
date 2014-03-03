@@ -46,12 +46,12 @@
                 {{ category.get('content') | raw }}
             </div>
 
-          {% elseif part == 'content' %}
+          {% elseif part == 'view' %}
 
             {% set viewInfo = category.get('view_name') | split(':') %}
             {% if viewInfo[0] == 'view' %}
 
-              {{ THIS.view(viewInfo[1]) }}
+              {{ THIS.view(viewInfo[1]) | raw }}
 
             {% elseif viewInfo[0] == 'block' %}
 

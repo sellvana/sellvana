@@ -134,15 +134,14 @@ function phptal_tales_cms_block($src, $nothrow)
     return "BPHPTAL::talesCmsBlock('".str_replace("'","\\'",$src)."')";
 }
 
-function phptal_tales_href($src, $nothrow)
+function phptal_tales_href($href, $nothrow)
 {
-    return "BApp::href('".str_replace("'","\\'",$src)."')";
+    return "BApp::href('".str_replace("'","\\'", $href)."')";
 }
 
 function phptal_tales_src($src, $nothrow)
 {
-    list($modName, $file) = explode('/', $src, 2)+array('');
-    return "BApp::src('".str_replace("'","\\'",$modName)."','".str_replace("'","\\'",$file)."')";
+    return "BApp::src('".str_replace("'","\\'", $src)."')";
 }
 
 class BPHPTAL_PreFilter extends PHPTAL_PreFilter

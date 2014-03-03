@@ -20,23 +20,64 @@
     <div class="btn-group">
       <button class="btn btn-primary" data-toggle="modal" data-target="#add-widget-modal">{{ '+ Add Widget'|_ }}</button>
     </div>
-    <div class="btn-group dropdown">
-      <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-        <i class="icon-calendar"></i>
-        <span>{{ 'Custom'|_ }}</span>
-        <b class="caret"></b>
-      </button>
-      <ul class="dropdown-menu pull-right dashboard-filter-range">
-        <li>
-          <div class="input-group range">
-            <input type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange" value="">
-            <span class="input-group-addon">
-              <i class="icon-calendar"></i>
-            </span>
-          </div>
-        </li>
-      </ul>
+    <div class="btn-group  dropdown  f-filter-btns date-range-plugin" id="custom">
+        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <i class="icon-calendar"></i>
+            <span>{{ 'Custom'|_ }}</span>
+            <b class="caret"></b>
+        </button>
+
+        <ul class="dropdown-menu filter-box">
+            <li>
+                <div class="input-group">
+                    <div class="input-group-btn  dropdown" >
+                        <button class='btn btn-default dropdown dropdown-toggle filter-text-sub ' data-toggle='dropdown'>
+                            {{ 'Between'|_ }}
+                            <span class='caret'></span>
+                        </button>
+
+                        <ul class='dropdown-menu filter-sub'>
+                            <li>
+                                <a class='filter_op range' data-id='between' href='javascript:void()'>{{ 'between'|_ }}</a>
+                            </li>
+                            <li>
+                                <a class='filter_op not_range' data-id='from' href='javascript:void()'>{{ 'from'|_ }}</a>
+                            </li>
+                            <li>
+                                <a class='filter_op not_range' data-id='to' href='javascript:void()'>{{ 'to'|_ }}</a>
+                            </li>
+                            <li>
+                                <a  class='filter_op not_range' data-id='equal' href='javascript:void()'>{{ 'is equal to'|_ }}</a>
+                            </li>
+                            <li>
+                                <a class='filter_op range' data-id='not_in' href='javascript:void()'>{{ 'not in'|_ }}</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="input-group range"  >
+                        <input id="data-range-picker-text" type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange" value="">
+                    <span id="daterange2" class="input-group-addon">
+                      <i class="icon-calendar"></i>
+                    </span>
+                    </div>
+                    <div class="datepicker input-group not_range">
+                        <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" class="form-control" value="">
+                  <span class="input-group-addon">
+                    <span data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></span>
+                  </span>
+                    </div>
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-primary update">
+                            <i class=" icon-check-sign"></i>
+                            {{ 'Update'|_ }}
+                        </button>
+                    </div>
+                </div>
+            </li>
+        </ul>
     </div>
+
     <div class="pull-right btn-group">
       <button class="btn btn-default">{{ 'Last month'|_ }}</button>
       <button class="btn btn-default">{{ 'Last week'|_ }}</button>
@@ -100,10 +141,10 @@
 </div>
 
 <script>
-require(['jquery', 'jquery-ui'], function($) {
+require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], function($) {
   var dashboardUrl = "{{ APP.href('dashboard') }}", personalizeUrl = "{{ APP.href('my_account/personalize') }}";
   //var widgetTemplate = _.template($('#dashboard-widget-template').html());
-
+  var select = $('#add-widget-selection');
   function load(widgets, wrapped, add) {
     $.get(dashboardUrl, { widgets:widgets, wrapped:wrapped||'', add:add||'' }, function(response, status, xhr) {
       $.each(response.widgets, function(key, widget) {
@@ -121,7 +162,10 @@ require(['jquery', 'jquery-ui'], function($) {
   {% endif %}
 
   $('#add-widget-submit').click(function(ev) {
-    load($('#add-widget-selection').val(), true, true);
+
+    load(select.val(), true, true);
+    $('#add-widget-selection option[value="'+ select.val() +'"]').remove();
+    select.val('');
     $('#add-widget-modal').modal('hide');
   });
 
@@ -146,7 +190,24 @@ require(['jquery', 'jquery-ui'], function($) {
     var $el = $(this);
     var postData = { do:'dashboard.widget.close', key:$el.parents('li').data('id') };
     $.post(personalizeUrl, postData, function(response, status, xhr) {
-      console.log(response);
+        var option = '';
+        switch (response.r.key) {
+            case 'orders-list':
+                option = "<option value='orders-list'>Recent Orders</option>";
+                break;
+            case 'customers-list':
+                option = "<option value='customers-list'>Recent Customers</option>";
+                break;
+            case 'visitors-totals':
+                option = "<option value='visitors-totals'>Visitors</option>";
+                break;
+            case 'orders-totals':
+                option = "<option value='orders-totals'>Order Totals</option>";
+                break;
+            default :break;
+        }
+        console.log(option);
+        select.append(option);
     });
   })
 
@@ -157,5 +218,43 @@ require(['jquery', 'jquery-ui'], function($) {
       console.log(response);
     });
   })
+  $(".datepicker").datetimepicker({
+      pickTime: false
+  });
+  $("#daterange2").daterangepicker({
+    format: "YYYY-MM-DD"
+  },function (start, end) {
+    return $("#data-range-picker-text").val(start.format("YYYY-MM-DD") + "~" + end.format("YYYY-MM-DD"));
+  });
+  $('.daterangepicker').on('click', function (ev) {
+    ev.stopPropagation();
+    ev.preventDefault();
+    return false;
+  });
+  $('#custom').on('click', 'input', function (ev) {
+      ev.stopPropagation();
+      ev.preventDefault();
+      return false;
+  });
+  $('#custom .filter-text-sub').click(function () {
+     $(this).parents('div.dropdown:first').toggleClass('open');
+     return false;
+  });
+  $('#custom a.filter_op').click(function (ev) {
+      var custom = $('#custom');
+      if ($(ev.target).hasClass('range')) {
+          custom.find('div.range').css('display', 'table');
+          custom.find('div.not_range').css('display', 'none');
+      } else {
+          custom.find('div.range').css('display', 'none');
+          custom.find('div.not_range').css('display', 'table');
+      }
+      var text = $(ev.target).html();
+      text = text.charAt(0).toUpperCase() + text.slice(1);
+      custom.find('button.filter-text-sub').html(text + "<span class='caret'></span>");
+      custom.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
+
+      return false;
+  });
 })
 </script>

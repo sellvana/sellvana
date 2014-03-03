@@ -11,6 +11,7 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
 
         array('version', '@integer'),
         array('page_enabled', '@integer'),
+        array('page_url', 'FCom_Cms_Model_Block::rulePageUrlUnique', 'Duplicate URL Key'),
     );
 
     public function validateBlock()
@@ -39,6 +40,10 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
 //        $this->set('version_comments', $this->version ? $this->version : '1');
         $this->set('update_at', BDb::now());
         $this->set('modified_time', time()); // attempt to compare with filemtime() for caching
+
+        if ($this->get('page_url')==='') {
+            $this->set('page_url', null);
+        }
         return true;
     }
 
@@ -56,5 +61,26 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
             'ts' => BDb::now(),
             'data' => BUtil::toJson(BUtil::arrayMask($this->as_array(), 'content')), // more fields?
         ))->save();
+    }
+
+    /**
+     * rule pageu url unique
+     * @param $data
+     * @param $args
+     * @return bool
+     */
+    public static function rulePageUrlUnique($data, $args)
+    {
+        if (empty($data[$args['field']])) {
+            return true;
+        }
+        $orm = static::i()->orm()->where('page_url', $data[$args['field']]);
+        if (!empty($data['id'])) {
+            $orm->where_not_equal('id', $data['id']);
+        }
+        if ($orm->find_one()) {
+            return false;
+        }
+        return true;
     }
 }

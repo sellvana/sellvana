@@ -1,6 +1,6 @@
 <?php
 
-class FCom_Customer_ApiServer_V1_Address extends FCom_Api_Controller_Abstract
+class FCom_Customer_ApiServer_V1_Address extends FCom_ApiServer_Controller_Abstract
 {
     public function action_index()
     {

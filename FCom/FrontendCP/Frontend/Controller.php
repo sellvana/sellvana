@@ -2,7 +2,7 @@
 
 class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abstract
 {
-    public function action_upload()
+    public function action_upload__POST()
     {
         if (!FCom_Admin_Model_User::i()->sessionUser()->getPermission('frontendcp/edit')) {
             BResponse::i()->status(403);
@@ -13,7 +13,7 @@ class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abstract
         BResponse::i()->json(array('image'=>array('url'=>$imgUrl)));
     }
 
-    public function action_update()
+    public function action_update__PUT()
     {
         if (!FCom_Admin_Model_User::i()->sessionUser()->getPermission('frontendcp/edit')) {
             BResponse::i()->status(403);

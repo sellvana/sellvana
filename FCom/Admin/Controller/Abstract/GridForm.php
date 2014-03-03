@@ -49,9 +49,11 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         #$gridHtmlUrl = BApp::href($this->_gridHref.'/grid_html');
         $gridHtmlUrl = BApp::href($this->_gridHref);
         $formUrl = BApp::href($this->_formHref);
+        $modelClass = $this->_modelClass;
         $config = array(
             'id' => static::$_origClass,
-            'orm' => $this->_modelClass,
+            'orm' => $modelClass ? $modelClass::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*') : null,
+            #'orm' => $modelClass,
             'data_url' => $gridDataUrl,
             'edit_url' => $gridDataUrl,
             'grid_url' => $gridHtmlUrl,
@@ -63,9 +65,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     public function simpleGridConfig()
     {
         $config = array(
-                'columns' => array(),
-                'data' => array(),
-            );
+            'columns' => array(),
+            'data' => array(),
+        );
 
         return $config;
 
@@ -203,6 +205,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $class = $this->_modelClass;
             $id = $r->param('id', true);
             $model = $id ? $class::i()->load($id) : $class::i()->create();
+            if (!$model) {
+                throw new BException("This item does not exist");
+            }
             $data = $r->post('model');
             $args = array('id'=>$id, 'do'=>$r->post('do'), 'data'=>&$data, 'model'=>&$model);
             $this->formPostBefore($args);
@@ -226,6 +231,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             }
             $this->formPostAfter($args);
         } catch (Exception $e) {
+            //BDebug::exceptionHandler($e);
             $this->formPostError($args);
             $this->message($e->getMessage(), 'error');
             $redirectUrl = BApp::href($this->_formHref).'?id='.$id;

@@ -12,6 +12,7 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'market';
     protected $_modelClass = 'FCom_MarketClient_Model_Modules';
+    protected $_permission = 'market_client';
     //protected $_mainTableAlias = '';
 
     public function gridConfig()
@@ -98,6 +99,7 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
         } catch (Exception $e) {
             $this->message($e->getMessage(), 'error');
             BResponse::i()->redirect("market", 'error');
+            return;
         }
 
         $model = new stdClass();
@@ -156,6 +158,7 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
         } catch(Exception $e) {
             $this->message($e->getMessage(), 'error');
             BResponse::i()->redirect("marketclient/form?mod_name={$modName}");
+            return;
         }
 
         try {
@@ -163,11 +166,13 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
         } catch(Exception $e) {
             $this->message($e->getMessage(), 'error');
             BResponse::i()->redirect("marketclient/form?mod_name={$modName}");
+            return;
         }
 
         if (!$moduleFile) {
             $this->message("Permissions denied to write into file: ".$moduleFile, 'error');
             BResponse::i()->redirect("marketclient/form?mod_name={$modName}");
+            return;
         }
 
         try {
@@ -177,6 +182,7 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
                 $this->message($error, 'error');
             }
             BResponse::i()->redirect("marketclient3/form?mod_name={$modName}");
+            return;
         }
 
         if ($res) {

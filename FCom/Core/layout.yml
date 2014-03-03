@@ -20,6 +20,8 @@ common_js_libs:
             - [ requireJs, bootstrap, @FCom_Core/js/lib/bootstrap-3, { deps: [ jquery ] } ]
 #            - [ requireJs, bootstrap, @FCom_Core/js/lib/bootstrap-3.min, { deps: [ jquery ] } ]
             - [ requireJs, fcom.password, @FCom_Core/js/fcom/fcom.password ]
+            - [ requireJs, fcom.ipmode, @FCom_Core/js/fcom/fcom.ipmode ]
+            - [ requireJs, fcom.locale, @FCom_Core/js/fcom/fcom.locale ]
 
             - [ requireJs, jquery.bootstrap-growl, @FCom_Core/js/lib/jquery.bootstrap-growl.min, { deps: [ jquery, bootstrap ] } ]
 

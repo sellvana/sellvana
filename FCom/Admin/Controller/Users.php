@@ -17,7 +17,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label' => 'ID', 'index' => 'id', 'width' => 55, 'cell' => 'integer'),
-            array('name' => 'username', 'label' => 'User Name', 'width' => 100, 'href' => BApp::href($this->_formHref.'?id=:id')),
+            array('name' => 'username', 'label' => 'User Name', 'width' => 100),
             array('name' => 'email', 'label' => 'Email', 'width' => 150),
             array('name' => 'firstname', 'label' => 'First Name', 'width' => 150),
             array('name' => 'lastname', 'label' => 'Last Name', 'width' => 150),

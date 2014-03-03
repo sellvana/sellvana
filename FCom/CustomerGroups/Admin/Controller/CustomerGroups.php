@@ -13,6 +13,7 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
     protected $_gridTitle = 'Customer Groups';
     protected $_recordName = 'Customer Group';
     protected $_mainTableAlias = 'cg';
+    protected $_permission = 'customer_groups';
 
     public function gridConfig()
     {

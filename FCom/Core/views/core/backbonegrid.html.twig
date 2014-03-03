@@ -164,15 +164,17 @@
 <script type="template" id="{{ config.id }}-row-template"> {
   <%
     function printCustomButton (obj, id) {
+        var event = (typeof(obj.event) !== 'undefined') ? obj.event: '';
         if (obj.type === 'link') {
-            print('<a class="btn btn-link btn-custom" href="'+obj.href+id+'" title="'+(obj.title ? obj.title : '')+'">');
+
+            print('<a '+ event +' class="btn btn-link btn-custom" href="'+obj.href+id+'" title="'+(obj.title ? obj.title : '')+'">');
             if (typeof(obj.icon) !== 'undefined') {
                 print('<i class="' + obj.icon + '"></i>');
             }
             print(obj.caption);
             print('</a>');
         } else if (typeof(obj.type) === 'undefined' || obj.type === 'button') {
-            print('<button class="btn btn-link btn-custom" type="button" title="'+(obj.title ? obj.title : '')+'">');
+            print('<button '+ event +' class="btn btn-link btn-custom" type="button" title="'+(obj.title ? obj.title : '')+'">');
             if (typeof(obj.icon) !== 'undefined') {
                 print('<i class="' + obj.icon + '"></i>');
             }
@@ -237,9 +239,18 @@
         if (typeof(col.display) === 'undefined') {
           if (typeof(col.editable) !== 'undefined') {
 
-            if (typeof(col.editor) === 'undefined' || col.editor === 'text' || col.editor === 'textarea') {
+            if (typeof(col.editor) === 'undefined' || col.editor === 'text') {
               if(col.editable === 'inline') {
                 print('<input type="text"  id="{{ config.id }}'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}['+rc.row['id']+']['+col.name+']" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" value="'+rc.row[col.name]+'">');
+                print ('<span style="display:none;">'+rc.row[col.name]+'</span>');
+              } else {
+                print(rc.row[col.name]);
+              }
+            }
+
+            else if (col.editor === 'textarea') {
+              if(col.editable === 'inline') {
+                print('<textarea id="{{ config.id }}'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}['+rc.row['id']+']['+col.name+']" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" rows="4">'+rc.row[col.name]+'</textarea>');
                 print ('<span style="display:none;">'+rc.row[col.name]+'</span>');
               } else {
                 print(rc.row[col.name]);
@@ -249,8 +260,14 @@
             else if (col.editor === 'select') {
               if(col.editable === 'inline') {
                 print('<select id="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}['+rc.row['id']+']['+col.name+']" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" >');
-                for(var key in col.options) {
-                    print('<option value="'+key+'">'+col.options[key]+'</option>');
+                if (_.isArray(col.options)) {
+                    for(var i = 0, l = col.options.length; i<l; i++) {
+                        print('<option value="'+col.options[i].value+'">'+col.options[i].label+'</option>');
+                    }
+                } else {
+                    for(var key in col.options) {
+                        print('<option value="'+key+'">'+col.options[key]+'</option>');
+                    }
                 }
                 print('</select>');
                 print ('<span style="display:none;">'+col.options[rc.row[col.name]]+'</span>')
@@ -269,7 +286,7 @@
 
             else if (col.editor === 'radio') {
               if(col.editable === 'inline') {
-                print('<input type="radio" id="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}['+col.name+']" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" />');
+                print('<input value="'+rc.row['id']+'" type="radio" id="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}['+col.name+']" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" />');
               } else {
                 print(rc.row[col.name] ? 'Yes' : 'No');
               }
@@ -347,7 +364,16 @@
           <% if(rc.val ==='') { %>
               {{ 'All'|_ }}
           <%} else { %>
-              <%- rc.filterLabel %> "<%- rc.val %>"
+            <%
+                var val = rc.val.split(',');
+                var str = '';
+                for (var i in val) {
+                    var tmp = rc.options;
+                    str += tmp[val[i]] + ',';
+                }
+                str = str.substring(0, str.length - 1);
+            %>
+            <%- rc.filterLabel %> "<%- str %>"
           <% } %>
         </span>
         <span class="caret"></span>
@@ -356,7 +382,7 @@
     <ul class="dropdown-menu filter-box">
       <li>
           <div class="input-group">
-            <input type="hidden" id="multi_hidden" style="width:100%;min-width:120px;"/>
+            <input type="hidden" id="multi_hidden" style="width:100%;min-width:120px;" value="<%- rc.val %>"/>
             <div class="input-group-btn">
               <button type="button" class="btn btn-primary update">
                  {{ 'Update'|_ }}
@@ -375,7 +401,10 @@
     <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
         <span class='f-grid-filter-field'><%- rc.label %></span>:
         <span class='f-grid-filter-value'>
-          <% if(rc.val ==='') { %>
+          <%
+            var text = rc.filterLabel;
+            rc.filterLabel = text.charAt(0).toUpperCase() + text.slice(1);
+            if(rc.val ==='') { %>
               {{ 'All'|_ }}
           <%} else { %>
               <%- rc.filterLabel %> "<%- rc.val %>"
@@ -468,7 +497,7 @@
             </div>
 
             <div class="input-group range" <%= !rc.range ? 'style="display:none;"' :'style="display:table;"' %> >
-                <input type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange" value="<%= rc.range ? rc.val : '' %>">
+                <input id="date-range-text-<%- rc.field %>" type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange" value="<%= rc.range ? rc.val : '' %>">
                 <span id="daterange2" class="input-group-addon">
                   <i class="icon-calendar"></i>
                 </span>

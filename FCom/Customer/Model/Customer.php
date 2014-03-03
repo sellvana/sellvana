@@ -159,7 +159,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         parent::onAfterSave();
 
-        if (self::sessionUser()) {
+        if (static::sessionUserId() === $this->id()) {
             BSession::i()->data('customer_user', serialize($this));
             static::$_sessionUser = $this;
         }
@@ -249,7 +249,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     static public function sessionUserId()
     {
-        $user = self::sessionUser();
+        $user = static::sessionUser();
         return !empty($user) ? $user->id() : false;
     }
 
@@ -290,7 +290,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     static public function logout()
     {
-        BEvents::i()->fire(__METHOD__.'.before', array('user'=>  self::sessionUser()));
+        BEvents::i()->fire(__METHOD__.'.before', array('user'=> static::sessionUser()));
 
         BSession::i()->data('customer_user', false);
         static::$_sessionUser = null;
@@ -324,8 +324,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         $result['status'] = '';
         if (empty($cust)) {
             if (empty($data['customer']['email'])) {
-                if (self::$lastImportedCustomer) {
-                    $cust = self::$lastImportedCustomer;
+                if (static::$lastImportedCustomer) {
+                    $cust = static::$lastImportedCustomer;
                     $result['status'] = 'updated';
                 } else {
                     $result = array('status'=>'error', 'message'=>'Missing email address');
@@ -348,7 +348,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             }
         }
 
-        self::$lastImportedCustomer = $cust;
+        static::$lastImportedCustomer = $cust;
 
         $result['addr'] = FCom_Customer_Model_Address::i()->import($data, $cust);
 
@@ -380,12 +380,12 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public function getPaymentMethod()
     {
-        return self::i()->load($this->id)->payment_method;
+        return static::i()->load($this->id)->payment_method;
     }
 
     public function getPaymentDetails()
     {
-        return self::i()->load($this->id)->payment_details;
+        return static::i()->load($this->id)->payment_details;
     }
 
     public function setPaymentDetails($data)
@@ -398,8 +398,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         $cart = $args['model'];
 
-        $user = self::sessionUser();
-        if($user){
+        $user = static::sessionUser();
+        if ($user) {
             $user->session_cart_id = $cart->id();
             $user->save();
         }
@@ -431,12 +431,16 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
      */
     public static function ruleEmailUnique($data, $args)
     {
-        if (!isset($data[$args['field']])) {
+        if (empty($data[$args['field']])) {
+            return true;
+        }
+        $orm = static::i()->orm()->where('email', $data[$args['field']]);
+        if (!empty($data['id'])) {
+            $orm->where_not_equal('id', $data['id']);
+        }
+        if ($orm->find_one()) {
             return false;
         }
-        $model = self::i()->orm()->where('email', $data[$args['field']])->find_one();
-        if ($model)
-            return false;
         return true;
     }
 
@@ -450,13 +454,15 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             'lifetime' => 0,
             'avg'      => 0,
         );
-        $orders = FCom_Sales_Model_Order::i()->orm()->where('customer_id', $this->id)->find_many();
-        if ($orders) {
-            $cntOrders = count($orders);
-            foreach($orders as $order) {
-                $statistics['lifetime'] += $order->grandtotal;
+        if (BModuleRegistry::i()->isLoaded('FCom_Sales')) {
+            $orders = FCom_Sales_Model_Order::i()->orm()->where('customer_id', $this->id)->find_many();
+            if ($orders) {
+                $cntOrders = count($orders);
+                foreach($orders as $order) {
+                    $statistics['lifetime'] += $order->grandtotal;
+                }
+                $statistics['avg'] = $statistics['lifetime'] / $cntOrders;
             }
-            $statistics['avg'] = $statistics['lifetime'] / $cntOrders;
         }
         return $statistics;
     }

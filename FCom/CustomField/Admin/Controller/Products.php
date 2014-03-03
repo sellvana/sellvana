@@ -191,7 +191,6 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         }
         FCom_CustomField_Model_ProductField::i()->removeField($p, $hide_field);
         BResponse::i()->json('');
-        exit;
     }
 
     public function action_fields_partial()

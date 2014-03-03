@@ -127,16 +127,14 @@ class FCom_Customer_Migrate extends BClass
                   'create_dt'      => 'RENAME create_at datetime NOT NULL',
                   'update_dt'      => 'RENAME update_at datetime NOT NULL',
             ),
-          )
-        );
+        ));
         $table = FCom_Customer_Model_Address::table();
         BDb::ddlTableDef($table, array(
             'COLUMNS' => array(
                   'create_dt'      => 'RENAME create_at datetime NOT NULL',
                   'update_dt'      => 'RENAME update_at datetime NOT NULL',
             ),
-          )
-        );
+        ));
     }
 
     public function upgrade__0_1_6__0_1_7()
@@ -145,7 +143,18 @@ class FCom_Customer_Migrate extends BClass
         BDb::ddlTableDef($table, array(
             'COLUMNS' => array(
                 'status' => 'ENUM("review", "active", "disabled") NOT NULL DEFAULT "review"',
-        )));
+            ),
+        ));
     }
 
+    public function upgrade__0_1_7__0_1_8()
+    {
+        $table = FCom_Customer_Model_Customer::table();
+        BDb::ddlTableDef($table, array(
+            'COLUMNS' => array(
+                'payment_method' => 'varchar(20) null',
+                'payment_details' => 'text null',
+            ),
+        ));
+    }
 }

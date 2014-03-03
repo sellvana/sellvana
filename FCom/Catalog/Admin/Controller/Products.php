@@ -8,6 +8,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     protected $_gridTitle = 'Products';
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'p';
+    protected $_permission = 'catalog/products';
 
     public function gridConfig()
     {
@@ -182,7 +183,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'file_id', 'label'=>'File ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'product_id', 'label'=>'Product ID', 'width'=>400, 'hidden'=>true, 'default'=>$model->id()),
-                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>200, 'print'=>'"<a href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'),
+                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>200, 'print'=>'"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
                     array('name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline', 'validation'=>array('required'=>true)),
                     array('name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true,'required'=>true)),
@@ -211,7 +212,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $thumb_url = FCom_Core_Main::i()->resizeUrl().'?s=100x100&f='.BConfig::i()->get('web/media_dir').'/'.'product/images/';
         $data = BDb::many_as_array($model->mediaORM('I')
                 ->order_by_expr('pa.position asc')
-                ->select(array('pa.id', 'pa.product_id', 'pa.remote_url','pa.position','pa.label','a.file_name','a.file_size','pa.create_at','pa.update_at'))
+                ->select(array('pa.id', 'pa.product_id', 'pa.remote_url','pa.position','pa.label','a.file_name','a.file_size','pa.create_at','pa.update_at', 'pa.main_thumb'))
                 ->select('a.id','file_id')
                 ->find_many());
         return array(
@@ -232,7 +233,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
                     array('name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline'),
                     array('name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true)),
-                    array('name'=>'main_thumb', 'label'=>'Thumbnail', 'width'=>50, 'editable'=>'inline', 'editor'=>'checkbox'),
+                    array('name'=>'main_thumb', 'label'=>'Thumbnail', 'width'=>50, 'print' => '"<input class=\'main-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"'),
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
                     array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>true, 'delete'=>true))
@@ -246,7 +247,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('field'=>'file_name', 'type'=>'text'),
                     array('field'=>'label', 'type'=>'text'),
                     '_quick'=>array('expr'=>'file_name like ? ', 'args'=> array('%?%'))
-                )
+                ),
+                'callbacks' => array('after_render' => 'afterRenderImageGrid')
             )
         );
     }
@@ -509,29 +511,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'id'   =>explode(',', $data['grid'][$typeName]['del']),
                 ));
             }
-
-            if (!empty($data['grid'][$typeName]['rows'])) {
-                $rows = json_decode($data['grid'][$typeName]['rows'], true);
-                foreach($rows as $row) {
-                    if (isset($row['_new'])) {
-                        $mediaModel = $hlp->create(array(
-                            'product_id'=>$model->id,
-                            'media_type'=>$type,
-                            'file_id'=>$row['file_id'],
-                            'label'=>isset($row['label']) ? $row['label'] : '',
-                            'position'=>isset($row['position']) ? $row['position'] : '',
-                            //TODO remote_url and file_path can be fetched based on file_id. Beside, file_name can be changed in media libary.
-                            //'remote_url' =>BApp::href('/media/grid/download?folder=media/product/attachment&file_='.$row['file_id']),
-
-                        ))->save();
-                    } else {
-                        $mediaModel = $hlp->load($row['id'])->set($row)->save();
-                    }
-                    if ($mediaModel->get('main_thumb')) {
-                        $mediaLibModel = FCom_Core_Model_MediaLibrary::i()->load($mediaModel->get('file_id'));
-                        $model->set('thumb_url', $mediaLibModel->get('folder').'/'.$mediaLibModel->get('file_name'))->save();
-                    }
-                }
 /*
 //echo "<pre>"; print_r($data['grid'][$typeName]['add']);
                 $oldAtt = $hlp->orm()->where('product_id', $model->id)->where('media_type', $type)
@@ -555,8 +534,50 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 }
 //echo "</pre>";
 //exit;**/
+            if (isset($data['product_'.$typeName])) {
+                foreach ($data['product_'.$typeName] as $key => $image) {
+                    if ($key != 'main_thumb') {
+                        $mediaModel =  $hlp->load($key);
+                        $main_thumb = 0;
+                        if ($type == 'I') {
+                            if (isset($data['product_'.$typeName]['main_thumb']) && $data['product_'.$typeName]['main_thumb'] == $key) {
+                                $main_thumb = 1;
+                            }
+                            $image['main_thumb'] = $main_thumb;
+                        }
+
+                        if (isset($image['position']) && is_numeric($image['position'])) {
+                            $image['position'] = (int) $image['position'];
+                        }
+
+                        if ($mediaModel) {
+                            $mediaModel->set($image)->save();
+                        } else {
+                            $productMediaModel = $hlp->orm()->where('product_id', $model->id)->where('file_id', $image['file_id'])->find_one();
+                            if (!$productMediaModel) {
+                                $image['file_id'] = (int) $image['file_id'];
+                                $image['product_id'] = $model->id;
+                                $image['media_type'] = $type;
+
+                                //TODO remote_url and file_path can be fetched based on file_id. Beside, file_name can be changed in media libary.
+                                //'remote_url' =>BApp::href('/media/grid/download?folder=media/product/attachment&file_='.$row['file_id']),
+                                $hlp->create($image)->save();
+                            }
+                        }
+                    }
+
+                }
             }
+
         }
+        $productMediaModel = $hlp->orm()->where('media_type', 'I')->where('product_id', $model->id)->where('main_thumb', 1)->find_one();
+        $thumbUrl = NULL;
+        if ($productMediaModel) {
+            $mediaLibModel = FCom_Core_Model_MediaLibrary::i()->load($productMediaModel->get('file_id'));
+            $thumbUrl = $mediaLibModel->get('folder').'/'.$mediaLibModel->get('file_name');
+            $thumbUrl = preg_replace('#^media/#', '', $thumbUrl); //TODO: resolve the dir string ambiguity
+        }
+        $model->set('thumb_url', $thumbUrl)->save();
         return $this;
     }
 
@@ -678,9 +699,13 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function getDuplicateSuffixNumber($oldName, $oldSku, $oldUrlKey)
     {
-        $sql = 'SELECT * FROM fcom_product WHERE product_name REGEXP "'.$oldName.'-[0-9]$"
-                OR local_sku REGEXP "'.$oldSku.'-[0-9]$" OR url_key REGEXP"'.$oldUrlKey.'-[0-9]$" ORDER BY id DESC';
-        $result = FCom_Catalog_Model_Product::i()->orm()->raw_query($sql)->find_one();
+        $result = FCom_Catalog_Model_Product::i()->orm()
+            ->where(array('OR' => array(
+                array('product_name REGEXP ?', $oldName . '-[0-9]$'),
+                array('local_sku REGEXP ?', $oldSku . '-[0-9]$'),
+                array('url_key REGEXP ?', $oldUrlKey . '-[0-9]$'),
+            )))
+            ->order_by_desc('id')->find_one();
         $numberSuffix = 1;
         if ($result) {
             foreach ($result as $arr) {

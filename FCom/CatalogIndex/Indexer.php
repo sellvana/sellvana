@@ -8,6 +8,9 @@ class FCom_CatalogIndex_Indexer extends BClass
 
     static public function indexProducts($products)
     {
+        if (empty($products)) {
+            return;
+        }
         if ($products === true) {
             $i = 0;
             //$start = 0;
@@ -25,15 +28,8 @@ class FCom_CatalogIndex_Indexer extends BClass
                 //$start += static::$_maxChunkSize;
             } while (sizeof($products)==static::$_maxChunkSize);
             return;
-        } else {
-            $pIds = array();
-            foreach ($products as $p) {
-                $pIds[] = $p->id();
-            }
-            if ($pIds) {
-                static::indexDropDocs($pIds);
-            }
         }
+
         if (sizeof($products) > static::$_maxChunkSize) {
             $chunks = array_chunk($products, static::$_maxChunkSize);
             foreach ($chunks as $i=>$chunk) {
@@ -43,6 +39,29 @@ class FCom_CatalogIndex_Indexer extends BClass
             return;
         }
 
+        $pIds = array();
+        $loadIds = array();
+        foreach ($products as $i => $p) {
+            if (is_numeric($p)) {
+                $loadIds[$i] = (int)$p;
+                $pIds[] = (int)$p;
+            } else {
+                $pIds[] = $p->id();
+            }
+        }
+        if ($loadIds) {
+            $loadProducts = FCom_Catalog_Model_Product::i()->orm('p')->where_in('p.id', $loadIds)->find_many_assoc();
+            foreach ($loadIds as $i => $p) {
+                if (!empty($loadProducts[$p])) {
+                    $products[$i] = $loadProducts[$p];
+                } else {
+                    unset($products[$i]);
+                }
+            }
+        }
+        if ($pIds) {
+            static::indexDropDocs($pIds);
+        }
         //TODO: for less memory usage chunk the products data
         static::_indexFetchProductsData($products);
         unset($products);

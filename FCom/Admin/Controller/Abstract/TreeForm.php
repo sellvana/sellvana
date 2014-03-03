@@ -173,6 +173,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
 
         try {
             $id = BRequest::i()->param('id', true);
+            $id = preg_replace('#^[^0-9]+#', '', $id);
             if (!$id || !($model = $class::i()->load($id))) {
                 throw new Exception('Invalid node ID');
             }
@@ -203,6 +204,9 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                 $result = array('status'=>'error', 'message'=> $this->getErrorMessages());
             }
         } catch (Exception $e) {
+//BDebug::exceptionHandler($e);
+#print_r(BORM::get_last_query());
+#print_r($e); exit;
             $result = array('status'=>'error', 'message'=>$e->getMessage());
         }
         BResponse::i()->json($result);

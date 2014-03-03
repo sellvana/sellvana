@@ -140,7 +140,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     static public function sessionUserId()
     {
-        $user = self::sessionUser();
+        $user = static::sessionUser();
         return !empty($user) ? $user->id() : false;
     }
 

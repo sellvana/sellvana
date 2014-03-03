@@ -6,7 +6,12 @@
     }
 </script>
 <script>
+var rows = null;
 
+function changeStatus(e) {
+    $('.grid-mass-edit').click();
+    rows = {id: $(e).parents('tr').attr('id')};
+}
 function afterModuleGridRowRendered(el, row)
 {
     if(row.migration_available) {
@@ -63,17 +68,37 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
         if (ev.grid !== 'FCom_Admin_Controller_Modules') {
             return;
         }
-        console.log(ev.rows);
-        for (var i in ev.rows) {
-            var data = {
-                module_name: ev.rows[i].name,
-                run_level_core: ev.rows[i].run_level_core/*,
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')*/
-            };
-            $.post("{{ THIS.get('form_url') }}", data, function(response, status, xhr) {
-                //$.bootstrapGrowl("Run level has been saved", { type:'success', align:'center', width:'auto' });
-            });
+        var tmpRows =  [];
+        var data = [];
+        var tmpSelectedRows = ev.rows;
+        if (rows) {
+            ev.selectedRows.reset();
+            var tmp = ev.rowsCollection.findWhere({id: rows.id});
+            for (var key in ev.modalElementVals) {
+                tmp.set(key, ev.modalElementVals[key]);
+            }
+            tmpRows.push({name: tmp.get('name'), run_level_core: tmp.get('run_level_core')});
+        } else {
+            tmpRows = ev.rows;
         }
+
+        for (var i in tmpRows) {
+            data.push({module_name: tmpRows[i].name, run_level_core: tmpRows[i].run_level_core});
+        };
+        $.post("{{ THIS.get('form_url') }}", {data: data}, function(response, status, xhr) {
+            rows = null;
+            $.post("{{ THIS.get('form_url') }}", {async: true, data: data}, function(response, status, xhr) {
+                response.data.forEach(function (obj) {
+                  var tem = ev.rowsCollection.findWhere({name: obj.module_name}).set('run_status', obj.run_status).set('run_level', obj.run_level);
+                })
+                tmpSelectedRows.forEach(function (obj) {
+                    var tmp = ev.rowsCollection.findWhere({id: obj.id});
+                    ev.selectedRows.add(tmp);
+                });
+                ev.rowsCollection.trigger('render');
+            });
+            //$.bootstrapGrowl("Run level has been saved", { type:'success', align:'center', width:'auto' });
+        });
     }
 
     var rowModelEx = new RowModelEx();
