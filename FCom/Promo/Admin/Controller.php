@@ -15,7 +15,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $config = parent::gridConfig();
 
         $config['columns'] = array(
-            array('type' => 'multiselect'),
+            array('type' => 'row_select'),
             array('name' => 'id', 'label' => 'ID', 'index' => 'id', 'width' => 55, 'sorttype' => 'number'),
             array('name' => 'description', 'label' => 'Description', 'index' => 'description', 'width' => 250),
             array('name' => 'from_date', 'label' => 'Start Date', 'index' => 'from_date', 'formatter' => 'date'),
@@ -26,12 +26,12 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             array('name' => 'details', 'label' => 'Details', 'index' => 'details', 'hidden' => true),
             array('name' => 'attachments', 'label' => 'Attachments', 'sortable' => false, 'hidden' => false),
             array(
-				'type' =>'btn_group', 'name'=>'_actions','label'=> 'Actions', 'sortable' => false,
+                'type' =>'btn_group', 'name'=>'_actions','label'=> 'Actions', 'sortable' => false,
                 'buttons'=> array(
-								   array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 
-								   array('name'=>'delete')
-								)
-				)            
+                                   array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 
+                                   array('name'=>'delete')
+                                )
+                )            
         );
         $config['actions'] = array(
             'edit' => true,
@@ -230,7 +230,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $config[ 'data' ]      = !empty( $groupData[ $groupId ] ) ? $groupData[ $groupId ] : array();
         $config[ 'data_mode' ] = 'local';
         $config[ 'columns' ]   = array(
-            array( 'type'=>'multiselect'),
+            array( 'type'=>'row_select'),
             array( 'name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 40, 'hidden' => true ),
             array( 'name' => 'product_name', 'label'   => 'Name', 'index'   => 'product_name',
                    'width'=> 450, 'addable' => true ),

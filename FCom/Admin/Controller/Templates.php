@@ -13,12 +13,12 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $config = parent::gridConfig();
 
         $config['columns'] = array(
-            array('type'=>'multiselect'),
+            array('type'=>'row_select'),
             //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
             array('name' => 'view_name', 'label' => 'View Name', 'index' => 'view_name', 'width' => 100, 'overflow' => true),
             array('name' => 'file_ext', 'label' => 'File Ext.', 'index' => 'file_ext', 'width' => 50),
             array('name' => 'module_name', 'label' => 'Module', 'index' => 'module_name', 'width' => 100),
-            array('type'=>'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 
+            array('type'=>'btn_group', 
 				'buttons' => array(
 								array('name'=>'edit', 'href'=>BApp::href('templates/form?id='), 'col'=>'view_name'),
 								array('name'=>'delete', 'caption' => 'Remove/Revert')

@@ -58,7 +58,7 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
             $localeOptions[$iso] = $iso;
         }
         $config['columns'] = array(
-            array('type'=>'multiselect'),
+            array('type'=>'row_select'),
             array('name' => 'module', 'label' => 'Module', 'width' => 250),
             array('type'=>'input', 'name' => 'locale', 'label' => 'Locale', 'width' => 50, 'options' => $localeOptions, 'editor' => 'select'),
             array('name' => 'file', 'label' => 'File', 'width' => 60),

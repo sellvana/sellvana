@@ -13,7 +13,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            array('type'=>'multiselect'),
+            array('type'=>'row_select'),
             array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true),
             array('display'=>'eval', 'name'=>'thumb_path', 'label'=>'Thumbnail', 'width'=>48,
                 'print'=>'"<img src=\'"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["product_name"]+"\' >"', 'sortable'=>false),
@@ -27,12 +27,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('name' => 'position', 'label' => 'Position', 'index' => 'p.position', 'hidden' => true),
             array('name'=>'create_at', 'label'=>'Created', 'index'=>'p.create_at', 'width'=>100),
             array('name'=>'update_at', 'label'=>'Updated', 'index'=>'p.update_at', 'width'=>100),
-            array('type'=>'btn_group', 'name'=>'Actions','label'=>'Actions', 
-						'buttons' => array(
-										array('name'=>'edit', 'href'=>BApp::href('catalog/products/form?id=')),
-										array('name'=>'delete')
-									)
-				)
+            array('type'=>'btn_group', 
+                  'buttons' => array(
+                                        array('name'=>'edit', 'href'=>BApp::href('catalog/products/form?id=')),
+                                        array('name'=>'delete')
+                                    )
+                )
         );
         $config['actions'] = array(
             'export'=>true,
@@ -149,7 +149,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $config = $this->gridConfig();
         $config['columns'] = array(
-            array( 'type'=>'multiselect'),
+            array( 'type'=>'row_select'),
             array( 'name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true ),
             array( 'name' => 'product_name', 'label'   => 'Name', 'index'   => 'p.product_name',
                    'width'=> 450, 'addable' => true ),
@@ -181,7 +181,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'data_mode'=>'local',
                 'data'=>BDb::many_as_array($model->mediaORM('A')->order_by_expr('pa.position asc')->select(array('pa.id', 'pa.product_id', 'pa.remote_url','pa.position','pa.label','a.file_name','a.file_size','pa.create_at','pa.update_at'))->select('a.id','file_id')->find_many()),
                 'columns'=>array(
-                    array('type'=>'multiselect'),
+                    array('type'=>'row_select'),
                     array('name'=>'download_url',  'hidden'=>true, 'default'=>$download_url),
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'file_id', 'label'=>'File ID', 'width'=>400, 'hidden'=>true),
@@ -192,12 +192,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('type'=>'input', 'name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true,'required'=>true)),
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
-                    array('type'=>'btn_group', 'name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 
-							'buttons'=>array(
-											array('name'=>'edit'),
-											array('name'=>'delete')
-											)
-						)
+                    array('type'=>'btn_group', 'name'=>'_actions',
+                          'buttons'=>array(
+                                            array('name'=>'edit'),
+                                            array('name'=>'delete')
+                                            )
+                        )
                 ),
                 'actions'=>array(
                     'add'=>array('caption'=>'Add attachments'),
@@ -230,7 +230,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'data_mode'=>'local',
                 'data'=>$data,
                 'columns'=>array(
-                    array('type'=>'multiselect'),
+                    array('type'=>'row_select'),
                     array('name'=>'id', 'hidden'=>true),
                     array('name'=>'file_id',  'hidden'=>true),
                     array('name'=>'product_id', 'hidden'=>true,'default'=>$model->id()),
@@ -245,11 +245,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
                     array('type'=>'btn_group', 'name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 
-							'buttons'=>array(
-										array('name'=>'edit'), 
-										array('name'=>'delete')
-									)
-						)
+                            'buttons'=>array(
+                                        array('name'=>'edit'), 
+                                        array('name'=>'delete')
+                                    )
+                        )
                 ),
                 'actions'=>array(
                     'add'=>array('caption'=>'Add images'),
@@ -276,7 +276,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         //$config['id'] = 'category_all_prods_grid-'.$model->id;
         $config['id'] = 'category_all_prods_grid_'.$model->id;
         $config['columns'] = array(
-            array('type'=>'multiselect'),
+            array('type'=>'row_select'),
             array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true),
             array('name'=>'product_name', 'label'=>'Name', 'index'=>'p.product_name', 'width'=>250),
             array('name'=>'local_sku', 'label'=>'SKU', 'index'=>'p.local_sku', 'width'=>100),
@@ -317,7 +317,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $config['data'] = $orm->find_many();
         $config['id'] = 'category_prods_grid_'.$model->id;
         $config['columns'] = array(
-            array('type'=>'multiselect'),
+            array('type'=>'row_select'),
             array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>80, 'hidden'=>true),
             array('name'=>'product_name', 'label'=>'Name', 'index'=>'p.product_name', 'width'=>400),
             array('name'=>'local_sku', 'label'=>'SKU', 'index'=>'p.local_sku', 'width'=>200)
@@ -363,7 +363,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'data_mode'     =>'local',
                 //'caption'      =>$caption,
                 'columns'      =>array(
-                    array('type'=>'multiselect'),
+                    array('type'=>'row_select'),
                     array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>80, 'hidden'=>true),
                     array('name'=>'product_name', 'label'=>'Name', 'index'=>'p.product_name', 'width'=>400),
                     array('name'=>'local_sku', 'label'=>'SKU', 'index'=>'p.local_sku', 'width'=>200),

@@ -17,7 +17,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $reviewConfigs = FCom_ProductReviews_Model_Review::i()->config();
         $config = parent::gridConfig();
         $columns = array(
-            array('type'=>'multiselect'),
+            array('type'=>'row_select'),
             array('name'=>'id','label'=>'ID', 'width'=>55, 'hidden'=>true),
             array('type'=>'input', 'name'=>'title', 'label'=>'Title', 'width'=>250, 'addable' => true, 'editable'=>true, 'validation' => array('required' => true)),
             array('type'=>'input', 'name'=>'text', 'label'=>'Comment', 'width'=>250, 'addable' => true, 'editable'=>true, 'editor' => 'textarea'),
@@ -47,11 +47,11 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
                   'options'=>FCom_Customer_Model_Customer::i()->getOptionsData(), 'editor' => 'select',
                   'validation' => array('required' => true)),
             array('type' =>'btn_group', 'name'=>'_actions', 'label' => 'Actions', 'sortable' => false, 
-					'buttons' => array(
-										array('name'=>'edit'),
-										array('name'=>'delete')
-									)
-				)
+                    'buttons' => array(
+                                        array('name'=>'edit'),
+                                        array('name'=>'delete')
+                                    )
+                )
         );
 
         $config['filters'] = array(
@@ -187,7 +187,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $config = parent::gridConfig();
         $config['id'] = 'customer_reviews_grid_'.$customer->id;
         $config['columns'] = array(
-            array('type'=>'multiselect'),
+            array('type'=>'row_select'),
             array('name'=>'id','label'=>'ID', 'width'=>55, 'hidden'=>true),
             array('type'=>'input', 'name'=>'title', 'label'=>'Title', 'width'=>250, 'addable' => true, 'editable'=>true, 'validation' => array('required' => true)),
             array('type'=>'input', 'name'=>'text', 'label'=>'Comment', 'width'=>250, 'addable' => true, 'editable'=>true, 'editor' => 'textarea'),

@@ -14,13 +14,13 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            array('type' => 'multiselect'),
+            array('type' => 'row_select'),
             array('name' => 'id', 'label' => 'ID'),
             array('name' => 'name', 'label'=>'Name'),
             array('name' => 'description', 'label'=>'Description'),
             array('name' => 'url_key', 'label'=>'URL Key'),
             array('name' => 'post', 'label'=>'Posts', 'href' => BApp::href('blog/post/?category=')),
-            array('type'=>'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+            array('type'=>'btn_group',
                 'buttons' => array(
 								array('name'=>'edit', 'href' => BApp::href('blog/category/form/?id='), 'col'=>'id'),
 								array('name'=>'delete')
