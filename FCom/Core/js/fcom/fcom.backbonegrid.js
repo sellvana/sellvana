@@ -47,6 +47,21 @@ function validationRules(rules) {
     return str;
 }
 
+function filesizeFormat(size) {
+	var size = parseInt(size);
+    if (size/(1024*1024) > 1) {
+		size = size/(1024*1024);
+		size = size.toFixed(2)+' MB';
+	} else if (size/1024 > 1) {
+		size = size/1024;
+		size = size.toFixed(2)+' KB';
+	} else {
+		size = size+' Byte';
+	}
+    
+	return size;
+}
+
 define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
     'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker', 'jquery-ui', 'moment', 'daterangepicker'],
     function (Backbone, _, $, NProgress) {

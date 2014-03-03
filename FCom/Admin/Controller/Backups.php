@@ -13,12 +13,12 @@ class FCom_Admin_Controller_Backups extends FCom_Admin_Controller_Abstract_GridF
         $config = parent::gridConfig();
 
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40, 'overflow' => true),
+            array('type'=>'multiselect'),
             //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
             array('name' => 'file_name', 'label' => 'File Name', 'index' => 'file_name', 'width' => 100, 'overflow' => true),
             array('name' => 'create_at', 'label' => 'Created At', 'index' => 'create_at', 'width' => 100),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array(
-                'delete' => array('caption' => 'Remove/Revert'),
+            array('type'=>'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'buttons' => array(
+                array('name'=>'delete', 'caption' => 'Remove/Revert'),
             )),
         );
 
