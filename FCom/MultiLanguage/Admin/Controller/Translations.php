@@ -8,49 +8,6 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
     protected $_recordName = 'Translation';
     protected $_permission = 'translations';
 
-    /*public function gridConfig()
-    {
-        $formUrl = BApp::href("translations/form");
-        $config = array();
-        $columns = array(
-            'module'=>array('label'=>'Module', 'width'=>250, 'editable'=>true),
-            'locale' => array('label'=>'Locale', 'width'=>250, 'editable'=>true),
-            'file'=>array('label'=>'File', 'width'=>60, 'editable'=>true)
-        );
-
-        $config['grid']['id'] = 'translation';
-        $config['grid']['autowidth'] = false;
-        $config['grid']['caption'] = 'All translations';
-        $config['grid']['multiselect'] = false;
-        $config['grid']['height'] = '100%';
-        $config['grid']['columns'] = $columns;
-        $config['navGrid'] = array('add'=>false, 'edit'=>true, 'del'=>false);
-        $config['grid']['datatype'] = 'local';
-        $config['grid']['editurl'] = '';
-        $config['grid']['url'] = '';
-        $config['custom'] = array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id=');
-
-        //$data = BLocale::getTranslations();
-        //print_r($data);exit;
-        $data = array();
-        $modules = BModuleRegistry::i()->getAllModules();
-        foreach($modules as $module){
-            if (!empty($module->translations)) {
-                foreach($module->translations as $trlocale => $trfile) {
-                    $data[] = array(
-                        'module' => $module->name,
-                        'locale' => $trlocale,
-                        'file' => $trfile,
-                        'id'=>$module->name.'/'.$trfile);
-                }
-            }
-        }
-        //print_r($data);exit;
-        //exit;
-        $config['grid']['data'] = $data;
-        return $config;
-    }*/
-
     public function gridConfig()
     {
         $config = parent::gridConfig();
@@ -123,35 +80,5 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
             ),
         ));
         BEvents::i()->fire(static::$_origClass.'::formViewBefore', $args);
-    }
-
-    public function action_form__POST()
-    {
-        if (empty($_POST)) {
-            return;
-        }
-        $id = $_POST['file'];
-
-        list($module, $file) = explode("/", $id);
-
-        if (!$file) {
-            BDebug::error('Invalid Filename: '.$id);
-        }
-        $moduleClass = BApp::m($module);
-        if (!is_object($moduleClass)) {
-            BDebug::error('Invalid Module name: '.$id);
-        }
-
-        $filename = $moduleClass->baseDir().'/i18n/'.$file;
-
-        if (!is_writable($filename)) {
-            BDebug::error('Not writeable filename: '.$filename);
-        }
-
-        if (!empty($_POST['source'])) {
-            file_put_contents($filename, $_POST['source']);
-        }
-
-        BResponse::i()->redirect($this->_gridHref);
     }
 }
