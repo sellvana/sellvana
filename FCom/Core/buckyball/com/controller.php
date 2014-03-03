@@ -671,16 +671,16 @@ class BRequest extends BClass
     */
     public static function currentUrl()
     {
-        $webroot = rtrim(static::webRoot(), '/');
-        $scheme = static::scheme();
-        $port = static::httpPort();
-        $url = $scheme.'://'.static::httpHost();
+        $host = static::scheme().'://'.static::httpHost(true);
         if (BConfig::i()->get('web/hide_script_name') && BApp::i()->get('area')!=='FCom_Admin') {
-            $url = rtrim($url, '/') . '/' . ltrim(str_replace('//', '/', $webroot), '/');;
+            $root = static::webRoot();
         } else {
-            $url = rtrim($url, '/') . '/' . ltrim(str_replace('//', '/', static::scriptName()), '/');
+            $root = static::scriptName();
         }
-        $url .= static::rawPath().(($q = static::rawGet()) ? '?'.$q : '');
+        $root = trim($root, '/');
+        $path = ltrim(static::rawPath(), '/');
+        $get = static::rawGet();
+        $url = $host . '/' . ($root ? $root . '/' : '') . $path . ($get ? '?' . $get : '');
         return $url;
     }
 
@@ -1534,8 +1534,24 @@ class BRouting extends BClass
         return $this;
     }
 
+    public function removeRoute($route, $callback = null)
+    {
+        if (is_null($callback)) {
+            unset($this->_routes[$route]);
+            BDebug::debug('REMOVE ROUTE '.$route);
+        } else {
+            if (!empty($this->_routes[$route])) {
+                $this->_routes[$route]->removeObserver($callback);
+                BDebug::debug('REMOVE ROUTE CALLBACK '.$route.' : '.print_r($callback,1));
+            }
+        }
+        return $this;
+    }
+
     /**
      * Shortcut to $this->route() for GET http verb
+     *
+     * @deprecated
      * @param mixed  $route
      * @param mixed  $callback
      * @param array  $args
@@ -1550,6 +1566,8 @@ class BRouting extends BClass
 
     /**
      * Shortcut to $this->route() for POST http verb
+     *
+     * @deprecated
      * @param mixed  $route
      * @param mixed  $callback
      * @param array  $args
@@ -1564,6 +1582,8 @@ class BRouting extends BClass
 
     /**
      * Shortcut to $this->route() for PUT http verb
+     *
+     * @deprecated
      * @param mixed $route
      * @param null  $callback
      * @param null  $args
@@ -1578,6 +1598,8 @@ class BRouting extends BClass
 
     /**
      * Shortcut to $this->route() for GET|POST|DELETE|PUT|HEAD http verbs
+     *
+     * @deprecated
      * @param mixed $route
      * @param null  $callback
      * @param null  $args
@@ -1592,6 +1614,8 @@ class BRouting extends BClass
 
     /**
      * Process shortcut methods
+     *
+     * @deprecated
      * @param mixed  $route
      * @param string $verb
      * @param null   $callback
@@ -1947,6 +1971,16 @@ class BRouteNode
             if (!$o->skip) return $o;
         }
         return null;
+    }
+
+    public function removeObserver($callback)
+    {
+        foreach ($this->_observers as $i => $o) {
+            if ($o->callback == $callback) {
+                unset($this->_observers[$i]);
+            }
+        }
+        return $this;
     }
 
     /**
