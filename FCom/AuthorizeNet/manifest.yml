@@ -30,4 +30,4 @@ modules:
             FCom_Frontend:
                 auto_use: [ views ]
                 routing:
-                    - [ any, /authorizenet/.action, FCom_AuthorizeNet_Frontend_Controller ]
+                    - [ /authorizenet/.action, FCom_AuthorizeNet_Frontend_Controller ]

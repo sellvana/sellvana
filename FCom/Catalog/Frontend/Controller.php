@@ -14,6 +14,10 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $layout = BLayout::i();
         $crumbs = array('home');
         $p = BRequest::i()->params('product');
+        if ($p==='' || is_null($p)) {
+            $this->forward(false);
+            return $this;
+        }
         $product = FCom_Catalog_Model_Product::i()->load($p, 'url_key');
         if (!$product) {
             $this->forward(false);
@@ -79,6 +83,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $product = FCom_Catalog_Model_Product::i()->load($p, 'url_key');
         if (!$product) {
             BResponse::i()->redirect($href);
+            return;
         }
 
         $post = BRequest::post();
@@ -122,6 +127,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             } else {
                 $this->message('No products to compare');
                 BResponse::i()->redirect(FCom_Core_Main::i()->lastNav());
+                return;
             }
         }
         $layout->view('catalog/compare')->set('products', array_values($products));

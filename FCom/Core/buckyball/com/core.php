@@ -374,9 +374,9 @@ class BApp extends BClass
         return $this;
     }
 
-    public function get($key)
+    public function get($key, $default = null)
     {
-        return isset($this->_vars[$key]) ? $this->_vars[$key] : null;
+        return isset($this->_vars[$key]) ? $this->_vars[$key] : $default;
     }
 
     /**
@@ -557,9 +557,11 @@ class BConfig extends BClass
     * Ex: BConfig::i()->get('some/deep/config')
     *
     * @param string $path
+    * @param mixed $default return if node not found
     * @param boolean $toSave if true, get the configuration from config tree to save
+    * @return mixed
     */
-    public function get($path=null, $toSave=false)
+    public function get($path = null, $default = null, $toSave = false)
     {
         $node = $toSave ? $this->_configToSave : $this->_config;
         if (is_null($path)) {
@@ -567,7 +569,7 @@ class BConfig extends BClass
         }
         foreach (explode('/', $path) as $key) {
             if (!isset($node[$key])) {
-                return null;
+                return $default;
             }
             $node = $node[$key];
         }
@@ -1604,13 +1606,6 @@ if (!class_exists($r[0])) {
 }
 
 /**
- * Alias for backwards compatibility
- *
- * @deprecated by BEvents
- */
-class BPubSub extends BEvents {}
-
-/**
 * Facility to handle session state
 */
 class BSession extends BClass
@@ -1686,8 +1681,14 @@ class BSession extends BClass
             return $this;
         }
 
-        $ttl = !empty($config['timeout']) ? $config['timeout'] : 3600;
-        $path = !empty($config['path']) ? $config['path'] : BConfig::i()->get('web/base_href');
+        $rememberMeTtl = 86400 * (!empty($config['remember_days']) ? $config['remember_days'] : 30);
+        if (BRequest::i()->cookie('remember_me')) {
+            $ttl = $rememberMeTtl;
+        } else {
+            $ttl = !empty($config['timeout']) ? $config['timeout'] : 3600;
+        }
+
+        $path = !empty($config['path']) ? $config['path'] : BConfig::i()->get('web/base_store');
         if (empty($path)) $path = BRequest::i()->webRoot();
 
         $domain = !empty($config['domain']) ? $config['domain'] : BRequest::i()->httpHost(false);
@@ -1702,6 +1703,7 @@ class BSession extends BClass
             BUtil::ensureDir($dir);
             session_save_path($dir);
         }
+        #ini_set('session.gc_maxlifetime', $rememberMeTtl); // moved to .haccess
 
         if (!empty($id) || ($id = BRequest::i()->get('SID'))) {
             session_id($id);
@@ -1829,9 +1831,9 @@ BDebug::debug(__METHOD__.': '.spl_object_hash($this));
         return $this;
     }
 
-    public function get($key)
+    public function get($key, $default = null)
     {
-        return isset($this->data[$key]) ? $this->data[$key] : null;
+        return isset($this->data[$key]) ? $this->data[$key] : $default;
     }
 
     public function set($key, $value)

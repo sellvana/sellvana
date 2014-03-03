@@ -65,8 +65,23 @@ class FCom_CatalogIndex_Main extends BClass
     static public function onProductAfterSave($args)
     {
         if (static::$_autoReindex) {
-            //FCom_CatalogIndex_Indexer::indexProducts(array($args['model']));
+            FCom_CatalogIndex_Indexer::i()->indexProducts(array($args['model']));
         }
+    }
+
+    static public function onCategoryAfterSave($args)
+    {
+        $cat = $args['model'];
+        $addIds = explode(',', $cat->get('product_ids_add'));
+        $removeIds = explode(',', $cat->get('product_ids_remove'));
+        $reindexIds = array();
+        if (sizeof($addIds)>0 && $addIds[0] != '') {
+            $reindexIds += $addIds;
+        }
+        if (sizeof($removeIds)>0 && $removeIds[0] != '') {
+            $reindexIds += $removeIds;
+        }
+        FCom_CatalogIndex_Indexer::i()->indexProducts($reindexIds);
     }
 
     static public function onCustomFieldAfterSave($args)
@@ -75,8 +90,15 @@ class FCom_CatalogIndex_Main extends BClass
             $indexField = FCom_CatalogIndex_Model_Field::i()->load($args['model']->field_code, 'field_name');
             if ($indexField) {
                 //TODO when a edited field is saved, it throws error
-                //static::reindexField($indexField);
+                //FCom_CatalogIndex_Indexer::i()->reindexField($indexField);
             }
         }
+    }
+
+    static public function bootstrap()
+    {
+        FCom_Admin_Model_Role::i()->createPermission(array(
+            'catalog_index' => 'Product Indexing',
+        ));
     }
 }

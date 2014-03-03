@@ -10,6 +10,6 @@ modules:
                 views:
                     - [ frontendcp/editable, { view_class: FCom_FrontendCP_Frontend_View_EditableAttributes } ]
                 routing:
-                    - [ post, /frontendcp/upload, FCom_FrontendCP_Frontend_Controller.upload ]
-                    - [ put, /frontendcp/update, FCom_FrontendCP_Frontend_Controller.update ]
+                    - [ /frontendcp/upload, FCom_FrontendCP_Frontend_Controller.upload ]
+                    - [ /frontendcp/update, FCom_FrontendCP_Frontend_Controller.update ]
 

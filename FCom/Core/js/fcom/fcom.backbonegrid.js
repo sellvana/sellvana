@@ -622,7 +622,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return this.data_url + c + append + '&gridId=' + BackboneGrid.id;
                 },
                 parse: function (response) {
-                    if (typeof(response[0].c) !== 'undefined') {
+                    if (typeof (response[0]) !== 'undefined' && typeof(response[0].c) !== 'undefined') {
                         //  if (response[0].c !== BackboneGrid.currentState.c) {
                         var mp = Math.ceil(response[0].c / BackboneGrid.currentState.ps);
                         BackboneGrid.currentState.mp = mp;
@@ -794,7 +794,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['after_render']) !== 'undefined') {
                         console.log('after_render');
                         var func = BackboneGrid.callbacks['after_render'];
-                        var script = func + '(this.$el,this.model.toJSON());';
+                        var script = func + '(this.$el, this.model.toJSON(), columnsCollection);';
                         eval(script);
                     }
                     return this;
@@ -1179,10 +1179,19 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     if (typeof(this.model.get('filterLabel')) !== 'undefined') {
                         html = this.model.get('filterLabel') + ' ';
                         html += ('"' + this.model.get('val') + '"');
+                        html = html.charAt(0).toUpperCase() + html.slice(1);
                     } else {
                         html = this.model.get('val');
+                        if (typeof(this.model.get('options')) !== 'undefined') {
+                            var val = html.split(',');
+                            var str = '';
+                            for (var i in val) {
+                                var tmp = this.model.get('options');
+                                str += tmp[val[i]] + ',';
+                            }
+                            html = str.substring(0, str.length - 1);
+                        }
                     }
-
                     this.$el.find('span.f-grid-filter-value').html($('<div/>').text(html).html());
                 }
             });
@@ -1212,9 +1221,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 filterOperatorSelected: function (ev) {
                     //this.filterValChanged();
                     var operator = $(ev.target);
+                    var text = operator.html();
                     this.model.set('op', operator.attr('data-id'));
-                    this.model.set('filterLabel', operator.html());
-                    this.$el.find('button.filter-text-sub').html(operator.html() + "<span class='caret'></span>");
+                    this.model.set('filterLabel', text);
+                    this.$el.find('button.filter-text-sub').html(text.charAt(0).toUpperCase() + text.slice(1) + "<span class='caret'></span>");
                     this.$el.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
 
                     return false;
@@ -1249,9 +1259,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
 
                     var operator = $(ev.target);
+                    var text = operator.html();
                     this.model.set('op', operator.attr('data-id'));
                     this.model.set('filterLabel', operator.html());
-                    this.$el.find('button.filter-text-sub').html(operator.html() + "<span class='caret'></span>");
+                    text = text.charAt(0).toUpperCase() + text.slice(1);
+                    this.$el.find('button.filter-text-sub').html(text + "<span class='caret'></span>");
                     this.$el.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
 
                     return false;
@@ -1275,16 +1287,17 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 render: function () {
                     BackboneGrid.Views.FilterCell.prototype.render.call(this);
                     var self = this.$el;
+                    var model = this.model;
                     this.$el.find('#daterange2').daterangepicker({
                         format: "YYYY-MM-DD"
                     }, function (start, end) {
-                        return self.find("#daterange2").parent().find("input").first().val(start.format("YYYY-MM-DD") + "~" + end.format("YYYY-MM-DD"));
+                        return $('#date-range-text-' + model.get('field')).val(start.format("YYYY-MM-DD") + "~" + end.format("YYYY-MM-DD"));
                     });
                     this.$el.find(".datepicker").datetimepicker({
                         pickTime: false
                     });
 
-                    $('div.daterangepicker').on('click', function (ev) {
+                    $('.daterangepicker').on('click', function (ev) {
                             ev.stopPropagation();
                             ev.preventDefault();
 
@@ -1392,7 +1405,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         var val = $(this).val();
                         var temp = self.$el.find('div.select2-container span.select2-chosen');
                         if (val !== '') {
-                            temp.html('<span class="f-grid-filter-field">' + fieldLabel + '</span>: <span class="f-grid-filter-value">' + val + '</span>');
+                            temp.html('<span class="f-grid-filter-field">' + fieldLabel + '</span>: <span class="f-grid-filter-value">' + options[val] + '</span>');
                         } else {
                             temp.html('<span class="f-grid-filter-field">' + fieldLabel + '</span>: <span class="f-grid-filter-value">All</span>');
                         }
@@ -1404,7 +1417,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                     var temp = this.$el.find('div.select2-container span.select2-chosen');
                     if (this.model.get('val') !== '') {
-                        temp.html('<span class="f-grid-filter-field">' + fieldLabel + '</span>: <span class="f-grid-filter-value">' + this.model.get('val') + '</span>');
+                        temp.html('<span class="f-grid-filter-field">' + fieldLabel + '</span>: <span class="f-grid-filter-value">' + options[this.model.get('val')] + '</span>');
                     }
 
                     return this;
@@ -1491,7 +1504,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 for (var key in BackboneGrid.modalElementVals)
                                     rows[i][key] = BackboneGrid.modalElementVals[key];
                             }
-                            var evt = {grid: BackboneGrid.id, rows: rows};
+                            var evt = {grid: BackboneGrid.id, rows: rows, selectedRows: selectedRows, rowsCollection: rowsCollection, modalElementVals: BackboneGrid.modalElementVals};
                             g_vent.trigger('mass-edit', evt);
                         }
                         if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length > 0) {
@@ -1517,11 +1530,14 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 rowsCollection.each(function (rows) {
                                     if (rows.get('id') == model.get('id')) {
                                         rows.set(key, BackboneGrid.modalElementVals[key]);
-                                        rows.trigger('render');
+                                        // rows.trigger('render'); //remove trigger render of each row
                                     }
                                 })
                             }
                         });
+                        //trigger render after update each row in rowsCollection
+                        console.log('rowsCollection.trigger.render');
+                        rowsCollection.trigger('render');
                     }
 
                     if (modalForm.modalType === 'addable') {
@@ -1599,7 +1615,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.formEl.validate({});
                     if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['after_modalForm_render']) !== 'undefined') {
                         var func = BackboneGrid.callbacks['after_modalForm_render'];
-                        var script = func + '(this.$el,rowsCollection.toJSON());';
+                        var script = func + '(this.$el, rowsCollection.toJSON(), BackboneGrid.currentRow);';
                         eval(script);
                     }
                     this.collection.each(function (col) {
@@ -1724,7 +1740,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 html += '<a class="js-change-url" href="#">' + mp + ' &raquo;</a>';
                 html += '</li>';
 
-
                 $('.' + BackboneGrid.id + '.pagination.page').html(html);
 
                 //update page size options
@@ -1735,7 +1750,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     pageSizeOptsRender.push(value);
                     if (BackboneGrid.currentState.c <= value) {
                         if (BackboneGrid.currentState.ps > value) { //fix current page size
-                            BackboneGrid.currentState.ps = _.last[pageSizeOptsRender];
+                            BackboneGrid.currentState.ps = _.last(pageSizeOptsRender);
                         }
                         break;
                     }
@@ -2045,7 +2060,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     $('ul.pagination.pagesize li').removeClass('active');
                     BackboneGrid.currentState.ps = parseInt($(this).html());
                     BackboneGrid.currentState.p = 1;
-                    rowsCollection.fetch({reset: true});
+                    //@Todo: fixed, but should find better solutions for backbonegrid
+                    if (typeof (config.data_url) !== 'undefined') {
+                        rowsCollection.fetch({reset: true});
+                    }
                     $(this).parents('li:first').addClass('active');
                     ev.preventDefault();
 
@@ -2116,7 +2134,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         confirm = window.confirm("Do you really want to delete selected rows?");
 
                     if (confirm) {
-                        if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length > 0) {
+                        if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length > 0 && BackboneGrid.data_mode !== 'local') {
                             var ids = selectedRows.pluck('id').join(",");
                             $.post(BackboneGrid.edit_url, {id: ids, oper: 'mass-delete'})
                                 .done(function (data) {

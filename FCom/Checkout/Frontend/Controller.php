@@ -58,6 +58,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             }
             if (BRequest::i()->xhr()) {
                 BResponse::i()->json($result);
+                return;
             } else {
                 BResponse::i()->redirect($cartHref); // not sure if this is the best way to go (most likely it is not)
             }

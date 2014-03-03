@@ -59,9 +59,14 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     }
                     if ($allowLogin) {
                         $user->login();
+                        if (!empty($login['remember_me'])) {
+                            $days = BConfig::i()->get('cookie/remember_days');
+                            BResponse::i()->cookie('remember_me', 1, ($days ? $days : 30)*86400);
+                        }
                     } else {
                         $this->message($errorMessage, 'error', 'frontend', array('title' => ''));
                         BResponse::i()->redirect('login');
+                        return;
                     }
                 } else {
                     throw new Exception($this->_('Invalid email or password.'));

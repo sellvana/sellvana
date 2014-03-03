@@ -24,23 +24,23 @@ class FCom_Sales_Model_Order_Status extends FCom_Core_Model_Abstract
 
     public function statusNew()
     {
-        return self::orm()->where('code', 'new')->find_one();
+        return static::orm()->where('code', 'new')->find_one();
     }
     public function statusPending()
     {
-        return self::orm()->where('code', 'pending')->find_one();
+        return static::orm()->where('code', 'pending')->find_one();
     }
     public function statusPaid()
     {
-        return self::orm()->where('code', 'paid')->find_one();
+        return static::orm()->where('code', 'paid')->find_one();
     }
     public function status($name)
     {
-        return self::orm()->where('code', $name)->find_one();
+        return static::orm()->where('code', $name)->find_one();
     }
     public function statusList()
     {
-        return self::orm()->find_many();
+        return static::orm()->find_many();
     }
 
     public function statusOptions()

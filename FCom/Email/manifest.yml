@@ -17,10 +17,10 @@ modules:
             FCom_Admin:
                 auto_use: [ views, layout, bootstrap ]
                 routing:
-                    - [ get, /subscriptions, FCom_Email_Admin_Controller_Subscriptions.index ]
-                    - [ any, /subscriptions/.action, FCom_Email_Admin_Controller_Subscriptions ]
+                    - [ /subscriptions, FCom_Email_Admin_Controller_Subscriptions.index ]
+                    - [ /subscriptions/.action, FCom_Email_Admin_Controller_Subscriptions ]
 
             FCom_Frontend:
                 routing:
-                    - [ any, /email/pref, FCom_Email_Frontend_Controller.pref ]
-                    - [ any, /email/subscribe, FCom_Email_Frontend_Controller.subscribe ]
+                    - [ /email/pref, FCom_Email_Frontend_Controller.pref ]
+                    - [ /email/subscribe, FCom_Email_Frontend_Controller.subscribe ]

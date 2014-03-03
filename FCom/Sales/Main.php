@@ -13,6 +13,14 @@ class FCom_Sales_Main extends BClass
         foreach (array('Subtotal', 'Shipping', 'Discount', 'GrandTotal') as $total) {
             FCom_Sales_Model_Cart::i()->registerTotalRowHandler('FCom_Sales_Model_Cart_Total_'.$total);
         }
+
+        FCom_Admin_Model_Role::i()->createPermission(array(
+            'sales' => 'Sales',
+            'sales/orders' => 'Orders',
+            'sales/order_status' => 'Order Status',
+            'sales/carts' => 'Carts',
+            'sales/reports' => 'Reports'
+        ));
     }
 
     public function addPaymentMethod($name, $class=null)

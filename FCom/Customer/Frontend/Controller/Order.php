@@ -27,6 +27,7 @@ class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_A
                 ->where('customer_id', $customerId)->find_one();
         if (!$order) {
             BResponse::i()->redirect('customer/order');
+            return;
         }
 
         $orderItems = FCom_Sales_Model_Order_Item::i()->orm()->where("order_id", $order->id())->find_many();

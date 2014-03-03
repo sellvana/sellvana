@@ -71,6 +71,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     private $_importErrors = null;
     private $_dataImport = array();
 
+    protected static $_urlPrefix;
+
     /**
      * Shortcut to help with IDE autocompletion
      * @param bool  $new
@@ -104,9 +106,18 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $options;
     }
 
+    static public function urlPrefix()
+    {
+        if (empty(static::$_urlPrefix)) {
+            static::$_urlPrefix = BConfig::i()->get('modules/FCom_Catalog/url_prefix');
+        }
+        return static::$_urlPrefix;
+    }
+
     public function url($category=null)
     {
-        return BApp::href(($category ? $category->get('url_path').'/' : '') . $this->get('url_key'));
+        $prefix = static::urlPrefix();
+        return BApp::href($prefix . ($category ? $category->get('url_path').'/' : '') . $this->get('url_key'));
     }
 
     public function imageUrl($full=false)
@@ -131,6 +142,23 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
         if (!$this->get('create_at'))  $this->set('create_at', BDb::now());
         $this->set('update_at', BDb::now());
+
+        // Cleanup possible bad input
+        if ($this->get('sale_price') === '') {
+            $this->set('sale_price', null);
+        }
+        if ($this->get('cost') === '') {
+            $this->set('cost', null);
+        }
+        if ($this->get('msrp') === '') {
+            $this->set('msrp', null);
+        }
+        if ($this->get('map') === '') {
+            $this->set('map', null);
+        }
+        if ($this->get('markup') === '') {
+            $this->set('markup', null);
+        }
 
         return true;
     }

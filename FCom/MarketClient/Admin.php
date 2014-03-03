@@ -4,6 +4,11 @@ class FCom_MarketClient_Admin extends BClass
 {
     static public function bootstrap()
     {
+        FCom_Admin_Model_Role::i()->createPermission(array(
+            'market_client' => 'Market Client',
+            'market_client/public' => 'Public',
+            'market_client/remote' => 'Remote',
+        ));
     }
 
     public static function hookFindModulesForUpdates($args)

@@ -109,6 +109,10 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                         'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
                         'icon' => 'icon-check-empty', 'type' => 'link', 'title' => $this->_('On Demand')
                     ),
+                    'custom' => array(
+                        'icon' => 'glyphicon glyphicon-repeat',
+                        'event' => 'onclick="changeStatus(this)"'
+                    ),
                 )
             ),
         );
@@ -146,9 +150,29 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     {
         if (BRequest::i()->xhr()) {
             $r = BRequest::i()->post();
-            BConfig::i()->set('module_run_levels/FCom_Core/'.$r['module_name'], $r['run_level_core'], false, true);
-            FCom_Core_Main::i()->writeConfigFiles('core');
-            BResponse::i()->json(array('success'=>true));
+            if (isset($r['async'])) {
+                $allModules = BModuleRegistry::i()->getAllModules();
+                $data = array();
+                foreach ($r['data'] as $arr => $key) {
+                    $module = $allModules[$key['module_name']];
+                    $tmp = array(
+                        'module_name' => $key['module_name'],
+                        'run_status' => $module->run_status,
+                        'run_level' => $module->run_level,
+                    );
+                    array_push($data, $tmp);
+                }
+                BResponse::i()->json(array('data' => $data));
+                return;
+            }
+            if (isset($r['data'])) {
+                foreach ($r['data'] as $arr => $key) {
+                   BConfig::i()->set('module_run_levels/FCom_Core/'.$key['module_name'], $key['run_level_core'], false, true);
+                   FCom_Core_Main::i()->writeConfigFiles('core');
+                }
+                BResponse::i()->json(array('success' => true));
+                return;
+            }
         }
         try {
             $areas = array('FCom_Core', 'FCom_Admin', 'FCom_Frontend');

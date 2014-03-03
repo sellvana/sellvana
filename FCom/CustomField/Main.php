@@ -5,6 +5,13 @@ class FCom_CustomField_Main extends BClass
     protected $_types;
     protected $_disabled;
 
+    static public function bootstrap()
+    {
+        FCom_Admin_Model_Role::i()->createPermission(array(
+            'custom_fields' => 'Custom Fields'
+        ));
+    }
+
     public function disable($flag)
     {
         $this->_disabled = $flag;

@@ -17,6 +17,10 @@ class FCom_Email_Main extends BClass
         if (!empty($c['default_handler'])) {
             BEmail::i()->setDefaultHandler($c['default_handler']);
         }
+
+        FCom_Admin_Model_Role::i()->createPermission(array(
+            'subscriptions' => 'Email Subscriptions',
+        ));
     }
 
     public static function onEmailSendBefore($args)

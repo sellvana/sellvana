@@ -141,4 +141,49 @@ class FCom_CustomField_Migrate extends BClass
         $tProdField = FCom_CustomField_Model_Field::table();
         BDb::ddlTableDef($tProdField, array('COLUMNS'=>array('required' => "tinyint(1) NOT NULL DEFAULT '1'")));
     }
+
+    public function upgrade__0_1_8__0_1_9()
+    {
+        $fieldHlp = FCom_CustomField_Model_Field::i();
+
+        while (true) {
+            $dups = $fieldHlp->orm()->select('(min(id))', 'min_id')->group_by('field_code')
+                ->having_gt('(count(*))', 1)->find_many_assoc('min_id');
+            if (!$dups) {
+                break;
+            }
+            $fieldHlp->delete_many(array('id' => array_keys($dups)));
+        }
+
+        BDb::ddlTableDef($fieldHlp->table(), array(
+            'KEYS' => array(
+                'UNQ_field_code' => 'UNIQUE (field_code)',
+            ),
+        ));
+
+        $exist = $fieldHlp->orm()->where_in('field_code', array('color', 'size'))
+            ->select('field_code')->find_many_assoc('field_code');
+        if (empty($exist['color'])) {
+            $fieldHlp->create(array(
+                'field_code' => 'color',
+                'field_name' => 'Color',
+                'table_field_type' => 'varchar(255)',
+                'admin_input_type' => 'select',
+                'frontend_label' => 'Color',
+                'frontend_show' => 0,
+                'sort_order' => 1,
+            ))->save();
+        }
+        if (empty($exist['size'])) {
+            $fieldHlp->create(array(
+                'field_code' => 'size',
+                'field_name' => 'Size',
+                'table_field_type' => 'varchar(255)',
+                'admin_input_type' => 'select',
+                'frontend_label' => 'Size',
+                'frontend_show' => 0,
+                'sort_order' => 1,
+            ))->save();
+        }
+    }
 }

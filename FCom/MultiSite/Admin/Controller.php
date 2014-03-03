@@ -9,6 +9,7 @@ class FCom_MultiSite_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     protected $_gridTitle = 'Multi Sites';
     protected $_recordName = 'Site';
     protected $_mainTableAlias = 's';
+    protected $_permission = 'multi_site';
 
     public function gridConfig()
     {
@@ -16,7 +17,7 @@ class FCom_MultiSite_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
         $config['columns'] = array(
             array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
             array('name' => 'id', 'label' => 'ID', 'index'=>'s.id'),
-            array('name' => 'name', 'label'=>'Site Name', 'index'=>'s.name', 'href' => BApp::href($this->_formHref.'?id=:id')),
+            array('name' => 'name', 'label'=>'Site Name', 'index'=>'s.name'),
             array('name' => 'match_domains', 'label'=>'Match Domains', 'index'=>'s.match_domains'),
             array('name' => 'default_theme', 'label'=>'Default Theme', 'index'=>'s.default_theme'),
             array('name' => 'mode_by_ip', 'label'=>'Mode by IP', 'index'=>'s.mode_by_ip'),

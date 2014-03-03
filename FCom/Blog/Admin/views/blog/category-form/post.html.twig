@@ -19,8 +19,8 @@
                 console.log(key);
                 console.log(val.add);
                 val.remove = _.intersection(val.remove, val.origin);
-                $("input[id='" + key +"_ids_add']").val(val.add.join(','));
-                $("input[id='" +  key +"_ids_remove']").val(val.remove.join(','));
+                $("#" + key +"_ids_add").val(val.add.join(','));
+                $("#" +  key +"_ids_remove").val(val.remove.join(','));
             }
         }
         function _processEvt(rows, flag) {

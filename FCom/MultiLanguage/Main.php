@@ -12,10 +12,14 @@ class FCom_MultiLanguage_Main extends BClass
 
     public static function bootstrap()
     {
-        $lang = self::getLanguage();
+        $lang = static::getLanguage();
         if(!empty($lang)){
             BSession::i()->set('_language', $lang);
         }
+        FCom_Admin_Model_Role::i()->createPermission(array(
+            'translations' => 'Translations',
+        ));
+
     }
 
     /**
@@ -28,21 +32,21 @@ class FCom_MultiLanguage_Main extends BClass
 
     public function productCollectionLoadLocale($args)
     {
-        return $this->modelCollectionLoadLocale($args, self::ENTITY_TYPE_PRODUCT);
+        return $this->modelCollectionLoadLocale($args, static::ENTITY_TYPE_PRODUCT);
     }
 
     public function productLoadLocale($args)
     {
-        return $this->modelLoadLocale($args, self::ENTITY_TYPE_PRODUCT);
+        return $this->modelLoadLocale($args, static::ENTITY_TYPE_PRODUCT);
     }
 
     public function categoryLoadLocale($args)
     {
-        return $this->modelLoadLocale($args, self::ENTITY_TYPE_CATEGORY);
+        return $this->modelLoadLocale($args, static::ENTITY_TYPE_CATEGORY);
     }
 
     public function categoryCollectionLoadLocale($args){
-        return $this->modelCollectionLoadLocale($args, self::ENTITY_TYPE_CATEGORY);
+        return $this->modelCollectionLoadLocale($args, static::ENTITY_TYPE_CATEGORY);
     }
 
     public function modelLoadLocale($args, $entityType)

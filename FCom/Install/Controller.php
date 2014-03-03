@@ -46,6 +46,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         $sData = BSession::i()->data();
         if (empty($sData['w']['agree']) || $sData['w']['agree']!=='Agree') {
             BResponse::i()->redirect('?error=1');
+            return;
         }
         BResponse::i()->redirect('install/step1');
     }
@@ -63,6 +64,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     {
         if (BRequest::i()->post('do')==='back') {
             BResponse::i()->redirect('install/index');
+            return;
         }
         try {
             $w = BRequest::i()->post('w');
@@ -82,6 +84,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         $userHlp = FCom_Admin_Model_User::i();
         if (BDb::ddlTableExists($userHlp->table()) && $userHlp->orm('u')->find_one()) {
             BResponse::i()->redirect('install/step3');
+            return;
         } else {
             BApp::m('FCom_Admin')->run_status = BModule::LOADED; // for proper migration on some hosts
             BMigrate::i()->migrateModules('FCom_Admin');
@@ -97,6 +100,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     {
         if (BRequest::i()->post('do')==='back') {
             BResponse::i()->redirect('install/step1');
+            return;
         }
         try {
             $w = BRequest::i()->post('w');
@@ -126,6 +130,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     {
         if (BRequest::i()->post('do')==='back') {
             BResponse::i()->redirect('install/step2');
+            return;
         }
 
         $w = BRequest::i()->post('w');

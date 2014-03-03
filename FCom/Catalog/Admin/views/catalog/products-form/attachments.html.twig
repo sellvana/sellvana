@@ -1,6 +1,6 @@
 {% set m = THIS.get('model') %}
 {% set prodAttachConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productAttachmentsGridConfig(m) %}
-{% set mediaLibAttachConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_attachments', 'folder': 'media/product/attachment'}) %}
+{% set mediaLibAttachConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_attachments', 'folder': 'media/product/attachment', 'callbacks': {'after_render': 'renderAttachment'}}) %}
 <input type='hidden' name="grid[attachments][del]" id='prod-attach-remove' />
 <input type='hidden' name="grid[attachments][rows]" id='prod-attach-rows' />
 
@@ -9,6 +9,7 @@
 
 require(['jquery', 'unique'], function($) {
     var prod_img_rows = [], editedRows = [], removedIds = [], originRows = [];
+    var gridAllAttachment = $('#all_attachments tbody');
     function _getAttachmentsDbFields(row) {
         var keys = ['id', 'file_id', 'label', 'position', '_new'];
         var ret = {};
@@ -35,8 +36,8 @@ require(['jquery', 'unique'], function($) {
             editedRows[i] = _getAttachmentsDbFields(editedRows[i]);
         }
         console.log(editedRows);
-        $("input[id='prod-attach-rows']").val(JSON.stringify(editedRows));
-        $("input[id='prod-attach-remove']").val(removedIds.join(','));
+        $('#prod-attach-rows').val(JSON.stringify(editedRows));
+        $('#prod-attach-remove').val(removedIds.join(','));
     }
 
     g_vent.bind('init-detail', function(ev) {
@@ -49,7 +50,7 @@ require(['jquery', 'unique'], function($) {
         if (ev.grid === 'all_attachments') {
             prod_img_rows = ev.rows;
             var caption = 'Add';
-            var addButton = $('button.btn-add.prod-attachments-modal-add');
+            var addButton = $('#prod-attachments-modal-add');
             if(prod_img_rows.length>0) {
                 if (prod_img_rows.length==1) {
                     caption += ' a row';
@@ -76,16 +77,18 @@ require(['jquery', 'unique'], function($) {
             if (_.indexOf(removedIds,ev.id) !== -1)
                 return;
             removedIds[removedIds.length] = ev.id;
+            gridAllAttachment.find('tr[id="'+ ev.row.file_id +'"]').removeClass('hidden');
             _setFormVal();
         }
     });
 
     g_vent.bind('mass-delete', function(ev) {
         if(ev.grid === 'product_attachments') {
-            var ids = _.pluck(ev.rows, 'id');
-            console.log(ids);
-            for(var i in ids)
-                removedIds[removedIds.length] = ids[i];
+            for(var i in ev.rows) {
+                removedIds[removedIds.length] = ev.rows[i].id;
+                gridAllAttachment.find('tr[id="'+ ev.rows[i].file_id +'"]').removeClass('hidden');
+            }
+
             _setFormVal();
         }
     });
@@ -105,26 +108,29 @@ require(['jquery', 'unique'], function($) {
         }
     });
 
-    $('button.btn-add.prod-attachments-modal-add').click(function() {
+    $('#prod-attachments-modal-add').click(function() {
         var objs = _.clone(prod_img_rows);
-        originFileIds = _.pluck(originRows, 'file_id');
-        addedFileIds = _.pluck(editedRows, 'file_id');
-        objs = _.filter(objs, function(row) {
-            return _.indexOf(originFileIds, row.id) === -1 && _.indexOf(addedFileIds, row.id) === -1;
-        });
+//        originFileIds = _.pluck(originRows, 'file_id');
+//        addedFileIds = _.pluck(editedRows, 'file_id');
+//        objs = _.filter(objs, function(row) {
+//            return _.indexOf(originFileIds, row.id) === -1 && _.indexOf(addedFileIds, row.id) === -1;
+//        });
 
         for(var i in objs) {
             var row = objs[i];
             row.file_id = row.id;
             row.id = guid();
             row._new = true;
-            editedRows[editedRows.length] = row;
+//            editedRows[editedRows.length] = row;
+            var hidden = '<input type="hidden" name="product_attachments['+ row.id +'][file_id]" value="'+ row.file_id +'" />';
+            $('#tab-attachments').prepend(hidden);
+            gridAllAttachment.find('tr[id="'+ row.file_id +'"]').addClass('hidden');
         }
 
         g_vent.trigger('silent_inject', {grid: 'product_attachments', rows: prod_img_rows});
         g_vent.trigger('clear_selection', {grid: 'all_attachments'});
         $(this).next().trigger('click');
-        _setFormVal();
+//        _setFormVal();
     });
 });
 </script>
@@ -266,13 +272,20 @@ require(['jquery', 'unique'], function($) {
                 </div>
             </div>
             <div class='modal-footer'>
-                <button class='btn btn-primary btn-add prod-attachments-modal-add disabled' data-dismiss='modal' type='button'>{{ "Add"|_ }}</button>
+                <button id="prod-attachments-modal-add" class='btn btn-primary btn-add  disabled' data-dismiss='modal' type='button'>{{ "Add"|_ }}</button>
                 <button class='btn btn-default btn-close prod-attachments-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
             </div>
         </div>
     </div>
 </div>
 <script>
+
+    function renderAttachment(el, row) {
+        if ($('#product_attachments').find('a.file-attachments[data-file-id="'+ row.id+'"]').length > 0) {
+            $(el).addClass('hidden');
+        }
+    }
+
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
 
 
@@ -297,7 +310,7 @@ require(['jquery', 'unique'], function($) {
                     prod_img_rows[prod_img_rows.length] = data.result;
                     if ($('tr.template-upload').length === 0) {
                         g_vent.trigger('select-rows', {grid: 'all_attachments', rows:prod_img_rows});
-                        $('button.btn-add.prod-attachments-modal-add').trigger('click');
+                        $('#prod-attachments-modal-add').trigger('click');
                     }
                 }
             }

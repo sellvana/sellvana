@@ -7,6 +7,7 @@ class FCom_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstract_G
     protected $_gridTitle = 'Carts';
     protected $_recordName = 'Cart';
     protected $_mainTableAlias = 'cart';
+    protected $_permission = 'sales/carts';
 
     public function gridConfig()
     {
@@ -43,7 +44,7 @@ class FCom_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstract_G
             array('field' => 'grandtotal', 'type' => 'number-range'),
             array('field' => 'status', 'type' => 'multiselect'),
         );
-        $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*')->where('customer_id', $customer->id);
+        $config['orm'] = $config['orm']->where('customer_id', $customer->id);
 
         return array('config' => $config);
     }
