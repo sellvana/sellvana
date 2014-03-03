@@ -57,4 +57,10 @@ class FCom_Core_Migrate extends BClass
             ),
         ));
     }
+    
+    public function upgrade__0_1_2__0_1_3()
+    {
+        BConfig::i()->set('cookie/session_check_ip', 1, false, true);
+        FCom_Core_Main::i()->writeConfigFiles();
+    }
 }

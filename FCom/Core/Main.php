@@ -71,6 +71,7 @@ class FCom_Core_Main extends BClass
         BDebug::debug('ROOTDIR='.$rootDir);
 
         $webRoot = $req->webRoot();
+        $webRootTrimmed = rtrim($webRoot, '/');
         $baseHref = $config->get('web/base_href');
         $baseSrc = $config->get('web/base_src');
         $baseStore = $config->get('web/base_store');
@@ -78,17 +79,17 @@ class FCom_Core_Main extends BClass
         if (!$baseHref) {
             $baseHref = $webRoot;
         } elseif (!BUtil::isPathAbsolute($baseHref)) {
-            $baseHref = $webRoot.'/'.$baseHref;
+            $baseHref = $webRootTrimmed.'/'.$baseHref;
         }
         if (!$baseSrc) {
             $baseSrc = $baseHref;
         } elseif (!BUtil::isPathAbsolute($baseSrc)) {
-            $baseSrc = $webRoot.'/'.$baseSrc;
+            $baseSrc = $webRootTrimmed.'/'.$baseSrc;
         }
         if (!$baseStore) {
             $baseStore = $baseHref;
         } elseif (!BUtil::isPathAbsolute($baseStore)) {
-            $baseStore = $webRoot.'/'.$baseStore;
+            $baseStore = $webRootTrimmed.'/'.$baseStore;
         }
         $localConfig['web']['base_href'] = $baseHref;
         $localConfig['web']['base_src'] = $baseSrc;
@@ -491,7 +492,10 @@ class FCom_Core_Main extends BClass
         $head->meta('csrf-token', BSession::i()->csrfToken());
         $head->js_raw('js_init', array('content'=>"
 FCom = {};
-FCom.cookie_options = ".BUtil::toJson(array('domain'=>$cookieConfig['domain'], 'path'=>$cookieConfig['path'])).";
+FCom.cookie_options = ".BUtil::toJson(array(
+    'domain' => !empty($cookieConfig['domain']) ? $cookieConfig['domain'] : null,
+    'path' => !empty($cookieConfig['path']) ? $cookieConfig['path'] : null,
+)).";
 FCom.base_href = '".BApp::i()->baseUrl()."';
 FCom.base_src = '".BConfig::i()->get('web/base_src')."';
         "));
