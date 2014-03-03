@@ -14,7 +14,7 @@ class FCom_MultiSite_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type'=>'multiselect'),
             array('name' => 'id', 'label' => 'ID', 'index'=>'s.id'),
             array('name' => 'name', 'label'=>'Site Name', 'index'=>'s.name'),
             array('name' => 'match_domains', 'label'=>'Match Domains', 'index'=>'s.match_domains'),

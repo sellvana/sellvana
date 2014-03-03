@@ -14,14 +14,19 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type'=>'multiselect'),
             array('name' => 'id', 'label'=>'ID', 'width'=>50, 'index' => 's.id'),
-            array('name' => 'sku', 'label' => 'SKU', 'width' => 300, 'index' => 's.sku', 'editable' => true, 'addable' => true, 'edit_inline' => true,
+            array('type'=>'input', 'name' => 'sku', 'label' => 'SKU', 'width' => 300, 'index' => 's.sku', 'editable' => true, 'addable' => true, 'edit_inline' => true,
                   'editor' => 'text', 'validation' => array('required' => true, 'unique' => BApp::href('stock/unique'))),
-            array('name' => 'qty_in_stock', 'label' => 'Qty In Stock', 'width' => 300, 'index' => 's.qty_in_stock', 'editable' => true, 'addable' => true,
+            array('type'=>'input', 'name' => 'qty_in_stock', 'label' => 'Qty In Stock', 'width' => 300, 'index' => 's.qty_in_stock', 'editable' => true, 'addable' => true,
                   'edit_inline' => true, 'editor' => 'text', 'validation' => array('required' => true, 'number' => true)),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                  'data'=> array('edit' => true, 'delete' => true, 'edit_inline' => true)),
+            array('type'=>'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+				  'buttons'=> array(
+									array('name'=>'edit'),
+									array('name'=>'delete'),
+									array('name'=>'edit_inline')
+								)
+				)
         );
         $config['actions'] = array(
 //            'new' => array('caption' => 'Add New Customer Group', 'modal' => true),

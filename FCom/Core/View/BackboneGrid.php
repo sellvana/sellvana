@@ -191,14 +191,20 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 								}
 								
 								break;
+							case 'custom':
+								$btn['cssClass'] = 'btn-custom';
+								
+								break;
 							/*case 'edit_inline':
 								$col['icon'] = 'icon-pencil';
 								
 								break;*/
 							case 'delete':
 								$btn['icon'] = 'icon-remove';
-								$btn['cssClass'] = ' btn-delete ';
-
+								$btn['cssClass'] = 'btn-delete ';
+								if(!empty($btn['noconfirm']) && $btn['noconfirm']) {
+									$btn['cssClass'] .= 'noconfirm';
+								}
 								break;					
 						}
 						
