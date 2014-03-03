@@ -1007,12 +1007,12 @@ if ($args['name']==="FCom_Referrals") {
                 $multiple = isset($r[4]) ? $r[4] : true;
             } else {
                 $method = strtolower($r[0]);
-                if (!isset($r[1]) || !isset($r[2])) {
+                if (!isset($r[1])) {
                     BDebug::error('Invalid routing directive: '.print_r($r));
                     continue;
                 }
                 $route = $r[1];
-                $callback = $r[2];
+                $callback = isset($r[2]) ? $r[2] : null;
                 $args = isset($r[3]) ? $r[3] : array();
                 $name = isset($r[4]) ? $r[4] : null;
                 $multiple = isset($r[5]) ? $r[5] : true;

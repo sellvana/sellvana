@@ -95,4 +95,22 @@ class FCom_ProductReviews_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_2_4__0_2_5()
+    {
+        $hlp = FCom_CatalogIndex_Model_Field::i();
+        if (!$hlp->load('avg_rating', 'field_name')) {
+            $hlp->create(array(
+                'field_name' => 'avg_rating',
+                'field_label' => 'Average Rating',
+                'field_type' => 'varchar',
+                'weight' => 0,
+                'source_type' => 'callback',
+                'source_callback' => 'FCom_ProductReviews_Model_Review::indexAvgRating',
+                'filter_type' => 'exclusive',
+                'filter_counts' => 1,
+                'filter_order' => 10,
+            ))->save();
+        }
+    }
 }
