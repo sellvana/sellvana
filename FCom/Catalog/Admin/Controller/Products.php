@@ -699,9 +699,13 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function getDuplicateSuffixNumber($oldName, $oldSku, $oldUrlKey)
     {
-        $sql = 'SELECT * FROM fcom_product WHERE product_name REGEXP "'.$oldName.'-[0-9]$"
-                OR local_sku REGEXP "'.$oldSku.'-[0-9]$" OR url_key REGEXP"'.$oldUrlKey.'-[0-9]$" ORDER BY id DESC';
-        $result = FCom_Catalog_Model_Product::i()->orm()->raw_query($sql)->find_one();
+        $result = FCom_Catalog_Model_Product::i()->orm()
+            ->where(array('OR' => array(
+                array('product_name REGEXP ?', $oldName . '-[0-9]$'),
+                array('local_sku REGEXP ?', $oldSku . '-[0-9]$'),
+                array('url_key REGEXP ?', $oldUrlKey . '-[0-9]$'),
+            )))
+            ->order_by_desc('id')->find_one();
         $numberSuffix = 1;
         if ($result) {
             foreach ($result as $arr) {
