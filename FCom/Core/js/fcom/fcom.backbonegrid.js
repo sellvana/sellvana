@@ -674,7 +674,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     'change .form-control': '_cellValChanged',
                     //'blur .form-control': '_validate',
                     'click button.btn-delete': '_deleteRow',
-                    'click button.btn-edit._modal': '_editModal',
+                    'click button.btn-edit': '_editModal',
                     'click button.btn-custom': '_callbackCustom',
                     'click button.btn-edit-inline': 'editInline',
                     'click button.btn-save-inline': 'saveInline'
@@ -783,8 +783,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 },
                 _deleteRow: function (ev) {
+					
                     var confirm;
-                    if ($(ev.target).hasClass('noconfirm'))
+                    if ($(ev.target).closest('button').hasClass('noconfirm'))
                         confirm = true;
                     else
                         confirm = window.confirm("Do you want to really delete?");

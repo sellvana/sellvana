@@ -315,7 +315,7 @@
 				%><div class="table-actions-btns-group"><%
 				for(var i in col.buttons) {
 					var btn = col.buttons[i];
-					var event = (typeof(btn.event) !== 'undefined') ? btn.event: '';
+					var event = (typeof(btn.event) !== 'undefined') ? 'onclick="'+btn.event+'"': '';
 					switch(btn.type){
 					case 'link': 
 						%><a <%= event %> class="btn btn-link <%= btn.cssClass %>" href="<%= btn.href %><%= rc.row[btn.col] %>"

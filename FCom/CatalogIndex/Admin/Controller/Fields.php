@@ -33,7 +33,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
                   'editor' => 'select', 'addable' => true, 'editable' => true, 'options' => $fieldHlp->fieldOptions('filter_show_empty')),
             array('type'=>'input', 'name' => 'filter_order', 'label' => 'Facet Order', 'index' => 'idxf.filter_order', 'addable' => true, 'editable' => true),
             array('name' => 'filter_custom_view', 'label' => 'Facet Custom View', 'index' => 'idxf.filter_custom_view', 'width' => 80, 'hidden' => true,'editable' => true,'display'=>'eval',
-                  'print' => '<input readonly name="filter_custom_view" id="filter_custom_view" type="text" class="form-control">', 'editor'=>'none'),
+                  'element_print' => '<input readonly name="filter_custom_view" id="filter_custom_view" type="text" class="form-control">', 'editor'=>'none'),
             array('type'=>'input', 'name' => 'search_type', 'label' => 'Search', 'index' => 'idxf.search_type', 'editor' => 'select',
                   'options' => $fieldHlp->fieldOptions('search_type'), 'width' => 80, 'addable' => true, 'editable' => true),
             array('type'=>'input', 'name' => 'sort_type', 'label' => 'Sort', 'index' => 'idxf.sort_type', 'editor' => 'select', 'addable' => true,

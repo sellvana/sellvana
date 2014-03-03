@@ -23,7 +23,7 @@ class FCom_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_Grid
         $config = parent::gridConfig();
         $config['id'] = 'customer_grid_wishlist_'.$customer->id;
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type'=>'multiselect'),
             array('name' => 'wishlist_id', 'label' => 'Wishlist ID'),
             array('name' => 'product_name', 'label' => 'Product Name'),
             array('name' => 'local_sku', 'label' => 'SKU'),

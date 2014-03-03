@@ -13,16 +13,21 @@ class FCom_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controller_Ab
     {
         $config            = parent::gridConfig();
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type'=>'multiselect'),
             array('name' => 'id', 'label' => 'ID', 'index' => 'e.id'),
-            array('name' => 'email', 'label' => 'Email', 'index' => 'e.email', 'addable' => true, 'editable' => true,
+            array('type'=>'input', 'name' => 'email', 'label' => 'Email', 'index' => 'e.email', 'addable' => true, 'editable' => true,
                   'validation' => array('required' => true, 'unique' => BApp::href('subscriptions/unique'))),
-            array('name' => 'unsub_all', 'label' => 'Un-subscribe all', 'index' => 'e.unsub_all', 'addable' => true, 'editable' => true,
+            array('type'=>'input', 'name' => 'unsub_all', 'label' => 'Un-subscribe all', 'index' => 'e.unsub_all', 'addable' => true, 'editable' => true,
                   'mass-editable' => true, 'options' => array('1' => 'Yes', '0' => 'No'), 'editor' => 'select'),
-            array('name' => 'sub_newsletter', 'label' => 'Subscribe newsletter', 'index' => 'e.sub_newsletter', 'addable' => true,
+            array('type'=>'input', 'name' => 'sub_newsletter', 'label' => 'Subscribe newsletter', 'index' => 'e.sub_newsletter', 'addable' => true,
                   'editable' => true, 'mass-editable' => true, 'options' => array('1' => 'Yes', '0' => 'No'), 'editor' => 'select'),
             array('name' => 'create_at', 'label' => 'Created', 'index' => 'e.create_at'),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => true, 'delete' => true)),
+            array('type' => 'btn_group', 'label' => 'Actions', 'sortable' => false,
+				  'buttons' => array(
+										array('name'=>'edit'),
+										array('name'=>'delete')
+									)
+				)
         );
         $config['actions'] = array(
             'new' => array('caption' => 'New Email Subscription', 'modal' => true),

@@ -18,14 +18,18 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type'=>'multiselect'),
             array('name' => 'id', 'label'=>'ID', 'width'=>50, 'index' => 'cg.id'),
-            array('name' => 'title', 'label' => 'Title', 'width' => 300, 'index' => 'cg.title', 'editable' => true, 'addable' => true,
+            array('type'=>'input', 'name' => 'title', 'label' => 'Title', 'width' => 300, 'index' => 'cg.title', 'editable' => true, 'addable' => true,
                   'validation' => array('required' => true)),
-            array('name' => 'code', 'label' => 'Code', 'width' => 300, 'index' => 'cg.code', 'editable' => true, 'addable' => true,
+            array('type'=>'input', 'name' => 'code', 'label' => 'Code', 'width' => 300, 'index' => 'cg.code', 'editable' => true, 'addable' => true,
                   'validation' => array('required' => true, 'unique' => BApp::href('customer-groups/unique'))),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                  'data'=> array('edit' => true, 'delete' => true)),
+            array('type' => 'btn_group', 'label' => 'Actions', 'sortable' => false,
+                  'buttons'=> array(
+									array('name'=>'edit'), 
+									array('name'=>'delete')
+								)
+				)
         );
         $config['actions'] = array(
 //            'new' => array('caption' => 'Add New Customer Group', 'modal' => true),

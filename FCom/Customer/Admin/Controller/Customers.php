@@ -13,34 +13,37 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type'=>'multiselect'),
             array('name' => 'id', 'label' => 'ID', 'index'=>'c.id'),
             array('name' => 'firstname', 'label'=>'First Name', 'index'=>'c.firstname'),
             array('name' => 'lastname', 'label'=>'Last Name', 'index'=>'c.lastname'),
             array('name' => 'email', 'label'=>'Email', 'index'=>'c.email'),
-            array('name' => 'customer_group', 'label'=>'Customer Group', 'index'=>'c.customer_group', 'editor' => 'select', 'mass-editable-show' => false,
+            array('type' => 'input', 'name' => 'customer_group', 'label'=>'Customer Group', 'index'=>'c.customer_group', 
+				  'editor' => 'select', 'mass-editable-show' => false,
                   'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(), 'editable' => true, 'mass-editable' => true),
-            array('name' => 'status', 'label' => 'Status', 'index' => 'c.status', 'editor' => 'select', 'mass-editable-show' => false,
-                  'options' => FCom_Customer_Model_Customer::i()->fieldOptions('status'), 'editable' => true, 'mass-editable' => true),
+            array('type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'c.status', 'editor' => 'select',
+				  'mass-editable-show' => false, 'options' => FCom_Customer_Model_Customer::i()->fieldOptions('status'), 
+				  'editable' => true, 'mass-editable' => true),
             array('name' => 'street1', 'label'=>'Address', 'index'=>'a.street1'),
             array('name' => 'city', 'label'=>'City', 'index'=>'a.city'),
             array('name' => 'region', 'label'=>'Region', 'index'=>'a.region'),
             array('name' => 'postcode', 'label'=>'Postal Code', 'index'=>'a.postcode'),
-            array('name' => 'country', 'label'=>'Country', 'index'=>'a.country', 'options'=>FCom_Geo_Model_Country::i()->options()),
+            array('type' => 'input', 'name' => 'country', 'label'=>'Country', 'index'=>'a.country', 'editor'=>'select',
+					'options'=>FCom_Geo_Model_Country::i()->options()),
             array('name' => 'create_at', 'label'=>'Created', 'index'=>'c.create_at'),
             /*array('name' => 'update_at', 'label'=>'Updated', 'index'=>'c.update_at'),*/
             array('name' => 'last_login', 'label'=>'Last Login', 'index'=>'c.last_login'),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115,
-                  'data' => array(
-                  /*
-                      'custom' => array(
-                          'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
-                          'icon' => 'icon-time', 'type' => 'link', 'title' => $this->_('Customer history')),
-                  */
-                      'edit'   => array('href' => BApp::href($this->_formHref . '?id='), 'col' => 'id'),
-                      'delete' => true
-                  )
-            ),
+            array('type' => 'btn_group', 'name'=>'_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115,
+                  'buttons' => array(
+								  /*
+									  'custom' => array(
+										  'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
+										  'icon' => 'icon-time', 'type' => 'link', 'title' => $this->_('Customer history')),
+								  */
+									  array('name'=>'edit', 'href' => BApp::href($this->_formHref . '?id='), 'col' => 'id'),
+									  array('name'=>'delete')
+								)
+				)            
         );
         $config['actions'] = array(
             'export' => true,
@@ -155,7 +158,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         $config['data'] = $orm->find_many();
         $config['id'] = 'group_customers_grid_'.$group->id;
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type'=>'multiselect'),
             array('name' => 'id', 'label' => 'ID', 'index' => 'c.id', 'width' => 80, 'hidden' => true),
             array('name' => 'firstname', 'label' => 'Firstname', 'index' => 'c.username', 'width' => 200),
             array('name' => 'lastname', 'label' => 'Lastname', 'index' => 'c.username', 'width' => 200),
@@ -185,7 +188,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         $config            = parent::gridConfig();
         $config['id']      = 'group_all_customers_grid_' . $group->id;
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type'=>'multiselect'),
             array('name' => 'id', 'label' => 'ID', 'index' => 'c.id', 'width' => 80, 'hidden' => true),
             array('name' => 'firstname', 'label' => 'Firstname', 'index' => 'c.username', 'width' => 200),
             array('name' => 'lastname', 'label' => 'Lastname', 'index' => 'c.username', 'width' => 200),
