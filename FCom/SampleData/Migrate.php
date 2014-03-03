@@ -47,26 +47,42 @@ class FCom_SampleData_Migrate extends BClass
 
             $fieldName = FCom_IndexTank_Index_Product::i()->getCustomFieldKey( $f );
             $doc       = FCom_IndexTank_Model_ProductField::orm()->where( 'field_name', $fieldName )->find_one();
-            if ( $doc ) {
-                continue;
+            if ( !$doc ) {
+                /* @var FCom_IndexTank_Model_ProductField $doc */
+                // create indextank custom fields.
+                $doc = FCom_IndexTank_Model_ProductField::orm()->create();
+
+                $matches = array();
+                preg_match( "#(\w+)#", $data[ 'table_field_type' ], $matches );
+                $type = $matches[ 1 ];
+
+                $doc->field_name      = $fieldName;
+                $doc->field_nice_name = $data[ 'frontend_label' ];
+                $doc->field_type      = $type;
+                $doc->facets          = 1;
+                $doc->search          = 0;
+                $doc->source_type     = 'custom_field';
+                $doc->source_value    = $data[ 'field_code' ];
+
+                $doc->save();
             }
+            $fieldName = $f->get('field_code');
+            /* @var FCom_CatalogIndex_Model_Field $catalogIndexField */
+            $catalogIndexField = FCom_CatalogIndex_Model_Field::orm()->where( 'field_name', $fieldName)->find_one();
 
-            // create indextank custom fields.
-            $doc = FCom_IndexTank_Model_ProductField::orm()->create();
-
-            $matches = array();
-            preg_match( "#(\w+)#", $data[ 'table_field_type' ], $matches );
-            $type = $matches[ 1 ];
-
-            $doc->field_name      = $fieldName;
-            $doc->field_nice_name = $data[ 'frontend_label' ];
-            $doc->field_type      = $type;
-            $doc->facets          = 1;
-            $doc->search          = 0;
-            $doc->source_type     = 'custom_field';
-            $doc->source_value    = $data[ 'field_code' ];
-
-            $doc->save();
+            if ( !$catalogIndexField ) {
+                $data = array(
+                    "field_name"    => $f->get( 'field_code' ),
+                    "field_label"   => $f->get( 'field_name' ),
+                    "field_type"    => 'varchar',
+                    "weight"        => 0,
+                    "fcom_field_id" => $f->id(),
+                    "search_type"   => 'none',
+                    "sort_type"     => 'none',
+                );
+                $catalogIndexField = FCom_CatalogIndex_Model_Field::orm()->create( $data );
+                $catalogIndexField->save();
+            }
         }
     }
 }
