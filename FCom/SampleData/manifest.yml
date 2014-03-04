@@ -1,5 +1,5 @@
 modules:
-    FCom_SampleData:
+    #FCom_SampleData:
         version: 0.1.0
         channel: beta
         description: "Sample data for catalog"
