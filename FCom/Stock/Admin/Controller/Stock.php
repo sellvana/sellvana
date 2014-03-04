@@ -3,7 +3,7 @@
 class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
-    protected $_permission = 'catalog/stock';
+    protected $_permission = 'catalog/stocks';
     protected $_modelClass = 'FCom_Stock_Model_Sku';
     protected $_gridHref = 'stock';
     protected $_gridTitle = 'Stock Inventory';

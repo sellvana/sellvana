@@ -6,28 +6,28 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_field';
 
     protected static $_fieldOptions = array(
-        'field_type' => array(
+        'field_type'       => array(
             'product' => 'Products',
         ),
         'table_field_type' => array(
-            'varchar(255)' => 'Short Text',
-            'text' => 'Long Text',
-            'int(11)' => 'Integer',
-            'tinyint(3)' => 'Tiny Int',
+            'varchar(255)'  => 'Short Text',
+            'text'          => 'Long Text',
+            'int(11)'       => 'Integer',
+            'tinyint(3)'    => 'Tiny Int',
             'decimal(12,2)' => 'Decimal',
-            'date' => 'Date',
-            'datetime' => 'Date/Time',
-            '_serialized' => 'Serialized',
+            'date'          => 'Date',
+            'datetime'      => 'Date/Time',
+            '_serialized'   => 'Serialized',
         ),
         'admin_input_type' => array(
-            'text' => 'Text Line',
-            'textarea' => 'Text Area',
-            'select' => 'Drop down',
+            'text'        => 'Text Line',
+            'textarea'    => 'Text Area',
+            'select'      => 'Drop down',
             'multiselect' => 'Multiple Select',
-            'boolean' => 'Yes/No',
-            'wysiwyg' => 'WYSIWYG editor'
+            'boolean'     => 'Yes/No',
+            'wysiwyg'     => 'WYSIWYG editor'
         ),
-        'frontend_show' => array(
+        'frontend_show'    => array(
             '1' => 'Yes',
             '0' => 'No'
         ),

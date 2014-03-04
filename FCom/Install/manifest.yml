@@ -7,10 +7,10 @@ modules:
 
         auto_use: [ views ]
         routing:
-            - [ get, /, FCom_Install_Controller.index ]
-            - [ get, /*catchall, FCom_Install_Controller.index ]
-            - [ any, /install, FCom_Install_Controller.index ]
-            - [ any, /install/.action, FCom_Install_Controller ]
+            - [ /, FCom_Install_Controller.index ]
+            - [ /*catchall, FCom_Install_Controller.index ]
+            - [ /install, FCom_Install_Controller.index ]
+            - [ /install/.action, FCom_Install_Controller ]
 
         provides:
             themes:

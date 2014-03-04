@@ -1,6 +1,6 @@
 modules:
     FCom_Catalog:
-        version: 0.2.17
+        version: 0.2.18
         channel: beta
         require: { module: { FCom_Core: 0.1.0 } }
         categories: [ Catalog, Products ]
@@ -12,29 +12,24 @@ modules:
             FCom_Admin:
                 require: { module: { FCom_Admin: 0.1.0 } }
                 routing:
-                    - [ any, /catalog/test, FCom_Catalog_Admin_Controller_Products.test ]
-                    - [ get, /catalog/categories, FCom_Catalog_Admin_Controller_Categories.index ]
-                    - [ any, /catalog/categories/.action, FCom_Catalog_Admin_Controller_Categories ]
+                    - [ /catalog/categories, FCom_Catalog_Admin_Controller_Categories.index ]
+                    - [ /catalog/categories/.action, FCom_Catalog_Admin_Controller_Categories ]
 
-                    - [ get, /catalog/products, FCom_Catalog_Admin_Controller_Products.index ]
-                    - [ any, /catalog/products/.action, FCom_Catalog_Admin_Controller_Products ]
+                    - [ /catalog/products, FCom_Catalog_Admin_Controller_Products.index ]
+                    - [ /catalog/products/.action, FCom_Catalog_Admin_Controller_Products ]
 
-                    - [ get, /catalog/families, FCom_Catalog_Admin_Controller_Families.index ]
-                    - [ any, /catalog/families/.action, FCom_Catalog_Admin_Controller_Families ]
-
-                    - [ any, /catalog/products/import/.action, FCom_Catalog_Admin_Controller_ProductsImport ]
+                    - [ /catalog/products/import/.action, FCom_Catalog_Admin_Controller_ProductsImport ]
 
             FCom_Frontend:
                 require: { module: { FCom_Frontend: 0.1.0 } }
                 routing:
-                    - [ get, /*category, FCom_Catalog_Frontend_Controller_Search.category ]
-                    - [ get, /catalog/search, FCom_Catalog_Frontend_Controller_Search.search ]
-                    - [ get, /catalog/quickview, FCom_Catalog_Frontend_Controller.quickview ]
-                    - [ get, /*manuf, FCom_Catalog_Frontend_Controller.manuf ]
-                    - [ any, /:product, FCom_Catalog_Frontend_Controller.product ]
-                    - [ get, /*category/:product, FCom_Catalog_Frontend_Controller.product ]
-                    - [ get, /catalog/compare, FCom_Catalog_Frontend_Controller.compare ]
-                    - [ get, /catalog/compare/add, FCom_Catalog_Frontend_Controller.compare_add ]
+                    - [ /*category, FCom_Catalog_Frontend_Controller_Search.category ]
+                    - [ /catalog/search, FCom_Catalog_Frontend_Controller_Search.search ]
+                    - [ /catalog/quickview, FCom_Catalog_Frontend_Controller.quickview ]
+                    - [ /:product, FCom_Catalog_Frontend_Controller.product ]
+                    - [ /*category/:product, FCom_Catalog_Frontend_Controller.product ]
+                    - [ /catalog/compare, FCom_Catalog_Frontend_Controller.compare ]
+                    - [ /catalog/compare/add, FCom_Catalog_Frontend_Controller.compare_add ]
 
                 observe:
                     - [ FCom_FrontendCP_Frontend_Controller::action_update:after, FCom_Catalog_Frontend_ControlPanel::onAfterUpdate ]
@@ -44,8 +39,8 @@ modules:
 
             FCom_ApiServer:
                 routing:
-                    - [ any, /v1/catalog/category, FCom_Catalog_ApiServer_V1_Category.index ]
-                    - [ any, /v1/catalog/category/:id, FCom_Catalog_ApiServer_V1_Category.index ]
+                    - [ /v1/catalog/category, FCom_Catalog_ApiServer_V1_Category.index ]
+                    - [ /v1/catalog/category/:id, FCom_Catalog_ApiServer_V1_Category.index ]
 
-                    - [ any, /v1/catalog/product, FCom_Catalog_ApiServer_V1_Product.index ]
-                    - [ any, /v1/catalog/product/:id, FCom_Catalog_ApiServer_V1_Product.index ]
+                    - [ /v1/catalog/product, FCom_Catalog_ApiServer_V1_Product.index ]
+                    - [ /v1/catalog/product/:id, FCom_Catalog_ApiServer_V1_Product.index ]

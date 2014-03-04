@@ -71,6 +71,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     private $_importErrors = null;
     private $_dataImport = array();
 
+    protected static $_urlPrefix;
+
     /**
      * Shortcut to help with IDE autocompletion
      * @param bool  $new
@@ -104,9 +106,18 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $options;
     }
 
+    static public function urlPrefix()
+    {
+        if (empty(static::$_urlPrefix)) {
+            static::$_urlPrefix = BConfig::i()->get('modules/FCom_Catalog/url_prefix');
+        }
+        return static::$_urlPrefix;
+    }
+
     public function url($category=null)
     {
-        return BApp::href(($category ? $category->get('url_path').'/' : '') . $this->get('url_key'));
+        $prefix = static::urlPrefix();
+        return BApp::href($prefix . ($category ? $category->get('url_path').'/' : '') . $this->get('url_key'));
     }
 
     public function imageUrl($full=false)
@@ -354,10 +365,15 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $this->mediaORM($type)->find_many_assoc();
     }
 
+    /**
+     * @param array $data
+     * @param array $config
+     * @return array|null
+     */
     public function import($data, $config=array())
     {
         if (empty($data) || !is_array($data)) {
-            return;
+            return null;
         }
 
         //HANDLE CONFIG
@@ -423,6 +439,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $customFields = array();
         $productIds = array();
         $errors = array();
+        $relatedProducts = array();
         foreach($data as $d) {
             //if must have fields not defined then skip the record
             if (empty($d['product_name']) && empty($d['local_sku']) && empty($d['url_key'])) {
@@ -505,7 +522,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
             //$memstart = memory_get_usage();
             //echo $memstart/1024 . "kb<br>";
-
+            if ( $config[ 'import' ][ 'related' ][ 'import' ] && !empty( $d[ 'related' ] ) ) {
+                $relatedProducts[$p->id()] = explode( $config[ 'format' ][ 'multivalue_separator' ], $d[ 'related' ] );
+                unset( $d[ 'related' ] );
+            }
             $p->set($d);
             if ($p->is_dirty()) {
                 $p->save();
@@ -694,6 +714,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             unset($customFields);
             unset($customsResult);
         }
+
+        if ( !empty( $relatedProducts ) ) {
+            $relatedResult = $this->_importRelatedProducts( $relatedProducts );
+        }
         unset($data);
         $this->_importErrors = $errors;
         if ($errors) {
@@ -805,6 +829,78 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function isAlreadyReviewed($customerId)
     {
         return FCom_ProductReviews_Model_Review::i()->load(array('product_id' => $this->id, 'customer_id' => $customerId));
+    }
+
+    /**
+     * Create product relations from import
+     *
+     * Import initially collects all imported products relations,
+     * to be sure that relations are created regardless of import order of products
+     * $relatedProducts is an array with all imported product ids as keys and all
+     * related product skus as values
+     *
+     * [ 2 => [ 'rel_sku_1', 'rel_sku_2', ... ] ]
+     *
+     * Returns either true if no errors occurred during process, or an array with error messages
+     *
+     * @param array $relatedProducts
+     * @return array|bool
+     */
+    protected function _importRelatedProducts( $relatedProducts )
+    {
+        $relatedIds = array();
+        $relation   = FCom_Catalog_Model_ProductLink::i();
+        $errors     = array();
+        try {
+            foreach ( $relatedProducts as $pId => $relatedSkus ) {
+                $temp   = array();
+                $linked = array();
+
+                foreach ( $relatedSkus as $sku ) {
+                    // loop $relatedSkus and if they are not in fetched ids, add them to $temp to retrieve them
+                    // if id is fetched already then add it to $linked array
+                    if ( !isset( $relatedIds[ $sku ] ) ) {
+                        $temp[ ] = $sku;
+                    } else {
+                        $linked[ ] = $relatedIds[ $sku ];
+                    }
+                }
+
+                if ( !empty( $temp ) ) {
+                    // fetch related sku objects
+                    $related = $this->orm()->select( array( 'id', 'local_sku' ) )
+                                    ->where_in( "local_sku", $temp )
+                                    ->find_many();
+
+                    foreach ( $related as $r ) {
+                        /* @var FCom_Catalog_Model_Product $r */
+                        $linked[ ] = $r->id();
+                        $relatedIds[$r->local_sku] = $r->id();
+                    }
+                }
+
+                foreach ( $linked as $rId ) {
+                    // try to create links of type 'related'
+                    try {
+                        $relation->create(
+                                 array(
+                                     'link_type'         => 'related',
+                                     'product_id'        => $pId,
+                                     'linked_product_id' => $rId,
+                                 )
+                        );
+                    } catch ( Exception $e ) {
+                        $errors[ ] = $e->getMessage();
+                    }
+
+                } // end foreach $linked
+
+            } // end foreach $relatedProducts
+
+        } catch ( Exception $e ) {
+            $errors[ ] = $e->getMessage();
+        }
+        return empty( $errors ) ? true : $errors;
     }
 }
 

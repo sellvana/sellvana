@@ -2,6 +2,8 @@
 
 class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_Abstract
 {
+    protected $_permission = 'market_client/publish';
+
     public function action_index()
     {
         $moduleNames = join(',', array_keys(BModuleRegistry::i()->getAllModules()));

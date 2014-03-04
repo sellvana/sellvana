@@ -201,4 +201,12 @@ VALUES
         ));
         //TODO: delete doc.sort_product_name
     }
+
+    public function upgrade__0_1_8__0_1_9()
+    {
+        FCom_CatalogIndex_Model_Field::i()->update_many(array(
+            'source_type' => 'callback',
+            'source_callback' => 'FCom_CatalogIndex_Model_Field::indexPrice',
+        ), array('field_name' => 'price'));
+    }
 }

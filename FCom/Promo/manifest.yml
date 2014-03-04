@@ -9,19 +9,16 @@ modules:
             FCom_Admin:
                 auto_use: [ all ]
                 routing:
-                    - [ get, /promo, FCom_Promo_Admin_Controller.index ]
-                    - [ any, /promo/.action, FCom_Promo_Admin_Controller ]
+                    - [ /promo, FCom_Promo_Admin_Controller.index ]
+                    - [ /promo/.action, FCom_Promo_Admin_Controller ]
 
-                    - [ get, /promo/form/:id/products, FCom_Promo_Admin_Controller.form_products ]
-                    - [ get, /promo/form/:id/group, FCom_Promo_Admin_Controller.form_group ]
-                    - [ get, /promo/attachments, FCom_Promo_Admin_Controller.attachments ]
-                    - [ get, /promo/attachments/download, FCom_Promo_Admin_Controller.attachments_download ]
-                    - [ post, /promo/attachments/:do, FCom_Promo_Admin_Controller.attachments_post ]
+                    - [ /promo/form/:id/products, FCom_Promo_Admin_Controller.form_products ]
+                    - [ /promo/form/:id/group, FCom_Promo_Admin_Controller.form_group ]
 
             FCom_Frontend:
                 auto_use: [ views, layout ]
                 routing:
-                    - [ get, /promo/media, FCom_Promo_Frontend_Controller.media ]
+                    - [ /promo/media, FCom_Promo_Frontend_Controller.media ]
                 observe:
                     - [ FCom_Sales_Model_Cart::calculateTotals, FCom_Promo_Frontend::onPromoCartValidate ]
                     - [ FCom_Sales_Model_Cart::addProduct, FCom_Promo_Frontend::onPromoCartAddProduct ]

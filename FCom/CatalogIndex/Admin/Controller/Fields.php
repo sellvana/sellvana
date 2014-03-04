@@ -8,6 +8,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
     protected $_gridTitle = 'Catalog Index Fields';
     protected $_recordName = 'Index Field';
     protected $_mainTableAlias = 'idxf';
+    protected $_permission = 'catalog_index';
 
     public function gridConfig()
     {

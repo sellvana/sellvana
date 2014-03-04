@@ -7,6 +7,10 @@ class FCom_Catalog_Model_SearchHistory extends FCom_Core_Model_Abstract
 
     static public function addSearchHit($query, $numProductsFound = null)
     {
+        if ($query === '' || is_null($query)) {
+            return false;
+        }
+
         $sData =& BSession::i()->dataToUpdate();
         if (!empty($sData['search_history'][$query])) {
             return null;

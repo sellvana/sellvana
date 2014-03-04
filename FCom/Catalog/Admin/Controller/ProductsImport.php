@@ -3,6 +3,7 @@
 class FCom_Catalog_Admin_Controller_ProductsImport extends FCom_Admin_Controller_Abstract
 {
     //protected $_permission = 'catalog/products/import';
+    protected $_permission = 'catalog/products';
 
     public function getImportFilesGridConfig()
     {

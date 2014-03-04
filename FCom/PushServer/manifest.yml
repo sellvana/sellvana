@@ -16,7 +16,7 @@ modules:
             FCom_PushServer:
                 auto_use: [ bootstrap ]
                 routing:
-                    - [ post, /, FCom_PushServer_Controller.index ]
+                    - [ /, FCom_PushServer_Controller.index ]
 
                 default_config:
                     modules/FCom_PushServer/delay_sec: 1

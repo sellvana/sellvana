@@ -14,6 +14,10 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $layout = BLayout::i();
         $crumbs = array('home');
         $p = BRequest::i()->params('product');
+        if ($p==='' || is_null($p)) {
+            $this->forward(false);
+            return $this;
+        }
         $product = FCom_Catalog_Model_Product::i()->load($p, 'url_key');
         if (!$product) {
             $this->forward(false);

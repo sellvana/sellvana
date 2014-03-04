@@ -4,6 +4,7 @@ modules:
         channel: beta
         require: { module: { FCom_Core: 0.1.0 } }
         description: "Fulleron Extension Market Client"
+        auto_use: [ bootstrap, layout, views ]
 
         observe:
             - [ FCom_MarketClient_Model_Module::find_one:orm, FCom_MarketClient_Model_Module::onFindOrm ]
@@ -13,10 +14,10 @@ modules:
             FCom_Admin:
                 auto_use: [ all ]
                 routing:
-                    - [ get, /marketclient/?.action, FCom_MarketClient_Admin_Controller_Market ]
-                    - [ any, /marketclient/site/?.action, FCom_MarketClient_Admin_Controller_Site ]
-                    - [ any, /marketclient/module/?.action, FCom_MarketClient_Admin_Controller_Module ]
-                    - [ any, /marketclient/publish/?.action, FCom_MarketClient_Admin_Controller_Publish ]
+                    - [ /marketclient/?.action, FCom_MarketClient_Admin_Controller_Market ]
+                    - [ /marketclient/site/?.action, FCom_MarketClient_Admin_Controller_Site ]
+                    - [ /marketclient/module/?.action, FCom_MarketClient_Admin_Controller_Module ]
+                    - [ /marketclient/publish/?.action, FCom_MarketClient_Admin_Controller_Publish ]
                 observe:
                     - [ BLayout::hook:notification, FCom_MarketClient_Admin.hookFindModulesForUpdates ]
                     - [ FCom_Admin_Controller_Modules::gridView, FCom_MarketClient_Admin.onModuleGridView ]

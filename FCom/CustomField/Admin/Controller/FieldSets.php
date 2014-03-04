@@ -2,6 +2,8 @@
 
 class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_Abstract
 {
+    protected $_permission = 'custom_fields';
+
     public function fieldSetsGridConfig()
     {
         $orm = FCom_CustomField_Model_Set::i()->orm('s')->select('s.*')
