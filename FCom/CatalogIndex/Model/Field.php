@@ -9,14 +9,30 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
     protected static $_sortingArray;
 
     protected static $_fieldOptions = array(
-        'field_type' => array('int' => 'Integer', 'decimal' => 'Decimal', 'varchar' => 'String', 'text' => 'Text', 'category' => 'Category'),
-        'source_type' => array('field' => 'Field', 'method' => 'Model Method', 'callback' => 'Callback'),
-        'filter_type' => array('none' => 'None', 'exclusive' => 'Exclusive', 'inclusive' => 'Inclusive', 'range' => 'Range'),
-        'filter_multivalue' => array(0 => 'No', 1 => 'Yes'),
-        'filter_counts' => array(0 => 'No', 1 => 'Yes'),
-        'filter_show_empty' => array(0 => 'No', 1 => 'Yes'),
-        'search_type' => array('none' => 'None', 'terms' => 'Terms'),
-        'sort_type' => array('none' => 'None', 'asc' => 'Ascending Only', 'desc' => 'Descending Only', 'both' => 'Both Directions'),
+        'field_type'        => array(
+            'int'      => 'Integer',
+            'decimal'  => 'Decimal',
+            'varchar'  => 'String',
+            'text'     => 'Text',
+            'category' => 'Category'
+        ),
+        'source_type'       => array( 'field' => 'Field', 'method' => 'Model Method', 'callback' => 'Callback' ),
+        'filter_type'       => array(
+            'none'      => 'None',
+            'exclusive' => 'Exclusive',
+            'inclusive' => 'Inclusive',
+            'range'     => 'Range'
+        ),
+        'filter_multivalue' => array( 0 => 'No', 1 => 'Yes' ),
+        'filter_counts'     => array( 0 => 'No', 1 => 'Yes' ),
+        'filter_show_empty' => array( 0 => 'No', 1 => 'Yes' ),
+        'search_type'       => array( 'none' => 'None', 'terms' => 'Terms' ),
+        'sort_type'         => array(
+            'none' => 'None',
+            'asc'  => 'Ascending Only',
+            'desc' => 'Descending Only',
+            'both' => 'Both Directions'
+        ),
     );
 
     static public function getFields($context='all', $where=null)

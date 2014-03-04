@@ -672,7 +672,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     protected function _prepareVariables($product)
     {
-        $fieldsList = FCom_IndexTank_Model_ProductField::i()->getVarialbesList();
+        $fieldsList = FCom_IndexTank_Model_ProductField::i()->getVariablesList();
         $variablesList = $this->_processFields($fieldsList, $product, 'variables');
 
         $variables = array();

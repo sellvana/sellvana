@@ -58,7 +58,7 @@ class FCom_IndexTank_Search extends BClass
         }
 
         if ($v) {
-            $variablesFields = FCom_IndexTank_Model_ProductField::i()->getVarialbesList();
+            $variablesFields = FCom_IndexTank_Model_ProductField::i()->getVariablesList();
             foreach ($v as $key => $values) {
                 if (!is_array($values)){
                     $values = array($values);

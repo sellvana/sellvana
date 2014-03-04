@@ -11,10 +11,9 @@ define(['backbone',  'jquery',  'select2'], function(Backbone, $) {
             return this;
         },
         remove: function () {
-            console.log('nguyen')
             this.$el.remove();
         }
 
     });
     return ipMode;
-})
+});
