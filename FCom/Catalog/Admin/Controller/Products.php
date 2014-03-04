@@ -27,7 +27,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('name' => 'position', 'label' => 'Position', 'index' => 'p.position', 'hidden' => true),
             array('name'=>'create_at', 'label'=>'Created', 'index'=>'p.create_at', 'width'=>100),
             array('name'=>'update_at', 'label'=>'Updated', 'index'=>'p.update_at', 'width'=>100),
-            array('type'=>'btn_group', 
+            array('type'=>'btn_group',
                   'buttons' => array(
                                         array('name'=>'edit', 'href'=>BApp::href('catalog/products/form?id=')),
                                         array('name'=>'delete')
@@ -192,7 +192,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('type'=>'input', 'name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true,'required'=>true)),
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
-                    array('type'=>'btn_group', 'name'=>'_actions',
+                    array('type'=>'btn_group',
                           'buttons'=>array(
                                             array('name'=>'edit'),
                                             array('name'=>'delete')
@@ -244,9 +244,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'main_thumb', 'label'=>'Thumbnail', 'width'=>50, 'display'=>'eval', 'print' => '"<input class=\'main-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"'),
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
-                    array('type'=>'btn_group', 'name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 
+                    array('type'=>'btn_group', 'name'=>'_actions', 'label'=>'Actions', 'sortable'=>false,
                             'buttons'=>array(
-                                        array('name'=>'edit'), 
+                                        array('name'=>'edit'),
                                         array('name'=>'delete')
                                     )
                         )
@@ -290,7 +290,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             '_quick'=>array('expr'=>'product_name like ? or local_sku like ? or p.id=?', 'args'=> array('?%', '%?%', '?'))
         );
 
-        $config['events'] = array('add');
+        $config['register_func'] = 'allProdGridRegister';
         /*$config['_callbacks'] = "{
             'add':'categoryProdsMng.addSelectedProds'
         }";*/
@@ -331,7 +331,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('field'=>'local_sku', 'type'=>'text')
         );
         $config['data_mode'] = 'local';
-        $config['events'] = array('init', 'add','mass-delete');
+        $config['register_func'] = 'catProdGridRegister';
 
         return array('config'=>$config);
     }

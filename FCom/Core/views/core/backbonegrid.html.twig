@@ -205,8 +205,8 @@
                     <li><a href="#{{ key }}">{{ option }}</a></li>
                 {% endfor %}
             </ul>
-        </div>  
-    <% } else { 
+        </div>
+    <% } else {
         if (rc.sortable) { %>
             <a class="js-change-url" style="cursor: pointer;"><%= rc.label %></a>
         <% } else { %>
@@ -218,7 +218,6 @@
 {# grid row template #}
 <script type="template" id="{{ config.id }}-row-template">
     <% for (var index in rc.colsInfo) {
-        console.log(col);
         var col = rc.colsInfo[index];
         if (col.hidden || col.form_only) {
             continue;
@@ -233,38 +232,38 @@
                 var isSelected = '';
                 if (rc.row._selectable && rc.row.selected)
                     isSelected = 'checked';
-                var isSelectable = rc.row._selectable ? '' : 'DISABLED'; 
-                %><input type="checkbox" name="{{ config.id }}[checked][<%= rc.row.id %>]" class="select-row" 
-                        <%= isSelected %> <%= isSelectable %> ><%               
-                
+                var isSelectable = rc.row._selectable ? '' : 'DISABLED';
+                %><input type="checkbox" name="{{ config.id }}[checked][<%= rc.row.id %>]" class="select-row"
+                        <%= isSelected %> <%= isSelectable %> ><%
+
                 break;
-            case 'input':           
-            
-                
+            case 'input':
+
+
                 if (col.editable !== 'inline') {
                     switch (col.editor) {
                     case 'checkbox':
-                    case 'radio' : 
+                    case 'radio' :
                         %><%= rc.row[col.name] ? 'Yes' : 'No' %><%
 
                          break;
-                    case 'select': 
-                        %><%= col.options[rc.row[col.name]] 
+                    case 'select':
+                        %><%= col.options[rc.row[col.name]]
 
                         %><% break;
-                    default: 
+                    default:
                         %><%= rc.row[col.name] %><%
                      }
 
                     break;
                 }
-                
+
                 var strName = "{{ config.id }}["+rc.row['id']+"]["+col.name+"]";
                 var strId = "{{ config.id }}-"+col.name+"-"+rc.row['id'];
                 var strClass = col.cssClass ? col.cssClass + ' form-control' : ' form-control';
                 var strDisabled = (typeof(rc.row[col.name + '_disabled']) !== 'undefined' &&
                                    rc.row[col.name + '_disabled'] === true) ? 'DISABLED' : '';
-                
+
                 switch (col.editor) {
                 case 'checkbox':
                     %><input type="checkbox" id="<%= strId %> name=<%= strName %>" class="<%= strClass %>" <%= col.validation %>
@@ -281,32 +280,32 @@
                 case 'select':
                     %><select id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>" <%= col.validation %>
                             data-col="<%= col.name %>"  <%= strDisabled %> ><%
-                    
+
                         if (_.isArray(col.options)) {
-                            for(var i = 0, l = col.options.length; i<l; i++) { 
+                            for(var i = 0, l = col.options.length; i<l; i++) {
                                 %><option value="<%= col.options[i].value %>"><%= col.options[i].label %></option><%
                              }
                         } else {
-                            for(var key in col.options) { 
+                            for(var key in col.options) {
                                 %><option value="<%= key %>"><%= col.options[key] %></option><%
                              }
                         }
-                    
+
                     %></select><%
 
                     break;
-                case 'radio': 
-                    %><input type="checkbox" id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>"  
+                case 'radio':
+                    %><input type="checkbox" id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>"
                             <%= col.validation %> data-col="<%= col.name %>"  <%= strDisabled %> /><%
 
                     break;
-                default: 
-                    %><input type="text"  id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>"  
-                            <%= col.validation %> data-col="<%= col.name %>"  <%= strDisabled %> 
+                default:
+                    %><input type="text"  id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>"
+                            <%= col.validation %> data-col="<%= col.name %>"  <%= strDisabled %>
                             value="<%= rc.row[col.name] %>" /><%
 
                     break;
-                } 
+                }
                 {# TODO why is it need in inline edit mode? #}
                 %><span style="display:none;"><%= rc.row[col.name] %></span><%
 
@@ -315,9 +314,9 @@
                 %><div class="table-actions-btns-group"><%
                 for(var i in col.buttons) {
                     var btn = col.buttons[i];
-                    var event = (typeof(btn.event) !== 'undefined') ? 'onclick="'+btn.event+'"': '';
+                    var event = (typeof(btn.event) !== 'undefined') ? btn.event : '';
                     switch(btn.type){
-                    case 'link': 
+                    case 'link':
                         %><a <%= event %> class="btn btn-link <%= btn.cssClass %>" href="<%= btn.href %><%= rc.row[btn.col] %>"
                                 title="<%= btn.title ? btn.title : '' %>">
                             <i class="<%= btn.icon %>" ></i>
@@ -325,7 +324,7 @@
                         </a><%
 
                          break;
-                    default: 
+                    default:
                         %><button <%= event %> class="btn btn-link <%= btn.cssClass %>" title="<%= btn.title ? btn.title : '' %>">
                             <i class="<%= btn.icon %>" ></i>
                             <%= btn.caption %>
@@ -340,16 +339,16 @@
                      eval('print('+col.print+');');
 
                      break;
-                case 'file_size': 
+                case 'file_size':
                     %><%= filesizeFormat(rc.row[col.name]) %><%
 
                      break;
-                default: 
+                default:
                     %><%= rc.row[col.name] %><%
                  }
 
                 break;
-            } 
+            }
         %></td><%
     } %>
 </script>
@@ -600,7 +599,7 @@
     </div>
 </script>
 <script>
-require(['jquery', 'fcom.backbonegrid'], function($) {
+require(['jquery', 'fcom.backbonegrid', 'backbone', 'underscore'], function($, Backbone, _) {
 
     if ($('#fcom_append_form').length > 0) {
       $('#fcom_append_form').append('<form id="{{ config.id }}-new-form" class="form form-horizontal validate-form"/>');

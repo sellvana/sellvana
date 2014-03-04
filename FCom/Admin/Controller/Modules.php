@@ -96,7 +96,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             array('name' => 'schema_version', 'label' => 'DB Version', 'width' => 80, 'cell' => new BValue("FCom.Backgrid.SchemaVersionCell"), 'overflow' => true),
             array('name' => 'run_status', 'label' => 'Status', 'options' => $runStatusOptions, 'width' => 80, 'cell' => new BValue("FCom.Backgrid.RunStatusCell"), 'overflow' => true),
             array('name' => 'run_level', 'label' => 'Level', 'options' => $coreRunLevelOptions, 'width' => 100, 'cell' => new BValue("FCom.Backgrid.RunLevelCell"), 'overflow' => true),
-            array('type'=>'input','name' => 'run_level_core', 'label' => "Run Level (Core)", 'options' => $areaRunLevelOptions, 'width' => 200, 'mass-editable-show' => true, 'mass-editable' => true, 'editor' => 'select', 'overflow' => true),
+            array('type'=>'input','name' => 'run_level_core', 'label' => "Run Level (Core)", 'options' => $areaRunLevelOptions, 'width' => 200, 'mass-editable-show' => true, 'editable'=>true, 'mass-editable' => true, 'editor' => 'select', 'overflow' => true),
             array('name' => 'requires', 'label' => 'Requires', 'width' => 250, 'overflow' => true),
             array('name' => 'required_by', 'label' => 'Required By', 'width' => 300,'overflow' => true),
             array('type'=>'btn_group', 'width' => 115,
@@ -112,9 +112,8 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                         'icon' => 'icon-check-empty', 'type' => 'link', 'title' => $this->_('On Demand')
                     ),
                     array(
-						'type'=>'button','name'=>'repeat', 
+						'type'=>'button','name'=>'edit',
                         'icon' => 'glyphicon glyphicon-repeat',
-                        'event' => 'onclick="changeStatus(this)"'
                     ),
                 )
             ),
@@ -134,7 +133,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             'edit' => array('caption'=>'Change Status')
         );
         $config['events'] = array('edit', 'mass-edit');
-        $config['callbacks'] = array('after_render'=>'afterModuleGridRowRendered');
+        $config['register_func'] = 'moduleGridRegister';
 
         //$config['state'] =array(5,6,7,8);
         return $config;
