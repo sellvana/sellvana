@@ -286,6 +286,10 @@ class BModuleRegistry extends BClass
             }
             if (!empty($manifest['modules'])) {
                 foreach ($manifest['modules'] as $modName=>$params) {
+                    if (!is_array($params)) {
+                        BDebug::debug('Invalid module declaration');
+                        continue;
+                    }
                     $params['manifest_file'] = $file;
                     $this->addModule($modName, $params);
                 }
