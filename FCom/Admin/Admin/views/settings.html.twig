@@ -85,6 +85,12 @@
                     break;
                 }
             }
+            $.validator.addMethod('checkIp', checkIp, 'IP address not correctly.');
+
+            $.validator.addClassRules("text-ip-mode", {
+                required: true,
+                checkIp: true
+            });
             mainForm.validate({
                 ignore: [],
                 invalidHandler: function(event, validator) {
@@ -94,23 +100,31 @@
                     var data = mainForm.serializeArray();
                     data.forEach(function (obj) {
                         var tmp = '';
-                        if (obj.name == 'config[mode_by_ip][FCom_Admin]') {
-                            var tmp = textIpMode('#setting-ip-mode-fcom-admin');
-                            obj.value = tmp.substr(0, tmp.length - 1);
-                        }
+                        var def = '';
+                        switch (obj.name) {
+                            case 'config[mode_by_ip][FCom_Admin]' :
+                                def = $('#ip-mode-default-admin').val();
+                                var tmp = textIpMode('#setting-ip-mode-fcom-admin');
+                                obj.value = (tmp != '') ? def + '\n' + tmp.substr(0, tmp.length - 1): def;
+                                break;
+                            case 'config[mode_by_ip][FCom_ApiServer]' :
+                                def = $('#ip-mode-default-api-server').val();
+                                var tmp = textIpMode('#setting-ip-mode-fcom-api-server');
+                                obj.value = (tmp != '') ?  def + '\n' + tmp.substr(0, tmp.length - 1): def;
+                                break;
+                            case 'config[mode_by_ip][FCom_Frontend]' :
+                                def = $('#ip-mode-default-frontend').val();
+                                var tmp = textIpMode('#setting-ip-mode-fcom-frontend');
+                                obj.value = (tmp != '') ? def + '\n' + tmp.substr(0, tmp.length - 1): def;
+                                break;
+                            case 'config[mode_by_ip][FCom_Cron]' :
+                                def = $('#ip-mode-default-cron').val();
+                                var tmp = textIpMode('#setting-ip-mode-fcom-cron');
+                                obj.value = (tmp != '') ? def + '\n' + tmp.substr(0, tmp.length - 1): def;
+                                break;
+                            default:
+                                break;
 
-                        if (obj.name == 'config[mode_by_ip][FCom_ApiServer]') {
-                            var tmp = textIpMode('#setting-ip-mode-fcom-api-server');
-                            obj.value = tmp.substr(0, tmp.length - 1);
-                        }
-
-                        if (obj.name == 'config[mode_by_ip][FCom_Frontend]') {
-                            var tmp = textIpMode('#setting-ip-mode-fcom-frontend');
-                            obj.value = tmp.substr(0, tmp.length - 1);
-                        }
-                        if (obj.name == 'config[mode_by_ip][FCom_Cron]') {
-                            var tmp = textIpMode('#setting-ip-mode-fcom-cron');
-                            obj.value = tmp.substr(0, tmp.length - 1);
                         }
                     });
                     processFlag({invalid: null});
@@ -124,15 +138,19 @@
                 }
             });
 
+            function checkIp(value, elem, params) {
+                var regex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])$/;
+                return regex.test(value);
+            }
             function textIpMode(el) {
                 var result = '';
                 $(el).find('.text-ip-mode').each(function () {
-                    result = result + $(this).val()+ ':' + $(this).parents('.group-ip-mode').find('select.select-mode').val() + '\n';
+                    result = result + $(this).val()+ ':' + $(this).parents('.group-ip-mode').find('select').val() + '\n';
                 });
                 return result;
             }
 
-            $( "body" ).on('change', elem, function () {
+            $("body").on('change', elem, function () {
                 $(text).find('li.active').each(function () {
                     if ($(this).children('a').find('i.icon-pencil').length === 0) {
                         if ($(this).children('a').children('i.error').length !== 0) {
@@ -144,9 +162,10 @@
                 })
             });
             $('body').on('click', '.add-ip-mode', function () {
-                var ip = new ipMode.Views();
+                var ip = new ipMode.ipMode.Views();
                 var mode = $(this).parents('.group-ip-mode').find('select.select-mode').val();
-                $(this).parents('.ip-mode').append(ip.render(mode).el);
+                $(this).parents('.ip-mode').append(ip.render().el);
+
             });
             FCom.Admin.Tabs('.f-admin-main', {
                 url_get: "{{ formUrl }}",
@@ -176,19 +195,11 @@
 <script type="template" id="ip-mode-template">
     <div  class="col-md-8 col-lg-push-2 row group-ip-mode" style="margin-bottom: 15px">
         <div class="col-md-3">
-            <input type="text" class="form-control text-ip-mode required valid" />
+            <input type="text" name="<%- id %>" class="form-control text-ip-mode" id="<%- id %>"/>
         </div>
         <div class="col-md-3">
             <select class="form-control select-mode">
-                <option value="PRODUCTION">{{ "PRODUCTION"|_ }}</option>
-                <option value="DEBUG">{{ "DEBUG"|_ }}</option>
-                <option value="STAGING">{{ "STAGING"|_ }}</option>
-                <option value="DEVELOPMENT">{{ "DEVELOPMENT"|_ }}</option>
-                <option value="MIGRATION">{{ "MIGRATION"|_ }}</option>
-                <option value="MIGRATION">{{ "MIGRATION"|_ }}</option>
-                <option value="INSTALLATION">{{ "INSTALLATION"|_ }}</option>
-                <option value="RECOVERY">{{ "RECOVERY"|_ }}</option>
-                <option value="DISABLED">{{ "DISABLED"|_ }}</option>
+                {{ UTIL.optionsHtml(APP.instance('FCom_Admin_Controller_Settings').getAllMode())|raw }}
             </select>
         </div>
         <div class="col-md-6">
