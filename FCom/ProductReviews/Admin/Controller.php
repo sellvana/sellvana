@@ -10,6 +10,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     protected $_recordName = 'Product Review';
     //custom grid view
     protected $_gridViewName = 'prodreviews/grid';
+    protected $_permission = 'product_review';
 
     public function gridConfig($productModel = false)
     {

@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * Class FCom_IndexTank_Model_ProductField
+ *
+ * @property string field_name
+ * @property string field_nice_name
+ * @property string field_type
+ * @property int facets
+ * @property int search
+ * @property string source_type
+ * @property string source_value
+ */
 class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_indextank_product_field';
@@ -20,10 +31,12 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
     );
 
     /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @return FCom_IndexTank_Model_ProductField
-    */
+     * Shortcut to help with IDE autocompletion
+     *
+     * @param bool  $new
+     * @param array $args
+     * @return FCom_IndexTank_Model_ProductField
+     */
     public static function i($new=false, array $args=array())
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
@@ -63,7 +76,7 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
         return $result;
     }
 
-    public function getVarialbesList()
+    public function getVariablesList()
     {
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
                 ->where('scoring', 1)->find_many();

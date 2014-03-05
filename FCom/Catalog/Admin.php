@@ -49,6 +49,7 @@ class FCom_Catalog_Admin extends BClass
             'catalog/products' => 'Manage Products',
             'catalog/categories' => 'Manage Categories',
             'catalog/families' => 'Manage Families',
+            'catalog/stocks' => 'Manage Stocks',
         ));
     }
 
@@ -64,10 +65,23 @@ print_r($args); exit;
 
     public function getAvailableViews()
     {
+        $template = array();
+        $allViews = FCom_Frontend_Main::i()->getLayout()->getAllViews();
+        foreach ($allViews as $view) {
+            $tmp = $view->param('view_name');
+            if ($tmp !='') {
+                $template['view:'.$tmp] = $tmp;
+            }
+        }
+        $cmsBlocks = array();
+        $blocks = BDb::many_as_array(FCom_Cms_Model_Block::i()->orm()->select('id')->select('description')->find_many());
+        foreach ($blocks as $block) {
+            $cmsBlocks['block:'.$block['id']] = $block['description'];
+        }
         return array(
             '' => '',
-            '@CMS Pages' => array(),
-            '@Templates' => array(),
+            '@CMS Pages' => $cmsBlocks,
+            '@Templates' => $template,
         );
     }
 }

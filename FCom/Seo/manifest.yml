@@ -9,17 +9,17 @@ modules:
             FCom_Admin:
                 auto_use: [ views, layout ]
                 routing:
-                    - [ get, /sitemaps, FCom_Seo_Admin_Controller_Sitemaps.index ]
-                    - [ any, /sitemaps/.action, FCom_Seo_Admin_Controller_Sitemaps ]
-                    - [ get, /urlaliases, FCom_Seo_Admin_Controller_UrlAliases.index ]
-                    - [ any, /urlaliases/.action, FCom_Seo_Admin_Controller_UrlAliases ]
+                    - [ /sitemaps, FCom_Seo_Admin_Controller_Sitemaps.index ]
+                    - [ /sitemaps/.action, FCom_Seo_Admin_Controller_Sitemaps ]
+                    - [ /urlaliases, FCom_Seo_Admin_Controller_UrlAliases.index ]
+                    - [ /urlaliases/.action, FCom_Seo_Admin_Controller_UrlAliases ]
 
             FCom_Frontend:
                 auto_use: [ bootstrap, views, layout ]
                 routing:
-                    - [ get, /sitemap, FCom_Seo_Frontend_Controller_Sitemaps.sitemap ]
+                    - [ /sitemap, FCom_Seo_Frontend_Controller_Sitemaps.sitemap ]
                     # https://support.google.com/webmasters/bin/answer.py?hl=en&answer=71453
-                    - [ get, /sitemap-index.xml, FCom_Seo_Frontend_Controller_Sitemaps.index_xml ]
+                    - [ /sitemap-index.xml, FCom_Seo_Frontend_Controller_Sitemaps.index_xml ]
                     # https://support.google.com/webmasters/bin/answer.py?hl=en&answer=183668 */
-                    - [ get, ^/sitemap(-([a-z0-9-]+))?\.(xml|txt)(\.gz)?$, FCom_Seo_Frontend_Controller_Sitemaps.sitemap_data ]
-                    - [ get, /*url, FCom_Seo_Frontend_Controller_UrlAliases.index ]
+                    - [ ^/sitemap(-([a-z0-9-]+))?\.(xml|txt)(\.gz)?$, FCom_Seo_Frontend_Controller_Sitemaps.sitemap_data ]
+                    - [ /*url, FCom_Seo_Frontend_Controller_UrlAliases.index ]

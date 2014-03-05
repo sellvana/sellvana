@@ -8,20 +8,20 @@ modules:
         areas:
             FCom_Frontend:
                 routing:
-                    - [ get, /blog/?, FCom_Blog_Frontend_Controller.index ]
-                    - [ get, /blog/*post, FCom_Blog_Frontend_Controller.post ]
-                    - [ get, /blog/tag/:tag, FCom_Blog_Frontend_Controller.tag ]
-                    - [ get, /blog/category/:category, FCom_Blog_Frontend_Controller.category ]
-                    - [ get, /blog/author/:user, FCom_Blog_Frontend_Controller.author ]
-                    - [ get, /blog/archive/:year/?:month, FCom_Blog_Frontend_Controller.archive ]
+                    - [ /blog/?, FCom_Blog_Frontend_Controller.index ]
+                    - [ /blog/*post, FCom_Blog_Frontend_Controller.post ]
+                    - [ /blog/tag/:tag, FCom_Blog_Frontend_Controller.tag ]
+                    - [ /blog/category/:category, FCom_Blog_Frontend_Controller.category ]
+                    - [ /blog/author/:user, FCom_Blog_Frontend_Controller.author ]
+                    - [ /blog/archive/:year/?:month, FCom_Blog_Frontend_Controller.archive ]
 
-                    - [ get, /blog/feed.rss, FCom_Blog_Frontend_Controller.rss ]
-                    - [ get, /blog/tag/:tag/feed.rss, FCom_Blog_Frontend_Controller.rss ]
-                    - [ get, /blog/category/:category/feed.rss, FCom_Blog_Frontend_Controller.rss ]
-                    - [ get, /blog/author/:user/feed.rss, FCom_Blog_Frontend_Controller.rss ]
+                    - [ /blog/feed.rss, FCom_Blog_Frontend_Controller.rss ]
+                    - [ /blog/tag/:tag/feed.rss, FCom_Blog_Frontend_Controller.rss ]
+                    - [ /blog/category/:category/feed.rss, FCom_Blog_Frontend_Controller.rss ]
+                    - [ /blog/author/:user/feed.rss, FCom_Blog_Frontend_Controller.rss ]
 
             FCom_Admin:
                 require: { module: { FCom_Admin: 0.1.0 } }
                 routing:
-                    - [ any, /blog/post/?.action, FCom_Blog_Admin_Controller_Post ]
-                    - [ any, /blog/category/?.action, FCom_Blog_Admin_Controller_Category ]
+                    - [ /blog/post/?.action, FCom_Blog_Admin_Controller_Post ]
+                    - [ /blog/category/?.action, FCom_Blog_Admin_Controller_Category ]

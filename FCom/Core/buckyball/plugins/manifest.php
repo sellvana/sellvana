@@ -10,7 +10,7 @@
         'bootstrap' => array('file' => 'BPHPTAL.php', 'callback' => 'BPHPTAL::bootstrap' ),
     ),
     'BTwig' => array(
-        'version' => '1.12.4',
+        'version' => '1.15.1',
         'root_dir' => 'BTwig',
         'bootstrap' => array('file' => 'BTwig.php', 'callback' => 'BTwig::bootstrap' ),
     ),

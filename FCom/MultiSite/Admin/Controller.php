@@ -9,6 +9,7 @@ class FCom_MultiSite_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     protected $_gridTitle = 'Multi Sites';
     protected $_recordName = 'Site';
     protected $_mainTableAlias = 's';
+    protected $_permission = 'multi_site';
 
     public function gridConfig()
     {

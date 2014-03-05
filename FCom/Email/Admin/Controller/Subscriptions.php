@@ -8,6 +8,7 @@ class FCom_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controller_Ab
     protected $_gridTitle = 'Subscriptions';
     protected $_recordName = 'Subscription';
     protected $_mainTableAlias = 'e';
+    protected $_permission = 'subscriptions';
 
     public function gridConfig()
     {

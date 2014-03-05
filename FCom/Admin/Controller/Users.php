@@ -28,7 +28,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             array('name' => 'update_at', 'label' => 'Updated', 'width' => 100),
             array('type'=>'btn_group', 'width' => 85,
                   'buttons'=> array(
-                                array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 
+                                array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'),
                                 array('name'=>'delete')
                             )
                 )
@@ -89,7 +89,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config['data'] = $orm->find_many();
         $config['id'] = 'role_users_grid_'.$model->id;
         $config['columns'] = array(
-            array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
+            array('type'=>'row_select'),
             array('name'=>'id', 'label'=>'ID', 'index'=>'au.id', 'width'=>80, 'hidden'=>true),
             array('name'=>'username', 'label'=>'Username', 'index'=>'au.username', 'width'=>200),
             array('name'=>'email', 'label'=>'Email', 'index'=>'au.email', 'width'=>200),
@@ -98,6 +98,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         );
         $config['actions'] = array(
             'add'=>array('caption'=>'Add user'),
+            'delete'=>array('caption'=>'Remove')
         );
         $config['filters'] = array(
             array('field'=>'username', 'type'=>'text'),
@@ -105,6 +106,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             array('field'=>'status', 'type' => 'multiselect')
         );
         $config['data_mode'] = 'local';
+        $config['register_func'] = 'rolesGridRegister';
         $config['events'] = array('init', 'add','mass-delete');
 
         return array('config'=>$config);
@@ -140,7 +142,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         if ($filterAdmin) {
             $config['orm'] = FCom_Admin_Model_User::i()->orm()->where('is_superadmin', 0);
         }
-
+        $config['register_func'] = 'userGridRegister';
         $config['events'] = array('add');
 
         return array('config' => $config);

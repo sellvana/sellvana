@@ -8,6 +8,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
     protected $_gridTitle = 'Orders';
     protected $_recordName = 'Order';
     protected $_mainTableAlias = 'o';
+    protected $_permission = 'sales/orders';
 
     public function gridConfig()
     {
