@@ -1,5 +1,6 @@
 {% set c = THIS.get('model') %}
 {% set mode = c.get("mode_by_ip/FCom_Admin")|split("\n")|join('|') %}
+
 <h2>{{ "Admin Settings"|_}}</h2>
 <div class="accordion accordion-blue panel-group" id="settings-FCom_Admin">
     <div class="panel panel-default">
@@ -49,33 +50,9 @@
         </div>
         <div class="panel-collapse accordion-body" id="settings-FCom_Admin-group1">
             <div class="panel-body">
-                <div class="form-group ip-mode" id="setting-ip-mode-fcom-admin">
+                <div class="form-group">
                     <label class="col-md-2 control-label">{{ "IP: Mode"|_ }}</label>
-                    <div class="col-md-8 row group-ip-mode" style="margin-bottom: 15px">
-                        <div class="col-md-3 text-right">
-                            <label class="control-label">{{ "Default"|_ }}</label>
-                            <input type="hidden" value="*" class="text-ip-mode" name="config[mode_by_ip][FCom_Admin]"/>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-control select2-offscreen select-mode">
-                                <option value="PRODUCTION">{{ "PRODUCTION"|_ }}</option>
-                                <option value="DEBUG">{{ "DEBUG"|_ }}</option>
-                                <option value="STAGING">{{ "STAGING"|_ }}</option>
-                                <option value="DEVELOPMENT">{{ "DEVELOPMENT"|_ }}</option>
-                                <option value="MIGRATION">{{ "MIGRATION"|_ }}</option>
-                                <option value="MIGRATION">{{ "MIGRATION"|_ }}</option>
-                                <option value="INSTALLATION">{{ "INSTALLATION"|_ }}</option>
-                                <option value="RECOVERY">{{ "RECOVERY"|_ }}</option>
-                                <option value="DISABLED">{{ "DISABLED"|_ }}</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <button class="btn btn-info btn-xs add-ip-mode" style="margin-top: 5px;" type="button">
-                                <i class="icon-plus"></i>
-                            </button>
-                        </div>
-                        {#<textarea class="form-control" name="config[mode_by_ip][FCom_Admin]" rows="5"></textarea>#}
-                    </div>
+                    <div class="col-md-8 group-ip-mode"></div>
                 </div>
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "Modules to run in RECOVERY mode"|_ }}</label>
@@ -108,15 +85,6 @@
     require(['backbone', 'jquery', 'fcom.ipmode', 'select2'], function(Backbone, $, ipMode) {
         var mode = '{{ mode }}';
         mode = mode.split('|');
-        mode.forEach(function (obj) {
-            var tmp = obj.split(':');
-            if (tmp[0] == '*') {
-                $('.select2-offscreen').select2().select2('val', tmp[1]);
-            } else {
-                var ip = new ipMode.Views();
-                $('#setting-ip-mode-fcom-admin').append(ip.render(tmp[1]).el);
-                ip.$el.find('.text-ip-mode').val(tmp[0]);
-            }
-        });
+        ipMode.initMode({el: $('#settings-FCom_Admin-group1').find('.group-ip-mode'), name: 'config[mode_by_ip][FCom_Admin]', mode: mode});
     })
 </script>
