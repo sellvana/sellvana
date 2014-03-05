@@ -12,11 +12,8 @@ class FCom_SampleData_Model_Loader extends BClass
     public static function loadProducts()
     {
         $file     = BConfig::i()->get( 'modules/FCom_SampleData/sample_file' );
-        $module   = BModuleRegistry::i()->currentModule();
-        $basePath = '';
-        if ( $module ) {
-            $basePath = $module->root_dir;
-        }
+        $basePath = BConfig::i()->get( 'fs/root_dir' );
+
         if ( !$file ) {
             $file = static::$defaultProductDataFile;
         }
