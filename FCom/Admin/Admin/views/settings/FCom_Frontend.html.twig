@@ -51,36 +51,9 @@
         </div>
         <div class="panel-collapse accordion-body" id="settings-FCom_Frontend-group1">
             <div class="panel-body">
-                <div class="form-group ip-mode" id="setting-ip-mode-fcom-frontend">
+                <div class="form-group" >
                     <label class="col-md-2 control-label">{{ "IP: Mode"|_ }}</label>
-                    <div class="col-md-8 row group-ip-mode" style="margin-bottom: 15px" >
-                        <div class="col-md-3 text-right">
-                            <label class="control-label">{{ "Default"|_ }}</label>
-                            <input type="hidden" value="*" class="text-ip-mode" name="config[mode_by_ip][FCom_Frontend]"/>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-control select-mode" >
-                                <option value="PRODUCTION">{{ "PRODUCTION"|_ }}</option>
-                                <option value="DEBUG">{{ "DEBUG"|_ }}</option>
-                                <option value="STAGING">{{ "STAGING"|_ }}</option>
-                                <option value="DEVELOPMENT">{{ "DEVELOPMENT"|_ }}</option>
-                                <option value="MIGRATION">{{ "MIGRATION"|_ }}</option>
-                                <option value="MIGRATION">{{ "MIGRATION"|_ }}</option>
-                                <option value="INSTALLATION">{{ "INSTALLATION"|_ }}</option>
-                                <option value="RECOVERY">{{ "RECOVERY"|_ }}</option>
-                                <option value="DISABLED">{{ "DISABLED"|_ }}</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <button class="btn btn-info btn-xs add-ip-mode" style="margin-top: 5px;" type="button">
-                                <i class="icon-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    {#<div class="col-md-5">#}
-                        {##}
-                        {#<textarea class="form-control" name="config[mode_by_ip][FCom_Frontend]" rows="5">{{ c.get('mode_by_ip/FCom_Frontend') }}</textarea>#}
-                    {#</div>#}
+                    <div class="col-md-8 group-ip-mode"></div>
                 </div>
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "Modules to run in RECOVERY mode"|_ }}</label>
@@ -96,17 +69,6 @@
     require(['backbone', 'jquery', 'fcom.ipmode','select2'], function(Backbone, $, ipMode) {
         var mode = '{{ mode }}';
         mode = mode.split('|');
-        var select = $('#setting-ip-mode-fcom-frontend').find('select').select2();
-        mode.forEach(function (obj) {
-            var tmp = obj.split(':');
-            if (tmp[0] == '*') {
-                select.select2('val', tmp[1]);
-            } else {
-                var ip = new ipMode.Views();
-                $('#setting-ip-mode-fcom-frontend').append(ip.render(tmp[1]).el);
-                ip.$el.find('.text-ip-mode').val(tmp[0]);
-            }
-        });
-
+        ipMode.initMode({el: $('#settings-FCom_Frontend-group1').find('ip-mode'), name: 'config[mode_by_ip][FCom_Frontend]', mode: mode});
     })
 </script>
