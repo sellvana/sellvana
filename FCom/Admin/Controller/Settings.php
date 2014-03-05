@@ -23,7 +23,6 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
     public function action_index__POST()
     {
         $xhr = BRequest::i()->xhr();
-
         try {
             $post = BRequest::i()->post();
 
@@ -39,25 +38,30 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
                 }
             }
             FCom_Core_Main::i()->writeConfigFiles();
-            $message = 'Settings have been saved successfully';
-            $status = 'success';
+
+            if (!$xhr) {
+                $this->message('Settings updated');
+            } else {
+                $result = array('message' => BLocale::_('Settings has been saved successfully'), 'status' => 'success');
+            }
+
         } catch (Exception $e) {
 
             BDebug::logException($e);
-            $message = $e->getMessage();
-            $status = 'error';
-        }
-
-        if (!$xhr) {
-            $this->message($message, $status);
-            if ( !empty( $post[ 'current_tab' ] ) ) {
-                $tab = $post[ 'current_tab' ];
+            if (!$xhr) {
+                $this->message($e->getMessage(), 'error');
             } else {
-                $tab = 'FCom_Admin';
+                $result = array('message' => BLocale::_($e->getMessage()), 'status' => 'error');
             }
+        }
+        if (!empty($post['current_tab'])) {
+            $tab = $post['current_tab'];
+        } else {
+            $tab = 'FCom_Admin';
+        }
+        if (!$xhr) {
             BResponse::i()->redirect('settings'.'?tab='.$tab);
         } else {
-            $result = array('message' => BLocale::_($message), 'status' => $status);
             BResponse::i()->json($result);
         }
     }
@@ -80,5 +84,17 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
         }
 
         BResponse::i()->json("success");
+    }
+
+    public function getAllMode()
+    {
+        return array(
+          BDebug::MODE_DEBUG => BDebug::MODE_DEBUG,
+          BDebug::MODE_DEVELOPMENT => BDebug::MODE_DEVELOPMENT,
+          BDebug::MODE_STAGING => BDebug::MODE_STAGING,
+          BDebug::MODE_PRODUCTION => BDebug::MODE_PRODUCTION,
+          BDebug::MODE_RECOVERY => BDebug::MODE_RECOVERY,
+          BDebug::MODE_DISABLED => BDebug::MODE_DISABLED
+        );
     }
 }

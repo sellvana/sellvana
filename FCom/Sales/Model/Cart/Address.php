@@ -33,9 +33,9 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
     protected $_validationRules = array(
         array('firstname', '@required'),
-        array('firstname', '@alphanum'),
+        #array('firstname', '@alphanum'),
         array('lastname', '@required'),
-        array('lastname', '@alphanum'),
+        #array('lastname', '@alphanum'),
         array('email', '@required'),
         array('email', '@email'),
         array("street1", '@required'),
