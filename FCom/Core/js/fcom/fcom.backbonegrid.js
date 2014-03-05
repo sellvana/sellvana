@@ -822,8 +822,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             BackboneGrid.Views.GridView = Backbone.View.extend({
                 //  el: 'table tbody',
                 initialize: function () {
-                    //this.collection.on('reset', this.render, this);
-                    //this.collection.on('render', this.render, this);
+                    this.collection.on('reset', this.render, this);
+                    this.collection.on('render', this.render, this);
                     this.collection.on('add', this.addRow, this);
                 },
                 setCss: function () {
