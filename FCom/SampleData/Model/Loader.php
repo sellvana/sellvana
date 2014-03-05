@@ -11,20 +11,21 @@ class FCom_SampleData_Model_Loader extends BClass
 
     public static function loadProducts()
     {
-        $file     = BConfig::i()->get( 'modules/FCom_SampleData/sample_file' );
-        $basePath = BConfig::i()->get( 'fs/root_dir' );
+        $basePath = BConfig::i()->get( 'fs/root_dir' ) . '/storage';
+        $ds       = DIRECTORY_SEPARATOR;
 
+        $file     = BConfig::i()->get( 'modules/FCom_SampleData/sample_file' );
         if ( !$file ) {
             $file = static::$defaultProductDataFile;
         }
 
         $path = BConfig::i()->get( 'modules/FCom_SampleData/sample_path' );
-
         if ( !$path ) {
-            $path = $basePath . DIRECTORY_SEPARATOR . static::$defaultDataPath;
+            $path = static::$defaultDataPath;
         }
+        $path = $basePath . DIRECTORY_SEPARATOR . $path;
 
-        $fileName = rtrim( $path, '/' ) . DIRECTORY_SEPARATOR . ltrim( $file, '/' );
+        $fileName = rtrim( $path, $ds ) . $ds . ltrim( $file, $ds );
         $fileName = str_replace( '\\', '/', realpath( $fileName ) );
         $fr       = fopen( $fileName, 'r' );
         $headings = fgetcsv( $fr );

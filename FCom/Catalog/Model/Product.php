@@ -564,6 +564,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     //create new categories if not
                     $categories = array();
                     foreach($categoriesPath as $catpath) {
+                        /** @var FCom_Catalog_Model_Category $parent */
                         $parent = $topParentCategory;
                         $catNodes = explode($config['format']['nesting_separator'], $catpath);
                         /*print_r($catpath);
