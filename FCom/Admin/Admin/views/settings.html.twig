@@ -2,7 +2,7 @@
 
 <script type="text/javascript">
 
-    require(['backbone', 'underscore', 'jquery', 'fcom.ipmode', 'jquery.validate', 'bootstrap', 'fcom.admin', 'switch', 'jquery.bootstrap-growl',  'select2'], function(Backbone, _, $, ipMode) {
+    require(['backbone', 'underscore', 'jquery', 'fcom.ipmode', 'jquery.validate', 'fcom.validate.ext', 'bootstrap', 'fcom.admin', 'switch', 'jquery.bootstrap-growl',  'select2'], function(Backbone, _, $, ipMode) {
         $(function() {
             function onSortableStop(event, ui) {
                 var type = ui.item[0].nodeName.toLowerCase()=='li' ? 'tabs' : 'sections';
@@ -85,11 +85,10 @@
                     break;
                 }
             }
-            $.validator.addMethod('checkIp', checkIp, 'IP address not correctly.');
 
             $.validator.addClassRules("text-ip-mode", {
                 required: true,
-                checkIp: true
+                validateIP: true
             });
             mainForm.validate({
                 ignore: [],
@@ -98,33 +97,14 @@
                 },
                 submitHandler: function (form) {
                     var data = mainForm.serializeArray();
+                    var arr = [ 'config[mode_by_ip][FCom_Admin]',
+                                'config[mode_by_ip][FCom_ApiServer]',
+                                'config[mode_by_ip][FCom_Frontend]',
+                                'config[mode_by_ip][FCom_Cron]'
+                              ];
                     data.forEach(function (obj) {
-                        var tmp = '';
-                        var def = '';
-                        switch (obj.name) {
-                            case 'config[mode_by_ip][FCom_Admin]' :
-                                def = $('#ip-mode-default-admin').val();
-                                var tmp = textIpMode('#setting-ip-mode-fcom-admin');
-                                obj.value = (tmp != '') ? def + '\n' + tmp.substr(0, tmp.length - 1): def;
-                                break;
-                            case 'config[mode_by_ip][FCom_ApiServer]' :
-                                def = $('#ip-mode-default-api-server').val();
-                                var tmp = textIpMode('#setting-ip-mode-fcom-api-server');
-                                obj.value = (tmp != '') ?  def + '\n' + tmp.substr(0, tmp.length - 1): def;
-                                break;
-                            case 'config[mode_by_ip][FCom_Frontend]' :
-                                def = $('#ip-mode-default-frontend').val();
-                                var tmp = textIpMode('#setting-ip-mode-fcom-frontend');
-                                obj.value = (tmp != '') ? def + '\n' + tmp.substr(0, tmp.length - 1): def;
-                                break;
-                            case 'config[mode_by_ip][FCom_Cron]' :
-                                def = $('#ip-mode-default-cron').val();
-                                var tmp = textIpMode('#setting-ip-mode-fcom-cron');
-                                obj.value = (tmp != '') ? def + '\n' + tmp.substr(0, tmp.length - 1): def;
-                                break;
-                            default:
-                                break;
-
+                        if ($.inArray(obj.name, arr) > -1) {
+                            obj.value = getIpModeValue(mainForm.find('input[name="'+ obj.name +'"]').parents('.group-ip-mode'));
                         }
                     });
                     processFlag({invalid: null});
@@ -138,16 +118,17 @@
                 }
             });
 
-            function checkIp(value, elem, params) {
-                var regex = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])$/;
-                return regex.test(value);
-            }
-            function textIpMode(el) {
+
+            function getIpModeValue(el) {
                 var result = '';
-                $(el).find('.text-ip-mode').each(function () {
-                    result = result + $(this).val()+ ':' + $(this).parents('.group-ip-mode').find('select').val() + '\n';
+                el.find('.default, .text-ip-mode').each(function () {
+                    if ($(this).hasClass('default')) {
+                        result += $(this).parents('.ip-mode').find('select').val() + '\n';
+                    } else {
+                        result +=  $(this).val()+ ':' + $(this).parents('.ip-mode').find('select').val() + '\n';
+                    }
                 });
-                return result;
+                return result.substr(0, result.length -1);
             }
 
             $("body").on('change', elem, function () {
@@ -163,8 +144,7 @@
             });
             $('body').on('click', '.add-ip-mode', function () {
                 var ip = new ipMode.ipMode.Views();
-                var mode = $(this).parents('.group-ip-mode').find('select.select-mode').val();
-                $(this).parents('.ip-mode').append(ip.render().el);
+                $(this).parents('.group-ip-mode').append(ip.render().el);
 
             });
             FCom.Admin.Tabs('.f-admin-main', {
@@ -193,9 +173,14 @@
 </script>
 
 <script type="template" id="ip-mode-template">
-    <div  class="col-md-8 col-lg-push-2 row group-ip-mode" style="margin-bottom: 15px">
-        <div class="col-md-3">
-            <input type="text" name="<%- id %>" class="form-control text-ip-mode" id="<%- id %>"/>
+    <div  class="row ip-mode" style="margin-bottom: 15px">
+        <div class="col-md-3 text-right">
+            <% if (typeof (default_mode) !== 'undefined') { %>
+                <label class="control-label">{{ "Default"|_ }}</label>
+                <input type="hidden" class="default"  name="<%- name %>"/>
+            <% } else { %>
+                <input type="text" name="<%- name %>" class="form-control text-ip-mode" id="<%- name %>"/>
+            <% } %>
         </div>
         <div class="col-md-3">
             <select class="form-control select-mode">
@@ -203,8 +188,10 @@
             </select>
         </div>
         <div class="col-md-6">
-            <button class="btn btn-danger btn-xs remove-ip-mode" style="margin-top: 5px;" type="button">
-                <i class="icon-remove"></i>
+            <button class="btn  btn-xs <%- class_button %>" style="margin-top: 5px;" type="button">
+                <%
+                    (typeof (default_mode) !== 'undefined') ? print('<i class="icon-plus"></i>') : print('<i class="icon-remove"></i>');
+                %>
             </button>
         </div>
     </div>
