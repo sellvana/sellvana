@@ -860,7 +860,8 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                 try {
                     editors[id].destroy();
                 } catch (e) {
-                    editors[id].destroy();
+                    CKEDITOR.instances[id].destroy();
+                    //editors[id].destroy();
                 }
                 editors[id] = null;
             }
