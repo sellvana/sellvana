@@ -278,7 +278,10 @@ class FeatureContext extends MinkContext
         if ( !$productLink ) {
             throw new ElementNotFoundException( $this->getSession(), null, null, $productLinkPath );
         }
-
+        if(!isset($productLink[1])){
+            echo "\tSecond product link not found, skipping.\n";
+            return;
+        }
         $this->productName = $productLink[ 1 ]->getText();
         echo "\t{$this->productName}\n";
         $productLink[ 1 ]->click();

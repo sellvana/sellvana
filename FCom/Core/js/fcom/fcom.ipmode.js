@@ -27,6 +27,7 @@ define(['backbone',  'jquery', 'unique', 'select2'], function(Backbone, $) {
             return this;
         },
         remove: function () {
+            console.log('nguyen');
             this.$el.remove();
         }
 
@@ -49,9 +50,9 @@ define(['backbone',  'jquery', 'unique', 'select2'], function(Backbone, $) {
                 }
             }
         });
-    }
+    };
     return {
         ipMode: ipMode,
         initMode: initMode
     };
-})
+});

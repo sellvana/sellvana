@@ -1,4 +1,7 @@
 {% set c = THIS.get('model') %}
+{% set mname = APP.instance('BModuleRegistry').currentModuleName() %}
+{% set baseHtmlName = "config[modules][" ~ mname ~ "]" %}
+{% set baseConfigPath = "modules/"~ mname %}
 {% set btn = "sample-btn-load" %}
 <h2>{{ "Sample Catalog Data" | _ }}</h2>
 <div class="accordion accordion-blue panel-group" id="sample-data-load-acc">
@@ -9,7 +12,24 @@
         <div class="panel-collapse collapse in" id="sample-data-load-panel">
             <div class="panel-body">
                 <div class="form-group">
-                    <div class="col-md-5">
+                    <label class="col-md-2 control-label" for="sample_data_sample_file">{{ "Sample data file name" | _ }}</label>
+                    <div class="col-md-5"><input type="text" class="form-control" name="{{ baseHtmlName }}[sample_file]"
+                                                 id="sample_data_sample_file" value="{{ c.get(baseConfigPath ~ '/sample_file') }}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="sample_data_sample_file">{{ "Sample data file path" | _ }}</label>
+                    <div class="col-md-5"><input type="text" class="form-control" name="{{ baseHtmlName }}[sample_path]"
+                                                 id="sample_data_sample_file" value="{{ c.get(baseConfigPath ~ '/sample_path') }}">
+                        <br/>
+                        <div><small>{{ "File path should be directory path within '<code>storage</code>' folder.
+                        Leave empty for default '<code>data</code>' folder.
+                        A file with '<code>file name</code>' must be found in configured or default path.
+                        Default file name is <code>products.csv</code>." }}</small></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-5 col-md-offset-2">
                         {#<input type="hidden" name="{{ baseHtmlName }}[load]" value="0"/>#}
                         {#<input id="{{ prefix }}test" type="checkbox" class="switch-cbx" name="{{ baseHtmlName }}[load]"#}
                                {#value="1" {% if c.get(baseConfigPath ~ '/load') == 1 %}checked="checked"{% endif %} />#}
@@ -32,6 +52,7 @@
                                                         console.log(jqXHR);
                                                         console.log(textStatus);
                                                         console.log(errorThrown);
+                                                        $.bootstrapGrowl(errorThrown, {type: 'error', align: 'center', width: 'auto'});
                                                     });
                                         }
                                     });

@@ -375,7 +375,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (empty($data) || !is_array($data)) {
             return null;
         }
-
+        $oldTimeOut = ini_get('max_execution_time');
+        ini_set('max_execution_time', 300);
         //HANDLE CONFIG
 
         //multi value separator used to separate values in one column like for images
@@ -440,7 +441,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $productIds = array();
         $errors = array();
         $relatedProducts = array();
-        foreach($data as $d) {
+        for( $i = 0, $c = count($data); $i < $c; $i++ ) {
+            $d = $data[$i];
             //if must have fields not defined then skip the record
             if (empty($d['product_name']) && empty($d['local_sku']) && empty($d['url_key'])) {
                 continue;
@@ -564,6 +566,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     //create new categories if not
                     $categories = array();
                     foreach($categoriesPath as $catpath) {
+                        /** @var FCom_Catalog_Model_Category $parent */
                         $parent = $topParentCategory;
                         $catNodes = explode($config['format']['nesting_separator'], $catpath);
                         /*print_r($catpath);
@@ -594,13 +597,15 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                             if (!$category) {
                                 break;
                             }
+
                             $parent = $category;
-                            $categories[$category->id()] = $category;
+                            $cId                = $category->id();
+                            $categories[ $cId ] = $category;
+                            if ($config['import']['categories']['menu'] && $categories[ $cId ]->inMenu() == false) {
+                                $categories[ $cId ]->setInMenu(true);
+                            }
                         }
 
-                        if ($config['import']['categories']['menu'] && $categories[$category->id()]->inMenu() == false) {
-                            $categories[$category->id()]->setInMenu(true);
-                        }
                     }
 
                     //assign products to categories
@@ -630,55 +635,16 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
             //HANDLE IMAGES
             if (!empty($imagesNames)) {
-                $mediaLib = FCom_Core_Model_MediaLibrary::i();
-                $productMedia = FCom_Catalog_Model_ProductMedia::i();
-                $imageFolder = BConfig::i()->get('fs/image_folder');
-
-                foreach($imagesNames as $fileName) {
-                    $pathinfo = pathinfo($fileName);
-                    $subfolder = $pathinfo['dirname'] == '.' ? null : $pathinfo['dirname'];
-                    $att = $mediaLib->load(array('folder'=>$imageFolder, 'subfolder' => $subfolder, 'file_name'=>$pathinfo['basename']));
-                    if (!$att) {
-                        $fullPathToFile = FULLERON_ROOT_DIR.'/'.$imageFolder.'/'.$fileName;
-                        $size = 0;
-                        if (file_exists($fullPathToFile)) {
-                            $size = filesize($fullPathToFile);
-                        }
-
-                        $subfolder = null;
-                        if ($config['import']['images']['with_subfolders']) {
-                            $subfolder = $pathinfo['dirname'] == '.' ? null : $pathinfo['dirname'];
-                        }
-                        try {
-                            $att = $mediaLib->create(array(
-                                    'folder'    => $imageFolder,
-                                    'subfolder' => $subfolder,
-                                    'file_name' => $pathinfo['basename'],
-                                    'file_size' => $size,
-                            ))->save();
-                        } catch(Exception $e) {
-                            $errors[] = $e->getMessage();
-                        }
-                    }
-                    $fileId = $productMedia->orm()->where('product_id', $p->id())
-                                ->where('file_id', $att->id())->find_one();
-                    if (!$fileId) {
-                        try {
-                            $fileId = $productMedia->create(array(
-                                    'product_id' => $p->id(),
-                                    'media_type' => 'images',
-                                    'file_id' => $att->id(),
-                            ))->save();
-                        } catch (Exception $e) {
-                            $errors[] = $e->getMessage();
-                        }
-                    }
+                $imagesResult = $this->_importImages( $config, $imagesNames, $p );
+                if(is_array($imagesResult)){
+                    $errors[] += $imagesResult;
                 }
             }
 
             $productIds[] = $p->id();
-            unset($fileId);
-            unset($att);
+//            unset($fileId);
+//            unset($att);
+            unset($data[$i]);
         }
 
         //HANDLE CUSTOM FIELDS to product relations
@@ -717,12 +683,16 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
         if ( !empty( $relatedProducts ) ) {
             $relatedResult = $this->_importRelatedProducts( $relatedProducts );
+            if ( is_array( $relatedResult ) ) {
+                $errors[ ] += $relatedResult;
+            }
         }
         unset($data);
         $this->_importErrors = $errors;
         if ($errors) {
             $result['errors'] = $errors;
         }
+        ini_set('max_execution_time', $oldTimeOut);
         return $result;
     }
 
@@ -899,6 +869,72 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
         } catch ( Exception $e ) {
             $errors[ ] = $e->getMessage();
+        }
+        return empty( $errors ) ? true : $errors;
+    }
+
+    /**
+     * @param $config
+     * @param $imagesNames
+     * @param FCom_Catalog_Model_Product $p
+     * @return array|bool
+     */
+    protected function _importImages( $config, $imagesNames, $p )
+    {
+        $mediaLib     = FCom_Core_Model_MediaLibrary::i();
+        $productMedia = FCom_Catalog_Model_ProductMedia::i();
+        $imageFolder  = BConfig::i()->get( 'fs/image_folder' );
+        $errors = array();
+
+        foreach ( $imagesNames as $fileName ) {
+            $pathInfo  = pathinfo( $fileName );
+            $subFolder = $pathInfo[ 'dirname' ] == '.' ? null : $pathInfo[ 'dirname' ];
+            $att       = $mediaLib->load(
+                                  array(
+                                      'folder'    => $imageFolder,
+                                      'subfolder' => $subFolder,
+                                      'file_name' => $pathInfo[ 'basename' ]
+                                  )
+            );
+            if ( !$att ) {
+                $fullPathToFile = FULLERON_ROOT_DIR . '/' . $imageFolder . '/' . $fileName;
+                $size           = 0;
+                if ( file_exists( $fullPathToFile ) ) {
+                    $size = filesize( $fullPathToFile );
+                }
+
+                $subFolder = null;
+                if ( $config[ 'import' ][ 'images' ][ 'with_subfolders' ] ) {
+                    $subFolder = $pathInfo[ 'dirname' ] == '.' ? null : $pathInfo[ 'dirname' ];
+                }
+                try {
+                    $att = $mediaLib->create(
+                                    array(
+                                        'folder'    => $imageFolder,
+                                        'subfolder' => $subFolder,
+                                        'file_name' => $pathInfo[ 'basename' ],
+                                        'file_size' => $size,
+                                    )
+                    )->save();
+                } catch ( Exception $e ) {
+                    $errors[ ] = $e->getMessage();
+                }
+            }
+            $fileId = $productMedia->orm()->where( 'product_id', $p->id() )
+                                   ->where( 'file_id', $att->id() )->find_one();
+            if ( !$fileId ) {
+                try {
+                    $productMedia->create(
+                                           array(
+                                               'product_id' => $p->id(),
+                                               'media_type' => 'images',
+                                               'file_id'    => $att->id(),
+                                           )
+                    )->save();
+                } catch ( Exception $e ) {
+                    $errors[ ] = $e->getMessage();
+                }
+            }
         }
         return empty( $errors ) ? true : $errors;
     }
