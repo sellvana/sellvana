@@ -15,17 +15,31 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-md-2 control-label">{{ "Content"|_ }}</label>
-        <div class="col-md-10">
-            <textarea class="form-control ckeditor" name="model[content]" id="main-content" rows="5">{{ validator.fieldValue('content') }}</textarea>
-        </div>
-    </div>
-    <div class="form-group">
         <label class="col-md-2 control-label">{{ "Content Format"|_ }}</label>
         <div class="col-md-5">
-            <select class="form-control" name="model[renderer]">
+            <select class="form-control" name="model[renderer]" id="model-renderer">
                 {{ UTIL.optionsHtml(LAYOUT.getAllRenderers(true), validator.fieldValue('renderer'))|raw }}
             </select>
         </div>
     </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">{{ "Content"|_ }}</label>
+        <div class="col-md-9">
+            <textarea class="form-control" name="model[content]" id="main-content" rows="10">{{ validator.fieldValue('content') }}</textarea>
+        </div>
+    </div>
 </fieldset>
+
+<script>
+require(['jquery', 'ckeditor', 'fcom.admin'], function($) {
+    var renderers = {{ UTIL.toJson(LAYOUT.getAllRenderers()) | raw }};
+    function updateEditor() {
+        switch (renderers[$('#model-renderer').val()].editor) {
+            case 'text': adminForm.wysiwygDestroy('main-content'); break;
+            case 'html': adminForm.wysiwygCreate('main-content'); break;
+        }
+    }
+    $('#model-renderer').change(updateEditor);
+    updateEditor();
+})
+</script>
