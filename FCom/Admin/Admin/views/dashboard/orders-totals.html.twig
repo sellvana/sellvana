@@ -1,36 +1,13 @@
+{% set orderTotal = APP.instance('FCom_Admin_Controller_Dashboard').getData('orderTotal', {type: "default"}) %}
+
 <div class='row'>
-  <div class='col-sm-6'>
-    <div class='box-content box-statistic'>
-      <h3 class='title text-error'>191</h3>
-      <small>New</small>
-      <div class='text-error icon-inbox align-right'></div>
-    </div>
-    <div class='box-content box-statistic'>
-      <h3 class='title text-warning'>311</h3>
-      <small>In process</small>
-      <div class='text-warning icon-check align-right'></div>
-    </div>
-    <div class='box-content box-statistic'>
-      <h3 class='title text-info'>3</h3>
-      <small>Pending</small>
-      <div class='text-info icon-time align-right'></div>
-    </div>
-  </div>
-  <div class='col-sm-6'>
-    <div class='box-content box-statistic'>
-      <h3 class='title text-primary'>3</h3>
-      <small>Shipped</small>
-      <div class='text-primary icon-truck align-right'></div>
-    </div>
-    <div class='box-content box-statistic'>
-      <h3 class='title text-success'>981</h3>
-      <small>Completed</small>
-      <div class='text-success icon-flag align-right'></div>
-    </div>
-    <div class='box-content box-statistic'>
-      <h3 class='title text-muted'>0</h3>
-      <small>Canceled</small>
-      <div class='text-muted icon-remove align-right'></div>
-    </div>
-  </div>
+  {% for  order in orderTotal %}
+      <div class='col-sm-6'>
+          <div class='box-content box-statistic'>
+              <h3 class='title text-error dashboard-order-total' data-id="{{ order.id }}">{{ order.order|_ }}</h3>
+              <small>{{ order.name|_ }}</small>
+              <div class='text-error icon-inbox align-right'></div>
+          </div>
+      </div>
+  {% endfor %}
 </div>
