@@ -375,8 +375,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (empty($data) || !is_array($data)) {
             return null;
         }
-        $oldTimeOut = ini_get('max_execution_time');
-        ini_set('max_execution_time', 300);
+        BResponse::i()->startLongResponse();
+        BConfig::i()->set('db/logging', 0);
         //HANDLE CONFIG
 
         //multi value separator used to separate values in one column like for images
@@ -692,7 +692,6 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($errors) {
             $result['errors'] = $errors;
         }
-        ini_set('max_execution_time', $oldTimeOut);
         return $result;
     }
 
