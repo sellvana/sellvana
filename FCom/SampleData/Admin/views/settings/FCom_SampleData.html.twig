@@ -1,7 +1,7 @@
 {% set c = THIS.get('model') %}
 {% set mname = APP.instance('BModuleRegistry').currentModuleName() %}
 {% set baseHtmlName = "config[modules][" ~ mname ~ "]" %}
-{% set baseConfigPath = "modules/"~ mname ~"/" %}
+{% set baseConfigPath = "modules/"~ mname %}
 {% set btn = "sample-btn-load" %}
 <h2>{{ "Sample Catalog Data" | _ }}</h2>
 <div class="accordion accordion-blue panel-group" id="sample-data-load-acc">
@@ -52,6 +52,7 @@
                                                         console.log(jqXHR);
                                                         console.log(textStatus);
                                                         console.log(errorThrown);
+                                                        $.bootstrapGrowl(errorThrown, {type: 'error', align: 'center', width: 'auto'});
                                                     });
                                         }
                                     });
