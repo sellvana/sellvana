@@ -190,6 +190,9 @@ class BLayout extends BClass
         if (is_string($params['file_ext'])) {
             $params['file_ext'] = explode(';', $params['file_ext']);
         }
+        if (empty($params['editor'])) {
+            $params['editor'] = 'text';
+        }
 
         static::$_renderers[$name] = $params;
 
