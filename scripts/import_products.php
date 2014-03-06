@@ -1,11 +1,11 @@
 <?php
 
-require_once __DIR_.'/../shell/index.php';
+require_once __DIR__.'/../shell/index.php';
 
 
 
 $config = array();
-$config['file']['filename'] = FULLERON_ROOT_DIR.'/storage/products.csv';
+$config['file']['filename'] = FULLERON_ROOT_DIR.'/storage/data/products.csv';
 $config['import']['actions'] = 'create_or_update';
 $config['format']['encoding'] = 'UTF-8';
 $config['format']['delimiter'] = "\t";
