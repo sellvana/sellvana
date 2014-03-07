@@ -1,4 +1,8 @@
-{% set orderTotal = APP.instance('FCom_Sales_Admin_Controller_Orders').getOrderTotal({type: "default"}) %}
+{% set filter = THIS.get('filter') %}
+{% if filter is null %}
+    {% set filter = {type: "default"} %}
+{% endif %}
+{% set orderTotal = APP.instance('FCom_Sales_Admin_Controller_Orders').getOrderTotal(filter) %}
 
 <div class='row'>
   {% for  order in orderTotal %}

@@ -129,6 +129,7 @@ class FCom_Sales_Main extends BClass
             'view' => 'order/dashboard/orders-totals',
             'cols' => 4,
             'async' => true,
+            'filter' => true
         ));
     }
 }

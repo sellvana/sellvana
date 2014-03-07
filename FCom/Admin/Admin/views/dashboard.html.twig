@@ -229,14 +229,12 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
       return false;
   });
   function filterDate(data) {
-      if ($('#dashboard-widget__orders-totals').length) {
-          $.post('{{ APP.href("orders/dashboard") }}', data, function(response, status, xhr) {
-              $('#dashboard-widget__orders-totals').find('.dashboard-order-total').each(function () {
-                  var tmp = _.where(response, {id: $(this).attr('data-id')});
-                  (tmp.length > 0) ? $(this).html(tmp[0].order):  $(this).html(0);
-              });
+      $.post('{{ APP.href("dashboard/data") }}', data, function(response, status, xhr) {
+          $.each(response, function(key, widget) {
+            $('#dashboard-widget__'+ widget.key+' .widget-contents').html(widget.html);
           });
-      }
+
+      });
   }
 
   function resetFilterDate() {
