@@ -65,6 +65,7 @@ function filesizeFormat(size) {
     return size;
 }
 
+
 define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
     'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker', 'jquery-ui', 'moment', 'daterangepicker'],
     function (Backbone, _, $, NProgress) {
@@ -90,6 +91,32 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
             }
 
+            function validateUnique(element, model ,editInline) {
+                var url = model.get('validation').unique;
+                element.rules("add", {
+                    onfocusout: false,
+                    onkeyup: false,
+                    remote: {
+                    url: url,
+                    type: 'post',
+                    data: {
+                            _name: model.get('name')
+                    },
+                    dataFilter: function (responseString) {
+                        var response = jQuery.parseJSON(responseString);
+                        currentMessage = response.Message;
+                        if ((modalForm.modalType === 'editable' || editInline) && BackboneGrid.currentRow.get('id') === response.id){
+                            return true;
+                        }
+                        return response.unique;
+                    },
+                    async:false
+                    },
+                    messages: {
+                        remote: "This " + model.get('label') + " is already taken place"
+                    }
+                });
+            }
             BackboneGrid.Models.ColModel = Backbone.Model.extend({
                 defaults: {
                     style: '',
@@ -375,6 +402,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     //this.on('change', this.checkSelectVal, this);
                 },
                 checkSelectVal: function () {
+
                     var isSelected = typeof(selectedRows.findWhere({id: this.get('id')})) !== 'undefined';
                     this.set('selected', isSelected);
                 },
@@ -391,7 +419,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return false;
                 },
                 save: function (not_render) {
-                    console.log('save');
+
                     var self = this;
                     var id = this.get('id');
 //                    var hash = this.changedAttributes(); //todo: check why sometimes cannot detect attributes is changed
@@ -592,7 +620,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 events: {
                     'change input.select-row': '_selectRow',
-                    //'change .form-control': '_cellValChanged',
+                    'change .form-control': '_cellValChanged',
                     //'blur .form-control': '_validate',
                     'click button.btn-delete': '_deleteRow',
                     'click button.btn-edit': '_editModal',
@@ -671,7 +699,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     var name = $(ev.target).attr('data-col');
 
                     //@todo why change cell must be saved?
-//                    this.model.set(name, val);
+                    this.model.set(name, val);
 //                    this.model.save(true);
 
                 },
@@ -699,13 +727,21 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     console.log('row-render');
                     var colsInfo = columnsCollection.toJSON();
 
-                    this.$el.html(this.template({row: this.model.toJSON(), colsInfo: colsInfo}));
-                    /*if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['after_render']) !== 'undefined') {
-                        console.log('after_render');
-                        var func = BackboneGrid.callbacks['after_render'];
-                        var script = func + '(this.$el, this.model.toJSON(), columnsCollection);';
-                        eval(script);
-                    }*/
+                    var rowJSON = this.model.toJSON();
+
+                    var strRowSelect = '';
+                    if (!this.model.get('_selectable')) {
+                        strRowSelect = 'DISABLED ';
+                    } else if (this.model.get('selected')) {
+                        strRowSelect += 'CHECKED';
+                    }
+
+                    rowJSON._rowSelect = strRowSelect;
+
+
+
+                    this.$el.html(this.template({row: rowJSON, colsInfo: colsInfo}));
+
                     if (typeof(this.afterRender) === 'function') {
                         this.afterRender();
                     }
@@ -851,6 +887,17 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     });
                     this.$el.append(rowView.render().el);
                     rowView.setValidation();
+                },
+                clearSelectedRows: function() {
+                    selectedRows.reset();
+                    rowsCollection.each(function (model) {
+                        if (model.get('selected'))
+                            model.set('selected', false);
+                        //model.trigger('render');
+                    });
+                    gridView.$el.find('input.select-row:not([disabled])').prop('checked', false);
+                    $(BackboneGrid.MassDeleteButton).addClass('disabled');
+                    $(BackboneGrid.MassEditButton).addClass('disabled');
                 }
             });
             BackboneGrid.Views.ColCheckView = Backbone.View.extend({
@@ -1376,7 +1423,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         console.log('fwfw');
                     }
 
-                    this.model.set('validation', validationRules(this.model.get('validation')));
+                    this.model.set('_validation', validationRules(this.model.get('validation')));
 
                 },
                 render: function () {
@@ -1387,26 +1434,26 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             BackboneGrid.Views.ModalForm = Backbone.View.extend({
                 initialize: function () {
                     this.modalType = 'mass-editable';
-                    this.$el.parents('div.modal-dialog:first').find('button.save').click(this._saveChanges);
+                    this.$el.parents('div.modal-dialog:first').find('button.save').click(this.saveChanges);
                 },
-                _saveChanges: function (ev) {
+                saveChanges: function (ev) {
 
                     modalForm.$el.find('textarea, input, select').each(function () {
                         var key = $(this).attr('id');
                         var val = $(this).val();
                         BackboneGrid.modalElementVals[key] = val;
                     });
-
+                    console.log(this.formEl);
                     modalForm.formEl.validate();
                     if (!modalForm.formEl.valid())
-                        return;
+                        return false;
 
-                    for (var key in BackboneGrid.modalElementVals) {
+                    /*for (var key in BackboneGrid.modalElementVals) {
                         if (BackboneGrid.modalElementVals[key] === '' || BackboneGrid.modalElementVals[key] === null) {
                             delete BackboneGrid.modalElementVals[key];
                         }
 
-                    }
+                    }*/
                     if (modalForm.modalType === 'mass-editable') {
 
                         var ids = selectedRows.pluck('id').join(",");
@@ -1470,8 +1517,13 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         BackboneGrid.currentRow.save();
                     }
 
-                    $(ev.target).prev().trigger('click');
+                    //check this form is rendered in default view of grid or not.
+                    if (ev && $(ev.target).prev().hasClass('f-grid-modal-close'))
+                        $(ev.target).prev().trigger('click');
+
                     BackboneGrid.modalElementVals = {};
+
+                    return true;
 
                 },
                 render: function () {
@@ -1510,7 +1562,14 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         $(BackboneGrid.modalFormId).find('select').val('');*/
                     if (this.modalType === 'mass-editable')
                         $(BackboneGrid.modalFormId).find('select').val('');
-                    this.formEl = this.$el.parents('form:first');
+                    console.log(this.$el.is("form"));
+                    if (this.$el.is("form")) {
+                        this.formEl = this.$el;
+                    } else {
+                        this.formEl = this.$el.parents('form:first');
+                    }
+
+
                     this.formEl.validate({});
                     if (BackboneGrid.callbacks && typeof(BackboneGrid.callbacks['after_modalForm_render']) !== 'undefined') {
                         var func = BackboneGrid.callbacks['after_modalForm_render'];
@@ -1518,6 +1577,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         eval(script);
                     }
                     this.collection.each(function (col) {
+
+                        console.log('u', col.get('validation'));
                         if (typeof(col.get('validation')) !== 'undefined' && typeof(col.get('validation').unique) !== 'undefined') {
                             if (modalForm.$el.find('#' + col.get('name')).length) {
                                 validateUnique(modalForm.$el.find('#' + col.get('name')), col, false);
@@ -1529,6 +1590,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     $(BackboneGrid.modalFormId).on('shown.bs.modal', function() {
                         $('input:text:visible:first', this).focus();
                     });*/
+
+                    return this;
 
                 },
                 addElementDiv: function (model) {
@@ -1678,17 +1741,32 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 return gridView;
             }
 
+            this.getThView = function() {
+                return t
+            }
             this.getRows = function() {
                 return rowsCollection;
             }
+
+            this.getCols = function() {
+                return columnsCollection;
+            }
+
             this.getSelectedRows = function() {
                 return selectedRows;
             }
+
             this.getGridSkeleton = function() {
                 return BackboneGrid;
             }
 
+            this.getModalForm = function() {
+                return modalForm;
+            }
 
+            /*this.afterSelectionChanged = function() {
+
+            }*/
             this.build = function() {
                  _.templateSettings.variable = 'rc';
                 this.id = config.id;
@@ -1736,7 +1814,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 BackboneGrid.Views.ColCheckView.prototype.template = _.template($('#' + config.id + '-col-template').html());
                 BackboneGrid.Views.FilterCheckView.prototype.template = _.template($('#' + config.id + '-filter-check-template').html());
                 //mass edit modal view
-                BackboneGrid.Views.ModalForm.prototype.el = BackboneGrid.modalFormId + " .modal-body";
+                if (typeof(BackboneGrid.Views.ModalForm.prototype.el) === 'undefined')
+                    BackboneGrid.Views.ModalForm.prototype.el = BackboneGrid.modalFormId + " .modal-body";
+
                 BackboneGrid.Views.ModalElement.prototype.template = _.template($('#' + config.id + '-modal-element-template').html());
                 BackboneGrid.Views.ModalMassGridElement.prototype.template = _.template($('#'+ config.id + '-add-set-fields').html());
 
@@ -1744,32 +1824,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                  state.mp = config.data.data.length;
                  }*/
 
-                function validateUnique(element, model ,editInline) {
-                    var url = model.get('validation').unique;
-                    element.rules("add", {
-                        onfocusout: false,
-                        onkeyup: false,
-                        remote: {
-                            url: url,
-                            type: 'post',
-                            data: {
-                                _name: model.get('name')
-                            },
-                            dataFilter: function (responseString) {
-                                var response = jQuery.parseJSON(responseString);
-                                currentMessage = response.Message;
-                                if ((modalForm.modalType === 'editable' || editInline) && BackboneGrid.currentRow.get('id') === response.id){
-                                    return true;
-                                }
-                                return response.unique;
-                            }
-                            //async:false
-                        },
-                        messages: {
-                            remote: "This " + model.get('label') + " is already taken place"
-                        }
-                    });
-                }
+
 
                 if (config.data_mode != 'local') {
                     $('ul.pagination.page').on('click', 'li', function (ev) {
@@ -1808,7 +1863,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     c.id = config.id + '-' + c.name;
                     //c.style = c['width'] ? "width:"+c['width']+"px" : '';
 
-                    //c.cssClass = '';
+                    c.cssClass = '';
                     if (!c['no_reorder'])
                         c.cssClass += 'js-draggable ';
 
@@ -1924,10 +1979,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 //showing selected rows count
                 selectedRows = new Backbone.Collection;
                 var multiselectCol = columnsCollection.findWhere({type: 'row_select'});
-                selectedRows.on('add remove reset', function () {
+                selectedRows.on('add remove reset', function (ev) {
                     multiselectCol.set('selectedCount', selectedRows.length);
                     //@todo: fix loop forever when add selected items from inside form, need check this carefully and ask Boris other solutions, or need refactor this
-    //                multiselectCol.trigger('render');
+                    multiselectCol.trigger('render');
                     if (selectedRows.length > 0) {
                         $(BackboneGrid.MassDeleteButton).removeClass('disabled');
                         $(BackboneGrid.MassEditButton).removeClass('disabled');
@@ -1935,6 +1990,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         $(BackboneGrid.MassDeleteButton).addClass('disabled');
                         $(BackboneGrid.MassEditButton).addClass('disabled');
                     }
+                    console.log(typeof(gridView.afterSelectionChanged));
+                    if (typeof(gridView.afterSelectionChanged) === 'function')
+                        gridView.afterSelectionChanged();
+
+                    return true;
                 });
 
                 for (var i in rows) {
@@ -1988,12 +2048,12 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 }
 
                 //action logic
-                BackboneGrid.MassDeleteButton = 'Div #' + config.id + ' button.grid-mass-delete';
-                BackboneGrid.AddButton = 'Div #' + config.id + ' button.grid-add';
-                BackboneGrid.MassEditButton = 'Div #' + config.id + ' a.grid-mass-edit';
+                BackboneGrid.MassDeleteButton = '#' + config.id + ' button.grid-mass-delete';
+                BackboneGrid.AddButton = '#' + config.id + ' button.grid-add';
+                BackboneGrid.MassEditButton = '#' + config.id + ' a.grid-mass-edit';
                 BackboneGrid.NewButton = (typeof(config.new_button) !== 'undefined') ? config.new_button :'Div #' + config.id + ' button.grid-new';
-                BackboneGrid.RefreshButton = 'Div #' + config.id + ' button.grid-refresh';
-                BackboneGrid.ExportButton = 'Div #' + config.id + ' button.grid-export';
+                BackboneGrid.RefreshButton = '#' + config.id + ' button.grid-refresh';
+                BackboneGrid.ExportButton = '#' + config.id + ' button.grid-export';
 
                 //if ($(BackboneGrid.AddButton).length > 0 || $(BackboneGrid.MassEditButton).length > 0) {
                 modalForm = new BackboneGrid.Views.ModalForm({collection: columnsCollection});
@@ -2042,6 +2102,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 if ($(BackboneGrid.MassDeleteButton).length > 0) {
                     $(BackboneGrid.MassDeleteButton).on('click', function () {
+
+
                         var confirm;
                         if ($(this).hasClass('noconfirm'))
                             confirm = true;
@@ -2049,7 +2111,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             confirm = window.confirm("Do you really want to delete selected rows?");
 
                         if (confirm) {
-                            if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length > 0 && BackboneGrid.data_mode !== 'local') {
+
+                            if (BackboneGrid.data_mode !== 'local') {
                                 var ids = selectedRows.pluck('id').join(",");
                                 $.post(BackboneGrid.edit_url, {id: ids, oper: 'mass-delete'})
                                     .done(function (data) {

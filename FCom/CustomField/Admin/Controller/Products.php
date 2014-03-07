@@ -50,7 +50,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'actions'=>array(
                                    'delete' => array('caption' => 'Remove')
                                 ),
-                'events'=>array('init', 'delete', 'mass-delete')
+                'register_func'=>'variantFieldGridRegister'
             )
         );
 
@@ -82,11 +82,11 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $columns[] = $f;
             }
         }
-        $columns[] = array('type'=>'input', 'name'=>'sku', 'label'=>'SKU', 'width'=>150, 'editable'=>'inline', 
+        $columns[] = array('type'=>'input', 'name'=>'sku', 'label'=>'SKU', 'width'=>150, 'editable'=>'inline',
                             'addable'=>true, 'validation'=>array('required'=>true), 'default'=>'');
-        $columns[] = array('type'=>'input', 'name'=>'price', 'label'=>'PRICE', 'width'=>150, 'editable'=>'inline', 
+        $columns[] = array('type'=>'input', 'name'=>'price', 'label'=>'PRICE', 'width'=>150, 'editable'=>'inline',
                             'addable'=>true, 'validation'=>array('required'=>true,'number'=>true), 'default'=>'');
-        $columns[] = array('type'=>'input', 'name'=>'qty', 'label'=>'QTY', 'width'=>150, 'editable'=>'inline', 
+        $columns[] = array('type'=>'input', 'name'=>'qty', 'label'=>'QTY', 'width'=>150, 'editable'=>'inline',
                             'addable'=>true, 'validation'=>array('required'=>true,'number'=>true), 'default'=>'');
         $columns[] = array('type'=>'btn_group',  'buttons' => array(array('name'=>'delete')));
 
@@ -117,9 +117,9 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 ),
                 'actions'=>array(
                                     'new'=>array('caption'=>'New Variant'),
-                                    'edit'=>array('caption'=>'Edit Variants'),
                                     'delete' => array('caption' => 'Remove')
-                                )
+                                ),
+                'register_func'=>'variantGridRegister'
             )
         );
 
@@ -149,7 +149,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                     array('name'=>'label', 'label'=>'Field Label', 'width'=>200),
                     array('name'=>'input_type', 'label'=>'Input Type', 'width'=>200),
                     array('name'=>'options', 'label'=>'Options', 'width'=>200),
-                    array('type'=>'input', 'name'=>'price', 'label'=>'Price', 'width'=>200, 'editable' => 'inline', 
+                    array('type'=>'input', 'name'=>'price', 'label'=>'Price', 'width'=>200, 'editable' => 'inline',
                             'validation' => array('number' => true)),
                     array('type'=>'btn_group', 'buttons' => array(array('name'=>'delete')))
                 ),
@@ -157,7 +157,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                                     'add' => array('caption' => 'Add Fields'),
                                     'delete' => array('caption' => 'Remove')
                                 ),
-                'events'=>array('add')
+                'register_func'=>'frontendFieldGridRegister'
             )
         );
 

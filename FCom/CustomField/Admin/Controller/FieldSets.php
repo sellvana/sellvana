@@ -42,7 +42,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                             array('field'=>'set_code', 'type'=>'text'),
                             '_quick'=>array('expr'=>'product_name like ? or set_code like ', 'args'=> array('%?%', '%?%'))
                 ),
-                'register'=>'customefields'
+                'register_func'=>'customFieldsGridRegister'
 //                'new_button' => '#add_new_field_set'
             )
         );
@@ -74,7 +74,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'actions'=>array(
                                     'delete' => array('caption' => 'Remove', 'confirm'=>false)
                                 ),
-                'callbacks' => array('after_mass_delete' => 'afterDeleteLinkField')
+                'register_func'=>'selectedFieldGridRegister'
             )
         );
 
@@ -102,9 +102,9 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                             '_quick'=>array('expr'=>'field_code like ? or id like ', 'args'=> array('%?%', '%?%'))
                 ),
                 'actions'=>array(
-                                    'add' => array('caption' => 'Add fields'),
+                                    'add' => array('caption' => 'Add Selected Fields')
                                 ),
-                'events'=>array('add')
+                'register_func'=>'addFieldGridRegister'
             )
         );
 

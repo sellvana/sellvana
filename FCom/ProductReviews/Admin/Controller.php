@@ -46,13 +46,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
                   'validation' => array('required' => true)),
             array('type'=>'input', 'name'=>'customer_id', 'label'=>'Customer', 'addable' => true, 'hidden' => true,
                   'options'=>FCom_Customer_Model_Customer::i()->getOptionsData(), 'editor' => 'select',
-                  'validation' => array('required' => true)),
-            array('type' =>'btn_group', 'name'=>'_actions', 'label' => 'Actions', 'sortable' => false, 
-                    'buttons' => array(
-                                        array('name'=>'edit'),
-                                        array('name'=>'delete')
-                                    )
-                )
+                  'validation' => array('required' => true))
         );
 
         $config['filters'] = array(
@@ -80,7 +74,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             'deny'    => array('html' => '<button type="button" class="btn btn-warning disabled" id="prod-reviews-deny"><span>Deny</span></button>'),
         );
 
-        $config['events'] = array('select-rows');
+
         //$config['autowidth'] = false;
         $config['caption'] = 'All review';
         //$config['multiselect'] = false;
@@ -95,6 +89,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             $config['columns'][$i]['data']['edit']['async_edit'] = true;
             $config['columns'][] = array('name'=>'customer', 'label'=>'Customer', 'width'=>250);
             $config['data_mode'] = 'local';
+            $config['edit_url_required'] = true;
             //$config['filters'][] = array('field'=>'product_name', 'type'=>'text');
             $config['custom'] = array('personalize'=>true);
             $orm = FCom_ProductReviews_Model_Review::orm('pr')->where('product_id', $productModel->id())
@@ -128,13 +123,19 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
                 ->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as customer');
         }
 
-        $config['columns'][] = array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80,
-                                     'data' => array('edit' => true, 'delete' => true));
+        $config['columns'][] = array('type' =>'btn_group', 'name'=>'_actions', 'label' => 'Actions', 'sortable' => false,
+                                        'buttons' => array(
+                                            array('name'=>'edit'),
+                                            array('name'=>'delete')
+                                        )
+                                    );
 
         $callbacks = '$(".rateit").rateit();
                       $("#'.$config['id'].'-modal-form").on("show.bs.modal", function(){ $(".rateit").rateit(); });';
         $config['callbacks'] = array('after_gridview_render' => $callbacks);
         $config['new_button'] = '#add_new_product_review';
+
+        $config['register_func'] = $config['id'].'_register';
         return $config;
     }
 

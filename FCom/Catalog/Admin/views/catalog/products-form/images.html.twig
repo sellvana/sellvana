@@ -1,137 +1,145 @@
 {% set m = THIS.get('model') %}
 {% set prodImagesConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
 {% set mediaLibImageConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_images', 'folder': 'media/product/images', 'callbacks': {'after_render': 'renderImage'}}) %}
-<input type='hidden' name="grid[images][del]" id='prod-image-remove' />
-<input type='hidden' name="grid[product_images][rows]" id='prod-image-rows' />
-<input type='hidden' id='main-thumb-image' value="" />
 
 <script>
-/*require(['jquery', 'unique'], function($) {
-    var prod_image_rows = [], editedRows = [], removedIds = [], originRows = [];
-    var gridAllImage = $('#all_images tbody');
+var mediaGrid, imagesGrid;
+require(['jquery','underscore','backbone'], function($, _) {
+    var originIds, removedIds = [];
+    var mainThumb = $('#main-thumb-image');
     function _getAttachmentsDbFields(row) {
-        var keys = ['id', 'file_id', 'label', 'position', '_new'];
-        var ret = {};
-        for(var i in keys) {
-            if(typeof(row[keys[i]]) !== 'undefined') {
-                ret[keys[i]] = row[keys[i]];
-            }
-        }
-
-        return ret;
+        return {
+            id: row.id,
+            file_id: row.file_id,
+            label: row.label,
+            position: row.position,
+            _new: row._new
+        };
     }
 
-    function _setFormVal()
-    {
-        var originIds = _.pluck(originRows,'id');
-        removedIds = _.filter(removedIds, function(rowId) {
-                            return _.indexOf(originIds, rowId) !== -1;
-                        });
+    /*
+    *relect attachment grid data into form fields to send them server
+    */
+    window.setImagesGridVals = function() {
 
-        editedRows = _.filter(editedRows, function(row) {
-                            return _.indexOf(removedIds, row.id) === -1;
-                        });
+        removedIds = _.difference(originIds, imagesGrid.getRows().pluck('id'));
 
-        for(var i in editedRows) {
-            editedRows[i] = _getAttachmentsDbFields(editedRows[i]);
-        }
-        $('#prod-image-rows').val(JSON.stringify(editedRows));
+        var rows = [];
+        imagesGrid.getRows().forEach(function(row) {
+            rows.push(_getAttachmentsDbFields(row.toJSON()));
+        });
+
+        $('#prod-image-rows').val(JSON.stringify(rows));
         $('#prod-image-remove').val(removedIds.join(','));
+
+        console.log($('#prod-image-rows').val());
+        console.log($('#prod-image-remove').val());
+        console.log(mainThumb.val());
     }
 
-    g_vent.bind('init-detail', function(ev) {
-        if (ev.grid === 'product_images') {
-            originRows = ev.rows;
-        }
-    });
+    /*
+    *MediaGrid registery function
+    */
+    window.all_images_register = function(grid) {
+        mediaGrid = grid;
+        grid.build();
 
-    g_vent.bind('select-rows', function(ev) {
-        if (ev.grid === 'all_images') {
-            prod_image_rows = ev.rows;
-            var caption = 'Add';
-            var addButton = $('button.btn-add.prod-images-modal-add');
-            if(prod_image_rows.length>0) {
-                if (prod_image_rows.length==1) {
-                    caption += ' a row';
-                } else {
-                    caption += (' ' + prod_image_rows.length + ' rows');
+
+        mediaGrid.getSelectedRows().on('add remove', function() {
+            if (mediaGrid.getSelectedRows().length>0) {
+                $('.prod-images-modal-add').removeClass('disabled');
+            } else {
+                $('.prod-images-modal-add').addClass('disabled');
+            }
+        });
+
+        $('.prod-images-modal-add').click(function() {
+
+            mediaGrid.getSelectedRows().forEach(function (row) {
+                if (!imagesGrid.getRows().findWhere({file_id: row.get('id')})) {
+                    var addedRow = row.toJSON();
+                    addedRow._new = true;
+                    addedRow.file_id = row.id;
+                    addedRow.id = guid();
+                    imagesGrid.getRows().add(addedRow);
                 }
-                addButton.removeClass('disabled');
-            } else {
-                addButton.addClass('disabled');
-            }
-            addButton.html(caption);
-        }
-    });
+            });
 
-    g_vent.bind('add', function(ev) {
-        if (ev.grid === 'product_images') {
+
+            mediaGrid.getGridView().clearSelectedRows();
+            $('.prod-attachments-modal-close').trigger('click');
+
+        });
+    }
+
+    window.imagesGridRegister = function(grid) {
+        imagesGrid = grid;
+
+        imagesGrid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
+            var input = this.$el.find('.main-thumb');
+            if (mainThumb.val() == '' && this.model.get('main_thumb') == 1) {
+                input.prop('checked', true);
+            }
+            if (mainThumb.val() == this.model.get('id')) {
+                input.prop('checked', true);
+            }
+        }
+
+        imagesGrid.build();
+
+        originIds = imagesGrid.getRows().pluck('id');
+        console.log(originIds);
+
+        $(imagesGrid.getGridSkeleton().AddButton).click(function() {
             $('#btn_prod_image_modal').trigger('click');
-        }
-    });
+        });
 
-    g_vent.bind('delete', function(ev) {
-        if(ev.grid === 'product_images') {
-            if (_.indexOf(removedIds,ev.id) !== -1)
-                return;
-            removedIds[removedIds.length] = ev.id;
-            gridAllImage.find('tr[id="'+ ev.row.file_id +'"]').removeClass('hidden');
-            _setFormVal();
-        }
-    });
+    }
 
-    g_vent.bind('mass-delete', function(ev) {
-        if(ev.grid === 'product_images') {
-//            var ids = _.pluck(ev.rows, 'id');
-            for(var i in ev.rows) {
-                gridAllImage.find('tr[id="'+ ev.rows[i].file_id +'"]').removeClass('hidden');
-                removedIds[removedIds.length] = ev.rows[i].id;
+    function renderAttachment(el, row) {
+        if ($('#product_attachments').find('a.file-attachments[data-file-id="'+ row.id+'"]').length > 0) {
+            $(el).addClass('hidden');
+        }
+    }
+});
+    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
+        $('#prod-image-fileupload').fileupload({
+            url: '{{ APP.href("media/grid/upload?folder=media/product/images") | raw}}',
+            multiple:true,
+            acceptFileTypes:  /(jpg)|(jpeg)(tiff)|(gif)|(png)|(bmp)$/i
+        })
+        .bind('fileuploadalways', function(e, data) {
+
+            if(data.result.id) {
+                mediaGrid.getRows().add(data.result);
+
+                $('td.name span').each(function(i) {
+                    if($(this).html() === data.result.file_name)
+                    $(this).parents('tr:first').remove();
+                });
+
+                if ($('#prod-attach-checkbox').is(':checked')) {
+
+                    var addedRow = data.result;
+                    addedRow._new = true;
+                    addedRow.file_id = addedRow.id;
+                    addedRow.id = guid();
+                    imagesGrid.getRows().add(addedRow);
+
+                    if ($('tr.template-upload').length === 0) {
+                        $('.prod-images-modal-close').trigger('click');
+                    }
+                }
             }
+        });
 
-            _setFormVal();
-        }
     });
 
-    g_vent.bind('edit', function(ev) {
-        if(ev.grid === 'product_images') {
-            var ret =_.findWhere(editedRows,{id: ev.row.id});
-            if (typeof(ret) == 'undefined') {
-                editedRows[editedRows.length] = ev.row;
-            } else {
-                editedRows = _.filter(editedRows, function(r) {
-                                return r.id !== ret.id
-                            });
-                editedRows[editedRows.length] = ev.row;
-            }
-            _setFormVal();
-        }
+    $('body').on('click', '.main-thumb', function () {
+        mainThumb.val($(this).parents('tr').attr('id'));
     });
-    $('button.btn-add.prod-images-modal-add').click(function() {
-        var objs = _.clone(prod_image_rows);
-//        originFileIds = _.pluck(originRows, 'file_id');
-//        addedFileIds = _.pluck(editedRows, 'file_id');
-//        objs = _.filter(objs, function(row) {
-//            return _.indexOf(originFileIds, row.id) === -1 && _.indexOf(addedFileIds, row.id) === -1;
-//        });
-        for(var i in objs) {
-            var row = objs[i];
-            row.file_id = row.id;
-            row.id = guid();
-            row._new = true;
-//            editedRows[editedRows.length] = row;
-            var hidden = '<input type="hidden" name="product_images['+ row.id +'][file_id]" value="'+ row.file_id +'" />';
-            $('#tab-images').append(hidden);
-            gridAllImage.find('tr[id="'+ row.file_id +'"]').addClass('hidden');
-        }
-        console.log(objs);
-        g_vent.trigger('silent_inject', {grid: 'product_images', rows: prod_image_rows});
-        g_vent.trigger('clear_selection', {grid: 'all_images'});
-        $(this).next().trigger('click');
-//        _setFormVal();
-    });
-});*/
+
 </script>
-
 
 {{ THIS.view('core/backbonegrid').set('grid', prodImagesConfig) | raw }}
 
@@ -275,62 +283,10 @@
         </div>
     </div>
 </div>
-<script>
-    var mainThumb = $('#main-thumb-image');
-    function afterRenderImageGrid(el, row) {
-        var input = $(el).find('input[type="radio"]');
-        if (mainThumb.val() == '' && row.main_thumb == 1) {
-            input.prop('checked', true);
-        }
-        if (mainThumb.val() == row.id) {
-            input.prop('checked', true);
-        }
-    }
 
-    function renderImage(el, row) {
-        if ($('#product_images').find('input[data-file-id="'+ row.id+'"]').length > 0) {
-            $(el).addClass('hidden');
-        }
-    }
-
-    if (typeof(g_vent) === 'undefined') {
-        g_vent = _.extend(Backbone.Event);
-    }
-    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
-        console.log('all_images');
-        console.log(g_vent);
-        var prod_image_rows = [];
-
-        $('#prod-image-checkbox').change(function() {
-            prod_image_rows = [];
-        });
-        $('#prod-image-fileupload').fileupload({
-            url: '{{ APP.href("media/grid/upload?folder=media/product/images") | raw}}',
-            multiple:true,
-            acceptFileTypes:  /(jpg)|(jpeg)(tiff)|(gif)|(png)|(bmp)$/i
-        })
-        .bind('fileuploadalways', function(e, data) {
-            if(data.result.id) {
-                g_vent.trigger('add_row', {grid: 'all_images', row:data.result});
-                $('td.name span').each(function(i) {
-                    if($(this).html() === data.result.file_name)
-                        $(this).parents('tr:first').remove();
-                });
-
-                if ($('#prod-image-checkbox').is(':checked')) {
-                    prod_image_rows[prod_image_rows.length] = data.result;
-                    if ($('tr.template-upload').length === 0) {
-                        g_vent.trigger('select-rows', {grid: 'all_images', rows:prod_image_rows});
-                        $('button.btn-add.prod-images-modal-add').trigger('click');
-                    }
-                }
-            }
-        });
-        $('body').on('click', '.main-thumb', function () {
-            mainThumb.val($(this).parents('tr').attr('id'));
-        });
-    });
+<input type='hidden' name="grid[images][del]" id='prod-image-remove' />
+<input type='hidden' name="grid[images][rows]" id='prod-image-rows' />
+<input type='hidden' id='main-thumb-image' value="" />
 
 
-</script>
 
