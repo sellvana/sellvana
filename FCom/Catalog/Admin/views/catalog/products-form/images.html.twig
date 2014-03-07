@@ -2,6 +2,144 @@
 {% set prodImagesConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
 {% set mediaLibImageConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_images', 'folder': 'media/product/images', 'callbacks': {'after_render': 'renderImage'}}) %}
 
+<script>
+var mediaGrid, imagesGrid;
+require(['jquery','underscore','backbone'], function($, _) {
+    var originIds, removedIds = [];
+    var mainThumb = $('#main-thumb-image');
+    function _getAttachmentsDbFields(row) {
+        return {
+            id: row.id,
+            file_id: row.file_id,
+            label: row.label,
+            position: row.position,
+            _new: row._new
+        };
+    }
+
+    /*
+    *relect attachment grid data into form fields to send them server
+    */
+    window.setImagesGridVals = function() {
+
+        removedIds = _.difference(originIds, imagesGrid.getRows().pluck('id'));
+
+        var rows = [];
+        imagesGrid.getRows().forEach(function(row) {
+            rows.push(_getAttachmentsDbFields(row.toJSON()));
+        });
+
+        $('#prod-image-rows').val(JSON.stringify(rows));
+        $('#prod-image-remove').val(removedIds.join(','));
+
+        console.log($('#prod-image-rows').val());
+        console.log($('#prod-image-remove').val());
+        console.log(mainThumb.val());
+    }
+
+    /*
+    *MediaGrid registery function
+    */
+    window.all_images_register = function(grid) {
+        mediaGrid = grid;
+        grid.build();
+
+
+        mediaGrid.getSelectedRows().on('add remove', function() {
+            if (mediaGrid.getSelectedRows().length>0) {
+                $('.prod-images-modal-add').removeClass('disabled');
+            } else {
+                $('.prod-images-modal-add').addClass('disabled');
+            }
+        });
+
+        $('.prod-images-modal-add').click(function() {
+
+            mediaGrid.getSelectedRows().forEach(function (row) {
+                if (!imagesGrid.getRows().findWhere({file_id: row.get('id')})) {
+                    var addedRow = row.toJSON();
+                    addedRow._new = true;
+                    addedRow.file_id = row.id;
+                    addedRow.id = guid();
+                    imagesGrid.getRows().add(addedRow);
+                }
+            });
+
+
+            mediaGrid.getGridView().clearSelectedRows();
+            $('.prod-attachments-modal-close').trigger('click');
+
+        });
+    }
+
+    window.imagesGridRegister = function(grid) {
+        imagesGrid = grid;
+
+        imagesGrid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
+            var input = this.$el.find('.main-thumb');
+            if (mainThumb.val() == '' && this.model.get('main_thumb') == 1) {
+                input.prop('checked', true);
+            }
+            if (mainThumb.val() == this.model.get('id')) {
+                input.prop('checked', true);
+            }
+        }
+
+        imagesGrid.build();
+
+        originIds = imagesGrid.getRows().pluck('id');
+        console.log(originIds);
+
+        $(imagesGrid.getGridSkeleton().AddButton).click(function() {
+            $('#btn_prod_image_modal').trigger('click');
+        });
+
+    }
+
+    function renderAttachment(el, row) {
+        if ($('#product_attachments').find('a.file-attachments[data-file-id="'+ row.id+'"]').length > 0) {
+            $(el).addClass('hidden');
+        }
+    }
+});
+    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
+        $('#prod-image-fileupload').fileupload({
+            url: '{{ APP.href("media/grid/upload?folder=media/product/images") | raw}}',
+            multiple:true,
+            acceptFileTypes:  /(jpg)|(jpeg)(tiff)|(gif)|(png)|(bmp)$/i
+        })
+        .bind('fileuploadalways', function(e, data) {
+
+            if(data.result.id) {
+                mediaGrid.getRows().add(data.result);
+
+                $('td.name span').each(function(i) {
+                    if($(this).html() === data.result.file_name)
+                    $(this).parents('tr:first').remove();
+                });
+
+                if ($('#prod-attach-checkbox').is(':checked')) {
+
+                    var addedRow = data.result;
+                    addedRow._new = true;
+                    addedRow.file_id = addedRow.id;
+                    addedRow.id = guid();
+                    imagesGrid.getRows().add(addedRow);
+
+                    if ($('tr.template-upload').length === 0) {
+                        $('.prod-images-modal-close').trigger('click');
+                    }
+                }
+            }
+        });
+
+    });
+
+    $('body').on('click', '.main-thumb', function () {
+        mainThumb.val($(this).parents('tr').attr('id'));
+    });
+
+</script>
 
 {{ THIS.view('core/backbonegrid').set('grid', prodImagesConfig) | raw }}
 
@@ -150,141 +288,5 @@
 <input type='hidden' name="grid[images][rows]" id='prod-image-rows' />
 <input type='hidden' id='main-thumb-image' value="" />
 
-<script>
 
-    var mediaGrid, imagesGrid, originIds, removedIds = [];
-    var mainThumb = $('#main-thumb-image');
-    function _getAttachmentsDbFields(row) {
-        return {
-            id: row.id,
-            file_id: row.file_id,
-            label: row.label,
-            position: row.position,
-            _new: row._new
-        };
-    }
-
-    /*
-    *relect attachment grid data into form fields to send them server
-    */
-    window.setImagesGridVals = function() {
-
-        removedIds = _.difference(originIds, imagesGrid.getRows().pluck('id'));
-
-        var rows = [];
-        imagesGrid.getRows().forEach(function(row) {
-            rows.push(_getAttachmentsDbFields(row.toJSON()));
-        });
-
-        $('#prod-image-rows').val(JSON.stringify(rows));
-        $('#prod-image-remove').val(removedIds.join(','));
-
-        console.log($('#prod-image-rows').val());
-        console.log($('#prod-image-remove').val());
-        console.log(mainThumb.val());
-    }
-
-    /*
-    *MediaGrid registery function
-    */
-    window.all_images_register = function(grid) {
-        mediaGrid = grid;
-        grid.build();
-
-
-        mediaGrid.getSelectedRows().on('add remove', function() {
-            if (mediaGrid.getSelectedRows().length>0) {
-                $('.prod-images-modal-add').removeClass('disabled');
-            } else {
-                $('.prod-images-modal-add').addClass('disabled');
-            }
-        });
-
-        $('.prod-images-modal-add').click(function() {
-
-            mediaGrid.getSelectedRows().forEach(function (row) {
-                if (!imagesGrid.getRows().findWhere({file_id: row.get('id')})) {
-                    var addedRow = row.toJSON();
-                    addedRow._new = true;
-                    addedRow.file_id = row.id;
-                    addedRow.id = guid();
-                    imagesGrid.getRows().add(addedRow);
-                }
-            });
-
-
-            mediaGrid.getGridView().clearSelectedRows();
-            $('.prod-attachments-modal-close').trigger('click');
-
-        });
-    }
-
-    window.imagesGridRegister = function(grid) {
-        imagesGrid = grid;
-
-        imagesGrid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
-            var input = this.$el.find('.main-thumb');
-            if (mainThumb.val() == '' && this.model.get('main_thumb') == 1) {
-                input.prop('checked', true);
-            }
-            if (mainThumb.val() == this.model.get('id')) {
-                input.prop('checked', true);
-            }
-        }
-
-        imagesGrid.build();
-
-        originIds = imagesGrid.getRows().pluck('id');
-        console.log(originIds);
-
-        $(imagesGrid.getGridSkeleton().AddButton).click(function() {
-            $('#btn_prod_image_modal').trigger('click');
-        });
-
-    }
-
-    function renderAttachment(el, row) {
-        if ($('#product_attachments').find('a.file-attachments[data-file-id="'+ row.id+'"]').length > 0) {
-            $(el).addClass('hidden');
-        }
-    }
-
-    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
-        $('#prod-image-fileupload').fileupload({
-            url: '{{ APP.href("media/grid/upload?folder=media/product/images") | raw}}',
-            multiple:true,
-            acceptFileTypes:  /(jpg)|(jpeg)(tiff)|(gif)|(png)|(bmp)$/i
-        })
-        .bind('fileuploadalways', function(e, data) {
-
-            if(data.result.id) {
-                mediaGrid.getRows().add(data.result);
-
-                $('td.name span').each(function(i) {
-                    if($(this).html() === data.result.file_name)
-                    $(this).parents('tr:first').remove();
-                });
-
-                if ($('#prod-attach-checkbox').is(':checked')) {
-
-                    var addedRow = data.result;
-                    addedRow._new = true;
-                    addedRow.file_id = addedRow.id;
-                    addedRow.id = guid();
-                    imagesGrid.getRows().add(addedRow);
-
-                    if ($('tr.template-upload').length === 0) {
-                        $('.prod-images-modal-close').trigger('click');
-                    }
-                }
-            }
-        });
-
-    });
-
-    $('body').on('click', '.main-thumb', function () {
-        mainThumb.val($(this).parents('tr').attr('id'));
-    });
-
-</script>
 

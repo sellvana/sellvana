@@ -1,6 +1,6 @@
 {% set ctrl = APP.instance('FCom_CustomerGroups_Admin_Controller_TierPrices') %}
 <script>
- require(['jquery.validate', 'unique'], function() {
+require(['jquery','underscore','backbone', 'jquery.validate', 'unique'], function($, _, Backbone) {
     var pricesGrid;
     var inputQty = 'input[data-col="qty"]';
     var selectGroupId = 'select[data-col="group_id"]';

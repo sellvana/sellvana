@@ -1,7 +1,7 @@
 {% set fieldSetsCtrl = APP.instance('FCom_CustomField_Admin_Controller_FieldSets') %}
 
 <script>
-$(function() {
+require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], function($, _, Backbone) {
     var mainGrid, selectedGrid, addGrid;
     var formFieldSet = $('#field-set-modal-form');
     window.customFieldsGridRegister = function(grid) {

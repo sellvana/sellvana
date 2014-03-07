@@ -1,34 +1,9 @@
 {% set prodCtrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
 {% set fieldSetsCtrl = APP.instance('FCom_CustomField_Admin_Controller_FieldSets') %}
-<input type='hidden' id='prod_frontend_data' name='prod_frontend_data' />
-<div class="row">
-    <div class="col-sm-10">
-        {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.frontendFieldGrid(model))| raw }}
-    </div>
-</div>
-
-<a role="button" href="#prod-frontend-add" data-toggle="modal" style='display:none;' id='btn_add_frontend'></a>
-<div class='modal fade' id='prod-frontend-add' tabindex='-1'>
-    <div class='modal-dialog' style='width:800px;'>
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
-                <h4 class='modal-title' id='myModalLabel'>{{ "Add products"|_ }}</h4>
-            </div>
-            <div class='modal-body'>
-                {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsetModalAddGridConfig()) | raw }}
-            </div>
-            <div class='modal-footer'>
-                <button class='btn btn-default btn-close btn-prod-frontend-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 
 <script>
-$(function() {
+require(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
     var mainGrid, subGrid;
     window.frontendFieldGridRegister = function(grid) {
         mainGrid = grid;
@@ -64,3 +39,31 @@ $(function() {
 
 });
 </script>
+
+<input type='hidden' id='prod_frontend_data' name='prod_frontend_data' />
+<div class="row">
+    <div class="col-sm-10">
+        {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.frontendFieldGrid(model))| raw }}
+    </div>
+</div>
+
+<a role="button" href="#prod-frontend-add" data-toggle="modal" style='display:none;' id='btn_add_frontend'></a>
+<div class='modal fade' id='prod-frontend-add' tabindex='-1'>
+    <div class='modal-dialog' style='width:800px;'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
+                <h4 class='modal-title' id='myModalLabel'>{{ "Add products"|_ }}</h4>
+            </div>
+            <div class='modal-body'>
+                {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsetModalAddGridConfig()) | raw }}
+            </div>
+            <div class='modal-footer'>
+                <button class='btn btn-default btn-close btn-prod-frontend-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

@@ -15,9 +15,8 @@
   </div>
 </div>
 <script>
-$(function() {
-    var btnApprove = $('#prod-reviews-approve');
-    var btnDeny = $('#prod-reviews-deny');
+
+require(["jquery", "underscore", "jquery.validate"], function($, _) {
     var reviewGrid;
     window.{{ grid['config']['id']}}_register = function(grid) {
         reviewGrid = grid;
@@ -35,33 +34,29 @@ $(function() {
 
     }
 
-    require(["jquery.rateit",  "fcom.admin", "bootstrap"], function() {
+    var btnApprove = $('#prod-reviews-approve');
+    var btnDeny = $('#prod-reviews-deny');
 
-        /*adminForm.createSwitchButton();
-        adminForm.wysiwygInit();*/
-
-        btnApprove.on('click', function() {
-            updateStatus(1);
-        });
-
-        btnDeny.on('click', function() {
-            updateStatus(0);
-        });
-
-        function updateStatus(approve)
-        {
-            var selectedRows = reviewGrid.getRows().toJSON();
-            for (var index = 0; index < selectedRows.length; index++) {
-                var row = reviewGrid.getRows().findWhere({id:selectedRows[index].id});
-                row.set('approved', approve);
-                row.save();
-                row.trigger('render');
-                //TODO implement collection update method
-
-            }
-
-            $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
-        }
+    btnApprove.on('click', function() {
+        updateStatus(1);
     });
+
+    btnDeny.on('click', function() {
+        updateStatus(0);
+    });
+
+    function updateStatus(approve)
+    {
+        var selectedRows = reviewGrid.getRows().toJSON();
+        for (var index = 0; index < selectedRows.length; index++) {
+            var row = reviewGrid.getRows().findWhere({id:selectedRows[index].id});
+            row.set('approved', approve);
+            row.save();
+            row.trigger('render');
+            //TODO implement collection update method
+
+        }
+    }
 });
+
 </script>

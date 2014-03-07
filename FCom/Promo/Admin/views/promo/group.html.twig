@@ -37,7 +37,7 @@ function removeGroup(el) {
     grid.remove();
 }
 
-$(function() {
+require(['jquery','underscore','backbone'], function ($, _, Backbone) {
     var prodLibGrid, mainGrid, originIds;
     window.{{ gridConfig.config.id }}_register = function(grid) {
         mainGrid = grid;

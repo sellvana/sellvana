@@ -12,7 +12,7 @@ $(function() {
         prodReviewGrid = grid;
         grid.build();
     }
-    require(["fcom.admin", "bootstrap"], function($, _) {
+    require(["jquery", "underscore", "jquery.validate", "fcom.admin", "bootstrap"], function($, _) {
         adminForm.createSwitchButton();
         adminForm.wysiwygInit();
 
