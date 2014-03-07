@@ -15,4 +15,15 @@ class FCom_Customer_Admin extends BClass
 
         FCom_Admin_Controller_MediaLibrary::i()->allowFolder('storage/import/customers');
     }
+
+    public function onGetDashboardWidgets($args)
+    {
+        $view = $args['view'];
+        $view->addWidget('customers-list', array(
+            'title' => 'Recent Customers',
+            'icon' => 'group',
+            'view' => 'customer/dashboard/customers-list',
+            'async' => true,
+        ));
+    }
 }

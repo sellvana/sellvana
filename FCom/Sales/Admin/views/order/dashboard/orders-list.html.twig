@@ -13,15 +13,22 @@
             <th>{{ "Order Date"|_ }}</th>
         </tr>
         </thead>
-        {% for  order in orders %}
+
+        {% if orders is empty %}
             <tr>
-                <td>{{ order.id|_ }}</td>
-                <td>{{ order.firstname|_ }} {{ order.lastname|_ }}</td>
-                <td>{{ order.grandtotal|_ }}</td>
-                <td>{{ order.balance|_ }}</td>
-                <td>{{ order.status|_ }}</td>
-                <td>{{ order.create_at|_ }}</td>
+                <td colspan="6">{{ "No data"|_ }}</td>
             </tr>
-        {% endfor %}
+        {% else %}
+            {% for  order in orders %}
+                <tr>
+                    <td>{{ order.id|_ }}</td>
+                    <td>{{ order.firstname|_ }} {{ order.lastname|_ }}</td>
+                    <td>{{ order.grandtotal|_ }}</td>
+                    <td>{{ order.balance|_ }}</td>
+                    <td>{{ order.status|_ }}</td>
+                    <td>{{ order.create_at|_ }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
     </table>
 </div>

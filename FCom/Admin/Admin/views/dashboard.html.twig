@@ -95,7 +95,9 @@
       <ul class="js-sortable-container" id="dashboard-widgets-container">
       {% for widget in widgets %}
         {% if not widget.state.closed %}
-          {{ THIS.view('dashboard/widget').set('widget', widget) | raw }}
+          {% if widget.async %}
+            {{ THIS.view('dashboard/widget').set('widget', widget) | raw }}
+          {% endif %}
         {% endif %}
       {% endfor %}
       </ul>
@@ -228,12 +230,14 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
       return false;
   });
   function filterDate(data) {
-      $.post(dashboardUrl, data, function(response, status, xhr) {
-          $('#dashboard-widget__orders-totals').find('.dashboard-order-total').each(function () {
-              var tmp = _.where(response, {id: $(this).attr('data-id')});
-              (tmp.length > 0) ? $(this).html(tmp[0].order):  $(this).html(0);
+      if ($('#dashboard-widget__orders-totals').length) {
+          $.post(dashboardUrl, data, function(response, status, xhr) {
+              $('#dashboard-widget__orders-totals').find('.dashboard-order-total').each(function () {
+                  var tmp = _.where(response, {id: $(this).attr('data-id')});
+                  (tmp.length > 0) ? $(this).html(tmp[0].order):  $(this).html(0);
+              });
           });
-      });
+      }
   }
 
   function resetFilterDate() {
