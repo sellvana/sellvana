@@ -1,7 +1,8 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator', m) %}
 
-<fieldset class="adm-section-group">
+<fieldset class="form-horizontal">
+    <div class="f-section">
     <div class="form-group">
         <label class="col-md-2 control-label">{{ "Handle"|_ }}</label>
         <div class="col-md-5">
@@ -27,5 +28,6 @@
                 {{ UTIL.optionsHtml(LAYOUT.getAllRenderers(true), validator.fieldValue('renderer'))|raw }}
             </select>
         </div>
+    </div>
     </div>
 </fieldset>
