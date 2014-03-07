@@ -278,15 +278,15 @@
                     %><select id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>" <%= validation %>
                             data-col="<%= col.name %>"  <%= strDisabled %> ><%
 
-                        //if (_.isArray(col.options)) {
+                        if (_.isArray(col.options)) {
                             for(var i = 0, l = col.options.length; i<l; i++) {
                                 %><option value="<%= col.options[i].value %>"><%= col.options[i].label %></option><%
                              }
-                        /*} else {
+                        } else {
                             for(var key in col.options) {
                                 %><option value="<%= key %>"><%= col.options[key] %></option><%
                              }
-                        }*/
+                        }
 
                     %></select><%
 
