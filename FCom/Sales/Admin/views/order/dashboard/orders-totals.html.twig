@@ -1,4 +1,4 @@
-{% set orderTotal = APP.instance('FCom_Admin_Controller_Dashboard').getData('orderTotal', {type: "default"}) %}
+{% set orderTotal = APP.instance('FCom_Sales_Admin_Controller_Orders').getOrderTotal({type: "default"}) %}
 
 <div class='row'>
   {% for  order in orderTotal %}

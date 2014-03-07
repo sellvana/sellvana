@@ -181,7 +181,6 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
       var text = $(this).text().charAt(0).toUpperCase() + $(this).text().slice(1);
       filter.attr('data-text', text);
   });
-
   $('.btn-filter-date').click(function () {
       var data = {};
       resetFilterDate();
@@ -231,7 +230,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
   });
   function filterDate(data) {
       if ($('#dashboard-widget__orders-totals').length) {
-          $.post(dashboardUrl, data, function(response, status, xhr) {
+          $.post('{{ APP.href("orders/dashboard") }}', data, function(response, status, xhr) {
               $('#dashboard-widget__orders-totals').find('.dashboard-order-total').each(function () {
                   var tmp = _.where(response, {id: $(this).attr('data-id')});
                   (tmp.length > 0) ? $(this).html(tmp[0].order):  $(this).html(0);
@@ -246,7 +245,6 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
       custom.find('.custom-filter-value').html('All');
       $('.date-filter').val('');
   }
-
 
   sortable.sortable({
     connectWith: '.js-sortable-container',

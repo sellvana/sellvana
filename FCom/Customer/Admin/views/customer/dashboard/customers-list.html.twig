@@ -1,4 +1,4 @@
-{% set customers = APP.instance('FCom_Admin_Controller_Dashboard').getData('customerRecent') %}
+{% set customers = APP.instance('FCom_Customer_Admin_Controller_Customers').getCustomerRecent() %}
 <div class='box-content' style="height: 300px; overflow-y: scroll">
     {#<div id='stats-chart2'></div>#}
     <table class="table table-bordered table-hover table-striped">
