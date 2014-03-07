@@ -24,31 +24,33 @@
 <input type='hidden' id='vfield_ids' name='vfields' />
 <input type='hidden' id='variants' name='variants' />
 <script>
-require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(Backbone, _, $) {
+$(function() {
     var fieldCollection = null;
     var vColsCollection = null;
     var vRowsCollection = null;
     var valueCurrentField = Array();
     var vField = $('#variants-tab-field');
     var arrField = Array();
-    g_vent.trigger('get_rows_collection',
-                    {
-                        'grid': 'variable-field-grid',
-                        callback: vFieldGridInit
-                    }
-                   );
-    g_vent.trigger('get_cols_collection', {'grid': 'variant-grid', callback: function(c){ vColsCollection = c;} });
-    g_vent.trigger('get_rows_collection', {'grid': 'variant-grid', callback: function(r){ vRowsCollection = r;} });
+
+    window.variantFieldGridRegister = function(grid) {
+        grid.build();
+        fieldCollection = grid.getRows();
+        vFieldGridInit();
+    }
+    window.variantGridRegister = function(grid) {
+        grid.build();
+        vColsCollection = grid.getCols();
+        vRowsCollection = grid.getRows();
+    }
+
     function resetSelect()
     {
         $('#sel_var_field').val('');
         $('#sel_var_field').select2();
     }
 
-    function vFieldGridInit(c)
+    function vFieldGridInit()
     {
-
-        fieldCollection = c;
         var mapField = fieldCollection.map(function (obj) {
             return {id: obj.id, name: obj.get('name')};
         });

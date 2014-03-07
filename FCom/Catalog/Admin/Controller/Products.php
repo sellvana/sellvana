@@ -37,7 +37,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         );
         $config['actions'] = array(
             'export'=>true,
-            'delete'=>true
+            'delete'=>true,
+            //'custom'=>array('class'=>'test', 'caption'=>'ffff', 'id'=>'prod_custom')
         );
         $config['filters'] = array(
             array('field'=>'product_name', 'type'=>'text'),
@@ -167,7 +168,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $config[ 'actions' ] = array(
             'add' => array( 'caption' => 'Add selected products' )
         );
-        $config[ 'events' ]  = array( 'add' );
+        $config['register_func'] = 'prodLibGridRegister';
         //$config['custom']['autoresize'] = '#linked-products-layout';
         return array( 'config' => $config );
     }
@@ -204,7 +205,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'add'=>array('caption'=>'Add attachments'),
                     'delete'=>array('caption'=>'Remove')
                 ),
-                'events'=>array('init-detail', 'add','mass-delete', 'delete', 'edit'),
+                'register_func'=>'attachmentGridRegister',
                 'filters'=>array(
                     array('field'=>'file_name', 'type'=>'text'),
                     array('field'=>'label', 'type'=>'text'),
@@ -256,13 +257,13 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'add'=>array('caption'=>'Add images'),
                     'delete'=>array('caption'=>'Remove')
                 ),
-                'events'=>array('init-detail', 'add','mass-delete', 'delete', 'edit'),
+                'register_func'=>'imagesGridRegister',
                 'filters'=>array(
                     array('field'=>'file_name', 'type'=>'text'),
                     array('field'=>'label', 'type'=>'text'),
                     '_quick'=>array('expr'=>'file_name like ? ', 'args'=> array('%?%'))
                 ),
-                'callbacks' => array('after_render' => 'afterRenderImageGrid')
+
             )
         );
     }
@@ -380,7 +381,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('field'=>'product_name', 'type'=>'text'),
                     array('field'=>'local_sku', 'type'=>'text')
                 ),
-                'events'=>array('init', 'add','mass-delete')
+                'events'=>array('init', 'add','mass-delete'),
+                'register_func'=>$gridId.'_register'
             );
 
 
@@ -407,6 +409,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         parent::formPostAfter($args);
         $model = $args['model'];
         $data = BRequest::i()->post();
+
+
         if (isset($data['do']) && $data['do'] === 'DELETE') {
             $this->deleteRelateInfo($model);
         } else {
@@ -517,7 +521,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $hlp = FCom_Catalog_Model_ProductMedia::i();
         foreach (array('A'=>'attachments', 'I'=>'images') as $type=>$typeName) {
-            //$typeName = 'product_'.$typeName;
+
             if (!empty($data['grid'][$typeName]['del'])) {
                 $hlp->delete_many(array(
                     'product_id'=>$model->id,
@@ -525,31 +529,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'id'   =>explode(',', $data['grid'][$typeName]['del']),
                 ));
             }
-/*
-//echo "<pre>"; print_r($data['grid'][$typeName]['add']);
-                $oldAtt = $hlp->orm()->where('product_id', $model->id)->where('media_type', $type)
-                    ->find_many_assoc('file_id');
-//print_r(BDb::many_as_array($oldAtt));
-                foreach (explode(',', $data['grid'][$typeName]['add']) as $attId) {
-                    if ($attId && empty($oldAtt[$attId])) {
-//try {
-//    echo 1;
-                        $m = $hlp->create(array(
-                            'product_id'=>$model->id,
-                            'media_type'=>$type,
-                            'file_id'=>$attId,
-                        ))->save();
-//    print_r($m->as_array());
-//} catch (Exception $e) {
-//    echo 2;
-//    Debug::exceptionHandler($e);
-//}
-                    }
-                }
-//echo "</pre>";
-//exit;**/
-            if (isset($data['product_'.$typeName])) {
-                foreach ($data['product_'.$typeName] as $key => $image) {
+
+            if (!empty($data['grid'][$typeName]['rows'])) {
+                $rows = BUtil::fromJson($data['grid'][$typeName]['rows']);
+                foreach ($rows as $image) {
+                    $key = $image['id'];
+                    unset($image['id']);
                     if ($key != 'main_thumb') {
                         $mediaModel =  $hlp->load($key);
                         $main_thumb = 0;

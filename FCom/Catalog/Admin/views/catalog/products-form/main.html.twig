@@ -190,12 +190,26 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         $("#short_desc_lang_fields").val(JSON.stringify(shortDescModel.langFields.toJSON()));
         $("#desc_lang_fields").val(JSON.stringify(descModel.langFields.toJSON()));
 
+        //setting hidden values, 'if' statement is required to check tab is load or not.
+        if (typeof(window.setAttachementsGridVals) === 'function') {
+            setAttachementsGridVals();
+        }
+
+        if (typeof(window.setImagesGridVals) === 'function') {
+            setImagesGridVals();
+        }
+
+        if (typeof(window.setLindedGridVals) === 'function') {
+            setLindedGridVals();
+        }
+
         if (!$(this).valid()) {
             SystemFields.checkingForm = true;
             return false;
         } else {
             if (SystemFields.checkingForm) {
                 SystemFields.checkingForm = false;
+
                 $(this).submit();
             }
         }

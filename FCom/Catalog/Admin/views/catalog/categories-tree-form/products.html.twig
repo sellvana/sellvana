@@ -4,7 +4,7 @@
 <input type='hidden' name='model[product_ids_remove]' id='product_ids_remove'/>
 <script>
 require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
-    var allProdGrid, catProdGrid, orignIds, addedIds = [], removedIds = [];
+    var allProdGrid, catProdGrid, orignIds;
     function updateFormData() {
         console.log(catProdGrid.getRows().pluck('id'));
         removedIds = _.difference(removedIds, catProdGrid.getRows().pluck('id'));

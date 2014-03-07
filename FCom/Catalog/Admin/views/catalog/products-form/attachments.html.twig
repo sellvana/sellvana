@@ -1,140 +1,6 @@
 {% set m = THIS.get('model') %}
 {% set prodAttachConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productAttachmentsGridConfig(m) %}
 {% set mediaLibAttachConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_attachments', 'folder': 'media/product/attachment', 'callbacks': {'after_render': 'renderAttachment'}}) %}
-<input type='hidden' name="grid[attachments][del]" id='prod-attach-remove' />
-<input type='hidden' name="grid[attachments][rows]" id='prod-attach-rows' />
-
-<script>
-
-
-/*require(['jquery', 'unique'], function($) {
-    var prod_img_rows = [], editedRows = [], removedIds = [], originRows = [];
-    var gridAllAttachment = $('#all_attachments tbody');
-    function _getAttachmentsDbFields(row) {
-        var keys = ['id', 'file_id', 'label', 'position', '_new'];
-        var ret = {};
-        for(var i in keys) {
-            if(typeof(row[keys[i]]) !== 'undefined') {
-                ret[keys[i]] = row[keys[i]];
-            }
-        }
-
-        return ret;
-    }
-    function _setFormVal()
-    {
-        var originIds = _.pluck(originRows,'id');
-        removedIds = _.filter(removedIds, function(rowId) {
-                            return _.indexOf(originIds, rowId) !== -1;
-                        });
-
-        editedRows = _.filter(editedRows, function(row) {
-                            return _.indexOf(removedIds, row.id) === -1;
-                        });
-
-        for(var i in editedRows) {
-            editedRows[i] = _getAttachmentsDbFields(editedRows[i]);
-        }
-        console.log(editedRows);
-        $('#prod-attach-rows').val(JSON.stringify(editedRows));
-        $('#prod-attach-remove').val(removedIds.join(','));
-    }
-
-    g_vent.bind('init-detail', function(ev) {
-        if (ev.grid === 'product_attachments') {
-            originRows = ev.rows;
-        }
-    });
-
-    g_vent.bind('select-rows', function(ev) {
-        if (ev.grid === 'all_attachments') {
-            prod_img_rows = ev.rows;
-            var caption = 'Add';
-            var addButton = $('#prod-attachments-modal-add');
-            if(prod_img_rows.length>0) {
-                if (prod_img_rows.length==1) {
-                    caption += ' a row';
-                } else {
-                    caption += (' ' + prod_img_rows.length + ' rows');
-                }
-                addButton.removeClass('disabled');
-            } else {
-                addButton.addClass('disabled');
-            }
-            addButton.html(caption);
-        }
-
-    });
-
-    g_vent.bind('add', function(ev) {
-        if (ev.grid === 'product_attachments') {
-            $('#btn_prod_attach_modal').trigger('click');
-        }
-    });
-
-    g_vent.bind('delete', function(ev) {
-        if(ev.grid === 'product_attachments') {
-            if (_.indexOf(removedIds,ev.id) !== -1)
-                return;
-            removedIds[removedIds.length] = ev.id;
-            gridAllAttachment.find('tr[id="'+ ev.row.file_id +'"]').removeClass('hidden');
-            _setFormVal();
-        }
-    });
-
-    g_vent.bind('mass-delete', function(ev) {
-        if(ev.grid === 'product_attachments') {
-            for(var i in ev.rows) {
-                removedIds[removedIds.length] = ev.rows[i].id;
-                gridAllAttachment.find('tr[id="'+ ev.rows[i].file_id +'"]').removeClass('hidden');
-            }
-
-            _setFormVal();
-        }
-    });
-
-    g_vent.bind('edit', function(ev) {
-        if(ev.grid === 'product_attachments') {
-            var ret =_.findWhere(editedRows,{id: ev.row.id});
-            if (typeof(ret) == 'undefined') {
-                editedRows[editedRows.length] = ev.row;
-            } else {
-                editedRows = _.filter(editedRows, function(r) {
-                                return r.id !== ret.id
-                            });
-                editedRows[editedRows.length] = ev.row;
-            }
-            _setFormVal();
-        }
-    });
-
-    $('#prod-attachments-modal-add').click(function() {
-        var objs = _.clone(prod_img_rows);
-//        originFileIds = _.pluck(originRows, 'file_id');
-//        addedFileIds = _.pluck(editedRows, 'file_id');
-//        objs = _.filter(objs, function(row) {
-//            return _.indexOf(originFileIds, row.id) === -1 && _.indexOf(addedFileIds, row.id) === -1;
-//        });
-
-        for(var i in objs) {
-            var row = objs[i];
-            row.file_id = row.id;
-            row.id = guid();
-            row._new = true;
-//            editedRows[editedRows.length] = row;
-            var hidden = '<input type="hidden" name="product_attachments['+ row.id +'][file_id]" value="'+ row.file_id +'" />';
-            $('#tab-attachments').prepend(hidden);
-            gridAllAttachment.find('tr[id="'+ row.file_id +'"]').addClass('hidden');
-        }
-
-        g_vent.trigger('silent_inject', {grid: 'product_attachments', rows: prod_img_rows});
-        g_vent.trigger('clear_selection', {grid: 'all_attachments'});
-        $(this).next().trigger('click');
-//        _setFormVal();
-    });
-});*/
-</script>
-
 
 {{ THIS.view('core/backbonegrid').set('grid', prodAttachConfig) | raw }}
 
@@ -278,7 +144,86 @@
         </div>
     </div>
 </div>
+
+<input type='hidden' name="grid[attachments][del]" id='prod-attach-remove' />
+<input type='hidden' name="grid[attachments][rows]" id='prod-attach-rows' />
+
 <script>
+    var mediaGrid, attachmentGrid, orignIds, addedIds = [], removedIds = [];
+
+    function _getAttachmentsDbFields(row) {
+        return {
+            id: row.id,
+            file_id: row.file_id,
+            label: row.label,
+            position: row.position,
+            _new: row._new
+        };
+    }
+
+    /*
+    *function to set attachment grid data into form fields to send them server
+    *This function is callend when 'save' button of product form is clicked.
+    */
+    window.setAttachementsGridVals = function() {
+        console.log('setAttachmentsGridVals');
+        removedIds = _.difference(orignIds, attachmentGrid.getRows().pluck('id'));
+
+        var rows = [];
+        attachmentGrid.getRows().forEach(function(row) {
+            rows.push(_getAttachmentsDbFields(row.toJSON()));
+        });
+
+        $('#prod-attach-rows').val(JSON.stringify(rows));
+        $('#prod-attach-remove').val(removedIds.join(','));
+    }
+
+    /*
+    *MediaGrid registery function
+    */
+    window.all_attachments_register = function(grid) {
+        mediaGrid = grid;
+        grid.build();
+
+        //Depending selected rows count, disable or enable add button of popup
+        mediaGrid.getSelectedRows().on('add remove', function() {
+            if (mediaGrid.getSelectedRows().length>0) {
+                $('#prod-attachments-modal-add').removeClass('disabled');
+            } else {
+                $('#prod-attachments-modal-add').addClass('disabled');
+            }
+        });
+
+        $('#prod-attachments-modal-add').click(function() {
+
+            mediaGrid.getSelectedRows().forEach(function (row) {
+                if (!attachmentGrid.getRows().findWhere({file_id: row.get('id')})) {
+                    var addedRow = row.toJSON();
+                    addedRow._new = true;
+                    addedRow.file_id = row.id;
+                    addedRow.id = guid();
+                    attachmentGrid.getRows().add(addedRow);
+                }
+            });
+
+            mediaGrid.getGridView().clearSelectedRows();
+            $('.prod-attachments-modal-close').trigger('click');
+
+        });
+    }
+
+    window.attachmentGridRegister = function(grid) {
+        attachmentGrid = grid;
+        attachmentGrid.build();
+
+        var attachmentConfig = attachmentGrid.getGridSkeleton();
+        originIds = attachmentGrid.getRows().pluck('id');
+
+        $(attachmentConfig.AddButton).click(function() {
+            $('#btn_prod_attach_modal').trigger('click');
+        });
+
+    }
 
     function renderAttachment(el, row) {
         if ($('#product_attachments').find('a.file-attachments[data-file-id="'+ row.id+'"]').length > 0) {
@@ -287,33 +232,33 @@
     }
 
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
-
-
-        var prod_img_rows = [];
-        $('#prod-attach-checkbox').change(function() {
-            prod_img_rows = [];
-        });
         $('#prod-attach-fileupload').fileupload({
             url: '{{ APP.href("media/grid/upload?folder=media/product/attachment") | raw}}',
             multiple:true
         })
         .bind('fileuploadalways', function(e, data) {
 
-            if(data.result.id) {
-                g_vent.trigger('add_row', {grid: 'all_attachments', row:data.result});
-                $('td.name span').each(function(i) {
-                    if($(this).html() === data.result.file_name)
-                        $(this).parents('tr:first').remove();
-                });
+        if(data.result.id) {
+            mediaGrid.getRows().add(data.result);
 
-                if ($('#prod-attach-checkbox').is(':checked')) {
-                    prod_img_rows[prod_img_rows.length] = data.result;
-                    if ($('tr.template-upload').length === 0) {
-                        g_vent.trigger('select-rows', {grid: 'all_attachments', rows:prod_img_rows});
-                        $('#prod-attachments-modal-add').trigger('click');
-                    }
+            $('td.name span').each(function(i) {
+                if($(this).html() === data.result.file_name)
+                $(this).parents('tr:first').remove();
+            });
+
+            if ($('#prod-attach-checkbox').is(':checked')) {
+
+                var addedRow = data.result;
+                addedRow._new = true;
+                addedRow.file_id = addedRow.id;
+                addedRow.id = guid();
+                attachmentGrid.getRows().add(addedRow);
+
+                if ($('tr.template-upload').length === 0) {
+                    $('.prod-attachments-modal-close').trigger('click');
                 }
             }
+        }
         });
 
     });

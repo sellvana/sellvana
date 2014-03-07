@@ -107,7 +107,7 @@
                     </div>
                 </form>
                 <div class='modal-footer'>
-                    <button class='btn btn-default' data-dismiss='modal' type='button'>{{ 'Close'|_ }}</button>
+                    <button class='btn btn-default f-grid-modal-close' data-dismiss='modal' type='button'>{{ 'Close'|_ }}</button>
                     <button class='btn btn-primary save' type='button'>{{ 'Save changes' |_ }}</button>
                 </div>
             </div>
@@ -123,7 +123,7 @@
         <div class="control-label col-sm-3">
             <label for="<%= rc.name %>">
                 <%= rc.label%>
-                <% if(rc.validation.indexOf('required') !== -1) { print('*'); } %>
+                <% if(rc._validation.indexOf('required') !== -1) { print('*'); } %>
             </label>
         </div>
     <% } %>
@@ -135,7 +135,7 @@
 
                 <% break;
             case 'select': %>
-                <select name="<%= rc.name %>" id="<%= rc.name %>" class="form-control" <%= rc.validation %>>
+                <select name="<%= rc.name %>" id="<%= rc.name %>" class="form-control" <%= rc._validation %>>
                     <% for(var key in rc.options) { %>
                         <option value="<%= key %>"><%= rc.options[key] %></option>
                     <% } %>
@@ -143,12 +143,12 @@
 
                 <% break;
             case 'textarea': %>
-                <textarea name="<%= rc.name %>" id="<%= rc.name %>" class="form-control" rows="5" <%= rc.validation %>>
+                <textarea name="<%= rc.name %>" id="<%= rc.name %>" class="form-control" rows="5" <%= rc._validation %>>
                 </textarea>
 
                 <%break;
             default: %>
-                <input name="<%= rc.name %>" id="<%= rc.name %>" type="text" class="form-control" <%= rc.validation %> >
+                <input name="<%= rc.name %>" id="<%= rc.name %>" type="text" class="form-control" <%= rc._validation %> >
 
       <% } %>
     </div>
@@ -181,7 +181,8 @@
 
 {# grid header template #}
 <script type='template' id="{{ config.id | raw }}-header-template">
-    <%if (rc.type === 'row_select') { %>
+    <%
+    if (rc.type === 'row_select') { %>
         <div class="{{ config.id | raw }} dropdown f-grid-display-type">
             <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
                 <span class="icon-placeholder">
@@ -207,10 +208,10 @@
             </ul>
         </div>
     <% } else {
-        if (rc.sortable) { %>
-            <a class="js-change-url" style="cursor: pointer;"><%= rc.label %></a>
-        <% } else { %>
+        if (rc.sortable === false) { %>
             <%= rc.label %>
+        <% } else { %>
+            <a class="js-change-url" style="cursor: pointer;"><%= rc.label %></a>
         <% }
     } %>
 </script>
@@ -229,12 +230,8 @@
         %><td data-col="<%= col.name %>" <%= col.overflow %> ><%
             switch (col.type) {
             case 'row_select':
-                var isSelected = '';
-                if (rc.row._selectable && rc.row.selected)
-                    isSelected = 'checked';
-                var isSelectable = rc.row._selectable ? '' : 'DISABLED';
                 %><input type="checkbox" name="{{ config.id }}[checked][<%= rc.row.id %>]" class="select-row"
-                        <%= isSelected %> <%= isSelectable %> ><%
+                        <%= rc.row._rowSelect %> ><%
 
                 break;
             case 'input':
@@ -263,45 +260,45 @@
                 var strClass = col.cssClass ? col.cssClass + ' form-control' : ' form-control';
                 var strDisabled = (typeof(rc.row[col.name + '_disabled']) !== 'undefined' &&
                                    rc.row[col.name + '_disabled'] === true) ? 'DISABLED' : '';
-
+                var validation = validationRules(col.validation);
                 switch (col.editor) {
                 case 'checkbox':
-                    %><input type="checkbox" id="<%= strId %> name=<%= strName %>" class="<%= strClass %>" <%= col.validation %>
+                    %><input type="checkbox" id="<%= strId %> name=<%= strName %>" class="<%= strClass %>" <%=validation  %>
                             data-col="<%= col.name %>" <%= strDisabled %> /><%
 
                      break;
                 case 'textarea':
-                    %><textarea id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>" <%= col.validation %>
+                    %><textarea id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>" <%= validation %>
                             data-col="<%= col.name %>" <%= strDisabled %>  rows="4">
                         <%= rc.row[col.name] %>
                     </textarea><%
 
                     break;
                 case 'select':
-                    %><select id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>" <%= col.validation %>
+                    %><select id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>" <%= validation %>
                             data-col="<%= col.name %>"  <%= strDisabled %> ><%
 
-                        if (_.isArray(col.options)) {
+                        //if (_.isArray(col.options)) {
                             for(var i = 0, l = col.options.length; i<l; i++) {
                                 %><option value="<%= col.options[i].value %>"><%= col.options[i].label %></option><%
                              }
-                        } else {
+                        /*} else {
                             for(var key in col.options) {
                                 %><option value="<%= key %>"><%= col.options[key] %></option><%
                              }
-                        }
+                        }*/
 
                     %></select><%
 
                     break;
                 case 'radio':
                     %><input type="checkbox" id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>"
-                            <%= col.validation %> data-col="<%= col.name %>"  <%= strDisabled %> /><%
+                            <%= validation %> data-col="<%= col.name %>"  <%= strDisabled %> /><%
 
                     break;
                 default:
                     %><input type="text"  id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>"
-                            <%= col.validation %> data-col="<%= col.name %>"  <%= strDisabled %>
+                            <%= validation %> data-col="<%= col.name %>"  <%= strDisabled %>
                             value="<%= rc.row[col.name] %>" /><%
 
                     break;
@@ -325,7 +322,7 @@
 
                          break;
                     default:
-                        %><button <%= event %> class="btn btn-link <%= btn.cssClass %>" title="<%= btn.title ? btn.title : '' %>">
+                        %><button <%= event %> class="btn btn-link <%= btn.cssClass %>" title="<%= btn.title ? btn.title : '' %>" type="button">
                             <i class="<%= btn.icon %>" ></i>
                             <%= btn.caption %>
                         </button><%

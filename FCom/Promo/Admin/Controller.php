@@ -28,10 +28,10 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             array(
                 'type' =>'btn_group', 'name'=>'_actions','label'=> 'Actions', 'sortable' => false,
                 'buttons'=> array(
-                                   array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 
+                                   array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'),
                                    array('name'=>'delete')
                                 )
-                )            
+                )
         );
         $config['actions'] = array(
             'edit' => true,
@@ -244,7 +244,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $config[ 'filters' ] = array(
             array( 'field' => 'product_name', 'type' => 'text' )
         );
-        $config[ 'events' ] = array( 'init', 'add', 'mass-delete' );
+        $config['register_func'] = $gridId.'_register';
 
 //        $config = array(
 //            'grid' => array(

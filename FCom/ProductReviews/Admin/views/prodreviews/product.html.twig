@@ -1,57 +1,20 @@
 {% set m = THIS.get('model') %}
 {% set ctrl = APP.instance('FCom_ProductReviews_Admin_Controller') %}
+{% set gridConfig = ctrl.gridConfig(m) %}
 
 <script>
+$(function() {
     var btnApprove = $('#prod-reviews-approve');
     var btnDeny = $('#prod-reviews-deny');
     var selectedRows = [];
-
-    if(typeof(g_vent) === 'undefined') {
-        g_vent = _.extend({}, Backbone.Events);
+    var prodReviewGrid;
+    window.products_reviews_register = function(grid) {
+        prodReviewGrid = grid;
+        grid.build();
     }
-    require(["jquery", "underscore", "jquery.validate", "fcom.admin", "bootstrap"], function($, _) {
+    require(["fcom.admin", "bootstrap"], function($, _) {
         adminForm.createSwitchButton();
         adminForm.wysiwygInit();
-        g_vent.bind('custom_callback', function(ev) {
-            console.log(ev);
-            if(ev.grid === 'products_reviews') {
-                var review = ev.row;
-                $('#prod-review-id').val(review.id);
-                $('#prod-review-title').val(review.title);
-                CKEDITOR.instances['prod-review-text'].setData(review.text);
-                $('#prod-review-rating').val(review.rating);
-                $('#prod-review-helpful').val(review.helpful);
-
-                $('div#prod-review-modal div.col-md-5:last').html(
-                            '<input type="hidden" name="model[approved]" value="'+(review.approved === '1' ? '1' : '0')+'" />'+
-                            '<input class="switch-cbx" id="prod-review-approved" type="checkbox" name="model[approved]" value="'+(review.approved === '1' ? '1' : '0')+'" '+(review.approved === '1' ? 'checked' : '')+'/>');
-                adminForm.createSwitchButton();
-
-                $('a#btn_prod-review-modal').trigger('click');
-            }
-        }).bind('select-rows', function(ev) {
-            if (ev.rows.length > 0) {
-                btnApprove.removeClass('disabled');
-                btnDeny.removeClass('disabled');
-                selectedRows = ev.rows;
-            } else {
-                btnApprove.addClass('disabled');
-                btnDeny.addClass('disabled');
-                selectedRows = [];
-            }
-        });
-
-        $('button.btn-prod-review-save').click(function(){
-            var row = {};
-            row.id = $('#prod-review-id').val();
-            row.title = $('#prod-review-title').val();
-            row.text = CKEDITOR.instances['prod-review-text'].getData();
-            row.rating = $('#prod-review-rating').val();
-            row.helpful = $('#prod-review-helpful').val();
-            row.approved = $('#prod-review-approved').parent().hasClass('switch-on') ? '1' : '0';
-            console.log(row.approved);
-            g_vent.trigger('update_row', {grid: 'products_reviews', row: row});
-        });
 
         btnApprove.on('click', function() {
             updateStatus(1);
@@ -63,39 +26,19 @@
 
         function updateStatus(approve)
         {
+            var selectedRows = reviewGrid.getRows().toJSON();
             for (var index = 0; index < selectedRows.length; index++) {
-                selectedRows[index].approved = approve;
-                g_vent.trigger('update_row', {grid: 'products_reviews', row: selectedRows[index]});
+                var row = reviewGrid.getRows().findWhere({id:selectedRows[index].id});
+                row.set('approved', approve);
+                row.save();
+                row.trigger('render');
                 //todo: implement update multi rows
             }
             $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
-            /*var url = '{{ APP.href('/prodreviews/approve') }}';
-            $.ajax({
-                type: "POST",
-                url: url,
-                data: {approve: approve, ids: ids},
-                success: function (data)
-                {
-                    if (data.status == 'success') {
-                        $.bootstrapGrowl(data.message, { type: 'success', align: 'center', width: 'auto' });
-                        for (var index = 0; index < selectedRows.length; index++) {
-                            selectedRows[index].approved = approve;
-                            g_vent.trigger('update_row', {grid: 'products_reviews', row: selectedRows[index]});
-                        }
-                    } else if (data.status == 'error') {
-                        $.bootstrapGrowl("Error:<br>" + data.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
-                    } else {
-                        $.bootstrapGrowl('Dont know data status type', { type: 'warning', align: 'center', width: 'auto' });
-                    }
-                },
-                error: function (xhr, textStatus, errorThrown)
-                {
-                    alert("[ERROR]<br>" + textStatus);
-                }
-            });*/
         }
 
     });
+});
 </script>
 
 {#<div>
@@ -158,6 +101,6 @@
 </div>#}
 
 
-{{ THIS.view('core/backbonegrid').set('grid', {config: ctrl.gridConfig(m)}) | raw }}
+{{ THIS.view('core/backbonegrid').set('grid', {config: gridConfig }) | raw }}
 
 

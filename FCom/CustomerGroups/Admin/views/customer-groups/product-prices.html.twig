@@ -1,72 +1,65 @@
 {% set ctrl = APP.instance('FCom_CustomerGroups_Admin_Controller_TierPrices') %}
 <script>
- /*   var inputQty = 'input[data-col="qty"]';
+ require(['jquery.validate', 'unique'], function() {
+    var pricesGrid;
+    var inputQty = 'input[data-col="qty"]';
     var selectGroupId = 'select[data-col="group_id"]';
-    function addClassUnique(el, row) {
-        $(el).find(inputQty).addClass('unique');
-        $(el).find(selectGroupId).addClass('unique');
-    }
-var g_vent;
-    require(['jquery','underscore','backbone', 'jquery.validate', 'unique'], function($, _, Backbone) {
-        var bodyPrice = $('#tier-prices tbody');
-        var prices, submiting = true;
-        var json = {
+    var originIds;
+    var json = {
             rows: [],
             remove_ids: []
         }
-
-        $('#catalog-products-form').submit(function(ev) {
-            checkUnique();
-        });
-        function checkUnique(value, elem, params) {
-            var error = true;
-            json.remove_ids = _.difference(json.remove_ids, prices.pluck('id'));
-            prices.each(function (data) {
-                var tr = bodyPrice.find('#'+ data.id);
-                data.set('qty', tr.find(inputQty).val());
-                data.set('sale_price', tr.find('input[data-col="sale_price"]').val());
-                data.set('base_price', tr.find('input[data-col="base_price"]').val());
-                data.set('group_id', tr.find(selectGroupId).val());
-            });
-            prices.each(function (data) {
-                if (typeof (elem) !== 'undefined') {
-                    var parent = $(elem).parents('tr');
-                    if (parent.attr('id') != data.get('id') && parent.find(inputQty).val() == data.get('qty') && parent.find(selectGroupId).val() == data.get('group_id')) {
-                        error = false;
-                    }
-                }
-            });
-            var rows = prices.toJSON();
-            for(var i in rows) {
-                rows[i] = _.pick(rows[i], 'id', 'group_id', 'product_id', 'qty', 'base_price', 'sale_price', '_new');
-            }
-            json.rows = rows;
-            $("#product_price_info").val(JSON.stringify(json));
-            return error;
+    window.tierPricesGridRegister = function(grid) {
+        pricesGrid = grid;
+        grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
+            this.$el.find(inputQty).addClass('unique');
+            this.$el.find(selectGroupId).addClass('unique');
         }
-        bodyPrice.on('change', 'input, select', function () {
-            bodyPrice.find(inputQty).each(function () {
-                if ($(this).val() != '') {
-                    $(this).valid();
-                }
-            });
-            bodyPrice.find(selectGroupId).each(function () {
-                $(this).valid();
-            });
-        });
-        $.validator.addMethod('checkUnique',checkUnique , 'Minimum Qty, Customer Group are already taken place.');
+        grid.build();
+        originIds = grid.getRows().pluck('id');
+    }
 
-        $.validator.addClassRules("unique", {
-            required: true,
-            checkUnique: true
-        });
-        g_vent.bind('init-detail', function(ev) {
-            if(ev.grid === 'tier-prices') {
-                json.remove_ids = ev.collection.pluck('id');
-                prices = ev.collection;
-            }
-        });
-    });*/
+    var bodyPrice = $('#tier-prices tbody');
+    var prices, submiting = true;
+
+    $('#catalog-products-form').submit(function(ev) {
+        json.remove_ids = _.difference(originIds, pricesGrid.getRows().pluck('id'));
+        var rows = pricesGrid.getRows().toJSON();
+        for(var i in rows) {
+            rows[i] = _.pick(rows[i], 'id', 'group_id', 'product_id', 'qty', 'base_price', 'sale_price', '_new');
+        }
+        json.rows = rows;
+        $("#product_price_info").val(JSON.stringify(json));
+        return checkUnique();
+    });
+
+
+    /*
+    *custom validation function for checking duplicated input
+    */
+    function checkUnique(value, elem, params) {
+        var error = true;
+        if (typeof (elem) !== 'undefined') {
+            pricesGrid.getRows().each(function (data) {
+
+                    var parent = $(elem).parents('tr');
+                    if (parent.attr('id') != data.get('id') && parent.find(inputQty).val() == data.get('qty') &&
+                        parent.find(selectGroupId).val() == data.get('group_id')) {
+                            error = false;
+                        }
+            });
+        }
+
+        return error;
+    }
+
+    $.validator.addMethod('checkUnique',checkUnique , 'Minimum Qty, Customer Group are already taken place.');
+
+    $.validator.addClassRules("unique", {
+        required: true,
+        checkUnique: true
+    });
+});
 </script>
 <h3>{{ 'Price Chart'|_ }}</h3>
 <input type='hidden' name='model[price_info]' id='product_price_info'/>

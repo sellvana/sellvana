@@ -121,9 +121,16 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $grid = $this->grid;
         $c =& $grid['config'];
 
+
         if (!empty($c['data_mode']) && $c['data_mode'] === 'local') {
             unset($c['data_url']);
-            unset($c['edit_url']);
+
+            //IMPORTANT: edit_url_required is used when local mode grid needs to be saved through edit_url
+            //ex) ProductReviewGrid on product edit form
+            if (empty($c['edit_url_required']) || !$c['edit_url_required']){
+                unset($c['edit_url']);
+            }
+
         }
 
         if (empty($c['grid_url'])) {
@@ -182,6 +189,24 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                     $col['no_reorder'] = true;
 
 					break;
+                case 'input':
+                    /*if (!empty($col['editor']) && $col['editor'] === 'select' && !empty($col['options'])) {
+
+                        $temp = array();
+                        foreach($col['options'] as $key=>$val) {
+
+                            if (is_array($val)) {
+                                $temp[] = $val;
+                            } else {
+                                $temp[] = array('label'=>$val, 'value'=>$key);
+                            }
+                        }
+                        $col['options'] = $temp;
+
+                    }*/
+
+
+                    break;
 				case 'btn_group':
                     $col['label'] = 'Actions';
                     $col['name'] = 'btn_group';
@@ -324,9 +349,12 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                     default:
                         $action = static::$_defaultActions[$k];
                 }
-            }
-            if (is_string($action)) {
-                $action = array('html'=>$action);
+            } else {
+                $action = array('html'=>BUtil::tagHtml('button',
+                            array('class'=>isset($action['class'])? 'btn '.$action['class'] : 'btn', 'type'=>'button', 'id'=>isset($action['class']) ? $action['class'] : ''),
+                            isset($action['caption']) ? $action['caption'] : BLocale::_('Add')
+                ));
+                break;
             }
         }
         unset($action);

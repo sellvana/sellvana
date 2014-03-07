@@ -19,11 +19,11 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             array('name' => 'firstname', 'label'=>'First Name', 'index'=>'c.firstname'),
             array('name' => 'lastname', 'label'=>'Last Name', 'index'=>'c.lastname'),
             array('name' => 'email', 'label'=>'Email', 'index'=>'c.email'),
-            array('type' => 'input', 'name' => 'customer_group', 'label'=>'Customer Group', 'index'=>'c.customer_group', 
+            array('type' => 'input', 'name' => 'customer_group', 'label'=>'Customer Group', 'index'=>'c.customer_group',
                   'editor' => 'select', 'mass-editable-show' => false,
                   'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(), 'editable' => true, 'mass-editable' => true),
             array('type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'c.status', 'editor' => 'select',
-                  'mass-editable-show' => false, 'options' => FCom_Customer_Model_Customer::i()->fieldOptions('status'), 
+                  'mass-editable-show' => false, 'options' => FCom_Customer_Model_Customer::i()->fieldOptions('status'),
                   'editable' => true, 'mass-editable' => true),
             array('name' => 'street1', 'label'=>'Address', 'index'=>'a.street1'),
             array('name' => 'city', 'label'=>'City', 'index'=>'a.city'),
@@ -44,7 +44,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
                                       array('name'=>'edit', 'href' => BApp::href($this->_formHref . '?id='), 'col' => 'id'),
                                       array('name'=>'delete')
                                 )
-                )            
+                )
         );
         $config['actions'] = array(
             'export' => true,
@@ -174,7 +174,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             array('field'=>'email', 'type'=>'text'),
         );
         $config['data_mode'] = 'local';
-        $config['events'] = array('init', 'add','mass-delete');
+
 
         return array('config'=>$config);
     }
@@ -205,7 +205,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             '_quick' => array('expr' => 'firstname like ? or lastname like ? or email like ? or c.id=?', 'args' => array('?%', '%?%', '?'))
         );
 
-        $config['events'] = array('add');
+
 
         return array('config' => $config);
     }
