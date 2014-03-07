@@ -81,8 +81,8 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
         $widgets = FCom_Admin_View_Dashboard::i()->getWidgets();
         $result = array();
         foreach ($widgets as $key => $widget) {
-            if (isset($widget['async']) && $widget['async'] === true && isset($widget['filter']) && $widget['filter'] === true ) {
-                if (isset($widget['state']['close']) && $widget['state']['close']  === false) {
+            if (isset($widget['async']) && $widget['async'] == true && isset($widget['filter']) && $widget['filter'] == true ) {
+                if (!isset($widget['state']['closed']) || $widget['state']['closed']  == false) {
                     $widget['async'] = false;
                     $html = $this->view($widget['view'])->set('filter', $p)->render();
                     $result[] = array('key' => $key, 'html' => $html);
