@@ -16,7 +16,7 @@
             <p>
                 <?=$this->_('Before proceeding, please make sure that the following folders are writable for web service:')?>
                 <?php foreach ($this->errors as $error): ?>
-                    <div class="alert alert-danger well well-small"><?=$error?></li>
+                    <div class="alert alert-danger well well-small"><?=$error?></div>
                 <?php endforeach ?>
             </p>
         </div>

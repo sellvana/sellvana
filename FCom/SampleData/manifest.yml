@@ -3,7 +3,7 @@ modules:
         version: 0.1.0
         channel: beta
         description: "Sample data for catalog"
-        require: { module: { FCom_Core: 0.1.0, FCom_Catalog: 0.2.18 } }
+        require: { module: { FCom_Core: 0.1.0, FCom_Catalog: 0.2.18, FCom_CatalogIndex: 0.1.9 } }
 
         areas:
             FCom_Admin:
