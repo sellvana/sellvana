@@ -289,4 +289,56 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
 
         return array('config' => $config);
     }
+
+    public function getOrderRecent()
+    {
+        $dayRecent = (BConfig::i()->get('modules/FCom_Sales/recent_day')) ? BConfig::i()->get('modules/FCom_Sales/recent_day') : 7;
+        $recent = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s')) - $dayRecent*86400);
+        $result = FCom_Sales_Model_Order::i()->orm('o')
+            ->join('FCom_Customer_Model_Customer', array('o.customer_id', '=', 'c.id'), 'c')
+            ->where_gte('o.create_at', $recent)
+            ->select(array('o.*',  'c.firstname', 'c.lastname'))->find_many();
+
+        return $result;
+    }
+
+    public function getOrderTotal($filter)
+    {
+        $orderTotal = FCom_Sales_Model_Order_Status::i()->orm('s')
+            ->left_outer_join('FCom_Sales_Model_Order', array('o.status', '=', 's.name'), 'o')
+            ->group_by('s.id')
+            ->select_expr('COUNT(o.id)', 'order')
+            ->select(array('s.id', 'name'));
+        $tmp = $result = $orderTotal->find_many();
+        switch ($filter['type']) {
+            case 'between':
+                $tmp = $orderTotal->where_gte('o.create_at', $filter['min'])->where_lte('o.create_at', $filter['max'])->find_many();
+                break;
+            case 'to':
+                $tmp = $orderTotal->where_lte('o.create_at', $filter['date'])->find_many();
+                break;
+            case 'from':
+                $tmp = $orderTotal->where_gte('o.create_at', $filter['date'])->find_many();
+                break;
+            case 'equal':
+                $tmp = $orderTotal->where_like('o.create_at', $filter['date'].'%')->find_many();
+                break;
+            case 'not_in':
+                $tmp = $orderTotal->where_raw('o.create_at', 'NOT BETWEEN ? AND ?', $filter['min'], $filter['max'])->find_many();
+                break;
+            default:
+                break;
+        }
+        foreach ($result as $obj) {
+            $order = 0;
+            foreach ($tmp as $key) {
+                if ($obj->get('id') == $key->get('id')) {
+                    $order = $key->get('order');
+                }
+            }
+            $obj->set('order', $order);
+        }
+        return $result;
+    }
+
 }

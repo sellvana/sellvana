@@ -231,4 +231,13 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
 
         BResponse::i()->redirect($redirectUrl);
     }
+
+    public function getCustomerRecent()
+    {
+        $recent = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s')) - 7*86400);
+        $result = FCom_Customer_Model_Customer::i()->orm()
+            ->where_gte('create_at', $recent)
+            ->select(array('id' ,'email', 'firstname', 'lastname', 'create_at', 'status'))->find_many();
+        return $result;
+    }
 }

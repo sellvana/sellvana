@@ -421,10 +421,10 @@ class FCom_Core_Main extends BClass
     {
         static $url = array();
         if (empty($url[$full])) {
-            $url[$full] = rtrim(BConfig::i()->get('web/base_src'), '/').'/resize.php';
             if ($full) {
-                $r = BRequest::i();
-                $url[$full] = BApp::baseUrl(true).$url[$full];
+                $url[$full] = BApp::baseUrl(true).'/resize.php';
+            } else {
+                $url[$full] = rtrim(BConfig::i()->get('web/base_src'), '/').'/resize.php';
             }
         }
         return $url[$full];

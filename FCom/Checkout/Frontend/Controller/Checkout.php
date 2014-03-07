@@ -2,11 +2,15 @@
 
 class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controller_Abstract
 {
+    protected $_authenticationFree = array(
+        '/checkout/login',
+        '/checkout/success',
+    );
     public function authenticate($args = array())
     {
         $r = BRequest::i();
         $isLoggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
-        if (!$isLoggedIn && $r->get('guest') != 'yes' && $r->rawPath() != '/checkout/login') {
+        if (!$isLoggedIn && $r->get('guest') != 'yes' && !in_array($r->rawPath(), $this->_authenticationFree) ) {
             BResponse::i()->redirect('checkout/login');
             return;
         } elseif ($isLoggedIn && $r->rawPath() == '/checkout/login') {

@@ -1,7 +1,8 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator', m) %}
 
-<fieldset class="adm-section-group">
+<fieldset class="form-horizontal">
+    <div class="f-section">
     <div class="form-group">
         <label class="col-md-2 control-label">{{ "Page Enabled"|_ }}</label>
         <div class="col-md-5">
@@ -44,5 +45,6 @@
         <div class="col-md-5">
             <input class="form-control" type="text" name="model[meta_keywords]" value="{{ validator.fieldValue('meta_keywords') }}" />
         </div>
+    </div>
     </div>
 </fieldset>
