@@ -3650,3 +3650,10 @@ body.error .error-container-footer a {
 .f-admin-page-header .date-range-plugin.open .btn-default  {
     border: 1px solid rgba(0,0,0,.110);
 }
+.date-range-plugin .choice-close {
+    color: #bbb;
+    font-size: 13px;
+}
+.date-range-plugin .filter {
+    background: #eaedf6;
+}
