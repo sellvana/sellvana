@@ -49,9 +49,9 @@ define(['backbone',  'jquery', 'unique', 'select2'], function(Backbone, $) {
                 }
             }
         });
-    }
+    };
     return {
         ipMode: ipMode,
         initMode: initMode
     };
-})
+});

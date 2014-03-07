@@ -113,5 +113,24 @@ class FCom_Sales_Main extends BClass
             );
         }
     }
+
+    public function onGetDashboardWidgets($args)
+    {
+        $view = $args['view'];
+        $view->addWidget('orders-list', array(
+            'title' => 'Recent Orders',
+            'icon' => 'inbox',
+            'view' => 'order/dashboard/orders-list',
+            'async' => true,
+        ));
+        $view->addWidget('orders-totals', array(
+            'title' => 'Order Totals',
+            'icon' => 'inbox',
+            'view' => 'order/dashboard/orders-totals',
+            'cols' => 4,
+            'async' => true,
+            'filter' => true
+        ));
+    }
 }
 

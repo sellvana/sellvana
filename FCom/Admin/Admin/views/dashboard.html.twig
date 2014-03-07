@@ -11,6 +11,7 @@
     {% set availWidgets = availWidgets|merge([widget]) %}
   {% endif %}
 {% endfor %}
+<input type="hidden" id="filter-text" value="between" data-range="range" data-text="Between"/>
 <div class="f-admin-main-view">
   <div class="page-header f-admin-page-header">
     <h1 class="f-page-title">
@@ -22,8 +23,10 @@
     </div>
     <div class="btn-group  dropdown  f-filter-btns date-range-plugin" id="custom">
         <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <i class="icon-remove-sign choice-close hidden"></i>
             <i class="icon-calendar"></i>
-            <span>{{ 'Custom'|_ }}</span>
+            <span>{{ 'Custom:'|_ }}</span>
+            <span class="custom-filter-value">{{ "All"|_ }}</span>
             <b class="caret"></b>
         </button>
 
@@ -38,34 +41,34 @@
 
                         <ul class='dropdown-menu filter-sub'>
                             <li>
-                                <a class='filter_op range' data-id='between' href='javascript:void()'>{{ 'between'|_ }}</a>
+                                <a class='filter_op' data-range="range" data-id='between' href='javascript:void()'>{{ 'between'|_ }}</a>
                             </li>
                             <li>
-                                <a class='filter_op not_range' data-id='from' href='javascript:void()'>{{ 'from'|_ }}</a>
+                                <a class='filter_op' data-range="not_range" data-id='from' href='javascript:void()'>{{ 'from'|_ }}</a>
                             </li>
                             <li>
-                                <a class='filter_op not_range' data-id='to' href='javascript:void()'>{{ 'to'|_ }}</a>
+                                <a class='filter_op' data-range="not_range" data-id='to' href='javascript:void()'>{{ 'to'|_ }}</a>
                             </li>
                             <li>
-                                <a  class='filter_op not_range' data-id='equal' href='javascript:void()'>{{ 'is equal to'|_ }}</a>
+                                <a  class='filter_op' data-range="not_range" data-id='equal' href='javascript:void()'>{{ 'is equal to'|_ }}</a>
                             </li>
                             <li>
-                                <a class='filter_op range' data-id='not_in' href='javascript:void()'>{{ 'not in'|_ }}</a>
+                                <a class='filter_op' data-range="range" data-id='not_in' href='javascript:void()'>{{ 'not in'|_ }}</a>
                             </li>
                         </ul>
                     </div>
 
                     <div class="input-group range"  >
-                        <input id="data-range-picker-text" type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange" value="">
-                    <span id="daterange2" class="input-group-addon">
-                      <i class="icon-calendar"></i>
-                    </span>
+                        <input id="data-range-picker-text" type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange date-filter" value="">
+                        <span id="daterange2" class="input-group-addon">
+                          <i class="icon-calendar"></i>
+                        </span>
                     </div>
                     <div class="datepicker input-group not_range">
-                        <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" class="form-control" value="">
-                  <span class="input-group-addon">
-                    <span data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></span>
-                  </span>
+                        <input type="text" placeholder="Select date" data-format="yyyy-MM-dd" class="form-control date-filter" value="">
+                        <span class="input-group-addon">
+                            <span data-time-icon="icon-time" data-date-icon="icon-calendar" class="icon-calendar"></span>
+                        </span>
                     </div>
                     <div class="input-group-btn">
                         <button type="button" class="btn btn-primary update">
@@ -79,9 +82,9 @@
     </div>
 
     <div class="pull-right btn-group">
-      <button class="btn btn-default">{{ 'Last month'|_ }}</button>
-      <button class="btn btn-default">{{ 'Last week'|_ }}</button>
-      <button class="btn btn-default">{{ 'Today'|_ }}</button>
+      <button class="btn btn-default btn-filter-date" data-date="month">{{ 'Last month'|_ }}</button>
+      <button class="btn btn-default btn-filter-date" data-date="week">{{ 'Last week'|_ }}</button>
+      <button class="btn btn-default btn-filter-date" data-date="today">{{ 'Today'|_ }}</button>
     </div>
   </div>
 
@@ -92,7 +95,9 @@
       <ul class="js-sortable-container" id="dashboard-widgets-container">
       {% for widget in widgets %}
         {% if not widget.state.closed %}
-          {{ THIS.view('dashboard/widget').set('widget', widget) | raw }}
+          {% if widget.async %}
+            {{ THIS.view('dashboard/widget').set('widget', widget) | raw }}
+          {% endif %}
         {% endif %}
       {% endfor %}
       </ul>
@@ -143,6 +148,10 @@
 <script>
 require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], function($) {
   var dashboardUrl = "{{ APP.href('dashboard') }}", personalizeUrl = "{{ APP.href('my_account/personalize') }}";
+  var filter =  $('#filter-text');
+  var custom = $('#custom');
+  var sortable = $('.js-sortable-container');
+  var closeFilter = custom.find('.choice-close');
   //var widgetTemplate = _.template($('#dashboard-widget-template').html());
   var select = $('#add-widget-selection');
   function load(widgets, wrapped, add) {
@@ -156,20 +165,86 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
       });
     });
   }
-
   {% if asyncWidgets %}
     load({{ UTIL.toJson(asyncWidgets)|raw }}.join(','));
   {% endif %}
 
   $('#add-widget-submit').click(function(ev) {
-
     load(select.val(), true, true);
     $('#add-widget-selection option[value="'+ select.val() +'"]').remove();
     select.val('');
     $('#add-widget-modal').modal('hide');
   });
+  custom.find('.filter_op').click(function () {
+      filter.val($(this).attr('data-id'));
+      filter.attr('data-range', $(this).attr('data-range'));
+      var text = $(this).text().charAt(0).toUpperCase() + $(this).text().slice(1);
+      filter.attr('data-text', text);
+  });
+  $('.btn-filter-date').click(function () {
+      var data = {};
+      resetFilterDate();
+      switch ($(this).attr('data-date')) {
+          case 'month':
+              data['type'] = 'between';
+              data['range'] = 'range';
+              data['date']  = 'last-month';
+              filterDate(data);
+              break;
+          case 'week':
+              data['type'] = 'between';
+              data['range'] = 'range';
+              data['date']  = 'last-week';
+              filterDate(data);
+              break;
+          case 'today':
+              data['type'] = 'equal';
+              data['range'] = 'not_range';
+              data['date'] = 'today';
+              filterDate(data);
+              break;
+          default:
+              break;
+      }
+  });
 
-  $('.js-sortable-container').sortable({
+  custom.find('.update').click(function () {
+    var date = '';
+      if (filter.attr('data-range') == 'not_range') {
+          date = $(this).parents('.input-group').children('.not_range').children('.date-filter').val();
+      } else {
+          date = $(this).parents('.input-group').children('.range').children('.date-filter').val();
+      }
+    if (date != '') {
+        var data = {type: filter.val(), date: date , range: filter.attr('data-range')};
+        closeFilter.removeClass('hidden');
+        custom.children('button').addClass('filter');
+        custom.find('.custom-filter-value').html(filter.attr('data-text') +' "' + date + '"');
+        filterDate(data)
+    }
+  });
+  closeFilter.click(function (){
+      resetFilterDate();
+      filterDate({type: 'default', date: 'all', range: 'range'});
+      return false;
+  });
+  function filterDate(data) {
+      $.post('{{ APP.href("dashboard/data") }}', data, function(response, status, xhr) {
+          $.each(response, function(key, widget) {
+            $('#dashboard-widget__'+ widget.key+' .widget-contents').html(widget.html);
+          });
+
+      });
+  }
+
+  function resetFilterDate() {
+      closeFilter.addClass('hidden');
+      custom.children('button').removeClass('filter');
+      custom.find('.custom-filter-value').html('All');
+      $('.date-filter').val('');
+  }
+
+  sortable.sortable({
     connectWith: '.js-sortable-container',
     handle: '.js-sortable-handle',
     update: function(ev, ui) {
@@ -186,7 +261,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
     //delay: 100,
   })
 
-  $('.js-sortable-container').on('click', '.js-remove', function(idx, el) {
+  sortable.on('click', '.js-remove', function(idx, el) {
     var $el = $(this);
     var postData = { do:'dashboard.widget.close', key:$el.parents('li').data('id') };
     $.post(personalizeUrl, postData, function(response, status, xhr) {
@@ -202,6 +277,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
                 option = "<option value='visitors-totals'>Visitors</option>";
                 break;
             case 'orders-totals':
+                $('.date-filter').val('');
                 option = "<option value='orders-totals'>Order Totals</option>";
                 break;
             default :break;
@@ -211,7 +287,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
     });
   })
 
-  $('.js-sortable-container').on('click', '.js-collapse', function(idx, el) {
+  sortable.on('click', '.js-collapse', function(idx, el) {
     var $el = $(this);
     var postData = { do:'dashboard.widget.collapse', key:$el.parents('li').data('id'), 'collapsed':!$el.parents('.box-collapsed').get(0) };
     $.post(personalizeUrl, postData, function(response, status, xhr) {
@@ -231,23 +307,22 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
     ev.preventDefault();
     return false;
   });
-  $('#custom').on('click', 'input', function (ev) {
+  custom.on('click', 'input', function (ev) {
       ev.stopPropagation();
       ev.preventDefault();
       return false;
   });
-  $('#custom .filter-text-sub').click(function () {
+  custom.find('.filter-text-sub').click(function () {
      $(this).parents('div.dropdown:first').toggleClass('open');
      return false;
   });
-  $('#custom a.filter_op').click(function (ev) {
-      var custom = $('#custom');
-      if ($(ev.target).hasClass('range')) {
-          custom.find('div.range').css('display', 'table');
-          custom.find('div.not_range').css('display', 'none');
+  custom.find('a.filter_op').click(function (ev) {
+      if ($(ev.target).attr('data-range') == 'range') {
+          custom.find('.range').css('display', 'table');
+          custom.find('.not_range').css('display', 'none');
       } else {
-          custom.find('div.range').css('display', 'none');
-          custom.find('div.not_range').css('display', 'table');
+          custom.find('.range').css('display', 'none');
+          custom.find('.not_range').css('display', 'table');
       }
       var text = $(ev.target).html();
       text = text.charAt(0).toUpperCase() + text.slice(1);
