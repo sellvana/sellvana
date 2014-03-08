@@ -1358,6 +1358,8 @@ class BResponse extends BClass
         }
         // redundancy: avoid memory leakage from debug log
         BDebug::level(BDebug::MEMORY, false);
+        // turn off in-memory SQL log
+        BConfig::i()->set('db/logging', 0);
         // remove process timeout limitation
         set_time_limit(0);
         // output in real time
