@@ -13,18 +13,25 @@ class FCom_SampleData_Admin extends BClass
     {
         FCom_Admin_Model_Role::i()->createPermission( array( 'sample_data' => 'Install Sample Data' ) );
     }
-    
+
     public static function loadProducts()
     {
-        $basePath = BConfig::i()->get( 'fs/root_dir' ) . '/storage';
+        $start = microtime(true);
+        $config    = BConfig::i();
+        $batchSize = $config->get( 'modules/FCom_SampleData/batch_size' );
+        if ( !$batchSize ) {
+            $batchSize = 100;
+        }
+
+        $basePath = $config->get( 'fs/root_dir' ) . '/storage';
         $ds       = DIRECTORY_SEPARATOR;
 
-        $file     = BConfig::i()->get( 'modules/FCom_SampleData/sample_file' );
+        $file = $config->get( 'modules/FCom_SampleData/sample_file' );
         if ( !$file ) {
             $file = static::$defaultProductDataFile;
         }
 
-        $path = BConfig::i()->get( 'modules/FCom_SampleData/sample_path' );
+        $path = $config->get( 'modules/FCom_SampleData/sample_path' );
         if ( !$path ) {
             $path = static::$defaultDataPath;
         }
@@ -36,24 +43,19 @@ class FCom_SampleData_Admin extends BClass
         $headings = fgetcsv( $fr );
 
         $rows = array();
-
-        FCom_CatalogIndex_Main::i()->autoReindex(false);
         $i = 0;
         while ( $line = fgetcsv( $fr ) ) {
             $row = array_combine( $headings, $line );
             if ( $row ) {
                 $rows[ ] = $row;
-                $i++;
-                if ($i==100) {
-echo "* ";
-                    FCom_Catalog_Model_Product::i()->import( $rows );
-                    $rows = array();
-                    $i = 0;
-                }
+            }
+            if($i++ == $batchSize){
+                FCom_Catalog_Model_Product::i()->import( $rows );
+                $rows = array();
+                $i = 1;
             }
         }
-        FCom_CatalogIndex_Indexer::i()->indexProducts(true);
-        
-        // todo
+        FCom_Catalog_Model_Product::i()->import( $rows );
+        BDebug::log("Sample data imported in: " . round(microtime(true) - $start, 4) . " seconds.");
     }
 }
