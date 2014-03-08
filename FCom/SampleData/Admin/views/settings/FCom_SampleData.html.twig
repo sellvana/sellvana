@@ -12,6 +12,12 @@
         <div class="panel-collapse collapse in" id="sample-data-load-panel">
             <div class="panel-body">
                 <div class="form-group">
+                    <label class="col-md-2 control-label" for="sample_data_sample_file">{{ "Sample data batch size" | _ }}</label>
+                    <div class="col-md-5"><input type="text" class="form-control" name="{{ baseHtmlName }}[batch_size]"
+                                                 id="sample_data_sample_file" value="{{ c.get(baseConfigPath ~ '/batch_size') }}">
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="col-md-2 control-label" for="sample_data_sample_file">{{ "Sample data file name" | _ }}</label>
                     <div class="col-md-5"><input type="text" class="form-control" name="{{ baseHtmlName }}[sample_file]"
                                                  id="sample_data_sample_file" value="{{ c.get(baseConfigPath ~ '/sample_file') }}">
@@ -33,25 +39,30 @@
                         {#<input type="hidden" name="{{ baseHtmlName }}[load]" value="0"/>#}
                         {#<input id="{{ prefix }}test" type="checkbox" class="switch-cbx" name="{{ baseHtmlName }}[load]"#}
                                {#value="1" {% if c.get(baseConfigPath ~ '/load') == 1 %}checked="checked"{% endif %} />#}
-                        <div class="btn-group">
+                        <div class="form-group">
                             <button class="btn btn-danger" type="button" id="{{ btn }}">Load sample products</button>
+                            <span id="{{ btn }}-loading" style="display: none" class="label label-info">{{ "Loading ..." | _ }}</span>
                             <script type="text/javascript">
                                 require(['jquery'], function($){
                                     var load_url = '{{ APP.href("/sampledata/load") }}';
 
                                     var $btn = $("#{{ btn }}");
+                                    var $loading = $("#{{ btn }}-loading");
                                     $btn.click(function(){
                                         var load = confirm( '{{ "You are about to load sample product data. Do you want to continue" | _ }}' );
                                         if ( load ) {
+                                            $loading.show();
                                             $.get(load_url, {})
                                                     .done(function (data) {
                                                         console.log(data);
-                                                        $.bootstrapGrowl(data.message, {type: data.status, align: 'center', width: 'auto'});
+                                                        $loading.hide();
+//                                                        $.bootstrapGrowl(data.message, {type: data.status, align: 'center', width: 'auto'});
                                                     })
                                                     .fail(function (jqXHR, textStatus, errorThrown) {
                                                         console.log(jqXHR);
                                                         console.log(textStatus);
                                                         console.log(errorThrown);
+                                                        $loading.hide();
                                                         $.bootstrapGrowl(errorThrown, {type: 'error', align: 'center', width: 'auto'});
                                                     });
                                         }
