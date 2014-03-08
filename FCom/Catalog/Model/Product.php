@@ -378,6 +378,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $oldTimeOut = ini_get('max_execution_time');
         ini_set('max_execution_time', 300);
         //HANDLE CONFIG
+        
+        BEvents::i()->fire(__METHOD__.':before', array('data' => &$data, 'config' => &$config));
 
         //multi value separator used to separate values in one column like for images
         //For example: image.png; image2.png; image3.png
@@ -524,7 +526,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
             //$memstart = memory_get_usage();
             //echo $memstart/1024 . "kb<br>";
-            if ( $config[ 'import' ][ 'related' ][ 'import' ] && !empty( $d[ 'related' ] ) ) {
+            if ( !empty($config[ 'import' ][ 'related' ][ 'import' ]) && !empty( $d[ 'related' ] ) ) {
                 $relatedProducts[$p->id()] = explode( $config[ 'format' ][ 'multivalue_separator' ], $d[ 'related' ] );
                 unset( $d[ 'related' ] );
             }
@@ -692,6 +694,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($errors) {
             $result['errors'] = $errors;
         }
+        BEvents::i()->fire(__METHOD__.':after', array('product_ids' => $productIds, 'config' => &$config, 'result' => &$result));
         ini_set('max_execution_time', $oldTimeOut);
         return $result;
     }
