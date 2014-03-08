@@ -43,6 +43,7 @@ class FCom_SampleData_Admin extends BClass
         $headings = fgetcsv( $fr );
 
         $rows = array();
+        FCom_CatalogIndex_Main::i()->autoReindex(false);
         $i = 0;
         while ( $line = fgetcsv( $fr ) ) {
             $row = array_combine( $headings, $line );
@@ -50,12 +51,14 @@ class FCom_SampleData_Admin extends BClass
                 $rows[ ] = $row;
             }
             if($i++ == $batchSize){
+                echo "* ";
                 FCom_Catalog_Model_Product::i()->import( $rows );
                 $rows = array();
                 $i = 1;
             }
         }
         FCom_Catalog_Model_Product::i()->import( $rows );
+        FCom_CatalogIndex_Indexer::i()->indexProducts(true);
         BDebug::log("Sample data imported in: " . round(microtime(true) - $start, 4) . " seconds.");
     }
 }
