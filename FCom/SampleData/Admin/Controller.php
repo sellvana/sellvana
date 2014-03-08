@@ -13,7 +13,9 @@ class FCom_SampleData_Admin_Controller extends FCom_Admin_Controller_Abstract
         $status = 'error';
 
         try {
-            BResponse::i()->startLongResponse();
+            BResponse::i()->startLongResponse(false);
+            BConfig::i()->set('db/logging', 0);
+
             FCom_SampleData_Admin::i()->loadProducts();
             $msg    = 'Sample products imported';
             $status = 'success';

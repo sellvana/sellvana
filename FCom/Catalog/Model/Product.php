@@ -375,8 +375,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (empty($data) || !is_array($data)) {
             return null;
         }
-        BResponse::i()->startLongResponse(false);
-        BConfig::i()->set('db/logging', 0);
+//        BResponse::i()->startLongResponse(false);
         //HANDLE CONFIG
 
         BEvents::i()->fire(__METHOD__.':before', array('data' => &$data, 'config' => &$config));
