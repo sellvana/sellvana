@@ -379,6 +379,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         BConfig::i()->set('db/logging', 0);
         //HANDLE CONFIG
 
+        BEvents::i()->fire(__METHOD__.':before', array('data' => &$data, 'config' => &$config));
+
         //multi value separator used to separate values in one column like for images
         //For example: image.png; image2.png; image3.png
         if (!isset( $config[ 'format' ][ 'multivalue_separator' ] )) {
@@ -699,6 +701,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($errors) {
             $result['errors'] = $errors;
         }
+        BEvents::i()->fire(__METHOD__.':after', array('product_ids' => $productIds, 'config' => &$config, 'result' => &$result));
+
         return $result;
     }
 

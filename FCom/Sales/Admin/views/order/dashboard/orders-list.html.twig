@@ -1,0 +1,33 @@
+{% set orders = APP.instance('FCom_Sales_Admin_Controller_Orders').getOrderRecent() %}
+<div class='box-content' style="height: 300px; overflow-y: scroll">
+    {#<div id='stats-chart1'></div>#}
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+        <tr>
+            <th>{{ "ID"|_ }}</th>
+            <th>{{ "Bill to Name"|_ }}</th>
+            <th>{{ "Order Total"|_ }}</th>
+            <th>{{ "Paid"|_ }}</th>
+            <th>{{ "Status"|_ }}</th>
+            <th>{{ "Order Date"|_ }}</th>
+        </tr>
+        </thead>
+
+        {% if orders is empty %}
+            <tr>
+                <td colspan="6">{{ "No data"|_ }}</td>
+            </tr>
+        {% else %}
+            {% for  order in orders %}
+                <tr>
+                    <td>{{ order.id|_ }}</td>
+                    <td>{{ order.firstname|_ }} {{ order.lastname|_ }}</td>
+                    <td>{{ order.grandtotal|_ }}</td>
+                    <td>{{ order.balance|_ }}</td>
+                    <td>{{ order.status|_ }}</td>
+                    <td>{{ order.create_at|_ }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+</div>
