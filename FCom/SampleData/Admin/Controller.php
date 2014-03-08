@@ -13,7 +13,7 @@ class FCom_SampleData_Admin_Controller extends FCom_Admin_Controller_Abstract
         $status = 'error';
 
         try {
-            BResponse::i()->startLongResponse(false);
+            BResponse::i()->startLongResponse();
             BConfig::i()->set('db/logging', 0);
 
             FCom_SampleData_Admin::i()->loadProducts();
