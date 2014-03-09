@@ -80,7 +80,6 @@
                                                 break;
                                         }
                                     }
-                                    PushClient.listen({channel: 'import', callback: channel_import});
                                     var load_url = '{{ APP.href("/sampledata/load") }}';
 
                                     var $btn = $("#{{ btn }}");
@@ -88,6 +87,7 @@
                                     $btn.click(function(){
                                         var load = confirm( '{{ "You are about to load sample product data. Do you want to continue" | _ }}' );
                                         if ( load ) {
+                                            PushClient.listen({channel: 'import', callback: channel_import});
                                             $loading.show();
                                             $.get(load_url, {})
                                                     .done(function (data) {
