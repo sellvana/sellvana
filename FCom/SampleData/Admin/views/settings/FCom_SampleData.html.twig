@@ -48,18 +48,18 @@
                                     var $logCanvas = $('#{{ btn }}-log');
                                     var found;
                                     function channel_import(msg) {
-                                        console.log(msg);
+//                                        console.log(msg);
                                         switch (msg.signal) {
                                             case 'found':
-                                                $logCanvas.html('<div class="alert-info">Found: ' + msg.found + ' products</div>');
+                                                $logCanvas.html('<div class="alert-info">Found: ' + msg.found + ' lines</div>');
                                                 found = msg.found;
                                                 break;
                                             case 'progress':
                                                 var processed = found - msg.progress;
                                                 var percent = Math.round(processed / found * 100)
                                                 $logCanvas.append('<div class="alert-success">Processed ' + processed + ' of ' +
-                                                    found + ' products - ' +
-                                                    percent + '%</div>');
+                                                        found + ' lines - ' +
+                                                        percent + '%</div>');
                                                 break;
                                             case 'import_time':
                                                 $logCanvas.append('<div class="alert-info">Products imported in: ' +
@@ -67,7 +67,7 @@
                                                 break;
                                             case 'reindex':
                                                 var message;
-                                                if(msg.reindex == 'start') {
+                                                if (msg.reindex == 'start') {
                                                     message = "{{ 'Product indexing started.' | _ }}"
                                                 } else {
                                                     message = "{{ 'Product indexing finished' | _ }}"
@@ -80,6 +80,14 @@
                                                 break;
                                         }
                                     }
+
+                                    function channel_index(msg) {
+                                        $logCanvas.append('<div class="alert-info">Re-indexed: ' + msg.reindexed + ' products</div>');
+                                    }
+
+                                    PushClient.listen({channel: 'import', callback: channel_import});
+                                    PushClient.listen({channel: 'index', callback: channel_index});
+
                                     var load_url = '{{ APP.href("/sampledata/load") }}';
 
                                     var $btn = $("#{{ btn }}");
@@ -87,7 +95,6 @@
                                     $btn.click(function(){
                                         var load = confirm( '{{ "You are about to load sample product data. Do you want to continue" | _ }}' );
                                         if ( load ) {
-                                            PushClient.listen({channel: 'import', callback: channel_import});
                                             $loading.show();
                                             $.get(load_url, {})
                                                     .done(function (data) {
