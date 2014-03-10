@@ -42,7 +42,7 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
         grid.build();
 
         //Depending selected rows count, disable or enable add button of popup
-        mediaGrid.getSelectedRows().on('add remove', function() {
+        mediaGrid.getSelectedRows().on('add remove reset', function() {
             if (mediaGrid.getSelectedRows().length>0) {
                 $('#prod-attachments-modal-add').removeClass('disabled');
             } else {

@@ -37,7 +37,7 @@ require(['jquery','underscore','backbone'], function($, _) {
         var addBtn = $(allProdGrid.getGridSkeleton().AddButton);
 
         //Depending selected rows count, disable or enable add button of popup
-        allProdGrid.getSelectedRows().on('add remove', function() {
+        allProdGrid.getSelectedRows().on('add remove reset', function() {
             if (allProdGrid.getSelectedRows().length>0) {
                 addBtn.removeClass('disabled');
             } else {

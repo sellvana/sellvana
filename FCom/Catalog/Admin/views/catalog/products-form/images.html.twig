@@ -31,10 +31,6 @@ require(['jquery','underscore','backbone'], function($, _) {
 
         $('#prod-image-rows').val(JSON.stringify(rows));
         $('#prod-image-remove').val(removedIds.join(','));
-
-        console.log($('#prod-image-rows').val());
-        console.log($('#prod-image-remove').val());
-        console.log(mainThumb.val());
     }
 
     /*
@@ -45,7 +41,7 @@ require(['jquery','underscore','backbone'], function($, _) {
         grid.build();
 
 
-        mediaGrid.getSelectedRows().on('add remove', function() {
+        mediaGrid.getSelectedRows().on('add remove reset', function() {
             if (mediaGrid.getSelectedRows().length>0) {
                 $('.prod-images-modal-add').removeClass('disabled');
             } else {

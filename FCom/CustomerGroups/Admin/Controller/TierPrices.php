@@ -59,7 +59,7 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
                     'new'=>array('caption'=>'Add New Price'),
                     'delete'=>true
                 ),
-                'register_func'=>'tierPricesGridRegister'
+                'grid_before_create'=>'tierPricesGridRegister'
             )
         );
         return $grid;

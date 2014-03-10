@@ -168,7 +168,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $config[ 'actions' ] = array(
             'add' => array( 'caption' => 'Add selected products' )
         );
-        $config['register_func'] = 'prodLibGridRegister';
+        $config['grid_before_create'] = 'prodLibGridRegister';
         //$config['custom']['autoresize'] = '#linked-products-layout';
         return array( 'config' => $config );
     }
@@ -205,7 +205,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'add'=>array('caption'=>'Add attachments'),
                     'delete'=>array('caption'=>'Remove')
                 ),
-                'register_func'=>'attachmentGridRegister',
+                'grid_before_create'=>'attachmentGridRegister',
                 'filters'=>array(
                     array('field'=>'file_name', 'type'=>'text'),
                     array('field'=>'label', 'type'=>'text'),
@@ -257,7 +257,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'add'=>array('caption'=>'Add images'),
                     'delete'=>array('caption'=>'Remove')
                 ),
-                'register_func'=>'imagesGridRegister',
+                'grid_before_create'=>'imagesGridRegister',
                 'filters'=>array(
                     array('field'=>'file_name', 'type'=>'text'),
                     array('field'=>'label', 'type'=>'text'),
@@ -292,7 +292,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             '_quick'=>array('expr'=>'product_name like ? or local_sku like ? or p.id=?', 'args'=> array('?%', '%?%', '?'))
         );
 
-        $config['register_func'] = 'allProdGridRegister';
+        $config['grid_before_create'] = 'allProdGridRegister';
         /*$config['_callbacks'] = "{
             'add':'categoryProdsMng.addSelectedProds'
         }";*/
@@ -333,7 +333,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('field'=>'local_sku', 'type'=>'text')
         );
         $config['data_mode'] = 'local';
-        $config['register_func'] = 'catProdGridRegister';
+        $config['grid_before_create'] = 'catProdGridRegister';
 
         return array('config'=>$config);
     }
@@ -382,7 +382,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('field'=>'local_sku', 'type'=>'text')
                 ),
                 'events'=>array('init', 'add','mass-delete'),
-                'register_func'=>$gridId.'_register'
+                'grid_before_create'=>$gridId.'_register'
             );
 
 

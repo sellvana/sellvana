@@ -133,7 +133,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             'edit' => array('caption'=>'Change Status')
         );
         $config['events'] = array('edit', 'mass-edit');
-        $config['register_func'] = 'moduleGridRegister';
+        $config['grid_before_create'] = 'moduleGridRegister';
 
         //$config['state'] =array(5,6,7,8);
         return $config;

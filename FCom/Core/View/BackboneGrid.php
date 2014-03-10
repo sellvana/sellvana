@@ -300,7 +300,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             return;
         }
         $grid = $this->grid;
+
         foreach ($grid['config']['actions'] as $k=>&$action) {
+            //var_dump($action);
             if (!empty(static::$_defaultActions[$k])) {
 
                 switch ($k) {
@@ -351,10 +353,11 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 }
             } else {
                 $action = array('html'=>BUtil::tagHtml('button',
-                            array('class'=>isset($action['class'])? 'btn '.$action['class'] : 'btn', 'type'=>'button', 'id'=>isset($action['class']) ? $action['class'] : ''),
+                            array('class'=>isset($action['class'])? 'btn '.$action['class'] : 'btn', 'type'=>'button', 'id'=>isset($action['id']) ? $action['id'] : ''),
                             isset($action['caption']) ? $action['caption'] : BLocale::_('Add')
                 ));
-                break;
+
+
             }
         }
         unset($action);

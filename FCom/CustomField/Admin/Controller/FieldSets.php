@@ -42,7 +42,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                             array('field'=>'set_code', 'type'=>'text'),
                             '_quick'=>array('expr'=>'product_name like ? or set_code like ', 'args'=> array('%?%', '%?%'))
                 ),
-                'register_func'=>'customFieldsGridRegister'
+                'grid_before_create'=>'customFieldsGridRegister'
 //                'new_button' => '#add_new_field_set'
             )
         );
@@ -74,7 +74,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'actions'=>array(
                                     'delete' => array('caption' => 'Remove', 'confirm'=>false)
                                 ),
-                'register_func'=>'selectedFieldGridRegister'
+                'grid_before_create'=>'selectedFieldGridRegister'
             )
         );
 
@@ -104,7 +104,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'actions'=>array(
                                     'add' => array('caption' => 'Add Selected Fields')
                                 ),
-                'register_func'=>'addFieldGridRegister'
+                'grid_before_create'=>'addFieldGridRegister'
             )
         );
 
@@ -184,7 +184,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                                     'delete'=>true
                                 ),
                 //'callbacks'=>array('after_render'=>'afterRowRenderFieldsGrid'),
-                'register_func'=>'fieldsGridRegister',
+                'grid_before_create'=>'fieldsGridRegister',
                 'new_button' => '#add_new_field'
             )
         );
@@ -216,7 +216,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                                     'new' => array('caption' => 'Insert New Option'),
                                     'delete' => array('caption' => 'Remove', 'confirm' => false)
                                 ),
-                'register_func'=>'optionsGridRegister'
+                'grid_before_create'=>'optionsGridRegister'
             )
         );
 
