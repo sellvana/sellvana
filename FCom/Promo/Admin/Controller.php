@@ -244,7 +244,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $config[ 'filters' ] = array(
             array( 'field' => 'product_name', 'type' => 'text' )
         );
-        $config['register_func'] = $gridId.'_register';
+        $config['grid_before_create'] = $gridId.'_register';
 
 //        $config = array(
 //            'grid' => array(

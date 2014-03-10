@@ -50,7 +50,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'actions'=>array(
                                    'delete' => array('caption' => 'Remove')
                                 ),
-                'register_func'=>'variantFieldGridRegister'
+                'grid_before_create'=>'variantFieldGridRegister'
             )
         );
 
@@ -119,7 +119,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                                     'new'=>array('caption'=>'New Variant'),
                                     'delete' => array('caption' => 'Remove')
                                 ),
-                'register_func'=>'variantGridRegister'
+                'grid_before_create'=>'variantGridRegister'
             )
         );
 
@@ -157,7 +157,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                                     'add' => array('caption' => 'Add Fields'),
                                     'delete' => array('caption' => 'Remove')
                                 ),
-                'register_func'=>'frontendFieldGridRegister'
+                'grid_before_create'=>'frontendFieldGridRegister'
             )
         );
 

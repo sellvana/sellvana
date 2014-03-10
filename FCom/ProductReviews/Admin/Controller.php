@@ -67,11 +67,11 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         if (!$productModel) {
 //            $config['actions']['new'] = array('caption' => 'New Product Review', 'modal' => true);
         }
-        $config['actions'] += array(
+        $config['actions'] = array(
             'export'  => true,
             'delete'  => true,
-            'approve' => array('html' => '<button type="button" class="btn btn-primary disabled" id="prod-reviews-approve"><span>Approve</span></button>'),
-            'deny'    => array('html' => '<button type="button" class="btn btn-warning disabled" id="prod-reviews-deny"><span>Deny</span></button>'),
+            'deny'    => array('class'=>'btn btn-warning disabled', 'id'=>"prod-reviews-deny", 'caption'=>'Deny'),
+            'approve' => array('class'=>"btn btn-primary disabled", 'id'=>"prod-reviews-approve", 'caption'=>'Approve'),
         );
 
 
@@ -135,7 +135,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $config['callbacks'] = array('after_gridview_render' => $callbacks);
         $config['new_button'] = '#add_new_product_review';
 
-        $config['register_func'] = $config['id'].'_register';
+        $config['grid_before_create'] = $config['id'].'_register';
         return $config;
     }
 

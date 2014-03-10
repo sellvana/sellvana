@@ -106,7 +106,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             array('field'=>'status', 'type' => 'multiselect')
         );
         $config['data_mode'] = 'local';
-        $config['register_func'] = 'rolesGridRegister';
+        $config['grid_before_create'] = 'rolesGridRegister';
         $config['events'] = array('init', 'add','mass-delete');
 
         return array('config'=>$config);
@@ -142,7 +142,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         if ($filterAdmin) {
             $config['orm'] = FCom_Admin_Model_User::i()->orm()->where('is_superadmin', 0);
         }
-        $config['register_func'] = 'userGridRegister';
+        $config['grid_before_create'] = 'userGridRegister';
         $config['events'] = array('add');
 
         return array('config' => $config);

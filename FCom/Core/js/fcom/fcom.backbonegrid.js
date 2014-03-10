@@ -554,8 +554,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     //console.log('add');
                 },
                 removeInOriginal: function (model) {
+
                     this.originalRows.remove(model);
-                    //console.log('remove');
+                    console.log('remove');
                 },
                 sortLocalData: function () {
                     if (BackboneGrid.currentState.s !== '' && BackboneGrid.currentState.sd !== '') {
@@ -712,7 +713,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         confirm = window.confirm("Do you want to really delete?");
 
                     if (confirm) {
-                        rowsCollection.remove(this.model, {silent: true});
+                        rowsCollection.remove(this.model/*, {silent: true}*/);
                         selectedRows.remove(this.model, {silent: true});
                         this._destorySelf();
                     }
@@ -1741,9 +1742,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 return gridView;
             }
 
-            this.getThView = function() {
-                return t
-            }
             this.getRows = function() {
                 return rowsCollection;
             }
@@ -1990,7 +1988,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         $(BackboneGrid.MassDeleteButton).addClass('disabled');
                         $(BackboneGrid.MassEditButton).addClass('disabled');
                     }
-                    console.log(typeof(gridView.afterSelectionChanged));
+
                     if (typeof(gridView.afterSelectionChanged) === 'function')
                         gridView.afterSelectionChanged();
 
@@ -2025,8 +2023,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
 
                     setLocalPageInfo();
-                    rowsCollection.on('add remove reset filter', function () {
-                        console.log('change');
+                    rowsCollection.on('add remove reset filter', function (ev) {
+                        console.log(ev);
                         setLocalPageInfo();
                     });
                 }
@@ -2202,8 +2200,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             }
 
 
-            if (typeof(config.register_func) !== 'undefined') {
-                window[config.register_func](this);
+            if (typeof(config.grid_before_create) !== 'undefined') {
+                window[config.grid_before_create](this);
             } else {
                 this.build();
             }

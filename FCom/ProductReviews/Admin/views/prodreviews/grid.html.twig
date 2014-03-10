@@ -21,7 +21,6 @@ require(["jquery", "underscore", "jquery.validate"], function($, _) {
     window.{{ grid['config']['id']}}_register = function(grid) {
         reviewGrid = grid;
         grid.getGridSkeleton().Views.GridView.prototype.afterSelectionChanged = function() {
-            console.log('fff');
             if (reviewGrid.getSelectedRows().length > 0) {
                 btnApprove.removeClass('disabled');
                 btnDeny.removeClass('disabled');
@@ -56,6 +55,7 @@ require(["jquery", "underscore", "jquery.validate"], function($, _) {
             //TODO implement collection update method
 
         }
+        $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
     }
 });
 
