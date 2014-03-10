@@ -181,12 +181,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return hash;
                 },
                 events: {
-                    'click a': '_changesortState',
-                    'change select.js-sel': '_checkAction',
+                    'click a.js-change-url': '_changesortState',
                     'click ul.dropdown-menu.js-sel>li>a': '_checkAction'
                 },
                 initialize: function () {
-                    // this.model.on('change', this, this);
                     this.model.on('render', this.render, this);
                 },
                 _selectPageAction: function (flag) {
@@ -225,11 +223,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         this._selectAction(ev.target);
                     else
                         this._showAction(ev.target);
-
-                    ev.stopPropagation();
-                    ev.preventDefault();
-
-                    return false;
                 },
                 //function to show All,Selected or Unselelected rows
                 _showAction: function (eleSelected) {
@@ -244,8 +237,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 BackboneGrid.data_mode = BackboneGrid.prev_data_mode;
                                 rowsCollection.originalRows = BackboneGrid.prev_originalRows;
                                 BackboneGrid.showingSelected = false;
+                                $('.f-grid-bottom.f-grid-toolbar.'+BackboneGrid.id+' > div.pagination').css('display', 'block');
                                 if (BackboneGrid.data_mode !== 'local') {
-                                    $('.f-htmlgrid-toolbar.' + BackboneGrid.id + ' > div.pagination').css('display', 'block');
                                     rowsCollection.fetch({reset: true});
                                 } else {
                                     rowsCollection.filter();
@@ -258,15 +251,21 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 displayType.find('span.title').html('S');
                                 //console.log('show_sel!');
                                 BackboneGrid.prev_data_mode = BackboneGrid.data_mode;
+                                if (!rowsCollection.originalRows) {
+                                    rowsCollection.originalRows = new Backbone.Collection();
+                                }
                                 BackboneGrid.prev_originalRows = rowsCollection.originalRows;
                                 BackboneGrid.showingSelected = true;
-                                if (BackboneGrid.data_mode !== 'local') {
-                                    $('.f-htmlgrid-toolbar.' + BackboneGrid.id + ' > div.pagination').css('display', 'none');
-                                }
+                                console.log('consof',BackboneGrid.data_mode)
+                                //if (BackboneGrid.data_mode !== 'local') {
+                                    $('.f-grid-bottom.f-grid-toolbar.' + BackboneGrid.id + ' > div.pagination').css('display', 'none');
+                                //}
 
                                 BackboneGrid.data_mode = 'local';
+                                console.log(selectedRows.models);
                                 rowsCollection.originalRows = selectedRows;
-                                rowsCollection.reset(selectedRows.models);
+                                rowsCollection.reset(selectedRows.toJSON());
+
                                 //console.log(selectedRows);
                             }
                             break;
@@ -546,8 +545,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                     }
 //                    console.log(temp.models.length);
-                    this.reset(temp.models);
+
+                    this.reset(temp.toJSON(), {silent: true});
                     gridView.render();
+
                 },
                 addInOriginal: function (model) {
                     this.originalRows.add(model);
@@ -575,6 +576,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
                 },
                 url: function () {
+                    if (BackboneGrid.data_mode !== 'server') {
+                        return false;
+                    }
+
                     var append = '';
                     var keys = ['p', 's', 'sd', 'ps'];
                     for (var i in keys) {
