@@ -375,21 +375,25 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (empty($data) || !is_array($data)) {
             return null;
         }
-        $oldTimeOut = ini_get('max_execution_time');
-        ini_set('max_execution_time', 300);
+//        BResponse::i()->startLongResponse(false);
         //HANDLE CONFIG
+
+        BEvents::i()->fire(__METHOD__.':before', array('data' => &$data, 'config' => &$config));
 
         //multi value separator used to separate values in one column like for images
         //For example: image.png; image2.png; image3.png
-        if (!isset($config['format']['multivalue_separator'])) {
-            $config['format']['multivalue_separator'] = ';';
+        if (!isset( $config[ 'format' ][ 'multivalue_separator' ] )) {
+            $config[ 'format' ][ 'multivalue_separator' ] = ';';
         }
+        $ms = $config[ 'format' ][ 'multivalue_separator' ];
 
         //nesting level separator used to separate nesting of categories
         //For example: Category1 > Category2; Category3 > Category4 > Category5;
         if (!isset($config['format']['nesting_separator'])) {
             $config['format']['nesting_separator'] = '>';
         }
+
+        $ns = $config['format']['nesting_separator'];
 
         //product import actions: create, update, create_or_update
         if (!isset($config['import']['actions'])) {
@@ -401,9 +405,14 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $config['import']['images']['import'] = true;
         }
 
-        //reatain image subfolders - default false
+        //reatain image subfolders - default true
         if (!isset($config['import']['images']['with_subfolders'])) {
             $config['import']['images']['with_subfolders'] = true;
+        }
+
+        // import related products - default true
+        if ( !isset( $config[ 'import' ][ 'related' ][ 'import' ] ) ) {
+            $config[ 'import' ][ 'related' ][ 'import' ] = true;
         }
 
         //import categories - default true
@@ -450,16 +459,15 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
             $categoriesPath = array();
             if ($config['import']['categories']['import'] && !empty($d['categories'])) {
-                $categoriesPath = explode($config['format']['multivalue_separator'], $d['categories']);
+                $categoriesPath = explode( $ms, $d['categories']);
                 unset($d['categories']);
             }
 
             $imagesNames = array();
             if ($config['import']['images']['import'] && !empty($d['images'])) {
-                $imagesNames = explode($config['format']['multivalue_separator'], $d['images']);
+                $imagesNames = explode( $ms, $d['images']);
                 unset($d['images']);
             }
-
             //HANDLE CUSTOM FIELDS
             if ($config['import']['custom_fields']['import']) {
                 //find intersection of custom fields with data fields
@@ -521,13 +529,15 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             } else {
                 $result[]['status'] = 'updated';
             }
+            $pId = $p->id();
 
             //$memstart = memory_get_usage();
             //echo $memstart/1024 . "kb<br>";
             if ( $config[ 'import' ][ 'related' ][ 'import' ] && !empty( $d[ 'related' ] ) ) {
-                $relatedProducts[$p->id()] = explode( $config[ 'format' ][ 'multivalue_separator' ], $d[ 'related' ] );
+                $relatedProducts[ $pId ] = explode( $ms, $d[ 'related' ] );
                 unset( $d[ 'related' ] );
             }
+
             $p->set($d);
             if ($p->is_dirty()) {
                 $p->save();
@@ -536,9 +546,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             //set custom fields for product
             if (!empty($cfIntersection)) {
                 foreach($cfIntersection as $cfk) {
-                    $customFields[$p->id()][$cfk] = $d[$cfk];
+                    $customFields[ $pId ][$cfk] = $d[$cfk];
                 }
             }
+
             //echo memory_get_usage()/1024 . "kb<br>";
             //echo (memory_get_usage()-$memstart)/1024 . "kb - diff<br><hr/>";
 
@@ -568,10 +579,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     foreach($categoriesPath as $catpath) {
                         /** @var FCom_Catalog_Model_Category $parent */
                         $parent = $topParentCategory;
-                        $catNodes = explode($config['format']['nesting_separator'], $catpath);
+                        $catNodes = explode($ns, $catpath);
                         /*print_r($catpath);
                         echo "\n";
-                        print_r($config['format']['nesting_separator']);
+                        print_r($ns);
                         echo "\n";
                         print_r($catNodes);
                          *
@@ -612,13 +623,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     if (!empty($categories)) {
                         foreach($categories as $category) {
                             $catProduct = FCom_Catalog_Model_CategoryProduct::i()->orm()
-                                    ->where('product_id', $p->id())
+                                    ->where('product_id', $pId )
                                     ->where('category_id', $category->id())
                                     ->find_one();
                             if (!$catProduct) {
                                 try {
                                     FCom_Catalog_Model_CategoryProduct::orm()
-                                        ->create(array('product_id' => $p->id(), 'category_id'=>$category->id()))
+                                        ->create(array('product_id' => $pId, 'category_id'=>$category->id()))
                                         ->save();
                                 } catch (Exception $e) {
                                     $errors[] = $e->getMessage();
@@ -632,7 +643,6 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 }
             }
 
-
             //HANDLE IMAGES
             if (!empty($imagesNames)) {
                 $imagesResult = $this->_importImages( $config, $imagesNames, $p );
@@ -641,14 +651,12 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 }
             }
 
-            $productIds[] = $p->id();
-//            unset($fileId);
-//            unset($att);
-            unset($data[$i]);
+            $productIds[] = $pId;
         }
 
         //HANDLE CUSTOM FIELDS to product relations
-        if ($config['import']['custom_fields']['import'] && !empty($cfIntersection) && !empty($productIds)) {
+        if ($config['import']['custom_fields']['import']
+            && !empty($cfIntersection) && !empty($productIds) && !empty($cfFields)) {
             //get custom fields values from data
             $fieldIds = array();
             foreach($cfIntersection as $cfk) {
@@ -692,7 +700,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($errors) {
             $result['errors'] = $errors;
         }
-        ini_set('max_execution_time', $oldTimeOut);
+        BEvents::i()->fire(__METHOD__.':after', array('product_ids' => $productIds, 'config' => &$config, 'result' => &$result));
+
         return $result;
     }
 
@@ -838,8 +847,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
                 if ( !empty( $temp ) ) {
                     // fetch related sku objects
-                    $related = $this->orm()->select( array( 'id', 'local_sku' ) )
-                                    ->where_in( "local_sku", $temp )
+                    $related = $this->orm()->where_in( "local_sku", $temp )
                                     ->find_many();
 
                     foreach ( $related as $r ) {
