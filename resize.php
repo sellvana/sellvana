@@ -92,7 +92,7 @@ class ImageResizer
     protected function validate()
     {
         if ( empty( $_SERVER[ 'HTTP_REFERER' ] ) ) {
-//            $this->restrict();
+            $this->restrict();
         }
         return;
         $webFolder = preg_replace( '#' . __FILE__ . '$#', '', $_SERVER[ 'SCRIPT_NAME' ] );
