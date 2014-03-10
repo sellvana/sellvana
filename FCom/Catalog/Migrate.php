@@ -360,4 +360,14 @@ class FCom_Catalog_Migrate extends BClass
         ));
         */
     }
+
+    public function upgrade__0_2_18__0_2_19()
+    {
+        $tProduct = FCom_Catalog_Model_Product::table();
+        BDb::ddlTableDef($tProduct, array(
+            'KEYS' => array(
+                'UNQ_product_name' => 'DROP',
+            ),
+        ));
+    }
 }
