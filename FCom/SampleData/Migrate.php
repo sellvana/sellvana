@@ -65,4 +65,34 @@ class FCom_SampleData_Migrate extends BClass
             }
         }
     }
+
+    public function upgrade__0_1_0__0_1_1()
+    {
+        $fields = array(
+            'finish',
+            'ship_type',
+            'lead_time'
+        );
+
+        $indexFields = FCom_CatalogIndex_Model_Field::orm()->where_in( 'field_name', $fields )->find_many();
+        $nextCount = BORM::get_db()->query( 'SELECT max(`filter_order`) as "max" FROM ' . FCom_CatalogIndex_Model_Field::table() )->fetchAll();
+        $nextCount = $nextCount[0]['max'] + 1;
+
+        if ( $indexFields ) {
+            foreach ( $indexFields as $f ) {
+                /** @var FCom_CatalogIndex_Model_Field $f */
+                if ( $f->get( 'filter_type' ) == 'none' ) {
+                    $f->set( 'filter_type', 'inclusive' );
+                }
+                if ( !$f->get( 'filter_counts' ) ) {
+                    $f->set( 'filter_counts', 1 );
+                }
+                if ( !$f->get( 'filter_order' ) ) {
+                    $f->set( 'filter_order', $nextCount++ );
+                }
+                $f->save();
+            }
+
+        }
+    }
 }
