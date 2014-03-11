@@ -125,7 +125,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function imageUrl($full=false)
     {
-        $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media/';
+        $media = BConfig::i()->get('web/media_dir');# ? BConfig::i()->get('web/media_dir') : 'media/';
         $url = $full ? BApp::href('/') : '';
         $thumbUrl = $this->get('thumb_url');
         return $url.$media.'/'.($thumbUrl ? $thumbUrl : 'image-not-found.jpg');

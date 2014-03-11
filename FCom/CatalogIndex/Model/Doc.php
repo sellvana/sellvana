@@ -7,6 +7,9 @@ class FCom_CatalogIndex_Model_Doc extends FCom_Core_Model_Abstract
 
     static public function flagReindex($productIds)
     {
+        if (!$productIds) {
+            return;
+        }
         static::update_many(array('flag_reindex' => 1), array('id' => $productIds));
     }
 }
