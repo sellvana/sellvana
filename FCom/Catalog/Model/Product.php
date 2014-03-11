@@ -140,6 +140,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         //todo: check out for unique url_key before save
         if (!$this->get('url_key')) $this->generateUrlKey();
 
+
         if (!$this->get('create_at'))  $this->set('create_at', BDb::now());
         $this->set('update_at', BDb::now());
 
@@ -206,7 +207,27 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         //$key = $this->manuf()->manuf_name.'-'.$this->local_sku.'-'.$this->product_name;
         $key = $this->product_name;
-        $this->set('url_key', BLocale::transliterate($key));
+        $url_key = BLocale::transliterate( $key );
+        $t = static::$_table;
+        $count_sql = "SELECT COUNT(*) from {$t} WHERE url_key=?";
+        $result = $this->orm()->raw_query( $count_sql, array( $url_key ) );
+        if ( $result->find_one() ) {
+            $match_sql        = "SELECT url_key FROM {$t} WHERE url_key LIKE ?";
+            $result           = $this->orm()->raw_query( $match_sql, array( $url_key . '%' ) )->find_many();
+            $similar_url_keys = array();
+            foreach ( $result as $row ) {
+                $similar_url_keys[ $row->get( 'url_key' ) ] = 1;
+            }
+
+            for ( $i = 1; $i < 1001; $i++ ) {
+                $tmp = $url_key . '-' . $i;
+                if ( !isset( $similar_url_keys[ $tmp ] ) ) {
+                    $url_key = $tmp;
+                    break;
+                }
+            }
+        }
+        $this->set('url_key', $url_key );
         return $this;
     }
 
@@ -507,9 +528,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 if (isset($d['local_sku'])) {
                     $p = $this->orm()->where("local_sku", $d['local_sku'])->find_one();
                 }
-                if (!$p && isset($d['product_name'])) {
-                    $p = $this->orm()->where("product_name", $d['product_name'])->find_one();
-                }
+//                if (!$p && isset($d['product_name'])) {
+//                    $p = $this->orm()->where("product_name", $d['product_name'])->find_one();
+//                }
                 if (!$p && isset($d['url_key'])) {
                     $p = $this->orm()->where("url_key", $d['url_key'])->find_one();
                 }
@@ -522,6 +543,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     $p = $this->orm()->create($d)->save();
                     $result[]['status'] = 'created';
                 } catch (Exception $e) {
+                    BDebug::log($e->getMessage());
                     $errors[] = $e->getMessage();
                     $result[]['status'] = 'error';
                     continue;
