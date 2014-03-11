@@ -411,6 +411,7 @@ class FCom_Core_Main extends BClass
     public function getConfigVersionHash()
     {
         $dir = BConfig::i()->get('fs/config_dir');
+        $hash = '';
         foreach (array('core', 'db', 'local') as $f) {
             $hash += filemtime($dir.'/'.$f);
         }
