@@ -340,7 +340,8 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $services = $shippingMethod->getDefaultService();
             $this->shipping_service = key($services);
         } else {
-            throw new BException("No shipping methods configured.");
+            // handle orders with no shipping needed
+            #throw new BException("No shipping methods configured.");
         }
 
         if (!$this->payment_method) {
