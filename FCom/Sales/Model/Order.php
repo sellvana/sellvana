@@ -233,7 +233,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $salesOrder = static::_createFromCart($cart);
 
         $salesOrder->save(); // save to have valid unique_id
-        if(isset($options['all_components']) && $options['all_components']){
+        if (isset($options['all_components']) && $options['all_components']) {
             $options['order_id'] = $salesOrder->id();
             static::createOrderItems($cart, $options);
             static::createOrderAddress($cart, $options);
@@ -243,6 +243,12 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             $paymentMethod = $cart->getPaymentMethod();
             static::createOrderPayment($paymentMethod, $salesOrder, $options);
         }
+        BEvents::i()->fire(__METHOD__.':after', array(
+            'cart'           => $cart,
+            'options'        => $options,
+            'payment_method' => $paymentMethod,
+            'order'          => $salesOrder,
+        ));
         return $salesOrder;
     }
 
