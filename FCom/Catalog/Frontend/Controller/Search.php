@@ -58,6 +58,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $rowsView->products = $productsData['rows'];
 
         $layout->view('catalog/product/pager')->set(array('query' => $q, 'filters' => $filter));
+        $layout->view('catalog/nav')->set(array('category' => $category));
 
         FCom_Core_Main::i()->lastNav(true);
 

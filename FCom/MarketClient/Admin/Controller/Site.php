@@ -7,7 +7,7 @@ class FCom_MarketClient_Admin_Controller_Site extends FCom_Admin_Controller_Abst
         $hlp = FCom_MarketClient_RemoteApi::i();
         $data = $hlp->requestSiteNonce();
         if (!empty($data['nonce'])) {
-            $setupUrl = $hlp->getUrl('market/site/setup', array(
+            $setupUrl = $hlp->getUrl('market/site/sso', array(
                 'nonce' => $data['nonce'],
                 'hash' => sha1(BConfig::i()->get('modules/FCom_MarketClient/site_key')),
                 'redirect_to' => $hlp->getUrl('market'),
@@ -35,6 +35,6 @@ class FCom_MarketClient_Admin_Controller_Site extends FCom_Admin_Controller_Abst
             BConfig::i()->set('modules/FCom_MarketClient/site_key', $response['site_key'], false, true);
             FCom_Core_Main::i()->writeConfigFiles('local');
         }
-        BResponse::i()->redirect($hlp->getUrl());
+        BResponse::i()->redirect($hlp->getUrl('market'));
     }
 }
