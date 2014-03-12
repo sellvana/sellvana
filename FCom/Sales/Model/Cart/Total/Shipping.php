@@ -4,4 +4,5 @@ class FCom_Sales_Model_Cart_Total_Shipping extends FCom_Sales_Model_Cart_Total_A
 {
     protected $_label = 'Shipping & Handling';
     protected $_sortOrder = 40;
+
 }
