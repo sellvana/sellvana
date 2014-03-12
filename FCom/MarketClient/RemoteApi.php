@@ -2,9 +2,11 @@
 
 final class FCom_MarketClient_RemoteApi extends BClass
 {
+    protected $_apiUrl = 'https://www.sellvana.com/';
+
     public function getUrl($path = '', $params = array())
     {
-        $url = 'https://www.sellvana.com/'; # 'https://fulleron.com/';
+        $url = $this->_apiUrl;
         $url .= ltrim($path, '/');
         if ($params) {
             $url = BUtil::setUrlQuery($url, $params);
@@ -21,16 +23,25 @@ final class FCom_MarketClient_RemoteApi extends BClass
         ));
         $response = BUtil::remoteHttp('GET', $url);
         $result = BUtil::fromJson($response);
-        if (!empty($result['error']) && $result['error']==='not_found') {
-            // assigned site key is not found
-            BConfig::i()->set('modules/FCom_MarketClient/site_key', null, false, true);
-            FCom_Core_Main::i()->writeConfigFiles();
-            $url = $this->getUrl('api/v1/market/site/nonce', array(
-                'admin_url' => BApp::href(),
-            ));
-            $response = BUtil::remoteHttp('GET', $url);
-            $result = BUtil::fromJson($response);
+        if (!empty($result['site_key'])) {
+            BConfig::i()->set('modules/FCom_MarketClient/site_key', $result['site_key'], false, true);
+            FCom_Core_Main::i()->writeConfigFiles('local');
         }
+        /*
+        if (!empty($result['error'])) {
+            switch ($result['error']) {
+                case 'not_found': case 'unknown_ip':
+                    // assigned site key is not found
+                    
+                    $url = $this->getUrl('api/v1/market/site/nonce', array(
+                        'admin_url' => BApp::href(),
+                    ));
+                    $response = BUtil::remoteHttp('GET', $url);
+                    $result = BUtil::fromJson($response);
+                    break;
+            }
+        }
+        */
         return $result;
     }
 
