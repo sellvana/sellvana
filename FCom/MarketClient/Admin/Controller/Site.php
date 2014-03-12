@@ -35,6 +35,6 @@ class FCom_MarketClient_Admin_Controller_Site extends FCom_Admin_Controller_Abst
             BConfig::i()->set('modules/FCom_MarketClient/site_key', $response['site_key'], false, true);
             FCom_Core_Main::i()->writeConfigFiles('local');
         }
-        BResponse::i()->redirect($hlp->getUrl());
+        BResponse::i()->redirect($hlp->getUrl('market'));
     }
 }
