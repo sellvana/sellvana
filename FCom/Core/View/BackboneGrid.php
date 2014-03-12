@@ -358,7 +358,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $this->_processPersonalization();
 
         $grid = $this->grid;
-        BEvents::i()->fire(__METHOD__.'.after', array('grid'=>&$grid));
+        BEvents::i()->fire(__METHOD__.':after', array('grid'=>&$grid));
         $grid['_processed'] = true;
         $this->grid = $grid;
 
@@ -391,7 +391,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             if (is_string($orm)) {
                 $orm = $orm::i()->orm();
             }
-            BEvents::i()->fire(__METHOD__.'.initORM: '.$config['id'], array('orm'=>$orm, 'grid'=>$grid));
+            BEvents::i()->fire(__METHOD__.':initORM:'.$config['id'], array('orm'=>$orm, 'grid'=>$grid));
 
 
             $gridId = $config['id'];
@@ -427,7 +427,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             //var_dump($grid['result']);exit;
             $grid['result']['state']['description'] = $this->stateDescription($grid['result']['state']);
 
-            BEvents::i()->fire(__METHOD__.'.after: '.$config['id'], array('grid' =>& $grid));
+            BEvents::i()->fire(__METHOD__.':after:'.$config['id'], array('grid' =>& $grid));
         }
 
         //$mapColumns = array();
@@ -668,7 +668,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
         if (!is_null($method)) {
             //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
-            BEvents::i()->fire($method.'.orm', array('orm'=>$orm));
+            BEvents::i()->fire($method.':orm', array('orm'=>$orm));
         }
 
         //TODO is there any better way to return all rows in paginate function?
@@ -684,9 +684,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         //$data['hash'] = base64_encode(BUtil::toJson(BUtil::arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);
         /*if (!is_null($method)) {
-            BEvents::i()->fire($method.'.data', array('data'=>&$data));
+            BEvents::i()->fire($method.':data', array('data'=>&$data));
         }*/
-        BEvents::i()->fire(__METHOD__.'.data', array('data'=>&$data));
+        BEvents::i()->fire(__METHOD__.':data', array('data'=>&$data));
         return $data;
     }
 

@@ -370,7 +370,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             );
 
 
-        //BEvents::i()->fire(__METHOD__.'.orm', array('type'=>$type, 'orm'=>$orm));
+        //BEvents::i()->fire(__METHOD__.':orm', array('type'=>$type, 'orm'=>$orm));
         $data = BDb::many_as_array($orm->find_many());
         //unset unused columns
         /*$columnKeys = array_keys($config['columns']);
@@ -384,7 +384,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
         $config['data'] = $data;
 
-        //BEvents::i()->fire(__METHOD__.'.config', array('type'=>$type, 'config'=>&$config));
+        //BEvents::i()->fire(__METHOD__.':config', array('type'=>$type, 'config'=>&$config));
         return array('config'=>$config);
     }
 
