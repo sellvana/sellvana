@@ -188,7 +188,8 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     public function refreshDescendants($save=false, $resetUrl=false)
     {
-        foreach ($this->descendants() as $c) {
+        $children = $this->children();
+        foreach ($children as $c) {
             $c->set(array(
                     'id_path' => $this->get('id_path') .'/'.$c->id(),
                     'full_name' => $this->get('full_name').static::$_separator.$c->get('node_name'),
@@ -365,7 +366,9 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     public function generateUrlPath()
     {
         $urlKey = $this->get('url_key');
-        $urlPath = $this->parent() ? $this->parent()->get('url_path') : null;
+        $parent = $this->parent();
+        //todo: confirm with Boris system don't save url_path of root node
+        $urlPath = ($parent && $parent->get('parent_id')) ? $parent->get('url_path') : null;
         if ($urlPath) {
             $urlKey = trim($urlPath.'/'.$urlKey, '/');
         }
