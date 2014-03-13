@@ -1040,6 +1040,7 @@ class BUtil extends BClass
             }
             static::$_lastRemoteHttpInfo['headers'][strtolower($arr[0])] = trim($arr[1]);
         }
+        #BDebug::log(print_r(compact('method', 'url', 'data', 'response'), 1), 'remotehttp.log');
 
         return $response;
     }
