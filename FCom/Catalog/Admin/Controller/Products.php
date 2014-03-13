@@ -278,6 +278,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         );
 
         $config['events'] = array('add');
+        // productExcludeId is callbacks function , use to filters product_id in merchandising tab.
+        $config['exclude_id']  = "productExcludeId";
         /*$config['_callbacks'] = "{
             'add':'categoryProdsMng.addSelectedProds'
         }";*/

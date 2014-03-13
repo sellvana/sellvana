@@ -1868,6 +1868,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     if (li.hasClass('page'))
                         BackboneGrid.currentState.p = parseInt(li.find('a').html());
                     updatePageHtml();
+
+                    setExcludeId();
                     rowsCollection.fetch({reset: true});
                     ev.preventDefault();
                     return;
@@ -1875,6 +1877,15 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 updatePageHtml();
             }
+
+            function setExcludeId() {
+                if (typeof(config.exclude_id) !== 'undefined') {
+                    var script = config.exclude_id + '(BackboneGrid, rowsCollection);';
+                    var data = eval(script);
+                    BackboneGrid.current_filters['exclude_id'] =  data;
+                }
+            }
+
             //header view
             var columns = config.columns;
             columnsCollection = new BackboneGrid.Collections.ColsCollection;
@@ -2062,6 +2073,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     BackboneGrid.currentState.p = 1;
                     //@Todo: fixed, but should find better solutions for backbonegrid
                     if (typeof (config.data_url) !== 'undefined') {
+                        setExcludeId();
                         rowsCollection.fetch({reset: true});
                     }
                     $(this).parents('li:first').addClass('active');
@@ -2309,6 +2321,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             }
 
             setModalHeight();
+            setExcludeId();
         }
 
     }

@@ -58,6 +58,9 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         if (isset($options['callbacks'])) {
             $config['config']['callbacks'] = $options['callbacks'];
         }
+        if (isset($options['exclude_id'])) {
+            $config['config']['exclude_id'] = $options['exclude_id'];
+        }
         if (!empty($options['config'])) {
             $config = BUtil::arrayMerge($config, $options['config']);
         }
@@ -70,11 +73,19 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     {
         switch (BRequest::i()->params('do')) {
         case 'data':
+            $r = BRequest::i()->get();
             $folder = $this->getFolder();
             $orm = FCom_Core_Model_MediaLibrary::i()->orm()->table_alias('a')
                 ->where('folder', $folder)
                 ->select(array('a.id', 'a.folder', 'a.file_name', 'a.file_size'))
             ;
+            if (isset($r['filters'])) {
+                $filters = BUtil::fromJson($r['filters']);
+                if (isset($filters['exclude_id']) && $filters['exclude_id'] != '') {
+                    $arr = explode(',', $filters['exclude_id']);
+                    $orm =  $orm->where_not_in('a.id', $arr);
+                }
+            }
             $data = FCom_Core_View_BackboneGrid::i()->processORM($orm);
             BResponse::i()->json(array(
                     array('c' => $data['state']['c']),
