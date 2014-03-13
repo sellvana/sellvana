@@ -14,11 +14,12 @@ final class FCom_MarketClient_RemoteApi extends BClass
         return $url;
     }
 
-    public function requestSiteNonce()
+    public function setupConnection()
     {
         $siteKey = BConfig::i()->get('modules/FCom_MarketClient/site_key');
-        $url = $this->getUrl('api/v1/market/site/nonce', array(
+        $url = $this->getUrl('api/v1/market/site/connect', array(
             'admin_url' => BApp::href(),
+            'retry_url' => BApp::href('marketclient/site/connect'),
             'site_key' => $siteKey,
         ));
         $response = BUtil::remoteHttp('GET', $url);
@@ -27,31 +28,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
             BConfig::i()->set('modules/FCom_MarketClient/site_key', $result['site_key'], false, true);
             FCom_Core_Main::i()->writeConfigFiles('local');
         }
-        /*
-        if (!empty($result['error'])) {
-            switch ($result['error']) {
-                case 'not_found': case 'unknown_ip':
-                    // assigned site key is not found
-                    
-                    $url = $this->getUrl('api/v1/market/site/nonce', array(
-                        'admin_url' => BApp::href(),
-                    ));
-                    $response = BUtil::remoteHttp('GET', $url);
-                    $result = BUtil::fromJson($response);
-                    break;
-            }
-        }
-        */
         return $result;
-    }
-
-    public function requestSiteKey($nonce)
-    {
-        $url = $this->getUrl('api/v1/market/site/key', array(
-            'nonce' => $nonce,
-        ));
-        $response = BUtil::remoteHttp('GET', $url);
-        return BUtil::fromJson($response);
     }
 
     public function getModulesVersions($modules)

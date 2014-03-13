@@ -31,12 +31,6 @@ class FCom_MarketClient_Admin_Controller extends FCom_Admin_Controller_Abstract_
         return $config;
     }
 
-    public function action_remote()
-    {
-        $this->view('marketclient/remote')->url = FCom_MarketClient_RemoteApi::i()->getUrl('/market');
-        $this->layout('/marketclient/remote');
-    }
-
     public function action_form()
     {
         $modName = BRequest::i()->params('mod_name', true);
