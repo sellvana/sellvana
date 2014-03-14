@@ -38,7 +38,7 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
                   'options' => FCom_Geo_Model_Country::i()->options(), 'editable' => true,
                   'validation' => array('required' => true)),
             array('name' => 'region', 'label' => 'State/Province/Region', 'index' => 'a.region', 'addable' => true, 'editable' => true, 'editor' => 'select',
-                'options' => FCom_Geo_Model_Region::i()->allOptions(),
+                'options' => FCom_Geo_Model_Region::i()->options('US'),
 //                'validation' => array('required' => true)),
             ),
             array('name' => 'city', 'label' => 'City', 'index' => 'a.city', 'addable' => true, 'editable' => true,
@@ -67,7 +67,29 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
         );
 
         $config['orm'] = FCom_Customer_Model_Address::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*')->where('customer_id', $customer->id);
-        $config['callbacks'] = array('after_modalForm_render' => 'renderModalAddress', 'after_render' => 'renderAddress');
+        $callbackModal = "
+            $('#country').on('change',function () {
+                getState($(this).val());
+            });
+            getState($('#country').val());
+            function getState (country) {
+                $.post('".BApp::i()->href('addresses/get_state')."', {country: country}).done(function (data) {
+                            var region = $('#region');
+                            if (!$.isEmptyObject(data)) {
+                                region.html('');
+                                region.parents('div.form-group').show();
+                                for (var i in data ) {
+                                    var option = '<option value='+ i +'>' + data[i] + '</option>';
+                                    region.append(option);
+                                }
+                            } else {
+                                region.html('<option value=\" \"></option>');
+                                region.parents('div.form-group').hide();
+                            };
+                    });
+            };
+        ";
+        $config['callbacks'] = array('after_modalForm_render' => $callbackModal);
         return array('config' => $config);
     }
 

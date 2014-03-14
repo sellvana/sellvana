@@ -14,7 +14,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type'=>'row_select'),
             array('name' => 'id', 'index'=>'o.id', 'label' => 'Order id', 'width' =>70, 'href'=>BApp::href('orders/form/?id=:id')),
             array('name' => 'admin_name', 'index'=>'o.admin_id', 'label' => 'Assisted by'),
             array('name' => 'create_at', 'index'=>'o.create_at', 'label' => 'Order Date'),
@@ -27,8 +27,12 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             array('name' => 'discount', 'label'=>'Discount', 'index'=>'o.coupon_code'),
             //todo: confirm with Boris about status should be stored as id_status
             array('name' => 'status', 'label'=>'Status', 'index'=>'o.status', 'options' => FCom_Sales_Model_Order_Status::i()->statusOptions()),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                  'data' => array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'))));
+            array('type' => 'btn_group',
+                  'buttons' => array(
+                                    array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id')
+                                    )
+                )
+        );
         $config['filters'] = array(
             array('field' => 'create_at', 'type' => 'date-range'),
             array('field' => 'billing_name', 'type' => 'text', 'having' => true),
@@ -229,7 +233,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                 'orm'       => 'FCom_Sales_Model_Order_Item',
                 'columns'   => array(
                     //todo: add row for image
-                    array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+                    array('type'=>'row_select'),
                     array('name' => 'id', 'label' => 'ID', 'width' => 80, 'hidden' => true),
                     array('name' => 'product_name', 'label' => 'Name', 'width' => 400),
                     array('name' => 'local_sku', 'label' => 'SKU', 'width' => 200),
@@ -256,7 +260,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $config = parent::gridConfig();
         $config['id'] = 'customer_grid_orders_'.$customer->id;
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type' => 'row_select'),
             array('name' => 'id', 'index'=>'o.id', 'label' => 'Order id', 'width' =>70),
             array('name' => 'create_at', 'index'=>'o.create_at', 'label' => 'Order Date'),
             array('name' => 'billing_name', 'label'=>'Bill to Name', 'index'=>'ab.billing_name'),
@@ -267,8 +271,12 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             array('name' => 'balance', 'label'=>'Paid', 'index'=>'o.balance'),
             array('name' => 'discount', 'label'=>'Discount', 'index'=>'o.coupon_code'),
             array('name' => 'status', 'label'=>'Status', 'index'=>'o.status', 'options' => FCom_Sales_Model_Order_Status::i()->statusOptions()),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                  'data' => array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'))));
+            array('type' => 'btn_group',
+                  'buttons' => array(
+                                    array('name'=>'edit','href' => BApp::href($this->_formHref.'?id='), 'col' => 'id')
+                                )
+                )
+            );
         $config['filters'] = array(
             array('field' => 'create_at', 'type' => 'date-range'),
             array('field' => 'billing_name', 'type' => 'text'),

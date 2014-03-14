@@ -42,7 +42,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'data_url' => $url.'/data?folder='.urlencode($folder),
                 'edit_url' => $url.'/edit?folder='.urlencode($folder),
                 'columns' => array(
-                    array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+                    array('type'=>'row_select'),
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'print'=>'"<a href=\''.$baseSrc.'"+rc.row["folder"]+"/"+rc.row["file_name"]+"\' target=_blank><img src=\''.$baseSrc.'"+rc.row["folder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"', 'sortable'=>false),
                     array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),

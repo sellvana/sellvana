@@ -156,11 +156,71 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     {
         $grid = $this->grid;
         $pos = 0;
+
         foreach ($grid['config']['columns'] as $cId=>&$col) {
             if (empty($col['name'])) {
                 $col['name'] = $cId;
             }
-            $col['position'] = ++$pos;
+
+			if ($cId === 0) {
+				$col['cssClass'] = 'select-row';
+				$col['edit'] = 'inline';
+			}
+			
+			if (empty($col['type'])) {
+				continue;
+			}
+			switch($col['type']) {
+				case 'multiselect':
+					$col['width'] = 50;
+                    $col['no_reorder'] = true;
+										
+					break;
+				case 'btn_group':
+                    $col['label'] = 'Actions';
+                    $col['sortable'] = false;                     
+					foreach($col['buttons'] as $bId=>&$btn) {						
+						switch($btn['name']) {
+							case 'edit':																
+								$btn['icon'] = ' icon-edit-sign';								
+								$btn['cssClass'] = ' btn-xs btn-edit ';
+								if (!empty($btn['href'])) {								
+									$btn['type'] = 'link';
+									
+									if(empty($btn['col'])) {
+										$btn['col']= 'id';
+									}
+								}
+								
+								break;
+							case 'custom':
+								$btn['cssClass'] = 'btn-custom';
+								
+								break;
+							/*case 'edit_inline':
+								$col['icon'] = 'icon-pencil';
+								
+								break;*/
+							case 'delete':
+								$btn['icon'] = 'icon-remove';
+								$btn['cssClass'] = 'btn-delete ';
+								if(!empty($btn['noconfirm']) && $btn['noconfirm']) {
+									$btn['cssClass'] .= 'noconfirm';
+								}
+								break;					
+						}
+						
+						//TODO: Is it really necessary not to have default icon when button has caption?
+						if (!empty($btn['caption'])) {
+							$btn['icon'] = '';
+						}
+					}
+					
+					
+					break;
+				
+			}
+            /*$col['position'] = ++$pos;
             switch ($cId) {
                 case '_multiselect':
                     $col['type'] = 'multiselect';
@@ -169,7 +229,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                     $col['format'] = function($args) {
                         return BUtil::tagHtml('input', array(
                             'type' =>'checkbox',
-                            //'name' =>"grid[{$args['grid']['config']['id']}][sel][{$args['row']->id}]",
+                            'name' =>"grid[{$args['grid']['config']['id']}][sel][{$args['row']->id}]",
                             'class'=>'js-sel',
                         ));
                     };
@@ -193,7 +253,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         return BUtil::tagHtml('select', array('class'=>'js-actions'), BUtil::optionsHtml($options));
                     };
                     break;
-            }
+            }*/
         }
         unset($col);
         $this->grid = $grid;
