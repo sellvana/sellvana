@@ -14,9 +14,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
+            array('type'=>'row_select'),
             array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true),
-            array('name'=>'thumb_path', 'label'=>'Thumbnail', 'width'=>48,
+            array('display'=>'eval', 'name'=>'thumb_path', 'label'=>'Thumbnail', 'width'=>48,
                 'print'=>'"<img src=\'"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["product_name"]+"\' >"', 'sortable'=>false),
             array('name'=>'product_name', 'label'=>'Name', 'width'=>250),
             array('name'=>'local_sku', 'label'=>'SKU', 'index'=>'p.local_sku', 'width'=>100),
@@ -28,8 +28,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('name' => 'position', 'label' => 'Position', 'index' => 'p.position', 'hidden' => true),
             array('name'=>'create_at', 'label'=>'Created', 'index'=>'p.create_at', 'width'=>100),
             array('name'=>'update_at', 'label'=>'Updated', 'index'=>'p.update_at', 'width'=>100),
-            array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false,
-                'data'=>array('edit'=>array('href'=>BApp::href('catalog/products/form?id='), 'col'=>'id'),'delete'=>true)),
+            array('type'=>'btn_group', 
+                  'buttons' => array(
+                                        array('name'=>'edit', 'href'=>BApp::href('catalog/products/form?id=')),
+                                        array('name'=>'delete')
+                                    )
+                )
         );
         $config['actions'] = array(
             'export'=>true,
@@ -146,7 +150,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $config = $this->gridConfig();
         $config['columns'] = array(
-            array( 'cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40 ),
+            array( 'type'=>'row_select'),
             array( 'name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true ),
             array( 'name' => 'product_name', 'label'   => 'Name', 'index'   => 'p.product_name',
                    'width'=> 450, 'addable' => true ),
@@ -178,18 +182,23 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'data_mode'=>'local',
                 'data'=>BDb::many_as_array($model->mediaORM('A')->order_by_expr('pa.position asc')->select(array('pa.id', 'pa.product_id', 'pa.remote_url','pa.position','pa.label','a.file_name','a.file_size','pa.create_at','pa.update_at'))->select('a.id','file_id')->find_many()),
                 'columns'=>array(
-                    array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
+                    array('type'=>'row_select'),
                     array('name'=>'download_url',  'hidden'=>true, 'default'=>$download_url),
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'file_id', 'label'=>'File ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'product_id', 'label'=>'Product ID', 'width'=>400, 'hidden'=>true, 'default'=>$model->id()),
-                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>200, 'print'=>'"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'),
+                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>200, 'display'=>'eval', 'print'=>'"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
-                    array('name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline', 'validation'=>array('required'=>true)),
-                    array('name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true,'required'=>true)),
+                    array('type'=>'input', 'name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline', 'validation'=>array('required'=>true)),
+                    array('type'=>'input', 'name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true,'required'=>true)),
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
-                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>true,'delete'=>true))
+                    array('type'=>'btn_group', 'name'=>'_actions',
+                          'buttons'=>array(
+                                            array('name'=>'edit'),
+                                            array('name'=>'delete')
+                                            )
+                        )
                 ),
                 'actions'=>array(
                     'add'=>array('caption'=>'Add attachments'),
@@ -222,21 +231,26 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'data_mode'=>'local',
                 'data'=>$data,
                 'columns'=>array(
-                    array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
+                    array('type'=>'row_select'),
                     array('name'=>'id', 'hidden'=>true),
                     array('name'=>'file_id',  'hidden'=>true),
                     array('name'=>'product_id', 'hidden'=>true,'default'=>$model->id()),
                     array('name'=>'download_url',  'hidden'=>true, 'default'=>$download_url),
                     array('name'=>'thumb_url',  'hidden'=>true, 'default'=>$thumb_url),
                     array('name'=>'file_name', 'label' => 'File Name', 'hidden'=>true),
-                    array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'print'=>'"<a href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'><img src=\'"+rc.row["thumb_url"]+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' ></a>"', 'sortable'=>false),
+                    array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'display'=>'eval', 'print'=>'"<a href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'><img src=\'"+rc.row["thumb_url"]+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' ></a>"', 'sortable'=>false),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
-                    array('name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline'),
-                    array('name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true)),
-                    array('name'=>'main_thumb', 'label'=>'Thumbnail', 'width'=>50, 'print' => '"<input class=\'main-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"'),
+                    array('type'=>'input', 'name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline'),
+                    array('type'=>'input', 'name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true)),
+                    array('name'=>'main_thumb', 'label'=>'Thumbnail', 'width'=>50, 'display'=>'eval', 'print' => '"<input class=\'main-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"'),
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
-                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('edit'=>true, 'delete'=>true))
+                    array('type'=>'btn_group', 'name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 
+                            'buttons'=>array(
+                                        array('name'=>'edit'), 
+                                        array('name'=>'delete')
+                                    )
+                        )
                 ),
                 'actions'=>array(
                     'add'=>array('caption'=>'Add images'),
@@ -263,7 +277,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         //$config['id'] = 'category_all_prods_grid-'.$model->id;
         $config['id'] = 'category_all_prods_grid_'.$model->id;
         $config['columns'] = array(
-            array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
+            array('type'=>'row_select'),
             array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>55, 'hidden'=>true),
             array('name'=>'product_name', 'label'=>'Name', 'index'=>'p.product_name', 'width'=>250),
             array('name'=>'local_sku', 'label'=>'SKU', 'index'=>'p.local_sku', 'width'=>100),
@@ -306,7 +320,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $config['data'] = $orm->find_many();
         $config['id'] = 'category_prods_grid_'.$model->id;
         $config['columns'] = array(
-            array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
+            array('type'=>'row_select'),
             array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>80, 'hidden'=>true),
             array('name'=>'product_name', 'label'=>'Name', 'index'=>'p.product_name', 'width'=>400),
             array('name'=>'local_sku', 'label'=>'SKU', 'index'=>'p.local_sku', 'width'=>200)
@@ -352,7 +366,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'data_mode'     =>'local',
                 //'caption'      =>$caption,
                 'columns'      =>array(
-                    array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
+                    array('type'=>'row_select'),
                     array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>80, 'hidden'=>true),
                     array('name'=>'product_name', 'label'=>'Name', 'index'=>'p.product_name', 'width'=>400),
                     array('name'=>'local_sku', 'label'=>'SKU', 'index'=>'p.local_sku', 'width'=>200),
