@@ -55,14 +55,15 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'events' => array('add','select-rows','init')
             )
         );
+        
+        if (!empty($options['config'])) {
+            $config = BUtil::arrayMerge($config, $options['config']);
+        }
         if (isset($options['callbacks'])) {
             $config['config']['callbacks'] = $options['callbacks'];
         }
         if (isset($options['exclude_id'])) {
             $config['config']['exclude_id'] = $options['exclude_id'];
-        }
-        if (!empty($options['config'])) {
-            $config = BUtil::arrayMerge($config, $options['config']);
         }
         //BEvents::i()->fire(__METHOD__, array('config'=>&$config));
         //BEvents::i()->fire(__METHOD__.'.'.$folder, array('config'=>&$config));
