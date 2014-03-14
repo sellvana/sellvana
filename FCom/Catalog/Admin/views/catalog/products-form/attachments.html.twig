@@ -1,15 +1,19 @@
 {% set m = THIS.get('model') %}
 {% set prodAttachConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productAttachmentsGridConfig(m) %}
-{% set mediaLibAttachConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_attachments', 'folder': 'media/product/attachment', 'callbacks': {'after_render': 'renderAttachment'}}) %}
+{% set mediaLibAttachConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_attachments', 'folder': 'media/product/attachment', 'exclude_id': 'attachmentExcludeId'}) %}
 <input type='hidden' name="grid[attachments][del]" id='prod-attach-remove' />
 <input type='hidden' name="grid[attachments][rows]" id='prod-attach-rows' />
 
 <script>
-
+    var attachments = {
+        rowCollection: false,
+        BackboneGrid: false,
+        originFileIds: []
+    }
 
 require(['jquery', 'unique'], function($) {
     var prod_img_rows = [], editedRows = [], removedIds = [], originRows = [];
-    var gridAllAttachment = $('#all_attachments tbody');
+    var btnAddAttachment = $('#prod-attachments-modal-add');
     function _getAttachmentsDbFields(row) {
         var keys = ['id', 'file_id', 'label', 'position', '_new'];
         var ret = {};
@@ -43,6 +47,7 @@ require(['jquery', 'unique'], function($) {
     g_vent.bind('init-detail', function(ev) {
         if (ev.grid === 'product_attachments') {
             originRows = ev.rows;
+            attachments.originFileIds = _.pluck(originRows, 'file_id');
         }
     });
 
@@ -50,24 +55,24 @@ require(['jquery', 'unique'], function($) {
         if (ev.grid === 'all_attachments') {
             prod_img_rows = ev.rows;
             var caption = 'Add';
-            var addButton = $('#prod-attachments-modal-add');
             if(prod_img_rows.length>0) {
                 if (prod_img_rows.length==1) {
                     caption += ' a row';
                 } else {
                     caption += (' ' + prod_img_rows.length + ' rows');
                 }
-                addButton.removeClass('disabled');
+                btnAddAttachment.removeClass('disabled');
             } else {
-                addButton.addClass('disabled');
+                btnAddAttachment.addClass('disabled');
             }
-            addButton.html(caption);
+            btnAddAttachment.html(caption);
         }
 
     });
 
     g_vent.bind('add', function(ev) {
         if (ev.grid === 'product_attachments') {
+            refreshGridAddAttachments();
             $('#btn_prod_attach_modal').trigger('click');
         }
     });
@@ -77,18 +82,23 @@ require(['jquery', 'unique'], function($) {
             if (_.indexOf(removedIds,ev.id) !== -1)
                 return;
             removedIds[removedIds.length] = ev.id;
-            gridAllAttachment.find('tr[id="'+ ev.row.file_id +'"]').removeClass('hidden');
+            attachments.originFileIds = _.filter(images.originFileIds, function (id) {
+                return id != ev.row.file_id;
+            });
             _setFormVal();
         }
     });
 
     g_vent.bind('mass-delete', function(ev) {
         if(ev.grid === 'product_attachments') {
+            var arr = [];
             for(var i in ev.rows) {
+                arr.push(ev.rows[i].file_id);
                 removedIds[removedIds.length] = ev.rows[i].id;
-                gridAllAttachment.find('tr[id="'+ ev.rows[i].file_id +'"]').removeClass('hidden');
             }
-
+            attachments.originFileIds = _.filter(images.originFileIds, function (id) {
+                return _.indexOf(arr, id) === -1;
+            });
             _setFormVal();
         }
     });
@@ -108,7 +118,7 @@ require(['jquery', 'unique'], function($) {
         }
     });
 
-    $('#prod-attachments-modal-add').click(function() {
+    btnAddAttachment.click(function() {
         var objs = _.clone(prod_img_rows);
 //        originFileIds = _.pluck(originRows, 'file_id');
 //        addedFileIds = _.pluck(editedRows, 'file_id');
@@ -119,12 +129,12 @@ require(['jquery', 'unique'], function($) {
         for(var i in objs) {
             var row = objs[i];
             row.file_id = row.id;
+            attachments.originFileIds.push(row.id);
             row.id = guid();
             row._new = true;
 //            editedRows[editedRows.length] = row;
             var hidden = '<input type="hidden" name="product_attachments['+ row.id +'][file_id]" value="'+ row.file_id +'" />';
             $('#tab-attachments').prepend(hidden);
-            gridAllAttachment.find('tr[id="'+ row.file_id +'"]').addClass('hidden');
         }
 
         g_vent.trigger('silent_inject', {grid: 'product_attachments', rows: prod_img_rows});
@@ -279,10 +289,19 @@ require(['jquery', 'unique'], function($) {
     </div>
 </div>
 <script>
+    function refreshGridAddAttachments() {
+        attachments.BackboneGrid.current_filters['exclude_id'] = attachments.originFileIds.join(',');
+        attachments.rowCollection.fetch({reset: true});
+    }
 
-    function renderAttachment(el, row) {
-        if ($('#product_attachments').find('a.file-attachments[data-file-id="'+ row.id+'"]').length > 0) {
-            $(el).addClass('hidden');
+    function attachmentExcludeId(grid, row) {
+        if (grid.id == 'all_attachments') {
+            if (attachments.rowCollection === false) {
+                attachments.BackboneGrid = grid;
+                attachments.rowCollection = row;
+            }
+
+            return attachments.originFileIds.join(',');
         }
     }
 
