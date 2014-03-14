@@ -1,6 +1,6 @@
 /*
- *Utility functions
- */
+*Utility functions
+*/
 function validationRules(rules) {
     var str = '';
     for (var key in rules) {
@@ -97,20 +97,20 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     onfocusout: false,
                     onkeyup: false,
                     remote: {
-                        url: url,
-                        type: 'post',
-                        data: {
+                    url: url,
+                    type: 'post',
+                    data: {
                             _name: model.get('name')
-                        },
-                        dataFilter: function (responseString) {
-                            var response = jQuery.parseJSON(responseString);
-                            currentMessage = response.Message;
-                            if ((modalForm.modalType === 'editable' || editInline) && BackboneGrid.currentRow.get('id') === response.id){
-                                return true;
-                            }
-                            return response.unique;
-                        },
-                        async:false
+                    },
+                    dataFilter: function (responseString) {
+                        var response = jQuery.parseJSON(responseString);
+                        currentMessage = response.Message;
+                        if ((modalForm.modalType === 'editable' || editInline) && BackboneGrid.currentRow.get('id') === response.id){
+                            return true;
+                        }
+                        return response.unique;
+                    },
+                    async:false
                     },
                     messages: {
                         remote: "This " + model.get('label') + " is already taken place"
@@ -174,10 +174,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         hash['style'] = "width: " + this.model.get('width') + 'px;';
                     }
                     /*
-                     if (this.model.has('overflow')) {
-                     hash['style'] += 'overflow:hidden;'
-                     }
-                     */
+                    if (this.model.has('overflow')) {
+                        hash['style'] += 'overflow:hidden;'
+                    }
+                    */
                     return hash;
                 },
                 events: {
@@ -258,7 +258,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 BackboneGrid.showingSelected = true;
                                 console.log('consof',BackboneGrid.data_mode)
                                 //if (BackboneGrid.data_mode !== 'local') {
-                                $('.f-grid-bottom.f-grid-toolbar.' + BackboneGrid.id + ' > div.pagination').css('display', 'none');
+                                    $('.f-grid-bottom.f-grid-toolbar.' + BackboneGrid.id + ' > div.pagination').css('display', 'none');
                                 //}
 
                                 BackboneGrid.data_mode = 'local';
@@ -823,9 +823,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     var self = this;
                     var previousAttributes = self.model.previousAttributes();
                     $(ev.target).parents('tr').find('input, select, textarea').each(function () {
-                        if (!$(this).valid()) {
-                            valid = false;
-                        }
+                       if (!$(this).valid()) {
+                           valid = false;
+                       }
                     })
                     if (valid) {
                         $(ev.target).parents('tr').find('td').each(function (index) {
@@ -851,10 +851,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             self.model.attributes = data;
                             self.render();
                         }).fail(function(data) {
-                            self.model.attributes = previousAttributes;
-                            self.render();
-                            $.bootstrapGrowl('Error: cannot saved', { type: 'danger', align: 'center', width: 'auto' });
-                        });
+                                self.model.attributes = previousAttributes;
+                                self.render();
+                                $.bootstrapGrowl('Error: cannot saved', { type: 'danger', align: 'center', width: 'auto' });
+                            });
                         $(ev.target).parents('tr').find('button.btn-edit-inline').removeClass('hide');
                         $(ev.target).parent().addClass('hide');
                     }
@@ -978,7 +978,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                     // not working
                     /*this.$el.find('.dd:first').nestable().on('change',function(){
-                     });*/
+                    });*/
 
                     // working
                     //$('.'+BackboneGrid.id+'.columns-span').nestable().on('change',this.orderChanged);
@@ -1306,8 +1306,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.model.set('val', val);
                     this._filter(val);
                     /*var html = this.model.get('label')+': '+val;
-                     html += '<span class="caret"></span>';
-                     this.$el.find('button.filter-text-main').html(html);*/
+                    html += '<span class="caret"></span>';
+                    this.$el.find('button.filter-text-main').html(html);*/
                 },
                 render: function () {
                     BackboneGrid.Views.FilterCell.prototype.render.call(this);
@@ -1455,11 +1455,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         return false;
 
                     /*for (var key in BackboneGrid.modalElementVals) {
-                     if (BackboneGrid.modalElementVals[key] === '' || BackboneGrid.modalElementVals[key] === null) {
-                     delete BackboneGrid.modalElementVals[key];
-                     }
+                        if (BackboneGrid.modalElementVals[key] === '' || BackboneGrid.modalElementVals[key] === null) {
+                            delete BackboneGrid.modalElementVals[key];
+                        }
 
-                     }*/
+                    }*/
                     if (modalForm.modalType === 'mass-editable') {
 
                         var ids = selectedRows.pluck('id').join(",");
@@ -1565,7 +1565,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         this.collection.each(this.addElementDiv, this);
                     }
                     /*if (this.modalType === 'addable' || this.modalType ==='mass-editable')
-                     $(BackboneGrid.modalFormId).find('select').val('');*/
+                        $(BackboneGrid.modalFormId).find('select').val('');*/
                     if (this.modalType === 'mass-editable')
                         $(BackboneGrid.modalFormId).find('select').val('');
                     console.log(this.$el.is("form"));
@@ -1593,9 +1593,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     });
 
                     /*//focus to first input when modal shown
-                     $(BackboneGrid.modalFormId).on('shown.bs.modal', function() {
-                     $('input:text:visible:first', this).focus();
-                     });*/
+                    $(BackboneGrid.modalFormId).on('shown.bs.modal', function() {
+                        $('input:text:visible:first', this).focus();
+                    });*/
 
                     return this;
 
@@ -1741,8 +1741,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             }
 
             /*
-             *   public functions
-             */
+            *   public functions
+            */
             this.getGridView = function() {
                 return gridView;
             }
@@ -1769,9 +1769,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
             /*this.afterSelectionChanged = function() {
 
-             }*/
+            }*/
             this.build = function() {
-                _.templateSettings.variable = 'rc';
+                 _.templateSettings.variable = 'rc';
                 this.id = config.id;
                 BackboneGrid.id = config.id;
                 BackboneGrid.personalize_url = config.personalize_url;
@@ -2135,31 +2135,31 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 }
 
                 /*if ($(BackboneGrid.AddButton).length > 0) {
-                 $(BackboneGrid.AddButton).on('click', function (ev) {
+                    $(BackboneGrid.AddButton).on('click', function (ev) {
 
-                 ev.preventDefault();
-                 ev.stopPropagation();
+                        ev.preventDefault();
+                        ev.stopPropagation();
 
-                 return false;
-                 });
-                 }*/
+                        return false;
+                    });
+                }*/
 
                 //validation
                 /*if (BackboneGrid.validation === true) {
-                 gridView.form = gridView.$el.parents('form:first');
+                    gridView.form = gridView.$el.parents('form:first');
 
-                 gridView.form.submit(function(ev) {
-                 ev.preventDefault();
-                 ev.stopPropagation();
-                 if(!gridView.form.valid()) {
+                    gridView.form.submit(function(ev) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        if(!gridView.form.valid()) {
 
 
-                 return false;
-                 }
+                            return false;
+                        }
 
-                 return true;
-                 });
-                 }*/
+                        return true;
+                    });
+                }*/
 
 
                 //quick search
@@ -2217,5 +2217,4 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
     }
 );
-
 
