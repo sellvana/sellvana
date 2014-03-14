@@ -5,6 +5,16 @@ class FCom_Catalog_Model_CategoryProduct extends BModel
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_category_product';
 
+    protected static $_importExportProfile = array(
+        __CLASS__ => array(
+            'skip'    => array( 'id' ),
+            'related' => array(
+                'product_id'  => 'FCom_Catalog_Model_Product.id',
+                'category_id' => 'FCom_Catalog_Model_Category.id',
+            )
+        )
+    );
+
     public function category()
     {
         if (!$this->category) {

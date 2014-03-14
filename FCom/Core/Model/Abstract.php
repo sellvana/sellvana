@@ -30,6 +30,13 @@ class FCom_Core_Model_Abstract extends BModel
      */
     static protected $_dataFieldsMap = array();
 
+    static protected $_importExportProfile;
+
+    public static function modelExportProfile()
+    {
+        return static::$_importExportProfile;
+    }
+
     /**
      * Get custom data from serialized field
      *

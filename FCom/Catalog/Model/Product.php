@@ -68,6 +68,17 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         array('avg_rating', '@numeric'),
     );
 
+    protected static $_importExportProfile = array(
+        __CLASS__=> array(
+            'skip' => array(
+                'create_dt',
+                'update_dt',
+                'indextank_indexed',
+                'indextank_indexed_at',
+            ),
+        )
+    );
+
     private $_importErrors = null;
     private $_dataImport = array();
 
