@@ -25,6 +25,7 @@
 
 <form class="form-inline" method="get" action="{{ url }}">
   <fieldset class="f-prod-listing-toolbar">
+    <input type="hidden" name="q" value="{{ REQUEST.get('q') }}">
     <div class="form-group pull-right">
       <label for="#" class="control-label">Sort by:</label>
       <select name="sc" onchange="this.form.submit()" class="form-control">
@@ -33,7 +34,7 @@
     </div>
     <div class="form-group pull-right">
       <select class="form-control visible-xs" name="ps" onchange="this.form.submit()">
-        <option value="">Per page:</option>
+        <option value="">{{ 'Per page:'|_ }}</option>
         {% for ps in psOptions %}
           <option value="{{ ps }}" {{ ps==s.ps ? 'selected'}}>{{ ps }}</option>
         {% endfor %}

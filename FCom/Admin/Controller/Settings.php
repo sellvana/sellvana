@@ -85,4 +85,16 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
 
         BResponse::i()->json("success");
     }
+
+    public function getAllMode()
+    {
+        return array(
+          BDebug::MODE_DEBUG => BDebug::MODE_DEBUG,
+          BDebug::MODE_DEVELOPMENT => BDebug::MODE_DEVELOPMENT,
+          BDebug::MODE_STAGING => BDebug::MODE_STAGING,
+          BDebug::MODE_PRODUCTION => BDebug::MODE_PRODUCTION,
+          BDebug::MODE_RECOVERY => BDebug::MODE_RECOVERY,
+          BDebug::MODE_DISABLED => BDebug::MODE_DISABLED
+        );
+    }
 }

@@ -2,7 +2,7 @@
 
 <script type="text/javascript">
 
-    require(['jquery', 'jquery.validate', 'bootstrap', 'fcom.admin', 'switch', 'jquery.bootstrap-growl'], function($) {
+    require(['backbone', 'underscore', 'jquery', 'fcom.ipmode', 'jquery.validate', 'fcom.validate.ext', 'bootstrap', 'fcom.admin', 'switch', 'jquery.bootstrap-growl',  'select2'], function(Backbone, _, $, ipMode) {
         $(function() {
             function onSortableStop(event, ui) {
                 var type = ui.item[0].nodeName.toLowerCase()=='li' ? 'tabs' : 'sections';
@@ -51,7 +51,7 @@
             //initTabs.apply($('#settings-form'));
 
             //$('.adm-tabs-sidebar > ul').sortable({axis: 'y', stop: onSortableStop, distance:5});
-            var mainForm = $('form#settings-form');
+            var mainForm = $('#settings-form');
             var elem = mainForm.find('input, textarea, select');
             var text = '#settings-form ul.nav-tabs li.dropdown';
             function processFlag (validator) {
@@ -85,23 +85,53 @@
                     break;
                 }
             }
+
+            $.validator.addClassRules("text-ip-mode", {
+                required: true,
+                validateIP: true
+            });
             mainForm.validate({
                 ignore: [],
                 invalidHandler: function(event, validator) {
                     processFlag(validator);
                 },
                 submitHandler: function (form) {
+                    var data = mainForm.serializeArray();
+                    var arr = [ 'config[mode_by_ip][FCom_Admin]',
+                                'config[mode_by_ip][FCom_ApiServer]',
+                                'config[mode_by_ip][FCom_Frontend]',
+                                'config[mode_by_ip][FCom_Cron]'
+                              ];
+                    data.forEach(function (obj) {
+                        if ($.inArray(obj.name, arr) > -1) {
+                            obj.value = getIpModeValue(mainForm.find('input[name="'+ obj.name +'"]').parents('.group-ip-mode'));
+                        }
+                    });
                     processFlag({invalid: null});
 //                    $('#settings-form').submit(function(ev) {
 //                        var $form = $(this);
-                        $.post(mainForm.attr('action'), mainForm.serializeArray(), function(data, status, xhr) {
-                            $.bootstrapGrowl(data.message, {type: data.status, align: 'center', width: 'auto'});
-                        });
+                    $.post(mainForm.attr('action'), data, function(data, status, xhr) {
+                        $.bootstrapGrowl(data.message, {type: data.status, align: 'center', width: 'auto'});
+                    });
 //                        return false;
 //                    })
                 }
             });
-            $( "body" ).on('change', elem, function () {
+
+
+            function getIpModeValue(el) {
+                var result = '';
+                el.find('.default, .text-ip-mode').each(function () {
+                    if ($(this).hasClass('default')) {
+                        result += $(this).parents('.ip-mode').find('select').val() + '\n';
+                    } else {
+                        result +=  $(this).val()+ ':' + $(this).parents('.ip-mode').find('select').val() + '\n';
+                    }
+                });
+                return result.substr(0, result.length -1);
+            }
+
+            $("body").on('change', elem, function () {
                 $(text).find('li.active').each(function () {
                     if ($(this).children('a').find('i.icon-pencil').length === 0) {
                         if ($(this).children('a').children('i.error').length !== 0) {
@@ -112,7 +142,11 @@
                     }
                 })
             });
+            $('body').on('click', '.add-ip-mode', function () {
+                var ip = new ipMode.ipMode.Views();
+                $(this).parents('.group-ip-mode').append(ip.render().el);
 
+            });
             FCom.Admin.Tabs('.f-admin-main', {
                 url_get: "{{ formUrl }}",
                 cur_tab: "{{ THIS.get('cur_tab') }}",
@@ -123,6 +157,8 @@
                     loadSwitchButtons();
                 }
             });
+
+
             $('.accordion').each(function(i, el) {
                 FCom.Admin.Accordion(el.id);
             });
@@ -136,47 +172,74 @@
     })
 </script>
 
-<div class="f-admin-main-view">
-  {{ THIS.view('core/messages') | raw }}
-  <form id="settings-form" class="form form-horizontal" action="{{ formUrl }}" method="post">
-      <div class="page-header f-admin-page-header">
-        <h1 class="f-page-title">
-            <i class="icon-cog"></i>
-            <span>{{ "Settings" |_ }}</span>
-        </h1>
-        <div class="btn-group">
-            <button class="btn btn-primary" type="submit">{{ "Save All" |_ }}</button>
+<script type="template" id="ip-mode-template">
+    <div  class="row ip-mode" style="margin-bottom: 15px">
+        <div class="col-md-3 text-right">
+            <% if (typeof (default_mode) !== 'undefined') { %>
+                <label class="control-label">{{ "Default"|_ }}</label>
+                <input type="hidden" class="default"  name="<%- name %>"/>
+            <% } else { %>
+                <input type="text" name="<%- name %>" class="form-control text-ip-mode" id="<%- name %>"/>
+            <% } %>
         </div>
-      </div>
-      <div class="f-admin-main">
-          <ul class="f-horiz-nav-tabs nav nav-tabs">
-              {% for group in THIS.tab_groups %}
-                  <li class="dropdown">
-                      <a class="dropdown-toggle" href="#" data-toggle="dropdown">{{ group.label }} <b class="caret"></b></a>
-                      <ul class="dropdown-menu" {% if group.open is empty %}hidden{% endif %}>
-                          {% for k, tab in group.tabs %}
-                              {% if tab.disabled is empty %}
-                                  <li id="settings-tab-{{ k }}">
-                                      <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab">
-                                          <span class="icon"></span>
-                                          {{ tab.label }}
-                                      </a>
-                                  </li>
-                              {% endif %}
-                          {% endfor %}
-                      </ul>
-                  </li>
-              {% endfor %}
-          </ul>
-          <div class="tab-content">
-              {% for k, tab in THIS.tabs %}
-                  <div class="tab-pane" id="tab-{{ k }}"{% if tab.async is empty %} data-loaded="true"{% endif %}>
-                      {% if tab.async is empty  %}
-                          {{ THIS.view(tab.view)|raw }}
-                      {% endif %}
-                  </div>
-              {% endfor %}
-          </div>
-      </div>
-  </form>
+        <div class="col-md-3">
+            <select class="form-control select-mode">
+                {{ UTIL.optionsHtml(APP.instance('FCom_Admin_Controller_Settings').getAllMode())|raw }}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <button class="btn  btn-xs <%- class_button %>" style="margin-top: 5px;" type="button">
+                <%
+                    (typeof (default_mode) !== 'undefined') ? print('<i class="icon-plus"></i>') : print('<i class="icon-remove"></i>');
+                %>
+            </button>
+        </div>
+    </div>
+
+</script>
+
+
+<div class="f-admin-main-view">
+    {{ THIS.view('core/messages') | raw }}
+    <form id="settings-form" class="form form-horizontal" action="{{ formUrl }}" method="post">
+        <div class="page-header f-admin-page-header">
+            <h1 class="f-page-title">
+                <i class="icon-cog"></i>
+                <span>{{ "Settings" |_ }}</span>
+            </h1>
+            <div class="btn-group">
+                <button class="btn btn-primary" type="submit">{{ "Save All" |_ }}</button>
+            </div>
+        </div>
+        <div class="f-admin-main">
+            <ul class="f-horiz-nav-tabs nav nav-tabs">
+                {% for group in THIS.tab_groups %}
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" href="#" data-toggle="dropdown">{{ group.label }} <b class="caret"></b></a>
+                        <ul class="dropdown-menu" {% if group.open is empty %}hidden{% endif %}>
+                            {% for k, tab in group.tabs %}
+                                {% if tab.disabled is empty %}
+                                    <li id="settings-tab-{{ k }}">
+                                        <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab">
+                                            <span class="icon"></span>
+                                            {{ tab.label }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+            <div class="tab-content">
+                {% for k, tab in THIS.tabs %}
+                    <div class="tab-pane" id="tab-{{ k }}"{% if tab.async is empty %} data-loaded="true"{% endif %}>
+                        {% if tab.async is empty  %}
+                            {{ THIS.view(tab.view)|raw }}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </form>
 </div>

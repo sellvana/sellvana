@@ -13,6 +13,14 @@ class FCom_Sales_Main extends BClass
         foreach (array('Subtotal', 'Shipping', 'Discount', 'GrandTotal') as $total) {
             FCom_Sales_Model_Cart::i()->registerTotalRowHandler('FCom_Sales_Model_Cart_Total_'.$total);
         }
+
+        FCom_Admin_Model_Role::i()->createPermission(array(
+            'sales' => 'Sales',
+            'sales/orders' => 'Orders',
+            'sales/order_status' => 'Order Status',
+            'sales/carts' => 'Carts',
+            'sales/reports' => 'Reports'
+        ));
     }
 
     public function addPaymentMethod($name, $class=null)
@@ -104,6 +112,25 @@ class FCom_Sales_Main extends BClass
                 'code' => "sales_missing_payment",
             );
         }
+    }
+
+    public function onGetDashboardWidgets($args)
+    {
+        $view = $args['view'];
+        $view->addWidget('orders-list', array(
+            'title' => 'Recent Orders',
+            'icon' => 'inbox',
+            'view' => 'order/dashboard/orders-list',
+            'async' => true,
+        ));
+        $view->addWidget('orders-totals', array(
+            'title' => 'Order Totals',
+            'icon' => 'inbox',
+            'view' => 'order/dashboard/orders-totals',
+            'cols' => 4,
+            'async' => true,
+            'filter' => true
+        ));
     }
 }
 

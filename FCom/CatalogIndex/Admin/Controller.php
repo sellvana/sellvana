@@ -113,6 +113,7 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
             echo '<p>Reindexing...</p>';
 
             $this->forward('reindex');
+            return;
         }
 
         // show sample search result

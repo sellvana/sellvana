@@ -83,4 +83,9 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
         }
         return true;
     }
+
+    public function createView($params = array())
+    {
+        return FCom_Cms_Frontend_View_Block::i()->createView($this, $params);
+    }
 }

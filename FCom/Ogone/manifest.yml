@@ -11,4 +11,4 @@ modules:
         areas:
             FCom_Frontend:
                 routing:
-                    - [ any, /ogone/.action, FCom_Ogone_Frontend_Controller ]
+                    - [ /ogone/.action, FCom_Ogone_Frontend_Controller ]

@@ -8,6 +8,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     protected $_gridTitle = 'Products';
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'p';
+    protected $_permission = 'catalog/products';
 
     public function gridConfig()
     {
@@ -27,7 +28,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('name' => 'position', 'label' => 'Position', 'index' => 'p.position', 'hidden' => true),
             array('name'=>'create_at', 'label'=>'Created', 'index'=>'p.create_at', 'width'=>100),
             array('name'=>'update_at', 'label'=>'Updated', 'index'=>'p.update_at', 'width'=>100),
-            array('type'=>'btn_group', 
+            array('type'=>'btn_group',
                   'buttons' => array(
                                         array('name'=>'edit', 'href'=>BApp::href('catalog/products/form?id=')),
                                         array('name'=>'delete')
@@ -36,7 +37,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         );
         $config['actions'] = array(
             'export'=>true,
-            'delete'=>true
+            'delete'=>true,
+            //'custom'=>array('class'=>'test', 'caption'=>'ffff', 'id'=>'prod_custom')
         );
         $config['filters'] = array(
             array('field'=>'product_name', 'type'=>'text'),
@@ -166,7 +168,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $config[ 'actions' ] = array(
             'add' => array( 'caption' => 'Add selected products' )
         );
-        $config[ 'events' ]  = array( 'add' );
+        $config['grid_before_create'] = 'prodLibGridRegister';
         //$config['custom']['autoresize'] = '#linked-products-layout';
         return array( 'config' => $config );
     }
@@ -192,7 +194,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('type'=>'input', 'name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true,'required'=>true)),
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
-                    array('type'=>'btn_group', 'name'=>'_actions',
+                    array('type'=>'btn_group',
                           'buttons'=>array(
                                             array('name'=>'edit'),
                                             array('name'=>'delete')
@@ -203,7 +205,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'add'=>array('caption'=>'Add attachments'),
                     'delete'=>array('caption'=>'Remove')
                 ),
-                'events'=>array('init-detail', 'add','mass-delete', 'delete', 'edit'),
+                'grid_before_create'=>'attachmentGridRegister',
                 'filters'=>array(
                     array('field'=>'file_name', 'type'=>'text'),
                     array('field'=>'label', 'type'=>'text'),
@@ -244,9 +246,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'main_thumb', 'label'=>'Thumbnail', 'width'=>50, 'display'=>'eval', 'print' => '"<input class=\'main-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"'),
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
-                    array('type'=>'btn_group', 'name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 
+                    array('type'=>'btn_group', 'name'=>'_actions', 'label'=>'Actions', 'sortable'=>false,
                             'buttons'=>array(
-                                        array('name'=>'edit'), 
+                                        array('name'=>'edit'),
                                         array('name'=>'delete')
                                     )
                         )
@@ -255,13 +257,13 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'add'=>array('caption'=>'Add images'),
                     'delete'=>array('caption'=>'Remove')
                 ),
-                'events'=>array('init-detail', 'add','mass-delete', 'delete', 'edit'),
+                'grid_before_create'=>'imagesGridRegister',
                 'filters'=>array(
                     array('field'=>'file_name', 'type'=>'text'),
                     array('field'=>'label', 'type'=>'text'),
                     '_quick'=>array('expr'=>'file_name like ? ', 'args'=> array('%?%'))
                 ),
-                'callbacks' => array('after_render' => 'afterRenderImageGrid')
+
             )
         );
     }
@@ -290,7 +292,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             '_quick'=>array('expr'=>'product_name like ? or local_sku like ? or p.id=?', 'args'=> array('?%', '%?%', '?'))
         );
 
-        $config['events'] = array('add');
+        $config['grid_before_create'] = 'allProdGridRegister';
         /*$config['_callbacks'] = "{
             'add':'categoryProdsMng.addSelectedProds'
         }";*/
@@ -331,7 +333,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             array('field'=>'local_sku', 'type'=>'text')
         );
         $config['data_mode'] = 'local';
-        $config['events'] = array('init', 'add','mass-delete');
+        $config['grid_before_create'] = 'catProdGridRegister';
 
         return array('config'=>$config);
     }
@@ -379,7 +381,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('field'=>'product_name', 'type'=>'text'),
                     array('field'=>'local_sku', 'type'=>'text')
                 ),
-                'events'=>array('init', 'add','mass-delete')
+                'events'=>array('init', 'add','mass-delete'),
+                'grid_before_create'=>$gridId.'_register'
             );
 
 
@@ -406,6 +409,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         parent::formPostAfter($args);
         $model = $args['model'];
         $data = BRequest::i()->post();
+
+
         if (isset($data['do']) && $data['do'] === 'DELETE') {
             $this->deleteRelateInfo($model);
         } else {
@@ -516,7 +521,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $hlp = FCom_Catalog_Model_ProductMedia::i();
         foreach (array('A'=>'attachments', 'I'=>'images') as $type=>$typeName) {
-            //$typeName = 'product_'.$typeName;
+
             if (!empty($data['grid'][$typeName]['del'])) {
                 $hlp->delete_many(array(
                     'product_id'=>$model->id,
@@ -524,31 +529,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'id'   =>explode(',', $data['grid'][$typeName]['del']),
                 ));
             }
-/*
-//echo "<pre>"; print_r($data['grid'][$typeName]['add']);
-                $oldAtt = $hlp->orm()->where('product_id', $model->id)->where('media_type', $type)
-                    ->find_many_assoc('file_id');
-//print_r(BDb::many_as_array($oldAtt));
-                foreach (explode(',', $data['grid'][$typeName]['add']) as $attId) {
-                    if ($attId && empty($oldAtt[$attId])) {
-//try {
-//    echo 1;
-                        $m = $hlp->create(array(
-                            'product_id'=>$model->id,
-                            'media_type'=>$type,
-                            'file_id'=>$attId,
-                        ))->save();
-//    print_r($m->as_array());
-//} catch (Exception $e) {
-//    echo 2;
-//    Debug::exceptionHandler($e);
-//}
-                    }
-                }
-//echo "</pre>";
-//exit;**/
-            if (isset($data['product_'.$typeName])) {
-                foreach ($data['product_'.$typeName] as $key => $image) {
+
+            if (!empty($data['grid'][$typeName]['rows'])) {
+                $rows = BUtil::fromJson($data['grid'][$typeName]['rows']);
+                foreach ($rows as $image) {
+                    $key = $image['id'];
+                    unset($image['id']);
                     if ($key != 'main_thumb') {
                         $mediaModel =  $hlp->load($key);
                         $main_thumb = 0;
@@ -712,9 +698,13 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function getDuplicateSuffixNumber($oldName, $oldSku, $oldUrlKey)
     {
-        $sql = 'SELECT * FROM fcom_product WHERE product_name REGEXP "'.$oldName.'-[0-9]$"
-                OR local_sku REGEXP "'.$oldSku.'-[0-9]$" OR url_key REGEXP"'.$oldUrlKey.'-[0-9]$" ORDER BY id DESC';
-        $result = FCom_Catalog_Model_Product::i()->orm()->raw_query($sql)->find_one();
+        $result = FCom_Catalog_Model_Product::i()->orm()
+            ->where(array('OR' => array(
+                array('product_name REGEXP ?', $oldName . '-[0-9]$'),
+                array('local_sku REGEXP ?', $oldSku . '-[0-9]$'),
+                array('url_key REGEXP ?', $oldUrlKey . '-[0-9]$'),
+            )))
+            ->order_by_desc('id')->find_one();
         $numberSuffix = 1;
         if ($result) {
             foreach ($result as $arr) {

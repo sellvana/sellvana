@@ -629,6 +629,9 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                     }, function (r) {
                         if (r.status) {
                             $(data.rslt.obj).attr("id", "node_" + r.id);
+                            var nodeSelected = $.jstree._focused().get_selected();
+                            el.jstree('deselect_node').trigger('deselect_node.jstree', nodeSelected);
+                            el.jstree('select_node', data.rslt.obj);
                         }
                         else {
                             $.bootstrapGrowl("Error:<br>" + r.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
@@ -857,7 +860,8 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                 try {
                     editors[id].destroy();
                 } catch (e) {
-                    editors[id].destroy();
+                    CKEDITOR.instances[id].destroy();
+                    //editors[id].destroy();
                 }
                 editors[id] = null;
             }
@@ -1213,7 +1217,8 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
         $(document).bind('ajaxSuccess', function (event, request, settings) {
             if (request.responseText[0]==='{' && (data = $.parseJSON(request.responseText))) {
                 if (data.error == 'login') {
-                    location.href = FCom.base_href;
+//                    location.href = FCom.base_href;
+                    location.reload(true);
                 }
             }
         });

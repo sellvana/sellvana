@@ -9,6 +9,6 @@ modules:
             FCom_Admin:
                 auto_use: [ layout, views ]
                 routing:
-                    - [ get, /tests/index, FCom_Test_Admin_Controller_Tests.index ]
-                    - [ get, /tests/run, FCom_Test_Admin_Controller_Tests.run ]
-                    - [ get, /tests/run2, FCom_Test_Admin_Controller_Tests.run2 ]
+                    - [ /tests/index, FCom_Test_Admin_Controller_Tests.index ]
+                    - [ /tests/run, FCom_Test_Admin_Controller_Tests.run ]
+                    - [ /tests/run2, FCom_Test_Admin_Controller_Tests.run2 ]

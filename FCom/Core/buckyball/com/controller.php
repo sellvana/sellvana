@@ -671,16 +671,16 @@ class BRequest extends BClass
     */
     public static function currentUrl()
     {
-        $webroot = rtrim(static::webRoot(), '/');
-        $scheme = static::scheme();
-        $port = static::httpPort();
-        $url = $scheme.'://'.static::httpHost();
+        $host = static::scheme().'://'.static::httpHost(true);
         if (BConfig::i()->get('web/hide_script_name') && BApp::i()->get('area')!=='FCom_Admin') {
-            $url = rtrim($url, '/') . '/' . ltrim(str_replace('//', '/', $webroot), '/');;
+            $root = static::webRoot();
         } else {
-            $url = rtrim($url, '/') . '/' . ltrim(str_replace('//', '/', static::scriptName()), '/');
+            $root = static::scriptName();
         }
-        $url .= static::rawPath().(($q = static::rawGet()) ? '?'.$q : '');
+        $root = trim($root, '/');
+        $path = ltrim(static::rawPath(), '/');
+        $get = static::rawGet();
+        $url = $host . '/' . ($root ? $root . '/' : '') . $path . ($get ? '?' . $get : '');
         return $url;
     }
 
@@ -1358,6 +1358,8 @@ class BResponse extends BClass
         }
         // redundancy: avoid memory leakage from debug log
         BDebug::level(BDebug::MEMORY, false);
+        // turn off in-memory SQL log
+        BConfig::i()->set('db/logging', 0);
         // remove process timeout limitation
         set_time_limit(0);
         // output in real time
@@ -1534,8 +1536,24 @@ class BRouting extends BClass
         return $this;
     }
 
+    public function removeRoute($route, $callback = null)
+    {
+        if (is_null($callback)) {
+            unset($this->_routes[$route]);
+            BDebug::debug('REMOVE ROUTE '.$route);
+        } else {
+            if (!empty($this->_routes[$route])) {
+                $this->_routes[$route]->removeObserver($callback);
+                BDebug::debug('REMOVE ROUTE CALLBACK '.$route.' : '.print_r($callback,1));
+            }
+        }
+        return $this;
+    }
+
     /**
      * Shortcut to $this->route() for GET http verb
+     *
+     * @deprecated
      * @param mixed  $route
      * @param mixed  $callback
      * @param array  $args
@@ -1550,6 +1568,8 @@ class BRouting extends BClass
 
     /**
      * Shortcut to $this->route() for POST http verb
+     *
+     * @deprecated
      * @param mixed  $route
      * @param mixed  $callback
      * @param array  $args
@@ -1564,6 +1584,8 @@ class BRouting extends BClass
 
     /**
      * Shortcut to $this->route() for PUT http verb
+     *
+     * @deprecated
      * @param mixed $route
      * @param null  $callback
      * @param null  $args
@@ -1578,6 +1600,8 @@ class BRouting extends BClass
 
     /**
      * Shortcut to $this->route() for GET|POST|DELETE|PUT|HEAD http verbs
+     *
+     * @deprecated
      * @param mixed $route
      * @param null  $callback
      * @param null  $args
@@ -1592,6 +1616,8 @@ class BRouting extends BClass
 
     /**
      * Process shortcut methods
+     *
+     * @deprecated
      * @param mixed  $route
      * @param string $verb
      * @param null   $callback
@@ -1640,6 +1666,12 @@ class BRouting extends BClass
             $requestRoute = BRequest::i()->rawPath();
         }
 
+        // try first new route syntax, without method included
+        if (!empty($this->_routes[$requestRoute]) && $this->_routes[$requestRoute]->validObserver()) {
+            BDebug::debug('DIRECT ROUTE: '.$requestRoute);
+            return $this->_routes[$requestRoute];
+        }
+
         if (strpos($requestRoute, ' ')===false) {
             $requestRoute = BRequest::i()->method().' '.$requestRoute;
         }
@@ -1650,7 +1682,7 @@ class BRouting extends BClass
         }
 
         BDebug::debug('FIND ROUTE: '.$requestRoute);
-        foreach ($this->_routes as $route) {
+        foreach ($this->_routes as $routeName => $route) {
             if ($route->match($requestRoute)) {
                 return $route;
             }
@@ -1659,7 +1691,7 @@ class BRouting extends BClass
     }
 
     /**
-    * Convert collected routes into tree
+    * Sort collected routes by specificity
     *
     * @return BFrontController
     */
@@ -1673,8 +1705,8 @@ class BRouting extends BClass
 #echo ' ** ('.$a->route_name.'):('.$b->route_name.'): '.$res.' ** <br>';
                 return $res;
             }
-            $ap = (strpos($a->route_name, '/*') ? 10 : 0)+(strpos($a->route_name, '/.') ? 5 : 0)+(strpos($a->route_name, '/:') ? 1 : 0);
-            $bp = (strpos($b->route_name, '/*') ? 10 : 0)+(strpos($b->route_name, '/.') ? 5 : 0)+(strpos($b->route_name, '/:') ? 1 : 0);
+            $ap = (strpos($a->route_name, '/*')!==false ? 10 : 0)+(strpos($a->route_name, '/.')!==false ? 5 : 0)+(strpos($a->route_name, '/:')!==false ? 1 : 0);
+            $bp = (strpos($b->route_name, '/*')!==false ? 10 : 0)+(strpos($b->route_name, '/.')!==false ? 5 : 0)+(strpos($b->route_name, '/:')!==false ? 1 : 0);
 #echo $a->route_name.' ('.$ap.'), '.$b->route_name.'('.$bp.')<br>';
             return $ap === $bp ? 0 : ($ap < $bp ? -1 : 1 );
         });
@@ -1744,7 +1776,6 @@ class BRouting extends BClass
             $this->_currentRoute = $route;
 
             $forward = $route->dispatch();
-
             if ($this->_stop) {
                 return $this;
             }
@@ -1822,9 +1853,14 @@ class BRouteNode
         }
         $a = explode(' ', $this->route_name);
         if (sizeof($a)<2) {
-            throw new BException('Invalid route format: '.$this->route_name);
+            $a = array(
+                'GET|POST|DELETE|PUT|HEAD',
+                $a[0],
+            );
+            $this->multi_method = true;
+        } else {
+            $this->multi_method = strpos($a[0], '|') !== false;
         }
-        $this->multi_method = strpos($a[0], '|') !== false;
         if ($a[1]==='/') {
             $this->regex = '#^('.$a[0].') (/)$#';
         } else {
@@ -1939,6 +1975,16 @@ class BRouteNode
         return null;
     }
 
+    public function removeObserver($callback)
+    {
+        foreach ($this->_observers as $i => $o) {
+            if ($o->callback == $callback) {
+                unset($this->_observers[$i]);
+            }
+        }
+        return $this;
+    }
+
     /**
     * Try to dispatch valid observers
     *
@@ -1951,6 +1997,7 @@ class BRouteNode
         $attempts = 0;
         $observer = $this->validObserver();
         while ((++$attempts<100) && $observer) {
+
             $forward = $observer->dispatch();
             if (is_array($forward)) {
                 return $forward;

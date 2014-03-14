@@ -1,7 +1,7 @@
 {% set c = THIS.get('model') %}
+{% set mode = c.get("mode_by_ip/FCom_Admin")|split("\n")|join('|') %}
 
 <h2>{{ "Admin Settings"|_}}</h2>
-
 <div class="accordion accordion-blue panel-group" id="settings-FCom_Admin">
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -52,9 +52,7 @@
             <div class="panel-body">
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "IP: Mode"|_ }}</label>
-                    <div class="col-md-5">
-                        <textarea class="form-control" name="config[mode_by_ip][FCom_Admin]" rows="5">{{ c.get("mode_by_ip/FCom_Admin")|raw }}</textarea>
-                    </div>
+                    <div class="col-md-8 group-ip-mode"></div>
                 </div>
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ "Modules to run in RECOVERY mode"|_ }}</label>
@@ -76,10 +74,17 @@
                     <div class="col-md-5">
                         <input type="hidden" name="config[modules][FCom_Admin][password_strength]" value="0" />
                         <input type="checkbox" class="switch-cbx" name="config[modules][FCom_Admin][password_strength]" value="1"
-                               {{ c.get('modules/FCom_Admin/password_strength') == '1' ? 'checked="checked"' : '' }} />
+                                {{ c.get('modules/FCom_Admin/password_strength') == '1' ? 'checked="checked"' : '' }} />
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script  type="text/javascript">
+    require(['backbone', 'jquery', 'fcom.ipmode', 'select2'], function(Backbone, $, ipMode) {
+        var mode = '{{ mode }}';
+        mode = mode.split('|');
+        ipMode.initMode({el: $('#settings-FCom_Admin-group1').find('.group-ip-mode'), name: 'config[mode_by_ip][FCom_Admin]', mode: mode});
+    })
+</script>

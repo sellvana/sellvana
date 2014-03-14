@@ -200,6 +200,7 @@ class BModuleRegistry extends BClass
         $data = array();
         foreach ($this->_modules as $modName => $mod) {
             $data[$modName] = (array)$mod;
+            $data[$modName]['is_cached'] = true;
             unset($data['run_level']);
         }
         #file_put_contents($cacheFile, '<'.'?php return '.var_export($data, 1).';');
@@ -285,6 +286,10 @@ class BModuleRegistry extends BClass
             }
             if (!empty($manifest['modules'])) {
                 foreach ($manifest['modules'] as $modName=>$params) {
+                    if (!is_array($params)) {
+                        BDebug::debug('Invalid module declaration: '.print_r($manifest['modules'], 1));
+                        continue;
+                    }
                     $params['manifest_file'] = $file;
                     $this->addModule($modName, $params);
                 }
@@ -659,6 +664,8 @@ class BModule extends BClass
     public $autoload;
     public $crontab;
     public $custom;
+
+    public $is_cached;
     /**
      * @var array
      */
@@ -734,27 +741,33 @@ if ($args['name']==="FCom_Referrals") {
 */
         $this->set($args);
 
-        $args = $this->_processAreas($args);
-
         $m = $this->_getManifestData();
-        if (!empty($this->bootstrap) && empty($this->bootstrap['file'])) {
-            $this->bootstrap['file'] = null;
-        }
-        if (empty($this->root_dir)) {
-            $this->root_dir = $m['root_dir'];
-        }
-        //TODO: optimize path calculations
-        if (!BUtil::isPathAbsolute($this->root_dir)) {
-//echo "{$m['root_dir']}, {$args['root_dir']}\n";
-            if($m['root_dir'] != $this->root_dir)
-                $this->root_dir = BUtil::normalizePath($m['root_dir'].'/'.$this->root_dir);
-            else{
-                $this->root_dir = BUtil::normalizePath($this->root_dir);
+
+        if (!$this->is_cached) {
+            $args = $this->_processAreas($args);
+
+            if (!empty($this->bootstrap) && empty($this->bootstrap['file'])) {
+                $this->bootstrap['file'] = null;
+            }
+            if (empty($this->root_dir)) {
+                $this->root_dir = $m['root_dir'];
+            }
+            //TODO: optimize path calculations
+            if (!BUtil::isPathAbsolute($this->root_dir)) {
+    //echo "{$m['root_dir']}, {$args['root_dir']}\n";
+                if($m['root_dir'] != $this->root_dir)
+                    $this->root_dir = BUtil::normalizePath($m['root_dir'].'/'.$this->root_dir);
+                else{
+                    $this->root_dir = BUtil::normalizePath($this->root_dir);
+                }
+
+                //$this->root_dir = BUtil::normalizePath($this->root_dir);
+                //echo $this->root_dir."\n";
             }
 
-            //$this->root_dir = BUtil::normalizePath($this->root_dir);
-            //echo $this->root_dir."\n";
+            $this->_normalizeManifestRequireFormat();
         }
+
         $this->run_level = static::$_defaultRunLevel; // disallow declaring run_level in manifest
         /*
         if (!isset($this->run_level)) {
@@ -765,8 +778,6 @@ if ($args['name']==="FCom_Referrals") {
         if (!isset($this->run_status)) {
             $this->run_status = BModule::IDLE;
         }
-
-        $this->_normalizeManifestRequireFormat();
     }
 
     protected function _normalizeManifestRequireFormat()
@@ -991,13 +1002,25 @@ if ($args['name']==="FCom_Referrals") {
         }
         $hlp = BRouting::i();
         foreach ($this->routing as $r) {
-            $method = strtolower($r[0]);
-            if (!isset($r[1]) || !isset($r[2])) { var_dump($this); exit; }
-            $route = $r[1];
-            $callback = $r[2];
-            $args = isset($r[3]) ? $r[3] : array();
-            $name = isset($r[4]) ? $r[4] : null;
-            $multiple = isset($r[5]) ? $r[5] : true;
+            if ($r[0][0] === '/' || $r[0][0] === '^') {
+                $method = 'route';
+                $route = $r[0];
+                $callback = $r[1];
+                $args = isset($r[2]) ? $r[2] : array();
+                $name = isset($r[3]) ? $r[3] : null;
+                $multiple = isset($r[4]) ? $r[4] : true;
+            } else {
+                $method = strtolower($r[0]);
+                if (!isset($r[1])) {
+                    BDebug::error('Invalid routing directive: '.print_r($r));
+                    continue;
+                }
+                $route = $r[1];
+                $callback = isset($r[2]) ? $r[2] : null;
+                $args = isset($r[3]) ? $r[3] : array();
+                $name = isset($r[4]) ? $r[4] : null;
+                $multiple = isset($r[5]) ? $r[5] : true;
+            }
             $hlp->$method($route, $callback, $args, $name, $multiple);
         }
     }

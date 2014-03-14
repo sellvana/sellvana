@@ -32,8 +32,9 @@ class BPHPTAL extends BClass
 
         BLayout::i()->addRenderer('BPHPTAL', array(
             'description' => 'PHPTAL',
-            'callback' => 'BPHPTAL::renderer',
-            'file_ext' => array('.zpt', '.zpt.html'),
+            'callback'    => 'BPHPTAL::renderer',
+            'file_ext'    => array('.zpt', '.zpt.html'),
+            'editor'      => 'html',
         ));
 
         BEvents::i()->on('BLayout::loadTheme:before', 'BPHPTAL::onLayoutLoadThemeBefore');

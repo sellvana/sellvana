@@ -9,14 +9,30 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
     protected static $_sortingArray;
 
     protected static $_fieldOptions = array(
-        'field_type' => array('int' => 'Integer', 'decimal' => 'Decimal', 'varchar' => 'String', 'text' => 'Text', 'category' => 'Category'),
-        'source_type' => array('field' => 'Field', 'method' => 'Model Method', 'callback' => 'Callback'),
-        'filter_type' => array('none' => 'None', 'exclusive' => 'Exclusive', 'inclusive' => 'Inclusive', 'range' => 'Range'),
-        'filter_multivalue' => array(0 => 'No', 1 => 'Yes'),
-        'filter_counts' => array(0 => 'No', 1 => 'Yes'),
-        'filter_show_empty' => array(0 => 'No', 1 => 'Yes'),
-        'search_type' => array('none' => 'None', 'terms' => 'Terms'),
-        'sort_type' => array('none' => 'None', 'asc' => 'Ascending Only', 'desc' => 'Descending Only', 'both' => 'Both Directions'),
+        'field_type'        => array(
+            'int'      => 'Integer',
+            'decimal'  => 'Decimal',
+            'varchar'  => 'String',
+            'text'     => 'Text',
+            'category' => 'Category'
+        ),
+        'source_type'       => array( 'field' => 'Field', 'method' => 'Model Method', 'callback' => 'Callback' ),
+        'filter_type'       => array(
+            'none'      => 'None',
+            'exclusive' => 'Exclusive',
+            'inclusive' => 'Inclusive',
+            'range'     => 'Range'
+        ),
+        'filter_multivalue' => array( 0 => 'No', 1 => 'Yes' ),
+        'filter_counts'     => array( 0 => 'No', 1 => 'Yes' ),
+        'filter_show_empty' => array( 0 => 'No', 1 => 'Yes' ),
+        'search_type'       => array( 'none' => 'None', 'terms' => 'Terms' ),
+        'sort_type'         => array(
+            'none' => 'None',
+            'asc'  => 'Ascending Only',
+            'desc' => 'Descending Only',
+            'both' => 'Both Directions'
+        ),
     );
 
     static public function getFields($context='all', $where=null)
@@ -130,13 +146,21 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         return $data;
     }
 
+    static public function indexPrice($products, $field)
+    {
+        $data = array();
+        foreach ($products as $p) {
+            $data[$p->id] = $p->sale_price ? $p->sale_price : $p->base_price;
+        }
+        return $data;
+    }
+
     static public function indexPriceRange($products, $field)
     {
         $data = array();
         foreach ($products as $p) {
-            $f = $field->source_callback ? $field->source_callback : $field->field_name;
-            $m = isset($p->$f) ? $p->$f : $p->base_price;
-            if     ($m ===   0) $v = '0         ==> FREE';
+            $m = $p->sale_price ? $p->sale_price : $p->base_price;
+            if     ($m ==    0) $v = '0         ==> FREE';
             elseif ($m <   100) $v = '1-99      ==> $1 to $99';
             elseif ($m <   200) $v = '100-199   ==> $100 to $199';
             elseif ($m <   300) $v = '200-299   ==> $200 to $299';
@@ -157,7 +181,7 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
             elseif ($m <  9000) $v = '8000-8999 ==> $8000 to $8999';
             elseif ($m < 10000) $v = '9000-9999 ==> $9000 to $9999';
             else                $v = '10000-    ==> $10000 or more';
-            $data[$p->id] = $v;
+            $data[$p->id()] = $v;
         }
         return $data;
     }

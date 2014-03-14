@@ -31,6 +31,12 @@ class FCom_IndexTank_Admin extends BClass
 
         }
 
+        FCom_Admin_Model_Role::i()->createPermission(array(
+            'index_tank' => 'Index Tank',
+            'index_tank/product_field' => 'Product Fields',
+            'index_tank/product_function' => 'Product Functions',
+        ));
+
         FCom_IndexTank_Admin_Controller::bootstrap();
     }
 

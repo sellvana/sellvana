@@ -153,7 +153,7 @@
 
 <script>
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
-    var _mainForm = $('form#catalog-products-form');
+    var _mainForm = $('#catalog-products-form');
     var _submitted = false; //flag for prevent infitive loop
 
     function checkLangField(field)
@@ -190,12 +190,26 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         $("#short_desc_lang_fields").val(JSON.stringify(shortDescModel.langFields.toJSON()));
         $("#desc_lang_fields").val(JSON.stringify(descModel.langFields.toJSON()));
 
+        //setting hidden values, 'if' statement is required to check tab is load or not.
+        if (typeof(window.setAttachementsGridVals) === 'function') {
+            setAttachementsGridVals();
+        }
+
+        if (typeof(window.setImagesGridVals) === 'function') {
+            setImagesGridVals();
+        }
+
+        if (typeof(window.setLindedGridVals) === 'function') {
+            setLindedGridVals();
+        }
+
         if (!$(this).valid()) {
             SystemFields.checkingForm = true;
             return false;
         } else {
             if (SystemFields.checkingForm) {
                 SystemFields.checkingForm = false;
+
                 $(this).submit();
             }
         }
@@ -310,6 +324,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
                 multilang.addClass('btn-info');
             } else {
                 html += ' {{ 'Translate'|_ }}';
+                multilang.removeClass('btn-info');
             }
             multilang.html(html);
             this.$el.find('select.prod_sel_locale').select2();

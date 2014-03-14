@@ -190,6 +190,9 @@ class BLayout extends BClass
         if (is_string($params['file_ext'])) {
             $params['file_ext'] = explode(';', $params['file_ext']);
         }
+        if (empty($params['editor'])) {
+            $params['editor'] = 'text';
+        }
 
         static::$_renderers[$name] = $params;
 
@@ -253,10 +256,13 @@ class BLayout extends BClass
         return $this;
     }
 
-    public function collectAllViewsFiles()
+    public function collectAllViewsFiles($area = null)
     {
         $t = BDebug::debug(__METHOD__);
-        $cacheKey = 'ALL_VIEWS-'.BApp::i()->get('area'); //TODO: more flexible key
+        if (is_null($area)) {
+            $area = BApp::i()->get('area');
+        }
+        $cacheKey = 'ALL_VIEWS-' . $area;
         $cacheConfig = BConfig::i()->get('core/cache/view_files');
         $useCache = !$cacheConfig && BDebug::is('STAGING,PRODUCTION') || $cacheConfig === 'enable';
         if ($useCache) {
@@ -467,14 +473,18 @@ class BLayout extends BClass
             }
 
             $this->_views[$viewAlias] = BView::i()->factory($viewName, $params);
+            /*
             BEvents::i()->fire('BLayout::view:add:' . $viewAlias, array(
                 'view' => $this->_views[$viewAlias],
             ));
+            */
         } else {
             $this->_views[$viewAlias]->setParam($params);
+            /*
             BEvents::i()->fire('BLayout::view:update:' . $viewAlias, array(
                 'view' => $this->_views[$viewAlias],
             ));
+            */
         }
 
         return $this;
@@ -793,7 +803,8 @@ class BLayout extends BClass
                     }
                 }
                 if (empty($d['type'])) {
-                    BDebug::dump($d);
+                    BDebug::error('Unknown directive: '.print_r($d, 1));
+                    continue;
                 }
             }
             $d['type'] = trim($d['type']);

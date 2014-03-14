@@ -14,12 +14,12 @@ modules:
             FCom_Frontend:
                 auto_use: [ bootstrap, layout ]
                 routing:
-                    - [ any, /cart/?.action, FCom_Checkout_Frontend_Controller_Cart ]
-                    - [ any, /checkout, FCom_Checkout_Frontend_Controller_Checkout.checkout ]
-                    - [ get, /checkout/login, FCom_Checkout_Frontend_Controller_Checkout.checkout_login ]
-                    - [ any, /checkout/payment, FCom_Checkout_Frontend_Controller_Checkout.payment ]
-                    - [ any, /checkout/shipping, FCom_Checkout_Frontend_Controller_Checkout.shipping ]
-                    - [ get, /checkout/success, FCom_Checkout_Frontend_Controller_Checkout.success ]
-                    - [ any, /checkout/address, FCom_Checkout_Frontend_Controller_Address.address ]
+                    - [ /cart/?.action, FCom_Checkout_Frontend_Controller_Cart ]
+                    - [ /checkout, FCom_Checkout_Frontend_Controller_Checkout.checkout ]
+                    - [ /checkout/login, FCom_Checkout_Frontend_Controller_Checkout.checkout_login ]
+                    - [ /checkout/payment, FCom_Checkout_Frontend_Controller_Checkout.payment ]
+                    - [ /checkout/shipping, FCom_Checkout_Frontend_Controller_Checkout.shipping ]
+                    - [ /checkout/success, FCom_Checkout_Frontend_Controller_Checkout.success ]
+                    - [ /checkout/address, FCom_Checkout_Frontend_Controller_Address.address ]
                 observe:
                     - [ FCom_Catalog_Frontend_Controller::action_product:addToCart, FCom_Checkout_Frontend_Controller_Cart::onAddToCart ]

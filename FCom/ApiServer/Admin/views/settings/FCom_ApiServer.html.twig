@@ -1,5 +1,5 @@
 {% set m = THIS.get('model') %}
-
+{% set mode = m.get("mode_by_ip/FCom_ApiServer")|split("\n")|join('|') %}
 <h2>{{ "API Server Settings"|_}}</h2>
 
 <div class="accordion accordion-blue panel-group" id="settings-FCom_ApiServer">
@@ -9,13 +9,18 @@
         </div>
         <div class="panel-collapse accordion-body in" id="settings-FCom_ApiServer-group0">
             <div class="panel-body">
-                <div class="form-group">
-                    <label class="col-md-2 label-control">{{ 'IP: Mode'|_ }}</label>
-                    <div class="col-md-5">
-                        <textarea class="form-control" name="config[mode_by_ip][FCom_ApiServer]" rows="5">{{ m.get('mode_by_ip/FCom_ApiServer') }}</textarea>
-                    </div>
+                <div class="form-group " >
+                    <label class="col-md-2 control-label">{{ "IP: Mode"|_ }}</label>
+                    <div class="col-md-8 group-ip-mode"></div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script  type="text/javascript">
+    require(['backbone', 'jquery', 'fcom.ipmode','select2'], function(Backbone, $, ipMode) {
+        var mode = '{{ mode }}';
+        mode = mode.split('|');
+        ipMode.initMode({el: $('#settings-FCom_ApiServer-group0').find('.group-ip-mode'), name: 'config[mode_by_ip][FCom_ApiServer]', mode: mode});
+    })
+</script>

@@ -1,104 +1,99 @@
 {% set m = THIS.get('model') %}
 {% set prodCtrl =  APP.instance('FCom_Catalog_Admin_Controller_Products') %}
 
-<script>
-
-require(['jquery'], function($) {
-    var related = 'linked_products_related', similar = 'linked_products_similar';
-    var modalGrid = 'category_all_prods_grid_{{ m.id }}';
-    var data = {
-        related : {
-            add: [],
-            remove: [],
-            origin: []
-        },
-        similar: {
-            add: [],
-            remove: [],
-            origin: []
-        }
-    };
-
-    function _setFormValue() {
-        for(var key in data) {
-            var val = data[key];
-            val.add = _.difference(val.add, val.origin);
-            val.remove = _.intersection(val.remove, val.origin);
-            $("#" + key +"_ids_add").val(val.add.join(','));
-            $("#" +  key +"_ids_remove").val(val.remove.join(','));
-        }
-    }
-    function _processEvt(rows, flag) {
-        var type = $('ul.nav.prod-type li.active a').attr('href').replace('#', '');
-        var selData;
-        var gridId = '';
-        if (type === 'related') {
-            gridId = related;
-            selData = data.related;
-        }
-        if (type === 'similar') {
-            gridId = similar;
-            selData = data.similar;
-        }
-        if (flag) {
-            g_vent.trigger('silent_inject', {grid: gridId, rows:rows});
-            selData.add = _.union(_.pluck(rows,'id'), selData.add);
-            selData.remove = _.difference(selData.remove, _.pluck(rows,'id'));
-        } else {
-            console.log(_.pluck(rows,'id'));
-
-            selData.remove = _.union(_.pluck(rows,'id'), selData.remove);
-            selData.add = _.difference(selData.add, selData.remove);
-            console.log(selData.remove);
-        }
-
-        _setFormValue();
-    }
-    g_vent.bind('add', function(ev) {
-
-        if (ev.grid === related || ev.grid === similar) {
-            $('#btn_add_prod').trigger('click');
-        }
-        if (ev.grid === modalGrid) {
-            _processEvt(ev.rows, true);
-            g_vent.trigger('clear_selection', {grid: modalGrid});
-            $('button.btn-close.linked-prod-modal-close').trigger('click');
-        }
-
-    });
-
-    g_vent.bind('init', function(ev) {
-        var selData;
-        if (ev.grid === related) {
-            selData = data.related;
-        } else {
-            selData = data.similar;
-        }
-        selData.origin = ev.ids;
-        console.log(selData.origin);
-    });
-
-    g_vent.bind('mass-delete', function(ev) {
-         _processEvt(ev.rows, false);
-    });
-});
-
-</script>
 <input type='hidden' name='grid[linked_products_similar][add]' id='similar_ids_add' />
 <input type='hidden' name='grid[linked_products_similar][del]' id='similar_ids_remove'/>
 <input type='hidden' name='grid[linked_products_related][add]' id='related_ids_add'/>
 <input type='hidden' name='grid[linked_products_related][del]' id='related_ids_remove'/>
+
+<script>
+var allProdGrid, relatedProdGrid, similarProdGrid, selectedGrid;
+require(['jquery','underscore','backbone'], function($, _) {
+
+    var modalGrid = 'category_all_prods_grid_{{ m.id }}';
+    var relatedOriginIds = [], similarOriginIds = [];
+
+    window.setLindedGridVals = function() {
+
+        similarRows = _.filter(similarProdGrid.getRows().toJSON(), function(row) { return row._new;});
+        relatedRows = _.filter(relatedProdGrid.getRows().toJSON(), function(row) { return row._new;});
+
+
+        similarRows = similarRows ? _.pluck(similarRows, 'id') : [];
+        relatedRows = relatedRows ? _.pluck(relatedRows, 'id') : [];
+
+        console.log(similarRows, relatedRows);
+
+        $('#similar_ids_add').val(similarRows.join(','));
+        $('#related_ids_add').val(relatedRows.join(','));
+
+        $('#related_ids_remove').val( _.difference(relatedOriginIds, relatedProdGrid.getRows().pluck('id')).join(',') );
+        $('#similar_ids_remove').val( _.difference(similarOriginIds, similarProdGrid.getRows().pluck('id')).join(',') );
+    }
+
+    window.allProdGridRegister = function(grid) {
+        allProdGrid = grid;
+        grid.build();
+        var addBtn = $(allProdGrid.getGridSkeleton().AddButton);
+
+        //Depending selected rows count, disable or enable add button of popup
+        allProdGrid.getSelectedRows().on('add remove reset', function() {
+            if (allProdGrid.getSelectedRows().length>0) {
+                addBtn.removeClass('disabled');
+            } else {
+                addBtn.addClass('disabled');
+            }
+        });
+
+        addBtn.click(function() {
+            allProdGrid.getSelectedRows().forEach(function (row) {
+                if (!selectedGrid.getRows().findWhere({id: row.get('id')})) {
+                    var temp = row.toJSON();
+                    temp._new = true;
+                    selectedGrid.getRows().add(temp);
+                }
+            });
+
+            allProdGrid.getGridView().clearSelectedRows();
+            $('.linked-prod-modal-close').trigger('click');
+        });
+    }
+
+    window.linked_products_related_register = function(grid) {
+
+        relatedProdGrid = grid;
+        relatedProdGrid.build();
+
+        selectedGrid = relatedProdGrid;
+
+        relatedOriginIds = relatedProdGrid.getRows().pluck('id');
+        $(relatedProdGrid.getGridSkeleton().AddButton).click(function() {
+            $('#btn_add_prod').trigger('click');
+        });
+    }
+
+    window.linked_products_similar_register = function(grid) {
+        similarProdGrid = grid;
+        similarProdGrid.build();
+        similarOriginIds = similarProdGrid.getRows().pluck('id');
+        $(similarProdGrid.getGridSkeleton().AddButton).click(function() {
+            $('#btn_add_prod').trigger('click');
+        });
+    }
+});
+</script>
+
 <div class='row'>
     <div class='col-sm-10'>
     <div class='tabbable'>
         <ul class='nav nav-tabs f-horiz-nav-tabs prod-type'>
             <li class='active'>
-                <a data-toggle='tab' href='#related'>
+                <a data-toggle='tab' href='#related' onclick="selectedGrid = relatedProdGrid;">
                     {{ "Related"|_ }}
                 </a>
             </li>
             <li>
-                <a data-toggle='tab' href='#similar'>
+                <a data-toggle='tab' href='#similar' onclick="selectedGrid = similarProdGrid;">
                     {{ "Upsells"|_ }}
                 </a>
             </li>

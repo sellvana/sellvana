@@ -1,4 +1,4 @@
-define(['jquery', 'jquery.cookie', 'jquery.tablesorter'], function ($) {
+define(['jquery', 'jquery.cookie', 'jquery.tablesorter', 'fcom.locale'], function ($) {
 
     FCom.CompareBlock = function (opt) {
         //console.log('FROM CATALOG.JS', $, $.cookie);
@@ -29,7 +29,7 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter'], function ($) {
 
         function add(id) {
             if (selected.length == 4) {
-                alert("Can not add more than 4 to compare");
+                alert(locale._("Can not add more than 4 to compare"));
                 return false;
             }
             var img = $(opt.prodContainerPrefix + id + ' ' + opt.img);

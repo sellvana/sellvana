@@ -16,26 +16,27 @@ modules:
             FCom_Admin:
                 auto_use: [ views, layout ]
                 routing:
-                    - [ get, /orders, FCom_Sales_Admin_Controller_Orders.index ]
-                    - [ any, /orders/.action, FCom_Sales_Admin_Controller_Orders ]
-                    - [ get, /orderstatus, FCom_Sales_Admin_Controller_OrderStatus.index ]
-                    - [ any, /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]
+                    - [ /orders, FCom_Sales_Admin_Controller_Orders.index ]
+                    - [ /orders/.action, FCom_Sales_Admin_Controller_Orders ]
+                    - [ /orderstatus, FCom_Sales_Admin_Controller_OrderStatus.index ]
+                    - [ /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]
                 observe:
                     - [ FCom_Admin_View_Header::getNotifications, FCom_Sales_Main.checkDefaultShippingPayment ]
+                    - [ FCom_Admin_View_Dashboard::getWidgets, FCom_Sales_Main.onGetDashboardWidgets ]
 
             FCom_ApiServer:
                 routing:
-                    - [ any, /v1/sales/order, FCom_Sales_ApiServer_V1_Order.index ]
-                    - [ any, /v1/sales/order/:id, FCom_Sales_ApiServer_V1_Order.index ]
+                    - [ /v1/sales/order, FCom_Sales_ApiServer_V1_Order.index ]
+                    - [ /v1/sales/order/:id, FCom_Sales_ApiServer_V1_Order.index ]
 
             FCom_Frontend:
                 auto_use: [ layout, views ]
                 routing:
-                    - [ get, /orders, FCom_Sales_Admin_Controller_Orders.index ]
-                    - [ any, /orders/.action, FCom_Sales_Admin_Controller_Orders ]
+                    - [ /orders, FCom_Sales_Admin_Controller_Orders.index ]
+                    - [ /orders/.action, FCom_Sales_Admin_Controller_Orders ]
 
-                    - [ get, /orderstatus, FCom_Sales_Admin_Controller_OrderStatus.index ]
-                    - [ any, /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]
+                    - [ /orderstatus, FCom_Sales_Admin_Controller_OrderStatus.index ]
+                    - [ /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]
                 observe:
                     - [ FCom_Customer_Model_Customer::login:after, FCom_Sales_Model_Cart::onUserLogin ]
                     - [ FCom_Customer_Model_Customer::logout:before, FCom_Sales_Model_Cart::onUserLogout ]

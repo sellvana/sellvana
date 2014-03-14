@@ -1,6 +1,6 @@
 modules:
     FCom_Customer:
-        version: 0.1.7
+        version: 0.1.8
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_Geo: 0.1.0 } }
         translations: { de: de.php }
@@ -9,38 +9,41 @@ modules:
             FCom_Admin:
                 auto_use: [ bootstrap, layout, views ]
                 routing:
-                    - [ get, /customers, FCom_Customer_Admin_Controller_Customers.index ]
-                    - [ any, /customers/.action, FCom_Customer_Admin_Controller_Customers ]
-                    - [ any, /customers/import/.action, FCom_Customer_Admin_Controller_CustomersImport ]
-                    - [ any, /addresses/.action, FCom_Customer_Admin_Controller_Addresses ]
+                    - [ /customers, FCom_Customer_Admin_Controller_Customers.index ]
+                    - [ /customers/.action, FCom_Customer_Admin_Controller_Customers ]
+                    - [ /customers/import/.action, FCom_Customer_Admin_Controller_CustomersImport ]
+                    - [ /addresses/.action, FCom_Customer_Admin_Controller_Addresses ]
+                observe:
+                    - [ FCom_Admin_View_Dashboard::getWidgets, FCom_Customer_Admin.onGetDashboardWidgets ]
 
             FCom_Frontend:
                 auto_use: [ layout, views ]
                 routing:
-                    - [ any, /login, FCom_Customer_Frontend_Controller.login ]
-                    - [ any, /customer/register, FCom_Customer_Frontend_Controller.register ]
-                    - [ any, /customer/password/recover, FCom_Customer_Frontend_Controller.password_recover ]
-                    - [ any, /customer/password/reset, FCom_Customer_Frontend_Controller.password_reset ]
-                    - [ get, /logout, FCom_Customer_Frontend_Controller.logout ]
+                    - [ /login, FCom_Customer_Frontend_Controller.login ]
+                    - [ /customer/register, FCom_Customer_Frontend_Controller.register ]
+                    - [ /customer/password/recover, FCom_Customer_Frontend_Controller.password_recover ]
+                    - [ /customer/password/reset, FCom_Customer_Frontend_Controller.password_reset ]
+                    - [ /logout, FCom_Customer_Frontend_Controller.logout ]
 
-                    - [ get, /customer/myaccount, FCom_Customer_Frontend_Controller_Account.index ]
-                    - [ any, /customer/myaccount/.action, FCom_Customer_Frontend_Controller_Account ]
+                    - [ /customer/myaccount, FCom_Customer_Frontend_Controller_Account.index ]
+                    - [ /customer/myaccount/.action, FCom_Customer_Frontend_Controller_Account ]
 
-                    - [ any, /customer/order, FCom_Customer_Frontend_Controller_Order.index ]
-                    - [ any, /customer/order/.action, FCom_Customer_Frontend_Controller_Order ]
+                    - [ /customer/order, FCom_Customer_Frontend_Controller_Order.index ]
+                    - [ /customer/order/.action, FCom_Customer_Frontend_Controller_Order ]
 
-                    - [ any, /customer/address, FCom_Customer_Frontend_Controller_Address.index ]
-                    - [ any, /customer/address/.action, FCom_Customer_Frontend_Controller_Address ]
-                    #- [ get, /customer/address/billing, FCom_Customer_Frontend_Controller_Address.billing ]
+                    - [ /customer/address, FCom_Customer_Frontend_Controller_Address.index ]
+                    - [ /customer/address/.action, FCom_Customer_Frontend_Controller_Address ]
+                    #- [ /customer/address/billing, FCom_Customer_Frontend_Controller_Address.billing ]
                 observe:
                     - [ FCom_Sales_Model_Cart::addProduct, FCom_Customer_Model_Customer::onAddProductToCart ]
+                    - [ FCom_Admin_View_Dashboard::getWidgets, FCom_Customer_Admin.onGetDashboardWidgets ]
                 views:
                     - [ customer/account/sidebar, { view_class: FCom_Customer_Frontend_View_Sidebar } ]
 
             FCom_ApiServer:
                 routing:
-                    - [ any, /v1/customer/customer, FCom_Customer_ApiServer_V1_Customer.index ]
-                    - [ any, /v1/customer/customer/:id, FCom_Customer_ApiServer_V1_Customer.index ]
+                    - [ /v1/customer/customer, FCom_Customer_ApiServer_V1_Customer.index ]
+                    - [ /v1/customer/customer/:id, FCom_Customer_ApiServer_V1_Customer.index ]
 
-                    - [ any, /v1/customer/address, FCom_Customer_ApiServer_V1_Address.index ]
-                    - [ any, /v1/customer/address/:id, FCom_Customer_ApiServer_V1_Address.index ]
+                    - [ /v1/customer/address, FCom_Customer_ApiServer_V1_Address.index ]
+                    - [ /v1/customer/address/:id, FCom_Customer_ApiServer_V1_Address.index ]

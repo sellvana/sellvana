@@ -37,13 +37,17 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
             'config'=>array(
                 'id'=>'tier-prices',
                 'columns'=>array(
-                    array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
+                    array('type'=>'row_select'),
                     array('name'=>'id', 'label'=>'ID', 'hidden'=>true),
-                    array('name'=>'group_id', 'label'=>'Customer Group', 'options'=>$cgOptions,'validation'=>array('required'=>true), 'editable'=>'inline', 'addable'=>true, 'editor'=>'select', 'width'=>150, 'default'=>1),
-                    array('name'=>'qty', 'label'=>'Minimum Qty', 'editable'=>'inline', 'addable'=>true, 'width'=>150, 'validation'=>array('required'=>true, 'number'=>true)),
-                    array('name'=>'base_price', 'label'=>'Regular Price','validation'=>array('required'=>true, 'number'=>true), 'editable'=>'inline', 'addable'=>true, 'width'=>150),
-                    array('name'=>'sale_price', 'label'=>'Special Price','validation'=>array('required'=>true, 'number'=>true), 'editable'=>'inline', 'addable'=>true, 'width'=>150),
-                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('delete'=>true))
+                    array('type'=>'input', 'name'=>'group_id', 'label'=>'Customer Group', 'options'=>$cgOptions,'validation'=>array('required'=>true),
+                            'editable'=>'inline', 'addable'=>true, 'editor'=>'select', 'width'=>150, 'default'=>1),
+                    array('type'=>'input', 'name'=>'qty', 'label'=>'Minimum Qty', 'editable'=>'inline', 'addable'=>true, 'width'=>150,
+                            'validation'=>array('required'=>true, 'number'=>true)),
+                    array('type'=>'input', 'name'=>'base_price', 'label'=>'Regular Price','validation'=>array('required'=>true, 'number'=>true),
+                             'editable'=>'inline', 'addable'=>true, 'width'=>150),
+                    array('type'=>'input', 'name'=>'sale_price', 'label'=>'Special Price','validation'=>array('required'=>true, 'number'=>true),
+                            'editable'=>'inline', 'addable'=>true, 'width'=>150),
+                    array('type'=>'btn_group', 'buttons'=>array( array('name'=>'delete') ))
                 ),
                 'data'=>BDb::many_as_array($orm->find_many()),
                 'data_mode'=>'local',
@@ -55,10 +59,7 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
                     'new'=>array('caption'=>'Add New Price'),
                     'delete'=>true
                 ),
-                'events'=>array(
-                    'init-detail','delete','mass-delete'
-                ),
-                'callbacks' => array('after_render' => 'addClassUnique')
+                'grid_before_create'=>'tierPricesGridRegister'
             )
         );
         return $grid;
