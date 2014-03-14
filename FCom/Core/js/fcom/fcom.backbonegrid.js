@@ -2217,5 +2217,3 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
     }
 );
-
-
