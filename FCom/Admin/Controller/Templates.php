@@ -19,12 +19,12 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
             array('name' => 'file_ext', 'label' => 'File Ext.', 'index' => 'file_ext', 'width' => 50),
             array('name' => 'module_name', 'label' => 'Module', 'index' => 'module_name', 'width' => 100),
             array('type'=>'btn_group',
-                'buttons' => array(
-                    array('name'=>'edit', 'href'=>BApp::href('templates/form?id='), 'col'=>'view_name'),
-                    array('name'=>'delete', 'caption' => 'Remove/Revert')
-                )
-            ),
-        );
+				'buttons' => array(
+								array('name'=>'edit', 'href'=>BApp::href('templates/form?id='), 'col'=>'view_name'),
+								array('name'=>'delete', 'caption' => 'Remove/Revert')
+								)
+			),
+		);
 
         $config['state'] = array('s' => 'view_name');
 
