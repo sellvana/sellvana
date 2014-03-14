@@ -112,11 +112,18 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $data = $config['data'];
             BResponse::i()->json(array(array('c' => 1), $data));
         } else {
-
+            $r = BRequest::i()->get();
             if (empty($grid['orm'])) {
                 $mc = $this->_modelClass;
                 $grid['orm'] = $mc::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
                 $view->set('grid', $grid);
+            }
+            if (isset($r['filters'])) {
+                $filters = BUtil::fromJson($r['filters']);
+                if (isset($filters['exclude_id']) && $filters['exclude_id'] != '') {
+                    $arr = explode(',', $filters['exclude_id']);
+                    $grid['orm'] =  $grid['orm']->where_not_in($this->_mainTableAlias.'.id', $arr);
+                }
             }
             $this->gridOrmConfig($grid['orm']);
 
