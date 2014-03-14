@@ -7,116 +7,116 @@
 <input type='hidden' name='grid[linked_products_related][del]' id='related_ids_remove'/>
 
 <script>
-    var allProdGrid, relatedProdGrid, similarProdGrid, selectedGrid;
-    require(['jquery','underscore','backbone'], function($, _) {
+var allProdGrid, relatedProdGrid, similarProdGrid, selectedGrid;
+require(['jquery','underscore','backbone'], function($, _) {
 
-        var modalGrid = 'category_all_prods_grid_{{ m.id }}';
-        var relatedOriginIds = [], similarOriginIds = [];
+    var modalGrid = 'category_all_prods_grid_{{ m.id }}';
+    var relatedOriginIds = [], similarOriginIds = [];
 
-        window.setLindedGridVals = function() {
+    window.setLindedGridVals = function() {
 
-            similarRows = _.filter(similarProdGrid.getRows().toJSON(), function(row) { return row._new;});
-            relatedRows = _.filter(relatedProdGrid.getRows().toJSON(), function(row) { return row._new;});
+        similarRows = _.filter(similarProdGrid.getRows().toJSON(), function(row) { return row._new;});
+        relatedRows = _.filter(relatedProdGrid.getRows().toJSON(), function(row) { return row._new;});
 
 
-            similarRows = similarRows ? _.pluck(similarRows, 'id') : [];
-            relatedRows = relatedRows ? _.pluck(relatedRows, 'id') : [];
+        similarRows = similarRows ? _.pluck(similarRows, 'id') : [];
+        relatedRows = relatedRows ? _.pluck(relatedRows, 'id') : [];
 
-            console.log(similarRows, relatedRows);
+        console.log(similarRows, relatedRows);
 
-            $('#similar_ids_add').val(similarRows.join(','));
-            $('#related_ids_add').val(relatedRows.join(','));
+        $('#similar_ids_add').val(similarRows.join(','));
+        $('#related_ids_add').val(relatedRows.join(','));
 
-            $('#related_ids_remove').val( _.difference(relatedOriginIds, relatedProdGrid.getRows().pluck('id')).join(',') );
-            $('#similar_ids_remove').val( _.difference(similarOriginIds, similarProdGrid.getRows().pluck('id')).join(',') );
-        }
+        $('#related_ids_remove').val( _.difference(relatedOriginIds, relatedProdGrid.getRows().pluck('id')).join(',') );
+        $('#similar_ids_remove').val( _.difference(similarOriginIds, similarProdGrid.getRows().pluck('id')).join(',') );
+    }
 
-        window.allProdGridRegister = function(grid) {
-            allProdGrid = grid;
-            grid.build();
-            var addBtn = $(allProdGrid.getGridSkeleton().AddButton);
+    window.allProdGridRegister = function(grid) {
+        allProdGrid = grid;
+        grid.build();
+        var addBtn = $(allProdGrid.getGridSkeleton().AddButton);
 
-            //Depending selected rows count, disable or enable add button of popup
-            allProdGrid.getSelectedRows().on('add remove reset', function() {
-                if (allProdGrid.getSelectedRows().length>0) {
-                    addBtn.removeClass('disabled');
-                } else {
-                    addBtn.addClass('disabled');
+        //Depending selected rows count, disable or enable add button of popup
+        allProdGrid.getSelectedRows().on('add remove reset', function() {
+            if (allProdGrid.getSelectedRows().length>0) {
+                addBtn.removeClass('disabled');
+            } else {
+                addBtn.addClass('disabled');
+            }
+        });
+
+        addBtn.click(function() {
+            allProdGrid.getSelectedRows().forEach(function (row) {
+                if (!selectedGrid.getRows().findWhere({id: row.get('id')})) {
+                    var temp = row.toJSON();
+                    temp._new = true;
+                    selectedGrid.getRows().add(temp);
                 }
             });
 
-            addBtn.click(function() {
-                allProdGrid.getSelectedRows().forEach(function (row) {
-                    if (!selectedGrid.getRows().findWhere({id: row.get('id')})) {
-                        var temp = row.toJSON();
-                        temp._new = true;
-                        selectedGrid.getRows().add(temp);
-                    }
-                });
+            allProdGrid.getGridView().clearSelectedRows();
+            $('.linked-prod-modal-close').trigger('click');
+        });
+    }
 
-                allProdGrid.getGridView().clearSelectedRows();
-                $('.linked-prod-modal-close').trigger('click');
-            });
-        }
+    window.linked_products_related_register = function(grid) {
 
-        window.linked_products_related_register = function(grid) {
+        relatedProdGrid = grid;
+        relatedProdGrid.build();
 
-            relatedProdGrid = grid;
-            relatedProdGrid.build();
+        selectedGrid = relatedProdGrid;
 
-            selectedGrid = relatedProdGrid;
+        relatedOriginIds = relatedProdGrid.getRows().pluck('id');
+        $(relatedProdGrid.getGridSkeleton().AddButton).click(function() {
+            $('#btn_add_prod').trigger('click');
+        });
+    }
 
-            relatedOriginIds = relatedProdGrid.getRows().pluck('id');
-            $(relatedProdGrid.getGridSkeleton().AddButton).click(function() {
-                $('#btn_add_prod').trigger('click');
-            });
-        }
-
-        window.linked_products_similar_register = function(grid) {
-            similarProdGrid = grid;
-            similarProdGrid.build();
-            similarOriginIds = similarProdGrid.getRows().pluck('id');
-            $(similarProdGrid.getGridSkeleton().AddButton).click(function() {
-                $('#btn_add_prod').trigger('click');
-            });
-        }
-    });
+    window.linked_products_similar_register = function(grid) {
+        similarProdGrid = grid;
+        similarProdGrid.build();
+        similarOriginIds = similarProdGrid.getRows().pluck('id');
+        $(similarProdGrid.getGridSkeleton().AddButton).click(function() {
+            $('#btn_add_prod').trigger('click');
+        });
+    }
+});
 </script>
 
 <div class='row'>
     <div class='col-sm-10'>
-        <div class='tabbable'>
-            <ul class='nav nav-tabs f-horiz-nav-tabs prod-type'>
-                <li class='active'>
-                    <a data-toggle='tab' href='#related' onclick="selectedGrid = relatedProdGrid;">
-                        {{ "Related"|_ }}
-                    </a>
-                </li>
-                <li>
-                    <a data-toggle='tab' href='#similar' onclick="selectedGrid = similarProdGrid;">
-                        {{ "Upsells"|_ }}
-                    </a>
-                </li>
-                <li>
-                    <a data-toggle='tab' href='#cross-sell'>
-                        {{ " Cross-Sell"|_ }}
-                    </a>
-                </li>
-            </ul>
-            <div class='tab-content'>
-                <div class='tab-pane active' id='related'>
-                    {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'related')) | raw }}
-                </div>
-                <div class='tab-pane' id='similar'>
-                    {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'similar')) | raw }}
-                </div>
-                <div class='tab-pane' id='cross-sell'>
-                    <div class="f-section">
-                        NEED ADD DATA IN HERE
-                    </div>
-                </div>
+    <div class='tabbable'>
+        <ul class='nav nav-tabs f-horiz-nav-tabs prod-type'>
+            <li class='active'>
+                <a data-toggle='tab' href='#related' onclick="selectedGrid = relatedProdGrid;">
+                    {{ "Related"|_ }}
+                </a>
+            </li>
+            <li>
+                <a data-toggle='tab' href='#similar' onclick="selectedGrid = similarProdGrid;">
+                    {{ "Upsells"|_ }}
+                </a>
+            </li>
+            <li>
+                <a data-toggle='tab' href='#cross-sell'>
+                    {{ " Cross-Sell"|_ }}
+                </a>
+            </li>
+        </ul>
+        <div class='tab-content'>
+            <div class='tab-pane active' id='related'>
+                {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'related')) | raw }}
+            </div>
+            <div class='tab-pane' id='similar'>
+                {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'similar')) | raw }}
+            </div>
+            <div class='tab-pane' id='cross-sell'>
+              <div class="f-section">
+                NEED ADD DATA IN HERE
+              </div>
             </div>
         </div>
+    </div>
     </div>
 </div>
 
@@ -137,7 +137,6 @@
         </div>
     </div>
 </div>
-
 
 
 
