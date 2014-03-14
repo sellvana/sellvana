@@ -21,17 +21,17 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             array('name' => 'from_date', 'label' => 'Start Date', 'index' => 'from_date', 'formatter' => 'date'),
             array('name' => 'to_date', 'label' => 'End Date', 'index' => 'to_date', 'formatter' => 'date'),
             array('type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'p.status',
-                  'editable' => true, 'mass-editable' => true, 'options' => FCom_Promo_Model_Promo::i()->fieldOptions('status'), 'editor' => 'select'
+                'editable' => true, 'mass-editable' => true, 'options' => FCom_Promo_Model_Promo::i()->fieldOptions('status'), 'editor' => 'select'
             ),
             array('name' => 'details', 'label' => 'Details', 'index' => 'details', 'hidden' => true),
             array('name' => 'attachments', 'label' => 'Attachments', 'sortable' => false, 'hidden' => false),
             array(
                 'type' =>'btn_group', 'name'=>'_actions','label'=> 'Actions', 'sortable' => false,
                 'buttons'=> array(
-                                   array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 
-                                   array('name'=>'delete')
-                                )
-                )            
+                    array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'),
+                    array('name'=>'delete')
+                )
+            )
         );
         $config['actions'] = array(
             'edit' => true,
@@ -52,9 +52,9 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
 
         //load attachments
         $orm->select("(select group_concat(a.file_name separator ', ') from ".
-                FCom_Promo_Model_Media::table().
-                " pa inner join fcom_media_library a on a.id=pa.file_id where pa.promo_id=p.id)",
-                'attachments')
+            FCom_Promo_Model_Media::table().
+            " pa inner join fcom_media_library a on a.id=pa.file_id where pa.promo_id=p.id)",
+            'attachments')
         ;
     }
 
@@ -116,8 +116,8 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         if ( !empty( $data[ '_del_group_ids' ] ) ) {
             $deleteGroups = explode( ',', trim( $data[ '_del_group_ids' ], ',' ) );
             FCom_Promo_Model_Group::i()->delete_many(array(
-                  'id'       => $deleteGroups,
-                  'promo_id' => $model->id,
+                    'id'       => $deleteGroups,
+                    'promo_id' => $model->id,
                 )
             );
             foreach ( $deleteGroups as $gId ) {
@@ -129,10 +129,10 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             foreach ( $data[ 'group' ] as $gId => $g ) {
                 if ( $gId < 0 ) {
                     $group  = FCom_Promo_Model_Group::i()->create(array(
-                              'promo_id'   => $model->id,
-                              'group_type' => $g[ 'group_type' ],
-                              'group_name' => $g[ 'group_name' ],
-                        ))->save();
+                        'promo_id'   => $model->id,
+                        'group_type' => $g[ 'group_type' ],
+                        'group_name' => $g[ 'group_name' ],
+                    ))->save();
                     $gIdMap[ $gId ]       = $group->id;
                     $groups[ $group->id ] = $group;
                 } elseif ( !empty( $groups[ $gId ] ) ) {
@@ -149,10 +149,10 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                             continue;
                         }
                         FCom_Promo_Model_Product::i()->create(array(
-                                'promo_id'   => $model->id,
-                                'group_id'   => $gId,
-                                'product_id' => $pId,
-                            ))->save();
+                            'promo_id'   => $model->id,
+                            'group_id'   => $gId,
+                            'product_id' => $pId,
+                        ))->save();
                         $groupData[ $gId ][ $pId ] = 1;
                     }
                 }
@@ -222,7 +222,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         }
 
         $groupName = $model ? htmlspecialchars( $groups[ $model->id ][ $groupId ]->group_name )
-                            : 'Group ' . abs( $groupId );
+            : 'Group ' . abs( $groupId );
         $gridId    = 'promo_products_' . $type . '_' . $groupId;
         $config    = parent::gridConfig();
         unset( $config[ 'orm' ] );
@@ -233,7 +233,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             array( 'type'=>'row_select'),
             array( 'name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 40, 'hidden' => true ),
             array( 'name' => 'product_name', 'label'   => 'Name', 'index'   => 'product_name',
-                   'width'=> 450, 'addable' => true ),
+                'width'=> 450, 'addable' => true ),
             array( 'name' => 'local_sku', 'label' => 'SKU', 'index' => 'local_sku', 'width' => 70 ),
         );
         $actions = array(
@@ -244,7 +244,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $config[ 'filters' ] = array(
             array( 'field' => 'product_name', 'type' => 'text' )
         );
-        $config[ 'events' ] = array( 'init', 'add', 'mass-delete' );
+        $config['grid_before_create'] = $gridId.'_register';
 
 //        $config = array(
 //            'grid' => array(
@@ -311,12 +311,12 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     {
         array_splice($args['config']['grid']['colModel'], -1, 0, array(
                 array( 'name'          => 'promo_status',
-                       'label'         => 'Status',
-                       'width'         => 80,
-                       'options'       => array( '' => 'All', 'A' => 'Active', 'I' => 'Inactive' ),
-                       'editable'      => true,
-                       'edittype'      => 'select',
-                       'searchoptions' => array( 'defaultValue' => 'A' )
+                    'label'         => 'Status',
+                    'width'         => 80,
+                    'options'       => array( '' => 'All', 'A' => 'Active', 'I' => 'Inactive' ),
+                    'editable'      => true,
+                    'edittype'      => 'select',
+                    'searchoptions' => array( 'defaultValue' => 'A' )
                 ),
             )
         );

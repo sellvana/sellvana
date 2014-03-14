@@ -19,32 +19,32 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             array('name' => 'firstname', 'label'=>'First Name', 'index'=>'c.firstname'),
             array('name' => 'lastname', 'label'=>'Last Name', 'index'=>'c.lastname'),
             array('name' => 'email', 'label'=>'Email', 'index'=>'c.email'),
-            array('type' => 'input', 'name' => 'customer_group', 'label'=>'Customer Group', 'index'=>'c.customer_group', 
-                  'editor' => 'select', 'mass-editable-show' => false,
-                  'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(), 'editable' => true, 'mass-editable' => true),
+            array('type' => 'input', 'name' => 'customer_group', 'label'=>'Customer Group', 'index'=>'c.customer_group',
+                'editor' => 'select', 'mass-editable-show' => false,
+                'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(), 'editable' => true, 'mass-editable' => true),
             array('type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'c.status', 'editor' => 'select',
-                  'mass-editable-show' => false, 'options' => FCom_Customer_Model_Customer::i()->fieldOptions('status'), 
-                  'editable' => true, 'mass-editable' => true),
+                'mass-editable-show' => false, 'options' => FCom_Customer_Model_Customer::i()->fieldOptions('status'),
+                'editable' => true, 'mass-editable' => true),
             array('name' => 'street1', 'label'=>'Address', 'index'=>'a.street1'),
             array('name' => 'city', 'label'=>'City', 'index'=>'a.city'),
             array('name' => 'region', 'label'=>'Region', 'index'=>'a.region'),
             array('name' => 'postcode', 'label'=>'Postal Code', 'index'=>'a.postcode'),
             array('type' => 'input', 'name' => 'country', 'label'=>'Country', 'index'=>'a.country', 'editor'=>'select',
-                    'options'=>FCom_Geo_Model_Country::i()->options()),
+                'options'=>FCom_Geo_Model_Country::i()->options()),
             array('name' => 'create_at', 'label'=>'Created', 'index'=>'c.create_at'),
             /*array('name' => 'update_at', 'label'=>'Updated', 'index'=>'c.update_at'),*/
             array('name' => 'last_login', 'label'=>'Last Login', 'index'=>'c.last_login'),
             array('type' => 'btn_group',
-                  'buttons' => array(
-                                  /*
-                                      'custom' => array(
-                                          'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
-                                          'icon' => 'icon-time', 'type' => 'link', 'title' => $this->_('Customer history')),
-                                  */
-                                      array('name'=>'edit', 'href' => BApp::href($this->_formHref . '?id='), 'col' => 'id'),
-                                      array('name'=>'delete')
-                                )
-                )            
+                'buttons' => array(
+                    /*
+                        'custom' => array(
+                            'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
+                            'icon' => 'icon-time', 'type' => 'link', 'title' => $this->_('Customer history')),
+                    */
+                    array('name'=>'edit', 'href' => BApp::href($this->_formHref . '?id='), 'col' => 'id'),
+                    array('name'=>'delete')
+                )
+            )
         );
         $config['actions'] = array(
             'export' => true,
@@ -98,9 +98,9 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         $actions = $args['view']->get('actions');
         if ($m->id) {
             $actions = array_merge($actions, array(
-                    'create-order' => '<a class="btn btn-primary" title="'.BLocale::_('Redirect to frontend and create order').'"
+                'create-order' => '<a class="btn btn-primary" title="'.BLocale::_('Redirect to frontend and create order').'"
                                         href="'.BApp::href('customers/create_order?id='.$m->id).'"><span>' . BLocale::_('Create Order') . '</span></a>'
-                ));
+            ));
         }
         $saleStatistics = $m->saleStatistics();
         $info = $this->_('Lifetime Sales') . ' ' . BLocale::currency($saleStatistics['lifetime']) . ' | ' . $this->_('Avg. Sales') . ' ' . BLocale::currency($saleStatistics['avg']);
@@ -174,7 +174,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             array('field'=>'email', 'type'=>'text'),
         );
         $config['data_mode'] = 'local';
-        $config['events'] = array('init', 'add','mass-delete');
+
 
         return array('config'=>$config);
     }
@@ -205,7 +205,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             '_quick' => array('expr' => 'firstname like ? or lastname like ? or email like ? or c.id=?', 'args' => array('?%', '%?%', '?'))
         );
 
-        $config['events'] = array('add');
+
 
         return array('config' => $config);
     }

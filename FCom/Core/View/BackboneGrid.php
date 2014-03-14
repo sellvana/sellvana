@@ -121,6 +121,18 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $grid = $this->grid;
         $c =& $grid['config'];
 
+
+        if (!empty($c['data_mode']) && $c['data_mode'] === 'local') {
+            unset($c['data_url']);
+
+            //IMPORTANT: edit_url_required is used when local mode grid needs to be saved through edit_url
+            //ex) ProductReviewGrid on product edit form
+            if (empty($c['edit_url_required']) || !$c['edit_url_required']){
+                unset($c['edit_url']);
+            }
+
+        }
+
         if (empty($c['grid_url'])) {
             $c['grid_url'] = BRequest::currentUrl();
         }
@@ -149,6 +161,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $grid['request'] = BRequest::i()->get();
         }
 
+
         $this->grid = $grid;
     }
 
@@ -162,64 +175,86 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 $col['name'] = $cId;
             }
 
-			if ($cId === 0) {
-				$col['cssClass'] = 'select-row';
-				$col['edit'] = 'inline';
-			}
-			
-			if (empty($col['type'])) {
-				continue;
-			}
-			switch($col['type']) {
-				case 'multiselect':
-					$col['width'] = 50;
+            if ($cId === 0) {
+                $col['cssClass'] = 'select-row';
+                $col['edit'] = 'inline';
+            }
+
+            if (empty($col['type'])) {
+                continue;
+            }
+            switch($col['type']) {
+                case 'multiselect':
+                    $col['width'] = 50;
                     $col['no_reorder'] = true;
-										
-					break;
-				case 'btn_group':
+
+                    break;
+                case 'input':
+                    /*if (!empty($col['editor']) && $col['editor'] === 'select' && !empty($col['options'])) {
+
+                        $temp = array();
+                        foreach($col['options'] as $key=>$val) {
+
+                            if (is_array($val)) {
+                                $temp[] = $val;
+                            } else {
+                                $temp[] = array('label'=>$val, 'value'=>$key);
+                            }
+                        }
+                        $col['options'] = $temp;
+
+                    }*/
+
+
+                    break;
+                case 'btn_group':
                     $col['label'] = 'Actions';
-                    $col['sortable'] = false;                     
-					foreach($col['buttons'] as $bId=>&$btn) {						
-						switch($btn['name']) {
-							case 'edit':																
-								$btn['icon'] = ' icon-edit-sign';								
-								$btn['cssClass'] = ' btn-xs btn-edit ';
-								if (!empty($btn['href'])) {								
-									$btn['type'] = 'link';
-									
-									if(empty($btn['col'])) {
-										$btn['col']= 'id';
-									}
-								}
-								
-								break;
-							case 'custom':
-								$btn['cssClass'] = 'btn-custom';
-								
-								break;
-							/*case 'edit_inline':
-								$col['icon'] = 'icon-pencil';
-								
-								break;*/
-							case 'delete':
-								$btn['icon'] = 'icon-remove';
-								$btn['cssClass'] = 'btn-delete ';
-								if(!empty($btn['noconfirm']) && $btn['noconfirm']) {
-									$btn['cssClass'] .= 'noconfirm';
-								}
-								break;					
-						}
-						
-						//TODO: Is it really necessary not to have default icon when button has caption?
-						if (!empty($btn['caption'])) {
-							$btn['icon'] = '';
-						}
-					}
-					
-					
-					break;
-				
-			}
+                    $col['name'] = 'btn_group';
+                    $col['sortable'] = false;
+                    foreach($col['buttons'] as $bId=>&$btn) {
+                        switch($btn['name']) {
+                            case 'edit':
+                                if (empty($btn['icon'])) {
+                                    $btn['icon'] = ' icon-edit-sign';
+                                }
+
+                                $btn['cssClass'] = ' btn-xs btn-edit ';
+                                if (!empty($btn['href'])) {
+                                    $btn['type'] = 'link';
+
+                                    if(empty($btn['col'])) {
+                                        $btn['col']= 'id';
+                                    }
+                                }
+
+                                break;
+                            case 'custom':
+                                $btn['cssClass'] = 'btn-custom';
+
+                                break;
+                            /*case 'edit_inline':
+                                $col['icon'] = 'icon-pencil';
+
+                                break;*/
+                            case 'delete':
+                                $btn['icon'] = 'icon-remove';
+                                $btn['cssClass'] = 'btn-delete ';
+                                if(!empty($btn['noconfirm']) && $btn['noconfirm']) {
+                                    $btn['cssClass'] .= 'noconfirm';
+                                }
+                                break;
+                        }
+
+                        //TODO: Is it really necessary not to have default icon when button has caption?
+                        if (!empty($btn['caption'])) {
+                            $btn['icon'] = '';
+                        }
+                    }
+
+
+                    break;
+
+            }
             /*$col['position'] = ++$pos;
             switch ($cId) {
                 case '_multiselect':
@@ -265,58 +300,64 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             return;
         }
         $grid = $this->grid;
+
         foreach ($grid['config']['actions'] as $k=>&$action) {
+            //var_dump($action);
             if (!empty(static::$_defaultActions[$k])) {
 
                 switch ($k) {
                     case 'refresh':
                         $action = array('html'=>BUtil::tagHtml('a',
-                            array('href'=>BRequest::currentUrl(), 'class'=>'js-change-url grid-refresh btn'),
-                            isset($action['caption']) ? $action['caption'] : BLocale::_('Refresh')
-                        ));
+                                array('href'=>BRequest::currentUrl(), 'class'=>'js-change-url grid-refresh btn'),
+                                isset($action['caption']) ? $action['caption'] : BLocale::_('Refresh')
+                            ));
                         break;
                     case 'export':
                         $action = array('html'=>BUtil::tagHtml('button',
-                            array('type'=>'button', 'class'=>'grid-export btn'),
-                            isset($action['caption']) ? $action['caption'] : BLocale::_('Export')
-                        ));
+                                array('type'=>'button', 'class'=>'grid-export btn'),
+                                isset($action['caption']) ? $action['caption'] : BLocale::_('Export')
+                            ));
                         break;
                     case 'link_to_page':
                         $action = array('html'=>BUtil::tagHtml('a',
-                            array('href'=>BRequest::currentUrl(), 'class'=>'grid-link_to_page btn'),
-                            isset($action['caption']) ? $action['caption'] : BLocale::_('Link')
-                        ));
+                                array('href'=>BRequest::currentUrl(), 'class'=>'grid-link_to_page btn'),
+                                isset($action['caption']) ? $action['caption'] : BLocale::_('Link')
+                            ));
                         break;
                     case 'edit':
                         $action = array('html'=>BUtil::tagHtml('a',
-                            array('class'=>'btn grid-mass-edit btn-success disabled', 'data-toggle'=>'modal', 'href'=>'#'.$grid['config']['id'].'-mass-edit', 'role'=>'button'),
-                            isset($action['caption']) ? $action['caption'] : BLocale::_('Edit')
-                        ));
+                                array('class'=>'btn grid-mass-edit btn-success disabled', 'data-toggle'=>'modal', 'href'=>'#'.$grid['config']['id'].'-mass-edit', 'role'=>'button'),
+                                isset($action['caption']) ? $action['caption'] : BLocale::_('Edit')
+                            ));
                         break;
                     case 'delete':
                         $action = array('html'=>BUtil::tagHtml('button',
-                            array('class'=>'btn grid-mass-delete btn-danger disabled'.((isset($action['confirm']) && $action['confirm'] === false) ? ' noconfirm' : ''), 'type'=>'button'),
-                            isset($action['caption']) ? $action['caption'] : BLocale::_('Delete')
-                        ));
+                                array('class'=>'btn grid-mass-delete btn-danger disabled'.((isset($action['confirm']) && $action['confirm'] === false) ? ' noconfirm' : ''), 'type'=>'button'),
+                                isset($action['caption']) ? $action['caption'] : BLocale::_('Delete')
+                            ));
                         break;
                     case 'add':
                         $action = array('html'=>BUtil::tagHtml('button',
-                            array('class'=>'btn grid-add btn-primary', 'type'=>'button'),
-                            isset($action['caption']) ? $action['caption'] : BLocale::_('Add')
-                        ));
+                                array('class'=>'btn grid-add btn-primary', 'type'=>'button'),
+                                isset($action['caption']) ? $action['caption'] : BLocale::_('Add')
+                            ));
                         break;
                     case 'new':
                         $action = array('html'=>BUtil::tagHtml('button',
-                            array('class'=>"btn grid-new btn-primary ".(isset($action['modal']) && $action['modal'] ? '_modal' : ''), 'type'=>'button'),
-                            isset($action['caption']) ? $action['caption'] : BLocale::_('Add')
-                        ));
+                                array('class'=>"btn grid-new btn-primary ".(isset($action['modal']) && $action['modal'] ? '_modal' : ''), 'type'=>'button'),
+                                isset($action['caption']) ? $action['caption'] : BLocale::_('Add')
+                            ));
                         break;
                     default:
                         $action = static::$_defaultActions[$k];
                 }
-            }
-            if (is_string($action)) {
-                $action = array('html'=>$action);
+            } else {
+                $action = array('html'=>BUtil::tagHtml('button',
+                        array('class'=>isset($action['class'])? 'btn '.$action['class'] : 'btn', 'type'=>'button', 'id'=>isset($action['id']) ? $action['id'] : ''),
+                        isset($action['caption']) ? $action['caption'] : BLocale::_('Add')
+                    ));
+
+
             }
         }
         unset($action);
@@ -781,9 +822,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         break;
 
                     case 'text-range': case 'date-range':
-                        $descr .= ' '.$this->_('is between <u>%s</u> and <u>%s</u>', $this->q($s['from']), $this->q($s['to']));
+                    $descr .= ' '.$this->_('is between <u>%s</u> and <u>%s</u>', $this->q($s['from']), $this->q($s['to']));
 
-                        break;
+                    break;
                     case 'quick':
                         $descr .= ' '.$this->_('by <u>%s</u>', $this->q($s));
                         break;
@@ -905,39 +946,39 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         }
                         break;
                     case 'date-range': case 'number-range':
-                        $val = $filters[$fId]['val'];
-                        $temp = explode('~', $val);
-                        if (!empty($filters[$fId])) {
-                            switch ($filters[$fId]['op']) {
-                                case 'between':
-                                    $this->_processGridFiltersOne($f, 'gte', $temp[0], $orm);
-                                    if (isset($temp[1])) {
-                                        $this->_processGridFiltersOne($f, 'lte', $temp[1], $orm);
-                                    }
+                    $val = $filters[$fId]['val'];
+                    $temp = explode('~', $val);
+                    if (!empty($filters[$fId])) {
+                        switch ($filters[$fId]['op']) {
+                            case 'between':
+                                $this->_processGridFiltersOne($f, 'gte', $temp[0], $orm);
+                                if (isset($temp[1])) {
+                                    $this->_processGridFiltersOne($f, 'lte', $temp[1], $orm);
+                                }
 
-                                    break;
-                                case 'from':
-                                    $this->_processGridFiltersOne($f, 'gte', $val, $orm);
+                                break;
+                            case 'from':
+                                $this->_processGridFiltersOne($f, 'gte', $val, $orm);
 
-                                    break;
-                                case 'to':
-                                    $this->_processGridFiltersOne($f, 'lte', $val, $orm);
+                                break;
+                            case 'to':
+                                $this->_processGridFiltersOne($f, 'lte', $val, $orm);
 
-                                    break;
-                                case 'equal':
-                                    if ($f['type'] === 'date-range')
-                                        $this->_processGridFiltersOne($f, 'like', $val.'%', $orm);
-                                    else
-                                        $this->_processGridFiltersOne($f, 'equal', $val, $orm);
+                                break;
+                            case 'equal':
+                                if ($f['type'] === 'date-range')
+                                    $this->_processGridFiltersOne($f, 'like', $val.'%', $orm);
+                                else
+                                    $this->_processGridFiltersOne($f, 'equal', $val, $orm);
 
-                                    break;
-                                case 'not_in':
-                                    $orm->where_raw($f['field']. ' NOT BETWEEN ? and ?', array($temp[0], $temp[1]));
+                                break;
+                            case 'not_in':
+                                $orm->where_raw($f['field']. ' NOT BETWEEN ? and ?', array($temp[0], $temp[1]));
 
-                                    break;
-                            }
+                                break;
                         }
-                        break;
+                    }
+                    break;
                     case 'number-range':
 
                         if (!empty($filters[$fId]['from'])) {
@@ -949,14 +990,14 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         break;
 
                     case 'select':
-                            $this->_processGridFiltersOne($f, 'equal', $filters[$fId]['val'], $orm);
-                            break;
+                        $this->_processGridFiltersOne($f, 'equal', $filters[$fId]['val'], $orm);
+                        break;
                     case 'multiselect':
-                            $vals = explode(',', $filters[$fId]['val']);
-                            $this->_processGridFiltersOne($f, 'in', $vals, $orm);
+                        $vals = explode(',', $filters[$fId]['val']);
+                        $this->_processGridFiltersOne($f, 'in', $vals, $orm);
 
                         break;
-                    }
+                }
             }
         }
 
@@ -1041,9 +1082,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
                 $val = !empty($row->$k) ? $row->$k : '';
 //                if (isset($col['options']) && !empty($col['options'])) {
-                    if (isset($col['options'][$row->$k])) {
-                        $val = $col['options'][$row->$k];
-                    }
+                if (isset($col['options'][$row->$k])) {
+                    $val = $col['options'][$row->$k];
+                }
 //                }
                 /*if (!empty($col['editoptions']['value'][$val])) {
                     $val = $col['editoptions']['value'][$val];

@@ -17,13 +17,13 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                     'num_fields' => array('label' => 'Fields', 'width'=>30),
                 ),
                 'actions' => array(
-                            'edit' => true,
-                            'delete' => true
+                    'edit' => true,
+                    'delete' => true
                 ),
                 'filters' => array(
-                            array('field' => 'set_name', 'type' => 'text'),
-                            array('field' => 'set_code', 'type' => 'text'),
-                            '_quick' => array('expr' => 'product_name like ? or set_code like ', 'args' =>  array('%?%', '%?%'))
+                    array('field' => 'set_name', 'type' => 'text'),
+                    array('field' => 'set_code', 'type' => 'text'),
+                    '_quick' => array('expr' => 'product_name like ? or set_code like ', 'args' =>  array('%?%', '%?%'))
                 )
             )
         );
@@ -48,9 +48,9 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                     array('type'=>'btn_group',  'buttons' => array(array('name'=>'delete')))
                 ),
                 'actions'=>array(
-                                   'delete' => array('caption' => 'Remove')
-                                ),
-                'events'=>array('init', 'delete', 'mass-delete')
+                    'delete' => array('caption' => 'Remove')
+                ),
+                'grid_before_create'=>'variantFieldGridRegister'
             )
         );
 
@@ -82,12 +82,12 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $columns[] = $f;
             }
         }
-        $columns[] = array('type'=>'input', 'name'=>'sku', 'label'=>'SKU', 'width'=>150, 'editable'=>'inline', 
-                            'addable'=>true, 'validation'=>array('required'=>true), 'default'=>'');
-        $columns[] = array('type'=>'input', 'name'=>'price', 'label'=>'PRICE', 'width'=>150, 'editable'=>'inline', 
-                            'addable'=>true, 'validation'=>array('required'=>true,'number'=>true), 'default'=>'');
-        $columns[] = array('type'=>'input', 'name'=>'qty', 'label'=>'QTY', 'width'=>150, 'editable'=>'inline', 
-                            'addable'=>true, 'validation'=>array('required'=>true,'number'=>true), 'default'=>'');
+        $columns[] = array('type'=>'input', 'name'=>'sku', 'label'=>'SKU', 'width'=>150, 'editable'=>'inline',
+            'addable'=>true, 'validation'=>array('required'=>true), 'default'=>'');
+        $columns[] = array('type'=>'input', 'name'=>'price', 'label'=>'PRICE', 'width'=>150, 'editable'=>'inline',
+            'addable'=>true, 'validation'=>array('required'=>true,'number'=>true), 'default'=>'');
+        $columns[] = array('type'=>'input', 'name'=>'qty', 'label'=>'QTY', 'width'=>150, 'editable'=>'inline',
+            'addable'=>true, 'validation'=>array('required'=>true,'number'=>true), 'default'=>'');
         $columns[] = array('type'=>'btn_group',  'buttons' => array(array('name'=>'delete')));
 
         $data = array();
@@ -113,13 +113,13 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'data'=>$data,
                 'columns'=>$columns,
                 'filters'=>array(
-                            '_quick'=>array('expr'=>'field_name like ? or id like ', 'args'=> array('%?%', '%?%'))
+                    '_quick'=>array('expr'=>'field_name like ? or id like ', 'args'=> array('%?%', '%?%'))
                 ),
                 'actions'=>array(
-                                    'new'=>array('caption'=>'New Variant'),
-                                    'edit'=>array('caption'=>'Edit Variants'),
-                                    'delete' => array('caption' => 'Remove')
-                                )
+                    'new'=>array('caption'=>'New Variant'),
+                    'delete' => array('caption' => 'Remove')
+                ),
+                'grid_before_create'=>'variantGridRegister'
             )
         );
 
@@ -149,15 +149,15 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                     array('name'=>'label', 'label'=>'Field Label', 'width'=>200),
                     array('name'=>'input_type', 'label'=>'Input Type', 'width'=>200),
                     array('name'=>'options', 'label'=>'Options', 'width'=>200),
-                    array('type'=>'input', 'name'=>'price', 'label'=>'Price', 'width'=>200, 'editable' => 'inline', 
-                            'validation' => array('number' => true)),
+                    array('type'=>'input', 'name'=>'price', 'label'=>'Price', 'width'=>200, 'editable' => 'inline',
+                        'validation' => array('number' => true)),
                     array('type'=>'btn_group', 'buttons' => array(array('name'=>'delete')))
                 ),
                 'actions'=>array(
-                                    'add' => array('caption' => 'Add Fields'),
-                                    'delete' => array('caption' => 'Remove')
-                                ),
-                'events'=>array('add')
+                    'add' => array('caption' => 'Add Fields'),
+                    'delete' => array('caption' => 'Remove')
+                ),
+                'grid_before_create'=>'frontendFieldGridRegister'
             )
         );
 
@@ -177,7 +177,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         $fields = FCom_CustomField_Model_ProductField::i()->productFields($p);
         foreach($fields as $field){
             $fields_options[$field->id] = FCom_CustomField_Model_FieldOption::i()->orm()
-                    ->where("field_id", $field->id)->find_many();
+                ->where("field_id", $field->id)->find_many();
         }
         $view = $this->view('customfields/products/fields-partial');
         $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fields_options);
@@ -210,7 +210,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         $fields = FCom_CustomField_Model_ProductField::i()->productFields($p, BRequest::i()->request());
         foreach($fields as $field){
             $fields_options[$field->id] = FCom_CustomField_Model_FieldOption::i()->orm()
-                    ->where("field_id", $field->id)->find_many();
+                ->where("field_id", $field->id)->find_many();
         }
 
         $view = $this->view('customfields/products/fields-partial');
@@ -244,11 +244,11 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         $id = $r->get('id');
         $set = FCom_CustomField_Model_Set::i()->load($id);
         $fields = BDb::many_as_array(
-                    FCom_CustomField_Model_SetField::i()->orm('sf')
-                    ->join('FCom_CustomField_Model_Field', array('f.id','=','sf.field_id'), 'f')
-                    ->select(array('f.id', 'f.field_name', 'f.admin_input_type'))
-                    ->where('sf.set_id', $id)->find_many()
-                );
+            FCom_CustomField_Model_SetField::i()->orm('sf')
+                ->join('FCom_CustomField_Model_Field', array('f.id','=','sf.field_id'), 'f')
+                ->select(array('f.id', 'f.field_name', 'f.admin_input_type'))
+                ->where('sf.set_id', $id)->find_many()
+        );
         foreach($fields as &$field) {
             if ($field['admin_input_type'] === 'select' ||  $field['admin_input_type'] === 'multiselect') {
                 $field['options'] = FCom_CustomField_Model_FieldOption::i()->getListAssocById($field['id']);
@@ -269,27 +269,27 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     public function action_save__POST()
     {
-         $data = BRequest::i()->post();
-         $prodId = $data['id'];
-         $json = $data['json'];
+        $data = BRequest::i()->post();
+        $prodId = $data['id'];
+        $json = $data['json'];
 
-         $res = BDb::many_as_array(FCom_CustomField_Model_ProductField::i()->orm()->where('product_id',$prodId)->find_many());
+        $res = BDb::many_as_array(FCom_CustomField_Model_ProductField::i()->orm()->where('product_id',$prodId)->find_many());
 
-         if(empty($res)) {
+        if(empty($res)) {
             $new = FCom_CustomField_Model_ProductField::i()->create();
             $new->product_id = $prodId;
             $new->_data_serialized = $json;
             $new->save();
             $status = 'Successfully saved.';
-         } else {
+        } else {
 
             $row = FCom_CustomField_Model_ProductField::i()->load($res[0]['id']);
             $row->_data_serialized = $json;
             $row->save();
             $status = 'Successfully updated.';
-         }
+        }
 
-         BResponse::i()->json(array('status'=>$status));
+        BResponse::i()->json(array('status'=>$status));
     }
 
     public function action_get_fields__POST()

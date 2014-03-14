@@ -3,122 +3,122 @@
 {% set mediaLibAttachConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_attachments', 'folder': 'media/product/attachment', 'callbacks': {'after_render': 'renderAttachment'}}) %}
 
 <script>
-var mediaGrid, attachmentGrid;
-require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone) {
-    var orignIds, addedIds = [], removedIds = [];
+    var mediaGrid, attachmentGrid;
+    require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone) {
+        var orignIds, addedIds = [], removedIds = [];
 
-    function _getAttachmentsDbFields(row) {
-        return {
-            id: row.id,
-            file_id: row.file_id,
-            label: row.label,
-            position: row.position,
-            _new: row._new
-        };
-    }
+        function _getAttachmentsDbFields(row) {
+            return {
+                id: row.id,
+                file_id: row.file_id,
+                label: row.label,
+                position: row.position,
+                _new: row._new
+            };
+        }
 
-    /*
-    *function to set attachment grid data into form fields to send them server
-    *This function is callend when 'save' button of product form is clicked.
-    */
-    window.setAttachementsGridVals = function() {
-        console.log('setAttachmentsGridVals');
-        removedIds = _.difference(orignIds, attachmentGrid.getRows().pluck('id'));
+        /*
+         *function to set attachment grid data into form fields to send them server
+         *This function is callend when 'save' button of product form is clicked.
+         */
+        window.setAttachementsGridVals = function() {
+            console.log('setAttachmentsGridVals');
+            removedIds = _.difference(orignIds, attachmentGrid.getRows().pluck('id'));
 
-        var rows = [];
-        attachmentGrid.getRows().forEach(function(row) {
-            rows.push(_getAttachmentsDbFields(row.toJSON()));
-        });
+            var rows = [];
+            attachmentGrid.getRows().forEach(function(row) {
+                rows.push(_getAttachmentsDbFields(row.toJSON()));
+            });
 
-        $('#prod-attach-rows').val(JSON.stringify(rows));
-        $('#prod-attach-remove').val(removedIds.join(','));
-    }
+            $('#prod-attach-rows').val(JSON.stringify(rows));
+            $('#prod-attach-remove').val(removedIds.join(','));
+        }
 
-    /*
-    *MediaGrid registery function
-    */
-    window.all_attachments_register = function(grid) {
-        mediaGrid = grid;
-        grid.build();
+        /*
+         *MediaGrid registery function
+         */
+        window.all_attachments_register = function(grid) {
+            mediaGrid = grid;
+            grid.build();
 
-        //Depending selected rows count, disable or enable add button of popup
-        mediaGrid.getSelectedRows().on('add remove reset', function() {
-            if (mediaGrid.getSelectedRows().length>0) {
-                $('#prod-attachments-modal-add').removeClass('disabled');
-            } else {
-                $('#prod-attachments-modal-add').addClass('disabled');
-            }
-        });
-
-        $('#prod-attachments-modal-add').click(function() {
-
-            mediaGrid.getSelectedRows().forEach(function (row) {
-                if (!attachmentGrid.getRows().findWhere({file_id: row.get('id')})) {
-                    var addedRow = row.toJSON();
-                    addedRow._new = true;
-                    addedRow.file_id = row.id;
-                    addedRow.id = guid();
-                    attachmentGrid.getRows().add(addedRow);
+            //Depending selected rows count, disable or enable add button of popup
+            mediaGrid.getSelectedRows().on('add remove reset', function() {
+                if (mediaGrid.getSelectedRows().length>0) {
+                    $('#prod-attachments-modal-add').removeClass('disabled');
+                } else {
+                    $('#prod-attachments-modal-add').addClass('disabled');
                 }
             });
 
-            mediaGrid.getGridView().clearSelectedRows();
-            $('.prod-attachments-modal-close').trigger('click');
+            $('#prod-attachments-modal-add').click(function() {
 
-        });
-    }
+                mediaGrid.getSelectedRows().forEach(function (row) {
+                    if (!attachmentGrid.getRows().findWhere({file_id: row.get('id')})) {
+                        var addedRow = row.toJSON();
+                        addedRow._new = true;
+                        addedRow.file_id = row.id;
+                        addedRow.id = guid();
+                        attachmentGrid.getRows().add(addedRow);
+                    }
+                });
 
-    window.attachmentGridRegister = function(grid) {
-        attachmentGrid = grid;
-        attachmentGrid.build();
+                mediaGrid.getGridView().clearSelectedRows();
+                $('.prod-attachments-modal-close').trigger('click');
 
-        var attachmentConfig = attachmentGrid.getGridSkeleton();
-        originIds = attachmentGrid.getRows().pluck('id');
-
-        $(attachmentConfig.AddButton).click(function() {
-            $('#btn_prod_attach_modal').trigger('click');
-        });
-
-    }
-
-    function renderAttachment(el, row) {
-        if ($('#product_attachments').find('a.file-attachments[data-file-id="'+ row.id+'"]').length > 0) {
-            $(el).addClass('hidden');
+            });
         }
-    }
-});
 
-require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
+        window.attachmentGridRegister = function(grid) {
+            attachmentGrid = grid;
+            attachmentGrid.build();
+
+            var attachmentConfig = attachmentGrid.getGridSkeleton();
+            originIds = attachmentGrid.getRows().pluck('id');
+
+            $(attachmentConfig.AddButton).click(function() {
+                $('#btn_prod_attach_modal').trigger('click');
+            });
+
+        }
+
+        function renderAttachment(el, row) {
+            if ($('#product_attachments').find('a.file-attachments[data-file-id="'+ row.id+'"]').length > 0) {
+                $(el).addClass('hidden');
+            }
+        }
+    });
+
+    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
         $('#prod-attach-fileupload').fileupload({
             url: '{{ APP.href("media/grid/upload?folder=media/product/attachment") | raw}}',
             multiple:true
         })
-        .bind('fileuploadalways', function(e, data) {
+                .bind('fileuploadalways', function(e, data) {
 
-        if(data.result.id) {
-            mediaGrid.getRows().add(data.result);
+                    if(data.result.id) {
+                        mediaGrid.getRows().add(data.result);
 
-            $('td.name span').each(function(i) {
-                if($(this).html() === data.result.file_name)
-                $(this).parents('tr:first').remove();
-            });
+                        $('td.name span').each(function(i) {
+                            if($(this).html() === data.result.file_name)
+                                $(this).parents('tr:first').remove();
+                        });
 
-            if ($('#prod-attach-checkbox').is(':checked')) {
+                        if ($('#prod-attach-checkbox').is(':checked')) {
 
-                var addedRow = data.result;
-                addedRow._new = true;
-                addedRow.file_id = addedRow.id;
-                addedRow.id = guid();
-                attachmentGrid.getRows().add(addedRow);
+                            var addedRow = data.result;
+                            addedRow._new = true;
+                            addedRow.file_id = addedRow.id;
+                            addedRow.id = guid();
+                            attachmentGrid.getRows().add(addedRow);
 
-                if ($('tr.template-upload').length === 0) {
-                    $('.prod-attachments-modal-close').trigger('click');
-                }
-            }
-        }
-        });
+                            if ($('tr.template-upload').length === 0) {
+                                $('.prod-attachments-modal-close').trigger('click');
+                            }
+                        }
+                    }
+                });
 
-});
+    });
 </script>
 
 
@@ -131,48 +131,48 @@ require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fil
             <div class='modal-body'>
                 <div class='row'>
                     <div class='col-sm-12'>
-                    <div class='tabbable'>
-                        <ul class='nav nav-tabs prod-type'>
-                            <li class='active'>
-                                <a data-toggle='tab' href='#attach_library'>
-                                    Library
-                                </a>
-                            </li>
-                            <li>
-                                <a data-toggle='tab' href='#prod-attach-fileupload'>
-                                    Upload
-                                </a>
-                            </li>
-                        </ul>
-                        <div class='tab-content'>
-                            <div class='tab-pane active' id='attach_library'>
-                                {{ THIS.view('core/backbonegrid').set('grid', mediaLibAttachConfig) | raw }}
-                            </div>
-                            <div class='tab-pane' id='prod-attach-fileupload'>
-                                <div class='box-content'>
+                        <div class='tabbable'>
+                            <ul class='nav nav-tabs prod-type'>
+                                <li class='active'>
+                                    <a data-toggle='tab' href='#attach_library'>
+                                        Library
+                                    </a>
+                                </li>
+                                <li>
+                                    <a data-toggle='tab' href='#prod-attach-fileupload'>
+                                        Upload
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class='tab-content'>
+                                <div class='tab-pane active' id='attach_library'>
+                                    {{ THIS.view('core/backbonegrid').set('grid', mediaLibAttachConfig) | raw }}
+                                </div>
+                                <div class='tab-pane' id='prod-attach-fileupload'>
+                                    <div class='box-content'>
                                         <div class='row fileupload-buttonbar'>
-                                                          <div class='col-sm-12'>
+                                            <div class='col-sm-12'>
                                                             <span class='btn btn-success fileinput-button'>
                                                               <i class='icon-plus icon-white'></i>
                                                               <span>Add files...</span>
                                                               <input data-bfi-disabled='' multiple='' name='upload[]' type='file' >
                                                             </span>
-                                                            <button class='btn btn-primary start' type='submit'>
-                                                              <i class='icon-upload icon-white'></i>
-                                                              <span>Start upload</span>
-                                                            </button>
-                                                            <button class='btn btn-warning cancel' type='reset'>
-                                                              <i class='icon-ban-circle icon-white'></i>
-                                                              <span>Cancel upload</span>
-                                                            </button>
-                                                            <input class='toggle' type='checkbox' checked id='prod-attach-checkbox'>&nbsp;Add uploaded files and close
-                                                          </div>
-                                                          <div class='col-sm-5 fileupload-progress fade'>
-                                                            <div aria-valuemax='100' aria-valuemin='0' class='progress progress-success progress-striped active' role='progressbar'>
-                                                              <div class='bar' style='width:0%;'></div>
-                                                            </div>
-                                                            <div class='progress-extended'> </div>
-                                                          </div>
+                                                <button class='btn btn-primary start' type='submit'>
+                                                    <i class='icon-upload icon-white'></i>
+                                                    <span>Start upload</span>
+                                                </button>
+                                                <button class='btn btn-warning cancel' type='reset'>
+                                                    <i class='icon-ban-circle icon-white'></i>
+                                                    <span>Cancel upload</span>
+                                                </button>
+                                                <input class='toggle' type='checkbox' checked id='prod-attach-checkbox'>&nbsp;Add uploaded files and close
+                                            </div>
+                                            <div class='col-sm-5 fileupload-progress fade'>
+                                                <div aria-valuemax='100' aria-valuemin='0' class='progress progress-success progress-striped active' role='progressbar'>
+                                                    <div class='bar' style='width:0%;'></div>
+                                                </div>
+                                                <div class='progress-extended'> </div>
+                                            </div>
                                         </div>
                                         <div class='fileupload-loading'></div>
                                         <br>
@@ -180,10 +180,10 @@ require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fil
                                             <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
                                         </table>
 
-                                </div>
-                                {% verbatim %}
-                                <script id="template-upload" type="text/x-tmpl">
-                                    {% for (var i=0, file; file=o.files[i]; i++) { %}
+                                    </div>
+                                    {% verbatim %}
+                                    <script id="template-upload" type="text/x-tmpl">
+                                        {% for (var i=0, file; file=o.files[i]; i++) { %}
                                         <tr class="template-upload fade">
                                             <td class="preview"><span class="fade"></span></td>
                                             <td class="name"><span>{%=file.name%}</span></td>
@@ -220,8 +220,8 @@ require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fil
                                 </script>
                                 <!-- The template to display files available for download -->
 
-                                <script id="template-download" type="text/x-tmpl">
-                                    {% for (var i=0, file; file=o.files[i]; i++) { %}
+                                    <script id="template-download" type="text/x-tmpl">
+                                        {% for (var i=0, file; file=o.files[i]; i++) { %}
                                         <tr class="template-download fade">
                                            {% if (file.error) { %}
                                                 <td></td>
@@ -250,10 +250,10 @@ require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fil
                                         </tr>
                                     {% } %}
                                 </script>
-                                {% endverbatim %}
+                                    {% endverbatim %}
+                                </div>
                             </div>
                         </div>
-                    </div>
                     </div>
                 </div>
             </div>
@@ -267,3 +267,4 @@ require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fil
 
 <input type='hidden' name="grid[attachments][del]" id='prod-attach-remove' />
 <input type='hidden' name="grid[attachments][rows]" id='prod-attach-rows' />
+
