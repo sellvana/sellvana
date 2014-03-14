@@ -55,12 +55,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'grid_before_create'=>$id.'_register'
             )
         );
-        if (isset($options['callbacks'])) {
-            $config['config']['callbacks'] = $options['callbacks'];
-        }
-        if (isset($options['exclude_id'])) {
-            $config['config']['exclude_id'] = $options['exclude_id'];
-        }
+
         if (!empty($options['config'])) {
             $config = BUtil::arrayMerge($config, $options['config']);
         }
