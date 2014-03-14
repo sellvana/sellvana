@@ -2,66 +2,66 @@
 
 <script>
 require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, Backbone) {
-    var selFieldSetRow,selFieldRow,originOptionsId=[];
-    if (typeof(g_vent) === 'undefined')
-        g_vent = _.extend({}, Backbone.Events);
-    var optionForm = $('#options-form')
-    g_vent.bind('custom_callback', function(ev) {
-        console.log(ev);
-        if (ev.grid === 'fields') {
-            selFieldRow = ev.row;
-            g_vent.trigger('fetch_rows', {
-                                            grid: 'options-grid',
-                                            url: '{{ APP.href('customfields/fieldsets/field_option_grid_data?field_id=') | raw }}'+ev.row.id,
-                                            callback: function() {
-                                                $('a#btn-field-grid-modal').trigger('click');
-                                                optionForm.validate();
-                                                g_vent.trigger('get_rows', function(rows){
-                                                    originOptionsId = _.pluck(rows, 'id');
-                                                });
-                                            }
-                                        }
-            );
+    var fieldsGrid, optionsGrid, selectedRow;
+    var optionForm = $('#options-form');
+    window.optionsGridRegister = function(grid) {
+            optionsGrid = grid;
+            optionsGrid.build();
+    };
+
+    window.fieldsGridRegister = function(grid) {
+        fieldsGrid = grid;
+        fieldsGrid.getGridSkeleton().Views.RowView.prototype._callbackCustom = function (ev) {
+            selectedRow = this.model;
+
+            optionsGrid.getRows().url = '{{ APP.href('customfields/fieldsets/field_option_grid_data?field_id=') | raw }}'
+                                                    + selectedRow.get('id');
+            optionsGrid.getRows().fetch({
+                reset: true,
+                success: function () {
+                    console.log('success');
+                    $('#btn-field-grid-modal').trigger('click');
+                    $('#options-form').validate();
+                }
+            });
         }
-    });
+
+        fieldsGrid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
+            var inputType = this.model.get('admin_input_type');
+            console.log(inputType);
+            if (inputType !== 'select' && inputType !== 'multiselect') {
+                this.$el.find('button.btn-custom').remove();
+            }
+        }
+
+        fieldsGrid.build();
+    };
+
     $('button.field-modal-save').click(function() {
         if (optionForm.valid()) {
-            g_vent.trigger( 'get_rows',
+            var dataForm = optionForm.serializeArray();
+            rows = optionsGrid.getRows().toJSON();
+            rows.forEach(function (data, index) {
+                data.label =  dataForm[index]['value'];
+            });
+
+            $.post('{{ APP.href('customfields/fieldsets/field_option_grid_data') | raw }}',
                     {
-                        grid: 'options-grid',
-                        callback: function(rows) {
-                            var dataForm = optionForm.serializeArray();
-                            rows.forEach(function (data, index) {
-                                data.label =  dataForm[index]['value'];
-                            })
-                            $.post('{{ APP.href('customfields/fieldsets/field_option_grid_data') | raw }}',
-                                    {
-                                        field_id: selFieldRow.id,
-                                        rows: rows
-                                    },
-                                    function (data) {
-                                        selFieldRow.num_options = rows.length;
-                                        g_vent.trigger('update_row', {grid: 'fields', row: selFieldRow});
+                        field_id: selectedRow.get('id'),
+                        rows: rows
+                    },
+                    function (data) {
+                                        selectedRow.set('num_options', rows.length);
+                                        selectedRow.trigger('render');
                                         $('button.field-modal-close').trigger('click');
                                     }
-                            );
-                        }
-                    }
             );
+
+
         }
     });
 });
 
-/**
-* callback function for checking edit button disablity on fields grid
-**/
-function afterRowRenderFieldsGrid(el, row)
-{
-    console.log(row);
-    if(row.admin_input_type !== 'select' &&  row.admin_input_type !== 'multiselect') {
-        el.find('button.btn-custom').remove();
-    }
-}
 </script>
 
 <div class="f-admin-main-view">
@@ -77,7 +77,7 @@ function afterRowRenderFieldsGrid(el, row)
           <button id="add_new_field" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add a field" |_ }}</span></button>
       </div>
   </div>
-  
+
   <div class="f-admin-main">
       {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsGridConfig())| raw }}
   </div>

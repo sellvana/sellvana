@@ -4,86 +4,67 @@
 <input type='hidden' name='model[user_ids_remove]' id='user_ids_remove'/>
 
 <script>
+require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
+    var userGrid, rolesGrid, orignIds, addedIds = [], removedIds = [];
+    function updateFormData() {
+        console.log(rolesGrid.getRows().pluck('id'));
+        removedIds = _.difference(removedIds, rolesGrid.getRows().pluck('id'));
+        console.log(rolesGrid.getRows().toJSON());
+        var addedRows = _.filter(rolesGrid.getRows().toJSON(), function(row) {
+                            return row['added_row'];
+                        });
 
-    /**Event Aggregator
-     This aggregator is for triggering silent_inject that causes main grid adding selected rows from modal grid.**/
+        addedIds = _.pluck(addedRows, 'id');
+        $('#user_ids_add').val(addedIds.join(','));
+        $('#user_ids_remove').val(removedIds.join(','));
+    }
+    window.userGridRegister = function(grid) {
+        userGrid = grid;
+        grid.build();
 
-    var roleUserMng;
-    require(['jquery', 'underscore', 'fcom.backbonegrid'], function($) {
-        if(typeof(g_vent) === 'undefined') {
-            g_vent = _.extend({}, Backbone.Events);
-        }
-
-        function UserRoleMng() {
-            this.mainGridId = 'role_users_grid_{{ m.id }}';
-            this.modalGridId = 'role_all_users_grid_{{ m.id }}';
-
-            g_vent.bind('init', this._getOriginalIds);
-            g_vent.bind('add', this._addRows);
-            g_vent.bind('mass-delete', this._removeRows);
-
-            this.add_ids = [];
-            this.remove_ids = [];
-            this.original_ids = [];
-
-        }
-
-        UserRoleMng.prototype._setFormValues = function() {
-
-            this.add_ids = _.difference(this.add_ids,this.original_ids);
-            this.remove_ids = _.intersection(this.remove_ids, this.original_ids);
-            $('#user_ids_add').val(this.add_ids.join(','));
-            $('#user_ids_remove').val(this.remove_ids.join(','));
-
-            console.log(this.original_ids);
-            console.log(this.add_ids);
-            console.log(this.remove_ids);
-        }
-
-        UserRoleMng.prototype._getOriginalIds = function(ev) {
-
-            if (ev.grid === self.mainGridId) {
-                self.original_ids = ev.ids;
+        $(userGrid.getGridSkeleton().AddButton).click(function() {
+            if(userGrid.getSelectedRows().length >0) {
+                userGrid.getSelectedRows().forEach(function (row) {
+                    if (!rolesGrid.getRows().findWhere({username: row.get('username')})) {
+                        var addedRow = row.toJSON();
+                        addedRow.added_row = true;
+                        rolesGrid.getRows().add(addedRow);
+                    }
+                });
             }
-        }
+            rolesGrid.getGridView().render();
+            userGrid.getSelectedRows().reset({});
+            $('.role-user-modal-close').trigger('click');
 
-        UserRoleMng.prototype._addRows = function(ev) {
+            updateFormData();
+        });
+    }
 
-            if (ev.grid === self.mainGridId)
-                $('#btn_add_user').trigger('click');
+    window.rolesGridRegister = function(grid) {
+        rolesGrid = grid;
+        rolesGrid.build();
+        originIds = rolesGrid.getRows().pluck('id');
 
-            if (ev.grid === self.modalGridId) {
-                g_vent.trigger('silent_inject', {grid: self.mainGridId, rows: ev.rows});
-                self.add_ids = _.union(_.pluck(ev.rows,'id'), self.add_ids);
-                self.remove_ids = _.difference(self.remove_ids, _.pluck(ev.rows,'id'));
-                self._setFormValues();
-                g_vent.trigger('clear_selection', {grid: self.modalGridId});
-                $('button.btn-close.role-user-modal-close').trigger('click');
+        $(rolesGrid.getGridSkeleton().AddButton).click(function() {
+            $('#btn_add_user').trigger('click');
+        });
 
-            }
+        $(rolesGrid.getGridSkeleton().MassDeleteButton).off('click');
+        $(rolesGrid.getGridSkeleton().MassDeleteButton).click(function() {
 
+            var rows = rolesGrid.getRows();
+            var sRows = rolesGrid.getSelectedRows();
 
-        }
+            removedIds = sRows.pluck('id');
 
-        UserRoleMng.prototype._removeRows = function(ev) {
-            if(ev.grid === self.mainGridId) {
-                self.remove_ids = _.union(_.pluck(ev.rows,'id'), self.remove_ids);
-                self.add_ids = _.difference(self.add_ids, _.pluck(ev.rows,'id'));
-                self._setFormValues();
-            }
-        }
+            rows.remove(sRows.models);
+            sRows.reset();
+            rolesGrid.getGridView().render();
 
-        UserRoleMng.prototype.reset = function() {
-            this.add_ids = [];
-            this.remove_ids = [];
-            $('#user_ids_add').val('');
-            $('#user_ids_remove').val('');
-        }
-        var self = new UserRoleMng();
-        roleUserMng = self;
-    });
-
-
+            updateFormData();
+        });
+    }
+});
 </script>
 
 {{ THIS.view('core/backbonegrid').set('grid', userCtrl.getRoleUsersConfig(m)) | raw }}

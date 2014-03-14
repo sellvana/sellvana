@@ -123,12 +123,14 @@
                         </div>
                     </div>
 <script>
+    window.{{ config.id }}_register = function(grid) {
+
+        //media grid is used in several places. So we need to share it through window[grid_id + '_grid']
+
+        window.{{ config.id }}_grid = grid;
+        grid.build();
+    }
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
-
-
-        var prod_img_rows = [];
-
-
         $('#{{config.id}}-media-upload').fileupload({
             url: '{{ APP.href("media/grid/upload?folder=") | raw }}{{ config.folder | raw}}',
             multiple:true
@@ -136,19 +138,21 @@
         .bind('fileuploadalways', function(e, data) {
 
             if(data.result.id) {
-                g_vent.trigger('add_row', {grid: '{{ config.id }}', row:data.result});
+                //get self media grid
+                var mediaGrid = window['{{ config.id }}_grid'];
+
+                //insert uploaded file in media grid and get selected
+                var newRow = data.result;
+                newRow.selected = true;
+
+                mediaGrid.getSelectedRows().add(data.result);
+                mediaGrid.getRows().add(newRow,{merge: true}).trigger('render');
+
+
                 $('td.name span').each(function(i) {
                     if($(this).html() === data.result.file_name)
                         $(this).parents('tr:first').remove();
                 });
-
-
-                    prod_img_rows[prod_img_rows.length] = data.result;
-                    if ($('tr.template-upload').length === 0) {
-                        g_vent.trigger('select-rows', {grid: '{{ config.id }}', rows:prod_img_rows});
-
-                    }
-
             }
         });
 
