@@ -1,12 +1,12 @@
 {% set m = THIS.get('model') %}
 {% set prodAttachConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productAttachmentsGridConfig(m) %}
-{% set mediaLibAttachConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_attachments', 'folder': 'media/product/attachment', 'callbacks': {'after_render': 'renderAttachment'}}) %}
+{% set mediaLibAttachConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_attachments', 'folder': 'media/product/attachment'}) %}
 
 <script>
 var mediaGrid, attachmentGrid;
 require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone) {
-    var orignIds, addedIds = [], removedIds = [];
-
+    var originIds, addedIds = [], removedIds = [];
+    var backboneGridAllImages, rowsAllImages;
     function _getAttachmentsDbFields(row) {
         return {
             id: row.id,
@@ -23,13 +23,13 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
     */
     window.setAttachementsGridVals = function() {
         console.log('setAttachmentsGridVals');
-        removedIds = _.difference(orignIds, attachmentGrid.getRows().pluck('id'));
+        removedIds = _.difference(originIds, attachmentGrid.getRows().pluck('id'));
 
         var rows = [];
         attachmentGrid.getRows().forEach(function(row) {
             rows.push(_getAttachmentsDbFields(row.toJSON()));
         });
-
+        console.log(removedIds);
         $('#prod-attach-rows').val(JSON.stringify(rows));
         $('#prod-attach-remove').val(removedIds.join(','));
     }
@@ -41,6 +41,8 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
         mediaGrid = grid;
         grid.build();
 
+        backboneGridAllImages = mediaGrid.getGridSkeleton();
+        rowsAllImages = mediaGrid.getRows();
         //Depending selected rows count, disable or enable add button of popup
         mediaGrid.getSelectedRows().on('add remove reset', function() {
             if (mediaGrid.getSelectedRows().length>0) {
@@ -76,15 +78,21 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
         originIds = attachmentGrid.getRows().pluck('id');
 
         $(attachmentConfig.AddButton).click(function() {
+            refreshGridAdd();
             $('#btn_prod_attach_modal').trigger('click');
         });
 
     }
 
-    function renderAttachment(el, row) {
-        if ($('#product_attachments').find('a.file-attachments[data-file-id="'+ row.id+'"]').length > 0) {
-            $(el).addClass('hidden');
-        }
+    function refreshGridAdd() {
+        var data = getExcludeId();
+        backboneGridAllImages.current_filters['exclude_id'] = data;
+        rowsAllImages.fetch({reset: true});
+    }
+
+    function getExcludeId() {
+        var arr = attachmentGrid.getRows().pluck('file_id');
+        return  arr.join(',');
     }
 });
 

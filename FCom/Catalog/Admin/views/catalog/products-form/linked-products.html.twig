@@ -8,6 +8,7 @@
 
 <script>
 var allProdGrid, relatedProdGrid, similarProdGrid, selectedGrid;
+var productId = '{{ m.id() }}';
 require(['jquery','underscore','backbone'], function($, _) {
 
     var modalGrid = 'category_all_prods_grid_{{ m.id }}';
@@ -68,6 +69,7 @@ require(['jquery','underscore','backbone'], function($, _) {
 
         relatedOriginIds = relatedProdGrid.getRows().pluck('id');
         $(relatedProdGrid.getGridSkeleton().AddButton).click(function() {
+            refreshGridAdd();
             $('#btn_add_prod').trigger('click');
         });
     }
@@ -77,8 +79,21 @@ require(['jquery','underscore','backbone'], function($, _) {
         similarProdGrid.build();
         similarOriginIds = similarProdGrid.getRows().pluck('id');
         $(similarProdGrid.getGridSkeleton().AddButton).click(function() {
+            refreshGridAdd();
             $('#btn_add_prod').trigger('click');
         });
+    }
+
+    function refreshGridAdd() {
+        var data = getExcludeId();
+        allProdGrid.getGridSkeleton().current_filters['exclude_id'] = data;
+        allProdGrid.getRows().fetch({reset: true});
+    }
+
+    function getExcludeId() {
+        var arr = selectedGrid.getRows().pluck('id');
+        arr.push(productId);
+        return  arr.join(',');
     }
 });
 </script>

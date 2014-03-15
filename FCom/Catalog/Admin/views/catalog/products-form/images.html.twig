@@ -1,11 +1,12 @@
 {% set m = THIS.get('model') %}
 {% set prodImagesConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
-{% set mediaLibImageConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_images', 'folder': 'media/product/images', 'callbacks': {'after_render': 'renderImage'}}) %}
+{% set mediaLibImageConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_images', 'folder': 'media/product/images'}) %}
 
 <script>
 var mediaGrid, imagesGrid;
 require(['jquery','underscore','backbone'], function($, _) {
     var originIds, removedIds = [];
+    var backboneGridAllImages, rowsAllImages;
     var mainThumb = $('#main-thumb-image');
     function _getAttachmentsDbFields(row) {
         return {
@@ -40,7 +41,8 @@ require(['jquery','underscore','backbone'], function($, _) {
         mediaGrid = grid;
         grid.build();
 
-
+        backboneGridAllImages = mediaGrid.getGridSkeleton();
+        rowsAllImages = mediaGrid.getRows();
         mediaGrid.getSelectedRows().on('add remove reset', function() {
             if (mediaGrid.getSelectedRows().length>0) {
                 $('.prod-images-modal-add').removeClass('disabled');
@@ -87,15 +89,21 @@ require(['jquery','underscore','backbone'], function($, _) {
         console.log(originIds);
 
         $(imagesGrid.getGridSkeleton().AddButton).click(function() {
+            refreshGridAdd();
             $('#btn_prod_image_modal').trigger('click');
         });
 
     }
 
-    function renderAttachment(el, row) {
-        if ($('#product_attachments').find('a.file-attachments[data-file-id="'+ row.id+'"]').length > 0) {
-            $(el).addClass('hidden');
-        }
+    function refreshGridAdd() {
+        var data = getExcludeId();
+        backboneGridAllImages.current_filters['exclude_id'] = data;
+        rowsAllImages.fetch({reset: true});
+    }
+
+    function getExcludeId() {
+        var arr = imagesGrid.getRows().pluck('file_id');
+        return  arr.join(',');
     }
 });
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
@@ -129,10 +137,6 @@ require(['jquery','underscore','backbone'], function($, _) {
             }
         });
 
-    });
-
-    $('body').on('click', '.main-thumb', function () {
-        mainThumb.val($(this).parents('tr').attr('id'));
     });
 
 </script>
