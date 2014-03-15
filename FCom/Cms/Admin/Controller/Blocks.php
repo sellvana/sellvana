@@ -12,13 +12,13 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type' => 'row_select'),
             array('name' => 'handle', 'label'=>'Handle'),
             array('name' => 'description', 'label'=>'Description', 'editable'=>true),
-            array('name' => 'renderer', 'label'=>'Renderer',
+            array('type' => 'input', 'name' => 'renderer', 'label'=>'Renderer',
                   'options' => BLayout::i()->getAllRenderers(true), 'editable' => true, 'mass-editable' => true, 'editor' => 'select'),
             array('name' => 'version', 'label'=>'Version'),
-            array('name' => 'page_enabled', 'label'=>'Page Enable',
+            array('type' => 'input', 'name' => 'page_enabled', 'label'=>'Page Enable',
                   'options' => array('1' => 'Yes', '0' => 'No'), 'editable' => true, 'mass-editable' => true, 'editor' => 'select'),
             array('name' => 'page_url', 'label'=>'Page Url'),
             array('name' => 'page_title', 'label'=>'Page Title'),
@@ -26,8 +26,12 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
             array('name' => 'meta_description', 'label'=>'Meta Description', 'hidden' => true),
             array('name' => 'meta_keywords', 'label'=>'Meta Keywords', 'hidden' => true),
             array('name' => 'modified_time', 'label'=>'Modified Time', 'hidden' => true),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                  'data'=> array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)),
+            array('type' => 'btn_group',
+                  'buttons'=> array(
+									array('name' => 'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'),
+									array('name' => 'delete')
+								   )
+				)
         );
         $config['actions'] = array(
             'edit' => true,
@@ -60,7 +64,7 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
                     'id' => array('label'=>'ID', 'hidden'=>true),
                     'ts' => array('label'=>'TimeStamp', 'formatter'=>'date'),
                     'version' => array('label'=>'Version'),
-                    'user_id' => array('label'=>'User', 'options'=>FCom_Admin_Model_User::i()->options()),
+                    'user_id' => array('type'=>'input', 'label'=>'User','editor'=>'select', 'options'=>FCom_Admin_Model_User::i()->options()),
                     'username' => array('Label'=>'User Name', 'hidden'=>true),
                     'comments' => array('labl'=>'Comments'),
                 ),

@@ -3,100 +3,97 @@
 {% set config = THIS.getGridConfig() %}
 {% set s = config.data.result.state %}
 
+{# main grid structure #}
 {# p=page, ps=pagesize, mp=maxpage, s=sort, sd=sortdir, c=totalrows #}
+<!-- Grid Start -->
 <div class="fcom-htmlgrid responsive-table f-grid-wrapper" id="{{ config.id }}" style="min-height:520px;">
-  {% if config.filters %}
+    <!-- Grid Header Start -->
+    {% if config.filters %}
     <div class="f-grid-top f-grid-toolbar {{ config.id | raw }} clearfix">
-      <div class="f-col-filters-selection pull-left">
-        <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}" id="{{ config.id | raw }}-quick-search">
+        <div class="f-col-filters-selection pull-left">
+        <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}"
+        id="{{ config.id | raw }}-quick-search">
         <span class="{{ config.id }} dropdown">
-          <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
-            {{ 'Filters'|_ }}
-            <b class="caret"></b>
-          </a>
-          <ul class="{{ config.id }} dd-list dropdown-menu filters"></ul>
-        </span>
-      </div>
-      {% if config.filters[0] %}
-        <span class="{{ config.id }} f-filter-btns">
-          <!-- filter buttons here -->
-        </span>
-      {% endif %}
-    </div>
-  {% endif %}
-
-  <div class="row f-grid-bottom f-grid-toolbar {{ config.id | raw }} clearfix">
-      <div class="col-sm-6">
-        <span class="{{ config.id }} dropdown dd dd-nestable columns-span" style="display:inline;">
             <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
-                {{ 'Columns' |_ }}
+                {{ 'Filters'|_ }}
                 <b class="caret"></b>
             </a>
-                <ol class="{{ config.id }} dd-list dropdown-menu columns" style="min-width:200px;">
-                    <!--li calss="ui-state-default"-->
-                    <!-- visibiility template -->
-                    <!--/li -->
-                </ol>
+            <ul class="{{ config.id }} dd-list dropdown-menu filters"></ul>
         </span>
-        {% for action in THIS.gridActions() %}
-          {% if action.renderer %}
-            {{ THIS.callUserFunc(action.renderer, [action]) | raw }}
-          {% elseif action.html %}
-            {{ action.html | raw }}
-          {% endif %}
-        {% endfor %}
-      </div>
-      <div class="col-sm-6 text-right pagination" style='margin:0px;'>
-        <span class="{{ config.id }}-pagination f-grid-pagination"> </span>
-        {% if config['data_mode']!= 'local' %}
-          <ul class="pagination pagination-sm pagesize" style='margin:0px;'>
-            {% for ps in THIS.pageSizeOptions() %}
-              <li {{ ps == s.ps ? 'class="active"' }}>
-                <a class="js-change-url page-size" href="#">{{ ps }}</a>
-              </li>
-            {% endfor %}
-          </ul>
-
-          <ul class="{{ config.id }} pagination pagination-sm page" style='margin:0px;'>
-            {#
-            <label>
-              {{ 'Page'|_ }}
-            </label>
-            <input class="fcom-htmlgrid__gotopage js-change-url" data-href="{{ THIS.pageChangeHref() }}" value="{{ s.p }}">
-            {{ 'of %s'|_(s.mp) }}
-            #}
-          </ul>
+        </div>
+        {% if config.filters[0] %}
+        <span class="{{ config.id }} f-filter-btns">
+            <!-- filter buttons here -->
+        </span>
         {% endif %}
-      </div>
-  </div>
-
-  {% if s.description %}
-    <div class="fcom-htmlgrid__status-description">
-      {{ s.description|raw }}
     </div>
-  {% endif %}
-  <div class="scrollable-area">
-    <table class="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable" id = {{ config.id | raw }}>
-      {#<colgroup>
-        {% foreach ($config['columns'] as $colId => $column) %}
-          <col>(width="#{!empty($column['width']) ? $column['width'] : ''}")</col>
-        {% end %}
-      </colgroup>#}
-      <thead>
-        <tr id="tr-sort-{{ config.id }}" role="row">
-          <!-- header template -->
-        </tr>
-      </thead>
-      <tbody>
-        {#{ THIS.rowsHtml() | raw }#}
-        <!-- row template -->
-      </tbody>
-    </table>
-  </div>
+    {% endif %}
+
+    <div class="row f-grid-bottom f-grid-toolbar {{ config.id | raw }} clearfix">
+        <div class="col-sm-6">
+            <span class="{{ config.id }} dropdown dd dd-nestable columns-span" style="display:inline;">
+                <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
+                    {{ 'Columns' |_ }}
+                    <b class="caret"></b>
+                </a>
+                <ol class="{{ config.id }} dd-list dropdown-menu columns" style="min-width:200px;">
+                </ol>
+            </span>
+            {% for action in THIS.gridActions() %}
+                {% if action.renderer %}
+                    {{ THIS.callUserFunc(action.renderer, [action]) | raw }}
+                {% elseif action.html %}
+                    {{ action.html | raw }}
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="col-sm-6 text-right pagination" style='margin:0px;'>
+            <span class="{{ config.id }}-pagination f-grid-pagination"> </span>
+            {% if config['data_mode']!= 'local' %}
+                <ul class="pagination pagination-sm pagesize" style='margin:0px;'>
+                    {% for ps in THIS.pageSizeOptions() %}
+                        <li {{ ps == s.ps ? 'class="active"' }}>
+                            <a class="js-change-url page-size" href="#">{{ ps }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <ul class="{{ config.id }} pagination pagination-sm page" style='margin:0px;'>
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+    {% if s.description %}
+        <div class="fcom-htmlgrid__status-description">
+            {{ s.description|raw }}
+        </div>
+    {% endif %}
+    <!-- Grid Header End -->
+
+    <!-- Grid Body Start -->
+    <div class="scrollable-area">
+        <table class="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable"
+                id = {{ config.id | raw }}>
+            <thead>
+                <tr id="tr-sort-{{ config.id }}" role="row">
+                    <!-- header template -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- row template -->
+            </tbody>
+        </table>
+    </div>
+    <!-- Grid Body End -->
 </div>
- <div id="{{ config.id }}-modal">
-      <a class="btn" id="{{ config.id }}-modal-form-show" role="button" href="#{{ config.id }}-modal-form" data-toggle="modal" style="display:none;"></a>
-      <div class='modal fade' id='{{ config.id }}-modal-form' tabindex='-1'>
+<!-- Grid End -->
+
+{# modal body template #}
+<div id="{{ config.id }}-modal">
+    <a class="btn" id="{{ config.id }}-modal-form-show" role="button"
+            href="#{{ config.id }}-modal-form" data-toggle="modal" style="display:none;">
+    </a>
+    <div class='modal fade' id='{{ config.id }}-modal-form' tabindex='-1'>
         <div class='modal-dialog'>
             <div class='modal-content'>
                 <div class='modal-header'>
@@ -104,261 +101,260 @@
                     <h4 class='modal-title' id='myModalLabel'>{{ 'Edit form'|_ }}</h4>
                 </div>
                 <form class="form form-horizontal validate-form" id='{{ config.id }}-modal-form'>
-                  <div class='modal-body'>
-                  </div>
+                    <div class='modal-body'>
+                        <!-- Modal body template -->
+                        {# BackboneGrid.Views.ModalForm #}
+                    </div>
                 </form>
                 <div class='modal-footer'>
-                    <button class='btn btn-default' data-dismiss='modal' type='button'>{{ 'Close'|_ }}</button>
+                    <button class='btn btn-default f-grid-modal-close' data-dismiss='modal' type='button'>{{ 'Close'|_ }}</button>
                     <button class='btn btn-primary save' type='button'>{{ 'Save changes' |_ }}</button>
                 </div>
             </div>
         </div>
       </div>
-  </div>
+</div>
 
+{# modal element template #}
+{# it can render one of text, textarea, select and custom HTML string #}
+{# default is text #}
 <script type="template" id="{{ config.id }}-modal-element-template">
     <% if (typeof(rc.form_hidden_label) === 'undefined' || !rc.form_hidden_label) { %>
-    <div class="control-label col-sm-3">
-      <label for="<%- rc.name %>">
-        <%- rc.label%>
-        <% if(typeof(rc.validation) !== 'undefined' && typeof(rc.validation.required) !== 'undefined') { %>*<% } %>
-      </label>
-    </div>
+        <div class="control-label col-sm-3">
+            <label for="<%= rc.name %>">
+                <%= rc.label%>
+                <% if(rc._validation.indexOf('required') !== -1) { print('*'); } %>
+            </label>
+        </div>
     <% } %>
+
     <div class="controls col-sm-8">
-      <% if (typeof(rc.element_print) !== 'undefined') {
-        print(rc.element_print);
-      } else if (typeof(rc.editor) === 'undefined' || rc.editor ==='text') { %>
-        <input name="<%- rc.name %>" id="<%- rc.name %>" type="text" class="form-control" <% print(validationRules(rc.validation));%> >
-      <% } else if(rc.editor === 'select') { %>
-        <select name="<%- rc.name %>" id="<%- rc.name %>" class="form-control" <% print(validationRules(rc.validation)); %>>
-          <% for(var key in rc.options) { %>
-            <option value="<%- key %>"><%- rc.options[key] %></option>
-          <% } %>
-        </select>
-      <% } else if (rc.editor === 'textarea') { %>
-        <textarea name="<%- rc.name %>" id="<%- rc.name %>" class="form-control" rows="5" <% print(validationRules(rc.validation));%>></textarea>
+      <% switch(rc.editor) {
+            case 'none': %>
+                <%= rc.element_print %>
+
+                <% break;
+            case 'select': %>
+                <select name="<%= rc.name %>" id="<%= rc.name %>" class="form-control" <%= rc._validation %>>
+                    <% for(var key in rc.options) { %>
+                        <option value="<%= key %>"><%= rc.options[key] %></option>
+                    <% } %>
+                </select>
+
+                <% break;
+            case 'textarea': %>
+                <textarea name="<%= rc.name %>" id="<%= rc.name %>" class="form-control" rows="5" <%= rc._validation %>>
+                </textarea>
+
+                <%break;
+            default: %>
+                <input name="<%= rc.name %>" id="<%= rc.name %>" type="text" class="form-control" <%= rc._validation %> >
+
       <% } %>
     </div>
 </script>
+
+{# column sequence & visiblity management template #}
 <script type="template" id="{{ config.id }}-col-template">
   <div class="icon-ellipsis-vertical dd-handle dd3-handle"></div>
   <div class="dd3-content">
     <label>
-        <input class="showhide_column" type="checkbox" datid=<%- rc.name %> <% if (rc.hidden === false) { %>checked <% } %> >
-        <%- rc.label %>
+        <input class="showhide_column" type="checkbox" datid=<%= rc.name %> <% if (rc.hidden === false) { %>checked <% } %> >
+        <%= rc.label %>
     </label>
   </div>
 </script>
 
+{# column filter visibility management template #}
 <script type="template" id="{{ config.id }}-filter-check-template">
   <div class="icon-ellipsis-vertical dd-handle dd3-handle"></div>
   <div class="dd3-content">
     <label>
-        <input class="showhide_column" type="checkbox" datid=<%- rc.field %> <% if (rc.hidden === false) { %>checked <% } %> >
-        <%- rc.label %>
+        <input class="showhide_column" type="checkbox" datid=<%= rc.field %> <% if (rc.hidden === false) { %>checked <% } %> >
+        <%= rc.label %>
     </label>
   </div>
-</script>
-
-<script type="template" id="{{ config.id }}-row-template"> {
-  <%
-    function printCustomButton (obj, id) {
-        var event = (typeof(obj.event) !== 'undefined') ? obj.event: '';
-        if (obj.type === 'link') {
-
-            print('<a '+ event +' class="btn btn-link btn-custom" href="'+obj.href+id+'" title="'+(obj.title ? obj.title : '')+'">');
-            if (typeof(obj.icon) !== 'undefined') {
-                print('<i class="' + obj.icon + '"></i>');
-            }
-            print(obj.caption);
-            print('</a>');
-        } else if (typeof(obj.type) === 'undefined' || obj.type === 'button') {
-            print('<button '+ event +' class="btn btn-link btn-custom" type="button" title="'+(obj.title ? obj.title : '')+'">');
-            if (typeof(obj.icon) !== 'undefined') {
-                print('<i class="' + obj.icon + '"></i>');
-            }
-            print(obj.caption);
-            print('</button>');
-        }
-    }
-    for (var index in rc.colsInfo) {
-    var col = rc.colsInfo[index];
-    if(col.hidden || col.form_only) {
-      continue;
-    }
-    var overflow = '';
-    if(col.overflow) {
-      overflow = ' style="overflow:hidden;"';
-    }
-    print('<td data-col="'+col.name+'" '+overflow +'>');
-
-    if (col.cell === 'select-row') {
-        var isSelected = '';
-        var isSelectable = rc.row._selectable ? '' : 'DISABLED';
-        if (rc.row._selectable && rc.row.selected)
-          isSelected = 'checked';
-        print('<input type="checkbox" name="{{ config.id }}[checked]['+rc.row.id+']" class="select-row" '+isSelected+' '+isSelectable+' >');
-    } else if (col.name === '_actions') {
-        print('<div class="table-actions-btns-group">');
-        if (typeof(col.data.custom) !== 'undefined') {
-            if (typeof(col.data.custom[0]) ===  'object') {
-                for (var index in col.data.custom) {
-                    printCustomButton(col.data.custom[index], rc.row[col.data.custom[index].col]);
-                }
-            } else {
-                printCustomButton(col.data.custom, rc.row[col.data.custom.col]);
-            }
-        }
-
-        if (typeof(col.data.edit) != 'undefined') {
-            if (typeof(col.data.edit.href) !== 'undefined') {
-              print('<a class="btn btn-link btn-xs btn-edit" href="'+col.data.edit.href+rc.row[col.data.edit.col]+'"><i class=" icon-edit-sign"></i></a>');
-            } else {
-              print('<button type="button" class="btn btn-link btn-xs btn-edit _modal" ><i class=" icon-edit-sign"></i></button>');
-            }
-        }
-        if (typeof(col.data.delete) !== 'undefined') {
-          print('<button class="btn btn-link btn-delete '+col.data.delete+'" type="button">');
-          print('<i class="icon-remove"></i>');
-          print('</button>');
-        }
-        if (typeof(col.data.edit_inline) !== 'undefined' && col.data.edit_inline) {
-            print('<button class="btn btn-link btn-edit-inline '+col.data.editInline+'" type="button" title="Edit Inline">');
-                print('<i class="icon-pencil"></i>');
-                print('</button>');
-            print('<button class="btn btn-link btn-save-inline hide '+col.data.editInline+'" type="button">');
-                print('<i class="icon-ok-sign"></i>');
-                print('</button>');
-        }
-        print('</div>');
-    } else {
-      if (typeof(col.print) !== 'undefined') {
-        eval('print('+col.print+');');
-      } else {
-        if (typeof(col.display) === 'undefined') {
-          if (typeof(col.editable) !== 'undefined') {
-
-            if (typeof(col.editor) === 'undefined' || col.editor === 'text') {
-              if(col.editable === 'inline') {
-                print('<input type="text"  id="{{ config.id }}'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}['+rc.row['id']+']['+col.name+']" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" value="'+rc.row[col.name]+'">');
-                print ('<span style="display:none;">'+rc.row[col.name]+'</span>');
-              } else {
-                print(rc.row[col.name]);
-              }
-            }
-
-            else if (col.editor === 'textarea') {
-              if(col.editable === 'inline') {
-                print('<textarea id="{{ config.id }}'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}['+rc.row['id']+']['+col.name+']" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" rows="4">'+rc.row[col.name]+'</textarea>');
-                print ('<span style="display:none;">'+rc.row[col.name]+'</span>');
-              } else {
-                print(rc.row[col.name]);
-              }
-            }
-
-            else if (col.editor === 'select') {
-              if(col.editable === 'inline') {
-                print('<select id="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}['+rc.row['id']+']['+col.name+']" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" >');
-                if (_.isArray(col.options)) {
-                    for(var i = 0, l = col.options.length; i<l; i++) {
-                        print('<option value="'+col.options[i].value+'">'+col.options[i].label+'</option>');
-                    }
-                } else {
-                    for(var key in col.options) {
-                        print('<option value="'+key+'">'+col.options[key]+'</option>');
-                    }
-                }
-                print('</select>');
-                print ('<span style="display:none;">'+col.options[rc.row[col.name]]+'</span>')
-              } else {
-                print(col.options[rc.row[col.name]]);
-              }
-            }
-
-            else if (col.editor === 'checkbox') {
-              if(col.editable === 'inline') {
-                print('<input type="checkbox" id="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}['+rc.row['id']+']['+col.name+']" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" />');
-              } else {
-                print(rc.row[col.name] ? 'Yes' : 'No');
-              }
-            }
-
-            else if (col.editor === 'radio') {
-              if(col.editable === 'inline') {
-                print('<input value="'+rc.row['id']+'" type="radio" id="{{ config.id }}-'+col.name+'-'+rc.row['id']+'" name="{{ config.id }}['+col.name+']" class="form-control" '+validationRules(col.validation)+' data-col="'+col.name+'" />');
-              } else {
-                print(rc.row[col.name] ? 'Yes' : 'No');
-              }
-            }
-
-          } else {
-            if (col.href !== '') {
-                print('<a class="btn-link" href="'+col.href+rc.row['id']+'" title="">' + rc.row[col.name]+'</a>');
-            } else {
-                print(rc.row[col.name]);
-            }
-
-          }
-        } else if (col.display === 'file_size') {
-          var size = parseInt(rc.row[col.name]);
-          if (size/(1024*1024) > 1) {
-            size = size/(1024*1024);
-            size = size.toFixed(2)+' MB';
-          } else if (size/1024 > 1) {
-            size = size/1024;
-            size = size.toFixed(2)+' KB';
-          } else {
-            size = size+' Byte';
-          }
-          print(size);
-        }
-    }
-  }
-
-    print('</td>');
-  } %>
 </script>
 
 {% set multiselectToggleOptions = THIS.multiselectToggleOptions() %}
 {% set multiselectCurrent = THIS.multiselectCurrent() %}
 
+{# grid header template #}
 <script type='template' id="{{ config.id | raw }}-header-template">
-  <% if(rc.type === '' || rc.type === 'default') { %>
-    <% if (typeof(rc.sortable) === 'undefined' || rc.sortable === true) { %><a class="js-change-url" style="cursor: pointer;"> <% } %>
-      <%- rc.label %>
-    <% if (typeof(rc.sortable) === 'undefined' || rc.sortable === true) { %> </a> <% } %>
-  <% } else if (rc.type === 'multiselect') { %>
-      <div class="{{ config.id | raw }} dropdown f-grid-display-type">
-          <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-              <span class="icon-placeholder">
-                  <% if (rc.selectedCount>0) { %>
-                    <i class="glyphicon glyphicon-check"></i>
-                  <% } else { %>
-                    <i class="glyphicon glyphicon-list"></i>
-                  <% } %>
-              </span>
-              <span class="title">
-                  <% if (rc.selectedCount>0) { %>
-                    <%- rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>
-                  <% } else { %>
-                    A
-                  <% } %>
-              </span>
-              <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu js-sel">
-              {% for key, option in multiselectToggleOptions %}
-                <li><a href="#{{ key }}">{{ option }}</a></li>
-              {% endfor %}
-          </ul>
-      </div>
-  <% } %>
+    <%
+    if (rc.type === 'row_select') { %>
+        <div class="{{ config.id | raw }} dropdown f-grid-display-type">
+            <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                <span class="icon-placeholder">
+                    <% if (rc.selectedCount>0) { %>
+                        <i class="glyphicon glyphicon-check"></i>
+                    <% } else { %>
+                        <i class="glyphicon glyphicon-list"></i>
+                    <% } %>
+                </span>
+                <span class="title">
+                    <% if (rc.selectedCount>0) { %>
+                        <%= rc.selectedCount %> row<% if (rc.selectedCount>1) { %>s<% } %>
+                    <% } else { %>
+                        A
+                    <% } %>
+                </span>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu js-sel">
+                {% for key, option in multiselectToggleOptions %}
+                    <li><a href="#{{ key }}">{{ option }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    <% } else {
+        if (rc.sortable === false) { %>
+            <%= rc.label %>
+        <% } else { %>
+            <a class="js-change-url" style="cursor: pointer;"><%= rc.label %></a>
+        <% }
+    } %>
 </script>
+
+{# grid row template #}
+<script type="template" id="{{ config.id }}-row-template">
+    <% for (var index in rc.colsInfo) {
+        var col = rc.colsInfo[index];
+        if (col.hidden || col.form_only) {
+            continue;
+        }
+        var overflow = '';
+        if (col.overflow) {
+                overflow = ' style="overflow:hidden;"';
+        }
+        %><td data-col="<%= col.name %>" <%= col.overflow %> ><%
+            switch (col.type) {
+            case 'row_select':
+                %><input type="checkbox" name="{{ config.id }}[checked][<%= rc.row.id %>]" class="select-row"
+                        <%= rc.row._rowSelect %> ><%
+
+                break;
+            case 'input':
+
+
+                if (col.editable !== 'inline') {
+                    switch (col.editor) {
+                    case 'checkbox':
+                    case 'radio' :
+                        %><%= rc.row[col.name] ? 'Yes' : 'No' %><%
+
+                         break;
+                    case 'select':
+                        %><%= col.options[rc.row[col.name]]
+
+                        %><% break;
+                    default:
+                        %><%= rc.row[col.name] %><%
+                     }
+
+                    break;
+                }
+
+                var strName = "{{ config.id }}["+rc.row['id']+"]["+col.name+"]";
+                var strId = "{{ config.id }}-"+col.name+"-"+rc.row['id'];
+                var strClass = col.cssClass ? col.cssClass + ' form-control' : ' form-control';
+                var strDisabled = (typeof(rc.row[col.name + '_disabled']) !== 'undefined' &&
+                                   rc.row[col.name + '_disabled'] === true) ? 'DISABLED' : '';
+                var validation = validationRules(col.validation);
+                switch (col.editor) {
+                case 'checkbox':
+                    %><input type="checkbox" id="<%= strId %> name=<%= strName %>" class="<%= strClass %>" <%=validation  %>
+                            data-col="<%= col.name %>" <%= strDisabled %> /><%
+
+                     break;
+                case 'textarea':
+                    %><textarea id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>" <%= validation %>
+                            data-col="<%= col.name %>" <%= strDisabled %>  rows="4">
+                        <%= rc.row[col.name] %>
+                    </textarea><%
+
+                    break;
+                case 'select':
+                    %><select id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>" <%= validation %>
+                            data-col="<%= col.name %>"  <%= strDisabled %> ><%
+
+                        if (_.isArray(col.options)) {
+                            for(var i = 0, l = col.options.length; i<l; i++) {
+                                %><option value="<%= col.options[i].value %>"><%= col.options[i].label %></option><%
+                             }
+                        } else {
+                            for(var key in col.options) {
+                                %><option value="<%= key %>"><%= col.options[key] %></option><%
+                             }
+                        }
+
+                    %></select><%
+
+                    break;
+                case 'radio':
+                    %><input type="checkbox" id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>"
+                            <%= validation %> data-col="<%= col.name %>"  <%= strDisabled %> /><%
+
+                    break;
+                default:
+                    %><input type="text"  id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>"
+                            <%= validation %> data-col="<%= col.name %>"  <%= strDisabled %>
+                            value="<%= rc.row[col.name] %>" /><%
+
+                    break;
+                }
+                {# TODO why is it need in inline edit mode? #}
+                %><span style="display:none;"><%= rc.row[col.name] %></span><%
+
+                 break;
+            case 'btn_group':
+                %><div class="table-actions-btns-group"><%
+                for(var i in col.buttons) {
+                    var btn = col.buttons[i];
+                    var event = (typeof(btn.event) !== 'undefined') ? btn.event : '';
+                    switch(btn.type){
+                    case 'link':
+                        %><a <%= event %> class="btn btn-link <%= btn.cssClass %>" href="<%= btn.href %><%= rc.row[btn.col] %>"
+                                title="<%= btn.title ? btn.title : '' %>">
+                            <i class="<%= btn.icon %>" ></i>
+                            <%= btn.caption %>
+                        </a><%
+
+                         break;
+                    default:
+                        %><button <%= event %> class="btn btn-link <%= btn.cssClass %>" title="<%= btn.title ? btn.title : '' %>" type="button">
+                            <i class="<%= btn.icon %>" ></i>
+                            <%= btn.caption %>
+                        </button><%
+                     }
+                }
+                %></div><%
+                break;
+            default:
+                switch(col.display) {
+                case 'eval':
+                     eval('print('+col.print+');');
+
+                     break;
+                case 'file_size':
+                    %><%= filesizeFormat(rc.row[col.name]) %><%
+
+                     break;
+                default:
+                    %><%= rc.row[col.name] %><%
+                 }
+
+                break;
+            }
+        %></td><%
+    } %>
+</script>
+
+
 <script type='template' id="{{ config.id }}-multiselect-filter-template">
       <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
         <span class='f-grid-filter-field'>
-          <%- rc.label %>
+          <%= rc.label %>
         </span>:
         <span class='f-grid-filter-value'>
           <% if(rc.val ==='') { %>
@@ -373,7 +369,7 @@
                 }
                 str = str.substring(0, str.length - 1);
             %>
-            <%- rc.filterLabel %> "<%- str %>"
+            <%= rc.filterLabel %> "<%= str %>"
           <% } %>
         </span>
         <span class="caret"></span>
@@ -382,7 +378,7 @@
     <ul class="dropdown-menu filter-box">
       <li>
           <div class="input-group">
-            <input type="hidden" id="multi_hidden" style="width:100%;min-width:120px;" value="<%- rc.val %>"/>
+            <input type="hidden" id="multi_hidden" style="width:100%;min-width:120px;" value="<%= rc.val %>"/>
             <div class="input-group-btn">
               <button type="button" class="btn btn-primary update">
                  {{ 'Update'|_ }}
@@ -399,7 +395,7 @@
 
 <script type='template' id="{{ config.id }}-text-filter-template">
     <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
-        <span class='f-grid-filter-field'><%- rc.label %></span>:
+        <span class='f-grid-filter-field'><%= rc.label %></span>:
         <span class='f-grid-filter-value'>
           <%
             var text = rc.filterLabel;
@@ -407,7 +403,7 @@
             if(rc.val ==='') { %>
               {{ 'All'|_ }}
           <%} else { %>
-              <%- rc.filterLabel %> "<%- rc.val %>"
+              <%= rc.filterLabel %> "<%= rc.val %>"
           <% } %>
         </span>
         <span class="caret"></span>
@@ -418,7 +414,7 @@
           <div class="input-group">
             <div class="input-group-btn dropdown">
               <button class='btn btn-default dropdown-toggle filter-text-sub' data-toggle='dropdown'>
-                  <%- rc.filterLabel%>
+                  <%= rc.filterLabel%>
                   <span class='caret'></span>
               </button>
 
@@ -441,7 +437,7 @@
               </ul>
             </div>
 
-            <input type="text" class="form-control" value="<%- rc.val  %>">
+            <input type="text" class="form-control" value="<%= rc.val  %>">
 
             <div class="input-group-btn">
               <button type="button" class="btn btn-primary update">
@@ -456,13 +452,13 @@
 <script type='template' id="{{ config.id }}-date-range-filter-template">
     <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
         <span class='f-grid-filter-field'>
-          <%- rc.label %>
+          <%= rc.label %>
         </span>:
         <span class='f-grid-filter-value'>
           <% if(rc.val ==='') { %>
               {{ 'All'|_ }}
           <%} else { %>
-              <%- rc.filterLabel %> "<%- rc.val %>"
+              <%= rc.filterLabel %> "<%= rc.val %>"
           <% } %>
         </span>
         <span class="caret"></span>
@@ -473,7 +469,7 @@
           <div class="input-group">
             <div class="input-group-btn dropdown" >
               <button class='btn btn-default dropdown-toggle filter-text-sub' data-toggle='dropdown'>
-                  <%- rc.filterLabel%>
+                  <%= rc.filterLabel%>
                   <span class='caret'></span>
               </button>
 
@@ -497,7 +493,7 @@
             </div>
 
             <div class="input-group range" <%= !rc.range ? 'style="display:none;"' :'style="display:table;"' %> >
-                <input id="date-range-text-<%- rc.field %>" type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange" value="<%= rc.range ? rc.val : '' %>">
+                <input id="date-range-text-<%= rc.field %>" type="text" placeholder="{{ 'Select date range'|_ }}" class="form-control daterange" value="<%= rc.range ? rc.val : '' %>">
                 <span id="daterange2" class="input-group-addon">
                   <i class="icon-calendar"></i>
                 </span>
@@ -522,13 +518,13 @@
 <script type='template' id="{{ config.id }}-number-range-filter-template">
     <button class='btn dropdown-toggle filter-text-main' data-toggle='dropdown'>
         <span class='f-grid-filter-field'>
-          <%- rc.label %>
+          <%= rc.label %>
         </span>:
         <span class='f-grid-filter-value'>
           <% if(rc.val ==='') { %>
               {{ 'All'|_ }}
           <%} else { %>
-              <%- rc.filterLabel %> "<%- rc.val %>"
+              <%= rc.filterLabel %> "<%= rc.val %>"
           <% } %>
         </span>
         <span class="caret"></span>
@@ -539,7 +535,7 @@
           <div class="input-group">
             <div class="input-group-btn dropdown" >
               <button class='btn btn-default dropdown-toggle filter-text-sub' data-toggle='dropdown'>
-                  <%- rc.filterLabel%>
+                  <%= rc.filterLabel%>
                   <span class='caret'></span>
               </button>
 
@@ -600,7 +596,7 @@
     </div>
 </script>
 <script>
-require(['jquery', 'fcom.backbonegrid'], function($) {
+require(['jquery', 'fcom.backbonegrid', 'backbone', 'underscore'], function($, Backbone, _) {
 
     if ($('#fcom_append_form').length > 0) {
       $('#fcom_append_form').append('<form id="{{ config.id }}-new-form" class="form form-horizontal validate-form"/>');

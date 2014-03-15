@@ -3,82 +3,67 @@
 <input type='hidden' name='model[product_ids_add]' id='product_ids_add'/>
 <input type='hidden' name='model[product_ids_remove]' id='product_ids_remove'/>
 <script>
+require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
+    var allProdGrid, catProdGrid, orignIds;
+    function updateFormData() {
+        console.log(catProdGrid.getRows().pluck('id'));
+        removedIds = _.difference(removedIds, catProdGrid.getRows().pluck('id'));
+        console.log(catProdGrid.getRows().toJSON());
+        var addedRows = _.filter(catProdGrid.getRows().toJSON(), function(row) {
+                            return row['added_row'];
+                        });
 
-/**Event Aggregator
-This aggregator is for triggering silent_inject that causes main grid adding selected rows from modal grid.**/
+        addedIds = _.pluck(addedRows, 'id');
+        $('#user_ids_add').val(addedIds.join(','));
+        $('#user_ids_remove').val(removedIds.join(','));
+    }
+    window.allProdGridRegister = function(grid) {
+        allProdGrid = grid;
+        grid.build();
 
-if(typeof(g_vent) === 'undefined')
-    g_vent = _.extend({}, Backbone.Events);
+        $(allProdGrid.getGridSkeleton().AddButton).click(function() {
+            if(allProdGrid.getSelectedRows().length >0) {
+                allProdGrid.getSelectedRows().forEach(function (row) {
+                    if (!catProdGrid.getRows().findWhere({username: row.get('username')})) {
+                        var addedRow = row.toJSON();
+                        addedRow.added_row = true;
+                        catProdGrid.getRows().add(addedRow);
+                    }
+                });
+            }
+            catProdGrid.getGridView().render();
+            allProdGrid.getSelectedRows().reset({});
+            $('.category-prod-modal-close').trigger('click');
 
-var categoryProdMng;
-require(['jquery'], function($) {
-
-    function CategoryProdsMng() {
-        this.mainGridId = 'category_prods_grid_{{ m.id }}';
-        this.modalGridId = 'category_all_prods_grid_{{ m.id }}';
-
-        g_vent.bind('init', this._getOriginalIds);
-        g_vent.bind('add', this._addRows);
-        g_vent.bind('mass-delete', this._removeRows);
-
-        this.add_ids = [];
-        this.remove_ids = [];
-        this.original_ids = [];
-
+            updateFormData();
+        });
     }
 
-    CategoryProdsMng.prototype._setFormValues = function() {
+    window.catProdGridRegister = function(grid) {
+        catProdGrid = grid;
+        catProdGrid.build();
+        originIds = catProdGrid.getRows().pluck('id');
 
-        this.add_ids = _.difference(this.add_ids,this.original_ids);
-        this.remove_ids = _.intersection(this.remove_ids, this.original_ids);
-        $('#product_ids_add').val(this.add_ids.join(','));
-        $('#product_ids_remove').val(this.remove_ids.join(','));
-    }
-
-    CategoryProdsMng.prototype._getOriginalIds = function(ev) {
-
-        if (ev.grid === self.mainGridId) {
-            self.original_ids = ev.ids;
-        }
-    }
-
-    CategoryProdsMng.prototype._addRows = function(ev) {
-
-        if (ev.grid === self.mainGridId)
+        $(catProdGrid.getGridSkeleton().AddButton).click(function() {
             $('#btn_add_prod').trigger('click');
+        });
 
-        if (ev.grid === self.modalGridId) {
-            g_vent.trigger('silent_inject', {grid: self.mainGridId, rows: ev.rows});
-            self.add_ids = _.union(_.pluck(ev.rows,'id'), self.add_ids);
-            self.remove_ids = _.difference(self.remove_ids, _.pluck(ev.rows,'id'));
-            self._setFormValues();
-            g_vent.trigger('clear_selection', {grid: self.modalGridId});
-            $('button.btn-close.category-prod-modal-close').trigger('click');
+        $(catProdGrid.getGridSkeleton().MassDeleteButton).off('click');
+        $(catProdGrid.getGridSkeleton().MassDeleteButton).click(function() {
 
-        }
+            var rows = catProdGrid.getRows();
+            var sRows = catProdGrid.getSelectedRows();
 
+            removedIds = sRows.pluck('id');
 
+            rows.remove(sRows.models);
+            sRows.reset();
+            catProdGrid.getGridView().render();
+
+            updateFormData();
+        });
     }
-
-    CategoryProdsMng.prototype._removeRows = function(ev) {
-        if(ev.grid === self.mainGridId) {
-            self.remove_ids = _.union(_.pluck(ev.rows,'id'), self.remove_ids);
-            self.add_ids = _.difference(self.add_ids, _.pluck(ev.rows,'id'));
-            self._setFormValues();
-        }
-    }
-
-    CategoryProdsMng.prototype.reset = function() {
-        this.add_ids = [];
-        this.remove_ids = [];
-        $('#product_ids_add').val('');
-        $('#product_ids_remove').val('');
-    }
-    var self = new CategoryProdsMng();
-    categoryProdMng = self;
 });
-
-
 </script>
 
 {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.getCatProdConfig(m)) | raw }}

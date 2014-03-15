@@ -18,12 +18,20 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'edit_url'=>BApp::href('customfields/fieldsets/grid_data'),
                 'orm'=>$orm,
                 'columns'=>array(
-                    array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
+                    array('type'=>'row_select'),
                     array('name'=>'id','label'=>'ID', 'width'=>55, 'sorttype'=>'number', 'key'=>true, 'hidden'=>true),
-                    array('name'=>'set_code', 'label'=>'Set Code', 'width'=>100,  'addable'=>true, 'editable'=>true, 'validation'=>array('required'=>true,'unique'=>BApp::href('customfields/fieldsets/unique_set'))),
-                    array('name'=>'set_name', 'label'=>'Set Name', 'width'=>200,  'addable'=>true, 'editable'=>true , 'validation'=>array('required'=>true)),
+                    array('type'=>'input', 'name'=>'set_code', 'label'=>'Set Code', 'width'=>100,  'addable'=>true,
+                            'editable'=>true, 'validation'=>array('required'=>true,
+                            'unique'=>BApp::href('customfields/fieldsets/unique_set'))),
+                    array('type'=>'input', 'name'=>'set_name', 'label'=>'Set Name', 'width'=>200,  'addable'=>true,
+                            'editable'=>true , 'validation'=>array('required'=>true)),
                     array('name'=>'num_fields', 'label'=>'Fields', 'width'=>30, 'default'=>'0'),
-                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('custom' => array('icon' => 'icon-edit-sign', 'col'=>'id'), 'delete' => true))
+                    array('type'=>'btn_group',
+                            'buttons'=>array(
+                                                array('name'=>'edit_custom', 'icon'=>'icon-edit-sign', 'cssClass'=>'btn-custom'),
+                                                array('name' =>'delete')
+                                            )
+                        )
                 ),
                 'actions'=>array(
 //                            'new'=> array('caption'=>'Add New FieldSet', 'modal'=>true),
@@ -34,6 +42,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                             array('field'=>'set_code', 'type'=>'text'),
                             '_quick'=>array('expr'=>'product_name like ? or set_code like ', 'args'=> array('%?%', '%?%'))
                 ),
+                'grid_before_create'=>'customFieldsGridRegister'
 //                'new_button' => '#add_new_field_set'
             )
         );
@@ -50,7 +59,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'data_mode'=>'local',
                 'data'=>array(),
                 'columns'=>array(
-                    array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
+                    array('type'=>'row_select'),
                     array('name'=>'id', 'label'=>'ID', 'width'=>30),
                     array('name'=>'field_code', 'label'=>'Field Code', 'width'=>100, 'sortable'=>false),
                     array('name'=>'field_name', 'label'=>'Field Name', 'width'=>100, 'sortable'=>false),
@@ -65,7 +74,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'actions'=>array(
                                     'delete' => array('caption' => 'Remove', 'confirm'=>false)
                                 ),
-                'callbacks' => array('after_mass_delete' => 'afterDeleteLinkField')
+                'grid_before_create'=>'selectedFieldGridRegister'
             )
         );
 
@@ -80,7 +89,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'caption'=>'Fields',
                 'orm'=>'FCom_CustomField_Model_Field',
                 'columns'=>array(
-                    array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
+                    array('type'=>'row_select'),
                     array('name'=>'id', 'label'=>'ID', 'width'=>30),
                     array('name'=>'field_code', 'label'=>'Field Code', 'width'=>100),
                     array('name'=>'field_name', 'label'=>'Field Name', 'width'=>100),
@@ -93,9 +102,9 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                             '_quick'=>array('expr'=>'field_code like ? or id like ', 'args'=> array('%?%', '%?%'))
                 ),
                 'actions'=>array(
-                                    'add' => array('caption' => 'Add fields'),
+                                    'add' => array('caption' => 'Add Selected Fields')
                                 ),
-                'events'=>array('add')
+                'grid_before_create'=>'addFieldGridRegister'
             )
         );
 
@@ -116,29 +125,45 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'data_url'=>BApp::href('customfields/fieldsets/field_grid_data'),
                 'edit_url'=>BApp::href('customfields/fieldsets/field_grid_data'),
                 'columns'=>array(
-                    array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
+                    array('type'=>'row_select'),
                     array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
-                    array('name'=>'field_code', 'label'=>'Field Code', 'width'=>100, 'editable'=>true, 'defualt'=>'', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true, 'unique'=>BApp::href('/customfields/fields/unique_field'))),
-                    array('name'=>'field_name', 'label'=>'Field Name', 'width'=>100, 'editable'=>true, 'default'=>'', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true)),
-                    array('name'=>'frontend_label', 'label'=>'Frontend Label', 'width'=>100, 'editable'=>true, 'default'=>'', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true)),
-                    array('name'=>'frontend_show', 'label'=>'Show on frontend', 'width'=>90, 'editable'=>true, 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true),
-                        'options'=>$fld->fieldOptions('frontend_show'), 'editor'=>'select'),
-                    array('name'=>'sort_order', 'label'=>'Sort order', 'width'=>30, 'editable'=>true,/*'editor'=>'select',*/ 'validate'=>'number', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true)/*,
-                    'options'=>range(0,20)*/),
-                    /*'facet_select'=>array('label'=>'Facet', 'width'=>200, 'editable'=>true,
-                        'options'=>array('No'=>'No', 'Exclusive'=>'Exclusive', 'Inclusive'=>'Inclusive')),*/
-                    array('name'=>'table_field_type', 'label'=>'DB Type', 'width'=>180, 'editor'=>'select', 'addable'=>true, 'validation'=>array('required'=>true),
-                    'options'=>$fld->fieldOptions('table_field_type')),
-                    array('name'=>'admin_input_type', 'label'=>'Input Type', 'width'=>180, 'editable'=>true,'editor'=>'select', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true),
-                        'options'=>$fld->fieldOptions('admin_input_type')),
-                    array('name'=>'num_options', 'label'=>'Options', 'width'=>30, 'default'=>'0'),
-                    array('name'=>'system', 'label'=>'System field', 'width'=>90, 'editable'=>false, 'editor'=>'select', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true),
-                        'options'=>array('0'=>'No', '1'=>'Yes')),
-                    array('name'=>'multilanguage', 'label'=>'Multi Language', 'width'=>90, 'editable'=>true, 'editor'=>'select', 'addable'=>true, 'mass-editable'=>true,'validation'=>array('required'=>true),
-                        'options'=>array('0'=>'No', '1'=>'Yes')),
-                    array('name'=>'required', 'label'=>'Required', 'width'=>90, 'editable'=>true, 'editor'=>'select', 'addable'=>true, 'mass-editable'=>true,'validation'=>array('required'=>true),
+                    array('type'=>'input', 'name'=>'field_code', 'label'=>'Field Code', 'width'=>100, 'editable'=>true,
+                            'defualt'=>'', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true,
+                            'unique'=>BApp::href('/customfields/fields/unique_field'))),
+                    array('type'=>'input', 'name'=>'field_name', 'label'=>'Field Name', 'width'=>100, 'editable'=>true,
+                            'default'=>'', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true)),
+                    array('type'=>'input', 'name'=>'frontend_label', 'label'=>'Frontend Label', 'width'=>100, 'editable'=>true,
+                            'default'=>'', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true)),
+                    array('type'=>'input', 'name'=>'frontend_show', 'label'=>'Show on frontend', 'width'=>90,
+                            'editable'=>true, 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true),
+                            'options'=>$fld->fieldOptions('frontend_show'), 'editor'=>'select'),
+                    array('type'=>'input', 'name'=>'sort_order', 'label'=>'Sort order', 'width'=>30, 'editable'=>true,
+                            /*'editor'=>'select',*/ 'validate'=>'number', 'addable'=>true,
+                            'mass-editable'=>true, 'validation'=>array('required'=>true)/*,
+                            'options'=>range(0,20)*/),
+                            /*'facet_select'=>array('label'=>'Facet', 'width'=>200, 'editable'=>true,
+                                'options'=>array('No'=>'No', 'Exclusive'=>'Exclusive', 'Inclusive'=>'Inclusive')),*/
+                    array('type'=>'input', 'name'=>'table_field_type', 'label'=>'DB Type', 'width'=>180, 'editor'=>'select',
+                            'addable'=>true, 'validation'=>array('required'=>true),'options'=>$fld->fieldOptions('table_field_type')),
+                    array('type'=>'input', 'name'=>'admin_input_type', 'label'=>'Input Type', 'width'=>180,
+                        'editable'=>true,'editor'=>'select', 'addable'=>true, 'mass-editable'=>true,
+                        'validation'=>array('required'=>true), 'options'=>$fld->fieldOptions('admin_input_type')),
+                    array('type'=>'input', 'name'=>'num_options', 'label'=>'Options', 'width'=>30, 'default'=>'0'),
+                    array('type'=>'input', 'name'=>'system', 'label'=>'System field', 'width'=>90, 'editable'=>false, 'editor'=>'select',
+                         'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true), 'options'=>array('0'=>'No', '1'=>'Yes')),
+                    array('type'=>'input', 'name'=>'multilanguage', 'label'=>'Multi Language', 'width'=>90,
+                        'editable'=>true, 'editor'=>'select', 'addable'=>true, 'mass-editable'=>true,
+                        'validation'=>array('required'=>true), 'options'=>array('0'=>'No', '1'=>'Yes')),
+                    array('type'=>'input', 'name'=>'required', 'label'=>'Required', 'width'=>90, 'editable'=>true,
+                        'editor'=>'select', 'addable'=>true, 'mass-editable'=>true,'validation'=>array('required'=>true),
                         'options'=>array('1'=>'Yes', '0'=>'No')),
-                    array('name'=>'_actions', 'label'=>'Actions', 'sortable'=>false, 'data'=>array('custom'=>array('caption'=>'options...'), 'edit'=>true,'delete'=>true))
+                    array('type'=>'btn_group',
+                        'buttons'=>array(
+                                            array('name'=>'custom', 'caption'=>'options...'),
+                                            array('name'=>'edit'),
+                                            array('name'=>'delete')
+                                        )
+                        )
                 ),
                 'filters'=>array(
                             array('field'=>'field_code', 'type'=>'text'),
@@ -158,7 +183,8 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                                     'edit'=>true,
                                     'delete'=>true
                                 ),
-                'callbacks'=>array('after_render'=>'afterRowRenderFieldsGrid'),
+                //'callbacks'=>array('after_render'=>'afterRowRenderFieldsGrid'),
+                'grid_before_create'=>'fieldsGridRegister',
                 'new_button' => '#add_new_field'
             )
         );
@@ -174,10 +200,14 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'data_mode'=>'local',
                 'data'=>array(),
                 'columns'=>array(
-                    array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
+                    array('type'=>'row_select'),
                     array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
-                    array('name'=>'label', 'label'=>'Label', 'width'=>300, 'editable'=>'inline', 'sortable' => false, 'validation' => array('required' => true)),
-                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => 'noconfirm'))
+                    array('type'=>'input', 'name'=>'label', 'label'=>'Label', 'width'=>300, 'editable'=>'inline',
+                            'sortable' => false, 'validation' => array('required' => true)),
+                    array('type'=>'btn_group',
+                            'buttons' => array(array('name'=>'delete', 'noconfirm'=>true))
+                        )
+
                 ),
                 'filters'=>array(
                             '_quick'=>array('expr'=>'field_code like ? or id like ', 'args'=> array('%?%', '%?%'))
@@ -186,7 +216,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                                     'new' => array('caption' => 'Insert New Option'),
                                     'delete' => array('caption' => 'Remove', 'confirm' => false)
                                 ),
-                'events'=>array('init')
+                'grid_before_create'=>'optionsGridRegister'
             )
         );
 
@@ -312,7 +342,6 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $model->delete_many(array('field_id'=>$p['field_id']));
         foreach ($p['rows'] as $row) {
             $data = array('field_id'=>$p['field_id'], 'label'=>$row['label']);
-            print_r($data);
             $model->create($data)->save();
         }
         BResponse::i()->json(array('success'=>true));
