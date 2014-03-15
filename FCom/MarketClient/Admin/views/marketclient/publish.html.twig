@@ -9,10 +9,9 @@
           <form method="post" action="{{ APP.href('marketclient/publish/module') }}">
             <ul class="list-group">
   {% for modName, mod in THIS.get('modules') %}
-    <li class="list-group-item">
+              <li class="list-group-item">
               {% if mod.status == 'available' %}
-                  <input type="hidden" name="mod_name" value="{{ modName }}">
-                  <button type="submit" class="btn btn-primary btn-small" onclick="return confirm('{{ 'Are you sure you want to publish %s ?'|_(modName) }}')">
+                  <button type="submit" name="mod_name" value="{{ modName }}" class="btn btn-primary btn-small" onclick="return confirm('{{ 'Are you sure you want to publish %s ?'|_(modName) }}')">
                       {{ 'Publish'|_ }}
                   </button>
               {% endif %}
