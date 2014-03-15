@@ -222,8 +222,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $thumb_url = FCom_Core_Main::i()->resizeUrl().'?s=100x100&f='.BConfig::i()->get('web/media_dir').'/'.'product/images/';
         $data = BDb::many_as_array($model->mediaORM('I')
                 ->order_by_expr('pa.position asc')
+                ->left_outer_join('FCom_Catalog_Model_ProductMedia', array('pa.file_id', '=', 'pm.file_id'), 'pm')
                 ->select(array('pa.id', 'pa.product_id', 'pa.remote_url','pa.position','pa.label','a.file_name','a.file_size','pa.create_at','pa.update_at', 'pa.main_thumb'))
                 ->select('a.id','file_id')
+                ->select_expr('COUNT(pm.product_id)', 'associated_product')
+                ->group_by('pa.id')
                 ->find_many());
         return array(
             'config'=>array(
@@ -244,7 +247,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('type'=>'input', 'name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline'),
                     array('type'=>'input', 'name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true)),
                     array('name'=>'main_thumb', 'label'=>'Thumbnail', 'width'=>50, 'display'=>'eval', 'print' => '"<input class=\'main-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"'),
-                    array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
+                    array('name'=>'associated_product', 'label'=>'Associated Products', 'width'=>50),
+                    array('name'=>'create_at', 'label'=>'Added', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
                     array('type'=>'btn_group', 'name'=>'_actions', 'label'=>'Actions', 'sortable'=>false,
                             'buttons'=>array(
@@ -254,8 +258,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                         )
                 ),
                 'actions'=>array(
+                    'rescan' => array('caption' => 'Rescan'),
                     'add'=>array('caption'=>'Add images'),
-                    'delete'=>array('caption'=>'Remove')
+                    'delete'=>array('caption'=>'Remove'),
                 ),
                 'grid_before_create'=>'imagesGridRegister',
                 'filters'=>array(
