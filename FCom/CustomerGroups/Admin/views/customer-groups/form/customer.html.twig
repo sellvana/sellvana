@@ -4,84 +4,9 @@
 <input type='hidden' name='model[customer_ids_remove]' id='customer_ids_remove'/>
 
 <script>
-
-    /**Event Aggregator
-     This aggregator is for triggering silent_inject that causes main grid adding selected rows from modal grid.**/
-
-    var groupCustomerMng;
-    require(['jquery', 'underscore', 'fcom.backbonegrid'], function($) {
-        if(typeof(g_vent) === 'undefined') {
-            g_vent = _.extend({}, Backbone.Events);
-        }
-
-        function GroupCustomerMng() {
-            this.mainGridId = 'group_customers_grid_{{ m.id }}';
-            this.modalGridId = 'group_all_customers_grid_{{ m.id }}';
-
-            g_vent.bind('init', this._getOriginalIds);
-            g_vent.bind('add', this._addRows);
-            g_vent.bind('mass-delete', this._removeRows);
-
-            this.add_ids = [];
-            this.remove_ids = [];
-            this.original_ids = [];
-
-        }
-
-        GroupCustomerMng.prototype._setFormValues = function() {
-
-            this.add_ids = _.difference(this.add_ids,this.original_ids);
-            this.remove_ids = _.intersection(this.remove_ids, this.original_ids);
-            $('#customer_ids_add').val(this.add_ids.join(','));
-            $('#customer_ids_remove').val(this.remove_ids.join(','));
-
-            console.log(this.original_ids);
-            console.log(this.add_ids);
-            console.log(this.remove_ids);
-        }
-
-        GroupCustomerMng.prototype._getOriginalIds = function(ev) {
-
-            if (ev.grid === self.mainGridId) {
-                self.original_ids = ev.ids;
-            }
-        }
-
-        GroupCustomerMng.prototype._addRows = function(ev) {
-
-            if (ev.grid === self.mainGridId)
-                $('#btn_add_customer').trigger('click');
-
-            if (ev.grid === self.modalGridId) {
-                g_vent.trigger('silent_inject', {grid: self.mainGridId, rows: ev.rows});
-                self.add_ids = _.union(_.pluck(ev.rows,'id'), self.add_ids);
-                self.remove_ids = _.difference(self.remove_ids, _.pluck(ev.rows,'id'));
-                self._setFormValues();
-                g_vent.trigger('clear_selection', {grid: self.modalGridId});
-                $('button.btn-close.group-customer-modal-close').trigger('click');
-
-            }
-
-
-        }
-
-        GroupCustomerMng.prototype._removeRows = function(ev) {
-            if(ev.grid === self.mainGridId) {
-                self.remove_ids = _.union(_.pluck(ev.rows,'id'), self.remove_ids);
-                self.add_ids = _.difference(self.add_ids, _.pluck(ev.rows,'id'));
-                self._setFormValues();
-            }
-        }
-
-        GroupCustomerMng.prototype.reset = function() {
-            this.add_ids = [];
-            this.remove_ids = [];
-            $('#customer_ids_add').val('');
-            $('#customer_ids_remove').val('');
-        }
-        var self = new GroupCustomerMng();
-        groupCustomerMng = self;
-    });
+/*
+*Not used
+*/
 
 
 </script>
