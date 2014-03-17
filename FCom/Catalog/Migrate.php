@@ -380,4 +380,14 @@ class FCom_Catalog_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_2_20__0_2_21()
+    {
+        $tProductLink = FCom_Catalog_Model_ProductLink::table();
+        BDb::ddlTableDef($tProductLink, array(
+            'COLUMNS' => array(
+                'link_type'     => "enum('related','similar', 'cross_sell') NOT NULL",
+            ),
+        ));
+    }
 }

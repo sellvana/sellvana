@@ -74,7 +74,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ->where('folder', $folder)
                 ->left_outer_join('FCom_Catalog_Model_ProductMedia', array('a.id', '=', 'pm.file_id'), 'pm')
                 ->select(array('a.id', 'a.folder', 'a.file_name', 'a.file_size'))
-                ->select_expr('COUNT(pm.product_id)', 'associated_product')
+                ->select_expr('COUNT(pm.product_id)', 'associated_products')
                 ->group_by('a.id')
             ;
             if (isset($r['filters'])) {
