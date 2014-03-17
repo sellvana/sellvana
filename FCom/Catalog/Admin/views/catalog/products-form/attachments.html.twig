@@ -3,7 +3,7 @@
 {% set mediaLibAttachConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_attachments', 'folder': 'media/product/attachment'}) %}
 
 <script>
-var mediaGrid, attachmentGrid;
+var mediaAttachmentGrid, attachmentGrid;
 require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone) {
     var originIds, addedIds = [], removedIds = [];
     var backboneGridAllImages, rowsAllImages;
@@ -38,14 +38,14 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
     *MediaGrid registery function
     */
     window.all_attachments_register = function(grid) {
-        mediaGrid = grid;
+        mediaAttachmentGrid = grid;
         grid.build();
 
-        backboneGridAllImages = mediaGrid.getGridSkeleton();
-        rowsAllImages = mediaGrid.getRows();
+        backboneGridAllImages = mediaAttachmentGrid.getGridSkeleton();
+        rowsAllImages = mediaAttachmentGrid.getRows();
         //Depending selected rows count, disable or enable add button of popup
-        mediaGrid.getSelectedRows().on('add remove reset', function() {
-            if (mediaGrid.getSelectedRows().length>0) {
+        mediaAttachmentGrid.getSelectedRows().on('add remove reset', function() {
+            if (mediaAttachmentGrid.getSelectedRows().length>0) {
                 $('#prod-attachments-modal-add').removeClass('disabled');
             } else {
                 $('#prod-attachments-modal-add').addClass('disabled');
@@ -54,7 +54,7 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
 
         $('#prod-attachments-modal-add').click(function() {
 
-            mediaGrid.getSelectedRows().forEach(function (row) {
+            mediaAttachmentGrid.getSelectedRows().forEach(function (row) {
                 if (!attachmentGrid.getRows().findWhere({file_id: row.get('id')})) {
                     var addedRow = row.toJSON();
                     addedRow._new = true;
@@ -64,7 +64,7 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
                 }
             });
 
-            mediaGrid.getGridView().clearSelectedRows();
+            mediaAttachmentGrid.getGridView().clearSelectedRows();
             $('.prod-attachments-modal-close').trigger('click');
 
         });
@@ -104,7 +104,7 @@ require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fil
         .bind('fileuploadalways', function(e, data) {
 
         if(data.result.id) {
-            mediaGrid.getRows().add(data.result);
+            mediaAttachmentGrid.getRows().add(data.result);
 
             $('td.name span').each(function(i) {
                 if($(this).html() === data.result.file_name)

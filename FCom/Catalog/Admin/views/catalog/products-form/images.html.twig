@@ -71,9 +71,11 @@ require(['jquery','underscore','backbone'], function($, _) {
     }
 
     window.imagesGridRegister = function(grid) {
+        var confirmDelete = $('#confirm-delete-product-images');
+        var selfRow;
         imagesGrid = grid;
-
-        imagesGrid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
+        var rowView = imagesGrid.getGridSkeleton().Views.RowView;
+        rowView.prototype.afterRender = function() {
             var input = this.$el.find('.main-thumb');
             if (mainThumb.val() == '' && this.model.get('main_thumb') == 1) {
                 input.prop('checked', true);
@@ -82,6 +84,21 @@ require(['jquery','underscore','backbone'], function($, _) {
                 input.prop('checked', true);
             }
         }
+
+        rowView.prototype._deleteRow = function (ev) {
+            selfRow = this;
+            var text = (this.model.get('associated_products') > 0) ?
+                        "This image is associated with "+ this.model.get('associated_products') +" of products. Are you sure you want to delete?" : "Are you sure you want to delete?";
+            confirmDelete.find('.modal-body').html(text);
+            confirmDelete.modal('show');
+        }
+
+        $('.prod-images-modal-delete').click(function () {
+            imagesGrid.getRows().remove(selfRow.model);
+            imagesGrid.getSelectedRows().remove(selfRow.model, {silent: true});
+            selfRow._destorySelf();
+            confirmDelete.modal("hide");
+        });
 
         imagesGrid.build();
 
@@ -287,3 +304,19 @@ require(['jquery','underscore','backbone'], function($, _) {
 <input type='hidden' name="grid[images][del]" id='prod-image-remove' />
 <input type='hidden' name="grid[images][rows]" id='prod-image-rows' />
 <input type='hidden' id='main-thumb-image' value="" />
+<div class='modal fade' id='confirm-delete-product-images' tabindex='-1'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">{{ "Delete"|_ }}</h4>
+                </div>
+            <div class='modal-body'>
+            </div>
+            <div class='modal-footer'>
+                <button class='btn btn-primary btn-add prod-images-modal-delete' data-dismiss='modal' type='button'>{{ "Yes"|_ }}</button>
+                <button class='btn btn-default btn-close' data-dismiss='modal' type='button'>{{ "Cancel"|_ }}</button>
+            </div>
+        </div>
+    </div>
+</div>
