@@ -86,16 +86,17 @@ require(['jquery','underscore','backbone'], function($, _) {
 
         rowView.prototype._deleteRow = function (ev) {
             var self = this;
+            var confirmDelete = $('#confirm-delete-product-images');
             $('.prod-images-modal-delete').click(function () {
                 imagesGrid.getRows().remove(self.model);
                 imagesGrid.getSelectedRows().remove(self.model, {silent: true});
                 self._destorySelf();
-                $(this).dialog("close");
+                confirmDelete.modal("hide");
             });
             var text = (this.model.get('associated_product') > 0) ?
                         "This image is associated with "+ this.model.get('associated_product') +" of products. Are you sure you want to delete?" : "Are you sure you want to delete?";
-            $("#confirm-delete-product-images").find('.modal-body').html(text);
-            $('#confirm-delete-product-images').modal('show');
+            confirmDelete.find('.modal-body').html(text);
+            confirmDelete.modal('show');
         }
         imagesGrid.build();
 
