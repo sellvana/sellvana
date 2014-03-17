@@ -682,7 +682,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
             //HANDLE IMAGES
             if (!empty($imagesNames)) {
-                $imagesResult = $this->_importImages( $config, $imagesNames, $p );
+                $imagesConfig = !empty($config['import']['images']) ? $config['import']['images'] : array();
+                $imagesResult = $this->importImages( $imagesNames, $imagesConfig, $p );
                 if(is_array($imagesResult)){
                     $errors[] += $imagesResult;
                 }
@@ -919,15 +920,20 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @todo Fix hardcoded folder names
      * @param $config
      * @param $imagesNames
      * @param FCom_Catalog_Model_Product $p
      * @return array|bool
      */
-    protected function _importImages( $config, $imagesNames, $p )
+    public function importImages( $imagesNames, $config = array(), $p = null )
     {
+        if (is_null($p)) {
+            $p = $this;
+        }
         $mediaLib     = FCom_Core_Model_MediaLibrary::i();
         $productMedia = FCom_Catalog_Model_ProductMedia::i();
+        $rootDir      = BConfig::i()->get( 'fs/root_dir' );
         $imageFolder  = BConfig::i()->get( 'fs/image_folder' );
         $thumbUrl = str_ireplace('media/product/image', '', $p->get('thumb_url'));
         $errors = array();
@@ -935,33 +941,29 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         foreach ( $imagesNames as $fileName ) {
             $pathInfo  = pathinfo( $fileName );
             $subFolder = $pathInfo[ 'dirname' ] == '.' ? null : $pathInfo[ 'dirname' ];
-            $att       = $mediaLib->load(
-                                  array(
-                                      'folder'    => $imageFolder,
-                                      'subfolder' => $subFolder,
-                                      'file_name' => $pathInfo[ 'basename' ]
-                                  )
-            );
+            $att       = $mediaLib->load(array(
+                'folder'    => $imageFolder,
+                'subfolder' => $subFolder,
+                'file_name' => $pathInfo[ 'basename' ]
+            ));
             if ( !$att ) {
-                $fullPathToFile = FULLERON_ROOT_DIR . '/' . $imageFolder . '/' . $fileName;
+                $fullPathToFile = $rootDir . '/' . $imageFolder . '/' . $fileName;
                 $size           = 0;
                 if ( file_exists( $fullPathToFile ) ) {
                     $size = filesize( $fullPathToFile );
                 }
 
                 $subFolder = null;
-                if ( $config[ 'import' ][ 'images' ][ 'with_subfolders' ] ) {
+                if ( !empty($config[ 'with_subfolders' ]) ) {
                     $subFolder = $pathInfo[ 'dirname' ] == '.' ? null : $pathInfo[ 'dirname' ];
                 }
                 try {
-                    $att = $mediaLib->create(
-                                    array(
-                                        'folder'    => $imageFolder,
-                                        'subfolder' => $subFolder,
-                                        'file_name' => $pathInfo[ 'basename' ],
-                                        'file_size' => $size,
-                                    )
-                    )->save();
+                    $att = $mediaLib->create(array(
+                        'folder'    => $imageFolder,
+                        'subfolder' => $subFolder,
+                        'file_name' => $pathInfo[ 'basename' ],
+                        'file_size' => $size,
+                    ))->save();
                 } catch ( Exception $e ) {
                     $errors[ ] = $e->getMessage();
                 }
@@ -971,14 +973,12 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $isThumb = ( 'product/image/' . $fileName == $thumbUrl );
             if ( !$fileId ) {
                 try {
-                    $productMedia->create(
-                                           array(
-                                               'product_id' => $p->id(),
-                                               'media_type' => 'images',
-                                               'file_id'    => $att->id(),
-                                               'main_thumb' => $isThumb ? 1 : 0
-                                           )
-                    )->save();
+                    $productMedia->create(array(
+                        'product_id' => $p->id(),
+                        'media_type' => 'images',
+                        'file_id'    => $att->id(),
+                        'main_thumb' => $isThumb ? 1 : 0
+                    ))->save();
                 } catch ( Exception $e ) {
                     $errors[ ] = $e->getMessage();
                 }
