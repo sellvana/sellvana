@@ -72,24 +72,22 @@
     require(['jquery', 'fcom.admin'], function($) {
         $(function() {
             FCom.Admin.Accordion('import-accordion');
-            var selectedRows;
-            g_vent.trigger('get_selected_rows_collection', {
-                                                                grid: 'import_files',
-                                                                callback: function(rows) {
-                                                                    selectedRows = rows;
-                                                                }
-                                                            }
-            );
+
+
+
 
             var importAccordionEle = $('#import-accordion');
             var importConfigEle = $('#import-accordion-group1');
             var importStatusEle = $('#import-accordion-group2');
 
             $('#step1-next').click(function(ev) {
-                if (!selectedRows || !selectedRows.length) {
+                //import_files_grid is global object created in medialib.html.twig
+                var selectedRows = import_files_grid.getSelectedRows();
+                if (!selectedRows.length) {
                     alert('Please select one file');
                     return;
                 }
+
                 var filename = selectedRows.at(0).get('file_name');
                 importConfigEle.prev().find('a').trigger('click');
                 importConfigEle.html('Please wait loading file configuration...');

@@ -370,4 +370,24 @@ class FCom_Catalog_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_2_19__0_2_20()
+    {
+        $tProductLink = FCom_Catalog_Model_ProductLink::table();
+        BDb::ddlTableDef($tProductLink, array(
+            'COLUMNS' => array(
+                'link_type'     => "enum('related','similar', 'cross-sell') NOT NULL",
+            ),
+        ));
+    }
+
+    public function upgrade__0_2_20__0_2_21()
+    {
+        $tProductLink = FCom_Catalog_Model_ProductLink::table();
+        BDb::ddlTableDef($tProductLink, array(
+            'COLUMNS' => array(
+                'link_type'     => "enum('related','similar', 'cross_sell') NOT NULL",
+            ),
+        ));
+    }
 }

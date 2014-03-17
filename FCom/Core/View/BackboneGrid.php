@@ -121,6 +121,18 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $grid = $this->grid;
         $c =& $grid['config'];
 
+
+        if (!empty($c['data_mode']) && $c['data_mode'] === 'local') {
+            unset($c['data_url']);
+
+            //IMPORTANT: edit_url_required is used when local mode grid needs to be saved through edit_url
+            //ex) ProductReviewGrid on product edit form
+            if (empty($c['edit_url_required']) || !$c['edit_url_required']){
+                unset($c['edit_url']);
+            }
+
+        }
+
         if (empty($c['grid_url'])) {
             $c['grid_url'] = BRequest::currentUrl();
         }
@@ -149,6 +161,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $grid['request'] = BRequest::i()->get();
         }
 
+
         $this->grid = $grid;
     }
 
@@ -156,11 +169,93 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     {
         $grid = $this->grid;
         $pos = 0;
+
         foreach ($grid['config']['columns'] as $cId=>&$col) {
             if (empty($col['name'])) {
                 $col['name'] = $cId;
             }
-            $col['position'] = ++$pos;
+
+			if ($cId === 0) {
+				$col['cssClass'] = 'select-row';
+				$col['edit'] = 'inline';
+			}
+
+			if (empty($col['type'])) {
+				continue;
+			}
+			switch($col['type']) {
+				case 'multiselect':
+					$col['width'] = 50;
+                    $col['no_reorder'] = true;
+
+					break;
+                case 'input':
+                    /*if (!empty($col['editor']) && $col['editor'] === 'select' && !empty($col['options'])) {
+
+                        $temp = array();
+                        foreach($col['options'] as $key=>$val) {
+
+                            if (is_array($val)) {
+                                $temp[] = $val;
+                            } else {
+                                $temp[] = array('label'=>$val, 'value'=>$key);
+                            }
+                        }
+                        $col['options'] = $temp;
+
+                    }*/
+
+
+                    break;
+				case 'btn_group':
+                    $col['label'] = 'Actions';
+                    $col['name'] = 'btn_group';
+                    $col['sortable'] = false;
+					foreach($col['buttons'] as $bId=>&$btn) {
+						switch($btn['name']) {
+							case 'edit':
+								if (empty($btn['icon'])) {
+                                    $btn['icon'] = ' icon-edit-sign';
+                                }
+
+								$btn['cssClass'] = ' btn-xs btn-edit ';
+								if (!empty($btn['href'])) {
+									$btn['type'] = 'link';
+
+									if(empty($btn['col'])) {
+										$btn['col']= 'id';
+									}
+								}
+
+								break;
+							case 'custom':
+								$btn['cssClass'] = 'btn-custom';
+
+								break;
+							/*case 'edit_inline':
+								$col['icon'] = 'icon-pencil';
+
+								break;*/
+							case 'delete':
+								$btn['icon'] = 'icon-remove';
+								$btn['cssClass'] = 'btn-delete ';
+								if(!empty($btn['noconfirm']) && $btn['noconfirm']) {
+									$btn['cssClass'] .= 'noconfirm';
+								}
+								break;
+						}
+
+						//TODO: Is it really necessary not to have default icon when button has caption?
+						if (!empty($btn['caption'])) {
+							$btn['icon'] = '';
+						}
+					}
+
+
+					break;
+
+			}
+            /*$col['position'] = ++$pos;
             switch ($cId) {
                 case '_multiselect':
                     $col['type'] = 'multiselect';
@@ -169,7 +264,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                     $col['format'] = function($args) {
                         return BUtil::tagHtml('input', array(
                             'type' =>'checkbox',
-                            //'name' =>"grid[{$args['grid']['config']['id']}][sel][{$args['row']->id}]",
+                            'name' =>"grid[{$args['grid']['config']['id']}][sel][{$args['row']->id}]",
                             'class'=>'js-sel',
                         ));
                     };
@@ -193,7 +288,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         return BUtil::tagHtml('select', array('class'=>'js-actions'), BUtil::optionsHtml($options));
                     };
                     break;
-            }
+            }*/
         }
         unset($col);
         $this->grid = $grid;
@@ -205,7 +300,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             return;
         }
         $grid = $this->grid;
+
         foreach ($grid['config']['actions'] as $k=>&$action) {
+            //var_dump($action);
             if (!empty(static::$_defaultActions[$k])) {
 
                 switch ($k) {
@@ -254,9 +351,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                     default:
                         $action = static::$_defaultActions[$k];
                 }
-            }
-            if (is_string($action)) {
-                $action = array('html'=>$action);
+            } else {
+                $action = array('html'=>BUtil::tagHtml('button',
+                            array('class'=>isset($action['class'])? 'btn '.$action['class'] : 'btn', 'type'=>'button', 'id'=>isset($action['id']) ? $action['id'] : ''),
+                            isset($action['caption']) ? $action['caption'] : BLocale::_('Add')
+                ));
+
+
             }
         }
         unset($action);

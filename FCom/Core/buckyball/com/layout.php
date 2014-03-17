@@ -1882,9 +1882,9 @@ class BViewHead extends BView
      * @param bool  $start
      * @return BViewHead
      */
-    public function title($title, $start = false)
+    public function title($title, $start = false, $length = 1)
     {
-        $this->addTitle($title, $start);
+        $this->addTitle($title, $start, $length);
     }
 
     /**
@@ -2005,10 +2005,10 @@ class BViewHead extends BView
      * @param bool $start
      * @return $this
      */
-    public function addTitle($title, $start = false)
+    public function addTitle($title, $start = false, $length = 1)
     {
-        if ($start) {
-            array_splice($this->_title, 0, 1, $title);
+        if ($start !== false) {
+            array_splice($this->_title, $start, $length, (array)$title);
         } else {
             $this->_title[] = $title;
         }
@@ -2057,6 +2057,17 @@ class BViewHead extends BView
         }
 
         return '<title>' . $this->q(join($this->_titleSeparator, $this->_title)) . '</title>';
+    }
+
+    public function removeTitle($pattern)
+    {
+if (BDebug::is('DEBUG')) {
+    #var_dump($this->_title); exit;
+}
+        $this->_title = array_filter($this->_title, function ($val) use ($pattern) {
+            return !preg_match('#'.$pattern.'#', $val);
+        });
+        return $this;
     }
 
     /**

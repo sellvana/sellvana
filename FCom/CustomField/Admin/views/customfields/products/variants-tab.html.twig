@@ -1,28 +1,7 @@
 {% set ctrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
 {% set fieldConfig = ctrl.variantFieldGridConfig(model) %}
 {% set variantConfig = ctrl.variantGridConfig(model) %}
-<div class="well clearfix">
-    <div class="pull-left" style="width: 245px">
-        <select id="sel_var_field" class="form-control" style="width:150px;">
-            {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').getDropdowns()) | raw }}
-        </select>
-        <button class="btn btn-primary btn-sm" id="btn_add_var_field" type="button">Add Field</button>
-    </div>
-    <div class="col-sm-8" style="position: relative">
-        <ol id="variants-tab-field" class="dd-list columns dd-list-axis-x"></ol>
-    </div>
-</div>
-<div class="hidden" id="grid-field-hidden">
-    {{ THIS.view('core/backbonegrid').set('grid', fieldConfig) | raw }}
-</div>
-<div class="f-variants-col row">
-  <div class="col-sm-12">
-    {{ THIS.view('core/backbonegrid').set('grid', variantConfig) | raw }}
-  </div>
-</div>
 
-<input type='hidden' id='vfield_ids' name='vfields' />
-<input type='hidden' id='variants' name='variants' />
 <script>
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(Backbone, _, $) {
     var fieldCollection = null;
@@ -31,24 +10,26 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
     var valueCurrentField = Array();
     var vField = $('#variants-tab-field');
     var arrField = Array();
-    g_vent.trigger('get_rows_collection',
-                    {
-                        'grid': 'variable-field-grid',
-                        callback: vFieldGridInit
-                    }
-                   );
-    g_vent.trigger('get_cols_collection', {'grid': 'variant-grid', callback: function(c){ vColsCollection = c;} });
-    g_vent.trigger('get_rows_collection', {'grid': 'variant-grid', callback: function(r){ vRowsCollection = r;} });
+
+    window.variantFieldGridRegister = function(grid) {
+        grid.build();
+        fieldCollection = grid.getRows();
+        vFieldGridInit();
+    }
+    window.variantGridRegister = function(grid) {
+        grid.build();
+        vColsCollection = grid.getCols();
+        vRowsCollection = grid.getRows();
+    }
+
     function resetSelect()
     {
         $('#sel_var_field').val('');
         $('#sel_var_field').select2();
     }
 
-    function vFieldGridInit(c)
+    function vFieldGridInit()
     {
-
-        fieldCollection = c;
         var mapField = fieldCollection.map(function (obj) {
             return {id: obj.id, name: obj.get('name')};
         });
@@ -210,6 +191,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
         });
 
         vColsCollection.add({
+            type: 'input',
             name: text,
             label: text,
             width: 150,
@@ -245,3 +227,27 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
 
 });
 </script>
+
+<div class="well clearfix">
+    <div class="pull-left" style="width: 245px">
+        <select id="sel_var_field" class="form-control" style="width:150px;">
+            {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').getDropdowns()) | raw }}
+        </select>
+        <button class="btn btn-primary btn-sm" id="btn_add_var_field" type="button">Add Field</button>
+    </div>
+    <div class="col-sm-8" style="position: relative">
+        <ol id="variants-tab-field" class="dd-list columns dd-list-axis-x"></ol>
+    </div>
+</div>
+<div class="hidden" id="grid-field-hidden">
+    {{ THIS.view('core/backbonegrid').set('grid', fieldConfig) | raw }}
+</div>
+<div class="f-variants-col row">
+  <div class="col-sm-12">
+    {{ THIS.view('core/backbonegrid').set('grid', variantConfig) | raw }}
+  </div>
+</div>
+
+<input type='hidden' id='vfield_ids' name='vfields' />
+<input type='hidden' id='variants' name='variants' />
+

@@ -42,15 +42,15 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'data_mode'=>'local',
                 'data'=>($data === null ? array() : $data),
                 'columns'=>array(
-                    array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
+                    array('type'=>'row_select'),
                     array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
                     array('name'=>'name', 'label'=>'Field Name', 'width'=>300),
-                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => true))
+                    array('type'=>'btn_group',  'buttons' => array(array('name'=>'delete')))
                 ),
                 'actions'=>array(
                                    'delete' => array('caption' => 'Remove')
                                 ),
-                'events'=>array('init', 'delete', 'mass-delete')
+                'grid_before_create'=>'variantFieldGridRegister'
             )
         );
 
@@ -60,7 +60,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
     public function variantGridConfig($model)
     {
         $columns = array(
-            array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30, 'position'=>0),
+            array('type'=>'row_select'),
             array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true, 'position'=>1)
         );
 
@@ -68,6 +68,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         if ($vFields !== null) {
             $pos = 2;
             foreach($vFields as $f) {
+                $f['type'] = 'input';
                 $f['options'] = FCom_CustomField_Model_FieldOption::i()->getListAssocById($f['id']);
                 $f['label'] = $f['name'];
                 $f['editable'] = 'inline';
@@ -81,10 +82,13 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $columns[] = $f;
             }
         }
-        $columns[] = array('name'=>'sku', 'label'=>'SKU', 'width'=>150, 'editable'=>'inline', 'addable'=>true, 'validation'=>array('required'=>true), 'default'=>'');
-        $columns[] = array('name'=>'price', 'label'=>'PRICE', 'width'=>150, 'editable'=>'inline', 'addable'=>true, 'validation'=>array('required'=>true,'number'=>true), 'default'=>'');
-        $columns[] = array('name'=>'qty', 'label'=>'QTY', 'width'=>150, 'editable'=>'inline', 'addable'=>true, 'validation'=>array('required'=>true,'number'=>true), 'default'=>'');
-        $columns[] = array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete'=>true));
+        $columns[] = array('type'=>'input', 'name'=>'sku', 'label'=>'SKU', 'width'=>150, 'editable'=>'inline',
+                            'addable'=>true, 'validation'=>array('required'=>true), 'default'=>'');
+        $columns[] = array('type'=>'input', 'name'=>'price', 'label'=>'PRICE', 'width'=>150, 'editable'=>'inline',
+                            'addable'=>true, 'validation'=>array('required'=>true,'number'=>true), 'default'=>'');
+        $columns[] = array('type'=>'input', 'name'=>'qty', 'label'=>'QTY', 'width'=>150, 'editable'=>'inline',
+                            'addable'=>true, 'validation'=>array('required'=>true,'number'=>true), 'default'=>'');
+        $columns[] = array('type'=>'btn_group',  'buttons' => array(array('name'=>'delete')));
 
         $data = array();
 
@@ -113,9 +117,9 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 ),
                 'actions'=>array(
                                     'new'=>array('caption'=>'New Variant'),
-                                    'edit'=>array('caption'=>'Edit Variants'),
                                     'delete' => array('caption' => 'Remove')
-                                )
+                                ),
+                'grid_before_create'=>'variantGridRegister'
             )
         );
 
@@ -139,20 +143,21 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'data_mode'=>'local',
                 'data'=>$data,
                 'columns'=>array(
-                    array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>30),
+                    array('type'=>'row_select'),
                     array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
                     array('name'=>'name', 'label'=>'Field Name', 'width'=>200),
                     array('name'=>'label', 'label'=>'Field Label', 'width'=>200),
                     array('name'=>'input_type', 'label'=>'Input Type', 'width'=>200),
                     array('name'=>'options', 'label'=>'Options', 'width'=>200),
-                    array('name'=>'price', 'label'=>'Price', 'width'=>200, 'editable' => 'inline', 'validation' => array('number' => true)),
-                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => true))
+                    array('type'=>'input', 'name'=>'price', 'label'=>'Price', 'width'=>200, 'editable' => 'inline',
+                            'validation' => array('number' => true)),
+                    array('type'=>'btn_group', 'buttons' => array(array('name'=>'delete')))
                 ),
                 'actions'=>array(
                                     'add' => array('caption' => 'Add Fields'),
                                     'delete' => array('caption' => 'Remove')
                                 ),
-                'events'=>array('add')
+                'grid_before_create'=>'frontendFieldGridRegister'
             )
         );
 

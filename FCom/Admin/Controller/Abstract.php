@@ -51,6 +51,15 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         }
     }
 
+    public function beforeDispatch()
+    {
+        if (!parent::beforeDispatch()) return false;
+
+        $this->view('head')->addTitle(BLocale::_('%s Admin', BConfig::i()->get('modules/FCom_Core/site_title')));
+
+        return true;
+    }
+
     public function processFormTabs($view, $model=null, $mode='edit', $allowed=null)
     {
         $r = BRequest::i();

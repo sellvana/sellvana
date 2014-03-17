@@ -14,14 +14,13 @@ class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abst
     {
         $config = parent::gridConfig();
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type'=>'row_select'),
             array('name' => 'id', 'index' => 'o.id', 'label' => 'ID', 'width' => 70),
             array('name' => 'code', 'index' => 'code', 'label' => 'Code',
                   'addable' => true, 'editable' => true, 'validation' => array('required' => true, 'unique' => BApp::href('orderstatus/unique'))),
             array('name' => 'name', 'index' => 'name', 'label' => 'Label',
                   'addable' => true, 'editable' => true, 'validation' => array('required' => true, /*'unique' => BApp::href('orderstatus/unique')*/)),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                  'data' => array('edit' => true,'delete' => true)),
+            array('type'=>'btn_group', 'buttons' => array( array('name'=>'edit'), array('name'=>'delete' ) ) )
         );
         $config['actions'] = array(
             'new'    => array('caption' => 'Add New Order Status', 'modal' => true),

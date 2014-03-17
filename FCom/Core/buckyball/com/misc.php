@@ -926,12 +926,11 @@ class BUtil extends BClass
         }
 
         // curl disabled because file upload doesn't work for some reason. TODO: figure out why
-        if (false && function_exists('curl_init')) {
+        if (false && function_exists('curl_init') || ini_get('safe_mode')) {
             $curlOpt = array(
                 CURLOPT_USERAGENT => $userAgent,
                 CURLOPT_URL => $url,
                 CURLOPT_ENCODING => '',
-                CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_AUTOREFERER => true,
                 CURLOPT_SSL_VERIFYPEER => true,
@@ -943,6 +942,11 @@ class BUtil extends BClass
                 CURLOPT_HTTPHEADER, array('Expect:'), //Fixes the HTTP/1.1 417 Expectation Failed
                 CURLOPT_HEADER => true,
             );
+            if (!ini_get('safe_mode') && !ini_get('open_basedir')) {
+                $curlOpt += array(
+                    CURLOPT_FOLLOWLOCATION => true,
+                );
+            }
             if (false) { // TODO: figure out cookies handling
                 $cookieDir = BConfig::i()->get('fs/storage_dir').'/cache';
                 BUtil::ensureDir($cookieDir);
@@ -966,7 +970,7 @@ class BUtil extends BClass
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
-            list($response, $headers) = explode("\r\n\r\n", $rawResponse, 2);
+            list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2);
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
             $respHeaders = explode("\r\n", $headers);
             if(curl_errno($ch) != 0){
@@ -974,7 +978,6 @@ class BUtil extends BClass
                 static::$_lastRemoteHttpInfo['error'] = curl_error($ch);
             }
             curl_close($ch);
-
         } else {
             $opts = array('http' => array(
                 'method' => $method,
@@ -3523,7 +3526,7 @@ class BValidate extends BClass
             'message' => 'Invalid URL',
         ),
         'email'     => array(
-            'rule'    => '/^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/',
+            'rule'    => '/^([\w-\.\+]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/',
             'message' => 'Invalid Email',
         ),
         'string'    => array(
