@@ -71,7 +71,8 @@ require(['jquery','underscore','backbone'], function($, _) {
     }
 
     window.imagesGridRegister = function(grid) {
-
+        var confirmDelete = $('#confirm-delete-product-images');
+        var selfRow;
         imagesGrid = grid;
         var rowView = imagesGrid.getGridSkeleton().Views.RowView;
         rowView.prototype.afterRender = function() {
@@ -85,19 +86,20 @@ require(['jquery','underscore','backbone'], function($, _) {
         }
 
         rowView.prototype._deleteRow = function (ev) {
-            var self = this;
-            var confirmDelete = $('#confirm-delete-product-images');
-            $('.prod-images-modal-delete').click(function () {
-                imagesGrid.getRows().remove(self.model);
-                imagesGrid.getSelectedRows().remove(self.model, {silent: true});
-                self._destorySelf();
-                confirmDelete.modal("hide");
-            });
-            var text = (this.model.get('associated_product') > 0) ?
-                        "This image is associated with "+ this.model.get('associated_product') +" of products. Are you sure you want to delete?" : "Are you sure you want to delete?";
+            selfRow = this;
+            var text = (this.model.get('associated_products') > 0) ?
+                        "This image is associated with "+ this.model.get('associated_products') +" of products. Are you sure you want to delete?" : "Are you sure you want to delete?";
             confirmDelete.find('.modal-body').html(text);
             confirmDelete.modal('show');
         }
+
+        $('.prod-images-modal-delete').click(function () {
+            imagesGrid.getRows().remove(selfRow.model);
+            imagesGrid.getSelectedRows().remove(selfRow.model, {silent: true});
+            selfRow._destorySelf();
+            confirmDelete.modal("hide");
+        });
+
         imagesGrid.build();
 
         originIds = imagesGrid.getRows().pluck('id');
