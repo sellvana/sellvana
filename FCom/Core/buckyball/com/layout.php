@@ -1882,9 +1882,9 @@ class BViewHead extends BView
      * @param bool  $start
      * @return BViewHead
      */
-    public function title($title, $start = false)
+    public function title($title, $start = false, $length = 1)
     {
-        $this->addTitle($title, $start);
+        $this->addTitle($title, $start, $length);
     }
 
     /**
@@ -2005,10 +2005,10 @@ class BViewHead extends BView
      * @param bool $start
      * @return $this
      */
-    public function addTitle($title, $start = false)
+    public function addTitle($title, $start = false, $length = 1)
     {
-        if ($start) {
-            array_splice($this->_title, 0, 1, $title);
+        if ($start !== false) {
+            array_splice($this->_title, $start, $length, (array)$title);
         } else {
             $this->_title[] = $title;
         }
