@@ -5,7 +5,8 @@ class FCom_Catalog_Model_SearchAlias extends FCom_Core_Model_Abstract
     static protected $_table = 'fcom_search_alias';
     static protected $_origClass = __CLASS__;
     protected static $_importExportProfile = array(
-        __CLASS__ => array( 'skip' => array( 'id', 'create_at', 'update_at' ) ),
+        __CLASS__ => array( 'model' => __CLASS__,
+                            'skip' => array( 'id', 'create_at', 'update_at' ) ),
     );
 
     static public function processSearchQuery($query)

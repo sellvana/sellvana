@@ -7,6 +7,7 @@ class FCom_Catalog_Model_ProductLink extends FCom_Core_Model_Abstract
 
     protected static $_importExportProfile = array(
         __CLASS__ => array(
+            'model'   => __CLASS__,
             'skip'    => array( 'id' ),
             'related' => array(
                 'product_id'        => 'FCom_Catalog_Model_Product.id',

@@ -70,6 +70,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     protected static $_importExportProfile = array(
         __CLASS__=> array(
+            'model' => __CLASS__,
             'skip' => array(
                 'create_dt',
                 'update_dt',

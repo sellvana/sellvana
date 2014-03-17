@@ -6,6 +6,7 @@ class FCom_Catalog_Model_ProductMedia extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
     protected static $_importExportProfile = array(
         __CLASS__ => array(
+            'model'   => __CLASS__,
             'skip'    => array( 'id', 'create_at', 'update_at' ),
             'related' => array(
                 'product_id' => 'FCom_Catalog_Model_Product.id',

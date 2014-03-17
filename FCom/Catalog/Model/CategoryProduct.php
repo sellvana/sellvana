@@ -7,6 +7,7 @@ class FCom_Catalog_Model_CategoryProduct extends BModel
 
     protected static $_importExportProfile = array(
         __CLASS__ => array(
+            'model'   => __CLASS__,
             'skip'    => array( 'id' ),
             'related' => array(
                 'product_id'  => 'FCom_Catalog_Model_Product.id',

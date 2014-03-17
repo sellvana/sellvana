@@ -7,6 +7,7 @@
 class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
 {
     protected $_table = 'fcom_import_info';
+    protected $_default_export_file = 'export.json';
 
     /**
      * @return array
@@ -22,6 +23,35 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
             }
         }
         return $exportableModels;
+    }
+
+    public function export( $models = array(), $toFile = null )
+    {
+        if ( !$toFile ) {
+            $toFile = $this->_default_export_file;
+        }
+        $path = BConfig::i()->get( 'fs/storage_dir' );
+
+        $toFile = $path . '/export/' . trim( $toFile, '/' );
+        BUtil::ensureDir( dirname( $toFile ) );
+        $fe = fopen( $toFile, 'w' );
+
+        if ( !$fe ) {
+            BDebug::log( "Could not open $toFile for writing, aborting export." );
+            return false;
+        }
+        $this->writeLine( $fe, $this->storeUUID() );
+        $exportableModels = $this->collectExportableModels();
+        if ( !empty( $models ) ) {
+            $diff = array_diff( array_keys( $exportableModels ), $models );
+            foreach ( $diff as $d ) {
+                unset( $exportableModels[ $d ] );
+            }
+        }
+
+        $sorted = $this->sortModels( $exportableModels );
+
+        return true;
     }
 
     /**
@@ -62,118 +92,91 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
         return $modelConfigs;
     }
 
+    protected $_export_sorted;
+    protected $_temp_sorted;
+    protected $_is_sorted;
+
     /**
      * @param array $models
      * @return array
      */
     public function sortModels( $models )
     {
-        $circRefsArr = array();
-        foreach ( $models as $modelName => $mod ) {
-            $circRefs = $this->detectCircularReferences( $mod, $models );
-            if ( $circRefs ) {
-                foreach ( $circRefs as $circ ) {
-                    $circRefsArr[ join( ' -> ', $circ ) ] = 1;
+        foreach ( $models as $k => $m ) {
+            if ( !isset( $m[ 'related' ] ) || empty( $m[ 'related' ] ) ) {
+                $this->_export_sorted[ ] = $m; // no dependencies, add to sorted
+                $this->_is_sorted[ $k ]  = 1;
+                continue;
+            }
+        }
 
-                    $s        = sizeof( $circ );
-                    $mod1name = $circ[ $s - 1 ];
-                    $mod2name = $circ[ $s - 2 ];
-                    $mod1     = $models[ $mod1name ];
-                    $mod2     = $models[ $mod2name ];
-                    foreach ( $mod1[ 'related' ] as $i => $p ) {
-                        if ( $p === $mod2name ) {
-                            unset( $mod1[ 'related' ][ $i ] );
+        foreach ( $models as $k => $m ) {
+            $this->_sort( $m, $k, $models );
+        }
+
+        return $this->_export_sorted;
+    }
+
+    protected function _sort( array $model, $name, array $models )
+    {
+        if ( isset( $this->_temp_sorted[ $name ] ) ) {
+            BDebug::log( "Circular reference, $name", "ie.log" );
+        } else {
+            if ( !isset( $this->_is_sorted[ $name ] ) ) {
+                $this->_temp_sorted[ $name ] = 1;
+                if ( isset( $model[ 'related' ] ) ) {
+                    foreach ( (array)$model[ 'related' ] as $node ) {
+                        $t    = explode( '.', $node );
+                        $node = $t[ 0 ];
+                        if ( isset( $this->_is_sorted[ $node ] ) ) {
+                            continue;
                         }
+                        if ( isset( $models[ $node ] ) ) {
+                            $tmpModel = $models[ $node ];
+                        } else {
+                            if ( class_exists( $node ) ) {
+                                $tmpModel        = array_pop( $node::modelExportProfile() );
+                                $models[ $node ] = $tmpModel;
+                            }
+                        }
+                        if ( !isset( $tmpModel ) ) {
+                            BDebug::log( "Could not find valid configuration for $node", "ie.log" );
+                            continue;
+                        }
+                        $this->_sort( $tmpModel, $node, $models );
                     }
                 }
+                $this->_is_sorted[ $name ] = 1;
+                $this->_export_sorted[ ]   = $model;
+                unset( $this->_temp_sorted[ $name ] );
             }
         }
-        foreach ( $circRefsArr as $circRef => $_ ) {
-            BDebug::warning( 'Circular reference detected: ' . $circRef );
-        }
+    }
 
-        // get modules without dependencies
-        $rootModules = array();
-        foreach ( $models as $modName => $mod ) {
-            if ( isset( $mod[ 'related' ] ) || !empty( $mod[ 'related' ] ) ) {
-                $rootModules[ $modName ] = $mod;
-            }
-        }
-
-        // begin algorithm
-        $sorted = array();
-        while ( $models ) {
-            // check for circular reference
-            if ( !$rootModules ) {
-                BDebug::warning( 'Circular reference detected, aborting module sorting' );
-                return false;
-            }
-            $rKeys = array_keys( $rootModules );
-            // remove this node from root modules and add it to the output
-            $n             = array_pop( $rootModules );
-            $rk            = array_pop( $rKeys );
-            $sorted[ $rk ] = $n;
-
-            foreach ( $n[ 'related' ] as $key => $reference ) {
-                $refModel = $models[ $reference ];
-                unset($n[ 'related' ][$key]);
-                // todo
-            }
-
-            // for each of its children: queue the new node, finally remove the original
-            for ( $i = count( $n[ 'related' ] ) - 1; $i >= 0; $i-- ) {
-                // get child module
-                $childModule = $modules[ $n->children[ $i ] ];
-                // remove child modules from parent
-                unset( $n->children[ $i ] );
-                // remove parent from child module
-                unset( $childModule->parents[ array_search( $n->name, $childModule->parents ) ] );
-                // check if this child has other parents. if not, add it to the root modules list
-                if ( !$childModule->parents ) {
-                    array_push( $rootModules, $childModule );
-                }
-            }
-            // remove processed module from list
-            unset( $modules[ $n->name ] );
-        }
-        // move modules that have load_after=='ALL' to the end of list
-        foreach ( $sorted as $modName => $mod ) {
-            if ( $mod->load_after === 'ALL' ) {
-                unset( $sorted[ $modName ] );
-                $sorted[ $modName ] = $mod;
-            }
-        }
-        return $sorted;
+    protected function storeUUID()
+    {
+        return '11'; // todo generate unique store id
     }
 
     /**
-     * Detect circular model dependencies references
+     * @param $handle
+     * @param $line
      */
-    public function detectCircularReferences( $model, $models, $depPathArr = array() )
+    protected function writeLine( $handle, $line )
     {
-        $circ = array();
-        if ( $model[ 'related' ] ) {
-            foreach ( $model[ 'related' ] as $rel ) {
-                if ( isset( $depPathArr[ $rel ] ) ) {
-                    $found    = false;
-                    $circPath = array();
-                    foreach ( $depPathArr as $k => $_ ) {
-                        if ( $rel === $k ) {
-                            $found = true;
-                        }
-                        if ( $found ) {
-                            $circPath[ ] = $k;
-                        }
-                    }
-                    $circPath[ ] = $rel;
-                    $circ[ ]     = $circPath;
-                } else {
-                    $depPathArr1         = $depPathArr;
-                    $depPathArr1[ $rel ] = 1;
-                    $circ += $this->detectCircularReferences( $models[ $rel ], $models, $depPathArr1 );
-                }
+        $line = trim( $line );
+        $l    = strlen( $line );
+        if ( $l < 1 ) {
+            return;
+        }
+        $written = 0;
+        while ( $written < $l ) { // check if entire line is written to file, if not try to continue from break point
+            $written += fwrite( $handle, trim( substr( $line, $written ) ) . "\n" );
+
+            if ( !$written ) { // if written is false or 0, there has been an error writing.
+                BDebug::log( "Writing failed", 'ie.log' );
+                break;
             }
         }
-        return $circ;
     }
 }
