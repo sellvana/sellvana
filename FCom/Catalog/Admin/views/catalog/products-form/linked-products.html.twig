@@ -5,31 +5,36 @@
 <input type='hidden' name='grid[linked_products_similar][del]' id='similar_ids_remove'/>
 <input type='hidden' name='grid[linked_products_related][add]' id='related_ids_add'/>
 <input type='hidden' name='grid[linked_products_related][del]' id='related_ids_remove'/>
+<input type='hidden' name='grid[linked_products_cross-sell][add]' id='cross-sell_ids_add'/>
+<input type='hidden' name='grid[linked_products_cross-sell][del]' id='cross-sell_ids_remove'/>
 
 <script>
-var allProdGrid, relatedProdGrid, similarProdGrid, selectedGrid;
+var allProdGrid, relatedProdGrid, similarProdGrid, crossSellProdGrid, selectedGrid;
 var productId = '{{ m.id() }}';
 require(['jquery','underscore','backbone'], function($, _) {
 
     var modalGrid = 'category_all_prods_grid_{{ m.id }}';
-    var relatedOriginIds = [], similarOriginIds = [];
+    var relatedOriginIds = [], similarOriginIds = [], crossSellOriginIds = [];
 
     window.setLindedGridVals = function() {
 
         similarRows = _.filter(similarProdGrid.getRows().toJSON(), function(row) { return row._new;});
         relatedRows = _.filter(relatedProdGrid.getRows().toJSON(), function(row) { return row._new;});
-
+        crossSellRows = _.filter(crossSellProdGrid.getRows().toJSON(), function(row) { return row._new;});
 
         similarRows = similarRows ? _.pluck(similarRows, 'id') : [];
         relatedRows = relatedRows ? _.pluck(relatedRows, 'id') : [];
+        crossSellRows = crossSellRows ? _.pluck(crossSellRows, 'id') : [];
 
         console.log(similarRows, relatedRows);
 
         $('#similar_ids_add').val(similarRows.join(','));
         $('#related_ids_add').val(relatedRows.join(','));
+        $('#cross-sell_ids_add').val(crossSellRows.join(','));
 
         $('#related_ids_remove').val( _.difference(relatedOriginIds, relatedProdGrid.getRows().pluck('id')).join(',') );
         $('#similar_ids_remove').val( _.difference(similarOriginIds, similarProdGrid.getRows().pluck('id')).join(',') );
+        $('#cross-sell_ids_remove').val( _.difference(crossSellOriginIds, crossSellProdGrid.getRows().pluck('id')).join(',') );
     }
 
     window.allProdGridRegister = function(grid) {
@@ -84,6 +89,16 @@ require(['jquery','underscore','backbone'], function($, _) {
         });
     }
 
+    window.linked_products_cross_sell_register = function (grid) {
+        crossSellProdGrid = grid;
+        crossSellProdGrid.build();
+        crossSellOriginIds = crossSellProdGrid.getRows().pluck('id');
+        $(crossSellProdGrid.getGridSkeleton().AddButton).click(function() {
+            refreshGridAdd();
+            $('#btn_add_prod').trigger('click');
+        });
+    }
+
     function refreshGridAdd() {
         var data = getExcludeId();
         allProdGrid.getGridSkeleton().current_filters['exclude_id'] = data;
@@ -113,7 +128,7 @@ require(['jquery','underscore','backbone'], function($, _) {
                 </a>
             </li>
             <li>
-                <a data-toggle='tab' href='#cross-sell'>
+                <a data-toggle='tab' href='#cross-sell' onclick="selectedGrid = crossSellProdGrid;">
                     {{ " Cross-Sell"|_ }}
                 </a>
             </li>
@@ -126,9 +141,7 @@ require(['jquery','underscore','backbone'], function($, _) {
                 {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'similar')) | raw }}
             </div>
             <div class='tab-pane' id='cross-sell'>
-              <div class="f-section">
-                NEED ADD DATA IN HERE
-              </div>
+                {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'cross-sell')) | raw }}
             </div>
         </div>
     </div>
