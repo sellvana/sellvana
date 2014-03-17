@@ -25,7 +25,7 @@ class FCom_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstract_G
         $config = parent::gridConfig();
         $config['id'] = 'customer_grid_carts_'.$customer->id;
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type'=>'row_select'),
             array('name' => 'id', 'label' => 'ID', 'width' =>70, 'hidden' => true),
             array('name' => 'session_id', 'label' => 'Session ID'),
             array('name' => 'item_num', 'label' => 'Total Items'),
@@ -35,7 +35,7 @@ class FCom_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstract_G
             array('name' => 'grand_total', 'label' => 'Grand Total'),
             array('name' => 'shipping_method', 'label' => 'Shipping Method'),
             array('name' => 'payment_method', 'label' => 'Payment Method'),
-            array('name' => 'status', 'label' => 'Status', 'editor' => 'select', 'editable' => true,
+            array('type' => 'input', 'name' => 'status', 'label' => 'Status', 'editor' => 'select', 'editable' => true,
                   'options' => FCom_Sales_Model_Cart::i()->fieldOptions('status')),
             array('name' => 'create_at', 'label' => 'Created'),
         );

@@ -9,7 +9,7 @@ base:
   - view: head
     do:
       - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
-      - [ title, Sellvana Admin ]
+      #- [ title, Sellvana Admin ]
       - [ icon, @FCom_Core/favicon.ico ]
       #- [ js, @FCom_Core/js/lib/head.min.js ]
       #- [ css, @FCom_Core/css/bootstrap-3.min.css ]

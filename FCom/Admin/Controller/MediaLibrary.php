@@ -42,9 +42,9 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'data_url' => $url.'/data?folder='.urlencode($folder),
                 'edit_url' => $url.'/edit?folder='.urlencode($folder),
                 'columns' => array(
-                    array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+                    array('type'=>'row_select'),
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
-                    array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'print'=>'"<a href=\''.$baseSrc.'"+rc.row["folder"]+"/"+rc.row["file_name"]+"\' target=_blank><img src=\''.$baseSrc.'"+rc.row["folder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"', 'sortable'=>false),
+                    array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'display'=>'eval', 'print'=>'"<a href=\''.$baseSrc.'"+rc.row["folder"]+"/"+rc.row["file_name"]+"\' target=_blank><img src=\''.$baseSrc.'"+rc.row["folder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"', 'sortable'=>false),
                     array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>260, 'search'=>false, 'display'=>'file_size')
                     //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
@@ -52,12 +52,10 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'filters' => array(
                     array('field' => 'file_name', 'type' => 'text')
                 ),
-                'events' => array('add','select-rows','init')
+                'grid_before_create'=>$id.'_register'
             )
         );
-        if (isset($options['callbacks'])) {
-            $config['config']['callbacks'] = $options['callbacks'];
-        }
+
         if (!empty($options['config'])) {
             $config = BUtil::arrayMerge($config, $options['config']);
         }
@@ -71,10 +69,21 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         switch (BRequest::i()->params('do')) {
         case 'data':
             $folder = $this->getFolder();
+            $r = BRequest::i()->get();
             $orm = FCom_Core_Model_MediaLibrary::i()->orm()->table_alias('a')
                 ->where('folder', $folder)
+                ->left_outer_join('FCom_Catalog_Model_ProductMedia', array('a.id', '=', 'pm.file_id'), 'pm')
                 ->select(array('a.id', 'a.folder', 'a.file_name', 'a.file_size'))
+                ->select_expr('COUNT(pm.product_id)', 'associated_products')
+                ->group_by('a.id')
             ;
+            if (isset($r['filters'])) {
+                $filters = BUtil::fromJson($r['filters']);
+                if (isset($filters['exclude_id']) && $filters['exclude_id'] != '') {
+                    $arr = explode(',', $filters['exclude_id']);
+                    $orm =  $orm->where_not_in('a.id', $arr);
+                }
+            }
             $data = FCom_Core_View_BackboneGrid::i()->processORM($orm);
             BResponse::i()->json(array(
                     array('c' => $data['state']['c']),

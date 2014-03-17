@@ -1,3 +1,53 @@
+<script>
+
+require(['jquery', 'bootstrap', 'fcom.admin'], function($) {
+    $(function() {
+        FCom.Admin.Accordion('import-accordion');
+
+
+        var importAccordionEle = $('#import-accordion');
+        var importConfigEle = $('#import-accordion-group1');
+        var importStatusEle = $('#import-accordion-group2');
+
+        $('#step1-next').click(function(ev) {
+            //import_products_grid is global object created in medialib.html.twig
+            var selectedRows = import_products_grid.getSelectedRows();
+            if (!selectedRows.length) {
+                alert('Please select one file');
+                return;
+            }
+
+            var filename = selectedRows.at(0).get('file_name');
+
+            importConfigEle.prev().find('a').trigger('click');
+            importConfigEle.html('Please wait loading file configuration...');
+            $.getJSON('{{APP.href('catalog/products/import/config')}}?file='+encodeURIComponent(filename),
+                        function(data, status, xhr) { importConfigEle.html(data.html); }
+
+            );
+        });
+
+        importAccordionEle.on('click', '#step2-next', function(ev) {
+            importStatusEle.prev().find('a').trigger('click');
+            importStatusEle.html('Please wait starting import...');
+            $.post('{{APP.href('catalog/products/import/config')}}', $('#import-columns-form').serialize(), function(data, status, xhr) {
+                importStatusEle.html(data);
+            });
+        });
+
+        importAccordionEle.on('click', '#step3-start', function(ev) {
+            importStatusEle.load('{{APP.href('catalog/products/import/status')}}?start=true');
+        });
+
+        importAccordionEle.on('click', '#step3-stop', function(ev) {
+            $.post('{{APP.href('catalog/products/import/stop')}}', $('#import-columns-form').serialize(), function(data, status, xhr) {
+                importStatusEle.html(data);
+            });
+        });
+    });
+});
+</script>
+
 <div class="f-admin-main-view">
   <div class="page-header f-admin-page-header">
       <h1 class="f-page-title">
@@ -30,7 +80,7 @@
                         </div>
                     </div>
                 </div>
-    
+
                 <!-- import config -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -41,7 +91,7 @@
                         </div>
                     </div>
                 </div>
-    
+
                 <!-- import status -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -52,7 +102,7 @@
                         </div>
                     </div>
                 </div>
-    
+
                 <!-- import review -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -65,57 +115,4 @@
                 </div>
             </div>
         </div>
-  <script>
-      require(['jquery', 'bootstrap', 'fcom.admin'], function($) {
-          $(function() {
-              var selectedRows=false;
-              FCom.Admin.Accordion('import-accordion');
-              g_vent.trigger('get_selected_rows_collection', {
-                                                                  grid: 'import_products',
-                                                                  callback: function(rows) {
-                                                                      selectedRows = rows;
-                                                                  }
-                                                              }
-              );
-  
-              var importAccordionEle = $('#import-accordion');
-              var importConfigEle = $('#import-accordion-group1');
-              var importStatusEle = $('#import-accordion-group2');
-  
-              $('#step1-next').click(function(ev) {
-  
-                  if (!selectedRows || !selectedRows.length) {
-                      alert('Please select one file');
-                      return;
-                  }
-  
-                  var filename = selectedRows.at(0).get('file_name');
-  
-                  importConfigEle.prev().find('a').trigger('click');
-                  importConfigEle.html('Please wait loading file configuration...');
-                  $.getJSON('{{APP.href('catalog/products/import/config')}}?file='+encodeURIComponent(filename), function(data, status, xhr) {
-                      importConfigEle.html(data.html);
-                  });
-              });
-  
-              importAccordionEle.on('click', '#step2-next', function(ev) {
-                  importStatusEle.prev().find('a').trigger('click');
-                  importStatusEle.html('Please wait starting import...');
-                  $.post('{{APP.href('catalog/products/import/config')}}', $('#import-columns-form').serialize(), function(data, status, xhr) {
-                      importStatusEle.html(data);
-                  });
-              });
-  
-              importAccordionEle.on('click', '#step3-start', function(ev) {
-                  importStatusEle.load('{{APP.href('catalog/products/import/status')}}?start=true');
-              });
-  
-              importAccordionEle.on('click', '#step3-stop', function(ev) {
-                  $.post('{{APP.href('catalog/products/import/stop')}}', $('#import-columns-form').serialize(), function(data, status, xhr) {
-                      importStatusEle.html(data);
-                  });
-              });
-          });
-      })
-  </script>
 </div>
