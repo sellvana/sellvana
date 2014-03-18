@@ -435,4 +435,19 @@ class FCom_Sales_Migrate extends BClass
                 ),
             ));
     }
+
+    public function upgrade__0_2_8__0_2_9()
+    {
+        BDb::ddlTableDef(FCom_Sales_Model_Cart::table(), array(
+            'COLUMNS' => array(
+                'customer_id' => 'int unsigned null',
+                'shipping_method' => 'varchar(50) null',
+                'shipping_price' => 'decimal(10,2) null',
+                'shipping_service' => 'varchar(50) null',
+                'payment_method' => 'varchar(50) null',
+                'payment_details' => 'text null',
+                'admin_id' => 'int unsigned null',
+            ),
+        ));
+    }
 }
