@@ -7,11 +7,6 @@ modules:
         translations: { de: de.php }
         description: "Categories and products management, admin and frontend"
         auto_use: [ bootstrap, views, layout ]
-        backup_models:
-            - FCom_Catalog_Model_Product
-            - FCom_Catalog_Model_Category
-            - FCom_Catalog_Model_CategoryProduct
-            - FCom_Catalog_Model_ProductMedia
 
         areas:
             FCom_Admin:

@@ -32,11 +32,6 @@ class FCom_Core_Model_Abstract extends BModel
 
     static protected $_importExportProfile;
 
-    public static function modelExportProfile()
-    {
-        return static::$_importExportProfile;
-    }
-
     /**
      * Get custom data from serialized field
      *
@@ -126,5 +121,13 @@ class FCom_Core_Model_Abstract extends BModel
         }
 
         return true;
+    }
+
+    public function registerImportExport( &$config )
+    {
+        if ( !empty(static::$_importExportProfile) ) {
+            $config[ static::$_origClass ] = static::$_importExportProfile;
+            $config[ static::$_origClass ]['model'] = static::$_origClass;
+        }
     }
 }

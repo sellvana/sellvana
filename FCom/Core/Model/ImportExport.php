@@ -6,6 +6,7 @@
  */
 class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
 {
+    protected static $_origClass = 'FCom_Core_Model_ImportExport';
     protected $_table = 'fcom_import_info';
     protected $_default_export_file = 'export.json';
 
@@ -22,6 +23,8 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
                 $exportableModels = BUtil::arrayMerge( $exportableModels, $this->collectModuleModels( $module ) );
             }
         }
+
+        BEvents::i()->fire( __METHOD__ . ':after', array( 'models' => &$exportableModels ) );
         return $exportableModels;
     }
 
@@ -40,7 +43,7 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
             BDebug::log( "Could not open $toFile for writing, aborting export." );
             return false;
         }
-        $this->writeLine( $fe, $this->storeUUID() );
+        $this->writeLine( $fe, json_encode( array( '_store_unique_id' => $this->storeUUID() ) ) );
         $exportableModels = $this->collectExportableModels();
         if ( !empty( $models ) ) {
             $diff = array_diff( array_keys( $exportableModels ), $models );
@@ -51,6 +54,52 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
 
         $sorted = $this->sortModels( $exportableModels );
 
+        foreach ( $sorted as $s ) {
+            $model   = $s[ 'model' ];
+            $heading = array( '_default_model' => $model, '_default_fields' => array() );
+            $sample = $model::i()->orm()->find_one()->as_array();
+            foreach ( $sample as $key => $value ) {
+                if ( !in_array( $key, $s[ 'skip' ] ) ) {
+                    $heading['_default_fields'][] = $key;
+                }
+            }
+            $this->writeLine( $fe, BUtil::toJson( $heading ) );
+            $records = $model::i()->orm()->select($heading['_default_fields'])->find_many();
+            if ( $records ) {
+                foreach ( $records as $r ) {
+
+                    /** @var FCom_Core_Model_Abstract $r */
+                    $data = $r->as_array();
+//                    $export = array();
+//                    foreach ( $data as $key => $value ) {
+//                        if(!in_array($key, $s['skip'])){
+//
+//                        }
+//                    }
+//
+//                    if ( empty( $heading[ '_default_fields' ] ) ) {
+//                        $keys = array_keys( $data );
+//                        foreach ( $keys as $i => $field ) {
+//                            if ( in_array( $field, $s[ 'skip' ] ) ) {
+//                                $unset[ ] = $i;
+//                            } else {
+//                                $heading[ '_default_fields' ][ ] = $field;
+//                            }
+//                        }
+//                        $this->writeLine( $fe, BUtil::toJson( $heading ) );
+//                    }
+                    $data = array_values($data);
+//                    foreach ( $unset as $i ) {
+//                        unset( $data[ $i ] );
+//                    }
+
+                    $json = BUtil::toJson( $data );
+                    $this->writeLine( $fe, $json );
+                }
+
+            }
+        }
+
         return true;
     }
 
@@ -60,35 +109,19 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
      */
     protected function collectModuleModels( $module )
     {
-        $path         = $module->root_dir . '/Model/*.php';
+        $path         = $module->root_dir . '/Model/';
         $modelConfigs = array();
-        $files        = glob( $path );
+        $files        = BUtil::globRecursive( $path, '*.php' );
         if ( empty( $files ) ) {
             return $modelConfigs;
         }
-        $currentClasses = get_declared_classes();
-        $newClasses     = array();
-        $baseClass      = $module->name . '_Model_';
         foreach ( $files as $file ) {
-            include_once $file;
-            $baseName = explode( '.', basename( $file ) );
-            $baseName = $baseName[ 0 ];
-            $cls      = $baseClass . $baseName;
-            if ( class_exists( $cls ) ) {
-                $newClasses[ ] = $cls;
+            $cls = $module->name . '_Model_' . basename( $file, '.php' );
+            if ( method_exists( $cls, 'registerImportExport' ) ) { // instanceof does not work with class name
+                $cls::i()->registerImportExport( $modelConfigs );
             }
         }
 
-        $newClasses = BUtil::arrayMerge( $newClasses, array_diff( get_declared_classes(), $currentClasses ) );
-        foreach ( $newClasses as $model ) {
-            if ( method_exists( $model, 'modelExportProfile' ) ) {
-                $config = $model::modelExportProfile();
-                if ( empty( $config ) ) {
-                    continue;
-                }
-                $modelConfigs = array_merge( $modelConfigs, $config );
-            }
-        }
         return $modelConfigs;
     }
 
@@ -131,14 +164,16 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
                         if ( isset( $this->_is_sorted[ $node ] ) ) {
                             continue;
                         }
+
                         if ( isset( $models[ $node ] ) ) {
                             $tmpModel = $models[ $node ];
                         } else {
-                            if ( class_exists( $node ) ) {
-                                $tmpModel        = array_pop( $node::modelExportProfile() );
-                                $models[ $node ] = $tmpModel;
+                            if ( method_exists( $node, 'registerImportExport' ) ) {
+                                $node::i()->registerImportExport( $models );
+                                $tmpModel = $models[ $node ];
                             }
                         }
+
                         if ( !isset( $tmpModel ) ) {
                             BDebug::log( "Could not find valid configuration for $node", "ie.log" );
                             continue;
@@ -153,17 +188,26 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
         }
     }
 
-    protected function storeUUID()
+    protected
+    function storeUUID()
     {
-        return '11'; // todo generate unique store id
+        $suid = BConfig::i()->get( 'db/store_unique_id' );
+        if ( !$suid ) {
+            $suid = uniqid( BConfig::i()->get( '' ) );
+            BConfig::i()->set( 'db/store_unique_id', $suid, true );
+        }
+        return $suid;
     }
 
     /**
      * @param $handle
      * @param $line
      */
-    protected function writeLine( $handle, $line )
-    {
+    protected
+    function writeLine(
+        $handle,
+        $line
+    ) {
         $line = trim( $line );
         $l    = strlen( $line );
         if ( $l < 1 ) {

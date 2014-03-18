@@ -1,18 +1,15 @@
 <?php
 
-class FCom_Catalog_Model_CategoryProduct extends BModel
+class FCom_Catalog_Model_CategoryProduct extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_category_product';
 
     protected static $_importExportProfile = array(
-        __CLASS__ => array(
-            'model'   => __CLASS__,
-            'skip'    => array( 'id' ),
-            'related' => array(
-                'product_id'  => 'FCom_Catalog_Model_Product.id',
-                'category_id' => 'FCom_Catalog_Model_Category.id',
-            )
+        'skip'    => array( 'id' ),
+        'related' => array(
+            'product_id'  => 'FCom_Catalog_Model_Product.id',
+            'category_id' => 'FCom_Catalog_Model_Category.id',
         )
     );
 

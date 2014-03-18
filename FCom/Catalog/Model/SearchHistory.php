@@ -4,10 +4,7 @@ class FCom_Catalog_Model_SearchHistory extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_search_history';
     static protected $_origClass = __CLASS__;
-    protected static $_importExportProfile = array(
-        __CLASS__ => array( 'model' => __CLASS__,
-                            'skip' => array( 'id' ), )
-    );
+    protected static $_importExportProfile = array( 'skip' => array( 'id' ), );
     static public function addSearchHit($query, $numProductsFound = null)
     {
         if ($query === '' || is_null($query)) {

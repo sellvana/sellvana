@@ -69,15 +69,12 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     );
 
     protected static $_importExportProfile = array(
-        __CLASS__=> array(
-            'model' => __CLASS__,
-            'skip' => array(
-                'create_dt',
-                'update_dt',
-                'indextank_indexed',
-                'indextank_indexed_at',
-            ),
-        )
+        'skip' => array(
+            'create_dt',
+            'update_dt',
+            'indextank_indexed',
+            'indextank_indexed_at',
+        ),
     );
 
     private $_importErrors = null;

@@ -4,9 +4,7 @@ class FCom_Core_Model_MediaLibrary extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_media_library';
     protected static $_origClass = __CLASS__;
-    protected static $_importExportProfile = array(
-        __CLASS__ => array( 'skip' => array( 'id', 'create_at', 'update_at' ), )
-    );
+    protected static $_importExportProfile = array( 'skip' => array( 'id', 'create_at', 'update_at' ), );
     public function onAfterLoad()
     {
         parent::onAfterLoad();
