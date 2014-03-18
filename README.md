@@ -11,7 +11,7 @@ Installation
 3. Create database and db user for sellvana (make sure db collation is utf8_general_ci)
 4. Open the selvana folder in browser
 5. Follow the steps in the installation wizard
-6. Once intalled, you'll be redirected to frontend
+6. Once installed, you'll be redirected to frontend
 7. Open **admin** at `{webroot}/sellvana/admin` (should be already logged in with user info from the wizard)
 8. Go to **Modules > Manage Modules**, set modules you'd like to use to `REQUESTED` run level, click **Save**
 
@@ -25,7 +25,7 @@ To report a bug, go to [Sellvana's Bug Tracker](https://bitbucket.org/sellvana/c
 3. In the Title field, enter a short summary title that clarifies the issue encountered.
 4. In the Description field, describe the issue encountered in detail. To expedite the handling of an issue, we recommend you use the following template when reporting an issue.
 
-    * Describe briefly what the intention of the action that was being performed.
+    * Describe briefly what the intention was of the action that was being performed.
     * **Environment:** Enter PHP and MySQL versions, server details (i.e. local computer server, dedicated, cloud), browser type and version, and anything else that might be helpful to troubleshoot the bug.
     * **Steps to Reproduce:** Add steps taken to achieve the task described in bulleted form.
     * **Expected Result:** List the result you were expecting while performing the steps above (i.e. I should have been directed to the registration form page)
@@ -51,6 +51,6 @@ Contributing
 2. Fork the Sellvana repository into your account according to [BitBucket's Fork a Repo](https://confluence.atlassian.com/display/BITBUCKET/Fork+a+Repo,+Compare+Code,+and+Create+a+Pull+Request).
 3. Make your changes. We also recommend you test your code before contributing.
 4. Once ready to commit your changes, create a pull request according to [BitBucket's Create a Pull Request](https://confluence.atlassian.com/display/BITBUCKET/Fork+a+Repo,+Compare+Code,+and+Create+a+Pull+Request).
-5. When received, Sellvana development team will review your contribution and if approved, will pull your request to the master branch.
+5. Once received, the Sellvana development team will review your contribution and if approved, will pull your request to the appropriate branch.
 
 Note: You must agree to [Sellvana's Contributor License Agreement](http://sellvana.com/cla) before pulling any requests. You only need to sign the agreement once.
