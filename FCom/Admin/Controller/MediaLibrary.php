@@ -72,10 +72,8 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $r = BRequest::i()->get();
             $orm = FCom_Core_Model_MediaLibrary::i()->orm()->table_alias('a')
                 ->where('folder', $folder)
-                ->left_outer_join('FCom_Catalog_Model_ProductMedia', array('a.id', '=', 'pm.file_id'), 'pm')
                 ->select(array('a.id', 'a.folder', 'a.file_name', 'a.file_size'))
-                ->select_expr('COUNT(pm.product_id)', 'associated_products')
-                ->group_by('a.id')
+                ->select_expr('(SELECT COUNT(*) FROM fcom_product_media pm WHERE pm.file_id = a.id)', 'associated_products')
             ;
             if (isset($r['filters'])) {
                 $filters = BUtil::fromJson($r['filters']);
@@ -221,6 +219,41 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 call_user_func($options['on_delete'], $args);
             }
             BResponse::i()->json(array('success'=>true));
+            break;
+        case 'rescan':
+            try {
+                $scanFolder = array_diff(scandir($targetDir), array('.', '..'));
+                $arrImages = array();
+                $records = BDb::many_as_array(FCom_Core_Model_MediaLibrary::i()->orm()->select(array('folder', 'subfolder', 'file_name'))->where('folder', $folder)->find_many());
+                foreach ($scanFolder as $key) {
+                    if (is_file($targetDir.'/'.$key)) {
+                        if (exif_imagetype($targetDir.'/'.$key)) {
+                            $tmp = array('folder' => $folder, 'subfolder' => null, 'file_name' => $key);
+                            if (!in_array($tmp, $records)) {
+                                array_push($arrImages, $tmp);
+                            }
+                        }
+                    } else {
+                        $scanSubFolder =array_diff(scandir($targetDir.'/'.$key), array('..', '.'));
+                        foreach ($scanSubFolder as $subKey) {
+                            if (is_file($targetDir.'/'.$key.'/'.$subKey) && exif_imagetype($targetDir.'/'.$key.'/'.$subKey)) {
+                                $tmp = array('folder' => $folder, 'subfolder' => $key, 'file_name' => $subKey);
+                                if (!in_array($tmp, $records)) {
+                                    array_push($arrImages, $tmp);
+                                }
+                            }
+                        }
+                    }
+                }
+                foreach ($arrImages as $arr) {
+                    $arr['file_size'] = ($arr['subfolder']) ? filesize($targetDir.'/'.$arr['subfolder'].'/'.$arr['file_name']) :
+                                        filesize($targetDir.'/'.$arr['file_name']);
+                    $attModel->create($arr)->save();
+                }
+                BResponse::i()->json(array('status' => 'success'));
+            } catch (Exception $e) {
+                BResponse::i()->json(array('status' => 'error', 'messages' => $e->getMessage()));
+            }
             break;
         }
     }

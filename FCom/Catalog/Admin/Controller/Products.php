@@ -258,7 +258,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                         )
                 ),
                 'actions'=>array(
-                    'rescan' => array('caption' => 'Rescan'),
+                    'rescan' => array('caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'),
                     'add'=>array('caption'=>'Add images'),
                     'delete'=>array('caption'=>'Remove'),
                 ),
