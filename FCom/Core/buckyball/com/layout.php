@@ -1523,7 +1523,9 @@ class BView extends BClass
     public function collectMetaData($viewContent = null)
     {
         $t = BDebug::debug('COLLECT META DATA: '.$this->getParam('view_name'));
+
         if (is_null($viewContent)) {
+            $prerendered = false;
             $viewContent = $this->getParam('source');
             if (!$viewContent) {
                 // get template file name for the view
@@ -1534,6 +1536,8 @@ class BView extends BClass
                 }
                 $viewContent = file_get_contents($viewFile);
             }
+        } else {
+            $prerendered = true;
         }
 
         // collect template source for meta tags for further interpolation processing
@@ -1543,13 +1547,17 @@ class BView extends BClass
             return $viewContent;
         }
         $metaContent = join("\n", $matches[0]);
-        // create a view with only meta tags
-        $metaView = BView::i()->factory($this->getParam('view_name').'__meta', array(
-            'renderer' => $this->getParam('renderer'),
-            'source' => $metaContent,
-        ));
-        // render the meta view for variables interpolation
-        $metaOutput = $metaView->_render();
+        if ($prerendered) {
+            $metaOutput = $metaContent;
+        } else {
+            // create a view with only meta tags
+            $metaView = BView::i()->factory($this->getParam('view_name').'__meta', array(
+                'renderer' => $this->getParam('renderer'),
+                'source' => $metaContent,
+            ));
+            // render the meta view for variables interpolation
+            $metaOutput = $metaView->_render();
+        }
         // collect meta data
         $metaData = array();
         if (preg_match_all(static::$_metaDataRegex, $metaOutput, $matches, PREG_SET_ORDER)) {
