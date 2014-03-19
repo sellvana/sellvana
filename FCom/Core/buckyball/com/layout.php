@@ -2067,6 +2067,17 @@ class BViewHead extends BView
         return '<title>' . $this->q(join($this->_titleSeparator, $this->_title)) . '</title>';
     }
 
+    public function removeTitle($pattern)
+    {
+if (BDebug::is('DEBUG')) {
+    #var_dump($this->_title); exit;
+}
+        $this->_title = array_filter($this->_title, function ($val) use ($pattern) {
+            return !preg_match('#'.$pattern.'#', $val);
+        });
+        return $this;
+    }
+
     /**
      * Get meta tags
      * If name is null, returns all meta tags joined

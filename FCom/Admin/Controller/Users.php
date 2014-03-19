@@ -26,12 +26,10 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
                   'options' => FCom_Admin_Model_User::i()->fieldOptions('status')),
             array('name' => 'create_at', 'label' => 'Created', 'width' => 100),
             array('name' => 'update_at', 'label' => 'Updated', 'width' => 100),
-            array('type'=>'btn_group', 'width' => 85,
-                  'buttons'=> array(
-                                array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'),
-                                array('name'=>'delete')
-                            )
-                )
+            array('type'=>'btn_group', 'width' => 85, 'buttons'=> array(
+                array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'),
+                array('name'=>'delete')
+            )),
         );
         $config['actions'] = array(
             'edit' => array('caption' => 'status'),
