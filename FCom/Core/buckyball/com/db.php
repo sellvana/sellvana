@@ -1344,6 +1344,7 @@ class BORM extends ORMWrapper
             $this->_dirty_fields[$key] = $value;
         }
         $this->_data[$key] = $value;
+
     }
 
     /**

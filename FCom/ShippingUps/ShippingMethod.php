@@ -114,24 +114,25 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
         $packageId = 0;
         $groupPackageId = 0;
         foreach($items as $item) {
-            if ( $item->getWeight() > 250 ||  $item->getWeight() == 0 ) {
+            $itemWeight = $item->getItemWeight();
+            if ( $itemWeight > 250 ||  $itemWeight == 0 ) {
                 continue;
             }
             for ($i = 0; $i < $item->getQty(); $i++) {
                 if ($item->isGroupAble()){
-                    if (!empty($packages[$groupPackageId]) && $item->getWeight() + $packages[$groupPackageId] >= 150) {
+                    if (!empty($packages[$groupPackageId]) && $itemWeight + $packages[$groupPackageId] >= 150) {
                         $packageId++;
                         $groupPackageId = $packageId;
                     }
                     if (!empty($packages[$groupPackageId])) {
-                        $packages[$groupPackageId] += $item->getWeight();
+                        $packages[$groupPackageId] += $itemWeight;
                     } else {
-                        $packages[$groupPackageId] = $item->getWeight();
+                        $packages[$groupPackageId] = $itemWeight;
                     }
 
                 } else {
                     $packageId++;
-                    $packages[$packageId] = $item->getWeight();
+                    $packages[$packageId] = $itemWeight;
                 }
             }
         }

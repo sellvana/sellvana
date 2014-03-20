@@ -89,7 +89,6 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (empty($data[$args['field']])) {
             return true;
         }
-        $sku = $data[$args['field']];
         $orm = static::orm('p')->where('local_sku', $data[$args['field']]);
         if (!empty($data['id'])) {
             $orm->where_not_equal('p.id', $data['id']);
@@ -114,6 +113,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return static::$_urlPrefix;
     }
 
+    /**
+     * @param FCom_Catalog_Model_Category $category
+     * @return string
+     */
     public function url($category=null)
     {
         $prefix = static::urlPrefix();
@@ -122,7 +125,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function imageUrl($full=false)
     {
-        $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media/';
+        $media = BConfig::i()->get('web/media_dir');# ? BConfig::i()->get('web/media_dir') : 'media/';
         $url = $full ? BApp::href('/') : '';
         $thumbUrl = $this->get('thumb_url');
         return $url.$media.'/'.($thumbUrl ? $thumbUrl : 'image-not-found.jpg');
@@ -139,6 +142,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
         //todo: check out for unique url_key before save
         if (!$this->get('url_key')) $this->generateUrlKey();
+
 
         if (!$this->get('create_at'))  $this->set('create_at', BDb::now());
         $this->set('update_at', BDb::now());
@@ -206,7 +210,27 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         //$key = $this->manuf()->manuf_name.'-'.$this->local_sku.'-'.$this->product_name;
         $key = $this->product_name;
-        $this->set('url_key', BLocale::transliterate($key));
+        $url_key = BLocale::transliterate( $key );
+        $t = static::$_table;
+        $count_sql = "SELECT COUNT(*) from {$t} WHERE url_key=?";
+        $result = $this->orm()->raw_query( $count_sql, array( $url_key ) );
+        if ( $result->find_one() ) {
+            $match_sql        = "SELECT url_key FROM {$t} WHERE url_key LIKE ?";
+            $result           = $this->orm()->raw_query( $match_sql, array( $url_key . '%' ) )->find_many();
+            $similar_url_keys = array();
+            foreach ( $result as $row ) {
+                $similar_url_keys[ $row->get( 'url_key' ) ] = 1;
+            }
+
+            for ( $i = 1; $i < 1001; $i++ ) {
+                $tmp = $url_key . '-' . $i;
+                if ( !isset( $similar_url_keys[ $tmp ] ) ) {
+                    $url_key = $tmp;
+                    break;
+                }
+            }
+        }
+        $this->set('url_key', $url_key );
         return $this;
     }
 
@@ -375,21 +399,25 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (empty($data) || !is_array($data)) {
             return null;
         }
-        $oldTimeOut = ini_get('max_execution_time');
-        ini_set('max_execution_time', 300);
+//        BResponse::i()->startLongResponse(false);
         //HANDLE CONFIG
+
+        BEvents::i()->fire(__METHOD__.':before', array('data' => &$data, 'config' => &$config));
 
         //multi value separator used to separate values in one column like for images
         //For example: image.png; image2.png; image3.png
-        if (!isset($config['format']['multivalue_separator'])) {
-            $config['format']['multivalue_separator'] = ';';
+        if (!isset( $config[ 'format' ][ 'multivalue_separator' ] )) {
+            $config[ 'format' ][ 'multivalue_separator' ] = ';';
         }
+        $ms = $config[ 'format' ][ 'multivalue_separator' ];
 
         //nesting level separator used to separate nesting of categories
         //For example: Category1 > Category2; Category3 > Category4 > Category5;
         if (!isset($config['format']['nesting_separator'])) {
             $config['format']['nesting_separator'] = '>';
         }
+
+        $ns = $config['format']['nesting_separator'];
 
         //product import actions: create, update, create_or_update
         if (!isset($config['import']['actions'])) {
@@ -401,9 +429,18 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $config['import']['images']['import'] = true;
         }
 
-        //reatain image subfolders - default false
+        //reatain image subfolders - default true
         if (!isset($config['import']['images']['with_subfolders'])) {
             $config['import']['images']['with_subfolders'] = true;
+        }
+
+        if ( !isset($config['import']['images']['url_thumb_prefix']) ) {
+            $config['import']['images']['url_thumb_prefix'] = 'product/image/';
+        }
+
+        // import related products - default true
+        if ( !isset( $config[ 'import' ][ 'related' ][ 'import' ] ) ) {
+            $config[ 'import' ][ 'related' ][ 'import' ] = true;
         }
 
         //import categories - default true
@@ -450,15 +487,22 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
             $categoriesPath = array();
             if ($config['import']['categories']['import'] && !empty($d['categories'])) {
-                $categoriesPath = explode($config['format']['multivalue_separator'], $d['categories']);
+                $categoriesPath = explode( $ms, $d['categories']);
                 unset($d['categories']);
             }
 
             $imagesNames = array();
             if ($config['import']['images']['import'] && !empty($d['images'])) {
-                $imagesNames = explode($config['format']['multivalue_separator'], $d['images']);
+                $imagesNames = explode( $ms, $d['images']);
                 unset($d['images']);
             }
+
+            if(!empty($config['import']['images']['url_thumb_prefix']) && !empty($d['thumb_url'])){
+                if(!strpos($d['thumb_url'], $config['import']['images']['url_thumb_prefix']) !== 0){
+                    $d['thumb_url'] = $config['import']['images']['url_thumb_prefix'] . $d['thumb_url'];
+                }
+            }
+
 
             //HANDLE CUSTOM FIELDS
             if ($config['import']['custom_fields']['import']) {
@@ -499,14 +543,14 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 if (isset($d['local_sku'])) {
                     $p = $this->orm()->where("local_sku", $d['local_sku'])->find_one();
                 }
-                if (!$p && isset($d['product_name'])) {
-                    $p = $this->orm()->where("product_name", $d['product_name'])->find_one();
-                }
+//                if (!$p && isset($d['product_name'])) {
+//                    $p = $this->orm()->where("product_name", $d['product_name'])->find_one();
+//                }
                 if (!$p && isset($d['url_key'])) {
                     $p = $this->orm()->where("url_key", $d['url_key'])->find_one();
                 }
             }
-
+            /** @var FCom_Catalog_Model_Product $p */
             if (!$p && 'update' == $config['import']['actions']) {
                 continue;
             } elseif (!$p) {
@@ -514,6 +558,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     $p = $this->orm()->create($d)->save();
                     $result[]['status'] = 'created';
                 } catch (Exception $e) {
+                    BDebug::log($e->getMessage());
                     $errors[] = $e->getMessage();
                     $result[]['status'] = 'error';
                     continue;
@@ -521,13 +566,15 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             } else {
                 $result[]['status'] = 'updated';
             }
+            $pId = $p->id();
 
             //$memstart = memory_get_usage();
             //echo $memstart/1024 . "kb<br>";
             if ( $config[ 'import' ][ 'related' ][ 'import' ] && !empty( $d[ 'related' ] ) ) {
-                $relatedProducts[$p->id()] = explode( $config[ 'format' ][ 'multivalue_separator' ], $d[ 'related' ] );
+                $relatedProducts[ $pId ] = explode( $ms, $d[ 'related' ] );
                 unset( $d[ 'related' ] );
             }
+
             $p->set($d);
             if ($p->is_dirty()) {
                 $p->save();
@@ -536,9 +583,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             //set custom fields for product
             if (!empty($cfIntersection)) {
                 foreach($cfIntersection as $cfk) {
-                    $customFields[$p->id()][$cfk] = $d[$cfk];
+                    $customFields[ $pId ][$cfk] = $d[$cfk];
                 }
             }
+
             //echo memory_get_usage()/1024 . "kb<br>";
             //echo (memory_get_usage()-$memstart)/1024 . "kb - diff<br><hr/>";
 
@@ -568,10 +616,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     foreach($categoriesPath as $catpath) {
                         /** @var FCom_Catalog_Model_Category $parent */
                         $parent = $topParentCategory;
-                        $catNodes = explode($config['format']['nesting_separator'], $catpath);
+                        $catNodes = explode($ns, $catpath);
                         /*print_r($catpath);
                         echo "\n";
-                        print_r($config['format']['nesting_separator']);
+                        print_r($ns);
                         echo "\n";
                         print_r($catNodes);
                          *
@@ -612,13 +660,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     if (!empty($categories)) {
                         foreach($categories as $category) {
                             $catProduct = FCom_Catalog_Model_CategoryProduct::i()->orm()
-                                    ->where('product_id', $p->id())
+                                    ->where('product_id', $pId )
                                     ->where('category_id', $category->id())
                                     ->find_one();
                             if (!$catProduct) {
                                 try {
                                     FCom_Catalog_Model_CategoryProduct::orm()
-                                        ->create(array('product_id' => $p->id(), 'category_id'=>$category->id()))
+                                        ->create(array('product_id' => $pId, 'category_id'=>$category->id()))
                                         ->save();
                                 } catch (Exception $e) {
                                     $errors[] = $e->getMessage();
@@ -632,23 +680,21 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 }
             }
 
-
             //HANDLE IMAGES
             if (!empty($imagesNames)) {
-                $imagesResult = $this->_importImages( $config, $imagesNames, $p );
+                $imagesConfig = !empty($config['import']['images']) ? $config['import']['images'] : array();
+                $imagesResult = $this->importImages( $imagesNames, $imagesConfig, $p );
                 if(is_array($imagesResult)){
                     $errors[] += $imagesResult;
                 }
             }
 
-            $productIds[] = $p->id();
-//            unset($fileId);
-//            unset($att);
-            unset($data[$i]);
+            $productIds[] = $pId;
         }
 
         //HANDLE CUSTOM FIELDS to product relations
-        if ($config['import']['custom_fields']['import'] && !empty($cfIntersection) && !empty($productIds)) {
+        if ($config['import']['custom_fields']['import']
+            && !empty($cfIntersection) && !empty($productIds) && !empty($cfFields)) {
             //get custom fields values from data
             $fieldIds = array();
             foreach($cfIntersection as $cfk) {
@@ -692,7 +738,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($errors) {
             $result['errors'] = $errors;
         }
-        ini_set('max_execution_time', $oldTimeOut);
+        BEvents::i()->fire(__METHOD__.':after', array('product_ids' => $productIds, 'config' => &$config, 'result' => &$result));
+
         return $result;
     }
 
@@ -838,8 +885,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
                 if ( !empty( $temp ) ) {
                     // fetch related sku objects
-                    $related = $this->orm()->select( array( 'id', 'local_sku' ) )
-                                    ->where_in( "local_sku", $temp )
+                    $related = $this->orm()->where_in( "local_sku", $temp )
                                     ->find_many();
 
                     foreach ( $related as $r ) {
@@ -874,66 +920,70 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @todo Fix hardcoded folder names
      * @param $config
      * @param $imagesNames
      * @param FCom_Catalog_Model_Product $p
      * @return array|bool
      */
-    protected function _importImages( $config, $imagesNames, $p )
+    public function importImages( $imagesNames, $config = array(), $p = null )
     {
+        if (is_null($p)) {
+            $p = $this;
+        }
         $mediaLib     = FCom_Core_Model_MediaLibrary::i();
         $productMedia = FCom_Catalog_Model_ProductMedia::i();
+        $rootDir      = BConfig::i()->get( 'fs/root_dir' );
         $imageFolder  = BConfig::i()->get( 'fs/image_folder' );
+        $thumbUrl = str_ireplace('media/product/image', '', $p->get('thumb_url'));
         $errors = array();
 
         foreach ( $imagesNames as $fileName ) {
             $pathInfo  = pathinfo( $fileName );
             $subFolder = $pathInfo[ 'dirname' ] == '.' ? null : $pathInfo[ 'dirname' ];
-            $att       = $mediaLib->load(
-                                  array(
-                                      'folder'    => $imageFolder,
-                                      'subfolder' => $subFolder,
-                                      'file_name' => $pathInfo[ 'basename' ]
-                                  )
-            );
+            $att       = $mediaLib->load(array(
+                'folder'    => $imageFolder,
+                'subfolder' => $subFolder,
+                'file_name' => $pathInfo[ 'basename' ]
+            ));
             if ( !$att ) {
-                $fullPathToFile = FULLERON_ROOT_DIR . '/' . $imageFolder . '/' . $fileName;
+                $fullPathToFile = $rootDir . '/' . $imageFolder . '/' . $fileName;
                 $size           = 0;
                 if ( file_exists( $fullPathToFile ) ) {
                     $size = filesize( $fullPathToFile );
                 }
 
                 $subFolder = null;
-                if ( $config[ 'import' ][ 'images' ][ 'with_subfolders' ] ) {
+                if ( !empty($config[ 'with_subfolders' ]) ) {
                     $subFolder = $pathInfo[ 'dirname' ] == '.' ? null : $pathInfo[ 'dirname' ];
                 }
                 try {
-                    $att = $mediaLib->create(
-                                    array(
-                                        'folder'    => $imageFolder,
-                                        'subfolder' => $subFolder,
-                                        'file_name' => $pathInfo[ 'basename' ],
-                                        'file_size' => $size,
-                                    )
-                    )->save();
+                    $att = $mediaLib->create(array(
+                        'folder'    => $imageFolder,
+                        'subfolder' => $subFolder,
+                        'file_name' => $pathInfo[ 'basename' ],
+                        'file_size' => $size,
+                    ))->save();
                 } catch ( Exception $e ) {
                     $errors[ ] = $e->getMessage();
                 }
             }
             $fileId = $productMedia->orm()->where( 'product_id', $p->id() )
                                    ->where( 'file_id', $att->id() )->find_one();
+            $isThumb = ( 'product/image/' . $fileName == $thumbUrl );
             if ( !$fileId ) {
                 try {
-                    $productMedia->create(
-                                           array(
-                                               'product_id' => $p->id(),
-                                               'media_type' => 'images',
-                                               'file_id'    => $att->id(),
-                                           )
-                    )->save();
+                    $productMedia->create(array(
+                        'product_id' => $p->id(),
+                        'media_type' => 'images',
+                        'file_id'    => $att->id(),
+                        'main_thumb' => $isThumb ? 1 : 0
+                    ))->save();
                 } catch ( Exception $e ) {
                     $errors[ ] = $e->getMessage();
                 }
+            } else if ( $fileId->get('main_thumb') == 0 && $isThumb ){
+                $fileId->set('main_thumb', 1)->save();
             }
         }
         return empty( $errors ) ? true : $errors;

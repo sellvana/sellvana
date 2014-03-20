@@ -15,12 +15,12 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         $config = parent::gridConfig();
 
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type' => 'row_select'),
             array('name' => 'id', 'label' => 'ID'),
             array('name' => 'author', 'label'=>'Author'),
-            array('name' => 'status', 'label' => 'Status', 'edit_inline' => false, 'editable' => true, 'mass-editable' => true, 'editor' => 'select','mass-editable-show' => true,
+            array('type' => 'input', 'name' => 'status', 'label' => 'Status', 'edit_inline' => false, 'editable' => true, 'mass-editable' => true, 'editor' => 'select','mass-editable-show' => true,
                   'options' => FCom_Blog_Model_Post::i()->fieldOptions('status'), 'index' => $this->_mainTableAlias.'.status'),
-            array('name' => 'title', 'label'=>'Title','editable' => true, 'edit_inline' => true, 'validation' => array('required' => true)
+            array('type'=>'input', 'name' => 'title', 'label'=>'Title','editable' => true, 'edit_inline' => true, 'validation' => array('required' => true)
 //                'href' => BApp::href('blog/post/form/?id=:id')
             ),
             array('name' => 'url_key', 'label'=>'Url Key', 'hidden' => true),
@@ -30,8 +30,12 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             array('name' => 'create_ym', 'label'=>'Create ym' , 'hidden' => true),
             array('name' => 'create_at', 'label'=>'Created', 'cell'=>'date'),
             array('name' => 'update_at', 'label'=>'Updated', 'cell'=>'date'),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                  'data' => array('edit' => array('href' => BApp::href('blog/post/form/?id='), 'col'=>'id'),'delete' => true, 'edit_inline' => false)),
+            array('type' => 'btn_group',
+                  'buttons' => array(
+									array('name' => 'edit', 'href' => BApp::href('blog/post/form/?id='), 'col'=>'id'),
+									array('name' => 'delete' , 'edit_inline' => false)
+									)
+				)
         );
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {
@@ -152,7 +156,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         );
 
 
-        //BEvents::i()->fire(__METHOD__.'.orm', array('type'=>$type, 'orm'=>$orm));
+        //BEvents::i()->fire(__METHOD__.':orm', array('type'=>$type, 'orm'=>$orm));
         $data = BDb::many_as_array($orm->find_many());
         //unset unused columns
         /*$columnKeys = array_keys($config['columns']);
@@ -166,7 +170,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
 
         $config['data'] = $data;
 
-        //BEvents::i()->fire(__METHOD__.'.config', array('type'=>$type, 'config'=>&$config));
+        //BEvents::i()->fire(__METHOD__.':config', array('type'=>$type, 'config'=>&$config));
         return array('config'=>$config);
     }
 

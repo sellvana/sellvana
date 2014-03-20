@@ -1,107 +1,73 @@
-
-
 <script>
-    function runMigrationScripts() {
-        $('#form-modules').attr('action', '{{ APP.href("modules/migrate") }}').submit();
-    }
-</script>
-<script>
-var rows = null;
 
-function changeStatus(e) {
-    $('.grid-mass-edit').click();
-    rows = {id: $(e).parents('tr').attr('id')};
+function runMigrationScripts() {
+    $('#form-modules').attr('action', '{{ APP.href("modules/migrate") }}').submit();
 }
-function afterModuleGridRowRendered(el, row)
-{
-    if(row.migration_available) {
-        el.find('td[data-col="schema_version"]').html('<span class="badge badge-important">'+row.schema_version+'</span>');
-    }
-
-    if(row.run_status === 'LOADED') {
-        el.find('td[data-col="run_status"]').html('<span class="badge badge-success">'+row.run_status+'</span>');
-    } else if(row.run_status ==='ERROR') {
-        el.find('td[data-col="run_status"]').html('<span class="badge badge-important">'+row.run_status+'</span>');
-    }
-
-    var badge = '';
-    switch(row.run_level) {
-        case 'REQUESTED':
-            badge = 'success';
-            break;
-        case 'REQUIRED':
-            badge = 'warning';
-            break;
-    }
-    if(badge != '')
-        el.find('td[data-col="run_level"]').html('<span class="badge badge-'+badge+'">'+row.run_level+'</span>');
-}
-
-/**Event Aggregator
-This aggregator is for triggering slient_inject that causes main grid adding selected rows from modal grid.**/
 
 require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
-    if (typeof(g_vent) === 'undefined') {
-        g_vent = _.extend({}, Backbone.Events);
-    }
+    var moduleGrid = null;
 
-    function RowModelEx() {
-        g_vent.bind('mass-edit', this.mass_save);
-        g_vent.bind('edit', this.save);
-
-    }
-    RowModelEx.prototype.save = function(ev) {
-        if (ev.grid !== 'FCom_Admin_Controller_Modules') {
-            return;
-        }
-        var data = {
-            module_name: ev.row.name,
-            run_level_core: ev.row.run_level_core/*,
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')*/
-        };
-        $.post("{{ THIS.get('form_url') }}", data, function(response, status, xhr) {
-            $.bootstrapGrowl("Run level has been saved", { type:'success', align:'center', width:'auto' });
-        });
-    }
-
-    RowModelEx.prototype.mass_save = function(ev) {
-        if (ev.grid !== 'FCom_Admin_Controller_Modules') {
-            return;
-        }
-        var tmpRows =  [];
+    function changeLevel(rows) {
         var data = [];
-        var tmpSelectedRows = ev.rows;
-        if (rows) {
-            ev.selectedRows.reset();
-            var tmp = ev.rowsCollection.findWhere({id: rows.id});
-            for (var key in ev.modalElementVals) {
-                tmp.set(key, ev.modalElementVals[key]);
-            }
-            tmpRows.push({name: tmp.get('name'), run_level_core: tmp.get('run_level_core')});
-        } else {
-            tmpRows = ev.rows;
-        }
-
-        for (var i in tmpRows) {
-            data.push({module_name: tmpRows[i].name, run_level_core: tmpRows[i].run_level_core});
+        for (var i in rows) {
+            data.push({module_name: rows[i].name, run_level_core: rows[i].run_level_core});
         };
+
         $.post("{{ THIS.get('form_url') }}", {data: data}, function(response, status, xhr) {
-            rows = null;
+
             $.post("{{ THIS.get('form_url') }}", {async: true, data: data}, function(response, status, xhr) {
                 response.data.forEach(function (obj) {
-                  var tem = ev.rowsCollection.findWhere({name: obj.module_name}).set('run_status', obj.run_status).set('run_level', obj.run_level);
-                })
-                tmpSelectedRows.forEach(function (obj) {
-                    var tmp = ev.rowsCollection.findWhere({id: obj.id});
-                    ev.selectedRows.add(tmp);
+                  var temp = moduleGrid.getRows().findWhere({name: obj.module_name}).set('run_status', obj.run_status).set('run_level', obj.run_level);
+                  temp.trigger('render');
                 });
-                ev.rowsCollection.trigger('render');
             });
-            //$.bootstrapGrowl("Run level has been saved", { type:'success', align:'center', width:'auto' });
         });
     }
 
-    var rowModelEx = new RowModelEx();
+    window.moduleGridRegister = function(grid) {
+        moduleGrid = grid;
+        grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
+            var row = this.model.toJSON();
+            var el = this.$el;
+            if(row.migration_available) {
+                el.find('td[data-col="schema_version"]').html('<span class="badge badge-important">'+row.schema_version+'</span>');
+            }
+
+            if(row.run_status === 'LOADED') {
+                el.find('td[data-col="run_status"]').html('<span class="badge badge-success">'+row.run_status+'</span>');
+            } else if(row.run_status ==='ERROR') {
+                el.find('td[data-col="run_status"]').html('<span class="badge badge-important">'+row.run_status+'</span>');
+            }
+
+            var badge = '';
+            switch(row.run_level) {
+                case 'REQUESTED':
+                    badge = 'success';
+                    break;
+                case 'REQUIRED':
+                    badge = 'warning';
+                    break;
+            }
+
+            if(badge != '') {
+                el.find('td[data-col="run_level"]').html('<span class="badge badge-'+badge+'">'+row.run_level+'</span>');
+            }
+
+            if(!row._selectable) {
+                el.find('td[data-col="btn_group"]').html('');
+            }
+
+        };
+
+        grid.build();
+
+        grid.getRows().bind('mass_changed', function(ev) {
+            changeLevel(grid.getSelectedRows().toJSON());
+        });
+        grid.getRows().bind('change', function(ev) {
+            changeLevel([ev.toJSON()]);
+        });
+    }
 });
 </script>
 
