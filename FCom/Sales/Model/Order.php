@@ -387,7 +387,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $orderNumber = BConfig::i()->get('modules/FCom_Sales/order_number');
         if ($orderNumber) {
-            $args['seq_id'] =  $orderNumber;
+            $args['seq_id'] =  '1'.$orderNumber;
         }
     }
 
