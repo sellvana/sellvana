@@ -354,10 +354,10 @@ form:
         - [ addTabGroup, areas, { label: Areas, pos: 10 } ]
         - [ addTabGroup, themes, { label: Themes, pos: 800 } ]
         - [ addTabGroup, other, { label: Other, pos: 900 } ]
-        - [ addTab, FCom_Core, { label: Fulleron Core, group: areas, async: true } ]
-        - [ addTab, FCom_Admin, { label: Fulleron Admin, group: areas, async: true } ]
-        - [ addTab, FCom_Frontend, { label: Fulleron Frontend, group: areas, async: true } ]
-        - [ addTab, FCom_FrontendTheme, { label: General Theme Settings, group: themes, async: true } ]
+        - [ addTab, FCom_Core, { label: Fulleron Core, group: areas, async: true, pos: 10 } ]
+        - [ addTab, FCom_Admin, { label: Fulleron Admin, group: areas, async: true, pos: 20 } ]
+        - [ addTab, FCom_Frontend, { label: Fulleron Frontend, group: areas, async: true, pos: 30 } ]
+        - [ addTab, FCom_FrontendTheme, { label: General Theme Settings, group: themes, async: true, pos: 10 } ]
 
 /modules:
     - { include: base }

@@ -189,9 +189,11 @@
         </div>
         <div class="col-md-6">
             <button class="btn  btn-xs <%- class_button %>" style="margin-top: 5px;" type="button">
-                <%
-                    (typeof (default_mode) !== 'undefined') ? print('<i class="icon-plus"></i>') : print('<i class="icon-remove"></i>');
-                %>
+                <% if (typeof (default_mode) !== 'undefined') { %>
+                    <i class="icon-plus"></i>
+                <% } else { %>
+                    <i class="icon-remove"></i> 
+                <% } %>
             </button>
         </div>
     </div>
@@ -216,9 +218,9 @@
                 {% for group in THIS.tab_groups %}
                     <li class="dropdown">
                         <a class="dropdown-toggle" href="#" data-toggle="dropdown">{{ group.label }} <b class="caret"></b></a>
-                        <ul class="dropdown-menu" {% if group.open is empty %}hidden{% endif %}>
+                        <ul class="dropdown-menu" {% if not group.open %}hidden{% endif %}>
                             {% for k, tab in group.tabs %}
-                                {% if tab.disabled is empty %}
+                                {% if not tab.disabled %}
                                     <li id="settings-tab-{{ k }}">
                                         <a class="js-form-tab-toggle" href="#tab-{{ k }}" data-toggle="tab">
                                             <span class="icon"></span>
@@ -233,8 +235,8 @@
             </ul>
             <div class="tab-content">
                 {% for k, tab in THIS.tabs %}
-                    <div class="tab-pane" id="tab-{{ k }}"{% if tab.async is empty %} data-loaded="true"{% endif %}>
-                        {% if tab.async is empty  %}
+                    <div class="tab-pane" id="tab-{{ k }}"{% if not tab.async %} data-loaded="true"{% endif %}>
+                        {% if not tab.async  %}
                             {{ THIS.view(tab.view)|raw }}
                         {% endif %}
                     </div>

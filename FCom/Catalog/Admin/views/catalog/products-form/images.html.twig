@@ -122,6 +122,16 @@ require(['jquery','underscore','backbone'], function($, _) {
         var arr = imagesGrid.getRows().pluck('file_id');
         return  arr.join(',');
     }
+
+    $('.btn-rescan-images').click(function () {
+        $.post('{{ APP.href('media/grid/rescan?folder=media/product/images') }}', function (response) {
+            if (response.status == 'success') {
+                $.bootstrapGrowl("Rescan success", { type: 'success', align: 'center', width: 'auto' });
+            } else {
+                $.bootstrapGrowl("Error:<br>" + response.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+            }
+        });
+    });
 });
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
         $('#prod-image-fileupload').fileupload({

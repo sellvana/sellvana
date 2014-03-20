@@ -33,8 +33,10 @@ final class FCom_MarketClient_RemoteApi extends BClass
 
     public function getModulesVersions($modules)
     {
+        $siteKey = BConfig::i()->get('modules/FCom_MarketClient/site_key');
         $url = $this->getUrl('api/v1/market/module/version', array(
             'mod_name' => $modules,
+            'site_key' => $siteKey,
         ));
         $response = BUtil::remoteHttp("GET", $url);
         return BUtil::fromJson($response);
