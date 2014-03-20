@@ -341,4 +341,21 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         return $result;
     }
 
+    public function action_validate_order_number__POST()
+    {
+        $r = BRequest::i()->post('config');
+        $seq = FCom_Core_Model_Seq::i()->orm()->where('entity_type', 'order')->find_one();
+        $result = array('status' => true, 'messages' => '');
+        if ($seq) {
+            if (isset($r['modules']['FCom_Sales']['order_number'])) {
+                $orderNumber = $r['modules']['FCom_Sales']['order_number'];
+                $localOrderNumber = BConfig::i()->get('modules/FCom_Sales/order_number');
+                if ($localOrderNumber != '' && $orderNumber != $localOrderNumber && $orderNumber < $seq->current_seq_id) {
+                    $result['status'] = false;
+                    $result['messages'] = BLocale::_('Order number must larger order current: '.$seq->current_seq_id);
+                }
+            }
+        }
+        BResponse::i()->json($result);
+    }
 }

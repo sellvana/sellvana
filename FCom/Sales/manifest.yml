@@ -40,3 +40,4 @@ modules:
                 observe:
                     - [ FCom_Customer_Model_Customer::login:after, FCom_Sales_Model_Cart::onUserLogin ]
                     - [ FCom_Customer_Model_Customer::logout:before, FCom_Sales_Model_Cart::onUserLogout ]
+                    - [ FCom_Core_Model_Seq::getFirstSeqId, FCom_Sales_Model_Order.getFirstSeqId ]

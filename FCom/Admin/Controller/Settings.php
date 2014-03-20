@@ -44,6 +44,13 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             }
             FCom_Core_Main::i()->writeConfigFiles();
 
+            if (isset($post['config']['modules']['FCom_Sales']['order_number'])) {
+                $seq = FCom_Core_Model_Seq::i()->orm()->where('entity_type', 'order')->find_one();
+                if ($seq) {
+                    $seq->set('current_seq_id', '1'.$post['config']['modules']['FCom_Sales']['order_number'])->save();
+                }
+            }
+
             if (!$xhr) {
                 $this->message('Settings updated');
             } else {

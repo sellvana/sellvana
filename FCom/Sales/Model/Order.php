@@ -383,4 +383,12 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         return join("\n", $result);
     }
 
+    static public function getFirstSeqId($args)
+    {
+        $orderNumber = BConfig::i()->get('modules/FCom_Sales/order_number');
+        if ($orderNumber) {
+            $args['seq_id'] =  $orderNumber;
+        }
+    }
+
 }
