@@ -56,42 +56,25 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
 
         foreach ( $sorted as $s ) {
             $model   = $s[ 'model' ];
+            if($model == 'FCom_Catalog_Model_Product'){
+                // disable custom fields to avoid them adding bunch of fields to export
+                FCom_CustomField_Main::i()->disable(true);
+            }
+            $sample = BDb::ddlFieldInfo($model::table());
             $heading = array( '_default_model' => $model, '_default_fields' => array() );
-            $sample = $model::i()->orm()->find_one()->as_array();
             foreach ( $sample as $key => $value ) {
                 if ( !in_array( $key, $s[ 'skip' ] ) ) {
                     $heading['_default_fields'][] = $key;
                 }
             }
-            $this->writeLine( $fe, BUtil::toJson( $heading ) );
             $records = $model::i()->orm()->select($heading['_default_fields'])->find_many();
             if ( $records ) {
+                $this->writeLine( $fe, BUtil::toJson( $heading ) );
                 foreach ( $records as $r ) {
 
                     /** @var FCom_Core_Model_Abstract $r */
                     $data = $r->as_array();
-//                    $export = array();
-//                    foreach ( $data as $key => $value ) {
-//                        if(!in_array($key, $s['skip'])){
-//
-//                        }
-//                    }
-//
-//                    if ( empty( $heading[ '_default_fields' ] ) ) {
-//                        $keys = array_keys( $data );
-//                        foreach ( $keys as $i => $field ) {
-//                            if ( in_array( $field, $s[ 'skip' ] ) ) {
-//                                $unset[ ] = $i;
-//                            } else {
-//                                $heading[ '_default_fields' ][ ] = $field;
-//                            }
-//                        }
-//                        $this->writeLine( $fe, BUtil::toJson( $heading ) );
-//                    }
                     $data = array_values($data);
-//                    foreach ( $unset as $i ) {
-//                        unset( $data[ $i ] );
-//                    }
 
                     $json = BUtil::toJson( $data );
                     $this->writeLine( $fe, $json );
@@ -194,7 +177,7 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
         $suid = BConfig::i()->get( 'db/store_unique_id' );
         if ( !$suid ) {
             $suid = uniqid( BConfig::i()->get( '' ) );
-            BConfig::i()->set( 'db/store_unique_id', $suid, true );
+            BConfig::i()->set( 'db/store_unique_id', $suid, true )->save();
         }
         return $suid;
     }
