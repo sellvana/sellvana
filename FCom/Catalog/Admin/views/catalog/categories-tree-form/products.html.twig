@@ -6,9 +6,7 @@
 require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
     var allProdGrid, catProdGrid, orignIds;
     function updateFormData() {
-        console.log(catProdGrid.getRows().pluck('id'));
         removedIds = _.difference(removedIds, catProdGrid.getRows().pluck('id'));
-        console.log(catProdGrid.getRows().toJSON());
         var addedRows = _.filter(catProdGrid.getRows().toJSON(), function(row) {
                             return row['added_row'];
                         });
