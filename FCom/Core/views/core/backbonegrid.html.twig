@@ -143,8 +143,7 @@
 
                 <% break;
             case 'textarea': %>
-                <textarea name="<%= rc.name %>" id="<%= rc.name %>" class="form-control" rows="5" <%= rc._validation %>>
-                </textarea>
+                <textarea name="<%= rc.name %>" id="<%= rc.name %>" class="form-control" rows="5" <%= rc._validation %>></textarea>
 
                 <%break;
             default: %>
@@ -269,9 +268,7 @@
                      break;
                 case 'textarea':
                     %><textarea id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>" <%= validation %>
-                            data-col="<%= col.name %>" <%= strDisabled %>  rows="4">
-                        <%= rc.row[col.name] %>
-                    </textarea><%
+                            data-col="<%= col.name %>" <%= strDisabled %>  rows="4"><%= rc.row[col.name] %></textarea><%
 
                     break;
                 case 'select':

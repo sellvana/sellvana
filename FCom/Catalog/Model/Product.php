@@ -89,7 +89,6 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (empty($data[$args['field']])) {
             return true;
         }
-        $sku = $data[$args['field']];
         $orm = static::orm('p')->where('local_sku', $data[$args['field']]);
         if (!empty($data['id'])) {
             $orm->where_not_equal('p.id', $data['id']);
@@ -114,6 +113,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return static::$_urlPrefix;
     }
 
+    /**
+     * @param FCom_Catalog_Model_Category $category
+     * @return string
+     */
     public function url($category=null)
     {
         $prefix = static::urlPrefix();
@@ -122,7 +125,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function imageUrl($full=false)
     {
-        $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media/';
+        $media = BConfig::i()->get('web/media_dir');# ? BConfig::i()->get('web/media_dir') : 'media/';
         $url = $full ? BApp::href('/') : '';
         $thumbUrl = $this->get('thumb_url');
         return $url.$media.'/'.($thumbUrl ? $thumbUrl : 'image-not-found.jpg');
@@ -431,6 +434,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $config['import']['images']['with_subfolders'] = true;
         }
 
+        if ( !isset($config['import']['images']['url_thumb_prefix']) ) {
+            $config['import']['images']['url_thumb_prefix'] = 'product/image/';
+        }
+
         // import related products - default true
         if ( !isset( $config[ 'import' ][ 'related' ][ 'import' ] ) ) {
             $config[ 'import' ][ 'related' ][ 'import' ] = true;
@@ -489,6 +496,14 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 $imagesNames = explode( $ms, $d['images']);
                 unset($d['images']);
             }
+
+            if(!empty($config['import']['images']['url_thumb_prefix']) && !empty($d['thumb_url'])){
+                if(!strpos($d['thumb_url'], $config['import']['images']['url_thumb_prefix']) !== 0){
+                    $d['thumb_url'] = $config['import']['images']['url_thumb_prefix'] . $d['thumb_url'];
+                }
+            }
+
+
             //HANDLE CUSTOM FIELDS
             if ($config['import']['custom_fields']['import']) {
                 //find intersection of custom fields with data fields
@@ -535,7 +550,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     $p = $this->orm()->where("url_key", $d['url_key'])->find_one();
                 }
             }
-
+            /** @var FCom_Catalog_Model_Product $p */
             if (!$p && 'update' == $config['import']['actions']) {
                 continue;
             } elseif (!$p) {
@@ -667,7 +682,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
             //HANDLE IMAGES
             if (!empty($imagesNames)) {
-                $imagesResult = $this->_importImages( $config, $imagesNames, $p );
+                $imagesConfig = !empty($config['import']['images']) ? $config['import']['images'] : array();
+                $imagesResult = $this->importImages( $imagesNames, $imagesConfig, $p );
                 if(is_array($imagesResult)){
                     $errors[] += $imagesResult;
                 }
@@ -904,66 +920,70 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @todo Fix hardcoded folder names
      * @param $config
      * @param $imagesNames
      * @param FCom_Catalog_Model_Product $p
      * @return array|bool
      */
-    protected function _importImages( $config, $imagesNames, $p )
+    public function importImages( $imagesNames, $config = array(), $p = null )
     {
+        if (is_null($p)) {
+            $p = $this;
+        }
         $mediaLib     = FCom_Core_Model_MediaLibrary::i();
         $productMedia = FCom_Catalog_Model_ProductMedia::i();
+        $rootDir      = BConfig::i()->get( 'fs/root_dir' );
         $imageFolder  = BConfig::i()->get( 'fs/image_folder' );
+        $thumbUrl = str_ireplace('media/product/image', '', $p->get('thumb_url'));
         $errors = array();
 
         foreach ( $imagesNames as $fileName ) {
             $pathInfo  = pathinfo( $fileName );
             $subFolder = $pathInfo[ 'dirname' ] == '.' ? null : $pathInfo[ 'dirname' ];
-            $att       = $mediaLib->load(
-                                  array(
-                                      'folder'    => $imageFolder,
-                                      'subfolder' => $subFolder,
-                                      'file_name' => $pathInfo[ 'basename' ]
-                                  )
-            );
+            $att       = $mediaLib->load(array(
+                'folder'    => $imageFolder,
+                'subfolder' => $subFolder,
+                'file_name' => $pathInfo[ 'basename' ]
+            ));
             if ( !$att ) {
-                $fullPathToFile = FULLERON_ROOT_DIR . '/' . $imageFolder . '/' . $fileName;
+                $fullPathToFile = $rootDir . '/' . $imageFolder . '/' . $fileName;
                 $size           = 0;
                 if ( file_exists( $fullPathToFile ) ) {
                     $size = filesize( $fullPathToFile );
                 }
 
                 $subFolder = null;
-                if ( $config[ 'import' ][ 'images' ][ 'with_subfolders' ] ) {
+                if ( !empty($config[ 'with_subfolders' ]) ) {
                     $subFolder = $pathInfo[ 'dirname' ] == '.' ? null : $pathInfo[ 'dirname' ];
                 }
                 try {
-                    $att = $mediaLib->create(
-                                    array(
-                                        'folder'    => $imageFolder,
-                                        'subfolder' => $subFolder,
-                                        'file_name' => $pathInfo[ 'basename' ],
-                                        'file_size' => $size,
-                                    )
-                    )->save();
+                    $att = $mediaLib->create(array(
+                        'folder'    => $imageFolder,
+                        'subfolder' => $subFolder,
+                        'file_name' => $pathInfo[ 'basename' ],
+                        'file_size' => $size,
+                    ))->save();
                 } catch ( Exception $e ) {
                     $errors[ ] = $e->getMessage();
                 }
             }
             $fileId = $productMedia->orm()->where( 'product_id', $p->id() )
                                    ->where( 'file_id', $att->id() )->find_one();
+            $isThumb = ( 'product/image/' . $fileName == $thumbUrl );
             if ( !$fileId ) {
                 try {
-                    $productMedia->create(
-                                           array(
-                                               'product_id' => $p->id(),
-                                               'media_type' => 'images',
-                                               'file_id'    => $att->id(),
-                                           )
-                    )->save();
+                    $productMedia->create(array(
+                        'product_id' => $p->id(),
+                        'media_type' => 'images',
+                        'file_id'    => $att->id(),
+                        'main_thumb' => $isThumb ? 1 : 0
+                    ))->save();
                 } catch ( Exception $e ) {
                     $errors[ ] = $e->getMessage();
                 }
+            } else if ( $fileId->get('main_thumb') == 0 && $isThumb ){
+                $fileId->set('main_thumb', 1)->save();
             }
         }
         return empty( $errors ) ? true : $errors;

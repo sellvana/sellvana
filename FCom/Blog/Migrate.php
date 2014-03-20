@@ -28,7 +28,7 @@ class FCom_Blog_Migrate extends BClass
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(
-                'UNQ_url_key' => '(url_key)',
+                'UNQ_url_key' => 'UNIQUE (url_key)',
                 'IDX_status_create_at' => '(status, create_at)',
                 'IDX_create_ym' => '(status, create_ym)',
             ),

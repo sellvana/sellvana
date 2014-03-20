@@ -61,7 +61,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $config = BUtil::arrayMerge($config, $options['config']);
         }
         //BEvents::i()->fire(__METHOD__, array('config'=>&$config));
-        //BEvents::i()->fire(__METHOD__.'.'.$folder, array('config'=>&$config));
+        //BEvents::i()->fire(__METHOD__.':'.$folder, array('config'=>&$config));
         return $config;
     }
 
@@ -164,7 +164,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     } else {
                         $att->set(array('file_size' => $uploads['size'][$i]))->save();
                     }
-                    BEvents::i()->fire(__METHOD__.'.'.$folder.'.upload', array('model'=>$att));
+                    BEvents::i()->fire(__METHOD__.':'.$folder.':upload', array('model'=>$att));
                     if (!empty($options['on_upload'])) {
                         call_user_func($options['on_upload'], $att);
                     }
@@ -199,7 +199,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $oldFileName = $att->file_name;
             if (@rename($targetDir.'/'.$oldFileName, $targetDir.'/'.$fileName)) {
                 $att->set('file_name', $fileName)->save();
-                BEvents::i()->fire(__METHOD__.'.'.$folder.'.edit', array('model'=>$att));
+                BEvents::i()->fire(__METHOD__.':'.$folder.':edit', array('model'=>$att));
                 if (!empty($options['on_edit'])) {
                     call_user_func($options['on_edit'], $att);
                 }
@@ -216,7 +216,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             }
             $args = array('folder'=>$folder, 'file_name'=>$files);
             $attModel->delete_many($args);
-            BEvents::i()->fire(__METHOD__.'.'.$folder.'.delete', array('files'=>$files));
+            BEvents::i()->fire(__METHOD__.':'.$folder.':delete', array('files'=>$files));
             if (!empty($options['on_delete'])) {
                 call_user_func($options['on_delete'], $args);
             }

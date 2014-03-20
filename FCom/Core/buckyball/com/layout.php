@@ -1523,7 +1523,9 @@ class BView extends BClass
     public function collectMetaData($viewContent = null)
     {
         $t = BDebug::debug('COLLECT META DATA: '.$this->getParam('view_name'));
+
         if (is_null($viewContent)) {
+            $prerendered = false;
             $viewContent = $this->getParam('source');
             if (!$viewContent) {
                 // get template file name for the view
@@ -1534,6 +1536,8 @@ class BView extends BClass
                 }
                 $viewContent = file_get_contents($viewFile);
             }
+        } else {
+            $prerendered = true;
         }
 
         // collect template source for meta tags for further interpolation processing
@@ -1543,13 +1547,17 @@ class BView extends BClass
             return $viewContent;
         }
         $metaContent = join("\n", $matches[0]);
-        // create a view with only meta tags
-        $metaView = BView::i()->factory($this->getParam('view_name').'__meta', array(
-            'renderer' => $this->getParam('renderer'),
-            'source' => $metaContent,
-        ));
-        // render the meta view for variables interpolation
-        $metaOutput = $metaView->_render();
+        if ($prerendered) {
+            $metaOutput = $metaContent;
+        } else {
+            // create a view with only meta tags
+            $metaView = BView::i()->factory($this->getParam('view_name').'__meta', array(
+                'renderer' => $this->getParam('renderer'),
+                'source' => $metaContent,
+            ));
+            // render the meta view for variables interpolation
+            $metaOutput = $metaView->_render();
+        }
         // collect meta data
         $metaData = array();
         if (preg_match_all(static::$_metaDataRegex, $metaOutput, $matches, PREG_SET_ORDER)) {
@@ -1882,9 +1890,9 @@ class BViewHead extends BView
      * @param bool  $start
      * @return BViewHead
      */
-    public function title($title, $start = false)
+    public function title($title, $start = false, $length = 1)
     {
-        $this->addTitle($title, $start);
+        $this->addTitle($title, $start, $length);
     }
 
     /**
@@ -2005,10 +2013,10 @@ class BViewHead extends BView
      * @param bool $start
      * @return $this
      */
-    public function addTitle($title, $start = false)
+    public function addTitle($title, $start = false, $length = 1)
     {
-        if ($start) {
-            array_splice($this->_title, 0, 1, $title);
+        if ($start !== false) {
+            array_splice($this->_title, $start, $length, (array)$title);
         } else {
             $this->_title[] = $title;
         }
@@ -2057,6 +2065,17 @@ class BViewHead extends BView
         }
 
         return '<title>' . $this->q(join($this->_titleSeparator, $this->_title)) . '</title>';
+    }
+
+    public function removeTitle($pattern)
+    {
+if (BDebug::is('DEBUG')) {
+    #var_dump($this->_title); exit;
+}
+        $this->_title = array_filter($this->_title, function ($val) use ($pattern) {
+            return !preg_match('#'.$pattern.'#', $val);
+        });
+        return $this;
     }
 
     /**
