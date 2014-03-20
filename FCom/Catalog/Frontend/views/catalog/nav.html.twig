@@ -8,11 +8,11 @@
 <!-- TODO: correct active category -->
             <li class="dropdown">
                 <a class="dropdown-toggle disabled {{ activeCategory == cat.get('url_path') ? 'active' }}"
-                    href="{{ APP.href(cat.get('url_path')) }}" data-toggle="dropdown">{{ cat.get('node_name') }}</a>
+                    href="{{ cat.url() }}" data-toggle="dropdown">{{ cat.get('node_name') }}</a>
 {% if cat.get('children') %}
                 <ul class="dropdown-menu">
 {% for cat1 in cat.get('children') %}
-                    <li><a href="{{ APP.href(cat1.get('url_path')) }}">{{ cat1.get('node_name') }}</a></li>
+                    <li><a href="{{ cat1.url() }}">{{ cat1.get('node_name') }}</a></li>
 {% endfor %}
                 </ul>
 {% endif %}

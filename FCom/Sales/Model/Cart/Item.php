@@ -28,13 +28,22 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
         return  true;
     }
 
-    public function getWeight()
+    public function getItemWeight($ship = true)
     {
         $p = $this->product();
         if (!$p) {
             return false;
         }
-        return $p->weight;
+        return $p->get($ship ? 'ship_weight' : 'net_weight');
+    }
+
+    public function getRowWeight($ship = true)
+    {
+        $w = $this->getItemWeight($ship);
+        if (false === $w) {
+            return false;
+        }
+        return $this->getQty() * $w;
     }
 
     public function getQty()

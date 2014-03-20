@@ -1,11 +1,12 @@
 {% set m = THIS.get('model') %}
 {% set prodImagesConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
-{% set mediaLibImageConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_images', 'folder': 'media/product/images', 'callbacks': {'after_render': 'renderImage'}}) %}
+{% set mediaLibImageConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_images', 'folder': 'media/product/images'}) %}
 
 <script>
 var mediaGrid, imagesGrid;
 require(['jquery','underscore','backbone'], function($, _) {
     var originIds, removedIds = [];
+    var backboneGridAllImages, rowsAllImages;
     var mainThumb = $('#main-thumb-image');
     function _getAttachmentsDbFields(row) {
         return {
@@ -40,7 +41,8 @@ require(['jquery','underscore','backbone'], function($, _) {
         mediaGrid = grid;
         grid.build();
 
-
+        backboneGridAllImages = mediaGrid.getGridSkeleton();
+        rowsAllImages = mediaGrid.getRows();
         mediaGrid.getSelectedRows().on('add remove reset', function() {
             if (mediaGrid.getSelectedRows().length>0) {
                 $('.prod-images-modal-add').removeClass('disabled');
@@ -69,9 +71,11 @@ require(['jquery','underscore','backbone'], function($, _) {
     }
 
     window.imagesGridRegister = function(grid) {
+        var confirmDelete = $('#confirm-delete-product-images');
+        var selfRow;
         imagesGrid = grid;
-
-        imagesGrid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
+        var rowView = imagesGrid.getGridSkeleton().Views.RowView;
+        rowView.prototype.afterRender = function() {
             var input = this.$el.find('.main-thumb');
             if (mainThumb.val() == '' && this.model.get('main_thumb') == 1) {
                 input.prop('checked', true);
@@ -81,22 +85,53 @@ require(['jquery','underscore','backbone'], function($, _) {
             }
         }
 
+        rowView.prototype._deleteRow = function (ev) {
+            selfRow = this;
+            var text = (this.model.get('associated_products') > 0) ?
+                        "This image is associated with "+ this.model.get('associated_products') +" of products. Are you sure you want to delete?" : "Are you sure you want to delete?";
+            confirmDelete.find('.modal-body').html(text);
+            confirmDelete.modal('show');
+        }
+
+        $('.prod-images-modal-delete').click(function () {
+            imagesGrid.getRows().remove(selfRow.model);
+            imagesGrid.getSelectedRows().remove(selfRow.model, {silent: true});
+            selfRow._destorySelf();
+            confirmDelete.modal("hide");
+        });
+
         imagesGrid.build();
 
         originIds = imagesGrid.getRows().pluck('id');
         console.log(originIds);
 
         $(imagesGrid.getGridSkeleton().AddButton).click(function() {
+            refreshGridAdd();
             $('#btn_prod_image_modal').trigger('click');
         });
 
     }
 
-    function renderAttachment(el, row) {
-        if ($('#product_attachments').find('a.file-attachments[data-file-id="'+ row.id+'"]').length > 0) {
-            $(el).addClass('hidden');
-        }
+    function refreshGridAdd() {
+        var data = getExcludeId();
+        backboneGridAllImages.current_filters['exclude_id'] = data;
+        rowsAllImages.fetch({reset: true});
     }
+
+    function getExcludeId() {
+        var arr = imagesGrid.getRows().pluck('file_id');
+        return  arr.join(',');
+    }
+
+    $('.btn-rescan-images').click(function () {
+        $.post('{{ APP.href('media/grid/rescan?folder=media/product/images') }}', function (response) {
+            if (response.status == 'success') {
+                $.bootstrapGrowl("Rescan success", { type: 'success', align: 'center', width: 'auto' });
+            } else {
+                $.bootstrapGrowl("Error:<br>" + response.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+            }
+        });
+    });
 });
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
         $('#prod-image-fileupload').fileupload({
@@ -129,10 +164,6 @@ require(['jquery','underscore','backbone'], function($, _) {
             }
         });
 
-    });
-
-    $('body').on('click', '.main-thumb', function () {
-        mainThumb.val($(this).parents('tr').attr('id'));
     });
 
 </script>
@@ -283,6 +314,19 @@ require(['jquery','underscore','backbone'], function($, _) {
 <input type='hidden' name="grid[images][del]" id='prod-image-remove' />
 <input type='hidden' name="grid[images][rows]" id='prod-image-rows' />
 <input type='hidden' id='main-thumb-image' value="" />
-
-
-
+<div class='modal fade' id='confirm-delete-product-images' tabindex='-1'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">{{ "Delete"|_ }}</h4>
+                </div>
+            <div class='modal-body'>
+            </div>
+            <div class='modal-footer'>
+                <button class='btn btn-primary btn-add prod-images-modal-delete' data-dismiss='modal' type='button'>{{ "Yes"|_ }}</button>
+                <button class='btn btn-default btn-close' data-dismiss='modal' type='button'>{{ "Cancel"|_ }}</button>
+            </div>
+        </div>
+    </div>
+</div>

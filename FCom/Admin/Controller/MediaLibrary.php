@@ -29,6 +29,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $orm = FCom_Core_Model_MediaLibrary::i()->orm()->table_alias('a')
                 ->where('folder', $folder)
                 ->select(array('a.id', 'a.folder', 'a.file_name', 'a.file_size'))
+                ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
                 ->order_by_expr('id asc');
             ;
         $baseSrc = rtrim(BConfig::i()->get('web/base_src'), '/') . '/';
@@ -44,7 +45,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'columns' => array(
                     array('type'=>'row_select'),
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
-                    array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'display'=>'eval', 'print'=>'"<a href=\''.$baseSrc.'"+rc.row["folder"]+"/"+rc.row["file_name"]+"\' target=_blank><img src=\''.$baseSrc.'"+rc.row["folder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"', 'sortable'=>false),
+                    array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'display'=>'eval', 'print'=>'"<a href=\''.$baseSrc.'"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' target=_blank><img src=\''.$baseSrc.'"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"', 'sortable'=>false),
                     array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>260, 'search'=>false, 'display'=>'file_size')
                     //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
@@ -60,7 +61,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $config = BUtil::arrayMerge($config, $options['config']);
         }
         //BEvents::i()->fire(__METHOD__, array('config'=>&$config));
-        //BEvents::i()->fire(__METHOD__.'.'.$folder, array('config'=>&$config));
+        //BEvents::i()->fire(__METHOD__.':'.$folder, array('config'=>&$config));
         return $config;
     }
 
@@ -69,10 +70,20 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         switch (BRequest::i()->params('do')) {
         case 'data':
             $folder = $this->getFolder();
+            $r = BRequest::i()->get();
             $orm = FCom_Core_Model_MediaLibrary::i()->orm()->table_alias('a')
                 ->where('folder', $folder)
-                ->select(array('a.id', 'a.folder', 'a.file_name', 'a.file_size'))
+                ->select(array('a.id', 'a.folder','a.file_name', 'a.file_size'))
+                ->select_expr('(SELECT COUNT(*) FROM '.FCom_Catalog_Model_ProductMedia::table().' pm WHERE pm.file_id = a.id)', 'associated_products')
+                ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder)', 'subfolder')
             ;
+            if (isset($r['filters'])) {
+                $filters = BUtil::fromJson($r['filters']);
+                if (isset($filters['exclude_id']) && $filters['exclude_id'] != '') {
+                    $arr = explode(',', $filters['exclude_id']);
+                    $orm =  $orm->where_not_in('a.id', $arr);
+                }
+            }
             $data = FCom_Core_View_BackboneGrid::i()->processORM($orm);
             BResponse::i()->json(array(
                     array('c' => $data['state']['c']),
@@ -153,7 +164,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     } else {
                         $att->set(array('file_size' => $uploads['size'][$i]))->save();
                     }
-                    BEvents::i()->fire(__METHOD__.'.'.$folder.'.upload', array('model'=>$att));
+                    BEvents::i()->fire(__METHOD__.':'.$folder.':upload', array('model'=>$att));
                     if (!empty($options['on_upload'])) {
                         call_user_func($options['on_upload'], $att);
                     }
@@ -188,7 +199,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $oldFileName = $att->file_name;
             if (@rename($targetDir.'/'.$oldFileName, $targetDir.'/'.$fileName)) {
                 $att->set('file_name', $fileName)->save();
-                BEvents::i()->fire(__METHOD__.'.'.$folder.'.edit', array('model'=>$att));
+                BEvents::i()->fire(__METHOD__.':'.$folder.':edit', array('model'=>$att));
                 if (!empty($options['on_edit'])) {
                     call_user_func($options['on_edit'], $att);
                 }
@@ -205,11 +216,45 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             }
             $args = array('folder'=>$folder, 'file_name'=>$files);
             $attModel->delete_many($args);
-            BEvents::i()->fire(__METHOD__.'.'.$folder.'.delete', array('files'=>$files));
+            BEvents::i()->fire(__METHOD__.':'.$folder.':delete', array('files'=>$files));
             if (!empty($options['on_delete'])) {
                 call_user_func($options['on_delete'], $args);
             }
             BResponse::i()->json(array('success'=>true));
+            break;
+        case 'rescan':
+            try {
+                $fileSPLObjects =  new RecursiveIteratorIterator(
+                    new RecursiveDirectoryIterator($targetDir),
+                    RecursiveIteratorIterator::SELF_FIRST
+                );
+                $arrImages = array();
+                $records = BDb::many_as_array(FCom_Core_Model_MediaLibrary::i()->orm()->select(array('folder', 'subfolder', 'file_name'))->where('folder', $folder)->find_many());
+                foreach( $fileSPLObjects as $fullFileName => $fileSPLObject ) {
+                    $fileName = $fileSPLObject->getFilename();
+                    $path = $fileSPLObject->getPath();
+                    $subFolder = null;
+                    if (is_file($fullFileName) && exif_imagetype($fullFileName)) {
+                        if ($path != $targetDir) {
+                            $path = str_replace('\\', '/', $path);
+                            $subFolder = trim(str_replace($targetDir.'/', '', $path));
+                            $subFolder = ltrim($subFolder, '/');
+                        }
+                        $tmp = array('folder' => $folder, 'subfolder' => $subFolder, 'file_name' => $fileName);
+                        if (!in_array($tmp, $records)) {
+                            array_push($arrImages, $tmp);
+                        }
+                    }
+                }
+                foreach ($arrImages as $arr) {
+                    $arr['file_size'] = ($arr['subfolder']) ? filesize($targetDir.'/'.$arr['subfolder'].'/'.$arr['file_name']) :
+                                        filesize($targetDir.'/'.$arr['file_name']);
+                    $attModel->create($arr)->save();
+                }
+                BResponse::i()->json(array('status' => 'success'));
+            } catch (Exception $e) {
+                BResponse::i()->json(array('status' => 'error', 'messages' => $e->getMessage()));
+            }
             break;
         }
     }

@@ -51,6 +51,15 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         }
     }
 
+    public function beforeDispatch()
+    {
+        if (!parent::beforeDispatch()) return false;
+
+        $this->view('head')->addTitle(BLocale::_('%s Admin', BConfig::i()->get('modules/FCom_Core/site_title')));
+
+        return true;
+    }
+
     public function processFormTabs($view, $model=null, $mode='edit', $allowed=null)
     {
         $r = BRequest::i();
@@ -93,13 +102,6 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                     $tab['disabled'] = true;
                     continue;
                 }
-                if (!$curTab) {
-                    $curTab = $k;
-                }
-                if ($curTab===$k) {
-                    $tab['active'] = true;
-                    $tab['async'] = false;
-                }
                 if (!empty($tab['view'])) {
                     $tabView = $layout->view($tab['view']);
                     if ($tabView) {
@@ -119,21 +121,33 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
         if ($view->tab_groups) {
             $tabGroups = $view->sortedTabGroups();
-            foreach ($tabs as $k=>$tab) {
-                $tabGroups[$tab['group']]['tabs'][$k] = $tab;
+            foreach ($tabs as $k => &$tab) {
+                $tabGroups[$tab['group']]['tabs'][$k] =& $tab;
                 if (!empty($tab['active'])) {
                     $tabGroups[$tab['group']]['open'] = true;
                 }
             }
-            foreach ($tabGroups as $k=>$tabGroup) {
+            unset($tab);
+            foreach ($tabGroups as $k => &$tabGroup) {
                 if (empty($tabGroup['tabs'])) {
                     unset($tabGroups[$k]);
                 } else {
                     uasort($tabGroup['tabs'], function($a, $b) {
                         return $a['pos']<$b['pos'] ? -1 : ($a['pos']>$b['pos'] ? 1 : 0);
                     });
+                    if (!$curTab) {
+                        foreach ($tabGroup['tabs'] as $tabId => &$tab) {
+                            $curTab = $tabId;
+                            $tabGroup['open'] = true;
+                            $tab['active'] = true;
+                            $tab['async'] = false;
+                            break;
+                        }
+                        unset($tab);
+                    }
                 }
             }
+            unset($tabGroup);
             $view->tab_groups = $tabGroups;
         }
 

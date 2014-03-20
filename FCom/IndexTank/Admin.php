@@ -17,8 +17,8 @@ class FCom_IndexTank_Admin extends BClass
                     ->on('FCom_Catalog_Model_Product::onBeforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
 
                     //for categories
-                    ->on('FCom_Catalog_Admin_Controller_Categories::action_tree_data__POST:move_node.before', 'FCom_IndexTank_Admin::onCategoryMoveBefore')
-                    ->on('FCom_Catalog_Admin_Controller_Categories::action_tree_data__POST:move_node.after', 'FCom_IndexTank_Admin::onCategoryMoveAfter')
+                    ->on('FCom_Catalog_Admin_Controller_Categories::action_tree_data__POST:move_node:before', 'FCom_IndexTank_Admin::onCategoryMoveBefore')
+                    ->on('FCom_Catalog_Admin_Controller_Categories::action_tree_data__POST:move_node:after', 'FCom_IndexTank_Admin::onCategoryMoveAfter')
                     ->on('FCom_Catalog_Model_Category::onBeforeDelete', 'FCom_IndexTank_Admin::onCategoryBeforeDelete')
                     ->on('FCom_Catalog_Model_CategoryProduct::onAfterSave', 'FCom_IndexTank_Admin::onCategoryProductAfterSave')
                     ->on('FCom_Catalog_Model_CategoryProduct::onBeforeDelete', 'FCom_IndexTank_Admin::onCategoryProductBeforeDelete')

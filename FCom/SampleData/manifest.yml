@@ -1,6 +1,6 @@
 modules:
     FCom_SampleData:
-        version: 0.1.0
+        version: 0.1.1
         channel: beta
         description: "Sample data for catalog"
         require: { module: { FCom_Core: 0.1.0, FCom_Catalog: 0.2.18, FCom_CatalogIndex: 0.1.9 } }

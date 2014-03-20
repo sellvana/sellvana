@@ -2475,12 +2475,15 @@ div.jGrowl div.jGrowl-notification, div.jGrowl div.jGrowl-closer {
 .f-horiz-nav-tabs > li:first-of-type > a:focus {
   border-left:none;
   }
-.f-horiz-nav-tabs .dropdown-menu > .active > a, 
-.f-horiz-nav-tabs .dropdown-menu > .active > a:hover, 
-.f-horiz-nav-tabs .dropdown-menu > .active > a:focus {
-  background:none;
-  color:#444;
+.f-horiz-nav-tabs .dropdown-menu > .active > a {
+  background:#DDD;
+  color:#000;
   }
+.f-horiz-nav-tabs .dropdown-menu > .active > a:hover,
+.f-horiz-nav-tabs .dropdown-menu > .active > a:focus  {
+  background:#748ddd;
+  color:#FFF;
+}
 .f-horiz-nav-tabs .dropdown-menu .active a:after {
   display:inline-block;
   background:#748ddd;
