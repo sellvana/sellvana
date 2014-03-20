@@ -1,10 +1,7 @@
 {% set c = THIS.get('model') %}
 {% set paymentMethods = UTIL.arrayToOptions(APP.instance('FCom_Sales_Main').getPaymentMethods(), '.getName') %}
 {% set shippingMethods = UTIL.arrayToOptions(APP.instance('FCom_Sales_Main').getShippingMethods(), '.getName') %}
-{% set orderNumber = c.get('modules/FCom_Sales/order_number') %}
-{% if orderNumber is null or orderNumber is empty %}
-    {% set orderNumber = "0000000" %}
-{% endif %}
+{% set orderNumber = c.get('modules/FCom_Sales/order_number', '0000000') %}
 <h2>{{ "Sales Settings"|_}}</h2>
 
 <div class="accordion accordion-blue panel-group" id="settings-FCom_Sales">
@@ -49,7 +46,7 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">{{ 'Define starting order number'|_ }}</label>
                     <div class="col-md-5">
-                        <input id="FCom_Sales-order-number" type="text" class="form-control required" maxlength="14" data-rule-number="true" name="config[modules][FCom_Sales][order_number]"
+                        <input id="FCom_Sales-order-number" type="text" class="form-control required" data-rule-number="true" name="config[modules][FCom_Sales][order_number]"
                                value="{{ orderNumber }}" />
                     </div>
                 </div>
@@ -61,12 +58,13 @@
     require(['jquery', 'jquery.validate'], function ($) {
         $('#FCom_Sales-order-number').rules('add', {
             required: true,
+            maxlength: 14,
             remote: {
                 url: '{{ APP.href('orders/validate_order_number') }}',
                 async: false,
                 type: 'post',
                 dataFilter: function (response) {
-                    var res = jQuery.parseJSON(response);
+                    var res = $.parseJSON(response);
                     $.validator.messages.remote = res.messages;
                     return res.status;
                 }
