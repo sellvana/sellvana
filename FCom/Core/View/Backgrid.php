@@ -127,7 +127,7 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
         }
         if (!is_null($method)) {
             //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
-            BEvents::i()->fire($method.'.orm', array('orm'=>$orm));
+            BEvents::i()->fire($method.':orm', array('orm'=>$orm));
         }
 
         $data = $orm->paginate($r);
@@ -136,7 +136,7 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
         //$data['hash'] = base64_encode(BUtil::toJson(BUtil::arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);
         if (!is_null($method)) {
-            BEvents::i()->fire($method.'.data', array('data'=>&$data));
+            BEvents::i()->fire($method.':data', array('data'=>&$data));
         }
 
         return $data;

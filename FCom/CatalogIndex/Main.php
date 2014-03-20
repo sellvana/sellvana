@@ -3,6 +3,7 @@
 class FCom_CatalogIndex_Main extends BClass
 {
     protected static $_autoReindex = true;
+    protected static $_prevAutoReindex;
     protected static $_filterParams;
 
     static public function autoReindex($flag)
@@ -66,6 +67,21 @@ class FCom_CatalogIndex_Main extends BClass
     {
         if (static::$_autoReindex) {
             FCom_CatalogIndex_Indexer::i()->indexProducts(array($args['model']));
+        }
+    }
+    
+    static public function onProductBeforeImport($args)
+    {
+        static::$_prevAutoReindex = static::$_autoReindex;
+        static::$_autoReindex = false;
+    }
+    
+    static public function onProductAfterImport($args)
+    {
+        static::$_autoReindex = static::$_prevAutoReindex;
+        FCom_CatalogIndex_Model_Doc::i()->flagReindex($args['product_ids']);
+        if (static::$_autoReindex) {
+            FCom_CatalogIndex_Indexer::i()->indexProducts(true);
         }
     }
 

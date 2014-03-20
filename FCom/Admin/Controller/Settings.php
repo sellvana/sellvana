@@ -13,11 +13,16 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
         foreach ($tabViews as $tabViewName=>$tabView) {
             $tabName = preg_replace('#^settings/#', '', $tabViewName);
             if (empty($view->tabs[$tabName])) {
-                $view->addTab($tabName, array('async'=>true, 'label'=>str_replace('_', ' ', $tabName), 'view'=>$tabViewName));
+                $view->addTab($tabName, array(
+                    'async' => true, 
+                    'label' => str_replace('_', ' ', $tabName), 
+                    'view'  => $tabViewName,
+                ));
             }
         }
         $this->layout('/settings');
         $this->processFormTabs($view, BConfig::i());
+#echo "<pre>"; var_dump($view);echo "</pre>"; exit;
     }
 
     public function action_index__POST()

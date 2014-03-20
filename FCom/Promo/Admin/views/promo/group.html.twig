@@ -24,102 +24,50 @@
     {% endif %}
 </div>
 
-{{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }}
+
 
 <script>
-    function removeGroup(el) {
-        var grid = $(el);
-        var gId = $('#promo-group-type-{{ groupSuffix }} input[name=_group_id]', grid).val();
-        var deleteIds = $('input[name=_del_group_ids]');
-        if (gId > 0) {
-            deleteIds.val(deleteIds.val() + ',' + gId);
-        }
-        grid.remove();
+function removeGroup(el) {
+    var grid = $(el);
+    var gId = $('#promo-group-type-{{ groupSuffix }} input[name=_group_id]', grid).val();
+    var deleteIds = $('input[name=_del_group_ids]');
+    if (gId > 0) {
+        deleteIds.val(deleteIds.val() + ',' + gId);
+    }
+    grid.remove();
+}
+
+require(['jquery','underscore','backbone'], function ($, _, Backbone) {
+    var prodLibGrid, mainGrid, originIds;
+    window.{{ gridConfig.config.id }}_register = function(grid) {
+        mainGrid = grid;
+        grid.build();
+        originIds = mainGrid.getRows().pluck('id');
+        $(mainGrid.getGridSkeleton().AddButton).click(function() {
+            $('#btn-fieldset-grid-modal').trigger('click');
+        });
+    }
+    window.prodLibGridRegister = function(grid) {
+        prodLibGrid = grid;
+        grid.build();
+        $(prodLibGrid.getGridSkeleton().AddButton).click(function() {
+            mainGrid.getRows().add(prodLibGrid.getSelectedRows().toJSON());
+            prodLibGrid.getGridView().clearSelectedRows();
+            $('.promo-prod-modal-close').trigger('click');
+        });
     }
 
-    /**
-     * Event Aggregator
-     * This aggregator is for triggering silent_inject that causes main grid adding selected rows from modal grid.
-     **/
-
-    if (typeof(g_vent) === 'undefined') {
-        g_vent = _.extend({}, Backbone.Events);
-    }
-
-    var {{ groupSuffix }}promoProdMng;
-    require(['jquery'], function ($) {
-
-        function PromoProdsMng(type, id) {
-            this.groupSuffix = "{{ groupSuffix }}";
-            this.mainGridId = 'promo_products_' + this.groupSuffix;
-            this.modalGridId = 'productLibrary';
-            this.groupType = type;
-            this.groupId = id;
-
-            g_vent.bind('init', this._getOriginalIds);
-            g_vent.bind('add', this._addRows);
-            g_vent.bind('mass-delete', this._removeRows);
-
-            this.add_ids = [];
-            this.remove_ids = [];
-            this.original_ids = [];//product_ids_add-buy_1
-            this.add_ids_element = $("#product_ids_add-" + this.groupSuffix);
-            this.remove_ids_element = $("#product_ids_remove-" + this.groupSuffix);
-
-        }
-
-        PromoProdsMng.prototype._setFormValues = function () {
-
-            this.add_ids = _.difference(this.add_ids, this.original_ids);
-            this.remove_ids = _.intersection(this.remove_ids, this.original_ids);
-            this.add_ids_element.val(this.add_ids.join(','));
-            this.remove_ids_element.val(this.remove_ids.join(','));
-
-            console.log("this.add_ids");
-            console.log(this.add_ids);
-            console.log(this.add_ids_element);
-        };
-
-        PromoProdsMng.prototype._getOriginalIds = function (ev) {
-
-            if (ev.grid === self.mainGridId) {
-                self.original_ids = ev.ids;
-            }
-        };
-
-        PromoProdsMng.prototype._addRows = function (ev) {
-            if (ev.grid === self.mainGridId) {
-                $('#btn-fieldset-grid-modal').trigger("click");
-                this.add = true;
-            }
-
-            if (ev.grid === self.modalGridId && this.add) {
-                this.add = false;
-                g_vent.trigger("silent_inject", {grid: self.mainGridId, rows: ev.rows});
-                self.add_ids = _.union(_.pluck(ev.rows, "id"), self.add_ids);
-                self.remove_ids = _.difference(self.remove_ids, _.pluck(ev.rows, "id"));
-                self._setFormValues();
-                g_vent.trigger("clear_selection", {grid: self.modalGridId});
-                $("button.btn-close.promo-prod-modal-close").trigger("click");
-
-            }
-        };
-
-        PromoProdsMng.prototype._removeRows = function (ev) {
-            if (ev.grid === self.mainGridId) {
-                self.remove_ids = _.union(_.pluck(ev.rows, 'id'), self.remove_ids);
-                self.add_ids = _.difference(self.add_ids, _.pluck(ev.rows, 'id'));
-                self._setFormValues();
-            }
-        };
-
-        PromoProdsMng.prototype.reset = function () {
-            this.add_ids = [];
-            this.remove_ids = [];
-            $("#product_ids_add-" + this.groupType + "-" + this.groupId).val('');
-            $("#product_ids_remove-" + this.groupType + "-" + this.groupId).val('');
-        };
-        var self = new PromoProdsMng('{{ groupType }}', '{{ groupId }}');
-        {{ groupSuffix }}promoProdMng = self;
+    $('#promo-form').submit(function() {
+        var addedIds = _.difference(mainGrid.getRows().pluck('id'), originIds);
+        var removedIds = _.difference(originIds, mainGrid.getRows().pluck('id'));
+        console.log(removedIds);
+        $('#product_ids_add-{{ groupSuffix }}').val(addedIds.join(','));
+        $('#product_ids_remove-{{ groupSuffix }}').val(removedIds.join(','));
     });
+
+});
 </script>
+
+{{ THIS.view('core/backbonegrid').set('grid', gridConfig) | raw }}
+
+

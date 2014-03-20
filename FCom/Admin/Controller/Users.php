@@ -15,19 +15,21 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config = parent::gridConfig();
 
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type'=>'row_select'),
             array('name' => 'id', 'label' => 'ID', 'index' => 'id', 'width' => 55, 'cell' => 'integer'),
             array('name' => 'username', 'label' => 'User Name', 'width' => 100),
             array('name' => 'email', 'label' => 'Email', 'width' => 150),
             array('name' => 'firstname', 'label' => 'First Name', 'width' => 150),
             array('name' => 'lastname', 'label' => 'Last Name', 'width' => 150),
-            array('name' => 'is_superadmin', 'label' => 'SuperAdmin', 'width' => 100, 'editable' => true,  'editor' => 'select', 'options' => FCom_Admin_Model_User::i()->fieldOptions('is_superadmin')),
-            array('name' => 'status', 'label' => 'Status', 'width' => 100, 'editor' => 'select', 'editable' => true, 'mass-editable' => true,
+            array('type'=>'input', 'name' => 'is_superadmin', 'label' => 'SuperAdmin', 'width' => 100, 'editable' => true,  'editor' => 'select', 'options' => FCom_Admin_Model_User::i()->fieldOptions('is_superadmin')),
+            array('type'=>'input', 'name' => 'status', 'label' => 'Status', 'width' => 100, 'editor' => 'select', 'editable' => true, 'mass-editable' => true,
                   'options' => FCom_Admin_Model_User::i()->fieldOptions('status')),
             array('name' => 'create_at', 'label' => 'Created', 'width' => 100),
             array('name' => 'update_at', 'label' => 'Updated', 'width' => 100),
-            array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 85,
-                  'data'=> array('edit' => array('href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'), 'delete' => true)),
+            array('type'=>'btn_group', 'width' => 85, 'buttons'=> array(
+                array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'),
+                array('name'=>'delete')
+            )),
         );
         $config['actions'] = array(
             'edit' => array('caption' => 'status'),
@@ -85,7 +87,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config['data'] = $orm->find_many();
         $config['id'] = 'role_users_grid_'.$model->id;
         $config['columns'] = array(
-            array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
+            array('type'=>'row_select'),
             array('name'=>'id', 'label'=>'ID', 'index'=>'au.id', 'width'=>80, 'hidden'=>true),
             array('name'=>'username', 'label'=>'Username', 'index'=>'au.username', 'width'=>200),
             array('name'=>'email', 'label'=>'Email', 'index'=>'au.email', 'width'=>200),
@@ -94,6 +96,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         );
         $config['actions'] = array(
             'add'=>array('caption'=>'Add user'),
+            'delete'=>array('caption'=>'Remove')
         );
         $config['filters'] = array(
             array('field'=>'username', 'type'=>'text'),
@@ -101,6 +104,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             array('field'=>'status', 'type' => 'multiselect')
         );
         $config['data_mode'] = 'local';
+        $config['grid_before_create'] = 'rolesGridRegister';
         $config['events'] = array('init', 'add','mass-delete');
 
         return array('config'=>$config);
@@ -117,11 +121,11 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         $config            = parent::gridConfig();
         $config['id']      = 'role_all_users_grid_' . $model->id;
         $config['columns'] = array(
-            array('cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40),
+            array('type'=>'row_select'),
             array('name' => 'id', 'label' => 'ID', 'index' => 'au.id', 'width' => 55, 'hidden' => true),
             array('name' => 'username', 'label' => 'Name', 'index' => 'au.username', 'width' => 250),
             array('name' => 'email', 'label' => 'Email', 'index' => 'au.email', 'width' => 100),
-            array('name' => 'status', 'label' => 'Status', 'index' => 'au.status', 'width' => 100, 'editable' => true, 'mass-editable' => true,
+            array('type'=>'input', 'name' => 'status', 'label' => 'Status', 'index' => 'au.status', 'width' => 100, 'editable' => true, 'mass-editable' => true,
                   'editor' => 'select', 'options' => FCom_Admin_Model_User::i()->fieldOptions('status'))
         );
         $config['actions'] = array(
@@ -136,7 +140,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         if ($filterAdmin) {
             $config['orm'] = FCom_Admin_Model_User::i()->orm()->where('is_superadmin', 0);
         }
-
+        $config['grid_before_create'] = 'userGridRegister';
         $config['events'] = array('add');
 
         return array('config' => $config);

@@ -498,7 +498,7 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                     if (!r.status) {
                         $.bootstrapGrowl("Error:<br>" + r.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
                     } else {
-                        el.jstree('refresh', $.jstree._focused()._get_parent());
+                        el.jstree('refresh', $.jstree._focused()._get_parent(), {idNode:  r.newNodeID});
                     }
                 });
             }
@@ -629,9 +629,8 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                     }, function (r) {
                         if (r.status) {
                             $(data.rslt.obj).attr("id", "node_" + r.id);
-                            var nodeSelected = $.jstree._focused().get_selected();
-                            el.jstree('deselect_node').trigger('deselect_node.jstree', nodeSelected);
-                            el.jstree('select_node', data.rslt.obj);
+                            el.jstree('deselect_all').trigger('deselect_all.jstree');
+                            $(el).jstree('select_node', "#node_" + r.id, true);
                         }
                         else {
                             $.bootstrapGrowl("Error:<br>" + r.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
@@ -675,6 +674,15 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                         }
                     }
                 );
+            })
+            .bind('refresh.jstree', function (e, data) {
+                var obj = data.args[1];
+                if (typeof (obj) !== 'undefined' && typeof (obj.idNode) !== 'undefined') {
+                    $(el).jstree('deselect_all').trigger('deselect_all.jstree');
+                    $(el).jstree('select_node', '#' + obj.idNode, true);
+                    var focused = $.jstree._focused();
+                    focused.data.ui.to_select = [];
+                }
             })
             .bind("move_node.jstree", function (e, data) {
                 data.rslt.o.each(function (i) {

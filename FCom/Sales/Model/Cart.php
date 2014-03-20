@@ -158,9 +158,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         }
         $orm = FCom_Sales_Model_Cart_Item::i()->orm('ci')->where('ci.cart_id', $this->id())
             ->order_by_desc('ci.update_at')->limit($limit);
-        BEvents::i()->fire(__METHOD__.'.orm', array('orm'=>$orm));
+        BEvents::i()->fire(__METHOD__.':orm', array('orm'=>$orm));
         $items = $orm->find_many();
-        BEvents::i()->fire(__METHOD__.'.data', array('items'=>&$items));
+        BEvents::i()->fire(__METHOD__.':data', array('items'=>&$items));
         return $items;
     }
 
@@ -340,7 +340,8 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $services = $shippingMethod->getDefaultService();
             $this->shipping_service = key($services);
         } else {
-            throw new BException("No shipping methods configured.");
+            // handle orders with no shipping needed
+            #throw new BException("No shipping methods configured.");
         }
 
         if (!$this->payment_method) {

@@ -1,28 +1,7 @@
 {% set ctrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
 {% set fieldConfig = ctrl.variantFieldGridConfig(model) %}
 {% set variantConfig = ctrl.variantGridConfig(model) %}
-<div class="well clearfix">
-    <div class="pull-left" style="width: 245px">
-        <select id="sel_var_field" class="form-control" style="width:150px;">
-            {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').getDropdowns()) | raw }}
-        </select>
-        <button class="btn btn-primary btn-sm" id="btn_add_var_field" type="button">Add Field</button>
-    </div>
-    <div class="col-sm-8" style="position: relative">
-        <ol id="variants-tab-field" class="dd-list columns dd-list-axis-x"></ol>
-    </div>
-</div>
-<div class="hidden" id="grid-field-hidden">
-    {{ THIS.view('core/backbonegrid').set('grid', fieldConfig) | raw }}
-</div>
-<div class="f-variants-col row">
-  <div class="col-sm-12">
-    {{ THIS.view('core/backbonegrid').set('grid', variantConfig) | raw }}
-  </div>
-</div>
 
-<input type='hidden' id='vfield_ids' name='vfields' />
-<input type='hidden' id='variants' name='variants' />
 <script>
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(Backbone, _, $) {
     var fieldCollection = null;
@@ -30,36 +9,55 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
     var vRowsCollection = null;
     var valueCurrentField = Array();
     var vField = $('#variants-tab-field');
+    var bodyGrid = $('#variant-grid').find('tbody');
     var arrField = Array();
-    g_vent.trigger('get_rows_collection',
-                    {
-                        'grid': 'variable-field-grid',
-                        callback: vFieldGridInit
-                    }
-                   );
-    g_vent.trigger('get_cols_collection', {'grid': 'variant-grid', callback: function(c){ vColsCollection = c;} });
-    g_vent.trigger('get_rows_collection', {'grid': 'variant-grid', callback: function(r){ vRowsCollection = r;} });
+    var field;
+
+    window.variantFieldGridRegister = function(grid) {
+        grid.build();
+        fieldCollection = grid.getRows();
+    }
+    window.variantGridRegister = function(grid) {
+        grid.build();
+        vColsCollection = grid.getCols();
+        vRowsCollection = grid.getRows();
+        vFieldGridInit();
+        grayGrid();
+    }
+
+    function grayGrid() {
+        if ($('#variants-tab-field').children().length) {
+            bodyGrid.find('input, select, button').each(function () {
+                $(this).prop('disabled', false);
+            });
+            $('#variant-grid').find('.grid-new').prop('disabled', false);
+        } else {
+            bodyGrid.find('input, select, button').each(function () {
+                $(this).prop('disabled', true);
+            });
+            $('#variant-grid').find('.grid-new').prop('disabled', true);
+        }
+
+    }
+
     function resetSelect()
     {
         $('#sel_var_field').val('');
         $('#sel_var_field').select2();
     }
 
-    function vFieldGridInit(c)
+    function vFieldGridInit()
     {
-
-        fieldCollection = c;
         var mapField = fieldCollection.map(function (obj) {
             return {id: obj.id, name: obj.get('name')};
         });
-        $('#variant-grid thead tr').find('th').each(function () {
-            var self = this;
-            mapField.forEach(function (obj) {
-                if (obj.name == $(self).attr('data-id')) {
-                    $("#sel_var_field option[value='"+obj.id+"']").remove();
+        vColsCollection.each(function (obj) {
+            mapField.forEach(function (field) {
+                if (field.name == obj.get('name')) {
+                    $("#sel_var_field option[value='"+field.id+"']").remove();
 
                     var fields = '<li class="dd-item dd3-item"><div class="icon-ellipsis-vertical dd-handle dd3-handle"></div><div class="dd3-content">' +
-                            '<label>'+ obj.name +'</label> <i data-name="'+ obj.name +'" data-id="'+ obj.id +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
+                            '<label>'+ field.name +'</label> <i data-name="'+ field.name +'" data-id="'+ field.id +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
                     vField.append(fields);
                 }
             });
@@ -86,7 +84,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
         });
         $('#vfield_ids').val(JSON.stringify(variant_fields));
         var variants = [];
-        $('#variant-grid tbody').find('tr').each(function () {
+        bodyGrid.find('tr').each(function () {
             var variant = {};
             var fvals = {};
            $(this).find('td').each(function () {
@@ -172,7 +170,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
             addColumn(data.name, data.options);
         });
         valueCurrentField = Array();
-        $('#variant-grid tbody').find('tr').each(function () {
+        bodyGrid.find('tr').each(function () {
             var tmp = Array();
             $(this).find('td').each(function () {
                 var self = this;
@@ -189,7 +187,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
         })
         vColsCollection.trigger('render');
         vRowsCollection.trigger('render');
-        $('#variant-grid tbody').find('tr').each(function (index) {
+        bodyGrid.find('tr').each(function (index) {
             $(this).find('td').each(function () {
                 var self = this;
                 if (valueCurrentField.length) {
@@ -210,6 +208,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
         });
 
         vColsCollection.add({
+            type: 'input',
             name: text,
             label: text,
             width: 150,
@@ -222,26 +221,72 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
             options: options,
             'default': ''
         });
+        grayGrid();
     }
 
     $('body').on('click', '.btn-delete-field', function () {
-       var row;
-       var self = this;
+        $('#confirm-delete-field-variant').modal('show');
+        field = this;
+    });
+
+    $('.modal-delete-field-variant').click(function () {
+        var row;
         fieldCollection.each(function (r) {
-          if (r.id == $(self).attr('data-id')) {
-              row = r.attributes;
-          }
-       });
+            if (r.id == $(field).attr('data-id')) {
+                row = r.attributes;
+            }
+        });
         var option = '<option value="'+row.id+'">'+row.name+'</option>';
         $('#sel_var_field').append(option);
         resetSelect();
         removeColumn(row);
-        $(this).parents('li').remove();
-        renderGrid()
-
+        $(field).parents('li').remove();
+        renderGrid();
+        grayGrid();
     });
-
 
 
 });
 </script>
+
+<div class="well clearfix">
+    <div class="pull-left" style="width: 245px">
+        <select id="sel_var_field" class="form-control" style="width:150px;">
+            {{ UTIL.optionsHtml(APP.instance('FCom_CustomField_Model_Field').getDropdowns()) | raw }}
+        </select>
+        <button class="btn btn-primary btn-sm" id="btn_add_var_field" type="button">Add Field</button>
+    </div>
+    <div class="col-sm-8" style="position: relative">
+        <ol id="variants-tab-field" class="dd-list columns dd-list-axis-x"></ol>
+    </div>
+</div>
+<div class="hidden" id="grid-field-hidden">
+    {{ THIS.view('core/backbonegrid').set('grid', fieldConfig) | raw }}
+</div>
+<div class="f-variants-col row">
+  <div class="col-sm-12">
+    {{ THIS.view('core/backbonegrid').set('grid', variantConfig) | raw }}
+  </div>
+</div>
+
+<div class='modal fade' id='confirm-delete-field-variant' tabindex='-1'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{{ "Delete"|_ }}</h4>
+            </div>
+            <div class='modal-body'>
+                {{ "Deleting this field will remove all associated variants of this product. Are you sure you want to delete?"|_ }}
+            </div>
+            <div class='modal-footer'>
+                <button class='btn btn-primary btn-add modal-delete-field-variant' data-dismiss='modal' type='button'>{{ "Yes"|_ }}</button>
+                <button class='btn btn-default btn-close' data-dismiss='modal' type='button'>{{ "Cancel"|_ }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type='hidden' id='vfield_ids' name='vfields' />
+<input type='hidden' id='variants' name='variants' />
+

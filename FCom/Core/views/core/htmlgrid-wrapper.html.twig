@@ -70,9 +70,12 @@
 </script>
 
 <script>
-require(['jquery', 'fcom.htmlgrid'], function($) {
+require(['backbone', 'underscore','jquery', 'fcom.htmlgrid'], function(Backbone, _, $) {
 
     $(function() {
+        {% if config.register %}
+            window['{{ config.register }}'] = _.extend({}, Backbone.Events);
+        {% end if %}
         var grid = new FCom.BackboneGrid({
             id: "{{ config.id }}",
             personalize_url: "{{ APP.href('my_account/personalize') }}",

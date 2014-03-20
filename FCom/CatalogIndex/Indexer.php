@@ -1,16 +1,24 @@
 <?php
 
+/**
+ * Class FCom_CatalogIndex_Indexer
+ *
+ * @method static FCom_CatalogIndex_Indexer i()
+ */
 class FCom_CatalogIndex_Indexer extends BClass
 {
     protected static $_maxChunkSize = 100;
     protected static $_indexData;
     protected static $_filterValues;
+    protected static $_cnt_reindexed;
 
     static public function indexProducts($products)
     {
         if (empty($products)) {
             return;
         }
+        /** @var FCom_PushServer_Model_Client $pushClient */
+        $pushClient = FCom_PushServer_Model_Client::sessionClient();
         if ($products === true) {
             $i = 0;
             //$start = 0;
@@ -64,11 +72,13 @@ class FCom_CatalogIndex_Indexer extends BClass
         }
         //TODO: for less memory usage chunk the products data
         static::_indexFetchProductsData($products);
+        static::$_cnt_reindexed += count($products);
         unset($products);
         static::_indexSaveDocs();
         static::_indexSaveFilterData();
         static::_indexSaveSearchData();
         static::indexCleanMemory();
+        $pushClient->send( array( 'channel' => 'index', 'signal' => 'progress', 'reindexed' => static::$_cnt_reindexed ) );
     }
 
     static public function indexDropDocs($pIds)
