@@ -1534,7 +1534,11 @@ class BMigrate extends BClass
                 FCom_Core_Main::i()->writeConfigFiles('core');
             }
             */
-            throw $e;
+            if (BDebug::mode() == 'PRODUCTION') {
+                print_r("<p style='color: red'>Whoops, the migration didn't finish. The following url might be helpful: <a href='https://www.sellvana.com/fdoc'>sellvana.com</a></p>");
+            } else {
+                throw new $e;
+            }
         }
         $modReg->currentModule(null);
         static::$_migratingModule = null;
