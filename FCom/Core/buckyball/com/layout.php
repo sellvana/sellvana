@@ -1582,6 +1582,9 @@ class BView extends BClass
 
         $metaData = $this->getParam('meta_data');
         if ($metaData) {
+            if (!empty($metaData['layout.include'])) {
+                BLayout::i()->applyLayout($metaData['layout.include']);
+            }
             if (!empty($metaData['layout.yml'])) {
                 $layoutData = BYAML::i()->parse(trim($metaData['layout.yml']));
                 BLayout::i()->addLayout('viewproxy-metadata', $layoutData)->applyLayout('viewproxy-metadata');
