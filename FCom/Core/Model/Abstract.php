@@ -130,4 +130,11 @@ class FCom_Core_Model_Abstract extends BModel
             $config[ static::$_origClass ]['model'] = static::$_origClass;
         }
     }
+
+    public static function getIdField()
+    {
+        $class = static::$_origClass ? static::$_origClass : get_called_class();
+
+        return static::_get_id_column_name( $class );
+    }
 }

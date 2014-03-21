@@ -30,12 +30,8 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
 
     public function export( $models = array(), $toFile = null )
     {
-        if ( !$toFile ) {
-            $toFile = $this->_defaultExportFile;
-        }
-        $path = BConfig::i()->get( 'fs/storage_dir' );
+        $toFile = $this->getFullPath($toFile);
 
-        $toFile = $path . '/export/' . trim( $toFile, '/' );
         BUtil::ensureDir( dirname( $toFile ) );
         $fe = fopen( $toFile, 'w' );
 
@@ -55,15 +51,18 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
         $sorted = $this->sortModels( $exportableModels );
 
         foreach ( $sorted as $s ) {
+            /** @var FCom_Core_Model_Abstract $model */
             $model   = $s[ 'model' ];
             if($model == 'FCom_Catalog_Model_Product'){
                 // disable custom fields to avoid them adding bunch of fields to export
                 FCom_CustomField_Main::i()->disable(true);
             }
             $sample = BDb::ddlFieldInfo($model::table());
+            $idField = $model::getIdField();
             $heading = array( '_default_model' => $model, '_default_fields' => array() );
             foreach ( $sample as $key => $value ) {
-                if ( !in_array( $key, $s[ 'skip' ] ) ) {
+                if ( !in_array( $key, $s[ 'skip' ] ) || $idField == $key ) {
+                    // always export id column
                     $heading['_default_fields'][] = $key;
                 }
             }
@@ -81,6 +80,17 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
                 }
 
             }
+        }
+
+        return true;
+    }
+
+    public function import( $fromFile = null )
+    {
+        $fromFile = $this->getFullPath( $fromFile );
+        if(!is_readable($fromFile)){
+            BDebug::log("Could not find file to import.");
+            return false;
         }
 
         return true;
@@ -201,5 +211,23 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
                 break;
             }
         }
+    }
+
+    /**
+     * @param string $file
+     * @return string
+     */
+    public function getFullPath( $file )
+    {
+        if ( !$file ) {
+            $file = $this->_defaultExportFile;
+        }
+        $path = BConfig::i()->get( 'fs/storage_dir' );
+
+        $file = $path . '/export/' . trim( $file, '/' );
+        if(strpos(realpath(dirname($file)), $path) !== 0){
+            return false;
+        }
+        return $file;
     }
 }
