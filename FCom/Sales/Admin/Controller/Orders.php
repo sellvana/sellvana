@@ -341,4 +341,36 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         return $result;
     }
 
+    public function action_validate_order_number__POST()
+    {
+        $r = BRequest::i()->post('config');
+        $seq = FCom_Core_Model_Seq::i()->orm()->where('entity_type', 'order')->find_one();
+        $result = array('status' => true, 'messages' => '');
+        if ($seq) {
+            if (isset($r['modules']['FCom_Sales']['order_number'])) {
+                $orderNumber = '1'.$r['modules']['FCom_Sales']['order_number'];
+                $configOrderNumber = BConfig::i()->get('modules/FCom_Sales/order_number');
+                if ($configOrderNumber != null) {
+                    $configOrderNumber = '1'.$configOrderNumber;
+                }
+                if ($configOrderNumber && $orderNumber != $configOrderNumber  && $orderNumber < $seq->current_seq_id) {
+                    $result['status'] = false;
+                    $result['messages'] = BLocale::_('Order number must larger than order current: '.$seq->current_seq_id);
+                }
+            }
+        }
+        BResponse::i()->json($result);
+    }
+
+    public function onSaveAdminSettings($args)
+    {
+        if (isset($args['post']['config']['modules']['FCom_Sales']['order_number'])) {
+            $seq = FCom_Core_Model_Seq::i()->orm()->where('entity_type', 'order')->find_one();
+            $configOrderNumber = BConfig::i()->get('modules/FCom_Sales/order_number');
+            $orderNumber = $args['post']['config']['modules']['FCom_Sales']['order_number'];
+            if ($seq && ($configOrderNumber != null || $orderNumber != $configOrderNumber)) {
+                $seq->set('current_seq_id', '1'.$orderNumber)->save();
+            }
+        }
+    }
 }
