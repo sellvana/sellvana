@@ -12,7 +12,14 @@
     </p>
     <h4>{{ "Your billing information" |_ }}</h4>
     <address>
-      {{ billing.get('firstname') ~ ' ' ~ billing.get('lastname') ~ ' (' ~ billing.get('email') ~ ')' }}
+        {{ "First name:"|_ }} {{ billing.get('firstname') }}<br>
+        {{ "Last name:"|_ }} {{ billing.get('lastname') }}<br>
+        {{ "Street:"|_ }} {{ billing.get('street1') ~ ' ' ~ billing.get('street2') ~ ' ' ~ billing.get('street3') }}<br>
+        {{ "City:"|_ }} {{ billing.get('city') }}<br>
+        {{ "State/Region:"|_ }} {{ billing.get('region') }}<br>
+        {{ "Zip/Postal Code:"|_ }} {{ billing.get('postcode') }}<br>
+        {{ "Country:"|_ }} {{ billing.get('country') }}
+      {#{{ billing.get('firstname') ~ ' ' ~ billing.get('lastname') ~ ' (' ~ billing.get('email') ~ ')' }}#}
     </address>
   </div>
 </div>
