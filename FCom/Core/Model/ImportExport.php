@@ -91,8 +91,15 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
 
     public function import( $fromFile = null )
     {
+        $start = microtime(true);
+        /** @var FCom_PushServer_Model_Client $client */
+        $client = FCom_PushServer_Model_Client::sessionClient();
+        $client->send( array( 'channel' => 'import', 'signal' => 'start', 'msg' => "Import started." ) );
+
         $fromFile = $this->getFullPath( $fromFile );
         if(!is_readable($fromFile)){
+            $client->send( array( 'channel' => 'import', 'signal' => 'problem',
+                                  'problem' => "Could not find file to import.\n$fromFile" ) );
             BDebug::log("Could not find file to import.");
             return false;
         }
@@ -108,40 +115,47 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
             $meta = json_decode($importMeta);
             if(isset($meta[self::STORE_UNIQUE_ID_KEY])){
                 $importID  = $meta[self::STORE_UNIQUE_ID_KEY];
+                $client->send( array( 'channel' => 'import', 'signal' => 'info', 'msg' => "Store id: $importID" ) );
             } else {
+                $client->send( array( 'channel' => 'import', 'signal' => 'problem',
+                                      'problem' => "Unique store id is not found, using 'default' as key" ) );
                 BDebug::warning("Unique store id is not found, using 'default' as key");
             }
         }
-
         $currentModel = null;
         $currentModelId = null;
         $currentConfig = null;
         $currentFields = array();
         $currentRelated = array();
-
+        $cnt = 1;
         while ( ( $line = fgets( $fi ) ) !== false ) {
+            $cnt++;
             $isHeading = false;
-            $model = null;
-            $data = json_decode($line);
-            if(isset($data[self::DEFAULT_MODEL_KEY])){
-                $currentModel = $data[self::DEFAULT_MODEL_KEY];
+            /** @var FCom_Core_Model_Abstract $model */
+            $model     = null;
+            $data      = json_decode( $line );
+            if ( isset( $data[ self::DEFAULT_MODEL_KEY ] ) ) {
+                $currentModel   = $data[ self::DEFAULT_MODEL_KEY ];
+                $client->send( array( 'channel' => 'import', 'signal' => 'info', 'msg' => "Importing: $currentModel" ) );
                 $currentModelId = $currentModel::getIdField();
-                $currentConfig = $ieConfig[$currentModel];
-                if(!$currentConfig){
-                    BDebug::warning("Could not find I/E config for $currentModel.");
+                $currentConfig  = $ieConfig[ $currentModel ];
+                if ( !$currentConfig ) {
+                    $client->send( array( 'channel' => 'import', 'signal' => 'problem',
+                                          'problem' => "Could not find I/E config for $currentModel." ) );
+                    BDebug::warning( "Could not find I/E config for $currentModel." );
                     continue;
                 }
 
-                if( isset( $currentConfig[ 'related' ] ) && $importID != self::DEFAULT_STORE_ID ){
+                if ( isset( $currentConfig[ 'related' ] ) && $importID != self::DEFAULT_STORE_ID ) {
                     foreach ( $currentConfig[ 'related' ] as $r ) {
-                        if(isset($currentRelated[$r])){
+                        if ( isset( $currentRelated[ $r ] ) ) {
                             continue;
                         }
-                        list($relModel, $field) = explode('.', $r);
+                        list( $relModel, $field ) = explode( '.', $r );
                         $tempRel = $ieHelper::orm()
-                                 ->select(array('import_id', 'local_id'))
-                                 ->where( array( 'model' => $relModel, 'store_id' => $importID ) )
-                                 ->find_many();
+                                            ->select( array( 'import_id', 'local_id' ) )
+                                            ->where( array( 'model' => $relModel, 'store_id' => $importID ) )
+                                            ->find_many();
 
                         foreach ( $tempRel as $tr ) {
                             $currentRelated[ $r ][ $tr[ 'import_id' ] ] = $tr[ 'local_id' ];
@@ -151,23 +165,27 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
                 $isHeading = true;
             }
 
-            if(isset($data[self::DEFAULT_FIELDS_KEY])){
-                $currentFields = $data[self::DEFAULT_FIELDS_KEY];
-                $isHeading = true;
+
+            if ( isset( $data[ self::DEFAULT_FIELDS_KEY ] ) ) {
+                $currentFields = $data[ self::DEFAULT_FIELDS_KEY ];
+                $isHeading     = true;
             }
 
-            if($isHeading){
+            if ( $isHeading ) {
                 continue;
             }
+            if ( $cnt % 20 == 0 ) {
+                $client->send( array( 'channel' => 'import', 'signal' => 'info', 'msg' => "Importing #$cnt" ) );
+            }
 
-            if(!$this->isArrayAssoc($data)) {
-                $data = array_combine($currentFields, $data);
+            if ( !$this->isArrayAssoc( $data ) ) {
+                $data = array_combine( $currentFields, $data );
                 foreach ( $currentConfig[ 'related' ] as $i => $l ) {
                     // match related ids
-                    if( isset($data[$i]) ){
-                        $tmp = $data[$i];
-                        if(isset($currentRelated[$l][$tmp])){
-                            $data[$i] = $currentRelated[$l][$tmp];
+                    if ( isset( $data[ $i ] ) ) {
+                        $tmp = $data[ $i ];
+                        if ( isset( $currentRelated[ $l ][ $tmp ] ) ) {
+                            $data[ $i ] = $currentRelated[ $l ][ $tmp ];
                         }
                     }
                 }
@@ -178,29 +196,33 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
                     'local_id'  => null,
                 );
                 unset( $data[ $currentModelId ] );
-                if(isset($currentConfig['unique_key'])){
+                if ( isset( $currentConfig[ 'unique_key' ] ) ) {
                     $where = array();
                     foreach ( (array)$currentConfig[ 'unique_key' ] as $key ) {
-                        if(isset($data[$key])){
-                            $where[$key] = $data[$key];
+                        if ( isset( $data[ $key ] ) ) {
+                            $where[ $key ] = $data[ $key ];
                         }
                     }
-                    $model = $currentModel::i()->orm()->where($where)->find_one();
+                    $model = $currentModel::i()->orm()->where( $where )->find_one();
                 }
 
-                if($model){
-                    $model->set($data)->save();
+                if ( $model ) {
+                    $model->set( $data )->save();
                 } else {
                     $model = $currentModel::i()->create( $data )->save();
                 }
-                $ieData['local_id'] = $model->id();
-                $ieHelper->create($ieData)->save();
+                $ieData[ 'local_id' ] = $model->id();
+                $ieHelper->create( $ieData )->save();
             }
         }
         if ( !feof( $fi ) ) {
+            $client->send( array( 'channel' => 'import', 'signal' => 'problem',
+                                  'problem' => "Error: unexpected file fail" ) );
             BDebug::debug( "Error: unexpected file fail");
         }
         fclose( $fi );
+        $client->send( array( 'channel' => 'import', 'signal' => 'finished',
+                              'msg' => "Done in: " . round( microtime(true) - $start) ) . " sec.");
 
         return true;
     }
