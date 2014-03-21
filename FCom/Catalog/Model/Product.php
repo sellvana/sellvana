@@ -77,8 +77,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         ),
     );
 
-    private $_importErrors = null;
-    private $_dataImport = array();
+    protected $_importErrors = null;
+    protected $_dataImport = array();
 
     protected static $_urlPrefix;
 

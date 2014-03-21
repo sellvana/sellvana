@@ -8,7 +8,7 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = 'FCom_Core_Model_ImportExport';
     protected $_table = 'fcom_import_info';
-    protected $_default_export_file = 'export.json';
+    protected $_defaultExportFile = 'export.json';
 
     /**
      * @return array
@@ -31,7 +31,7 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
     public function export( $models = array(), $toFile = null )
     {
         if ( !$toFile ) {
-            $toFile = $this->_default_export_file;
+            $toFile = $this->_defaultExportFile;
         }
         $path = BConfig::i()->get( 'fs/storage_dir' );
 
@@ -108,9 +108,9 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
         return $modelConfigs;
     }
 
-    protected $_export_sorted;
-    protected $_temp_sorted;
-    protected $_is_sorted;
+    protected $_exportSorted;
+    protected $_tempSorted;
+    protected $_isSorted;
 
     /**
      * @param array $models
@@ -120,8 +120,8 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
     {
         foreach ( $models as $k => $m ) {
             if ( !isset( $m[ 'related' ] ) || empty( $m[ 'related' ] ) ) {
-                $this->_export_sorted[ ] = $m; // no dependencies, add to sorted
-                $this->_is_sorted[ $k ]  = 1;
+                $this->_exportSorted[ ] = $m; // no dependencies, add to sorted
+                $this->_isSorted[ $k ]  = 1;
                 continue;
             }
         }
@@ -130,21 +130,21 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
             $this->_sort( $m, $k, $models );
         }
 
-        return $this->_export_sorted;
+        return $this->_exportSorted;
     }
 
     protected function _sort( array $model, $name, array $models )
     {
-        if ( isset( $this->_temp_sorted[ $name ] ) ) {
+        if ( isset( $this->_tempSorted[ $name ] ) ) {
             BDebug::log( "Circular reference, $name", "ie.log" );
         } else {
-            if ( !isset( $this->_is_sorted[ $name ] ) ) {
-                $this->_temp_sorted[ $name ] = 1;
+            if ( !isset( $this->_isSorted[ $name ] ) ) {
+                $this->_tempSorted[ $name ] = 1;
                 if ( isset( $model[ 'related' ] ) ) {
                     foreach ( (array)$model[ 'related' ] as $node ) {
                         $t    = explode( '.', $node );
                         $node = $t[ 0 ];
-                        if ( isset( $this->_is_sorted[ $node ] ) ) {
+                        if ( isset( $this->_isSorted[ $node ] ) ) {
                             continue;
                         }
 
@@ -164,33 +164,29 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
                         $this->_sort( $tmpModel, $node, $models );
                     }
                 }
-                $this->_is_sorted[ $name ] = 1;
-                $this->_export_sorted[ ]   = $model;
-                unset( $this->_temp_sorted[ $name ] );
+                $this->_isSorted[ $name ] = 1;
+                $this->_exportSorted[ ]   = $model;
+                unset( $this->_tempSorted[ $name ] );
             }
         }
     }
 
-    protected
-    function storeUUID()
+    protected function storeUUID()
     {
-        $suid = BConfig::i()->get( 'db/store_unique_id' );
-        if ( !$suid ) {
-            $suid = uniqid( BConfig::i()->get( '' ) );
-            BConfig::i()->set( 'db/store_unique_id', $suid, true )->save();
+        $sUid = BConfig::i()->get( 'db/store_unique_id' );
+        if ( !$sUid ) {
+            $sUid = BUtil::randomString( 32 );
+            BConfig::i()->set( 'db/store_unique_id', $sUid, false, true );
+            FCom_Core_Main::i()->writeConfigFiles();
         }
-        return $suid;
+        return $sUid;
     }
 
     /**
      * @param $handle
      * @param $line
      */
-    protected
-    function writeLine(
-        $handle,
-        $line
-    ) {
+    protected function writeLine( $handle, $line ) {
         $line = trim( $line );
         $l    = strlen( $line );
         if ( $l < 1 ) {
