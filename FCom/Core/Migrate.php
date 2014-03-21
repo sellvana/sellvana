@@ -57,10 +57,26 @@ class FCom_Core_Migrate extends BClass
             ),
         ));
     }
-    
+
     public function upgrade__0_1_2__0_1_3()
     {
         BConfig::i()->set('cookie/session_check_ip', 1, false, true);
         FCom_Core_Main::i()->writeConfigFiles();
+    }
+
+    public function upgrade__0_1_3__0_1_4()
+    {
+        //Source, model, import id, local id
+        BDb::ddlTableDef(FCom_Core_Model_ImportExport::table(), array(
+            'COLUMNS' => array(
+                'id'        => 'int(11)',
+                'store_id'  => 'char(32)',
+                'model'     => 'varchar(100)',
+                'import_id' => 'int(11)',
+                'local_id'  => 'int(11)',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ),
+        ));
     }
 }

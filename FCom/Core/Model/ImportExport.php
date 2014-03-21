@@ -9,6 +9,10 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
     protected static $_origClass = 'FCom_Core_Model_ImportExport';
     protected $_table = 'fcom_import_info';
     protected $_defaultExportFile = 'export.json';
+    const STORE_UNIQUE_ID_KEY = '_store_unique_id';
+    const DEFAULT_FIELDS_KEY = '_default_fields';
+    const DEFAULT_MODEL_KEY = '_default_model';
+    const DEFAULT_STORE_ID = 'default';
 
     /**
      * @return array
@@ -39,7 +43,7 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
             BDebug::log( "Could not open $toFile for writing, aborting export." );
             return false;
         }
-        $this->writeLine( $fe, json_encode( array( '_store_unique_id' => $this->storeUUID() ) ) );
+        $this->writeLine( $fe, json_encode( array( self::STORE_UNIQUE_ID_KEY => $this->storeUUID() ) ) );
         $exportableModels = $this->collectExportableModels();
         if ( !empty( $models ) ) {
             $diff = array_diff( array_keys( $exportableModels ), $models );
@@ -59,14 +63,14 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
             }
             $sample = BDb::ddlFieldInfo($model::table());
             $idField = $model::getIdField();
-            $heading = array( '_default_model' => $model, '_default_fields' => array() );
+            $heading = array( self::DEFAULT_MODEL_KEY => $model, self::DEFAULT_FIELDS_KEY => array() );
             foreach ( $sample as $key => $value ) {
                 if ( !in_array( $key, $s[ 'skip' ] ) || $idField == $key ) {
                     // always export id column
-                    $heading['_default_fields'][] = $key;
+                    $heading[ self::DEFAULT_FIELDS_KEY ][] = $key;
                 }
             }
-            $records = $model::i()->orm()->select($heading['_default_fields'])->find_many();
+            $records = $model::i()->orm()->select($heading[ self::DEFAULT_FIELDS_KEY ])->find_many();
             if ( $records ) {
                 $this->writeLine( $fe, BUtil::toJson( $heading ) );
                 foreach ( $records as $r ) {
@@ -92,10 +96,119 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
             BDebug::log("Could not find file to import.");
             return false;
         }
+        ini_set("auto_detect_line_endings", 1);
+        $fi = fopen($fromFile, 'r');
+        $ieConfig = $this->collectExportableModels();
+        $importID = self::DEFAULT_STORE_ID;
+        /** @var FCom_Core_Model_ImportExport $ieHelper */
+        $ieHelper = static::i();
+
+        $importMeta = fgets($fi);
+        if($importMeta){
+            $meta = json_decode($importMeta);
+            if(isset($meta[self::STORE_UNIQUE_ID_KEY])){
+                $importID  = $meta[self::STORE_UNIQUE_ID_KEY];
+            } else {
+                BDebug::warning("Unique store id is not found, using 'default' as key");
+            }
+        }
+
+        $currentModel = null;
+        $currentModelId = null;
+        $currentConfig = null;
+        $currentFields = array();
+        $currentRelated = array();
+
+        while ( ( $line = fgets( $fi ) ) !== false ) {
+            $isHeading = false;
+            $model = null;
+            $data = json_decode($line);
+            if(isset($data[self::DEFAULT_MODEL_KEY])){
+                $currentModel = $data[self::DEFAULT_MODEL_KEY];
+                $currentModelId = $currentModel::getIdField();
+                $currentConfig = $ieConfig[$currentModel];
+                if(!$currentConfig){
+                    BDebug::warning("Could not find I/E config for $currentModel.");
+                    continue;
+                }
+
+                if( isset( $currentConfig[ 'related' ] ) && $importID != self::DEFAULT_STORE_ID ){
+                    foreach ( $currentConfig[ 'related' ] as $r ) {
+                        if(isset($currentRelated[$r])){
+                            continue;
+                        }
+                        list($relModel, $field) = explode('.', $r);
+                        $tempRel = $ieHelper::orm()
+                                 ->select(array('import_id', 'local_id'))
+                                 ->where( array( 'model' => $relModel, 'store_id' => $importID ) )
+                                 ->find_many();
+
+                        foreach ( $tempRel as $tr ) {
+                            $currentRelated[ $r ][ $tr[ 'import_id' ] ] = $tr[ 'local_id' ];
+                        }
+                    }
+                }
+                $isHeading = true;
+            }
+
+            if(isset($data[self::DEFAULT_FIELDS_KEY])){
+                $currentFields = $data[self::DEFAULT_FIELDS_KEY];
+                $isHeading = true;
+            }
+
+            if($isHeading){
+                continue;
+            }
+
+            if(!$this->isArrayAssoc($data)) {
+                $data = array_combine($currentFields, $data);
+                foreach ( $currentConfig[ 'related' ] as $i => $l ) {
+                    // match related ids
+                    if( isset($data[$i]) ){
+                        $tmp = $data[$i];
+                        if(isset($currentRelated[$l][$tmp])){
+                            $data[$i] = $currentRelated[$l][$tmp];
+                        }
+                    }
+                }
+                $ieData = array(
+                    'store_id'  => $importID,
+                    'model'     => $currentModel,
+                    'import_id' => $data[ $currentModelId ],
+                    'local_id'  => null,
+                );
+                unset( $data[ $currentModelId ] );
+                if(isset($currentConfig['unique_key'])){
+                    $where = array();
+                    foreach ( (array)$currentConfig[ 'unique_key' ] as $key ) {
+                        if(isset($data[$key])){
+                            $where[$key] = $data[$key];
+                        }
+                    }
+                    $model = $currentModel::i()->orm()->where($where)->find_one();
+                }
+
+                if($model){
+                    $model->set($data)->save();
+                } else {
+                    $model = $currentModel::i()->create( $data )->save();
+                }
+                $ieData['local_id'] = $model->id();
+                $ieHelper->create($ieData)->save();
+            }
+        }
+        if ( !feof( $fi ) ) {
+            BDebug::debug( "Error: unexpected file fail");
+        }
+        fclose( $fi );
 
         return true;
     }
 
+    protected function isArrayAssoc( array $arr )
+    {
+        return (bool)count( array_filter( array_keys( $arr ), 'is_string' ) );
+    }
     /**
      * @param BModule $module
      * @return array

@@ -607,14 +607,15 @@ class BUtil extends BClass
     }
 
     /**
-    * Return only specific fields from source array
-    *
-    * @param array $source
-    * @param array|string $fields
-    * @param boolean $inverse if true, will return anything NOT in $fields
-    * @param boolean $setNulls fill missing fields with nulls
-    * @result array
-    */
+     * Return only specific fields from source array
+     *
+     * @param array        $source
+     * @param array|string $fields
+     * @param boolean      $inverse if true, will return anything NOT in $fields
+     * @param boolean      $setNulls fill missing fields with nulls
+     * @return array
+     * @result array
+     */
     static public function arrayMask(array $source, $fields, $inverse=false, $setNulls=true)
     {
         if (is_string($fields)) {
