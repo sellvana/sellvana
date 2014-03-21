@@ -153,6 +153,18 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             }
             unset($tabGroup);
             $view->tab_groups = $tabGroups;
+        } else {
+            if (!$curTab) {
+                $tabs = $view->tabs;
+                foreach ($tabs as $k => &$tab) {
+                    $curTab = $k;
+                    $tab['active'] = true;
+                    $tab['async'] = false;
+                    break;
+                }
+                unset($tab);
+                $view->tabs = $tabs;
+            }
         }
 
         $view->set(array(

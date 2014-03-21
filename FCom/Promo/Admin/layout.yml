@@ -10,14 +10,5 @@ promo_form_tabs:
 #           - [ addTab, attachments, { label: Attachments, async: true, pos: 30 } ]
 #           - [ addTab, history, { label: History, async: true } ]
 
-/promo:
-    - { include: base }
-    - { hook: main, views: admin/grid }
-    - { view: admin/nav, do: [[ setNav, catalog/promo ]] }
-
 /promo/form:
-    - { include: base }
-    - { include: form }
     - { include: promo_form_tabs }
-    - { hook: main, views: admin/form }
-    - { view: admin/nav, do: [[ setNav, catalog/promo ]] }

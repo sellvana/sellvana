@@ -5,18 +5,6 @@ base:
             - [ addNav, customer/customers, { label: Customers, href: /customers, pos: 10 } ]
             - [ addNav, customer/import, { label: Import Customers, href: /customers/import/index, pos: 40 } ]
 
-/customers:
-    - { include: base }
-    - { hook: main, views: admin/grid }
-    - { view: admin/nav, do: [[ setNav, customer/customers ]] }
-
-/customers/form:
-    - { include: base }
-    - { include: form }
-    - { hook: main, views: admin/form }
-    - { view: admin/nav, do: [[ setNav, customer/customers ]] }
-    - { view: admin/form, set: { tab_view_prefix: customer/customers-form/ } }
-
 /customers/import:
     - { include: base }
     - { include: form }

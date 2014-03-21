@@ -1732,7 +1732,7 @@ class BModel extends Model
      *
      * @var array
      */
-    protected $_validationRules = array();
+    protected static $_validationRules = array();
 
     /**
     * Retrieve original class name
@@ -2577,7 +2577,7 @@ class BModel extends Model
         if (!$data && $this->orm) {
             $data = $this->as_array();
         }
-        $rules = array_merge($this->_validationRules, $rules);
+        $rules = array_merge(static::$_validationRules, $rules);
         BEvents::i()->fire($this->_origClass()."::validate:before", array("rules" => &$rules, "data" => &$data));
         $valid = BValidate::i()->validateInput($data, $rules, $formName);
         if (!$valid) {

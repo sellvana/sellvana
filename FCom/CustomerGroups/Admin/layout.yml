@@ -3,21 +3,5 @@ base:
         do:
             - [ addNav, customer/customer-groups, { label: Customer Groups, href: /customer-groups, pos: 20 } ]
 
-/customer-groups:
-    - { include: base }
-    - { hook: main, views: admin/grid }
-    - { view: admin/nav, do: [[ setNav, customer/customer-groups ]] }
-
-/customer-groups/form:
-    - { include: base }
-    - { include: form }
-    - { hook: main, views: admin/form }
-    - { view: admin/nav, do: [[ setNav, customer/customer-groups ]] }
-    - view: admin/form
-        set: { tab_view_prefix: customer-groups/form/ }
-        do:
-            - [ addTab, main, { label: Customer Group, pos: 10 } ]
-            - [ addTab, customer, { label: Customer, pos: 20 } ]
-
 /catalog/products/form:
     - { hook: catalog/products-form/prices, views: customer-groups/product-prices }

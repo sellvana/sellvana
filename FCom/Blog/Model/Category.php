@@ -4,7 +4,7 @@ class FCom_Blog_Model_Category extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_blog_category';
-    protected $_validationRules = array(
+    protected static $_validationRules = array(
         array('url_key', 'FCom_Blog_Model_Category::validateDupUrlKey', 'Duplicate URL Key'),
 
     );

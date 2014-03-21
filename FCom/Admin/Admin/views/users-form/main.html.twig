@@ -1,3 +1,6 @@
+<!--{ label: General Info }-->
+<!--{ pos: 10 }-->
+
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator', m) %}
 {% set hlp = APP.instance('FCom_Admin_Model_User') %}
@@ -17,7 +20,7 @@
                   <input type="checkbox" id="model-superadmin" name="model[is_superadmin]"
                          value="1" {{ validator.fieldValue('is_superadmin') == 1 ? 'checked="checked"' : ''  }} />
               </div>
-  
+
           </div>
       </div>
       <div class="form-group">
