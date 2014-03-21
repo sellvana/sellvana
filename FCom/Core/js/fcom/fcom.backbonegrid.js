@@ -909,7 +909,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     var name = 'hidden' + this.model.get('name');
                     var value = this.model.get('hidden');
                     gridView.collection.each(function (row) {
-                        row.set(name, value);
+                        row.set(name, value, {silent: true});
                     });
 
                     $.post(BackboneGrid.personalize_url, {
@@ -1494,9 +1494,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                     if (modalForm.modalType === 'editable') {
                         for (key in BackboneGrid.modalElementVals) {
-                            BackboneGrid.currentRow.set(key, BackboneGrid.modalElementVals[key]);
+                            BackboneGrid.currentRow.set(key, BackboneGrid.modalElementVals[key], {silent: true});
                         }
                         BackboneGrid.currentRow.save();
+                        rowsCollection.trigger('row_changed', BackboneGrid.currentRow);
                     }
 
                     //check this form is rendered in default view of grid or not.
