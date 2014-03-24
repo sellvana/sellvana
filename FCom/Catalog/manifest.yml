@@ -4,7 +4,7 @@ modules:
         channel: beta
         require: { module: { FCom_Core: 0.1.0 } }
         categories: [ Catalog, Products ]
-        translations: { de: en.php }
+        translations: { en: en.php }
         description: "Categories and products management, admin and frontend"
         auto_use: [ bootstrap, views, layout ]
 
