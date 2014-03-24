@@ -1439,6 +1439,8 @@ class BMigrate extends BClass
             return;
         }
 
+        BConfig::i()->set('db/logging', 1);
+
         // TODO: move special cases from buckyball to fulleron
         // special case for FCom_Admin because some frontend modules require its tables
         if (empty($migration['DEFAULT']['FCom_Admin']['schema_version'])
@@ -1461,7 +1463,7 @@ class BMigrate extends BClass
         BResponse::i()->startLongResponse();
         echo '<html><body><h1>Migrating modules DB structure...</h1><pre>';
         $i = 0;
-
+        $error = false;
         try {
             foreach ($migration as $connectionName => $modules) {
                 BDb::connect($connectionName);
@@ -1534,19 +1536,31 @@ class BMigrate extends BClass
                 FCom_Core_Main::i()->writeConfigFiles('core');
             }
             */
-            if (BDebug::mode() == 'PRODUCTION') {
-                print_r("<p style='color: red'>Whoops, the migration didn't finish. The following url might be helpful: <a href='https://www.sellvana.com/fdoc'>sellvana.com</a></p>");
-            } else {
-                throw new $e;
+            $trace = $e->getTrace();
+            foreach ($trace as $traceStep) {
+                if (strpos($traceStep['file'], BUCKYBALL_ROOT_DIR)!==0) {
+                    break;
+                }
             }
+            echo "\n\n" . $e->getMessage();
+            if (BORM::get_last_query()) {
+                echo "\n\nQUERY: " . BORM::get_last_query();
+            }
+            echo "\n\nLOCATION: " . $traceStep['file'].':'.$traceStep['line'];
+            $error = true;
         }
         $modReg->currentModule(null);
         static::$_migratingModule = null;
 
         $url = !is_null($redirectUrl) ? $redirectUrl : BRequest::i()->currentUrl();
         echo '</pre>';
-        echo '<script>location.href="'.$url.'";</script>';
-        echo 'ALL DONE. <a href="'.$url.'">Click here to continue</a>';
+        if (!$error) {
+            echo '<script>location.href="'.$url.'";</script>';
+            echo '<p>ALL DONE. <a href="'.$url.'">Click here to continue</a></p>';
+        } else {
+            echo '<p>There was an error, please check the output or log file and try again.</p>';
+            echo '<p><a href="'.$url.'">Click here to continue</a></p>';
+        }
         echo '</body></html>';
         exit;
     }

@@ -205,22 +205,26 @@ class BDb
         $results = array();
         foreach ($queries as $i=>$query){
            if (strlen(trim($query)) > 0) {
-                try {
+                // try {
                     BDebug::debug('DB.RUN: '.$query);
                     if (!empty($options['echo'])) {
                         echo '<hr><pre>'.$query.'<pre>';
                     }
+                    BORM::set_last_query($query);
                     if (is_null($params)) {
                         $results[] = BORM::get_db()->exec($query);
                     } else {
                         $results[] = BORM::get_db()->prepare($query)->execute($params);
                     }
-                } catch (Exception $e) {
-                    echo "<hr>{$e->getMessage()}: <pre>{$query}</pre>";
-                    if (empty($options['try'])) {
-                        throw $e;
-                    }
-                }
+                // } catch (Exception $e) {
+                //     $trace = $e->getTrace();
+                //     throw new BException($e->getMessage()
+                //         . " \nFile: " . $trace[1]['file'].':'.$trace[1]['line']
+                //     );
+                //     if (empty($options['try'])) {
+                //         throw $e;
+                //     }
+                // }
            }
         }
         return $results;
@@ -1025,6 +1029,11 @@ class BORM extends ORMWrapper
         return $result;
     }
 
+    public static function set_last_query($query)
+    {
+        static::$_last_query = $query;
+    }
+
     /**
     * Execute the SELECT query that has been built up by chaining methods
     * on this class. Return an array of rows as associative arrays.
@@ -1176,18 +1185,11 @@ class BORM extends ORMWrapper
         BDb::connect( $this->_readConnectionName );
         $query = $this->_build_select();
         static::_log_query( $query, $this->_values );
+        static::$_last_query = $query;
         $statement = static::$_db->prepare( $query );
-        try {
-            $statement->execute( $this->_values );
-        } catch ( Exception $e ) {
-            if (BDebug::mode() == 'PRODUCTION') {
-                print_r("<p style='color: red'>Whoops, the migration didn't finish. The following url might be helpful: <a href='https://www.sellvana.com/fdoc'>sellvana.com</a></p>");
-            } else {
-                echo $query;
-                BDebug::error( $e );
-            }
-            exit;
-        }
+
+        $statement->execute( $this->_values );
+
         return $statement;
     }
 
@@ -1971,6 +1973,23 @@ class BModel extends Model
             ) {
                 $model->cacheStore();
             }
+        }
+        return $model;
+    }
+
+    /**
+     * Load a model or create an empty one if doesn't exist
+     *
+     * @param int|string|array $id
+     * @param string $field
+     * @param boolean $cache
+     * @return BModel
+     */
+    public static function loadOrCreate($id, $field, $cache=false)
+    {
+        $model = static::load($id, $fied, $cache);
+        if (!$model) {
+            $model = static::create();
         }
         return $model;
     }
