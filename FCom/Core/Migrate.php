@@ -91,7 +91,10 @@ class FCom_Core_Migrate extends BClass
                     'id'         => 'int unsigned not null auto_increment',
                     'model_name' => 'varchar(255)',
                 ),
-                'PRIMARY' => '(id)'
+                'PRIMARY' => '(id)',
+                'KEYS' => array(
+                    'model_name' => 'UNIQUE(model_name)',
+                )
             )
         );
 
@@ -103,7 +106,10 @@ class FCom_Core_Migrate extends BClass
                     'id'        => 'int unsigned not null auto_increment',
                     'site_code' => 'char(32)',
                 ),
-                'PRIMARY' => '(id)'
+                'PRIMARY' => '(id)',
+                'KEYS' => array(
+                    'site_code' => 'UNIQUE(site_code)',
+                )
             )
         );
 
