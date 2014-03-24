@@ -1180,8 +1180,12 @@ class BORM extends ORMWrapper
         try {
             $statement->execute( $this->_values );
         } catch ( Exception $e ) {
-            echo $query;
-            print_r( $e );
+            if (BDebug::mode() == 'PRODUCTION') {
+                print_r("<p style='color: red'>Whoops, the migration didn't finish. The following url might be helpful: <a href='https://www.sellvana.com/fdoc'>sellvana.com</a></p>");
+            } else {
+                echo $query;
+                BDebug::error( $e );
+            }
             exit;
         }
         return $statement;

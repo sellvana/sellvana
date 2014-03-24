@@ -2,7 +2,7 @@ modules:
     FCom_Ogone:
         version: 0.1.0
         channel: beta
-        translations: { de: de.php }
+        translations: { en: en.php }
         description: "Ogone Payment Method"
         require: { module: { FCom_Sales: 0.1.10, FCom_Checkout: 0.2.1 } }
         autoload: lib
