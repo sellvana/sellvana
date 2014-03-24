@@ -1972,6 +1972,23 @@ class BModel extends Model
     }
 
     /**
+     * Load a model or create an empty one if doesn't exist
+     *
+     * @param int|string|array $id
+     * @param string $field
+     * @param boolean $cache
+     * @return BModel
+     */
+    public static function loadOrCreate($id, $field, $cache=false)
+    {
+        $model = static::load($id, $fied, $cache);
+        if (!$model) {
+            $model = static::create();
+        }
+        return $model
+    }
+
+    /**
     * Placeholder for after load callback
     *
     * @return BModel
