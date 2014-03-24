@@ -20,7 +20,7 @@ foreach ($modules as $modName => $mod) {
 //        mkdir($targetFile);
         BUtil::ensureDir($targetFile);
     }
-    $targetFile .= '/de.php';
+    $targetFile .= '/en.php';
     if (!file_exists($targetFile)) {
         touch($targetFile);
     }
