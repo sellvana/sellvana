@@ -2,7 +2,7 @@ modules:
     FCom_PaymentCC:
         version: 0.1.0
         channel: beta
-        translations: { de: de.php }
+        translations: { en: en.php }
         description: "Payment Credit Card test module"
         require: { module: { FCom_Sales: 0.1.10 } }
 
