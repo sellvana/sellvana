@@ -1,25 +1,68 @@
 {% set order = THIS.get('order') %}
-{% set billing = order.billing() %}
+{% set addresses = order.addresses %}
 <div class="f-site-main" role="main">
-  <div class="container">
-    <header class="f-page-header">
-      <h1 class="f-page-title">{{ 'Thank you for your order!'|_ }}</h1>
-    </header>
-    <p>{{ "Your order has successfully been submitted." |_ }}
-{% if THIS.get('user') %}<br/>
-    Your {{ "order number is" |_ }} #<a href="{{ APP.href('customer/order/view') ~ '?id=' ~ order.id() }}">{{ order.id() }}</a>. Please note for your record.
-{% endif %}
-    </p>
-    <h4>{{ "Your billing information" |_ }}</h4>
-    <address>
-        {{ "First name:"|_ }} {{ billing.get('firstname') }}<br>
-        {{ "Last name:"|_ }} {{ billing.get('lastname') }}<br>
-        {{ "Street:"|_ }} {{ billing.get('street1') ~ ' ' ~ billing.get('street2') ~ ' ' ~ billing.get('street3') }}<br>
-        {{ "City:"|_ }} {{ billing.get('city') }}<br>
-        {{ "State/Region:"|_ }} {{ billing.get('region') }}<br>
-        {{ "Zip/Postal Code:"|_ }} {{ billing.get('postcode') }}<br>
-        {{ "Country:"|_ }} {{ billing.get('country') }}
-      {#{{ billing.get('firstname') ~ ' ' ~ billing.get('lastname') ~ ' (' ~ billing.get('email') ~ ')' }}#}
-    </address>
-  </div>
+    <div class="container">
+        <header class="f-page-header">
+            <h1 class="f-page-title">{{ 'Thank you for your order!'|_ }}</h1>
+        </header>
+        <p>{{ "Your order has successfully been submitted." |_ }}
+            {% if THIS.get('user') %}<br/>
+                Your {{ "order number is" |_ }} #<a
+                    href="{{ APP.href('customer/order/view') ~ '?id=' ~ order.id() }}">{{ order.id() }}</a>. Please note for your record.
+            {% endif %}
+        </p>
+
+        <div class="row">
+            {% for address in addresses %}
+                <div class="col-md-6">
+                    {% if address.get('atype') == 'billing' %}
+                        <h4>{{ "Your billing information" |_ }}</h4>
+                    {% else %}
+                        <h4>{{ "Your shipping information" |_ }}</h4>
+                    {% endif %}
+                    {{ THIS.view('checkout/success/address').set('address', address) | raw }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                {% if order.items %}
+                    <h4>{{ "Order items" | _ }}</h4>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tr>
+                                <th>{{ "ID" | _ }}</th>
+                                <th>{{ "Info" | _ }}</th>
+                                <th>{{ "Qty" | _ }}</th>
+                                <th>{{ "Total" | _ }}</th>
+                            </tr>
+                            {% for item in order.items %}
+                                <tr>
+                                    <td>{{ item.get('id') }}</td>
+                                    <td>{{ THIS.view('checkout/success/item').set('product', UTIL.fromJson(item.get('product_info'))) | raw }} </td>
+                                    <td>{{ item.get('qty') }} </td>
+                                    <td>{{ item.get('total') }} </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-6">
+                <p><strong>{{ "Shipping" | _ }}:</strong>{{ order.get('shipping_method') }}</p>
+                <p><strong>{{ "Payment" | _ }}:</strong>{{ order.get('payment_method') }}</p>
+                <p><strong>{{ "Status" | _ }}:</strong>{{ order.get('status') }}</p>
+            </div>
+            <div class="col-xs-6">
+                <p><strong>{{ "Subtotal" | _ }}:</strong>{{ order.get('subtotal') }}</p>
+                <p><strong>{{ "Tax" | _ }}:</strong>{{ order.get('tax') }}</p>
+                <p><strong>{{ "Grand Total" | _ }}:</strong>{{ order.get('grandtotal') }}</p>
+            </div>
+        </div>
+
+    </div>
 </div>
