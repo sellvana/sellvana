@@ -4,10 +4,9 @@
  * Created by pp
  * @project sellvana_core
  */
-class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
+class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 {
-    protected static $_origClass = 'FCom_Core_Model_ImportExport';
-    protected $_table = 'fcom_import_info';
+    protected static $_origClass = __CLASS__;
     protected $_defaultExportFile = 'export.json';
     const STORE_UNIQUE_ID_KEY = '_store_unique_id';
     const DEFAULT_FIELDS_KEY = '_default_fields';
@@ -43,7 +42,7 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
             BDebug::log( "Could not open $toFile for writing, aborting export." );
             return false;
         }
-        $this->writeLine( $fe, json_encode( array( self::STORE_UNIQUE_ID_KEY => $this->storeUUID() ) ) );
+        $this->writeLine( $fe, json_encode( array( static::STORE_UNIQUE_ID_KEY => $this->storeUUID() ) ) );
         $exportableModels = $this->collectExportableModels();
         if ( !empty( $models ) ) {
             $diff = array_diff( array_keys( $exportableModels ), $models );
@@ -63,14 +62,14 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
             }
             $sample = BDb::ddlFieldInfo($model::table());
             $idField = $model::getIdField();
-            $heading = array( self::DEFAULT_MODEL_KEY => $model, self::DEFAULT_FIELDS_KEY => array() );
+            $heading = array( static::DEFAULT_MODEL_KEY => $model, static::DEFAULT_FIELDS_KEY => array() );
             foreach ( $sample as $key => $value ) {
                 if ( !in_array( $key, $s[ 'skip' ] ) || $idField == $key ) {
                     // always export id column
-                    $heading[ self::DEFAULT_FIELDS_KEY ][] = $key;
+                    $heading[ static::DEFAULT_FIELDS_KEY ][] = $key;
                 }
             }
-            $records = $model::i()->orm()->select($heading[ self::DEFAULT_FIELDS_KEY ])->find_many();
+            $records = $model::i()->orm()->select($heading[ static::DEFAULT_FIELDS_KEY ])->find_many();
             if ( $records ) {
                 $this->writeLine( $fe, BUtil::toJson( $heading ) );
                 foreach ( $records as $r ) {
@@ -92,13 +91,13 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
     public function import( $fromFile = null )
     {
         $start = microtime(true);
-        /** @var FCom_PushServer_Model_Client $client */
-        $client = FCom_PushServer_Model_Client::sessionClient();
-        $client->send( array( 'channel' => 'import', 'signal' => 'start', 'msg' => "Import started." ) );
+        /** @var FCom_PushServer_Model_Channel $channel */
+        $channel = FCom_PushServer_Model_Channel::i()->getChannel('import', true);
+        $channel->send( array( 'channel' => 'import', 'signal' => 'start', 'msg' => "Import started." ) );
 
         $fromFile = $this->getFullPath( $fromFile );
         if(!is_readable($fromFile)){
-            $client->send( array( 'channel' => 'import', 'signal' => 'problem',
+            $channel->send( array( 'channel' => 'import', 'signal' => 'problem',
                                   'problem' => "Could not find file to import.\n$fromFile" ) );
             BDebug::log("Could not find file to import.");
             return false;
@@ -106,18 +105,18 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
         ini_set("auto_detect_line_endings", 1);
         $fi = fopen($fromFile, 'r');
         $ieConfig = $this->collectExportableModels();
-        $importID = self::DEFAULT_STORE_ID;
-        /** @var FCom_Core_Model_ImportExport $ieHelper */
+        $importID = static::DEFAULT_STORE_ID;
+        /** @var FCom_Core_ImportExport $ieHelper */
         $ieHelper = static::i();
 
         $importMeta = fgets($fi);
         if($importMeta){
             $meta = json_decode($importMeta);
-            if(isset($meta[self::STORE_UNIQUE_ID_KEY])){
-                $importID  = $meta[self::STORE_UNIQUE_ID_KEY];
-                $client->send( array( 'channel' => 'import', 'signal' => 'info', 'msg' => "Store id: $importID" ) );
+            if(isset($meta[static::STORE_UNIQUE_ID_KEY])){
+                $importID  = $meta[static::STORE_UNIQUE_ID_KEY];
+                $channel->send( array( 'channel' => 'import', 'signal' => 'info', 'msg' => "Store id: $importID" ) );
             } else {
-                $client->send( array( 'channel' => 'import', 'signal' => 'problem',
+                $channel->send( array( 'channel' => 'import', 'signal' => 'problem',
                                       'problem' => "Unique store id is not found, using 'default' as key" ) );
                 BDebug::warning("Unique store id is not found, using 'default' as key");
             }
@@ -134,19 +133,19 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
             /** @var FCom_Core_Model_Abstract $model */
             $model     = null;
             $data      = json_decode( $line );
-            if ( isset( $data[ self::DEFAULT_MODEL_KEY ] ) ) {
-                $currentModel   = $data[ self::DEFAULT_MODEL_KEY ];
-                $client->send( array( 'channel' => 'import', 'signal' => 'info', 'msg' => "Importing: $currentModel" ) );
+            if ( isset( $data[ static::DEFAULT_MODEL_KEY ] ) ) {
+                $currentModel   = $data[ static::DEFAULT_MODEL_KEY ];
+                $channel->send( array( 'channel' => 'import', 'signal' => 'info', 'msg' => "Importing: $currentModel" ) );
                 $currentModelId = $currentModel::getIdField();
                 $currentConfig  = $ieConfig[ $currentModel ];
                 if ( !$currentConfig ) {
-                    $client->send( array( 'channel' => 'import', 'signal' => 'problem',
+                    $channel->send( array( 'channel' => 'import', 'signal' => 'problem',
                                           'problem' => "Could not find I/E config for $currentModel." ) );
                     BDebug::warning( "Could not find I/E config for $currentModel." );
                     continue;
                 }
 
-                if ( isset( $currentConfig[ 'related' ] ) && $importID != self::DEFAULT_STORE_ID ) {
+                if ( isset( $currentConfig[ 'related' ] ) && $importID != static::DEFAULT_STORE_ID ) {
                     foreach ( $currentConfig[ 'related' ] as $r ) {
                         if ( isset( $currentRelated[ $r ] ) ) {
                             continue;
@@ -166,8 +165,8 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
             }
 
 
-            if ( isset( $data[ self::DEFAULT_FIELDS_KEY ] ) ) {
-                $currentFields = $data[ self::DEFAULT_FIELDS_KEY ];
+            if ( isset( $data[ static::DEFAULT_FIELDS_KEY ] ) ) {
+                $currentFields = $data[ static::DEFAULT_FIELDS_KEY ];
                 $isHeading     = true;
             }
 
@@ -175,7 +174,7 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
                 continue;
             }
             if ( $cnt % 20 == 0 ) {
-                $client->send( array( 'channel' => 'import', 'signal' => 'info', 'msg' => "Importing #$cnt" ) );
+                $channel->send( array( 'channel' => 'import', 'signal' => 'info', 'msg' => "Importing #$cnt" ) );
             }
 
             if ( !$this->isArrayAssoc( $data ) ) {
@@ -216,12 +215,12 @@ class FCom_Core_Model_ImportExport extends FCom_Core_Model_Abstract
             }
         }
         if ( !feof( $fi ) ) {
-            $client->send( array( 'channel' => 'import', 'signal' => 'problem',
+            $channel->send( array( 'channel' => 'import', 'signal' => 'problem',
                                   'problem' => "Error: unexpected file fail" ) );
             BDebug::debug( "Error: unexpected file fail");
         }
         fclose( $fi );
-        $client->send( array( 'channel' => 'import', 'signal' => 'finished',
+        $channel->send( array( 'channel' => 'import', 'signal' => 'finished',
                               'msg' => "Done in: " . round( microtime(true) - $start) ) . " sec.");
 
         return true;

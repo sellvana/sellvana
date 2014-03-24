@@ -67,7 +67,7 @@ class FCom_Core_Migrate extends BClass
     public function upgrade__0_1_3__0_1_4()
     {
         //Source, model, import id, local id
-        BDb::ddlTableDef(FCom_Core_Model_ImportExport::table(), array(
+        BDb::ddlTableDef(FCom_Core_ImportExport::table(), array(
             'COLUMNS' => array(
                 'id'        => 'int(11)',
                 'store_id'  => 'char(32)',
@@ -78,5 +78,55 @@ class FCom_Core_Migrate extends BClass
                 'update_at' => 'datetime',
             ),
         ));
+    }
+
+    public function upgrade__0_1_4__0_1_5()
+    {
+        BDb::run("DROP TABLE IF EXISTS fcom_import_info");
+        $tModel = FCom_Core_Model_ImportExport_Model::table();
+        BDb::ddlTableDef(
+            $tModel,
+            array(
+                'COLUMNS' => array(
+                    'id'         => 'int unsigned not null auto_increment',
+                    'model_name' => 'varchar(255)',
+                ),
+                'PRIMARY' => '(id)'
+            )
+        );
+
+        $tSite = FCom_Core_Model_ImportExport_Site::table();
+        BDb::ddlTableDef(
+            $tSite,
+            array(
+                'COLUMNS' => array(
+                    'id'        => 'int unsigned not null auto_increment',
+                    'site_code' => 'char(32)',
+                ),
+                'PRIMARY' => '(id)'
+            )
+        );
+
+        //Source, model, import id, local id
+        BDb::ddlTableDef(
+            FCom_Core_Model_ImportExport_Id::table(),
+            array(
+                'COLUMNS' => array(
+                    'id'        => 'int unsigned not null auto_increment',
+                    'site_id'   => 'int unsigned',
+                    'model_id'  => 'int unsigned',
+                    'import_id' => 'int unsigned',
+                    'local_id'  => 'int unsigned',
+                    'create_at' => 'datetime',
+                    'update_at' => 'datetime',
+                ),
+                'PRIMARY' => '(id)',
+                'CONSTRAINTS' => array(
+                    'Ffk_import_fk_model_id' => "FOREIGN KEY (model_id) REFERENCES {$tModel}(id) ON DELETE CASCADE ON UPDATE CASCADE",
+                    'Ffk_import_fk_site_id' => "FOREIGN KEY (site_id) REFERENCES {$tSite}(id) ON DELETE CASCADE ON UPDATE CASCADE",
+                ),
+            )
+        );
+
     }
 }
