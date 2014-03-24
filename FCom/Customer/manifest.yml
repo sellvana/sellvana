@@ -3,7 +3,7 @@ modules:
         version: 0.1.8
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_Geo: 0.1.0 } }
-        translations: { de: de.php }
+        translations: { en: en.php }
         description: Customer Accounts and Management
         areas:
             FCom_Admin:

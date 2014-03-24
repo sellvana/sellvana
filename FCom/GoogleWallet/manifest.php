@@ -8,7 +8,7 @@
             'require' => array(
                 'module' => array('FCom_Checkout'=>'0.1.0'),
             ),
-            //'translations' => array('de' => 'de.php'),
+            //'translations' => array('en' => 'en.php'),
             'description' => "Google Wallet payment method",
         ),
 
