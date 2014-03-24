@@ -9,7 +9,7 @@ class FCom_CustomerGroups_Model_Group extends FCom_Core_Model_Abstract
     protected static $_table = "fcom_customer_groups";
     protected static $_origClass = __CLASS__;
 
-    protected $_validationRules = array(
+    protected static $_validationRules = array(
         array('title', '@required'),
         array('code', '@required'),
     );

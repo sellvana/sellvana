@@ -10,6 +10,8 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'm';
     protected $_gridViewName = 'core/backbonegrid';
+    protected $_navPath = 'modules/installed';
+    protected $_useDefaultLayout = false;
 
     public function getModulesData()
     {

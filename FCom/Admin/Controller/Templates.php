@@ -7,6 +7,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
     protected $_gridHref = 'templates';
     protected $_gridTitle = 'Frontend Templates';
     protected $_recordName = 'Template';
+    protected $_navPath = 'system/templates';
 
     public function gridConfig()
     {

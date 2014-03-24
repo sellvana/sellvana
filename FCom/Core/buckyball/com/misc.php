@@ -1407,7 +1407,7 @@ class BUtil extends BClass
             $ptime = strtotime($ptime);
         }
         if (!$now) {
-            $now = time();
+            $now = strtotime(BDb::now());#time();
         } elseif (!is_numeric($now)) {
             $now = strtotime($now);
         }

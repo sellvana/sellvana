@@ -24,7 +24,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         ),
     );
 
-    protected $_validationRules = array(
+    protected static $_validationRules = array(
         array('username', '@required'),
         array('email', '@required'),
         array('email', '@email'),

@@ -41,7 +41,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     private static $lastImportedCustomer = 0;
 
-    protected $_validationRules = array(
+    protected static $_validationRules = array(
         array('email', '@required'),
         array('firstname', '@required'),
         array('lastname', '@required'),
@@ -74,7 +74,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
      */
     public function setLoginRules()
     {
-        $this->_validationRules =  array(
+        static::$_validationRules =  array(
             array('email', '@required'),
             array('password', '@required'),
             array('email', '@email'),
@@ -86,7 +86,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
      */
     public function setPasswordRecoverRules()
     {
-        $this->_validationRules =  array(
+        static::$_validationRules =  array(
             array('email', '@required'),
             array('email', '@email'),
         );
@@ -94,21 +94,21 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public function setAccountEditRules($incChangePassword = false)
     {
-        $this->_validationRules = array(
+        static::$_validationRules = array(
             array('email', '@required'),
             array('firstname', '@required'),
             array('lastname', '@required'),
         );
 
         if ($incChangePassword) {
-            $this->_validationRules[] = array('password', '@required');
-            $this->_validationRules[] = array('password_confirm', '@password_confirm');
+            static::$_validationRules[] = array('password', '@required');
+            static::$_validationRules[] = array('password_confirm', '@password_confirm');
         }
     }
 
     public function setChangePasswordRules()
     {
-        $this->_validationRules = array(
+        static::$_validationRules = array(
             array('current_password', '@required'),
             array('password', '@required'),
             array('password_confirm', '@password_confirm'),
@@ -117,7 +117,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public function setSimpleRegisterRules()
     {
-        $this->_validationRules = array(
+        static::$_validationRules = array(
             array('email', '@required'),
             array('password', '@required'),
             array('password_confirm', '@password_confirm'),

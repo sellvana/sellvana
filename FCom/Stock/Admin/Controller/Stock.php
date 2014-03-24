@@ -9,6 +9,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
     protected $_gridTitle = 'Stock Inventory';
     protected $_recordName = 'SKU';
     protected $_mainTableAlias = 's';
+    protected $_navPath = 'catalog/stock';
 
     public function gridConfig()
     {
@@ -16,13 +17,13 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
         $config['columns'] = array(
             array('type'=>'row_select'),
             array('name' => 'id', 'label'=>'ID', 'width'=>50, 'index' => 's.id'),
-            array('type'=>'input', 'name' => 'sku', 'label' => 'SKU', 'width' => 300, 'index' => 's.sku', 
-                    'editable' => true, 'addable' => true, 'edit_inline' => true, 'editor' => 'text', 
+            array('type'=>'input', 'name' => 'sku', 'label' => 'SKU', 'width' => 300, 'index' => 's.sku',
+                    'editable' => true, 'addable' => true, 'edit_inline' => true, 'editor' => 'text',
                     'validation' => array('required' => true, 'unique' => BApp::href('stock/unique'))),
-            array('type'=>'input', 'name' => 'qty_in_stock', 'label' => 'Qty In Stock', 'width' => 300, 
-                    'index' => 's.qty_in_stock', 'editable' => true, 'addable' => true, 'edit_inline' => true, 
+            array('type'=>'input', 'name' => 'qty_in_stock', 'label' => 'Qty In Stock', 'width' => 300,
+                    'index' => 's.qty_in_stock', 'editable' => true, 'addable' => true, 'edit_inline' => true,
                     'editor' => 'text', 'validation' => array('required' => true, 'number' => true)),
-            array('type'=>'btn_group', 
+            array('type'=>'btn_group',
                   'buttons'=> array(
                                     array('name'=>'edit'),
                                     array('name'=>'delete'),

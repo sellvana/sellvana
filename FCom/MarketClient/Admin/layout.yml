@@ -4,17 +4,6 @@ base:
             - [ addNav, modules/remote, { label: Install from Market, href: /marketclient/connect, target: MarketClient } ]
             - [ addNav, modules/publish, { label: Publish to Market, href: /marketclient/publish } ]
 
-/marketclient:
-    - { include: base }
-    - { hook: main, views: admin/grid }
-    - { view: admin/nav, do: [[ setNav, modules ]] }
-
-/marketclient/form:
-    - { include: base }
-    - { include: form }
-    - { hook: main, views: admin/form }
-    - { view: admin/nav, do: [[ setNav, modules ]] }
-
 /marketclient/remote:
     - { include: base }
     - { root: marketclient/remote }

@@ -44,7 +44,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         ),
     );
 
-    protected $_validationRules = array(
+    protected static $_validationRules = array(
         array('product_name', '@required'),
         array('base_price', '@required'),
         array('local_sku', '@required'),

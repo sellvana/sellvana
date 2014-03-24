@@ -9,6 +9,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     protected $_gridTitle = 'Promotions';
     protected $_recordName = 'Promotion';
     protected $_mainTableAlias = 'p';
+    protected $_navPath = 'catalog/promo';
 
     public function gridConfig()
     {

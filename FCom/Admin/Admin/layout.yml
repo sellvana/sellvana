@@ -60,9 +60,9 @@ base:
       - [ css, @FCom_Admin/Admin/js/dynatree/skin-vista/ui.dynatree.css ]
   - { include: common_js_libs }
   - { include: lib_admin_theme1 }
-  - { include: grid }
+  #- { include: grid }
   #- { include: jqgrid }
-  - { include: jstree }
+  #- { include: jstree }
  # - { include: lib_backgrid }
 
   - view: head
@@ -256,12 +256,23 @@ flot:
       - [ requireJs, flot.symbol, @FCom_Admin/Admin/js/flot/jquery.flot.symbol.min, { deps: [ flot ] } ]
       - [ requireJs, flot.time, @FCom_Admin/Admin/js/flot/jquery.flot.time.min, { deps: [ flot ] } ]
       - [ requireJs, flot.threshold, @FCom_Admin/Admin/js/flot/jquery.flot.threshold.min, { deps: [ flot ] } ]
+
+default_grid:
+  - { include: base }
+  - { hook: main, views: admin/grid }
+
+default_form:
+    - { include: base }
+    - { include: form }
+    - { hook: main, views: admin/form }
+
 form:
   - view: head
     do:
       #- [ css, @FCom_Core/js/lib/themes/default/style.css ]
-  - { include: jstree }
-  - { include: lib_cleditor }
+  #- { include: jstree }
+  #- { include: lib_cleditor }
+
 
 404:
   - { include: base }
@@ -310,38 +321,6 @@ form:
     - { include: base }
     - { hook: main, views: reports }
 
-/users:
-    - { include: base }
-    - { hook: main, views: admin/grid }
-    - { view: admin/nav, do: [[ setNav, system/users ]] }
-
-/users/form:
-    - { include: base }
-    - { include: form }
-    - { view: admin/nav, do: [[ setNav, system/users ]] }
-    - { hook: main, views: admin/form }
-    - view: admin/form
-      set: { tab_view_prefix: users-form/ }
-      do:
-        - [ addTab, main, { label: General Info, pos: 10 } ]
-#        - [ addTab, history, { label: History } ]
-
-/roles:
-    - { include: base }
-    - { hook: main, views: admin/grid }
-    - { view: admin/nav, do: [[ setNav, system/roles ]] }
-
-/roles/form:
-    - { include: base }
-    - { include: form }
-    - { view: admin/nav, do: [[ setNav, system/roles ]] }
-    - { hook: main, views: admin/form }
-    - view: admin/form
-      set: { tab_view_prefix: roles-form/ }
-      do:
-        - [ addTab, main, { label: Permissions } ]
-        - [ addTab, users, { label: Users } ]
-
 /settings:
     - { include: base }
     - { include: form }
@@ -364,34 +343,5 @@ form:
     - { hook: main, views: modules }
     - { view: admin/nav, do: [[ setNav, modules/installed ]] }
 
-/templates:
-    - { include: base }
-    - { hook: main, views: admin/grid }
-    - { view: admin/nav, do: [[ setNav, system/templates ]] }
-
 /templates/form:
-    - { include: base }
-    - { include: form }
     - { include: codemirror }
-    - { hook: main, views: admin/form }
-    - { view: admin/nav, do: [[ setNav, system/templates ]] }
-    - view: admin/form
-        set: { tab_view_prefix: templates-form/ }
-        do:
-            - [ addTab, main, { label: Template, pos: 10 } ]
-
-/backups:
-    - { include: base }
-    - { hook: main, views: admin/grid }
-    - { view: admin/nav, do: [[ setNav, system/backups ]] }
-
-/backups/form:
-    - { include: base }
-    - { include: form }
-    - { include: codemirror }
-    - { hook: main, views: admin/form }
-    - { view: admin/nav, do: [[ setNav, system/backups ]] }
-    - view: admin/form
-        set: { tab_view_prefix: backups-form/ }
-        do:
-            - [ addTab, main, { label: Backup, pos: 10 } ]
