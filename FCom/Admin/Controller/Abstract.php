@@ -102,6 +102,10 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                     $tab['disabled'] = true;
                     continue;
                 }
+                if ($k === $curTab) {
+                    $tab['active'] = true;
+                    $tab['async'] = false;
+                }
                 if (!empty($tab['view'])) {
                     $tabView = $layout->view($tab['view']);
                     if ($tabView) {
@@ -149,6 +153,18 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             }
             unset($tabGroup);
             $view->tab_groups = $tabGroups;
+        } else {
+            if (!$curTab) {
+                $tabs = $view->tabs;
+                foreach ($tabs as $k => &$tab) {
+                    $curTab = $k;
+                    $tab['active'] = true;
+                    $tab['async'] = false;
+                    break;
+                }
+                unset($tab);
+                $view->tabs = $tabs;
+            }
         }
 
         $view->set(array(

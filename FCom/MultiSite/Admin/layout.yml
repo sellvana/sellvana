@@ -3,20 +3,6 @@ base:
         do:
             - [ addNav, system/multisite, { label: Multi Site, pos: 30, href: /multisite } ]
 
-/multisite:
-    - { include: base }
-    - { hook: main, views: admin/grid }
-    - { view: admin/nav, do: [[ setNav, system/multisite ]] }
-
-/multisite/form:
-    - { include: base }
-    - { include: form }
-    - { view: admin/nav, do: [[ setNav, system/multisite ]] }
-    - view: admin/form
-        set: { tab_view_prefix: multisite/sites-form/ }
-        do:
-            - [ addTab, main, { label: Site Info, pos: 10 } ]
-
 /settings:
     - view: settings
         do:

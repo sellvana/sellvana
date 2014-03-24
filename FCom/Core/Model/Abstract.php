@@ -30,6 +30,8 @@ class FCom_Core_Model_Abstract extends BModel
      */
     static protected $_dataFieldsMap = array();
 
+    static protected $_importExportProfile;
+
     /**
      * Get custom data from serialized field
      *
@@ -119,5 +121,20 @@ class FCom_Core_Model_Abstract extends BModel
         }
 
         return true;
+    }
+
+    public function registerImportExport( &$config )
+    {
+        if ( !empty(static::$_importExportProfile) ) {
+            $config[ static::$_origClass ] = static::$_importExportProfile;
+            $config[ static::$_origClass ]['model'] = static::$_origClass;
+        }
+    }
+
+    public static function getIdField()
+    {
+        $class = static::$_origClass ? static::$_origClass : get_called_class();
+
+        return static::_get_id_column_name( $class );
     }
 }

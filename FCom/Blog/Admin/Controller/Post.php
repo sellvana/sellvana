@@ -9,6 +9,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
     protected $_recordName = 'Blog Post';
     protected $_permission = 'blog';
     protected $_mainTableAlias = 'p';
+    protected $_navPath = 'cms/blog';
 
     public function gridConfig()
     {

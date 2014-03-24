@@ -8,6 +8,16 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 
     protected static $_urlPrefix;
 
+    protected static $_importExportProfile = array(
+        'skip'    => array(),
+        'related' => array(
+            'parent_id' => 'FCom_Catalog_Model_Category.id',
+        ),
+        'calc'    => array(
+            'id_path' => 'FCom_Catalog_Model_Category.id',
+        ),
+    );
+
     public function productsORM()
     {
         return FCom_Catalog_Model_Product::i()->orm('p')
@@ -48,7 +58,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 
     /**
      * Add category to top menu
-     * @param type $set
+     * @param bool $set
      */
     public function setInMenu($set=true)
     {

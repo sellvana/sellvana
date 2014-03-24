@@ -7,7 +7,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     protected static $_cacheAuto = array('id', 'full_name', 'url_path');
     protected static $_cacheFlags = array('full_name'=>array('key_lower'));
 
-    protected $_validationRules = array(
+    protected static $_validationRules = array(
         /*array('parent_id', '@required'),
         array('id_path', '@required'),
         array('sort_order', '@required'),*/

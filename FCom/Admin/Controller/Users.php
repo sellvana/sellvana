@@ -9,6 +9,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
     protected $_gridTitle = 'Admin Users';
     protected $_recordName = 'User';
     protected $_mainTableAlias = 'au';
+    protected $_navPath = 'system/users';
 
     public function gridConfig()
     {

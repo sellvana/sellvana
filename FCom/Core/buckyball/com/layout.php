@@ -178,7 +178,7 @@ class BLayout extends BClass
      * For renderer to work, params should either be array with 'renderer' field
      * or a string representing renderer class.
      *
-     * @param string $ext
+     * @param       $name
      * @param array $params
      * @return $this
      */
@@ -1396,7 +1396,7 @@ class BView extends BClass
     }
 
     /**
-     * @param string $defaultFileExt
+     * @param null $fileExt
      * @param bool $quiet
      * @return BView|mixed|string
      */
@@ -1582,6 +1582,9 @@ class BView extends BClass
 
         $metaData = $this->getParam('meta_data');
         if ($metaData) {
+            if (!empty($metaData['layout.include'])) {
+                BLayout::i()->applyLayout($metaData['layout.include']);
+            }
             if (!empty($metaData['layout.yml'])) {
                 $layoutData = BYAML::i()->parse(trim($metaData['layout.yml']));
                 BLayout::i()->addLayout('viewproxy-metadata', $layoutData)->applyLayout('viewproxy-metadata');

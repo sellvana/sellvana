@@ -36,7 +36,7 @@ class FCom_Promo_Model_Promo extends BModel
         ),
     );
 
-    protected $_validationRules = array(
+    protected static $_validationRules = array(
         array('description', '@required'),
 //        array('manuf_vendor_id', '@required'),
 
