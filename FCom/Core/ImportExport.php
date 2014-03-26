@@ -108,12 +108,12 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         $start = microtime(true);
         /** @var FCom_PushServer_Model_Channel $channel */
         $this->channel = FCom_PushServer_Model_Channel::i()->getChannel( 'import', true );
-        $this->channel->send( array( 'channel' => 'import', 'signal' => 'start', 'msg' => "Import started." ) );
+        $this->channel->send( array( 'signal' => 'start', 'msg' => "Import started." ) );
         $bs = BConfig::i()->get("FCom_Core/import_export/batch_size", 100);
 
         $fromFile = $this->getFullPath( $fromFile );
         if(!is_readable($fromFile)){
-            $this->channel->send( array( 'channel' => 'import', 'signal' => 'problem',
+            $this->channel->send( array( 'signal' => 'problem',
                                   'problem' => "Could not find file to import.\n$fromFile" ) );
             BDebug::log("Could not find file to import.");
             return false;
@@ -130,11 +130,11 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $meta = json_decode( $importMeta );
             if ( isset( $meta->{static::STORE_UNIQUE_ID_KEY} ) ) {
                 $importID = $meta->{static::STORE_UNIQUE_ID_KEY};
-                $this->channel->send( array( 'channel' => 'import', 'signal' => 'info', 'msg' => "Store id: $importID" ) );
+                $this->channel->send( array( 'signal' => 'info', 'msg' => "Store id: $importID" ) );
             } else {
                 $this->channel->send(
                     array(
-                        'channel' => 'import',
+
                         'signal'  => 'problem',
                         'problem' => "Unique store id is not found, using 'default' as key"
                     )
@@ -172,7 +172,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                     $batchData = array();
                 }
                 $this->currentModel   = $data[ static::DEFAULT_MODEL_KEY ];
-                $this->channel->send( array( 'channel' => 'import', 'signal' => 'info', 'msg' => "Importing: $this->currentModel" ) );
+                $this->channel->send( array( 'signal' => 'info', 'msg' => "Importing: $this->currentModel" ) );
                 if ( !isset( $this->importModels[ $this->currentModel ] ) ) {
                     // first time importing this model
                     $tm = $ieHelperMod->load( $this->currentModel, 'model_name' ); // check if it has been created
@@ -186,7 +186,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 $this->currentModelIdField = $cm::i()->getIdField();
                 $this->currentConfig  = $ieConfig[ $this->currentModel ];
                 if ( !$this->currentConfig ) {
-                    $this->channel->send( array( 'channel' => 'import', 'signal' => 'problem',
+                    $this->channel->send( array( 'signal' => 'problem',
                                           'problem' => "Could not find I/E config for $this->currentModel." ) );
                     BDebug::warning( "Could not find I/E config for $this->currentModel." );
                     continue;
@@ -223,25 +223,25 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             if( $cnt % $bs != 0 ){
                 continue; // accumulate batch data
             } else {
-                $this->channel->send( array( 'channel' => 'import', 'signal' => 'info', 'msg' => "Importing #$cnt" ) );
+                $this->channel->send( array( 'signal' => 'info', 'msg' => "Importing #$cnt" ) );
             }
 
             $this->importBatch( $batchData );
             $batchData = array();
         }
         if ( !feof( $fi ) ) {
-            $this->channel->send( array( 'channel' => 'import', 'signal' => 'problem',
+            $this->channel->send( array( 'signal' => 'problem',
                                   'problem' => "Error: unexpected file fail" ) );
             BDebug::debug( "Error: unexpected file fail");
         }
         fclose( $fi );
-        $this->channel->send( array( 'channel' => 'import', 'signal' => 'new_models',
+        $this->channel->send( array( 'signal' => 'new_models',
                               'msg' => BLocale::_( "Created %d new models", $this->newModels )));
-        $this->channel->send( array( 'channel' => 'import', 'signal' => 'updated_models',
+        $this->channel->send( array( 'signal' => 'updated_models',
                               'msg' => BLocale::_( "Updated %d models", $this->updatedModels )));
-        $this->channel->send( array( 'channel' => 'import', 'signal' => 'finished',
+        $this->channel->send( array( 'signal' => 'finished',
                               'msg' => BLocale::_( "No changes for %d models", $this->notChanged )));
-        $this->channel->send( array( 'channel' => 'import', 'signal' => 'finished',
+        $this->channel->send( array( 'signal' => 'finished',
                               'msg' => "Done in: " . round( microtime(true) - $start) ) . " sec.");
 
         return true;
@@ -352,7 +352,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 }
             } catch ( PDOException $e ) {
                 BDebug::logException($e);
-                $this->channel->send( array( 'channel' => 'import', 'signal' => 'problem',
+                $this->channel->send( array( 'signal' => 'problem',
                                       'problem' => "Error: unexpected file fail" ) );
             }
 
