@@ -2,7 +2,7 @@ modules:
     FCom_Core:
         version: 0.1.5
         channel: beta
-        require: { module: { BHAML: 3.2, BTwig: 1.12.4 } }
+        require: { module: { BTwig: 1.12.4 } }
         before_bootstrap: { callback: FCom_Core_Main::beforeBootstrap }
         run_level: REQUIRED
         description: "Base Sellvana classes and JS libraries"

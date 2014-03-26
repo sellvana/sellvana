@@ -79,7 +79,7 @@ class FCom_AdminChat_Admin extends BClass
 
             foreach ($history as $msg) {
                 $chats[$msg->get('chat_id')]['history'][] = array(
-                    'time' => gmdate("Y-m-d H:i:s +0000", strtotime($msg->get('create_at'))),
+                    'time' => date("Y-m-d H:i:s +0000", strtotime($msg->get('create_at'))),
                     'username' => $msg->get('username'),
                     'text' => $msg->get('text'),
                 );

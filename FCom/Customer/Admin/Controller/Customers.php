@@ -9,6 +9,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     protected $_recordName = 'Customer';
     protected $_mainTableAlias = 'c';
     protected $_permission = 'customers/manage';
+    protected $_formViewPrefix = 'customer/customers-form/';
 
     public function gridConfig()
     {

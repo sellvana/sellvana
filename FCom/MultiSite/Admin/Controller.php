@@ -2,7 +2,6 @@
 
 class FCom_MultiSite_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
 {
-
     protected static $_origClass = __CLASS__;
     protected $_gridHref = 'multisite';
     protected $_modelClass = 'FCom_MultiSite_Model_Site';
@@ -10,6 +9,8 @@ class FCom_MultiSite_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
     protected $_recordName = 'Site';
     protected $_mainTableAlias = 's';
     protected $_permission = 'multi_site';
+    protected $_formViewPrefix = 'multisite/sites-form/';
+    protected $_navPath = 'system/multisite';
 
     public function gridConfig()
     {
@@ -34,14 +35,5 @@ class FCom_MultiSite_Admin_Controller extends FCom_Admin_Controller_Abstract_Gri
             array('field' => 'mode_by_ip', 'type' => 'text'),
         );
         return $config;
-    }
-
-    public function formViewBefore($args)
-    {
-        parent::formViewBefore($args);
-        $m = $args['model'];
-        $args['view']->set(array(
-            'title' => $m->id ? 'Edit Site' : 'Create New Site',
-        ));
     }
 }

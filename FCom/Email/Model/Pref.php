@@ -15,7 +15,7 @@ class FCom_Email_Model_Pref extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_email_pref';
 
-    protected $_validationRules = array(
+    protected static $_validationRules = array(
         array('email', '@required'),
         array('email', '@email'),
     );

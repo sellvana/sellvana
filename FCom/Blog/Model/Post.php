@@ -11,7 +11,7 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
         ),
     );
 
-    protected $_validationRules = array(
+    protected static $_validationRules = array(
         /*array('author_user_id', '@required'),*/
         array('title', '@required'),
         /*array('url_key', '@required'),*/

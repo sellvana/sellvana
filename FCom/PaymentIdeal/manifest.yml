@@ -3,7 +3,7 @@ modules:
         version: 0.1.0
         channel: beta
         require: { module: { FCom_Sales: 0.1.10 } }
-        translations: { de: de.php, nl: nl.php }
+        translations: { en: en.php, nl: nl.php }
         description: "Payment iDEAL module"
         autoload: lib
 

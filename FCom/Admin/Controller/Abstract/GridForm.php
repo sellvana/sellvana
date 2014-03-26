@@ -8,6 +8,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     // Optional parameters
     protected $_permission;# = 'feature/permission';
+    protected $_navPath;# = 'nav/subnav';
     protected $_recordName = 'Record';
     protected $_gridTitle = 'List of Records';
     #protected $_gridViewName = 'admin/grid';
@@ -15,15 +16,20 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_gridLayoutName;# = '/feature';
     protected $_formHref;# = 'feature/form';
     protected $_formLayoutName;# = '/feature/form';
+    protected $_formViewPrefix;# = 'module/feature-form/';
     protected $_formViewName = 'admin/form';
     protected $_formTitle;# = 'Record';
     protected $_mainTableAlias = 'main';
+
+    protected $_useDefaultLayout = true;
 
     public function __construct()
     {
         parent::__construct();
         $this->_gridHref = trim($this->_gridHref, '/');
+
         if (is_null($this->_permission))     $this->_permission = $this->_gridHref;
+        if (is_null($this->_navPath))        $this->_navPath = $this->_permission;
 
         if (is_null($this->_gridLayoutName)) $this->_gridLayoutName = '/'.$this->_gridHref;
         if (is_null($this->_gridViewName))   $this->_gridViewName = 'core/backbonegrid';
@@ -31,8 +37,10 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if (is_null($this->_formHref))       $this->_formHref = $this->_gridHref.'/form';
         if (is_null($this->_formLayoutName)) $this->_formLayoutName = $this->_gridLayoutName.'/form';
         if (is_null($this->_formViewName))   $this->_formViewName = 'admin/form';
+        if (is_null($this->_formViewPrefix)) $this->_formViewPrefix = $this->_gridHref.'-form/';
 
         if (is_null($this->_mainTableAlias)) $this->_mainTableAlias = 'main';
+
     }
 
     public function gridView()
@@ -77,13 +85,23 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if (BRequest::i()->xhr()) {
             BResponse::i()->set($this->gridView())->output();
         }
+
         if (($head = $this->view('head'))) {
             $head->addTitle($this->_gridTitle);
         }
-        //$this->messages('core/messages', $this->formId());
+
+        if (($nav = $this->view('admin/nav'))) {
+            $nav->setNav($this->_navPath);
+        }
+
         $view = $this->gridView();
         $this->gridViewBefore(array('view' => $view));
-        $this->layout($this->_gridLayoutName);
+
+        $this->layout();
+        if ($this->_useDefaultLayout) {
+            BLayout::i()->applyLayout('default_grid');
+        }
+        BLayout::i()->applyLayout($this->_gridLayoutName);
     }
 
     public function gridViewBefore($args)
@@ -176,11 +194,23 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $this->formMessages();
         $view = $this->view($this->_formViewName)->set('model', $model);
         $this->formViewBefore(array('view'=>$view, 'model'=>$model));
-        $this->layout($this->_formLayoutName);
-        $this->processFormTabs($view, $model, 'edit');
+
         if ($this->_formTitle && ($head = $this->view('head'))) {
             $head->addTitle($this->_formTitle);
         }
+
+        if (($nav = $this->view('admin/nav'))) {
+            $nav->setNav($this->_navPath);
+        }
+
+        $this->layout();
+        BLayout::i()->view('admin/form')->set('tab_view_prefix', $this->_formViewPrefix);
+        if ($this->_useDefaultLayout) {
+            BLayout::i()->applyLayout('default_form');
+        }
+        BLayout::i()->applyLayout($this->_formLayoutName);
+
+        $this->processFormTabs($view, $model);
     }
 
     public function formViewBefore($args)
@@ -194,9 +224,13 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         }
         $actions['save'] = '<button type="submit" class="btn btn-primary" onclick="return adminForm.saveAll(this)"><span>' .  BLocale::_('Save') . '</span></button>';
 
+        $id = method_exists($m, 'id') ? $m->id(): $m->id;
+        $title = $id ? BLocale::_('Edit %s: %s', array($this->_recordName, $m->title)) : BLocale::_('Create New %s', array($this->_recordName));
+
         $args['view']->set(array(
             'form_id' => $this->formId(),
             'form_url' => BApp::href($this->_formHref).'?id='.$m->id,
+            'title' => $title,
             'actions' => $actions,
         ));
         BEvents::i()->fire(static::$_origClass.'::formViewBefore', $args);

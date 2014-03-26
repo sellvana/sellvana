@@ -7,6 +7,7 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
     protected $_gridTitle = 'All translations';
     protected $_recordName = 'Translation';
     protected $_permission = 'translations';
+    protected $_navPath = 'system/translations';
 
     public function gridConfig()
     {
