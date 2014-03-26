@@ -224,7 +224,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         }
         $actions['save'] = '<button type="submit" class="btn btn-primary" onclick="return adminForm.saveAll(this)"><span>' .  BLocale::_('Save') . '</span></button>';
 
-        $title = $m->id() ? BLocale::_('Edit %s: %s', array($this->_recordName, $m->title)) : BLocale::_('Create New %s', array($this->_recordName));
+        $id = method_exists($m, 'id') ? $m->id(): $m->id;
+        $title = $id ? BLocale::_('Edit %s: %s', array($this->_recordName, $m->title)) : BLocale::_('Create New %s', array($this->_recordName));
 
         $args['view']->set(array(
             'form_id' => $this->formId(),
