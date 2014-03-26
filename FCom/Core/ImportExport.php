@@ -27,6 +27,8 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
     protected $notChanged = 0;
     protected $newModels = 0;
     protected $updatedModels = 0;
+    protected $changedModels;
+    protected $circularRelated;
 
     /**
      * @return array
@@ -255,20 +257,10 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         /** @var FCom_Core_Model_ImportExport_Id $ieHelperId */
         $ieHelperId = FCom_Core_Model_ImportExport_Id::i();
         $cm = $this->currentModel;
-        $related = array();
         $existing = array();
+        $this->populateRelated( $batchData );
+
         foreach ( $batchData as $key => $data ) {
-            if ( isset($this->currentConfig['related']) ) {
-                foreach ( $this->currentConfig[ 'related' ] as $field => $l ) {
-                    // collect related ids
-                    if ( isset( $data[ $field ] ) ) {
-                        $tmp = $data[ $field ];
-                        if ( !isset( $related[ $l ][ $tmp ] ) ) {
-                            $related[ $l ][ $field ][$tmp] = 1;
-                        }
-                    }
-                }
-            }
             if ( isset( $this->currentConfig[ 'unique_key' ] ) ) {
                 $where = array('AND');
                 foreach ( (array) $this->currentConfig[ 'unique_key' ] as $ukey ) {
@@ -284,43 +276,12 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $batchData[$key] = $data;
         }
 
-        if ( !empty($related) && !$this->defaultSite ) {
-            foreach ( $this->currentConfig[ 'related' ] as $f => $r ) {
-                if ( isset( $this->currentRelated[ $r ] ) ) {
-                    continue;
-                }
-                list( $relModel, $field ) = explode( '.', $r );
-                $tempRel = $ieHelperId::orm()
-                                      ->select( array( 'import_id', 'local_id' ) )
-                                      ->join(
-                                          FCom_Core_Model_ImportExport_Model::table(),
-                                          'iem.id=model_id and iem.model_name=\'' . $relModel . '\'',
-                                          'iem'
-                                      )
-                                      ->where( array( 'site_id' => $this->importId ) )
-                                      ->where(array('local_id' => array_keys($related[$r][$f]) ))
-                                      ->find_many();
-
-                foreach ( $tempRel as $tr ) {
-                    $this->currentRelated[ $r ][ $tr[ 'import_id' ] ] = $tr[ 'local_id' ];
-                }
-            }
-        }
         $oldModels = array();
         if(!empty($existing)){
             $oldModels = $this->getExistingModels( $cm, $existing );
         }
 
         foreach ( $batchData as $id => $data ) {
-            foreach ( $this->currentConfig[ 'related' ] as $field => $l ) {
-                // collect related ids
-                if ( isset( $data[ $field ] ) ) {
-                    $tmp = $data[ $field ];
-                    if ( isset( $this->currentRelated[ $l ][ $tmp ] ) ) {
-                        $data[ $field ] = $this->currentRelated[ $l ][ $tmp ];
-                    }
-                }
-            }
             $ieData = array(
                 'site_id' => $this->importId,
                 'model_id' => $this->importModels[ $this->currentModel ]->id(),
@@ -356,8 +317,16 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                                       'problem' => "Error: unexpected file fail" ) );
             }
 
-            $ieData[ 'local_id' ] = $model->id();
-            $ieHelperId->create( $ieData )->save();
+            if ( $model ) {
+                $ieData[ 'local_id' ] = $model->id();
+                $ieHelperId->create( $ieData )->save();
+                $this->changedModels[$id] = $model;
+            } else {
+                BDebug::warning("Invalid model: $id");
+            }
+        }
+        if($this->circularRelated){
+            $this->processCircularRelations();
         }
     }
     protected function isArrayAssoc( array $arr )
@@ -526,4 +495,82 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         }
         return $result;
     }
+
+    /**
+     * Populated related IDs
+     * We need to handle this before attempting to import
+     * to ensure unique keys do not get triggered
+     * also having related id before parsing unique keys, will allow
+     * to use related keys for unique_key
+     *
+     * @param $batchData
+     */
+    protected function populateRelated( &$batchData )
+    {
+        $related = array();
+        $this->circularRelated = false;
+        if ( isset( $this->currentConfig[ 'related' ] ) ) {
+            foreach ( $this->currentConfig[ 'related' ] as $field => $l ) {
+                foreach ( $batchData as $data ) { // prepare related search
+                    // collect related ids
+                    if ( isset( $data[ $field ] ) ) {
+                        $tmp = $data[ $field ];
+                        if ( !isset( $related[ $l ][ $tmp ] ) ) {
+                            $related[ $l ][ $field ][ $tmp ] = 1;
+                        }
+                    }
+                } // end foreach data
+            } // end foreach related
+        } // end if related
+
+        if ( !empty( $related ) && !$this->defaultSite ) { // search related ids
+            foreach ( $this->currentConfig[ 'related' ] as $f => $r ) {
+                if ( isset( $this->currentRelated[ $r ] ) ) {
+                    continue;
+                }
+                list( $relModel, $field ) = explode( '.', $r );
+                if ( $relModel == $this->currentModel ) {
+                    // potentially imported models depend on current patch to be imported
+                    $this->circularRelated = true;
+                }
+                $tempRel = FCom_Core_Model_ImportExport_Id::orm()
+                                      ->select( array( 'import_id', 'local_id' ) )
+                                      ->join(
+                                          FCom_Core_Model_ImportExport_Model::table(),
+                                          'iem.id=model_id and iem.model_name=\'' . $relModel . '\'',
+                                          'iem'
+                                      )
+                                      ->where( array( 'site_id' => $this->importId ) )
+                                      ->where( array( 'local_id' => array_keys( $related[ $r ][ $f ] ) ) )
+                                      ->find_many();
+
+                /** @var FCom_Core_Model_Abstract $tr */
+                foreach ( $tempRel as $tr ) {
+                    $this->currentRelated[ $r ][ $tr->get( 'import_id' ) ] = $tr->get( 'local_id' );
+                }
+            }
+        }
+
+        if ( isset( $this->currentConfig[ 'related' ] ) ) {
+            foreach ( $this->currentConfig[ 'related' ] as $field => $l ) {
+                if ( !empty( $this->currentRelated[ $l ]) ) {
+                    foreach ( $batchData as &$data ) { // populate related data
+                        if ( isset( $data[ $field ] ) ) {
+                            $tmp = $data[ $field ];
+                            if ( isset( $this->currentRelated[ $l ][ $tmp ] ) ) {
+                                $data[ $field ] = $this->currentRelated[ $l ][ $tmp ];
+                            }
+                        }
+                    } // end foreach batch data
+                } // end if !empty
+            } // end foreach ['related']
+        } // end if related
+    }
+
+    protected function processCircularRelations()
+    {
+        // todo , figure out exactly how to process circular relations
+        // like category parent id
+    }
+
 }
