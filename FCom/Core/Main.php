@@ -258,7 +258,7 @@ class FCom_Core_Main extends BClass
         }
 
         $this->initDebug();
-        $this->runConfigMigration();
+        #$this->runConfigMigration();
 
         $mode = BDebug::mode();
 
