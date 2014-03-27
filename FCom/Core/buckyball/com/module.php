@@ -1382,6 +1382,17 @@ class BMigrate extends BClass
     */
     public static function migrateModules($limitModules = false, $force = false, $redirectUrl = null)
     {
+        if (!$force) {
+            $conf = BConfig::i();
+            $req = BRequest::i();
+            if (!$conf->get('install_status') === 'installed' 
+                || !$conf->get('db/implicit_migration') 
+                || $req->xhr() && !$req->get('MIGRATE')
+            ) {
+                return;
+            }
+        }
+
         $modReg = BModuleRegistry::i();
         $migration = static::getMigrationData();
         if (!$migration) {
