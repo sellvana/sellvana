@@ -52,14 +52,19 @@ require(['jquery','underscore','backbone'], function($, _) {
         });
 
         addBtn.click(function() {
+            var rowsCollection = selectedGrid.getRows();
             allProdGrid.getSelectedRows().forEach(function (row) {
                 if (!selectedGrid.getRows().findWhere({id: row.get('id')})) {
-                    var temp = row.toJSON();
-                    temp._new = true;
-                    selectedGrid.getRows().add(temp);
+                    var temp = row;
+                    temp.set("_new", true);
+                    temp.set('selected', false);
+                    rowsCollection.models.push(temp);
                 }
             });
-
+            rowsCollection.length = rowsCollection.models.length;
+            rowsCollection.originalRows.length = rowsCollection.length;
+            rowsCollection.originalRows.models = rowsCollection.models;
+            selectedGrid.getGridView().render(rowsCollection);
             allProdGrid.getGridView().clearSelectedRows();
             $('.linked-prod-modal-close').trigger('click');
         });
