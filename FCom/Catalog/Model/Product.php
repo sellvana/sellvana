@@ -75,6 +75,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             'indextank_indexed',
             'indextank_indexed_at',
         ),
+        'unique_key' => 'local_sku'
     );
 
     protected $_importErrors = null;

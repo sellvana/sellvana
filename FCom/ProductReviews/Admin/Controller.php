@@ -10,6 +10,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     protected $_recordName = 'Product Review';
     //custom grid view
     protected $_gridViewName = 'prodreviews/grid';
+    protected $_useDefaultLayout = false;
     protected $_permission = 'product_review';
 
     public function gridConfig($productModel = false)
@@ -165,6 +166,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
+        BLayout::i()->applyLayout('prodreviews');
         $this->view('prodreviews/grid')->set(array(
                 'title' => $this->_gridTitle,
                 'actions' => array('new' => '<button id="add_new_product_review" class="btn grid-new btn-primary _modal" type="button">'.BLocale::_('New Product Review').'</button>')

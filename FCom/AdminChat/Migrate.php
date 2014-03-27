@@ -102,9 +102,6 @@ class FCom_AdminChat_Migrate extends BClass
                 'update_at' => 'datetime',
             ),
             'PRIMARY' => '(id)',
-            'KEYS' => array(
-                'IDX_update_at' => '(update_at)',
-            ),
             'CONSTRAINTS' => array(
                 "FK_{$tUserStatus}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
             ),
