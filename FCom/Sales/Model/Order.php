@@ -103,10 +103,6 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     }
 
-/*    public function addresses()
-    {
-        return FCom_Sales_Model_Order_Address::i()->orm('a')->where('order_id', $this->id)->find_many();
-    }*/
 
     public function prepareApiData($orders, $includeItems=false)
     {
@@ -189,10 +185,12 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             $shippingServiceTitle = $shippingMethod->getService($cart->shipping_service);
         }
 
+
         $orderData                    = array();
         $orderData['cart_id']         = $cart->id();
         $orderData['admin_id']        = $cart->admin_id;
         $orderData['customer_id']     = $cart->customer_id;
+        $orderData['customer_email']  = $cart->customer_email;
         $orderData['item_qty']        = $cart->item_qty;
         $orderData['subtotal']        = $cart->subtotal;
         $orderData['shipping_method'] = $cart->shipping_method;
@@ -303,7 +301,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         }
     }
 
-    protected function getAddresses()
+    public function getAddresses()
     {
         if (!$this->addresses) {
             $this->addresses = FCom_Sales_Model_Order_Address::i()->orm()
@@ -379,6 +377,15 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             $result[] = $line;
         }
         return join("\n", $result);
+    }
+
+    static public function onGetFirstSeqId($args)
+    {
+        $orderNumber = BConfig::i()->get('modules/FCom_Sales/order_number');
+        if ($orderNumber) {
+            //todo: confirm with Boris about add prefix 1 to order number.
+            $args['seq_id'] =  '1'.$orderNumber;
+        }
     }
 
 }

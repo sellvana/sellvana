@@ -191,7 +191,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'file_name', 'label'=>'File Name', 'width'=>200, 'display'=>'eval', 'print'=>'"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
                     array('type'=>'input', 'name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline', 'validation'=>array('required'=>true)),
-                    array('type'=>'input', 'name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true,'required'=>true)),
+                    array('type'=>'input', 'name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true)),
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
                     array('type'=>'btn_group',
@@ -219,13 +219,14 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
 
         $download_url = BApp::href('/media/grid/download?folder=media/product/images&file=');
-        $thumb_url = FCom_Core_Main::i()->resizeUrl().'?s=100x100&f='.BConfig::i()->get('web/media_dir').'/'.'product/images/';
+        $thumb_url = FCom_Core_Main::i()->resizeUrl().'?s=100x100&f='.BConfig::i()->get('web/media_dir').'/'.'product/images';
         $data = BDb::many_as_array($model->mediaORM('I')
                 ->order_by_expr('pa.position asc')
                 ->left_outer_join('FCom_Catalog_Model_ProductMedia', array('pa.file_id', '=', 'pm.file_id'), 'pm')
                 ->select(array('pa.id', 'pa.product_id', 'pa.remote_url','pa.position','pa.label','a.file_name','a.file_size','pa.create_at','pa.update_at', 'pa.main_thumb'))
                 ->select('a.id','file_id')
                 ->select_expr('COUNT(pm.product_id)', 'associated_products')
+                ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
                 ->group_by('pa.id')
                 ->find_many());
         return array(
@@ -242,7 +243,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'download_url',  'hidden'=>true, 'default'=>$download_url),
                     array('name'=>'thumb_url',  'hidden'=>true, 'default'=>$thumb_url),
                     array('name'=>'file_name', 'label' => 'File Name', 'hidden'=>true),
-                    array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'display'=>'eval', 'print'=>'"<a href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'><img src=\'"+rc.row["thumb_url"]+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' ></a>"', 'sortable'=>false),
+                    array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'display'=>'eval', 'print'=>'"<a href=\'"+rc.row["download_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\'><img src=\'"+rc.row["thumb_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' ></a>"', 'sortable'=>false),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
                     array('type'=>'input', 'name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline'),
                     array('type'=>'input', 'name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true)),
@@ -258,7 +259,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                         )
                 ),
                 'actions'=>array(
-                    'rescan' => array('caption' => 'Rescan'),
+                    'rescan' => array('caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'),
                     'add'=>array('caption'=>'Add images'),
                     'delete'=>array('caption'=>'Remove'),
                 ),
@@ -577,7 +578,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $thumbUrl = NULL;
         if ($productMediaModel) {
             $mediaLibModel = FCom_Core_Model_MediaLibrary::i()->load($productMediaModel->get('file_id'));
-            $thumbUrl = $mediaLibModel->get('folder').'/'.$mediaLibModel->get('file_name');
+            $thumbUrl = ($mediaLibModel->get('subfolder') != null) ? $mediaLibModel->get('folder').'/'.$mediaLibModel->get('subfolder').'/'.$mediaLibModel->get('file_name') : $mediaLibModel->get('folder').'/'.$mediaLibModel->get('file_name');
             $thumbUrl = preg_replace('#^media/#', '', $thumbUrl); //TODO: resolve the dir string ambiguity
         }
         $model->set('thumb_url', $thumbUrl)->save();

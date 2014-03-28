@@ -10,6 +10,8 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     protected $_recordName = 'Product';
     protected $_mainTableAlias = 'm';
     protected $_gridViewName = 'core/backbonegrid';
+    protected $_navPath = 'modules/installed';
+    protected $_useDefaultLayout = false;
 
     public function getModulesData()
     {
@@ -202,7 +204,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     public function action_migrate__POST()
     {
         try {
-            BMigrate::i()->migrateModules(true);
+            BMigrate::i()->migrateModules(true, true);
             $this->message('Migration complete');
         } catch (Exception $e) {
             BDebug::logException($e);

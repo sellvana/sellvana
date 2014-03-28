@@ -3,7 +3,7 @@ modules:
         version: 0.1.9
         channel: beta
         require: { module: { FCom_Catalog: 0.2.1 } }
-        translations: { de: de.php }
+        translations: { en: en.php }
         after: [ FCom_Customer ]
         description: "Base custom fields implementation, currently for catalog only"
         auto_use: [ bootstrap ]

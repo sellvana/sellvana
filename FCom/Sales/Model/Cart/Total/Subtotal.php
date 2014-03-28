@@ -13,7 +13,7 @@ class FCom_Sales_Model_Cart_Total_Subtotal extends FCom_Sales_Model_Cart_Total_A
         $subtotal = 0;
         foreach ($this->_cart->items() as $item) {
             if (!$item->product()) {
-                $cart->removeProduct($item->product_id);
+                $this->_cart->removeProduct($item->product_id);
             }
             $itemNum++;
             $item->qty = $item->qty;

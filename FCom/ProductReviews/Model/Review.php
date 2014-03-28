@@ -11,7 +11,7 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
        'step' => 1,
     );
 
-    protected $_validationRules = array(
+    protected static $_validationRules = array(
         array('product_id', '@required'),
         array('customer_id', '@required'),
         array('rating', '@required'),

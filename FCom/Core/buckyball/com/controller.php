@@ -39,10 +39,12 @@ class BRequest extends BClass
     protected $_params = array();
 
     /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @return BRequest
-    */
+     * Shortcut to help with IDE autocompletion
+     *
+     * @param bool  $new
+     * @param array $args
+     * @return BRequest
+     */
     public static function i($new=false, array $args=array())
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);

@@ -4,18 +4,16 @@
 <input type='hidden' name='model[product_ids_remove]' id='product_ids_remove'/>
 <script>
 require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
-    var allProdGrid, catProdGrid, orignIds;
+    var allProdGrid, catProdGrid, originIds, removedIds = [], addedIds = [];
     function updateFormData() {
-        console.log(catProdGrid.getRows().pluck('id'));
         removedIds = _.difference(removedIds, catProdGrid.getRows().pluck('id'));
-        console.log(catProdGrid.getRows().toJSON());
         var addedRows = _.filter(catProdGrid.getRows().toJSON(), function(row) {
                             return row['added_row'];
                         });
 
         addedIds = _.pluck(addedRows, 'id');
-        $('#user_ids_add').val(addedIds.join(','));
-        $('#user_ids_remove').val(removedIds.join(','));
+        $('#product_ids_add').val(addedIds.join(','));
+        $('#product_ids_remove').val(removedIds.join(','));
     }
     window.allProdGridRegister = function(grid) {
         allProdGrid = grid;
@@ -24,7 +22,7 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
         $(allProdGrid.getGridSkeleton().AddButton).click(function() {
             if(allProdGrid.getSelectedRows().length >0) {
                 allProdGrid.getSelectedRows().forEach(function (row) {
-                    if (!catProdGrid.getRows().findWhere({username: row.get('username')})) {
+                    if (!catProdGrid.getRows().findWhere({id: row.get('id')})) {
                         var addedRow = row.toJSON();
                         addedRow.added_row = true;
                         catProdGrid.getRows().add(addedRow);
@@ -32,7 +30,7 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
                 });
             }
             catProdGrid.getGridView().render();
-            allProdGrid.getSelectedRows().reset({});
+            allProdGrid.getGridView().clearSelectedRows();
             $('.category-prod-modal-close').trigger('click');
 
             updateFormData();
@@ -45,23 +43,34 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
         originIds = catProdGrid.getRows().pluck('id');
 
         $(catProdGrid.getGridSkeleton().AddButton).click(function() {
+            refreshGridAdd();
             $('#btn_add_prod').trigger('click');
         });
 
         $(catProdGrid.getGridSkeleton().MassDeleteButton).off('click');
         $(catProdGrid.getGridSkeleton().MassDeleteButton).click(function() {
-
-            var rows = catProdGrid.getRows();
-            var sRows = catProdGrid.getSelectedRows();
-
-            removedIds = sRows.pluck('id');
-
-            rows.remove(sRows.models);
-            sRows.reset();
-            catProdGrid.getGridView().render();
-
-            updateFormData();
+            var conf = confirm('Do you want to really delete.');
+            if (conf) {
+                var rows = catProdGrid.getRows();
+                var sRows = catProdGrid.getSelectedRows();
+                removedIds = sRows.pluck('id');
+                rows.remove(sRows.models);
+                sRows.reset();
+                catProdGrid.getGridView().render();
+                updateFormData();
+            }
         });
+    }
+
+    function refreshGridAdd() {
+        var data = getExcludeId();
+        allProdGrid.getGridSkeleton().current_filters['exclude_id'] = data;
+        allProdGrid.getRows().fetch({reset: true});
+    }
+
+    function getExcludeId() {
+        var arr = catProdGrid.getRows().pluck('id');
+        return  arr.join(',');
     }
 });
 </script>

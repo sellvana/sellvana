@@ -5,7 +5,7 @@ class FCom_Sales_Model_Order_Status extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_sales_order_status';
     protected static $_origClass = __CLASS__;
 
-    protected $_validationRules = array(
+    protected static $_validationRules = array(
         array('name', '@required'),
         array('code', '@required'),
     );

@@ -1063,6 +1063,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         BUtil::ensureDir($dir);
         $filename = $dir.'/'.$this->grid['config']['id'].'.csv';
         $fp = fopen($filename, 'w');
+        fwrite($fp, "\xEF\xBB\xBF"); // add UTF8 BOM character to open excel.
         fputcsv($fp, $headers);
         /*$orm->iterate(function($row) use($columns, $fp) {
             if ($class) {

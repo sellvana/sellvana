@@ -22,7 +22,7 @@ class FCom_Core_Controller_Abstract extends BActionController
     /**
      * Apply current area theme and layouts supplied as parameter
      */
-    public function layout($name)
+    public function layout($name = null)
     {
         $theme = BConfig::i()->get('modules/'.BApp::i()->get('area').'/theme');
         if (!$theme) {
@@ -32,8 +32,10 @@ class FCom_Core_Controller_Abstract extends BActionController
         if ($theme) {
             $layout->applyTheme($theme);
         }
-        foreach ((array)$name as $l) {
-            $layout->applyLayout($l);
+        if ($name) {
+            foreach ((array)$name as $l) {
+                $layout->applyLayout($l);
+            }
         }
         return $this;
     }

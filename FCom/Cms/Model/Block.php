@@ -5,7 +5,7 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_cms_block';
     protected static $_origClass = __CLASS__;
 
-    protected $_validationRules = array(
+    protected static $_validationRules = array(
         array('handle', '@required'),
         /*array('version', '@required'),*/
 

@@ -2,7 +2,7 @@ modules:
     FCom_IndexTank:
         version: 0.2.1
         channel: beta
-        translations: { de: de.php }
+        translations: { en: en.php }
         description: "IndexTank API integration"
         require: { module: { FCom_Core: 0.1.0 } }
         auto_use: [ bootstrap ]

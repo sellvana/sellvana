@@ -82,12 +82,16 @@ class FCom_Stock_Migrate extends BClass
             }
         } // end if products
 
-        BDb::ddlTableDef( $pTable, array(
-                'COLUMNS' => array(
-                    'net_weight'  => 'DROP',
-                    'ship_weight' => 'DROP',
+        try {
+            BDb::ddlTableDef( $pTable, array(
+                    'COLUMNS' => array(
+                        'net_weight'  => 'DROP',
+                        'ship_weight' => 'DROP',
+                    )
                 )
-            )
-        );
+            );
+        } catch (Exception $e) {
+            //TODO: fix checking for existing fields on DROP
+        }
     }
 }

@@ -102,10 +102,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                     $tab['disabled'] = true;
                     continue;
                 }
-                if (!$curTab) {
-                    $curTab = $k;
-                }
-                if ($curTab===$k) {
+                if ($k === $curTab) {
                     $tab['active'] = true;
                     $tab['async'] = false;
                 }
@@ -128,22 +125,46 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
         if ($view->tab_groups) {
             $tabGroups = $view->sortedTabGroups();
-            foreach ($tabs as $k=>$tab) {
-                $tabGroups[$tab['group']]['tabs'][$k] = $tab;
+            foreach ($tabs as $k => &$tab) {
+                $tabGroups[$tab['group']]['tabs'][$k] =& $tab;
                 if (!empty($tab['active'])) {
                     $tabGroups[$tab['group']]['open'] = true;
                 }
             }
-            foreach ($tabGroups as $k=>$tabGroup) {
+            unset($tab);
+            foreach ($tabGroups as $k => &$tabGroup) {
                 if (empty($tabGroup['tabs'])) {
                     unset($tabGroups[$k]);
                 } else {
                     uasort($tabGroup['tabs'], function($a, $b) {
                         return $a['pos']<$b['pos'] ? -1 : ($a['pos']>$b['pos'] ? 1 : 0);
                     });
+                    if (!$curTab) {
+                        foreach ($tabGroup['tabs'] as $tabId => &$tab) {
+                            $curTab = $tabId;
+                            $tabGroup['open'] = true;
+                            $tab['active'] = true;
+                            $tab['async'] = false;
+                            break;
+                        }
+                        unset($tab);
+                    }
                 }
             }
+            unset($tabGroup);
             $view->tab_groups = $tabGroups;
+        } else {
+            if (!$curTab) {
+                $tabs = $view->tabs;
+                foreach ($tabs as $k => &$tab) {
+                    $curTab = $k;
+                    $tab['active'] = true;
+                    $tab['async'] = false;
+                    break;
+                }
+                unset($tab);
+                $view->tabs = $tabs;
+            }
         }
 
         $view->set(array(
