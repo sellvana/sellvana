@@ -75,7 +75,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ->where('folder', $folder)
                 ->select(array('a.id', 'a.folder','a.file_name', 'a.file_size'))
                 ->select_expr('(SELECT COUNT(*) FROM '.FCom_Catalog_Model_ProductMedia::table().' pm WHERE pm.file_id = a.id)', 'associated_products')
-                ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder)', 'subfolder')
+                ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
             ;
             if (isset($r['filters'])) {
                 $filters = BUtil::fromJson($r['filters']);
@@ -175,7 +175,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     $status = 'ERROR';
                 }
 
-                $row = array('id'=>$id, 'file_name'=>$fileName, 'file_size'=>$att->file_size, 'act' => $status, 'folder' => $folder);
+                $row = array('id'=>$id, 'file_name'=>$fileName, 'file_size'=>$att->file_size, 'act' => $status, 'folder' => $folder, 'subfolder' => '');
                 BResponse::i()->json($row);
 
                 //echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".BUtil::toJson($row)."); </script>";

@@ -233,9 +233,9 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function thumb($w, $h=null)
     {
         return BUtil::gravatar($this->get('email'));
-        return FCom_Core_Main::i()->resizeUrl().http_build_query(array(
-            'f' => $this->thumb_url,
-        ));
+//        return FCom_Core_Main::i()->resizeUrl().http_build_query(array(
+//            'f' => $this->thumb_url,
+//        ));
     }
 
     /**
