@@ -23,24 +23,9 @@ catalog_product_form_tabs:
 
       - [ addTab, additional, { label: Additional Info, pos: 11, async: true } ]
 
-/catalog/test:
-  - { include: base }
-  - { hook: main, views: admin/grid }
-
-/catalog/products:
-  - { include: base }
-  #- { include: lib_backgrid }
-  - { hook: main, views: admin/grid }
-  - { view: admin/nav, do: [[ setNav, catalog/products ]] }
-
 /catalog/products/form:
-  - { include: base }
-  - { include: form }
-  #- { include: lib_backgrid }
   - { include: jstree }
   - { include: catalog_product_form_tabs }
-  - { hook: main, views: 'admin/form' }
-  - { view: admin/nav, do: [[ setNav, catalog/products ]] }
 
 /catalog/products/import:
   - { include: base }
@@ -52,6 +37,7 @@ catalog_product_form_tabs:
 /catalog/categories:
   - { include: base }
   - { include: form }
+  - { include: jstree }
   - { hook: main, views: catalog/categories }
   - { view: admin/nav, do: [[ setNav, catalog/categories ]] }
 
@@ -64,12 +50,6 @@ catalog_product_form_tabs:
       - [ addTab, content, { label: Page Content, pos: 20 } ]
       - [ addTab, products, { label: Products, pos: 30  } ]
       - [ addTab, advanced, { label: Advanced, pos: 40 } ]
-
-/catalog/families:
-  - { include: base }
-  - { hook: main, views: admin/grid }
-  - { view: admin/nav, do: [[ setNav, catalog/families ]] }
-
 
 /settings:
   - view: settings

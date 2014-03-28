@@ -9,6 +9,7 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
     protected $_recordName = 'Blog Category';
     protected $_permission = 'blog';
     protected $_mainTableAlias = 'c';
+    protected $_navPath = 'cms/category';
 
     public function gridConfig()
     {

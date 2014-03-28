@@ -220,10 +220,9 @@ class BApp extends BClass
         // bootstrap modules
         BModuleRegistry::i()->bootstrap();
 
+
         // run module migration scripts if necessary
-        if (BConfig::i()->get('install_status')==='installed' && BConfig::i()->get('db/implicit_migration')) {
-            BMigrate::i()->migrateModules(true);
-        }
+        BMigrate::i()->migrateModules(true);
 
         // dispatch requested controller action
         BRouting::i()->dispatch();
@@ -737,17 +736,29 @@ class BClassRegistry extends BClass
     * @todo figure out how to update events on class override
     *
     * @param string $class Class to be overridden
-    * @param string $newClass New class
+    * @param string|null $newClass New class or clear class override
     * @param bool $replaceSingleton If there's already singleton of overridden class, replace with new one
     * @return BClassRegistry
     */
     static public function overrideClass($class, $newClass, $replaceSingleton=false)
     {
-        static::$_classes[$class] = array(
-            'class_name' => $newClass,
-            'module_name' => BModuleRegistry::i()->currentModuleName(),
-        );
-        BDebug::debug('OVERRIDE CLASS: '.$class.' -> '.$newClass);
+        if (is_string($newClass)) {
+            static::$_classes[$class] = array(
+                'class_name' => $newClass,
+                'module_name' => BModuleRegistry::i()->currentModuleName(),
+            );
+            BDebug::debug('OVERRIDE CLASS: '.$class.' -> '.$newClass);
+        } elseif (is_null($newClass)) {
+            if (empty(static::$_classes[$class])) {
+                return;
+            }
+            $newClass = $class;
+            $class = static::$_classes[$class]['class_name'];
+            unset(static::$_classes[$class]);
+            BDebug::debug('CLEAR CLASS OVERRIDE: '.$class.' -> '.$newClass);
+        } else {
+            throw new BException('Invalid argument type: '.print_r($newClass, 1));
+        }
         if ($replaceSingleton && !empty(static::$_singletons[$class]) && get_class(static::$_singletons[$class])!==$newClass) {
             static::$_singletons[$class] = static::instance($newClass);
         }

@@ -7,6 +7,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
     protected $_gridHref = 'templates';
     protected $_gridTitle = 'Frontend Templates';
     protected $_recordName = 'Template';
+    protected $_navPath = 'system/templates';
 
     public function gridConfig()
     {
@@ -99,6 +100,10 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $view->set('actions', $actions);
 
         $this->layout($this->_formLayoutName);
+        $view->set('tab_view_prefix', $this->_formViewPrefix);
+        if ($this->_useDefaultLayout) {
+            BLayout::i()->applyLayout('default_form');
+        }
         $this->processFormTabs($view, $model, 'edit');
         if ($this->_formTitle && ($head = $this->view('head'))) {
             $head->addTitle($this->_formTitle);

@@ -61,10 +61,10 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
 
         grid.build();
 
-        grid.getRows().bind('mass_changed', function(ev) {
+        grid.getRows().on('mass_changed', function(ev) {
             changeLevel(grid.getSelectedRows().toJSON());
         });
-        grid.getRows().bind('change', function(ev) {
+        grid.getRows().on('row_changed', function(ev) {
             changeLevel([ev.toJSON()]);
         });
     }

@@ -29,8 +29,10 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
         $hlp = FCom_MarketClient_RemoteApi::i();
         $connResult = $hlp->setupConnection();
 
-        $modName = BRequest::i()->post('mod_name');
+        list($action, $modName) = explode('/', BRequest::i()->post('mod_name'))+array('');
         $versionResult = $hlp->getModulesVersions($modName);
+        #$redirectUrl = $hlp->getUrl('market/module/edit', array('mod_name' => $modName));
+        $redirectUrl = BRequest::i()->currentUrl();
         #var_dump($modName, $versionResult); exit;
         if (!empty($versionResult[$modName]) && $versionResult[$modName]['status']==='available') {
             $createResult = $hlp->createModule($modName);
@@ -39,11 +41,13 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
                 BResponse::i()->redirect('marketclient/publish');
                 return;
             }
+            if (!empty($createResult['redirect_url'])) {
+                $redirectUrl = $createResult['redirect_url'];
+            }
         }
         $uploadResult = $hlp->uploadPackage($modName);
         //TODO: handle $result
-        $url = $hlp->getUrl('market/module/edit', array('mod_name' => $modName));
-        BResponse::i()->redirect($url);
+        BResponse::i()->redirect($redirectUrl);
     }
 
     public function action_upgrade__POST()

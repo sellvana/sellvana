@@ -4,21 +4,6 @@ base:
             - [ addNav, customer/subscriptions, { label: Email Subscriptions, href: /subscriptions, pos: 100 } ]
             #- [ addNav, customer/email-queues, { label: Email Queues, href: /email-queues, pos: 110 } ]
 
-/subscriptions:
-    - { include: base }
-    - { hook: main, views: admin/grid }
-    - { view: admin/nav, do: [[ setNav, customer/subscriptions ]] }
-
-/subscriptions/form:
-    - { include: base }
-    - { include: form }
-    - { hook: main, views: admin/form }
-    - { view: admin/nav, do: [[ setNav, customer/subscriptions ]] }
-    - view: admin/form
-        set: { tab_view_prefix: emails/form/ }
-        do:
-            - [ addTab, main, { label: Email, pos: 10 } ]
-
 /settings:
     - view: settings
         do:

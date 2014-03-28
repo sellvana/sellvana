@@ -2,7 +2,7 @@ modules:
     FCom_PaymentBasic:
         version: 0.1.0
         channel: beta
-        translations: { de: de.php }
+        translations: { en: en.php }
         description: "Basic payment methods (check/money order, purchase order)"
         require: { module: { FCom_Sales: 0.1.10 } }
         auto_use: [ bootstrap ]

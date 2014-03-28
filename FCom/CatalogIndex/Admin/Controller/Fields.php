@@ -9,6 +9,8 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
     protected $_recordName = 'Index Field';
     protected $_mainTableAlias = 'idxf';
     protected $_permission = 'catalog_index';
+    protected $_navPath = 'catalog/index-fields';
+    protected $_formViewPrefix = 'catalogindex/fields/form/';
 
     public function gridConfig()
     {
@@ -44,7 +46,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
             array('type'=>'input', 'name' => 'source_type', 'label' => 'Source', 'index' => 'idxf.source_type', 'options' => $fieldHlp->fieldOptions('source_type'),
                   'editor'=>'select', 'width' => 80, 'addable' => true, 'editable' => true),
             array('name' =>'source_callback', 'label' => 'Source Callback', 'index' => 'idxf.source_callback', 'width' => 80, 'hidden' => true),
-            array('type' =>'btn_group', 'name'=>'_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80, 
+            array('type' =>'btn_group', 'name'=>'_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80,
                     'buttons' => array(
                                         array('name'=>'edit'),
                                         array('name'=>'delete')
