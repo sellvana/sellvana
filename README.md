@@ -44,6 +44,53 @@ Documentation
 
 We have put together a [quick guide](http://sellvana.com/fdoc/fulleron) to get you started. As a community member, we also invite you to collaborate, improve and submit new articles on [https://bitbucket.org/sellvana/sellvanadoc](https://bitbucket.org/sellvana/sellvanadoc).
 
+PHP-FPM support
+---------------
+
+A .user.ini is included in the installation, setting parameters for php-fpm
+installations. Please review the settings to match your machine and security
+policies.
+
+NGINX support
+-------------
+
+Nginx will require the
+[headers-more](http://wiki.nginx.org/HttpHeadersMoreModule) module to remove
+some headers. The following is an example configuration:
+
+    server {
+        # Ip's, server_name etc here
+        root        /var/www/example.com;
+
+        location / {
+            index        index.php;
+            if_modified_since    off;
+            more_clear_headers    'If-None-Match';
+            more_clear_headers    'ETag';
+            etag                off;
+            try_files    $uri $uri/ @sellvana;
+        }
+
+        location /.git { deny all; }
+        location ~ \.(yml|twig)$ { deny all; }
+        location ~ \.(jpg|jpeg|png|webm|svg)$ {
+            expires    30d;
+        }
+
+        location @sellvana {
+            rewrite ^(.*)$ /index.php$1;
+        }
+
+        location ~ ^(.+\.php)(.*)$ {
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_split_path_info ^(.+\.php)(.*)$;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_param PATH_INFO $fastcgi_path_info;
+            fastcgi_param HTTP_MOD_REWRITE On;
+            include fastcgi_params;
+        }
+    }
+
 Contributing
 ------------
 
