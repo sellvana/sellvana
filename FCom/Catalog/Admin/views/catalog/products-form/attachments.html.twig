@@ -53,17 +53,19 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
         });
 
         $('#prod-attachments-modal-add').click(function() {
-
+            var gridView = attachmentGrid.getGridView();
             mediaAttachmentGrid.getSelectedRows().forEach(function (row) {
                 if (!attachmentGrid.getRows().findWhere({file_id: row.get('id')})) {
-                    var addedRow = row.toJSON();
-                    addedRow._new = true;
-                    addedRow.file_id = row.id;
-                    addedRow.id = guid();
-                    attachmentGrid.getRows().add(addedRow);
+                    var addedRow = row;
+                    addedRow.set('_new', true);
+                    addedRow.set('file_id', row.id);
+                    addedRow.set('id', guid());
+                    addedRow.set('selected', false);
+                    gridView.collection.models.push(addedRow);
                 }
             });
-
+            gridView.collection.originalRows.models = gridView.collection.models;
+            gridView.render();
             mediaAttachmentGrid.getGridView().clearSelectedRows();
             $('.prod-attachments-modal-close').trigger('click');
 
@@ -91,7 +93,7 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
     }
 
     function getExcludeId() {
-        var arr = attachmentGrid.getRows().pluck('file_id');
+        var arr = attachmentGrid.getGridView().collection.originalRows.pluck('file_id');
         return  arr.join(',');
     }
 });
