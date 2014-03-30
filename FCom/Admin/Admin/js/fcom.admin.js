@@ -833,12 +833,14 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
             if (!editors[id] && CKEDITOR !== 'undefined' && !CKEDITOR.instances[id]) {
                 console.log(id, 'wysiwygcreate');
                 editors[id] = true; // prevent double loading
+                
                 CKEDITOR.replace(id, {
                     /*toolbarGroups: [
                         { name: 'mode' },
                         { name: 'basicstyles' },
                         { name: 'links' }
                     ],*/
+                    filebrowserBrowseUrl: FCom.Admin.baseUrl+'admin/media',                    
                     startupMode: 'wysiwyg'
                 });
 //
@@ -1219,6 +1221,9 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
             CKEDITOR.config.toolbarCanCollapse = true;
             CKEDITOR.config.toolbarStartupExpanded = false;
             CKEDITOR.config.startupMode = 'wysiwyg';//'source';
+            CKEDITOR.config.filebrowserWindowHeight = 678;
+            CKEDITOR.config.filebrowserWindowWidth = 912;
+
             //CKEDITOR.config.filebrowserUploadUrl = '/';
         }
         //$('.datepicker').datepicker();
