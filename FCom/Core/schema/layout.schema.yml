@@ -1,6 +1,6 @@
 /:
     type: map
-    key_pattern: ^[/A-Za-z0-9_]+$
+    key_pattern: "^[/A-Za-z0-9_]+$"
 
 /*:
     type: seq
