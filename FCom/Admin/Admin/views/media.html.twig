@@ -8,8 +8,7 @@
     });
     window.ckeditor_all_images_register = function(grid) {
         mediaGrid = grid;
-        grid.getGridSkeleton().Views.RowView.prototype._selectRow = function(ev) {
-            console.log('fff');
+        grid.getGridSkeleton().Views.RowView.prototype._selectRow = function(ev) {            
             var selectedRows = grid.getSelectedRows();
 
             var checked = $(ev.target).is(':checked');
