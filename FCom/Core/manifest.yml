@@ -1,6 +1,6 @@
 modules:
     FCom_Core:
-        version: 0.1.5
+        version: 0.1.6
         channel: beta
         require: { module: { BTwig: 1.12.4 } }
         before_bootstrap: { callback: FCom_Core_Main::beforeBootstrap }

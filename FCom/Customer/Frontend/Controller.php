@@ -22,7 +22,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $redirect = BRequest::i()->referrer();
         }
         if ($redirect) {
-            BSession::i()->data('login_orig_url', $redirect);
+            BSession::i()->set('login_orig_url', $redirect);
         }
     }
 
@@ -80,7 +80,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     $url = $r->referrer();
                 }
             } else {
-                $url = BSession::i()->data('login_orig_url');
+                $url = BSession::i()->get('login_orig_url');
             }
             BResponse::i()->redirect(!empty($url) ? $url : '');
         } catch (Exception $e) {

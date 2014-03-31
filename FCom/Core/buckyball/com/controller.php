@@ -1021,22 +1021,6 @@ class BResponse extends BClass
         return $this;
     }
 
-    /**
-    * Set or retrieve response content MIME type
-    *
-    * @deprecated
-    * @param string $type
-    * @return BResponse|string
-    */
-    public function contentType($type=BNULL)
-    {
-        if (BNULL===$type) {
-            return $this->_contentType;
-        }
-        $this->_contentType = $type;
-        return $this;
-    }
-
     public function setContentType($type)
     {
         $this->_contentType = $type;
@@ -1048,22 +1032,6 @@ class BResponse extends BClass
         return $this->_contentType;
     }
 
-    /**
-    * Set or retrieve response content prefix string
-    *
-    * @deprecated
-    * @param string $string
-    * @return BResponse|string
-    */
-    public function contentPrefix($string=BNULL)
-    {
-        if (BNULL===$string) {
-            return $this->_contentPrefix;
-        }
-        $this->_contentPrefix = $string;
-        return $this;
-    }
-
     public function setContentPrefix($string)
     {
         $this->_contentPrefix = $string;
@@ -1073,22 +1041,6 @@ class BResponse extends BClass
     public function getContentPrefix()
     {
         return $this->_contentPrefix;
-    }
-
-    /**
-    * Set or retrieve response content suffix string
-    *
-    * @deprecated
-    * @param string $string
-    * @return BResponse|string
-    */
-    public function contentSuffix($string=BNULL)
-    {
-        if (BNULL===$string) {
-            return $this->_contentSuffix;
-        }
-        $this->_contentSuffix = $string;
-        return $this;
     }
 
     public function setContentSuffix($string)

@@ -160,7 +160,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         parent::onAfterSave();
 
         if (static::sessionUserId() === $this->id()) {
-            BSession::i()->data('customer_user', serialize($this));
+            BSession::i()->set('customer_user', serialize($this));
             static::$_sessionUser = $this;
         }
     }
@@ -237,7 +237,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     static public function sessionUser($reset=false)
     {
         if ($reset || !static::$_sessionUser) {
-            $data = BSession::i()->data('customer_user');
+            $data = BSession::i()->get('customer_user');
             if (is_string($data)) {
                 static::$_sessionUser = $data ? unserialize($data) : false;
             } else {
@@ -275,7 +275,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         $this->set('last_login', BDb::now())->save();
 
-        BSession::i()->data('customer_user', serialize($this));
+        BSession::i()->set('customer_user', serialize($this));
         static::$_sessionUser = $this;
 
         if ($this->locale) {
@@ -292,7 +292,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         BEvents::i()->fire(__METHOD__.':before', array('user'=> static::sessionUser()));
 
-        BSession::i()->data('customer_user', false);
+        BSession::i()->set('customer_user', false);
         static::$_sessionUser = null;
     }
 

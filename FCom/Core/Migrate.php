@@ -133,6 +133,14 @@ class FCom_Core_Migrate extends BClass
                 ),
             )
         );
+    }
 
+    public function upgrade__0_1_5__0_1_6()
+    {
+        if (!BConfig::i()->get('cache/default_backend')) {
+            $this->_defaultBackend = BCache::i()->getFastestAvailableBackend();
+            BConfig::i()->set('cache/default_backend', $this->_defaultBackend, false, true);
+            FCom_Core_Main::i()->writeConfigFiles('core');
+        }
     }
 }

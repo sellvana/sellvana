@@ -128,6 +128,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
         if (isset($config['data']) && (!empty($config['data']))) {
             $data = $config['data'];
+            $data = $this->gridDataAfter($data);
             BResponse::i()->json(array(array('c' => 1), $data));
         } else {
             $r = BRequest::i()->get();
@@ -167,6 +168,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function gridDataAfter($data)
     {
+        BEvents::i()->fire(static::$_origClass.'::gridDataAfter', array('data'=>&$data));
         return $data;
     }
 

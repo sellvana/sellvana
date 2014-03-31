@@ -914,6 +914,7 @@ class BUtil extends BClass
     */
     public static function remoteHttp($method, $url, $data = array())
     {
+        $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: '.$method.' '.$url));
         $timeout = 5;
         $userAgent = 'Mozilla/5.0';
         if ($method==='GET' && $data) {
@@ -1046,6 +1047,7 @@ class BUtil extends BClass
         }
         #BDebug::log(print_r(compact('method', 'url', 'data', 'response'), 1), 'remotehttp.log');
 
+        BDebug::profile($debugProfile);
         return $response;
     }
 
@@ -2479,7 +2481,7 @@ class BDebug extends BClass
     public static function dumpLog($return=false)
     {
         if (!(static::$_mode===static::MODE_DEBUG || static::$_mode===static::MODE_DEVELOPMENT)
-            || BResponse::i()->contentType()!=='text/html'
+            || BResponse::i()->getContentType()!=='text/html'
             || BRequest::i()->xhr()
         ) {
             return;

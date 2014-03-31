@@ -478,9 +478,9 @@ class FCom_Core_Main extends BClass
         $s = BSession::i();
         $r = BRequest::i();
         if ($save) {
-            $s->data('lastNav', array($r->rawPath(), $r->get()));
+            $s->set('lastNav', array($r->rawPath(), $r->get()));
         } else {
-            $d = $s->data('lastNav');
+            $d = $s->get('lastNav');
             return BApp::href().($d ? $d[0].'?'.http_build_query((array)$d[1]) : '');
         }
     }
