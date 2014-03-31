@@ -59,7 +59,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             BDebug::log( "Could not open $toFile for writing, aborting export." );
             return false;
         }
-        $this->writeLine( $fe, json_encode( array( static::STORE_UNIQUE_ID_KEY => $this->storeUUID() ) ) );
+        $this->writeLine( $fe, json_encode( array( static::STORE_UNIQUE_ID_KEY => $this->storeUID() ) ) );
         $exportableModels = $this->collectExportableModels();
         if ( !empty( $models ) ) {
             $diff = array_diff( array_keys( $exportableModels ), $models );
@@ -418,7 +418,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         }
     }
 
-    protected function storeUUID()
+    protected function storeUID()
     {
         $sUid = BConfig::i()->get( 'db/store_unique_id' );
         if ( !$sUid ) {
