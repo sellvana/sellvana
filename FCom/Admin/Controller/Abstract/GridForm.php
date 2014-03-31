@@ -11,7 +11,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_navPath;# = 'nav/subnav';
     protected $_recordName = 'Record';
     protected $_gridTitle = 'List of Records';
-    #protected $_gridViewName = 'admin/grid';
+    protected $_gridPageViewName = 'admin/grid';
     protected $_gridViewName = 'core/backbonegrid';
     protected $_gridLayoutName;# = '/feature';
     protected $_formHref;# = 'feature/form';
@@ -94,8 +94,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $nav->setNav($this->_navPath);
         }
 
+        $pageView = $this->view($this->_gridPageViewName);
         $view = $this->gridView();
-        $this->gridViewBefore(array('view' => $view));
+        $this->gridViewBefore(array('view' => $view, 'page_view' => $pageView));
 
         $this->layout();
         if ($this->_useDefaultLayout) {
@@ -106,7 +107,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function gridViewBefore($args)
     {
-        $this->view('admin/grid')->set(array(
+        $view = $args['page_view'];
+        $view->set(array(
             'title' => $this->_gridTitle,
             'actions' => array(
                 'new' => ' <button class="btn btn-primary btn-sm" onclick="location.href=\''.BApp::href($this->_formHref).'\'"><span>New '.BView::i()->q($this->_recordName).'</span></button>',

@@ -49,7 +49,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
         /* @var $order FCom_Sales_Model_Order */
         $order         = $payment->getOrder();
         // if we're going to allow multiple same method transactions, then we can namespace them with trans_id
-        $api->trans_id = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod::PAYMENT_METHOD_KEY . '/transaction_id');
+        $api->trans_id = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod_Aim::PAYMENT_METHOD_KEY . '/transaction_id');
         // todo add amount to capture if needed
         $response = $api->priorAuthCapture();
         return $this->responseAsArray($response);
@@ -64,12 +64,12 @@ class FCom_AuthorizeNet_AimApi extends BClass
         $api = $this->getApi();
         /* @var $order FCom_Sales_Model_Order */
         $order         = $payment->getOrder();
-        $trId = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod::PAYMENT_METHOD_KEY . '/transaction_id');
+        $trId = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod_Aim::PAYMENT_METHOD_KEY . '/transaction_id');
         $api->trans_id = $trId;
         // todo, get refund amount from order or credit object
-        $api->amount = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod::PAYMENT_METHOD_KEY . '/' . $trId . '/amount');
-        $api->card_num = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod::PAYMENT_METHOD_KEY . '/last_four');
-        $api->exp_date = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod::PAYMENT_METHOD_KEY . '/card_exp_date');
+        $api->amount = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod_Aim::PAYMENT_METHOD_KEY . '/' . $trId . '/amount');
+        $api->card_num = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod_Aim::PAYMENT_METHOD_KEY . '/last_four');
+        $api->exp_date = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod_Aim::PAYMENT_METHOD_KEY . '/card_exp_date');
         $response = $api->credit();
         return $this->responseAsArray($response);
     }
@@ -82,7 +82,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
     {
         $api = $this->getApi();
         $order = $payment->getOrder();
-        $trId = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod::PAYMENT_METHOD_KEY . '/transaction_id');
+        $trId = $order->getData('payment_details/' . FCom_AuthorizeNet_PaymentMethod_Aim::PAYMENT_METHOD_KEY . '/transaction_id');
         $response = $api->void($trId);
 
         return $this->responseAsArray($response);
@@ -171,6 +171,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
             if ($data->get('debug') && !defined('AUTHORIZENET_LOG_FILE')) {
                 define('AUTHORIZENET_LOG_FILE', static::AUTHORIZENET_LOG_FILE);
             }
+            BClassAutoload::i(true, array('root_dir', __DIR__ . '/lib'));
             $this->api = new AuthorizeNetAIM();
 /* API is missing currency code !!!!
             if($data->get('currency')){

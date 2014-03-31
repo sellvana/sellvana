@@ -5,7 +5,7 @@ modules:
         require: { module: { FCom_Sales: 0.1.10 } }
         translations: { en: en.php, nl: nl.php }
         description: "Payment iDEAL module"
-        autoload: lib
+        #autoload: lib
 
         auto_use: [ bootstrap ]
         default_config:

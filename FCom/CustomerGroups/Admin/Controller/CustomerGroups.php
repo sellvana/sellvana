@@ -23,11 +23,11 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
             array('name' => 'id', 'label'=>'ID', 'width'=>50, 'index' => 'cg.id'),
             array('type'=>'input', 'name' => 'title', 'label' => 'Title', 'width' => 300, 'index' => 'cg.title',
                     'editable' => true, 'addable' => true, 'validation' => array('required' => true)),
-            array('type'=>'input', 'name' => 'code', 'label' => 'Code', 'width' => 300, 'index' => 'cg.code', 
+            array('type'=>'input', 'name' => 'code', 'label' => 'Code', 'width' => 300, 'index' => 'cg.code',
                     'editable' => true, 'addable' => true, 'validation' => array('required' => true, 'unique' => BApp::href('customer-groups/unique'))),
             array('type' => 'btn_group',
                   'buttons'=> array(
-                                    array('name'=>'edit'), 
+                                    array('name'=>'edit'),
                                     array('name'=>'delete')
                                 )
                 )
