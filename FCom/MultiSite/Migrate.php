@@ -2,7 +2,7 @@
 
 class FCom_MultiSite_Migrate extends BClass
 {
-    public function install__0_1_0()
+    public function install__0_1_1()
     {
         $tSite = FCom_MultiSite_Model_Site::table();
 
@@ -18,8 +18,8 @@ class FCom_MultiSite_Migrate extends BClass
                 'meta_title' => 'text',
                 'meta_description' => 'text',
                 'meta_keywords' => 'text',
-                'create_dt' => 'datetime not null',
-                'update_dt' => 'datetime not null',
+                'create_at' => 'datetime not null',
+                'update_at' => 'datetime not null',
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(

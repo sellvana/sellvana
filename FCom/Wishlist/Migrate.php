@@ -1,13 +1,13 @@
 <?php
 class FCom_Wishlist_Migrate extends BClass
 {
-    public function install__0_1_0()
+    public function install__0_1_1()
     {
         $tWishlist = FCom_Wishlist_Model_Wishlist::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tWishlist} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `user_id` int(10) unsigned NOT NULL,
+            `customer_id` int(10) unsigned NOT NULL,
             PRIMARY KEY (`id`),
             UNIQUE KEY `user_id` (`user_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -2,7 +2,7 @@
 
 class FCom_IndexTank_Migrate extends BClass
 {
-    public function install__0_1_0()
+    public function install__0_2_1()
     {
         $pIndexHelperTable = FCom_IndexTank_Model_IndexHelper::table();
         BDb::run( "
@@ -30,6 +30,7 @@ class FCom_IndexTank_Migrate extends BClass
             `filter` enum('','inclusive','exclusive') NOT NULL DEFAULT '',
             `source_type` varchar(255) NOT NULL,
             `source_value` varchar(255) NOT NULL,
+            `sort_order` int(11) NOT NULL DEFAULT '0',
             PRIMARY KEY (`id`)
             )ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
@@ -45,7 +46,10 @@ class FCom_IndexTank_Migrate extends BClass
             `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
             `name` VARCHAR( 1024 ) NOT NULL,
             `number` INT( 11 ) UNSIGNED NOT NULL ,
-            `definition` VARCHAR( 1024 ) NOT NULL
+            `definition` VARCHAR( 1024 ) NOT NULL,
+            `field_name` VARCHAR( 100 ) NOT NULL,
+            `sort_order` enum('asc','desc') NOT NULL DEFAULT 'asc',
+            `use_custom_formula` enum('asc','desc') tinyint(1) NOT NULL DEFAULT 0,
             ) ENGINE = InnoDB;
             ");
         BDb::i()->ddlClearCache();
@@ -70,6 +74,43 @@ class FCom_IndexTank_Migrate extends BClass
             }
             BDb::run("insert into {$pFunctionsTable}(name, number, definition) values('{$func_name}', {$func['number']}, '{$func['definition']}')");
         }
+
+        $productsTable = FCom_Catalog_Model_Product::table();
+        if (!BDb::ddlFieldInfo($productsTable, 'indextank_indexed')) {
+            BDb::run( " ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0,
+            ADD indextank_indexed_at datetime not null; ");
+        }
+
+        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
+        BDb::run( "
+            CREATE TABLE IF NOT EXISTS {$pIndexingStatusTable} (
+            `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+            `task` VARCHAR( 255 ) NOT NULL ,
+            `info` VARCHAR( 255 ) NOT NULL ,
+            `updated_at` datetime
+            ) ENGINE = InnoDB;
+         ");
+        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
+        BDb::ddlAddColumns($pIndexingStatusTable, array(
+            'status' => "enum('start', 'pause') NOT NULL DEFAULT 'start'",
+            'percent' => "BIGINT( 11 ) NOT NULL",
+            'indexed' => "BIGINT( 11 ) NOT NULL",
+            'to_index' =>"BIGINT( 11 ) NOT NULL",
+            'index_size' => "BIGINT( 11 ) NOT NULL",
+            'label' => "varchar(100) NOT NULL"
+
+        ));
+        $sql = "
+        update {$pFunctionsTable} set label = 'Newest first' where name='age';
+        update {$pFunctionsTable} set label = 'Relevance' where name='relevance';
+        update {$pFunctionsTable} set label = 'Price (Lower first)' where name='base_price_asc';
+        update {$pFunctionsTable} set label = 'Price (Higher first)' where name='base_price_desc';
+        update {$pFunctionsTable} set label = 'Product name (A-Z)' where name='product_name_asc';
+        update {$pFunctionsTable} set label = 'Product name (Z-A)' where name='product_name_desc';
+        update {$pFunctionsTable} set label = 'Manuf SKU (A-Z)' where name='local_sku_asc';
+        update {$pFunctionsTable} set label = 'Manuf SKU (Z-A)' where name='local_sku_desc';
+        ";
+        BDb::run( $sql );
 
     }
 
