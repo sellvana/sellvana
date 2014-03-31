@@ -1221,7 +1221,7 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
             CKEDITOR.config.toolbarCanCollapse = true;
             CKEDITOR.config.toolbarStartupExpanded = false;
             CKEDITOR.config.startupMode = 'wysiwyg';//'source';
-            CKEDITOR.config.filebrowserWindowHeight = 678;
+            CKEDITOR.config.filebrowserWindowHeight = 757;
             CKEDITOR.config.filebrowserWindowWidth = 912;
 
             //CKEDITOR.config.filebrowserUploadUrl = '/';

@@ -53,7 +53,10 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'filters' => array(
                     array('field' => 'file_name', 'type' => 'text')
                 ),
-                'grid_before_create'=>$id.'_register'
+                'grid_before_create'=>$id.'_register',
+                'actions' => array(
+                    'refresh' => true
+                )
             )
         );
         
@@ -82,13 +85,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ->select_expr('(SELECT COUNT(*) FROM '.FCom_Catalog_Model_ProductMedia::table().' pm WHERE pm.file_id = a.id)', 'associated_products')
                 ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
             ;
-            if (isset($r['filters'])) {
-                $filters = BUtil::fromJson($r['filters']);
-                if (isset($filters['exclude_id']) && $filters['exclude_id'] != '') {
-                    $arr = explode(',', $filters['exclude_id']);
-                    $orm =  $orm->where_not_in('a.id', $arr);
-                }
-            }
+            
             $data = FCom_Core_View_BackboneGrid::i()->processORM($orm);
             BResponse::i()->json(array(
                     array('c' => $data['state']['c']),
