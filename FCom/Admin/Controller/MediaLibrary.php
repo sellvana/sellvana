@@ -56,15 +56,20 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'grid_before_create'=>$id.'_register'
             )
         );
-
+        
         if (!empty($options['config'])) {
+            
             $config = BUtil::arrayMerge($config, $options['config']);
+
         }
         //BEvents::i()->fire(__METHOD__, array('config'=>&$config));
         //BEvents::i()->fire(__METHOD__.':'.$folder, array('config'=>&$config));
         return $config;
     }
-
+    public function action_index()
+    {
+         $this->layout('/media');
+    }
     public function action_grid_data()
     {
         switch (BRequest::i()->params('do')) {

@@ -139,7 +139,7 @@ require(['jquery','underscore','backbone'], function($, _) {
         $('#prod-image-fileupload').fileupload({
             url: '{{ APP.href("media/grid/upload?folder=media/product/images") | raw}}',
             multiple:true,
-            acceptFileTypes:  /(jpg)|(jpeg)(tiff)|(gif)|(png)|(bmp)$/i
+            acceptFileTypes:  /(\.|\/)(jpe?g|tiff|gif|png|bmp)$/i
         })
         .bind('fileuploadalways', function(e, data) {
 
@@ -237,7 +237,7 @@ require(['jquery','underscore','backbone'], function($, _) {
                                             <td class="name"><span>{%=file.name%}</span></td>
                                             <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
                                             {% if (file.error) { %}
-                                                <td class="error" colspan="2"><span class="label label-important">Error</span> {%=file.error%}</td>
+                                                <td class="error" colspan="2"><span class="label label-important">{{ 'Error'|_ }}</span> {%=file.error%}</td>
                                             {% } else if (o.files.valid && !i) { %}
                                             <td>
                                                 <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
@@ -248,7 +248,7 @@ require(['jquery','underscore','backbone'], function($, _) {
                                                 {% if (!o.options.autoUpload) { %}
                                                     <button class="btn btn-primary start">
                                                         <i class="icon-upload icon-white"></i>
-                                                        <span>Upload</span>
+                                                        <span>{{ 'Upload'|_ }}</span>
                                                     </button>
                                                 {% } %}
                                             </td>
@@ -259,7 +259,7 @@ require(['jquery','underscore','backbone'], function($, _) {
                                                {% if (!i) { %}
                                                 <button class="btn btn-warning cancel">
                                                     <i class="icon-ban-circle icon-white"></i>
-                                                    <span>Cancel</span>
+                                                    <span>{{ 'Cancel'|_ }}</span>
                                                 </button>
                                                 {% } %}
                                             </td>
@@ -275,7 +275,7 @@ require(['jquery','underscore','backbone'], function($, _) {
                                                 <td></td>
                                                 <td class="name"><span>{%=file.name%}</span></td>
                                                 <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
-                                                <td class="error" colspan="2"><span class="label label-important">Error</span> {%=file.error%}</td>
+                                                <td class="error" colspan="2"><span class="label label-important">{{ 'Error'|_ }}</span> {%=file.error%}</td>
                                             {% } else { %}
                                                 <td class="preview">
                                                 {% if (file.thumbnail_url) { %}
