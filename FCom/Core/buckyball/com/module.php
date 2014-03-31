@@ -664,6 +664,7 @@ class BModule extends BClass
     public $autoload;
     public $crontab;
     public $custom;
+    public $license;
 
     public $is_cached;
     /**

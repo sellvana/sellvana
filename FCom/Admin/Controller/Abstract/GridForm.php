@@ -111,7 +111,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $view->set(array(
             'title' => $this->_gridTitle,
             'actions' => array(
-                'new' => ' <button class="btn btn-primary btn-sm" onclick="location.href=\''.BApp::href($this->_formHref).'\'"><span>New '.BView::i()->q($this->_recordName).'</span></button>',
+                'new' => ' <button type="button" class="btn btn-primary btn-sm" onclick="location.href=\''.BApp::href($this->_formHref).'\'"><span>New '.BView::i()->q($this->_recordName).'</span></button>',
             ),
         ));
         BEvents::i()->fire(static::$_origClass.'::gridViewBefore', $args);
