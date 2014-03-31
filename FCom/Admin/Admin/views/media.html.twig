@@ -8,15 +8,31 @@
     });
     window.ckeditor_all_images_register = function(grid) {
         mediaGrid = grid;
-        grid.build();                
-        
-        mediaGrid.getSelectedRows().on('add remove reset', function() {
-            if (mediaGrid.getSelectedRows().length>0) {
+        grid.getGridSkeleton().Views.RowView.prototype._selectRow = function(ev) {            
+            var selectedRows = grid.getSelectedRows();
+
+            var checked = $(ev.target).is(':checked');
+            $('.select-row').prop('checked', false);
+            $(ev.target).prop('checked', checked);
+
+            this.model.set('selected', checked);            
+            selectedRows.reset();
+            console.log(selectedRows.length);
+            if (checked) {            
+                selectedRows.add(this.model);
                 $('#btn_media_select').removeClass('disabled');
-            } else {
+            } else {            
+        
                 $('#btn_media_select').addClass('disabled');
             }
-        });
+            console.log(selectedRows.length);
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            return;
+        }
+
+        grid.build();                
 
         $('#btn_media_select').click(function() {
             var row = mediaGrid.getSelectedRows().at(0);
@@ -184,4 +200,4 @@
                         </div>
                     </div>
                     </div>
-                </div>
+</div>

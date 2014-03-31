@@ -763,6 +763,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
 //print_r($r); exit;
         //$r = array_replace_recursive($hash, $r);
+        
 
         if (!empty($filters)) {
             $this->_processGridFilters($config, $filters, $orm);
@@ -894,12 +895,30 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
     protected function _processGridFilters(&$config, $filters, $orm)
     {
-        if (empty($config['filters'])) {
-            return;
+        if (!empty($config['filters'])) {
+            foreach ($config['filters'] as $fId=>$f) {
+                $f['field'] = !empty($f['field']) ? $f['field'] : $fId;
+                if ($fId === '_quick') {
+                    if (!empty($f['expr']) && !empty($f['args']) && !empty($filters[$fId])) {
+                        $args = array();
+                        foreach ($f['args'] as $a) {
+                            $args[] = str_replace('?', $filters['_quick'], $a);
+                        }
+                        $orm->where_raw('('.$config['filters']['_quick']['expr'].')', $args);
+                    }
+                    break;
+                }
+            }
+            //delete $filters[$fId];
         }
-        $columnData = $this->findColumnDataForFilters($config);
-        foreach ($config['filters'] as $fId=>$f) {
-            $f['field'] = !empty($f['field']) ? $f['field'] : $fId;
+        
+        //$columnData = $this->findColumnDataForFilters($config);
+        foreach ($filters as $fId=>$f) {
+            if ($fId === '_quick') {
+                continue;
+            }
+         
+            /*$f['field'] = !empty($f['field']) ? $f['field'] : $fId;
             if ($fId === '_quick') {
                 if (!empty($f['expr']) && !empty($f['args']) && !empty($filters[$fId])) {
                     $args = array();
@@ -910,12 +929,15 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 }
                 continue;
             }
-            $fId = $f['field'];
+            $fId = $f['field'];*/
 
             if (isset($filters[$fId]) && !empty($f['type']) && isset($filters[$fId]['val']) && (!empty($filters[$fId]['val']) || $filters[$fId]['val'] == 0) && $filters[$fId]['val'] !== '') {
-                if (isset($columnData[$f['field']]['index'])){
+                /*if (isset($columnData[$f['field']]['index'])){
                     $f['field'] = $columnData[$f['field']]['index'];
-                }
+                }*/
+                if (!isset($f['field']))
+                    $f['field'] = $fId;
+
                 switch ($f['type']) {
                     case 'text':
                         $val = $filters[$fId];
