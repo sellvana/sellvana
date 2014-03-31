@@ -839,6 +839,7 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                         { name: 'basicstyles' },
                         { name: 'links' }
                     ],*/
+                    allowedContent: true,
                     startupMode: 'wysiwyg'
                 });
 //
