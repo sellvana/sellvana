@@ -840,7 +840,7 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
                         { name: 'basicstyles' },
                         { name: 'links' }
                     ],*/
-                    filebrowserBrowseUrl: FCom.Admin.baseUrl+'admin/media',                    
+                    filebrowserBrowseUrl: FCom.base_href+'media',                    
                     startupMode: 'wysiwyg'
                 });
 //
