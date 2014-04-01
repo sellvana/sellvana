@@ -1,5 +1,10 @@
 <script>
 
+window.import_products_register = function(grid) {
+    import_products_grid = grid;
+    grid.build();
+}
+
 require(['jquery', 'bootstrap', 'fcom.admin'], function($) {
     $(function() {
         FCom.Admin.Accordion('import-accordion');

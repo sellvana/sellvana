@@ -62,7 +62,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         
         if (!empty($options['config'])) {
             
-            $config = BUtil::arrayMerge($config, $options['config']);
+            $config['config'] = BUtil::arrayMerge($config['config'], $options['config']);
 
         }
         //BEvents::i()->fire(__METHOD__, array('config'=>&$config));
