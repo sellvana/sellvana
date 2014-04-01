@@ -308,7 +308,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 switch ($k) {
                     case 'refresh':
                         $action = array('html'=>BUtil::tagHtml('a',
-                            array('href'=>BRequest::currentUrl(), 'class'=>'js-change-url grid-refresh btn'),
+                            array('href'=>'#', 'class'=>'js-change-url grid-refresh btn'),
                             isset($action['caption']) ? $action['caption'] : BLocale::_('Refresh')
                         ));
                         break;
