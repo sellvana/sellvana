@@ -1,5 +1,3 @@
-{% set mediaLibImageConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'ckeditor_all_images', 'folder': 'media/images', config: {config: {actions: {custom: {id: 'btn_media_select', class: 'btn-primary disabled', caption: 'Select' } }  } } }) %}
-
 <script>
     $(document).ready(function() {      
         $('.f-admin-header').remove();
@@ -7,7 +5,7 @@
         $('#main-nav').remove();
     });
     window.ckeditor_all_images_register = function(grid) {
-        mediaGrid = grid;
+        ckeditor_all_images_grid = grid;
         grid.getGridSkeleton().Views.RowView.prototype._selectRow = function(ev) {            
             var selectedRows = grid.getSelectedRows();
 
@@ -20,10 +18,10 @@
             console.log(selectedRows.length);
             if (checked) {            
                 selectedRows.add(this.model);
-                $('#btn_media_select').removeClass('disabled');
+                $('.btn_media_add').removeClass('disabled');
             } else {            
         
-                $('#btn_media_select').addClass('disabled');
+                $('.btn_media_add').addClass('disabled');
             }
             console.log(selectedRows.length);
             ev.stopPropagation();
@@ -33,171 +31,29 @@
         }
 
         grid.build();                
-
-        $('#btn_media_select').click(function() {
-            var row = mediaGrid.getSelectedRows().at(0);
+        $('.row:first').append("<div class='modal-footer'>"+
+                "<button class='btn btn-primary btn-add btn_media_add disabled' data-dismiss='modal' type='button'>{{ "Add"|_ }}</button>"+
+                "<button class='btn btn-default btn-close btn_media_close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>"+
+        "</div>");
+        $('.btn_media_add').click(function() {
+            var row = ckeditor_all_images_grid.getSelectedRows().at(0);
             var funcNum = '{{ REQUEST.get('CKEditorFuncNum') }}';           
             var path = FCom.Admin.baseUrl + row.get("folder") + row.get("subfolder") + "/" + row.get("file_name");
             window.opener.CKEDITOR.tools.callFunction(funcNum, path);            
             window.close();
         });
+
+        $('.btn_media_close').click(function() {window.close(); });
     }
-    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
-        $('#prod-image-fileupload').fileupload({
-            url: '{{ APP.href("media/grid/upload?folder=media/images") | raw}}',
-            multiple:true,
-            acceptFileTypes:  /(\.|\/)(jpe?g|tiff|gif|png|bmp)$/i
-        })
-        .bind('fileuploadalways', function(e, data) {
-
-            if(data.result.id) {
-                mediaGrid.getRows().add(data.result);
-
-                $('td.name span').each(function(i) {
-                    if($(this).html() === data.result.file_name)
-                    $(this).parents('tr:first').remove();
-                });
-
-                if ($('#prod-attach-checkbox').is(':checked')) {
-
-                    var addedRow = data.result;
-                    addedRow._new = true;
-                    addedRow.file_id = addedRow.id;
-                    addedRow.id = guid();
-                    imagesGrid.getRows().add(addedRow);
-
-                    if ($('tr.template-upload').length === 0) {
-                        $('.prod-images-modal-close').trigger('click');
-                    }
-                }
-            }
-        });
-
-    });
+ 
 </script>
 <div class='row'>
-                    <div class='col-sm-12'>
-                    <div class='tabbable'>
-                        <ul class='nav nav-tabs prod-type'>
-                            <li class='active'>
-                                <a data-toggle='tab' href='#images_library'>
-                                    {{ 'Library'|_ }}
-                                </a>
-                            </li>
-                            <li>
-                                <a data-toggle='tab' href='#prod-image-fileupload'>
-                                    {{ 'Upload'|_ }}
-                                </a>
-                            </li>
-                        </ul>
-                        <div class='tab-content'>
-                            <div class='tab-pane active' id='images_library'>
-                                {{ THIS.view('core/backbonegrid').set('grid', mediaLibImageConfig) | raw }}
-                            </div>
-                            <div class='tab-pane'  id='prod-image-fileupload'>
-                                <div class='box-content'>
-                                        <div class='row fileupload-buttonbar'>
-                                                          <div class='col-sm-12'>
-                                                            <span class='btn btn-success fileinput-button'>
-                                                              <i class='icon-plus icon-white'></i>
-                                                              <span>{{ 'Add files...'|_ }}</span>
-                                                              <input data-bfi-disabled='' multiple='' name='upload[]' type='file' >
-                                                            </span>
-                                                            <button class='btn btn-primary start' type='submit'>
-                                                              <i class='icon-upload icon-white'></i>
-                                                              <span>{{ 'Start upload'|_ }}</span>
-                                                            </button>
-                                                            <button class='btn btn-warning cancel' type='reset'>
-                                                              <i class='icon-ban-circle icon-white'></i>
-                                                              <span>{{ 'Cancel upload'|_ }}</span>
-                                                            </button>                                                            
-                                                          </div>
-                                                          <div class='col-sm-5 fileupload-progress fade'>
-                                                            <div aria-valuemax='100' aria-valuemin='0' class='progress progress-success progress-striped active' role='progressbar'>
-                                                              <div class='bar' style='width:0%;'></div>
-                                                            </div>
-                                                            <div class='progress-extended'> </div>
-                                                          </div>
-                                        </div>
-                                        <div class='fileupload-loading'></div>
-                                        <br>
-                                        <table class='table table-striped' role='presentation'>
-                                            <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
-                                        </table>
-
-                                </div>
-                                {% verbatim %}
-                                <script id="template-upload" type="text/x-tmpl">
-                                    {% for (var i=0, file; file=o.files[i]; i++) { %}
-                                        <tr class="template-upload fade">
-                                            <td class="preview"><span class="fade"></span></td>
-                                            <td class="name"><span>{%=file.name%}</span></td>
-                                            <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
-                                            {% if (file.error) { %}
-                                                <td class="error" colspan="2"><span class="label label-important">{{ 'Error'|_ }}</span> {%=file.error%}</td>
-                                            {% } else if (o.files.valid && !i) { %}
-                                            <td>
-                                                <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                                                    <div class="bar" style="width:0%;"></div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                {% if (!o.options.autoUpload) { %}
-                                                    <button class="btn btn-primary start">
-                                                        <i class="icon-upload icon-white"></i>
-                                                        <span>{{ 'Upload'|_ }}</span>
-                                                    </button>
-                                                {% } %}
-                                            </td>
-                                            {% } else { %}
-                                                <td colspan="2"></td>
-                                            {% } %}
-                                            <td>
-                                               {% if (!i) { %}
-                                                <button class="btn btn-warning cancel">
-                                                    <i class="icon-ban-circle icon-white"></i>
-                                                    <span>{{ 'Cancel'|_ }}</span>
-                                                </button>
-                                                {% } %}
-                                            </td>
-                                        </tr>
-                                    {% } %}
-                                </script>
-                                <!-- The template to display files available for download -->
-
-                                <script id="template-download" type="text/x-tmpl">
-                                    {% for (var i=0, file; file=o.files[i]; i++) { %}
-                                        <tr class="template-download fade">
-                                           {% if (file.error) { %}
-                                                <td></td>
-                                                <td class="name"><span>{%=file.name%}</span></td>
-                                                <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
-                                                <td class="error" colspan="2"><span class="label label-important">{{ 'Error'|_ }}</span> {%=file.error%}</td>
-                                            {% } else { %}
-                                                <td class="preview">
-                                                {% if (file.thumbnail_url) { %}
-                                                    <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="gallery" download="{%=file.name%}">
-                                                        <img src="{%=file.thumbnail_url%}">
-                                                    </a>
-                                                {% } %}
-                                                </td>
-                                                <td class="name">
-                                                    <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="{%=file.thumbnail_url&&'gallery'%}" download="{%=file.name%}">
-                                                        {%=file.name%}
-                                                    </a>
-                                                </td>
-                                                <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
-                                                <td colspan="2"></td>
-                                            {% } %}
-                                            <td>
-                                                <input type="checkbox" name="delete" value="1" class="toggle">
-                                            </td>
-                                        </tr>
-                                    {% } %}
-                                </script>
-                                {% endverbatim %}
-                            </div>
-                        </div>
-                    </div>
-                    </div>
+    <div class='col-sm-12'>
+        {{ THIS.view('core/medialib').set('config', {
+                                                        'id': 'ckeditor_all_images', 
+                                                        'folder': 'media/images',                                                         
+                                                        mode: 'thumbnail'
+                                                    }
+                                        ) | raw }}              
+    </div>
 </div>
