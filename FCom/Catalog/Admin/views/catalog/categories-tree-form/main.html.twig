@@ -105,7 +105,8 @@
 <script>    
 require(['jquery'], function($) {
     $('#btn_add_image').click(function() {
-        $('#cat-image-grid-modal').modal();
+        $('.btn_category_images_add').addClass('disabled');
+        $('#category_images_modal').modal();
     }); 
 });
 </script>
@@ -131,10 +132,10 @@ require(['jquery'], function($) {
                 console.log(selectedRows.length);
                 if (checked) {            
                     selectedRows.add(this.model);
-                    $('.cat-image-modal-add').removeClass('disabled');
+                    $('.btn_category_images_add').removeClass('disabled');
                 } else {            
             
-                    $('.cat-image-modal-add').addClass('disabled');
+                    $('.btn_category_images_add').addClass('disabled');
                 }
                 console.log(selectedRows.length);
                 ev.stopPropagation();
@@ -145,34 +146,17 @@ require(['jquery'], function($) {
 
             grid.build();                
 
-            $('.cat-image-modal-add').click(function() {
+            $('.btn_category_images_add').click(function() {
                 var row = category_images_grid.getSelectedRows().at(0);            
                 var path = row.get("folder") + row.get("subfolder") + "/" + row.get("file_name");
                 var imageTag = '<img src="{{ resizeUrl }}?s=150x150&cache=0&f='+ path +'" />';
                 $('#model-image-url').val(path);
                 $('#current-image').html(imageTag); 
-                category_images_grid.getGridView().clearSelectedRows();
-                $('.cat-image-modal-close').trigger('click');
+                category_images_grid.getGridView().clearSelectedRows();               
             });        
         }    
     });
 </script>
-<a role="button" href="#cat-image-grid-modal" data-toggle="modal" style='display:none;' id='btn_cat_image_modal'>{{ "Add"|_ }}</a>
-<div class='modal fade' id='cat-image-grid-modal' tabindex='-1'>
-    <div class='modal-dialog' style='width:1050px;'>
-        <div class='modal-content'>
-            <div class='modal-body'>
-                <div class='row'>
-                    <div class='col-sm-12'>
-                        {{ THIS.view('core/medialib').set('config', {'id': 'category_images', 'folder': 'media/category/images', 'onlyImage': true}) | raw }} 
-                    </div>
-                </div>
-            </div>
-            <div class='modal-footer'>
-                <button class='btn btn-primary btn-add cat-image-modal-add disabled' data-dismiss='modal' type='button'>{{ "Add"|_ }}</button>
-                <button class='btn btn-default btn-close cat-image-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
-            </div>
-        </div>
-    </div>
-</div>
+
+{{ THIS.view('core/medialib').set('config', {'id': 'category_images', 'folder': 'media/category/images', title: 'Category Image'}) | raw }} 
 

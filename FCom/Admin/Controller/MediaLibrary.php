@@ -65,6 +65,18 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $config['config'] = BUtil::arrayMerge($config['config'], $options['config']);
 
         }
+
+        if($options['mode'] && $options['mode'] === 'link') {
+            $download_url = BApp::href('/media/grid/download?folder='.$folder.'&file=');
+            $config['config']['columns'] = array(
+                    array('type'=>'row_select'),
+                    array('name'=>'download_url',  'hidden'=>true, 'default'=>$download_url),
+                    array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),                    
+                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>200, 'display'=>'eval', 'print'=>'"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'),
+                    array('name'=>'file_size', 'label'=>'File Size', 'width'=>260, 'search'=>false, 'display'=>'file_size')
+                    //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
+                );
+        }
         //BEvents::i()->fire(__METHOD__, array('config'=>&$config));
         //BEvents::i()->fire(__METHOD__.':'.$folder, array('config'=>&$config));
         return $config;
