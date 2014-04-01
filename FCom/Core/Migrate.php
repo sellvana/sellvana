@@ -2,7 +2,7 @@
 
 class FCom_Core_Migrate extends BClass
 {
-    public function install__0_1_5()
+    public function install__0_1_6()
     {
         if (BDb::ddlTableExists('buckyball_module')) {
             BDb::run("
@@ -105,6 +105,11 @@ class FCom_Core_Migrate extends BClass
                 ),
             )
         );
+        if (!BConfig::i()->get('cache/default_backend')) {
+            $this->_defaultBackend = BCache::i()->getFastestAvailableBackend();
+            BConfig::i()->set('cache/default_backend', $this->_defaultBackend, false, true);
+            FCom_Core_Main::i()->writeConfigFiles('core');
+        }
     }
 
     public function upgrade__0_1_0__0_1_1()

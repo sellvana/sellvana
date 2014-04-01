@@ -43,13 +43,15 @@ class FCom_IndexTank_Migrate extends BClass
         $pFunctionsTable = FCom_IndexTank_Model_ProductFunction::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$pFunctionsTable} (
-            `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-            `name` VARCHAR( 1024 ) NOT NULL,
-            `number` INT( 11 ) UNSIGNED NOT NULL ,
-            `definition` VARCHAR( 1024 ) NOT NULL,
-            `field_name` VARCHAR( 100 ) NOT NULL,
-            `sort_order` enum('asc','desc') NOT NULL DEFAULT 'asc',
-            `use_custom_formula` enum('asc','desc') tinyint(1) NOT NULL DEFAULT 0,
+              `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+              `name` varchar(1024)  NOT NULL,
+              `number` int(11) NOT NULL DEFAULT '-1',
+              `definition` varchar(1024)  NOT NULL,
+              `label` varchar(100)  NOT NULL,
+              `field_name` varchar(100) NOT NULL,
+              `sort_order` enum('asc','desc') NOT NULL DEFAULT 'asc',
+              `use_custom_formula` tinyint(1) NOT NULL DEFAULT '0',
+              PRIMARY KEY (`id`)
             ) ENGINE = InnoDB;
             ");
         BDb::i()->ddlClearCache();

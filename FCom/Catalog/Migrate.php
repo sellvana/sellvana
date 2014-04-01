@@ -2,7 +2,7 @@
 
 class FCom_Catalog_Migrate extends BClass
 {
-    public function install__0_2_22()
+    public function install__0_2_23()
     {
         $tProduct = FCom_Catalog_Model_Product::table();
 
@@ -38,8 +38,8 @@ class FCom_Catalog_Migrate extends BClass
                 'uom'           => "VARCHAR(10) NOT NULL DEFAULT 'EACH'",
                 'thumb_url'     => 'TEXT',
                 'images_data'   => 'TEXT',
-                'create_dt'     => 'DATETIME DEFAULT NULL',
-                'update_dt'     => 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+                'create_at'     => 'DATETIME DEFAULT NULL',
+                'update_at'     => 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
                 'data_serialized' => 'mediumtext null',
                 'is_featured' => 'tinyint',
                 'is_popular' => 'tinyint',
@@ -124,6 +124,7 @@ class FCom_Catalog_Migrate extends BClass
                 'show_view' => 'tinyint(1) unsigned default 0',
                 'view_name' => 'varchar(255)',
                 'page_parts' => 'varchar(50)',
+                'image_url' => 'TEXT NULL',
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(

@@ -118,7 +118,7 @@ class FCom_Cms_Migrate extends BClass
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(
-                'UNQ_form_name' => 'UNIQUE (form_name)',
+                'UNQ_form_name' => 'UNIQUE (form_name)'
             ),
         ));
 
@@ -136,8 +136,6 @@ class FCom_Cms_Migrate extends BClass
                 'data_serialized' => 'text',
             ),
             'PRIMARY' => '(id)',
-            'KEYS' => array(
-            ),
             'CONSTRAINTS' => array(
                 "FK_{$tFormData}_form" => "FOREIGN KEY (form_id) REFERENCES {$tForm} (id) ON UPDATE CASCADE ON DELETE CASCADE",
             ),

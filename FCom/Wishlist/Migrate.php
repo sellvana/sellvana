@@ -9,7 +9,7 @@ class FCom_Wishlist_Migrate extends BClass
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
             `customer_id` int(10) unsigned NOT NULL,
             PRIMARY KEY (`id`),
-            UNIQUE KEY `user_id` (`user_id`)
+            UNIQUE KEY `customer_id` (`customer_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
