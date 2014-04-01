@@ -509,29 +509,6 @@ class BLayout extends BClass
     }
 
     /**
-     * Set or retrieve main (root) view object
-     *
-     * @deprecated
-     * @param string $viewName
-     * @return BView|BLayout
-     */
-    public function rootView($viewName = BNULL)
-    {
-        if (BNULL === $viewName) {
-//            return $this->_rootViewName ? $this->view($this->_rootViewName) : null;
-            return $this->getRootView(); // the above seems like this method?!
-        }
-        /*
-        if (empty($this->_views[$viewName])) {
-            throw new BException(BLocale::_('Invalid view name for main view: %s', $viewName));
-        }
-        */
-        $this->_rootViewName = $viewName;
-
-        return $this;
-    }
-
-    /**
      * Set root view name
      * @param string $viewName
      * @return $this
@@ -566,9 +543,9 @@ class BLayout extends BClass
      * @param string $to
      * @return BView
      */
-    public function cloneView($from, $to = BNULL)
+    public function cloneView($from, $to = null)
     {
-        if (BNULL === $to) {
+        if (is_null($to)) {
             $to = $from . '-copy';
             for ($i = 2; !empty($this->_views[$to]); $i++) {
                 $to = $from . '-copy' . $i;

@@ -53,7 +53,10 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'filters' => array(
                     array('field' => 'file_name', 'type' => 'text')
                 ),
-                'grid_before_create'=>$id.'_register'
+                'grid_before_create'=>$id.'_register',
+                'actions' => array(
+                    'refresh' => true,
+                )
             )
         );
         

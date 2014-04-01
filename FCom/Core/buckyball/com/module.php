@@ -39,7 +39,7 @@ class BModuleRegistry extends BClass
     protected $_modules = array();
 
     /**
-    * Current module name, not BNULL when:
+    * Current module name, not null when:
     * - In module bootstrap
     * - In observer
     * - In view
@@ -664,6 +664,7 @@ class BModule extends BClass
     public $autoload;
     public $crontab;
     public $custom;
+    public $license;
 
     public $is_cached;
     /**
@@ -1170,7 +1171,7 @@ if (!isset($o[0]) || !isset($o[1])) {
     */
     public function runStatus($status=null)
     {
-        if (BNULL===$status) {
+        if (is_null($status)) {
             return $this->run_status;
         }
         $this->run_status = $status;
@@ -1385,8 +1386,8 @@ class BMigrate extends BClass
         if (!$force) {
             $conf = BConfig::i();
             $req = BRequest::i();
-            if (!$conf->get('install_status') === 'installed' 
-                || !$conf->get('db/implicit_migration') 
+            if (!$conf->get('install_status') === 'installed'
+                || !$conf->get('db/implicit_migration')
                 || $req->xhr() && !$req->get('MIGRATE')
             ) {
                 return;

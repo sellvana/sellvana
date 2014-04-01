@@ -662,7 +662,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return true;
 
                 },
-                _selectRow: function (ev) {
+                _selectRow: function (ev) {                    
                     var checked = $(ev.target).is(':checked');
                     this.model.set('selected', checked);
 

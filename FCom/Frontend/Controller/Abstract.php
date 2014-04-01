@@ -4,7 +4,7 @@
 class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
 {
     protected static $_postSanitized = false;
-    
+
     public function action_unauthenticated()
     {
         $r = BRequest::i();
@@ -15,10 +15,10 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
         }
 
         if ($r->xhr()) {
-            BSession::i()->data('login_orig_url', $redirect ? $redirect : $r->referrer());
+            BSession::i()->set('login_orig_url', $redirect ? $redirect : $r->referrer());
             BResponse::i()->json(array('error'=>'login'));
         } else {
-            BSession::i()->data('login_orig_url', $redirect ? $redirect : $r->currentUrl());
+            BSession::i()->set('login_orig_url', $redirect ? $redirect : $r->currentUrl());
             $this->layout('/customer/login');
             BResponse::i()->status(401, 'Unauthorized'); // HTTP sic
         }
@@ -34,15 +34,15 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
         }
 
         if ($r->xhr()) {
-            BSession::i()->data('login_orig_url', $redirect ? $redirect : $r->referrer());
+            BSession::i()->set('login_orig_url', $redirect ? $redirect : $r->referrer());
             BResponse::i()->json(array('error'=>'denied'));
         } else {
-            BSession::i()->data('login_orig_url', $redirect ? $redirect : $r->currentUrl());
+            BSession::i()->set('login_orig_url', $redirect ? $redirect : $r->currentUrl());
             $this->layout('/denied');
             BResponse::i()->status(403, 'Forbidden');
         }
     }
-    
+
     public function sanitizeRecursive(&$data)
     {
         foreach ($data as $k => &$v) {
@@ -63,7 +63,7 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
             $this->sanitizeRecursive($_POST);
             static::$_postSanitized = true;
         }
-        
+
         $this->view('head')->setTitle(BConfig::i()->get('modules/FCom_Core/site_title'));
 
         return true;

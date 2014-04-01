@@ -78,7 +78,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         parent::onAfterSave();
 
         if ($this->id()===static::sessionUserId()) {
-            BSession::i()->data('admin_user', serialize($this));
+            BSession::i()->set('admin_user', serialize($this));
             static::$_sessionUser = $this;
         }
     }
@@ -128,7 +128,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     static public function sessionUser($reset=false)
     {
         if ($reset || !static::$_sessionUser) {
-            $data = BSession::i()->data('admin_user');
+            $data = BSession::i()->get('admin_user');
             if (is_string($data)) {
                 static::$_sessionUser = $data ? unserialize($data) : false;
             } else {
@@ -185,7 +185,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     {
         $this->set('last_login', BDb::now())->save();
 
-        BSession::i()->data('admin_user', serialize($this));
+        BSession::i()->set('admin_user', serialize($this));
         static::$_sessionUser = $this;
 
         if ($this->get('locale')) {
@@ -202,7 +202,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     static public function logout()
     {
         BEvents::i()->fire(__METHOD__);
-        BSession::i()->data('admin_user', null);
+        BSession::i()->set('admin_user', null);
         static::$_sessionUser = null;
     }
 

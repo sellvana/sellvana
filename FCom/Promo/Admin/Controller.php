@@ -294,7 +294,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         BResponse::i()->nocache();
         $r = BRequest::i();
         $this->view('jqgrid')->set('config', $this->productGridConfig(false, $r->get('type'), $r->get('group_id')));
-        BLayout::i()->rootView('jqgrid');
+        BLayout::i()->setRootView('jqgrid');
     }
 
     public function action_form_products()

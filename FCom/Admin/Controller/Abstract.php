@@ -29,10 +29,10 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     {
         $r = BRequest::i();
         if ($r->xhr()) {
-            BSession::i()->data('admin_login_orig_url', $r->referrer());
+            BSession::i()->set('admin_login_orig_url', $r->referrer());
             BResponse::i()->json(array('error'=>'login'));
         } else {
-            BSession::i()->data('admin_login_orig_url', $r->currentUrl());
+            BSession::i()->set('admin_login_orig_url', $r->currentUrl());
             $this->layout('/login');
             BResponse::i()->status(401, 'Unauthorized'); // HTTP sic
         }
@@ -42,10 +42,10 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     {
         $r = BRequest::i();
         if ($r->xhr()) {
-            BSession::i()->data('admin_login_orig_url', $r->referrer());
+            BSession::i()->set('admin_login_orig_url', $r->referrer());
             BResponse::i()->json(array('error'=>'denied'));
         } else {
-            BSession::i()->data('admin_login_orig_url', $r->currentUrl());
+            BSession::i()->set('admin_login_orig_url', $r->currentUrl());
             $this->layout('/denied');
             BResponse::i()->status(403, 'Forbidden');
         }
