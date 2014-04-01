@@ -663,6 +663,7 @@ class BModule extends BClass
     public $default_config;
     public $autoload;
     public $crontab;
+    public $security;
     public $custom;
     public $license;
 
@@ -1080,6 +1081,13 @@ if (!isset($o[0]) || !isset($o[1])) {
         }
     }
 
+    protected function _processSecurity()
+    {
+        if (!empty($this->security['request_fields_whitelist'])) {
+            BRequest::i()->addRequestFieldsWhitelist($this->security['request_fields_whitelist']);
+        }
+    }
+
     /**
      * Register module specific autoload callback
      *
@@ -1270,6 +1278,7 @@ if (!isset($o[0]) || !isset($o[1])) {
         $this->_processAutoUse();
         $this->_processRouting();
         $this->_processObserve();
+        $this->_processSecurity();
 
         BEvents::i()->fire('BModule::bootstrap:before', array('module'=>$this));
 

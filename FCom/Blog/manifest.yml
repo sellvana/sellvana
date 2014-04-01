@@ -25,3 +25,7 @@ modules:
                 routing:
                     - [ /blog/post/?.action, FCom_Blog_Admin_Controller_Post ]
                     - [ /blog/category/?.action, FCom_Blog_Admin_Controller_Category ]
+                security:
+                    request_fields_whitelist:
+                        /blog/post/form:
+                            POST/model/content: *

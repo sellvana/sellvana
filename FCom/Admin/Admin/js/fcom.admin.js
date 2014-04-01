@@ -833,14 +833,15 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
             if (!editors[id] && CKEDITOR !== 'undefined' && !CKEDITOR.instances[id]) {
                 console.log(id, 'wysiwygcreate');
                 editors[id] = true; // prevent double loading
-                
+
                 CKEDITOR.replace(id, {
                     /*toolbarGroups: [
                         { name: 'mode' },
                         { name: 'basicstyles' },
                         { name: 'links' }
                     ],*/
-                    filebrowserBrowseUrl: FCom.base_href+'media',                    
+                    filebrowserBrowseUrl: FCom.base_href+'media',
+                    allowedContent: true,
                     startupMode: 'wysiwyg'
                 });
 //
@@ -1223,6 +1224,7 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
             CKEDITOR.config.startupMode = 'wysiwyg';//'source';
             CKEDITOR.config.filebrowserWindowHeight = 757;
             CKEDITOR.config.filebrowserWindowWidth = 912;
+            CKEDITOR.config.allowedContent = true;
 
             //CKEDITOR.config.filebrowserUploadUrl = '/';
         }

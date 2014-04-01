@@ -43,26 +43,9 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
         }
     }
 
-    public function sanitizeRecursive(&$data)
-    {
-        foreach ($data as $k => &$v) {
-            if (is_array($v)) {
-                $this->sanitizeRecursive($v);
-            } elseif (!is_numeric($v)) {
-                $v = strip_tags($v);
-            }
-        }
-        unset($v);
-    }
-
     public function beforeDispatch()
     {
         if (!parent::beforeDispatch()) return false;
-
-        if (!static::$_postSanitized && !empty($_POST)) {
-            $this->sanitizeRecursive($_POST);
-            static::$_postSanitized = true;
-        }
 
         $this->view('head')->setTitle(BConfig::i()->get('modules/FCom_Core/site_title'));
 

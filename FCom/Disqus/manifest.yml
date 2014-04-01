@@ -13,3 +13,11 @@ modules:
                 auto_use: [ layout ]
                 #observe:
                     #- [ BLayout::loadTheme:after, FCom_Disqus_Frontend::layout ]
+
+            FCom_Admin:
+                security:
+                    request_fields_whitelist:
+                        /settings:
+                            POST/config/modules/FCom_Disqus/comments_code: *
+                            POST/config/modules/FCom_Disqus/counts_code: *
+

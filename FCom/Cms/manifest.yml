@@ -25,3 +25,7 @@ modules:
 
                     - [ /cms/forms, FCom_Cms_Admin_Controller_Forms.index ]
                     - [ /cms/forms/.action, FCom_Cms_Admin_Controller_Forms ]
+                security:
+                    request_fields_whitelist:
+                        /cms/blocks/form:
+                            POST/model/content: *
