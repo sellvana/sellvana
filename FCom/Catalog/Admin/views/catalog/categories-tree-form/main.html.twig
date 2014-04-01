@@ -39,19 +39,24 @@
                 <div class='col-sm-12'>
                     <span class='btn btn-primary fileinput-button' id='btn_add_image'>
                         <i class='icon-plus icon-white'></i>
-                        <span>{{ 'Add Image...'|_ }}</span>     
-                        <input id="model-image-url" type="hidden" name="model[image_url]" />
+                        <span id="btn_add_text">
+                        {% if m.get('image_url') %}
+                            {{ 'Change Image...'|_ }}
+                        {% else %}
+                            {{ 'Add Image...'|_ }}
+                        {% endif %}
+                        </span>     
+                        <input id="model-image-url" type="hidden" name="model[image_url]" value="{{ m.get('image_url') }}"/>
                     </span>
-                </div>
-                <div class='col-sm-5 fileupload-progress fade'>
-                    <div aria-valuemax='100' aria-valuemin='0' class='progress progress-success progress-striped active' 
-                    role='progressbar'>
-                        <div class='bar' style='width:0%;'></div>
-                    </div>
-                    <div class='progress-extended'> </div>
-                </div>
-            </div>
-            <div class='fileupload-loading'></div>
+
+                    
+                        <span class='btn btn-primary fileinput-button' id='btn_remove_image' style='display: {% if m.get('image_url') %} block; {% else %} none; {% endif %}'>                            
+                            × {{ 'Remove Image...'|_ }}
+                        </span>
+                    
+
+                </div>             
+            </div>            
             <br>
             <div id="current-image">
                 {% if m.get('image_url') %}
@@ -104,10 +109,22 @@
 
 <script>    
 require(['jquery'], function($) {
+    {% if m.get('image_url') %}
+        $('.btn_category_images_add').html('{{ 'Change'|_ }}');
+    {% endif %}
+
     $('#btn_add_image').click(function() {
         $('.btn_category_images_add').addClass('disabled');
-        $('#category_images_modal').modal();
+        $('#category_images_modal').modal();        
     }); 
+
+    $('#btn_remove_image').click(function() {
+        $('#btn_add_text').html('{{ 'Add Image...'|_ }}');
+        $('#btn_remove_image').css('display', 'none');
+        $('#current-image').html('');
+        $('#model-image-url').val('');
+        $('.btn_category_images_add').html('{{ 'Add'|_ }}');
+    });
 });
 </script>
 
@@ -152,7 +169,10 @@ require(['jquery'], function($) {
                 var imageTag = '<img src="{{ resizeUrl }}?s=150x150&cache=0&f='+ path +'" />';
                 $('#model-image-url').val(path);
                 $('#current-image').html(imageTag); 
-                category_images_grid.getGridView().clearSelectedRows();               
+                category_images_grid.getGridView().clearSelectedRows();   
+                $('#btn_add_text').html('{{ 'Change Image...'|_ }}');
+                $('#btn_remove_image').css('display', 'block');  
+                $('.btn_category_images_add').html('{{ 'Change'|_ }}');          
             });        
         }    
     });
