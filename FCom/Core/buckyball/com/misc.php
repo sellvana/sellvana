@@ -1463,7 +1463,7 @@ class BUtil extends BClass
         if ($first) {
             $dir = realpath($dir);
         }
-        if (!file_exists($dir)) {
+        if (!$dir || !file_exists($dir)) {
             return true;
         }
         if (!is_dir($dir) || is_link($dir)) {
@@ -1473,9 +1473,9 @@ class BUtil extends BClass
             if ($item == '.' || $item == '..') {
                 continue;
             }
-            if (!static::rmdirRecursive($dir . "/" . $item, false)) {
+            if (!static::rmdirRecursive_YesIHaveCheckedThreeTimes($dir . "/" . $item, false)) {
                 chmod($dir . "/" . $item, 0777);
-                if (!static::rmdirRecursive($dir . "/" . $item, false)) return false;
+                if (!static::rmdirRecursive_YesIHaveCheckedThreeTimes($dir . "/" . $item, false)) return false;
             }
         }
         return rmdir($dir);

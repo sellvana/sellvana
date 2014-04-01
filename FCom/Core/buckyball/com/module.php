@@ -632,6 +632,7 @@ class BModule extends BClass
     public $bootstrap;
     public $version;
     public $channel;
+    public $category;
     public $db_connection_name;
     public $root_dir;
     public $view_root_dir;
