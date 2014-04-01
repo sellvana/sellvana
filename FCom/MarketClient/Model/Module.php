@@ -74,9 +74,9 @@ class FCom_MarketClient_Model_Module extends FCom_Core_Model_Abstract
                     //'channel' => $
                 ))->save();
             } else
-            $localMod = $modules[$modName]
+            #$localMod = $modules[$modName];
         }
-        $this->update_many_by_id($update);
+        #$this->update_many_by_id($update);
         return $modules;
     }
 }
