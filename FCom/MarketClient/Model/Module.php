@@ -73,7 +73,7 @@ class FCom_MarketClient_Model_Module extends FCom_Core_Model_Abstract
                     'core_module_id' => !empty($dbModules[$modName]) ? $dbModules[$modName]->id() : null,
                     //'channel' => $
                 ))->save();
-            } else
+            }
             #$localMod = $modules[$modName];
         }
         #$this->update_many_by_id($update);
