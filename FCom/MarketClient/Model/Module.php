@@ -8,11 +8,12 @@ class FCom_MarketClient_Model_Module extends FCom_Core_Model_Abstract
     static public function onFindOrm($args)
     {
         $args['orm']
-            ->join('FCom_Core_Model_Module', array('m.id','=','core_module_id'), 'm')
+            ->left_outer_join('FCom_Core_Model_Module', array('m.id','=','core_module_id'), 'm')
             ->select('m.module_name')
             ->select('m.schema_version')
             ->select('m.data_version')
             ->select('m.last_upgrade')
+            ->select('m.id')
         ;
     }
 
@@ -57,5 +58,25 @@ class FCom_MarketClient_Model_Module extends FCom_Core_Model_Abstract
             }
         }
         return $localModules;
+    }
+
+    public function collectAllModules()
+    {
+        $dbModules = BDbModule::i()->orm()->find_many_assoc('module_name');
+        $modules = static::orm()->find_many_assoc('module_name');
+        $remoteModules = FCom_MarketClient_RemoteApi::i()->getModulesVersions(true);
+        $update = array();
+        foreach ($remoteModules as $modName => $mod) {
+            if (empty($modules[$modName])) {
+                $modules[$modName] = static::create(array(
+                    'module_name' => $modName,
+                    'core_module_id' => !empty($dbModules[$modName]) ? $dbModules[$modName]->id() : null,
+                    //'channel' => $
+                ))->save();
+            } else
+            $localMod = $modules[$modName]
+        }
+        $this->update_many_by_id($update);
+        return $modules;
     }
 }

@@ -14,4 +14,14 @@ class FCom_MarketClient_Admin_Controller_Market extends FCom_Admin_Controller_Ab
         BResponse::i()->redirect($data['url']);
     }
 
+    public function action_check_updates__POST()
+    {
+        try {
+            FCom_MarketClient_RemoteApi::i()->getModulesVersions(true, true);
+            $this->message('Updates retrieved successfully');
+        } catch (Exception $e) {
+            $this->message($e->getMessage());
+        }
+        BResponse::i()->redirect(BRequest::i()->referrer());
+    }
 }

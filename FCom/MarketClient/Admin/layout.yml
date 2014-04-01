@@ -13,12 +13,12 @@ base:
 /marketclient/publish:
     - { include: base }
     - { hook: main, views: marketclient/publish }
-    - { view: admin/nav, do: [[ setNav, modules ]] }
+    - { view: admin/nav, do: [[ setNav, modules/publish ]] }
 
 /marketclient/publish/module:
     - { include: base }
     - { hook: main, views: marketclient/publish/module }
-    - { view: admin/nav, do: [[ setNav, modules ]] }
+    - { view: admin/nav, do: [[ setNav, modules/publish ]] }
 
 /marketclient/install:
     - { include: base }
