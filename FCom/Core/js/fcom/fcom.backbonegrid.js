@@ -73,6 +73,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
         FCom.BackboneGrid = function (config) {
             var rowsCollection;
             var columnsCollection;
+            var filtersCollection;
             var gridView;
             var headerView;
             var filterView;

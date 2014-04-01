@@ -123,15 +123,7 @@ require(['jquery','underscore','backbone'], function($, _) {
         return  arr.join(',');
     }
 
-    $('.btn-rescan-images').click(function () {
-        $.post('{{ APP.href('media/grid/rescan?folder=media/product/images') }}', function (response) {
-            if (response.status == 'success') {
-                $.bootstrapGrowl("Rescan success", { type: 'success', align: 'center', width: 'auto' });
-            } else {
-                $.bootstrapGrowl("Error:<br>" + response.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
-            }
-        });
-    });
+
 });
 </script>
 {{ THIS.view('core/backbonegrid').set('grid', prodImagesConfig) | raw }}

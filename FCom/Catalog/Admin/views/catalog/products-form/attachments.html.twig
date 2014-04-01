@@ -27,7 +27,7 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
         attachmentGrid.getRows().forEach(function(row) {
             rows.push(_getAttachmentsDbFields(row.toJSON()));
         });
-        console.log(removedIds);
+        console.log(rows);
         $('#prod-attach-rows').val(JSON.stringify(rows));
         $('#prod-attach-remove').val(removedIds.join(','));
     }
