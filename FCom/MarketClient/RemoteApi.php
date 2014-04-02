@@ -119,14 +119,14 @@ final class FCom_MarketClient_RemoteApi extends BClass
             return false;
         }
 
-        $filename = $dir . '/' . $moduleName . '.zip';
+        $filename = $moduleName . '.zip';
         $reqInfo = BUtil::lastRemoteHttpInfo();
         if (preg_match('#;\s*filename=(.*)$#i', $reqInfo['headers']['content-disposition'], $m)) {
             $filename = $m[1];
         }
-
-        if (file_put_contents($filename, $response)) {
-            return $filename;
+        $filepath = $dir . '/' . $filename;
+        if (file_put_contents($filepath, $response)) {
+            return $filepath;
         } else {
             return false;
         }
