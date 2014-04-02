@@ -36,3 +36,7 @@ define(['jquery', 'jquery.validate'], function($) {
     };
     $('.has-progress-bar').strengthLevelPassword();
 });
+
+
+
+

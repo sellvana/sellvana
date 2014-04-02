@@ -104,3 +104,15 @@ function partial(el, options) {
 function partialParent(el, params) {
     partial($(el).closest('.include'), params);
 }
+
+
+
+
+
+
+
+
+
+
+
+
