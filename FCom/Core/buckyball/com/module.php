@@ -781,6 +781,10 @@ if ($args['name']==="FCom_Referrals") {
         if (!isset($this->run_status)) {
             $this->run_status = BModule::IDLE;
         }
+
+        if (!isset($this->channel)) {
+            $this->channel = 'alpha';
+        }
     }
 
     protected function _normalizeManifestRequireFormat()

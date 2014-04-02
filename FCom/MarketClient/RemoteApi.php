@@ -54,6 +54,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
             'site_key' => $siteKey,
         ));
         $response = BUtil::remoteHttp("GET", $url);
+#echo "<pre>"; var_dump($response); exit;
         $result = BUtil::fromJson($response);
 
         if (!empty($result)) {

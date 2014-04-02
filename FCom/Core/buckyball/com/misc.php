@@ -1686,6 +1686,14 @@ class BUtil extends BClass
         }
         return false;
     }
+
+    /**
+     * Alias of version_compare for use in Twig templates
+     */
+    public function versionCompare($v1, $v2, $op = null)
+    {
+        return version_compare($v1, $v2, $op);
+    }
 }
 
 class BHTML extends BClass

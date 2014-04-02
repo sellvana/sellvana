@@ -28,8 +28,8 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             array('name' => 'create_at', 'label' => 'Created', 'width' => 100),
             array('name' => 'update_at', 'label' => 'Updated', 'width' => 100),
             array('type'=>'btn_group', 'width' => 85, 'buttons'=> array(
-                array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'),
-                array('name'=>'delete')
+                array('name'=>'edit'),
+                array('name'=>'delete'),
             )),
         );
         $config['actions'] = array(
