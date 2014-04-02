@@ -609,7 +609,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 className: function () {
                     return this.model.get('cssClass');
                 },
-                attributes: function () {
+                attributes: function () {                    
                     return {id: this.model.get('id')};
                 },
                 events: {
@@ -870,7 +870,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.$el.html('');
                     if (config.data_mode == 'local') {
                         rowsCollection.sortLocalData();                        
-                        var models = this.paginationLocalData();
+                        var models = this.paginationLocalData();                        
                         _.each(models, function(model){
                             this.addRow(model);
                         }, this);
@@ -901,18 +901,18 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     $(BackboneGrid.MassEditButton).addClass('disabled');
                 },
                 paginationLocalData: function () {
-                    var clone = this.collection.filterLocalData();
+                    var clone = this.collection.filterLocalData();                    
                     var models = [];                    
                     var page = (BackboneGrid.currentState.p - 1)*BackboneGrid.currentState.ps;
-
-                    for (var i=page;i<BackboneGrid.currentState.ps + page;i++) {
+                    var len = Math.min(BackboneGrid.currentState.ps + page, clone.length);
+                    for (var i=page;i<len;i++) {                        
                         models.push(clone.at(i));    
                     }                    
                     //this.collection.reset(models, {silent: true});                    
                     BackboneGrid.currentState.mp = Math.ceil(clone.length / BackboneGrid.currentState.ps);
                     BackboneGrid.currentState.c = clone.length;
                     updatePageHtml();
-
+                    
                     return models;
                 }
             });
@@ -2002,7 +2002,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 for (var i in rows) {
 
                     var rowModel = new BackboneGrid.Models.Row(rows[i]);
-                    rowsCollection.add(rowModel, {silent: true});
+                    rowsCollection.add(rowModel);
                 }
 
                 gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});
