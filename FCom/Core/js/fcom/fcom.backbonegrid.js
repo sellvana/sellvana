@@ -906,16 +906,15 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     console.log(clone.toJSON());
                     var models = [];                    
                     var page = (BackboneGrid.currentState.p - 1)*BackboneGrid.currentState.ps;
-
-                    for (var i=page;i<BackboneGrid.currentState.ps + page;i++) {
-                        if(clone.at(i))
-                            models.push(clone.at(i));    
+                    var len = Math.min(BackboneGrid.currentState.ps + page, models.length);
+                    for (var i=page;i<len;i++) {                        
+                        models.push(clone.at(i));    
                     }                    
                     //this.collection.reset(models, {silent: true});                    
                     BackboneGrid.currentState.mp = Math.ceil(clone.length / BackboneGrid.currentState.ps);
                     BackboneGrid.currentState.c = clone.length;
                     updatePageHtml();
-                    console.log(models);
+                    
                     return models;
                 }
             });
