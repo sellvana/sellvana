@@ -609,7 +609,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 className: function () {
                     return this.model.get('cssClass');
                 },
-                attributes: function () {
+                attributes: function () {                    
                     return {id: this.model.get('id')};
                 },
                 events: {
@@ -871,6 +871,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     if (config.data_mode == 'local') {
                         rowsCollection.sortLocalData();                        
                         var models = this.paginationLocalData();
+                        console.log(models);
                         _.each(models, function(model){
                             this.addRow(model);
                         }, this);
@@ -879,7 +880,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
                     
                     $(BackboneGrid.quickInputId).quicksearch('table#' + BackboneGrid.id + ' tbody tr');
-
+                    console.log('ffff');
                     return this;
                 },
                 addRow: function (row) {
@@ -902,17 +903,19 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 paginationLocalData: function () {
                     var clone = this.collection.filterLocalData();
+                    console.log(clone.toJSON());
                     var models = [];                    
                     var page = (BackboneGrid.currentState.p - 1)*BackboneGrid.currentState.ps;
 
                     for (var i=page;i<BackboneGrid.currentState.ps + page;i++) {
-                        models.push(clone.at(i));    
+                        if(clone.at(i))
+                            models.push(clone.at(i));    
                     }                    
                     //this.collection.reset(models, {silent: true});                    
                     BackboneGrid.currentState.mp = Math.ceil(clone.length / BackboneGrid.currentState.ps);
                     BackboneGrid.currentState.c = clone.length;
                     updatePageHtml();
-
+                    console.log(models);
                     return models;
                 }
             });
@@ -2002,7 +2005,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 for (var i in rows) {
 
                     var rowModel = new BackboneGrid.Models.Row(rows[i]);
-                    rowsCollection.add(rowModel, {silent: true});
+                    rowsCollection.add(rowModel);
                 }
 
                 gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});
