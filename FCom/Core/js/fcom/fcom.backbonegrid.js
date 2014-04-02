@@ -449,10 +449,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 filterLocalData: function (data) {
 
-                    var temp = this.clone();
-                    console.log(filtersCollection.toJSON());
-                    for (var filter_key in BackboneGrid.current_filters) {
-                        console.log(filter_key);
+                    var temp = this.clone();                    
+                    for (var filter_key in BackboneGrid.current_filters) {                    
                         var filter_val = BackboneGrid.current_filters[filter_key].val;
                         var type = filtersCollection.findWhere({field: filter_key}).get('type');
                         if (filter_val == '') {
@@ -1726,8 +1724,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
                 }
                 //render page size options html
-                var pageSizeHtml = '';
-                console.log(pageSizeOptsRender);
+                var pageSizeHtml = '';                
                 for (j = 0; j < pageSizeOptsRender.length; j++) {
                     pageSizeHtml += '<li' + (pageSizeOptsRender[j] == BackboneGrid.currentState.ps ? ' class="active"' : '') + '>';
                     pageSizeHtml += '<a class="js-change-url page-size" href="#">' + pageSizeOptsRender[j] + '</a>';
@@ -1774,8 +1771,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             /*this.afterSelectionChanged = function() {
 
             }*/
-            this.build = function() {
-                console.log(config);
+            this.build = function() {                
                  _.templateSettings.variable = 'rc';
                 this.id = config.id;
                 BackboneGrid.id = config.id;
@@ -1792,10 +1788,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 var state = config.data.state;
                 state.p = parseInt(state.p);
                 state.mp = parseInt(state.mp);
-                BackboneGrid.currentState = state;
-                console.log(config);
+                BackboneGrid.currentState = state;                
                 BackboneGrid.pageSizeOptions = config.page_size_options;
-                console.log(BackboneGrid.pageSizeOptions)
+                
                 //check data mode
                 if (config.data_mode) {
                     BackboneGrid.data_mode = config.data_mode;
@@ -1855,7 +1850,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 var columns = config.columns;
                 columnsCollection = new BackboneGrid.Collections.ColsCollection;
                 var filters = config.filters;
-                console.log(filters);
+                
                 for (var i in columns) {
                     var c = columns[i];
                     //if (c.name != 'id') {
@@ -1933,8 +1928,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 headerView.render();
                 var colsVisibilityView = new BackboneGrid.Views.ColsVisibilityView({collection: columnsCollection});
                 colsVisibilityView.render();
-                console.log('fCollection');
-                console.log(fCollection);
+                
                 filtersCollection = new BackboneGrid.Collections.FilterCollection(fCollection);
                 filterView = new BackboneGrid.Views.FilterView({collection: filtersCollection});
                 filterView.render();
@@ -2013,8 +2007,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 if (BackboneGrid.data_mode == 'local') {
                     BackboneGrid.currentState.p = 1;
-                    BackboneGrid.currentState.ps = 10;
-                    console.log(config);
+                    BackboneGrid.currentState.ps = 10;                    
                 }
                 gridView.render();
 
