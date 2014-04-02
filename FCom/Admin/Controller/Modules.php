@@ -38,6 +38,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
 
         $data = array();
         $migrate = false;
+        $id = 0;
         foreach ($modules as $modName=>$mod) {
             $r = BUtil::arrayMask((array)$mod, 'name,description,version,channel,run_status,run_level,require,children_copy');
             $reqs = array();
@@ -57,7 +58,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             //$r['run_level_frontend'] = !empty($frontendLevels[$modName]) ? $frontendLevels[$modName] : '';
             $r['schema_version'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->get('schema_version') : '';
             $r['migration_available'] = !empty($schemaModules[$modName]) && $r['schema_version']!=$r['version'];
-            $r['id'] = $r['name'];
+            $r['id'] = $id++;
             $r['_selectable'] = !$r['auto_run_level'];
             $data[] = $r;
         }
