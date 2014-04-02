@@ -72,6 +72,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
         FCom.BackboneGrid = function (config) {
             var rowsCollection;
+            var filtersCollection;
             var columnsCollection;
             var gridView;
             var headerView;
@@ -232,14 +233,14 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 displayType.find('span.icon-placeholder').html('<i class="glyphicon glyphicon-list"></i>');
                                 displayType.find('span.title').html('A');
                                 BackboneGrid.data_mode = BackboneGrid.prev_data_mode;
-                                rowsCollection.originalRows = BackboneGrid.prev_originalRows;
+                                rowsCollection.reset(BackboneGrid.prev_originalRows);
                                 BackboneGrid.showingSelected = false;
                                 $('.f-grid-bottom.f-grid-toolbar.'+BackboneGrid.id+' > div.pagination').css('display', 'block');
-                                if (BackboneGrid.data_mode !== 'local') {
+                                /*if (BackboneGrid.data_mode !== 'local') {
                                     rowsCollection.fetch({reset: true});
-                                } else {
-                                    rowsCollection.filter();
-                                }
+                                } else {*/
+                                    gridView.render();
+                                //}
                             }
                             break;
                         case 'show_sel':
@@ -247,15 +248,13 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 displayType.find('span.icon-placeholder').html('<i class="glyphicon glyphicon-th-list"></i>');
                                 displayType.find('span.title').html('S');
                                 BackboneGrid.prev_data_mode = BackboneGrid.data_mode;
-                                if (!rowsCollection.originalRows) {
-                                    rowsCollection.originalRows = new Backbone.Collection();
-                                }
-                                BackboneGrid.prev_originalRows = rowsCollection.originalRows;
+                                
+                                BackboneGrid.prev_originalRows = rowsCollection.toJSON();
                                 BackboneGrid.showingSelected = true;
                                 $('.f-grid-bottom.f-grid-toolbar.' + BackboneGrid.id + ' > div.pagination').css('display', 'none');
 
                                 BackboneGrid.data_mode = 'local';
-                                rowsCollection.originalRows = selectedRows;
+                                
                                 rowsCollection.reset(selectedRows.toJSON());
 
                             }
@@ -437,26 +436,21 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             BackboneGrid.Collections.Rows = Backbone.Collection.extend({
                 model: BackboneGrid.Models.Row,
                 initialize: function (models) {
-                    if (BackboneGrid.data_mode === 'local') {
-                        this.originalRows = new Backbone.Collection(models);
-
-                        this.on('add', this.addInOriginal, this);
-                        this.on('remove', this.removeInOriginal, this);
+                    if (BackboneGrid.data_mode === 'local') {                                                
+                        this.on('add remove', this.updatePageInfo, this);
                     }
-
                 },
                 _addRow: function (ev) {
-                    if (ev.grid === BackboneGrid.id) {
+                    if (ev.grid === BackboneGrid.id) {                        
                         var newRow = new BackboneGrid.Models.Row(ev.row);
                         rowsCollection.add(newRow);
                         gridView.render();
                     }
                 },
-                filter: function (data) {
+                filterLocalData: function (data) {
 
-                    var temp = this.originalRows.clone();
-                    for (var filter_key in BackboneGrid.current_filters) {
-
+                    var temp = this.clone();                    
+                    for (var filter_key in BackboneGrid.current_filters) {                    
                         var filter_val = BackboneGrid.current_filters[filter_key].val;
                         var type = filtersCollection.findWhere({field: filter_key}).get('type');
                         if (filter_val == '') {
@@ -532,18 +526,21 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                     }
 
-                    this.reset(temp.toJSON(), {silent: true});
+                    //this.reset(temp.toJSON(), {silent: true});
                     if (typeof (data) !== 'undefined'  && data.reset_page == true ) {
                         //TODO: confirm save value filter into database.
                         BackboneGrid.currentState.p = 1;
                     }
-                    return this;
+
+                    temp.length = temp.models.length;
+                    return temp;
                 },
-                addInOriginal: function (model) {
-                    this.originalRows.add(model);
-                },
-                removeInOriginal: function (model) {
-                    this.originalRows.remove(model);
+                updatePageInfo: function() {
+                    
+                    var clone = this.filterLocalData();
+                    BackboneGrid.currentState.mp = Math.ceil(clone.length / BackboneGrid.currentState.ps);
+                    BackboneGrid.currentState.c = clone.length;
+                    updatePageHtml();
                 },
                 sortLocalData: function () {
                     if (BackboneGrid.currentState.s !== '' && BackboneGrid.currentState.sd !== '') {
@@ -553,6 +550,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         if (BackboneGrid.currentState.sd === 'desc') {
                             this.comparator = this.reverseSortBy(this.comparator);
                         }
+                        this.sort();
+                    } else {
+                        this.comparator = function (col) {
+                            return col.get('id');
+                        };
                         this.sort();
                     }
                     return this;
@@ -607,7 +609,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 className: function () {
                     return this.model.get('cssClass');
                 },
-                attributes: function () {
+                attributes: function () {                    
                     return {id: this.model.get('id')};
                 },
                 events: {
@@ -867,16 +869,15 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.setCss();
                     this.$el.html('');
                     if (config.data_mode == 'local') {
-                        rowsCollection.sortLocalData();
-                        this.collection = rowsCollection.filter(data);
-
-                        if (typeof (data) !== 'undefined' && typeof (data.deleteRows) !== 'undefined') {
-                            this.collection.remove(data.deleteRows.models, {silent: true});
-                            this.collection.originalRows.remove(data.deleteRows.models, {silent: true});
-                        }
-                        this.paginationLocalData();
+                        rowsCollection.sortLocalData();                        
+                        var models = this.paginationLocalData();                        
+                        _.each(models, function(model){
+                            this.addRow(model);
+                        }, this);
+                    } else {
+                        this.collection.each(this.addRow, this);    
                     }
-                    this.collection.each(this.addRow, this);
+                    
                     $(BackboneGrid.quickInputId).quicksearch('table#' + BackboneGrid.id + ' tbody tr');
 
                     return this;
@@ -900,20 +901,19 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     $(BackboneGrid.MassEditButton).addClass('disabled');
                 },
                 paginationLocalData: function () {
-                    var clone = this.collection.clone();
-                    var models = [];
-                    var i = 1;
+                    var clone = this.collection.filterLocalData();                    
+                    var models = [];                    
                     var page = (BackboneGrid.currentState.p - 1)*BackboneGrid.currentState.ps;
-                    clone.each(function (obj) {
-                        if (i <= (BackboneGrid.currentState.ps + page) && page < i) {
-                            models.push(obj);
-                        }
-                        i++;
-                    });
-                    this.collection.reset(models, {silent: true});
+                    var len = Math.min(BackboneGrid.currentState.ps + page, clone.length);
+                    for (var i=page;i<len;i++) {                        
+                        models.push(clone.at(i));    
+                    }                    
+                    //this.collection.reset(models, {silent: true});                    
                     BackboneGrid.currentState.mp = Math.ceil(clone.length / BackboneGrid.currentState.ps);
                     BackboneGrid.currentState.c = clone.length;
                     updatePageHtml();
+                    
+                    return models;
                 }
             });
             BackboneGrid.Views.ColCheckView = Backbone.View.extend({
@@ -1726,8 +1726,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
                 }
                 //render page size options html
-                var pageSizeHtml = '';
-                console.log(pageSizeOptsRender);
+                var pageSizeHtml = '';                
                 for (j = 0; j < pageSizeOptsRender.length; j++) {
                     pageSizeHtml += '<li' + (pageSizeOptsRender[j] == BackboneGrid.currentState.ps ? ' class="active"' : '') + '>';
                     pageSizeHtml += '<a class="js-change-url page-size" href="#">' + pageSizeOptsRender[j] + '</a>';
@@ -1774,7 +1773,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             /*this.afterSelectionChanged = function() {
 
             }*/
-            this.build = function() {
+            this.build = function() {                
                  _.templateSettings.variable = 'rc';
                 this.id = config.id;
                 BackboneGrid.id = config.id;
@@ -1791,10 +1790,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 var state = config.data.state;
                 state.p = parseInt(state.p);
                 state.mp = parseInt(state.mp);
-                BackboneGrid.currentState = state;
-                console.log(config);
+                BackboneGrid.currentState = state;                
                 BackboneGrid.pageSizeOptions = config.page_size_options;
-                console.log(BackboneGrid.pageSizeOptions)
+                
                 //check data mode
                 if (config.data_mode) {
                     BackboneGrid.data_mode = config.data_mode;
@@ -1854,6 +1852,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 var columns = config.columns;
                 columnsCollection = new BackboneGrid.Collections.ColsCollection;
                 var filters = config.filters;
+                
                 for (var i in columns) {
                     var c = columns[i];
                     //if (c.name != 'id') {
@@ -1931,7 +1930,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 headerView.render();
                 var colsVisibilityView = new BackboneGrid.Views.ColsVisibilityView({collection: columnsCollection});
                 colsVisibilityView.render();
-
+                
                 filtersCollection = new BackboneGrid.Collections.FilterCollection(fCollection);
                 filterView = new BackboneGrid.Views.FilterView({collection: filtersCollection});
                 filterView.render();
@@ -2010,8 +2009,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 if (BackboneGrid.data_mode == 'local') {
                     BackboneGrid.currentState.p = 1;
-                    BackboneGrid.currentState.ps = 10;
-                    console.log(config);
+                    BackboneGrid.currentState.ps = 10;                    
                 }
                 gridView.render();
 
@@ -2057,7 +2055,12 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 if ($(BackboneGrid.RefreshButton).length > 0) {
                     $(BackboneGrid.RefreshButton).on('click', function (ev) {
-                        rowsCollection.fetch({reset: true});
+                        if (BackboneGrid.data_mode === 'server') {
+                            rowsCollection.fetch({reset: true});    
+                        } else {
+                            gridView.render();
+                        }
+                        
                         ev.stopPropagation();
                         ev.preventDefault();
 

@@ -61,8 +61,7 @@ require(['jquery','underscore','backbone'], function($, _) {
                     gridView.collection.models.push(addedRow);
                 }
             });
-
-            gridView.collection.originalRows.models = gridView.collection.models;
+            
             gridView.render();
             grid.getGridView().clearSelectedRows();
             $('#all_prod_images_modal').modal('hide');
@@ -119,7 +118,7 @@ require(['jquery','underscore','backbone'], function($, _) {
     }
 
     function getExcludeId() {
-        var arr = imagesGrid.getGridView().collection.originalRows.pluck('file_id');
+        var arr = imagesGrid.getGridView().collection.pluck('file_id');
         return  arr.join(',');
     }
 
