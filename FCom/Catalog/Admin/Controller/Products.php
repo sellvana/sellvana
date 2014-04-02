@@ -242,7 +242,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'product_id', 'hidden'=>true,'default'=>$model->id()),
                     array('name'=>'download_url',  'hidden'=>true, 'default'=>$download_url),
                     array('name'=>'thumb_url',  'hidden'=>true, 'default'=>$thumb_url),
-                    array('name'=>'file_name', 'label' => 'File Name', 'hidden'=>true),
+                    array('name'=>'file_name', 'label' => 'File Name'),
                     array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'display'=>'eval', 'print'=>'"<a href=\'"+rc.row["download_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\'><img src=\'"+rc.row["thumb_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' ></a>"', 'sortable'=>false),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
                     array('type'=>'input', 'name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline'),
