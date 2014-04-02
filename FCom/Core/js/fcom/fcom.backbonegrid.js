@@ -576,6 +576,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 parse: function (response) {
                     if (typeof (response[0]) !== 'undefined' && typeof(response[0].c) !== 'undefined') {
+
                         //  if (response[0].c !== BackboneGrid.currentState.c) {
                         var mp = Math.ceil(response[0].c / BackboneGrid.currentState.ps);
                         BackboneGrid.currentState.mp = mp;
@@ -583,7 +584,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         if (BackboneGrid.data_mode !== 'local')
                             updatePageHtml();
                         // }
+
                     }
+                                        
                     return response[1];
                 },
                 reverseSortBy: function (sortByFunction) {
