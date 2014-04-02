@@ -2053,7 +2053,12 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 if ($(BackboneGrid.RefreshButton).length > 0) {
                     $(BackboneGrid.RefreshButton).on('click', function (ev) {
-                        rowsCollection.fetch({reset: true});
+                        if (BackboneGrid.data_mode === 'server') {
+                            rowsCollection.fetch({reset: true});    
+                        } else {
+                            gridView.render();
+                        }
+                        
                         ev.stopPropagation();
                         ev.preventDefault();
 

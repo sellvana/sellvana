@@ -36,6 +36,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 )
         );
         $config['actions'] = array(
+            'refresh'=>true,
             'export'=>true,
             'delete'=>true,
             //'custom'=>array('class'=>'test', 'caption'=>'ffff', 'id'=>'prod_custom')
@@ -259,6 +260,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                         )
                 ),
                 'actions'=>array(
+                    'refresh'=>true,
                     'rescan' => array('caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'),
                     'add'=>array('caption'=>'Add images'),
                     'delete'=>array('caption'=>'Remove'),
