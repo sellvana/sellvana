@@ -870,8 +870,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.$el.html('');
                     if (config.data_mode == 'local') {
                         rowsCollection.sortLocalData();                        
-                        var models = this.paginationLocalData();
-                        console.log(models);
+                        var models = this.paginationLocalData();                        
                         _.each(models, function(model){
                             this.addRow(model);
                         }, this);
@@ -880,7 +879,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
                     
                     $(BackboneGrid.quickInputId).quicksearch('table#' + BackboneGrid.id + ' tbody tr');
-                    console.log('ffff');
+
                     return this;
                 },
                 addRow: function (row) {
@@ -902,11 +901,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     $(BackboneGrid.MassEditButton).addClass('disabled');
                 },
                 paginationLocalData: function () {
-                    var clone = this.collection.filterLocalData();
-                    console.log(clone.toJSON());
+                    var clone = this.collection.filterLocalData();                    
                     var models = [];                    
                     var page = (BackboneGrid.currentState.p - 1)*BackboneGrid.currentState.ps;
-                    var len = Math.min(BackboneGrid.currentState.ps + page, models.length);
+                    var len = Math.min(BackboneGrid.currentState.ps + page, clone.length);
                     for (var i=page;i<len;i++) {                        
                         models.push(clone.at(i));    
                     }                    
