@@ -16,6 +16,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         'calc'    => array(
             'id_path' => 'FCom_Catalog_Model_Category.id',
         ),
+        'unique_key' => 'url_path'
     );
 
     public function productsORM()

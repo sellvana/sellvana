@@ -3,9 +3,9 @@ modules:
         version: 0.1.0
         channel: beta
         require: { module: { FCom_Sales: 0.1.10 } }
-        translations: { de: de.php }
+        translations: { en: en.php }
         description: "Authorize.net payment methods"
-        autoload: lib
+        #autoload: lib
 
         auto_use: [ bootstrap ]
         encrypt_config:

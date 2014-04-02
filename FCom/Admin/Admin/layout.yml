@@ -345,3 +345,8 @@ form:
 
 /templates/form:
     - { include: codemirror }
+/media:
+    - { include: base }
+    - { hook: header, clear: true }
+    - { hook: top-nav, clear: true }
+    - { hook: main, views: media }

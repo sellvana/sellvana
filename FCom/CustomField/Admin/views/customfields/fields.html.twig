@@ -12,6 +12,7 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
     window.fieldsGridRegister = function(grid) {
         fieldsGrid = grid;
         fieldsGrid.getGridSkeleton().Views.RowView.prototype._callbackCustom = function (ev) {
+            
             selectedRow = this.model;
 
             optionsGrid.getRows().url = '{{ APP.href('customfields/fieldsets/field_option_grid_data?field_id=') | raw }}'
@@ -20,6 +21,7 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
                 reset: true,
                 success: function () {
                     console.log('success');
+                    optionsGrid.getGridView().render();
                     $('#btn-field-grid-modal').trigger('click');
                     $('#options-form').validate();
                 }

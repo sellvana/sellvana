@@ -43,7 +43,7 @@ class Blog
 
     public static function user()
     {
-        return BSession::i()->data('user');
+        return BSession::i()->get('user');
     }
 
     public static function redirect($url, $status, $msg, $msgArgs=array())
@@ -194,7 +194,7 @@ class Blog_Controller_Admin extends BActionController
             if (!($request->post('username')=='admin' && $request->post('password')=='admin')) {
                 throw new Exception("Invalid user name or password");
             }
-            BSession::i()->data('user', 'admin');
+            BSession::i()->set('user', 'admin');
             Blog::redirect('/', 'success',  "You're logged in as admin");
         } catch (Exception $e) {
             Blog::redirect('/', 'error', $e->getMessage());
@@ -203,7 +203,7 @@ class Blog_Controller_Admin extends BActionController
 
     public function action_logout()
     {
-        BSession::i()->data('user', false);
+        BSession::i()->set('user', false);
         Blog::redirect('/', 'success', "You've been logged out");
     }
 

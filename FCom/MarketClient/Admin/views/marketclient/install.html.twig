@@ -1,4 +1,14 @@
-<form action="{{ APP.href('marketclient/module/install') }}" method="post">
+
+<div class="f-admin-main-view">
+  <div class="page-header f-admin-page-header">
+    <h1 class="f-page-title">{{ 'Install Module' }}</h1>
+  </div>
+  <div class="f-admin-main">
+      {{ THIS.view('core/messages') | raw }}
+      <div class="panel">
+        <div class="panel-body">
+
+<form method="post">
     {% for modName, modInfo in THIS.get('install') %}
         <div class="row">
             {{ modName }}:
@@ -12,3 +22,7 @@
     {% endfor %}
     <button type="submit" class="btn btn-primary">{{ 'Install'|_ }}</button>
 </form>
+        </div>
+      </div>
+    </div>
+</div>

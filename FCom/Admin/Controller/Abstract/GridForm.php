@@ -11,7 +11,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_navPath;# = 'nav/subnav';
     protected $_recordName = 'Record';
     protected $_gridTitle = 'List of Records';
-    #protected $_gridViewName = 'admin/grid';
+    protected $_gridPageViewName = 'admin/grid';
     protected $_gridViewName = 'core/backbonegrid';
     protected $_gridLayoutName;# = '/feature';
     protected $_formHref;# = 'feature/form';
@@ -94,8 +94,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $nav->setNav($this->_navPath);
         }
 
+        $pageView = $this->view($this->_gridPageViewName);
         $view = $this->gridView();
-        $this->gridViewBefore(array('view' => $view));
+        $this->gridViewBefore(array('view' => $view, 'page_view' => $pageView));
 
         $this->layout();
         if ($this->_useDefaultLayout) {
@@ -106,10 +107,11 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function gridViewBefore($args)
     {
-        $this->view('admin/grid')->set(array(
+        $view = $args['page_view'];
+        $view->set(array(
             'title' => $this->_gridTitle,
             'actions' => array(
-                'new' => ' <button class="btn btn-primary btn-sm" onclick="location.href=\''.BApp::href($this->_formHref).'\'"><span>New '.BView::i()->q($this->_recordName).'</span></button>',
+                'new' => ' <button type="button" class="btn btn-primary btn-sm" onclick="location.href=\''.BApp::href($this->_formHref).'\'"><span>New '.BView::i()->q($this->_recordName).'</span></button>',
             ),
         ));
         BEvents::i()->fire(static::$_origClass.'::gridViewBefore', $args);
@@ -128,6 +130,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
         if (isset($config['data']) && (!empty($config['data']))) {
             $data = $config['data'];
+            $data = $this->gridDataAfter($data);
             BResponse::i()->json(array(array('c' => 1), $data));
         } else {
             $r = BRequest::i()->get();
@@ -167,6 +170,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function gridDataAfter($data)
     {
+        BEvents::i()->fire(static::$_origClass.'::gridDataAfter', array('data'=>&$data));
         return $data;
     }
 
@@ -224,7 +228,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         }
         $actions['save'] = '<button type="submit" class="btn btn-primary" onclick="return adminForm.saveAll(this)"><span>' .  BLocale::_('Save') . '</span></button>';
 
-        $title = $m->id() ? BLocale::_('Edit %s: %s', array($this->_recordName, $m->title)) : BLocale::_('Create New %s', array($this->_recordName));
+        $id = method_exists($m, 'id') ? $m->id(): $m->id;
+        $title = $id ? BLocale::_('Edit %s: %s', array($this->_recordName, $m->title)) : BLocale::_('Create New %s', array($this->_recordName));
 
         $args['view']->set(array(
             'form_id' => $this->formId(),

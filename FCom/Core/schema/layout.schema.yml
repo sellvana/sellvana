@@ -1,0 +1,35 @@
+/:
+    type: map
+    key_pattern: "^[/A-Za-z0-9_]+$"
+
+/*:
+    type: seq
+
+/*/*:
+    type: map
+    require_key_enum: [ root, include, hook, view, callback ]
+
+/*/*/(root|include|hook|view|callback):
+    type: str
+
+/*/*/views:
+    require_sibling_key: hook
+    type: seq_cast
+
+/*/*/views/*:
+    type: str
+
+/*/*/clear:
+    require_sibling_key: hook
+    type: [ str, bool, seq ]
+
+/*/*/set:
+    require_sibling_key: view
+    type: map
+
+/*/*/do:
+    require_subling_key: view
+    type: seq
+
+/*/*/do/*:
+    type: seq

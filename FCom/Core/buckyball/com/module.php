@@ -39,7 +39,7 @@ class BModuleRegistry extends BClass
     protected $_modules = array();
 
     /**
-    * Current module name, not BNULL when:
+    * Current module name, not null when:
     * - In module bootstrap
     * - In observer
     * - In view
@@ -632,6 +632,7 @@ class BModule extends BClass
     public $bootstrap;
     public $version;
     public $channel;
+    public $category;
     public $db_connection_name;
     public $root_dir;
     public $view_root_dir;
@@ -663,7 +664,9 @@ class BModule extends BClass
     public $default_config;
     public $autoload;
     public $crontab;
+    public $security;
     public $custom;
+    public $license;
 
     public $is_cached;
     /**
@@ -1079,6 +1082,13 @@ if (!isset($o[0]) || !isset($o[1])) {
         }
     }
 
+    protected function _processSecurity()
+    {
+        if (!empty($this->security['request_fields_whitelist'])) {
+            BRequest::i()->addRequestFieldsWhitelist($this->security['request_fields_whitelist']);
+        }
+    }
+
     /**
      * Register module specific autoload callback
      *
@@ -1170,7 +1180,7 @@ if (!isset($o[0]) || !isset($o[1])) {
     */
     public function runStatus($status=null)
     {
-        if (BNULL===$status) {
+        if (is_null($status)) {
             return $this->run_status;
         }
         $this->run_status = $status;
@@ -1269,6 +1279,7 @@ if (!isset($o[0]) || !isset($o[1])) {
         $this->_processAutoUse();
         $this->_processRouting();
         $this->_processObserve();
+        $this->_processSecurity();
 
         BEvents::i()->fire('BModule::bootstrap:before', array('module'=>$this));
 
@@ -1382,6 +1393,17 @@ class BMigrate extends BClass
     */
     public static function migrateModules($limitModules = false, $force = false, $redirectUrl = null)
     {
+        if (!$force) {
+            $conf = BConfig::i();
+            $req = BRequest::i();
+            if (!$conf->get('install_status') === 'installed'
+                || !$conf->get('db/implicit_migration')
+                || $req->xhr() && !$req->get('MIGRATE')
+            ) {
+                return;
+            }
+        }
+
         $modReg = BModuleRegistry::i();
         $migration = static::getMigrationData();
         if (!$migration) {
@@ -1439,6 +1461,8 @@ class BMigrate extends BClass
             return;
         }
 
+        BConfig::i()->set('db/logging', 1);
+
         // TODO: move special cases from buckyball to fulleron
         // special case for FCom_Admin because some frontend modules require its tables
         if (empty($migration['DEFAULT']['FCom_Admin']['schema_version'])
@@ -1461,7 +1485,7 @@ class BMigrate extends BClass
         BResponse::i()->startLongResponse();
         echo '<html><body><h1>Migrating modules DB structure...</h1><pre>';
         $i = 0;
-
+        $error = false;
         try {
             foreach ($migration as $connectionName => $modules) {
                 BDb::connect($connectionName);
@@ -1534,15 +1558,31 @@ class BMigrate extends BClass
                 FCom_Core_Main::i()->writeConfigFiles('core');
             }
             */
-            throw $e;
+            $trace = $e->getTrace();
+            foreach ($trace as $traceStep) {
+                if (strpos($traceStep['file'], BUCKYBALL_ROOT_DIR)!==0) {
+                    break;
+                }
+            }
+            echo "\n\n" . $e->getMessage();
+            if (BORM::get_last_query()) {
+                echo "\n\nQUERY: " . BORM::get_last_query();
+            }
+            echo "\n\nLOCATION: " . $traceStep['file'].':'.$traceStep['line'];
+            $error = true;
         }
         $modReg->currentModule(null);
         static::$_migratingModule = null;
 
         $url = !is_null($redirectUrl) ? $redirectUrl : BRequest::i()->currentUrl();
         echo '</pre>';
-        echo '<script>location.href="'.$url.'";</script>';
-        echo 'ALL DONE. <a href="'.$url.'">Click here to continue</a>';
+        if (!$error) {
+            echo '<script>location.href="'.$url.'";</script>';
+            echo '<p>ALL DONE. <a href="'.$url.'">Click here to continue</a></p>';
+        } else {
+            echo '<p>There was an error, please check the output or log file and try again.</p>';
+            echo '<p><a href="'.$url.'">Click here to continue</a></p>';
+        }
         echo '</body></html>';
         exit;
     }

@@ -54,7 +54,7 @@
     <fieldset class="adm-section-group">
 <?php if ($this->mode!=='create'): ?>
         <div class="btns-set">
-            <button class="btn st2 sz2 btn-cancel" onclick="return adminForm.tabAction('cancel', this);"><span>Cancel</span></button>
+            <button class="btn st2 sz2 btn-cancel" onclick="return adminForm.tabAction('cancel', this);"><span>{{ 'Cancel'|_ }}</span></button>
             <button class="btn st1 sz2 btn-save" onclick="return adminForm.tabAction('save', this);"><span>Save</span></button>
         </div>
 <?php endif ?>

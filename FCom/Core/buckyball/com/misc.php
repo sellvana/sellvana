@@ -607,14 +607,15 @@ class BUtil extends BClass
     }
 
     /**
-    * Return only specific fields from source array
-    *
-    * @param array $source
-    * @param array|string $fields
-    * @param boolean $inverse if true, will return anything NOT in $fields
-    * @param boolean $setNulls fill missing fields with nulls
-    * @result array
-    */
+     * Return only specific fields from source array
+     *
+     * @param array        $source
+     * @param array|string $fields
+     * @param boolean      $inverse if true, will return anything NOT in $fields
+     * @param boolean      $setNulls fill missing fields with nulls
+     * @return array
+     * @result array
+     */
     static public function arrayMask(array $source, $fields, $inverse=false, $setNulls=true)
     {
         if (is_string($fields)) {
@@ -913,6 +914,7 @@ class BUtil extends BClass
     */
     public static function remoteHttp($method, $url, $data = array())
     {
+        $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: '.$method.' '.$url));
         $timeout = 5;
         $userAgent = 'Mozilla/5.0';
         if ($method==='GET' && $data) {
@@ -1045,6 +1047,7 @@ class BUtil extends BClass
         }
         #BDebug::log(print_r(compact('method', 'url', 'data', 'response'), 1), 'remotehttp.log');
 
+        BDebug::profile($debugProfile);
         return $response;
     }
 
@@ -1460,7 +1463,7 @@ class BUtil extends BClass
         if ($first) {
             $dir = realpath($dir);
         }
-        if (!file_exists($dir)) {
+        if (!$dir || !file_exists($dir)) {
             return true;
         }
         if (!is_dir($dir) || is_link($dir)) {
@@ -1470,9 +1473,11 @@ class BUtil extends BClass
             if ($item == '.' || $item == '..') {
                 continue;
             }
-            if (!static::rmdirRecursive($dir . "/" . $item, false)) {
+            if (!static::rmdirRecursive_YesIHaveCheckedThreeTimes($dir . "/" . $item, false)) {
                 chmod($dir . "/" . $item, 0777);
-                if (!static::rmdirRecursive($dir . "/" . $item, false)) return false;
+                if (!static::rmdirRecursive_YesIHaveCheckedThreeTimes($dir . "/" . $item, false)) {
+                    return false;
+                }
             }
         }
         return rmdir($dir);
@@ -2478,7 +2483,7 @@ class BDebug extends BClass
     public static function dumpLog($return=false)
     {
         if (!(static::$_mode===static::MODE_DEBUG || static::$_mode===static::MODE_DEVELOPMENT)
-            || BResponse::i()->contentType()!=='text/html'
+            || BResponse::i()->getContentType()!=='text/html'
             || BRequest::i()->xhr()
         ) {
             return;
@@ -2889,7 +2894,7 @@ class BLocale extends BClass
     protected static function addTranslation($r, $module=null)
     {
         if (empty($r[1])) {
-            BDebug::debug('No translation specified for '.$r[0]);
+            BDebug::debug('Empty translation for "'.$r[0].'"');
             return;
         }
         // short and quick way

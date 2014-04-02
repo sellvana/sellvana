@@ -215,7 +215,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
         $view = $this->view('customfields/products/fields-partial');
         $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fields_options);
-        BLayout::i()->rootView('customfields/products/fields-partial');
+        BLayout::i()->setRootView('customfields/products/fields-partial');
         BResponse::i()->render();
     }
 

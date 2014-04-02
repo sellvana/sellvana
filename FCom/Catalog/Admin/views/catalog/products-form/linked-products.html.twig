@@ -17,10 +17,12 @@ require(['jquery','underscore','backbone'], function($, _) {
     var relatedOriginIds = [], similarOriginIds = [], crossSellOriginIds = [];
 
     window.setLindedGridVals = function() {
-
-        similarRows = _.filter(similarProdGrid.getRows().toJSON(), function(row) { return row._new;});
-        relatedRows = _.filter(relatedProdGrid.getRows().toJSON(), function(row) { return row._new;});
-        crossSellRows = _.filter(crossSellProdGrid.getRows().toJSON(), function(row) { return row._new;});
+        var similarOriginalRows = similarProdGrid.getGridView().collection.originalRows;
+        var relatedOriginalRows = relatedProdGrid.getGridView().collection.originalRows;
+        var crossSellOriginalRows = crossSellProdGrid.getGridView().collection.originalRows;
+        similarRows = _.filter(similarOriginalRows.toJSON(), function(row) { return row._new;});
+        relatedRows = _.filter(relatedOriginalRows.toJSON(), function(row) { return row._new;});
+        crossSellRows = _.filter(crossSellOriginalRows.toJSON(), function(row) { return row._new;});
 
         similarRows = similarRows ? _.pluck(similarRows, 'id') : [];
         relatedRows = relatedRows ? _.pluck(relatedRows, 'id') : [];
@@ -32,9 +34,9 @@ require(['jquery','underscore','backbone'], function($, _) {
         $('#related_ids_add').val(relatedRows.join(','));
         $('#cross_sell_ids_add').val(crossSellRows.join(','));
 
-        $('#related_ids_remove').val( _.difference(relatedOriginIds, relatedProdGrid.getRows().pluck('id')).join(',') );
-        $('#similar_ids_remove').val( _.difference(similarOriginIds, similarProdGrid.getRows().pluck('id')).join(',') );
-        $('#cross_sell_ids_remove').val( _.difference(crossSellOriginIds, crossSellProdGrid.getRows().pluck('id')).join(',') );
+        $('#related_ids_remove').val( _.difference(relatedOriginIds, relatedOriginalRows.pluck('id')).join(',') );
+        $('#similar_ids_remove').val( _.difference(similarOriginIds, similarOriginalRows.pluck('id')).join(',') );
+        $('#cross_sell_ids_remove').val( _.difference(crossSellOriginIds, crossSellOriginalRows.pluck('id')).join(',') );
     }
 
     window.allProdGridRegister = function(grid) {
@@ -52,14 +54,17 @@ require(['jquery','underscore','backbone'], function($, _) {
         });
 
         addBtn.click(function() {
+            var gridView = selectedGrid.getGridView();
             allProdGrid.getSelectedRows().forEach(function (row) {
                 if (!selectedGrid.getRows().findWhere({id: row.get('id')})) {
-                    var temp = row.toJSON();
-                    temp._new = true;
-                    selectedGrid.getRows().add(temp);
+                    var temp = row;
+                    temp.set("_new", true);
+                    temp.set('selected', false);
+                    gridView.collection.models.push(temp);
                 }
             });
-
+            gridView.collection.originalRows.models = gridView.collection.models;
+            gridView.render();
             allProdGrid.getGridView().clearSelectedRows();
             $('.linked-prod-modal-close').trigger('click');
         });
@@ -106,7 +111,7 @@ require(['jquery','underscore','backbone'], function($, _) {
     }
 
     function getExcludeId() {
-        var arr = selectedGrid.getRows().pluck('id');
+        var arr = selectedGrid.getGridView().collection.originalRows.pluck('id');
         arr.push(productId);
         return  arr.join(',');
     }

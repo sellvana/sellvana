@@ -43,7 +43,7 @@ class FCom_Cron_Main extends BClass
         $modules = BModuleRegistry::i()->getAllModules();
         $hlp = static::i();
         foreach ($modules as $modName => $mod) {
-            if ($mod->crontab) {
+            if ($mod->run_status === BModule::LOADED && $mod->crontab) {
                 foreach ($mod->crontab as $task) {
                     $hlp->task($task[0], $task[1], !empty($task[2]) ? $task[2] : array());
                 }

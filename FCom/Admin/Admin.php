@@ -26,6 +26,7 @@ class FCom_Admin_Admin extends BClass
         if (($head = BLayout::i()->view('head'))) {
             $head->js_raw('admin_init', '
 FCom.Admin = {};
+FCom.Admin.baseUrl = "'.rtrim(BConfig::i()->get('web/base_src'), '/') . '/'.'";
 FCom.Admin.codemirrorBaseUrl = "'.BApp::src('@FCom_Admin/Admin/js/codemirror').'";
 FCom.Admin.upload_href = "'.BApp::href('upload').'";
 FCom.Admin.personalize_href = "'.BApp::href('my_account/personalize').'";

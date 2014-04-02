@@ -2,7 +2,7 @@ modules:
     FCom_MultiSite:
         version: 0.1.1
         channel: beta
-        translations: { de: de.php }
+        translations: { en: en.php }
         description: "Enable multiple website management from the same instance"
         before_bootstrap: { callback: FCom_MultiSite_Main::beforeBootstrap }
         require: { module: { FCom_Core: 0.1.0 } }

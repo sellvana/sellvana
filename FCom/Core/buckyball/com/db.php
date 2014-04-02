@@ -205,22 +205,26 @@ class BDb
         $results = array();
         foreach ($queries as $i=>$query){
            if (strlen(trim($query)) > 0) {
-                try {
+                // try {
                     BDebug::debug('DB.RUN: '.$query);
                     if (!empty($options['echo'])) {
                         echo '<hr><pre>'.$query.'<pre>';
                     }
+                    BORM::set_last_query($query);
                     if (is_null($params)) {
                         $results[] = BORM::get_db()->exec($query);
                     } else {
                         $results[] = BORM::get_db()->prepare($query)->execute($params);
                     }
-                } catch (Exception $e) {
-                    echo "<hr>{$e->getMessage()}: <pre>{$query}</pre>";
-                    if (empty($options['try'])) {
-                        throw $e;
-                    }
-                }
+                // } catch (Exception $e) {
+                //     $trace = $e->getTrace();
+                //     throw new BException($e->getMessage()
+                //         . " \nFile: " . $trace[1]['file'].':'.$trace[1]['line']
+                //     );
+                //     if (empty($options['try'])) {
+                //         throw $e;
+                //     }
+                // }
            }
         }
         return $results;
@@ -1025,6 +1029,11 @@ class BORM extends ORMWrapper
         return $result;
     }
 
+    public static function set_last_query($query)
+    {
+        static::$_last_query = $query;
+    }
+
     /**
     * Execute the SELECT query that has been built up by chaining methods
     * on this class. Return an array of rows as associative arrays.
@@ -1176,14 +1185,11 @@ class BORM extends ORMWrapper
         BDb::connect( $this->_readConnectionName );
         $query = $this->_build_select();
         static::_log_query( $query, $this->_values );
+        static::$_last_query = $query;
         $statement = static::$_db->prepare( $query );
-        try {
-            $statement->execute( $this->_values );
-        } catch ( Exception $e ) {
-            echo $query;
-            print_r( $e );
-            exit;
-        }
+
+        $statement->execute( $this->_values );
+
         return $statement;
     }
 
@@ -1339,7 +1345,7 @@ class BORM extends ORMWrapper
         ) {
 #echo "DIRTY: "; var_dump($this->_data[$key], $value); echo "\n";
             if (!array_key_exists($key, $this->_old_values)) {
-                $this->_old_values[$key] = array_key_exists($key, $this->_data) ? $this->_data[$key] : BNULL;
+                $this->_old_values[$key] = array_key_exists($key, $this->_data) ? $this->_data[$key] : null;
             }
             $this->_dirty_fields[$key] = $value;
         }
@@ -1972,6 +1978,23 @@ class BModel extends Model
     }
 
     /**
+     * Load a model or create an empty one if doesn't exist
+     *
+     * @param int|string|array $id
+     * @param string $field
+     * @param boolean $cache
+     * @return BModel
+     */
+    public static function loadOrCreate($id, $field, $cache=false)
+    {
+        $model = static::load($id, $fied, $cache);
+        if (!$model) {
+            $model = static::create();
+        }
+        return $model;
+    }
+
+    /**
     * Placeholder for after load callback
     *
     * @return BModel
@@ -2351,6 +2374,46 @@ class BModel extends Model
     }
 
     /**
+     * Faster update with one statement by utilizing `case .. when .. then .. else .. end`
+     *
+     * @param array format: array($id1 => array($field1 => $value1, $field2 => $value2))
+     * @param string optional ID field
+     * @param string optional field to be updated, used when $data values are not arrays
+     */
+    public static function update_many_by_id(array $data, $idField = null, $updateField = null)
+    {
+        if (is_null($idField)) {
+            $idField = static::_get_id_column_name(get_called_class());
+        }
+        $fields = array();
+        foreach ($data as $id => $fields) {
+            foreach ($fields as $f => $v) {
+                $fields[$f][$id] = $v;
+            }
+        }
+        $updates = array();
+        $params = array();
+        foreach ($fields as $f => $values) {
+            $update = "`{$f}` = CASE `{$idField}`";
+            foreach ($values as $id => $v) {
+                $update .= " WHEN ? THEN ?";
+                $params[] = $id;
+                $params[] = $v;
+            }
+            $update .= " ELSE `{$f}` END";
+            $updates[] = $update;
+        }
+        foreach ($data as $id => $fields) {
+            $params[] = $id;
+        }
+
+        $sql = "UPDATE " . static::table() . " SET " . join(', ', $updates) . ' WHERE '
+            . $idField . ' IN (' . join(', ', array_fill(0, sizeof($data), '?')) . ')';
+        BDebug::debug('SQL: '.$sql);
+        return static::run_sql($sql, array_merge($params, $p));
+    }
+
+    /**
     * Delete one or many records of the class
     *
     * @param string|array $where where conditions (@see BDb::where)
@@ -2643,7 +2706,7 @@ class BModelUser extends BModel
 
     public static function sessionUserId()
     {
-        $userId = BSession::i()->data(static::$_sessionUserNamespace.'_id');
+        $userId = BSession::i()->get(static::$_sessionUserNamespace.'_id');
         return $userId ? $userId : false;
     }
 
@@ -2700,7 +2763,7 @@ class BModelUser extends BModel
     {
         $this->set('last_login', BDb::now())->save();
 
-        BSession::i()->data(array(
+        BSession::i()->set(array(
             static::$_sessionUserNamespace.'_id' => $this->id,
             static::$_sessionUserNamespace => serialize($this->as_array()),
         ));
@@ -2728,7 +2791,7 @@ class BModelUser extends BModel
 
     public static function logout()
     {
-        BSession::i()->data(static::$_sessionUserNamespace.'_id', false);
+        BSession::i()->set(static::$_sessionUserNamespace.'_id', false);
         BEvents::i()->fire(__METHOD__.':after', array('user' => static::$_sessionUser));
         static::$_sessionUser = null;
     }
