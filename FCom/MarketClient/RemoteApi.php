@@ -69,7 +69,6 @@ final class FCom_MarketClient_RemoteApi extends BClass
             'mod_name' => $modules,
         ));
         $response = BUtil::remoteHttp("GET", $url);
-#echo $response; exit;
         return BUtil::fromJson($response);
     }
 

@@ -30,6 +30,7 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
 
     public function action_module__POST()
     {
+        BResponse::i()->startLongResponse(false);
         $hlp = FCom_MarketClient_RemoteApi::i();
         $connResult = $hlp->setupConnection();
 
@@ -46,7 +47,7 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
                 return;
             }
             if (!empty($createResult['redirect_url'])) {
-                $newWindowUrl = $createResult['redirect_url'];
+                $redirectUrl = $createResult['redirect_url'];
             }
         }
         $uploadResult = $hlp->uploadPackage($modName);
@@ -57,7 +58,7 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
 <!DOCTYPE html>
 <html><body><form id="new-window" method="get" action="{$newWindowUrl}" target="SellvanaMarketServer"></form><script>
 document.getElementById('new-window').submit();
-location.href = "{$redirectUrl}";
+//location.href = "{$redirectUrl}";
 </script></html>
 EOT
             );
