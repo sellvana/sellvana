@@ -551,6 +551,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             this.comparator = this.reverseSortBy(this.comparator);
                         }
                         this.sort();
+                    } else {
+                        this.comparator = function (col) {
+                            return col.get('id');
+                        };
+                        this.sort();
                     }
                     return this;
 
@@ -897,15 +902,12 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 paginationLocalData: function () {
                     var clone = this.collection.filterLocalData();
-                    var models = [];
-                    var i = 1;
+                    var models = [];                    
                     var page = (BackboneGrid.currentState.p - 1)*BackboneGrid.currentState.ps;
-                    clone.each(function (obj) {
-                        if (i <= (BackboneGrid.currentState.ps + page) && page < i) {
-                            models.push(obj);
-                        }
-                        i++;
-                    });                    
+
+                    for (var i=page;i<BackboneGrid.currentState.ps + page;i++) {
+                        models.push(clone.at(i));    
+                    }                    
                     //this.collection.reset(models, {silent: true});                    
                     BackboneGrid.currentState.mp = Math.ceil(clone.length / BackboneGrid.currentState.ps);
                     BackboneGrid.currentState.c = clone.length;
