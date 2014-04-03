@@ -19,8 +19,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
     }
     window.variantGridRegister = function(grid) {
         grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
-            this.$el.find('select').addClass('variantUnique');
-            this.$el.find('select').removeClass('valid');
+        
+            this.$el.find('select').addClass('variantUnique'); 
         }
         grid.build();
         vColsCollection = grid.getCols();
@@ -266,10 +266,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
 
                     var parent = $(elem).parents('tr');
                     if (parent.attr('id') != data.get('id')) {
-
                         var flag = false;// all select fields are same
                         parent.find('select').each(function(index) {
-
                             var comparand = $('#variant-grid-'+$(this).data('col')+'-'+data.get('id')).val();
                             if ($(this).val() !== comparand) {
                                 flag = true; // at least one field is different

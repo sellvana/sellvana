@@ -7,23 +7,3 @@ define(['jquery', 'jquery.validate'], function($) {
 
     //todo: move validatePasswordSecurity to here
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
