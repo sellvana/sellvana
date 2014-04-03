@@ -86,7 +86,7 @@ class FCom_Catalog_Migrate extends BClass
         BDb::ddlTableDef($tProductLink, array(
             'COLUMNS' => array(
                 'id'            => 'int unsigned NOT NULL AUTO_INCREMENT',
-                'link_type'     => "enum('related','similar', 'cross_sell') NOT NULL",
+                'link_type'     => "enum('related','similar', 'cross-sell') NOT NULL",
                 'product_id'    => 'int(10) unsigned NOT NULL',
                 'linked_product_id' => 'int(10) unsigned NOT NULL',
             ),

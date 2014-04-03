@@ -871,14 +871,18 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     this.$el.html('');
                     if (config.data_mode == 'local') {
                         rowsCollection.sortLocalData();                        
-                        var models = this.paginationLocalData();                        
+                        var models = this.paginationLocalData();
+                        var rows = [];
                         _.each(models, function(model){
-                            this.addRow(model);
+                            var row = new rowsCollection.model(model.toJSON());
+                            rows.push(row);
+                            this.addRow(row);
                         }, this);
+                        rowsCollection.reset(rows, {silent: true});
                     } else {
                         this.collection.each(this.addRow, this);    
                     }
-                    
+
                     $(BackboneGrid.quickInputId).quicksearch('table#' + BackboneGrid.id + ' tbody tr');
 
                     return this;
