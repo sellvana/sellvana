@@ -171,7 +171,6 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
                     'id' => $this->id(),
                     'email' => $this->email,
                     'name' => $this->firstname . ' ' . $this->lastname,
-                    'href' => BApp::href('customers/form?id='.$this->id()),
                 ),
             ));
         }
