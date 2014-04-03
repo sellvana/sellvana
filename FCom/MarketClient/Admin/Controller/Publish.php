@@ -7,7 +7,7 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
     public function action_index()
     {
         $result = FCom_MarketClient_RemoteApi::i()->getModulesVersions(true);
-        $view = $this->view('marketclient/publish')->set('result', $result);
+        $view = $this->view('marketclient/publish');
         if (!empty($result['error'])) {
             $this->message($result['message'], 'error');
         } else {
@@ -51,6 +51,9 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
             }
         }
         $uploadResult = $hlp->uploadPackage($modName);
+#echo "<pre>"; var_dump($uploadResult); exit;
+        $this->message($uploadResult['message'], !empty($uploadResult['error']) ? 'error' : 'success', 'admin');
+
 #echo "<pre>"; var_dump($uploadResult); exit;
         //TODO: handle $result
         if (!empty($newWindowUrl)) {

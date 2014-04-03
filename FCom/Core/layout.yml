@@ -44,7 +44,3 @@ lib_tokeninput:
             - [ css, @FCom_Core/js/lib/css/token-input-facebook.css ]
             - [ requireJs, jquery.tokeninput, @FCom_Core/js/lib/jquery.tokeninput, { deps: [ jquery ] } ]
 
-lib_wysihtml5:
-    - view: head
-        do:
-            - [ css, @FCom_Core/js/lib/wysihtml5/bootstrap-wysihtml5.css ]

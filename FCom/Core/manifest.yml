@@ -2,7 +2,7 @@ modules:
     FCom_Core:
         version: 0.1.6
         channel: beta
-        require: { module: { BTwig: 1.12.4 } }
+        require: { module: { FCom_LibTwig: 0.1.0 } }
         before_bootstrap: { callback: FCom_Core_Main::beforeBootstrap }
         run_level: REQUIRED
         description: "Base Sellvana classes and JS libraries"
@@ -22,7 +22,7 @@ modules:
             - [ core/medialib, {view_class: FCom_Core_View_Abstract } ]
 
         observe:
-            - [ BTwig::init, FCom_Core_Main::onTwigInit ]
+            - [ FCom_LibTwig_Main::init, FCom_Core_Main.onTwigInit ]
 
         default_config:
             db:
