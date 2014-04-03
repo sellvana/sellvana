@@ -19,6 +19,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
     }
     window.variantGridRegister = function(grid) {
         grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
+        
             this.$el.find('select').addClass('variantUnique'); 
         }
         grid.build();
