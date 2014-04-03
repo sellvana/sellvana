@@ -2,32 +2,37 @@
 
 class FCom_Sales_Migrate extends BClass
 {
-    public function install__0_1_0()
+    public function install__0_2_10()
     {
         $tOrder = FCom_Sales_Model_Order::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tOrder} (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `user_id` int(10) unsigned NOT NULL,
-            `cart_id` int(10) unsigned NOT NULL,
-            `status` enum('new', 'paid') not null default 'new',
-            `item_qty` int(10) unsigned NOT NULL,
-            `subtotal` decimal(12,2) NOT NULL DEFAULT '0.0000',
-            `shipping_method` varchar(50) NOT NULL,
-            `shipping_service` char(2) NOT NULL,
-            `payment_method` varchar(50) NOT NULL,
-            `payment_details` text NOT NULL,
-            `discount_code` varchar(50) NOT NULL,
-            `tax` varchar(50) NOT NULL,
-            `balance` decimal(10,2) NOT NULL,
-            `totals_json` text NOT NULL,
-            PRIMARY KEY (`id`),
-            UNIQUE KEY cart_id (`cart_id`)
+              `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+              `customer_id` int(10) unsigned DEFAULT NULL,
+              `customer_email` varchar(100) DEFAULT NULL,
+              `cart_id` int(10) unsigned NOT NULL,
+              `status` varchar(50) NOT NULL,
+              `item_qty` int(10) unsigned NOT NULL,
+              `subtotal` decimal(12,2) NOT NULL DEFAULT '0.00',
+              `shipping_method` varchar(50) DEFAULT NULL,
+              `shipping_service` varchar(50) DEFAULT NULL,
+              `payment_method` varchar(50) DEFAULT NULL,
+              `coupon_code` varchar(50) DEFAULT NULL,
+              `tax` decimal(10,2) DEFAULT NULL,
+              `balance` decimal(10,2) NOT NULL,
+              `create_at` datetime DEFAULT NULL,
+              `update_at` datetime DEFAULT NULL,
+              `grandtotal` decimal(12,2) NOT NULL,
+              `shipping_service_title` varchar(100) DEFAULT NULL,
+              `data_serialized` text,
+              `unique_id` varchar(15) NOT NULL,
+              `admin_id` int(10) unsigned DEFAULT NULL,
+              PRIMARY KEY (`id`),
+              UNIQUE KEY cart_id (`cart_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
         $tItem = FCom_Sales_Model_Order_Item::table();
-        $tOrder = FCom_Sales_Model_Order::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tItem} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -40,6 +45,167 @@ class FCom_Sales_Migrate extends BClass
             CONSTRAINT `FK_{$tItem}_cart` FOREIGN KEY (`order_id`) REFERENCES {$tOrder} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
+
+        $tAddress = FCom_Sales_Model_Order_Address::table();
+        BDb::run("
+            CREATE TABLE IF NOT EXISTS {$tAddress} (
+            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+            `order_id` int(11) unsigned NOT NULL,
+            `atype` ENUM( 'shipping', 'billing' ) NOT NULL DEFAULT 'shipping',
+            `firstname` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `lastname` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `middle_initial` varchar(2) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `prefix` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `suffix` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `company` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `attn` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `street1` text COLLATE utf8_unicode_ci NOT NULL,
+            `street2` text COLLATE utf8_unicode_ci,
+            `street3` text COLLATE utf8_unicode_ci,
+            `city` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+            `region` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `postcode` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `country` char(2) COLLATE utf8_unicode_ci NOT NULL,
+            `phone` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `fax` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `create_at` datetime NOT NULL,
+            `update_at` datetime NOT NULL,
+            `lat` decimal(15,10) DEFAULT NULL,
+            `lng` decimal(15,10) DEFAULT NULL,
+            PRIMARY KEY (`id`),
+            CONSTRAINT `FK_{$tAddress}_cart` FOREIGN KEY (`order_id`) REFERENCES {$tOrder} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+        ");
+
+        $tStatus = FCom_Sales_Model_Order_Status::table();
+        BDb::run("
+            CREATE TABLE IF NOT EXISTS {$tStatus} (
+            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+            `name` varchar(50) NOT NULL DEFAULT '' ,
+            `code` varchar(50) NOT NULL DEFAULT '',
+            PRIMARY KEY (`id`)
+            )
+        ");
+        BDb::run("
+            insert into {$tStatus}(id,name,code) values(1, 'New', 'new'),(2,'Pending','pending'),(3,'Paid','paid')
+        ");
+
+        $tCart = FCom_Sales_Model_Cart::table();
+        $tCartItem = FCom_Sales_Model_Cart_Item::table();
+        $tAddress = FCom_Sales_Model_Cart_Address::table();
+
+        BDb::run("
+            CREATE TABLE IF NOT EXISTS {$tCart} (
+            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+            `item_qty` decimal(12,2) NOT NULL DEFAULT '0.0000',
+            `item_num` smallint(6) unsigned NOT NULL DEFAULT '0',
+            `subtotal` decimal(12,2) NOT NULL DEFAULT '0.0000',
+            `tax_amount` decimal(12,2) NOT NULL default 0,
+            `discount_amount` decimal(12,2) NOT NULL default 0,
+            `grand_total` decimal(12,2) NOT NULL default 0,
+            `session_id` varchar(100) DEFAULT NULL,
+            `customer_id` int unsigned NOT NULL,
+            `customer_email` varchar(100) NULL,
+            `shipping_method` VARCHAR( 50 )  NULL ,
+            `shipping_price` DECIMAL( 10, 2 ) NULL ,
+            `shipping_service` CHAR( 2 )  NULL,
+            `payment_method` VARCHAR( 50 ) NULL ,
+            `payment_details` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci  NULL,
+            `coupon_code` VARCHAR( 50 ) NOT NULL,
+            `status` ENUM( 'new', 'finished' ) NOT NULL DEFAULT 'new',
+            `create_at` DATETIME NULL,
+            `update_at` DATETIME NULL,
+            `data_serialized` text NULL,
+            `last_calc_at` int unsigned,
+            `admin_id` int(10) unsigned  NULL,
+            PRIMARY KEY (`id`),
+            KEY `session_id` (`session_id`),
+            KEY `customer_id` (`customer_id`),
+            KEY `status` (`status`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+            CREATE TABLE IF NOT EXISTS {$tCartItem} (
+            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+            `cart_id` int(10) unsigned DEFAULT NULL,
+            `product_id` int(10) unsigned DEFAULT NULL,
+            `local_sku` varchar(100) DEFAULT NULL,
+            `product_name` varchar(255) DEFAULT NULL,
+            `qty` decimal(12,2) DEFAULT NULL,
+            `price` decimal(12,2) NOT NULL DEFAULT '0.0000',
+            `rowtotal` decimal(12,2) NULL,
+            `tax` decimal(12,2) NOT NULL default 0,
+            `discount` decimal(12,2) NOT NULL default 0,
+
+            `promo_id_buy` VARCHAR(50) NOT NULL,
+            `promo_id_get` INT(10) UNSIGNED NOT NULL,
+            `promo_qty_used` decimal(12,2) DEFAULT NULL,
+            `promo_amt_used` decimal(12,2) DEFAULT NULL,
+
+            `create_at` DATETIME NOT NULL,
+            `update_at` DATETIME NOT NULL,
+            `data_serialized` text  NULL,
+
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `cart_id` (`cart_id`,`product_id`),
+            CONSTRAINT `FK_{$tCartItem}_cart` FOREIGN KEY (`cart_id`) REFERENCES {$tCart} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+            CREATE TABLE IF NOT EXISTS {$tAddress} (
+            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+            `cart_id` int(11) unsigned NOT NULL,
+            `atype` ENUM( 'shipping', 'billing' ) NOT NULL DEFAULT 'shipping',
+            `firstname` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `lastname` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `middle_initial` varchar(2) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `prefix` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `suffix` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `company` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `attn` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `street1` text COLLATE utf8_unicode_ci NOT NULL,
+            `street2` text COLLATE utf8_unicode_ci,
+            `street3` text COLLATE utf8_unicode_ci,
+            `city` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+            `region` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `postcode` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `country` char(2) COLLATE utf8_unicode_ci NOT NULL,
+            `phone` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `fax` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+            `email` VARCHAR( 100 ) NOT NULL,
+            `create_at` datetime NOT NULL,
+            `update_at` datetime NOT NULL,
+            `lat` decimal(15,10) DEFAULT NULL,
+            `lng` decimal(15,10) DEFAULT NULL,
+            PRIMARY KEY (`id`),
+            CONSTRAINT `FK_{$tAddress}_cart` FOREIGN KEY (`cart_id`) REFERENCES {$tCart} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+        ");
+        BDb::ddlTableDef(FCom_Sales_Model_Order_Payment::table(), array(
+            'COLUMNS' => array(
+                'id'               => 'int (10) unsigned not null auto_increment',
+                'create_at'        => 'datetime not null',
+                'update_at'        => 'datetime null',
+                'method'           => 'varchar(50) not null',
+                'parent_id'        => 'int(10) null',
+                'order_id'         => 'int(10) unsigned not null',
+                'amount'           => 'decimal(12,2)',
+                'data_serialized'  => 'text',
+                'status'           => 'varchar(50)',
+                'transaction_id'   => 'varchar(50)',
+                'transaction_type' => 'varchar(50)',
+                'online'           => 'BOOL',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS'  => array(
+                'method'           => '(method)',
+                'order_id'         => '(order_id)',
+                'status'           => '(status)',
+                'transaction_id'   => '(transaction_id)',
+                'transaction_type' => '(transaction_type)',
+            ),
+            'CONSTRAINTS' => array(
+                'fk_payment_order' => "FOREIGN KEY (order_id) REFERENCES {$tOrder}(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+            ),
+        ));
     }
 
     public function upgrade__0_1_0__0_1_1()

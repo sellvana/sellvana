@@ -2,12 +2,14 @@
 
 class FCom_Blog_Migrate extends BClass
 {
-    public function install__0_1_1()
+    public function install__0_1_4()
     {
         $tPost = FCom_Blog_Model_Post::table();
         $tTag = FCom_Blog_Model_Tag::table();
         $tPostTag = FCom_Blog_Model_PostTag::table();
         $tUser = FCom_Admin_Model_User::table();
+        $tCategory = FCom_Blog_Model_Category::table();
+        $tPostCategory = FCom_Blog_Model_PostCategory::table();
 
         BDb::ddlTableDef($tPost, array(
             'COLUMNS' => array(
@@ -62,6 +64,33 @@ class FCom_Blog_Migrate extends BClass
             'CONSTRAINTS' => array(
                 "FK_{$tPostTag}_post" => "FOREIGN KEY (post_id) REFERENCES {$tPost} (id) ON UPDATE CASCADE ON DELETE CASCADE",
                 "FK_{$tPostTag}_tag" => "FOREIGN KEY (tag_id) REFERENCES {$tTag} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            ),
+        ));
+
+
+        BDb::ddlTableDef($tCategory, array(
+            'COLUMNS' => array(
+                'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
+                'name'    => 'varchar(255) NOT NULL',
+                'url_key'    => 'varchar(255) NOT NULL',
+                'description'    => 'text NULL',
+            ),
+            'PRIMARY' => '(id)',
+        ));
+        BDb::ddlTableDef($tPostCategory, array(
+            'COLUMNS' => array(
+                'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
+                'category_id'    => 'INT(10) UNSIGNED NOT NULL',
+                'post_id'   => 'INT(10) UNSIGNED NOT NULL',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'post_id' => 'UNIQUE (`post_id`,`category_id`)',
+                'category_id__post_id' => '(`category_id`,`post_id`)',
+            ),
+            'CONSTRAINTS' => array(
+                "FK_{$tPostCategory}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tPostCategory}_post" => "FOREIGN KEY (`post_id`) REFERENCES `{$tPost}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ),
         ));
     }

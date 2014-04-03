@@ -8,7 +8,7 @@
 class FCom_CustomerGroups_Migrate
     extends BClass
 {
-    public function install__0_1_0()
+    public function install__0_1_2()
     {
         $tableCustomerGroup = FCom_CustomerGroups_Model_Group::table();
 
@@ -41,6 +41,34 @@ class FCom_CustomerGroups_Migrate
                  ),
             )
         );
+
+        $tableTierPrices = FCom_CustomerGroups_Model_TierPrice::table();
+
+        $tableProduct = FCom_Catalog_Model_Product::table();
+        BDb::ddlTableDef($tableTierPrices,
+            array(
+                'COLUMNS' => array(
+                    'id'         => 'int(10) unsigned not null auto_increment',
+                    'product_id' => 'int(10) unsigned not null',
+                    'group_id'   => 'int(10) unsigned not null',
+                    'base_price' => 'decimal(12,2) not null',
+                    'sale_price' => 'decimal(12,2) not null',
+                    'qty'        => 'int(10) unsigned not null default 1',
+                ),
+                'PRIMARY' => '(id)',
+                'KEYS' => array(
+                    'unq_prod_group_qty' => 'UNIQUE(product_id, group_id, qty)',
+                ), // should we add unique key from product_id + group_id + qty ???
+                'CONSTRAINTS' => array(
+                    'fk_tier_product_id' => "FOREIGN KEY (product_id) REFERENCES {$tableProduct}(id) ON DELETE CASCADE ON UPDATE CASCADE",
+                    'fk_tier_group_id' => "FOREIGN KEY (group_id) REFERENCES {$tableCustomerGroup}(id) ON DELETE CASCADE ON UPDATE CASCADE"
+                ),
+            )
+        );
+        BDb::run("
+        replace INTO `{$tableCustomerGroup}` (`id`, `title`, `code`)
+        VALUES (0, 'ALL', 'all')
+        ");
     } // end install
 
     public function upgrade__0_1_0__0_1_1()

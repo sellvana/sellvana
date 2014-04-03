@@ -152,6 +152,7 @@
 {% endif %}
 <script>
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
+        var mediaGrid = window['{{ config.id }}_grid'];
         $('#{{config.id}}-media-upload').fileupload({
             url: '{{ APP.href("media/grid/upload?folder=") | raw }}{{ config.folder | raw}}',
             multiple:true
@@ -163,7 +164,6 @@
 
             if(data.result.id) {
                 //get self media grid
-                var mediaGrid = window['{{ config.id }}_grid'];
 
                 //insert uploaded file in media grid and get selected
                 var newRow = data.result;
@@ -181,6 +181,16 @@
                         $(this).parents('tr:first').remove();
                 });
             }
+        });
+        $('.btn-rescan-images').click(function () {
+            $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw}}', function (response) {
+                if (response.status == 'success') {
+                    $.bootstrapGrowl("Rescan success", { type: 'success', align: 'center', width: 'auto' });
+                    mediaGrid.getRows().fetch();
+                } else {
+                    $.bootstrapGrowl("Error:<br>" + response.message, { type: 'danger', align: 'center', width: 'auto', delay: 5000});
+                }
+            });
         });
 
     });
