@@ -36,6 +36,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 )
         );
         $config['actions'] = array(
+            'refresh'=>true,
             'export'=>true,
             'delete'=>true,
             //'custom'=>array('class'=>'test', 'caption'=>'ffff', 'id'=>'prod_custom')
@@ -190,12 +191,13 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'product_id', 'label'=>'Product ID', 'width'=>400, 'hidden'=>true, 'default'=>$model->id()),
                     array('name'=>'file_name', 'label'=>'File Name', 'width'=>200, 'display'=>'eval', 'print'=>'"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
-                    array('type'=>'input', 'name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline'),
+                    array('type'=>'input', 'name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline', 'validation'=>array('required'=>true)),
                     array('type'=>'input', 'name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true)),
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
                     array('type'=>'btn_group',
                           'buttons'=>array(
+                                            array('name'=>'edit'),
                                             array('name'=>'delete')
                                             )
                         )
@@ -241,22 +243,25 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'product_id', 'hidden'=>true,'default'=>$model->id()),
                     array('name'=>'download_url',  'hidden'=>true, 'default'=>$download_url),
                     array('name'=>'thumb_url',  'hidden'=>true, 'default'=>$thumb_url),
-                    array('name'=>'file_name', 'label' => 'File Name', 'hidden'=>true),
+                    array('name'=>'file_name', 'label' => 'File Name'),
                     array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'display'=>'eval', 'print'=>'"<a href=\'"+rc.row["download_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\'><img src=\'"+rc.row["thumb_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' ></a>"', 'sortable'=>false),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
                     array('type'=>'input', 'name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline'),
                     array('type'=>'input', 'name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true)),
                     array('name'=>'main_thumb', 'label'=>'Thumbnail', 'width'=>50, 'display'=>'eval', 'print' => '"<input class=\'main-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"'),
+                    array('name'=>'associated_products', 'label'=>'Associated Products', 'width'=>50),
                     array('name'=>'create_at', 'label'=>'Added', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
                     array('type'=>'btn_group', 'name'=>'_actions', 'label'=>'Actions', 'sortable'=>false,
                             'buttons'=>array(
+                                        array('name'=>'edit'),
                                         array('name'=>'delete')
                                     )
                         )
                 ),
                 'actions'=>array(
-
+                    'refresh'=>true,
+                    'rescan' => array('caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'),
                     'add'=>array('caption'=>'Add images'),
                     'delete'=>array('caption'=>'Remove'),
                 ),
