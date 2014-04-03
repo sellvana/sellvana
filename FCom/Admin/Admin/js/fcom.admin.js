@@ -1,4 +1,9 @@
-define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 'jquery.bootstrap-growl', 'switch'], function ($, angular) {
+var fcomAdminDeps = ["jquery", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 'jquery.bootstrap-growl', 'switch'];
+if (require.specified('ckeditor')) {
+    fcomAdminDeps.push('ckeditor');
+}
+
+define(fcomAdminDeps, function ($) {
     /*
      var myApp = angular.module("fcomApp", [], function($interpolateProvider) {
      $interpolateProvider.startSymbol("<%");
@@ -1258,20 +1263,4 @@ define(["jquery", "angular", "jquery-ui", "bootstrap", "fcom.core", 'ckeditor', 
 
         $.fn.foundationCustomForms && $(".foundation-forms").foundationCustomForms();
     })
-
-    angular.module('fcom.directives', [])
-
-        .directive('fcomSelect2', function () {
-            return {
-                restrict: 'AC',
-                link: function ($scope, element, attrs) {
-                    var params = {
-                        width: 'other values', minimumResultsForSearch: 20
-                    }
-                    angular.extend(params, $scope.$eval(attrs.mySelect2));
-
-                    $(element).select2(params || {});
-                }
-            }
-        })
 })

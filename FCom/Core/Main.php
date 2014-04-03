@@ -310,10 +310,10 @@ class FCom_Core_Main extends BClass
             $modReg->deleteManifestCache();
         }
         if (!$manifestsLoaded) {
-            if (defined('BUCKYBALL_ROOT_DIR')) {
-                $this->_modulesDirs[] = BUCKYBALL_ROOT_DIR.'/plugins';
+            // if (defined('BUCKYBALL_ROOT_DIR')) {
+                // $this->_modulesDirs[] = BUCKYBALL_ROOT_DIR.'/plugins';
                 // if minified version used, need to load plugins manually
-            }
+            // }
             $this->_modulesDirs[] = $dirConf['storage_dir'].'/custom'; // Custom module
             $this->_modulesDirs[] = $dirConf['local_dir'].'/*/*'; // Local modules
             $this->_modulesDirs[] = $dirConf['dlc_dir'].'/*/*'; // Downloaded modules
