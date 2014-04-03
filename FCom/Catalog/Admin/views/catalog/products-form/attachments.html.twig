@@ -50,7 +50,7 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
             }
         });
 
-        $('.btn_all_attachments_add').click(function() {            
+        $('.btn_all_attachments_add').click(function() {
             var gridView = attachmentGrid.getGridView();
             all_attachments_grid.getSelectedRows().forEach(function (row) {
                 if (!attachmentGrid.getRows().findWhere({file_id: row.get('id')})) {
