@@ -1,0 +1,5 @@
+common_js_libs:
+    - view: head
+        do:
+            - [ requireJs, ckeditor, @FCom_LibJsCkeditor/js/ckeditor/ckeditor, { deps: [ jquery ] } ]
+            - [ requireJs, ckeditor-jquery, @FCom_LibJsCkeditor/js/ckeditor/adapters/jquery, { deps: [ jquery, ckeditor ] } ]

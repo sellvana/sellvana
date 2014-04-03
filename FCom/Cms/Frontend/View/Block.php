@@ -68,7 +68,7 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
             return '';
         }
 
-        $subRenderer = BLayout::i()->getRenderer($model->renderer ? $model->renderer : 'BTwig');
+        $subRenderer = BLayout::i()->getRenderer($model->renderer ? $model->renderer : 'FCom_LibTwig');
 
         $view->setParam(array(
             //'renderer'    => $subRenderer,

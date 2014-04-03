@@ -49,7 +49,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         array('base_price', '@required'),
         array('local_sku', '@required'),
         array('local_sku', '@string', null, array('max' => 100)),
-        array('local_sku', 'FCom_Catalog_Model_Product::validateDupSku', 'Duplicate SKU'),
+        array('local_sku', 'FCom_Catalog_Model_Product.validateDupSku', 'Duplicate SKU'),
         //TODO validation fails on is_hidden field
         /*array('is_hidden', '@required'),*/
         /*array('uom', '@required'),*/
@@ -96,6 +96,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public static function validateDupSku($data, $args)
     {
+        if (!empty(static::$_flags['skip_duplicate_checks'])) {
+            return true;
+        }
         if (empty($data[$args['field']])) {
             return true;
         }

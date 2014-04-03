@@ -1,0 +1,5 @@
+modules:
+    FCom_LibGanon:
+        version: 0.1.0
+        observe:
+            - [ BLayout::render:after, FCom_LibGanon_Main.onLayoutRenderAfter ]

@@ -19,7 +19,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
     }
     window.variantGridRegister = function(grid) {
         grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
-            this.$el.find('select').addClass('variantUnique');
+        
+            this.$el.find('select').addClass('variantUnique'); 
         }
         grid.build();
         vColsCollection = grid.getCols();
@@ -114,7 +115,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
            variants.push(variant);
         });
         $('#variants').val(JSON.stringify(variants));
-        return true;
     });
 
     $('#btn_add_var_field').click(function() {
@@ -159,6 +159,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
         vRowsCollection.each(function(r) {
             delete r.attributes[row.name];
         });
+
+
     }
 
     function renderGrid()
@@ -201,7 +203,10 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                     });
                 }
             });
-        })
+        });
+
+        //$('form').isValid();
+
     }
 
     function addColumn(text, options) {
@@ -246,24 +251,31 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
         $(field).parents('li').remove();
         renderGrid();
         grayGrid();
+
+        $('.variantUnique').valid();
     });
 
     /*
     *custom validation function for checking duplicated input
     */
     function variantUnique(value, elem, params) {
+        console.log('fff');
         var error = true;
         if (typeof (elem) !== 'undefined') {
             vRowsCollection.each(function (data) {
+
                     var parent = $(elem).parents('tr');
                     if (parent.attr('id') != data.get('id')) {
                         var flag = false;// all select fields are same
                         parent.find('select').each(function(index) {
-                            if ($(this).val() !== data.get($(this).data('col'))) {
+                            var comparand = $('#variant-grid-'+$(this).data('col')+'-'+data.get('id')).val();
+                            if ($(this).val() !== comparand) {
                                 flag = true; // at least one field is different
                             }
                         });
+
                         if (!flag) {
+
                             error = false;
                         }
                     }
@@ -323,4 +335,3 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
 
 <input type='hidden' id='vfield_ids' name='vfields' />
 <input type='hidden' id='variants' name='variants' />
-

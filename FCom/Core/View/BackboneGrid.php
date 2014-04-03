@@ -215,18 +215,18 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         if(empty($btn['col'])) {
                             $btn['col'] = 'id';
                         }
-                        
+
                         switch($btn['name']) {
                             case 'edit':
                                 if (empty($btn['icon'])) {
                                     $btn['icon'] = ' icon-edit-sign';
                                 }
-                                if (empty($btn['href'])) {
+                                if (!empty($grid['config']['form_url']) && empty($btn['href'])) {
                                     $btn['href'] = $grid['config']['form_url'].'?'.$btn['col'].'=';
                                 }
                                 $btn['cssClass'] = ' btn-xs btn-edit ';
                                 break;
-                                
+
                             case 'delete':
                                 $btn['icon'] = 'icon-remove';
                                 $btn['cssClass'] = 'btn-delete ';
@@ -235,7 +235,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                                 }
                                 break;
                         }
-                        
+
                         if (!empty($btn['href'])) {
                             $btn['type'] = 'link';
                             if (!BUtil::isUrlFull($btn['href'])) {
@@ -761,7 +761,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
 //print_r($r); exit;
         //$r = array_replace_recursive($hash, $r);
-        
+
 
         if (!empty($filters)) {
             $this->_processGridFilters($config, $filters, $orm);
@@ -909,13 +909,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             }
             //delete $filters[$fId];
         }
-        
+
         //$columnData = $this->findColumnDataForFilters($config);
         foreach ($filters as $fId=>$f) {
             if ($fId === '_quick') {
                 continue;
             }
-         
+
             /*$f['field'] = !empty($f['field']) ? $f['field'] : $fId;
             if ($fId === '_quick') {
                 if (!empty($f['expr']) && !empty($f['args']) && !empty($filters[$fId])) {
