@@ -47,7 +47,8 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'display'=>'eval', 'print'=>'"<a href=\''.$baseSrc.'"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' target=_blank><img src=\''.$baseSrc.'"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"', 'sortable'=>false),
                     array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
-                    array('name'=>'file_size', 'label'=>'File Size', 'width'=>260, 'search'=>false, 'display'=>'file_size')
+                    array('name'=>'file_size', 'label'=>'File Size', 'width'=>260, 'search'=>false, 'display'=>'file_size'),
+                    array('name'=>'associated_products', 'label'=>'Associated Products', 'width'=>50),
                     //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
                 ),
                 'filters' => array(
@@ -55,6 +56,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ),
                 'grid_before_create'=>$id.'_register',
                 'actions' => array(
+                    'rescan' => array('caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'),
                     'refresh' => true,
                 )
             )

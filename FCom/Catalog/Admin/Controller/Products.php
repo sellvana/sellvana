@@ -191,13 +191,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'product_id', 'label'=>'Product ID', 'width'=>400, 'hidden'=>true, 'default'=>$model->id()),
                     array('name'=>'file_name', 'label'=>'File Name', 'width'=>200, 'display'=>'eval', 'print'=>'"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>200, 'display'=>'file_size'),
-                    array('type'=>'input', 'name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline', 'validation'=>array('required'=>true)),
+                    array('type'=>'input', 'name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline'),
                     array('type'=>'input', 'name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true)),
                     array('name'=>'create_at', 'label'=>'Created', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
                     array('type'=>'btn_group',
                           'buttons'=>array(
-                                            array('name'=>'edit'),
                                             array('name'=>'delete')
                                             )
                         )
@@ -249,19 +248,16 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('type'=>'input', 'name'=>'label', 'label'=>'Label', 'width'=>250, 'editable'=>'inline'),
                     array('type'=>'input', 'name'=>'position', 'label'=>'Position', 'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true)),
                     array('name'=>'main_thumb', 'label'=>'Thumbnail', 'width'=>50, 'display'=>'eval', 'print' => '"<input class=\'main-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"'),
-                    array('name'=>'associated_products', 'label'=>'Associated Products', 'width'=>50),
                     array('name'=>'create_at', 'label'=>'Added', 'width'=>200),
                     array('name'=>'update_at', 'label'=>'Updated', 'width'=>200),
                     array('type'=>'btn_group', 'name'=>'_actions', 'label'=>'Actions', 'sortable'=>false,
                             'buttons'=>array(
-                                        array('name'=>'edit'),
                                         array('name'=>'delete')
                                     )
                         )
                 ),
                 'actions'=>array(
                     'refresh'=>true,
-                    'rescan' => array('caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'),
                     'add'=>array('caption'=>'Add images'),
                     'delete'=>array('caption'=>'Remove'),
                 ),
@@ -352,7 +348,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ->select(array('p.id', 'p.product_name', 'p.local_sku', 'p.base_price', 'p.sale_price'));
 
         switch ($type) {
-        case 'related': case 'similar':case 'cross_sell':
+        case 'related': case 'similar':case 'cross-sell':
             $orm->join('FCom_Catalog_Model_ProductLink', array('pl.linked_product_id','=','p.id'), 'pl')
                 ->where('link_type', $type)
                 ->where('pl.product_id', $model ? $model->id : 0);
@@ -421,14 +417,15 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         if (isset($data['do']) && $data['do'] === 'DELETE') {
             $this->deleteRelateInfo($model);
         } else {
-            $this->processCategoriesPost($model);
-            $this->processLinkedProductsPost($model, $data);
-            $this->processMediaPost($model, $data);
-            $this->processCustomFieldPost($model, $data);
-            $this->processVariantPost($model, $data);
-            $this->processSystemLangFieldsPost($model, $data);
-            $this->processFrontendPost($model, $data);
-
+            if (!$args['validateFailed']) {
+                $this->processCategoriesPost($model);
+                $this->processLinkedProductsPost($model, $data);
+                $this->processMediaPost($model, $data);
+                $this->processCustomFieldPost($model, $data);
+                $this->processVariantPost($model, $data);
+                $this->processSystemLangFieldsPost($model, $data);
+                $this->processFrontendPost($model, $data);
+            }
         }
     }
 
@@ -497,7 +494,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         //echo "<pre>"; print_r($data); echo "</pre>";
         $hlp = FCom_Catalog_Model_ProductLink::i();
-        foreach (array('related', 'similar', 'cross_sell') as $type) {
+        foreach (array('related', 'similar', 'cross-sell') as $type) {
             $typeName = 'linked_products_'.$type;
             if (!empty($data['grid'][$typeName]['del'])) {
                 $hlp->delete_many(array(

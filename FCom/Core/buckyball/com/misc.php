@@ -3172,7 +3172,7 @@ class BLoginThrottle extends BClass
         return true;
     }
 
-    public function failure()
+    public function failure($sleepSec = null)
     {
         $username = $this->_username;
         $now = time();
@@ -3191,7 +3191,7 @@ class BLoginThrottle extends BClass
         $this->_fire('fail:wait');
 
         $this->_gc();
-        sleep($c['sleep_sec']);
+        sleep(!is_null($sleepSec) ? $sleepSec : $c['sleep_sec']);
 
         $this->_rec['status'] = '';
         $this->_save();

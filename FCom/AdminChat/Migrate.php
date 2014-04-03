@@ -2,7 +2,7 @@
 
 class FCom_AdminChat_Migrate extends BClass
 {
-    public function install__0_1_0()
+    public function install__0_1_4()
     {
         $tChat = FCom_AdminChat_Model_Chat::table();
         $tParticipant = FCom_AdminChat_Model_Participant::table();
@@ -13,6 +13,7 @@ class FCom_AdminChat_Migrate extends BClass
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
                 'status' => 'varchar(20)',
+                'owner_user_id' => 'int unsigned not null',
                 'num_participants' => 'smallint unsigned not null default 0',
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
@@ -20,6 +21,9 @@ class FCom_AdminChat_Migrate extends BClass
             'PRIMARY' => '(id)',
             'KEYS' => array(
                 'IDX_update_at' => '(update_at)',
+            ),
+            'CONSTRAINTS' => array(
+                "FK_{$tChat}_owner" => "FOREIGN KEY (owner_user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
             ),
         ));
 
@@ -29,6 +33,7 @@ class FCom_AdminChat_Migrate extends BClass
                 'chat_id' => 'int unsigned not null',
                 'user_id' => 'int unsigned not null',
                 'status' => 'varchar(20)',
+                'chat_title' => 'varchar(50) null',
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ),
@@ -47,6 +52,7 @@ class FCom_AdminChat_Migrate extends BClass
                 'id' => 'int unsigned not null auto_increment',
                 'chat_id' => 'int unsigned not null',
                 'user_id' => 'int unsigned not null',
+                'entry_type' => 'varchar(20) default "text"',
                 'text' => 'text',
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
@@ -58,6 +64,23 @@ class FCom_AdminChat_Migrate extends BClass
             'CONSTRAINTS' => array(
                 "FK_{$tHistory}_chat" => "FOREIGN KEY (chat_id) REFERENCES {$tChat} (id) ON UPDATE CASCADE ON DELETE CASCADE",
                 "FK_{$tHistory}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            ),
+        ));
+
+        $tUserStatus = FCom_AdminChat_Model_UserStatus::table();
+
+        BDb::ddlTableDef($tUserStatus, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'user_id' => 'int unsigned not null',
+                'status' => 'varchar(20)',
+                'message' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ),
+            'PRIMARY' => '(id)',
+            'CONSTRAINTS' => array(
+                "FK_{$tUserStatus}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
             ),
         ));
     }

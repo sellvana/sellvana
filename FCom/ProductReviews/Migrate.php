@@ -15,7 +15,7 @@ class FCom_ProductReviews_Migrate extends BClass
         );
     }
 
-    public function install__0_2_0()
+    public function install__0_2_5()
     {
         $tReview = FCom_ProductReviews_Model_Review::table();
         $tReviewFlag = FCom_ProductReviews_Model_ReviewFlag::table();
@@ -27,14 +27,18 @@ class FCom_ProductReviews_Migrate extends BClass
             `product_id` int(10) unsigned NOT NULL,
             `customer_id` int(10) unsigned NOT NULL,
             `rating` tinyint(1) unsigned not null,
+            `rating1` tinyint(1) unsigned NOT NULL,
+            `rating2` tinyint(1) unsigned NOT NULL,
+            `rating3` tinyint(1) unsigned NOT NULL,
             `approved` int(11) not null default 0,
             `helpful` int(11) not null DEFAULT '0',
             `helpful_voices` bigint(11) not null DEFAULT '0',
             `offensive` int(11) null,
             `title` varchar(255) NOT NULL,
-            `created_dt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            `create_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             `text` text,
-            PRIMARY KEY (`id`)
+            PRIMARY KEY (`id`),
+            KEY `IDX_product_approved` (`product_id`,`approved`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
@@ -52,6 +56,21 @@ class FCom_ProductReviews_Migrate extends BClass
             UNIQUE KEY `rev2cust` (`review_id`,`customer_id`)
             ) ENGINE = InnoDB;"
         );
+
+        $hlp = FCom_CatalogIndex_Model_Field::i();
+        if (!$hlp->load('avg_rating', 'field_name')) {
+            $hlp->create(array(
+                'field_name' => 'avg_rating',
+                'field_label' => 'Average Rating',
+                'field_type' => 'varchar',
+                'weight' => 0,
+                'source_type' => 'callback',
+                'source_callback' => 'FCom_ProductReviews_Model_Review::indexAvgRating',
+                'filter_type' => 'exclusive',
+                'filter_counts' => 1,
+                'filter_order' => 10,
+            ))->save();
+        }
     }
 
     public function upgrade__0_2_0__0_2_1()

@@ -2,7 +2,7 @@
 
 class FCom_Seo_Migrate extends BClass
 {
-    public function install__0_1_0()
+    public function install__0_1_1()
     {
         BDb::ddlTableDef(FCom_Seo_Model_UrlAlias::table(), array(
             'COLUMNS' => array(
@@ -12,8 +12,8 @@ class FCom_Seo_Migrate extends BClass
                 'is_active' => 'tinyint',
                 'is_regexp' => 'tinyint',
                 'redirect_type' => 'varchar(10)',
-                'create_dt' => 'datetime',
-                'update_dt' => 'datetime',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(
@@ -27,8 +27,8 @@ class FCom_Seo_Migrate extends BClass
                 'name' => 'varchar(100)',
                 'url_key' => 'varchar(50)',
                 'data_json' => 'text',
-                'create_dt' => 'datetime',
-                'update_dt' => 'datetime',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(

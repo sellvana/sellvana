@@ -1739,6 +1739,13 @@ class BModel extends Model
      * @var array
      */
     protected static $_validationRules = array();
+    
+    /**
+    * Model scope flags for internal use
+    * 
+    * @var array
+    */
+    protected static $_flags = array();
 
     /**
     * Retrieve original class name
@@ -1748,6 +1755,16 @@ class BModel extends Model
     public static function origClass()
     {
         return static::$_origClass;
+    }
+    
+    public function setFlag($flag, $value)
+    {
+        static::$_flags[$flag] = $value;
+    }
+    
+    public function getFlag($flag)
+    {
+        return isset(static::$_flags[$flag]) ? static::$_flags[$flag] : null;
     }
 
     /**
