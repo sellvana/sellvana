@@ -3,7 +3,7 @@
 {% set variantConfig = ctrl.variantGridConfig(model) %}
 
 <script>
-require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(Backbone, _, $) {
+require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.validate'], function(Backbone, _, $) {
     var fieldCollection = null;
     var vColsCollection = null;
     var vRowsCollection = null;
@@ -18,6 +18,9 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
         fieldCollection = grid.getRows();
     }
     window.variantGridRegister = function(grid) {
+        grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
+            this.$el.find('select').addClass('variantUnique');
+        }
         grid.build();
         vColsCollection = grid.getCols();
         vRowsCollection = grid.getRows();
@@ -245,7 +248,38 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui'], function(B
         grayGrid();
     });
 
+    /*
+    *custom validation function for checking duplicated input
+    */
+    function variantUnique(value, elem, params) {
+        var error = true;
+        if (typeof (elem) !== 'undefined') {
+            vRowsCollection.each(function (data) {
+                    var parent = $(elem).parents('tr');
+                    if (parent.attr('id') != data.get('id')) {
+                        var flag = false;// all select fields are same
+                        parent.find('select').each(function(index) {
+                            if ($(this).val() !== data.get($(this).data('col'))) {
+                                flag = true; // at least one field is different
+                            }
+                        });
+                        if (!flag) {
+                            error = false;
+                        }
+                    }
 
+                    return error;
+            });
+        }
+
+        return error;
+    }
+
+    $.validator.addMethod('variantUnique',variantUnique , 'Same variant is already taken place.');
+
+    $.validator.addClassRules("variantUnique", {
+        variantUnique: true
+    });
 });
 </script>
 

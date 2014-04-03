@@ -52,4 +52,15 @@ class FCom_MarketClient_Migrate extends BClass
             ),
         ));
     }
+
+    public function upgrade__0_2_2__0_2_3()
+    {
+        $tMarketModule = FCom_MarketClient_Model_Module::table();
+        BDb::ddlTableDef($tMarketModule, array(
+            'COLUMNS' => array(
+                'module_name' => 'varchar(100) NOT NULL AFTER `id`',
+                'core_module_id' => 'int unsigned null',
+            ),
+        ));
+    }
 }

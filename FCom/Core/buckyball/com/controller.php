@@ -38,6 +38,8 @@ class BRequest extends BClass
     */
     protected $_params = array();
 
+    protected $_postTagsWhitelist = array();
+
     /**
      * Shortcut to help with IDE autocompletion
      *
@@ -869,6 +871,49 @@ class BRequest extends BClass
         }
         return $modRewrite;
     }
+
+    public function addRequestFieldsWhitelist($whitelist)
+    {
+        foreach ((array)$whitelist as $urlPath => $fieldPaths) {
+            foreach ($fieldPaths as $fieldPath => $allowTags) {
+                if (is_numeric($fieldPath)) {
+                    $fieldPath = $allowTags;
+                    $allowTags = '*';
+                }
+                $this->_postTagsWhitelist[$urlPath][$fieldPath] = $allowTags;
+            }
+        }
+        return $this;
+    }
+
+    public function stripRequestFieldsTags()
+    {
+        static $alreadyStripped;
+        if ($alreadyStripped) {
+            return;
+        }
+        $data = array('GET' =>& $_GET, 'POST' =>& $_POST, 'REQUEST' =>& $_REQUEST, 'COOKIE' =>& $_COOKIE);
+        $this->stripTagsRecursive($data, static::rawPath());
+        $alreadyStripped = true;
+        return $this;
+    }
+
+    public function stripTagsRecursive(&$data, $forUrlPath, $curPath = null)
+    {
+        foreach ($data as $k => &$v) {
+            $childPath = is_null($curPath) ? $k : ($curPath . '/' . $k);
+            if (is_array($v)) {
+                $this->stripTagsRecursive($v,  $forUrlPath, $childPath);
+            } elseif (!empty($v) && !is_numeric($v)) {
+                if (empty($this->_postTagsWhitelist[$forUrlPath][$childPath])) {
+                    $v = strip_tags($v);
+                } elseif ('*' !== $this->_postTagsWhitelist[$forUrlPath][$childPath]) {
+                    $v = strip_tags($v, $this->_postTagsWhitelist[$forUrlPath][$childPath]);
+                }
+            }
+        }
+        unset($v);
+    }
 }
 
 /**
@@ -1240,7 +1285,8 @@ class BResponse extends BClass
         BSession::i()->close();
         $this->status($status, null, false);
         if (true === $url) {
-            $url = BRequest::i()->currentUrl();
+            $referrer = BRequest::i()->referrer();
+            $url = $referrer ? $referrer : BRequest::i()->currentUrl();
         } elseif (!BUtil::isUrlFull($url)) {
             $url = BApp::href($url);
         }
@@ -2179,12 +2225,15 @@ class BActionController extends BClass
             $this->forward(false);
             return $this;
         }
-        try {
+
+        BRequest::i()->stripRequestFieldsTags();
+
+        // try {
             $this->$actionMethod($args);
-        } catch (Exception $e) {
+        // } catch (Exception $e) {
             //BDebug::exceptionHandler($e);
-            $this->sendError($e->getMessage());
-        }
+            // $this->sendError($e->getMessage());
+        // }
         return $this;
     }
 
@@ -2243,7 +2292,7 @@ class BActionController extends BClass
     */
     public function beforeDispatch()
     {
-        BEvents::i()->fire(__METHOD__);
+        BEvents::i()->fire(static::$_origClass.'::beforeDispatch');
         return true;
     }
 
@@ -2253,7 +2302,7 @@ class BActionController extends BClass
     */
     public function afterDispatch()
     {
-        BEvents::i()->fire(__METHOD__);
+        BEvents::i()->fire(static::$_origClass.'::afterDispatch');
     }
 
     /**

@@ -132,6 +132,11 @@ class BCache extends BClass
         return $this->getBackend()->delete($key);
     }
 
+    public function deleteMany($pattern)
+    {
+        return $this->getBackend()->deleteMany($pattern);
+    }
+
     public function gc()
     {
         return $this->getBackend()->gc();

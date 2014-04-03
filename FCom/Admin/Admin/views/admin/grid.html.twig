@@ -1,5 +1,4 @@
 <div class="f-admin-main-view">
-  <form method="post">
   <div class="page-header f-admin-page-header">
     <h1 class="f-page-title">
         <i class="icon-table"></i>
@@ -9,7 +8,6 @@
         {{ THIS.get('actions') | join(' ') | raw }}
     </div>
   </div>
-  </form>
   <div class="f-admin-main">
     {{ THIS.view('core/messages') | raw }}
     {{ THIS.view('core/backbonegrid') | raw }}

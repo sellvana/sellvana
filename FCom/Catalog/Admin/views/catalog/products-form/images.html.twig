@@ -36,22 +36,22 @@ require(['jquery','underscore','backbone'], function($, _) {
     *MediaGrid registery function
     */
     window.all_prod_images_register = function(grid) {
-        mediaGrid = grid;
+        all_prod_images_grid = grid;
         grid.build();
 
-        all_prod_images_grid = mediaGrid.getGridSkeleton();
-        rowsAllImages = mediaGrid.getRows();
-        mediaGrid.getSelectedRows().on('add remove reset', function() {
-            if (mediaGrid.getSelectedRows().length>0) {
-                $('.prod-images-modal-add').removeClass('disabled');
+        
+        rowsAllImages = grid.getRows();
+        grid.getSelectedRows().on('add remove reset', function() {
+            if (grid.getSelectedRows().length>0) {
+                $('.btn_all_prod_images_add').removeClass('disabled');
             } else {
-                $('.prod-images-modal-add').addClass('disabled');
+                $('.btn_all_prod_images_add').addClass('disabled');
             }
         });
 
-        $('.prod-images-modal-add').click(function() {
+        $('.btn_all_prod_images_add').click(function() {
             var gridView = imagesGrid.getGridView();
-            mediaGrid.getSelectedRows().forEach(function (row) {
+            grid.getSelectedRows().forEach(function (row) {
                 if (!imagesGrid.getRows().findWhere({file_id: row.get('id')})) {
                     var addedRow = row;
                     addedRow.set('_new', true);
@@ -61,11 +61,10 @@ require(['jquery','underscore','backbone'], function($, _) {
                     gridView.collection.models.push(addedRow);
                 }
             });
-
-            gridView.collection.originalRows.models = gridView.collection.models;
+            
             gridView.render();
-            mediaGrid.getGridView().clearSelectedRows();
-            $('.prod-attachments-modal-close').trigger('click');
+            grid.getGridView().clearSelectedRows();
+            $('#all_prod_images_modal').modal('hide');
 
         });
     }
@@ -107,19 +106,19 @@ require(['jquery','underscore','backbone'], function($, _) {
 
         $(imagesGrid.getGridSkeleton().AddButton).click(function() {
             refreshGridAdd();
-            $('#btn_prod_image_modal').trigger('click');
+            $('#all_prod_images_modal').modal('show');
         });
 
     }
 
     function refreshGridAdd() {
         var data = getExcludeId();
-        all_prod_images_grid.current_filters['exclude_id'] = data;
+        all_prod_images_grid.getGridSkeleton().current_filters['exclude_id'] = data;
         rowsAllImages.fetch({reset: true});
     }
 
     function getExcludeId() {
-        var arr = imagesGrid.getGridView().collection.originalRows.pluck('file_id');
+        var arr = imagesGrid.getGridView().collection.pluck('file_id');
         return  arr.join(',');
     }
 
@@ -127,25 +126,7 @@ require(['jquery','underscore','backbone'], function($, _) {
 });
 </script>
 {{ THIS.view('core/backbonegrid').set('grid', prodImagesConfig) | raw }}
-
-<a role="button" href="#prod-image-grid-modal" data-toggle="modal" style='display:none;' id='btn_prod_image_modal'>{{ "Add"|_ }}</a>
-<div class='modal fade' id='prod-image-grid-modal' tabindex='-1'>
-    <div class='modal-dialog' style='width:1050px;'>
-        <div class='modal-content'>
-            <div class='modal-body'>
-                <div class='row'>
-                    <div class='col-sm-12'>
-                        {{ THIS.view('core/medialib').set('config', {'id': 'all_prod_images', 'folder': 'media/product/images', onlyImage: true}) | raw }}
-                    </div>
-                </div>
-            </div>
-            <div class='modal-footer'>
-                <button class='btn btn-primary btn-add prod-images-modal-add disabled' data-dismiss='modal' type='button'>{{ "Add"|_ }}</button>
-                <button class='btn btn-default btn-close prod-images-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
-            </div>
-        </div>
-    </div>
-</div>
+{{ THIS.view('core/medialib').set('config', {'id': 'all_prod_images', 'folder': 'media/product/images', mode: 'thumbnail', title: 'Images', multiSelAllowed: true}) | raw }}
 
 <input type='hidden' name="grid[images][del]" id='prod-image-remove' />
 <input type='hidden' name="grid[images][rows]" id='prod-image-rows' />

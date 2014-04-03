@@ -35,17 +35,10 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             array('name' => 'create_at', 'label'=>'Created', 'index'=>'c.create_at'),
             /*array('name' => 'update_at', 'label'=>'Updated', 'index'=>'c.update_at'),*/
             array('name' => 'last_login', 'label'=>'Last Login', 'index'=>'c.last_login'),
-            array('type' => 'btn_group',
-                  'buttons' => array(
-                                  /*
-                                      'custom' => array(
-                                          'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
-                                          'icon' => 'icon-time', 'type' => 'link', 'title' => $this->_('Customer history')),
-                                  */
-                                      array('name'=>'edit', 'href' => BApp::href($this->_formHref . '?id='), 'col' => 'id'),
-                                      array('name'=>'delete')
-                                )
-                )
+            array('type' => 'btn_group', 'buttons' => array(
+                array('name'=>'edit'),
+                array('name'=>'delete'),
+            )),
         );
         $config['actions'] = array(
             'export' => true,

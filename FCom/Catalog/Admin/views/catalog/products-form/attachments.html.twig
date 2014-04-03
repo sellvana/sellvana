@@ -44,13 +44,13 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
         //Depending selected rows count, disable or enable add button of popup
         all_attachments_grid.getSelectedRows().on('add remove reset', function() {
             if (all_attachments_grid.getSelectedRows().length>0) {
-                $('#prod-attachments-modal-add').removeClass('disabled');
+                $('.btn_all_attachments_add').removeClass('disabled');
             } else {
-                $('#prod-attachments-modal-add').addClass('disabled');
+                $('.btn_all_attachments_add').addClass('disabled');
             }
         });
 
-        $('#prod-attachments-modal-add').click(function() {
+        $('.btn_all_attachments_add').click(function() {            
             var gridView = attachmentGrid.getGridView();
             all_attachments_grid.getSelectedRows().forEach(function (row) {
                 if (!attachmentGrid.getRows().findWhere({file_id: row.get('id')})) {
@@ -62,10 +62,10 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
                     gridView.collection.models.push(addedRow);
                 }
             });
-            gridView.collection.originalRows.models = gridView.collection.models;
+
             gridView.render();
             all_attachments_grid.getGridView().clearSelectedRows();
-            $('.prod-attachments-modal-close').trigger('click');
+            $('#all_attachments_modal').modal('hide');
 
         });
     }
@@ -79,7 +79,7 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
 
         $(attachmentConfig.AddButton).click(function() {
             refreshGridAdd();
-            $('#btn_prod_attach_modal').trigger('click');
+            $('#all_attachments_modal').modal('show');
         });
 
     }
@@ -91,7 +91,7 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
     }
 
     function getExcludeId() {
-        var arr = attachmentGrid.getGridView().collection.originalRows.pluck('file_id');
+        var arr = attachmentGrid.getGridView().collection.pluck('file_id');
         return  arr.join(',');
     }
 });
@@ -101,26 +101,7 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
 
 
 {{ THIS.view('core/backbonegrid').set('grid', prodAttachConfig) | raw }}
-
-<a role="button" href="#prod-attach-grid-modal" data-toggle="modal" style='display:none;' id='btn_prod_attach_modal'>{{ "Add"|_ }}</a>
-<div class='modal fade' id='prod-attach-grid-modal' tabindex='-1'>
-    <div class='modal-dialog' style='width:1050px;'>
-        <div class='modal-content'>
-            <div class='modal-body'>
-                <div class='row'>
-                    <div class='col-sm-12'>
-                        {{ THIS.view('core/medialib').set('config', {'id': 'all_attachments', 'folder': 'media/product/attachment'}) | raw }}   
-                        
-                    </div>
-                </div>
-            </div>
-            <div class='modal-footer'>
-                <button id="prod-attachments-modal-add" class='btn btn-primary btn-add  disabled' data-dismiss='modal' type='button'>{{ "Add"|_ }}</button>
-                <button class='btn btn-default btn-close prod-attachments-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
-            </div>
-        </div>
-    </div>
-</div>
+{{ THIS.view('core/medialib').set('config', {'id': 'all_attachments', 'folder': 'media/product/attachment', mode: 'link', title: 'Attachments', multiSelAllowed: true}) | raw }}
 
 <input type='hidden' name="grid[attachments][del]" id='prod-attach-remove' />
 <input type='hidden' name="grid[attachments][rows]" id='prod-attach-rows' />

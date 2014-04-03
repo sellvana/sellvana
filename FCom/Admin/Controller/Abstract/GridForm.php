@@ -14,6 +14,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_gridPageViewName = 'admin/grid';
     protected $_gridViewName = 'core/backbonegrid';
     protected $_gridLayoutName;# = '/feature';
+    protected $_gridConfig = array();
     protected $_formHref;# = 'feature/form';
     protected $_formLayoutName;# = '/feature/form';
     protected $_formViewPrefix;# = 'module/feature-form/';
@@ -46,7 +47,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     public function gridView()
     {
         $view = $this->view($this->_gridViewName);
-        $view->set('grid', array('config' => $this->gridConfig()));
+        $config = $this->_processConfig($this->gridConfig());
+        $view->set('grid', array('config' => $config));
         BEvents::i()->fire(static::$_origClass.'::gridView', array('view' => $view));
         return $view;
     }
@@ -65,11 +67,14 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             'data_url' => $gridDataUrl,
             'edit_url' => $gridDataUrl,
             'grid_url' => $gridHtmlUrl,
+            'form_url' => $formUrl,
             'columns' => array(
             ),
         );
+        $config = array_merge($config, $this->_gridConfig);
         return $config;
     }
+    
     public function simpleGridConfig()
     {
         $config = array(
@@ -80,6 +85,12 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         return $config;
 
     }
+
+    protected function _processConfig($config)
+    {
+        return $config;
+    }
+
     public function action_index()
     {
         if (BRequest::i()->xhr()) {

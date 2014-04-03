@@ -18,10 +18,10 @@
             console.log(selectedRows.length);
             if (checked) {            
                 selectedRows.add(this.model);
-                $('#btn_media_select').removeClass('disabled');
+                $('.btn_media_add').removeClass('disabled');
             } else {            
         
-                $('#btn_media_select').addClass('disabled');
+                $('.btn_media_add').addClass('disabled');
             }
             console.log(selectedRows.length);
             ev.stopPropagation();
@@ -31,14 +31,19 @@
         }
 
         grid.build();                
-
-        $('#btn_media_select').click(function() {
+        $('.row:first').append("<div class='modal-footer'>"+
+                "<button class='btn btn-primary btn-add btn_media_add disabled' data-dismiss='modal' type='button'>{{ "Add"|_ }}</button>"+
+                "<button class='btn btn-default btn-close btn_media_close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>"+
+        "</div>");
+        $('.btn_media_add').click(function() {
             var row = ckeditor_all_images_grid.getSelectedRows().at(0);
             var funcNum = '{{ REQUEST.get('CKEditorFuncNum') }}';           
             var path = FCom.Admin.baseUrl + row.get("folder") + row.get("subfolder") + "/" + row.get("file_name");
             window.opener.CKEDITOR.tools.callFunction(funcNum, path);            
             window.close();
         });
+
+        $('.btn_media_close').click(function() {window.close(); });
     }
  
 </script>
@@ -46,17 +51,8 @@
     <div class='col-sm-12'>
         {{ THIS.view('core/medialib').set('config', {
                                                         'id': 'ckeditor_all_images', 
-                                                        'folder': 'media/images', 
-                                                        config: {                                                                
-                                                            actions: {
-                                                                custom: {
-                                                                    id: 'btn_media_select', 
-                                                                    class: 'btn-primary disabled', 
-                                                                    caption: 'Select' 
-                                                                } 
-                                                            }  
-                                                        },
-                                                        onlyImage: true
+                                                        'folder': 'media/images',                                                         
+                                                        mode: 'thumbnail'
                                                     }
                                         ) | raw }}              
     </div>

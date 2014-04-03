@@ -32,6 +32,9 @@
 /modules/*/(title|author|description):
     type: str
 
+/modules/*/category:
+    type: seq_cast
+
 /modules/*/migrate:
     include: $callback
 
@@ -199,3 +202,18 @@ $area/translations/*:
 
 $area/custom:
     type: map
+
+$area/security:
+    type: map
+    key_enum: [ request_fields_whitelist ]
+
+$area/security/request_fields_whitelist:
+    type: map
+
+$area/security/request_fields_whitelist/*:
+    type: map
+    key_pattern: "^/.*$"
+
+$area/security/request_fields_whitelist/*/*:
+    type: str
+    key_pattern: "^(GET|POST|REQUEST|COOKIE)/.*$"
