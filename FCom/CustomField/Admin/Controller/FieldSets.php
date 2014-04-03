@@ -159,7 +159,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                         'options'=>array('1'=>'Yes', '0'=>'No')),
                     array('type'=>'btn_group',
                         'buttons'=>array(
-                                            array('name'=>'custom', 'caption'=>'options...'),
+                                            array('name'=>'custom', 'caption'=>'options...', 'cssClass'=>'btn-custom'),
                                             array('name'=>'edit'),
                                             array('name'=>'delete')
                                         )
