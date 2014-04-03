@@ -2,7 +2,7 @@
 
 class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
-    public function action_reindex()
+    public function action_reindex__POST()
     {
         BResponse::i()->startLongResponse();
         BDebug::mode('PRODUCTION');

@@ -914,6 +914,7 @@ class BUtil extends BClass
     */
     public static function remoteHttp($method, $url, $data = array())
     {
+        $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: '.$method.' '.$url));
         $timeout = 5;
         $userAgent = 'Mozilla/5.0';
         if ($method==='GET' && $data) {
@@ -1046,6 +1047,7 @@ class BUtil extends BClass
         }
         #BDebug::log(print_r(compact('method', 'url', 'data', 'response'), 1), 'remotehttp.log');
 
+        BDebug::profile($debugProfile);
         return $response;
     }
 
@@ -1461,7 +1463,7 @@ class BUtil extends BClass
         if ($first) {
             $dir = realpath($dir);
         }
-        if (!file_exists($dir)) {
+        if (!$dir || !file_exists($dir)) {
             return true;
         }
         if (!is_dir($dir) || is_link($dir)) {
@@ -1471,9 +1473,11 @@ class BUtil extends BClass
             if ($item == '.' || $item == '..') {
                 continue;
             }
-            if (!static::rmdirRecursive($dir . "/" . $item, false)) {
+            if (!static::rmdirRecursive_YesIHaveCheckedThreeTimes($dir . "/" . $item, false)) {
                 chmod($dir . "/" . $item, 0777);
-                if (!static::rmdirRecursive($dir . "/" . $item, false)) return false;
+                if (!static::rmdirRecursive_YesIHaveCheckedThreeTimes($dir . "/" . $item, false)) {
+                    return false;
+                }
             }
         }
         return rmdir($dir);
@@ -1681,6 +1685,14 @@ class BUtil extends BClass
             return $success;
         }
         return false;
+    }
+
+    /**
+     * Alias of version_compare for use in Twig templates
+     */
+    public function versionCompare($v1, $v2, $op = null)
+    {
+        return version_compare($v1, $v2, $op);
     }
 }
 
@@ -2479,7 +2491,7 @@ class BDebug extends BClass
     public static function dumpLog($return=false)
     {
         if (!(static::$_mode===static::MODE_DEBUG || static::$_mode===static::MODE_DEVELOPMENT)
-            || BResponse::i()->contentType()!=='text/html'
+            || BResponse::i()->getContentType()!=='text/html'
             || BRequest::i()->xhr()
         ) {
             return;
@@ -2890,7 +2902,7 @@ class BLocale extends BClass
     protected static function addTranslation($r, $module=null)
     {
         if (empty($r[1])) {
-            BDebug::debug('No translation specified for '.$r[0]);
+            BDebug::debug('Empty translation for "'.$r[0].'"');
             return;
         }
         // short and quick way

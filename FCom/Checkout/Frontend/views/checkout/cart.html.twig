@@ -1,7 +1,7 @@
 {% set loggedIn = APP.instance('FCom_Customer_Model_Customer').isLoggedIn() %}
 {% set cart = APP.instance('FCom_Sales_Model_Cart').sessionCart() %}
 {% set cartItems = cart.items() %}
-{% set shipping_estimates = SESSION.data('shipping_estimate') %}
+{% set shipping_estimates = SESSION.get('shipping_estimate') %}
 {% set checkout_methods = APP.instance('FCom_Sales_Main').getCheckoutMethods() %}
 <div class="f-site-main" role="main">
   <div class="container">

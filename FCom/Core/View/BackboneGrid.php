@@ -175,20 +175,20 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 $col['name'] = $cId;
             }
 
-			if ($cId === 0) {
-				$col['cssClass'] = 'select-row';
-				$col['edit'] = 'inline';
-			}
+            if ($cId === 0) {
+                $col['cssClass'] = 'select-row';
+                $col['edit'] = 'inline';
+            }
 
-			if (empty($col['type'])) {
-				continue;
-			}
-			switch($col['type']) {
-				case 'multiselect':
-					$col['width'] = 50;
+            if (empty($col['type'])) {
+                continue;
+            }
+            switch($col['type']) {
+                case 'multiselect':
+                    $col['width'] = 50;
                     $col['no_reorder'] = true;
 
-					break;
+                    break;
                 case 'input':
                     /*if (!empty($col['editor']) && $col['editor'] === 'select' && !empty($col['options'])) {
 
@@ -207,54 +207,52 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
 
                     break;
-				case 'btn_group':
+                case 'btn_group':
                     $col['label'] = 'Actions';
                     $col['name'] = 'btn_group';
                     $col['sortable'] = false;
-					foreach($col['buttons'] as $bId=>&$btn) {
-						switch($btn['name']) {
-							case 'edit':
-								if (empty($btn['icon'])) {
+                    foreach($col['buttons'] as $bId=>&$btn) {
+                        if(empty($btn['col'])) {
+                            $btn['col'] = 'id';
+                        }
+                        
+                        switch($btn['name']) {
+                            case 'edit':
+                                if (empty($btn['icon'])) {
                                     $btn['icon'] = ' icon-edit-sign';
                                 }
+                                if (empty($btn['href'])) {
+                                    $btn['href'] = $grid['config']['form_url'].'?'.$btn['col'].'=';
+                                }
+                                $btn['cssClass'] = ' btn-xs btn-edit ';
+                                break;
+                                
+                            case 'delete':
+                                $btn['icon'] = 'icon-remove';
+                                $btn['cssClass'] = 'btn-delete ';
+                                if(!empty($btn['noconfirm']) && $btn['noconfirm']) {
+                                    $btn['cssClass'] .= 'noconfirm';
+                                }
+                                break;
+                        }
+                        
+                        if (!empty($btn['href'])) {
+                            $btn['type'] = 'link';
+                            if (!BUtil::isUrlFull($btn['href'])) {
+                                $btn['href'] = BApp::href($btn['href']);
+                            }
+                        }
 
-								$btn['cssClass'] = ' btn-xs btn-edit ';
-								if (!empty($btn['href'])) {
-									$btn['type'] = 'link';
-
-									if(empty($btn['col'])) {
-										$btn['col']= 'id';
-									}
-								}
-
-								break;
-							case 'custom':
-								$btn['cssClass'] = 'btn-custom';
-
-								break;
-							/*case 'edit_inline':
-								$col['icon'] = 'icon-pencil';
-
-								break;*/
-							case 'delete':
-								$btn['icon'] = 'icon-remove';
-								$btn['cssClass'] = 'btn-delete ';
-								if(!empty($btn['noconfirm']) && $btn['noconfirm']) {
-									$btn['cssClass'] .= 'noconfirm';
-								}
-								break;
-						}
-
-						//TODO: Is it really necessary not to have default icon when button has caption?
-						if (!empty($btn['caption'])) {
-							$btn['icon'] = '';
-						}
-					}
+                        //TODO: Is it really necessary not to have default icon when button has caption?
+                        if (!empty($btn['caption'])) {
+                            $btn['icon'] = '';
+                        }
+                    }
 
 
-					break;
+                    break;
 
-			}
+            }
             /*$col['position'] = ++$pos;
             switch ($cId) {
                 case '_multiselect':

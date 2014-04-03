@@ -50,12 +50,12 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public $totals;
     protected $shipping_method;
 
-    static public function sessionCartId($id=BNULL)
+    static public function sessionCartId($id = null)
     {
-        if (BNULL===$id) {
-            return BSession::i()->data('cart_id');
+        if (is_null($id)) {
+            return BSession::i()->get('cart_id');
         }
-        BSession::i()->data('cart_id', $id);
+        BSession::i()->set('cart_id', $id);
         return $id;
     }
 

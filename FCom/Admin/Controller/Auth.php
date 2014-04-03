@@ -25,7 +25,7 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
             } else {
                 $this->message('Username and password cannot be blank.', 'error');
             }
-            $url = BSession::i()->data('admin_login_orig_url');
+            $url = BSession::i()->get('admin_login_orig_url');
         } catch (Exception $e) {
             BDebug::logException($e);
             $this->message($e->getMessage(), 'error');

@@ -18,7 +18,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
         BEvents::i()->fire( __CLASS__ . '::action_cart:cart', array('cart'=>$cart));
 
-        $shippingEstimate = BSession::i()->data('shipping_estimate');
+        $shippingEstimate = BSession::i()->get('shipping_estimate');
         $layout->view('checkout/cart')->set(array('cart' => $cart, 'shipping_esitmate' => $shippingEstimate));
         $this->layout('/checkout/cart');
     }
@@ -70,7 +70,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                     foreach (FCom_Sales_Main::i()->getShippingMethods() as $shipping) {
                         $estimate[] = array('estimate' => $shipping->getEstimate(), 'description' => $shipping->getDescription());
                     }
-                    BSession::i()->data('shipping_estimate', $estimate);
+                    BSession::i()->set('shipping_estimate', $estimate);
                 }
                 $cart->calculateTotals()->save();
                 $this->message('Your cart has been updated');

@@ -43,8 +43,8 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_index__POST()
     {
-        $sData = BSession::i()->data();
-        if (empty($sData['w']['agree']) || $sData['w']['agree']!=='Agree') {
+        $sData = BSession::i()->get('w');
+        if (empty($sData['agree']) || $sData['agree']!=='Agree') {
             BResponse::i()->redirect('?error=1');
             return;
         }
@@ -200,6 +200,9 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                 'FCom_Frontend' => array(
                     'theme' => 'FCom_FrontendThemeBootSimple',
                 ),
+            ),
+            'cache' => array(
+                'default_backend' => BCache::i()->getFastestAvailableBackend(),
             ),
         ), true);
 

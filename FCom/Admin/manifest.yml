@@ -58,6 +58,11 @@ modules:
                 observe:
                     - [ FCom_Admin_Controller_Settings::action_index__POST, FCom_Admin_Admin.onSettingsPost ]
                     - [ FCom_Admin_View_Dashboard::getWidgets, FCom_Admin_Admin.onGetDashboardWidgets ]
+                security:
+                    request_fields_whitelist:
+                        /settings:
+                            POST/config/modules/FCom_Admin/add_js_code: *
+                            POST/config/modules/FCom_Frontend/add_js_code: *
 
     FCom_Admin_DefaultTheme:
         version: 0.1.0

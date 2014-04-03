@@ -42,6 +42,7 @@ class BCache extends BClass
         foreach (array('File','Shmop','Apc','Memcache','Db') as $type) {
             $this->addBackend($type, 'BCache_Backend_'.$type);
         }
+        $this->_defaultBackend = BConfig::i()->get('cache/default_backend', 'file');
     }
 
     public function addBackend($type, $backend)
@@ -65,7 +66,7 @@ class BCache extends BClass
 
     public function setBackend($type)
     {
-        $this->_defaultBackend = $type;
+        $this->_defaultBackend = strtolower($type);
         return $this;
     }
 
@@ -74,27 +75,30 @@ class BCache extends BClass
         return $this->_backends;
     }
 
+    public function getFastestAvailableBackend()
+    {
+        $minRank = 1000;
+        $fastest = null;
+        foreach ($this->_backends as $t => $backend) { // find fastest backend from available
+            $info = $backend->info();
+            if (empty($info['available'])) {
+                continue;
+            }
+            if ($info['rank'] < $minRank) {
+                $minRank = $info['rank'];
+                $fastest = $t;
+            }
+        }
+        return $fastest;
+    }
+
     public function getBackend($type=null)
     {
         if (is_null($type)) { // type not specified
-            if (empty($this->_defaultBackend)) { // no default backend yet
-                $minRank = 1000;
-                $fastest = null;
-                foreach ($this->_backends as $t => $backend) { // find fastest backend from available
-                    $info = $backend->info();
-                    if (empty($info['available'])) {
-                        continue;
-                    }
-                    if ($info['rank'] < $minRank) {
-                        $minRank = $info['rank'];
-                        $fastest = $t;
-                    }
-                }
-                $this->_defaultBackend = $fastest;
-            }
             $type = $this->_defaultBackend;
+        } else {
+            $type = strtolower($type);
         }
-        $type = strtolower($type);
         $backend = $this->_backends[$type];
         if (empty($this->_backendStatus[$type])) {
             $info = $backend->info();
@@ -126,6 +130,11 @@ class BCache extends BClass
     public function delete($key)
     {
         return $this->getBackend()->delete($key);
+    }
+
+    public function deleteMany($pattern)
+    {
+        return $this->getBackend()->deleteMany($pattern);
     }
 
     public function gc()
