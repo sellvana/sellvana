@@ -163,6 +163,18 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             BSession::i()->set('customer_user', serialize($this));
             static::$_sessionUser = $this;
         }
+
+        if ($this->_newRecord) {
+            FCom_PushServer_Model_Channel::i()->getChannel('customers_feed', true)->send(array(
+                'signal' => 'new_customer',
+                'customer' => array(
+                    'id' => $this->id(),
+                    'email' => $this->email,
+                    'name' => $this->firstname . ' ' . $this->lastname,
+                    'href' => BApp::href('customers/form?id='.$this->id()),
+                ),
+            ));
+        }
     }
 
     public function prepareApiData($customers)
