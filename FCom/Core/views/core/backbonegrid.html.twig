@@ -14,7 +14,7 @@
         <input type="text" class="f-grid-quick-search form-control" placeholder="{{ 'Quick Search'|_ }}"
         id="{{ config.id | raw }}-quick-search">
         <span class="{{ config.id }} dropdown">
-            <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
+            <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns" href="javascript:void()">
                 {{ 'Filters'|_ }}
                 <b class="caret"></b>
             </a>
@@ -32,7 +32,7 @@
     <div class="row f-grid-bottom f-grid-toolbar {{ config.id | raw }} clearfix">
         <div class="col-sm-6">
             <span class="{{ config.id }} dropdown dd dd-nestable columns-span" style="display:inline;">
-                <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns grid-refresh" href="javascript:void()">
+                <a data-toggle="dropdown" class="btn dropdown-toggle showhide_columns" href="javascript:void()">
                     {{ 'Columns' |_ }}
                     <b class="caret"></b>
                 </a>
@@ -49,7 +49,8 @@
         </div>
         <div class="col-sm-6 text-right pagination" style='margin:0px;'>
             <span class="{{ config.id }}-pagination f-grid-pagination"> </span>
-            {% if config['data_mode']!= 'local' %}
+            {# why this line has been commented? In local mode grid, we don't need pagination...#}
+            {#{% if config['data_mode']!= 'local' %}#}
                 <ul class="pagination pagination-sm pagesize" style='margin:0px;'>
                     {% for ps in THIS.pageSizeOptions() %}
                         <li {{ ps == s.ps ? 'class="active"' }}>
@@ -60,7 +61,7 @@
 
                 <ul class="{{ config.id }} pagination pagination-sm page" style='margin:0px;'>
                 </ul>
-            {% endif %}
+            {#{% endif %}#}
         </div>
     </div>
     {% if s.description %}

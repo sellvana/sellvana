@@ -23,7 +23,7 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
             array('name' => 'file', 'label' => 'File', 'width' => 60),
             array('name' => 'id', 'label' => 'Id', 'width' => 200)
         );
-
+        $config['data_mode'] = 'local';
         $data = array();
         $modules = BModuleRegistry::i()->getAllModules();
         foreach($modules as $module){

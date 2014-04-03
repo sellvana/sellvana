@@ -175,20 +175,20 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 $col['name'] = $cId;
             }
 
-			if ($cId === 0) {
-				$col['cssClass'] = 'select-row';
-				$col['edit'] = 'inline';
-			}
+            if ($cId === 0) {
+                $col['cssClass'] = 'select-row';
+                $col['edit'] = 'inline';
+            }
 
-			if (empty($col['type'])) {
-				continue;
-			}
-			switch($col['type']) {
-				case 'multiselect':
-					$col['width'] = 50;
+            if (empty($col['type'])) {
+                continue;
+            }
+            switch($col['type']) {
+                case 'multiselect':
+                    $col['width'] = 50;
                     $col['no_reorder'] = true;
 
-					break;
+                    break;
                 case 'input':
                     /*if (!empty($col['editor']) && $col['editor'] === 'select' && !empty($col['options'])) {
 
@@ -207,54 +207,52 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
 
                     break;
-				case 'btn_group':
+                case 'btn_group':
                     $col['label'] = 'Actions';
                     $col['name'] = 'btn_group';
                     $col['sortable'] = false;
-					foreach($col['buttons'] as $bId=>&$btn) {
-						switch($btn['name']) {
-							case 'edit':
-								if (empty($btn['icon'])) {
+                    foreach($col['buttons'] as $bId=>&$btn) {
+                        if(empty($btn['col'])) {
+                            $btn['col'] = 'id';
+                        }
+
+                        switch($btn['name']) {
+                            case 'edit':
+                                if (empty($btn['icon'])) {
                                     $btn['icon'] = ' icon-edit-sign';
                                 }
+                                if (!empty($grid['config']['form_url']) && empty($btn['href'])) {
+                                    $btn['href'] = $grid['config']['form_url'].'?'.$btn['col'].'=';
+                                }
+                                $btn['cssClass'] = ' btn-xs btn-edit ';
+                                break;
 
-								$btn['cssClass'] = ' btn-xs btn-edit ';
-								if (!empty($btn['href'])) {
-									$btn['type'] = 'link';
+                            case 'delete':
+                                $btn['icon'] = 'icon-remove';
+                                $btn['cssClass'] = 'btn-delete ';
+                                if(!empty($btn['noconfirm']) && $btn['noconfirm']) {
+                                    $btn['cssClass'] .= 'noconfirm';
+                                }
+                                break;
+                        }
 
-									if(empty($btn['col'])) {
-										$btn['col']= 'id';
-									}
-								}
+                        if (!empty($btn['href'])) {
+                            $btn['type'] = 'link';
+                            if (!BUtil::isUrlFull($btn['href'])) {
+                                $btn['href'] = BApp::href($btn['href']);
+                            }
+                        }
 
-								break;
-							case 'custom':
-								$btn['cssClass'] = 'btn-custom';
-
-								break;
-							/*case 'edit_inline':
-								$col['icon'] = 'icon-pencil';
-
-								break;*/
-							case 'delete':
-								$btn['icon'] = 'icon-remove';
-								$btn['cssClass'] = 'btn-delete ';
-								if(!empty($btn['noconfirm']) && $btn['noconfirm']) {
-									$btn['cssClass'] .= 'noconfirm';
-								}
-								break;
-						}
-
-						//TODO: Is it really necessary not to have default icon when button has caption?
-						if (!empty($btn['caption'])) {
-							$btn['icon'] = '';
-						}
-					}
+                        //TODO: Is it really necessary not to have default icon when button has caption?
+                        if (!empty($btn['caption'])) {
+                            $btn['icon'] = '';
+                        }
+                    }
 
 
-					break;
+                    break;
 
-			}
+            }
             /*$col['position'] = ++$pos;
             switch ($cId) {
                 case '_multiselect':
@@ -308,7 +306,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 switch ($k) {
                     case 'refresh':
                         $action = array('html'=>BUtil::tagHtml('a',
-                            array('href'=>BRequest::currentUrl(), 'class'=>'js-change-url grid-refresh btn'),
+                            array('href'=>'#', 'class'=>'js-change-url grid-refresh btn'),
                             isset($action['caption']) ? $action['caption'] : BLocale::_('Refresh')
                         ));
                         break;
@@ -764,6 +762,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 //print_r($r); exit;
         //$r = array_replace_recursive($hash, $r);
 
+
         if (!empty($filters)) {
             $this->_processGridFilters($config, $filters, $orm);
         }
@@ -894,12 +893,30 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
     protected function _processGridFilters(&$config, $filters, $orm)
     {
-        if (empty($config['filters'])) {
-            return;
+        if (!empty($config['filters'])) {
+            foreach ($config['filters'] as $fId=>$f) {
+                $f['field'] = !empty($f['field']) ? $f['field'] : $fId;
+                if ($fId === '_quick') {
+                    if (!empty($f['expr']) && !empty($f['args']) && !empty($filters[$fId])) {
+                        $args = array();
+                        foreach ($f['args'] as $a) {
+                            $args[] = str_replace('?', $filters['_quick'], $a);
+                        }
+                        $orm->where_raw('('.$config['filters']['_quick']['expr'].')', $args);
+                    }
+                    break;
+                }
+            }
+            //delete $filters[$fId];
         }
-        $columnData = $this->findColumnDataForFilters($config);
-        foreach ($config['filters'] as $fId=>$f) {
-            $f['field'] = !empty($f['field']) ? $f['field'] : $fId;
+
+        //$columnData = $this->findColumnDataForFilters($config);
+        foreach ($filters as $fId=>$f) {
+            if ($fId === '_quick') {
+                continue;
+            }
+
+            /*$f['field'] = !empty($f['field']) ? $f['field'] : $fId;
             if ($fId === '_quick') {
                 if (!empty($f['expr']) && !empty($f['args']) && !empty($filters[$fId])) {
                     $args = array();
@@ -910,12 +927,15 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 }
                 continue;
             }
-            $fId = $f['field'];
+            $fId = $f['field'];*/
 
             if (isset($filters[$fId]) && !empty($f['type']) && isset($filters[$fId]['val']) && (!empty($filters[$fId]['val']) || $filters[$fId]['val'] == 0) && $filters[$fId]['val'] !== '') {
-                if (isset($columnData[$f['field']]['index'])){
+                /*if (isset($columnData[$f['field']]['index'])){
                     $f['field'] = $columnData[$f['field']]['index'];
-                }
+                }*/
+                if (!isset($f['field']))
+                    $f['field'] = $fId;
+
                 switch ($f['type']) {
                     case 'text':
                         $val = $filters[$fId];
@@ -1063,6 +1083,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         BUtil::ensureDir($dir);
         $filename = $dir.'/'.$this->grid['config']['id'].'.csv';
         $fp = fopen($filename, 'w');
+        fwrite($fp, "\xEF\xBB\xBF"); // add UTF8 BOM character to open excel.
         fputcsv($fp, $headers);
         /*$orm->iterate(function($row) use($columns, $fp) {
             if ($class) {

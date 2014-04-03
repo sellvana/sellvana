@@ -72,6 +72,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
         FCom.BackboneGrid = function (config) {
             var rowsCollection;
+            var filtersCollection;
             var columnsCollection;
             var gridView;
             var headerView;
@@ -232,14 +233,14 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 displayType.find('span.icon-placeholder').html('<i class="glyphicon glyphicon-list"></i>');
                                 displayType.find('span.title').html('A');
                                 BackboneGrid.data_mode = BackboneGrid.prev_data_mode;
-                                rowsCollection.originalRows = BackboneGrid.prev_originalRows;
+                                rowsCollection.reset(BackboneGrid.prev_originalRows);
                                 BackboneGrid.showingSelected = false;
                                 $('.f-grid-bottom.f-grid-toolbar.'+BackboneGrid.id+' > div.pagination').css('display', 'block');
-                                if (BackboneGrid.data_mode !== 'local') {
+                                /*if (BackboneGrid.data_mode !== 'local') {
                                     rowsCollection.fetch({reset: true});
-                                } else {
-                                    rowsCollection.filter();
-                                }
+                                } else {*/
+                                    gridView.render();
+                                //}
                             }
                             break;
                         case 'show_sel':
@@ -247,15 +248,13 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 displayType.find('span.icon-placeholder').html('<i class="glyphicon glyphicon-th-list"></i>');
                                 displayType.find('span.title').html('S');
                                 BackboneGrid.prev_data_mode = BackboneGrid.data_mode;
-                                if (!rowsCollection.originalRows) {
-                                    rowsCollection.originalRows = new Backbone.Collection();
-                                }
-                                BackboneGrid.prev_originalRows = rowsCollection.originalRows;
+                                
+                                BackboneGrid.prev_originalRows = rowsCollection.toJSON();
                                 BackboneGrid.showingSelected = true;
                                 $('.f-grid-bottom.f-grid-toolbar.' + BackboneGrid.id + ' > div.pagination').css('display', 'none');
 
                                 BackboneGrid.data_mode = 'local';
-                                rowsCollection.originalRows = selectedRows;
+                                
                                 rowsCollection.reset(selectedRows.toJSON());
 
                             }
@@ -314,7 +313,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
 
                     if (BackboneGrid.data_mode === 'local') {
-                        rowsCollection.sortLocalData();
+                        gridView.render();
+//                        rowsCollection.sortLocalData();
                         $.post(BackboneGrid.personalize_url,
                             {
                                 'do': 'grid.state',
@@ -436,26 +436,21 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             BackboneGrid.Collections.Rows = Backbone.Collection.extend({
                 model: BackboneGrid.Models.Row,
                 initialize: function (models) {
-                    if (BackboneGrid.data_mode === 'local') {
-                        this.originalRows = new Backbone.Collection(models);
-
-                        this.on('add', this.addInOriginal, this);
-                        this.on('remove', this.removeInOriginal, this);
+                    if (BackboneGrid.data_mode === 'local') {                                                
+                        this.on('add remove', this.updatePageInfo, this);
                     }
-
                 },
                 _addRow: function (ev) {
-                    if (ev.grid === BackboneGrid.id) {
+                    if (ev.grid === BackboneGrid.id) {                        
                         var newRow = new BackboneGrid.Models.Row(ev.row);
                         rowsCollection.add(newRow);
                         gridView.render();
                     }
                 },
-                filter: function () {
+                filterLocalData: function (data) {
 
-                    var temp = this.originalRows.clone();
-                    for (var filter_key in BackboneGrid.current_filters) {
-
+                    var temp = this.clone();                    
+                    for (var filter_key in BackboneGrid.current_filters) {                    
                         var filter_val = BackboneGrid.current_filters[filter_key].val;
                         var type = filtersCollection.findWhere({field: filter_key}).get('type');
                         if (filter_val == '') {
@@ -531,15 +526,21 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                     }
 
-                    this.reset(temp.toJSON(), {silent: true});
-                    gridView.render();
+                    //this.reset(temp.toJSON(), {silent: true});
+                    if (typeof (data) !== 'undefined'  && data.reset_page == true ) {
+                        //TODO: confirm save value filter into database.
+                        BackboneGrid.currentState.p = 1;
+                    }
 
+                    temp.length = temp.models.length;
+                    return temp;
                 },
-                addInOriginal: function (model) {
-                    this.originalRows.add(model);
-                },
-                removeInOriginal: function (model) {
-                    this.originalRows.remove(model);
+                updatePageInfo: function() {
+                    
+                    var clone = this.filterLocalData();
+                    BackboneGrid.currentState.mp = Math.ceil(clone.length / BackboneGrid.currentState.ps);
+                    BackboneGrid.currentState.c = clone.length;
+                    updatePageHtml();
                 },
                 sortLocalData: function () {
                     if (BackboneGrid.currentState.s !== '' && BackboneGrid.currentState.sd !== '') {
@@ -550,11 +551,14 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             this.comparator = this.reverseSortBy(this.comparator);
                         }
                         this.sort();
-                        gridView.render();
                     } else {
-                        this.reset(this.originalRows.models);
-                        gridView.render();
+                        this.comparator = function (col) {
+                            return col.get('id');
+                        };
+                        this.sort();
                     }
+                    return this;
+
                 },
                 url: function () {
                     if (BackboneGrid.data_mode !== 'server') {
@@ -574,6 +578,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 parse: function (response) {
                     if (typeof (response[0]) !== 'undefined' && typeof(response[0].c) !== 'undefined') {
+
                         //  if (response[0].c !== BackboneGrid.currentState.c) {
                         var mp = Math.ceil(response[0].c / BackboneGrid.currentState.ps);
                         BackboneGrid.currentState.mp = mp;
@@ -581,7 +586,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         if (BackboneGrid.data_mode !== 'local')
                             updatePageHtml();
                         // }
+
                     }
+                                        
                     return response[1];
                 },
                 reverseSortBy: function (sortByFunction) {
@@ -602,7 +609,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 className: function () {
                     return this.model.get('cssClass');
                 },
-                attributes: function () {
+                attributes: function () {                    
                     return {id: this.model.get('id')};
                 },
                 events: {
@@ -660,7 +667,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return true;
 
                 },
-                _selectRow: function (ev) {
+                _selectRow: function (ev) {                    
                     var checked = $(ev.target).is(':checked');
                     this.model.set('selected', checked);
 
@@ -858,10 +865,19 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 getMainTable: function () {
                     return $('#' + BackboneGrid.id);
                 },
-                render: function () {
+                render: function (data) {
                     this.setCss();
                     this.$el.html('');
-                    this.collection.each(this.addRow, this);
+                    if (config.data_mode == 'local') {
+                        rowsCollection.sortLocalData();                        
+                        var models = this.paginationLocalData();                        
+                        _.each(models, function(model){
+                            this.addRow(model);
+                        }, this);
+                    } else {
+                        this.collection.each(this.addRow, this);    
+                    }
+                    
                     $(BackboneGrid.quickInputId).quicksearch('table#' + BackboneGrid.id + ' tbody tr');
 
                     return this;
@@ -883,6 +899,21 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     gridView.$el.find('input.select-row:not([disabled])').prop('checked', false);
                     $(BackboneGrid.MassDeleteButton).addClass('disabled');
                     $(BackboneGrid.MassEditButton).addClass('disabled');
+                },
+                paginationLocalData: function () {
+                    var clone = this.collection.filterLocalData();                    
+                    var models = [];                    
+                    var page = (BackboneGrid.currentState.p - 1)*BackboneGrid.currentState.ps;
+                    var len = Math.min(BackboneGrid.currentState.ps + page, clone.length);
+                    for (var i=page;i<len;i++) {                        
+                        models.push(clone.at(i));    
+                    }                    
+                    //this.collection.reset(models, {silent: true});                    
+                    BackboneGrid.currentState.mp = Math.ceil(clone.length / BackboneGrid.currentState.ps);
+                    BackboneGrid.currentState.c = clone.length;
+                    updatePageHtml();
+                    
+                    return models;
                 }
             });
             BackboneGrid.Views.ColCheckView = Backbone.View.extend({
@@ -1085,7 +1116,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     BackboneGrid.current_filters[this.model.get('field')] = filterJSON;
 
                     if (BackboneGrid.data_mode === 'local') {
-                        rowsCollection.filter();
+                        gridView.render({reset_page: true});
+//                        rowsCollection.filter();
                     } else {
                         rowsCollection.fetch({reset: true});
                     }
@@ -1694,13 +1726,14 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
                 }
                 //render page size options html
-                var pageSizeHtml = '';
+                var pageSizeHtml = '';                
                 for (j = 0; j < pageSizeOptsRender.length; j++) {
                     pageSizeHtml += '<li' + (pageSizeOptsRender[j] == BackboneGrid.currentState.ps ? ' class="active"' : '') + '>';
                     pageSizeHtml += '<a class="js-change-url page-size" href="#">' + pageSizeOptsRender[j] + '</a>';
                     pageSizeHtml += '</li>';
                 }
-                $('.pagination.pagesize').html(pageSizeHtml);
+
+                $('#'+BackboneGrid.id).find('.pagination.pagesize').html(pageSizeHtml);
 
                 var caption = '';
                 if (BackboneGrid.currentState.c > 0)
@@ -1740,7 +1773,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             /*this.afterSelectionChanged = function() {
 
             }*/
-            this.build = function() {
+            this.build = function() {                
                  _.templateSettings.variable = 'rc';
                 this.id = config.id;
                 BackboneGrid.id = config.id;
@@ -1757,10 +1790,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 var state = config.data.state;
                 state.p = parseInt(state.p);
                 state.mp = parseInt(state.mp);
-                BackboneGrid.currentState = state;
-
+                BackboneGrid.currentState = state;                
                 BackboneGrid.pageSizeOptions = config.page_size_options;
-
+                
                 //check data mode
                 if (config.data_mode) {
                     BackboneGrid.data_mode = config.data_mode;
@@ -1793,37 +1825,34 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 BackboneGrid.Views.ModalElement.prototype.template = _.template($('#' + config.id + '-modal-element-template').html());
                 BackboneGrid.Views.ModalMassGridElement.prototype.template = _.template($('#'+ config.id + '-add-set-fields').html());
 
-                /*if (BackboneGrid.data_mode === 'local') {
-                 state.mp = config.data.data.length;
-                 }*/
-
-
-
-                if (config.data_mode != 'local') {
-                    $('ul.pagination.page').on('click', 'li', function (ev) {
-                        var li = $(this);
-                        if (li.hasClass('first'))
-                            BackboneGrid.currentState.p = 1;
-                        if (li.hasClass('next'))
-                            BackboneGrid.currentState.p++;
-                        if (li.hasClass('prev'))
-                            BackboneGrid.currentState.p--;
-                        if (li.hasClass('last'))
-                            BackboneGrid.currentState.p = BackboneGrid.currentState.mp;
-                        if (li.hasClass('page'))
-                            BackboneGrid.currentState.p = parseInt(li.find('a').html());
-                        updatePageHtml();
+                $('#'+BackboneGrid.id).find('ul.pagination.page').on('click', 'li', function (ev) {
+                    var li = $(this);
+                    if (li.hasClass('first'))
+                        BackboneGrid.currentState.p = 1;
+                    if (li.hasClass('next'))
+                        BackboneGrid.currentState.p++;
+                    if (li.hasClass('prev'))
+                        BackboneGrid.currentState.p--;
+                    if (li.hasClass('last'))
+                        BackboneGrid.currentState.p = BackboneGrid.currentState.mp;
+                    if (li.hasClass('page'))
+                        BackboneGrid.currentState.p = parseInt(li.find('a').html());
+                    if (config.data_mode == 'local') {
+//                        rowsCollection.sortLocalData();
+                        gridView.render();
+                    } else {
                         rowsCollection.fetch({reset: true});
-                        ev.preventDefault();
-                        return;
-                    });
+                    }
 
-                    updatePageHtml();
-                }
+                    ev.preventDefault();
+                    return;
+                });
+
                 //header view
                 var columns = config.columns;
                 columnsCollection = new BackboneGrid.Collections.ColsCollection;
                 var filters = config.filters;
+                
                 for (var i in columns) {
                     var c = columns[i];
                     //if (c.name != 'id') {
@@ -1901,7 +1930,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 headerView.render();
                 var colsVisibilityView = new BackboneGrid.Views.ColsVisibilityView({collection: columnsCollection});
                 colsVisibilityView.render();
-
+                
                 filtersCollection = new BackboneGrid.Collections.FilterCollection(fCollection);
                 filterView = new BackboneGrid.Views.FilterView({collection: filtersCollection});
                 filterView.render();
@@ -1978,53 +2007,37 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});
 
-                if (BackboneGrid.data_mode === 'local' && BackboneGrid.currentState.s !== '' && BackboneGrid.currentState.s !== '') {
-                    rowsCollection.sortLocalData();
-                } else {
-                    gridView.render();
+                if (BackboneGrid.data_mode == 'local') {
+                    BackboneGrid.currentState.p = 1;
+                    BackboneGrid.currentState.ps = 10;                    
                 }
+                gridView.render();
 
 
-                //local rows count info
-                if (BackboneGrid.data_mode === 'local') {
-                    var pageSpan = $('span.' + BackboneGrid.id + '-pagination.f-grid-pagination');
-                    pageSpan.css('top', 10);
-                    function setLocalPageInfo() {
-                        if (rowsCollection.length === 0) {
-                            pageSpan.html('No data.');
-                        } else {
-                            pageSpan.html(rowsCollection.length + ' rows');
-                        }
+                $('#'+BackboneGrid.id).find('ul.pagination.pagesize').on('click', 'a', function (ev) {
+                    $('#'+BackboneGrid.id).find('ul.pagination.pagesize li').removeClass('active');
+                    BackboneGrid.currentState.ps = parseInt($(this).html());
+                    BackboneGrid.currentState.p = 1;
+                    //@Todo: fixed, but should find better solutions for backbonegrid
+                    if (typeof (config.data_url) !== 'undefined' && config.data_mode != 'local') {
+                        rowsCollection.fetch({reset: true});
                     }
+                    if (config.data_mode == 'local') {
+                        gridView.render();
+                    }
+                    $(this).parents('li:first').addClass('active');
+                    ev.preventDefault();
 
-                    setLocalPageInfo();
-                    rowsCollection.on('add remove reset filter', function (ev) {
-                        setLocalPageInfo();
-                    });
-                }
-                if (config.dataMode != 'local') {
-                    $('ul.pagination.pagesize').on('click', 'a', function (ev) {
-                        $('ul.pagination.pagesize li').removeClass('active');
-                        BackboneGrid.currentState.ps = parseInt($(this).html());
-                        BackboneGrid.currentState.p = 1;
-                        //@Todo: fixed, but should find better solutions for backbonegrid
-                        if (typeof (config.data_url) !== 'undefined') {
-                            rowsCollection.fetch({reset: true});
-                        }
-                        $(this).parents('li:first').addClass('active');
-                        ev.preventDefault();
+                    return false;
 
-                        return false;
-
-                    });
-                }
+                });
 
                 //action logic
                 BackboneGrid.MassDeleteButton = '#' + config.id + ' button.grid-mass-delete';
                 BackboneGrid.AddButton = '#' + config.id + ' button.grid-add';
                 BackboneGrid.MassEditButton = '#' + config.id + ' a.grid-mass-edit';
                 BackboneGrid.NewButton = (typeof(config.new_button) !== 'undefined') ? config.new_button :'Div #' + config.id + ' button.grid-new';
-                BackboneGrid.RefreshButton = '#' + config.id + ' button.grid-refresh';
+                BackboneGrid.RefreshButton = '#' + config.id + ' .grid-refresh';
                 BackboneGrid.ExportButton = '#' + config.id + ' button.grid-export';
 
                 //if ($(BackboneGrid.AddButton).length > 0 || $(BackboneGrid.MassEditButton).length > 0) {
@@ -2042,7 +2055,12 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 if ($(BackboneGrid.RefreshButton).length > 0) {
                     $(BackboneGrid.RefreshButton).on('click', function (ev) {
-                        rowsCollection.fetch({reset: true});
+                        if (BackboneGrid.data_mode === 'server') {
+                            rowsCollection.fetch({reset: true});    
+                        } else {
+                            gridView.render();
+                        }
+                        
                         ev.stopPropagation();
                         ev.preventDefault();
 
@@ -2097,7 +2115,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                             rowsCollection.remove(selectedRows.models, {silent: true});
                             $('select.' + config.id + '.js-sel').val('');
-                            gridView.render();
+                            if (config.data_mode == 'local') {
+                                gridView.render({deleteRows: {models: selectedRows.models}})
+                            } else {
+                                gridView.render();
+                            }
                             selectedRows.reset();
                         }
                     });
@@ -2171,6 +2193,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
 
                 setModalHeight();
+                updatePageHtml();
             }
 
 

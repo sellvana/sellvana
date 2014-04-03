@@ -6,9 +6,13 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
 
     public function action_index()
     {
-        $moduleNames = join(',', array_keys(BModuleRegistry::i()->getAllModules()));
-        $result = FCom_MarketClient_RemoteApi::i()->getModulesVersions($moduleNames);
-        $this->view('marketclient/publish')->set('modules', $result);
+        $result = FCom_MarketClient_RemoteApi::i()->getModulesVersions(true);
+        $view = $this->view('marketclient/publish');
+        if (!empty($result['error'])) {
+            $this->message($result['message'], 'error');
+        } else {
+            $view->set('modules', $result);
+        }
         $this->layout('/marketclient/publish');
     }
 
@@ -26,13 +30,14 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
 
     public function action_module__POST()
     {
+        BResponse::i()->startLongResponse(false);
         $hlp = FCom_MarketClient_RemoteApi::i();
         $connResult = $hlp->setupConnection();
 
         list($action, $modName) = explode('/', BRequest::i()->post('mod_name'))+array('');
         $versionResult = $hlp->getModulesVersions($modName);
         #$redirectUrl = $hlp->getUrl('market/module/edit', array('mod_name' => $modName));
-        $redirectUrl = BRequest::i()->currentUrl();
+        $redirectUrl = BRequest::i()->referrer();
         #var_dump($modName, $versionResult); exit;
         if (!empty($versionResult[$modName]) && $versionResult[$modName]['status']==='available') {
             $createResult = $hlp->createModule($modName);
@@ -46,8 +51,23 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
             }
         }
         $uploadResult = $hlp->uploadPackage($modName);
+#echo "<pre>"; var_dump($uploadResult); exit;
+        $this->message($uploadResult['message'], !empty($uploadResult['error']) ? 'error' : 'success', 'admin');
+
+#echo "<pre>"; var_dump($uploadResult); exit;
         //TODO: handle $result
-        BResponse::i()->redirect($redirectUrl);
+        if (!empty($newWindowUrl)) {
+            BResponse::i()->set(<<<EOT
+<!DOCTYPE html>
+<html><body><form id="new-window" method="get" action="{$newWindowUrl}" target="SellvanaMarketServer"></form><script>
+document.getElementById('new-window').submit();
+//location.href = "{$redirectUrl}";
+</script></html>
+EOT
+            );
+        } else {
+            BResponse::i()->redirect($redirectUrl);
+        }
     }
 
     public function action_upgrade__POST()

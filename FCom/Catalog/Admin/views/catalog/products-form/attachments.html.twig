@@ -1,9 +1,7 @@
 {% set m = THIS.get('model') %}
 {% set prodAttachConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productAttachmentsGridConfig(m) %}
-{% set mediaLibAttachConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': 'all_attachments', 'folder': 'media/product/attachment'}) %}
-
 <script>
-var mediaAttachmentGrid, attachmentGrid;
+var all_attachments_grid, attachmentGrid;
 require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone) {
     var originIds, addedIds = [], removedIds = [];
     var backboneGridAllImages, rowsAllImages;
@@ -38,34 +36,36 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
     *MediaGrid registery function
     */
     window.all_attachments_register = function(grid) {
-        mediaAttachmentGrid = grid;
+        all_attachments_grid = grid;
         grid.build();
 
-        backboneGridAllImages = mediaAttachmentGrid.getGridSkeleton();
-        rowsAllImages = mediaAttachmentGrid.getRows();
+        backboneGridAllImages = all_attachments_grid.getGridSkeleton();
+        rowsAllImages = all_attachments_grid.getRows();
         //Depending selected rows count, disable or enable add button of popup
-        mediaAttachmentGrid.getSelectedRows().on('add remove reset', function() {
-            if (mediaAttachmentGrid.getSelectedRows().length>0) {
-                $('#prod-attachments-modal-add').removeClass('disabled');
+        all_attachments_grid.getSelectedRows().on('add remove reset', function() {
+            if (all_attachments_grid.getSelectedRows().length>0) {
+                $('.btn_all_attachments_add').removeClass('disabled');
             } else {
-                $('#prod-attachments-modal-add').addClass('disabled');
+                $('.btn_all_attachments_add').addClass('disabled');
             }
         });
 
-        $('#prod-attachments-modal-add').click(function() {
-
-            mediaAttachmentGrid.getSelectedRows().forEach(function (row) {
+        $('.btn_all_attachments_add').click(function() {
+            var gridView = attachmentGrid.getGridView();
+            all_attachments_grid.getSelectedRows().forEach(function (row) {
                 if (!attachmentGrid.getRows().findWhere({file_id: row.get('id')})) {
-                    var addedRow = row.toJSON();
-                    addedRow._new = true;
-                    addedRow.file_id = row.id;
-                    addedRow.id = guid();
-                    attachmentGrid.getRows().add(addedRow);
+                    var addedRow = row;
+                    addedRow.set('_new', true);
+                    addedRow.set('file_id', row.id);
+                    addedRow.set('id', guid());
+                    addedRow.set('selected', false);
+                    gridView.collection.models.push(addedRow);
                 }
             });
 
-            mediaAttachmentGrid.getGridView().clearSelectedRows();
-            $('.prod-attachments-modal-close').trigger('click');
+            gridView.render();
+            all_attachments_grid.getGridView().clearSelectedRows();
+            $('#all_attachments_modal').modal('hide');
 
         });
     }
@@ -79,7 +79,7 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
 
         $(attachmentConfig.AddButton).click(function() {
             refreshGridAdd();
-            $('#btn_prod_attach_modal').trigger('click');
+            $('#all_attachments_modal').modal('show');
         });
 
     }
@@ -91,187 +91,17 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
     }
 
     function getExcludeId() {
-        var arr = attachmentGrid.getRows().pluck('file_id');
+        var arr = attachmentGrid.getGridView().collection.pluck('file_id');
         return  arr.join(',');
     }
 });
 
-require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
-        $('#prod-attach-fileupload').fileupload({
-            url: '{{ APP.href("media/grid/upload?folder=media/product/attachment") | raw}}',
-            multiple:true
-        })
-        .bind('fileuploadalways', function(e, data) {
 
-        if(data.result.id) {
-            mediaAttachmentGrid.getRows().add(data.result);
-
-            $('td.name span').each(function(i) {
-                if($(this).html() === data.result.file_name)
-                $(this).parents('tr:first').remove();
-            });
-
-            if ($('#prod-attach-checkbox').is(':checked')) {
-
-                var addedRow = data.result;
-                addedRow._new = true;
-                addedRow.file_id = addedRow.id;
-                addedRow.id = guid();
-                attachmentGrid.getRows().add(addedRow);
-
-                if ($('tr.template-upload').length === 0) {
-                    $('.prod-attachments-modal-close').trigger('click');
-                }
-            }
-        }
-        });
-
-});
 </script>
 
 
 {{ THIS.view('core/backbonegrid').set('grid', prodAttachConfig) | raw }}
-
-<a role="button" href="#prod-attach-grid-modal" data-toggle="modal" style='display:none;' id='btn_prod_attach_modal'>{{ "Add"|_ }}</a>
-<div class='modal fade' id='prod-attach-grid-modal' tabindex='-1'>
-    <div class='modal-dialog' style='width:1050px;'>
-        <div class='modal-content'>
-            <div class='modal-body'>
-                <div class='row'>
-                    <div class='col-sm-12'>
-                    <div class='tabbable'>
-                        <ul class='nav nav-tabs prod-type'>
-                            <li class='active'>
-                                <a data-toggle='tab' href='#attach_library'>
-                                    Library
-                                </a>
-                            </li>
-                            <li>
-                                <a data-toggle='tab' href='#prod-attach-fileupload'>
-                                    Upload
-                                </a>
-                            </li>
-                        </ul>
-                        <div class='tab-content'>
-                            <div class='tab-pane active' id='attach_library'>
-                                {{ THIS.view('core/backbonegrid').set('grid', mediaLibAttachConfig) | raw }}
-                            </div>
-                            <div class='tab-pane' id='prod-attach-fileupload'>
-                                <div class='box-content'>
-                                        <div class='row fileupload-buttonbar'>
-                                                          <div class='col-sm-12'>
-                                                            <span class='btn btn-success fileinput-button'>
-                                                              <i class='icon-plus icon-white'></i>
-                                                              <span>Add files...</span>
-                                                              <input data-bfi-disabled='' multiple='' name='upload[]' type='file' >
-                                                            </span>
-                                                            <button class='btn btn-primary start' type='submit'>
-                                                              <i class='icon-upload icon-white'></i>
-                                                              <span>Start upload</span>
-                                                            </button>
-                                                            <button class='btn btn-warning cancel' type='reset'>
-                                                              <i class='icon-ban-circle icon-white'></i>
-                                                              <span>Cancel upload</span>
-                                                            </button>
-                                                            <input class='toggle' type='checkbox' checked id='prod-attach-checkbox'>&nbsp;Add uploaded files and close
-                                                          </div>
-                                                          <div class='col-sm-5 fileupload-progress fade'>
-                                                            <div aria-valuemax='100' aria-valuemin='0' class='progress progress-success progress-striped active' role='progressbar'>
-                                                              <div class='bar' style='width:0%;'></div>
-                                                            </div>
-                                                            <div class='progress-extended'> </div>
-                                                          </div>
-                                        </div>
-                                        <div class='fileupload-loading'></div>
-                                        <br>
-                                        <table class='table table-striped' role='presentation'>
-                                            <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
-                                        </table>
-
-                                </div>
-                                {% verbatim %}
-                                <script id="template-upload" type="text/x-tmpl">
-                                    {% for (var i=0, file; file=o.files[i]; i++) { %}
-                                        <tr class="template-upload fade">
-                                            <td class="preview"><span class="fade"></span></td>
-                                            <td class="name"><span>{%=file.name%}</span></td>
-                                            <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
-                                            {% if (file.error) { %}
-                                                <td class="error" colspan="2"><span class="label label-important">Error</span> {%=file.error%}</td>
-                                            {% } else if (o.files.valid && !i) { %}
-                                            <td>
-                                                <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                                                    <div class="bar" style="width:0%;"></div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                {% if (!o.options.autoUpload) { %}
-                                                    <button class="btn btn-primary start">
-                                                        <i class="icon-upload icon-white"></i>
-                                                        <span>Start</span>
-                                                    </button>
-                                                {% } %}
-                                            </td>
-                                            {% } else { %}
-                                                <td colspan="2"></td>
-                                            {% } %}
-                                            <td>
-                                               {% if (!i) { %}
-                                                <button class="btn btn-warning cancel">
-                                                    <i class="icon-ban-circle icon-white"></i>
-                                                    <span>Cancel</span>
-                                                </button>
-                                                {% } %}
-                                            </td>
-                                        </tr>
-                                    {% } %}
-                                </script>
-                                <!-- The template to display files available for download -->
-
-                                <script id="template-download" type="text/x-tmpl">
-                                    {% for (var i=0, file; file=o.files[i]; i++) { %}
-                                        <tr class="template-download fade">
-                                           {% if (file.error) { %}
-                                                <td></td>
-                                                <td class="name"><span>{%=file.name%}</span></td>
-                                                <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
-                                                <td class="error" colspan="2"><span class="label label-important">Error</span> {%=file.error%}</td>
-                                            {% } else { %}
-                                                <td class="preview">
-                                                {% if (file.thumbnail_url) { %}
-                                                    <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="gallery" download="{%=file.name%}">
-                                                        <img src="{%=file.thumbnail_url%}">
-                                                    </a>
-                                                {% } %}
-                                                </td>
-                                                <td class="name">
-                                                    <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="{%=file.thumbnail_url&&'gallery'%}" download="{%=file.name%}">
-                                                        {%=file.name%}
-                                                    </a>
-                                                </td>
-                                                <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
-                                                <td colspan="2"></td>
-                                            {% } %}
-                                            <td>
-                                                <input type="checkbox" name="delete" value="1" class="toggle">
-                                            </td>
-                                        </tr>
-                                    {% } %}
-                                </script>
-                                {% endverbatim %}
-                            </div>
-                        </div>
-                    </div>
-                    </div>
-                </div>
-            </div>
-            <div class='modal-footer'>
-                <button id="prod-attachments-modal-add" class='btn btn-primary btn-add  disabled' data-dismiss='modal' type='button'>{{ "Add"|_ }}</button>
-                <button class='btn btn-default btn-close prod-attachments-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
-            </div>
-        </div>
-    </div>
-</div>
+{{ THIS.view('core/medialib').set('config', {'id': 'all_attachments', 'folder': 'media/product/attachment', mode: 'link', title: 'Attachments', multiSelAllowed: true}) | raw }}
 
 <input type='hidden' name="grid[attachments][del]" id='prod-attach-remove' />
 <input type='hidden' name="grid[attachments][rows]" id='prod-attach-rows' />

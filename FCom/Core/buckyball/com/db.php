@@ -1345,7 +1345,7 @@ class BORM extends ORMWrapper
         ) {
 #echo "DIRTY: "; var_dump($this->_data[$key], $value); echo "\n";
             if (!array_key_exists($key, $this->_old_values)) {
-                $this->_old_values[$key] = array_key_exists($key, $this->_data) ? $this->_data[$key] : BNULL;
+                $this->_old_values[$key] = array_key_exists($key, $this->_data) ? $this->_data[$key] : null;
             }
             $this->_dirty_fields[$key] = $value;
         }
@@ -2391,6 +2391,46 @@ class BModel extends Model
     }
 
     /**
+     * Faster update with one statement by utilizing `case .. when .. then .. else .. end`
+     *
+     * @param array format: array($id1 => array($field1 => $value1, $field2 => $value2))
+     * @param string optional ID field
+     * @param string optional field to be updated, used when $data values are not arrays
+     */
+    public static function update_many_by_id(array $data, $idField = null, $updateField = null)
+    {
+        if (is_null($idField)) {
+            $idField = static::_get_id_column_name(get_called_class());
+        }
+        $fields = array();
+        foreach ($data as $id => $fields) {
+            foreach ($fields as $f => $v) {
+                $fields[$f][$id] = $v;
+            }
+        }
+        $updates = array();
+        $params = array();
+        foreach ($fields as $f => $values) {
+            $update = "`{$f}` = CASE `{$idField}`";
+            foreach ($values as $id => $v) {
+                $update .= " WHEN ? THEN ?";
+                $params[] = $id;
+                $params[] = $v;
+            }
+            $update .= " ELSE `{$f}` END";
+            $updates[] = $update;
+        }
+        foreach ($data as $id => $fields) {
+            $params[] = $id;
+        }
+
+        $sql = "UPDATE " . static::table() . " SET " . join(', ', $updates) . ' WHERE '
+            . $idField . ' IN (' . join(', ', array_fill(0, sizeof($data), '?')) . ')';
+        BDebug::debug('SQL: '.$sql);
+        return static::run_sql($sql, array_merge($params, $p));
+    }
+
+    /**
     * Delete one or many records of the class
     *
     * @param string|array $where where conditions (@see BDb::where)
@@ -2683,7 +2723,7 @@ class BModelUser extends BModel
 
     public static function sessionUserId()
     {
-        $userId = BSession::i()->data(static::$_sessionUserNamespace.'_id');
+        $userId = BSession::i()->get(static::$_sessionUserNamespace.'_id');
         return $userId ? $userId : false;
     }
 
@@ -2740,7 +2780,7 @@ class BModelUser extends BModel
     {
         $this->set('last_login', BDb::now())->save();
 
-        BSession::i()->data(array(
+        BSession::i()->set(array(
             static::$_sessionUserNamespace.'_id' => $this->id,
             static::$_sessionUserNamespace => serialize($this->as_array()),
         ));
@@ -2768,7 +2808,7 @@ class BModelUser extends BModel
 
     public static function logout()
     {
-        BSession::i()->data(static::$_sessionUserNamespace.'_id', false);
+        BSession::i()->set(static::$_sessionUserNamespace.'_id', false);
         BEvents::i()->fire(__METHOD__.':after', array('user' => static::$_sessionUser));
         static::$_sessionUser = null;
     }

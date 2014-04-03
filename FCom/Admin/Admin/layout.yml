@@ -49,8 +49,6 @@ base:
 
       - [ requireJs, jquery.equalHeights, @FCom_Core/js/lib/jquery.equalHeights, { deps: [ jquery ] } ]
 
-      - [ requireJs, ckeditor, @FCom_Core/js/lib/ckeditor/ckeditor, { deps: [ jquery ] } ]
-      - [ requireJs, ckeditor-jquery, @FCom_Core/js/lib/ckeditor/adapters/jquery, { deps: [ jquery, ckeditor ] } ]
       - [ requireJs, fcom.admin, @FCom_Admin/Admin/js/fcom.admin ]
       - [ requireJs, fcom.admin.dynatree, @FCom_Admin/Admin/js/fcom/fcom.admin.dynatree ]
       - [ requireJs, fcom.admin.form, @FCom_Admin/Admin/js/fcom.admin.form ]
@@ -280,7 +278,7 @@ form:
 
 /:
     - { include: base }
-    - { include: flot }
+    - { include: lib_js_flot }
     - { hook: main, views: dashboard }
     - { view: admin/nav, do: [[ setNav, dashboard ]] }
     - view: head
@@ -324,7 +322,7 @@ form:
 /settings:
     - { include: base }
     - { include: form }
-    - { include: codemirror }
+    - { include: lib_js_codemirror }
     - { hook: main, views: settings }
     - { view: admin/nav, do: [[ setNav, system/settings ]] }
     - view: settings
@@ -344,4 +342,9 @@ form:
     - { view: admin/nav, do: [[ setNav, modules/installed ]] }
 
 /templates/form:
-    - { include: codemirror }
+    - { include: lib_js_codemirror }
+/media:
+    - { include: base }
+    - { hook: header, clear: true }
+    - { hook: top-nav, clear: true }
+    - { hook: main, views: media }

@@ -2,19 +2,21 @@
 
 class FCom_MarketClient_Admin_Controller_Module extends FCom_Admin_Controller_Abstract
 {
+    protected $_permission = 'market_client/install';
+
     public function action_install()
     {
         //$result = FCom_MarketClient_RemoteApi::i()->requestSiteNonce();
         $modName = BRequest::i()->get('mod_name');
         $result = FCom_MarketClient_RemoteApi::i()->getModuleInstallInfo($modName);
         $this->view('marketclient/install')->set('install', $result);
-        $this->layout('/marketclient/install');
+        $this->layout('/marketclient/module/install');
     }
 
     public function action_install__POST()
     {
+        BResponse::i()->startLongResponse(false);
         $install = BRequest::i()->post('install');
-        BResponse::i()->startLongResponse();
         $api = FCom_MarketClient_RemoteApi::i();
 
         $configUpdated = false;
@@ -39,5 +41,6 @@ class FCom_MarketClient_Admin_Controller_Module extends FCom_Admin_Controller_Ab
         if ($configUpdated) {
             FCom_Core_Main::i()->writeConfigFiles();
         }
+        BResponse::i()->redirect('modules');
     }
 }

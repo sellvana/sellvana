@@ -6,6 +6,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
     protected $_gridHref = 'blog/post';
     protected $_modelClass = 'FCom_Blog_Model_Post';
     protected $_gridTitle = 'Blog Posts';
+    protected $_formHref = 'blog/post/form';
     protected $_recordName = 'Blog Post';
     protected $_permission = 'blog';
     protected $_mainTableAlias = 'p';
@@ -31,12 +32,10 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             array('name' => 'create_ym', 'label'=>'Create ym' , 'hidden' => true),
             array('name' => 'create_at', 'label'=>'Created', 'cell'=>'date'),
             array('name' => 'update_at', 'label'=>'Updated', 'cell'=>'date'),
-            array('type' => 'btn_group',
-                  'buttons' => array(
-									array('name' => 'edit', 'href' => BApp::href('blog/post/form/?id='), 'col'=>'id'),
-									array('name' => 'delete' , 'edit_inline' => false)
-									)
-				)
+            array('type' => 'btn_group', 'buttons' => array(
+                array('name' => 'edit'),
+                array('name' => 'delete', 'edit_inline' => false)
+            ))
         );
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {

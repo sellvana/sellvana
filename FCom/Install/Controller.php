@@ -43,8 +43,8 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_index__POST()
     {
-        $sData = BSession::i()->data();
-        if (empty($sData['w']['agree']) || $sData['w']['agree']!=='Agree') {
+        $sData = BSession::i()->get('w');
+        if (empty($sData['agree']) || $sData['agree']!=='Agree') {
             BResponse::i()->redirect('?error=1');
             return;
         }
@@ -87,7 +87,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             return;
         } else {
             BApp::m('FCom_Admin')->run_status = BModule::LOADED; // for proper migration on some hosts
-            BMigrate::i()->migrateModules('FCom_Admin');
+            BMigrate::i()->migrateModules('FCom_Admin', true);
         }
         BLayout::i()->applyLayout('/step2');
         $sData =& BSession::i()->dataToUpdate();
@@ -104,7 +104,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         }
         try {
             $w = BRequest::i()->post('w');
-            BMigrate::i()->migrateModules('FCom_Admin');
+            BMigrate::i()->migrateModules('FCom_Admin', true);
             FCom_Admin_Model_User::i()
                 ->create($w['admin'])
                 ->set('is_superadmin', 1)
@@ -200,6 +200,9 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                 'FCom_Frontend' => array(
                     'theme' => 'FCom_FrontendThemeBootSimple',
                 ),
+            ),
+            'cache' => array(
+                'default_backend' => BCache::i()->getFastestAvailableBackend(),
             ),
         ), true);
 
