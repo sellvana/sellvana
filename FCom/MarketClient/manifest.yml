@@ -22,3 +22,6 @@ modules:
                     - [ BLayout::hook:notification, FCom_MarketClient_Admin.hookFindModulesForUpdates ]
                     - [ FCom_Admin_Controller_Modules::gridViewBefore, FCom_MarketClient_Admin.onModulesGridViewBefore ]
                     - [ FCom_Admin_Controller_Modules::gridView, FCom_MarketClient_Admin.onModulesGridView ]
+            FCom_Cron:
+                crontab:
+                    - [ * * * * *, FCom_MarketClient_Cron.collectModules ]

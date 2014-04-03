@@ -59,12 +59,12 @@ class FCom_CustomField_Migrate extends BClass
               `field_id` int(10) unsigned NOT NULL,
               `position` smallint(5) unsigned DEFAULT NULL,
               PRIMARY KEY (`id`),
-              UNIQUE KEY `set_id__field_id` (`set_id`,`field_id`),
-              KEY `set_id__position` (`set_id`,`position`),
-              KEY `FK_fcom_fieldset_field_field` (`field_id`),
+              UNIQUE KEY `UNQ_set_id__field_id` (`set_id`,`field_id`),
+              KEY `IDX_set_id__position` (`set_id`,`position`),
+              KEY `FK_{$tSetField}_field` (`field_id`),
               CONSTRAINT `FK_{$tSetField}_field` FOREIGN KEY (`field_id`) REFERENCES {$tField} (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
               CONSTRAINT `FK_{$tSetField}_set` FOREIGN KEY (`set_id`) REFERENCES {$tSet} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-            ) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8;
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
         $tProductField = FCom_CustomField_Model_ProductField::table();

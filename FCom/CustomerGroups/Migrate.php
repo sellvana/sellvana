@@ -5,8 +5,7 @@
  * @package FCom_CustomerGroups
  */
 
-class FCom_CustomerGroups_Migrate
-    extends BClass
+class FCom_CustomerGroups_Migrate extends BClass
 {
     public function install__0_1_2()
     {
@@ -57,11 +56,11 @@ class FCom_CustomerGroups_Migrate
                 ),
                 'PRIMARY' => '(id)',
                 'KEYS' => array(
-                    'unq_prod_group_qty' => 'UNIQUE(product_id, group_id, qty)',
+                    'UNQ_prod_group_qty' => 'UNIQUE (product_id, group_id, qty)',
                 ), // should we add unique key from product_id + group_id + qty ???
                 'CONSTRAINTS' => array(
-                    'fk_tier_product_id' => "FOREIGN KEY (product_id) REFERENCES {$tableProduct}(id) ON DELETE CASCADE ON UPDATE CASCADE",
-                    'fk_tier_group_id' => "FOREIGN KEY (group_id) REFERENCES {$tableCustomerGroup}(id) ON DELETE CASCADE ON UPDATE CASCADE"
+                    "FK_{$tableTierPrices}_product" => "FOREIGN KEY (product_id) REFERENCES {$tableProduct}(id) ON DELETE CASCADE ON UPDATE CASCADE",
+                    "FK_{$tableTierPrices}_group" => "FOREIGN KEY (group_id) REFERENCES {$tableCustomerGroup}(id) ON DELETE CASCADE ON UPDATE CASCADE"
                 ),
             )
         );
@@ -89,11 +88,11 @@ class FCom_CustomerGroups_Migrate
                 ),
                 'PRIMARY' => '(id)',
                 'KEYS' => array(
-                    'unq_prod_group_qty' => 'UNIQUE(product_id, group_id, qty)',
+                    'UNQ_prod_group_qty' => 'UNIQUE (product_id, group_id, qty)',
                 ), // should we add unique key from product_id + group_id + qty ???
                 'CONSTRAINTS' => array(
-                    'fk_tier_product_id' => "FOREIGN KEY (product_id) REFERENCES {$tableProduct}(id) ON DELETE CASCADE ON UPDATE CASCADE",
-                    'fk_tier_group_id' => "FOREIGN KEY (group_id) REFERENCES {$tableCustGroups}(id) ON DELETE CASCADE ON UPDATE CASCADE"
+                    "FK_{$tableTierPrices}_product" => "FOREIGN KEY (product_id) REFERENCES {$tableProduct}(id) ON DELETE CASCADE ON UPDATE CASCADE",
+                    "FK_{$tableTierPrices}_group" => "FOREIGN KEY (group_id) REFERENCES {$tableCustGroups}(id) ON DELETE CASCADE ON UPDATE CASCADE"
                 ),
             )
         );
