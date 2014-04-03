@@ -874,7 +874,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         var models = this.paginationLocalData();
                         var rows = [];
                         _.each(models, function(model){
-                            var row = new rowsCollection.model(model.toJSON());
+                            var row = model;
+                            if (model.get('_new') == true) {
+                                row = new rowsCollection.model(model.toJSON());
+                            }
                             rows.push(row);
                             this.addRow(row);
                         }, this);
