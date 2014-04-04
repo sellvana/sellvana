@@ -684,7 +684,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         return $out;
     }
 
-    public function outputData($export = false)
+    public function generateOutputData($export = false)
     {
         $grid = $this->get('grid');
         $config = $grid['config'];
@@ -869,33 +869,20 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $where = isset($j['where']) ? str_replace(array('{lk}', '{fk}', '{lt}', '{ft}'), array($localKey, $foreignKey, $mainTableAlias, $tableAlias), $j['where']) : array($foreignKey, $op, $localKey);
 
             $orm->$joinMethod($table, $where, $tableAlias);
-
-            /*
-            if (!empty($j['select'])) {
-                list($localTable, ) = explode('.', $localKey);
-                foreach ($j['select'] as $jm) {
-                    $fieldAlias = !empty($jm['alias']) ? $jm['alias'] : null;
-                    if (isset($jm['field'])) {
-                        $orm->select($tableAlias.'.'.$jm['field'], $fieldAlias);
-                    } elseif (isset($jm['expr'])) {
-                        $expr = str_replace(array('{lt}', '{ft}'), array($localTable, $tableAlias), $jm['expr']);
-                        $orm->select_expr($expr, $fieldAlias);
-                    }
-                }
-            }
-
-            if (!empty($j['where'])) {
-                $orm->where_raw($j['where'][0], $j['where'][1]);
-            }
-            */
         }
     }
 
     protected function _processGridFilters(&$config, $filters, $orm)
     {
         if (!empty($config['filters'])) {
-            foreach ($config['filters'] as $fId=>$f) {
+            $indexes = BUtil::arraySeqToMap($config['columns'], 'name', 'index');
+            foreach ($filters as $fId => &$f) {
                 $f['field'] = !empty($f['field']) ? $f['field'] : $fId;
+                if (!empty($indexes[$f['field']])) {
+                    $f['field'] = $indexes[$f['field']];
+                }
+            }
+            foreach ($config['filters'] as $fId => $f) {
                 if ($fId === '_quick') {
                     if (!empty($f['expr']) && !empty($f['args']) && !empty($filters[$fId])) {
                         $args = array();
@@ -907,120 +894,105 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                     break;
                 }
             }
-            //delete $filters[$fId];
+            unset($f);
         }
 
-        //$columnData = $this->findColumnDataForFilters($config);
-        foreach ($filters as $fId=>$f) {
-            if ($fId === '_quick') {
+        foreach ($filters as $fId => $f) {
+            if ($fId === '_quick'
+                || !is_array($f)
+                || empty($f['type'])
+                || !isset($f['val'])
+                || $f['val'] === ''
+                || (empty($f['val']) && $f['val'] !== 0)
+            ) {
                 continue;
             }
 
-            /*$f['field'] = !empty($f['field']) ? $f['field'] : $fId;
-            if ($fId === '_quick') {
-                if (!empty($f['expr']) && !empty($f['args']) && !empty($filters[$fId])) {
-                    $args = array();
-                    foreach ($f['args'] as $a) {
-                        $args[] = str_replace('?', $filters['_quick'], $a);
-                    }
-                    $orm->where_raw('('.$config['filters']['_quick']['expr'].')', $args);
-                }
-                continue;
-            }
-            $fId = $f['field'];*/
-
-            if (isset($filters[$fId]) && !empty($f['type']) && isset($filters[$fId]['val']) && (!empty($filters[$fId]['val']) || $filters[$fId]['val'] == 0) && $filters[$fId]['val'] !== '') {
-                /*if (isset($columnData[$f['field']]['index'])){
-                    $f['field'] = $columnData[$f['field']]['index'];
-                }*/
-                if (!isset($f['field']))
-                    $f['field'] = $fId;
-
-                switch ($f['type']) {
-                    case 'text':
-                        $val = $filters[$fId];
-                        if (!empty($filters[$fId])) {
-                            $val = $filters[$fId]['val'];
-                            switch ($filters[$fId]['op']) {
-                                case 'start'://start with
-                                    $val = $val.'%';
-                                    $op = 'like';
-                                    break;
-                                case 'end'://end with
-                                    $val = '%'.$val;
-                                    $op = 'like';
-                                    break;
-                                case 'contains'://contain
-                                    $val = '%'.$val.'%';
-                                    $op = 'like';
-                                    break;
-                                case 'equal'://equal to
-                                    $op = 'like';
-                                    break;
-                                case 'not'://does not contain
-                                    $val = '%'.$val.'%';
-                                    $op = 'not_like';
-                                    break;
-                            }
-                            $this->_processGridFiltersOne($f, $op, $val, $orm);
-                        }
-                        break;
-                    case 'date-range': case 'number-range':
-                        $val = $filters[$fId]['val'];
-                        $temp = explode('~', $val);
-                        if (!empty($filters[$fId])) {
-                            switch ($filters[$fId]['op']) {
-                                case 'between':
-                                    $this->_processGridFiltersOne($f, 'gte', $temp[0], $orm);
-                                    if (isset($temp[1])) {
-                                        $this->_processGridFiltersOne($f, 'lte', $temp[1], $orm);
-                                    }
-
-                                    break;
-                                case 'from':
-                                    $this->_processGridFiltersOne($f, 'gte', $val, $orm);
-
-                                    break;
-                                case 'to':
-                                    $this->_processGridFiltersOne($f, 'lte', $val, $orm);
-
-                                    break;
-                                case 'equal':
-                                    if ($f['type'] === 'date-range')
-                                        $this->_processGridFiltersOne($f, 'like', $val.'%', $orm);
-                                    else
-                                        $this->_processGridFiltersOne($f, 'equal', $val, $orm);
-
-                                    break;
-                                case 'not_in':
-                                    $orm->where_raw($f['field']. ' NOT BETWEEN ? and ?', array($temp[0], $temp[1]));
-
-                                    break;
-                            }
-                        }
-                        break;
-                    case 'number-range':
-
-                        if (!empty($filters[$fId]['from'])) {
-                            $this->_processGridFiltersOne($f, 'gte', $filters[$fId]['from'], $orm);
-                        }
-                        if (!empty($filters[$fId]['val'])) {
-                            $this->_processGridFiltersOne($f, 'lte', $filters[$fId]['val'], $orm);
-                        }
-                        break;
-
-                    case 'select':
-                            $this->_processGridFiltersOne($f, 'equal', $filters[$fId]['val'], $orm);
+            switch ($f['type']) {
+            case 'text':
+                $val = $filters[$fId];
+                if (!empty($filters[$fId])) {
+                    $val = $filters[$fId]['val'];
+                    switch ($filters[$fId]['op']) {
+                        case 'start'://start with
+                            $val = $val.'%';
+                            $op = 'like';
                             break;
-                    case 'multiselect':
-                            $vals = explode(',', $filters[$fId]['val']);
-                            $this->_processGridFiltersOne($f, 'in', $vals, $orm);
-
-                        break;
+                        case 'end'://end with
+                            $val = '%'.$val;
+                            $op = 'like';
+                            break;
+                        case 'contains'://contain
+                            $val = '%'.$val.'%';
+                            $op = 'like';
+                            break;
+                        case 'equal'://equal to
+                            $op = 'like';
+                            break;
+                        case 'not'://does not contain
+                            $val = '%'.$val.'%';
+                            $op = 'not_like';
+                            break;
                     }
+                    $this->_processGridFiltersOne($f, $op, $val, $orm);
+                }
+                break;
+
+            case 'date-range': case 'number-range':
+                $val = $filters[$fId]['val'];
+                $temp = explode('~', $val);
+                if (!empty($filters[$fId])) {
+                    switch ($filters[$fId]['op']) {
+                        case 'between':
+                            $this->_processGridFiltersOne($f, 'gte', $temp[0], $orm);
+                            if (isset($temp[1])) {
+                                $this->_processGridFiltersOne($f, 'lte', $temp[1], $orm);
+                            }
+
+                            break;
+                        case 'from':
+                            $this->_processGridFiltersOne($f, 'gte', $val, $orm);
+
+                            break;
+                        case 'to':
+                            $this->_processGridFiltersOne($f, 'lte', $val, $orm);
+
+                            break;
+                        case 'equal':
+                            if ($f['type'] === 'date-range')
+                                $this->_processGridFiltersOne($f, 'like', $val.'%', $orm);
+                            else
+                                $this->_processGridFiltersOne($f, 'equal', $val, $orm);
+
+                            break;
+                        case 'not_in':
+                            $orm->where_raw($f['field']. ' NOT BETWEEN ? and ?', array($temp[0], $temp[1]));
+
+                            break;
+                    }
+                }
+                break;
+
+            case 'number-range':
+
+                if (!empty($filters[$fId]['from'])) {
+                    $this->_processGridFiltersOne($f, 'gte', $filters[$fId]['from'], $orm);
+                }
+                if (!empty($filters[$fId]['val'])) {
+                    $this->_processGridFiltersOne($f, 'lte', $filters[$fId]['val'], $orm);
+                }
+                break;
+
+            case 'select':
+                    $this->_processGridFiltersOne($f, 'equal', $filters[$fId]['val'], $orm);
+                    break;
+
+            case 'multiselect':
+                    $vals = explode(',', $filters[$fId]['val']);
+                    $this->_processGridFiltersOne($f, 'in', $vals, $orm);
+                break;
             }
         }
-
     }
 
     protected function _processGridFiltersOne($filter, $op, $value, $orm)
@@ -1117,20 +1089,4 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         fclose($fp);
         BResponse::i()->sendFile($filename);
     }
-
-    public function findColumnDataForFilters($config)
-    {
-        $filters = $config['filters'];
-        $columns = $config['columns'];
-        $data = array();
-        foreach ($filters as $filter) {
-            foreach ($columns as $column) {
-                if (isset($column['name']) && isset($filter['field']) && ($column['name'] == $filter['field'])) {
-                    $data[$filter['field']] = $column;
-                }
-            }
-        }
-        return $data;
-    }
-
 }

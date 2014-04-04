@@ -23,11 +23,6 @@ modules:
                     - [ /, FCom_Frontend_Controller.index ]
                     - [ /*view, FCom_Frontend_Controller.static ]
 
-    FCom_Frontend_DefaultTheme:
-        version: 0.1.0
-        channel: beta
-        require: { module: { FCom_Frontend: 0.1.0 } }
-        description: "Default Frontend theme"
         provides:
             themes:
                 FCom_Frontend_DefaultTheme:
