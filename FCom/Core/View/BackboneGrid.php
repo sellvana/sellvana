@@ -467,14 +467,14 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     public function getGridConfig()
     {
         $grid = $this->getGrid();
-        $data = $this->getGridData(); // initialize data
+        $data = $this->getGridConfigData(); // initialize data
         $config = $grid['config'];
         $config['data'] = $this->getPageRowsData();
         $config['personalize_url'] = BApp::href('my_account/personalize');
         return $config;
     }
 
-    public function getGridData(array $options=array())
+    public function getGridConfigData(array $options=array())
     {
         // fetch grid configuration
         $grid = $this->getGrid();
@@ -496,18 +496,10 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $gridId = $config['id'];
             $pers = FCom_Admin_Model_User::i()->personalize();
             $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
+            $persFilters = !empty($persState['filters']) ? $persState['filters'] : array();
             $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');
 
-            $filters = array();
-            if (!empty($config['filters'])) {
-                foreach ($config['filters'] as $k => $v) {
-                    if (isset($v['field'])) {
-                        $filters[$v['field']] = $v;
-
-                    }
-                }
-            }
-            $this->_processGridFilters($config, $filters, $orm);
+            $this->_processGridFilters($config, $persFilters, $orm);
 
             $config['state'] = $persState;
 
@@ -747,7 +739,6 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             }
         }
 
-        $persFilters = !empty($pers['grid'][$gridId]['filters']) ? $pers['grid'][$gridId]['filters'] : array();
         $filters = $r['filters'];
         $persData = array('grid' => array($gridId => array('state' => $r, 'filters' => $filters)));
         FCom_Admin_Model_User::i()->personalize($persData);
@@ -776,7 +767,6 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $r['p'] = 1;
             $r['ps'] = 1000000;
         }
-
         $data = $orm->paginate($r);
 
 
@@ -882,6 +872,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                     $f['field'] = $indexes[$f['field']];
                 }
             }
+            unset($f);
             foreach ($config['filters'] as $fId => $f) {
                 if ($fId === '_quick') {
                     if (!empty($f['expr']) && !empty($f['args']) && !empty($filters[$fId])) {
@@ -894,9 +885,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                     break;
                 }
             }
-            unset($f);
         }
-
         foreach ($filters as $fId => $f) {
             if ($fId === '_quick'
                 || !is_array($f)
