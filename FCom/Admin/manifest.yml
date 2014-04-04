@@ -64,11 +64,6 @@ modules:
                             POST/config/modules/FCom_Admin/add_js_code: *
                             POST/config/modules/FCom_Frontend/add_js_code: *
 
-    FCom_Admin_DefaultTheme:
-        version: 0.1.0
-        channel: beta
-        require: { module: { FCom_Core: 0.1.0 } }
-        description: "Default Admin theme"
         provides:
             themes:
                 FCom_Admin_DefaultTheme:

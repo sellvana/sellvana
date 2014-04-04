@@ -25,13 +25,15 @@
                   <button type="submit" name="mod_name" value="publish/{{ modName }}" class="btn btn-primary btn-small" onclick="return confirm('{{ 'Are you sure you want to publish module %s ?'|_(modName) }}')">
                       {{ 'Publish'|_ }}
                   </button>
+                <strong>{{ modName }}</strong>
               {% elseif mod.status == 'mine' %}
                   {% set remChannelVer = mod.channels[localMod.channel].version_uploaded %}
                   <button type="submit" name="mod_name" value="release/{{ modName }}" class="btn {{ UTIL.versionCompare(remChannelVer, localMod.version, '<') ? 'btn-success' }} btn-small" onclick="return confirm('{{ 'Are you sure you want to publish release %s ?'|_(modName) }}')">
                       {{ 'Update'|_ }}
                   </button>
+                  <a href="{{ mod.edit_href }}" target="MarketPublish"><strong>{{ modName }}</strong></a>
+
               {% endif %}
-              <strong>{{ modName }}</strong>
 
               ( <strong>{{ localMod.version ~ (localMod.channel ? ' @ ' ~ localMod.channel) }}</strong> )
 

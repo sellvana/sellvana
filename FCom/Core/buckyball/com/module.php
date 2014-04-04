@@ -1578,7 +1578,7 @@ class BMigrate extends BClass
         $modReg->currentModule(null);
         static::$_migratingModule = null;
 
-        $url = !is_null($redirectUrl) ? $redirectUrl : BRequest::i()->currentUrl();
+        $url = !is_null($redirectUrl) ? $redirectUrl : BRequest::i()->referrer();
         echo '</pre>';
         if (!$error) {
             echo '<script>location.href="'.$url.'";</script>';

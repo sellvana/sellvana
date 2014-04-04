@@ -902,7 +902,8 @@ class BLayout extends BClass
         if (!empty($d['do'])) {
             foreach ($d['do'] as $args) {
                 $method = array_shift($args);
-                BDebug::debug('LAYOUT.view.do ' . $method);
+                BDebug::debug('LAYOUT.view.do ' . $method .
+                    (!empty($args[0]) ? (' ('.print_r($args[0],1).(!empty($args[1]) ? (', '.json_encode($args[1])) : '').')') : ''));
                 call_user_func_array(array($view, $method), $args);
             }
         }

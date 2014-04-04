@@ -10,7 +10,7 @@ class FCom_IndexTank_Admin_Controller extends FCom_Admin_Controller_Abstract
     }
     static public function initButtons()
     {
-        BGanon::i()->ready('FCom_IndexTank_Admin_Controller::initIndexButtons', array('on_path'=>array(
+        FCom_LibGanon_Main::i()->ready('FCom_IndexTank_Admin_Controller::initIndexButtons', array('on_path'=>array(
             '/catalog/products',
             '/indextank/product_fields',
             '/indextank/product_functions',
@@ -44,7 +44,7 @@ function ajax_products_clear_all() { $.ajax({ type: "DELETE", url: "'.BApp::href
     .done(function( msg ) { alert( "Index recreated" ); }); }
 </script>
 ';
-        if (($el = BGanon::i()->find('header.adm-page-title div.btns-set', 0))) {
+        if (($el = FCom_LibGanon_Main::i()->find('header.adm-page-title div.btns-set', 0))) {
             $el->setInnerText($insert.$el->getInnerText());
         }
 

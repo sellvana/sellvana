@@ -2,7 +2,7 @@
 
 class FCom_Catalog_Migrate extends BClass
 {
-    public function install__0_2_6()
+    public function install__0_2_23()
     {
         $tProduct = FCom_Catalog_Model_Product::table();
 
@@ -13,6 +13,9 @@ class FCom_Catalog_Migrate extends BClass
 
         $tCategory = FCom_Catalog_Model_Category::table();
         $tCategoryProduct = FCom_Catalog_Model_CategoryProduct::table();
+
+        $tSearchHistory = FCom_Catalog_Model_SearchHistory::table();
+        $tSearchAlias = FCom_Catalog_Model_SearchAlias::table();
 
         BDb::ddlTableDef($tProduct, array(
             'COLUMNS' => array(
@@ -35,16 +38,21 @@ class FCom_Catalog_Migrate extends BClass
                 'uom'           => "VARCHAR(10) NOT NULL DEFAULT 'EACH'",
                 'thumb_url'     => 'TEXT',
                 'images_data'   => 'TEXT',
-                'create_dt'     => 'DATETIME DEFAULT NULL',
-                'update_dt'     => 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+                'create_at'     => 'DATETIME DEFAULT NULL',
+                'update_at'     => 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
                 'data_serialized' => 'mediumtext null',
+                'is_featured' => 'tinyint',
+                'is_popular' => 'tinyint',
+                'position' => 'SMALLINT(6) UNSIGNED DEFAULT NULL',
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(
                 'UNQ_local_sku' => 'UNIQUE (local_sku)',
                 'UNQ_url_key'   => 'UNIQUE (url_key)',
-                'UNQ_product_name' => 'UNIQUE (product_name)',
+//                'UNQ_product_name' => 'UNIQUE (product_name)',
                 'is_hidden'     => '(is_hidden)',
+                'IDX_featured' => '(is_featured)',
+                'IDX_popular' => '(is_popular)',
             ),
         ));
 
@@ -56,11 +64,18 @@ class FCom_Catalog_Migrate extends BClass
                 'file_id'       => 'int(11) unsigned NULL',
                 'file_path'     => 'text',
                 'remote_url'    => 'text',
+                'data_serialized'     => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'label' => 'text',
+                'position' => 'smallint',
+                'main_thumb' => 'tinyint(1) unsigned default 0',
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(
                 'file_id'        => '(file_id)',
                 'product_id__media_type' => '(product_id, media_type)',
+
             ),
             'CONSTRAINTS' => array(
                 "FK_{$tMedia}_product" => "FOREIGN KEY (`product_id`) REFERENCES `{$tProduct}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
@@ -71,7 +86,7 @@ class FCom_Catalog_Migrate extends BClass
         BDb::ddlTableDef($tProductLink, array(
             'COLUMNS' => array(
                 'id'            => 'int unsigned NOT NULL AUTO_INCREMENT',
-                'link_type'     => "enum('related','similar') NOT NULL",
+                'link_type'     => "enum('related','similar', 'cross-sell') NOT NULL",
                 'product_id'    => 'int(10) unsigned NOT NULL',
                 'linked_product_id' => 'int(10) unsigned NOT NULL',
             ),
@@ -82,7 +97,7 @@ class FCom_Catalog_Migrate extends BClass
             'COLUMNS' => array(
                 'id'            => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                 'parent_id'     => 'INT(10) UNSIGNED DEFAULT NULL',
-                'id_path'       => 'VARCHAR(50) NOT NULL',
+                'id_path'       => 'VARCHAR(50)  NULL',
                 'level'         => 'tinyint',
                 'sort_order'    => 'INT(10) UNSIGNED NULL',
                 'node_name'     => 'VARCHAR(255) NULL',
@@ -92,9 +107,24 @@ class FCom_Catalog_Migrate extends BClass
                 'num_children'  => 'INT(11) UNSIGNED DEFAULT NULL',
                 'num_descendants' => 'INT(11) UNSIGNED DEFAULT NULL',
                 'num_products'  => 'INT(10) UNSIGNED DEFAULT NULL',
+                'is_enabled' => 'TINYINT(1) UNSIGNED DEFAULT 1 ',
                 'is_virtual'    => 'TINYINT(3) UNSIGNED DEFAULT NULL',
                 'is_top_menu'   => 'TINYINT(3) UNSIGNED DEFAULT NULL',
                 'data_serialized' => 'mediumtext null',
+                'show_content'  => 'TINYINT(1) UNSIGNED DEFAULT NULL',
+                'content'       => 'TEXT',
+                'show_products' => 'TINYINT(1) UNSIGNED DEFAULT NULL',
+                'show_sub_cat'  => 'TINYINT(1) UNSIGNED DEFAULT NULL',
+                'layout_update' => 'TEXT',
+                'page_title' => 'VARCHAR(255) DEFAULT NULL',
+                'description'  => 'TEXT DEFAULT NULL',
+                'meta_description' => 'TEXT DEFAULT NULL',
+                'meta_keywords' => 'TEXT DEFAULT NULL',
+                'show_sidebar' => 'TINYINT(1) UNSIGNED DEFAULT NULL',
+                'show_view' => 'tinyint(1) unsigned default 0',
+                'view_name' => 'varchar(255)',
+                'page_parts' => 'varchar(50)',
+                'image_url' => 'TEXT NULL',
             ),
             'PRIMARY' => '(id)',
             'KEYS' => array(
@@ -128,6 +158,41 @@ class FCom_Catalog_Migrate extends BClass
         ));
 
         BDb::run("REPLACE INTO {$tCategory} (id,id_path) VALUES (1,1)");
+
+
+        BDb::ddlTableDef($tSearchHistory, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'term_type' => "char(1) not null default 'F'", // (F)ull or (W)ord
+                'query' => 'varchar(50) not null',
+                'first_at' => 'datetime not null',
+                'last_at' => 'datetime not null',
+                'num_searches' => 'int not null default 0',
+                'num_products_found_last' => 'int not null default 0',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'UNQ_query' => 'UNIQUE (term_type, query)',
+            ),
+        ));
+
+        BDb::ddlTableDef($tSearchAlias, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'alias_type' => "char(1) not null default 'F'", // (F)ull or (W)ord
+                'alias_term' => 'varchar(50) not null',
+                'target_term' => 'varchar(50) not null',
+                'num_hits' => 'int not null default 0',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'UNQ_alias' => 'UNIQUE (alias_type, alias_term)',
+                'IDX_target' => '(target_term)',
+            ),
+        ));
+        FCom_Catalog_Model_Category::i()->update_many(array('show_products' => 1, 'show_sidebar' => 1, 'is_enabled' => 1));
     }
 
     public function upgrade__0_2_1__0_2_2()
@@ -383,12 +448,14 @@ class FCom_Catalog_Migrate extends BClass
 
     public function upgrade__0_2_20__0_2_21()
     {
+        /*
         $tProductLink = FCom_Catalog_Model_ProductLink::table();
         BDb::ddlTableDef($tProductLink, array(
             'COLUMNS' => array(
                 'link_type'     => "enum('related','similar', 'cross_sell') NOT NULL",
             ),
         ));
+        */
     }
 
     public function upgrade__0_2_21__0_2_22()

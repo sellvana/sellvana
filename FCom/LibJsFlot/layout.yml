@@ -1,0 +1,20 @@
+lib_js_flot:
+  - view: head
+    do:
+      - [ requireJs, excanvas, @FCom_LibJsFlot/js/flot/excanvas.min ]
+      - [ requireJs, jquery.colorhelpers, @FCom_LibJsFlot/js/flot/jquery.colorhelpers.min, { deps: [ jquery ] } ]
+      - [ requireJs, flot, @FCom_LibJsFlot/js/flot/jquery.flot.min, { deps: [ jquery ] } ]
+      - [ requireJs, flot.canvas, @FCom_LibJsFlot/js/flot/jquery.flot.canvas.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.categories, @FCom_LibJsFlot/js/flot/jquery.flot.categories.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.crosshair, @FCom_LibJsFlot/js/flot/jquery.flot.crosshair.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.errorbars, @FCom_LibJsFlot/js/flot/jquery.flot.errorbars.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.fillbetween, @FCom_LibJsFlot/js/flot/jquery.flot.fillbetween.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.image, @FCom_LibJsFlot/js/flot/jquery.flot.image.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.navigate, @FCom_LibJsFlot/js/flot/jquery.flot.navigate.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.pie, @FCom_LibJsFlot/js/flot/jquery.flot.pie.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.resize, @FCom_LibJsFlot/js/flot/jquery.flot.resize.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.selection, @FCom_LibJsFlot/js/flot/jquery.flot.selection.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.stack, @FCom_LibJsFlot/js/flot/jquery.flot.stack.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.symbol, @FCom_LibJsFlot/js/flot/jquery.flot.symbol.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.time, @FCom_LibJsFlot/js/flot/jquery.flot.time.min, { deps: [ flot ] } ]
+      - [ requireJs, flot.threshold, @FCom_LibJsFlot/js/flot/jquery.flot.threshold.min, { deps: [ flot ] } ]

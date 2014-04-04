@@ -2,30 +2,31 @@
 
 class FCom_Promo_Migrate extends BClass
 {
-    public function install__0_1_0()
+    public function install__0_1_6()
     {
         $tPromo = FCom_Promo_Model_Promo::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tPromo}(
-    `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
-    `description` VARCHAR(255) COLLATE utf8_general_ci NOT NULL  ,
-    `details` TEXT COLLATE utf8_general_ci NULL  ,
-    `manuf_vendor_id` INT(10) UNSIGNED NOT NULL  ,
-    `from_date` DATE NULL  ,
-    `to_date` DATE NULL  ,
-    `status` ENUM('template','pending','active','expired') COLLATE utf8_general_ci NOT NULL  DEFAULT 'pending' ,
-    `buy_type` ENUM('qty','$') COLLATE utf8_general_ci NOT NULL  DEFAULT 'qty' ,
-    `buy_group` ENUM('one','any','all') COLLATE utf8_general_ci NOT NULL  DEFAULT 'one' ,
-    `buy_amount` INT(11) NULL  ,
-    `get_type` ENUM('qty','$','%','text','choice') COLLATE utf8_general_ci NOT NULL  DEFAULT 'qty' ,
-    `get_group` ENUM('same_prod','same_group','any_group','diff_group') COLLATE utf8_general_ci NOT NULL  DEFAULT 'same_prod' ,
-    `get_amount` INT(11) NULL  ,
-    `originator` ENUM('manuf','vendor') COLLATE utf8_general_ci NOT NULL  DEFAULT 'manuf' ,
-    `fulfillment` ENUM('manuf','vendor') COLLATE utf8_general_ci NOT NULL  DEFAULT 'manuf' ,
-    `create_dt` DATETIME NOT NULL  ,
-    `update_dt` DATETIME NULL  ,
-    PRIMARY KEY (`id`)
-) ENGINE=INNODB DEFAULT CHARSET='utf8';
+            `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
+            `description` VARCHAR(255) COLLATE utf8_general_ci NOT NULL  ,
+            `details` TEXT COLLATE utf8_general_ci NULL  ,
+            `manuf_vendor_id` INT(10) UNSIGNED NULL  ,
+            `from_date` DATE NULL  ,
+            `to_date` DATE NULL  ,
+            `status` ENUM('template','pending','active','expired') COLLATE utf8_general_ci NOT NULL  DEFAULT 'pending' ,
+            `buy_type` ENUM('qty','$') COLLATE utf8_general_ci NOT NULL  DEFAULT 'qty' ,
+            `buy_group` ENUM('one', 'any', 'all', 'cat', 'anyp') COLLATE utf8_general_ci NOT NULL  DEFAULT 'one',
+            `buy_amount` INT(11) NULL  ,
+            `get_type` ENUM('qty','$','%','text','choice','free') COLLATE utf8_general_ci NOT NULL  DEFAULT 'qty' ,
+            `get_group` ENUM('same_prod','same_group','any_group','diff_group') COLLATE utf8_general_ci NOT NULL  DEFAULT 'same_prod' ,
+            `get_amount` INT(11) NULL  ,
+            `originator` ENUM('manuf','vendor') COLLATE utf8_general_ci NOT NULL  DEFAULT 'manuf' ,
+            `fulfillment` ENUM('manuf','vendor') COLLATE utf8_general_ci NOT NULL  DEFAULT 'manuf' ,
+            `create_at` DATETIME NOT NULL  ,
+            `update_at` DATETIME NULL  ,
+            `coupon` varchar(100) NULL  ,
+            PRIMARY KEY (`id`)
+            ) ENGINE=INNODB DEFAULT CHARSET='utf8';
         ");
 
         $tGroup = FCom_Promo_Model_Group::table();
@@ -69,7 +70,16 @@ class FCom_Promo_Migrate extends BClass
 ) ENGINE=INNODB DEFAULT CHARSET='utf8';
         ");
 
-
+        $tCart = FCom_Promo_Model_Cart::table();
+        BDb::run("
+            CREATE TABLE IF NOT EXISTS $tCart(
+            `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
+            `cart_id` INT(10) UNSIGNED NOT NULL  ,
+            `promo_id` INT(10) UNSIGNED NOT NULL  ,
+            `update_at` datetime NULL  ,
+            PRIMARY KEY (`id`)
+        ) ENGINE=INNODB DEFAULT CHARSET='utf8';
+        ");
     }
 
     public function upgrade__0_1_0__0_1_1()

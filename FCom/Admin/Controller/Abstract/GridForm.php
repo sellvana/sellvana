@@ -74,7 +74,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $config = array_merge($config, $this->_gridConfig);
         return $config;
     }
-    
+
     public function simpleGridConfig()
     {
         $config = array(
@@ -164,12 +164,12 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $gridId = !empty($config['id']) ? $config['id'] : $oc;
 
             if (BRequest::i()->request('export')) {
-                $data = $view->outputData(true);
+                $data = $view->generateOutputData(true);
                 $view->export($data['rows'], $oc);
             } else {
 
                 //$data = $view->processORM($orm, $oc.'::action_grid_data', $gridId);
-                $data = $view->outputData();
+                $data = $view->generateOutputData();
                 $data = $this->gridDataAfter($data);
                 BResponse::i()->json(array(
                     array('c' => $data['state']['c']),
@@ -267,6 +267,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $data = $r->post('model');
             $args = array('id'=>$id, 'do'=>$r->post('do'), 'data'=>&$data, 'model'=>&$model);
             $this->formPostBefore($args);
+            $args['validateFailed'] = false;
             if ($r->post('do')==='DELETE') {
                 $model->delete();
                 $this->message('The record has been deleted');
@@ -281,6 +282,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                     }
                 } else {
                     $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:'.$formId);
+                    $args['validateFailed'] = true;
                     $redirectUrl = BApp::href($this->_formHref).'?id='.$id;
                 }
 

@@ -28,6 +28,7 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
         }
         BResponse::i()->startLongResponse();
         FCom_CatalogIndex_Main::i()->autoReindex(false);
+        FCom_Catalog_Model_Product::i()->setFlag('skip_duplicate_checks', true);
 
         // create categories / subcategories
         if (true) {
@@ -58,12 +59,13 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
             FCom_CustomField_Main::i()->disable(true);
             $max = FCom_Catalog_Model_Product::i()->orm()->select_expr('(max(id))', 'id')->find_one();
             FCom_CustomField_Main::i()->disable(false);
-            $maxId = $max->id;
+            $maxId = $max->id();
 //            $categories = FCom_Catalog_Model_Category::i()->orm()->where_raw("id_path like '1/%/%'")->select('id')->find_many();
             $products = array();
             for ($i=0; $i<1000; $i++) {
                 ++$maxId;
                 $product = FCom_Catalog_Model_Product::i()->create(array(
+                    'local_sku' => 'test-'.$maxId,
                     'product_name' => 'Product '.$maxId,
                     'short_description' => 'Short Description '.$maxId,
                     'description' => 'Long Description '.$maxId,

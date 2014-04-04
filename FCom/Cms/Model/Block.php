@@ -22,7 +22,7 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
     public function onAfterCreate()
     {
         parent::onAfterCreate();
-        $this->set('renderer', 'BTwig');
+        $this->set('renderer', 'FCom_LibTwig');
     }
 
     public function onBeforeSave()

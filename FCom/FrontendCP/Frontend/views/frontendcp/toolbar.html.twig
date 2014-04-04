@@ -16,49 +16,4 @@
             {{ THIS.hook('frontendcp/toolbar') | raw }}
         </div>
     </div>
-
-    <script>
-        require(['jquery'], function($) {
-            window.mercuryPackages = {
-                fcom: { javascripts: 'js/mercury.js,js/mercury_dialogs.js', stylesheets: 'css/mercury.bundle.css' }
-            }
-            // updated mercury_loader.js:59: var options = window.mercuryOptions || { ... }
-            window.mercuryOptions = {
-                src: "{{ APP.src('@FCom_FrontendCP/Frontend') }}",
-                pack: 'fcom'
-            }
-
-            var currentlyEditing = window.frameElement && window.frameElement.id === 'mercury_iframe';
-            var saveUrl = "{{ APP.href('frontendcp/update') }}";
-            var uploadUrl = "{{ APP.href('frontendcp/upload') }}";
-            if (!currentlyEditing) {
-                $('#admin-toolbar--edit').click(function() {
-                    $.getScript("{{ APP.src('@FCom_FrontendCP/Frontend/js/mercury_loader.js') }}", function() {
-                        $(window).on('mercury:ready', function() {
-                            window.Mercury.saveUrl = saveUrl;
-                            window.Mercury.config.uploading.url = uploadUrl;
-
-                            //window.Mercury.config.regions.identifier = 'data-id';
-                            window.Mercury.config.regions.dataAttributes = ['entity', 'model_id', 'field'];
-                            //window.Mercury.config.regions.determineType = function(region) { console.log('determineType', region); };
-                        })
-                    });
-                    return false;
-                })
-            } else {
-                $('#admin-toolbar--edit').html("{{ 'Cancel Page Editing' |_ }}");
-                $('#admin-toolbar--edit').click(function() {
-                    top.location.href = location.href
-                        .replace(/mercury_frame=true/, '')
-                        .replace(/_=[0-9]+/, '')
-                        .replace(/&+$/, '')
-                        .replace(/\?$/, '');
-                    return false;
-                })
-            }
-            $(document).ajaxSuccess(function(event, xhr, settings) {
-console.log(event, xhr, settings);
-            });
-        })
-    </script>
 {% endif %}
