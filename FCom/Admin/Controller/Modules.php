@@ -127,6 +127,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             ),
         );
 
+        $config['state']['ps'] = 100;
         $config['data'] = $this->getModulesData();
         $config['data_mode'] = 'local';
         $config['filters'] = array(
