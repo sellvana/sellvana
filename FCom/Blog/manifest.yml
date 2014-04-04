@@ -21,7 +21,6 @@ modules:
                     - [ /blog/author/:user/feed.rss, FCom_Blog_Frontend_Controller.rss ]
 
             FCom_Admin:
-                require: { module: { FCom_Admin: 0.1.0 } }
                 routing:
                     - [ /blog/post/?.action, FCom_Blog_Admin_Controller_Post ]
                     - [ /blog/category/?.action, FCom_Blog_Admin_Controller_Category ]
