@@ -59,7 +59,6 @@ require(['jquery','underscore','backbone'], function($, _) {
                 if (!selectedGrid.getRows().findWhere({id: row.get('id')})) {
                     var temp = row;
                     temp.set("_new", true);
-                    temp.set("position", null);
                     temp.set('selected', false);
                     gridView.collection.add(temp.toJSON());
                 }
