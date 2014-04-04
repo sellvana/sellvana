@@ -883,9 +883,11 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         if (!empty($config['filters'])) {
             $indexes = BUtil::arraySeqToMap($config['columns'], 'name', 'index');
             foreach ($filters as $fId => &$f) {
-                $f['field'] = !empty($f['field']) ? $f['field'] : $fId;
-                if (!empty($indexes[$f['field']])) {
-                    $f['field'] = $indexes[$f['field']];
+                if (is_array($f)) {
+                    $f['field'] = !empty($f['field']) ? $f['field'] : $fId;
+                    if (!empty($indexes[$f['field']])) {
+                        $f['field'] = $indexes[$f['field']];
+                    }
                 }
             }
             unset($f);

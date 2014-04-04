@@ -60,7 +60,7 @@ require(['jquery','underscore','backbone'], function($, _) {
                     var temp = row;
                     temp.set("_new", true);
                     temp.set('selected', false);
-                    gridView.collection.models.push(temp);
+                    gridView.collection.add(temp.toJSON());
                 }
             });
 
@@ -146,7 +146,7 @@ require(['jquery','underscore','backbone'], function($, _) {
                 {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'similar')) | raw }}
             </div>
             <div class='tab-pane' id='cross_sell'>
-                {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'cross_sell')) | raw }}
+                {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'cross-sell')) | raw }}
             </div>
         </div>
     </div>
