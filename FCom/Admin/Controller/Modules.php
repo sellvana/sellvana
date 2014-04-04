@@ -20,8 +20,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         $adminLevels = $config->get('module_run_levels/FCom_Admin');
         $frontendLevels = $config->get('module_run_levels/FCom_Frontend');
         $modules = BModuleRegistry::i()->getAllModules();
-        $autoRunLevelMods = array_flip(explode(',', 'FCom_Core,FCom_Admin,FCom_Admin_DefaultTheme,'.
-            'FCom_Frontend,FCom_Frontend_DefaultTheme,FCom_Install'));
+        $autoRunLevelMods = array_flip(explode(',', 'FCom_Core,FCom_Admin,FCom_Frontend,FCom_Install'));
 
 
         try {
@@ -128,6 +127,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             ),
         );
 
+        $config['state']['ps'] = 100;
         $config['data'] = $this->getModulesData();
         $config['data_mode'] = 'local';
         $config['filters'] = array(

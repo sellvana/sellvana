@@ -2,7 +2,7 @@ modules:
     FCom_MultiLanguage:
         version: 0.1.1
         channel: beta
-        require: { module: { FCom_Core: 0.1.0 } }
+        require: { module: { FCom_Core: 0.1.0, FCom_CatalogIndex: 0.1.0, FCom_CustomField: 0.1.0 } }
         translations: { en: en.php }
         auto_use: [ bootstrap ]
 

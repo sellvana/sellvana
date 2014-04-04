@@ -2,12 +2,6 @@
 
 class FCom_MarketClient_Cron extends BClass
 {
-    public static function bootstrap()
-    {
-        FCom_Cron_Main::i()
-            ->task('* * * * *', 'FCom_MarketClient_Cron.collectModules');
-    }
-
     public function collectModules()
     {
         set_time_limit(0);

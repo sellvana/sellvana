@@ -268,6 +268,32 @@ class BUtil extends BClass
     }
 
     /**
+     * Convert sequential array of rows to associated array by one of the fields
+     *
+     * @param array $array
+     * @param string $idField
+     * @param array|string $mapFields
+     * @return array
+     */
+    public static function arraySeqToMap($array, $idField, $mapFields = null)
+    {
+        $map = array();
+        foreach ($array as $k => $row) {
+            if (is_array($mapFields)) {
+                $outRow = BUtil::arrayMask($row, $mapFields);
+            } elseif (is_string($mapFields)) {
+                $outRow = !empty($row[$mapFields]) ? $row[$mapFields] : null;
+            }
+            if (!is_numeric($k)) {
+                $map[$k] = $outRow;
+            } elseif (isset($row[$idField])) {
+                $map[$row[$idField]] = $outRow;
+            }
+        }
+        return $map;
+    }
+
+    /**
      * version of sprintf for cases where named arguments are desired (php syntax)
      *
      * with sprintf: sprintf('second: %2$s ; first: %1$s', '1st', '2nd');
@@ -662,6 +688,9 @@ class BUtil extends BClass
         return $options;
     }
 
+    /**
+     * @todo consolidate with arraySeqToMap()
+     */
     static public function arrayMakeAssoc($source, $keyField)
     {
         $isObject = is_object(current($source));
@@ -2770,7 +2799,7 @@ class BLocale extends BClass
     protected static function addTranslation($r, $module=null)
     {
         if (empty($r[1])) {
-            BDebug::debug('Empty translation for "'.$r[0].'"');
+            #BDebug::debug('Empty translation for "'.$r[0].'"');
             return;
         }
         // short and quick way

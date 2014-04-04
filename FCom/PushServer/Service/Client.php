@@ -15,4 +15,9 @@ class FCom_PushServer_Service_Client extends FCom_PushServer_Service_Abstract
     {
         //TODO: broadcast client connection?
     }
+
+    public function signal_subscribe()
+    {
+        $this->_client->subscribe($this->_message['to']);
+    }
 }
