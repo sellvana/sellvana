@@ -28,11 +28,9 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             array('name' => 'discount', 'label'=>'Discount', 'index'=>'o.coupon_code'),
             //todo: confirm with Boris about status should be stored as id_status
             array('name' => 'status', 'label'=>'Status', 'index'=>'o.status', 'options' => FCom_Sales_Model_Order_Status::i()->statusOptions()),
-            array('type' => 'btn_group',
-                  'buttons' => array(
-                                    array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id')
-                                    )
-                )
+            array('type' => 'btn_group', 'buttons' => array(
+                array('name'=>'edit'),
+            )),
         );
         $config['filters'] = array(
             array('field' => 'create_at', 'type' => 'date-range'),
@@ -272,12 +270,10 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             array('name' => 'balance', 'label'=>'Paid', 'index'=>'o.balance'),
             array('name' => 'discount', 'label'=>'Discount', 'index'=>'o.coupon_code'),
             array('name' => 'status', 'label'=>'Status', 'index'=>'o.status', 'options' => FCom_Sales_Model_Order_Status::i()->statusOptions()),
-            array('type' => 'btn_group',
-                  'buttons' => array(
-                                    array('name'=>'edit','href' => BApp::href($this->_formHref.'?id='), 'col' => 'id')
-                                )
-                )
-            );
+            array('type' => 'btn_group', 'buttons' => array(
+                array('name' => 'edit'),
+            )),
+        );
         $config['filters'] = array(
             array('field' => 'create_at', 'type' => 'date-range'),
             array('field' => 'billing_name', 'type' => 'text'),

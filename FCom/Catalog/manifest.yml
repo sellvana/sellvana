@@ -1,8 +1,8 @@
 modules:
     FCom_Catalog:
-        version: 0.2.21
+        version: 0.2.24
         channel: beta
-        require: { module: { FCom_Core: 0.1.0 } }
+        require: { module: { FCom_Core: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
         categories: [ Catalog, Products ]
         translations: { en: en.php }
         description: "Categories and products management, admin and frontend"
@@ -10,7 +10,6 @@ modules:
 
         areas:
             FCom_Admin:
-                require: { module: { FCom_Admin: 0.1.0 } }
                 routing:
                     - [ /catalog/categories, FCom_Catalog_Admin_Controller_Categories.index ]
                     - [ /catalog/categories/.action, FCom_Catalog_Admin_Controller_Categories ]
@@ -19,9 +18,14 @@ modules:
                     - [ /catalog/products/.action, FCom_Catalog_Admin_Controller_Products ]
 
                     - [ /catalog/products/import/.action, FCom_Catalog_Admin_Controller_ProductsImport ]
+                security:
+                    request_fields_whitelist:
+                        /catalog/categories/tree_form:
+                            POST/model/content: *
+                        /catalog/products/form:
+                            POST/model/description: *
 
             FCom_Frontend:
-                require: { module: { FCom_Frontend: 0.1.0 } }
                 routing:
                     - [ /*category, FCom_Catalog_Frontend_Controller_Search.category ]
                     - [ /catalog/search, FCom_Catalog_Frontend_Controller_Search.search ]

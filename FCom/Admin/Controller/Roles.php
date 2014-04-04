@@ -17,8 +17,8 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
             array('type'=>'row_select'),
             array('name' => 'role_name', 'label'=>'Role Name', 'width'=>100),
             array('type'=>'btn_group', 'width' => 85,
-					'buttons'=>array(array('name'=>'edit','href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'))
-				 )
+                'buttons'=>array(array('name'=>'edit')),
+             ),
         );
         $config['actions'] = array(
             'delete' => true,

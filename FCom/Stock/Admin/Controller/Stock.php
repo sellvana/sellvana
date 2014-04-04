@@ -47,7 +47,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
-        $this->view('admin/grid')->set(array( 'actions' => array( 'new' => '<button id="add_new_sku" class="btn grid-new btn-primary _modal">'.BLocale::_('New Sku').'</button>')));
+        $this->view('admin/grid')->set(array( 'actions' => array( 'new' => '<button type="button" id="add_new_sku" class="btn grid-new btn-primary _modal">'.BLocale::_('New Sku').'</button>')));
     }
 
     public function action_unique__POST()

@@ -9,7 +9,7 @@ modules:
         areas:
             FCom_Admin:
                 auto_use: [ bootstrap, views, layout ]
-                require: { module: { BGanon: 0.5.0 } }
+                require: { module: { FCom_LibGanon: 0.1.0 } }
                 routing:
                     - [ /indextank/product_fields, FCom_IndexTank_Admin_Controller_ProductFields.index ]
                     - [ /indextank/product_fields/.action, FCom_IndexTank_Admin_Controller_ProductFields ]

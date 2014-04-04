@@ -2,7 +2,7 @@
 
 class FCom_Cms_Migrate extends BClass
 {
-    public function install__0_1_0()
+    public function install__0_1_3()
     {
 /*
         $tNav = FCom_Cms_Model_Nav::table();
@@ -67,12 +67,22 @@ class FCom_Cms_Migrate extends BClass
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
             `handle` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
             `description` text COLLATE utf8_unicode_ci,
+            `renderer` varchar(100) null,
             `content` text COLLATE utf8_unicode_ci,
             `layout_update` text COLLATE utf8_unicode_ci,
             `version` int(11) NOT NULL,
-            `create_dt` datetime DEFAULT NULL,
-            `update_dt` datetime DEFAULT NULL,
-            PRIMARY KEY (`id`)
+            `create_at` datetime DEFAULT NULL,
+            `update_at` datetime DEFAULT NULL,
+            `page_enabled` TINYINT DEFAULT 0 NOT NULL,
+            `page_url` VARCHAR (100) NULL,
+            `page_title` TEXT NULL,
+            `meta_title` TEXT NULL,
+            `meta_description` TEXT NULL,
+            `meta_keywords` TEXT NULL,
+            `modified_time` int unsigned,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `UNQ_handle` (`handle`),
+            UNIQUE KEY `UNQ_page_url` (`page_enabled`,`page_url`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");
 
@@ -92,6 +102,44 @@ class FCom_Cms_Migrate extends BClass
             CONSTRAINT `FK_{$tBlockHistory}_block` FOREIGN KEY (`block_id`) REFERENCES {$tBlock} (`id`) ON UPDATE CASCADE ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
         ");
+
+        $tForm = FCom_Cms_Model_Form::table();
+        $tFormData = FCom_Cms_Model_FormData::table();
+
+        BDb::ddlTableDef($tForm, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'form_name' => 'varchar(100)',
+                'form_url' => 'varchar(255)',
+                'form_status' => "char(1) not null default 'P'",
+                'validation_rules' => 'text',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+            ),
+            'PRIMARY' => '(id)',
+            'KEYS' => array(
+                'UNQ_form_name' => 'UNIQUE (form_name)'
+            ),
+        ));
+
+        BDb::ddlTableDef($tFormData, array(
+            'COLUMNS' => array(
+                'id' => 'int unsigned not null auto_increment',
+                'form_id' => 'int unsigned not null',
+                'customer_id' => 'int unsigned',
+                'session_id' => 'varchar(100)',
+                'remote_ip' => 'varchar(15)',
+                'post_status' => "char(1) not null default 'N'",
+                'email' => 'varchar(100)',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'data_serialized' => 'text',
+            ),
+            'PRIMARY' => '(id)',
+            'CONSTRAINTS' => array(
+                "FK_{$tFormData}_form" => "FOREIGN KEY (form_id) REFERENCES {$tForm} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            ),
+        ));
 
         //BDb::run("REPLACE INTO {$tNav} (id,id_path) VALUES (1,1)");
     }

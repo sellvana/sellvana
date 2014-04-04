@@ -8,7 +8,6 @@ modules:
 
         areas:
             FCom_Admin:
-                require: { module: { FCom_Admin: 0.1.0 } }
                 auto_use: [ layout ]
                 observe:
                     - [ FCom_Admin_Model_User::logout, FCom_PushServer_Main::onAdminUserLogout ]

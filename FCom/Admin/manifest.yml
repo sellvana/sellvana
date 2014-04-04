@@ -2,7 +2,7 @@ modules:
     FCom_Admin:
         version: 0.1.7
         channel: beta
-        require: { module: { FCom_Core: 0.1.0, FCom_Admin_DefaultTheme: 0.1.0 } }
+        require: { module: { FCom_Core: 0.1.0 } }
         description: Base Admin functionality
 
         default_config:
@@ -53,15 +53,17 @@ modules:
                     - [ /modules/?.action, FCom_Admin_Controller_Modules ]
 
                     - [ /settings/dismiss, FCom_Admin_Controller_Settings.dismiss]
+
+                    - [ /media, FCom_Admin_Controller_MediaLibrary.index ]
                 observe:
                     - [ FCom_Admin_Controller_Settings::action_index__POST, FCom_Admin_Admin.onSettingsPost ]
                     - [ FCom_Admin_View_Dashboard::getWidgets, FCom_Admin_Admin.onGetDashboardWidgets ]
+                security:
+                    request_fields_whitelist:
+                        /settings:
+                            POST/config/modules/FCom_Admin/add_js_code: *
+                            POST/config/modules/FCom_Frontend/add_js_code: *
 
-    FCom_Admin_DefaultTheme:
-        version: 0.1.0
-        channel: beta
-        require: { module: { FCom_Core: 0.1.0 } }
-        description: "Default Admin theme"
         provides:
             themes:
                 FCom_Admin_DefaultTheme:

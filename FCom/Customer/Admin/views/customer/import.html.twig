@@ -17,7 +17,7 @@
                         <form class="form form-horizontal" method="post">
                             <div class="form-group">
                                 <div class="col-md-12">
-                                    {{ THIS.view('core/medialib').set('config', {id: 'import_files', folder: 'storage/import/customers'}) | raw }}
+                                    {{ THIS.view('core/medialib').set('config', {id: 'import_files', folder: 'storage/import/customers', mode: 'link'}) | raw }}
                                 </div>
                             </div>
                             <div class="form-actions form-actions-padding-sm">
@@ -69,12 +69,13 @@
 
 </div>
 <script>
-    require(['jquery', 'fcom.admin'], function($) {
-        $(function() {
+    window.import_files_register = function(grid) {
+        import_files_grid = grid;
+        grid.build();
+    }
+    
+    require(['jquery', 'fcom.admin'], function($) {        
             FCom.Admin.Accordion('import-accordion');
-
-
-
 
             var importAccordionEle = $('#import-accordion');
             var importConfigEle = $('#import-accordion-group1');
@@ -112,7 +113,6 @@
                 $.post('{{APP.href('customers/import/stop')}}', $('#import-columns-form').serialize(), function(data, status, xhr) {
                     importStatusEle.html(data);
                 });
-            });
-        });
+            });        
     });
 </script>

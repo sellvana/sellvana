@@ -49,7 +49,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         array('base_price', '@required'),
         array('local_sku', '@required'),
         array('local_sku', '@string', null, array('max' => 100)),
-        array('local_sku', 'FCom_Catalog_Model_Product::validateDupSku', 'Duplicate SKU'),
+        array('local_sku', 'FCom_Catalog_Model_Product::validateDupSku'),
+        array('url_key', 'FCom_Catalog_Model_Product::validateDupUrlKey'),
         //TODO validation fails on is_hidden field
         /*array('is_hidden', '@required'),*/
         /*array('uom', '@required'),*/
@@ -75,6 +76,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             'indextank_indexed',
             'indextank_indexed_at',
         ),
+        'unique_key' => 'local_sku'
     );
 
     protected $_importErrors = null;
@@ -95,6 +97,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public static function validateDupSku($data, $args)
     {
+        if (!empty(static::$_flags['skip_duplicate_checks'])) {
+            return true;
+        }
         if (empty($data[$args['field']])) {
             return true;
         }
@@ -102,7 +107,28 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (!empty($data['id'])) {
             $orm->where_not_equal('p.id', $data['id']);
         }
-        return !$orm->find_one();
+        if ($orm->find_one()) {
+            return BLocale::_('The SKU number entered is already in use. Please enter a valid SKU number.');
+        }
+        return true;
+    }
+
+    public static function validateDupUrlKey($data, $args)
+    {
+        if (!empty(static::$_flags['skip_duplicate_checks'])) {
+            return true;
+        }
+        if (empty($data[$args['field']])) {
+            return true;
+        }
+        $orm = static::orm('p')->where('url_key', $data[$args['field']]);
+        if (!empty($data['id'])) {
+            $orm->where_not_equal('p.id', $data['id']);
+        }
+        if ($orm->find_one()) {
+            return BLocale::_('The URL Key entered is already in use. Please enter a valid URL Key.');
+        }
+        return true;
     }
 
     public static function stockStatusOptions($onlyAvailable=false)

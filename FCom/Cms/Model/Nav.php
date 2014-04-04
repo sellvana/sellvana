@@ -48,7 +48,7 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
         default:
             BLayout::i()
                 ->addView('cms_nav', array(
-                    'renderer'    => 'BPHPTAL::renderer',
+                    'renderer'    => 'FCom_LibTwig_Main::renderer',
                     'source'      => $this->content ? $this->content : ' ',
                     'source_name' => 'cms_nav:'.$this->url_path.':'.strtotime($this->update_at),
                 ))
