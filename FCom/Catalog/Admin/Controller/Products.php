@@ -350,6 +350,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         switch ($type) {
         case 'related': case 'similar':case 'cross-sell':
             $orm->join('FCom_Catalog_Model_ProductLink', array('pl.linked_product_id','=','p.id'), 'pl')
+                ->select(array('pl.position'))
                 ->where('link_type', $type)
                 ->where('pl.product_id', $model ? $model->id : 0);
 
@@ -360,7 +361,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         default:
             $caption = '';
         }
-        $gridId = 'linked_products_'.$type;
+        //TODO: confirm to Boris $type = cross-sell
+        $gridId = 'linked_products_'.str_replace('-', '_', $type);
 
         $config = array(
                 'id'           =>$gridId,
@@ -374,7 +376,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'local_sku', 'label'=>'SKU', 'index'=>'p.local_sku', 'width'=>200),
                     array('name'=>'base_price', 'label'=>'Base Price', 'index'=>'p.base_price'),
                     array('name'=>'sale_price', 'label'=>'Sale Price', 'index'=>'p.sale_price'),
-                    array('name' => 'position', 'label' => 'Position', 'index' => 'p.position'),
+                    array('name' => 'position', 'label' => 'Position', 'index' => 'pl.position'  ,'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true), 'type' => 'input'),
                 ),
                 'actions'=>array(
                     'add'=>array('caption'=>'Add products'),
@@ -512,8 +514,14 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                             'product_id'=>$model->id,
                             'link_type'=>$type,
                             'linked_product_id'=>$linkedId,
+                            'position' => (int) $data[$typeName][$linkedId]['position']
                         ))->save();
                     }
+                }
+            }
+            if (isset($data[$typeName])) {
+                foreach ($data[$typeName] as $key => $arr) {
+                    $hlp->load(array('product_id' => $model->id, 'linked_product_id' => $key, 'link_type'=>$type))->set('position', (int) $data[$typeName][$key]['position'])->save();
                 }
             }
         }

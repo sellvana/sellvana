@@ -2,14 +2,15 @@
 
 class FCom_MarketClient_Migrate extends BClass
 {
-    public function install__0_2_2()
+    public function install__0_2_3()
     {
         $tCoreModule = FCom_Core_Model_Module::table();
         $tMarketModule = FCom_MarketClient_Model_Module::table();
         BDb::ddlTableDef($tMarketModule, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
-                'core_module_id' => 'int unsigned not null',
+                'module_name' => 'varchar(100) not null',
+                'core_module_id' => 'int unsigned null',
                 'channel' => 'varchar(20)',
                 'remote_version' => 'varchar(20)',
                 'version_check_at' => 'datetime',
