@@ -1120,7 +1120,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
 
                     var filterJSON = this.model.toJSON();
-                    delete filterJSON['field'];
+//                    delete filterJSON['field'];
                     BackboneGrid.current_filters[this.model.get('field')] = filterJSON;
 
                     if (BackboneGrid.data_mode === 'local') {

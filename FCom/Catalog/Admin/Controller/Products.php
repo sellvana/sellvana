@@ -350,6 +350,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         switch ($type) {
         case 'related': case 'similar':case 'cross-sell':
             $orm->join('FCom_Catalog_Model_ProductLink', array('pl.linked_product_id','=','p.id'), 'pl')
+                ->select_expr('pl.position', 'product_link_position')
                 ->where('link_type', $type)
                 ->where('pl.product_id', $model ? $model->id : 0);
 
@@ -360,6 +361,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         default:
             $caption = '';
         }
+
         $gridId = 'linked_products_'.$type;
 
         $config = array(
@@ -374,7 +376,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('name'=>'local_sku', 'label'=>'SKU', 'index'=>'p.local_sku', 'width'=>200),
                     array('name'=>'base_price', 'label'=>'Base Price', 'index'=>'p.base_price'),
                     array('name'=>'sale_price', 'label'=>'Sale Price', 'index'=>'p.sale_price'),
-                    array('name' => 'position', 'label' => 'Position', 'index' => 'p.position'),
+                    array('name' => 'product_link_position', 'label' => 'Position', 'index' => 'pl.position'  ,'width'=>50, 'editable'=>'inline', 'validation'=>array('number'=>true), 'type' => 'input'),
                 ),
                 'actions'=>array(
                     'add'=>array('caption'=>'Add products'),
@@ -385,7 +387,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('field'=>'local_sku', 'type'=>'text')
                 ),
                 'events'=>array('init', 'add','mass-delete'),
-                'grid_before_create'=>$gridId.'_register'
+                'grid_before_create'=> str_replace('-', '_', $gridId).'_register' //TODO: confirm to Boris $type = cross-sell
             );
 
 
@@ -503,17 +505,35 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'linked_product_id'=>explode(',', $data['grid'][$typeName]['del']),
                 ));
             }
-            if (!empty($data['grid'][$typeName]['add'])) {
-                $oldLinks = $hlp->orm()->where('link_type', $type)->where('product_id', $model->id)
-                    ->find_many_assoc('linked_product_id');
-                foreach (explode(',', $data['grid'][$typeName]['add']) as $linkedId) {
-                    if ($linkedId && empty($oldLinks[$linkedId])) {
-                        $m = $hlp->create(array(
+//            if (!empty($data['grid'][$typeName]['add'])) {
+//                $oldLinks = $hlp->orm()->where('link_type', $type)->where('product_id', $model->id)
+//                    ->find_many_assoc('linked_product_id');
+//                foreach (explode(',', $data['grid'][$typeName]['add']) as $linkedId) {
+//                    if ($linkedId && empty($oldLinks[$linkedId])) {
+//                        $m = $hlp->create(array(
+//                            'product_id'=>$model->id,
+//                            'link_type'=>$type,
+//                            'linked_product_id'=>$linkedId,
+//                            'position' => $data[$typeName][$linkedId]['product_link_position']
+//                        ))->save();
+//                    }
+//                }
+//            }
+            if (isset($data[$typeName])) {
+                foreach ($data[$typeName] as $key => $arr) {
+                    $productLink = $hlp->load(array('product_id' => $model->id, 'linked_product_id' => $key, 'link_type'=>$type));
+                    $position = (is_numeric($data[$typeName][$key]['product_link_position'])) ? (int) $data[$typeName][$key]['product_link_position']: 0;
+                    if ($productLink) {
+                        $productLink->set('position', $position)->save();
+                    } else {
+                        $hlp->create(array(
                             'product_id'=>$model->id,
                             'link_type'=>$type,
-                            'linked_product_id'=>$linkedId,
+                            'linked_product_id'=>$key,
+                            'position' => $position
                         ))->save();
                     }
+
                 }
             }
         }
@@ -549,8 +569,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                             $image['main_thumb'] = $main_thumb;
                         }
 
-                        if (isset($image['position']) && is_numeric($image['position'])) {
-                            $image['position'] = (int) $image['position'];
+                        if (isset($image['position'])) {
+                            $image['position'] = (is_numeric($image['position'])) ? (int) $image['position']: 0;
                         }
 
                         if ($mediaModel) {
