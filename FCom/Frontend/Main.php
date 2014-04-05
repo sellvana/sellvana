@@ -4,22 +4,6 @@ class FCom_Frontend_Main extends BClass
 {
     protected $_layout;
 
-    public static function adminHref($url='')
-    {
-        $href = BConfig::i()->get('web/base_admin');
-        if (!$href) {
-            $href = BApp::baseUrl(true) . '/admin';
-        }
-        return trim($href.'/'.ltrim($url, '/'), '/');
-    }
-
-    public static function href($url='')
-    {
-        $r = BRequest::i();
-        $href = $r->scheme().'://'.$r->httpHost().BConfig::i()->get('web/base_store');
-        return trim(rtrim($href, '/').'/'.ltrim($url, '/'), '/');
-    }
-
     public function getLayout()
     {
         if (empty($this->_layout)) {
@@ -44,6 +28,16 @@ class FCom_Frontend_Main extends BClass
             $this->_layout->collectAllViewsFiles('FCom_Frontend');
         }
         return $this->_layout;
+    }
+
+    public static function adminHref($url='')
+    {
+        return BApp::adminHref($url);
+    }
+
+    public static function href($url='')
+    {
+        return BApp::frontendHref($url);
     }
 }
 
