@@ -418,6 +418,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         if (!isset($grid['config']['filters']) && !empty($persGrid['filters'])) {
             $grid['config']['filters'] = array();
         }
+
         if (isset($grid['config']['filters'])) {
             foreach ($grid['config']['filters'] as $filter) {
                 if (!empty($filter['field']) && !empty($persGrid['filters'][$filter['field']])) {
@@ -471,6 +472,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $config = $grid['config'];
         $config['data'] = $this->getPageRowsData();
         $config['personalize_url'] = BApp::href('my_account/personalize');
+
         return $config;
     }
 
@@ -500,7 +502,6 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $grid['result']['state'] = $persState;
 
             $grid['result']['rows'] = $config['data'];
-
         } elseif (!empty($config['orm'])) {
             $orm = $config['orm'];
             if (is_string($orm)) {

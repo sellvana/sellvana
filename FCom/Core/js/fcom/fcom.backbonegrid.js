@@ -89,7 +89,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 currentState: {},
                 colsInfo: {},
                 data_mode: 'server',
-                multiselect_filter: false
+                multiselect_filter: false,
+                local_personalize_filters: false
 
             }
 
@@ -556,17 +557,19 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 },
                 saveLocalState: function() {
-
-                    $.post(BackboneGrid.personalize_url,
-                        {
-                                'do': 'grid.state',
-                                'grid': BackboneGrid.id,
-                                's': BackboneGrid.currentState.s,
-                                'sd': BackboneGrid.currentState.sd,
-                                'p': BackboneGrid.currentState.p,
-                                'ps': BackboneGrid.currentState.ps,
-                        }
-                    );
+                    //only if local_personalize_filters configuration flag is true, we can personalize
+                    if (BackboneGrid.local_personalize_filters) {
+                        $.post(BackboneGrid.personalize_url,
+                            {
+                                    'do': 'grid.state',
+                                    'grid': BackboneGrid.id,
+                                    's': BackboneGrid.currentState.s,
+                                    'sd': BackboneGrid.currentState.sd,
+                                    'p': BackboneGrid.currentState.p,
+                                    'ps': BackboneGrid.currentState.ps,
+                            }
+                        );
+                    }
                 },
                 url: function () {
                     if (BackboneGrid.data_mode !== 'server') {
@@ -1125,7 +1128,15 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                     if (BackboneGrid.data_mode === 'local') {
                         gridView.render();
-//                        rowsCollection.filter();
+                        if (BackboneGrid.local_personalize_filters) {
+                            $.post(BackboneGrid.personalize_url,
+                                {
+                                        'do': 'grid.local.filters',
+                                        'grid': BackboneGrid.id,
+                                        'filters': JSON.stringify(BackboneGrid.current_filters)
+                                }
+                            );
+                        }
                     } else {
                         rowsCollection.fetch({reset: true});
                     }
@@ -1802,12 +1813,14 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 BackboneGrid.currentState = state;
                 BackboneGrid.pageSizeOptions = config.page_size_options;
-
                 //check data mode
                 if (config.data_mode) {
                     BackboneGrid.data_mode = config.data_mode;
                 }
 
+                if (config.local_personalize_filters) {
+                    BackboneGrid.local_personalize_filters = config.local_personalize_filters;
+                }
                 //theader
                 BackboneGrid.Collections.ColsCollection.prototype.grid = config.id;
                 BackboneGrid.Models.ColModel.prototype.personalize_url = config.personalize_url;
@@ -1901,6 +1914,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     // }
                 }
                 var fCollection = [];
+                console.log(filters);
                 for (var i in filters) {
                     var filter = filters[i];
                     if (typeof(filter.type) !== 'undefined') {
