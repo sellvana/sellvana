@@ -143,7 +143,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         );
         $config['events'] = array('edit', 'mass-edit');
         $config['grid_before_create'] = 'moduleGridRegister';
-        $config['local_personalize_filters'] = true;
+        $config['local_personalize'] = true;
 
         //$config['state'] =array(5,6,7,8);
         return $config;

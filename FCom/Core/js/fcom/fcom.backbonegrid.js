@@ -90,7 +90,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 colsInfo: {},
                 data_mode: 'server',
                 multiselect_filter: false,
-                local_personalize_filters: false
+                local_personalize: false
 
             }
 
@@ -557,8 +557,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 },
                 saveLocalState: function() {
-                    //only if local_personalize_filters configuration flag is true, we can personalize
-                    if (BackboneGrid.local_personalize_filters) {
+                    //only if local_personalize configuration flag is true, we can personalize
+                    if (BackboneGrid.local_personalize) {
                         $.post(BackboneGrid.personalize_url,
                             {
                                     'do': 'grid.state',
@@ -1128,7 +1128,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                     if (BackboneGrid.data_mode === 'local') {
                         gridView.render();
-                        if (BackboneGrid.local_personalize_filters) {
+                        if (BackboneGrid.local_personalize) {
                             $.post(BackboneGrid.personalize_url,
                                 {
                                         'do': 'grid.local.filters',
@@ -1818,8 +1818,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     BackboneGrid.data_mode = config.data_mode;
                 }
 
-                if (config.local_personalize_filters) {
-                    BackboneGrid.local_personalize_filters = config.local_personalize_filters;
+                if (config.local_personalize) {
+                    BackboneGrid.local_personalize = config.local_personalize;
                 }
                 //theader
                 BackboneGrid.Collections.ColsCollection.prototype.grid = config.id;
