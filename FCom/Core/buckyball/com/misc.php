@@ -2386,7 +2386,11 @@ class BDebug extends BClass
 
         if ($backtrace || !empty(static::$_verboseBacktrace[$e['msg']])) {
             foreach ($bt as $t) {
-                $e['msg'] .= "\n".$t['file'].':'.$t['line'];
+                if (!empty($t['file'])) {
+                    $e['msg'] .= "\n".$t['file'].':'.$t['line'];
+                } elseif (!empty($t['class'])) {
+                    $e['msg'] .= "\n".$t['class'].$t['type'].$t['function'];
+                }
             }
         }
 
