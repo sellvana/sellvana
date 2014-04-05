@@ -164,16 +164,24 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             if (!empty($r['s']) && empty($r['sd'])) {
                 $r['sd'] = 'asc';
             }
-
             /*if ($r['sd']==='ascending') {
                 $r['sd'] = 'asc';
             } elseif ($r['sd']==='descending') {
                 $r['sd'] = 'desc';
             }*/
-
             $data = array('grid' => array($r['grid'] => array('state' => BUtil::arrayMask($r, 'p,ps,s,sd,q'))));
-            break;
 
+            break;
+        case 'grid.local.filters':
+            if (empty($r['grid'])) {
+                break;
+            }
+            if (!is_array($r['filters'])) {
+                $r['filters'] = BUtil::fromJson($r['filters']);
+            }
+            $data = array('grid' => array($r['grid'] => array('filters' => $r['filters'])));
+
+            break;
         case 'settings.tabs.order':
             break;
 
