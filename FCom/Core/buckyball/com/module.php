@@ -1400,7 +1400,7 @@ class BMigrate extends BClass
         if (!$force) {
             $conf = BConfig::i();
             $req = BRequest::i();
-            if (!$conf->get('install_status') === 'installed'
+            if ($conf->get('install_status') !== 'installed'
                 || !$conf->get('db/implicit_migration')
                 || $req->xhr() && !$req->get('MIGRATE')
             ) {
