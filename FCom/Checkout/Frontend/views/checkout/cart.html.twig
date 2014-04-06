@@ -19,6 +19,7 @@
         </header>
         <div class="table-responsive">
           <form method="post" action="{{ APP.href('cart/add') }}">
+            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
             <table class="table">
               <thead>
                 <tr>

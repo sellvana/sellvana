@@ -6,7 +6,8 @@
     </header>
     <div class="row">
       <form action="{{ APP.href('checkout') }}{{ REQUEST.get('guest') == 'yes' ? '?guest=yes' : '' }}" method="post">
-      <div class="f-col-main col-sm-9">
+        <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+        <div class="f-col-main col-sm-9">
           <a  href='{{ APP.href('cart') }}'>
               <strong>{{ 'Back to cart' |_ }}</strong>
           </a>

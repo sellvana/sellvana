@@ -27,6 +27,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     static public function sessionClient()
     {
         $sessId = BSession::i()->sessionId();
+        if (!empty(static::$_clientCache[$sessId])) {
+            return static::$_clientCache[$sessId];
+        }
         $client = static::load($sessId, 'session_id');
         if (!$client) {
             $client = static::create(array(
@@ -46,6 +49,8 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
                 $client->set('customer_id', $custId);
             }
         }
+        static::$_clientCache[$sessId] = $client;
+        static::$_clientCache[$client->id()] = $client;
         return $client;
     }
 

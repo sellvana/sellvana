@@ -4,6 +4,7 @@
         <strong><span>{{ "Newsletter" |_ }}</span></strong>
     </div>
     <form action="{{ APP.href('newsletter/subscriber/form/') }}" method="post" id="newsletter-validate-detail">
+        <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
         <div class="block-content">
             <label for="newsletter">{{ "Sign Up for Our Newsletter" |_ }}:</label>
             <div class="input-box">

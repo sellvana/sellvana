@@ -46,6 +46,7 @@
           <!-- /.f-price-group -->
           <!--{{ p.get('short_description') }}-->
           <form method="post" action="{{ addToCartUrl }}" class="hidden-xs">
+            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
             <input type="hidden" name="action" value="add">
             <input type="hidden" name="qty" value="1">
             <p>

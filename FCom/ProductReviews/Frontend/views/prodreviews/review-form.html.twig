@@ -12,6 +12,7 @@
 
 {% if action == 'add' or (action == 'edit' and pr is not empty) %}
     <form action="{{ APP.href('prodreviews/' ~ action) }}" method="post" class="f-prod-reviews" id="f-prod-reviews-main-form">
+        <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
         <input type="hidden" name="pid" value="{{ prod.id() }}">
         <input type="hidden" name="rid" value="{{ pr.id() }}" id="id-preview">
 
