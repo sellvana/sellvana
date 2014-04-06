@@ -9,6 +9,7 @@
 
 {% if THIS.get('wishlist') or THIS.get('wishlist').items() %}
        <form name="cart" action="{{ APP.href('wishlist') }}" method="post">
+          <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
           <div class="table-responsive">
             <table class="table">
                 <col width="30"/>

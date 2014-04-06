@@ -218,7 +218,6 @@ class BApp extends BClass
         // bootstrap modules
         BModuleRegistry::i()->bootstrap();
 
-
         // run module migration scripts if necessary
         BMigrate::i()->migrateModules(true);
 

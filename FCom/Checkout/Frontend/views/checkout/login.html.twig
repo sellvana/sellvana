@@ -1,6 +1,7 @@
 <div class="f-site-main" role="main">
   <div class="container">
     <form action="{{ APP.href('login') }}" method="post" id="login-form" role="form">
+      <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
       <input type="hidden" name="redirect_to" value="checkout" />
       <fieldset class="f-authentification-form">
         <header class="f-page-header">

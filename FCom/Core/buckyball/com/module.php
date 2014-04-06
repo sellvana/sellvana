@@ -1400,7 +1400,7 @@ class BMigrate extends BClass
         if (!$force) {
             $conf = BConfig::i();
             $req = BRequest::i();
-            if (!$conf->get('install_status') === 'installed'
+            if ($conf->get('install_status') !== 'installed'
                 || !$conf->get('db/implicit_migration')
                 || $req->xhr() && !$req->get('MIGRATE')
             ) {
@@ -1578,7 +1578,7 @@ class BMigrate extends BClass
         $modReg->currentModule(null);
         static::$_migratingModule = null;
 
-        $url = !is_null($redirectUrl) ? $redirectUrl : BRequest::i()->referrer();
+        $url = !is_null($redirectUrl) ? $redirectUrl : BRequest::i()->currentUrl();
         echo '</pre>';
         if (!$error) {
             echo '<script>location.href="'.$url.'";</script>';
