@@ -48,7 +48,17 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             BResponse::i()->redirect('?error=1');
             return;
         }
-        BResponse::i()->redirect('install/step1');
+        $redirectUrl = 'install/step1';
+        if (!BApp::m('FCom_Admin')) {
+            BResponse::i()->startLongResponse();
+            $modules = FCom_MarketClient_RemoteApi::i()->getModuleInstallInfo('FCom_VirtPackCoreEcom');
+            FCom_MarketClient_Main::i()->downloadAndInstall($modules, true);
+            echo '<script>location.href="'.$redirectUrl.'";</script>';
+            echo '<p>ALL DONE. <a href="'.$redirectUrl.'">Click here to continue</a></p>';
+            exit;
+        } else {
+            BResponse::i()->redirect($redirectUrl);
+        }
     }
 
     public function action_step1()

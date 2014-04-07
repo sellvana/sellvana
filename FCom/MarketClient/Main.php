@@ -2,38 +2,46 @@
 
 class FCom_MarketClient_Main extends BClass
 {
-    public function installFiles($modName, $origZipFile)
+    public function downloadAndInstall($modules, $showProgress)
     {
-        if (!preg_match('#^([A-Za-z0-9]+)_([A-Za-z0-9]+)$#', $modName, $match)) {
-            throw new BException('Invalid module name: ' . $modName);
+        if ($showProgress) {
+            echo '<h1>'.BLocale::_('Downloading and installing packages...').'</h1>';
         }
+        $api = FCom_MarketClient_RemoteApi::i();
+        $configUpdated = false;
+        $i = 0;
+        $cnt = sizeof($modules);
+        foreach ($modules as $modName => $modInfo) {
+            $i++;
+            if ($showProgress) {
+                echo '<br>'.BLocale::_('[%d/%d] Downloading: %s...', array($i, $cnt, $modName)).' ';
+            }
+            $filename = FCom_MarketClient_RemoteApi::i()->downloadPackage($modName, $modInfo['version']);
+            if (!$filename) {
+                $this->message('Could not download module package file: '.$modName.' ('.$modInfo['version'].')');
+                continue;
+            }
+            $modNameArr = explode('_', $modName);
+            $targetDir = BConfig::i()->get('fs/dlc_dir') . '/' . $modNameArr[0] .'/'. $modNameArr[1];
+            BUtil::ensureDir($targetDir);
 
-        if (!BUtil::isPathAbsolute($origZipFile)) {
-            $origZipFile = BConfig::i()->get('fs/storage_dir') . '/dlc/packages/' . $origZipFile;
+            if ($showProgress) {
+                echo BLocale::_('Installing...').' ';
+            }
+            if (!BUtil::zipExtract($filename, $targetDir)) {
+                $this->message('Could not extract module package file: '.$modName.' ('.$modInfo['version'].')');
+                continue;
+            }
+            if (!empty($modInfo['enable'])) {
+                $configUpdated = true;
+                BConfig::i()->set('module_run_levels/FCom_Core/'.$modName, 'REQUESTED', false, true);
+            }
+            if ($showProgress) {
+                echo 'DONE';
+            }
         }
-
-        $targetDir = BConfig::i()->get('fs/dlc_dir') . '/' . $match[1] . '/' . $match[2];
-        BUtil::ensureDir($targetDir);
-
-        $ftpConf = BConfig::i()->get('modules/FCom_MarketClient/ftp');
-        if (!empty($ftpConf['enabled'])) {
-            $modulePath = dirname($moduleFile).'/'.$modName;
-            $res = FCom_MarketClient_Main::i()->extract($origZipFile, $modulePath);
-            //copy modulePath by FTP to marketPath
-            if (!$res) {
-                throw new BException("Permissions denied to write into storage dir: ".$modulePath);
-            }
-            if (empty($ftpConf['port'])) {
-                $ftpConf['port'] = $ftpConf['type'] =='ftp' ? 21 : 22;
-            }
-            $ftpClient = new BFtpClient($ftpConf);
-            $errors = $ftpClient->upload($modulePath, $targetDir);
-            if ($errors) {
-                throw new BException(join("\n", $errors));
-            }
-        } else {
-            $res = FCom_MarketClient_Main::i()->extract($moduleFile, $targetDir);
+        if ($configUpdated) {
+            FCom_Core_Main::i()->writeConfigFiles();
         }
-        return $res;
     }
 }
