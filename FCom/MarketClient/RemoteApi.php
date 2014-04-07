@@ -56,7 +56,11 @@ final class FCom_MarketClient_RemoteApi extends BClass
         $response = BUtil::remoteHttp("GET", $url);
 #echo "<pre>"; var_dump($response); exit;
         $modResult = BUtil::fromJson($response);
-        $result = BUtil::arrayMerge($result, $modResult);
+        if (!empty($modResult['error'])) {
+            BCache::i()->delete(static::$_modulesVersionsCacheKey);
+            throw new BException($modResult['message']);
+        }
+        $result = BUtil::arrayMerge($result, $modResult['modules']);
         foreach ($result as $modName => &$mod) {
             $mod['name'] = $modName;
             if (!empty($mod['status']) && $mod['status'] === 'mine') {
@@ -81,7 +85,11 @@ final class FCom_MarketClient_RemoteApi extends BClass
         $response = BUtil::remoteHttp("GET", $url);
 #var_dump($response); exit;
         $result = BUtil::fromJson($response);
-        foreach ($result as $modName => &$modInfo) {
+        if (!empty($result['error'])) {
+            throw new BException($result['message']);
+        }
+        $modules = $result['modules'];
+        foreach ($modules as $modName => &$modInfo) {
             $localMod = BApp::m($modName);
             if ($modInfo['status']==='dependency' && $localMod) {
                 if (version_compare($localMod->version, $modInfo['version'], '<')) {
@@ -93,7 +101,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
             }
         }
         unset($modInfo);
-        return $result;
+        return $modules;
     }
 
     public function createModule($modName)
@@ -111,6 +119,9 @@ final class FCom_MarketClient_RemoteApi extends BClass
     public function uploadPackage($moduleName)
     {
         $mod = BModuleRegistry::i()->module($moduleName);
+        if (!$mod) {
+            return array('error' => true, 'message' => 'Invalid package: '.$moduleName);
+        }
         $packageDir = BConfig::i()->get('fs/storage_dir') . '/marketclient/upload';
         BUtil::ensureDir($packageDir);
         $packageFilename = "{$packageDir}/{$moduleName}-{$mod->version}.zip";
