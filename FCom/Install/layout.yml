@@ -10,7 +10,7 @@ base:
             - [ css, @FCom_Core/css/bootstrap-3.min.css ]
             - [ css, @FCom_Core/css/fcom.core.css ]
             - [ css, @FCom_Install/css/styles.css ]
-            - [ css, @FCom_FrontendThemeBootSimple/css/fulleron-base.css ]
+            #- [ css, @FCom_Core/../FrontendThemeBootSimple/css/fulleron-base.css ]
             #- [ requireRun, fcom.core ]
 
 /:
