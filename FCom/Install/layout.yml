@@ -10,6 +10,8 @@ base:
             - [ css, @FCom_Core/css/bootstrap-3.min.css ]
             - [ css, @FCom_Core/css/fcom.core.css ]
             - [ css, @FCom_Install/css/styles.css ]
+            - [ requireJs, jquery.validate, @FCom_LibJsCommon/theme1/assets/javascripts/plugins/validate/jquery.validate.min ]
+            - [ requireJs, fcom.password, @FCom_Core/js/fcom/fcom.password ]
             #- [ css, @FCom_Core/../FrontendThemeBootSimple/css/fulleron-base.css ]
             #- [ requireRun, fcom.core ]
 
