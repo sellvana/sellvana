@@ -271,9 +271,9 @@ class FCom_Core_Main extends BClass
             $runLevels = array($area => 'REQUIRED');
         } else {
             $config->set('module_run_levels', array());
-            $runLevels = array('FCom_Install' => 'REQUIRED');
+            $runLevels = array('FCom_Install' => 'REQUIRED', 'FCom_LibTwig' => 'REQUESTED');
         }
-
+        BDebug::debug('AREA: '.$area.', MODE: '.$mode);
         if ('RECOVERY' === $mode) { // load manifests for RECOVERY mode
             $recoveryModules = BConfig::i()->get('recovery_modules/'.$area);
             if ($recoveryModules) {

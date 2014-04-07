@@ -4,6 +4,7 @@
             <h1 class="title">{{ "Shopping Cart" |_ }}</h1>
         </header>
         <form name="cart" action="{{ APP.href('cart/add') }}" method="post">
+            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
             <table class="table">
                 <col width="30"/>
                 <col width="60"/>
@@ -61,6 +62,7 @@
         </form>
         <section class="row">
             <form action="{{ APP.href('cart/add') }}" method="post" class="col-md-6 control-group form-inline">
+                <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
                 <label for="" class="control-label">{{ "Promo Code" |_ }}</label>
                 <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the </p>
                 <div class="controls">
@@ -69,6 +71,7 @@
                 </div>
             </form>
             <form action="{{ APP.href('cart/add') }}" method="post" class="col-md-6">
+                <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
                 <header>{{ "Shipping Estimate" |_ }}</header>
                 <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the </p>
                 {% if (shipping_estimates) %}

@@ -1,0 +1,57 @@
+
+<div class="f-admin-main-view">
+  <div class="page-header f-admin-page-header">
+    <h1 class="f-page-title">{{ 'Upgrades Available' }}</h1>
+    <div class="btn-group">
+      <button class="btn btn-primary" type="button" onclick="$('#util-form').attr('action', '{{ APP.href('marketclient/site/check_updates') }}').submit()"><span>{{ 'Check For Updates'|_ }}</span></button>
+    </div>
+  </div>
+  <div class="f-admin-main">
+      {{ THIS.view('core/messages') | raw }}
+      <div class="panel">
+        <div class="panel-body">
+{% if THIS.get('result').reconnect %}
+          <a href="{{ APP.href('marketclient/site/connect') }}" target="_blank">{{ 'Reconnect'|_ }}</a>
+{% endif %}
+
+{% if THIS.get('modules') %}
+          <form method="post" action="{{ APP.href('marketclient/publish/module') }}">
+            <ul class="list-group">
+  {% for modName, mod in THIS.get('modules') %}
+  {% set localMod = APP.m(modName) %}
+    {% if mod.status == 'available' or mod.status == 'mine' %}
+              <li class="list-group-item">
+              {% if mod.status == 'available' %}
+                  <button type="submit" name="mod_name" value="publish/{{ modName }}" class="btn btn-primary btn-small" onclick="return confirm('{{ 'Are you sure you want to publish module %s ?'|_(modName) }}')">
+                      {{ 'Publish'|_ }}
+                  </button>
+                <strong>{{ modName }}</strong>
+              {% elseif mod.status == 'mine' %}
+                  {% set remChannelVer = mod.channels[localMod.channel].version_uploaded %}
+                  <button type="submit" name="mod_name" value="release/{{ modName }}" class="btn {{ UTIL.versionCompare(remChannelVer, localMod.version, '<') ? 'btn-success' }} btn-small" onclick="return confirm('{{ 'Are you sure you want to publish release %s ?'|_(modName) }}')">
+                      {{ 'Update'|_ }}
+                  </button>
+                  <a href="{{ mod.edit_href }}" target="MarketClient"><strong>{{ modName }}</strong></a>
+
+              {% endif %}
+
+              ( <strong>{{ localMod.version ~ (localMod.channel ? ' @ ' ~ localMod.channel) }}</strong> )
+
+              {% if mod.status == 'mine' and mod.channels %}
+                [ Remote versions:
+                {% for remChannelName, remChannel in mod.channels %}
+                  <strong>{{ remChannel.version_uploaded ~ ' @ ' ~ remChannelName }}</strong>;
+                {% endfor %}
+                ]
+              {% endif %}
+              </li>
+    {% endif %}
+  {% endfor %}
+            </ul>
+          </form>
+{% endif %}
+          </div>
+      </div>
+    </div>
+  </div>
+</div>

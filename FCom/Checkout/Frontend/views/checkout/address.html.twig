@@ -6,9 +6,10 @@
         <h1 class="f-page-title">{{ 'Shipping Address'|_ }}</h1>
       </header>
       <form action="{{ APP.href('checkout/address') }}" method="post" id="address-form" role="form">
+        <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
         <input type="hidden" name="address_equal" value="0">
         <input type="hidden" name="t" value="{{ THIS.get('address_type') }}">
-        <fieldset> 
+        <fieldset>
           <div class="row">
             <div class="form-group col-sm-6">
               <label for="address-firstname" class="control-label required">{{ "First name" |_ }}</label>
@@ -80,7 +81,7 @@
                 {{ validator.errorHtml("postcode", "address-postcode") | raw }}
             </div>
           </div>
-    
+
           {% if 's' == THIS.get('address_type') %}
           <div class="checkbox">
             <label for="address_equal">

@@ -6,7 +6,7 @@ base:
             - [ css, "//fonts.googleapis.com/css?family=Lato:400,700,900,400italic,700italic,900italic" ]
             - [ css, @FCom_FrontendThemeBootSimple/Frontend/css/bootstrap.css ]
             - [ css, @FCom_Core/css/flags.css ]
-            - [ css, @FCom_Core/js/lib/css/jquery.rateit.css ]
+            - [ css, @FCom_LibJsCommon/js/css/jquery.rateit.css ]
             - [ css, @FCom_FrontendThemeBootSimple/Frontend/css/fulleron-base.css ]
 
             - [ js, //html5shim.googlecode.com/svn/trunk/html5.js, { if: lt IE 9 } ]

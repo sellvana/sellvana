@@ -1,0 +1,40 @@
+common_js_libs:
+    - view: head
+        do:
+            - [ requireJs, jquery.cookie, @FCom_LibJsCommon/js/jquery.cookie, { deps: [ jquery ] } ]
+            #- [ requireJs, jquery.resizableColumns, @FCom_LibJsCommon/js/jquery.resizableColumns.js, { deps: [ jquery ] } ]
+            - [ requireJs, jquery.tablesorter, @FCom_LibJsCommon/js/jquery.tablesorter.min, { deps: [ jquery ] }]
+            - [ requireJs, jquery.widgets, @FCom_LibJsCommon/js/jquery.tablesorter.widgets, { deps: [ jquery.tablesorter ] } ]
+            - [ requireJs, jquery.validate, @FCom_LibJsCommon/js/jquery.validate.min, { deps: [ jquery ] } ]
+            - [ requireJs, jquery.rateit, @FCom_LibJsCommon/js/jquery.rateit.min, { deps: [ jquery ] } ]
+            - [ requireJs, jquery.quicksearch, @FCom_LibJsCommon/js/jquery.quicksearch, { deps: [ jquery ] } ]
+            - [ requireJs, ngprogress, @FCom_LibJsCommon/js/ngprogress, { deps: [ jquery ] } ]
+            - [ requireJs, jquery.zoom, @FCom_LibJsCommon/js/jquery.zoom, { deps: [ jquery ] } ]
+            - [ requireJs, unique, @FCom_LibJsCommon/js/unique ]
+            - [ requireJs, bootstrap, @FCom_LibJsCommon/js/bootstrap-3, { deps: [ jquery ] } ]
+#            - [ requireJs, bootstrap, @FCom_LibJsCommon/js/bootstrap-3.min, { deps: [ jquery ] } ]
+            - [ requireJs, fcom.password, @FCom_Core/js/fcom/fcom.password ]
+            - [ requireJs, fcom.ipmode, @FCom_Core/js/fcom/fcom.ipmode ]
+            - [ requireJs, fcom.validate.ext, @FCom_Core/js/fcom/fcom.validate.ext ]
+            - [ requireJs, fcom.locale, @FCom_Core/js/fcom/fcom.locale ]
+
+            - [ requireJs, jquery.bootstrap-growl, @FCom_LibJsCommon/js/jquery.bootstrap-growl.min, { deps: [ jquery, bootstrap ] } ]
+
+            #- [ js_raw, require_config, { content: "requirejs.config({ urlArgs: 'bust='+(new Date()).getTime() })" } ]
+            #- [ requireModulePath, FCom_Core ]
+            #- [ requireJs, jquery.tools, @FCom_LibJsCommon/js/jquery.tools.min, { deps: [ jquery ] } ]
+            - [ css, @FCom_LibJsCommon/js/css/ngprogress.css ]
+
+lib_visualsearch:
+    - view: head
+        do:
+            - [ css, @FCom_LibJsCommon/js/css/visualsearch.min.css ]
+            - [ requireJs, visualsearch, @FCom_LibJsCommon/js/visualsearch.min, { deps: [ backbone ] } ]
+
+lib_tokeninput:
+    - view: head
+        do:
+            - [ css, @FCom_LibJsCommon/js/css/token-input.css ]
+            - [ css, @FCom_LibJsCommon/js/css/token-input-facebook.css ]
+            - [ requireJs, jquery.tokeninput, @FCom_LibJsCommon/js/jquery.tokeninput, { deps: [ jquery ] } ]
+

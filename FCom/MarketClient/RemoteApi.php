@@ -36,12 +36,12 @@ final class FCom_MarketClient_RemoteApi extends BClass
 
     public function getModulesVersions($modules, $resetCache = false)
     {
-
-        if (true === $modules && !$resetCache) {
-            $result = BCache::i()->load(static::$_modulesVersionsCacheKey);
-            if ($result) {
-                return $result;
-            }
+        $result = BCache::i()->load(static::$_modulesVersionsCacheKey);
+        if ($result && true === $modules && !$resetCache) {
+            return $result;
+        }
+        if (!$result) {
+            $result = array();
         }
 
         if (true === $modules) {
@@ -55,8 +55,21 @@ final class FCom_MarketClient_RemoteApi extends BClass
         ));
         $response = BUtil::remoteHttp("GET", $url);
 #echo "<pre>"; var_dump($response); exit;
-        $result = BUtil::fromJson($response);
-
+        $modResult = BUtil::fromJson($response);
+        if (!empty($modResult['error'])) {
+            BCache::i()->delete(static::$_modulesVersionsCacheKey);
+            throw new BException($modResult['message']);
+        }
+        $result = BUtil::arrayMerge($result, $modResult['modules']);
+        foreach ($result as $modName => &$mod) {
+            $mod['name'] = $modName;
+            if (!empty($mod['status']) && $mod['status'] === 'mine') {
+                $localMod = BApp::m($modName);
+                $remChannelVer = $mod['channels'][$localMod->channel]['version_uploaded'];
+                $mod['can_update'] = version_compare($remChannelVer, $localMod->version, '>');
+            }
+        }
+        unset($mod);
         if (!empty($result)) {
             BCache::i()->save(static::$_modulesVersionsCacheKey, $result, 86400);
         }
@@ -70,7 +83,25 @@ final class FCom_MarketClient_RemoteApi extends BClass
             'mod_name' => $modules,
         ));
         $response = BUtil::remoteHttp("GET", $url);
-        return BUtil::fromJson($response);
+#var_dump($response); exit;
+        $result = BUtil::fromJson($response);
+        if (!empty($result['error'])) {
+            throw new BException($result['message']);
+        }
+        $modules = $result['modules'];
+        foreach ($modules as $modName => &$modInfo) {
+            $localMod = BApp::m($modName);
+            if ($modInfo['status']==='dependency' && $localMod) {
+                if (version_compare($localMod->version, $modInfo['version'], '<')) {
+                    $modInfo['status'] = 'upgrade';
+                } else {
+                    #unset($result[$modName]);
+                    $modInfo['status'] = 'latest';
+                }
+            }
+        }
+        unset($modInfo);
+        return $modules;
     }
 
     public function createModule($modName)
@@ -88,6 +119,9 @@ final class FCom_MarketClient_RemoteApi extends BClass
     public function uploadPackage($moduleName)
     {
         $mod = BModuleRegistry::i()->module($moduleName);
+        if (!$mod) {
+            return array('error' => true, 'message' => 'Invalid package: '.$moduleName);
+        }
         $packageDir = BConfig::i()->get('fs/storage_dir') . '/marketclient/upload';
         BUtil::ensureDir($packageDir);
         $packageFilename = "{$packageDir}/{$moduleName}-{$mod->version}.zip";
@@ -101,6 +135,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
             'package_zip' => '@'.$packageFilename,
         );
         $response = BUtil::remoteHttp('POST', $url, $data);
+#echo "<pre>"; var_dump($response); exit;
         BCache::i()->delete(static::$_modulesVersionsCacheKey);
         return BUtil::fromJson($response);
     }
