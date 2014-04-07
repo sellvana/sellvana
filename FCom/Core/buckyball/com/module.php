@@ -505,7 +505,7 @@ class BModuleRegistry extends BClass
             if ($mod->load_after && is_array($mod->load_after)) {
                 foreach ($mod->load_after as $n) {
                     if (empty($modules[$n])) {
-                        BDebug::notice('Invalid module name specified: '.$n);
+                        BDebug::debug('Invalid module name specified in load_after: '.$n);
                         continue;
                     }
                     $mod->parents[] = $n;
