@@ -393,6 +393,7 @@ class BModuleRegistry extends BClass
     public function propagateRequireErrors($mod)
     {
         //$mod->action = !empty($dep['action']) ? $dep['action'] : 'error';
+        BDebug::debug('Module dependency unmet for '.$mod->name.': '.print_r($mod->errors, 1));
         $mod->run_status = BModule::ERROR;
         $mod->errors_propagated = true;
         foreach ($mod->children as $childName) {
