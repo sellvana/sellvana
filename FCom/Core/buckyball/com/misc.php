@@ -2279,8 +2279,9 @@ class BDebug extends BClass
 
     public static function exceptionHandler($e)
     {
+#echo "<pre>"; print_r($e); exit;
         //static::trigger($e->getCode(), $e->getMessage(), $e->stackPop+1);
-        static::trigger(static::ERROR, $e);
+        static::trigger(static::ERROR, $e, 1, true);
     }
 
     public static function shutdownHandler()
@@ -2351,7 +2352,7 @@ class BDebug extends BClass
         }
     }
 
-    public static function trigger($level, $msg, $stackPop=0)
+    public static function trigger($level, $msg, $stackPop=0, $backtrace=false)
     {
         if ($level !== static::DEBUG) {
             static::$_collectedErrors[$level][] = $msg;
@@ -2359,6 +2360,7 @@ class BDebug extends BClass
         if (is_scalar($msg)) {
             $e = array('msg'=>$msg);
         } elseif (is_object($msg) && $msg instanceof Exception) {
+            $bt = $msg->getTrace();
             $e = array('msg'=>$msg->getMessage());
         } elseif (is_array($msg)) {
             $e = $msg;
@@ -2367,7 +2369,9 @@ class BDebug extends BClass
         }
 
         //$stackPop++;
-        $bt = debug_backtrace(true);
+        if (empty($bt)) {
+            $bt = debug_backtrace(true);
+        }
         $e['level'] = static::$_levelLabels[$level];
         if (isset($bt[$stackPop]['file'])) $e['file'] = $bt[$stackPop]['file'];
         if (isset($bt[$stackPop]['line'])) $e['line'] = $bt[$stackPop]['line'];
@@ -2380,9 +2384,13 @@ class BDebug extends BClass
         $e['c'] = null;
         $e['mem'] = memory_get_usage();
 
-        if (!empty(static::$_verboseBacktrace[$e['msg']])) {
+        if ($backtrace || !empty(static::$_verboseBacktrace[$e['msg']])) {
             foreach ($bt as $t) {
-                $e['msg'] .= "\n".$t['file'].':'.$t['line'];
+                if (!empty($t['file'])) {
+                    $e['msg'] .= "\n".$t['file'].':'.$t['line'];
+                } elseif (!empty($t['class'])) {
+                    $e['msg'] .= "\n".$t['class'].$t['type'].$t['function'];
+                }
             }
         }
 
@@ -2460,34 +2468,40 @@ class BDebug extends BClass
         return isset($id) ? $id : null;
     }
 
-    public static function alert($msg, $stackPop=0)
+    public static function alert($msg, $stackPop=0, $backtrace=false)
     {
         return static::trigger(static::ALERT, $msg, $stackPop+1);
     }
 
-    public static function critical($msg, $stackPop=0)
+    public static function critical($msg, $stackPop=0, $backtrace=false)
     {
         return static::trigger(static::CRITICAL, $msg, $stackPop+1);
     }
 
-    public static function error($msg, $stackPop=0)
+    public static function error($msg, $stackPop=0, $backtrace=false)
     {
         return static::trigger(static::ERROR, $msg, $stackPop+1);
     }
 
-    public static function warning($msg, $stackPop=0)
+    public static function warning($msg, $stackPop=0, $backtrace=false)
     {
         return static::trigger(static::WARNING, $msg, $stackPop+1);
     }
 
-    public static function notice($msg, $stackPop=0)
+    public static function notice($msg, $stackPop=0, $backtrace=false)
     {
         return static::trigger(static::NOTICE, $msg, $stackPop+1);
     }
 
-    public static function info($msg, $stackPop=0)
+    public static function info($msg, $stackPop=0, $backtrace=false)
     {
         return static::trigger(static::INFO, $msg, $stackPop+1);
+    }
+
+    public static function debug($msg, $stackPop=0, $backtrace=false)
+    {
+        if ('DEBUG'!==static::$_mode) return; // to speed things up
+        return static::trigger(static::DEBUG, $msg, $stackPop+1);
     }
 
     static public function getCollectedErrors($type=self::ERROR)
@@ -2495,12 +2509,6 @@ class BDebug extends BClass
         if (!empty(static::$_collectedErrors[$type])) {
             return static::$_collectedErrors[$type];
         }
-    }
-
-    public static function debug($msg, $stackPop=0)
-    {
-        if ('DEBUG'!==static::$_mode) return; // to speed things up
-        return static::trigger(static::DEBUG, $msg, $stackPop+1);
     }
 
     public static function profile($id)

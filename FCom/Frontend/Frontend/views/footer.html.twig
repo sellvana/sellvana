@@ -22,7 +22,8 @@
         <dd><a href="#">Shipping Policy</a></dd>
         <dd><a href="#">Help</a></dd>
       </dl>
-      <form class="col-md-3 col-sm-3 f-mini-newsletter" role="form" action="{{ APP.href('email/subscribe') }}">
+      <form class="col-md-3 col-sm-3 f-mini-newsletter" role="form" action="{{ APP.href('email/subscribe') }}" method="post">
+        <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
         <div class="form-group">
           <label for="newsletter-email" class="f-col-title">{{ "Subscribe to our newsletter"|_ }}</label>
           <input type="email" name="email" class="form-control required" id="newsletter-email" placeholder="Enter your email">

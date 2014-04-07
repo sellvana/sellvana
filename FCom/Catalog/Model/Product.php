@@ -245,27 +245,33 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         //$key = $this->manuf()->manuf_name.'-'.$this->local_sku.'-'.$this->product_name;
         $key = $this->product_name;
-        $url_key = BLocale::transliterate( $key );
+        $urlKey = BLocale::transliterate( $key );
         $t = static::$_table;
-        $count_sql = "SELECT COUNT(*) from {$t} WHERE url_key=?";
-        $result = $this->orm()->raw_query( $count_sql, array( $url_key ) );
-        if ( $result->find_one() ) {
-            $match_sql        = "SELECT url_key FROM {$t} WHERE url_key LIKE ?";
-            $result           = $this->orm()->raw_query( $match_sql, array( $url_key . '%' ) )->find_many();
-            $similar_url_keys = array();
+        $existsSql = "SELECT COUNT(*) as cnt from {$t} WHERE url_key=?";
+        if ($this->id()) {
+            $existsSql .= ' and id!='.(int)$this->id();
+        }
+        $exists = $this->orm()->raw_query( $existsSql, array( $urlKey ) )->find_one();
+        if ( $exists && $exists->cnt > 0 ) {
+            $matchSql        = "SELECT url_key FROM {$t} WHERE url_key LIKE ?";
+            if ($this->id()) {
+                $matchSql .= ' and id!='.(int)$this->id();
+            }
+            $result           = $this->orm()->raw_query( $matchSql, array( $urlKey . '%' ) )->find_many();
+            $similarUrlKeys = array();
             foreach ( $result as $row ) {
-                $similar_url_keys[ $row->get( 'url_key' ) ] = 1;
+                $similarUrlKeys[ $row->get( 'url_key' ) ] = 1;
             }
 
             for ( $i = 1; $i < 1001; $i++ ) {
-                $tmp = $url_key . '-' . $i;
-                if ( !isset( $similar_url_keys[ $tmp ] ) ) {
-                    $url_key = $tmp;
+                $tmp = $urlKey . '-' . $i;
+                if ( !isset( $similarUrlKeys[ $tmp ] ) ) {
+                    $urlKey = $tmp;
                     break;
                 }
             }
         }
-        $this->set('url_key', $url_key );
+        $this->set('url_key', $urlKey );
         return $this;
     }
 

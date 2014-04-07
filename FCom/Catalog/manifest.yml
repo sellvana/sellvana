@@ -10,7 +10,6 @@ modules:
 
         areas:
             FCom_Admin:
-                require: { module: { FCom_Admin: 0.1.0 } }
                 routing:
                     - [ /catalog/categories, FCom_Catalog_Admin_Controller_Categories.index ]
                     - [ /catalog/categories/.action, FCom_Catalog_Admin_Controller_Categories ]
@@ -27,7 +26,6 @@ modules:
                             POST/model/description: *
 
             FCom_Frontend:
-                require: { module: { FCom_Frontend: 0.1.0 } }
                 routing:
                     - [ /*category, FCom_Catalog_Frontend_Controller_Search.category ]
                     - [ /catalog/search, FCom_Catalog_Frontend_Controller_Search.search ]

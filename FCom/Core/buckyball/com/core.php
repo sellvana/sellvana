@@ -218,7 +218,6 @@ class BApp extends BClass
         // bootstrap modules
         BModuleRegistry::i()->bootstrap();
 
-
         // run module migration scripts if necessary
         BMigrate::i()->migrateModules(true);
 
@@ -330,6 +329,39 @@ class BApp extends BClass
     {
         return BApp::baseUrl( $full, $method )
                . BRouting::processHref( $url );
+    }
+
+    public static function adminHref($url = '')
+    {
+        static $baseAdminHref;
+        if (!$baseAdminHref) {
+            $conf = BConfig::i();
+            $r = BRequest::i();
+            $adminHref = $conf->get('web/admin_href');
+            if (!$adminHref) {
+                $adminHref = rtrim(BConfig::i()->get('web/base_store'), '/') . '/admin/index.php';
+                $conf->set('web/admin_href', $adminHref);
+            }
+            if (!BUtil::isUrlFull($adminHref)) {
+                $adminHref = $r->scheme() . '://' . $r->httpHost() . $adminHref;
+            }
+            $baseAdminHref = rtrim($adminHref, '/') . '/';
+        }
+        return $baseAdminHref . ltrim($url, '/');
+    }
+
+    public static function frontendHref($url = '')
+    {
+        static $baseStoreHref;
+        if (!$baseStoreHref) {
+            $r = BRequest::i();
+            $storeHref = BConfig::i()->get('web/base_store');
+            if (!BUtil::isUrlFull($storeHref)) {
+                $storeHref = $r->scheme() . '://' . $r->httpHost() . $storeHref;
+            }
+            $baseStoreHref = rtrim($storeHref, '/') . '/';
+        }
+        return $baseStoreHref . ltrim($url, '/');
     }
 
     /**

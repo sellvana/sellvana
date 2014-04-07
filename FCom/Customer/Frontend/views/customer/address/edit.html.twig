@@ -10,6 +10,7 @@
         </header>
           {{ THIS.view('core/messages') | raw }}
         <form action="{{ APP.href('customer/address/edit') }}{{ address.get('id') ? '?id=' ~ address.get('id') : ''}}" method="post" class="address-form" id="address-form">
+          <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
           {#{% if address.get('id') %}
           <input type="hidden" name="id" value="{{ address.get('id') }}">
           {% endif %}#}

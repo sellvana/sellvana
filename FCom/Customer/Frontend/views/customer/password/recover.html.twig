@@ -2,6 +2,7 @@
   <div class="container">
     {{ THIS.view('core/messages') | raw }}
     <form action="{{ APP.href('customer/password/recover') }}" method="post" id="recovery-form" role="form">
+      <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
       <fieldset class="f-authentification-form">
         <header class="f-page-header">
           <h1 class="f-page-title">{{ 'Password Help' |_ }}</h1>

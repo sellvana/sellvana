@@ -9,6 +9,7 @@
         </header>
         {{ THIS.view('core/messages') | raw }}
         <form action="{{ APP.href('customer/myaccount/edit') }}" method="post" id="edit-form" role="form">
+          <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
           <fieldset>
             <div class="row">
               <div class="form-group col-md-6">

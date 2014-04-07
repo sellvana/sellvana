@@ -418,6 +418,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         if (!isset($grid['config']['filters']) && !empty($persGrid['filters'])) {
             $grid['config']['filters'] = array();
         }
+
         if (isset($grid['config']['filters'])) {
             foreach ($grid['config']['filters'] as $filter) {
                 if (!empty($filter['field']) && !empty($persGrid['filters'][$filter['field']])) {
@@ -471,6 +472,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $config = $grid['config'];
         $config['data'] = $this->getPageRowsData();
         $config['personalize_url'] = BApp::href('my_account/personalize');
+
         return $config;
     }
 
@@ -483,7 +485,22 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             throw new BException('Either ORM or data is required');
         }
         if (isset($config['data']) && !empty($config['data'])) {
-            $grid['result']['state'] = array(); //todo: add pagination for reserved data
+            $gridId = $config['id'];
+            $pers = FCom_Admin_Model_User::i()->personalize();
+            $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
+
+            //param 'q' is needed?
+            $params = array("p", "ps", "s", "sd"/*,"q"*/);
+
+            foreach($params as $p) {
+                $persState[$p] = isset($persState[$p]) ? $persState[$p] :
+                                    ( (isset($config['state']) && isset($config['state'][$p])) ? $config['state'][$p] : null);
+            }
+
+            $persState['p'] = isset($persState['p']) ? $persState['p'] : 1;
+            $persState['ps'] = isset($persState['ps']) ? $persState['ps'] : 10;
+            $grid['result']['state'] = $persState;
+
             $grid['result']['rows'] = $config['data'];
         } elseif (!empty($config['orm'])) {
             $orm = $config['orm'];
