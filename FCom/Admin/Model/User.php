@@ -78,7 +78,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         parent::onAfterSave();
 
         if ($this->id()===static::sessionUserId()) {
-            BSession::i()->data('admin_user', serialize($this));
+            BSession::i()->set('admin_user', serialize($this));
             static::$_sessionUser = $this;
         }
     }
@@ -98,7 +98,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         }
         $password = $data[$args['field']];
         if(strlen($password) > 0 && !preg_match('/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/', $password)) {
-            return 'Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.';
+            return BLocale::_('Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.');
         }
         return true;
     }
@@ -128,7 +128,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     static public function sessionUser($reset=false)
     {
         if ($reset || !static::$_sessionUser) {
-            $data = BSession::i()->data('admin_user');
+            $data = BSession::i()->get('admin_user');
             if (is_string($data)) {
                 static::$_sessionUser = $data ? unserialize($data) : false;
             } else {
@@ -185,7 +185,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     {
         $this->set('last_login', BDb::now())->save();
 
-        BSession::i()->data('admin_user', serialize($this));
+        BSession::i()->set('admin_user', serialize($this));
         static::$_sessionUser = $this;
 
         if ($this->get('locale')) {
@@ -202,7 +202,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     static public function logout()
     {
         BEvents::i()->fire(__METHOD__);
-        BSession::i()->data('admin_user', null);
+        BSession::i()->set('admin_user', null);
         static::$_sessionUser = null;
     }
 
@@ -233,9 +233,9 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function thumb($w, $h=null)
     {
         return BUtil::gravatar($this->get('email'));
-        return FCom_Core_Main::i()->resizeUrl().http_build_query(array(
-            'f' => $this->thumb_url,
-        ));
+//        return FCom_Core_Main::i()->resizeUrl().http_build_query(array(
+//            'f' => $this->thumb_url,
+//        ));
     }
 
     /**

@@ -317,12 +317,7 @@
          * Magic getter method, allows $model->property access to data.
          */
         public function __get($property) {
-#$bt = debug_backtrace(); BDebug::log('__get: '.$bt[0]['file'].':'.$bt[0]['line']);
-if (!is_object($this->orm)) {
-    echo "Calling __get() without \$orm setup: ";
-    echo "<pre>"; debug_print_backtrace(); echo "</pre>";
-}
-//if (memory_get_usage()>500000000) { echo "<pre>"; debug_print_backtrace(); echo "</pre>"; }
+if (!is_object($this->orm)) BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);
             return $this->orm->get($property);
         }
 
@@ -330,11 +325,7 @@ if (!is_object($this->orm)) {
          * Magic setter method, allows $model->property = 'value' access to data.
          */
         public function __set($property, $value) {
-#$bt = debug_backtrace(); BDebug::log('__set: '.$bt[0]['file'].':'.$bt[0]['line']);
-if (!is_object($this->orm)) {
-    echo "Calling __set() without \$orm setup: ";
-    echo "<pre>"; debug_print_backtrace(); echo "</pre>";
-}
+if (!is_object($this->orm)) BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);
             $this->orm->set($property, $value);
         }
 
@@ -342,7 +333,7 @@ if (!is_object($this->orm)) {
          * Magic isset method, allows isset($model->property) to work correctly.
          */
         public function __isset($property) {
-#$bt = debug_backtrace(); BDebug::log('__isset: '.$bt[0]['file'].':'.$bt[0]['line']);
+if (!is_object($this->orm)) BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);
             return $this->orm->__isset($property);
         }
 
@@ -350,11 +341,7 @@ if (!is_object($this->orm)) {
          * Getter method, allows $model->get('property') access to data
          */
         public function get($property) {
-if (!$this->orm) {
-    echo "Calling get() without \$orm setup: ";
-    echo "<pre>"; debug_print_backtrace(); echo "</pre>";
-    return null;
-}
+if (!is_object($this->orm)) BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);
             return $this->orm->get($property);
         }
 
@@ -362,10 +349,7 @@ if (!$this->orm) {
          * Setter method, allows $model->set('property', 'value') access to data.
          */
         public function set($property, $value) {
-if (!$this->orm) {
-    echo "Calling set() without \$orm setup: ";
-    echo "<pre>"; debug_print_backtrace(); echo "</pre>";
-}
+if (!is_object($this->orm)) BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);
             $this->orm->set($property, $value);
         }
 
@@ -373,6 +357,7 @@ if (!$this->orm) {
          * Check whether the given field has changed since the object was created or saved
          */
         public function is_dirty($property) {
+if (!is_object($this->orm)) BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);
             return $this->orm->is_dirty($property);
         }
 
@@ -380,10 +365,7 @@ if (!$this->orm) {
          * Wrapper for Idiorm's as_array method.
          */
         public function as_array() {
-if (!$this->orm) {
-    echo "Calling as_array() without \$orm setup: ";
-    echo "<pre>"; debug_print_backtrace(); echo "</pre>";
-}
+if (!is_object($this->orm)) BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);
             $args = func_get_args();
             return call_user_func_array(array($this->orm, 'as_array'), $args);
         }
@@ -392,6 +374,7 @@ if (!$this->orm) {
          * Save the data associated with this model instance to the database.
          */
         public function save() {
+if (!is_object($this->orm)) BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);
             return $this->orm->save();
         }
 
@@ -399,6 +382,7 @@ if (!$this->orm) {
          * Delete the database row associated with this model instance.
          */
         public function delete() {
+if (!is_object($this->orm)) BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);
             return $this->orm->delete();
         }
 
@@ -406,6 +390,7 @@ if (!$this->orm) {
          * Get the database ID of this model instance.
          */
         public function id() {
+if (!is_object($this->orm)) BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);
             return $this->orm->id();
         }
 
@@ -416,6 +401,7 @@ if (!$this->orm) {
          * do not match up with columns, the database will throw an error.
          */
         public function hydrate($data) {
+if (!is_object($this->orm)) BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);
             $this->orm->hydrate($data)->force_all_dirty();
         }
     }

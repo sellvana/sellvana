@@ -1,6 +1,7 @@
 {% set fKey = THIS.get('facet_key') %}
 {% set facet = THIS.get('facet') %}
 {% set facets = THIS.products_data['facets'] %}
+{% set prefix = APP.instance('FCom_Catalog_Model_Category').urlPrefix() %}
 {% set s = THIS.products_data['state'] %}
 {%  if facet['values'] %}
   <dt>{{ "Categories" | _ }}</dt>
@@ -11,9 +12,9 @@
         {%  if value['selected'] %}
           <strong>{{ value['display'] }}</strong>
         {% elseif value['parent'] %}
-          <strong><a href="{{ APP.href(vKey) ~ '?' ~ REQUEST.rawGet() }}">{{ value['display'] }}</a></strong>
+          <strong><a href="{{ APP.href(prefix ~ vKey) ~ '?' ~ REQUEST.rawGet() }}">{{ value['display'] }}</a></strong>
         {% else %}
-          <a href="{{ APP.href(vKey) ~ '?' ~ REQUEST.rawGet() }}">{{ value['display'] }}
+          <a href="{{ APP.href(prefix ~ vKey) ~ '?' ~ REQUEST.rawGet() }}">{{ value['display'] }}
             {{ (value['cnt'] ? '<span class="count">(' ~ value['cnt'] ~ ')</span>') | raw }}</a>
         {% endif %}
       </li>

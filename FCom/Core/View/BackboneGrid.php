@@ -175,20 +175,20 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 $col['name'] = $cId;
             }
 
-			if ($cId === 0) {
-				$col['cssClass'] = 'select-row';
-				$col['edit'] = 'inline';
-			}
+            if ($cId === 0) {
+                $col['cssClass'] = 'select-row';
+                $col['edit'] = 'inline';
+            }
 
-			if (empty($col['type'])) {
-				continue;
-			}
-			switch($col['type']) {
-				case 'multiselect':
-					$col['width'] = 50;
+            if (empty($col['type'])) {
+                continue;
+            }
+            switch($col['type']) {
+                case 'multiselect':
+                    $col['width'] = 50;
                     $col['no_reorder'] = true;
 
-					break;
+                    break;
                 case 'input':
                     /*if (!empty($col['editor']) && $col['editor'] === 'select' && !empty($col['options'])) {
 
@@ -207,54 +207,52 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
 
                     break;
-				case 'btn_group':
+                case 'btn_group':
                     $col['label'] = 'Actions';
                     $col['name'] = 'btn_group';
                     $col['sortable'] = false;
-					foreach($col['buttons'] as $bId=>&$btn) {
-						switch($btn['name']) {
-							case 'edit':
-								if (empty($btn['icon'])) {
+                    foreach($col['buttons'] as $bId=>&$btn) {
+                        if(empty($btn['col'])) {
+                            $btn['col'] = 'id';
+                        }
+
+                        switch($btn['name']) {
+                            case 'edit':
+                                if (empty($btn['icon'])) {
                                     $btn['icon'] = ' icon-edit-sign';
                                 }
+                                if (!empty($grid['config']['form_url']) && empty($btn['href'])) {
+                                    $btn['href'] = $grid['config']['form_url'].'?'.$btn['col'].'=';
+                                }
+                                $btn['cssClass'] = ' btn-xs btn-edit ';
+                                break;
 
-								$btn['cssClass'] = ' btn-xs btn-edit ';
-								if (!empty($btn['href'])) {
-									$btn['type'] = 'link';
+                            case 'delete':
+                                $btn['icon'] = 'icon-remove';
+                                $btn['cssClass'] = 'btn-delete ';
+                                if(!empty($btn['noconfirm']) && $btn['noconfirm']) {
+                                    $btn['cssClass'] .= 'noconfirm';
+                                }
+                                break;
+                        }
 
-									if(empty($btn['col'])) {
-										$btn['col']= 'id';
-									}
-								}
+                        if (!empty($btn['href'])) {
+                            $btn['type'] = 'link';
+                            if (!BUtil::isUrlFull($btn['href'])) {
+                                $btn['href'] = BApp::href($btn['href']);
+                            }
+                        }
 
-								break;
-							case 'custom':
-								$btn['cssClass'] = 'btn-custom';
-
-								break;
-							/*case 'edit_inline':
-								$col['icon'] = 'icon-pencil';
-
-								break;*/
-							case 'delete':
-								$btn['icon'] = 'icon-remove';
-								$btn['cssClass'] = 'btn-delete ';
-								if(!empty($btn['noconfirm']) && $btn['noconfirm']) {
-									$btn['cssClass'] .= 'noconfirm';
-								}
-								break;
-						}
-
-						//TODO: Is it really necessary not to have default icon when button has caption?
-						if (!empty($btn['caption'])) {
-							$btn['icon'] = '';
-						}
-					}
+                        //TODO: Is it really necessary not to have default icon when button has caption?
+                        if (!empty($btn['caption'])) {
+                            $btn['icon'] = '';
+                        }
+                    }
 
 
-					break;
+                    break;
 
-			}
+            }
             /*$col['position'] = ++$pos;
             switch ($cId) {
                 case '_multiselect':
@@ -308,7 +306,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 switch ($k) {
                     case 'refresh':
                         $action = array('html'=>BUtil::tagHtml('a',
-                            array('href'=>BRequest::currentUrl(), 'class'=>'js-change-url grid-refresh btn'),
+                            array('href'=>'#', 'class'=>'js-change-url grid-refresh btn'),
                             isset($action['caption']) ? $action['caption'] : BLocale::_('Refresh')
                         ));
                         break;
@@ -420,6 +418,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         if (!isset($grid['config']['filters']) && !empty($persGrid['filters'])) {
             $grid['config']['filters'] = array();
         }
+
         if (isset($grid['config']['filters'])) {
             foreach ($grid['config']['filters'] as $filter) {
                 if (!empty($filter['field']) && !empty($persGrid['filters'][$filter['field']])) {
@@ -469,14 +468,15 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     public function getGridConfig()
     {
         $grid = $this->getGrid();
-        $data = $this->getGridData(); // initialize data
+        $data = $this->getGridConfigData(); // initialize data
         $config = $grid['config'];
         $config['data'] = $this->getPageRowsData();
         $config['personalize_url'] = BApp::href('my_account/personalize');
+
         return $config;
     }
 
-    public function getGridData(array $options=array())
+    public function getGridConfigData(array $options=array())
     {
         // fetch grid configuration
         $grid = $this->getGrid();
@@ -485,7 +485,22 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             throw new BException('Either ORM or data is required');
         }
         if (isset($config['data']) && !empty($config['data'])) {
-            $grid['result']['state'] = array(); //todo: add pagination for reserved data
+            $gridId = $config['id'];
+            $pers = FCom_Admin_Model_User::i()->personalize();
+            $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
+
+            //param 'q' is needed?
+            $params = array("p", "ps", "s", "sd"/*,"q"*/);
+
+            foreach($params as $p) {
+                $persState[$p] = isset($persState[$p]) ? $persState[$p] :
+                                    ( (isset($config['state']) && isset($config['state'][$p])) ? $config['state'][$p] : null);
+            }
+
+            $persState['p'] = isset($persState['p']) ? $persState['p'] : 1;
+            $persState['ps'] = isset($persState['ps']) ? $persState['ps'] : 10;
+            $grid['result']['state'] = $persState;
+
             $grid['result']['rows'] = $config['data'];
         } elseif (!empty($config['orm'])) {
             $orm = $config['orm'];
@@ -498,18 +513,10 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $gridId = $config['id'];
             $pers = FCom_Admin_Model_User::i()->personalize();
             $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : array();
+            $persFilters = !empty($persState['filters']) ? $persState['filters'] : array();
             $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');
 
-            $filters = array();
-            if (!empty($config['filters'])) {
-                foreach ($config['filters'] as $k => $v) {
-                    if (isset($v['field'])) {
-                        $filters[$v['field']] = $v;
-
-                    }
-                }
-            }
-            $this->_processGridFilters($config, $filters, $orm);
+            $this->_processGridFilters($config, $persFilters, $orm);
 
             $config['state'] = $persState;
 
@@ -686,7 +693,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         return $out;
     }
 
-    public function outputData($export = false)
+    public function generateOutputData($export = false)
     {
         $grid = $this->get('grid');
         $config = $grid['config'];
@@ -749,7 +756,6 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             }
         }
 
-        $persFilters = !empty($pers['grid'][$gridId]['filters']) ? $pers['grid'][$gridId]['filters'] : array();
         $filters = $r['filters'];
         $persData = array('grid' => array($gridId => array('state' => $r, 'filters' => $filters)));
         FCom_Admin_Model_User::i()->personalize($persData);
@@ -764,6 +770,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 //print_r($r); exit;
         //$r = array_replace_recursive($hash, $r);
 
+
         if (!empty($filters)) {
             $this->_processGridFilters($config, $filters, $orm);
         }
@@ -777,7 +784,6 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $r['p'] = 1;
             $r['ps'] = 1000000;
         }
-
         $data = $orm->paginate($r);
 
 
@@ -870,137 +876,131 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $where = isset($j['where']) ? str_replace(array('{lk}', '{fk}', '{lt}', '{ft}'), array($localKey, $foreignKey, $mainTableAlias, $tableAlias), $j['where']) : array($foreignKey, $op, $localKey);
 
             $orm->$joinMethod($table, $where, $tableAlias);
-
-            /*
-            if (!empty($j['select'])) {
-                list($localTable, ) = explode('.', $localKey);
-                foreach ($j['select'] as $jm) {
-                    $fieldAlias = !empty($jm['alias']) ? $jm['alias'] : null;
-                    if (isset($jm['field'])) {
-                        $orm->select($tableAlias.'.'.$jm['field'], $fieldAlias);
-                    } elseif (isset($jm['expr'])) {
-                        $expr = str_replace(array('{lt}', '{ft}'), array($localTable, $tableAlias), $jm['expr']);
-                        $orm->select_expr($expr, $fieldAlias);
-                    }
-                }
-            }
-
-            if (!empty($j['where'])) {
-                $orm->where_raw($j['where'][0], $j['where'][1]);
-            }
-            */
         }
     }
 
     protected function _processGridFilters(&$config, $filters, $orm)
     {
-        if (empty($config['filters'])) {
-            return;
-        }
-        $columnData = $this->findColumnDataForFilters($config);
-        foreach ($config['filters'] as $fId=>$f) {
-            $f['field'] = !empty($f['field']) ? $f['field'] : $fId;
-            if ($fId === '_quick') {
-                if (!empty($f['expr']) && !empty($f['args']) && !empty($filters[$fId])) {
-                    $args = array();
-                    foreach ($f['args'] as $a) {
-                        $args[] = str_replace('?', $filters['_quick'], $a);
+        if (!empty($config['filters'])) {
+            $indexes = BUtil::arraySeqToMap($config['columns'], 'name', 'index');
+            foreach ($filters as $fId => &$f) {
+                if (is_array($f)) {
+                    $f['field'] = !empty($f['field']) ? $f['field'] : $fId;
+                    if (!empty($indexes[$f['field']])) {
+                        $f['field'] = $indexes[$f['field']];
                     }
-                    $orm->where_raw('('.$config['filters']['_quick']['expr'].')', $args);
                 }
+            }
+            unset($f);
+            foreach ($config['filters'] as $fId => $f) {
+                if ($fId === '_quick') {
+                    if (!empty($f['expr']) && !empty($f['args']) && !empty($filters[$fId])) {
+                        $args = array();
+                        foreach ($f['args'] as $a) {
+                            $args[] = str_replace('?', $filters['_quick'], $a);
+                        }
+                        $orm->where_raw('('.$config['filters']['_quick']['expr'].')', $args);
+                    }
+                    break;
+                }
+            }
+        }
+        foreach ($filters as $fId => $f) {
+            if ($fId === '_quick'
+                || !is_array($f)
+                || empty($f['type'])
+                || !isset($f['val'])
+                || $f['val'] === ''
+                || (empty($f['val']) && $f['val'] !== 0)
+            ) {
                 continue;
             }
-            $fId = $f['field'];
 
-            if (isset($filters[$fId]) && !empty($f['type']) && isset($filters[$fId]['val']) && (!empty($filters[$fId]['val']) || $filters[$fId]['val'] == 0) && $filters[$fId]['val'] !== '') {
-                if (isset($columnData[$f['field']]['index'])){
-                    $f['field'] = $columnData[$f['field']]['index'];
-                }
-                switch ($f['type']) {
-                    case 'text':
-                        $val = $filters[$fId];
-                        if (!empty($filters[$fId])) {
-                            $val = $filters[$fId]['val'];
-                            switch ($filters[$fId]['op']) {
-                                case 'start'://start with
-                                    $val = $val.'%';
-                                    $op = 'like';
-                                    break;
-                                case 'end'://end with
-                                    $val = '%'.$val;
-                                    $op = 'like';
-                                    break;
-                                case 'contains'://contain
-                                    $val = '%'.$val.'%';
-                                    $op = 'like';
-                                    break;
-                                case 'equal'://equal to
-                                    $op = 'like';
-                                    break;
-                                case 'not'://does not contain
-                                    $val = '%'.$val.'%';
-                                    $op = 'not_like';
-                                    break;
-                            }
-                            $this->_processGridFiltersOne($f, $op, $val, $orm);
-                        }
-                        break;
-                    case 'date-range': case 'number-range':
-                        $val = $filters[$fId]['val'];
-                        $temp = explode('~', $val);
-                        if (!empty($filters[$fId])) {
-                            switch ($filters[$fId]['op']) {
-                                case 'between':
-                                    $this->_processGridFiltersOne($f, 'gte', $temp[0], $orm);
-                                    if (isset($temp[1])) {
-                                        $this->_processGridFiltersOne($f, 'lte', $temp[1], $orm);
-                                    }
-
-                                    break;
-                                case 'from':
-                                    $this->_processGridFiltersOne($f, 'gte', $val, $orm);
-
-                                    break;
-                                case 'to':
-                                    $this->_processGridFiltersOne($f, 'lte', $val, $orm);
-
-                                    break;
-                                case 'equal':
-                                    if ($f['type'] === 'date-range')
-                                        $this->_processGridFiltersOne($f, 'like', $val.'%', $orm);
-                                    else
-                                        $this->_processGridFiltersOne($f, 'equal', $val, $orm);
-
-                                    break;
-                                case 'not_in':
-                                    $orm->where_raw($f['field']. ' NOT BETWEEN ? and ?', array($temp[0], $temp[1]));
-
-                                    break;
-                            }
-                        }
-                        break;
-                    case 'number-range':
-
-                        if (!empty($filters[$fId]['from'])) {
-                            $this->_processGridFiltersOne($f, 'gte', $filters[$fId]['from'], $orm);
-                        }
-                        if (!empty($filters[$fId]['val'])) {
-                            $this->_processGridFiltersOne($f, 'lte', $filters[$fId]['val'], $orm);
-                        }
-                        break;
-
-                    case 'select':
-                            $this->_processGridFiltersOne($f, 'equal', $filters[$fId]['val'], $orm);
+            switch ($f['type']) {
+            case 'text':
+                $val = $filters[$fId];
+                if (!empty($filters[$fId])) {
+                    $val = $filters[$fId]['val'];
+                    switch ($filters[$fId]['op']) {
+                        case 'start'://start with
+                            $val = $val.'%';
+                            $op = 'like';
                             break;
-                    case 'multiselect':
-                            $vals = explode(',', $filters[$fId]['val']);
-                            $this->_processGridFiltersOne($f, 'in', $vals, $orm);
-
-                        break;
+                        case 'end'://end with
+                            $val = '%'.$val;
+                            $op = 'like';
+                            break;
+                        case 'contains'://contain
+                            $val = '%'.$val.'%';
+                            $op = 'like';
+                            break;
+                        case 'equal'://equal to
+                            $op = 'like';
+                            break;
+                        case 'not'://does not contain
+                            $val = '%'.$val.'%';
+                            $op = 'not_like';
+                            break;
                     }
+                    $this->_processGridFiltersOne($f, $op, $val, $orm);
+                }
+                break;
+
+            case 'date-range': case 'number-range':
+                $val = $filters[$fId]['val'];
+                $temp = explode('~', $val);
+                if (!empty($filters[$fId])) {
+                    switch ($filters[$fId]['op']) {
+                        case 'between':
+                            $this->_processGridFiltersOne($f, 'gte', $temp[0], $orm);
+                            if (isset($temp[1])) {
+                                $this->_processGridFiltersOne($f, 'lte', $temp[1], $orm);
+                            }
+
+                            break;
+                        case 'from':
+                            $this->_processGridFiltersOne($f, 'gte', $val, $orm);
+
+                            break;
+                        case 'to':
+                            $this->_processGridFiltersOne($f, 'lte', $val, $orm);
+
+                            break;
+                        case 'equal':
+                            if ($f['type'] === 'date-range')
+                                $this->_processGridFiltersOne($f, 'like', $val.'%', $orm);
+                            else
+                                $this->_processGridFiltersOne($f, 'equal', $val, $orm);
+
+                            break;
+                        case 'not_in':
+                            $orm->where_raw($f['field']. ' NOT BETWEEN ? and ?', array($temp[0], $temp[1]));
+
+                            break;
+                    }
+                }
+                break;
+
+            case 'number-range':
+
+                if (!empty($filters[$fId]['from'])) {
+                    $this->_processGridFiltersOne($f, 'gte', $filters[$fId]['from'], $orm);
+                }
+                if (!empty($filters[$fId]['val'])) {
+                    $this->_processGridFiltersOne($f, 'lte', $filters[$fId]['val'], $orm);
+                }
+                break;
+
+            case 'select':
+                    $this->_processGridFiltersOne($f, 'equal', $filters[$fId]['val'], $orm);
+                    break;
+
+            case 'multiselect':
+                    $vals = explode(',', $filters[$fId]['val']);
+                    $this->_processGridFiltersOne($f, 'in', $vals, $orm);
+                break;
             }
         }
-
     }
 
     protected function _processGridFiltersOne($filter, $op, $value, $orm)
@@ -1063,6 +1063,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         BUtil::ensureDir($dir);
         $filename = $dir.'/'.$this->grid['config']['id'].'.csv';
         $fp = fopen($filename, 'w');
+        fwrite($fp, "\xEF\xBB\xBF"); // add UTF8 BOM character to open excel.
         fputcsv($fp, $headers);
         /*$orm->iterate(function($row) use($columns, $fp) {
             if ($class) {
@@ -1096,20 +1097,4 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         fclose($fp);
         BResponse::i()->sendFile($filename);
     }
-
-    public function findColumnDataForFilters($config)
-    {
-        $filters = $config['filters'];
-        $columns = $config['columns'];
-        $data = array();
-        foreach ($filters as $filter) {
-            foreach ($columns as $column) {
-                if (isset($column['name']) && isset($filter['field']) && ($column['name'] == $filter['field'])) {
-                    $data[$filter['field']] = $column;
-                }
-            }
-        }
-        return $data;
-    }
-
 }

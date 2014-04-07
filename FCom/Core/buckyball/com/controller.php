@@ -38,6 +38,8 @@ class BRequest extends BClass
     */
     protected $_params = array();
 
+    protected $_postTagsWhitelist = array();
+
     /**
      * Shortcut to help with IDE autocompletion
      *
@@ -869,6 +871,49 @@ class BRequest extends BClass
         }
         return $modRewrite;
     }
+
+    public function addRequestFieldsWhitelist($whitelist)
+    {
+        foreach ((array)$whitelist as $urlPath => $fieldPaths) {
+            foreach ($fieldPaths as $fieldPath => $allowTags) {
+                if (is_numeric($fieldPath)) {
+                    $fieldPath = $allowTags;
+                    $allowTags = '*';
+                }
+                $this->_postTagsWhitelist[$urlPath][$fieldPath] = $allowTags;
+            }
+        }
+        return $this;
+    }
+
+    public function stripRequestFieldsTags()
+    {
+        static $alreadyStripped;
+        if ($alreadyStripped) {
+            return;
+        }
+        $data = array('GET' =>& $_GET, 'POST' =>& $_POST, 'REQUEST' =>& $_REQUEST, 'COOKIE' =>& $_COOKIE);
+        $this->stripTagsRecursive($data, static::rawPath());
+        $alreadyStripped = true;
+        return $this;
+    }
+
+    public function stripTagsRecursive(&$data, $forUrlPath, $curPath = null)
+    {
+        foreach ($data as $k => &$v) {
+            $childPath = is_null($curPath) ? $k : ($curPath . '/' . $k);
+            if (is_array($v)) {
+                $this->stripTagsRecursive($v,  $forUrlPath, $childPath);
+            } elseif (!empty($v) && !is_numeric($v)) {
+                if (empty($this->_postTagsWhitelist[$forUrlPath][$childPath])) {
+                    $v = strip_tags($v);
+                } elseif ('*' !== $this->_postTagsWhitelist[$forUrlPath][$childPath]) {
+                    $v = strip_tags($v, $this->_postTagsWhitelist[$forUrlPath][$childPath]);
+                }
+            }
+        }
+        unset($v);
+    }
 }
 
 /**
@@ -1021,22 +1066,6 @@ class BResponse extends BClass
         return $this;
     }
 
-    /**
-    * Set or retrieve response content MIME type
-    *
-    * @deprecated
-    * @param string $type
-    * @return BResponse|string
-    */
-    public function contentType($type=BNULL)
-    {
-        if (BNULL===$type) {
-            return $this->_contentType;
-        }
-        $this->_contentType = $type;
-        return $this;
-    }
-
     public function setContentType($type)
     {
         $this->_contentType = $type;
@@ -1048,22 +1077,6 @@ class BResponse extends BClass
         return $this->_contentType;
     }
 
-    /**
-    * Set or retrieve response content prefix string
-    *
-    * @deprecated
-    * @param string $string
-    * @return BResponse|string
-    */
-    public function contentPrefix($string=BNULL)
-    {
-        if (BNULL===$string) {
-            return $this->_contentPrefix;
-        }
-        $this->_contentPrefix = $string;
-        return $this;
-    }
-
     public function setContentPrefix($string)
     {
         $this->_contentPrefix = $string;
@@ -1073,22 +1086,6 @@ class BResponse extends BClass
     public function getContentPrefix()
     {
         return $this->_contentPrefix;
-    }
-
-    /**
-    * Set or retrieve response content suffix string
-    *
-    * @deprecated
-    * @param string $string
-    * @return BResponse|string
-    */
-    public function contentSuffix($string=BNULL)
-    {
-        if (BNULL===$string) {
-            return $this->_contentSuffix;
-        }
-        $this->_contentSuffix = $string;
-        return $this;
     }
 
     public function setContentSuffix($string)
@@ -1287,7 +1284,10 @@ class BResponse extends BClass
     {
         BSession::i()->close();
         $this->status($status, null, false);
-        if (!BUtil::isUrlFull($url)) {
+        if (true === $url) {
+            $referrer = BRequest::i()->referrer();
+            $url = $referrer ? $referrer : BRequest::i()->currentUrl();
+        } elseif (!BUtil::isUrlFull($url)) {
             $url = BApp::href($url);
         }
         header("Location: {$url}", null, $status);
@@ -2225,12 +2225,15 @@ class BActionController extends BClass
             $this->forward(false);
             return $this;
         }
-        try {
+
+        BRequest::i()->stripRequestFieldsTags();
+
+        // try {
             $this->$actionMethod($args);
-        } catch (Exception $e) {
+        // } catch (Exception $e) {
             //BDebug::exceptionHandler($e);
-            $this->sendError($e->getMessage());
-        }
+            // $this->sendError($e->getMessage());
+        // }
         return $this;
     }
 
@@ -2289,7 +2292,7 @@ class BActionController extends BClass
     */
     public function beforeDispatch()
     {
-        BEvents::i()->fire(__METHOD__);
+        BEvents::i()->fire(static::$_origClass.'::beforeDispatch');
         return true;
     }
 
@@ -2299,7 +2302,7 @@ class BActionController extends BClass
     */
     public function afterDispatch()
     {
-        BEvents::i()->fire(__METHOD__);
+        BEvents::i()->fire(static::$_origClass.'::afterDispatch');
     }
 
     /**

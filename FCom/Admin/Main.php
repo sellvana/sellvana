@@ -18,13 +18,11 @@ class FCom_Admin_Main extends BClass
 
     public static function href($url='')
     {
-        return BApp::href($url, 1, 2);
+        return BApp::adminHref($url);
     }
 
     public static function frontendHref($url='')
     {
-        $r = BRequest::i();
-        $href = $r->scheme().'://'.$r->httpHost().BConfig::i()->get('web/base_store');
-        return trim(rtrim($href, '/').'/'.ltrim($url, '/'), '/');
+        return BApp::frontendHref($url);
     }
 }

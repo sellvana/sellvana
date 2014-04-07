@@ -1,9 +1,5 @@
 <script>
 
-function runMigrationScripts() {
-    $('#form-modules').attr('action', '{{ APP.href("modules/migrate") }}').submit();
-}
-
 require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
     var moduleGrid = null;
 
@@ -71,25 +67,6 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
 });
 </script>
 
-<div class="f-admin-main-view">
-  <div class="page-header f-admin-page-header">
-    <h1 class="f-page-title">
-        <i class="icon-table"></i>
-        {{ "Modules" |_ }}
-    </h1>
-    <div class="btn-group">
-      <form id="form-modules" method="post">
-<!--          <button class="btn btn-success" type="button" onclick="location.href='{{APP.href('modules/market')}}'"><span>{{ 'Download new Modules'|_ }}</span></button>-->
-          <button class="btn btn-primary" type="button" onclick="return runMigrationScripts()"><span>{{ 'Run Migration Scripts'|_ }}</span></button>
-      </form>
-    </div>
-  </div>
-
-  <div class="f-admin-main">
-      {{ THIS.view('core/messages') | raw }}
-      {{ THIS.view('core/backbonegrid') | raw }}
-  </div>
-</div>
-
+{{ THIS.view('admin/grid') | raw }}
 
 

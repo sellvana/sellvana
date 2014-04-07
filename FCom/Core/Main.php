@@ -258,7 +258,7 @@ class FCom_Core_Main extends BClass
         }
 
         $this->initDebug();
-        $this->runConfigMigration();
+        #$this->runConfigMigration();
 
         $mode = BDebug::mode();
 
@@ -271,9 +271,9 @@ class FCom_Core_Main extends BClass
             $runLevels = array($area => 'REQUIRED');
         } else {
             $config->set('module_run_levels', array());
-            $runLevels = array('FCom_Install' => 'REQUIRED');
+            $runLevels = array('FCom_Install' => 'REQUIRED', 'FCom_LibTwig' => 'REQUESTED');
         }
-
+        BDebug::debug('AREA: '.$area.', MODE: '.$mode);
         if ('RECOVERY' === $mode) { // load manifests for RECOVERY mode
             $recoveryModules = BConfig::i()->get('recovery_modules/'.$area);
             if ($recoveryModules) {
@@ -310,10 +310,10 @@ class FCom_Core_Main extends BClass
             $modReg->deleteManifestCache();
         }
         if (!$manifestsLoaded) {
-            if (defined('BUCKYBALL_ROOT_DIR')) {
-                $this->_modulesDirs[] = BUCKYBALL_ROOT_DIR.'/plugins';
+            // if (defined('BUCKYBALL_ROOT_DIR')) {
+                // $this->_modulesDirs[] = BUCKYBALL_ROOT_DIR.'/plugins';
                 // if minified version used, need to load plugins manually
-            }
+            // }
             $this->_modulesDirs[] = $dirConf['storage_dir'].'/custom'; // Custom module
             $this->_modulesDirs[] = $dirConf['local_dir'].'/*/*'; // Local modules
             $this->_modulesDirs[] = $dirConf['dlc_dir'].'/*/*'; // Downloaded modules
@@ -478,9 +478,9 @@ class FCom_Core_Main extends BClass
         $s = BSession::i();
         $r = BRequest::i();
         if ($save) {
-            $s->data('lastNav', array($r->rawPath(), $r->get()));
+            $s->set('lastNav', array($r->rawPath(), $r->get()));
         } else {
-            $d = $s->data('lastNav');
+            $d = $s->get('lastNav');
             return BApp::href().($d ? $d[0].'?'.http_build_query((array)$d[1]) : '');
         }
     }

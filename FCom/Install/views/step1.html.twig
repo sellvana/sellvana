@@ -1,4 +1,4 @@
-{% set w = SESSION.data('w') %}
+{% set w = SESSION.get('w') %}
 
 <form method="post" action="{{APP.href('install/step1')}}" class="form-horizontal">
     <div class="panel-heading">

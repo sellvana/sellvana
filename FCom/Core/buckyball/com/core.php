@@ -21,8 +21,6 @@
 * @license http://www.apache.org/licenses/LICENSE-2.0.html
 */
 
-define('BNULL', '!@BNULL#$');
-
 /**
 * Base class that allows easy singleton/instance creation and method overrides (decorator)
 *
@@ -221,9 +219,7 @@ class BApp extends BClass
         BModuleRegistry::i()->bootstrap();
 
         // run module migration scripts if necessary
-        if (BConfig::i()->get('install_status')==='installed' && BConfig::i()->get('db/implicit_migration')) {
-            BMigrate::i()->migrateModules(true);
-        }
+        BMigrate::i()->migrateModules(true);
 
         // dispatch requested controller action
         BRouting::i()->dispatch();
@@ -333,6 +329,39 @@ class BApp extends BClass
     {
         return BApp::baseUrl( $full, $method )
                . BRouting::processHref( $url );
+    }
+
+    public static function adminHref($url = '')
+    {
+        static $baseAdminHref;
+        if (!$baseAdminHref) {
+            $conf = BConfig::i();
+            $r = BRequest::i();
+            $adminHref = $conf->get('web/admin_href');
+            if (!$adminHref) {
+                $adminHref = rtrim(BConfig::i()->get('web/base_store'), '/') . '/admin/index.php';
+                $conf->set('web/admin_href', $adminHref);
+            }
+            if (!BUtil::isUrlFull($adminHref)) {
+                $adminHref = $r->scheme() . '://' . $r->httpHost() . $adminHref;
+            }
+            $baseAdminHref = rtrim($adminHref, '/') . '/';
+        }
+        return $baseAdminHref . ltrim($url, '/');
+    }
+
+    public static function frontendHref($url = '')
+    {
+        static $baseStoreHref;
+        if (!$baseStoreHref) {
+            $r = BRequest::i();
+            $storeHref = BConfig::i()->get('web/base_store');
+            if (!BUtil::isUrlFull($storeHref)) {
+                $storeHref = $r->scheme() . '://' . $r->httpHost() . $storeHref;
+            }
+            $baseStoreHref = rtrim($storeHref, '/') . '/';
+        }
+        return $baseStoreHref . ltrim($url, '/');
     }
 
     /**
@@ -1814,42 +1843,19 @@ BDebug::debug(__METHOD__.': '.spl_object_hash($this));
         return $this;
     }
 
-    /**
-    * Set or retrieve session variable
-    *
-    * @deprecated
-    * @param string $key If ommited, return all session data
-    * @param mixed $value If ommited, return data by $key
-    * @return mixed|BSession
-    */
-    public function data($key=null, $value=BNULL)
-    {
-        if (is_null($key)) {
-            return $this->data;
-        }
-        if (is_array($key)) {
-            foreach ($key as $k=>$v) {
-                $this->data($k, $v);
-            }
-            return $this;
-        }
-        if (BNULL===$value) {
-            return isset($this->data[$key]) ? $this->data[$key] : null;
-        }
-        if (!isset($this->data[$key]) || $this->data[$key]!==$value) {
-            $this->dirty(true);
-        }
-        $this->data[$key] = $value;
-        return $this;
-    }
-
     public function get($key, $default = null)
     {
         return isset($this->data[$key]) ? $this->data[$key] : $default;
     }
 
-    public function set($key, $value)
+    public function set($key, $value = null)
     {
+        if (is_array($key)) {
+            foreach ($key as $k=>$v) {
+                $this->set($k, $v);
+            }
+            return $this;
+        }
         if (!isset($this->data[$key]) || $this->data[$key]!==$value) {
             $this->setDirty();
         }

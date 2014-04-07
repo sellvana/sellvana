@@ -5,7 +5,8 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function ($, _, exports
     var state = { sub_id: 0, window_name: window.name, conn_id: 0, msg_id: 0, conn_cnt: 0 },
         channels = {},
         subscribers = {},
-        messages = [];
+        messages = [],
+        stop = false;
 
     send({channel: 'client', signal: 'ready'});
 
@@ -22,7 +23,9 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function ($, _, exports
         if (messages.length) {
             connect();
         }
-        setTimeout(scheduler, 300);
+        if (!stop) {
+            setTimeout(scheduler, 300);
+        }
     }
 
     function connect() {
@@ -38,6 +41,10 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function ($, _, exports
     }
 
     function receive(response, status, xhr) {
+        if (_.isString(response) || response.stop) { // in case there's a server error
+            stop = true;
+            return;
+        }
         console.log('receive', JSON.stringify(response.messages));
 
         _.each(response.messages, function (msg) {

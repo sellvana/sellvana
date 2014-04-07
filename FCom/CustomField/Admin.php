@@ -18,7 +18,7 @@ class FCom_CustomField_Admin extends BClass
         // not deleting to preserve meta info about fields
     }
 */
-    public function productGridColumns($args)
+    public function onProductGridColumns($args)
     {
         $fields = FCom_CustomField_Model_Field::i()->orm('f')->find_many();
         foreach ($fields as $f) {

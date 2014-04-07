@@ -18,7 +18,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
         BEvents::i()->fire('FCom_Checkout_Frontend_Controller::action_cart:cart', array('cart'=>$cart));
 
-        $shippingEstimate = BSession::i()->data('shipping_estimate');
+        $shippingEstimate = BSession::i()->get('shipping_estimate');
         $layout->view('checkout/cart')->set('cart', $cart);
         $layout->view('checkout/cart')->set('shipping_esitmate', $shippingEstimate);
         $this->layout('/checkout/cart');
@@ -83,7 +83,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                 foreach (FCom_Sales_Main::i()->getShippingMethods() as $shipping) {
                     $estimate[] = array('estimate' => $shipping->getEstimate(), 'description' => $shipping->getDescription());
                 }
-                BSession::i()->data('shipping_estimate', $estimate);
+                BSession::i()->set('shipping_estimate', $estimate);
             }
             $cart->calculateTotals()->save();
             BResponse::i()->redirect($cartHref);

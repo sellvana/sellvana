@@ -39,7 +39,7 @@ class BModuleRegistry extends BClass
     protected $_modules = array();
 
     /**
-    * Current module name, not BNULL when:
+    * Current module name, not null when:
     * - In module bootstrap
     * - In observer
     * - In view
@@ -393,6 +393,7 @@ class BModuleRegistry extends BClass
     public function propagateRequireErrors($mod)
     {
         //$mod->action = !empty($dep['action']) ? $dep['action'] : 'error';
+        BDebug::debug('Module dependency unmet for '.$mod->name.': '.print_r($mod->errors, 1));
         $mod->run_status = BModule::ERROR;
         $mod->errors_propagated = true;
         foreach ($mod->children as $childName) {
@@ -504,7 +505,7 @@ class BModuleRegistry extends BClass
             if ($mod->load_after && is_array($mod->load_after)) {
                 foreach ($mod->load_after as $n) {
                     if (empty($modules[$n])) {
-                        BDebug::notice('Invalid module name specified: '.$n);
+                        BDebug::debug('Invalid module name specified in load_after: '.$n);
                         continue;
                     }
                     $mod->parents[] = $n;
@@ -632,6 +633,7 @@ class BModule extends BClass
     public $bootstrap;
     public $version;
     public $channel;
+    public $category;
     public $db_connection_name;
     public $root_dir;
     public $view_root_dir;
@@ -663,7 +665,9 @@ class BModule extends BClass
     public $default_config;
     public $autoload;
     public $crontab;
+    public $security;
     public $custom;
+    public $license;
 
     public $is_cached;
     /**
@@ -777,6 +781,10 @@ if ($args['name']==="FCom_Referrals") {
         */
         if (!isset($this->run_status)) {
             $this->run_status = BModule::IDLE;
+        }
+
+        if (!isset($this->channel)) {
+            $this->channel = 'alpha';
         }
     }
 
@@ -1079,6 +1087,13 @@ if (!isset($o[0]) || !isset($o[1])) {
         }
     }
 
+    protected function _processSecurity()
+    {
+        if (!empty($this->security['request_fields_whitelist'])) {
+            BRequest::i()->addRequestFieldsWhitelist($this->security['request_fields_whitelist']);
+        }
+    }
+
     /**
      * Register module specific autoload callback
      *
@@ -1170,7 +1185,7 @@ if (!isset($o[0]) || !isset($o[1])) {
     */
     public function runStatus($status=null)
     {
-        if (BNULL===$status) {
+        if (is_null($status)) {
             return $this->run_status;
         }
         $this->run_status = $status;
@@ -1269,6 +1284,7 @@ if (!isset($o[0]) || !isset($o[1])) {
         $this->_processAutoUse();
         $this->_processRouting();
         $this->_processObserve();
+        $this->_processSecurity();
 
         BEvents::i()->fire('BModule::bootstrap:before', array('module'=>$this));
 
@@ -1382,6 +1398,17 @@ class BMigrate extends BClass
     */
     public static function migrateModules($limitModules = false, $force = false, $redirectUrl = null)
     {
+        if (!$force) {
+            $conf = BConfig::i();
+            $req = BRequest::i();
+            if ($conf->get('install_status') !== 'installed'
+                || !$conf->get('db/implicit_migration')
+                || $req->xhr() && !$req->get('MIGRATE')
+            ) {
+                return;
+            }
+        }
+
         $modReg = BModuleRegistry::i();
         $migration = static::getMigrationData();
         if (!$migration) {

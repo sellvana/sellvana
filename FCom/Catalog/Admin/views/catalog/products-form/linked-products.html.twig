@@ -5,8 +5,8 @@
 <input type='hidden' name='grid[linked_products_similar][del]' id='similar_ids_remove'/>
 <input type='hidden' name='grid[linked_products_related][add]' id='related_ids_add'/>
 <input type='hidden' name='grid[linked_products_related][del]' id='related_ids_remove'/>
-<input type='hidden' name='grid[linked_products_cross_sell][add]' id='cross_sell_ids_add'/>
-<input type='hidden' name='grid[linked_products_cross_sell][del]' id='cross_sell_ids_remove'/>
+<input type='hidden' name='grid[linked_products_cross-sell][add]' id='cross-sell_ids_add'/>
+<input type='hidden' name='grid[linked_products_cross-sell][del]' id='cross-sell_ids_remove'/>
 
 <script>
 var allProdGrid, relatedProdGrid, similarProdGrid, crossSellProdGrid, selectedGrid;
@@ -17,10 +17,12 @@ require(['jquery','underscore','backbone'], function($, _) {
     var relatedOriginIds = [], similarOriginIds = [], crossSellOriginIds = [];
 
     window.setLindedGridVals = function() {
-
-        similarRows = _.filter(similarProdGrid.getRows().toJSON(), function(row) { return row._new;});
-        relatedRows = _.filter(relatedProdGrid.getRows().toJSON(), function(row) { return row._new;});
-        crossSellRows = _.filter(crossSellProdGrid.getRows().toJSON(), function(row) { return row._new;});
+        var similarOriginalRows = similarProdGrid.getRows();
+        var relatedOriginalRows = relatedProdGrid.getRows();
+        var crossSellOriginalRows = crossSellProdGrid.getRows();
+        similarRows = _.filter(similarOriginalRows.toJSON(), function(row) { return row._new;});
+        relatedRows = _.filter(relatedOriginalRows.toJSON(), function(row) { return row._new;});
+        crossSellRows = _.filter(crossSellOriginalRows.toJSON(), function(row) { return row._new;});
 
         similarRows = similarRows ? _.pluck(similarRows, 'id') : [];
         relatedRows = relatedRows ? _.pluck(relatedRows, 'id') : [];
@@ -30,11 +32,11 @@ require(['jquery','underscore','backbone'], function($, _) {
 
         $('#similar_ids_add').val(similarRows.join(','));
         $('#related_ids_add').val(relatedRows.join(','));
-        $('#cross_sell_ids_add').val(crossSellRows.join(','));
+        $('#cross-sell_ids_add').val(crossSellRows.join(','));
 
-        $('#related_ids_remove').val( _.difference(relatedOriginIds, relatedProdGrid.getRows().pluck('id')).join(',') );
-        $('#similar_ids_remove').val( _.difference(similarOriginIds, similarProdGrid.getRows().pluck('id')).join(',') );
-        $('#cross_sell_ids_remove').val( _.difference(crossSellOriginIds, crossSellProdGrid.getRows().pluck('id')).join(',') );
+        $('#related_ids_remove').val( _.difference(relatedOriginIds, relatedOriginalRows.pluck('id')).join(',') );
+        $('#similar_ids_remove').val( _.difference(similarOriginIds, similarOriginalRows.pluck('id')).join(',') );
+        $('#cross-sell_ids_remove').val( _.difference(crossSellOriginIds, crossSellOriginalRows.pluck('id')).join(',') );
     }
 
     window.allProdGridRegister = function(grid) {
@@ -52,14 +54,17 @@ require(['jquery','underscore','backbone'], function($, _) {
         });
 
         addBtn.click(function() {
+            var gridView = selectedGrid.getGridView();
             allProdGrid.getSelectedRows().forEach(function (row) {
                 if (!selectedGrid.getRows().findWhere({id: row.get('id')})) {
-                    var temp = row.toJSON();
-                    temp._new = true;
-                    selectedGrid.getRows().add(temp);
+                    var temp = row;
+                    temp.set("_new", true);
+                    temp.set('selected', false);
+                    gridView.collection.add(temp.toJSON());
                 }
             });
 
+            gridView.render();
             allProdGrid.getGridView().clearSelectedRows();
             $('.linked-prod-modal-close').trigger('click');
         });
@@ -106,7 +111,7 @@ require(['jquery','underscore','backbone'], function($, _) {
     }
 
     function getExcludeId() {
-        var arr = selectedGrid.getRows().pluck('id');
+        var arr = selectedGrid.getGridView().collection.pluck('id');
         arr.push(productId);
         return  arr.join(',');
     }
@@ -141,7 +146,7 @@ require(['jquery','underscore','backbone'], function($, _) {
                 {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'similar')) | raw }}
             </div>
             <div class='tab-pane' id='cross_sell'>
-                {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'cross_sell')) | raw }}
+                {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'cross-sell')) | raw }}
             </div>
         </div>
     </div>

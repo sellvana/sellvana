@@ -2,9 +2,12 @@
 
 class FCom_MultiLanguage_Migrate extends BClass
 {
-    public function install__0_1_0()
+    public function install__0_1_1()
     {
         $tTrans = FCom_MultiLanguage_Model_Translation::table();
+        $tIndexField = FCom_CatalogIndex_Model_Field::table();
+        $tCustomField = FCom_CustomField_Model_Field::table();
+        $tCustomFieldOption = FCom_CustomField_Model_FieldOption::table();
         BDb::ddlTableDef($tTrans, array(
             'COLUMNS' => array(
                 'id' => 'INT UNSIGNED NOT NULL AUTO_INCREMENT',
@@ -12,10 +15,30 @@ class FCom_MultiLanguage_Migrate extends BClass
                 'entity_id' => 'INT UNSIGNED NOT NULL',
                 'locale' => 'VARCHAR(10) NOT NULL',
                 'data_serialized' => 'MEDIUMTEXT NOT NULL',
+                'field' => 'varchar(50) NOT NULL',
+                'value' => 'text NOT NULL'
             ),
             'PRIMARY' => '(`id`)',
             'KEYS' => array(
-                'UNQ_id' => 'UNIQUE (`entity_type`, `entity_id`, `locale`)',
+                'UNQ_type_id_locale_field' => 'UNIQUE (`entity_type`, `entity_id`, `locale`, `field`)'
+            ),
+        ));
+
+        BDb::ddlTableDef($tIndexField, array(
+            'COLUMNS' => array(
+                'locale' => 'VARCHAR(10) NOT NULL DEFAULT "_"',
+                'multilanguage' => 'bool NOT NULL default 0'
+            ),
+        ));
+
+        BDb::ddlTableDef($tCustomFieldOption, array(
+            'COLUMNS' => array(
+                'locale' => 'VARCHAR(10) NOT NULL DEFAULT "_"',
+            ),
+        ));
+        BDb::ddlTableDef($tCustomField, array(
+            'COLUMNS' => array(
+                'multilanguage' => 'bool NOT NULL default 0'
             ),
         ));
     }
