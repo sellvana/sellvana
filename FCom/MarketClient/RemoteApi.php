@@ -36,12 +36,12 @@ final class FCom_MarketClient_RemoteApi extends BClass
 
     public function getModulesVersions($modules, $resetCache = false)
     {
-
-        if (true === $modules && !$resetCache) {
-            $result = BCache::i()->load(static::$_modulesVersionsCacheKey);
-            if ($result) {
-                return $result;
-            }
+        $result = BCache::i()->load(static::$_modulesVersionsCacheKey);
+        if ($result && true === $modules && !$resetCache) {
+            return $result;
+        }
+        if (!$result) {
+            $result = array();
         }
 
         if (true === $modules) {
@@ -55,8 +55,17 @@ final class FCom_MarketClient_RemoteApi extends BClass
         ));
         $response = BUtil::remoteHttp("GET", $url);
 #echo "<pre>"; var_dump($response); exit;
-        $result = BUtil::fromJson($response);
-
+        $modResult = BUtil::fromJson($response);
+        $result = BUtil::arrayMerge($result, $modResult);
+        foreach ($result as $modName => &$mod) {
+            $mod['name'] = $modName;
+            if (!empty($mod['status']) && $mod['status'] === 'mine') {
+                $localMod = BApp::m($modName);
+                $remChannelVer = $mod['channels'][$localMod->channel]['version_uploaded'];
+                $mod['can_update'] = version_compare($remChannelVer, $localMod->version, '>');
+            }
+        }
+        unset($mod);
         if (!empty($result)) {
             BCache::i()->save(static::$_modulesVersionsCacheKey, $result, 86400);
         }
@@ -70,7 +79,21 @@ final class FCom_MarketClient_RemoteApi extends BClass
             'mod_name' => $modules,
         ));
         $response = BUtil::remoteHttp("GET", $url);
-        return BUtil::fromJson($response);
+#var_dump($response); exit;
+        $result = BUtil::fromJson($response);
+        foreach ($result as $modName => &$modInfo) {
+            $localMod = BApp::m($modName);
+            if ($modInfo['status']==='dependency' && $localMod) {
+                if (version_compare($localMod->version, $modInfo['version'], '<')) {
+                    $modInfo['status'] = 'upgrade';
+                } else {
+                    #unset($result[$modName]);
+                    $modInfo['status'] = 'latest';
+                }
+            }
+        }
+        unset($modInfo);
+        return $result;
     }
 
     public function createModule($modName)
@@ -101,6 +124,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
             'package_zip' => '@'.$packageFilename,
         );
         $response = BUtil::remoteHttp('POST', $url, $data);
+#echo "<pre>"; var_dump($response); exit;
         BCache::i()->delete(static::$_modulesVersionsCacheKey);
         return BUtil::fromJson($response);
     }

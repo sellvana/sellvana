@@ -14,7 +14,6 @@ modules:
             FCom_Admin:
                 auto_use: [ all ]
                 routing:
-                    - [ /marketclient/?.action, FCom_MarketClient_Admin_Controller_Market ]
                     - [ /marketclient/site/?.action, FCom_MarketClient_Admin_Controller_Site ]
                     - [ /marketclient/module/?.action, FCom_MarketClient_Admin_Controller_Module ]
                     - [ /marketclient/publish/?.action, FCom_MarketClient_Admin_Controller_Publish ]

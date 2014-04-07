@@ -1,7 +1,7 @@
 
 <div class="f-admin-main-view">
   <div class="page-header f-admin-page-header">
-    <h1 class="f-page-title">{{ 'Publish' }}</h1>
+    <h1 class="f-page-title">{{ 'Upgrades Available' }}</h1>
     <div class="btn-group">
       <button class="btn btn-primary" type="button" onclick="$('#util-form').attr('action', '{{ APP.href('marketclient/site/check_updates') }}').submit()"><span>{{ 'Check For Updates'|_ }}</span></button>
     </div>
@@ -28,10 +28,10 @@
                 <strong>{{ modName }}</strong>
               {% elseif mod.status == 'mine' %}
                   {% set remChannelVer = mod.channels[localMod.channel].version_uploaded %}
-                  <button type="submit" name="mod_name" value="release/{{ modName }}" class="btn {{ mod.can_update ? 'btn-success' }} btn-small" onclick="return confirm('{{ 'Are you sure you want to publish release %s ?'|_(modName) }}')">
+                  <button type="submit" name="mod_name" value="release/{{ modName }}" class="btn {{ UTIL.versionCompare(remChannelVer, localMod.version, '<') ? 'btn-success' }} btn-small" onclick="return confirm('{{ 'Are you sure you want to publish release %s ?'|_(modName) }}')">
                       {{ 'Update'|_ }}
                   </button>
-                  <a href="{{ mod.edit_href }}" target="MarketPublish"><strong>{{ modName }}</strong></a>
+                  <a href="{{ mod.edit_href }}" target="MarketClient"><strong>{{ modName }}</strong></a>
 
               {% endif %}
 

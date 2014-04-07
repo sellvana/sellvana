@@ -2,7 +2,7 @@ modules:
     FCom_Admin:
         version: 0.1.7
         channel: beta
-        require: { module: { FCom_Core: 0.1.0 } }
+        require: { module: { FCom_Core: 0.1.0, FCom_LibJsCommon: 0.1.0 } }
         description: Base Admin functionality
 
         default_config:

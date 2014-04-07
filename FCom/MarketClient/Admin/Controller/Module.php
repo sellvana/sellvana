@@ -43,4 +43,9 @@ class FCom_MarketClient_Admin_Controller_Module extends FCom_Admin_Controller_Ab
         }
         BResponse::i()->redirect('modules');
     }
+
+    public function action_upgrade()
+    {
+        $this->layout('/marketclient/module/upgrade');
+    }
 }
