@@ -13,21 +13,20 @@
                 $('#progress-stop').click(stop);
                 $('#progress-restart').click(restart);
                 $.post(baseUrl + '/start', { modules: modules, 'X-CSRF-TOKEN': csrfToken });
-                setTimeout(progress, 2000);
+                progress();
             }
 
             function progress() {
                 $.get(baseUrl + '/progress', function(response, status, xhr) {
                     switch (response.progress.status) {
-                        case 'ACTIVE':
-                            setTimeout(progress, 2000);
-                            break;
-
                         case 'DONE':
                             if (redirectUrl) {
                                 location.href = redirectUrl;
                             }
                             break;
+
+                        default:
+                            setTimeout(progress, 2000);
                     }
                     $('#progress-container').html(response.html);
                 })

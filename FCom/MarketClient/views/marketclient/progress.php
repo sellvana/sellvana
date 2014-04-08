@@ -8,10 +8,12 @@
 </div>
 </div>
 
+<?php if (!empty($p['modules'])): ?>
 <pre>
 <?php foreach ($p['modules'] as $modName => $modLine): ?>
 <?= $this->q($modLine)."\n" ?>
 <?php endforeach ?>
 </pre>
+<?php endif ?>
 
 <?php endif ?>
