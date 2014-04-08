@@ -1,6 +1,6 @@
 modules:
     FCom_Catalog:
-        version: 0.2.24
+        version: 0.2.25
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
         categories: [ Catalog, Products ]
