@@ -6,6 +6,7 @@ modules:
         require:
             module:
                 FCom_AdapterExcel: 0.1.0
+                FCom_Admin: 0.1.0
                 FCom_AdminChat: 0.1.0
                 FCom_ApiServer: 0.1.0
                 FCom_AuthorizeNet: 0.1.0
@@ -23,6 +24,7 @@ modules:
                 FCom_Email: 0.1.0
                 FCom_Feedback: 0.1.0
                 FCom_FreshBooks: 0.1.0
+                FCom_Frontend: 0.1.0
                 FCom_FrontendCP: 0.1.0
                 FCom_FrontendThemeBootSimple: 0.1.0
                 FCom_Geo: 0.1.0

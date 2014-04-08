@@ -566,7 +566,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                     's': BackboneGrid.currentState.s,
                                     'sd': BackboneGrid.currentState.sd,
                                     'p': BackboneGrid.currentState.p,
-                                    'ps': BackboneGrid.currentState.ps,
+                                    'ps': BackboneGrid.currentState.ps
                             }
                         );
                     }
@@ -719,7 +719,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     if (confirm) {
                         rowsCollection.remove(this.model/*, {silent: true}*/);
                         selectedRows.remove(this.model, {silent: true});
-                        this._destorySelf();
+//                        this._destorySelf();
                     }
                 },
                 _destorySelf: function () {
@@ -2033,10 +2033,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});
 
-                /*if (BackboneGrid.data_mode == 'local') {
+                //TODO: find other solutions when state.p=NaN and state.mp=NaN.
+                if (BackboneGrid.data_mode == 'local' && isNaN(state.p)) {
                     BackboneGrid.currentState.p = 1;
                     BackboneGrid.currentState.ps = 10;
-                }*/
+                }
                 gridView.render();
 
 

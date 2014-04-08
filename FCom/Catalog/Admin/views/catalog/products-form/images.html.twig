@@ -58,7 +58,7 @@ require(['jquery','underscore','backbone'], function($, _) {
                     addedRow.set('file_id', row.id);
                     addedRow.set('id', guid());
                     addedRow.set('selected', false);
-                    gridView.collection.add(addedRow.toJSON());
+                    gridView.collection.add(addedRow.toJSON(), {silent: true});
                 }
             });
 

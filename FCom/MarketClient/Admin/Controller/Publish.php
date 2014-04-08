@@ -72,9 +72,4 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
         // TODO: why $this->message() doesn't work here?
         BResponse::i()->redirect($redirectUrl);
     }
-
-    public function action_upgrade__POST()
-    {
-
-    }
 }
