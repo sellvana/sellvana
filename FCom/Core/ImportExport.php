@@ -28,9 +28,9 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
     protected $newModels = 0;
     protected $updatedModels = 0;
     protected $changedModels;
-    protected $circularRelated;
 
     /**
+     * @throws Exception
      * @return array
      */
     public function collectExportableModels()
@@ -88,6 +88,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             }
             $records = $model::i()->orm()->select($heading[ static::DEFAULT_FIELDS_KEY ])->find_many();
             if ( $records ) {
+                BEvents::i()->fire( __METHOD__ . ':beforeOutput', array( 'records' => $records ) );
                 $this->writeLine( $fe, BUtil::toJson( $heading ) );
                 foreach ( $records as $r ) {
 
@@ -153,6 +154,10 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         $this->importId = $importSite->id();
 
         $this->importModels = $ieHelperMod->orm()->find_many_assoc('model_name');
+        BEvents::i()->fire(
+            __METHOD__ . ':meta',
+            array( 'import_id' => $importID, 'import_site' => $importSite, 'import_models' => &$this->importModels )
+        );
 
         $this->currentModel = null;
         $this->currentModelIdField = null;
@@ -169,10 +174,16 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $model     = null;
             $data      = (array)json_decode( $line );
             if ( !empty( $data[ static::DEFAULT_MODEL_KEY ] ) ) {
+                // new model declaration found, import reminder of previous batch
                 if(!empty($batchData)){
                     $this->importBatch($batchData);
                     $batchData = array();
                 }
+
+                if( $this->currentModel ){
+                    BEvents::i()->fire( __METHOD__ . ':afterModel:' . $this->currentModel );
+                }
+
                 $this->currentModel   = $data[ static::DEFAULT_MODEL_KEY ];
                 $this->channel->send( array( 'signal' => 'info', 'msg' => "Importing: $this->currentModel" ) );
                 if ( !isset( $this->importModels[ $this->currentModel ] ) ) {
@@ -251,6 +262,8 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
     /**
      * @param array $batchData
+     * @throws BException
+     * @throws Exception
      */
     protected function importBatch( $batchData )
     {
@@ -325,9 +338,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 BDebug::warning("Invalid model: $id");
             }
         }
-        if($this->circularRelated){
-            $this->processCircularRelations();
-        }
+        BEvents::i()->fire( __METHOD__ . ':afterBatch:' . $cm, array( 'records' => $this->changedModels ) );
     }
     protected function isArrayAssoc( array $arr )
     {
@@ -471,6 +482,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
     /**
      * @param $modelName
      * @param $modelKeyConditions
+     * @throws BException
      * @return array
      */
     protected function getExistingModels( $modelName, $modelKeyConditions )
@@ -504,11 +516,12 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
      * to use related keys for unique_key
      *
      * @param $batchData
+     * @throws BException
+     * @throws Exception
      */
     protected function populateRelated( &$batchData )
     {
         $related = array();
-        $this->circularRelated = false;
         if ( isset( $this->currentConfig[ 'related' ] ) ) {
             foreach ( $this->currentConfig[ 'related' ] as $field => $l ) {
                 foreach ( $batchData as $data ) { // prepare related search
@@ -529,10 +542,6 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                     continue;
                 }
                 list( $relModel, $field ) = explode( '.', $r );
-                if ( $relModel == $this->currentModel ) {
-                    // potentially imported models depend on current patch to be imported
-                    $this->circularRelated = true;
-                }
                 $tempRel = FCom_Core_Model_ImportExport_Id::orm()
                                       ->select( array( 'import_id', 'local_id' ) )
                                       ->join(
@@ -566,11 +575,4 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             } // end foreach ['related']
         } // end if related
     }
-
-    protected function processCircularRelations()
-    {
-        // todo , figure out exactly how to process circular relations
-        // like category parent id
-    }
-
 }
