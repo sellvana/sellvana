@@ -28,10 +28,10 @@ modules:
             db:
                 dbname: sellvana
                 username: root
-                logging: false
+                logging: true
                 implicit_migration: true
             web:
-                csrf_check_method: referrer
+                csrf_check_method: token
                 headers:
                     X-UA-Compatible: IE=edge
                     X-Frame-Options: SAMEORIGIN

@@ -43,9 +43,10 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_index__POST()
     {
-        $sData = BSession::i()->get('w');
-        if (empty($sData['agree']) || $sData['agree']!=='Agree') {
-            BResponse::i()->redirect('?error=1');
+        $w = BRequest::i()->post('w');
+        if (empty($w['agree']) || $w['agree']!=='Agree') {
+            $this->message('Please click "I Agree" checkbox before continuing with installation', 'error', 'install');
+            BResponse::i()->redirect('');
             return;
         }
         $redirectUrl = 'install/step1';
@@ -238,6 +239,6 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
         FCom_Core_Main::i()->writeConfigFiles();
 
-        BResponse::i()->redirect('');
+        BResponse::i()->redirect(BApp::i()->adminHref(''));
     }
 }
