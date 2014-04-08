@@ -9,10 +9,10 @@ modules:
 
         auto_use: [ bootstrap ]
         encrypt_config:
-          - modules/FCom_AuthorizeNet/aim/login
-          - modules/FCom_AuthorizeNet/aim/trans_key
-          - modules/FCom_AuthorizeNet/dpm/login
-          - modules/FCom_AuthorizeNet/dpm/trans_key
+            - modules/FCom_AuthorizeNet/aim/login
+            - modules/FCom_AuthorizeNet/aim/trans_key
+            - modules/FCom_AuthorizeNet/dpm/login
+            - modules/FCom_AuthorizeNet/dpm/trans_key
         default_config:
             modules:
                 FCom_AuthorizeNet:

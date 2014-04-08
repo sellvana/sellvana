@@ -14,6 +14,7 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
     protected static $_validationRules = array(
         /*array('author_user_id', '@required'),*/
         array('title', '@required'),
+        array('url_key', 'FCom_Blog_Model_Post::validateDupUrlKey')
         /*array('url_key', '@required'),*/
     );
 
@@ -122,5 +123,23 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
     public function getRelatedPosts()
     {
         return array();
+    }
+
+    public static function validateDupUrlKey($data, $args)
+    {
+        if (!empty(static::$_flags['skip_duplicate_checks'])) {
+            return true;
+        }
+        if (empty($data[$args['field']])) {
+            return true;
+        }
+        $orm = static::orm('p')->where('url_key', $data[$args['field']]);
+        if (!empty($data['id'])) {
+            $orm->where_not_equal('p.id', $data['id']);
+        }
+        if ($orm->find_one()) {
+            return BLocale::_('The URL Key entered is already in use. Please enter a valid URL Key.');
+        }
+        return true;
     }
 }
