@@ -181,7 +181,9 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 }
 
                 if( $this->currentModel ){
-                    BEvents::i()->fire( __METHOD__ . ':afterModel:' . $this->currentModel );
+                    BEvents::i()->fire( __METHOD__ . ':afterModel:' . $this->currentModel,
+                        array('import_id' => $importID )
+                    );
                 }
 
                 $this->currentModel   = $data[ static::DEFAULT_MODEL_KEY ];
@@ -275,18 +277,18 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
         foreach ( $batchData as $key => $data ) {
             if ( isset( $this->currentConfig[ 'unique_key' ] ) ) {
-                $where = array('AND');
-                foreach ( (array) $this->currentConfig[ 'unique_key' ] as $ukey ) {
+                $where = array( 'AND' );
+                foreach ( (array)$this->currentConfig[ 'unique_key' ] as $ukey ) {
                     if ( isset( $data[ $ukey ] ) ) {
                         $where[ $ukey ] = $data[ $ukey ];
                     }
                 }
-                if(!empty($where)){
-                    $existing[] = $where;
+                if ( !empty( $where ) ) {
+                    $existing[ ] = $where;
                 }
             }
 
-            $batchData[$key] = $data;
+            $batchData[ $key ] = $data;
         }
 
         $oldModels = array();
@@ -296,12 +298,14 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
         foreach ( $batchData as $id => $data ) {
             $ieData = array(
-                'site_id' => $this->importId,
-                'model_id' => $this->importModels[ $this->currentModel ]->id(),
+                'site_id'   => $this->importId,
+                'model_id'  => $this->importModels[ $this->currentModel ]->id(),
                 'import_id' => $data[ $this->currentModelIdField ],
-                'local_id' => null,
+                'local_id'  => null,
+                'relations' => !empty( $data[ 'failed_related' ] ) ? json_encode( $data[ 'failed_related' ] ) : null,
+                'update_at' => BDb::i()->now(),
             );
-            unset( $data[ $this->currentModelIdField ] );
+            unset( $data[ $this->currentModelIdField ], $data['failed_related'] );
             /** @var FCom_Core_Model_Abstract $model */
             $model = isset( $oldModels[ $id ] ) ? $oldModels[ $id ] : null;
 
@@ -562,12 +566,19 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
         if ( isset( $this->currentConfig[ 'related' ] ) ) {
             foreach ( $this->currentConfig[ 'related' ] as $field => $l ) {
+                $relModel = explode( '.', $l );
+                $relModel = $relModel[0];
                 if ( !empty( $this->currentRelated[ $l ]) ) {
                     foreach ( $batchData as &$data ) { // populate related data
                         if ( isset( $data[ $field ] ) ) {
                             $tmp = $data[ $field ];
                             if ( isset( $this->currentRelated[ $l ][ $tmp ] ) ) {
                                 $data[ $field ] = $this->currentRelated[ $l ][ $tmp ];
+                            } else {
+                                // if there is no match for needed field
+                                // set related field to be null, so that it can be updated after model data is imported.
+                                // store relation data
+                                $data['failed_relation'][$field] = $tmp;
                             }
                         }
                     } // end foreach batch data

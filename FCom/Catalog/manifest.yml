@@ -38,6 +38,7 @@ modules:
                 observe:
                     - [ FCom_FrontendCP_Frontend_Controller::action_update:after, FCom_Catalog_Frontend_ControlPanel::onAfterUpdate ]
                     - [ FCom_Core_View_BackboneGrid::getPageRowsData, FCom_Catalog_Admin_Controller_Products::processInitalData ]
+                    - [ FCom_Core_ImportExport::import:afterModel:FCom_Catalog_Model_Category, FCom_Catalog_Model_Category::processAfterImport ]
                 views:
                     - [ catalog/product/price, { view_class: FCom_Catalog_Frontend_View_Price } ]
 

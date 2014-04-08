@@ -1386,7 +1386,7 @@ class BORM extends ORMWrapper
      *
      * @return boolean
      */
-    public function save()
+    public function save( $replace = false )
     {
         BDb::connect($this->_writeConnectionName);
         $this->_dirty_fields = BDb::cleanForTable($this->_table_name, $this->_dirty_fields);
@@ -1739,10 +1739,10 @@ class BModel extends Model
      * @var array
      */
     protected static $_validationRules = array();
-    
+
     /**
     * Model scope flags for internal use
-    * 
+    *
     * @var array
     */
     protected static $_flags = array();
@@ -1756,12 +1756,12 @@ class BModel extends Model
     {
         return static::$_origClass;
     }
-    
+
     public function setFlag($flag, $value)
     {
         static::$_flags[$flag] = $value;
     }
-    
+
     public function getFlag($flag)
     {
         return isset(static::$_flags[$flag]) ? static::$_flags[$flag] : null;

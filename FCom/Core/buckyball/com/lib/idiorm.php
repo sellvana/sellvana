@@ -1053,7 +1053,7 @@ exit;
          * Save any fields which have been modified on this object
          * to the database.
          */
-        public function save() {
+        public function save( $replace = false ) {
             $query = array();
             $values = array_values($this->_dirty_fields);
 
@@ -1065,7 +1065,7 @@ exit;
                 $query = $this->_build_update();
                 $values[] = $this->id();
             } else { // INSERT
-                $query = $this->_build_insert();
+                $query = $this->_build_insert( $replace );
             }
 
             static::_log_query($query, $values);
@@ -1108,8 +1108,13 @@ exit;
         /**
          * Build an INSERT query
          */
-        protected function _build_insert() {
-            $query[] = "INSERT INTO";
+        protected function _build_insert( $replace = false ) {
+
+            $operation = "INSERT INTO";
+            if($replace){
+                $operation = "REPLACE INTO";
+            }
+            $query[] = $operation;
             $query[] = $this->_quote_identifier($this->_table_name);
             $field_list = array_map(array($this, '_quote_identifier'), array_keys($this->_dirty_fields));
             $query[] = "(" . join(", ", $field_list) . ")";
