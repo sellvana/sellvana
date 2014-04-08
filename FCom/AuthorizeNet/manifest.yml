@@ -1,6 +1,6 @@
 modules:
     FCom_AuthorizeNet:
-        version: 0.1.1
+        version: 0.1.0
         channel: beta
         require: { module: { FCom_Sales: 0.1.10 } }
         translations: { en: en.php }
@@ -9,10 +9,10 @@ modules:
 
         auto_use: [ bootstrap ]
         encrypt_config:
-          - modules/FCom_AuthorizeNet/aim/login
-          - modules/FCom_AuthorizeNet/aim/trans_key
-          - modules/FCom_AuthorizeNet/dpm/login
-          - modules/FCom_AuthorizeNet/dpm/trans_key
+            - modules/FCom_AuthorizeNet/aim/login
+            - modules/FCom_AuthorizeNet/aim/trans_key
+            - modules/FCom_AuthorizeNet/dpm/login
+            - modules/FCom_AuthorizeNet/dpm/trans_key
         default_config:
             modules:
                 FCom_AuthorizeNet:
