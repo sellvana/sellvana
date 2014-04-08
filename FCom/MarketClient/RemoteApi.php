@@ -4,8 +4,8 @@ final class FCom_MarketClient_RemoteApi extends BClass
 {
     protected static $_modulesVersionsCacheKey = 'marketclient_modules_versions';
 
-    #protected $_apiUrl = 'https://www.sellvana.com/';
-    protected $_apiUrl = 'http://stage.sellvana.com/';
+    #protected $_apiUrl = 'https://market.sellvana.com/';
+    protected $_apiUrl = 'http://market.sellvana.com/';
 
     public function getUrl($path = '', $params = array())
     {
@@ -66,7 +66,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
             if (!empty($mod['status']) && $mod['status'] === 'mine') {
                 $localMod = BApp::m($modName);
                 $remChannelVer = $mod['channels'][$localMod->channel]['version_uploaded'];
-                $mod['can_update'] = version_compare($remChannelVer, $localMod->version, '>');
+                $mod['can_update'] = version_compare($remChannelVer, $localMod->version, '<');
             }
         }
         unset($mod);
@@ -142,16 +142,25 @@ final class FCom_MarketClient_RemoteApi extends BClass
 
     public function downloadPackage($moduleName, $version = null, $channel = null)
     {
+        if ($version === '*') {
+            $version = null;
+        }
+        if ($channel === '*') {
+            $channel = null;
+        }
         $url = $this->getUrl('api/v1/market/module/download', array(
             'mod_name' => $moduleName,
             'version' => $version,
             'channel' => $channel,
         ));
         $response = BUtil::remoteHttp("GET", $url);
+        if (!$response) {
+            throw new BException("Problem downloading the package ({$moduleName})");
+        }
         $dir = BConfig::i()->get('fs/storage_dir') . '/marketclient/download';
         BUtil::ensureDir($dir);
         if (!is_writable($dir)) {
-            return false;
+            throw new BException("Problem with write permissions ({$dir})");
         }
 
         $filename = $moduleName . '.zip';
@@ -163,7 +172,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
         if (file_put_contents($filepath, $response)) {
             return $filepath;
         } else {
-            return false;
+            throw new BException("Problem with write permissions ({$filepath})");
         }
     }
 }
