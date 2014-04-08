@@ -59,7 +59,7 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
                     addedRow.set('file_id', row.id);
                     addedRow.set('id', guid());
                     addedRow.set('selected', false);
-                    gridView.collection.models.push(addedRow);
+                    gridView.collection.add(addedRow.toJSON(), {silent: true});
                 }
             });
 

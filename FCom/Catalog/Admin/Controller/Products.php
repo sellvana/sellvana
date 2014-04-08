@@ -348,7 +348,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ->select(array('p.id', 'p.product_name', 'p.local_sku', 'p.base_price', 'p.sale_price'));
 
         switch ($type) {
-        case 'related': case 'similar':case 'cross-sell':
+        case 'related': case 'similar':case 'cross_sell':
             $orm->join('FCom_Catalog_Model_ProductLink', array('pl.linked_product_id','=','p.id'), 'pl')
                 ->select_expr('pl.position', 'product_link_position')
                 ->where('link_type', $type)
@@ -387,7 +387,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     array('field'=>'local_sku', 'type'=>'text')
                 ),
                 'events'=>array('init', 'add','mass-delete'),
-                'grid_before_create'=> str_replace('-', '_', $gridId).'_register' //TODO: confirm to Boris $type = cross-sell
+                'grid_before_create'=> $gridId.'_register'
             );
 
 
@@ -496,7 +496,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         //echo "<pre>"; print_r($data); echo "</pre>";
         $hlp = FCom_Catalog_Model_ProductLink::i();
-        foreach (array('related', 'similar', 'cross-sell') as $type) {
+        foreach (array('related', 'similar', 'cross_sell') as $type) {
             $typeName = 'linked_products_'.$type;
             if (!empty($data['grid'][$typeName]['del'])) {
                 $hlp->delete_many(array(

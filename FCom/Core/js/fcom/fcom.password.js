@@ -18,7 +18,7 @@ define(['jquery', 'jquery.validate'], function($) {
             if (regex.test($(this).val())) {
                 progressBar.css('width', '70%');
                 if ($(this).val().length > 12) {
-                    progressBar.css('width', '70%');
+                    progressBar.css('width', '100%');
                 }
                 progressBar.parent().removeClass('progress-warning');
             } else {

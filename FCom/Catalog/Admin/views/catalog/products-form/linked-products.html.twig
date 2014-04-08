@@ -5,8 +5,8 @@
 <input type='hidden' name='grid[linked_products_similar][del]' id='similar_ids_remove'/>
 <input type='hidden' name='grid[linked_products_related][add]' id='related_ids_add'/>
 <input type='hidden' name='grid[linked_products_related][del]' id='related_ids_remove'/>
-<input type='hidden' name='grid[linked_products_cross-sell][add]' id='cross-sell_ids_add'/>
-<input type='hidden' name='grid[linked_products_cross-sell][del]' id='cross-sell_ids_remove'/>
+<input type='hidden' name='grid[linked_products_cross_sell][add]' id='cross_sell_ids_add'/>
+<input type='hidden' name='grid[linked_products_cross_sell][del]' id='cross_sell_ids_remove'/>
 
 <script>
 var allProdGrid, relatedProdGrid, similarProdGrid, crossSellProdGrid, selectedGrid;
@@ -32,11 +32,11 @@ require(['jquery','underscore','backbone'], function($, _) {
 
         $('#similar_ids_add').val(similarRows.join(','));
         $('#related_ids_add').val(relatedRows.join(','));
-        $('#cross-sell_ids_add').val(crossSellRows.join(','));
+        $('#cross_sell_ids_add').val(crossSellRows.join(','));
 
         $('#related_ids_remove').val( _.difference(relatedOriginIds, relatedOriginalRows.pluck('id')).join(',') );
         $('#similar_ids_remove').val( _.difference(similarOriginIds, similarOriginalRows.pluck('id')).join(',') );
-        $('#cross-sell_ids_remove').val( _.difference(crossSellOriginIds, crossSellOriginalRows.pluck('id')).join(',') );
+        $('#cross_sell_ids_remove').val( _.difference(crossSellOriginIds, crossSellOriginalRows.pluck('id')).join(',') );
     }
 
     window.allProdGridRegister = function(grid) {
@@ -60,7 +60,7 @@ require(['jquery','underscore','backbone'], function($, _) {
                     var temp = row;
                     temp.set("_new", true);
                     temp.set('selected', false);
-                    gridView.collection.add(temp.toJSON());
+                    gridView.collection.add(temp.toJSON(), {silent: true});
                 }
             });
 
@@ -146,7 +146,7 @@ require(['jquery','underscore','backbone'], function($, _) {
                 {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'similar')) | raw }}
             </div>
             <div class='tab-pane' id='cross_sell'>
-                {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'cross-sell')) | raw }}
+                {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.linkedProductGridConfig(m, 'cross_sell')) | raw }}
             </div>
         </div>
     </div>

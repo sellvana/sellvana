@@ -2,7 +2,7 @@
 
 class FCom_Catalog_Migrate extends BClass
 {
-    public function install__0_2_24()
+    public function install__0_2_25()
     {
         $tProduct = FCom_Catalog_Model_Product::table();
 
@@ -86,7 +86,7 @@ class FCom_Catalog_Migrate extends BClass
         BDb::ddlTableDef($tProductLink, array(
             'COLUMNS' => array(
                 'id'            => 'int unsigned NOT NULL AUTO_INCREMENT',
-                'link_type'     => "enum('related','similar', 'cross-sell') NOT NULL",
+                'link_type'     => "varchar(20) NOT NULL",
                 'product_id'    => 'int(10) unsigned NOT NULL',
                 'linked_product_id' => 'int(10) unsigned NOT NULL',
                 'position' => 'smallint(6) null',
@@ -485,6 +485,16 @@ class FCom_Catalog_Migrate extends BClass
         BDb::ddlTableDef($tProductLink, array(
             'COLUMNS' => array(
                 'position' => 'smallint(6) null',
+            ),
+        ));
+    }
+
+    public function upgrade__0_2_24__0_2_25()
+    {
+        $tProductLink = FCom_Catalog_Model_ProductLink::table();
+        BDb::ddlTableDef($tProductLink, array(
+            'COLUMNS' => array(
+                'link_type' => "varchar(20) NOT NULL",
             ),
         ));
     }
