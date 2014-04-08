@@ -556,6 +556,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return this;
 
                 },
+
                 saveLocalState: function() {
                     //only if local_personalize configuration flag is true, we can personalize
                     if (BackboneGrid.local_personalize) {
@@ -702,7 +703,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 _cellValChanged: function (ev) {
                     var val = $(ev.target).val();
                     var name = $(ev.target).attr('data-col');
-
+                    //@TODO: find other solution when sort value is number
+                    if (!isNaN(val)) {
+                        val = Number(val);
+                    }
                     //@todo why change cell must be saved?
                     this.model.set(name, val);
 //                    this.model.save(true);

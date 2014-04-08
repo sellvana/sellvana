@@ -105,13 +105,13 @@ require(['jquery','underscore','backbone'], function($, _) {
         console.log(originIds);
 
         $(imagesGrid.getGridSkeleton().AddButton).click(function() {
-            refreshGridAdd();
+            //refreshGridAdd();
             $('#all_prod_images_modal').modal('show');
         });
 
     }
 
-    function refreshGridAdd() {
+   /* function refreshGridAdd() {
         var data = getExcludeId();
         all_prod_images_grid.getGridSkeleton().current_filters['exclude_id'] = data;
         rowsAllImages.fetch({reset: true});
@@ -120,7 +120,7 @@ require(['jquery','underscore','backbone'], function($, _) {
     function getExcludeId() {
         var arr = imagesGrid.getGridView().collection.pluck('file_id');
         return  arr.join(',');
-    }
+    }*/
 
 
 });
