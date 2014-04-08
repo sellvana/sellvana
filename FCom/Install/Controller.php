@@ -43,12 +43,42 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_index__POST()
     {
-        $sData = BSession::i()->data();
-        if (empty($sData['w']['agree']) || $sData['w']['agree']!=='Agree') {
+        $sData = BSession::i()->get('w');
+        if (empty($sData['agree']) || $sData['agree']!=='Agree') {
             BResponse::i()->redirect('?error=1');
             return;
         }
-        BResponse::i()->redirect('install/step1');
+        $redirectUrl = 'install/step1';
+        if (!BApp::m('FCom_Admin')) {
+            BResponse::i()->redirect('install/download');
+            /*
+            BResponse::i()->startLongResponse();
+            $modules = FCom_MarketClient_RemoteApi::i()->getModuleInstallInfo('FCom_VirtPackCoreEcom');
+            FCom_MarketClient_Main::i()->downloadAndInstall($modules, true);
+            echo '<script>location.href="'.$redirectUrl.'";</script>';
+            echo '<p>ALL DONE. <a href="'.$redirectUrl.'">Click here to continue</a></p>';
+            exit;
+            */
+        } else {
+            BResponse::i()->redirect($redirectUrl);
+        }
+    }
+
+    public function action_download()
+    {
+        BLayout::i()->setRootView('marketclient/container');
+        $data = FCom_MarketClient_RemoteApi::i()->getModuleInstallInfo('FCom_VirtPackCoreEcom');
+        $modules = array();
+        foreach ($data as $modName => $modInfo) {
+            if (BApp::m($modName) || in_array($modName, array('FCom_Core','FCom_Install','FCom_MarketClient'))) {
+                continue;
+            }
+            $modules[$modName] = $modInfo['version'];
+        }
+        $this->view('marketclient/container')->set(array(
+            'modules' => $modules,
+            'redirect_to' => BApp::href('install/step1'),
+        ));
     }
 
     public function action_step1()
@@ -200,6 +230,9 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                 'FCom_Frontend' => array(
                     'theme' => 'FCom_FrontendThemeBootSimple',
                 ),
+            ),
+            'cache' => array(
+                'default_backend' => BCache::i()->getFastestAvailableBackend(),
             ),
         ), true);
 

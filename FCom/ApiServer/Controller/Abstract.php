@@ -13,7 +13,7 @@ class FCom_ApiServer_Controller_Abstract extends FCom_Admin_Controller_Abstract
         foreach ($this->_authorizeActionsWhitelist as &$action) {
             $action = strtolower($action);
         }
-        BResponse::i()->contentType('application/json');
+        BResponse::i()->setContentType('application/json');
     }
 
     public function ok($msg = null)

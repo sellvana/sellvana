@@ -16,7 +16,7 @@ class FCom_Cms_Frontend_View_NavContent extends FCom_Core_View_Abstract
         }
 
         $this->setParam(array(
-            'renderer'    => $nav->renderer ? $nav->renderer : 'BTwig::renderer',
+            'renderer'    => $nav->renderer ? $nav->renderer : 'FCom_LibTwig_Main::renderer',
             'source'      => $nav->content ? $nav->content : ' ',
             'source_name' => 'cms_nav:'.$nav->url_path.':'.strtotime($nav->update_at),
         ));

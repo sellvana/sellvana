@@ -14,6 +14,12 @@ class FCom_Customer_Admin extends BClass
         ));
 
         FCom_Admin_Controller_MediaLibrary::i()->allowFolder('storage/import/customers');
+
+        if (BApp::m('FCom_PushServer')->run_status === BModule::LOADED
+            && BConfig::i()->get('modules/FCom_Customer/newcustomer_realtime_notification')
+        ) {
+            FCom_PushServer_Model_Client::i()->sessionClient()->subscribe('customers_feed');
+        }
     }
 
     public function onGetDashboardWidgets($args)

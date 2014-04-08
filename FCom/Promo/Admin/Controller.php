@@ -26,13 +26,10 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             ),
             array('name' => 'details', 'label' => 'Details', 'index' => 'details', 'hidden' => true),
             array('name' => 'attachments', 'label' => 'Attachments', 'sortable' => false, 'hidden' => false),
-            array(
-                'type' =>'btn_group', 'name'=>'_actions','label'=> 'Actions', 'sortable' => false,
-                'buttons'=> array(
-                                   array('name'=>'edit', 'href' => BApp::href($this->_formHref.'?id='), 'col' => 'id'),
-                                   array('name'=>'delete')
-                                )
-                )
+            array('type' =>'btn_group', 'buttons'=> array(
+                array('name'=>'edit'),
+                array('name'=>'delete'),
+            )),
         );
         $config['actions'] = array(
             'edit' => true,
@@ -294,7 +291,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         BResponse::i()->nocache();
         $r = BRequest::i();
         $this->view('jqgrid')->set('config', $this->productGridConfig(false, $r->get('type'), $r->get('group_id')));
-        BLayout::i()->rootView('jqgrid');
+        BLayout::i()->setRootView('jqgrid');
     }
 
     public function action_form_products()

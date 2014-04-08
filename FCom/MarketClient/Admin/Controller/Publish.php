@@ -6,9 +6,28 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
 
     public function action_index()
     {
-        $moduleNames = join(',', array_keys(BModuleRegistry::i()->getAllModules()));
-        $result = FCom_MarketClient_RemoteApi::i()->getModulesVersions($moduleNames);
-        $this->view('marketclient/publish')->set('modules', $result);
+        $result = FCom_MarketClient_RemoteApi::i()->getModulesVersions(true);
+
+        uasort($result, function($a, $b) {
+            $a1 = !empty($a['can_update']);
+            $b1 = !empty($b['can_update']);
+            if ($a1 && !$b1) return -1;
+            if ($b1 && !$a1) return 1;
+
+            $a2 = !empty($a['status']) && $a['status']==='available';
+            $b2 = !empty($b['status']) && $b['status']==='available';
+            if ($a2 && !$b2) return -1;
+            if ($b2 && !$a2) return 1;
+
+            return strcmp($a['name'], $b['name']);
+        });
+
+        $view = $this->view('marketclient/publish');
+        if (!empty($result['error'])) {
+            $this->message($result['message'], 'error');
+        } else {
+            $view->set('modules', $result);
+        }
         $this->layout('/marketclient/publish');
     }
 
@@ -26,13 +45,14 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
 
     public function action_module__POST()
     {
+        BResponse::i()->startLongResponse(false);
         $hlp = FCom_MarketClient_RemoteApi::i();
         $connResult = $hlp->setupConnection();
 
         list($action, $modName) = explode('/', BRequest::i()->post('mod_name'))+array('');
         $versionResult = $hlp->getModulesVersions($modName);
         #$redirectUrl = $hlp->getUrl('market/module/edit', array('mod_name' => $modName));
-        $redirectUrl = BRequest::i()->currentUrl();
+        $redirectUrl = BRequest::i()->referrer();
         #var_dump($modName, $versionResult); exit;
         if (!empty($versionResult[$modName]) && $versionResult[$modName]['status']==='available') {
             $createResult = $hlp->createModule($modName);
@@ -46,12 +66,10 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
             }
         }
         $uploadResult = $hlp->uploadPackage($modName);
-        //TODO: handle $result
+        $this->message($uploadResult['message'], !empty($uploadResult['error']) ? 'error' : 'success', 'admin');
+
+#echo "<pre>"; var_dump($uploadResult); exit;
+        // TODO: why $this->message() doesn't work here?
         BResponse::i()->redirect($redirectUrl);
-    }
-
-    public function action_upgrade__POST()
-    {
-
     }
 }

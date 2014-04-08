@@ -1,6 +1,7 @@
 <div class="f-site-main" role="main">
     <div class="container">
         <form action="{{ APP.href('email/subscribe') }}" method="post" id="f-newsletter" role="form">
+            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
             <fieldset class="f-newsletter-block">
                 <header class="f-page-header">
                     <h1 class="f-page-title">{{ 'Subscribe Newsletter' |_ }}</h1>

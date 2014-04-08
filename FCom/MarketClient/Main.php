@@ -2,38 +2,110 @@
 
 class FCom_MarketClient_Main extends BClass
 {
-    public function installFiles($modName, $origZipFile)
+    public function progress($data = null, $reset = false)
     {
-        if (!preg_match('#^([A-Za-z0-9]+)_([A-Za-z0-9]+)$#', $modName, $match)) {
-            throw new BException('Invalid module name: ' . $modName);
+        $progress = !$reset ? BCache::i()->load('marketclient_progress') : array();
+        if (!empty($data)) {
+            $progress = BUtil::arrayMerge($progress, $data);
+            BCache::i()->save('marketclient_progress', $progress);
+        }
+        return $progress;
+    }
+
+    public function downloadAndInstall($modules, $force = false)
+    {
+        $progress = $this->progress();
+        if (!$force && !empty($progress['status']) && in_array($progress['status'], array('ACTIVE'))) {
+            return;
         }
 
-        if (!BUtil::isPathAbsolute($origZipFile)) {
-            $origZipFile = BConfig::i()->get('fs/storage_dir') . '/dlc/packages/' . $origZipFile;
-        }
+        $configUpdated = false;
+        $i = 0;
+        $cnt = sizeof($modules);
+        $uid = mt_rand();
 
-        $targetDir = BConfig::i()->get('fs/dlc_dir') . '/' . $match[1] . '/' . $match[2];
-        BUtil::ensureDir($targetDir);
-
-        $ftpConf = BConfig::i()->get('modules/FCom_MarketClient/ftp');
-        if (!empty($ftpConf['enabled'])) {
-            $modulePath = dirname($moduleFile).'/'.$modName;
-            $res = FCom_MarketClient_Main::i()->extract($origZipFile, $modulePath);
-            //copy modulePath by FTP to marketPath
-            if (!$res) {
-                throw new BException("Permissions denied to write into storage dir: ".$modulePath);
-            }
-            if (empty($ftpConf['port'])) {
-                $ftpConf['port'] = $ftpConf['type'] =='ftp' ? 21 : 22;
-            }
-            $ftpClient = new BFtpClient($ftpConf);
-            $errors = $ftpClient->upload($modulePath, $targetDir);
-            if ($errors) {
-                throw new BException(join("\n", $errors));
-            }
-        } else {
-            $res = FCom_MarketClient_Main::i()->extract($moduleFile, $targetDir);
+        $this->progress(array(
+            'status' => 'ACTIVE',
+            'cnt' => $cnt,
+            'cur' => 0,
+            'uid' => $uid,
+        ), true);
+        if (is_string($modules)) {
+            $modules = explode(',', $modules);
         }
-        return $res;
+        foreach ($modules as $modName => $modInfo) {
+            $progress = $this->progress();
+            if ($progress['uid'] !== $uid) {
+                break;
+            }
+            if ($progress['status'] === 'STOP') {
+                $this->progress(array('status' => 'STOPPED'));
+                break;
+            }
+            $i++;
+
+            if (is_numeric($modName)) {
+                $modName = $modInfo;
+                $modInfo = array('version' => '*');
+            } elseif (is_string($modInfo)) {
+                $modInfo = array('version' => $modInfo);
+            }
+
+            $this->progress(array(
+                'cur' => $i,
+                'modules' => array(
+                    $modName => BLocale::_('[%d/%d] Downloading: %s...', array($i, $cnt, $modName)),
+                ),
+            ));
+
+            $filename = FCom_MarketClient_RemoteApi::i()->downloadPackage($modName, $modInfo['version']);
+            if (!$filename) {
+                $this->progress(array(
+                    'errors' => array(
+                        'Could not download module package file: '.$modName.' ('.$modInfo['version'].')',
+                    ),
+                ));
+                $this->message('Could not download module package file: '.$modName.' ('.$modInfo['version'].')');
+                continue;
+            }
+            $modNameArr = explode('_', $modName);
+            $targetDir = BConfig::i()->get('fs/dlc_dir') . '/' . $modNameArr[0] .'/'. $modNameArr[1];
+            BUtil::ensureDir($targetDir);
+
+            $this->progress(array(
+                'modules' => array(
+                    $modName => BLocale::_('[%d/%d] Downloading: %s... Installing...', array($i, $cnt, $modName)),
+                ),
+            ));
+
+            if (!BUtil::zipExtract($filename, $targetDir)) {
+                $this->progress(array(
+                    'errors' => array(
+                        'Could not extract module package file: '.$modName.' ('.$modInfo['version'].')',
+                    ),
+                ));
+                $this->message('Could not extract module package file: '.$modName.' ('.$modInfo['version'].')');
+                continue;
+            }
+            if (!empty($modInfo['enable'])) {
+                $configUpdated = true;
+                BConfig::i()->set('module_run_levels/FCom_Core/'.$modName, 'REQUESTED', false, true);
+            }
+            $this->progress(array(
+                'modules' => array(
+                    $modName => BLocale::_('[%d/%d] Downloading: %s... Installing... DONE', array($i, $cnt, $modName)),
+                ),
+            ));
+        }
+        $this->progress(array('status' => 'DONE'));
+        if ($configUpdated) {
+            FCom_Core_Main::i()->writeConfigFiles();
+        }
+    }
+
+    public function stopDownloading()
+    {
+        $this->progress(array('status' => 'STOP'));
+        return $this;
     }
 }

@@ -47,24 +47,46 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),
                     array('name'=>'prev_img', 'label'=>'Preview', 'width'=>110, 'display'=>'eval', 'print'=>'"<a href=\''.$baseSrc.'"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' target=_blank><img src=\''.$baseSrc.'"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"', 'sortable'=>false),
                     array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
-                    array('name'=>'file_size', 'label'=>'File Size', 'width'=>260, 'search'=>false, 'display'=>'file_size')
+                    array('name'=>'file_size', 'label'=>'File Size', 'width'=>260, 'search'=>false, 'display'=>'file_size'),
+                    array('name'=>'associated_products', 'label'=>'Associated Products', 'width'=>50),
                     //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
                 ),
                 'filters' => array(
                     array('field' => 'file_name', 'type' => 'text')
                 ),
-                'grid_before_create'=>$id.'_register'
+                'grid_before_create'=>$id.'_register',
+                'actions' => array(
+                    'rescan' => array('caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'),
+                    'refresh' => true,
+                )
             )
         );
-
+        
         if (!empty($options['config'])) {
-            $config = BUtil::arrayMerge($config, $options['config']);
+            
+            $config['config'] = BUtil::arrayMerge($config['config'], $options['config']);
+
+        }
+
+        if($options['mode'] && $options['mode'] === 'link') {
+            $download_url = BApp::href('/media/grid/download?folder='.$folder.'&file=');
+            $config['config']['columns'] = array(
+                    array('type'=>'row_select'),
+                    array('name'=>'download_url',  'hidden'=>true, 'default'=>$download_url),
+                    array('name'=>'id', 'label'=>'ID', 'width'=>400, 'hidden'=>true),                    
+                    array('name'=>'file_name', 'label'=>'File Name', 'width'=>200, 'display'=>'eval', 'print'=>'"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'),
+                    array('name'=>'file_size', 'label'=>'File Size', 'width'=>260, 'search'=>false, 'display'=>'file_size')
+                    //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
+                );
         }
         //BEvents::i()->fire(__METHOD__, array('config'=>&$config));
         //BEvents::i()->fire(__METHOD__.':'.$folder, array('config'=>&$config));
         return $config;
     }
-
+    public function action_index()
+    {
+         $this->layout('/media');
+    }
     public function action_grid_data()
     {
         switch (BRequest::i()->params('do')) {

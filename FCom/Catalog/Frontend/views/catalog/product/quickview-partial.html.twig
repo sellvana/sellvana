@@ -61,6 +61,7 @@
       <!-- /.f-price-group -->
 
       <form class="f-prod-select form-horizontal" role="form" method="post" action="{{ APP.href('cart/add') }}">
+        <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
         <input type="hidden" name="id" value="{{ m.id() }}">
         <input type="hidden" name="action" value="add">
 {#

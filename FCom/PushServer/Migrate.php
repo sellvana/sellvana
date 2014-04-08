@@ -80,6 +80,7 @@ class FCom_PushServer_Migrate extends BClass
             'PRIMARY' => '(id)',
             'KEYS' => array(
                 'IDX_update_at' => '(update_at)',
+                'IDX_client_window_status' => '(client_id, window_name, status)'
             ),
             'CONSTRAINTS' => array(
                 "FK_{$tMessage}_channel" => "FOREIGN KEY (channel_id) REFERENCES {$tChannel} (id) ON UPDATE CASCADE ON DELETE SET NULL",

@@ -3,7 +3,6 @@ modules:
         version: 0.1.0
         channel: beta
         description: Bootstrap 3.x simple theme
-        require: { module: { FCom_Frontend_DefaultTheme: 0.1.0 } }
 
         areas:
             FCom_Frontend:

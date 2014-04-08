@@ -1,0 +1,52 @@
+modules:
+    FCom_VirtPackCoreEcom:
+        version: 0.1.0
+        channel: alpha
+
+        require:
+            module:
+                FCom_AdapterExcel: 0.1.0
+                FCom_Admin: 0.1.0
+                FCom_AdminChat: 0.1.0
+                FCom_ApiServer: 0.1.0
+                FCom_AuthorizeNet: 0.1.0
+                FCom_Blog: 0.1.0
+                FCom_Catalog: 0.1.0
+                FCom_CatalogIndex: 0.1.0
+                FCom_Checkout: 0.1.0
+                FCom_Cms: 0.1.0
+                FCom_Cron: 0.1.0
+                FCom_Customer: 0.1.0
+                FCom_CustomerGroups: 0.1.0
+                FCom_CustomField: 0.1.0
+                FCom_Disqus: 0.1.0
+                FCom_EasyPost: 0.1.0
+                FCom_Email: 0.1.0
+                FCom_Feedback: 0.1.0
+                FCom_FreshBooks: 0.1.0
+                FCom_Frontend: 0.1.0
+                FCom_FrontendCP: 0.1.0
+                FCom_FrontendThemeBootSimple: 0.1.0
+                FCom_Geo: 0.1.0
+                FCom_MarketClient: 0.1.0
+                FCom_MultiCurrency: 0.1.0
+                FCom_MultiLanguage: 0.1.0
+                FCom_MultiSite: 0.1.0
+                FCom_MultiVendor: 0.1.0
+                FCom_MultiWarehouse: 0.1.0
+                FCom_Ogone: 0.1.0
+                FCom_PaymentBasic: 0.1.0
+                FCom_PaymentCC: 0.1.0
+                FCom_PaymentIdeal: 0.1.0
+                FCom_PayPal: 0.1.0
+                FCom_ProductReviews: 0.1.0
+                FCom_Promo: 0.1.0
+                FCom_PushServer: 0.1.0
+                FCom_Referrals: 0.1.0
+                FCom_Sales: 0.1.0
+                FCom_SampleData: 0.1.0
+                FCom_Seo: 0.1.0
+                FCom_ShippingPlain: 0.1.0
+                FCom_ShippingUps: 0.1.0
+                FCom_Stock: 0.1.0
+                FCom_Wishlist: 0.1.0

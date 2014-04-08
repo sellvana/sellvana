@@ -9,65 +9,30 @@ base:
   - view: head
     do:
       - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
-      #- [ title, Sellvana Admin ]
       - [ icon, @FCom_Core/favicon.ico ]
-      #- [ js, @FCom_Core/js/lib/head.min.js ]
-      #- [ css, @FCom_Core/css/bootstrap-3.min.css ]
-      #- [ css, @FCom_Admin/Admin/compass/css/screen.css ]
-      #- [ js, @FCom_Core/js/lib/html5shiv.min.js, { if: lt IE 9 } ]
-      #- [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
-      #- [ js, //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js ]
-      #- [ css, @FCom_Core/js/lib/css/smoothness/jquery-ui-1.8.17.custom.css ]
-
       - [ js, @FCom_Admin/Admin/theme1/assets/javascripts/ie/html5shiv.js, { if: lt IE 9 } ]
       - [ js, @FCom_Admin/Admin/theme1/assets/javascripts/ie/respond.min.js, { if: lt IE 9 } ]
 
-      #- [ css, @FCom_Core/js/select2/select2.css ]
       - [ css, @FCom_Core/css/fcom.core.css ]
-      #- [ css, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.min.css ]
-      #- [ css, @FCom_Core/js/lib/css/layout-default-latest.css ]
-      #- [ css, @FCom_Core/js/lib/css/jquery.pnotify.default.css ]
-      #- [ css, @FCom_Core/bootstrap/css/bootstrap-responsive.min.css ]
+      - [ requireJs, jquery.cookie, @FCom_LibJsCommon/js/jquery.cookie, { deps: [ jquery ] } ]
+      - [ requireJs, jquery.hotkeys, @FCom_LibJsCommon/js/jquery.hotkeys, { deps: [ jquery ] } ]
+      - [ requireJs, jquery.contextmenu, @FCom_LibJsCommon/js/jqGrid/plugins/jquery.contextmenu, { deps: [ jquery ] } ]
 
-      #- [ js, @FCom_Core/js/lib/json2.js ]
-      #- [ js, //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js ]
-      #- [ js, @FCom_Core/js/lib/angular.min.js ]
-      #- [ js, @FCom_Core/js/lib/jquery.ba-hashchange.min.js ]
-      #- [ requireModulePath, FCom_Admin ]
-      - [ requireJs, jquery.cookie, @FCom_Core/js/lib/jquery.cookie, { deps: [ jquery ] } ]
-      - [ requireJs, jquery.hotkeys, @FCom_Core/js/lib/jquery.hotkeys, { deps: [ jquery ] } ]
-      #- [ requireJs, jquery.inline-editor, @FCom_Core/js/lib/jquery.inline-editor.min, { deps: [ jquery ] } ]
-      #- [ requireJs, @FCom_Core/js/lib/jquery.layout-latest.min.js ]
-      #- [ js, @FCom_Core/js/lib/jquery.pnotify.min.js ]
-      #- [ js, @FCom_Core/js/select2/select2.min.js ]
-      # highcharts
-      #- [ requireJs, highcharts, @FCom_Admin/Admin/js/highcharts/highcharts, { deps: [ jquery ] } ]
-      - [ requireJs, jquery.contextmenu, @FCom_Core/js/lib/jqGrid/plugins/jquery.contextmenu, { deps: [ jquery ] } ]
+      - [ requireJs, jquery.splitter, @FCom_LibJsCommon/js/splitter/jquery.splitter, { deps: [ jquery ] } ]
+      - [ css, @FCom_LibJsCommon/js/splitter/jquery.splitter.css ]
 
-      - [ requireJs, jquery.splitter, @FCom_Core/js/lib/splitter/jquery.splitter, { deps: [ jquery ] } ]
-      - [ css, @FCom_Core/js/lib/splitter/jquery.splitter.css ]
+      - [ requireJs, jquery.equalHeights, @FCom_LibJsCommon/js/jquery.equalHeights, { deps: [ jquery ] } ]
 
-      - [ requireJs, jquery.equalHeights, @FCom_Core/js/lib/jquery.equalHeights, { deps: [ jquery ] } ]
-
-      - [ requireJs, ckeditor, @FCom_Core/js/lib/ckeditor/ckeditor, { deps: [ jquery ] } ]
-      - [ requireJs, ckeditor-jquery, @FCom_Core/js/lib/ckeditor/adapters/jquery, { deps: [ jquery, ckeditor ] } ]
       - [ requireJs, fcom.admin, @FCom_Admin/Admin/js/fcom.admin ]
       - [ requireJs, fcom.admin.dynatree, @FCom_Admin/Admin/js/fcom/fcom.admin.dynatree ]
       - [ requireJs, fcom.admin.form, @FCom_Admin/Admin/js/fcom.admin.form ]
       - [ requireRun, fcom.admin ]
 
-      - [ requireJs, dynatree, @FCom_Admin/Admin/js/dynatree/jquery.dynatree.min, { deps: [ jquery ] } ]
-      - [ css, @FCom_Admin/Admin/js/dynatree/skin-vista/ui.dynatree.css ]
+      #- [ requireJs, dynatree, @FCom_Admin/Admin/js/dynatree/jquery.dynatree.min, { deps: [ jquery ] } ]
+      #- [ css, @FCom_Admin/Admin/js/dynatree/skin-vista/ui.dynatree.css ]
+
   - { include: common_js_libs }
   - { include: lib_admin_theme1 }
-  #- { include: grid }
-  #- { include: jqgrid }
-  #- { include: jstree }
- # - { include: lib_backgrid }
-
-  - view: head
-    do:
-      #- [ css, @FCom_Admin/Admin/css/fcom.admin.css ] # need to be separate from other CSS for correct ordering in styling
 
   - view: admin/nav
     do:
@@ -92,54 +57,40 @@ base:
 common_js_libs:
   - view: head
     do:
-      - [ requireJs, transparency, @FCom_Core/js/lib/transparency.min ]
-      - [ requireJs, date, @FCom_Core/js/lib/date, { exports: Date } ]
+      - [ requireJs, transparency, @FCom_LibJsCommon/js/transparency.min ]
+      - [ requireJs, date, @FCom_LibJsCommon/js/date, { exports: Date } ]
 
-      #- [ requireJs, jquery, [ //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min, @FCom_Core/js/lib/jquery.min ], { exports: [ $, jQuery ] } ]
+      #- [ requireJs, jquery, [ //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min, @FCom_LibJsCommon/js/jquery.min ], { exports: [ $, jQuery ] } ]
       #- [ requireJs, select2, @FCom_Core/js/select2/select2, { deps: [ jquery ] } ]
-      - [ requireJs, jquery.form, @FCom_Core/js/lib/jquery.form, { deps: [ jquery ] } ]
-      - [ requireJs, jquery-ui, [ //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min, @FCom_Core/js/lib/jquery-ui.min ], { deps: [ jquery ] } ]
-      #- [ requireJs, jquery.dragtable, @FCom_Core/js/lib/jquery.dragtable-jebaird, { deps: [ jquery, jquery-ui ] } ]
+      - [ requireJs, jquery.form, @FCom_LibJsCommon/js/jquery.form, { deps: [ jquery ] } ]
+      - [ requireJs, jquery-ui, [ //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min, @FCom_LibJsCommon/js/jquery-ui.min ], { deps: [ jquery ] } ]
 
-      - [ requireJs, nicedit, @FCom_Core/js/lib/nicEdit ]
+      #- [ requireJs, nicedit, @FCom_LibJsCommon/js/nicEdit ]
 
-      - [ requireJs, underscore, @FCom_Core/js/lib/underscore, { exports: _ } ]
-      - [ requireJs, bacon, @FCom_Core/js/lib/bacon.min, { exports: Bacon } ]
-      - [ requireJs, backbone, @FCom_Core/js/lib/backbone, { deps: [ jquery, underscore ], exports: Backbone } ]
-      #- [ requireJs, backbone.modelbinder, @FCom_Core/js/lib/backbone.modelbinder.min, { deps: [ backbone ], exports: Backbone.ModelBinder } ]
-      #- [ requireJs, marionette, @FCom_Core/js/lib/backbone.marionette.min, { deps: [ backbone ], exports: Backbone.Marionette } ]
-      #- [ requireJs, backbone-pageable, @FCom_Core/js/lib/backbone-pageable, { deps: [ backbone ], exports: Backbone.PageableCollection } ]
-      #- [ requireJs, backbone.bootstrap-modal, @FCom_Core/js/lib/backbone.bootstrap-Modal, { deps: [ backbone ], exports: Backbone.BootstrapModal } ]
-      #- [ requireJs, memento, @FCom_Core/js/lib/backbone.memento.min, { deps: [ backbone ], exports: Backbone.Memento } ]
-      #- [ requireJs, backbone.forms, @FCom_Core/js/lib/backbone-forms, { deps: [ backbone ], exports: Backbone.Form } ]
+      - [ requireJs, underscore, @FCom_LibJsCommon/js/underscore, { exports: _ } ]
+      - [ requireJs, bacon, @FCom_LibJsCommon/js/bacon.min, { exports: Bacon } ]
+      - [ requireJs, backbone, @FCom_LibJsCommon/js/backbone, { deps: [ jquery, underscore ], exports: Backbone } ]
+      #- [ requireJs, backbone.modelbinder, @FCom_LibJsCommon/js/backbone.modelbinder.min, { deps: [ backbone ], exports: Backbone.ModelBinder } ]
+      #- [ requireJs, marionette, @FCom_LibJsCommon/js/backbone.marionette.min, { deps: [ backbone ], exports: Backbone.Marionette } ]
+      #- [ requireJs, backbone-pageable, @FCom_LibJsCommon/js/backbone-pageable, { deps: [ backbone ], exports: Backbone.PageableCollection } ]
+      #- [ requireJs, backbone.bootstrap-modal, @FCom_LibJsCommon/js/backbone.bootstrap-Modal, { deps: [ backbone ], exports: Backbone.BootstrapModal } ]
+      #- [ requireJs, memento, @FCom_LibJsCommon/js/backbone.memento.min, { deps: [ backbone ], exports: Backbone.Memento } ]
+      #- [ requireJs, backbone.forms, @FCom_LibJsCommon/js/backbone-forms, { deps: [ backbone ], exports: Backbone.Form } ]
 
-      - [ requireJs, jquery.bootstrap-growl, @FCom_Core/js/lib/jquery.bootstrap-growl.min, { deps: [ jquery, bootstrap ] } ]
+      - [ requireJs, jquery.bootstrap-growl, @FCom_LibJsCommon/js/jquery.bootstrap-growl.min, { deps: [ jquery, bootstrap ] } ]
 
-      - [ requireJs, mustache, @FCom_Core/js/lib/mustache ]
-      - [ requireJs, recline, @FCom_Core/js/lib/recline, { deps: [ underscore, backbone, jquery, mustache, bootstrap ] } ]
+      - [ requireJs, mustache, @FCom_LibJsCommon/js/mustache ]
+      - [ requireJs, recline, @FCom_LibJsCommon/js/recline, { deps: [ underscore, backbone, jquery, mustache, bootstrap ] } ]
 
-      #- [ requireJs, colResizable, @FCom_Core/js/lib/colResizable-1.3.source, { deps: [ jquery ] } ]
-      #- [ requireJs, jquery.dragtable, @FCom_Core/js/lib/jquery.dragtable-akottr, { deps: [ jquery, jquery-ui ] } ]
-      - [ requireJs, lunr, @FCom_Core/js/lib/lunr.min, { exports: lunr } ]
-      - [ requireJs, moment, @FCom_Core/js/lib/moment.min, { exports: moment } ]
+      #- [ requireJs, colResizable, @FCom_LibJsCommon/js/colResizable-1.3.source, { deps: [ jquery ] } ]
+      #- [ requireJs, jquery.dragtable, @FCom_LibJsCommon/js/jquery.dragtable-akottr, { deps: [ jquery, jquery-ui ] } ]
+      - [ requireJs, lunr, @FCom_LibJsCommon/js/lunr.min, { exports: lunr } ]
+      - [ requireJs, moment, @FCom_LibJsCommon/js/moment.min, { exports: moment } ]
 
-      - [ requireJs, angular, [ //ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min, @FCom_Core/js/lib/angular.min ], { deps: [ jquery ], exports: angular } ]
+      - [ requireJs, angular, [ //ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min, @FCom_LibJsCommon/js/angular.min ], { deps: [ jquery ], exports: angular } ]
 
       - [ requireJs, fcom.core, @FCom_Core/js/fcom.core ]
-      #- [ requireJs, fcom.htmlgrid, @FCom_Core/js/fcom/fcom.htmlgrid ]
       - [ requireJs, fcom.backbonegrid, @FCom_Core/js/fcom/fcom.backbonegrid ]
-      #- [ requireJs, backgrid, @FCom_Core/js/lib/backgrid/backgrid, { deps: [ backbone, backbone-pageable ], exports: Backgrid } ]
-      #- [ requireJs, backgrid-filter, @FCom_Core/js/lib/backgrid/extensions/filter/backgrid-filter, { deps: [ backgrid ] } ]
-      #- [ requireJs, backgrid-paginator, @FCom_Core/js/lib/backgrid/extensions/paginator/backgrid-paginator, { deps: [ backgrid, backbone-pageable ] } ]
-      #- [ requireJs, backgrid-select-all, @FCom_Core/js/lib/backgrid/extensions/select-all/backgrid-select-all, { deps: [ backgrid ] } ]
-      #- [ requireJs, backgrid-moment-cell, @FCom_Core/js/lib/backgrid/extensions/moment-cell/backgrid-moment-cell, { deps: [ backgrid, moment ] } ]
-      #- [ requireJs, fcom.backgrid.toolbar, @FCom_Core/js/fcom.backgrid.toolbar ]
-
-      - [ requireJs, wysihtml5, @FCom_Core/js/lib/wysihtml5/wysihtml5-0.4.0pre ]
-      - [ requireJs, bootstrap-wysihtml5, @FCom_Core/js/lib/wysihtml5/bootstrap-wysihtml5, { deps: [ jquery, bootstrap, wysihtml5 ] } ]
-      #- [ requireJs, store, @FCom_Core/js/lib/store ]
-      #- [ requireJs, resizableColumns, @FCom_Core/js/lib/jquery.resizableColumns, { deps: [ jquery] } ]
-      #- [ requireJs, fcom.backbone.grid, @FCom_Core/js/fcom.backbone.grid ]
 
 lib_admin_theme1:
   - view: head
@@ -206,7 +157,7 @@ lib_admin_theme1:
 
       - [ js, @FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery.min.js, { alias: jquery } ]
       - [ requireJs, jquery-mobile, @FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery.mobile.custom.min, { deps: [ jquery ] } ]
-      - [ requireJs, jquery-ui, @FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery-ui.min, { deps: [ jquery ] } ]
+      #- [ requireJs, jquery-ui, @FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery-ui.min, { deps: [ jquery ] } ]
       - [ requireJs, jquery-migrate, @FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery-migrate.min, { deps: [ jquery ] } ]
       - [ requireJs, bootstrap, @FCom_Admin/Admin/theme1/assets/javascripts/bootstrap/bootstrap.min, { deps: [ jquery ] } ]
 
@@ -219,15 +170,15 @@ lib_admin_theme1:
 jstree:
   - view: head
     do:
-      - [ css, @FCom_Core/js/lib/themes/default/style.css ]
-      - [ requireJs, jstree, @FCom_Core/js/lib/jquery.jstree, { deps: [ jquery, jquery.hotkeys, jquery.cookie ] } ]
+      - [ css, @FCom_LibJsCommon/js/themes/default/style.css ]
+      - [ requireJs, jstree, @FCom_LibJsCommon/js/jquery.jstree, { deps: [ jquery, jquery.hotkeys, jquery.cookie ] } ]
 
 mcdropdown:
   - view: head
     do:
-      - [ css, @FCom_Core/js/lib/css/jquery.mcdropdown.css ]
-      - [ requireJs, jquery.bgiframe, @FCom_Core/js/lib/jquery.bgiframe, { deps: [ jquery ] } ]
-      - [ requireJs, mcdropdown, @FCom_Core/js/lib/jquery.mcdropdown, { deps: [ jquery, jquery.bgiframe ] } ]
+      - [ css, @FCom_LibJsCommon/js/css/jquery.mcdropdown.css ]
+      - [ requireJs, jquery.bgiframe, @FCom_LibJsCommon/js/jquery.bgiframe, { deps: [ jquery ] } ]
+      - [ requireJs, mcdropdown, @FCom_LibJsCommon/js/jquery.mcdropdown, { deps: [ jquery, jquery.bgiframe ] } ]
 
 codemirror:
   - view: head
@@ -269,7 +220,7 @@ default_form:
 form:
   - view: head
     do:
-      #- [ css, @FCom_Core/js/lib/themes/default/style.css ]
+      #- [ css, @FCom_LibJsCommon/js/themes/default/style.css ]
   #- { include: jstree }
   #- { include: lib_cleditor }
 
@@ -280,14 +231,14 @@ form:
 
 /:
     - { include: base }
-    - { include: flot }
+    - { include: lib_js_flot }
     - { hook: main, views: dashboard }
     - { view: admin/nav, do: [[ setNav, dashboard ]] }
     - view: head
       do:
         #- [ requireJs, ModalLauncher, @FCom_Admin/Admin/js/BackboneViews/ModalLauncher ]
         #- [ requireJs, FormView, @FCom_Admin/Admin/js/BackboneViews/FormView ]
-        - [ css, @FCom_Core/js/lib/css/dragtable-akottr.css ]
+        - [ css, @FCom_LibJsCommon/js/css/dragtable-akottr.css ]
 
 /denied:
     - { include: base }
@@ -324,7 +275,7 @@ form:
 /settings:
     - { include: base }
     - { include: form }
-    - { include: codemirror }
+    - { include: lib_js_codemirror }
     - { hook: main, views: settings }
     - { view: admin/nav, do: [[ setNav, system/settings ]] }
     - view: settings
@@ -344,4 +295,9 @@ form:
     - { view: admin/nav, do: [[ setNav, modules/installed ]] }
 
 /templates/form:
-    - { include: codemirror }
+    - { include: lib_js_codemirror }
+/media:
+    - { include: base }
+    - { hook: header, clear: true }
+    - { hook: top-nav, clear: true }
+    - { hook: main, views: media }
