@@ -2292,7 +2292,8 @@ class BActionController extends BClass
     */
     public function beforeDispatch()
     {
-        BEvents::i()->fire(static::$_origClass.'::beforeDispatch');
+        BEvents::i()->fire(__METHOD__); // general beforeDispatch event for all controller
+        BEvents::i()->fire(static::$_origClass.'::beforeDispatch'); // specific controller instance
         return true;
     }
 
@@ -2302,7 +2303,8 @@ class BActionController extends BClass
     */
     public function afterDispatch()
     {
-        BEvents::i()->fire(static::$_origClass.'::afterDispatch');
+        BEvents::i()->fire(__METHOD__); // general afterDispatch event for all controller
+        BEvents::i()->fire(static::$_origClass.'::afterDispatch'); // specific controller instance
     }
 
     /**
