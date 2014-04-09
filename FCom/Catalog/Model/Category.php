@@ -218,4 +218,37 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         }
         return $this;
     }
+
+    public function processAfterImport( $args )
+    {
+        $importId = $args[ 'import_id' ];
+        $toUpdate = $this->orm()->where( 'parent_id IS NULL' )->find_many_assoc();
+        if ( empty( $toUpdate ) ) {
+            return;
+        }
+        $ids = array_keys( $toUpdate );
+        $importData = FCom_Core_Model_ImportExport_Id::i()->orm()
+            ->join(
+              FCom_Core_Model_ImportExport_Model::i()->table(),
+              'iem.id=model_id and iem.model_name=\'' . static::origClass() . '\'',
+              'iem'
+            )
+            ->where( array( 'site_id' => $importId ) )
+            ->where( array( 'local_id' => $ids ) )
+            ->find_many();
+
+        if(empty($importData)){
+            BDebug::log( BLocale::_( "Could not update category data, missing import details" ));
+            return;
+        }
+
+        foreach ( $importData as $item ) {
+            $relations = $item->get( 'relations' );
+            if ( empty( $relations ) ) {
+                continue;
+            }
+            $relations = json_decode($relations);
+        }
+
+    }
 }

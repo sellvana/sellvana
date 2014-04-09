@@ -546,10 +546,10 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                     continue;
                 }
                 list( $relModel, $field ) = explode( '.', $r );
-                $tempRel = FCom_Core_Model_ImportExport_Id::orm()
+                $tempRel = FCom_Core_Model_ImportExport_Id::i()->orm()
                                       ->select( array( 'import_id', 'local_id' ) )
                                       ->join(
-                                          FCom_Core_Model_ImportExport_Model::table(),
+                                          FCom_Core_Model_ImportExport_Model::i()->table(),
                                           'iem.id=model_id and iem.model_name=\'' . $relModel . '\'',
                                           'iem'
                                       )
