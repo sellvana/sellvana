@@ -181,12 +181,14 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 }
 
                 if( $this->currentModel ){
-                    BEvents::i()->fire( __METHOD__ . ':afterModel:' . $this->currentModel,
-                        array('import_id' => $importID )
+                    BEvents::i()->fire(
+                        __METHOD__ . ':afterModel:' . $this->currentModel,
+                        array( 'import_id' => $importID, 'models' => $this->changedModels )
                     );
                 }
 
                 $this->currentModel   = $data[ static::DEFAULT_MODEL_KEY ];
+                $this->changedModels = array();
                 $this->channel->send( array( 'signal' => 'info', 'msg' => "Importing: $this->currentModel" ) );
                 if ( !isset( $this->importModels[ $this->currentModel ] ) ) {
                     // first time importing this model
@@ -244,6 +246,15 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $this->importBatch( $batchData );
             $batchData = array();
         }
+
+        if ( !empty($batchData) ) {
+            $this->importBatch( $batchData );
+        }
+
+        BEvents::i()->fire(
+            __METHOD__ . ':afterModel:' . $this->currentModel,
+            array( 'import_id' => $importID, 'models' => $this->changedModels )
+        );
         if ( !feof( $fi ) ) {
             $this->channel->send( array( 'signal' => 'problem',
                                   'problem' => "Error: unexpected file fail" ) );
@@ -302,7 +313,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 'model_id'  => $this->importModels[ $this->currentModel ]->id(),
                 'import_id' => $data[ $this->currentModelIdField ],
                 'local_id'  => null,
-                'relations' => !empty( $data[ 'failed_related' ] ) ? json_encode( $data[ 'failed_related' ] ) : null,
+                'relations' => !empty( $data[ 'failed_relation' ] ) ? json_encode( $data[ 'failed_relation' ] ) : null,
                 'update_at' => BDb::i()->now(),
             );
             unset( $data[ $this->currentModelIdField ], $data['failed_related'] );
@@ -325,7 +336,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                         $this->notChanged++;
                     }
                 } else {
-                    $model = $cm::i()->create( $data )->save();
+                    $model = $cm::i()->create( $data )->save( false );
                     $this->newModels++;
                 }
             } catch ( PDOException $e ) {
@@ -336,7 +347,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
             if ( $model ) {
                 $ieData[ 'local_id' ] = $model->id();
-                $ieHelperId->create( $ieData )->save();
+                $ieHelperId->create( $ieData )->save( true, true );
                 $this->changedModels[$id] = $model;
             } else {
                 BDebug::warning("Invalid model: $id");
@@ -578,6 +589,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                                 // if there is no match for needed field
                                 // set related field to be null, so that it can be updated after model data is imported.
                                 // store relation data
+                                $data[ $field ] = null;
                                 $data['failed_relation'][$field] = $tmp;
                             }
                         }

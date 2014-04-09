@@ -373,9 +373,9 @@ if (!is_object($this->orm)) BDebug::error("Calling ".__FUNCTION__."() without \$
         /**
          * Save the data associated with this model instance to the database.
          */
-        public function save() {
+        public function save( $replace = false ) {
 if (!is_object($this->orm)) BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);
-            return $this->orm->save();
+            return $this->orm->save( $replace );
         }
 
         /**

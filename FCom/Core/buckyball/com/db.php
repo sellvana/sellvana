@@ -1392,7 +1392,7 @@ class BORM extends ORMWrapper
         $this->_dirty_fields = BDb::cleanForTable($this->_table_name, $this->_dirty_fields);
         if (true) {
             #if (array_diff_assoc($this->_old_values, $this->_dirty_fields)) {
-                $result = parent::save();
+                $result = parent::save( $replace );
             #}
         } else {
             echo $this->_class_name.'['.$this->id.']: ';
@@ -2242,7 +2242,7 @@ class BModel extends Model
     * @param boolean $callBeforeAfter whether to call onBeforeSave and onAfterSave methods
     * @return BModel
     */
-    public function save($callBeforeAfter=true)
+    public function save( $callBeforeAfter=true, $replace = false )
     {
         if ($callBeforeAfter) {
             try {
@@ -2256,7 +2256,7 @@ class BModel extends Model
 
         $this->_newRecord = !$this->get(static::_get_id_column_name(get_called_class()));
 
-        parent::save();
+        parent::save( $replace );
 
         if ($callBeforeAfter) {
             $this->onAfterSave();

@@ -376,6 +376,23 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function generateIdPath()
+    {
+        $idPath = $this->id();
+        $parentIdPath = '';
+        /** @var FCom_Core_Model_TreeAbstract $parent */
+        $parent = $this->parent();
+        while( $parent ) {
+            $parentIdPath = $parent->id() . '/' . $parentIdPath;
+            $parent = $parent->parent();
+        }
+        if ($parentIdPath) {
+            $idPath = trim( $parentIdPath, '/' ) . '/' . $idPath;
+        }
+        $this->set('id_path', $idPath);
+        return $this;
+    }
+
     public function generateFullName()
     {
         $parent = $this->parent();
