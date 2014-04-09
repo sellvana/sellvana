@@ -27,7 +27,7 @@
                   {% for subCat in subCategories %}
                       <li class="col-md-6 list-unstyled">
                           <a href="{{ subCat.url() }}" title="{{ subCat.get('node_name') }}">
-                              <img src="{{ APP.instance('FCom_Core_Main').resizeUrl() }}?s=98x98&f={{ subCat.image_url }}"
+                              <img src="{{ APP.instance('FCom_Core_Main').resizeUrl() }}?s=98x98&f={{ subCat.get('image_url') }}"
                                    alt="{{ subCat.get('node_name') }}" />
                           </a>
                           <a href="{{ subCat.url() }}" title="{{ subCat.get('node_name') }}">{{ subCat.get('node_name') }}</a>
