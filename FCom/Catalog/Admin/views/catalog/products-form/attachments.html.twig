@@ -2,7 +2,7 @@
 {% set prodAttachConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productAttachmentsGridConfig(m) %}
 <script>
 var all_attachments_grid, attachmentGrid;
-require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone) {
+require(['jquery', 'underscore', 'backbone', 'unique', 'fcom.backbonegrid'], function($, _, Backbone) {
     var originIds, addedIds = [], removedIds = [];
     var backboneGridAllImages, rowsAllImages;
     function _getAttachmentsDbFields(row) {

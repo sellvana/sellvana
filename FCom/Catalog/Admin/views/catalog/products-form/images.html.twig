@@ -2,7 +2,7 @@
 {% set prodImagesConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
 <script>
 var all_prod_images_grid, imagesGrid;
-require(['jquery','underscore','backbone'], function($, _) {
+require(['jquery','underscore','backbone', 'fcom.backbonegrid'], function($, _) {
     var originIds, removedIds = [];
     var rowsAllImages;
     var mainThumb = $('#main-thumb-image');
