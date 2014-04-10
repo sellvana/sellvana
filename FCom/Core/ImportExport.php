@@ -577,24 +577,20 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
         if ( isset( $this->currentConfig[ 'related' ] ) ) {
             foreach ( $this->currentConfig[ 'related' ] as $field => $l ) {
-                $relModel = explode( '.', $l );
-                $relModel = $relModel[0];
-                if ( !empty( $this->currentRelated[ $l ]) ) {
-                    foreach ( $batchData as &$data ) { // populate related data
-                        if ( isset( $data[ $field ] ) ) {
-                            $tmp = $data[ $field ];
-                            if ( isset( $this->currentRelated[ $l ][ $tmp ] ) ) {
-                                $data[ $field ] = $this->currentRelated[ $l ][ $tmp ];
-                            } else {
-                                // if there is no match for needed field
-                                // set related field to be null, so that it can be updated after model data is imported.
-                                // store relation data
-                                $data[ $field ] = null;
-                                $data['failed_relation'][$field] = $tmp;
-                            }
+                foreach ( $batchData as &$data ) { // populate related data
+                    if ( isset( $data[ $field ] ) ) {
+                        $tmp = $data[ $field ];
+                        if ( isset( $this->currentRelated[ $l ][ $tmp ] ) ) {
+                            $data[ $field ] = $this->currentRelated[ $l ][ $tmp ];
+                        } else {
+                            // if there is no match for needed field
+                            // set related field to be null, so that it can be updated after model data is imported.
+                            // store relation data
+                            $data[ $field ]                      = null;
+                            $data[ 'failed_relation' ][ $field ] = $tmp;
                         }
-                    } // end foreach batch data
-                } // end if !empty
+                    }
+                } // end foreach batch data
             } // end foreach ['related']
         } // end if related
     }

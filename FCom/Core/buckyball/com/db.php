@@ -1399,9 +1399,8 @@ class BORM extends ORMWrapper
         BDb::connect($this->_writeConnectionName);
         $this->_dirty_fields = BDb::cleanForTable($this->_table_name, $this->_dirty_fields);
         if (true) {
-            $this->_replace = $replace;
             #if (array_diff_assoc($this->_old_values, $this->_dirty_fields)) {
-                $result = parent::save();
+                $result = $this->_save( $replace );
             #}
         } else {
             echo $this->_class_name.'['.$this->id.']: ';
@@ -1415,15 +1414,54 @@ class BORM extends ORMWrapper
     }
 
     /**
+     * Save any fields which have been modified on this object
+     * to the database.
+     */
+    protected function _save( $replace = false )
+    {
+        $values = array_values( $this->_dirty_fields );
+
+        if ( !$this->_is_new ) { // UPDATE
+            // If there are no dirty values, do nothing
+            if ( count( $values ) == 0 ) {
+                return true;
+            }
+            $query     = $this->_build_update();
+            $values[ ] = $this->id();
+        } else {
+            if ( $replace ) {
+                $query = $this->_build_replace();
+            } else { // INSERT
+                $query = $this->_build_insert();
+            }
+        }
+
+        static::_log_query( $query, $values );
+#$mem = memory_get_usage();
+        $statement = static::$_db->prepare( $query );
+        $success   = $statement->execute( $values );
+        //$success = true;
+#echo '('.(memory_get_usage()-$mem).') ';
+
+        // If we've just inserted a new record, set the ID of this object
+        if ( $this->_is_new ) {
+            $this->_is_new = false;
+            if ( is_null( $this->id() ) ) {
+                $this->_data[ $this->_get_id_column_name() ] = self::$_db->lastInsertId();
+            }
+        }
+
+        $this->_dirty_fields = array();
+        return $success;
+    }
+
+    /**
      * Build an INSERT query
      */
-    protected function _build_insert()
+    protected function _build_replace()
     {
 
-        $operation = "INSERT INTO";
-        if ( $this->_replace ) {
-            $operation = "REPLACE INTO";
-        }
+        $operation  = "REPLACE INTO";
         $query[ ]   = $operation;
         $query[ ]   = $this->_quote_identifier( $this->_table_name );
         $field_list = array_map( array( $this, '_quote_identifier' ), array_keys( $this->_dirty_fields ) );
@@ -2423,9 +2461,10 @@ class BModel extends Model
     /**
      * Faster update with one statement by utilizing `case .. when .. then .. else .. end`
      *
-     * @param array format: array($id1 => array($field1 => $value1, $field2 => $value2))
-     * @param string optional ID field
-     * @param string optional field to be updated, used when $data values are not arrays
+     * @param array  $data format: array($id1 => array($field1 => $value1, $field2 => $value2))
+     * @param string $idField optional ID field
+     * @param string $updateField optional field to be updated, used when $data values are not arrays
+     * @return \PDOStatement
      */
     public static function update_many_by_id(array $data, $idField = null, $updateField = null)
     {

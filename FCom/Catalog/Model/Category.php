@@ -218,20 +218,26 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return $this;
     }
 
-    public function processAfterImport( $args )
+    public function onImportAfterModel( $args )
     {
         $importId = $args[ 'import_id' ];
         $importSite = FCom_Core_Model_ImportExport_Site::i()->load( $importId, 'site_code' );
         if(!$importSite){
             return;
         }
-        $toUpdate = static::i()->orm()->where( array( 'parent_id IS NULL', 'id_path IS NULL' ) )->find_many_assoc();
+        if(isset($args['models'])){
+            $toUpdate = $args['models'];
+        } else {
+            $toUpdate = static::i()->orm()
+                  ->where( array( 'parent_id IS NULL', array( 'OR' => 'id_path IS NULL' ) ) )
+                  ->find_many_assoc();
+        }
         if ( empty( $toUpdate ) ) {
             return;
         }
-        if ( isset( $toUpdate[ 1 ] ) ) { // remove root category
-            unset( $toUpdate[ 1 ] );
-        }
+//        if ( isset( $toUpdate[ 1 ] ) && $toUpdate[ 1 ]->get( "level" ) == null) { // remove root category
+//            unset( $toUpdate[ 1 ] );
+//        }
         $ids = array_keys( $toUpdate );
         $importData = FCom_Core_Model_ImportExport_Id::i()->orm()
             ->join(
