@@ -925,6 +925,13 @@ class BORM extends ORMWrapper
     protected $_old_values = array();
 
     /**
+     * Perform replace when building insert
+     *
+     * @var bool
+     */
+    protected $_replace;
+
+    /**
     * Shortcut factory for generic instance
     *
     * @param bool $new
@@ -1384,6 +1391,7 @@ class BORM extends ORMWrapper
      *
      * Connection will be switched to write, if set
      *
+     * @param bool $replace
      * @return boolean
      */
     public function save( $replace = false )
@@ -1391,8 +1399,9 @@ class BORM extends ORMWrapper
         BDb::connect($this->_writeConnectionName);
         $this->_dirty_fields = BDb::cleanForTable($this->_table_name, $this->_dirty_fields);
         if (true) {
+            $this->_replace = $replace;
             #if (array_diff_assoc($this->_old_values, $this->_dirty_fields)) {
-                $result = parent::save( $replace );
+                $result = parent::save();
             #}
         } else {
             echo $this->_class_name.'['.$this->id.']: ';
@@ -1403,6 +1412,27 @@ class BORM extends ORMWrapper
         }
         //$this->_old_values = array(); // commented out to make original loaded object old values available after save
         return $result;
+    }
+
+    /**
+     * Build an INSERT query
+     */
+    protected function _build_insert()
+    {
+
+        $operation = "INSERT INTO";
+        if ( $this->_replace ) {
+            $operation = "REPLACE INTO";
+        }
+        $query[ ]   = $operation;
+        $query[ ]   = $this->_quote_identifier( $this->_table_name );
+        $field_list = array_map( array( $this, '_quote_identifier' ), array_keys( $this->_dirty_fields ) );
+        $query[ ]   = "(" . join( ", ", $field_list ) . ")";
+        $query[ ]   = "VALUES";
+
+        $placeholders = $this->_create_placeholders( count( $this->_dirty_fields ) );
+        $query[ ]     = "({$placeholders})";
+        return join( " ", $query );
     }
 
     /**
