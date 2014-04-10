@@ -65,6 +65,14 @@ function filesizeFormat(size) {
     return size;
 }
 
+function dateTimeNow() {
+    var d = new Date();
+    var dateTime = d.getFullYear()+ '-' + toString((d.getMonth() + 1)) + '-' + toString(d.getDate())+ ' '+ toString(d.getHours())+ ':' + toString(d.getMinutes()) + ':' + toString(d.getSeconds());
+    function toString(val) {
+       return (val <  10) ? '0' + val: val;
+    }
+    return dateTime;
+}
 
 define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
     'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker', 'jquery-ui', 'moment', 'daterangepicker'],
@@ -556,6 +564,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return this;
 
                 },
+
                 saveLocalState: function() {
                     //only if local_personalize configuration flag is true, we can personalize
                     if (BackboneGrid.local_personalize) {
@@ -702,7 +711,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 _cellValChanged: function (ev) {
                     var val = $(ev.target).val();
                     var name = $(ev.target).attr('data-col');
-
+                    //@TODO: find other solution when sort value is number
+                    if (!isNaN(val)) {
+                        val = Number(val);
+                    }
                     //@todo why change cell must be saved?
                     this.model.set(name, val);
 //                    this.model.save(true);
