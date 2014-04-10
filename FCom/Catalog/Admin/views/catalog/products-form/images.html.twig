@@ -2,7 +2,7 @@
 {% set prodImagesConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
 <script>
 var all_prod_images_grid, imagesGrid;
-require(['jquery','underscore','backbone'], function($, _) {
+require(['jquery','underscore','backbone', 'fcom.backbonegrid'], function($, _) {
     var originIds, removedIds = [];
     var rowsAllImages;
     var mainThumb = $('#main-thumb-image');
@@ -12,6 +12,8 @@ require(['jquery','underscore','backbone'], function($, _) {
             file_id: row.file_id,
             label: row.label,
             position: row.position,
+            create_at: row.create_at,
+            update_at: row.update_at,
             _new: row._new
         };
     }
@@ -37,6 +39,23 @@ require(['jquery','underscore','backbone'], function($, _) {
     */
     window.all_prod_images_register = function(grid) {
         all_prod_images_grid = grid;
+        var confirmDelete = $('#confirm-delete-product-images');
+        var selfRow;
+        all_prod_images_grid.getGridSkeleton().Views.RowView.prototype._deleteRow = function (ev) {
+            console.log("est");
+            selfRow = this;
+            var text = (this.model.get('associated_products') > 0) ?
+                    "This image is associated with "+ this.model.get('associated_products') +" of products. Are you sure you want to delete?" : "Are you sure you want to delete?";
+            confirmDelete.find('.modal-body').html(text);
+            confirmDelete.modal('show');
+        }
+
+        $('.prod-images-modal-delete').click(function () {
+            all_prod_images_grid.getRows().remove(selfRow.model);
+            all_prod_images_grid.getSelectedRows().remove(selfRow.model, {silent: true});
+            selfRow._destorySelf();
+            confirmDelete.modal("hide");
+        });
         grid.build();
 
 
@@ -56,6 +75,8 @@ require(['jquery','underscore','backbone'], function($, _) {
                     var addedRow = row;
                     addedRow.set('_new', true);
                     addedRow.set('file_id', row.id);
+                    addedRow.set('update_at', dateTimeNow());
+                    addedRow.set('create_at', dateTimeNow());
                     addedRow.set('id', guid());
                     addedRow.set('selected', false);
                     gridView.collection.add(addedRow.toJSON(), {silent: true});
@@ -70,8 +91,7 @@ require(['jquery','underscore','backbone'], function($, _) {
     }
 
     window.imagesGridRegister = function(grid) {
-        var confirmDelete = $('#confirm-delete-product-images');
-        var selfRow;
+
         imagesGrid = grid;
         var rowView = imagesGrid.getGridSkeleton().Views.RowView;
         rowView.prototype.afterRender = function() {
@@ -84,34 +104,18 @@ require(['jquery','underscore','backbone'], function($, _) {
             }
         }
 
-        rowView.prototype._deleteRow = function (ev) {
-            selfRow = this;
-            var text = (this.model.get('associated_products') > 0) ?
-                        "This image is associated with "+ this.model.get('associated_products') +" of products. Are you sure you want to delete?" : "Are you sure you want to delete?";
-            confirmDelete.find('.modal-body').html(text);
-            confirmDelete.modal('show');
-        }
-
-        $('.prod-images-modal-delete').click(function () {
-            imagesGrid.getRows().remove(selfRow.model);
-            imagesGrid.getSelectedRows().remove(selfRow.model, {silent: true});
-            selfRow._destorySelf();
-            confirmDelete.modal("hide");
-        });
-
         imagesGrid.build();
 
         originIds = imagesGrid.getRows().pluck('id');
-        console.log(originIds);
 
         $(imagesGrid.getGridSkeleton().AddButton).click(function() {
-            refreshGridAdd();
+            //refreshGridAdd();
             $('#all_prod_images_modal').modal('show');
         });
 
     }
 
-    function refreshGridAdd() {
+   /* function refreshGridAdd() {
         var data = getExcludeId();
         all_prod_images_grid.getGridSkeleton().current_filters['exclude_id'] = data;
         rowsAllImages.fetch({reset: true});
@@ -120,7 +124,7 @@ require(['jquery','underscore','backbone'], function($, _) {
     function getExcludeId() {
         var arr = imagesGrid.getGridView().collection.pluck('file_id');
         return  arr.join(',');
-    }
+    }*/
 
 
 });

@@ -134,7 +134,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $callbacks = '$(".rateit").rateit();
                       $("#'.$config['id'].'-modal-form").on("show.bs.modal", function(){ $(".rateit").rateit(); });';
         $config['callbacks'] = array('after_gridview_render' => $callbacks);
-        $config['new_button'] = '#add_new_product_review';
+//        $config['new_button'] = '#add_new_product_review';
 
         $config['grid_before_create'] = $config['id'].'_register';
         return $config;
@@ -169,7 +169,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         BLayout::i()->applyLayout('prodreviews');
         $this->view('prodreviews/grid')->set(array(
                 'title' => $this->_gridTitle,
-                'actions' => array('new' => '<button id="add_new_product_review" class="btn grid-new btn-primary _modal" type="button">'.BLocale::_('New Product Review').'</button>')
+                'actions' => array()
             ));
     }
 
