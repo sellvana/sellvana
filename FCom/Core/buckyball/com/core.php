@@ -218,7 +218,6 @@ class BApp extends BClass
         // bootstrap modules
         BModuleRegistry::i()->bootstrap();
 
-
         // run module migration scripts if necessary
         BMigrate::i()->migrateModules(true);
 
@@ -395,12 +394,14 @@ class BApp extends BClass
 
     public function set($key, $val, $const=false)
     {
-        if (!empty($this->_isConst[$key])) {
+        if (!$const && !empty($this->_isConst[$key])) {
             BDebug::warning('Trying to reset a constant var: '.$key.' = '.$val);
             return $this;
         }
         $this->_vars[$key] = $val;
-        if ($const) $this->_isConst[$key] = true;
+        if ($const) {
+            $this->_isConst[$key] = true;
+        }
         return $this;
     }
 

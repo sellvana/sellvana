@@ -17,11 +17,24 @@ class FCom_MarketClient_Admin_Controller_Site extends FCom_Admin_Controller_Abst
     public function action_check_updates__POST()
     {
         try {
-            FCom_MarketClient_RemoteApi::i()->getModulesVersions(true, true);
-            $this->message('Updates retrieved successfully');
+            $redirectUrl = BRequest::i()->referrer();
+            $result = FCom_MarketClient_RemoteApi::i()->getModulesVersions(true, true);
+            foreach ($result as $modName => $modUpgrade) {
+                if (!empty($modUpgrade['can_update'])) {
+                    $upgradeModNames[] = $modName;
+                }
+            }
+            if (!empty($upgradeModNames)) {
+                $this->message('Upgrades found: '.join(', ', $upgradeModNames));
+                if (BRequest::i()->get('install')) {
+                    $redirectUrl = 'marketclient/module/install?mod_name='.join(',', $upgradeModNames);
+                }
+            } else {
+                $this->message('No upgrades were found');
+            }
         } catch (Exception $e) {
-            $this->message($e->getMessage());
+            $this->message($e->getMessage(), 'error');
         }
-        BResponse::i()->redirect(BRequest::i()->referrer());
+        BResponse::i()->redirect($redirectUrl);
     }
 }

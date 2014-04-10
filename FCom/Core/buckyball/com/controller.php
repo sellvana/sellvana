@@ -584,13 +584,15 @@ class BRequest extends BClass
     * @param array $methods Methods to check for CSRF attack
     * @return boolean
     */
-    public static function csrf()
+    public static function csrf($checkMethod = null, $httpMethods = null)
     {
         $c = BConfig::i();
 
 
-        $m = $c->get('web/csrf_http_methods');
-        $httpMethods = $m ? (is_string($m) ? explode(',', $m) : $m) : array('POST','PUT','DELETE');
+        if (is_null($httpMethods)) {
+            $m = $c->get('web/csrf_http_methods');
+            $httpMethods = $m ? (is_string($m) ? explode(',', $m) : $m) : array('POST','PUT','DELETE');
+        }
 
         if (is_array($httpMethods) && !in_array(static::method(), $httpMethods)) {
             return false; // not one of checked methods, pass
@@ -606,10 +608,12 @@ class BRequest extends BClass
             }
         }
 
-        $m = $c->get('web/csrf_check_method');
-        $method = $m ? $m : 'referrer';
+        if (is_null($checkMethod)) {
+            $m = $c->get('web/csrf_check_method');
+            $checkMethod = $m ? $m : 'referrer';
+        }
 
-        switch ($method) {
+        switch ($checkMethod) {
             case 'referrer':
                 if (!($ref = static::referrer())) {
                     return true; // no referrer sent, high prob. csrf
@@ -907,8 +911,14 @@ class BRequest extends BClass
             } elseif (!empty($v) && !is_numeric($v)) {
                 if (empty($this->_postTagsWhitelist[$forUrlPath][$childPath])) {
                     $v = strip_tags($v);
-                } elseif ('*' !== $this->_postTagsWhitelist[$forUrlPath][$childPath]) {
-                    $v = strip_tags($v, $this->_postTagsWhitelist[$forUrlPath][$childPath]);
+                } else {
+                    $tags = $this->_postTagsWhitelist[$forUrlPath][$childPath];
+                    if ('+' === $tags) {
+                        $tags = "<a><b><blockquote><code><del><dd><dl><dt><em><h1><i><img><kbd><li><ol><p><pre><s><sup><sub><strong><strike><ul><br><hr>";
+                    }
+                    if ('*' !== $tags) {
+                        $v = strip_tags($v, $tags);
+                    }
                 }
             }
         }
@@ -2292,7 +2302,8 @@ class BActionController extends BClass
     */
     public function beforeDispatch()
     {
-        BEvents::i()->fire(static::$_origClass.'::beforeDispatch');
+        BEvents::i()->fire(__METHOD__); // general beforeDispatch event for all controller
+        BEvents::i()->fire(static::$_origClass.'::beforeDispatch'); // specific controller instance
         return true;
     }
 
@@ -2302,7 +2313,8 @@ class BActionController extends BClass
     */
     public function afterDispatch()
     {
-        BEvents::i()->fire(static::$_origClass.'::afterDispatch');
+        BEvents::i()->fire(__METHOD__); // general afterDispatch event for all controller
+        BEvents::i()->fire(static::$_origClass.'::afterDispatch'); // specific controller instance
     }
 
     /**

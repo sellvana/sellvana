@@ -35,7 +35,7 @@ class FCom_Test_AllTests extends BClass
             }
         }
 
-        require_once FULLERON_ROOT_DIR.'/FCom/buckyball/tests/buckyball/AllTests.php';
+        require_once FULLERON_ROOT_DIR.'/FCom/Test/Core/buckyball/AllTests.php';
         $suite->addTest(BAllTests::suite());
 
         return $suite;

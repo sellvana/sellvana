@@ -4,13 +4,15 @@ base:
 
     - { callback: FCom_Core_Main::defaultThemeCustomLayout }
     - { include: common_js_libs }
-
     - view: head
         do:
             - [ css, @FCom_Core/css/bootstrap-3.min.css ]
             - [ css, @FCom_Core/css/fcom.core.css ]
             - [ css, @FCom_Install/css/styles.css ]
-            - [ css, @FCom_Core/../FrontendThemeBootSimple/css/fulleron-base.css ]
+            - [ requireJs, jquery.validate, @FCom_Install/js/jquery.validate.min, { deps: [ jquery ] }]
+            - [ requireJs, fcom.password, @FCom_Core/js/fcom/fcom.password ]
+            - [ requireRun, fcom.password ]
+            #- [ css, @FCom_Core/../FrontendThemeBootSimple/css/fulleron-base.css ]
             #- [ requireRun, fcom.core ]
 
 /:

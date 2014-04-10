@@ -86,6 +86,7 @@
                     {% else %}
                         <div id="block_review_helpful_{{ review.get('id') }}" class="block_review_helpful">
                             <form action="{{ APP.href('prodreviews/helpful') }}" method="post"  onsubmit="return false;">
+                                <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
                                 <input type="hidden" name="pid" value="{{ prod.get('id') }}">
                                 <input type="hidden" name="rid" value="{{ review.get('id') }}">
                                 {{ "Was this review helpful to you" | _ }}?

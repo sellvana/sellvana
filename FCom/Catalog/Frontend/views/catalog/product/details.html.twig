@@ -49,6 +49,7 @@
       <!-- Product Select Column-->
       <div class="col-md-7 f-col-prod-select">
         <form action="{{ APP.href('cart/add') }}" method="post" onsubmit="" >
+          <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
           <input type="hidden" name="id" value="{{ prod.id() }}">
           <input type="hidden" name="action" value="add">
           <h1 class="f-prod-name">{{ prod.get('product_name') }}</h1>

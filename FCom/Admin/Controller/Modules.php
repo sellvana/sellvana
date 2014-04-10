@@ -22,7 +22,6 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         $modules = BModuleRegistry::i()->getAllModules();
         $autoRunLevelMods = array_flip(explode(',', 'FCom_Core,FCom_Admin,FCom_Frontend,FCom_Install'));
 
-
         try {
             $schemaVersions = BDbModule::i()->orm()->find_many_assoc('module_name');
             $schemaModules = array();
@@ -39,7 +38,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         $migrate = false;
         $id = 0;
         foreach ($modules as $modName=>$mod) {
-            $r = BUtil::arrayMask((array)$mod, 'name,description,version,channel,run_status,run_level,require,children_copy');
+            $r = BUtil::arrayMask((array)$mod, 'name,description,version,channel,run_status,run_level,require,children_copy,errors');
             $reqs = array();
             if (!empty($r['require']['module'])) {
                 foreach ($r['require']['module'] as $req) {
@@ -57,6 +56,13 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             //$r['run_level_frontend'] = !empty($frontendLevels[$modName]) ? $frontendLevels[$modName] : '';
             $r['schema_version'] = !empty($schemaVersions[$modName]) ? $schemaVersions[$modName]->get('schema_version') : '';
             $r['migration_available'] = !empty($schemaModules[$modName]) && $r['schema_version']!=$r['version'];
+            $r['dep_errors'] = '';
+            if (!empty($r['errors'])) {
+                foreach ($r['errors'] as $e) {
+                    $r['dep_errors'] .= $e['mod'] . ': ' . $e['type'] . '; ';
+                }
+                unset($r['errors']);
+            }
             $r['id'] = $id++;
             $r['_selectable'] = !$r['auto_run_level'];
             $data[] = $r;
@@ -105,6 +111,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             array('type'=>'input','name' => 'run_level_core', 'label' => "Run Level (Core)", 'options' => $areaRunLevelOptions, 'width' => 200, 'mass-editable-show' => true, 'editable'=>true, 'mass-editable' => true, 'editor' => 'select', 'overflow' => true),
             array('name' => 'requires', 'label' => 'Requires', 'width' => 250, 'overflow' => true),
             array('name' => 'required_by', 'label' => 'Required By', 'width' => 300,'overflow' => true),
+            array('name' => 'dep_errors', 'label' => 'Dependency Errors', 'width' => 300,'overflow' => true, 'hidden' => true),
             array('type'=>'btn_group', 'width' => 115,
                 'buttons' => array(
                 /*
