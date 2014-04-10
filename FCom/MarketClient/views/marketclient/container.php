@@ -21,7 +21,7 @@
                     switch (response.progress.status) {
                         case 'DONE':
                             if (redirectUrl) {
-                                location.href = redirectUrl;
+                                window.top.location.href = redirectUrl;
                             }
                             break;
 
