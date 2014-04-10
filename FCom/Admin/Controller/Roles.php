@@ -73,10 +73,4 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
         }
     }
 
-    public function action_form()
-    {
-        parent::action_form(); // TODO: find better way to apply jstree layout
-        BLayout::i()->applyLayout('jstree');
-    }
-
 }
