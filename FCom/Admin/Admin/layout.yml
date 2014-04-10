@@ -302,5 +302,5 @@ form:
     - { hook: top-nav, clear: true }
     - { hook: main, views: media }
 
-/roles/form
+/roles/form:
     - { include: jstree }
