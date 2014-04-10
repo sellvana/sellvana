@@ -14,6 +14,7 @@ modules:
                     - [ /customers/import/.action, FCom_Customer_Admin_Controller_CustomersImport ]
                     - [ /addresses/.action, FCom_Customer_Admin_Controller_Addresses ]
                 observe:
+                    - [ BActionController::beforeDispatch, FCom_Customer_Admin.onControllerBeforeDispatch ]
                     - [ FCom_Admin_View_Dashboard::getWidgets, FCom_Customer_Admin.onGetDashboardWidgets ]
 
             FCom_Frontend:

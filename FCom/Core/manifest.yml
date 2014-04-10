@@ -5,6 +5,7 @@ modules:
         before_bootstrap: { callback: FCom_Core_Main::beforeBootstrap }
         run_level: REQUIRED
         description: "Base Sellvana classes and JS libraries"
+        load_after: [ FCom_LibTwig ]
         auto_use: [ layout, views ]
         override:
             class:
@@ -27,10 +28,10 @@ modules:
             db:
                 dbname: sellvana
                 username: root
-                logging: false
+                logging: true
                 implicit_migration: true
             web:
-                csrf_check_method: referrer
+                csrf_check_method: token
                 headers:
                     X-UA-Compatible: IE=edge
                     X-Frame-Options: SAMEORIGIN

@@ -17,17 +17,11 @@ class FCom_MarketClient_Admin_Controller_Module extends FCom_Admin_Controller_Ab
     {
         BResponse::i()->startLongResponse(false);
 
-        $modules = BRequest::i()->post('install');
-        $showProgress = BRequest::i()->request('show_progress');
+        $modules = BRequest::i()->post('modules');
+        $redirectUrl = BRequest::i()->request('redirect_to');
 
-        FCom_MarketClient_Main::i()->downloadAndInstall($modules, $showProgress);
+        FCom_MarketClient_Main::i()->downloadAndInstall($modules);
 
-        $redirectUrl = BReuest::i()->request('redirect_to');
         BResponse::i()->redirect($redirectUrl ? $redirectUrl : 'modules');
-    }
-
-    public function action_upgrade()
-    {
-        $this->layout('/marketclient/module/upgrade');
     }
 }

@@ -1,6 +1,7 @@
 {% set w = SESSION.get('w') %}
 
 <form method="post" action="{{APP.href('install/step1')}}" class="form-horizontal">
+    <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
     <div class="panel-heading">
         <h1 class="panel-title">{{ 'Step 1 of 3: Database Connection' |_ }}</h1>
     </div>
