@@ -911,8 +911,14 @@ class BRequest extends BClass
             } elseif (!empty($v) && !is_numeric($v)) {
                 if (empty($this->_postTagsWhitelist[$forUrlPath][$childPath])) {
                     $v = strip_tags($v);
-                } elseif ('*' !== $this->_postTagsWhitelist[$forUrlPath][$childPath]) {
-                    $v = strip_tags($v, $this->_postTagsWhitelist[$forUrlPath][$childPath]);
+                } else {
+                    $tags = $this->_postTagsWhitelist[$forUrlPath][$childPath];
+                    if ('+' === $tags) {
+                        $tags = "<a><b><blockquote><code><del><dd><dl><dt><em><h1><i><img><kbd><li><ol><p><pre><s><sup><sub><strong><strike><ul><br><hr>";
+                    }
+                    if ('*' !== $tags) {
+                        $v = strip_tags($v, $tags);
+                    }
                 }
             }
         }
