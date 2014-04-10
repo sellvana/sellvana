@@ -16,4 +16,8 @@
 </pre>
 <?php endif ?>
 
+<?php if ($p['status'] === 'DONE'): ?>
+<p>ALL DONE</p>
+<?php endif ?>
+
 <?php endif ?>

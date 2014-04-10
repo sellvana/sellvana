@@ -584,13 +584,15 @@ class BRequest extends BClass
     * @param array $methods Methods to check for CSRF attack
     * @return boolean
     */
-    public static function csrf()
+    public static function csrf($checkMethod = null, $httpMethods = null)
     {
         $c = BConfig::i();
 
 
-        $m = $c->get('web/csrf_http_methods');
-        $httpMethods = $m ? (is_string($m) ? explode(',', $m) : $m) : array('POST','PUT','DELETE');
+        if (is_null($httpMethods)) {
+            $m = $c->get('web/csrf_http_methods');
+            $httpMethods = $m ? (is_string($m) ? explode(',', $m) : $m) : array('POST','PUT','DELETE');
+        }
 
         if (is_array($httpMethods) && !in_array(static::method(), $httpMethods)) {
             return false; // not one of checked methods, pass
@@ -606,10 +608,12 @@ class BRequest extends BClass
             }
         }
 
-        $m = $c->get('web/csrf_check_method');
-        $method = $m ? $m : 'referrer';
+        if (is_null($checkMethod)) {
+            $m = $c->get('web/csrf_check_method');
+            $checkMethod = $m ? $m : 'referrer';
+        }
 
-        switch ($method) {
+        switch ($checkMethod) {
             case 'referrer':
                 if (!($ref = static::referrer())) {
                     return true; // no referrer sent, high prob. csrf
