@@ -30,6 +30,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ->where('folder', $folder)
                 ->select(array('a.id', 'a.folder', 'a.file_name', 'a.file_size'))
                 ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
+                ->select_expr('(SELECT COUNT(*) FROM '.FCom_Catalog_Model_ProductMedia::table().' pm WHERE pm.file_id = a.id)', 'associated_products')
                 ->order_by_expr('id asc');
             ;
         $baseSrc = rtrim(BConfig::i()->get('web/base_src'), '/') . '/';
@@ -49,7 +50,11 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     array('name'=>'file_name', 'label'=>'File Name', 'width'=>400),
                     array('name'=>'file_size', 'label'=>'File Size', 'width'=>260, 'search'=>false, 'display'=>'file_size'),
                     array('name'=>'associated_products', 'label'=>'Associated Products', 'width'=>50),
-                    //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
+                    array('type'=>'btn_group',
+                        'buttons' => array(
+                            array('name'=>'delete')
+                        )
+                    ),
                 ),
                 'filters' => array(
                     array('field' => 'file_name', 'type' => 'text')
@@ -92,7 +97,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         switch (BRequest::i()->params('do')) {
         case 'data':
             $folder = $this->getFolder();
-            $r = BRequest::i()->get();
+//            $r = BRequest::i()->get();
             $orm = FCom_Core_Model_MediaLibrary::i()->orm()->table_alias('a')
                 ->where('folder', $folder)
                 ->select(array('a.id', 'a.folder','a.file_name', 'a.file_size'))
@@ -173,31 +178,40 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 if (!$fileName) {
                     continue;
                 }
-
+                $associatedProducts = 0;
+                $fileSize = 0;
                 if (!$uploads['error'][$i] && @move_uploaded_file($uploads['tmp_name'][$i], $targetDir.'/'.$fileName)) {
                     $att = $attModel->load(array('folder'=>$folder, 'file_name'=>$fileName));
+
                     if (!$att) {
                         $att = $attModel->create(array(
                             'folder'    => $folder,
                             'subfolder' => $subfolder,
                             'file_name' => $fileName,
                             'file_size' => $uploads['size'][$i],
+                            'create_at' =>  BDb::now(),
+                            'update_at' =>  BDb::now()
                         ))->save();
                     } else {
-                        $att->set(array('file_size' => $uploads['size'][$i]))->save();
+                        $associatedProducts = FCom_Catalog_Model_ProductMedia::i()->orm()
+                                              ->select_expr('COUNT(*)', 'associated_products')
+                                              ->where('file_id', $att->get('id'))->find_one();
+                        $associatedProducts = $associatedProducts->get('associated_products');
+                        $att->set(array('file_size' => $uploads['size'][$i], 'update_at' =>  BDb::now()))->save();
                     }
                     BEvents::i()->fire(__METHOD__.':'.$folder.':upload', array('model'=>$att));
                     if (!empty($options['on_upload'])) {
                         call_user_func($options['on_upload'], $att);
                     }
                     $id = $att->id;
+                    $fileSize = $att->file_size;
                     $status = '';
                 } else {
                     $id = '';
                     $status = 'ERROR';
                 }
 
-                $row = array('id'=>$id, 'file_name'=>$fileName, 'file_size'=>$att->file_size, 'act' => $status, 'folder' => $folder, 'subfolder' => '');
+                $row = array('id'=>$id, 'file_name'=>$fileName, 'file_size'=> $fileSize, 'act' => $status, 'folder' => $folder, 'subfolder' => '', 'associated_products' => $associatedProducts);
                 BResponse::i()->json($row);
 
                 //echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".BUtil::toJson($row)."); </script>";

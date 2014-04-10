@@ -225,7 +225,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 ->left_outer_join('FCom_Catalog_Model_ProductMedia', array('pa.file_id', '=', 'pm.file_id'), 'pm')
                 ->select(array('pa.id', 'pa.product_id', 'pa.remote_url','pa.position','pa.label','a.file_name','a.file_size','pa.create_at','pa.update_at', 'pa.main_thumb'))
                 ->select('a.id','file_id')
-                ->select_expr('COUNT(pm.product_id)', 'associated_products')
                 ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
                 ->group_by('pa.id')
                 ->find_many());

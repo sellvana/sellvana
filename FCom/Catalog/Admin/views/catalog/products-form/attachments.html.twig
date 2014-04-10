@@ -11,6 +11,8 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
             file_id: row.file_id,
             label: row.label,
             position: row.position,
+            create_at: row.create_at,
+            update_at: row.update_at,
             _new: row._new
         };
     }
@@ -59,6 +61,8 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
                     addedRow.set('file_id', row.id);
                     addedRow.set('id', guid());
                     addedRow.set('selected', false);
+                    addedRow.set('update_at', dateTimeNow());
+                    addedRow.set('create_at', dateTimeNow());
                     gridView.collection.add(addedRow.toJSON(), {silent: true});
                 }
             });

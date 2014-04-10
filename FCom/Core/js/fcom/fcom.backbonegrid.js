@@ -65,6 +65,14 @@ function filesizeFormat(size) {
     return size;
 }
 
+function dateTimeNow() {
+    var d = new Date();
+    var dateTime = d.getFullYear()+ '-' + toString((d.getMonth() + 1)) + '-' + toString(d.getDate())+ ' '+ toString(d.getHours())+ ':' + toString(d.getMinutes()) + ':' + toString(d.getSeconds());
+    function toString(val) {
+       return (val <  10) ? '0' + val: val;
+    }
+    return dateTime;
+}
 
 define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
     'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker', 'jquery-ui', 'moment', 'daterangepicker'],
