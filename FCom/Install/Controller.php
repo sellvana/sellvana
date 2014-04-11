@@ -118,7 +118,8 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             return;
         } else {
             BApp::m('FCom_Admin')->run_status = BModule::LOADED; // for proper migration on some hosts
-            BDbModule::i()->init();
+            BDb::connect();
+            FCom_Core_Model_Module::i()->init();
             BMigrate::i()->migrateModules('FCom_Admin', true);
         }
         BLayout::i()->applyLayout('/step2');
