@@ -462,8 +462,8 @@ EOT
             static::connect(static::$_defaultConnectionName);
         }
         $a = explode('.', $fullTableName);
-        $dbName = empty($a[1]) ? static::dbName() : $a[0];
-        $tableName = empty($a[1]) ? $fullTableName : $a[1];
+        $dbName = strtolower(empty($a[1]) ? static::dbName() : $a[0]);
+        $tableName = strtolower(empty($a[1]) ? $fullTableName : $a[1]);
         if (!isset(static::$_tables[$dbName])) {
             $tables = BORM::i()->raw_query("SHOW TABLES FROM `{$dbName}`", array())->find_many();
             $field = "Tables_in_{$dbName}";
