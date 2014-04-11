@@ -301,3 +301,6 @@ form:
     - { hook: header, clear: true }
     - { hook: top-nav, clear: true }
     - { hook: main, views: media }
+
+/roles/form:
+    - { include: jstree }
