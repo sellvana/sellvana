@@ -227,4 +227,15 @@ class FCom_Core_Migrate extends BClass
             FCom_Core_Main::i()->writeConfigFiles('core');
         }
     }
+
+    public function upgrade__0_1_6__0_1_7()
+    {
+        BDb::ddlTableDef(
+            FCom_Core_Model_ImportExport_Id::table(),
+            array(
+                'COLUMNS' => array( 'relations' => 'text null' ),
+                'KEYS' => array( 'uk_site_model_import_id' => "UNIQUE (site_id,model_id,import_id)"),
+            )
+        );
+    }
 }

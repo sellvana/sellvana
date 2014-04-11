@@ -2,7 +2,7 @@
 {% set prodAttachConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productAttachmentsGridConfig(m) %}
 <script>
 var all_attachments_grid, attachmentGrid;
-require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone) {
+require(['jquery', 'underscore', 'backbone', 'unique', 'fcom.backbonegrid'], function($, _, Backbone) {
     var originIds, addedIds = [], removedIds = [];
     var backboneGridAllImages, rowsAllImages;
     function _getAttachmentsDbFields(row) {
@@ -11,6 +11,8 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
             file_id: row.file_id,
             label: row.label,
             position: row.position,
+            create_at: row.create_at,
+            update_at: row.update_at,
             _new: row._new
         };
     }
@@ -59,6 +61,8 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
                     addedRow.set('file_id', row.id);
                     addedRow.set('id', guid());
                     addedRow.set('selected', false);
+                    addedRow.set('update_at', dateTimeNow());
+                    addedRow.set('create_at', dateTimeNow());
                     gridView.collection.add(addedRow.toJSON(), {silent: true});
                 }
             });
@@ -78,13 +82,13 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
         originIds = attachmentGrid.getRows().pluck('id');
 
         $(attachmentConfig.AddButton).click(function() {
-            refreshGridAdd();
+           //refreshGridAdd();
             $('#all_attachments_modal').modal('show');
         });
 
     }
 
-    function refreshGridAdd() {
+    /*function refreshGridAdd() {
         var data = getExcludeId();
         backboneGridAllImages.current_filters['exclude_id'] = data;
         rowsAllImages.fetch({reset: true});
@@ -93,7 +97,7 @@ require(['jquery', 'underscore', 'backbone', 'unique'], function($, _, Backbone)
     function getExcludeId() {
         var arr = attachmentGrid.getGridView().collection.pluck('file_id');
         return  arr.join(',');
-    }
+    }*/
 });
 
 

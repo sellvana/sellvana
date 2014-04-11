@@ -19,8 +19,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
     }
     window.variantGridRegister = function(grid) {
         grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
-        
-            this.$el.find('select').addClass('variantUnique'); 
+
+            this.$el.find('select').addClass('variantUnique');
         }
         grid.build();
         vColsCollection = grid.getCols();
@@ -31,14 +31,16 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
 
     function grayGrid() {
         if ($('#variants-tab-field').children().length) {
-            bodyGrid.find('input, select, button').each(function () {
-                $(this).prop('disabled', false);
-            });
             $('#variant-grid').find('.grid-new').prop('disabled', false);
+            //if new field column is added, we need to add  blank row
+            if (vRowsCollection.length === 0) {
+                vRowsCollection.reset({id: (Math.random() + '').replace(/^0\./, 'f-')});
+            }
         } else {
-            bodyGrid.find('input, select, button').each(function () {
-                $(this).prop('disabled', true);
-            });
+            //if all field columns are removed, we need to remove all rows
+            if (vRowsCollection) {
+                vRowsCollection.reset();
+            }
             $('#variant-grid').find('.grid-new').prop('disabled', true);
         }
 
@@ -204,9 +206,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                 }
             });
         });
-
-        //$('form').isValid();
-
     }
 
     function addColumn(text, options) {
@@ -259,7 +258,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
     *custom validation function for checking duplicated input
     */
     function variantUnique(value, elem, params) {
-        console.log('fff');
         var error = true;
         if (typeof (elem) !== 'undefined') {
             vRowsCollection.each(function (data) {

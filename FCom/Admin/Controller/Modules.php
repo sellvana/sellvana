@@ -23,7 +23,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         $autoRunLevelMods = array_flip(explode(',', 'FCom_Core,FCom_Admin,FCom_Frontend,FCom_Install'));
 
         try {
-            $schemaVersions = BDbModule::i()->orm()->find_many_assoc('module_name');
+            $schemaVersions = FCom_Core_Model_Module::i()->orm()->find_many_assoc('module_name');
             $schemaModules = array();
             foreach (BMigrate::getMigrationData() as $connection=>$migrationModules) {
                 foreach ($migrationModules as $modName=>$migrData) {
