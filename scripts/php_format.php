@@ -108,6 +108,7 @@ function formatFile( $file, $j = 0 )
     $interpolation = false;
 
 // First pass - filter out unwanted tokens
+if (false) { // do not touch syntax
     $filteredTokens = array();
     for ( $i = 0, $n = count( $tokens ); $i < $n; $i++ ) {
         /* @var $token Token */
@@ -137,7 +138,10 @@ function formatFile( $file, $j = 0 )
             if ( $token->type != T_CURLY_OPEN && $token->type != T_DOLLAR_OPEN_CURLY_BRACES ) { // variable interpolation in string {
                 $level++;
                 if ( strpos( $tokens[ $i + 1 ]->contents, "\n" ) === false && $level ) {
+                    /*
+                    //TODO: moves comments to next line
                     $token->contents .= "\n" . str_repeat( $sep, $level );
+                    */
                 }
             } else {
                 $interpolation = true;
@@ -160,6 +164,8 @@ function formatFile( $file, $j = 0 )
             $matchingTernary = true;
         }
         if ( in_array( $token->type, $IMPORT_STATEMENTS ) && nextToken( $j, $i, $tokens )->contents == '(' ) {
+            /*
+            //TODO: breaks whitespace after import statements
             $filteredTokens[ ] = $token;
             if ( $tokens[ $i + 1 ]->type != T_WHITESPACE ) {
                 $filteredTokens[ ] = new Token( array( T_WHITESPACE, ' ' ) );
@@ -172,6 +178,7 @@ function formatFile( $file, $j = 0 )
                     $filteredTokens[ ] = $token;
                 }
             } while ( $token->contents != ')' );
+            */
         } elseif ( $token->type == T_ELSE && nextToken( $j, $i, $tokens )->type == T_IF ) {
             $i                 = $j;
             $filteredTokens[ ] = new Token( array( T_ELSEIF, 'elseif' ) );
@@ -228,7 +235,7 @@ function formatFile( $file, $j = 0 )
         }
     }
     $tokens = $filteredTokens;
-
+}
 
 // Second pass - add whitespace
     $output          = '';
@@ -279,11 +286,12 @@ function formatFile( $file, $j = 0 )
         } elseif ( $token->type == T_STRING && ( $first || $tokens[ $i - 1 ]->contents == '[' )
                    && ( $last || $tokens[ $i + 1 ]->contents == ']' )
         ) {
-            if ( preg_match( '/[a-z_]+/', $token->contents ) ) {
-                $output .= "'" . $token->contents . "'";
-            } else {
+            //TODO: converts also constants into strings?
+            //if ( preg_match( '/[a-z_]+/', $token->contents ) ) {
+            //    $output .= "'" . $token->contents . "'";
+            //} else {
                 $output .= $token->contents;
-            }
+            //}
         } elseif ( $token->type == T_ENCAPSED_AND_WHITESPACE || $token->type == T_STRING ) {
             $output .= $token->contents;
         } elseif ( $token->contents == '-' && ( $last || in_array(
@@ -342,6 +350,35 @@ function formatFile( $file, $j = 0 )
     }
 
     $output = str_replace( array( '( )', '(  )', '[ ]', '[  ]' ), array( '()', '()', '[]', '[]' ), $output );
+
+    if ( preg_replace( '#\s+#', '', $code ) !== preg_replace( '#\s+#', '', $output ) ) {
+        $originalLines = explode( "\n", $code );
+        $formattedLines = explode( "\n", $output );
+        $error = "Lines do not match:\n";
+        $j = -1;
+        foreach ( $originalLines as $i => $line ) {
+            $j++;
+            if ( preg_replace( '#\s+#', '', $line ) === preg_replace( '#\s+#', '', $formattedLines[ $j ] ) ) {
+                continue;
+            }
+
+            $error .= str_pad( $i, 5, ' ', STR_PAD_LEFT ) . ": - {$line}\n";
+            $error .= str_pad( $j, 5, ' ', STR_PAD_LEFT ) . ": + {$formattedLines[$j]}\n";
+
+            $origNextLine = preg_replace( '#\s+#', '', $originalLines [ $i + 1 ] );
+            $formatNextChunk = array_slice($formattedLines, $j + 1, 5);
+            $error .= "$origNextLine\n";
+            while (!empty($formattedLines[ $j + 1 ]) && $origNextLine != preg_replace( '#\s+#', '', $formattedLines[ $j + 1 ] ) ) {
+                $error .= str_pad( $j + 1, 5, ' ', STR_PAD_LEFT ) . ": + " . $formattedLines[ $j + 1 ] . "\n";
+                $j++;
+            }
+            if ($j > $i + 10) {
+                $error .= $formattedLines[ $j + 1 ];
+                break;
+            }
+        }
+        //throw new Exception($error);
+    }
 
     return $output;
 }
