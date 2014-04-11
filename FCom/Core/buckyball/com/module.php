@@ -1797,17 +1797,20 @@ class BDbModule extends BModel
         //BDb::connect();
         $table = static::table();
         if (!BDb::ddlTableExists($table)) {
-            BDb::run("
-CREATE TABLE {$table} (
-id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-module_name VARCHAR(100) NOT NULL,
-schema_version VARCHAR(20),
-data_version varchar(20),
-last_upgrade DATETIME,
-last_status varchar(20),
-UNIQUE (module_name)
-) ENGINE=INNODB;
-            ");
+            BDb::ddlTableDef($table, array(
+                'COLUMNS' => array(
+                    'id' => 'int unsigned not null auto_increment',
+                    'module_name' => 'varchar(100) not null',
+                    'schema_version' => 'varchar(20)',
+                    'data_version' => 'varchar(20)',
+                    'last_upgrade' => 'datetime',
+                    'last_status' => 'varchar(20)',
+                ),
+                'PRIMARY' => '(id)',
+                'KEYS' => array(
+                    'UNQ_module_name' => 'UNIQUE (module_name)',
+                ),
+            ));
         }
         //BDbModuleConfig::init();
     }
