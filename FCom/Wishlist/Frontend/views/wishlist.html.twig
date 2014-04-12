@@ -7,7 +7,7 @@
                 <h1 class="f-page-title">{{ "Wishlist" | _ }}</h1>
                 <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">Menu</a>
             </header>
-
+            {{ THIS.view('core/messages') | raw }}
             {% if wishlist %}
                 <form name="cart" action="{{ APP.href('wishlist') }}" method="post">
                     <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
