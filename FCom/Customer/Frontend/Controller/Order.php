@@ -28,7 +28,7 @@ class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_A
             BResponse::i()->redirect('customer/order');
             return;
         }
-        //BDebug::dump($order);die;
+
         $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
         $crumbs[] = array('label'=>'Orders', 'href'=>Bapp::href('customer/order'));
         $crumbs[] = array('label'=>'View order', 'active'=>true);
