@@ -90,7 +90,7 @@
 
   <div class="f-admin-main f-page-dashboard">
     {{ THIS.view('core/messages')|raw }}
-  
+
     <div class="row">
       <ul class="js-sortable-container" id="dashboard-widgets-container">
       {% for widget in widgets %}
@@ -121,6 +121,12 @@
         <div class="modal-body">
           <div class="row">
             <div class="form-group col-sm-12">
+                <div class="alert alert-danger alert-dismissable" id="wigets-avail-status">
+                    <h4>
+                        <b>All available widgets have been added.</b>
+                        <br><br>
+                    </h4>
+                </div>
                 <label class="control-label">{{ "Widget to add to dashboard"|_ }}</label>
                 <div class="controls">
                   <select class="form-control required" name="widget" id="add-widget-selection">
@@ -147,6 +153,9 @@
 
 <script>
 require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], function($) {
+
+  check_avail_status();
+
   var dashboardUrl = "{{ APP.href('dashboard') }}", personalizeUrl = "{{ APP.href('my_account/personalize') }}";
   var filter =  $('#filter-text');
   var custom = $('#custom');
@@ -154,6 +163,20 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
   var closeFilter = custom.find('.choice-close');
   //var widgetTemplate = _.template($('#dashboard-widget-template').html());
   var select = $('#add-widget-selection');
+
+  function check_avail_status() {
+
+    if ($('#add-widget-selection option').length > 1) {
+        $('#wigets-avail-status').css('display', 'none');
+        $('#add-widget-submit').removeClass('disabled');
+        $('#add-widget-selection').prop('disabled', false);
+    } else {
+        $('#wigets-avail-status').css('display', 'block');
+        $('#add-widget-submit').addClass('disabled');
+        $('#add-widget-selection').prop('disabled', 'disabled');
+    }
+  }
+
   function load(widgets, wrapped, add) {
     $.get(dashboardUrl, { widgets:widgets, wrapped:wrapped||'', add:add||'' }, function(response, status, xhr) {
       $.each(response.widgets, function(key, widget) {
@@ -174,6 +197,8 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
     $('#add-widget-selection option[value="'+ select.val() +'"]').remove();
     select.val('');
     $('#add-widget-modal').modal('hide');
+
+    check_avail_status();
   });
   custom.find('.filter_op').click(function () {
       filter.val($(this).attr('data-id'));
@@ -284,6 +309,8 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
         }
         console.log(option);
         select.append(option);
+
+        check_avail_status();
     });
   })
 

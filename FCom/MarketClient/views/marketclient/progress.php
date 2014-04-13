@@ -8,10 +8,16 @@
 </div>
 </div>
 
+<?php if (!empty($p['modules'])): ?>
 <pre>
 <?php foreach ($p['modules'] as $modName => $modLine): ?>
 <?= $this->q($modLine)."\n" ?>
 <?php endforeach ?>
 </pre>
+<?php endif ?>
+
+<?php if ($p['status'] === 'DONE'): ?>
+<p>ALL DONE</p>
+<?php endif ?>
 
 <?php endif ?>

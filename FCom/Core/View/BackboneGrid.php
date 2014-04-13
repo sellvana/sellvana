@@ -181,8 +181,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             }
 
             if (empty($col['type'])) {
+                if (!empty($col['editor'])) {
+                    $col['type'] = 'input';
+                }
+
                 continue;
             }
+
             switch($col['type']) {
                 case 'multiselect':
                     $col['width'] = 50;

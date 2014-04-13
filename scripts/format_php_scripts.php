@@ -39,15 +39,23 @@ function formatModulePhpFiles( $dir, $target = null )
         if($ext != "php"){
             continue;
         }
-        $source = formatFile($file);
+        echo "Formatting {$file} ... ";
+        try {
+            $source = formatFile($file);
+        } catch (Exception $e) {
+            echo "ERROR:\n" . $e->getMessage() . "\n";
+            continue;
+        }
         $fileName = str_replace($base.'/', '', $file);
         $dirName = pathinfo($fileName, PATHINFO_DIRNAME);
         mkdir(rtrim($target, '/') . '/' . trim($dirName, '/'), 0775, true);
         $targetFile = $target . "/" . $fileName;
-        if (@file_put_contents($targetFile, $source)){
-            echo "$targetFile\n";
+        if (file_put_contents($targetFile, $source)){
+            echo "OK\n";
+        } else {
+            echo "ERROR WRITING FILE\n";
         }
     }
 }
 
-echo "Done" . PHP_EOL;
+echo "DONE\n";

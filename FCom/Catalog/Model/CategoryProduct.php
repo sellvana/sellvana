@@ -10,7 +10,11 @@ class FCom_Catalog_Model_CategoryProduct extends FCom_Core_Model_Abstract
         'related' => array(
             'product_id'  => 'FCom_Catalog_Model_Product.id',
             'category_id' => 'FCom_Catalog_Model_Category.id',
-        )
+        ),
+        'unique_key' => array(
+            'product_id',
+            'category_id',
+        ),
     );
 
     public function category()
