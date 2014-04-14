@@ -2,8 +2,8 @@
 
 <script>
 require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], function($, _, Backbone) {
-    var mainGrid, selectedGrid, addGrid;
-    var formFieldSet = $('#field-set-modal-form');
+    var mainGrid, selectedGrid, addGrid, fieldAdd = [], fieldRemove = [], currentFieldSetId = null;
+//    var formFieldSet = $('#field-set-modal-form');
     window.customFieldsGridRegister = function(grid) {
         mainGrid = grid;
 
@@ -20,6 +20,7 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
 
             //fetch linked field data of selected fieldset from server
             var url = '{{ APP.href('customfields/fieldsets/set_field_grid_data?set_id=') | raw }}' + this.model.get('id');
+            currentFieldSetId =  this.model.get('id');
             $.get(url, function(data) {
                 selectedGrid.getRows().reset(data[1]);
             });
@@ -32,9 +33,9 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
         grid.build();
 
         //whenever main grid row is edited or added, number of fields count should be updated.
-        grid.getRows().on('add change', function(ev) {
+        /*grid.getRows().on('add change', function(ev) {
             ev.set('num_fields', selectedGrid.getRows().length);
-        });
+        });*/
 
 
     }
@@ -66,12 +67,17 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
     });
 
     $('button.fieldset-modal-save').click(function () {
+            if (currentFieldSetId != null) {
+                console.log('current id', currentFieldSetId)
+                mainGrid.getRows().findWhere({id: currentFieldSetId}).set('num_fields', selectedGrid.getRows().length);
+            }
             mainGrid.getGridSkeleton().modalElementVals = {field_ids: selectedGrid.getRows().pluck('id').join(',')};
             if (mainGrid.getModalForm().saveChanges()) {
                 selectedGrid.getRows().reset();
                 selectedGrid.getSelectedRows().reset();
                 $('.fieldset-modal-close').trigger('click');
                 $('#fieldset_tab').trigger('click');
+                currentFieldSetId = null;
             }
 
     });

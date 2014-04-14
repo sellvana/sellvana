@@ -2130,11 +2130,12 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                             rowsCollection.remove(selectedRows.models, {silent: true});
                             $('select.' + config.id + '.js-sel').val('');
-                            if (config.data_mode == 'local') {
+                            /*if (config.data_mode == 'local') {
                                 gridView.render({deleteRows: {models: selectedRows.models}})
                             } else {
                                 gridView.render();
-                            }
+                            }*/
+                            gridView.render();
                             selectedRows.reset();
                         }
                     });
