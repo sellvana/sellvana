@@ -9,12 +9,11 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
     protected static $_urlPrefix;
 
     protected static $_importExportProfile = array(
-        'skip'    => array(),
+        'skip'    => array(
+            'id_path'
+        ),
         'related' => array(
             'parent_id' => 'FCom_Catalog_Model_Category.id',
-        ),
-        'calc'    => array(
-            'id_path' => 'FCom_Catalog_Model_Category.id',
         ),
         'unique_key' => 'url_path'
     );
@@ -217,5 +216,85 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             FCom_Catalog_Model_CategoryProduct::i()->orm()->raw_query($sql)->execute();
         }
         return $this;
+    }
+
+    public function onImportAfterModel( $args )
+    {
+        $importId = $args[ 'import_id' ];
+        $importSite = FCom_Core_Model_ImportExport_Site::i()->load( $importId, 'site_code' );
+        if(!$importSite){
+            return;
+        }
+        if(isset($args['models'])){
+            $toUpdate = $args['models'];
+        } else {
+            $toUpdate = static::i()->orm()
+                  ->where( array( 'parent_id IS NULL', array( 'OR' => 'id_path IS NULL' ) ) )
+                  ->find_many_assoc();
+        }
+        if ( empty( $toUpdate ) ) {
+            return;
+        }
+//        if ( isset( $toUpdate[ 1 ] ) && $toUpdate[ 1 ]->get( "level" ) == null) { // remove root category
+//            unset( $toUpdate[ 1 ] );
+//        }
+        $ids = array_keys( $toUpdate );
+        $importData = FCom_Core_Model_ImportExport_Id::i()->orm()
+            ->join(
+              FCom_Core_Model_ImportExport_Model::i()->table(),
+              'iem.id=model_id and iem.model_name=\'' . static::origClass() . '\'',
+              'iem'
+            )
+            ->where( array( 'site_id' => $importSite->id() ) )
+            ->where( array( 'local_id' => $ids ) )
+            ->find_many();
+
+        if(empty($importData)){
+            BDebug::log( BLocale::_( "Could not update category data, missing import details" ));
+            return;
+        }
+
+        $relations = array();
+
+        foreach ( $importData as $item ) {
+            $rel = $item->get( 'relations' );
+            if ( empty( $rel ) ) {
+                continue;
+            }
+            $relations[$item->get('local_id')] = json_decode($rel, true);
+        }
+        unset($rel);
+
+        $fetch = array();
+        foreach ( $relations as $v ) {
+            foreach ( $v as $id ) {
+                if ( !isset( $fetch[ $id ] ) ) {
+                    $fetch[ $id ] = 1;
+                }
+            }
+        }
+        $relatedData = FCom_Core_Model_ImportExport_Id::i()->orm()
+            ->join(
+              FCom_Core_Model_ImportExport_Model::i()->table(),
+              'iem.id=model_id and iem.model_name=\'' . static::origClass() . '\'',
+              'iem'
+            )
+            ->where( array( 'site_id' => $importSite->id() ) )
+            ->where( array( 'import_id' => array_keys( $fetch ) ) )
+            ->find_many_assoc('import_id');
+
+        foreach ( $relations as $k => $v ) {
+            $model = $toUpdate[$k];
+            foreach ( $v as $field => $r ) {
+                $rel = $relatedData[$r];
+                $model->set( $field, $rel->get('local_id'));
+            }
+        }
+
+        foreach ( $toUpdate as $model ) {
+            /** @var FCom_Catalog_Model_Category $model */
+            $model->generateIdPath()->save();
+        }
+
     }
 }

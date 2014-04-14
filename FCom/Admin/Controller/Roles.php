@@ -72,4 +72,5 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
             }
         }
     }
+
 }

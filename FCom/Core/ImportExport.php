@@ -27,8 +27,10 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
     protected $notChanged = 0;
     protected $newModels = 0;
     protected $updatedModels = 0;
+    protected $changedModels;
 
     /**
+     * @throws Exception
      * @return array
      */
     public function collectExportableModels()
@@ -57,7 +59,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             BDebug::log( "Could not open $toFile for writing, aborting export." );
             return false;
         }
-        $this->writeLine( $fe, json_encode( array( static::STORE_UNIQUE_ID_KEY => $this->storeUUID() ) ) );
+        $this->writeLine( $fe, json_encode( array( static::STORE_UNIQUE_ID_KEY => $this->storeUID() ) ) );
         $exportableModels = $this->collectExportableModels();
         if ( !empty( $models ) ) {
             $diff = array_diff( array_keys( $exportableModels ), $models );
@@ -86,6 +88,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             }
             $records = $model::i()->orm()->select($heading[ static::DEFAULT_FIELDS_KEY ])->find_many();
             if ( $records ) {
+                BEvents::i()->fire( __METHOD__ . ':beforeOutput', array( 'records' => $records ) );
                 $this->writeLine( $fe, BUtil::toJson( $heading ) );
                 foreach ( $records as $r ) {
 
@@ -108,12 +111,12 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         $start = microtime(true);
         /** @var FCom_PushServer_Model_Channel $channel */
         $this->channel = FCom_PushServer_Model_Channel::i()->getChannel( 'import', true );
-        $this->channel->send( array( 'channel' => 'import', 'signal' => 'start', 'msg' => "Import started." ) );
+        $this->channel->send( array( 'signal' => 'start', 'msg' => "Import started." ) );
         $bs = BConfig::i()->get("FCom_Core/import_export/batch_size", 100);
 
         $fromFile = $this->getFullPath( $fromFile );
         if(!is_readable($fromFile)){
-            $this->channel->send( array( 'channel' => 'import', 'signal' => 'problem',
+            $this->channel->send( array( 'signal' => 'problem',
                                   'problem' => "Could not find file to import.\n$fromFile" ) );
             BDebug::log("Could not find file to import.");
             return false;
@@ -130,11 +133,11 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $meta = json_decode( $importMeta );
             if ( isset( $meta->{static::STORE_UNIQUE_ID_KEY} ) ) {
                 $importID = $meta->{static::STORE_UNIQUE_ID_KEY};
-                $this->channel->send( array( 'channel' => 'import', 'signal' => 'info', 'msg' => "Store id: $importID" ) );
+                $this->channel->send( array( 'signal' => 'info', 'msg' => "Store id: $importID" ) );
             } else {
                 $this->channel->send(
                     array(
-                        'channel' => 'import',
+
                         'signal'  => 'problem',
                         'problem' => "Unique store id is not found, using 'default' as key"
                     )
@@ -151,6 +154,10 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         $this->importId = $importSite->id();
 
         $this->importModels = $ieHelperMod->orm()->find_many_assoc('model_name');
+        BEvents::i()->fire(
+            __METHOD__ . ':meta',
+            array( 'import_id' => $importID, 'import_site' => $importSite, 'import_models' => &$this->importModels )
+        );
 
         $this->currentModel = null;
         $this->currentModelIdField = null;
@@ -167,12 +174,22 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $model     = null;
             $data      = (array)json_decode( $line );
             if ( !empty( $data[ static::DEFAULT_MODEL_KEY ] ) ) {
+                // new model declaration found, import reminder of previous batch
                 if(!empty($batchData)){
                     $this->importBatch($batchData);
                     $batchData = array();
                 }
+
+                if( $this->currentModel ){
+                    BEvents::i()->fire(
+                        __METHOD__ . ':afterModel:' . $this->currentModel,
+                        array( 'import_id' => $importID, 'models' => $this->changedModels )
+                    );
+                }
+
                 $this->currentModel   = $data[ static::DEFAULT_MODEL_KEY ];
-                $this->channel->send( array( 'channel' => 'import', 'signal' => 'info', 'msg' => "Importing: $this->currentModel" ) );
+                $this->changedModels = array();
+                $this->channel->send( array( 'signal' => 'info', 'msg' => "Importing: $this->currentModel" ) );
                 if ( !isset( $this->importModels[ $this->currentModel ] ) ) {
                     // first time importing this model
                     $tm = $ieHelperMod->load( $this->currentModel, 'model_name' ); // check if it has been created
@@ -186,7 +203,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 $this->currentModelIdField = $cm::i()->getIdField();
                 $this->currentConfig  = $ieConfig[ $this->currentModel ];
                 if ( !$this->currentConfig ) {
-                    $this->channel->send( array( 'channel' => 'import', 'signal' => 'problem',
+                    $this->channel->send( array( 'signal' => 'problem',
                                           'problem' => "Could not find I/E config for $this->currentModel." ) );
                     BDebug::warning( "Could not find I/E config for $this->currentModel." );
                     continue;
@@ -223,25 +240,34 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             if( $cnt % $bs != 0 ){
                 continue; // accumulate batch data
             } else {
-                $this->channel->send( array( 'channel' => 'import', 'signal' => 'info', 'msg' => "Importing #$cnt" ) );
+                $this->channel->send( array( 'signal' => 'info', 'msg' => "Importing #$cnt" ) );
             }
 
             $this->importBatch( $batchData );
             $batchData = array();
         }
+
+        if ( !empty($batchData) ) {
+            $this->importBatch( $batchData );
+        }
+
+        BEvents::i()->fire(
+            __METHOD__ . ':afterModel:' . $this->currentModel,
+            array( 'import_id' => $importID, 'models' => $this->changedModels )
+        );
         if ( !feof( $fi ) ) {
-            $this->channel->send( array( 'channel' => 'import', 'signal' => 'problem',
+            $this->channel->send( array( 'signal' => 'problem',
                                   'problem' => "Error: unexpected file fail" ) );
             BDebug::debug( "Error: unexpected file fail");
         }
         fclose( $fi );
-        $this->channel->send( array( 'channel' => 'import', 'signal' => 'new_models',
+        $this->channel->send( array( 'signal' => 'new_models',
                               'msg' => BLocale::_( "Created %d new models", $this->newModels )));
-        $this->channel->send( array( 'channel' => 'import', 'signal' => 'updated_models',
+        $this->channel->send( array( 'signal' => 'updated_models',
                               'msg' => BLocale::_( "Updated %d models", $this->updatedModels )));
-        $this->channel->send( array( 'channel' => 'import', 'signal' => 'finished',
+        $this->channel->send( array( 'signal' => 'finished',
                               'msg' => BLocale::_( "No changes for %d models", $this->notChanged )));
-        $this->channel->send( array( 'channel' => 'import', 'signal' => 'finished',
+        $this->channel->send( array( 'signal' => 'finished',
                               'msg' => "Done in: " . round( microtime(true) - $start) ) . " sec.");
 
         return true;
@@ -249,85 +275,48 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
     /**
      * @param array $batchData
+     * @throws BException
+     * @throws Exception
      */
     protected function importBatch( $batchData )
     {
         /** @var FCom_Core_Model_ImportExport_Id $ieHelperId */
         $ieHelperId = FCom_Core_Model_ImportExport_Id::i();
         $cm = $this->currentModel;
-        $related = array();
         $existing = array();
+        $this->populateRelated( $batchData );
+
         foreach ( $batchData as $key => $data ) {
-            if ( isset($this->currentConfig['related']) ) {
-                foreach ( $this->currentConfig[ 'related' ] as $field => $l ) {
-                    // collect related ids
-                    if ( isset( $data[ $field ] ) ) {
-                        $tmp = $data[ $field ];
-                        if ( !isset( $related[ $l ][ $tmp ] ) ) {
-                            $related[ $l ][ $field ][$tmp] = 1;
-                        }
-                    }
-                }
-            }
             if ( isset( $this->currentConfig[ 'unique_key' ] ) ) {
-                $where = array('AND');
-                foreach ( (array) $this->currentConfig[ 'unique_key' ] as $ukey ) {
+                $where = array( 'AND' );
+                foreach ( (array)$this->currentConfig[ 'unique_key' ] as $ukey ) {
                     if ( isset( $data[ $ukey ] ) ) {
                         $where[ $ukey ] = $data[ $ukey ];
                     }
                 }
-                if(!empty($where)){
-                    $existing[] = $where;
+                if ( !empty( $where ) ) {
+                    $existing[ ] = $where;
                 }
             }
 
-            $batchData[$key] = $data;
+            $batchData[ $key ] = $data;
         }
 
-        if ( !empty($related) && !$this->defaultSite ) {
-            foreach ( $this->currentConfig[ 'related' ] as $f => $r ) {
-                if ( isset( $this->currentRelated[ $r ] ) ) {
-                    continue;
-                }
-                list( $relModel, $field ) = explode( '.', $r );
-                $tempRel = $ieHelperId::orm()
-                                      ->select( array( 'import_id', 'local_id' ) )
-                                      ->join(
-                                          FCom_Core_Model_ImportExport_Model::table(),
-                                          'iem.id=model_id and iem.model_name=\'' . $relModel . '\'',
-                                          'iem'
-                                      )
-                                      ->where( array( 'site_id' => $this->importId ) )
-                                      ->where(array('local_id' => array_keys($related[$r][$f]) ))
-                                      ->find_many();
-
-                foreach ( $tempRel as $tr ) {
-                    $this->currentRelated[ $r ][ $tr[ 'import_id' ] ] = $tr[ 'local_id' ];
-                }
-            }
-        }
         $oldModels = array();
         if(!empty($existing)){
             $oldModels = $this->getExistingModels( $cm, $existing );
         }
 
         foreach ( $batchData as $id => $data ) {
-            foreach ( $this->currentConfig[ 'related' ] as $field => $l ) {
-                // collect related ids
-                if ( isset( $data[ $field ] ) ) {
-                    $tmp = $data[ $field ];
-                    if ( isset( $this->currentRelated[ $l ][ $tmp ] ) ) {
-                        $data[ $field ] = $this->currentRelated[ $l ][ $tmp ];
-                    }
-                }
-            }
             $ieData = array(
-                'site_id' => $this->importId,
-                'model_id' => $this->importModels[ $this->currentModel ]->id(),
+                'site_id'   => $this->importId,
+                'model_id'  => $this->importModels[ $this->currentModel ]->id(),
                 'import_id' => $data[ $this->currentModelIdField ],
-                'local_id' => null,
+                'local_id'  => null,
+                'relations' => !empty( $data[ 'failed_relation' ] ) ? json_encode( $data[ 'failed_relation' ] ) : null,
+                'update_at' => BDb::i()->now(),
             );
-            unset( $data[ $this->currentModelIdField ] );
+            unset( $data[ $this->currentModelIdField ], $data['failed_related'] );
             /** @var FCom_Core_Model_Abstract $model */
             $model = isset( $oldModels[ $id ] ) ? $oldModels[ $id ] : null;
 
@@ -347,18 +336,24 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                         $this->notChanged++;
                     }
                 } else {
-                    $model = $cm::i()->create( $data )->save();
+                    $model = $cm::i()->create( $data )->save( false );
                     $this->newModels++;
                 }
             } catch ( PDOException $e ) {
                 BDebug::logException($e);
-                $this->channel->send( array( 'channel' => 'import', 'signal' => 'problem',
+                $this->channel->send( array( 'signal' => 'problem',
                                       'problem' => "Error: unexpected file fail" ) );
             }
 
-            $ieData[ 'local_id' ] = $model->id();
-            $ieHelperId->create( $ieData )->save();
+            if ( $model ) {
+                $ieData[ 'local_id' ] = $model->id();
+                $ieHelperId->create( $ieData )->save( true, true );
+                $this->changedModels[$id] = $model;
+            } else {
+                BDebug::warning("Invalid model: $id");
+            }
         }
+        BEvents::i()->fire( __METHOD__ . ':afterBatch:' . $cm, array( 'records' => $this->changedModels ) );
     }
     protected function isArrayAssoc( array $arr )
     {
@@ -449,7 +444,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         }
     }
 
-    protected function storeUUID()
+    protected function storeUID()
     {
         $sUid = BConfig::i()->get( 'db/store_unique_id' );
         if ( !$sUid ) {
@@ -502,6 +497,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
     /**
      * @param $modelName
      * @param $modelKeyConditions
+     * @throws BException
      * @return array
      */
     protected function getExistingModels( $modelName, $modelKeyConditions )
@@ -525,5 +521,77 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $result[ trim( $id, '/' ) ] = $model;
         }
         return $result;
+    }
+
+    /**
+     * Populated related IDs
+     * We need to handle this before attempting to import
+     * to ensure unique keys do not get triggered
+     * also having related id before parsing unique keys, will allow
+     * to use related keys for unique_key
+     *
+     * @param $batchData
+     * @throws BException
+     * @throws Exception
+     */
+    protected function populateRelated( &$batchData )
+    {
+        $related = array();
+        if ( isset( $this->currentConfig[ 'related' ] ) ) {
+            foreach ( $this->currentConfig[ 'related' ] as $field => $l ) {
+                foreach ( $batchData as $data ) { // prepare related search
+                    // collect related ids
+                    if ( isset( $data[ $field ] ) ) {
+                        $tmp = $data[ $field ];
+                        if ( !isset( $related[ $l ][ $tmp ] ) ) {
+                            $related[ $l ][ $field ][ $tmp ] = 1;
+                        }
+                    }
+                } // end foreach data
+            } // end foreach related
+        } // end if related
+
+        if ( !empty( $related ) && !$this->defaultSite ) { // search related ids
+            foreach ( $this->currentConfig[ 'related' ] as $f => $r ) {
+                if ( isset( $this->currentRelated[ $r ] ) ) {
+                    continue;
+                }
+                list( $relModel, $field ) = explode( '.', $r );
+                $tempRel = FCom_Core_Model_ImportExport_Id::i()->orm()
+                                      ->select( array( 'import_id', 'local_id' ) )
+                                      ->join(
+                                          FCom_Core_Model_ImportExport_Model::i()->table(),
+                                          'iem.id=model_id and iem.model_name=\'' . $relModel . '\'',
+                                          'iem'
+                                      )
+                                      ->where( array( 'site_id' => $this->importId ) )
+                                      ->where( array( 'local_id' => array_keys( $related[ $r ][ $f ] ) ) )
+                                      ->find_many();
+
+                /** @var FCom_Core_Model_Abstract $tr */
+                foreach ( $tempRel as $tr ) {
+                    $this->currentRelated[ $r ][ $tr->get( 'import_id' ) ] = $tr->get( 'local_id' );
+                }
+            }
+        }
+
+        if ( isset( $this->currentConfig[ 'related' ] ) ) {
+            foreach ( $this->currentConfig[ 'related' ] as $field => $l ) {
+                foreach ( $batchData as &$data ) { // populate related data
+                    if ( isset( $data[ $field ] ) ) {
+                        $tmp = $data[ $field ];
+                        if ( isset( $this->currentRelated[ $l ][ $tmp ] ) ) {
+                            $data[ $field ] = $this->currentRelated[ $l ][ $tmp ];
+                        } else {
+                            // if there is no match for needed field
+                            // set related field to be null, so that it can be updated after model data is imported.
+                            // store relation data
+                            $data[ $field ]                      = null;
+                            $data[ 'failed_relation' ][ $field ] = $tmp;
+                        }
+                    }
+                } // end foreach batch data
+            } // end foreach ['related']
+        } // end if related
     }
 }

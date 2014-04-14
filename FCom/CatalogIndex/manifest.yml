@@ -11,6 +11,9 @@ modules:
             - [ FCom_Catalog_Model_Product::import:after, FCom_CatalogIndex_Main::onProductAfterImport ]
             - [ FCom_Catalog_Model_Category::onAfterSave:products, FCom_CatalogIndex_Main::onCategoryAfterSave ]
             - [ FCom_CustomField_Model_Field::onAfterSave, FCom_CatalogIndex_Main::onCustomFieldAfterSave ]
+        default_config:
+            modules/FCom_CatalogIndex/show_root_categories: 1
+            modules/FCom_CatalogIndex/show_sibling_categories: 1
         areas:
             FCom_Admin:
                 routing:

@@ -47,12 +47,14 @@
       {% endfor %}
       </ul>
     </div>
+    {% if not THIS.get('hide_display_selector') %}
     <div class="form-group hidden-xs">
       <div class="btn-group">
         <a href="{{ UTIL.setUrlQuery(url, {view:'grid'}) }}" class="{{ viewAs=='grid'?'btn active':'btn' }}"><i class="glyphicon glyphicon-th {{ viewAs=='grid'?'icon-white' }}"></i></a>
         <a href="{{ UTIL.setUrlQuery(url, {view:'list'}) }}" class="{{ viewAs=='list'?'btn active':'btn' }}"><i class="glyphicon glyphicon-th-list {{ viewAs=='list'?'icon-white' }}"></i></a>
       </div>
     </div>
+    {% endif %}
     <div class="form-group">
       <label for="#" class="control-label">Go to:</label>
       <select class="form-control" name="p" onchange="this.form.submit()">
