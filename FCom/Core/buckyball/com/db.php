@@ -2072,7 +2072,7 @@ class BModel extends Model
      */
     public static function loadOrCreate($id, $field, $cache=false)
     {
-        $model = static::load($id, $fied, $cache);
+        $model = static::load($id, $field, $cache);
         if (!$model) {
             $model = static::create();
         }
