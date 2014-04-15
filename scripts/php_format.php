@@ -287,11 +287,11 @@ if (false) { // do not touch syntax
                    && ( $last || $tokens[ $i + 1 ]->contents == ']' )
         ) {
             //TODO: converts also constants into strings?
-            //if ( preg_match( '/[a-z_]+/', $token->contents ) ) {
-            //    $output .= "'" . $token->contents . "'";
-            //} else {
+            if ( false && preg_match( '/[a-z_]+/', $token->contents ) ) {
+                $output .= "'" . $token->contents . "'";
+            } else {
                 $output .= $token->contents;
-            //}
+            }
         } elseif ( $token->type == T_ENCAPSED_AND_WHITESPACE || $token->type == T_STRING ) {
             $output .= $token->contents;
         } elseif ( $token->contents == '-' && ( $last || in_array(
@@ -305,7 +305,7 @@ if (false) { // do not touch syntax
             if ( $tokens[ $i + 1 ]->type != T_WHITESPACE ) {
                 $output .= ' ';
             }
-        } elseif ( $token->contents == '}' && ( !$last && in_array( $tokens[ $i + 1 ]->type, $CONTROL_STRUCTURES ) ) ) {
+        } elseif ( !$doubleQuote && $token->contents == '}' && ( !$last && in_array( $tokens[ $i + 1 ]->type, $CONTROL_STRUCTURES ) ) ) {
             $output .= '} ';
         } elseif ( $token->contents == '=' && ( !$last && $tokens[ $i + 1 ]->contents == '&' ) ) {
             if ( !$first && $tokens[ $i - 1 ]->type != T_WHITESPACE ) {
@@ -325,20 +325,20 @@ if (false) { // do not touch syntax
             if ( !$last && $tokens[ $i + 1 ]->type != T_WHITESPACE ) {
                 $output .= ' ';
             }
-        } elseif ( in_array(
+        } elseif ( !$doubleQuote && in_array(
                        $token->contents,
                        $WHITESPACE_BEFORE
                    ) && !$first && $tokens[ $i - 1 ]->type != T_WHITESPACE &&
                    in_array( $token->contents, $WHITESPACE_AFTER ) && !$last && $tokens[ $i + 1 ]->type != T_WHITESPACE
         ) {
             $output .= ' ' . $token->contents . ' ';
-        } elseif ( in_array(
+        } elseif ( !$doubleQuote && in_array(
                        $token->contents,
                        $WHITESPACE_BEFORE
                    ) && !$first && $tokens[ $i - 1 ]->type != T_WHITESPACE
         ) {
             $output .= ' ' . $token->contents;
-        } elseif ( in_array(
+        } elseif ( !$doubleQuote && in_array(
                        $token->contents,
                        $WHITESPACE_AFTER
                    ) && !$last && $tokens[ $i + 1 ]->type != T_WHITESPACE
