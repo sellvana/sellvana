@@ -25,24 +25,24 @@ class FCom_Cms_Migrate extends BClass
             `layout_update` text,
             PRIMARY KEY (`id`),
             CONSTRAINT `FK_{$tNav}_parent` FOREIGN KEY (`parent_id`) REFERENCES {$tNav} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
         $tPage = FCom_Cms_Model_Page::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tPage} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `handle` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-            `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-            `content` text COLLATE utf8_unicode_ci NOT NULL,
-            `layout_update` text COLLATE utf8_unicode_ci,
+            `handle` varchar(255)  NOT NULL,
+            `title` varchar(255)  NOT NULL,
+            `content` text  NOT NULL,
+            `layout_update` text ,
             `create_dt` datetime DEFAULT NULL,
             `update_dt` datetime DEFAULT NULL,
             `version` int(11) unsigned NOT NULL,
-            `meta_title` text COLLATE utf8_unicode_ci,
-            `meta_description` text COLLATE utf8_unicode_ci,
-            `meta_keywords` text COLLATE utf8_unicode_ci,
+            `meta_title` text ,
+            `meta_description` text ,
+            `meta_keywords` text ,
             PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
         ");
 
@@ -53,23 +53,23 @@ class FCom_Cms_Migrate extends BClass
             `page_id` int(10) unsigned NOT NULL,
             `version` int(11) unsigned NOT NULL,
             `user_id` int(11) unsigned null,
-            `username` varchar(50) COLLATE utf8_unicode_ci NULL,
-            `data` text COLLATE utf8_unicode_ci NOT NULL,
-            `comments` text COLLATE utf8_unicode_ci NOT NULL,
+            `username` varchar(50)  NULL,
+            `data` text  NOT NULL,
+            `comments` text  NOT NULL,
             `ts` datetime not null,
             PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
 */
         $tBlock = FCom_Cms_Model_Block::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tBlock} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `handle` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-            `description` text COLLATE utf8_unicode_ci,
+            `handle` varchar(100)  NOT NULL,
+            `description` text ,
             `renderer` varchar(100) null,
-            `content` text COLLATE utf8_unicode_ci,
-            `layout_update` text COLLATE utf8_unicode_ci,
+            `content` text ,
+            `layout_update` text ,
             `version` int(11) NOT NULL,
             `create_at` datetime DEFAULT NULL,
             `update_at` datetime DEFAULT NULL,
@@ -83,7 +83,7 @@ class FCom_Cms_Migrate extends BClass
             PRIMARY KEY (`id`),
             UNIQUE KEY `UNQ_handle` (`handle`),
             UNIQUE KEY `UNQ_page_url` (`page_enabled`,`page_url`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
 
         $tBlock = FCom_Cms_Model_Block::table();
@@ -94,13 +94,13 @@ class FCom_Cms_Migrate extends BClass
             `block_id` int(10) unsigned NOT NULL,
             `version` int(11) unsigned NOT NULL,
             `user_id` int(11) unsigned null,
-            `username` varchar(50) COLLATE utf8_unicode_ci NULL,
-            `data` text COLLATE utf8_unicode_ci NOT NULL,
-            `comments` text COLLATE utf8_unicode_ci NOT NULL,
+            `username` varchar(50)  NULL,
+            `data` text  NOT NULL,
+            `comments` text  NOT NULL,
             `ts` datetime not null,
             PRIMARY KEY (`id`),
             CONSTRAINT `FK_{$tBlockHistory}_block` FOREIGN KEY (`block_id`) REFERENCES {$tBlock} (`id`) ON UPDATE CASCADE ON DELETE CASCADE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
 
         $tForm = FCom_Cms_Model_Form::table();
