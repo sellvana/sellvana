@@ -296,21 +296,44 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
     public function action_grid_data__POST()
     {
         $r = BRequest::i();
-        if ($r->post('oper') == 'add') {
-            $data = $r->post();
-            $field_ids = $data['field_ids'];
-            unset($data['id'], $data['oper'], $data['field_ids']);
-            $set = FCom_CustomField_Model_Set::i()->create($data)->save();
-            $result = $set->as_array();
-            if ($field_ids !== '') {
-                $model = FCom_CustomField_Model_SetField::i();
-                foreach (explode(',', $field_ids) as $i=>$fId) {
-                    $model->create(array('set_id'=>$result['id'], 'field_id'=>$fId, 'position'=>$i))->save();
+        $data = $r->post();
+        $field_ids = $data['field_ids'];
+        $model = FCom_CustomField_Model_SetField::i();
+        switch ($r->post('oper')) {
+            case 'add':
+                unset($data['id'], $data['oper'], $data['field_ids']);
+                $set = FCom_CustomField_Model_Set::i()->create($data)->save();
+                $result = $set->as_array();
+                $mum_fields = 0;
+                if ($field_ids !== '') {
+                    $arr = explode(',', $field_ids);
+                    $mum_fields = count($arr);
+                    foreach ($arr as $i=>$fId) {
+                        $model->create(array('set_id'=>$result['id'], 'field_id'=>$fId, 'position'=>$i))->save();
+                    }
                 }
-            }
-            BResponse::i()->json($result);
-        } else {
-            $this->_processGridDataPost('FCom_CustomField_Model_Set');
+                $result['num_fields'] = $mum_fields;
+                BResponse::i()->json($result);
+                break;
+            case 'edit':
+                $model->delete_many(array('set_id' => $data['id']));
+                if ($field_ids !== '') {
+                    $arr = explode(',', $field_ids);
+                    foreach ($arr as $i => $fId) {
+                        if (!$model->load(array('set_id'=> $data['id'], 'field_id'=> $fId))) {
+                            $model->create(array('set_id'=> $data['id'], 'field_id'=> $fId, 'position' => $i))->save();
+                        }
+                    }
+                }
+                $set = FCom_CustomField_Model_Set::i()->load($data['id']);
+                unset($data['id'], $data['oper'], $data['field_ids']);
+                $set->set($data)->save();
+                $result = $set->as_array();
+                BResponse::i()->json($result);
+                break;
+            default:
+                $this->_processGridDataPost('FCom_CustomField_Model_Set');
+                break;
         }
 
     }

@@ -1078,12 +1078,13 @@ if (!isset($o[0]) || !isset($o[1])) {
         //load translations
         $language = BSession::i()->get('_language');
         if (!empty($language) && !empty($this->translations[$language])) {
+            /*
             if (!is_array($this->translations[$language])) {
                 $this->translations[$language] = array($this->translations[$language]);
             }
-            foreach($this->translations[$language] as $file) {
-                BLocale::addTranslationsFile($file);
-            }
+            */
+            $file = $this->root_dir . '/i18n/' . $this->translations[$language];
+            BLocale::addTranslationsFile($file);
         }
     }
 

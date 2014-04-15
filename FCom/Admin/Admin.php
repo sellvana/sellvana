@@ -7,7 +7,7 @@ class FCom_Admin_Admin extends BClass
         $defaultTheme = BConfig::i()->get('modules/FCom_Admin/theme');
         BLayout::i()
             ->setDefaultTheme($defaultTheme ? $defaultTheme : 'FCom_Admin_DefaultTheme')
-            ->defaultViewClass('FCom_Admin_View_Default')
+            ->setDefaultViewClass('FCom_Admin_View_Default')
         ;
     }
 

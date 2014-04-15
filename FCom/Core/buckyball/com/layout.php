@@ -388,11 +388,10 @@ class BLayout extends BClass
     /**
      * Set default view class
      *
-     * @todo rename to setDefaultViewClass()
      * @param mixed $className
      * @return BLayout
      */
-    public function defaultViewClass($className)
+    public function setDefaultViewClass($className)
     {
         $this->_defaultViewClass = $className;
         return $this;
@@ -1429,9 +1428,11 @@ class BView extends BClass
     {
         $renderer = $this->getParam('renderer');
         if ($renderer) {
+            BDebug::debug('VIEW.RENDER "'.$this->param('view_name').'" USING '.print_r($renderer, 1));
             return call_user_func($renderer, $this);
         }
 
+        BDebug::debug('VIEW.RENDER "'.$this->param('view_name').'" USING PHP');
         ob_start();
         include $this->getTemplateFileName();
         return ob_get_clean();

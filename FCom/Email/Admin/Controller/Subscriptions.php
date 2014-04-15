@@ -8,11 +8,13 @@ class FCom_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controller_Ab
     protected $_gridTitle = 'Subscriptions';
     protected $_recordName = 'Subscription';
     protected $_mainTableAlias = 'e';
+    protected $_navPath = 'customer/subscriptions';
     protected $_permission = 'subscriptions';
 
     public function gridConfig()
     {
         $config            = parent::gridConfig();
+        unset($config['form_url']);
         $config['columns'] = array(
             array('type'=>'row_select'),
             array('name' => 'id', 'label' => 'ID', 'index' => 'e.id'),
@@ -31,7 +33,7 @@ class FCom_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controller_Ab
                 )
         );
         $config['actions'] = array(
-            'new' => array('caption' => 'New Email Subscription', 'modal' => true),
+//            'new' => array('caption' => 'New Email Subscription', 'modal' => true),
             'export' => true,
             'edit'   => true,
             'delete' => true
@@ -40,13 +42,14 @@ class FCom_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controller_Ab
             array('field' => 'email', 'type' => 'text'),
             array('field' => 'sub_newsletter', 'type' => 'multiselect'),
         );
+        $config['new_button'] = '#add_new_email_subscription';
         return $config;
     }
 
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
-        $this->view('admin/grid')->set(array( 'actions' => array( 'new' => '')));
+        $this->view('admin/grid')->set(array( 'actions' => array( 'new' => '<button type="button" id="add_new_email_subscription" class="btn grid-new btn-primary _modal">'.BLocale::_('New Email Subscription').'</button>')));
     }
 
     public function action_unique__POST()
