@@ -14,6 +14,14 @@
         </div>
     </div>
     <div class="form-group">
+        <label class="col-md-2 control-label" for="model-status">{{ 'Author'|_ }}</label>
+        <div class="col-md-5">
+            <select class="form-control" id="model-author_user_id" name="model[author_user_id]">
+                {{ UTIL.optionsHtml(APP.instance('FCom_Admin_Model_User').options(), validator.fieldValue('author_user_id'))|raw }}
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
         <label class="col-md-2 control-label" for="model-title">{{ 'Title'|_ }}</label>
         <div class="col-md-5">
             <input class="form-control required" id="model-title" type="text" name="model[title]" value="{{ validator.fieldValue('title') }}" />
