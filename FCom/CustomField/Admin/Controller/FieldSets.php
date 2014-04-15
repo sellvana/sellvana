@@ -296,16 +296,16 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
     public function action_grid_data__POST()
     {
         $r = BRequest::i();
+        $data = $r->post();
+        $field_ids = $data['field_ids'];
+        $model = FCom_CustomField_Model_SetField::i();
         switch ($r->post('oper')) {
             case 'add':
-                $data = $r->post();
-                $field_ids = $data['field_ids'];
                 unset($data['id'], $data['oper'], $data['field_ids']);
                 $set = FCom_CustomField_Model_Set::i()->create($data)->save();
                 $result = $set->as_array();
                 $mum_fields = 0;
                 if ($field_ids !== '') {
-                    $model = FCom_CustomField_Model_SetField::i();
                     $arr = explode(',', $field_ids);
                     $mum_fields = count($arr);
                     foreach ($arr as $i=>$fId) {
@@ -316,15 +316,9 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 BResponse::i()->json($result);
                 break;
             case 'edit':
-                $data = $r->post();
-
-                $field_ids = $data['field_ids'];
-                $model = FCom_CustomField_Model_SetField::i();
                 $model->delete_many(array('set_id' => $data['id']));
-                $mum_fields = 0;
                 if ($field_ids !== '') {
                     $arr = explode(',', $field_ids);
-                    $mum_fields = count($arr);
                     foreach ($arr as $i => $fId) {
                         if (!$model->load(array('set_id'=> $data['id'], 'field_id'=> $fId))) {
                             $model->create(array('set_id'=> $data['id'], 'field_id'=> $fId, 'position' => $i))->save();
@@ -335,7 +329,6 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 unset($data['id'], $data['oper'], $data['field_ids']);
                 $set->set($data)->save();
                 $result = $set->as_array();
-                $result['num_fields'] = $mum_fields;
                 BResponse::i()->json($result);
                 break;
             default:

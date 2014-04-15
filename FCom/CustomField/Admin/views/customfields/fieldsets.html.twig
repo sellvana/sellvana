@@ -17,7 +17,7 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
             mainGrid.getModalForm().modalType = 'editable';
             skeleton.currentRow = this.model;
             mainGrid.getModalForm().render();
-
+            selectedGrid.getGridView().clearSelectedRows();
             //fetch linked field data of selected fieldset from server
             var url = '{{ APP.href('customfields/fieldsets/set_field_grid_data?set_id=') | raw }}' + this.model.get('id');
             currentFieldSetId =  this.model.get('id');
@@ -49,18 +49,27 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
         addGrid = grid;
         grid.build();
         $(addGrid.getGridSkeleton().AddButton).click(function() {
-            var sRows = addGrid.getSelectedRows().toJSON();
-            _.each(sRows, function(row) { row.selected = true;});
-            selectedGrid.getSelectedRows().add(sRows);
-            selectedGrid.getRows().add(sRows);
+            /*var sRows = addGrid.getSelectedRows().toJSON();
+            _.each(sRows, function(row) { row.selected = true;});*/
+            var rowsSelectedGrid = selectedGrid.getRows();
+            addGrid.getSelectedRows().each(function (row) {
+               if (!rowsSelectedGrid.findWhere('id', row.get('id'))) {
+                   row.set('selected', true);
+                   selectedGrid.getSelectedRows().add(row.toJSON());
+                   rowsSelectedGrid.add(row.toJSON());
+               }
+            });
             addGrid.getGridView().clearSelectedRows();
             $('#selected_fields_tab').trigger('click');
         });
     }
 
     $('#add_new_field_set').click(function () {
+        currentFieldSetId = null;
         selectedGrid.getRows().reset();
-        addGrid.getSelectedRows().reset();
+        selectedGrid.getGridView().clearSelectedRows();
+        //addGrid.getSelectedRows().reset();
+        addGrid.getGridView().clearSelectedRows();
         mainGrid.getModalForm().modalType = 'addable';
         mainGrid.getModalForm().render();
         $('a#btn-fieldset-grid-modal').trigger('click');
@@ -68,7 +77,6 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
 
     $('button.fieldset-modal-save').click(function () {
             if (currentFieldSetId != null) {
-                console.log('current id', currentFieldSetId)
                 mainGrid.getRows().findWhere({id: currentFieldSetId}).set('num_fields', selectedGrid.getRows().length);
             }
             mainGrid.getGridSkeleton().modalElementVals = {field_ids: selectedGrid.getRows().pluck('id').join(',')};
