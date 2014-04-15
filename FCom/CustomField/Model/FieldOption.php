@@ -4,6 +4,9 @@ class FCom_CustomField_Model_FieldOption extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_field_option';
+    protected static $_importExportProfile = array(
+        'unique_key' => array( 'field_id', 'label' ),
+        'related' => array( 'field_id' => 'FCom_CustomField_Model_Field.id' ));
 
     public function getListAssocById($fieldId)
     {

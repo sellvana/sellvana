@@ -11,6 +11,8 @@ class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_product_variant';
     protected static $_origClass = __CLASS__;
+    protected static $_importExportProfile = array( 'related' => array( 'product_id' => 'FCom_Catalog_Model_Product.id' ),
+                                                    'unique_key' => array( 'product_id', 'field_values', ),);
 
 
 }

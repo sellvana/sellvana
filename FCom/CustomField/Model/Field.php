@@ -38,6 +38,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
             'class' => 'FCom_CustomField_Model_ProductField',
         ),
     );
+    protected static $_importExportProfile = array( 'skip' => array(  ),  'unique_key' => array( 'field_code', ),);
 
     protected $_oldTableFieldCode;
     protected $_oldTableFieldType;
