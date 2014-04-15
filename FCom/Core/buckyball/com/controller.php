@@ -641,7 +641,7 @@ class BRequest extends BClass
                 return empty($receivedToken) || $receivedToken !== BSession::i()->csrfToken();
 
             default:
-                throw new BException('Invalid CSRF check method: '.$method);
+                throw new BException('Invalid CSRF check method: '.$checkMethod);
         }
     }
 
