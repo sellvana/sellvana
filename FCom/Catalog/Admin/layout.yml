@@ -21,7 +21,6 @@ catalog_product_form_tabs:
       - [ addTab, images, { label: Images, pos: 50, async: true } ]
       - [ addTab, attachments, { label: Attachments, pos: 60, async: true } ]
 
-      - [ addTab, additional, { label: Additional Info, pos: 11, async: true } ]
 
 /catalog/products/form:
   - { include: jstree }

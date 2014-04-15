@@ -18,6 +18,7 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
     public function gridConfig()
     {
         $config = parent::gridConfig();
+        unset($config['form_url']);
         $config['columns'] = array(
             array('type'=>'row_select'),
             array('name' => 'id', 'label'=>'ID', 'width'=>50, 'index' => 'cg.id'),

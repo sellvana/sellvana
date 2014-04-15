@@ -434,6 +434,9 @@ label.error {
 .f-prod-listing-toolbar .pagination {
   margin:2px 0;
   }
+.f-prod-listing-toolbar .btn-group .btn {
+  background:none;
+  }
 .f-prod-listing-toolbar .f-search-pages-pagination .glyphicon {
   top:0;
   font-size:9px;
