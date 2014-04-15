@@ -18,7 +18,14 @@ class FCom_MarketClient_Main extends BClass
         if (!$force && !empty($progress['status']) && in_array($progress['status'], array('ACTIVE'))) {
             return;
         }
-
+        foreach ($modules as $modName => $modInfo) {
+            if (!$modInfo || $modInfo === '-' 
+                || (!empty($modInfo['version']) && ($modInfo['version'] === '' || $modInfo['version'] === '-'))
+            ) {
+                unset($modules[$modName]);
+            }
+        }
+        
         $configUpdated = false;
         $i = 0;
         $cnt = sizeof($modules);
@@ -50,7 +57,7 @@ class FCom_MarketClient_Main extends BClass
             } elseif (is_string($modInfo)) {
                 $modInfo = array('version' => $modInfo);
             }
-
+            
             $this->progress(array(
                 'cur' => $i,
                 'modules' => array(
