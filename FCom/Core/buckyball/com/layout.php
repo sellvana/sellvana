@@ -388,11 +388,10 @@ class BLayout extends BClass
     /**
      * Set default view class
      *
-     * @todo rename to setDefaultViewClass()
      * @param mixed $className
      * @return BLayout
      */
-    public function defaultViewClass($className)
+    public function setDefaultViewClass($className)
     {
         $this->_defaultViewClass = $className;
         return $this;
