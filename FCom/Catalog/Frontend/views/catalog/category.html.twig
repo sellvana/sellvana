@@ -2,11 +2,7 @@
 {% set parts = category.getPageParts(true) %}
 <div class="f-site-main" role="main">
   <div class="container">
-   <!--  breadcrumb -->
-    <ul class="breadcrumb">
-      <li><a href="{{ APP.href() }}">Home</a></li>
-      <li class="active">{{ category.get('node_name') }}</li>
-    </ul>
+    {{ THIS.view('breadcrumbs') | raw }}
     <header class="f-page-header visible-xs">
       <span class="f-page-title">{{ category.get('node_name') }}</span>
       <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">{{ 'Filters'|_ }}</a>
