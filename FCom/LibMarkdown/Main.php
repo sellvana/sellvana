@@ -10,7 +10,7 @@ class FCom_LibMarkdown_Main extends BClass
     {
         BLayout::i()->addRenderer('FCom_LibMarkdown', array(
             'description' => 'Markdown Extra',
-            'callback' => 'FCom_LibMarkdown::renderer',
+            'callback' => 'FCom_LibMarkdown_Main::renderer',
             'file_ext' => array('.md'),
         ));
     }

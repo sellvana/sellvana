@@ -275,7 +275,10 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
      */
     static public function searchProducts($search=null, $filters=null, $sort=null, $options=array())
     {
-        $filterParams = FCom_CatalogIndex_Main::i()->parseUrl();
+        $config = BConfig::i()->get('modules/FCom_CatalogIndex');
+        if (is_null($filters)) {
+            $filters = FCom_CatalogIndex_Main::i()->parseUrl();
+        }
 
         // base products ORM object
         $productsOrm = FCom_Catalog_Model_Product::i()->orm('p')
@@ -304,11 +307,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 return array('orm' => $productsOrm, 'facets' => array());
             }
         }
-
-        if (is_null($filters)) {
-            $filters = $filterParams;
-        }
-
+        
         // result for facet counts
         $facets = array();
 
@@ -403,7 +402,9 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                     $facets[$fName]['values'][$v]['selected'] = 1;
 
                     if ($field['field_type']=='category') {
-                        $curLevel = sizeof(explode('/', $v));
+                        $valueArr = explode('/', $v);
+                        $curLevel = sizeof($valueArr);
+                        $valueParent = join('/', array_slice($valueArr, 0, $curLevel - 1));
                         $facets[$fName]['values'][$v]['level'] = $value['category_level'];
                         $countValueIds = array();
                         foreach ($filterValues as $vId1=>$value1) {
@@ -411,14 +412,36 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                             if (empty($value1['category_level']) || $vId === $vId1) {
                                 continue; // skip other fields or same category value
                             }
-                            if ($value1['category_level'] == $curLevel + 1 && strpos($vVal.'/', $v.'/')===0) { // count only children
-                                $facetFilters[$fName]['count_value_ids'][$value1['id']] = $value1['id'];
+                            $showCategory = false;
+                            $showCount = false;
+                            $isParent = false;
+                            if ($value1['category_level'] === $curLevel + 1 && strpos($vVal.'/', $v.'/') === 0) {
+                                // display and count children
+                                $showCategory = true;
+                                $showCount = true;
+                            } elseif (strpos($v, $vVal.'/') === 0) { 
+                                // display parent categories
+                                $showCategory = true;
+                                $isParent = true;
+                            } elseif (!empty($config['show_root_categories']) && $value1['category_level'] === 1) {
+                                // display root categories
+                                $showCategory = true;
+                                $isParent = true;
+                                //$showCount = true;
+                            } elseif (!empty($config['show_sibling_categories']) && $value1['category_level'] === $curLevel && strpos($vVal, $valueParent.'/') === 0) {
+                                // display siblings of current category
+                                $showCategory = true;
+                                $showCount = true;
+                            }
+                            if ($showCategory) {
                                 $facets[$fName]['values'][$vVal]['display'] = $value1['display'];
                                 $facets[$fName]['values'][$vVal]['level'] = $value1['category_level'];
-                            } elseif (strpos($v, $vVal.'/')===0) { // display parent categories
-                                $facets[$fName]['values'][$vVal]['display'] = $value1['display'];
-                                $facets[$fName]['values'][$vVal]['parent'] = 1;
-                                $facets[$fName]['values'][$vVal]['level'] = $value1['category_level'];
+                                if ($isParent) {
+                                    $facets[$fName]['values'][$vVal]['parent'] = 1;
+                                }
+                                if ($showCount) {
+                                    $facetFilters[$fName]['count_value_ids'][$value1['id']] = $value1['id'];
+                                }
                             }
                         }
                         if (empty($facetFilters[$fName]['count_value_ids'])) {

@@ -372,7 +372,7 @@ class FCom_Core_Main extends BClass
 
     static public function beforeBootstrap()
     {
-        BLayout::i()->defaultViewClass('FCom_Core_View_Base');
+        BLayout::i()->setDefaultViewClass('FCom_Core_View_Base');
     }
 
     public function writeConfigFiles($files = null)

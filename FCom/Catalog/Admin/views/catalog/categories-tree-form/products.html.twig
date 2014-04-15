@@ -25,10 +25,12 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
                     if (!catProdGrid.getRows().findWhere({id: row.get('id')})) {
                         var addedRow = row.toJSON();
                         addedRow.added_row = true;
-                        catProdGrid.getRows().add(addedRow);
+                        //{silent: true} make sure 'add' event won't trigger so that grid view is not rendered whenever row is added.
+                        catProdGrid.getRows().add(addedRow, {silent: true});
                     }
                 });
             }
+
             catProdGrid.getGridView().render();
             allProdGrid.getGridView().clearSelectedRows();
             $('.category-prod-modal-close').trigger('click');

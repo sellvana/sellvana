@@ -21,7 +21,7 @@ class FCom_CatalogIndex_Main extends BClass
                     continue;
                 }
                 $filterArr = explode('-', $filterStr, 2);
-                if (empty($filterArr[1])) {
+                if (!isset($filterArr[1])) {
                     continue;
                 }
                 $valueArr = explode(' ', $filterArr[1]);

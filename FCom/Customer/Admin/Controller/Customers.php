@@ -9,6 +9,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     protected $_recordName = 'Customer';
     protected $_mainTableAlias = 'c';
     protected $_permission = 'customers/manage';
+    protected $_navPath = 'customer/customers';
     protected $_formViewPrefix = 'customer/customers-form/';
 
     public function gridConfig()
@@ -21,11 +22,11 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             array('name' => 'lastname', 'label'=>'Last Name', 'index'=>'c.lastname'),
             array('name' => 'email', 'label'=>'Email', 'index'=>'c.email'),
             array('type' => 'input', 'name' => 'customer_group', 'label'=>'Customer Group', 'index'=>'c.customer_group',
-                  'editor' => 'select', 'mass-editable-show' => false,
-                  'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(), 'editable' => true, 'mass-editable' => true),
+                  'editor' => 'select', 'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(),
+                  'editable' => true, 'mass-editable' => true, 'validation' => array('required' => true)),
             array('type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'c.status', 'editor' => 'select',
-                  'mass-editable-show' => false, 'options' => FCom_Customer_Model_Customer::i()->fieldOptions('status'),
-                  'editable' => true, 'mass-editable' => true),
+                  'options' => FCom_Customer_Model_Customer::i()->fieldOptions('status'),
+                  'editable' => true, 'mass-editable' => true, 'validation' => array('required' => true)),
             array('name' => 'street1', 'label'=>'Address', 'index'=>'a.street1'),
             array('name' => 'city', 'label'=>'City', 'index'=>'a.city'),
             array('name' => 'region', 'label'=>'Region', 'index'=>'a.region'),

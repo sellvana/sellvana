@@ -23,7 +23,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         $autoRunLevelMods = array_flip(explode(',', 'FCom_Core,FCom_Admin,FCom_Frontend,FCom_Install'));
 
         try {
-            $schemaVersions = BDbModule::i()->orm()->find_many_assoc('module_name');
+            $schemaVersions = FCom_Core_Model_Module::i()->orm()->find_many_assoc('module_name');
             $schemaModules = array();
             foreach (BMigrate::getMigrationData() as $connection=>$migrationModules) {
                 foreach ($migrationModules as $modName=>$migrData) {
@@ -108,7 +108,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             array('name' => 'schema_version', 'label' => 'DB Version', 'width' => 80, 'cell' => new BValue("FCom.Backgrid.SchemaVersionCell"), 'overflow' => true),
             array('name' => 'run_status', 'label' => 'Status', 'options' => $runStatusOptions, 'width' => 80, 'cell' => new BValue("FCom.Backgrid.RunStatusCell"), 'overflow' => true),
             array('name' => 'run_level', 'label' => 'Level', 'options' => $coreRunLevelOptions, 'width' => 100, 'cell' => new BValue("FCom.Backgrid.RunLevelCell"), 'overflow' => true),
-            array('type'=>'input','name' => 'run_level_core', 'label' => "Run Level (Core)", 'options' => $areaRunLevelOptions, 'width' => 200, 'mass-editable-show' => true, 'editable'=>true, 'mass-editable' => true, 'editor' => 'select', 'overflow' => true),
+            array('type'=>'input','name' => 'run_level_core', 'label' => "Run Level (Core)", 'options' => $areaRunLevelOptions, 'width' => 200,  'validation' => array('required' => true), 'editable'=>true, 'mass-editable' => true, 'editor' => 'select', 'overflow' => true),
             array('name' => 'requires', 'label' => 'Requires', 'width' => 250, 'overflow' => true),
             array('name' => 'required_by', 'label' => 'Required By', 'width' => 300,'overflow' => true),
             array('name' => 'dep_errors', 'label' => 'Dependency Errors', 'width' => 300,'overflow' => true, 'hidden' => true),
