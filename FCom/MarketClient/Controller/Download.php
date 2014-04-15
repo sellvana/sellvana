@@ -4,11 +4,13 @@ class FCom_MarketClient_Controller_Download extends FCom_Core_Controller_Abstrac
 {
     public function action_index__POST()
     {
+        #echo 1; exit;
         BLayout::i()->setRootView('marketclient/container');
         $this->view('marketclient/container')->set(array(
             'modules' => BRequest::i()->request('modules'),
             'redirect_to' => BRequest::i()->request('redirect_to'),
         ));
+        FCom_MarketClient_Main::i()->progress(array(), true);
     }
 
     public function action_start__POST()

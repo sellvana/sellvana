@@ -395,6 +395,8 @@ class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
 
     public function info()
     {
+        return array('available' => false);
+
         //TODO: explicit configuration
         return array('available' => class_exists('Memcache', false) && $this->init(), 'rank' => 10);
     }
@@ -457,6 +459,8 @@ class BCache_Backend_Db extends BClass implements BCache_Backend_Interface
     public function info()
     {
 #echo "<pre>"; debug_print_backtrace(); exit;
+        return array('available' => false);
+
         $avail = (boolean)BConfig::i()->get('db/dbname');
         return array('available' => $avail, 'rank' => 90);
     }

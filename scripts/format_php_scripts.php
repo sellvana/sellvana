@@ -12,6 +12,7 @@ foreach ( $modules as $modName => $mod ) {
         continue;
     }
     $dir = $mod->root_dir;
+echo $dir . PHP_EOL;    
     if ( !file_exists( $dir ) ) {
         echo $modName . " has no files." . PHP_EOL;
         continue;
@@ -35,19 +36,30 @@ function formatModulePhpFiles( $dir, $target = null )
     }
     $base = str_replace('\\', '/', realpath(__DIR__ . '/../'));
     foreach ( $files as $file ) {
+        if (strpos($file, '/lib/') !== false) {
+            continue;
+        }
         $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
         if($ext != "php"){
             continue;
         }
-        $source = formatFile($file);
+        echo "Formatting {$file} ... ";
+        try {
+            $source = formatFile($file);
+        } catch (Exception $e) {
+            echo "ERROR:\n" . $e->getMessage() . "\n";
+            continue;
+        }
         $fileName = str_replace($base.'/', '', $file);
         $dirName = pathinfo($fileName, PATHINFO_DIRNAME);
         mkdir(rtrim($target, '/') . '/' . trim($dirName, '/'), 0775, true);
         $targetFile = $target . "/" . $fileName;
-        if (@file_put_contents($targetFile, $source)){
-            echo "$targetFile\n";
+        if (file_put_contents($targetFile, $source)){
+            echo "OK\n";
+        } else {
+            echo "ERROR WRITING FILE\n";
         }
     }
 }
 
-echo "Done" . PHP_EOL;
+echo "DONE\n";

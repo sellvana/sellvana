@@ -91,6 +91,8 @@ final class FCom_MarketClient_RemoteApi extends BClass
         $modules = $result['modules'];
         foreach ($modules as $modName => &$modInfo) {
             $localMod = BApp::m($modName);
+            $modInfo['local_channel'] = $localMod->channel;
+            $modInfo['local_version'] = $localMod->version;
             if ($modInfo['status']==='dependency' && $localMod) {
                 if (version_compare($localMod->version, $modInfo['version'], '<')) {
                     $modInfo['status'] = 'upgrade';

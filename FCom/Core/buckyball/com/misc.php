@@ -3020,8 +3020,8 @@ class BLocale extends BClass
 
     static protected $_currencySymbolMap = array(
         'USD' => '$',
-        'EUR' => '',
-        'GBP' => '',
+        'EUR' => '€',
+        'GBP' => '£',
     );
     static protected $_currencyCode = 'USD';
     static protected $_currencySymbol = '$';

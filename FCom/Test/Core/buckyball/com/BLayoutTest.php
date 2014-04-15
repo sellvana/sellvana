@@ -49,7 +49,7 @@ class BLayout_Test extends PHPUnit_Framework_TestCase
         $class = 'SampleView';
 
         $layout = $this->_layout;
-        $layout->defaultViewClass($class);
+        $layout->setDefaultViewClass($class);
         $layout->addView('my', array());
         $this->assertEquals($class, $layout->getView('my')->getParam('view_class'));
     }

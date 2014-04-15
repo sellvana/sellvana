@@ -13,11 +13,13 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
     protected $_gridTitle = 'Customer Groups';
     protected $_recordName = 'Customer Group';
     protected $_mainTableAlias = 'cg';
+    protected $_navPath = 'customer/customer-groups';
     protected $_permission = 'customer_groups';
 
     public function gridConfig()
     {
         $config = parent::gridConfig();
+        unset($config['form_url']);
         $config['columns'] = array(
             array('type'=>'row_select'),
             array('name' => 'id', 'label'=>'ID', 'width'=>50, 'index' => 'cg.id'),
