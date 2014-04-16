@@ -583,33 +583,18 @@
     </ul>
 </script>
 
-<script type="template" id="{{ config.id }}-element-mass-edit">
-    <div class="control-label col-sm-2">
-        <input type="checkbox" class="edit-field ignore-validate"/>
-    </div>
-    <div class="control-label col-sm-4">
-        <label for="customer_group">
-            <%= rc.label  %>
-        </label>
-    </div>
-    <div class="controls col-sm-6">
-        <%
-        var validation = validationRules(rc.validation);
-        switch (rc.editor) {
-        case 'select':
-        %>
-        <select name="<%= rc.name  %>" id="<%= rc.name  %>"  class="form-control ignore-validate" <%= validation %>>
-            <% for(var key in rc.options) { %>
-            <option value="<%= key %>"><%= rc.options[key] %></option>
-            <% } %>
-        </select>
-        <%          break;
-        case 'text':
-        %>
-        <input type="text" name="<%= rc.name  %>" id="<%= rc.name  %>"  class="form-control ignore-validate" <%= validation %>/>
-        <%          break;
-        } %>
-
+<script type="template" id="{{ config.id }}-add-set-fields">
+    <div class="well">
+        <div class="row">
+            <div class="col-sm-12">
+                <select id="{{ config.id }}-sel_sets" class="select2 form-control" style="width:150px;">
+                    <option value=""></option>
+                    <% for (var index in rc) {
+                    print('<option value="'+rc[index].name+'">'+ rc[index].label+ '</option>');
+                    }%>
+                </select>
+            </div>
+        </div>
     </div>
 </script>
 <script>

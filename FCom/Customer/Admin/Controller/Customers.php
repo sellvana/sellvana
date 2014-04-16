@@ -68,7 +68,14 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             }
             $this->gridOrmConfig($config['orm']);
         }
+        $config['grid_before_create'] = 'customerGridRegister';
         return $config;
+    }
+
+    public function gridViewBefore($args)
+    {
+        parent::gridViewBefore($args);
+        $this->_useDefaultLayout = false;
     }
 
     public function gridOrmConfig($orm)
