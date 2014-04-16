@@ -704,6 +704,9 @@ label.error {
   color:#777;
   font-weight:normal;
   }
+.f-price-group .f-free-price .f-price { 
+  color: #6A6; 
+  }
 .f-price-group .f-reg-price .f-price,
 .f-price-group .f-special-price .f-price {
   color:#b21919;
