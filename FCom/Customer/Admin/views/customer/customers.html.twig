@@ -79,9 +79,7 @@
                             .done(function (data) {
                                 if (data.success) {
                                     $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
-                                    selectedRows.each(function(model) {
-                                        model.trigger('render');
-                                    });
+                                    grid.getGridView().render();
                                 } else {
                                     $.bootstrapGrowl(data.error, { type: 'danger', align: 'center', width: 'auto' });
                                 }

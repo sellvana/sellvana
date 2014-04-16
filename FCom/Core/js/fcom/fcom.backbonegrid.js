@@ -1504,9 +1504,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                     .done(function (data) {
                                         if (data.success) {
                                             $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
-                                            selectedRows.each(function(model) {
-                                                model.trigger('render');
-                                            });
+                                            gridView.render();
                                         } else {
                                             $.bootstrapGrowl(data.error, { type: 'danger', align: 'center', width: 'auto' });
                                         }
