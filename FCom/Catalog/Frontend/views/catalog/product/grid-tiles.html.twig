@@ -1,6 +1,6 @@
-{% set colMd = THIS.get('col_md')|default(2) %}
-{% set colSm = THIS.get('col_sm')|default(4) %}
-{% set colXs = THIS.get('col_xs')|default(6) %}
+{% set colMd = THIS.get('col_md') ?: 4 %}
+{% set colSm = THIS.get('col_sm') ?: 6 %}
+{% set colXs = THIS.get('col_xs') ?: 12 %}
 {% set addToCartUrl = THIS.url('cart/add') %}
 
 <div class="f-prod-listing f-prod-listing-grid">

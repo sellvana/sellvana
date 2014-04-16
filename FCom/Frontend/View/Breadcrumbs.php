@@ -21,11 +21,18 @@ class FCom_Frontend_View_Breadcrumbs extends BView
                 }
                 $crumbs[] = array('label'=>$this->navNode->node_name, 'active'=>true);
             }
-
             if (!empty($crumbs)) {
                 foreach ($crumbs as $i=>&$c) {
-                    if ($c=='home') $c = array('href'=>BApp::href(), 'label'=>'Home', 'li_class'=>'home');
-                    if (!isset($c['title'])) $c['title'] = $c['label'];
+                    if ($c=='home') {
+                        $url = $this->get('home_url');
+                        if (!BUtil::isUrlFull($url)) {
+                            $url = BApp::href($url);
+                        }
+                        $c = array('href'=>$url, 'label'=>'Home', 'li_class'=>'home');
+                    }
+                    if (!isset($c['title'])) {
+                        $c['title'] = $c['label'];
+                    }
                 }
                 unset($c);
                 $this->crumbs_formatted = $crumbs;
