@@ -7,7 +7,7 @@ class FCom_Email_Migrate extends BClass
         BDb::ddlTableDef(FCom_Email_Model_Pref::table(), array(
             'COLUMNS' => array(
                 'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
-                'email' => 'varchar(100) COLLATE utf8_unicode_ci NOT NULL',
+                'email' => 'varchar(100)  NOT NULL',
                 'unsub_all' => 'tinyint(4) NOT NULL',
                 'sub_newsletter' => 'tinyint(4) NOT NULL',
                 'create_at' => 'datetime NOT NULL',

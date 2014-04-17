@@ -8,21 +8,21 @@ class FCom_Customer_Migrate extends BClass
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tCustomer} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `email` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-            `firstname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-            `lastname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-            `password_hash` text COLLATE utf8_unicode_ci,
+            `email` varchar(100)  NOT NULL,
+            `firstname` varchar(50)  NOT NULL,
+            `lastname` varchar(50)  NOT NULL,
+            `password_hash` text ,
             `default_shipping_id` int(11) unsigned DEFAULT NULL,
             `default_billing_id` int(11) unsigned DEFAULT NULL,
             `create_at` datetime NOT NULL,
             `update_at` datetime NOT NULL,
             `last_login` datetime DEFAULT NULL,
             `token` varchar(20) DEFAULT NULL,
-            `payment_method` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
-            `payment_details` text COLLATE utf8_unicode_ci,
+            `payment_method` varchar(20)  DEFAULT NULL,
+            `payment_details` text ,
             `status` enum('review','active','disabled') NOT NULL DEFAULT 'review',
             PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
 
         $tCustomer = FCom_Customer_Model_Customer::table();
@@ -31,30 +31,30 @@ class FCom_Customer_Migrate extends BClass
             CREATE TABLE IF NOT EXISTS {$tAddress} (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
               `customer_id` int(11) unsigned NOT NULL,
-              `email` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-              `firstname` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-              `lastname` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-              `middle_initial` varchar(2) COLLATE utf8_unicode_ci DEFAULT NULL,
-              `prefix` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
-              `suffix` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
-              `company` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-              `attn` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-              `street1` text COLLATE utf8_unicode_ci NOT NULL,
-              `street2` text COLLATE utf8_unicode_ci,
-              `street3` text COLLATE utf8_unicode_ci,
-              `city` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-              `region` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-              `postcode` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
-              `country` char(2) COLLATE utf8_unicode_ci NOT NULL,
-              `phone` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-              `fax` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+              `email` varchar(100)  NOT NULL,
+              `firstname` varchar(50)  DEFAULT NULL,
+              `lastname` varchar(50)  DEFAULT NULL,
+              `middle_initial` varchar(2)  DEFAULT NULL,
+              `prefix` varchar(10)  DEFAULT NULL,
+              `suffix` varchar(10)  DEFAULT NULL,
+              `company` varchar(50)  DEFAULT NULL,
+              `attn` varchar(50)  DEFAULT NULL,
+              `street1` text  NOT NULL,
+              `street2` text ,
+              `street3` text ,
+              `city` varchar(50)  NOT NULL,
+              `region` varchar(50)  DEFAULT NULL,
+              `postcode` varchar(20)  DEFAULT NULL,
+              `country` char(2)  NOT NULL,
+              `phone` varchar(50)  DEFAULT NULL,
+              `fax` varchar(50)  DEFAULT NULL,
               `create_at` datetime NOT NULL,
               `update_at` datetime NOT NULL,
               `lat` decimal(15,10) DEFAULT NULL,
               `lng` decimal(15,10) DEFAULT NULL,
               PRIMARY KEY (`id`),
               CONSTRAINT `FK_{$tAddress}_customer` FOREIGN KEY (`customer_id`) REFERENCES {$tCustomer} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
             /*
         ALTER TABLE {$tCustomer}

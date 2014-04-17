@@ -1,10 +1,6 @@
 <div class="f-site-main" role="main">
   <div class="container">
-   <!--  breadcrumb -->
-    <ul class="breadcrumb">
-      <li><a href="{{ APP.href() }}">{{ 'Home'|_ }}</a></li>
-      <li class="active">{{ 'Search'|_ }}</li>
-    </ul>
+    {{ THIS.view('breadcrumbs') | raw }}
     <header class="f-page-header visible-xs">
       <span class="f-page-title">{{ 'Search: %s' | _(THIS.get('query')) }}</span>
       <a href="javascript:void();" id="button" class="f-btn-prod-listing-filter-toggle btn btn-default">Filters</a>

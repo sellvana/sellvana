@@ -39,14 +39,19 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         $head = $this->view('head');
         $crumbs = array('home');
+        $activeCatIds = array($category->id());
         foreach ($category->ascendants() as $c) {
             $nodeName = $c->get('node_name');
             if ($nodeName) {
+                $activeCatIds[] = $c->id();
                 $crumbs[] = array('label'=>$nodeName, 'href'=>$c->url());
                 $head->addTitle($nodeName);
+                
             }
         }
         $crumbs[] = array('label'=>$category->get('node_name'), 'active'=>true);
+        $category->set('is_active', 1);
+
         $head->addTitle($category->get('node_name'));
         $layout->view('breadcrumbs')->set('crumbs', $crumbs);
 
@@ -58,6 +63,12 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $rowsView->category = $category;
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
+        
+        $layout->view('catalog/nav')->set(array(
+            'category' => $category, 
+            'active_ids' => $activeCatIds,
+            'home_url' => BConfig::i()->get('modules/FCom_Catalog/url_prefix'),
+        ));
 
         $layout->view('catalog/product/pager')->set('sort_options', FCom_CatalogIndex_Model_Field::i()->getSortingArray());
         $layout->view('catalog/category/sidebar')->set('products_data', $productsData);

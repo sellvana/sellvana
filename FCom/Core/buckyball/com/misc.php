@@ -2361,7 +2361,11 @@ class BDebug extends BClass
             $e = array('msg'=>$msg);
         } elseif (is_object($msg) && $msg instanceof Exception) {
             $bt = $msg->getTrace();
-            $e = array('msg'=>$msg->getMessage());
+            $msgStr = $msg->getMessage();
+            if ($msg instanceof PDOException) {
+                $msgStr .= "\nQUERY: ".BORM::get_last_query();
+            }
+            $e = array('msg' => $msgStr);
         } elseif (is_array($msg)) {
             $e = $msg;
         } else {
