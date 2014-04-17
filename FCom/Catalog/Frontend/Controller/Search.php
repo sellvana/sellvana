@@ -31,8 +31,10 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
 
         $head = $this->view('head');
         $crumbs = array('home');
+        $activeCatIds = array($category->id());
         foreach ($category->ascendants() as $c) {
             if ($c->node_name) {
+                $activeCatIds[] = $c->id();
                 $crumbs[] = array('label'=>$c->node_name, 'href'=>$c->url());
                 $head->addTitle($c->node_name);
             }
@@ -58,7 +60,12 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $rowsView->products = $productsData['rows'];
 
         $layout->view('catalog/product/pager')->set(array('query' => $q, 'filters' => $filter));
-        $layout->view('catalog/nav')->set(array('category' => $category));
+        $layout->view('catalog/nav')->set(array(
+            'category' => $category, 
+            'active_ids' => $activeCatIds,
+            'home_url' => BConfig::i()->get('modules/FCom_Catalog/url_prefix'),
+        ));
+
 
         FCom_Core_Main::i()->lastNav(true);
 

@@ -18,10 +18,10 @@
 
           function progress() {
               $.get(baseUrl + '/progress', function(response, status, xhr) {
-                  switch (response.progress.status) {
+                  switch (response.progress ? response.progress.status : null) {
                       case 'DONE':
                           if (redirectUrl) {
-                              //window.top.location.href = redirectUrl;
+                              window.top.location.href = redirectUrl;
                           }
                           break;
 
@@ -51,9 +51,9 @@
     line-height: 1.42857;
     color: #444;
     background-color: white;
-    padding:0 5px; 
+    padding:0 5px;
     }
-    
+
   </style>
 </head>
 <body>

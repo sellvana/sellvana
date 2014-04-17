@@ -431,7 +431,8 @@ abstract class Twig_Template implements Twig_TemplateInterface
             $method = 'get'.$item;
         } elseif (isset(self::$cache[$class]['methods']['is'.$lcItem])) {
             $method = 'is'.$item;
-        } elseif (isset(self::$cache[$class]['methods']['__call'])) {
+        } elseif (isset(self::$cache[$class]['methods']['__call']) 
+                    && Twig_Template::METHOD_CALL === $type) { //SELLVANA ADDED
             $method = (string) $item;
             $call = true;
         } else {

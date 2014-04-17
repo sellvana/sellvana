@@ -8,20 +8,20 @@ class FCom_Promo_Migrate extends BClass
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tPromo}(
             `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
-            `description` VARCHAR(255) COLLATE utf8_general_ci NOT NULL  ,
-            `details` TEXT COLLATE utf8_general_ci NULL  ,
+            `description` VARCHAR(255)  NOT NULL  ,
+            `details` TEXT  NULL  ,
             `manuf_vendor_id` INT(10) UNSIGNED NULL  ,
             `from_date` DATE NULL  ,
             `to_date` DATE NULL  ,
-            `status` ENUM('template','pending','active','expired') COLLATE utf8_general_ci NOT NULL  DEFAULT 'pending' ,
-            `buy_type` ENUM('qty','$') COLLATE utf8_general_ci NOT NULL  DEFAULT 'qty' ,
-            `buy_group` ENUM('one', 'any', 'all', 'cat', 'anyp') COLLATE utf8_general_ci NOT NULL  DEFAULT 'one',
+            `status` ENUM('template','pending','active','expired')  NOT NULL  DEFAULT 'pending' ,
+            `buy_type` ENUM('qty','$')  NOT NULL  DEFAULT 'qty' ,
+            `buy_group` ENUM('one', 'any', 'all', 'cat', 'anyp')  NOT NULL  DEFAULT 'one',
             `buy_amount` INT(11) NULL  ,
-            `get_type` ENUM('qty','$','%','text','choice','free') COLLATE utf8_general_ci NOT NULL  DEFAULT 'qty' ,
-            `get_group` ENUM('same_prod','same_group','any_group','diff_group') COLLATE utf8_general_ci NOT NULL  DEFAULT 'same_prod' ,
+            `get_type` ENUM('qty','$','%','text','choice','free')  NOT NULL  DEFAULT 'qty' ,
+            `get_group` ENUM('same_prod','same_group','any_group','diff_group')  NOT NULL  DEFAULT 'same_prod' ,
             `get_amount` INT(11) NULL  ,
-            `originator` ENUM('manuf','vendor') COLLATE utf8_general_ci NOT NULL  DEFAULT 'manuf' ,
-            `fulfillment` ENUM('manuf','vendor') COLLATE utf8_general_ci NOT NULL  DEFAULT 'manuf' ,
+            `originator` ENUM('manuf','vendor')  NOT NULL  DEFAULT 'manuf' ,
+            `fulfillment` ENUM('manuf','vendor')  NOT NULL  DEFAULT 'manuf' ,
             `create_at` DATETIME NOT NULL  ,
             `update_at` DATETIME NULL  ,
             `coupon` varchar(100) NULL  ,
@@ -34,8 +34,8 @@ class FCom_Promo_Migrate extends BClass
             CREATE TABLE IF NOT EXISTS {$tGroup}(
     `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
     `promo_id` INT(10) UNSIGNED NOT NULL  ,
-    `group_type` ENUM('buy','get') COLLATE utf8_general_ci NOT NULL  ,
-    `group_name` VARCHAR(255) COLLATE utf8_general_ci NOT NULL  ,
+    `group_type` ENUM('buy','get')  NOT NULL  ,
+    `group_name` VARCHAR(255)  NOT NULL  ,
     PRIMARY KEY (`id`) ,
     KEY `FK_promo_group_promo`(`promo_id`)
 ) ENGINE=INNODB DEFAULT CHARSET='utf8';
@@ -48,7 +48,7 @@ class FCom_Promo_Migrate extends BClass
     `promo_id` INT(10) UNSIGNED NULL  ,
     `file_id` INT(11) UNSIGNED NOT NULL  ,
     `manuf_vendor_id` INT(11) UNSIGNED NULL  ,
-    `promo_status` CHAR(1) COLLATE utf8_general_ci NOT NULL  DEFAULT 'A' ,
+    `promo_status` CHAR(1)  NOT NULL  DEFAULT 'A' ,
     PRIMARY KEY (`id`) ,
     KEY `FK_promo_media_file`(`file_id`) ,
     KEY `FK_promo_media_promo`(`promo_id`)
@@ -137,7 +137,7 @@ class FCom_Promo_Migrate extends BClass
             'COLUMNS' => array(
                 "coupon"          => "varchar(100)",
                 "manuf_vendor_id" => "INT(10) UNSIGNED NULL",
-                "buy_group"       => "ENUM('one', 'any', 'all', 'cat', 'anyp') COLLATE utf8_general_ci NOT NULL  DEFAULT 'one'"
+                "buy_group"       => "ENUM('one', 'any', 'all', 'cat', 'anyp')  NOT NULL  DEFAULT 'one'"
             ),
         ));
     }

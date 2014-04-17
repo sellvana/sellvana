@@ -2,8 +2,13 @@
     <div class="alert alert-info">{{ "There are no products matching the selection." |_ }}</div>
 {% else %}
     <section class="f-category-prod-listing">
+    
       {{ THIS.view('catalog/product/pager').set('state', THIS.get('products_data').state) | raw }}
-      {{ THIS.view('catalog/product/list-rows').set('products', THIS.get('products_data').rows).set('category', THIS.get('category')) | raw }}
+      
+      <div class="f-prod-listing f-prod-listing-rows">
+        {{ THIS.view('catalog/product/list-rows').set('products', THIS.get('products_data').rows).set('category', THIS.get('category')) | raw }}
+      </div>
+      
     </section>
 
 {% endif %}

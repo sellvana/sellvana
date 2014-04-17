@@ -1172,6 +1172,10 @@ class BResponse extends BClass
     {
         BSession::i()->close();
 
+        if (!file_exists($source)) {
+            $this->status(404, 'File not found', 'File not found');
+        }
+
         if (!$fileName) {
             $fileName = basename($source);
         }
