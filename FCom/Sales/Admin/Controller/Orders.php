@@ -370,4 +370,26 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             }
         }
     }
+
+    public function onHeaderSearch($args)
+    {
+        $r = BRequest::i()->get();
+        if (isset($r['q'])) {
+            $value = '%'.$r['q'].'%';
+            $result = FCom_Sales_Model_Order::i()->orm()
+                ->where(array('OR' => array(
+                    array('id like ?', $value),
+                    array('customer_email like ?', $value),
+                    array('unique_id like ?', $value),
+                    array('coupon_code like ?', $value),
+                )))->find_one();
+            $args['result']['order'] = null;
+            if ($result) {
+                $args['result']['order'] = array(
+                    'priority' => 20,
+                    'url' => BApp::href($this->_formHref).'?id='.$result->id()
+                );
+            }
+        }
+    }
 }

@@ -80,6 +80,20 @@
             </div>
         </div>
     </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#">{{ "Site Map"|_ }}</a>
+        </div>
+        <div class="panel-collapse accordion-body" id="settings-FCom_Admin-group2">
+            <div class="panel-body">
+                <div class="form-group">
+                    <div class="col-md-5">
+                        <a class="btn btn-primary" href="{{ APP.href('generateSiteMap') }}">{{ 'Generate Site Map'|_ }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script  type="text/javascript">
     require(['backbone', 'jquery', 'fcom.ipmode', 'select2'], function(Backbone, $, ipMode) {
