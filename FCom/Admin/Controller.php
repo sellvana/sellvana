@@ -223,7 +223,12 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
 
     public function action_generate_sitemap()
     {
+        $static_page = BLayout::i()->addAllViews(BConfig::i()->get('fs/root_dir').'/FCom/Frontend')->findViewsRegex('/^(Frontend\/views\/static\/)[\w\-]+$/');
         $site_map = array();
+        foreach ($static_page as $view => $arr) {
+            array_push($site_map, array('loc' => BApp::frontendHref(preg_replace('/Frontend\/views\/static\//', '', $view)), 'changefreq' => 'daily'));
+
+        }
         BEvents::i()->fire(__METHOD__, array('site_map' => &$site_map));
         $xml = new DOMDocument('1.0');
         $xml->formatOutput = true;
@@ -232,14 +237,10 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         foreach ($site_map as $el) {
             $url = $xml->createElement('url');
             $loc = $xml->createElement('loc');
-            $loc->appendChild(
-                $xml->createTextNode( $el['loc'] )
-            );
+            $loc->appendChild($xml->createTextNode($el['loc']));
             $url->appendChild($loc);
             $changefreq = $xml->createElement('changefreq');
-            $changefreq->appendChild(
-                $xml->createTextNode( $el['changefreq'] )
-            );
+            $changefreq->appendChild($xml->createTextNode($el['changefreq']));
             $url->appendChild($changefreq);
             $url_set->appendChild($url);
         }
