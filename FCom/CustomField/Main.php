@@ -48,7 +48,7 @@ class FCom_CustomField_Main extends BClass
                 $dataCustom[$key] = $data[$key];
             }
             //print_r($dataCustom);exit;
-            $custom->set('product_id', $p->id)->set($dataCustom)->save();
+            $custom->set($dataCustom)->set('product_id', $p->id())->save();            
         }
         // not deleting to preserve meta info about fields
     }
