@@ -23,5 +23,4 @@ base:
 
 /customers:
     - { include: base }
-    - { hook: main, views: customer/customers }
-    - { hook: main, views: admin/grid }
+    - { hook: main, views: ['customer/customers', 'admin/grid'] }
