@@ -244,8 +244,9 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             $url_set->appendChild($url);
         }
         $xml->appendChild($url_set);
-        $xml->save("site_map.xml");
+        $xml->save(BConfig::i()->get('fs/root_dir')."/site_map.xml");
         echo "<pre>Starting generate site map...\n";
+        echo "Location: ".BConfig::i()->get('fs/root_dir')."/site_map.xml \n";
         echo 'DONE';
         exit;
     }
