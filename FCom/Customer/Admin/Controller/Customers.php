@@ -246,7 +246,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     public function onHeaderSearch($args)
     {
         $r = BRequest::i()->get();
-        if (isset($r['q'])) {
+        if (isset($r['q']) && $r['q'] != '') {
             $value = '%'.$r['q'].'%';
             $result = FCom_Customer_Model_Customer::i()->orm()
                 ->where(array('OR' => array(

@@ -374,7 +374,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
     public function onHeaderSearch($args)
     {
         $r = BRequest::i()->get();
-        if (isset($r['q'])) {
+        if (isset($r['q']) && $r['q'] != '') {
             $value = '%'.$r['q'].'%';
             $result = FCom_Sales_Model_Order::i()->orm()
                 ->where(array('OR' => array(

@@ -839,7 +839,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function onHeaderSearch($args)
     {
         $r = BRequest::i()->get();
-        if (isset($r['q'])) {
+        if (isset($r['q']) && $r['q'] != '') {
             $value = '%'.$r['q'].'%';
             $result = FCom_Catalog_Model_Product::i()->orm('p')
                 ->where(array('OR' => array(
