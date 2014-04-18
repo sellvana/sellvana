@@ -56,7 +56,7 @@ modules:
 
                     - [ /media, FCom_Admin_Controller_MediaLibrary.index ]
                     - [ /header_search, FCom_Admin_Controller_HeaderSearch.index ]
-                    - [ /generateSiteMap, FCom_Admin_Controller.generate_sitemap ]
+                    - [ /generate_sitemap, FCom_Admin_Controller.generate_sitemap ]
 
                 observe:
                     - [ FCom_Admin_Controller_Settings::action_index__POST, FCom_Admin_Admin.onSettingsPost ]
