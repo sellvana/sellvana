@@ -4,13 +4,6 @@ class FCom_Core_Migrate extends BClass
 {
     public function install__0_1_6()
     {
-        if (BDb::ddlTableExists('buckyball_module')) {
-            BDb::run("
-                replace into fcom_module select * from buckyball_module;
-                drop table buckyball_module;
-            ");
-            return;
-        }
         if (!BDb::ddlTableExists('fcom_media_library')) {
             $tMediaLibrary = FCom_Core_Model_MediaLibrary::table();
             BDb::run("
