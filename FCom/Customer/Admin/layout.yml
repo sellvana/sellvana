@@ -26,5 +26,4 @@ base:
     - { hook: main, views: ['customer/customers', 'admin/grid'] }
 
 /header_search:
-    - { include: base }
     - { hook: main, views: 'header-search/FCom_Customer' }
