@@ -2,9 +2,6 @@
 
 class FCom_Admin_Controller_HeaderSearch extends FCom_Admin_Controller_Abstract_GridForm
 {
-    protected $_gridPageViewName = 'header_search';
-    protected $_gridLayoutName = '/header_search';
-
     public function action_index()
     {
         if (BRequest::i()->xhr()) {
@@ -25,24 +22,6 @@ class FCom_Admin_Controller_HeaderSearch extends FCom_Admin_Controller_Abstract_
         if ($url != '') {
             BResponse::i()->redirect($url);
         }
-
-        if (($head = $this->view('head'))) {
-            $head->addTitle($this->_gridTitle);
-        }
-
-        if (($nav = $this->view('admin/nav'))) {
-            $nav->setNav($this->_navPath);
-        }
-
-        $pageView = $this->view($this->_gridPageViewName);
-        $view = $this->gridView();
-        $this->gridViewBefore(array('view' => $view, 'page_view' => $pageView));
-
-        $this->layout();
-        $this->_useDefaultLayout = false;
-        if ($this->_useDefaultLayout) {
-            BLayout::i()->applyLayout('default_grid');
-        }
-        BLayout::i()->applyLayout($this->_gridLayoutName);
+        $this->layout('/header_search');
     }
 }
