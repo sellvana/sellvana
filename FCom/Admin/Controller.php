@@ -223,10 +223,10 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
 
     public function action_generate_sitemap()
     {
-        $static_page = FCom_Admin_Controller_Templates::i()->getAreaLayout()->findViewsRegex('/^(static\/)[\w\-]+$/');
+        $static_page = FCom_Admin_Controller_Templates::i()->getAreaLayout()->findViewsRegex('#^(static/)[\w\-]+$#');
         $site_map = array();
         foreach ($static_page as $view => $arr) {
-            array_push($site_map, array('loc' => BApp::frontendHref(preg_replace('/Frontend\/views\/static\//', '', $view)), 'changefreq' => 'daily'));
+            array_push($site_map, array('loc' => BApp::frontendHref(preg_replace('#static/#', '', $view)), 'changefreq' => 'daily'));
 
         }
         BEvents::i()->fire(__METHOD__, array('site_map' => &$site_map));
