@@ -20,6 +20,10 @@ modules:
                     - [ /catalog/products/.action, FCom_Catalog_Admin_Controller_Products ]
 
                     - [ /catalog/products/import/.action, FCom_Catalog_Admin_Controller_ProductsImport ]
+                observe:
+                    - [ FCom_Admin_Controller_HeaderSearch::action_index, FCom_Catalog_Admin_Controller_Products.onHeaderSearch ]
+                    - [ FCom_Admin_Controller::action_generate_sitemap, FCom_Catalog_Admin_Controller_Products.onGenerateSiteMap ]
+                    - [ FCom_Admin_Controller::action_generate_sitemap, FCom_Catalog_Admin_Controller_Categories.onGenerateSiteMap ]
                 security:
                     request_fields_whitelist:
                         /catalog/categories/tree_form:

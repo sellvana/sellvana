@@ -220,4 +220,35 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         FCom_Admin_Model_User::i()->personalize($data);
         BResponse::i()->json(array('success'=>true, 'data' => $data, 'r' => $r));
     }
+
+    public function action_generate_sitemap()
+    {
+        $static_page = FCom_Admin_Controller_Templates::i()->getAreaLayout()->findViewsRegex('#^(static/)[\w\-]+$#');
+        $site_map = array();
+        foreach ($static_page as $view => $arr) {
+            array_push($site_map, array('loc' => BApp::frontendHref(preg_replace('#static/#', '', $view)), 'changefreq' => 'daily'));
+
+        }
+        BEvents::i()->fire(__METHOD__, array('site_map' => &$site_map));
+        $xml = new DOMDocument('1.0');
+        $xml->formatOutput = true;
+        $url_set = $xml->createElement("urlset");
+        $url_set->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
+        foreach ($site_map as $el) {
+            $url = $xml->createElement('url');
+            $loc = $xml->createElement('loc');
+            $loc->appendChild($xml->createTextNode($el['loc']));
+            $url->appendChild($loc);
+            $changefreq = $xml->createElement('changefreq');
+            $changefreq->appendChild($xml->createTextNode($el['changefreq']));
+            $url->appendChild($changefreq);
+            $url_set->appendChild($url);
+        }
+        $xml->appendChild($url_set);
+        $xml->save(BConfig::i()->get('fs/root_dir')."/site_map.xml");
+        echo "<pre>Starting generate site map...\n";
+        echo "Location: ".BConfig::i()->get('fs/root_dir')."/site_map.xml \n";
+        echo 'DONE';
+        exit;
+    }
 }
