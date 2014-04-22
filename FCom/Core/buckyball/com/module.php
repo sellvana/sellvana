@@ -271,7 +271,8 @@ class BModuleRegistry extends BClass
                     $manifest = include($file);
                     break;
                 case 'yml':
-                    $manifest = BYAML::i()->load($file);
+                    $useCache = !BDebug::is('DEBUG,DEVELOPMENT,INSTALLATION');
+                    $manifest = BYAML::i()->load($file, $useCache);
                     break;
                 case 'json':
                     $json = file_get_contents($file);
