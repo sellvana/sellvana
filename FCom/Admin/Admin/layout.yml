@@ -304,3 +304,7 @@ form:
 
 /roles/form:
     - { include: jstree }
+    
+/header_search:
+    - { include: base }
+    - { hook: main, views: header_search }
