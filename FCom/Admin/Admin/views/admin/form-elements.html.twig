@@ -76,6 +76,7 @@ Using custom id/name:
 
 {% macro textarea(p) %}
     {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set value = view.getInputValue(p) %}
     {% import _self as forms %}
     <div class="form-group {{ p.form_group_class }}">
         {{ forms.label(p) }}
@@ -86,13 +87,14 @@ Using custom id/name:
                 class="form-control {{ p.input_class }} {{ p.required ? 'required' }}"
                 style="{{ p.style }}"
                 {{ p.required ? 'data-rule-required="true"' }}
-            >{{ view.getInputValue(p) }}</textarea>
+            >{{ p.raw ? value|raw : value }}</textarea>
         </div>
     </div>
 {% endmacro %}
 
 {% macro wysiwyg(p) %}
     {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set value = view.getInputValue(p) %}
     {% import _self as forms %}
     <div class="form-group {{ p.form_group_class }}">
         {{ forms.label(p) }}
@@ -101,13 +103,36 @@ Using custom id/name:
                 class="form-control ckeditor js-desc-wysiwyg {{ p.input_class }}"
                 id="{{ view.getInputId(p) }}"
                 name="{{ view.getInputName(p) }}"
-            >{{ view.getInputValue(p) }}</textarea>
+            >{{ p.raw ? value|raw : value }}</textarea>
             <textarea
                 class="form-control js-desc-wysiwyg"
                 id="{{ view.getInputId(p) }}-validation"
                 style="display:none;"
                 {{ p.required ? 'data-rule-required="true"' }}
-            >{{ view.getInputValue(p) }}</textarea>
+            >{{ p.raw ? value|raw : value }}</textarea>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro accordion_start(p) %}
+<div class="accordion accordion-blue panel-group" id="{{ p.id }}">
+{% endmacro %}
+
+{% macro accordion_end(p) %}
+</div>
+{% endmacro %}
+
+{% macro accordion_panel_start(p) %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <a class="accordion-toggle" href="#">{{ p.label }}</a>
+        </div>
+        <div class="panel-collapse accordion-body {{ p.in ? 'in' }}" id="{{ p.id }}">
+            <div class="panel-body">
+{% endmacro %}
+
+{% macro accordion_panel_end(p) %}
+            </div>
         </div>
     </div>
 {% endmacro %}

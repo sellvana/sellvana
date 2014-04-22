@@ -15,7 +15,7 @@
     {{ forms.textarea(fieldData|merge({field:'short_description', required:1, label:'Short Description'|_, form_group_class:'has-multilang'})) }}
     <div id="main-product-shortdesc-lang"></div>
 
-    {{ forms.wysiwyg(fieldData|merge({field:'description', required:1, label:'Long Description'|_, form_group_class:'has-multilang', input_div_class:'col-md-10'})) }}
+    {{ forms.wysiwyg(fieldData|merge({field:'description', required:1, label:'Long Description'|_, form_group_class:'has-multilang', input_div_class:'col-md-10', raw:1})) }}
     <div id="main-product-desc-lang"></div>
 
     {{ forms.input(fieldData|merge({field:'net_weight', label:'Net Weight'|_})) }}

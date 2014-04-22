@@ -1010,7 +1010,8 @@ a.dropdown-toggle { outline:none; }
   
   
 /* Forms */
-.form-horizontal label[class^='col-'] { 
+.form-horizontal label[class^='col-'],
+.form-horizontal label[class*=' col-'] { 
   padding-right:0; 
   }
 label.control-label.required:after {
@@ -1309,6 +1310,8 @@ fieldset[disabled] .btn {
   font-size:16px; 
   }
 .modal-content .modal-header .close { 
+
+
   margin-top:-5px;
   font-size:25px; 
   }
