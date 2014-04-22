@@ -1,104 +1,35 @@
 {% set c = THIS.get('model') %}
-{% set mode = c.get("mode_by_ip/FCom_Admin")|split("\n")|join('|') %}
+{% set fieldData = { model: c, id_prefix:'FCom_Admin', name_prefix:'config[modules][FCom_Admin]' } %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 
 <h2>{{ "Admin Settings"|_}}</h2>
-<div class="accordion accordion-blue panel-group" id="settings-FCom_Admin">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a class="accordion-toggle" href="#">{{ "HTML"|_ }}</a>
+{{ forms.accordion_start({id:'settings-FCom_Admin'}) }}
+    {{ forms.accordion_panel_start({label:'HTML'|_, id:'settings-FCom_Admin-group0', in:1}) }}
+        {{ forms.select(fieldData|merge({field:'theme', label:'Theme'|_, options:LAYOUT.getThemes("FCom_Admin", true), value:c.get('modules/FCom_Admin/theme')})) }}
+        {{ forms.textarea(fieldData|merge({field:'add_js_files', label:'Additional JS Files'|_, value:c.get('modules/FCom_Admin/add_js_files'), raw:1 })) }}
+        {{ forms.textarea(fieldData|merge({field:'add_css_files', label:'Additional CSS Files'|_, value:c.get('modules/FCom_Admin/add_css_files'), raw:1 })) }}
+        {{ forms.textarea(fieldData|merge({field:'add_js_code', label:'Additional JS Code'|_, value:c.get('modules/FCom_Admin/add_js_code'), raw:1 })) }}
+        {{ forms.textarea(fieldData|merge({field:'add_css_style', label:'Additional CSS Style'|_, value:c.get('modules/FCom_Admin/add_css_style'), raw:1 })) }}
+    {{ forms.accordion_panel_end }}
+    
+    {{ forms.accordion_panel_start({label:'Area Settings'|_, id:'settings-FCom_Admin-group1'}) }}
+        <div class="form-group">
+            {{ forms.label({label:'IP: mode'|_}) }}
+            <div class="col-md-8 group-ip-mode"></div>
         </div>
-        <div class="panel-collapse accordion-body in" id="settings-FCom_Admin-group0">
-            <div class="panel-body">
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="input-theme-selection">{{ "Theme"|_ }}</label>
-                    <div class="col-md-5">
-                        <select class="form-control" name="config[modules][FCom_Admin][theme]" id="input-theme-selection">
-                            {{ UTIL.optionsHtml(LAYOUT.getThemes("FCom_Admin", true), c.get('modules/FCom_Admin/theme'))|raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="add-js-files">{{ "Additional JS Files"|_ }}</label>
-                    <div class="col-md-5">
-                        <textarea class="form-control" name="config[modules][FCom_Admin][add_js_files]" id="add-js-files" rows="5">{{ c.get("modules/FCom_Admin/add_js_files")|raw }}</textarea>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="add-css-files">{{ "Additional CSS Files"|_ }}</label>
-                    <div class="col-md-5">
-                        <textarea class="form-control" name="config[modules][FCom_Admin][add_css_files]" id="add-css-files" rows="5">{{ c.get("modules/FCom_Admin/add_css_files")|raw }}</textarea>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="add-js-code">{{ "Additional JS Code"|_ }}</label>
-                    <div class="col-md-5">
-                        <textarea class="form-control js-code-editor" name="config[modules][FCom_Admin][add_js_code]" id="add-js-code" rows="5">{{ c.get("modules/FCom_Admin/add_js_code")|raw }}</textarea>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="add-css-style">{{ "Additional CSS Style"|_ }}</label>
-                    <div class="col-md-5">
-                        <textarea class="form-control js-code-editor" name="config[modules][FCom_Admin][add_css_style]" id="add-css-style" rows="5">{{ c.get("modules/FCom_Admin/add_css_style")|raw }}</textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a class="accordion-toggle" href="#">{{ "Area Settings"|_ }}</a>
-        </div>
-        <div class="panel-collapse accordion-body" id="settings-FCom_Admin-group1">
-            <div class="panel-body">
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ "IP: Mode"|_ }}</label>
-                    <div class="col-md-8 group-ip-mode"></div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ "Modules to run in RECOVERY mode"|_ }}</label>
-                    <div class="col-md-5">
-                        <textarea class="form-control" name="config[recovery_modules][FCom_Admin]" rows="5">{{ c.get("recovery_modules/FCom_Admin")|raw }}</textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a class="accordion-toggle" href="#">{{ "Users"|_ }}</a>
-        </div>
-        <div class="panel-collapse accordion-body" id="settings-FCom_Admin-group2">
-            <div class="panel-body">
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ 'Strong Password Security'|_ }}</label>
-                    <div class="col-md-5">
-                        <input type="hidden" name="config[modules][FCom_Admin][password_strength]" value="0" />
-                        <input type="checkbox" class="switch-cbx" name="config[modules][FCom_Admin][password_strength]" value="1"
-                                {{ c.get('modules/FCom_Admin/password_strength') == '1' ? 'checked="checked"' : '' }} />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a class="accordion-toggle" href="#">{{ "Site Map"|_ }}</a>
-        </div>
-        <div class="panel-collapse accordion-body" id="settings-FCom_Admin-group2">
-            <div class="panel-body">
-                <div class="form-group">
-                    <div class="col-md-5">
-                        <a class="btn btn-primary" href="{{ APP.href('generate_sitemap') }}">{{ 'Generate Site Map'|_ }}</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+        {{ forms.textarea(fieldData|merge({name:'config[recovery_modules][FCom_Admin]', id:'recovery_modules-FCom_Admin',
+            label:'Modules to run in RECOVERY mode'|_, value:c.get('recovery_modules/FCom_Admin'), raw:1 })) }}
+    {{ forms.accordion_panel_end }}
+    
+    
+    {{ forms.accordion_panel_start({label:'Users'|_, id:'settings-FCom_Admin-group2'}) }}
+        {{ forms.boolean(fieldData|merge({field:'password_strength', label:'Strong Password Security'|_, value:c.get('modules/FCom_Admin/password_strength')})) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}
+
 <script  type="text/javascript">
     require(['backbone', 'jquery', 'fcom.ipmode', 'select2'], function(Backbone, $, ipMode) {
-        var mode = '{{ mode }}';
-        mode = mode.split('|');
+        var mode = {{ UTIL.toJson(c.get("mode_by_ip/FCom_Admin")|split("\n")) | raw }};
         ipMode.initMode({el: $('#settings-FCom_Admin-group1').find('.group-ip-mode'), name: 'config[mode_by_ip][FCom_Admin]', mode: mode});
     })
 </script>
