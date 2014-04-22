@@ -49,22 +49,32 @@ require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
 
             var children = row.get('children');
 
-            if(!children) {
-                return;
+            if(children) {
+                // eventually change this into recursion if more than 3 levels of permissions are to be set
+                _.each(children, function (o) {
+                    var chId = [id[0]];
+                    chId.push(op);
+                    chId.push(o);
+                    chId = chId.join('-');
+                    var $chBox = $('#' + chId);
+                    if (val && !$chBox.is(':checked')) {
+                        $chBox.click();
+                    } else if (!val && $chBox.is(':checked')) {
+                        $chBox.click();
+                    }
+                });
             }
-            // eventually change this into recursion if more than 3 levels of permissions are to be set
-            _.each(children, function(o){
-                var chId = [id[0]];
-                chId.push(op);
-                chId.push(o);
-                chId = chId.join('-');
-                var $chBox = $('#' + chId);
-                if(val && !$chBox.is(':checked')) {
-                    $chBox.click();
-                } else if(!val && $chBox.is(':checked')) {
-                    $chBox.click();
+            if (!val) {
+                var parent = row.get('parent');
+
+                if (parent) {
+                    var pId = [id[0]];
+                    pId.push(op);
+                    pId.push(parent);
+                    pId = pId.join('-');
+                    $('#' + pId)[0].checked = false;
                 }
-            });
+            }
             updateFormData();
         });
         $(iePermGrid.getGridSkeleton().AddButton).click(function() {

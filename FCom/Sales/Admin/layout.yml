@@ -23,3 +23,6 @@ base:
     set: { tab_view_prefix: order/orders-form/ }
     do:
       - [ addTab, main, { label: General Info, pos: 10 } ]
+
+/header_search:
+  - { hook: main, views: 'header-search/FCom_Sales_Orders' }
