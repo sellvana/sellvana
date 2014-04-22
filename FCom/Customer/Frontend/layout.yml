@@ -2,45 +2,45 @@
     - { include: base }
     - view: head
       do:
-        - [ title, Customer Login ]
-        - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
-        - { hook: main, views: customer/login }
+            - [ title, Customer Login ]
+            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
+    - { hook: main, views: customer/login }
 
 /customer/register:
     - { include: base }
     - view: head
       do:
-        - [ title, Customer Registration ]
-        - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
-        - { hook: main, views: customer/register }
+            - [ title, Customer Registration ]
+            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
+    - { hook: main, views: customer/register }
 
 /customer/password/recover:
     - { include: base }
     - view: head
       do:
-        - [ title, Password Recovery ]
-        - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
-        - { hook: main, views: customer/password/recover }
+            - [ title, Password Recovery ]
+            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
+    - { hook: main, views: customer/password/recover }
 
 /customer/password/reset:
     - { include: base }
     - view: head
       do:
-        - [ title, Password Reset ]
-        - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
-        - { hook: main, views: customer/password/reset }
+            - [ title, Password Reset ]
+            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
+    - { hook: main, views: customer/password/reset }
 
 customer_account_sidebar:
     - { view: root, do: [[ addBodyClass, page-customer ]] }
     - view: customer/account/sidebar
       do:
-        - [ addNavItem, dashboard, { label: Dashboard, position: 1, href: customer/myaccount } ]
-        - [ addNavItem, edit, { label: Edit Account, position: 10, href: customer/myaccount/edit } ]
-        - [ addNavItem, addresses, { label: Address Book, position: 10, href: customer/address } ]
-        - [ addNavItem, orders, { label: My Orders, position: 20, href: customer/order } ]
-        #- [ addNavItem, downloads, { label: Downloads, position: 40, href: customer/downloads } ]
-        #- [ addNavItem, returns, { label: Returns, position: 50, href: customer/returns } ]
-        #- [ addNavItem, newsletters, { label: Newsletters, position: 60, href: email/subscriptions } ]
+            - [ addNavItem, dashboard, { label: Dashboard, position: 1, href: customer/myaccount } ]
+            - [ addNavItem, edit, { label: Edit Account, position: 10, href: customer/myaccount/edit } ]
+            - [ addNavItem, addresses, { label: Address Book, position: 10, href: customer/address } ]
+            - [ addNavItem, orders, { label: My Orders, position: 20, href: customer/order } ]
+            #- [ addNavItem, downloads, { label: Downloads, position: 40, href: customer/downloads } ]
+            #- [ addNavItem, returns, { label: Returns, position: 50, href: customer/returns } ]
+            #- [ addNavItem, newsletters, { label: Newsletters, position: 60, href: email/subscriptions } ]
 
 /customer/account:
     - { include: base }
