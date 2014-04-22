@@ -237,7 +237,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
     {
         $view = $this->view('core/backbonegrid');
         $view->set('grid', $this->fieldSetsGridConfig());
-        $data = $view->outputData();
+        $data = $view->generateOutputData();
         BResponse::i()->json(array(
             array('c' => $data['state']['c']),
             BDb::many_as_array($data['rows']),
@@ -262,7 +262,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
     {
         $view = $this->view('core/backbonegrid');
         $view->set('grid', $this->fieldsGridConfig());
-        $data = $view->outputData();
+        $data = $view->generateOutputData();
         BResponse::i()->json(array(
             array('c' => $data['state']['c']),
             BDb::many_as_array($data['rows']),

@@ -860,11 +860,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function onGenerateSiteMap($args)
     {
-        $products = FCom_Catalog_Model_Product::i()->orm()->find_many();
-        if ($products) {
-            foreach ($products as $product) {
-                array_push($args['site_map'], array('loc' => BApp::frontendHref($product->get('url_key')), 'changefreq' => 'daily'));
-            }
-        }
+        $callback = function ($row) use ($args) {
+            array_push($args['site_map'], array('loc' => BApp::frontendHref($row->get('url_key')), 'changefreq' => 'daily'));
+        };
+        FCom_Catalog_Model_Product::i()->orm()->select('url_key')->iterate($callback);
     }
 }

@@ -48,13 +48,11 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
 
     public function onGenerateSiteMap($args)
     {
-        $categories = FCom_Catalog_Model_Category::i()->orm()->find_many();
-        if ($categories) {
-            foreach ($categories as $category) {
-                if ($category->get('parent_id')) {
-                    array_push($args['site_map'], array('loc' => BApp::frontendHref($category->get('url_path')), 'changefreq' => 'daily'));
-                }
+        $callback = function ($row) use ($args) {
+            if ($row->get('parent_id') != null) {
+                array_push($args['site_map'], array('loc' => BApp::frontendHref($row->get('url_path')), 'changefreq' => 'daily'));
             }
-        }
+        };
+        FCom_Catalog_Model_Category::i()->orm()->select(array('url_path', 'parent_id'))->iterate($callback);
     }
 }
