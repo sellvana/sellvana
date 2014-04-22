@@ -17,3 +17,6 @@ base:
             - [ addTab, FCom_SalesShipping, { label: General, group: shipping_methods, pos: 10, async: true } ]
             - [ addTab, FCom_SalesPayment, { label: General, group: payment_methods, pos: 10, async: true } ]
 
+
+/header_search:
+  - { hook: main, views: 'header-search/FCom_Sales_Orders' }

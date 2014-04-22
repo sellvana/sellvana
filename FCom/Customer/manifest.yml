@@ -16,6 +16,7 @@ modules:
                 observe:
                     - [ BActionController::beforeDispatch, FCom_Customer_Admin.onControllerBeforeDispatch ]
                     - [ FCom_Admin_View_Dashboard::getWidgets, FCom_Customer_Admin.onGetDashboardWidgets ]
+                    - [ FCom_Admin_Controller_HeaderSearch::action_index, FCom_Customer_Admin_Controller_Customers.onHeaderSearch]
 
             FCom_Frontend:
                 auto_use: [ layout, views ]
