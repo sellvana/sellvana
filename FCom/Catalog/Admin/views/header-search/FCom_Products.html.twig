@@ -1,0 +1,12 @@
+{% set prodCtrl =  APP.instance('FCom_Catalog_Admin_Controller_Products') %}
+<div class="f-admin-main-view">
+    <div class="page-header f-admin-page-header">
+        <h1 class="f-page-title">
+            <i class="icon-table"></i>
+            {{ "Products"|_ }}
+        </h1>
+    </div>
+    <div class="f-admin-main">
+        {{ THIS.view('core/backbonegrid').set('grid', { "config" : prodCtrl.gridConfig()}) | raw }}
+    </div>
+</div>

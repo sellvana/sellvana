@@ -835,4 +835,34 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
         return true;
     }
+
+    public function onHeaderSearch($args)
+    {
+        $r = BRequest::i()->get();
+        if (isset($r['q']) && $r['q'] != '') {
+            $value = '%'.$r['q'].'%';
+            $result = FCom_Catalog_Model_Product::i()->orm('p')
+                ->where(array('OR' => array(
+                    array('p.id like ?', $value),
+                    array('p.local_sku like ?', $value),
+                    array('p.url_key like ?', $value),
+                    array('p.product_name like ?', $value),
+                )))->find_one();
+            $args['result']['product'] = null;
+            if ($result) {
+                $args['result']['product'] = array(
+                    'priority' => 1,
+                    'url' => BApp::href($this->_formHref).'?id='.$result->id()
+                );
+            }
+        }
+    }
+
+    public function onGenerateSiteMap($args)
+    {
+        $callback = function ($row) use ($args) {
+            array_push($args['site_map'], array('loc' => BApp::frontendHref($row->get('url_key')), 'changefreq' => 'daily'));
+        };
+        FCom_Catalog_Model_Product::i()->orm()->select('url_key')->iterate($callback);
+    }
 }

@@ -68,7 +68,14 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             }
             $this->gridOrmConfig($config['orm']);
         }
+        $config['grid_before_create'] = 'customerGridRegister';
         return $config;
+    }
+
+    public function gridViewBefore($args)
+    {
+        parent::gridViewBefore($args);
+        $this->_useDefaultLayout = false;
     }
 
     public function gridOrmConfig($orm)
@@ -234,5 +241,29 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             ->where_gte('create_at', $recent)
             ->select(array('id' ,'email', 'firstname', 'lastname', 'create_at', 'status'))->find_many();
         return $result;
+    }
+
+    public function onHeaderSearch($args)
+    {
+        $r = BRequest::i()->get();
+        if (isset($r['q']) && $r['q'] != '') {
+            $value = '%'.$r['q'].'%';
+            $result = FCom_Customer_Model_Customer::i()->orm()
+                ->where(array('OR' => array(
+                    array('id like ?', $value),
+                    array('firstname like ?', $value),
+                    array('lastname like ?', $value),
+                    array('email like ?', $value),
+                )))->find_one();
+            $args['result']['customer'] = null;
+            if ($result) {
+                $args['result']['customer'] = array(
+                    'priority' => 10,
+                    'url' => BApp::href($this->_formHref).'?id='.$result->id()
+                );
+            }
+
+        }
+
     }
 }

@@ -118,9 +118,7 @@ class FCom_LibTwig_Main extends BClass
 
         if (!$source) {
 
-            //$filename = $view->getTemplateFileName(static::$_defaultFileExt);
-            $modName = $view->getParam('module_name');
-            $template = static::$_fileTwig->loadTemplate('@'.$modName.'/'.$viewName . $view->getParam('file_ext'));
+            $template = static::$_fileTwig->loadTemplate($view->twigName());
             $output = $template->render($args);
 
         } else {

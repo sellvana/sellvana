@@ -1744,6 +1744,11 @@ class BView extends BClass
         }
         return $this->_validators[$formName];
     }
+
+    public function twigName()
+    {
+        return "@{$this->_params['module_name']}/{$this->_params['view_name']}{$this->_params['file_ext']}";
+    }
 }
 
 /**

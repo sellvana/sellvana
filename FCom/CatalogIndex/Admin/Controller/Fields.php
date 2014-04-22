@@ -16,6 +16,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
     {
         $fieldHlp = FCom_CatalogIndex_Model_Field::i();
         $config = parent::gridConfig();
+        unset($config['form_url']);
         $config['columns'] = array(
             array('type'=>'row_select'),
             array('name' => 'id', 'label' => 'ID', 'index' => 'idxf.id'),
