@@ -1,6 +1,6 @@
 base:
     - view: admin/nav
-        do:
+      do:
             - [ addNav, customer/customer-groups, { label: Customer Groups, href: /customer-groups, pos: 20 } ]
 
 /catalog/products/form:

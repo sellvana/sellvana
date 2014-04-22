@@ -1,6 +1,6 @@
 common_js_libs:
     - view: head
-        do:
+      do:
             - [ requireJs, jquery.cookie, @FCom_LibJsCommon/js/jquery.cookie, { deps: [ jquery ] } ]
             #- [ requireJs, jquery.resizableColumns, @FCom_LibJsCommon/js/jquery.resizableColumns.js, { deps: [ jquery ] } ]
             - [ requireJs, jquery.tablesorter, @FCom_LibJsCommon/js/jquery.tablesorter.min, { deps: [ jquery ] }]
@@ -27,13 +27,13 @@ common_js_libs:
 
 lib_visualsearch:
     - view: head
-        do:
+      do:
             - [ css, @FCom_LibJsCommon/js/css/visualsearch.min.css ]
             - [ requireJs, visualsearch, @FCom_LibJsCommon/js/visualsearch.min, { deps: [ backbone ] } ]
 
 lib_tokeninput:
     - view: head
-        do:
+      do:
             - [ css, @FCom_LibJsCommon/js/css/token-input.css ]
             - [ css, @FCom_LibJsCommon/js/css/token-input-facebook.css ]
             - [ requireJs, jquery.tokeninput, @FCom_LibJsCommon/js/jquery.tokeninput, { deps: [ jquery ] } ]

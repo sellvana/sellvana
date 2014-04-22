@@ -14,8 +14,8 @@ modules:
                     - [ /customers/import/.action, FCom_Customer_Admin_Controller_CustomersImport ]
                     - [ /addresses/.action, FCom_Customer_Admin_Controller_Addresses ]
                 observe:
-                    - [ BActionController::beforeDispatch, FCom_Customer_Admin.onControllerBeforeDispatch ]
-                    - [ FCom_Admin_View_Dashboard::getWidgets, FCom_Customer_Admin.onGetDashboardWidgets ]
+                    - [ "BActionController::beforeDispatch", FCom_Customer_Admin.onControllerBeforeDispatch ]
+                    - [ "FCom_Admin_View_Dashboard::getWidgets", FCom_Customer_Admin.onGetDashboardWidgets ]
 
             FCom_Frontend:
                 auto_use: [ layout, views ]
@@ -36,18 +36,18 @@ modules:
                     - [ /customer/address/.action, FCom_Customer_Frontend_Controller_Address ]
                     #- [ /customer/address/billing, FCom_Customer_Frontend_Controller_Address.billing ]
                 observe:
-                    - [ FCom_Sales_Model_Cart::addProduct, FCom_Customer_Model_Customer::onAddProductToCart ]
-                    - [ FCom_Admin_View_Dashboard::getWidgets, FCom_Customer_Admin.onGetDashboardWidgets ]
+                    - [ "FCom_Sales_Model_Cart::addProduct", "FCom_Customer_Model_Customer::onAddProductToCart" ]
+                    - [ "FCom_Admin_View_Dashboard::getWidgets", FCom_Customer_Admin.onGetDashboardWidgets ]
                 views:
                     - [ customer/account/sidebar, { view_class: FCom_Customer_Frontend_View_Sidebar } ]
 
             FCom_ApiServer:
                 routing:
                     - [ /v1/customer/customer, FCom_Customer_ApiServer_V1_Customer.index ]
-                    - [ /v1/customer/customer/:id, FCom_Customer_ApiServer_V1_Customer.index ]
+                    - [ "/v1/customer/customer/:id", FCom_Customer_ApiServer_V1_Customer.index ]
 
                     - [ /v1/customer/address, FCom_Customer_ApiServer_V1_Address.index ]
-                    - [ /v1/customer/address/:id, FCom_Customer_ApiServer_V1_Address.index ]
+                    - [ "/v1/customer/address/:id", FCom_Customer_ApiServer_V1_Address.index ]
 
         default_config:
             modules/FCom_Customer/newcustomer_realtime_notification: true

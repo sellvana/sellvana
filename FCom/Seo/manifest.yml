@@ -21,5 +21,5 @@ modules:
                     # https://support.google.com/webmasters/bin/answer.py?hl=en&answer=71453
                     - [ /sitemap-index.xml, FCom_Seo_Frontend_Controller_Sitemaps.index_xml ]
                     # https://support.google.com/webmasters/bin/answer.py?hl=en&answer=183668 */
-                    - [ ^/sitemap(-([a-z0-9-]+))?\.(xml|txt)(\.gz)?$, FCom_Seo_Frontend_Controller_Sitemaps.sitemap_data ]
+                    - [ '^/sitemap(-([a-z0-9-]+))?\.(xml|txt)(\.gz)?$', FCom_Seo_Frontend_Controller_Sitemaps.sitemap_data ]
                     - [ /*url, FCom_Seo_Frontend_Controller_UrlAliases.index ]
