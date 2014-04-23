@@ -1,37 +1,10 @@
 {% set c = THIS.get('model') %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 
-<h2>{{ "FrontEnd Settings"|_}}</h2>
+<h2>{{ "FrontEnd Theme Settings"|_}}</h2>
 
-<div class="accordion accordion-blue panel-group" id="settings-FCom_Frontend">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a class="accordion-toggle" href="#">{{ "Navigation"|_ }}</a>
-        </div>
-        <div class="panel-collapse accordion-body" id="settings-FCom_Frontend-group2">
-            <div class="panel-body">
-                <!--
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ "Select top menu"|_ }}</label>
-                    <div class="col-md-5">
-                        <select class="form-control" name="config[modules][FCom_Frontend][nav_top][type]">
-                            {{ UTIL.optionsHtml({'':'Select an option', 'categories_root':'Categories menu by root id'}, c.get('modules/FCom_Frontend/nav_top/type'))|raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ "Root id cms"|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" type="text" name="config[modules][FCom_Frontend][nav_top][root_cms]" value="{{ c.get('modules/FCom_Frontend/nav_top/root_cms') }}" />
-                    </div>
-                </div>
-                -->
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ "Root id categories"|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" type="text" name="config[modules][FCom_Frontend][nav_top][root_category]" value="{{ c.get('modules/FCom_Frontend/nav_top/root_category') }}" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+{{ forms.accordion_start({id:'settings-FCom_FrontendTheme'}) }}
+    {{ forms.accordion_panel_start({label:'Navigation'|_, id:'settings-FCom_FrontendTheme-group0', in:1}) }}
+        {{ forms.input({ name:'config[modules][FCom_Frontend][nav_top][root_category]', label:'Root id categories'|_, value:c.get('modules/FCom_Frontend/nav_top/root_category') }) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}
