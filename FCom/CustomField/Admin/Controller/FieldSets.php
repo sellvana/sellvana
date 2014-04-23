@@ -127,17 +127,17 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'columns'=>array(
                     array('type'=>'row_select'),
                     array('name'=>'id', 'label'=>'ID', 'width'=>30, 'hidden'=>true),
-                    array('type'=>'input', 'name'=>'field_code', 'label'=>'Field Code', 'width'=>100, 'editable'=>true,
+                    array('type'=>'input', 'name'=>'field_code', 'label'=>'Field Code', 'width'=>100, 'editable'=>true, 'editor'=> 'text',
                             'defualt'=>'', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true,
                             'unique'=>BApp::href('/customfields/fields/unique_field'))),
-                    array('type'=>'input', 'name'=>'field_name', 'label'=>'Field Name', 'width'=>100, 'editable'=>true,
+                    array('type'=>'input', 'name'=>'field_name', 'label'=>'Field Name', 'width'=>100, 'editable'=>true, 'editor'=> 'text',
                             'default'=>'', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true)),
-                    array('type'=>'input', 'name'=>'frontend_label', 'label'=>'Frontend Label', 'width'=>100, 'editable'=>true,
+                    array('type'=>'input', 'name'=>'frontend_label', 'label'=>'Frontend Label', 'width'=>100, 'editable'=>true, 'editor'=> 'text',
                             'default'=>'', 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true)),
-                    array('type'=>'input', 'name'=>'frontend_show', 'label'=>'Show on frontend', 'width'=>90,
+                    array('type'=>'input', 'name'=>'frontend_show', 'label'=>'Show on frontend', 'width'=>90, 'editor'=> 'text',
                             'editable'=>true, 'addable'=>true, 'mass-editable'=>true, 'validation'=>array('required'=>true),
                             'options'=>$fld->fieldOptions('frontend_show'), 'editor'=>'select'),
-                    array('type'=>'input', 'name'=>'sort_order', 'label'=>'Sort order', 'width'=>30, 'editable'=>true,
+                    array('type'=>'input', 'name'=>'sort_order', 'label'=>'Sort order', 'width'=>30, 'editable'=>true, 'editor'=> 'text',
                             /*'editor'=>'select',*/ 'validate'=>'number', 'addable'=>true,
                             'mass-editable'=>true, 'validation'=>array('required'=>true)/*,
                             'options'=>range(0,20)*/),
@@ -237,7 +237,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
     {
         $view = $this->view('core/backbonegrid');
         $view->set('grid', $this->fieldSetsGridConfig());
-        $data = $view->outputData();
+        $data = $view->generateOutputData();
         BResponse::i()->json(array(
             array('c' => $data['state']['c']),
             BDb::many_as_array($data['rows']),
@@ -262,7 +262,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
     {
         $view = $this->view('core/backbonegrid');
         $view->set('grid', $this->fieldsGridConfig());
-        $data = $view->outputData();
+        $data = $view->generateOutputData();
         BResponse::i()->json(array(
             array('c' => $data['state']['c']),
             BDb::many_as_array($data['rows']),
@@ -296,21 +296,44 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
     public function action_grid_data__POST()
     {
         $r = BRequest::i();
-        if ($r->post('oper') == 'add') {
-            $data = $r->post();
-            $field_ids = $data['field_ids'];
-            unset($data['id'], $data['oper'], $data['field_ids']);
-            $set = FCom_CustomField_Model_Set::i()->create($data)->save();
-            $result = $set->as_array();
-            if ($field_ids !== '') {
-                $model = FCom_CustomField_Model_SetField::i();
-                foreach (explode(',', $field_ids) as $i=>$fId) {
-                    $model->create(array('set_id'=>$result['id'], 'field_id'=>$fId, 'position'=>$i))->save();
+        $data = $r->post();
+        $field_ids = $data['field_ids'];
+        $model = FCom_CustomField_Model_SetField::i();
+        switch ($r->post('oper')) {
+            case 'add':
+                unset($data['id'], $data['oper'], $data['field_ids']);
+                $set = FCom_CustomField_Model_Set::i()->create($data)->save();
+                $result = $set->as_array();
+                $mum_fields = 0;
+                if ($field_ids !== '') {
+                    $arr = explode(',', $field_ids);
+                    $mum_fields = count($arr);
+                    foreach ($arr as $i=>$fId) {
+                        $model->create(array('set_id'=>$result['id'], 'field_id'=>$fId, 'position'=>$i))->save();
+                    }
                 }
-            }
-            BResponse::i()->json($result);
-        } else {
-            $this->_processGridDataPost('FCom_CustomField_Model_Set');
+                $result['num_fields'] = $mum_fields;
+                BResponse::i()->json($result);
+                break;
+            case 'edit':
+                $model->delete_many(array('set_id' => $data['id']));
+                if ($field_ids !== '') {
+                    $arr = explode(',', $field_ids);
+                    foreach ($arr as $i => $fId) {
+                        if (!$model->load(array('set_id'=> $data['id'], 'field_id'=> $fId))) {
+                            $model->create(array('set_id'=> $data['id'], 'field_id'=> $fId, 'position' => $i))->save();
+                        }
+                    }
+                }
+                $set = FCom_CustomField_Model_Set::i()->load($data['id']);
+                unset($data['id'], $data['oper'], $data['field_ids']);
+                $set->set($data)->save();
+                $result = $set->as_array();
+                BResponse::i()->json($result);
+                break;
+            default:
+                $this->_processGridDataPost('FCom_CustomField_Model_Set');
+                break;
         }
 
     }

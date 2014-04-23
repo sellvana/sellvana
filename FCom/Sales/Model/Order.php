@@ -86,7 +86,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
 
     /**
-     * Return total UNIQUE number of items in the order
+     * Return the order items
      * @param boolean $assoc
      * @return array
      */
@@ -96,13 +96,24 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $assoc ? $this->items : array_values($this->items);
     }
 
-    public function isOrderExists($productId, $customerID)
+    public function getOrders($customerId)
     {
-        return $this->orm('o')->join('FCom_Sales_Model_Order_Item', array('o.id','=','oi.order_id'), 'oi')
-                ->where("customer_id", $customerID)->where("product_id", $productId)->find_one();
+        return $this::i()->orm()->where('customer_id', $customerId)->find_many_assoc();
 
     }
 
+
+    /**
+     * Verify if order exist if yes return the order data
+     *
+     * @param $orderId
+     * @param $customerId
+     * @return BModel | false
+     */
+    public function isOrderExists($uniqueId, $customerId)
+    {
+        return $this::i()->orm()->where('unique_id', $uniqueId)->where('customer_id', $customerId)->find_one();
+    }
 
     public function prepareApiData($orders, $includeItems=false)
     {

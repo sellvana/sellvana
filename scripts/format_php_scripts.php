@@ -12,6 +12,7 @@ foreach ( $modules as $modName => $mod ) {
         continue;
     }
     $dir = $mod->root_dir;
+echo $dir . PHP_EOL;    
     if ( !file_exists( $dir ) ) {
         echo $modName . " has no files." . PHP_EOL;
         continue;
@@ -35,6 +36,9 @@ function formatModulePhpFiles( $dir, $target = null )
     }
     $base = str_replace('\\', '/', realpath(__DIR__ . '/../'));
     foreach ( $files as $file ) {
+        if (strpos($file, '/lib/') !== false) {
+            continue;
+        }
         $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
         if($ext != "php"){
             continue;

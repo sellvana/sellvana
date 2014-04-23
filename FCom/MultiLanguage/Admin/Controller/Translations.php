@@ -26,14 +26,15 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
         $config['data_mode'] = 'local';
         $data = array();
         $modules = BModuleRegistry::i()->getAllModules();
-        foreach($modules as $module){
+        foreach($modules as $modName => $module){
             if (!empty($module->translations)) {
                 foreach($module->translations as $trlocale => $trfile) {
                     $data[] = array(
                         'module' => $module->name,
                         'locale' => strtoupper($trlocale),
-                        'file' => $trfile,
-                        'id'=>$module->name.'/'.$trfile);
+                        'file'   => $trfile,
+                        'id'     => $module->name.'/'.$trfile
+                    );
                 }
             }
         }

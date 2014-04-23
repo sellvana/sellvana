@@ -1,11 +1,18 @@
-{% set colMd = THIS.get('col_md')|default(2) %}
-{% set colSm = THIS.get('col_sm')|default(4) %}
-{% set colXs = THIS.get('col_xs')|default(6) %}
+{% set lgColumns = THIS.get('lg_columns') ?: 4 %}
+{% set mdColumns = THIS.get('md_columns') ?: 3 %}
+{% set smColumns = THIS.get('sm_columns') ?: 2 %}
+{% set xsColumns = THIS.get('xs_columns') ?: 1 %}
+
+{% set colLg = (12 / lgColumns) | floor %}
+{% set colMd = (12 / mdColumns) | floor %}
+{% set colSm = (12 / smColumns) | floor %}
+{% set colXs = (12 / xsColumns) | floor %}
+
 {% set addToCartUrl = THIS.url('cart/add') %}
 
-<div class="f-prod-listing f-prod-listing-grid">
-  <div class="row">
-  {% for p in THIS.get('products') %}
+
+{% set count = 0 %}
+{% for p in THIS.get('products') %}
   {% set productName = p.get('product_name') %}
   {% set productUrl = p.url(THIS.get('category')) %}
     <div class="col-md-{{ colMd }} col-sm-{{ colSm }} col-xs-{{ colXs }}">
@@ -15,7 +22,7 @@
         {% endif %}
         <div class="f-col-listing-prod-img">
           <a data-toggle="modal" href="#f-prod-quickview" class="btn btn-info btn-xs f-prod-quickview-btn" data-id="{{ p.id() }}">{{ 'Quick View'|_ }}</a>
-          <a href="{{ productUrl }}" class="f-prod-img">
+          <a href="{{ productUrl }}" class="f-prod-img" title="{{ productName }}">
             <img alt="{{ productName }}" src="{{ p.thumbUrl(350, 350) }}"/>
           </a>
         </div>
@@ -24,21 +31,20 @@
           <table class="f-price-group">
             {% if p.get('base_price') == 0 %}
               <tr class="f-reg-price">
-                <th class="f-price-label">Price:</th>
                 <td class="f-price">{{ 'FREE'|_ }}</td>
               </tr>
             {% elseif p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
               <tr class="f-special-price">
-                <th class="f-price-label">Price:</th>
+                <th class="f-price-label">{{ 'Price:'|_ }}</th>
                 <td class="f-price">{{ p.get('sale_price') | currency }}</td>
               </tr>
               <tr class="f-old-price">
-                <th class="f-price-label">Was:</th>
+                <th class="f-price-label">{{ 'Was:'|_ }}</th>
                 <td class="f-price">{{ p.get('base_price') | currency }}</td>
               </tr>
             {% else %}
               <tr class="f-reg-price">
-                <th class="f-price-label">Price:</th>
+                <th class="f-price-label">{{ 'Price:'|_ }}</th>
                 <td class="f-price">{{ p.get('base_price') | currency }}</td>
               </tr>
             {% endif %}
@@ -63,7 +69,17 @@
         </div>
       </div>
     </div>
-    {% endfor %}
-  </div>
-</div>
-
+    {% set count = count + 1 %}
+    {% if count % lgColumns == 0 %}
+        <div class="visible-lg clearfix"></div>
+    {% endif %}
+    {% if count % mdColumns == 0 %}
+        <div class="visible-md clearfix"></div>
+    {% endif %}
+    {% if count % smColumns == 0 %}
+        <div class="visible-sm clearfix"></div>
+    {% endif %}
+    {% if count % xsColumns == 0 %}
+        <div class="visible-xs clearfix"></div>
+    {% endif %}
+{% endfor %}

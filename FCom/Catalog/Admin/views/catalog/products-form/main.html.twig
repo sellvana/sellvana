@@ -1,75 +1,28 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
+{% set fieldData = { validator:validator } %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 
 <fieldset name="main-product">
   <div class="f-section">
-    <div class="form-group has-multilang">
-        <label class="col-md-2 control-label" for="model-product-name">{{ 'Product Name'|_ }}</label>
-        <div class="col-md-5">
-            <input class="form-control required" type="text" id="model-product-name" name="model[product_name]" value="{{ validator.fieldValue('product_name') }}" data-rule-required="true" />
-        </div>
-    </div>
-    <div id="main-product-name-lang">
-    </div>
+    {{ forms.input(fieldData|merge({field:'product_name', required:1, label:'Product Name'|_, form_group_class:'has-multilang'})) }}
+    <div id="main-product-name-lang"></div>
 
+    {{ forms.input(fieldData|merge({field:'url_key', label:'URL Key'|_ ~ ' (' ~ 'optional'|_ ~ ')'})) }}
 
+    {{ forms.input(fieldData|merge({field:'local_sku', required:1, label:'SKU'|_})) }}
 
-    <div class="form-group">
-        <label class="col-md-2 control-label" for="model-url-key">{{ 'URL Key'|_ }} ({{ 'optional'|_ }})</label>
-        <div class="col-md-5">
-            <input class="form-control" type="text" id="model-url-key" name="model[url_key]" value="{{ validator.fieldValue('url_key') }}" />
-        </div>
-    </div>
+    {{ forms.textarea(fieldData|merge({field:'short_description', required:1, label:'Short Description'|_, form_group_class:'has-multilang'})) }}
+    <div id="main-product-shortdesc-lang"></div>
 
-    <div class="form-group">
-        <label class="col-md-2 control-label" for="model-local-sku">{{ 'SKU'|_ }}</label>
-        <div class="col-md-5">
-            <input class="form-control" type="text" id="model-local-sku" name="model[local_sku]" data-rule-required="true" value="{{ validator.fieldValue('local_sku') }}" />
-        </div>
-    </div>
+    {{ forms.wysiwyg(fieldData|merge({field:'description', required:1, label:'Long Description'|_, form_group_class:'has-multilang', input_div_class:'col-md-10', raw:1})) }}
+    <div id="main-product-desc-lang"></div>
 
-    <div class="form-group has-multilang">
-        <label class="col-md-2 control-label" for="model-short-description">{{ 'Short Description'|_ }}</label>
-        <div class="col-md-5">
-            <textarea class="form-control" id="model-short-description" name="model[short_description]" rows="5" data-rule-required="true">{{ validator.fieldValue('short_description') }}</textarea>
-        </div>
-    </div>
-    <div id="main-product-shortdesc-lang">
-    </div>
+    {{ forms.input(fieldData|merge({field:'net_weight', label:'Net Weight'|_})) }}
 
+    {{ forms.input(fieldData|merge({field:'ship_weight', label:'Shipping Weight'|_})) }}
 
-    <div class="form-group has-multilang">
-        <label class="col-md-2 control-label" for="model-description">{{ 'Long Description'|_ }}</label>
-        <div class="col-md-10">
-            <textarea class="form-control ckeditor js-desc-wysiwyg" id="model-description" name="model[description]" rows="5" >{{ validator.fieldValue('description') }}</textarea>
-            <textarea class="form-control js-desc-wysiwyg" id="model-description-validation" name="js-desc-wysiwyg" rows="5" style="display:none;" data-rule-required="true">{{ validator.fieldValue('description') }}</textarea>
-        </div>
-    </div>
-    <div id="main-product-desc-lang">
-    </div>
-
-
-    <div class="form-group">
-        <label class="col-md-2 control-label" for="model-net-weight">{{ 'Net Weight'|_ }}</label>
-        <div class="col-md-5">
-            <input class="form-control" type="text" id="model-net-weight" name="model[net_weight]" value="{{ validator.fieldValue('net_weight') }}" />
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label class="col-md-2 control-label" for="model-shipping-weight">{{ 'Shipping Weight'|_ }}</label>
-        <div class="col-md-5">
-            <input type="text" class="form-control" id="model-shipping-weight" name="model[ship_weight]" value="{{ validator.fieldValue('ship_weight') }}" />
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label class="col-md-2 control-label" for="model-hide-product">{{ 'Hide Product'|_ }}</label>
-        <div class="col-md-5">
-            <input type="hidden" name="model[is_hidden]" value="0" />
-            <input id="model-hide-product" class="switch-cbx" name="model[is_hidden]" {% if validator.fieldValue('is_hidden') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
-        </div>
-    </div>
+    {{ forms.boolean(fieldData|merge({field:'is_hidden', label:'Hide Product'|_})) }}
 
     <input type='hidden' id='name_lang_fields' name='name_lang_fields'/>
     <input type='hidden' id='short_desc_lang_fields' name='short_desc_lang_fields'/>

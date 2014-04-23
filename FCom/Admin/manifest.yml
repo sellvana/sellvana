@@ -14,6 +14,7 @@ modules:
                     - [ root, { view_class: FCom_Core_View_Root } ]
                     - [ admin/header, { view_class: FCom_Admin_View_Header } ]
                     - [ admin/nav, { view_class: FCom_Admin_View_Nav } ]
+                    - [ admin/form-elements, { view_class: FCom_Admin_View_FormElements } ]
                     #- [ jqgrid, { view_class: FCom_Admin_View_JqGrid } ]
                     - [ dashboard, { view_class: FCom_Admin_View_Dashboard } ]
                 auto_use: [ bootstrap, views ]
@@ -55,6 +56,9 @@ modules:
                     - [ /settings/dismiss, FCom_Admin_Controller_Settings.dismiss]
 
                     - [ /media, FCom_Admin_Controller_MediaLibrary.index ]
+                    - [ /header_search, FCom_Admin_Controller_HeaderSearch.index ]
+                    - [ /generate_sitemap, FCom_Admin_Controller.generate_sitemap ]
+
                 observe:
                     - [ FCom_Admin_Controller_Settings::action_index__POST, FCom_Admin_Admin.onSettingsPost ]
                     - [ FCom_Admin_View_Dashboard::getWidgets, FCom_Admin_Admin.onGetDashboardWidgets ]

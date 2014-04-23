@@ -2361,7 +2361,11 @@ class BDebug extends BClass
             $e = array('msg'=>$msg);
         } elseif (is_object($msg) && $msg instanceof Exception) {
             $bt = $msg->getTrace();
-            $e = array('msg'=>$msg->getMessage());
+            $msgStr = $msg->getMessage();
+            if ($msg instanceof PDOException) {
+                $msgStr .= "\nQUERY: ".BORM::get_last_query();
+            }
+            $e = array('msg' => $msgStr);
         } elseif (is_array($msg)) {
             $e = $msg;
         } else {
@@ -3020,8 +3024,8 @@ class BLocale extends BClass
 
     static protected $_currencySymbolMap = array(
         'USD' => '$',
-        'EUR' => '',
-        'GBP' => '',
+        'EUR' => '€',
+        'GBP' => '£',
     );
     static protected $_currencyCode = 'USD';
     static protected $_currencySymbol = '$';

@@ -9,6 +9,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     protected $_recordName = 'Customer';
     protected $_mainTableAlias = 'c';
     protected $_permission = 'customers/manage';
+    protected $_navPath = 'customer/customers';
     protected $_formViewPrefix = 'customer/customers-form/';
 
     public function gridConfig()
@@ -21,11 +22,11 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             array('name' => 'lastname', 'label'=>'Last Name', 'index'=>'c.lastname'),
             array('name' => 'email', 'label'=>'Email', 'index'=>'c.email'),
             array('type' => 'input', 'name' => 'customer_group', 'label'=>'Customer Group', 'index'=>'c.customer_group',
-                  'editor' => 'select', 'mass-editable-show' => false,
-                  'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(), 'editable' => true, 'mass-editable' => true),
+                  'editor' => 'select', 'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(),
+                  'editable' => true, 'mass-editable' => true, 'validation' => array('required' => true)),
             array('type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'c.status', 'editor' => 'select',
-                  'mass-editable-show' => false, 'options' => FCom_Customer_Model_Customer::i()->fieldOptions('status'),
-                  'editable' => true, 'mass-editable' => true),
+                  'options' => FCom_Customer_Model_Customer::i()->fieldOptions('status'),
+                  'editable' => true, 'mass-editable' => true, 'validation' => array('required' => true)),
             array('name' => 'street1', 'label'=>'Address', 'index'=>'a.street1'),
             array('name' => 'city', 'label'=>'City', 'index'=>'a.city'),
             array('name' => 'region', 'label'=>'Region', 'index'=>'a.region'),
@@ -67,7 +68,14 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             }
             $this->gridOrmConfig($config['orm']);
         }
+        $config['grid_before_create'] = 'customerGridRegister';
         return $config;
+    }
+
+    public function gridViewBefore($args)
+    {
+        parent::gridViewBefore($args);
+        $this->_useDefaultLayout = false;
     }
 
     public function gridOrmConfig($orm)
@@ -233,5 +241,29 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             ->where_gte('create_at', $recent)
             ->select(array('id' ,'email', 'firstname', 'lastname', 'create_at', 'status'))->find_many();
         return $result;
+    }
+
+    public function onHeaderSearch($args)
+    {
+        $r = BRequest::i()->get();
+        if (isset($r['q']) && $r['q'] != '') {
+            $value = '%'.$r['q'].'%';
+            $result = FCom_Customer_Model_Customer::i()->orm()
+                ->where(array('OR' => array(
+                    array('id like ?', $value),
+                    array('firstname like ?', $value),
+                    array('lastname like ?', $value),
+                    array('email like ?', $value),
+                )))->find_one();
+            $args['result']['customer'] = null;
+            if ($result) {
+                $args['result']['customer'] = array(
+                    'priority' => 10,
+                    'url' => BApp::href($this->_formHref).'?id='.$result->id()
+                );
+            }
+
+        }
+
     }
 }

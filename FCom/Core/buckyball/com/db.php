@@ -1382,7 +1382,28 @@ class BORM extends ORMWrapper
         if (self::$_classTableMap[$table]) {
             $table = self::$_classTableMap[$table];
         }
-        return parent::_add_join_source($join_operator, $table, $constraint, $table_alias);
+        
+        $join_operator = trim("{$join_operator} JOIN");
+
+        $table = $this->_quote_identifier($table);
+
+        // Add table alias if present
+        if (!is_null($table_alias)) {
+            $table_alias = $this->_quote_identifier($table_alias);
+            $table .= " {$table_alias}";
+        }
+
+        // Build the constraint
+        if (is_array($constraint)) {
+            list($first_column, $operator, $second_column) = $constraint;
+            $first_column = $this->_quote_identifier($first_column);
+            $second_column = $this->_quote_identifier($second_column);
+            $constraint = "{$first_column} {$operator} {$second_column}";
+        }
+
+        // ADDED: avoid duplicate joins of the same table and alias
+        $this->_join_sources["{$join_operator} {$table} ON {$constraint}"] = "{$join_operator} {$table} ON {$constraint}";
+        return $this;
     }
 
     /**
@@ -1896,6 +1917,7 @@ class BModel extends Model
         if ($alias) {
             $orm->table_alias($alias);
         }
+        BEvents::i()->fire(static::$_origClass.'::orm', array('orm' => $orm, 'alias' => $alias));
         return $orm;
     }
 
@@ -2072,7 +2094,7 @@ class BModel extends Model
      */
     public static function loadOrCreate($id, $field, $cache=false)
     {
-        $model = static::load($id, $fied, $cache);
+        $model = static::load($id, $field, $cache);
         if (!$model) {
             $model = static::create();
         }

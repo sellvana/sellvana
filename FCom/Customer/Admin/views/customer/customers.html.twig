@@ -1,0 +1,137 @@
+<script type="template" id="customer-element-mass-edit">
+    <div class="control-label col-sm-2">
+        <input type="checkbox" class="edit-field ignore-validate"/>
+    </div>
+    <div class="control-label col-sm-4">
+        <label for="customer_group">
+            <%= rc.label  %>
+        </label>
+    </div>
+    <div class="controls col-sm-6">
+        <%
+        var validation = validationRules(rc.validation);
+        switch (rc.editor) {
+            case 'select':
+        %>
+        <select name="<%= rc.name  %>" id="<%= rc.name  %>"  class="form-control ignore-validate" <%= validation %>>
+        <% for(var key in rc.options) { %>
+        <option value="<%= key %>"><%= rc.options[key] %></option>
+        <% } %>
+        </select>
+        <%          break;
+            case 'text':
+        %>
+        <input type="text" name="<%= rc.name  %>" id="<%= rc.name  %>"  class="form-control ignore-validate" <%= validation %>/>
+        <%          break;
+        } %>
+    </div>
+</script>
+<script>
+    require(['jquery', 'underscore', 'backbone', 'fcom.backbonegrid'], function ($, _, Backbone) {
+        window.customerGridRegister = function (grid) {
+            var BackboneGrid = grid.getGridSkeleton();
+            var modalForm, selectedRows, rowsCollection;
+
+            BackboneGrid.Views.ModalForm.prototype.render = function () {
+                this.$el.html('');
+                var self = this;
+                BackboneGrid.currentRow = false;
+                $(BackboneGrid.modalFormId).find('h4').html('Mass Edit Form');
+                BackboneGrid.modalElementVals = {};
+
+                this.collection.each(function (model) {
+                    if (model.has(self.modalType) && model.get(self.modalType)) {
+                        var elementView = new BackboneGrid.Views.ModalMassGridElement({model: model});
+                        $(BackboneGrid.Views.ModalForm.prototype.el).append(elementView.render().el);
+                    }
+                });
+
+                if (this.$el.is("form")) {
+                    this.formEl = this.$el;
+                } else {
+                    this.formEl = this.$el.parents('form:first');
+                }
+                this.formEl.validate({ignore: '.ignore-validate'});
+                return this;
+            }
+
+            BackboneGrid.Views.ModalForm.prototype.saveChanges = function (ev) {
+                modalForm.$el.find('textarea, input, select').each(function () {
+                    var key = $(this).attr('id');
+                    var val = $(this).val();
+                    if (!$(this).hasClass('ignore-validate')) {
+                        BackboneGrid.modalElementVals[key] = val;
+                    }
+                });
+                if (!modalForm.formEl.valid()) {
+                    BackboneGrid.modalElementVals = {};
+                    return false;
+                }
+
+
+                var ids = selectedRows.pluck('id').join(",");
+
+                if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length > 0 && !$.isEmptyObject(BackboneGrid.modalElementVals)) {
+                    var hash = BackboneGrid.modalElementVals;
+                    hash.id = ids;
+                    hash.oper = 'mass-edit';
+                    $.post(BackboneGrid.edit_url, hash)
+                            .done(function (data) {
+                                if (data.success) {
+                                    $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
+                                    grid.getGridView().render();
+                                } else {
+                                    $.bootstrapGrowl(data.error, { type: 'danger', align: 'center', width: 'auto' });
+                                }
+
+                            });
+                    delete BackboneGrid.modalElementVals.id;
+                    delete BackboneGrid.modalElementVals.oper;
+                }
+
+                selectedRows.each(function (model) {
+                    for (var key in BackboneGrid.modalElementVals) {
+                        rowsCollection.each(function (row) {
+                            if (row.get('id') == model.get('id')) {
+                                row.set(key, BackboneGrid.modalElementVals[key], {silent: true});
+                            }
+                        })
+                    }
+                });
+
+                //check this form is rendered in default view of grid or not.
+                if (ev && $(ev.target).prev().hasClass('f-grid-modal-close')) {
+                    $(ev.target).prev().trigger('click');
+                }
+
+                BackboneGrid.modalElementVals = {};
+
+                return true;
+            }
+
+            BackboneGrid.Views.ModalMassGridElement = Backbone.View.extend({
+                className: 'form-group',
+                render: function () {
+                    this.$el.html(this.template(this.model.toJSON()));
+                    return this;
+                },
+                events: {
+                    'change .edit-field': 'selectFieldEdit'
+                },
+                selectFieldEdit: function (ev) {
+                    if ($(ev.target).is(':checked')) {
+                        modalForm.$el.find('#' + this.model.get('name')).removeClass('ignore-validate');
+                    } else {
+                        modalForm.$el.find('#' + this.model.get('name')).addClass('ignore-validate');
+                    }
+                }
+            });
+
+            grid.build();
+            modalForm = grid.getModalForm();
+            selectedRows = grid.getSelectedRows();
+            rowsCollection = grid.getRows();
+            BackboneGrid.Views.ModalMassGridElement.prototype.template = _.template($('#customer-element-mass-edit').html());
+        }
+    })
+</script>

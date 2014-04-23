@@ -1078,12 +1078,13 @@ if (!isset($o[0]) || !isset($o[1])) {
         //load translations
         $language = BSession::i()->get('_language');
         if (!empty($language) && !empty($this->translations[$language])) {
+            /*
             if (!is_array($this->translations[$language])) {
                 $this->translations[$language] = array($this->translations[$language]);
             }
-            foreach($this->translations[$language] as $file) {
-                BLocale::addTranslationsFile($file);
-            }
+            */
+            $file = $this->root_dir . '/i18n/' . $this->translations[$language];
+            BLocale::addTranslationsFile($file);
         }
     }
 
@@ -1318,6 +1319,11 @@ class BMigrate extends BClass
     protected static $_migratingModule;
 
     /**
+    * Last ran query during installation routine
+    */
+    protected static $_lastQuery;
+
+    /**
     * Shortcut to help with IDE autocompletion
     *
     * @return BMigrate
@@ -1488,6 +1494,7 @@ class BMigrate extends BClass
         }
 
         BResponse::i()->startLongResponse();
+        $view = BView::i();
         echo '<html><body><h1>Migrating modules DB structure...</h1><pre>';
         $i = 0;
         $error = false;
@@ -1502,9 +1509,9 @@ class BMigrate extends BClass
 
                     echo '<br>['.(++$i).'/'.$num.'] ';
                     if (empty($mod['schema_version'])) {
-                        echo 'Installing <strong>'.$modName.': '.$mod['code_version'].'</strong> ... ';
+                        echo 'Installing <strong>'.$view->q($modName.': '.$mod['code_version']).'</strong> ... ';
                     } else {
-                        echo 'Upgrading  <strong>'.$modName.': '.$mod['schema_version'].' -> '.$mod['code_version'].'</strong> ... ';
+                        echo 'Upgrading  <strong>'.$view->q($modName.': '.$mod['schema_version'].' -> '.$mod['code_version']).'</strong> ... ';
                     }
 
                     $modReg->currentModule($modName);
@@ -1527,7 +1534,7 @@ class BMigrate extends BClass
                         BDb::transaction();
                     */
                         BDb::ddlClearCache(); // clear DDL cache before each migration step
-                        BDebug::debug('DB.MIGRATE '.$script);
+                        BDebug::debug('DB.MIGRATE '.$view->q($script));
                         if (is_callable($script)) {
                             $result = call_user_func($script);
                         } elseif (is_file($module->root_dir.'/'.$script)) {
@@ -1570,8 +1577,11 @@ class BMigrate extends BClass
                 }
             }
             echo "\n\n" . $e->getMessage();
-            if (BORM::get_last_query()) {
-                echo "\n\nQUERY: " . BORM::get_last_query();
+            if (!static::$_lastQuery) {
+                static::$_lastQuery = BORM::get_last_query();
+            }
+            if (static::$_lastQuery) {
+                echo "\n\nQUERY: " . static::$_lastQuery;
             }
             echo "\n\nLOCATION: " . $traceStep['file'].':'.$traceStep['line'];
             $error = true;
@@ -1669,6 +1679,7 @@ BDebug::debug(__METHOD__.': '.var_export($mod, 1));
                 $result = null;
             }
             if (false===$result) {
+                static::$_lastQuery = BORM::get_last_query();
                 $module->delete();
                 return false;
             }
@@ -1676,6 +1687,7 @@ BDebug::debug(__METHOD__.': '.var_export($mod, 1));
             $mod['schema_version'] = $version;
         } catch (Exception $e) {
             // delete module schema record if unsuccessful
+            static::$_lastQuery = BORM::get_last_query();
             $module->delete();
             throw $e;
         }
@@ -1745,6 +1757,7 @@ BDebug::debug(__METHOD__.': '.var_export($mod, 1));
                 'last_status' => 'UPGRADED',
             ))->save();
         } catch (Exception $e) {
+            static::$_lastQuery = BORM::get_last_query();
             $module->set(array('last_status'=>'ERROR'))->save();
             throw $e;
         }

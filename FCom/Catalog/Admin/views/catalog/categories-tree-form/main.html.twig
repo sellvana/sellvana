@@ -1,35 +1,19 @@
 {% set m = THIS.get('model') %}
+{% set fieldData = { model:m } %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 {% set resizeUrl = APP.instance('FCom_Core_Main').resizeUrl() %}
+
 <div class="form-group">
     <div class="col-md-2 control-label">{{ "ID: %s"|_(m.id()) }}</div>
 </div>
-<div class="form-group">
-    <label class="col-md-2 control-label" for="main-node_name">{{ 'Label'|_ }}</label>
-    <div class="col-md-5">
-        <input class="form-control required" id="main-node_name" type="text" name="model[node_name]" value="{{ m.get('node_name') }}" />
-    </div>
-</div>
-<div class="form-group">
-    <label class="col-md-2 control-label" for="main-url_key">{{ 'Url Key'|_ }}</label>
-    <div class="col-md-5">
-        <input class="form-control required" id="main-url_key" type="text" name="model[url_key]" value="{{ m.get('url_key') }}" />
-    </div>
-</div>
 
-<div class="form-group">
-    <label class="col-md-2 control-label" for="model-is-top-menu">{{ 'Display In Navigation'|_ }}</label>
-    <div class="col-md-5">
-        <input type="hidden" name="model[is_top_menu]" value="0" />
-        <input id="model-is-top-menu" class="switch-cbx" name="model[is_top_menu]" {% if m.get('is_top_menu') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
-    </div>
-</div>
-<div class="form-group">
-    <label class="col-md-2 control-label" for="model-is_enabled">{{ 'Enable'|_ }}</label>
-    <div class="col-md-5">
-        <input type="hidden" name="model[is_enabled]" value="0" />
-        <input id="model-is_enabled" class="switch-cbx" name="model[is_enabled]" {% if m.get('is_enabled') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
-    </div>
-</div>
+{{ forms.input(fieldData|merge({field:'node_name', label:'Label'|_, required:1})) }}
+
+{{ forms.input(fieldData|merge({field:'url_key', label:'URL Key'|_, required:1})) }}
+
+{{ forms.boolean(fieldData|merge({field:'is_top_menu', label:'Display In Navigation'|_})) }}
+
+{{ forms.boolean(fieldData|merge({field:'is_enabled', label:'Enable'|_})) }}
 
 <div class='form-group'>
     <label class="col-md-2 control-label" for="model-image">{{ 'Image'|_ }}</label>
@@ -45,18 +29,18 @@
                         {% else %}
                             {{ 'Add Image...'|_ }}
                         {% endif %}
-                        </span>     
+                        </span>
                         <input id="model-image-url" type="hidden" name="model[image_url]" value="{{ m.get('image_url') }}"/>
                     </span>
 
-                    
-                        <span class='btn btn-primary fileinput-button' id='btn_remove_image' style='display: {% if m.get('image_url') %} block; {% else %} none; {% endif %}'>                            
+
+                        <span class='btn btn-primary fileinput-button' id='btn_remove_image' style='display: {% if m.get('image_url') %} block; {% else %} none; {% endif %}'>
                             × {{ 'Remove Image...'|_ }}
                         </span>
-                    
 
-                </div>             
-            </div>            
+
+                </div>
+            </div>
             <br>
             <div id="current-image">
                 {% if m.get('image_url') %}
@@ -67,47 +51,23 @@
                 <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
             </table>
         </div>
-        
+
     </div>
 </div>
 
+{{ forms.textarea(fieldData|merge({field:'description', label:'Internal Notes'|_ })) }}
 
-<div class="form-group">
-    <label class="col-md-2 control-label" for="model-description">{{ 'Internal Notes'|_ }}</label>
-    <div class="col-md-10">
-        <textarea id="model-description" class="form-control" rows="5" name="model[description]">{{ m.get('description') }}</textarea>
-    </div>
-</div>
+{{ forms.input(fieldData|merge({field:'page_title', label:'Page Title'|_ })) }}
 
-<div class="form-group">
-    <label class="col-md-2 control-label" for="main-page_title">{{ 'Page Title'|_ }}</label>
-    <div class="col-md-5">
-        <input class="form-control" id="main-page_title" type="text" name="model[page_title]" value="{{ m.get('page_title') }}" />
-    </div>
-</div>
-<div class="form-group">
-    <label class="col-md-2 control-label" for="main-meta_title">{{ 'Meta Title'|_ }}</label>
-    <div class="col-md-5">
-        <input class="form-control" id="main-page_title" type="text" name="model[page_title]" value="{{ m.get('page_title') }}" />
-    </div>
-</div>
-<div class="form-group">
-    <label class="col-md-2 control-label" for="model-meta_description">{{ 'Meta Description'|_ }}</label>
-    <div class="col-md-10">
-        <textarea id="model-meta_description" class="form-control" rows="5" name="model[meta_description]">
-            {{ m.get('meta_description') }}
-        </textarea>
-    </div>
-</div>
-<div class="form-group">
-    <label class="col-md-2 control-label" for="model-meta_keywords">{{ 'Meta Keywords'|_ }}</label>
-    <div class="col-md-10">
-        <textarea id="model-meta_keywords" class="form-control" rows="5" name="model[meta_keywords]">{{ m.get('meta_keywords') }}
-        </textarea>
-    </div>
-</div>
+{{ forms.input(fieldData|merge({field:'meta_title', label:'Meta Title'|_ })) }}
 
-<script>    
+{{ forms.input(fieldData|merge({field:'page_title', label:'Page Title'|_ })) }}
+
+{{ forms.textarea(fieldData|merge({field:'meta_description', label:'Meta Description'|_, input_div_class:'col-md-10' })) }}
+
+{{ forms.textarea(fieldData|merge({field:'meta_keywords', label:'Meta Keywords'|_, input_div_class:'col-md-10' })) }}
+
+<script>
 require(['jquery'], function($) {
     {% if m.get('image_url') %}
         $('.btn_category_images_add').html('{{ 'Change'|_ }}');
@@ -115,8 +75,8 @@ require(['jquery'], function($) {
 
     $('#btn_add_image').click(function() {
         $('.btn_category_images_add').addClass('disabled');
-        $('#category_images_modal').modal();        
-    }); 
+        $('#category_images_modal').modal();
+    });
 
     $('#btn_remove_image').click(function() {
         $('#btn_add_text').html('{{ 'Add Image...'|_ }}');
@@ -131,27 +91,27 @@ require(['jquery'], function($) {
 <script>
     var category_images_grid;
     require(['jquery','underscore','backbone'], function($, _) {
-            
+
         /*
         *MediaGrid registery function
         */
         window.category_images_register = function(grid) {
             category_images_grid = grid;
-            grid.getGridSkeleton().Views.RowView.prototype._selectRow = function(ev) {            
+            grid.getGridSkeleton().Views.RowView.prototype._selectRow = function(ev) {
                 var selectedRows = grid.getSelectedRows();
 
                 var checked = $(ev.target).is(':checked');
                 $('.select-row').prop('checked', false);
                 $(ev.target).prop('checked', checked);
 
-                this.model.set('selected', checked);            
+                this.model.set('selected', checked);
                 selectedRows.reset();
                 console.log(selectedRows.length);
-                if (checked) {            
+                if (checked) {
                     selectedRows.add(this.model);
                     $('.btn_category_images_add').removeClass('disabled');
-                } else {            
-            
+                } else {
+
                     $('.btn_category_images_add').addClass('disabled');
                 }
                 console.log(selectedRows.length);
@@ -161,22 +121,22 @@ require(['jquery'], function($) {
                 return;
             }
 
-            grid.build();                
+            grid.build();
 
             $('.btn_category_images_add').click(function() {
-                var row = category_images_grid.getSelectedRows().at(0);            
+                var row = category_images_grid.getSelectedRows().at(0);
                 var path = row.get("folder") + row.get("subfolder") + "/" + row.get("file_name");
                 var imageTag = '<img src="{{ resizeUrl }}?s=150x150&cache=0&f='+ path +'" />';
                 $('#model-image-url').val(path);
-                $('#current-image').html(imageTag); 
-                category_images_grid.getGridView().clearSelectedRows();   
+                $('#current-image').html(imageTag);
+                category_images_grid.getGridView().clearSelectedRows();
                 $('#btn_add_text').html('{{ 'Change Image...'|_ }}');
-                $('#btn_remove_image').css('display', 'block');  
-                $('.btn_category_images_add').html('{{ 'Change'|_ }}');          
-            });        
-        }    
+                $('#btn_remove_image').css('display', 'block');
+                $('.btn_category_images_add').html('{{ 'Change'|_ }}');
+            });
+        }
     });
 </script>
 
-{{ THIS.view('core/medialib').set('config', {'id': 'category_images', 'folder': 'media/category/images', title: 'Category Image'}) | raw }} 
+{{ THIS.view('core/medialib').set('config', {'id': 'category_images', 'folder': 'media/category/images', title: 'Category Image'}) | raw }}
 

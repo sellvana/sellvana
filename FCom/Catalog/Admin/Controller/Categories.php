@@ -45,4 +45,14 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
         }
         BResponse::i()->json($results);
     }
+
+    public function onGenerateSiteMap($args)
+    {
+        $callback = function ($row) use ($args) {
+            if ($row->get('parent_id') != null) {
+                array_push($args['site_map'], array('loc' => BApp::frontendHref($row->get('url_path')), 'changefreq' => 'daily'));
+            }
+        };
+        FCom_Catalog_Model_Category::i()->orm()->select(array('url_path', 'parent_id'))->iterate($callback);
+    }
 }
