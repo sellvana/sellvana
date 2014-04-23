@@ -34,6 +34,7 @@ Using custom id/name:
                 style="{{ p.style }}"
                 value="{{ view.getInputValue(p) }}"
                 {{ p.required ? 'data-rule-required="true"' }}
+                {{ p.attr | raw }}
             />
         </div>
     </div>
@@ -51,6 +52,7 @@ Using custom id/name:
                 class="form-control {{ p.input_class }} {{ p.required ? 'required' }}"
                 style="{{ p.style }}"
                 {{ p.required ? 'data-rule-required="true"' }}
+                {{ p.attr | raw }}
             >
                 {{ UTIL.optionsHtml(p.options, view.getInputValue(p)) | raw }}
             </select>
@@ -87,7 +89,8 @@ Using custom id/name:
                 class="form-control {{ p.input_class }} {{ p.required ? 'required' }}"
                 style="{{ p.style }}"
                 {{ p.required ? 'data-rule-required="true"' }}
-            >{{ p.raw ? value|raw : value }}</textarea>
+                {{ p.attr | raw }}
+           >{{ p.raw ? value|raw : value }}</textarea>
         </div>
     </div>
 {% endmacro %}
@@ -103,12 +106,14 @@ Using custom id/name:
                 class="form-control ckeditor js-desc-wysiwyg {{ p.input_class }}"
                 id="{{ view.getInputId(p) }}"
                 name="{{ view.getInputName(p) }}"
+                {{ p.attr_wysiwyg | raw }}
             >{{ p.raw ? value|raw : value }}</textarea>
             <textarea
                 class="form-control js-desc-wysiwyg"
                 id="{{ view.getInputId(p) }}-validation"
                 style="display:none;"
                 {{ p.required ? 'data-rule-required="true"' }}
+                {{ p.attr | raw }}
             >{{ p.raw ? value|raw : value }}</textarea>
         </div>
     </div>

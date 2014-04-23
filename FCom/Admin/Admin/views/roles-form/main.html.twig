@@ -4,15 +4,11 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
 {% set hlp = APP.instance('FCom_Admin_Model_Role') %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 
 <fieldset>
   <div class="f-section">
-    <div class="form-group">
-        <label class="col-md-2 control-label" for="model-role_name">{{ 'Role Name'|_ }}</label>
-        <div class="col-md-5">
-            <input type="text" id="model-role_name" name="model[role_name]" class="required form-control" value="{{ validator.fieldValue('role_name') }}" />
-        </div>
-    </div>
+    {{ forms.input({field:'role_name', validator:validator, required:1, label:'Role Name'|_})}}
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-permissions">{{ 'Permissions'|_ }}</label>
         <div class="col-md-5">
