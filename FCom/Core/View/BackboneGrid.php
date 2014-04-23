@@ -481,6 +481,10 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         return $config;
     }
 
+    public function set( $name, $value = null )
+    {
+        return parent::set( $name, $value );
+    }
     public function getGridConfigData(array $options=array())
     {
         // fetch grid configuration
