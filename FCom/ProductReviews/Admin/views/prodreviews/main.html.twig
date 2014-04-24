@@ -2,33 +2,10 @@
 {% set validator = THIS.get('validator') %}
 
 <fieldset name="adm-section-group">
-    <div class="form-group">
-        <label class="col-md-2 control-label" for="model-title">{{ 'Title'|_ }}</label>
-        <div class="col-md-5">
-            <input class="form-control" type="text" id="model-title" name="model[title]" value="{{ validator.fieldValue('title') }}" />
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label class="col-md-2 control-label" for="model-text">{{ 'Text'|_ }}</label>
-        <div class="col-md-10">
-            <textarea class="form-control ckeditor" id="model-text" name="model[text]" rows="5" cols="35">{{ validator.fieldValue('text') }}</textarea>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label class="col-md-2 control-label" for="model-rating">{{ 'Rating of product'|_ }}</label>
-        <div class="col-md-5">
-            <input type="text" class="form-control" id="model-rating" name="model[rating]" value="{{ validator.fieldValue('rating') }}"/>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label class="col-md-2 control-label" for="model-helpful">{{ 'Helpful points'|_ }}</label>
-        <div class="col-md-5">
-            <input type="text" class="form-control" id="model-helpful" name="model[helpful]" value="{{ validator.fieldValue('helpful') }}"/>
-        </div>
-    </div>
+    {{ forms.input({label: 'Title'|_, required: 1, name: "model[title]", value: validator.fieldValue('title'), id: "model-title" }) }}
+    {{ forms.textarea({label: 'Text'|_, input_class: "ckeditor", input_div_class:"col-md-10", name: "model[text]", value: validator.fieldValue('text'), id: "model-title" }) }}
+    {{ forms.input({label: 'Rating of product'|_, required: 1, name: "model[rating]", value: validator.fieldValue('rating'), id: "model-rating" }) }}
+    {{ forms.input({label: 'Helpful points'|_, required: 1, name: "model[helpful]", value: validator.fieldValue('helpful'), id: "model-helpful" }) }}
 
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-approved">{{ 'Approved'|_ }}</label>

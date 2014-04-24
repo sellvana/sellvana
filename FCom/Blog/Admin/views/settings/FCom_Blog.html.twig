@@ -1,21 +1,9 @@
 {% set c = THIS.get('model') %}
-
+{% set fieldData = { model: c, id_prefix:'FCom_Blog', name_prefix:'config[modules][FCom_Blog]' } %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 <h2>{{ "Blog Settings"|_}}</h2>
-
-<div class="accordion accordion-blue panel-group" id="settings-FCom_Blog">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a class="accordion-toggle" href="#">{{ "Website"|_ }}</a>
-        </div>
-        <div class="panel-collapse accordion-body in" id="settings-FCom_Blog-group1">
-            <div class="panel-body">
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ "Blog Title"|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" type="text" name="config[modules][FCom_Blog][blog_title]" value="{{ c.get('modules/FCom_Blog/blog_title') }}" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+{{ forms.accordion_start({id:'settings-FCom_Blog'}) }}
+     {{ forms.accordion_panel_start({label:'Website'|_, id:'settings-FCom_Blog-group0', in:1}) }}
+        {{ forms.input(fieldData|merge({field:'blog_title', label:'Blog Title'|_, value:c.get('modules/FCom_Blog/blog_title')})) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

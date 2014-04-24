@@ -12,282 +12,111 @@
 {% set dpmPrefix = "authorizenet_"~ dpm ~"_" %}
 {% set baseDpmHtmlName = baseHtmlName ~ dpm ~ "]" %}
 {% set baseDpmConfigPath = baseConfigPath ~ dpm %}
-
+{% set fieldData = { model: c, id_prefix: aimPrefix, name_prefix: baseAimHtmlName } %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 <h2>{{ "Authorize.net Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-FCom_AuthorizeNet'}) }}
+     {{ forms.accordion_panel_start({label:'Authorize.net API'|_, id:'settings-FCom_AuthorizeNet-group0', in:1}) }}
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="{{ aimPrefix }}active">{{ 'Enabled'|_ }}</label>
+            <div class="col-md-5">
+                <input type="hidden" name="{{ baseAimHtmlName }}[active]" value="0" id="{{ aimPrefix }}active"/>
+                <input class="switch-cbx" name="{{ baseAimHtmlName }}[active]" {% if c.get(baseAimConfigPath ~ "/active") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
+            </div>
+        </div>
+        {{ forms.input(fieldData|merge({field:'sort_order', label:'Payment Method Order'|_, value: c.get(baseAimConfigPath ~ '/sort_order')})) }}
+        {{ forms.input(fieldData|merge({field:'title', label:'Title'|_, value: c.get(baseAimConfigPath ~ '/title')})) }}
+        {{ forms.input(fieldData|merge({field:'login', label:'API Login ID'|_, type: "password", value: c.get(baseAimConfigPath ~ '/login')})) }}
+        {{ forms.input(fieldData|merge({field:'trans_key', label:'API Transaction Key'|_, type: "password", value: c.get(baseAimConfigPath ~ '/trans_key')})) }}
+        {{ forms.select(fieldData|merge({field:'payment_action', label:'Payment Action'|_, options: APP.instance('FCom_AuthorizeNet_Model_Settings').paymentActions(), value: c.get(baseAimConfigPath ~ '/payment_action')})) }}
+        {{ forms.select(fieldData|merge({field:'order_status', label:'New Order Status'|_, options: APP.instance('FCom_AuthorizeNet_Model_Settings').orderStatuses(), value: c.get(baseAimConfigPath ~ '/payment_action')})) }}
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="{{ aimPrefix }}test">{{ 'Sandbox Mode'|_ }}</label>
+            <div class="col-md-5">
+                <input type="hidden" name="{{ baseAimHtmlName }}[test]" id="{{ aimPrefix }}test" value="0"/>
+                <input class="switch-cbx" name="{{ baseAimHtmlName }}[test]" {% if c.get(baseAimConfigPath ~ "/payment_action") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
+            </div>
+        </div>
+        {{ forms.input(fieldData|merge({field:'cgi_url', label:'Gateway URL'|_, attr: 'data-rule-number="true"', value: APP.instance('FCom_AuthorizeNet_Model_Settings').gatewayUrl(c)})) }}
+        {{ forms.select(fieldData|merge({field:'currency', label:'Accepted Currency'|_, options: APP.instance('FCom_AuthorizeNet_Model_Settings').currencies(), value: c.get(baseAimConfigPath ~ '/currency')})) }}
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="{{ aimPrefix }}email_customer">{{ 'Email Customer'|_ }}</label>
+            <div class="col-md-5">
+                <input type="hidden" name="{{ baseAimHtmlName }}[email_customer]" id="{{ aimPrefix }}email_customer" value="0"/>
+                <input class="switch-cbx" name="{{ baseAimHtmlName }}[email_customer]" {% if c.get(baseAimConfigPath ~ "/email_customer") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
+            </div>
+        </div>
 
-<div class="accordion accordion-blue panel-group" id="settings-FCom_AuthorizeNet">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a href="#" class="accordion-toggle">{{ 'Authorize.net API'|_ }}</a>
-        </div>
-        <div class="panel-collapse accordion-body in" id="settings-FCom_AuthorizeNet-group0">
-            <div class="panel-body">
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}active">{{ 'Enabled'|_ }}</label>
-                    <div class="col-md-5">
-                        <input type="hidden" name="{{ baseAimHtmlName }}[active]" value="0" id="{{ aimPrefix }}active"/>
-                        <input class="switch-cbx" name="{{ baseAimHtmlName }}[active]" {% if c.get(baseAimConfigPath ~ "/active") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}sort_order">{{ 'Payment Method Order'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" id="{{ aimPrefix }}sort_order" name="{{ baseAimHtmlName }}[sort_order]" type="text" value="{{ c.get(baseAimConfigPath ~ '/sort_order') }}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}title">{{ 'Title'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" id="{{ aimPrefix }}title" name="{{ baseAimHtmlName }}[title]" type="text" value="{{ c.get(baseAimConfigPath ~ '/title') }}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}login">{{ 'API Login ID'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" id="{{ aimPrefix }}login" name="{{ baseAimHtmlName }}[login]" type="password" value="{{ c.get(baseAimConfigPath ~ '/login') }}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}trans_key">{{ 'API Transaction Key'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" id="{{ aimPrefix }}trans_key" name="{{ baseAimHtmlName }}[trans_key]" type="password" value="{{ c.get(baseAimConfigPath ~ '/trans_key') }}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}payment_action">{{ 'Payment Action'|_ }}</label>
-                    <div class="col-md-5">
-                        <select class="form-control" name="{{ baseAimHtmlName }}[payment_action]" id="{{ aimPrefix }}payment_action">
-                            {{ UTIL.optionsHtml( APP.instance('FCom_AuthorizeNet_Model_Settings').paymentActions(), c.get(baseAimConfigPath ~ '/payment_action'))|raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}order_status">{{ 'New Order Status'|_ }}</label>
-                    <div class="col-md-5">
-                        <select class="form-control" name="{{ baseAimHtmlName }}[order_status]" id="{{ aimPrefix }}order_status">
-                            {{ UTIL.optionsHtml( APP.instance('FCom_AuthorizeNet_Model_Settings').orderStatuses(), c.get(baseAimConfigPath ~ '/payment_action'))|raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}test">{{ 'Sandbox Mode'|_ }}</label>
-                    <div class="col-md-5">
-                        <input type="hidden" name="{{ baseAimHtmlName }}[test]" id="{{ aimPrefix }}test" value="0"/>
-                        <input class="switch-cbx" name="{{ baseAimHtmlName }}[test]" {% if c.get(baseAimConfigPath ~ "/payment_action") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}cgi_url">{{ 'Gateway URL'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" id="{{ aimPrefix }}cgi_url" name="{{ baseAimHtmlName }}[cgi_url]" type="text" value="{{ APP.instance('FCom_AuthorizeNet_Model_Settings').gatewayUrl(c) }}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}currency">{{ 'Accepted Currency'|_ }}</label>
-                    <div class="col-md-5">
-                        <select class="form-control" name="{{ baseAimHtmlName }}[currency]" id="{{ aimPrefix }}currency">
-                            {{ UTIL.optionsHtml( APP.instance('FCom_AuthorizeNet_Model_Settings').currencies(), c.get(baseAimConfigPath ~ '/currency'))|raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}email_customer">{{ 'Email Customer'|_ }}</label>
-                    <div class="col-md-5">
-                        <input type="hidden" name="{{ baseAimHtmlName }}[email_customer]" id="{{ aimPrefix }}email_customer" value="0"/>
-                        <input class="switch-cbx" name="{{ baseAimHtmlName }}[email_customer]" {% if c.get(baseAimConfigPath ~ "/email_customer") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}merchant_email">{{ 'Merchant\'s Email'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" id="{{ aimPrefix }}merchant_email" name="{{ baseAimHtmlName }}[merchant_email]" type="text" value="{{ c.get(baseAimConfigPath ~ '/merchant_email') }}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}cctypes">{{ 'Credit Card Types'|_ }}</label>
-                    <div class="col-md-5">
-                        <select class="form-control" name="{{ baseAimHtmlName }}[cctypes][]" id="{{ aimPrefix }}cctypes" multiple="multiple">
-                            {{ UTIL.optionsHtml( APP.instance('FCom_AuthorizeNet_Model_Settings').cardTypes(), c.get(baseAimConfigPath ~ '/cctypes'))|raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}useccv">{{ 'Credit Card Verification'|_ }}</label>
-                    <div class="col-md-5">
-                        <input type="hidden" name="{{ baseAimHtmlName }}[useccv]" id="{{ aimPrefix }}useccv" value="0"/>
-                        <input class="switch-cbx" name="{{ baseAimHtmlName }}[useccv]" {% if c.get(baseAimConfigPath ~ "/useccv") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}allowspecific">{{ 'Payment from Applicable Countries'|_ }}</label>
-                    <div class="col-md-5">
-                        <select class="form-control" name="{{ baseAimHtmlName }}[allowspecific]" id="{{ aimPrefix }}allowspecific">
-                            {{ UTIL.optionsHtml( {0:'All Allowed Countries', 1:'Specific Countries'}, c.get(baseAimConfigPath ~ '/allowspecific'))|raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}specificcountry">{{ 'Payment from Specific Countries'|_ }}</label>
-                    <div class="col-md-5">
-                        <select class="form-control" name="{{ baseAimHtmlName }}[specific_country][]" id="{{ aimPrefix }}specificcountry" multiple="multiple">
-                            {{ UTIL.optionsHtml( APP.instance('FCom_AuthorizeNet_Model_Settings').countries(), c.get(baseAimConfigPath ~ '/specific_country'))|raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ aimPrefix }}allow_partial_authorization">{{ 'Allow Partial Authorization'|_ }}</label>
-                    <div class="col-md-5">
-                        <input type="hidden" name="{{ baseAimHtmlName }}[allow_partial_authorization]" id="{{ aimPrefix }}allow_partial_authorization" value="0"/>
-                        <input class="switch-cbx" name="{{ baseAimHtmlName }}[allow_partial_authorization]" {% if c.get(baseAimConfigPath ~ "/allow_partial_authorization") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
-                    </div>
-                </div>
+        {{ forms.input(fieldData|merge({field:'merchant_email', label:'Merchant\'s Email'|_, attr: 'data-rule-number="true"', value: c.get(baseAimConfigPath ~ '/merchant_email')})) }}
+        {{ forms.select(fieldData|merge({field:'cctypes', label:'Credit Card Types'|_, options: APP.instance('FCom_AuthorizeNet_Model_Settings').cardTypes(), value: c.get(baseAimConfigPath ~ '/cctypes'), attr: 'multiple="multiple"'})) }}
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="{{ aimPrefix }}useccv">{{ 'Credit Card Verification'|_ }}</label>
+            <div class="col-md-5">
+                <input type="hidden" name="{{ baseAimHtmlName }}[useccv]" id="{{ aimPrefix }}useccv" value="0"/>
+                <input class="switch-cbx" name="{{ baseAimHtmlName }}[useccv]" {% if c.get(baseAimConfigPath ~ "/useccv") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
             </div>
         </div>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a href="#" class="accordion-toggle">{{ 'Authorize.net Direct Post Method API'|_ }}</a>
-        </div>
-        <div class="panel-collapse accordion-body" id="settings-FCom_AuthorizeNet-group1">
-            <div class="panel-body">
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}active">{{ 'Enabled'|_ }}</label>
-                    <div class="col-md-5">
-                        <input type="hidden" name="{{ baseDpmHtmlName }}[active]" id="{{ dpmPrefix }}active" value="0"/>
-                        <input class="switch-cbx" name="{{ baseDpmHtmlName }}[active]" {% if c.get(baseDpmConfigPath ~ "/active") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}title">{{ 'Title'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" id="{{ dpmPrefix }}title" name="{{ baseDpmHtmlName }}[title]" type="text" value="{{ c.get(baseDpmConfigPath ~ '/title') }}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}login">{{ 'API Login ID'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" id="{{ dpmPrefix }}login" name="{{ baseDpmHtmlName }}[login]" type="password" value="{{ c.get(baseDpmConfigPath ~ '/login') }}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}trans_key">{{ 'Transaction Key'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" id="{{ dpmPrefix }}trans_key" name="{{ baseDpmHtmlName }}[trans_key]" type="password" value="{{ c.get(baseDpmConfigPath ~ '/trans_key') }}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}trans_md5">{{ 'Merchant MD5'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" id="{{ dpmPrefix }}trans_md5" name="{{ baseDpmHtmlName }}[trans_md5]" type="password" value="{{ c.get(baseDpmConfigPath ~ '/trans_md5') }}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}payment_action">{{ 'Payment Action'|_ }}</label>
-                    <div class="col-md-5">
-                        <select class="form-control" name="{{ baseDpmHtmlName }}[payment_action]" id="{{ dpmPrefix }}payment_action">
-                            {{ UTIL.optionsHtml( APP.instance('FCom_AuthorizeNet_Model_Settings').paymentActions(), c.get(baseDpmConfigPath ~ '/payment_action'))|raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}order_status">{{ 'New Order Status'|_ }}</label>
-                    <div class="col-md-5">
-                        <select class="form-control" name="{{ baseDpmHtmlName }}[order_status]" id="{{ dpmPrefix }}order_status">
-                            {{ UTIL.optionsHtml( APP.instance('FCom_AuthorizeNet_Model_Settings').orderStatuses(), c.get(baseDpmConfigPath ~ '/payment_action'))|raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}test">{{ 'Test Mode'|_ }}</label>
-                    <div class="col-md-5">
-                        <input type="hidden" name="{{ baseDpmHtmlName }}[test]" id="{{ dpmPrefix }}test" value="0"/>
-                        <input class="switch-cbx" name="{{ baseDpmHtmlName }}[test]" {% if c.get(baseDpmConfigPath ~ "/payment_action") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}cgi_url">{{ 'Gateway URL'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" id="{{ dpmPrefix }}cgi_url" name="{{ baseDpmHtmlName }}[cgi_url]" type="text" value="{{ APP.instance('FCom_AuthorizeNet_Model_Settings').gatewayUrl(c) }}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}currency">{{ 'Accepted Currency'|_ }}</label>
-                    <div class="col-md-5">
-                        <select class="form-control" name="{{ baseDpmHtmlName }}[currency]" id="{{ dpmPrefix }}currency">
-                            {{ UTIL.optionsHtml( APP.instance('FCom_AuthorizeNet_Model_Settings').currencies(), c.get(baseDpmConfigPath ~ '/currency'))|raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}debug">{{ 'Debug'|_ }}</label>
-                    <div class="col-md-5">
-                        <input type="hidden" name="{{ baseDpmHtmlName }}[debug]" id="{{ dpmPrefix }}debug" value="0"/>
-                        <input class="switch-cbx" name="{{ baseDpmHtmlName }}[debug]" {% if c.get(baseDpmConfigPath ~ "/debug") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}email_customer">{{ 'Email Customer'|_ }}</label>
-                    <div class="col-md-5">
-                        <input type="hidden" name="{{ baseDpmHtmlName }}[email_customer]" id="{{ dpmPrefix }}email_customer" value="0"/>
-                        <input class="switch-cbx" name="{{ baseDpmHtmlName }}[email_customer]" {% if c.get(baseDpmConfigPath ~ "/email_customer") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}merchant_email">{{ 'Merchant\'s Email'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" id="{{ dpmPrefix }}merchant_email" name="{{ baseDpmHtmlName }}[merchant_email]" type="text" value="{{ c.get(baseDpmConfigPath ~ '/merchant_email') }}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}cctypes">{{ 'Credit Card Types'|_ }}</label>
-                    <div class="col-md-5">
-                        <select class="form-control" name="{{ baseDpmHtmlName }}[cctypes][]" id="{{ dpmPrefix }}cctypes" multiple="multiple">
-                            {{ UTIL.optionsHtml( APP.instance('FCom_AuthorizeNet_Model_Settings').cardTypes(), c.get(baseDpmConfigPath ~ '/cctypes'))|raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}useccv">{{ 'Credit Card Verification'|_ }}</label>
-                    <div class="col-md-5">
-                        <input type="hidden" name="{{ baseDpmHtmlName }}[useccv]" id="{{ dpmPrefix }}useccv" value="0"/>
-                        <input class="switch-cbx" name="{{ baseDpmHtmlName }}[useccv]" {% if c.get(baseDpmConfigPath ~ "/useccv") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}allowspecific">{{ 'Payment from Applicable Countries'|_ }}</label>
-                    <div class="col-md-5">
-                        <select class="form-control" name="{{ baseDpmHtmlName }}[allowspecific]" id="{{ dpmPrefix }}allowspecific">
-                            {{ UTIL.optionsHtml( {0:'All Allowed Countries', 1:'Specific Countries'}, c.get(baseDpmConfigPath ~ '/allowspecific'))|raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}specificcountry">{{ 'Payment from Specific Countries'|_ }}</label>
-                    <div class="col-md-5">
-                        <select class="form-control" name="{{ baseDpmHtmlName }}[specific_country][]" id="{{ dpmPrefix }}specificcountry" multiple="multiple">
-                            {{ UTIL.optionsHtml( APP.instance('FCom_AuthorizeNet_Model_Settings').countries(), c.get(baseDpmConfigPath ~ '/specific_country'))|raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}min_order_total">{{ 'Minimum Order Total'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" id="{{ dpmPrefix }}min_order_total" name="{{ baseDpmHtmlName }}[min_order_total]" type="text" value="{{ c.get(baseDpmConfigPath ~ '/min_order_total') }}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}max_order_total">{{ 'Maximum Order Total'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" id="{{ dpmPrefix }}max_order_total" name="{{ baseDpmHtmlName }}[max_order_total]" type="text" value="{{ c.get(baseDpmConfigPath ~ '/max_order_total') }}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="{{ dpmPrefix }}sort_order">{{ 'Sort Order'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" id="{{ dpmPrefix }}sort_order" name="{{ baseDpmHtmlName }}[sort_order]" type="text" value="{{ c.get(baseDpmConfigPath ~ '/sort_order') }}" />
-                    </div>
-                </div>
+        {{ forms.select(fieldData|merge({field:'allowspecific', label:'Payment from Applicable Countries'|_, options: {0:'All Allowed Countries', 1:'Specific Countries'}, value: c.get(baseAimConfigPath ~ '/allowspecific')})) }}
+        {{ forms.select(fieldData|merge({field:'specific_country', label:'Payment from Specific Countries'|_, options: APP.instance('FCom_AuthorizeNet_Model_Settings').countries(), value: c.get(baseAimConfigPath ~ '/specific_country'), attr: 'multiple="multiple"'})) }}
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="{{ aimPrefix }}allow_partial_authorization">{{ 'Allow Partial Authorization'|_ }}</label>
+            <div class="col-md-5">
+                <input type="hidden" name="{{ baseAimHtmlName }}[allow_partial_authorization]" id="{{ aimPrefix }}allow_partial_authorization" value="0"/>
+                <input class="switch-cbx" name="{{ baseAimHtmlName }}[allow_partial_authorization]" {% if c.get(baseAimConfigPath ~ "/allow_partial_authorization") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
             </div>
         </div>
-    </div>
-</div>
+    {{ forms.accordion_panel_end }}
+    {{ forms.accordion_panel_start({label:'Authorize.net Direct Post Method API'|_, id:'settings-FCom_AuthorizeNet-group1'}) }}
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="{{ dpmPrefix }}active">{{ 'Enabled'|_ }}</label>
+            <div class="col-md-5">
+                <input type="hidden" name="{{ baseDpmHtmlName }}[active]" id="{{ dpmPrefix }}active" value="0"/>
+                <input class="switch-cbx" name="{{ baseDpmHtmlName }}[active]" {% if c.get(baseDpmConfigPath ~ "/active") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
+            </div>
+        </div>
+        {{ forms.input(fieldData|merge({field:'title', label:'Title'|_, value: c.get(baseDpmConfigPath ~ '/title')})) }}
+        {{ forms.input(fieldData|merge({field:'login', label:'API Login ID'|_, type: "password", value: c.get(baseDpmConfigPath ~ '/login')})) }}
+        {{ forms.input(fieldData|merge({field:'trans_key', label:'Transaction Key'|_, type: "password", value: c.get(baseDpmConfigPath ~ '/trans_key')})) }}
+        {{ forms.input(fieldData|merge({field:'trans_md5', label:'Merchant MD5'|_, type: "password", value: c.get(baseDpmConfigPath ~ '/trans_md5')})) }}
+        {{ forms.select(fieldData|merge({field:'payment_action', label:'Payment Action'|_, options: APP.instance('FCom_AuthorizeNet_Model_Settings').paymentActions(), value: c.get(baseDpmConfigPath ~ '/payment_action')})) }}
+        {{ forms.select(fieldData|merge({field:'order_status', label:'New Order Status'|_, options: APP.instance('FCom_AuthorizeNet_Model_Settings').orderStatuses(), value: c.get(baseDpmConfigPath ~ '/order_status')})) }}
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="{{ dpmPrefix }}test">{{ 'Test Mode'|_ }}</label>
+            <div class="col-md-5">
+                <input type="hidden" name="{{ baseDpmHtmlName }}[test]" id="{{ dpmPrefix }}test" value="0"/>
+                <input class="switch-cbx" name="{{ baseDpmHtmlName }}[test]" {% if c.get(baseDpmConfigPath ~ "/payment_action") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
+            </div>
+        </div>
+        {{ forms.input(fieldData|merge({field:'cgi_url', label:'Gateway URL'|_, value: APP.instance('FCom_AuthorizeNet_Model_Settings').gatewayUrl(c)})) }}
+        {{ forms.select(fieldData|merge({field:'currency', label:'Accepted Currency'|_, options: APP.instance('FCom_AuthorizeNet_Model_Settings').currencies(), value: c.get(baseDpmConfigPath ~ '/currency')})) }}
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="{{ dpmPrefix }}debug">{{ 'Debug'|_ }}</label>
+            <div class="col-md-5">
+                <input type="hidden" name="{{ baseDpmHtmlName }}[debug]" id="{{ dpmPrefix }}debug" value="0"/>
+                <input class="switch-cbx" name="{{ baseDpmHtmlName }}[debug]" {% if c.get(baseDpmConfigPath ~ "/debug") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="{{ dpmPrefix }}email_customer">{{ 'Email Customer'|_ }}</label>
+            <div class="col-md-5">
+                <input type="hidden" name="{{ baseDpmHtmlName }}[email_customer]" id="{{ dpmPrefix }}email_customer" value="0"/>
+                <input class="switch-cbx" name="{{ baseDpmHtmlName }}[email_customer]" {% if c.get(baseDpmConfigPath ~ "/email_customer") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
+            </div>
+        </div>
+        {{ forms.input(fieldData|merge({field:'merchant_email', label:'Merchant\'s Email'|_, value: c.get(baseDpmConfigPath ~ '/merchant_email')})) }}
+        {{ forms.select(fieldData|merge({field:'cctypes', label:'Credit Card Types'|_, attr: ' multiple="multiple"', options: APP.instance('FCom_AuthorizeNet_Model_Settings').cardTypes(), value: c.get(baseDpmConfigPath ~ '/cctypes')})) }}
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="{{ dpmPrefix }}useccv">{{ 'Credit Card Verification'|_ }}</label>
+            <div class="col-md-5">
+                <input type="hidden" name="{{ baseDpmHtmlName }}[useccv]" id="{{ dpmPrefix }}useccv" value="0"/>
+                <input class="switch-cbx" name="{{ baseDpmHtmlName }}[useccv]" {% if c.get(baseDpmConfigPath ~ "/useccv") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
+            </div>
+        </div>
+        {{ forms.select(fieldData|merge({field:'allowspecific', label:'Payment from Applicable Countries'|_, options: {0:'All Allowed Countries', 1:'Specific Countries'}, value: c.get(baseDpmConfigPath ~ '/allowspecific')})) }}
+        {{ forms.select(fieldData|merge({field:'specificcountry', label:'Payment from Specific Countries'|_, attr: 'multiple="multiple"', options: APP.instance('FCom_AuthorizeNet_Model_Settings').countries(), value: c.get(baseDpmConfigPath ~ '/specific_country')})) }}
+        {{ forms.input(fieldData|merge({field:'min_order_total', label:'Minimum Order Total'|_, value: c.get(baseDpmConfigPath ~ '/min_order_total')})) }}
+        {{ forms.input(fieldData|merge({field:'max_order_total', label:'Maximum Order Total'|_, value: c.get(baseDpmConfigPath ~ '/max_order_total')})) }}
+        {{ forms.input(fieldData|merge({field:'sort_order', label:'Sort Order'|_, value: c.get(baseDpmConfigPath ~ '/sort_order')})) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}
+
