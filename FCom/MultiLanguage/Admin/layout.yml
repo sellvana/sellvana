@@ -3,5 +3,5 @@ base:
 
 /settings:
     - view: settings
-      do:
-        - [ addTab, FCom_MultiLanguage, { label: Multi Language, group: catalog, pos: 150, async: true } ]
+        do:
+            - [ addTab, FCom_MultiLanguage, { label: Multi Language, group: catalog, pos: 150, async: true } ]

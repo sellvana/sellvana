@@ -1,6 +1,6 @@
 base:
     - view: head
-      do:
+        do:
             - [ requireJs, fcom.checkout, "@FCom_Checkout/Frontend/js/fcom.checkout" ]
             - [ requireRun, fcom.checkout]
 
@@ -10,14 +10,14 @@ base:
     - { hook: cart_upsell, views: checkout/also-bought }
     - { view: root, do: [[ addBodyClass, page-cart ]] }
     - view: head
-      do:
+        do:
             - [ title, Shopping Cart ]
             - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
 
 /checkout/checkout:
     - { include: base }
     - view: head
-      do:
+        do:
             - [ title, Checkout ]
             - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
     - { hook: main, views: checkout/checkout }
@@ -25,7 +25,7 @@ base:
 /checkout/login:
     - { include: base }
     - view: head
-      do:
+        do:
             - [ title, Checkout Login ]
             - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
     - { hook: main, views: checkout/login }
@@ -33,28 +33,28 @@ base:
 /checkout/payment:
     - { include: base }
     - view: head
-      do:
+        do:
             - [ title, Checkout Payment Method ]
     - { hook: main, views: checkout/payment }
 
 /checkout/shipping:
     - { include: base }
     - view: head
-      do:
+        do:
             - [ title, Checkout Shipping Method ]
     - { hook: main, views: checkout/shipping }
 
 /checkout/address:
     - { include: base }
     - view: head
-      do:
+        do:
             - [ title, Checkout Address ]
     - { hook: main, views: checkout/address }
 
 /checkout/success:
     - { include: base }
     - view: head
-      do:
+        do:
             - [ title, Checkout Success ]
     - { hook: main, views: checkout/success }
 

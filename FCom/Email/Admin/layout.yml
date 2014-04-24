@@ -1,10 +1,10 @@
 base:
     - view: admin/nav
-      do:
-        - [ addNav, customer/subscriptions, { label: Email Subscriptions, href: /subscriptions, pos: 100 } ]
-        #- [ addNav, customer/email-queues, { label: Email Queues, href: /email-queues, pos: 110 } ]
+        do:
+            - [ addNav, customer/subscriptions, { label: Email Subscriptions, href: /subscriptions, pos: 100 } ]
+            #- [ addNav, customer/email-queues, { label: Email Queues, href: /email-queues, pos: 110 } ]
 
 /settings:
     - view: settings
-      do:
-        - [ addTab, FCom_Email, { label: Emails, group: customers, async: true } ]
+        do:
+            - [ addTab, FCom_Email, { label: Emails, group: customers, async: true } ]

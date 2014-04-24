@@ -1,19 +1,19 @@
 base:
     - view: head
-      do:
-        - [ requireJs, fcom.customfields, "@FCom_CustomField/Admin/js/fcom.customfields" ]
+        do:
+            - [ requireJs, fcom.customfields, "@FCom_CustomField/Admin/js/fcom.customfields" ]
 
     - view: admin/nav
-      do:
-        - [ addNav, catalog/fieldsets, { label: Field Sets, href: /customfields/fieldsets } ]
-        - [ addNav, catalog/fields, { label: Fields, href: /customfields/fields } ]
+        do:
+            - [ addNav, catalog/fieldsets, { label: Field Sets, href: /customfields/fieldsets } ]
+            - [ addNav, catalog/fields, { label: Fields, href: /customfields/fields } ]
 
 catalog_product_form_tabs:
     - view: admin/form
-      do:
-        - [ addTab, fields, { label: Additional Info, pos: 25, view: customfields/products/fields-tab, async: true } ]
-        - [ addTab, variants, { label: Variants, pos: 26, view: customfields/products/variants-tab, async: true } ]
-        - [ addTab, frontend, { label: Shopper Editable Fields, pos: 29, view: customfields/products/frontend-tab, async: true } ]
+        do:
+            - [ addTab, fields, { label: Additional Info, pos: 25, view: customfields/products/fields-tab, async: true } ]
+            - [ addTab, variants, { label: Variants, pos: 26, view: customfields/products/variants-tab, async: true } ]
+            - [ addTab, frontend, { label: Shopper Editable Fields, pos: 29, view: customfields/products/frontend-tab, async: true } ]
 
 /customfields/fieldsets:
     - { include: base }
@@ -31,6 +31,6 @@ catalog_product_form_tabs:
     - { hook: main, views: customfields/fieldsets/form }
 
 /settings:
-  - view: settings
-    do:
-      - [ addTab, FCom_CustomField, { label: Custom Fields, group: catalog, async: true } ]
+    - view: settings
+        do:
+            - [ addTab, FCom_CustomField, { label: Custom Fields, group: catalog, async: true } ]

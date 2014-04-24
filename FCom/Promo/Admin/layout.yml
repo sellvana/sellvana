@@ -3,9 +3,9 @@ base:
 
 promo_form_tabs:
     - view: admin/form
-      set: { tab_view_prefix: 'promo/tab-' }
-      do:
-        - [ addTab, main, { label: Promo Info, pos: 10 } ]
+        set: { tab_view_prefix: 'promo/tab-' }
+        do:
+            - [ addTab, main, { label: Promo Info, pos: 10 } ]
 #           - [ addTab, details, { label: Details, async: true, pos: 20 } ]
 #           - [ addTab, attachments, { label: Attachments, async: true, pos: 30 } ]
 #           - [ addTab, history, { label: History, async: true } ]

@@ -1,6 +1,6 @@
 common_js_libs:
     - view: head
-      do:
+        do:
             - [ js, "@FCom_Core/js/lib/html5shiv.min.js", { if: lt IE 9 } ]
             - [ js, "@FCom_Core/js/lib/es5-shim.min.js", { if: lt IE 9 } ]
             - [ js, "@FCom_Core/js/lib/json2.js", { if: lt IE 8 } ]

@@ -1,8 +1,8 @@
 base:
     - view: admin/nav
-      do:
-        - [ addNav, modules/install, { label: Install from Market, href: /marketclient/site/connect, target: MarketInstall } ]
-        - [ addNav, modules/publish, { label: Publish to Market, href: /marketclient/publish } ]
+        do:
+            - [ addNav, modules/install, { label: Install from Market, href: /marketclient/site/connect, target: MarketInstall } ]
+            - [ addNav, modules/publish, { label: Publish to Market, href: /marketclient/publish } ]
 
 /marketclient/remote:
     - { include: base }

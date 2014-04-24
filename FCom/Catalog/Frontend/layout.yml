@@ -1,6 +1,6 @@
 base:
     - view: head
-      do:
+        do:
             - [ requireJs, fcom.catalog, "@FCom_Catalog/Frontend/js/fcom.catalog" ]
             - [ requireRun, fcom.catalog ]
 

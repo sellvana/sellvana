@@ -1,9 +1,9 @@
 base:
     - view: admin/nav
-      do:
+        do:
             - [ addNav, catalog/index-fields, { label: Products Indexing, href: /catalogindex/fields } ]
 
 /settings:
     - view: settings
-      do:
+        do:
             - [ addTab, FCom_CatalogIndex, { label: Catalog Index, group: catalog, async: true } ]

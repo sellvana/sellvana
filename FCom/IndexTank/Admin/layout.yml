@@ -1,9 +1,9 @@
 base:
     - view: admin/nav
-      do:
-        - [ addNav, indextank, { label: IndexDen, pos: 100 } ]
-        - [ addNav, indextank/product_fields, { label: Product Fields, href: /indextank/product_fields } ]
-        - [ addNav, indextank/product_functions, { label: Product Functions, href: /indextank/product_functions } ]
+        do:
+            - [ addNav, indextank, { label: IndexDen, pos: 100 } ]
+            - [ addNav, indextank/product_fields, { label: Product Fields, href: /indextank/product_fields } ]
+            - [ addNav, indextank/product_functions, { label: Product Functions, href: /indextank/product_functions } ]
 
 /indextank/product_fields:
     - { include: base }
@@ -16,9 +16,9 @@ base:
     - { hook: main, views: admin/form }
     - { view: admin/nav, do: [[ setNav, indextank/product_fields ]] }
     - view: admin/form
-      set: { tab_view_prefix: indextank/product_fields-form/ }
-      do:
-        - [ addTab, main, { label: Product Fields, pos: 10 } ]
+        set: { tab_view_prefix: indextank/product_fields-form/ }
+        do:
+            - [ addTab, main, { label: Product Fields, pos: 10 } ]
 
 /indextank/product_functions:
     - { include: base }
@@ -31,9 +31,9 @@ base:
     - { hook: main, views: admin/form }
     - { view: admin/nav, do: [[ setNav, indextank/product_functions ]] }
     - view: admin/form
-      set: { tab_view_prefix: indextank/product_functions-form/ }
-      do:
-        - [ addTab, main, { label: Product Functions, pos: 10 } ]
+        set: { tab_view_prefix: indextank/product_functions-form/ }
+        do:
+            - [ addTab, main, { label: Product Functions, pos: 10 } ]
 
 /settings:
     - { view: settings, do: [[ addTab, FCom_IndexTank, { label: IndexDen API, async: true } ]] }

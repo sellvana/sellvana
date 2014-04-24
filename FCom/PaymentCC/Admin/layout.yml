@@ -1,4 +1,4 @@
 /settings:
     - view: settings
-      do:
-        - [ addTab, FCom_PaymentCC, { label: Saved CC, group: payment_methods, pos: 50, async: true } ]
+        do:
+            - [ addTab, FCom_PaymentCC, { label: Saved CC, group: payment_methods, pos: 50, async: true } ]

@@ -1,21 +1,21 @@
 base:
     - view: head
-      do:
-        - [ meta, viewport, "width=device-width, initial-scale=1.0" ]
-        #- [ meta, X-UA-Compatible, IE=100, true ]
-        - [ css, "//fonts.googleapis.com/css?family=Lato:400,700,900,400italic,700italic,900italic" ]
-        - [ css, "@FCom_FrontendThemeBootSimple/Frontend/css/bootstrap.css" ]
-        - [ css, "@FCom_Core/css/flags.css" ]
-        - [ css, "@FCom_LibJsCommon/js/css/jquery.rateit.css" ]
-        - [ css, "@FCom_FrontendThemeBootSimple/Frontend/css/fulleron-base.css" ]
+        do:
+            - [ meta, viewport, "width=device-width, initial-scale=1.0" ]
+            #- [ meta, X-UA-Compatible, IE=100, true ]
+            - [ css, "//fonts.googleapis.com/css?family=Lato:400,700,900,400italic,700italic,900italic" ]
+            - [ css, "@FCom_FrontendThemeBootSimple/Frontend/css/bootstrap.css" ]
+            - [ css, "@FCom_Core/css/flags.css" ]
+            - [ css, "@FCom_LibJsCommon/js/css/jquery.rateit.css" ]
+            - [ css, "@FCom_FrontendThemeBootSimple/Frontend/css/fulleron-base.css" ]
 
-        - [ js, //html5shim.googlecode.com/svn/trunk/html5.js, { if: lt IE 9 } ]
+            - [ js, //html5shim.googlecode.com/svn/trunk/html5.js, { if: lt IE 9 } ]
 
-        - [ requireJs, bootstrap, "@FCom_FrontendThemeBootSimple/Frontend/js/bootstrap", { deps: [ jquery ] } ]
-        - [ requireJs, responsiveslides, "@FCom_FrontendThemeBootSimple/Frontend/js/vendor/responsiveslides.min", { deps: [ jquery ] } ]
-        - [ requireJs, typeahead, "@FCom_FrontendThemeBootSimple/Frontend/js/vendor/typeahead.min", { deps: [ jquery ] } ]
-        - [ requireJs, fcom.frontend, "@FCom_FrontendThemeBootSimple/Frontend/js/fcom.frontend" ]
-        - [ requireRun, fcom.frontend ]
+            - [ requireJs, bootstrap, "@FCom_FrontendThemeBootSimple/Frontend/js/bootstrap", { deps: [ jquery ] } ]
+            - [ requireJs, responsiveslides, "@FCom_FrontendThemeBootSimple/Frontend/js/vendor/responsiveslides.min", { deps: [ jquery ] } ]
+            - [ requireJs, typeahead, "@FCom_FrontendThemeBootSimple/Frontend/js/vendor/typeahead.min", { deps: [ jquery ] } ]
+            - [ requireJs, fcom.frontend, "@FCom_FrontendThemeBootSimple/Frontend/js/fcom.frontend" ]
+            - [ requireRun, fcom.frontend ]
 
 /:
     - { view: root, do: [[ addBodyClass, f-page-home ]] }

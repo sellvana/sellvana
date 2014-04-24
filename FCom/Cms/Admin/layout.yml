@@ -1,11 +1,11 @@
 base:
     - view: admin/nav
-      do:
-        - [ addNav, cms, { label: CMS, pos: 500, icon_class: icon-folder-open } ]
-        - [ addNav, cms/blocks, { label: Blocks, href: /cms/blocks } ]
-        #- [ addNav, cms/nav, { label: Navigation, href: /cms/nav } ]
-        #- [ addNav, cms/pages, { label: Pages, href: /cms/pages } ]
-        #- [ addNav, cms/templates, { label: Templates, href: /templates  } ]
+        do:
+            - [ addNav, cms, { label: CMS, pos: 500, icon_class: icon-folder-open } ]
+            - [ addNav, cms/blocks, { label: Blocks, href: /cms/blocks } ]
+            #- [ addNav, cms/nav, { label: Navigation, href: /cms/nav } ]
+            #- [ addNav, cms/pages, { label: Pages, href: /cms/pages } ]
+            #- [ addNav, cms/templates, { label: Templates, href: /templates  } ]
 
 /cms/nav:
     - { include: base }
@@ -16,10 +16,10 @@ base:
 /cms/nav/tree_form:
     - { root: cms/nav-tree-form }
     - view: cms/nav-tree-form
-      set: { tab_view_prefix: cms/nav-tree-form/ }
-      do:
-        - [ addTab, main, { label: Navigation Node, pos: 10 } ]
-        - [ addTab, content, { label: Page Content, pos: 20 } ]
+        set: { tab_view_prefix: cms/nav-tree-form/ }
+        do:
+            - [ addTab, main, { label: Navigation Node, pos: 10 } ]
+            - [ addTab, content, { label: Page Content, pos: 20 } ]
 
 /settings:
     - { view: settings, do: [[ addTab, FCom_Cms, { label: Cms, group: catalog, async: true } ]] }

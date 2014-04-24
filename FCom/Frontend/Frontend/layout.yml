@@ -6,7 +6,7 @@ base:
     - { view: core/messages, set: { namespace: frontend } }
 
     - view: head
-      do:
+        do:
             - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
             - [ icon, @FCom_Core/favicon.ico ]
 
@@ -31,6 +31,6 @@ base:
 /:
     - { include: base }
     - view: head
-      do:
+        do:
             - [ title, Home Page ]
     - { hook: main, views: static/index, use_meta: true }

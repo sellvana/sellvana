@@ -1,4 +1,4 @@
 /settings:
     - view: settings
-      do:
+        do:
             - [ addTab, FCom_ShippingUps, { label: UPS, group: shipping_methods, async: true } ]
