@@ -19,4 +19,4 @@ base:
 
 
 /header_search:
-  - { hook: main, views: 'header-search/FCom_Sales_Orders' }
+    - { hook: main, views: 'header-search/FCom_Sales_Orders' }

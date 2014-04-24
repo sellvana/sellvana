@@ -3,4 +3,4 @@ modules:
         version: 0.1.0
         auto_use: [ bootstrap ]
         observe:
-            - [ BLayout::loadTheme:before, FCom_LibPhptal_Main.onLayoutLoadThemeBefore ]
+            - [ "BLayout::loadTheme:before", FCom_LibPhptal_Main.onLayoutLoadThemeBefore ]

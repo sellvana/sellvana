@@ -1,6 +1,6 @@
 base:
     - view: head
         do:
-            - [ requireJs, fcom.pushclient, @FCom_PushServer/js/fcom.pushclient ]
+            - [ requireJs, fcom.pushclient, "@FCom_PushServer/js/fcom.pushclient" ]
 
-    - { callback: FCom_PushServer_Main::layoutInit }
+    - { callback: "FCom_PushServer_Main::layoutInit" }
