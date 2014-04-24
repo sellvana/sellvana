@@ -4,7 +4,7 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator', m) %}
 {% import THIS.view('admin/form-elements').twigName() as forms %}
-
+{% set fieldData = { validator: validator } %}
 <fieldset class="form-horizontal">
     <div class="f-section">
     <div class="form-group">
@@ -14,11 +14,11 @@
             <input class="switch-cbx" type="checkbox" name="model[page_enabled]" value="1" {% if validator.fieldValue('page_enabled') %}checked="checked"{% endif %} />
         </div>
     </div>
-    {{ forms.input({label: 'Page URL Path'|_, name: "model[page_url]", value: validator.fieldValue('page_url')}) }}
-    {{ forms.input({label: 'Window Title'|_, name: "model[page_title]", value: validator.fieldValue('page_title')}) }}
-    {{ forms.textarea({label: 'Page Layout Update'|_, name: "model[layout_update]",  input_class: "ckeditor",value:  validator.fieldValue('layout_update'), id: "model-layout-update" }) }}
-    {{ forms.input({label: 'Meta Title'|_, name: "model[meta_title]", value: validator.fieldValue('meta_title')}) }}
-    {{ forms.input({label: 'Meta Description'|_, name: "model[meta_description]", value: validator.fieldValue('meta_description')}) }}
-    {{ forms.input({label: 'Meta Keywords'|_, name: "model[meta_keywords]", value: validator.fieldValue('meta_keywords')}) }}
+    {{ forms.input(fieldData|merge({field:'page_url', label:'Page URL Path'|_})) }}
+    {{ forms.input(fieldData|merge({field:'page_title', label:'Window Title'|_})) }}
+    {{ forms.textarea(fieldData|merge({field:'layout_update', label:'Page Layout Update'|_,  input_class: "ckeditor"})) }}
+    {{ forms.input(fieldData|merge({field:'meta_title', label:'Meta Title'|_})) }}
+    {{ forms.input(fieldData|merge({field:'meta_description', label:'Meta Description'|_})) }}
+    {{ forms.input(fieldData|merge({field:'meta_keywords', label:'Meta Keywords'|_})) }}
     </div>
 </fieldset>
