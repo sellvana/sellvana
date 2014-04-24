@@ -1,4 +1,4 @@
 /settings:
     - view: settings
-        do:
-            - [ addTab, FCom_PaymentIdeal, { label: iDEAL, group: payment_methods } ]
+      do:
+        - [ addTab, FCom_PaymentIdeal, { label: iDEAL, group: payment_methods } ]

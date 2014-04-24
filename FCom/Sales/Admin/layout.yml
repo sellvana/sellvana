@@ -1,6 +1,6 @@
 base:
     - view: admin/nav
-        do:
+      do:
             - [ addNav, sales, { label: Sales, pos: 100, icon_class: icon-shopping-cart } ]
             - [ addNav, sales/orders, { label: Orders, href: /orders } ]
             - [ addNav, sales/orderstatus, { label: Order Statuses, href: /orderstatus } ]
@@ -8,7 +8,7 @@ base:
 
 /settings:
     - view: settings
-        do:
+      do:
             - [ addTabGroup, sales, { label: Sales, pos: 100 } ]
             - [ addTabGroup, shipping_methods, { label: Shipping, pos: 110 } ]
             - [ addTabGroup, payment_methods, { label: Payment, pos: 120 } ]

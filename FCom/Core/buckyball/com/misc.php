@@ -3285,11 +3285,6 @@ class BYAML extends BCLass
     static protected $_peclYaml = null;
     static protected $_peclSyck = null;
 
-    static public function bootstrap()
-    {
-
-    }
-
     static public function load($filename, $cache=true)
     {
         //$filename1 = realpath($filename);

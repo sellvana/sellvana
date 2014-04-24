@@ -1,5 +1,5 @@
 base:
     - { hook: body_start, views: frontendcp/toolbar }
     - view: head
-        do:
-            - [ css, @FCom_FrontendCP/Frontend/css/fcom.frontendcp.css ]
+      do:
+        - [ css, "@FCom_FrontendCP/Frontend/css/fcom.frontendcp.css" ]

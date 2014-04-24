@@ -1,6 +1,6 @@
 base:
     - view: admin/nav
-        do:
+      do:
             - [ addNav, system/dev, { label: Developers } ]
             - [ addNav, system/dev/tests, { label: Tests, pos: 100, href: /tests/index } ]
 

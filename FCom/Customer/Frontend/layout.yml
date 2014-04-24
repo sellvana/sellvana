@@ -1,7 +1,7 @@
 /customer/login:
     - { include: base }
     - view: head
-        do:
+      do:
             - [ title, Customer Login ]
             - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
     - { hook: main, views: customer/login }
@@ -9,7 +9,7 @@
 /customer/register:
     - { include: base }
     - view: head
-        do:
+      do:
             - [ title, Customer Registration ]
             - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
     - { hook: main, views: customer/register }
@@ -17,7 +17,7 @@
 /customer/password/recover:
     - { include: base }
     - view: head
-        do:
+      do:
             - [ title, Password Recovery ]
             - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
     - { hook: main, views: customer/password/recover }
@@ -25,7 +25,7 @@
 /customer/password/reset:
     - { include: base }
     - view: head
-        do:
+      do:
             - [ title, Password Reset ]
             - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
     - { hook: main, views: customer/password/reset }
@@ -33,7 +33,7 @@
 customer_account_sidebar:
     - { view: root, do: [[ addBodyClass, page-customer ]] }
     - view: customer/account/sidebar
-        do:
+      do:
             - [ addNavItem, dashboard, { label: Dashboard, position: 1, href: customer/myaccount } ]
             - [ addNavItem, edit, { label: Edit Account, position: 10, href: customer/myaccount/edit } ]
             - [ addNavItem, addresses, { label: Address Book, position: 10, href: customer/address } ]
