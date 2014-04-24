@@ -8,31 +8,12 @@
 {% if APP.m('FCom_MultiSite').run_status == 'LOADED' %}
     {% set sites = APP.instance('FCom_MultiSite_Model_Site').siteOptions() %}
 {% endif %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 
 <fieldset class="adm-section-group">
-    <div class="form-group">
-        <label class="col-md-2 control-label" for="model-description">{{ 'Description'|_ }}</label>
-        <div class="col-md-5">
-            <input class="form-control required" id="model-description " type="text" name="model[description]" value="{{ validator.fieldValue('description') }}"/>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 control-label" for="model-coupon">{{ 'Coupon code'|_ }}</label>
-
-        <div class="col-md-5">
-            <input class="form-control" id="model-coupon" type="text" name="model[coupon]"
-                   value="{{ validator.fieldValue('coupon') }}"/>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 control-label" for="model-status">{{ 'Status'|_ }}</label>
-
-        <div class="col-md-5">
-            <select class="form-control" name="model[status]">
-                {{ UTIL.optionsHtml(promo.fieldOptions('status'), validator.fieldValue('status'))|raw }}
-            </select>
-        </div>
-    </div>
+    {{ forms.input({label: 'Description'|_, required: 1, name: "model[description]", value: validator.fieldValue('description'), id: "model-description" }) }}
+    {{ forms.input({label: 'Coupon code'|_, name: "model[coupon]", value: validator.fieldValue('coupon'), id: "model-coupon" }) }}
+    {{ forms.select({label: 'Status'|_, options: promo.fieldOptions('status'), name: "model[status]", value: validator.fieldValue('status'), id: "model-status" }) }}
 
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-from_date">{{ 'Date Range'|_ }}</label>

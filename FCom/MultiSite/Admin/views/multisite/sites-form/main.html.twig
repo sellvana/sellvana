@@ -3,48 +3,14 @@
 
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
-
+{% set fieldData = {validator: validator} %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 <fieldset>
-    <div class="form-group">
-        <label class="col-md-2 label-control">{{ "Name"|_ }}</label>
-        <div class="col-md-5">
-            <input class="form-control required" type="text" name="model[name]" value="{{ validator.fieldValue('name') }}"/>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 label-control">{{ "Domains"|_ }}</label>
-        <div class="col-md-5">
-            <textarea class="form-control" name="model[match_domains]">{{ validator.fieldValue('match_domains') }}</textarea>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 label-control">{{ "Default Theme"|_ }}</label>
-        <div class="col-md-5">
-            <input class="form-control" type="text" name="model[default_theme]" value="{{ validator.fieldValue('default_theme') }}"/>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 label-control">{{ "Layout Update"|_ }}</label>
-        <div class="col-md-5">
-            <textarea class="form-control" id="main-layout_update" name="model[layout_update]" rows="5">{{ validator.fieldValue('layout_update') }}</textarea>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 label-control">{{ "Meta Title"|_ }}</label>
-        <div class="col-md-5">
-            <input class="form-control" type="text" name="model[meta_title]" value="{{ validator.fieldValue('meta_title') }}"/>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 label-control">{{ "Meta Description"|_ }}</label>
-        <div class="col-md-5">
-            <textarea class="form-control" id="main-content" name="model[meta_description]" rows="5">{{ validator.fieldValue('meta_description') }}</textarea>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 label-control">{{ "Meta Keywords"|_ }}</label>
-        <div class="col-md-5">
-            <textarea class="form-control" id="main-content" name="model[meta_keywords]" rows="5">{{ validator.fieldValue('meta_keywords') }}</textarea>
-        </div>
-    </div>
+    {{ forms.input(fieldData|merge({field: 'name'|_, required: 1, label: "Name"})) }}
+    {{ forms.textarea(fieldData|merge({field: 'match_domains'|_, rows: 2, label: "Domains"})) }}
+    {{ forms.input(fieldData|merge({field: 'default_theme'|_, label: "Default Theme"})) }}
+    {{ forms.textarea(fieldData|merge({field: 'layout_update'|_, rows: 5, label: "Layout Update"})) }}
+    {{ forms.textarea(fieldData|merge({field: 'meta_title'|_, rows: 5, label: "Meta Title"})) }}
+    {{ forms.textarea(fieldData|merge({field: 'meta_description'|_, rows: 5, label: "Meta Description"})) }}
+    {{ forms.textarea(fieldData|merge({field: 'meta_keywords'|_, rows: 5, label: "Meta Keywords"})) }}
 </fieldset>

@@ -3,6 +3,7 @@
 
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator', m) %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 
 <fieldset class="form-horizontal">
     <div class="f-section">
@@ -13,41 +14,11 @@
             <input class="switch-cbx" type="checkbox" name="model[page_enabled]" value="1" {% if validator.fieldValue('page_enabled') %}checked="checked"{% endif %} />
         </div>
     </div>
-    <div class="form-group">
-        <label class="col-md-2 control-label">{{ "Page URL Path"|_ }}</label>
-        <div class="col-md-5">
-            <input class="form-control" type="text" name="model[page_url]" value="{{ validator.fieldValue('page_url') }}" />
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 control-label">{{ "Window Title"|_ }}</label>
-        <div class="col-md-5">
-            <input class="form-control" type="text" name="model[page_title]" value="{{ validator.fieldValue('page_title') }}" />
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 control-label">{{ "Page Layout Update"|_ }}</label>
-        <div class="col-md-5">
-            <textarea class="form-control" name="model[layout_update]" id="main-content" rows="5">{{ validator.fieldValue('layout_update') }}</textarea>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 control-label">{{ "Meta Title"|_ }}</label>
-        <div class="col-md-5">
-            <input class="form-control" type="text" name="model[meta_title]" value="{{ validator.fieldValue('meta_title') }}" />
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 control-label">{{ "Meta Description"|_ }}</label>
-        <div class="col-md-5">
-            <input class="form-control" type="text" name="model[meta_description]" value="{{ validator.fieldValue('meta_description') }}" />
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 control-label">{{ "Meta Keywords"|_ }}</label>
-        <div class="col-md-5">
-            <input class="form-control" type="text" name="model[meta_keywords]" value="{{ validator.fieldValue('meta_keywords') }}" />
-        </div>
-    </div>
+    {{ forms.input({label: 'Page URL Path'|_, name: "model[page_url]", value: validator.fieldValue('page_url')}) }}
+    {{ forms.input({label: 'Window Title'|_, name: "model[page_title]", value: validator.fieldValue('page_title')}) }}
+    {{ forms.textarea({label: 'Page Layout Update'|_, name: "model[layout_update]",  input_class: "ckeditor",value:  validator.fieldValue('layout_update'), id: "model-layout-update" }) }}
+    {{ forms.input({label: 'Meta Title'|_, name: "model[meta_title]", value: validator.fieldValue('meta_title')}) }}
+    {{ forms.input({label: 'Meta Description'|_, name: "model[meta_description]", value: validator.fieldValue('meta_description')}) }}
+    {{ forms.input({label: 'Meta Keywords'|_, name: "model[meta_keywords]", value: validator.fieldValue('meta_keywords')}) }}
     </div>
 </fieldset>

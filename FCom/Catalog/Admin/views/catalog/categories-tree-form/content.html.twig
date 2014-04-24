@@ -1,5 +1,6 @@
 {% set m = THIS.get('model') %}
 {% set views = APP.instance('FCom_Catalog_Admin').getAvailableViews() %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 
 <div class="form-group">
     <label class="col-md-2 control-label" for="main-show_order">{{ 'Show Order'|_ }}</label>
@@ -53,12 +54,7 @@
         <input id="model-show_products" class="switch-cbx" name="model[show_sidebar]" {% if m.get('show_sidebar') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
     </div>
 </div>
-<div class="form-group">
-    <label class="col-md-2 control-label" for="main-content">{{ 'Custom Content'|_ }}</label>
-    <div class="col-md-10">
-        <textarea id="main-content" class="form-control ckeditor" name="model[content]" rows="5">{{ m.get('content') }}</textarea>
-    </div>
-</div>
+{{ forms.textarea({label: 'Custom Content'|_, name: "model[content]", input_div_class: "col-md-10", value:  m.get('content'), id: "model-content", input_class: "ckeditor" }) }}
 <script>
 require(['jquery', 'jquery-ui', 'select2'], function($) {
     $('#category-view-name-select2').select2({

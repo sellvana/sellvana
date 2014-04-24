@@ -1,43 +1,17 @@
 {% set c = THIS.get('model') %}
-
+{% set fieldData = { model: c, id_prefix:'FCom_Cms', name_prefix:'config[modules][FCom_Cms]' } %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 <h2>{{ "CMS Settings"|_}}</h2>
-
-<div class="accordion accordion-blue panel-group" id="settings-FCom_Cms">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a href="#" class="accordion-toggle">{{ 'CMS Frontend Configuration'|_ }}</a>
-        </div>
-        <div class="panel-collapse accordion-body in" id="settings-FCom_Cms-group0">
-            <div class="panel-body">
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ 'Enable CMS Pages'|_ }}</label>
-                    <div class="col-md-5">
-                        <input type="hidden" name="config[modules][FCom_Cms][page_enable]" value="0"/>
-                        <input class="switch-cbx" name="config[modules][FCom_Cms][page_enable]" {% if c.get('modules/FCom_Cms/page_enable') == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ 'CMS Page URL Prefix'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" type="text" name="config[modules][FCom_Cms][page_url_prefix]" value="{{ c.get('modules/FCom_Cms/page_url_prefix') }}" />
-                    </div>
-                </div>
-                <!--
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ 'Enable CMS Nav'|_ }}</label>
-                    <div class="col-md-5">
-                        <input type="hidden" name="config[modules][FCom_Cms][nav_enable]" value="0"/>
-                        <input class="switch-cbx" name="config[modules][FCom_Cms][nav_enable]" {% if c.get('modules/FCom_Cms/nav_enable') == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ 'CMS Nav URL Prefix'|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" type="text" name="config[modules][FCom_Cms][nav_url_prefix]" value="{{ c.get('modules/FCom_Cms/nav_url_prefix') }}" />
-                    </div>
-                </div>
-                -->
+{{ forms.accordion_start({id:'settings-FCom_Cms'}) }}
+     {{ forms.accordion_panel_start({label:'CMS Frontend Configuration'|_, id:'settings-FCom_Cms-group0', in:1}) }}
+        <div class="form-group">
+            <label class="col-md-2 control-label">{{ 'Enable CMS Pages'|_ }}</label>
+            <div class="col-md-5">
+                <input type="hidden" name="config[modules][FCom_Cms][page_enable]" value="0"/>
+                <input class="switch-cbx" name="config[modules][FCom_Cms][page_enable]" {% if c.get('modules/FCom_Cms/page_enable') == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
             </div>
         </div>
-    </div>
-</div>
+        {{ forms.input(fieldData|merge({field:'page_url_prefix', label:'CMS Page URL Prefix'|_, value:c.get('modules/FCom_Cms/page_url_prefix')})) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}
+

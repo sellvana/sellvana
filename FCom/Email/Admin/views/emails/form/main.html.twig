@@ -1,13 +1,9 @@
 {% set model = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
-
+{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% set fieldData = { validator: validator } %}
 <fieldset>
-    <div class="form-group">
-        <label class="col-md-2 label-control" for="model-email">{{ 'Email'|_ }}</label>
-        <div class="col-md-5">
-            <input id="model-email" class="form-control" type="text" name="model[email]" value="{{ validator.fieldValue('email') }}" />
-        </div>
-    </div>
+    {{ forms.input(fieldData|merge({field:'email', label:'Email'|_})) }}
     <div class="form-group">
         <label class="col-md-2 label-control" for="model-unsub_all">{{ 'Un Subscribe All'|_ }}</label>
         <div class="col-md-5">
