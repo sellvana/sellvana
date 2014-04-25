@@ -12,8 +12,7 @@
 {{ forms.accordion_end }}
 <script  type="text/javascript">
     require(['backbone', 'jquery', 'fcom.ipmode','select2'], function(Backbone, $, ipMode) {
-        var mode = '{{ mode }}';
-        mode = mode.split('|');
+        var mode = {{ UTIL.toJson(c.get("mode_by_ip/FCom_Test")|split("\n")) | raw }};
         ipMode.initMode({el: $('#settings-FCom_Test-group0').find('.group-ip-mode'), name: 'config[mode_by_ip][FCom_Test]', mode: mode});
     })
 </script>

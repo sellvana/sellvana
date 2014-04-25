@@ -4,20 +4,6 @@
 {% set fieldData = { validator: validator } %}
 <fieldset>
     {{ forms.input(fieldData|merge({field:'email', label:'Email'|_})) }}
-    <div class="form-group">
-        <label class="col-md-2 label-control" for="model-unsub_all">{{ 'Un Subscribe All'|_ }}</label>
-        <div class="col-md-5">
-            <input value="0" name="model[unsub_all]" type="hidden" />
-            <input id="model-unsub_all" class="form-control switch-cbx" type="checkbox" {{ validator.fieldValue('unsub_all') == 1 ? 'checked' : '' }}
-                   name="model[unsub_all]" value="{{ validator.fieldValue('unsub_all') }}" />
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 label-control" for="model-sub_newsletter">{{ 'Subscribe Newsletter'|_ }}</label>
-        <div class="col-md-5">
-            <input value="0" name="model[sub_newsletter]" type="hidden" />
-            <input id="model-sub_newsletter" class="form-control switch-cbx" type="checkbox" {{ validator.fieldValue('sub_newsletter') == 1 ? 'checked' : '' }}
-                   name="model[sub_newsletter]" value="{{ validator.fieldValue('sub_newsletter') }}" />
-        </div>
-    </div>
+    {{ forms.boolean(fieldData|merge({field:'unsub_all', label:'Un Subscribe All'|_})) }}
+    {{ forms.boolean(fieldData|merge({field:'sub_newsletter', label:'Subscribe Newsletter'|_})) }}
 </fieldset>
