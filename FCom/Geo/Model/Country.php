@@ -6,7 +6,9 @@ class FCom_Geo_Model_Country extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
 
     protected static $_optionsCache = array();
-
+    protected static $_importExportProfile = array (
+      'unique_key' => array ( 'iso', ),
+    );
     public static function options($limit=null)
     {
         $key = $limit ? $limit : '-';

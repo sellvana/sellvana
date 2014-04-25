@@ -1,0 +1,101 @@
+<!--{ label: IE/Permissions }-->
+<!--{ pos: 30 }-->
+
+{% set m = THIS.get('model') %}
+{% set ieConfig = APP.instance('FCom_Admin_Controller_ImportExport') %}
+<input type='hidden' name='model[ie_perm_ids_add][import]' id='ie_perm_ids_add_import'/>
+<input type='hidden' name='model[ie_perm_ids_add][export]' id='ie_perm_ids_add_export'/>
+
+<script>
+require(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
+    var iePermGrid, addedImportModels = [], addedExportModels = [];
+
+    function updateFormData() {
+        console.log(iePermGrid.getRows().toJSON());
+        var addedImportRows = _.filter(iePermGrid.getRows().toJSON(), function (row) {
+            var id = '#' + iePermGrid.id + '-' + 'import' + '-' + row['id'];
+            var $cb = $(id);
+            var $cb2 = $cb[0];
+            return $cb2 && $cb2.checked;
+        });
+
+        addedImportModels = _.pluck(addedImportRows, 'id');
+        $('#ie_perm_ids_add_import').val(addedImportModels.join(','));
+
+        var addedExportRows = _.filter(iePermGrid.getRows().toJSON(), function (row) {
+            var id = '#' + iePermGrid.id + '-' + 'export' + '-' + row['id'];
+            var $cb = $(id);
+            var $cb2 = $cb[0];
+            return $cb2 && $cb2.checked;
+        });
+
+        addedExportModels = _.pluck(addedExportRows, 'id');
+        $('#ie_perm_ids_add_export').val(addedExportModels.join(','));
+    }
+    window.iePermGridRegister = function(grid) {
+        iePermGrid = grid;
+        grid.build();
+
+        $('#' + iePermGrid.id).find('input[type=checkbox]').on('click', function(){
+            console.log(this);
+            var val = this.checked;
+            var id = this.id.split('-');
+            var rowId = id.pop();
+            var op = id.pop();
+
+            var rowsCol = iePermGrid.getRows();
+
+            var row = rowsCol.get(rowId);
+
+            var children = row.get('children');
+
+            if(children) {
+                // eventually change this into recursion if more than 3 levels of permissions are to be set
+                _.each(children, function (o) {
+                    var chId = [id[0]];
+                    chId.push(op);
+                    chId.push(o);
+                    chId = chId.join('-');
+                    var $chBox = $('#' + chId);
+                    if (val && !$chBox.is(':checked')) {
+                        $chBox.click();
+                    } else if (!val && $chBox.is(':checked')) {
+                        $chBox.click();
+                    }
+                });
+            }
+            if (!val) {
+                var parent = row.get('parent');
+
+                if (parent) {
+                    var pId = [id[0]];
+                    pId.push(op);
+                    pId.push(parent);
+                    pId = pId.join('-');
+                    $('#' + pId)[0].checked = false;
+                }
+            }
+            updateFormData();
+        });
+        $(iePermGrid.getGridSkeleton().AddButton).click(function() {
+//            if(iePermGrid.getSelectedRows().length >0) {
+//                iePermGrid.getSelectedRows().forEach(function (row) {
+//                    if (!rolesGrid.getRows().findWhere({username: row.get('username')})) {
+//                        var addedRow = row.toJSON();
+//                        addedRow.added_row = true;
+//                        rolesGrid.getRows().add(addedRow);
+//                    }
+//                });
+//            }
+//            rolesGrid.getGridView().render();
+//            iePermGrid.getSelectedRows().reset({});
+            updateFormData();
+        });
+        updateFormData();
+    };
+
+});
+</script>
+
+{{ THIS.view('core/backbonegrid').set('grid', ieConfig.getIeConfig(m)) | raw }}
+

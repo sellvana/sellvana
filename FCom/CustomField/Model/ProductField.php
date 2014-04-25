@@ -4,6 +4,8 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_product_custom';
+    protected static $_importExportProfile = array( 'skip' => array(),
+     'related' => array( 'product_id' => 'FCom_Catalog_Model_Product.id', ),);
 
     public function productFields($p, $r=array())
     {

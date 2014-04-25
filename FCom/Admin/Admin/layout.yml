@@ -44,6 +44,7 @@ base:
             - [ addNav, system/roles, { label: Roles & Permissions, href: /roles  } ]
             - [ addNav, system/templates, { label: Templates, href: /templates  } ]
             - [ addNav, system/backups, { label: Backups, href: /backups  } ]
+            - [ addNav, system/importexport, { label: Import/Export, href: /importexport  } ]
             - [ addNav, system/settings, { label: Settings, href: /settings, class: system-settings } ]
 
     - view: admin/header
