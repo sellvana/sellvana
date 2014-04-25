@@ -25,19 +25,19 @@ class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abst
             array('type'=>'btn_group', 'buttons' => array( array('name'=>'edit'), array('name'=>'delete' ) ) )
         );
         $config['actions'] = array(
-            'new'    => array('caption' => 'Add New Order Status', 'modal' => true),
             'delete' => true
         );
         $config['filters'] = array(
             array('field' => 'code', 'type' => 'text'),
         );
+        $config['new_button'] = '#add_new_order_status';
         return $config;
     }
 
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
-        $this->view('admin/grid')->set(array( 'actions' => array( 'new' => '')));
+        $this->view('admin/grid')->set(array( 'actions' => array( 'new' => '<button type="button" id="add_new_order_status" class="btn grid-new btn-primary _modal">'.BLocale::_('Add New Order Status').'</button>')));
     }
 
     /**
