@@ -6,12 +6,6 @@
      {{ forms.accordion_panel_start({label:'Basic Payment Settings'|_, id:'settings-FCom_PaymentBasic-group0', in:1}) }}
         {{ forms.input(fieldData|merge({field:'label', label:'Label'|_, value:c.get('modules/FCom_PaymentBasic/label')})) }}
         {{ forms.input(fieldData|merge({field:'sort_order', label:'Sort Order'|_, value:c.get('modules/FCom_PaymentBasic/sort_order')})) }}
-        <div class="form-group">
-            <label class="col-md-2 control-label">{{ 'Custom Order Status On Payment'|_ }}</label>
-            <div class="col-md-5">
-                <input type="hidden" name="config[modules][FCom_PaymentBasic][order_status_authorized]" value="0"/>
-                <input class="switch-cbx" name="config[modules][FCom_PaymentBasic][order_status_authorized]" {% if c.get("modules/FCom_PaymentBasic/order_status_authorized") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
-            </div>
-        </div>
+        {{ forms.boolean(fieldData|merge({field:'order_status_authorized', label:'Custom Order Status On Payment'|_, value: c.get("modules/FCom_PaymentBasic/order_status_authorized")})) }}
      {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

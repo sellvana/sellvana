@@ -7,13 +7,7 @@
 {% set fieldData = { validator: validator } %}
 <fieldset class="form-horizontal">
     <div class="f-section">
-    <div class="form-group">
-        <label class="col-md-2 control-label">{{ "Page Enabled"|_ }}</label>
-        <div class="col-md-5">
-            <input type="hidden" name="model[page_enabled]" value="0" />
-            <input class="switch-cbx" type="checkbox" name="model[page_enabled]" value="1" {% if validator.fieldValue('page_enabled') %}checked="checked"{% endif %} />
-        </div>
-    </div>
+    {{ forms.boolean(fieldData|merge({field:'page_enabled', label:'Page Enabled'|_})) }}
     {{ forms.input(fieldData|merge({field:'page_url', label:'Page URL Path'|_})) }}
     {{ forms.input(fieldData|merge({field:'page_title', label:'Window Title'|_})) }}
     {{ forms.textarea(fieldData|merge({field:'layout_update', label:'Page Layout Update'|_,  input_class: "ckeditor"})) }}

@@ -1,23 +1,9 @@
 {% set c = THIS.get('model') %}
-
+{% set fieldData = { model: c, id_prefix:'FCom_ProductReviews', name_prefix:'config[modules][FCom_ProductReviews]' } %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 <h2>{{ "Product Reviews Settings"|_}}</h2>
-
-<div class="accordion accordion-blue panel-group" id="settings-FCom_ProductReviews">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a href="#" class="accordion-toggle">{{ 'General Settings'|_ }}</a>
-        </div>
-        <div class="panel-collapse accordion-body in" id="settings-FCom_ProductReviews-group0">
-            <div class="panel-body">
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="model-need_approve">{{ 'Reviews need approve'|_ }}</label>
-                    <div class="col-md-5">
-                        <input type="hidden" name="config[modules][FCom_ProductReviews][need_approve]" value="0" />
-                        <input type="checkbox" id="model-need_approve" class="switch-cbx" value="1"
-                               name="config[modules][FCom_ProductReviews][need_approve]" {{ c.get('modules/FCom_ProductReviews/need_approve') == 1 ? 'checked="checked"' : '' }}  />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+{{ forms.accordion_start({id:'settings-FCom_ProductReviews'}) }}
+     {{ forms.accordion_panel_start({label:'General Settings'|_, id:'settings-FCom_ProductReviews-group0', in:1}) }}
+        {{ forms.boolean(fieldData|merge({field:'need_approve', label:'Custom Order Status On Payment'|_, value: c.get("modules/FCom_ProductReviews/need_approve")})) }}
+     {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}
