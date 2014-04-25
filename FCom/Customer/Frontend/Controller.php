@@ -152,6 +152,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     public function action_logout()
     {
         FCom_Customer_Model_Customer::i()->logout();
+        BResponse::i()->cookie('remember_me', 0);
         BResponse::i()->redirect(BApp::baseUrl());
     }
 

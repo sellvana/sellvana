@@ -16,7 +16,7 @@
 {% import THIS.view('admin/form-elements').twigName() as forms %}
 <h2>{{ "Authorize.net Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_AuthorizeNet'}) }}
-     {{ forms.accordion_panel_start({label:'Authorize.net API'|_, id:'settings-FCom_AuthorizeNet-group0', in:1}) }}
+    {{ forms.accordion_panel_start({label:'Authorize.net API'|_, id:'settings-FCom_AuthorizeNet-group0', in:1}) }}
         {{ forms.boolean(fieldData|merge({field:'active', label:'Enabled'|_, value: c.get(baseAimConfigPath ~ "/active")})) }}
         {{ forms.input(fieldData|merge({field:'sort_order', label:'Payment Method Order'|_, value: c.get(baseAimConfigPath ~ '/sort_order')})) }}
         {{ forms.input(fieldData|merge({field:'title', label:'Title'|_, value: c.get(baseAimConfigPath ~ '/title')})) }}
