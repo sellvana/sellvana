@@ -5,7 +5,7 @@ modules:
         require: { module: { FCom_Core: 0.1.0 } }
         description: "FreshBooks&reg; payment method and invoice management API integration"
         observe:
-            - [ FCom_Sales_Model_Order::invoice, FCom_FreshBooks.createInvoiceFromOrder ]
+            - [ "FCom_Sales_Model_Order::invoice", FCom_FreshBooks.createInvoiceFromOrder ]
 
         areas:
             FCom_Admin:

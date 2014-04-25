@@ -29,29 +29,33 @@ class FCom_MarketClient_Admin extends BClass
             array('name' => 'market_version', 'label' => 'Available', 'width' => 80, 'overflow' => true),
         ), 'arr.before.name==version');
 
-        $marketModulesData = FCom_MarketClient_RemoteApi::i()->getModulesVersions(true);
-        $preferData = BConfig::i()->get('modules/FCom_MarketClient/prefer');
+        try {
+            $marketModulesData = FCom_MarketClient_RemoteApi::i()->getModulesVersions(true);
+            $preferData = BConfig::i()->get('modules/FCom_MarketClient/prefer');
 
-        foreach ($grid['config']['data'] as &$mod) {
-            if (empty($marketModulesData[$mod['name']])) {
-                continue;
+            foreach ($grid['config']['data'] as &$mod) {
+                if (empty($marketModulesData[$mod['name']])) {
+                    continue;
+                }
+                $rem = $marketModulesData[$mod['name']];
+                $channels = $rem['channels'];
+                #$channels = $rem->getData('channels');
+                if (!empty($channels[$mod['channel']])) {
+                    $channel = $mod['channel'];
+                    $version = $channels[$mod['channel']]['version_uploaded'];
+                } else {
+                    #$channel = $rem->channel;
+                    #$version = $rem->version;
+                    $channel = $rem['channel'];
+                    $version = $rem['version'];
+                }
+                if ($version) {
+                    $mod['market_version'] = $version . ($channel !== $mod['channel'] ? (' @ ' . $channel) : '');
+                }
+                $mod['prefer_channel'] = !empty($prefer[$mod['name']]['channel']) ? $prefer[$mod['name']]['channel'] : null;
             }
-            $rem = $marketModulesData[$mod['name']];
-            $channels = $rem['channels'];
-            #$channels = $rem->getData('channels');
-            if (!empty($channels[$mod['channel']])) {
-                $channel = $mod['channel'];
-                $version = $channels[$mod['channel']]['version_uploaded'];
-            } else {
-                #$channel = $rem->channel;
-                #$version = $rem->version;
-                $channel = $rem['channel'];
-                $version = $rem['version'];
-            }
-            if ($version) {
-                $mod['market_version'] = $version . ($channel !== $mod['channel'] ? (' @ ' . $channel) : '');
-            }
-            $mod['prefer_channel'] = !empty($prefer[$mod['name']]['channel']) ? $prefer[$mod['name']]['channel'] : null;
+        } catch (Exception $e) {
+            BDebug::debug('ERROR: Could not retrieve Market updates');
         }
 
         $args['view']->set('grid', $grid);

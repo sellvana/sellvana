@@ -17,15 +17,15 @@ modules:
 
                     - [ /cms/pages, FCom_Cms_Admin_Controller_Pages.index ]
                     - [ /cms/pages/.action, FCom_Cms_Admin_Controller_Pages ]
-                    - [ /cms/pages/history/:id/grid_data, FCom_Cms_Admin_Controller_Pages.history_grid_data ]
+                    - [ "/cms/pages/history/:id/grid_data", FCom_Cms_Admin_Controller_Pages.history_grid_data ]
 
                     - [ /cms/blocks, FCom_Cms_Admin_Controller_Blocks.index ]
                     - [ /cms/blocks/.action, FCom_Cms_Admin_Controller_Blocks ]
-                    - [ /cms/blocks/history/:id/grid_data, FCom_Cms_Admin_Controller_Blocks.history_grid_data ]
+                    - [ "/cms/blocks/history/:id/grid_data", FCom_Cms_Admin_Controller_Blocks.history_grid_data ]
 
                     - [ /cms/forms, FCom_Cms_Admin_Controller_Forms.index ]
                     - [ /cms/forms/.action, FCom_Cms_Admin_Controller_Forms ]
                 security:
                     request_fields_whitelist:
                         /cms/blocks/form:
-                            POST/model/content: *
+                            POST/model/content: "*"

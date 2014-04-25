@@ -1,60 +1,60 @@
 base:
-  - view: admin/nav
-    do:
-      - [ addNav, catalog, { label: Catalog, pos: 200, icon_class: icon-barcode } ]
-      - [ addNav, catalog/categories, { label: Navigation, href: /catalog/categories } ]
-      - [ addNav, catalog/products, { label: Products, href: /catalog/products } ]
-      - [ addNav, catalog/products_import, { label: Products Import, href: /catalog/products/import/index } ]
-  - view: admin/header
-    do:
-      - [ addQuickSearch, catalog/products, { label: Products, href: /catalog/products } ]
-      - [ addShortcut, catalog/products, { label: New Product, href: /catalog/products/form/ } ]
+    - view: admin/nav
+        do:
+            - [ addNav, catalog, { label: Catalog, pos: 200, icon_class: icon-barcode } ]
+            - [ addNav, catalog/categories, { label: Navigation, href: /catalog/categories } ]
+            - [ addNav, catalog/products, { label: Products, href: /catalog/products } ]
+            - [ addNav, catalog/products_import, { label: Products Import, href: /catalog/products/import/index } ]
+    - view: admin/header
+        do:
+            - [ addQuickSearch, catalog/products, { label: Products, href: /catalog/products } ]
+            - [ addShortcut, catalog/products, { label: New Product, href: /catalog/products/form/ } ]
 
 catalog_product_form_tabs:
-  - view: admin/form
-    set: { tab_view_prefix: catalog/products-form/ }
-    do:
-      - [ addTab, main, { label: General Info, pos: 10 } ]
-      - [ addTab, prices, { label: "Prices", pos: 20 } ]
-      - [ addTab, linked-products, { label: Merchandising, pos: 30, async: true } ]
-      - [ addTab, categories, { label: Categories, pos: 40, async: true } ]
-      - [ addTab, images, { label: Images, pos: 50, async: true } ]
-      - [ addTab, attachments, { label: Attachments, pos: 60, async: true } ]
+    - view: admin/form
+        set: { tab_view_prefix: catalog/products-form/ }
+        do:
+            - [ addTab, main, { label: General Info, pos: 10 } ]
+            - [ addTab, prices, { label: "Prices", pos: 20 } ]
+            - [ addTab, linked-products, { label: Merchandising, pos: 30, async: true } ]
+            - [ addTab, categories, { label: Categories, pos: 40, async: true } ]
+            - [ addTab, images, { label: Images, pos: 50, async: true } ]
+            - [ addTab, attachments, { label: Attachments, pos: 60, async: true } ]
 
 
 /catalog/products/form:
-  - { include: jstree }
-  - { include: catalog_product_form_tabs }
+    - { include: jstree }
+    - { include: catalog_product_form_tabs }
 
 /catalog/products/import:
-  - { include: base }
-  - { include: form }
-  - { hook: main, views: catalog/products/import }
-  - { view: admin/nav, do: [[ setNav, catalog/products_import ]] }
+    - { include: base }
+    - { include: form }
+    - { hook: main, views: catalog/products/import }
+    - { view: admin/nav, do: [[ setNav, catalog/products_import ]] }
 
 
 /catalog/categories:
-  - { include: base }
-  - { include: form }
-  - { include: jstree }
-  - { hook: main, views: catalog/categories }
-  - { view: admin/nav, do: [[ setNav, catalog/categories ]] }
+    - { include: base }
+    - { include: form }
+    - { include: jstree }
+    - { hook: main, views: catalog/categories }
+    - { view: admin/nav, do: [[ setNav, catalog/categories ]] }
 
 /catalog/categories/tree_form:
-  - { root, catalog/categories-tree-form }
-  - view: catalog/categories-tree-form
-    set: { tab_view_prefix: catalog/categories-tree-form/ }
-    do:
-      - [ addTab, main, { label: General, pos: 10 } ]
-      - [ addTab, content, { label: Page Content, pos: 20 } ]
-      - [ addTab, products, { label: Products, pos: 30  } ]
-      - [ addTab, advanced, { label: Advanced, pos: 40 } ]
+    - { root, catalog/categories-tree-form }
+    - view: catalog/categories-tree-form
+        set: { tab_view_prefix: catalog/categories-tree-form/ }
+        do:
+            - [ addTab, main, { label: General, pos: 10 } ]
+            - [ addTab, content, { label: Page Content, pos: 20 } ]
+            - [ addTab, products, { label: Products, pos: 30  } ]
+            - [ addTab, advanced, { label: Advanced, pos: 40 } ]
 
 /settings:
-  - view: settings
-    do:
-      - [ addTabGroup, catalog, { label: Catalog, pos: 20 } ]
-      - [ addTab, FCom_Catalog, { label: Catalog, group: catalog, async: true } ]
+    - view: settings
+        do:
+            - [ addTabGroup, catalog, { label: Catalog, pos: 20 } ]
+            - [ addTab, FCom_Catalog, { label: Catalog, group: catalog, async: true } ]
 
 /header_search:
-  - { hook: main, views: 'header-search/FCom_Products' }
+    - { hook: main, views: 'header-search/FCom_Products' }

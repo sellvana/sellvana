@@ -65,7 +65,7 @@
                         if (data.status == 'success') {
                             $.bootstrapGrowl("Saved", { type: 'success', align: 'center', width: 'auto' });
                             var nodeSelected = $.jstree._focused().get_selected();
-                            $.jstree._focused().set_text(nodeSelected, $('#main-node_name').val());
+                            $.jstree._focused().set_text(nodeSelected, $('#model-node_name').val());
                             $('.page-header .f-page-title').html(data.path.replace(/\|/g, ' '));
                         }
                         console.log(self);

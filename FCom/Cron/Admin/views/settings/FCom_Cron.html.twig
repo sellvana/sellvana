@@ -1,50 +1,22 @@
 {% set c = THIS.get('model') %}
 {% set mode = c.get("mode_by_ip/FCom_Cron")|split("\n")|join('|') %}
+{% set fieldData = { model: c, id_prefix:'FCom_Cron', name_prefix:'config[modules][FCom_Cron]' } %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 <h2>{{ "Crontab Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-FCom_Cron'}) }}
+     {{ forms.accordion_panel_start({label:'Area Settings'|_, id:'settings-FCom_Cron-group0', in:1}) }}
+        <div class="form-group" >
+            <label class="col-md-2 control-label">{{ "IP: Mode"|_ }}</label>
+            <div class="col-md-8  group-ip-mode"></div>
+        </div>
+    {{ forms.accordion_panel_end }}
+    {{ forms.accordion_panel_start({label:'Cron Dispatch'|_, id:'settings-FCom_Cron-group1'}) }}
+        {{ forms.input(fieldData|merge({field:'leeway_mins', label:'Leeway Minutes'|_, value: c.get('modules/FCom_Cron/leeway_mins')})) }}
+        {{ forms.input(fieldData|merge({field:'timeout_mins', label:'Timeout Minutes'|_, value: c.get('modules/FCom_Cron/timeout_mins')})) }}
+        {{ forms.input(fieldData|merge({field:'wait_sec', label:'Wait Seconds'|_, value: c.get('modules/FCom_Cron/wait_sec')})) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}
 
-<div class="accordion accordion-blue panel-group" id="settings-FCom_Cron">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a class="accordion-toggle" href="#">{{ "Area Settings"|_ }}</a>
-        </div>
-        <div class="panel-collapse accordion-body in" id="settings-FCom_Cron-group0">
-            <div class="panel-body">
-                <div class="form-group" >
-                    <label class="col-md-2 control-label">{{ "IP: Mode"|_ }}</label>
-                    <div class="col-md-8  group-ip-mode"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a class="accordion-toggle" href="#">{{ "Cron Dispatch"|_ }}</a>
-        </div>
-        <div class="panel-collapse accordion-body" id="settings-FCom_Cron-group1">
-            <div class="panel-body">
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ "Leeway Minutes"|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control"type="text" name="config[modules][FCom_Cron][leeway_mins]" value="{{ c.get('modules/FCom_Cron/leeway_mins') }}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ "Timeout Minutes"|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" type="text" name="config[modules][FCom_Cron][timeout_mins]" value="{{ c.get('modules/FCom_Cron/timeout_mins') }}" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ "Wait Seconds"|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" type="text" name="config[modules][FCom_Cron][wait_sec]" value="{{ c.get('modules/FCom_Cron/wait_sec') }}" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <script  type="text/javascript">
     require(['backbone', 'jquery', 'fcom.ipmode','select2'], function(Backbone, $, ipMode) {
         var mode = '{{ mode }}';

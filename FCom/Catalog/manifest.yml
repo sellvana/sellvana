@@ -8,7 +8,7 @@ modules:
         description: "Categories and products management, admin and frontend"
         auto_use: [ bootstrap, views, layout ]
         observe:
-          - [ FCom_Core_ImportExport::import:afterModel:FCom_Catalog_Model_Category, FCom_Catalog_Model_Category::onImportAfterModel ]
+            - [ "FCom_Core_ImportExport::import:afterModel:FCom_Catalog_Model_Category", "FCom_Catalog_Model_Category::onImportAfterModel" ]
 
         areas:
             FCom_Admin:
@@ -27,30 +27,30 @@ modules:
                 security:
                     request_fields_whitelist:
                         /catalog/categories/tree_form:
-                            POST/model/content: *
+                            POST/model/content: "*"
                         /catalog/products/form:
-                            POST/model/description: *
+                            POST/model/description: "*"
 
             FCom_Frontend:
                 routing:
                     - [ /*category, FCom_Catalog_Frontend_Controller_Search.category ]
                     - [ /catalog/search, FCom_Catalog_Frontend_Controller_Search.search ]
                     - [ /catalog/quickview, FCom_Catalog_Frontend_Controller.quickview ]
-                    - [ /:product, FCom_Catalog_Frontend_Controller.product ]
-                    - [ /*category/:product, FCom_Catalog_Frontend_Controller.product ]
+                    - [ "/:product", FCom_Catalog_Frontend_Controller.product ]
+                    - [ "/*category/:product", FCom_Catalog_Frontend_Controller.product ]
                     - [ /catalog/compare, FCom_Catalog_Frontend_Controller.compare ]
                     - [ /catalog/compare/add, FCom_Catalog_Frontend_Controller.compare_add ]
 
                 observe:
-                    - [ FCom_FrontendCP_Frontend_Controller::action_update:after, FCom_Catalog_Frontend_ControlPanel::onAfterUpdate ]
-                    - [ FCom_Core_View_BackboneGrid::getPageRowsData, FCom_Catalog_Admin_Controller_Products::processInitalData ]
+                    - [ "FCom_FrontendCP_Frontend_Controller::action_update:after", "FCom_Catalog_Frontend_ControlPanel::onAfterUpdate" ]
+                    - [ "FCom_Core_View_BackboneGrid::getPageRowsData", "FCom_Catalog_Admin_Controller_Products::processInitalData" ]
                 views:
                     - [ catalog/product/price, { view_class: FCom_Catalog_Frontend_View_Price } ]
 
             FCom_ApiServer:
                 routing:
                     - [ /v1/catalog/category, FCom_Catalog_ApiServer_V1_Category.index ]
-                    - [ /v1/catalog/category/:id, FCom_Catalog_ApiServer_V1_Category.index ]
+                    - [ "/v1/catalog/category/:id", FCom_Catalog_ApiServer_V1_Category.index ]
 
                     - [ /v1/catalog/product, FCom_Catalog_ApiServer_V1_Product.index ]
-                    - [ /v1/catalog/product/:id, FCom_Catalog_ApiServer_V1_Product.index ]
+                    - [ "/v1/catalog/product/:id", FCom_Catalog_ApiServer_V1_Product.index ]

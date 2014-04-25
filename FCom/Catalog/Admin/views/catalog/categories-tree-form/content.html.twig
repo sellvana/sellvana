@@ -1,6 +1,7 @@
 {% set m = THIS.get('model') %}
 {% set views = APP.instance('FCom_Catalog_Admin').getAvailableViews() %}
-
+{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% set fieldData = { model:m } %}
 <div class="form-group">
     <label class="col-md-2 control-label" for="main-show_order">{{ 'Show Order'|_ }}</label>
     <div class="col-md-2">
@@ -12,53 +13,28 @@
         </ol>
     </div>
 </div>
+    {{ forms.boolean(fieldData|merge({field:'show_content', label:'Show Custom Content'|_})) }}
 
-<div class="form-group">
-    <label class="col-md-2 control-label" for="model-show_content">{{ 'Show Custom Content'|_ }}</label>
-    <div class="col-md-5">
-        <input type="hidden" name="model[show_content]" value="0" />
-        <input id="model-show_content" class="switch-cbx" name="model[show_content]" {% if m.get('show_content') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
+
+    <div class="form-group">
+        {{ forms.label(fieldData|merge({field:'show_view', label:'Show Block / Page'|_})) }}
+        <div class="col-md-3">
+            <select style="float: left; width: auto" class="form-control" name="model[show_view]" value="{{ c.get('modules/FCom_ShippingUps/services/s'~sId) }}">
+                <option value="0">{{ "no"|_ }}</option>
+                <option value="1" {% if m.get('show_view') == 1  %}selected{% endif %}>{{ "YES"|_ }}</option>
+            </select>
+        </div>
+        <div class="col-md-5">
+            <select name="model[view_name]" class="form-control select2" id="category-view-name-select2">
+                {{ UTIL.optionsHtml(views, m.get('view_name')) | raw }}
+            </select>
+        </div>
     </div>
-</div>
-<div class="form-group">
-    <label class="col-md-2 control-label" for="model-show_view">{{ 'Show Block / Page'|_ }}</label>
-    <div class="col-md-2">
-        <input type="hidden" name="model[show_view]" value="0" />
-        <input id="model-show_view" class="switch-cbx" name="model[show_view]" {% if m.get('show_view') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
-    </div>
-    <div class="col-md-5">
-        <select name="model[view_name]" class="form-control select2" id="category-view-name-select2">
-            {{ UTIL.optionsHtml(views, m.get('view_name')) | raw }}
-        </select>
-    </div>
-</div>
-<div class="form-group">
-    <label class="col-md-2 control-label" for="model-show_sub_cat">{{ 'Show Subcategories'|_ }}</label>
-    <div class="col-md-5">
-        <input type="hidden" name="model[show_sub_cat]" value="0" />
-        <input id="model-show_sub_cat" class="switch-cbx" name="model[show_sub_cat]" {% if m.get('show_sub_cat') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
-    </div>
-</div>
-<div class="form-group">
-    <label class="col-md-2 control-label" for="model-show_products">{{ 'Show Products'|_ }}</label>
-    <div class="col-md-5">
-        <input type="hidden" name="model[show_products]" value="0" />
-        <input id="model-show_products" class="switch-cbx" name="model[show_products]" {% if m.get('show_products') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
-    </div>
-</div>
-<div class="form-group">
-    <label class="col-md-2 control-label" for="model-show_sidebar">{{ 'Show Sidebar'|_ }}</label>
-    <div class="col-md-5">
-        <input type="hidden" name="model[show_sidebar]" value="0" />
-        <input id="model-show_products" class="switch-cbx" name="model[show_sidebar]" {% if m.get('show_sidebar') == 1 %}checked="checked"{% endif %} value='1' type='checkbox' />
-    </div>
-</div>
-<div class="form-group">
-    <label class="col-md-2 control-label" for="main-content">{{ 'Custom Content'|_ }}</label>
-    <div class="col-md-10">
-        <textarea id="main-content" class="form-control ckeditor" name="model[content]" rows="5">{{ m.get('content') }}</textarea>
-    </div>
-</div>
+    {{ forms.boolean(fieldData|merge({field:'show_sub_cat', label:'Show Subcategories'|_})) }}
+    {{ forms.boolean(fieldData|merge({field:'show_products', label:'Show Products'|_})) }}
+    {{ forms.boolean(fieldData|merge({field:'show_sidebar', label:'Show Sidebar'|_})) }}
+
+    {{ forms.textarea({label: 'Custom Content'|_, name: "model[content]", input_div_class: "col-md-10", value:  m.get('content'), id: "model-content", input_class: "ckeditor" }) }}
 <script>
 require(['jquery', 'jquery-ui', 'select2'], function($) {
     $('#category-view-name-select2').select2({

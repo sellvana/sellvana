@@ -1,9 +1,9 @@
 common_js_libs:
     - view: head
         do:
-            - [ js, @FCom_Core/js/lib/html5shiv.min.js, { if: lt IE 9 } ]
-            - [ js, @FCom_Core/js/lib/es5-shim.min.js, { if: lt IE 9 } ]
-            - [ js, @FCom_Core/js/lib/json2.js, { if: lt IE 8 } ]
-            - [ js, @FCom_Core/js/lib/require.js ]
+            - [ js, "@FCom_Core/js/lib/html5shiv.min.js", { if: lt IE 9 } ]
+            - [ js, "@FCom_Core/js/lib/es5-shim.min.js", { if: lt IE 9 } ]
+            - [ js, "@FCom_Core/js/lib/json2.js", { if: lt IE 8 } ]
+            - [ js, "@FCom_Core/js/lib/require.js" ]
 
-            - [ requireJs, jquery, [ //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery, @FCom_Core/js/lib/jquery.min ], { exports: [ $, jQuery ] } ]
+            - [ requireJs, jquery, [ //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery, "@FCom_Core/js/lib/jquery.min" ], { exports: [ $, jQuery ] } ]

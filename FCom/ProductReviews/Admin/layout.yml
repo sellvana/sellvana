@@ -4,8 +4,8 @@ base:
             - [ addNav, catalog/prodreviews, { label: Product Reviews, href: /prodreviews } ]
     - view: head
         do:
-            - [ requireJs, jquery.rateit, @FCom_LibJsCommon/js/jquery.rateit.min, { deps: [ jquery ] } ]
-            - [ css, @FCom_LibJsCommon/js/css/jquery.rateit.css ]
+            - [ requireJs, jquery.rateit, "@FCom_LibJsCommon/js/jquery.rateit.min", { deps: [ jquery ] } ]
+            - [ css, "@FCom_LibJsCommon/js/css/jquery.rateit.css" ]
             - [ requireRun, jquery.rateit ]
 
 catalog_product_form_tabs:
@@ -29,6 +29,6 @@ catalog_product_form_tabs:
             - [ addTab, main, { label: Product Review, pos: 10 } ]
 
 /settings:
-  - view: settings
-    do:
-      - [ addTab, FCom_ProductReviews, { label: Product Reviews, group: catalog, async: true } ]
+    - view: settings
+        do:
+            - [ addTab, FCom_ProductReviews, { label: Product Reviews, group: catalog, async: true } ]

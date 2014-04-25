@@ -10,10 +10,10 @@ modules:
             FCom_Frontend:
                 auto_use: [ views, bootstrap ]
                 observe:
-                    - [ FCom_Catalog_Model_Product::find_many:after, FCom_MultiLanguage_Main.productCollectionLoadLocale ]
-                    - [ FCom_Catalog_Model_Product::find_one:after, FCom_MultiLanguage_Main.productLoadLocale ]
-                    - [ FCom_Catalog_Model_Category::find_many:after, FCom_MultiLanguage_Main.categoryCollectionLoadLocale ]
-                    - [ FCom_Catalog_Model_Category::find_one:after, FCom_MultiLanguage_Main.categoryLoadLocale ]
+                    - [ "FCom_Catalog_Model_Product::find_many:after", FCom_MultiLanguage_Main.productCollectionLoadLocale ]
+                    - [ "FCom_Catalog_Model_Product::find_one:after", FCom_MultiLanguage_Main.productLoadLocale ]
+                    - [ "FCom_Catalog_Model_Category::find_many:after", FCom_MultiLanguage_Main.categoryCollectionLoadLocale ]
+                    - [ "FCom_Catalog_Model_Category::find_one:after", FCom_MultiLanguage_Main.categoryLoadLocale ]
 
             FCom_Admin:
                 auto_use: [ views, layout ]
