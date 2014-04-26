@@ -156,4 +156,16 @@ class FCom_PushServer_Migrate extends BClass
             ),
         ));
     }
+
+    // Support for IPv6:
+    // 39 nominal and 6 extra for embedded ipv4 as ipv6.
+    public function upgrade__0_1_3__0_1_4()
+    {
+        $tClient = FCom_PushServer_Model_Client::table();
+        BDb::ddlTableDef($tClient, array(
+            'COLUMNS' => array(
+                'remote_ip' => 'varchar(45)',
+            )
+        ));
+    }
 }
