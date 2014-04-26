@@ -25,6 +25,10 @@ class FCom_Core_Model_Module extends BDbModule
         ),
     );
 
+    protected static $_importExportProfile = array(
+        'unique_key' => array( 'module_name', ),
+    );
+
     static public function getModulesData()
     {
         $config = BConfig::i()->get('module_run_levels');

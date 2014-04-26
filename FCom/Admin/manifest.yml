@@ -40,6 +40,8 @@ modules:
 
                     - [ "/backups/?.action", FCom_Admin_Controller_Backups ]
 
+                    - [ /importexport/?.action, FCom_Admin_Controller_ImportExport ]
+
                     - [ /users, FCom_Admin_Controller_Users.index ]
                     - [ /users/.action, FCom_Admin_Controller_Users ]
 

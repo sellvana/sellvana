@@ -4,6 +4,8 @@ class FCom_Core_Model_Seq extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_core_seq';
     static protected $_origClass = __CLASS__;
+    protected static $_importExportProfile = array(
+        'unique_key' => array( 'entity_type', 'current_seq_id', ), );
 
     static public function getSeqIdFormat($entityType)
     {

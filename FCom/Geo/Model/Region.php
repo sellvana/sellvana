@@ -7,7 +7,9 @@ class FCom_Geo_Model_Region extends FCom_Core_Model_Abstract
 
     protected static $_optionsCache = array();
     protected static $_allOptionsLoaded;
-
+    protected static $_importExportProfile = array (
+      'unique_key' => array ( 'country', 'code', ),
+    );
     public static function options($country)
     {
         if (empty(static::$_optionsCache[$country])) {
