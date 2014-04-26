@@ -164,7 +164,7 @@ class FCom_PushServer_Migrate extends BClass
         $tClient = FCom_PushServer_Model_Client::table();
         BDb::ddlTableDef($tClient, array(
             'COLUMNS' => array(
-                'remote_ip' => 'remote_ip varchar(45)',
+                'remote_ip' => 'varchar(45)',
             )
         ));
     }
