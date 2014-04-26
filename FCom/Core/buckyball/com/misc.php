@@ -1465,6 +1465,40 @@ class BUtil extends BClass
     }
 
     /**
+    * Output locale formatted date/time HTML
+    *
+    * @param string|int $time
+    * @param string $showTime
+    * @param mixed $format date() format or
+    *                   SHORT:'m/d/Y'|'m/d/Y h:ia',
+    *                   MEDIUM:'M jS, Y'|'M jS, Y \at h:ia',
+    *                   LONG:'l jS \of F Y'|'l jS \of F Y \at h:i:s A'
+    * @param mixed $tz
+    */
+    public static function timeHtml($time, $showTime = false, $format = null, $tz = null)
+    {
+        if (!is_numeric($time)) {
+            $time = strtotime($time);
+        }
+        $timeStr = date($showTime ? 'Y-m-d H:i:s' : 'Y-m-d', $time);
+        if (is_null($format)) {
+            $format = BSession::i()->get($showTime ? '_timeformat' : '_dateformat');
+            if (!$format) {
+                $format = $showTime ? 'm/d/Y H:i' : 'm/d/Y';
+            }
+        }
+        if (!is_null($tz)) {
+            $oldTz = date_default_timezone_get();
+            date_default_timezone_set($tz);
+        }
+        $formattedTime = date($format, $time);
+        if (!is_null($tz)) {
+            date_default_timezone_set($oldTz);
+        }
+        return '<time datetime="' . $timeStr . '">' . $formattedTime . '</time>';
+    }
+
+    /**
      * Simplify string to allowed characters only
      *
      * @param string $str input string
@@ -3284,11 +3318,6 @@ class BYAML extends BCLass
 {
     static protected $_peclYaml = null;
     static protected $_peclSyck = null;
-
-    static public function bootstrap()
-    {
-
-    }
 
     static public function load($filename, $cache=true)
     {

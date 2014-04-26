@@ -30,15 +30,17 @@ modules:
                     - [ /password/reset, FCom_Admin_Controller_Auth.password_reset ]
                     - [ /logout, FCom_Admin_Controller_Auth.logout ]
 
-                    - [ /dashboard/?.action, FCom_Admin_Controller_Dashboard ]
+                    - [ "/dashboard/?.action", FCom_Admin_Controller_Dashboard ]
 
                     - [ /my_account, FCom_Admin_Controller.my_account ]
                     - [ /reports, FCom_Admin_Controller.reports ]
                     - [ /my_account/personalize, FCom_Admin_Controller.personalize ]
 
-                    - [ /templates/?.action, FCom_Admin_Controller_Templates ]
+                    - [ "/templates/?.action", FCom_Admin_Controller_Templates ]
 
-                    - [ /backups/?.action, FCom_Admin_Controller_Backups ]
+                    - [ "/backups/?.action", FCom_Admin_Controller_Backups ]
+
+                    - [ /importexport/?.action, FCom_Admin_Controller_ImportExport ]
 
                     - [ /users, FCom_Admin_Controller_Users.index ]
                     - [ /users/.action, FCom_Admin_Controller_Users ]
@@ -47,11 +49,11 @@ modules:
                     - [ /roles, FCom_Admin_Controller_Roles.index ]
                     - [ /roles/.action, FCom_Admin_Controller_Roles ]
 
-                    - [ /media/grid/:do, FCom_Admin_Controller_MediaLibrary.grid_data ]
+                    - [ "/media/grid/:do", FCom_Admin_Controller_MediaLibrary.grid_data ]
 
                     - [ /settings, FCom_Admin_Controller_Settings.index ]
 
-                    - [ /modules/?.action, FCom_Admin_Controller_Modules ]
+                    - [ "/modules/?.action" , FCom_Admin_Controller_Modules ]
 
                     - [ /settings/dismiss, FCom_Admin_Controller_Settings.dismiss]
 
@@ -60,13 +62,13 @@ modules:
                     - [ /generate_sitemap, FCom_Admin_Controller.generate_sitemap ]
 
                 observe:
-                    - [ FCom_Admin_Controller_Settings::action_index__POST, FCom_Admin_Admin.onSettingsPost ]
-                    - [ FCom_Admin_View_Dashboard::getWidgets, FCom_Admin_Admin.onGetDashboardWidgets ]
+                    - [ "FCom_Admin_Controller_Settings::action_index__POST", FCom_Admin_Admin.onSettingsPost ]
+                    - [ "FCom_Admin_View_Dashboard::getWidgets", FCom_Admin_Admin.onGetDashboardWidgets ]
                 security:
                     request_fields_whitelist:
                         /settings:
-                            POST/config/modules/FCom_Admin/add_js_code: *
-                            POST/config/modules/FCom_Frontend/add_js_code: *
+                            POST/config/modules/FCom_Admin/add_js_code: "*"
+                            POST/config/modules/FCom_Frontend/add_js_code: "*"
 
         provides:
             themes:

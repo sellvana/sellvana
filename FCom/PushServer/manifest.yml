@@ -10,7 +10,7 @@ modules:
             FCom_Admin:
                 auto_use: [ layout ]
                 observe:
-                    - [ FCom_Admin_Model_User::logout, FCom_PushServer_Main::onAdminUserLogout ]
+                    - [ "FCom_Admin_Model_User::logout", "FCom_PushServer_Main::onAdminUserLogout" ]
 
             FCom_PushServer:
                 auto_use: [ bootstrap ]

@@ -13,6 +13,7 @@ class FCom_Admin_Main extends BClass
             'system/modules' => 'Manage Modules',
             'system/templates' => 'Edit System Templates',
             'system/backups' => 'System Backups',
+            'system/importexport' => 'Import Export',
         ));
     }
 

@@ -1,21 +1,18 @@
 {% set c = THIS.get('model') %}
-
+{% set fieldData = { model: c, id_prefix:'FCom_Test', name_prefix:'config[modules][FCom_Test]' } %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 <h2>{{ "Unit Tests Settings"|_}}</h2>
-
-<div class="accordion accordion-blue panel-group" id="settings-FCom_Test">
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			<a href="#" class="accordion-toggle">{{ 'Area Settings'|_ }}</a>
-		</div>
-		<div class="panel-collapse accordion-body" id="settings-FCom_Test-group0">
-			<div class="panel-body">
-				<div class="form-group">
-					<label class="col-md-2 control-label">{{ 'IP: Mode'|_ }}</label>
-					<div class="col-md-5">
-						<textarea class="form-control" name="config[modules][FCom_Test][mode_by_ip]" rows="5">{{ c.get('modules/FCom_Test/mode_by_ip') }}</textarea>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
+{{ forms.accordion_start({id:'settings-FCom_Test'}) }}
+    {{ forms.accordion_panel_start({label:'Area Settings'|_, id:'settings-FCom_Test-group0', in:1}) }}
+        <div class="form-group" >
+            <label class="col-md-2 control-label">{{ "IP: Mode"|_ }}</label>
+            <div class="col-md-8  group-ip-mode"></div>
+        </div>
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}
+<script  type="text/javascript">
+    require(['backbone', 'jquery', 'fcom.ipmode','select2'], function(Backbone, $, ipMode) {
+        var mode = {{ UTIL.toJson(c.get("mode_by_ip/FCom_Test")|split("\n")) | raw }};
+        ipMode.initMode({el: $('#settings-FCom_Test-group0').find('.group-ip-mode'), name: 'config[mode_by_ip][FCom_Test]', mode: mode});
+    })
+</script>

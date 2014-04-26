@@ -45,6 +45,17 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
         if (empty($args['data']['model']['permissions'])) {
             $args['data']['model']['permissions'] = array();
         }
+        if(!empty($args['data']['ie_perm_ids_add'])){
+            $iePerms = $args['data']['ie_perm_ids_add'];
+            foreach ( (array)$iePerms as $type => $permissions ) {
+                if(empty($permissions)){
+                    continue;
+                }
+                foreach ( explode(',', $permissions) as $p ) {
+                    $args['data']['permissions'][$p . '/' .$type] = 1;
+                }
+            }
+        }
     }
 
     public function formPostAfter($args)

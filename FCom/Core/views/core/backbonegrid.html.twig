@@ -263,7 +263,7 @@
                 var validation = validationRules(col.validation);
                 switch (col.editor) {
                 case 'checkbox':
-                    %><input type="checkbox" id="<%= strId %> name=<%= strName %>" class="<%= strClass %>" <%=validation  %>
+                    %><input type="checkbox" id="<%= strId %>" name="<%= strName %>" class="<%= strClass %>" <%=validation  %>
                             data-col="<%= col.name %>" <%= strDisabled %> /><%
 
                      break;

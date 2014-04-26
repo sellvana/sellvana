@@ -1,7 +1,7 @@
 base:
     - view: head
         do:
-            - [ requireJs, fcom.customfields, @FCom_CustomField/Admin/js/fcom.customfields ]
+            - [ requireJs, fcom.customfields, "@FCom_CustomField/Admin/js/fcom.customfields" ]
 
     - view: admin/nav
         do:
@@ -31,6 +31,6 @@ catalog_product_form_tabs:
     - { hook: main, views: customfields/fieldsets/form }
 
 /settings:
-  - view: settings
-    do:
-      - [ addTab, FCom_CustomField, { label: Custom Fields, group: catalog, async: true } ]
+    - view: settings
+        do:
+            - [ addTab, FCom_CustomField, { label: Custom Fields, group: catalog, async: true } ]

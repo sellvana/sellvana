@@ -73,6 +73,9 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         foreach ( $sorted as $s ) {
             /** @var FCom_Core_Model_Abstract $model */
             $model   = $s[ 'model' ];
+            if ( !isset( $s[ 'skip' ] ) ) {
+                $s[ 'skip' ] = array();
+            }
             if($model == 'FCom_Catalog_Model_Product'){
                 // disable custom fields to avoid them adding bunch of fields to export
                 FCom_CustomField_Main::i()->disable(true);

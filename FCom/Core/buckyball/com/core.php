@@ -1456,15 +1456,16 @@ class BEvents extends BClass
     }
 
     /**
-    * Declare observers in bootstrap function
-    *
-    * observe|watch|on|sub|subscribe ?
-    *
-    * @param string|array $eventName accepts multiple observers in form of non-associative array
-    * @param mixed $callback
-    * @param array|object $args
-    * @return BEvents
-    */
+     * Declare observers in bootstrap function
+     *
+     * observe|watch|on|sub|subscribe ?
+     *
+     * @param string|array $eventName accepts multiple observers in form of non-associative array
+     * @param mixed        $callback
+     * @param array|object $args
+     * @param null         $alias
+     * @return BEvents
+     */
     public function on($eventName, $callback = null, $args = array(), $alias = null)
     {
         if (is_array($eventName)) {
@@ -1491,8 +1492,9 @@ class BEvents extends BClass
      * Run callback on event only once, and remove automatically
      *
      * @param string|array $eventName accepts multiple observers in form of non-associative array
-     * @param mixed $callback
+     * @param mixed        $callback
      * @param array|object $args
+     * @param null         $alias
      * @return BEvents
      */
     public function once($eventName, $callback=null, $args=array(), $alias = null)
@@ -1515,12 +1517,12 @@ class BEvents extends BClass
     }
 
     /**
-    * Disable all observers for an event or a specific observer
-    *
-    * @param string $eventName
-    * @param callback $callback
-    * @return BEvents
-    */
+     * Disable all observers for an event or a specific observer
+     *
+     * @param string $eventName
+     * @param null   $alias
+     * @return BEvents
+     */
     public function off($eventName, $alias = null)
     {
         $eventName = strtolower($eventName);

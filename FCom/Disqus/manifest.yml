@@ -18,6 +18,6 @@ modules:
                 security:
                     request_fields_whitelist:
                         /settings:
-                            POST/config/modules/FCom_Disqus/comments_code: *
-                            POST/config/modules/FCom_Disqus/counts_code: *
+                            POST/config/modules/FCom_Disqus/comments_code: "*"
+                            POST/config/modules/FCom_Disqus/counts_code: "*"
 
