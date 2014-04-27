@@ -116,7 +116,7 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
         if (!parent::onBeforeSave()) return false;
         if (empty($this->create_at)) $this->create_at = BDb::now();
         $this->update_at = BDb::now();
-        $this->permissions_data = trim(join("\n", array_keys($this->permissions)));
+        $this->permissions_data = $this->permissions ? trim(join("\n", array_keys($this->permissions))) : '';
         return true;
     }
 }
