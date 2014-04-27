@@ -6,7 +6,7 @@
             'version' => '0.1.0',
             //'migrate' => 'FCom_GoogleWallet_Migrate',
             'require' => array(
-                'module' => array('FCom_Checkout'=>'0.1.0'),
+                'module' => array( 'FCom_Checkout' => '0.1.0' ),
             ),
             //'translations' => array('en' => 'en.php'),
             'description' => "Google Wallet payment method",

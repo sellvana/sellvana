@@ -6,7 +6,7 @@ class FCom_Admin_Main extends BClass
     {
         FCom_Admin_Model_User::i();
 
-        FCom_Admin_Model_Role::i()->createPermission(array(
+        FCom_Admin_Model_Role::i()->createPermission( array(
             'system/users' => 'Manage Users',
             'system/roles' => 'Manage Roles and Permissions',
             'system/settings' => 'Update Settings',
@@ -14,16 +14,16 @@ class FCom_Admin_Main extends BClass
             'system/templates' => 'Edit System Templates',
             'system/backups' => 'System Backups',
             'system/importexport' => 'Import Export',
-        ));
+        ) );
     }
 
-    public static function href($url='')
+    public static function href( $url = '' )
     {
-        return BApp::adminHref($url);
+        return BApp::adminHref( $url );
     }
 
-    public static function frontendHref($url='')
+    public static function frontendHref( $url = '' )
     {
-        return BApp::frontendHref($url);
+        return BApp::frontendHref( $url );
     }
 }

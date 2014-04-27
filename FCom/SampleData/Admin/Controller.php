@@ -14,10 +14,10 @@ class FCom_SampleData_Admin_Controller extends FCom_Admin_Controller_Abstract
 
         try {
             BResponse::i()->startLongResponse();
-            BConfig::i()->set('db/logging', 0);
+            BConfig::i()->set( 'db/logging', 0 );
 
             FCom_SampleData_Admin::i()->loadProducts();
-            $msg    = BLocale::_('Sample products imported');
+            $msg    = BLocale::_( 'Sample products imported' );
             $status = 'success';
         } catch ( Exception $e ) {
             BDebug::logException( $e );

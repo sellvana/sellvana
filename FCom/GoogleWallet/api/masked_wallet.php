@@ -27,43 +27,43 @@ require_once 'util.php';
 
 class MaskedWallet {
 
-  public static function post($input) {
-    WalletUtil::assert_input($input, array('estimatedTotalPrice', 'currencyCode'));
-    $now = (int)date('U');
-    $estimated_total_price = WalletUtil::to_dollars($input['estimatedTotalPrice']);
+  public static function post( $input ) {
+    WalletUtil::assert_input( $input, array( 'estimatedTotalPrice', 'currencyCode' ) );
+    $now = (int)date( 'U' );
+    $estimated_total_price = WalletUtil::to_dollars( $input[ 'estimatedTotalPrice' ] );
     $mwr = array(
       'iat' => $now,
       'exp' => $now + 3600,
       'typ' => 'google/wallet/online/masked/v2/request',
       'aud' => 'Google',
       'iss' => MERCHANT_ID,
-      'request'=> array(
+      'request' => array(
         'clientId' =>  CLIENT_ID,
-        'merchantName'=> MERCHANT_NAME,
-        'origin'=> ORIGIN,
-         'pay'=> array (
-           'estimatedTotalPrice'=> $estimated_total_price,
-           'currencyCode'=> $input['currencyCode'],
+        'merchantName' => MERCHANT_NAME,
+        'origin' => ORIGIN,
+         'pay' => array (
+           'estimatedTotalPrice' => $estimated_total_price,
+           'currencyCode' => $input[ 'currencyCode' ],
           ),
-          'ship'=> new stdClass(),
+          'ship' => new stdClass(),
       ),
     );
-    if (isset($input['googleTransactionId'])) {
-      $mwr['request']['googleTransactionId'] = $input['googleTransactionId'];
+    if ( isset( $input[ 'googleTransactionId' ] ) ) {
+      $mwr[ 'request' ][ 'googleTransactionId' ] = $input[ 'googleTransactionId' ];
     }
-    WalletUtil::encode_send_jwt($mwr);
+    WalletUtil::encode_send_jwt( $mwr );
   }
 
 
-  public static function put($input) {
-    WalletUtil::assert_input($input, array('jwt', 'googleTransactionId'));
-    $mwr = JWT::decode($input['jwt'], null, FALSE);
-    $now = (int)date('U');
-    $mwr['iat'] = $now;
-    $mwr['exp'] = $now + 3600;
-    $mwr['request']['googleTransactionId'] = $input['googleTransactionId'];
-    $mwr['request']['ship'] = new stdClass();
-    WalletUtil::encode_send_jwt($mwr);
+  public static function put( $input ) {
+    WalletUtil::assert_input( $input, array( 'jwt', 'googleTransactionId' ) );
+    $mwr = JWT::decode( $input[ 'jwt' ], null, FALSE );
+    $now = (int)date( 'U' );
+    $mwr[ 'iat' ] = $now;
+    $mwr[ 'exp' ] = $now + 3600;
+    $mwr[ 'request' ][ 'googleTransactionId' ] = $input[ 'googleTransactionId' ];
+    $mwr[ 'request' ][ 'ship' ] = new stdClass();
+    WalletUtil::encode_send_jwt( $mwr );
   }
 
 }

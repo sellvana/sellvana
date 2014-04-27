@@ -4,54 +4,54 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 {
     public function beforeDispatch()
     {
-        if (!parent::beforeDispatch()) return false;
+        if ( !parent::beforeDispatch() ) return false;
 
         $method = BRequest::i()->method();
-        switch ($method) {
+        switch ( $method ) {
         case 'GET':
-            BLayout::i()->applyTheme('FCom_Install');
+            BLayout::i()->applyTheme( 'FCom_Install' );
             break;
 
         case 'POST':
             $sData =& BSession::i()->dataToUpdate();
-            $w = BRequest::i()->post('w');
-            $sData['w'] = !empty($sData['w']) ? BUtil::arrayMerge($sData['w'], $w) : $w;
+            $w = BRequest::i()->post( 'w' );
+            $sData[ 'w' ] = !empty( $sData[ 'w' ] ) ? BUtil::arrayMerge( $sData[ 'w' ], $w ) : $w;
             break;
         }
 
         return true;
     }
 
-    public function message($msg, $type='success', $tag='install', $options=array())
+    public function message( $msg, $type = 'success', $tag = 'install', $options = array() )
     {
-        if (is_array($msg)) {
-            array_walk($msg, 'BLocale::_');
+        if ( is_array( $msg ) ) {
+            array_walk( $msg, 'BLocale::_' );
         } else {
-            $msg = BLocale::_($msg);
+            $msg = BLocale::_( $msg );
         }
-        BSession::i()->addMessage($msg, $type, $tag, $options);
+        BSession::i()->addMessage( $msg, $type, $tag, $options );
         return $this;
     }
 
     public function action_index()
     {
-        BLayout::i()->applyLayout('/');
+        BLayout::i()->applyLayout( '/' );
 
         $errors = BDebug::i()->getCollectedErrors();
-        BLayout::i()->view('index')->errors = $errors;
+        BLayout::i()->view( 'index' )->errors = $errors;
     }
 
     public function action_index__POST()
     {
-        $w = BRequest::i()->post('w');
-        if (empty($w['agree']) || $w['agree']!=='Agree') {
-            $this->message('Please click "I Agree" checkbox before continuing with installation', 'error', 'install');
-            BResponse::i()->redirect('');
+        $w = BRequest::i()->post( 'w' );
+        if ( empty( $w[ 'agree' ] ) || $w[ 'agree' ] !== 'Agree' ) {
+            $this->message( 'Please click "I Agree" checkbox before continuing with installation', 'error', 'install' );
+            BResponse::i()->redirect( '' );
             return;
         }
         $redirectUrl = 'install/step1';
-        if (!BApp::m('FCom_Admin')) {
-            BResponse::i()->redirect('install/download');
+        if ( !BApp::m( 'FCom_Admin' ) ) {
+            BResponse::i()->redirect( 'install/download' );
             /*
             BResponse::i()->startLongResponse();
             $modules = FCom_MarketClient_RemoteApi::i()->getModuleInstallInfo('FCom_VirtPackCoreEcom');
@@ -61,115 +61,115 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             exit;
             */
         } else {
-            BResponse::i()->redirect($redirectUrl);
+            BResponse::i()->redirect( $redirectUrl );
         }
     }
 
     public function action_download()
     {
-        BLayout::i()->setRootView('marketclient/container');
-        $data = FCom_MarketClient_RemoteApi::i()->getModuleInstallInfo('FCom_VirtPackCoreEcom');
+        BLayout::i()->setRootView( 'marketclient/container' );
+        $data = FCom_MarketClient_RemoteApi::i()->getModuleInstallInfo( 'FCom_VirtPackCoreEcom' );
         $modules = array();
-        foreach ($data as $modName => $modInfo) {
-            if (BApp::m($modName) || in_array($modName, array('FCom_Core','FCom_Install','FCom_MarketClient'))) {
+        foreach ( $data as $modName => $modInfo ) {
+            if ( BApp::m( $modName ) || in_array( $modName, array( 'FCom_Core', 'FCom_Install', 'FCom_MarketClient' ) ) ) {
                 continue;
             }
-            $modules[$modName] = $modInfo['version'];
+            $modules[ $modName ] = $modInfo[ 'version' ];
         }
-        $this->view('marketclient/container')->set(array(
+        $this->view( 'marketclient/container' )->set( array(
             'modules' => $modules,
-            'redirect_to' => BApp::href('install/step1'),
-        ));
+            'redirect_to' => BApp::href( 'install/step1' ),
+        ) );
     }
 
     public function action_step1()
     {
-        BLayout::i()->applyLayout('/step1');
+        BLayout::i()->applyLayout( '/step1' );
         $sData =& BSession::i()->dataToUpdate();
-        if (empty($sData['w']['db'])) {
-            $sData['w']['db'] = array('host'=>'127.0.0.1', 'dbname'=>'sellvana', 'username'=>'root', 'password'=>'', 'table_prefix'=>'');
+        if ( empty( $sData[ 'w' ][ 'db' ] ) ) {
+            $sData[ 'w' ][ 'db' ] = array( 'host' => '127.0.0.1', 'dbname' => 'sellvana', 'username' => 'root', 'password' => '', 'table_prefix' => '' );
         }
     }
 
     public function action_step1__POST()
     {
-        if (BRequest::i()->post('do')==='back') {
-            BResponse::i()->redirect('install/index');
+        if ( BRequest::i()->post( 'do' ) === 'back' ) {
+            BResponse::i()->redirect( 'install/index' );
             return;
         }
         try {
-            $w = BRequest::i()->post('w');
-            BConfig::i()->add(array('db'=>$w['db']), true);
-            BDb::connect(null, true);
-            FCom_Core_Main::i()->writeConfigFiles('db');
-            BResponse::i()->redirect('install/step2');
-        } catch (Exception $e) {
+            $w = BRequest::i()->post( 'w' );
+            BConfig::i()->add( array( 'db' => $w[ 'db' ] ), true );
+            BDb::connect( null, true );
+            FCom_Core_Main::i()->writeConfigFiles( 'db' );
+            BResponse::i()->redirect( 'install/step2' );
+        } catch ( Exception $e ) {
             //print_r($e);
-            $this->message($e->getMessage(), 'error', 'install');
-            BResponse::i()->redirect('install/step1');
+            $this->message( $e->getMessage(), 'error', 'install' );
+            BResponse::i()->redirect( 'install/step1' );
         }
     }
 
     public function action_step2()
     {
         $userHlp = FCom_Admin_Model_User::i();
-        if (BDb::ddlTableExists($userHlp->table()) && $userHlp->orm('u')->find_one()) {
-            BResponse::i()->redirect('install/step3');
+        if ( BDb::ddlTableExists( $userHlp->table() ) && $userHlp->orm( 'u' )->find_one() ) {
+            BResponse::i()->redirect( 'install/step3' );
             return;
         } else {
-            BApp::m('FCom_Admin')->run_status = BModule::LOADED; // for proper migration on some hosts
+            BApp::m( 'FCom_Admin' )->run_status = BModule::LOADED; // for proper migration on some hosts
             BDb::connect();
             FCom_Core_Model_Module::i()->init();
-            BMigrate::i()->migrateModules('FCom_Admin', true);
+            BMigrate::i()->migrateModules( 'FCom_Admin', true );
         }
-        BLayout::i()->applyLayout('/step2');
+        BLayout::i()->applyLayout( '/step2' );
         $sData =& BSession::i()->dataToUpdate();
-        if (empty($sData['w']['admin'])) {
-            $sData['w']['admin'] = array('username'=>'admin', 'password'=>'', 'email'=>'', 'firstname'=>'', 'lastname'=>'');
+        if ( empty( $sData[ 'w' ][ 'admin' ] ) ) {
+            $sData[ 'w' ][ 'admin' ] = array( 'username' => 'admin', 'password' => '', 'email' => '', 'firstname' => '', 'lastname' => '' );
         }
     }
 
     public function action_step2__POST()
     {
-        if (BRequest::i()->post('do')==='back') {
-            BResponse::i()->redirect('install/step1');
+        if ( BRequest::i()->post( 'do' ) === 'back' ) {
+            BResponse::i()->redirect( 'install/step1' );
             return;
         }
         try {
-            $w = BRequest::i()->post('w');
-            BMigrate::i()->migrateModules('FCom_Admin', true);
+            $w = BRequest::i()->post( 'w' );
+            BMigrate::i()->migrateModules( 'FCom_Admin', true );
             FCom_Admin_Model_User::i()
-                ->create($w['admin'])
-                ->set('is_superadmin', 1)
+                ->create( $w[ 'admin' ] )
+                ->set( 'is_superadmin', 1 )
                 ->save()
                 ->login();
-            BResponse::i()->redirect('install/step3');
-        } catch (Exception $e) {
-            $this->message($e->getMessage(), 'error', 'install');
-            BResponse::i()->redirect('install/step2');
+            BResponse::i()->redirect( 'install/step3' );
+        } catch ( Exception $e ) {
+            $this->message( $e->getMessage(), 'error', 'install' );
+            BResponse::i()->redirect( 'install/step2' );
         }
     }
 
     public function action_step3()
     {
-        $this->view('step3')->set(array(
-            'debug_modes' => array('DEBUG' => 'DEBUG', /*'PRODUCTION' => 'PRODUCTION', */),
-            'run_level_bundles' => array('all' => 'All Bundled', 'min' => 'Minimal'),
-        ));
-        BLayout::i()->applyLayout('/step3');
+        $this->view( 'step3' )->set( array(
+            'debug_modes' => array( 'DEBUG' => 'DEBUG', /*'PRODUCTION' => 'PRODUCTION', */ ),
+            'run_level_bundles' => array( 'all' => 'All Bundled', 'min' => 'Minimal' ),
+        ) );
+        BLayout::i()->applyLayout( '/step3' );
     }
 
     public function action_step3__POST()
     {
-        if (BRequest::i()->post('do')==='back') {
-            BResponse::i()->redirect('install/step2');
+        if ( BRequest::i()->post( 'do' ) === 'back' ) {
+            BResponse::i()->redirect( 'install/step2' );
             return;
         }
 
-        $w = BRequest::i()->post('w');
+        $w = BRequest::i()->post( 'w' );
         $runLevels = array();
-        if (!empty($w['config']['run_levels_bundle'])) {
-            switch ($w['config']['run_levels_bundle']) {
+        if ( !empty( $w[ 'config' ][ 'run_levels_bundle' ] ) ) {
+            switch ( $w[ 'config' ][ 'run_levels_bundle' ] ) {
                 case 'min':
                     $runLevels = array(
                         'FCom_MarketClient' => 'REQUESTED',
@@ -221,13 +221,13 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             }
         }
 
-        BConfig::i()->add(array(
+        BConfig::i()->add( array(
             'install_status' => 'installed',
-            'db' => array('implicit_migration' => 1/*, 'currently_migrating' => 0*/),
-            'module_run_levels' => array('FCom_Core' => $runLevels),
+            'db' => array( 'implicit_migration' => 1/*, 'currently_migrating' => 0*/ ),
+            'module_run_levels' => array( 'FCom_Core' => $runLevels ),
             'mode_by_ip' => array(
-                'FCom_Frontend' => !empty($w['config']['run_mode_frontend']) ? $w['config']['run_mode_frontend'] : 'DEBUG',
-                'FCom_Admin' => !empty($w['config']['run_mode_admin']) ? $w['config']['run_mode_admin'] : 'DEBUG',
+                'FCom_Frontend' => !empty( $w[ 'config' ][ 'run_mode_frontend' ] ) ? $w[ 'config' ][ 'run_mode_frontend' ] : 'DEBUG',
+                'FCom_Admin' => !empty( $w[ 'config' ][ 'run_mode_admin' ] ) ? $w[ 'config' ][ 'run_mode_admin' ] : 'DEBUG',
             ),
             'modules' => array(
                 'FCom_Frontend' => array(
@@ -237,10 +237,10 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             'cache' => array(
                 'default_backend' => BCache::i()->getFastestAvailableBackend(),
             ),
-        ), true);
+        ), true );
 
         FCom_Core_Main::i()->writeConfigFiles();
 
-        BResponse::i()->redirect(BApp::i()->adminHref(''));
+        BResponse::i()->redirect( BApp::i()->adminHref( '' ) );
     }
 }

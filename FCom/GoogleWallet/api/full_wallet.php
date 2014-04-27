@@ -24,20 +24,20 @@ require_once 'util.php';
 
 class FullWallet {
 
-  public static function post($input) {
-    $now = (int)date('U');
-    $cart_data = $input['cart'];
-    $total_price = WalletUtil::to_dollars($cart_data['totalPrice']);
-    $currency_code = $cart_data['currencyCode'];
-    $line_items = $cart_data['lineItems'];
-    for($i=0; $i<sizeof($line_items); $i++) {
-      if(isset($line_items[$i]['totalPrice'])) {
-        $line_items[$i]['totalPrice'] =
-          WalletUtil::to_dollars($line_items[$i]['totalPrice']);
+  public static function post( $input ) {
+    $now = (int)date( 'U' );
+    $cart_data = $input[ 'cart' ];
+    $total_price = WalletUtil::to_dollars( $cart_data[ 'totalPrice' ] );
+    $currency_code = $cart_data[ 'currencyCode' ];
+    $line_items = $cart_data[ 'lineItems' ];
+    for ( $i = 0; $i < sizeof( $line_items ); $i++ ) {
+      if ( isset( $line_items[ $i ][ 'totalPrice' ] ) ) {
+        $line_items[ $i ][ 'totalPrice' ] =
+          WalletUtil::to_dollars( $line_items[ $i ][ 'totalPrice' ] );
       }
-      if(isset($line_items[$i]['unitPrice'])) {
-        $line_items[$i]['unitPrice'] =
-          WalletUtil::to_dollars($line_items[$i]['unitPrice']);
+      if ( isset( $line_items[ $i ][ 'unitPrice' ] ) ) {
+        $line_items[ $i ][ 'unitPrice' ] =
+          WalletUtil::to_dollars( $line_items[ $i ][ 'unitPrice' ] );
       }
     }
 
@@ -47,10 +47,10 @@ class FullWallet {
       'typ' => 'google/wallet/online/full/v2/request',
       'aud' => 'Google',
       'iss' => MERCHANT_ID,
-      'request'=> array(
-        'merchantName'=> MERCHANT_NAME,
-        'googleTransactionId' => $input['googleTransactionId'],
-        'origin'=> ORIGIN,
+      'request' => array(
+        'merchantName' => MERCHANT_NAME,
+        'googleTransactionId' => $input[ 'googleTransactionId' ],
+        'origin' => ORIGIN,
         'cart' => array(
           'totalPrice' => $total_price,
           'currencyCode' => $currency_code,
@@ -58,7 +58,7 @@ class FullWallet {
         ),
       ),
     );
-    $json = str_replace('\/', '/', json_encode($fwr));
-    WalletUtil::encode_send_jwt($fwr);
+    $json = str_replace( '\/', '/', json_encode( $fwr ) );
+    WalletUtil::encode_send_jwt( $fwr );
   }
 }

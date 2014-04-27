@@ -20,57 +20,57 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
      * @param array       $args
      * @return FCom_CustomerGroups_Admin_Controller_TierPrices
      */
-    public static function i($new = false, array $args = array())
+    public static function i( $new = false, array $args = array() )
     {
-        return parent::i($new, $args);
+        return parent::i( $new, $args );
     }
 
     /**
      * @param FCom_Catalog_Model_Product $model
      * @return array
      */
-    public function getTierPricesGrid($model)
+    public function getTierPricesGrid( $model )
     {
         $cgOptions = FCom_CustomerGroups_Model_Group::i()->groupsOptions();
-        $orm = FCom_CustomerGroups_Model_TierPrice::i()->orm()->where('product_id', $model->id());
+        $orm = FCom_CustomerGroups_Model_TierPrice::i()->orm()->where( 'product_id', $model->id() );
         $grid = array(
-            'config'=>array(
-                'id'=>'tier-prices',
-                'columns'=>array(
-                    array('type'=>'row_select'),
-                    array('name'=>'id', 'label'=>'ID', 'hidden'=>true),
-                    array('type'=>'input', 'name'=>'group_id', 'label'=>'Customer Group', 'options'=>$cgOptions,'validation'=>array('required'=>true),
-                            'editable'=>'inline', 'addable'=>true, 'editor'=>'select', 'width'=>150, 'default'=>1),
-                    array('type'=>'input', 'name'=>'qty', 'label'=>'Minimum Qty', 'editable'=>'inline', 'addable'=>true, 'width'=>150,
-                            'validation'=>array('required'=>true, 'number'=>true)),
-                    array('type'=>'input', 'name'=>'base_price', 'label'=>'Regular Price','validation'=>array('required'=>true, 'number'=>true),
-                             'editable'=>'inline', 'addable'=>true, 'width'=>150),
-                    array('type'=>'input', 'name'=>'sale_price', 'label'=>'Special Price','validation'=>array('required'=>true, 'number'=>true),
-                            'editable'=>'inline', 'addable'=>true, 'width'=>150),
-                    array('type'=>'btn_group', 'buttons'=>array( array('name'=>'delete') ))
+            'config' => array(
+                'id' => 'tier-prices',
+                'columns' => array(
+                    array( 'type' => 'row_select' ),
+                    array( 'name' => 'id', 'label' => 'ID', 'hidden' => true ),
+                    array( 'type' => 'input', 'name' => 'group_id', 'label' => 'Customer Group', 'options' => $cgOptions, 'validation' => array( 'required' => true ),
+                            'editable' => 'inline', 'addable' => true, 'editor' => 'select', 'width' => 150, 'default' => 1 ),
+                    array( 'type' => 'input', 'name' => 'qty', 'label' => 'Minimum Qty', 'editable' => 'inline', 'addable' => true, 'width' => 150,
+                            'validation' => array( 'required' => true, 'number' => true ) ),
+                    array( 'type' => 'input', 'name' => 'base_price', 'label' => 'Regular Price', 'validation' => array( 'required' => true, 'number' => true ),
+                             'editable' => 'inline', 'addable' => true, 'width' => 150 ),
+                    array( 'type' => 'input', 'name' => 'sale_price', 'label' => 'Special Price', 'validation' => array( 'required' => true, 'number' => true ),
+                            'editable' => 'inline', 'addable' => true, 'width' => 150 ),
+                    array( 'type' => 'btn_group', 'buttons' => array( array( 'name' => 'delete' ) ) )
                 ),
-                'data'=>BDb::many_as_array($orm->find_many()),
-                'data_mode'=>'local',
-                'filters'=>array(
-                    array('field'=>'name', 'type'=>'text'),
-                    array('field'=>'group_id', 'type'=>'multiselect')
+                'data' => BDb::many_as_array( $orm->find_many() ),
+                'data_mode' => 'local',
+                'filters' => array(
+                    array( 'field' => 'name', 'type' => 'text' ),
+                    array( 'field' => 'group_id', 'type' => 'multiselect' )
                 ),
-                'actions'=>array(
-                    'new'=>array('caption'=>'Add New Price'),
-                    'delete'=>true
+                'actions' => array(
+                    'new' => array( 'caption' => 'Add New Price' ),
+                    'delete' => true
                 ),
-                'grid_before_create'=>'tierPricesGridRegister'
+                'grid_before_create' => 'tierPricesGridRegister'
             )
         );
         return $grid;
     }
 
-    public function addTitle($title = '')
+    public function addTitle( $title = '' )
     {
         /* @var $v BViewHead */
-        $v = $this->view('head');
-        if ($v) {
-            $v->addTitle($title);
+        $v = $this->view( 'head' );
+        if ( $v ) {
+            $v->addTitle( $title );
         }
     }
 }

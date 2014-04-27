@@ -76,9 +76,9 @@ class BUtil extends BClass
     *
     * @return BUtil
     */
-    public static function i($new=false, array $args=array())
+    public static function i( $new = false, array $args = array() )
     {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
 
     /**
@@ -89,14 +89,14 @@ class BUtil extends BClass
     * @param mixed $data
     * @return string
     */
-    public static function toJson($data)
+    public static function toJson( $data )
     {
-        if (is_array($data) && is_object(current($data)) && current($data) instanceof BModel) {
-            $data = BDb::many_as_array($data);
-        } elseif (is_object($data) && $data instanceof BData) {
-            $data = $data->as_array(true);
+        if ( is_array( $data ) && is_object( current( $data ) ) && current( $data ) instanceof BModel ) {
+            $data = BDb::many_as_array( $data );
+        } elseif ( is_object( $data ) && $data instanceof BData ) {
+            $data = $data->as_array( true );
         }
-        return json_encode($data);
+        return json_encode( $data );
     }
 
     /**
@@ -106,10 +106,10 @@ class BUtil extends BClass
     * @param bool $asObject if false will attempt to convert to array,
     *                       otherwise standard combination of objects and arrays
     */
-    public static function fromJson($json, $asObject=false)
+    public static function fromJson( $json, $asObject = false )
     {
-        $obj = json_decode($json);
-        return $asObject ? $obj : static::objectToArray($obj);
+        $obj = json_decode( $json );
+        return $asObject ? $obj : static::objectToArray( $obj );
     }
 
     /**
@@ -119,32 +119,32 @@ class BUtil extends BClass
     *
     * @return string Indented version of the original JSON string.
     */
-    public static function jsonIndent($json)
+    public static function jsonIndent( $json )
     {
 
         $result      = '';
         $pos         = 0;
-        $strLen      = strlen($json);
+        $strLen      = strlen( $json );
         $indentStr   = '  ';
         $newLine     = "\n";
         $prevChar    = '';
         $outOfQuotes = true;
 
-        for ($i=0; $i<=$strLen; $i++) {
+        for ( $i = 0; $i <= $strLen; $i++ ) {
 
             // Grab the next character in the string.
-            $char = substr($json, $i, 1);
+            $char = substr( $json, $i, 1 );
 
             // Are we inside a quoted string?
-            if ($char == '"' && $prevChar != '\\') {
+            if ( $char == '"' && $prevChar != '\\' ) {
                 $outOfQuotes = !$outOfQuotes;
 
             // If this character is the end of an element,
             // output a new line and indent the next line.
-            } else if(($char == '}' || $char == ']') && $outOfQuotes) {
+            } else if ( ( $char == '}' || $char == ']' ) && $outOfQuotes ) {
                 $result .= $newLine;
                 $pos --;
-                for ($j=0; $j<$pos; $j++) {
+                for ( $j = 0; $j < $pos; $j++ ) {
                     $result .= $indentStr;
                 }
             }
@@ -154,13 +154,13 @@ class BUtil extends BClass
 
             // If the last character was the beginning of an element,
             // output a new line and indent the next line.
-            if (($char == ',' || $char == '{' || $char == '[') && $outOfQuotes) {
+            if ( ( $char == ',' || $char == '{' || $char == '[' ) && $outOfQuotes ) {
                 $result .= $newLine;
-                if ($char == '{' || $char == '[') {
+                if ( $char == '{' || $char == '[' ) {
                     $pos ++;
                 }
 
-                for ($j = 0; $j < $pos; $j++) {
+                for ( $j = 0; $j < $pos; $j++ ) {
                     $result .= $indentStr;
                 }
             }
@@ -179,58 +179,58 @@ class BUtil extends BClass
     * @param mixed $val
     * @return string
     */
-    public static function toJavaScript($val)
+    public static function toJavaScript( $val )
     {
-        if (is_null($val)) {
+        if ( is_null( $val ) ) {
             return 'null';
-        } elseif (is_bool($val)) {
+        } elseif ( is_bool( $val ) ) {
             return $val ? 'true' : 'false';
-        } elseif (is_string($val)) {
-            if (preg_match('#^\s*function\s*\(#', $val)) {
+        } elseif ( is_string( $val ) ) {
+            if ( preg_match( '#^\s*function\s*\(#', $val ) ) {
                 return $val;
             } else {
-                return "'".addslashes($val)."'";
+                return "'" . addslashes( $val ) . "'";
             }
-        } elseif (is_int($val) || is_float($val)) {
+        } elseif ( is_int( $val ) || is_float( $val ) ) {
             return $val;
-        } elseif ($val instanceof BValue) {
+        } elseif ( $val instanceof BValue ) {
             return $val->toPlain();
-        } elseif (($isObj = is_object($val)) || is_array($val)) {
+        } elseif ( ( $isObj = is_object( $val ) ) || is_array( $val ) ) {
             $out = array();
-            if (!empty($val) && ($isObj || array_keys($val) !== range(0, count($val)-1))) { // assoc?
-                foreach ($val as $k=>$v) {
-                    $out[] = "'".addslashes($k)."':".static::toJavaScript($v);
+            if ( !empty( $val ) && ( $isObj || array_keys( $val ) !== range( 0, count( $val )-1 ) ) ) { // assoc?
+                foreach ( $val as $k => $v ) {
+                    $out[] = "'" . addslashes( $k ) . "':" . static::toJavaScript( $v );
                 }
-                return '{'.join(',', $out).'}';
+                return '{' . join( ',', $out ) . '}';
             } else {
-                foreach ($val as $k=>$v) {
-                    $out[] = static::toJavaScript($v);
+                foreach ( $val as $k => $v ) {
+                    $out[] = static::toJavaScript( $v );
                 }
-                return '['.join(',', $out).']';
+                return '[' . join( ',', $out ) . ']';
             }
         }
         return '"UNSUPPORTED TYPE"';
     }
 
-    public static function toRss($data)
+    public static function toRss( $data )
     {
-        $lang = !empty($data['language']) ? $data['language'] : 'en-us';
-        $ttl = !empty($data['ttl']) ? (int)$data['ttl'] : 40;
-        $descr = !empty($data['description']) ? $data['description'] : $data['title'];
+        $lang = !empty( $data[ 'language' ] ) ? $data[ 'language' ] : 'en-us';
+        $ttl = !empty( $data[ 'ttl' ] ) ? (int)$data[ 'ttl' ] : 40;
+        $descr = !empty( $data[ 'description' ] ) ? $data[ 'description' ] : $data[ 'title' ];
         $xml = '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel>'
-.'<title><![CDATA['.$data['title'].']]></title><link><![CDATA['.$data['link'].']]></link>'
-.'<description><![CDATA['.$descr.']]></description><language><![CDATA['.$lang.']]></language><ttl>'.$ttl.'</ttl>';
-        foreach ($data['items'] as $item) {
-            if (!is_numeric($item['pubDate'])) {
-                $item['pubDate'] =  strtotime($item['pubDate']);
+. '<title><![CDATA[' . $data[ 'title' ] . ']]></title><link><![CDATA[' . $data[ 'link' ] . ']]></link>'
+. '<description><![CDATA[' . $descr . ']]></description><language><![CDATA[' . $lang . ']]></language><ttl>' . $ttl . '</ttl>';
+        foreach ( $data[ 'items' ] as $item ) {
+            if ( !is_numeric( $item[ 'pubDate' ] ) ) {
+                $item[ 'pubDate' ] =  strtotime( $item[ 'pubDate' ] );
             }
-            if (empty($item['guid'])) {
-                $item['guid'] = $item['link'];
+            if ( empty( $item[ 'guid' ] ) ) {
+                $item[ 'guid' ] = $item[ 'link' ];
             }
-            $xml .= '<item><title><![CDATA['.$item['title'].']]></title>'
-.'<description><![CDATA['.$item['description'].']]></description>'
-.'<pubDate>'.date('r', $item['pubDate']).'</pubDate>'
-.'<guid><![CDATA['.$item['guid'].']]></guid><link><![CDATA['.$item['link'].']]></link></item>';
+            $xml .= '<item><title><![CDATA[' . $item[ 'title' ] . ']]></title>'
+. '<description><![CDATA[' . $item[ 'description' ] . ']]></description>'
+. '<pubDate>' . date( 'r', $item[ 'pubDate' ] ) . '</pubDate>'
+. '<guid><![CDATA[' . $item[ 'guid' ] . ']]></guid><link><![CDATA[' . $item[ 'link' ] . ']]></link></item>';
         }
         $xml .= '</channel></rss>';
         return $xml;
@@ -242,13 +242,13 @@ class BUtil extends BClass
     * @param object $d
     * @return array
     */
-    public static function objectToArray($d)
+    public static function objectToArray( $d )
     {
-        if (is_object($d)) {
-            $d = get_object_vars($d);
+        if ( is_object( $d ) ) {
+            $d = get_object_vars( $d );
         }
-        if (is_array($d)) {
-            return array_map('BUtil::objectToArray', $d);
+        if ( is_array( $d ) ) {
+            return array_map( 'BUtil::objectToArray', $d );
         }
         return $d;
     }
@@ -259,10 +259,10 @@ class BUtil extends BClass
     * @param mixed $d
     * @return object
     */
-    public static function arrayToObject($d)
+    public static function arrayToObject( $d )
     {
-        if (is_array($d)) {
-            return (object) array_map('BUtil::objectToArray', $d);
+        if ( is_array( $d ) ) {
+            return (object) array_map( 'BUtil::objectToArray', $d );
         }
         return $d;
     }
@@ -275,19 +275,19 @@ class BUtil extends BClass
      * @param array|string $mapFields
      * @return array
      */
-    public static function arraySeqToMap($array, $idField, $mapFields = null)
+    public static function arraySeqToMap( $array, $idField, $mapFields = null )
     {
         $map = array();
-        foreach ($array as $k => $row) {
-            if (is_array($mapFields)) {
-                $outRow = BUtil::arrayMask($row, $mapFields);
-            } elseif (is_string($mapFields)) {
-                $outRow = !empty($row[$mapFields]) ? $row[$mapFields] : null;
+        foreach ( $array as $k => $row ) {
+            if ( is_array( $mapFields ) ) {
+                $outRow = BUtil::arrayMask( $row, $mapFields );
+            } elseif ( is_string( $mapFields ) ) {
+                $outRow = !empty( $row[ $mapFields ] ) ? $row[ $mapFields ] : null;
             }
-            if (!is_numeric($k)) {
-                $map[$k] = $outRow;
-            } elseif (isset($row[$idField])) {
-                $map[$row[$idField]] = $outRow;
+            if ( !is_numeric( $k ) ) {
+                $map[ $k ] = $outRow;
+            } elseif ( isset( $row[ $idField ] ) ) {
+                $map[ $row[ $idField ] ] = $outRow;
             }
         }
         return $map;
@@ -308,34 +308,34 @@ class BUtil extends BClass
      * @param array $args array of [ 'arg_name' => 'arg value', ... ] replacements to be made
      * @return string|false result of sprintf call, or bool false on error
      */
-    public static function sprintfn($format, $args = array())
+    public static function sprintfn( $format, $args = array() )
     {
         $args = (array)$args;
 
         // map of argument names to their corresponding sprintf numeric argument value
-        $arg_nums = array_slice(array_flip(array_keys(array(0 => 0) + $args)), 1);
+        $arg_nums = array_slice( array_flip( array_keys( array( 0 => 0 ) + $args ) ), 1 );
 
         // find the next named argument. each search starts at the end of the previous replacement.
-        for ($pos = 0; preg_match('/(?<=%)([a-zA-Z_]\w*)(?=\$)/', $format, $match, PREG_OFFSET_CAPTURE, $pos);) {
-            $arg_pos = $match[0][1];
-            $arg_len = strlen($match[0][0]);
-            $arg_key = $match[1][0];
+        for ( $pos = 0; preg_match( '/(?<=%)([a-zA-Z_]\w*)(?=\$)/', $format, $match, PREG_OFFSET_CAPTURE, $pos ); ) {
+            $arg_pos = $match[ 0 ][ 1 ];
+            $arg_len = strlen( $match[ 0 ][ 0 ] );
+            $arg_key = $match[ 1 ][ 0 ];
 
             // programmer did not supply a value for the named argument found in the format string
-            if (! array_key_exists($arg_key, $arg_nums)) {
-                user_error("sprintfn(): Missing argument '${arg_key}'", E_USER_WARNING);
+            if ( ! array_key_exists( $arg_key, $arg_nums ) ) {
+                user_error( "sprintfn(): Missing argument '${arg_key}'", E_USER_WARNING );
                 return false;
             }
 
             // replace the named argument with the corresponding numeric one
-            $format = substr_replace($format, $replace = $arg_nums[$arg_key], $arg_pos, $arg_len);
-            $pos = $arg_pos + strlen($replace); // skip to end of replacement for next iteration
+            $format = substr_replace( $format, $replace = $arg_nums[ $arg_key ], $arg_pos, $arg_len );
+            $pos = $arg_pos + strlen( $replace ); // skip to end of replacement for next iteration
         }
 
-        if (!$args) {
-            $args = array('');
+        if ( !$args ) {
+            $args = array( '' );
         }
-        return vsprintf($format, array_values($args));
+        return vsprintf( $format, array_values( $args ) );
     }
 
     /**
@@ -348,14 +348,14 @@ class BUtil extends BClass
     * @param array $vars
     * @return string
     */
-    public static function injectVars($str, $vars)
+    public static function injectVars( $str, $vars )
     {
         $from = array(); $to = array();
-        foreach ($vars as $k=>$v) {
-            $from[] = ':'.$k;
+        foreach ( $vars as $k => $v ) {
+            $from[] = ':' . $k;
             $to[] = $v;
         }
-        return str_replace($from, $to, $str);
+        return str_replace( $from, $to, $str );
     }
 
     /**
@@ -374,25 +374,25 @@ class BUtil extends BClass
      **/
      public static function arrayMerge() {
          $arrays = func_get_args();
-         $base = array_shift($arrays);
-         if (!is_array($base))  {
-             $base = empty($base) ? array() : array($base);
+         $base = array_shift( $arrays );
+         if ( !is_array( $base ) )  {
+             $base = empty( $base ) ? array() : array( $base );
          }
-         foreach ($arrays as $append) {
-             if (!is_array($append)) {
-                 $append = array($append);
+         foreach ( $arrays as $append ) {
+             if ( !is_array( $append ) ) {
+                 $append = array( $append );
              }
-             foreach ($append as $key => $value) {
-                 if (is_numeric($key)) {
-                     if (!in_array($value, $base)) {
+             foreach ( $append as $key => $value ) {
+                 if ( is_numeric( $key ) ) {
+                     if ( !in_array( $value, $base ) ) {
                         $base[] = $value;
                      }
-                 } elseif (!array_key_exists($key, $base)) {
-                     $base[$key] = $value;
-                 } elseif (is_array($value) && is_array($base[$key])) {
-                     $base[$key] = static::arrayMerge($base[$key], $append[$key]);
+                 } elseif ( !array_key_exists( $key, $base ) ) {
+                     $base[ $key ] = $value;
+                 } elseif ( is_array( $value ) && is_array( $base[ $key ] ) ) {
+                     $base[ $key ] = static::arrayMerge( $base[ $key ], $append[ $key ] );
                  } else {
-                     $base[$key] = $value;
+                     $base[ $key ] = $value;
                  }
              }
          }
@@ -405,33 +405,33 @@ class BUtil extends BClass
     * @param array $array1
     * @param array $array2
     */
-    public static function arrayCompare(array $array1, array $array2)
+    public static function arrayCompare( array $array1, array $array2 )
     {
         $diff = false;
         // Left-to-right
-        foreach ($array1 as $key => $value) {
-            if (!array_key_exists($key,$array2)) {
-                $diff[0][$key] = $value;
-            } elseif (is_array($value)) {
-                if (!is_array($array2[$key])) {
-                    $diff[0][$key] = $value;
-                    $diff[1][$key] = $array2[$key];
+        foreach ( $array1 as $key => $value ) {
+            if ( !array_key_exists( $key, $array2 ) ) {
+                $diff[ 0 ][ $key ] = $value;
+            } elseif ( is_array( $value ) ) {
+                if ( !is_array( $array2[ $key ] ) ) {
+                    $diff[ 0 ][ $key ] = $value;
+                    $diff[ 1 ][ $key ] = $array2[ $key ];
                 } else {
-                    $new = static::arrayCompare($value, $array2[$key]);
-                    if ($new !== false) {
-                        if (isset($new[0])) $diff[0][$key] = $new[0];
-                        if (isset($new[1])) $diff[1][$key] = $new[1];
+                    $new = static::arrayCompare( $value, $array2[ $key ] );
+                    if ( $new !== false ) {
+                        if ( isset( $new[ 0 ] ) ) $diff[ 0 ][ $key ] = $new[ 0 ];
+                        if ( isset( $new[ 1 ] ) ) $diff[ 1 ][ $key ] = $new[ 1 ];
                     }
                 }
-            } elseif ($array2[$key] !== $value) {
-                 $diff[0][$key] = $value;
-                 $diff[1][$key] = $array2[$key];
+            } elseif ( $array2[ $key ] !== $value ) {
+                 $diff[ 0 ][ $key ] = $value;
+                 $diff[ 1 ][ $key ] = $array2[ $key ];
             }
         }
         // Right-to-left
-        foreach ($array2 as $key => $value) {
-            if (!array_key_exists($key,$array1)) {
-                $diff[1][$key] = $value;
+        foreach ( $array2 as $key => $value ) {
+            if ( !array_key_exists( $key, $array1 ) ) {
+                $diff[ 1 ][ $key ] = $value;
             }
             // No direct comparsion because matching keys were compared in the
             // left-to-right loop earlier, recursively.
@@ -448,19 +448,19 @@ class BUtil extends BClass
     * @param boolean $ignoreExceptions
     * @return array
     */
-    static public function arrayWalk($arr, $cb, $args=array(), $ignoreExceptions=false)
+    static public function arrayWalk( $arr, $cb, $args = array(), $ignoreExceptions = false )
     {
         $result = array();
-        foreach ($arr as $i=>$r) {
-            $callback = is_string($cb) && $cb[0]==='.' ? array($r, substr($cb, 1)) : $cb;
-            if ($ignoreExceptions) {
+        foreach ( $arr as $i => $r ) {
+            $callback = is_string( $cb ) && $cb[ 0 ] === '.' ? array( $r, substr( $cb, 1 ) ) : $cb;
+            if ( $ignoreExceptions ) {
                 try {
-                    $result[] = call_user_func_array($callback, $args);
-                } catch (Exception $e) {
-                    BDebug::warning('EXCEPTION class('.get_class($r).') arrayWalk('.$i.'): '.$e->getMessage());
+                    $result[] = call_user_func_array( $callback, $args );
+                } catch ( Exception $e ) {
+                    BDebug::warning( 'EXCEPTION class(' . get_class( $r ) . ') arrayWalk(' . $i . '): ' . $e->getMessage() );
                 }
             } else {
-                $result[] = call_user_func_array($callback, $args);
+                $result[] = call_user_func_array( $callback, $args );
             }
         }
         return $result;
@@ -473,17 +473,17 @@ class BUtil extends BClass
      * @param array $filter
      * @return boolean|int
      */
-    static public function arrayFind(array $array, array $filter)
+    static public function arrayFind( array $array, array $filter )
     {
-        foreach ($array as $i => $item) {
+        foreach ( $array as $i => $item ) {
             $found = true;
-            foreach ($filter as $k=>$v) {
-                if (!(isset($item[$k]) && $item[$k]===$v)) {
+            foreach ( $filter as $k => $v ) {
+                if ( !( isset( $item[ $k ] ) && $item[ $k ] === $v ) ) {
                     $found = false;
                     break;
                 }
             }
-            if (!$found) {
+            if ( !$found ) {
                 continue;
             }
             return $i;
@@ -499,16 +499,16 @@ class BUtil extends BClass
     * @param array|string $arr
     * @return array
     */
-    static public function arrayCleanInt($arr)
+    static public function arrayCleanInt( $arr )
     {
         $res = array();
-        if (is_string($arr)) {
-            $arr = explode(',', $arr);
+        if ( is_string( $arr ) ) {
+            $arr = explode( ',', $arr );
         }
-        if (is_array($arr)) {
-            foreach ($arr as $k=>$v) {
-                if (is_numeric($v)) {
-                    $res[$k] = intval($v);
+        if ( is_array( $arr ) ) {
+            foreach ( $arr as $k => $v ) {
+                if ( is_numeric( $v ) ) {
+                    $res[ $k ] = intval( $v );
                 }
             }
         }
@@ -531,102 +531,102 @@ class BUtil extends BClass
     *   - arr.(before|after).$item_array_key==$key
     * @return array resulting array
     */
-    static public function arrayInsert($array, $items, $where)
+    static public function arrayInsert( $array, $items, $where )
     {
         $result = array();
-        $w1 = explode('==', $where, 2);
-        $w2 = explode('.', $w1[0], 3);
+        $w1 = explode( '==', $where, 2 );
+        $w2 = explode( '.', $w1[ 0 ], 3 );
 
-        switch ($w2[0]) {
+        switch ( $w2[ 0 ] ) {
         case 'start':
-            $result = array_merge($items, $array);
+            $result = array_merge( $items, $array );
             break;
 
         case 'end':
-            $result = array_merge($array, $items);
+            $result = array_merge( $array, $items );
             break;
 
         case 'offset': // for associative only
-            $key = $w1[1];
+            $key = $w1[ 1 ];
             $i = 0;
-            foreach ($array as $k=>$v) {
-                if ($key===$i++) {
-                    foreach ($items as $k1=>$v1) {
-                        $result[$k1] = $v1;
+            foreach ( $array as $k => $v ) {
+                if ( $key === $i++ ) {
+                    foreach ( $items as $k1 => $v1 ) {
+                        $result[ $k1 ] = $v1;
                     }
                 }
-                $result[$k] = $v;
+                $result[ $k ] = $v;
             }
             break;
 
         case 'key': // for associative only
-            $rel = $w2[1];
-            $key = $w1[1];
-            foreach ($array as $k=>$v) {
-                if ($key===$k) {
-                    if ($rel==='after') {
-                        $result[$k] = $v;
+            $rel = $w2[ 1 ];
+            $key = $w1[ 1 ];
+            foreach ( $array as $k => $v ) {
+                if ( $key === $k ) {
+                    if ( $rel === 'after' ) {
+                        $result[ $k ] = $v;
                     }
-                    foreach ($items as $k1=>$v1) {
-                        $result[$k1] = $v1;
+                    foreach ( $items as $k1 => $v1 ) {
+                        $result[ $k1 ] = $v1;
                     }
-                    if ($rel==='before') {
-                        $result[$k] = $v;
+                    if ( $rel === 'before' ) {
+                        $result[ $k ] = $v;
                     }
                 } else {
-                    $result[$k] = $v;
+                    $result[ $k ] = $v;
                 }
             }
             break;
 
         case 'obj':
-            $rel = $w2[1];
-            $f = $w2[2];
-            $key = $w1[1];
-            foreach ($array as $k=>$v) {
-                if ($key===$v->$f) {
-                    if ($rel==='after') {
-                        $result[$k] = $v;
+            $rel = $w2[ 1 ];
+            $f = $w2[ 2 ];
+            $key = $w1[ 1 ];
+            foreach ( $array as $k => $v ) {
+                if ( $key === $v->$f ) {
+                    if ( $rel === 'after' ) {
+                        $result[ $k ] = $v;
                     }
-                    foreach ($items as $k1=>$v1) {
-                        $result[$k1] = $v1;
+                    foreach ( $items as $k1 => $v1 ) {
+                        $result[ $k1 ] = $v1;
                     }
-                    if ($rel==='before') {
-                        $result[$k] = $v;
+                    if ( $rel === 'before' ) {
+                        $result[ $k ] = $v;
                     }
                 } else {
-                    $result[$k] = $v;
+                    $result[ $k ] = $v;
                 }
             }
             break;
 
         case 'arr':
-            $rel = $w2[1];
-            $f = $w2[2];
-            $key = $w1[1];
-            $isAssoc = empty($array[0]);
-            foreach ($array as $k=>$v) {
-                if (!isset($v[$f])) {
-                    if ($isAssoc) $result[$k] = $v; else $result[] = $v;
+            $rel = $w2[ 1 ];
+            $f = $w2[ 2 ];
+            $key = $w1[ 1 ];
+            $isAssoc = empty( $array[ 0 ] );
+            foreach ( $array as $k => $v ) {
+                if ( !isset( $v[ $f ] ) ) {
+                    if ( $isAssoc ) $result[ $k ] = $v; else $result[] = $v;
                     continue;
                 }
-                if ($key===$v[$f]) {
-                    if ($rel==='after') {
-                        if ($isAssoc) $result[$k] = $v; else $result[] = $v;
+                if ( $key === $v[ $f ] ) {
+                    if ( $rel === 'after' ) {
+                        if ( $isAssoc ) $result[ $k ] = $v; else $result[] = $v;
                     }
-                    foreach ($items as $k1=>$v1) {
-                        if ($isAssoc) $result[$k1] = $v1; else $result[] = $v1;
+                    foreach ( $items as $k1 => $v1 ) {
+                        if ( $isAssoc ) $result[ $k1 ] = $v1; else $result[] = $v1;
                     }
-                    if ($rel==='before') {
-                        if ($isAssoc) $result[$k] = $v; else $result[] = $v;
+                    if ( $rel === 'before' ) {
+                        if ( $isAssoc ) $result[ $k ] = $v; else $result[] = $v;
                     }
                 } else {
-                    if ($isAssoc) $result[$k] = $v; else $result[] = $v;
+                    if ( $isAssoc ) $result[ $k ] = $v; else $result[] = $v;
                 }
             }
             break;
 
-        default: BDebug::error('Invalid where condition: '.$where);
+        default: BDebug::error( 'Invalid where condition: ' . $where );
         }
 
         return $result;
@@ -642,47 +642,47 @@ class BUtil extends BClass
      * @return array
      * @result array
      */
-    static public function arrayMask(array $source, $fields, $inverse=false, $setNulls=true)
+    static public function arrayMask( array $source, $fields, $inverse = false, $setNulls = true )
     {
-        if (is_string($fields)) {
-            $fields = explode(',', $fields);
-            @array_walk($fields, 'trim'); // LLVM BUG
+        if ( is_string( $fields ) ) {
+            $fields = explode( ',', $fields );
+            @array_walk( $fields, 'trim' ); // LLVM BUG
         }
         $result = array();
-        if (!$inverse) {
-            foreach ($fields as $k) {
-                if (isset($source[$k])) {
-                    $result[$k] = $source[$k];
-                } elseif ($setNulls) {
-                    $result[$k] = null;
+        if ( !$inverse ) {
+            foreach ( $fields as $k ) {
+                if ( isset( $source[ $k ] ) ) {
+                    $result[ $k ] = $source[ $k ];
+                } elseif ( $setNulls ) {
+                    $result[ $k ] = null;
                 }
             }
         } else {
-            foreach ($source as $k=>$v) {
-                if (!in_array($k, $fields)) $result[$k] = $v;
+            foreach ( $source as $k => $v ) {
+                if ( !in_array( $k, $fields ) ) $result[ $k ] = $v;
             }
         }
         return $result;
     }
 
-    static public function arrayToOptions($source, $labelField, $keyField=null, $emptyLabel=null)
+    static public function arrayToOptions( $source, $labelField, $keyField = null, $emptyLabel = null )
     {
         $options = array();
-        if (!is_null($emptyLabel)) {
-            $options = array("" => $emptyLabel);
+        if ( !is_null( $emptyLabel ) ) {
+            $options = array( "" => $emptyLabel );
         }
-        if (empty($source)) {
+        if ( empty( $source ) ) {
             return array();
         }
-        $isObject = is_object(current($source));
-        foreach ($source as $k=>$item) {
-            if ($isObject) {
-                $key = is_null($keyField) ? $k : $item->$keyField;
-                $label = $labelField[0]==='.' ? $item->{substr($labelField, 1)}() : $item->labelField;
-                $options[$key] = $label;
+        $isObject = is_object( current( $source ) );
+        foreach ( $source as $k => $item ) {
+            if ( $isObject ) {
+                $key = is_null( $keyField ) ? $k : $item->$keyField;
+                $label = $labelField[ 0 ] === '.' ? $item-> {substr( $labelField, 1 )}() : $item->labelField;
+                $options[ $key ] = $label;
             } else {
-                $key = is_null($keyField) ? $k : $item[$keyField];
-                $options[$key] = $item[$labelField];
+                $key = is_null( $keyField ) ? $k : $item[ $keyField ];
+                $options[ $key ] = $item[ $labelField ];
             }
         }
         return $options;
@@ -691,15 +691,15 @@ class BUtil extends BClass
     /**
      * @todo consolidate with arraySeqToMap()
      */
-    static public function arrayMakeAssoc($source, $keyField)
+    static public function arrayMakeAssoc( $source, $keyField )
     {
-        $isObject = is_object(current($source));
+        $isObject = is_object( current( $source ) );
         $assocArray = array();
-        foreach ($source as $k => $item) {
-            if ($isObject) {
-                $assocArray[$item->$keyField] = $item;
+        foreach ( $source as $k => $item ) {
+            if ( $isObject ) {
+                $assocArray[ $item->$keyField ] = $item;
             } else {
-                $assocArray[$item[$keyField]] = $item;
+                $assocArray[ $item[ $keyField ] ] = $item;
             }
         }
         return $assocArray;
@@ -712,8 +712,8 @@ class BUtil extends BClass
     */
     static public function mcryptIV()
     {
-        if (!static::$_mcryptIV) {
-            static::$_mcryptIV = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_DEV_URANDOM);
+        if ( !static::$_mcryptIV ) {
+            static::$_mcryptIV = mcrypt_create_iv( mcrypt_get_iv_size( MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB ), MCRYPT_DEV_URANDOM );
         }
         return static::$_mcryptIV;
     }
@@ -723,12 +723,12 @@ class BUtil extends BClass
     *
     * @return string
     */
-    static public function mcryptKey($key=null, $configPath=null)
+    static public function mcryptKey( $key = null, $configPath = null )
     {
-        if (!is_null($key)) {
+        if ( !is_null( $key ) ) {
             static::$_mcryptKey = $key;
-        } elseif (is_null(static::$_mcryptKey) && $configPath) {
-            static::$_mcryptKey = BConfig::i()->get($configPath);
+        } elseif ( is_null( static::$_mcryptKey ) && $configPath ) {
+            static::$_mcryptKey = BConfig::i()->get( $configPath );
         }
         return static::$_mcryptKey;
 
@@ -744,11 +744,11 @@ class BUtil extends BClass
     * @param boolean $base64
     * @return string
     */
-    static public function encrypt($value, $key=null, $base64=true)
+    static public function encrypt( $value, $key = null, $base64 = true )
     {
-        if (is_null($key)) $key = static::mcryptKey();
-        $enc = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $value, MCRYPT_MODE_ECB, static::mcryptIV());
-        return $base64 ? trim(base64_encode($enc)) : $enc;
+        if ( is_null( $key ) ) $key = static::mcryptKey();
+        $enc = mcrypt_encrypt( MCRYPT_RIJNDAEL_256, $key, $value, MCRYPT_MODE_ECB, static::mcryptIV() );
+        return $base64 ? trim( base64_encode( $enc ) ) : $enc;
     }
 
     /**
@@ -761,11 +761,11 @@ class BUtil extends BClass
     * @param boolean $base64
     * @return string
     */
-    static public function decrypt($value, $key=null, $base64=true)
+    static public function decrypt( $value, $key = null, $base64 = true )
     {
-        if (is_null($key)) $key = static::mcryptKey();
-        $enc = $base64 ? base64_decode($value) : $value;
-        return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $enc, MCRYPT_MODE_ECB, static::mcryptIV()));
+        if ( is_null( $key ) ) $key = static::mcryptKey();
+        $enc = $base64 ? base64_decode( $value ) : $value;
+        return trim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, $key, $enc, MCRYPT_MODE_ECB, static::mcryptIV() ) );
     }
 
     /**
@@ -774,16 +774,16 @@ class BUtil extends BClass
     * @param int $strLen length of resulting string
     * @param string $chars allowed characters to be used
     */
-    public static function randomString($strLen=8, $chars=null)
+    public static function randomString( $strLen = 8, $chars = null )
     {
-        if (is_null($chars)) {
+        if ( is_null( $chars ) ) {
             $chars = static::$_defaultCharPool;
         }
-        $charsLen = strlen($chars)-1;
+        $charsLen = strlen( $chars )-1;
         $str = '';
         mt_srand();
-        for ($i=0; $i<$strLen; $i++) {
-            $str .= $chars[mt_rand(0, $charsLen)];
+        for ( $i = 0; $i < $strLen; $i++ ) {
+            $str .= $chars[ mt_rand( 0, $charsLen ) ];
         }
         return $str;
     }
@@ -799,33 +799,33 @@ class BUtil extends BClass
     * @param string $pattern
     * @return string
     */
-    public static function randomPattern($pattern)
+    public static function randomPattern( $pattern )
     {
-        static $chars = array('L'=>'bcdfghjkmnpqrstvwxyz', 'U'=>'BCDFGHJKLMNPQRSTVWXYZ', 'D'=>'123456789');
+        static $chars = array( 'L' => 'bcdfghjkmnpqrstvwxyz', 'U' => 'BCDFGHJKLMNPQRSTVWXYZ', 'D' => '123456789' );
 
-        while (preg_match('#\{([ULD]+)([0-9]+)\}#i', $pattern, $m)) {
-            for ($i=0, $c=''; $i<strlen($m[1]); $i++) $c .= $chars[$m[1][$i]];
-            $pattern = preg_replace('#'.preg_quote($m[0], '#').'#', BUtil::randomString($m[2], $c), $pattern, 1);
+        while ( preg_match( '#\{([ULD]+)([0-9]+)\}#i', $pattern, $m ) ) {
+            for ( $i = 0, $c = ''; $i < strlen( $m[ 1 ] ); $i++ ) $c .= $chars[ $m[ 1 ][ $i ] ];
+            $pattern = preg_replace( '#' . preg_quote( $m[ 0 ], '#' ) . '#', BUtil::randomString( $m[ 2 ], $c ), $pattern, 1 );
         }
         return $pattern;
     }
 
-    public static function nextStringValue($string='', $chars=null)
+    public static function nextStringValue( $string = '', $chars = null )
     {
-        if (is_null($chars)) {
+        if ( is_null( $chars ) ) {
             $chars = static::$_defaultCharPool; // avoid leading 0
         }
-        $pos = strlen($string);
-        $lastChar = substr($chars, -1);
-        while (--$pos>=-1) {
-            if ($pos==-1) {
-                $string = $chars[0].$string;
+        $pos = strlen( $string );
+        $lastChar = substr( $chars, -1 );
+        while ( --$pos >= -1 ) {
+            if ( $pos == -1 ) {
+                $string = $chars[ 0 ] . $string;
                 return $string;
-            } elseif ($string[$pos]===$lastChar) {
-                $string[$pos] = $chars[0];
+            } elseif ( $string[ $pos ] === $lastChar ) {
+                $string[ $pos ] = $chars[ 0 ];
                 continue;
             } else {
-                $string[$pos] = $chars[strpos($chars, $string[$pos])+1];
+                $string[ $pos ] = $chars[ strpos( $chars, $string[ $pos ] ) + 1 ];
                 return $string;
             }
         }
@@ -838,17 +838,17 @@ class BUtil extends BClass
     *
     * @param string $algo
     */
-    public static function hashAlgo($algo=null)
+    public static function hashAlgo( $algo = null )
     {
-        if (is_null($algo)) {
+        if ( is_null( $algo ) ) {
             return static::$_hashAlgo;
         }
         static::$_hashAlgo = $algo;
     }
 
-    public static function hashIter($iter=null)
+    public static function hashIter( $iter = null )
     {
-        if (is_null($iter)) {
+        if ( is_null( $iter ) ) {
             return static::$_hashIter;
         }
         static::$iter = $iter;
@@ -863,10 +863,10 @@ class BUtil extends BClass
     * @param mixed $algo
     * @return string
     */
-    public static function saltedHash($string, $salt, $algo=null)
+    public static function saltedHash( $string, $salt, $algo = null )
     {
-        $algo = !is_null($algo) ? $algo : static::$_hashAlgo;
-        return hash($algo, $salt.$string);
+        $algo = !is_null( $algo ) ? $algo : static::$_hashAlgo;
+        return hash( $algo, $salt . $string );
     }
 
     /**
@@ -880,21 +880,21 @@ class BUtil extends BClass
     * @param string $algo
     * @param integer $iter
     */
-    public static function fullSaltedHash($string, $salt=null, $algo=null, $iter=null)
+    public static function fullSaltedHash( $string, $salt = null, $algo = null, $iter = null )
     {
-        $algo = !is_null($algo) ? $algo : static::$_hashAlgo;
-        if ('bcrypt'===$algo) {
-            return Bcrypt::i()->hash($string);
+        $algo = !is_null( $algo ) ? $algo : static::$_hashAlgo;
+        if ( 'bcrypt' === $algo ) {
+            return Bcrypt::i()->hash( $string );
         }
-        $iter = !is_null($iter) ? $iter : static::$_hashIter;
+        $iter = !is_null( $iter ) ? $iter : static::$_hashIter;
         $s = static::$_hashSep;
-        $hash = $s.$algo.$s.$iter;
-        for ($i=0; $i<$iter; $i++) {
-            $salt1 = !is_null($salt) ? $salt : static::randomString();
-            $hash .= $s.$salt1;
-            $string = static::saltedHash($string, $salt1, $algo);
+        $hash = $s . $algo . $s . $iter;
+        for ( $i = 0; $i < $iter; $i++ ) {
+            $salt1 = !is_null( $salt ) ? $salt : static::randomString();
+            $hash .= $s . $salt1;
+            $string = static::saltedHash( $string, $salt1, $algo );
         }
-        return $hash.$s.$string;
+        return $hash . $s . $string;
     }
 
     /**
@@ -905,31 +905,31 @@ class BUtil extends BClass
     * @param string $storedHash fully composed salted hash
     * @return bool
     */
-    public static function validateSaltedHash($string, $storedHash)
+    public static function validateSaltedHash( $string, $storedHash )
     {
-        if (strpos($storedHash, '$2a$')===0 || strpos($storedHash, '$2y$')===0) {
-            return Bcrypt::i()->verify($string, $storedHash);
+        if ( strpos( $storedHash, '$2a$' ) === 0 || strpos( $storedHash, '$2y$' ) === 0 ) {
+            return Bcrypt::i()->verify( $string, $storedHash );
         }
-        if (!$storedHash) {
+        if ( !$storedHash ) {
             return false;
         }
-        $sep = $storedHash[0];
-        $arr = explode($sep, $storedHash);
-        array_shift($arr);
-        $algo = array_shift($arr);
-        $iter = array_shift($arr);
+        $sep = $storedHash[ 0 ];
+        $arr = explode( $sep, $storedHash );
+        array_shift( $arr );
+        $algo = array_shift( $arr );
+        $iter = array_shift( $arr );
         $verifyHash = $string;
-        for ($i=0; $i<$iter; $i++) {
-            $salt = array_shift($arr);
-            $verifyHash = static::saltedHash($verifyHash, $salt, $algo);
+        for ( $i = 0; $i < $iter; $i++ ) {
+            $salt = array_shift( $arr );
+            $verifyHash = static::saltedHash( $verifyHash, $salt, $algo );
         }
-        $knownHash = array_shift($arr);
-        return $verifyHash===$knownHash;
+        $knownHash = array_shift( $arr );
+        return $verifyHash === $knownHash;
     }
 
-    public static function sha512base64($str)
+    public static function sha512base64( $str )
     {
-        return base64_encode(pack('H*', hash('sha512', $str)));
+        return base64_encode( pack( 'H*', hash( 'sha512', $str ) ) );
     }
 
     static protected $_lastRemoteHttpInfo;
@@ -941,23 +941,23 @@ class BUtil extends BClass
     * @param array $data
     * @return string
     */
-    public static function remoteHttp($method, $url, $data = array())
+    public static function remoteHttp( $method, $url, $data = array() )
     {
-        $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: '.$method.' '.$url));
+        $debugProfile = BDebug::debug( chunk_split( 'REMOTE HTTP: ' . $method . ' ' . $url ) );
         $timeout = 5;
         $userAgent = 'Mozilla/5.0';
-        if ($method==='GET' && $data) {
-            if(is_array($data)){
-                $request = http_build_query($data, '', '&');
+        if ( $method === 'GET' && $data ) {
+            if ( is_array( $data ) ) {
+                $request = http_build_query( $data, '', '&' );
             } else {
                 $request = $data;
             }
 
-            $url .= (strpos($url, '?')===false ? '?' : '&') . $request;
+            $url .= ( strpos( $url, '?' ) === false ? '?' : '&' ) . $request;
         }
 
         // curl disabled because file upload doesn't work for some reason. TODO: figure out why
-        if (false && function_exists('curl_init') || ini_get('safe_mode')) {
+        if ( false && function_exists( 'curl_init' ) || ini_get( 'safe_mode' ) ) {
             $curlOpt = array(
                 CURLOPT_USERAGENT => $userAgent,
                 CURLOPT_URL => $url,
@@ -965,118 +965,118 @@ class BUtil extends BClass
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_AUTOREFERER => true,
                 CURLOPT_SSL_VERIFYPEER => true,
-                CURLOPT_CAINFO => dirname(__DIR__).'/ssl/ca-bundle.crt',
+                CURLOPT_CAINFO => dirname( __DIR__ ) . '/ssl/ca-bundle.crt',
                 CURLOPT_SSL_VERIFYHOST => 2,
                 CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_TIMEOUT => $timeout,
                 CURLOPT_MAXREDIRS => 10,
-                CURLOPT_HTTPHEADER, array('Expect:'), //Fixes the HTTP/1.1 417 Expectation Failed
+                CURLOPT_HTTPHEADER, array( 'Expect:' ), //Fixes the HTTP/1.1 417 Expectation Failed
                 CURLOPT_HEADER => true,
             );
-            if (!ini_get('safe_mode') && !ini_get('open_basedir')) {
+            if ( !ini_get( 'safe_mode' ) && !ini_get( 'open_basedir' ) ) {
                 $curlOpt += array(
                     CURLOPT_FOLLOWLOCATION => true,
                 );
             }
-            if (false) { // TODO: figure out cookies handling
-                $cookieDir = BConfig::i()->get('fs/storage_dir').'/cache';
-                BUtil::ensureDir($cookieDir);
-                $cookie = tempnam($cookieDir, 'CURLCOOKIE');
+            if ( false ) { // TODO: figure out cookies handling
+                $cookieDir = BConfig::i()->get( 'fs/storage_dir' ) . '/cache';
+                BUtil::ensureDir( $cookieDir );
+                $cookie = tempnam( $cookieDir, 'CURLCOOKIE' );
                 $curlOpt += array(
                     CURLOPT_COOKIEJAR => $cookie,
                 );
             }
 
-            if ($method==='POST') {
+            if ( $method === 'POST' ) {
                 $curlOpt += array(
                     CURLOPT_POSTFIELDS => $data,
                     CURLOPT_POST => 1,
                 );
-            } elseif ($method==='PUT') {
+            } elseif ( $method === 'PUT' ) {
                 $curlOpt += array(
                     CURLOPT_POSTFIELDS => $data,
                     CURLOPT_PUT => 1,
                 );
             }
             $ch = curl_init();
-            curl_setopt_array($ch, $curlOpt);
-            $rawResponse = curl_exec($ch);
-            list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2);
-            static::$_lastRemoteHttpInfo = curl_getinfo($ch);
-            $respHeaders = explode("\r\n", $headers);
-            if(curl_errno($ch) != 0){
-                static::$_lastRemoteHttpInfo['errno'] = curl_errno($ch);
-                static::$_lastRemoteHttpInfo['error'] = curl_error($ch);
+            curl_setopt_array( $ch, $curlOpt );
+            $rawResponse = curl_exec( $ch );
+            list( $headers, $response ) = explode( "\r\n\r\n", $rawResponse, 2 );
+            static::$_lastRemoteHttpInfo = curl_getinfo( $ch );
+            $respHeaders = explode( "\r\n", $headers );
+            if ( curl_errno( $ch ) != 0 ) {
+                static::$_lastRemoteHttpInfo[ 'errno' ] = curl_errno( $ch );
+                static::$_lastRemoteHttpInfo[ 'error' ] = curl_error( $ch );
             }
-            curl_close($ch);
+            curl_close( $ch );
         } else {
-            $opts = array('http' => array(
+            $opts = array( 'http' => array(
                 'method' => $method,
                 'timeout' => $timeout,
                 'header' => "User-Agent: {$userAgent}\r\n",
-            ));
-            if ($method==='POST' || $method==='PUT') {
+            ) );
+            if ( $method === 'POST' || $method === 'PUT' ) {
                 $multipart = false;
-                if (is_array($data)) {
-                    foreach ($data as $k=>$v) {
-                        if (is_string($v) && $v[0]==='@') {
+                if ( is_array( $data ) ) {
+                    foreach ( $data as $k => $v ) {
+                        if ( is_string( $v ) && $v[ 0 ] === '@' ) {
                             $multipart = true;
                             break;
                         }
                     }
                 }
-                if (!$multipart) {
+                if ( !$multipart ) {
                     $contentType = 'application/x-www-form-urlencoded';
-                    $opts['http']['content'] = is_array($data) ? http_build_query($data) : $data;
+                    $opts[ 'http' ][ 'content' ] = is_array( $data ) ? http_build_query( $data ) : $data;
                 } else {
-                    $boundary = '--------------------------'.microtime(true);
-                    $contentType = 'multipart/form-data; boundary='.$boundary;
-                    $opts['http']['content'] = '';
+                    $boundary = '--------------------------' . microtime( true );
+                    $contentType = 'multipart/form-data; boundary=' . $boundary;
+                    $opts[ 'http' ][ 'content' ] = '';
                     //TODO: implement recursive forms
-                    foreach ($data as $k =>$v) {
-                        if (is_string($v) && $v[0]==='@') {
-                            $filename = substr($v, 1);
-                            $fileContents = file_get_contents($filename);
-                            $opts['http']['content'] .= "--{$boundary}\r\n".
-                                "Content-Disposition: form-data; name=\"{$k}\"; filename=\"".basename($filename)."\"\r\n".
-                                "Content-Type: application/zip\r\n".
-                                "\r\n".
+                    foreach ( $data as $k => $v ) {
+                        if ( is_string( $v ) && $v[ 0 ] === '@' ) {
+                            $filename = substr( $v, 1 );
+                            $fileContents = file_get_contents( $filename );
+                            $opts[ 'http' ][ 'content' ] .= "--{$boundary}\r\n" .
+                                "Content-Disposition: form-data; name=\"{$k}\"; filename=\"" . basename( $filename ) . "\"\r\n" .
+                                "Content-Type: application/zip\r\n" .
+                                "\r\n" .
                                 "{$fileContents}\r\n";
                         } else {
-                            $opts['http']['content'] .= "--{$boundary}\r\n".
-                                "Content-Disposition: form-data; name=\"{$k}\"\r\n".
-                                "\r\n".
+                            $opts[ 'http' ][ 'content' ] .= "--{$boundary}\r\n" .
+                                "Content-Disposition: form-data; name=\"{$k}\"\r\n" .
+                                "\r\n" .
                                 "{$v}\r\n";
                         }
                     }
-                    $opts['http']['content'] .= "--{$boundary}--\r\n";
+                    $opts[ 'http' ][ 'content' ] .= "--{$boundary}--\r\n";
                 }
-                $opts['http']['header'] .= "Content-Type: {$contentType}\r\n";
+                $opts[ 'http' ][ 'header' ] .= "Content-Type: {$contentType}\r\n";
                     //."Content-Length: ".strlen($request)."\r\n";
-                if (preg_match('#^(ssl|ftps|https):#', $url)) {
-                    $opts['ssl'] = array(
+                if ( preg_match( '#^(ssl|ftps|https):#', $url ) ) {
+                    $opts[ 'ssl' ] = array(
                         'verify_peer' => true,
-                        'cafile' => dirname(__DIR__).'/ssl/ca-bundle.crt',
+                        'cafile' => dirname( __DIR__ ) . '/ssl/ca-bundle.crt',
                         'verify_depth' => 5,
                     );
                 }
             }
-            $response = @file_get_contents($url, false, stream_context_create($opts));
+            $response = @file_get_contents( $url, false, stream_context_create( $opts ) );
 
             static::$_lastRemoteHttpInfo = array(); //TODO: emulate curl data?
-            $respHeaders = isset($http_response_header) ? $http_response_header : array();
+            $respHeaders = isset( $http_response_header ) ? $http_response_header : array();
         }
-        foreach ($respHeaders as $i => $line) {
-            if ($i) {
-                $arr = explode(':', $line, 2);
+        foreach ( $respHeaders as $i => $line ) {
+            if ( $i ) {
+                $arr = explode( ':', $line, 2 );
             } else {
-                $arr = array(0, $line);
+                $arr = array( 0, $line );
             }
-            static::$_lastRemoteHttpInfo['headers'][strtolower($arr[0])] = trim($arr[1]);
+            static::$_lastRemoteHttpInfo[ 'headers' ][ strtolower( $arr[ 0 ] ) ] = trim( $arr[ 1 ] );
         }
         #BDebug::log(print_r(compact('method', 'url', 'data', 'response'), 1), 'remotehttp.log');
 
-        BDebug::profile($debugProfile);
+        BDebug::profile( $debugProfile );
         return $response;
     }
 
@@ -1085,35 +1085,35 @@ class BUtil extends BClass
         return static::$_lastRemoteHttpInfo;
     }
 
-    public static function normalizePath($path)
+    public static function normalizePath( $path )
     {
-        $path = str_replace('\\', '/', $path);
-        if (strpos($path, '/..')!==false) {
-            $a = explode('/', $path);
+        $path = str_replace( '\\', '/', $path );
+        if ( strpos( $path, '/..' ) !== false ) {
+            $a = explode( '/', $path );
             $b = array();
-            foreach ($a as $p) {
-                if ($p==='..') array_pop($b); else $b[] = $p;
+            foreach ( $a as $p ) {
+                if ( $p === '..' ) array_pop( $b ); else $b[] = $p;
             }
-            $path = join('/', $b);
+            $path = join( '/', $b );
         }
         return $path;
     }
 
-    public static function globRecursive($dir, $pattern = null, $flags=0)
+    public static function globRecursive( $dir, $pattern = null, $flags = 0 )
     {
         /**/
-        if (is_null($pattern)) {
+        if ( is_null( $pattern ) ) {
             $pattern = '*';
         }
-        $files = glob($dir . '/' . $pattern, $flags);
-        if (!$files) {
+        $files = glob( $dir . '/' . $pattern, $flags );
+        if ( !$files ) {
             return array();
         }
         $result = $files;
-        foreach ($files as $file) {
-            if (is_dir($file)) {
-                $subFiles = static::globRecursive($file, $pattern, $flags);
-                $result = array_merge($result, $subFiles);
+        foreach ( $files as $file ) {
+            if ( is_dir( $file ) ) {
+                $subFiles = static::globRecursive( $file, $pattern, $flags );
+                $result = array_merge( $result, $subFiles );
             }
         }
         return $result;
@@ -1137,27 +1137,27 @@ class BUtil extends BClass
         /**/
     }
 
-    public static function isPathAbsolute($path)
+    public static function isPathAbsolute( $path )
     {
-        return !empty($path) && ($path[0]==='/' || $path[0]==='\\') // starting with / or \
-            || !empty($path[1]) && $path[1]===':'; // windows drive letter C:
+        return !empty( $path ) && ( $path[ 0 ] === '/' || $path[ 0 ] === '\\' ) // starting with / or \
+            || !empty( $path[ 1 ] ) && $path[ 1 ] === ':'; // windows drive letter C:
     }
 
-    public static function isUrlFull($url)
+    public static function isUrlFull( $url )
     {
-        return preg_match('#^(https?:)?//#', $url);
+        return preg_match( '#^(https?:)?//#', $url );
     }
 
-    public static function ensureDir($dir)
+    public static function ensureDir( $dir )
     {
-        if (is_file($dir)) {
-            BDebug::warning($dir.' is a file, directory required');
+        if ( is_file( $dir ) ) {
+            BDebug::warning( $dir . ' is a file, directory required' );
             return;
         }
-        if (!is_dir($dir)) {
-            @$res = mkdir($dir, 0777, true);
-            if (!$res) {
-                BDebug::warning("Can't create directory: ".$dir);
+        if ( !is_dir( $dir ) ) {
+            @$res = mkdir( $dir, 0777, true );
+            if ( !$res ) {
+                BDebug::warning( "Can't create directory: " . $dir );
             }
         }
     }
@@ -1169,18 +1169,18 @@ class BUtil extends BClass
     * @param array $p result of parse_url()
     * @return string
     */
-    public static function unparseUrl($p)
+    public static function unparseUrl( $p )
     {
-        $scheme   = isset($p['scheme'])   ? $p['scheme'] . '://' : '';
-        $user     = isset($p['user'])     ? $p['user']           : '';
-        $pass     = isset($p['pass'])     ? ':' . $p['pass']     : '';
-        $pass     = ($user || $pass)      ? $pass . '@'          : '';
-        $host     = isset($p['host'])     ? $p['host']           : '';
-        $port     = isset($p['port'])     ? ':' . $p['port']     : '';
-        $path     = isset($p['path'])     ? $p['path']           : '';
-        $query    = isset($p['query'])    ? '?' . $p['query']    : '';
-        $fragment = isset($p['fragment']) ? '#' . $p['fragment'] : '';
-        return $scheme.$user.$pass.$host.$port.$path.$query.$fragment;
+        $scheme   = isset( $p[ 'scheme' ] )   ? $p[ 'scheme' ] . '://' : '';
+        $user     = isset( $p[ 'user' ] )     ? $p[ 'user' ]           : '';
+        $pass     = isset( $p[ 'pass' ] )     ? ':' . $p[ 'pass' ]     : '';
+        $pass     = ( $user || $pass )      ? $pass . '@'          : '';
+        $host     = isset( $p[ 'host' ] )     ? $p[ 'host' ]           : '';
+        $port     = isset( $p[ 'port' ] )     ? ':' . $p[ 'port' ]     : '';
+        $path     = isset( $p[ 'path' ] )     ? $p[ 'path' ]           : '';
+        $query    = isset( $p[ 'query' ] )    ? '?' . $p[ 'query' ]    : '';
+        $fragment = isset( $p[ 'fragment' ] ) ? '#' . $p[ 'fragment' ] : '';
+        return $scheme . $user . $pass . $host . $port . $path . $query . $fragment;
     }
 
     /**
@@ -1190,48 +1190,48 @@ class BUtil extends BClass
     * @param array $params
     * @return string
     */
-    public static function setUrlQuery($url, $params)
+    public static function setUrlQuery( $url, $params )
     {
-        if (true === $url) {
+        if ( true === $url ) {
             $url = BRequest::currentUrl();
         }
-        $parsed = parse_url($url);
+        $parsed = parse_url( $url );
         $query = array();
-        if (!empty($parsed['query'])) {
-            foreach (explode('&', $parsed['query']) as $q) {
-                $a = explode('=', $q);
-                if ($a[0]==='') {
+        if ( !empty( $parsed[ 'query' ] ) ) {
+            foreach ( explode( '&', $parsed[ 'query' ] ) as $q ) {
+                $a = explode( '=', $q );
+                if ( $a[ 0 ] === '' ) {
                     continue;
                 }
-                $a[0] = urldecode($a[0]);
-                $query[$a[0]] = urldecode($a[1]);
+                $a[ 0 ] = urldecode( $a[ 0 ] );
+                $query[ $a[ 0 ] ] = urldecode( $a[ 1 ] );
             }
         }
-        foreach($params as $k => $v){
-            if($v === ""){
-                if(isset($query[$k])){
-                    unset($query[$k]);
+        foreach ( $params as $k => $v ) {
+            if ( $v === "" ) {
+                if ( isset( $query[ $k ] ) ) {
+                    unset( $query[ $k ] );
                 }
-                unset($params[$k]);
+                unset( $params[ $k ] );
             }
         }
-        $query = array_merge($query, $params);
-        $parsed['query'] = http_build_query($query);
-        return static::unparseUrl($parsed);
+        $query = array_merge( $query, $params );
+        $parsed[ 'query' ] = http_build_query( $query );
+        return static::unparseUrl( $parsed );
     }
 
-    public static function paginateSortUrl($url, $state, $field)
+    public static function paginateSortUrl( $url, $state, $field )
     {
-        return static::setUrlQuery($url, array(
-            's'=>$field,
-            'sd'=>$state['s']!=$field || $state['sd']=='desc' ? 'asc' : 'desc',
-        ));
+        return static::setUrlQuery( $url, array(
+            's' => $field,
+            'sd' => $state[ 's' ] != $field || $state[ 'sd' ] == 'desc' ? 'asc' : 'desc',
+        ) );
     }
 
-    public static function paginateSortAttr($url, $state, $field, $class='')
+    public static function paginateSortAttr( $url, $state, $field, $class = '' )
     {
-        return 'href="'.static::paginateSortUrl($url, $state, $field)
-            .'" class="'.$class.' '.($state['s']==$field ? $state['sd'] : '').'"';
+        return 'href="' . static::paginateSortUrl( $url, $state, $field )
+            . '" class="' . $class . ' ' . ( $state[ 's' ] == $field ? $state[ 'sd' ] : '' ) . '"';
     }
 
     /**
@@ -1240,36 +1240,36 @@ class BUtil extends BClass
      * @param null   $content
      * @return string
      */
-    public static function tagHtml($tag, $attrs = array(), $content = null)
+    public static function tagHtml( $tag, $attrs = array(), $content = null )
     {
         $attrsHtmlArr = array();
-        foreach ($attrs as $k => $v) {
-            if (is_null($v) || false === $v) {
+        foreach ( $attrs as $k => $v ) {
+            if ( is_null( $v ) || false === $v ) {
                 continue;
             }
-            if (true === $v) {
+            if ( true === $v ) {
                 $v = $k;
-            } elseif (is_array($v)) {
-                switch ($k) {
+            } elseif ( is_array( $v ) ) {
+                switch ( $k ) {
                     case 'class':
-                        $v = join(' ', $v);
+                        $v = join( ' ', $v );
                         break;
 
                     case 'style':
                         $attrHtmlArr = array();
-                        foreach ($v as $k1 => $v1) {
-                            $attrHtmlArr[] = $k1.':'.$v1;
+                        foreach ( $v as $k1 => $v1 ) {
+                            $attrHtmlArr[] = $k1 . ':' . $v1;
                         }
-                        $v = join('; ', $attrHtmlArr);
+                        $v = join( '; ', $attrHtmlArr );
                         break;
 
                     default:
-                        $v = join('', $v);
+                        $v = join( '', $v );
                 }
             }
-            $attrsHtmlArr[] = $k.'="'.htmlspecialchars($v, ENT_QUOTES, 'UTF-8').'"';
+            $attrsHtmlArr[] = $k . '="' . htmlspecialchars( $v, ENT_QUOTES, 'UTF-8' ) . '"';
         }
-        return '<'.$tag.' '.join(' ', $attrsHtmlArr).'>'.$content.'</'.$tag.'>';
+        return '<' . $tag . ' ' . join( ' ', $attrsHtmlArr ) . '>' . $content . '</' . $tag . '>';
     }
 
     /**
@@ -1277,32 +1277,32 @@ class BUtil extends BClass
      * @param string $default
      * @return string
      */
-    public static function optionsHtml($options, $default = '')
+    public static function optionsHtml( $options, $default = '' )
     {
-        if(!is_array($default)){
+        if ( !is_array( $default ) ) {
             $default = (string)$default;
         }
         $htmlArr = array();
-        foreach ($options as $k => $v) {
+        foreach ( $options as $k => $v ) {
             $k = (string)$k;
-            if (is_array($v) && $k!=='' && $k[0] === '@') { // group
-                $label = trim(substr($k, 1));
-                $htmlArr[] = BUtil::tagHtml('optgroup', array('label' => $label), static::optionsHtml($v, $default));
+            if ( is_array( $v ) && $k !== '' && $k[ 0 ] === '@' ) { // group
+                $label = trim( substr( $k, 1 ) );
+                $htmlArr[] = BUtil::tagHtml( 'optgroup', array( 'label' => $label ), static::optionsHtml( $v, $default ) );
                 continue;
             }
-            if (is_array($v)) {
+            if ( is_array( $v ) ) {
                 $attr = $v;
-                $v = !empty($attr['text']) ? $attr['text'] : '';
-                unset($attr['text']);
+                $v = !empty( $attr[ 'text' ] ) ? $attr[ 'text' ] : '';
+                unset( $attr[ 'text' ] );
             } else {
                 $attr = array();
             }
-            $attr['value'] = $k;
-            $attr['selected'] = is_array($default) && in_array($k, $default) || $default === $k;
-            $htmlArr[] = BUtil::tagHtml('option', $attr, $v);
+            $attr[ 'value' ] = $k;
+            $attr[ 'selected' ] = is_array( $default ) && in_array( $k, $default ) || $default === $k;
+            $htmlArr[] = BUtil::tagHtml( 'option', $attr, $v );
         }
 
-        return join("\n", $htmlArr);
+        return join( "\n", $htmlArr );
     }
 
     /**
@@ -1338,41 +1338,41 @@ class BUtil extends BClass
      *   - border
      * @return string
      */
-    public static function gravatar($email, $params=array())
+    public static function gravatar( $email, $params = array() )
     {
-        if (empty($params['default'])) {
-            $params['default'] = 'identicon';
+        if ( empty( $params[ 'default' ] ) ) {
+            $params[ 'default' ] = 'identicon';
         }
-        return BRequest::i()->scheme().'://www.gravatar.com/avatar/'.md5(strtolower($email))
-            .($params ? '?'.http_build_query($params) : '');
+        return BRequest::i()->scheme() . '://www.gravatar.com/avatar/' . md5( strtolower( $email ) )
+            . ( $params ? '?' . http_build_query( $params ) : '' );
     }
 
-    public static function extCallback($callback)
+    public static function extCallback( $callback )
     {
-        if (is_string($callback)) {
-            if (strpos($callback, '.')!==false) {
-                list($class, $method) = explode('.', $callback);
-            } elseif (strpos($callback, '->')) {
-                list($class, $method) = explode('->', $callback);
+        if ( is_string( $callback ) ) {
+            if ( strpos( $callback, '.' ) !== false ) {
+                list( $class, $method ) = explode( '.', $callback );
+            } elseif ( strpos( $callback, '->' ) ) {
+                list( $class, $method ) = explode( '->', $callback );
             }
-            if (!empty($class)) {
-                $callback = array($class::i(), $method);
+            if ( !empty( $class ) ) {
+                $callback = array( $class::i(), $method );
             }
         }
         return $callback;
     }
 
-    public static function call($callback, $args=array(), $array=false)
+    public static function call( $callback, $args = array(), $array = false )
     {
-        $callback = static::extCallback($callback);
-        if ($array) {
-            return call_user_func_array($callback, $args);
+        $callback = static::extCallback( $callback );
+        if ( $array ) {
+            return call_user_func_array( $callback, $args );
         } else {
-            return call_user_func($callback, $args);
+            return call_user_func( $callback, $args );
         }
     }
 
-    public static function varSize($var)
+    public static function varSize( $var )
     {
         /*
         function varCopy($src)
@@ -1413,53 +1413,53 @@ class BUtil extends BClass
         }
         */
         $old = memory_get_usage();
-        $dummy = unserialize(serialize($var));
-        return memory_get_usage()-$old;
+        $dummy = unserialize( serialize( $var ) );
+        return memory_get_usage() - $old;
     }
 
-    public static function formatDateRecursive($source, $format='m/d/Y')
+    public static function formatDateRecursive( $source, $format = 'm/d/Y' )
     {
-        foreach ($source as $i=>$val) {
-            if (is_string($val)) {
+        foreach ( $source as $i => $val ) {
+            if ( is_string( $val ) ) {
                 // checking only beginning of string for speed, assuming it is a date
-                if (preg_match('#^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]( |$)#', $val)) {
-                    $source[$i] = date($format, strtotime($val));
+                if ( preg_match( '#^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]( |$)#', $val ) ) {
+                    $source[ $i ] = date( $format, strtotime( $val ) );
                 }
-            } elseif (is_array($val)) {
-                $source[$i] = static::formatDateRecursive($val, $format);
+            } elseif ( is_array( $val ) ) {
+                $source[ $i ] = static::formatDateRecursive( $val, $format );
             }
         }
         return $source;
     }
 
-    public static function timeAgo($ptime, $now=null, $long=false)
+    public static function timeAgo( $ptime, $now = null, $long = false )
     {
-        if (!is_numeric($ptime)) {
-            $ptime = strtotime($ptime);
+        if ( !is_numeric( $ptime ) ) {
+            $ptime = strtotime( $ptime );
         }
-        if (!$now) {
-            $now = strtotime(BDb::now());#time();
-        } elseif (!is_numeric($now)) {
-            $now = strtotime($now);
+        if ( !$now ) {
+            $now = strtotime( BDb::now() );#time();
+        } elseif ( !is_numeric( $now ) ) {
+            $now = strtotime( $now );
         }
         $etime = $now - $ptime;
-        if ($etime < 1) {
+        if ( $etime < 1 ) {
             return $long ? 'less than 1 second' : '0s';
         }
         $a = array(
-            12 * 30 * 24 * 60 * 60  =>  array('year', 'y'),
-            30 * 24 * 60 * 60       =>  array('month', 'mon'),
-            24 * 60 * 60            =>  array('day', 'd'),
-            60 * 60                 =>  array('hour', 'h'),
-            60                      =>  array('minute', 'm'),
-            1                       =>  array('second', 's'),
+            12 * 30 * 24 * 60 * 60  =>  array( 'year', 'y' ),
+            30 * 24 * 60 * 60       =>  array( 'month', 'mon' ),
+            24 * 60 * 60            =>  array( 'day', 'd' ),
+            60 * 60                 =>  array( 'hour', 'h' ),
+            60                      =>  array( 'minute', 'm' ),
+            1                       =>  array( 'second', 's' ),
         );
 
-        foreach ($a as $secs => $sa) {
+        foreach ( $a as $secs => $sa ) {
             $d = $etime / $secs;
-            if ($d >= 1) {
-                $r = round($d);
-                return $r . ($long ? ' ' . $sa[0] . ($r > 1 ? 's' : '') : $sa[1]);
+            if ( $d >= 1 ) {
+                $r = round( $d );
+                return $r . ( $long ? ' ' . $sa[ 0 ] . ( $r > 1 ? 's' : '' ) : $sa[ 1 ] );
             }
         }
     }
@@ -1475,25 +1475,25 @@ class BUtil extends BClass
     *                   LONG:'l jS \of F Y'|'l jS \of F Y \at h:i:s A'
     * @param mixed $tz
     */
-    public static function timeHtml($time, $showTime = false, $format = null, $tz = null)
+    public static function timeHtml( $time, $showTime = false, $format = null, $tz = null )
     {
-        if (!is_numeric($time)) {
-            $time = strtotime($time);
+        if ( !is_numeric( $time ) ) {
+            $time = strtotime( $time );
         }
-        $timeStr = date($showTime ? 'Y-m-d H:i:s' : 'Y-m-d', $time);
-        if (is_null($format)) {
-            $format = BSession::i()->get($showTime ? '_timeformat' : '_dateformat');
-            if (!$format) {
+        $timeStr = date( $showTime ? 'Y-m-d H:i:s' : 'Y-m-d', $time );
+        if ( is_null( $format ) ) {
+            $format = BSession::i()->get( $showTime ? '_timeformat' : '_dateformat' );
+            if ( !$format ) {
                 $format = $showTime ? 'm/d/Y H:i' : 'm/d/Y';
             }
         }
-        if (!is_null($tz)) {
+        if ( !is_null( $tz ) ) {
             $oldTz = date_default_timezone_get();
-            date_default_timezone_set($tz);
+            date_default_timezone_set( $tz );
         }
-        $formattedTime = date($format, $time);
-        if (!is_null($tz)) {
-            date_default_timezone_set($oldTz);
+        $formattedTime = date( $format, $time );
+        if ( !is_null( $tz ) ) {
+            date_default_timezone_set( $oldTz );
         }
         return '<time datetime="' . $timeStr . '">' . $formattedTime . '</time>';
     }
@@ -1506,12 +1506,12 @@ class BUtil extends BClass
      * @param string $filler character to replace not allowed characters with
      * @return string
      */
-    static public function simplifyString($str, $pattern='#[^a-z0-9-]+#', $filler='-')
+    static public function simplifyString( $str, $pattern = '#[^a-z0-9-]+#', $filler = '-' )
     {
-        if (preg_match('#e[a-zA-Z]*$#', $pattern)) {
-            throw new BException('Restricted modifier');
+        if ( preg_match( '#e[a-zA-Z]*$#', $pattern ) ) {
+            throw new BException( 'Restricted modifier' );
         }
-        return trim(preg_replace($pattern, $filler, strtolower($str)), $filler);
+        return trim( preg_replace( $pattern, $filler, strtolower( $str ) ), $filler );
     }
 
     /**
@@ -1521,86 +1521,86 @@ class BUtil extends BClass
     *
     * @param string $dir
     */
-    static public function rmdirRecursive_YesIHaveCheckedThreeTimes($dir, $first=true)
+    static public function rmdirRecursive_YesIHaveCheckedThreeTimes( $dir, $first = true )
     {
-        if ($first) {
-            $dir = realpath($dir);
+        if ( $first ) {
+            $dir = realpath( $dir );
         }
-        if (!$dir || !file_exists($dir)) {
+        if ( !$dir || !file_exists( $dir ) ) {
             return true;
         }
-        if (!is_dir($dir) || is_link($dir)) {
-            return unlink($dir);
+        if ( !is_dir( $dir ) || is_link( $dir ) ) {
+            return unlink( $dir );
         }
-        foreach (scandir($dir) as $item) {
-            if ($item == '.' || $item == '..') {
+        foreach ( scandir( $dir ) as $item ) {
+            if ( $item == '.' || $item == '..' ) {
                 continue;
             }
-            if (!static::rmdirRecursive_YesIHaveCheckedThreeTimes($dir . "/" . $item, false)) {
-                chmod($dir . "/" . $item, 0777);
-                if (!static::rmdirRecursive_YesIHaveCheckedThreeTimes($dir . "/" . $item, false)) {
+            if ( !static::rmdirRecursive_YesIHaveCheckedThreeTimes( $dir . "/" . $item, false ) ) {
+                chmod( $dir . "/" . $item, 0777 );
+                if ( !static::rmdirRecursive_YesIHaveCheckedThreeTimes( $dir . "/" . $item, false ) ) {
                     return false;
                 }
             }
         }
-        return rmdir($dir);
+        return rmdir( $dir );
     }
 
-    static public function topoSort(array $array, array $args=array())
+    static public function topoSort( array $array, array $args = array() )
     {
-        if (empty($array)) {
+        if ( empty( $array ) ) {
             return array();
         }
 
         // nodes listed in 'after' are parents
         // nodes listed in 'before' are children
         // prepare initial $nodes array
-        $beforeVar = !empty($args['before']) ? $args['before'] : 'before';
-        $afterVar = !empty($args['before']) ? $args['after'] : 'after';
-        $isObject = is_object(current($array));
+        $beforeVar = !empty( $args[ 'before' ] ) ? $args[ 'before' ] : 'before';
+        $afterVar = !empty( $args[ 'before' ] ) ? $args[ 'after' ] : 'after';
+        $isObject = is_object( current( $array ) );
         $nodes = array();
-        foreach ($array as $k=>$v) {
-            $before = $isObject ? $v->$beforeVar : $v[$beforeVar];
-            if (is_string($before)) {
-                $before = array_walk(explode(',', $before), 'trim');
+        foreach ( $array as $k => $v ) {
+            $before = $isObject ? $v->$beforeVar : $v[ $beforeVar ];
+            if ( is_string( $before ) ) {
+                $before = array_walk( explode( ',', $before ), 'trim' );
             }
-            $after = $isObject ? $v->$afterVar : $v[$afterVar];
-            if (is_string($after)) {
-                $after = array_walk(explode(',', $after), 'trim');
+            $after = $isObject ? $v->$afterVar : $v[ $afterVar ];
+            if ( is_string( $after ) ) {
+                $after = array_walk( explode( ',', $after ), 'trim' );
             }
-            $nodes[$k] = array('key' => $k, 'item' => $v, 'parents' => (array)$after, 'children' => (array)$before);
+            $nodes[ $k ] = array( 'key' => $k, 'item' => $v, 'parents' => (array)$after, 'children' => (array)$before );
         }
 
         // get nodes without parents
         $rootNodes = array();
-        foreach ($nodes as $k=>$node) {
-            if (empty($node['parents'])) {
+        foreach ( $nodes as $k => $node ) {
+            if ( empty( $node[ 'parents' ] ) ) {
                 $rootNodes[] = $node;
             }
         }
         // begin algorithm
         $sorted = array();
-        while ($nodes) {
+        while ( $nodes ) {
             // check for circular reference
-            if (!$rootNodes) return false;
+            if ( !$rootNodes ) return false;
             // remove this node from root nodes and add it to the output
-            $n = array_pop($rootNodes);
-            $sorted[$n['key']] = $n['item'];
+            $n = array_pop( $rootNodes );
+            $sorted[ $n[ 'key' ] ] = $n[ 'item' ];
             // for each of its children: queue the new node, finally remove the original
-            for ($i = count($n['children'])-1; $i>=0; $i--) {
+            for ( $i = count( $n[ 'children' ] )-1; $i >= 0; $i-- ) {
                 // get child node
-                $childNode = $nodes[$n['children'][$i]];
+                $childNode = $nodes[ $n[ 'children' ][ $i ] ];
                 // remove child nodes from parent
-                unset($n['children'][$i]);
+                unset( $n[ 'children' ][ $i ] );
                 // remove parent from child node
-                unset($childNode['parents'][array_search($n['name'], $childNode['parents'])]);
+                unset( $childNode[ 'parents' ][ array_search( $n[ 'name' ], $childNode[ 'parents' ] ) ] );
                 // check if this child has other parents. if not, add it to the root nodes list
-                if (!$childNode['parents']) {
-                    array_push($rootNodes, $childNode);
+                if ( !$childNode[ 'parents' ] ) {
+                    array_push( $rootNodes, $childNode );
                 }
             }
             // remove processed node from list
-            unset($nodes[$n['key']]);
+            unset( $nodes[ $n[ 'key' ] ] );
         }
         return $sorted;
     }
@@ -1612,45 +1612,45 @@ class BUtil extends BClass
      * @param string $targetDir
      * @return boolean Result
      */
-    static public function zipExtract($filename, $targetDir)
+    static public function zipExtract( $filename, $targetDir )
     {
-        if (!class_exists('ZipArchive')) {
-            throw new BException("Class ZipArchive doesn't exist");
+        if ( !class_exists( 'ZipArchive' ) ) {
+            throw new BException( "Class ZipArchive doesn't exist" );
         }
         $zip = new ZipArchive;
-        $res = $zip->open($filename);
-        if (!$res) {
-            throw new BException("Can't open zip archive for reading: " . $filename);
+        $res = $zip->open( $filename );
+        if ( !$res ) {
+            throw new BException( "Can't open zip archive for reading: " . $filename );
         }
-        BUtil::ensureDir($targetDir);
-        $res = $zip->extractTo($targetDir);
+        BUtil::ensureDir( $targetDir );
+        $res = $zip->extractTo( $targetDir );
         $zip->close();
-        if (!$res) {
-            throw new BException("Can't extract zip archive: " . $filename . " to " . $targetDir);
+        if ( !$res ) {
+            throw new BException( "Can't extract zip archive: " . $filename . " to " . $targetDir );
         }
         return true;
     }
 
-    static public function zipCreateFromDir($filename, $sourceDir)
+    static public function zipCreateFromDir( $filename, $sourceDir )
     {
-        if (!class_exists('ZipArchive')) {
-            throw new BException("Class ZipArchive doesn't exist");
+        if ( !class_exists( 'ZipArchive' ) ) {
+            throw new BException( "Class ZipArchive doesn't exist" );
         }
-        $files = BUtil::globRecursive($sourceDir);
-        if (!$files) {
-            throw new BException('Invalid or empty source dir');
+        $files = BUtil::globRecursive( $sourceDir );
+        if ( !$files ) {
+            throw new BException( 'Invalid or empty source dir' );
         }
         $zip = new ZipArchive;
-        $res = $zip->open($filename, ZipArchive::CREATE);
-        if (!$res) {
-            throw new BException("Can't open zip archive for writing: " . $filename);
+        $res = $zip->open( $filename, ZipArchive::CREATE );
+        if ( !$res ) {
+            throw new BException( "Can't open zip archive for writing: " . $filename );
         }
-        foreach ($files as $file) {
-            $packedFile = str_replace($sourceDir.'/', '', $file);
-            if (is_dir($file)) {
-                $zip->addEmptyDir($packedFile);
+        foreach ( $files as $file ) {
+            $packedFile = str_replace( $sourceDir . '/', '', $file );
+            if ( is_dir( $file ) ) {
+                $zip->addEmptyDir( $packedFile );
             } else {
-                $zip->addFile($file, $packedFile);
+                $zip->addFile( $file, $packedFile );
             }
         }
         $zip->close();
@@ -1659,9 +1659,9 @@ class BUtil extends BClass
 
     static public function getMemoryLimit()
     {
-        preg_match('#^([0-9]+)([GMK]?)$#', ini_get('memory_limit'), $val);
-        $mult = array('G' => 1073741824, 'M' => 1048576, 'K' => 1024);
-        return $val[1]*(!empty($mult[$val[2]]) ? $mult[$val[2]] : 1);
+        preg_match( '#^([0-9]+)([GMK]?)$#', ini_get( 'memory_limit' ), $val );
+        $mult = array( 'G' => 1073741824, 'M' => 1048576, 'K' => 1024 );
+        return $val[ 1 ] * ( !empty( $mult[ $val[ 2 ] ] ) ? $mult[ $val[ 2 ] ] : 1 );
     }
 
     /**
@@ -1673,78 +1673,78 @@ class BUtil extends BClass
      * @param string  $fileType
      * @return boolean
      */
-    static public function convertImage($srcFile, $dstFile, $dw = null, $dh = null, $fileType = 'jpg')
+    static public function convertImage( $srcFile, $dstFile, $dw = null, $dh = null, $fileType = 'jpg' )
     {
-        clearstatcache(true, $srcFile);
+        clearstatcache( true, $srcFile );
 
-        if (!file_exists($srcFile) || !filesize($srcFile)) {
+        if ( !file_exists( $srcFile ) || !filesize( $srcFile ) ) {
             return false;
         }
 
-        list($sw, $sh, $type) = getimagesize($srcFile);
-        if (!$sw) {
+        list( $sw, $sh, $type ) = getimagesize( $srcFile );
+        if ( !$sw ) {
             return false;
         }
 
-        if (!$dw) {
+        if ( !$dw ) {
             $dw = $sw;
         }
-        if (!$dh) {
+        if ( !$dh ) {
             $dh = $sh;
         }
 
         //get image
-        switch ($type) {
+        switch ( $type ) {
             case IMAGETYPE_GIF :
-                $srcImage = imagecreatefromgif($srcFile);
+                $srcImage = imagecreatefromgif( $srcFile );
                 break;
             case IMAGETYPE_BMP:
-                $srcImage = imagecreatefromwbmp($srcFile);
+                $srcImage = imagecreatefromwbmp( $srcFile );
                 break;
             case IMAGETYPE_PNG:
-                $srcImage = imagecreatefrompng($srcFile);
+                $srcImage = imagecreatefrompng( $srcFile );
                 break;
             case IMAGETYPE_JPEG:
             default:
-                $srcImage = imagecreatefromjpeg($srcFile);
+                $srcImage = imagecreatefromjpeg( $srcFile );
                 break;
         }
 
-        if ($srcImage) {
-            $dstImage = imagecreatetruecolor($dw, $dh);
-            $color = imagecolorallocate($dstImage,
-                base_convert(substr('FFFFFF', 0, 2), 16, 10),
-                base_convert(substr('FFFFFF', 2, 2), 16, 10),
-                base_convert(substr('FFFFFF', 4, 2), 16, 10)
+        if ( $srcImage ) {
+            $dstImage = imagecreatetruecolor( $dw, $dh );
+            $color = imagecolorallocate( $dstImage,
+                base_convert( substr( 'FFFFFF', 0, 2 ), 16, 10 ),
+                base_convert( substr( 'FFFFFF', 2, 2 ), 16, 10 ),
+                base_convert( substr( 'FFFFFF', 4, 2 ), 16, 10 )
             );
-            imagefill($dstImage, 0, 0, $color);
+            imagefill( $dstImage, 0, 0, $color );
             $scale = $sw > $sh ? $dw / $sw : $dh / $sh;
             $dfw = $sw * $scale; //diff width
             $dfh = $sh * $scale; //diff height
-            if ($sh < $dh) {
+            if ( $sh < $dh ) {
                 $dfh = $sh;
             }
-            if ($sw < $dw) {
+            if ( $sw < $dw ) {
                 $dfw = $sw;
             }
-            imagecopyresampled($dstImage, $srcImage, ($dw - $dfw) / 2, ($dh - $dfh) / 2, 0, 0, $dfw, $dfh, $sw, $sh);
+            imagecopyresampled( $dstImage, $srcImage, ( $dw - $dfw ) / 2, ( $dh - $dfh ) / 2, 0, 0, $dfw, $dfh, $sw, $sh );
 
             //write image base on file_type
-            switch ($fileType) {
+            switch ( $fileType ) {
                 case 'gif':
-                    $success = imagegif($dstImage, $dstFile);
+                    $success = imagegif( $dstImage, $dstFile );
                     break;
                 case 'png':
-                    $success = imagepng($dstImage, $dstFile, 7);
+                    $success = imagepng( $dstImage, $dstFile, 7 );
                     break;
                 case 'jpg':
                 case 'jpeg':
                 default:
-                    $success = imagejpeg($dstImage, $dstFile, 90);
+                    $success = imagejpeg( $dstImage, $dstFile, 90 );
                     break;
             }
-            imagedestroy($dstImage);
-            @chmod($dstFile, 0664);
+            imagedestroy( $dstImage );
+            @chmod( $dstFile, 0664 );
             return $success;
         }
         return false;
@@ -1753,9 +1753,9 @@ class BUtil extends BClass
     /**
      * Alias of version_compare for use in Twig templates
      */
-    public function versionCompare($v1, $v2, $op = null)
+    public function versionCompare( $v1, $v2, $op = null )
     {
-        return version_compare($v1, $v2, $op);
+        return version_compare( $v1, $v2, $op );
     }
 }
 
@@ -1774,18 +1774,18 @@ class BEmail extends BClass
 
     public function __construct()
     {
-        $this->addHandler('default', array($this, 'defaultHandler'));
+        $this->addHandler( 'default', array( $this, 'defaultHandler' ) );
     }
 
-    public function addHandler($name, $params)
+    public function addHandler( $name, $params )
     {
-        if (is_callable($params)) {
+        if ( is_callable( $params ) ) {
             $params = array(
                 'description' => $name,
                 'callback' => $params,
             );
         }
-        static::$_handlers[$name] = $params;
+        static::$_handlers[ $name ] = $params;
     }
 
     public function getHandlers()
@@ -1793,19 +1793,19 @@ class BEmail extends BClass
         return static::$_handlers;
     }
 
-    public function setDefaultHandler($name)
+    public function setDefaultHandler( $name )
     {
         static::$_defaultHandler = $name;
     }
 
-    public function send($data)
+    public function send( $data )
     {
         static $allowedHeadersRegex = '/^(to|from|cc|bcc|reply-to|return-path|content-type|list-unsubscribe|x-.*)$/';
 
-        $data = array_change_key_case($data, CASE_LOWER);
+        $data = array_change_key_case( $data, CASE_LOWER );
 
-        $body = trim($data['body']);
-        unset($data['body']);
+        $body = trim( $data[ 'body' ] );
+        unset( $data[ 'body' ] );
 
         $to      = '';
         $subject = '';
@@ -1813,40 +1813,40 @@ class BEmail extends BClass
         $params  = array();
         $files   = array();
 
-        foreach ($data as $k => $v) {
-            if ($k == 'subject') {
+        foreach ( $data as $k => $v ) {
+            if ( $k == 'subject' ) {
                 $subject = $v;
 
-            } elseif ($k == 'to') {
+            } elseif ( $k == 'to' ) {
                 $to = $v;
 
-            } elseif ($k == 'attach') {
-                foreach ((array)$v as $file) {
+            } elseif ( $k == 'attach' ) {
+                foreach ( (array)$v as $file ) {
                     $files[] = $file;
                 }
 
-            } elseif ($k[0] === '-') {
-                $params[$k] = $k . ' ' . $v;
+            } elseif ( $k[ 0 ] === '-' ) {
+                $params[ $k ] = $k . ' ' . $v;
 
-            } elseif (preg_match($allowedHeadersRegex, $k)) {
-                if (!empty($v) && $v!=='"" <>') {
-                    $headers[$k] = $k . ': ' . $v;
+            } elseif ( preg_match( $allowedHeadersRegex, $k ) ) {
+                if ( !empty( $v ) && $v !== '"" <>' ) {
+                    $headers[ $k ] = $k . ': ' . $v;
                 }
             }
         }
 
         $origBody = $body;
 
-        $this->_formatAlternative($headers, $body);
-        $body = trim(preg_replace('#<!--.*?-->#', '', $body));
+        $this->_formatAlternative( $headers, $body );
+        $body = trim( preg_replace( '#<!--.*?-->#', '', $body ) );
 
-        if ($files) {
+        if ( $files ) {
             // $body and $headers will be updated
-            $this->_addAttachments($files, $headers, $body);
+            $this->_addAttachments( $files, $headers, $body );
         }
 
-        if (empty($headers['content-type'])) {
-            $headers['content-type'] = 'Content-Type: text/plain; charset=utf-8';
+        if ( empty( $headers[ 'content-type' ] ) ) {
+            $headers[ 'content-type' ] = 'Content-Type: text/plain; charset=utf-8';
         }
 
         $emailData = array(
@@ -1860,55 +1860,55 @@ class BEmail extends BClass
             'orig_data' => $data,
         );
 
-        return $this->_dispatch($emailData);
+        return $this->_dispatch( $emailData );
     }
 
-    protected function _dispatch($emailData)
+    protected function _dispatch( $emailData )
     {
         try {
-            $flags = BEvents::i()->fire('BEmail::send:before', array('email_data' => $emailData));
-            if ($flags===false) {
+            $flags = BEvents::i()->fire( 'BEmail::send:before', array( 'email_data' => $emailData ) );
+            if ( $flags === false ) {
                 return false;
-            } elseif (is_array($flags)) {
-                foreach ($flags as $f) {
-                    if ($f===false) {
+            } elseif ( is_array( $flags ) ) {
+                foreach ( $flags as $f ) {
+                    if ( $f === false ) {
                         return false;
                     }
                 }
             }
-        } catch (BException $e) {
-            BDebug::warning($e->getMessage());
+        } catch ( BException $e ) {
+            BDebug::warning( $e->getMessage() );
             return false;
         }
 
-        $callback = static::$_handlers[static::$_defaultHandler]['callback'];
-        if (is_callable($callback)) {
-            $result = call_user_func($callback, $emailData);
+        $callback = static::$_handlers[ static::$_defaultHandler ][ 'callback' ];
+        if ( is_callable( $callback ) ) {
+            $result = call_user_func( $callback, $emailData );
         } else {
-            BDebug::warning('Default email handler is not callable');
+            BDebug::warning( 'Default email handler is not callable' );
             $result = false;
         }
-        $emailData['result'] = $result;
+        $emailData[ 'result' ] = $result;
 
-        BEvents::i()->fire('BEmail::send:after', array('email_data' => $emailData));
+        BEvents::i()->fire( 'BEmail::send:after', array( 'email_data' => $emailData ) );
 
         return $result;
     }
 
-    protected function _formatAlternative(&$headers, &$body)
+    protected function _formatAlternative( &$headers, &$body )
     {
-        if (!preg_match('#<!--=+-->#', $body)) {
+        if ( !preg_match( '#<!--=+-->#', $body ) ) {
             return $body;
         }
-        $mimeBoundary = "==Multipart_Boundary_x" . md5(microtime()) . "x";
+        $mimeBoundary = "==Multipart_Boundary_x" . md5( microtime() ) . "x";
 
         // headers for attachment
-        $headers['mime-version'] = "MIME-Version: 1.0";
-        $headers['content-type'] = "Content-Type: multipart/alternative; boundary=\"{$mimeBoundary}\"";
+        $headers[ 'mime-version' ] = "MIME-Version: 1.0";
+        $headers[ 'content-type' ] = "Content-Type: multipart/alternative; boundary=\"{$mimeBoundary}\"";
 
-        $parts = preg_split('#<!--=+-->#', $body);
-        $message = "--{$mimeBoundary}\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n" . trim($parts[0]);
-        $message .= "\r\n--{$mimeBoundary}\r\nContent-Type: text/html; charset=utf-8\r\n\r\n" . trim($parts[1]);
+        $parts = preg_split( '#<!--=+-->#', $body );
+        $message = "--{$mimeBoundary}\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n" . trim( $parts[ 0 ] );
+        $message .= "\r\n--{$mimeBoundary}\r\nContent-Type: text/html; charset=utf-8\r\n\r\n" . trim( $parts[ 1 ] );
         $message .= "\r\n--{$mimeBoundary}--";
 
         $body = $message;
@@ -1922,28 +1922,28 @@ class BEmail extends BClass
      * @param $mailheaders
      * @param $body
      */
-    protected function _addAttachments($files, &$headers, &$body)
+    protected function _addAttachments( $files, &$headers, &$body )
     {
-        $body = trim($body);
+        $body = trim( $body );
 
-        $mimeBoundary = "==Multipart_Boundary_x" . md5(microtime()) . "x";
+        $mimeBoundary = "==Multipart_Boundary_x" . md5( microtime() ) . "x";
 
         //headers and message for text
         $message = "--{$mimeBoundary}\r\n{$mailheaders['content-type']}\r\n\r\n{$body}\r\n\r\n";
 
         // headers for attachment
-        $headers['mime-version'] = "MIME-Version: 1.0";
-        $headers['content-type'] = "Content-Type: multipart/mixed; boundary=\"{$mimeBoundary}\"";
+        $headers[ 'mime-version' ] = "MIME-Version: 1.0";
+        $headers[ 'content-type' ] = "Content-Type: multipart/mixed; boundary=\"{$mimeBoundary}\"";
 
         // preparing attachments
-        foreach ($files as $file) {
-            if (is_file($file)) {
-                $data = chunk_split(base64_encode(file_get_contents($file)));
-                $name = basename($file);
+        foreach ( $files as $file ) {
+            if ( is_file( $file ) ) {
+                $data = chunk_split( base64_encode( file_get_contents( $file ) ) );
+                $name = basename( $file );
                 $message .= "--{$mimeBoundary}\r\n" .
                     "Content-Type: application/octet-stream; name=\"{$name}\"\r\n" .
                     "Content-Description: {$name}\r\n" .
-                    "Content-Disposition: attachment; filename=\"{$name}\"; size=".filesize($files[$i]).";\r\n" .
+                    "Content-Disposition: attachment; filename=\"{$name}\"; size=" . filesize( $files[ $i ] ) . ";\r\n" .
                     "Content-Transfer-Encoding: base64\r\n\r\n{$data}\r\n\r\n";
             }
         }
@@ -1953,10 +1953,10 @@ class BEmail extends BClass
         return true;
     }
 
-    public function defaultHandler($data)
+    public function defaultHandler( $data )
     {
-        return mail($data['to'], $data['subject'], $data['body'],
-            join("\r\n", $data['headers']), join(' ', $data['params']));
+        return mail( $data[ 'to' ], $data[ 'subject' ], $data[ 'body' ],
+            join( "\r\n", $data[ 'headers' ] ), join( ' ', $data[ 'params' ] ) );
     }
 }
 
@@ -1968,7 +1968,7 @@ class BValue
     public $content;
     public $type;
 
-    public function __construct($content, $type='string')
+    public function __construct( $content, $type = 'string' )
     {
         $this->content = $content;
         $this->type = $type;
@@ -1994,75 +1994,75 @@ class BData extends BClass implements ArrayAccess
 {
     protected $_data;
 
-    public function __construct($data, $recursive = false)
+    public function __construct( $data, $recursive = false )
     {
-        if (!is_array($data)) {
+        if ( !is_array( $data ) ) {
             $data = array(); // not sure for here, should we try to convert data to array or do empty array???
         }
-        if ($recursive) {
-            foreach ($data as $k => $v) {
-                if (is_array($v)) {
-                    $data[$k] = new BData($v, true);
+        if ( $recursive ) {
+            foreach ( $data as $k => $v ) {
+                if ( is_array( $v ) ) {
+                    $data[ $k ] = new BData( $v, true );
                 }
             }
         }
         $this->_data = $data;
     }
 
-    public function as_array($recursive=false)
+    public function as_array( $recursive = false )
     {
         $data = $this->_data;
-        if ($recursive) {
-            foreach ($data as $k => $v) {
-                if (is_object($v) && $v instanceof BData) {
-                    $data[$k] = $v->as_array();
+        if ( $recursive ) {
+            foreach ( $data as $k => $v ) {
+                if ( is_object( $v ) && $v instanceof BData ) {
+                    $data[ $k ] = $v->as_array();
                 }
             }
         }
         return $data;
     }
 
-    public function __get($name)
+    public function __get( $name )
     {
-        return isset($this->_data[$name]) ? $this->_data[$name] : null;
+        return isset( $this->_data[ $name ] ) ? $this->_data[ $name ] : null;
     }
 
-    public function __set($name, $value)
+    public function __set( $name, $value )
     {
-        $this->_data[$name] = $value;
+        $this->_data[ $name ] = $value;
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet( $offset, $value )
     {
-        if (is_null($offset)) {
+        if ( is_null( $offset ) ) {
             $this->_data[] = $value;
         } else {
-            $this->_data[$offset] = $value;
+            $this->_data[ $offset ] = $value;
         }
     }
 
-    public function offsetExists($offset) {
-        return isset($this->_data[$offset]);
+    public function offsetExists( $offset ) {
+        return isset( $this->_data[ $offset ] );
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset( $offset )
     {
-        unset($this->_data[$offset]);
+        unset( $this->_data[ $offset ] );
     }
 
-    public function offsetGet($offset)
+    public function offsetGet( $offset )
     {
-        return isset($this->_data[$offset]) ? $this->_data[$offset] : null;
+        return isset( $this->_data[ $offset ] ) ? $this->_data[ $offset ] : null;
     }
 
-    public function get($name)
+    public function get( $name )
     {
-        return isset($this->_data[$name]) ? $this->_data[$name] : null;
+        return isset( $this->_data[ $name ] ) ? $this->_data[ $name ] : null;
     }
 
-    public function set($name, $value)
+    public function set( $name, $value )
     {
-        $this->_data[$name] = $value;
+        $this->_data[ $name ] = $value;
         return $this;
     }
 }
@@ -2072,9 +2072,9 @@ class BErrorException extends Exception
     public $context;
     public $stackPop;
 
-    public function __construct($code, $message, $file, $line, $context=null, $stackPop=1)
+    public function __construct( $code, $message, $file, $line, $context = null, $stackPop = 1 )
     {
-        parent::__construct($message, $code);
+        parent::__construct( $message, $code );
         $this->file = $file;
         $this->line = $line;
         $this->context = $context;
@@ -2147,7 +2147,7 @@ class BDebug extends BClass
             self::MEMORY    => false,
             self::SYSLOG    => false,
             self::FILE      => self::WARNING,
-            self::EMAIL     => false,//self::ERROR,
+            self::EMAIL     => false, //self::ERROR,
             self::OUTPUT    => self::CRITICAL,
             self::EXCEPTION => self::ERROR,
             self::STOP      => self::CRITICAL,
@@ -2156,7 +2156,7 @@ class BDebug extends BClass
             self::MEMORY    => false,
             self::SYSLOG    => false,
             self::FILE      => self::WARNING,
-            self::EMAIL     => false,//self::ERROR,
+            self::EMAIL     => false, //self::ERROR,
             self::OUTPUT    => self::CRITICAL,
             self::EXCEPTION => self::ERROR,
             self::STOP      => self::CRITICAL,
@@ -2165,7 +2165,7 @@ class BDebug extends BClass
             self::MEMORY    => self::INFO,
             self::SYSLOG    => false,
             self::FILE      => self::WARNING,
-            self::EMAIL     => false,//self::CRITICAL,
+            self::EMAIL     => false, //self::CRITICAL,
             self::OUTPUT    => self::NOTICE,
             self::EXCEPTION => self::ERROR,
             self::STOP      => self::CRITICAL,
@@ -2174,7 +2174,7 @@ class BDebug extends BClass
             self::MEMORY    => self::DEBUG,
             self::SYSLOG    => false,
             self::FILE      => self::WARNING,
-            self::EMAIL     => false,//self::CRITICAL,
+            self::EMAIL     => false, //self::CRITICAL,
             self::OUTPUT    => self::NOTICE,
             self::EXCEPTION => self::ERROR,
             self::STOP      => self::CRITICAL,
@@ -2183,7 +2183,7 @@ class BDebug extends BClass
             self::MEMORY    => self::DEBUG,
             self::SYSLOG    => false,
             self::FILE      => self::WARNING,
-            self::EMAIL     => false,//self::CRITICAL,
+            self::EMAIL     => false, //self::CRITICAL,
             self::OUTPUT    => self::NOTICE,
             self::EXCEPTION => self::ERROR,
             self::STOP      => self::CRITICAL,
@@ -2192,7 +2192,7 @@ class BDebug extends BClass
             self::MEMORY    => self::DEBUG,
             self::SYSLOG    => false,
             self::FILE      => self::WARNING,
-            self::EMAIL     => false,//self::CRITICAL,
+            self::EMAIL     => false, //self::CRITICAL,
             self::OUTPUT    => self::NOTICE,
             self::EXCEPTION => self::ERROR,
             self::STOP      => self::CRITICAL,
@@ -2201,7 +2201,7 @@ class BDebug extends BClass
             self::MEMORY    => self::DEBUG,
             self::SYSLOG    => false,
             self::FILE      => self::WARNING,
-            self::EMAIL     => false,//self::CRITICAL,
+            self::EMAIL     => false, //self::CRITICAL,
             self::OUTPUT    => self::NOTICE,
             self::EXCEPTION => self::ERROR,
             self::STOP      => self::CRITICAL,
@@ -2262,8 +2262,8 @@ class BDebug extends BClass
     */
     public function __construct()
     {
-        static::$_startTime = microtime(true);
-        BEvents::i()->on('BResponse::output:after', 'BDebug::afterOutput');
+        static::$_startTime = microtime( true );
+        BEvents::i()->on( 'BResponse::output:after', 'BDebug::afterOutput' );
     }
 
     /**
@@ -2273,216 +2273,216 @@ class BDebug extends BClass
      * @param array $args
      * @return BDebug
      */
-    public static function i($new=false, array $args=array())
+    public static function i( $new = false, array $args = array() )
     {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
 
     public static function registerErrorHandlers()
     {
-        set_error_handler('BDebug::errorHandler');
-        set_exception_handler('BDebug::exceptionHandler');
-        register_shutdown_function('BDebug::shutdownHandler');
+        set_error_handler( 'BDebug::errorHandler' );
+        set_exception_handler( 'BDebug::exceptionHandler' );
+        register_shutdown_function( 'BDebug::shutdownHandler' );
     }
 
     public static function startErrorLogger()
     {
         static::$_errorHandlerLog = array();
-        set_error_handler('BDebug::errorHandlerLogger');
+        set_error_handler( 'BDebug::errorHandlerLogger' );
     }
 
     public static function stopErrorLogger()
     {
-        set_error_handler('BDebug::errorHandler');
+        set_error_handler( 'BDebug::errorHandler' );
         return static::$_errorHandlerLog;
     }
 
-    public static function errorHandlerLogger($code, $message, $file, $line, $context=null)
+    public static function errorHandlerLogger( $code, $message, $file, $line, $context = null )
     {
-        return static::$_errorHandlerLog[] = compact('code', 'message', 'file', 'line', 'context');
+        return static::$_errorHandlerLog[] = compact( 'code', 'message', 'file', 'line', 'context' );
     }
 
-    public static function errorHandler($code, $message, $file, $line, $context=null)
+    public static function errorHandler( $code, $message, $file, $line, $context = null )
     {
-        if (!(error_reporting() & $code)) {
+        if ( !( error_reporting() & $code ) ) {
             return;
         }
-        static::trigger(static::$_phpErrorMap[$code], $message, 1);
+        static::trigger( static::$_phpErrorMap[ $code ], $message, 1 );
         //throw new BErrorException(static::$_phpErrorMap[$code], $message, $file, $line, $context);
     }
 
-    public static function exceptionHandler($e)
+    public static function exceptionHandler( $e )
     {
 #echo "<pre>"; print_r($e); exit;
         //static::trigger($e->getCode(), $e->getMessage(), $e->stackPop+1);
-        static::trigger(static::ERROR, $e, 1, true);
+        static::trigger( static::ERROR, $e, 1, true );
     }
 
     public static function shutdownHandler()
     {
         $e = error_get_last();
-        if ($e && ($e['type']===E_ERROR || $e['type']===E_PARSE || $e['type']===E_COMPILE_ERROR || $e['type']===E_COMPILE_WARNING)) {
-            static::trigger(static::CRITICAL, $e['file'].':'.$e['line'].': '.$e['message'], 1);
+        if ( $e && ( $e[ 'type' ] === E_ERROR || $e[ 'type' ] === E_PARSE || $e[ 'type' ] === E_COMPILE_ERROR || $e[ 'type' ] === E_COMPILE_WARNING ) ) {
+            static::trigger( static::CRITICAL, $e[ 'file' ] . ':' . $e[ 'line' ] . ': ' . $e[ 'message' ], 1 );
         }
     }
 
-    public static function level($type, $level=null)
+    public static function level( $type, $level = null )
     {
-        if (!isset(static::$_level[$type])) {
+        if ( !isset( static::$_level[ $type ] ) ) {
             //TODO: check back later
             #throw new BException('Invalid debug level type');
         }
-        if (is_null($level)) {
-            if (is_null(static::$_level)) {
-                static::$_level = static::$_levelPreset[static::$_mode];
+        if ( is_null( $level ) ) {
+            if ( is_null( static::$_level ) ) {
+                static::$_level = static::$_levelPreset[ static::$_mode ];
             }
-            return static::$_level[$type];
+            return static::$_level[ $type ];
         }
-        static::$_level[$type] = $level;
+        static::$_level[ $type ] = $level;
     }
 
-    public static function logDir($dir)
+    public static function logDir( $dir )
     {
-        BUtil::ensureDir($dir);
+        BUtil::ensureDir( $dir );
         static::$_logDir = $dir;
     }
 
-    public static function log($msg, $file='debug.log', $backtrace=false)
+    public static function log( $msg, $file = 'debug.log', $backtrace = false )
     {
-        $file = static::$_logDir.'/'.$file;
-        error_log($msg."\n", 3, $file);
-        if ($backtrace) {
+        $file = static::$_logDir . '/' . $file;
+        error_log( $msg . "\n", 3, $file );
+        if ( $backtrace ) {
             ob_start();
-            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-            error_log(ob_get_clean(), 3, $file);
+            debug_print_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS );
+            error_log( ob_get_clean(), 3, $file );
         }
     }
 
-    public static function logException($e)
+    public static function logException( $e )
     {
-        static::log(print_r($e, 1), 'exceptions.log');
+        static::log( print_r( $e, 1 ), 'exceptions.log' );
     }
 
-    public static function adminEmail($email)
+    public static function adminEmail( $email )
     {
         static::$_adminEmail = $email;
     }
 
-    public static function mode($mode=null, $setLevels=true)
+    public static function mode( $mode = null, $setLevels = true )
     {
-        if (is_null($mode)) {
+        if ( is_null( $mode ) ) {
             return static::$_mode;
         }
         static::$_mode = $mode;
-        if ($setLevels && !empty(static::$_levelPreset[$mode])) {
-            static::$_level = static::$_levelPreset[$mode];
+        if ( $setLevels && !empty( static::$_levelPreset[ $mode ] ) ) {
+            static::$_level = static::$_levelPreset[ $mode ];
         }
     }
 
-    public static function backtraceOn($msg)
+    public static function backtraceOn( $msg )
     {
-        foreach ((array)$msg as $m) {
-            static::$_verboseBacktrace[$m] = true;
+        foreach ( (array)$msg as $m ) {
+            static::$_verboseBacktrace[ $m ] = true;
         }
     }
 
-    public static function trigger($level, $msg, $stackPop=0, $backtrace=false)
+    public static function trigger( $level, $msg, $stackPop = 0, $backtrace = false )
     {
-        if ($level !== static::DEBUG) {
-            static::$_collectedErrors[$level][] = $msg;
+        if ( $level !== static::DEBUG ) {
+            static::$_collectedErrors[ $level ][] = $msg;
         }
-        if (is_scalar($msg)) {
-            $e = array('msg'=>$msg);
-        } elseif (is_object($msg) && $msg instanceof Exception) {
+        if ( is_scalar( $msg ) ) {
+            $e = array( 'msg' => $msg );
+        } elseif ( is_object( $msg ) && $msg instanceof Exception ) {
             $bt = $msg->getTrace();
             $msgStr = $msg->getMessage();
-            if ($msg instanceof PDOException) {
-                $msgStr .= "\nQUERY: ".BORM::get_last_query();
+            if ( $msg instanceof PDOException ) {
+                $msgStr .= "\nQUERY: " . BORM::get_last_query();
             }
-            $e = array('msg' => $msgStr);
-        } elseif (is_array($msg)) {
+            $e = array( 'msg' => $msgStr );
+        } elseif ( is_array( $msg ) ) {
             $e = $msg;
         } else {
-            throw new Exception('Invalid message type: '.print_r($msg, 1));
+            throw new Exception( 'Invalid message type: ' . print_r( $msg, 1 ) );
         }
 
         //$stackPop++;
-        if (empty($bt)) {
-            $bt = debug_backtrace(true);
+        if ( empty( $bt ) ) {
+            $bt = debug_backtrace( true );
         }
-        $e['level'] = static::$_levelLabels[$level];
-        if (isset($bt[$stackPop]['file'])) $e['file'] = $bt[$stackPop]['file'];
-        if (isset($bt[$stackPop]['line'])) $e['line'] = $bt[$stackPop]['line'];
+        $e[ 'level' ] = static::$_levelLabels[ $level ];
+        if ( isset( $bt[ $stackPop ][ 'file' ] ) ) $e[ 'file' ] = $bt[ $stackPop ][ 'file' ];
+        if ( isset( $bt[ $stackPop ][ 'line' ] ) ) $e[ 'line' ] = $bt[ $stackPop ][ 'line' ];
         //$o = $bt[$stackPop]['object'];
         //$e['object'] = is_object($o) ? get_class($o) : $o;
 
-        $e['ts'] = BDb::now();
-        $e['t'] = microtime(true)-static::$_startTime;
-        $e['d'] = null;
-        $e['c'] = null;
-        $e['mem'] = memory_get_usage();
+        $e[ 'ts' ] = BDb::now();
+        $e[ 't' ] = microtime( true ) - static::$_startTime;
+        $e[ 'd' ] = null;
+        $e[ 'c' ] = null;
+        $e[ 'mem' ] = memory_get_usage();
 
-        if ($backtrace || !empty(static::$_verboseBacktrace[$e['msg']])) {
-            foreach ($bt as $t) {
-                if (!empty($t['file'])) {
-                    $e['msg'] .= "\n".$t['file'].':'.$t['line'];
-                } elseif (!empty($t['class'])) {
-                    $e['msg'] .= "\n".$t['class'].$t['type'].$t['function'];
+        if ( $backtrace || !empty( static::$_verboseBacktrace[ $e[ 'msg' ] ] ) ) {
+            foreach ( $bt as $t ) {
+                if ( !empty( $t[ 'file' ] ) ) {
+                    $e[ 'msg' ] .= "\n" . $t[ 'file' ] . ':' . $t[ 'line' ];
+                } elseif ( !empty( $t[ 'class' ] ) ) {
+                    $e[ 'msg' ] .= "\n" . $t[ 'class' ] . $t[ 'type' ] . $t[ 'function' ];
                 }
             }
         }
 
-        $message = "{$e['level']}: {$e['msg']}".(isset($e['file'])?" ({$e['file']}:{$e['line']})":'');
+        $message = "{$e['level']}: {$e['msg']}" . ( isset( $e[ 'file' ] ) ? " ({$e['file']}:{$e['line']})" : '' );
 
-        if (($moduleName = BModuleRegistry::i()->currentModuleName())) {
-            $e['module'] = $moduleName;
+        if ( ( $moduleName = BModuleRegistry::i()->currentModuleName() ) ) {
+            $e[ 'module' ] = $moduleName;
         }
 
-        if (is_null(static::$_level) && !empty(static::$_levelPreset[static::$_mode])) {
-            static::$_level = static::$_levelPreset[static::$_mode];
+        if ( is_null( static::$_level ) && !empty( static::$_levelPreset[ static::$_mode ] ) ) {
+            static::$_level = static::$_levelPreset[ static::$_mode ];
         }
 
-        $l = static::$_level[static::MEMORY];
-        if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
+        $l = static::$_level[ static::MEMORY ];
+        if ( false !== $l && ( is_array( $l ) && in_array( $level, $l ) || $l >= $level ) ) {
             //$e['msg'] = substr($e['msg'], 0, 50); $e['file'] = ''; $e['line'] = '';
             static::$_events[] = $e;
-            $id = sizeof(static::$_events)-1;
+            $id = sizeof( static::$_events )-1;
         }
 
-        $l = static::$_level[static::SYSLOG];
-        if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
-            error_log($message, 0, static::$_logDir);
+        $l = static::$_level[ static::SYSLOG ];
+        if ( false !== $l && ( is_array( $l ) && in_array( $level, $l ) || $l >= $level ) ) {
+            error_log( $message, 0, static::$_logDir );
         }
 
-        if (!is_null(static::$_logDir)) { // require explicit enable of file log
-            $l = static::$_level[static::FILE];
-            if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
+        if ( !is_null( static::$_logDir ) ) { // require explicit enable of file log
+            $l = static::$_level[ static::FILE ];
+            if ( false !== $l && ( is_array( $l ) && in_array( $level, $l ) || $l >= $level ) ) {
                 /*
                 if (is_null(static::$_logDir)) {
                     static::$_logDir = sys_get_temp_dir();
                 }
                 */
-                $file = static::$_logDir.'/'.static::$_logFile[$level];
-                if (is_writable(static::$_logDir) || is_writable($file)) {
-                    error_log("{$e['ts']} {$e['mem']} {$e['t']} {$message}\n", 3, $file);
+                $file = static::$_logDir . '/' . static::$_logFile[ $level ];
+                if ( is_writable( static::$_logDir ) || is_writable( $file ) ) {
+                    error_log( "{$e['ts']} {$e['mem']} {$e['t']} {$message}\n", 3, $file );
                 } else {
                     //TODO: anything needs to be done here?
                 }
             }
         }
 
-        if (!is_null(static::$_adminEmail)) { // require explicit enable of email
-            $l = static::$_level[static::EMAIL];
-            if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
-                error_log(print_r($e, 1), 1, static::$_adminEmail);
+        if ( !is_null( static::$_adminEmail ) ) { // require explicit enable of email
+            $l = static::$_level[ static::EMAIL ];
+            if ( false !== $l && ( is_array( $l ) && in_array( $level, $l ) || $l >= $level ) ) {
+                error_log( print_r( $e, 1 ), 1, static::$_adminEmail );
             }
         }
 
-        $l = static::$_level[static::OUTPUT];
-        if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
+        $l = static::$_level[ static::OUTPUT ];
+        if ( false !== $l && ( is_array( $l ) && in_array( $level, $l ) || $l >= $level ) ) {
             echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
             //ob_start();
-            echo $message."\n";
+            echo $message . "\n";
             debug_print_backtrace();
             //echo ob_get_clean();
             echo '</xmp>';
@@ -2497,76 +2497,76 @@ class BDebug extends BClass
             }
         }
 */
-        $l = static::$_level[static::STOP];
-        if (false!==$l && (is_array($l) && in_array($level, $l) || $l>=$level)) {
+        $l = static::$_level[ static::STOP ];
+        if ( false !== $l && ( is_array( $l ) && in_array( $level, $l ) || $l >= $level ) ) {
             static::dumpLog();
             die;
         }
 
-        return isset($id) ? $id : null;
+        return isset( $id ) ? $id : null;
     }
 
-    public static function alert($msg, $stackPop=0, $backtrace=false)
+    public static function alert( $msg, $stackPop = 0, $backtrace = false )
     {
-        return static::trigger(static::ALERT, $msg, $stackPop+1);
+        return static::trigger( static::ALERT, $msg, $stackPop + 1 );
     }
 
-    public static function critical($msg, $stackPop=0, $backtrace=false)
+    public static function critical( $msg, $stackPop = 0, $backtrace = false )
     {
-        return static::trigger(static::CRITICAL, $msg, $stackPop+1);
+        return static::trigger( static::CRITICAL, $msg, $stackPop + 1 );
     }
 
-    public static function error($msg, $stackPop=0, $backtrace=false)
+    public static function error( $msg, $stackPop = 0, $backtrace = false )
     {
-        return static::trigger(static::ERROR, $msg, $stackPop+1);
+        return static::trigger( static::ERROR, $msg, $stackPop + 1 );
     }
 
-    public static function warning($msg, $stackPop=0, $backtrace=false)
+    public static function warning( $msg, $stackPop = 0, $backtrace = false )
     {
-        return static::trigger(static::WARNING, $msg, $stackPop+1);
+        return static::trigger( static::WARNING, $msg, $stackPop + 1 );
     }
 
-    public static function notice($msg, $stackPop=0, $backtrace=false)
+    public static function notice( $msg, $stackPop = 0, $backtrace = false )
     {
-        return static::trigger(static::NOTICE, $msg, $stackPop+1);
+        return static::trigger( static::NOTICE, $msg, $stackPop + 1 );
     }
 
-    public static function info($msg, $stackPop=0, $backtrace=false)
+    public static function info( $msg, $stackPop = 0, $backtrace = false )
     {
-        return static::trigger(static::INFO, $msg, $stackPop+1);
+        return static::trigger( static::INFO, $msg, $stackPop + 1 );
     }
 
-    public static function debug($msg, $stackPop=0, $backtrace=false)
+    public static function debug( $msg, $stackPop = 0, $backtrace = false )
     {
-        if ('DEBUG'!==static::$_mode) return; // to speed things up
-        return static::trigger(static::DEBUG, $msg, $stackPop+1);
+        if ( 'DEBUG' !== static::$_mode ) return; // to speed things up
+        return static::trigger( static::DEBUG, $msg, $stackPop + 1 );
     }
 
-    static public function getCollectedErrors($type=self::ERROR)
+    static public function getCollectedErrors( $type = self::ERROR )
     {
-        if (!empty(static::$_collectedErrors[$type])) {
-            return static::$_collectedErrors[$type];
+        if ( !empty( static::$_collectedErrors[ $type ] ) ) {
+            return static::$_collectedErrors[ $type ];
         }
     }
 
-    public static function profile($id)
+    public static function profile( $id )
     {
-        if ($id && !empty(static::$_events[$id])) {
-            static::$_events[$id]['d'] = microtime(true)-static::$_startTime-static::$_events[$id]['t'];
-            static::$_events[$id]['c']++;
+        if ( $id && !empty( static::$_events[ $id ] ) ) {
+            static::$_events[ $id ][ 'd' ] = microtime( true ) - static::$_startTime - static::$_events[ $id ][ 't' ];
+            static::$_events[ $id ][ 'c' ]++;
         }
     }
 
-    public static function is($modes)
+    public static function is( $modes )
     {
-        if (is_string($modes)) $modes = explode(',', $modes);
-        return in_array(static::$_mode, $modes);
+        if ( is_string( $modes ) ) $modes = explode( ',', $modes );
+        return in_array( static::$_mode, $modes );
     }
 
-    public static function dumpLog($return=false)
+    public static function dumpLog( $return = false )
     {
-        if (!(static::$_mode===static::MODE_DEBUG || static::$_mode===static::MODE_DEVELOPMENT)
-            || BResponse::i()->getContentType()!=='text/html'
+        if ( !( static::$_mode === static::MODE_DEBUG || static::$_mode === static::MODE_DEVELOPMENT )
+            || BResponse::i()->getContentType() !== 'text/html'
             || BRequest::i()->xhr()
         ) {
             return;
@@ -2582,21 +2582,21 @@ class BDebug extends BClass
 </style>
 <div id="buckyball-debug-trigger" onclick="var el=document.getElementById('buckyball-debug-console');el.style.display=el.style.display?'':'none'">[DBG]</div>
 <div id="buckyball-debug-console" style="display:none"><?php
-        echo "DELTA: ".BDebug::i()->delta().', PEAK: '.memory_get_peak_usage(true).', EXIT: '.memory_get_usage(true);
+        echo "DELTA: " . BDebug::i()->delta() . ', PEAK: ' . memory_get_peak_usage( true ) . ', EXIT: ' . memory_get_usage( true );
         echo "<pre>";
-        print_r(BORM::get_query_log());
+        print_r( BORM::get_query_log() );
         //BEvents::i()->debug();
         echo "</pre>";
         //print_r(static::$_events);
 ?><table cellspacing="0"><tr><th>Message</th><th>Rel.Time</th><th>Profile</th><th>Memory</th><th>Level</th><th>Relevant Location</th><th>Module</th></tr><?php
-        foreach (static::$_events as $e) {
-            if (empty($e['file'])) { $e['file'] = ''; $e['line'] = ''; }
-            $profile = $e['d'] ? number_format($e['d'], 6).($e['c']>1 ? ' ('.$e['c'].')' : '') : '';
-            echo "<tr><td>".nl2br(htmlspecialchars($e['msg']))."</td><td>".number_format($e['t'], 6)."</td><td>".$profile."</td><td>".number_format($e['mem'], 0)."</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>".(!empty($e['module'])?$e['module']:'')."</td></tr>";
+        foreach ( static::$_events as $e ) {
+            if ( empty( $e[ 'file' ] ) ) { $e[ 'file' ] = ''; $e[ 'line' ] = ''; }
+            $profile = $e[ 'd' ] ? number_format( $e[ 'd' ], 6 ) . ( $e[ 'c' ] > 1 ? ' (' . $e[ 'c' ] . ')' : '' ) : '';
+            echo "<tr><td>" . nl2br( htmlspecialchars( $e[ 'msg' ] ) ) . "</td><td>" . number_format( $e[ 't' ], 6 ) . "</td><td>" . $profile . "</td><td>" . number_format( $e[ 'mem' ], 0 ) . "</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>" . ( !empty( $e[ 'module' ] ) ? $e[ 'module' ] : '' ) . "</td></tr>";
         }
 ?></table></div><?php
         $html = ob_get_clean();
-        if ($return) {
+        if ( $return ) {
             return $html;
         } else {
             echo $html;
@@ -2610,24 +2610,24 @@ class BDebug extends BClass
     */
     public static function delta()
     {
-        return microtime(true)-static::$_startTime;
+        return microtime( true ) - static::$_startTime;
     }
 
-    public static function dump($var)
+    public static function dump( $var )
     {
-        if (is_array($var) && current($var) instanceof Model) {
-            foreach ($var as $k=>$v) {
-                echo '<hr>'.$k.':';
-                static::dump($v);
+        if ( is_array( $var ) && current( $var ) instanceof Model ) {
+            foreach ( $var as $k => $v ) {
+                echo '<hr>' . $k . ':';
+                static::dump( $v );
             }
-        } elseif ($var instanceof Model) {
-            echo '<pre>'; print_r($var->as_array()); echo '</pre>';
+        } elseif ( $var instanceof Model ) {
+            echo '<pre>'; print_r( $var->as_array() ); echo '</pre>';
         } else {
-            echo '<pre>'; print_r($var); echo '</pre>';
+            echo '<pre>'; print_r( $var ); echo '</pre>';
         }
     }
 
-    public static function afterOutput($args)
+    public static function afterOutput( $args )
     {
         static::dumpLog();
         //$args['content'] = str_replace('</body>', static::dumpLog(true).'</body>', $args['content']);
@@ -2690,9 +2690,9 @@ class BLocale extends BClass
      * @param array $args
      * @return BLocale
      */
-    public static function i($new=false, array $args=array())
+    public static function i( $new = false, array $args = array() )
     {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
 
     /**
@@ -2701,35 +2701,35 @@ class BLocale extends BClass
     */
     public function __construct()
     {
-        date_default_timezone_set($this->_defaultTz);
-        setlocale(LC_ALL, $this->_defaultLocale);
-        $this->_tzCache['GMT'] = new DateTimeZone('GMT');
+        date_default_timezone_set( $this->_defaultTz );
+        setlocale( LC_ALL, $this->_defaultLocale );
+        $this->_tzCache[ 'GMT' ] = new DateTimeZone( 'GMT' );
     }
 
-    public static function transliterate($str, $filler='-')
+    public static function transliterate( $str, $filler = '-' )
     {
-        $qFiller = preg_quote($filler);
-        if (function_exists('transliterator_transliterate')) { // PHP >= 5.4.0
+        $qFiller = preg_quote( $filler );
+        if ( function_exists( 'transliterator_transliterate' ) ) { // PHP >= 5.4.0
             $rules = "Any-Latin; NFD; [:Nonspacing Mark:] Remove; NFC; [:Punctuation:] Remove; Lower();";
-            $str = transliterator_transliterate($rules, $str);
-            $str = preg_replace('/['.$qFiller.'\s]+/', $filler, $str); // consolidate fillers
+            $str = transliterator_transliterate( $rules, $str );
+            $str = preg_replace( '/[' . $qFiller . '\s]+/', $filler, $str ); // consolidate fillers
         } else {
-            $str = preg_replace('/[^\\pL0-9]+/u', $filler, $str); // leave only letters and numbers, consolidate fillers
-            $str = iconv("utf-8", "us-ascii//TRANSLIT", $str); // transliterate
-            $str = preg_replace('/[^'.$qFiller.'a-z0-9]+/', '', strtolower($str)); // remove leftovers from transliteration
+            $str = preg_replace( '/[^\\pL0-9]+/u', $filler, $str ); // leave only letters and numbers, consolidate fillers
+            $str = iconv( "utf-8", "us-ascii//TRANSLIT", $str ); // transliterate
+            $str = preg_replace( '/[^' . $qFiller . 'a-z0-9]+/', '', strtolower( $str ) ); // remove leftovers from transliteration
         }
-        $str = trim($str, $filler); // remove fillers from start and end of string
+        $str = trim( $str, $filler ); // remove fillers from start and end of string
         return $str;
     }
 
-    public static function setCurrentLanguage($lang)
+    public static function setCurrentLanguage( $lang )
     {
         static::$_currentLanguage = $lang;
     }
 
     public static function getCurrentLanguage()
     {
-        if (empty(static::$_currentLanguage)) {
+        if ( empty( static::$_currentLanguage ) ) {
             static::$_currentLanguage = static::$_defaultLanguage;
         }
         return static::$_currentLanguage;
@@ -2743,113 +2743,113 @@ class BLocale extends BClass
      * @param mixed $data array or file name string
      * @param array $params
      */
-    public static function importTranslations($data, $params=array())
+    public static function importTranslations( $data, $params = array() )
     {
-        $module = !empty($params['_module']) ? $params['_module'] : BModuleRegistry::i()->currentModuleName();
-        if (is_string($data)) {
-            if (!BUtil::isPathAbsolute($data)) {
-                $data = BApp::m($module)->root_dir.'/i18n/'.$data;
+        $module = !empty( $params[ '_module' ] ) ? $params[ '_module' ] : BModuleRegistry::i()->currentModuleName();
+        if ( is_string( $data ) ) {
+            if ( !BUtil::isPathAbsolute( $data ) ) {
+                $data = BApp::m( $module )->root_dir . '/i18n/' . $data;
             }
 
-            if (is_readable($data)) {
-                $extension = !empty($params['extension']) ? $params['extension'] : 'csv';
-                switch ($extension) {
+            if ( is_readable( $data ) ) {
+                $extension = !empty( $params[ 'extension' ] ) ? $params[ 'extension' ] : 'csv';
+                switch ( $extension ) {
                     case 'csv':
-                        $fp = fopen($data, 'r');
-                        while (($r = fgetcsv($fp, 2084))) {
-                            static::addTranslation($r, $module);
+                        $fp = fopen( $data, 'r' );
+                        while ( ( $r = fgetcsv( $fp, 2084 ) ) ) {
+                            static::addTranslation( $r, $module );
                         }
-                        fclose($fp);
+                        fclose( $fp );
                         break;
 
                     case 'json':
-                        $content = file_get_contents($data);
-                        $translations = BUtil::fromJson($content);
-                        foreach ($translations as $word => $tr) {
-                            static::addTranslation(array($word,$tr), $module);
+                        $content = file_get_contents( $data );
+                        $translations = BUtil::fromJson( $content );
+                        foreach ( $translations as $word => $tr ) {
+                            static::addTranslation( array( $word, $tr ), $module );
                         }
                         break;
 
                     case 'php':
                         $translations = include $data;
-                        foreach ($translations as $word => $tr) {
-                            static::addTranslation(array($word,$tr), $module);
+                        foreach ( $translations as $word => $tr ) {
+                            static::addTranslation( array( $word, $tr ), $module );
                         }
                         break;
 
                     case 'po':
                         //TODO: implement https://github.com/clinisbut/PHP-po-parser
-                        $contentLines = file($data);
+                        $contentLines = file( $data );
                         $translations = array();
                         $mode = null;
-                        foreach ($contentLines as $line) {
-                            $line = trim($line);
-                            if ($line[0]==='"') {
-                                $cmd = '+'.$mode;
+                        foreach ( $contentLines as $line ) {
+                            $line = trim( $line );
+                            if ( $line[ 0 ] === '"' ) {
+                                $cmd = '+' . $mode;
                                 $str = $line;
                             } else {
-                                list($cmd, $str) = explode(' ', $line, 2);
+                                list( $cmd, $str ) = explode( ' ', $line, 2 );
                             }
-                            $str = preg_replace('/(^\s*"|"\s*$)/', '', $str);
-                            switch ($cmd) {
-                                case 'msgid': $msgid = $str; $mode = $cmd; $translations[$msgid] = ''; break;
+                            $str = preg_replace( '/(^\s*"|"\s*$)/', '', $str );
+                            switch ( $cmd ) {
+                                case 'msgid': $msgid = $str; $mode = $cmd; $translations[ $msgid ] = ''; break;
                                 case '+msgid': $msgid .= $str; break;
-                                case 'msgstr': $mode = $cmd; $translations[$msgid] = $str; break;
-                                case '+msgstr': $translations[$msgid] .= $str; break;
+                                case 'msgstr': $mode = $cmd; $translations[ $msgid ] = $str; break;
+                                case '+msgstr': $translations[ $msgid ] .= $str; break;
                             }
                         }
                         break;
                 }
             } else {
-                BDebug::info('Could not load translation file: '.$data);
+                BDebug::info( 'Could not load translation file: ' . $data );
                 return;
             }
-        } elseif (is_array($data)) {
-            foreach ($data as $r) {
-                static::addTranslation($r, $module);
+        } elseif ( is_array( $data ) ) {
+            foreach ( $data as $r ) {
+                static::addTranslation( $r, $module );
             }
         }
     }
 
-    static public function getFilesFromDir($dir)
+    static public function getFilesFromDir( $dir )
     {
         $files = array();
-        if (false !== ($handle = opendir($dir))) {
-            while (false !== ($file = readdir($handle))) {
-                if ($file != "." && $file != "..") {
-                    if(is_dir($dir.'/'.$file)) {
-                        $dir2 = $dir.'/'.$file;
-                        $files = array_merge($files, static::getFilesFromDir($dir2));
+        if ( false !== ( $handle = opendir( $dir ) ) ) {
+            while ( false !== ( $file = readdir( $handle ) ) ) {
+                if ( $file != "." && $file != ".." ) {
+                    if ( is_dir( $dir . '/' . $file ) ) {
+                        $dir2 = $dir . '/' . $file;
+                        $files = array_merge( $files, static::getFilesFromDir( $dir2 ) );
                     }
                     else {
-                        $files[] = $dir.'/'.$file;
+                        $files[] = $dir . '/' . $file;
                     }
                 }
             }
-            closedir($handle);
+            closedir( $handle );
         }
 
         return $files;
     }
 
-    static public function addTranslationsFile($file)
+    static public function addTranslationsFile( $file )
     {
-        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-        if (empty($ext)) {
+        $ext = strtolower( pathinfo( $file, PATHINFO_EXTENSION ) );
+        if ( empty( $ext ) ) {
             return;
         }
-        $params['extension'] = $ext;
-        static::importTranslations($file, $params);
+        $params[ 'extension' ] = $ext;
+        static::importTranslations( $file, $params );
     }
 
-    protected static function addTranslation($r, $module=null)
+    protected static function addTranslation( $r, $module = null )
     {
-        if (empty($r[1])) {
+        if ( empty( $r[ 1 ] ) ) {
             #BDebug::debug('Empty translation for "'.$r[0].'"');
             return;
         }
         // short and quick way
-        static::$_tr[ $r[0] ][ !empty($module) ? $module : '_' ] = $r[1];
+        static::$_tr[ $r[ 0 ] ][ !empty( $module ) ? $module : '_' ] = $r[ 1 ];
 
         /*
         // a bit of memory saving way
@@ -2879,44 +2879,44 @@ class BLocale extends BClass
 
     }
 
-    public static function _($string, $params=array(), $module=null)
+    public static function _( $string, $params = array(), $module = null )
     {
-        if (empty(static::$_tr[$string])) { // if no translation at all
+        if ( empty( static::$_tr[ $string ] ) ) { // if no translation at all
             $tr = $string; // return original string
         } else { // if some translation present
-            $arr = static::$_tr[$string];
-            if (!empty($module) && !empty($arr[$module])) { // if module requested and translation for it present
-                $tr = $arr[$module]; // use it
-            } elseif (!empty($arr['_'])) { // otherwise, if there's default translation
-                $tr = $arr['_']; // use it
+            $arr = static::$_tr[ $string ];
+            if ( !empty( $module ) && !empty( $arr[ $module ] ) ) { // if module requested and translation for it present
+                $tr = $arr[ $module ]; // use it
+            } elseif ( !empty( $arr[ '_' ] ) ) { // otherwise, if there's default translation
+                $tr = $arr[ '_' ]; // use it
             } else { // otherwise
-                reset($arr); // find the first available translation
-                $tr = current($arr); // and use it
+                reset( $arr ); // find the first available translation
+                $tr = current( $arr ); // and use it
             }
         }
 
-        return BUtil::sprintfn($tr, $params);
+        return BUtil::sprintfn( $tr, $params );
     }
 
-    public function translations($sources)
+    public function translations( $sources )
     {
         $results = array();
-        if(is_array($sources)){
+        if ( is_array( $sources ) ) {
             foreach ( $sources as $string ) {
-                if(is_string($string)){
-                    $results[$string] = static::_($string);
-                } else if(is_array($string) && !empty($string)) {
-                    $str = (string) $string[0];
-                    $params = isset($string[1])? (array) $string[1]: array();
-                    $module = isset($string[2])? (string) $string[2]: null;
-                    $results[$str] = static::_($str, $params, $module);
+                if ( is_string( $string ) ) {
+                    $results[ $string ] = static::_( $string );
+                } else if ( is_array( $string ) && !empty( $string ) ) {
+                    $str = (string) $string[ 0 ];
+                    $params = isset( $string[ 1 ] ) ? (array) $string[ 1 ] : array();
+                    $module = isset( $string[ 2 ] ) ? (string) $string[ 2 ] : null;
+                    $results[ $str ] = static::_( $str, $params, $module );
                 }
             }
         } else {
-            $results[(string) $sources] = static::_((string) $sources);
+            $results[ (string) $sources ] = static::_( (string) $sources );
         }
 
-        return BUtil::toJson($results);
+        return BUtil::toJson( $results );
     }
 
     /*
@@ -2981,7 +2981,7 @@ class BLocale extends BClass
     */
     public function serverTz()
     {
-        return date('e'); // Examples: UTC, GMT, Atlantic/Azores
+        return date( 'e' ); // Examples: UTC, GMT, Atlantic/Azores
     }
 
     /**
@@ -2990,15 +2990,15 @@ class BLocale extends BClass
     * @param stirng|null $tz If null, return server timezone offset
     * @return int
     */
-    public function tzOffset($tz=null)
+    public function tzOffset( $tz = null )
     {
-        if (is_null($tz)) { // Server timezone
-            return date('O') * 36; //  x/100*60*60; // Seconds from GMT
+        if ( is_null( $tz ) ) { // Server timezone
+            return date( 'O' ) * 36; //  x/100*60*60; // Seconds from GMT
         }
-        if (empty($this->_tzCache[$tz])) {
-            $this->_tzCache[$tz] = new DateTimeZone($tz);
+        if ( empty( $this->_tzCache[ $tz ] ) ) {
+            $this->_tzCache[ $tz ] = new DateTimeZone( $tz );
         }
-        return $this->_tzCache[$tz]->getOffset($this->_tzCache['GMT']);
+        return $this->_tzCache[ $tz ]->getOffset( $this->_tzCache[ 'GMT' ] );
     }
 
     /**
@@ -3007,13 +3007,13 @@ class BLocale extends BClass
     * @param string $value
     * @return string
     */
-    public function datetimeLocalToDb($value)
+    public function datetimeLocalToDb( $value )
     {
-        if (is_array($value)) {
-            return array_map(array($this, __METHOD__), $value);
+        if ( is_array( $value ) ) {
+            return array_map( array( $this, __METHOD__ ), $value );
         }
-        if (!$value) return $value;
-        return gmstrftime('%F %T', strtotime($value));
+        if ( !$value ) return $value;
+        return gmstrftime( '%F %T', strtotime( $value ) );
     }
 
     /**
@@ -3023,18 +3023,18 @@ class BLocale extends BClass
     * @param null|string|array $fields if null, all fields will be parsed, if string, will be split by comma
     * @return array|object clone of $request with parsed dates
     */
-    public function parseRequestDates($request, $fields=null)
+    public function parseRequestDates( $request, $fields = null )
     {
-        if (is_string($fields)) $fields = explode(',', $fields);
-        $isObject = is_object($request);
-        if ($isObject) $result = clone $request;
-        foreach ($request as $k=>$v) {
-            if (is_null($fields) || in_array($k, $fields)) {
-                $r = $this->datetimeLocalToDb($v);
+        if ( is_string( $fields ) ) $fields = explode( ',', $fields );
+        $isObject = is_object( $request );
+        if ( $isObject ) $result = clone $request;
+        foreach ( $request as $k => $v ) {
+            if ( is_null( $fields ) || in_array( $k, $fields ) ) {
+                $r = $this->datetimeLocalToDb( $v );
             } else {
                 $r = $v;
             }
-            if ($isObject) $result->$k = $r; else $result[$k] = $r;
+            if ( $isObject ) $result->$k = $r; else $result[ $k ] = $r;
         }
         return $result;
     }
@@ -3046,9 +3046,9 @@ class BLocale extends BClass
     * @param bool $full Full format or short
     * @return string
     */
-    public function datetimeDbToLocal($value, $full=false)
+    public function datetimeDbToLocal( $value, $full = false )
     {
-        return strftime($full ? '%c' : '%x', strtotime($value));
+        return strftime( $full ? '%c' : '%x', strtotime( $value ) );
     }
 
     static public function getTranslations()
@@ -3064,22 +3064,22 @@ class BLocale extends BClass
     static protected $_currencyCode = 'USD';
     static protected $_currencySymbol = '$';
 
-    static public function setCurrency($code, $symbol = null)
+    static public function setCurrency( $code, $symbol = null )
     {
         static::$_currencyCode = $code;
-        if (is_null($symbol)) {
-            if (!empty(static::$_currencySymbolMap[$code])) {
-                $symbol = static::$_currencySymbolMap[$code];
+        if ( is_null( $symbol ) ) {
+            if ( !empty( static::$_currencySymbolMap[ $code ] ) ) {
+                $symbol = static::$_currencySymbolMap[ $code ];
             } else {
-                $symbol = $code.' ';
+                $symbol = $code . ' ';
             }
         }
         static::$_currencySymbol = $symbol;
     }
 
-    static public function currency($value, $decimals = 2)
+    static public function currency( $value, $decimals = 2 )
     {
-        return sprintf('%s%s', static::$_currencySymbol, number_format($value, $decimals));
+        return sprintf( '%s%s', static::$_currencySymbol, number_format( $value, $decimals ) );
     }
 }
 
@@ -3093,77 +3093,77 @@ class BFtpClient extends BClass
     protected $_ftpUsername = '';
     protected $_ftpPassword = '';
 
-    public function __construct($config)
+    public function __construct( $config )
     {
-        if (!empty($config['hostname'])) {
-            $this->_ftpHost = $config['hostname'];
+        if ( !empty( $config[ 'hostname' ] ) ) {
+            $this->_ftpHost = $config[ 'hostname' ];
         }
-        if (!empty($config['port'])) {
-            $this->_ftpPort = $config['port'];
+        if ( !empty( $config[ 'port' ] ) ) {
+            $this->_ftpPort = $config[ 'port' ];
         }
-        if (!empty($config['username'])) {
-            $this->_ftpUsername = $config['username'];
+        if ( !empty( $config[ 'username' ] ) ) {
+            $this->_ftpUsername = $config[ 'username' ];
         }
-        if (!empty($config['password'])) {
-            $this->_ftpPassword = $config['password'];
+        if ( !empty( $config[ 'password' ] ) ) {
+            $this->_ftpPassword = $config[ 'password' ];
         }
     }
 
-    public function upload($from, $to)
+    public function upload( $from, $to )
     {
-        if (!extension_loaded('ftp')) {
-            new BException('FTP PHP extension is not installed');
+        if ( !extension_loaded( 'ftp' ) ) {
+            new BException( 'FTP PHP extension is not installed' );
         }
 
-        if (!($conn = ftp_connect($this->_ftpHost, $this->_ftpPort))) {
-            throw new BException('Could not connect to FTP host');
+        if ( !( $conn = ftp_connect( $this->_ftpHost, $this->_ftpPort ) ) ) {
+            throw new BException( 'Could not connect to FTP host' );
         }
 
-        if (!@ftp_login($conn, $this->_ftpUsername, $this->_ftpPassword)) {
-            ftp_close($conn);
-            throw new BException('Could not login to FTP host');
+        if ( !@ftp_login( $conn, $this->_ftpUsername, $this->_ftpPassword ) ) {
+            ftp_close( $conn );
+            throw new BException( 'Could not login to FTP host' );
         }
 
-        if (!ftp_chdir($conn, $to)) {
-            ftp_close($conn);
-            throw new BException('Could not navigate to '. $to);
+        if ( !ftp_chdir( $conn, $to ) ) {
+            ftp_close( $conn );
+            throw new BException( 'Could not navigate to ' . $to );
         }
 
-        $errors = $this->uploadDir($conn, $from.'/');
-        ftp_close($conn);
+        $errors = $this->uploadDir( $conn, $from . '/' );
+        ftp_close( $conn );
 
         return $errors;
     }
 
-    public function uploadDir($conn, $source, $ftpPath='')
+    public function uploadDir( $conn, $source, $ftpPath = '' )
     {
         $errors = array();
-        $dir = opendir($source);
-        while ($file = readdir($dir)) {
-            if ($file=='.' || $file=="..") {
+        $dir = opendir( $source );
+        while ( $file = readdir( $dir ) ) {
+            if ( $file == '.' || $file == ".." ) {
                 continue;
             }
 
-            if (!is_dir($source.$file)) {
-                if (@ftp_put($conn, $file, $source.$file, FTP_BINARY)) {
+            if ( !is_dir( $source . $file ) ) {
+                if ( @ftp_put( $conn, $file, $source . $file, FTP_BINARY ) ) {
                     // all is good
                     #ftp_chmod($conn, $this->_ftpFileMode, $file);
                 } else {
-                    $errors[] = ftp_pwd($conn).'/'.$file;
+                    $errors[] = ftp_pwd( $conn ) . '/' . $file;
                 }
                 continue;
             }
-            if (@ftp_chdir($conn, $file)) {
+            if ( @ftp_chdir( $conn, $file ) ) {
                 // all is good
-            } elseif (@ftp_mkdir($conn, $file)) {
-                ftp_chmod($conn, $this->_ftpDirMode, $file);
-                ftp_chdir($conn, $file);
+            } elseif ( @ftp_mkdir( $conn, $file ) ) {
+                ftp_chmod( $conn, $this->_ftpDirMode, $file );
+                ftp_chdir( $conn, $file );
             } else {
-                $errors[] = ftp_pwd($conn).'/'.$file.'/';
+                $errors[] = ftp_pwd( $conn ) . '/' . $file . '/';
                 continue;
             }
-            $errors += $this->uploadDir($conn, $source.$file.'/', $ftpPath.$file.'/');
-            ftp_chdir($conn, '..');
+            $errors += $this->uploadDir( $conn, $source . $file . '/', $ftpPath . $file . '/' );
+            ftp_chdir( $conn, '..' );
         }
         return $errors;
     }
@@ -3192,28 +3192,28 @@ class BLoginThrottle extends BClass
     *
     * @return BLoginThrottle
     */
-    public static function i($new=false, array $args=array())
+    public static function i( $new = false, array $args = array() )
     {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
 
     public function __construct()
     {
-        $c = BConfig::i()->get('modules/BLoginThrottle');
+        $c = BConfig::i()->get( 'modules/BLoginThrottle' );
 
-        if (empty($c['sleep_sec'])) $c['sleep_sec'] = 2; // lock record for 2 secs after failed login
-        if (empty($c['brute_attempts_max'])) $c['brute_attempts_max'] = 3; // after 3 fast attempts do something
-        if (empty($c['reset_time'])) $c['reset_time'] = 10; // after 10 secs reset record
+        if ( empty( $c[ 'sleep_sec' ] ) ) $c[ 'sleep_sec' ] = 2; // lock record for 2 secs after failed login
+        if ( empty( $c[ 'brute_attempts_max' ] ) ) $c[ 'brute_attempts_max' ] = 3; // after 3 fast attempts do something
+        if ( empty( $c[ 'reset_time' ] ) ) $c[ 'reset_time' ] = 10; // after 10 secs reset record
 
         $this->_config = $c;
     }
 
-    public function config($config)
+    public function config( $config )
     {
-        $this->_config = BUtil::arrayMerge($this->_config, $config);
+        $this->_config = BUtil::arrayMerge( $this->_config, $config );
     }
 
-    public function init($area, $username)
+    public function init( $area, $username )
     {
         $now = time();
         $c = $this->_config;
@@ -3222,17 +3222,17 @@ class BLoginThrottle extends BClass
         $this->_username = $username;
         $this->_rec = $this->_load();
 
-        if ($this->_rec) {
-            if ($this->_rec['status'] === 'FAILED') {
-                if (empty($this->_rec['brute_attempts_cnt'])) {
-                    $this->_rec['brute_attempts_cnt'] = 1;
+        if ( $this->_rec ) {
+            if ( $this->_rec[ 'status' ] === 'FAILED' ) {
+                if ( empty( $this->_rec[ 'brute_attempts_cnt' ] ) ) {
+                    $this->_rec[ 'brute_attempts_cnt' ] = 1;
                 } else {
-                    $this->_rec['brute_attempts_cnt']++;
+                    $this->_rec[ 'brute_attempts_cnt' ]++;
                 }
                 $this->_save();
-                $this->_fire('init:brute');
-                if ($this->_rec['brute_attempts_cnt'] == $c['brute_attempts_max']) {
-                    $this->_fire('init:brute_max');
+                $this->_fire( 'init:brute' );
+                if ( $this->_rec[ 'brute_attempts_cnt' ] == $c[ 'brute_attempts_max' ] ) {
+                    $this->_fire( 'init:brute_max' );
                 }
                 return false; // currently locked
             }
@@ -3242,65 +3242,65 @@ class BLoginThrottle extends BClass
 
     public function success()
     {
-        $this->_fire('success');
+        $this->_fire( 'success' );
         $this->_reset();
         return true;
     }
 
-    public function failure($sleepSec = null)
+    public function failure( $sleepSec = null )
     {
         $username = $this->_username;
         $now = time();
         $c = $this->_config;
 
-        $this->_fire('fail:before');
+        $this->_fire( 'fail:before' );
 
-        if (empty($this->_rec['attempt_cnt'])) {
-            $this->_rec['attempt_cnt'] = 1;
+        if ( empty( $this->_rec[ 'attempt_cnt' ] ) ) {
+            $this->_rec[ 'attempt_cnt' ] = 1;
         } else {
-            $this->_rec['attempt_cnt']++;
+            $this->_rec[ 'attempt_cnt' ]++;
         }
-        $this->_rec['last_attempt'] = $now;
-        $this->_rec['status'] = 'FAILED';
+        $this->_rec[ 'last_attempt' ] = $now;
+        $this->_rec[ 'status' ] = 'FAILED';
         $this->_save();
-        $this->_fire('fail:wait');
+        $this->_fire( 'fail:wait' );
 
         $this->_gc();
-        sleep(!is_null($sleepSec) ? $sleepSec : $c['sleep_sec']);
+        sleep( !is_null( $sleepSec ) ? $sleepSec : $c[ 'sleep_sec' ] );
 
-        $this->_rec['status'] = '';
+        $this->_rec[ 'status' ] = '';
         $this->_save();
-        $this->_fire('fail:after');
+        $this->_fire( 'fail:after' );
 
         return true; // normal response
     }
 
-    protected function _fire($event)
+    protected function _fire( $event )
     {
-        BEvents::i()->fire('BLoginThrottle::'.$event, array(
+        BEvents::i()->fire( 'BLoginThrottle::' . $event, array(
             'area'     => $this->_area,
             'username' => $this->_username,
             'rec'      => $this->_rec,
             'config'   => $this->_config,
-        ));
+        ) );
     }
 
     protected function _load()
     {
-        $key = $this->_area.'/'.$this->_username;
-        return BCache::i()->load($this->_cachePrefix.$key);
+        $key = $this->_area . '/' . $this->_username;
+        return BCache::i()->load( $this->_cachePrefix . $key );
     }
 
     protected function _save()
     {
-        $key = $this->_area.'/'.$this->_username;
-        return BCache::i()->save($this->_cachePrefix.$key, $this->_rec, $this->_config['reset_time']);
+        $key = $this->_area . '/' . $this->_username;
+        return BCache::i()->save( $this->_cachePrefix . $key, $this->_rec, $this->_config[ 'reset_time' ] );
     }
 
     protected function _reset()
     {
-        $key = $this->_area.'/'.$this->_username;
-        return BCache::i()->delete($key);
+        $key = $this->_area . '/' . $this->_username;
+        return BCache::i()->delete( $key );
     }
 
     protected function _gc()
@@ -3319,31 +3319,31 @@ class BYAML extends BCLass
     static protected $_peclYaml = null;
     static protected $_peclSyck = null;
 
-    static public function load($filename, $cache=true)
+    static public function load( $filename, $cache = true )
     {
         //$filename1 = realpath($filename);
         //if (!$filename1) {
-        if (!file_exists($filename)) {
-            BDebug::debug('BCache load: file does not exist: '.$filename);
+        if ( !file_exists( $filename ) ) {
+            BDebug::debug( 'BCache load: file does not exist: ' . $filename );
             return false;
         }
         //$filename = $filename1;
 
-        $filemtime = filemtime($filename);
+        $filemtime = filemtime( $filename );
 
-        if ($cache) {
-            $cacheData = BCache::i()->load('BYAML--'.$filename);
-            if (!empty($cacheData) && !empty($cacheData['v']) && $cacheData['v'] === $filemtime) {
-                return $cacheData['d'];
+        if ( $cache ) {
+            $cacheData = BCache::i()->load( 'BYAML--' . $filename );
+            if ( !empty( $cacheData ) && !empty( $cacheData[ 'v' ] ) && $cacheData[ 'v' ] === $filemtime ) {
+                return $cacheData[ 'd' ];
             }
         }
 
-        $yamlData = file_get_contents($filename);
-        $yamlData = str_replace("\t", '    ', $yamlData); //TODO: make configurable tab size
-        $arrayData = static::parse($yamlData);
+        $yamlData = file_get_contents( $filename );
+        $yamlData = str_replace( "\t", '    ', $yamlData ); //TODO: make configurable tab size
+        $arrayData = static::parse( $yamlData );
 
-        if ($cache) {
-            BCache::i()->save('BYAML--'.$filename, array('v'=>$filemtime, 'd'=>$arrayData), false);
+        if ( $cache ) {
+            BCache::i()->save( 'BYAML--' . $filename, array( 'v' => $filemtime, 'd' => $arrayData ), false );
         }
 
         return $arrayData;
@@ -3351,15 +3351,15 @@ class BYAML extends BCLass
 
     static public function init()
     {
-        if (is_null(static::$_peclYaml)) {
-            static::$_peclYaml = function_exists('yaml_parse');
+        if ( is_null( static::$_peclYaml ) ) {
+            static::$_peclYaml = function_exists( 'yaml_parse' );
 
-            if (!static::$_peclYaml) {
-                static::$_peclSyck = function_exists('syck_load');
+            if ( !static::$_peclYaml ) {
+                static::$_peclSyck = function_exists( 'syck_load' );
             }
 
-            if (!static::$_peclYaml && !static::$_peclSyck) {
-                require_once(__DIR__.'/lib/spyc.php');
+            if ( !static::$_peclYaml && !static::$_peclSyck ) {
+                require_once( __DIR__ . '/lib/spyc.php' );
                 /*
                 require_once(__DIR__.'/Yaml/Exception/ExceptionInterface.php');
                 require_once(__DIR__.'/Yaml/Exception/RuntimeException.php');
@@ -3377,37 +3377,37 @@ class BYAML extends BCLass
         return true;
     }
 
-    static public function parse($yamlData)
+    static public function parse( $yamlData )
     {
         static::init();
 
-        if (static::$_peclYaml) {
-            return yaml_parse($yamlData);
-        } elseif (static::$_peclSyck) {
-            return syck_load($yamlData);
+        if ( static::$_peclYaml ) {
+            return yaml_parse( $yamlData );
+        } elseif ( static::$_peclSyck ) {
+            return syck_load( $yamlData );
         }
 
-        if (class_exists('Spyc', false)) {
-            return Spyc::YAMLLoadString($yamlData);
+        if ( class_exists( 'Spyc', false ) ) {
+            return Spyc::YAMLLoadString( $yamlData );
         } else {
-            return Symfony\Component\Yaml\Yaml::parse($yamlData);
+            return Symfony\Component\Yaml\Yaml::parse( $yamlData );
         }
     }
 
-    static public function dump($arrayData)
+    static public function dump( $arrayData )
     {
         static::init();
 
-        if (static::$_peclYaml) {
-            return yaml_emit($arrayData);
-        } elseif (static::$_peclSyck) {
-            return syck_dump($arrayData);
+        if ( static::$_peclYaml ) {
+            return yaml_emit( $arrayData );
+        } elseif ( static::$_peclSyck ) {
+            return syck_dump( $arrayData );
         }
 
-        if (class_exists('Spyc', false)) {
-            return Spyc::YAMLDump($arrayData);
+        if ( class_exists( 'Spyc', false ) ) {
+            return Spyc::YAMLDump( $arrayData );
         } else {
-            return Symfony\Component\Yaml\Yaml::dump($arrayData);
+            return Symfony\Component\Yaml\Yaml::dump( $arrayData );
         }
     }
 }
@@ -3451,7 +3451,7 @@ class BValidate extends BClass
         'password_confirm' => array(
             'rule'    => 'BValidate::rulePasswordConfirm',
             'message' => 'Password confirmation does not match',
-            'args'    => array('original' => 'password'),
+            'args'    => array( 'original' => 'password' ),
         ),
     );
 
@@ -3465,86 +3465,86 @@ class BValidate extends BClass
      * @param array $args
      * @return BValidate
      */
-    public static function i($new = false, array $args = array())
+    public static function i( $new = false, array $args = array() )
     {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
 
-    public function addValidator($name, $rule)
+    public function addValidator( $name, $rule )
     {
-        $this->_defaultRules[$name] = $rule;
+        $this->_defaultRules[ $name ] = $rule;
         return $this;
     }
 
-    protected function _expandRules($rules)
+    protected function _expandRules( $rules )
     {
         $this->_expandedRules = array();
-        foreach ($rules as $rule) {
-            if (!empty($rule[0]) && !empty($rule[1])) {
+        foreach ( $rules as $rule ) {
+            if ( !empty( $rule[ 0 ] ) && !empty( $rule[ 1 ] ) ) {
                 $r = $rule;
-                $rule = array('field' => $r[0], 'rule' => $r[1]);
-                if (isset($r[2])) $rule['message'] = $r[2];
-                if (isset($r[3])) $rule['args'] = $r[3];
-                if (isset($rule['args']) && is_string($rule['args'])) {
-                    $rule['args'] = array($rule['args'] => true);
+                $rule = array( 'field' => $r[ 0 ], 'rule' => $r[ 1 ] );
+                if ( isset( $r[ 2 ] ) ) $rule[ 'message' ] = $r[ 2 ];
+                if ( isset( $r[ 3 ] ) ) $rule[ 'args' ] = $r[ 3 ];
+                if ( isset( $rule[ 'args' ] ) && is_string( $rule[ 'args' ] ) ) {
+                    $rule[ 'args' ] = array( $rule[ 'args' ] => true );
                 }
             }
-            if (is_string($rule['rule']) && $rule['rule'][0] === '@') {
-                $ruleName = substr($rule['rule'], 1);
-                if (empty($this->_defaultRules[$ruleName])) {
-                    throw new BException('Invalid rule name: ' . $ruleName);
+            if ( is_string( $rule[ 'rule' ] ) && $rule[ 'rule' ][ 0 ] === '@' ) {
+                $ruleName = substr( $rule[ 'rule' ], 1 );
+                if ( empty( $this->_defaultRules[ $ruleName ] ) ) {
+                    throw new BException( 'Invalid rule name: ' . $ruleName );
                 }
-                $defRule = $this->_defaultRules[$ruleName];
-                $rule = BUtil::arrayMerge($defRule, $rule);
-                $rule['rule'] = $defRule['rule'];
+                $defRule = $this->_defaultRules[ $ruleName ];
+                $rule = BUtil::arrayMerge( $defRule, $rule );
+                $rule[ 'rule' ] = $defRule[ 'rule' ];
             }
-            if(empty($rule['message'])) $rule['message'] = $this->_defaultMessage;
+            if ( empty( $rule[ 'message' ] ) ) $rule[ 'message' ] = $this->_defaultMessage;
             $this->_expandedRules[] = $rule;
         }
     }
 
-    protected function _validateRules($data)
+    protected function _validateRules( $data )
     {
         $this->_validateErrors = array();
-        foreach ($this->_expandedRules as $r) {
-            $args = !empty($r['args']) ? $r['args'] : array();
-            $r['args']['field'] = $r['field']; // for callback and message vars
+        foreach ( $this->_expandedRules as $r ) {
+            $args = !empty( $r[ 'args' ] ) ? $r[ 'args' ] : array();
+            $r[ 'args' ][ 'field' ] = $r[ 'field' ]; // for callback and message vars
 
-            if (is_string($r['rule']) && preg_match($this->_reRegex, $r['rule'], $m)) {
+            if ( is_string( $r[ 'rule' ] ) && preg_match( $this->_reRegex, $r[ 'rule' ], $m ) ) {
 
-                $result = empty($data[$r['field']]) || preg_match($m[0], (string)$data[$r['field']]);
+                $result = empty( $data[ $r[ 'field' ] ] ) || preg_match( $m[ 0 ], (string)$data[ $r[ 'field' ] ] );
 
-            } elseif($r['rule'] instanceof Closure){
+            } elseif ( $r[ 'rule' ] instanceof Closure ) {
 
-                $result = $r['rule']($data, $r['args']);
+                $result = $r[ 'rule' ]( $data, $r[ 'args' ] );
 
-            } elseif (is_callable($r['rule'])) {
+            } elseif ( is_callable( $r[ 'rule' ] ) ) {
 
-                $result = call_user_func($r['rule'], $data, $r['args']);
+                $result = call_user_func( $r[ 'rule' ], $data, $r[ 'args' ] );
 
-            } elseif (is_string($r['rule'])) {
+            } elseif ( is_string( $r[ 'rule' ] ) ) {
 
-                $callback = BUtil::extCallback($r['rule']);
-                if ($callback !== $r['rule']) {
-                    $result = call_user_func($r['rule'], $data, $r['args']);
+                $callback = BUtil::extCallback( $r[ 'rule' ] );
+                if ( $callback !== $r[ 'rule' ] ) {
+                    $result = call_user_func( $r[ 'rule' ], $data, $r[ 'args' ] );
                 } else {
-                    throw new BException('Invalid rule: '.print_r($r['rule'], 1));
+                    throw new BException( 'Invalid rule: ' . print_r( $r[ 'rule' ], 1 ) );
                 }
 
             } else {
 
-                throw new BException('Invalid rule: '.print_r($r['rule'], 1));
+                throw new BException( 'Invalid rule: ' . print_r( $r[ 'rule' ], 1 ) );
 
             }
 
-            if (is_string($result)) {
-                $r['message'] = $result;
+            if ( is_string( $result ) ) {
+                $r[ 'message' ] = $result;
                 $result = false;
             }
 
-            if (!$result) {
-                $this->_validateErrors[$r['field']][] = BUtil::injectVars($r['message'], $r['args']);
-                if (!empty($r['args']['break'])) {
+            if ( !$result ) {
+                $this->_validateErrors[ $r[ 'field' ] ][] = BUtil::injectVars( $r[ 'message' ], $r[ 'args' ] );
+                if ( !empty( $r[ 'args' ][ 'break' ] ) ) {
                     break;
                 }
             }
@@ -3591,18 +3591,18 @@ class BValidate extends BClass
      * @param null  $formName
      * @return bool
      */
-    public function validateInput($data, $rules, $formName = null)
+    public function validateInput( $data, $rules, $formName = null )
     {
-        $this->_expandRules($rules);
+        $this->_expandRules( $rules );
 
-        $this->_validateRules($data);
+        $this->_validateRules( $data );
 
-        if ($this->_validateErrors && $formName) {
-            BSession::i()->set('validator-data:' . $formName, $data);
-            foreach ($this->_validateErrors as $field => $errors) {
-                foreach ($errors as $error) {
-                    $msg = compact('error', 'field');
-                    BSession::i()->addMessage($msg, 'error', 'validator-errors:' . $formName);
+        if ( $this->_validateErrors && $formName ) {
+            BSession::i()->set( 'validator-data:' . $formName, $data );
+            foreach ( $this->_validateErrors as $field => $errors ) {
+                foreach ( $errors as $error ) {
+                    $msg = compact( 'error', 'field' );
+                    BSession::i()->addMessage( $msg, 'error', 'validator-errors:' . $formName );
                 }
             }
         }
@@ -3614,34 +3614,34 @@ class BValidate extends BClass
         return $this->_validateErrors;
     }
 
-    static public function ruleRequired($data, $args)
+    static public function ruleRequired( $data, $args )
     {
-        if (!isset($data[$args['field']])) {
+        if ( !isset( $data[ $args[ 'field' ] ] ) ) {
             return false;
         }
-        if (is_numeric($data[$args['field']])) {
+        if ( is_numeric( $data[ $args[ 'field' ] ] ) ) {
             return true;
         }
-        return !empty($data[$args['field']]);
+        return !empty( $data[ $args[ 'field' ] ] );
     }
 
-    static public function rulePasswordConfirm($data, $args)
+    static public function rulePasswordConfirm( $data, $args )
     {
-        return empty($data[$args['original']])
-            || !empty($data[$args['field']]) && $data[$args['field']] === $data[$args['original']];
+        return empty( $data[ $args[ 'original' ] ] )
+            || !empty( $data[ $args[ 'field' ] ] ) && $data[ $args[ 'field' ] ] === $data[ $args[ 'original' ] ];
     }
 
-    static public function ruleString($data, $args)
+    static public function ruleString( $data, $args )
     {
-        if (!isset($data[$args['field']])) {
+        if ( !isset( $data[ $args[ 'field' ] ] ) ) {
             return true;
         }
-        $value = $data[$args['field']];
-        if (!empty($args['min']) && strlen($value) < $args['min']) {
-            return 'The field should be at least '.$args['min'].' characters long: :field';
+        $value = $data[ $args[ 'field' ] ];
+        if ( !empty( $args[ 'min' ] ) && strlen( $value ) < $args[ 'min' ] ) {
+            return 'The field should be at least ' . $args[ 'min' ] . ' characters long: :field';
         }
-        if (!empty($args['max']) && strlen($value) > $args['max']) {
-            return 'The field can not exceed '.$args['max'].' characters: :field';
+        if ( !empty( $args[ 'max' ] ) && strlen( $value ) > $args[ 'max' ] ) {
+            return 'The field can not exceed ' . $args[ 'max' ] . ' characters: :field';
         }
         return true;
     }
@@ -3657,58 +3657,58 @@ class BValidateViewHelper extends BClass
     protected $_errors = array();
     protected $_data = array();
 
-    public function __construct($args)
+    public function __construct( $args )
     {
-        if (!isset($args['form'])) {
+        if ( !isset( $args[ 'form' ] ) ) {
             return;
         }
-        if (isset($args['data'])) {
-            if (is_object($args['data'])) {
-                $args['data'] = $args['data']->as_array();
+        if ( isset( $args[ 'data' ] ) ) {
+            if ( is_object( $args[ 'data' ] ) ) {
+                $args[ 'data' ] = $args[ 'data' ]->as_array();
             }
-            $this->_data = $args['data'];
+            $this->_data = $args[ 'data' ];
         }
 
         $sessionHlp = BSession::i();
-        $errors     = $sessionHlp->messages('validator-errors:' . $args['form']);
-        $formData   = $sessionHlp->get('validator-data:' . $args['form']);
-        $this->_data = BUtil::arrayMerge($this->_data, $formData);
-        $sessionHlp->set('validator-data:' . $args['form'], null);
+        $errors     = $sessionHlp->messages( 'validator-errors:' . $args[ 'form' ] );
+        $formData   = $sessionHlp->get( 'validator-data:' . $args[ 'form' ] );
+        $this->_data = BUtil::arrayMerge( $this->_data, $formData );
+        $sessionHlp->set( 'validator-data:' . $args[ 'form' ], null );
 
-        foreach ($errors as $error) {
-            $field                 = $error['msg']['field'];
-            $error['value']        = !empty($formData[$field]) ? $formData[$field] : null;
-            $this->_errors[$field] = $error;
+        foreach ( $errors as $error ) {
+            $field                 = $error[ 'msg' ][ 'field' ];
+            $error[ 'value' ]        = !empty( $formData[ $field ] ) ? $formData[ $field ] : null;
+            $this->_errors[ $field ] = $error;
         }
     }
 
-    public function fieldClass($field)
+    public function fieldClass( $field )
     {
-        if (empty($this->_errors[$field]['type'])) {
+        if ( empty( $this->_errors[ $field ][ 'type' ] ) ) {
             return '';
         }
-        return $this->_errors[$field]['type'];
+        return $this->_errors[ $field ][ 'type' ];
     }
 
-    public function fieldValue($field)
+    public function fieldValue( $field )
     {
-        return !empty($this->_data[$field]) ? $this->_data[$field] : null;
+        return !empty( $this->_data[ $field ] ) ? $this->_data[ $field ] : null;
     }
 
-    public function messageClass($field)
+    public function messageClass( $field )
     {
-        if (empty($this->_errors[$field]['type'])) {
+        if ( empty( $this->_errors[ $field ][ 'type' ] ) ) {
             return '';
         }
-        return $this->_errors[$field]['type'];
+        return $this->_errors[ $field ][ 'type' ];
     }
 
-    public function messageText($field)
+    public function messageText( $field )
     {
-        if (empty($this->_errors[$field]['msg']['error'])) {
+        if ( empty( $this->_errors[ $field ][ 'msg' ][ 'error' ] ) ) {
             return '';
         }
-        return BLocale::_($this->_errors[$field]['msg']['error']);
+        return BLocale::_( $this->_errors[ $field ][ 'msg' ][ 'error' ] );
     }
 
     /**
@@ -3716,12 +3716,12 @@ class BValidateViewHelper extends BClass
      * @param string $fieldId form field ID
      * @return string
      */
-    public function errorHtml($field, $fieldId)
+    public function errorHtml( $field, $fieldId )
     {
         $html = '';
 
-        if(!empty($this->_errors[$field]['type'])){
-            $html .= BUtil::tagHtml('label', array('for' => $fieldId, 'class' => $this->messageClass($field)),$this->messageText($field));
+        if ( !empty( $this->_errors[ $field ][ 'type' ] ) ) {
+            $html .= BUtil::tagHtml( 'label', array( 'for' => $fieldId, 'class' => $this->messageClass( $field ) ), $this->messageText( $field ) );
         }
 
         return $html;
@@ -3737,71 +3737,71 @@ class Bcrypt extends BClass
 {
     public function __construct()
     {
-        if (CRYPT_BLOWFISH != 1 && !function_exists('password_hash')) {
-            throw new Exception("bcrypt not supported in this installation. See http://php.net/crypt");
+        if ( CRYPT_BLOWFISH != 1 && !function_exists( 'password_hash' ) ) {
+            throw new Exception( "bcrypt not supported in this installation. See http://php.net/crypt" );
         }
     }
 
-    public function hash($input)
+    public function hash( $input )
     {
-        $hash = crypt($input, $this->getSalt());
-        return strlen($hash) > 13 ? $hash : false;
+        $hash = crypt( $input, $this->getSalt() );
+        return strlen( $hash ) > 13 ? $hash : false;
     }
 
-    public static function verify($input, $existingHash)
+    public static function verify( $input, $existingHash )
     {
         // md5 for protection against timing side channel attack (needed)
-        return md5(crypt($input, $existingHash)) === md5($existingHash);
+        return md5( crypt( $input, $existingHash ) ) === md5( $existingHash );
     }
 
     private function getSalt()
     {
         // The security weakness between 5.3.7 affects password with 8-bit characters only
         // @see: http://php.net/security/crypt_blowfish.php
-        $salt = '$' . (version_compare(phpversion(), '5.3.7', '>=') ? '2y' : '2a') . '$12$';
-        $salt .= $this->encodeBytes($this->getRandomBytes(16));
+        $salt = '$' . ( version_compare( phpversion(), '5.3.7', '>=' ) ? '2y' : '2a' ) . '$12$';
+        $salt .= $this->encodeBytes( $this->getRandomBytes( 16 ) );
         return $salt;
     }
 
     private $randomState;
-    private function getRandomBytes($count)
+    private function getRandomBytes( $count )
     {
         $bytes = '';
 
-        if (function_exists('openssl_random_pseudo_bytes') &&
-            (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN')) { // OpenSSL slow on Win
-            $bytes = openssl_random_pseudo_bytes($count);
+        if ( function_exists( 'openssl_random_pseudo_bytes' ) &&
+            ( strtoupper( substr( PHP_OS, 0, 3 ) ) !== 'WIN' ) ) { // OpenSSL slow on Win
+            $bytes = openssl_random_pseudo_bytes( $count );
         }
 
-        if ($bytes === '' && is_readable('/dev/urandom') &&
-            ($hRand = @fopen('/dev/urandom', 'rb')) !== FALSE) {
-            $bytes = fread($hRand, $count);
-            fclose($hRand);
+        if ( $bytes === '' && is_readable( '/dev/urandom' ) &&
+            ( $hRand = @fopen( '/dev/urandom', 'rb' ) ) !== FALSE ) {
+            $bytes = fread( $hRand, $count );
+            fclose( $hRand );
         }
 
-        if (strlen($bytes) < $count) {
+        if ( strlen( $bytes ) < $count ) {
             $bytes = '';
 
-            if ($this->randomState === null) {
+            if ( $this->randomState === null ) {
                 $this->randomState = microtime();
-                if (function_exists('getmypid')) {
+                if ( function_exists( 'getmypid' ) ) {
                     $this->randomState .= getmypid();
                 }
             }
 
-            for ($i = 0; $i < $count; $i += 16) {
-                $this->randomState = md5(microtime() . $this->randomState);
+            for ( $i = 0; $i < $count; $i += 16 ) {
+                $this->randomState = md5( microtime() . $this->randomState );
 
-                $bytes .= md5($this->randomState, true);
+                $bytes .= md5( $this->randomState, true );
             }
 
-            $bytes = substr($bytes, 0, $count);
+            $bytes = substr( $bytes, 0, $count );
         }
 
         return $bytes;
     }
 
-    private function encodeBytes($input)
+    private function encodeBytes( $input )
     {
         // The following is code from the PHP Password Hashing Framework
         $itoa64 = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -3809,24 +3809,24 @@ class Bcrypt extends BClass
         $output = '';
         $i = 0;
         do {
-            $c1 = ord($input[$i++]);
-            $output .= $itoa64[$c1 >> 2];
-            $c1 = ($c1 & 0x03) << 4;
-            if ($i >= 16) {
-                $output .= $itoa64[$c1];
+            $c1 = ord( $input[ $i++ ] );
+            $output .= $itoa64[ $c1 >> 2 ];
+            $c1 = ( $c1 & 0x03 ) << 4;
+            if ( $i >= 16 ) {
+                $output .= $itoa64[ $c1 ];
                 break;
             }
 
-            $c2 = ord($input[$i++]);
+            $c2 = ord( $input[ $i++ ] );
             $c1 |= $c2 >> 4;
-            $output .= $itoa64[$c1];
-            $c1 = ($c2 & 0x0f) << 2;
+            $output .= $itoa64[ $c1 ];
+            $c1 = ( $c2 & 0x0f ) << 2;
 
-            $c2 = ord($input[$i++]);
+            $c2 = ord( $input[ $i++ ] );
             $c1 |= $c2 >> 6;
-            $output .= $itoa64[$c1];
-            $output .= $itoa64[$c2 & 0x3f];
-        } while (1);
+            $output .= $itoa64[ $c1 ];
+            $output .= $itoa64[ $c2 & 0x3f ];
+        } while ( 1 );
 
         return $output;
     }
@@ -3842,42 +3842,42 @@ class BRSA extends BClass
 
     public function __construct()
     {
-        if (!function_exists('openssl_pkey_new')) {
+        if ( !function_exists( 'openssl_pkey_new' ) ) {
             // TODO: integrate Crypt_RSA ?
-            throw new BException('RSA encryption requires openssl module installed');
+            throw new BException( 'RSA encryption requires openssl module installed' );
         }
         $defConf = array(
             "digest_alg" => "sha512",
             "private_key_bits" => 4096,
             "private_key_type" => OPENSSL_KEYTYPE_RSA,
         );
-        $conf = BConfig::i()->get($this->_configPath);
-        $this->_config = array_merge($defConf, $conf);
+        $conf = BConfig::i()->get( $this->_configPath );
+        $this->_config = array_merge( $defConf, $conf );
     }
 
     public function generateKey()
     {
-        $config = BUtil::arrayMask($this->_config, 'digest_alg,x509_extensions,req_extensions,'
-            . 'private_key_bits,private_key_type,encrypt_key,encrypt_key_cipher');
-        $res = openssl_pkey_new($config);
-        openssl_pkey_export($res, $this->_privateKey); // private key
+        $config = BUtil::arrayMask( $this->_config, 'digest_alg,x509_extensions,req_extensions,'
+            . 'private_key_bits,private_key_type,encrypt_key,encrypt_key_cipher' );
+        $res = openssl_pkey_new( $config );
+        openssl_pkey_export( $res, $this->_privateKey ); // private key
 
-        $pubKey = openssl_pkey_get_details($res); // public key
-        $this->_publicKey = $pubKey["key"];
+        $pubKey = openssl_pkey_get_details( $res ); // public key
+        $this->_publicKey = $pubKey[ "key" ];
 
-        BConfig::i()->set($this->_configPath.'/public_key', $this->_publicKey, false, true);
+        BConfig::i()->set( $this->_configPath . '/public_key', $this->_publicKey, false, true );
 
-        file_put_contents($this->_getPrivateKeyFileName(), $this->_privateKey);
+        file_put_contents( $this->_getPrivateKeyFileName(), $this->_privateKey );
 
         return $this;
     }
 
     protected  function _getPublicKey()
     {
-        if (!$this->_publicKey) {
-            $this->_publicKey = BConfig::i()->get($this->_configPath.'/public_key');
-            if (!$this->_publicKey) {
-                throw new BException('No public key defined');
+        if ( !$this->_publicKey ) {
+            $this->_publicKey = BConfig::i()->get( $this->_configPath . '/public_key' );
+            if ( !$this->_publicKey ) {
+                throw new BException( 'No public key defined' );
             }
         }
         return $this->_publicKey;
@@ -3885,40 +3885,40 @@ class BRSA extends BClass
 
     protected function _getPrivateKeyFileName()
     {
-        $configDir = BConfig::i()->get('fs/config_dir');
-        if (!$configDir) {
+        $configDir = BConfig::i()->get( 'fs/config_dir' );
+        if ( !$configDir ) {
             $configDir = '.';
         }
-        return $configDir . '/private-' . md5($this->_getPublicKey()) . '.key';
+        return $configDir . '/private-' . md5( $this->_getPublicKey() ) . '.key';
     }
 
     protected function _getPrivateKey()
     {
-        if (!$this->_privateKey) {
+        if ( !$this->_privateKey ) {
             $filepath = $this->_getPrivateKeyFileName();
-            if (!is_readable($filepath)) {
-                throw new BException('No private key file found');
+            if ( !is_readable( $filepath ) ) {
+                throw new BException( 'No private key file found' );
             }
-            $this->_privateKey = file_get_contents($filepath);
+            $this->_privateKey = file_get_contents( $filepath );
         }
         return $this->_privateKey;
     }
 
-    public function setPublicKey($key)
+    public function setPublicKey( $key )
     {
         $this->_publicKey = $key;
         return $this;
     }
 
-    public function setPrivateKey($key)
+    public function setPrivateKey( $key )
     {
         $this->_privateKey = $key;
         return $this;
     }
 
-    public function encrypt($plain)
+    public function encrypt( $plain )
     {
-        openssl_public_encrypt($plain, $encrypted, $this->_getPublicKey());
+        openssl_public_encrypt( $plain, $encrypted, $this->_getPublicKey() );
         return $encrypted;
     }
 
@@ -3930,31 +3930,31 @@ class BRSA extends BClass
      * @param string $encrypted
      * @return string
      */
-    public function decrypt($encrypted)
+    public function decrypt( $encrypted )
     {
-        $hash = sha1($encrypted);
-        if (!empty($this->_cache[$hash])) {
-            return $this->_cache[$hash];
+        $hash = sha1( $encrypted );
+        if ( !empty( $this->_cache[ $hash ] ) ) {
+            return $this->_cache[ $hash ];
         }
         // even though decrypt_url can potentially be overridden by extension, only encrypted data is sent over
-        if (!empty($this->_config['decrypt_url'])) {
-            $data = array('encrypted' => base64_encode($encrypted));
-            $result = BUtil::remoteHttp('GET', $this->_config['decrypt_url'], $data);
-            $decrypted = base64_decode($result);
-            if (!empty($result['decrypted'])) {
-                $decrypted = $result['decrypted'];
+        if ( !empty( $this->_config[ 'decrypt_url' ] ) ) {
+            $data = array( 'encrypted' => base64_encode( $encrypted ) );
+            $result = BUtil::remoteHttp( 'GET', $this->_config[ 'decrypt_url' ], $data );
+            $decrypted = base64_decode( $result );
+            if ( !empty( $result[ 'decrypted' ] ) ) {
+                $decrypted = $result[ 'decrypted' ];
             } else {
                 //TODO: handle exceptions
             }
         } else {
-            openssl_private_decrypt($encrypted, $decrypted, $this->_getPrivateKey());
+            openssl_private_decrypt( $encrypted, $decrypted, $this->_getPrivateKey() );
         }
-        $this->_cache[$hash] = $decrypted;
+        $this->_cache[ $hash ] = $decrypted;
         return $decrypted;
     }
 }
 
-if( !function_exists( 'xmlentities' ) ) {
+if ( !function_exists( 'xmlentities' ) ) {
     /**
      * @see http://www.php.net/manual/en/function.htmlentities.php#106535
      */
@@ -3963,39 +3963,39 @@ if( !function_exists( 'xmlentities' ) ) {
         return preg_replace_callback( "/[^{$not_in_list}]/" , 'get_xml_entity_at_index_0' , $string );
     }
     function get_xml_entity_at_index_0( $CHAR ) {
-        if( !is_string( $CHAR[0] ) || ( strlen( $CHAR[0] ) > 1 ) ) {
+        if ( !is_string( $CHAR[ 0 ] ) || ( strlen( $CHAR[ 0 ] ) > 1 ) ) {
             die( "function: 'get_xml_entity_at_index_0' requires data type: 'char' (single character). '{$CHAR[0]}' does not match this type." );
         }
-        switch( $CHAR[0] ) {
+        switch ( $CHAR[ 0 ] ) {
             case "'":    case '"':    case '&':    case '<':    case '>':
-                return htmlspecialchars( $CHAR[0], ENT_QUOTES );    break;
+                return htmlspecialchars( $CHAR[ 0 ], ENT_QUOTES );    break;
             default:
-                return numeric_entity_4_char($CHAR[0]);                break;
+                return numeric_entity_4_char( $CHAR[ 0 ] );                break;
         }
     }
     function numeric_entity_4_char( $char ) {
-        return "&#".str_pad(ord($char), 3, '0', STR_PAD_LEFT).";";
+        return "&#" . str_pad( ord( $char ), 3, '0', STR_PAD_LEFT ) . ";";
     }
 }
 
-if (!function_exists('password_hash')) {
+if ( !function_exists( 'password_hash' ) ) {
     /**
      * If FISMA/FIPS/NIST compliance required, use PBKDF2
      *
      * @see http://stackoverflow.com/questions/4795385/how-do-you-use-bcrypt-for-hashing-passwords-in-php
      */
-    function password_hash($password)
+    function password_hash( $password )
     {
-        return Bcrypt::i()->hash($password);
+        return Bcrypt::i()->hash( $password );
     }
 
-    function password_verify($password, $hash)
+    function password_verify( $password, $hash )
     {
-        return Bcrypt::i()->verify($password, $hash);
+        return Bcrypt::i()->verify( $password, $hash );
     }
 }
 
-if (!function_exists('hash_hmac')) {
+if ( !function_exists( 'hash_hmac' ) ) {
     /**
      * HMAC hash, works if hash extension is not installed
      *
@@ -4013,32 +4013,32 @@ if (!function_exists('hash_hmac')) {
      *
      * @return string Hash
      */
-    function hash_hmac($algo, $data, $key, $raw_output = false)
+    function hash_hmac( $algo, $data, $key, $raw_output = false )
     {
-        $algo = strtolower($algo);
-        $pack = 'H'.strlen($algo('test'));
+        $algo = strtolower( $algo );
+        $pack = 'H' . strlen( $algo( 'test' ) );
         $size = 64;
-        $opad = str_repeat(chr(0x5C), $size);
-        $ipad = str_repeat(chr(0x36), $size);
+        $opad = str_repeat( chr( 0x5C ), $size );
+        $ipad = str_repeat( chr( 0x36 ), $size );
 
-        if (strlen($key) > $size) {
-            $key = str_pad(pack($pack, $algo($key)), $size, chr(0x00));
+        if ( strlen( $key ) > $size ) {
+            $key = str_pad( pack( $pack, $algo( $key ) ), $size, chr( 0x00 ) );
         } else {
-            $key = str_pad($key, $size, chr(0x00));
+            $key = str_pad( $key, $size, chr( 0x00 ) );
         }
 
-        for ($i = 0; $i < strlen($key) - 1; $i++) {
-            $opad[$i] = $opad[$i] ^ $key[$i];
-            $ipad[$i] = $ipad[$i] ^ $key[$i];
+        for ( $i = 0; $i < strlen( $key ) - 1; $i++ ) {
+            $opad[ $i ] = $opad[ $i ] ^ $key[ $i ];
+            $ipad[ $i ] = $ipad[ $i ] ^ $key[ $i ];
         }
 
-        $output = $algo($opad.pack($pack, $algo($ipad.$data)));
+        $output = $algo( $opad . pack( $pack, $algo( $ipad . $data ) ) );
 
-        return ($raw_output) ? pack($pack, $output) : $output;
+        return ( $raw_output ) ? pack( $pack, $output ) : $output;
     }
 }
 
-if (!function_exists('hash_pbkdf2')) {
+if ( !function_exists( 'hash_pbkdf2' ) ) {
     /**
      * PBKDF2 key derivation function as defined by RSA's PKCS #5: https://www.ietf.org/rfc/rfc2898.txt
      *
@@ -4057,41 +4057,41 @@ if (!function_exists('hash_pbkdf2')) {
      * @param boolean $raw_output - If true, the key is returned in raw binary format. Hex encoded otherwise.
      * @return A $key_length-byte key derived from the password and salt.
      */
-    function hash_pbkdf2($algorithm, $password, $salt, $count, $key_length, $raw_output = false)
+    function hash_pbkdf2( $algorithm, $password, $salt, $count, $key_length, $raw_output = false )
     {
-        if (function_exists('openssl_pbkdf2')) {
-            return openssl_pbkdf2($password, $salt, $key_length, $count, $algorithm);
+        if ( function_exists( 'openssl_pbkdf2' ) ) {
+            return openssl_pbkdf2( $password, $salt, $key_length, $count, $algorithm );
         }
-        $algorithm = strtolower($algorithm);
-        if(!in_array($algorithm, hash_algos(), true))
-            die('PBKDF2 ERROR: Invalid hash algorithm.');
-        if($count <= 0 || $key_length <= 0)
-            die('PBKDF2 ERROR: Invalid parameters.');
+        $algorithm = strtolower( $algorithm );
+        if ( !in_array( $algorithm, hash_algos(), true ) )
+            die( 'PBKDF2 ERROR: Invalid hash algorithm.' );
+        if ( $count <= 0 || $key_length <= 0 )
+            die( 'PBKDF2 ERROR: Invalid parameters.' );
 
-        $hash_length = strlen(hash($algorithm, "", true));
-        $block_count = ceil($key_length / $hash_length);
+        $hash_length = strlen( hash( $algorithm, "", true ) );
+        $block_count = ceil( $key_length / $hash_length );
 
         $output = "";
-        for($i = 1; $i <= $block_count; $i++) {
+        for ( $i = 1; $i <= $block_count; $i++ ) {
             // $i encoded as 4 bytes, big endian.
-            $last = $salt . pack("N", $i);
+            $last = $salt . pack( "N", $i );
             // first iteration
-            $last = $xorsum = hash_hmac($algorithm, $last, $password, true);
+            $last = $xorsum = hash_hmac( $algorithm, $last, $password, true );
             // perform the other $count - 1 iterations
-            for ($j = 1; $j < $count; $j++) {
-                $xorsum ^= ($last = hash_hmac($algorithm, $last, $password, true));
+            for ( $j = 1; $j < $count; $j++ ) {
+                $xorsum ^= ( $last = hash_hmac( $algorithm, $last, $password, true ) );
             }
             $output .= $xorsum;
         }
 
-        if($raw_output)
-            return substr($output, 0, $key_length);
+        if ( $raw_output )
+            return substr( $output, 0, $key_length );
         else
-            return bin2hex(substr($output, 0, $key_length));
+            return bin2hex( substr( $output, 0, $key_length ) );
     }
 }
 
-if (!function_exists('oath_hotp')) {
+if ( !function_exists( 'oath_hotp' ) ) {
     /**
      * Yet another OATH HOTP function. Has a 64 bit counter.
      *
@@ -4102,15 +4102,15 @@ if (!function_exists('oath_hotp')) {
      * @param integer $len OTP length
      * @return string
      */
-    function oath_hotp($secret, $counter, $len = 8)
+    function oath_hotp( $secret, $counter, $len = 8 )
     {
-        $binctr = pack ('NNC*', $counter>>32, $counter & 0xFFFFFFFF);
-        $hash = hash_hmac ("sha1", $binctr, $secret);
+        $binctr = pack ( 'NNC*', $counter>>32, $counter & 0xFFFFFFFF );
+        $hash = hash_hmac ( "sha1", $binctr, $secret );
         // This is where hashing stops and truncation begins
-        $ofs = 2*hexdec (substr ($hash, 39, 1));
-        $int = hexdec (substr ($hash, $ofs, 8)) & 0x7FFFFFFF;
-        $pin = substr ($int, -$len);
-        $pin = str_pad ($pin, $len, "0", STR_PAD_LEFT);
+        $ofs = 2 * hexdec ( substr ( $hash, 39, 1 ) );
+        $int = hexdec ( substr ( $hash, $ofs, 8 ) ) & 0x7FFFFFFF;
+        $pin = substr ( $int, - $len );
+        $pin = str_pad ( $pin, $len, "0", STR_PAD_LEFT );
         return $pin;
     }
 }

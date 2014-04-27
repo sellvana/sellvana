@@ -20,32 +20,32 @@ class FCom_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstract_G
      * @param $customer
      * @return array
      */
-    public function customerCartsGridConfig($customer)
+    public function customerCartsGridConfig( $customer )
     {
         $config = parent::gridConfig();
-        $config['id'] = 'customer_grid_carts_'.$customer->id;
-        $config['columns'] = array(
-            array('type'=>'row_select'),
-            array('name' => 'id', 'label' => 'ID', 'width' =>70, 'hidden' => true),
-            array('name' => 'session_id', 'label' => 'Session ID'),
-            array('name' => 'item_num', 'label' => 'Total Items'),
-            array('name' => 'item_qty', 'label' => 'Total Qty'),
-            array('name' => 'subtotal', 'label' => 'Sub Total'),
-            array('name' => 'discount_amount', 'label' => 'Discount'),
-            array('name' => 'grand_total', 'label' => 'Grand Total'),
-            array('name' => 'shipping_method', 'label' => 'Shipping Method'),
-            array('name' => 'payment_method', 'label' => 'Payment Method'),
-            array('type' => 'input', 'name' => 'status', 'label' => 'Status', 'editor' => 'select', 'editable' => true,
-                  'options' => FCom_Sales_Model_Cart::i()->fieldOptions('status')),
-            array('name' => 'create_at', 'label' => 'Created'),
+        $config[ 'id' ] = 'customer_grid_carts_' . $customer->id;
+        $config[ 'columns' ] = array(
+            array( 'type' => 'row_select' ),
+            array( 'name' => 'id', 'label' => 'ID', 'width' => 70, 'hidden' => true ),
+            array( 'name' => 'session_id', 'label' => 'Session ID' ),
+            array( 'name' => 'item_num', 'label' => 'Total Items' ),
+            array( 'name' => 'item_qty', 'label' => 'Total Qty' ),
+            array( 'name' => 'subtotal', 'label' => 'Sub Total' ),
+            array( 'name' => 'discount_amount', 'label' => 'Discount' ),
+            array( 'name' => 'grand_total', 'label' => 'Grand Total' ),
+            array( 'name' => 'shipping_method', 'label' => 'Shipping Method' ),
+            array( 'name' => 'payment_method', 'label' => 'Payment Method' ),
+            array( 'type' => 'input', 'name' => 'status', 'label' => 'Status', 'editor' => 'select', 'editable' => true,
+                  'options' => FCom_Sales_Model_Cart::i()->fieldOptions( 'status' ) ),
+            array( 'name' => 'create_at', 'label' => 'Created' ),
         );
-        $config['filters'] = array(
-            array('field' => 'create_at', 'type' => 'date-range'),
-            array('field' => 'grandtotal', 'type' => 'number-range'),
-            array('field' => 'status', 'type' => 'multiselect'),
+        $config[ 'filters' ] = array(
+            array( 'field' => 'create_at', 'type' => 'date-range' ),
+            array( 'field' => 'grandtotal', 'type' => 'number-range' ),
+            array( 'field' => 'status', 'type' => 'multiselect' ),
         );
-        $config['orm'] = $config['orm']->where('customer_id', $customer->id);
+        $config[ 'orm' ] = $config[ 'orm' ]->where( 'customer_id', $customer->id );
 
-        return array('config' => $config);
+        return array( 'config' => $config );
     }
 }

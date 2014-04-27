@@ -12,30 +12,30 @@ class FCom_ShippingPlain_ShippingMethod extends FCom_Sales_Method_Shipping_Abstr
 
     public function getServices()
     {
-        return array('01' => 'Air', '02' => 'Ground');
+        return array( '01' => 'Air', '02' => 'Ground' );
     }
 
     public function getDefaultService()
     {
-        return array('02' => 'Ground');
+        return array( '02' => 'Ground' );
     }
 
     public function getServicesSelected()
     {
         $c = BConfig::i();
         $selected = array();
-        foreach($this->getServices() as $sId => $sName) {
-            if ($c->get('modules/FCom_ShippingPlain/services/s'.$sId) == 1) {
-                $selected[$sId] = $sName;
+        foreach ( $this->getServices() as $sId => $sName ) {
+            if ( $c->get( 'modules/FCom_ShippingPlain/services/s' . $sId ) == 1 ) {
+                $selected[ $sId ] = $sName;
             }
         }
-        if (empty($selected)) {
+        if ( empty( $selected ) ) {
             $selected = $this->getDefaultService();
         }
         return $selected;
     }
 
-    public function getRateCallback($cart)
+    public function getRateCallback( $cart )
     {
         return 100;
     }

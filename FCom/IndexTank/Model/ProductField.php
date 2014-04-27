@@ -37,17 +37,17 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
      * @param array $args
      * @return FCom_IndexTank_Model_ProductField
      */
-    public static function i($new=false, array $args=array())
+    public static function i( $new = false, array $args = array() )
     {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
 
     public function getList()
     {
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()->find_many();
         $result = array();
-        foreach ($productFields as $p) {
-            $result[$p->field_name] = $p;
+        foreach ( $productFields as $p ) {
+            $result[ $p->field_name ] = $p;
         }
         return $result;
     }
@@ -55,12 +55,12 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
     public function getFacetsList()
     {
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
-                ->where('facets', 1)
-                ->order_by_asc('sort_order')
+                ->where( 'facets', 1 )
+                ->order_by_asc( 'sort_order' )
                 ->find_many();
         $result = array();
-        foreach ($productFields as $p) {
-            $result[$p->field_name] = $p;
+        foreach ( $productFields as $p ) {
+            $result[ $p->field_name ] = $p;
         }
         return $result;
     }
@@ -68,10 +68,10 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
     public function getSearchList()
     {
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
-                ->where('search', 1)->find_many();
+                ->where( 'search', 1 )->find_many();
         $result = array();
-        foreach ($productFields as $p) {
-            $result[$p->field_name] = $p;
+        foreach ( $productFields as $p ) {
+            $result[ $p->field_name ] = $p;
         }
         return $result;
     }
@@ -79,10 +79,10 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
     public function getVariablesList()
     {
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
-                ->where('scoring', 1)->find_many();
+                ->where( 'scoring', 1 )->find_many();
         $result = array();
-        foreach ($productFields as $p) {
-            $result[$p->field_name] = $p;
+        foreach ( $productFields as $p ) {
+            $result[ $p->field_name ] = $p;
         }
         return $result;
     }
@@ -90,10 +90,10 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
     public function getInclusiveList()
     {
         $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
-                ->where('filter', 'inclusive')->find_many();
+                ->where( 'filter', 'inclusive' )->find_many();
         $result = array();
-        foreach ($productFields as $p) {
-            $result[$p->field_name] = $p;
+        foreach ( $productFields as $p ) {
+            $result[ $p->field_name ] = $p;
         }
         return $result;
     }

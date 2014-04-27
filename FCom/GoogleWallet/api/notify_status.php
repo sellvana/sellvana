@@ -24,11 +24,11 @@ require_once 'util.php';
 
 class NotifyStatus {
 
-  public static function post($input) {
-    WalletUtil::assert_input($input, array('jwt'));
-    $full_jwt = JWT::decode($input['jwt'], null, FALSE);
-    $full_response = $full_jwt['response'];
-    $now = (int)date('U');
+  public static function post( $input ) {
+    WalletUtil::assert_input( $input, array( 'jwt' ) );
+    $full_jwt = JWT::decode( $input[ 'jwt' ], null, FALSE );
+    $full_response = $full_jwt[ 'response' ];
+    $now = (int)date( 'U' );
 
     $data = array(
       'iat' => $now,
@@ -36,12 +36,12 @@ class NotifyStatus {
       'typ' => 'google/wallet/online/transactionstatus/v2/request',
       'aud' => 'Google',
       'iss' => MERCHANT_ID,
-      'request'=> array(
-        'merchantName'=> MERCHANT_NAME,
-        'googleTransactionId' => $full_response['googleTransactionId'],
+      'request' => array(
+        'merchantName' => MERCHANT_NAME,
+        'googleTransactionId' => $full_response[ 'googleTransactionId' ],
         'status' => 'SUCCESS'
       ),
     );
-    WalletUtil::encode_send_jwt($data);
+    WalletUtil::encode_send_jwt( $data );
   }
 }

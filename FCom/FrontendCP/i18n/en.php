@@ -1,2 +1,2 @@
-<?php return array('Edit Page Contents' => '',
-'Cancel Page Editing' => '');
+<?php return array( 'Edit Page Contents' => '',
+'Cancel Page Editing' => '' );

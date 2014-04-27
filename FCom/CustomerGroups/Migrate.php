@@ -11,7 +11,7 @@ class FCom_CustomerGroups_Migrate extends BClass
     {
         $tableCustomerGroup = FCom_CustomerGroups_Model_Group::table();
 
-        BDb::ddlTableDef($tableCustomerGroup,
+        BDb::ddlTableDef( $tableCustomerGroup,
             array(
                 'COLUMNS' => array(
                   'id'    => 'int(10) unsigned auto_increment',
@@ -25,12 +25,12 @@ class FCom_CustomerGroups_Migrate extends BClass
             )
         );
 
-        BDb::run("
+        BDb::run( "
         replace INTO `{$tableCustomerGroup}` (`id`, `title`, `code`)
         VALUES (1, 'General', 'general'), (2, 'NOT LOGGED IN', 'guest'), (3, 'Retailer', 'retailer')
-        ");
+        " );
 
-        BDb::ddlTableDef(FCom_Customer_Model_Customer::table(),
+        BDb::ddlTableDef( FCom_Customer_Model_Customer::table(),
             array(
                  'COLUMNS' => array(
                      'customer_group' => 'int(10) unsigned null default null'
@@ -44,7 +44,7 @@ class FCom_CustomerGroups_Migrate extends BClass
         $tableTierPrices = FCom_CustomerGroups_Model_TierPrice::table();
 
         $tableProduct = FCom_Catalog_Model_Product::table();
-        BDb::ddlTableDef($tableTierPrices,
+        BDb::ddlTableDef( $tableTierPrices,
             array(
                 'COLUMNS' => array(
                     'id'         => 'int(10) unsigned not null auto_increment',
@@ -64,10 +64,10 @@ class FCom_CustomerGroups_Migrate extends BClass
                 ),
             )
         );
-        BDb::run("
+        BDb::run( "
         replace INTO `{$tableCustomerGroup}` (`id`, `title`, `code`)
         VALUES (0, 'ALL', 'all')
-        ");
+        " );
     } // end install
 
     public function upgrade__0_1_0__0_1_1()
@@ -76,7 +76,7 @@ class FCom_CustomerGroups_Migrate extends BClass
 
         $tableProduct = FCom_Catalog_Model_Product::table();
         $tableCustGroups = FCom_CustomerGroups_Model_Group::table();
-        BDb::ddlTableDef($tableTierPrices,
+        BDb::ddlTableDef( $tableTierPrices,
             array(
                 'COLUMNS' => array(
                     'id'         => 'int(10) unsigned not null auto_increment',
@@ -122,9 +122,9 @@ class FCom_CustomerGroups_Migrate extends BClass
     public function upgrade__0_1_1__0_1_2()
     {
         $tableCustomerGroup = FCom_CustomerGroups_Model_Group::table();
-        BDb::run("
+        BDb::run( "
         replace INTO `{$tableCustomerGroup}` (`id`, `title`, `code`)
         VALUES (0, 'ALL', 'all')
-        ");
+        " );
     }
 }

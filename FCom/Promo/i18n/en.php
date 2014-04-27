@@ -1,1 +1,1 @@
-<?php return array('Promotions' => '');
+<?php return array( 'Promotions' => '' );

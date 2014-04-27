@@ -32,62 +32,62 @@ class FCom_LibGanon_Main extends BClass
      * @param array $args
      * @return FCom_LibGanon_Main
      */
-    public static function i($new=false, array $args=array())
+    public static function i( $new = false, array $args = array() )
     {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
 
-    public function onLayoutRenderAfter($args)
+    public function onLayoutRenderAfter( $args )
     {
-        $this->_html = $args['output'];# : '<!DOCTYPE html><html><head></head><body></body></html>';
+        $this->_html = $args[ 'output' ];# : '<!DOCTYPE html><html><head></head><body></body></html>';
         //$args['doc'] = $this->doc();
-        $args['current_path'] = BRequest::i()->rawPath();
-        BEvents::i()->fire('FCom_LibGanon::render', $args);
-        BEvents::i()->fire('FCom_LibGanon::render:'.$args['current_path'], $args);
+        $args[ 'current_path' ] = BRequest::i()->rawPath();
+        BEvents::i()->fire( 'FCom_LibGanon::render', $args );
+        BEvents::i()->fire( 'FCom_LibGanon::render:' . $args[ 'current_path' ], $args );
 
-        if ($this->_doc) {
-            $args['output'] = (string)$this->_doc;
+        if ( $this->_doc ) {
+            $args[ 'output' ] = (string)$this->_doc;
         }
     }
 
-    public function ready($callback, $args=array())
+    public function ready( $callback, $args = array() )
     {
-        if (empty($args['on_path'])) {
-            BEvents::i()->on('FCom_LibGanon_Main::render', $callback, $args);
+        if ( empty( $args[ 'on_path' ] ) ) {
+            BEvents::i()->on( 'FCom_LibGanon_Main::render', $callback, $args );
         } else {
-            foreach ((array)$args['on_path'] as $path) {
-                BEvents::i()->on('FCom_LibGanon_Main::render:'.$path, $callback, $args);
+            foreach ( (array)$args[ 'on_path' ] as $path ) {
+                BEvents::i()->on( 'FCom_LibGanon_Main::render:' . $path, $callback, $args );
             }
         }
         return $this;
     }
 
-    public function doc($html=null)
+    public function doc( $html = null )
     {
-        if (is_null($this->_doc)) {
+        if ( is_null( $this->_doc ) ) {
             require_once __DIR__ . "ganon.php";
         }
-        if (!is_null($html) || is_null($this->_doc)) {
-            if (is_null($html) && is_null($this->_doc)) {
+        if ( !is_null( $html ) || is_null( $this->_doc ) ) {
+            if ( is_null( $html ) && is_null( $this->_doc ) ) {
                 $html = $this->_html;
-                unset($this->_html);
-            } elseif (!is_null($html) && !is_null($this->_doc)) {
-                unset($this->_doc);
+                unset( $this->_html );
+            } elseif ( !is_null( $html ) && !is_null( $this->_doc ) ) {
+                unset( $this->_doc );
             }
-            $a = new HTML_Parser_HTML5($html);
+            $a = new HTML_Parser_HTML5( $html );
             $this->_doc = $a->root;
         }
         return $this->_doc;
     }
 
-    public function file($filename)
+    public function file( $filename )
     {
-        return $this->doc(file_get_contents($filename));
+        return $this->doc( file_get_contents( $filename ) );
     }
 
-    public function find($selector, $idx=null)
+    public function find( $selector, $idx = null )
     {
         $root = $this->doc();
-        return $root($selector, $idx);
+        return $root( $selector, $idx );
     }
 }

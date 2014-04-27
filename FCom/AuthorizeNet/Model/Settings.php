@@ -23,7 +23,7 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
         "x_tran_key",
         "x_type",
         "x_amount", // Up to 15 digits with a decimal point (no dollar symbol).
-        "x_card_num",// Between 13 and 16 digits without spaces. When x_type=CREDIT, only the last four digits are required
+        "x_card_num", // Between 13 and 16 digits without spaces. When x_type=CREDIT, only the last four digits are required
         "x_exp_date", // Format: MMYY, MM/YY, MM-YY, MMYYYY, MM/YYYY, MMYYYY
         "x_relay_response",
         "x_delim_data",
@@ -45,7 +45,7 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
         "x_prepaid_balance_on_card",
         "x_prepaid_requested_amount",
         "x_card_type",
-        "x_method",//CC or ECHECK
+        "x_method", //CC or ECHECK
         "x_recurring_billing",
         "x_currency_code", // USD, CAD, EUR, or GBP
         "x_card_code", // The three- or four-digit number on the back of a credit card (on the front for American Express).
@@ -105,8 +105,8 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
     public static function paymentActions()
     {
         return array(
-            "AUTH_ONLY"         => BLocale::i()->_("Authorize Only"),
-            "AUTH_CAPTURE" => BLocale::i()->_("Authorize and Capture")
+            "AUTH_ONLY"         => BLocale::i()->_( "Authorize Only" ),
+            "AUTH_CAPTURE" => BLocale::i()->_( "Authorize and Capture" )
         );
     }
 /*
@@ -121,7 +121,7 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
             "DI" => "Discover",
             "DC" => "Diners Club",
             "JC" => "JCB",
-            "OT" => BLocale::i()->_("Other")
+            "OT" => BLocale::i()->_( "Other" )
         );
     }
 
@@ -176,11 +176,11 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
     public static function countries()
     {
         $countries = array();
-        foreach (FCom_Geo_Model_Country::i()->options() as $iso => $name) {
-            if (empty($iso)) {
+        foreach ( FCom_Geo_Model_Country::i()->options() as $iso => $name ) {
+            if ( empty( $iso ) ) {
                 continue;
             }
-            $countries[$iso] = $name;
+            $countries[ $iso ] = $name;
         }
 
         return $countries;
@@ -208,11 +208,11 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
      * @param BConfig $config
      * @return string
      */
-    public static function gatewayUrl($config)
+    public static function gatewayUrl( $config )
     {
         $url = static::$gatewayUrl;
-        if ($config->get('modules/FCom_AuthorizeNet/cgi_url')) {
-            $url = $config->get('modules/FCom_AuthorizeNet/cgi_url');
+        if ( $config->get( 'modules/FCom_AuthorizeNet/cgi_url' ) ) {
+            $url = $config->get( 'modules/FCom_AuthorizeNet/cgi_url' );
         }
         return $url;
     }
@@ -221,8 +221,8 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
      * @param BConfig $config
      * @return string
      */
-    public static function gatewayDpmUrl($config)
+    public static function gatewayDpmUrl( $config )
     {
-        return static::gatewayUrl($config);
+        return static::gatewayUrl( $config );
     }
 }

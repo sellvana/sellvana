@@ -50,7 +50,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
     public function export( $models = array(), $toFile = null )
     {
-        $toFile = $this->getFullPath($toFile);
+        $toFile = $this->getFullPath( $toFile );
 
         BUtil::ensureDir( dirname( $toFile ) );
         $fe = fopen( $toFile, 'w' );
@@ -76,11 +76,11 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             if ( !isset( $s[ 'skip' ] ) ) {
                 $s[ 'skip' ] = array();
             }
-            if($model == 'FCom_Catalog_Model_Product'){
+            if ( $model == 'FCom_Catalog_Model_Product' ) {
                 // disable custom fields to avoid them adding bunch of fields to export
-                FCom_CustomField_Main::i()->disable(true);
+                FCom_CustomField_Main::i()->disable( true );
             }
-            $sample = BDb::ddlFieldInfo($model::table());
+            $sample = BDb::ddlFieldInfo( $model::table() );
             $idField = $model::getIdField();
             $heading = array( static::DEFAULT_MODEL_KEY => $model, static::DEFAULT_FIELDS_KEY => array() );
             foreach ( $sample as $key => $value ) {
@@ -89,7 +89,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                     $heading[ static::DEFAULT_FIELDS_KEY ][] = $key;
                 }
             }
-            $records = $model::i()->orm()->select($heading[ static::DEFAULT_FIELDS_KEY ])->find_many();
+            $records = $model::i()->orm()->select( $heading[ static::DEFAULT_FIELDS_KEY ] )->find_many();
             if ( $records ) {
                 BEvents::i()->fire( __METHOD__ . ':beforeOutput', array( 'records' => $records ) );
                 $this->writeLine( $fe, BUtil::toJson( $heading ) );
@@ -97,7 +97,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
                     /** @var FCom_Core_Model_Abstract $r */
                     $data = $r->as_array();
-                    $data = array_values($data);
+                    $data = array_values( $data );
 
                     $json = BUtil::toJson( $data );
                     $this->writeLine( $fe, $json );
@@ -111,31 +111,31 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
     public function import( $fromFile = null )
     {
-        $start = microtime(true);
+        $start = microtime( true );
         /** @var FCom_PushServer_Model_Channel $channel */
         $this->channel = FCom_PushServer_Model_Channel::i()->getChannel( 'import', true );
         $this->channel->send( array( 'signal' => 'start', 'msg' => "Import started." ) );
-        $bs = BConfig::i()->get("FCom_Core/import_export/batch_size", 100);
+        $bs = BConfig::i()->get( "FCom_Core/import_export/batch_size", 100 );
 
         $fromFile = $this->getFullPath( $fromFile );
-        if(!is_readable($fromFile)){
+        if ( !is_readable( $fromFile ) ) {
             $this->channel->send( array( 'signal' => 'problem',
                                   'problem' => "Could not find file to import.\n$fromFile" ) );
-            BDebug::log("Could not find file to import.");
+            BDebug::log( "Could not find file to import." );
             return false;
         }
-        ini_set("auto_detect_line_endings", 1);
-        $fi = fopen($fromFile, 'r');
+        ini_set( "auto_detect_line_endings", 1 );
+        $fi = fopen( $fromFile, 'r' );
         $ieConfig = $this->collectExportableModels();
         $importID = static::DEFAULT_STORE_ID;
         /** @var FCom_Core_Model_ImportExport_Model $ieHelperMod */
         $ieHelperMod = FCom_Core_Model_ImportExport_Model::i();
 
-        $importMeta = fgets($fi);
+        $importMeta = fgets( $fi );
         if ( $importMeta ) {
             $meta = json_decode( $importMeta );
-            if ( isset( $meta->{static::STORE_UNIQUE_ID_KEY} ) ) {
-                $importID = $meta->{static::STORE_UNIQUE_ID_KEY};
+            if ( isset( $meta-> {static::STORE_UNIQUE_ID_KEY} ) ) {
+                $importID = $meta-> {static::STORE_UNIQUE_ID_KEY};
                 $this->channel->send( array( 'signal' => 'info', 'msg' => "Store id: $importID" ) );
             } else {
                 $this->channel->send(
@@ -156,7 +156,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         }
         $this->importId = $importSite->id();
 
-        $this->importModels = $ieHelperMod->orm()->find_many_assoc('model_name');
+        $this->importModels = $ieHelperMod->orm()->find_many_assoc( 'model_name' );
         BEvents::i()->fire(
             __METHOD__ . ':meta',
             array( 'import_id' => $importID, 'import_site' => $importSite, 'import_models' => &$this->importModels )
@@ -178,12 +178,12 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $data      = (array)json_decode( $line );
             if ( !empty( $data[ static::DEFAULT_MODEL_KEY ] ) ) {
                 // new model declaration found, import reminder of previous batch
-                if(!empty($batchData)){
-                    $this->importBatch($batchData);
+                if ( !empty( $batchData ) ) {
+                    $this->importBatch( $batchData );
                     $batchData = array();
                 }
 
-                if( $this->currentModel ){
+                if ( $this->currentModel ) {
                     BEvents::i()->fire(
                         __METHOD__ . ':afterModel:' . $this->currentModel,
                         array( 'import_id' => $importID, 'models' => $this->changedModels )
@@ -240,7 +240,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
             $batchData[ trim( $id, '/' ) ] = $data;
 
-            if( $cnt % $bs != 0 ){
+            if ( $cnt % $bs != 0 ) {
                 continue; // accumulate batch data
             } else {
                 $this->channel->send( array( 'signal' => 'info', 'msg' => "Importing #$cnt" ) );
@@ -250,7 +250,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $batchData = array();
         }
 
-        if ( !empty($batchData) ) {
+        if ( !empty( $batchData ) ) {
             $this->importBatch( $batchData );
         }
 
@@ -261,17 +261,17 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         if ( !feof( $fi ) ) {
             $this->channel->send( array( 'signal' => 'problem',
                                   'problem' => "Error: unexpected file fail" ) );
-            BDebug::debug( "Error: unexpected file fail");
+            BDebug::debug( "Error: unexpected file fail" );
         }
         fclose( $fi );
         $this->channel->send( array( 'signal' => 'new_models',
-                              'msg' => BLocale::_( "Created %d new models", $this->newModels )));
+                              'msg' => BLocale::_( "Created %d new models", $this->newModels ) ) );
         $this->channel->send( array( 'signal' => 'updated_models',
-                              'msg' => BLocale::_( "Updated %d models", $this->updatedModels )));
+                              'msg' => BLocale::_( "Updated %d models", $this->updatedModels ) ) );
         $this->channel->send( array( 'signal' => 'finished',
-                              'msg' => BLocale::_( "No changes for %d models", $this->notChanged )));
+                              'msg' => BLocale::_( "No changes for %d models", $this->notChanged ) ) );
         $this->channel->send( array( 'signal' => 'finished',
-                              'msg' => "Done in: " . round( microtime(true) - $start) ) . " sec.");
+                              'msg' => "Done in: " . round( microtime( true ) - $start ) ) . " sec." );
 
         return true;
     }
@@ -298,7 +298,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                     }
                 }
                 if ( !empty( $where ) ) {
-                    $existing[ ] = $where;
+                    $existing[] = $where;
                 }
             }
 
@@ -306,7 +306,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         }
 
         $oldModels = array();
-        if(!empty($existing)){
+        if ( !empty( $existing ) ) {
             $oldModels = $this->getExistingModels( $cm, $existing );
         }
 
@@ -319,7 +319,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 'relations' => !empty( $data[ 'failed_relation' ] ) ? json_encode( $data[ 'failed_relation' ] ) : null,
                 'update_at' => BDb::i()->now(),
             );
-            unset( $data[ $this->currentModelIdField ], $data['failed_related'] );
+            unset( $data[ $this->currentModelIdField ], $data[ 'failed_related' ] );
             /** @var FCom_Core_Model_Abstract $model */
             $model = isset( $oldModels[ $id ] ) ? $oldModels[ $id ] : null;
 
@@ -343,7 +343,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                     $this->newModels++;
                 }
             } catch ( PDOException $e ) {
-                BDebug::logException($e);
+                BDebug::logException( $e );
                 $this->channel->send( array( 'signal' => 'problem',
                                       'problem' => "Error: unexpected file fail" ) );
             }
@@ -351,9 +351,9 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             if ( $model ) {
                 $ieData[ 'local_id' ] = $model->id();
                 $ieHelperId->create( $ieData )->save( true, true );
-                $this->changedModels[$id] = $model;
+                $this->changedModels[ $id ] = $model;
             } else {
-                BDebug::warning("Invalid model: $id");
+                BDebug::warning( "Invalid model: $id" );
             }
         }
         BEvents::i()->fire( __METHOD__ . ':afterBatch:' . $cm, array( 'records' => $this->changedModels ) );
@@ -396,7 +396,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
     {
         foreach ( $models as $k => $m ) {
             if ( !isset( $m[ 'related' ] ) || empty( $m[ 'related' ] ) ) {
-                $this->_exportSorted[ ] = $m; // no dependencies, add to sorted
+                $this->_exportSorted[] = $m; // no dependencies, add to sorted
                 $this->_isSorted[ $k ]  = 1;
                 continue;
             }
@@ -441,7 +441,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                     }
                 }
                 $this->_isSorted[ $name ] = 1;
-                $this->_exportSorted[ ]   = $model;
+                $this->_exportSorted[]   = $model;
                 unset( $this->_tempSorted[ $name ] );
             }
         }
@@ -491,7 +491,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         $path = BConfig::i()->get( 'fs/storage_dir' );
 
         $file = $path . '/export/' . trim( $file, '/' );
-        if(strpos(realpath(dirname($file)), $path) !== 0){
+        if ( strpos( realpath( dirname( $file ) ), $path ) !== 0 ) {
             return false;
         }
         return $file;
@@ -512,7 +512,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
            // $orm->where(array('OR'=>$where));
         //}
 
-        $orm->where_complex( array('OR'=>$modelKeyConditions), true );
+        $orm->where_complex( array( 'OR' => $modelKeyConditions ), true );
         $models = $orm->find_many();
         $result = array();
 

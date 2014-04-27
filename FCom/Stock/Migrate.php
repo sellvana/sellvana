@@ -7,7 +7,7 @@ class FCom_Stock_Migrate extends BClass
         $tSku = FCom_Stock_Model_Sku::table();
         $tBin = FCom_Stock_Model_Bin::table();
 
-        BDb::ddlTableDef($tBin, array(
+        BDb::ddlTableDef( $tBin, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
                 'title' => 'varchar(50)',
@@ -16,9 +16,9 @@ class FCom_Stock_Migrate extends BClass
                 'update_at' => 'datetime not null',
             ),
             'PRIMARY' => '(id)',
-        ));
+        ) );
 
-        BDb::ddlTableDef($tSku, array(
+        BDb::ddlTableDef( $tSku, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
                 'sku' => 'varchar(128) not null',
@@ -34,11 +34,11 @@ class FCom_Stock_Migrate extends BClass
             'CONSTRAINTS' => array(
                 "FK_{$tSku}_bin" => "FOREIGN KEY (bin_id) REFERENCES {$tBin} (id) ON UPDATE CASCADE ON DELETE CASCADE",
             ),
-        ));
+        ) );
 
         $pTable = FCom_Catalog_Model_Product::table();
         $sTable = FCom_Stock_Model_Sku::table();
-        BDb::ddlTableDef($sTable, array(
+        BDb::ddlTableDef( $sTable, array(
                 'COLUMNS' => array(
                     'net_weight'  => 'decimal(12,2) null default null',
                     'ship_weight' => 'decimal(12,2) null default null',
@@ -47,18 +47,18 @@ class FCom_Stock_Migrate extends BClass
         );
 
         $productWeights = FCom_Catalog_Model_Product::orm()
-            ->select(array('local_sku', 'net_weight', 'ship_weight'))
-            ->where( array( 'OR' => array("`net_weight` IS NOT NULL", "`ship_weight` IS NOT NULL") ) )
+            ->select( array( 'local_sku', 'net_weight', 'ship_weight' ) )
+            ->where( array( 'OR' => array( "`net_weight` IS NOT NULL", "`ship_weight` IS NOT NULL" ) ) )
             ->find_many();
 
-        if( $productWeights ){
-            $prodStocks = FCom_Stock_Model_Sku::orm()->find_many_assoc('sku');
+        if ( $productWeights ) {
+            $prodStocks = FCom_Stock_Model_Sku::orm()->find_many_assoc( 'sku' );
             foreach ( $productWeights as $product ) {
                 /** @var FCom_Catalog_Model_Product $product */
-                $k = $product->get('local_sku');
-                if( isset($prodStocks[$k]) ){
+                $k = $product->get( 'local_sku' );
+                if ( isset( $prodStocks[ $k ] ) ) {
                     /** @var FCom_Stock_Model_Sku $stock */
-                    $stock = $prodStocks[$k];
+                    $stock = $prodStocks[ $k ];
                     $stock->set(
                         array(
                             'net_weight'  => $product->get( 'net_weight' ),
@@ -86,7 +86,7 @@ class FCom_Stock_Migrate extends BClass
                     )
                 )
             );
-        } catch (Exception $e) {
+        } catch ( Exception $e ) {
             //TODO: fix checking for existing fields on DROP
         }
     }
@@ -96,7 +96,7 @@ class FCom_Stock_Migrate extends BClass
         // todo move net_weight and ship_weight from fcom_product to fcom_stock_sku table
         $pTable = FCom_Catalog_Model_Product::table();
         $sTable = FCom_Stock_Model_Sku::table();
-        BDb::ddlTableDef($sTable, array(
+        BDb::ddlTableDef( $sTable, array(
                 'COLUMNS' => array(
                     'net_weight'  => 'decimal(12,2) null default null',
                     'ship_weight' => 'decimal(12,2) null default null',
@@ -105,18 +105,18 @@ class FCom_Stock_Migrate extends BClass
         );
 
         $productWeights = FCom_Catalog_Model_Product::orm()
-            ->select(array('local_sku', 'net_weight', 'ship_weight'))
-            ->where( array( 'OR' => array("`net_weight` IS NOT NULL", "`ship_weight` IS NOT NULL") ) )
+            ->select( array( 'local_sku', 'net_weight', 'ship_weight' ) )
+            ->where( array( 'OR' => array( "`net_weight` IS NOT NULL", "`ship_weight` IS NOT NULL" ) ) )
             ->find_many();
 
-        if( $productWeights ){
-            $prodStocks = FCom_Stock_Model_Sku::orm()->find_many_assoc('sku');
+        if ( $productWeights ) {
+            $prodStocks = FCom_Stock_Model_Sku::orm()->find_many_assoc( 'sku' );
             foreach ( $productWeights as $product ) {
                 /** @var FCom_Catalog_Model_Product $product */
-                $k = $product->get('local_sku');
-                if( isset($prodStocks[$k]) ){
+                $k = $product->get( 'local_sku' );
+                if ( isset( $prodStocks[ $k ] ) ) {
                     /** @var FCom_Stock_Model_Sku $stock */
-                    $stock = $prodStocks[$k];
+                    $stock = $prodStocks[ $k ];
                     $stock->set(
                           array(
                               'net_weight'  => $product->get( 'net_weight' ),
@@ -144,7 +144,7 @@ class FCom_Stock_Migrate extends BClass
                     )
                 )
             );
-        } catch (Exception $e) {
+        } catch ( Exception $e ) {
             //TODO: fix checking for existing fields on DROP
         }
     }

@@ -1,4 +1,4 @@
-<?php return array('Categories' => '',
+<?php return array( 'Categories' => '',
 'Clear filters' => '',
 'Narrow Results' => '',
-'(%s)' => '');
+'(%s)' => '' );

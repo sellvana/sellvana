@@ -1,1 +1,1 @@
-<?php return array('Choose your bank' => '');
+<?php return array( 'Choose your bank' => '' );

@@ -4,7 +4,7 @@ class FCom_Email_Migrate extends BClass
 {
     public function install__0_1_2()
     {
-        BDb::ddlTableDef(FCom_Email_Model_Pref::table(), array(
+        BDb::ddlTableDef( FCom_Email_Model_Pref::table(), array(
             'COLUMNS' => array(
                 'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
                 'email' => 'varchar(100)  NOT NULL',
@@ -13,12 +13,12 @@ class FCom_Email_Migrate extends BClass
                 'create_at' => 'datetime NOT NULL',
                 'update_at' => 'datetime NOT NULL',
             ),
-            'PRIMARY' =>'(`id`)',
+            'PRIMARY' => '(`id`)',
             'KEYS' => array(
                 'email' => 'UNIQUE (`email`)',
             ),
-        ));
-        BDb::ddlTableDef(FCom_Email_Model_Message::table(), array(
+        ) );
+        BDb::ddlTableDef( FCom_Email_Model_Message::table(), array(
             'COLUMNS' => array(
                 'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
                 'recipient' => 'varchar(100) NOT NULL',
@@ -31,16 +31,16 @@ class FCom_Email_Migrate extends BClass
                 'create_at' => 'datetime NOT NULL',
                 'resent_at' => 'datetime NULL',
             ),
-            'PRIMARY' =>'(`id`)',
+            'PRIMARY' => '(`id`)',
             'KEYS' => array(
                 'recipient' => '(`recipient`)',
             ),
-        ));
+        ) );
     }
 
     public function upgrade__0_1_0__0_1_1()
     {
-        BDb::ddlTableDef(FCom_Email_Model_Message::table(), array(
+        BDb::ddlTableDef( FCom_Email_Model_Message::table(), array(
             'COLUMNS' => array(
                 'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
                 'recipient' => 'varchar(100) NOT NULL',
@@ -53,28 +53,28 @@ class FCom_Email_Migrate extends BClass
                 'create_dt' => 'datetime NOT NULL',
                 'resent_dt' => 'datetime NULL',
             ),
-            'PRIMARY' =>'(`id`)',
+            'PRIMARY' => '(`id`)',
             'KEYS' => array(
                 'recipient' => '(`recipient`)',
             ),
-        ));
+        ) );
     }
 
     public function upgrade__0_1_1__0_1_2()
     {
         $table = FCom_Email_Model_Message::table();
-        BDb::ddlTableDef($table, array(
+        BDb::ddlTableDef( $table, array(
             'COLUMNS' => array(
                   'create_dt'      => 'RENAME create_at datetime NOT NULL',
                   'resent_dt'      => 'RENAME resent_at datetime NULL',
             ),
-        ));
+        ) );
         $table = FCom_Email_Model_Pref::table();
-        BDb::ddlTableDef($table, array(
+        BDb::ddlTableDef( $table, array(
             'COLUMNS' => array(
                   'create_dt'      => 'RENAME create_at datetime NOT NULL',
                   'update_dt'      => 'RENAME update_at datetime NOT NULL',
             ),
-        ));
+        ) );
     }
 }

@@ -9,7 +9,7 @@ class BValueTest extends PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->object = new BValue('test');
+        $this->object = new BValue( 'test' );
     }
 
     /**
@@ -17,7 +17,7 @@ class BValueTest extends PHPUnit_Framework_TestCase
      */
     public function testToPlain()
     {
-        $this->assertEquals('test', $this->object->toPlain());
+        $this->assertEquals( 'test', $this->object->toPlain() );
     }
 
     /**
@@ -26,7 +26,7 @@ class BValueTest extends PHPUnit_Framework_TestCase
     public function test__toString()
     {
 
-        $this->assertEquals('test', (string)$this->object);
+        $this->assertEquals( 'test', (string)$this->object );
     }
 
     /**
@@ -34,8 +34,8 @@ class BValueTest extends PHPUnit_Framework_TestCase
      */
     public function testToPlainArray()
     {
-        $this->object = new BValue(array(1));
-        $this->assertEquals(array(1), $this->object->toPlain());
+        $this->object = new BValue( array( 1 ) );
+        $this->assertEquals( array( 1 ), $this->object->toPlain() );
     }
 
     /**
@@ -43,8 +43,8 @@ class BValueTest extends PHPUnit_Framework_TestCase
      */
     public function test__toStringArray()
     {
-        $this->object = new BValue(array(1));
-        $this->assertEquals('Array', (string)$this->object);
+        $this->object = new BValue( array( 1 ) );
+        $this->assertEquals( 'Array', (string)$this->object );
     }
 
     /**
@@ -52,8 +52,8 @@ class BValueTest extends PHPUnit_Framework_TestCase
      */
     public function testToPlainStdObj()
     {
-        $this->object = new BValue((object)array(1));
-        $this->assertEquals((object)array(1), $this->object->toPlain());
+        $this->object = new BValue( (object)array( 1 ) );
+        $this->assertEquals( (object)array( 1 ), $this->object->toPlain() );
     }
 
     /**
@@ -61,8 +61,8 @@ class BValueTest extends PHPUnit_Framework_TestCase
      */
     public function test__toStringStdObj()
     {
-        $this->object = new BValue((object)array(1));
-        $this->assertEquals('', (string)$this->object);
+        $this->object = new BValue( (object)array( 1 ) );
+        $this->assertEquals( '', (string)$this->object );
     }
 
     /**
@@ -70,8 +70,8 @@ class BValueTest extends PHPUnit_Framework_TestCase
      */
     public function testToPlainCustomObj()
     {
-        $this->object = new BValue(new VO(array(1)));
-        $this->assertEquals('1', $this->object->toPlain());
+        $this->object = new BValue( new VO( array( 1 ) ) );
+        $this->assertEquals( '1', $this->object->toPlain() );
     }
 
     /**
@@ -79,8 +79,8 @@ class BValueTest extends PHPUnit_Framework_TestCase
      */
     public function test__toStringCustomObj()
     {
-        $this->object = new BValue(new VO(array(1)));
-        $this->assertEquals('1', (string)$this->object);
+        $this->object = new BValue( new VO( array( 1 ) ) );
+        $this->assertEquals( '1', (string)$this->object );
     }
 }
 
@@ -88,18 +88,18 @@ class VO
 {
     protected $_val;
 
-    public function __construct($v)
+    public function __construct( $v )
     {
         $this->_val = $v;
     }
 
     public function __toString()
     {
-        if(is_string($this->_val)){
+        if ( is_string( $this->_val ) ) {
             return $this->_val;
         }
-        if(is_array($this->_val)){
-            return implode(', ', $this->_val);
+        if ( is_array( $this->_val ) ) {
+            return implode( ', ', $this->_val );
         }
 
         return (string) $this->_val;

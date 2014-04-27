@@ -43,14 +43,14 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 $mod[ 'model' ]                      = $module;
                 $mod[ 'parent' ]                     = 'FCom';
                 $gridData[ $module ]                 = $mod;
-                $gridData[ 'FCom' ][ 'children' ][ ] = $module;
+                $gridData[ 'FCom' ][ 'children' ][] = $module;
             }
             $obj                                  = $default;
             $obj[ 'id' ]                          = $id;
             $obj[ 'model' ]                       = $id;
             $obj[ 'parent' ]                      = $module;
             $gridData[ $id ]                      = $obj;
-            $gridData[ $module ][ 'children' ][ ] = $id;
+            $gridData[ $module ][ 'children' ][] = $id;
         }
 
         $config[ 'data' ] = $gridData;
@@ -120,14 +120,14 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 $mod[ 'permission_name' ]            = $module;
                 $mod[ 'parent' ]                     = 'FCom';
                 $gridData[ $module ]                 = $mod;
-                $gridData[ 'FCom' ][ 'children' ][ ] = $module;
+                $gridData[ 'FCom' ][ 'children' ][] = $module;
             }
             $obj                                  = $default;
             $obj[ 'id' ]                          = $id;
             $obj[ 'permission_name' ]             = $id;
             $obj[ 'parent' ]                      = $module;
             $gridData[ $id ]                      = $obj;
-            $gridData[ $module ][ 'children' ][ ] = $id;
+            $gridData[ $module ][ 'children' ][] = $id;
         }
 
         foreach ( $gridData as $id => &$value ) {
@@ -147,7 +147,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
 
     public function action_index()
     {
-        $model['export_config'] = $this->getExportConfig();
+        $model[ 'export_config' ] = $this->getExportConfig();
         $this->formMessages();
         $view = $this->view( $this->_formViewName )->set( 'model', $model );
 
@@ -171,13 +171,13 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
 
     public function action_export()
     {
-        $exportData = BRequest::i()->post('ie_export_grid');
-        $toFile = isset($exportData['export_file_name']) ? $exportData['export_file_name'] : null;
-        $models = !empty($exportData['checked']) ? array_keys($exportData['checked']) : null;
+        $exportData = BRequest::i()->post( 'ie_export_grid' );
+        $toFile = isset( $exportData[ 'export_file_name' ] ) ? $exportData[ 'export_file_name' ] : null;
+        $models = !empty( $exportData[ 'checked' ] ) ? array_keys( $exportData[ 'checked' ] ) : null;
 
-        if($models){
+        if ( $models ) {
             foreach ( $models as $m ) {
-                if($m == 'FCom'){
+                if ( $m == 'FCom' ) {
                     // if FCom is selected to export, this means all should be exported.
                     $models = null;
                     break;
@@ -185,7 +185,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
             }
 
         }
-        $result = FCom_Core_ImportExport::i()->export($models, $toFile);
-        BResponse::i()->json(['result'=> print_r($result, 1)]);
+        $result = FCom_Core_ImportExport::i()->export( $models, $toFile );
+        BResponse::i()->json( [ 'result' => print_r( $result, 1 ) ] );
     }
 }

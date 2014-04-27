@@ -13,9 +13,9 @@ class FCom_Catalog_Model_ProductMedia extends FCom_Core_Model_Abstract
     );
     public function getUrl()
     {
-        $subfolder = $this->get('subfolder');
-        $path = $this->get('folder') . '/' . ($subfolder ? $subfolder . '/' : '') . $this->get('file_name');
-        return BApp::src($path);
+        $subfolder = $this->get( 'subfolder' );
+        $path = $this->get( 'folder' ) . '/' . ( $subfolder ? $subfolder . '/' : '' ) . $this->get( 'file_name' );
+        return BApp::src( $path );
     }
 
 

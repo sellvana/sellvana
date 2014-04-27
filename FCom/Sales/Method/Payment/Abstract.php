@@ -21,10 +21,10 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
         'void_online'   => 0,
     );
 
-    public function can($capability)
+    public function can( $capability )
     {
-        if(isset($this->_capabilities[strtolower($capability)])){
-            return (bool) $this->_capabilities[strtolower($capability)];
+        if ( isset( $this->_capabilities[ strtolower( $capability ) ] ) ) {
+            return (bool) $this->_capabilities[ strtolower( $capability ) ];
         }
         return false;
     }
@@ -48,7 +48,7 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
      * @param $options
      * @return $this
      */
-    public function setSalesEntity($order, $options)
+    public function setSalesEntity( $order, $options )
     {
         $this->salesEntity = $order;
         $this->salesOptions = $options;
@@ -61,7 +61,7 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
      * @param array $details
      * @return $this
      */
-    public function setDetails($details)
+    public function setDetails( $details )
     {
         $this->details = $details;
         return $this;
@@ -83,7 +83,7 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
      * @return $this
      * @internal This replaces initCart in basic payment
      */
-    public function setCartEntity($cart)
+    public function setCartEntity( $cart )
     {
         $this->cart = $cart;
         return $this;
@@ -91,16 +91,16 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
 
     public function asArray()
     {
-        return array("name" => $this->getName());
+        return array( "name" => $this->getName() );
     }
 
-    public function set($name, $value)
+    public function set( $name, $value )
     {
-        return $this->details[$name] = $value;
+        return $this->details[ $name ] = $value;
     }
 
-    public function get($name, $default = null)
+    public function get( $name, $default = null )
     {
-        return isset($this->details[$name]) ? $this->details[$name]: $default;
+        return isset( $this->details[ $name ] ) ? $this->details[ $name ] : $default;
     }
 }

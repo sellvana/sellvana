@@ -1,1 +1,1 @@
-<?php return array('Secure payment by Ogone' => '');
+<?php return array( 'Secure payment by Ogone' => '' );

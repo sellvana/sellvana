@@ -45,10 +45,10 @@ class FCom_SampleData_Migrate extends BClass
                 $f = $exist[ $f ];
             }
 
-            $fieldName = $f->get('field_code');
+            $fieldName = $f->get( 'field_code' );
 
             /* @var FCom_CatalogIndex_Model_Field $catalogIndexField */
-            $catalogIndexField = FCom_CatalogIndex_Model_Field::orm()->where( 'field_name', $fieldName)->find_one();
+            $catalogIndexField = FCom_CatalogIndex_Model_Field::orm()->where( 'field_name', $fieldName )->find_one();
 
             if ( !$catalogIndexField ) {
                 $data = array(
@@ -72,7 +72,7 @@ class FCom_SampleData_Migrate extends BClass
 
         $indexFields = $customField->orm()->where_in( 'field_name', $fields )->find_many();
         $nextCount = BORM::get_db()->query( 'SELECT max(`filter_order`) as "max" FROM ' . FCom_CatalogIndex_Model_Field::table() )->fetchAll();
-        $nextCount = $nextCount[0]['max'] + 1;
+        $nextCount = $nextCount[ 0 ][ 'max' ] + 1;
 
         if ( $indexFields ) {
             foreach ( $indexFields as $f ) {
@@ -102,7 +102,7 @@ class FCom_SampleData_Migrate extends BClass
 
         $indexFields = FCom_CatalogIndex_Model_Field::orm()->where_in( 'field_name', $fields )->find_many();
         $nextCount = BORM::get_db()->query( 'SELECT max(`filter_order`) as "max" FROM ' . FCom_CatalogIndex_Model_Field::table() )->fetchAll();
-        $nextCount = $nextCount[0]['max'] + 1;
+        $nextCount = $nextCount[ 0 ][ 'max' ] + 1;
 
         if ( $indexFields ) {
             foreach ( $indexFields as $f ) {

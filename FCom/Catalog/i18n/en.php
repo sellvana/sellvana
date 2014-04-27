@@ -1,4 +1,4 @@
-<?php return array('Narrow Results' => '',
+<?php return array( 'Narrow Results' => '',
 'Categories' => '',
 'All categories' => '',
 'Home' => '',
@@ -38,4 +38,4 @@
 'Product Description' => '',
 'Related Products' => '',
 'You may also like these items' => '',
-'Per page:' => '');
+'Per page:' => '' );

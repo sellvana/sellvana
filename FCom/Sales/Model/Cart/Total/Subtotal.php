@@ -11,9 +11,9 @@ class FCom_Sales_Model_Cart_Total_Subtotal extends FCom_Sales_Model_Cart_Total_A
         $itemNum = 0;
         $itemQty = 0;
         $subtotal = 0;
-        foreach ($this->_cart->items() as $item) {
-            if (!$item->product()) {
-                $this->_cart->removeProduct($item->product_id);
+        foreach ( $this->_cart->items() as $item ) {
+            if ( !$item->product() ) {
+                $this->_cart->removeProduct( $item->product_id );
             }
             $itemNum++;
             $item->qty = $item->qty;
@@ -23,11 +23,11 @@ class FCom_Sales_Model_Cart_Total_Subtotal extends FCom_Sales_Model_Cart_Total_A
         }
 
         $this->_value = $subtotal;
-        $this->_cart->set(array(
+        $this->_cart->set( array(
             'item_num' => $itemNum,
             'item_qty' => $itemQty,
             'subtotal' => $subtotal,
-        ));
+        ) );
         return $this;
     }
 }

@@ -13,7 +13,7 @@ class FCom_CatalogIndex_Migrate extends BClass
         $tDocValue = FCom_CatalogIndex_Model_DocValue::table();
         $tDocTerm = FCom_CatalogIndex_Model_DocTerm::table();
         $tDocSort = FCom_CatalogIndex_Model_DocSort::table();
-        BDb::ddlTableDef($tTerm, array(
+        BDb::ddlTableDef( $tTerm, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
                 'term' => 'varchar(50) not null',
@@ -22,8 +22,8 @@ class FCom_CatalogIndex_Migrate extends BClass
             'KEYS' => array(
                 'IDX_term' => 'UNIQUE (term)',
             ),
-        ));
-        BDb::ddlTableDef($tField, array(
+        ) );
+        BDb::ddlTableDef( $tField, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
                 'field_name' => 'varchar(50) not null',
@@ -49,8 +49,8 @@ class FCom_CatalogIndex_Migrate extends BClass
             'CONSTRAINTS' => array(
                 "FK_{$tField}_field" => "FOREIGN KEY (`fcom_field_id`) REFERENCES {$tCustField} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ),
-        ));
-        BDb::ddlTableDef($tFieldValue, array(
+        ) );
+        BDb::ddlTableDef( $tFieldValue, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
                 'field_id' => 'int unsigned not null',
@@ -66,8 +66,8 @@ class FCom_CatalogIndex_Migrate extends BClass
             'CONSTRAINTS' => array(
                 "FK_{$tFieldValue}_field" => "FOREIGN KEY (`field_id`) REFERENCES {$tField} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ),
-        ));
-        BDb::ddlTableDef($tDoc, array(
+        ) );
+        BDb::ddlTableDef( $tDoc, array(
             'COLUMNS' => array(
                 'id' => 'int(10) unsigned not null auto_increment',
                 'last_indexed' => 'datetime not null',
@@ -87,8 +87,8 @@ class FCom_CatalogIndex_Migrate extends BClass
             'CONSTRAINTS' => array(
                 "FK_{$tDoc}_product" => "FOREIGN KEY (`id`) REFERENCES {$tProduct} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ),
-        ));
-        BDb::ddlTableDef($tDocTerm, array(
+        ) );
+        BDb::ddlTableDef( $tDocTerm, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
                 'doc_id' => 'int(10) unsigned NOT NULL',
@@ -102,8 +102,8 @@ class FCom_CatalogIndex_Migrate extends BClass
                 "FK_{$tDocTerm}_field" => "FOREIGN KEY (`field_id`) REFERENCES {$tField} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
                 "FK_{$tDocTerm}_term" => "FOREIGN KEY (`term_id`) REFERENCES {$tTerm} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ),
-        ));
-        BDb::ddlTableDef($tDocValue, array(
+        ) );
+        BDb::ddlTableDef( $tDocValue, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
                 'doc_id' => 'int(10) unsigned NOT NULL',
@@ -119,15 +119,15 @@ class FCom_CatalogIndex_Migrate extends BClass
                 "FK_{$tDocValue}_field" => "FOREIGN KEY (`field_id`) REFERENCES {$tField} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
                 "FK_{$tDocValue}_value" => "FOREIGN KEY (`value_id`) REFERENCES {$tFieldValue} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ),
-        ));
+        ) );
 
         $this->upgrade__0_1_3__0_1_4();
-        FCom_CatalogIndex_Model_Field::i()->update_many(array(
+        FCom_CatalogIndex_Model_Field::i()->update_many( array(
             'source_type' => 'callback',
             'source_callback' => 'FCom_CatalogIndex_Model_Field::indexPrice',
-        ), array('field_name' => 'price'));
+        ), array( 'field_name' => 'price' ) );
 
-        BDb::ddlTableDef($tDocSort, array(
+        BDb::ddlTableDef( $tDocSort, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
                 'doc_id' => 'int unsigned not null',
@@ -142,13 +142,13 @@ class FCom_CatalogIndex_Migrate extends BClass
                 "FK_{$tDocSort}_doc" => "FOREIGN KEY (doc_id) REFERENCES {$tDoc} (id) ON UPDATE CASCADE ON DELETE CASCADE",
                 "FK_{$tDocSort}_field" => "FOREIGN KEY (field_id) REFERENCES {$tField} (id) ON UPDATE CASCADE ON DELETE CASCADE",
             ),
-        ));
+        ) );
     }
 
     public function upgrade__0_1_3__0_1_4()
     {
         //$this->install();
-        BDb::run("
+        BDb::run( "
 REPLACE  INTO `fcom_index_field`
 (`id`,`field_name`,`field_label`,`field_type`,`weight`,`fcom_field_id`,`source_type`,`source_callback`,`filter_type`,`filter_multivalue`,`filter_counts`,`filter_show_empty`,`filter_order`,`filter_custom_view`,`search_type`,`sort_type`,`sort_label`,`sort_order`)
 VALUES
@@ -160,42 +160,42 @@ VALUES
 (7,'size','Size','varchar',0,NULL,'field',NULL,'inclusive',0,1,0,3,NULL,'none','none',NULL,NULL),
 (8,'price_range','Price Range','varchar',0,NULL,'callback','FCom_CatalogIndex_Model_Field::indexPriceRange','inclusive',0,1,0,4,NULL,'none','none',NULL,NULL),
 (9,'price','Price','decimal',0,NULL,'field',NULL,'none',0,0,0,4,NULL,'none','both','Price (Min-Max) || Price (Max-Min)',NULL)
-        ");
+        " );
     }
 
     public function upgrade__0_1_4__0_1_5()
     {
-        BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), array(
+        BDb::ddlTableDef( FCom_CatalogIndex_Model_Field::table(), array(
             'COLUMNS' => array(
                 'filter_counts' => 'tinyint unsigned NOT NULL DEFAULT 0 AFTER filter_multivalue',
             ),
-        ));
+        ) );
 
         FCom_CatalogIndex_Model_Field::i()->update_many(
-            array('filter_custom_view' => 'catalogindex/product/_filter_categories'),
-            array('field_name' => 'category')
+            array( 'filter_custom_view' => 'catalogindex/product/_filter_categories' ),
+            array( 'field_name' => 'category' )
         );
     }
 
     public function upgrade__0_1_5__0_1_6()
     {
-        BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), array(
+        BDb::ddlTableDef( FCom_CatalogIndex_Model_Field::table(), array(
             'COLUMNS' => array(
                 'filter_multiselect' => 'DROP',
             ),
-        ));
+        ) );
     }
 
     public function upgrade__0_1_6__0_1_7()
     {
-        BDb::ddlTableDef(FCom_CatalogIndex_Model_Doc::table(), array(
+        BDb::ddlTableDef( FCom_CatalogIndex_Model_Doc::table(), array(
             'COLUMNS' => array(
                 'flag_reindex' => 'tinyint not null default 0 after last_indexed',
             ),
             'KEYS' => array(
                 'IDX_flag_reindex' => '(flag_reindex)',
             ),
-        ));
+        ) );
     }
 
     public function upgrade__0_1_7__0_1_8()
@@ -204,7 +204,7 @@ VALUES
         $tField = FCom_CatalogIndex_Model_Field::table();
         $tDocSort = FCom_CatalogIndex_Model_DocSort::table();
 
-        BDb::ddlTableDef($tDocSort, array(
+        BDb::ddlTableDef( $tDocSort, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
                 'doc_id' => 'int unsigned not null',
@@ -219,15 +219,15 @@ VALUES
                 "FK_{$tDocSort}_doc" => "FOREIGN KEY (doc_id) REFERENCES {$tDoc} (id) ON UPDATE CASCADE ON DELETE CASCADE",
                 "FK_{$tDocSort}_field" => "FOREIGN KEY (field_id) REFERENCES {$tField} (id) ON UPDATE CASCADE ON DELETE CASCADE",
             ),
-        ));
+        ) );
         //TODO: delete doc.sort_product_name
     }
 
     public function upgrade__0_1_8__0_1_9()
     {
-        FCom_CatalogIndex_Model_Field::i()->update_many(array(
+        FCom_CatalogIndex_Model_Field::i()->update_many( array(
             'source_type' => 'callback',
             'source_callback' => 'FCom_CatalogIndex_Model_Field::indexPrice',
-        ), array('field_name' => 'price'));
+        ), array( 'field_name' => 'price' ) );
     }
 }

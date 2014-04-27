@@ -11,7 +11,7 @@ class FCom_Blog_Migrate extends BClass
         $tCategory = FCom_Blog_Model_Category::table();
         $tPostCategory = FCom_Blog_Model_PostCategory::table();
 
-        BDb::ddlTableDef($tPost, array(
+        BDb::ddlTableDef( $tPost, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
                 'author_user_id' => 'int unsigned not null',
@@ -37,9 +37,9 @@ class FCom_Blog_Migrate extends BClass
             'CONSTRAINTS' => array(
                 "FK_{$tPost}_author" => "FOREIGN KEY (author_user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
             ),
-        ));
+        ) );
 
-        BDb::ddlTableDef($tTag, array(
+        BDb::ddlTableDef( $tTag, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
                 'tag_key' => 'varchar(50)',
@@ -49,9 +49,9 @@ class FCom_Blog_Migrate extends BClass
             'KEYS' => array(
                 'UNQ_tag_key' => 'UNIQUE (tag_key)',
             ),
-        ));
+        ) );
 
-        BDb::ddlTableDef($tPostTag, array(
+        BDb::ddlTableDef( $tPostTag, array(
             'COLUMNS' => array(
                 'id' => 'int unsigned not null auto_increment',
                 'tag_id' => 'int unsigned not null',
@@ -65,10 +65,10 @@ class FCom_Blog_Migrate extends BClass
                 "FK_{$tPostTag}_post" => "FOREIGN KEY (post_id) REFERENCES {$tPost} (id) ON UPDATE CASCADE ON DELETE CASCADE",
                 "FK_{$tPostTag}_tag" => "FOREIGN KEY (tag_id) REFERENCES {$tTag} (id) ON UPDATE CASCADE ON DELETE CASCADE",
             ),
-        ));
+        ) );
 
 
-        BDb::ddlTableDef($tCategory, array(
+        BDb::ddlTableDef( $tCategory, array(
             'COLUMNS' => array(
                 'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                 'name'    => 'varchar(255) NOT NULL',
@@ -76,8 +76,8 @@ class FCom_Blog_Migrate extends BClass
                 'description'    => 'text NULL',
             ),
             'PRIMARY' => '(id)',
-        ));
-        BDb::ddlTableDef($tPostCategory, array(
+        ) );
+        BDb::ddlTableDef( $tPostCategory, array(
             'COLUMNS' => array(
                 'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                 'category_id'    => 'INT(10) UNSIGNED NOT NULL',
@@ -92,18 +92,18 @@ class FCom_Blog_Migrate extends BClass
                 "FK_{$tPostCategory}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
                 "FK_{$tPostCategory}_post" => "FOREIGN KEY (`post_id`) REFERENCES `{$tPost}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ),
-        ));
+        ) );
     }
 
     public function upgrade__0_1_0__0_1_1()
     {
-        BDb::run("
+        BDb::run( "
 SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS fcom_blog_article_tag;
 DROP TABLE IF EXISTS fcom_blog_tag;
 DROP TABLE IF EXISTS fcom_blog_article;
 SET FOREIGN_KEY_CHECKS=1;
-        ");
+        " );
         $this->install__0_1_1();
     }
 
@@ -113,7 +113,7 @@ SET FOREIGN_KEY_CHECKS=1;
         $tPost = FCom_Blog_Model_Post::table();
         $tPostCategory = FCom_Blog_Model_PostCategory::table();
 
-        BDb::ddlTableDef($tCategory, array(
+        BDb::ddlTableDef( $tCategory, array(
                 'COLUMNS' => array(
                     'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                     'name'    => 'varchar(255) NOT NULL',
@@ -121,8 +121,8 @@ SET FOREIGN_KEY_CHECKS=1;
                     'description'    => 'text NULL',
                 ),
                 'PRIMARY' => '(id)',
-            ));
-        BDb::ddlTableDef($tPostCategory, array(
+            ) );
+        BDb::ddlTableDef( $tPostCategory, array(
                 'COLUMNS' => array(
                     'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                     'category_id'    => 'INT(10) UNSIGNED NOT NULL',
@@ -137,7 +137,7 @@ SET FOREIGN_KEY_CHECKS=1;
                     "FK_{$tPostCategory}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
                     "FK_{$tPostCategory}_post" => "FOREIGN KEY (`post_id`) REFERENCES `{$tPost}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
                 ),
-            ));
+            ) );
     }
 
     public function upgrade__0_1_2__0_1_3()

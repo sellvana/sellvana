@@ -41,22 +41,22 @@ class FCom_Core_Model_Abstract extends BModel
      * @param string $path slash separated path to the data within structured array
      * @return mixed
      */
-    public function getData($path = null)
+    public function getData( $path = null )
     {
-        if (is_null($this->get(static::$_dataCustomField))) {
-            $dataJson = $this->get(static::$_dataSerializedField);
-            $this->set(static::$_dataCustomField, $dataJson ? BUtil::fromJson($dataJson) : array());
+        if ( is_null( $this->get( static::$_dataCustomField ) ) ) {
+            $dataJson = $this->get( static::$_dataSerializedField );
+            $this->set( static::$_dataCustomField, $dataJson ? BUtil::fromJson( $dataJson ) : array() );
         }
-        $data = $this->get(static::$_dataCustomField);
-        if (is_null($path)) {
+        $data = $this->get( static::$_dataCustomField );
+        if ( is_null( $path ) ) {
             return $data;
         }
-        $pathArr = explode('/', $path);
-        foreach ($pathArr as $k) {
-            if (!isset($data[$k])) {
+        $pathArr = explode( '/', $path );
+        foreach ( $pathArr as $k ) {
+            if ( !isset( $data[ $k ] ) ) {
                 return null;
             }
-            $data = $data[$k];
+            $data = $data[ $k ];
         }
         return $data;
     }
@@ -71,25 +71,25 @@ class FCom_Core_Model_Abstract extends BModel
      * @param bool   $merge
      * @return FCom_Core_Model_Abstract
      */
-    public function setData($path, $value = null, $merge = false)
+    public function setData( $path, $value = null, $merge = false )
     {
-        if (is_array($path)) {
-            foreach ($path as $p => $v) {
-                $this->setData($p, $v);
+        if ( is_array( $path ) ) {
+            foreach ( $path as $p => $v ) {
+                $this->setData( $p, $v );
             }
             return $this;
         }
         $data = $this->getData();
         $node =& $data;
-        foreach (explode('/', $path) as $key) {
-            $node =& $node[$key];
+        foreach ( explode( '/', $path ) as $key ) {
+            $node =& $node[ $key ];
         }
-        if ($merge) {
-            $node = BUtil::arrayMerge((array)$node, (array)$value);
+        if ( $merge ) {
+            $node = BUtil::arrayMerge( (array)$node, (array)$value );
         } else {
             $node = $value;
         }
-        $this->set(static::$_dataCustomField, $data);
+        $this->set( static::$_dataCustomField, $data );
         return $this;
     }
 
@@ -97,27 +97,27 @@ class FCom_Core_Model_Abstract extends BModel
     {
         parent::onAfterLoad();
 
-        foreach (static::$_dataFieldsMap as $k => $v) {
-            if (is_numeric($k)) {
+        foreach ( static::$_dataFieldsMap as $k => $v ) {
+            if ( is_numeric( $k ) ) {
                 $k = $v;
             }
-            $this->set($k, $this->getData($v));
+            $this->set( $k, $this->getData( $v ) );
         }
     }
 
     public function onBeforeSave()
     {
-        if (!parent::onBeforeSave()) return false;
+        if ( !parent::onBeforeSave() ) return false;
 
-        foreach (static::$_dataFieldsMap as $k => $v) {
-            if (is_numeric($k)) {
+        foreach ( static::$_dataFieldsMap as $k => $v ) {
+            if ( is_numeric( $k ) ) {
                 $k = $v;
             }
-            $this->setData($v, $this->get($k));
+            $this->setData( $v, $this->get( $k ) );
         }
 
-        if (($data = $this->get(static::$_dataCustomField))) {
-            $this->set(static::$_dataSerializedField, BUtil::toJson($data));
+        if ( ( $data = $this->get( static::$_dataCustomField ) ) ) {
+            $this->set( static::$_dataSerializedField, BUtil::toJson( $data ) );
         }
 
         return true;
@@ -125,9 +125,9 @@ class FCom_Core_Model_Abstract extends BModel
 
     public function registerImportExport( &$config )
     {
-        if ( !empty(static::$_importExportProfile) ) {
+        if ( !empty( static::$_importExportProfile ) ) {
             $config[ static::$_origClass ] = static::$_importExportProfile;
-            $config[ static::$_origClass ]['model'] = static::$_origClass;
+            $config[ static::$_origClass ][ 'model' ] = static::$_origClass;
         }
     }
 
