@@ -22,9 +22,11 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             [ 'name' => 'email', 'label' => 'Email', 'width' => 150 ],
             [ 'name' => 'firstname', 'label' => 'First Name', 'width' => 150 ],
             [ 'name' => 'lastname', 'label' => 'Last Name', 'width' => 150 ],
-            [ 'type' => 'input', 'name' => 'is_superadmin', 'label' => 'SuperAdmin', 'width' => 100, 'editable' => true,  'editor' => 'select', 'options' => FCom_Admin_Model_User::i()->fieldOptions( 'is_superadmin' ) ],
-            [ 'type' => 'input', 'name' => 'status', 'label' => 'Status', 'width' => 100, 'editor' => 'select', 'editable' => true, 'mass-editable' => true,
-                  'options' => FCom_Admin_Model_User::i()->fieldOptions( 'status' ) ],
+            [ 'type' => 'input', 'name' => 'is_superadmin', 'label' => 'SuperAdmin', 'width' => 100, 'editable' => true,
+                'editor' => 'select', 'options' => FCom_Admin_Model_User::i()->fieldOptions( 'is_superadmin' ) ],
+            [ 'type' => 'input', 'name' => 'status', 'label' => 'Status', 'width' => 100, 'editor' => 'select',
+                'editable' => true, 'mass-editable' => true,
+                'options' => FCom_Admin_Model_User::i()->fieldOptions( 'status' ) ],
             [ 'name' => 'create_at', 'label' => 'Created', 'width' => 100 ],
             [ 'name' => 'update_at', 'label' => 'Updated', 'width' => 100 ],
             [ 'type' => 'btn_group', 'width' => 85, 'buttons' => [
@@ -92,8 +94,9 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             [ 'name' => 'id', 'label' => 'ID', 'index' => 'au.id', 'width' => 80, 'hidden' => true ],
             [ 'name' => 'username', 'label' => 'Username', 'index' => 'au.username', 'width' => 200 ],
             [ 'name' => 'email', 'label' => 'Email', 'index' => 'au.email', 'width' => 200 ],
-            [ 'name' => 'status', 'label' => 'Status', 'index' => 'au.status', 'width' => 200, 'editable' => true, 'mass-editable' => true,
-                  'editor' => 'select', 'options' => FCom_Admin_Model_User::i()->fieldOptions( 'status' ) ]
+            [ 'name' => 'status', 'label' => 'Status', 'index' => 'au.status', 'width' => 200, 'editable' => true,
+                'mass-editable' => true, 'editor' => 'select',
+                'options' => FCom_Admin_Model_User::i()->fieldOptions( 'status' ) ]
         ];
         $config[ 'actions' ] = [
             'add' => [ 'caption' => 'Add user' ],
@@ -126,8 +129,9 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             [ 'name' => 'id', 'label' => 'ID', 'index' => 'au.id', 'width' => 55, 'hidden' => true ],
             [ 'name' => 'username', 'label' => 'Name', 'index' => 'au.username', 'width' => 250 ],
             [ 'name' => 'email', 'label' => 'Email', 'index' => 'au.email', 'width' => 100 ],
-            [ 'type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'au.status', 'width' => 100, 'editable' => true, 'mass-editable' => true,
-                  'editor' => 'select', 'options' => FCom_Admin_Model_User::i()->fieldOptions( 'status' ) ]
+            [ 'type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'au.status', 'width' => 100,
+                'editable' => true, 'mass-editable' => true, 'editor' => 'select',
+                'options' => FCom_Admin_Model_User::i()->fieldOptions( 'status' ) ]
         ];
         $config[ 'actions' ] = [
             'add' => [ 'caption' => 'Add selected users' ]

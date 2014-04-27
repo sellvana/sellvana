@@ -175,7 +175,8 @@ class BRequest extends BClass
 
         if ( isset( $_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ] ) ) {
             // break up string into pieces (languages and q factors)
-            preg_match_all( '/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ], $lang_parse );
+            $langRegex = '/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i';
+            preg_match_all($langRegex , $_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ], $lang_parse );
 
             if ( count( $lang_parse[ 1 ] ) ) {
                 // create a list like "en" => 0.8
@@ -554,7 +555,8 @@ class BRequest extends BClass
                 $name = $source[ 'name' ];
                 $type = $source[ 'type' ];
                 if ( !is_null( $typesRegex ) && !preg_match( '#' . $typesRegex . '#i', $type ) ) {
-                    $result[] = [ 'error' => 'invalid_type', 'tp' => 4, 'type' => $type, 'pattern' => $typesRegex, 'source' => $source, 'name' => $name ];
+                    $result[] = [ 'error' => 'invalid_type', 'tp' => 4, 'type' => $type, 'pattern' => $typesRegex,
+                        'source' => $source, 'name' => $name ];
                 } else {
                     BUtil::ensureDir( $targetDir );
                     move_uploaded_file( $tmpName, $targetDir . '/' . $name );
@@ -914,7 +916,8 @@ class BRequest extends BClass
                 } else {
                     $tags = $this->_postTagsWhitelist[ $forUrlPath ][ $childPath ];
                     if ( '+' === $tags ) {
-                        $tags = "<a><b><blockquote><code><del><dd><dl><dt><em><h1><i><img><kbd><li><ol><p><pre><s><sup><sub><strong><strike><ul><br><hr>";
+                        $tags = "<a><b><blockquote><code><del><dd><dl><dt><em><h1><i><img><kbd><li><ol><p><pre><s><sup>'
+                            . '<sub><strong><strike><ul><br><hr>";
                     }
                     if ( '*' !== $tags ) {
                         $v = strip_tags( $v, $tags );
@@ -1743,8 +1746,12 @@ class BRouting extends BClass
 #echo ' ** ('.$a->route_name.'):('.$b->route_name.'): '.$res.' ** <br>';
                 return $res;
             }
-            $ap = ( strpos( $a->route_name, '/*' ) !== false ? 10 : 0 ) + ( strpos( $a->route_name, '/.' ) !== false ? 5 : 0 ) + ( strpos( $a->route_name, '/:' ) !== false ? 1 : 0 );
-            $bp = ( strpos( $b->route_name, '/*' ) !== false ? 10 : 0 ) + ( strpos( $b->route_name, '/.' ) !== false ? 5 : 0 ) + ( strpos( $b->route_name, '/:' ) !== false ? 1 : 0 );
+            $ap = ( strpos( $a->route_name, '/*' ) !== false ? 10 : 0 )
+                + ( strpos( $a->route_name, '/.' ) !== false ? 5 : 0 )
+                + ( strpos( $a->route_name, '/:' ) !== false ? 1 : 0 );
+            $bp = ( strpos( $b->route_name, '/*' ) !== false ? 10 : 0 )
+                + ( strpos( $b->route_name, '/.' ) !== false ? 5 : 0 )
+                + ( strpos( $b->route_name, '/:' ) !== false ? 1 : 0 );
 #echo $a->route_name.' ('.$ap.'), '.$b->route_name.'('.$bp.')<br>';
             return $ap === $bp ? 0 : ( $ap < $bp ? -1 : 1 );
         } );

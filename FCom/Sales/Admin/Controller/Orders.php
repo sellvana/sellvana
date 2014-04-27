@@ -16,7 +16,8 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $config = parent::gridConfig();
         $config[ 'columns' ] = [
             [ 'type' => 'row_select' ],
-            [ 'name' => 'id', 'index' => 'o.id', 'label' => 'Order id', 'width' => 70, 'href' => BApp::href( 'orders/form/?id=:id' ) ],
+            [ 'name' => 'id', 'index' => 'o.id', 'label' => 'Order id', 'width' => 70,
+                'href' => BApp::href( 'orders/form/?id=:id' ) ],
             [ 'name' => 'admin_name', 'index' => 'o.admin_id', 'label' => 'Assisted by' ],
             [ 'name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date' ],
             [ 'name' => 'billing_name', 'label' => 'Bill to Name', 'index' => 'billing_name' ],
@@ -27,7 +28,8 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             [ 'name' => 'balance', 'label' => 'Paid', 'index' => 'o.balance' ],
             [ 'name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code' ],
             //todo: confirm with Boris about status should be stored as id_status
-            [ 'name' => 'status', 'label' => 'Status', 'index' => 'o.status', 'options' => FCom_Sales_Model_Order_Status::i()->statusOptions() ],
+            [ 'name' => 'status', 'label' => 'Status', 'index' => 'o.status',
+                'options' => FCom_Sales_Model_Order_Status::i()->statusOptions() ],
             [ 'type' => 'btn_group', 'buttons' => [
                 [ 'name' => 'edit' ],
             ] ],
@@ -131,9 +133,13 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $act = $m->act;
         if ( 'edit' == $act ) {
             $actions = [
-                'back' => '<a class="btn btn-link" href=\'' . BApp::href( $this->_gridHref ) . '\'><span>' .  BLocale::_( 'Back to list' ) . '</span></a>',
-                'delete' => '<button type="submit" class="st2 sz2 btn btn-danger" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>' .  BLocale::_( 'Delete' ) . '</span></button>',
-                'save' => '<button type="submit" class="st1 sz2 btn btn-primary" onclick="return adminForm.saveAll(this)"><span>' .  BLocale::_( 'Save' ) . '</span></button>',
+                'back' => '<a class="btn btn-link" href=\'' . BApp::href( $this->_gridHref ) . '\'><span>'
+                    . BLocale::_( 'Back to list' ) . '</span></a>',
+                'delete' => '<button type="submit" class="st2 sz2 btn btn-danger" name="do" value="DELETE" '
+                    . 'onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>'
+                    . BLocale::_( 'Delete' ) . '</span></button>',
+                'save' => '<button type="submit" class="st1 sz2 btn btn-primary" onclick="return adminForm.saveAll(this)"><span>'
+                    . BLocale::_( 'Save' ) . '</span></button>',
             ];
         } else {
             $actions = [
@@ -166,7 +172,8 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             $order = $args[ 'model' ];
             $addrPost = BRequest::i()->post( 'address' );
             if ( ( $newData = BUtil::fromJson( $addrPost[ 'data_json' ] ) ) ) {
-                $oldModels = FCom_Sales_Model_Order_Address::i()->orm( 'a' )->where( 'order_id', $order->id )->find_many_assoc();
+                $oldModels = FCom_Sales_Model_Order_Address::i()->orm( 'a' )->where( 'order_id', $order->id )
+                    ->find_many_assoc();
                 foreach ( $newData as $data ) {
                     if ( empty( $data[ 'id' ] ) ) {
                         continue;
@@ -187,7 +194,8 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             $modelPost = BRequest::i()->post( 'model' );
             $items = $modelPost[ 'items' ];
             if ( $items ) {
-                $oldItems = FCom_Sales_Model_Order_Item::i()->orm( 'i' )->where( 'order_id', $order->id )->find_many_assoc();
+                $oldItems = FCom_Sales_Model_Order_Item::i()->orm( 'i' )->where( 'order_id', $order->id )
+                    ->find_many_assoc();
                 foreach ( $items as $id => $itemData ) {
                     if ( empty( $id ) ) {
                         continue;
@@ -269,7 +277,8 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             [ 'name' => 'grandtotal', 'label' => 'Order Total', 'index' => 'o.grandtotal' ],
             [ 'name' => 'balance', 'label' => 'Paid', 'index' => 'o.balance' ],
             [ 'name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code' ],
-            [ 'name' => 'status', 'label' => 'Status', 'index' => 'o.status', 'options' => FCom_Sales_Model_Order_Status::i()->statusOptions() ],
+            [ 'name' => 'status', 'label' => 'Status', 'index' => 'o.status',
+                'options' => FCom_Sales_Model_Order_Status::i()->statusOptions() ],
             [ 'type' => 'btn_group', 'buttons' => [
                 [ 'name' => 'edit' ],
             ] ],

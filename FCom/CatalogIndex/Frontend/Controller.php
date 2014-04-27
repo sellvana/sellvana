@@ -20,7 +20,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $q = BRequest::i()->get( 'q' );
 
         $productsData = FCom_CatalogIndex_Indexer::i()->searchProducts( null, null, null, [ 'category' => $category ] );
-        BEvents::i()->fire( 'FCom_Catalog_Frontend_Controller_Search::action_category:products_orm', [ 'data' => $productsData[ 'orm' ] ] );
+        BEvents::i()->fire( 'FCom_Catalog_Frontend_Controller_Search::action_category:products_orm', [ 'orm' => $productsData[ 'orm' ] ] );
         $r = BRequest::i()->get();
         $r[ 'sc' ] = '';
         $paginated = $productsData[ 'orm' ]->paginate( $r, [ 'ps' => 10 ] );
@@ -46,7 +46,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
                 $activeCatIds[] = $c->id();
                 $crumbs[] = [ 'label' => $nodeName, 'href' => $c->url() ];
                 $head->addTitle( $nodeName );
-                
+
             }
         }
         $crumbs[] = [ 'label' => $category->get( 'node_name' ), 'active' => true ];
@@ -63,9 +63,9 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $rowsView->category = $category;
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData[ 'rows' ];
-        
+
         $layout->view( 'catalog/nav' )->set( [
-            'category' => $category, 
+            'category' => $category,
             'active_ids' => $activeCatIds,
             'home_url' => BConfig::i()->get( 'modules/FCom_Catalog/url_prefix' ),
         ] );

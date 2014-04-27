@@ -791,7 +791,9 @@ class BClassRegistry extends BClass
         } else {
             throw new BException( 'Invalid argument type: ' . print_r( $newClass, 1 ) );
         }
-        if ( $replaceSingleton && !empty( static::$_singletons[ $class ] ) && get_class( static::$_singletons[ $class ] ) !== $newClass ) {
+        if ( $replaceSingleton && !empty( static::$_singletons[ $class ] )
+            && get_class( static::$_singletons[ $class ] ) !== $newClass
+        ) {
             static::$_singletons[ $class ] = static::instance( $newClass );
         }
     }

@@ -54,7 +54,10 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_ApiServer_Controller_Abstra
                 $post[ 'categories_id' ] = [ $post[ 'categories_id' ] ];
             }
             foreach ( $post[ 'categories_id' ] as $catId ) {
-                FCom_Catalog_Model_CategoryProduct::i()->orm()->create( [ 'category_id' => $catId, 'product_id' => $product->id ] )->save();
+                FCom_Catalog_Model_CategoryProduct::i()->create( [
+                    'category_id' => $catId,
+                    'product_id' => $product->id
+                ] )->save();
             }
         }
 

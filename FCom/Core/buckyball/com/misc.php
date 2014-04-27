@@ -476,6 +476,7 @@ class BUtil extends BClass
     static public function arrayFind( array $array, array $filter )
     {
         foreach ( $array as $i => $item ) {
+
             $found = true;
             foreach ( $filter as $k => $v ) {
                 if ( !( isset( $item[ $k ] ) && $item[ $k ] === $v ) ) {
@@ -2588,11 +2589,15 @@ class BDebug extends BClass
         //BEvents::i()->debug();
         echo "</pre>";
         //print_r(static::$_events);
-?><table cellspacing="0"><tr><th>Message</th><th>Rel.Time</th><th>Profile</th><th>Memory</th><th>Level</th><th>Relevant Location</th><th>Module</th></tr><?php
+?><table cellspacing="0"><tr><th>Message</th><th>Rel.Time</th><th>Profile</th><th>Memory</th><th>Level</th>
+    <th>Relevant Location</th><th>Module</th></tr><?php
         foreach ( static::$_events as $e ) {
             if ( empty( $e[ 'file' ] ) ) { $e[ 'file' ] = ''; $e[ 'line' ] = ''; }
             $profile = $e[ 'd' ] ? number_format( $e[ 'd' ], 6 ) . ( $e[ 'c' ] > 1 ? ' (' . $e[ 'c' ] . ')' : '' ) : '';
-            echo "<tr><td>" . nl2br( htmlspecialchars( $e[ 'msg' ] ) ) . "</td><td>" . number_format( $e[ 't' ], 6 ) . "</td><td>" . $profile . "</td><td>" . number_format( $e[ 'mem' ], 0 ) . "</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>" . ( !empty( $e[ 'module' ] ) ? $e[ 'module' ] : '' ) . "</td></tr>";
+            echo "<tr><td>" . nl2br( htmlspecialchars( $e[ 'msg' ] ) ) . "</td><td>" . number_format( $e[ 't' ], 6 )
+                . "</td><td>" . $profile . "</td><td>" . number_format( $e[ 'mem' ], 0 )
+                . "</td><td>{$e['level']}</td><td>{$e['file']}:{$e['line']}</td><td>"
+                . ( !empty( $e[ 'module' ] ) ? $e[ 'module' ] : '' ) . "</td></tr>";
         }
 ?></table></div><?php
         $html = ob_get_clean();
@@ -3721,7 +3726,8 @@ class BValidateViewHelper extends BClass
         $html = '';
 
         if ( !empty( $this->_errors[ $field ][ 'type' ] ) ) {
-            $html .= BUtil::tagHtml( 'label', [ 'for' => $fieldId, 'class' => $this->messageClass( $field ) ], $this->messageText( $field ) );
+            $html .= BUtil::tagHtml( 'label', [ 'for' => $fieldId, 'class' => $this->messageClass( $field ) ],
+                $this->messageText( $field ) );
         }
 
         return $html;

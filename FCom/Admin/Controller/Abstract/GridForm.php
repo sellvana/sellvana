@@ -122,7 +122,9 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $view->set( [
             'title' => $this->_gridTitle,
             'actions' => [
-                'new' => ' <button type="button" class="btn btn-primary btn-sm" onclick="location.href=\'' . BApp::href( $this->_formHref ) . '\'"><span>New ' . BView::i()->q( $this->_recordName ) . '</span></button>',
+                'new' => ' <button type="button" class="btn btn-primary btn-sm" onclick="location.href=\''
+                    . BApp::href( $this->_formHref ) . '\'"><span>New ' . BView::i()->q( $this->_recordName )
+                    . '</span></button>',
             ],
         ] );
         BEvents::i()->fire( static::$_origClass . '::gridViewBefore', $args );
@@ -233,11 +235,14 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $m = $args[ 'model' ];
         $actions = [];
 
-        $actions[ 'back' ] = '<button type="button" class="btn btn-link" onclick="location.href=\'' . BApp::href( $this->_gridHref ) . '\'"><span>' .  BLocale::_( 'Back to list' ) . '</span></button>';
+        $actions[ 'back' ] = '<button type="button" class="btn btn-link" onclick="location.href=\''
+            . BApp::href( $this->_gridHref ) . '\'"><span>' .  BLocale::_( 'Back to list' ) . '</span></button>';
         if ( $m->id ) {
-            $actions[ 'delete' ] = '<button type="submit" class="btn btn-warning" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\')"><span>' .  BLocale::_( 'Delete' ) . '</span></button>';
+            $actions[ 'delete' ] = '<button type="submit" class="btn btn-warning" name="do" value="DELETE" '
+                . 'onclick="return confirm(\'Are you sure?\')"><span>' .  BLocale::_( 'Delete' ) . '</span></button>';
         }
-        $actions[ 'save' ] = '<button type="submit" class="btn btn-primary" onclick="return adminForm.saveAll(this)"><span>' .  BLocale::_( 'Save' ) . '</span></button>';
+        $actions[ 'save' ] = '<button type="submit" class="btn btn-primary" onclick="return adminForm.saveAll(this)"><span>'
+            . BLocale::_( 'Save' ) . '</span></button>';
 
         $id = method_exists( $m, 'id' ) ? $m->id() : $m->id;
         $title = $id ? BLocale::_( 'Edit %s: %s', [ $this->_recordName, $m->title ] ) : BLocale::_( 'Create New %s', [ $this->_recordName ] );

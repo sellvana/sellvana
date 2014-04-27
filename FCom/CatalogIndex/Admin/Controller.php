@@ -91,7 +91,8 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
             echo '<p>Assigning products to categories...</p>';
 
             BDb::run( "TRUNCATE fcom_category_product" );
-            $categories = FCom_Catalog_Model_Category::i()->orm()->where_raw( "id_path like '1/%/%'" )->find_many_assoc( 'id', 'url_path' );
+            $categories = FCom_Catalog_Model_Category::i()->orm()->where_raw( "id_path like '1/%/%'" )
+                ->find_many_assoc( 'id', 'url_path' );
             $catIds = array_keys( $categories );
             $hlp = FCom_Catalog_Model_CategoryProduct::i();
 

@@ -26,21 +26,19 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     [ 'type' => 'input', 'name' => 'set_name', 'label' => 'Set Name', 'width' => 200,  'addable' => true,
                             'editable' => true , 'validation' => [ 'required' => true ] ],
                     [ 'name' => 'num_fields', 'label' => 'Fields', 'width' => 30, 'default' => '0' ],
-                    [ 'type' => 'btn_group',
-                            'buttons' => [
-                                                [ 'name' => 'edit_custom', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom' ],
-                                                [ 'name' => 'delete' ]
-                                            ]
-                        ]
+                    [ 'type' => 'btn_group', 'buttons' => [
+                        [ 'name' => 'edit_custom', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom' ],
+                        [ 'name' => 'delete' ]
+                    ] ]
                 ],
                 'actions' => [
-//                            'new'=> array('caption'=>'Add New FieldSet', 'modal'=>true),
-                            'delete' => true
+//                    'new'=> array('caption'=>'Add New FieldSet', 'modal'=>true),
+                    'delete' => true
                 ],
                 'filters' => [
-                            [ 'field' => 'set_name', 'type' => 'text' ],
-                            [ 'field' => 'set_code', 'type' => 'text' ],
-                            '_quick' => [ 'expr' => 'product_name like ? or set_code like ', 'args' => [ '%?%', '%?%' ] ]
+                    [ 'field' => 'set_name', 'type' => 'text' ],
+                    [ 'field' => 'set_code', 'type' => 'text' ],
+                    '_quick' => [ 'expr' => 'product_name like ? or set_code like ', 'args' => [ '%?%', '%?%' ] ]
                 ],
                 'grid_before_create' => 'customFieldsGridRegister'
 //                'new_button' => '#add_new_field_set'
@@ -63,17 +61,18 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     [ 'name' => 'id', 'label' => 'ID', 'width' => 30 ],
                     [ 'name' => 'field_code', 'label' => 'Field Code', 'width' => 100, 'sortable' => false ],
                     [ 'name' => 'field_name', 'label' => 'Field Name', 'width' => 100, 'sortable' => false ],
-                    [ 'name' => 'position', 'label' => 'Position', 'width' => 100, 'editable' => true, 'valdiate' => 'number', 'default' => '0', 'sortable' => false ],
+                    [ 'name' => 'position', 'label' => 'Position', 'width' => 100, 'editable' => true,
+                        'valdiate' => 'number', 'default' => '0', 'sortable' => false ],
 //                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => 'noconfirm'))
                 ],
                 'filters' => [
-                            [ 'field' => 'field_code', 'type' => 'text' ],
-                            [ 'field' => 'field_name', 'type' => 'text' ],
-                            '_quick' => [ 'expr' => 'field_code like ? or id like ', 'args' => [ '%?%', '%?%' ] ]
+                    [ 'field' => 'field_code', 'type' => 'text' ],
+                    [ 'field' => 'field_name', 'type' => 'text' ],
+                    '_quick' => [ 'expr' => 'field_code like ? or id like ', 'args' => [ '%?%', '%?%' ] ]
                 ],
                 'actions' => [
-                                    'delete' => [ 'caption' => 'Remove', 'confirm' => false ]
-                                ],
+                    'delete' => [ 'caption' => 'Remove', 'confirm' => false ]
+                ],
                 'grid_before_create' => 'selectedFieldGridRegister'
             ]
         ];
@@ -97,13 +96,13 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     [ 'name' => 'admin_input_type', 'label' => 'Input Type', 'width' => 180 ]
                 ],
                 'filters' => [
-                            [ 'field' => 'field_code', 'type' => 'text' ],
-                            [ 'field' => 'field_name', 'type' => 'text' ],
-                            '_quick' => [ 'expr' => 'field_code like ? or id like ', 'args' => [ '%?%', '%?%' ] ]
+                    [ 'field' => 'field_code', 'type' => 'text' ],
+                    [ 'field' => 'field_name', 'type' => 'text' ],
+                    '_quick' => [ 'expr' => 'field_code like ? or id like ', 'args' => [ '%?%', '%?%' ] ]
                 ],
                 'actions' => [
-                                    'add' => [ 'caption' => 'Add Selected Fields' ]
-                                ],
+                    'add' => [ 'caption' => 'Add Selected Fields' ]
+                ],
                 'grid_before_create' => 'addFieldGridRegister'
             ]
         ];
@@ -157,32 +156,30 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     [ 'type' => 'input', 'name' => 'required', 'label' => 'Required', 'width' => 90, 'editable' => true,
                         'editor' => 'select', 'addable' => true, 'mass-editable' => true, 'validation' => [ 'required' => true ],
                         'options' => [ '1' => 'Yes', '0' => 'No' ] ],
-                    [ 'type' => 'btn_group',
-                        'buttons' => [
-                                            [ 'name' => 'custom', 'caption' => 'options...', 'cssClass' => 'btn-custom' ],
-                                            [ 'name' => 'edit' ],
-                                            [ 'name' => 'delete' ]
-                                        ]
-                        ]
+                    [ 'type' => 'btn_group', 'buttons' => [
+                        [ 'name' => 'custom', 'caption' => 'options...', 'cssClass' => 'btn-custom' ],
+                        [ 'name' => 'edit' ],
+                        [ 'name' => 'delete' ]
+                    ] ]
                 ],
                 'filters' => [
-                            [ 'field' => 'field_code', 'type' => 'text' ],
-                            [ 'field' => 'field_name', 'type' => 'text' ],
-                            [ 'field' => 'frontend_label', 'type' => 'text' ],
-                            [ 'field' => 'frontend_show', 'type' => 'multiselect' ],
-                            [ 'field' => 'table_field_type', 'type' => 'multiselect' ],
-                            [ 'field' => 'admin_input_type', 'type' => 'multiselect' ],
-                            [ 'field' => 'num_options', 'type' => 'text' ],
-                            [ 'field' => 'system', 'type' => 'multiselect' ],
-                            [ 'field' => 'multilanguage', 'type' => 'multiselect' ],
-                            [ 'field' => 'required', 'type' => 'multiselect' ],
-                            '_quick' => [ 'expr' => 'field_code like ? or id like ', 'args' => [ '%?%', '%?%' ] ]
+                    [ 'field' => 'field_code', 'type' => 'text' ],
+                    [ 'field' => 'field_name', 'type' => 'text' ],
+                    [ 'field' => 'frontend_label', 'type' => 'text' ],
+                    [ 'field' => 'frontend_show', 'type' => 'multiselect' ],
+                    [ 'field' => 'table_field_type', 'type' => 'multiselect' ],
+                    [ 'field' => 'admin_input_type', 'type' => 'multiselect' ],
+                    [ 'field' => 'num_options', 'type' => 'text' ],
+                    [ 'field' => 'system', 'type' => 'multiselect' ],
+                    [ 'field' => 'multilanguage', 'type' => 'multiselect' ],
+                    [ 'field' => 'required', 'type' => 'multiselect' ],
+                    '_quick' => [ 'expr' => 'field_code like ? or id like ', 'args' => [ '%?%', '%?%' ] ]
                 ],
                 'actions' => [
-                                    //'new'=>array('caption'=>'Add a field', 'modal'=>true),
-                                    'edit' => true,
-                                    'delete' => true
-                                ],
+                    //'new'=>array('caption'=>'Add a field', 'modal'=>true),
+                    'edit' => true,
+                    'delete' => true
+                ],
                 //'callbacks'=>array('after_render'=>'afterRowRenderFieldsGrid'),
                 'grid_before_create' => 'fieldsGridRegister',
                 'new_button' => '#add_new_field'
@@ -203,19 +200,19 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     [ 'type' => 'row_select' ],
                     [ 'name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true ],
                     [ 'type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 300, 'editable' => 'inline',
-                            'sortable' => false, 'validation' => [ 'required' => true ] ],
+                        'sortable' => false, 'validation' => [ 'required' => true ] ],
                     [ 'type' => 'btn_group',
-                            'buttons' => [ [ 'name' => 'delete', 'noconfirm' => true ] ]
-                        ]
+                        'buttons' => [ [ 'name' => 'delete', 'noconfirm' => true ] ]
+                    ]
 
                 ],
                 'filters' => [
-                            '_quick' => [ 'expr' => 'field_code like ? or id like ', 'args' => [ '%?%', '%?%' ] ]
+                    '_quick' => [ 'expr' => 'field_code like ? or id like ', 'args' => [ '%?%', '%?%' ] ]
                 ],
                 'actions' => [
-                                    'new' => [ 'caption' => 'Insert New Option' ],
-                                    'delete' => [ 'caption' => 'Remove', 'confirm' => false ]
-                                ],
+                    'new' => [ 'caption' => 'Insert New Option' ],
+                    'delete' => [ 'caption' => 'Remove', 'confirm' => false ]
+                ],
                 'grid_before_create' => 'optionsGridRegister'
             ]
         ];
@@ -419,7 +416,8 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
             }
             $data[ 'model' ] = BLocale::i()->parseRequestDates( $data[ 'model' ], 'from_date,to_date' );
             $model->set( $data[ 'model' ] );
-            BEvents::i()->fire( 'FCom_CustomField_Admin_Controller_FieldSets::form_post', [ 'id' => $id, 'data' => $data, 'model' => $model ] );
+            BEvents::i()->fire( 'FCom_CustomField_Admin_Controller_FieldSets::form_post',
+                [ 'id' => $id, 'data' => $data, 'model' => $model ] );
             $model->save();
             if ( !$id ) {
                 $id = $model->id;

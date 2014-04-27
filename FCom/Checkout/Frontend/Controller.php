@@ -47,7 +47,8 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                 $cart->addProduct( $p->id(), $options )->calculateTotals()->save();
                 $result = [
                     'title' => 'Added to cart',
-                    'html' => '<img src="' . $p->thumbUrl( 35, 35 ) . '" width="35" height="35" style="float:left"/> ' . htmlspecialchars( $p->product_name )
+                    'html' => '<img src="' . $p->thumbUrl( 35, 35 ) . '" width="35" height="35" style="float:left"/> '
+                        . htmlspecialchars( $p->product_name )
                         . ( !empty( $post[ 'qty' ] ) && $post[ 'qty' ] > 1 ? ' (' . $post[ 'qty' ] . ')' : '' )
                         . '<br><br><a href="' . $cartHref . '" class="button">Go to cart</a>',
                     'minicart_html' => BLayout::i()->view( 'checkout/cart/block' )->render(),

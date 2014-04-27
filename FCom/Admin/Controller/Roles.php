@@ -72,7 +72,8 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
                 }
             }
         }
-        if ( !empty( $data[ 'user_ids_add' ] ) ) { //todo: check if can use sql executes to faster, update role_id where user_id in (user_ids_add)?
+        //todo: check if can use sql executes to faster, update role_id where user_id in (user_ids_add)?
+        if ( !empty( $data[ 'user_ids_add' ] ) ) {
             $user_ids = explode( ",", $data[ 'user_ids_add' ] );
             foreach ( $user_ids as $user_id ) {
                 $user = FCom_Admin_Model_User::i()->load( $user_id );

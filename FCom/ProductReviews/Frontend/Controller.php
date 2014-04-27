@@ -20,21 +20,19 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             return;
         }
         $pr = FCom_ProductReviews_Model_Review::i()->load( [
-                'product_id' => $r[ 'pid' ],
-                'customer_id' => FCom_Customer_Model_Customer::i()->sessionUserId()
-            ] );
+            'product_id' => $r[ 'pid' ],
+            'customer_id' => FCom_Customer_Model_Customer::i()->sessionUserId()
+        ] );
         if ( $pr ) {
             BResponse::i()->redirect( $product->url() );
             return;
         }
         $this->formMessages( $this->formId );
-        $this->view( 'prodreviews/review-form' )->set(
-            [
-                'prod'   => $product,
-                'formId' => $this->formId,
-                'action' => 'add',
-            ]
-        );
+        $this->view( 'prodreviews/review-form' )->set( [
+            'prod'   => $product,
+            'formId' => $this->formId,
+            'action' => 'add',
+        ] );
         $this->layout( '/prodreview/form' );
     }
 
@@ -43,9 +41,9 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         $post = BRequest::i()->post();
         //check if customer have debug
         $pr = FCom_ProductReviews_Model_Review::i()->load( [
-                'product_id' => $post[ 'pid' ],
-                'customer_id' => FCom_Customer_Model_Customer::i()->sessionUserId()
-            ] );
+            'product_id' => $post[ 'pid' ],
+            'customer_id' => FCom_Customer_Model_Customer::i()->sessionUserId()
+        ] );
 
         $product = FCom_Catalog_Model_Product::i()->load( $post[ 'pid' ] );
         if ( !$product || empty( $post[ 'review' ] ) ) {
@@ -173,10 +171,11 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         $messages = BSession::i()->messages( 'validator-errors:' . $this->formId );
         $errorMessages = [];
         foreach ( $messages as $m ) {
-            if ( is_array( $m[ 'msg' ] ) )
+            if ( is_array( $m[ 'msg' ] ) ) {
                 $errorMessages[] = $m[ 'msg' ][ 'error' ];
-            else
+            } else {
                 $errorMessages[] = $m[ 'msg' ];
+            }
         }
 
         return implode( "<br />", $errorMessages );
@@ -197,10 +196,10 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             }
             $reviews = $product->reviews();
             BResponse::i()->set( $this->view( 'prodreviews/product-reviews-list' )->set( [
-                        'reviews' => $reviews,
-                        'userId'  => FCom_Customer_Model_Customer::i()->sessionUserId(),
-                        'prod'    => $product
-                    ] ) );
+                'reviews' => $reviews,
+                'userId'  => FCom_Customer_Model_Customer::i()->sessionUserId(),
+                'prod'    => $product
+            ] ) );
         }
     }
 
@@ -209,9 +208,9 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         $r = BRequest::i()->get();
         $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $pr = FCom_ProductReviews_Model_Review::i()->load( [
-                'id'          => $r[ 'rid' ],
-                'customer_id' => $customerId
-            ] );
+            'id'          => $r[ 'rid' ],
+            'customer_id' => $customerId
+        ] );
         if ( !$pr ) {
             $this->message( 'Cannot find your review, please check again', 'error', 'validator-errors:' . $this->formId );
         } else {
@@ -223,14 +222,14 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             }
 
             $this->view( 'prodreviews/review-form' )->set( [
-                    'prod' => $prod,
-                    'pr' => $pr,
-                ] );
+                'prod' => $prod,
+                'pr' => $pr,
+            ] );
         }
         $this->view( 'prodreviews/review-form' )->set( [
-                'formId' => $this->formId,
-                'action' => 'edit',
-            ] );
+            'formId' => $this->formId,
+            'action' => 'edit',
+        ] );
         $this->formMessages( $this->formId );
         $this->layout( '/prodreview/form' );
     }
@@ -240,9 +239,9 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         $post = BRequest::i()->post();
         $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $pr = FCom_ProductReviews_Model_Review::i()->load( [
-                'id'          => $post[ 'rid' ],
-                'customer_id' => $customerId
-            ] );
+            'id'          => $post[ 'rid' ],
+            'customer_id' => $customerId
+        ] );
         $prod = FCom_Catalog_Model_Product::i()->load( $pr->product_id );
         if ( !$pr ) {
             $this->message( 'Cannot load your review, please check again', 'error', 'validator-errors:' . $this->formId );
@@ -287,9 +286,9 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         $post = BRequest::i()->post();
         $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $pr = FCom_ProductReviews_Model_Review::i()->load( [
-                'id'          => $post[ 'rid' ],
-                'customer_id' => $customerId
-            ] );
+            'id'          => $post[ 'rid' ],
+            'customer_id' => $customerId
+        ] );
         if ( !$pr ) {
             BResponse::i()->json( [ 'status' => 'error', 'message' => 'Cannot load your review, please check again' ] );
         } else {

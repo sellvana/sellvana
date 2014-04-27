@@ -105,29 +105,35 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             [ 'name' => 'description', 'label' => 'Description', 'width' => 150, 'overflow' => true ],
             [ 'name' => 'version', 'label' => 'Version', 'width' => 80, 'overflow' => true ],
             [ 'name' => 'channel', 'label' => 'Channel', 'width' => 80, 'overflow' => true ],
-            [ 'name' => 'schema_version', 'label' => 'DB Version', 'width' => 80, 'cell' => new BValue( "FCom.Backgrid.SchemaVersionCell" ), 'overflow' => true ],
-            [ 'name' => 'run_status', 'label' => 'Status', 'options' => $runStatusOptions, 'width' => 80, 'cell' => new BValue( "FCom.Backgrid.RunStatusCell" ), 'overflow' => true ],
-            [ 'name' => 'run_level', 'label' => 'Level', 'options' => $coreRunLevelOptions, 'width' => 100, 'cell' => new BValue( "FCom.Backgrid.RunLevelCell" ), 'overflow' => true ],
-            [ 'type' => 'input', 'name' => 'run_level_core', 'label' => "Run Level (Core)", 'options' => $areaRunLevelOptions, 'width' => 200,  'validation' => [ 'required' => true ], 'editable' => true, 'mass-editable-show' => true, 'mass-editable' => true, 'editor' => 'select', 'overflow' => true ],
+            [ 'name' => 'schema_version', 'label' => 'DB Version', 'width' => 80,
+                'cell' => new BValue( "FCom.Backgrid.SchemaVersionCell" ), 'overflow' => true ],
+            [ 'name' => 'run_status', 'label' => 'Status', 'options' => $runStatusOptions, 'width' => 80,
+                'cell' => new BValue( "FCom.Backgrid.RunStatusCell" ), 'overflow' => true ],
+            [ 'name' => 'run_level', 'label' => 'Level', 'options' => $coreRunLevelOptions, 'width' => 100,
+                'cell' => new BValue( "FCom.Backgrid.RunLevelCell" ), 'overflow' => true ],
+            [ 'type' => 'input', 'name' => 'run_level_core', 'label' => "Run Level (Core)", 'overflow' => true,
+                'options' => $areaRunLevelOptions, 'width' => 200,  'validation' => [ 'required' => true ],
+                'editable' => true, 'mass-editable-show' => true, 'mass-editable' => true, 'editor' => 'select' ],
             [ 'name' => 'requires', 'label' => 'Requires', 'width' => 250, 'overflow' => true ],
             [ 'name' => 'required_by', 'label' => 'Required By', 'width' => 300, 'overflow' => true ],
-            [ 'name' => 'dep_errors', 'label' => 'Dependency Errors', 'width' => 300, 'overflow' => true, 'hidden' => true ],
+            [ 'name' => 'dep_errors', 'label' => 'Dependency Errors', 'width' => 300, 'overflow' => true,
+                'hidden' => true ],
             [ 'type' => 'btn_group', 'width' => 115,
                 'buttons' => [
                 /*
                     array(
-						'type'=>'link','name'=>'required',
+                        'type'=>'link','name'=>'required',
                         'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
                         'icon' => 'icon-check-sign', 'type' => 'link', 'title' => $this->_('Required')
                     ),
                     array(
-						'type'=>'link','name'=>'ondemand',
+                        'type'=>'link','name'=>'ondemand',
                         'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
                         'icon' => 'icon-check-empty', 'type' => 'link', 'title' => $this->_('On Demand')
                     ),
                 */
                     [
-						'type' => 'button', 'name' => 'edit',
+                        'type' => 'button', 'name' => 'edit',
                         'icon' => 'glyphicon glyphicon-repeat',
                     ],
                 ]
@@ -163,7 +169,9 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         $view = $args[ 'page_view' ];
         $actions = (array)$view->get( 'actions' );
         $actions += [
-            'run_migration' => '<button class="btn btn-primary" type="button" onclick="$(\'#util-form\').attr(\'action\', \'' . BApp::href( 'modules/migrate' ) . '\').submit()"><span>' . BLocale::_( 'Run Migration Scripts' ) . '</span></button>',
+            'run_migration' => '<button class="btn btn-primary" type="button" onclick="$(\'#util-form\').attr(\'action\', \''
+                . BApp::href( 'modules/migrate' ) . '\').submit()"><span>' . BLocale::_( 'Run Migration Scripts' )
+                . '</span></button>',
         ];
         unset( $actions[ 'new' ] );
         $view->set( 'actions', $actions );

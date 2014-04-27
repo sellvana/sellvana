@@ -26,11 +26,13 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $id = !empty( $options[ 'id' ] ) ? $options[ 'id' ] : 'media_library';
         $folder = $options[ 'folder' ];
         $url = BApp::href( '/media/grid' );
+        $tProductMedia =
         $orm = FCom_Core_Model_MediaLibrary::i()->orm()->table_alias( 'a' )
                 ->where( 'folder', $folder )
                 ->select( [ 'a.id', 'a.folder', 'a.file_name', 'a.file_size' ] )
                 ->select_expr( 'IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder' )
-                ->select_expr( '(SELECT COUNT(*) FROM ' . FCom_Catalog_Model_ProductMedia::table() . ' pm WHERE pm.file_id = a.id)', 'associated_products' )
+                ->select_expr( '(SELECT COUNT(*) FROM ' . FCom_Catalog_Model_ProductMedia::table()
+                    . ' pm WHERE pm.file_id = a.id)', 'associated_products' )
                 ->order_by_expr( 'id asc' );
             ;
         $baseSrc = rtrim( BConfig::i()->get( 'web/base_src' ), '/' ) . '/';
@@ -46,9 +48,13 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'columns' => [
                     [ 'type' => 'row_select' ],
                     [ 'name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true ],
-                    [ 'name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval', 'print' => '"<a href=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' target=_blank><img src=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"', 'sortable' => false ],
+                    [ 'name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
+                        'print' => '"<a href=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' target=_blank>'
+                            . '<img src=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"',
+                        'sortable' => false ],
                     [ 'name' => 'file_name', 'label' => 'File Name', 'width' => 400 ],
-                    [ 'name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false, 'display' => 'file_size' ],
+                    [ 'name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
+                        'display' => 'file_size' ],
                     [ 'name' => 'associated_products', 'label' => 'Associated Products', 'width' => 50 ],
                     [ 'type' => 'btn_group',
                         'buttons' => [
@@ -66,9 +72,9 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ]
             ]
         ];
-        
+
         if ( !empty( $options[ 'config' ] ) ) {
-            
+
             $config[ 'config' ] = BUtil::arrayMerge( $config[ 'config' ], $options[ 'config' ] );
 
         }
@@ -78,9 +84,12 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $config[ 'config' ][ 'columns' ] = [
                     [ 'type' => 'row_select' ],
                     [ 'name' => 'download_url',  'hidden' => true, 'default' => $download_url ],
-                    [ 'name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true ],                    
-                    [ 'name' => 'file_name', 'label' => 'File Name', 'width' => 200, 'display' => 'eval', 'print' => '"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"' ],
-                    [ 'name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false, 'display' => 'file_size' ]
+                    [ 'name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true ],
+                    [ 'name' => 'file_name', 'label' => 'File Name', 'width' => 200, 'display' => 'eval',
+                        'print' => '"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' '
+                            . 'href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"' ],
+                    [ 'name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
+                        'display' => 'file_size' ]
                     //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
                 ];
         }
@@ -101,7 +110,8 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $orm = FCom_Core_Model_MediaLibrary::i()->orm()->table_alias( 'a' )
                 ->where( 'folder', $folder )
                 ->select( [ 'a.id', 'a.folder', 'a.file_name', 'a.file_size' ] )
-                ->select_expr( '(SELECT COUNT(*) FROM ' . FCom_Catalog_Model_ProductMedia::table() . ' pm WHERE pm.file_id = a.id)', 'associated_products' )
+                ->select_expr( '(SELECT COUNT(*) FROM ' . FCom_Catalog_Model_ProductMedia::table()
+                    . ' pm WHERE pm.file_id = a.id)', 'associated_products' )
                 ->select_expr( 'IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder' )
             ;
             /*if (isset($r['filters'])) {
@@ -180,7 +190,9 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 }
                 $associatedProducts = 0;
                 $fileSize = 0;
-                if ( !$uploads[ 'error' ][ $i ] && @move_uploaded_file( $uploads[ 'tmp_name' ][ $i ], $targetDir . '/' . $fileName ) ) {
+                if ( !$uploads[ 'error' ][ $i ]
+                    && @move_uploaded_file( $uploads[ 'tmp_name' ][ $i ], $targetDir . '/' . $fileName )
+                ) {
                     $att = $attModel->load( [ 'folder' => $folder, 'file_name' => $fileName ] );
 
                     if ( !$att ) {
@@ -211,7 +223,8 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     $status = 'ERROR';
                 }
 
-                $row = [ 'id' => $id, 'file_name' => $fileName, 'file_size' => $fileSize, 'act' => $status, 'folder' => $folder, 'subfolder' => '', 'associated_products' => $associatedProducts ];
+                $row = [ 'id' => $id, 'file_name' => $fileName, 'file_size' => $fileSize, 'act' => $status,
+                    'folder' => $folder, 'subfolder' => '', 'associated_products' => $associatedProducts ];
                 BResponse::i()->json( $row );
 
                 //echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".BUtil::toJson($row)."); </script>";
@@ -265,7 +278,8 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     RecursiveIteratorIterator::SELF_FIRST
                 );
                 $arrImages = [];
-                $records = BDb::many_as_array( FCom_Core_Model_MediaLibrary::i()->orm()->select( [ 'folder', 'subfolder', 'file_name' ] )->where( 'folder', $folder )->find_many() );
+                $records = BDb::many_as_array( FCom_Core_Model_MediaLibrary::i()->orm()
+                    ->select( [ 'folder', 'subfolder', 'file_name' ] )->where( 'folder', $folder )->find_many() );
                 foreach ( $fileSPLObjects as $fullFileName => $fileSPLObject ) {
                     $fileName = $fileSPLObject->getFilename();
                     $path = $fileSPLObject->getPath();

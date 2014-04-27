@@ -16,8 +16,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $config[ 'columns' ] = [
             [ 'type' => 'row_select' ],
             [ 'name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true ],
-            [ 'display' => 'eval', 'name' => 'thumb_path', 'label' => 'Thumbnail', 'width' => 48,
-                'print' => '"<img src=\'"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["product_name"]+"\' >"', 'sortable' => false ],
+            [ 'display' => 'eval', 'name' => 'thumb_path', 'label' => 'Thumbnail', 'width' => 48, 'sortable' => false,
+                'print' => '"<img src=\'"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["product_name"]+"\' >"' ],
             [ 'name' => 'product_name', 'label' => 'Name', 'width' => 250 ],
             [ 'name' => 'local_sku', 'label' => 'SKU', 'index' => 'p.local_sku', 'width' => 100 ],
             [ 'name' => 'short_description', 'label' => 'Description',  'width' => 200 ],
@@ -28,12 +28,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             [ 'name' => 'position', 'label' => 'Position', 'index' => 'p.position', 'hidden' => true ],
             [ 'name' => 'create_at', 'label' => 'Created', 'index' => 'p.create_at', 'width' => 100 ],
             [ 'name' => 'update_at', 'label' => 'Updated', 'index' => 'p.update_at', 'width' => 100 ],
-            [ 'type' => 'btn_group',
-                  'buttons' => [
-                                        [ 'name' => 'edit', 'href' => BApp::href( 'catalog/products/form?id=' ) ],
-                                        [ 'name' => 'delete' ]
-                                    ]
-                ]
+            [ 'type' => 'btn_group', 'buttons' => [
+                  [ 'name' => 'edit', 'href' => BApp::href( 'catalog/products/form?id=' ) ],
+                  [ 'name' => 'delete' ]
+            ] ],
         ];
         $config[ 'actions' ] = [
             'refresh' => true,
@@ -102,9 +100,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $m = $args[ 'model' ];
         $newAction = [];
         if ( $m->id ) {
-            $newAction[ 'duplicate' ] = '<a href="' . BApp::href( $this->_gridHref . '/duplicate?id=' . $m->id ) . '" title="Duplicate" class="btn btn-primary"><span>' .  BLocale::_( 'Duplicate' ) . '</span></a>';
+            $newAction[ 'duplicate' ] = '<a href="' . BApp::href( $this->_gridHref . '/duplicate?id=' . $m->id ) .
+                '" title="Duplicate" class="btn btn-primary"><span>' .  BLocale::_( 'Duplicate' ) . '</span></a>';
         }
-        $newAction[ 'saveAndContinue' ] = '<button type="submit" class="btn btn-primary" name="do" value="saveAndContinue" ><span>' .  BLocale::_( 'Save And Continue' ) . '</span></button>';
+        $newAction[ 'saveAndContinue' ] = '<button type="submit" class="btn btn-primary" name="do" value="saveAndContinue"><span>'
+            . BLocale::_( 'Save And Continue' ) . '</span></button>';
         $actions = array_merge( $args[ 'view' ]->actions, $newAction );
         $args[ 'view' ]->set( [
             'sidebar_img' => $m->thumbUrl( 98 ),
@@ -182,24 +182,26 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'id' => 'product_attachments',
                 'caption' => 'Product Attachments',
                 'data_mode' => 'local',
-                'data' => BDb::many_as_array( $model->mediaORM( 'A' )->order_by_expr( 'pa.position asc' )->select( [ 'pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name', 'a.file_size', 'pa.create_at', 'pa.update_at' ] )->select( 'a.id', 'file_id' )->find_many() ),
+                'data' => BDb::many_as_array( $model->mediaORM( 'A' )->order_by_expr( 'pa.position asc' )
+                    ->select( [ 'pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name',
+                        'a.file_size', 'pa.create_at', 'pa.update_at' ] )
+                    ->select( 'a.id', 'file_id' )->find_many() ),
                 'columns' => [
                     [ 'type' => 'row_select' ],
                     [ 'name' => 'download_url',  'hidden' => true, 'default' => $download_url ],
                     [ 'name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true ],
                     [ 'name' => 'file_id', 'label' => 'File ID', 'width' => 400, 'hidden' => true ],
                     [ 'name' => 'product_id', 'label' => 'Product ID', 'width' => 400, 'hidden' => true, 'default' => $model->id() ],
-                    [ 'name' => 'file_name', 'label' => 'File Name', 'width' => 200, 'display' => 'eval', 'print' => '"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"' ],
+                    [ 'name' => 'file_name', 'label' => 'File Name', 'width' => 200, 'display' => 'eval',
+                        'print' => '"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' '
+                            . 'href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"' ],
                     [ 'name' => 'file_size', 'label' => 'File Size', 'width' => 200, 'display' => 'file_size' ],
                     [ 'type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 250, 'editable' => 'inline' ],
-                    [ 'type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 50, 'editable' => 'inline', 'validation' => [ 'number' => true ] ],
+                    [ 'type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 50,
+                        'editable' => 'inline', 'validation' => [ 'number' => true ] ],
                     [ 'name' => 'create_at', 'label' => 'Created', 'width' => 200 ],
                     [ 'name' => 'update_at', 'label' => 'Updated', 'width' => 200 ],
-                    [ 'type' => 'btn_group',
-                          'buttons' => [
-                                            [ 'name' => 'delete' ]
-                                            ]
-                        ]
+                    [ 'type' => 'btn_group', 'buttons' => [ [ 'name' => 'delete' ] ] ],
                 ],
                 'actions' => [
                     'add' => [ 'caption' => 'Add attachments' ],
@@ -223,7 +225,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $data = BDb::many_as_array( $model->mediaORM( 'I' )
                 ->order_by_expr( 'pa.position asc' )
                 ->left_outer_join( 'FCom_Catalog_Model_ProductMedia', [ 'pa.file_id', '=', 'pm.file_id' ], 'pm' )
-                ->select( [ 'pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name', 'a.file_size', 'pa.create_at', 'pa.update_at', 'pa.main_thumb' ] )
+                ->select( [ 'pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name',
+                    'a.file_size', 'pa.create_at', 'pa.update_at', 'pa.main_thumb' ] )
                 ->select( 'a.id', 'file_id' )
                 ->select_expr( 'IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder' )
                 ->group_by( 'pa.id' )
@@ -242,18 +245,23 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     [ 'name' => 'download_url',  'hidden' => true, 'default' => $download_url ],
                     [ 'name' => 'thumb_url',  'hidden' => true, 'default' => $thumb_url ],
                     [ 'name' => 'file_name', 'label' => 'File Name' ],
-                    [ 'name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval', 'print' => '"<a href=\'"+rc.row["download_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\'><img src=\'"+rc.row["thumb_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' ></a>"', 'sortable' => false ],
+                    [ 'name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
+                        'print' => '"<a href=\'"+rc.row["download_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\'>'
+                            . '<img src=\'"+rc.row["thumb_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' '
+                            . 'alt=\'"+rc.row["file_name"]+"\' ></a>"',
+                        'sortable' => false ],
                     [ 'name' => 'file_size', 'label' => 'File Size', 'width' => 200, 'display' => 'file_size' ],
                     [ 'type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 250, 'editable' => 'inline' ],
-                    [ 'type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 50, 'editable' => 'inline', 'validation' => [ 'number' => true ] ],
-                    [ 'name' => 'main_thumb', 'label' => 'Thumbnail', 'width' => 50, 'display' => 'eval', 'print' => '"<input class=\'main-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"' ],
+                    [ 'type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 50,
+                        'editable' => 'inline', 'validation' => [ 'number' => true ] ],
+                    [ 'name' => 'main_thumb', 'label' => 'Thumbnail', 'width' => 50, 'display' => 'eval',
+                        'print' => '"<input class=\'main-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
+                            . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' '
+                            . 'data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"' ],
                     [ 'name' => 'create_at', 'label' => 'Created', 'width' => 200 ],
                     [ 'name' => 'update_at', 'label' => 'Updated', 'width' => 200 ],
                     [ 'type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
-                            'buttons' => [
-                                        [ 'name' => 'delete' ]
-                                    ]
-                        ]
+                        'buttons' => [ [ 'name' => 'delete' ] ] ],
                 ],
                 'actions' => [
                     'refresh' => true,
@@ -375,7 +383,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     [ 'name' => 'local_sku', 'label' => 'SKU', 'index' => 'p.local_sku', 'width' => 200 ],
                     [ 'name' => 'base_price', 'label' => 'Base Price', 'index' => 'p.base_price' ],
                     [ 'name' => 'sale_price', 'label' => 'Sale Price', 'index' => 'p.sale_price' ],
-                    [ 'name' => 'product_link_position', 'label' => 'Position', 'index' => 'pl.position'  , 'width' => 50, 'editable' => 'inline', 'validation' => [ 'number' => true ], 'type' => 'input' ],
+                    [ 'name' => 'product_link_position', 'label' => 'Position', 'index' => 'pl.position', 'width' => 50,
+                        'editable' => 'inline', 'validation' => [ 'number' => true ], 'type' => 'input' ],
                 ],
                 'actions' => [
                     'add' => [ 'caption' => 'Add products' ],
@@ -521,7 +530,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             if ( isset( $data[ $typeName ] ) ) {
                 foreach ( $data[ $typeName ] as $key => $arr ) {
                     $productLink = $hlp->load( [ 'product_id' => $model->id, 'linked_product_id' => $key, 'link_type' => $type ] );
-                    $position = ( is_numeric( $data[ $typeName ][ $key ][ 'product_link_position' ] ) ) ? (int) $data[ $typeName ][ $key ][ 'product_link_position' ] : 0;
+                    $position = ( is_numeric( $data[ $typeName ][ $key ][ 'product_link_position' ] ) )
+                        ? (int) $data[ $typeName ][ $key ][ 'product_link_position' ] : 0;
                     if ( $productLink ) {
                         $productLink->set( 'position', $position )->save();
                     } else {
@@ -562,7 +572,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                         $mediaModel =  $hlp->load( $key );
                         $main_thumb = 0;
                         if ( $type == 'I' ) {
-                            if ( isset( $data[ 'product_' . $typeName ][ 'main_thumb' ] ) && $data[ 'product_' . $typeName ][ 'main_thumb' ] == $key ) {
+                            if ( isset( $data[ 'product_' . $typeName ][ 'main_thumb' ] )
+                                && $data[ 'product_' . $typeName ][ 'main_thumb' ] == $key
+                            ) {
                                 $main_thumb = 1;
                             }
                             $image[ 'main_thumb' ] = $main_thumb;
@@ -575,7 +587,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                         if ( $mediaModel ) {
                             $mediaModel->set( $image )->save();
                         } else {
-                            $productMediaModel = $hlp->orm()->where( 'product_id', $model->id )->where( 'file_id', $image[ 'file_id' ] )->find_one();
+                            $productMediaModel = $hlp->orm()->where( 'product_id', $model->id )
+                                ->where( 'file_id', $image[ 'file_id' ] )->find_one();
                             if ( !$productMediaModel ) {
                                 $image[ 'file_id' ] = (int) $image[ 'file_id' ];
                                 $image[ 'product_id' ] = $model->id;
@@ -592,11 +605,14 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             }
 
         }
-        $productMediaModel = $hlp->orm()->where( 'media_type', 'I' )->where( 'product_id', $model->id )->where( 'main_thumb', 1 )->find_one();
+        $productMediaModel = $hlp->orm()->where( 'media_type', 'I' )->where( 'product_id', $model->id )
+            ->where( 'main_thumb', 1 )->find_one();
         $thumbUrl = NULL;
         if ( $productMediaModel ) {
             $mediaLibModel = FCom_Core_Model_MediaLibrary::i()->load( $productMediaModel->get( 'file_id' ) );
-            $thumbUrl = ( $mediaLibModel->get( 'subfolder' ) != null ) ? $mediaLibModel->get( 'folder' ) . '/' . $mediaLibModel->get( 'subfolder' ) . '/' . $mediaLibModel->get( 'file_name' ) : $mediaLibModel->get( 'folder' ) . '/' . $mediaLibModel->get( 'file_name' );
+            $thumbUrl = ( $mediaLibModel->get( 'subfolder' ) != null )
+                ? $mediaLibModel->get( 'folder' ) . '/' . $mediaLibModel->get( 'subfolder' ) . '/' . $mediaLibModel->get( 'file_name' )
+                : $mediaLibModel->get( 'folder' ) . '/' . $mediaLibModel->get( 'file_name' );
             $thumbUrl = preg_replace( '#^media/#', '', $thumbUrl ); //TODO: resolve the dir string ambiguity
         }
         $model->set( 'thumb_url', $thumbUrl )->save();

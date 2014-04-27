@@ -18,10 +18,10 @@ class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abst
         $config[ 'columns' ] = [
             [ 'type' => 'row_select' ],
             [ 'name' => 'id', 'index' => 'o.id', 'label' => 'ID', 'width' => 70 ],
-            [ 'name' => 'code', 'index' => 'code', 'label' => 'Code',
-                  'addable' => true, 'editable' => true, 'validation' => [ 'required' => true, 'unique' => BApp::href( 'orderstatus/unique' ) ] ],
-            [ 'name' => 'name', 'index' => 'name', 'label' => 'Label',
-                  'addable' => true, 'editable' => true, 'validation' => [ 'required' => true, /*'unique' => BApp::href('orderstatus/unique')*/ ] ],
+            [ 'name' => 'code', 'index' => 'code', 'label' => 'Code', 'addable' => true, 'editable' => true,
+                'validation' => [ 'required' => true, 'unique' => BApp::href( 'orderstatus/unique' ) ] ],
+            [ 'name' => 'name', 'index' => 'name', 'label' => 'Label', 'addable' => true, 'editable' => true,
+                'validation' => [ 'required' => true, /*'unique' => BApp::href('orderstatus/unique')*/ ] ],
             [ 'type' => 'btn_group', 'buttons' => [ [ 'name' => 'edit' ], [ 'name' => 'delete' ] ] ]
         ];
         $config[ 'actions' ] = [
@@ -37,7 +37,9 @@ class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abst
     public function gridViewBefore( $args )
     {
         parent::gridViewBefore( $args );
-        $this->view( 'admin/grid' )->set( [ 'actions' => [ 'new' => '<button type="button" id="add_new_order_status" class="btn grid-new btn-primary _modal">' . BLocale::_( 'Add New Order Status' ) . '</button>' ] ] );
+        $this->view( 'admin/grid' )->set( [ 'actions' => [
+            'new' => '<button type="button" id="add_new_order_status" class="btn grid-new btn-primary _modal">'
+                . BLocale::_( 'Add New Order Status' ) . '</button>' ] ] );
     }
 
     /**

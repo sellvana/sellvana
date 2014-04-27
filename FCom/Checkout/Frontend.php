@@ -16,7 +16,8 @@ class FCom_Checkout_Frontend extends BClass
         if ( false == $cart->items() ) {
             return;
         }
-        FCom_Sales_Model_Cart::i()->addTotalRow( 'subtotal', [ 'callback' => 'FCom_Sales_Model_Cart.subtotalCallback', 'label' => 'Subtotal', 'after' => '' ] );
+        FCom_Sales_Model_Cart::i()->addTotalRow( 'subtotal', [ 'callback' => 'FCom_Sales_Model_Cart.subtotalCallback',
+            'label' => 'Subtotal', 'after' => '' ] );
         if ( $cart->shipping_method ) {
             $shippingClass = FCom_Sales_Main::i()->getShippingMethodClassName( $cart->shipping_method );
             FCom_Sales_Model_Cart::i()->addTotalRow( 'shipping', [ 'callback' => $shippingClass . '.getRateCallback',

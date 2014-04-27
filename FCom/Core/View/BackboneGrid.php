@@ -329,13 +329,15 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         break;
                     case 'edit':
                         $action = [ 'html' => BUtil::tagHtml( 'a',
-                            [ 'class' => 'btn grid-mass-edit btn-success disabled', 'data-toggle' => 'modal', 'href' => '#' . $grid[ 'config' ][ 'id' ] . '-mass-edit', 'role' => 'button' ],
+                            [ 'class' => 'btn grid-mass-edit btn-success disabled', 'data-toggle' => 'modal',
+                                'href' => '#' . $grid[ 'config' ][ 'id' ] . '-mass-edit', 'role' => 'button' ],
                             isset( $action[ 'caption' ] ) ? $action[ 'caption' ] : BLocale::_( 'Edit' )
                         ) ];
                         break;
                     case 'delete':
                         $action = [ 'html' => BUtil::tagHtml( 'button',
-                            [ 'class' => 'btn grid-mass-delete btn-danger disabled' . ( ( isset( $action[ 'confirm' ] ) && $action[ 'confirm' ] === false ) ? ' noconfirm' : '' ), 'type' => 'button' ],
+                            [ 'class' => 'btn grid-mass-delete btn-danger disabled' . ( ( isset( $action[ 'confirm' ] )
+                                && $action[ 'confirm' ] === false ) ? ' noconfirm' : '' ), 'type' => 'button' ],
                             isset( $action[ 'caption' ] ) ? $action[ 'caption' ] : BLocale::_( 'Delete' )
                         ) ];
                         break;
@@ -347,7 +349,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         break;
                     case 'new':
                         $action = [ 'html' => BUtil::tagHtml( 'button',
-                            [ 'class' => "btn grid-new btn-primary " . ( isset( $action[ 'modal' ] ) && $action[ 'modal' ] ? '_modal' : '' ), 'type' => 'button' ],
+                            [ 'class' => "btn grid-new btn-primary " . ( isset( $action[ 'modal' ] )
+                                && $action[ 'modal' ] ? '_modal' : '' ), 'type' => 'button' ],
                             isset( $action[ 'caption' ] ) ? $action[ 'caption' ] : BLocale::_( 'Add' )
                         ) ];
                         break;
@@ -355,12 +358,17 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         $action = static::$_defaultActions[ $k ];
                 }
             } else {
-                $action = [ 'html' => BUtil::tagHtml( 'button',
-                            [ 'class' => isset( $action[ 'class' ] ) ? 'btn ' . $action[ 'class' ] : 'btn', 'type' => 'button', 'id' => isset( $action[ 'id' ] ) ? $action[ 'id' ] : '' ],
-                            isset( $action[ 'caption' ] ) ? $action[ 'caption' ] : BLocale::_( 'Add' )
-                ) ];
-
-
+                $action = [
+                    'html' => BUtil::tagHtml(
+                        'button',
+                        [
+                            'class' => isset( $action[ 'class' ] ) ? 'btn ' . $action[ 'class' ] : 'btn',
+                            'type' => 'button',
+                            'id' => isset( $action[ 'id' ] ) ? $action[ 'id' ] : ''
+                        ],
+                        isset( $action[ 'caption' ] ) ? $action[ 'caption' ] : BLocale::_( 'Add' )
+                    )
+                ];
             }
         }
         unset( $action );
@@ -498,8 +506,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $params = [ "p", "ps", "s", "sd"/*,"q"*/ ];
 
             foreach ( $params as $p ) {
-                $persState[ $p ] = isset( $persState[ $p ] ) ? $persState[ $p ] :
-                                    ( ( isset( $config[ 'state' ] ) && isset( $config[ 'state' ][ $p ] ) ) ? $config[ 'state' ][ $p ] : null );
+                $persState[ $p ] = isset( $persState[ $p ] ) ? $persState[ $p ]
+                    : ( ( isset( $config[ 'state' ] ) && isset( $config[ 'state' ][ $p ] ) ) ? $config[ 'state' ][ $p ] : null );
             }
 
             $persState[ 'p' ] = isset( $persState[ 'p' ] ) ? $persState[ 'p' ] : 1;
@@ -878,7 +886,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
             $joinMethod = ( isset( $j[ 'type' ] ) ? $j[ 'type' ] . '_' : '' ) . 'join';
 
-            $where = isset( $j[ 'where' ] ) ? str_replace( [ '{lk}', '{fk}', '{lt}', '{ft}' ], [ $localKey, $foreignKey, $mainTableAlias, $tableAlias ], $j[ 'where' ] ) : [ $foreignKey, $op, $localKey ];
+            $where = isset( $j[ 'where' ] )
+                ? str_replace(
+                    [ '{lk}', '{fk}', '{lt}', '{ft}' ],
+                    [ $localKey, $foreignKey, $mainTableAlias, $tableAlias ],
+                    $j[ 'where' ]
+                )
+                : [ $foreignKey, $op, $localKey ];
 
             $orm->$joinMethod( $table, $where, $tableAlias );
         }

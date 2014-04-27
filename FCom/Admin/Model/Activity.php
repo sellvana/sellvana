@@ -55,7 +55,8 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
         if ( !static::$_usersRestrictionsCache ) {
             $users = FCom_Admin_Model_User::i()->orm( 'u' )
                 ->left_outer_join( 'FCom_Admin_Model_Role', [ 'r.id', '=', 'u.role_id' ], 'r' )
-                ->select( 'u.id' )->select( 'u.is_superadmin' )->select( 'u.data_serialized' )->select( 'r.permissions_data' )
+                ->select( 'u.id' )->select( 'u.is_superadmin' )
+                ->select( 'u.data_serialized' )->select( 'r.permissions_data' )
                 ->find_many_assoc();
 
             foreach ( $users as $uId => $u ) {

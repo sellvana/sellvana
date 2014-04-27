@@ -22,7 +22,8 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             [ 'name' => 'from_date', 'label' => 'Start Date', 'index' => 'from_date', 'formatter' => 'date' ],
             [ 'name' => 'to_date', 'label' => 'End Date', 'index' => 'to_date', 'formatter' => 'date' ],
             [ 'type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'p.status',
-                  'editable' => true, 'mass-editable' => true, 'options' => FCom_Promo_Model_Promo::i()->fieldOptions( 'status' ), 'editor' => 'select'
+                'editable' => true, 'mass-editable' => true, 'editor' => 'select',
+                'options' => FCom_Promo_Model_Promo::i()->fieldOptions( 'status' )
             ],
             [ 'name' => 'details', 'label' => 'Details', 'index' => 'details', 'hidden' => true ],
             [ 'name' => 'attachments', 'label' => 'Attachments', 'sortable' => false, 'hidden' => false ],
@@ -50,9 +51,9 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
 
         //load attachments
         $orm->select( "(select group_concat(a.file_name separator ', ') from " .
-                FCom_Promo_Model_Media::table() .
-                " pa inner join fcom_media_library a on a.id=pa.file_id where pa.promo_id=p.id)",
-                'attachments' )
+            FCom_Promo_Model_Media::table() .
+            " pa inner join fcom_media_library a on a.id=pa.file_id where pa.promo_id=p.id)",
+            'attachments' )
         ;
     }
 
@@ -127,10 +128,10 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             foreach ( $data[ 'group' ] as $gId => $g ) {
                 if ( $gId < 0 ) {
                     $group  = FCom_Promo_Model_Group::i()->create( [
-                              'promo_id'   => $model->id,
-                              'group_type' => $g[ 'group_type' ],
-                              'group_name' => $g[ 'group_name' ],
-                        ] )->save();
+                        'promo_id'   => $model->id,
+                        'group_type' => $g[ 'group_type' ],
+                        'group_name' => $g[ 'group_name' ],
+                    ] )->save();
                     $gIdMap[ $gId ]       = $group->id;
                     $groups[ $group->id ] = $group;
                 } elseif ( !empty( $groups[ $gId ] ) ) {
@@ -147,10 +148,10 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                             continue;
                         }
                         FCom_Promo_Model_Product::i()->create( [
-                                'promo_id'   => $model->id,
-                                'group_id'   => $gId,
-                                'product_id' => $pId,
-                            ] )->save();
+                            'promo_id'   => $model->id,
+                            'group_id'   => $gId,
+                            'product_id' => $pId,
+                        ] )->save();
                         $groupData[ $gId ][ $pId ] = 1;
                     }
                 }
@@ -165,11 +166,10 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                     }
                     if ( $pIds ) {
                         FCom_Promo_Model_Product::i()->delete_many( [
-                                'promo_id'   => $model->id,
-                                'group_id'   => $gId,
-                                'product_id' => $pIds,
-                            ]
-                        );
+                            'promo_id'   => $model->id,
+                            'group_id'   => $gId,
+                            'product_id' => $pIds,
+                        ] );
                     }
                 }
 
@@ -230,8 +230,8 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $config[ 'columns' ]   = [
             [ 'type' => 'row_select' ],
             [ 'name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 40, 'hidden' => true ],
-            [ 'name' => 'product_name', 'label'   => 'Name', 'index'   => 'product_name',
-                   'width' => 450, 'addable' => true ],
+            [ 'name' => 'product_name', 'label' => 'Name', 'index' => 'product_name',
+                'width' => 450, 'addable' => true ],
             [ 'name' => 'local_sku', 'label' => 'SKU', 'index' => 'local_sku', 'width' => 70 ],
         ];
         $actions = [
@@ -308,16 +308,15 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     public function onAttachmentsGridConfig( $args )
     {
         array_splice( $args[ 'config' ][ 'grid' ][ 'colModel' ], -1, 0, [
-                [ 'name'          => 'promo_status',
-                       'label'         => 'Status',
-                       'width'         => 80,
-                       'options'       => [ '' => 'All', 'A' => 'Active', 'I' => 'Inactive' ],
-                       'editable'      => true,
-                       'edittype'      => 'select',
-                       'searchoptions' => [ 'defaultValue' => 'A' ]
-                ],
-            ]
-        );
+            [ 'name'          => 'promo_status',
+                'label'         => 'Status',
+                'width'         => 80,
+                'options'       => [ '' => 'All', 'A' => 'Active', 'I' => 'Inactive' ],
+                'editable'      => true,
+                'edittype'      => 'select',
+                'searchoptions' => [ 'defaultValue' => 'A' ]
+            ],
+        ] );
     }
 
     public function onAttachmentsGridGetORM( $args )

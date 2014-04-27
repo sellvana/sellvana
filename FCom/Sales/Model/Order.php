@@ -136,11 +136,11 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
                 $items = $order->items();
                 foreach ( $items as $item ) {
                     $result[ $i ][ 'items' ][] = [
-                        'product_id'    => $item->product_id,
-                        'qty'    => $item->qty,
-                        'total'    => $item->total,
+                        'product_id' => $item->product_id,
+                        'qty' => $item->qty,
+                        'total' => $item->total,
                         //get product info as object and prepare data for api
-                        'product_info'    => FCom_Catalog_Model_Product::i()->prepareApiData( BUtil::fromJson( $item->product_info, true ) ),
+                        'product_info' => FCom_Catalog_Model_Product::i()->prepareApiData( BUtil::fromJson( $item->product_info, true ) ),
                     ];
                 }
             }

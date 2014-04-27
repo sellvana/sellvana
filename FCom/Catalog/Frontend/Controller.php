@@ -87,13 +87,14 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         }
 
         $post = BRequest::post();
+        $eventArgs = [ 'product' => &$product, 'qty' => $post[ 'qty' ] ];
 
         if ( !empty( $post[ 'add2cart' ] ) ) {
-            BEvents::i()->fire( 'FCom_Catalog_Frontend_Controller::action_product:addToCart', [ 'product' => &$product, 'qty' => $post[ 'qty' ] ] );
+            BEvents::i()->fire( 'FCom_Catalog_Frontend_Controller::action_product:addToCart', $eventArgs );
         }
 
         if ( !empty( $post[ 'add2wishlist' ] ) ) {
-            BEvents::i()->fire( 'FCom_Catalog_Frontend_Controller::action_product:addToWishlist', [ 'product' => &$product ] );
+            BEvents::i()->fire( 'FCom_Catalog_Frontend_Controller::action_product:addToWishlist', $eventArgs );
         }
 
 

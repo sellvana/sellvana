@@ -20,9 +20,12 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             [ 'type' => 'row_select' ],
             [ 'name' => 'id', 'label' => 'ID' ],
             [ 'name' => 'author', 'label' => 'Author' ],
-            [ 'type' => 'input', 'name' => 'status', 'label' => 'Status', 'edit_inline' => false, 'editable' => true, 'mass-editable' => true, 'editor' => 'select', 'mass-editable-show' => true,
-                  'options' => FCom_Blog_Model_Post::i()->fieldOptions( 'status' ), 'index' => $this->_mainTableAlias . '.status' ],
-            [ 'type' => 'input', 'name' => 'title', 'label' => 'Title', 'editable' => true, 'edit_inline' => true, 'validation' => [ 'required' => true ]
+            [ 'type' => 'input', 'name' => 'status', 'label' => 'Status', 'edit_inline' => false, 'editable' => true,
+                'mass-editable' => true, 'editor' => 'select', 'mass-editable-show' => true,
+                'options' => FCom_Blog_Model_Post::i()->fieldOptions( 'status' ),
+                'index' => $this->_mainTableAlias . '.status' ],
+            [ 'type' => 'input', 'name' => 'title', 'label' => 'Title', 'editable' => true, 'edit_inline' => true,
+                'validation' => [ 'required' => true ]
 //                'href' => BApp::href('blog/post/form/?id=:id')
             ],
             [ 'name' => 'url_key', 'label' => 'Url Key', 'hidden' => true ],

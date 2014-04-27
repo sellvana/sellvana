@@ -148,7 +148,8 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         $hlp = FCom_Catalog_Model_CategoryProduct::i();
 
         if ( sizeof( $addIds ) > 0 && $addIds[ 0 ] != '' ) {
-            $exists = $hlp->orm( 'cp' )->where( 'category_id', $this->id() )->where_in( 'product_id', $addIds )->find_many_assoc( 'product_id' );
+            $exists = $hlp->orm( 'cp' )->where( 'category_id', $this->id() )->where_in( 'product_id', $addIds )
+                ->find_many_assoc( 'product_id' );
             foreach ( $addIds as $pId ) {
                 if ( empty( $exists[ $pId ] ) ) {
                     $hlp->create( [ 'category_id' => $this->id(), 'product_id' => $pId ] )->save();

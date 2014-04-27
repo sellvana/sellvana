@@ -651,7 +651,13 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
 
             $joinMethod = ( isset( $j[ 'type' ] ) ? $j[ 'type' ] . '_' : '' ) . 'join';
 
-            $where = isset( $j[ 'where' ] ) ? str_replace( [ '{lk}', '{fk}', '{lt}', '{ft}' ], [ $localKey, $foreignKey, $mainTableAlias, $tableAlias ], $j[ 'where' ] ) : [ $foreignKey, $op, $localKey ];
+            $where = isset( $j[ 'where' ] )
+                ? str_replace(
+                    [ '{lk}', '{fk}', '{lt}', '{ft}' ],
+                    [ $localKey, $foreignKey, $mainTableAlias, $tableAlias ],
+                    $j[ 'where' ]
+                )
+                : [ $foreignKey, $op, $localKey ];
 
             $orm->$joinMethod( $table, $where, $tableAlias );
 

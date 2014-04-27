@@ -39,7 +39,8 @@ class FCom_CustomerGroups_Admin extends BClass
                      * onProductAfterSave called multiple times when product save
                      * @Todo: find other solutions
                      */
-                    $tier = $model->orm()->where( 'product_id', $row[ 'product_id' ] )->where( 'group_id', $row[ 'group_id' ] )->where( 'qty', $row[ 'qty' ] )->find_one();
+                    $tier = $model->orm()->where( 'product_id', $row[ 'product_id' ] )
+                        ->where( 'group_id', $row[ 'group_id' ] )->where( 'qty', $row[ 'qty' ] )->find_one();
                     if ( !$tier ) {
                         $model->create( $row )->save();
                     }

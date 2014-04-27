@@ -152,7 +152,10 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
                 if ( empty( $col[ 'name' ] ) || $col[ 'name' ] === 'cb' ) {
                     continue;
                 }
-                $columns[ $col[ 'name' ] ] = [ 'position' => $col[ 'position' ], 'hidden' => empty( $col[ 'hidden' ] ) ? false : $col[ 'hidden' ] ];
+                $columns[ $col[ 'name' ] ] = [
+                    'position' => $col[ 'position' ],
+                    'hidden' => empty( $col[ 'hidden' ] ) ? false : $col[ 'hidden' ]
+                ];
             }
             $data = [ 'grid' => [ $r[ 'grid' ] => [ 'columns' => $columns ] ] ];
 
@@ -210,7 +213,9 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
                 $data[ 'closed' ] = true;
             }
             if ( $r[ 'do' ] == 'dashboard.widget.collapse' ) {
-                $data[ 'collapsed' ] = !empty( $r[ 'collapsed' ] ) && $r[ 'collapsed' ] !== '0' && $r[ 'collapsed' ] !== 'false';
+                $data[ 'collapsed' ] = !empty( $r[ 'collapsed' ] )
+                    && $r[ 'collapsed' ] !== '0'
+                    && $r[ 'collapsed' ] !== 'false';
             }
             $data = [ 'dashboard' => [ 'widgets' => [ $r[ 'key' ] => $data ] ] ];
             break;
@@ -226,8 +231,10 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         $static_page = FCom_Admin_Controller_Templates::i()->getAreaLayout()->findViewsRegex( '#^(static/)[\w\-]+$#' );
         $site_map = [];
         foreach ( $static_page as $view => $arr ) {
-            array_push( $site_map, [ 'loc' => BApp::frontendHref( preg_replace( '#static/#', '', $view ) ), 'changefreq' => 'daily' ] );
-
+            array_push( $site_map, [
+                'loc' => BApp::frontendHref( preg_replace( '#static/#', '', $view ) ),
+                'changefreq' => 'daily'
+            ] );
         }
         BEvents::i()->fire( __METHOD__, [ 'site_map' => &$site_map ] );
         $xml = new DOMDocument( '1.0' );

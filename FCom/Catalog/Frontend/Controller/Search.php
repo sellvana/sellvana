@@ -20,7 +20,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         }
 
         $productsORM = FCom_Catalog_Model_Product::i()->searchProductOrm( $q, $filter, $category );
-        BEvents::i()->fire( 'FCom_Catalog_Frontend_Controller_Search::action_category:products_orm', [ 'data' => $productsORM ] );
+        BEvents::i()->fire( 'FCom_Catalog_Frontend_Controller_Search::action_category:products_orm', [ 'orm' => $productsORM ] );
         $productsData = $productsORM->paginate( null, [ 'ps' => 25 ] );
         BEvents::i()->fire( 'FCom_Catalog_Frontend_Controller_Search::action_category:products_data', [ 'data' => &$productsData ] );
 
@@ -61,7 +61,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
 
         $layout->view( 'catalog/product/pager' )->set( [ 'query' => $q, 'filters' => $filter ] );
         $layout->view( 'catalog/nav' )->set( [
-            'category' => $category, 
+            'category' => $category,
             'active_ids' => $activeCatIds,
             'home_url' => BConfig::i()->get( 'modules/FCom_Catalog/url_prefix' ),
         ] );

@@ -80,11 +80,13 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
         $password = !empty( $form[ 'password' ] ) ? $form[ 'password' ] : null;
         $confirm = !empty( $form[ 'password_confirm' ] ) ? $form[ 'password_confirm' ] : null;
         $returnUrl = BRequest::i()->referrer();
-        if ( !( $token && ( $user = FCom_Admin_Model_User::i()->load( $token, 'token' ) ) && $user->get( 'token' ) === $token ) ) {
+        if ( !( $token && ( $user = FCom_Admin_Model_User::i()->load( $token, 'token' ) )
+            && $user->get( 'token' ) === $token )
+        ) {
             $this->message( 'Invalid token', 'error' );
             BResponse::i()->redirect( $returnUrl );
             return;
-        } elseif ( !( $password && $confirm && $password === $confirm ) ) {
+        } elseif ( !( $password && $confirm && ( $password === $confirm ) ) ) {
             $this->message( 'Invalid password or confirmation', 'error' );
             BResponse::i()->redirect( $returnUrl );
             return;

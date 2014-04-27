@@ -31,7 +31,8 @@ class FCom_CatalogIndex_Indexer extends BClass
                     //->offset($start)
                     ->find_many();
                 static::indexProducts( $products );
-                echo 'DONE CHUNK ' . ( $i++ ) . ': ' . memory_get_usage( true ) . ' / ' . memory_get_peak_usage( true ) . ' - ' . ( time() - $t ) . "s\n";
+                echo 'DONE CHUNK ' . ( $i++ ) . ': ' . memory_get_usage( true ) . ' / ' . memory_get_peak_usage( true )
+                    . ' - ' . ( time() - $t ) . "s\n";
                 $t = time();
                 //$start += static::$_maxChunkSize;
             } while ( sizeof( $products ) == static::$_maxChunkSize );
@@ -307,7 +308,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 return [ 'orm' => $productsOrm, 'facets' => [] ];
             }
         }
-        
+
         // result for facet counts
         $facets = [];
 
@@ -419,7 +420,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                                 // display and count children
                                 $showCategory = true;
                                 $showCount = true;
-                            } elseif ( strpos( $v, $vVal . '/' ) === 0 ) { 
+                            } elseif ( strpos( $v, $vVal . '/' ) === 0 ) {
                                 // display parent categories
                                 $showCategory = true;
                                 $isParent = true;
@@ -428,7 +429,9 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                                 $showCategory = true;
                                 $isParent = true;
                                 //$showCount = true;
-                            } elseif ( !empty( $config[ 'show_sibling_categories' ] ) && $value1[ 'category_level' ] === $curLevel && strpos( $vVal, $valueParent . '/' ) === 0 ) {
+                            } elseif ( !empty( $config[ 'show_sibling_categories' ] )
+                                && $value1[ 'category_level' ] === $curLevel && strpos( $vVal, $valueParent . '/' ) === 0
+                            ) {
                                 // display siblings of current category
                                 $showCategory = true;
                                 $showCount = true;
@@ -533,7 +536,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 }
                 if ( $counts ) {
                     foreach ( $counts as $vId => $cnt ) {
-                        if ( !isset( $filterValues[ $vId ] ) || !is_array( $v ) 
+                        if ( !isset( $filterValues[ $vId ] ) || !is_array( $v )
                             || !isset( $filterFields[ $filterFieldNamesById[ $v[ 'field_id' ] ] ] )
                         ) {
                             continue;
