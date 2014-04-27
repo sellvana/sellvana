@@ -48,18 +48,18 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
     {
         $class = $this->_navModelClass;
         $nodeChildren = $node ? $node->children() : $class::i()->orm()->where_null( 'parent_id' )->find_many();
-        $children = array();
+        $children = [];
         foreach ( $nodeChildren as $c ) {
             $nodeName = $c->get( 'node_name' );
             $numChildren = $c->get( 'num_children' );
-            $children[] = array(
+            $children[] = [
                 'data'     => $nodeName ? $nodeName : 'ROOT',
-                'attr'     => array( 'id' => $c->id() ),
+                'attr'     => [ 'id' => $c->id() ],
                 'state'    => $numChildren ? ( $depth ? 'open' : 'closed' ) : null,
                 'rel'      => $node ? 'root' : ( $numChildren ? 'parent' : 'leaf' ),
                 'position' => $c->get( 'sort_order' ),
                 'children' => $depth && $numChildren ? $this->_nodeChildren( $c, $depth-1 ) : null,
-            );
+            ];
         }
         return $children;
     }
@@ -73,7 +73,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                 throw new BException( 'Invalid ID' );
             }
             /** @var $node FCom_Core_Model_TreeAbstract */
-            $result = array( 'status' => 1 );
+            $result = [ 'status' => 1 ];
 
             $eventName = static::$_origClass . '::action_tree_data__POST.' . $r->post( 'operation' );
             BEvents::i()->fire( $eventName . ':before', $r->post() );
@@ -85,7 +85,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                         $node->cacheSaveDirty();
                         $result[ 'id' ] = $child->id;
                     } else {
-                        $result = array( 'status' => 0, 'message' => $this->_( "Can't create node duplicate name node." ) );
+                        $result = [ 'status' => 0, 'message' => $this->_( "Can't create node duplicate name node." ) ];
                     }
                     break;
 
@@ -97,7 +97,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                         $node->rename( $r->post( 'title' ), true );
                         $node->cacheSaveDirty();
                     } else {
-                        $result = array( 'status' => 0, 'message' => $this->_( "Can't rename duplicate name node." ) );
+                        $result = [ 'status' => 0, 'message' => $this->_( "Can't rename duplicate name node." ) ];
                     }
 
                     break;
@@ -148,7 +148,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
 
             BEvents::i()->fire( $eventName . ':after', $r->post() );
         } catch ( Exception $e ) {
-            $result = array( 'status' => 0, 'message' => $e->getMessage() );
+            $result = [ 'status' => 0, 'message' => $e->getMessage() ];
         }
         BResponse::i()->json( $result );
     }
@@ -179,7 +179,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
             }
 
             $model->set( BRequest::i()->post( 'model' ) )
-                ->set( array( 'url_path' => null, 'full_name' => null ) );
+                ->set( [ 'url_path' => null, 'full_name' => null ] );
 
             if ( BRequest::i()->post( 'action' ) === 'clone' ) {
                 $parent = $model->parent();
@@ -194,20 +194,20 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
             //always return false -> update rules in FCom_Core_Model_Abstract
             /** @see FCom_Core_Model_Abstract */
             $formId = $this->formId;
-            if ( $model->validate( $model->as_array(), array(), $formId ) ) {
+            if ( $model->validate( $model->as_array(), [], $formId ) ) {
 
                 $model->save();
                 $model->refreshDescendants( true, true );
-                $result = array( 'status' => 'success', 'message' => 'Node updated', 'path' => $model->full_name );
+                $result = [ 'status' => 'success', 'message' => 'Node updated', 'path' => $model->full_name ];
             } else {
                 $this->message( 'Cannot save data, please fix above errors', 'error', 'validator-errors:' . $formId );
-                $result = array( 'status' => 'error', 'message' => $this->getErrorMessages() );
+                $result = [ 'status' => 'error', 'message' => $this->getErrorMessages() ];
             }
         } catch ( Exception $e ) {
 //BDebug::exceptionHandler($e);
 #print_r(BORM::get_last_query());
 #print_r($e); exit;
-            $result = array( 'status' => 'error', 'message' => $e->getMessage() );
+            $result = [ 'status' => 'error', 'message' => $e->getMessage() ];
         }
         BResponse::i()->json( $result );
     }
@@ -215,7 +215,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
     public function getErrorMessages()
     {
         $messages = BSession::i()->messages( 'validator-errors:' . $this->formId );
-        $errorMessages = array();
+        $errorMessages = [];
         foreach ( $messages as $m ) {
             if ( is_array( $m[ 'msg' ] ) )
                 $errorMessages[] = $m[ 'msg' ][ 'error' ];

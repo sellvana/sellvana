@@ -7,10 +7,10 @@ class FCom_Admin_Controller_HeaderSearch extends FCom_Admin_Controller_Abstract_
         if ( BRequest::i()->xhr() ) {
             return ;
         }
-        $result = array();
+        $result = [];
         $priority = 1000000;
         $url = '';
-        BEvents::i()->fire( __METHOD__, array( 'result' => &$result ) );
+        BEvents::i()->fire( __METHOD__, [ 'result' => &$result ] );
         foreach ( $result as $key ) {
             if ( is_array( $key ) ) {
                 if ( isset( $key[ 'priority' ] ) && $key[ 'url' ] && $key[ 'priority' ] < $priority ) {

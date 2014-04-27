@@ -5,11 +5,11 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     static protected $_table = 'fcom_pushserver_client';
     static protected $_origClass = __CLASS__;
 
-    static protected $_clientCache = array();
+    static protected $_clientCache = [];
     static protected $_windowName;
     static protected $_connId;
 
-    protected $_messages = array();
+    protected $_messages = [];
     /**
      * - id
      * - session_id
@@ -32,10 +32,10 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         }
         $client = static::load( $sessId, 'session_id' );
         if ( !$client ) {
-            $client = static::create( array(
+            $client = static::create( [
                 'session_id' => $sessId,
                 'remote_ip' => BRequest::i()->ip(),
-            ) )->save();
+            ] )->save();
         }
         if ( !$client->get( 'admin_user_id' ) && class_exists( 'FCom_Admin_Model_User' ) ) {
             $userId = FCom_Admin_Model_User::i()->sessionUserId();
@@ -107,10 +107,10 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         $client = FCom_PushServer_Model_Client::i()->sessionClient();
 
         if ( !isset( $request[ 'window_name' ] ) || !isset( $request[ 'conn_id' ] ) ) {
-            $client->send( array(
+            $client->send( [
                 'signal' => 'error',
                 'description' => 'Missing window_name or conn_id',
-            ) );
+            ] );
             return;
         }
         static::$_windowName = $request[ 'window_name' ];
@@ -165,13 +165,13 @@ if ( FCom_PushServer_Main::isDebugMode() ) {
                     $instance->onAfterDispatch();
                 }
             } catch ( Exception $e ) {
-                $client->send( array(
+                $client->send( [
                     'ref_seq' => !empty( $message[ 'seq' ] ) ? $message[ 'seq' ] : null,
                     'ref_signal' => !empty( $message[ 'signal' ] ) ? $message[ 'signal' ] : null,
                     'signal' => 'error',
                     'description' => $e->getMessage(),
                     'trace' => $e->getTrace(),
-                ) );
+                ] );
             }
         }
 
@@ -186,7 +186,7 @@ if ( FCom_PushServer_Main::isDebugMode() ) {
     {
         $oldWindows = $newWindows = (array) $this->getData( 'windows' );
         $oldConnections = !empty( $oldWindows[ static::$_windowName ][ 'connections' ] )
-            ? $oldWindows[ static::$_windowName ][ 'connections' ] : array();
+            ? $oldWindows[ static::$_windowName ][ 'connections' ] : [];
 
         foreach ( $newWindows as $windowName => $window ) { // some cleanup
             if ( empty( $window[ 'connections' ] ) ) {
@@ -254,11 +254,11 @@ if ( FCom_PushServer_Main::isDebugMode() ) {
     public function sync()
     {
         $msgHlp = FCom_PushServer_Model_Message::i();
-        $where = array( 'client_id' => $this->get( 'id' ), 'window_name' => static::$_windowName, 'status' => 'published' );
-        $msgHlp->update_many( array( 'status' => 'locked' ), $where );
+        $where = [ 'client_id' => $this->get( 'id' ), 'window_name' => static::$_windowName, 'status' => 'published' ];
+        $msgHlp->update_many( [ 'status' => 'locked' ], $where );
         $where[ 'status' ] = 'locked';
         $messageModels = $msgHlp->orm( 'm' )->where( $where )->find_many_assoc();
-        $messages = array();
+        $messages = [];
         foreach ( $messageModels as $msg ) {
 
 if ( FCom_PushServer_Main::isDebugMode() ) {
@@ -281,7 +281,7 @@ if ( FCom_PushServer_Main::isDebugMode() ) {
             unset( $connections[ static::$_connId ] );
             $this->setData( $connKey, $connections );
             if ( !$messages ) {
-                $messages[] = array( 'channel' => 'client', 'signal' => 'noop' );
+                $messages[] = [ 'channel' => 'client', 'signal' => 'noop' ];
             }
         }
         // foreach ($connections as $connId => $conn) {
@@ -329,7 +329,7 @@ if ( FCom_PushServer_Main::isDebugMode() ) {
     public function setStatus( $status )
     {
         $this->set( 'status', $status );
-        BEvents::i()->fire( __METHOD__, array( 'client' => $this, 'status' => $status ) );
+        BEvents::i()->fire( __METHOD__, [ 'client' => $this, 'status' => $status ] );
         return $this;
     }
 
@@ -345,7 +345,7 @@ if ( FCom_PushServer_Main::isDebugMode() ) {
             $channel = FCom_PushServer_Model_Channel::i()->getChannel( $channel, true );
         }
         $hlp = FCom_PushServer_Model_Subscriber::i();
-        $data = array( 'client_id' => $this->id(), 'channel_id' => $channel->id() );
+        $data = [ 'client_id' => $this->id(), 'channel_id' => $channel->id() ];
         $subscriber = $hlp->load( $data );
         if ( !$subscriber ) {
             $subscriber = $hlp->create( $data )->save();
@@ -361,7 +361,7 @@ if ( FCom_PushServer_Main::isDebugMode() ) {
         if ( !is_object( $channel ) ) {
             $channel = FCom_PushServer_Model_Channel::i()->getChannel( $channel, true );
         }
-        $data = array( 'client_id' => $this->id(), 'channel_id' => $channel->id() );
+        $data = [ 'client_id' => $this->id(), 'channel_id' => $channel->id() ];
         FCom_PushServer_Model_Subscriber::i()->delete_many( $data );
         return $this;
     }

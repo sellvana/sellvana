@@ -11,9 +11,9 @@ class FCom_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller_Abs
     {
         $output = '<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-        $sitemaps = array( //TODO: fetch real paginated sitemaps
-            array( 'loc' => BApp::href( 'sitemap.xml.gz' ) ),
-        );
+        $sitemaps = [ //TODO: fetch real paginated sitemaps
+            [ 'loc' => BApp::href( 'sitemap.xml.gz' ) ],
+        ];
         foreach ( $sitemaps as $sitemap ) {
             $output .= '<sitemap>'
                 . '<loc>' . $sitemap[ 'loc' ] . '</loc>'
@@ -31,9 +31,9 @@ class FCom_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller_Abs
         $page = $params[ 2 ];
         $type = $params[ 3 ];
 
-        $urls = array();
+        $urls = [];
         BEvents::i()->fire( 'FCom_Seo_Frontend_Controller_Sitemaps.sitemap',
-            array( 'urls' => &$urls, 'page' => $page, 'filetype' => $type ) );
+            [ 'urls' => &$urls, 'page' => $page, 'filetype' => $type ] );
 
         switch ( $type ) {
         case 'txt':
@@ -48,7 +48,7 @@ class FCom_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller_Abs
         }
         foreach ( $urls as $url ) {
             if ( !is_array( $url ) ) {
-                $url = array( 'loc' => $url );
+                $url = [ 'loc' => $url ];
             }
             switch ( $type ) {
             case '.txt':

@@ -8,22 +8,22 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_admin_role';
 
-    protected static $_validationRules = array(
-        array( 'role_name', '@required' ),
+    protected static $_validationRules = [
+        [ 'role_name', '@required' ],
         //array('permissions_data', '@required'),
-    );
+    ];
 
-    protected static $_allPermissions = array(
-        '/' => array( 'title' => 'All Permissions', 'level' => 0 ),
-        'admin' => array( 'title' => 'Admin Tasks', 'level' => 1 ),
-    );
+    protected static $_allPermissions = [
+        '/' => [ 'title' => 'All Permissions', 'level' => 0 ],
+        'admin' => [ 'title' => 'Admin Tasks', 'level' => 1 ],
+    ];
 
     public static function options()
     {
         $roles = static::i()->orm()
             ->select( 'id' )->select( 'role_name' )
             ->find_many();
-        $options = array();
+        $options = [];
         foreach ( $roles as $r ) {
             $options[ $r->id ] = $r->role_name;
         }
@@ -39,7 +39,7 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
             return $this;
         }
         if ( is_string( $params ) ) {
-            $params = array( 'title' => $params );
+            $params = [ 'title' => $params ];
         }
         if ( empty( $params[ 'module_name' ] ) ) {
             $params[ 'module_name' ] = BModuleRegistry::i()->currentModuleName();
@@ -56,16 +56,16 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
     public function getAllPermissionsTree( $rootPath = null, $level = null )
     {
         if ( is_null( $rootPath ) ) {
-            return array( array(
+            return [ [
                 'data' => static::$_allPermissions[ '/' ][ 'title' ],
-                'attr' => array( 'id' => 'perm___', 'path' => '/' ),
+                'attr' => [ 'id' => 'perm___', 'path' => '/' ],
                 'icon' => 'folder',
                 'state' => 'open',
                 'children' => $this->getAllPermissionsTree( '', 1 ),
-            ) );
+            ] ];
         }
 
-        $nodes = array();
+        $nodes = [];
         foreach ( static::$_allPermissions as $path => $params ) {
             if ( !isset( $params[ 'level' ] ) ) {
                 $params[ 'level' ] = sizeof( explode( '/', $path ) );
@@ -75,13 +75,13 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
                 continue;
             }
             $children = $this->getAllPermissionsTree( $path . '/', $level + 1 );
-            $nodes[] = array(
+            $nodes[] = [
                 'data' => $params[ 'title' ],
-                'attr' => array( 'id' => 'perm_' . str_replace( '/', '__', $path ), 'path' => $path ),
+                'attr' => [ 'id' => 'perm_' . str_replace( '/', '__', $path ), 'path' => $path ],
                 'icon' => $children ? 'folder' : 'leaf',
                 'state' => $this->orm && !empty( $this->permissions[ $path ] ) && $children ? 'open' : null,
                 'children' => $children,
-            );
+            ];
         }
         unset( $params );
         if ( $nodes ) {
@@ -96,7 +96,7 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
 
     public function getPermissionIds()
     {
-        $perms = array();
+        $perms = [];
         foreach ( (array)$this->permissions as $p => $_ ) {
             $perms[ 'perm_' . str_replace( '/', '__', $p ) ] = $_;
         }

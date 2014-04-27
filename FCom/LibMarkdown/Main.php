@@ -8,11 +8,11 @@ class FCom_LibMarkdown_Main extends BClass
 
     static public function bootstrap()
     {
-        BLayout::i()->addRenderer( 'FCom_LibMarkdown', array(
+        BLayout::i()->addRenderer( 'FCom_LibMarkdown', [
             'description' => 'Markdown Extra',
             'callback' => 'FCom_LibMarkdown_Main::renderer',
-            'file_ext' => array( '.md' ),
-        ) );
+            'file_ext' => [ '.md' ],
+        ] );
     }
 
     static public function parser()

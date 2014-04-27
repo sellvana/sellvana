@@ -41,23 +41,23 @@ class FullWallet {
       }
     }
 
-    $fwr = array(
+    $fwr = [
       'iat' => $now,
       'exp' => $now + 3600,
       'typ' => 'google/wallet/online/full/v2/request',
       'aud' => 'Google',
       'iss' => MERCHANT_ID,
-      'request' => array(
+      'request' => [
         'merchantName' => MERCHANT_NAME,
         'googleTransactionId' => $input[ 'googleTransactionId' ],
         'origin' => ORIGIN,
-        'cart' => array(
+        'cart' => [
           'totalPrice' => $total_price,
           'currencyCode' => $currency_code,
           'lineItems' => $line_items
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
     $json = str_replace( '\/', '/', json_encode( $fwr ) );
     WalletUtil::encode_send_jwt( $fwr );
   }

@@ -14,17 +14,17 @@ $s = $data[ 'result' ][ 'state' ];
 <label>Rows per page:</label>
 <select onchange="location.href=this.value">
 <?php foreach ( $config[ 'pageSizeOptions' ] as $i ): ?>
-    <option value="<?php echo $this->gridUrl( array( 'pageSize' => $i ) ) ?>" <?php if ( !empty( $s[ 'pageSize' ] ) && $s[ 'pageSize' ] == $i ):?>selected="selected"<?php endif ?> ><?php echo $i ?></option>
+    <option value="<?php echo $this->gridUrl( [ 'pageSize' => $i ] ) ?>" <?php if ( !empty( $s[ 'pageSize' ] ) && $s[ 'pageSize' ] == $i ):?>selected="selected"<?php endif ?> ><?php echo $i ?></option>
 <?php endforeach ?>
 </select>
 
 <label>Page:</label>
-<?php if ( $s[ 'page' ] > 1 ): ?><a href="<?php echo $this->gridUrl( array( 'page' => $s[ 'page' ]-1 ) ) ?>">&lt;&lt;</a><?php endif ?>
+<?php if ( $s[ 'page' ] > 1 ): ?><a href="<?php echo $this->gridUrl( [ 'page' => $s[ 'page' ]-1 ] ) ?>">&lt;&lt;</a><?php endif ?>
 <select onchange="location.href=this.value">
 <?php for ( $i = 1; $i <= $s[ 'totalPages' ]; $i++ ): ?>
-    <option value="<?php echo $this->gridUrl( array( 'page' => $i ) ) ?>" <?php if ( !empty( $s[ 'page' ] ) && $s[ 'page' ] == $i ):?>selected="selected"<?php endif ?> ><?php echo $i ?></option><?php endfor ?>
+    <option value="<?php echo $this->gridUrl( [ 'page' => $i ] ) ?>" <?php if ( !empty( $s[ 'page' ] ) && $s[ 'page' ] == $i ):?>selected="selected"<?php endif ?> ><?php echo $i ?></option><?php endfor ?>
 </select>
-<?php if ( $s[ 'page' ] < $s[ 'totalPages' ] ): ?><a href="<?php echo $this->gridUrl( array( 'page' => $s[ 'page' ] + 1 ) ) ?>">&gt;&gt;</a><?php endif ?>
+<?php if ( $s[ 'page' ] < $s[ 'totalPages' ] ): ?><a href="<?php echo $this->gridUrl( [ 'page' => $s[ 'page' ] + 1 ] ) ?>">&gt;&gt;</a><?php endif ?>
  of <?php echo $s[ 'totalPages' ] ?> ::
 
 <?php /*if ($s['page']>6): ?><a href="<?php echo $this->gridUrl(array('page'=>1)) ?>">1</a> <?php endif ?>
@@ -68,7 +68,7 @@ $s = $data[ 'result' ][ 'state' ];
 <tbody>
 <?php foreach ( $data[ 'result' ][ 'out' ] as $rowId => $row ): ?>
     <tr class="<?php echo $rowId % 2 ? 'odd' : 'even' ?>">
-<?php foreach ( $config[ 'columns' ] as $colId => $column ): $cell = !empty( $row[ $colId ] ) ? $row[ $colId ] : array() ?>
+<?php foreach ( $config[ 'columns' ] as $colId => $column ): $cell = !empty( $row[ $colId ] ) ? $row[ $colId ] : [] ?>
         <td <?php if ( !empty( $column[ 'style' ] ) ): ?>style="<?php echo is_callable( $column[ 'style' ] ) ? call_user_func( $column[ 'style' ], $row, $colId ) : $column[ 'style' ] ?>"<?php endif ?> <?php if (!empty($column['class'])): ?>class="<?php echo $column['class'] ?>"<?php endif ?>>
 <?php switch ( !empty( $column[ 'type' ] ) ? $column[ 'type' ] : '' ): ?>
 <?php case 'link': ?>

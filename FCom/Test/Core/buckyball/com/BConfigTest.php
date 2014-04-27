@@ -15,7 +15,7 @@ class BConfig_Test extends PHPUnit_Framework_TestCase
     public function testAdd()
     {
         $config = BConfig::i();
-        $set = array( 'key' => 'value' );
+        $set = [ 'key' => 'value' ];
         $config->add( $set );
         $this->assertEquals( 'value', $config->get( 'key' ) );
     }
@@ -30,12 +30,12 @@ class BConfig_Test extends PHPUnit_Framework_TestCase
     {
         $config = BConfig::i();
         //set first time value
-        $set = array( 'key' => 'value' );
+        $set = [ 'key' => 'value' ];
         $config->add( $set );
         $this->assertEquals( 'value', $config->get( 'key' ) );
 
         //set second time value2
-        $set = array( 'key' => 'value2' );
+        $set = [ 'key' => 'value2' ];
         $config->add( $set );
         $this->assertEquals( 'value2', $config->get( 'key' ) );
     }

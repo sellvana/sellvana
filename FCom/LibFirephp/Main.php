@@ -14,13 +14,13 @@ class FCom_LibFirephp_Main extends BClass
             $firephp->setEnabled( $enabled );
         }
 
-        $options = array(
+        $options = [
             'maxObjectDepth' => 10,
             'maxArrayDepth' => 10,
             'maxDepth' => 20,
             'useNativeJsonEncode' => true,
             'includeLineNumbers' => true,
-        );
+        ];
         $firephp->setOptions( $options );
 
         /*

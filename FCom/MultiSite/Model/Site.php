@@ -5,10 +5,10 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
     static protected $_table = 'fcom_multisite_site';
     static protected $_mapCacheKey = 'FCom_MultiSite.domain_map';
 
-    protected static $_validationRules = array(
-        array( 'name', '@required' ),
-        array( 'root_category_id', '@integer' ),
-    );
+    protected static $_validationRules = [
+        [ 'name', '@required' ],
+        [ 'root_category_id', '@integer' ],
+    ];
 
     public function onAfterSave()
     {
@@ -19,9 +19,9 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
     static public function createDomainMap()
     {
         if ( !BDb::ddlTableExists( static::table() ) ) {
-            return array();
+            return [];
         }
-        $map = array();
+        $map = [];
         $sites = (array)static::i()->orm()->find_many();
         foreach ( $sites as $site ) {
             $domains = explode( "\n", $site->match_domains );
@@ -70,7 +70,7 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
     public function siteOptions()
     {
         $sites = (array)static::i()->orm()->find_many();
-        $groups = array();
+        $groups = [];
         foreach ( $sites as $model ) {
             $key            = $model->id;
             $groups[ $key ] = $model->name;

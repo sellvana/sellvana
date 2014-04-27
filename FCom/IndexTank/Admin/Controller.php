@@ -10,11 +10,11 @@ class FCom_IndexTank_Admin_Controller extends FCom_Admin_Controller_Abstract
     }
     static public function initButtons()
     {
-        FCom_LibGanon_Main::i()->ready( 'FCom_IndexTank_Admin_Controller::initIndexButtons', array( 'on_path' => array(
+        FCom_LibGanon_Main::i()->ready( 'FCom_IndexTank_Admin_Controller::initIndexButtons', [ 'on_path' => [
             '/catalog/products',
             '/indextank/product_fields',
             '/indextank/product_functions',
-        ) ) );
+        ] ] );
     }
 
     public static function initIndexButtons( $args )

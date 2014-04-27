@@ -1,3 +1,3 @@
-<?php return array( 'Comments' => 'GRcomments',
+<?php return [ 'Comments' => 'GRcomments',
 'posts' => 'GR posts',
-'days' => 'GR days' );
+'days' => 'GR days' ];

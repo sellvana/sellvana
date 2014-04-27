@@ -10,7 +10,7 @@ class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abstract
         $result = BRequest::i()->receiveFiles( 'image', BConfig::i()->get( 'fs/media_dir' ) . '/tmp' );
         $imgUrl = BConfig::i()->get( 'web/media_dir' ) . '/tmp/' . $result[ 'image' ][ 'name' ];
         $imgUrl = FCom_Core_Main::i()->resizeUrl() . '?f=' . urlencode( ltrim( $imgUrl, '/' ) );
-        BResponse::i()->json( array( 'image' => array( 'url' => $imgUrl ) ) );
+        BResponse::i()->json( [ 'image' => [ 'url' => $imgUrl ] ] );
     }
 
     public function action_update__PUT()
@@ -20,7 +20,7 @@ class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abstract
         }
         $request = BRequest::i()->json();
 
-        $result = array();
+        $result = [];
         try {
             if ( empty( $request[ 'content' ] ) ) {
                 throw new Exception( 'Missing content' );
@@ -29,7 +29,7 @@ class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abstract
 
             foreach ( $request[ 'content' ] as $id => $params ) {
                 if ( empty( $params[ 'data' ][ 'entity' ] ) || empty( $handlers[ $params[ 'data' ][ 'entity' ] ] ) ) {
-                    $result[ 'content' ][ $id ] = array( 'error' => 'Missing or invalid entity' );
+                    $result[ 'content' ][ $id ] = [ 'error' => 'Missing or invalid entity' ];
                     continue;
                 }
                 $handler = $handlers[ $params[ 'data' ][ 'entity' ] ];
@@ -43,7 +43,7 @@ class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abstract
             $result[ 'message' ] = $e->getMessage();
         }
 
-        BEvents::i()->fire( __METHOD__ . ':after', array( 'request' => $request, 'result' => $result ) );
+        BEvents::i()->fire( __METHOD__ . ':after', [ 'request' => $request, 'result' => $result ] );
 
         BResponse::i()->json( $result );
     }

@@ -18,9 +18,9 @@ class FCom_Email_Main extends BClass
             BEmail::i()->setDefaultHandler( $c[ 'default_handler' ] );
         }
 
-        FCom_Admin_Model_Role::i()->createPermission( array(
+        FCom_Admin_Model_Role::i()->createPermission( [
             'subscriptions' => 'Email Subscriptions',
-        ) );
+        ] );
     }
 
     public static function onEmailSendBefore( $args )
@@ -32,29 +32,29 @@ class FCom_Email_Main extends BClass
 
     public static function handler( $data )
     {
-        $msg = FCom_Email_Model_Message::i()->create( array(
+        $msg = FCom_Email_Model_Message::i()->create( [
             'recipient' => $data[ 'to' ],
             'subject' => $data[ 'subject' ],
             'body' => $data[ 'body' ],
             'data' => BUtil::arrayMask( $data, 'headers,params,files,orig_data' ),
             'status' => 'sending',
-        ) )->save();
+        ] )->save();
 
         BDebug::startErrorLogger();
         $result = BEmail::i()->defaultHandler( $data );
         $errors = BDebug::stopErrorLogger();
 
         if ( $result ) {
-            $msg->set( array(
+            $msg->set( [
                 'status' => 'success',
-            ) )->save();
+            ] )->save();
             return true;
         } else if ( $errors ) {
-            $msg->set( array(
+            $msg->set( [
                 'status' => 'error',
                 'error_message' => $errors[ 0 ][ 'message' ],
                 'num_attempts' => $msg->num_attempts + 1,
-            ) )->save();
+            ] )->save();
             return false;
         }
     }

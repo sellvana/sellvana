@@ -15,7 +15,7 @@ class FCom_CustomerGroups_Model_TierPrice
      * @param array $args
      * @return FCom_CustomerGroups_Model_TierPrice
      */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return parent::i( $new, $args ); // auto completion helper
     }
@@ -31,6 +31,6 @@ class FCom_CustomerGroups_Model_TierPrice
         foreach ( $tiers as $tier ) {
             $tier->set( 'save_percent', ceil( ( 1 - $tier->get( 'sale_price' ) / $price ) * 100 ) );
         }
-        return $tiers ? BDb::many_as_array( $tiers ) : array();
+        return $tiers ? BDb::many_as_array( $tiers ) : [];
     }
 }

@@ -5,10 +5,10 @@ class FCom_Geo_Model_Country extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_geo_country';
     protected static $_origClass = __CLASS__;
 
-    protected static $_optionsCache = array();
-    protected static $_importExportProfile = array (
-      'unique_key' => array ( 'iso', ),
-    );
+    protected static $_optionsCache = [];
+    protected static $_importExportProfile = [
+      'unique_key' => [ 'iso', ],
+    ];
     public static function options( $limit = null )
     {
         $key = $limit ? $limit : '-';

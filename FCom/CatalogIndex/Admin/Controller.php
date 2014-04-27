@@ -12,7 +12,7 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
         echo "<pre>Starting...\n";
         if ( BRequest::i()->request( 'CLEAR' ) ) {
             //FCom_CatalogIndex_Indexer::i()->indexDropDocs(true);
-            FCom_CatalogIndex_Model_Doc::i()->update_many( array( 'flag_reindex' => 1 ) );
+            FCom_CatalogIndex_Model_Doc::i()->update_many( [ 'flag_reindex' => 1 ] );
         }
         FCom_CatalogIndex_Indexer::i()->indexProducts( true );
         FCom_CatalogIndex_Indexer::i()->indexGC();
@@ -61,10 +61,10 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
             FCom_CustomField_Main::i()->disable( false );
             $maxId = $max->id();
 //            $categories = FCom_Catalog_Model_Category::i()->orm()->where_raw("id_path like '1/%/%'")->select('id')->find_many();
-            $products = array();
+            $products = [];
             for ( $i = 0; $i < 1000; $i++ ) {
                 ++$maxId;
-                $product = FCom_Catalog_Model_Product::i()->create( array(
+                $product = FCom_Catalog_Model_Product::i()->create( [
                     'local_sku' => 'test-' . $maxId,
                     'product_name' => 'Product ' . $maxId,
                     'short_description' => 'Short Description ' . $maxId,
@@ -72,8 +72,8 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
                     'base_price' => rand( 1, 1000 ),
                     'color' => $colors[ rand( 0, sizeof( $colors )-1 ) ],
                     'size' => $sizes[ rand( 0, sizeof( $sizes )-1 ) ],
-                ) )->save();
-                $exists = array();
+                ] )->save();
+                $exists = [];
 //                $pId = $product->id;
 //                for ($i=0; $i<5; $i++) {
 //                    do {
@@ -98,12 +98,12 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
             FCom_CustomField_Main::i()->disable( true );
             FCom_Catalog_Model_Product::i()->orm()->select( 'id' )->iterate( function( $row ) use( $catIds, $exists, $hlp ) {
                 $pId = $row->id;
-                $exists = array();
+                $exists = [];
                 for ( $i = 0; $i < 5; $i++ ) {
                     do {
                         $cId = $catIds[ rand( 0, sizeof( $catIds )-1 ) ];
                     } while ( !empty( $exists[ $pId . '-' . $cId ] ) );
-                    $hlp->create( array( 'product_id' => $pId, 'category_id' => $cId ) )->save();
+                    $hlp->create( [ 'product_id' => $pId, 'category_id' => $cId ] )->save();
                     $exists[ $pId . '-' . $cId ] = true;
                 }
             } );
@@ -122,7 +122,7 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
             echo "<pre>Starting...\n";
             if ( BRequest::i()->request( 'CLEAR' ) ) {
                 //FCom_CatalogIndex_Indexer::i()->indexDropDocs(true);
-                FCom_CatalogIndex_Model_Doc::i()->update_many( array( 'flag_reindex' => 1 ) );
+                FCom_CatalogIndex_Model_Doc::i()->update_many( [ 'flag_reindex' => 1 ] );
             }
             FCom_CatalogIndex_Indexer::i()->indexProducts( true );
             FCom_CatalogIndex_Indexer::i()->indexGC();
@@ -132,11 +132,11 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
 
         // show sample search result
         if ( false ) {
-            $result = FCom_CatalogIndex_Indexer::i()->searchProducts( 'lorem', array(
+            $result = FCom_CatalogIndex_Indexer::i()->searchProducts( 'lorem', [
                 'category' => 'category-1/subcategory-1-1',
                 'color' => 'Green',
                 'size' => 'Medium',
-            ), 'product_name' );
+            ], 'product_name' );
             echo "<pre>";
             print_r( $result[ 'facets' ] );
             $pageData = $result[ 'orm' ]->paginate();

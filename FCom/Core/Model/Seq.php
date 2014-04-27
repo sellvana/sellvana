@@ -4,8 +4,8 @@ class FCom_Core_Model_Seq extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_core_seq';
     static protected $_origClass = __CLASS__;
-    protected static $_importExportProfile = array(
-        'unique_key' => array( 'entity_type', 'current_seq_id', ), );
+    protected static $_importExportProfile = [
+        'unique_key' => [ 'entity_type', 'current_seq_id', ], ];
 
     static public function getSeqIdFormat( $entityType )
     {
@@ -23,10 +23,10 @@ class FCom_Core_Model_Seq extends FCom_Core_Model_Abstract
         BDb::run( 'lock tables ' . static::table() . ' write' );
         $seq = static::orm( static::table() )->where( 'entity_type', $entityType )->find_one();
         if ( !$seq ) {
-            $seq = static::create( array(
+            $seq = static::create( [
                 'entity_type' => $entityType,
                 'current_seq_id' => static::getFirstSeqId( $entityType )
-            ) )->save();
+            ] )->save();
         }
         $nextId = BUtil::nextStringValue( $seq->current_seq_id, static::getAllowedChars() );
         $seq->set( 'current_seq_id', $nextId )->save();
@@ -37,7 +37,7 @@ class FCom_Core_Model_Seq extends FCom_Core_Model_Abstract
     static public function getFirstSeqId( $entityType )
     {
         $seqId = str_pad( '1', 8, '0' );
-        BEvents::i()->fire( __METHOD__, array( 'entity_type' => $entityType, 'seq_id' => & $seqId ) );
+        BEvents::i()->fire( __METHOD__, [ 'entity_type' => $entityType, 'seq_id' => & $seqId ] );
         return $seqId;
     }
 }

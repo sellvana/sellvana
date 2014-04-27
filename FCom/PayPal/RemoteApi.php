@@ -6,7 +6,7 @@ class FCom_PayPal_RemoteApi extends BClass
     protected static $_baseUrl;
     protected static $_apiUrl = 'https://api-3t.sandbox.paypal.com/nvp';
 
-    protected $errorArr = array();
+    protected $errorArr = [];
 
     public function __construct()
     {
@@ -24,14 +24,14 @@ class FCom_PayPal_RemoteApi extends BClass
                 && in_array( BRequest::i()->ip(), explode( ',', $config[ 'sandbox' ][ 'ip' ] ) );
         $apiConfig = $config[ $sandbox ? 'sandbox' : 'production' ];
 
-        $nvpArr = array_merge( array(
+        $nvpArr = array_merge( [
             //'x'         => 'y',
             'METHOD'    => $methodName,
             'VERSION'   => static::$_apiVersion,
             'USER'      => $apiConfig[ 'username' ],
             'PWD'       => $apiConfig[ 'password' ],
             'SIGNATURE' => $apiConfig[ 'signature' ],
-        ), $nvpArr );
+        ], $nvpArr );
 
         $result = BUtil::remoteHttp( 'GET', self::$_apiUrl, $nvpArr );
         parse_str( $result, $resArr );
@@ -43,11 +43,11 @@ class FCom_PayPal_RemoteApi extends BClass
                 return $resArr;
             }
         }
-        $errorArr = array(
+        $errorArr = [
             'type' => 'API',
             'ack' => $ack,
             'response' => $resArr,
-        );
+        ];
         if ( isset( $resArr[ 'VERSION' ] ) ) {
             $errorArr[ 'version' ] = $resArr[ 'VERSION' ];
         }

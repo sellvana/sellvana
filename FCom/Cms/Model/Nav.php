@@ -11,7 +11,7 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
     public function getUrl()
     {
         if ( $this->url_href ) {
-            if ( 0 === stripos( $this->url_href, array( 'http://', 'https://' ) ) ) {
+            if ( 0 === stripos( $this->url_href, [ 'http://', 'https://' ] ) ) {
                 return $this->url_href;
             } else {
                 return FCom_Frontend_Main::i()->href( $this->url_href );
@@ -47,11 +47,11 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
         case 'content':
         default:
             BLayout::i()
-                ->addView( 'cms_nav', array(
+                ->addView( 'cms_nav', [
                     'renderer'    => 'FCom_LibTwig_Main::renderer',
                     'source'      => $this->content ? $this->content : ' ',
                     'source_name' => 'cms_nav:' . $this->url_path . ':' . strtotime( $this->update_at ),
-                ) )
+                ] )
                 ->hookView( 'main', 'cms_nav' )
             ;
 

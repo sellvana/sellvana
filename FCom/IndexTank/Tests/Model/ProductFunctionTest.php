@@ -10,17 +10,17 @@ class FCom_IndexTank_Tests_Model_ProductFunctionTest extends FCom_Test_DatabaseT
     {
         $this->assertEquals( 2, $this->getConnection()->getRowCount( 'fcom_indextank_product_function' ), "Pre-Condition" );
 
-        $data = array(
+        $data = [
             'name'        => "base_price_asc",
             'number'        => "2",
             'definition'       => '-d[0]'
-        );
+        ];
         FCom_IndexTank_Model_ProductFunction::orm()->create( $data )->save();
-        $data = array(
+        $data = [
             'name'        => "base_price_desc",
             'number'        => "3",
             'definition'       => 'd[0]'
-        );
+        ];
         FCom_IndexTank_Model_ProductFunction::orm()->create( $data )->save();
 
         $this->assertEquals( 4, $this->getConnection()->getRowCount( 'fcom_indextank_product_function' ), "Insert failed" );

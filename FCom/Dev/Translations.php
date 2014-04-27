@@ -20,7 +20,7 @@ class FCom_Dev_Translations extends BClass
         }
 
         //find all BLocale::_ calls and extract first parameter - translation key
-        $keys = array();
+        $keys = [];
         foreach ( $files as $file ) {
             $source = file_get_contents( $file );
             $source = static::getTwigSource( $file, $source );
@@ -68,7 +68,7 @@ class FCom_Dev_Translations extends BClass
             }
         }
         //add undefined translation to $targetFile
-        $newTranslations = array();
+        $newTranslations = [];
         if ( $translations ) {
             foreach ( $translations as $trKey => $tr ) {
                 list( , $newTranslations[ $trKey ] ) = each( $tr );
@@ -120,7 +120,7 @@ class FCom_Dev_Translations extends BClass
         $handle = fopen( $targetFile, "w" );
         foreach ( $array as $k => $v ) {
             $k = trim( $k, '"' );
-            fputcsv( $handle, array( $k, $v ) );
+            fputcsv( $handle, [ $k, $v ] );
         }
         fclose( $handle );
     }

@@ -7,7 +7,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
     #protected $_apiUrl = 'https://market.sellvana.com/';
     protected $_apiUrl = 'http://market.sellvana.com/';
 
-    public function getUrl( $path = '', $params = array() )
+    public function getUrl( $path = '', $params = [] )
     {
         $url = $this->_apiUrl;
         $url .= ltrim( $path, '/' );
@@ -20,11 +20,11 @@ final class FCom_MarketClient_RemoteApi extends BClass
     public function setupConnection()
     {
         $siteKey = BConfig::i()->get( 'modules/FCom_MarketClient/site_key' );
-        $url = $this->getUrl( 'api/v1/market/site/connect', array(
+        $url = $this->getUrl( 'api/v1/market/site/connect', [
             'admin_url' => BApp::href(),
             'retry_url' => BApp::href( 'marketclient/site/connect' ),
             'site_key' => $siteKey,
-        ) );
+        ] );
         $response = BUtil::remoteHttp( 'GET', $url );
         $result = BUtil::fromJson( $response );
         if ( !empty( $result[ 'site_key' ] ) ) {
@@ -41,7 +41,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
             return $result;
         }
         if ( !$result ) {
-            $result = array();
+            $result = [];
         }
 
         if ( true === $modules ) {
@@ -49,10 +49,10 @@ final class FCom_MarketClient_RemoteApi extends BClass
         }
 
         $siteKey = BConfig::i()->get( 'modules/FCom_MarketClient/site_key' );
-        $url = $this->getUrl( 'api/v1/market/module/version', array(
+        $url = $this->getUrl( 'api/v1/market/module/version', [
             'mod_name' => $modules,
             'site_key' => $siteKey,
-        ) );
+        ] );
         $response = BUtil::remoteHttp( "GET", $url );
 #echo "<pre>"; var_dump($response); exit;
         $modResult = BUtil::fromJson( $response );
@@ -79,9 +79,9 @@ final class FCom_MarketClient_RemoteApi extends BClass
 
     public function getModuleInstallInfo( $modules )
     {
-        $url = $this->getUrl( 'api/v1/market/module/install_info', array(
+        $url = $this->getUrl( 'api/v1/market/module/install_info', [
             'mod_name' => $modules,
-        ) );
+        ] );
         $response = BUtil::remoteHttp( "GET", $url );
 #var_dump($response); exit;
         $result = BUtil::fromJson( $response );
@@ -114,10 +114,10 @@ final class FCom_MarketClient_RemoteApi extends BClass
     {
         $siteKey = BConfig::i()->get( 'modules/FCom_MarketClient/site_key' );
         $url = $this->getUrl( 'api/v1/market/module/create' );
-        $data = array(
+        $data = [
             'site_key' => $siteKey,
             'mod_name' => $modName,
-        );
+        ];
         $response = BUtil::remoteHttp( 'POST', $url, $data );
         return BUtil::fromJson( $response );
     }
@@ -126,7 +126,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
     {
         $mod = BModuleRegistry::i()->module( $moduleName );
         if ( !$mod ) {
-            return array( 'error' => true, 'message' => 'Invalid package: ' . $moduleName );
+            return [ 'error' => true, 'message' => 'Invalid package: ' . $moduleName ];
         }
         $packageDir = BConfig::i()->get( 'fs/storage_dir' ) . '/marketclient/upload';
         BUtil::ensureDir( $packageDir );
@@ -135,11 +135,11 @@ final class FCom_MarketClient_RemoteApi extends BClass
         BUtil::zipCreateFromDir( $packageFilename, $mod->root_dir );
         $siteKey = BConfig::i()->get( 'modules/FCom_MarketClient/site_key' );
         $url = $this->getUrl( 'api/v1/market/module/upload' );
-        $data = array(
+        $data = [
             'site_key' => $siteKey,
             'mod_name' => $moduleName,
             'package_zip' => '@' . $packageFilename,
-        );
+        ];
         $response = BUtil::remoteHttp( 'POST', $url, $data );
 #echo "<pre>"; var_dump($response); exit;
         BCache::i()->delete( static::$_modulesVersionsCacheKey );
@@ -154,11 +154,11 @@ final class FCom_MarketClient_RemoteApi extends BClass
         if ( $channel === '*' ) {
             $channel = null;
         }
-        $url = $this->getUrl( 'api/v1/market/module/download', array(
+        $url = $this->getUrl( 'api/v1/market/module/download', [
             'mod_name' => $moduleName,
             'version' => $version,
             'channel' => $channel,
-        ) );
+        ] );
         $response = BUtil::remoteHttp( "GET", $url );
         if ( !$response ) {
             throw new BException( "Problem downloading the package ({$moduleName})" );

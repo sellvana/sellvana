@@ -51,7 +51,7 @@ class FCom_Customer_ApiServer_V1_Customer extends FCom_ApiServer_Controller_Abst
             $this->internalError( "Can't create a customer" );
         }
 
-        $this->created( array( 'id' => $customer->id ) );
+        $this->created( [ 'id' => $customer->id ] );
     }
 
     public function action_index__PUT()

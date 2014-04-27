@@ -18,7 +18,7 @@ class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
     public function addNew( $data )
     {
-        BEvents::i()->fire( __CLASS__ . '.addNew', array( 'paymentData' => $data ) );
+        BEvents::i()->fire( __CLASS__ . '.addNew', [ 'paymentData' => $data ] );
         return $this->create( $data );
     }
 
@@ -27,7 +27,7 @@ class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
      * @param array $args
      * @return FCom_Sales_Model_Order_Payment
      */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( __CLASS__, $args, !$new );
     }

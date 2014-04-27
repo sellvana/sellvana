@@ -34,8 +34,8 @@ class BValueTest extends PHPUnit_Framework_TestCase
      */
     public function testToPlainArray()
     {
-        $this->object = new BValue( array( 1 ) );
-        $this->assertEquals( array( 1 ), $this->object->toPlain() );
+        $this->object = new BValue( [ 1 ] );
+        $this->assertEquals( [ 1 ], $this->object->toPlain() );
     }
 
     /**
@@ -43,7 +43,7 @@ class BValueTest extends PHPUnit_Framework_TestCase
      */
     public function test__toStringArray()
     {
-        $this->object = new BValue( array( 1 ) );
+        $this->object = new BValue( [ 1 ] );
         $this->assertEquals( 'Array', (string)$this->object );
     }
 
@@ -52,8 +52,8 @@ class BValueTest extends PHPUnit_Framework_TestCase
      */
     public function testToPlainStdObj()
     {
-        $this->object = new BValue( (object)array( 1 ) );
-        $this->assertEquals( (object)array( 1 ), $this->object->toPlain() );
+        $this->object = new BValue( (object)[ 1 ] );
+        $this->assertEquals( (object)[ 1 ], $this->object->toPlain() );
     }
 
     /**
@@ -61,7 +61,7 @@ class BValueTest extends PHPUnit_Framework_TestCase
      */
     public function test__toStringStdObj()
     {
-        $this->object = new BValue( (object)array( 1 ) );
+        $this->object = new BValue( (object)[ 1 ] );
         $this->assertEquals( '', (string)$this->object );
     }
 
@@ -70,7 +70,7 @@ class BValueTest extends PHPUnit_Framework_TestCase
      */
     public function testToPlainCustomObj()
     {
-        $this->object = new BValue( new VO( array( 1 ) ) );
+        $this->object = new BValue( new VO( [ 1 ] ) );
         $this->assertEquals( '1', $this->object->toPlain() );
     }
 
@@ -79,7 +79,7 @@ class BValueTest extends PHPUnit_Framework_TestCase
      */
     public function test__toStringCustomObj()
     {
-        $this->object = new BValue( new VO( array( 1 ) ) );
+        $this->object = new BValue( new VO( [ 1 ] ) );
         $this->assertEquals( '1', (string)$this->object );
     }
 }

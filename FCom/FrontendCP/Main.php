@@ -2,14 +2,14 @@
 
 class FCom_FrontendCP_Main extends BClass
 {
-    static protected $_entityHandlers = array();
+    static protected $_entityHandlers = [];
 
     static public function bootstrap()
     {
-        FCom_Admin_Model_Role::i()->createPermission( array(
+        FCom_Admin_Model_Role::i()->createPermission( [
             'frontendcp' => 'Frontend Control Panel',
             'frontendcp/edit' => 'Edit Page Content',
-        ) );
+        ] );
     }
 
     public function addEntityHandler( $entity, $handler )
@@ -23,7 +23,7 @@ class FCom_FrontendCP_Main extends BClass
         return static::$_entityHandlers;
     }
 
-    public function saveCustomViewTemplate( $viewName, $content, $options = array() )
+    public function saveCustomViewTemplate( $viewName, $content, $options = [] )
     {
         $rootDir = BConfig::i()->get( 'fs/storage_dir' ) . '/custom';
         $area = !empty( $options[ 'area' ] ) ? $options[ 'area' ] : 'FCom_Frontend';

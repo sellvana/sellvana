@@ -23,8 +23,8 @@
 
 class BCache extends BClass
 {
-    protected $_backends = array();
-    protected $_backendStatus = array();
+    protected $_backends = [];
+    protected $_backendStatus = [];
     protected $_defaultBackend;
 
     /**
@@ -32,14 +32,14 @@ class BCache extends BClass
     *
     * @return BCache
     */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
 
     public function __construct()
     {
-        foreach ( array( 'File', 'Shmop', 'Apc', 'Memcache', 'Db' ) as $type ) {
+        foreach ( [ 'File', 'Shmop', 'Apc', 'Memcache', 'Db' ] as $type ) {
             $this->addBackend( $type, 'BCache_Backend_' . $type );
         }
         $this->_defaultBackend = BConfig::i()->get( 'cache/default_backend', 'file' );
@@ -147,7 +147,7 @@ interface BCache_Backend_Interface
 {
     public function info();
 
-    public function init( $config = array() );
+    public function init( $config = [] );
 
     public function load( $key );
 
@@ -164,14 +164,14 @@ interface BCache_Backend_Interface
 
 class BCache_Backend_File extends BClass implements BCache_Backend_Interface
 {
-    protected $_config = array();
+    protected $_config = [];
 
     public function info()
     {
-        return array( 'available' => true, 'rank' => 70 );
+        return [ 'available' => true, 'rank' => 70 ];
     }
 
-    public function init( $config = array() )
+    public function init( $config = [] )
     {
         if ( empty( $config[ 'dir' ] ) ) {
             $config[ 'dir' ] = BConfig::i()->get( 'fs/cache_dir' );
@@ -217,11 +217,11 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
         $filename = $this->_filename( $key );
         $dir = dirname( $filename );
         BUtil::ensureDir( $dir );
-        $meta = array(
+        $meta = [
             'ts' => time(),
             'ttl' => !is_null( $ttl ) ? $ttl : $this->_config[ 'default_ttl' ],
             'key' => $key,
-        );
+        ];
         file_put_contents( $filename, serialize( $meta ) . "\n" . serialize( $data ) );
         return true;
     }
@@ -247,9 +247,9 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
     {
         $files = glob( $this->_config[ 'dir' ] . '/*/*' . BUtil::simplifyString( $pattern ) . '*' );
         if ( !$files ) {
-            return array();
+            return [];
         }
-        $result = array();
+        $result = [];
         foreach ( $files as $filename ) {
             $fp = fopen( $filename, 'r' );
             $meta = unserialize( fgets( $fp, 1024 ) );
@@ -277,7 +277,7 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
         if ( !$files ) {
             return false;
         }
-        $result = array();
+        $result = [];
         foreach ( $files as $filename ) {
             if ( $pattern === true ) {
                 @unlink( $filename );
@@ -308,10 +308,10 @@ class BCache_Backend_Apc extends BClass implements BCache_Backend_Interface
 
     public function info()
     {
-        return array( 'available' => function_exists( 'apc_fetch' ), 'rank' => 10 );
+        return [ 'available' => function_exists( 'apc_fetch' ), 'rank' => 10 ];
     }
 
-    public function init( $config = array() )
+    public function init( $config = [] )
     {
         if ( empty( $config[ 'prefix' ] ) ) {
             $config[ 'prefix' ] = substr( md5( __DIR__ ), 0, 16 ) . '/';
@@ -350,7 +350,7 @@ class BCache_Backend_Apc extends BClass implements BCache_Backend_Interface
         //TODO: regexp: new APCIterator('user', '/^MY_APC_TESTA/', APC_ITER_VALUE);
         $items = new APCIterator( 'user' );
         $prefix = $this->_config[ 'prefix' ];
-        $result = array();
+        $result = [];
         foreach ( $items as $item ) {
             $key = $item[ 'key' ];
             if ( strpos( $key, $prefix ) !== 0 ) {
@@ -395,13 +395,13 @@ class BCache_Backend_Memcache extends BClass implements BCache_Backend_Interface
 
     public function info()
     {
-        return array( 'available' => false );
+        return [ 'available' => false ];
 
         //TODO: explicit configuration
-        return array( 'available' => class_exists( 'Memcache', false ) && $this->init(), 'rank' => 10 );
+        return [ 'available' => class_exists( 'Memcache', false ) && $this->init(), 'rank' => 10 ];
     }
 
-    public function init( $config = array() )
+    public function init( $config = [] )
     {
         if ( $this->_conn ) {
             return true;
@@ -459,13 +459,13 @@ class BCache_Backend_Db extends BClass implements BCache_Backend_Interface
     public function info()
     {
 #echo "<pre>"; debug_print_backtrace(); exit;
-        return array( 'available' => false );
+        return [ 'available' => false ];
 
         $avail = (boolean)BConfig::i()->get( 'db/dbname' );
-        return array( 'available' => $avail, 'rank' => 90 );
+        return [ 'available' => $avail, 'rank' => 90 ];
     }
 
-    public function init( $config = array() )
+    public function init( $config = [] )
     {
         $this->migrate();
     }
@@ -488,18 +488,18 @@ class BCache_Backend_Db extends BClass implements BCache_Backend_Interface
         $hlp = BCache_Backend_Db_Model_Cache::i();
         $cache = $hlp->load( $key, 'cache_key' );
         if ( !$cache ) {
-            $cache = $hlp->create( array( 'cache_key' => $key ) );
+            $cache = $hlp->create( [ 'cache_key' => $key ] );
         }
-        $cache->set( array(
+        $cache->set( [
             'expires_at' => is_null( $ttl ) ? null : time() + $ttl,
             'cache_value' => serialize( $data ),
-        ) )->save();
+        ] )->save();
         return true;
     }
 
     public function delete( $key )
     {
-        BCache_Backend_Db_Model_Cache::i()->delete_many( array( 'cache_key' => $key ) );
+        BCache_Backend_Db_Model_Cache::i()->delete_many( [ 'cache_key' => $key ] );
         return true;
     }
 
@@ -523,22 +523,22 @@ class BCache_Backend_Db extends BClass implements BCache_Backend_Interface
     {
         $t = BCache_Backend_Db_Model_Cache::table();
         if ( !BDb::ddlTableExists( $t ) ) {
-            BDb::ddlTableDef( $t, array(
-                'COLUMNS' => array(
+            BDb::ddlTableDef( $t, [
+                'COLUMNS' => [
                     'id' => 'int unsigned not null auto_increment',
                     'cache_key' => 'varchar(255) not null',
                     'cache_value' => 'mediumtext not null',
                     'expires_at' => 'int unsigned null',
-                ),
+                ],
                 'PRIMARY' => '(id)',
-                'KEYS' => array(
+                'KEYS' => [
                     'UNQ_cache_key' => '(cache_key)',
                     'IDX_expires_at' => '(expires_at)',
-                ),
-                'OPTIONS' => array(
+                ],
+                'OPTIONS' => [
                     'engine' => 'MyISAM',
-                ),
-            ) );
+                ],
+            ] );
         }
     }
 }
@@ -553,10 +553,10 @@ class BCache_Backend_Shmop extends BClass implements BCache_Backend_Interface
 {
     public function info()
     {
-        return array( 'available' => false/*function_exists('shmop_open')*/, 'rank' => 10 );
+        return [ 'available' => false/*function_exists('shmop_open')*/, 'rank' => 10 ];
     }
 
-    public function init( $config = array() )
+    public function init( $config = [] )
     {
 
     }

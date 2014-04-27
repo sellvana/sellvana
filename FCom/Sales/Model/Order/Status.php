@@ -5,10 +5,10 @@ class FCom_Sales_Model_Order_Status extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_sales_order_status';
     protected static $_origClass = __CLASS__;
 
-    protected static $_validationRules = array(
-        array( 'name', '@required' ),
-        array( 'code', '@required' ),
-    );
+    protected static $_validationRules = [
+        [ 'name', '@required' ],
+        [ 'code', '@required' ],
+    ];
 
     /**
     * Fallback singleton/instance factory
@@ -17,7 +17,7 @@ class FCom_Sales_Model_Order_Status extends FCom_Core_Model_Abstract
     * @param array $args
     * @return FCom_Sales_Model_Order_Item
     */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( get_called_class(), $args, !$new );
     }
@@ -46,7 +46,7 @@ class FCom_Sales_Model_Order_Status extends FCom_Core_Model_Abstract
     public function statusOptions()
     {
         $status = $this->statusList();
-        $options = array();
+        $options = [];
         if ( $status ) {
             foreach ( $status as $s ) {
                 $options[ $s->code ] = $s->name;

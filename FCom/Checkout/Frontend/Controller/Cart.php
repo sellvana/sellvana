@@ -12,14 +12,14 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         }
 
 
-        $layout->view( 'breadcrumbs' )->set( 'crumbs', array( array( 'label' => 'Home', 'href' =>  BApp::baseUrl() ),
-            array( 'label' => 'Cart', 'active' => true ) ) );
+        $layout->view( 'breadcrumbs' )->set( 'crumbs', [ [ 'label' => 'Home', 'href' =>  BApp::baseUrl() ],
+            [ 'label' => 'Cart', 'active' => true ] ] );
 
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
-        BEvents::i()->fire( __CLASS__ . '::action_cart:cart', array( 'cart' => $cart ) );
+        BEvents::i()->fire( __CLASS__ . '::action_cart:cart', [ 'cart' => $cart ] );
 
         $shippingEstimate = BSession::i()->get( 'shipping_estimate' );
-        $layout->view( 'checkout/cart' )->set( array( 'cart' => $cart, 'shipping_esitmate' => $shippingEstimate ) );
+        $layout->view( 'checkout/cart' )->set( [ 'cart' => $cart, 'shipping_esitmate' => $shippingEstimate ] );
         $this->layout( '/checkout/cart' );
     }
 
@@ -38,7 +38,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                     return;
                 }
                 $qty = !empty( $post[ 'qty' ] ) ? $post[ 'qty' ] : 1;
-                $options = array( 'qty' => $qty, 'price' => $p->base_price );
+                $options = [ 'qty' => $qty, 'price' => $p->base_price ];
                 if ( Bapp::m( 'FCom_Customer' ) && FCom_Customer_Model_Customer::isLoggedIn() ) {
                     $cart->customer_id = FCom_Customer_Model_Customer::sessionUserId();
                     $cart->save();
@@ -66,9 +66,9 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                     }
                 }
                 if ( !empty( $post[ 'postcode' ] ) ) {
-                    $estimate = array();
+                    $estimate = [];
                     foreach ( FCom_Sales_Main::i()->getShippingMethods() as $shipping ) {
-                        $estimate[] = array( 'estimate' => $shipping->getEstimate(), 'description' => $shipping->getDescription() );
+                        $estimate[] = [ 'estimate' => $shipping->getEstimate(), 'description' => $shipping->getDescription() ];
                     }
                     BSession::i()->set( 'shipping_estimate', $estimate );
                 }
@@ -84,22 +84,22 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         $cartHref = BApp::href( 'cart' );
         $post = BRequest::i()->post();
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
-        $result = array();
+        $result = [];
         switch ( $post[ 'action' ] ) {
         case 'add':
             $p = FCom_Catalog_Model_Product::i()->load( $post[ 'id' ] );
             if ( !$p ) {
-                BResponse::i()->json( array( 'title' => "Incorrect product id" ) );
+                BResponse::i()->json( [ 'title' => "Incorrect product id" ] );
                 return;
             }
 
-            $options = array( 'qty' => $post[ 'qty' ], 'price' => $p->base_price );
+            $options = [ 'qty' => $post[ 'qty' ], 'price' => $p->base_price ];
             if ( Bapp::m( 'FCom_Customer' ) && FCom_Customer_Model_Customer::isLoggedIn() ) {
                 $cart->customer_id = FCom_Customer_Model_Customer::sessionUserId();
                 $cart->save();
             }
             $cart->addProduct( $p->id(), $options )->calculateTotals()->save();
-            $result = array(
+            $result = [
                 'title' => 'Added to cart',
                 'html' => '<img src="' . $p->thumbUrl( 35, 35 ) . '" width="35" height="35" style="float:left"/> ' . htmlspecialchars( $p->product_name )
                     . ( !empty( $post[ 'qty' ] ) && $post[ 'qty' ] > 1 ? ' (' . $post[ 'qty' ] . ')' : '' )
@@ -107,7 +107,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                 'minicart_html' => BLayout::i()->view( 'checkout/cart/block' )->render(),
                 'cnt' => $cart->itemQty(),
                 'subtotal' => $cart->subtotal,
-            );
+            ];
             break;
         }
 
@@ -124,6 +124,6 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
 
         $qty = !empty( $qty ) ? $qty : 1;
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
-        $cart->addProduct( $product->id(), array( 'qty' => $qty, 'price' => $product->base_price ) );
+        $cart->addProduct( $product->id(), [ 'qty' => $qty, 'price' => $product->base_price ] );
     }
 }

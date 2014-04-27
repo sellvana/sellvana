@@ -13,8 +13,8 @@ class FCom_Sales_Tests_Model_CartAddressTest extends FCom_Test_DatabaseTestCase
 
         $cartId = 1;
 
-        $data = array( 'id' => 3, 'city' => "Big city", 'country' => 'US',
-            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave' );
+        $data = [ 'id' => 3, 'city' => "Big city", 'country' => 'US',
+            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave' ];
 
         FCom_Sales_Model_Cart_Address::i()->newAddress( $cartId, 'billing', $data );
 
@@ -27,8 +27,8 @@ class FCom_Sales_Tests_Model_CartAddressTest extends FCom_Test_DatabaseTestCase
 
         $cartId = 1;
 
-        $data = array( 'city' => "Big city", 'country' => 'US',
-            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave' );
+        $data = [ 'city' => "Big city", 'country' => 'US',
+            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave' ];
 
         FCom_Sales_Model_Cart_Address::i()->newAddress( $cartId, 'shipping', $data );
 
@@ -41,8 +41,8 @@ class FCom_Sales_Tests_Model_CartAddressTest extends FCom_Test_DatabaseTestCase
 
         $cartId = 1;
 
-        $data = array( 'city' => "Big city", 'country' => 'US',
-            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave' );
+        $data = [ 'city' => "Big city", 'country' => 'US',
+            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave' ];
 
         $address = FCom_Sales_Model_Cart_Address::i()->findByCartType( $cartId, 'shipping' );
         $this->assertEquals( "Los Angeles", $address->city, "Address not found" );
@@ -61,8 +61,8 @@ class FCom_Sales_Tests_Model_CartAddressTest extends FCom_Test_DatabaseTestCase
 
         $cartId = 3;
 
-        $data = array( 'id' => 3, 'city' => "Big city", 'country' => 'US',
-            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave' );
+        $data = [ 'id' => 3, 'city' => "Big city", 'country' => 'US',
+            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave' ];
 
         FCom_Sales_Model_Cart_Address::i()->newAddress( $cartId, 'billing', $data );
 
@@ -74,8 +74,8 @@ class FCom_Sales_Tests_Model_CartAddressTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals( 2, $this->getConnection()->getRowCount( 'fcom_checkout_address' ), "Pre-Condition" );
 
         $cartId = 3;
-        $data = array( 'id' => 3, 'city' => "Big city", 'country' => 'US',
-            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave' );
+        $data = [ 'id' => 3, 'city' => "Big city", 'country' => 'US',
+            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave' ];
 
         FCom_Sales_Model_Cart_Address::i()->newAddress( $cartId, 'billing', $data );
         $this->assertEquals( 3, $this->getConnection()->getRowCount( 'fcom_checkout_address' ), "Insert failed" );

@@ -15,10 +15,10 @@ class FCom_Email_Model_Pref extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_email_pref';
 
-    protected static $_validationRules = array(
-        array( 'email', '@required' ),
-        array( 'email', '@email' ),
-    );
+    protected static $_validationRules = [
+        [ 'email', '@required' ],
+        [ 'email', '@email' ],
+    ];
 
     public static function unsubAll( $email )
     {
@@ -27,12 +27,12 @@ class FCom_Email_Model_Pref extends FCom_Core_Model_Abstract
         return $pref;
     }
 
-    public static function getUrl( $email, $params = array() )
+    public static function getUrl( $email, $params = [] )
     {
         if ( true === $params ) {
-            $params = array( 'unsub_all' => 'true' );
+            $params = [ 'unsub_all' => 'true' ];
         }
-        $params += array( 'email' => $email, 'token' => static::getToken( $email ) );
+        $params += [ 'email' => $email, 'token' => static::getToken( $email ) ];
         return BUtil::setUrlQuery( BApp::href( 'email/pref', true, 1 ), $params );
     }
 

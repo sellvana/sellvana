@@ -2,7 +2,7 @@
 
 class FCom_Customer_Frontend_View_Sidebar extends FCom_Core_View_Abstract
 {
-    protected $_navItems = array();
+    protected $_navItems = [];
 
     public function addNavItem( $itemKey, $item )
     {

@@ -51,14 +51,14 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_ApiServer_Controller_Abstra
 
         if ( !empty( $post[ 'categories_id' ] ) ) {
             if ( !is_array( $post[ 'categories_id' ] ) ) {
-                $post[ 'categories_id' ] = array( $post[ 'categories_id' ] );
+                $post[ 'categories_id' ] = [ $post[ 'categories_id' ] ];
             }
             foreach ( $post[ 'categories_id' ] as $catId ) {
-                FCom_Catalog_Model_CategoryProduct::i()->orm()->create( array( 'category_id' => $catId, 'product_id' => $product->id ) )->save();
+                FCom_Catalog_Model_CategoryProduct::i()->orm()->create( [ 'category_id' => $catId, 'product_id' => $product->id ] )->save();
             }
         }
 
-        $this->created( array( 'id' => $product->id ) );
+        $this->created( [ 'id' => $product->id ] );
     }
 
     public function action_index__put()

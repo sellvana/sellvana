@@ -14,7 +14,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     protected $_gridPageViewName = 'admin/grid';
     protected $_gridViewName = 'core/backbonegrid';
     protected $_gridLayoutName;# = '/feature';
-    protected $_gridConfig = array();
+    protected $_gridConfig = [];
     protected $_formHref;# = 'feature/form';
     protected $_formLayoutName;# = '/feature/form';
     protected $_formViewPrefix;# = 'module/feature-form/';
@@ -48,8 +48,8 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     {
         $view = $this->view( $this->_gridViewName );
         $config = $this->_processConfig( $this->gridConfig() );
-        $view->set( 'grid', array( 'config' => $config ) );
-        BEvents::i()->fire( static::$_origClass . '::gridView', array( 'view' => $view ) );
+        $view->set( 'grid', [ 'config' => $config ] );
+        BEvents::i()->fire( static::$_origClass . '::gridView', [ 'view' => $view ] );
         return $view;
     }
 
@@ -60,7 +60,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $gridHtmlUrl = BApp::href( $this->_gridHref );
         $formUrl = BApp::href( $this->_formHref );
         $modelClass = $this->_modelClass;
-        $config = array(
+        $config = [
             'id' => static::$_origClass,
             'orm' => $modelClass ? $modelClass::i()->orm( $this->_mainTableAlias )->select( $this->_mainTableAlias . '.*' ) : null,
             #'orm' => $modelClass,
@@ -68,19 +68,19 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             'edit_url' => $gridDataUrl,
             'grid_url' => $gridHtmlUrl,
             'form_url' => $formUrl,
-            'columns' => array(
-            ),
-        );
+            'columns' => [
+            ],
+        ];
         $config = array_merge( $config, $this->_gridConfig );
         return $config;
     }
 
     public function simpleGridConfig()
     {
-        $config = array(
-            'columns' => array(),
-            'data' => array(),
-        );
+        $config = [
+            'columns' => [],
+            'data' => [],
+        ];
 
         return $config;
 
@@ -107,7 +107,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
         $pageView = $this->view( $this->_gridPageViewName );
         $view = $this->gridView();
-        $this->gridViewBefore( array( 'view' => $view, 'page_view' => $pageView ) );
+        $this->gridViewBefore( [ 'view' => $view, 'page_view' => $pageView ] );
 
         $this->layout();
         if ( $this->_useDefaultLayout ) {
@@ -119,12 +119,12 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     public function gridViewBefore( $args )
     {
         $view = $args[ 'page_view' ];
-        $view->set( array(
+        $view->set( [
             'title' => $this->_gridTitle,
-            'actions' => array(
+            'actions' => [
                 'new' => ' <button type="button" class="btn btn-primary btn-sm" onclick="location.href=\'' . BApp::href( $this->_formHref ) . '\'"><span>New ' . BView::i()->q( $this->_recordName ) . '</span></button>',
-            ),
-        ) );
+            ],
+        ] );
         BEvents::i()->fire( static::$_origClass . '::gridViewBefore', $args );
     }
 
@@ -142,7 +142,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if ( isset( $config[ 'data' ] ) && ( !empty( $config[ 'data' ] ) ) ) {
             $data = $config[ 'data' ];
             $data = $this->gridDataAfter( $data );
-            BResponse::i()->json( array( array( 'c' => 1 ), $data ) );
+            BResponse::i()->json( [ [ 'c' => 1 ], $data ] );
         } else {
             $r = BRequest::i()->get();
             if ( empty( $grid[ 'orm' ] ) ) {
@@ -171,23 +171,23 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 //$data = $view->processORM($orm, $oc.'::action_grid_data', $gridId);
                 $data = $view->generateOutputData();
                 $data = $this->gridDataAfter( $data );
-                BResponse::i()->json( array(
-                    array( 'c' => $data[ 'state' ][ 'c' ] ),
+                BResponse::i()->json( [
+                    [ 'c' => $data[ 'state' ][ 'c' ] ],
                     BDb::many_as_array( $data[ 'rows' ] ),
-                ) );
+                ] );
             }
         }
     }
 
     public function gridDataAfter( $data )
     {
-        BEvents::i()->fire( static::$_origClass . '::gridDataAfter', array( 'data' => &$data ) );
+        BEvents::i()->fire( static::$_origClass . '::gridDataAfter', [ 'data' => &$data ] );
         return $data;
     }
 
     public function gridOrmConfig( $orm )
     {
-        BEvents::i()->fire( static::$_origClass . '::gridOrmConfig', array( 'orm' => &$orm ) );
+        BEvents::i()->fire( static::$_origClass . '::gridOrmConfig', [ 'orm' => &$orm ] );
     }
 
     public function action_grid_data__POST()
@@ -208,7 +208,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         }
         $this->formMessages();
         $view = $this->view( $this->_formViewName )->set( 'model', $model );
-        $this->formViewBefore( array( 'view' => $view, 'model' => $model ) );
+        $this->formViewBefore( [ 'view' => $view, 'model' => $model ] );
 
         if ( $this->_formTitle && ( $head = $this->view( 'head' ) ) ) {
             $head->addTitle( $this->_formTitle );
@@ -231,7 +231,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     public function formViewBefore( $args )
     {
         $m = $args[ 'model' ];
-        $actions = array();
+        $actions = [];
 
         $actions[ 'back' ] = '<button type="button" class="btn btn-link" onclick="location.href=\'' . BApp::href( $this->_gridHref ) . '\'"><span>' .  BLocale::_( 'Back to list' ) . '</span></button>';
         if ( $m->id ) {
@@ -240,21 +240,21 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $actions[ 'save' ] = '<button type="submit" class="btn btn-primary" onclick="return adminForm.saveAll(this)"><span>' .  BLocale::_( 'Save' ) . '</span></button>';
 
         $id = method_exists( $m, 'id' ) ? $m->id() : $m->id;
-        $title = $id ? BLocale::_( 'Edit %s: %s', array( $this->_recordName, $m->title ) ) : BLocale::_( 'Create New %s', array( $this->_recordName ) );
+        $title = $id ? BLocale::_( 'Edit %s: %s', [ $this->_recordName, $m->title ] ) : BLocale::_( 'Create New %s', [ $this->_recordName ] );
 
-        $args[ 'view' ]->set( array(
+        $args[ 'view' ]->set( [
             'form_id' => $this->formId(),
             'form_url' => BApp::href( $this->_formHref ) . '?id=' . $m->id,
             'title' => $title,
             'actions' => $actions,
-        ) );
+        ] );
         BEvents::i()->fire( static::$_origClass . '::formViewBefore', $args );
     }
 
     public function action_form__POST()
     {
         $r = BRequest::i();
-        $args = array();
+        $args = [];
         $formId = $this->formId();
         $redirectUrl = BApp::href( $this->_gridHref );
         try {
@@ -265,7 +265,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 throw new BException( "This item does not exist" );
             }
             $data = $r->post( 'model' );
-            $args = array( 'id' => $id, 'do' => $r->post( 'do' ), 'data' => &$data, 'model' => &$model );
+            $args = [ 'id' => $id, 'do' => $r->post( 'do' ), 'data' => &$data, 'model' => &$model ];
             $this->formPostBefore( $args );
             $args[ 'validateFailed' ] = false;
             if ( $r->post( 'do' ) === 'DELETE' ) {
@@ -274,7 +274,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             } else {
                 $model->set( $data );
 
-                if ( $model->validate( $model->as_array(), array(), $formId ) ) {
+                if ( $model->validate( $model->as_array(), [], $formId ) ) {
                     $model->save();
                     $this->message( 'Changes have been saved' );
                     if ( $r->post( 'do' ) === 'saveAndContinue' ) {
@@ -295,7 +295,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $redirectUrl = BApp::href( $this->_formHref ) . '?id=' . $id;
         }
         if ( $r->xhr() ) {
-            $this->forward( 'form', null, array( 'id' => $id ) );
+            $this->forward( 'form', null, [ 'id' => $id ] );
         } else {
             BResponse::i()->redirect( $redirectUrl );
         }
@@ -338,7 +338,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $formId = $this->formId();
         $messages = BSession::i()->messages( 'validator-errors:' . $formId );
         if ( count( $messages ) ) {
-            $msg = array();
+            $msg = [];
 #BDebug::dump($messages); exit;
             foreach ( $messages as $m ) {
                 $msg[] = is_array( $m[ 'msg' ] ) ? $m[ 'msg' ][ 'error' ] : $m[ 'msg' ];

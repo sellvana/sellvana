@@ -7,7 +7,7 @@ class FCom_AdminChat_PushServer_User extends FCom_PushServer_Service_Abstract
         if ( !parent::onBeforeDispatch() ) return false;
 
         if ( !FCom_Admin_Model_User::i()->isLoggedIn() ) {
-            $this->reply( array( 'channel' => 'client', 'signal' => 'logout' ) );
+            $this->reply( [ 'channel' => 'client', 'signal' => 'logout' ] );
             return false;
         }
 

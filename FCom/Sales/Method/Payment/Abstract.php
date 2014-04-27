@@ -10,7 +10,7 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
     protected $_sortOrder = 50;
     protected $_name;
 
-    protected $_capabilities = array(
+    protected $_capabilities = [
         'pay'           => 1,
         'refund'        => 1,
         'void'          => 1,
@@ -19,7 +19,7 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
         'pay_online'    => 0,
         'refund_online' => 0,
         'void_online'   => 0,
-    );
+    ];
 
     public function can( $capability )
     {
@@ -91,7 +91,7 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
 
     public function asArray()
     {
-        return array( "name" => $this->getName() );
+        return [ "name" => $this->getName() ];
     }
 
     public function set( $name, $value )

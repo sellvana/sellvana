@@ -4,8 +4,8 @@ class FCom_ApiServer_Controller_Abstract extends FCom_Admin_Controller_Abstract
 {
     protected static $_origClass;
     protected $_permission;
-    protected $_authorizeActions = array( 'get', 'put', 'post', 'delete' );
-    protected $_authorizeActionsWhitelist = array();
+    protected $_authorizeActions = [ 'get', 'put', 'post', 'delete' ];
+    protected $_authorizeActionsWhitelist = [];
 
     public function __construct()
     {
@@ -50,7 +50,7 @@ class FCom_ApiServer_Controller_Abstract extends FCom_Admin_Controller_Abstract
         return true;
     }
 
-    public function authenticate( $args = array() )
+    public function authenticate( $args = [] )
     {
         $res = FCom_Admin_Model_User::i()->isLoggedIn();
         if ( !$res ) {
@@ -60,7 +60,7 @@ class FCom_ApiServer_Controller_Abstract extends FCom_Admin_Controller_Abstract
     }
 
 
-    public function authorize( $args = array() )
+    public function authorize( $args = [] )
     {
         $authorizeActions = $this->_authorizeActions;
         if ( false == $authorizeActions ) {
@@ -68,7 +68,7 @@ class FCom_ApiServer_Controller_Abstract extends FCom_Admin_Controller_Abstract
         }
 
         if ( !is_array( $authorizeActions ) ) {
-            $authorizeActions = array( $authorizeActions );
+            $authorizeActions = [ $authorizeActions ];
         }
 
         if ( !empty( $this->_authorizeActionsWhitelist ) ) {

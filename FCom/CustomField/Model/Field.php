@@ -5,11 +5,11 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_field';
 
-    protected static $_fieldOptions = array(
-        'field_type'       => array(
+    protected static $_fieldOptions = [
+        'field_type'       => [
             'product' => 'Products',
-        ),
-        'table_field_type' => array(
+        ],
+        'table_field_type' => [
             'varchar(255)'  => 'Short Text',
             'text'          => 'Long Text',
             'int(11)'       => 'Integer',
@@ -18,32 +18,32 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
             'date'          => 'Date',
             'datetime'      => 'Date/Time',
             '_serialized'   => 'Serialized',
-        ),
-        'admin_input_type' => array(
+        ],
+        'admin_input_type' => [
             'text'        => 'Text Line',
             'textarea'    => 'Text Area',
             'select'      => 'Drop down',
             'multiselect' => 'Multiple Select',
             'boolean'     => 'Yes/No',
             'wysiwyg'     => 'WYSIWYG editor'
-        ),
-        'frontend_show'    => array(
+        ],
+        'frontend_show'    => [
             '1' => 'Yes',
             '0' => 'No'
-        ),
-    );
+        ],
+    ];
 
-    protected static $_fieldTypes = array(
-        'product' => array(
+    protected static $_fieldTypes = [
+        'product' => [
             'class' => 'FCom_CustomField_Model_ProductField',
-        ),
-    );
-    protected static $_importExportProfile = array( 'skip' => array(),  'unique_key' => array( 'field_code', ),  );
+        ],
+    ];
+    protected static $_importExportProfile = [ 'skip' => [],  'unique_key' => [ 'field_code', ],  ];
 
     protected $_oldTableFieldCode;
     protected $_oldTableFieldType;
 
-    protected static $_fieldsCache = array();
+    protected static $_fieldsCache = [];
 
     public function tableName()
     {
@@ -103,7 +103,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         $fCode = preg_replace( '#([^0-9A-Za-z_])#', '', $this->field_code );
         $fType = preg_replace( '#([^0-9a-z\(\),])#', '', strtolower( $this->table_field_type ) );
         $field = BDb::ddlFieldInfo( $fTable, $this->field_code );
-        $columnsUpdate = array();
+        $columnsUpdate = [];
 
         if ( $fType === '_serialized' ) {
             if ( $field ) {
@@ -119,7 +119,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
             }
         }
         if ( $columnsUpdate ) {
-            BDb::ddlTableDef( $fTable, array( 'COLUMNS' => $columnsUpdate ) );
+            BDb::ddlTableDef( $fTable, [ 'COLUMNS' => $columnsUpdate ] );
         }
 
         $this->_oldTableFieldCode = $this->field_code;
@@ -137,7 +137,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
     {
         parent::onAfterDelete();
         if ( $this->table_field_type !== '_serialized' ) {
-            BDb::ddlTableDef( $this->tableName(), array( 'COLUMNS' => array( $this->field_code => 'DROP' ) ) );
+            BDb::ddlTableDef( $this->tableName(), [ 'COLUMNS' => [ $this->field_code => 'DROP' ] ] );
         }
     }
 
@@ -148,7 +148,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
 
     public function getListAssoc()
     {
-        $result = array();
+        $result = [];
         $cfList = $this->orm()->find_many();
         foreach ( $cfList as $cffield ) {
             $result[ $cffield->field_code ] = $cffield;
@@ -159,7 +159,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
     public function getDropdowns()
     {
         $fields = BDb::many_as_array( $this->orm()->where( 'admin_input_type', 'select' )->find_many() );
-        $res = array();
+        $res = [];
         foreach ( $fields as $field ) {
             $res[ $field[ 'id' ] ] = $field[ 'field_name' ];
         }

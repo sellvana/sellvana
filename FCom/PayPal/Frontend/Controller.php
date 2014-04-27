@@ -13,10 +13,10 @@ class FCom_PayPal_Frontend_Controller extends BActionController
         }
 
         $baseUrl = BApp::href( 'paypal' );
-        $nvpShippingAddress = array();
+        $nvpShippingAddress = [];
         if ( BConfig::i()->get( 'modules/FCom_PayPal/show_shipping' ) == 'on' ) {
             $shippingAddress = FCom_Sales_Model_Cart_Address::i()->findByCartType( $cart->id(), 'shipping' );
-            $nvpShippingAddress = array(
+            $nvpShippingAddress = [
                 'NOSHIPPING' => 0,
                 'REQCONFIRMSHIPPING' => 0,
                 'PAYMENTREQUEST_0_SHIPTONAME' => $shippingAddress->firstname . ' ' . $shippingAddress->lastname,
@@ -27,12 +27,12 @@ class FCom_PayPal_Frontend_Controller extends BActionController
                 'PAYMENTREQUEST_0_SHIPTOZIP' => $shippingAddress->postcode,
                 'PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE' => $shippingAddress->country,
                 'PAYMENTREQUEST_0_SHIPTOPHONENUM' => $shippingAddress->phone
-            );
+            ];
         } else {
             $nvpShippingAddress[ 'NOSHIPPING' ] = 1;
         }
 
-        $nvpArr = array(
+        $nvpArr = [
             'INVNUM'                            => $salesOrder->id(),
             'PAYMENTREQUEST_0_AMT'              => number_format( $salesOrder->balance, 2 ),
             'PAYMENTREQUEST_0_PAYMENTACTION'    => 'Sale',
@@ -40,7 +40,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
             'RETURNURL'                         => $baseUrl . '/return',
             'CANCELURL'                         => $baseUrl . '/cancel',
             //'PAGESTYLE'     => 'paypal',
-        );
+        ];
         $nvpArr = array_merge( $nvpArr, $nvpShippingAddress );
         //print_r($nvpArr);exit;
         $resArr = FCom_PayPal_RemoteApi::i()->call( 'SetExpressCheckout', $nvpArr );
@@ -64,7 +64,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
             return;
         }
 
-        $resArr = FCom_PayPal_RemoteApi::i()->call( 'GetExpressCheckoutDetails',  array( 'TOKEN' => $sData[ 'paypal' ][ 'token' ] ) );
+        $resArr = FCom_PayPal_RemoteApi::i()->call( 'GetExpressCheckoutDetails',  [ 'TOKEN' => $sData[ 'paypal' ][ 'token' ] ] );
         if ( false === $resArr ) {
             $this->message( FCom_PayPal_RemoteApi::i()->getError(), 'error' );
             BResponse::i()->redirect( 'checkout/checkout' );
@@ -94,7 +94,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
             'paypal_status' => '!/'.$resArr['PAYERSTATUS'].'/'.$resArr['ADDRESSSTATUS'],
         ))->save();
 */
-        $nvpArr = array(
+        $nvpArr = [
             'TOKEN'         => $resArr[ 'TOKEN' ],
             'PAYERID'       => $resArr[ 'PAYERID' ],
             'PAYMENTREQUEST_0_PAYMENTACTION' => 'Sale',
@@ -103,11 +103,11 @@ class FCom_PayPal_Frontend_Controller extends BActionController
             'PAYMENTREQUEST_0_CURRENCYCODE'  => 'USD',
             'IPADDRESS'     => $_SERVER[ 'SERVER_NAME' ],
             //'BUTTONSOURCE'  => '',
-        );
-        $nvpShipArr = array();
+        ];
+        $nvpShipArr = [];
         if ( BConfig::i()->get( 'modules/FCom_PayPal/show_shipping' ) == 'on' ) {
             $shippingAddress = FCom_Sales_Model_Cart_Address::i()->findByCartType( $cart->id(), 'shipping' );
-            $nvpShipArr = array(
+            $nvpShipArr = [
                 'PAYMENTREQUEST_0_SHIPTONAME' => $shippingAddress->firstname . ' ' . $shippingAddress->lastname,
                     'PAYMENTREQUEST_0_SHIPTOSTREET' => $shippingAddress->street1,
                     'PAYMENTREQUEST_0_SHIPTOSTREET2' => $shippingAddress->street2,
@@ -117,7 +117,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
                     'PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE' => $shippingAddress->country,
                     'PAYMENTREQUEST_0_SHIPTOPHONENUM' => $shippingAddress->phone
                 //'BUTTONSOURCE'  => '',
-            );
+            ];
         }
         if ( !empty( $nvpShipArr ) ) {
             $nvpArr = array_merge( $nvpArr, $nvpShipArr );

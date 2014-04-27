@@ -29,7 +29,7 @@ class BLayout_Test extends PHPUnit_Framework_TestCase
     {
         $layout = $this->_layout;
         $layout->addAllViews( realpath( dirname( __FILE__ ) ) . '/Frontend/views' );
-        foreach ( array( 'test1', 'test2', 'test3',  ) as $vn ) {
+        foreach ( [ 'test1', 'test2', 'test3',  ] as $vn ) {
             $this->assertNotNull( $layout->getView( $vn ) );
         }
 
@@ -39,7 +39,7 @@ class BLayout_Test extends PHPUnit_Framework_TestCase
     {
         $layout = $this->_layout;
         $layout->addAllViews( '/Frontend/views' );
-        foreach ( array( 'test1', 'test2', 'test3',  ) as $vn ) {
+        foreach ( [ 'test1', 'test2', 'test3',  ] as $vn ) {
             $this->assertNull( $layout->getView( $vn ) );
         }
     }
@@ -50,7 +50,7 @@ class BLayout_Test extends PHPUnit_Framework_TestCase
 
         $layout = $this->_layout;
         $layout->setDefaultViewClass( $class );
-        $layout->addView( 'my', array() );
+        $layout->addView( 'my', [] );
         $this->assertEquals( $class, $layout->getView( 'my' )->getParam( 'view_class' ) );
     }
 
@@ -58,30 +58,30 @@ class BLayout_Test extends PHPUnit_Framework_TestCase
     {
         $layout = $this->_layout;
         $this->assertNull( $layout->getView( 'my' ) );
-        $layout->addView( 'my', array() );
+        $layout->addView( 'my', [] );
         $this->assertNotNull( $layout->getView( 'my' ) );
     }
 
     public function testViewReturnsLayoutWhenInvokedWithParams()
     {
         $layout = $this->_layout;
-        $this->assertInstanceOf( 'BLayout', $layout->view( 'my', array( 'template' => 'test' ) ) );
+        $this->assertInstanceOf( 'BLayout', $layout->view( 'my', [ 'template' => 'test' ] ) );
     }
 
     public function testViewReturnsNullWhenInvokedWithEmptyParams()
     {
         $layout = $this->_layout;
-        $this->assertNull( $layout->view( 'my', array() ) );
+        $this->assertNull( $layout->view( 'my', [] ) );
     }
 
     public function testMultipleAddView()
     {
         $layout = $this->_layout;
-        $views = array(
-            array( 'one', array() ),
-            array( 'two', array() ),
-            array( 'three', array() ),
-        );
+        $views = [
+            [ 'one', [] ],
+            [ 'two', [] ],
+            [ 'three', [] ],
+        ];
         $layout->addView( $views );
         foreach ( $views as $v ) {
             $this->assertNotNull( $layout->getView( $v[ 0 ] ) );
@@ -91,7 +91,7 @@ class BLayout_Test extends PHPUnit_Framework_TestCase
 
     public function testViewReturnsViewWhenCalledWithViewNameOnly()
     {
-        $this->_layout->addView( 'my', array() );
+        $this->_layout->addView( 'my', [] );
         $this->assertInstanceOf( 'BView', $this->_layout->view( 'my' ) );
     }
 
@@ -99,12 +99,12 @@ class BLayout_Test extends PHPUnit_Framework_TestCase
     {
         $layout = $this->_layout;
 
-        $views = array(
-            array( 'catalog/category/one', array() ),
-            array( 'catalog/product/one', array() ),
-            array( 'catalog/compare/one', array() ),
-            array( 'catalog/price/one', array() ),
-        );
+        $views = [
+            [ 'catalog/category/one', [] ],
+            [ 'catalog/product/one', [] ],
+            [ 'catalog/compare/one', [] ],
+            [ 'catalog/price/one', [] ],
+        ];
 
         $layout->addView( $views );
 
@@ -117,7 +117,7 @@ class BLayout_Test extends PHPUnit_Framework_TestCase
     public function testChangingRootView()
     {
         $layout = $this->_layout;
-        $layout->addView( 'newRoot', array() );
+        $layout->addView( 'newRoot', [] );
         $layout->setRootView( 'newRoot' );
         $this->assertEquals( 'newRoot', $layout->getRootView()->getParam( 'view_name' ) );
     }
@@ -126,7 +126,7 @@ class BLayout_Test extends PHPUnit_Framework_TestCase
     {
         $layout = $this->_layout;
 
-        $layout->addView( 'my', array( 'key' => 'value' ) );
+        $layout->addView( 'my', [ 'key' => 'value' ] );
         $view1 = $layout->getView( 'my' );
         $view2 = $layout->cloneView( 'my' );
         $view3 = $layout->cloneView( 'my', 'yours' );
@@ -151,7 +151,7 @@ class BLayout_Test extends PHPUnit_Framework_TestCase
     public function testHookView()
     {
         $layout = $this->_layout;
-        $view = array( 'my', 'raw_text' => 'Called' );
+        $view = [ 'my', 'raw_text' => 'Called' ];
         $layout->hookView( 'main', $view );
         $result = $layout->dispatch( 'hook.main' );
 

@@ -13,7 +13,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     * @param array $args
     * @return FCom_Sales_Model_Order
     */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( get_called_class(), $args, !$new );
     }
@@ -50,20 +50,20 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $status = FCom_Sales_Model_Order_Status::i()->statusNew();
         $data[ 'status' ] = $status->name;
         $data[ 'status_id' ] = $status->id;
-        BEvents::i()->fire( __CLASS__ . '.addNew', array( 'order' => $data ) );
+        BEvents::i()->fire( __CLASS__ . '.addNew', [ 'order' => $data ] );
         return $this->create( $data );//->save();
     }
 
     public function update( $data )
     {
-        BEvents::i()->fire( __CLASS__ . '.update', array( 'order' => $data ) );
+        BEvents::i()->fire( __CLASS__ . '.update', [ 'order' => $data ] );
         return $this->set( $data );//->save();
     }
 
     public function paid()
     {
         $status = FCom_Sales_Model_Order_Status::i()->statusPaid();
-        $data = array();
+        $data = [];
         $data[ 'status' ] = $status->name;
         $data[ 'status_id' ] = $status->id;
         $data[ 'update_at' ] = date( "Y-m-d H:i:s" );
@@ -73,7 +73,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     public function pending()
     {
         $status = FCom_Sales_Model_Order_Status::i()->statusPending();
-        $data = array();
+        $data = [];
         $data[ 'status' ] = $status->name;
         $data[ 'status_id' ] = $status->id;
         $this->set( $data )->save();
@@ -117,9 +117,9 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function prepareApiData( $orders, $includeItems = false )
     {
-        $result = array();
+        $result = [];
         foreach ( $orders as $i => $order ) {
-            $result[ $i ] = array(
+            $result[ $i ] = [
                 'id'                => $order->id,
                 'customer_id'      => $order->customer_id,
                 'status'               => $order->status,
@@ -131,17 +131,17 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
                 'shipping_service'       => $order->shipping_service,
                 'payment_method'       => $order->payment_method,
                 'coupon_code'       => $order->coupon_code
-            );
+            ];
             if ( $includeItems ) {
                 $items = $order->items();
                 foreach ( $items as $item ) {
-                    $result[ $i ][ 'items' ][] = array(
+                    $result[ $i ][ 'items' ][] = [
                         'product_id'    => $item->product_id,
                         'qty'    => $item->qty,
                         'total'    => $item->total,
                         //get product info as object and prepare data for api
                         'product_info'    => FCom_Catalog_Model_Product::i()->prepareApiData( BUtil::fromJson( $item->product_info, true ) ),
-                    );
+                    ];
                 }
             }
         }
@@ -150,7 +150,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function formatApiPost( $post )
     {
-        $data = array();
+        $data = [];
         if ( !empty( $post[ 'customer_id' ] ) ) {
             $data[ 'customer_id' ] = $post[ 'customer_id' ];
         }
@@ -197,7 +197,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         }
 
 
-        $orderData                    = array();
+        $orderData                    = [];
         $orderData[ 'cart_id' ]         = $cart->id();
         $orderData[ 'admin_id' ]        = $cart->admin_id;
         $orderData[ 'customer_id' ]     = $cart->customer_id;
@@ -215,10 +215,10 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $orderData[ 'grandtotal' ] = $cart->grand_total; // full grand total
         $orderData[ 'create_at' ] = $orderData[ 'update_at' ] = BDb::now();
 
-        $data_ = array(
+        $data_ = [
             'totals'           => $cart->data[ 'totals' ],
             'shipping_service' => $cart->shipping_service
-        );
+        ];
         $orderData[ static::$_dataCustomField ] = $data_;
 
         /* @var $salesOrder FCom_Sales_Model_Order */
@@ -236,7 +236,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
      * @param array $options
      * @return FCom_Sales_Model_Order
      */
-    public static function createFromCart( $cart, $options = array() )
+    public static function createFromCart( $cart, $options = [] )
     {
         $cart->calculateTotals();
         $salesOrder = static::_createFromCart( $cart );
@@ -252,12 +252,12 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             $paymentMethod = $cart->getPaymentMethod();
             static::createOrderPayment( $paymentMethod, $salesOrder, $options );
         }
-        BEvents::i()->fire( __METHOD__ . ':after', array(
+        BEvents::i()->fire( __METHOD__ . ':after', [
             'cart'           => $cart,
             'options'        => $options,
             'payment_method' => $paymentMethod,
             'order'          => $salesOrder,
-        ) );
+        ] );
         return $salesOrder;
     }
 
@@ -339,7 +339,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             if ( !$product ) {
                 continue;
             }
-            $orderItem                 = array();
+            $orderItem                 = [];
             $orderItem[ 'order_id' ]     = $orderId;
             $orderItem[ 'product_id' ]   = $item->product_id;
             $orderItem[ 'qty' ]          = $item->qty;
@@ -372,7 +372,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function getTextDescription()
     {
-        $description = array();
+        $description = [];
         foreach ( $this->items() as $item ) {
             $product_data = BUtil::fromJson( $item->get( 'product_info' ) );
             $name = isset( $product_data[ 'product_name' ] ) ? $product_data[ 'product_name' ] : null;
@@ -382,7 +382,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
                 $description[ $name ] += $item->qty;
             }
         }
-        $result = array();
+        $result = [];
         foreach ( $description as $name => $qty ) {
             $line = $name . ' x (' . $qty . ')';
             $result[] = $line;

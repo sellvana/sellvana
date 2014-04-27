@@ -7,7 +7,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         if ( !parent::beforeDispatch() ) {
             return false;
         }
-        if ( FCom_Customer_Model_Customer::i()->isLoggedIn() && in_array( $this->_action, array( 'login', 'register', 'password_recover' ) ) ) {
+        if ( FCom_Customer_Model_Customer::i()->isLoggedIn() && in_array( $this->_action, [ 'login', 'register', 'password_recover' ] ) ) {
             BResponse::i()->redirect( '' );
         }
         return true;
@@ -36,7 +36,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                 $login = $r->post();
             }
             $customerModel->setLoginRules();
-            if ( $customerModel->validate( $login, array(), 'frontend' ) ) {
+            if ( $customerModel->validate( $login, [], 'frontend' ) ) {
                 $user = $customerModel->authenticate( $login[ 'email' ], $login[ 'password' ] );
                 if ( $user ) {
                     switch ( $user->status ) {
@@ -64,7 +64,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                             BResponse::i()->cookie( 'remember_me', 1, ( $days ? $days : 30 ) * 86400 );
                         }
                     } else {
-                        $this->message( $errorMessage, 'error', 'frontend', array( 'title' => '' ) );
+                        $this->message( $errorMessage, 'error', 'frontend', [ 'title' => '' ] );
                         BResponse::i()->redirect( 'login' );
                         return;
                     }
@@ -101,7 +101,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $email = BRequest::i()->request( 'email' );
             $customerModel = FCom_Customer_Model_Customer::i();
             $customerModel->setPasswordRecoverRules();
-            if ( $customerModel->validate( array( 'email' => $email ), array(), 'frontend' ) ) {
+            if ( $customerModel->validate( [ 'email' => $email ], [], 'frontend' ) ) {
                 $user = $customerModel->load( $email, 'email' );
                 if ( $user ) {
                     $user->recoverPassword();
@@ -169,7 +169,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $a = BRequest::i()->post( 'address' );
             $customerModel = FCom_Customer_Model_Customer::i();
             $formId = 'register-form';
-            $emailUniqueRules = array( array( 'email', 'FCom_Customer_Model_Customer::ruleEmailUnique', 'An account with this email address already exists' ) );
+            $emailUniqueRules = [ [ 'email', 'FCom_Customer_Model_Customer::ruleEmailUnique', 'An account with this email address already exists' ] ];
             if ( $customerModel->validate( $r, $emailUniqueRules, $formId ) ) {
                 $customer = $customerModel->register( $r );
                 if ( $a ) {

@@ -24,13 +24,13 @@ function file_get_dom( $file, $return_root = true, $use_include_path = false, $c
     }
     return ( ( $f === false ) ? false : str_get_dom( $f, $return_root ) );
 }
-function dom_format( &$root, $options = array() ) {
+function dom_format( &$root, $options = [] ) {
     $formatter = new HTML_Formatter( $options );
     return $formatter->format( $root );
 }
 if ( version_compare( PHP_VERSION, '5.0.0', '<' ) ) {
     function str_split( $string ) {
-        $res = array();
+        $res = [];
         $size = strlen( $string );
         for ( $i = 0; $i < $size; $i++ ) {
             $res[] = $string[ $i ];
@@ -40,7 +40,7 @@ if ( version_compare( PHP_VERSION, '5.0.0', '<' ) ) {
 }
 if ( version_compare( PHP_VERSION, '5.2.0', '<' ) ) {
     function array_fill_keys( $keys, $value ) {
-        $res = array();
+        $res = [];
         foreach ( $keys as $k ) {
             $res[ $k ] = $value;
         }
@@ -58,14 +58,14 @@ class Tokenizer_Base {
     var $doc = '';
     var $size = 0;
     var $pos = 0;
-    var $line_pos = array( 0, 0 );
+    var $line_pos = [ 0, 0 ];
     var $token = self::TOK_NULL;
     var $token_start = null;
     var $whitespace = " \t\n\r\0\x0B";
     var $identifiers = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_';
-    var $custom_char_map = array();
-    var $char_map = array();
-    var $errors = array();
+    var $custom_char_map = [];
+    var $char_map = [];
+    var $errors = [];
     function __construct( $doc = '', $pos = 0 ) {
         $this->setWhitespace( $this->whitespace );
         $this->setIdentifiers( $this->identifiers );
@@ -81,14 +81,14 @@ class Tokenizer_Base {
     }
     function setPos( $pos = 0 ) {
         $this->pos = $pos - 1;
-        $this->line_pos = array( 0, 0 );
+        $this->line_pos = [ 0, 0 ];
         $this->next();
     }
     function getPos() {
         return $this->pos;
     }
     function getLinePos() {
-        return array( $this->line_pos[ 0 ], $this->pos - $this->line_pos[ 1 ] );
+        return [ $this->line_pos[ 0 ], $this->pos - $this->line_pos[ 1 ] ];
     }
     function getToken() {
         return $this->token;
@@ -313,8 +313,8 @@ class HTML_Parser_Base extends Tokenizer_Base {
     const TOK_STRING = 104;
     const TOK_EQUALS = 105;
     var $identifiers = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890:-_!?%';
-    var $status = array();
-    var $custom_char_map = array(
+    var $status = [];
+    var $custom_char_map = [
         '<' => self::TOK_TAG_OPEN,
         '>' => self::TOK_TAG_CLOSE,
         "'" => 'parse_string',
@@ -322,19 +322,19 @@ class HTML_Parser_Base extends Tokenizer_Base {
         '/' => self::TOK_SLASH_FORWARD,
         '\\' => self::TOK_SLASH_BACKWARD,
         '=' => self::TOK_EQUALS
-    );
+    ];
     function __construct( $doc = '', $pos = 0 ) {
         parent::__construct( $doc, $pos );
         $this->parse_all();
     }
-    var $tag_map = array(
+    var $tag_map = [
         '!doctype' => 'parse_doctype',
         '?' => 'parse_php',
         '?php' => 'parse_php',
         '%' => 'parse_asp',
         'style' => 'parse_style',
         'script' => 'parse_script'
-    );
+    ];
     protected function parse_string() {
         if ( $this->next_pos( $this->doc[ $this->pos ], false ) !== self::TOK_UNKNOWN ) {
             --$this->pos;
@@ -461,7 +461,7 @@ class HTML_Parser_Base extends Tokenizer_Base {
         return true;
     }
     function parse_attributes() {
-        $this->status[ 'attributes' ] = array();
+        $this->status[ 'attributes' ] = [];
         while ( $this->next_no_whitespace() === self::TOK_IDENTIFIER ) {
             $attr = $this->getTokenString();
             if ( ( $attr === '?' ) || ( $attr === '%' ) ) {
@@ -494,7 +494,7 @@ class HTML_Parser_Base extends Tokenizer_Base {
     }
     function parse_tag_default() {
         if ( $this->status[ 'closing_tag' ] ) {
-            $this->status[ 'attributes' ] = array();
+            $this->status[ 'attributes' ] = [];
             $this->next_no_whitespace();
         } else {
             if ( !$this->parse_attributes() ) {
@@ -573,7 +573,7 @@ class HTML_Parser_Base extends Tokenizer_Base {
         return $res;
     }
     function parse_all() {
-        $this->errors = array();
+        $this->errors = [];
         $this->status[ 'last_pos' ] = -1;
         if ( ( $this->token === self::TOK_TAG_OPEN ) || ( $this->next_pos( '<', false ) === self::TOK_UNKNOWN ) ) {
             do {
@@ -589,8 +589,8 @@ class HTML_Parser_Base extends Tokenizer_Base {
 }
 class HTML_Parser extends HTML_Parser_Base {
     var $root = 'HTML_Node';
-    var $hierarchy = array();
-    var    $tags_selfclose = array(
+    var $hierarchy = [];
+    var    $tags_selfclose = [
         'area'        => true,
         'base'        => true,
         'basefont'    => true,
@@ -610,7 +610,7 @@ class HTML_Parser extends HTML_Parser_Base {
         'source'    => true,
         'track'        => true,
         'wbr'        => true
-    );
+    ];
     function __construct( $doc = '', $pos = 0, $root = null ) {
         if ( $root === null ) {
             $root = new $this->root( '~root~', null );
@@ -766,53 +766,53 @@ class HTML_Parser extends HTML_Parser_Base {
         }
     }
     function parse_all() {
-        $this->hierarchy = array( &$this->root );
+        $this->hierarchy = [ &$this->root ];
         return ( ( parent::parse_all() ) ? $this->root : false );
     }
 }
 class HTML_Parser_HTML5 extends HTML_Parser {
-    var $tags_optional_close = array(
-        'li'             => array( 'li' => true ),
-        'dt'             => array( 'dt' => true, 'dd' => true ),
-        'dd'             => array( 'dt' => true, 'dd' => true ),
-        'address'         => array( 'p' => true ),
-        'article'         => array( 'p' => true ),
-        'aside'         => array( 'p' => true ),
-        'blockquote'     => array( 'p' => true ),
-        'dir'             => array( 'p' => true ),
-        'div'             => array( 'p' => true ),
-        'dl'             => array( 'p' => true ),
-        'fieldset'         => array( 'p' => true ),
-        'footer'         => array( 'p' => true ),
-        'form'             => array( 'p' => true ),
-        'h1'             => array( 'p' => true ),
-        'h2'             => array( 'p' => true ),
-        'h3'             => array( 'p' => true ),
-        'h4'             => array( 'p' => true ),
-        'h5'             => array( 'p' => true ),
-        'h6'             => array( 'p' => true ),
-        'header'         => array( 'p' => true ),
-        'hgroup'         => array( 'p' => true ),
-        'hr'             => array( 'p' => true ),
-        'menu'             => array( 'p' => true ),
-        'nav'             => array( 'p' => true ),
-        'ol'             => array( 'p' => true ),
-        'p'             => array( 'p' => true ),
-        'pre'             => array( 'p' => true ),
-        'section'         => array( 'p' => true ),
-        'table'         => array( 'p' => true ),
-        'ul'             => array( 'p' => true ),
-        'rt'            => array( 'rt' => true, 'rp' => true ),
-        'rp'            => array( 'rt' => true, 'rp' => true ),
-        'optgroup'        => array( 'optgroup' => true, 'option' => true ),
-        'option'        => array( 'option' ),
-        'tbody'            => array( 'thread' => true, 'tbody' => true, 'tfoot' => true ),
-        'tfoot'            => array( 'thread' => true, 'tbody' => true ),
-        'tr'            => array( 'tr' => true ),
-        'td'            => array( 'td' => true, 'th' => true ),
-        'th'            => array( 'td' => true, 'th' => true ),
-        'body'            => array( 'head' => true )
-    );
+    var $tags_optional_close = [
+        'li'             => [ 'li' => true ],
+        'dt'             => [ 'dt' => true, 'dd' => true ],
+        'dd'             => [ 'dt' => true, 'dd' => true ],
+        'address'         => [ 'p' => true ],
+        'article'         => [ 'p' => true ],
+        'aside'         => [ 'p' => true ],
+        'blockquote'     => [ 'p' => true ],
+        'dir'             => [ 'p' => true ],
+        'div'             => [ 'p' => true ],
+        'dl'             => [ 'p' => true ],
+        'fieldset'         => [ 'p' => true ],
+        'footer'         => [ 'p' => true ],
+        'form'             => [ 'p' => true ],
+        'h1'             => [ 'p' => true ],
+        'h2'             => [ 'p' => true ],
+        'h3'             => [ 'p' => true ],
+        'h4'             => [ 'p' => true ],
+        'h5'             => [ 'p' => true ],
+        'h6'             => [ 'p' => true ],
+        'header'         => [ 'p' => true ],
+        'hgroup'         => [ 'p' => true ],
+        'hr'             => [ 'p' => true ],
+        'menu'             => [ 'p' => true ],
+        'nav'             => [ 'p' => true ],
+        'ol'             => [ 'p' => true ],
+        'p'             => [ 'p' => true ],
+        'pre'             => [ 'p' => true ],
+        'section'         => [ 'p' => true ],
+        'table'         => [ 'p' => true ],
+        'ul'             => [ 'p' => true ],
+        'rt'            => [ 'rt' => true, 'rp' => true ],
+        'rp'            => [ 'rt' => true, 'rp' => true ],
+        'optgroup'        => [ 'optgroup' => true, 'option' => true ],
+        'option'        => [ 'option' ],
+        'tbody'            => [ 'thread' => true, 'tbody' => true, 'tfoot' => true ],
+        'tfoot'            => [ 'thread' => true, 'tbody' => true ],
+        'tr'            => [ 'tr' => true ],
+        'td'            => [ 'td' => true, 'th' => true ],
+        'th'            => [ 'td' => true, 'th' => true ],
+        'body'            => [ 'head' => true ]
+    ];
     protected function parse_hierarchy( $self_close = null ) {
         $tag_curr = strtolower( $this->status[ 'tag_name' ] );
         if ( $self_close === null ) {
@@ -851,15 +851,15 @@ class HTML_Node {
     var $childClass_XML = 'HTML_Node_XML';
     var $childClass_ASP = 'HTML_Node_ASP';
     var $parent = null;
-    var $attributes = array();
+    var $attributes = [];
     var $attributes_ns = null;
-    var $children = array();
+    var $children = [];
     var $tag = '';
     var $tag_ns = null;
     var $self_close = false;
     var $self_close_str = ' /';
     var $attribute_shorttag = true;
-    var $filter_map = array(
+    var $filter_map = [
         'root' => 'filter_root',
         'nth-child' => 'filter_nchild',
         'eq' => 'filter_nchild',
@@ -888,7 +888,7 @@ class HTML_Node {
         'element' => 'filter_element',
         'text' => 'filter_text',
         'comment' => 'filter_comment'
-    );
+    ];
     function __construct( $tag, $parent ) {
         $this->parent = $parent;
         if ( is_string( $tag ) ) {
@@ -1027,7 +1027,7 @@ class HTML_Node {
         foreach ( $this->children as $c ) {
             $c->delete();
         }
-        $this->children = array();
+        $this->children = [];
     }
     function changeParent( $to, &$index = null ) {
         if ( $this->parent !== null ) {
@@ -1156,9 +1156,9 @@ class HTML_Node {
         if ( $tag_ns === null ) {
             $a = explode( ':', $this->tag, 2 );
             if ( empty( $a[ 1 ] ) ) {
-                $this->tag_ns = array( '', $a[ 0 ] );
+                $this->tag_ns = [ '', $a[ 0 ] ];
             } else {
-                $this->tag_ns = array( $a[ 0 ], $a[ 1 ] );
+                $this->tag_ns = [ $a[ 0 ], $a[ 1 ] ];
             }
         }
         return $this->tag_ns[ 0 ];
@@ -1237,7 +1237,7 @@ class HTML_Node {
             if ( $offset < 0 ) {
                 $offset += count( $this->children );
             }
-            array_splice( $this->children, $offset++, 0, array( &$tag ) );
+            array_splice( $this->children, $offset++, 0, [ &$tag ] );
         } else {
             $this->children[] =& $tag;
         }
@@ -1267,10 +1267,10 @@ class HTML_Node {
     function &addDoctype( $dtd, &$offset = null ) {
         return $this->addChild( new $this->childClass_Doctype( $this, $dtd ), $offset );
     }
-    function &addXML( $tag = 'xml', $text = '', $attributes = array(), &$offset = null ) {
+    function &addXML( $tag = 'xml', $text = '', $attributes = [], &$offset = null ) {
         return $this->addChild( new $this->childClass_XML( $this, $tag, $text, $attributes ), $offset );
     }
-    function &addASP( $tag = '', $text = '', $attributes = array(), &$offset = null ) {
+    function &addASP( $tag = '', $text = '', $attributes = [], &$offset = null ) {
         return $this->addChild( new $this->childClass_ASP( $this, $tag, $text, $attributes ), $offset );
     }
     function deleteChild( $child, $soft_delete = false ) {
@@ -1283,7 +1283,7 @@ class HTML_Node {
             $this->children[ $child ]->delete();
         }
         unset( $this->children[ $child ] );
-        $tmp = array();
+        $tmp = [];
         foreach ( array_keys( $this->children ) as $k ) {
             $tmp[] =& $this->children[ $k ];
         }
@@ -1339,9 +1339,9 @@ class HTML_Node {
                     ++$index;
                 }
                 if ( empty( $b[ 1 ] ) ) {
-                    return array( array( '', $b[ 0 ], $attr, $index ) );
+                    return [ [ '', $b[ 0 ], $attr, $index ] ];
                 } else {
-                    return array( array( $b[ 0 ], $b[ 1 ], $attr, $index ) );
+                    return [ [ $b[ 0 ], $b[ 1 ], $attr, $index ] ];
                 }
             } else {
                 return false;
@@ -1352,9 +1352,9 @@ class HTML_Node {
                 foreach ( $this->attributes as $a => $v ) {
                     $b = explode( ':', $a, 2 );
                     if ( empty( $b[ 1 ] ) ) {
-                        $this->attributes_ns[ $b[ 0 ] ][] = array( '', $b[ 0 ], $a, $index );
+                        $this->attributes_ns[ $b[ 0 ] ][] = [ '', $b[ 0 ], $a, $index ];
                     } else {
-                        $this->attributes_ns[ $b[ 1 ] ][] = array( $b[ 0 ], $b[ 1 ], $a, $index );
+                        $this->attributes_ns[ $b[ 1 ] ][] = [ $b[ 0 ], $b[ 1 ], $a, $index ];
                     }
                     ++$index;
                 }
@@ -1366,7 +1366,7 @@ class HTML_Node {
                 $attr = strtolower( $attr );
             }
             if ( $compare === 'namespace' ) {
-                $res = array();
+                $res = [];
                 foreach ( $t as $ar ) {
                     foreach ( $ar as $a ) {
                         if ( $a[ 0 ] === $attr ) {
@@ -1391,7 +1391,7 @@ class HTML_Node {
             if ( count( $f ) === 1 ) {
                 return $this->attributes[ $f[ 0 ][ 0 ] ];
             } else {
-                $res = array();
+                $res = [];
                 foreach ( $f as $a ) {
                     $res[] = $a[ 0 ];
                 }
@@ -1424,7 +1424,7 @@ class HTML_Node {
             if ( count( $f ) === 1 ) {
                 return $this->attributes[ $f[ 0 ][ 2 ] ];
             } else {
-                $res = array();
+                $res = [];
                 foreach ( $f as $a ) {
                     $res[] = $this->attributes[ $a[ 2 ] ];
                 }
@@ -1466,7 +1466,7 @@ class HTML_Node {
     }
     function addClass( $className ) {
         if ( !is_array( $className ) ) {
-            $className = array( $className );
+            $className = [ $className ];
         }
         $class = $this->class;
         foreach ( $className as $c ) {
@@ -1478,7 +1478,7 @@ class HTML_Node {
     }
     function removeClass( $className ) {
         if ( !is_array( $className ) ) {
-            $className = array( $className );
+            $className = [ $className ];
         }
         $class = $this->class;
         foreach ( $className as $c ) {
@@ -1493,9 +1493,9 @@ class HTML_Node {
     function getChildrenByCallback( $callback, $recursive = true, $check_self = false ) {
         $count = $this->childCount();
         if ( $check_self && $callback( $this ) ) {
-            $res = array( $this );
+            $res = [ $this ];
         } else {
-            $res = array();
+            $res = [];
         }
         if ( $count > 0 ) {
             if ( is_int( $recursive ) ) {
@@ -1516,12 +1516,12 @@ class HTML_Node {
         $res = false;
         foreach ( $tags as $tag => $match ) {
             if ( !is_array( $match ) ) {
-                $match = array(
+                $match = [
                     'match' => $match,
                     'operator' => 'or',
                     'compare' => 'total',
                     'case_sensitive' => false
-                );
+                ];
             } else {
                 if ( is_int( $tag ) ) {
                     $tag = $match[ 'tag' ];
@@ -1562,14 +1562,14 @@ class HTML_Node {
         $res = false;
         foreach ( $attributes as $attribute => $match ) {
             if ( !is_array( $match ) ) {
-                $match = array(
+                $match = [
                     'operator_value' => 'equals',
                     'value' => $match,
                     'match' => true,
                     'operator_result' => 'or',
                     'compare' => 'total',
                     'case_sensitive' => false
-                );
+                ];
             } else {
                 if ( is_int( $attribute ) ) {
                     $attribute = $match[ 'attribute' ];
@@ -1653,7 +1653,7 @@ class HTML_Node {
         }
         return $res;
     }
-    protected function match_filters( $conditions, $custom_filters = array() ) {
+    protected function match_filters( $conditions, $custom_filters = [] ) {
         foreach ( $conditions as $c ) {
             $c[ 'filter' ] = strtolower( $c[ 'filter' ] );
             if ( isset( $this->filter_map[ $c[ 'filter' ] ] ) ) {
@@ -1671,7 +1671,7 @@ class HTML_Node {
         }
         return true;
     }
-    function match( $conditions, $match = true, $custom_filters = array() ) {
+    function match( $conditions, $match = true, $custom_filters = [] ) {
         $t = isset( $conditions[ 'tags' ] );
         $a = isset( $conditions[ 'attributes' ] );
         $f = isset( $conditions[ 'filters' ] );
@@ -1699,7 +1699,7 @@ class HTML_Node {
     }
     function getChildrenByAttribute( $attribute, $value, $mode = 'equals', $compare = 'total', $recursive = true ) {
         if ( $this->childCount() < 1 ) {
-            return array();
+            return [];
         }
         $mode = explode( ' ', strtolower( $mode ) );
         $match = ( ( isset( $mode[ 1 ] ) && ( $mode[ 1 ] === 'not' ) ) ? 'false' : 'true' );
@@ -1729,7 +1729,7 @@ CALLBACK;
     }
     function getChildrenByTag( $tag, $compare = 'total', $recursive = true ) {
         if ( $this->childCount() < 1 ) {
-            return array();
+            return [];
         }
         $tag = explode( ' ', strtolower( $tag ) );
         $match = ( ( isset( $tag[ 1 ] ) && ( $tag[ 1 ] === 'not' ) ) ? 'false' : 'true' );
@@ -1972,7 +1972,7 @@ class HTML_NODE_DOCTYPE extends HTML_Node {
 class HTML_NODE_EMBEDDED extends HTML_Node {
     var $tag_char = '';
     var $text = '';
-    function __construct( $parent, $tag_char = '', $tag = '', $text = '', $attributes = array() ) {
+    function __construct( $parent, $tag_char = '', $tag = '', $text = '', $attributes = [] ) {
         $this->parent = $parent;
         $this->tag_char = $tag_char;
         if ( $tag[ 0 ] !== $this->tag_char ) {
@@ -1995,13 +1995,13 @@ class HTML_NODE_EMBEDDED extends HTML_Node {
 }
 class HTML_NODE_XML extends HTML_NODE_EMBEDDED {
     const NODE_TYPE = self::NODE_XML;
-    function __construct( $parent, $tag = 'xml', $text = '', $attributes = array() ) {
+    function __construct( $parent, $tag = 'xml', $text = '', $attributes = [] ) {
         return parent::__construct( $parent, '?', $tag, $text, $attributes );
     }
 }
 class HTML_NODE_ASP extends HTML_NODE_EMBEDDED {
     const NODE_TYPE = self::NODE_ASP;
-    function __construct( $parent, $tag = '', $text = '', $attributes = array() ) {
+    function __construct( $parent, $tag = '', $text = '', $attributes = [] ) {
         return parent::__construct( $parent, '%', $tag, $text, $attributes );
     }
 }
@@ -2035,7 +2035,7 @@ class Tokenizer_CSSQuery extends Tokenizer_Base {
     const TOK_COMPARE_REGEX = 123;
     const TOK_COMPARE_STARTS = 124;
     var $identifiers = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-?';
-    var $custom_char_map = array(
+    var $custom_char_map = [
         '.' => self::TOK_CLASS,
         '#' => self::TOK_ID,
         ',' => self::TOK_COMMA,
@@ -2057,7 +2057,7 @@ class Tokenizer_CSSQuery extends Tokenizer_Base {
         '[' => self::TOK_BRACKET_OPEN,
         ']' => self::TOK_BRACKET_CLOSE,
         ':' => self::TOK_COLON
-    );
+    ];
     protected function parse_gt() {
         if ( $this->doc[ $this->pos + 1 ] === '=' ) {
             ++$this->pos;
@@ -2134,10 +2134,10 @@ class HTML_Selector {
     var $parser = 'Tokenizer_CSSQuery';
     var $root = null;
     var $query = '';
-    var $result = array();
+    var $result = [];
     var $search_root = false;
     var $search_recursive = true;
-    var $custom_filter_map = array();
+    var $custom_filter_map = [];
     function __construct( $root, $query = '*', $search_root = false, $search_recursive = true, $parser = null ) {
         if ( $parser === null ) {
             $parser = new $this->parser();
@@ -2161,8 +2161,8 @@ class HTML_Selector {
     }
     protected function error( $error ) {
         $error = htmlentities( str_replace(
-            array( '%tok%', '%pos%' ),
-            array( $this->parser->getTokenString(), (int) $this->parser->getPos() ),
+            [ '%tok%', '%pos%' ],
+            [ $this->parser->getTokenString(), (int) $this->parser->getPos() ],
             $error
         ) );
         trigger_error( $error );
@@ -2173,7 +2173,7 @@ class HTML_Selector {
         if ( $tok === Tokenizer_CSSQuery::TOK_IDENTIFIER ) {
             return $p->getTokenString();
         } elseif ( $tok === Tokenizer_CSSQuery::TOK_STRING ) {
-            return str_replace( array( '\\\'', '\\"', '\\\\' ), array( '\'', '"', '\\' ), $p->getTokenString( 1, -1 ) );
+            return str_replace( [ '\\\'', '\\"', '\\\\' ], [ '\'', '"', '\\' ], $p->getTokenString( 1, -1 ) );
         } elseif ( $do_error ) {
             $this->error( 'Expected identifier at %pos%!' );
         }
@@ -2186,25 +2186,25 @@ class HTML_Selector {
             $this->error( 'Invalid search pattern(1): Empty string!' );
             return false;
         }
-        $conditions_all = array();
+        $conditions_all = [];
         while ( $tok !== Tokenizer_CSSQuery::TOK_NULL ) {
-            $conditions = array( 'tags' => array(), 'attributes' => array() );
+            $conditions = [ 'tags' => [], 'attributes' => [] ];
             if ( $tok === Tokenizer_CSSQuery::TOK_ALL ) {
                 $tok = $p->next();
                 if ( ( $tok === Tokenizer_CSSQuery::TOK_PIPE ) && ( $tok = $p->next() ) && ( $tok !== Tokenizer_CSSQuery::TOK_ALL ) ) {
                     if ( ( $tag = $this->parse_getIdentifier() ) === false ) {
                         return false;
                     }
-                    $conditions[ 'tags' ][] = array(
+                    $conditions[ 'tags' ][] = [
                         'tag' => $tag,
                         'compare' => 'name'
-                    );
+                    ];
                     $tok = $p->next_no_whitespace();
                 } else {
-                    $conditions[ 'tags' ][ '' ] = array(
+                    $conditions[ 'tags' ][ '' ] = [
                         'tag' => '',
                         'match' => false
-                    );
+                    ];
                     if ( $tok === Tokenizer_CSSQuery::TOK_ALL ) {
                         $tok = $p->next_no_whitespace();
                     }
@@ -2212,15 +2212,15 @@ class HTML_Selector {
             } elseif ( $tok === Tokenizer_CSSQuery::TOK_PIPE ) {
                 $tok = $p->next();
                 if ( $tok === Tokenizer_CSSQuery::TOK_ALL ) {
-                    $conditions[ 'tags' ][] = array(
+                    $conditions[ 'tags' ][] = [
                         'tag' => '',
                         'compare' => 'namespace',
-                    );
+                    ];
                 } elseif ( ( $tag = $this->parse_getIdentifier() ) !== false ) {
-                    $conditions[ 'tags' ][] = array(
+                    $conditions[ 'tags' ][] = [
                         'tag' => $tag,
                         'compare' => 'total',
-                    );
+                    ];
                 } else {
                     return false;
                 }
@@ -2273,12 +2273,12 @@ class HTML_Selector {
                     if ( $tok === Tokenizer_CSSQuery::TOK_WHITESPACE ) {
                         $tok = $p->next_no_whitespace();
                     }
-                    $conditions[ 'tags' ][] = array(
+                    $conditions[ 'tags' ][] = [
                         'tag' => $tag,
                         'match' => $match,
                         'operator' => $last_mode,
                         'compare' => $compare
-                    );
+                    ];
                     switch ( $tok ) {
                         case Tokenizer_CSSQuery::TOK_COMMA:
                             $tok = $p->next_no_whitespace();
@@ -2301,25 +2301,25 @@ class HTML_Selector {
                 if ( $tok === Tokenizer_CSSQuery::TOK_PIPE ) {
                     $tok = $p->next();
                     if ( $tok === Tokenizer_CSSQuery::TOK_ALL ) {
-                        $conditions[ 'tags' ][] = array(
+                        $conditions[ 'tags' ][] = [
                             'tag' => $tag,
                             'compare' => 'namespace'
-                        );
+                        ];
                     } elseif ( ( $tag_name = $this->parse_getIdentifier() ) !== false ) {
                         $tag = $tag . ':' . $tag_name;
-                        $conditions[ 'tags' ][] = array(
+                        $conditions[ 'tags' ][] = [
                             'tag' => $tag,
                             'match' => true
-                        );
+                        ];
                     } else {
                         return false;
                     }
                     $tok = $p->next();
                 } else {
-                    $conditions[ 'tags' ][] = array(
+                    $conditions[ 'tags' ][] = [
                         'tag' => $tag,
                         'match' => true
-                    );
+                    ];
                 }
             } else {
                 unset( $conditions[ 'tags' ] );
@@ -2330,12 +2330,12 @@ class HTML_Selector {
                 if ( ( $class = $this->parse_getIdentifier() ) === false ) {
                     return false;
                 }
-                $conditions[ 'attributes' ][] = array(
+                $conditions[ 'attributes' ][] = [
                     'attribute' => 'class',
                     'operator_value' => 'contains',
                     'value' => $class,
                     'operator_result' => $last_mode
-                );
+                ];
                 $last_mode = 'and';
                 $tok = $p->next();
             }
@@ -2344,12 +2344,12 @@ class HTML_Selector {
                 if ( ( $id = $this->parse_getIdentifier() ) === false ) {
                     return false;
                 }
-                $conditions[ 'attributes' ][] = array(
+                $conditions[ 'attributes' ][] = [
                     'attribute' => 'id',
                     'operator_value' => 'equals',
                     'value' => $id,
                     'operator_result' => $last_mode
-                );
+                ];
                 $last_mode = 'and';
                 $tok = $p->next();
             }
@@ -2420,21 +2420,21 @@ class HTML_Selector {
                             break;
                     }
                     if ( $operator_value && $val ) {
-                        $conditions[ 'attributes' ][] = array(
+                        $conditions[ 'attributes' ][] = [
                             'attribute' => $attribute,
                             'operator_value' => $operator_value,
                             'value' => $val,
                             'match' => $match,
                             'operator_result' => $last_mode,
                             'compare' => $compare
-                        );
+                        ];
                     } else {
-                        $conditions[ 'attributes' ][] = array(
+                        $conditions[ 'attributes' ][] = [
                             'attribute' => $attribute,
                             'value' => $match,
                             'operator_result' => $last_mode,
                             'compare' => $compare
-                        );
+                        ];
                     }
                     switch ( $tok ) {
                         case Tokenizer_CSSQuery::TOK_COMMA:
@@ -2459,10 +2459,10 @@ class HTML_Selector {
             }
             while ( $tok === Tokenizer_CSSQuery::TOK_COLON ) {
                 if ( count( $conditions ) < 1 ) {
-                    $conditions[ 'tags' ] = array( array(
+                    $conditions[ 'tags' ] = [ [
                         'tag' => '',
                         'match' => false
-                    ) );
+                    ] ];
                 }
                 $tok = $p->next();
                 if ( ( $filter = $this->parse_getIdentifier() ) === false ) {
@@ -2486,7 +2486,7 @@ class HTML_Selector {
                 } else {
                     $params = '';
                 }
-                $conditions[ 'filters' ][] = array( 'filter' => $filter, 'params' => $params );
+                $conditions[ 'filters' ][] = [ 'filter' => $filter, 'params' => $params ];
             }
             if ( count( $conditions ) < 1 ) {
                 $this->error( 'Invalid search pattern(2): No conditions found!' );
@@ -2529,7 +2529,7 @@ func;
     }
     protected function parse_adjacent() {
         $tmp = $this->result;
-        $this->result = array();
+        $this->result = [];
         if ( ( $c = $this->parse_conditions() ) === false ) {
             return false;
         }
@@ -2544,7 +2544,7 @@ func;
     }
     protected function parse_result( $parent = false, $recursive = true ) {
         $tmp = $this->result;
-        $tmp_res = array();
+        $tmp_res = [];
         if ( ( $c = $this->parse_conditions() ) === false ) {
             return false;
         }
@@ -2563,7 +2563,7 @@ func;
     protected function parse() {
         $p =& $this->parser;
         $p->setPos( 0 );
-        $this->result = array();
+        $this->result = [];
         if ( !$this->parse_single() ) {
             return false;
         }
@@ -2620,62 +2620,62 @@ function indent_text( $text, $indent, $indent_string = '  ' ) {
     }
 }
 class HTML_Formatter {
-    var $block_elements = array(
-        'p' =>            array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'h1' =>         array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'h2' =>          array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'h3' =>          array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'h4' =>          array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'h5' =>          array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'h6' =>          array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'form' =>          array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'fieldset' =>      array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'legend' =>      array( 'new_line' => true,  'as_block' => false, 'format_inside' => true ),
-        'dl' =>          array( 'new_line' => true,  'as_block' => false, 'format_inside' => true ),
-        'dt' =>          array( 'new_line' => true,  'as_block' => false, 'format_inside' => true ),
-        'dd' =>          array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'ol' =>          array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'ul' =>          array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'li' =>          array( 'new_line' => true,  'as_block' => false, 'format_inside' => true ),
-        'table' =>      array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'tr' =>          array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'dir' =>          array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'menu' =>          array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'address' =>      array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'blockquote' => array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'center' =>      array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'del' =>          array( 'new_line' => true,  'as_block' => false, 'format_inside' => true ),
-        'hr' =>          array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'ins' =>          array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'noscript' =>      array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'pre' =>          array( 'new_line' => true,  'as_block' => true,  'format_inside' => false ),
-        'script' =>      array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'style' =>      array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'html' =>         array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'head' =>         array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'body' =>         array( 'new_line' => true,  'as_block' => true,  'format_inside' => true ),
-        'title' =>         array( 'new_line' => true,  'as_block' => false, 'format_inside' => false )
-    );
-    var $whitespace = array(
+    var $block_elements = [
+        'p' =>            [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'h1' =>         [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'h2' =>          [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'h3' =>          [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'h4' =>          [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'h5' =>          [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'h6' =>          [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'form' =>          [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'fieldset' =>      [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'legend' =>      [ 'new_line' => true,  'as_block' => false, 'format_inside' => true ],
+        'dl' =>          [ 'new_line' => true,  'as_block' => false, 'format_inside' => true ],
+        'dt' =>          [ 'new_line' => true,  'as_block' => false, 'format_inside' => true ],
+        'dd' =>          [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'ol' =>          [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'ul' =>          [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'li' =>          [ 'new_line' => true,  'as_block' => false, 'format_inside' => true ],
+        'table' =>      [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'tr' =>          [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'dir' =>          [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'menu' =>          [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'address' =>      [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'blockquote' => [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'center' =>      [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'del' =>          [ 'new_line' => true,  'as_block' => false, 'format_inside' => true ],
+        'hr' =>          [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'ins' =>          [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'noscript' =>      [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'pre' =>          [ 'new_line' => true,  'as_block' => true,  'format_inside' => false ],
+        'script' =>      [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'style' =>      [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'html' =>         [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'head' =>         [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'body' =>         [ 'new_line' => true,  'as_block' => true,  'format_inside' => true ],
+        'title' =>         [ 'new_line' => true,  'as_block' => false, 'format_inside' => false ]
+    ];
+    var $whitespace = [
         ' ' => false,
         "\t" => false,
         "\x0B" => false,
         "\0" => false,
         "\n" => true,
         "\r" => true
-    );
+    ];
     var $indent_string = ' ';
     var $linebreak_string = "\n";
-    var $options = array(
+    var $options = [
         'img_alt' => '',
         'self_close_str' => null,
         'attribute_shorttag' => false,
         'sort_attributes' => false,
         'attributes_case' => CASE_LOWER,
         'minify_script' => true
-    );
-    var $errors = array();
-    function __construct( $options = array() ) {
+    ];
+    var $errors = [];
+    function __construct( $options = [] ) {
         $this->options = array_merge( $this->options, $options );
     }
     function __invoke( &$node ) {
@@ -2699,7 +2699,7 @@ class HTML_Formatter {
     }
     static function minify_javascript( &$root, $indent_string = ' ', $wrap_comment = true, $recursive = true ) {
         include_once( 'third party/jsminplus.php' );
-        $errors = array();
+        $errors = [];
         foreach ( $root->select( 'script:not-empty > "~text~"', false, $recursive, true ) as $c ) {
             try {
                 $text = $c->text;
@@ -2729,7 +2729,7 @@ class HTML_Formatter {
                 }
                 $c->text = $text;
             } catch ( Exception $e ) {
-                $errors[] = array( $e, $c->parent->dumpLocation() );
+                $errors[] = [ $e, $c->parent->dumpLocation() ];
             }
         }
         return ( ( $errors ) ? $errors : true );
@@ -2839,7 +2839,7 @@ class HTML_Formatter {
         return true;
     }
     function format( &$node ) {
-        $this->errors = array();
+        $this->errors = [];
         if ( $this->options[ 'minify_script' ] ) {
             $a = self::minify_javascript( $node, $this->indent_string, true, true );
             if ( is_array( $a ) ) {

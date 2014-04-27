@@ -6,11 +6,11 @@ class FCom_MarketClient_Controller_Download extends FCom_Core_Controller_Abstrac
     {
         #echo 1; exit;
         BLayout::i()->setRootView( 'marketclient/container' );
-        $this->view( 'marketclient/container' )->set( array(
+        $this->view( 'marketclient/container' )->set( [
             'modules' => BRequest::i()->request( 'modules' ),
             'redirect_to' => BRequest::i()->request( 'redirect_to' ),
-        ) );
-        FCom_MarketClient_Main::i()->progress( array(), true );
+        ] );
+        FCom_MarketClient_Main::i()->progress( [], true );
     }
 
     public function action_start__POST()
@@ -36,9 +36,9 @@ class FCom_MarketClient_Controller_Download extends FCom_Core_Controller_Abstrac
         }
 
         $progress = FCom_MarketClient_Main::i()->progress();
-        BResponse::i()->json( array(
+        BResponse::i()->json( [
             'progress' => $progress,
             'html' => (string)$this->view( 'marketclient/progress' )->set( 'progress', $progress ),
-        ) );
+        ] );
     }
 }

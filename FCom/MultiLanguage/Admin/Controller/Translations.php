@@ -12,41 +12,41 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $localeOptions = array();
+        $localeOptions = [];
         foreach ( FCom_Geo_Model_Country::i()->options() as $iso => $name ) {
             $localeOptions[ $iso ] = $iso;
         }
-        $config[ 'columns' ] = array(
-            array( 'type' => 'row_select' ),
-            array( 'name' => 'module', 'label' => 'Module', 'width' => 250 ),
-            array( 'type' => 'input', 'name' => 'locale', 'label' => 'Locale', 'width' => 50, 'options' => $localeOptions, 'editor' => 'select' ),
-            array( 'name' => 'file', 'label' => 'File', 'width' => 60 ),
-            array( 'name' => 'id', 'label' => 'Id', 'width' => 200 )
-        );
+        $config[ 'columns' ] = [
+            [ 'type' => 'row_select' ],
+            [ 'name' => 'module', 'label' => 'Module', 'width' => 250 ],
+            [ 'type' => 'input', 'name' => 'locale', 'label' => 'Locale', 'width' => 50, 'options' => $localeOptions, 'editor' => 'select' ],
+            [ 'name' => 'file', 'label' => 'File', 'width' => 60 ],
+            [ 'name' => 'id', 'label' => 'Id', 'width' => 200 ]
+        ];
         $config[ 'data_mode' ] = 'local';
-        $data = array();
+        $data = [];
         $modules = BModuleRegistry::i()->getAllModules();
         foreach ( $modules as $modName => $module ) {
             if ( !empty( $module->translations ) ) {
                 foreach ( $module->translations as $trlocale => $trfile ) {
-                    $data[] = array(
+                    $data[] = [
                         'module' => $module->name,
                         'locale' => strtoupper( $trlocale ),
                         'file'   => $trfile,
                         'id'     => $module->name . '/' . $trfile
-                    );
+                    ];
                 }
             }
         }
         $config[ 'data' ] = $data;
         //todo: just show buttons, need add event and process for this controller
-        $config[ 'actions' ] = array(
+        $config[ 'actions' ] = [
             'delete' => true,
-        );
-        $config[ 'filters' ] = array(
-            array( 'field' => 'module', 'type' => 'text' ),
-            array( 'field' => 'locale', 'type' => 'multiselect' ),
-        );
+        ];
+        $config[ 'filters' ] = [
+            [ 'field' => 'module', 'type' => 'text' ],
+            [ 'field' => 'locale', 'type' => 'multiselect' ],
+        ];
         return $config;
     }
 
@@ -65,7 +65,7 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
         $model->id = $id;
         $model->source = file_get_contents( $filename );
         $view = $this->view( $this->_formViewName )->set( 'model', $model );
-        $this->formViewBefore( array( 'view' => $view, 'model' => $model ) );
+        $this->formViewBefore( [ 'view' => $view, 'model' => $model ] );
         $this->layout( $this->_formLayoutName );
         $this->processFormTabs( $view, $model, 'edit' );
     }
@@ -73,14 +73,14 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
     public function formViewBefore( $args )
     {
         $m = $args[ 'model' ];
-        $args[ 'view' ]->set( array(
+        $args[ 'view' ]->set( [
             'form_id' => BLocale::transliterate( $this->_formLayoutName ),
             'form_url' => BApp::href( $this->_formHref ) . '?id=' . $m->id,
-            'actions' => array(
+            'actions' => [
                 'back' => '<button type="button" class="st3 sz2 btn" onclick="location.href=\'' . BApp::href( $this->_gridHref ) . '\'"><span>' .  BLocale::_( 'Back to list' ) . '</span></button>',
                 'save' => '<button type="submit" class="st1 sz2 btn" onclick="return adminForm.saveAll(this)"><span>' .  BLocale::_( 'Save' ) . '</span></button>',
-            ),
-        ) );
+            ],
+        ] );
         BEvents::i()->fire( static::$_origClass . '::formViewBefore', $args );
     }
 }

@@ -62,7 +62,7 @@ class BClass
     * @param array $args
     * @return BClass
     */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         if ( is_object( $new ) ) {
             $class = get_class( $new );
@@ -97,21 +97,21 @@ class BApp extends BClass
     *
     * @var array
     */
-    protected static $_compat = array();
+    protected static $_compat = [];
 
     /**
     * Global app vars registry
     *
     * @var array
     */
-    protected $_vars = array();
+    protected $_vars = [];
 
     /**
     * Flags whether vars shouldn't be changed
     *
     * @var mixed
     */
-    protected $_isConst = array();
+    protected $_isConst = [];
 
     /**
     * Verify if a feature is currently supported. Features:
@@ -148,7 +148,7 @@ class BApp extends BClass
      * @param array $args
      * @return BApp
      */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
@@ -237,7 +237,7 @@ class BApp extends BClass
     * @param string|array $args Arguments for the text
     * @return string
     */
-    public static function t( $string, $args = array() )
+    public static function t( $string, $args = [] )
     {
         return Blocale::_( $string, $args );
     }
@@ -267,7 +267,7 @@ class BApp extends BClass
      */
     public static function baseUrl( $full = true, $method = self::USE_CONFIG )
     {
-        static $baseUrl = array();
+        static $baseUrl = [];
         $full = (int)$full;
         $key  = $full . '|' . $method;
         if ( empty( $baseUrl[ $key ] ) ) {
@@ -276,7 +276,7 @@ class BApp extends BClass
             $c          = BConfig::i();
             $scriptName = $r->scriptName();
             if ( substr( $scriptName, -1 ) === '/' ) {
-                $scriptPath = array( 'dirname' => $scriptName, 'basename' => basename( $_SERVER[ 'SCRIPT_FILENAME' ] ) );
+                $scriptPath = [ 'dirname' => $scriptName, 'basename' => basename( $_SERVER[ 'SCRIPT_FILENAME' ] ) ];
             } else {
                 $scriptPath = pathinfo( $r->scriptName() );
             }
@@ -418,7 +418,7 @@ class BApp extends BClass
      * @param array $args
      * @return BClass
      */
-    public function instance( $class, $new = false, $args = array() )
+    public function instance( $class, $new = false, $args = [] )
     {
         return $class::i( $new, $args );
     }
@@ -454,14 +454,14 @@ class BConfig extends BClass
     *
     * @var array
     */
-    protected $_config = array();
+    protected $_config = [];
 
     /**
     * Configuration that will be saved on request
     *
     * @var array
     */
-    protected $_configToSave = array();
+    protected $_configToSave = [];
 
     /**
     * Enable double data storage for saving?
@@ -470,14 +470,14 @@ class BConfig extends BClass
     */
     protected $_enableSaving = true;
 
-    protected $_encryptedPaths = array();
+    protected $_encryptedPaths = [];
 
     /**
     * Shortcut to help with IDE autocompletion
     *
     * @return BConfig
     */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
@@ -654,17 +654,17 @@ class BConfig extends BClass
 
     public function unsetConfig()
     {
-        $this->_config = array();
+        $this->_config = [];
     }
 
     public function isInvalidManifestPHP( $contents )
     {
         $tokens = token_get_all( $contents );
-        $allowed = array( T_OPEN_TAG => 1, T_RETURN => 1, T_WHITESPACE => 1, T_COMMENT => 1,
+        $allowed = [ T_OPEN_TAG => 1, T_RETURN => 1, T_WHITESPACE => 1, T_COMMENT => 1,
                     T_ARRAY => 1, T_CONSTANT_ENCAPSED_STRING => 1, T_DOUBLE_ARROW => 1,
                     T_DNUMBER => 1, T_LNUMBER => 1, T_STRING => 1,
-                    '(' => 1, ',' => 1, ')' => 1, ';' => 1 );
-        $denied = array();
+                    '(' => 1, ',' => 1, ')' => 1, ';' => 1 ];
+        $denied = [];
         foreach ( $tokens as $t ) {
             if ( is_string( $t ) && !isset( $t ) ) {
                 $denied[] = $t;
@@ -697,42 +697,42 @@ class BClassRegistry extends BClass
     *
     * @var array
     */
-    static protected $_classes = array();
+    static protected $_classes = [];
 
     /**
     * Registry of singletons
     *
     * @var array
     */
-    static protected $_singletons = array();
+    static protected $_singletons = [];
 
     /**
     * Classes that require decoration because of overridden methods
     *
     * @var array
     */
-    static protected $_decoratedClasses = array();
+    static protected $_decoratedClasses = [];
 
     /**
     * Method overrides and augmentations
     *
     * @var array
     */
-    static protected $_methods = array();
+    static protected $_methods = [];
 
     /**
     * Cache for method callbacks
     *
     * @var array
     */
-    static protected $_methodOverrideCache = array();
+    static protected $_methodOverrideCache = [];
 
     /**
     * Property setter/getter overrides and augmentations
     *
     * @var array
     */
-    static protected $_properties = array();
+    static protected $_properties = [];
 
     /**
     * Shortcut to help with IDE autocompletion
@@ -742,7 +742,7 @@ class BClassRegistry extends BClass
     * @param bool $forceRefresh force the recreation of singleton
     * @return BClassRegistry
     */
-    static public function i( $new = false, array $args = array(), $forceRefresh = false )
+    static public function i( $new = false, array $args = [], $forceRefresh = false )
     {
         if ( !static::$_instance ) {
             static::$_instance = new BClassRegistry;
@@ -775,10 +775,10 @@ class BClassRegistry extends BClass
     static public function overrideClass( $class, $newClass, $replaceSingleton = false )
     {
         if ( is_string( $newClass ) ) {
-            static::$_classes[ $class ] = array(
+            static::$_classes[ $class ] = [
                 'class_name' => $newClass,
                 'module_name' => BModuleRegistry::i()->currentModuleName(),
-            );
+            ];
             BDebug::debug( 'OVERRIDE CLASS: ' . $class . ' -> ' . $newClass );
         } elseif ( is_null( $newClass ) ) {
             if ( empty( static::$_classes[ $class ] ) ) {
@@ -816,10 +816,10 @@ class BClassRegistry extends BClass
         } else {
             $rel = 'is';
         }
-        static::$_methods[ $method ][ $static ? 1 : 0 ][ 'override' ][ $rel ][ $class ] = array(
+        static::$_methods[ $method ][ $static ? 1 : 0 ][ 'override' ][ $rel ][ $class ] = [
             'module_name' => BModuleRegistry::i()->currentModuleName(),
             'callback' => $callback,
-        );
+        ];
     }
 
     /**
@@ -894,10 +894,10 @@ class BClassRegistry extends BClass
     */
     static public function augmentMethod( $class, $method, $callback, $static = false )
     {
-        static::$_methods[ $method ][ $static ? 1 : 0 ][ 'augment' ][ 'is' ][ $class ][] = array(
+        static::$_methods[ $method ][ $static ? 1 : 0 ][ 'augment' ][ 'is' ][ $class ][] = [
             'module_name' => BModuleRegistry::i()->currentModuleName(),
             'callback' => $callback,
-        );
+        ];
         static::$_decoratedClasses[ $class ] = true;
     }
 
@@ -934,10 +934,10 @@ class BClassRegistry extends BClass
         if ( $type !== 'override' && $type !== 'before' && $type !== 'after' ) {
             BDebug::error( BLocale::_( 'Invalid property augmentation type: %s', $type ) );
         }
-        $entry = array(
+        $entry = [
             'module_name' => BModuleRegistry::i()->currentModuleName(),
             'callback' => $callback,
-        );
+        ];
         if ( $type === 'override' ) {
             static::$_properties[ $class ][ $property ][ $op . '_' . $type ] = $entry;
         } else {
@@ -1028,7 +1028,7 @@ class BClassRegistry extends BClass
     * @param mixed $args
     * @return mixed
     */
-    static public function callMethod( $origObject, $method, array $args = array(), $origClass = null )
+    static public function callMethod( $origObject, $method, array $args = [], $origClass = null )
     {
         //$class = $origClass ? $origClass : get_class($origObject);
         $class = get_class( $origObject );
@@ -1038,7 +1038,7 @@ class BClassRegistry extends BClass
             array_unshift( $args, $origObject );
             $overridden = true;
         } elseif ( method_exists( $origObject, $method ) ) {
-            $callback = array( $origObject, $method );
+            $callback = [ $origObject, $method ];
             $overridden = false;
         } else {
             BDebug::error( 'Invalid method: ' . get_class( $origObject ) . '::' . $method );
@@ -1071,13 +1071,13 @@ class BClassRegistry extends BClass
     * @param string $method
     * @param array $args
     */
-    static public function callStaticMethod( $class, $method, array $args = array(), $origClass = null )
+    static public function callStaticMethod( $class, $method, array $args = [], $origClass = null )
     {
         if ( ( $info = static::findMethodInfo( $class, $method, 1, 'override' ) ) ) {
             $callback = $info[ 'callback' ];
         } else {
             if ( method_exists( $class, $method ) ) {
-                $callback = array( $class, $method );
+                $callback = [ $class, $method ];
             } else {
                 throw new Exception( 'Invalid static method: ' . $class . '::' . $method );
             }
@@ -1177,7 +1177,7 @@ class BClassRegistry extends BClass
     * @param bool $singleton
     * @return object
     */
-    static public function instance( $class, array $args = array(), $singleton = false )
+    static public function instance( $class, array $args = [], $singleton = false )
     {
         // if singleton is requested and already exists, return the singleton
         if ( $singleton && !empty( static::$_singletons[ $class ] ) ) {
@@ -1193,7 +1193,7 @@ class BClassRegistry extends BClass
 
         // if any methods are overridden or augmented, get decorator
         if ( !empty( static::$_decoratedClasses[ $class ] ) ) {
-            $instance = static::instance( 'BClassDecorator', array( $instance ) );
+            $instance = static::instance( 'BClassDecorator', [ $instance ] );
         }
 
         // if singleton is requested, save
@@ -1329,7 +1329,7 @@ class BClassDecorator
         if ( method_exists( $this->_decoratedComponent, '__sleep' ) ) {
             return $this->_decoratedComponent->__sleep();
         }
-        return array();
+        return [];
     }
 
     /**
@@ -1376,7 +1376,7 @@ class BClassAutoload extends BClass
         foreach ( $params as $k => $v ) {
             $this->$k = $v;
         }
-        spl_autoload_register( array( $this, 'callback' ), false );
+        spl_autoload_register( [ $this, 'callback' ], false );
         BDebug::debug( 'AUTOLOAD: ' . print_r( $this, 1 ) );
     }
 
@@ -1391,7 +1391,7 @@ class BClassAutoload extends BClass
         if ( $this->filename_cb ) {
             $file = call_user_func( $this->filename_cb, $class );
         } else {
-            $file = str_replace( array( '_', '\\' ), array( '/', '/' ), $class ) . '.php';
+            $file = str_replace( [ '_', '\\' ], [ '/', '/' ], $class ) . '.php';
         }
         if ( $file ) {
             if ( $file[ 0 ] !== '/' && $file[ 1 ] !== ':' ) {
@@ -1416,7 +1416,7 @@ class BEvents extends BClass
     *
     * @var array
     */
-    protected $_events = array();
+    protected $_events = [];
 
     /**
      * Shortcut to help with IDE autocompletion
@@ -1425,7 +1425,7 @@ class BEvents extends BClass
      * @param array $args
      * @return BEvents
      */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
@@ -1439,19 +1439,19 @@ class BEvents extends BClass
     * @param array|object $args
     * @return BEvents
     */
-    public function event( $eventName, $args = array() )
+    public function event( $eventName, $args = [] )
     {
         if ( is_array( $eventName ) ) {
             foreach ( $eventName as $event ) {
-                $this->event( $event[ 0 ], !empty( $event[ 1 ] ) ? $event[ 1 ] : array() );
+                $this->event( $event[ 0 ], !empty( $event[ 1 ] ) ? $event[ 1 ] : [] );
             }
             return $this;
         }
         $eventName = strtolower( $eventName );
-        $this->_events[ $eventName ] = array(
-            'observers' => array(),
+        $this->_events[ $eventName ] = [
+            'observers' => [],
             'args' => $args,
-        );
+        ];
         return $this;
     }
 
@@ -1466,18 +1466,18 @@ class BEvents extends BClass
      * @param null         $alias
      * @return BEvents
      */
-    public function on( $eventName, $callback = null, $args = array(), $alias = null )
+    public function on( $eventName, $callback = null, $args = [], $alias = null )
     {
         if ( is_array( $eventName ) ) {
             foreach ( $eventName as $obs ) {
-                $this->on( $obs[ 0 ], $obs[ 1 ], !empty( $obs[ 2 ] ) ? $obs[ 2 ] : array() );
+                $this->on( $obs[ 0 ], $obs[ 1 ], !empty( $obs[ 2 ] ) ? $obs[ 2 ] : [] );
             }
             return $this;
         }
         if ( is_null( $alias ) && is_string( $callback ) ) {
             $alias = $callback;
         }
-        $observer = array( 'callback' => $callback, 'args' => $args, 'alias' => $alias );
+        $observer = [ 'callback' => $callback, 'args' => $args, 'alias' => $alias ];
         if ( ( $moduleName = BModuleRegistry::i()->currentModuleName() ) ) {
             $observer[ 'module_name' ] = $moduleName;
         }
@@ -1497,11 +1497,11 @@ class BEvents extends BClass
      * @param null         $alias
      * @return BEvents
      */
-    public function once( $eventName, $callback = null, $args = array(), $alias = null )
+    public function once( $eventName, $callback = null, $args = [], $alias = null )
     {
         if ( is_array( $eventName ) ) {
             foreach ( $eventName as $obs ) {
-                $this->once( $obs[ 0 ], $obs[ 1 ], !empty( $obs[ 2 ] ) ? $obs[ 2 ] : array() );
+                $this->once( $obs[ 0 ], $obs[ 1 ], !empty( $obs[ 2 ] ) ? $obs[ 2 ] : [] );
             }
             return $this;
         }
@@ -1553,11 +1553,11 @@ class BEvents extends BClass
     * @param array|object $args
     * @return array Collection of results from observers
     */
-    public function fire( $eventName, $args = array() )
+    public function fire( $eventName, $args = [] )
     {
         $eventName = strtolower( $eventName );
         $profileStart = BDebug::debug( 'FIRE ' . $eventName . ( empty( $this->_events[ $eventName ] ) ? ' (NO SUBSCRIBERS)' : '' ), 1 );
-        $result = array();
+        $result = [];
         if ( empty( $this->_events[ $eventName ] ) ) {
             return $result;
         }
@@ -1602,13 +1602,13 @@ class BEvents extends BClass
 
             // Special singleton syntax
             if ( is_string( $cb ) ) {
-                foreach ( array( '.', '->' ) as $sep ) {
+                foreach ( [ '.', '->' ] as $sep ) {
                     $r = explode( $sep, $cb );
                     if ( sizeof( $r ) == 2 ) {
 if ( !class_exists( $r[ 0 ] ) ) {
     echo "<pre>"; debug_print_backtrace(); echo "</pre>";
 }
-                        $cb = array( $r[ 0 ]::i(), $r[ 1 ] );
+                        $cb = [ $r[ 0 ]::i(), $r[ 1 ] ];
                         $observer[ 'callback' ] = $cb;
                         // remember for next call, don't want to use &$observer
                         $observers[ $i ][ 'callback' ] = $cb;
@@ -1635,7 +1635,7 @@ if ( !class_exists( $r[ 0 ] ) ) {
 
     public function fireRegexp( $eventRegexp, $args )
     {
-        $results = array();
+        $results = [];
         foreach ( $this->_events as $eventName => $event ) {
             if ( preg_match( $eventRegexp, $eventName ) ) {
                 $results += (array)$this->fire( $eventName, $args );
@@ -1683,9 +1683,9 @@ class BSession extends BClass
     */
     protected $_dirty = false;
 
-    protected $_availableHandlers = array(
+    protected $_availableHandlers = [
         '' => 'Default',
-    );
+    ];
 
     protected $_defaultSessionCookieName = 'fulleron';
     /**
@@ -1693,7 +1693,7 @@ class BSession extends BClass
     *
     * @return BSession
     */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
@@ -1706,7 +1706,7 @@ class BSession extends BClass
     public function getHandlers()
     {
         $handlers = array_keys( $this->_availableHandlers );
-        return $handlers ? array_combine( $handlers, $handlers ) : array();
+        return $handlers ? array_combine( $handlers, $handlers ) : [];
     }
 
     /**
@@ -1778,7 +1778,7 @@ class BSession extends BClass
 
         $namespace = !empty( $config[ 'session_namespace' ] ) ? $config[ 'session_namespace' ] : 'default';
         if ( empty( $_SESSION[ $namespace ] ) ) {
-            $_SESSION[ $namespace ] = array();
+            $_SESSION[ $namespace ] = [];
         }
         if ( $autoClose ) {
             $this->data = $_SESSION[ $namespace ];
@@ -1939,10 +1939,10 @@ BDebug::debug( __METHOD__ . ': ' . spl_object_hash( $this ) );
     * @param array $options
     * @return BSession
     */
-    public function addMessage( $msg, $type = 'info', $tag = '_', $options = array() )
+    public function addMessage( $msg, $type = 'info', $tag = '_', $options = [] )
     {
         $this->setDirty();
-        $message = array( 'type' => $type );
+        $message = [ 'type' => $type ];
         if ( is_array( $msg ) && !empty( $msg[ 0 ] ) ) {
             $message[ 'msgs' ] = $msg;
         } else {
@@ -1967,10 +1967,10 @@ BDebug::debug( __METHOD__ . ': ' . spl_object_hash( $this ) );
     public function messages( $tags = '_' )
     {
         if ( empty( $this->data[ '_messages' ] ) ) {
-            return array();
+            return [];
         }
         $tags = explode( ',', $tags );
-        $msgs = array();
+        $msgs = [];
         foreach ( $tags as $tag ) {
             if ( empty( $this->data[ '_messages' ][ $tag ] ) ) {
                 continue;
@@ -2018,9 +2018,9 @@ class BSession_APC extends BClass
             $this->_ttl = $ttl;
         }
         session_set_save_handler(
-            array( $this, 'open' ), array( $this, 'close' ),
-            array( $this, 'read' ), array( $this, 'write' ),
-            array( $this, 'destroy' ), array( $this, 'gc' )
+            [ $this, 'open' ], [ $this, 'close' ],
+            [ $this, 'read' ], [ $this, 'write' ],
+            [ $this, 'destroy' ], [ $this, 'gc' ]
         );
     }
 
@@ -2029,8 +2029,8 @@ class BSession_APC extends BClass
         $this->_prefix = 'BSession/' . $sessionName;
         if ( !apc_exists( $this->_prefix . '/TS' ) ) {
             // creating non-empty array @see http://us.php.net/manual/en/function.apc-store.php#107359
-            apc_store( $this->_prefix . '/TS', array( '' ) );
-            apc_store( $this->_prefix . '/LOCK', array( '' ) );
+            apc_store( $this->_prefix . '/TS', [ '' ] );
+            apc_store( $this->_prefix . '/LOCK', [ '' ] );
         }
         return true;
     }

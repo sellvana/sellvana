@@ -4,7 +4,7 @@ require_once __DIR__ . 'lib/PHPTAL.php';
 
 class FCom_LibPhptal_Main extends BClass
 {
-    protected static $_singletons = array();
+    protected static $_singletons = [];
 
     protected static $_outputMode = PHPTAL::HTML5;
 
@@ -25,17 +25,17 @@ class FCom_LibPhptal_Main extends BClass
 
         static::$_forceReparse = $config->get( 'modules/FCom_LibPhptal/force_reparse' );
 
-        static::$_fcomVars = BData::i( true, array(
+        static::$_fcomVars = BData::i( true, [
             'request' => BRequest::i(),
             'layout' => BLayout::i(),
-        ) );
+        ] );
 
-        BLayout::i()->addRenderer( 'FCom_LibPhptal', array(
+        BLayout::i()->addRenderer( 'FCom_LibPhptal', [
             'description' => 'PHPTAL',
             'callback'    => 'FCom_LibPhptal_Main::renderer',
-            'file_ext'    => array( '.zpt', '.zpt.html' ),
+            'file_ext'    => [ '.zpt', '.zpt.html' ],
             'editor'      => 'html',
-        ) );
+        ] );
     }
 
     public static function singleton( $class )
@@ -63,7 +63,7 @@ class FCom_LibPhptal_Main extends BClass
 
         $tal->set( 'FCOM', static::$_fcomVars );
 
-        BEvents::i()->fire( __METHOD__, array( 'tal' => $tal, 'tpl' => $tpl ) );
+        BEvents::i()->fire( __METHOD__, [ 'tal' => $tal, 'tpl' => $tpl ] );
         return $tal;
     }
 
@@ -147,13 +147,13 @@ class FCom_LibPhptal_PreFilter extends PHPTAL_PreFilter
 {
     public function filter( $source )
     {
-        BEvents::i()->fire( __METHOD__, array( 'source' => &$source ) );
+        BEvents::i()->fire( __METHOD__, [ 'source' => &$source ] );
         return $source;
     }
 
     public function filterDOM( PHPTAL_Dom_Element $element )
     {
-        BEvents::i()->fire( __METHOD__, array( 'element' => $element ) );
+        BEvents::i()->fire( __METHOD__, [ 'element' => $element ] );
     }
 }
 
@@ -161,7 +161,7 @@ class FCom_LibPhptal_PostFilter implements PHPTAL_Filter
 {
     public function filter( $html )
     {
-        BEvents::i()->fire( __METHOD__, array( 'html' => &$html ) );
+        BEvents::i()->fire( __METHOD__, [ 'html' => &$html ] );
         return $html;
     }
 }
@@ -171,9 +171,9 @@ class FCom_LibPhptal_TranslationService implements PHPTAL_TranslationService
     protected $_currentLang = 'en_US';
 
     protected $_currentDomain;
-    protected $_domains = array();
+    protected $_domains = [];
 
-    private $_context = array();
+    private $_context = [];
 
     public function setLanguage()
     {

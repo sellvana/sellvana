@@ -45,7 +45,7 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_ApiServer_Controller_Abstr
         if ( !$res ) {
             $this->badRequest( "Incorrect data provided" );
         }
-        $this->created( array( 'id' => $res->id ) );
+        $this->created( [ 'id' => $res->id ] );
     }
 
     public function action_index__put()

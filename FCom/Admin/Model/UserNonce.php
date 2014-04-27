@@ -24,11 +24,11 @@ class FCom_Admin_Model_UserNonce extends FCom_Core_Model_Abstract
         if ( $i === 10 ) {
             throw new BException( 'Unable to find available nonce' ); //???
         }
-        $nonceRecord = static::create( array(
+        $nonceRecord = static::create( [
             'user_id' => $userId,
             'nonce' => $nonce,
             'create_at' => BDb::now(),
-        ) )->save();
+        ] )->save();
         return $nonce;
     }
 

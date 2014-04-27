@@ -56,7 +56,7 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
      */
     public function getServices()
     {
-        return array(
+        return [
             '01' => 'UPS Next Day Air',
             '02' => 'UPS Second Day Air',
             '03' => 'UPS Ground',
@@ -69,18 +69,18 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
             '54' => 'UPS Worldwide Express Plus',
             '59' => 'UPS Second Day Air AM',
             '65' => 'UPS Saver'
-        );
+        ];
     }
 
     public function getDefaultService()
     {
-        return array( '03' => 'UPS Ground' );
+        return [ '03' => 'UPS Ground' ];
     }
 
     public function getServicesSelected()
     {
         $c = BConfig::i();
-        $selected = array();
+        $selected = [];
         foreach ( $this->getServices() as $sId => $sName ) {
             if ( $c->get( 'modules/FCom_ShippingUps/services/s' . $sId ) == 1 ) {
                 $selected[ $sId ] = $sName;
@@ -110,7 +110,7 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
         //package dimension
         $items = $cart->items();
         $length = $width = $height = 10;
-        $packages = array();
+        $packages = [];
         $packageId = 0;
         $groupPackageId = 0;
         foreach ( $items as $item ) {

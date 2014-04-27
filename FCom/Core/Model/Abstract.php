@@ -28,7 +28,7 @@ class FCom_Core_Model_Abstract extends BModel
      *
      * @var array
      */
-    static protected $_dataFieldsMap = array();
+    static protected $_dataFieldsMap = [];
 
     static protected $_importExportProfile;
 
@@ -45,7 +45,7 @@ class FCom_Core_Model_Abstract extends BModel
     {
         if ( is_null( $this->get( static::$_dataCustomField ) ) ) {
             $dataJson = $this->get( static::$_dataSerializedField );
-            $this->set( static::$_dataCustomField, $dataJson ? BUtil::fromJson( $dataJson ) : array() );
+            $this->set( static::$_dataCustomField, $dataJson ? BUtil::fromJson( $dataJson ) : [] );
         }
         $data = $this->get( static::$_dataCustomField );
         if ( is_null( $path ) ) {

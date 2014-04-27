@@ -8,16 +8,16 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
     {
         $view = $this->view( 'settings' );
         $tabViews = BLayout::i()->findViewsRegex( '#^settings/#' );
-        $tabGroups = array();
+        $tabGroups = [];
 
         foreach ( $tabViews as $tabViewName => $tabView ) {
             $tabName = preg_replace( '#^settings/#', '', $tabViewName );
             if ( empty( $view->tabs[ $tabName ] ) ) {
-                $view->addTab( $tabName, array(
+                $view->addTab( $tabName, [
                     'async' => true, 
                     'label' => str_replace( '_', ' ', $tabName ), 
                     'view'  => $tabViewName,
-                ) );
+                ] );
             }
         }
         $this->layout( '/settings' );
@@ -31,7 +31,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
         try {
             $post = BRequest::i()->post();
 
-            BEvents::i()->fire( __METHOD__, array( 'post' => &$post ) );
+            BEvents::i()->fire( __METHOD__, [ 'post' => &$post ] );
             BConfig::i()->add( $post[ 'config' ], true );
 
             if ( !empty( $post[ 'config' ][ 'db' ] ) ) {
@@ -47,7 +47,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             if ( !$xhr ) {
                 $this->message( 'Settings updated' );
             } else {
-                $result = array( 'message' => BLocale::_( 'Settings has been saved successfully' ), 'status' => 'success' );
+                $result = [ 'message' => BLocale::_( 'Settings has been saved successfully' ), 'status' => 'success' ];
             }
 
         } catch ( Exception $e ) {
@@ -56,7 +56,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             if ( !$xhr ) {
                 $this->message( $e->getMessage(), 'error' );
             } else {
-                $result = array( 'message' => BLocale::_( $e->getMessage() ), 'status' => 'error' );
+                $result = [ 'message' => BLocale::_( $e->getMessage() ), 'status' => 'error' ];
             }
         }
         if ( !empty( $post[ 'current_tab' ] ) ) {
@@ -77,7 +77,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
         $dismissed = $conf->get( 'modules/FCom_Core/dismissed/notifications' );
         $dirty = false;
         if ( !$dismissed ) {
-            $dismissed = array( $code );
+            $dismissed = [ $code ];
             $dirty = true;
         } elseif ( !in_array( $code, $dismissed ) ) {
             $dismissed[] = $code;
@@ -93,13 +93,13 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
 
     public function getAllMode()
     {
-        return array(
+        return [
           BDebug::MODE_DEBUG => BDebug::MODE_DEBUG,
           BDebug::MODE_DEVELOPMENT => BDebug::MODE_DEVELOPMENT,
           BDebug::MODE_STAGING => BDebug::MODE_STAGING,
           BDebug::MODE_PRODUCTION => BDebug::MODE_PRODUCTION,
           BDebug::MODE_RECOVERY => BDebug::MODE_RECOVERY,
           BDebug::MODE_DISABLED => BDebug::MODE_DISABLED
-        );
+        ];
     }
 }

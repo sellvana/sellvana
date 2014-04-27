@@ -31,11 +31,11 @@ class FCom_IndexTank_Admin extends BClass
 
         }
 
-        FCom_Admin_Model_Role::i()->createPermission( array(
+        FCom_Admin_Model_Role::i()->createPermission( [
             'index_tank' => 'Index Tank',
             'index_tank/product_field' => 'Product Fields',
             'index_tank/product_function' => 'Product Functions',
-        ) );
+        ] );
 
         FCom_IndexTank_Admin_Controller::bootstrap();
     }
@@ -74,7 +74,7 @@ class FCom_IndexTank_Admin extends BClass
      */
     static public function productsIndexStart()
     {
-        FCom_Catalog_Model_Product::i()->update_many( array( 'indextank_indexed' => '0' ), "indextank_indexed != 0" );
+        FCom_Catalog_Model_Product::i()->update_many( [ 'indextank_indexed' => '0' ], "indextank_indexed != 0" );
 
         FCom_IndexTank_Model_IndexingStatus::i()->updateInfoStatus();
     }
@@ -102,12 +102,12 @@ class FCom_IndexTank_Admin extends BClass
         header( 'Content-Type: text/plain; charset=utf-8' );
 
         $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->getIndexingStatus();
-        $res = array(
+        $res = [
             'index_size' => $indexingStatus->index_size,
             'to_index' => $indexingStatus->to_index,
             'percent' => ceil( $indexingStatus->percent ),
             'status' => $indexingStatus->status
-                );
+                ];
         echo BUtil::toJson( $res );
         exit;
     }
@@ -228,7 +228,7 @@ class FCom_IndexTank_Admin extends BClass
         $doc = FCom_IndexTank_Model_ProductField::orm()->where( 'field_name', $fieldName )->find_one();
         if ( !$doc ) {
             $doc = FCom_IndexTank_Model_ProductField::orm()->create();
-            $matches = array();
+            $matches = [];
             preg_match( "#(\w+)#", $cfModel->table_field_type, $matches );
             $type = $matches[ 1 ];
 

@@ -90,10 +90,10 @@ abstract class FCom_Sales_Model_Cart_Total_Abstract extends BCLass implements FC
 
     public function asArray()
     {
-        return array(
+        return [
             'label' => $this->getLabel(),
             'value' => $this->getValue(),
             'currency' => $this->getCurrency(),
-        );
+        ];
     }
 }

@@ -2,8 +2,8 @@
 
 class FCom_Admin_View_Header extends FCom_Core_View_Abstract
 {
-    protected $_quickSearches = array();
-    protected $_shortcuts = array();
+    protected $_quickSearches = [];
+    protected $_shortcuts = [];
 
     public function addQuickSearch( $name, $config )
     {
@@ -19,11 +19,11 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
 
     public function getNotifications()
     {
-        $notifications = array();
-        BEvents::i()->fire( __METHOD__, array( 'notifications' => &$notifications ) );
+        $notifications = [];
+        BEvents::i()->fire( __METHOD__, [ 'notifications' => &$notifications ] );
         $conf      = BConfig::i();
         $dismissed = $conf->get( 'modules/FCom_Core/dismissed/notifications' );
-        $result = array();
+        $result = [];
         foreach ( $notifications as $k => &$item ) {
             if ( $dismissed && in_array( $item[ 'code' ], $dismissed ) ) {
                 unset( $notifications[ $k ] );
@@ -38,19 +38,19 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
             if ( empty( $item[ 'title' ] ) ) {
                 $item[ 'title' ] = $item[ 'message' ];
             }
-            $item[ 'html' ] = BUtil::tagHtml( 'a', array(
+            $item[ 'html' ] = BUtil::tagHtml( 'a', [
                 'href' => $item[ 'href' ],
                 'title' => $item[ 'title' ],
 
-            ), $item[ 'message' ] );
+            ], $item[ 'message' ] );
             $result[ $item[ 'group' ] ][] = $item;
         }
         unset( $item );
-        return array( 'count' => sizeof( $notifications ), 'groups' => $result );
+        return [ 'count' => sizeof( $notifications ), 'groups' => $result ];
     }
 
     public function getRecentActivity()
     {
-        return array();
+        return [];
     }
 }

@@ -2,7 +2,7 @@
 
 class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
 {
-    public function authenticate( $args = array() )
+    public function authenticate( $args = [] )
     {
         return true;
     }
@@ -47,10 +47,10 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
             return;
         }
         $user = FCom_Admin_Model_User::i()->orm()
-            ->where( array( 'OR' => array(
+            ->where( [ 'OR' => [
                 'email' => $form[ 'email' ],
                 'username' => $form[ 'email' ],
-            ) ) )
+            ] ] )
             ->find_one();
         if ( $user ) {
             $user->recoverPassword();

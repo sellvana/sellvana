@@ -31,19 +31,19 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_sales_cart_address';
     protected static $_origClass = __CLASS__;
-    protected static $_validationRules = array(
-        array( 'firstname', '@required' ),
+    protected static $_validationRules = [
+        [ 'firstname', '@required' ],
         #array('firstname', '@alphanum'),
-        array( 'lastname', '@required' ),
+        [ 'lastname', '@required' ],
         #array('lastname', '@alphanum'),
-        array( 'email', '@required' ),
-        array( 'email', '@email' ),
-        array( "street1", '@required' ),
-        array( "city", '@required' ),
-        array( "country", '@required' ),
-        array( "region", '@required' ),
-        array( "postcode", '@required' ),
-    );
+        [ 'email', '@required' ],
+        [ 'email', '@email' ],
+        [ "street1", '@required' ],
+        [ "city", '@required' ],
+        [ "country", '@required' ],
+        [ "region", '@required' ],
+        [ "postcode", '@required' ],
+    ];
 
     public function as_html( $obj = null )
     {

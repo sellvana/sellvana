@@ -4,10 +4,10 @@ class FCom_Blog_Model_Category extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_blog_category';
-    protected static $_validationRules = array(
-        array( 'url_key', 'FCom_Blog_Model_Category::validateDupUrlKey', 'Duplicate URL Key' ),
+    protected static $_validationRules = [
+        [ 'url_key', 'FCom_Blog_Model_Category::validateDupUrlKey', 'Duplicate URL Key' ],
 
-    );
+    ];
 
     public static function validateDupUrlKey( $data, $args )
     {
@@ -30,9 +30,9 @@ class FCom_Blog_Model_Category extends FCom_Core_Model_Abstract
     static public function getCategoryCounts()
     {
         return FCom_Blog_Model_Category::i()->orm( 'c' )
-            ->join( 'FCom_Blog_Model_PostCategory', array( 'pc.category_id', '=', 'c.id' ), 'pc' )
-            ->join( 'FCom_Blog_Model_Post', array( 'p.id', '=', 'pc.post_id' ), 'p' )
-            ->where_in( 'p.status', array( 'published' ) )
+            ->join( 'FCom_Blog_Model_PostCategory', [ 'pc.category_id', '=', 'c.id' ], 'pc' )
+            ->join( 'FCom_Blog_Model_Post', [ 'p.id', '=', 'pc.post_id' ], 'p' )
+            ->where_in( 'p.status', [ 'published' ] )
             ->group_by( 'c.id' )
             ->select( 'c.id' )->select( 'c.name' )->select( 'c.url_key' )->select( '(count(*))', 'cnt' )
             ->find_many_assoc( 'id' );

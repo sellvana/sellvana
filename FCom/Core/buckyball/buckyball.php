@@ -51,8 +51,8 @@ require_once $comDir . 'import.php';
 */
 
 if ( getopt( 'c' ) ) {
-    $minified = array();
-    foreach ( array( 'core', 'misc', 'lib/idiorm', 'lib/paris', 'db', 'cache', 'module', 'controller', 'layout', 'cache' ) as $f ) {
+    $minified = [];
+    foreach ( [ 'core', 'misc', 'lib/idiorm', 'lib/paris', 'db', 'cache', 'module', 'controller', 'layout', 'cache' ] as $f ) {
         list( , $minified[] ) = explode( ' ', php_strip_whitespace( $comDir . $f . '.php' ), 2 );
     }
     $contents = "<?php define('BUCKYBALL_VERSION', '" . BUCKYBALL_VERSION . "'); " . join( ' ', $minified );

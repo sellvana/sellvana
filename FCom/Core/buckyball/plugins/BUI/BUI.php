@@ -25,7 +25,7 @@ class BUI
     public function jqgridData( $orm )
     {
         $p = BRequest::i()->request();
-        $data = $orm->paginate( array( 'p' => $p[ 'page' ], 'ps' => $p[ 'rows' ], 's' => $p[ 'sidx' ], 'sd' => $p[ 'sord' ] ) );
+        $data = $orm->paginate( [ 'p' => $p[ 'page' ], 'ps' => $p[ 'rows' ], 's' => $p[ 'sidx' ], 'sd' => $p[ 'sord' ] ] );
         $res = $data[ 'state' ];
         $res[ 'rows' ] = BDb::many_as_array( $data[ 'rows' ] );
         return $res;
@@ -34,7 +34,7 @@ class BUI
 
 class BViewGrid extends BView
 {
-    public function gridUrl( $changeRequest = array() )
+    public function gridUrl( $changeRequest = [] )
     {
         $grid = $this->grid;
         $grid[ 'request' ] = BUtil::arrayMerge( $grid[ 'request' ], $changeRequest );
@@ -44,9 +44,9 @@ class BViewGrid extends BView
     public function sortUrl( $colId )
     {
         if ( !empty( $this->grid[ 'request' ][ 'sort' ] ) && $this->grid[ 'request' ][ 'sort' ] == $colId ) {
-            $change = array( 'sortDir' => $this->grid[ 'request' ][ 'sortDir' ] == 'desc' ? 'asc' : 'desc' );
+            $change = [ 'sortDir' => $this->grid[ 'request' ][ 'sortDir' ] == 'desc' ? 'asc' : 'desc' ];
         } else {
-            $change = array( 'sort' => $colId, 'sortDir' => 'asc' );
+            $change = [ 'sort' => $colId, 'sortDir' => 'asc' ];
         }
         return $this->gridUrl( $change );
     }
@@ -72,7 +72,7 @@ class BViewGrid extends BView
     public function gridPrepareConfig( $c )
     {
         if ( empty( $c[ 'pageSizeOptions' ] ) ) {
-            $c[ 'pageSizeOptions' ] = array( 25, 50, 100 );
+            $c[ 'pageSizeOptions' ] = [ 25, 50, 100 ];
         }
         if ( empty( $c[ 'pageSize' ] ) ) {
             $c[ 'pageSize' ] = $c[ 'pageSizeOptions' ][ 0 ];
@@ -89,7 +89,7 @@ class BViewGrid extends BView
         if ( empty( $c[ 'fields' ] ) ) {
             $c[ 'fields' ] = $c[ 'columns' ];
             foreach ( $c[ 'columns' ] as $cId => $col ) {
-                $c[ 'columns' ][ $cId ][ 'fields' ] = array( $cId );
+                $c[ 'columns' ][ $cId ][ 'fields' ] = [ $cId ];
             }
         }
         foreach ( $c[ 'columns' ] as $cId => $col ) {
@@ -99,11 +99,11 @@ class BViewGrid extends BView
                 }
             }
         }
-        BEvents::i()->fire( 'BViewGrid::gridPrepareConfig:after', array( 'config' => &$c ) );
+        BEvents::i()->fire( 'BViewGrid::gridPrepareConfig:after', [ 'config' => &$c ] );
         return $c;
     }
 
-    public function gridData( array $options = array() )
+    public function gridData( array $options = [] )
     {
         // fetch grid configuration
         $grid = $this->grid;
@@ -118,13 +118,13 @@ class BViewGrid extends BView
         if ( empty( $grid[ 'request' ] ) ) {
             $grid[ 'request' ] = BRequest::i()->get();
         }
-        $p = BRequest::i()->sanitize( $grid[ 'request' ], array(
-            'page' => array( 'int', !empty( $config[ 'page' ] ) ? $config[ 'page' ] : 1 ),
-            'pageSize' => array( 'int', !empty( $config[ 'pageSize' ] ) ? $config[ 'pageSize' ] : $config[ 'pageSizeOptions' ][ 0 ] ),
-            'sort' => array( 'lower', !empty( $config[ 'sort' ] ) ? $config[ 'sort' ] : null ),
-            'sortDir' => array( 'alnum|lower', !empty( $config[ 'sortDir' ] ) ? $config[ 'sortDir' ] : 'asc' ),
-            'search' => array( '', array() ),
-        ) );
+        $p = BRequest::i()->sanitize( $grid[ 'request' ], [
+            'page' => [ 'int', !empty( $config[ 'page' ] ) ? $config[ 'page' ] : 1 ],
+            'pageSize' => [ 'int', !empty( $config[ 'pageSize' ] ) ? $config[ 'pageSize' ] : $config[ 'pageSizeOptions' ][ 0 ] ],
+            'sort' => [ 'lower', !empty( $config[ 'sort' ] ) ? $config[ 'sort' ] : null ],
+            'sortDir' => [ 'alnum|lower', !empty( $config[ 'sortDir' ] ) ? $config[ 'sortDir' ] : 'asc' ],
+            'search' => [ '', [] ],
+        ] );
 
         foreach ( $p[ 'search' ] as $k => $s ) {
             if ( $s === '' ) {
@@ -148,9 +148,9 @@ class BViewGrid extends BView
             $orm->where_complex( $config[ 'where' ] );
         }
 
-        BEvents::i()->fire( 'BViewGrid::gridData:initORM: ' . $config[ 'id' ], array( 'orm' => $orm, 'grid' => $grid ) );
+        BEvents::i()->fire( 'BViewGrid::gridData:initORM: ' . $config[ 'id' ], [ 'orm' => $orm, 'grid' => $grid ] );
 
-        $mapColumns = array();
+        $mapColumns = [];
 
         $this->_processGridJoins( $config, $mapColumns, $orm, 'before_count' );
         $this->_processGridFilters( $config, $p[ 'search' ], $orm );
@@ -195,7 +195,7 @@ class BViewGrid extends BView
 
         // init result
         $p[ 'description' ] = $this->stateDescription( $p );
-        $grid[ 'result' ] = array( 'state' => $p, 'raw' => array(), 'out' => array()/*, 'query'=>ORM::get_last_query()*/ );
+        $grid[ 'result' ] = [ 'state' => $p, 'raw' => [], 'out' => []/*, 'query'=>ORM::get_last_query()*/ ];
 
         foreach ( $models as $i => $model ) {
             $r = $model->as_array();
@@ -227,7 +227,7 @@ class BViewGrid extends BView
                 }
             }
         }
-        BEvents::i()->fire( 'BGridView::gridData:after: ' . $config[ 'id' ], array( 'grid' => &$grid ) );
+        BEvents::i()->fire( 'BGridView::gridData:after: ' . $config[ 'id' ], [ 'grid' => &$grid ] );
 
         $this->grid = $grid;
         return $grid;
@@ -275,7 +275,7 @@ class BViewGrid extends BView
 
             $joinMethod = ( isset( $j[ 'type' ] ) ? $j[ 'type' ] . '_' : '' ) . 'join';
 
-            $where = isset( $j[ 'where' ] ) ? str_replace( array( '{lk}', '{fk}', '{lt}', '{ft}' ), array( $localKey, $foreignKey, $mainTableAlias, $tableAlias ), $j[ 'where' ] ) : array( $foreignKey, $op, $localKey );
+            $where = isset( $j[ 'where' ] ) ? str_replace( [ '{lk}', '{fk}', '{lt}', '{ft}' ], [ $localKey, $foreignKey, $mainTableAlias, $tableAlias ], $j[ 'where' ] ) : [ $foreignKey, $op, $localKey ];
 
             $orm->$joinMethod( $table, $where, $tableAlias );
 
@@ -310,7 +310,7 @@ class BViewGrid extends BView
 
             if ( $fId == '_quick' ) {
                 if ( !empty( $f[ 'expr' ] ) && !empty( $f[ 'args' ] ) && !empty( $filters[ $fId ] ) ) {
-                    $args = array();
+                    $args = [];
                     foreach ( $f[ 'args' ] as $a ) {
                         $args[] = str_replace( '?', $filters[ '_quick' ], $a );
                     }
@@ -362,12 +362,12 @@ class BViewGrid extends BView
 
     public function stateDescription( $params )
     {
-        $descrArr = array();
+        $descrArr = [];
         if ( !empty( $params[ 'search' ] ) ) {
             $descr = "Filtered by: ";
             foreach ( $params[ 'search' ] as $k => $s ) {
                 if ( $k === '_quick' ) {
-                    $filter = array( 'type' => 'quick' );
+                    $filter = [ 'type' => 'quick' ];
                     $descr .= '<b>Quick search</b>';
                 } else {
                     $filter = $this->grid[ 'config' ][ 'filters' ][ $k ];
@@ -375,7 +375,7 @@ class BViewGrid extends BView
                 }
                 switch ( $filter[ 'type' ] ) {
                 case 'multiselect':
-                    $opts = array();
+                    $opts = [];
                     $os = explode( ',', $s );
                     if ( sizeof( $os ) == 1 ) {
                         $descr .= ' is <u>' . $filter[ 'options' ][ $os[ 0 ] ] . '</u>';
@@ -408,11 +408,11 @@ class BViewGrid extends BView
 
 class BViewJqGrid extends BViewGrid
 {
-    public function jqGridConfig( array $o = array() )
+    public function jqGridConfig( array $o = [] )
     {
         $c = $this->gridPrepareConfig( $this->grid[ 'config' ] );
-        $colNames = array();
-        $colModel = array();
+        $colNames = [];
+        $colModel = [];
         foreach ( $c[ 'columns' ] as $k => $col ) {
             $colNames[] = $col[ 'title' ];
             $col[ 'name' ] = $col[ 'field' ];
@@ -420,7 +420,7 @@ class BViewJqGrid extends BViewGrid
             unset( $col[ 'field' ], $col[ 'sort_by' ], $col[ 'title' ] );
             $colModel[] = $col;
         }
-        $result = $o + array(
+        $result = $o + [
             'url' => BApp::href( $c[ 'dataUrl' ] ),
             'datatype' => 'json',
             'colNames' => $colNames,
@@ -430,22 +430,22 @@ class BViewJqGrid extends BViewGrid
             'pager' => '#' . $c[ 'id' ] . '_pager',
             'sortname' => $c[ 'sort' ],
             'sortorder' => $c[ 'sortDir' ],
-        );
+        ];
         return $result;
     }
 
-    public function jqGridData( array $o = array() )
+    public function jqGridData( array $o = [] )
     {
         $r = BRequest::i()->get();
-        $this->grid[ 'request' ] = array(
+        $this->grid[ 'request' ] = [
             'page' => !empty( $r[ 'page' ] ) ? $r[ 'page' ] : null,
             'pageSize' => !empty( $r[ 'rows' ] ) ? $r[ 'rows' ] : null,
             'sort' => !empty( $r[ 'sidx' ] ) ? $r[ 'sidx' ] : null,
             'sortDir' => !empty( $r[ 'sord' ] ) ? $r[ 'sord' ] : null,
-            'search' => array( '', array() ),
-        );
-        $this->gridData( array( 'no_raw' => true ) );
-        $data = array();
+            'search' => [ '', [] ],
+        ];
+        $this->gridData( [ 'no_raw' => true ] );
+        $data = [];
         foreach ( $this->result[ 'out' ] as $rowId => $row ) {
             foreach ( $row as $colId => $cell ) {
                 $data[ $rowId ][ $colId ] = $cell[ 'value' ];

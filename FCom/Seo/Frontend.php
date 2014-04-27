@@ -13,9 +13,9 @@ class FCom_Seo_Frontend extends BClass
         if ( empty( $referrer ) ) {
             $url = BRequest::i()->referrer();
             if ( !$url ) {
-                $referrer = array(
+                $referrer = [
                     'url' => null,
-                );
+                ];
             } else {
                 $parts = parse_url( $url );
                 $source = null;
@@ -44,12 +44,12 @@ class FCom_Seo_Frontend extends BClass
                         $keywords = preg_split( '/\W+/', $keywords );
                     }
                 }
-                $referrer = array(
+                $referrer = [
                     'url' => $url,
                     'source_host' => $parts[ 'host' ],
                     'source' => $source,
                     'keywords' => $keywords,
-                );
+                ];
             }
         }
     }

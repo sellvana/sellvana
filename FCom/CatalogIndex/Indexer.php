@@ -25,8 +25,8 @@ class FCom_CatalogIndex_Indexer extends BClass
             $t = time();
             do {
                 $products = FCom_Catalog_Model_Product::i()->orm( 'p' )
-                    ->left_outer_join( 'FCom_CatalogIndex_Model_Doc', array( 'idx.id', '=', 'p.id' ), 'idx' )
-                    ->where_complex( array( 'OR' => array( 'idx.id is null', 'idx.flag_reindex=1' ) ) )
+                    ->left_outer_join( 'FCom_CatalogIndex_Model_Doc', [ 'idx.id', '=', 'p.id' ], 'idx' )
+                    ->where_complex( [ 'OR' => [ 'idx.id is null', 'idx.flag_reindex=1' ] ] )
                     ->limit( static::$_maxChunkSize )
                     //->offset($start)
                     ->find_many();
@@ -47,8 +47,8 @@ class FCom_CatalogIndex_Indexer extends BClass
             return;
         }
 
-        $pIds = array();
-        $loadIds = array();
+        $pIds = [];
+        $loadIds = [];
         foreach ( $products as $i => $p ) {
             if ( is_numeric( $p ) ) {
                 $loadIds[ $i ] = (int)$p;
@@ -78,7 +78,7 @@ class FCom_CatalogIndex_Indexer extends BClass
         static::_indexSaveFilterData();
         static::_indexSaveSearchData();
         static::indexCleanMemory();
-        $pushClient->send( array( 'channel' => 'index', 'signal' => 'progress', 'reindexed' => static::$_cnt_reindexed ) );
+        $pushClient->send( [ 'channel' => 'index', 'signal' => 'progress', 'reindexed' => static::$_cnt_reindexed ] );
     }
 
     static public function indexDropDocs( $pIds )
@@ -86,14 +86,14 @@ class FCom_CatalogIndex_Indexer extends BClass
         if ( $pIds === true ) {
             return BDb::run( "DELETE FROM " . FCom_CatalogIndex_Model_Doc::table() );
         } else {
-            return FCom_CatalogIndex_Model_Doc::i()->delete_many( array( 'id' => $pIds ) );
+            return FCom_CatalogIndex_Model_Doc::i()->delete_many( [ 'id' => $pIds ] );
         }
     }
 
     static protected function _indexFetchProductsData( $products )
     {
         $fields = FCom_CatalogIndex_Model_Field::i()->getFields();
-        static::$_indexData = array();
+        static::$_indexData = [];
 
         foreach ( $fields as $fName => $field ) {
             $source = $field->source_callback ? $field->source_callback : $fName;
@@ -109,7 +109,7 @@ class FCom_CatalogIndex_Indexer extends BClass
                 }
                 break;
             case 'callback':
-                $fieldData = BUtil::call( $source, array( $products, $field ), true );
+                $fieldData = BUtil::call( $source, [ $products, $field ], true );
                 foreach ( $fieldData as $pId => $value ) {
                     static::$_indexData[ $pId ][ $fName ] = $value;
                 }
@@ -126,8 +126,8 @@ class FCom_CatalogIndex_Indexer extends BClass
         $sortHlp = FCom_CatalogIndex_Model_DocSort::i();
         $now = BDb::now();
         $sortFields = FCom_CatalogIndex_Model_Field::i()->getFields( 'sort' );
-        $sortColumn = array();
-        $sortJoin = array();
+        $sortColumn = [];
+        $sortJoin = [];
         foreach ( $sortFields as $fName => $field ) {
             if ( $field->get( 'sort_method' ) === 'join' ) {
                 $sortJoin[ $fName ] = $field;
@@ -136,7 +136,7 @@ class FCom_CatalogIndex_Indexer extends BClass
             }
         }
         foreach ( static::$_indexData as $pId => $pData ) {
-            $row = array( 'id' => $pId, 'last_indexed' => $now );
+            $row = [ 'id' => $pId, 'last_indexed' => $now ];
 
             foreach ( $sortColumn as $fName => $field ) {
                 $row[ 'sort_' . $fName ] = $pData[ $fName ];
@@ -148,7 +148,7 @@ class FCom_CatalogIndex_Indexer extends BClass
                 if ( !isset( $pData[ $fName ] ) ) {
                     continue;
                 }
-                $row = array( 'doc_id' => $pId, 'field_id' => $field->id(), 'value' => $pData[ $fName ] );
+                $row = [ 'doc_id' => $pId, 'field_id' => $field->id(), 'value' => $pData[ $fName ] ];
                 $sortHlp->create( $row )->save();
             }
         }
@@ -163,7 +163,7 @@ class FCom_CatalogIndex_Indexer extends BClass
             foreach ( $filterFields as $fName => $field ) {
                 $fId = $field->id();
                 $value = !empty( $pData[ $fName ] ) ? $pData[ $fName ] : null;
-                if ( is_null( $value ) || $value === '' || $value === array() ) {
+                if ( is_null( $value ) || $value === '' || $value === [] ) {
                     continue;
                 }
                 foreach ( (array)$value as $vKey => $v ) {
@@ -171,17 +171,17 @@ class FCom_CatalogIndex_Indexer extends BClass
                     $vVal = BUtil::simplifyString( trim( $v1[ 0 ] ), '#[^a-z0-9/-]+#' );
                     $vDisplay = !empty( $v1[ 1 ] ) ? trim( $v1[ 1 ] ) : $v1[ 0 ];
                     if ( empty( static::$_filterValues[ $fId ][ $vVal ] ) ) {
-                        $fieldValue = $fieldValueHlp->load( array( 'field_id' => $fId, 'val' => $vVal ) );
+                        $fieldValue = $fieldValueHlp->load( [ 'field_id' => $fId, 'val' => $vVal ] );
                         if ( !$fieldValue ) {
-                            $fieldValue = $fieldValueHlp->create( array(
+                            $fieldValue = $fieldValueHlp->create( [
                                 'field_id' => $fId,
                                 'val' => $vVal,
                                 'display' => $vDisplay !== '' ? $vDisplay : null,
-                            ) )->save();
+                            ] )->save();
                         }
                         static::$_filterValues[ $fId ][ $vVal ] = $fieldValue->id();
                     }
-                    $row = array( 'doc_id' => $pId, 'field_id' => $fId, 'value_id' => static::$_filterValues[ $fId ][ $vVal ] );
+                    $row = [ 'doc_id' => $pId, 'field_id' => $fId, 'value_id' => static::$_filterValues[ $fId ][ $vVal ] ];
                     $docValueHlp->create( $row )->save();
                 }
             }
@@ -202,7 +202,7 @@ class FCom_CatalogIndex_Indexer extends BClass
         $docTermHlp = FCom_CatalogIndex_Model_DocTerm::i();
 
         $searchFields = FCom_CatalogIndex_Model_Field::i()->getFields( 'search' );
-        $allTerms = array();
+        $allTerms = [];
         foreach ( static::$_indexData as $pId => $pData ) {
             foreach ( $searchFields as $fName => $field ) {
                 $fId = $field->id();
@@ -216,17 +216,17 @@ class FCom_CatalogIndex_Indexer extends BClass
             }
         }
         if ( $allTerms ) {
-            $termIds = $termHlp->orm()->where( array( 'term' => array_keys( $allTerms ) ) )->find_many_assoc( 'term', 'id' );
+            $termIds = $termHlp->orm()->where( [ 'term' => array_keys( $allTerms ) ] )->find_many_assoc( 'term', 'id' );
             foreach ( $allTerms as $v => $termData ) {
                 if ( empty( $termIds[ $v ] ) ) {
-                    $term = $termHlp->create( array( 'term' => $v ) )->save();
+                    $term = $termHlp->create( [ 'term' => $v ] )->save();
                     $termId = $term->id;
                 } else {
                     $termId = $termIds[ $v ];
                 }
                 foreach ( $termData as $pId => $productData ) {
                     foreach ( $productData as $fId => $idx ) {
-                        $row = array( 'doc_id' => $pId, 'field_id' => $fId, 'term_id' => $termId, 'position' => $idx );
+                        $row = [ 'doc_id' => $pId, 'field_id' => $fId, 'term_id' => $termId, 'position' => $idx ];
                         $docTermHlp->create( $row )->save();
                     }
                 }
@@ -273,7 +273,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
      * @param array $options
      * @return array ['orm'=>$orm, 'facets'=>$facets]
      */
-    static public function searchProducts( $search = null, $filters = null, $sort = null, $options = array() )
+    static public function searchProducts( $search = null, $filters = null, $sort = null, $options = [] )
     {
         $config = BConfig::i()->get( 'modules/FCom_CatalogIndex' );
         if ( is_null( $filters ) ) {
@@ -282,7 +282,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
 
         // base products ORM object
         $productsOrm = FCom_Catalog_Model_Product::i()->orm( 'p' )
-            ->join( 'FCom_CatalogIndex_Model_Doc', array( 'd.id', '=', 'p.id' ), 'd' );
+            ->join( 'FCom_CatalogIndex_Model_Doc', [ 'd.id', '=', 'p.id' ], 'd' );
 
         $req = BRequest::i();
         // apply term search
@@ -299,29 +299,29 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             $orm->where_raw( "term regexp '(" . join( '|', $terms ) . ")'" );
             $termIds = $orm->find_many_assoc( 'term', 'id' );
             if ( $termIds ) {
-                $productsOrm->where( array(
-                    array( "(p.id IN (SELECT dt.doc_id FROM {$tDocTerm} dt WHERE term_id IN (?)))", array_values( $termIds ) ),
-                ) );
+                $productsOrm->where( [
+                    [ "(p.id IN (SELECT dt.doc_id FROM {$tDocTerm} dt WHERE term_id IN (?)))", array_values( $termIds ) ],
+                ] );
             } else {
                 $productsOrm->where_raw( '0' );
-                return array( 'orm' => $productsOrm, 'facets' => array() );
+                return [ 'orm' => $productsOrm, 'facets' => [] ];
             }
         }
         
         // result for facet counts
-        $facets = array();
+        $facets = [];
 
         // retrieve facet field information
         $filterFields = BDb::many_as_array( FCom_CatalogIndex_Model_Field::i()->getFields( 'filter' ) );
-        $filterFieldNamesById = array();
+        $filterFieldNamesById = [];
         foreach ( $filterFields as $fName => $field ) {
             $filterFieldNamesById[ $field[ 'id' ] ] = $fName;
-            $facets[ $fName ] = array( // init for sorting
+            $facets[ $fName ] = [ // init for sorting
                 'display' => $field[ 'field_label' ],
                 'custom_view' => !empty( $field[ 'filter_custom_view' ] ) ? $field[ 'filter_custom_view' ] : null,
-            );
-            $filterFields[ $fName ][ 'values' ] = array();
-            $filterFields[ $fName ][ 'value_ids' ] = array();
+            ];
+            $filterFields[ $fName ][ 'values' ] = [];
+            $filterFields[ $fName ][ 'value_ids' ] = [];
             // take category filter from options if available
             if ( !empty( $options[ 'category' ] ) && $field[ 'field_type' ] == 'category' ) {
                 $filters[ $fName ] = $options[ 'category' ]->get( 'url_path' );
@@ -331,7 +331,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         // retrieve facet field values information
         $filterValues = BDb::many_as_array( FCom_CatalogIndex_Model_FieldValue::i()->orm()
             ->where_in( 'field_id', array_keys( $filterFieldNamesById ) )->find_many_assoc( 'id' ) );
-        $filterValueIdsByVal = array();
+        $filterValueIdsByVal = [];
         foreach ( $filterValues as $vId => $v ) {
             $fName = $filterFieldNamesById[ $v[ 'field_id' ] ];
             $field = $filterFields[ $fName ];
@@ -349,13 +349,13 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         }
 
         // apply facet filters
-        $facetFilters = array();
+        $facetFilters = [];
         $tFieldValue = FCom_CatalogIndex_Model_FieldValue::table();
         $tDocValue = FCom_CatalogIndex_Model_DocValue::table();
         foreach ( $filterFields as $fName => $field ) {
             $fReqValues = !empty( $filters[ $fName ] ) ? (array)$filters[ $fName ] : null;
             if ( !empty( $fReqValues ) ) { // request has filter by this field
-                $fReqValueIds = array();
+                $fReqValueIds = [];
                 foreach ( $fReqValues as $v ) {
                     if ( empty( $filterValueIdsByVal[ $field[ 'id' ] ][ $v ] ) ) {
                         //TODO: error on invalid filter requested value?
@@ -364,11 +364,11 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                     $fReqValueIds[] = $filterValueIdsByVal[ $field[ 'id' ] ][ $v ];
                 }
                 if ( empty( $fReqValueIds ) ) {
-                    $whereArr = array( array( '(0)' ) );
+                    $whereArr = [ [ '(0)' ] ];
                 } else {
-                    $whereArr = array(
-                        array( "(p.id in (SELECT dv.doc_id from {$tDocValue} dv WHERE dv.value_id IN (?)))", $fReqValueIds ),
-                    );
+                    $whereArr = [
+                        [ "(p.id in (SELECT dv.doc_id from {$tDocValue} dv WHERE dv.value_id IN (?)))", $fReqValueIds ],
+                    ];
                 }
                 // order of following actions is important!
                 // 1. add filter condition to already created filter ORMs
@@ -379,12 +379,12 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 }
                 // 2. clone filter facets condition before adding current filter
                 if ( $field[ 'filter_type' ] == 'inclusive' || $field[ 'filter_multivalue' ] ) {
-                    $facetFilters[ $fName ] = array(
+                    $facetFilters[ $fName ] = [
                         'orm'        => clone $productsOrm,
                         'multivalue' => $field[ 'filter_multivalue' ],
-                        'field_ids'  => array( $field[ 'id' ] ),
-                        'skip_value_ids' => array(),
-                    );
+                        'field_ids'  => [ $field[ 'id' ] ],
+                        'skip_value_ids' => [],
+                    ];
                 }
                 // 3. add filter condition to products ORM
                 $productsOrm->where( $whereArr );
@@ -406,7 +406,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                         $curLevel = sizeof( $valueArr );
                         $valueParent = join( '/', array_slice( $valueArr, 0, $curLevel - 1 ) );
                         $facets[ $fName ][ 'values' ][ $v ][ 'level' ] = $value[ 'category_level' ];
-                        $countValueIds = array();
+                        $countValueIds = [];
                         foreach ( $filterValues as $vId1 => $value1 ) {
                             $vVal = $value1[ 'val' ];
                             if ( empty( $value1[ 'category_level' ] ) || $vId === $vId1 ) {
@@ -457,11 +457,11 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             } else { // not filtered by this field
                 if ( $field[ 'filter_multivalue' ] ) {
                     if ( empty( $facetFilters[ '_multivalue' ] ) ) {
-                        $facetFilters[ '_multivalue' ] = array( 'orm' => true, 'multivalue' => true, 'field_ids' => array() );
+                        $facetFilters[ '_multivalue' ] = [ 'orm' => true, 'multivalue' => true, 'field_ids' => [] ];
                     }
                     $facetFilters[ '_multivalue' ][ 'field_ids' ][] = $field[ 'id' ];
                 } else {
-                    $facetFilters[ $fName ] = array( 'orm' => true, 'field_ids' => array( $field[ 'id' ] ) );
+                    $facetFilters[ $fName ] = [ 'orm' => true, 'field_ids' => [ $field[ 'id' ] ] ];
                 }
             }
             if ( $field[ 'filter_show_empty' ] ) {
@@ -488,7 +488,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 continue;
             }
             $orm = $ff[ 'orm' ] === true ? clone $productsOrm : $ff[ 'orm' ];
-            $orm->join( 'FCom_CatalogIndex_Model_DocValue', array( 'dv.doc_id', '=', 'p.id' ), 'dv' );
+            $orm->join( 'FCom_CatalogIndex_Model_DocValue', [ 'dv.doc_id', '=', 'p.id' ], 'dv' );
 
             if ( !empty( $ff[ 'count_value_ids' ] ) ) {
                 $orm->where_in( 'dv.value_id', array_values( $ff[ 'count_value_ids' ] ) );
@@ -588,10 +588,10 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             }
         }
         if ( $sort ) {
-            list( $field, $dir ) = is_string( $sort ) ? explode( ' ', $sort ) + array( '', '' ) : $sort;
+            list( $field, $dir ) = is_string( $sort ) ? explode( ' ', $sort ) + [ '', '' ] : $sort;
             $method = 'order_by_' . ( strtolower( $dir ) == 'desc' ? 'desc' : 'asc' );
             $productsOrm->$method( 'sort_' . $field );
         }
-        return array( 'orm' => $productsOrm, 'facets' => $facets );
+        return [ 'orm' => $productsOrm, 'facets' => $facets ];
     }
 }

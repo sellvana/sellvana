@@ -5,7 +5,7 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
     static protected $_table = 'fcom_pushserver_channel';
     static protected $_origClass = __CLASS__;
 
-    static protected $_channelCache = array();
+    static protected $_channelCache = [];
 
     /**
      * - id
@@ -41,7 +41,7 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
             $channelName = $channel;
             $channel = static::load( $channel, 'channel_name' );
             if ( !$channel ) {
-                $channel = static::create( array( 'channel_name' => $channelName ) )->save();
+                $channel = static::create( [ 'channel_name' => $channelName ] )->save();
             }
             static::$_channelCache[ $channelName ] = $channel;
         }
@@ -62,7 +62,7 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
     {
         if ( !parent::onBeforeDelete() ) return false;
 
-        $this->send( array( 'signal' => 'delete' ) );
+        $this->send( [ 'signal' => 'delete' ] );
 
         return true;
     }
@@ -96,20 +96,20 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
 if ( FCom_PushServer_Main::isDebugMode() ) {
     BDebug::log( "SEND1: " . print_r( $message, 1 ) );
 }
-        BEvents::i()->fire( __METHOD__ . ':' . $this->get( 'channel_name' ), array(
+        BEvents::i()->fire( __METHOD__ . ':' . $this->get( 'channel_name' ), [
             'channel' => $this,
             'message' => $message,
             'client'  => $fromClient,
-        ) );
+        ] );
 
         $clientHlp = FCom_PushServer_Model_Client::i();
         $fromWindowName = $clientHlp->getWindowName();
         $fromConnId = $clientHlp->getConnId();
         $msgHlp = FCom_PushServer_Model_Message::i();
-        $msgIds = array();
+        $msgIds = [];
 
         $toClients = FCom_PushServer_Model_Client::i()->orm( 'c' )
-            ->join( 'FCom_PushServer_Model_Subscriber', array( 'c.id', '=', 's.client_id' ), 's' )
+            ->join( 'FCom_PushServer_Model_Subscriber', [ 'c.id', '=', 's.client_id' ], 's' )
             ->where( 's.channel_id', $this->id() )
             ->select( 's.id', 'sub_id' )->select( 'c.id' )->select( 'c.data_serialized' )
             ->find_many();
@@ -125,7 +125,7 @@ if ( FCom_PushServer_Main::isDebugMode() ) {
             $windows = (array)$toClient->getData( 'windows' );
             foreach ( $windows as $toWindowName => $toWindowData ) {
                 $toConnId = !empty( $toWindowData[ 'connections' ] ) ? key( $toWindowData[ 'connections' ] ) : null;
-                $msg = $msgHlp->create( array(
+                $msg = $msgHlp->create( [
                     'seq' => !empty( $message[ 'seq' ] ) ? $message[ 'seq' ] : null,
                     'channel_id' => $this->id(),
                     'subscriber_id' => $toClient->get( 'sub_id' ),
@@ -133,7 +133,7 @@ if ( FCom_PushServer_Main::isDebugMode() ) {
                     'window_name' => $toWindowName,
                     'conn_id' => $toConnId,
                     'status' => 'published',
-                ) )->setData( $message )->save();
+                ] )->setData( $message )->save();
                 //$msgIds[] = $msg->id;
 
 if ( FCom_PushServer_Main::isDebugMode() ) {
@@ -142,7 +142,7 @@ if ( FCom_PushServer_Main::isDebugMode() ) {
             }
         }
         if ( $msgIds ) {
-            $msgHlp->update_many( array( 'status' => 'published' ), array( 'id' => $msgIds ) );
+            $msgHlp->update_many( [ 'status' => 'published' ], [ 'id' => $msgIds ] );
         }
         return $this;
     }

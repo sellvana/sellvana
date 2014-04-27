@@ -76,7 +76,7 @@ class BUtil extends BClass
     *
     * @return BUtil
     */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
@@ -196,7 +196,7 @@ class BUtil extends BClass
         } elseif ( $val instanceof BValue ) {
             return $val->toPlain();
         } elseif ( ( $isObj = is_object( $val ) ) || is_array( $val ) ) {
-            $out = array();
+            $out = [];
             if ( !empty( $val ) && ( $isObj || array_keys( $val ) !== range( 0, count( $val )-1 ) ) ) { // assoc?
                 foreach ( $val as $k => $v ) {
                     $out[] = "'" . addslashes( $k ) . "':" . static::toJavaScript( $v );
@@ -277,7 +277,7 @@ class BUtil extends BClass
      */
     public static function arraySeqToMap( $array, $idField, $mapFields = null )
     {
-        $map = array();
+        $map = [];
         foreach ( $array as $k => $row ) {
             if ( is_array( $mapFields ) ) {
                 $outRow = BUtil::arrayMask( $row, $mapFields );
@@ -308,12 +308,12 @@ class BUtil extends BClass
      * @param array $args array of [ 'arg_name' => 'arg value', ... ] replacements to be made
      * @return string|false result of sprintf call, or bool false on error
      */
-    public static function sprintfn( $format, $args = array() )
+    public static function sprintfn( $format, $args = [] )
     {
         $args = (array)$args;
 
         // map of argument names to their corresponding sprintf numeric argument value
-        $arg_nums = array_slice( array_flip( array_keys( array( 0 => 0 ) + $args ) ), 1 );
+        $arg_nums = array_slice( array_flip( array_keys( [ 0 => 0 ] + $args ) ), 1 );
 
         // find the next named argument. each search starts at the end of the previous replacement.
         for ( $pos = 0; preg_match( '/(?<=%)([a-zA-Z_]\w*)(?=\$)/', $format, $match, PREG_OFFSET_CAPTURE, $pos ); ) {
@@ -333,7 +333,7 @@ class BUtil extends BClass
         }
 
         if ( !$args ) {
-            $args = array( '' );
+            $args = [ '' ];
         }
         return vsprintf( $format, array_values( $args ) );
     }
@@ -350,7 +350,7 @@ class BUtil extends BClass
     */
     public static function injectVars( $str, $vars )
     {
-        $from = array(); $to = array();
+        $from = []; $to = [];
         foreach ( $vars as $k => $v ) {
             $from[] = ':' . $k;
             $to[] = $v;
@@ -376,11 +376,11 @@ class BUtil extends BClass
          $arrays = func_get_args();
          $base = array_shift( $arrays );
          if ( !is_array( $base ) )  {
-             $base = empty( $base ) ? array() : array( $base );
+             $base = empty( $base ) ? [] : [ $base ];
          }
          foreach ( $arrays as $append ) {
              if ( !is_array( $append ) ) {
-                 $append = array( $append );
+                 $append = [ $append ];
              }
              foreach ( $append as $key => $value ) {
                  if ( is_numeric( $key ) ) {
@@ -448,11 +448,11 @@ class BUtil extends BClass
     * @param boolean $ignoreExceptions
     * @return array
     */
-    static public function arrayWalk( $arr, $cb, $args = array(), $ignoreExceptions = false )
+    static public function arrayWalk( $arr, $cb, $args = [], $ignoreExceptions = false )
     {
-        $result = array();
+        $result = [];
         foreach ( $arr as $i => $r ) {
-            $callback = is_string( $cb ) && $cb[ 0 ] === '.' ? array( $r, substr( $cb, 1 ) ) : $cb;
+            $callback = is_string( $cb ) && $cb[ 0 ] === '.' ? [ $r, substr( $cb, 1 ) ] : $cb;
             if ( $ignoreExceptions ) {
                 try {
                     $result[] = call_user_func_array( $callback, $args );
@@ -501,7 +501,7 @@ class BUtil extends BClass
     */
     static public function arrayCleanInt( $arr )
     {
-        $res = array();
+        $res = [];
         if ( is_string( $arr ) ) {
             $arr = explode( ',', $arr );
         }
@@ -533,7 +533,7 @@ class BUtil extends BClass
     */
     static public function arrayInsert( $array, $items, $where )
     {
-        $result = array();
+        $result = [];
         $w1 = explode( '==', $where, 2 );
         $w2 = explode( '.', $w1[ 0 ], 3 );
 
@@ -648,7 +648,7 @@ class BUtil extends BClass
             $fields = explode( ',', $fields );
             @array_walk( $fields, 'trim' ); // LLVM BUG
         }
-        $result = array();
+        $result = [];
         if ( !$inverse ) {
             foreach ( $fields as $k ) {
                 if ( isset( $source[ $k ] ) ) {
@@ -667,12 +667,12 @@ class BUtil extends BClass
 
     static public function arrayToOptions( $source, $labelField, $keyField = null, $emptyLabel = null )
     {
-        $options = array();
+        $options = [];
         if ( !is_null( $emptyLabel ) ) {
-            $options = array( "" => $emptyLabel );
+            $options = [ "" => $emptyLabel ];
         }
         if ( empty( $source ) ) {
-            return array();
+            return [];
         }
         $isObject = is_object( current( $source ) );
         foreach ( $source as $k => $item ) {
@@ -694,7 +694,7 @@ class BUtil extends BClass
     static public function arrayMakeAssoc( $source, $keyField )
     {
         $isObject = is_object( current( $source ) );
-        $assocArray = array();
+        $assocArray = [];
         foreach ( $source as $k => $item ) {
             if ( $isObject ) {
                 $assocArray[ $item->$keyField ] = $item;
@@ -801,7 +801,7 @@ class BUtil extends BClass
     */
     public static function randomPattern( $pattern )
     {
-        static $chars = array( 'L' => 'bcdfghjkmnpqrstvwxyz', 'U' => 'BCDFGHJKLMNPQRSTVWXYZ', 'D' => '123456789' );
+        static $chars = [ 'L' => 'bcdfghjkmnpqrstvwxyz', 'U' => 'BCDFGHJKLMNPQRSTVWXYZ', 'D' => '123456789' ];
 
         while ( preg_match( '#\{([ULD]+)([0-9]+)\}#i', $pattern, $m ) ) {
             for ( $i = 0, $c = ''; $i < strlen( $m[ 1 ] ); $i++ ) $c .= $chars[ $m[ 1 ][ $i ] ];
@@ -941,7 +941,7 @@ class BUtil extends BClass
     * @param array $data
     * @return string
     */
-    public static function remoteHttp( $method, $url, $data = array() )
+    public static function remoteHttp( $method, $url, $data = [] )
     {
         $debugProfile = BDebug::debug( chunk_split( 'REMOTE HTTP: ' . $method . ' ' . $url ) );
         $timeout = 5;
@@ -958,7 +958,7 @@ class BUtil extends BClass
 
         // curl disabled because file upload doesn't work for some reason. TODO: figure out why
         if ( false && function_exists( 'curl_init' ) || ini_get( 'safe_mode' ) ) {
-            $curlOpt = array(
+            $curlOpt = [
                 CURLOPT_USERAGENT => $userAgent,
                 CURLOPT_URL => $url,
                 CURLOPT_ENCODING => '',
@@ -970,33 +970,33 @@ class BUtil extends BClass
                 CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_TIMEOUT => $timeout,
                 CURLOPT_MAXREDIRS => 10,
-                CURLOPT_HTTPHEADER, array( 'Expect:' ), //Fixes the HTTP/1.1 417 Expectation Failed
+                CURLOPT_HTTPHEADER, [ 'Expect:' ], //Fixes the HTTP/1.1 417 Expectation Failed
                 CURLOPT_HEADER => true,
-            );
+            ];
             if ( !ini_get( 'safe_mode' ) && !ini_get( 'open_basedir' ) ) {
-                $curlOpt += array(
+                $curlOpt += [
                     CURLOPT_FOLLOWLOCATION => true,
-                );
+                ];
             }
             if ( false ) { // TODO: figure out cookies handling
                 $cookieDir = BConfig::i()->get( 'fs/storage_dir' ) . '/cache';
                 BUtil::ensureDir( $cookieDir );
                 $cookie = tempnam( $cookieDir, 'CURLCOOKIE' );
-                $curlOpt += array(
+                $curlOpt += [
                     CURLOPT_COOKIEJAR => $cookie,
-                );
+                ];
             }
 
             if ( $method === 'POST' ) {
-                $curlOpt += array(
+                $curlOpt += [
                     CURLOPT_POSTFIELDS => $data,
                     CURLOPT_POST => 1,
-                );
+                ];
             } elseif ( $method === 'PUT' ) {
-                $curlOpt += array(
+                $curlOpt += [
                     CURLOPT_POSTFIELDS => $data,
                     CURLOPT_PUT => 1,
-                );
+                ];
             }
             $ch = curl_init();
             curl_setopt_array( $ch, $curlOpt );
@@ -1010,11 +1010,11 @@ class BUtil extends BClass
             }
             curl_close( $ch );
         } else {
-            $opts = array( 'http' => array(
+            $opts = [ 'http' => [
                 'method' => $method,
                 'timeout' => $timeout,
                 'header' => "User-Agent: {$userAgent}\r\n",
-            ) );
+            ] ];
             if ( $method === 'POST' || $method === 'PUT' ) {
                 $multipart = false;
                 if ( is_array( $data ) ) {
@@ -1054,23 +1054,23 @@ class BUtil extends BClass
                 $opts[ 'http' ][ 'header' ] .= "Content-Type: {$contentType}\r\n";
                     //."Content-Length: ".strlen($request)."\r\n";
                 if ( preg_match( '#^(ssl|ftps|https):#', $url ) ) {
-                    $opts[ 'ssl' ] = array(
+                    $opts[ 'ssl' ] = [
                         'verify_peer' => true,
                         'cafile' => dirname( __DIR__ ) . '/ssl/ca-bundle.crt',
                         'verify_depth' => 5,
-                    );
+                    ];
                 }
             }
             $response = @file_get_contents( $url, false, stream_context_create( $opts ) );
 
-            static::$_lastRemoteHttpInfo = array(); //TODO: emulate curl data?
-            $respHeaders = isset( $http_response_header ) ? $http_response_header : array();
+            static::$_lastRemoteHttpInfo = []; //TODO: emulate curl data?
+            $respHeaders = isset( $http_response_header ) ? $http_response_header : [];
         }
         foreach ( $respHeaders as $i => $line ) {
             if ( $i ) {
                 $arr = explode( ':', $line, 2 );
             } else {
-                $arr = array( 0, $line );
+                $arr = [ 0, $line ];
             }
             static::$_lastRemoteHttpInfo[ 'headers' ][ strtolower( $arr[ 0 ] ) ] = trim( $arr[ 1 ] );
         }
@@ -1090,7 +1090,7 @@ class BUtil extends BClass
         $path = str_replace( '\\', '/', $path );
         if ( strpos( $path, '/..' ) !== false ) {
             $a = explode( '/', $path );
-            $b = array();
+            $b = [];
             foreach ( $a as $p ) {
                 if ( $p === '..' ) array_pop( $b ); else $b[] = $p;
             }
@@ -1107,7 +1107,7 @@ class BUtil extends BClass
         }
         $files = glob( $dir . '/' . $pattern, $flags );
         if ( !$files ) {
-            return array();
+            return [];
         }
         $result = $files;
         foreach ( $files as $file ) {
@@ -1196,7 +1196,7 @@ class BUtil extends BClass
             $url = BRequest::currentUrl();
         }
         $parsed = parse_url( $url );
-        $query = array();
+        $query = [];
         if ( !empty( $parsed[ 'query' ] ) ) {
             foreach ( explode( '&', $parsed[ 'query' ] ) as $q ) {
                 $a = explode( '=', $q );
@@ -1222,10 +1222,10 @@ class BUtil extends BClass
 
     public static function paginateSortUrl( $url, $state, $field )
     {
-        return static::setUrlQuery( $url, array(
+        return static::setUrlQuery( $url, [
             's' => $field,
             'sd' => $state[ 's' ] != $field || $state[ 'sd' ] == 'desc' ? 'asc' : 'desc',
-        ) );
+        ] );
     }
 
     public static function paginateSortAttr( $url, $state, $field, $class = '' )
@@ -1240,9 +1240,9 @@ class BUtil extends BClass
      * @param null   $content
      * @return string
      */
-    public static function tagHtml( $tag, $attrs = array(), $content = null )
+    public static function tagHtml( $tag, $attrs = [], $content = null )
     {
-        $attrsHtmlArr = array();
+        $attrsHtmlArr = [];
         foreach ( $attrs as $k => $v ) {
             if ( is_null( $v ) || false === $v ) {
                 continue;
@@ -1256,7 +1256,7 @@ class BUtil extends BClass
                         break;
 
                     case 'style':
-                        $attrHtmlArr = array();
+                        $attrHtmlArr = [];
                         foreach ( $v as $k1 => $v1 ) {
                             $attrHtmlArr[] = $k1 . ':' . $v1;
                         }
@@ -1282,12 +1282,12 @@ class BUtil extends BClass
         if ( !is_array( $default ) ) {
             $default = (string)$default;
         }
-        $htmlArr = array();
+        $htmlArr = [];
         foreach ( $options as $k => $v ) {
             $k = (string)$k;
             if ( is_array( $v ) && $k !== '' && $k[ 0 ] === '@' ) { // group
                 $label = trim( substr( $k, 1 ) );
-                $htmlArr[] = BUtil::tagHtml( 'optgroup', array( 'label' => $label ), static::optionsHtml( $v, $default ) );
+                $htmlArr[] = BUtil::tagHtml( 'optgroup', [ 'label' => $label ], static::optionsHtml( $v, $default ) );
                 continue;
             }
             if ( is_array( $v ) ) {
@@ -1295,7 +1295,7 @@ class BUtil extends BClass
                 $v = !empty( $attr[ 'text' ] ) ? $attr[ 'text' ] : '';
                 unset( $attr[ 'text' ] );
             } else {
-                $attr = array();
+                $attr = [];
             }
             $attr[ 'value' ] = $k;
             $attr[ 'selected' ] = is_array( $default ) && in_array( $k, $default ) || $default === $k;
@@ -1338,7 +1338,7 @@ class BUtil extends BClass
      *   - border
      * @return string
      */
-    public static function gravatar( $email, $params = array() )
+    public static function gravatar( $email, $params = [] )
     {
         if ( empty( $params[ 'default' ] ) ) {
             $params[ 'default' ] = 'identicon';
@@ -1356,13 +1356,13 @@ class BUtil extends BClass
                 list( $class, $method ) = explode( '->', $callback );
             }
             if ( !empty( $class ) ) {
-                $callback = array( $class::i(), $method );
+                $callback = [ $class::i(), $method ];
             }
         }
         return $callback;
     }
 
-    public static function call( $callback, $args = array(), $array = false )
+    public static function call( $callback, $args = [], $array = false )
     {
         $callback = static::extCallback( $callback );
         if ( $array ) {
@@ -1446,14 +1446,14 @@ class BUtil extends BClass
         if ( $etime < 1 ) {
             return $long ? 'less than 1 second' : '0s';
         }
-        $a = array(
-            12 * 30 * 24 * 60 * 60  =>  array( 'year', 'y' ),
-            30 * 24 * 60 * 60       =>  array( 'month', 'mon' ),
-            24 * 60 * 60            =>  array( 'day', 'd' ),
-            60 * 60                 =>  array( 'hour', 'h' ),
-            60                      =>  array( 'minute', 'm' ),
-            1                       =>  array( 'second', 's' ),
-        );
+        $a = [
+            12 * 30 * 24 * 60 * 60  =>  [ 'year', 'y' ],
+            30 * 24 * 60 * 60       =>  [ 'month', 'mon' ],
+            24 * 60 * 60            =>  [ 'day', 'd' ],
+            60 * 60                 =>  [ 'hour', 'h' ],
+            60                      =>  [ 'minute', 'm' ],
+            1                       =>  [ 'second', 's' ],
+        ];
 
         foreach ( $a as $secs => $sa ) {
             $d = $etime / $secs;
@@ -1546,10 +1546,10 @@ class BUtil extends BClass
         return rmdir( $dir );
     }
 
-    static public function topoSort( array $array, array $args = array() )
+    static public function topoSort( array $array, array $args = [] )
     {
         if ( empty( $array ) ) {
-            return array();
+            return [];
         }
 
         // nodes listed in 'after' are parents
@@ -1558,7 +1558,7 @@ class BUtil extends BClass
         $beforeVar = !empty( $args[ 'before' ] ) ? $args[ 'before' ] : 'before';
         $afterVar = !empty( $args[ 'before' ] ) ? $args[ 'after' ] : 'after';
         $isObject = is_object( current( $array ) );
-        $nodes = array();
+        $nodes = [];
         foreach ( $array as $k => $v ) {
             $before = $isObject ? $v->$beforeVar : $v[ $beforeVar ];
             if ( is_string( $before ) ) {
@@ -1568,18 +1568,18 @@ class BUtil extends BClass
             if ( is_string( $after ) ) {
                 $after = array_walk( explode( ',', $after ), 'trim' );
             }
-            $nodes[ $k ] = array( 'key' => $k, 'item' => $v, 'parents' => (array)$after, 'children' => (array)$before );
+            $nodes[ $k ] = [ 'key' => $k, 'item' => $v, 'parents' => (array)$after, 'children' => (array)$before ];
         }
 
         // get nodes without parents
-        $rootNodes = array();
+        $rootNodes = [];
         foreach ( $nodes as $k => $node ) {
             if ( empty( $node[ 'parents' ] ) ) {
                 $rootNodes[] = $node;
             }
         }
         // begin algorithm
-        $sorted = array();
+        $sorted = [];
         while ( $nodes ) {
             // check for circular reference
             if ( !$rootNodes ) return false;
@@ -1660,7 +1660,7 @@ class BUtil extends BClass
     static public function getMemoryLimit()
     {
         preg_match( '#^([0-9]+)([GMK]?)$#', ini_get( 'memory_limit' ), $val );
-        $mult = array( 'G' => 1073741824, 'M' => 1048576, 'K' => 1024 );
+        $mult = [ 'G' => 1073741824, 'M' => 1048576, 'K' => 1024 ];
         return $val[ 1 ] * ( !empty( $mult[ $val[ 2 ] ] ) ? $mult[ $val[ 2 ] ] : 1 );
     }
 
@@ -1769,21 +1769,21 @@ class BHTML extends BClass
  */
 class BEmail extends BClass
 {
-    static protected $_handlers = array();
+    static protected $_handlers = [];
     static protected $_defaultHandler = 'default';
 
     public function __construct()
     {
-        $this->addHandler( 'default', array( $this, 'defaultHandler' ) );
+        $this->addHandler( 'default', [ $this, 'defaultHandler' ] );
     }
 
     public function addHandler( $name, $params )
     {
         if ( is_callable( $params ) ) {
-            $params = array(
+            $params = [
                 'description' => $name,
                 'callback' => $params,
-            );
+            ];
         }
         static::$_handlers[ $name ] = $params;
     }
@@ -1809,9 +1809,9 @@ class BEmail extends BClass
 
         $to      = '';
         $subject = '';
-        $headers = array();
-        $params  = array();
-        $files   = array();
+        $headers = [];
+        $params  = [];
+        $files   = [];
 
         foreach ( $data as $k => $v ) {
             if ( $k == 'subject' ) {
@@ -1849,7 +1849,7 @@ class BEmail extends BClass
             $headers[ 'content-type' ] = 'Content-Type: text/plain; charset=utf-8';
         }
 
-        $emailData = array(
+        $emailData = [
             'to' => &$to,
             'subject' => &$subject,
             'orig_body' => &$origBody,
@@ -1858,7 +1858,7 @@ class BEmail extends BClass
             'params' => &$params,
             'files' => &$files,
             'orig_data' => $data,
-        );
+        ];
 
         return $this->_dispatch( $emailData );
     }
@@ -1866,7 +1866,7 @@ class BEmail extends BClass
     protected function _dispatch( $emailData )
     {
         try {
-            $flags = BEvents::i()->fire( 'BEmail::send:before', array( 'email_data' => $emailData ) );
+            $flags = BEvents::i()->fire( 'BEmail::send:before', [ 'email_data' => $emailData ] );
             if ( $flags === false ) {
                 return false;
             } elseif ( is_array( $flags ) ) {
@@ -1890,7 +1890,7 @@ class BEmail extends BClass
         }
         $emailData[ 'result' ] = $result;
 
-        BEvents::i()->fire( 'BEmail::send:after', array( 'email_data' => $emailData ) );
+        BEvents::i()->fire( 'BEmail::send:after', [ 'email_data' => $emailData ] );
 
         return $result;
     }
@@ -1997,7 +1997,7 @@ class BData extends BClass implements ArrayAccess
     public function __construct( $data, $recursive = false )
     {
         if ( !is_array( $data ) ) {
-            $data = array(); // not sure for here, should we try to convert data to array or do empty array???
+            $data = []; // not sure for here, should we try to convert data to array or do empty array???
         }
         if ( $recursive ) {
             foreach ( $data as $k => $v ) {
@@ -2098,7 +2098,7 @@ class BDebug extends BClass
         INFO        = 6,
         DEBUG       = 7;
 
-    static protected $_levelLabels = array(
+    static protected $_levelLabels = [
         self::EMERGENCY => 'EMERGENCY',
         self::ALERT     => 'ALERT',
         self::CRITICAL  => 'CRITICAL',
@@ -2107,7 +2107,7 @@ class BDebug extends BClass
         self::NOTICE    => 'NOTICE',
         self::INFO      => 'INFO',
         self::DEBUG     => 'DEBUG',
-    );
+    ];
 
     const MEMORY  = 0,
         FILE      = 1,
@@ -2142,8 +2142,8 @@ class BDebug extends BClass
     */
     static protected $_level;
 
-    static protected $_levelPreset = array(
-        self::MODE_PRODUCTION => array(
+    static protected $_levelPreset = [
+        self::MODE_PRODUCTION => [
             self::MEMORY    => false,
             self::SYSLOG    => false,
             self::FILE      => self::WARNING,
@@ -2151,8 +2151,8 @@ class BDebug extends BClass
             self::OUTPUT    => self::CRITICAL,
             self::EXCEPTION => self::ERROR,
             self::STOP      => self::CRITICAL,
-        ),
-        self::MODE_STAGING => array(
+        ],
+        self::MODE_STAGING => [
             self::MEMORY    => false,
             self::SYSLOG    => false,
             self::FILE      => self::WARNING,
@@ -2160,8 +2160,8 @@ class BDebug extends BClass
             self::OUTPUT    => self::CRITICAL,
             self::EXCEPTION => self::ERROR,
             self::STOP      => self::CRITICAL,
-        ),
-        self::MODE_DEVELOPMENT => array(
+        ],
+        self::MODE_DEVELOPMENT => [
             self::MEMORY    => self::INFO,
             self::SYSLOG    => false,
             self::FILE      => self::WARNING,
@@ -2169,8 +2169,8 @@ class BDebug extends BClass
             self::OUTPUT    => self::NOTICE,
             self::EXCEPTION => self::ERROR,
             self::STOP      => self::CRITICAL,
-        ),
-        self::MODE_DEBUG => array(
+        ],
+        self::MODE_DEBUG => [
             self::MEMORY    => self::DEBUG,
             self::SYSLOG    => false,
             self::FILE      => self::WARNING,
@@ -2178,8 +2178,8 @@ class BDebug extends BClass
             self::OUTPUT    => self::NOTICE,
             self::EXCEPTION => self::ERROR,
             self::STOP      => self::CRITICAL,
-        ),
-        self::MODE_RECOVERY => array(
+        ],
+        self::MODE_RECOVERY => [
             self::MEMORY    => self::DEBUG,
             self::SYSLOG    => false,
             self::FILE      => self::WARNING,
@@ -2187,8 +2187,8 @@ class BDebug extends BClass
             self::OUTPUT    => self::NOTICE,
             self::EXCEPTION => self::ERROR,
             self::STOP      => self::CRITICAL,
-        ),
-        self::MODE_MIGRATION => array(
+        ],
+        self::MODE_MIGRATION => [
             self::MEMORY    => self::DEBUG,
             self::SYSLOG    => false,
             self::FILE      => self::WARNING,
@@ -2196,8 +2196,8 @@ class BDebug extends BClass
             self::OUTPUT    => self::NOTICE,
             self::EXCEPTION => self::ERROR,
             self::STOP      => self::CRITICAL,
-        ),
-        self::MODE_INSTALLATION => array(
+        ],
+        self::MODE_INSTALLATION => [
             self::MEMORY    => self::DEBUG,
             self::SYSLOG    => false,
             self::FILE      => self::WARNING,
@@ -2205,8 +2205,8 @@ class BDebug extends BClass
             self::OUTPUT    => self::NOTICE,
             self::EXCEPTION => self::ERROR,
             self::STOP      => self::CRITICAL,
-        ),
-        self::MODE_DISABLED => array(
+        ],
+        self::MODE_DISABLED => [
             self::MEMORY    => false,
             self::SYSLOG    => false,
             self::FILE      => false,
@@ -2214,18 +2214,18 @@ class BDebug extends BClass
             self::OUTPUT    => false,
             self::EXCEPTION => false,
             self::STOP      => false,
-        ),
-    );
+        ],
+    ];
 
-    static protected $_modules = array();
+    static protected $_modules = [];
 
     static protected $_mode = 'PRODUCTION';
 
     static protected $_startTime;
-    static protected $_events = array();
+    static protected $_events = [];
 
     static protected $_logDir = null;
-    static protected $_logFile = array(
+    static protected $_logFile = [
         self::EMERGENCY => 'error.log',
         self::ALERT     => 'error.log',
         self::CRITICAL  => 'error.log',
@@ -2234,11 +2234,11 @@ class BDebug extends BClass
         self::NOTICE    => 'debug.log',
         self::INFO      => 'debug.log',
         self::DEBUG     => 'debug.log',
-    );
+    ];
 
     static protected $_adminEmail = null;
 
-    static protected $_phpErrorMap = array(
+    static protected $_phpErrorMap = [
         E_ERROR => self::ERROR,
         E_WARNING => self::WARNING,
         E_NOTICE => self::NOTICE,
@@ -2247,13 +2247,13 @@ class BDebug extends BClass
         E_USER_NOTICE => self::NOTICE,
         E_STRICT => self::NOTICE,
         E_RECOVERABLE_ERROR => self::ERROR,
-    );
+    ];
 
-    static protected $_verboseBacktrace = array();
+    static protected $_verboseBacktrace = [];
 
-    static protected $_collectedErrors = array();
+    static protected $_collectedErrors = [];
 
-    static protected $_errorHandlerLog = array();
+    static protected $_errorHandlerLog = [];
 
     /**
     * Constructor, remember script start time for delta timestamps
@@ -2273,7 +2273,7 @@ class BDebug extends BClass
      * @param array $args
      * @return BDebug
      */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
@@ -2287,7 +2287,7 @@ class BDebug extends BClass
 
     public static function startErrorLogger()
     {
-        static::$_errorHandlerLog = array();
+        static::$_errorHandlerLog = [];
         set_error_handler( 'BDebug::errorHandlerLogger' );
     }
 
@@ -2392,14 +2392,14 @@ class BDebug extends BClass
             static::$_collectedErrors[ $level ][] = $msg;
         }
         if ( is_scalar( $msg ) ) {
-            $e = array( 'msg' => $msg );
+            $e = [ 'msg' => $msg ];
         } elseif ( is_object( $msg ) && $msg instanceof Exception ) {
             $bt = $msg->getTrace();
             $msgStr = $msg->getMessage();
             if ( $msg instanceof PDOException ) {
                 $msgStr .= "\nQUERY: " . BORM::get_last_query();
             }
-            $e = array( 'msg' => $msgStr );
+            $e = [ 'msg' => $msgStr ];
         } elseif ( is_array( $msg ) ) {
             $e = $msg;
         } else {
@@ -2640,7 +2640,7 @@ class BDebug extends BClass
 class BLocale extends BClass
 {
     static protected $_domainPrefix = 'fulleron/';
-    static protected $_domainStack = array();
+    static protected $_domainStack = [];
 
     static protected $_defaultLanguage = 'en_US';
     static protected $_currentLanguage;
@@ -2664,7 +2664,7 @@ class BLocale extends BClass
     *
     * @var DateTimeZone
     */
-    protected $_tzCache = array();
+    protected $_tzCache = [];
 
     /**
     * Translations tree
@@ -2690,7 +2690,7 @@ class BLocale extends BClass
      * @param array $args
      * @return BLocale
      */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
@@ -2743,7 +2743,7 @@ class BLocale extends BClass
      * @param mixed $data array or file name string
      * @param array $params
      */
-    public static function importTranslations( $data, $params = array() )
+    public static function importTranslations( $data, $params = [] )
     {
         $module = !empty( $params[ '_module' ] ) ? $params[ '_module' ] : BModuleRegistry::i()->currentModuleName();
         if ( is_string( $data ) ) {
@@ -2766,21 +2766,21 @@ class BLocale extends BClass
                         $content = file_get_contents( $data );
                         $translations = BUtil::fromJson( $content );
                         foreach ( $translations as $word => $tr ) {
-                            static::addTranslation( array( $word, $tr ), $module );
+                            static::addTranslation( [ $word, $tr ], $module );
                         }
                         break;
 
                     case 'php':
                         $translations = include $data;
                         foreach ( $translations as $word => $tr ) {
-                            static::addTranslation( array( $word, $tr ), $module );
+                            static::addTranslation( [ $word, $tr ], $module );
                         }
                         break;
 
                     case 'po':
                         //TODO: implement https://github.com/clinisbut/PHP-po-parser
                         $contentLines = file( $data );
-                        $translations = array();
+                        $translations = [];
                         $mode = null;
                         foreach ( $contentLines as $line ) {
                             $line = trim( $line );
@@ -2813,7 +2813,7 @@ class BLocale extends BClass
 
     static public function getFilesFromDir( $dir )
     {
-        $files = array();
+        $files = [];
         if ( false !== ( $handle = opendir( $dir ) ) ) {
             while ( false !== ( $file = readdir( $handle ) ) ) {
                 if ( $file != "." && $file != ".." ) {
@@ -2879,7 +2879,7 @@ class BLocale extends BClass
 
     }
 
-    public static function _( $string, $params = array(), $module = null )
+    public static function _( $string, $params = [], $module = null )
     {
         if ( empty( static::$_tr[ $string ] ) ) { // if no translation at all
             $tr = $string; // return original string
@@ -2900,14 +2900,14 @@ class BLocale extends BClass
 
     public function translations( $sources )
     {
-        $results = array();
+        $results = [];
         if ( is_array( $sources ) ) {
             foreach ( $sources as $string ) {
                 if ( is_string( $string ) ) {
                     $results[ $string ] = static::_( $string );
                 } else if ( is_array( $string ) && !empty( $string ) ) {
                     $str = (string) $string[ 0 ];
-                    $params = isset( $string[ 1 ] ) ? (array) $string[ 1 ] : array();
+                    $params = isset( $string[ 1 ] ) ? (array) $string[ 1 ] : [];
                     $module = isset( $string[ 2 ] ) ? (string) $string[ 2 ] : null;
                     $results[ $str ] = static::_( $str, $params, $module );
                 }
@@ -3010,7 +3010,7 @@ class BLocale extends BClass
     public function datetimeLocalToDb( $value )
     {
         if ( is_array( $value ) ) {
-            return array_map( array( $this, __METHOD__ ), $value );
+            return array_map( [ $this, __METHOD__ ], $value );
         }
         if ( !$value ) return $value;
         return gmstrftime( '%F %T', strtotime( $value ) );
@@ -3056,11 +3056,11 @@ class BLocale extends BClass
         return static::$_tr;
     }
 
-    static protected $_currencySymbolMap = array(
+    static protected $_currencySymbolMap = [
         'USD' => '$',
         'EUR' => '€',
         'GBP' => '£',
-    );
+    ];
     static protected $_currencyCode = 'USD';
     static protected $_currencySymbol = '$';
 
@@ -3137,7 +3137,7 @@ class BFtpClient extends BClass
 
     public function uploadDir( $conn, $source, $ftpPath = '' )
     {
-        $errors = array();
+        $errors = [];
         $dir = opendir( $source );
         while ( $file = readdir( $dir ) ) {
             if ( $file == '.' || $file == ".." ) {
@@ -3184,7 +3184,7 @@ class BLoginThrottle extends BClass
     protected $_username;
     protected $_rec;
     protected $_config;
-    protected $_blockedIPs = array();
+    protected $_blockedIPs = [];
     protected $_cachePrefix = 'BLoginThrottle/';
 
     /**
@@ -3192,7 +3192,7 @@ class BLoginThrottle extends BClass
     *
     * @return BLoginThrottle
     */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
@@ -3277,12 +3277,12 @@ class BLoginThrottle extends BClass
 
     protected function _fire( $event )
     {
-        BEvents::i()->fire( 'BLoginThrottle::' . $event, array(
+        BEvents::i()->fire( 'BLoginThrottle::' . $event, [
             'area'     => $this->_area,
             'username' => $this->_username,
             'rec'      => $this->_rec,
             'config'   => $this->_config,
-        ) );
+        ] );
     }
 
     protected function _load()
@@ -3343,7 +3343,7 @@ class BYAML extends BCLass
         $arrayData = static::parse( $yamlData );
 
         if ( $cache ) {
-            BCache::i()->save( 'BYAML--' . $filename, array( 'v' => $filemtime, 'd' => $arrayData ), false );
+            BCache::i()->save( 'BYAML--' . $filename, [ 'v' => $filemtime, 'd' => $arrayData ], false );
         }
 
         return $arrayData;
@@ -3415,57 +3415,57 @@ class BYAML extends BCLass
 class BValidate extends BClass
 {
     protected $_reRegex = '#^([/\#~&,%])(.*)(\1)[imsxADSUXJu]*$#';
-    protected $_defaultRules = array(
-        'required' => array(
+    protected $_defaultRules = [
+        'required' => [
             'rule'    => 'BValidate::ruleRequired',
             'message' => 'Missing field: :field',
-        ),
-        'url'       => array(
+        ],
+        'url'       => [
             'rule'    => '#(([\w]+:)?//)?(([\d\w]|%[a-fA-f\d]{2,2})+(:([\d\w]|%[a-fA-f\d]{2,2})+)?@)?([\d\w][-\d\w]{0,253}[\d\w]\.)+[\w]{2,4}(:[\d]+)?(/([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)*(\?(&?([-+_~.\d\w]|%[a-fA-f\d]{2,2})=?)*)?(\#([-+_~.\d\w]|%[a-fA-f\d]{2,2})*)?#',
             'message' => 'Invalid URL',
-        ),
-        'email'     => array(
+        ],
+        'email'     => [
             'rule'    => '/^([\w-\.\+]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/',
             'message' => 'Invalid Email',
-        ),
-        'string'    => array(
+        ],
+        'string'    => [
             'rule'    => 'BValidate::ruleString',
             'message' => 'Invalid string length', // this is default, actual message supplied by callback
-        ),
-        'numeric'   => array(
+        ],
+        'numeric'   => [
             'rule'    => '/^([+-]?)([0-9 ]+)(\.?,?)([0-9]*)$/',
             'message' => 'Invalid number: :field',
-        ),
-        'integer'   => array(
+        ],
+        'integer'   => [
             'rule'    => '/^[+-]?[0-9]+$/',
             'message' => 'Invalid integer: :field',
-        ),
-        'alphanum'  => array(
+        ],
+        'alphanum'  => [
             'rule'    => '/^[a-zA-Z0-9 ]+$/',
             'message' => 'Invalid alphanumeric: :field',
-        ),
-        'alpha'  => array(
+        ],
+        'alpha'  => [
             'rule'    => '/^[a-zA-Z ]+$/',
             'message' => 'Invalid alphabet field: :field',
-        ),
-        'password_confirm' => array(
+        ],
+        'password_confirm' => [
             'rule'    => 'BValidate::rulePasswordConfirm',
             'message' => 'Password confirmation does not match',
-            'args'    => array( 'original' => 'password' ),
-        ),
-    );
+            'args'    => [ 'original' => 'password' ],
+        ],
+    ];
 
     protected $_defaultMessage = "Validation failed for: :field";
-    protected $_expandedRules = array();
+    protected $_expandedRules = [];
 
-    protected $_validateErrors = array();
+    protected $_validateErrors = [];
 
     /**
      * @param bool  $new
      * @param array $args
      * @return BValidate
      */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
@@ -3478,15 +3478,15 @@ class BValidate extends BClass
 
     protected function _expandRules( $rules )
     {
-        $this->_expandedRules = array();
+        $this->_expandedRules = [];
         foreach ( $rules as $rule ) {
             if ( !empty( $rule[ 0 ] ) && !empty( $rule[ 1 ] ) ) {
                 $r = $rule;
-                $rule = array( 'field' => $r[ 0 ], 'rule' => $r[ 1 ] );
+                $rule = [ 'field' => $r[ 0 ], 'rule' => $r[ 1 ] ];
                 if ( isset( $r[ 2 ] ) ) $rule[ 'message' ] = $r[ 2 ];
                 if ( isset( $r[ 3 ] ) ) $rule[ 'args' ] = $r[ 3 ];
                 if ( isset( $rule[ 'args' ] ) && is_string( $rule[ 'args' ] ) ) {
-                    $rule[ 'args' ] = array( $rule[ 'args' ] => true );
+                    $rule[ 'args' ] = [ $rule[ 'args' ] => true ];
                 }
             }
             if ( is_string( $rule[ 'rule' ] ) && $rule[ 'rule' ][ 0 ] === '@' ) {
@@ -3505,9 +3505,9 @@ class BValidate extends BClass
 
     protected function _validateRules( $data )
     {
-        $this->_validateErrors = array();
+        $this->_validateErrors = [];
         foreach ( $this->_expandedRules as $r ) {
-            $args = !empty( $r[ 'args' ] ) ? $r[ 'args' ] : array();
+            $args = !empty( $r[ 'args' ] ) ? $r[ 'args' ] : [];
             $r[ 'args' ][ 'field' ] = $r[ 'field' ]; // for callback and message vars
 
             if ( is_string( $r[ 'rule' ] ) && preg_match( $this->_reRegex, $r[ 'rule' ], $m ) ) {
@@ -3654,8 +3654,8 @@ class BValidate extends BClass
  */
 class BValidateViewHelper extends BClass
 {
-    protected $_errors = array();
-    protected $_data = array();
+    protected $_errors = [];
+    protected $_data = [];
 
     public function __construct( $args )
     {
@@ -3721,7 +3721,7 @@ class BValidateViewHelper extends BClass
         $html = '';
 
         if ( !empty( $this->_errors[ $field ][ 'type' ] ) ) {
-            $html .= BUtil::tagHtml( 'label', array( 'for' => $fieldId, 'class' => $this->messageClass( $field ) ), $this->messageText( $field ) );
+            $html .= BUtil::tagHtml( 'label', [ 'for' => $fieldId, 'class' => $this->messageClass( $field ) ], $this->messageText( $field ) );
         }
 
         return $html;
@@ -3835,10 +3835,10 @@ class Bcrypt extends BClass
 class BRSA extends BClass
 {
     protected $_configPath = 'modules/BRSA';
-    protected $_config = array();
+    protected $_config = [];
     protected $_publicKey;
     protected $_privateKey;
-    protected $_cache = array();
+    protected $_cache = [];
 
     public function __construct()
     {
@@ -3846,11 +3846,11 @@ class BRSA extends BClass
             // TODO: integrate Crypt_RSA ?
             throw new BException( 'RSA encryption requires openssl module installed' );
         }
-        $defConf = array(
+        $defConf = [
             "digest_alg" => "sha512",
             "private_key_bits" => 4096,
             "private_key_type" => OPENSSL_KEYTYPE_RSA,
-        );
+        ];
         $conf = BConfig::i()->get( $this->_configPath );
         $this->_config = array_merge( $defConf, $conf );
     }
@@ -3938,7 +3938,7 @@ class BRSA extends BClass
         }
         // even though decrypt_url can potentially be overridden by extension, only encrypted data is sent over
         if ( !empty( $this->_config[ 'decrypt_url' ] ) ) {
-            $data = array( 'encrypted' => base64_encode( $encrypted ) );
+            $data = [ 'encrypted' => base64_encode( $encrypted ) ];
             $result = BUtil::remoteHttp( 'GET', $this->_config[ 'decrypt_url' ], $data );
             $decrypted = base64_decode( $result );
             if ( !empty( $result[ 'decrypted' ] ) ) {

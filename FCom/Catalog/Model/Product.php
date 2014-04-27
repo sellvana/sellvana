@@ -32,8 +32,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_product';
 
-    protected static $_fieldOptions = array(
-        'stock_status' => array(
+    protected static $_fieldOptions = [
+        'stock_status' => [
             'in_stock' => 'In Stock',
             'backorder' => 'On Backorder',
             'special_order' => 'Special Order',
@@ -41,46 +41,46 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             'temp_unavail' => 'Temporarily Unavailable',
             'vendor_disc' => 'Supplier Discontinued',
             'manuf_disc' => 'MFR Discontinued',
-        ),
-    );
+        ],
+    ];
 
-    protected static $_validationRules = array(
-        array( 'product_name', '@required' ),
-        array( 'base_price', '@required' ),
-        array( 'local_sku', '@required' ),
-        array( 'local_sku', '@string', null, array( 'max' => 100 ) ),
-        array( 'local_sku', 'FCom_Catalog_Model_Product::validateDupSku' ),
-        array( 'url_key', 'FCom_Catalog_Model_Product::validateDupUrlKey' ),
+    protected static $_validationRules = [
+        [ 'product_name', '@required' ],
+        [ 'base_price', '@required' ],
+        [ 'local_sku', '@required' ],
+        [ 'local_sku', '@string', null, [ 'max' => 100 ] ],
+        [ 'local_sku', 'FCom_Catalog_Model_Product::validateDupSku' ],
+        [ 'url_key', 'FCom_Catalog_Model_Product::validateDupUrlKey' ],
         //TODO validation fails on is_hidden field
         /*array('is_hidden', '@required'),*/
         /*array('uom', '@required'),*/
 
         /*array('is_hidden', '@integer'),*/
-        array( 'num_reviews', '@integer' ),
+        [ 'num_reviews', '@integer' ],
 
 
-        array( 'cost', '@numeric' ),
-        array( 'msrp', '@numeric' ),
-        array( 'map', '@numeric' ),
-        array( 'markup', '@numeric' ),
-        array( 'sale_price', '@numeric' ),
-        array( 'net_weight', '@numeric' ),
-        array( 'ship_weight', '@numeric' ),
-        array( 'avg_rating', '@numeric' ),
-    );
+        [ 'cost', '@numeric' ],
+        [ 'msrp', '@numeric' ],
+        [ 'map', '@numeric' ],
+        [ 'markup', '@numeric' ],
+        [ 'sale_price', '@numeric' ],
+        [ 'net_weight', '@numeric' ],
+        [ 'ship_weight', '@numeric' ],
+        [ 'avg_rating', '@numeric' ],
+    ];
 
-    protected static $_importExportProfile = array(
-        'skip' => array(
+    protected static $_importExportProfile = [
+        'skip' => [
             'create_dt',
             'update_dt',
             'indextank_indexed',
             'indextank_indexed_at',
-        ),
+        ],
         'unique_key' => 'local_sku'
-    );
+    ];
 
     protected $_importErrors = null;
-    protected $_dataImport = array();
+    protected $_dataImport = [];
 
     protected static $_urlPrefix;
 
@@ -90,7 +90,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
      * @param array $args
      * @return FCom_Catalog_Model_Product
      */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
@@ -251,14 +251,14 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ( $this->id() ) {
             $existsSql .= ' and id!=' . (int)$this->id();
         }
-        $exists = $this->orm()->raw_query( $existsSql, array( $urlKey ) )->find_one();
+        $exists = $this->orm()->raw_query( $existsSql, [ $urlKey ] )->find_one();
         if ( $exists && $exists->cnt > 0 ) {
             $matchSql        = "SELECT url_key FROM {$t} WHERE url_key LIKE ?";
             if ( $this->id() ) {
                 $matchSql .= ' and id!=' . (int)$this->id();
             }
-            $result           = $this->orm()->raw_query( $matchSql, array( $urlKey . '%' ) )->find_many();
-            $similarUrlKeys = array();
+            $result           = $this->orm()->raw_query( $matchSql, [ $urlKey . '%' ] )->find_many();
+            $similarUrlKeys = [];
             foreach ( $result as $row ) {
                 $similarUrlKeys[ $row->get( 'url_key' ) ] = 1;
             }
@@ -290,11 +290,11 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function prepareApiData( $products, $includeCategories = false )
     {
         if ( !is_array( $products ) ) {
-            $products = array( $products );
+            $products = [ $products ];
         }
-        $result = array();
+        $result = [];
         foreach ( $products as $i => $product ) {
-            $result[ $i ] = array(
+            $result[ $i ] = [
                 'id'                => $product->id,
                 'product_name'      => $product->product_name,
                 'sku'               => $product->local_sku,
@@ -303,7 +303,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 'weight'            => $product->weight,
                 'short_description' => !empty( $product->short_description ) ? $product->short_description : '',
                 'description'       => $product->description,
-            );
+            ];
             if ( $includeCategories ) {
                 $categories = $product->categories();
                 $result[ $i ][ 'categories' ] = FCom_Catalog_Model_Category::i()->prepareApiData( $categories );
@@ -314,7 +314,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function formatApiPost( $post )
     {
-        $data = array();
+        $data = [];
         if ( !empty( $post[ 'product_name' ] ) ) {
             $data[ 'product_name' ] = $post[ 'product_name' ];
         }
@@ -344,11 +344,11 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function categories( $includeAscendants = false )
     {
         $categories = FCom_Catalog_Model_CategoryProduct::i()->orm( 'cp' )
-            ->join( 'FCom_Catalog_Model_Category', array( 'cp.category_id', '=', 'c.id' ), 'c' )
+            ->join( 'FCom_Catalog_Model_Category', [ 'cp.category_id', '=', 'c.id' ], 'c' )
             ->where( 'cp.product_id', $this->id() )->find_many_assoc();
 
         if ( $includeAscendants ) {
-            $ascIds = array();
+            $ascIds = [];
             foreach ( $categories as $cat ) {
                 foreach ( explode( '/', $cat->id_path ) as $id ) {
                     if ( $id > 1 && empty( $categories[ $id ] ) ) {
@@ -374,7 +374,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 */
     public function customFieldsShowOnFrontend()
     {
-        $result = array();
+        $result = [];
         $fields = FCom_CustomField_Model_ProductField::i()->productFields( $this );
         if ( $fields ) {
             foreach ( $fields as $f ) {
@@ -386,7 +386,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $result;
     }
 
-    public function searchProductOrm( $q = '', $filter = array(), $category = null )
+    public function searchProductOrm( $q = '', $filter = [], $category = null )
     {
         $qs = preg_split( '#\s+#', $q, 0, PREG_SPLIT_NO_EMPTY );
 
@@ -396,10 +396,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $productsORM = $this->orm();
         }
 
-        $and = array();
+        $and = [];
         if ( $qs ) {
-            foreach ( $qs as $k ) $and[] = array( 'product_name like ?', '%' . $k . '%' );
-            $productsORM->where( array( 'OR' => array( 'local_sku' => $q, 'AND' => $and ) ) );
+            foreach ( $qs as $k ) $and[] = [ 'product_name like ?', '%' . $k . '%' ];
+            $productsORM->where( [ 'OR' => [ 'local_sku' => $q, 'AND' => $and ] ] );
         }
 
         if ( !empty( $filter ) ) {
@@ -420,8 +420,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return FCom_Catalog_Model_ProductMedia::i()->orm()->table_alias( 'pa' )
             ->where( 'pa.product_id', $this->id )->where( 'pa.media_type', $type )
             //->select(array('pa.manuf_vendor_id'))
-            ->join( 'FCom_Core_Model_MediaLibrary', array( 'a.id', '=', 'pa.file_id' ), 'a' )
-            ->select( array( 'a.id', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'pa.label' ) )
+            ->join( 'FCom_Core_Model_MediaLibrary', [ 'a.id', '=', 'pa.file_id' ], 'a' )
+            ->select( [ 'a.id', 'a.folder', 'a.subfolder', 'a.file_name', 'a.file_size', 'pa.label' ] )
             ->order_by_asc( 'position' );
     }
 
@@ -435,7 +435,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
      * @param array $config
      * @return array|null
      */
-    public function import( $data, $config = array() )
+    public function import( $data, $config = [] )
     {
         if ( empty( $data ) || !is_array( $data ) ) {
             return null;
@@ -443,7 +443,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 //        BResponse::i()->startLongResponse(false);
         //HANDLE CONFIG
 
-        BEvents::i()->fire( __METHOD__ . ':before', array( 'data' => &$data, 'config' => &$config ) );
+        BEvents::i()->fire( __METHOD__ . ':before', [ 'data' => &$data, 'config' => &$config ] );
 
         //multi value separator used to separate values in one column like for images
         //For example: image.png; image2.png; image3.png
@@ -508,17 +508,17 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ( !isset( $config[ 'import' ][ 'custom_fields' ][ 'create_missing_options' ] ) ) {
             $config[ 'import' ][ 'custom_fields' ][ 'create_missing_options' ] = true;
         }
-        $result = array();
+        $result = [];
         //$result['status'] = '';
 
         $customFieldsOptions = FCom_CustomField_Model_FieldOption::i()->getListAssoc();
 
         //HANDLE IMPORT
         static $cfIntersection = '';
-        $customFields = array();
-        $productIds = array();
-        $errors = array();
-        $relatedProducts = array();
+        $customFields = [];
+        $productIds = [];
+        $errors = [];
+        $relatedProducts = [];
         for ( $i = 0, $c = count( $data ); $i < $c; $i++ ) {
             $d = $data[ $i ];
             //if must have fields not defined then skip the record
@@ -526,13 +526,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 continue;
             }
 
-            $categoriesPath = array();
+            $categoriesPath = [];
             if ( $config[ 'import' ][ 'categories' ][ 'import' ] && !empty( $d[ 'categories' ] ) ) {
                 $categoriesPath = explode( $ms, $d[ 'categories' ] );
                 unset( $d[ 'categories' ] );
             }
 
-            $imagesNames = array();
+            $imagesNames = [];
             if ( $config[ 'import' ][ 'images' ][ 'import' ] && !empty( $d[ 'images' ] ) ) {
                 $imagesNames = explode( $ms, $d[ 'images' ] );
                 unset( $d[ 'images' ] );
@@ -564,7 +564,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                                     if ( !in_array( $dataValue, $customFieldsOptions[ $field->id() ] ) ) {
                                         try {
                                             FCom_CustomField_Model_FieldOption::orm()
-                                                    ->create( array( 'field_id' => $field->id(), 'label' => $dataValue ) )
+                                                    ->create( [ 'field_id' => $field->id(), 'label' => $dataValue ] )
                                                     ->save();
                                         } catch ( Exception $e ) {
                                             $errors[] = $e->getMessage();
@@ -636,13 +636,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
                 //check if parent category exist
                 static $topParentCategory = '';
-                static $categoriesList = array();
+                static $categoriesList = [];
                 if ( !$topParentCategory ) {
                     $topParentCategory = FCom_Catalog_Model_Category::orm()->where_null( "parent_id" )->find_one();
                     if ( !$topParentCategory ) {
                         try {
                             $topParentCategory = FCom_Catalog_Model_Category::orm()
-                                    ->create( array( 'parent_id' => null ) )
+                                    ->create( [ 'parent_id' => null ] )
                                     ->save();
                         } catch ( Exception $e ) {
                             $errors[] = $e->getMessage();
@@ -653,7 +653,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 if ( $topParentCategory ) {
                     //check if categories exists
                     //create new categories if not
-                    $categories = array();
+                    $categories = [];
                     foreach ( $categoriesPath as $catpath ) {
                         /** @var FCom_Catalog_Model_Category $parent */
                         $parent = $topParentCategory;
@@ -707,7 +707,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                             if ( !$catProduct ) {
                                 try {
                                     FCom_Catalog_Model_CategoryProduct::orm()
-                                        ->create( array( 'product_id' => $pId, 'category_id' => $category->id() ) )
+                                        ->create( [ 'product_id' => $pId, 'category_id' => $category->id() ] )
                                         ->save();
                                 } catch ( Exception $e ) {
                                     $errors[] = $e->getMessage();
@@ -723,7 +723,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
             //HANDLE IMAGES
             if ( !empty( $imagesNames ) ) {
-                $imagesConfig = !empty( $config[ 'import' ][ 'images' ] ) ? $config[ 'import' ][ 'images' ] : array();
+                $imagesConfig = !empty( $config[ 'import' ][ 'images' ] ) ? $config[ 'import' ][ 'images' ] : [];
                 $imagesResult = $this->importImages( $imagesNames, $imagesConfig, $p );
                 if ( is_array( $imagesResult ) ) {
                     $errors[] += $imagesResult;
@@ -737,7 +737,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ( $config[ 'import' ][ 'custom_fields' ][ 'import' ]
             && !empty( $cfIntersection ) && !empty( $productIds ) && !empty( $cfFields ) ) {
             //get custom fields values from data
-            $fieldIds = array();
+            $fieldIds = [];
             foreach ( $cfIntersection as $cfk ) {
                 $field = $cfFields[ $cfk ];
                 $fieldIds[] = $field->id();
@@ -748,7 +748,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             foreach ( $customsResult as $cus ) {
                 $customsResult[ $cus->product_id ] = $cus;
             }
-            $productCustomFields = array();
+            $productCustomFields = [];
             foreach ( $productIds as $pId ) {
                 if ( !empty( $customFields[ $pId ] ) ) {
                     $productCustomFields = $customFields[ $pId ];
@@ -779,7 +779,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ( $errors ) {
             $result[ 'errors' ] = $errors;
         }
-        BEvents::i()->fire( __METHOD__ . ':after', array( 'product_ids' => $productIds, 'config' => &$config, 'result' => &$result ) );
+        BEvents::i()->fire( __METHOD__ . ':after', [ 'product_ids' => $productIds, 'config' => &$config, 'result' => &$result ] );
 
         return $result;
     }
@@ -788,14 +788,14 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         $hlp = FCom_Catalog_Model_CategoryProduct::i();
         foreach ( (array)$categoryIds as $cId ) {
-            $hlp->create( array( 'product_id' => $this->id, 'category_id' => $cId ) )->save();
+            $hlp->create( [ 'product_id' => $this->id, 'category_id' => $cId ] )->save();
         }
         return $this;
     }
 
     public function removeFromCategories( $categoryIds )
     {
-        FCom_Catalog_Model_CategoryProduct::i()->delete_many( array( 'product_id' => $this->id, 'category_id' => $categoryIds ) );
+        FCom_Catalog_Model_CategoryProduct::i()->delete_many( [ 'product_id' => $this->id, 'category_id' => $categoryIds ] );
         return $this;
     }
 
@@ -811,28 +811,28 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function reviews( $incAvgRating = true )
     {
-        $reviews = FCom_ProductReviews_Model_Review::i()->orm( 'pr' )->select( array( 'pr.*', 'c.firstname', 'c.lastname' ) )
-            ->join( 'FCom_Customer_Model_Customer', array( 'pr.customer_id', '=', 'c.id' ), 'c' )
-            ->where( array( 'pr.product_id' => $this->id(), 'approved' => 1 ) )->order_by_expr( 'pr.create_at DESC' )->find_many();
+        $reviews = FCom_ProductReviews_Model_Review::i()->orm( 'pr' )->select( [ 'pr.*', 'c.firstname', 'c.lastname' ] )
+            ->join( 'FCom_Customer_Model_Customer', [ 'pr.customer_id', '=', 'c.id' ], 'c' )
+            ->where( [ 'pr.product_id' => $this->id(), 'approved' => 1 ] )->order_by_expr( 'pr.create_at DESC' )->find_many();
 
         if ( $incAvgRating ) {
             $avgRating = $this->calcAverageRating( $reviews );
         }
-        return array(
+        return [
             'items' => $reviews,
-            'avgRating' => isset( $avgRating ) ? $avgRating : array(),
+            'avgRating' => isset( $avgRating ) ? $avgRating : [],
             'numReviews' => count( $reviews ),
-        );
+        ];
     }
 
-    public function calcAverageRating( $reviews = array() )
+    public function calcAverageRating( $reviews = [] )
     {
-        $rs = array(
+        $rs = [
             'rating' => 0,
             'rating1' => 0,
             'rating2' => 0,
             'rating3' => 0,
-        );
+        ];
         if ( !empty( $reviews ) ) {
             $numReviews = count( $reviews );
             foreach ( $reviews as $review ) {
@@ -853,12 +853,12 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function getRelatedProducts()
     {
-        return array();
+        return [];
     }
 
     public function getUpsellProducts()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -869,7 +869,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function getOptionsData( $labelIncId = false )
     {
         $results = $this->orm( 'p' )->find_many();
-        $data = array();
+        $data = [];
         if ( count( $results ) ) {
             foreach ( $results as $r ) {
                 $data[ $r->id ] = $labelIncId ? $r->id . ' - ' . $r->product_name : $r->product_name;
@@ -886,7 +886,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function isAlreadyReviewed( $customerId )
     {
-        return FCom_ProductReviews_Model_Review::i()->load( array( 'product_id' => $this->id, 'customer_id' => $customerId ) );
+        return FCom_ProductReviews_Model_Review::i()->load( [ 'product_id' => $this->id, 'customer_id' => $customerId ] );
     }
 
     /**
@@ -906,13 +906,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     protected function _importRelatedProducts( $relatedProducts )
     {
-        $relatedIds = array();
+        $relatedIds = [];
         $relation   = FCom_Catalog_Model_ProductLink::i();
-        $errors     = array();
+        $errors     = [];
         try {
             foreach ( $relatedProducts as $pId => $relatedSkus ) {
-                $temp   = array();
-                $linked = array();
+                $temp   = [];
+                $linked = [];
 
                 foreach ( $relatedSkus as $sku ) {
                     // loop $relatedSkus and if they are not in fetched ids, add them to $temp to retrieve them
@@ -940,11 +940,11 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     // try to create links of type 'related'
                     try {
                         $relation->create(
-                                 array(
+                                 [
                                      'link_type'         => 'related',
                                      'product_id'        => $pId,
                                      'linked_product_id' => $rId,
-                                 )
+                                 ]
                         );
                     } catch ( Exception $e ) {
                         $errors[] = $e->getMessage();
@@ -967,7 +967,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
      * @param FCom_Catalog_Model_Product $p
      * @return array|bool
      */
-    public function importImages( $imagesNames, $config = array(), $p = null )
+    public function importImages( $imagesNames, $config = [], $p = null )
     {
         if ( is_null( $p ) ) {
             $p = $this;
@@ -977,16 +977,16 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $rootDir      = BConfig::i()->get( 'fs/root_dir' );
         $imageFolder  = BConfig::i()->get( 'fs/image_folder' );
         $thumbUrl = str_ireplace( 'media/product/image', '', $p->get( 'thumb_url' ) );
-        $errors = array();
+        $errors = [];
 
         foreach ( $imagesNames as $fileName ) {
             $pathInfo  = pathinfo( $fileName );
             $subFolder = $pathInfo[ 'dirname' ] == '.' ? null : $pathInfo[ 'dirname' ];
-            $att       = $mediaLib->load( array(
+            $att       = $mediaLib->load( [
                 'folder'    => $imageFolder,
                 'subfolder' => $subFolder,
                 'file_name' => $pathInfo[ 'basename' ]
-            ) );
+            ] );
             if ( !$att ) {
                 $fullPathToFile = $rootDir . '/' . $imageFolder . '/' . $fileName;
                 $size           = 0;
@@ -999,12 +999,12 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     $subFolder = $pathInfo[ 'dirname' ] == '.' ? null : $pathInfo[ 'dirname' ];
                 }
                 try {
-                    $att = $mediaLib->create( array(
+                    $att = $mediaLib->create( [
                         'folder'    => $imageFolder,
                         'subfolder' => $subFolder,
                         'file_name' => $pathInfo[ 'basename' ],
                         'file_size' => $size,
-                    ) )->save();
+                    ] )->save();
                 } catch ( Exception $e ) {
                     $errors[] = $e->getMessage();
                 }
@@ -1014,12 +1014,12 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $isThumb = ( 'product/image/' . $fileName == $thumbUrl );
             if ( !$fileId ) {
                 try {
-                    $productMedia->create( array(
+                    $productMedia->create( [
                         'product_id' => $p->id(),
                         'media_type' => 'images',
                         'file_id'    => $att->id(),
                         'main_thumb' => $isThumb ? 1 : 0
-                    ) )->save();
+                    ] )->save();
                 } catch ( Exception $e ) {
                     $errors[] = $e->getMessage();
                 }

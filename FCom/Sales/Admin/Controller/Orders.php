@@ -14,31 +14,31 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config[ 'columns' ] = array(
-            array( 'type' => 'row_select' ),
-            array( 'name' => 'id', 'index' => 'o.id', 'label' => 'Order id', 'width' => 70, 'href' => BApp::href( 'orders/form/?id=:id' ) ),
-            array( 'name' => 'admin_name', 'index' => 'o.admin_id', 'label' => 'Assisted by' ),
-            array( 'name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date' ),
-            array( 'name' => 'billing_name', 'label' => 'Bill to Name', 'index' => 'billing_name' ),
-            array( 'name' => 'billing_address', 'label' => 'Bill to Address', 'index' => 'billing_address' ),
-            array( 'name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'shipping_name' ),
-            array( 'name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'shipping_address' ),
-            array( 'name' => 'grandtotal', 'label' => 'Order Total', 'index' => 'o.grandtotal' ),
-            array( 'name' => 'balance', 'label' => 'Paid', 'index' => 'o.balance' ),
-            array( 'name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code' ),
+        $config[ 'columns' ] = [
+            [ 'type' => 'row_select' ],
+            [ 'name' => 'id', 'index' => 'o.id', 'label' => 'Order id', 'width' => 70, 'href' => BApp::href( 'orders/form/?id=:id' ) ],
+            [ 'name' => 'admin_name', 'index' => 'o.admin_id', 'label' => 'Assisted by' ],
+            [ 'name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date' ],
+            [ 'name' => 'billing_name', 'label' => 'Bill to Name', 'index' => 'billing_name' ],
+            [ 'name' => 'billing_address', 'label' => 'Bill to Address', 'index' => 'billing_address' ],
+            [ 'name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'shipping_name' ],
+            [ 'name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'shipping_address' ],
+            [ 'name' => 'grandtotal', 'label' => 'Order Total', 'index' => 'o.grandtotal' ],
+            [ 'name' => 'balance', 'label' => 'Paid', 'index' => 'o.balance' ],
+            [ 'name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code' ],
             //todo: confirm with Boris about status should be stored as id_status
-            array( 'name' => 'status', 'label' => 'Status', 'index' => 'o.status', 'options' => FCom_Sales_Model_Order_Status::i()->statusOptions() ),
-            array( 'type' => 'btn_group', 'buttons' => array(
-                array( 'name' => 'edit' ),
-            ) ),
-        );
-        $config[ 'filters' ] = array(
-            array( 'field' => 'create_at', 'type' => 'date-range' ),
-            array( 'field' => 'billing_name', 'type' => 'text', 'having' => true ),
-            array( 'field' => 'shipping_name', 'type' => 'text', 'having' => true ),
-            array( 'field' => 'grandtotal', 'type' => 'number-range' ),
-            array( 'field' => 'status', 'type' => 'multiselect' ),
-        );
+            [ 'name' => 'status', 'label' => 'Status', 'index' => 'o.status', 'options' => FCom_Sales_Model_Order_Status::i()->statusOptions() ],
+            [ 'type' => 'btn_group', 'buttons' => [
+                [ 'name' => 'edit' ],
+            ] ],
+        ];
+        $config[ 'filters' ] = [
+            [ 'field' => 'create_at', 'type' => 'date-range' ],
+            [ 'field' => 'billing_name', 'type' => 'text', 'having' => true ],
+            [ 'field' => 'shipping_name', 'type' => 'text', 'having' => true ],
+            [ 'field' => 'grandtotal', 'type' => 'number-range' ],
+            [ 'field' => 'status', 'type' => 'multiselect' ],
+        ];
 
         //todo: check this in FCom_Admin_Controller_Abstract_GridForm
         if ( !empty( $config[ 'orm' ] ) ) {
@@ -69,17 +69,17 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ->select_expr( 'CONCAT_WS(" ", au.firstname,au.lastname)', 'admin_name' );
 
         $orm->left_outer_join( 'FCom_Sales_Model_Order_Status', 'o.status = os.code', 'os' )
-            ->select( array( 'os_name' => 'os.name' ) );
+            ->select( [ 'os_name' => 'os.name' ] );
     }
 
     public function gridViewBefore( $args )
     {
         parent::gridViewBefore( $args );
-        $this->view( 'admin/grid' )->set( array(
-            'actions' => array(
+        $this->view( 'admin/grid' )->set( [
+            'actions' => [
                 'new' => '',
-            ),
-        ) );
+            ],
+        ] );
     }
 
     public function action_form()
@@ -119,7 +119,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
 
         $view = $this->view( $this->_formViewName )->set( 'model', $model );
 
-        $this->formViewBefore( array( 'view' => $view, 'model' => $model ) );
+        $this->formViewBefore( [ 'view' => $view, 'model' => $model ] );
 
         $this->layout( $this->_formLayoutName );
         $this->processFormTabs( $view, $model, 'edit' );
@@ -130,16 +130,16 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $m = $args[ 'model' ];
         $act = $m->act;
         if ( 'edit' == $act ) {
-            $actions = array(
+            $actions = [
                 'back' => '<a class="btn btn-link" href=\'' . BApp::href( $this->_gridHref ) . '\'><span>' .  BLocale::_( 'Back to list' ) . '</span></a>',
                 'delete' => '<button type="submit" class="st2 sz2 btn btn-danger" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>' .  BLocale::_( 'Delete' ) . '</span></button>',
                 'save' => '<button type="submit" class="st1 sz2 btn btn-primary" onclick="return adminForm.saveAll(this)"><span>' .  BLocale::_( 'Save' ) . '</span></button>',
-            );
+            ];
         } else {
-            $actions = array(
+            $actions = [
                 'back' => '<a class="btn btn-link" href=\'' . BApp::href( $this->_gridHref ) . '\'><span>Back to list</span></a>',
                 'edit' => '<a class="btn btn-primary" href=\'' . BApp::href( 'orders/form' ) . '?id=' . $m->id . '&act=edit' . '\'><span>Edit</span></a>',
-            );
+            ];
         }
         if ( $m->id ) {
             if ( $m->act == 'edit' ) {
@@ -150,12 +150,12 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         } else {
             $title = 'Create New Order';
         }
-        $args[ 'view' ]->set( array(
+        $args[ 'view' ]->set( [
             'form_id' => BLocale::transliterate( $this->_formLayoutName ),
             'form_url' => BApp::href( $this->_formHref ) . '?id=' . $m->id,
             'actions' => $actions,
             'title' => $title,
-        ) );
+        ] );
         BEvents::i()->fire( static::$_origClass . '::formViewBefore', $args );
     }
 
@@ -181,7 +181,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                 }
             }
             if ( ( $del = BUtil::fromJson( $addrPost[ 'del_json' ] ) ) ) {
-                FCom_Sales_Model_Order_Address::i()->delete_many( array( 'id' => $del, 'order_id' => $order->id ) );
+                FCom_Sales_Model_Order_Address::i()->delete_many( [ 'id' => $del, 'order_id' => $order->id ] );
             }
 
             $modelPost = BRequest::i()->post( 'model' );
@@ -207,46 +207,46 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
 
     public function itemsOrderGridConfig( $order )
     {
-        $data = array();
+        $data = [];
         $items = $order->items();
         if ( $items ) {
             foreach ( $items as $item ) {
                 $product_info = BUtil::fromJson( $item->product_info );
-                $product = array(
+                $product = [
                     'id'           => $item->id,
                     'product_name' => $product_info[ 'product_name' ],
                     'local_sku'    => $product_info[ 'local_sku' ],
                     'price'        => $product_info[ 'base_price' ],
                     'qty'          => $item->qty,
                     'total'        => $item->total,
-                );
+                ];
                 $data[] = $product;
             }
         }
         $config = array_merge(
             parent::gridConfig(),
-            array(
+            [
                 'id'        => 'orders_item',
                 'data'      => $data,
                 'data_mode' => 'local',
                 'orm'       => 'FCom_Sales_Model_Order_Item',
-                'columns'   => array(
+                'columns'   => [
                     //todo: add row for image
-                    array( 'type' => 'row_select' ),
-                    array( 'name' => 'id', 'label' => 'ID', 'width' => 80, 'hidden' => true ),
-                    array( 'name' => 'product_name', 'label' => 'Name', 'width' => 400 ),
-                    array( 'name' => 'local_sku', 'label' => 'SKU', 'width' => 200 ),
-                    array( 'name' => 'price', 'label' => 'Price', 'width' => 100 ),
-                    array( 'name' => 'qty', 'label' => 'Qty', 'width' => 100 ),
-                    array( 'name' => 'total', 'label' => 'Total', 'width' => 150 ),
-                ),
-                'actions'   => array(
-                    'add'    => array( 'caption' => 'Add products' ),
-                    'delete' => array( 'caption' => 'Remove' ) //todo: fix remove is not delete in some grid
-                ),
-            )
+                    [ 'type' => 'row_select' ],
+                    [ 'name' => 'id', 'label' => 'ID', 'width' => 80, 'hidden' => true ],
+                    [ 'name' => 'product_name', 'label' => 'Name', 'width' => 400 ],
+                    [ 'name' => 'local_sku', 'label' => 'SKU', 'width' => 200 ],
+                    [ 'name' => 'price', 'label' => 'Price', 'width' => 100 ],
+                    [ 'name' => 'qty', 'label' => 'Qty', 'width' => 100 ],
+                    [ 'name' => 'total', 'label' => 'Total', 'width' => 150 ],
+                ],
+                'actions'   => [
+                    'add'    => [ 'caption' => 'Add products' ],
+                    'delete' => [ 'caption' => 'Remove' ] //todo: fix remove is not delete in some grid
+                ],
+            ]
         );
-        return array( 'config' => $config );
+        return [ 'config' => $config ];
     }
 
     /**
@@ -258,33 +258,33 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
     {
         $config = parent::gridConfig();
         $config[ 'id' ] = 'customer_grid_orders_' . $customer->id;
-        $config[ 'columns' ] = array(
-            array( 'type' => 'row_select' ),
-            array( 'name' => 'id', 'index' => 'o.id', 'label' => 'Order id', 'width' => 70 ),
-            array( 'name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date' ),
-            array( 'name' => 'billing_name', 'label' => 'Bill to Name', 'index' => 'ab.billing_name' ),
-            array( 'name' => 'billing_address', 'label' => 'Bill to Address', 'index' => 'ab.billing_address' ),
-            array( 'name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'as.shipping_name' ),
-            array( 'name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'as.shipping_address' ),
-            array( 'name' => 'grandtotal', 'label' => 'Order Total', 'index' => 'o.grandtotal' ),
-            array( 'name' => 'balance', 'label' => 'Paid', 'index' => 'o.balance' ),
-            array( 'name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code' ),
-            array( 'name' => 'status', 'label' => 'Status', 'index' => 'o.status', 'options' => FCom_Sales_Model_Order_Status::i()->statusOptions() ),
-            array( 'type' => 'btn_group', 'buttons' => array(
-                array( 'name' => 'edit' ),
-            ) ),
-        );
-        $config[ 'filters' ] = array(
-            array( 'field' => 'create_at', 'type' => 'date-range' ),
-            array( 'field' => 'billing_name', 'type' => 'text' ),
-            array( 'field' => 'shipping_name', 'type' => 'text' ),
-            array( 'field' => 'grandtotal', 'type' => 'number-range' ),
-            array( 'field' => 'status', 'type' => 'multiselect' ),
-        );
+        $config[ 'columns' ] = [
+            [ 'type' => 'row_select' ],
+            [ 'name' => 'id', 'index' => 'o.id', 'label' => 'Order id', 'width' => 70 ],
+            [ 'name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date' ],
+            [ 'name' => 'billing_name', 'label' => 'Bill to Name', 'index' => 'ab.billing_name' ],
+            [ 'name' => 'billing_address', 'label' => 'Bill to Address', 'index' => 'ab.billing_address' ],
+            [ 'name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'as.shipping_name' ],
+            [ 'name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'as.shipping_address' ],
+            [ 'name' => 'grandtotal', 'label' => 'Order Total', 'index' => 'o.grandtotal' ],
+            [ 'name' => 'balance', 'label' => 'Paid', 'index' => 'o.balance' ],
+            [ 'name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code' ],
+            [ 'name' => 'status', 'label' => 'Status', 'index' => 'o.status', 'options' => FCom_Sales_Model_Order_Status::i()->statusOptions() ],
+            [ 'type' => 'btn_group', 'buttons' => [
+                [ 'name' => 'edit' ],
+            ] ],
+        ];
+        $config[ 'filters' ] = [
+            [ 'field' => 'create_at', 'type' => 'date-range' ],
+            [ 'field' => 'billing_name', 'type' => 'text' ],
+            [ 'field' => 'shipping_name', 'type' => 'text' ],
+            [ 'field' => 'grandtotal', 'type' => 'number-range' ],
+            [ 'field' => 'status', 'type' => 'multiselect' ],
+        ];
         $config[ 'orm' ] = $config[ 'orm' ]->where( 'customer_id', $customer->id );
         $this->gridOrmConfig( $config[ 'orm' ] );
 
-        return array( 'config' => $config );
+        return [ 'config' => $config ];
     }
 
     public function getOrderRecent()
@@ -292,9 +292,9 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $dayRecent = ( BConfig::i()->get( 'modules/FCom_Sales/recent_day' ) ) ? BConfig::i()->get( 'modules/FCom_Sales/recent_day' ) : 7;
         $recent = date( 'Y-m-d H:i:s', strtotime( date( 'Y-m-d H:i:s' ) ) - $dayRecent * 86400 );
         $result = FCom_Sales_Model_Order::i()->orm( 'o' )
-            ->join( 'FCom_Customer_Model_Customer', array( 'o.customer_id', '=', 'c.id' ), 'c' )
+            ->join( 'FCom_Customer_Model_Customer', [ 'o.customer_id', '=', 'c.id' ], 'c' )
             ->where_gte( 'o.create_at', $recent )
-            ->select( array( 'o.*',  'c.firstname', 'c.lastname' ) )->find_many();
+            ->select( [ 'o.*',  'c.firstname', 'c.lastname' ] )->find_many();
 
         return $result;
     }
@@ -302,10 +302,10 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
     public function getOrderTotal( $filter )
     {
         $orderTotal = FCom_Sales_Model_Order_Status::i()->orm( 's' )
-            ->left_outer_join( 'FCom_Sales_Model_Order', array( 'o.status', '=', 's.name' ), 'o' )
+            ->left_outer_join( 'FCom_Sales_Model_Order', [ 'o.status', '=', 's.name' ], 'o' )
             ->group_by( 's.id' )
             ->select_expr( 'COUNT(o.id)', 'order' )
-            ->select( array( 's.id', 'name' ) );
+            ->select( [ 's.id', 'name' ] );
         $tmp = $result = $orderTotal->find_many();
         switch ( $filter[ 'type' ] ) {
             case 'between':
@@ -342,7 +342,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
     {
         $r = BRequest::i()->post( 'config' );
         $seq = FCom_Core_Model_Seq::i()->orm()->where( 'entity_type', 'order' )->find_one();
-        $result = array( 'status' => true, 'messages' => '' );
+        $result = [ 'status' => true, 'messages' => '' ];
         if ( $seq ) {
             if ( isset( $r[ 'modules' ][ 'FCom_Sales' ][ 'order_number' ] ) ) {
                 $orderNumber = '1' . $r[ 'modules' ][ 'FCom_Sales' ][ 'order_number' ];
@@ -377,18 +377,18 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         if ( isset( $r[ 'q' ] ) && $r[ 'q' ] != '' ) {
             $value = '%' . $r[ 'q' ] . '%';
             $result = FCom_Sales_Model_Order::i()->orm()
-                ->where( array( 'OR' => array(
-                    array( 'id like ?', $value ),
-                    array( 'customer_email like ?', $value ),
-                    array( 'unique_id like ?', $value ),
-                    array( 'coupon_code like ?', $value ),
-                ) ) )->find_one();
+                ->where( [ 'OR' => [
+                    [ 'id like ?', $value ],
+                    [ 'customer_email like ?', $value ],
+                    [ 'unique_id like ?', $value ],
+                    [ 'coupon_code like ?', $value ],
+                ] ] )->find_one();
             $args[ 'result' ][ 'order' ] = null;
             if ( $result ) {
-                $args[ 'result' ][ 'order' ] = array(
+                $args[ 'result' ][ 'order' ] = [
                     'priority' => 20,
                     'url' => BApp::href( $this->_formHref ) . '?id=' . $result->id()
-                );
+                ];
             }
         }
     }

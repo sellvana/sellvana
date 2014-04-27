@@ -23,19 +23,19 @@
 
 class BImport extends BClass
 {
-    protected $fields = array();
+    protected $fields = [];
     protected $dir = 'shared';
     protected $model = '';
 
     public function getFieldData()
     {
-        BEvents::i()->fire( __METHOD__, array( 'fields' => &$this->fields ) );
+        BEvents::i()->fire( __METHOD__, [ 'fields' => &$this->fields ] );
         return $this->fields;
     }
 
     public function getFieldOptions()
     {
-        $options = array();
+        $options = [];
         foreach ( $this->getFieldData() as $f => $_ ) {
             $options[ $f ] = $f;
         }
@@ -55,7 +55,7 @@ class BImport extends BClass
     public function getFileInfo( $file )
     {
         // assume we know nothing about the file
-        $info = array();
+        $info = [];
         // open file for reading
         if ( !file_exists( $file ) )
             return false;
@@ -63,8 +63,8 @@ class BImport extends BClass
         // get first line in the file
         $r = fgets( $fp );
         fclose( $fp );
-        $row = array();
-        foreach ( array( "\t", ',', ';', '|' ) as $chr ) {
+        $row = [];
+        foreach ( [ "\t", ',', ';', '|' ] as $chr ) {
             $row = str_getcsv( $r, $chr );
             if ( sizeof( $row ) > 1 ) {
                 $info[ 'delim' ] = $chr;
@@ -156,7 +156,7 @@ class BImport extends BClass
         }
         $config = $this->config();
         $filename = $this->getImportDir() . '/' . $config[ 'filename' ];
-        $status = array(
+        $status = [
             'start_time' => time(),
             'status' => 'running',
             'rows_total' => sizeof( file( $filename ) ), // file() will load entire file in memory, may be not good idea???
@@ -170,7 +170,7 @@ class BImport extends BClass
             'memory_usage' => memory_get_usage(),
             'run_time' => 0,
             'errors' => ''
-        );
+        ];
         $this->config( $status, true );
         $fp = fopen( $filename, 'r' );
         if ( !empty( $config[ 'skip_first' ] ) ) {
@@ -180,7 +180,7 @@ class BImport extends BClass
             }
         }
 
-        $importConfig = array();
+        $importConfig = [];
 
         $statusUpdate = 50;
         if ( $config[ 'batch_size' ] ) {
@@ -193,7 +193,7 @@ class BImport extends BClass
             $importConfig[ 'format' ][ 'nesting_separator' ] = $config[ 'nesting_separator' ];
         }
 
-        $dataBatch = array();
+        $dataBatch = [];
         while ( ( $r = fgetcsv( $fp, 0, $config[ 'delim' ] ) ) ) {
             if ( count( $r ) != count( $config[ 'columns' ] ) ) {
                 continue;
@@ -205,7 +205,7 @@ class BImport extends BClass
                 }
             }
 
-            $data = array();
+            $data = [];
             foreach ( $row as $k => $v ) {
                 $f = explode( '.', $k );
                 if ( empty( $f[ 0 ] ) || empty( $f[ 1 ] ) ) {
@@ -227,7 +227,7 @@ class BImport extends BClass
                             $status[ 'rows_' . $result[ 'status' ] ]++;
                         }
                     }
-                    $dataBatch = array();
+                    $dataBatch = [];
                 }
             } else {
                 $result = $model->import( $data, $importConfig );

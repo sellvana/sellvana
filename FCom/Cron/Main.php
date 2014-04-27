@@ -2,13 +2,13 @@
 
 class FCom_Cron_Main extends BClass
 {
-    protected $_tasks = array();
+    protected $_tasks = [];
 
-    public function task( $expr, $callback, $args = array() )
+    public function task( $expr, $callback, $args = [] )
     {
         if ( is_string( $callback ) && strpos( $callback, '.' ) !== false ) {
             list( $class, $method ) = explode( '.', $callback );
-            $callback = array( $class::i(), $method );
+            $callback = [ $class::i(), $method ];
         }
 
         $exprArr = preg_split( '#\s+#', $expr, null, PREG_SPLIT_NO_EMPTY );
@@ -45,7 +45,7 @@ class FCom_Cron_Main extends BClass
         foreach ( $modules as $modName => $mod ) {
             if ( $mod->run_status === BModule::LOADED && $mod->crontab ) {
                 foreach ( $mod->crontab as $task ) {
-                    $hlp->task( $task[ 0 ], $task[ 1 ], !empty( $task[ 2 ] ) ? $task[ 2 ] : array() );
+                    $hlp->task( $task[ 0 ], $task[ 1 ], !empty( $task[ 2 ] ) ? $task[ 2 ] : [] );
                 }
             }
         }
@@ -89,7 +89,7 @@ class FCom_Cron_Main extends BClass
                 // check whether to skip already existing tasks
                 if ( !$force && !empty( $dbTasks[ $h ] ) ) {
                 // skip pending and already running tasks
-                    if ( in_array( $dbTasks[ $h ]->status, array( 'pending', 'running' ) ) ) {
+                    if ( in_array( $dbTasks[ $h ]->status, [ 'pending', 'running' ] ) ) {
                         continue;
                     }
                     // skip tasks that started within last minute if not specified $force flag
@@ -104,10 +104,10 @@ class FCom_Cron_Main extends BClass
                 }
                 // create a new db task if never ran yet
                 if ( empty( $dbTasks[ $h ] ) ) {
-                    $dbTasks[ $h ] = FCom_Cron_Model_Task::i()->create( array(
+                    $dbTasks[ $h ] = FCom_Cron_Model_Task::i()->create( [
                         'handle' => $h,
                         'cron_expr' => $task[ 'cron_expr' ],
-                    ) );
+                    ] );
                 }
                 // mark task as pending
                 $dbTasks[ $h ]->set( 'status', 'pending' )->save();
@@ -126,24 +126,24 @@ class FCom_Cron_Main extends BClass
                 continue;
             }
             // mark task as running
-            $dbTask->set( array(
+            $dbTask->set( [
                 'status' => 'running',
                 'last_start_at' => BDb::now(),
                 'last_finish_at' => null,
-            ) )->save();
+            ] )->save();
             $task = $this->_tasks[ $dbTask->handle ];
 
             try {
                 // run task callback
                 call_user_func( $task[ 'callback' ], $task );
                 // if everything ok, mark task as success
-                $dbTask->set( array( 'status' => 'success' ) );
+                $dbTask->set( [ 'status' => 'success' ] );
             } catch ( Exception $e ) {
                 // on exception mark as error
-                $dbTask->set( array( 'status' => 'error', 'last_error_msg' => $e->getMessage() ) );
+                $dbTask->set( [ 'status' => 'error', 'last_error_msg' => $e->getMessage() ] );
             }
             // set finishing time and save task
-            $dbTask->set( array( 'last_finish_at' => BDb::now() ) )->save();
+            $dbTask->set( [ 'last_finish_at' => BDb::now() ] )->save();
         }
         return $this;
     }
@@ -216,11 +216,11 @@ class FCom_Cron_Main extends BClass
 
     public function toNumber( $val )
     {
-        static $convert = array(
+        static $convert = [
             'jan' => 1, 'feb' => 2, 'mar' => 3, 'apr' => 4, 'may' => 5, 'jun' => 6,
             'jul' => 7, 'aug' => 8, 'sep' => 9, 'oct' => 10, 'nov' => 11, 'dec' => 12,
             'sun' => 0, 'mon' => 1, 'tue' => 2, 'wed' => 3, 'thu' => 4, 'fri' => 5, 'sat' => 6,
-        );
+        ];
         if ( is_numeric( $val ) ) return $val;
         if ( is_string( $val ) ) {
             $val = strtolower( substr( $val, 0, 3 ) );

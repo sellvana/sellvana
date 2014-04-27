@@ -98,58 +98,58 @@ class FCom_Promo_Migrate extends BClass
     public function upgrade__0_1_1__0_1_2()
     {
         $tCart = FCom_Promo_Model_Cart::table();
-        BDb::ddlAddColumns( $tCart, array( 'updated_dt' => "datetime" ) );
+        BDb::ddlAddColumns( $tCart, [ 'updated_dt' => "datetime" ] );
     }
 
     public function upgrade__0_1_2__0_1_3()
     {
         $table = FCom_Promo_Model_Cart::table();
-        BDb::ddlTableDef( $table, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef( $table, [
+            'COLUMNS' => [
                   'updated_dt'      => 'RENAME updated_at datetime NULL',
-            ),
-        ) );
+            ],
+        ] );
         $table = FCom_Promo_Model_Promo::table();
-        BDb::ddlTableDef( $table, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef( $table, [
+            'COLUMNS' => [
                   'create_dt'      => 'RENAME create_at datetime NOT NULL',
                   'update_dt'      => 'RENAME update_at datetime NULL',
-            ),
-        ) );
+            ],
+        ] );
     }
 
     public function upgrade__0_1_3__0_1_4()
     {
 
         $table = FCom_Promo_Model_Cart::table();
-        BDb::ddlTableDef( $table, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef( $table, [
+            'COLUMNS' => [
                   'updated_at'      => 'RENAME update_at datetime NULL',
-            ),
-        ) );
+            ],
+        ] );
     }
 
     public function upgrade__0_1_4__0_1_5()
     {
 
         $table = FCom_Promo_Model_Promo::table();
-        BDb::ddlTableDef( $table, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef( $table, [
+            'COLUMNS' => [
                 "coupon"          => "varchar(100)",
                 "manuf_vendor_id" => "INT(10) UNSIGNED NULL",
                 "buy_group"       => "ENUM('one', 'any', 'all', 'cat', 'anyp')  NOT NULL  DEFAULT 'one'"
-            ),
-        ) );
+            ],
+        ] );
     }
 
     public function upgrade__0_1_5__0_1_6()
     {
 
         $table = FCom_Promo_Model_Promo::table();
-        BDb::ddlTableDef( $table, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef( $table, [
+            'COLUMNS' => [
                 "get_type"       => "enum('qty','$','%','text','choice','free') NOT NULL DEFAULT 'qty'"
-            ),
-        ) );
+            ],
+        ] );
     }
 }

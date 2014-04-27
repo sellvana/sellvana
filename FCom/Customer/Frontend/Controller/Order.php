@@ -2,7 +2,7 @@
 
 class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_Abstract
 {
-    public function authenticate( $args = array() )
+    public function authenticate( $args = [] )
     {
         return FCom_Customer_Model_Customer::i()->isLoggedIn() || BRequest::i()->rawPath() == '/login';
     }
@@ -12,8 +12,8 @@ class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_A
         $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $orders = FCom_Sales_Model_Order::i()->getOrders( $customerId );
 
-        $crumbs[] = array( 'label' => 'Account', 'href' => Bapp::href( 'customer/myaccount' ) );
-        $crumbs[] = array( 'label' => 'Orders', 'active' => true );
+        $crumbs[] = [ 'label' => 'Account', 'href' => Bapp::href( 'customer/myaccount' ) ];
+        $crumbs[] = [ 'label' => 'Orders', 'active' => true ];
         $this->view( 'breadcrumbs' )->crumbs = $crumbs;
         $this->view( 'customer/order/list' )->orders = $orders;
         $this->layout( '/customer/order/list' );
@@ -29,9 +29,9 @@ class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_A
             return;
         }
 
-        $crumbs[] = array( 'label' => 'Account', 'href' => Bapp::href( 'customer/myaccount' ) );
-        $crumbs[] = array( 'label' => 'Orders', 'href' => Bapp::href( 'customer/order' ) );
-        $crumbs[] = array( 'label' => 'View order', 'active' => true );
+        $crumbs[] = [ 'label' => 'Account', 'href' => Bapp::href( 'customer/myaccount' ) ];
+        $crumbs[] = [ 'label' => 'Orders', 'href' => Bapp::href( 'customer/order' ) ];
+        $crumbs[] = [ 'label' => 'View order', 'active' => true ];
         $this->view( 'breadcrumbs' )->crumbs = $crumbs;
         $this->view( 'customer/order/view' )->order = $order;
         $this->view( 'customer/order/view' )->billing = $order->billing();

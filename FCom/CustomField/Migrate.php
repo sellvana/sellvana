@@ -83,21 +83,21 @@ class FCom_CustomField_Migrate extends BClass
         " );
 
         $tProdVariant = FCom_CustomField_Model_ProductVariant::table();
-        BDb::ddlTableDef( $tProdVariant, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef( $tProdVariant, [
+            'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'product_id' => 'int unsigned not null',
                 'field_values' => 'varchar(255)',
                 'variant_sku' => 'varchar(50)',
                 'variant_price' => 'decimal(12,2)',
                 'data_serialized' => 'text',
-            ),
+            ],
             'PRIMARY' => '(id)',
-            'KEYS' => array(
+            'KEYS' => [
                 'UNQ_product' => 'UNIQUE (product_id, field_values)',
                 'IDX_sku' => '(variant_sku)',
-            ),
-        ) );
+            ],
+        ] );
         $tField = FCom_CustomField_Model_Field::i();
         while ( true ) {
             $dups = $tField->orm()->select( '(min(id))', 'min_id' )->group_by( 'field_code' )
@@ -105,19 +105,19 @@ class FCom_CustomField_Migrate extends BClass
             if ( !$dups ) {
                 break;
             }
-            $tField->delete_many( array( 'id' => array_keys( $dups ) ) );
+            $tField->delete_many( [ 'id' => array_keys( $dups ) ] );
         }
 
-        BDb::ddlTableDef( $tField->table(), array(
-            'KEYS' => array(
+        BDb::ddlTableDef( $tField->table(), [
+            'KEYS' => [
                 'UNQ_field_code' => 'UNIQUE (field_code)',
-            ),
-        ) );
+            ],
+        ] );
 
-        $exist = $tField->orm()->where_in( 'field_code', array( 'color', 'size' ) )
+        $exist = $tField->orm()->where_in( 'field_code', [ 'color', 'size' ] )
             ->select( 'field_code' )->find_many_assoc( 'field_code' );
         if ( empty( $exist[ 'color' ] ) ) {
-            $tField->create( array(
+            $tField->create( [
                 'field_code' => 'color',
                 'field_name' => 'Color',
                 'table_field_type' => 'varchar(255)',
@@ -125,10 +125,10 @@ class FCom_CustomField_Migrate extends BClass
                 'frontend_label' => 'Color',
                 'frontend_show' => 0,
                 'sort_order' => 1,
-            ) )->save();
+            ] )->save();
         }
         if ( empty( $exist[ 'size' ] ) ) {
-            $tField->create( array(
+            $tField->create( [
                 'field_code' => 'size',
                 'field_name' => 'Size',
                 'table_field_type' => 'varchar(255)',
@@ -136,7 +136,7 @@ class FCom_CustomField_Migrate extends BClass
                 'frontend_label' => 'Size',
                 'frontend_show' => 0,
                 'sort_order' => 1,
-            ) )->save();
+            ] )->save();
         }
     }
 
@@ -153,57 +153,57 @@ class FCom_CustomField_Migrate extends BClass
     public function upgrade__0_1_1__0_1_2()
     {
         $tField = FCom_CustomField_Model_Field::table();
-        BDb::ddlTableDef( $tField, array( 'COLUMNS' => array( 'sort_order' => "int not null default '0'" ) ) );
+        BDb::ddlTableDef( $tField, [ 'COLUMNS' => [ 'sort_order' => "int not null default '0'" ] ] );
     }
 
     public function upgrade__0_1_2__0_1_3()
     {
         $tField = FCom_CustomField_Model_Field::table();
-        BDb::ddlTableDef( $tField, array( 'COLUMNS' => array( 'facet_select' => "enum('No', 'Exclusive', 'Inclusive') NOT NULL DEFAULT 'No'" ) ) );
+        BDb::ddlTableDef( $tField, [ 'COLUMNS' => [ 'facet_select' => "enum('No', 'Exclusive', 'Inclusive') NOT NULL DEFAULT 'No'" ] ] );
     }
 
     public function upgrade__0_1_3__0_1_4()
     {
         $tField = FCom_CustomField_Model_Field::table();
-        BDb::ddlTableDef( $tField, array( 'COLUMNS' => array( 'system' => "tinyint(1) NOT NULL DEFAULT '0'" ) ) );
+        BDb::ddlTableDef( $tField, [ 'COLUMNS' => [ 'system' => "tinyint(1) NOT NULL DEFAULT '0'" ] ] );
     }
 
     public function upgrade__0_1_4__0_1_5()
     {
         $tProdField = FCom_CustomField_Model_ProductField::table();
-        BDb::ddlTableDef( $tProdField, array( 'COLUMNS' => array( '_data_serialized' => "text null AFTER _hide_field_ids" ) ) );
+        BDb::ddlTableDef( $tProdField, [ 'COLUMNS' => [ '_data_serialized' => "text null AFTER _hide_field_ids" ] ] );
     }
 
     public function upgrade__0_1_5__0_1_6()
     {
         $tProdVariant = FCom_CustomField_Model_ProductVariant::table();
-        BDb::ddlTableDef( $tProdVariant, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef( $tProdVariant, [
+            'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'product_id' => 'int unsigned not null',
                 'field_values' => 'varchar(255)',
                 'variant_sku' => 'varchar(50)',
                 'variant_price' => 'decimal(12,2)',
                 'data_serialized' => 'text',
-            ),
+            ],
             'PRIMARY' => '(id)',
-            'KEYS' => array(
+            'KEYS' => [
                 'UNQ_product' => 'UNIQUE (product_id, field_values)',
                 'IDX_sku' => '(variant_sku)',
-            ),
-        ) );
+            ],
+        ] );
     }
 
     public function upgrade__0_1_6__0_1_7()
     {
         $tProdField = FCom_CustomField_Model_Field::table();
-        BDb::ddlTableDef( $tProdField, array( 'COLUMNS' => array( 'validation' => "varchar(100) null" ) ) );
+        BDb::ddlTableDef( $tProdField, [ 'COLUMNS' => [ 'validation' => "varchar(100) null" ] ] );
     }
 
     public function upgrade__0_1_7__0_1_8()
     {
         $tProdField = FCom_CustomField_Model_Field::table();
-        BDb::ddlTableDef( $tProdField, array( 'COLUMNS' => array( 'required' => "tinyint(1) NOT NULL DEFAULT '1'" ) ) );
+        BDb::ddlTableDef( $tProdField, [ 'COLUMNS' => [ 'required' => "tinyint(1) NOT NULL DEFAULT '1'" ] ] );
     }
 
     public function upgrade__0_1_8__0_1_9()
@@ -216,19 +216,19 @@ class FCom_CustomField_Migrate extends BClass
             if ( !$dups ) {
                 break;
             }
-            $fieldHlp->delete_many( array( 'id' => array_keys( $dups ) ) );
+            $fieldHlp->delete_many( [ 'id' => array_keys( $dups ) ] );
         }
 
-        BDb::ddlTableDef( $fieldHlp->table(), array(
-            'KEYS' => array(
+        BDb::ddlTableDef( $fieldHlp->table(), [
+            'KEYS' => [
                 'UNQ_field_code' => 'UNIQUE (field_code)',
-            ),
-        ) );
+            ],
+        ] );
 
-        $exist = $fieldHlp->orm()->where_in( 'field_code', array( 'color', 'size' ) )
+        $exist = $fieldHlp->orm()->where_in( 'field_code', [ 'color', 'size' ] )
             ->select( 'field_code' )->find_many_assoc( 'field_code' );
         if ( empty( $exist[ 'color' ] ) ) {
-            $fieldHlp->create( array(
+            $fieldHlp->create( [
                 'field_code' => 'color',
                 'field_name' => 'Color',
                 'table_field_type' => 'varchar(255)',
@@ -236,10 +236,10 @@ class FCom_CustomField_Migrate extends BClass
                 'frontend_label' => 'Color',
                 'frontend_show' => 0,
                 'sort_order' => 1,
-            ) )->save();
+            ] )->save();
         }
         if ( empty( $exist[ 'size' ] ) ) {
-            $fieldHlp->create( array(
+            $fieldHlp->create( [
                 'field_code' => 'size',
                 'field_name' => 'Size',
                 'table_field_type' => 'varchar(255)',
@@ -247,7 +247,7 @@ class FCom_CustomField_Migrate extends BClass
                 'frontend_label' => 'Size',
                 'frontend_show' => 0,
                 'sort_order' => 1,
-            ) )->save();
+            ] )->save();
         }
     }
 }

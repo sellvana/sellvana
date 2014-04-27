@@ -22,23 +22,23 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
     static protected $_table = 'fcom_admin_activity';
     static protected $_origClass = __CLASS__;
 
-    protected $_fieldOptions = array(
-        'status' => array(
+    protected $_fieldOptions = [
+        'status' => [
             'new' => 'New',
             'recent' => 'Recent',
             'archived' => 'Archived',
-        ),
-        'type' => array(
+        ],
+        'type' => [
             'workflow' => 'Workflow',
             'alert' => 'Alert',
-        ),
-    );
+        ],
+    ];
 
-    static protected $_availableFilters = array();
+    static protected $_availableFilters = [];
 
-    static protected $_permissionsCache = array();
+    static protected $_permissionsCache = [];
 
-    static protected $_filtersCache = array();
+    static protected $_filtersCache = [];
 
     static public function registerFilter( $filter )
     {
@@ -54,7 +54,7 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
     {
         if ( !static::$_usersRestrictionsCache ) {
             $users = FCom_Admin_Model_User::i()->orm( 'u' )
-                ->left_outer_join( 'FCom_Admin_Model_Role', array( 'r.id', '=', 'u.role_id' ), 'r' )
+                ->left_outer_join( 'FCom_Admin_Model_Role', [ 'r.id', '=', 'u.role_id' ], 'r' )
                 ->select( 'u.id' )->select( 'u.is_superadmin' )->select( 'u.data_serialized' )->select( 'r.permissions_data' )
                 ->find_many_assoc();
 
@@ -106,7 +106,7 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
             if ( $filters && !preg_match( $filters, $data[ 'code' ] ) ) {
                 continue; // not in user filters
             }
-            $hlp->create( array( 'activity_id' => $model->id(), 'user_id' => $uId, 'alert_user_status' => 'new' ) )->save();
+            $hlp->create( [ 'activity_id' => $model->id(), 'user_id' => $uId, 'alert_user_status' => 'new' ] )->save();
         }
 
         return $model;
@@ -119,7 +119,7 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
         }
 
         $orm = static::orm( 'a' )
-            ->join( 'FCom_Admin_Model_ActivityUser', array( 'au.activity_id', '=', 'a.id' ), 'au' )
+            ->join( 'FCom_Admin_Model_ActivityUser', [ 'au.activity_id', '=', 'a.id' ], 'au' )
             ->where( 'au.user_id', $userId );
 
         if ( $type ) {
@@ -136,7 +136,7 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
         }
 
         $hlp = FCom_Admin_Model_ActivityUser::i();
-        $actUser = $hlp->load( array( 'activity_id' => $this->id(), 'user_id' => $userId ) );
+        $actUser = $hlp->load( [ 'activity_id' => $this->id(), 'user_id' => $userId ] );
         $actUser->set( 'alert_user_status', 'read' )->save();
 
         return $this;
@@ -150,7 +150,7 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
 
         $hlp = FCom_Admin_Model_ActivityUser::i();
 
-        $hlp->delete_many( array( 'activity_id' => $this->id(), 'user_id' => $userId ) );
+        $hlp->delete_many( [ 'activity_id' => $this->id(), 'user_id' => $userId ] );
 
         /*
         $actUser = $hlp->load(array('activity_id' => $this->id(), 'user_id' => $userId));

@@ -12,7 +12,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     public function action_product()
     {
         $layout = BLayout::i();
-        $crumbs = array( 'home' );
+        $crumbs = [ 'home' ];
         $p = BRequest::i()->params( 'product' );
         if ( $p === '' || is_null( $p ) ) {
             $this->forward( false );
@@ -23,7 +23,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $this->forward( false );
             return $this;
         }
-        BEvents::i()->fire( 'FCom_Catalog_Frontend_Controller::action_product:product', array( 'product' => &$product ) );
+        BEvents::i()->fire( 'FCom_Catalog_Frontend_Controller::action_product:product', [ 'product' => &$product ] );
         BApp::i()->set( 'current_product', $product );
 
         $layout->view( 'catalog/product/details' )->set( 'product', $product );
@@ -43,16 +43,16 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $head->canonical( $product->url() );
             foreach ( $category->ascendants() as $c ) {
                 if ( $c->get( 'node_name' ) ) {
-                    $crumbs[] = array( 'label' => $c->get( 'node_name' ), 'href' => $c->url() );
+                    $crumbs[] = [ 'label' => $c->get( 'node_name' ), 'href' => $c->url() ];
                     $head->addTitle( $c->get( 'node_name' ) );
                 }
             }
             $head->addTitle( $category->get( 'node_name' ) );
-            $crumbs[] = array( 'label' => $category->get( 'node_name' ), 'href' => $category->url() );
+            $crumbs[] = [ 'label' => $category->get( 'node_name' ), 'href' => $category->url() ];
         }
 
         $head->addTitle( $product->get( 'product_name' ) );
-        $crumbs[] = array( 'label' => $product->get( 'product_name' ), 'active' => true );
+        $crumbs[] = [ 'label' => $product->get( 'product_name' ), 'active' => true ];
 
         $layout->view( 'breadcrumbs' )->set( 'crumbs', $crumbs );
 
@@ -89,11 +89,11 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $post = BRequest::post();
 
         if ( !empty( $post[ 'add2cart' ] ) ) {
-            BEvents::i()->fire( 'FCom_Catalog_Frontend_Controller::action_product:addToCart', array( 'product' => &$product, 'qty' => $post[ 'qty' ] ) );
+            BEvents::i()->fire( 'FCom_Catalog_Frontend_Controller::action_product:addToCart', [ 'product' => &$product, 'qty' => $post[ 'qty' ] ] );
         }
 
         if ( !empty( $post[ 'add2wishlist' ] ) ) {
-            BEvents::i()->fire( 'FCom_Catalog_Frontend_Controller::action_product:addToWishlist', array( 'product' => &$product ) );
+            BEvents::i()->fire( 'FCom_Catalog_Frontend_Controller::action_product:addToWishlist', [ 'product' => &$product ] );
         }
 
 
@@ -135,9 +135,9 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $this->layout( '/catalog/compare/xhr' );
         } else {
             $this->layout( '/catalog/compare' );
-            $layout->view( 'breadcrumbs' )->set( 'crumbs', array( 'home',
-                array( 'label' => 'Compare ' . sizeof( $products ) . ' products', 'active' => true )
-            ) );
+            $layout->view( 'breadcrumbs' )->set( 'crumbs', [ 'home',
+                [ 'label' => 'Compare ' . sizeof( $products ) . ' products', 'active' => true ]
+            ] );
         }
     }
 

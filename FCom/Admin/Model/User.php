@@ -13,27 +13,27 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     protected static $_sessionUser;
 
-    protected static $_fieldOptions = array(
-        'status' => array(
+    protected static $_fieldOptions = [
+        'status' => [
             'A' => 'Active',
             'I' => 'Inactive',
-        ),
-        'is_superadmin' => array(
+        ],
+        'is_superadmin' => [
             '0' => 'No',
             '1' => 'Yes',
-        ),
-    );
+        ],
+    ];
 
-    protected static $_validationRules = array(
-        array( 'username', '@required' ),
-        array( 'email', '@required' ),
-        array( 'email', '@email' ),
-        array( 'password', 'FCom_Admin_Model_User::validatePasswordSecurity' ),
+    protected static $_validationRules = [
+        [ 'username', '@required' ],
+        [ 'email', '@required' ],
+        [ 'email', '@email' ],
+        [ 'password', 'FCom_Admin_Model_User::validatePasswordSecurity' ],
 
         //array('is_superadmin', '@integer'),
-        array( 'role_id', '@integer' ),
+        [ 'role_id', '@integer' ],
         //array('superior_id', '@integer'),
-    );
+    ];
 
     protected $_persModel;
     protected $_persData;
@@ -42,10 +42,10 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     public static function statusOptions()
     {
-        return array(
+        return [
             static::STATUS_ACTIVE => 'Active',
             static::STATUS_INACTIVE => 'Inactive',
-        );
+        ];
     }
 
     public function setPassword( $password )
@@ -83,7 +83,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         }
     }
 
-    public function as_array( array $objHashes = array() )
+    public function as_array( array $objHashes = [] )
     {
         $data = parent::as_array();
         unset( $data[ 'password_hash' ] );
@@ -118,7 +118,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         $users = static::i()->orm()
             ->select( 'id' )->select( 'firstname' )->select( 'lastname' )
             ->find_many();
-        $options = array();
+        $options = [];
         foreach ( $users as $u ) {
             $options[ $u->id ] = $u->firstname . ' ' . $u->lastname;
         }
@@ -156,7 +156,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         }
         BLoginThrottle::i()->init( 'FCom_Admin_Model_User', $username );
         /** @var FCom_Admin_Model_User */
-        $user = static::i()->orm()->where( array( 'OR' => array( 'username' => $username, 'email' => $username ) ) )->find_one();
+        $user = static::i()->orm()->where( [ 'OR' => [ 'username' => $username, 'email' => $username ] ] )->find_one();
         if ( !$user || !$user->validatePassword( $password ) ) {
             BLoginThrottle::i()->failure();
             return false;
@@ -194,7 +194,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if ( $this->get( 'timezone' ) ) {
             date_default_timezone_set( $this->get( 'timezone' ) );
         }
-        BEvents::i()->fire( 'FCom_Admin_Model_User::login:after', array( 'user' => $this ) );
+        BEvents::i()->fire( 'FCom_Admin_Model_User::login:after', [ 'user' => $this ] );
 
         return $this;
     }
@@ -208,14 +208,14 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     public function recoverPassword()
     {
-        $this->set( array( 'token' => BUtil::randomString(), 'token_at' => BDb::now() ) )->save();
+        $this->set( [ 'token' => BUtil::randomString(), 'token_at' => BDb::now() ] )->save();
         BLayout::i()->view( 'email/admin/user-password-recover' )->set( 'user', $this )->email();
         return $this;
     }
 
     public function resetPassword( $password )
     {
-        $this->set( array( 'token' => null, 'token_at' => null ) )->setPassword( $password )->save()->login();
+        $this->set( [ 'token' => null, 'token_at' => null ] )->setPassword( $password )->save()->login();
         BLayout::i()->view( 'email/admin/user-password-reset' )->set( 'user', $this )->email();
         return $this;
     }
@@ -259,12 +259,12 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if ( !$this->_persModel ) {
             $this->_persModel = FCom_Admin_Model_Personalize::i()->load( $this->id(), 'user_id' );
             if ( !$this->_persModel ) {
-                $this->_persModel = FCom_Admin_Model_Personalize::i()->create( array( 'user_id' => $this->id ) );
+                $this->_persModel = FCom_Admin_Model_Personalize::i()->create( [ 'user_id' => $this->id ] );
             }
         }
         if ( !$this->_persData ) {
             $dataJson = $this->_persModel->get( 'data_json' );
-            $this->_persData = $dataJson ? BUtil::fromJson( $dataJson ) : array();
+            $this->_persData = $dataJson ? BUtil::fromJson( $dataJson ) : [];
         }
         if ( is_null( $data ) ) {
             return $this->_persData;

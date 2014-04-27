@@ -25,7 +25,7 @@ class FCom_IndexTank_Search extends BClass
         $productFields = FCom_IndexTank_Model_ProductField::i()->getList();
         $inclusiveFields = FCom_IndexTank_Model_ProductField::i()->getInclusiveList();
 
-        $filtersSelected = array();
+        $filtersSelected = [];
 
         $categorySelected = '';
 
@@ -39,12 +39,12 @@ class FCom_IndexTank_Search extends BClass
                         continue;
                     }
                     $key = $kv[ 0 ];
-                    $values = array( $kv[ 1 ] );
+                    $values = [ $kv[ 1 ] ];
                     $categorySelected = $key;
                 }
 
                 if ( !is_array( $values ) ) {
-                    $values = array( $values );
+                    $values = [ $values ];
                 }
                 if ( isset( $inclusiveFields[ $key ] ) ) {
                     FCom_IndexTank_Index_Product::i()->rollupBy( $key );
@@ -61,7 +61,7 @@ class FCom_IndexTank_Search extends BClass
             $variablesFields = FCom_IndexTank_Model_ProductField::i()->getVariablesList();
             foreach ( $v as $key => $values ) {
                 if ( !is_array( $values ) ) {
-                    $values = array( $values );
+                    $values = [ $values ];
                 }
                 if ( in_array( $key, $variablesFields ) ) {
                     if ( $values[ 'from' ] < $values[ 'to' ] ) {
@@ -84,7 +84,7 @@ class FCom_IndexTank_Search extends BClass
 
 
         $productsData = FCom_IndexTank_Index_Product::i()->paginate( $productsORM, $r,
-                array( 'ps' => 25, 'c' => FCom_IndexTank_Index_Product::i()->totalFound() ) );
+                [ 'ps' => 25, 'c' => FCom_IndexTank_Index_Product::i()->totalFound() ] );
 
         //get all facets exclude categories
         $facetsData = FCom_IndexTank_Index_Product::i()->collectFacets( $facets );
@@ -100,7 +100,7 @@ class FCom_IndexTank_Search extends BClass
         $productsData[ 'state' ][ 'filter' ] = $v;
         $productsData[ 'state' ][ 'save_filter' ] = BConfig::i()->get( 'modules/FCom_IndexTank/save_filter' );
 
-        BEvents::i()->fire( __METHOD__, array( 'data' => &$productsData ) );
+        BEvents::i()->fire( __METHOD__, [ 'data' => &$productsData ] );
 
         return $productsData;
     }
@@ -130,7 +130,7 @@ class FCom_IndexTank_Search extends BClass
     *
     * @return FCom_IndexTank_Search
     */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( __CLASS__, $args, !$new );
     }

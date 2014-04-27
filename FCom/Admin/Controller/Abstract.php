@@ -5,12 +5,12 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     protected static $_origClass;
     protected $_permission;
 
-    public function authenticate( $args = array() )
+    public function authenticate( $args = [] )
     {
         return FCom_Admin_Model_User::i()->isLoggedIn();
     }
 
-    public function authorize( $args = array() )
+    public function authorize( $args = [] )
     {
         if ( !parent::authorize( $args ) ) {
             return false;
@@ -30,7 +30,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         $r = BRequest::i();
         if ( $r->xhr() ) {
             BSession::i()->set( 'admin_login_orig_url', $r->referrer() );
-            BResponse::i()->json( array( 'error' => 'login' ) );
+            BResponse::i()->json( [ 'error' => 'login' ] );
         } else {
             BSession::i()->set( 'admin_login_orig_url', $r->currentUrl() );
             $this->layout( '/login' );
@@ -43,7 +43,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         $r = BRequest::i();
         if ( $r->xhr() ) {
             BSession::i()->set( 'admin_login_orig_url', $r->referrer() );
-            BResponse::i()->json( array( 'error' => 'denied' ) );
+            BResponse::i()->json( [ 'error' => 'denied' ] );
         } else {
             BSession::i()->set( 'admin_login_orig_url', $r->currentUrl() );
             $this->layout( '/denied' );
@@ -71,7 +71,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         return $this;
     }
 
-    public function message( $msg, $type = 'success', $tag = 'admin', $options = array() )
+    public function message( $msg, $type = 'success', $tag = 'admin', $options = [] )
     {
         if ( is_array( $msg ) ) {
             array_walk( $msg, 'BLocale::_' );
@@ -109,11 +109,11 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                 if ( !empty( $tab[ 'view' ] ) ) {
                     $tabView = $layout->view( $tab[ 'view' ] );
                     if ( $tabView ) {
-                        $tabView->set( array(
+                        $tabView->set( [
                             'model' => $model,
                             #'validator' => $validator,
                             'mode' => $mode,
-                        ) );
+                        ] );
                     } else {
                         BDebug::warning( 'MISSING VIEW: ' . $tab[ 'view' ] );
                     }
@@ -167,12 +167,12 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             }
         }
 
-        $view->set( array(
+        $view->set( [
             'tabs' => $tabs,
             'model' => $model,
             'mode' => $mode,
             'cur_tab' => $curTab,
-        ) );
+        ] );
         return $this;
     }
 
@@ -211,7 +211,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         if ( $outTabs && $outTabs !== 'ALL' && is_string( $outTabs ) ) {
             $outTabs = explode( ',', $outTabs );
         }
-        $out = array();
+        $out = [];
         if ( $outTabs ) {
             $layout = BLayout::i();
             $tabs = $view->tabs;
@@ -224,17 +224,17 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                     BDebug::error( 'MISSING VIEW: ' . $tabs[ $k ][ 'view' ] );
                     continue;
                 }
-                $out[ 'tabs' ][ $k ] = (string)$view->set( array(
+                $out[ 'tabs' ][ $k ] = (string)$view->set( [
                     'model' => $model,
                     'mode' => $mode,
-                ) );
+                ] );
             }
         }
         $out[ 'messages' ] = BSession::i()->messages( 'admin' );
         BResponse::i()->json( $out );
     }
 
-    protected function _processGridDataPost( $class, $defData = array() )
+    protected function _processGridDataPost( $class, $defData = [] )
     {
         $r = BRequest::i();
         $id = $r->post( 'id' );
@@ -242,7 +242,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         $hlp = $class::i();
         unset( $data[ 'id' ], $data[ 'oper' ] );
 
-        $args = array( 'data' => &$data, 'oper' => $r->post( 'oper' ), 'helper' => $hlp );
+        $args = [ 'data' => &$data, 'oper' => $r->post( 'oper' ), 'helper' => $hlp ];
         $this->gridPostBefore( $args );
 
         switch ( $args[ 'oper' ] ) {
@@ -260,7 +260,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
         case 'del':
             $args[ 'model' ] = $hlp->load( $id )->delete();
-            $result = array( 'success' => true );
+            $result = [ 'success' => true ];
             break;
 
         case 'mass-delete':
@@ -268,7 +268,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             foreach ( $args[ 'ids' ] as $id ) {
                 $hlp->load( $id )->delete();
             }
-            $result = array( 'success' => true );
+            $result = [ 'success' => true ];
             break;
 
         case 'mass-edit':
@@ -281,7 +281,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                     $args[ 'models' ][] = $hlp->load( $id )->set( $data )->save();
                 }
             }
-            $result = array( 'success' => true );
+            $result = [ 'success' => true ];
             break;
         }
 

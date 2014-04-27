@@ -16,15 +16,15 @@ class FCom_Checkout_Frontend extends BClass
         if ( false == $cart->items() ) {
             return;
         }
-        FCom_Sales_Model_Cart::i()->addTotalRow( 'subtotal', array( 'callback' => 'FCom_Sales_Model_Cart.subtotalCallback', 'label' => 'Subtotal', 'after' => '' ) );
+        FCom_Sales_Model_Cart::i()->addTotalRow( 'subtotal', [ 'callback' => 'FCom_Sales_Model_Cart.subtotalCallback', 'label' => 'Subtotal', 'after' => '' ] );
         if ( $cart->shipping_method ) {
             $shippingClass = FCom_Sales_Main::i()->getShippingMethodClassName( $cart->shipping_method );
-            FCom_Sales_Model_Cart::i()->addTotalRow( 'shipping', array( 'callback' => $shippingClass . '.getRateCallback',
-                'label' => 'Shipping', 'after' => 'subtotal' ) );
+            FCom_Sales_Model_Cart::i()->addTotalRow( 'shipping', [ 'callback' => $shippingClass . '.getRateCallback',
+                'label' => 'Shipping', 'after' => 'subtotal' ] );
         }
         if ( $cart->coupon_code ) {
-            FCom_Sales_Model_Cart::i()->addTotalRow( 'discount', array( 'callback' => 'FCom_Sales_Model_Cart.discountCallback',
-                'label' => 'Discount', 'after' => 'shipping' ) );
+            FCom_Sales_Model_Cart::i()->addTotalRow( 'discount', [ 'callback' => 'FCom_Sales_Model_Cart.discountCallback',
+                'label' => 'Discount', 'after' => 'shipping' ] );
         }
     }
 }

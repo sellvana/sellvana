@@ -5,19 +5,19 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_product_review';
     protected static $_origClass = __CLASS__;
 
-    protected static $_config = array(
+    protected static $_config = [
        'max' => 5,
        'min' => 0,
        'step' => 1,
-    );
+    ];
 
-    protected static $_validationRules = array(
-        array( 'product_id', '@required' ),
-        array( 'customer_id', '@required' ),
-        array( 'rating', '@required' ),
-        array( 'title', '@required' ),
+    protected static $_validationRules = [
+        [ 'product_id', '@required' ],
+        [ 'customer_id', '@required' ],
+        [ 'rating', '@required' ],
+        [ 'title', '@required' ],
 
-        array( 'title', '@string', null, array( 'max' => 255 ) ),
+        [ 'title', '@string', null, [ 'max' => 255 ] ],
 
         /*array('helpful_voices', '@string', null, array('max' => 11)),
         array('rating', '@integer'),
@@ -28,7 +28,7 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
         array('helpful', '@integer'),
         array('offensive', '@integer'),
         array('offensive', '@integer'),*/
-    );
+    ];
 
     public function notify()
     {
@@ -80,7 +80,7 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
 
     static public function indexAvgRating( $products, $field )
     {
-        $data = array();
+        $data = [];
         foreach ( $products as $p ) {
             $m = $p->avg_rating;
             if     ( $m >= 4 ) $v = '4 ==> 4 Stars & Up';

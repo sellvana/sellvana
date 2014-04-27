@@ -6,18 +6,18 @@ class FCom_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Controll
 
     public function customerFilesGridConfig()
     {
-        return FCom_Admin_Controller_MediaLibrary::i()->gridConfig( array(
+        return FCom_Admin_Controller_MediaLibrary::i()->gridConfig( [
             'id' => 'import_files',
             'folder' => 'storage/import/customers',
-            'config' => array(
-                'grid' => array(
+            'config' => [
+                'grid' => [
                     'multiselect' => false,
                     'autowidth' => false,
                     'width' => 600,
                     'height' => 300,
-                ),
-            ),
-        ) );
+                ],
+            ],
+        ] );
     }
 
     public function action_index()
@@ -27,10 +27,10 @@ class FCom_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Controll
 
     public function action_config()
     {
-        $view = $this->view( 'customer/import/config' )->set( array(
+        $view = $this->view( 'customer/import/config' )->set( [
             'dir' => FCom_Customer_Import::i()->getImportDir(),
             'file' => BRequest::i()->get( 'file' ),
-        ) );
+        ] );
         $result[ 'html' ] = $view->render();
         BResponse::i()->json( $result );
     }
@@ -49,14 +49,14 @@ class FCom_Customer_Admin_Controller_CustomersImport extends FCom_Admin_Controll
 
     public function action_stop()
     {
-        FCom_Customer_Import::i()->config( array( 'status' => 'stopped' ), true );
+        FCom_Customer_Import::i()->config( [ 'status' => 'stopped' ], true );
         BResponse::i()->redirect( 'customers/import/status' );
     }
 
     public function action_status()
     {
         $s = BRequest::i()->request( 'start' );
-        $view = BLayout::i()->view( 'customer/import/status' )->set( array( 'start' => $s ) );
+        $view = BLayout::i()->view( 'customer/import/status' )->set( [ 'start' => $s ] );
         BResponse::i()->set( $view->render() );
     }
 }

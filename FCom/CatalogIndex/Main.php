@@ -15,7 +15,7 @@ class FCom_CatalogIndex_Main extends BClass
     {
         if ( ( $getFilters = BRequest::i()->get( 'filters' ) ) ) {
             $getFiltersArr = explode( '.', $getFilters );
-            static::$_filterParams = array();
+            static::$_filterParams = [];
             foreach ( $getFiltersArr as $filterStr ) {
                 if ( $filterStr === '' ) {
                     continue;
@@ -36,9 +36,9 @@ class FCom_CatalogIndex_Main extends BClass
         return static::$_filterParams;
     }
 
-    static public function getUrl( $add = array(), $remove = array() )
+    static public function getUrl( $add = [], $remove = [] )
     {
-        $filters = array();
+        $filters = [];
         $params = static::$_filterParams;
         if ( $add ) {
             foreach ( $add as $fKey => $fValues ) {
@@ -59,14 +59,14 @@ class FCom_CatalogIndex_Main extends BClass
                 $filters[] = $fKey . '-' . join( ' ', (array)$fValues );
             }
         }
-        return BUtil::setUrlQuery( BRequest::currentUrl(), array( 'filters' => join( '.', $filters ) ) );
+        return BUtil::setUrlQuery( BRequest::currentUrl(), [ 'filters' => join( '.', $filters ) ] );
     }
 
 
     static public function onProductAfterSave( $args )
     {
         if ( static::$_autoReindex ) {
-            FCom_CatalogIndex_Indexer::i()->indexProducts( array( $args[ 'model' ] ) );
+            FCom_CatalogIndex_Indexer::i()->indexProducts( [ $args[ 'model' ] ] );
         }
     }
     
@@ -90,7 +90,7 @@ class FCom_CatalogIndex_Main extends BClass
         $cat = $args[ 'model' ];
         $addIds = explode( ',', $cat->get( 'product_ids_add' ) );
         $removeIds = explode( ',', $cat->get( 'product_ids_remove' ) );
-        $reindexIds = array();
+        $reindexIds = [];
         if ( sizeof( $addIds ) > 0 && $addIds[ 0 ] != '' ) {
             $reindexIds += $addIds;
         }
@@ -113,8 +113,8 @@ class FCom_CatalogIndex_Main extends BClass
 
     static public function bootstrap()
     {
-        FCom_Admin_Model_Role::i()->createPermission( array(
+        FCom_Admin_Model_Role::i()->createPermission( [
             'catalog_index' => 'Product Indexing',
-        ) );
+        ] );
     }
 }

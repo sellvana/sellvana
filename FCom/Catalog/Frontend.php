@@ -24,6 +24,6 @@ class FCom_Catalog_Frontend extends BClass
 
     public function getRecentlyViewedProducts()
     {
-        return array();
+        return [];
     }
 }

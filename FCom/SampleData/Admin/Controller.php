@@ -30,10 +30,10 @@ class FCom_SampleData_Admin_Controller extends FCom_Admin_Controller_Abstract
         } else {
             echo $msg;
             exit;
-            $result = array(
+            $result = [
                 'message' => BLocale::_( $msg ),
                 'status'  => $status
-            );
+            ];
             BResponse::i()->json( $result );
         }
     }

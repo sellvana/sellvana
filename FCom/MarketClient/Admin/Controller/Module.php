@@ -20,7 +20,7 @@ class FCom_MarketClient_Admin_Controller_Module extends FCom_Admin_Controller_Ab
         $modules = BRequest::i()->post( 'modules' );
         $redirectUrl = BRequest::i()->request( 'redirect_to' );
 
-        FCom_MarketClient_Main::i()->progress( array(), true );
+        FCom_MarketClient_Main::i()->progress( [], true );
         FCom_MarketClient_Main::i()->downloadAndInstall( $modules );
 
         BResponse::i()->redirect( $redirectUrl ? $redirectUrl : 'modules' );

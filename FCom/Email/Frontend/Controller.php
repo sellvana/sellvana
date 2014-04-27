@@ -19,7 +19,7 @@ class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $data = BUtil::arrayMask( $r->post( 'model' ), 'id,email,create_at,update_at', true );
             $pref = $hlp->load( $email, 'email' );
             if ( !$pref ) {
-                $pref = $hlp->create( array( 'email' => $email ) );
+                $pref = $hlp->create( [ 'email' => $email ] );
             }
             if ( empty( $data[ 'unsub_all' ] ) ) {
                 $data[ 'unsub_all' ] = 0;
@@ -29,7 +29,7 @@ class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         } catch ( Exception $e ) {
             $this->message( $e->getMessage(), 'error' );
         }
-        $url = BUtil::setUrlQuery( $r->currentUrl(), array( 'token' => $hlp->getToken( $email ) ) );
+        $url = BUtil::setUrlQuery( $r->currentUrl(), [ 'token' => $hlp->getToken( $email ) ] );
         BResponse::i()->redirect( $url );
     }
 
@@ -48,7 +48,7 @@ class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             if ( !$model ) {
                 $model = FCom_Email_Model_Pref::i()->create();
             }
-            if ( $valid = $model->validate( $post, array(), 'email-subscription' ) ) {
+            if ( $valid = $model->validate( $post, [], 'email-subscription' ) ) {
                 $model->email          = $post[ 'email' ];
                 $model->sub_newsletter = 1;
                 $model->unsub_all      = 0;
@@ -58,9 +58,9 @@ class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $successMessage = $this->_( 'Email subscribe successful.' );
             if ( $r->xhr() ) { //ajax request
                 if ( $valid ) {
-                    $result = array( 'status' => 'success', 'message' => $successMessage );
+                    $result = [ 'status' => 'success', 'message' => $successMessage ];
                 } else {
-                    $result = array( 'status' => 'error', 'message' => $this->getAjaxErrorMessage() );
+                    $result = [ 'status' => 'error', 'message' => $this->getAjaxErrorMessage() ];
                 }
                 BResponse::i()->json( $result );
             } else {
@@ -74,7 +74,7 @@ class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         } catch ( Exception $e ) {
             BDebug::logException( $e );
             if ( $r->xhr() ) {
-                BResponse::i()->json( array( 'status' => 'error', 'message' => $e->getMessage() ) );
+                BResponse::i()->json( [ 'status' => 'error', 'message' => $e->getMessage() ] );
             } else {
                 $this->message( $e->getMessage(), 'error' );
                 BResponse::i()->redirect( 'email/subscribe' );
@@ -85,7 +85,7 @@ class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     public function getAjaxErrorMessage()
     {
         $messages      = BSession::i()->messages( 'validator-errors:email-subscription' );
-        $errorMessages = array();
+        $errorMessages = [];
         foreach ( $messages as $m ) {
             if ( is_array( $m[ 'msg' ] ) ) {
                 $errorMessages[] = $m[ 'msg' ][ 'error' ];

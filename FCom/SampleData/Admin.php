@@ -11,7 +11,7 @@ class FCom_SampleData_Admin extends BClass
 
     public static function bootstrap()
     {
-        FCom_Admin_Model_Role::i()->createPermission( array( 'sample_data' => 'Install Sample Data' ) );
+        FCom_Admin_Model_Role::i()->createPermission( [ 'sample_data' => 'Install Sample Data' ] );
     }
 
     public static function loadProducts()
@@ -52,11 +52,11 @@ class FCom_SampleData_Admin extends BClass
         while ( fgetcsv( $fr ) ) {
             $i++;
         }
-        $client->send( array( 'channel' => 'import', 'signal' => 'found', 'found' => $i ) );
+        $client->send( [ 'channel' => 'import', 'signal' => 'found', 'found' => $i ] );
         fseek( $fr, 0 );
         $headings = fgetcsv( $fr );
 
-        $rows = array();
+        $rows = [];
         FCom_CatalogIndex_Main::i()->autoReindex( false );
         $remaining = $i;
         $i = 0;
@@ -75,20 +75,20 @@ class FCom_SampleData_Admin extends BClass
             if ( $i == $batchSize ) {
                 echo "* ";
                 FCom_Catalog_Model_Product::i()->import( $rows );
-                $client->send( array( 'channel' => 'import', 'signal' => 'progress', 'progress' => $remaining ) );
-                $rows = array();
+                $client->send( [ 'channel' => 'import', 'signal' => 'progress', 'progress' => $remaining ] );
+                $rows = [];
                 $i = 0;
             }
         }
         FCom_Catalog_Model_Product::i()->import( $rows );
-        $client->send( array( 'channel' => 'import', 'signal' => 'progress', 'progress' => $remaining ) );
-        $client->send( array( 'channel' => 'import', 'signal' => 'import_time', 'time' => round( microtime( true ) - $start, 4 ) ) );
-        $client->send( array( 'channel' => 'import', 'signal' => 'reindex', 'reindex' => 'start' ) );
+        $client->send( [ 'channel' => 'import', 'signal' => 'progress', 'progress' => $remaining ] );
+        $client->send( [ 'channel' => 'import', 'signal' => 'import_time', 'time' => round( microtime( true ) - $start, 4 ) ] );
+        $client->send( [ 'channel' => 'import', 'signal' => 'reindex', 'reindex' => 'start' ] );
         FCom_CatalogIndex_Indexer::i()->indexProducts( true );
         $end = microtime( true );
         $msg = "Sample data imported in: " . round( $end - $start, 4 ) . " seconds.";
-        $client->send( array( 'channel' => 'import', 'signal' => 'reindex', 'reindex' => 'end' ) );
-        $client->send( array( 'channel' => 'import', 'signal' => 'finish', 'finish' => $msg ) );
+        $client->send( [ 'channel' => 'import', 'signal' => 'reindex', 'reindex' => 'end' ] );
+        $client->send( [ 'channel' => 'import', 'signal' => 'finish', 'finish' => $msg ] );
         BDebug::log( $msg );
     }
 }

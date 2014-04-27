@@ -11,7 +11,7 @@ class FCom_Wishlist_Tests_Model_WishlistTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals( 2, $this->getConnection()->getRowCount( 'fcom_wishlist' ), "Pre-Condition" );
 
-        $data = array( 'customer_id' => 3 );
+        $data = [ 'customer_id' => 3 ];
         FCom_Wishlist_Model_Wishlist::i()->create( $data )->save();
 
         $this->assertEquals( 3, $this->getConnection()->getRowCount( 'fcom_wishlist' ), "Insert failed" );

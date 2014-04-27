@@ -19,11 +19,11 @@ class FCom_LibHaml_Main extends BClass
 
     static public function bootstrap()
     {
-        BLayout::i()->addRenderer( 'FCom_LibHaml', array(
+        BLayout::i()->addRenderer( 'FCom_LibHaml', [
             'description' => 'HAML',
             'callback' => 'FCom_LibHaml_Main::renderer',
-            'file_ext' => array( '.haml' ),
-        ) );
+            'file_ext' => [ '.haml' ],
+        ] );
     }
 
     /**

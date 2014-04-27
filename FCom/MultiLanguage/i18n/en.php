@@ -1,2 +1,2 @@
-<?php return array( 'English' => 'English',
-'German' => 'Deutsch' );
+<?php return [ 'English' => 'English',
+'German' => 'Deutsch' ];

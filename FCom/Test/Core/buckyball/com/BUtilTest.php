@@ -4,7 +4,7 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
 {
     public function testToJson()
     {
-        $data = array( 'key' => 'value' );
+        $data = [ 'key' => 'value' ];
         $json = BUtil::toJson( $data );
         $this->assertTrue( is_string( $json ) );
     }
@@ -19,7 +19,7 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
 
     public function testToJavascript()
     {
-        $data = array( 'key' => 'value' );
+        $data = [ 'key' => 'value' ];
         $json = BUtil::toJavaScript( $data );
         $this->assertTrue( is_string( $json ) );
     }
@@ -35,7 +35,7 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
 
     public function testArrayToObject()
     {
-        $array = array( 'key' => 'value' );
+        $array = [ 'key' => 'value' ];
         $obj = BUtil::arrayToObject( $array );
 
         $this->assertTrue( is_object( $obj ) );
@@ -46,7 +46,7 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
     public function testSprintfn()
     {
         $format = 'Say %hi$s %bye$s!';
-        $args = array( 'hi' => 'Hi', 'bye' => 'Goodbye' );
+        $args = [ 'hi' => 'Hi', 'bye' => 'Goodbye' ];
         $string = BUtil::sprintfn( $format, $args );
         $this->assertEquals( 'Say Hi Goodbye!', $string );
     }
@@ -54,42 +54,42 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
     public function testInjectVars()
     {
         $str = 'One :two :three';
-        $args = array( 'two' => 2, 'three' => 3 );
+        $args = [ 'two' => 2, 'three' => 3 ];
         $string = BUtil::injectVars( $str, $args );
         $this->assertEquals( 'One 2 3', $string );
     }
 
     public function testArrayCompare()
     {
-        $a1 = array( 1, 2, array( 3, 4, 5 ) );
-        $a2 = array( 1, 2, array( 3, 4, 5, 6 ) );
+        $a1 = [ 1, 2, [ 3, 4, 5 ] ];
+        $a2 = [ 1, 2, [ 3, 4, 5, 6 ] ];
         $res = BUtil::arrayCompare( $a2, $a1 );
         // 0 - number of parameter with difference
         // 2 - first dimenstion of array
         // 3 - second dimenstion of array
-        $expected = array( '0' => array( '2' => array( '3' => 6 ) ) );
+        $expected = [ '0' => [ '2' => [ '3' => 6 ] ] ];
         $this->assertEquals( $expected, $res );
 
-        $a1 = array( 1, 2, array( 3, 4, 5 ) );
-        $a2 = array( 1, 2, array( 3, 4, 5, 6 ) );
+        $a1 = [ 1, 2, [ 3, 4, 5 ] ];
+        $a2 = [ 1, 2, [ 3, 4, 5, 6 ] ];
         $res = BUtil::arrayCompare( $a1, $a2 );
         //order of parameters was changed, so we expected '1' as array key
-        $expected = array( '1' => array( '2' => array( '3' => 6 ) ) );
+        $expected = [ '1' => [ '2' => [ '3' => 6 ] ] ];
         $this->assertEquals( $expected, $res );
     }
 
     public function testArrayMerge()
     {
-        $a1 = array( 1, 2, array( 3, 4, 5 ) );
-        $a2 = array( 1, 2, array( 3, 4, 5, 6 ) );
+        $a1 = [ 1, 2, [ 3, 4, 5 ] ];
+        $a2 = [ 1, 2, [ 3, 4, 5, 6 ] ];
         $res = BUtil::arrayMerge( $a1, $a2 );
-        $expected = array( 1, 2, array( 3, 4, 5 ), array( 3, 4, 5, 6 ) );
+        $expected = [ 1, 2, [ 3, 4, 5 ], [ 3, 4, 5, 6 ] ];
         $this->assertEquals( $expected, $res );
 
-        $a1 = array( 1, 2, array( 3, 4, 5 ), 6 );
-        $a2 = array( 1, 2, array( 3, 4, 5, 6 ), 7 );
+        $a1 = [ 1, 2, [ 3, 4, 5 ], 6 ];
+        $a2 = [ 1, 2, [ 3, 4, 5, 6 ], 7 ];
         $res = BUtil::arrayMerge( $a1, $a2 );
-        $expected = array( 1, 2, array( 3, 4, 5 ), 6, array( 3, 4, 5, 6 ), 7 );
+        $expected = [ 1, 2, [ 3, 4, 5 ], 6, [ 3, 4, 5, 6 ], 7 ];
         $this->assertEquals( $expected, $res );
     }
 
@@ -114,7 +114,7 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
 
     public function testUnparseUrl()
     {
-        $urlInfo = array(
+        $urlInfo = [
             'scheme' => 'http',
             'user' => 'utest',
             'pass' => 'ptest',
@@ -123,7 +123,7 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
             'path' => '/i/test/',
             'query' => 'a=b&c=d',
             'fragment' => 'start'
-        );
+        ];
         $url = Butil::unparseUrl( $urlInfo );
         $this->assertEquals( 'http://utest:ptest@google.com:80/i/test/?a=b&c=d#start', $url );
     }
@@ -131,10 +131,10 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
     public function testSetUrlQuery()
     {
         $url = "http://google.com?a=b&c=d";
-        $urlNew = BUtil::setUrlQuery( $url, array( 'f' => 'e' ) );
+        $urlNew = BUtil::setUrlQuery( $url, [ 'f' => 'e' ] );
         $this->assertEquals( $url . '&f=e', $urlNew );
 
-        $urlNew = BUtil::setUrlQuery( $url, array( 'c' => 'd2' ) );
+        $urlNew = BUtil::setUrlQuery( $url, [ 'c' => 'd2' ] );
         $this->assertEquals( "http://google.com?a=b&c=d2", $urlNew );
     }
 

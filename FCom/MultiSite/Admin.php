@@ -13,8 +13,8 @@ class FCom_MultiSite_Admin extends BClass
 //            ->addAllViews('Admin/views')
 //            ->loadLayoutAfterTheme('Admin/layout.yml')
 //        ;
-        FCom_Admin_Model_Role::i()->createPermission( array(
+        FCom_Admin_Model_Role::i()->createPermission( [
             'multi_site' => 'Multi Site'
-        ) );
+        ] );
     }
 }

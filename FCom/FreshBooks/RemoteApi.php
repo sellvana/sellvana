@@ -30,10 +30,10 @@ class FCom_FreshBooks_RemoteApi extends BClass
 
         $client = new FreshBooks_Client();
 
-        $rows = array();
-        $resultInfo = array();
+        $rows = [];
+        $resultInfo = [];
 
-        $client->listing( $rows, $resultInfo, 1, 25, array( 'email' => $order->email ) );
+        $client->listing( $rows, $resultInfo, 1, 25, [ 'email' => $order->email ] );
         if ( sizeof( $rows ) ) {
             $client = $rows[ 0 ];
         } else {
@@ -68,12 +68,12 @@ class FCom_FreshBooks_RemoteApi extends BClass
         $totalAmount = 0;
         foreach ( $order->items() as $item ) {
             $totalAmount += $item->row_total;
-            $invoice->lines[] = array(
+            $invoice->lines[] = [
                 'name' => $item->code,
                 'description' => $item->product_name,
                 'unitCost' => $item->price,
                 'quantity' => $item->qty,
-            );
+            ];
         }
         $invoice->create();
         if ( $invoice->lastError ) {

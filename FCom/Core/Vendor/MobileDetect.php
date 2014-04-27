@@ -98,7 +98,7 @@ class FCom_Core_Vendor_MobileDetect extends BClass
      * HTTP headers in the PHP-flavor. So HTTP_USER_AGENT and SERVER_SOFTWARE.
      * @var array
      */
-    protected $httpHeaders = array();
+    protected $httpHeaders = [];
 
     /**
      * All the rules combined.
@@ -124,7 +124,7 @@ class FCom_Core_Vendor_MobileDetect extends BClass
      *
      * @var array
      */
-    protected $phoneDevices = array(
+    protected $phoneDevices = [
         'iPhone'        => '\biPhone.*Mobile|\biPod', // |\biTunes
         'BlackBerry'    => 'BlackBerry|\bBB10\b|rim[0-9]+',
         'HTC'           => 'HTC|HTC.*(Sensation|Evo|Vision|Explorer|6800|8100|8900|A7272|S510e|C110e|Legend|Desire|T8282)|APX515CKT|Qtek9090|APA9292KT|HD_mini|Sensation.*Z710e|PG86100|Z715e|Desire.*(A8181|HD)|ADR6200|ADR6400L|ADR6425|001HT|Inspire 4G|Android.*\bEVO\b',
@@ -151,14 +151,14 @@ class FCom_Core_Vendor_MobileDetect extends BClass
         'SimValley'     => '\b(SP-80|XT-930|SX-340|XT-930|SX-310|SP-360|SP60|SPT-800|SP-120|SPT-800|SP-140|SPX-5|SPX-8|SP-100|SPX-8|SPX-12)\b',
         // @Tapatalk is a mobile app; @ref: http://support.tapatalk.com/threads/smf-2-0-2-os-and-browser-detection-plugin-and-tapatalk.15565/#post-79039
         'GenericPhone'  => 'Tapatalk|PDA;|SAGEM|mmp|pocket|psp|symbian|Smartphone|smartfon|treo|up.browser|up.link|vodafone|wap|nokia|Series40|Series60|S60|SonyEricsson|N900|MAUI.*WAP.*Browser|LG-P500'
-    );
+    ];
 
     /**
      * List of tablet devices.
      *
      * @var array
      */
-    protected $tabletDevices = array(
+    protected $tabletDevices = [
         'iPad'              => 'iPad|iPad.*Mobile', // @todo: check for mobile friendly emails topic.
         'NexusTablet'       => '^.*Android.*Nexus(((?:(?!Mobile))|(?:(\s(7|10).+))).)*$',
         'SamsungTablet'     => 'SAMSUNG.*Tablet|Galaxy.*Tab|SC-01C|GT-P1000|GT-P1003|GT-P1010|GT-P3105|GT-P6210|GT-P6800|GT-P6810|GT-P7100|GT-P7300|GT-P7310|GT-P7500|GT-P7510|SCH-I800|SCH-I815|SCH-I905|SGH-I957|SGH-I987|SGH-T849|SGH-T859|SGH-T869|SPH-P100|GT-P3100|GT-P3108|GT-P3110|GT-P5100|GT-P5110|GT-P6200|GT-P7320|GT-P7511|GT-N8000|GT-P8510|SGH-I497|SPH-P500|SGH-T779|SCH-I705|SCH-I915|GT-N8013|GT-P3113|GT-P5113|GT-P8110|GT-N8010|GT-N8005|GT-N8020|GT-P1013|GT-P6201|GT-P7501|GT-N5100|GT-N5110|SHV-E140K|SHV-E140L|SHV-E140S|SHV-E150S|SHV-E230K|SHV-E230L|SHV-E230S|SHW-M180K|SHW-M180L|SHW-M180S|SHW-M180W|SHW-M300W|SHW-M305W|SHW-M380K|SHW-M380S|SHW-M380W|SHW-M430W|SHW-M480K|SHW-M480S|SHW-M480W|SHW-M485W|SHW-M486W|SHW-M500W|GT-I9228|SCH-P739|SCH-I925|GT-I9200|GT-I9205|GT-P5200|GT-P5210|SM-T311|SM-T310|SM-T210|SM-T211|SM-P900',
@@ -256,14 +256,14 @@ class FCom_Core_Vendor_MobileDetect extends BClass
         // aka. Cute or Cool tablets. Not sure yet, must research to avoid collisions.
         'GUTablet'          => 'TX-A1301|TX-M9002|Q702', // A12R|D75A|D77|D79|R83|A95|A106C|R15|A75|A76|D71|D72|R71|R73|R77|D82|R85|D92|A97|D92|R91|A10F|A77F|W71F|A78F|W78F|W81F|A97F|W91F|W97F|R16G|C72|C73E|K72|K73|R96G
         'GenericTablet'     => 'Android.*\b97D\b|Tablet(?!.*PC)|ViewPad7|BNTV250A|MID-WCDMA|LogicPD Zoom2|\bA7EB\b|CatNova8|A1_07|CT704|CT1002|\bM721\b|hp-tablet|rk30sdk',
-    );
+    ];
 
     /**
      * List of mobile Operating Systems.
      *
      * @var array
      */
-    protected $operatingSystems = array(
+    protected $operatingSystems = [
         'AndroidOS'         => 'Android',
         'BlackBerryOS'      => 'blackberry|\bBB10\b|rim tablet os',
         'PalmOS'            => 'PalmOS|avantgo|blazer|elaine|hiptop|palm|plucker|xiino',
@@ -285,14 +285,14 @@ class FCom_Core_Vendor_MobileDetect extends BClass
         'webOS'             => 'webOS|hpwOS',
         'badaOS'            => '\bBada\b',
         'BREWOS'            => 'BREW',
-    );
+    ];
 
     /**
      * List of mobile User Agents.
      *
      * @var array
      */
-    protected $userAgents = array(
+    protected $userAgents = [
         // @reference: https://developers.google.com/chrome/mobile/docs/user-agent
         'Chrome'          => '\bCrMo\b|CriOS|Android.*Chrome/[.0-9]* (Mobile)?',
         'Dolfin'          => '\bDolfin\b',
@@ -318,14 +318,14 @@ class FCom_Core_Vendor_MobileDetect extends BClass
         // @reference: http://en.wikipedia.org/wiki/Minimo
         // http://en.wikipedia.org/wiki/Vision_Mobile_Browser
         'GenericBrowser'  => 'NokiaBrowser|OviBrowser|OneBrowser|TwonkyBeamBrowser|SEMC.*Browser|FlyFlow|Minimo|NetFront|Novarra-Vision'
-    );
+    ];
 
     /**
      * Utilities.
      *
      * @var array
      */
-    protected $utilities = array(
+    protected $utilities = [
         // Experimental. When a mobile device wants to switch to 'Desktop Mode'.
         // @ref: http://scottcate.com/technology/windows-phone-8-ie10-desktop-or-mobile/
         // @ref: https://github.com/serbanghita/Mobile-Detect/issues/57#issuecomment-15024011
@@ -335,7 +335,7 @@ class FCom_Core_Vendor_MobileDetect extends BClass
         'Bot'         => 'Googlebot|DoCoMo|YandexBot|bingbot|ia_archiver|AhrefsBot|Ezooms|GSLFbot|WBSearchBot|Twitterbot|TweetmemeBot|Twikle|PaperLiBot|Wotbox|UnwindFetchor|facebookexternalhit',
         'MobileBot'   => 'Googlebot-Mobile|DoCoMo|YahooSeeker/M1A1-R2D2',
         'Watch'       => 'SM-V700',
-    );
+    ];
 
     /**
      * The individual segments that could exist in a User-Agent string. VER refers to the regular
@@ -343,7 +343,7 @@ class FCom_Core_Vendor_MobileDetect extends BClass
      *
      * @var array
      */
-    protected $properties = array(
+    protected $properties = [
 
         // Build
         'Mobile'        => 'Mobile/[VER]',
@@ -359,23 +359,23 @@ class FCom_Core_Vendor_MobileDetect extends BClass
         'Kindle'        => 'Kindle/[VER]',
 
         // Browser
-        'Chrome'        => array( 'Chrome/[VER]', 'CriOS/[VER]', 'CrMo/[VER]' ),
+        'Chrome'        => [ 'Chrome/[VER]', 'CriOS/[VER]', 'CrMo/[VER]' ],
         'Dolfin'        => 'Dolfin/[VER]',
         // @reference: https://developer.mozilla.org/en-US/docs/User_Agent_Strings_Reference
         'Firefox'       => 'Firefox/[VER]',
         'Fennec'        => 'Fennec/[VER]',
         // @reference: http://msdn.microsoft.com/en-us/library/ms537503(v=vs.85).aspx
-        'IE'      => array( 'IEMobile/[VER];', 'IEMobile [VER]', 'MSIE [VER];' ),
+        'IE'      => [ 'IEMobile/[VER];', 'IEMobile [VER]', 'MSIE [VER];' ],
         // http://en.wikipedia.org/wiki/NetFront
         'NetFront'      => 'NetFront/[VER]',
         'NokiaBrowser'  => 'NokiaBrowser/[VER]',
-        'Opera'         => array( ' OPR/[VER]', 'Opera Mini/[VER]', 'Version/[VER]' ),
+        'Opera'         => [ ' OPR/[VER]', 'Opera Mini/[VER]', 'Version/[VER]' ],
         'Opera Mini'    => 'Opera Mini/[VER]',
         'Opera Mobi'    => 'Version/[VER]',
         'UC Browser'    => 'UC Browser[VER]',
         // @note: Safari 7534.48.3 is actually Version 5.1.
         // @note: On BlackBerry the Version is overwriten by the OS.
-        'Safari'        => array( 'Version/[VER]', 'Safari/[VER]' ),
+        'Safari'        => [ 'Version/[VER]', 'Safari/[VER]' ],
         'Skyfire'       => 'Skyfire/[VER]',
         'Tizen'         => 'Tizen/[VER]',
         'Webkit'        => 'webkit[ /][VER]',
@@ -388,19 +388,19 @@ class FCom_Core_Vendor_MobileDetect extends BClass
         // OS
         'iOS'              => ' \bOS\b [VER] ',
         'Android'          => 'Android [VER]',
-        'BlackBerry'       => array( 'BlackBerry[\w]+/[VER]', 'BlackBerry.*Version/[VER]', 'Version/[VER]' ),
+        'BlackBerry'       => [ 'BlackBerry[\w]+/[VER]', 'BlackBerry.*Version/[VER]', 'Version/[VER]' ],
         'BREW'             => 'BREW [VER]',
         'Java'             => 'Java/[VER]',
         // @reference: http://windowsteamblog.com/windows_phone/b/wpdev/archive/2011/08/29/introducing-the-ie9-on-windows-phone-mango-user-agent-string.aspx
         // @reference: http://en.wikipedia.org/wiki/Windows_NT#Releases
-        'Windows Phone OS' => array( 'Windows Phone OS [VER]', 'Windows Phone [VER]' ),
+        'Windows Phone OS' => [ 'Windows Phone OS [VER]', 'Windows Phone [VER]' ],
         'Windows Phone'    => 'Windows Phone [VER]',
         'Windows CE'       => 'Windows CE/[VER]',
         // http://social.msdn.microsoft.com/Forums/en-US/windowsdeveloperpreviewgeneral/thread/6be392da-4d2f-41b4-8354-8dcee20c85cd
         'Windows NT'       => 'Windows NT [VER]',
-        'Symbian'          => array( 'SymbianOS/[VER]', 'Symbian/[VER]' ),
-        'webOS'            => array( 'webOS/[VER]', 'hpwOS/[VER];' ),
-    );
+        'Symbian'          => [ 'SymbianOS/[VER]', 'Symbian/[VER]' ],
+        'webOS'            => [ 'webOS/[VER]', 'hpwOS/[VER];' ],
+    ];
 
     /**
      * Construct an instance of this class.
@@ -853,7 +853,7 @@ class FCom_Core_Vendor_MobileDetect extends BClass
      */
     public function prepareVersionNo( $ver )
     {
-        $ver = str_replace( array( '_', ' ', '/' ), array( '.', '.', '.' ), $ver );
+        $ver = str_replace( [ '_', ' ', '/' ], [ '.', '.', '.' ], $ver );
         $arrVer = explode( '.', $ver, 2 );
 
         if ( isset( $arrVer[ 1 ] ) ) {
@@ -877,7 +877,7 @@ class FCom_Core_Vendor_MobileDetect extends BClass
             return false;
         }
 
-        if ( !in_array( $type, array( 'text', 'float' ) ) ) {
+        if ( !in_array( $type, [ 'text', 'float' ] ) ) {
             $type = 'text';
         }
 

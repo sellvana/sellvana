@@ -67,7 +67,7 @@ FCom.Admin.personalize_href = "' . BApp::href( 'my_account/personalize' ) . '";
         }
 
         $ip = BRequest::i()->ip();
-        foreach ( array( 'Frontend', 'Admin' ) as $area ) {
+        foreach ( [ 'Frontend', 'Admin' ] as $area ) {
             if ( !empty( $args[ 'post' ][ 'config' ][ 'mode_by_ip' ][ 'FCom_' . $area ] ) ) {
                 $modes =& $args[ 'post' ][ 'config' ][ 'mode_by_ip' ][ 'FCom_' . $area ];
                 $modes = str_replace( '@', $ip, $modes );
@@ -79,12 +79,12 @@ FCom.Admin.personalize_href = "' . BApp::href( 'my_account/personalize' ) . '";
     public function onGetDashboardWidgets( $args )
     {
         $view = $args[ 'view' ];
-        $view->addWidget( 'visitors-totals', array(
+        $view->addWidget( 'visitors-totals', [
             'title' => 'Visitors',
             'icon' => 'group',
             'view' => 'dashboard/visitors-totals',
             'cols' => 2,
             'async' => true,
-        ) );
+        ] );
     }
 }

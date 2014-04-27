@@ -8,9 +8,9 @@ class FCom_CustomerGroups_Admin extends BClass
 {
     public static function bootstrap()
     {
-        FCom_Admin_Model_Role::i()->createPermission( array(
+        FCom_Admin_Model_Role::i()->createPermission( [
             'customer_groups' => "Customer Groups"
-        ) );
+        ] );
     }
 
     public static function onProductAfterSave( $args )

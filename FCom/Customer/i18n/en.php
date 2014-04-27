@@ -1,4 +1,4 @@
-<?php return array( 'Password reset instructions' => '',
+<?php return [ 'Password reset instructions' => '',
 'Hello, %s.' => '',
 'Please go to this URL to reset your password:' => '',
 'Password reset confirmation' => '',
@@ -75,4 +75,4 @@
 'Forgot your password?' => '',
 'No Account? ' => '',
 'Sign up now' => '',
-'This login form requires cookies enabled' => '' );
+'This login form requires cookies enabled' => '' ];

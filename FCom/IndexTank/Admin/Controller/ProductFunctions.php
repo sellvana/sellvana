@@ -18,19 +18,19 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
         }
 
         $config = parent::gridConfig();
-        $config[ 'grid' ][ 'columns' ] += array(
-            'number' => array( 'label' => 'Function Number', 'size' => 5 ),
-            'definition' => array( 'label' => 'Function definition' ),
-            'name' => array( 'label' => 'Function code', 'editable' => true, 'formatter' => 'showlink', 'formatoptions' => array(
+        $config[ 'grid' ][ 'columns' ] += [
+            'number' => [ 'label' => 'Function Number', 'size' => 5 ],
+            'definition' => [ 'label' => 'Function definition' ],
+            'name' => [ 'label' => 'Function code', 'editable' => true, 'formatter' => 'showlink', 'formatoptions' => [
                 'baseLinkUrl' => BApp::href( 'indextank/product_functions/form' ), 'idName' => 'id',
-            ) ),
-            'use_custom_formula' => array( 'label' => 'Custom Function', 'options' => array( 1 => 'Yes', 0 => 'No' ) ),
-            'label' => array( 'label' => 'Sorting label' ),
-            'field_name' => array( 'label' => 'Sorting field' ),
-            'sort_order' => array( 'label' => 'Sorting order', 'options' => array( 'asc' => 'Ascending', 'desc' => 'Descending' ) ),
+            ] ],
+            'use_custom_formula' => [ 'label' => 'Custom Function', 'options' => [ 1 => 'Yes', 0 => 'No' ] ],
+            'label' => [ 'label' => 'Sorting label' ],
+            'field_name' => [ 'label' => 'Sorting field' ],
+            'sort_order' => [ 'label' => 'Sorting order', 'options' => [ 'asc' => 'Ascending', 'desc' => 'Descending' ] ],
 
 
-        );
+        ];
 
         return $config;
     }
@@ -87,8 +87,8 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
         $fields = $maxVarField = FCom_IndexTank_Model_ProductField::orm()->where( 'scoring', 1 )->order_by_asc( 'var_number' )->find_many();
         $m = $args[ 'model' ];
         $m->scoring_fields = $fields;
-        $args[ 'view' ]->set( array(
+        $args[ 'view' ]->set( [
             'title' => $m->id ? 'Edit Product Function: ' . $m->name : 'Create New Product Function',
-        ) );
+        ] );
     }
 }

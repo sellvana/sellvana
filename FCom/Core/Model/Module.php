@@ -5,29 +5,29 @@ class FCom_Core_Model_Module extends BDbModule
     static protected $_table = 'fcom_module';
     static protected $_origClass = __CLASS__;
 
-    static protected $_fieldOptions = array(
-        'core_run_level' => array(
+    static protected $_fieldOptions = [
+        'core_run_level' => [
             BModule::ONDEMAND  => 'ONDEMAND',
             BModule::DISABLED  => 'DISABLED',
             BModule::REQUESTED => 'REQUESTED',
             BModule::REQUIRED  => 'REQUIRED',
-        ),
-        'area_run_level' => array(
+        ],
+        'area_run_level' => [
             ''  => '',
             BModule::DISABLED  => 'DISABLED',
             BModule::REQUESTED => 'REQUESTED',
             BModule::REQUIRED  => 'REQUIRED',
-        ),
-        'run_status' => array(
+        ],
+        'run_status' => [
             BModule::IDLE    => 'IDLE',
             BModule::LOADED  => 'LOADED',
             BModule::ERROR   => 'ERROR',
-        ),
-    );
+        ],
+    ];
 
-    protected static $_importExportProfile = array(
-        'unique_key' => array( 'module_name', ),
-    );
+    protected static $_importExportProfile = [
+        'unique_key' => [ 'module_name', ],
+    ];
 
     static public function getModulesData()
     {
@@ -39,7 +39,7 @@ class FCom_Core_Model_Module extends BDbModule
 
         try {
             $schemaVersions = static::orm()->find_many_assoc( 'module_name' );
-            $schemaModules = array();
+            $schemaModules = [];
             foreach ( BMigrate::getMigrationData() as $connection => $migrationModules ) {
                 foreach ( $migrationModules as $modName => $migrData ) {
                     $schemaModules[ $modName ] = 1;
@@ -49,11 +49,11 @@ class FCom_Core_Model_Module extends BDbModule
             BDebug::logException( $e );
         }
 
-        $data = array();
+        $data = [];
         $migrate = false;
         foreach ( $modules as $modName => $mod ) {
             $r = BUtil::arrayMask( (array)$mod, 'name,description,version,run_status,run_level,require,children_copy' );
-            $reqs = array();
+            $reqs = [];
             if ( !empty( $r[ 'require' ][ 'module' ] ) ) {
                 foreach ( $r[ 'require' ][ 'module' ] as $req ) {
                     $reqs[] = $req[ 'name' ];

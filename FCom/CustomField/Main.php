@@ -7,9 +7,9 @@ class FCom_CustomField_Main extends BClass
 
     static public function bootstrap()
     {
-        FCom_Admin_Model_Role::i()->createPermission( array(
+        FCom_Admin_Model_Role::i()->createPermission( [
             'custom_fields' => 'Custom Fields'
-        ) );
+        ] );
     }
 
     public function disable( $flag )
@@ -26,7 +26,7 @@ class FCom_CustomField_Main extends BClass
         $tP = $args[ 'orm' ]->table_alias();
         $args[ 'orm' ]
             ->select( $tP . '.*' )
-            ->left_outer_join( 'FCom_CustomField_Model_ProductField', array( 'pcf.product_id', '=', $tP . '.id' ), 'pcf' )
+            ->left_outer_join( 'FCom_CustomField_Model_ProductField', [ 'pcf.product_id', '=', $tP . '.id' ], 'pcf' )
         ;
         $fields = FCom_CustomField_Model_Field::i()->fieldsInfo( 'product', true );
         $args[ 'orm' ]->select( $fields );
@@ -43,7 +43,7 @@ class FCom_CustomField_Main extends BClass
                 $custom = FCom_CustomField_Model_ProductField::i()->create();
             }
             $dataCustomKeys = array_intersect( $fields, array_keys( $data ) );
-            $dataCustom = array();
+            $dataCustom = [];
             foreach ( $dataCustomKeys as $key ) {
                 $dataCustom[ $key ] = $data[ $key ];
             }
@@ -61,7 +61,7 @@ class FCom_CustomField_Main extends BClass
         }
 
         $customFields = FCom_CustomField_Model_Field::orm()
-                ->where_in( 'facet_select', array( 'Inclusive', 'Exclusive' ) )
+                ->where_in( 'facet_select', [ 'Inclusive', 'Exclusive' ] )
                 ->where( 'frontend_show', 1 )
                 ->order_by_asc( 'sort_order' )
                 ->find_many();
@@ -70,18 +70,18 @@ class FCom_CustomField_Main extends BClass
         }
 
         $filter = BRequest::get( 'f' );
-        $currentFilter = array();
-        $excludeFilters = array();
+        $currentFilter = [];
+        $excludeFilters = [];
         if ( !empty( $filter ) ) {
             foreach ( $filter as $fkey => $fval ) {
                 $fkey = urldecode( $fkey );
                 $field = FCom_CustomField_Model_Field::orm()->where( 'field_code', $fkey )->find_one();
                 $currentFilter[ $field->frontend_label ][] =
-                        array(
+                        [
                             'key' => $field->field_code,
                             'facet_select' => $field->facet_select,
                             'value' => $fval
-                            );
+                            ];
                 if ( is_array( $fval ) ) {
                     foreach ( $fval as $fvalsingle )
                     $excludeFilters[ $field->frontend_label ][] = $fvalsingle;
@@ -92,7 +92,7 @@ class FCom_CustomField_Main extends BClass
         }
 
 
-        $groups = array();
+        $groups = [];
         foreach ( $customFields as $cf ) {
             if ( $category ) {
                 $productOrm = $category->productsORM();
@@ -103,7 +103,7 @@ class FCom_CustomField_Main extends BClass
             if ( empty( $products ) ) {
                 continue;
             }
-            $values = array();
+            $values = [];
             foreach ( $products as $p ) {
                 if ( isset( $excludeFilters[ $cf->frontend_label ] ) &&
                         in_array( $p-> {$cf->field_code}, $excludeFilters[ $cf->frontend_label ] )
@@ -115,11 +115,11 @@ class FCom_CustomField_Main extends BClass
             if ( empty( $values ) ) {
                 continue;
             }
-            $groups[ $cf->frontend_label ] = array(
+            $groups[ $cf->frontend_label ] = [
                 'key' => $cf->field_code,
                 'facet_select' => $cf->facet_select,
                 'values' => $values
-                );
+                ];
         }
 
 

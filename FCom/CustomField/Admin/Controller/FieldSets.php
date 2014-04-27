@@ -10,103 +10,103 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
             ->select( '(select count(*) from ' . FCom_CustomField_Model_SetField::table() . ' where set_id=s.id)', 'num_fields' );
 
         ;
-        $config = array(
-            'config' => array(
+        $config = [
+            'config' => [
                 'id'     => 'fieldsets',
                 'caption' => 'Field Sets',
                 'data_url' => BApp::href( 'customfields/fieldsets/grid_data' ),
                 'edit_url' => BApp::href( 'customfields/fieldsets/grid_data' ),
                 'orm' => $orm,
-                'columns' => array(
-                    array( 'type' => 'row_select' ),
-                    array( 'name' => 'id', 'label' => 'ID', 'width' => 55, 'sorttype' => 'number', 'key' => true, 'hidden' => true ),
-                    array( 'type' => 'input', 'name' => 'set_code', 'label' => 'Set Code', 'width' => 100,  'addable' => true,
-                            'editable' => true, 'validation' => array( 'required' => true,
-                            'unique' => BApp::href( 'customfields/fieldsets/unique_set' ) ) ),
-                    array( 'type' => 'input', 'name' => 'set_name', 'label' => 'Set Name', 'width' => 200,  'addable' => true,
-                            'editable' => true , 'validation' => array( 'required' => true ) ),
-                    array( 'name' => 'num_fields', 'label' => 'Fields', 'width' => 30, 'default' => '0' ),
-                    array( 'type' => 'btn_group',
-                            'buttons' => array(
-                                                array( 'name' => 'edit_custom', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom' ),
-                                                array( 'name' => 'delete' )
-                                            )
-                        )
-                ),
-                'actions' => array(
+                'columns' => [
+                    [ 'type' => 'row_select' ],
+                    [ 'name' => 'id', 'label' => 'ID', 'width' => 55, 'sorttype' => 'number', 'key' => true, 'hidden' => true ],
+                    [ 'type' => 'input', 'name' => 'set_code', 'label' => 'Set Code', 'width' => 100,  'addable' => true,
+                            'editable' => true, 'validation' => [ 'required' => true,
+                            'unique' => BApp::href( 'customfields/fieldsets/unique_set' ) ] ],
+                    [ 'type' => 'input', 'name' => 'set_name', 'label' => 'Set Name', 'width' => 200,  'addable' => true,
+                            'editable' => true , 'validation' => [ 'required' => true ] ],
+                    [ 'name' => 'num_fields', 'label' => 'Fields', 'width' => 30, 'default' => '0' ],
+                    [ 'type' => 'btn_group',
+                            'buttons' => [
+                                                [ 'name' => 'edit_custom', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom' ],
+                                                [ 'name' => 'delete' ]
+                                            ]
+                        ]
+                ],
+                'actions' => [
 //                            'new'=> array('caption'=>'Add New FieldSet', 'modal'=>true),
                             'delete' => true
-                ),
-                'filters' => array(
-                            array( 'field' => 'set_name', 'type' => 'text' ),
-                            array( 'field' => 'set_code', 'type' => 'text' ),
-                            '_quick' => array( 'expr' => 'product_name like ? or set_code like ', 'args' => array( '%?%', '%?%' ) )
-                ),
+                ],
+                'filters' => [
+                            [ 'field' => 'set_name', 'type' => 'text' ],
+                            [ 'field' => 'set_code', 'type' => 'text' ],
+                            '_quick' => [ 'expr' => 'product_name like ? or set_code like ', 'args' => [ '%?%', '%?%' ] ]
+                ],
                 'grid_before_create' => 'customFieldsGridRegister'
 //                'new_button' => '#add_new_field_set'
-            )
-        );
+            ]
+        ];
 
         return $config;
     }
 
     public function fieldsetModalSelectedGridConfig()
     {
-        $config = array(
-            'config' => array(
+        $config = [
+            'config' => [
                 'id' => 'fieldset-modal-selected-grid',
                 'caption' => 'Fields',
                 'data_mode' => 'local',
-                'data' => array(),
-                'columns' => array(
-                    array( 'type' => 'row_select' ),
-                    array( 'name' => 'id', 'label' => 'ID', 'width' => 30 ),
-                    array( 'name' => 'field_code', 'label' => 'Field Code', 'width' => 100, 'sortable' => false ),
-                    array( 'name' => 'field_name', 'label' => 'Field Name', 'width' => 100, 'sortable' => false ),
-                    array( 'name' => 'position', 'label' => 'Position', 'width' => 100, 'editable' => true, 'valdiate' => 'number', 'default' => '0', 'sortable' => false ),
+                'data' => [],
+                'columns' => [
+                    [ 'type' => 'row_select' ],
+                    [ 'name' => 'id', 'label' => 'ID', 'width' => 30 ],
+                    [ 'name' => 'field_code', 'label' => 'Field Code', 'width' => 100, 'sortable' => false ],
+                    [ 'name' => 'field_name', 'label' => 'Field Name', 'width' => 100, 'sortable' => false ],
+                    [ 'name' => 'position', 'label' => 'Position', 'width' => 100, 'editable' => true, 'valdiate' => 'number', 'default' => '0', 'sortable' => false ],
 //                    array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('delete' => 'noconfirm'))
-                ),
-                'filters' => array(
-                            array( 'field' => 'field_code', 'type' => 'text' ),
-                            array( 'field' => 'field_name', 'type' => 'text' ),
-                            '_quick' => array( 'expr' => 'field_code like ? or id like ', 'args' => array( '%?%', '%?%' ) )
-                ),
-                'actions' => array(
-                                    'delete' => array( 'caption' => 'Remove', 'confirm' => false )
-                                ),
+                ],
+                'filters' => [
+                            [ 'field' => 'field_code', 'type' => 'text' ],
+                            [ 'field' => 'field_name', 'type' => 'text' ],
+                            '_quick' => [ 'expr' => 'field_code like ? or id like ', 'args' => [ '%?%', '%?%' ] ]
+                ],
+                'actions' => [
+                                    'delete' => [ 'caption' => 'Remove', 'confirm' => false ]
+                                ],
                 'grid_before_create' => 'selectedFieldGridRegister'
-            )
-        );
+            ]
+        ];
 
         return $config;
     }
 
     public function fieldsetModalAddGridConfig()
     {
-        $config = array(
-            'config' => array(
+        $config = [
+            'config' => [
                 'id' => 'fieldset-modal-add-grid',
                 'caption' => 'Fields',
                 'orm' => 'FCom_CustomField_Model_Field',
-                'columns' => array(
-                    array( 'type' => 'row_select' ),
-                    array( 'name' => 'id', 'label' => 'ID', 'width' => 30 ),
-                    array( 'name' => 'field_code', 'label' => 'Field Code', 'width' => 100 ),
-                    array( 'name' => 'field_name', 'label' => 'Field Name', 'width' => 100 ),
-                    array( 'name' => 'table_field_type', 'label' => 'DB Type', 'width' => 180 ),
-                    array( 'name' => 'admin_input_type', 'label' => 'Input Type', 'width' => 180 )
-                ),
-                'filters' => array(
-                            array( 'field' => 'field_code', 'type' => 'text' ),
-                            array( 'field' => 'field_name', 'type' => 'text' ),
-                            '_quick' => array( 'expr' => 'field_code like ? or id like ', 'args' => array( '%?%', '%?%' ) )
-                ),
-                'actions' => array(
-                                    'add' => array( 'caption' => 'Add Selected Fields' )
-                                ),
+                'columns' => [
+                    [ 'type' => 'row_select' ],
+                    [ 'name' => 'id', 'label' => 'ID', 'width' => 30 ],
+                    [ 'name' => 'field_code', 'label' => 'Field Code', 'width' => 100 ],
+                    [ 'name' => 'field_name', 'label' => 'Field Name', 'width' => 100 ],
+                    [ 'name' => 'table_field_type', 'label' => 'DB Type', 'width' => 180 ],
+                    [ 'name' => 'admin_input_type', 'label' => 'Input Type', 'width' => 180 ]
+                ],
+                'filters' => [
+                            [ 'field' => 'field_code', 'type' => 'text' ],
+                            [ 'field' => 'field_name', 'type' => 'text' ],
+                            '_quick' => [ 'expr' => 'field_code like ? or id like ', 'args' => [ '%?%', '%?%' ] ]
+                ],
+                'actions' => [
+                                    'add' => [ 'caption' => 'Add Selected Fields' ]
+                                ],
                 'grid_before_create' => 'addFieldGridRegister'
-            )
-        );
+            ]
+        ];
 
         return $config;
     }
@@ -117,108 +117,108 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $orm = FCom_CustomField_Model_Field::i()->orm( 'f' )->select( 'f.*' )
             ->select( '(select count(*) from ' . FCom_CustomField_Model_FieldOption::table() . ' where field_id=f.id)', 'num_options' )
         ;
-        $config = array(
-            'config' => array(
+        $config = [
+            'config' => [
                 'id' => 'fields',
                 'caption' => 'Fields',
                 'orm' => $orm,
                 'data_url' => BApp::href( 'customfields/fieldsets/field_grid_data' ),
                 'edit_url' => BApp::href( 'customfields/fieldsets/field_grid_data' ),
-                'columns' => array(
-                    array( 'type' => 'row_select' ),
-                    array( 'name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true ),
-                    array( 'type' => 'input', 'name' => 'field_code', 'label' => 'Field Code', 'width' => 100, 'editable' => true, 'editor' => 'text',
-                            'defualt' => '', 'addable' => true, 'mass-editable' => true, 'validation' => array( 'required' => true,
-                            'unique' => BApp::href( '/customfields/fields/unique_field' ) ) ),
-                    array( 'type' => 'input', 'name' => 'field_name', 'label' => 'Field Name', 'width' => 100, 'editable' => true, 'editor' => 'text',
-                            'default' => '', 'addable' => true, 'mass-editable' => true, 'validation' => array( 'required' => true ) ),
-                    array( 'type' => 'input', 'name' => 'frontend_label', 'label' => 'Frontend Label', 'width' => 100, 'editable' => true, 'editor' => 'text',
-                            'default' => '', 'addable' => true, 'mass-editable' => true, 'validation' => array( 'required' => true ) ),
-                    array( 'type' => 'input', 'name' => 'frontend_show', 'label' => 'Show on frontend', 'width' => 90, 'editor' => 'text',
-                            'editable' => true, 'addable' => true, 'mass-editable' => true, 'validation' => array( 'required' => true ),
-                            'options' => $fld->fieldOptions( 'frontend_show' ), 'editor' => 'select' ),
-                    array( 'type' => 'input', 'name' => 'sort_order', 'label' => 'Sort order', 'width' => 30, 'editable' => true, 'editor' => 'text',
+                'columns' => [
+                    [ 'type' => 'row_select' ],
+                    [ 'name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true ],
+                    [ 'type' => 'input', 'name' => 'field_code', 'label' => 'Field Code', 'width' => 100, 'editable' => true, 'editor' => 'text',
+                            'defualt' => '', 'addable' => true, 'mass-editable' => true, 'validation' => [ 'required' => true,
+                            'unique' => BApp::href( '/customfields/fields/unique_field' ) ] ],
+                    [ 'type' => 'input', 'name' => 'field_name', 'label' => 'Field Name', 'width' => 100, 'editable' => true, 'editor' => 'text',
+                            'default' => '', 'addable' => true, 'mass-editable' => true, 'validation' => [ 'required' => true ] ],
+                    [ 'type' => 'input', 'name' => 'frontend_label', 'label' => 'Frontend Label', 'width' => 100, 'editable' => true, 'editor' => 'text',
+                            'default' => '', 'addable' => true, 'mass-editable' => true, 'validation' => [ 'required' => true ] ],
+                    [ 'type' => 'input', 'name' => 'frontend_show', 'label' => 'Show on frontend', 'width' => 90, 'editor' => 'text',
+                            'editable' => true, 'addable' => true, 'mass-editable' => true, 'validation' => [ 'required' => true ],
+                            'options' => $fld->fieldOptions( 'frontend_show' ), 'editor' => 'select' ],
+                    [ 'type' => 'input', 'name' => 'sort_order', 'label' => 'Sort order', 'width' => 30, 'editable' => true, 'editor' => 'text',
                             /*'editor'=>'select',*/ 'validate' => 'number', 'addable' => true,
-                            'mass-editable' => true, 'validation' => array( 'required' => true )/*,
-                            'options'=>range(0,20)*/ ),
+                            'mass-editable' => true, 'validation' => [ 'required' => true ]/*,
+                            'options'=>range(0,20)*/ ],
                             /*'facet_select'=>array('label'=>'Facet', 'width'=>200, 'editable'=>true,
                                 'options'=>array('No'=>'No', 'Exclusive'=>'Exclusive', 'Inclusive'=>'Inclusive')),*/
-                    array( 'type' => 'input', 'name' => 'table_field_type', 'label' => 'DB Type', 'width' => 180, 'editor' => 'select',
-                            'addable' => true, 'validation' => array( 'required' => true ), 'options' => $fld->fieldOptions( 'table_field_type' ) ),
-                    array( 'type' => 'input', 'name' => 'admin_input_type', 'label' => 'Input Type', 'width' => 180,
+                    [ 'type' => 'input', 'name' => 'table_field_type', 'label' => 'DB Type', 'width' => 180, 'editor' => 'select',
+                            'addable' => true, 'validation' => [ 'required' => true ], 'options' => $fld->fieldOptions( 'table_field_type' ) ],
+                    [ 'type' => 'input', 'name' => 'admin_input_type', 'label' => 'Input Type', 'width' => 180,
                         'editable' => true, 'editor' => 'select', 'addable' => true, 'mass-editable' => true,
-                        'validation' => array( 'required' => true ), 'options' => $fld->fieldOptions( 'admin_input_type' ) ),
-                    array( 'type' => 'input', 'name' => 'num_options', 'label' => 'Options', 'width' => 30, 'default' => '0' ),
-                    array( 'type' => 'input', 'name' => 'system', 'label' => 'System field', 'width' => 90, 'editable' => false, 'editor' => 'select',
-                         'addable' => true, 'mass-editable' => true, 'validation' => array( 'required' => true ), 'options' => array( '0' => 'No', '1' => 'Yes' ) ),
-                    array( 'type' => 'input', 'name' => 'multilanguage', 'label' => 'Multi Language', 'width' => 90,
+                        'validation' => [ 'required' => true ], 'options' => $fld->fieldOptions( 'admin_input_type' ) ],
+                    [ 'type' => 'input', 'name' => 'num_options', 'label' => 'Options', 'width' => 30, 'default' => '0' ],
+                    [ 'type' => 'input', 'name' => 'system', 'label' => 'System field', 'width' => 90, 'editable' => false, 'editor' => 'select',
+                         'addable' => true, 'mass-editable' => true, 'validation' => [ 'required' => true ], 'options' => [ '0' => 'No', '1' => 'Yes' ] ],
+                    [ 'type' => 'input', 'name' => 'multilanguage', 'label' => 'Multi Language', 'width' => 90,
                         'editable' => true, 'editor' => 'select', 'addable' => true, 'mass-editable' => true,
-                        'validation' => array( 'required' => true ), 'options' => array( '0' => 'No', '1' => 'Yes' ) ),
-                    array( 'type' => 'input', 'name' => 'required', 'label' => 'Required', 'width' => 90, 'editable' => true,
-                        'editor' => 'select', 'addable' => true, 'mass-editable' => true, 'validation' => array( 'required' => true ),
-                        'options' => array( '1' => 'Yes', '0' => 'No' ) ),
-                    array( 'type' => 'btn_group',
-                        'buttons' => array(
-                                            array( 'name' => 'custom', 'caption' => 'options...', 'cssClass' => 'btn-custom' ),
-                                            array( 'name' => 'edit' ),
-                                            array( 'name' => 'delete' )
-                                        )
-                        )
-                ),
-                'filters' => array(
-                            array( 'field' => 'field_code', 'type' => 'text' ),
-                            array( 'field' => 'field_name', 'type' => 'text' ),
-                            array( 'field' => 'frontend_label', 'type' => 'text' ),
-                            array( 'field' => 'frontend_show', 'type' => 'multiselect' ),
-                            array( 'field' => 'table_field_type', 'type' => 'multiselect' ),
-                            array( 'field' => 'admin_input_type', 'type' => 'multiselect' ),
-                            array( 'field' => 'num_options', 'type' => 'text' ),
-                            array( 'field' => 'system', 'type' => 'multiselect' ),
-                            array( 'field' => 'multilanguage', 'type' => 'multiselect' ),
-                            array( 'field' => 'required', 'type' => 'multiselect' ),
-                            '_quick' => array( 'expr' => 'field_code like ? or id like ', 'args' => array( '%?%', '%?%' ) )
-                ),
-                'actions' => array(
+                        'validation' => [ 'required' => true ], 'options' => [ '0' => 'No', '1' => 'Yes' ] ],
+                    [ 'type' => 'input', 'name' => 'required', 'label' => 'Required', 'width' => 90, 'editable' => true,
+                        'editor' => 'select', 'addable' => true, 'mass-editable' => true, 'validation' => [ 'required' => true ],
+                        'options' => [ '1' => 'Yes', '0' => 'No' ] ],
+                    [ 'type' => 'btn_group',
+                        'buttons' => [
+                                            [ 'name' => 'custom', 'caption' => 'options...', 'cssClass' => 'btn-custom' ],
+                                            [ 'name' => 'edit' ],
+                                            [ 'name' => 'delete' ]
+                                        ]
+                        ]
+                ],
+                'filters' => [
+                            [ 'field' => 'field_code', 'type' => 'text' ],
+                            [ 'field' => 'field_name', 'type' => 'text' ],
+                            [ 'field' => 'frontend_label', 'type' => 'text' ],
+                            [ 'field' => 'frontend_show', 'type' => 'multiselect' ],
+                            [ 'field' => 'table_field_type', 'type' => 'multiselect' ],
+                            [ 'field' => 'admin_input_type', 'type' => 'multiselect' ],
+                            [ 'field' => 'num_options', 'type' => 'text' ],
+                            [ 'field' => 'system', 'type' => 'multiselect' ],
+                            [ 'field' => 'multilanguage', 'type' => 'multiselect' ],
+                            [ 'field' => 'required', 'type' => 'multiselect' ],
+                            '_quick' => [ 'expr' => 'field_code like ? or id like ', 'args' => [ '%?%', '%?%' ] ]
+                ],
+                'actions' => [
                                     //'new'=>array('caption'=>'Add a field', 'modal'=>true),
                                     'edit' => true,
                                     'delete' => true
-                                ),
+                                ],
                 //'callbacks'=>array('after_render'=>'afterRowRenderFieldsGrid'),
                 'grid_before_create' => 'fieldsGridRegister',
                 'new_button' => '#add_new_field'
-            )
-        );
+            ]
+        ];
         return $config;
     }
 
     public function optionsGridConfig()
     {
-        $config = array(
-            'config' => array(
+        $config = [
+            'config' => [
                 'id' => 'options-grid',
                 'caption' => 'Fields',
                 'data_mode' => 'local',
-                'data' => array(),
-                'columns' => array(
-                    array( 'type' => 'row_select' ),
-                    array( 'name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true ),
-                    array( 'type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 300, 'editable' => 'inline',
-                            'sortable' => false, 'validation' => array( 'required' => true ) ),
-                    array( 'type' => 'btn_group',
-                            'buttons' => array( array( 'name' => 'delete', 'noconfirm' => true ) )
-                        )
+                'data' => [],
+                'columns' => [
+                    [ 'type' => 'row_select' ],
+                    [ 'name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true ],
+                    [ 'type' => 'input', 'name' => 'label', 'label' => 'Label', 'width' => 300, 'editable' => 'inline',
+                            'sortable' => false, 'validation' => [ 'required' => true ] ],
+                    [ 'type' => 'btn_group',
+                            'buttons' => [ [ 'name' => 'delete', 'noconfirm' => true ] ]
+                        ]
 
-                ),
-                'filters' => array(
-                            '_quick' => array( 'expr' => 'field_code like ? or id like ', 'args' => array( '%?%', '%?%' ) )
-                ),
-                'actions' => array(
-                                    'new' => array( 'caption' => 'Insert New Option' ),
-                                    'delete' => array( 'caption' => 'Remove', 'confirm' => false )
-                                ),
+                ],
+                'filters' => [
+                            '_quick' => [ 'expr' => 'field_code like ? or id like ', 'args' => [ '%?%', '%?%' ] ]
+                ],
+                'actions' => [
+                                    'new' => [ 'caption' => 'Insert New Option' ],
+                                    'delete' => [ 'caption' => 'Remove', 'confirm' => false ]
+                                ],
                 'grid_before_create' => 'optionsGridRegister'
-            )
-        );
+            ]
+        ];
 
         return $config;
     }
@@ -238,24 +238,24 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $view = $this->view( 'core/backbonegrid' );
         $view->set( 'grid', $this->fieldSetsGridConfig() );
         $data = $view->generateOutputData();
-        BResponse::i()->json( array(
-            array( 'c' => $data[ 'state' ][ 'c' ] ),
+        BResponse::i()->json( [
+            [ 'c' => $data[ 'state' ][ 'c' ] ],
             BDb::many_as_array( $data[ 'rows' ] ),
-        ) );
+        ] );
     }
 
     public function action_set_field_grid_data()
     {
         $orm = FCom_CustomField_Model_SetField::i()->orm( 'sf' )
-            ->join( 'FCom_CustomField_Model_Field', array( 'f.id', '=', 'sf.field_id' ), 'f' )
-            ->select( array( 'f.id', 'f.field_name', 'f.field_code', 'sf.position' ) )
+            ->join( 'FCom_CustomField_Model_Field', [ 'f.id', '=', 'sf.field_id' ], 'f' )
+            ->select( [ 'f.id', 'f.field_name', 'f.field_code', 'sf.position' ] )
             ->where( 'sf.set_id', BRequest::i()->get( 'set_id' ) );
         //TODO check when rows count is over 10.(processORM paginate)
         $data = $this->view( 'core/backbonegrid' )->processORM( $orm, __METHOD__ );
-        BResponse::i()->json( array(
-            array( 'c' => $data[ 'state' ][ 'c' ] ),
+        BResponse::i()->json( [
+            [ 'c' => $data[ 'state' ][ 'c' ] ],
             BDb::many_as_array( $data[ 'rows' ] ),
-        ) );
+        ] );
     }
 
     public function action_field_grid_data()
@@ -263,10 +263,10 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $view = $this->view( 'core/backbonegrid' );
         $view->set( 'grid', $this->fieldsGridConfig() );
         $data = $view->generateOutputData();
-        BResponse::i()->json( array(
-            array( 'c' => $data[ 'state' ][ 'c' ] ),
+        BResponse::i()->json( [
+            [ 'c' => $data[ 'state' ][ 'c' ] ],
             BDb::many_as_array( $data[ 'rows' ] ),
-        ) );
+        ] );
     }
 
     public function action_field_option_grid_data()
@@ -274,10 +274,10 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $orm = FCom_CustomField_Model_FieldOption::i()->orm( 'fo' )->select( 'fo.*' )
             ->where( 'field_id', BRequest::i()->get( 'field_id' ) );
         $data = $this->view( 'core/backbonegrid' )->processORM( $orm, __METHOD__ );
-        BResponse::i()->json( array(
-            array( 'c' => $data[ 'state' ][ 'c' ] ),
+        BResponse::i()->json( [
+            [ 'c' => $data[ 'state' ][ 'c' ] ],
             BDb::many_as_array( $data[ 'rows' ] ),
-        ) );
+        ] );
     }
 
     public function action_options()
@@ -286,10 +286,10 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $options = FCom_CustomField_Model_FieldOption::i()->getListAssocById( $id );
 
         BResponse::i()->json(
-            array(
+            [
                 'success' => true,
                 'options' => $options
-            )
+            ]
         );
     }
 
@@ -309,19 +309,19 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     $arr = explode( ',', $field_ids );
                     $mum_fields = count( $arr );
                     foreach ( $arr as $i => $fId ) {
-                        $model->create( array( 'set_id' => $result[ 'id' ], 'field_id' => $fId, 'position' => $i ) )->save();
+                        $model->create( [ 'set_id' => $result[ 'id' ], 'field_id' => $fId, 'position' => $i ] )->save();
                     }
                 }
                 $result[ 'num_fields' ] = $mum_fields;
                 BResponse::i()->json( $result );
                 break;
             case 'edit':
-                $model->delete_many( array( 'set_id' => $data[ 'id' ] ) );
+                $model->delete_many( [ 'set_id' => $data[ 'id' ] ] );
                 if ( $field_ids !== '' ) {
                     $arr = explode( ',', $field_ids );
                     foreach ( $arr as $i => $fId ) {
-                        if ( !$model->load( array( 'set_id' => $data[ 'id' ], 'field_id' => $fId ) ) ) {
-                            $model->create( array( 'set_id' => $data[ 'id' ], 'field_id' => $fId, 'position' => $i ) )->save();
+                        if ( !$model->load( [ 'set_id' => $data[ 'id' ], 'field_id' => $fId ] ) ) {
+                            $model->create( [ 'set_id' => $data[ 'id' ], 'field_id' => $fId, 'position' => $i ] )->save();
                         }
                     }
                 }
@@ -344,13 +344,13 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         //print_r(BRequest::i()->request()); exit;
         $p = BRequest::i()->post();
         $model = FCom_CustomField_Model_SetField::i();
-        $model->delete_many( array( 'set_id' => $p[ 'set_id' ] ) );
+        $model->delete_many( [ 'set_id' => $p[ 'set_id' ] ] );
         if ( $p[ 'field_ids' ] !== '' ) {
             foreach ( explode( ',', $p[ 'field_ids' ] ) as $i => $fId ) {
-                $model->create( array( 'set_id' => $p[ 'set_id' ], 'field_id' => $fId, 'position' => $i ) )->save();
+                $model->create( [ 'set_id' => $p[ 'set_id' ], 'field_id' => $fId, 'position' => $i ] )->save();
             }
         }
-        BResponse::i()->json( array( 'success' => true ) );
+        BResponse::i()->json( [ 'success' => true ] );
     }
 
     public function action_field_grid_data__POST()
@@ -362,12 +362,12 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
     {
         $p = BRequest::i()->post();
         $model = FCom_CustomField_Model_FieldOption::i();
-        $model->delete_many( array( 'field_id' => $p[ 'field_id' ] ) );
+        $model->delete_many( [ 'field_id' => $p[ 'field_id' ] ] );
         foreach ( $p[ 'rows' ] as $row ) {
-            $data = array( 'field_id' => $p[ 'field_id' ], 'label' => $row[ 'label' ] );
+            $data = [ 'field_id' => $p[ 'field_id' ], 'label' => $row[ 'label' ] ];
             $model->create( $data )->save();
         }
-        BResponse::i()->json( array( 'success' => true ) );
+        BResponse::i()->json( [ 'success' => true ] );
         //$this->_processGridDataPost('FCom_CustomField_Model_FieldOption', array('field_id'=>BRequest::i()->get('field_id')));
     }
 
@@ -419,7 +419,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
             }
             $data[ 'model' ] = BLocale::i()->parseRequestDates( $data[ 'model' ], 'from_date,to_date' );
             $model->set( $data[ 'model' ] );
-            BEvents::i()->fire( 'FCom_CustomField_Admin_Controller_FieldSets::form_post', array( 'id' => $id, 'data' => $data, 'model' => $model ) );
+            BEvents::i()->fire( 'FCom_CustomField_Admin_Controller_FieldSets::form_post', [ 'id' => $id, 'data' => $data, 'model' => $model ] );
             $model->save();
             if ( !$id ) {
                 $id = $model->id;
@@ -429,7 +429,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         }
 
         if ( $r->xhr() ) {
-            $this->forward( 'form_tab', null, array( 'id' => $id ) );
+            $this->forward( 'form_tab', null, [ 'id' => $id ] );
         } else {
             BResponse::i()->redirect( 'customfields/customfield/form/?id=' . $id );
         }
@@ -442,7 +442,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $name = $p[ '_name' ];
         $val = $p[ $name ];
         $rows = BDb::many_as_array( FCom_CustomField_Model_Field::i()->orm()->where( $name, $val )->find_many() );
-        BResponse::i()->json( array( 'unique' => empty( $rows ), 'id' => ( empty( $rows ) ? -1 : $rows[ 0 ][ 'id' ] ) ) );
+        BResponse::i()->json( [ 'unique' => empty( $rows ), 'id' => ( empty( $rows ) ? -1 : $rows[ 0 ][ 'id' ] ) ] );
     }
 
     public function action_unique_set__POST()
@@ -452,6 +452,6 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $name = $p[ '_name' ];
         $val = $p[ $name ];
         $rows = BDb::many_as_array( FCom_CustomField_Model_Set::i()->orm()->where( $name, $val )->find_many() );
-        BResponse::i()->json( array( 'unique' => empty( $rows ), 'id' => ( empty( $rows ) ? -1 : $rows[ 0 ][ 'id' ] ) ) );
+        BResponse::i()->json( [ 'unique' => empty( $rows ), 'id' => ( empty( $rows ) ? -1 : $rows[ 0 ][ 'id' ] ) ] );
     }
 }

@@ -2,7 +2,7 @@
 
 class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 {
-    static protected $_defaultActions = array(
+    static protected $_defaultActions = [
         'refresh' => true,
         'link_to_page' => true,
         'columns' => true,
@@ -11,9 +11,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         'add' => true,
         'new' => true,
         'export' => true
-    );
+    ];
 
-    public function gridUrl( $changeRequest = array() )
+    public function gridUrl( $changeRequest = [] )
     {
         if ( !$changeRequest ) {
             return $this->grid[ 'config' ][ 'grid_url' ];
@@ -23,7 +23,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
     public function pageSizeHref()
     {
-        return BUtil::setUrlQuery( true, array( 'ps' => '-VALUE-' ) );
+        return BUtil::setUrlQuery( true, [ 'ps' => '-VALUE-' ] );
     }
 
     public function pageSizeOptions()
@@ -34,13 +34,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
     public function pageChangeHref()
     {
-        return BUtil::setUrlQuery( true, array( 'p' => '-VALUE-' ) );
+        return BUtil::setUrlQuery( true, [ 'p' => '-VALUE-' ] );
     }
 
     public function gridActions()
     {
         if ( empty( $this->grid[ 'config' ][ 'actions' ] ) ) {
-            return array();
+            return [];
         }
         return $this->grid[ 'config' ][ 'actions' ];
     }
@@ -52,7 +52,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
     public function multiselectToggleOptions()
     {
-        return array(
+        return [
             'show_all' => 'Show All',
             'show_sel' => 'Show Selected',
             'upd_sel' => 'Select Visible',
@@ -67,7 +67,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 'upd_unsel'=>'Unsel',
                 'upd_clear'=>'Clear'
             ),*/
-        );
+        ];
     }
 
     public function multiselectCurrent()
@@ -83,9 +83,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             return '#';
         }
         if ( !empty( $grid[ 'request' ][ 's' ] ) && $grid[ 'request' ][ 's' ] == $col[ 'name' ] ) {
-            $change = array( 'sd' => $grid[ 'request' ][ 'sd' ] == 'desc' ? 'asc' : 'desc' );
+            $change = [ 'sd' => $grid[ 'request' ][ 'sd' ] == 'desc' ? 'asc' : 'desc' ];
         } else {
-            $change = array( 's' => $col[ 'name' ], 'sd' => 'asc' );
+            $change = [ 's' => $col[ 'name' ], 'sd' => 'asc' ];
         }
         return BUtil::setUrlQuery( true, $change );
     }
@@ -97,7 +97,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
     public function sortClass( $col )
     {
-        $classArr = array();
+        $classArr = [];
         if ( empty( $col[ 'no_reorder' ] ) ) $classArr[] = 'js-draggable';
 
         $s = $this->grid[ 'result' ][ 'state' ];
@@ -137,7 +137,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $c[ 'grid_url' ] = BRequest::currentUrl();
         }
         if ( empty( $c[ 'page_size_options' ] ) ) {
-            $c[ 'page_size_options' ] = array( 10, 25, 50, 100 );
+            $c[ 'page_size_options' ] = [ 10, 25, 50, 100 ];
         }
         if ( empty( $c[ 'state' ][ 'ps' ] ) ) {
             $c[ 'state' ][ 'ps' ] = $c[ 'page_size_options' ][ 0 ];
@@ -310,55 +310,55 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
                 switch ( $k ) {
                     case 'refresh':
-                        $action = array( 'html' => BUtil::tagHtml( 'a',
-                            array( 'href' => '#', 'class' => 'js-change-url grid-refresh btn' ),
+                        $action = [ 'html' => BUtil::tagHtml( 'a',
+                            [ 'href' => '#', 'class' => 'js-change-url grid-refresh btn' ],
                             isset( $action[ 'caption' ] ) ? $action[ 'caption' ] : BLocale::_( 'Refresh' )
-                        ) );
+                        ) ];
                         break;
                     case 'export':
-                        $action = array( 'html' => BUtil::tagHtml( 'button',
-                            array( 'type' => 'button', 'class' => 'grid-export btn' ),
+                        $action = [ 'html' => BUtil::tagHtml( 'button',
+                            [ 'type' => 'button', 'class' => 'grid-export btn' ],
                             isset( $action[ 'caption' ] ) ? $action[ 'caption' ] : BLocale::_( 'Export' )
-                        ) );
+                        ) ];
                         break;
                     case 'link_to_page':
-                        $action = array( 'html' => BUtil::tagHtml( 'a',
-                            array( 'href' => BRequest::currentUrl(), 'class' => 'grid-link_to_page btn' ),
+                        $action = [ 'html' => BUtil::tagHtml( 'a',
+                            [ 'href' => BRequest::currentUrl(), 'class' => 'grid-link_to_page btn' ],
                             isset( $action[ 'caption' ] ) ? $action[ 'caption' ] : BLocale::_( 'Link' )
-                        ) );
+                        ) ];
                         break;
                     case 'edit':
-                        $action = array( 'html' => BUtil::tagHtml( 'a',
-                            array( 'class' => 'btn grid-mass-edit btn-success disabled', 'data-toggle' => 'modal', 'href' => '#' . $grid[ 'config' ][ 'id' ] . '-mass-edit', 'role' => 'button' ),
+                        $action = [ 'html' => BUtil::tagHtml( 'a',
+                            [ 'class' => 'btn grid-mass-edit btn-success disabled', 'data-toggle' => 'modal', 'href' => '#' . $grid[ 'config' ][ 'id' ] . '-mass-edit', 'role' => 'button' ],
                             isset( $action[ 'caption' ] ) ? $action[ 'caption' ] : BLocale::_( 'Edit' )
-                        ) );
+                        ) ];
                         break;
                     case 'delete':
-                        $action = array( 'html' => BUtil::tagHtml( 'button',
-                            array( 'class' => 'btn grid-mass-delete btn-danger disabled' . ( ( isset( $action[ 'confirm' ] ) && $action[ 'confirm' ] === false ) ? ' noconfirm' : '' ), 'type' => 'button' ),
+                        $action = [ 'html' => BUtil::tagHtml( 'button',
+                            [ 'class' => 'btn grid-mass-delete btn-danger disabled' . ( ( isset( $action[ 'confirm' ] ) && $action[ 'confirm' ] === false ) ? ' noconfirm' : '' ), 'type' => 'button' ],
                             isset( $action[ 'caption' ] ) ? $action[ 'caption' ] : BLocale::_( 'Delete' )
-                        ) );
+                        ) ];
                         break;
                     case 'add':
-                        $action = array( 'html' => BUtil::tagHtml( 'button',
-                            array( 'class' => 'btn grid-add btn-primary', 'type' => 'button' ),
+                        $action = [ 'html' => BUtil::tagHtml( 'button',
+                            [ 'class' => 'btn grid-add btn-primary', 'type' => 'button' ],
                             isset( $action[ 'caption' ] ) ? $action[ 'caption' ] : BLocale::_( 'Add' )
-                        ) );
+                        ) ];
                         break;
                     case 'new':
-                        $action = array( 'html' => BUtil::tagHtml( 'button',
-                            array( 'class' => "btn grid-new btn-primary " . ( isset( $action[ 'modal' ] ) && $action[ 'modal' ] ? '_modal' : '' ), 'type' => 'button' ),
+                        $action = [ 'html' => BUtil::tagHtml( 'button',
+                            [ 'class' => "btn grid-new btn-primary " . ( isset( $action[ 'modal' ] ) && $action[ 'modal' ] ? '_modal' : '' ), 'type' => 'button' ],
                             isset( $action[ 'caption' ] ) ? $action[ 'caption' ] : BLocale::_( 'Add' )
-                        ) );
+                        ) ];
                         break;
                     default:
                         $action = static::$_defaultActions[ $k ];
                 }
             } else {
-                $action = array( 'html' => BUtil::tagHtml( 'button',
-                            array( 'class' => isset( $action[ 'class' ] ) ? 'btn ' . $action[ 'class' ] : 'btn', 'type' => 'button', 'id' => isset( $action[ 'id' ] ) ? $action[ 'id' ] : '' ),
+                $action = [ 'html' => BUtil::tagHtml( 'button',
+                            [ 'class' => isset( $action[ 'class' ] ) ? 'btn ' . $action[ 'class' ] : 'btn', 'type' => 'button', 'id' => isset( $action[ 'id' ] ) ? $action[ 'id' ] : '' ],
                             isset( $action[ 'caption' ] ) ? $action[ 'caption' ] : BLocale::_( 'Add' )
-                ) );
+                ) ];
 
 
             }
@@ -379,14 +379,14 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
         // retrieve current personalization
         $pers = FCom_Admin_Model_User::i()->personalize();
-        $persGrid = !empty( $pers[ 'grid' ][ $gridId ] ) ? $pers[ 'grid' ][ $gridId ] : array();
+        $persGrid = !empty( $pers[ 'grid' ][ $gridId ] ) ? $pers[ 'grid' ][ $gridId ] : [];
 #var_dump($pers);
         $req = BRequest::i()->get();
 
         // prepare array to update personalization
 
-        $personalize = array();
-        foreach ( array( 'p', 'ps', 's', 'sd', 'q' ) as $k ) {
+        $personalize = [];
+        foreach ( [ 'p', 'ps', 's', 'sd', 'q' ] as $k ) {
             if ( !isset( $persGrid[ 'state' ][ $k ] ) ) {
                 $persGrid[ 'state' ][ $k ] = null;
             }
@@ -398,11 +398,11 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
         // save personalization
         if ( !empty( $personalize ) ) {
-            FCom_Admin_Model_User::i()->personalize( array( 'grid' => array( $gridId => $personalize ) ) );
+            FCom_Admin_Model_User::i()->personalize( [ 'grid' => [ $gridId => $personalize ] ] );
         }
 
         // get columns personalization
-        $persCols = array();
+        $persCols = [];
         $defPos = 0;
         foreach ( $grid[ 'config' ][ 'columns' ] as $col ) {
             if ( !empty( $col[ 'name' ] ) && !empty( $persGrid[ 'columns' ][ $col[ 'name' ] ] ) ) {
@@ -418,10 +418,10 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $grid[ 'config' ][ 'columns' ] = $persCols;
 
         //get filters personalization
-        $persFilters = array();
+        $persFilters = [];
         $defPos = 0;
         if ( !isset( $grid[ 'config' ][ 'filters' ] ) && !empty( $persGrid[ 'filters' ] ) ) {
-            $grid[ 'config' ][ 'filters' ] = array();
+            $grid[ 'config' ][ 'filters' ] = [];
         }
 
         if ( isset( $grid[ 'config' ][ 'filters' ] ) ) {
@@ -447,8 +447,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     {
         $grid = $this->grid;
         $gridId = !empty( $grid[ 'personalize' ][ 'id' ] ) ? $grid[ 'personalize' ][ 'id' ] : $grid[ 'config' ][ 'id' ];
-        $reset = array( 'state' => array( 'p' => null, 'ps' => null, 's' => null, 'sd' => null, 'q' => null ) );
-        FCom_Admin_Model_User::i()->personalize( array( 'grid' => array( $gridId => $reset ) ) );
+        $reset = [ 'state' => [ 'p' => null, 'ps' => null, 's' => null, 'sd' => null, 'q' => null ] ];
+        FCom_Admin_Model_User::i()->personalize( [ 'grid' => [ $gridId => $reset ] ] );
     }
 
     public function getGrid()
@@ -463,7 +463,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $this->_processPersonalization();
 
         $grid = $this->grid;
-        BEvents::i()->fire( __METHOD__ . ':after', array( 'grid' => &$grid ) );
+        BEvents::i()->fire( __METHOD__ . ':after', [ 'grid' => &$grid ] );
         $grid[ '_processed' ] = true;
         $this->grid = $grid;
 
@@ -481,7 +481,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         return $config;
     }
 
-    public function getGridConfigData( array $options = array() )
+    public function getGridConfigData( array $options = [] )
     {
         // fetch grid configuration
         $grid = $this->getGrid();
@@ -492,10 +492,10 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         if ( isset( $config[ 'data' ] ) && !empty( $config[ 'data' ] ) ) {
             $gridId = $config[ 'id' ];
             $pers = FCom_Admin_Model_User::i()->personalize();
-            $persState = !empty( $pers[ 'grid' ][ $gridId ][ 'state' ] ) ? $pers[ 'grid' ][ $gridId ][ 'state' ] : array();
+            $persState = !empty( $pers[ 'grid' ][ $gridId ][ 'state' ] ) ? $pers[ 'grid' ][ $gridId ][ 'state' ] : [];
 
             //param 'q' is needed?
-            $params = array( "p", "ps", "s", "sd"/*,"q"*/ );
+            $params = [ "p", "ps", "s", "sd"/*,"q"*/ ];
 
             foreach ( $params as $p ) {
                 $persState[ $p ] = isset( $persState[ $p ] ) ? $persState[ $p ] :
@@ -512,13 +512,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             if ( is_string( $orm ) ) {
                 $orm = $orm::i()->orm();
             }
-            BEvents::i()->fire( __METHOD__ . ':initORM:' . $config[ 'id' ], array( 'orm' => $orm, 'grid' => $grid ) );
+            BEvents::i()->fire( __METHOD__ . ':initORM:' . $config[ 'id' ], [ 'orm' => $orm, 'grid' => $grid ] );
 
 
             $gridId = $config[ 'id' ];
             $pers = FCom_Admin_Model_User::i()->personalize();
-            $persState = !empty( $pers[ 'grid' ][ $gridId ][ 'state' ] ) ? $pers[ 'grid' ][ $gridId ][ 'state' ] : array();
-            $persFilters = !empty( $persState[ 'filters' ] ) ? $persState[ 'filters' ] : array();
+            $persState = !empty( $pers[ 'grid' ][ $gridId ][ 'state' ] ) ? $pers[ 'grid' ][ $gridId ][ 'state' ] : [];
+            $persFilters = !empty( $persState[ 'filters' ] ) ? $persState[ 'filters' ] : [];
             $persState = BUtil::arrayMask( $persState, 's,sd,p,ps,q' );
 
             $this->_processGridFilters( $config, $persFilters, $orm );
@@ -526,12 +526,12 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $config[ 'state' ] = $persState;
 
             try {
-                $grid[ 'result' ] = $orm->paginate( $grid[ 'request' ], array(
+                $grid[ 'result' ] = $orm->paginate( $grid[ 'request' ], [
                     's' => !empty( $config[ 'state' ][ 's' ] )  ? $config[ 'state' ][ 's' ]  : null,
                     'sd' => !empty( $config[ 'state' ][ 'sd' ] ) ? $config[ 'state' ][ 'sd' ] : null,
                     'p' => !empty( $config[ 'state' ][ 'p' ] )  ? $config[ 'state' ][ 'p' ]  : null,
                     'ps' => !empty( $config[ 'state' ][ 'ps' ] ) ? $config[ 'state' ][ 'ps' ] : $config[ 'page_size_options' ][ 0 ],
-                ) );
+                ] );
             } catch ( Exception $e ) {
                 $this->_resetPersonalization();
                 throw $e;
@@ -540,7 +540,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             //var_dump($grid['result']);exit;
             $grid[ 'result' ][ 'state' ][ 'description' ] = $this->stateDescription( $grid[ 'result' ][ 'state' ] );
 
-            BEvents::i()->fire( __METHOD__ . ':after:' . $config[ 'id' ], array( 'grid' => & $grid ) );
+            BEvents::i()->fire( __METHOD__ . ':after:' . $config[ 'id' ], [ 'grid' => & $grid ] );
         }
 
         //$mapColumns = array();
@@ -554,13 +554,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     {
 
         $grid = $this->get( 'grid' );
-        $state = isset( $grid[ 'result' ][ 'state' ] ) ? $grid[ 'result' ][ 'state' ] : array();
-        $rows = isset( $grid[ 'result' ][ 'rows' ] ) ? $grid[ 'result' ][ 'rows' ] : array();
+        $state = isset( $grid[ 'result' ][ 'state' ] ) ? $grid[ 'result' ][ 'state' ] : [];
+        $rows = isset( $grid[ 'result' ][ 'rows' ] ) ? $grid[ 'result' ][ 'rows' ] : [];
         //var_dump($state);
         $gridId = $grid[ 'config' ][ 'id' ];
 //        $persState = !empty($grid['config']['state']) ? $grid['config']['state'] : array(); // overridden right after this section
         $pers = FCom_Admin_Model_User::i()->personalize();
-        $persState = !empty( $pers[ 'grid' ][ $gridId ][ 'state' ] ) ? $pers[ 'grid' ][ $gridId ][ 'state' ] : array();
+        $persState = !empty( $pers[ 'grid' ][ $gridId ][ 'state' ] ) ? $pers[ 'grid' ][ $gridId ][ 'state' ] : [];
         $persState = BUtil::arrayMask( $persState, 's,sd,p,ps,q' );
 
         foreach ( $persState as $k => $v ) {
@@ -570,7 +570,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
         //var_dump($state);
 
-        $data = array();
+        $data = [];
 
         foreach ( $rows as $rowId => $row ) {
             $data[] = is_array( $row ) ? $row : $row->as_array();
@@ -580,7 +580,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $data = $gridId::afterInitialData( $data );
         }
 
-        return array( 'state' => $state, 'data' => $data );
+        return [ 'state' => $state, 'data' => $data ];
     }
 
 
@@ -593,29 +593,29 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $gridId = $grid[ 'config' ][ 'id' ];
         $columns = $grid[ 'config' ][ 'columns' ];
 
-        $trArr = array();
+        $trArr = [];
         foreach ( $rows as $rowId => $row ) {
             $row->_id = $rowId;
-            $trAttr = array();
+            $trAttr = [];
             $trAttr[ 'id' ] = "data-row--{$gridId}--{$rowId}";
             $trAttr[ 'data-id' ] = $row->get( $grid[ 'config' ][ 'row_id_column' ] );
             $trAttr[ 'class' ][] = $rowId % 2 ? 'odd' : 'even';
 
-            $tdArr = array();
+            $tdArr = [];
             foreach ( $columns as $colId => $col ) {
                 $cellData = $this->cellData( $row, $col );
-                $tdArr[ $colId ] = array( 'attr' => $cellData[ 'attr' ], 'html' => $cellData[ 'html' ] );
+                $tdArr[ $colId ] = [ 'attr' => $cellData[ 'attr' ], 'html' => $cellData[ 'html' ] ];
                 if ( !empty( $cellData[ 'row_attr' ] ) ) {
                     $trAttr = array_merge_recursive( $cellData[ 'row_attr' ] );
                 }
             }
-            $trArr[ $rowId ] = array( 'attr' => $trAttr, 'cells' => $tdArr );
+            $trArr[ $rowId ] = [ 'attr' => $trAttr, 'cells' => $tdArr ];
         }
 
         if ( !empty( $grid[ 'config' ][ 'format_callback' ] ) ) {
             $cb = $grid[ 'config' ][ 'format_callback' ];
             if ( is_callable( $cb ) ) {
-                call_user_func( $cb, array( 'grid' => $grid, 'rows' => &$trArr ) );
+                call_user_func( $cb, [ 'grid' => $grid, 'rows' => &$trArr ] );
             } else {
                 BDebug::warning( 'Invalid grid format_callback' );
             }
@@ -627,9 +627,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     {
         $trArr = $this->getPageHtmlData( $rows );
 
-        $trHtmlArr = array();
+        $trHtmlArr = [];
         foreach ( $trArr as $rowId => $tr ) {
-            $tdHtmlArr = array();
+            $tdHtmlArr = [];
             foreach ( $tr[ 'cells' ] as $colId => $cell ) {
                 $tdHtmlArr[] = BUtil::tagHtml( 'td', $cell[ 'attr' ], $cell[ 'html' ] );
             }
@@ -642,10 +642,10 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     public function cellData( $row, $col )
     {
         $grid = $this->get( 'grid' );
-        $args = array( 'grid' => $grid, 'row' => $row, 'col' => $col );
-        $out = array();
+        $args = [ 'grid' => $grid, 'row' => $row, 'col' => $col ];
+        $out = [];
 
-        $out[ 'attr' ] = !empty( $col[ 'attr' ] ) ? $col[ 'attr' ] : array();
+        $out[ 'attr' ] = !empty( $col[ 'attr' ] ) ? $col[ 'attr' ] : [];
         if ( !empty( $col[ 'attr_callback' ] ) ) {
             $args[ 'attr' ] = $out[ 'attr' ];
             $out[ 'attr' ] = call_user_func( $col[ 'attr_callback' ], $args );
@@ -690,7 +690,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
 
         if ( !empty( $col[ 'href' ] ) ) {
-            $value = BUtil::tagHtml( 'a', array( 'href' => BUtil::injectVars( $col[ 'href' ], $row->as_array() ) ), $value );
+            $value = BUtil::tagHtml( 'a', [ 'href' => BUtil::injectVars( $col[ 'href' ], $row->as_array() ) ], $value );
         }
 
         $out[ 'html' ] = $value;
@@ -715,7 +715,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $orm = $grid[ 'orm' ];
         }
 
-        $data = $this->processORM( $orm, null, null, array(), $export );
+        $data = $this->processORM( $orm, null, null, [], $export );
 
         foreach ( $data[ 'rows' ] as $row ) {
             foreach ( $config[ 'columns' ] as $col ) {
@@ -739,7 +739,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         return $data;
     }
 
-    public function processORM( $orm, $method = null, $stateKey = null, $forceRequest = array(), $export = false )
+    public function processORM( $orm, $method = null, $stateKey = null, $forceRequest = [], $export = false )
     {
         $grid = $this->get( 'grid' );
         $config = $grid[ 'config' ];
@@ -752,7 +752,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $r = BUtil::arrayMask( $r, 's,sd,p,ps,q,filters,hash,gridId' );
         $gridId = isset( $r[ 'gridId' ] ) ? $r[ 'gridId' ] : $grid[ 'config' ][ 'id' ];
         $pers = FCom_Admin_Model_User::i()->personalize();
-        $persState = !empty( $pers[ 'grid' ][ $gridId ][ 'state' ] ) ? $pers[ 'grid' ][ $gridId ][ 'state' ] : array();
+        $persState = !empty( $pers[ 'grid' ][ $gridId ][ 'state' ] ) ? $pers[ 'grid' ][ $gridId ][ 'state' ] : [];
         $persState = BUtil::arrayMask( $persState, 's,sd,p,ps,q' );
 
         foreach ( $persState as $k => $v ) {
@@ -762,7 +762,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
 
         $filters = $r[ 'filters' ];
-        $persData = array( 'grid' => array( $gridId => array( 'state' => $r, 'filters' => $filters ) ) );
+        $persData = [ 'grid' => [ $gridId => [ 'state' => $r, 'filters' => $filters ] ] ];
         FCom_Admin_Model_User::i()->personalize( $persData );
 
         if ( $stateKey ) {
@@ -781,7 +781,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
         if ( !is_null( $method ) ) {
             //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
-            BEvents::i()->fire( $method . ':orm', array( 'orm' => $orm ) );
+            BEvents::i()->fire( $method . ':orm', [ 'orm' => $orm ] );
         }
 
         //TODO is there any better way to return all rows in paginate function?
@@ -798,13 +798,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         /*if (!is_null($method)) {
             BEvents::i()->fire($method.':data', array('data'=>&$data));
         }*/
-        BEvents::i()->fire( __METHOD__ . ':data', array( 'data' => &$data ) );
+        BEvents::i()->fire( __METHOD__ . ':data', [ 'data' => &$data ] );
         return $data;
     }
 
     public function stateDescription( $params = null )
     {
-        $descrArr = array();
+        $descrArr = [];
         if ( is_null( $params ) ) {
             $params = $this->grid[ 'result' ][ 'state' ];
         }
@@ -812,7 +812,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $descr = $this->_( "Filtered by:" ) . ' ';
             foreach ( $params[ 'search' ] as $k => $s ) {
                 if ( $k === '_quick' ) {
-                    $filter = array( 'type' => 'quick' );
+                    $filter = [ 'type' => 'quick' ];
                     $descr .= '<b>' . $this->_( 'Quick search' ) . '</b>';
                 } else {
                     $filter = $this->grid[ 'config' ][ 'filters' ][ $k ];
@@ -820,7 +820,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 }
                 switch ( $filter[ 'type' ] ) {
                     case 'multiselect':
-                        $opts = array();
+                        $opts = [];
                         $os = explode( ',', $s );
                         if ( sizeof( $os ) == 1 ) {
                             $descr .= ' ' . $this->_( 'is <u>%s</u>', $this->q( $filter[ 'options' ][ $os[ 0 ] ] ) );
@@ -878,7 +878,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
             $joinMethod = ( isset( $j[ 'type' ] ) ? $j[ 'type' ] . '_' : '' ) . 'join';
 
-            $where = isset( $j[ 'where' ] ) ? str_replace( array( '{lk}', '{fk}', '{lt}', '{ft}' ), array( $localKey, $foreignKey, $mainTableAlias, $tableAlias ), $j[ 'where' ] ) : array( $foreignKey, $op, $localKey );
+            $where = isset( $j[ 'where' ] ) ? str_replace( [ '{lk}', '{fk}', '{lt}', '{ft}' ], [ $localKey, $foreignKey, $mainTableAlias, $tableAlias ], $j[ 'where' ] ) : [ $foreignKey, $op, $localKey ];
 
             $orm->$joinMethod( $table, $where, $tableAlias );
         }
@@ -900,7 +900,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             foreach ( $config[ 'filters' ] as $fId => $f ) {
                 if ( $fId === '_quick' ) {
                     if ( !empty( $f[ 'expr' ] ) && !empty( $f[ 'args' ] ) && !empty( $filters[ $fId ] ) ) {
-                        $args = array();
+                        $args = [];
                         foreach ( $f[ 'args' ] as $a ) {
                             $args[] = str_replace( '?', $filters[ '_quick' ], $a );
                         }
@@ -979,7 +979,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
                             break;
                         case 'not_in':
-                            $orm->where_raw( $f[ 'field' ] . ' NOT BETWEEN ? and ?', array( $temp[ 0 ], $temp[ 1 ] ) );
+                            $orm->where_raw( $f[ 'field' ] . ' NOT BETWEEN ? and ?', [ $temp[ 0 ], $temp[ 1 ] ] );
 
                             break;
                     }
@@ -1048,7 +1048,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         exit;*/
         $grid = $this->getGrid();
         $columns = $grid[ 'config' ][ 'columns' ];
-        $headers = array();
+        $headers = [];
         foreach ( $columns as $i => $col ) {
             if ( !empty( $col[ 'hidden' ] ) && $col[ 'hidden' ] !== 'false' ) continue;
             if ( !empty( $col[ 'cell' ] ) || $col[ 'name' ] === 'thumb_path' ) continue;
@@ -1078,7 +1078,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
 
         foreach ( $rows as $row ) {
-            $data = array();
+            $data = [];
 
             foreach ( $columns as $col ) {
                 if ( !empty( $col[ 'hidden' ] ) && $col[ 'hidden' ] !== 'false' ) continue;

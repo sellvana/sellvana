@@ -8,7 +8,7 @@ require_once __DIR__ . '/buckyball/buckyball.php';
 
 class FCom_Core_Main extends BClass
 {
-    protected $_modulesDirs = array();
+    protected $_modulesDirs = [];
 
     public function init( $area )
     {
@@ -54,7 +54,7 @@ class FCom_Core_Main extends BClass
         $config = BConfig::i();
 
         // $localConfig used to override saved config with settings from entry point
-        $localConfig = array();
+        $localConfig = [];
         $localConfig[ 'fs' ][ 'fcom_root_dir' ] = FULLERON_ROOT_DIR;
 
         // $rootDir is used and not FULLERON_ROOT_DIR, to allow symlinks and other configurations
@@ -95,7 +95,7 @@ class FCom_Core_Main extends BClass
         $localConfig[ 'web' ][ 'base_src' ] = $baseSrc;
         $localConfig[ 'web' ][ 'base_store' ] = $baseStore;
 
-        $permissionErrors = array();
+        $permissionErrors = [];
 
         $mediaDir = $config->get( 'fs/media_dir' );
         if ( !$mediaDir ) {
@@ -170,7 +170,7 @@ class FCom_Core_Main extends BClass
 
         if ( $permissionErrors ) {
             BLayout::i()
-                ->addView( 'permissions', array( 'template' => __DIR__ . '/views/permissions.php' ) )
+                ->addView( 'permissions', [ 'template' => __DIR__ . '/views/permissions.php' ] )
                 ->setRootView( 'permissions' );
             BLayout::i()->view( 'permissions' )->set( 'errors', $permissionErrors );
             BResponse::i()->output();
@@ -208,8 +208,8 @@ class FCom_Core_Main extends BClass
         $modeByIp = trim( $config->get( 'mode_by_ip/' . $area ) );
 
         if ( $modeByIp ) {
-            $ipModes = array();
-            $ipPatterns = array();
+            $ipModes = [];
+            $ipPatterns = [];
             foreach ( explode( "\n", $modeByIp ) as $line ) {
                 $a = explode( ':', $line );
                 if ( strpos( $a[ 0 ], '*' ) > 0 ) {
@@ -217,7 +217,7 @@ class FCom_Core_Main extends BClass
                     continue;
                 }
                 if ( empty( $a[ 1 ] ) ) {
-                    $a = array( '*', $a[ 0 ] );
+                    $a = [ '*', $a[ 0 ] ];
                 }
                 $ipModes[ trim( $a[ 0 ] ) ] = strtoupper( trim( $a[ 1 ] ) );
             }
@@ -268,14 +268,14 @@ class FCom_Core_Main extends BClass
         }
 
         if ( $config->get( 'install_status' ) === 'installed' ) {
-            $runLevels = array( $area => 'REQUIRED' );
+            $runLevels = [ $area => 'REQUIRED' ];
         } else {
-            $config->set( 'module_run_levels', array() );
-            $runLevels = array(
+            $config->set( 'module_run_levels', [] );
+            $runLevels = [
                 'FCom_Install' => 'REQUIRED',
                 'FCom_LibTwig' => 'REQUESTED',
                 'FCom_MarketClient' => 'REQUESTED',
-            );
+            ];
             $area = 'FCom_Install';
             BApp::i()->set( 'area', $area, true );
         }
@@ -293,7 +293,7 @@ class FCom_Core_Main extends BClass
                 (array)$config->get( 'module_run_levels/' . $area ) +
                 (array)$config->get( 'module_run_levels/FCom_Core' );
         }
-        $config->add( array( 'module_run_levels' => array( 'request' => $runLevels ) ) );
+        $config->add( [ 'module_run_levels' => [ 'request' => $runLevels ] ] );
 
         //FCom::i()->registerBundledModules();
 #$d = BDebug::debug('SCANNING MANIFESTS');
@@ -357,9 +357,9 @@ class FCom_Core_Main extends BClass
             $config->addFile( 'local.php', true );
         }
 
-        BClassAutoload::i( true, array( 'root_dir' => $dirConf[ 'local_dir' ] ) );
-        BClassAutoload::i( true, array( 'root_dir' => $dirConf[ 'dlc_dir' ] ) );
-        BClassAutoload::i( true, array( 'root_dir' => $dirConf[ 'root_dir' ] ) );
+        BClassAutoload::i( true, [ 'root_dir' => $dirConf[ 'local_dir' ] ] );
+        BClassAutoload::i( true, [ 'root_dir' => $dirConf[ 'dlc_dir' ] ] );
+        BClassAutoload::i( true, [ 'root_dir' => $dirConf[ 'root_dir' ] ] );
 
         return $this;
     }
@@ -379,7 +379,7 @@ class FCom_Core_Main extends BClass
     {
         //TODO: make more flexible, to account for other (custom) file names
         if ( is_null( $files ) ) {
-            $files = array( 'core', 'db', 'local' );
+            $files = [ 'core', 'db', 'local' ];
         }
         if ( is_string( $files ) ) {
             $files = explode( ',', strtolower( $files ) );
@@ -391,19 +391,19 @@ class FCom_Core_Main extends BClass
         if ( in_array( 'core', $files ) ) {
             // configuration necessary for core startup
             unset( $c[ 'module_run_levels' ][ 'request' ] );
-            $core = array(
+            $core = [
                 'install_status' => !empty( $c[ 'install_status' ] ) ? $c[ 'install_status' ] : null,
                 'core' => !empty( $c[ 'core' ] ) ? $c[ 'core' ] : null,
-                'module_run_levels' => !empty( $c[ 'module_run_levels' ] ) ? $c[ 'module_run_levels' ] : array(),
+                'module_run_levels' => !empty( $c[ 'module_run_levels' ] ) ? $c[ 'module_run_levels' ] : [],
                 'recovery_modules' => !empty( $c[ 'recovery_modules' ] ) ? $c[ 'recovery_modules' ] : null,
-                'mode_by_ip' => !empty( $c[ 'mode_by_ip' ] ) ? $c[ 'mode_by_ip' ] : array(),
-                'cache' => !empty( $c[ 'cache' ] ) ? $c[ 'cache' ] : array(),
-            );
+                'mode_by_ip' => !empty( $c[ 'mode_by_ip' ] ) ? $c[ 'mode_by_ip' ] : [],
+                'cache' => !empty( $c[ 'cache' ] ) ? $c[ 'cache' ] : [],
+            ];
             $config->writeFile( 'core.php', $core );
         }
         if ( in_array( 'db', $files ) ) {
             // db connections
-            $db = !empty( $c[ 'db' ] ) ? array( 'db' => $c[ 'db' ] ) : array();
+            $db = !empty( $c[ 'db' ] ) ? [ 'db' => $c[ 'db' ] ] : [];
             $config->writeFile( 'db.php', $db );
         }
         if ( in_array( 'local', $files ) ) {
@@ -418,7 +418,7 @@ class FCom_Core_Main extends BClass
     {
         $dir = BConfig::i()->get( 'fs/config_dir' );
         $hash = '';
-        foreach ( array( 'core', 'db', 'local' ) as $f ) {
+        foreach ( [ 'core', 'db', 'local' ] as $f ) {
             $hash += filemtime( $dir . '/' . $f );
         }
         return $hash;
@@ -426,7 +426,7 @@ class FCom_Core_Main extends BClass
 
     public function resizeUrl( $full = false )
     {
-        static $url = array();
+        static $url = [];
         if ( empty( $url[ $full ] ) ) {
             if ( $full ) {
                 $url[ $full ] = BApp::baseUrl( true ) . '/resize.php';
@@ -484,7 +484,7 @@ class FCom_Core_Main extends BClass
         $s = BSession::i();
         $r = BRequest::i();
         if ( $save ) {
-            $s->set( 'lastNav', array( $r->rawPath(), $r->get() ) );
+            $s->set( 'lastNav', [ $r->rawPath(), $r->get() ] );
         } else {
             $d = $s->get( 'lastNav' );
             return BApp::href() . ( $d ? $d[ 0 ] . '?' . http_build_query( (array)$d[ 1 ] ) : '' );
@@ -497,15 +497,15 @@ class FCom_Core_Main extends BClass
         $head = BLayout::i()->view( 'head' );
 
         $head->meta( 'csrf-token', BSession::i()->csrfToken() );
-        $head->js_raw( 'js_init', array( 'content' => "
+        $head->js_raw( 'js_init', [ 'content' => "
 FCom = {};
-FCom.cookie_options = " . BUtil::toJson( array(
+FCom.cookie_options = " . BUtil::toJson( [
     'domain' => !empty( $cookieConfig[ 'domain' ] ) ? $cookieConfig[ 'domain' ] : null,
     'path' => !empty( $cookieConfig[ 'path' ] ) ? $cookieConfig[ 'path' ] : null,
-) ) . ";
+] ) . ";
 FCom.base_href = '" . BApp::i()->baseUrl() . "';
 FCom.base_src = '" . BConfig::i()->get( 'web/base_src' ) . "';
-        " ) );
+        " ] );
     }
 
     public static function onTwigInit( $args )

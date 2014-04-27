@@ -49,7 +49,7 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
         $hlp = FCom_MarketClient_RemoteApi::i();
         $connResult = $hlp->setupConnection();
 
-        list( $action, $modName ) = explode( '/', BRequest::i()->post( 'mod_name' ) ) + array( '' );
+        list( $action, $modName ) = explode( '/', BRequest::i()->post( 'mod_name' ) ) + [ '' ];
         $versionResult = $hlp->getModulesVersions( $modName );
         #$redirectUrl = $hlp->getUrl('market/module/edit', array('mod_name' => $modName));
         $redirectUrl = BRequest::i()->referrer();

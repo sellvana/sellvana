@@ -12,14 +12,14 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         $db->ddlClearCache();
         BConfig::i()->add(
         // config is being reset in its tests, so we have to load default config used to be able to test
-            array(
-                 'db' => array(
+            [
+                 'db' => [
                      'host'     => 'localhost',
                      'dbname'   => 'fulleron_test',
                      'username' => 'pp',
                      'password' => '111111',
-                 ),
-            )
+                 ],
+            ]
         );
     }
 
@@ -67,13 +67,13 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     {
 
         BConfig::i()->add(
-            array(
-                 'db' => array(
-                     'named' => array(
+            [
+                 'db' => [
+                     'named' => [
                          'test' => $this->dbConfig
-                     )
-                 )
-            )
+                     ]
+                 ]
+            ]
         );
 
         BConfig::i()->set( 'db/named/test/use', 'DEFAULT' );
@@ -93,13 +93,13 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     {
         BDbDouble::resetConnections();
         BConfig::i()->add(
-            array(
-                 'db' => array(
-                     'named' => array(
+            [
+                 'db' => [
+                     'named' => [
                          'test' => $this->dbConfig
-                     )
-                 )
-            )
+                     ]
+                 ]
+            ]
         );
 
 
@@ -119,13 +119,13 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     {
         BDbDouble::resetConnections();
         BConfig::i()->add(
-            array(
-                 'db' => array(
-                     'named' => array(
+            [
+                 'db' => [
+                     'named' => [
                          'test' => $this->dbConfig
-                     )
-                 )
-            )
+                     ]
+                 ]
+            ]
         );
 
         BConfig::i()->set( 'db/named/test/dbname', null );
@@ -140,13 +140,13 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     {
         BDbDouble::resetConnections();
         BConfig::i()->add(
-            array(
-                 'db' => array(
-                     'named' => array(
+            [
+                 'db' => [
+                     'named' => [
                          'test' => $this->dbConfig
-                     )
-                 )
-            )
+                     ]
+                 ]
+            ]
         );
 
         BConfig::i()->set( 'db/named/test/engine', 'pgsql' );
@@ -161,13 +161,13 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     {
 
         BConfig::i()->add(
-            array(
-                 'db' => array(
-                     'named' => array(
+            [
+                 'db' => [
+                     'named' => [
                          'test' => $this->dbConfig
-                     )
-                 )
-            )
+                     ]
+                 ]
+            ]
         );
 
         BConfig::i()->set( 'db/named/test/dbname', null );
@@ -181,13 +181,13 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     public function testConnectingMoreThanOnceWithSameNameReturnsSameConnection()
     {
         BConfig::i()->add(
-            array(
-                 'db' => array(
-                     'named' => array(
+            [
+                 'db' => [
+                     'named' => [
                          'test' => $this->dbConfig
-                     )
-                 )
-            )
+                     ]
+                 ]
+            ]
         );
 
         $connOne = BDb::connect( 'test' );
@@ -240,7 +240,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         BDbDouble::resetConnections();
         $db = BDbDouble::i();
         $query = "INSERT INTO `test_table_2`(test) VALUES(?),(?)";
-        $result = $db->run( $query, array( 2, 3 ) );
+        $result = $db->run( $query, [ 2, 3 ] );
 
         $this->assertTrue( $result[ 0 ] );
     }
@@ -254,7 +254,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         $db = BDbDouble::i();
         $query = "DROP TABLE IF EXISTS `test_table_2`";
         ob_start();
-        $db->run( $query, null, array( 'echo' => true ) );
+        $db->run( $query, null, [ 'echo' => true ] );
         $echo = ob_get_clean();
 
         $this->assertEquals( '<hr><pre>' . $query . '<pre>', $echo );
@@ -269,7 +269,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         $db = BDbDouble::i();
         $query = "DROP TABLE IF EXISTS ";
         ob_start();
-        $db->run( $query, null, array( 'try' => true ) );
+        $db->run( $query, null, [ 'try' => true ] );
         $echo = ob_get_clean();
         $this->assertContains( '<hr>', $echo );
     }
@@ -331,7 +331,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         )";
         BDb::run( $sql );
         $query = "INSERT INTO `test_table_2`(test) VALUES(?),(?)";
-        BDb::run( $query, array( 2, 3 ) );
+        BDb::run( $query, [ 2, 3 ] );
         BDb::rollback( 'test' );
         $this->assertTrue( BORM::get_db()->inTransaction() == 0 );
     }
@@ -348,12 +348,12 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         )";
         BDb::run( $sql );
 
-        $orig = array(
+        $orig = [
             'id' => 1,
             'test' => 'test'
-        );
+        ];
 
-        $dirty = $orig + array( 'test2' => 'test', 2, 3, 4 );
+        $dirty = $orig + [ 'test2' => 'test', 2, 3, 4 ];
         $result = BDb::cleanForTable( 'test_table_2', $dirty );
 
         $this->assertEquals( $orig, $result );
@@ -374,13 +374,13 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         $this->assertFalse( $conn->inTransaction() == 0 );
     }
 
-    protected $dbConfig = array(
+    protected $dbConfig = [
         'host'         => 'localhost',
         'dbname'       => 'fulleron_test',
         'username'     => 'pp',
         'password'     => '111111',
         'table_prefix' => null,
-    );
+    ];
 
     /**
      * @covers BDb::connect
@@ -390,13 +390,13 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     {
         $table = 'test_table';
         BConfig::i()->add(
-            array(
-                 'db' => array(
-                     'named' => array(
+            [
+                 'db' => [
+                     'named' => [
                          'test' => $this->dbConfig
-                     )
-                 )
-            )
+                     ]
+                 ]
+            ]
         );
         BDb::connect( 'test' );
         $this->assertEquals( $table, BDb::t( $table ) );
@@ -410,13 +410,13 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     {
         $table = 'test_table';
         BConfig::i()->add(
-            array(
-                 'db' => array(
-                     'named' => array(
+            [
+                 'db' => [
+                     'named' => [
                          'test' => $this->dbConfig
-                     )
-                 )
-            )
+                     ]
+                 ]
+            ]
         );
         $dbi = BDb::i( true );
         $dbi->connect( 'test' );
@@ -444,11 +444,11 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         $table = 'test_table';
         $dbi   = BDbDouble::i( true );
         BConfig::i()->add(
-            array(
-                 'db' => array(
+            [
+                 'db' => [
                      'table_prefix' => 'fl',
-                 ),
-            )
+                 ],
+            ]
         );
         $config = BConfig::i()->get( 'db' );
         BDbDouble::connect( 'DEFAULT' );
@@ -461,48 +461,48 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     public function testVariousWhereConditions()
     {
         $expected       = "f1 is null";
-        $expectedParams = array();
+        $expectedParams = [];
         $w              = BDb::where( "f1 is null" );
         $this->assertEquals( $expected, $w[ 0 ] );
         $this->assertEquals( $expectedParams, $w[ 1 ] );
 
         $expected       = "(f1=?) AND (f2=?)";
-        $expectedParams = array( 'V1', 'V2' );
-        $w              = BDb::where( array( 'f1' => 'V1', 'f2' => 'V2' ) );
+        $expectedParams = [ 'V1', 'V2' ];
+        $w              = BDb::where( [ 'f1' => 'V1', 'f2' => 'V2' ] );
         $this->assertEquals( $expected, $w[ 0 ] );
         $this->assertEquals( $expectedParams, $w[ 1 ] );
 
         $expected       = "(f1=?) AND (f2 LIKE ?)";
-        $expectedParams = array( 5, '%text%' );
-        $w              = BDb::where( array( 'f1' => 5, array( 'f2 LIKE ?', '%text%' ) ) );
+        $expectedParams = [ 5, '%text%' ];
+        $w              = BDb::where( [ 'f1' => 5, [ 'f2 LIKE ?', '%text%' ] ] );
         $this->assertEquals( $expected, $w[ 0 ] );
         $this->assertEquals( $expectedParams, $w[ 1 ] );
 
         $expected       = "((f1!=?) OR (f2 BETWEEN ? AND ?))";
-        $expectedParams = array( 5, 10, 20 );
-        $w              = BDb::where( array( 'OR' => array( array( 'f1!=?', 5 ), array( 'f2 BETWEEN ? AND ?', 10, 20 ) ) ) );
+        $expectedParams = [ 5, 10, 20 ];
+        $w              = BDb::where( [ 'OR' => [ [ 'f1!=?', 5 ], [ 'f2 BETWEEN ? AND ?', 10, 20 ] ] ] );
         $this->assertEquals( $expected, $w[ 0 ] );
         $this->assertEquals( $expectedParams, $w[ 1 ] );
 
         $expected       = "(f1 IN (?,?,?)) AND NOT (((f2 IS NULL) OR (f2=?)))";
-        $expectedParams = array( 1, 2, 3, 10 );
+        $expectedParams = [ 1, 2, 3, 10 ];
         $w              = BDb::where(
-            array(
-                 'f1'  => array( 1, 2, 3 ),
-                 'NOT' => array( 'OR' => array( "f2 IS NULL", 'f2' => 10 ) )
-            )
+            [
+                 'f1'  => [ 1, 2, 3 ],
+                 'NOT' => [ 'OR' => [ "f2 IS NULL", 'f2' => 10 ] ]
+            ]
         );
         $this->assertEquals( $expected, $w[ 0 ] );
         $this->assertEquals( $expectedParams, $w[ 1 ] );
 
         $expected       = "(((A) OR (B)) AND ((C) OR (D)))";
-        $expectedParams = array();
+        $expectedParams = [];
         $w              = BDb::where(
-            array(
-                 'AND' => array(
-                     array( 'OR', 'A', 'B' ), array( 'OR', 'C', 'D' )
-                 )
-            )
+            [
+                 'AND' => [
+                     [ 'OR', 'A', 'B' ], [ 'OR', 'C', 'D' ]
+                 ]
+            ]
         );
         $this->assertEquals( $expected, $w[ 0 ] );
         $this->assertEquals( $expectedParams, $w[ 1 ] );
@@ -574,7 +574,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         BDbDouble::resetConnections();
         BDbDouble::connect();
         $this->setExpectedException( 'BException', 'Missing fields definition for new table' );
-        BDbDouble::ddlTableDef( 'non_existing', array() );
+        BDbDouble::ddlTableDef( 'non_existing', [] );
     }
 
     /**
@@ -592,14 +592,14 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         if ( !$db->ddlTableExists( $vo->table ) ) {
             $db->ddlTableDef( $vo->table, $vo->tableFields );
         }
-        $update = array(
-            'COLUMNS' => array(
+        $update = [
+            'COLUMNS' => [
                 'test_char' => 'DROP'
-            ),
-            'KEYS'    => array(
+            ],
+            'KEYS'    => [
                 'test_char' => 'DROP'
-            ),
-        );
+            ],
+        ];
 
         $db->ddlTableDef( $vo->table, $update );
 
@@ -649,7 +649,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         )";
         BDb::run( $sql );
         $query = "INSERT INTO `test_table_2`(test) VALUES(?),(?)";
-        BDb::run( $query, array( 2, 3 ) );
+        BDb::run( $query, [ 2, 3 ] );
 
         $result = BORM::i()->for_table( 'test_table_2' )->select( 'test' )->limit( 2 )->find_many();
 
@@ -669,9 +669,9 @@ class BDbDouble extends BDb
     public static function resetConnections()
     {
         static::$_currentConnectionName = null;
-        static::$_config                = array( 'dbname' => null );
-        static::$_namedConnections      = array();
-        static::$_namedConnectionConfig = array();
+        static::$_config                = [ 'dbname' => null ];
+        static::$_namedConnections      = [];
+        static::$_namedConnectionConfig = [];
     }
 }
 
@@ -684,48 +684,48 @@ class Entity
     public $table = 'test_table';
     public $fTable = 'fk_test_table';
 
-    public $tableFields = array(
-        'COLUMNS'     => array(
+    public $tableFields = [
+        'COLUMNS'     => [
             'test_id'      => 'int(10) not null',
             'test_fk_id'   => 'int(10) not null',
             'test_varchar' => 'varchar(100) null',
             'test_char'    => 'char(10) null',
             'test_text'    => 'text null',
-        ),
+        ],
         'PRIMARY'     => '(test_id)', // at the moment this HAS to be IN parenthesis or wrong SQL is generated
-        'KEYS'        => array(
+        'KEYS'        => [
             'test_id'      => 'PRIMARY(test_id)',
             'test_fk_id'   => 'UNIQUE(test_fk_id)',
             'test_char'    => '(test_char)',
             'test_varchar' => '(test_varchar)',
-        ),
-        'CONSTRAINTS' => array(),
+        ],
+        'CONSTRAINTS' => [],
 //        'OPTIONS' => array(
 //            'engine' => 'InnoDB',
 //            'charset' => 'latin1',
 //            'collate' => 'latin1',// what will happen if they do not match?
 //        ),
-    );
-    public $fkTableFields = array(
-        'COLUMNS'     => array(
+    ];
+    public $fkTableFields = [
+        'COLUMNS'     => [
             'fk_test_id'    => 'int(10) not null',
             'fk_test_fk_id' => 'int(10) not null',
-        ),
+        ],
         'PRIMARY'     => '(fk_test_id)',
-        'KEYS'        => array(
+        'KEYS'        => [
             'fk_test_id'    => 'PRIMARY(fk_test_id)',
             'fk_test_fk_id' => 'UNIQUE(fk_test_fk_id)',
-        ),
+        ],
 //        'OPTIONS'     => array(
 //            'engine'  => 'InnoDB',
 //            'charset' => 'latin1',
 //            'collate' => 'latin1_swedish_ci', // what will happen if they do not match?
 //        ),
-    );
+    ];
 
-    public $constraints = array(
+    public $constraints = [
         'Ffk_test_fk_idK' => 'FOREIGN KEY (fk_test_fk_id) REFERENCES test_table(test_fk_id) ON DELETE CASCADE ON UPDATE CASCADE'
-    );
+    ];
 }
 
 /*

@@ -19,7 +19,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      * Defined scoring functions for products index
      * @var array
      */
-    protected $_functions  =  array ();
+    protected $_functions  =  [];
 
 
     /**
@@ -58,7 +58,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     *
     * @return FCom_IndexTank_Index_Product
     */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
@@ -135,7 +135,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      */
     public function filterRange( $var, $from, $to )
     {
-        $this->_filterDocvar[ $var ][] = array( $from, $to );
+        $this->_filterDocvar[ $var ][] = [ $from, $to ];
     }
 
 
@@ -154,7 +154,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      */
     public function resetFilters()
     {
-        $this->_filterCategory = array();
+        $this->_filterCategory = [];
     }
 
     /**
@@ -164,13 +164,13 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     public function status()
     {
         $metadata = $this->model()->get_metadata();
-        $result = array (
+        $result = [
             'name'          => $this->_indexName,
             'code'          => $metadata->code,
             'status'        => $metadata->status,
             'size'          => $metadata->size,
             'date'          => $metadata->creation_time
-        );
+        ];
         return $result;
     }
 
@@ -226,17 +226,17 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $this->_result = $result;
         //print_r( $this->_result);exit;
         if ( !$result || $result->matches <= 0 ) {
-            return FCom_Catalog_Model_Product::i()->orm( 'p' )->where_in( 'p.id', array( -1 ) );
+            return FCom_Catalog_Model_Product::i()->orm( 'p' )->where_in( 'p.id', [ -1 ] );
         }
 
-        $products = array();
+        $products = [];
         //$product_model = FCom_Catalog_Model_Product::i();
         foreach ( $result->results as $res ) {
             $products[] = $res->docid;
         }
 
         if ( !$products ) {
-            return FCom_Catalog_Model_Product::i()->orm( 'p' )->where_in( 'p.id', array( -1 ) );
+            return FCom_Catalog_Model_Product::i()->orm( 'p' )->where_in( 'p.id', [ -1 ] );
         }
         $productsORM = FCom_Catalog_Model_Product::i()->orm( 'p' )->where_in( "p.id", $products )
                 ->order_by_expr( "FIELD(p.id, " . implode( ",", $products ) . ")" );
@@ -259,7 +259,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         }
 #echo "<pre>"; print_r($this->_result->facets); exit;
         $facets = get_object_vars( $this->_result->facets );
-        $res = array();
+        $res = [];
         foreach ( $facets as $k => $v ) {
             $res[ $k ] = get_object_vars( $v );
         }
@@ -279,11 +279,11 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     public function add( $products, $limit = 0 )
     {
         if ( !is_array( $products ) ) {
-            $products = array( $products );
+            $products = [ $products ];
         }
 
         $counter = 0;
-        $documents = array();
+        $documents = [];
         foreach ( $products as $i => $product ) {
             if ( $product->disabled ) {
                 continue;
@@ -303,14 +303,14 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
             //submit every N products to IndexDen - this protect from network overloading
             if ( $limit && 0 == ++$counter % $limit ) {
-                BEvents::i()->fire( __METHOD__, array( 'docs' => &$documents ) );
+                BEvents::i()->fire( __METHOD__, [ 'docs' => &$documents ] );
                 $this->model()->add_documents( $documents );
-                $documents = array();
+                $documents = [];
             }
         }
 
         if ( $documents ) {
-            BEvents::i()->fire( __METHOD__, array( 'docs' => &$documents ) );
+            BEvents::i()->fire( __METHOD__, [ 'docs' => &$documents ] );
             $this->model()->add_documents( $documents );
         }
     }
@@ -318,7 +318,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     static public function onProductIndexAdd( $args )
     {
         // prepare products assoc array
-        $products = array();
+        $products = [];
         foreach ( $args[ 'docs' ] as &$doc ) {
             $products[ $doc[ 'docid' ] ] =& $doc;
         }
@@ -327,7 +327,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
         //add categories
         $categories = FCom_Catalog_Model_CategoryProduct::orm( 'cp' )->where_in( 'cp.product_id', $pIds )
-                ->join( 'FCom_Catalog_Model_Category', array( 'c.id', '=', 'cp.category_id' ), 'c' )
+                ->join( 'FCom_Catalog_Model_Category', [ 'c.id', '=', 'cp.category_id' ], 'c' )
                 ->select( 'c.id' )->select( 'cp.product_id' )->select( 'cp.category_id' )->select( 'c.node_name' )->find_many();
         if ( empty( $categories ) ) {
             return;
@@ -345,12 +345,12 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     public function updateTextField( $products, $field, $fieldValue )
     {
         if ( !is_array( $products ) ) {
-            $products = array( $products );
+            $products = [ $products ];
         }
 
         $limit = 500;
         $counter = 0;
-        $documents = array();
+        $documents = [];
         foreach ( $products as $i => $product ) {
             $fields[ $field ] = $fieldValue;
             $documents[ $i ][ 'docid' ] = $product->id();
@@ -359,7 +359,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             //submit every N products to IndexDen - this protect from network overloading
             if ( 0 == $counter++ % $limit ) {
                 $this->model()->add_documents( $documents );
-                $documents = array();
+                $documents = [];
             }
         }
 
@@ -403,7 +403,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      */
     public function deleteCategory( $product, $categoryField )
     {
-        $category = array( $categoryField => "" );
+        $category = [ $categoryField => "" ];
         $this->model()->update_categories( $product->id(), $category );
     }
 
@@ -435,9 +435,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     public function deleteProducts( $products )
     {
         if ( !is_array( $products ) ) {
-            $products = array( $products );
+            $products = [ $products ];
         }
-        $docids = array();
+        $docids = [];
         foreach ( $products as $product ) {
             $docids[] = $product->id();
         }
@@ -451,7 +451,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      */
     public function collectFacets( $facets )
     {
-        $facetsData = array();
+        $facetsData = [];
         if ( $facets ) {
 
             $facetsFields = FCom_IndexTank_Model_ProductField::i()->getFacetsList();
@@ -492,11 +492,11 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function collectCategories( $facets, $categorySelected = '' )
     {
-        $categoryData = array();
+        $categoryData = [];
         if ( $facets ) {
             $urlPath = '';
             //get categories
-            $catIds = array();
+            $catIds = [];
             foreach ( $facets as $fname => $fvalues ) {
                 //hard coded ct_categories prefix
                 if ( strpos( $fname, 'ct_' ) !== false ) {
@@ -504,7 +504,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 }
             }
             if ( empty( $catIds ) ) {
-                return array();
+                return [];
             }
             $categories = FCom_Catalog_Model_Category::i()->orm()->where_in( 'id', $catIds )->find_many_assoc();
             // fetch all ascendants that do not have products
@@ -530,7 +530,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             } );
             foreach ( $categories as $cat ) {
                 $level = count( explode( "/", $cat->id_path ) )-1;
-                $fvalues = !empty( $facets[ 'ct_' . $cat->id ] ) ? $facets[ 'ct_' . $cat->id ] : array( $cat->node_name => '' );
+                $fvalues = !empty( $facets[ 'ct_' . $cat->id ] ) ? $facets[ 'ct_' . $cat->id ] : [ $cat->node_name => '' ];
                 foreach ( $fvalues as $fvalue => $fcount ) {
                     $obj = new stdClass();
                     $obj->show_count = true;
@@ -597,7 +597,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     protected function _processFields( $fieldsList, $product, $type = '' )
     {
-        $result = array();
+        $result = [];
         foreach ( $fieldsList as $field ) {
             if ( empty( $field->source_value ) ) {
                 continue;
@@ -620,7 +620,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     } elseif ( strpos( $field->source_value, '.' ) ) {
                         $callback = BUtil::extCallback( $field->source_value );
                     } else {
-                        $callback = array( $this, $field->source_value );
+                        $callback = [ $this, $field->source_value ];
                     }
                     //check callback
                     if ( !BClassRegistry::isCallable( $callback ) ) {
@@ -675,7 +675,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $fieldsList = FCom_IndexTank_Model_ProductField::i()->getVariablesList();
         $variablesList = $this->_processFields( $fieldsList, $product, 'variables' );
 
-        $variables = array();
+        $variables = [];
         foreach ( $fieldsList as $field ) {
             $variables[ $field->var_number ] = $variablesList[ $field->field_name ];
         }

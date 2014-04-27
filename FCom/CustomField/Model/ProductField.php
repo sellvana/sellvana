@@ -4,12 +4,12 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_product_custom';
-    protected static $_importExportProfile = array( 'skip' => array(),
-     'related' => array( 'product_id' => 'FCom_Catalog_Model_Product.id', ),  );
+    protected static $_importExportProfile = [ 'skip' => [],
+     'related' => [ 'product_id' => 'FCom_Catalog_Model_Product.id', ],  ];
 
-    public function productFields( $p, $r = array() )
+    public function productFields( $p, $r = [] )
     {
-        $where = array();
+        $where = [];
         if ( $p->get( '_fieldset_ids' ) || !empty( $r[ 'add_fieldset_ids' ] ) ) {
             $addSetIds = BUtil::arrayCleanInt( $p->get( '_fieldset_ids' ) );
             if ( !empty( $r[ 'add_fieldset_ids' ] ) ) {
@@ -50,7 +50,7 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
         }
 
         if ( !$where ) {
-            $fields = array();
+            $fields = [];
         } else {
             $fields = FCom_CustomField_Model_Field::i()->orm( 'f' )
                     ->select( "f.*" )

@@ -22,7 +22,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         return true;
     }
 
-    public function message( $msg, $type = 'success', $tag = 'install', $options = array() )
+    public function message( $msg, $type = 'success', $tag = 'install', $options = [] )
     {
         if ( is_array( $msg ) ) {
             array_walk( $msg, 'BLocale::_' );
@@ -69,17 +69,17 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     {
         BLayout::i()->setRootView( 'marketclient/container' );
         $data = FCom_MarketClient_RemoteApi::i()->getModuleInstallInfo( 'FCom_VirtPackCoreEcom' );
-        $modules = array();
+        $modules = [];
         foreach ( $data as $modName => $modInfo ) {
-            if ( BApp::m( $modName ) || in_array( $modName, array( 'FCom_Core', 'FCom_Install', 'FCom_MarketClient' ) ) ) {
+            if ( BApp::m( $modName ) || in_array( $modName, [ 'FCom_Core', 'FCom_Install', 'FCom_MarketClient' ] ) ) {
                 continue;
             }
             $modules[ $modName ] = $modInfo[ 'version' ];
         }
-        $this->view( 'marketclient/container' )->set( array(
+        $this->view( 'marketclient/container' )->set( [
             'modules' => $modules,
             'redirect_to' => BApp::href( 'install/step1' ),
-        ) );
+        ] );
     }
 
     public function action_step1()
@@ -87,7 +87,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         BLayout::i()->applyLayout( '/step1' );
         $sData =& BSession::i()->dataToUpdate();
         if ( empty( $sData[ 'w' ][ 'db' ] ) ) {
-            $sData[ 'w' ][ 'db' ] = array( 'host' => '127.0.0.1', 'dbname' => 'sellvana', 'username' => 'root', 'password' => '', 'table_prefix' => '' );
+            $sData[ 'w' ][ 'db' ] = [ 'host' => '127.0.0.1', 'dbname' => 'sellvana', 'username' => 'root', 'password' => '', 'table_prefix' => '' ];
         }
     }
 
@@ -99,7 +99,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         }
         try {
             $w = BRequest::i()->post( 'w' );
-            BConfig::i()->add( array( 'db' => $w[ 'db' ] ), true );
+            BConfig::i()->add( [ 'db' => $w[ 'db' ] ], true );
             BDb::connect( null, true );
             FCom_Core_Main::i()->writeConfigFiles( 'db' );
             BResponse::i()->redirect( 'install/step2' );
@@ -125,7 +125,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         BLayout::i()->applyLayout( '/step2' );
         $sData =& BSession::i()->dataToUpdate();
         if ( empty( $sData[ 'w' ][ 'admin' ] ) ) {
-            $sData[ 'w' ][ 'admin' ] = array( 'username' => 'admin', 'password' => '', 'email' => '', 'firstname' => '', 'lastname' => '' );
+            $sData[ 'w' ][ 'admin' ] = [ 'username' => 'admin', 'password' => '', 'email' => '', 'firstname' => '', 'lastname' => '' ];
         }
     }
 
@@ -152,10 +152,10 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 
     public function action_step3()
     {
-        $this->view( 'step3' )->set( array(
-            'debug_modes' => array( 'DEBUG' => 'DEBUG', /*'PRODUCTION' => 'PRODUCTION', */ ),
-            'run_level_bundles' => array( 'all' => 'All Bundled', 'min' => 'Minimal' ),
-        ) );
+        $this->view( 'step3' )->set( [
+            'debug_modes' => [ 'DEBUG' => 'DEBUG', /*'PRODUCTION' => 'PRODUCTION', */ ],
+            'run_level_bundles' => [ 'all' => 'All Bundled', 'min' => 'Minimal' ],
+        ] );
         BLayout::i()->applyLayout( '/step3' );
     }
 
@@ -167,18 +167,18 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         }
 
         $w = BRequest::i()->post( 'w' );
-        $runLevels = array();
+        $runLevels = [];
         if ( !empty( $w[ 'config' ][ 'run_levels_bundle' ] ) ) {
             switch ( $w[ 'config' ][ 'run_levels_bundle' ] ) {
                 case 'min':
-                    $runLevels = array(
+                    $runLevels = [
                         'FCom_MarketClient' => 'REQUESTED',
                         'FCom_FrontendThemeBootSimple' => 'REQUESTED',
-                    );
+                    ];
                     break;
 
                 case 'all':
-                    $runLevels = array(
+                    $runLevels = [
                         'FCom_Api' => 'REQUESTED',
                         'FCom_AuthorizeNet' => 'REQUESTED',
                         'FCom_Catalog' => 'REQUESTED',
@@ -216,28 +216,28 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                         'FCom_ShippingUps' => 'REQUESTED',
                         'FCom_Test' => 'REQUESTED',
                         'FCom_Wishlist' => 'REQUESTED',
-                    );
+                    ];
                     break;
             }
         }
 
-        BConfig::i()->add( array(
+        BConfig::i()->add( [
             'install_status' => 'installed',
-            'db' => array( 'implicit_migration' => 1/*, 'currently_migrating' => 0*/ ),
-            'module_run_levels' => array( 'FCom_Core' => $runLevels ),
-            'mode_by_ip' => array(
+            'db' => [ 'implicit_migration' => 1/*, 'currently_migrating' => 0*/ ],
+            'module_run_levels' => [ 'FCom_Core' => $runLevels ],
+            'mode_by_ip' => [
                 'FCom_Frontend' => !empty( $w[ 'config' ][ 'run_mode_frontend' ] ) ? $w[ 'config' ][ 'run_mode_frontend' ] : 'DEBUG',
                 'FCom_Admin' => !empty( $w[ 'config' ][ 'run_mode_admin' ] ) ? $w[ 'config' ][ 'run_mode_admin' ] : 'DEBUG',
-            ),
-            'modules' => array(
-                'FCom_Frontend' => array(
+            ],
+            'modules' => [
+                'FCom_Frontend' => [
                     'theme' => 'FCom_FrontendThemeBootSimple',
-                ),
-            ),
-            'cache' => array(
+                ],
+            ],
+            'cache' => [
                 'default_backend' => BCache::i()->getFastestAvailableBackend(),
-            ),
-        ), true );
+            ],
+        ], true );
 
         FCom_Core_Main::i()->writeConfigFiles();
 

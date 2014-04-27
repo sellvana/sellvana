@@ -17,11 +17,11 @@ class BFtpClientTest extends PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->object = new BFtpClient(
-            array(
+            [
                  'hostname' => $this->host,
                  'username' => $this->userName,
                  'password' => $this->password,
-            )
+            ]
         );
         $testFile     = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'ftp/test.txt';
         if ( file_exists( $testFile ) == false ) {

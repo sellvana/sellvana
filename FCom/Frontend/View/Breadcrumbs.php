@@ -8,18 +8,18 @@ class FCom_Frontend_View_Breadcrumbs extends BView
             if ( $this->crumbs ) {
                 $crumbs = $this->crumbs;
             } elseif ( $this->navNode ) {
-                $crumbs = array( 'home' );
+                $crumbs = [ 'home' ];
                 if ( ( $asc = $this->navNode->ascendants() ) ) {
                     foreach ( $asc as $a ) {
                         if ( !$a->node_name ) continue;
-                        $crumbs[] = array(
+                        $crumbs[] = [
                             'href' => $a->url_href ? BApp::baseUrl() . trim( '/' . $a->url_href, '/' ) : null,
                             'title' => $a->node_name,
                             'label' => $a->node_name,
-                        );
+                        ];
                     }
                 }
-                $crumbs[] = array( 'label' => $this->navNode->node_name, 'active' => true );
+                $crumbs[] = [ 'label' => $this->navNode->node_name, 'active' => true ];
             }
             if ( !empty( $crumbs ) ) {
                 foreach ( $crumbs as $i => &$c ) {
@@ -28,7 +28,7 @@ class FCom_Frontend_View_Breadcrumbs extends BView
                         if ( !BUtil::isUrlFull( $url ) ) {
                             $url = BApp::href( $url );
                         }
-                        $c = array( 'href' => $url, 'label' => 'Home', 'li_class' => 'home' );
+                        $c = [ 'href' => $url, 'label' => 'Home', 'li_class' => 'home' ];
                     }
                     if ( !isset( $c[ 'title' ] ) ) {
                         $c[ 'title' ] = $c[ 'label' ];
@@ -37,7 +37,7 @@ class FCom_Frontend_View_Breadcrumbs extends BView
                 unset( $c );
                 $this->crumbs_formatted = $crumbs;
             } else {
-                $this->crumbs_formatted = array();
+                $this->crumbs_formatted = [];
             }
         }
         return $this->crumbs_formatted;

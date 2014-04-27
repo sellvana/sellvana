@@ -65,8 +65,8 @@ class FCom_Sales_Model_Order_Address extends FCom_Core_Model_Abstract
 
     public function getFullAddress( $delim = "\n" )
     {
-        $addressData = array();
-        $addressParts = array( 'street1', 'street2', 'street3',  );
+        $addressData = [];
+        $addressParts = [ 'street1', 'street2', 'street3',  ];
         foreach ( $addressParts as $p ) {
             if ( $part = $this->get( $p ) ) {
                 $addressData[] = $part;

@@ -2,21 +2,21 @@
 
 class FCom_Core_View_Messages extends FCom_Core_View_Abstract
 {
-    protected $_classes = array(
+    protected $_classes = [
         'error' => 'danger',
-    );
+    ];
 
-    protected $_titles = array(
+    protected $_titles = [
         'success' => 'Success',
         'warning' => 'Warning',
         'error' => 'Error',
-    );
+    ];
 
-    protected $_icons = array(
+    protected $_icons = [
         'success' => 'ok',
         'warning' => 'exclamation',
         'error' => 'remove',
-    );
+    ];
 
     public function getMessages()
     {
@@ -25,9 +25,9 @@ class FCom_Core_View_Messages extends FCom_Core_View_Abstract
         if ( !$messages && $namespace ) {
             $messages = BSession::i()->messages( $namespace );
         }
-        $out = array();
+        $out = [];
         foreach ( (array)$messages as $m ) {
-            $out[] = array(
+            $out[] = [
                 'type' => $m[ 'type' ],
                 'msg' => !empty( $m[ 'msg' ] ) ? $m[ 'msg' ] : null,
                 'msgs' => !empty( $m[ 'msgs' ] ) ? $m[ 'msgs' ] : null,
@@ -36,7 +36,7 @@ class FCom_Core_View_Messages extends FCom_Core_View_Abstract
                     ( !empty( $this->_titles[ $m[ 'type' ] ] ) ? BLocale::_( $this->_titles[ $m[ 'type' ] ] ) : null ),
                 'icon' => isset( $m[ 'icon' ] ) ? $m[ 'icon' ] :
                     ( !empty( $this->_icons[ $m[ 'type' ] ] ) ? BLocale::_( $this->_icons[ $m[ 'type' ] ] ) : $m[ 'type' ] ),
-            );
+            ];
         }
         return $out;
     }

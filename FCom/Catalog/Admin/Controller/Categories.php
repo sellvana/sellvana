@@ -26,22 +26,22 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
                     $dir = FCom_Core_Main::i()->dir( $model->imagePath() );
                     $imageFile = $dir . $id . '.jpg';
                     if ( move_uploaded_file( $tmp, $imageFile ) ) {
-                        $results = array( 'type' => 'success', 'filename' => $id . '.jpg' );
+                        $results = [ 'type' => 'success', 'filename' => $id . '.jpg' ];
                         if ( $needConvert && !BUtil::convertImage( $imageFile, $imageFile, null, null, 'jpg' ) ) {
-                            $results = array( 'type' => 'error', 'msg' => $this->_( 'An error occurred while convert image to jpg.' ) );
+                            $results = [ 'type' => 'error', 'msg' => $this->_( 'An error occurred while convert image to jpg.' ) ];
                             $model->deleteImage(); //delete uploaded image
                         }
                     } else {
-                        $results = array( 'type' => 'error', 'msg' => $this->_( 'An error occurred while uploading image.' ) );
+                        $results = [ 'type' => 'error', 'msg' => $this->_( 'An error occurred while uploading image.' ) ];
                     }
                 } else {
-                    $results = array( 'type' => 'error', 'msg' => $this->_( 'No image file uploaded, please check again.' ) );
+                    $results = [ 'type' => 'error', 'msg' => $this->_( 'No image file uploaded, please check again.' ) ];
                 }
             } else {
-                $results = array( 'type' => 'error', 'msg' => $this->_( 'Cannot load model.' ) );
+                $results = [ 'type' => 'error', 'msg' => $this->_( 'Cannot load model.' ) ];
             }
         } catch ( Exception $e ) {
-            $results = array( 'type' => 'error', 'msg' => $e->getMessage() );
+            $results = [ 'type' => 'error', 'msg' => $e->getMessage() ];
         }
         BResponse::i()->json( $results );
     }
@@ -50,9 +50,9 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
     {
         $callback = function ( $row ) use ( $args ) {
             if ( $row->get( 'parent_id' ) != null ) {
-                array_push( $args[ 'site_map' ], array( 'loc' => BApp::frontendHref( $row->get( 'url_path' ) ), 'changefreq' => 'daily' ) );
+                array_push( $args[ 'site_map' ], [ 'loc' => BApp::frontendHref( $row->get( 'url_path' ) ), 'changefreq' => 'daily' ] );
             }
         };
-        FCom_Catalog_Model_Category::i()->orm()->select( array( 'url_path', 'parent_id' ) )->iterate( $callback );
+        FCom_Catalog_Model_Category::i()->orm()->select( [ 'url_path', 'parent_id' ] )->iterate( $callback );
     }
 }

@@ -4,7 +4,7 @@ class FCom_Admin_View_Nav extends FCom_Core_View_Abstract
 {
     protected static $_allPermissions;
 
-    protected $_tree = array();
+    protected $_tree = [];
     protected $_curNav;
 
     public function addNav( $path, $node )
@@ -52,7 +52,7 @@ class FCom_Admin_View_Nav extends FCom_Core_View_Abstract
             $this->_curNav = $this->get( 'current_nav' );
         }
         if ( empty( $root[ '/' ] ) ) {
-            return array();
+            return [];
         }
 
         uasort( $root[ '/' ], function( $a, $b ) {
@@ -66,7 +66,7 @@ class FCom_Admin_View_Nav extends FCom_Core_View_Abstract
         }
         $user = FCom_Admin_Model_User::i()->sessionUser();
 
-        $result = array();
+        $result = [];
         foreach ( $root[ '/' ] as $k => $node ) {
             $key = !empty( $node[ 'key' ] ) ? $node[ 'key' ] : $k;
             $nextPath = $path . ( $path ? '/' : '' ) . $key;

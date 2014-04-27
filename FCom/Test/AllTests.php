@@ -23,7 +23,7 @@ class FCom_Test_AllTests extends BClass
 
         $modules = BModuleRegistry::i()->getAllModules();
 
-        $testModules = array();
+        $testModules = [];
         foreach ( $modules as $module ) {
             if ( ( isset( $module->auto[ 'all' ] ) || isset( $module->auto[ 'tests' ] ) ) ) { //TODO: move to tests
                 $module->tests = $module->name . '_Tests_AllTests';
@@ -31,7 +31,7 @@ class FCom_Test_AllTests extends BClass
             if ( !empty( $module->tests ) && class_exists( $module->tests ) ) {
                 $testModules[] = $module;
                 //print_R($module->tests);
-                $suite->addTestSuite( call_user_func( array( $module->tests, 'suite' ) ) );
+                $suite->addTestSuite( call_user_func( [ $module->tests, 'suite' ] ) );
             }
         }
 

@@ -22,16 +22,16 @@ class FCom_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_Grid
     {
         $config = parent::gridConfig();
         $config[ 'id' ] = 'customer_grid_wishlist_' . $customer->id;
-        $config[ 'columns' ] = array(
-            array( 'type' => 'row_select' ),
-            array( 'name' => 'wishlist_id', 'label' => 'Wishlist ID' ),
-            array( 'name' => 'product_name', 'label' => 'Product Name' ),
-            array( 'name' => 'local_sku', 'label' => 'SKU' ),
-            array( 'name' => 'base_price', 'label' => 'Base Price' ),
-            array( 'name' => 'sale_price', 'label' => 'Sale Price' ),
-        );
+        $config[ 'columns' ] = [
+            [ 'type' => 'row_select' ],
+            [ 'name' => 'wishlist_id', 'label' => 'Wishlist ID' ],
+            [ 'name' => 'product_name', 'label' => 'Product Name' ],
+            [ 'name' => 'local_sku', 'label' => 'SKU' ],
+            [ 'name' => 'base_price', 'label' => 'Base Price' ],
+            [ 'name' => 'sale_price', 'label' => 'Sale Price' ],
+        ];
 
-        $data = array();
+        $data = [];
         $wishlistArr = FCom_Wishlist_Model_Wishlist::i()->orm()->where( 'customer_id', $customer->id )->find_many();
         if ( $wishlistArr ) {
             foreach ( $wishlistArr as $wishlist ) {
@@ -48,6 +48,6 @@ class FCom_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_Grid
         $config[ 'data' ] = $data;
         $config[ 'data_mode' ] = 'local';
         unset( $config[ 'orm' ] );
-        return array( 'config' => $config );
+        return [ 'config' => $config ];
     }
 }

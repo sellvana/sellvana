@@ -13,19 +13,19 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        $config[ 'columns' ] = array(
-            array( 'type' => 'row_select' ),
-            array( 'name' => 'role_name', 'label' => 'Role Name', 'width' => 100 ),
-            array( 'type' => 'btn_group', 'width' => 85,
-                'buttons' => array( array( 'name' => 'edit' ) ),
-             ),
-        );
-        $config[ 'actions' ] = array(
+        $config[ 'columns' ] = [
+            [ 'type' => 'row_select' ],
+            [ 'name' => 'role_name', 'label' => 'Role Name', 'width' => 100 ],
+            [ 'type' => 'btn_group', 'width' => 85,
+                'buttons' => [ [ 'name' => 'edit' ] ],
+             ],
+        ];
+        $config[ 'actions' ] = [
             'delete' => true,
-        );
-        $config[ 'filters' ] = array(
-            array( 'field' => 'role_name', 'type' => 'text' ),
-        );
+        ];
+        $config[ 'filters' ] = [
+            [ 'field' => 'role_name', 'type' => 'text' ],
+        ];
         return $config;
     }
 
@@ -33,9 +33,9 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
     {
         parent::formViewBefore( $args );
         $m = $args[ 'model' ];
-        $args[ 'view' ]->set( array(
+        $args[ 'view' ]->set( [
             'title' => $m->id ? 'Edit Role: ' . $m->role_name : 'Create New Role',
-        ) );
+        ] );
     }
 
     public function formPostBefore( $args )
@@ -43,7 +43,7 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
         parent::formPostBefore( $args );
 
         if ( empty( $args[ 'data' ][ 'model' ][ 'permissions' ] ) ) {
-            $args[ 'data' ][ 'model' ][ 'permissions' ] = array();
+            $args[ 'data' ][ 'model' ][ 'permissions' ] = [];
         }
         if ( !empty( $args[ 'data' ][ 'ie_perm_ids_add' ] ) ) {
             $iePerms = $args[ 'data' ][ 'ie_perm_ids_add' ];

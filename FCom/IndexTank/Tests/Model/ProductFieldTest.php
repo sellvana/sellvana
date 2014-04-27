@@ -10,13 +10,13 @@ class FCom_IndexTank_Tests_Model_ProductFieldTest extends FCom_Test_DatabaseTest
     {
         $this->assertEquals( 2, $this->getConnection()->getRowCount( 'fcom_indextank_product_field' ), "Pre-Condition" );
 
-        $data = array(
+        $data = [
             'field_name'        => "description",
             'field_type'        => "text",
             'source_type'       => 'product',
             'source_value'      => "description",
             'search'            => 1
-        );
+        ];
         FCom_IndexTank_Model_ProductField::orm()->create( $data )->save();
 
         $this->assertEquals( 3, $this->getConnection()->getRowCount( 'fcom_indextank_product_field' ), "Insert failed" );

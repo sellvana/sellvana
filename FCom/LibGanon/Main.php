@@ -32,7 +32,7 @@ class FCom_LibGanon_Main extends BClass
      * @param array $args
      * @return FCom_LibGanon_Main
      */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
@@ -50,7 +50,7 @@ class FCom_LibGanon_Main extends BClass
         }
     }
 
-    public function ready( $callback, $args = array() )
+    public function ready( $callback, $args = [] )
     {
         if ( empty( $args[ 'on_path' ] ) ) {
             BEvents::i()->on( 'FCom_LibGanon_Main::render', $callback, $args );

@@ -25,12 +25,12 @@ class BImportTest extends PHPUnit_Framework_TestCase
      */
     public function testGetFieldOptions()
     {
-        $expected = array(
+        $expected = [
             'field1' => 'field1',
             'field2' => 'field2',
             'field3' => 'field3',
             'field4' => 'field4',
-        );
+        ];
 
         $this->assertEquals( $expected, $this->object->getFieldOptions() );
     }
@@ -51,7 +51,7 @@ class BImportTest extends PHPUnit_Framework_TestCase
     public function testUpdateFieldsDueToInfo()
     {
         $this->assertNotContains( 'field5', array_keys( $this->object->getFieldData() ) );
-        $this->object->updateFieldsDueToInfo( array( 'field5' => 'f5' ) ); // there is no documentation, how should $info look like, so I use this implementation
+        $this->object->updateFieldsDueToInfo( [ 'field5' => 'f5' ] ); // there is no documentation, how should $info look like, so I use this implementation
         $this->assertContains( 'field5', array_keys( $this->object->getFieldData() ) );
     }
 
@@ -61,11 +61,11 @@ class BImportTest extends PHPUnit_Framework_TestCase
     public function testGetFileInfo()
     {
         $file = dirname( __FILE__ ) . '/ftp/test.txt';
-        $info = array(
+        $info = [
             'delim' => ',',
             'skip_first' => false,
-            'first_row' => array( "test1", "test2", "test3", "test4", "test5" ),
-        );
+            'first_row' => [ "test1", "test2", "test3", "test4", "test5" ],
+        ];
         $result = $this->object->getFileInfo( $file );
         $this->assertFalse( $result ); // if file does not match csv, return is false
         $files = glob( dirname( __FILE__ ) . '/ftp/test*csv.txt' );
@@ -101,22 +101,22 @@ class BImportTest extends PHPUnit_Framework_TestCase
     public function testConfig()
     {
         BConfig::i()->add(
-            array(
-                 'fs' => array(
+            [
+                 'fs' => [
                      'root_dir' => realpath( __DIR__ . DIRECTORY_SEPARATOR . '..' )
-                 ),
-            )
+                 ],
+            ]
         );
         BSession::i()->open( 'test' );
         // initially config has no value
         $this->assertFalse( $this->object->config() );
         // prepare base config
-        $config = array( 'test' => 'value' );
+        $config = [ 'test' => 'value' ];
         // set config, returns true
         $this->assertTrue( $this->object->config( $config ) );
 
         // check that current config matches expected value, 'status' key is added in method
-        $config += array( 'status' => 'idle' );
+        $config += [ 'status' => 'idle' ];
         $this->assertEquals( $config, $this->object->config() );
 
         // test that status key can be set from external config, change external config a bit and check that it is in use
@@ -129,7 +129,7 @@ class BImportTest extends PHPUnit_Framework_TestCase
         unset( $config[ 'status' ] );
         $config[ 'test' ] = 'value2';
         $this->assertTrue( $this->object->config( $config, true ) );
-        $this->assertEquals( $config + array( 'status' => 'request' ), $this->object->config() );
+        $this->assertEquals( $config + [ 'status' => 'request' ], $this->object->config() );
 
         // test removing config
         $this->assertTrue( $this->object->config( false ) );
@@ -161,14 +161,14 @@ class BImportTest extends PHPUnit_Framework_TestCase
     public function testRun()
     {
         $this->object->setModel( 'ModelDouble' );
-        $config = array(
+        $config = [
             'filename' => 'test_semicolon_csv.txt',
             'batch_size' => '10',
             'multivalue_separator' => '|',
             'nesting_separator' => '>',
-            'defaults' => array( 'f1' => 'v1' ),
-        );
-        $config += $this->object->getFileInfo( $this->object->getImportDir() . "/" . $config['filename'] );
+            'defaults' => [ 'f1' => 'v1' ],
+        ];
+        $config += $this->object->getFileInfo( $this->object->getImportDir() . "/" . $config[ 'filename' ] );
         $this->object->config( $config );
         $this->object->run();
     }
@@ -176,12 +176,12 @@ class BImportTest extends PHPUnit_Framework_TestCase
 
 class BImportDouble extends BImport
 {
-    protected $fields = array(
-        'field1' => array( 'pattern' => 'f1' ),
-        'field2' => array( 'pattern' => 'f2' ),
-        'field3' => array( 'pattern' => 'f3' ),
-        'field4' => array( 'pattern' => 'f4' ),
-    );
+    protected $fields = [
+        'field1' => [ 'pattern' => 'f1' ],
+        'field2' => [ 'pattern' => 'f2' ],
+        'field3' => [ 'pattern' => 'f3' ],
+        'field4' => [ 'pattern' => 'f4' ],
+    ];
 
     public function updateFieldsDueToInfo( $info )
     {

@@ -79,7 +79,7 @@ class FCom_IndexTank_Cron extends BClass
     {
         $orm = FCom_Catalog_Model_Product::orm( 'p' )->select( 'p.*' )
                 ->where( 'disabled', $disabled )
-                ->where_in( "indextank_indexed", array( 1, 0 ) );
+                ->where_in( "indextank_indexed", [ 1, 0 ] );
 
         $batchSize = BConfig::i()->get( 'modules/FCom_IndexTank/index_products_limit' );
         if ( !$batchSize ) {
@@ -103,17 +103,17 @@ class FCom_IndexTank_Cron extends BClass
     public function setProductsStatus( $status, $products )
     {
         if ( !is_array( $products ) ) {
-            $products = array( $products );
+            $products = [ $products ];
         }
-        $productIds = array();
+        $productIds = [];
         foreach ( $products as $p ) {
             $productIds[] = $p->id();
         }
-        $updateQuery = array();
+        $updateQuery = [];
         if ( $status ) {
-            $updateQuery = array( "indextank_indexed" => $status, "indextank_indexed_at" => date( "Y-m-d H:i:s" ) );
+            $updateQuery = [ "indextank_indexed" => $status, "indextank_indexed_at" => date( "Y-m-d H:i:s" ) ];
         } else {
-            $updateQuery = array( "indextank_indexed" => $status );
+            $updateQuery = [ "indextank_indexed" => $status ];
         }
         FCom_Catalog_Model_Product::i()->update_many( $updateQuery,
                     "id in (" . implode( ",", $productIds ) . ")" );

@@ -15,7 +15,7 @@ class FCom_Core_Model_Config extends FCom_Core_Model_Abstract
         if ( ( $row = static::load( $path ) ) ) {
             $row->set( 'value', $value )->save();
         } else {
-            static::create( array( 'path' => $path, 'value' => $value ) )->save();
+            static::create( [ 'path' => $path, 'value' => $value ] )->save();
         }
     }
 

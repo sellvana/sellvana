@@ -11,10 +11,10 @@ class FCom_Frontend_Main extends BClass
 
             $modules = BModuleRegistry::i()->getAllModules();
             foreach ( $modules as $mod ) {
-                $autoUse = !empty( $mod->auto_use ) ? array_flip( (array)$mod->auto_use ) : array();
+                $autoUse = !empty( $mod->auto_use ) ? array_flip( (array)$mod->auto_use ) : [];
                 $frontendAutoUse = !empty( $mod->areas[ 'FCom_Frontend' ][ 'auto_use' ] )
                     ? array_flip( (array)$mod->areas[ 'FCom_Frontend' ][ 'auto_use' ] )
-                    : array();
+                    : [];
                 if ( empty( $autoUse[ 'views' ] ) && empty( $frontendAutoUse[ 'views' ] ) ) {
                     continue;
                 }

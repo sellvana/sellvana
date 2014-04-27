@@ -1,4 +1,4 @@
-<?php return array( 'Subscription Preferences' => '',
+<?php return [ 'Subscription Preferences' => '',
 'Your email' => '',
 'Unsubscribe from all non-transactional emails' => '',
 'Save Preferences' => '',
@@ -11,4 +11,4 @@
 'Newsletter' => '',
 'Sign Up for Our Newsletter' => '',
 'Sign up for our newsletter' => '',
-'Subscribe' => '' );
+'Subscribe' => '' ];

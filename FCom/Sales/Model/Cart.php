@@ -36,14 +36,14 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
 
     protected static $_sessionCart;
-    protected static $_totalRowHandlers = array();
+    protected static $_totalRowHandlers = [];
 
-    protected static $_fieldOptions = array(
-        'status' => array(
+    protected static $_fieldOptions = [
+        'status' => [
             'new'     => 'New',
             'ordered' => 'Ordered',
-        ),
-    );
+        ],
+    ];
 
     public $addresses;
     public $items;
@@ -82,7 +82,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                         static::$_sessionCart = $cart;
                         static::sessionCartId( $cart->id );
                     } else {
-                        static::$_sessionCart = static::i()->create( array( 'session_id' => $sessionId ) );
+                        static::$_sessionCart = static::i()->create( [ 'session_id' => $sessionId ] );
                         static::sessionCartId();
                     }
                 }
@@ -102,7 +102,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         // get session cart id
         $sessCartId = static::sessionCartId();
         // try to load customer cart which is new (not abandoned or converted to order)
-        $custCart = FCom_Sales_Model_Cart::i()->load( array( $customer->id => 'customer_id', 'status' => 'new' ) );
+        $custCart = FCom_Sales_Model_Cart::i()->load( [ $customer->id => 'customer_id', 'status' => 'new' ] );
 
         if ( $sessCartId && $custCart && $sessCartId !== $custCart->id ) {
 
@@ -133,7 +133,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     {
         $cart = static::i()->load( $cartId );
         foreach ( $cart->items() as $item ) {
-            $this->addProduct( $item->product_id, array( 'qty' => $item->qty, 'price' => $item->price ) );
+            $this->addProduct( $item->product_id, [ 'qty' => $item->qty, 'price' => $item->price ] );
         }
         $cart->delete();
         $this->calculateTotals()->save();
@@ -154,13 +154,13 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function recentItems( $limit = 3 )
     {
         if ( !$this->id() ) {
-            return array();
+            return [];
         }
         $orm = FCom_Sales_Model_Cart_Item::i()->orm( 'ci' )->where( 'ci.cart_id', $this->id() )
             ->order_by_desc( 'ci.update_at' )->limit( $limit );
-        BEvents::i()->fire( __METHOD__ . ':orm', array( 'orm' => $orm ) );
+        BEvents::i()->fire( __METHOD__ . ':orm', [ 'orm' => $orm ] );
         $items = $orm->find_many();
-        BEvents::i()->fire( __METHOD__ . ':data', array( 'items' => &$items ) );
+        BEvents::i()->fire( __METHOD__ . ':data', [ 'items' => &$items ] );
         return $items;
     }
 
@@ -169,7 +169,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if ( is_null( $items ) ) {
             $items = $this->items();
         }
-        $productIds = array();
+        $productIds = [];
         foreach ( $items as $item ) {
             if ( $item->product ) continue;
             if ( ( $cached = FCom_Catalog_Model_Product::i()->cacheFetch( 'id', $item->product_id ) ) ) {
@@ -193,7 +193,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $tProduct = FCom_Catalog_Model_Product::table();
         $tCartItem = FCom_Sales_Model_Cart_Item::table();
         return BDb::many_as_array( FCom_Catalog_Model_Product::i()->orm()
-            ->join( $tCartItem, array( $tCartItem . '.product_id', '=', $tProduct . '.id' ) )
+            ->join( $tCartItem, [ $tCartItem . '.product_id', '=', $tProduct . '.id' ] )
             ->select( $tProduct . '.*' )
             ->select( $tCartItem . '.*' )
             ->where( $tCartItem . '.cart_id', $cartId )
@@ -209,7 +209,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this->get( 'item_qty' ) * 1;
     }
 
-    public function addProduct( $productId, $params = array() )
+    public function addProduct( $productId, $params = [] )
     {
         //save cart to DB on add first product
         if ( !$this->id() ) {
@@ -226,20 +226,20 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         } else {
             $params[ 'price' ] = $params[ 'price' ]; //$params['price'] * $params['qty']; // ??
         }
-        $item = FCom_Sales_Model_Cart_Item::i()->load( array( 'cart_id' => $this->id, 'product_id' => $productId ) );
+        $item = FCom_Sales_Model_Cart_Item::i()->load( [ 'cart_id' => $this->id, 'product_id' => $productId ] );
         if ( $item && $item->promo_id_get == 0 ) {
             $item->add( 'qty', $params[ 'qty' ] );
             $item->set( 'price', $params[ 'price' ] );
         } else {
-            $item = FCom_Sales_Model_Cart_Item::i()->create( array( 'cart_id' => $this->id, 'product_id' => $productId,
-                'qty' => $params[ 'qty' ], 'price' => $params[ 'price' ] ) );
+            $item = FCom_Sales_Model_Cart_Item::i()->create( [ 'cart_id' => $this->id, 'product_id' => $productId,
+                'qty' => $params[ 'qty' ], 'price' => $params[ 'price' ] ] );
         }
         $item->save();
         if ( empty( $params[ 'no_calc_totals' ] ) ) {
             $this->calculateTotals()->save();
         }
 
-        BEvents::i()->fire( __METHOD__, array( 'model' => $this, 'item' => $item ) );
+        BEvents::i()->fire( __METHOD__, [ 'model' => $this, 'item' => $item ] );
 
         static::sessionCartId( $this->id );
         return $this;
@@ -263,7 +263,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     {
         $this->items();
         $this->removeItem( $this->childById( 'items', $productId, 'product_id' ) );
-        BEvents::i()->fire( __METHOD__, array( 'model' => $this ) );
+        BEvents::i()->fire( __METHOD__, [ 'model' => $this ] );
         return $this;
     }
 
@@ -290,7 +290,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function getTotalRowInstances()
     {
         if ( !$this->totals ) {
-            $this->totals = array();
+            $this->totals = [];
             foreach ( static::$_totalRowHandlers as $name => $class ) {
                 $inst = $class::i( true )->init( $this );
                 $this->totals[ $inst->getCode() ] = $inst;
@@ -304,7 +304,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     {
         $this->loadProducts();
         $data = $this->data;
-        $data[ 'totals' ] = array();
+        $data[ 'totals' ] = [];
         foreach ( $this->getTotalRowInstances() as $total ) {
             $total->init( $this )->calculate();
             $data[ 'totals' ][ $total->getCode() ] = $total->asArray();
@@ -356,7 +356,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function onAfterLoad()
     {
         parent::onAfterLoad();
-        $this->data = !empty( $this->data_serialized ) ? BUtil::fromJson( $this->data_serialized ) : array();
+        $this->data = !empty( $this->data_serialized ) ? BUtil::fromJson( $this->data_serialized ) : [];
     }
 
     public function getAddressByType( $atype )
@@ -388,7 +388,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     {
         $address = $this->getAddressByType( $atype );
         if ( !$address ) {
-            $address = FCom_Sales_Model_Cart_Address::i()->create( array( 'cart_id' => $this->id, 'atype' => $atype ) );
+            $address = FCom_Sales_Model_Cart_Address::i()->create( [ 'cart_id' => $this->id, 'atype' => $atype ] );
         }
         if ( $data instanceof FCom_Customer_Model_Address ) {
             $data = BUtil::arrayMask( $data->as_array(), 'firstname,lastname,attn,' .
@@ -479,7 +479,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function setStatus( $status )
     {
         $this->set( 'status', $status );
-        BEvents::i()->fire( __METHOD__, array( 'cart' => $this, 'status' => $status ) );
+        BEvents::i()->fire( __METHOD__, [ 'cart' => $this, 'status' => $status ] );
         return $this;
     }
 
@@ -488,7 +488,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $cart = $this->orm ? $this : static::sessionCart();
         try {
             /* @var $cart FCom_Sales_Model_Cart */
-            $order = FCom_Sales_Model_Order::i()->createFromCart( $cart, array( 'all_components' => true ) );
+            $order = FCom_Sales_Model_Order::i()->createFromCart( $cart, [ 'all_components' => true ] );
             $order->save();
 
             //$order->importAllComponentsFromCart($cart);
@@ -515,7 +515,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $this->totals = null;
     }
 
-    public function setPaymentDetails( $data = array() )
+    public function setPaymentDetails( $data = [] )
     {
         if ( !empty( $data ) ) {
             $paymentMethod = $this->getPaymentMethod();

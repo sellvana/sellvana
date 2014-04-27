@@ -27,10 +27,10 @@ class FCom_AdminChat_Model_UserStatus extends FCom_Core_Model_Abstract
             static::$_sessionUserStatus = static::load( $userId, 'user_id' );
 
             if ( $createIfNotExists && !static::$_sessionUserStatus ) {
-                static::$_sessionUserStatus = static::create( array(
+                static::$_sessionUserStatus = static::create( [
                     'user_id' => $userId,
                     'status' => $defaultStatus,
-                ) );
+                ] );
             }
         }
         return static::$_sessionUserStatus;
@@ -49,12 +49,12 @@ class FCom_AdminChat_Model_UserStatus extends FCom_Core_Model_Abstract
                 $user = $userHlp->load( $userId );
             }
             $channel = FCom_PushServer_Model_Channel::i()->getChannel( 'adminuser', true );
-            $channel->send( array(
+            $channel->send( [
                 'signal' => 'status',
-                'users' => array(
-                    array( 'username' => $user->get( 'username' ), 'status' => $status ),
-                ),
-            ) );
+                'users' => [
+                    [ 'username' => $user->get( 'username' ), 'status' => $status ],
+                ],
+            ] );
         }
         return $this;
     }

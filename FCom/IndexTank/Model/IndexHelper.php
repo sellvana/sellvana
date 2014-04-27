@@ -16,7 +16,7 @@ class FCom_IndexTank_Model_IndexHelper extends FCom_Core_Model_Abstract
     *
     * @return FCom_IndexTank_Model_IndexHelper
     */
-    public static function i( $new = false, array $args = array() )
+    public static function i( $new = false, array $args = [] )
     {
         return BClassRegistry::instance( __CLASS__, $args, !$new );
     }

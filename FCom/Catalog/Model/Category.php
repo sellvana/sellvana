@@ -8,20 +8,20 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 
     protected static $_urlPrefix;
 
-    protected static $_importExportProfile = array(
-        'skip'    => array(
+    protected static $_importExportProfile = [
+        'skip'    => [
             'id_path'
-        ),
-        'related' => array(
+        ],
+        'related' => [
             'parent_id' => 'FCom_Catalog_Model_Category.id',
-        ),
+        ],
         'unique_key' => 'url_path'
-    );
+    ];
 
     public function productsORM()
     {
         return FCom_Catalog_Model_Product::i()->orm( 'p' )
-            ->join( 'FCom_Catalog_Model_CategoryProduct', array( 'pc.product_id', '=', 'p.id' ), 'pc' )
+            ->join( 'FCom_Catalog_Model_CategoryProduct', [ 'pc.product_id', '=', 'p.id' ], 'pc' )
             ->where( 'pc.category_id', $this->id );
     }
 
@@ -68,16 +68,16 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 
     public function prepareApiData( $categories )
     {
-        $result = array();
+        $result = [];
         foreach ( $categories as $category ) {
-            $result[] = array(
+            $result[] = [
                 'id' => $category->id,
                 'parent_id' => $category->parent_id,
                 'name'  => $category->node_name,
                 'url'   => $category->url_key,
                 'path'  => $category->id_path,
                 'children'  => $category->num_children
-            );
+            ];
         }
         return $result;
     }
@@ -85,7 +85,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
     public function parentNodeList()
     {
         $categories = self::orm()->find_many();
-        $result = array();
+        $result = [];
         if ( empty( $categories ) ) {
             return $result;
         }
@@ -114,11 +114,11 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         }
         if ( $maxLevel === 2 ) {
             if ( sizeof( $categories ) === 0 ) {
-                $subcats = array();
+                $subcats = [];
             } else {
                 $subcats = static::orm()->where_in( 'parent_id', array_keys( $categories ) )->find_many();
             }
-            $children = array();
+            $children = [];
             foreach ( $subcats as $sc ) {
                 $children[ $sc->get( 'parent_id' ) ][] = $sc;
             }
@@ -133,11 +133,11 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
     {
         parent::onAfterCreate();
 
-        $this->set( array(
+        $this->set( [
             'show_products' => 1,
             'show_sidebar' => 1,
             'is_enabled' => 1,
-        ) );
+        ] );
     }
 
     public function onAfterSave()
@@ -151,14 +151,14 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             $exists = $hlp->orm( 'cp' )->where( 'category_id', $this->id() )->where_in( 'product_id', $addIds )->find_many_assoc( 'product_id' );
             foreach ( $addIds as $pId ) {
                 if ( empty( $exists[ $pId ] ) ) {
-                    $hlp->create( array( 'category_id' => $this->id(), 'product_id' => $pId ) )->save();
+                    $hlp->create( [ 'category_id' => $this->id(), 'product_id' => $pId ] )->save();
                 }
             }
         }
         if ( sizeof( $removeIds ) > 0 && $removeIds[ 0 ] != '' ) {
-            $hlp->delete_many( array( 'category_id' => $this->id(), 'product_id' => $removeIds ) );
+            $hlp->delete_many( [ 'category_id' => $this->id(), 'product_id' => $removeIds ] );
         }
-        BEvents::i()->fire( __METHOD__ . ':products', array( 'model' => $this, 'add_ids' => $addIds, 'remove_ids' => $removeIds ) );
+        BEvents::i()->fire( __METHOD__ . ':products', [ 'model' => $this, 'add_ids' => $addIds, 'remove_ids' => $removeIds ] );
     }
 
     public function imagePath()
@@ -178,12 +178,12 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 
     public function getPageParts( $onlyEnabled = false )
     {
-        $allParts = array(
+        $allParts = [
             'content' => 'Custom Content',
             'view' => 'Block / Page',
             'sub_cat' => 'Subcategories',
             'products' => 'Products',
-        );
+        ];
         if ( $onlyEnabled ) {
             foreach ( $allParts as $k => $l ) {
                 if ( !$this->get( 'show_' . $k ) ) {
@@ -195,7 +195,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             return $allParts;
         }
         $parts = explode( ',', $this->get( 'page_parts' ) );
-        $result = array();
+        $result = [];
         foreach ( $parts as $k ) {
             $result[ $k ] = isset( $allParts[ $k ] ) ? $allParts[ $k ] : null;
         }
@@ -229,7 +229,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             $toUpdate = $args[ 'models' ];
         } else {
             $toUpdate = static::i()->orm()
-                  ->where( array( 'parent_id IS NULL', array( 'OR' => 'id_path IS NULL' ) ) )
+                  ->where( [ 'parent_id IS NULL', [ 'OR' => 'id_path IS NULL' ] ] )
                   ->find_many_assoc();
         }
         if ( empty( $toUpdate ) ) {
@@ -245,8 +245,8 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
               'iem.id=model_id and iem.model_name=\'' . static::origClass() . '\'',
               'iem'
             )
-            ->where( array( 'site_id' => $importSite->id() ) )
-            ->where( array( 'local_id' => $ids ) )
+            ->where( [ 'site_id' => $importSite->id() ] )
+            ->where( [ 'local_id' => $ids ] )
             ->find_many();
 
         if ( empty( $importData ) ) {
@@ -254,7 +254,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             return;
         }
 
-        $relations = array();
+        $relations = [];
 
         foreach ( $importData as $item ) {
             $rel = $item->get( 'relations' );
@@ -265,7 +265,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         }
         unset( $rel );
 
-        $fetch = array();
+        $fetch = [];
         foreach ( $relations as $v ) {
             foreach ( $v as $id ) {
                 if ( !isset( $fetch[ $id ] ) ) {
@@ -279,8 +279,8 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
               'iem.id=model_id and iem.model_name=\'' . static::origClass() . '\'',
               'iem'
             )
-            ->where( array( 'site_id' => $importSite->id() ) )
-            ->where( array( 'import_id' => array_keys( $fetch ) ) )
+            ->where( [ 'site_id' => $importSite->id() ] )
+            ->where( [ 'import_id' => array_keys( $fetch ) ] )
             ->find_many_assoc( 'import_id' );
 
         foreach ( $relations as $k => $v ) {
