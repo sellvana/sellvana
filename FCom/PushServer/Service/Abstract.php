@@ -5,21 +5,21 @@ class FCom_PushServer_Service_Abstract extends BClass implements FCom_PushServer
     protected $_message;
     protected $_client;
 
-    public function setMessage($message, $client = null)
+    public function setMessage( $message, $client = null )
     {
         $this->_message = $message;
         $this->_client = $client;
         return $this;
     }
 
-    public function reply($message)
+    public function reply( $message )
     {
-        $message['ref_seq'] = !empty($this->_message['seq']) ? $this->_message['seq'] : null;
-        $message['ref_signal'] = !empty($this->_message['signal']) ? $this->_message['signal'] : null;
-        if (empty($message['channel'])) {
-            $message['channel'] = $this->_message['channel'];
+        $message[ 'ref_seq' ] = !empty( $this->_message[ 'seq' ] ) ? $this->_message[ 'seq' ] : null;
+        $message[ 'ref_signal' ] = !empty( $this->_message[ 'signal' ] ) ? $this->_message[ 'signal' ] : null;
+        if ( empty( $message[ 'channel' ] ) ) {
+            $message[ 'channel' ] = $this->_message[ 'channel' ];
         }
-        $this->_client->send($message);
+        $this->_client->send( $message );
         return $this;
     }
 
@@ -35,6 +35,6 @@ class FCom_PushServer_Service_Abstract extends BClass implements FCom_PushServer
 
     public function onUnknownSignal()
     {
-        $this->reply(array('signal' => 'error', 'description' => 'Unknown signal'));
+        $this->reply( [ 'signal' => 'error', 'description' => 'Unknown signal' ] );
     }
 }

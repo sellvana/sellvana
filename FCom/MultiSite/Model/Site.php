@@ -5,10 +5,10 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
     static protected $_table = 'fcom_multisite_site';
     static protected $_mapCacheKey = 'FCom_MultiSite.domain_map';
 
-    protected static $_validationRules = array(
-        array('name', '@required'),
-        array('root_category_id', '@integer'),
-    );
+    protected static $_validationRules = [
+        [ 'name', '@required' ],
+        [ 'root_category_id', '@integer' ],
+    ];
 
     public function onAfterSave()
     {
@@ -18,48 +18,48 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
 
     static public function createDomainMap()
     {
-        if (!BDb::ddlTableExists(static::table())) {
-            return array();
+        if ( !BDb::ddlTableExists( static::table() ) ) {
+            return [];
         }
-        $map = array();
+        $map = [];
         $sites = (array)static::i()->orm()->find_many();
-        foreach ($sites as $site) {
-            $domains = explode("\n", $site->match_domains);
-            foreach ($domains as $pattern) {
-                if(empty($pattern)){
+        foreach ( $sites as $site ) {
+            $domains = explode( "\n", $site->match_domains );
+            foreach ( $domains as $pattern ) {
+                if ( empty( $pattern ) ) {
                     continue;
                 }
-                if ($pattern[0]==='^') {
+                if ( $pattern[ 0 ] === '^' ) {
                     $regex = $pattern;
                 } else {
-                    $regex = str_replace('*', '.*', str_replace('.', '\\.', strtolower($pattern)));
+                    $regex = str_replace( '*', '.*', str_replace( '.', '\\.', strtolower( $pattern ) ) );
                 }
-                $map[$regex] = $site->as_array();
+                $map[ $regex ] = $site->as_array();
             }
         }
-        BCache::i()->save(static::$_mapCacheKey, $map, false);
+        BCache::i()->save( static::$_mapCacheKey, $map, false );
         return $map;
     }
 
     static public function getDomainMap()
     {
-        $map = BCache::i()->load(static::$_mapCacheKey);
-        if (!$map) {
+        $map = BCache::i()->load( static::$_mapCacheKey );
+        if ( !$map ) {
             $map = static::i()->createDomainMap();
         }
         return $map;
     }
 
-    static public function findByDomain($domain=null)
+    static public function findByDomain( $domain = null )
     {
-        if (is_null($domain)) {
-            $domain = BRequest::i()->httpHost(false);
+        if ( is_null( $domain ) ) {
+            $domain = BRequest::i()->httpHost( false );
         }
-        $domain = strtolower($domain);
+        $domain = strtolower( $domain );
         $map = (array)static::i()->getDomainMap();
         $site = null;
-        foreach ($map as $pattern=>$siteData) {
-            if (preg_match('#'.$pattern.'#', $domain)) {
+        foreach ( $map as $pattern => $siteData ) {
+            if ( preg_match( '#' . $pattern . '#', $domain ) ) {
                 $site = $siteData;
                 break;
             }
@@ -70,7 +70,7 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
     public function siteOptions()
     {
         $sites = (array)static::i()->orm()->find_many();
-        $groups = array();
+        $groups = [];
         foreach ( $sites as $model ) {
             $key            = $model->id;
             $groups[ $key ] = $model->name;

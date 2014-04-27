@@ -5,7 +5,7 @@ class FCom_Promo_Migrate extends BClass
     public function install__0_1_6()
     {
         $tPromo = FCom_Promo_Model_Promo::table();
-        BDb::run("
+        BDb::run( "
             CREATE TABLE IF NOT EXISTS {$tPromo}(
             `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
             `description` VARCHAR(255)  NOT NULL  ,
@@ -27,10 +27,10 @@ class FCom_Promo_Migrate extends BClass
             `coupon` varchar(100) NULL  ,
             PRIMARY KEY (`id`)
             ) ENGINE=INNODB DEFAULT CHARSET='utf8';
-        ");
+        " );
 
         $tGroup = FCom_Promo_Model_Group::table();
-        BDb::run("
+        BDb::run( "
             CREATE TABLE IF NOT EXISTS {$tGroup}(
     `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
     `promo_id` INT(10) UNSIGNED NOT NULL  ,
@@ -39,10 +39,10 @@ class FCom_Promo_Migrate extends BClass
     PRIMARY KEY (`id`) ,
     KEY `FK_promo_group_promo`(`promo_id`)
 ) ENGINE=INNODB DEFAULT CHARSET='utf8';
-        ");
+        " );
 
         $tMedia = FCom_Promo_Model_Media::table();
-        BDb::run("
+        BDb::run( "
             CREATE TABLE IF NOT EXISTS $tMedia(
     `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
     `promo_id` INT(10) UNSIGNED NULL  ,
@@ -53,10 +53,10 @@ class FCom_Promo_Migrate extends BClass
     KEY `FK_promo_media_file`(`file_id`) ,
     KEY `FK_promo_media_promo`(`promo_id`)
 ) ENGINE=INNODB DEFAULT CHARSET='utf8';
-        ");
+        " );
 
         $tProduct = FCom_Promo_Model_Product::table();
-        BDb::run("
+        BDb::run( "
             CREATE TABLE IF NOT EXISTS $tProduct(
     `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
     `promo_id` INT(10) UNSIGNED NOT NULL  ,
@@ -68,10 +68,10 @@ class FCom_Promo_Migrate extends BClass
     KEY `FK_promo_product_product`(`product_id`) ,
     KEY `FK_promo_product_group`(`group_id`)
 ) ENGINE=INNODB DEFAULT CHARSET='utf8';
-        ");
+        " );
 
         $tCart = FCom_Promo_Model_Cart::table();
-        BDb::run("
+        BDb::run( "
             CREATE TABLE IF NOT EXISTS $tCart(
             `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
             `cart_id` INT(10) UNSIGNED NOT NULL  ,
@@ -79,77 +79,77 @@ class FCom_Promo_Migrate extends BClass
             `update_at` datetime NULL  ,
             PRIMARY KEY (`id`)
         ) ENGINE=INNODB DEFAULT CHARSET='utf8';
-        ");
+        " );
     }
 
     public function upgrade__0_1_0__0_1_1()
     {
         $tCart = FCom_Promo_Model_Cart::table();
-        BDb::run("
+        BDb::run( "
             CREATE TABLE IF NOT EXISTS $tCart(
             `id` INT(10) UNSIGNED NOT NULL  AUTO_INCREMENT ,
             `cart_id` INT(10) UNSIGNED NOT NULL  ,
             `promo_id` INT(10) UNSIGNED NOT NULL  ,
             PRIMARY KEY (`id`)
         ) ENGINE=INNODB DEFAULT CHARSET='utf8';
-        ");
+        " );
     }
 
     public function upgrade__0_1_1__0_1_2()
     {
         $tCart = FCom_Promo_Model_Cart::table();
-        BDb::ddlAddColumns($tCart, array('updated_dt' => "datetime"));
+        BDb::ddlAddColumns( $tCart, [ 'updated_dt' => "datetime" ] );
     }
 
     public function upgrade__0_1_2__0_1_3()
     {
         $table = FCom_Promo_Model_Cart::table();
-        BDb::ddlTableDef($table, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef( $table, [
+            'COLUMNS' => [
                   'updated_dt'      => 'RENAME updated_at datetime NULL',
-            ),
-        ));
+            ],
+        ] );
         $table = FCom_Promo_Model_Promo::table();
-        BDb::ddlTableDef($table, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef( $table, [
+            'COLUMNS' => [
                   'create_dt'      => 'RENAME create_at datetime NOT NULL',
                   'update_dt'      => 'RENAME update_at datetime NULL',
-            ),
-        ));
+            ],
+        ] );
     }
 
     public function upgrade__0_1_3__0_1_4()
     {
 
         $table = FCom_Promo_Model_Cart::table();
-        BDb::ddlTableDef($table, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef( $table, [
+            'COLUMNS' => [
                   'updated_at'      => 'RENAME update_at datetime NULL',
-            ),
-        ));
+            ],
+        ] );
     }
 
     public function upgrade__0_1_4__0_1_5()
     {
 
         $table = FCom_Promo_Model_Promo::table();
-        BDb::ddlTableDef($table, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef( $table, [
+            'COLUMNS' => [
                 "coupon"          => "varchar(100)",
                 "manuf_vendor_id" => "INT(10) UNSIGNED NULL",
                 "buy_group"       => "ENUM('one', 'any', 'all', 'cat', 'anyp')  NOT NULL  DEFAULT 'one'"
-            ),
-        ));
+            ],
+        ] );
     }
 
     public function upgrade__0_1_5__0_1_6()
     {
 
         $table = FCom_Promo_Model_Promo::table();
-        BDb::ddlTableDef($table, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef( $table, [
+            'COLUMNS' => [
                 "get_type"       => "enum('qty','$','%','text','choice','free') NOT NULL DEFAULT 'qty'"
-            ),
-        ));
+            ],
+        ] );
     }
 }

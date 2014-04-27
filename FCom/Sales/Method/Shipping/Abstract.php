@@ -15,11 +15,11 @@ abstract class FCom_Sales_Method_Shipping_Abstract extends BClass implements
         return $this->_sortOrder;
     }
 
-    public function getService($serviceKey)
+    public function getService( $serviceKey )
     {
         $services = $this->getServices();
-        if (!empty($services[$serviceKey])) {
-            return $services[$serviceKey];
+        if ( !empty( $services[ $serviceKey ] ) ) {
+            return $services[ $serviceKey ];
         }
         return false;
     }
