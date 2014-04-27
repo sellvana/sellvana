@@ -435,11 +435,11 @@ EOT
     * Clear DDL cache
     *
     */
-    public static function ddlClearCache( $fullTableName = null )
+    public static function ddlClearCache( $fullTableName = null, $connectionName = null )
     {
         if ( $fullTableName ) {
             if ( !static::dbName() ) {
-                static::connect( static::$_defaultConnectionName );
+                static::connect( $connectionName ? $connectionName : static::$_defaultConnectionName );
             }
             $a = explode( '.', $fullTableName );
             $dbName = empty( $a[ 1 ] ) ? static::dbName() : $a[ 0 ];
@@ -456,10 +456,10 @@ EOT
     * @param string $fullTableName
     * @return bool
     */
-    public static function ddlTableExists( $fullTableName )
+    public static function ddlTableExists( $fullTableName, $connectionName = null )
     {
         if ( !static::dbName() ) {
-            static::connect( static::$_defaultConnectionName );
+            static::connect( $connectionName ? $connectionName : static::$_defaultConnectionName );
         }
         $a = explode( '.', $fullTableName );
         $dbName = strtolower( empty( $a[ 1 ] ) ? static::dbName() : $a[ 0 ] );
@@ -487,9 +487,9 @@ EOT
     * @throws BException
     * @return mixed
     */
-    public static function ddlFieldInfo( $fullTableName, $fieldName = null )
+    public static function ddlFieldInfo( $fullTableName, $fieldName = null, $connectionName = null )
     {
-        self::checkTable( $fullTableName );
+        self::checkTable( $fullTableName, $connectionName );
         $a = explode( '.', $fullTableName );
         $dbName = empty( $a[ 1 ] ) ? static::dbName() : $a[ 0 ];
         $tableName = empty( $a[ 1 ] ) ? $fullTableName : $a[ 1 ];
@@ -506,9 +506,9 @@ EOT
      * @param string $fullTableName
      * @throws BException
      */
-    protected static function checkTable( $fullTableName )
+    protected static function checkTable( $fullTableName, $connectionName = null )
     {
-        if ( !static::ddlTableExists( $fullTableName ) ) {
+        if ( !static::ddlTableExists( $fullTableName, $connectionName ) ) {
             throw new BException( BLocale::_( 'Invalid table name: %s', $fullTableName ) );
         }
     }
@@ -521,9 +521,9 @@ EOT
     * @throws BException
     * @return array|null
     */
-    public static function ddlIndexInfo( $fullTableName, $indexName = null )
+    public static function ddlIndexInfo( $fullTableName, $indexName = null, $connectionName = null )
     {
-        if ( !static::ddlTableExists( $fullTableName ) ) {
+        if ( !static::ddlTableExists( $fullTableName, $connectionName ) ) {
             throw new BException( BLocale::_( 'Invalid table name: %s', $fullTableName ) );
         }
         $a = explode( '.', $fullTableName );
@@ -547,9 +547,9 @@ EOT
     * @throws BException
     * @return array|null
     */
-    public static function ddlForeignKeyInfo( $fullTableName, $fkName = null )
+    public static function ddlForeignKeyInfo( $fullTableName, $fkName = null, $connectionName = null )
     {
-        if ( !static::ddlTableExists( $fullTableName ) ) {
+        if ( !static::ddlTableExists( $fullTableName, $connectionName ) ) {
             throw new BException( BLocale::_( 'Invalid table name: %s', $fullTableName ) );
         }
         $a = explode( '.', $fullTableName );
@@ -574,7 +574,7 @@ EOT
     * @throws BException
     * @return array
     */
-    public static function ddlTableDef( $fullTableName, $def )
+    public static function ddlTableDef( $fullTableName, $def, $connectionName = null )
     {
         $fields = !empty( $def[ 'COLUMNS' ] ) ? $def[ 'COLUMNS' ] : null;
         $primary = !empty( $def[ 'PRIMARY' ] ) ? $def[ 'PRIMARY' ] : null;
@@ -582,7 +582,7 @@ EOT
         $fks = !empty( $def[ 'CONSTRAINTS' ] ) ? $def[ 'CONSTRAINTS' ] : null;
         $options = !empty( $def[ 'OPTIONS' ] ) ? $def[ 'OPTIONS' ] : null;
 
-        if ( !static::ddlTableExists( $fullTableName ) ) {
+        if ( !static::ddlTableExists( $fullTableName, $connectionName ) ) {
             if ( !$fields ) {
                 throw new BException( 'Missing fields definition for new table' );
             }
@@ -603,7 +603,7 @@ EOT
                 ENGINE={$engine} DEFAULT CHARSET={$charset} COLLATE={$collate}", [] )->execute();
         }
         static::ddlTableColumns( $fullTableName, $fields, $indexes, $fks, $options );
-        static::ddlClearCache();
+        static::ddlClearCache(null, $connectionName);
     }
 
     /**
@@ -617,10 +617,10 @@ EOT
     *   - collate (default utf8_general_ci)
     * @return bool
     */
-    public static function ddlTable( $fullTableName, $fields, $options = null )
+    public static function ddlTable( $fullTableName, $fields, $options = null, $connectionName = null )
     {
-        if ( static::ddlTableExists( $fullTableName ) ) {
-            static::ddlTableColumns( $fullTableName, $fields, null, null, $options ); // altering options is not implemented
+        if ( static::ddlTableExists( $fullTableName, $connectionName ) ) {
+            static::ddlTableColumns( $fullTableName, $fields, null, null, $options, $connectionName ); // altering options is not implemented
         } else {
             $fieldsArr = [];
             foreach ( $fields as $f => $def ) {
@@ -634,7 +634,7 @@ EOT
             $collate = !empty( $options[ 'collate' ] ) ? $options[ 'collate' ] : 'utf8_general_ci';
             BORM::i()->raw_query( "CREATE TABLE {$fullTableName} (" . join( ', ', $fieldsArr ) . ")
                 ENGINE={$engine} DEFAULT CHARSET={$charset} COLLATE={$collate}", [] )->execute();
-            static::ddlClearCache();
+            static::ddlClearCache(null, $connectionName);
         }
         return true;
     }
@@ -654,9 +654,9 @@ EOT
     * @param array $fks
     * @return array
     */
-    public static function ddlTableColumns( $fullTableName, $fields, $indexes = null, $fks = null )
+    public static function ddlTableColumns( $fullTableName, $fields, $indexes = null, $fks = null, $connectionName = null )
     {
-        $tableFields = static::ddlFieldInfo( $fullTableName, null );
+        $tableFields = static::ddlFieldInfo( $fullTableName, null, $connectionName );
         $tableFields = array_change_key_case( $tableFields, CASE_LOWER );
         $alterArr = [];
         if ( $fields ) {
@@ -683,7 +683,7 @@ EOT
             }
         }
         if ( $indexes ) {
-            $tableIndexes = static::ddlIndexInfo( $fullTableName );
+            $tableIndexes = static::ddlIndexInfo( $fullTableName, null, $connectionName );
             $tableIndexes = array_change_key_case( $tableIndexes, CASE_LOWER );
             foreach ( $indexes as $idx => $def ) {
                 $idxLower = strtolower( $idx );
@@ -709,7 +709,7 @@ EOT
             }
         }
         if ( $fks ) {
-            $tableFKs = static::ddlForeignKeyInfo( $fullTableName );
+            $tableFKs = static::ddlForeignKeyInfo( $fullTableName, null, $connectionName );
             $tableFKs = array_change_key_case( $tableFKs, CASE_LOWER );
             // @see http://dev.mysql.com/doc/refman/5.5/en/innodb-foreign-key-constraints.html
             // You cannot add a foreign key and drop a foreign key in separate clauses of a single ALTER TABLE statement.
@@ -731,47 +731,15 @@ EOT
             }
             if ( !empty( $dropArr ) ) {
                 BORM::i()->raw_query( "ALTER TABLE {$fullTableName} " . join( ", ", $dropArr ), [] )->execute();
-                static::ddlClearCache();
+                static::ddlClearCache(null, $connectionName);
             }
         }
         $result = null;
         if ( $alterArr ) {
             $result = BORM::i()->raw_query( "ALTER TABLE {$fullTableName} " . join( ", ", $alterArr ), [] )->execute();
-            static::ddlClearCache();
+            static::ddlClearCache(null, $connectionName);
         }
         return $result;
-    }
-
-    /**
-     * A convenience method to add columns to table
-     * It should check if columns exist before passing to self::ddlTableColumns
-     * $columns array should be in same format as for ddlTableColumns:
-     *
-     * array(
-     *      'field_name' => 'column definition',
-     *      'field_two' => 'column definition',
-     *      'field_three' => 'column definition',
-     * )
-     *
-     * @param string $table
-     * @param array $columns
-     * @return array|null
-     */
-    public static function ddlAddColumns( $table, $columns = [] )
-    {
-       if ( empty( $columns ) ) {
-           BDebug::log( __METHOD__ . ": columns array is empty." );
-           return null;
-       }
-        $pass = [];
-        $tableFields = array_keys( static::ddlFieldInfo( $table ) );
-        foreach ( $columns as $field => $def ) {
-            if ( in_array( $field, $tableFields ) ) {
-                continue;
-            }
-            $pass[ $field ] = $def;
-        }
-        return static::ddlTableColumns( $table, $pass );
     }
 
     /**
@@ -781,12 +749,12 @@ EOT
     * @param array|object $data
     * @return array
     */
-    public static function cleanForTable( $table, $data )
+    public static function cleanForTable( $table, $data, $connectionName = null )
     {
         $isObject = is_object( $data );
         $result = [];
         foreach ( $data as $k => $v ) {
-            if ( BDb::ddlFieldInfo( $table, $k ) ) {
+            if ( BDb::ddlFieldInfo( $table, $k, $connectionName ) ) {
                 $result[ $k ] = $isObject ? $data->get( $k ) : $data[ $k ];
             }
         }
@@ -904,20 +872,6 @@ class BORM extends ORMWrapper
     protected $_writeConnectionName;
 
     /**
-    * Read DB name
-    *
-    * @var string
-    */
-    protected $_readDbName;
-
-    /**
-    * Write DB name
-    *
-    * @var string
-    */
-    protected $_writeDbName;
-
-    /**
     * Old values in the object before ->set()
     *
     * @var array
@@ -1022,10 +976,10 @@ class BORM extends ORMWrapper
     * @param string $write
     * @return BORMWrapper
     */
-    public function set_rw_db_names( $read, $write )
+    public function set_rw_connection_names( $read, $write )
     {
-        $this->_readDbName = $read;
-        $this->_writeDbName = $write;
+        $this->_readConnectionName = $read;
+        $this->_writeConnectionName = $write;
         return $this;
     }
 
@@ -1382,7 +1336,7 @@ class BORM extends ORMWrapper
         if ( self::$_classTableMap[ $table ] ) {
             $table = self::$_classTableMap[ $table ];
         }
-        
+
         $join_operator = trim( "{$join_operator} JOIN" );
 
         $table = $this->_quote_identifier( $table );
@@ -1843,6 +1797,21 @@ class BModel extends Model
     */
     public static function origClass()
     {
+        /*
+        if (is_null(static::$_origClass)) {
+            $origClass = get_called_class();
+            $parents = class_parents($origClass);
+            foreach ($parents as $parent) {
+                if ($parent !== 'Model' && $parent !== 'BModel' && strpos($parent, 'Abstract') === false) {
+                    $origClass = $parent;
+                } else {
+                    break;
+                }
+            }
+#echo "<pre>"; var_dump(get_called_class(), $parents, static::$_origClass, $origClass); echo "</pre>";
+            static::$_origClass = $origClass;
+        }
+        */
         return static::$_origClass;
     }
 
@@ -1863,6 +1832,10 @@ class BModel extends Model
     */
     public static function readDb()
     {
+        if (is_null(static::$_readConnectionName)) {
+            $readConnection = BConfig::i()->get('db/read_connection');
+            static::$_readConnectionName = $readConnection ? $readConnection : false;
+        }
         return BDb::connect( static::$_readConnectionName ? static::$_readConnectionName : static::$_connectionName );
     }
 
@@ -1873,6 +1846,10 @@ class BModel extends Model
     */
     public static function writeDb()
     {
+        if (is_null(static::$_writeConnectionName)) {
+            $writeConnectionName = BConfig::i()->get('db/write_connection');
+            static::$_writeConnectionName = $writeConnectionName ? $writeConnectionName : false;
+        }
         return BDb::connect( static::$_writeConnectionName ? static::$_writeConnectionName : static::$_connectionName );
     }
 
@@ -1896,7 +1873,7 @@ class BModel extends Model
         $orm = BORM::for_table( $table_name ); // CHANGED
         $orm->set_class_name( $class_name );
         $orm->use_id_column( static::_get_id_column_name( $class_name ) );
-        $orm->set_rw_db_names( // ADDED
+        $orm->set_rw_connection_names( // ADDED
             static::$_readConnectionName ? static::$_readConnectionName : static::$_connectionName,
             static::$_writeConnectionName ? static::$_writeConnectionName : static::$_connectionName
         );
@@ -2346,6 +2323,7 @@ class BModel extends Model
 
         $this->_newRecord = !$this->get( static::_get_id_column_name( get_called_class() ) );
 
+        static::writeDb();
         parent::save( $replace );
 
         if ( $callBeforeAfter ) {
@@ -2407,6 +2385,7 @@ class BModel extends Model
             }
         }
 
+        static::writeDb();
         parent::delete();
 
         $this->onAfterDelete();

@@ -70,6 +70,7 @@ class FCom_Core_Main extends BClass
 
         BDebug::debug( 'ROOTDIR=' . $rootDir );
 
+        $docRoot = $req->docRoot();
         $webRoot = $req->webRoot();
         $webRootTrimmed = rtrim( $webRoot, '/' );
         $baseHref = $config->get( 'web/base_href' );
@@ -107,7 +108,7 @@ class FCom_Core_Main extends BClass
         }
 
         if ( !$config->get( 'web/media_dir' ) ) {
-            $mediaUrl = str_replace( $rootDir, '', $mediaDir );
+            $mediaUrl = str_replace( $docRoot, '', $mediaDir );
             $config->set( 'web/media_dir', $mediaUrl );
         }
 
