@@ -98,7 +98,7 @@ class FCom_Promo_Migrate extends BClass
     public function upgrade__0_1_1__0_1_2()
     {
         $tCart = FCom_Promo_Model_Cart::table();
-        BDb::ddlAddColumns( $tCart, [ 'updated_dt' => "datetime" ] );
+        BDb::ddlTableDef( $tCart, [ 'COLUMNS' => [ 'updated_dt' => "datetime" ] ] );
     }
 
     public function upgrade__0_1_2__0_1_3()
