@@ -27,7 +27,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         $default         = [
             'model'    => '',
             'parent'   => null,
-            'children' => []
+            'children' => [ ]
         ];
         $fcom            = $default;
         $fcom[ 'id' ]    = 'FCom';
@@ -43,14 +43,14 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 $mod[ 'model' ]                      = $module;
                 $mod[ 'parent' ]                     = 'FCom';
                 $gridData[ $module ]                 = $mod;
-                $gridData[ 'FCom' ][ 'children' ][] = $module;
+                $gridData[ 'FCom' ][ 'children' ][ ] = $module;
             }
             $obj                                  = $default;
             $obj[ 'id' ]                          = $id;
             $obj[ 'model' ]                       = $id;
             $obj[ 'parent' ]                      = $module;
             $gridData[ $id ]                      = $obj;
-            $gridData[ $module ][ 'children' ][] = $id;
+            $gridData[ $module ][ 'children' ][ ] = $id;
         }
 
         $config[ 'data' ] = $gridData;
@@ -104,7 +104,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
             'import'          => 0,
             'export'          => 0,
             'parent'          => null,
-            'children'        => []
+            'children'        => [ ]
         ];
         $fcom                      = $default;
         $fcom[ 'id' ]              = 'FCom';
@@ -120,14 +120,14 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 $mod[ 'permission_name' ]            = $module;
                 $mod[ 'parent' ]                     = 'FCom';
                 $gridData[ $module ]                 = $mod;
-                $gridData[ 'FCom' ][ 'children' ][] = $module;
+                $gridData[ 'FCom' ][ 'children' ][ ] = $module;
             }
             $obj                                  = $default;
             $obj[ 'id' ]                          = $id;
             $obj[ 'permission_name' ]             = $id;
             $obj[ 'parent' ]                      = $module;
             $gridData[ $id ]                      = $obj;
-            $gridData[ $module ][ 'children' ][] = $id;
+            $gridData[ $module ][ 'children' ][ ] = $id;
         }
 
         foreach ( $gridData as $id => &$value ) {
@@ -148,6 +148,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
     public function action_index()
     {
         $model[ 'export_config' ] = $this->getExportConfig();
+        $model[ 'import_config' ] = $this->getImportConfig();
         $this->formMessages();
         $view = $this->view( $this->_formViewName )->set( 'model', $model );
 
@@ -169,11 +170,40 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         $this->processFormTabs( $view, $model );
     }
 
+    public function action_import()
+    {
+        /** @var FCom_Core_ImportExport $importer */
+        $importer = FCom_Core_ImportExport::i();
+        $uploads  = $_FILES[ 'upload' ];
+        foreach ( $uploads[ 'name' ] as $i => $fileName ) {
+
+            if ( !$fileName ) {
+                continue;
+            }
+            $fullFileName = $importer->getFullPath( $fileName );
+            BUtil::ensureDir( dirname( $fullFileName ) );
+            $fileSize = 0;
+            $status   = 'ERROR';
+            if ( !$uploads[ 'error' ][ $i ] && @move_uploaded_file( $uploads[ 'tmp_name' ][ $i ], $fullFileName ) ) {
+//                $importer->import( $fileName );
+                $status   = '';
+                $fileSize = $uploads[ 'size' ][ $i ];
+            }
+
+            $row = [
+                'name'   => $fileName,
+                'size'   => $fileSize,
+                'folder' => dirname( $fullFileName )
+            ];
+            BResponse::i()->json( [ 'files' => [ $row ] ] );
+        }
+    }
+
     public function action_export()
     {
         $exportData = BRequest::i()->post( 'ie_export_grid' );
-        $toFile = isset( $exportData[ 'export_file_name' ] ) ? $exportData[ 'export_file_name' ] : null;
-        $models = !empty( $exportData[ 'checked' ] ) ? array_keys( $exportData[ 'checked' ] ) : null;
+        $toFile     = isset( $exportData[ 'export_file_name' ] ) ? $exportData[ 'export_file_name' ] : null;
+        $models     = !empty( $exportData[ 'checked' ] ) ? array_keys( $exportData[ 'checked' ] ) : null;
 
         if ( $models ) {
             foreach ( $models as $m ) {
@@ -186,6 +216,24 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
 
         }
         $result = FCom_Core_ImportExport::i()->export( $models, $toFile );
-        BResponse::i()->json( [ 'result' => print_r( $result, 1 ) ] );
+        BResponse::i()->json( [ 'result' => 'success' ] );
     }
+
+    protected function getImportConfig()
+    {
+        $config = array(
+            'max_import_file_size' => $this->_getMaxUploadSize()
+        );
+
+        return $config;
+    }
+
+    protected function _getMaxUploadSize()
+    {
+        $p   = ini_get( 'post_max_size' );
+        $u   = ini_get( 'upload_max_filesize' );
+        $max = min( $p, $u );
+        return $max;
+    }
+
 }

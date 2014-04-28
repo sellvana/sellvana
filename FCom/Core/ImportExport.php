@@ -48,7 +48,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         return $exportableModels;
     }
 
-    public function export( $models = [], $toFile = null )
+    public function export( $models = [], $toFile = null, $batch = null )
     {
         $toFile = $this->getFullPath( $toFile );
 
@@ -58,6 +58,10 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         if ( !$fe ) {
             BDebug::log( "Could not open $toFile for writing, aborting export." );
             return false;
+        }
+        $bs = BConfig::i()->get( "FCom_Core/import_export/batch_size", 100 );
+        if ( $batch && is_numeric( $batch ) ) {
+            $bs = $batch; // todo implement batch export
         }
         $this->writeLine( $fe, json_encode( [ static::STORE_UNIQUE_ID_KEY => $this->storeUID() ] ) );
         $exportableModels = $this->collectExportableModels();
@@ -109,13 +113,16 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         return true;
     }
 
-    public function import( $fromFile = null )
+    public function import( $fromFile = null, $batch = null )
     {
         $start = microtime( true );
         /** @var FCom_PushServer_Model_Channel $channel */
         $this->channel = FCom_PushServer_Model_Channel::i()->getChannel( 'import', true );
         $this->channel->send( [ 'signal' => 'start', 'msg' => "Import started." ] );
         $bs = BConfig::i()->get( "FCom_Core/import_export/batch_size", 100 );
+        if($batch && is_numeric($batch)){
+            $bs = $batch;
+        }
 
         $fromFile = $this->getFullPath( $fromFile );
         if ( !is_readable( $fromFile ) ) {
