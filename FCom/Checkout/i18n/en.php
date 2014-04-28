@@ -1,4 +1,4 @@
-<?php return array('Shipping to' => '',
+<?php return [ 'Shipping to' => '',
 'Show active shipping address if any' => '',
 'Address' => '',
 'Shipping Options' => '',
@@ -66,4 +66,4 @@
 'Remember Me' => '',
 'Forgot your password?' => '',
 'No Account?' => '',
-'Checkout as a guest' => '');
+'Checkout as a guest' => '' ];

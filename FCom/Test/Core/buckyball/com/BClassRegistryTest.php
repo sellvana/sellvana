@@ -16,9 +16,9 @@ class BClassRegistry_Test extends PHPUnit_Framework_TestCase
     {
         $class = 'BClassRegistry_Test_A';
         $newClass = 'BClassRegistry_Test_B';
-        BClassRegistry::overrideClass($class, $newClass);
+        BClassRegistry::overrideClass( $class, $newClass );
         $a = $class::i();
-        $this->assertEquals("B", $a->me());
+        $this->assertEquals( "B", $a->me() );
     }
 
     //fixed: need to understand why overrideMethod doesn't work
@@ -27,11 +27,11 @@ class BClassRegistry_Test extends PHPUnit_Framework_TestCase
         $class = 'BClassRegistry_Test_A';
         $method = 'sayA';
 
-        BClassRegistry::overrideMethod($class, $method, array('BClassRegistry_Test_B', 'sayB'));
+        BClassRegistry::overrideMethod( $class, $method, [ 'BClassRegistry_Test_B', 'sayB' ] );
 
         $a = $class::i();
 
-        $this->assertEquals("B", $a->sayA());
+        $this->assertEquals( "B", $a->sayA() );
     }
 
     //fixed: need to understand why augmentMethod doesn't work
@@ -40,36 +40,36 @@ class BClassRegistry_Test extends PHPUnit_Framework_TestCase
         $class = 'BClassRegistry_Test_A';
         $method = 'augmentA';
 
-        BClassRegistry::augmentMethod($class, $method, array('BClassRegistry_Test_B', 'augmentB'));
+        BClassRegistry::augmentMethod( $class, $method, [ 'BClassRegistry_Test_B', 'augmentB' ] );
 
         $a = $class::i();
 
-        $this->assertEquals("B", $a->augmentA());
+        $this->assertEquals( "B", $a->augmentA() );
     }
 
     //todo: why don't work
     public function testAugmentPropertySet()
     {
-        BClassRegistry::augmentProperty('BClassRegistry_Test_A', 'foo', 'set',
-                'override', 'BClassRegistry_Test_AugmentProperty::newSetter');
+        BClassRegistry::augmentProperty( 'BClassRegistry_Test_A', 'foo', 'set',
+                'override', 'BClassRegistry_Test_AugmentProperty::newSetter' );
 
         $a = BClassRegistry_Test_A::i();
         $a->foo = 1;
 
         //todo: uncomment
-        $this->assertEquals(6, $a->foo);
+        $this->assertEquals( 6, $a->foo );
     }
 
     //todo: why don't work
     public function testAugmentPropertyGet()
     {
-        BClassRegistry::augmentProperty('BClassRegistry_Test_A', 'foo', 'get',
-                'after', 'BClassRegistry_Test_AugmentProperty::newGetter');
+        BClassRegistry::augmentProperty( 'BClassRegistry_Test_A', 'foo', 'get',
+                'after', 'BClassRegistry_Test_AugmentProperty::newGetter' );
 
         $a = BClassRegistry_Test_A::i();
 
         //todo: uncomment
-        $this->assertEquals(10, $a->foo);
+        $this->assertEquals( 10, $a->foo );
     }
 }
 
@@ -99,12 +99,12 @@ class BClassRegistry_Test_B extends BClass
         return 'B';
     }
 
-    static public function sayB($origObject=null)
+    static public function sayB( $origObject = null )
     {
         return 'B';
     }
 
-    static public function augmentB($result, $origObject)
+    static public function augmentB( $result, $origObject )
     {
         $result = 'B';
         return $result;
@@ -113,13 +113,13 @@ class BClassRegistry_Test_B extends BClass
 
 class BClassRegistry_Test_AugmentProperty extends BClass
 {
-    static public function newSetter($object, $property, $value)
+    static public function newSetter( $object, $property, $value )
     {
         $object->$property = $value + 5;
     }
 
-    static public function newGetter($object, $property, $prevResult)
+    static public function newGetter( $object, $property, $prevResult )
     {
-        return $prevResult+10;
+        return $prevResult + 10;
     }
 }

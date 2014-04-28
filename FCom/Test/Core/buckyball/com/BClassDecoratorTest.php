@@ -4,35 +4,35 @@ class BClassDecorator_Test extends PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $a = new BClassDecorator(array("BClassDecorator_Test_A"));
+        $a = new BClassDecorator( [ "BClassDecorator_Test_A" ] );
 
-        $this->assertTrue(is_object($a));
-        $this->assertInstanceOf("BClassDecorator", $a);
+        $this->assertTrue( is_object( $a ) );
+        $this->assertInstanceOf( "BClassDecorator", $a );
     }
 
     public function testFunctionCall()
     {
-        $a = new BClassDecorator(array("BClassDecorator_Test_A"));
-        $this->assertEquals("A", $a->me());
+        $a = new BClassDecorator( [ "BClassDecorator_Test_A" ] );
+        $this->assertEquals( "A", $a->me() );
     }
 
     public function testFunctionCallStatic()
     {
-        $a = new BClassDecorator(array("BClassDecorator_Test_A"));
-        $this->assertEquals("A", $a->meStatic());
+        $a = new BClassDecorator( [ "BClassDecorator_Test_A" ] );
+        $this->assertEquals( "A", $a->meStatic() );
     }
 
     public function testPropertySetUnset()
     {
-        $a = new BClassDecorator(array("BClassDecorator_Test_A"));
+        $a = new BClassDecorator( [ "BClassDecorator_Test_A" ] );
         $a->foo = 123;
         $b = $a->getDecoratedComponent();
 
-        $this->assertEquals("123", $b->foo);
-        $this->assertTrue(isset($b->foo));
+        $this->assertEquals( "123", $b->foo );
+        $this->assertTrue( isset( $b->foo ) );
 
-        unset($a->foo);
-        $this->assertFalse(isset($b->foo));
+        unset( $a->foo );
+        $this->assertFalse( isset( $b->foo ) );
     }
 }
 

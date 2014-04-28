@@ -1,4 +1,4 @@
-<?php return array(
+<?php return [
     'Narrow Results' => 'Ergebnisse filtern',
     'Categories' => 'Kategorien',
     'All categories' => 'Alle Kategorien',
@@ -33,4 +33,4 @@
     'Part #: %s' => 'Teilenummer: %s',
     '%s of 5' => '%s von 5',
     '%s reviews' => '%s Bewertungen'
-);
+];
