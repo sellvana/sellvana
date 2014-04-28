@@ -91,10 +91,7 @@
                         <td class="error" colspan="2"><span class="label label-important">{%=errorTr%}</span> {%=file.error%}</td>
                     {% } else { %}
                         <td class="name">
-                            <a href="{%=file.url%}" title="{%=file.name%}" data-gallery="{%=
-                                  file.thumbnail_url&&'gallery'%}" download="{%=file.name%}">
-                                {%=file.name%}
-                            </a>
+                            {%=file.name%}
                         </td>
                         <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
                         <td colspan="2"><span>{%=file.folder%}</span></td>

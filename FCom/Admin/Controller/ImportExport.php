@@ -183,18 +183,22 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
             $fullFileName = $importer->getFullPath( $fileName );
             BUtil::ensureDir( dirname( $fullFileName ) );
             $fileSize = 0;
-            $status   = 'ERROR';
             if ( !$uploads[ 'error' ][ $i ] && @move_uploaded_file( $uploads[ 'tmp_name' ][ $i ], $fullFileName ) ) {
-//                $importer->import( $fileName );
-                $status   = '';
+                $importer->import( $fileName );
+                $error   = '';
                 $fileSize = $uploads[ 'size' ][ $i ];
+            } else {
+                $error = $uploads['error'][$i];
             }
 
             $row = [
                 'name'   => $fileName,
                 'size'   => $fileSize,
-                'folder' => dirname( $fullFileName )
+                'folder' => str_replace(BConfig::i()->get('fs/root_dir'), '...',dirname( $fullFileName )),
             ];
+            if($error){
+                $row['error'] = $error;
+            }
             BResponse::i()->json( [ 'files' => [ $row ] ] );
         }
     }
@@ -215,7 +219,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
             }
 
         }
-        $result = FCom_Core_ImportExport::i()->export( $models, $toFile );
+        FCom_Core_ImportExport::i()->export( $models, $toFile );
         BResponse::i()->json( [ 'result' => 'success' ] );
     }
 
