@@ -1,5 +1,5 @@
 <?php
-return array(
+return [
     "No XML or XML with API error received from Mollie" => "Geen XML of XML met API fout ontvangen van Mollie",
     "The bank specified %s is incorrect or incomplete" => "De opgegeven bank %s is onjuist of incompleet",
     "The specified description %s is incomplete" => "De opgegeven omschrijving %s is incompleet",
@@ -11,4 +11,4 @@ return array(
     "Failed to communicate with Mollie: %s" => "Fout bij communiceren met Mollie: %s",
     "Could not process XML result" => "Kon XML resultaat niet verwerken",
     "An error has occurred, please try again later." => "",
-);
+];

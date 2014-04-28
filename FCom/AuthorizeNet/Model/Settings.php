@@ -9,43 +9,43 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
     protected static $gatewayUrl = "https://secure.authorize.net/gateway/transact.dll";
     protected static $testGatewayUrl = "https://test.authorize.net/gateway/transact.dll";
 
-    public static $ccTransactions = array(
+    public static $ccTransactions = [
         "AUTH_CAPTURE",
         "AUTH_ONLY",
         "CAPTURE_ONLY",
         "CREDIT", // for refunds
         "PRIOR_AUTH_CAPTURE", // capture after auth
         "VOID" // void payment
-    );
+    ];
 
-    protected static $reqFields = array(
+    protected static $reqFields = [
         "x_login",
         "x_tran_key",
         "x_type",
         "x_amount", // Up to 15 digits with a decimal point (no dollar symbol).
-        "x_card_num",// Between 13 and 16 digits without spaces. When x_type=CREDIT, only the last four digits are required
+        "x_card_num", // Between 13 and 16 digits without spaces. When x_type=CREDIT, only the last four digits are required
         "x_exp_date", // Format: MMYY, MM/YY, MM-YY, MMYYYY, MM/YYYY, MMYYYY
         "x_relay_response",
         "x_delim_data",
         "x_version",
         "x_delim_char", // single character
-    );
+    ];
 
-    protected static $reqFieldsCapture = array(
+    protected static $reqFieldsCapture = [
         "x_auth_code", // Required only for CAPTURE_ONLY transactions;Format: 6 characters
-    );
+    ];
 
-    protected static $reqFieldsAuthPrior = array(
+    protected static $reqFieldsAuthPrior = [
         "x_trans_id", // Required only for CREDIT, PRIOR_ AUTH_ CAPTURE, and VOID transactions
         "x_split_tender_id",
-    );
+    ];
 
-    protected static $otherFields = array(
+    protected static $otherFields = [
         "x_allow_partial_auth",
         "x_prepaid_balance_on_card",
         "x_prepaid_requested_amount",
         "x_card_type",
-        "x_method",//CC or ECHECK
+        "x_method", //CC or ECHECK
         "x_recurring_billing",
         "x_currency_code", // USD, CAD, EUR, or GBP
         "x_card_code", // The three- or four-digit number on the back of a credit card (on the front for American Express).
@@ -100,32 +100,32 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
         "x_footer_email_receipt", //
         "x_merchant_email", //
         "", //
-    );
+    ];
 
     public static function paymentActions()
     {
-        return array(
-            "AUTH_ONLY"         => BLocale::i()->_("Authorize Only"),
-            "AUTH_CAPTURE" => BLocale::i()->_("Authorize and Capture")
-        );
+        return [
+            "AUTH_ONLY"         => BLocale::i()->_( "Authorize Only" ),
+            "AUTH_CAPTURE" => BLocale::i()->_( "Authorize and Capture" )
+        ];
     }
 /*
 
  */
     public static function cardTypes()
     {
-        return array(
+        return [
             "AE" => "American Express",
             "VI" => "Visa",
             "MC" => "MasterCard",
             "DI" => "Discover",
             "DC" => "Diners Club",
             "JC" => "JCB",
-            "OT" => BLocale::i()->_("Other")
-        );
+            "OT" => BLocale::i()->_( "Other" )
+        ];
     }
 
-    protected static $responseFormat = array(
+    protected static $responseFormat = [
         1 => "Response Code",
         2 => "Response Subcode",
         3 => "Response Reason Code",
@@ -171,16 +171,16 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
         53 => "Split Tender ID",
         54 => "Requested Amount",
         55 => "Balance On Card"
-    );
+    ];
     
     public static function countries()
     {
-        $countries = array();
-        foreach (FCom_Geo_Model_Country::i()->options() as $iso => $name) {
-            if (empty($iso)) {
+        $countries = [];
+        foreach ( FCom_Geo_Model_Country::i()->options() as $iso => $name ) {
+            if ( empty( $iso ) ) {
                 continue;
             }
-            $countries[$iso] = $name;
+            $countries[ $iso ] = $name;
         }
 
         return $countries;
@@ -189,30 +189,30 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
     public static function currencies()
     {
         // todo - update to be dynamically built
-        return array(
+        return [
             "-"   => "-- Select One --",
             "usd" => "USD"
-        );
+        ];
     }
 
     public static function orderStatuses()
     {
         // todo - update to be dynamically built
-        return array(
+        return [
             "-"          => "-- Select One --",
             "processing" => "Processing"
-        );
+        ];
     }
 
     /**
      * @param BConfig $config
      * @return string
      */
-    public static function gatewayUrl($config)
+    public static function gatewayUrl( $config )
     {
         $url = static::$gatewayUrl;
-        if ($config->get('modules/FCom_AuthorizeNet/cgi_url')) {
-            $url = $config->get('modules/FCom_AuthorizeNet/cgi_url');
+        if ( $config->get( 'modules/FCom_AuthorizeNet/cgi_url' ) ) {
+            $url = $config->get( 'modules/FCom_AuthorizeNet/cgi_url' );
         }
         return $url;
     }
@@ -221,8 +221,8 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
      * @param BConfig $config
      * @return string
      */
-    public static function gatewayDpmUrl($config)
+    public static function gatewayDpmUrl( $config )
     {
-        return static::gatewayUrl($config);
+        return static::gatewayUrl( $config );
     }
 }
