@@ -235,6 +235,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         $this->parent()->add( 'num_children' );
         $numDesc = 1 + $this->get( 'num_descendants' );
         foreach ( $this->ascendants() as $c ) {
+            // TODO: fix updating when re-registering existing node
             $c->add( 'num_descendants', $numDesc );
             if ( $save ) $c->save();
         }
