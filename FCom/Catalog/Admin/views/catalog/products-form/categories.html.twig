@@ -15,7 +15,10 @@
                     override_ui:true,
                     checked_parent_open:true,
                     real_checkboxes:true,
-                    two_state: true
+                    two_state: true,
+                    real_checkboxes_names: function (n) {
+                        return [("category_id-" + (n[0].id)), n[0].id]
+                    }
                 },
                 initially_open: {{ openData | raw }}
             });

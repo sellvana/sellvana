@@ -128,7 +128,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         foreach ( $categories as $c ) {
             $idPathArr = explode( '/', $c->id_path );
             foreach ( $idPathArr as $id ) {
-                $result[] = 'check_' . $id;
+                $result[] = 'category_id-' . $id;
             }
         }
         return BUtil::toJson( $result );
@@ -143,7 +143,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
         $result = [];
         foreach ( $categories as $c ) {
-            $result[] = 'check_' . $c->category_id;
+            $result[] = 'category_id-' . $c->category_id;
         }
         return BUtil::toJson( $result );
     }
@@ -466,7 +466,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $categories = [];
         foreach ( $post as $key => $value ) {
             $matches = [];
-            if ( preg_match( "#check_(\d+)#", $key, $matches ) ) {
+            if ( preg_match( "#category_id-(\d+)#", $key, $matches ) ) {
                 $categories[ intval( $matches[ 1 ] ) ] = $value;
             }
         }
@@ -481,21 +481,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 } elseif ( false == $product ) {
                     $data = [ 'product_id' => $model->id(), 'category_id' => $cat_id ];
                     FCom_Catalog_Model_CategoryProduct::i()->create( $data )->save();
-                    /*
-                    $category = $category_model->load($cat_id);
-                    if(!$category){
-                        continue;
-                    }
-                    $category_ids = explode("/",$category->id_path);
-                    foreach($category_ids as $c_id) {
-                        $product = $cat_product->orm()->where('product_id', $model->id())->where('category_id', $c_id)->find_one();
-                        if(false == $product){
-                            $data=array('product_id'=>$model->id(), 'category_id'=>$c_id);
-                            FCom_Catalog_Model_CategoryProduct::i()->create($data)->save();
-                        }
-                    }
-                     *
-                     */
                 }
             }
         }
@@ -513,20 +498,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'linked_product_id' => explode( ',', $data[ 'grid' ][ $typeName ][ 'del' ] ),
                 ] );
             }
-//            if (!empty($data['grid'][$typeName]['add'])) {
-//                $oldLinks = $hlp->orm()->where('link_type', $type)->where('product_id', $model->id)
-//                    ->find_many_assoc('linked_product_id');
-//                foreach (explode(',', $data['grid'][$typeName]['add']) as $linkedId) {
-//                    if ($linkedId && empty($oldLinks[$linkedId])) {
-//                        $m = $hlp->create(array(
-//                            'product_id'=>$model->id,
-//                            'link_type'=>$type,
-//                            'linked_product_id'=>$linkedId,
-//                            'position' => $data[$typeName][$linkedId]['product_link_position']
-//                        ))->save();
-//                    }
-//                }
-//            }
             if ( isset( $data[ $typeName ] ) ) {
                 foreach ( $data[ $typeName ] as $key => $arr ) {
                     $productLink = $hlp->load( [ 'product_id' => $model->id, 'linked_product_id' => $key, 'link_type' => $type ] );
