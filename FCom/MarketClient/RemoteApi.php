@@ -23,6 +23,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
         $url = $this->getUrl( 'api/v1/market/site/connect', [
             'admin_url' => BApp::href(),
             'retry_url' => BApp::href( 'marketclient/site/connect' ),
+            'redirect_to' => BRequest::i()->get('redirect_to'),
             'site_key' => $siteKey,
         ] );
         $response = BUtil::remoteHttp( 'GET', $url );
@@ -36,44 +37,46 @@ final class FCom_MarketClient_RemoteApi extends BClass
 
     public function getModulesVersions( $modules, $resetCache = false )
     {
-        $result = BCache::i()->load( static::$_modulesVersionsCacheKey );
-        if ( $result && true === $modules && !$resetCache ) {
-            return $result;
-        }
-        if ( !$result ) {
-            $result = [];
+        $cached = BCache::i()->load( static::$_modulesVersionsCacheKey );
+        if ( $cached && true === $modules && !$resetCache ) {
+            return $cached;
         }
 
         if ( true === $modules ) {
-            $modules = join( ',', array_keys( BModuleRegistry::i()->getAllModules() ) );
+            $modules = array_keys( BModuleRegistry::i()->getAllModules() );
+        } elseif ( is_string( $modules) ) {
+            $modules = explode( ',', $modules );
         }
 
         $siteKey = BConfig::i()->get( 'modules/FCom_MarketClient/site_key' );
         $url = $this->getUrl( 'api/v1/market/module/version', [
-            'mod_name' => $modules,
+            'mod_name' => join( ',', $modules ),
             'site_key' => $siteKey,
         ] );
         $response = BUtil::remoteHttp( "GET", $url );
-#echo "<pre>"; var_dump($response); exit;
         $modResult = BUtil::fromJson( $response );
         if ( !empty( $modResult[ 'error' ] ) ) {
             BCache::i()->delete( static::$_modulesVersionsCacheKey );
             throw new BException( $modResult[ 'message' ] );
         }
-        $result = BUtil::arrayMerge( $result, $modResult[ 'modules' ] );
-        foreach ( $result as $modName => &$mod ) {
-            $mod[ 'name' ] = $modName;
+        foreach ( $modResult[ 'modules' ] as $modName => $mod ) {
+            if ( $mod && empty( $mod[ 'name' ] ) ) {
+                $mod[ 'name' ] = $modName;
+            }
             if ( !empty( $mod[ 'status' ] ) && $mod[ 'status' ] === 'mine' ) {
                 $localMod = BApp::m( $modName );
                 $remChannelVer = $mod[ 'channels' ][ $localMod->channel ][ 'version_uploaded' ];
                 $mod[ 'can_update' ] = version_compare( $remChannelVer, $localMod->version, '<' );
             }
+            $cached[ $modName ] = $mod;
         }
-        unset( $mod );
-        if ( !empty( $result ) ) {
-            BCache::i()->save( static::$_modulesVersionsCacheKey, $result, 86400 );
+        if ( !empty( $cached ) ) {
+            BCache::i()->save( static::$_modulesVersionsCacheKey, $cached, 86400 );
         }
-
+        $result = [];
+        foreach ($modules as $modName) {
+            $result[ $modName ] = $cached[ $modName ];
+        }
         return $result;
     }
 
