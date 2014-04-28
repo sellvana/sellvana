@@ -30,6 +30,40 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
     protected $changedModels;
 
     /**
+     * @var FCom_Admin_Model_User
+     */
+    protected $user;
+    /**
+     * Can user import current model
+     * @var bool
+     */
+    protected $canImport;
+
+    /**
+     * Get user
+     * If none is set explicitly, try to get currently logged user.
+     * @return FCom_Admin_Model_User
+     */
+    public function getUser()
+    {
+        if(empty($this->user)){
+            $this->user = FCom_Admin_Model_User::i()->sessionUser();
+        }
+        return $this->user;
+    }
+
+    /**
+     * Set profile user
+     *
+     * To be used in any API which uses importer.
+     * @param FCom_Admin_Model_User $user
+     */
+    public function setUser( $user )
+    {
+        $this->user = $user;
+    }
+
+    /**
      * @throws Exception
      * @return array
      */
@@ -77,6 +111,10 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         foreach ( $sorted as $s ) {
             /** @var FCom_Core_Model_Abstract $model */
             $model   = $s[ 'model' ];
+            if($this->getUser()->getPermission($model) == false){
+                BDebug::warning(BLocale::_('User: %s, cannot export "%s". Permission denied.', $this->getUser()->get('username'), $model));
+                continue;
+            }
             if ( !isset( $s[ 'skip' ] ) ) {
                 $s[ 'skip' ] = [];
             }
@@ -198,6 +236,13 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 }
 
                 $this->currentModel   = $data[ static::DEFAULT_MODEL_KEY ];
+                if($this->getUser()->getPermission($this->currentModel) == false){
+                    $this->canImport = false;
+                    BDebug::warning(BLocale::_('User: %s, cannot import "%s". Permission denied.', $this->getUser()->get('username'), $model));
+                    continue;
+                } else {
+                    $this->canImport = true;
+                }
                 $this->changedModels = [];
                 $this->channel->send( [ 'signal' => 'info', 'msg' => "Importing: $this->currentModel" ] );
                 if ( !isset( $this->importModels[ $this->currentModel ] ) ) {
@@ -232,7 +277,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 $isHeading     = true;
             }
 
-            if ( $isHeading ) {
+            if ( $isHeading || !$this->canImport) {
                 continue;
             }
 
