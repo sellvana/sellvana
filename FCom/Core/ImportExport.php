@@ -489,8 +489,8 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $file = $this->_defaultExportFile;
         }
         $path = BConfig::i()->get( 'fs/storage_dir' );
-
-        $file = $path . '/export/' . trim( $file, '/' );
+        $ds = DIRECTORY_SEPARATOR;
+        $file = $path . $ds . 'export' . $ds . trim( $file, $ds . '\\/' );
         if ( strpos( realpath( dirname( $file ) ), $path ) !== 0 ) {
             return false;
         }
