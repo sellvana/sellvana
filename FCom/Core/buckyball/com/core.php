@@ -1894,14 +1894,15 @@ BDebug::debug( __METHOD__ . ': ' . spl_object_hash( $this ) );
     */
     public function close()
     {
-        if ( !$this->_dirty || !empty( $_SESSION ) ) {
+        if ( !$this->_dirty/* || !empty( $_SESSION )*/ ) {
+#echo "<pre>"; var_dump($this->_dirty, $_SESSION); echo "</pre>";
             return;
         }
-BDebug::debug( __METHOD__ . ': ' . spl_object_hash( $this ) );
+#BDebug::debug( __METHOD__ . ': ' . spl_object_hash( $this ) );
 #ob_start(); debug_print_backtrace(); BDebug::debug(nl2br(ob_get_clean()));
         if ( !$this->_phpSessionOpen ) {
             if ( headers_sent() ) {
-                BDebug::warning( "Headers already sent, can't start session" );
+                BDebug::info( "Headers already sent, can't start session" );
             } else {
                 session_start();
             }
