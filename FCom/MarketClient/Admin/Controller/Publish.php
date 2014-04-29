@@ -12,9 +12,11 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
                 unset( $result[ $modName ] );
                 continue;
             }
-            $result[ $modName ][ 'edit_href' ] = BUtil::setUrlQuery( BApp::href( 'marketclient/site/connect' ), [
-                'redirect_to' => $modInfo[ 'edit_href' ],
-            ] );
+            if ( !empty( $modInfo[ 'edit_href' ] ) ) {
+                $result[ $modName ][ 'edit_href' ] = BUtil::setUrlQuery( BApp::href( 'marketclient/site/connect' ), [
+                    'redirect_to' => $modInfo[ 'edit_href' ],
+                ] );
+            }
 
         }
         if ( $result ) {

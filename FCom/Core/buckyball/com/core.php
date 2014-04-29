@@ -1995,6 +1995,11 @@ BDebug::debug( __METHOD__ . ': ' . spl_object_hash( $this ) );
         return $data[ '_csrf_token' ];
     }
 
+    public function validateCsrfToken( $token )
+    {
+        return $token === $this->csrfToken();
+    }
+
     public function __destruct()
     {
         //$this->close();
