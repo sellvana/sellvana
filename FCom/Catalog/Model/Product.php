@@ -854,13 +854,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function getProductLink()
     {
         $arrProduct = FCom_Catalog_Model_Product::i()->orm('p')->select('pl.link_type')
-            ->left_outer_join('FCom_Catalog_Model_ProductLink', array('p.id', '=', 'pl.linked_product_id'), 'pl')
+            ->left_outer_join('FCom_Catalog_Model_ProductLink', ['p.id', '=', 'pl.linked_product_id'], 'pl')
             ->where('pl.product_id', $this->id)->find_many();
-        $productLink = array(
-            'related'=> array('title' => BLocale::_('Related Products'), 'product' => array()),
-            'similar' => array('title' => BLocale::_('You may also like these items'), 'product' => array()),
-            'cross_sell' => array('title' => BLocale::_('You may also like these items'), 'product' => array())
-        );
+        $productLink = [
+            'related'=> ['title' => BLocale::_('Related Products'), 'product' => [] ],
+            'similar' => ['title' => BLocale::_('You may also like these items'), 'product' => [] ],
+            'cross_sell' => ['title' => BLocale::_('You may also like these items'), 'product' => [] ]
+        ];
         foreach ($arrProduct as $product) {
             if (isset($productLink[$product->get('link_type')])) {
                 array_push($productLink[$product->get('link_type')]['product'], $product);

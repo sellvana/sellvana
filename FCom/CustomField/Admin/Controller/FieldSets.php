@@ -27,7 +27,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                             'editable' => true , 'validation' => [ 'required' => true ] ],
                     [ 'name' => 'num_fields', 'label' => 'Fields', 'width' => 30, 'default' => '0' ],
                     [ 'type' => 'btn_group', 'buttons' => [
-                        [ 'name' => 'edit_custom', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom' ],
+                        [ 'name' => 'edit_custom', 'icon' => 'icon-pencil', 'cssClass' => 'btn-custom' ],
                         [ 'name' => 'delete' ]
                     ] ]
                 ],
