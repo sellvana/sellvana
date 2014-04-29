@@ -1044,6 +1044,22 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($data == 'custom_fields' && isset($data_serialized[$data])) {
             return BUtil::objectToArray(json_decode($data_serialized[$data]));
         }
+        if ($data == 'variants' && isset($data_serialized['variants_fields']) && isset($data_serialized['variants'])) {
+            $fields = [];
+            foreach ($data_serialized['variants_fields'] as $arr) {
+                $fields[$arr['name']] = [];
+                foreach ($data_serialized['variants'] as $vr) {
+                    if (isset($vr['fields'])) {
+                        foreach ($vr['fields'] as $key => $value) {
+                            if ($key == $arr['name']) {
+                                array_push($fields[$arr['name']], $value);
+                            }
+                        }
+                    }
+                }
+            }
+            return ['variants' => $data_serialized['variants'], 'fields' => $fields ];
+        }
         return isset($data_serialized[$data]) ? $data_serialized[$data] : array() ;
     }
 }

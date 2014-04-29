@@ -99,19 +99,34 @@
           </div> <!-- /.f-price-group -->
           <div class="f-prod-select">
             <div class="f-prod-add-cart">
-                {% if variants %}
-                    <section class="tab-pane active" id="f-prod-tab-description1">
-
-                            {% for vr in variants %}
-                                <div class="form-group" style="overflow: hidden">
-                                    {% for key,field in vr.fields %}
-                                        <label class="col-md-3 control-label">{{ key~": "~field |_ }}</label>
-                                    {% endfor %}
-                                    <label class="col-md-3 control-label">{{ "Quantity: "~vr.qty |_ }}</label>
-                                    <label class="col-md-2 control-label">{{ "Price: "~vr.price|_ }}</label>
+                {% if variants.fields %}
+                    <section class="tab-pane active" id="f-prod-tab-variant">
+                        {% for field_name,value  in variants.fields %}
+                            <div class="form-group" style="overflow: hidden">
+                                <label class="col-md-3 control-label">{{ field_name |_ }}</label>
+                                <div class="col-md-5">
+                                    <select id="{{ field_name }}" name="{{ field_name }}" class="form-control variant" style="width:auto">
+                                        {% for op  in value %}
+                                            <option value="{{ op }}">{{ op|_ }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
-                            {% endfor %}
-
+                            </div>
+                        {% endfor %}
+                        <div class="form-group" style="overflow: hidden">
+                            <label class="col-md-3 control-label ">{{ 'Price: ' |_ }}</label>
+                            <div class="col-md-2 f-price-group" style="margin: 0px;">
+                                <div class="f-reg-price">
+                                    <span class="f-price" id="price-variant"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" style="overflow: hidden">
+                            <label class="col-md-3 control-label">{{ 'Quantity: ' |_ }}</label>
+                            <div class="col-md-2">
+                                <input type="text" class="form-control col-md-2" id="quantity-variant"/>
+                            </div>
+                        </div>
                     </section>
                 {% endif %}
               <p class="f-stock-notice f-in-stock">In Stock.</p>
@@ -201,3 +216,16 @@
     {{ THIS.hook('after_product_details') | raw }}
 </div>
 {{ THIS.view('catalog/product/quickview') | raw }}
+<script>
+    require(['jquery'], function ($, _) {
+        var variants = $.parseJSON('{{ UTIL.toJson(variants.variants)|raw }}');
+        $('#price-variant').html(variants[0].price);
+        $('#quantity-variant').val(variants[0].qty);
+        for (var val in variants[0].fields ) {
+            $('select [name="'+ val +'"]').find('option [value="'+ variants[0].fields[val] +'"]').attr('selected', 'selected');
+        }
+        $('.variant').change(function () {
+
+        })
+    })
+</script>
