@@ -23,6 +23,10 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $this->forward( false );
             return $this;
         }
+        if ( $product->isDisabled() ) {
+            $this->forward( false );
+            return $this;
+        }
         BEvents::i()->fire( 'FCom_Catalog_Frontend_Controller::action_product:product', [ 'product' => &$product ] );
         BApp::i()->set( 'current_product', $product );
 

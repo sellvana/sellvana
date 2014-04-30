@@ -139,31 +139,31 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     {
         $view = $this->gridView();
         $grid = $view->get( 'grid' );
-        $config = $grid[ 'config' ];
 
-        if ( isset( $config[ 'data' ] ) && ( !empty( $config[ 'data' ] ) ) ) {
-            $data = $config[ 'data' ];
+        if ( isset( $grid[ 'config' ][ 'data' ] ) && ( !empty( $grid[ 'config' ][ 'data' ] ) ) ) {
+            $data = $grid[ 'config' ][ 'data' ];
             $data = $this->gridDataAfter( $data );
             BResponse::i()->json( [ [ 'c' => 1 ], $data ] );
         } else {
             $r = BRequest::i()->get();
-            if ( empty( $grid[ 'orm' ] ) ) {
+            if ( empty( $grid[ 'config' ][ 'orm' ] ) ) {
                 $mc = $this->_modelClass;
-                $grid[ 'orm' ] = $mc::i()->orm( $this->_mainTableAlias )->select( $this->_mainTableAlias . '.*' );
+                $grid[ 'config' ][ 'orm' ] = $mc::i()->orm( $this->_mainTableAlias )
+                    ->select( $this->_mainTableAlias . '.*' );
                 $view->set( 'grid', $grid );
             }
             if ( isset( $r[ 'filters' ] ) ) {
                 $filters = BUtil::fromJson( $r[ 'filters' ] );
                 if ( isset( $filters[ 'exclude_id' ] ) && $filters[ 'exclude_id' ] != '' ) {
                     $arr = explode( ',', $filters[ 'exclude_id' ] );
-                    $grid[ 'orm' ] =  $grid[ 'orm' ]->where_not_in( $this->_mainTableAlias . '.id', $arr );
+                    $grid[ 'config' ][ 'orm' ]->where_not_in( $this->_mainTableAlias . '.id', $arr );
                 }
             }
-            $this->gridOrmConfig( $grid[ 'orm' ] );
+            $this->gridOrmConfig( $grid[ 'config' ][ 'orm' ] );
 
             $oc = static::$_origClass;
 
-            $gridId = !empty( $config[ 'id' ] ) ? $config[ 'id' ] : $oc;
+            $gridId = !empty( $grid[ 'config' ][ 'id' ] ) ? $grid[ 'config' ][ 'id' ] : $oc;
 
             if ( BRequest::i()->request( 'export' ) ) {
                 $data = $view->generateOutputData( true );
