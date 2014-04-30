@@ -71,6 +71,7 @@ class FCom_CatalogIndex_Indexer extends BClass
         if ( $pIds ) {
             static::indexDropDocs( $pIds );
         }
+        // TODO: Improve filtering out disabled products
         foreach ( $products as $i => $p ) {
             if ( $p->isDisabled() ) {
                 unset( $products[ $i ] );

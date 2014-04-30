@@ -155,7 +155,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function url( $category = null )
     {
         $prefix = static::urlPrefix();
-        return BApp::href( $prefix . ( $category ? $category->get( 'url_path' ) . '/' : '' ) . $this->get( 'url_key' ) );
+        return BApp::frontendHref( $prefix . ( $category ? $category->get( 'url_path' ) . '/' : '' ) . $this->get( 'url_key' ) );
     }
 
     public function imageUrl( $full = false )
