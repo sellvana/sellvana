@@ -297,6 +297,22 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $this->grid = $grid;
     }
 
+    protected function _processFiltersConfig()
+    {
+        if ( empty( $this->grid[ 'config' ][ 'filters' ] ) ) {
+            return;
+        }
+        $grid = $this->grid;
+
+        foreach ($grid[ 'config' ][ 'filters' ] as $k => &$filter ) {
+            if ( empty( $filter[ 'type' ] ) ) {
+                $filter[ 'type' ] = 'text';
+            }
+        }
+        unset( $filter );
+        $this->grid = $grid;
+    }
+
     protected function _processActionsConfig()
     {
         if ( empty( $this->grid[ 'config' ][ 'actions' ] ) ) {
@@ -467,6 +483,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
         $this->_processDefaults();
         $this->_processColumnsConfig();
+        $this->_processFiltersConfig();
         $this->_processActionsConfig();
         $this->_processPersonalization();
 

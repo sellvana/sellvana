@@ -916,8 +916,7 @@ class BRequest extends BClass
                 } else {
                     $tags = $this->_postTagsWhitelist[ $forUrlPath ][ $childPath ];
                     if ( '+' === $tags ) {
-                        $tags = "<a><b><blockquote><code><del><dd><dl><dt><em><h1><i><img><kbd><li><ol><p><pre><s><sup>'
-                            . '<sub><strong><strike><ul><br><hr>";
+                        $tags = $this->getAllowedTags();
                     }
                     if ( '*' !== $tags ) {
                         $v = strip_tags( $v, $tags );
@@ -926,6 +925,13 @@ class BRequest extends BClass
             }
         }
         unset( $v );
+    }
+
+    public function getAllowedTags()
+    {
+        $tags = "<a><b><blockquote><code><del><dd><dl><dt><em><h1><i><img><kbd><li><ol><p><pre><s><sup>'
+            . '<sub><strong><strike><ul><br><hr>";
+        return $tags;
     }
 }
 
@@ -2144,6 +2150,7 @@ class BRouteObserver
 #var_dump($controllerName, $actionName);
         /** @var BActionController */
         $controller = BClassRegistry::instance( $controllerName, [], true );
+
         return $controller->dispatch( $actionName, $this->args );
     }
 
