@@ -640,7 +640,7 @@ class BRequest extends BClass
                 } elseif ( !empty( $_POST[ 'X-CSRF-TOKEN' ] ) ) {
                     $receivedToken = $_POST[ 'X-CSRF-TOKEN' ];
                 }
-                return empty( $receivedToken ) || $receivedToken !== BSession::i()->csrfToken();
+                return empty( $receivedToken ) || !BSession::i()->validateCsrfToken( $receivedToken );
 
             default:
                 throw new BException( 'Invalid CSRF check method: ' . $checkMethod );
