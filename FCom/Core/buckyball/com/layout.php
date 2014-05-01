@@ -124,6 +124,8 @@ class BLayout extends BClass
 
     protected $_rememberOverrides = false;
 
+    protected $_currentViewStack = array();
+
     /**
      * Shortcut to help with IDE autocompletion
      *
@@ -1121,6 +1123,35 @@ class BLayout extends BClass
         return $result;
     }
 
+    public function viewStackOn( $view )
+    {
+        array_push( $this->_currentViewStack, $view );
+        return $this;
+    }
+
+    public function viewStackOff($view)
+    {
+        $lastView = array_pop( $this->_currentViewStack );
+        $lastViewName = $lastView->getParam( 'view_name' );
+        $viewName = $view->getParam( 'view_name' );
+        if ( $lastViewName !== $viewName ) {
+            BDebug::warning('Wrong view stack off: ' . $viewName . ', expected: ' . $lastViewName );
+        }
+        return $this;
+    }
+
+    public function getViewStack($formatted = false)
+    {
+        if ( !$formatted ) {
+            return $this->_currentViewStack;
+        }
+        $output = array();
+        foreach ( $this->_currentViewStack as $i => $view ) {
+            $output[] = "#{$i}: @{$view->getParam('module_name')}/{$view->getParam('view_name')}";
+        }
+        return join("\n", $output);
+    }
+
     /**
      * @return void
      */
@@ -1476,6 +1507,10 @@ class BView extends BClass
         if ( $showDebugTags ) {
             $result .= "<!-- START VIEW: @{$modName}/{$viewName} -->\n";
         }
+
+        // TODO: link views with layouts
+        BLayout::i()->viewStackOn( $this );
+
         $result .= join( '', BEvents::i()->fire( 'BView::render:before', [ 'view' => $this ] ) );
 
         $viewContent = $this->_render();
@@ -1487,6 +1522,8 @@ class BView extends BClass
 
         $result .= $viewContent;
         $result .= join( '', BEvents::i()->fire( 'BView::render:after', [ 'view' => $this ] ) );
+
+        BLayout::i()->viewStackOff( $this );
 
         if ( $showDebugTags ) {
             $result .= "<!-- END VIEW: @{$modName}/{$viewName} -->\n";

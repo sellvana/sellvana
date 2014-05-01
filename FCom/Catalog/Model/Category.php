@@ -41,7 +41,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
     public function url()
     {
         $prefix = static::urlPrefix();
-        return BApp::href( $prefix . $this->url_path );
+        return BApp::frontendHref( $prefix . $this->url_path );
     }
 
     public function onReorderAZ( $args )
