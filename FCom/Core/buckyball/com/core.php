@@ -1738,7 +1738,18 @@ class BSession extends BClass
         $path = !empty( $config[ 'path' ] ) ? $config[ 'path' ] : BConfig::i()->get( 'web/base_store' );
         if ( empty( $path ) ) $path = BRequest::i()->webRoot();
 
-        $domain = !empty( $config[ 'domain' ] ) ? $config[ 'domain' ] : BRequest::i()->httpHost( false );
+        $httpHost = BRequest::i()->httpHost( false );
+        if ( !empty( $config[ 'domain' ] ) ) {
+            $allowedDomains = explode( '|', $config[ 'domain' ] );
+            if ( in_array( $httpHost, $allowedDomains ) ) {
+                $domain = $httpHost;
+            } else {
+                $domain = $allowedDomains[ 0 ];
+            }
+        } else {
+            $domain = $httpHost;
+        }
+
         if ( !empty( $config[ 'session_handler' ] ) && !empty( $this->_availableHandlers[ $config[ 'session_handler' ] ] ) ) {
             $class = $this->_availableHandlers[ $config[ 'session_handler' ] ];
             $class::i()->register( $ttl );
