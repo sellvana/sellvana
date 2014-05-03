@@ -1789,7 +1789,7 @@ class BSession extends BClass
         }
 
         if ( empty( $this->data[ '_language' ] ) ) {
-            $lang = BRequest::language();
+            $lang = BRequest::i()->language();
             if ( !empty( $lang ) ) {
                 $this->data[ '_language' ] = $lang;
             }
@@ -2010,19 +2010,27 @@ BDebug::debug( __METHOD__ . ': ' . spl_object_hash( $this ) );
 class BSession_APC extends BClass
 {
     protected $_prefix;
-    protected $_ttl = 0;
-    protected $_lockTimeout = 10;
+    protected $_ttl;
+    protected $_lockTimeout = 10; // if empty, no session locking, otherwise seconds to lock timeout
 
-    public function __construct()
+    public function __construct( $params = array() )
     {
         if ( function_exists( 'apc_store' ) ) {
             BSession::i()->addHandler( 'apc', __CLASS__ );
+        }
+        $def = session_get_cookie_params();
+        $this->_ttl = $def['lifetime'];
+        if (isset($params['ttl'])) {
+            $this->_ttl = $params['ttl'];
+        }
+        if (isset($params['lock_timeout'])) {
+            $this->_lockTimeout = $params['lock_timeout'];
         }
     }
 
     public function register( $ttl = null )
     {
-        if ( $ttl ) {
+        if ( !is_null( $ttl ) ) {
             $this->_ttl = $ttl;
         }
         session_set_save_handler(
