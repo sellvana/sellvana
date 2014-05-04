@@ -48,6 +48,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     {
         $view = $this->view( $this->_gridViewName );
         $config = $this->_processConfig( $this->gridConfig() );
+        $this->gridOrmConfig( $config[ 'orm' ] );
         $view->set( 'grid', [ 'config' => $config ] );
         BEvents::i()->fire( static::$_origClass . '::gridView', [ 'view' => $view ] );
         return $view;
@@ -119,11 +120,13 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     public function gridViewBefore( $args )
     {
         $view = $args[ 'page_view' ];
+        $hlp = BView::i();
         $view->set( [
             'title' => $this->_gridTitle,
             'actions' => [
                 'new' => ' <button type="button" class="btn btn-primary btn-sm" onclick="location.href=\''
-                    . BApp::href( $this->_formHref ) . '\'"><span>New ' . BView::i()->q( $this->_recordName )
+                    . BApp::href( $this->_formHref ) . '\'"><span>'
+                    . $hlp->q( $hlp->_( 'New %s', $this->_recordName ) )
                     . '</span></button>',
             ],
         ] );
@@ -146,6 +149,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             BResponse::i()->json( [ [ 'c' => 1 ], $data ] );
         } else {
             $r = BRequest::i()->get();
+            //TODO: clean up and remove
             if ( empty( $grid[ 'config' ][ 'orm' ] ) ) {
                 $mc = $this->_modelClass;
                 $grid[ 'config' ][ 'orm' ] = $mc::i()->orm( $this->_mainTableAlias )
@@ -159,7 +163,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                     $grid[ 'config' ][ 'orm' ]->where_not_in( $this->_mainTableAlias . '.id', $arr );
                 }
             }
-            $this->gridOrmConfig( $grid[ 'config' ][ 'orm' ] );
+            #$this->gridOrmConfig( $grid[ 'config' ][ 'orm' ] );
 
             $oc = static::$_origClass;
 
