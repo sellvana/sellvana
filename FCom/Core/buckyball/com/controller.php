@@ -40,6 +40,8 @@ class BRequest extends BClass
 
     protected $_postTagsWhitelist = [];
 
+    protected static $_language;
+
     /**
      * Shortcut to help with IDE autocompletion
      *
@@ -169,7 +171,7 @@ class BRequest extends BClass
      * Retrive language based on HTTP_ACCEPT_LANGUAGE
      * @return string
      */
-    static public function language()
+    static public function acceptLanguage()
     {
         $langs = [];
 
@@ -200,6 +202,17 @@ class BRequest extends BClass
         list( $toplang ) = each( $langs );
         //return en, de, es, it.... first two characters of language code
         return substr( $toplang, 0, 2 );
+    }
+
+    static public function language()
+    {
+        if ( is_null( static::$_language ) ) {
+            static::rawPath();
+            if ( is_null( static::$_language ) ) {
+                static::$_language = static::acceptLanguage();
+            }
+        }
+        return static::$_language;
     }
 
     /**
@@ -364,21 +377,30 @@ class BRequest extends BClass
     */
     public static function rawPath()
     {
-#echo "<pre>"; print_r($_SERVER); exit;
-        $path = !empty( $_SERVER[ 'PATH_INFO' ] ) ? $_SERVER[ 'PATH_INFO' ] :
-            ( !empty( $_SERVER[ 'ORIG_PATH_INFO' ] ) ? $_SERVER[ 'ORIG_PATH_INFO' ] : '/' );
-            /*
-                (!empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] :
-                    (!empty($_SERVER['SERVER_URL']) ? $_SERVER['SERVER_URL'] : '/')
-                )
-            );*/
+        static $path;
 
-        // nginx rewrite fix
-        $basename = basename( static::scriptName() );
-        $path = preg_replace( '#^/.*?' . preg_quote( $basename ) . '#', '', $path );
+        if ( is_null( $path ) ) {
+    #echo "<pre>"; print_r($_SERVER); exit;
+            $path = !empty( $_SERVER[ 'PATH_INFO' ] ) ? $_SERVER[ 'PATH_INFO' ] :
+                ( !empty( $_SERVER[ 'ORIG_PATH_INFO' ] ) ? $_SERVER[ 'ORIG_PATH_INFO' ] : '/' );
+                /*
+                    (!empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] :
+                        (!empty($_SERVER['SERVER_URL']) ? $_SERVER['SERVER_URL'] : '/')
+                    )
+                );*/
 
-        if ( !$path ) {
-            $path = '/';
+            // nginx rewrite fix
+            $basename = basename( static::scriptName() );
+            $path = preg_replace( '#^/.*?' . preg_quote( $basename ) . '#', '', $path );
+
+            if ( BConfig::i()->get( 'web/language_in_url' ) && preg_match( '#^/([a-z]{2})(/.*|$)#', $path, $match ) ) {
+                static::$_language = $match[ 1 ];
+                $path = $match[ 2 ];
+            }
+
+            if ( !$path ) {
+                $path = '/';
+            }
         }
 
         return $path;
@@ -402,6 +424,10 @@ class BRequest extends BClass
     */
     public static function get( $key = null )
     {
+        // Encountered this in some nginx + apache environments
+        if ( empty( $_GET ) && !empty( $_SERVER[ 'QUERY_STRING' ] ) ) {
+            parse_str( $_SERVER[ 'QUERY_STRING' ], $_GET );
+        }
         return is_null( $key ) ? $_GET : ( isset( $_GET[ $key ] ) ? $_GET[ $key ] : null );
     }
 
@@ -640,7 +666,7 @@ class BRequest extends BClass
                 } elseif ( !empty( $_POST[ 'X-CSRF-TOKEN' ] ) ) {
                     $receivedToken = $_POST[ 'X-CSRF-TOKEN' ];
                 }
-                return empty( $receivedToken ) || $receivedToken !== BSession::i()->csrfToken();
+                return empty( $receivedToken ) || !BSession::i()->validateCsrfToken( $receivedToken );
 
             default:
                 throw new BException( 'Invalid CSRF check method: ' . $checkMethod );
@@ -916,8 +942,7 @@ class BRequest extends BClass
                 } else {
                     $tags = $this->_postTagsWhitelist[ $forUrlPath ][ $childPath ];
                     if ( '+' === $tags ) {
-                        $tags = "<a><b><blockquote><code><del><dd><dl><dt><em><h1><i><img><kbd><li><ol><p><pre><s><sup>'
-                            . '<sub><strong><strike><ul><br><hr>";
+                        $tags = $this->getAllowedTags();
                     }
                     if ( '*' !== $tags ) {
                         $v = strip_tags( $v, $tags );
@@ -926,6 +951,13 @@ class BRequest extends BClass
             }
         }
         unset( $v );
+    }
+
+    public function getAllowedTags()
+    {
+        $tags = "<a><b><blockquote><code><del><dd><dl><dt><em><h1><i><img><kbd><li><ol><p><pre><s><sup>'
+            . '<sub><strong><strike><ul><br><hr>";
+        return $tags;
     }
 }
 
@@ -2144,6 +2176,7 @@ class BRouteObserver
 #var_dump($controllerName, $actionName);
         /** @var BActionController */
         $controller = BClassRegistry::instance( $controllerName, [], true );
+
         return $controller->dispatch( $actionName, $this->args );
     }
 

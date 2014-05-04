@@ -14,6 +14,7 @@ base:
             - [ requireJs, bootstrap, "@FCom_FrontendThemeBootSimple/Frontend/js/bootstrap", { deps: [ jquery ] } ]
             - [ requireJs, responsiveslides, "@FCom_FrontendThemeBootSimple/Frontend/js/vendor/responsiveslides.min", { deps: [ jquery ] } ]
             - [ requireJs, typeahead, "@FCom_FrontendThemeBootSimple/Frontend/js/vendor/typeahead.min", { deps: [ jquery ] } ]
+            - [ requireJs, fcom.core, "@FCom_Core/js/fcom.core" ]
             - [ requireJs, fcom.frontend, "@FCom_FrontendThemeBootSimple/Frontend/js/fcom.frontend" ]
             - [ requireRun, fcom.frontend ]
 

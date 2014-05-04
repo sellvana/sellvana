@@ -1738,7 +1738,18 @@ class BSession extends BClass
         $path = !empty( $config[ 'path' ] ) ? $config[ 'path' ] : BConfig::i()->get( 'web/base_store' );
         if ( empty( $path ) ) $path = BRequest::i()->webRoot();
 
-        $domain = !empty( $config[ 'domain' ] ) ? $config[ 'domain' ] : BRequest::i()->httpHost( false );
+        $httpHost = BRequest::i()->httpHost( false );
+        if ( !empty( $config[ 'domain' ] ) ) {
+            $allowedDomains = explode( '|', $config[ 'domain' ] );
+            if ( in_array( $httpHost, $allowedDomains ) ) {
+                $domain = $httpHost;
+            } else {
+                $domain = $allowedDomains[ 0 ];
+            }
+        } else {
+            $domain = $httpHost;
+        }
+
         if ( !empty( $config[ 'session_handler' ] ) && !empty( $this->_availableHandlers[ $config[ 'session_handler' ] ] ) ) {
             $class = $this->_availableHandlers[ $config[ 'session_handler' ] ];
             $class::i()->register( $ttl );
@@ -1789,7 +1800,7 @@ class BSession extends BClass
         }
 
         if ( empty( $this->data[ '_language' ] ) ) {
-            $lang = BRequest::language();
+            $lang = BRequest::i()->language();
             if ( !empty( $lang ) ) {
                 $this->data[ '_language' ] = $lang;
             }
@@ -1894,14 +1905,15 @@ BDebug::debug( __METHOD__ . ': ' . spl_object_hash( $this ) );
     */
     public function close()
     {
-        if ( !$this->_dirty || !empty( $_SESSION ) ) {
+        if ( !$this->_dirty/* || !empty( $_SESSION )*/ ) {
+#echo "<pre>"; var_dump($this->_dirty, $_SESSION); echo "</pre>";
             return;
         }
-BDebug::debug( __METHOD__ . ': ' . spl_object_hash( $this ) );
+#BDebug::debug( __METHOD__ . ': ' . spl_object_hash( $this ) );
 #ob_start(); debug_print_backtrace(); BDebug::debug(nl2br(ob_get_clean()));
         if ( !$this->_phpSessionOpen ) {
             if ( headers_sent() ) {
-                BDebug::warning( "Headers already sent, can't start session" );
+                BDebug::info( "Headers already sent, can't start session" );
             } else {
                 session_start();
             }
@@ -1995,6 +2007,11 @@ BDebug::debug( __METHOD__ . ': ' . spl_object_hash( $this ) );
         return $data[ '_csrf_token' ];
     }
 
+    public function validateCsrfToken( $token )
+    {
+        return $token === $this->csrfToken();
+    }
+
     public function __destruct()
     {
         //$this->close();
@@ -2004,19 +2021,27 @@ BDebug::debug( __METHOD__ . ': ' . spl_object_hash( $this ) );
 class BSession_APC extends BClass
 {
     protected $_prefix;
-    protected $_ttl = 0;
-    protected $_lockTimeout = 10;
+    protected $_ttl;
+    protected $_lockTimeout = 10; // if empty, no session locking, otherwise seconds to lock timeout
 
-    public function __construct()
+    public function __construct( $params = array() )
     {
         if ( function_exists( 'apc_store' ) ) {
             BSession::i()->addHandler( 'apc', __CLASS__ );
+        }
+        $def = session_get_cookie_params();
+        $this->_ttl = $def['lifetime'];
+        if (isset($params['ttl'])) {
+            $this->_ttl = $params['ttl'];
+        }
+        if (isset($params['lock_timeout'])) {
+            $this->_lockTimeout = $params['lock_timeout'];
         }
     }
 
     public function register( $ttl = null )
     {
-        if ( $ttl ) {
+        if ( !is_null( $ttl ) ) {
             $this->_ttl = $ttl;
         }
         session_set_save_handler(

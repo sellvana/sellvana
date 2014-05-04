@@ -138,12 +138,16 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
         }
         //package weight
         $total = 0;
-        foreach ( $packages as $pack ) {
-            $this->_rateApiCall( $cart->id(), $tozip, $service, $length, $width, $height, $pack );
-            if ( $this->_rate->isError() ) {
-                 continue;
+        foreach($packages as $pack) {
+            // Returns false if no credentials are configured.
+            // As a side effect, $this->_rate will be NULL.
+            if ( $this->_rateApiCall($cart->id(), $tozip, $service, $length, 
+                $width, $height, $pack) ) {
+                if ($this->_rate->isError()) {
+                     continue;
+                }
+                $total += $this->_rate->getTotal();
             }
-            $total += $this->_rate->getTotal();
         }
         return $total;
     }
