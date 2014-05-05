@@ -129,7 +129,7 @@
                         </div>
                     </section>
                 {% endif %}
-              <p class="f-stock-notice f-in-stock">In Stock.</p>
+              <p class="f-stock-notice f-in-stock" id="prod-in-stock">In Stock.</p>
               <button type="submit" class="btn btn-primary btn-lg" title="{{ "Add to Cart"| _ }}">
                   <span class="glyphicon glyphicon-shopping-cart"></span>{{ "Add to Cart"| _ }}</button>
                 <a class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ prod.id() }}"
@@ -217,15 +217,36 @@
 </div>
 {{ THIS.view('catalog/product/quickview') | raw }}
 <script>
-    require(['jquery'], function ($, _) {
+    require(['jquery'], function ($) {
         var variants = $.parseJSON('{{ UTIL.toJson(variants.variants)|raw }}');
         $('#price-variant').html(variants[0].price);
         $('#quantity-variant').val(variants[0].qty);
+        $('#prod-in-stock').html(variants[0].qty + ' Items In Stock.');
         for (var val in variants[0].fields ) {
             $('select [name="'+ val +'"]').find('option [value="'+ variants[0].fields[val] +'"]').attr('selected', 'selected');
         }
         $('.variant').change(function () {
-
+            var find = null;
+            variants.forEach(function (obj) {
+                var correct = true;
+                $('.variant').each(function () {
+                    if (obj.fields[$(this).attr('name')] != $(this).val()) {
+                        correct = false;
+                    }
+                });
+                if (correct) {
+                    find = obj;
+                }
+            })
+            if (find == null || find.qty == 0) {
+                $('#price-variant').html("Not exists");
+                $('#quantity-variant').val(0);
+                $('#prod-in-stock').html('Not Exists Items In Stock.');
+            } else {
+                $('#price-variant').html(find.price);
+                $('#quantity-variant').val(find.qty);
+                $('#prod-in-stock').html(find.qty + ' Items In Stock.');
+            }
         })
     })
 </script>

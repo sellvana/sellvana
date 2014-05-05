@@ -19,7 +19,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
     }
     window.variantGridRegister = function(grid) {
         grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
-
             this.$el.find('select').addClass('variantUnique');
         }
         grid.build();
@@ -27,6 +26,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
         vRowsCollection = grid.getRows();
         vFieldGridInit();
         grayGrid();
+        bodyGrid.find('select').change(function () {
+            $('.variantUnique').each(function () {
+
+                $(this).valid();
+            })
+        })
     }
 
     function grayGrid() {
@@ -48,8 +53,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
 
     function resetSelect()
     {
-        $('#sel_var_field').val('');
-        $('#sel_var_field').select2();
+        $('#sel_var_field').val('').select2();
     }
 
     function vFieldGridInit()
@@ -260,28 +264,24 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
     function variantUnique(value, elem, params) {
         var error = true;
         if (typeof (elem) !== 'undefined') {
-            vRowsCollection.each(function (data) {
-
-                    var parent = $(elem).parents('tr');
-                    if (parent.attr('id') != data.get('id')) {
-                        var flag = false;// all select fields are same
-                        parent.find('select').each(function(index) {
-                            var comparand = $('#variant-grid-'+$(this).data('col')+'-'+data.get('id')).val();
-                            if ($(this).val() !== comparand) {
-                                flag = true; // at least one field is different
-                            }
-                        });
-
-                        if (!flag) {
-
-                            error = false;
+            var parent = $(elem).parents('tr');
+            bodyGrid.find('tr').each(function () {
+                var self = this;
+                var flag = false;
+                if ($(this).attr('id') != parent.attr('id')) {
+                    parent.find('select').each(function(index) {
+                        if ($(this).val() !== $(self).find('select[data-col="'+ $(this).attr('data-col') +'"]').val()) {
+                            flag = true; // at least one field is different
                         }
+                    });
+                    if (!flag) {
+                        error = false;
                     }
+                }
 
-                    return error;
-            });
+                return error;
+            })
         }
-
         return error;
     }
 
