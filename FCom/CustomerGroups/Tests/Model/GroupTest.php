@@ -14,7 +14,7 @@ class FCom_CustomerGroups_Tests_Model_GroupTest
 
     protected function setUp()
     {
-        $this->model = FCom_CustomerGroups_Model_Group::i( true );
+        $this->model = FCom_CustomerGroups_Model_Group::i(true);
     }
 
     /**
@@ -24,8 +24,8 @@ class FCom_CustomerGroups_Tests_Model_GroupTest
     {
         $groupOptions = FCom_CustomerGroups_Model_Group::i()->groupsOptions();
 
-        $this->assertTrue( is_array( $groupOptions ) );
+        $this->assertTrue(is_array($groupOptions));
 
-        $this->assertTrue( count( $groupOptions ) >= 3 );
+        $this->assertTrue(count($groupOptions) >= 3);
     }
 }

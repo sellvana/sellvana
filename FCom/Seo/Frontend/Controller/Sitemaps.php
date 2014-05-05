@@ -4,20 +4,20 @@ class FCom_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller_Abs
 {
     public function action_sitemap()
     {
-        $this->layout( '/sitemap' );
+        $this->layout('/sitemap');
     }
 
     public function action_index_xml()
     {
         $output = '<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-        $sitemaps = [ //TODO: fetch real paginated sitemaps
-            [ 'loc' => BApp::href( 'sitemap.xml.gz' ) ],
+        $sitemaps = [//TODO: fetch real paginated sitemaps
+            ['loc' => BApp::href('sitemap.xml.gz')],
         ];
-        foreach ( $sitemaps as $sitemap ) {
+        foreach ($sitemaps as $sitemap) {
             $output .= '<sitemap>'
-                . '<loc>' . $sitemap[ 'loc' ] . '</loc>'
-                . '<lastmod>' . date( 'c' ) . '</lastmod>' //TODO: figure out how to get lastmod
+                . '<loc>' . $sitemap['loc'] . '</loc>'
+                . '<lastmod>' . date('c') . '</lastmod>' //TODO: figure out how to get lastmod
                 . '</sitemap>';
         }
         $output .= '</sitemapindex>';
@@ -28,14 +28,14 @@ class FCom_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller_Abs
     public function action_sitemap_data()
     {
         $params = BRequest::i()->param();
-        $page = $params[ 2 ];
-        $type = $params[ 3 ];
+        $page = $params[2];
+        $type = $params[3];
 
         $urls = [];
-        BEvents::i()->fire( 'FCom_Seo_Frontend_Controller_Sitemaps.sitemap',
-            [ 'urls' => &$urls, 'page' => $page, 'filetype' => $type ] );
+        BEvents::i()->fire('FCom_Seo_Frontend_Controller_Sitemaps.sitemap',
+            ['urls' => &$urls, 'page' => $page, 'filetype' => $type]);
 
-        switch ( $type ) {
+        switch ($type) {
         case 'txt':
             $output = '';
             break;
@@ -46,40 +46,40 @@ class FCom_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller_Abs
         xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
 ';
         }
-        foreach ( $urls as $url ) {
-            if ( !is_array( $url ) ) {
-                $url = [ 'loc' => $url ];
+        foreach ($urls as $url) {
+            if (!is_array($url)) {
+                $url = ['loc' => $url];
             }
-            switch ( $type ) {
+            switch ($type) {
             case '.txt':
-                $output .= $url[ 'loc' ] . "\n";
+                $output .= $url['loc'] . "\n";
                 break;
             case '.xml':
-                $output .= '<url><loc>' . $url[ 'loc' ] . '</loc>';
-                if ( !empty( $url[ 'lastmod' ] ) ) {
-                    $lastmod = $url[ 'lastmod' ];
-                    if ( !is_numeric( $lastmod ) ) $lastmod = strtotime( $lastmod );
-                    $output .= '<lastmod>' . date( 'c', $lastmod ) . '</lastmod>';
+                $output .= '<url><loc>' . $url['loc'] . '</loc>';
+                if (!empty($url['lastmod'])) {
+                    $lastmod = $url['lastmod'];
+                    if (!is_numeric($lastmod)) $lastmod = strtotime($lastmod);
+                    $output .= '<lastmod>' . date('c', $lastmod) . '</lastmod>';
                 }
-                if ( !empty( $url[ 'changefreq' ] ) ) {
-                    $output .= '<changefreq>' . $url[ 'changefreq' ] . '</changefreq>';
+                if (!empty($url['changefreq'])) {
+                    $output .= '<changefreq>' . $url['changefreq'] . '</changefreq>';
                 }
-                if ( !empty( $url[ 'priority' ] ) ) {
-                    $output .= '<priority>' . $url[ 'priority' ] . '</priority>';
+                if (!empty($url['priority'])) {
+                    $output .= '<priority>' . $url['priority'] . '</priority>';
                 }
                 $output .= '</url>';
                 break;
             }
         }
 
-        switch ( $type ) {
+        switch ($type) {
         case 'xml':
             $output .= '</urlset>';
             break;
         }
 
-        if ( !empty( $params[ 4 ] ) && $params[ 4 ] === '.gz' ) {
-            $output = gzcompress( $output );
+        if (!empty($params[4]) && $params[4] === '.gz') {
+            $output = gzcompress($output);
         }
         echo $output;
         exit;
