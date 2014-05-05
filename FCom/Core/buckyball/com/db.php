@@ -147,6 +147,9 @@ class BDb
             }
             $engine = !empty($config['engine']) ? $config['engine'] : 'mysql';
             $host = !empty($config['host']) ? $config['host'] : '127.0.0.1';
+            if (strpos($host, ':') !== false && $host[0] !== '[') {
+                $host = '[' . $host . ']';
+            }
             switch ($engine) {
                 case "mysql":
                     $dsn = "mysql:host={$host};dbname={$config['dbname']};charset=UTF8";
@@ -1398,6 +1401,7 @@ class BORM extends ORMWrapper
 
         if (!$this->_is_new) { // UPDATE
             // If there are no dirty values, do nothing
+
             if (count($values) == 0) {
                 return true;
             }
