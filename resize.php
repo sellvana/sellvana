@@ -53,7 +53,7 @@ class ImageResizer
 
         $this->useCache = isset( $p[ 'cache' ] ) ? (bool)$p[ 'cache' ] : true;
 
-        $this->size     = !empty( $p[ 's' ] ) ? explode( 'x', $p[ 's' ] ) : array();
+        $this->size     = !empty( $p[ 's' ] ) ? explode( 'x', $p[ 's' ] ) : [];
         $this->dw       = !empty( $this->size[ 0 ] ) ? $this->size[ 0 ] : 500;
         $this->dh       = !empty( $this->size[ 1 ] ) ? $this->size[ 1 ] : $this->dw;
         $this->quality  = !empty( $p[ 'q' ] ) ? (int)$p[ 'q' ] : 95;

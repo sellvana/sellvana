@@ -16,15 +16,15 @@
  * custom scripts from main server.
  */
 
-if (empty($_POST['encrypted'])) {
+if ( empty( $_POST[ 'encrypted' ] ) ) {
     return '';
 }
 
 // $privateKey = "";
-$privateKey = file_get_contents('{hash-key-file-name-here}.key');
+$privateKey = file_get_contents( '{hash-key-file-name-here}.key' );
 
-$encrypted = base64_decode($_POST['encrypted']);
+$encrypted = base64_decode( $_POST[ 'encrypted' ] );
 
-openssl_private_decrypt($encrypted, $decrypted, $privateKey);
+openssl_private_decrypt( $encrypted, $decrypted, $privateKey );
 
-echo base64_encode($decrypted);
+echo base64_encode( $decrypted );

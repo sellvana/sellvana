@@ -13,7 +13,7 @@ interface FCom_Sales_Method_Shipping_Interface
     /**
      * Return shipping rate(cost) based on service, location and package parameters
      */
-    public function getRateCallback($cart);
+    public function getRateCallback( $cart );
 
     public function getEstimate();
 

@@ -1,1 +1,1 @@
-<?php return array('Check / Money Order' => '');
+<?php return [ 'Check / Money Order' => '' ];

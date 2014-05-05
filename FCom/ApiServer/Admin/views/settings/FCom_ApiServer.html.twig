@@ -1,5 +1,4 @@
 {% set m = THIS.get('model') %}
-{% set mode = m.get("mode_by_ip/FCom_ApiServer")|split("\n")|join('|') %}
 <h2>{{ "API Server Settings"|_}}</h2>
 
 <div class="accordion accordion-blue panel-group" id="settings-FCom_ApiServer">
@@ -19,8 +18,7 @@
 </div>
 <script  type="text/javascript">
     require(['backbone', 'jquery', 'fcom.ipmode','select2'], function(Backbone, $, ipMode) {
-        var mode = '{{ mode }}';
-        mode = mode.split('|');
+        var mode = {{ UTIL.toJson(c.get("mode_by_ip/FCom_Admin")|split("\n")) | raw }};
         ipMode.initMode({el: $('#settings-FCom_ApiServer-group0').find('.group-ip-mode'), name: 'config[mode_by_ip][FCom_ApiServer]', mode: mode});
     })
 </script>

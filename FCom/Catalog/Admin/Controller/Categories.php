@@ -14,35 +14,45 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
 
     public function action_upload__POST()
     {
-        $id = BRequest::i()->param('id', true);
+        $id = BRequest::i()->param( 'id', true );
         try {
-            $model = FCom_Catalog_Model_Category::i()->load($id);
+            $model = FCom_Catalog_Model_Category::i()->load( $id );
             /** @var $model FCom_Catalog_Model_Category */
-            if ($model) {
-                if (isset($_FILES['upload']) && !empty($_FILES['upload']['tmp_name'])) {
+            if ( $model ) {
+                if ( isset( $_FILES[ 'upload' ] ) && !empty( $_FILES[ 'upload' ][ 'tmp_name' ] ) ) {
                     //todo:should add check max size
-                    $tmp = $_FILES['upload']['tmp_name'];
-                    $needConvert = (exif_imagetype($tmp) != IMAGETYPE_JPEG) ? true : false; //check if we need convert image to jpg
-                    $dir = FCom_Core_Main::i()->dir($model->imagePath());
-                    $imageFile = $dir.$id.'.jpg';
-                    if (move_uploaded_file($tmp, $imageFile)) {
-                        $results = array('type' => 'success', 'filename' => $id.'.jpg');
-                        if ($needConvert && !BUtil::convertImage($imageFile, $imageFile, null, null, 'jpg')) {
-                            $results = array('type' => 'error', 'msg' => $this->_('An error occurred while convert image to jpg.'));
+                    $tmp = $_FILES[ 'upload' ][ 'tmp_name' ];
+                    $needConvert = ( exif_imagetype( $tmp ) != IMAGETYPE_JPEG ) ? true : false; //check if we need convert image to jpg
+                    $dir = FCom_Core_Main::i()->dir( $model->imagePath() );
+                    $imageFile = $dir . $id . '.jpg';
+                    if ( move_uploaded_file( $tmp, $imageFile ) ) {
+                        $results = [ 'type' => 'success', 'filename' => $id . '.jpg' ];
+                        if ( $needConvert && !BUtil::convertImage( $imageFile, $imageFile, null, null, 'jpg' ) ) {
+                            $results = [ 'type' => 'error', 'msg' => $this->_( 'An error occurred while convert image to jpg.' ) ];
                             $model->deleteImage(); //delete uploaded image
                         }
                     } else {
-                        $results = array('type' => 'error', 'msg' => $this->_('An error occurred while uploading image.'));
+                        $results = [ 'type' => 'error', 'msg' => $this->_( 'An error occurred while uploading image.' ) ];
                     }
                 } else {
-                    $results = array('type' => 'error', 'msg' => $this->_('No image file uploaded, please check again.'));
+                    $results = [ 'type' => 'error', 'msg' => $this->_( 'No image file uploaded, please check again.' ) ];
                 }
             } else {
-                $results = array('type' => 'error', 'msg' => $this->_('Cannot load model.'));
+                $results = [ 'type' => 'error', 'msg' => $this->_( 'Cannot load model.' ) ];
             }
-        } catch (Exception $e) {
-            $results = array('type' => 'error', 'msg' => $e->getMessage());
+        } catch ( Exception $e ) {
+            $results = [ 'type' => 'error', 'msg' => $e->getMessage() ];
         }
-        BResponse::i()->json($results);
+        BResponse::i()->json( $results );
+    }
+
+    public function onGenerateSiteMap( $args )
+    {
+        $callback = function ( $row ) use ( $args ) {
+            if ( $row->get( 'parent_id' ) != null ) {
+                array_push( $args[ 'site_map' ], [ 'loc' => BApp::frontendHref( $row->get( 'url_path' ) ), 'changefreq' => 'daily' ] );
+            }
+        };
+        FCom_Catalog_Model_Category::i()->orm()->select( [ 'url_path', 'parent_id' ] )->iterate( $callback );
     }
 }

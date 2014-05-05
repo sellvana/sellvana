@@ -1,27 +1,9 @@
 {% set model = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
-
+{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% set fieldData = { validator: validator } %}
 <fieldset>
-    <div class="form-group">
-        <label class="col-md-2 label-control" for="model-email">{{ 'Email'|_ }}</label>
-        <div class="col-md-5">
-            <input id="model-email" class="form-control" type="text" name="model[email]" value="{{ validator.fieldValue('email') }}" />
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 label-control" for="model-unsub_all">{{ 'Un Subscribe All'|_ }}</label>
-        <div class="col-md-5">
-            <input value="0" name="model[unsub_all]" type="hidden" />
-            <input id="model-unsub_all" class="form-control switch-cbx" type="checkbox" {{ validator.fieldValue('unsub_all') == 1 ? 'checked' : '' }}
-                   name="model[unsub_all]" value="{{ validator.fieldValue('unsub_all') }}" />
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 label-control" for="model-sub_newsletter">{{ 'Subscribe Newsletter'|_ }}</label>
-        <div class="col-md-5">
-            <input value="0" name="model[sub_newsletter]" type="hidden" />
-            <input id="model-sub_newsletter" class="form-control switch-cbx" type="checkbox" {{ validator.fieldValue('sub_newsletter') == 1 ? 'checked' : '' }}
-                   name="model[sub_newsletter]" value="{{ validator.fieldValue('sub_newsletter') }}" />
-        </div>
-    </div>
+    {{ forms.input(fieldData|merge({field:'email', label:'Email'|_})) }}
+    {{ forms.boolean(fieldData|merge({field:'unsub_all', label:'Un Subscribe All'|_})) }}
+    {{ forms.boolean(fieldData|merge({field:'sub_newsletter', label:'Subscribe Newsletter'|_})) }}
 </fieldset>

@@ -36,9 +36,11 @@ class BRequest extends BClass
     *
     * @var array
     */
-    protected $_params = array();
+    protected $_params = [];
 
-    protected $_postTagsWhitelist = array();
+    protected $_postTagsWhitelist = [];
+
+    protected static $_language;
 
     /**
      * Shortcut to help with IDE autocompletion
@@ -47,9 +49,9 @@ class BRequest extends BClass
      * @param array $args
      * @return BRequest
      */
-    public static function i($new=false, array $args=array())
+    public static function i( $new = false, array $args = [] )
     {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
 
     /**
@@ -61,11 +63,11 @@ class BRequest extends BClass
     {
         $this->stripMagicQuotes();
 
-        if (!empty($_SERVER['ORIG_SCRIPT_NAME'])) {
-            $_SERVER['ORIG_SCRIPT_NAME'] = str_replace('/index.php/index.php', '/index.php', $_SERVER['ORIG_SCRIPT_NAME']);
+        if ( !empty( $_SERVER[ 'ORIG_SCRIPT_NAME' ] ) ) {
+            $_SERVER[ 'ORIG_SCRIPT_NAME' ] = str_replace( '/index.php/index.php', '/index.php', $_SERVER[ 'ORIG_SCRIPT_NAME' ] );
         }
-        if (!empty($_SERVER['ORIG_SCRIPT_FILENAME'])) {
-            $_SERVER['ORIG_SCRIPT_FILENAME'] = str_replace('/index.php/index.php', '/index.php', $_SERVER['ORIG_SCRIPT_FILENAME']);
+        if ( !empty( $_SERVER[ 'ORIG_SCRIPT_FILENAME' ] ) ) {
+            $_SERVER[ 'ORIG_SCRIPT_FILENAME' ] = str_replace( '/index.php/index.php', '/index.php', $_SERVER[ 'ORIG_SCRIPT_FILENAME' ] );
         }
     }
 
@@ -76,7 +78,7 @@ class BRequest extends BClass
     */
     public static function ip()
     {
-        return !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+        return !empty( $_SERVER[ 'REMOTE_ADDR' ] ) ? $_SERVER[ 'REMOTE_ADDR' ] : null;
     }
 
     /**
@@ -86,7 +88,7 @@ class BRequest extends BClass
     */
     public static function serverIp()
     {
-        return !empty($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : null;
+        return !empty( $_SERVER[ 'SERVER_ADDR' ] ) ? $_SERVER[ 'SERVER_ADDR' ] : null;
     }
 
     /**
@@ -96,7 +98,7 @@ class BRequest extends BClass
     */
     public static function serverName()
     {
-        return !empty($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : null;
+        return !empty( $_SERVER[ 'SERVER_NAME' ] ) ? $_SERVER[ 'SERVER_NAME' ] : null;
     }
 
     /**
@@ -104,16 +106,16 @@ class BRequest extends BClass
     *
     * @return string
     */
-    public static function httpHost($includePort = true)
+    public static function httpHost( $includePort = true )
     {
-        if (empty($_SERVER['HTTP_HOST'])) {
+        if ( empty( $_SERVER[ 'HTTP_HOST' ] ) ) {
             return null;
         }
-        if ($includePort) {
-            return $_SERVER['HTTP_HOST'];
+        if ( $includePort ) {
+            return $_SERVER[ 'HTTP_HOST' ];
         }
-        $a = explode(':', $_SERVER['HTTP_HOST']);
-        return $a[0];
+        $a = explode( ':', $_SERVER[ 'HTTP_HOST' ] );
+        return $a[ 0 ];
     }
 
     /**
@@ -123,7 +125,7 @@ class BRequest extends BClass
     */
     public static function httpPort()
     {
-        return !empty($_SERVER['HTTP_PORT']) ? $_SERVER['HTTP_PORT'] : null;
+        return !empty( $_SERVER[ 'HTTP_PORT' ] ) ? $_SERVER[ 'HTTP_PORT' ] : null;
     }
 
     /**
@@ -133,7 +135,7 @@ class BRequest extends BClass
     */
     public static function httpOrigin()
     {
-        return !empty($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : null;
+        return !empty( $_SERVER[ 'HTTP_ORIGIN' ] ) ? $_SERVER[ 'HTTP_ORIGIN' ] : null;
     }
 
     /**
@@ -143,7 +145,7 @@ class BRequest extends BClass
     */
     public static function https()
     {
-        return !empty($_SERVER['HTTPS']);
+        return !empty( $_SERVER[ 'HTTPS' ] );
     }
 
     /**
@@ -154,8 +156,8 @@ class BRequest extends BClass
     public static function serverProtocol()
     {
         $protocol = "HTTP/1.0";
-        if(isset($_SERVER['SERVER_PROTOCOL']) && stripos($_SERVER['SERVER_PROTOCOL'],"HTTP") >= 0){
-            $protocol = $_SERVER['SERVER_PROTOCOL'];
+        if ( isset( $_SERVER[ 'SERVER_PROTOCOL' ] ) && stripos( $_SERVER[ 'SERVER_PROTOCOL' ], "HTTP" ) >= 0 ) {
+            $protocol = $_SERVER[ 'SERVER_PROTOCOL' ];
         }
         return $protocol;
     }
@@ -169,36 +171,48 @@ class BRequest extends BClass
      * Retrive language based on HTTP_ACCEPT_LANGUAGE
      * @return string
      */
-    static public function language()
+    static public function acceptLanguage()
     {
-        $langs = array();
+        $langs = [];
 
-        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        if ( isset( $_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ] ) ) {
             // break up string into pieces (languages and q factors)
-            preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $lang_parse);
+            $langRegex = '/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i';
+            preg_match_all($langRegex , $_SERVER[ 'HTTP_ACCEPT_LANGUAGE' ], $lang_parse );
 
-            if (count($lang_parse[1])) {
+            if ( count( $lang_parse[ 1 ] ) ) {
                 // create a list like "en" => 0.8
-                $langs = array_combine($lang_parse[1], $lang_parse[4]);
+                $langs = array_combine( $lang_parse[ 1 ], $lang_parse[ 4 ] );
 
                 // set default to 1 for any without q factor
-                foreach ($langs as $lang => $val) {
-                    if ($val === '') $langs[$lang] = 1;
+                foreach ( $langs as $lang => $val ) {
+                    if ( $val === '' ) $langs[ $lang ] = 1;
                 }
 
                 // sort list based on value
-                arsort($langs, SORT_NUMERIC);
+                arsort( $langs, SORT_NUMERIC );
             }
         }
 
         //if no language detected return false
-        if (empty($langs)) {
+        if ( empty( $langs ) ) {
             return false;
         }
 
-        list($toplang) = each($langs);
+        list( $toplang ) = each( $langs );
         //return en, de, es, it.... first two characters of language code
-        return substr($toplang, 0, 2);
+        return substr( $toplang, 0, 2 );
+    }
+
+    static public function language()
+    {
+        if ( is_null( static::$_language ) ) {
+            static::rawPath();
+            if ( is_null( static::$_language ) ) {
+                static::$_language = static::acceptLanguage();
+            }
+        }
+        return static::$_language;
     }
 
     /**
@@ -208,19 +222,19 @@ class BRequest extends BClass
     */
     public static function xhr()
     {
-        return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH']=='XMLHttpRequest';
+        return !empty( $_SERVER[ 'HTTP_X_REQUESTED_WITH' ] ) && $_SERVER[ 'HTTP_X_REQUESTED_WITH' ] == 'XMLHttpRequest';
     }
 
-    public static function userAgent($pattern=null)
+    public static function userAgent( $pattern = null )
     {
-        if (empty($_SERVER['HTTP_USER_AGENT'])) {
+        if ( empty( $_SERVER[ 'HTTP_USER_AGENT' ] ) ) {
             return null;
         }
-        $userAgent = $_SERVER['HTTP_USER_AGENT'];
-        if (is_null($pattern)) {
+        $userAgent = $_SERVER[ 'HTTP_USER_AGENT' ];
+        if ( is_null( $pattern ) ) {
             return $userAgent;
         }
-        preg_match($pattern, $userAgent, $match);
+        preg_match( $pattern, $userAgent, $match );
         return $match;
     }
 
@@ -231,7 +245,7 @@ class BRequest extends BClass
     */
     public static function method()
     {
-        return !empty($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
+        return !empty( $_SERVER[ 'REQUEST_METHOD' ] ) ? $_SERVER[ 'REQUEST_METHOD' ] : 'GET';
     }
 
     /**
@@ -241,7 +255,7 @@ class BRequest extends BClass
     */
     public static function docRoot()
     {
-        return !empty($_SERVER['DOCUMENT_ROOT']) ? str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']) : null;
+        return !empty( $_SERVER[ 'DOCUMENT_ROOT' ] ) ? str_replace( '\\', '/', $_SERVER[ 'DOCUMENT_ROOT' ] ) : null;
     }
 
     /**
@@ -251,8 +265,8 @@ class BRequest extends BClass
     */
     public static function scriptName()
     {
-        return !empty($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_NAME']) :
-            (!empty($_SERVER['ORIG_SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['ORIG_SCRIPT_NAME']) : null);
+        return !empty( $_SERVER[ 'SCRIPT_NAME' ] ) ? str_replace( '\\', '/', $_SERVER[ 'SCRIPT_NAME' ] ) :
+            ( !empty( $_SERVER[ 'ORIG_SCRIPT_NAME' ] ) ? str_replace( '\\', '/', $_SERVER[ 'ORIG_SCRIPT_NAME' ] ) : null );
     }
 
     /**
@@ -262,8 +276,8 @@ class BRequest extends BClass
     */
     public static function scriptFilename()
     {
-        return !empty($_SERVER['SCRIPT_FILENAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME']) :
-            (!empty($_SERVER['ORIG_SCRIPT_FILENAME']) ? str_replace('\\', '/', $_SERVER['ORIG_SCRIPT_FILENAME']) : null);
+        return !empty( $_SERVER[ 'SCRIPT_FILENAME' ] ) ? str_replace( '\\', '/', $_SERVER[ 'SCRIPT_FILENAME' ] ) :
+            ( !empty( $_SERVER[ 'ORIG_SCRIPT_FILENAME' ] ) ? str_replace( '\\', '/', $_SERVER[ 'ORIG_SCRIPT_FILENAME' ] ) : null );
     }
 
     /**
@@ -273,10 +287,10 @@ class BRequest extends BClass
     */
     public static function scriptDir()
     {
-        return ($script = static::scriptFilename()) ? dirname($script) : null;
+        return ( $script = static::scriptFilename() ) ? dirname( $script ) : null;
     }
 
-    protected static $_webRootCache = array();
+    protected static $_webRootCache = [];
 
     /**
     * Web root path for current application
@@ -286,29 +300,29 @@ class BRequest extends BClass
     * @param $parent if required a parent of current web root, specify depth
     * @return string
     */
-    public static function webRoot($parentDepth=0)
+    public static function webRoot( $parentDepth = 0 )
     {
-        if (isset(static::$_webRootCache[$parentDepth])) {
-            return static::$_webRootCache[$parentDepth];
+        if ( isset( static::$_webRootCache[ $parentDepth ] ) ) {
+            return static::$_webRootCache[ $parentDepth ];
         }
         $scriptName = static::scriptName();
-        if (empty($scriptName)) {
+        if ( empty( $scriptName ) ) {
             return null;
         }
-        if (substr($scriptName, -1)!=='/') {
-            $scriptName = dirname($scriptName);
+        if ( substr( $scriptName, -1 ) !== '/' ) {
+            $scriptName = dirname( $scriptName );
         }
-        $root = rtrim(str_replace(array('//', '\\'), array('/', '/'), $scriptName), '/');
+        $root = rtrim( str_replace( [ '//', '\\' ], [ '/', '/' ], $scriptName ), '/' );
 
-        if ($parentDepth) {
-            $arr = explode('/', rtrim($root, '/'));
-            $len = sizeof($arr)-$parentDepth;
-            $root = $len>1 ? join('/', array_slice($arr, 0, $len)) : '/';
+        if ( $parentDepth ) {
+            $arr = explode( '/', rtrim( $root, '/' ) );
+            $len = sizeof( $arr ) - $parentDepth;
+            $root = $len > 1 ? join( '/', array_slice( $arr, 0, $len ) ) : '/';
         }
-        if (!$root) {
+        if ( !$root ) {
             $root = '/';
         }
-        static::$_webRootCache[$parentDepth] = $root;
+        static::$_webRootCache[ $parentDepth ] = $root;
 
         return $root;
     }
@@ -321,16 +335,16 @@ class BRequest extends BClass
     * @param boolean $includeQuery - add origin query string
     * @return string
     */
-    public static function baseUrl($forceSecure=null, $includeQuery=false)
+    public static function baseUrl( $forceSecure = null, $includeQuery = false )
     {
-        if (is_null($forceSecure)) {
+        if ( is_null( $forceSecure ) ) {
             $scheme = static::https() ? 'https:' : '';
         } else {
             $scheme = $forceSecure ? 'https:' : '';
         }
-        $url = $scheme.'//'.static::serverName().static::webRoot();
-        if ($includeQuery && ($query = static::rawGet())) {
-            $url .= '?'.$query;
+        $url = $scheme . '//' . static::serverName() . static::webRoot();
+        if ( $includeQuery && ( $query = static::rawGet() ) ) {
+            $url .= '?' . $query;
         }
         return $url;
     }
@@ -342,18 +356,18 @@ class BRequest extends BClass
     * @param int $length
     * @return string
     */
-    public static function path($offset, $length=null)
+    public static function path( $offset, $length = null )
     {
         $pathInfo = static::rawPath();
-        if (empty($pathInfo)) {
+        if ( empty( $pathInfo ) ) {
             return null;
         }
 
-        $path = explode('/', ltrim($pathInfo, '/'));
-        if (is_null($length)) {
-            return isset($path[$offset]) ? $path[$offset] : null;
+        $path = explode( '/', ltrim( $pathInfo, '/' ) );
+        if ( is_null( $length ) ) {
+            return isset( $path[ $offset ] ) ? $path[ $offset ] : null;
         }
-        return join('/', array_slice($path, $offset, true===$length ? null : $length));
+        return join( '/', array_slice( $path, $offset, true === $length ? null : $length ) );
     }
 
     /**
@@ -363,21 +377,30 @@ class BRequest extends BClass
     */
     public static function rawPath()
     {
-#echo "<pre>"; print_r($_SERVER); exit;
-        $path = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] :
-            (!empty($_SERVER['ORIG_PATH_INFO']) ? $_SERVER['ORIG_PATH_INFO'] : '/');
-            /*
-                (!empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] :
-                    (!empty($_SERVER['SERVER_URL']) ? $_SERVER['SERVER_URL'] : '/')
-                )
-            );*/
+        static $path;
 
-        // nginx rewrite fix
-        $basename = basename(static::scriptName());
-        $path = preg_replace('#^/.*?'.preg_quote($basename).'#', '', $path);
+        if ( is_null( $path ) ) {
+    #echo "<pre>"; print_r($_SERVER); exit;
+            $path = !empty( $_SERVER[ 'PATH_INFO' ] ) ? $_SERVER[ 'PATH_INFO' ] :
+                ( !empty( $_SERVER[ 'ORIG_PATH_INFO' ] ) ? $_SERVER[ 'ORIG_PATH_INFO' ] : '/' );
+                /*
+                    (!empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] :
+                        (!empty($_SERVER['SERVER_URL']) ? $_SERVER['SERVER_URL'] : '/')
+                    )
+                );*/
 
-        if (!$path) {
-            $path = '/';
+            // nginx rewrite fix
+            $basename = basename( static::scriptName() );
+            $path = preg_replace( '#^/.*?' . preg_quote( $basename ) . '#', '', $path );
+
+            if ( BConfig::i()->get( 'web/language_in_url' ) && preg_match( '#^/([a-z]{2})(/.*|$)#', $path, $match ) ) {
+                static::$_language = $match[ 1 ];
+                $path = $match[ 2 ];
+            }
+
+            if ( !$path ) {
+                $path = '/';
+            }
         }
 
         return $path;
@@ -389,8 +412,8 @@ class BRequest extends BClass
      */
     public static function pathTranslated()
     {
-        return !empty($_SERVER['PATH_TRANSLATED']) ? $_SERVER['PATH_TRANSLATED'] :
-            (!empty($_SERVER['ORIG_PATH_TRANSLATED']) ? $_SERVER['ORIG_PATH_TRANSLATED'] : '/');
+        return !empty( $_SERVER[ 'PATH_TRANSLATED' ] ) ? $_SERVER[ 'PATH_TRANSLATED' ] :
+            ( !empty( $_SERVER[ 'ORIG_PATH_TRANSLATED' ] ) ? $_SERVER[ 'ORIG_PATH_TRANSLATED' ] : '/' );
     }
 
     /**
@@ -399,15 +422,19 @@ class BRequest extends BClass
     * @param string $key
     * @return array|string|null
     */
-    public static function get($key=null)
+    public static function get( $key = null )
     {
-        return is_null($key) ? $_GET : (isset($_GET[$key]) ? $_GET[$key] : null);
+        // Encountered this in some nginx + apache environments
+        if ( empty( $_GET ) && !empty( $_SERVER[ 'QUERY_STRING' ] ) ) {
+            parse_str( $_SERVER[ 'QUERY_STRING' ], $_GET );
+        }
+        return is_null( $key ) ? $_GET : ( isset( $_GET[ $key ] ) ? $_GET[ $key ] : null );
     }
 
-    public static function server($key=null)
+    public static function server( $key = null )
     {
-        $key = strtoupper($key);
-        return is_null($key) ? $_SERVER : (isset($_SERVER[$key]) ? $_SERVER[$key] : null);
+        $key = strtoupper( $key );
+        return is_null( $key ) ? $_SERVER : ( isset( $_SERVER[ $key ] ) ? $_SERVER[ $key ] : null );
     }
 
     /**
@@ -417,7 +444,7 @@ class BRequest extends BClass
     */
     public static function rawGet()
     {
-        return !empty($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
+        return !empty( $_SERVER[ 'QUERY_STRING' ] ) ? $_SERVER[ 'QUERY_STRING' ] : '';
     }
 
     /**
@@ -426,9 +453,9 @@ class BRequest extends BClass
     * @param string|null $key
     * @return array|string|null
     */
-    public static function post($key=null)
+    public static function post( $key = null )
     {
-        return is_null($key) ? $_POST : (isset($_POST[$key]) ? $_POST[$key] : null);
+        return is_null( $key ) ? $_POST : ( isset( $_POST[ $key ] ) ? $_POST[ $key ] : null );
     }
 
     /**
@@ -440,7 +467,7 @@ class BRequest extends BClass
     */
     public static function rawPost()
     {
-        $post = file_get_contents('php://input');
+        $post = file_get_contents( 'php://input' );
         return $post;
     }
 
@@ -450,9 +477,9 @@ class BRequest extends BClass
     * @param boolean $asObject
     * @return mixed
     */
-    public static function json($asObject=false)
+    public static function json( $asObject = false )
     {
-        return BUtil::fromJson(static::rawPost(), $asObject);
+        return BUtil::fromJson( static::rawPost(), $asObject );
     }
 
     /**
@@ -461,9 +488,9 @@ class BRequest extends BClass
     * @param string|null $key
     * @return array|string|null
     */
-    public static function request($key=null)
+    public static function request( $key = null )
     {
-        return is_null($key) ? $_REQUEST : (isset($_REQUEST[$key]) ? $_REQUEST[$key] : null);
+        return is_null( $key ) ? $_REQUEST : ( isset( $_REQUEST[ $key ] ) ? $_REQUEST[ $key ] : null );
     }
 
     /**
@@ -475,21 +502,21 @@ class BRequest extends BClass
     * @param string $path Optional cookie path, default from config
     * @param string $domain Optional cookie domain, default from config
     */
-    public static function cookie($name, $value=null, $lifespan=null, $path=null, $domain=null)
+    public static function cookie( $name, $value = null, $lifespan = null, $path = null, $domain = null )
     {
-        if (is_null($value)) {
-            return isset($_COOKIE[$name]) ? $_COOKIE[$name] : null;
+        if ( is_null( $value ) ) {
+            return isset( $_COOKIE[ $name ] ) ? $_COOKIE[ $name ] : null;
         }
-        if (false===$value) {
-            return static::cookie($name, '', -1000);
+        if ( false === $value ) {
+            return static::cookie( $name, '', -1000 );
         }
 
-        $config = BConfig::i()->get('cookie');
-        $lifespan = !is_null($lifespan) ? $lifespan : $config['timeout'];
-        $path = !is_null($path) ? $path : (!empty($config['path']) ? $config['path'] : static::webRoot());
-        $domain = !is_null($domain) ? $domain : (!empty($config['domain']) ? $config['domain'] : static::httpHost(false));
+        $config = BConfig::i()->get( 'cookie' );
+        $lifespan = !is_null( $lifespan ) ? $lifespan : $config[ 'timeout' ];
+        $path = !is_null( $path ) ? $path : ( !empty( $config[ 'path' ] ) ? $config[ 'path' ] : static::webRoot() );
+        $domain = !is_null( $domain ) ? $domain : ( !empty( $config[ 'domain' ] ) ? $config[ 'domain' ] : static::httpHost( false ) );
 
-        setcookie($name, $value, time()+$lifespan, $path, $domain);
+        setcookie( $name, $value, time() + $lifespan, $path, $domain );
     }
 
     /**
@@ -499,27 +526,27 @@ class BRequest extends BClass
     * @param string $default default value to use in case there is no referrer available
     * @return string|null
     */
-    public static function referrer($default=null)
+    public static function referrer( $default = null )
     {
-        return !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $default;
+        return !empty( $_SERVER[ 'HTTP_REFERER' ] ) ? $_SERVER[ 'HTTP_REFERER' ] : $default;
     }
 
-    public static function receiveFiles($source, $targetDir, $typesRegex=null)
+    public static function receiveFiles( $source, $targetDir, $typesRegex = null )
     {
-        if (is_string($source)) {
-            if (!empty($_FILES[$source])) {
-                $source = $_FILES[$source];
+        if ( is_string( $source ) ) {
+            if ( !empty( $_FILES[ $source ] ) ) {
+                $source = $_FILES[ $source ];
             } else {
                 //TODO: missing enctype="multipart/form-data" ?
-                throw new BException('Missing enctype="multipart/form-data"?');
+                throw new BException( 'Missing enctype="multipart/form-data"?' );
             }
         }
-        if (empty($source)) {
+        if ( empty( $source ) ) {
             return;
         }
-        $result = array();
+        $result = [];
 
-        $uploadErrors = array(
+        $uploadErrors = [
             UPLOAD_ERR_OK         => "No errors.",
             UPLOAD_ERR_INI_SIZE   => "Larger than upload_max_filesize.",
             UPLOAD_ERR_FORM_SIZE  => "Larger than form MAX_FILE_SIZE.",
@@ -528,41 +555,42 @@ class BRequest extends BClass
             UPLOAD_ERR_NO_TMP_DIR => "No temporary directory.",
             UPLOAD_ERR_CANT_WRITE => "Can't write to disk.",
             UPLOAD_ERR_EXTENSION  => "File upload stopped by extension."
-        );
-        if (is_array($source['error'])) {
-            foreach ($source['error'] as $key=>$error) {
-                if ($error==UPLOAD_ERR_OK) {
-                    $tmpName = $source['tmp_name'][$key];
-                    $name = $source['name'][$key];
-                    $type = $source['type'][$key];
-                    if (!is_null($typesRegex) && !preg_match('#'.$typesRegex.'#i', $type)) {
-                        $result[$key] = array('error'=>'invalid_type', 'tp'=>1, 'type'=>$type, 'name'=>$name);
+        ];
+        if ( is_array( $source[ 'error' ] ) ) {
+            foreach ( $source[ 'error' ] as $key => $error ) {
+                if ( $error == UPLOAD_ERR_OK ) {
+                    $tmpName = $source[ 'tmp_name' ][ $key ];
+                    $name = $source[ 'name' ][ $key ];
+                    $type = $source[ 'type' ][ $key ];
+                    if ( !is_null( $typesRegex ) && !preg_match( '#' . $typesRegex . '#i', $type ) ) {
+                        $result[ $key ] = [ 'error' => 'invalid_type', 'tp' => 1, 'type' => $type, 'name' => $name ];
                         continue;
                     }
-                    BUtil::ensureDir($targetDir);
-                    move_uploaded_file($tmpName, $targetDir.'/'.$name);
-                    $result[$key] = array('name'=>$name, 'tp'=>2, 'type'=>$type, 'target'=>$targetDir.'/'.$name);
+                    BUtil::ensureDir( $targetDir );
+                    move_uploaded_file( $tmpName, $targetDir . '/' . $name );
+                    $result[ $key ] = [ 'name' => $name, 'tp' => 2, 'type' => $type, 'target' => $targetDir . '/' . $name ];
                 } else {
-                    $message = !empty($uploadErrors[$error]) ? $uploadErrors[$error] : null;
-                    $result[$key] = array('error'=>$error, 'message' => $message, 'tp'=>3);
+                    $message = !empty( $uploadErrors[ $error ] ) ? $uploadErrors[ $error ] : null;
+                    $result[ $key ] = [ 'error' => $error, 'message' => $message, 'tp' => 3 ];
                 }
             }
         } else {
-            $error = $source['error'];
-            if ($error==UPLOAD_ERR_OK) {
-                $tmpName = $source['tmp_name'];
-                $name = $source['name'];
-                $type = $source['type'];
-                if (!is_null($typesRegex) && !preg_match('#'.$typesRegex.'#i', $type)) {
-                    $result[] = array('error'=>'invalid_type', 'tp'=>4, 'type'=>$type, 'pattern'=>$typesRegex, 'source'=>$source, 'name'=>$name);
+            $error = $source[ 'error' ];
+            if ( $error == UPLOAD_ERR_OK ) {
+                $tmpName = $source[ 'tmp_name' ];
+                $name = $source[ 'name' ];
+                $type = $source[ 'type' ];
+                if ( !is_null( $typesRegex ) && !preg_match( '#' . $typesRegex . '#i', $type ) ) {
+                    $result[] = [ 'error' => 'invalid_type', 'tp' => 4, 'type' => $type, 'pattern' => $typesRegex,
+                        'source' => $source, 'name' => $name ];
                 } else {
-                    BUtil::ensureDir($targetDir);
-                    move_uploaded_file($tmpName, $targetDir.'/'.$name);
-                    $result[] = array('name'=>$name, 'type'=>$type, 'target'=>$targetDir.'/'.$name);
+                    BUtil::ensureDir( $targetDir );
+                    move_uploaded_file( $tmpName, $targetDir . '/' . $name );
+                    $result[] = [ 'name' => $name, 'type' => $type, 'target' => $targetDir . '/' . $name ];
                 }
             } else {
-                $message = !empty($uploadErrors[$error]) ? $uploadErrors[$error] : null;
-                $result[] = array('error'=>$error, 'message' => $message, 'tp'=>5);
+                $message = !empty( $uploadErrors[ $error ] ) ? $uploadErrors[ $error ] : null;
+                $result[] = [ 'error' => $error, 'message' => $message, 'tp' => 5 ];
             }
         }
         return $result;
@@ -584,64 +612,64 @@ class BRequest extends BClass
     * @param array $methods Methods to check for CSRF attack
     * @return boolean
     */
-    public static function csrf($checkMethod = null, $httpMethods = null)
+    public static function csrf( $checkMethod = null, $httpMethods = null )
     {
         $c = BConfig::i();
 
 
-        if (is_null($httpMethods)) {
-            $m = $c->get('web/csrf_http_methods');
-            $httpMethods = $m ? (is_string($m) ? explode(',', $m) : $m) : array('POST','PUT','DELETE');
+        if ( is_null( $httpMethods ) ) {
+            $m = $c->get( 'web/csrf_http_methods' );
+            $httpMethods = $m ? ( is_string( $m ) ? explode( ',', $m ) : $m ) : [ 'POST', 'PUT', 'DELETE' ];
         }
 
-        if (is_array($httpMethods) && !in_array(static::method(), $httpMethods)) {
+        if ( is_array( $httpMethods ) && !in_array( static::method(), $httpMethods ) ) {
             return false; // not one of checked methods, pass
         }
 
-        $whitelist = $c->get('web/csrf_path_whitelist');
-        if ($whitelist) {
+        $whitelist = $c->get( 'web/csrf_path_whitelist' );
+        if ( $whitelist ) {
             $path = static::rawPath();
-            foreach ((array)$whitelist as $pattern) {
-                if (preg_match($pattern, $path)) {
+            foreach ( (array)$whitelist as $pattern ) {
+                if ( preg_match( $pattern, $path ) ) {
                     return false;
                 }
             }
         }
 
-        if (is_null($checkMethod)) {
-            $m = $c->get('web/csrf_check_method');
+        if ( is_null( $checkMethod ) ) {
+            $m = $c->get( 'web/csrf_check_method' );
             $checkMethod = $m ? $m : 'referrer';
         }
 
-        switch ($checkMethod) {
+        switch ( $checkMethod ) {
             case 'referrer':
-                if (!($ref = static::referrer())) {
+                if ( !( $ref = static::referrer() ) ) {
                     return true; // no referrer sent, high prob. csrf
                 }
-                $p = parse_url($ref);
-                $p['path'] = preg_replace('#/+#', '/', $p['path']); // ignore duplicate slashes
-                $webRoot = $c->get('web/csrf_web_root');
-                if (!$webRoot) {
-                    $webRoot = $c->get('web/base_src');
+                $p = parse_url( $ref );
+                $p[ 'path' ] = preg_replace( '#/+#', '/', $p[ 'path' ] ); // ignore duplicate slashes
+                $webRoot = $c->get( 'web/csrf_web_root' );
+                if ( !$webRoot ) {
+                    $webRoot = $c->get( 'web/base_src' );
                 }
-                if (!$webRoot) {
+                if ( !$webRoot ) {
                     $webRoot = static::webRoot();
                 }
-                if ($p['host']!==static::httpHost(false) || $webRoot && strpos($p['path'], $webRoot)!==0) {
+                if ( $p[ 'host' ] !== static::httpHost( false ) || $webRoot && strpos( $p[ 'path' ], $webRoot ) !== 0 ) {
                     return true; // referrer host or doc root path do not match, high prob. csrf
                 }
                 return false; // not csrf
 
             case 'token':
-                if (!empty($_SERVER['HTTP_X_CSRF_TOKEN'])) {
-                    $receivedToken = $_SERVER['HTTP_X_CSRF_TOKEN'];
-                } elseif (!empty($_POST['X-CSRF-TOKEN'])) {
-                    $receivedToken = $_POST['X-CSRF-TOKEN'];
+                if ( !empty( $_SERVER[ 'HTTP_X_CSRF_TOKEN' ] ) ) {
+                    $receivedToken = $_SERVER[ 'HTTP_X_CSRF_TOKEN' ];
+                } elseif ( !empty( $_POST[ 'X-CSRF-TOKEN' ] ) ) {
+                    $receivedToken = $_POST[ 'X-CSRF-TOKEN' ];
                 }
-                return empty($receivedToken) || $receivedToken !== BSession::i()->csrfToken();
+                return empty( $receivedToken ) || !BSession::i()->validateCsrfToken( $receivedToken );
 
             default:
-                throw new BException('Invalid CSRF check method: '.$checkMethod);
+                throw new BException( 'Invalid CSRF check method: ' . $checkMethod );
         }
     }
 
@@ -652,18 +680,18 @@ class BRequest extends BClass
     * @param string $explicitHost
     * @return boolean
     */
-    public static function verifyOriginHostIp($method='OR', $host=null)
+    public static function verifyOriginHostIp( $method = 'OR', $host = null )
     {
         $ip = static::ip();
-        if (!$host) {
-            $host = static::httpHost(false);
+        if ( !$host ) {
+            $host = static::httpHost( false );
         }
         $origin = static::httpOrigin();
-        $hostIPs = gethostbynamel($host);
-        $hostMatches = $host && $method!='ORIGIN' ? in_array($ip, (array)$hostIPs) : false;
-        $originIPs = gethostbynamel($origin);
-        $originMatches = $origin && $method!='HOST' ? in_array($ip, (array)$originIPs) : false;
-        switch ($method) {
+        $hostIPs = gethostbynamel( $host );
+        $hostMatches = $host && $method != 'ORIGIN' ? in_array( $ip, (array)$hostIPs ) : false;
+        $originIPs = gethostbynamel( $origin );
+        $originMatches = $origin && $method != 'HOST' ? in_array( $ip, (array)$originIPs ) : false;
+        switch ( $method ) {
             case 'HOST': return $hostMatches;
             case 'ORIGIN': return $originMatches;
             case 'AND': return $hostMatches && $originMatches;
@@ -679,16 +707,16 @@ class BRequest extends BClass
     */
     public static function currentUrl()
     {
-        $host = static::scheme().'://'.static::httpHost(true);
-        if (BConfig::i()->get('web/hide_script_name') && BApp::i()->get('area')!=='FCom_Admin') {
+        $host = static::scheme() . '://' . static::httpHost( true );
+        if ( BConfig::i()->get( 'web/hide_script_name' ) && BApp::i()->get( 'area' ) !== 'FCom_Admin' ) {
             $root = static::webRoot();
         } else {
             $root = static::scriptName();
         }
-        $root = trim($root, '/');
-        $path = ltrim(static::rawPath(), '/');
+        $root = trim( $root, '/' );
+        $path = ltrim( static::rawPath(), '/' );
         $get = static::rawGet();
-        $url = $host . '/' . ($root ? $root . '/' : '') . $path . ($get ? '?' . $get : '');
+        $url = $host . '/' . ( $root ? $root . '/' : '' ) . $path . ( $get ? '?' . $get : '' );
         return $url;
     }
 
@@ -697,7 +725,7 @@ class BRequest extends BClass
     *
     * @param array $params
     */
-    public function initParams(array $params)
+    public function initParams( array $params )
     {
         $this->_params = $params;
         return $this;
@@ -710,14 +738,14 @@ class BRequest extends BClass
     * @param boolean $fallbackToGet
     * @return array|string|null
     */
-    public function param($key=null, $fallbackToGet=false)
+    public function param( $key = null, $fallbackToGet = false )
     {
-        if (is_null($key)) {
+        if ( is_null( $key ) ) {
             return $this->_params;
-        } elseif (isset($this->_params[$key]) && ''!==$this->_params[$key]) {
-            return $this->_params[$key];
-        } elseif ($fallbackToGet && !empty($_GET[$key])) {
-            return $_GET[$key];
+        } elseif ( isset( $this->_params[ $key ] ) && '' !== $this->_params[ $key ] ) {
+            return $this->_params[ $key ];
+        } elseif ( $fallbackToGet && !empty( $_GET[ $key ] ) ) {
+            return $_GET[ $key ];
         } else {
             return null;
         }
@@ -730,9 +758,9 @@ class BRequest extends BClass
     * @param mixed $key
     * @param mixed $fallbackToGet
     */
-    public function params($key=null, $fallbackToGet=false)
+    public function params( $key = null, $fallbackToGet = false )
     {
-        return $this->param($key, $fallbackToGet);
+        return $this->param( $key, $fallbackToGet );
     }
 
     /**
@@ -751,20 +779,20 @@ class BRequest extends BClass
     * @param bool $trim Whether to return only variables specified in config
     * @return array Sanitized result
     */
-    public static function sanitize($data, $config, $trim=true)
+    public static function sanitize( $data, $config, $trim = true )
     {
         $data = (array)$data;
-        if ($trim) {
-            $data = array_intersect_key($data, $config);
+        if ( $trim ) {
+            $data = array_intersect_key( $data, $config );
         }
-        foreach ($data as $k=>&$v) {
-            $filter = is_array($config[$k]) ? $config[$k][0] : $config[$k];
-            $v = static::sanitizeOne($v, $filter);
+        foreach ( $data as $k => &$v ) {
+            $filter = is_array( $config[ $k ] ) ? $config[ $k ][ 0 ] : $config[ $k ];
+            $v = static::sanitizeOne( $v, $filter );
         }
-        unset($v);
-        foreach ($config as $k=>$c) {
-            if (!isset($data[$k])) {
-                $data[$k] = is_array($c) && isset($c[1]) ? $c[1] : null;
+        unset( $v );
+        foreach ( $config as $k => $c ) {
+            if ( !isset( $data[ $k ] ) ) {
+                $data[ $k ] = is_array( $c ) && isset( $c[ 1 ] ) ? $c[ 1 ] : null;
             }
         }
         return $data;
@@ -797,43 +825,43 @@ class BRequest extends BClass
     * @param array|string $filter Filters as array or string separated by |
     * @return string Sanitized value
     */
-    public static function sanitizeOne($v, $filter)
+    public static function sanitizeOne( $v, $filter )
     {
-        if (is_array($v)) {
-            foreach ($v as $k=>&$v1) {
-                $v1 = static::sanitizeOne($v1, $filter);
+        if ( is_array( $v ) ) {
+            foreach ( $v as $k => &$v1 ) {
+                $v1 = static::sanitizeOne( $v1, $filter );
             }
-            unset($v1);
+            unset( $v1 );
             return $v;
         }
-        if (!is_array($filter)) {
-            $filter = explode('|', $filter);
+        if ( !is_array( $filter ) ) {
+            $filter = explode( '|', $filter );
         }
-        foreach ($filter as $f) {
-            if (strpos($f, ':')) {
-                list($f, $p) = explode(':', $f, 2);
+        foreach ( $filter as $f ) {
+            if ( strpos( $f, ':' ) ) {
+                list( $f, $p ) = explode( ':', $f, 2 );
             } else {
                 $p = null;
             }
-            switch ($f) {
+            switch ( $f ) {
                 case 'int': $v = (int)$v; break;
-                case 'positive': $v = $v>0 ? $v : null; break;
+                case 'positive': $v = $v > 0 ? $v : null; break;
                 case 'float': $v = (float)$v; break;
-                case 'trim': $v = trim($v); break;
-                case 'nohtml': $v = htmlentities($v, ENT_QUOTES); break;
-                case 'plain': $v = htmlentities($v, ENT_NOQUOTES); break;
-                case 'upper': $v = strtoupper($v); break;
-                case 'lower': $v = strtolower($v); break;
-                case 'ucwords': $v = ucwords($v); break;
-                case 'ucfirst': $v = ucfirst($v); break;
-                case 'urle': $v = urlencode($v); break;
-                case 'urld': $v = urldecode($v); break;
-                case 'alnum': $p = !empty($p)?$p:'_'; $v = preg_replace('#[^a-z0-9'.$p.']#i', '', $v); break;
-                case 'regex': case 'regexp': $v = preg_replace($p, '', $v); break;
-                case 'date': $v = date('Y-m-d', strtotime($v)); break;
-                case 'datetime': $v = date('Y-m-d H:i:s', strtotime($v)); break;
-                case 'gmdate': $v = gmdate('Y-m-d', strtotime($v)); break;
-                case 'gmdatetime': $v = gmdate('Y-m-d H:i:s', strtotime($v)); break;
+                case 'trim': $v = trim( $v ); break;
+                case 'nohtml': $v = htmlentities( $v, ENT_QUOTES ); break;
+                case 'plain': $v = htmlentities( $v, ENT_NOQUOTES ); break;
+                case 'upper': $v = strtoupper( $v ); break;
+                case 'lower': $v = strtolower( $v ); break;
+                case 'ucwords': $v = ucwords( $v ); break;
+                case 'ucfirst': $v = ucfirst( $v ); break;
+                case 'urle': $v = urlencode( $v ); break;
+                case 'urld': $v = urldecode( $v ); break;
+                case 'alnum': $p = !empty( $p ) ? $p : '_'; $v = preg_replace( '#[^a-z0-9' . $p . ']#i', '', $v ); break;
+                case 'regex': case 'regexp': $v = preg_replace( $p, '', $v ); break;
+                case 'date': $v = date( 'Y-m-d', strtotime( $v ) ); break;
+                case 'datetime': $v = date( 'Y-m-d H:i:s', strtotime( $v ) ); break;
+                case 'gmdate': $v = gmdate( 'Y-m-d', strtotime( $v ) ); break;
+                case 'gmdatetime': $v = gmdate( 'Y-m-d H:i:s', strtotime( $v ) ); break;
             }
         }
         return $v;
@@ -847,44 +875,44 @@ class BRequest extends BClass
     public static function stripMagicQuotes()
     {
         static $alreadyRan = false;
-        if (get_magic_quotes_gpc() && !$alreadyRan) {
-            $process = array(&$_GET, &$_POST, &$_COOKIE, &$_REQUEST);
-            while (list($key, $val) = each($process)) {
-                foreach ($val as $k => $v) {
-                    unset($process[$key][$k]);
-                    if (is_array($v)) {
-                        $process[$key][stripslashes($k)] = $v;
-                        $process[] = &$process[$key][stripslashes($k)];
+        if ( get_magic_quotes_gpc() && !$alreadyRan ) {
+            $process = [ &$_GET, &$_POST, &$_COOKIE, &$_REQUEST ];
+            while ( list( $key, $val ) = each( $process ) ) {
+                foreach ( $val as $k => $v ) {
+                    unset( $process[ $key ][ $k ] );
+                    if ( is_array( $v ) ) {
+                        $process[ $key ][ stripslashes( $k ) ] = $v;
+                        $process[] = &$process[ $key ][ stripslashes( $k ) ];
                     } else {
-                        $process[$key][stripslashes($k)] = stripslashes($v);
+                        $process[ $key ][ stripslashes( $k ) ] = stripslashes( $v );
                     }
                 }
             }
-            unset($process);
+            unset( $process );
             $alreadyRan = true;
         }
     }
 
     public static function modRewriteEnabled()
     {
-        if (function_exists('apache_get_modules')) {
+        if ( function_exists( 'apache_get_modules' ) ) {
             $modules = apache_get_modules();
-            $modRewrite = in_array('mod_rewrite', $modules);
+            $modRewrite = in_array( 'mod_rewrite', $modules );
         } else {
-            $modRewrite =  strtolower(getenv('HTTP_MOD_REWRITE'))=='on' ? true : false;
+            $modRewrite =  strtolower( getenv( 'HTTP_MOD_REWRITE' ) ) == 'on' ? true : false;
         }
         return $modRewrite;
     }
 
-    public function addRequestFieldsWhitelist($whitelist)
+    public function addRequestFieldsWhitelist( $whitelist )
     {
-        foreach ((array)$whitelist as $urlPath => $fieldPaths) {
-            foreach ($fieldPaths as $fieldPath => $allowTags) {
-                if (is_numeric($fieldPath)) {
+        foreach ( (array)$whitelist as $urlPath => $fieldPaths ) {
+            foreach ( $fieldPaths as $fieldPath => $allowTags ) {
+                if ( is_numeric( $fieldPath ) ) {
                     $fieldPath = $allowTags;
                     $allowTags = '*';
                 }
-                $this->_postTagsWhitelist[$urlPath][$fieldPath] = $allowTags;
+                $this->_postTagsWhitelist[ $urlPath ][ $fieldPath ] = $allowTags;
             }
         }
         return $this;
@@ -893,36 +921,43 @@ class BRequest extends BClass
     public function stripRequestFieldsTags()
     {
         static $alreadyStripped;
-        if ($alreadyStripped) {
+        if ( $alreadyStripped ) {
             return;
         }
-        $data = array('GET' =>& $_GET, 'POST' =>& $_POST, 'REQUEST' =>& $_REQUEST, 'COOKIE' =>& $_COOKIE);
-        $this->stripTagsRecursive($data, static::rawPath());
+        $data = [ 'GET' => & $_GET, 'POST' => & $_POST, 'REQUEST' => & $_REQUEST, 'COOKIE' => & $_COOKIE ];
+        $this->stripTagsRecursive( $data, static::rawPath() );
         $alreadyStripped = true;
         return $this;
     }
 
-    public function stripTagsRecursive(&$data, $forUrlPath, $curPath = null)
+    public function stripTagsRecursive( &$data, $forUrlPath, $curPath = null )
     {
-        foreach ($data as $k => &$v) {
-            $childPath = is_null($curPath) ? $k : ($curPath . '/' . $k);
-            if (is_array($v)) {
-                $this->stripTagsRecursive($v,  $forUrlPath, $childPath);
-            } elseif (!empty($v) && !is_numeric($v)) {
-                if (empty($this->_postTagsWhitelist[$forUrlPath][$childPath])) {
-                    $v = strip_tags($v);
+        foreach ( $data as $k => &$v ) {
+            $childPath = is_null( $curPath ) ? $k : ( $curPath . '/' . $k );
+            if ( is_array( $v ) ) {
+                $this->stripTagsRecursive( $v,  $forUrlPath, $childPath );
+            } elseif ( !empty( $v ) && !is_numeric( $v ) ) {
+                if ( empty( $this->_postTagsWhitelist[ $forUrlPath ][ $childPath ] ) ) {
+                    $v = strip_tags( $v );
                 } else {
-                    $tags = $this->_postTagsWhitelist[$forUrlPath][$childPath];
-                    if ('+' === $tags) {
-                        $tags = "<a><b><blockquote><code><del><dd><dl><dt><em><h1><i><img><kbd><li><ol><p><pre><s><sup><sub><strong><strike><ul><br><hr>";
+                    $tags = $this->_postTagsWhitelist[ $forUrlPath ][ $childPath ];
+                    if ( '+' === $tags ) {
+                        $tags = $this->getAllowedTags();
                     }
-                    if ('*' !== $tags) {
-                        $v = strip_tags($v, $tags);
+                    if ( '*' !== $tags ) {
+                        $v = strip_tags( $v, $tags );
                     }
                 }
             }
         }
-        unset($v);
+        unset( $v );
+    }
+
+    public function getAllowedTags()
+    {
+        $tags = "<a><b><blockquote><code><del><dd><dl><dt><em><h1><i><img><kbd><li><ol><p><pre><s><sup>'
+            . '<sub><strong><strike><ul><br><hr>";
+        return $tags;
     }
 }
 
@@ -931,7 +966,7 @@ class BRequest extends BClass
 */
 class BResponse extends BClass
 {
-    protected static $_httpStatuses = array(
+    protected static $_httpStatuses = [
         // INFORMATIONAL CODES
         100 => 'Continue',
         101 => 'Switching Protocols',
@@ -993,7 +1028,7 @@ class BResponse extends BClass
         507 => 'Insufficient Storage',
         508 => 'Loop Detected',
         511 => 'Network Authentication Required',
-    );
+    ];
     /**
     * Response content MIME type
     *
@@ -1019,9 +1054,9 @@ class BResponse extends BClass
     *
     * @return BResponse
     */
-    public static function i($new=false, array $args=array())
+    public static function i( $new = false, array $args = [] )
     {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
 
     /**
@@ -1030,16 +1065,16 @@ class BResponse extends BClass
     * @param string $str
     * @return string
     */
-    public static function q($str)
+    public static function q( $str )
     {
-        if (is_null($str)) {
+        if ( is_null( $str ) ) {
             return '';
         }
-        if (!is_scalar($str)) {
-            var_dump($str);
+        if ( !is_scalar( $str ) ) {
+            var_dump( $str );
             return ' ** ERROR ** ';
         }
-        return htmlspecialchars($str);
+        return htmlspecialchars( $str );
     }
 
     /**
@@ -1052,9 +1087,9 @@ class BResponse extends BClass
     * @param string $domain
     * @return BResponse
     */
-    public function cookie($name, $value=null, $lifespan=null, $path=null, $domain=null)
+    public function cookie( $name, $value = null, $lifespan = null, $path = null, $domain = null )
     {
-        BRequest::cookie($name, $value, $lifespan, $path, $domain);
+        BRequest::cookie( $name, $value, $lifespan, $path, $domain );
         return $this;
     }
 
@@ -1064,7 +1099,7 @@ class BResponse extends BClass
      * @param mixed $content
      * @return BResponse
      */
-    public function set($content)
+    public function set( $content )
     {
         $this->_content = $content;
         return $this;
@@ -1076,29 +1111,29 @@ class BResponse extends BClass
      * @param mixed $content
      * @return BResponse
      */
-    public function add($content)
+    public function add( $content )
     {
-        $this->_content = (array)$this->_content+(array)$content;
+        $this->_content = (array)$this->_content + (array)$content;
         return $this;
     }
 
-    public function header($header, $replace = true)
+    public function header( $header, $replace = true )
     {
-        if (headers_sent($file, $line)) {
-            BDebug::notice("Can't send header: '".print_r($header,1)."', output started in {$file}:{$line}");
+        if ( headers_sent( $file, $line ) ) {
+            BDebug::notice( "Can't send header: '" . print_r( $header, 1 ) . "', output started in {$file}:{$line}" );
             return $this;
         }
-        if (is_string($header)) {
-            header($header, $replace);
-        } elseif (is_array($header)) {
-            foreach ($header as $h) {
-                header($h, $replace);
+        if ( is_string( $header ) ) {
+            header( $header, $replace );
+        } elseif ( is_array( $header ) ) {
+            foreach ( $header as $h ) {
+                header( $h, $replace );
             }
         }
         return $this;
     }
 
-    public function setContentType($type)
+    public function setContentType( $type )
     {
         $this->_contentType = $type;
         return $this;
@@ -1109,7 +1144,7 @@ class BResponse extends BClass
         return $this->_contentType;
     }
 
-    public function setContentPrefix($string)
+    public function setContentPrefix( $string )
     {
         $this->_contentPrefix = $string;
         return $this;
@@ -1120,7 +1155,7 @@ class BResponse extends BClass
         return $this->_contentPrefix;
     }
 
-    public function setContentSuffix($string)
+    public function setContentSuffix( $string )
     {
         $this->_contentSuffix = $string;
         return $this;
@@ -1138,20 +1173,20 @@ class BResponse extends BClass
     *
     * @param mixed $data
     */
-    public function json($data)
+    public function json( $data )
     {
-        $response = BUtil::toJson($data);
-        $callback = BRequest::i()->get('callback');
-        if ($callback) {
-            $response = $callback.'('.$response.')';
+        $response = BUtil::toJson( $data );
+        $callback = BRequest::i()->get( 'callback' );
+        if ( $callback ) {
+            $response = $callback . '(' . $response . ')';
         }
-        $this->setContentType('application/json')->set($response)->render();
+        $this->setContentType( 'application/json' )->set( $response )->render();
     }
 
-    public function fileContentType($fileName)
+    public function fileContentType( $fileName )
     {
         $type = 'application/octet-stream';
-        switch (strtolower(pathinfo($fileName, PATHINFO_EXTENSION))) {
+        switch ( strtolower( pathinfo( $fileName, PATHINFO_EXTENSION ) ) ) {
             case 'jpeg': case 'jpg': $type = 'image/jpg'; break;
             case 'png': $type = 'image/png'; break;
             case 'gif': $type = 'image/gif'; break;
@@ -1168,35 +1203,35 @@ class BResponse extends BClass
      * @internal param string $filename
      * @return exit
      */
-    public function sendFile($source, $fileName=null, $disposition='attachment')
+    public function sendFile( $source, $fileName = null, $disposition = 'attachment' )
     {
         BSession::i()->close();
 
-        if (!file_exists($source)) {
-            $this->status(404, 'File not found', 'File not found');
+        if ( !file_exists( $source ) ) {
+            $this->status( 404, 'File not found', 'File not found' );
         }
 
-        if (!$fileName) {
-            $fileName = basename($source);
+        if ( !$fileName ) {
+            $fileName = basename( $source );
         }
 
-        static::header(array(
+        static::header( [
             'Pragma: public',
             'Cache-Control: must-revalidate, post-check=0, pre-check=0',
-            'Content-Length: ' . filesize($source),
-            'Last-Modified: ' . date('r'),
-            'Content-Type: '. $this->fileContentType($fileName),
-            'Content-Disposition: '.$disposition.'; filename=' . $fileName,
-        ));
+            'Content-Length: ' . filesize( $source ),
+            'Last-Modified: ' . date( 'r' ),
+            'Content-Type: ' . $this->fileContentType( $fileName ),
+            'Content-Disposition: ' . $disposition . '; filename=' . $fileName,
+        ] );
 
         //echo file_get_contents($source);
-        $fs = fopen($source, 'rb');
-        $fd = fopen('php://output', 'wb');
-        while (!feof($fs)) fwrite($fd, fread($fs, 8192));
-        fclose($fs);
-        fclose($fd);
+        $fs = fopen( $source, 'rb' );
+        $fd = fopen( 'php://output', 'wb' );
+        while ( !feof( $fs ) ) fwrite( $fd, fread( $fs, 8192 ) );
+        fclose( $fs );
+        fclose( $fd );
 
-        $this->shutdown(__METHOD__);
+        $this->shutdown( __METHOD__ );
     }
 
     /**
@@ -1207,20 +1242,20 @@ class BResponse extends BClass
      * @param string $disposition
      * @return exit
      */
-    public function sendContent($content, $fileName='download.txt', $disposition='attachment')
+    public function sendContent( $content, $fileName = 'download.txt', $disposition = 'attachment' )
     {
         BSession::i()->close();
 
-        static::header(array(
+        static::header( [
             'Pragma: public',
             'Cache-Control: must-revalidate, post-check=0, pre-check=0',
-            'Content-Type: '.$this->fileContentType($fileName),
-            'Content-Length: ' . strlen($content),
-            'Last-Modified: ' . date('r'),
-            'Content-Disposition: '.$disposition.'; filename=' . $fileName,
-        ));
+            'Content-Type: ' . $this->fileContentType( $fileName ),
+            'Content-Length: ' . strlen( $content ),
+            'Last-Modified: ' . date( 'r' ),
+            'Content-Disposition: ' . $disposition . '; filename=' . $fileName,
+        ] );
         echo $content;
-        $this->shutdown(__METHOD__);
+        $this->shutdown( __METHOD__ );
     }
 
     /**
@@ -1231,26 +1266,26 @@ class BResponse extends BClass
     * @param bool|string $output Proceed to output content and exit
     * @return BResponse|exit
     */
-    public function status($status, $message=null, $output=true)
+    public function status( $status, $message = null, $output = true )
     {
-        if (is_null($message)) {
-            if (!empty(static::$_httpStatuses[$status])) {
-                $message = static::$_httpStatuses[$status];
+        if ( is_null( $message ) ) {
+            if ( !empty( static::$_httpStatuses[ $status ] ) ) {
+                $message = static::$_httpStatuses[ $status ];
             } else {
                 $message = 'Unknown';
             }
         }
         $protocol = BRequest::i()->serverProtocol();
 
-        static::header(array(
+        static::header( [
             "{$protocol} {$status} {$message}",
             "Status: {$status} {$message}",
-        ));
+        ] );
 
-        if (is_string($output)) {
+        if ( is_string( $output ) ) {
             echo $output;
             exit;
-        } elseif ($output) {
+        } elseif ( $output ) {
             $this->output();
         }
         return $this;
@@ -1262,43 +1297,43 @@ class BResponse extends BClass
     * @param string $type Optional content type
     * @return exit
     */
-    public function output($type=null)
+    public function output( $type = null )
     {
-        if (!is_null($type)) {
-            $this->setContentType($type);
+        if ( !is_null( $type ) ) {
+            $this->setContentType( $type );
         }
         //BSession::i()->close();
-        $headers = array('Content-Type: '.$this->_contentType.'; charset='.$this->_charset);
+        $headers = [ 'Content-Type: ' . $this->_contentType . '; charset=' . $this->_charset ];
 
-        foreach ((array)BConfig::i()->get('web/headers') as $header => $content) {
-            $headers[] = $header.': '.$content;
+        foreach ( (array)BConfig::i()->get( 'web/headers' ) as $header => $content ) {
+            $headers[] = $header . ': ' . $content;
             //header('X-Frame-Options: SAMEORIGIN');
             //header('X-UA-Compatible: IE=edge');
         }
-        static::header($headers);
+        static::header( $headers );
 
-        if ($this->_contentType=='application/json') {
-            if (!empty($this->_content)) {
-                $this->_content = is_string($this->_content) ? $this->_content : BUtil::toJson($this->_content);
+        if ( $this->_contentType == 'application/json' ) {
+            if ( !empty( $this->_content ) ) {
+                $this->_content = is_string( $this->_content ) ? $this->_content : BUtil::toJson( $this->_content );
             }
-        } elseif (is_null($this->_content)) {
+        } elseif ( is_null( $this->_content ) ) {
             $this->_content = BLayout::i()->render();
         }
-        BEvents::i()->fire(__METHOD__.':before', array('content'=>&$this->_content));
+        BEvents::i()->fire( __METHOD__ . ':before', [ 'content' => &$this->_content ] );
 
-        if ($this->_contentPrefix) {
+        if ( $this->_contentPrefix ) {
             echo $this->_contentPrefix;
         }
-        if ($this->_content) {
+        if ( $this->_content ) {
             echo $this->_content;
         }
-        if ($this->_contentSuffix) {
+        if ( $this->_contentSuffix ) {
             echo $this->_contentSuffix;
         }
 
-        BEvents::i()->fire(__METHOD__.':after', array('content'=>$this->_content));
+        BEvents::i()->fire( __METHOD__ . ':after', [ 'content' => $this->_content ] );
 
-        $this->shutdown(__METHOD__);
+        $this->shutdown( __METHOD__ );
     }
 
     /**
@@ -1316,23 +1351,23 @@ class BResponse extends BClass
     * @param string $url URL to redirect
     * @param int $status Default 302 (temporary), another possible value 301 (permanent)
     */
-    public function redirect($url, $status=302)
+    public function redirect( $url, $status = 302 )
     {
         BSession::i()->close();
-        $this->status($status, null, false);
-        if (true === $url) {
+        $this->status( $status, null, false );
+        if ( true === $url ) {
             $referrer = BRequest::i()->referrer();
             $url = $referrer ? $referrer : BRequest::i()->currentUrl();
-        } elseif (!BUtil::isUrlFull($url)) {
-            $url = BApp::href($url);
+        } elseif ( !BUtil::isUrlFull( $url ) ) {
+            $url = BApp::href( $url );
         }
-        header("Location: {$url}", null, $status);
-        $this->shutdown(__METHOD__);
+        header( "Location: {$url}", null, $status );
+        $this->shutdown( __METHOD__ );
     }
 
     public function httpsRedirect()
     {
-        $this->redirect(str_replace('http://', 'https://', BRequest::i()->currentUrl()));
+        $this->redirect( str_replace( 'http://', 'https://', BRequest::i()->currentUrl() ) );
     }
 
     /**
@@ -1342,7 +1377,7 @@ class BResponse extends BClass
     */
     public function httpSTS()
     {
-        static::header('Strict-Transport-Security: max-age=500; includeSubDomains');
+        static::header( 'Strict-Transport-Security: max-age=500; includeSubDomains' );
         return $this;
     }
 
@@ -1352,54 +1387,54 @@ class BResponse extends BClass
     * @param array $options
     * @return BResponse
     */
-    public function cors($options=array())
+    public function cors( $options = [] )
     {
-        if (empty($options['origin'])) {
-            $options['origin'] = BRequest::i()->httpOrigin();
+        if ( empty( $options[ 'origin' ] ) ) {
+            $options[ 'origin' ] = BRequest::i()->httpOrigin();
         }
-        $headers = array('Access-Control-Allow-Origin: '.$options['origin']);
-        if (!empty($options['methods'])) {
-            $headers[] = 'Access-Control-Allow-Methods: '.$options['methods'];
+        $headers = [ 'Access-Control-Allow-Origin: ' . $options[ 'origin' ] ];
+        if ( !empty( $options[ 'methods' ] ) ) {
+            $headers[] = 'Access-Control-Allow-Methods: ' . $options[ 'methods' ];
         }
-        if (!empty($options['credentials'])) {
+        if ( !empty( $options[ 'credentials' ] ) ) {
             $headers[] = 'Access-Control-Allow-Credentials: true';
         }
-        if (!empty($options['headers'])) {
-            $headers[] = 'Access-Control-Allow-Headers: '.$options['headers'];
+        if ( !empty( $options[ 'headers' ] ) ) {
+            $headers[] = 'Access-Control-Allow-Headers: ' . $options[ 'headers' ];
         }
-        if (!empty($options['expose-headers'])) {
-            $headers[] = 'Access-Control-Expose-Headers: '.$options['expose-headers'];
+        if ( !empty( $options[ 'expose-headers' ] ) ) {
+            $headers[] = 'Access-Control-Expose-Headers: ' . $options[ 'expose-headers' ];
         }
-        if (!empty($options['age'])) {
-            $headers[] = 'Access-Control-Max-Age: '.$options['age'];
+        if ( !empty( $options[ 'age' ] ) ) {
+            $headers[] = 'Access-Control-Max-Age: ' . $options[ 'age' ];
         }
-        static::header($headers);
+        static::header( $headers );
         return $this;
     }
 
     public function nocache()
     {
-        static::header(array(
+        static::header( [
             "Expires: Sat, 26 Jul 1997 05:00:00 GMT", // Date in the past
-            "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT", // Current time
+            "Last-Modified: " . gmdate( "D, d M Y H:i:s" ) . " GMT", // Current time
             "Cache-Control: no-cache, must-revalidate", // HTTP/1.1
             "Pragma: no-cache",
-        ));
+        ] );
         return $this;
     }
 
-    public function startLongResponse($bypassBuffering = true)
+    public function startLongResponse( $bypassBuffering = true )
     {
         // improve performance by not processing debug log
-        if (BDebug::is('DEBUG')) {
-            BDebug::mode('DEVELOPMENT');
+        if ( BDebug::is( 'DEBUG' ) ) {
+            BDebug::mode( 'DEVELOPMENT' );
         }
         // redundancy: avoid memory leakage from debug log
-        BDebug::level(BDebug::MEMORY, false);
+        BDebug::level( BDebug::MEMORY, false );
         // turn off in-memory SQL log
-        BConfig::i()->set('db/logging', 0);
+        BConfig::i()->set( 'db/logging', 0 );
         // remove process timeout limitation
-        set_time_limit(0);
+        set_time_limit( 0 );
         // output in real time
         @ob_end_flush();
         ob_implicit_flush();
@@ -1408,17 +1443,17 @@ class BResponse extends BClass
         // remove session lock
         session_write_close();
         // bypass initial webservice buffering
-        if ($bypassBuffering) {
-            echo str_pad('', 2000, ' ');
+        if ( $bypassBuffering ) {
+            echo str_pad( '', 2000, ' ' );
         }
         // continue in background if the browser request was interrupted
         //ignore_user_abort(true);
         return $this;
     }
 
-    public function shutdown($lastMethod=null)
+    public function shutdown( $lastMethod = null )
     {
-        BEvents::i()->fire(__METHOD__, array('last_method'=>$lastMethod));
+        BEvents::i()->fire( __METHOD__, [ 'last_method' => $lastMethod ] );
         BSession::i()->close();
         BRouting::i()->stop();
         //exit;
@@ -1435,16 +1470,16 @@ class BRouting extends BClass
     *
     * @var array
     */
-    protected $_routes = array();
+    protected $_routes = [];
 
-    protected $_routesRegex = array();
+    protected $_routesRegex = [];
 
     /**
     * Partial route changes
     *
     * @var array
     */
-    protected static $_routeChanges = array();
+    protected static $_routeChanges = [];
 
     /**
     * Current route node, empty if front controller dispatch wasn't run yet
@@ -1458,7 +1493,7 @@ class BRouting extends BClass
     *
     * @var array
     */
-    protected $_urlTemplates = array();
+    protected $_urlTemplates = [];
 
     /**
     * Current controller name
@@ -1479,14 +1514,14 @@ class BRouting extends BClass
     *
     * @return BRouting
     */
-    public static function i($new=false, array $args=array())
+    public static function i( $new = false, array $args = [] )
     {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
+        return BClassRegistry::instance( __CLASS__, $args, !$new );
     }
 
     public function __construct()
     {
-        $this->route('_ /noroute', 'BActionController.noroute', array(), null, false);
+        $this->route( '_ /noroute', 'BActionController.noroute', [], null, false );
     }
 
     /**
@@ -1495,38 +1530,38 @@ class BRouting extends BClass
     * @param string $partValue
     * @param mixed $options
     */
-    public function changeRoute($from, $opt)
+    public function changeRoute( $from, $opt )
     {
-        if (!is_array($opt)) {
-            $opt = array('to'=>$opt);
+        if ( !is_array( $opt ) ) {
+            $opt = [ 'to' => $opt ];
         }
-        $type = !empty($opt['type']) ? $opt['type'] : 'first';
-        unset($opt['type']);
-        $this->_routeChanges[$type][$from] = $opt;
+        $type = !empty( $opt[ 'type' ] ) ? $opt[ 'type' ] : 'first';
+        unset( $opt[ 'type' ] );
+        $this->_routeChanges[ $type ][ $from ] = $opt;
         return $this;
     }
 
-    public static function processHref($href)
+    public static function processHref( $href )
     {
-        $href = ltrim($href, '/');
-        if (!empty(static::$_routeChanges['first'])) {
-            $rules = static::$_routeChanges['first'];
-            $parts = explode('/', $href, 2);
-            if (!empty($rules[$parts[0]])) {
-                $href = ($part0 = $rules[$parts[0]]['to'])
-                    .($part0 && isset($parts[1]) ? '/' : '')
-                    .(isset($parts[1]) ? $parts[1] : '');
+        $href = ltrim( $href, '/' );
+        if ( !empty( static::$_routeChanges[ 'first' ] ) ) {
+            $rules = static::$_routeChanges[ 'first' ];
+            $parts = explode( '/', $href, 2 );
+            if ( !empty( $rules[ $parts[ 0 ] ] ) ) {
+                $href = ( $part0 = $rules[ $parts[ 0 ] ][ 'to' ] )
+                    . ( $part0 && isset( $parts[ 1 ] ) ? '/' : '' )
+                    . ( isset( $parts[ 1 ] ) ? $parts[ 1 ] : '' );
             }
         }
         return $href;
     }
 
-    public function processRoutePath($route, $args=array())
+    public function processRoutePath( $route, $args = [] )
     {
-        if (!empty($args['module_name'])) {
-            $module = BModuleRegistry::i()->module($args['module_name']);
-            if ($module && ($prefix = $module->url_prefix)) {
-                $route = $prefix.$route;
+        if ( !empty( $args[ 'module_name' ] ) ) {
+            $module = BModuleRegistry::i()->module( $args[ 'module_name' ] );
+            if ( $module && ( $prefix = $module->url_prefix ) ) {
+                $route = $prefix . $route;
             }
         }
         #$route = static::processHref($route); // slower than alternative (replacing keys on saveRoute)
@@ -1546,43 +1581,43 @@ class BRouting extends BClass
      * @param bool   $multiple
      * @return BFrontController for chain linking
      */
-    public function route($route, $callback=null, $args=null, $name=null, $multiple=true)
+    public function route( $route, $callback = null, $args = null, $name = null, $multiple = true )
     {
-        if (is_array($route)) {
-            foreach ($route as $a) {
-                if (is_null($callback)) {
-                    $this->route($a[0], $a[1], isset($a[2])?$a[2]:null, isset($a[3])?$a[3]:null);
+        if ( is_array( $route ) ) {
+            foreach ( $route as $a ) {
+                if ( is_null( $callback ) ) {
+                    $this->route( $a[ 0 ], $a[ 1 ], isset( $a[ 2 ] ) ? $a[ 2 ] : null, isset( $a[ 3 ] ) ? $a[ 3 ] : null );
                 } else {
-                    $this->route($a, $callback, $args, $name, $multiple);
+                    $this->route( $a, $callback, $args, $name, $multiple );
                 }
             }
             return $this;
         }
-        if (empty($args['module_name'])) {
-            $args['module_name'] = BModuleRegistry::i()->currentModuleName();
+        if ( empty( $args[ 'module_name' ] ) ) {
+            $args[ 'module_name' ] = BModuleRegistry::i()->currentModuleName();
         }
-        BDebug::debug('ROUTE '.$route);
-        if (empty($this->_routes[$route])) {
-            $this->_routes[$route] = new BRouteNode(array('route_name'=>$route));
+        BDebug::debug( 'ROUTE ' . $route );
+        if ( empty( $this->_routes[ $route ] ) ) {
+            $this->_routes[ $route ] = new BRouteNode( [ 'route_name' => $route ] );
         }
 
-        $this->_routes[$route]->observe($callback, $args, $multiple);
+        $this->_routes[ $route ]->observe( $callback, $args, $multiple );
 
-        if (!is_null($name)) {
-            $this->_urlTemplates[$name] = $route;
+        if ( !is_null( $name ) ) {
+            $this->_urlTemplates[ $name ] = $route;
         }
         return $this;
     }
 
-    public function removeRoute($route, $callback = null)
+    public function removeRoute( $route, $callback = null )
     {
-        if (is_null($callback)) {
-            unset($this->_routes[$route]);
-            BDebug::debug('REMOVE ROUTE '.$route);
+        if ( is_null( $callback ) ) {
+            unset( $this->_routes[ $route ] );
+            BDebug::debug( 'REMOVE ROUTE ' . $route );
         } else {
-            if (!empty($this->_routes[$route])) {
-                $this->_routes[$route]->removeObserver($callback);
-                BDebug::debug('REMOVE ROUTE CALLBACK '.$route.' : '.print_r($callback,1));
+            if ( !empty( $this->_routes[ $route ] ) ) {
+                $this->_routes[ $route ]->removeObserver( $callback );
+                BDebug::debug( 'REMOVE ROUTE CALLBACK ' . $route . ' : ' . print_r( $callback, 1 ) );
             }
         }
         return $this;
@@ -1599,9 +1634,9 @@ class BRouting extends BClass
      * @param bool   $multiple
      * @return BFrontController
      */
-    public function get($route, $callback = null, $args = null, $name = null, $multiple = true)
+    public function get( $route, $callback = null, $args = null, $name = null, $multiple = true )
     {
-        return $this->_route($route, 'get', $callback, $args, $name, $multiple);
+        return $this->_route( $route, 'get', $callback, $args, $name, $multiple );
     }
 
     /**
@@ -1615,9 +1650,9 @@ class BRouting extends BClass
      * @param bool   $multiple
      * @return BFrontController
      */
-    public function post($route, $callback = null, $args = null, $name = null, $multiple = true)
+    public function post( $route, $callback = null, $args = null, $name = null, $multiple = true )
     {
-        return $this->_route($route, 'post', $callback, $args, $name, $multiple);
+        return $this->_route( $route, 'post', $callback, $args, $name, $multiple );
     }
 
     /**
@@ -1631,9 +1666,9 @@ class BRouting extends BClass
      * @param bool  $multiple
      * @return $this|BFrontController
      */
-    public function put($route, $callback = null, $args = null, $name = null, $multiple = true)
+    public function put( $route, $callback = null, $args = null, $name = null, $multiple = true )
     {
-        return $this->_route($route, 'put', $callback, $args, $name, $multiple);
+        return $this->_route( $route, 'put', $callback, $args, $name, $multiple );
     }
 
     /**
@@ -1647,9 +1682,9 @@ class BRouting extends BClass
      * @param bool  $multiple
      * @return $this|BFrontController
      */
-    public function any($route, $callback = null, $args = null, $name = null, $multiple = true)
+    public function any( $route, $callback = null, $args = null, $name = null, $multiple = true )
     {
-        return $this->_route($route, 'any', $callback, $args, $name, $multiple);
+        return $this->_route( $route, 'any', $callback, $args, $name, $multiple );
     }
 
     /**
@@ -1664,64 +1699,64 @@ class BRouting extends BClass
      * @param bool   $multiple
      * @return $this|BFrontController
      */
-    protected function _route($route, $verb, $callback = null, $args = null, $name = null, $multiple = true)
+    protected function _route( $route, $verb, $callback = null, $args = null, $name = null, $multiple = true )
     {
-        if (is_array($route)) {
-            foreach ($route as $a) {
-                if (is_null($callback)) {
-                    $this->_route($a[0], $verb, $a[1], isset($a[2]) ? $a[2] : null, isset($a[3]) ? $a[3] : null);
+        if ( is_array( $route ) ) {
+            foreach ( $route as $a ) {
+                if ( is_null( $callback ) ) {
+                    $this->_route( $a[ 0 ], $verb, $a[ 1 ], isset( $a[ 2 ] ) ? $a[ 2 ] : null, isset( $a[ 3 ] ) ? $a[ 3 ] : null );
                 } else {
-                    $this->any($a, $verb, $callback, $args);
+                    $this->any( $a, $verb, $callback, $args );
                 }
             }
             return $this;
         }
-        $verb = strtoupper($verb);
+        $verb = strtoupper( $verb );
         $isRegex = false;
-        if ($route[0]==='^') {
+        if ( $route[ 0 ] === '^' ) {
             $isRegex = true;
-            $route = substr($route, 1);
+            $route = substr( $route, 1 );
         }
-        if ($verb==='GET' || $verb==='POST' || $verb==='PUT') {
-            $route = $verb.' '.$route;
+        if ( $verb === 'GET' || $verb === 'POST' || $verb === 'PUT' ) {
+            $route = $verb . ' ' . $route;
         } else {
-            if ($isRegex) {
-                $route = '(GET|POST|DELETE|PUT|HEAD) '.$route;
+            if ( $isRegex ) {
+                $route = '(GET|POST|DELETE|PUT|HEAD) ' . $route;
             } else {
-                $route = 'GET|POST|DELETE|PUT|HEAD '.$route;
+                $route = 'GET|POST|DELETE|PUT|HEAD ' . $route;
             }
         }
-        if ($isRegex) {
-            $route = '^'.$route;
+        if ( $isRegex ) {
+            $route = '^' . $route;
         }
 
-        return $this->route($route, $callback, $args, $name, $multiple);
+        return $this->route( $route, $callback, $args, $name, $multiple );
     }
 
-    public function findRoute($requestRoute=null)
+    public function findRoute( $requestRoute = null )
     {
-        if (is_null($requestRoute)) {
+        if ( is_null( $requestRoute ) ) {
             $requestRoute = BRequest::i()->rawPath();
         }
 
         // try first new route syntax, without method included
-        if (!empty($this->_routes[$requestRoute]) && $this->_routes[$requestRoute]->validObserver()) {
-            BDebug::debug('DIRECT ROUTE: '.$requestRoute);
-            return $this->_routes[$requestRoute];
+        if ( !empty( $this->_routes[ $requestRoute ] ) && $this->_routes[ $requestRoute ]->validObserver() ) {
+            BDebug::debug( 'DIRECT ROUTE: ' . $requestRoute );
+            return $this->_routes[ $requestRoute ];
         }
 
-        if (strpos($requestRoute, ' ')===false) {
-            $requestRoute = BRequest::i()->method().' '.$requestRoute;
+        if ( strpos( $requestRoute, ' ' ) === false ) {
+            $requestRoute = BRequest::i()->method() . ' ' . $requestRoute;
         }
 
-        if (!empty($this->_routes[$requestRoute]) && $this->_routes[$requestRoute]->validObserver()) {
-            BDebug::debug('DIRECT ROUTE: '.$requestRoute);
-            return $this->_routes[$requestRoute];
+        if ( !empty( $this->_routes[ $requestRoute ] ) && $this->_routes[ $requestRoute ]->validObserver() ) {
+            BDebug::debug( 'DIRECT ROUTE: ' . $requestRoute );
+            return $this->_routes[ $requestRoute ];
         }
 
-        BDebug::debug('FIND ROUTE: '.$requestRoute);
-        foreach ($this->_routes as $routeName => $route) {
-            if ($route->match($requestRoute)) {
+        BDebug::debug( 'FIND ROUTE: ' . $requestRoute );
+        foreach ( $this->_routes as $routeName => $route ) {
+            if ( $route->match( $requestRoute ) ) {
                 return $route;
             }
         }
@@ -1735,27 +1770,31 @@ class BRouting extends BClass
     */
     public function processRoutes()
     {
-        uasort($this->_routes, function($a, $b) {
+        uasort( $this->_routes, function( $a, $b ) {
             $a1 = $a->num_parts;
             $b1 = $b->num_parts;
-            $res = $a1<$b1 ? 1 : ($a1>$b1 ? -1 : 0);
-            if ($res != 0) {
+            $res = $a1 < $b1 ? 1 : ( $a1 > $b1 ? -1 : 0 );
+            if ( $res != 0 ) {
 #echo ' ** ('.$a->route_name.'):('.$b->route_name.'): '.$res.' ** <br>';
                 return $res;
             }
-            $ap = (strpos($a->route_name, '/*')!==false ? 10 : 0)+(strpos($a->route_name, '/.')!==false ? 5 : 0)+(strpos($a->route_name, '/:')!==false ? 1 : 0);
-            $bp = (strpos($b->route_name, '/*')!==false ? 10 : 0)+(strpos($b->route_name, '/.')!==false ? 5 : 0)+(strpos($b->route_name, '/:')!==false ? 1 : 0);
+            $ap = ( strpos( $a->route_name, '/*' ) !== false ? 10 : 0 )
+                + ( strpos( $a->route_name, '/.' ) !== false ? 5 : 0 )
+                + ( strpos( $a->route_name, '/:' ) !== false ? 1 : 0 );
+            $bp = ( strpos( $b->route_name, '/*' ) !== false ? 10 : 0 )
+                + ( strpos( $b->route_name, '/.' ) !== false ? 5 : 0 )
+                + ( strpos( $b->route_name, '/:' ) !== false ? 1 : 0 );
 #echo $a->route_name.' ('.$ap.'), '.$b->route_name.'('.$bp.')<br>';
-            return $ap === $bp ? 0 : ($ap < $bp ? -1 : 1 );
-        });
+            return $ap === $bp ? 0 : ( $ap < $bp ? -1 : 1 );
+        } );
 #echo "<pre>"; print_r($this->_routes); echo "</pre>";
         return $this;
     }
 
-    public function forward($from, $to, $args=array())
+    public function forward( $from, $to, $args = [] )
     {
-        $args['target'] = $to;
-        $this->route($from, array($this, '_forwardCallback'), $args);
+        $args[ 'target' ] = $to;
+        $this->route( $from, [ $this, '_forwardCallback' ], $args );
         /*
         $this->route($from, function($args) {
             return array('forward'=>$this->processRoutePath($args['target'], $args));
@@ -1764,21 +1803,21 @@ class BRouting extends BClass
         return $this;
     }
 
-    protected function _forwardCallback($args)
+    protected function _forwardCallback( $args )
     {
-        return $this->processRoutePath($args['target'], $args);
+        return $this->processRoutePath( $args[ 'target' ], $args );
     }
 
-    public function redirect($from, $to, $args=array())
+    public function redirect( $from, $to, $args = [] )
     {
-        $args['target'] = $to;
-        $this->route($from, array($this, 'redirectCallback'), $args);
+        $args[ 'target' ] = $to;
+        $this->route( $from, [ $this, 'redirectCallback' ], $args );
         return $this;
     }
 
-    public function redirectCallback($args)
+    public function redirectCallback( $args )
     {
-        BResponse::i()->redirect($args['target']);
+        BResponse::i()->redirect( $args[ 'target' ] );
     }
 
     /**
@@ -1796,43 +1835,43 @@ class BRouting extends BClass
     * @param string $requestRoute optional route for explicit route dispatch
     * @return BFrontController
     */
-    public function dispatch($requestRoute=null)
+    public function dispatch( $requestRoute = null )
     {
-        BEvents::i()->fire(__METHOD__.':before');
+        BEvents::i()->fire( __METHOD__ . ':before' );
 
         $this->processRoutes();
 
         $attempts = 0;
         $forward = false; // null: no forward, false: try next route, true: exit loop, array: forward without new route
 #echo "<pre>"; print_r($this->_routes); exit;
-        while (($attempts++<100) && (false === $forward || is_array($forward))) {
-            $route = $this->findRoute($requestRoute);
+        while ( ( $attempts++ < 100 ) && ( false === $forward || is_array( $forward ) ) ) {
+            $route = $this->findRoute( $requestRoute );
 #echo "<pre>"; print_r($route); echo "</pre>";
-            if (!$route) {
-                $route = $this->findRoute('_ /noroute');
+            if ( !$route ) {
+                $route = $this->findRoute( '_ /noroute' );
             }
             $this->_currentRoute = $route;
 
             $forward = $route->dispatch();
-            if ($this->_stop) {
+            if ( $this->_stop ) {
                 return $this;
             }
 #var_dump($forward); exit;
-            if (is_array($forward)) {
-                list($actionName, $forwardCtrlName, $params) = $forward;
+            if ( is_array( $forward ) ) {
+                list( $actionName, $forwardCtrlName, $params ) = $forward;
                 $controllerName = $forwardCtrlName ? $forwardCtrlName : $route->controller_name;
                 $requestRoute = '_ /forward';
-                $this->route($requestRoute, $controllerName.'.'.$actionName, array(), null, false);
+                $this->route( $requestRoute, $controllerName . '.' . $actionName, [], null, false );
             }
         }
 
-        if ($attempts>=100) {
-            echo "<pre>"; print_r($route); echo "</pre>";
-            BDebug::error(BLocale::_('BFrontController: Reached 100 route iterations: %s', print_r($route,1)));
+        if ( $attempts >= 100 ) {
+            echo "<pre>"; print_r( $route ); echo "</pre>";
+            BDebug::error( BLocale::_( 'BFrontController: Reached 100 route iterations: %s', print_r( $route, 1 ) ) );
         }
     }
 
-    public function stop($flag = true)
+    public function stop( $flag = true )
     {
         $this->_stop = $flag;
         return $this;
@@ -1845,7 +1884,7 @@ class BRouting extends BClass
 
     public function debug()
     {
-        echo "<pre>"; print_r($this->_routes); echo "</pre>";
+        echo "<pre>"; print_r( $this->_routes ); echo "</pre>";
     }
 }
 
@@ -1859,14 +1898,14 @@ class BRouteNode
     *
     * @var array
     */
-    protected $_flags = array();
+    protected $_flags = [];
 
     /**
     * Route Observers
     *
     * @var array(BRouteObserver)
     */
-    protected $_observers = array();
+    protected $_observers = [];
 
     public $controller_name;
     public $action_idx;
@@ -1878,83 +1917,83 @@ class BRouteNode
     public $params_values;
     public $multi_method;
 
-    public function __construct($args=array())
+    public function __construct( $args = [] )
     {
-        foreach ($args as $k=>$v) {
+        foreach ( $args as $k => $v ) {
             $this->$k = $v;
         }
 
         // convert route name into regex and save param references
-        if ($this->route_name[0]==='^') {
-            $this->regex = '#'.$this->route_name.'#';
+        if ( $this->route_name[ 0 ] === '^' ) {
+            $this->regex = '#' . $this->route_name . '#';
             return;
         }
-        $a = explode(' ', $this->route_name);
-        if (sizeof($a)<2) {
-            $a = array(
+        $a = explode( ' ', $this->route_name );
+        if ( sizeof( $a ) < 2 ) {
+            $a = [
                 'GET|POST|DELETE|PUT|HEAD',
-                $a[0],
-            );
+                $a[ 0 ],
+            ];
             $this->multi_method = true;
         } else {
-            $this->multi_method = strpos($a[0], '|') !== false;
+            $this->multi_method = strpos( $a[ 0 ], '|' ) !== false;
         }
-        if ($a[1]==='/') {
-            $this->regex = '#^('.$a[0].') (/)$#';
+        if ( $a[ 1 ] === '/' ) {
+            $this->regex = '#^(' . $a[ 0 ] . ') (/)$#';
         } else {
-            $a1 = explode('/', trim($a[1], '/'));
-            $this->num_parts = sizeof($a1);
+            $a1 = explode( '/', trim( $a[ 1 ], '/' ) );
+            $this->num_parts = sizeof( $a1 );
             $paramId = 2;
-            foreach ($a1 as $i=>$k) {
-                $k0 = $k[0];
+            foreach ( $a1 as $i => $k ) {
+                $k0 = $k[ 0 ];
                 $part = '';
-                if ($k0==='?') {
-                    $k = substr($k, 1);
-                    $k0 = $k[0];
+                if ( $k0 === '?' ) {
+                    $k = substr( $k, 1 );
+                    $k0 = $k[ 0 ];
                     $part = '?';
                 }
-                if ($k0===':') { // optional param
-                    $this->params[++$paramId] = substr($k, 1);
+                if ( $k0 === ':' ) { // optional param
+                    $this->params[ ++$paramId ] = substr( $k, 1 );
                     $part .= '([^/]*)';
-                } elseif ($k0==='!') { // required param
-                    $this->params[++$paramId] = substr($k, 1);
+                } elseif ( $k0 === '!' ) { // required param
+                    $this->params[ ++$paramId ] = substr( $k, 1 );
                     $part .= '([^/]+)';
-                } elseif ($k0==='*') { // param until end of url
-                    $this->params[++$paramId] = substr($k, 1);
+                } elseif ( $k0 === '*' ) { // param until end of url
+                    $this->params[ ++$paramId ] = substr( $k, 1 );
                     $part .= '(.*)';
-                } elseif ($k0==='.') { // dynamic action
-                    $this->params[++$paramId] = substr($k, 1);
+                } elseif ( $k0 === '.' ) { // dynamic action
+                    $this->params[ ++$paramId ] = substr( $k, 1 );
                     $this->action_idx = $paramId;
                     $part .= '([a-zA-Z0-9_]*)';
                 } else {
                     //$part .= preg_quote($a1[$i]);
                 }
-                if (''!==$part) {
-                    $a1[$i] = $part;
+                if ( '' !== $part ) {
+                    $a1[ $i ] = $part;
                 }
             }
-            $this->regex = '#^('.$a[0].') (/'.join('/', $a1).'/?)$#'; // #...#i option?
+            $this->regex = '#^(' . $a[ 0 ] . ') (/' . join( '/', $a1 ) . '/?)$#'; // #...#i option?
 #echo $this->regex.'<hr>';
         }
     }
 
-    public function match($route)
+    public function match( $route )
     {
-        if (!preg_match($this->regex, $route, $match)) {
+        if ( !preg_match( $this->regex, $route, $match ) ) {
             return false;
         }
-        if (!$this->validObserver()) {
+        if ( !$this->validObserver() ) {
             return false;
         }
-        if ($this->action_idx) {
-            $this->action_name = !empty($match[$this->action_idx]) ? $match[$this->action_idx] : 'index';
+        if ( $this->action_idx ) {
+            $this->action_name = !empty( $match[ $this->action_idx ] ) ? $match[ $this->action_idx ] : 'index';
         }
-        if ($this->route_name[0]==='^') {
+        if ( $this->route_name[ 0 ] === '^' ) {
             $this->params_values = $match;
-        } elseif ($this->params) {
-            $this->params_values = array();
-            foreach ($this->params as $i=>$p) {
-                $this->params_values[$p] = $match[$i];
+        } elseif ( $this->params ) {
+            $this->params_values = [];
+            foreach ( $this->params as $i => $p ) {
+                $this->params_values[ $p ] = $match[ $i ];
             }
         }
         return true;
@@ -1971,9 +2010,9 @@ class BRouteNode
     * @param mixed $value
     * @return BRouteNode
     */
-    public function flag($flag, $value=true)
+    public function flag( $flag, $value = true )
     {
-        $this->_flags[$flag] = $value;
+        $this->_flags[ $flag ] = $value;
         return $this;
     }
 
@@ -1984,18 +2023,18 @@ class BRouteNode
     * @param array $args
     * @param boolean $multiple whether to allow multiple observers for the route
     */
-    public function observe($callback, $args=null, $multiple=true)
+    public function observe( $callback, $args = null, $multiple = true )
     {
-        $observer = new BRouteObserver(array(
+        $observer = new BRouteObserver( [
             'callback' => $callback,
             'args' => $args,
             'route_node' => $this,
-        ));
-        if ($multiple) {
+        ] );
+        if ( $multiple ) {
             $this->_observers[] = $observer;
         } else {
             //$this->_observers = BUtil::arrayMerge($this->_observers[0], $observer);
-            $this->_observers = array($observer);
+            $this->_observers = [ $observer ];
         }
         return $this;
     }
@@ -2007,17 +2046,17 @@ class BRouteNode
     */
     public function validObserver()
     {
-        foreach ($this->_observers as $o) {
-            if (!$o->skip) return $o;
+        foreach ( $this->_observers as $o ) {
+            if ( !$o->skip ) return $o;
         }
         return null;
     }
 
-    public function removeObserver($callback)
+    public function removeObserver( $callback )
     {
-        foreach ($this->_observers as $i => $o) {
-            if ($o->callback == $callback) {
-                unset($this->_observers[$i]);
+        foreach ( $this->_observers as $i => $o ) {
+            if ( $o->callback == $callback ) {
+                unset( $this->_observers[ $i ] );
             }
         }
         return $this;
@@ -2034,27 +2073,27 @@ class BRouteNode
     {
         $attempts = 0;
         $observer = $this->validObserver();
-        while ((++$attempts<100) && $observer) {
+        while ( ( ++$attempts < 100 ) && $observer ) {
 
             $forward = $observer->dispatch();
-            if (is_array($forward)) {
+            if ( is_array( $forward ) ) {
                 return $forward;
-            } elseif ($forward===false) {
+            } elseif ( $forward === false ) {
                 $observer->skip = true;
                 $observer = $this->validObserver();
             } else {
                 return null;
             }
         }
-        if ($attempts>=100) {
-            BDebug::error(BLocale::_('BRouteNode: Reached 100 route iterations: %s', print_r($observer,1)));
+        if ( $attempts >= 100 ) {
+            BDebug::error( BLocale::_( 'BRouteNode: Reached 100 route iterations: %s', print_r( $observer, 1 ) ) );
         }
         return false;
     }
 
     public function __destruct()
     {
-        unset($this->_observers, $this->_children, $this->_match);
+        unset( $this->_observers, $this->_children, $this->_match );
     }
 }
 
@@ -2091,9 +2130,9 @@ class BRouteObserver
     */
     public $route_node;
 
-    public function __construct($args)
+    public function __construct( $args )
     {
-        foreach ($args as $k=>$v) {
+        foreach ( $args as $k => $v ) {
             $this->$k = $v;
         }
     }
@@ -2105,22 +2144,22 @@ class BRouteObserver
     */
     public function dispatch()
     {
-        BModuleRegistry::i()->currentModule(!empty($this->args['module_name']) ? $this->args['module_name'] : null);
+        BModuleRegistry::i()->currentModule( !empty( $this->args[ 'module_name' ] ) ? $this->args[ 'module_name' ] : null );
 
         $node = $this->route_node;
-        BRequest::i()->initParams((array)$node->params_values);
-        if (is_string($this->callback) && $node->action_name) {
+        BRequest::i()->initParams( (array)$node->params_values );
+        if ( is_string( $this->callback ) && $node->action_name ) {
             // prevent envoking action_index__POST methods directly
-            $actionNameArr = explode('__', $node->action_name, 2);
-            $this->callback .= '.'.$actionNameArr[0];
+            $actionNameArr = explode( '__', $node->action_name, 2 );
+            $this->callback .= '.' . $actionNameArr[ 0 ];
         }
-        if (is_callable($this->callback)) {
-            return call_user_func($this->callback, $this->args);
+        if ( is_callable( $this->callback ) ) {
+            return call_user_func( $this->callback, $this->args );
         }
-        if (is_string($this->callback)) {
-            foreach (array('.', '->') as $sep) {
-                $r = explode($sep, $this->callback);
-                if (sizeof($r)==2) {
+        if ( is_string( $this->callback ) ) {
+            foreach ( [ '.', '->' ] as $sep ) {
+                $r = explode( $sep, $this->callback );
+                if ( sizeof( $r ) == 2 ) {
                     $this->callback = $r;
                     break;
                 }
@@ -2129,20 +2168,21 @@ class BRouteObserver
 
         $actionName = '';
         $controllerName = '';
-        if (is_array($this->callback)) {
-            $controllerName = $this->callback[0];
+        if ( is_array( $this->callback ) ) {
+            $controllerName = $this->callback[ 0 ];
             $node->controller_name = $controllerName;
-            $actionName = $this->callback[1];
+            $actionName = $this->callback[ 1 ];
         }
 #var_dump($controllerName, $actionName);
         /** @var BActionController */
-        $controller = BClassRegistry::instance($controllerName, array(), true);
-        return $controller->dispatch($actionName, $this->args);
+        $controller = BClassRegistry::instance( $controllerName, [], true );
+
+        return $controller->dispatch( $actionName, $this->args );
     }
 
     public function __destruct()
     {
-        unset($this->route_node, $this->callback, $this->args, $this->params);
+        unset( $this->route_node, $this->callback, $this->args, $this->params );
     }
 }
 
@@ -2183,9 +2223,9 @@ class BActionController extends BClass
     * @param string $viewname
     * @return BView
     */
-    public function view($viewname)
+    public function view( $viewname )
     {
-        return BLayout::i()->view($viewname);
+        return BLayout::i()->view( $viewname );
     }
 
     /**
@@ -2195,36 +2235,36 @@ class BActionController extends BClass
     * @param array $args Action arguments
     * @return forward information
     */
-    public function dispatch($actionName, $args=array())
+    public function dispatch( $actionName, $args = [] )
     {
         $this->_action = $actionName;
         $this->_forward = null;
 
-        if (!$this->beforeDispatch($args)) {
+        if ( !$this->beforeDispatch( $args ) ) {
             return false;
         }
-        if (!is_null($this->_forward)) {
+        if ( !is_null( $this->_forward ) ) {
             return $this->_forward;
         }
-        if ($actionName!=='unauthenticated') {
-            $authenticated = $this->authenticate($args);
-            if (!$authenticated) {
-                $this->forward('unauthenticated');
+        if ( $actionName !== 'unauthenticated' ) {
+            $authenticated = $this->authenticate( $args );
+            if ( !$authenticated ) {
+                $this->forward( 'unauthenticated' );
                 return $this->_forward;
             }
 
-            if ($actionName!=='unauthorized' && !$this->authorize($args)) {
-                $this->forward('unauthorized');
+            if ( $actionName !== 'unauthorized' && !$this->authorize( $args ) ) {
+                $this->forward( 'unauthorized' );
                 return $this->_forward;
             }
         } else {
             $authenticated = true;
         }
 
-        $this->tryDispatch($actionName, $args);
+        $this->tryDispatch( $actionName, $args );
 
-        if (is_null($this->_forward) && !BRouting::i()->isStopped()) {
-            $this->afterDispatch($args);
+        if ( is_null( $this->_forward ) && !BRouting::i()->isStopped() ) {
+            $this->afterDispatch( $args );
         }
         return $this->_forward;
     }
@@ -2235,37 +2275,37 @@ class BActionController extends BClass
     * @param string $actionName
     * @param array $args
     */
-    public function tryDispatch($actionName, $args)
+    public function tryDispatch( $actionName, $args )
     {
-        if (!is_string($actionName) && is_callable($actionName)) {
+        if ( !is_string( $actionName ) && is_callable( $actionName ) ) {
             try {
-                call_user_func($actionName);
-            } catch (Exception $e) {
-                BDebug::exceptionHandler($e);
-                $this->sendError($e->getMessage());
+                call_user_func( $actionName );
+            } catch ( Exception $e ) {
+                BDebug::exceptionHandler( $e );
+                $this->sendError( $e->getMessage() );
             }
             return $this;
         }
-        $actionMethod = $this->_actionMethodPrefix.$actionName;
+        $actionMethod = $this->_actionMethodPrefix . $actionName;
         $reqMethod = BRequest::i()->method();
-        if ($reqMethod !== 'GET') {
-            $tmpMethod = $actionMethod.'__'.$reqMethod;
-            if (method_exists($this, $tmpMethod)) {
+        if ( $reqMethod !== 'GET' ) {
+            $tmpMethod = $actionMethod . '__' . $reqMethod;
+            if ( method_exists( $this, $tmpMethod ) ) {
                 $actionMethod = $tmpMethod;
-            } elseif (BRouting::i()->currentRoute()->multi_method) {
-                $this->forward(false); // If route has multiple methods, require method suffix
+            } elseif ( BRouting::i()->currentRoute()->multi_method ) {
+                $this->forward( false ); // If route has multiple methods, require method suffix
             }
         }
         //echo $actionMethod;exit;
-        if (!method_exists($this, $actionMethod)) {
-            $this->forward(false);
+        if ( !method_exists( $this, $actionMethod ) ) {
+            $this->forward( false );
             return $this;
         }
 
         BRequest::i()->stripRequestFieldsTags();
 
         // try {
-            $this->$actionMethod($args);
+            $this->$actionMethod( $args );
         // } catch (Exception $e) {
             //BDebug::exceptionHandler($e);
             // $this->sendError($e->getMessage());
@@ -2281,12 +2321,12 @@ class BActionController extends BClass
     * @param array $params
     * @return string|null|BActionController
     */
-    public function forward($actionName=null, $controllerName=null, array $params=array())
+    public function forward( $actionName = null, $controllerName = null, array $params = [] )
     {
-        if (false===$actionName) {
+        if ( false === $actionName ) {
             $this->_forward = false;
         } else {
-            $this->_forward = array($actionName, $controllerName, $params);
+            $this->_forward = [ $actionName, $controllerName, $params ];
         }
         return $this;
     }
@@ -2303,7 +2343,7 @@ class BActionController extends BClass
     *
     * @param array $args
     */
-    public function authenticate($args=array())
+    public function authenticate( $args = [] )
     {
         return true;
     }
@@ -2315,7 +2355,7 @@ class BActionController extends BClass
     *
     * @param array $args
     */
-    public function authorize($args=array())
+    public function authorize( $args = [] )
     {
         return true;
     }
@@ -2328,8 +2368,8 @@ class BActionController extends BClass
     */
     public function beforeDispatch()
     {
-        BEvents::i()->fire(__METHOD__); // general beforeDispatch event for all controller
-        BEvents::i()->fire(static::$_origClass.'::beforeDispatch'); // specific controller instance
+        BEvents::i()->fire( __METHOD__ ); // general beforeDispatch event for all controller
+        BEvents::i()->fire( static::$_origClass . '::beforeDispatch' ); // specific controller instance
         return true;
     }
 
@@ -2339,8 +2379,8 @@ class BActionController extends BClass
     */
     public function afterDispatch()
     {
-        BEvents::i()->fire(__METHOD__); // general afterDispatch event for all controller
-        BEvents::i()->fire(static::$_origClass.'::afterDispatch'); // specific controller instance
+        BEvents::i()->fire( __METHOD__ ); // general afterDispatch event for all controller
+        BEvents::i()->fire( static::$_origClass . '::afterDispatch' ); // specific controller instance
     }
 
     /**
@@ -2349,9 +2389,9 @@ class BActionController extends BClass
     * @param string $message to be in response
     * @return exit
     */
-    public function sendError($message)
+    public function sendError( $message )
     {
-        BResponse::i()->set($message)->status(503);
+        BResponse::i()->set( $message )->status( 503 );
     }
 
     /**
@@ -2360,7 +2400,7 @@ class BActionController extends BClass
     */
     public function action_unauthenticated()
     {
-        BResponse::i()->set("Unauthenticated")->status(401);
+        BResponse::i()->set( "Unauthenticated" )->status( 401 );
     }
 
     /**
@@ -2369,7 +2409,7 @@ class BActionController extends BClass
     */
     public function action_unauthorized()
     {
-        BResponse::i()->set("Unauthorized")->status(403);
+        BResponse::i()->set( "Unauthorized" )->status( 403 );
     }
 
     /**
@@ -2378,7 +2418,7 @@ class BActionController extends BClass
     */
     public function action_noroute()
     {
-        BResponse::i()->set("Route not found")->status(404);
+        BResponse::i()->set( "Route not found" )->status( 404 );
     }
 
     /**
@@ -2401,33 +2441,33 @@ class BActionController extends BClass
         return self::origClass();
     }
 
-    public function viewProxy($viewPrefix, $defaultView='index', $hookName = 'main', $baseLayout = null)
+    public function viewProxy( $viewPrefix, $defaultView = 'index', $hookName = 'main', $baseLayout = null )
     {
-        $viewPrefix = trim($viewPrefix, '/').'/';
-        $page = BRequest::i()->params('view');
-        if (!$page) {
+        $viewPrefix = trim( $viewPrefix, '/' ) . '/';
+        $page = BRequest::i()->params( 'view' );
+        if ( !$page ) {
             $page = $defaultView;
         }
-        $view = $this->view($viewPrefix.$page);
-        if ($view instanceof BViewEmpty) {
-            $this->forward(false);
+        $view = $this->view( $viewPrefix . $page );
+        if ( $view instanceof BViewEmpty ) {
+            $this->forward( false );
             return false;
         }
 
-        if ($baseLayout) {
-            $this->layout($baseLayout);
+        if ( $baseLayout ) {
+            $this->layout( $baseLayout );
         }
-        BLayout::i()->applyLayout('view-proxy')->applyLayout($viewPrefix.$page);
+        BLayout::i()->applyLayout( 'view-proxy' )->applyLayout( $viewPrefix . $page );
         $view->useMetaData();
 
-        if (($root = BLayout::i()->view('root'))) {
-            $root->addBodyClass('page-'.$page);
+        if ( ( $root = BLayout::i()->view( 'root' ) ) ) {
+            $root->addBodyClass( 'page-' . $page );
         }
 
-        BLayout::i()->hookView($hookName, $viewPrefix . $page);
+        BLayout::i()->hookView( $hookName, $viewPrefix . $page );
 
-        if (!empty($metaData['http_status'])) {
-            BResponse::i()->status($metaData['http_status']);
+        if ( !empty( $metaData[ 'http_status' ] ) ) {
+            BResponse::i()->status( $metaData[ 'http_status' ] );
         }
 
         return $page;
@@ -2440,11 +2480,11 @@ class BActionController extends BClass
     * @param array $params
     * @param string $module if null, try to get current controller module
     */
-    public function _($string, $params=array(), $module=null)
+    public function _( $string, $params = [], $module = null )
     {
-        if (empty($module)) {
+        if ( empty( $module ) ) {
             $module = BModuleRegistry::i()->currentModuleName();
         }
-        return BLocale::_($string, $params, $module);
+        return BLocale::_( $string, $params, $module );
     }
 }

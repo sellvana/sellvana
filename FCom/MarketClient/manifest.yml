@@ -9,13 +9,13 @@ modules:
             FCom_Admin:
                 auto_use: [ bootstrap, layout, views ]
                 routing:
-                    - [ /marketclient/site/?.action, FCom_MarketClient_Admin_Controller_Site ]
-                    - [ /marketclient/module/?.action, FCom_MarketClient_Admin_Controller_Module ]
-                    - [ /marketclient/publish/?.action, FCom_MarketClient_Admin_Controller_Publish ]
-                    - [ /marketclient/download/?.action, FCom_MarketClient_Controller_Download ]
+                    - [ "/marketclient/site/?.action", FCom_MarketClient_Admin_Controller_Site ]
+                    - [ "/marketclient/module/?.action", FCom_MarketClient_Admin_Controller_Module ]
+                    - [ "/marketclient/publish/?.action", FCom_MarketClient_Admin_Controller_Publish ]
+                    - [ "/marketclient/download/?.action", FCom_MarketClient_Controller_Download ]
                 observe:
-                    - [ FCom_Admin_Controller_Modules::gridViewBefore, FCom_MarketClient_Admin.onModulesGridViewBefore ]
-                    - [ FCom_Admin_Controller_Modules::gridView, FCom_MarketClient_Admin.onModulesGridView ]
+                    - [ "FCom_Admin_Controller_Modules::gridViewBefore", FCom_MarketClient_Admin.onModulesGridViewBefore ]
+                    - [ "FCom_Admin_Controller_Modules::gridView", FCom_MarketClient_Admin.onModulesGridView ]
                     #- [ BLayout::hook:notification, FCom_MarketClient_Admin.hookFindModulesForUpdates ]
 
             FCom_Cron:
@@ -25,4 +25,4 @@ modules:
             FCom_Install:
                 auto_use: [ views ]
                 routing:
-                    - [ /marketclient/download/?.action, FCom_MarketClient_Controller_Download ]
+                    - [ "/marketclient/download/?.action", FCom_MarketClient_Controller_Download ]

@@ -18,17 +18,17 @@ class FCom_CustomField_Admin extends BClass
         // not deleting to preserve meta info about fields
     }
 */
-    public function onProductGridColumns($args)
+    public function onProductGridColumns( $args )
     {
-        $fields = FCom_CustomField_Model_Field::i()->orm('f')->find_many();
-        foreach ($fields as $f) {
-            $col = array('label'=>$f->field_name, 'index'=>'pcf.'.$f->field_name, 'hidden'=>true);
-            if ($f->admin_input_type=='select') {
-                $col['options'] = FCom_CustomField_Model_FieldOption::i()->orm()
-                    ->where('field_id', $f->id)
-                    ->find_many_assoc(stripos($f->table_field_type, 'varchar')===0 ? 'label' : 'id', 'label');
+        $fields = FCom_CustomField_Model_Field::i()->orm( 'f' )->find_many();
+        foreach ( $fields as $f ) {
+            $col = [ 'label' => $f->field_name, 'index' => 'pcf.' . $f->field_name, 'hidden' => true ];
+            if ( $f->admin_input_type == 'select' ) {
+                $col[ 'options' ] = FCom_CustomField_Model_FieldOption::i()->orm()
+                    ->where( 'field_id', $f->id )
+                    ->find_many_assoc( stripos( $f->table_field_type, 'varchar' ) === 0 ? 'label' : 'id', 'label' );
             }
-            $args['columns'][$f->field_code] = $col;
+            $args[ 'columns' ][ $f->field_code ] = $col;
         }
     }
 }
