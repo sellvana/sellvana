@@ -463,7 +463,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             usort( $persFilters, function( $a, $b ) { return $a[ 'position' ] - $b[ 'position' ]; } );
             $grid[ 'config' ][ 'filters' ] = $persFilters;
         }
-
+#BDebug::dump($persGrid); BDebug::dump($grid); exit;
         $this->grid = $grid;
     }
 
@@ -481,6 +481,10 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             return $this->grid;
         }
 
+        $grid = $this->grid;
+        BEvents::i()->fire( __METHOD__ . ':before', [ 'grid' => &$grid ] );
+        $this->grid = $grid;
+
         $this->_processDefaults();
         $this->_processColumnsConfig();
         $this->_processFiltersConfig();
@@ -497,8 +501,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
     public function getGridConfig()
     {
+        //TODO: replace magic with science
+        $data = $this->getGridConfigData(); // initialize config and data
         $grid = $this->getGrid();
-        $data = $this->getGridConfigData(); // initialize data
         $config = $grid[ 'config' ];
         $config[ 'data' ] = $this->getPageRowsData();
         $config[ 'personalize_url' ] = BApp::href( 'my_account/personalize' );
@@ -571,6 +576,11 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         //$mapColumns = array();
         //$this->_processGridJoins($config, $mapColumns, $orm, 'before_count');
 
+        foreach ( $grid[ 'config'] [ 'columns' ] as &$column ) {
+            unset( $column[ 'index' ] );
+        }
+        unset( $column );
+
         $this->grid = $grid;
         return $grid;
     }
@@ -606,121 +616,6 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
 
         return [ 'state' => $state, 'data' => $data ];
-    }
-
-
-    public function getPageHtmlData( $rows = null )
-    {
-        $grid = $this->get( 'grid' );
-        if ( is_null( $rows ) ) {
-            $rows = $grid[ 'result' ][ 'rows' ];
-        }
-        $gridId = $grid[ 'config' ][ 'id' ];
-        $columns = $grid[ 'config' ][ 'columns' ];
-
-        $trArr = [];
-        foreach ( $rows as $rowId => $row ) {
-            $row->_id = $rowId;
-            $trAttr = [];
-            $trAttr[ 'id' ] = "data-row--{$gridId}--{$rowId}";
-            $trAttr[ 'data-id' ] = $row->get( $grid[ 'config' ][ 'row_id_column' ] );
-            $trAttr[ 'class' ][] = $rowId % 2 ? 'odd' : 'even';
-
-            $tdArr = [];
-            foreach ( $columns as $colId => $col ) {
-                $cellData = $this->cellData( $row, $col );
-                $tdArr[ $colId ] = [ 'attr' => $cellData[ 'attr' ], 'html' => $cellData[ 'html' ] ];
-                if ( !empty( $cellData[ 'row_attr' ] ) ) {
-                    $trAttr = array_merge_recursive( $cellData[ 'row_attr' ] );
-                }
-            }
-            $trArr[ $rowId ] = [ 'attr' => $trAttr, 'cells' => $tdArr ];
-        }
-
-        if ( !empty( $grid[ 'config' ][ 'format_callback' ] ) ) {
-            $cb = $grid[ 'config' ][ 'format_callback' ];
-            if ( is_callable( $cb ) ) {
-                call_user_func( $cb, [ 'grid' => $grid, 'rows' => &$trArr ] );
-            } else {
-                BDebug::warning( 'Invalid grid format_callback' );
-            }
-        }
-        return $trArr;
-    }
-
-    public function rowsHtml( $rows = null )
-    {
-        $trArr = $this->getPageHtmlData( $rows );
-
-        $trHtmlArr = [];
-        foreach ( $trArr as $rowId => $tr ) {
-            $tdHtmlArr = [];
-            foreach ( $tr[ 'cells' ] as $colId => $cell ) {
-                $tdHtmlArr[] = BUtil::tagHtml( 'td', $cell[ 'attr' ], $cell[ 'html' ] );
-            }
-            $trHtmlArr[] = BUtil::tagHtml( 'tr', $tr[ 'attr' ], join( "\n", $tdHtmlArr ) );
-        }
-
-        return join( "\n", $trHtmlArr );
-    }
-
-    public function cellData( $row, $col )
-    {
-        $grid = $this->get( 'grid' );
-        $args = [ 'grid' => $grid, 'row' => $row, 'col' => $col ];
-        $out = [];
-
-        $out[ 'attr' ] = !empty( $col[ 'attr' ] ) ? $col[ 'attr' ] : [];
-        if ( !empty( $col[ 'attr_callback' ] ) ) {
-            $args[ 'attr' ] = $out[ 'attr' ];
-            $out[ 'attr' ] = call_user_func( $col[ 'attr_callback' ], $args );
-        }
-        if ( empty( $col[ 'name' ] ) ) {
-            $col[ 'name' ] = null; //TODO: correct value
-        }
-        $out[ 'attr' ][ 'data-col' ] = $col[ 'name' ];
-        //$out['attr']['id'] = "data-cell--{$grid['config']['id']}--{$row->_id}--{$col['id']}";
-
-        $field = !empty( $col[ 'field' ] ) ? $col[ 'field' ] : $col[ 'name' ];
-        $value = $row->get( $field );
-
-        if ( ( '' === $value || is_null( $value ) ) && !empty( $col[ 'default' ] ) ) {
-            $value = $col[ 'default' ];
-        }
-
-        $out[ 'attr' ][ 'data-value' ] = $value;
-
-        if ( isset( $col[ 'options' ][ $value ] ) ) {
-            $value = $col[ 'options' ][ $value ];
-        }
-
-        if ( !empty( $col[ 'format' ] ) ) {
-            if ( is_string( $col[ 'format' ] ) ) {
-                switch ( $col[ 'format' ] ) {
-                    case 'boolean': $value = $value ? 1 : 0; break;
-                    case 'date': $value = $value ? BLocale::i()->datetimeDbToLocal( $value ) : ''; break;
-                    case 'datetime': $value = $value ? BLocale::i()->datetimeDbToLocal( $value, true ) : ''; break;
-                    case 'currency': $value = $value ? '$' . number_format( $value, 2 ) : ''; break;
-                    default: BDebug::warning( 'Grid value format not implemented: ' . $col[ 'format' ] );
-                }
-                $value = nl2br( $this->q( $value ) );
-            } elseif ( is_callable( $col[ 'format' ] ) ) {
-                $args[ 'value' ] = $value;
-                $value = call_user_func( $col[ 'format' ], $args );
-            }
-        }
-
-        if ( !empty( $col[ 'row_attr_callback' ] ) && is_callable( $col[ 'row_attr_callback' ] ) ) {
-            $out[ 'row_attr' ] = call_user_func( $out[ 'row_attr_callback' ], $args );
-        }
-
-        if ( !empty( $col[ 'href' ] ) ) {
-            $value = BUtil::tagHtml( 'a', [ 'href' => BUtil::injectVars( $col[ 'href' ], $row->as_array() ) ], $value );
-        }
-
-        $out[ 'html' ] = $value;
-
-        return $out;
     }
 
     public function generateOutputData( $export = false )

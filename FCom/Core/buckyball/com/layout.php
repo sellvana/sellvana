@@ -1135,7 +1135,7 @@ class BLayout extends BClass
         $lastViewName = $lastView->getParam( 'view_name' );
         $viewName = $view->getParam( 'view_name' );
         if ( $lastViewName !== $viewName ) {
-            BDebug::warning('Wrong view stack off: ' . $viewName . ', expected: ' . $lastViewName );
+            BDebug::debug('Wrong view stack off: ' . $viewName . ', expected: ' . $lastViewName );
         }
         return $this;
     }

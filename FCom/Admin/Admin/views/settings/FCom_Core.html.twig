@@ -39,7 +39,7 @@
     {{ forms.accordion_panel_end }}
 
     {{ forms.accordion_panel_start({label:'Optimizations'|_, id:'settings-FCom_Core-group4'}) }}
-        {% set fieldData = { name_prefix: 'config[core][cache]', id_prefix: 'config-core-cache', options:{'':'Enable in staging or production modes', 'enable':'Enable always', 'disable':'Disable always'} } %}
+        {% set fieldData = { name_prefix: 'config[core][cache]', id_prefix: 'config-core-cache', options:{'':'Enable in staging or production modes'|_, 'enable':'Enable always'|_, 'disable':'Disable always'|_} } %}
         {{ forms.select(fieldData|merge({field:'manifest_files', label:'Module Manifest Files Cache'|_, value:c.get('core/cache/manifest_files') })) }}
         {{ forms.select(fieldData|merge({field:'layout_files', label:'Layout Files Cache'|_, value:c.get('core/cache/layout_files') })) }}
         {{ forms.select(fieldData|merge({field:'view_files', label:'View Template Files Cache'|_, value:c.get('core/cache/view_files') })) }}
