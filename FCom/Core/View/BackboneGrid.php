@@ -699,7 +699,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         if (!empty($filters)) {
             $this->_processGridFilters($config, $filters, $orm);
         }
-        if (!is_null($method)) {
+        if (null !== $method) {
             //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
             BEvents::i()->fire($method . ':orm', ['orm' => $orm]);
         }
@@ -725,7 +725,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     public function stateDescription($params = null)
     {
         $descrArr = [];
-        if (is_null($params)) {
+        if (null === $params) {
             $params = $this->grid['result']['state'];
         }
         if (!empty($params['search'])) {

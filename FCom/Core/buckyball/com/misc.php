@@ -181,7 +181,7 @@ class BUtil extends BClass
     */
     public static function toJavaScript($val)
     {
-        if (is_null($val)) {
+        if (null === $val) {
             return 'null';
         } elseif (is_bool($val)) {
             return $val ? 'true' : 'false';
@@ -670,7 +670,7 @@ class BUtil extends BClass
     static public function arrayToOptions($source, $labelField, $keyField = null, $emptyLabel = null)
     {
         $options = [];
-        if (!is_null($emptyLabel)) {
+        if (null !== $emptyLabel) {
             $options = ["" => $emptyLabel];
         }
         if (empty($source)) {
@@ -679,11 +679,11 @@ class BUtil extends BClass
         $isObject = is_object(current($source));
         foreach ($source as $k => $item) {
             if ($isObject) {
-                $key = is_null($keyField) ? $k : $item->$keyField;
+                $key = null === $keyField ? $k : $item->$keyField;
                 $label = $labelField[0] === '.' ? $item-> {substr($labelField, 1)}() : $item->labelField;
                 $options[$key] = $label;
             } else {
-                $key = is_null($keyField) ? $k : $item[$keyField];
+                $key = null === $keyField ? $k : $item[$keyField];
                 $options[$key] = $item[$labelField];
             }
         }
@@ -727,9 +727,9 @@ class BUtil extends BClass
     */
     static public function mcryptKey($key = null, $configPath = null)
     {
-        if (!is_null($key)) {
+        if (null !== $key) {
             static::$_mcryptKey = $key;
-        } elseif (is_null(static::$_mcryptKey) && $configPath) {
+        } elseif (null === static::$_mcryptKey && $configPath) {
             static::$_mcryptKey = BConfig::i()->get($configPath);
         }
         return static::$_mcryptKey;
@@ -748,7 +748,7 @@ class BUtil extends BClass
     */
     static public function encrypt($value, $key = null, $base64 = true)
     {
-        if (is_null($key)) $key = static::mcryptKey();
+        if (null === $key) $key = static::mcryptKey();
         $enc = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $value, MCRYPT_MODE_ECB, static::mcryptIV());
         return $base64 ? trim(base64_encode($enc)) : $enc;
     }
@@ -765,7 +765,7 @@ class BUtil extends BClass
     */
     static public function decrypt($value, $key = null, $base64 = true)
     {
-        if (is_null($key)) $key = static::mcryptKey();
+        if (null === $key) $key = static::mcryptKey();
         $enc = $base64 ? base64_decode($value) : $value;
         return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $enc, MCRYPT_MODE_ECB, static::mcryptIV()));
     }
@@ -778,7 +778,7 @@ class BUtil extends BClass
     */
     public static function randomString($strLen = 8, $chars = null)
     {
-        if (is_null($chars)) {
+        if (null === $chars) {
             $chars = static::$_defaultCharPool;
         }
         $charsLen = strlen($chars)-1;
@@ -814,7 +814,7 @@ class BUtil extends BClass
 
     public static function nextStringValue($string = '', $chars = null)
     {
-        if (is_null($chars)) {
+        if (null === $chars) {
             $chars = static::$_defaultCharPool; // avoid leading 0
         }
         $pos = strlen($string);
@@ -842,7 +842,7 @@ class BUtil extends BClass
     */
     public static function hashAlgo($algo = null)
     {
-        if (is_null($algo)) {
+        if (null === $algo) {
             return static::$_hashAlgo;
         }
         static::$_hashAlgo = $algo;
@@ -850,7 +850,7 @@ class BUtil extends BClass
 
     public static function hashIter($iter = null)
     {
-        if (is_null($iter)) {
+        if (null === $iter) {
             return static::$_hashIter;
         }
         static::$iter = $iter;
@@ -867,7 +867,7 @@ class BUtil extends BClass
     */
     public static function saltedHash($string, $salt, $algo = null)
     {
-        $algo = !is_null($algo) ? $algo : static::$_hashAlgo;
+        $algo = null !== $algo ? $algo : static::$_hashAlgo;
         return hash($algo, $salt . $string);
     }
 
@@ -884,15 +884,15 @@ class BUtil extends BClass
     */
     public static function fullSaltedHash($string, $salt = null, $algo = null, $iter = null)
     {
-        $algo = !is_null($algo) ? $algo : static::$_hashAlgo;
+        $algo = null !== $algo ? $algo : static::$_hashAlgo;
         if ('bcrypt' === $algo) {
             return Bcrypt::i()->hash($string);
         }
-        $iter = !is_null($iter) ? $iter : static::$_hashIter;
+        $iter = null !== $iter ? $iter : static::$_hashIter;
         $s = static::$_hashSep;
         $hash = $s . $algo . $s . $iter;
         for ($i = 0; $i < $iter; $i++) {
-            $salt1 = !is_null($salt) ? $salt : static::randomString();
+            $salt1 = null !== $salt ? $salt : static::randomString();
             $hash .= $s . $salt1;
             $string = static::saltedHash($string, $salt1, $algo);
         }
@@ -1104,7 +1104,7 @@ class BUtil extends BClass
     public static function globRecursive($dir, $pattern = null, $flags = 0)
     {
         /**/
-        if (is_null($pattern)) {
+        if (null === $pattern) {
             $pattern = '*';
         }
         $files = glob($dir . '/' . $pattern, $flags);
@@ -1246,7 +1246,7 @@ class BUtil extends BClass
     {
         $attrsHtmlArr = [];
         foreach ($attrs as $k => $v) {
-            if (is_null($v) || false === $v) {
+            if (null === $v || false === $v) {
                 continue;
             }
             if (true === $v) {
@@ -1390,7 +1390,7 @@ class BUtil extends BClass
             if (is_bool($src)) {
                 return ($src ? TRUE : FALSE);
             }
-            if (is_null($src)) {
+            if (null === $src) {
                 return NULL;
             }
 
@@ -1483,18 +1483,18 @@ class BUtil extends BClass
             $time = strtotime($time);
         }
         $timeStr = date($showTime ? 'Y-m-d H:i:s' : 'Y-m-d', $time);
-        if (is_null($format)) {
+        if (null === $format) {
             $format = BSession::i()->get($showTime ? '_timeformat' : '_dateformat');
             if (!$format) {
                 $format = $showTime ? 'm/d/Y H:i' : 'm/d/Y';
             }
         }
-        if (!is_null($tz)) {
+        if (null !== $tz) {
             $oldTz = date_default_timezone_get();
             date_default_timezone_set($tz);
         }
         $formattedTime = date($format, $time);
-        if (!is_null($tz)) {
+        if (null !== $tz) {
             date_default_timezone_set($oldTz);
         }
         return '<time datetime="' . $timeStr . '">' . $formattedTime . '</time>';
@@ -2036,7 +2036,7 @@ class BData extends BClass implements ArrayAccess
 
     public function offsetSet($offset, $value)
     {
-        if (is_null($offset)) {
+        if (null === $offset) {
             $this->_data[] = $value;
         } else {
             $this->_data[$offset] = $value;
@@ -2334,8 +2334,8 @@ class BDebug extends BClass
             //TODO: check back later
             #throw new BException('Invalid debug level type');
         }
-        if (is_null($level)) {
-            if (is_null(static::$_level)) {
+        if (null === $level) {
+            if (null === static::$_level) {
                 static::$_level = static::$_levelPreset[static::$_mode];
             }
             return static::$_level[$type];
@@ -2372,7 +2372,7 @@ class BDebug extends BClass
 
     public static function mode($mode = null, $setLevels = true)
     {
-        if (is_null($mode)) {
+        if (null === $mode) {
             return static::$_mode;
         }
         static::$_mode = $mode;
@@ -2440,7 +2440,7 @@ class BDebug extends BClass
             $e['module'] = $moduleName;
         }
 
-        if (is_null(static::$_level) && !empty(static::$_levelPreset[static::$_mode])) {
+        if (null === static::$_level && !empty(static::$_levelPreset[static::$_mode])) {
             static::$_level = static::$_levelPreset[static::$_mode];
         }
 
@@ -2456,11 +2456,11 @@ class BDebug extends BClass
             error_log($message, 0, static::$_logDir);
         }
 
-        if (!is_null(static::$_logDir)) { // require explicit enable of file log
+        if (null !== static::$_logDir) { // require explicit enable of file log
             $l = static::$_level[static::FILE];
             if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
                 /*
-                if (is_null(static::$_logDir)) {
+                if (null === static::$_logDir) {
                     static::$_logDir = sys_get_temp_dir();
                 }
                 */
@@ -2473,7 +2473,7 @@ class BDebug extends BClass
             }
         }
 
-        if (!is_null(static::$_adminEmail)) { // require explicit enable of email
+        if (null !== static::$_adminEmail) { // require explicit enable of email
             $l = static::$_level[static::EMAIL];
             if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
                 error_log(print_r($e, 1), 1, static::$_adminEmail);
@@ -3005,7 +3005,7 @@ class BLocale extends BClass
     */
     public function tzOffset($tz = null)
     {
-        if (is_null($tz)) { // Server timezone
+        if (null === $tz) { // Server timezone
             return date('O') * 36; //  x/100*60*60; // Seconds from GMT
         }
         if (empty($this->_tzCache[$tz])) {
@@ -3042,7 +3042,7 @@ class BLocale extends BClass
         $isObject = is_object($request);
         if ($isObject) $result = clone $request;
         foreach ($request as $k => $v) {
-            if (is_null($fields) || in_array($k, $fields)) {
+            if (null === $fields || in_array($k, $fields)) {
                 $r = $this->datetimeLocalToDb($v);
             } else {
                 $r = $v;
@@ -3080,7 +3080,7 @@ class BLocale extends BClass
     static public function setCurrency($code, $symbol = null)
     {
         static::$_currencyCode = $code;
-        if (is_null($symbol)) {
+        if (null === $symbol) {
             if (!empty(static::$_currencySymbolMap[$code])) {
                 $symbol = static::$_currencySymbolMap[$code];
             } else {
@@ -3279,7 +3279,7 @@ class BLoginThrottle extends BClass
         $this->_fire('fail:wait');
 
         $this->_gc();
-        sleep(!is_null($sleepSec) ? $sleepSec : $c['sleep_sec']);
+        sleep(null !== $sleepSec ? $sleepSec : $c['sleep_sec']);
 
         $this->_rec['status'] = '';
         $this->_save();
@@ -3364,7 +3364,7 @@ class BYAML extends BCLass
 
     static public function init()
     {
-        if (is_null(static::$_peclYaml)) {
+        if (null === static::$_peclYaml) {
             static::$_peclYaml = function_exists('yaml_parse');
 
             if (!static::$_peclYaml) {

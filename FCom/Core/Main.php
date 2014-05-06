@@ -379,7 +379,7 @@ class FCom_Core_Main extends BClass
     public function writeConfigFiles($files = null)
     {
         //TODO: make more flexible, to account for other (custom) file names
-        if (is_null($files)) {
+        if (null === $files) {
             $files = ['core', 'db', 'local'];
         }
         if (is_string($files)) {

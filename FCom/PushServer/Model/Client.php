@@ -358,7 +358,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
      */
     public function subscribe($channel = null)
     {
-        if (is_null($channel)) {
+        if (null === $channel) {
             $channel = $this->getChannel();
         }
         $isSessionClient = $this->session_id === BSession::i()->sessionId();

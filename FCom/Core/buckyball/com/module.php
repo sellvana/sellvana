@@ -100,7 +100,7 @@ class BModuleRegistry extends BClass
     */
     public function module($modName, $params = null)
     {
-        if (is_null($params)) {
+        if (null === $params) {
             return isset($this->_modules[$modName]) ? $this->_modules[$modName] : null;
         }
         return $this->addModule($modName, $params);
@@ -138,7 +138,7 @@ class BModuleRegistry extends BClass
     */
     public function currentModule($name = null)
     {
-        if (is_null($name)) {
+        if (null === $name) {
 #echo '<hr><pre>'; debug_print_backtrace(); echo static::$_currentModuleName.' * '; print_r($this->module(static::$_currentModuleName)); #echo '</pre>';
             $name = $this->currentModuleName();
             return $name ? $this->module($name) : false;
@@ -1168,7 +1168,7 @@ if (!isset($o[0]) || !isset($o[1])) {
 
     public function runLevel($level = null, $updateConfig = false)
     {
-        if (is_null($level)) {
+        if (null === $level) {
             return $this->run_level;
         }
         return $this->setRunLevel($level, $updateConfig);
@@ -1191,7 +1191,7 @@ if (!isset($o[0]) || !isset($o[1])) {
     */
     public function runStatus($status = null)
     {
-        if (is_null($status)) {
+        if (null === $status) {
             return $this->run_status;
         }
         $this->run_status = $status;
@@ -1374,7 +1374,7 @@ class BMigrate extends BClass
     /*
     public static function migrate($script='migrate.php', $moduleName=null)
     {
-        if (is_null($moduleName)) {
+        if (null === $moduleName) {
             $moduleName = BModuleRegistry::i()->currentModuleName();
         }
         $module = BModuleRegistry::i()->module($moduleName);
@@ -1392,7 +1392,7 @@ class BMigrate extends BClass
     /*
     public static function uninstall($script, $moduleName=null)
     {
-        if (is_null($moduleName)) {
+        if (null === $moduleName) {
             $moduleName = BModuleRegistry::i()->currentModuleName();
         }
         static::$_uninstall[$moduleName]['script'] = $script;
@@ -1594,7 +1594,7 @@ class BMigrate extends BClass
         $modReg->currentModule(null);
         static::$_migratingModule = null;
 
-        $url = !is_null($redirectUrl) ? $redirectUrl : BRequest::i()->currentUrl();
+        $url = null !== $redirectUrl ? $redirectUrl : BRequest::i()->currentUrl();
         echo '</pre>';
         if (!$error) {
             echo '<script>location.href="' . $url . '";</script>';
@@ -1777,7 +1777,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
     */
     public static function runUninstallScript($modName = null)
     {
-        if (is_null($modName)) {
+        if (null === $modName) {
             $modName = BModuleRegistry::i()->currentModuleName();
         }
         $mod =& static::$_migratingModule;
