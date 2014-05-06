@@ -22,30 +22,18 @@
         <div class="f-rslides-container">
           <ul class="thumbnails f-rslides f-prod-imgs" id="product-rslides">
 {% for img in images %}
-            <li><img class="f-prod-img img-responsive" src="{{ img.getUrl() }}" alt=""/></li>
+            <li><img data-id="{{ img.id() }}"  class="f-prod-img img-responsive" src="{{ img.getUrl() }}" alt=""/></li>
 {% endfor %}
           </ul>
         </div>
         <p class="text-center"><small>{{ 'Mouse move on Image to zoom'|_ }}</small></p>
         <ul class="f-prod-more-view-imgs row" id="product-rslides-pager">
 {% for img in images %}
-          <li class="col-md-2 col-xs-2"><a href="#"><img src="{{ img.getUrl() }}" alt="" title=""></a></li>
+          <li class="col-md-2 col-xs-2"><a href="#"><img data-id="{{ img.id() }}" src="{{ img.getUrl() }}" alt="" title=""></a></li>
 {% endfor %}
         </ul>
+          <a href="#" class="hidden" id="display-all-image"><i class="glyphicon glyphicon-refresh"></i> {{ "Display all images"|_ }}</a>
       </div>
-      <script>
-        require(['jquery', 'responsiveslides', 'jquery.zoom'], function($) {
-          $("#product-rslides").responsiveSlides({
-            auto: false,
-            speed: 500,
-            nav: true,
-            namespace: "f",
-            manualControls: '#product-rslides-pager'
-          });
-
-          $('#product-rslides li').addClass('zoom').zoom();
-        });
-      </script>
       <!-- /.f-col-prod-img -->
 
       <!-- Product Select Column-->
@@ -125,13 +113,13 @@
                         <div class="form-group" style="overflow: hidden">
                             <label class="col-md-3 control-label">{{ 'Quantity: ' |_ }}</label>
                             <div class="col-md-2">
-                                <input type="text" class="form-control col-md-2" id="quantity-variant"/>
+                                <input type="text" class="form-control col-md-2" id="quantity-variant" value="1"/>
                             </div>
                         </div>
                     </section>
                 {% endif %}
               <p class="f-stock-notice f-in-stock" id="prod-in-stock">In Stock.</p>
-              <button type="submit" class="btn btn-primary btn-lg" title="{{ "Add to Cart"| _ }}">
+              <button type="submit" class="btn btn-primary btn-lg" title="{{ "Add to Cart"| _ }}" id="prod-add-to-card">
                   <span class="glyphicon glyphicon-shopping-cart"></span>{{ "Add to Cart"| _ }}</button>
                 <a class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ prod.id() }}"
                    rel="nofollow">{{ "Add to Wishlist"|_ }}</a>
@@ -217,14 +205,55 @@
 </div>
 {{ THIS.view('catalog/product/quickview') | raw }}
 <script>
-    require(['jquery'], function ($) {
+    require(['jquery', 'responsiveslides', 'jquery.zoom'], function ($) {
+        var pager = $('#product-rslides-pager');
+        var quantityVariant = $('#quantity-variant');
+        var priceVariant = $('#price-variant');
+        var displayAllImage = $('#display-all-image');
+        $("#product-rslides").responsiveSlides({
+            auto: false,
+            speed: 500,
+            nav: true,
+            namespace: "f",
+            manualControls: '#product-rslides-pager'
+        });
+
+        $('#product-rslides li').addClass('zoom').zoom();
         var variants = $.parseJSON('{{ UTIL.toJson(variants.variants)|raw }}');
-        $('#price-variant').html(variants[0].price);
-        $('#quantity-variant').val(variants[0].qty);
-        $('#prod-in-stock').html(variants[0].qty + ' Items In Stock.');
-        for (var val in variants[0].fields ) {
-            $('select [name="'+ val +'"]').find('option [value="'+ variants[0].fields[val] +'"]').attr('selected', 'selected');
+
+        if (variants.length > 0) {
+            priceVariant.html(variants[0].price);
+            if (variants[0].qty == 0) {
+                quantityVariant.val(0);
+                $('#prod-add-to-card').prop('disabled', true);
+            }
+            $('#prod-in-stock').html(variants[0].qty + ' Items In Stock.');
+            for (var val in variants[0].fields ) {
+                $('select [name="'+ val +'"]').find('option [value="'+ variants[0].fields[val] +'"]').attr('selected', 'selected');
+            }
         }
+        function displayImage(image) {
+
+            if (image.length == 0) {
+                pager.find('li').each(function() {
+                    $(this).removeClass('hidden');
+                });
+                $('#product-rslides').parent().find('.f_nav').removeClass('hidden');
+            } else {
+                $('#product-rslides').parent().find('.f_nav').addClass('hidden');
+                pager.find('li').each(function() {
+                    if (image.indexOf($(this).find('img').attr('data-id')) != -1) {
+                        $(this).removeClass('hidden');
+                        if ($(this).find('img').attr('data-id') == image[0]) {
+                            $(this).children().click();
+                        }
+                    } else {
+                        $(this).addClass('hidden')
+                    }
+                });
+            }
+        }
+
         $('.variant').change(function () {
             var find = null;
             variants.forEach(function (obj) {
@@ -239,14 +268,25 @@
                 }
             })
             if (find == null || find.qty == 0) {
-                $('#price-variant').html("Not exists");
-                $('#quantity-variant').val(0);
-                $('#prod-in-stock').html('Not Exists Items In Stock.');
+                priceVariant.html("$0.00");
+                quantityVariant.val(0);
+                $('#prod-in-stock').html('Items not available.');
+                displayImage([]);
+                $('#prod-add-to-card').prop('disabled', true);
+                displayAllImage.addClass('hidden');
             } else {
-                $('#price-variant').html(find.price);
-                $('#quantity-variant').val(find.qty);
+                priceVariant.html(find.price);
+                quantityVariant.val(1);
                 $('#prod-in-stock').html(find.qty + ' Items In Stock.');
+                var image = (find.file_id == '')? []: find.file_id.split(',');
+                $('#prod-add-to-card').prop('disabled', false);
+                displayAllImage.removeClass('hidden');
+                displayImage(image);
             }
+        });
+        displayAllImage.click(function () {
+            displayImage([]);
+            $(this).addClass('hidden');
         })
     })
 </script>
