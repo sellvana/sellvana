@@ -1687,6 +1687,15 @@ class BORM extends ORMWrapper
         return "HAVING " . join(" AND ", $having_conditions);
     }
 
+    public function create($data = null, $new = true)
+    {
+        $model = parent::create($data);
+        if (!$new) {
+            $this->_is_new = false;
+        }
+        return $model;
+    }
+
     public function __destruct()
     {
         unset($this->_data);
@@ -1973,9 +1982,9 @@ class BModel extends Model
     * @param null|array $data
     * @return BModel
     */
-    public static function create($data = null)
+    public static function create($data = null, $new = true)
     {
-        $record = static::factory()->create($data);
+        $record = static::factory()->create($data, $new);
         $record->onAfterCreate();
         return $record;
     }

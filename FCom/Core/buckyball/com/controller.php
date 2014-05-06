@@ -512,7 +512,7 @@ class BRequest extends BClass
         }
 
         $config = BConfig::i()->get('cookie');
-        $lifespan = !is_null($lifespan) ? $lifespan : $config['timeout'];
+        $lifespan = !is_null($lifespan) ? $lifespan : (!empty($config['timeout']) ? $config['timeout'] : null);
         $path = !is_null($path) ? $path : (!empty($config['path']) ? $config['path'] : static::webRoot());
         $domain = !is_null($domain) ? $domain : (!empty($config['domain']) ? $config['domain'] : static::httpHost(false));
 

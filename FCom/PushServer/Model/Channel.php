@@ -29,21 +29,29 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
      *   - message_queue
      */
 
-    public function getChannel($channel, $create = false)
+    public function getChannel($channel, $create = false, $session = false)
     {
         if (is_object($channel) && ($channel instanceof FCom_PushServer_Model_Channel)) {
             return $channel;
+        } elseif (!is_string($channel)) {
+            throw new BException('Invalid channel identifier: ' . print_r($channel, 1));
         }
-        if (!empty(static::$_channelCache[$channel])) {
-            return static::$_channelCache[$channel];
+        $channelName = $channel;
+        if (!empty(static::$_channelCache[$channelName])) {
+            return static::$_channelCache[$channelName];
         }
-        if (is_string($channel)) {
-            $channelName = $channel;
-            $channel = static::load($channel, 'channel_name');
-            if (!$channel) {
-                $channel = static::create(['channel_name' => $channelName])->save();
-            }
-            static::$_channelCache[$channelName] = $channel;
+        $sessData =& BSession::i()->dataToUpdate();
+        if (!empty($sessData['pushserver']['channels'][$channelName])) {
+            static::$_channelCache[$channelName] = static::create($sessData['pushserver']['channels'][$channelName], false);
+            return static::$_channelCache[$channelName];
+        }
+        $channel = static::load($channelName, 'channel_name');
+        if (!$channel) {
+            $channel = static::create(['channel_name' => $channelName])->save();
+        }
+        static::$_channelCache[$channelName] = $channel;
+        if ($session) {
+            $sessData['pushserver']['channels'][$channelName] = $channel->as_array();
         }
         return $channel;
     }
@@ -56,6 +64,16 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
         $this->set('update_at', BDb::now());
 
         return true;
+    }
+
+    public function onAfterSave()
+    {
+        parent::onAfterSave();
+
+        $sessData =& BSession::i()->dataToUpdate();
+        if (!empty($sessData['pushserver']['channels'][$this->channel_name])) {
+            $sessData['pushserver']['channels'][$this->channel_name] = $this->as_array();
+        }
     }
 
     public function onBeforeDelete()
