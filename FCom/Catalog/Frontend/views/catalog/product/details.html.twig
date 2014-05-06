@@ -102,13 +102,13 @@
             <div class="f-prod-add-cart">
                 {% if variants.fields %}
                     <section class="tab-pane active" id="f-prod-tab-variant">
-                        {% for field_name,value  in variants.fields %}
+                        {% for field  in variants.fields %}
                             <div class="form-group" style="overflow: hidden">
-                                <label class="col-md-3 control-label">{{ field_name |_ }}</label>
+                                <label class="col-md-3 control-label">{{ field.name |_ }}</label>
                                 <div class="col-md-5">
-                                    <select id="{{ field_name }}" name="{{ field_name }}" class="form-control variant" style="width:auto">
-                                        {% for op  in value %}
-                                            <option value="{{ op }}">{{ op|_ }}</option>
+                                    <select id="{{ field.name }}" name="{{ field.name }}" class="form-control variant" style="width:auto">
+                                        {% for vr  in variants.variants %}
+                                            <option value="{{ vr.fields[field.name] }}">{{ vr.fields[field.name]|_ }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
