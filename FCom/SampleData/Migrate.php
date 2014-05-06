@@ -34,33 +34,33 @@ class FCom_SampleData_Migrate extends BClass
                 'sort_order'       => 1,
             ]
         ];
-        $exist    = $customField->orm()->where_in( 'field_code', array_keys( $fields ) )->find_many_assoc( 'field_code' );
+        $exist    = $customField->orm()->where_in('field_code', array_keys($fields))->find_many_assoc('field_code');
 
         //add custom fields
-        foreach ( $fields as $f => $data ) {
+        foreach ($fields as $f => $data) {
             // create custom fields if they don't exist
-            if ( empty( $exist[ $f ] ) ) {
-                $f = $customField->create( $data )->save();
+            if (empty($exist[$f])) {
+                $f = $customField->create($data)->save();
             } else {
-                $f = $exist[ $f ];
+                $f = $exist[$f];
             }
 
-            $fieldName = $f->get( 'field_code' );
+            $fieldName = $f->get('field_code');
 
             /* @var FCom_CatalogIndex_Model_Field $catalogIndexField */
-            $catalogIndexField = FCom_CatalogIndex_Model_Field::orm()->where( 'field_name', $fieldName )->find_one();
+            $catalogIndexField = FCom_CatalogIndex_Model_Field::orm()->where('field_name', $fieldName)->find_one();
 
-            if ( !$catalogIndexField ) {
+            if (!$catalogIndexField) {
                 $data = [
-                    "field_name"    => $f->get( 'field_code' ),
-                    "field_label"   => $f->get( 'field_name' ),
+                    "field_name"    => $f->get('field_code'),
+                    "field_label"   => $f->get('field_name'),
                     "field_type"    => 'varchar',
                     "weight"        => 0,
                     "fcom_field_id" => $f->id(),
                     "search_type"   => 'none',
                     "sort_type"     => 'none',
                 ];
-                $catalogIndexField = FCom_CatalogIndex_Model_Field::orm()->create( $data );
+                $catalogIndexField = FCom_CatalogIndex_Model_Field::orm()->create($data);
                 $catalogIndexField->save();
             }
         }
@@ -70,21 +70,21 @@ class FCom_SampleData_Migrate extends BClass
             'lead_time'
         ];
 
-        $indexFields = $customField->orm()->where_in( 'field_name', $fields )->find_many();
-        $nextCount = BORM::get_db()->query( 'SELECT max(`filter_order`) as "max" FROM ' . FCom_CatalogIndex_Model_Field::table() )->fetchAll();
-        $nextCount = $nextCount[ 0 ][ 'max' ] + 1;
+        $indexFields = $customField->orm()->where_in('field_name', $fields)->find_many();
+        $nextCount = BORM::get_db()->query('SELECT max(`filter_order`) as "max" FROM ' . FCom_CatalogIndex_Model_Field::table())->fetchAll();
+        $nextCount = $nextCount[0]['max'] + 1;
 
-        if ( $indexFields ) {
-            foreach ( $indexFields as $f ) {
+        if ($indexFields) {
+            foreach ($indexFields as $f) {
                 /** @var FCom_CatalogIndex_Model_Field $f */
-                if ( $f->get( 'filter_type' ) == 'none' ) {
-                    $f->set( 'filter_type', 'inclusive' );
+                if ($f->get('filter_type') == 'none') {
+                    $f->set('filter_type', 'inclusive');
                 }
-                if ( !$f->get( 'filter_counts' ) ) {
-                    $f->set( 'filter_counts', 1 );
+                if (!$f->get('filter_counts')) {
+                    $f->set('filter_counts', 1);
                 }
-                if ( !$f->get( 'filter_order' ) ) {
-                    $f->set( 'filter_order', $nextCount++ );
+                if (!$f->get('filter_order')) {
+                    $f->set('filter_order', $nextCount++);
                 }
                 $f->save();
             }
@@ -100,21 +100,21 @@ class FCom_SampleData_Migrate extends BClass
             'lead_time'
         ];
 
-        $indexFields = FCom_CatalogIndex_Model_Field::orm()->where_in( 'field_name', $fields )->find_many();
-        $nextCount = BORM::get_db()->query( 'SELECT max(`filter_order`) as "max" FROM ' . FCom_CatalogIndex_Model_Field::table() )->fetchAll();
-        $nextCount = $nextCount[ 0 ][ 'max' ] + 1;
+        $indexFields = FCom_CatalogIndex_Model_Field::orm()->where_in('field_name', $fields)->find_many();
+        $nextCount = BORM::get_db()->query('SELECT max(`filter_order`) as "max" FROM ' . FCom_CatalogIndex_Model_Field::table())->fetchAll();
+        $nextCount = $nextCount[0]['max'] + 1;
 
-        if ( $indexFields ) {
-            foreach ( $indexFields as $f ) {
+        if ($indexFields) {
+            foreach ($indexFields as $f) {
                 /** @var FCom_CatalogIndex_Model_Field $f */
-                if ( $f->get( 'filter_type' ) == 'none' ) {
-                    $f->set( 'filter_type', 'inclusive' );
+                if ($f->get('filter_type') == 'none') {
+                    $f->set('filter_type', 'inclusive');
                 }
-                if ( !$f->get( 'filter_counts' ) ) {
-                    $f->set( 'filter_counts', 1 );
+                if (!$f->get('filter_counts')) {
+                    $f->set('filter_counts', 1);
                 }
-                if ( !$f->get( 'filter_order' ) ) {
-                    $f->set( 'filter_order', $nextCount++ );
+                if (!$f->get('filter_order')) {
+                    $f->set('filter_order', $nextCount++);
                 }
                 $f->save();
             }

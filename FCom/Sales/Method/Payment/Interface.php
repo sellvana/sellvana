@@ -9,14 +9,14 @@ interface FCom_Sales_Method_Payment_Interface
      * @param $options
      * @return $this
      */
-    public function setSalesEntity( $order, $options );
+    public function setSalesEntity($order, $options);
 
     /**
      * Set any details gathered during checkout process
      * @param array $details
      * @return $this
      */
-    public function setDetails( $details );
+    public function setDetails($details);
 
     /**
      * Get public data

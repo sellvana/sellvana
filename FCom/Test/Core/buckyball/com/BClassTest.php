@@ -9,7 +9,7 @@ class BClassTest extends PHPUnit_Framework_TestCase
     public function testOrigClass()
     {
         $obj = new AClass();
-        $this->assertEquals( get_class( $obj ), AClass::origClass() );
+        $this->assertEquals(get_class($obj), AClass::origClass());
     }
 
     /**
@@ -18,17 +18,17 @@ class BClassTest extends PHPUnit_Framework_TestCase
     public function testI()
     {
         $obj = AClass::i();
-        $this->assertInstanceOf( 'BClass', $obj );
+        $this->assertInstanceOf('BClass', $obj);
 
         $objTwo = AClass::i();
-        $this->assertSame( $obj, $objTwo );
+        $this->assertSame($obj, $objTwo);
 
-        $objThree = BClass::i( $obj );
-        $this->assertSame( $obj, $objThree );
+        $objThree = BClass::i($obj);
+        $this->assertSame($obj, $objThree);
 
-        $objFour = AClass::i( true );
-        $this->assertEquals( get_class( $obj ), get_class( $objFour ) );
-        $this->assertNotSame( $obj, $objFour );
+        $objFour = AClass::i(true);
+        $this->assertEquals(get_class($obj), get_class($objFour));
+        $this->assertNotSame($obj, $objFour);
     }
 
     /**
@@ -36,8 +36,8 @@ class BClassTest extends PHPUnit_Framework_TestCase
      */
     public function test__call()
     {
-        $obj = AClass::i( true );
-        $this->assertEquals( 1, $obj->__call( 'method', [] ) );
+        $obj = AClass::i(true);
+        $this->assertEquals(1, $obj->__call('method', []));
     }
 
     /**
@@ -45,7 +45,7 @@ class BClassTest extends PHPUnit_Framework_TestCase
      */
     public function test__callStatic()
     {
-        $this->assertTrue( 1 == AClass::__callStatic( 'method', [] ) );
+        $this->assertTrue(1 == AClass::__callStatic('method', []));
     }
 }
 

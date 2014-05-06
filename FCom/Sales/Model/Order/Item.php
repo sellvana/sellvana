@@ -12,26 +12,26 @@ class FCom_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
     * @param array $args
     * @return FCom_Sales_Model_Order_Item
     */
-    public static function i( $new = false, array $args = [] )
+    public static function i($new = false, array $args = [])
     {
-        return BClassRegistry::instance( get_called_class(), $args, !$new );
+        return BClassRegistry::instance(get_called_class(), $args, !$new);
     }
 
-    public function addNew( $data )
+    public function addNew($data)
     {
-        BEvents::i()->fire( __CLASS__ . '.addNew', [ 'orderItem' => $data ] );
-        return $this->create( $data )->save();
+        BEvents::i()->fire(__CLASS__ . '.addNew', ['orderItem' => $data]);
+        return $this->create($data)->save();
     }
 
-    public function update( $data )
+    public function update($data)
     {
-        BEvents::i()->fire( __CLASS__ . '.update', [ 'orderItem' => $data ] );
-        return $this->set( $data )->save();
+        BEvents::i()->fire(__CLASS__ . '.update', ['orderItem' => $data]);
+        return $this->set($data)->save();
     }
 
-    public function isItemExist( $orderId, $product_id )
+    public function isItemExist($orderId, $product_id)
     {
-        return $this->orm()->where( "order_id", $orderId )
-                        ->where( "product_id", $product_id )->find_one();
+        return $this->orm()->where("order_id", $orderId)
+                        ->where("product_id", $product_id)->find_one();
     }
 }

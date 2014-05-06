@@ -14,27 +14,27 @@ class FCom_SampleData_Admin_Controller extends FCom_Admin_Controller_Abstract
 
         try {
             BResponse::i()->startLongResponse();
-            BConfig::i()->set( 'db/logging', 0 );
+            BConfig::i()->set('db/logging', 0);
 
             FCom_SampleData_Admin::i()->loadProducts();
-            $msg    = BLocale::_( 'Sample products imported' );
+            $msg    = BLocale::_('Sample products imported');
             $status = 'success';
-        } catch ( Exception $e ) {
-            BDebug::logException( $e );
+        } catch (Exception $e) {
+            BDebug::logException($e);
             $msg    = $e->getMessage();
             $status = 'error';
         }
-        if ( !$xhr ) {
-            $this->message( $msg, $status );
-            BResponse::i()->redirect( 'settings?tab=other' );
+        if (!$xhr) {
+            $this->message($msg, $status);
+            BResponse::i()->redirect('settings?tab=other');
         } else {
             echo $msg;
             exit;
             $result = [
-                'message' => BLocale::_( $msg ),
+                'message' => BLocale::_($msg),
                 'status'  => $status
             ];
-            BResponse::i()->json( $result );
+            BResponse::i()->json($result);
         }
     }
 }

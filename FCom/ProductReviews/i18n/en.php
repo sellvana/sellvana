@@ -1,4 +1,4 @@
-<?php return [ 'Overall' => '',
+<?php return ['Overall' => '',
 'Value' => '',
 'Features' => '',
 'Quality' => '',
@@ -26,4 +26,4 @@
 'No reviews. Become first person review this products.' => '',
 'Review the Product' => '',
 'Customer Reviews' => '',
-'Write your own review' => '' ];
+'Write your own review' => ''];

@@ -23,31 +23,31 @@
 
 class WalletUtil {
 
-  public static function log( $msg ) {
-    error_log( $msg );
+  public static function log($msg) {
+    error_log($msg);
   }
 
   /**
   * We use the dollar amounts as micro dollars to keep floating arithmetic sane
   */
-  public static function to_dollars( $micro_dollars ) {
-    $d = floatval( $micro_dollars ) / 1000000 ;
-    return number_format( $d, 2 );
+  public static function to_dollars($micro_dollars) {
+    $d = floatval($micro_dollars) / 1000000 ;
+    return number_format($d, 2);
   }
 
-  public static function assert_input( $input, $required ) {
-    for ( $i = 0; $i < sizeof( $required ); $i++ ) {
-      if ( !isset( $input[ $required[ $i ] ] ) ) {
-        header( 'HTTP/1.0 400 Bad request', true, 400 );
+  public static function assert_input($input, $required) {
+    for ($i = 0; $i < sizeof($required); $i++) {
+      if (!isset($input[$required[$i]])) {
+        header('HTTP/1.0 400 Bad request', true, 400);
         echo "Did not receive $required[$i] in the request" ;
         exit();
       }
     }
   }
 
-  public static function encode_send_jwt( $json ) {
-    $jwt = JWT::encode( $json, MERCHANT_SECRET );
-    header( 'Content-Type: text/plain' );
+  public static function encode_send_jwt($json) {
+    $jwt = JWT::encode($json, MERCHANT_SECRET);
+    header('Content-Type: text/plain');
     echo $jwt;
     exit();
   }

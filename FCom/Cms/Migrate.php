@@ -62,7 +62,7 @@ class FCom_Cms_Migrate extends BClass
         ");
 */
         $tBlock = FCom_Cms_Model_Block::table();
-        BDb::run( "
+        BDb::run("
             CREATE TABLE IF NOT EXISTS {$tBlock} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
             `handle` varchar(100)  NOT NULL,
@@ -84,11 +84,11 @@ class FCom_Cms_Migrate extends BClass
             UNIQUE KEY `UNQ_handle` (`handle`),
             UNIQUE KEY `UNQ_page_url` (`page_enabled`,`page_url`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
-        " );
+        ");
 
         $tBlock = FCom_Cms_Model_Block::table();
         $tBlockHistory = FCom_Cms_Model_BlockHistory::table();
-        BDb::run( "
+        BDb::run("
             CREATE TABLE IF NOT EXISTS {$tBlockHistory} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
             `block_id` int(10) unsigned NOT NULL,
@@ -101,12 +101,12 @@ class FCom_Cms_Migrate extends BClass
             PRIMARY KEY (`id`),
             CONSTRAINT `FK_{$tBlockHistory}_block` FOREIGN KEY (`block_id`) REFERENCES {$tBlock} (`id`) ON UPDATE CASCADE ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
-        " );
+        ");
 
         $tForm = FCom_Cms_Model_Form::table();
         $tFormData = FCom_Cms_Model_FormData::table();
 
-        BDb::ddlTableDef( $tForm, [
+        BDb::ddlTableDef($tForm, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'form_name' => 'varchar(100)',
@@ -120,9 +120,9 @@ class FCom_Cms_Migrate extends BClass
             'KEYS' => [
                 'UNQ_form_name' => 'UNIQUE (form_name)'
             ],
-        ] );
+        ]);
 
-        BDb::ddlTableDef( $tFormData, [
+        BDb::ddlTableDef($tFormData, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'form_id' => 'int unsigned not null',
@@ -139,14 +139,14 @@ class FCom_Cms_Migrate extends BClass
             'CONSTRAINTS' => [
                 "FK_{$tFormData}_form" => "FOREIGN KEY (form_id) REFERENCES {$tForm} (id) ON UPDATE CASCADE ON DELETE CASCADE",
             ],
-        ] );
+        ]);
 
         //BDb::run("REPLACE INTO {$tNav} (id,id_path) VALUES (1,1)");
     }
 
     public function upgrade__0_1_0__0_1_1()
     {
-        BDb::ddlTableDef( FCom_Cms_Model_Block::table(), [
+        BDb::ddlTableDef(FCom_Cms_Model_Block::table(), [
             'COLUMNS' => [
                 'renderer' => 'varchar(100) null after content',
                 'page_enabled' => 'TINYINT DEFAULT 0 NOT NULL',
@@ -161,7 +161,7 @@ class FCom_Cms_Migrate extends BClass
                 'UNQ_handle' => 'UNIQUE (handle)',
                 'UNQ_page_url' => 'UNIQUE (page_enabled, page_url)',
             ],
-        ] );
+        ]);
         /*
         BDb::ddlTableDef(FCom_Cms_Model_Nav::table(), array(
             'COLUMNS' => array(
@@ -191,12 +191,12 @@ class FCom_Cms_Migrate extends BClass
     public function upgrade__0_1_1__0_1_2()
     {
         $table = FCom_Cms_Model_Block::table();
-        BDb::ddlTableDef( $table, [
+        BDb::ddlTableDef($table, [
             'COLUMNS' => [
                   'create_dt'      => 'RENAME create_at datetime DEFAULT NULL',
                   'update_dt'      => 'RENAME update_at datetime DEFAULT NULL',
             ],
-        ] );
+        ]);
     }
 
     public function upgrade__0_1_2__0_1_3()
@@ -204,7 +204,7 @@ class FCom_Cms_Migrate extends BClass
         $tForm = FCom_Cms_Model_Form::table();
         $tFormData = FCom_Cms_Model_FormData::table();
 
-        BDb::ddlTableDef( $tForm, [
+        BDb::ddlTableDef($tForm, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'form_name' => 'varchar(100)',
@@ -218,9 +218,9 @@ class FCom_Cms_Migrate extends BClass
             'KEYS' => [
                 'UNQ_form_name' => 'UNIQUE (form_name)',
             ],
-        ] );
+        ]);
 
-        BDb::ddlTableDef( $tFormData, [
+        BDb::ddlTableDef($tFormData, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'form_id' => 'int unsigned not null',
@@ -239,6 +239,6 @@ class FCom_Cms_Migrate extends BClass
             'CONSTRAINTS' => [
                 "FK_{$tFormData}_form" => "FOREIGN KEY (form_id) REFERENCES {$tForm} (id) ON UPDATE CASCADE ON DELETE CASCADE",
             ],
-        ] );
+        ]);
     }
 }

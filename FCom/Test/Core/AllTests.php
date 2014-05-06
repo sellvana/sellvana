@@ -1,8 +1,8 @@
 <?php
 
 
-if ( !defined( 'PHPUnit_MAIN_METHOD' ) ) {
-    define( 'PHPUnit_MAIN_METHOD', 'AllTests::main' );
+if (!defined('PHPUnit_MAIN_METHOD')) {
+    define('PHPUnit_MAIN_METHOD', 'AllTests::main');
 }
 
 require_once __DIR__ . '/../../../../tests/index.php';
@@ -13,7 +13,7 @@ class AllTests_Buckyball
 {
     public static function main()
     {
-        PHPUnit_TextUI_TestRunner::run( self::suite() );
+        PHPUnit_TextUI_TestRunner::run(self::suite());
     }
 
     /**
@@ -23,14 +23,14 @@ class AllTests_Buckyball
      */
     public static function suite()
     {
-        $suite = new PHPUnit_Framework_TestSuite( 'Buckyball' );
+        $suite = new PHPUnit_Framework_TestSuite('Buckyball');
 
-        $suite->addTest( BAllTests::suite() );
+        $suite->addTest(BAllTests::suite());
 
         return $suite;
     }
 }
 
-if ( PHPUnit_MAIN_METHOD == 'AllTests::main' ) {
+if (PHPUnit_MAIN_METHOD == 'AllTests::main') {
     AllTests_Buckyball::main();
 }

@@ -10,7 +10,7 @@ class FCom_PaymentBasic_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
         $this->_name = 'Check / Money Order';
     }
 
-    public function initCart( $cart )
+    public function initCart($cart)
     {
         $this->_cart = $cart;
         return $this;
@@ -18,7 +18,7 @@ class FCom_PaymentBasic_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 
     public function getCheckoutFormView()
     {
-        return BLayout::i()->view( 'check_mo/form' );
+        return BLayout::i()->view('check_mo/form');
     }
 
     public function payOnCheckout()
