@@ -4,8 +4,8 @@
     <div id="progressbar"></div>
     <div id="indexing_message"></div>
     <div id="indexing_info">
-        Index name: <b><?=$this->status[ 'name' ]?></b><br/>
-        Index created at: <b><?=date( "Y-m-d", strtotime( $this->status[ 'date' ] ) )?></b>
+        Index name: <b><?=$this->status['name']?></b><br/>
+        Index created at: <b><?=date("Y-m-d", strtotime($this->status['date']))?></b>
     </div>
 </div>
 
@@ -23,7 +23,7 @@
     {
         $.ajax({
             type: "GET",
-            url: "<?=BApp::href( 'indextank/products/indexing-status' )?>"
+            url: "<?=BApp::href('indextank/products/indexing-status')?>"
         }).done(function( json ) {
             data = JSON.parse(json);
             $('#progressbar').progressbar({value: parseInt(data.percent)});
@@ -99,7 +99,7 @@
         $("#progressbar").progressbar({ value: 0 });
         $.ajax({
             type: "GET",
-            url: "<?=BApp::href( 'indextank/products/index' )?>"
+            url: "<?=BApp::href('indextank/products/index')?>"
             }
         ).done(function() {
             manageInterval('start');
@@ -113,7 +113,7 @@
         updateDialogButtons('resume');
         $.ajax({
             type: "GET",
-            url: "<?=BApp::href( 'indextank/products/index-resume' )?>"
+            url: "<?=BApp::href('indextank/products/index-resume')?>"
             }
         ).done(function() {
             manageInterval('start');
@@ -126,7 +126,7 @@
         updateDialogButtons('pause');
         $.ajax({
             type: "GET",
-            url: "<?=BApp::href( 'indextank/products/index-pause' )?>"
+            url: "<?=BApp::href('indextank/products/index-pause')?>"
             }
         ).done(function() {
             manageInterval('stop');

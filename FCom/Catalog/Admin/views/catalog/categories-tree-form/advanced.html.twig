@@ -3,4 +3,4 @@
 {% set fieldData = { validator:validator } %}
 {% import THIS.view('admin/form-elements').twigName() as forms %}
 
-{{ forms.textarea(fieldData|merge({field:'layout_update', required:1, label:'Layout Update'|_, input_div_class:'col-md-10'})) }}
+{{ forms.textarea(fieldData|merge({field:'layout_update', label:'Layout Update'|_, input_div_class:'col-md-10'})) }}

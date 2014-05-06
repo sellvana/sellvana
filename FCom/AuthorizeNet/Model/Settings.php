@@ -105,8 +105,8 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
     public static function paymentActions()
     {
         return [
-            "AUTH_ONLY"         => BLocale::i()->_( "Authorize Only" ),
-            "AUTH_CAPTURE" => BLocale::i()->_( "Authorize and Capture" )
+            "AUTH_ONLY"         => BLocale::i()->_("Authorize Only"),
+            "AUTH_CAPTURE" => BLocale::i()->_("Authorize and Capture")
         ];
     }
 /*
@@ -121,7 +121,7 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
             "DI" => "Discover",
             "DC" => "Diners Club",
             "JC" => "JCB",
-            "OT" => BLocale::i()->_( "Other" )
+            "OT" => BLocale::i()->_("Other")
         ];
     }
 
@@ -176,11 +176,11 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
     public static function countries()
     {
         $countries = [];
-        foreach ( FCom_Geo_Model_Country::i()->options() as $iso => $name ) {
-            if ( empty( $iso ) ) {
+        foreach (FCom_Geo_Model_Country::i()->options() as $iso => $name) {
+            if (empty($iso)) {
                 continue;
             }
-            $countries[ $iso ] = $name;
+            $countries[$iso] = $name;
         }
 
         return $countries;
@@ -208,11 +208,11 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
      * @param BConfig $config
      * @return string
      */
-    public static function gatewayUrl( $config )
+    public static function gatewayUrl($config)
     {
         $url = static::$gatewayUrl;
-        if ( $config->get( 'modules/FCom_AuthorizeNet/cgi_url' ) ) {
-            $url = $config->get( 'modules/FCom_AuthorizeNet/cgi_url' );
+        if ($config->get('modules/FCom_AuthorizeNet/cgi_url')) {
+            $url = $config->get('modules/FCom_AuthorizeNet/cgi_url');
         }
         return $url;
     }
@@ -221,8 +221,8 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
      * @param BConfig $config
      * @return string
      */
-    public static function gatewayDpmUrl( $config )
+    public static function gatewayDpmUrl($config)
     {
-        return static::gatewayUrl( $config );
+        return static::gatewayUrl($config);
     }
 }

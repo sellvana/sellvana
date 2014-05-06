@@ -10,8 +10,8 @@ class FCom_CustomerGroups_Model_Group extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
 
     protected static $_validationRules = [
-        [ 'title', '@required' ],
-        [ 'code', '@required' ],
+        ['title', '@required'],
+        ['code', '@required'],
     ];
 
     /**
@@ -19,9 +19,9 @@ class FCom_CustomerGroups_Model_Group extends FCom_Core_Model_Abstract
      * @param array $args
      * @return FCom_CustomerGroups_Model_Group
      */
-    public static function i( $new = false, array $args = [] )
+    public static function i($new = false, array $args = [])
     {
-        return parent::i( $new, $args ); // auto completion helper
+        return parent::i($new, $args); // auto completion helper
     }
 
     /**
@@ -32,9 +32,9 @@ class FCom_CustomerGroups_Model_Group extends FCom_Core_Model_Abstract
     {
         $groupModels = static::orm()->find_many();
         $groups = [];
-        foreach ( $groupModels as $model ) {
+        foreach ($groupModels as $model) {
             $key = $model->id;
-            $groups[ $key ] = $model->title;
+            $groups[$key] = $model->title;
         }
 
         return $groups;

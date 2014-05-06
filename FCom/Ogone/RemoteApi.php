@@ -84,23 +84,23 @@ class FCom_Ogone_RemoteApi extends BClass
     public function prepareRequestData()
     {
         return [];
-        $conf = new BData( BConfig::i()->get( 'modules/FCom_Ogone' ) );
-        $order = new BData( [] ); // order
-        $cust = new BData( [] ); // customer
-        $ogoneOrder = new BData( [] ); // order
+        $conf = new BData(BConfig::i()->get('modules/FCom_Ogone'));
+        $order = new BData([]); // order
+        $cust = new BData([]); // customer
+        $ogoneOrder = new BData([]); // order
         //$ogoneOrder = FCom_Ogone_Model_Order::i()->load($order->id, 'order_id');
 
         $complus = '';
-        $paramplus = [ 'amountOfProducts' => '5', 'usedCoupon' => 1 ]; //?
-        $homeUrl = FCom_Frontend_Main::i()->href( '' );
-        $callbackUrl = FCom_Frontend_Main::i()->href( 'ogone/callback' );
+        $paramplus = ['amountOfProducts' => '5', 'usedCoupon' => 1]; //?
+        $homeUrl = FCom_Frontend_Main::i()->href('');
+        $callbackUrl = FCom_Frontend_Main::i()->href('ogone/callback');
         $data = [
             'RL' => 'ncol_2.0',
             'PSPID' => $conf->pspid,
             'ORDERID' => $order->increment_id,
             'CURRENCY' => $order->order_currency,
             'LANGUAGE' => $order->language,
-            'AMOUNT' => intval( $order->amount_due * 100 ),
+            'AMOUNT' => intval($order->amount_due * 100),
             'CN' => $cust ? $cust->fullName() : null,
             'EMAIL' => $cust ? $cust->email : null,
             'COM' => $order->getTextDescription(),
@@ -123,7 +123,7 @@ class FCom_Ogone_RemoteApi extends BClass
             'CATALOGURL' => $catalogUrl,
 
             'TITLE' => $conf->title,
-            'TP' => $conf->template ? FCom_Frontend_Main::i()->href( 'ogone/template' ) : null,
+            'TP' => $conf->template ? FCom_Frontend_Main::i()->href('ogone/template') : null,
             'LOGO' => $conf->logo,
             'FONTTYPE' => $conf->fonttype,
             'BGCOLOR' => $conf->bgcolor,
@@ -134,67 +134,67 @@ class FCom_Ogone_RemoteApi extends BClass
             'BUTTONTXTCOLOR' => $conf->buttontxtcolor,
 
             'COMPLUS' => $complus,
-            'PARAMPLUS' => http_build_query( $paramplus ),
+            'PARAMPLUS' => http_build_query($paramplus),
             //'PARAMVAR' => 'PARAMVAR',
         ];
-        $data[ 'SHASIGN' ] = $this->_sha( $data, 'in' );
+        $data['SHASIGN'] = $this->_sha($data, 'in');
 
-        $ogoneOrder->set( 'shasign', $data[ 'SHASIGN' ] )->save();
+        $ogoneOrder->set('shasign', $data['SHASIGN'])->save();
 
-        $url = static::$_apiUrl[ $conf->mode_prod ? 'PROD' : 'TEST' ];
-        return [ 'form_url' => $url, 'data' => $data ];
+        $url = static::$_apiUrl[$conf->mode_prod ? 'PROD' : 'TEST'];
+        return ['form_url' => $url, 'data' => $data];
     }
 
-    public function processResult( $data = null )
+    public function processResult($data = null)
     {
-        if ( is_null( $data ) ) {
+        if (is_null($data)) {
             $data = BRequest::i()->request();
         }
-        if ( empty( $data[ 'SHASIGN' ] ) || $this->_sha( $data, 'out' ) != $data[ 'SHASIGN' ] ) {
-            throw new BException( 'SHA-OUT missing or invalid' );
+        if (empty($data['SHASIGN']) || $this->_sha($data, 'out') != $data['SHASIGN']) {
+            throw new BException('SHA-OUT missing or invalid');
         }
-        if ( empty( $data[ 'orderID' ] ) ) {
-            throw new BException( 'Missing orderID' );
+        if (empty($data['orderID'])) {
+            throw new BException('Missing orderID');
         }
-        $conf = new BData( BConfig::i()->get( 'modules/FCom_Ogone' ) );
-        $orderId = $data[ 'orderID' ];
-        $order = FCom_Sales_Model_Order::i()->load( $orderId, 'increment_id' );
-        $ogoneOrder = FCom_Ogone_Model_Order::i()->load( $order->id, 'order_id' );
+        $conf = new BData(BConfig::i()->get('modules/FCom_Ogone'));
+        $orderId = $data['orderID'];
+        $order = FCom_Sales_Model_Order::i()->load($orderId, 'increment_id');
+        $ogoneOrder = FCom_Ogone_Model_Order::i()->load($order->id, 'order_id');
 
         // Process response
-        $statusCode = $data[ 'STATUS' ];
+        $statusCode = $data['STATUS'];
 
-        $ogoneOrder->set( [ 'error' => 0, 'status_code' => $statusCode ] )->save();
+        $ogoneOrder->set(['error' => 0, 'status_code' => $statusCode])->save();
         $update = null;
         $comment = null;
         $notifyCustomer = false;
         $status = false;
 
-        switch ( $statusCode ) {
+        switch ($statusCode) {
         // SUCCESS
         case 9: // Capture accepted
-            $update = [ 'custom_status' => $conf->order_status_captured, 'payment_status' => 'CAPTURED' ];
+            $update = ['custom_status' => $conf->order_status_captured, 'payment_status' => 'CAPTURED'];
             $comment = 'Ogone capture accepted';
             $notifyCustomer = true;
             $status = true;
             break;
 
         case 91: // Capture pending
-            $update = [ 'custom_status' => $conf->order_status_captpend, 'payment_status' => 'CAPTURE_PENDING' ];
+            $update = ['custom_status' => $conf->order_status_captpend, 'payment_status' => 'CAPTURE_PENDING'];
             $comment = 'Ogone capture pending';
             $notifyCustomer = true;
             $status = true;
             break;
 
         case 5: // Authorized
-            $update = [ 'custom_status' => $conf->order_status_authorized, 'payment_status' => 'AUTHORIZED' ];
+            $update = ['custom_status' => $conf->order_status_authorized, 'payment_status' => 'AUTHORIZED'];
             $comment = 'Ogone authorized';
             $notifyCustomer = true;
             $status = true;
             break;
 
         case 51: // Authorization pending
-            $update = [ 'custom_status' => $conf->order_status_authpend, 'payment_status' => 'AUTH_PENDING' ];
+            $update = ['custom_status' => $conf->order_status_authpend, 'payment_status' => 'AUTH_PENDING'];
             $comment = 'Ogone authorization pending';
             $notifyCustomer = true;
             $status = true;
@@ -217,7 +217,7 @@ class FCom_Ogone_RemoteApi extends BClass
             // If you were to resend the the same transaction details, it would be automatically refused by Ogone, even
             // if you entered proper payment details.
             // However, opencart 1.5.x generates a new orderID on checkout confirm, so no harm in resubmitting.
-            $update = [ 'payment_status' => 'AUTH_FAILED' ];
+            $update = ['payment_status' => 'AUTH_FAILED'];
             $comment = 'Ogone payment failed authorization';
             break;
 
@@ -225,45 +225,45 @@ class FCom_Ogone_RemoteApi extends BClass
         case 92:
             // In both cases 52 and 92 Ogone recommends not reprocessing the transaction, becos it could result in double payment
             // Therefore we are confirming the order.
-            $update = [ 'custom_status' => $conf->order_status_uncertain, 'payment_status' => 'UNCERTAIN' ];
+            $update = ['custom_status' => $conf->order_status_uncertain, 'payment_status' => 'UNCERTAIN'];
             $comment = 'Ogone payment uncertain status';
             $notifyCustomer = true;
             $status = true;
             break;
 
         default: // Shouldn't happen, but anyways
-            $update = [ 'custom_status' => $conf->order_status_uncertain, 'payment_status' => 'UNCERTAIN' ];
+            $update = ['custom_status' => $conf->order_status_uncertain, 'payment_status' => 'UNCERTAIN'];
             $comment = 'Ogone payment uncertain status';
             $status = true;
             break;
         }
 
-        if ( $update ) {
-            $order->changeStatus( $update );
+        if ($update) {
+            $order->changeStatus($update);
         }
-        if ( $comment ) {
-            $order->addComment( BLocale::i()->_( $comment ) );
+        if ($comment) {
+            $order->addComment(BLocale::i()->_($comment));
         }
-        if ( $notifyCustomer ) {
-            $order->notifyCustomer( 'ORDER_RECEIVED' );
+        if ($notifyCustomer) {
+            $order->notifyCustomer('ORDER_RECEIVED');
         }
         return $status;
     }
 
-    protected function _sha( $data, $dir )
+    protected function _sha($data, $dir)
     {
-        unset( $data[ 'SHASIGN' ] );
-        $data = array_change_key_case( $data, CASE_UPPER );
-        ksort( $data );
-        array_walk( $data, 'trim' );
-        $data = array_filter( $data, function( $value ) { return (bool) strlen( $value ); } );
-        $shaPass = BConfig::i()->get( 'modules/FCom_Ogone/passphrase_' . $dir );
-        $shaMethod = BConfig::i()->get( 'modules/FCom_Ogone/sha_method' );
-        if ( !$shaMethod ) $shaMethod = 'sha512';
+        unset($data['SHASIGN']);
+        $data = array_change_key_case($data, CASE_UPPER);
+        ksort($data);
+        array_walk($data, 'trim');
+        $data = array_filter($data, function($value) { return (bool) strlen($value); });
+        $shaPass = BConfig::i()->get('modules/FCom_Ogone/passphrase_' . $dir);
+        $shaMethod = BConfig::i()->get('modules/FCom_Ogone/sha_method');
+        if (!$shaMethod) $shaMethod = 'sha512';
         $shaData = '';
-        foreach ( $data as $k => $v ) {
+        foreach ($data as $k => $v) {
             $shaData .= $k . '=' . $v . $shaPass;
         }
-        return strtoupper( hash( $shaMethod, $shaData ) );
+        return strtoupper(hash($shaMethod, $shaData));
     }
 }

@@ -27,13 +27,13 @@
  */
 
 
-  define( 'MERCHANT_ID', "your_id_goes_here" );
+  define('MERCHANT_ID', "your_id_goes_here");
 
-  define( 'MERCHANT_SECRET', "your_merchant_secret" );
+  define('MERCHANT_SECRET', "your_merchant_secret");
 
-  define( 'MERCHANT_NAME', "name_with_which_you_signed_up_merchant_account" );
+  define('MERCHANT_NAME', "name_with_which_you_signed_up_merchant_account");
 
-  define( 'CLIENT_ID',  "your_client_id_from_api_console" );
+  define('CLIENT_ID',  "your_client_id_from_api_console");
 
-  define( 'ORIGIN', "http://localhost" );
+  define('ORIGIN', "http://localhost");
 

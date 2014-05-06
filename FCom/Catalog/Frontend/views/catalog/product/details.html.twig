@@ -148,6 +148,7 @@
               </label>
             </div>
 #}
+            {{ THIS.hook('catalog/product/details:before_add_cart') | raw }}
             <div class="f-prod-add-cart">
               <p class="f-stock-notice f-in-stock">In Stock.</p>
               <button type="submit" class="btn btn-primary btn-lg" title="{{ "Add to Cart"| _ }}">

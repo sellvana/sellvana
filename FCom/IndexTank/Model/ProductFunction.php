@@ -9,17 +9,17 @@ class FCom_IndexTank_Model_ProductFunction extends FCom_Core_Model_Abstract
     *
     * @return FCom_IndexTank_Model_ProductFunction
     */
-    public static function i( $new = false, array $args = [] )
+    public static function i($new = false, array $args = [])
     {
-        return BClassRegistry::instance( __CLASS__, $args, !$new );
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public function getList()
     {
         $functions = FCom_IndexTank_Model_ProductFunction::i()->orm()->find_many();
         $result = [];
-        foreach ( $functions as $f ) {
-            $result[ $f->number ] = $f;
+        foreach ($functions as $f) {
+            $result[$f->number] = $f;
         }
         return $result;
     }
@@ -28,11 +28,11 @@ class FCom_IndexTank_Model_ProductFunction extends FCom_Core_Model_Abstract
     {
         $functions = FCom_IndexTank_Model_ProductFunction::i()->orm()->find_many();
         $result = [];
-        foreach ( $functions as $f ) {
-            if ( $f->use_custom_formula ) {
-                $result[ $f->name ] = $f->label;
+        foreach ($functions as $f) {
+            if ($f->use_custom_formula) {
+                $result[$f->name] = $f->label;
             } else {
-                $result[ $f->field_name . '|' . $f->sort_order ] = $f->label;
+                $result[$f->field_name . '|' . $f->sort_order] = $f->label;
             }
         }
         return $result;

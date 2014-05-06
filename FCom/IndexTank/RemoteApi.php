@@ -27,9 +27,9 @@ class FCom_IndexTank_RemoteApi extends BClass
      */
     public function service()
     {
-        if ( empty( $this->indextank ) ) {
-            $apiUrl = BConfig::i()->get( 'modules/FCom_IndexTank/api_url' );
-            $this->indextank = new Indextank_Api( $apiUrl );
+        if (empty($this->indextank)) {
+            $apiUrl = BConfig::i()->get('modules/FCom_IndexTank/api_url');
+            $this->indextank = new Indextank_Api($apiUrl);
         }
         return $this->indextank;
     }
