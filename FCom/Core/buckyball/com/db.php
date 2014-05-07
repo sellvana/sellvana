@@ -150,9 +150,10 @@ class BDb
             if (strpos($host, ':') !== false && $host[0] !== '[') {
                 $host = '[' . $host . ']';
             }
+            $port = !empty($config['port']) ? $config['port'] : '3306';
             switch ($engine) {
                 case "mysql":
-                    $dsn = "mysql:host={$host};dbname={$config['dbname']};charset=UTF8";
+                    $dsn = "mysql:host={$host};port={$port};dbname={$config['dbname']};charset=UTF8";
                     break;
 
                 default:
@@ -1398,6 +1399,7 @@ class BORM extends ORMWrapper
     protected function _save($replace = false)
     {
         $values = array_values($this->_dirty_fields);
+
 
         if (!$this->_is_new) { // UPDATE
             // If there are no dirty values, do nothing
