@@ -85,6 +85,12 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         return $exportableModels;
     }
 
+    /**
+     * @param array $models
+     * @param null  $toFile
+     * @param null  $batch
+     * @return bool
+     */
     public function export( $models = [], $toFile = null, $batch = null )
     {
         $fe = $this->getWriteHandle($toFile);
@@ -333,14 +339,22 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             BDebug::debug("Error: unexpected file fail");
         }
         fclose($fi);
-        $this->channel->send(['signal' => 'new_models',
-                              'msg' => BLocale::_("Created %d new models", $this->newModels)]);
-        $this->channel->send(['signal' => 'updated_models',
-                              'msg' => BLocale::_("Updated %d models", $this->updatedModels)]);
-        $this->channel->send(['signal' => 'finished',
-                              'msg' => BLocale::_("No changes for %d models", $this->notChanged)]);
-        $this->channel->send(['signal' => 'finished',
-                              'msg' => "Done in: " . round(microtime(true) - $start)] . " sec.");
+        $this->channel->send([
+            'signal' => 'new_models',
+            'msg'    => BLocale::_("Created %d new models", $this->newModels)
+        ]);
+        $this->channel->send([
+            'signal' => 'updated_models',
+            'msg'    => BLocale::_("Updated %d models", $this->updatedModels)
+        ]);
+        $this->channel->send([
+            'signal' => 'finished',
+            'msg'    => BLocale::_("No changes for %d models", $this->notChanged)
+        ]);
+        $this->channel->send([
+            'signal' => 'finished',
+            'msg'    => "Done in: " . round(microtime(true) - $start) . " sec."
+        ]);
 
         return true;
     }
