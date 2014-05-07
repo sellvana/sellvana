@@ -84,21 +84,22 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
     public function export( $models = [], $toFile = null, $batch = null )
     {
-        $toFile = $this->getFullPath($toFile);
-
-        BUtil::ensureDir(dirname($toFile));
-        $fe = fopen($toFile, 'w');
+        $fe = $this->getWriteHandle($toFile);
 
         if (!$fe) {
             BDebug::log("Could not open $toFile for writing, aborting export.");
             return false;
         }
+
         $bs = BConfig::i()->get( "FCom_Core/import_export/batch_size", 100 );
-        if ( $batch && is_numeric( $batch ) ) {
-            $bs = $batch; // todo implement batch export
+
+        if ($batch && is_numeric($batch)) {
+            $bs = $batch;
         }
+
         $this->writeLine( $fe, json_encode( [ static::STORE_UNIQUE_ID_KEY => $this->storeUID() ] ) );
         $exportableModels = $this->collectExportableModels();
+
         if (!empty($models)) {
             $diff = array_diff(array_keys($exportableModels), $models);
             foreach ($diff as $d) {
@@ -112,7 +113,8 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             /** @var FCom_Core_Model_Abstract $model */
             $model   = $s[ 'model' ];
             if($this->getUser()->getPermission($model) == false){
-                BDebug::warning(BLocale::_('User: %s, cannot export "%s". Permission denied.', $this->getUser()->get('username'), $model));
+                BDebug::warning(BLocale::_('User: %s, cannot export "%s". Permission denied.',
+                    $this->getUser()->get('username'), $model));
                 continue;
             }
             if ( !isset( $s[ 'skip' ] ) ) {
@@ -131,20 +133,34 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                     $heading[static::DEFAULT_FIELDS_KEY][] = $key;
                 }
             }
-            $records = $model::i()->orm()->select($heading[static::DEFAULT_FIELDS_KEY])->find_many();
+            $offset = 0;
+            $records = $model::i()
+                             ->orm()
+                             ->select($heading[static::DEFAULT_FIELDS_KEY])
+                             ->limit($bs)
+                             ->offset($offset)
+                             ->find_many();
             if ($records) {
-                BEvents::i()->fire(__METHOD__ . ':beforeOutput', ['records' => $records]);
                 $this->writeLine($fe, BUtil::toJson($heading));
-                foreach ($records as $r) {
+                while($records) {
+                    BEvents::i()->fire(__METHOD__ . ':beforeOutput', ['records' => $records]);
+                    foreach ($records as $r) {
 
-                    /** @var FCom_Core_Model_Abstract $r */
-                    $data = $r->as_array();
-                    $data = array_values($data);
+                        /** @var FCom_Core_Model_Abstract $r */
+                        $data = $r->as_array();
+                        $data = array_values($data);
 
-                    $json = BUtil::toJson($data);
-                    $this->writeLine($fe, $json);
+                        $json = BUtil::toJson($data);
+                        $this->writeLine($fe, $json);
+                    }
+                    $offset += $bs;
+                    $records = $model::i()
+                                     ->orm()
+                                     ->select($heading[static::DEFAULT_FIELDS_KEY])
+                                     ->limit($bs)
+                                     ->offset($offset)
+                                     ->find_many();
                 }
-
             }
         }
 
@@ -648,5 +664,28 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 } // end foreach batch data
             } // end foreach ['related']
         } // end if related
+    }
+
+    /**
+     * @param string|resource $toFile
+     * @return resource|false
+     */
+    protected function getWriteHandle($toFile)
+    {
+        if(is_resource($toFile)){
+            return $toFile;
+        }
+
+        if(strpos($toFile, 'php://') === 0){
+            $path = $toFile; // allow stream writers
+        } else {
+            $path = $this->getFullPath($toFile);
+            BUtil::ensureDir(dirname($toFile));
+        }
+        if(!is_writable($path)){
+            return false;
+        }
+        $fe = fopen($path, 'w');
+        return $fe;
     }
 }
