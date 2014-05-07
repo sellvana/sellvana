@@ -56,7 +56,7 @@ class FCom_Cron_Main extends BClass
         // get associated array of task handles, if specified
         if (is_string($handles)) {
             $handles = $handles !== '' ? array_flip(explode(',', $handles)) : null;
-        } elseif (!is_null($handles) && !is_array($handles)) {
+        } elseif (null !== $handles && !is_array($handles)) {
             throw new Exception('Invalid argument: ' . print_r($handles, 1));
         }
         // fetch configuration
@@ -83,7 +83,7 @@ class FCom_Cron_Main extends BClass
             $date = getdate($time - $i * 60);
             foreach ($this->_tasks as $h => $task) {
                 // skip task if not one of the specified handles
-                if (!is_null($handles) && !isset($handles[$h])) {
+                if (null !== $handles && !isset($handles[$h])) {
                     continue;
                 }
                 // check whether to skip already existing tasks
@@ -118,7 +118,7 @@ class FCom_Cron_Main extends BClass
         // 2. if previous task crashes, other tasks still will be ran on the next cron
         foreach ($dbTasks as $h => $dbTask) {
             // skip task if not one of the specified handles
-            if (!is_null($handles) && !isset($handles[$h])) {
+            if (null !== $handles && !isset($handles[$h])) {
                 continue;
             }
             // skip not pending tasks
@@ -160,7 +160,7 @@ class FCom_Cron_Main extends BClass
     public function matchPatternValue($pattern, $val)
     {
         // sanity check
-        if (!is_scalar($pattern) || '' === $pattern || is_null($pattern) || false === $pattern) {
+        if (!is_scalar($pattern) || '' === $pattern || null === $pattern || false === $pattern) {
             return false;
         }
 

@@ -10,7 +10,7 @@ class FCom_LibFirephp_Main extends BClass
         $firephp = FirePHP::getInstance(true);
 
         $enabled = BConfig::i()->get('modules/FCom_LibFirephp/enabled');
-        if (!is_null($enabled)) {
+        if (null !== $enabled) {
             $firephp->setEnabled($enabled);
         }
 

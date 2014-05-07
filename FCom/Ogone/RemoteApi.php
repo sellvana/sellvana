@@ -147,7 +147,7 @@ class FCom_Ogone_RemoteApi extends BClass
 
     public function processResult($data = null)
     {
-        if (is_null($data)) {
+        if (null === $data) {
             $data = BRequest::i()->request();
         }
         if (empty($data['SHASIGN']) || $this->_sha($data, 'out') != $data['SHASIGN']) {

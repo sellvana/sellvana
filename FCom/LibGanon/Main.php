@@ -64,14 +64,14 @@ class FCom_LibGanon_Main extends BClass
 
     public function doc($html = null)
     {
-        if (is_null($this->_doc)) {
+        if (null === $this->_doc) {
             require_once __DIR__ . "/lib/ganon.php";
         }
-        if (!is_null($html) || is_null($this->_doc)) {
-            if (is_null($html) && is_null($this->_doc)) {
+        if (null !== $html || null === $this->_doc) {
+            if (null === $html && null === $this->_doc) {
                 $html = $this->_html;
                 unset($this->_html);
-            } elseif (!is_null($html) && !is_null($this->_doc)) {
+            } elseif (null !== $html && null !== $this->_doc) {
                 unset($this->_doc);
             }
             $a = new HTML_Parser_HTML5($html);

@@ -1,12 +1,15 @@
 {% set ctrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
 {% set fieldConfig = ctrl.variantFieldGridConfig(model) %}
 {% set variantConfig = ctrl.variantGridConfig(model) %}
-
+{% set prodImagesConfig = APP.instance('FCom_CustomField_Admin_Controller_Products').variantImageGridConfig(model) %}
 <script>
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.validate'], function(Backbone, _, $) {
     var fieldCollection = null;
     var vColsCollection = null;
     var vRowsCollection = null;
+    var tr = null;
+    var gridImage = null;
+    var selectedImage = null;
     var valueCurrentField = Array();
     var vField = $('#variants-tab-field');
     var bodyGrid = $('#variant-grid').find('tbody');
@@ -19,7 +22,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
     }
     window.variantGridRegister = function(grid) {
         grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
-
+            var file_id = (typeof this.model.get('file_id') === 'undefined' ) ? '' : this.model.get('file_id');
+            this.$el.find('.btn-variant-image').attr('file-id', file_id);
             this.$el.find('select').addClass('variantUnique');
         }
         grid.build();
@@ -27,8 +31,34 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
         vRowsCollection = grid.getRows();
         vFieldGridInit();
         grayGrid();
+        bodyGrid.find('select').change(function () {
+            $('.variantUnique').each(function () {
+                $(this).valid();
+            })
+        });
+        $('.btn-variant-image').click(function () {
+            tr = $(this).parents('tr');
+            var rowsCollection = gridImage.getRows();
+            selectedImage.reset();
+            var imageId = tr.find('.btn-variant-image').attr('file-id').split(',');
+            rowsCollection.each(function (obj) {
+                if (imageId.indexOf(obj.get('file_id')) != -1) {
+                    obj.set('selected', true);
+                    selectedImage.add(obj)
+                } else {
+                    obj.set('selected', false);
+                }
+            })
+            gridImage.getGridView().render();
+            $('#prod-images-variant').modal('show');
+        })
     }
+    window.imagesGridRegister = function(grid) {
 
+        gridImage = grid;
+        gridImage.build();
+        selectedImage = gridImage.getSelectedRows();
+    }
     function grayGrid() {
         if ($('#variants-tab-field').children().length) {
             $('#variant-grid').find('.grid-new').prop('disabled', false);
@@ -48,8 +78,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
 
     function resetSelect()
     {
-        $('#sel_var_field').val('');
-        $('#sel_var_field').select2();
+        $('#sel_var_field').val('').select2();
     }
 
     function vFieldGridInit()
@@ -113,6 +142,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                         }
                 }
            });
+           variant.file_id =  $(this).find('.btn-variant-image').attr('file-id');
            variant.fields = fvals;
            variants.push(variant);
         });
@@ -260,28 +290,24 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
     function variantUnique(value, elem, params) {
         var error = true;
         if (typeof (elem) !== 'undefined') {
-            vRowsCollection.each(function (data) {
-
-                    var parent = $(elem).parents('tr');
-                    if (parent.attr('id') != data.get('id')) {
-                        var flag = false;// all select fields are same
-                        parent.find('select').each(function(index) {
-                            var comparand = $('#variant-grid-'+$(this).data('col')+'-'+data.get('id')).val();
-                            if ($(this).val() !== comparand) {
-                                flag = true; // at least one field is different
-                            }
-                        });
-
-                        if (!flag) {
-
-                            error = false;
+            var parent = $(elem).parents('tr');
+            bodyGrid.find('tr').each(function () {
+                var self = this;
+                var flag = false;
+                if ($(this).attr('id') != parent.attr('id')) {
+                    parent.find('select').each(function(index) {
+                        if ($(this).val() !== $(self).find('select[data-col="'+ $(this).attr('data-col') +'"]').val()) {
+                            flag = true; // at least one field is different
                         }
+                    });
+                    if (!flag) {
+                        error = false;
                     }
+                }
 
-                    return error;
-            });
+                return error;
+            })
         }
-
         return error;
     }
 
@@ -290,6 +316,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
     $.validator.addClassRules("variantUnique", {
         variantUnique: true
     });
+    $('.prod-images-variant-save').click(function() {
+        tr.find('.btn-variant-image').attr('file-id', gridImage.getSelectedRows().pluck('file_id'));
+    });
+
+
 });
 </script>
 
@@ -330,6 +361,22 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
         </div>
     </div>
 </div>
-
+<div class='modal fade' id='prod-images-variant' tabindex='-1'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{{ "Images"|_ }}</h4>
+            </div>
+            <div class='modal-body'>
+                {{ THIS.view('core/backbonegrid').set('grid', prodImagesConfig) | raw }}
+            </div>
+            <div class='modal-footer'>
+                <button class='btn btn-primary btn-add prod-images-variant-save' data-dismiss='modal' type='button'>{{ "Save"|_ }}</button>
+                <button class='btn btn-default btn-close' data-dismiss='modal' type='button'>{{ "Cancel"|_ }}</button>
+            </div>
+        </div>
+    </div>
+</div>
 <input type='hidden' id='vfield_ids' name='vfields' />
 <input type='hidden' id='variants' name='variants' />
