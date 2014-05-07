@@ -94,7 +94,7 @@ class BCache extends BClass
 
     public function getBackend($type = null)
     {
-        if (is_null($type)) { // type not specified
+        if (null === $type) { // type not specified
             $type = $this->_defaultBackend;
         } else {
             $type = strtolower($type);

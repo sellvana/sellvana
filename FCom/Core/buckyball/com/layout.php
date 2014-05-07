@@ -160,7 +160,7 @@ class BLayout extends BClass
      */
     public function setViewRootDir($rootDir, $module = null)
     {
-        if (is_null($module)) {
+        if (null === $module) {
             $module = BModuleRegistry::i()->currentModule();
         }
         $isAbsPath = strpos($rootDir, '/') === 0 || strpos($rootDir, ':') === 1;
@@ -226,7 +226,7 @@ class BLayout extends BClass
 
     public function addAllViewsDir($rootDir = null, $prefix = '', $curModule = null)
     {
-        if (is_null($curModule)) {
+        if (null === $curModule) {
             $curModule = BModuleRegistry::i()->currentModule();
         }
         $this->_addViewsDirs[] = [$rootDir, $prefix, $curModule];
@@ -261,7 +261,7 @@ class BLayout extends BClass
     public function collectAllViewsFiles($area = null)
     {
         $t = BDebug::debug(__METHOD__);
-        if (is_null($area)) {
+        if (null === $area) {
             $area = BApp::i()->get('area');
         }
         $cacheKey = 'ALL_VIEWS-' . $area;
@@ -338,7 +338,7 @@ class BLayout extends BClass
      */
     public function addAllViews($rootDir, $prefix = '', $curModule = null)
     {
-        if (is_null($curModule)) {
+        if (null === $curModule) {
             $curModule = BModuleRegistry::i()->currentModuleName();
         }
         $rootDir = $this->processRootDir($rootDir, $curModule);
@@ -546,7 +546,7 @@ class BLayout extends BClass
      */
     public function cloneView($from, $to = null)
     {
-        if (is_null($to)) {
+        if (null === $to) {
             $to = $from . '-copy';
             for ($i = 2; !empty($this->_views[$to]); $i++) {
                 $to = $from . '-copy' . $i;
@@ -623,7 +623,7 @@ class BLayout extends BClass
      */
     public function layout($layoutName, $layout = null)
     {
-        if (is_array($layoutName) || !is_null($layout)) {
+        if (is_array($layoutName) || null !== $layout) {
             $this->addLayout($layoutName, $layout);
         } else {
             $this->applyLayout($layoutName);
@@ -920,7 +920,7 @@ class BLayout extends BClass
      */
     public function defaultTheme($themeName = null)
     {
-        if (is_null($themeName)) {
+        if (null === $themeName) {
             return $this->_defaultTheme;
         }
         $this->_defaultTheme = $themeName;
@@ -969,7 +969,7 @@ class BLayout extends BClass
      */
     public function getThemes($area = null, $asOptions = false)
     {
-        if (is_null($area)) {
+        if (null === $area) {
             return $this->_themes;
         }
         $themes = [];
@@ -992,7 +992,7 @@ class BLayout extends BClass
      */
     public function applyTheme($themeName = null)
     {
-        if (is_null($themeName)) {
+        if (null === $themeName) {
             if (!$this->_defaultTheme) {
                 BDebug::error('Empty theme supplied and no default theme is set');
             }
@@ -1082,7 +1082,7 @@ class BLayout extends BClass
      */
     public function dispatch($eventName, $routeName = null, $args = [])
     {
-        if (is_null($routeName) && ($route = BRouting::i()->currentRoute())) {
+        if (null === $routeName && ($route = BRouting::i()->currentRoute())) {
             $args['route_name'] = $routeName = $route->route_name;
         }
         $result = BEvents::i()->fire("BLayout::{$eventName}", $args);
@@ -1236,7 +1236,7 @@ class BView extends BClass
      */
     public function param($key = null)
     {
-        if (is_null($key)) {
+        if (null === $key) {
             return $this->_params;
         }
 
@@ -1412,7 +1412,7 @@ class BView extends BClass
      */
     public function getTemplateFileName($fileExt = null, $quiet = false)
     {
-        if (is_null($fileExt)) {
+        if (null === $fileExt) {
             $fileExt = $this->getParam('file_ext');
         }
         $template = $this->param('template');
@@ -1542,7 +1542,7 @@ class BView extends BClass
     {
         $t = BDebug::debug('COLLECT META DATA: ' . $this->getParam('view_name'));
 
-        if (is_null($viewContent)) {
+        if (null === $viewContent) {
             $prerendered = false;
             $viewContent = $this->getParam('source');
             if (!$viewContent) {
@@ -1685,7 +1685,7 @@ class BView extends BClass
      */
     public function q($str, $args = [])
     {
-        if (is_null($str)) {
+        if (null === $str) {
             return '';
         }
         if (!is_scalar($str)) {
@@ -1887,7 +1887,7 @@ class BViewHead extends BView
      */
     public function subst($from, $to = null)
     {
-        if (is_null($to)) {
+        if (null === $to) {
             return str_replace(array_keys($this->_subst), array_values($this->_subst), $from);
         }
         $this->_subst['{' . $from . '}'] = $to;
@@ -1933,7 +1933,7 @@ class BViewHead extends BView
      */
     public function meta($name = null, $content = null, $httpEquiv = false)
     {
-        if (is_null($content)) {
+        if (null === $content) {
             return $this->getMeta($name);
         }
         $this->addMeta($name, $content, $httpEquiv);
@@ -2114,7 +2114,7 @@ if (BDebug::is('DEBUG')) {
      */
     public function getMeta($name = null)
     {
-        if (is_null($name)) {
+        if (null === $name) {
             return join("\n", $this->_meta);
         }
 
@@ -2303,13 +2303,13 @@ if (BDebug::is('DEBUG')) {
 
     public function requireModulePath($name = null, $path = null)
     {
-        if (is_null($name)) {
+        if (null === $name) {
             $m = BApp::m();
             $name = $m->name;
         } else {
             $m = BApp::m($name);
         }
-        if (is_null($path)) {
+        if (null === $path) {
             $path = trim($m->base_src, '/') . '/js';
         }
         BDebug::debug(__METHOD__ . ':' . $name . ':' . $path);
@@ -2320,7 +2320,7 @@ if (BDebug::is('DEBUG')) {
     public function requireJs($name, $path, $shim = null)
     {
         $this->_requireJs['config']['paths'][$name] = $path;
-        if (!is_null($shim)) {
+        if (null !== $shim) {
             $this->_requireJs['config']['shim'][$name] = $shim;
         }
         return $this;

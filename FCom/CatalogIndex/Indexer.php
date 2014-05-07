@@ -171,7 +171,7 @@ class FCom_CatalogIndex_Indexer extends BClass
             foreach ($filterFields as $fName => $field) {
                 $fId = $field->id();
                 $value = !empty($pData[$fName]) ? $pData[$fName] : null;
-                if (is_null($value) || $value === '' || $value === []) {
+                if ($value === null || $value === '' || $value === []) {
                     continue;
                 }
                 foreach ((array)$value as $vKey => $v) {
