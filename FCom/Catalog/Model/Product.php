@@ -851,14 +851,22 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $rs;
     }
 
-    public function getRelatedProducts()
+    public function getProductLink()
     {
-        return [];
-    }
-
-    public function getUpsellProducts()
-    {
-        return [];
+        $arrProduct = FCom_Catalog_Model_Product::i()->orm('p')->select('pl.link_type')
+            ->left_outer_join('FCom_Catalog_Model_ProductLink', ['p.id', '=', 'pl.linked_product_id'], 'pl')
+            ->where('pl.product_id', $this->id)->find_many();
+        $productLink = [
+            'related'=> ['title' => BLocale::_('Related Products'), 'product' => [] ],
+            'similar' => ['title' => BLocale::_('You may also like these items'), 'product' => [] ],
+            'cross_sell' => ['title' => BLocale::_('You may also like these items'), 'product' => [] ]
+        ];
+        foreach ($arrProduct as $product) {
+            if (isset($productLink[$product->get('link_type')])) {
+                array_push($productLink[$product->get('link_type')]['product'], $product);
+            }
+        }
+        return $productLink;
     }
 
     /**
@@ -1029,5 +1037,21 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
         return empty($errors) ? true : $errors;
     }
-}
 
+    public function getDataSerialized($data)
+    {
+        $data_serialized = BUtil::objectToArray(json_decode($this->data_serialized));
+        if ($data == 'custom_fields' && isset($data_serialized[$data])) {
+            return BUtil::objectToArray(json_decode($data_serialized[$data]));
+        }
+        if ($data == 'variants' && isset($data_serialized['variants_fields']) && isset($data_serialized['variants'])) {
+            foreach ($data_serialized['variants'] as &$vr) {
+                if (isset($vr['fields'])) {
+                    $vr['price'] = BLocale::currency($vr['price']);
+                }
+            }
+            return ['variants' => $data_serialized['variants'], 'fields' => $data_serialized['variants_fields']];
+        }
+        return isset($data_serialized[$data]) ? $data_serialized[$data] : array();
+    }
+}

@@ -109,24 +109,10 @@ require(['jquery','underscore','backbone', 'fcom.backbonegrid'], function($, _) 
         originIds = imagesGrid.getRows().pluck('id');
 
         $(imagesGrid.getGridSkeleton().AddButton).click(function() {
-            //refreshGridAdd();
             $('#all_prod_images_modal').modal('show');
         });
 
     }
-
-   /* function refreshGridAdd() {
-        var data = getExcludeId();
-        all_prod_images_grid.getGridSkeleton().current_filters['exclude_id'] = data;
-        rowsAllImages.fetch({reset: true});
-    }
-
-    function getExcludeId() {
-        var arr = imagesGrid.getGridView().collection.pluck('file_id');
-        return  arr.join(',');
-    }*/
-
-
 });
 </script>
 {{ THIS.view('core/backbonegrid').set('grid', prodImagesConfig) | raw }}
