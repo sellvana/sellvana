@@ -1,5 +1,11 @@
 <?php
 
+if (version_compare(PHP_VERSION, '5.4.0', '<')) {
+    header('HTTP/1.1 503 Service Unavailable');
+    header('Status: 503 Service Unavailable');
+    die('<h1>Unsupported PHP version: ' . PHP_VERSION . '</h1><p>PHP 5.4.0 or higher required</p>');
+}
+
 $rootDir = dirname(__DIR__);
 require_once $rootDir.'/FCom/Core/Main.php';
 

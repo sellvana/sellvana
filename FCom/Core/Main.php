@@ -96,13 +96,13 @@ class FCom_Core_Main extends BClass
         $localConfig['web']['base_src'] = $baseSrc;
         $localConfig['web']['base_store'] = $baseStore;
 
-        $permissionErrors = [];
+        $errors = [];
 
         $mediaDir = $config->get('fs/media_dir');
         if (!$mediaDir) {
             $mediaDir = $rootDir . '/media';
             if (!is_writable($mediaDir)) {
-                $permissionErrors[] = $mediaDir;
+                $errors['permissions'][] = $mediaDir;
             }
             $config->set('fs/media_dir', $mediaDir);
         }
@@ -121,7 +121,7 @@ class FCom_Core_Main extends BClass
         if (!$dlcDir) {
             $dlcDir = $rootDir . '/dlc';
             if (!is_writable($dlcDir)) {
-                $permissionErrors[] = $dlcDir;
+                $errors['permissions'][] = $dlcDir;
             }
             $config->set('fs/dlc_dir', $dlcDir);
         }
@@ -136,7 +136,7 @@ class FCom_Core_Main extends BClass
         if (!$storageDir) {
             $storageDir = $rootDir . '/storage';
             if (!is_writable($storageDir)) {
-                $permissionErrors[] = $storageDir;
+                $errors['permissions'][] = $storageDir;
             }
             $config->set('fs/storage_dir', $storageDir);
         }
@@ -169,11 +169,13 @@ class FCom_Core_Main extends BClass
             $config->set('fs/log_dir', $logDir);
         }
 
-        if ($permissionErrors) {
+        $config->add($localConfig);
+
+        if ($errors) {
             BLayout::i()
-                ->addView('permissions', ['template' => __DIR__ . '/views/permissions.php'])
-                ->setRootView('permissions');
-            BLayout::i()->view('permissions')->set('errors', $permissionErrors);
+                ->addView('core/errors', ['template' => __DIR__ . '/views/core/errors.php'])
+                ->setRootView('core/errors');
+            BLayout::i()->view('core/errors')->set('errors', $errors);
             BResponse::i()->output();
             exit;
         }
@@ -181,8 +183,6 @@ class FCom_Core_Main extends BClass
 #echo "<Pre>"; print_r($config->get()); exit;
         // add area module
         BApp::i()->set('area', $area, true);
-
-        $config->add($localConfig);
 
         return $this;
     }
