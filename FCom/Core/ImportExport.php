@@ -13,6 +13,9 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
     const DEFAULT_MODEL_KEY = '_default_model';
     const DEFAULT_STORE_ID = 'default';
     protected $importId;
+    /**
+     * @var FCom_PushServer_Model_Channel
+     */
     protected $channel;
     /**
      * @var string
@@ -178,15 +181,13 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                     $bs = $batch;
         }
 
-        $fromFile = $this->getFullPath($fromFile);
-        if (!is_readable($fromFile)) {
+        $fi = $this->getReadHandle($fromFile);
+        if (!$fi) {
             $this->channel->send(['signal' => 'problem',
                                   'problem' => "Could not find file to import.\n$fromFile"]);
             BDebug::log("Could not find file to import.");
             return false;
         }
-        ini_set("auto_detect_line_endings", 1);
-        $fi = fopen($fromFile, 'r');
         $ieConfig = $this->collectExportableModels();
         $importID = static::DEFAULT_STORE_ID;
         /** @var FCom_Core_Model_ImportExport_Model $ieHelperMod */
@@ -556,6 +557,9 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         if (!$file) {
             $file = $this->_defaultExportFile;
         }
+        if (BUtil::isPathAbsolute($file)){
+            return $file;
+        }
         $path = BConfig::i()->get( 'fs/storage_dir' );
         $ds = DIRECTORY_SEPARATOR;
         $file = $path . $ds . 'export' . $ds . trim( $file, $ds . '\\/' );
@@ -687,5 +691,28 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         }
         $fe = fopen($path, 'w');
         return $fe;
+    }
+
+    /**
+     * @param $fromFile
+     * @return resource|false
+     */
+    protected function getReadHandle($fromFile)
+    {
+        if (is_resource($fromFile)) {
+            return $fromFile;
+        }
+
+        if (strpos($fromFile, '://') !== false) {
+            $path = $fromFile; // allow stream readers
+        } else {
+            $path = $this->getFullPath($fromFile);
+        }
+        if (!is_readable($path)) {
+            return false;
+        }
+        ini_set("auto_detect_line_endings", 1);
+        $fi = fopen($path, 'r');
+        return $fi;
     }
 }
