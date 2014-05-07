@@ -13,6 +13,12 @@
         </div>
     </div>
     <div class="form-group">
+        <label for="db-port" class="control-label col-lg-4">{{ 'Port' |_ }}</label>
+        <div class="col-lg-7">
+            <input type="text" class="form-control" id="db-port" name="w[db][port]" value="{{w.db.port}}" placeholder="3306">
+        </div>
+    </div>
+    <div class="form-group">
         <label for="db-dbname" class="control-label col-lg-4 required">{{ 'Database' |_ }}</label>
         <div class="col-lg-7">
             <input type="text" class="form-control" id="db-dbname" name="w[db][dbname]" value="{{w.db.dbname}}" required>

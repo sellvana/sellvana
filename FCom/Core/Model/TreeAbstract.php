@@ -281,7 +281,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
             }
         }
         $numChildren = $this->get('num_children');
-        if (is_null($numChildren) || sizeof($children) != $numChildren) {
+        if (null === $numChildren || sizeof($children) != $numChildren) {
             $class = get_class($this);
             $orm = $this->orm('t')->where('t.parent_id', $id);
             if ($children) $orm->where_not_in('t.id', array_keys($children));
@@ -311,7 +311,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         }
 #echo "<pre>"; print_r(BDb::many_as_array($desc)); exit;
         $numDescendants = $this->get('num_descendants');
-        if (is_null($numDescendants) || sizeof($desc) != $numDescendants) {
+        if (null === $numDescendants || sizeof($desc) != $numDescendants) {
             $orm = $this->orm('t')->where_like('t.id_path', $path . '%');
             if ($desc) $orm->where_not_in('t.id', array_keys($desc));
             if ($sort) $orm->order_by_asc($sort);

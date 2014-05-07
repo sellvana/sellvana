@@ -2142,43 +2142,12 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                             rowsCollection.remove(selectedRows.models, {silent: true});
                             $('select.' + config.id + '.js-sel').val('');
-                            /*if (config.data_mode == 'local') {
-                                gridView.render({deleteRows: {models: selectedRows.models}})
-                            } else {
-                                gridView.render();
-                            }*/
                             gridView.render();
                             selectedRows.reset();
                         }
                     });
                 }
 
-                /*if ($(BackboneGrid.AddButton).length > 0) {
-                    $(BackboneGrid.AddButton).on('click', function (ev) {
-
-                        ev.preventDefault();
-                        ev.stopPropagation();
-
-                        return false;
-                    });
-                }*/
-
-                //validation
-                /*if (BackboneGrid.validation === true) {
-                    gridView.form = gridView.$el.parents('form:first');
-
-                    gridView.form.submit(function(ev) {
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                        if(!gridView.form.valid()) {
-
-
-                            return false;
-                        }
-
-                        return true;
-                    });
-                }*/
 
 
                 //quick search

@@ -43,12 +43,12 @@ class FCom_Core_Model_Abstract extends BModel
      */
     public function getData($path = null)
     {
-        if (is_null($this->get(static::$_dataCustomField))) {
+        if (null === $this->get(static::$_dataCustomField)) {
             $dataJson = $this->get(static::$_dataSerializedField);
             $this->set(static::$_dataCustomField, $dataJson ? BUtil::fromJson($dataJson) : []);
         }
         $data = $this->get(static::$_dataCustomField);
-        if (is_null($path)) {
+        if (null === $path) {
             return $data;
         }
         $pathArr = explode('/', $path);

@@ -251,7 +251,7 @@ class BApp extends BClass
     public static function m($modName = null)
     {
         $reg = BModuleRegistry::i();
-        return is_null($modName) ? $reg->currentModule() : $reg->module($modName);
+        return null === $modName ? $reg->currentModule() : $reg->module($modName);
     }
 
     const USE_CONFIG = 1;
@@ -595,7 +595,7 @@ class BConfig extends BClass
     public function get($path = null, $default = null, $toSave = false)
     {
         $node = $toSave ? $this->_configToSave : $this->_config;
-        if (is_null($path)) {
+        if (null === $path) {
             return $node;
         }
         foreach (explode('/', $path) as $key) {
@@ -609,10 +609,10 @@ class BConfig extends BClass
 
     public function writeFile($filename, $config = null, $format = null)
     {
-        if (is_null($config)) {
+        if (null === $config) {
             $config = $this->_configToSave;
         }
-        if (is_null($format)) {
+        if (null === $format) {
             $format = pathinfo($filename, PATHINFO_EXTENSION);
         }
         switch ($format) {
@@ -780,7 +780,7 @@ class BClassRegistry extends BClass
                 'module_name' => BModuleRegistry::i()->currentModuleName(),
             ];
             BDebug::debug('OVERRIDE CLASS: ' . $class . ' -> ' . $newClass);
-        } elseif (is_null($newClass)) {
+        } elseif (null === $newClass) {
             if (empty(static::$_classes[$class])) {
                 return;
             }
@@ -1476,7 +1476,7 @@ class BEvents extends BClass
             }
             return $this;
         }
-        if (is_null($alias) && is_string($callback)) {
+        if (null === $alias && is_string($callback)) {
             $alias = $callback;
         }
         $observer = ['callback' => $callback, 'args' => $args, 'alias' => $alias];
@@ -1720,7 +1720,7 @@ class BSession extends BClass
      */
     public function open($id = null, $autoClose = false)
     {
-        if (!is_null($this->data)) {
+        if (null !== $this->data) {
             return $this;
         }
         $config = BConfig::i()->get('cookie');
@@ -1840,7 +1840,7 @@ BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
     */
     public function dirty($flag = null)
     {
-        if (is_null($flag)) {
+        if (null === $flag) {
             return $this->_dirty;
         }
         BDebug::debug('SESSION.DIRTY ' . ($flag ? 'TRUE' : 'FALSE'), 2);
@@ -2041,7 +2041,7 @@ class BSession_APC extends BClass
 
     public function register($ttl = null)
     {
-        if (!is_null($ttl)) {
+        if (null !== $ttl) {
             $this->_ttl = $ttl;
         }
         session_set_save_handler(
