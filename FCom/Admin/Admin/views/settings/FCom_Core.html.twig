@@ -6,6 +6,7 @@
 {{ forms.accordion_start({id:'settings-FCom_Core'}) }}
     {{ forms.accordion_panel_start({label:'DB Settings'|_, id:'settings-FCom_Core-group0', in:1}) }}
         {{ forms.input({ name:'config[db][host]', label:'Host'|_, value:c.get('db/host') }) }}
+        {{ forms.input({ name:'config[db][port]', label:'Port'|_, value:c.get('db/port') }) }}
         {{ forms.input({ name:'config[db][dbname]', label:'Database'|_, value:c.get('db/dbname') }) }}
         {{ forms.input({ name:'config[db][username]', label:'Username'|_, value:c.get('db/username')}) }}
         {{ forms.input({ name:'config[db][password]', label:'Password'|_, value:c.get('db/password')?'*****':'', type:'password', placeholder:'*****' }) }}

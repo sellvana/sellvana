@@ -95,8 +95,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         $m = $args['model'];
         /** @var $m FCom_Customer_Model_Customer */
         $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media';
-        $resize_url = FCom_Core_Main::i()->resizeUrl();
-        $silhouetteImg = $resize_url . '?f=' . urlencode(trim($media . '/silhouette.jpg', '/')) . '&s=98x98';
+        $silhouetteImg = FCom_Core_Main::i()->resizeUrl($media . '/silhouette.jpg', ['s' => 98]);
         $actions = $args['view']->get('actions');
         if ($m->id) {
             $actions = array_merge($actions, [

@@ -131,8 +131,8 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     public function variantImageGridConfig($model)
     {
-        $download_url = BApp::href('/media/grid/download?folder=media/product/images&file=');
-        $thumb_url = FCom_Core_Main::i()->resizeUrl() . '?s=100x100&f=' . BConfig::i()->get('web/media_dir') . '/' . 'product/images';
+        $downloadUrl = BApp::href('/media/grid/download?folder=media/product/images&file=');
+        $thumbUrl = FCom_Core_Main::i()->resizeUrl(BConfig::i()->get('web/media_dir') . '/product/images', ['s' => 100]);
         $data = BDb::many_as_array($model->mediaORM('I')
             ->order_by_expr('pa.position asc')
             ->left_outer_join('FCom_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'pm.file_id'], 'pm')
@@ -153,8 +153,8 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                     ['name' => 'id', 'hidden' => true],
                     ['name' => 'file_id',  'hidden' => true],
                     ['name' => 'product_id', 'hidden' => true, 'default' => $model->id()],
-                    ['name' => 'download_url',  'hidden' => true, 'default' => $download_url],
-                    ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumb_url],
+                    ['name' => 'download_url',  'hidden' => true, 'default' => $downloadUrl],
+                    ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumbUrl],
                     ['name' => 'file_name', 'label' => 'File Name'],
                     ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
                         'print' => '"<a href=\'"+rc.row["download_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\'>'

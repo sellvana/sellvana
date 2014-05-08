@@ -61,22 +61,19 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public static function afterInitialData($rows)
     {
-
-        $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media/';
-        $resize_url = FCom_Core_Main::i()->resizeUrl();
+        $mediaUrl = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media';
+        $hlp = FCom_Core_Main::i();
         foreach ($rows as & $row) {
-            $thumbUrl = $row['thumb_url'];
-            $url = $media . '/' . ($thumbUrl ? $thumbUrl : 'image-not-found.jpg');
-            $row['thumb_path'] = $resize_url . '?f=' . urlencode(trim($url, '/')) . '&s=68x68';
+            $thumbUrl = $row['thumb_url'] ? $row['thumb_url'] : 'image-not-found.png';
+            $row['thumb_path'] = $hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]);
         }
-
         return $rows;
     }
 
     public function gridDataAfter($data)
     {
-        $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media/';
-        $resize_url = FCom_Core_Main::i()->resizeUrl();
+        $mediaUrl = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media';
+        $hlp = FCom_Core_Main::i();
 
         $data = parent::gridDataAfter($data);
         foreach ($data['rows'] as $row) {
@@ -85,10 +82,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 $row->set($customRowData);
                 $row->set('data', null);
             }
-
-            $thumbUrl = $row->thumb_url;
-            $url = $media . '/' . ($thumbUrl ? $thumbUrl : 'image-not-found.jpg');
-            $row->set('thumb_path', $resize_url . '?f=' . urlencode(trim($url, '/')) . '&s=68x68');
+            $thumbUrl = $row->get('thumb_url') ? $row->get('thumb_url') : 'image-not-found.png';
+            $row->set('thumb_path', $hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]));
         }
         unset($row);
         return $data;
@@ -219,9 +214,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function productImagesGridConfig($model)
     {
-
-        $download_url = BApp::href('/media/grid/download?folder=media/product/images&file=');
-        $thumb_url = FCom_Core_Main::i()->resizeUrl() . '?s=100x100&f=' . BConfig::i()->get('web/media_dir') . '/' . 'product/images';
+        $downloadUrl = BApp::href('/media/grid/download?folder=media/product/images&file=');
+        $thumbUrl = FCom_Core_Main::i()->resizeUrl(BConfig::i()->get('web/media_dir') . '/product/images', ['s' => 100]);
         $data = BDb::many_as_array($model->mediaORM('I')
                 ->order_by_expr('pa.position asc')
                 ->left_outer_join('FCom_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'pm.file_id'], 'pm')
@@ -242,8 +236,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     ['name' => 'id', 'hidden' => true],
                     ['name' => 'file_id',  'hidden' => true],
                     ['name' => 'product_id', 'hidden' => true, 'default' => $model->id()],
-                    ['name' => 'download_url',  'hidden' => true, 'default' => $download_url],
-                    ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumb_url],
+                    ['name' => 'download_url',  'hidden' => true, 'default' => $downloadUrl],
+                    ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumbUrl],
                     ['name' => 'file_name', 'label' => 'File Name'],
                     ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
                         'print' => '"<a href=\'"+rc.row["download_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\'>'
