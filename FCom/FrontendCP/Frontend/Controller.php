@@ -9,7 +9,7 @@ class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abstract
         }
         $result = BRequest::i()->receiveFiles('image', BConfig::i()->get('fs/media_dir') . '/tmp');
         $imgUrl = BConfig::i()->get('web/media_dir') . '/tmp/' . $result['image']['name'];
-        $imgUrl = FCom_Core_Main::i()->resizeUrl() . '?f=' . urlencode(ltrim($imgUrl, '/'));
+        $imgUrl = FCom_Core_Main::i()->resizeUrl($imgUrl);
         BResponse::i()->json(['image' => ['url' => $imgUrl]]);
     }
 
