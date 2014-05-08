@@ -94,11 +94,13 @@
                             <div class="form-group" style="overflow: hidden">
                                 <label class="col-md-3 control-label">{{ field.name |_ }}</label>
                                 <div class="col-md-5">
-                                    <select id="{{ field.name }}" name="{{ field.name }}" class="form-control variant" style="width:auto">
-                                        {% for vr  in variants.variants %}
-                                            <option value="{{ vr.fields[field.name] }}">{{ vr.fields[field.name]|_ }}</option>
-                                        {% endfor %}
-                                    </select>
+                                    {% if field.options %}
+                                        <select id="{{ field.name }}" name="{{ field.name }}" class="form-control variant" style="width:auto">
+                                            {% for key,val  in field.options %}
+                                                <option value="{{ key }}">{{ val|_ }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% endif %}
                                 </div>
                             </div>
                         {% endfor %}
@@ -220,8 +222,7 @@
 
         $('#product-rslides li').addClass('zoom').zoom();
         var variants = $.parseJSON('{{ UTIL.toJson(variants.variants)|raw }}');
-
-        if (variants.length > 0) {
+        if (variants != null) {
             priceVariant.html(variants[0].price);
             if (variants[0].qty == 0) {
                 quantityVariant.val(0);
@@ -267,22 +268,25 @@
                     find = obj;
                 }
             })
+            var image = [];
+            displayAllImage.addClass('hidden');
             if (find == null || find.qty == 0) {
                 priceVariant.html("$0.00");
                 quantityVariant.val(0);
                 $('#prod-in-stock').html('Items not available.');
-                displayImage([]);
                 $('#prod-add-to-card').prop('disabled', true);
-                displayAllImage.addClass('hidden');
             } else {
                 priceVariant.html(find.price);
                 quantityVariant.val(1);
                 $('#prod-in-stock').html(find.qty + ' Items In Stock.');
-                var image = (find.file_id == '')? []: find.file_id.split(',');
+                if (find.file_id != '') {
+                    image = find.file_id.split(',');
+                    displayAllImage.removeClass('hidden');
+                }
                 $('#prod-add-to-card').prop('disabled', false);
-                displayAllImage.removeClass('hidden');
-                displayImage(image);
+
             }
+            displayImage(image);
         });
         displayAllImage.click(function () {
             displayImage([]);

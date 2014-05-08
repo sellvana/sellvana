@@ -59,6 +59,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     public function variantGridConfig($model)
     {
+        $thumbUrl = FCom_Core_Main::i()->resizeUrl(BConfig::i()->get('web/media_dir') . '/product/images', ['s' => 30]);
         $columns = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true, 'position' => 1]
@@ -72,6 +73,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $f['options'] = FCom_CustomField_Model_FieldOption::i()->getListAssocById($f['id']);
                 $f['label'] = $f['name'];
                 $f['editable'] = 'inline';
+                $f['field_id'] = $f['id'];
                 $f['addable'] = true;
                 $f['mass-editable'] = true;
                 $f['width'] = 150;
@@ -82,14 +84,19 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $columns[] = $f;
             }
         }
+        $image = $this->variantImageGrid($model);
         $columns[] = ['type' => 'input', 'name' => 'sku', 'label' => 'SKU', 'width' => 150, 'editable' => 'inline',
                         'addable' => true, 'validation' => ['required' => true], 'default' => ''];
         $columns[] = ['type' => 'input', 'name' => 'price', 'label' => 'PRICE', 'width' => 150, 'editable' => 'inline',
                         'addable' => true, 'validation' => ['required' => true, 'number' => true], 'default' => ''];
         $columns[] = ['type' => 'input', 'name' => 'qty', 'label' => 'QTY', 'width' => 150, 'editable' => 'inline',
                         'addable' => true, 'validation' => ['required' => true, 'number' => true], 'default' => ''];
+        $columns[] = ['name' => 'image', 'label' => 'IMAGES', 'width' => 250, 'display' => 'eval',
+            'addable' => true, 'sortable' => false, 'print' => '"<input type=\"hidden\" class=\"store-variant-image-id\" value=\'"+ rc.row["file_id"] +"\'/><ol class=\"dd-list columns dd-list-axis-x list-variant-image\"></ol><select class=\"form-control variant-image\"><option value></option></select>"' ];
         $columns[] = ['name' => 'file_id',  'hidden' => true];
-        $columns[] = ['type' => 'btn_group',  'buttons' => [['name' => 'delete'], ['name' => 'custom', 'cssClass' => 'btn-variant-image', 'icon' => 'icon-picture']]];
+        $columns[] = ['name' => 'list_image',  'hidden' => true, 'default' => $image];
+        $columns[] = ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumbUrl];
+        $columns[] = ['type' => 'btn_group',  'buttons' => [['name' => 'delete']] ];
 
         $data = [];
 
@@ -129,50 +136,16 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     }
 
-    public function variantImageGridConfig($model)
+    public function variantImageGrid($model)
     {
-        $downloadUrl = BApp::href('/media/grid/download?folder=media/product/images&file=');
-        $thumbUrl = FCom_Core_Main::i()->resizeUrl(BConfig::i()->get('web/media_dir') . '/product/images', ['s' => 100]);
         $data = BDb::many_as_array($model->mediaORM('I')
-            ->order_by_expr('pa.position asc')
             ->left_outer_join('FCom_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'pm.file_id'], 'pm')
-            ->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name',
-                'a.file_size', 'pa.create_at', 'pa.update_at', 'pa.main_thumb'])
+            ->select(['pa.id', 'pa.position',  'a.file_name'])
             ->select('a.id', 'file_id')
             ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
             ->group_by('pa.id')
             ->find_many());
-        return [
-            'config' => [
-                'id' => 'prod_images_variant_'.$model->get('id'),
-                'caption' => 'Product Images',
-                'data_mode' => 'local',
-                'data' => $data,
-                'columns' => [
-                    ['type' => 'row_select'],
-                    ['name' => 'id', 'hidden' => true],
-                    ['name' => 'file_id',  'hidden' => true],
-                    ['name' => 'product_id', 'hidden' => true, 'default' => $model->id()],
-                    ['name' => 'download_url',  'hidden' => true, 'default' => $downloadUrl],
-                    ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumbUrl],
-                    ['name' => 'file_name', 'label' => 'File Name'],
-                    ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
-                        'print' => '"<a href=\'"+rc.row["download_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\'>'
-                            . '<img src=\'"+rc.row["thumb_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' '
-                            . 'alt=\'"+rc.row["file_name"]+"\' ></a>"',
-                        'sortable' => false],
-                ],
-                'actions' => [
-                ],
-                'grid_before_create' => 'imagesGridRegister',
-                'filters' => [
-                    ['field' => 'file_name', 'type' => 'text'],
-                    ['field' => 'label', 'type' => 'text'],
-                    '_quick' => ['expr' => 'file_name like ? ', 'args' => ['%?%']]
-                ],
-
-            ]
-        ];
+        return $data;
     }
 
     /**
