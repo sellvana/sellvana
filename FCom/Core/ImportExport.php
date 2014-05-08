@@ -100,7 +100,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             return false;
         }
 
-        $bs = BConfig::i()->get( "FCom_Core/import_export/batch_size", 100 );
+        $bs = BConfig::i()->get("module/FCom_Core/import_export/batch_size", 100);
 
         if ($batch && is_numeric($batch)) {
             $bs = $batch;
@@ -182,7 +182,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         /** @var FCom_PushServer_Model_Channel $channel */
         $this->channel = FCom_PushServer_Model_Channel::i()->getChannel('import', true);
         $this->channel->send(['signal' => 'start', 'msg' => "Import started."]);
-        $bs = BConfig::i()->get("FCom_Core/import_export/batch_size", 100);
+        $bs = BConfig::i()->get("modules/FCom_Core/import_export/batch_size", 100);
         if($batch && is_numeric($batch)){
                     $bs = $batch;
         }
@@ -340,20 +340,13 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         }
         fclose($fi);
         $this->channel->send([
-            'signal' => 'new_models',
-            'msg'    => BLocale::_("Created %d new models", $this->newModels)
-        ]);
-        $this->channel->send([
-            'signal' => 'updated_models',
-            'msg'    => BLocale::_("Updated %d models", $this->updatedModels)
-        ]);
-        $this->channel->send([
             'signal' => 'finished',
-            'msg'    => BLocale::_("No changes for %d models", $this->notChanged)
-        ]);
-        $this->channel->send([
-            'signal' => 'finished',
-            'msg'    => "Done in: " . round(microtime(true) - $start) . " sec."
+            'msg'    => "Done in: " . round(microtime(true) - $start) . " sec.",
+            'data'   => [
+                'new_models'     => BLocale::_("Created %d new models", $this->newModels),
+                'updated_models' => BLocale::_("Updated %d models", $this->updatedModels),
+                'not_changed'    => BLocale::_("No changes for %d models", $this->notChanged)
+            ]
         ]);
 
         return true;
