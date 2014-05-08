@@ -13,49 +13,49 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
     public function getExportConfig()
     {
         $config                = parent::gridConfig();
-        $config[ 'id' ]        = 'ie_export_grid';
-        $config[ 'data_mode' ] = 'local';
+        $config['id']        = 'ie_export_grid';
+        $config['data_mode'] = 'local';
 
-        $config[ 'columns' ]            = [
-            [ 'type' => 'row_select' ],
-            [ 'name' => 'model', 'label' => 'Models to export' ],
+        $config['columns']            = [
+            ['type' => 'row_select'],
+            ['name' => 'model', 'label' => 'Models to export'],
         ];
-        $config[ 'filters' ]            = [ [ 'field' => 'model', 'type' => 'text' ] ];
-        $config[ 'grid_before_create' ] = 'modelsGridRegister';
+        $config['filters']            = [['field' => 'model', 'type' => 'text']];
+        $config['grid_before_create'] = 'modelsGridRegister';
         $data                           = FCom_Core_ImportExport::i()->collectExportableModels();
-        ksort( $data );
+        ksort($data);
         $default         = [
             'model'    => '',
             'parent'   => null,
             'children' => []
         ];
         $fcom            = $default;
-        $fcom[ 'id' ]    = 'FCom';
-        $fcom[ 'model' ] = 'FCom';
-        $gridData        = [ 'FCom' => $fcom ];
-        foreach ( $data as $id => $d ) {
-            $module = explode( '_', $id, 3 );
-            array_splice( $module, 2 );
-            $module = join( '_', $module );
-            if ( !isset( $gridData[ $module ] ) ) {
+        $fcom['id']    = 'FCom';
+        $fcom['model'] = 'FCom';
+        $gridData        = ['FCom' => $fcom];
+        foreach ($data as $id => $d) {
+            $module = explode('_', $id, 3);
+            array_splice($module, 2);
+            $module = join('_', $module);
+            if (!isset($gridData[$module])) {
                 $mod                                 = $default;
-                $mod[ 'id' ]                         = $module;
-                $mod[ 'model' ]                      = $module;
-                $mod[ 'parent' ]                     = 'FCom';
-                $gridData[ $module ]                 = $mod;
-                $gridData[ 'FCom' ][ 'children' ][] = $module;
+                $mod['id']                         = $module;
+                $mod['model']                      = $module;
+                $mod['parent']                     = 'FCom';
+                $gridData[$module]                 = $mod;
+                $gridData['FCom']['children'][] = $module;
             }
             $obj                                  = $default;
-            $obj[ 'id' ]                          = $id;
-            $obj[ 'model' ]                       = $id;
-            $obj[ 'parent' ]                      = $module;
-            $gridData[ $id ]                      = $obj;
-            $gridData[ $module ][ 'children' ][] = $id;
+            $obj['id']                          = $id;
+            $obj['model']                       = $id;
+            $obj['parent']                      = $module;
+            $gridData[$id]                      = $obj;
+            $gridData[$module]['children'][] = $id;
         }
 
-        $config[ 'data' ] = $gridData;
+        $config['data'] = $gridData;
 
-        return [ 'config' => $config ];
+        return ['config' => $config];
     }
 
     /**
@@ -63,14 +63,14 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
      * @param $model FCom_Admin_Model_Role
      * @return array
      */
-    public function getIeConfig( $model )
+    public function getIeConfig($model)
     {
 
         $config                         = parent::gridConfig();
-        $config[ 'id' ]                 = 'role_all_ie_perm_grid_' . $model->id();
-        $config[ 'data_mode' ]          = 'local';
-        $config[ 'columns' ]            = [
-            [ 'name' => 'permission_name', 'label' => 'Permission Name', 'width' => 250 ],
+        $config['id']                 = 'role_all_ie_perm_grid_' . $model->id();
+        $config['data_mode']          = 'local';
+        $config['columns']            = [
+            ['name' => 'permission_name', 'label' => 'Permission Name', 'width' => 250],
             [
                 'type'     => 'input',
                 'name'     => 'import',
@@ -88,17 +88,17 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 'editor'   => 'checkbox',
             ],
         ];
-        $config[ 'actions' ]            = [
-            'add' => [ 'caption' => 'Add selected models' ]
+        $config['actions']            = [
+            'add' => ['caption' => 'Add selected models']
         ];
-        $config[ 'filters' ]            = [
-            [ 'field' => 'permission_name', 'type' => 'text' ],
+        $config['filters']            = [
+            ['field' => 'permission_name', 'type' => 'text'],
         ];
-        $config[ 'events' ]             = [ 'add' ];
-        $config[ 'grid_before_create' ] = 'iePermGridRegister';
+        $config['events']             = ['add'];
+        $config['grid_before_create'] = 'iePermGridRegister';
 
         $data                      = FCom_Core_ImportExport::i()->collectExportableModels();
-        $permissions               = array_flip( explode( "\n", $model->get( 'permissions_data' ) ) );
+        $permissions               = array_flip(explode("\n", $model->get('permissions_data')));
         $default                   = [
             'permission_name' => '',
             'import'          => 0,
@@ -107,77 +107,77 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
             'children'        => []
         ];
         $fcom                      = $default;
-        $fcom[ 'id' ]              = 'FCom';
-        $fcom[ 'permission_name' ] = 'FCom';
-        $gridData                  = [ 'FCom' => $fcom ];
-        foreach ( $data as $id => $d ) {
-            $module = explode( '_', $id, 3 );
-            array_splice( $module, 2 );
-            $module = join( '_', $module );
-            if ( !isset( $gridData[ $module ] ) ) {
+        $fcom['id']              = 'FCom';
+        $fcom['permission_name'] = 'FCom';
+        $gridData                  = ['FCom' => $fcom];
+        foreach ($data as $id => $d) {
+            $module = explode('_', $id, 3);
+            array_splice($module, 2);
+            $module = join('_', $module);
+            if (!isset($gridData[$module])) {
                 $mod                                 = $default;
-                $mod[ 'id' ]                         = $module;
-                $mod[ 'permission_name' ]            = $module;
-                $mod[ 'parent' ]                     = 'FCom';
-                $gridData[ $module ]                 = $mod;
-                $gridData[ 'FCom' ][ 'children' ][] = $module;
+                $mod['id']                         = $module;
+                $mod['permission_name']            = $module;
+                $mod['parent']                     = 'FCom';
+                $gridData[$module]                 = $mod;
+                $gridData['FCom']['children'][] = $module;
             }
             $obj                                  = $default;
-            $obj[ 'id' ]                          = $id;
-            $obj[ 'permission_name' ]             = $id;
-            $obj[ 'parent' ]                      = $module;
-            $gridData[ $id ]                      = $obj;
-            $gridData[ $module ][ 'children' ][] = $id;
+            $obj['id']                          = $id;
+            $obj['permission_name']             = $id;
+            $obj['parent']                      = $module;
+            $gridData[$id]                      = $obj;
+            $gridData[$module]['children'][] = $id;
         }
 
-        foreach ( $gridData as $id => &$value ) {
-            $parent = $value[ 'parent' ];
-            if ( isset( $permissions[ $id . '/import' ] ) || isset( $permissions[ $parent . '/import' ] ) ) {
-                $value[ 'import' ] = 1;
+        foreach ($gridData as $id => &$value) {
+            $parent = $value['parent'];
+            if (isset($permissions[$id . '/import']) || isset($permissions[$parent . '/import'])) {
+                $value['import'] = 1;
             }
-            if ( isset( $permissions[ $id . '/export' ] ) || isset( $permissions[ $parent . '/export' ] ) ) {
-                $value[ 'export' ] = 1;
+            if (isset($permissions[$id . '/export']) || isset($permissions[$parent . '/export'])) {
+                $value['export'] = 1;
             }
         }
 
-        $config[ 'data' ] = $gridData;
+        $config['data'] = $gridData;
 
-        return [ 'config' => $config ];
+        return ['config' => $config];
     }
 
     public function action_index()
     {
-        $model[ 'export_config' ] = $this->getExportConfig();
+        $model['export_config'] = $this->getExportConfig();
         $this->formMessages();
-        $view = $this->view( $this->_formViewName )->set( 'model', $model );
+        $view = $this->view($this->_formViewName)->set('model', $model);
 
-        if ( $this->_formTitle && ( $head = $this->view( 'head' ) ) ) {
-            $head->addTitle( $this->_formTitle );
+        if ($this->_formTitle && ($head = $this->view('head'))) {
+            $head->addTitle($this->_formTitle);
         }
 
-        if ( ( $nav = $this->view( 'admin/nav' ) ) ) {
-            $nav->setNav( $this->_navPath );
+        if (($nav = $this->view('admin/nav'))) {
+            $nav->setNav($this->_navPath);
         }
 
         $this->layout();
-        BLayout::i()->view( 'admin/form' )->set( 'tab_view_prefix', $this->_formViewPrefix );
-        if ( $this->_useDefaultLayout ) {
-            BLayout::i()->applyLayout( 'default_form' );
+        BLayout::i()->view('admin/form')->set('tab_view_prefix', $this->_formViewPrefix);
+        if ($this->_useDefaultLayout) {
+            BLayout::i()->applyLayout('default_form');
         }
-        BLayout::i()->applyLayout( $this->_formLayoutName );
+        BLayout::i()->applyLayout($this->_formLayoutName);
 
-        $this->processFormTabs( $view, $model );
+        $this->processFormTabs($view, $model);
     }
 
     public function action_export()
     {
-        $exportData = BRequest::i()->post( 'ie_export_grid' );
-        $toFile = isset( $exportData[ 'export_file_name' ] ) ? $exportData[ 'export_file_name' ] : null;
-        $models = !empty( $exportData[ 'checked' ] ) ? array_keys( $exportData[ 'checked' ] ) : null;
+        $exportData = BRequest::i()->post('ie_export_grid');
+        $toFile = isset($exportData['export_file_name']) ? $exportData['export_file_name'] : null;
+        $models = !empty($exportData['checked']) ? array_keys($exportData['checked']) : null;
 
-        if ( $models ) {
-            foreach ( $models as $m ) {
-                if ( $m == 'FCom' ) {
+        if ($models) {
+            foreach ($models as $m) {
+                if ($m == 'FCom') {
                     // if FCom is selected to export, this means all should be exported.
                     $models = null;
                     break;
@@ -185,7 +185,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
             }
 
         }
-        $result = FCom_Core_ImportExport::i()->export( $models, $toFile );
-        BResponse::i()->json( [ 'result' => print_r( $result, 1 ) ] );
+        $result = FCom_Core_ImportExport::i()->export($models, $toFile);
+        BResponse::i()->json(['result' => print_r($result, 1)]);
     }
 }

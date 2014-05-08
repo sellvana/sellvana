@@ -23,9 +23,9 @@ class BFtpClientTest extends PHPUnit_Framework_TestCase
                  'password' => $this->password,
             ]
         );
-        $testFile     = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'ftp/test.txt';
-        if ( file_exists( $testFile ) == false ) {
-            $this->fail( sprintf( "To test BFtpClient, you need to have ftp/test.txt in %s folder.", dirname( __FILE__ ) ) );
+        $testFile     = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'ftp/test.txt';
+        if (file_exists($testFile) == false) {
+            $this->fail(sprintf("To test BFtpClient, you need to have ftp/test.txt in %s folder.", dirname(__FILE__)));
         }
     }
 
@@ -34,11 +34,11 @@ class BFtpClientTest extends PHPUnit_Framework_TestCase
      */
     public function testFtpUpload()
     {
-        $this->markTestSkipped( "If you have actual FTP server to use, comment this line out to test its connection." );
-        $from = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'ftp/test.txt';
+        $this->markTestSkipped("If you have actual FTP server to use, comment this line out to test its connection.");
+        $from = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'ftp/test.txt';
         $to   = 'ftp/test.txt';
 
-        $result = $this->object->ftpUpload( $from, $to );
-        $this->assertEmpty( $result ); // empty result means no errors
+        $result = $this->object->ftpUpload($from, $to);
+        $this->assertEmpty($result); // empty result means no errors
     }
 }

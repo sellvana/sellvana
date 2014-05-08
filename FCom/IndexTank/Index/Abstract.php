@@ -7,18 +7,18 @@ class FCom_IndexTank_Index_Abstract extends BClass
     *
     * @return FCom_IndexTank_Index_Abstract
     */
-    public static function i( $new = false, array $args = [] )
+    public static function i($new = false, array $args = [])
     {
-        return BClassRegistry::instance( __CLASS__, $args, !$new );
+        return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
-    public function paginate( $orm, $r, $d = [] )
+    public function paginate($orm, $r, $d = [])
     {
         $rbak = $r;
-        $r[ 'sc' ] = null;
-        $d[ 'donotlimit' ] = true;
-        $res = $orm->paginate( $r, $d );
-        $res[ 'state' ][ 'sc' ] = !empty( $rbak[ 'sc' ] ) ? $rbak[ 'sc' ] : '';
+        $r['sc'] = null;
+        $d['donotlimit'] = true;
+        $res = $orm->paginate($r, $d);
+        $res['state']['sc'] = !empty($rbak['sc']) ? $rbak['sc'] : '';
         return $res;
     }
 }

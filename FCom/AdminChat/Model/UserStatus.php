@@ -16,55 +16,55 @@ class FCom_AdminChat_Model_UserStatus extends FCom_Core_Model_Abstract
 
     static protected $_sessionUserStatus;
 
-    public function sessionUserStatus( $createIfNotExists = false, $defaultStatus = 'offline' )
+    public function sessionUserStatus($createIfNotExists = false, $defaultStatus = 'offline')
     {
-        if ( !static::$_sessionUserStatus ) {
+        if (!static::$_sessionUserStatus) {
             $userId = FCom_Admin_Model_User::i()->sessionUserId();
-            if ( !$userId ) {
+            if (!$userId) {
                 return false;
             }
 
-            static::$_sessionUserStatus = static::load( $userId, 'user_id' );
+            static::$_sessionUserStatus = static::load($userId, 'user_id');
 
-            if ( $createIfNotExists && !static::$_sessionUserStatus ) {
-                static::$_sessionUserStatus = static::create( [
+            if ($createIfNotExists && !static::$_sessionUserStatus) {
+                static::$_sessionUserStatus = static::create([
                     'user_id' => $userId,
                     'status' => $defaultStatus,
-                ] );
+                ]);
             }
         }
         return static::$_sessionUserStatus;
     }
 
-    public function changeStatus( $status, $userId = null )
+    public function changeStatus($status, $userId = null)
     {
-        $userStatus = $this->sessionUserStatus( true );
-        if ( $userStatus->get( 'status' ) != $status ) {
-            $userStatus->set( 'status', $status )->save();
+        $userStatus = $this->sessionUserStatus(true);
+        if ($userStatus->get('status') != $status) {
+            $userStatus->set('status', $status)->save();
 
             $userHlp = FCom_Admin_Model_User::i();
-            if ( is_null( $userId ) || $userHlp->sessionUserId() === $userId ) {
+            if (is_null($userId) || $userHlp->sessionUserId() === $userId) {
                 $user = $userHlp->sessionUser();
             } else {
-                $user = $userHlp->load( $userId );
+                $user = $userHlp->load($userId);
             }
-            $channel = FCom_PushServer_Model_Channel::i()->getChannel( 'adminuser', true );
-            $channel->send( [
+            $channel = FCom_PushServer_Model_Channel::i()->getChannel('adminuser', true);
+            $channel->send([
                 'signal' => 'status',
                 'users' => [
-                    [ 'username' => $user->get( 'username' ), 'status' => $status ],
+                    ['username' => $user->get('username'), 'status' => $status],
                 ],
-            ] );
+            ]);
         }
         return $this;
     }
 
     public function onBeforeSave()
     {
-        if ( !parent::onBeforeSave() ) return false;
+        if (!parent::onBeforeSave()) return false;
 
-        $this->set( 'create_at', BDb::now(), 'IFNULL' );
-        $this->set( 'update_at', BDb::now() );
+        $this->set('create_at', BDb::now(), 'IFNULL');
+        $this->set('update_at', BDb::now());
 
         return true;
     }

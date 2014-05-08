@@ -10,13 +10,13 @@ class FCom_IndexTank_Tests_Index_ProductTest extends PHPUnit_Framework_TestCase
 
     public function testIndex()
     {
-        $this->assertTrue( is_object( $this->_model ) );
+        $this->assertTrue(is_object($this->_model));
     }
 
     public function testIndexStatus()
     {
         $status = FCom_IndexTank_Index_Product::i()->status();
-        $this->assertTrue( is_array( $status ) );
+        $this->assertTrue(is_array($status));
     }
 
 }

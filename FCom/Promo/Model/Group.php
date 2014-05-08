@@ -7,6 +7,6 @@ class FCom_Promo_Model_Group extends BModel
 
     public function products()
     {
-        return FCom_Promo_Model_Product::i()->orm()->where( 'group_id', $this->id )->find_many();
+        return FCom_Promo_Model_Product::i()->orm()->where('group_id', $this->id)->find_many();
     }
 }

@@ -1,4 +1,4 @@
-<?php return [ 'Credit Card' => '',
+<?php return ['Credit Card' => '',
 'Card Type' => '',
 'Visa' => '',
 'MasterCard' => '',
@@ -7,4 +7,4 @@
 'Expires' => '',
 'Choose' => '',
 'CVV' => '',
-'Apply changes' => '' ];
+'Apply changes' => ''];

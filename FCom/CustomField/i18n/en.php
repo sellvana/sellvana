@@ -1,1 +1,1 @@
-<?php return [ 'Custom fields here' => '' ];
+<?php return ['Custom fields here' => ''];

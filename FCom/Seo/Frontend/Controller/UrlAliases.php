@@ -4,22 +4,22 @@ class FCom_Seo_Frontend_Controller_UrlAliases extends FCom_Frontend_Controller_A
 {
     public function action_index()
     {
-        $url = BRequest::i()->param( 'url' );
-        if ( $url === '' || is_null( $url ) ) {
-            $this->forward( false );
+        $url = BRequest::i()->param('url');
+        if ($url === '' || null === $url) {
+            $this->forward(false);
             return;
         }
-        $alias = FCom_Seo_Model_UrlAlias::i()->findByUrl( $url );
-        if ( !$alias ) {
-            $this->forward( false );
+        $alias = FCom_Seo_Model_UrlAlias::i()->findByUrl($url);
+        if (!$alias) {
+            $this->forward(false);
             return;
         }
-        switch ( $alias->redirect_type ) {
+        switch ($alias->redirect_type) {
         case 'FWD':
-            $this->forward( true, $alias->target_url );
+            $this->forward(true, $alias->target_url);
             break;
         case '301': case '302':
-            BResponse::i()->redirect( $alias->targetUrl(), $alias->redirect_type );
+            BResponse::i()->redirect($alias->targetUrl(), $alias->redirect_type);
             break;
         }
     }
