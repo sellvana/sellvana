@@ -95,7 +95,17 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                 formatSelection: format,
                 maximumSelectionSize: 3
             });
+            this.$el.find('.field-value').select2();
+            this.$el.find('.select-value-field').select2({
+                allowClear: true,
+                data: [{id: 0, text: 'story'},{id: 1, text: 'bug'},{id: 2, text: 'task'}]
+            });
             this.$el.find('select:not(.variant-image)').addClass('variantUnique');
+        }
+
+        grid.getGridSkeleton().Views.RowView.prototype._deleteRow = function() {
+            grid.getRows().remove(this.model/*, {silent: true}*/);
+            grid.getSelectedRows().remove(this.model, {silent: true});
         }
         grid.build();
         vColsCollection = grid.getCols();
@@ -188,9 +198,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                     options = obj.get('options');
                 }
             })
+            console.log(options);
             variant_fields.push({id: $(this).attr('data-id'), field_code: $(this).attr('data-code'), options: options, name: $(this).attr('data-name')});
             tmp_fields.push($(this).attr('data-code'));
         });
+        return false;
         $('#vfield_ids').val(JSON.stringify(variant_fields));
         var variants = [];
         bodyGrid.find('tr').each(function () {
@@ -316,17 +328,15 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                 col.set(col.get('postion')+1);
         });
         vColsCollection.add({
-            type: 'input',
             name: field_code,
             label: text,
             field_id: field_id,
             width: 150,
-            editable: 'inline',
             addable: true,
-            'mass-ediatable': true,
             position: 1,
+            display: 'eval',
             validation:{required:true},
-            editor: 'select',
+            print: '"<input type=\'hidden\' name=\''+ field_code +'\' class=\'select-value-field\' style=\'width: 130px\' />"',
             options: options,
             'default': ''
         });

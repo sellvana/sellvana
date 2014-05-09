@@ -70,29 +70,28 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         if ($vFields !== null) {
             $pos = 2;
             foreach ($vFields as $f) {
-                $f['type'] = 'input';
                 $f['options'] = FCom_CustomField_Model_FieldOption::i()->getListAssocById($f['id']);
                 $f['label'] = $f['name'];
                 $f['name'] = $f['field_code'];
-                $f['editable'] = 'inline';
                 $f['field_id'] = $f['id'];
                 $f['addable'] = true;
                 $f['mass-editable'] = true;
                 $f['width'] = 150;
                 $f['position'] = $pos++;
                 $f['validation'] = ['required' => true];
-                $f['editor'] = 'select';
+                $f['display'] = 'eval';
+                $f['print'] = '"<p style=\"overflow:hidden\"><input type=\"hidden\" name=\''. $f['name'].'\' class=\"select-value-field\" style=\"width: 130px\" /></p><p style=\"overflow:hidden\"><input type=\"hidden\" name=\''. $f['name'].'\' class=\"select-value-field\" style=\"width: 130px\" /></p>"';
                 $f['default'] = '';
                 $columns[] = $f;
             }
         }
         $image = $this->variantImageGrid($model);
         $columns[] = ['type' => 'input', 'name' => 'sku', 'label' => 'SKU', 'width' => 150, 'editable' => 'inline',
-                        'addable' => true, 'validation' => ['required' => true], 'default' => ''];
+                        'addable' => true, 'default' => ''];
         $columns[] = ['type' => 'input', 'name' => 'price', 'label' => 'PRICE', 'width' => 150, 'editable' => 'inline',
-                        'addable' => true, 'validation' => ['required' => true, 'number' => true], 'default' => ''];
+                        'addable' => true, 'validation' => ['number' => true], 'default' => ''];
         $columns[] = ['type' => 'input', 'name' => 'qty', 'label' => 'QTY', 'width' => 150, 'editable' => 'inline',
-                        'addable' => true, 'validation' => ['required' => true, 'number' => true], 'default' => ''];
+                        'addable' => true, 'validation' => ['number' => true], 'default' => ''];
         $columns[] = ['name' => 'image', 'label' => 'IMAGES', 'width' => 250, 'display' => 'eval',
             'addable' => true, 'sortable' => false, 'print' => '"<input type=\"hidden\" class=\"store-variant-image-id\" value=\'"+ rc.row["file_id"] +"\'/><ol class=\"dd-list columns dd-list-axis-x hide list-variant-image\"></ol><select class=\"form-control variant-image\"><option value></option></select>"' ];
         $columns[] = ['name' => 'file_id',  'hidden' => true];
