@@ -168,7 +168,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function thumbUrl($w, $h = null, $full = false)
     {
-        return FCom_Core_Main::i()->resizeUrl() . '?f=' . urlencode(trim($this->imageUrl($full), '/')) . '&s=' . $w . 'x' . $h;
+        return FCom_Core_Main::i()->resizeUrl($this->imageUrl($full), ['s' => $w . 'x' . $h]);
     }
 
     public function onBeforeSave()
@@ -205,7 +205,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function onAfterLoad()
     {
         parent::onAfterLoad();
-        $thumbPath = FCom_Core_Main::i()->resizeUrl() . '?f=' . urlencode(trim($this->imageUrl(), '/')) . '&s=48x48';
+        $thumbPath = FCom_Core_Main::i()->resizeUrl($this->imageUrl(), ['s' => 48]);
         $this->set('thumb_path', $thumbPath);
 
     }

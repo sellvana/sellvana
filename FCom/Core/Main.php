@@ -425,24 +425,40 @@ class FCom_Core_Main extends BClass
         return $hash;
     }
 
-    public function resizeUrl($full = false)
+    public function resizeUrl($img = null, $params = [])
     {
-        static $url = [];
-        if (empty($url[$full])) {
+        static $scriptPath = [], $scriptPrefixRegex;
+
+        $full = !empty($params['full_url']);
+        unset($params['full_url']);
+        if (empty($scriptPath[$full])) {
             if ($full) {
-                $url[$full] = BApp::baseUrl(true) . '/resize.php';
+                $dir = BApp::baseUrl(true);
             } else {
-                $url[$full] = rtrim(BConfig::i()->get('web/base_src'), '/') . '/resize.php';
+                $dir = rtrim(BConfig::i()->get('web/base_src'), '/');
+            }
+            $scriptPath[$full] = $dir . '/resize.php';
+
+            if (null === $scriptPrefixRegex) {
+                $parsed = parse_url($dir);
+                $scriptPrefixRegex = '#^/?' . preg_quote(trim($parsed['path'], '/'), '#') . '/?#';
             }
         }
-        return $url[$full];
+
+        if (null === $img) {
+            return $scriptPath[$full];
+        }
+
+        $params['f'] = preg_replace($scriptPrefixRegex, '', $img);
+
+        return $scriptPath[$full] . '?' . http_build_query($params);
     }
 
     public function thumbSrc($module, $path, $size)
     {
         $url = BApp::src($module, $path);
         $path = str_replace(BApp::baseUrl(true), '', $url);
-        return $this->resizeUrl() . '?f=' . urlencode($path) . '&s=' . $size;
+        return $this->resizeUrl($path, ['s' => $size]);
     }
 
     public function dir($path, $autocreate = true, $mode = 0777)
@@ -475,6 +491,7 @@ class FCom_Core_Main extends BClass
     public static function frontendHref($url = '')
     {
         $r = BRequest::i();
+
         $href = $r->scheme() . '://' . $r->httpHost() . BConfig::i()->get('web/base_store');
         return trim(rtrim($href, '/') . '/' . ltrim($url, '/'), '/');
     }

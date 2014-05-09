@@ -812,6 +812,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
     protected function _processGridFilters(&$config, $filters, $orm)
     {
+        $configFilterFields = [];
         if (!empty($config['filters'])) {
             $indexes = BUtil::arraySeqToMap($config['columns'], 'name', 'index');
             foreach ($filters as $fId => &$f) {
@@ -833,6 +834,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                         $orm->where_raw('(' . $config['filters']['_quick']['expr'] . ')', $args);
                     }
                     break;
+                } elseif (!empty($f['field'])) {
+                    $configFilterFields[$f['field']] = 1;
                 }
             }
         }
@@ -843,6 +846,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 || !isset($f['val'])
                 || $f['val'] === ''
                 || (empty($f['val']) && $f['val'] !== 0)
+                || empty($configFilterFields[$fId])
             ) {
                 continue;
             }
@@ -887,33 +891,31 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                             if (isset($temp[1])) {
                                 $this->_processGridFiltersOne($f, 'lte', $temp[1], $orm);
                             }
-
                             break;
+
                         case 'from':
                             $this->_processGridFiltersOne($f, 'gte', $val, $orm);
-
                             break;
+
                         case 'to':
                             $this->_processGridFiltersOne($f, 'lte', $val, $orm);
-
                             break;
+
                         case 'equal':
                             if ($f['type'] === 'date-range')
                                 $this->_processGridFiltersOne($f, 'like', $val . '%', $orm);
                             else
                                 $this->_processGridFiltersOne($f, 'equal', $val, $orm);
-
                             break;
+
                         case 'not_in':
                             $orm->where_raw($f['field'] . ' NOT BETWEEN ? and ?', [$temp[0], $temp[1]]);
-
                             break;
                     }
                 }
                 break;
 
             case 'number-range':
-
                 if (!empty($filters[$fId]['from'])) {
                     $this->_processGridFiltersOne($f, 'gte', $filters[$fId]['from'], $orm);
                 }
@@ -923,12 +925,12 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 break;
 
             case 'select':
-                    $this->_processGridFiltersOne($f, 'equal', $filters[$fId]['val'], $orm);
-                    break;
+                $this->_processGridFiltersOne($f, 'equal', $filters[$fId]['val'], $orm);
+                break;
 
             case 'multiselect':
-                    $vals = explode(',', $filters[$fId]['val']);
-                    $this->_processGridFiltersOne($f, 'in', $vals, $orm);
+                $vals = explode(',', $filters[$fId]['val']);
+                $this->_processGridFiltersOne($f, 'in', $vals, $orm);
                 break;
             }
         }
