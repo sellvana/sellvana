@@ -13,6 +13,9 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
     const DEFAULT_MODEL_KEY = '_default_model';
     const DEFAULT_STORE_ID = 'default';
     protected $importId;
+    /**
+     * @var FCom_PushServer_Model_Channel
+     */
     protected $channel;
     /**
      * @var string
@@ -28,6 +31,40 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
     protected $newModels = 0;
     protected $updatedModels = 0;
     protected $changedModels;
+
+    /**
+     * @var FCom_Admin_Model_User
+     */
+    protected $user;
+    /**
+     * Can user import current model
+     * @var bool
+     */
+    protected $canImport;
+
+    /**
+     * Get user
+     * If none is set explicitly, try to get currently logged user.
+     * @return FCom_Admin_Model_User
+     */
+    public function getUser()
+    {
+        if(empty($this->user)){
+            $this->user = FCom_Admin_Model_User::i()->sessionUser();
+        }
+        return $this->user;
+    }
+
+    /**
+     * Set profile user
+     *
+     * To be used in any API which uses importer.
+     * @param FCom_Admin_Model_User $user
+     */
+    public function setUser( $user )
+    {
+        $this->user = $user;
+    }
 
     /**
      * @throws Exception
@@ -48,19 +85,30 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         return $exportableModels;
     }
 
-    public function export($models = [], $toFile = null)
+    /**
+     * @param array $models
+     * @param null  $toFile
+     * @param null  $batch
+     * @return bool
+     */
+    public function export( $models = [], $toFile = null, $batch = null )
     {
-        $toFile = $this->getFullPath($toFile);
-
-        BUtil::ensureDir(dirname($toFile));
-        $fe = fopen($toFile, 'w');
+        $fe = $this->getWriteHandle($toFile);
 
         if (!$fe) {
             BDebug::log("Could not open $toFile for writing, aborting export.");
             return false;
         }
-        $this->writeLine($fe, json_encode([static::STORE_UNIQUE_ID_KEY => $this->storeUID()]));
+
+        $bs = BConfig::i()->get( "FCom_Core/import_export/batch_size", 100 );
+
+        if ($batch && is_numeric($batch)) {
+            $bs = $batch;
+        }
+
+        $this->writeLine( $fe, json_encode( [ static::STORE_UNIQUE_ID_KEY => $this->storeUID() ] ) );
         $exportableModels = $this->collectExportableModels();
+
         if (!empty($models)) {
             $diff = array_diff(array_keys($exportableModels), $models);
             foreach ($diff as $d) {
@@ -72,9 +120,14 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
         foreach ($sorted as $s) {
             /** @var FCom_Core_Model_Abstract $model */
-            $model   = $s['model'];
-            if (!isset($s['skip'])) {
-                $s['skip'] = [];
+            $model   = $s[ 'model' ];
+            if($this->getUser()->getPermission($model) == false){
+                BDebug::warning(BLocale::_('User: %s, cannot export "%s". Permission denied.',
+                    $this->getUser()->get('username'), $model));
+                continue;
+            }
+            if ( !isset( $s[ 'skip' ] ) ) {
+                $s[ 'skip' ] = [];
             }
             if ($model == 'FCom_Catalog_Model_Product') {
                 // disable custom fields to avoid them adding bunch of fields to export
@@ -89,43 +142,58 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                     $heading[static::DEFAULT_FIELDS_KEY][] = $key;
                 }
             }
-            $records = $model::i()->orm()->select($heading[static::DEFAULT_FIELDS_KEY])->find_many();
+            $offset = 0;
+            $records = $model::i()
+                             ->orm()
+                             ->select($heading[static::DEFAULT_FIELDS_KEY])
+                             ->limit($bs)
+                             ->offset($offset)
+                             ->find_many();
             if ($records) {
-                BEvents::i()->fire(__METHOD__ . ':beforeOutput', ['records' => $records]);
                 $this->writeLine($fe, BUtil::toJson($heading));
-                foreach ($records as $r) {
+                while($records) {
+                    BEvents::i()->fire(__METHOD__ . ':beforeOutput', ['records' => $records]);
+                    foreach ($records as $r) {
 
-                    /** @var FCom_Core_Model_Abstract $r */
-                    $data = $r->as_array();
-                    $data = array_values($data);
+                        /** @var FCom_Core_Model_Abstract $r */
+                        $data = $r->as_array();
+                        $data = array_values($data);
 
-                    $json = BUtil::toJson($data);
-                    $this->writeLine($fe, $json);
+                        $json = BUtil::toJson($data);
+                        $this->writeLine($fe, $json);
+                    }
+                    $offset += $bs;
+                    $records = $model::i()
+                                     ->orm()
+                                     ->select($heading[static::DEFAULT_FIELDS_KEY])
+                                     ->limit($bs)
+                                     ->offset($offset)
+                                     ->find_many();
                 }
-
             }
         }
 
         return true;
     }
 
-    public function import($fromFile = null)
+    public function import( $fromFile = null, $batch = null )
     {
         $start = microtime(true);
         /** @var FCom_PushServer_Model_Channel $channel */
         $this->channel = FCom_PushServer_Model_Channel::i()->getChannel('import', true);
         $this->channel->send(['signal' => 'start', 'msg' => "Import started."]);
         $bs = BConfig::i()->get("FCom_Core/import_export/batch_size", 100);
+        if($batch && is_numeric($batch)){
+                    $bs = $batch;
+        }
 
-        $fromFile = $this->getFullPath($fromFile);
-        if (!is_readable($fromFile)) {
+        $fi = $this->getReadHandle($fromFile);
+        if (!$fi) {
             $this->channel->send(['signal' => 'problem',
                                   'problem' => "Could not find file to import.\n$fromFile"]);
             BDebug::log("Could not find file to import.");
             return false;
         }
-        ini_set("auto_detect_line_endings", 1);
-        $fi = fopen($fromFile, 'r');
         $ieConfig = $this->collectExportableModels();
         $importID = static::DEFAULT_STORE_ID;
         /** @var FCom_Core_Model_ImportExport_Model $ieHelperMod */
@@ -190,7 +258,14 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                     );
                 }
 
-                $this->currentModel   = $data[static::DEFAULT_MODEL_KEY];
+                $this->currentModel   = $data[ static::DEFAULT_MODEL_KEY ];
+                if($this->getUser()->getPermission($this->currentModel) == false){
+                    $this->canImport = false;
+                    BDebug::warning(BLocale::_('User: %s, cannot import "%s". Permission denied.', $this->getUser()->get('username'), $model));
+                    continue;
+                } else {
+                    $this->canImport = true;
+                }
                 $this->changedModels = [];
                 $this->channel->send(['signal' => 'info', 'msg' => "Importing: $this->currentModel"]);
                 if (!isset($this->importModels[$this->currentModel])) {
@@ -225,7 +300,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 $isHeading     = true;
             }
 
-            if ($isHeading) {
+            if ( $isHeading || !$this->canImport) {
                 continue;
             }
 
@@ -264,14 +339,22 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             BDebug::debug("Error: unexpected file fail");
         }
         fclose($fi);
-        $this->channel->send(['signal' => 'new_models',
-                              'msg' => BLocale::_("Created %d new models", $this->newModels)]);
-        $this->channel->send(['signal' => 'updated_models',
-                              'msg' => BLocale::_("Updated %d models", $this->updatedModels)]);
-        $this->channel->send(['signal' => 'finished',
-                              'msg' => BLocale::_("No changes for %d models", $this->notChanged)]);
-        $this->channel->send(['signal' => 'finished',
-                              'msg' => "Done in: " . round(microtime(true) - $start)] . " sec.");
+        $this->channel->send([
+            'signal' => 'new_models',
+            'msg'    => BLocale::_("Created %d new models", $this->newModels)
+        ]);
+        $this->channel->send([
+            'signal' => 'updated_models',
+            'msg'    => BLocale::_("Updated %d models", $this->updatedModels)
+        ]);
+        $this->channel->send([
+            'signal' => 'finished',
+            'msg'    => BLocale::_("No changes for %d models", $this->notChanged)
+        ]);
+        $this->channel->send([
+            'signal' => 'finished',
+            'msg'    => "Done in: " . round(microtime(true) - $start) . " sec."
+        ]);
 
         return true;
     }
@@ -488,10 +571,13 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         if (!$file) {
             $file = $this->_defaultExportFile;
         }
-        $path = BConfig::i()->get('fs/storage_dir');
-
-        $file = $path . '/export/' . trim($file, '/');
-        if (strpos(realpath(dirname($file)), $path) !== 0) {
+        if (BUtil::isPathAbsolute($file)){
+            return $file;
+        }
+        $path = BConfig::i()->get( 'fs/storage_dir' );
+        $ds = DIRECTORY_SEPARATOR;
+        $file = $path . $ds . 'export' . $ds . trim( $file, $ds . '\\/' );
+        if ( strpos( realpath( dirname( $file ) ), $path ) !== 0 ) {
             return false;
         }
         return $file;
@@ -596,5 +682,51 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 } // end foreach batch data
             } // end foreach ['related']
         } // end if related
+    }
+
+    /**
+     * @param string|resource $toFile
+     * @return resource|false
+     */
+    protected function getWriteHandle($toFile)
+    {
+        if(is_resource($toFile)){
+            return $toFile;
+        }
+
+        if(strpos($toFile, 'php://') === 0){
+            $path = $toFile; // allow stream writers
+        } else {
+            $path = $this->getFullPath($toFile);
+            BUtil::ensureDir(dirname($toFile));
+        }
+        if(!is_writable($path)){
+            return false;
+        }
+        $fe = fopen($path, 'w');
+        return $fe;
+    }
+
+    /**
+     * @param $fromFile
+     * @return resource|false
+     */
+    protected function getReadHandle($fromFile)
+    {
+        if (is_resource($fromFile)) {
+            return $fromFile;
+        }
+
+        if (strpos($fromFile, '://') !== false) {
+            $path = $fromFile; // allow stream readers
+        } else {
+            $path = $this->getFullPath($fromFile);
+        }
+        if (!is_readable($path)) {
+            return false;
+        }
+        ini_set("auto_detect_line_endings", 1);
+        $fi = fopen($path, 'r');
+        return $fi;
     }
 }

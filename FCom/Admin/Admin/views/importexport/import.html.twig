@@ -1,4 +1,139 @@
 <!--{ label: IE/Import }-->
 <!--{ pos: 20 }-->
 {% set m = THIS.get('model') %}
-{{ "Import" }}
+<div class='tab-pane' id='f-import-upload'>
+    <div class="panel-body">
+        <h2>{{ "Upload and import files" }}</h2>
+        <div class="help-block">Max file size allowed: <span id="max_import_file_size">{{ m.import_config.max_import_file_size }}</span></div>
+        <div class='box-content'>
+            <div class='row fileupload-buttonbar'>
+                <div class='col-sm-12'>
+                    <span class='btn btn-success fileinput-button'>
+                        <i class='icon-plus icon-white'></i>
+                        <span>{{ "Add files..."|_ }}</span>
+                        <input data-bfi-disabled='' multiple='' name='upload[]' type='file'>
+                    </span>
+                    <button class='btn btn-primary start' type='submit'>
+                        <i class='icon-upload icon-white'></i>
+                        <span>{{ "Upload and import"|_ }}</span>
+                    </button>
+                    <button class='btn btn-warning cancel' type='reset'>
+                        <i class='icon-ban-circle icon-white'></i>
+                        <span>{{ "Cancel"|_ }}</span>
+                    </button>
+                </div>
+                <div class='col-sm-5 fileupload-progress fade'>
+                    <div aria-valuemax='100' aria-valuemin='0' class='progress progress-success progress-striped active'
+                         role='progressbar'>
+                        <div class='bar' style='width:0%;'></div>
+                    </div>
+                    <div class='progress-extended'></div>
+                </div>
+            </div>
+            <div class='fileupload-loading'></div>
+            <br>
+            <table class='table table-striped' role='presentation'>
+                <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
+            </table>
+        </div>
+        <script>
+            var uploadTr = '{{ 'Upload'|_ }}';
+            var errorTr = '{{ 'Error'|_ }}';
+            var cancelTr = '{{ 'Cancel'|_ }}';
+        </script>
+        {% verbatim %}
+        <script id="template-upload" type="text/x-tmpl">
+            {% for (var i=0, file; file=o.files[i]; i++) { %}
+                <tr class="template-upload fade">
+                    <td class="preview"><span class="fade"></span></td>
+                    <td class="name"><span>{%=file.name%}</span></td>
+                    <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+                    {% if (file.error) { %}
+                        <td class="error" colspan="2"><span class="label label-important">{%=errorTr%}</span> {%=file.error%}</td>
+                    {% } else if (o.files.valid && !i) { %}
+                    <td>
+                        <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                            <div class="bar" style="width:0%;"></div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if (!o.options.autoUpload) { %}
+                            <button class="btn btn-primary start">
+                                <i class="icon-upload icon-white"></i>
+                                <span>{%=uploadTr%}</span>
+                            </button>
+                        {% } %}
+                    </td>
+                    {% } else { %}
+                        <td colspan="2"></td>
+                    {% } %}
+                    <td>
+                       {% if (!i) { %}
+                        <button class="btn btn-warning cancel">
+                            <i class="icon-ban-circle icon-white"></i>
+                            <span>{%=cancelTr%}</span>
+                        </button>
+                        {% } %}
+                    </td>
+                </tr>
+            {% } %}
+
+        </script>
+    <!-- The template to display files available for download -->
+
+        <script id="template-download" type="text/x-tmpl">
+            {% for (var i=0, file; file=o.files[i]; i++) { %}
+                <tr class="template-download fade">
+                   {% if (file.error) { %}
+                        <td></td>
+                        <td class="name"><span>{%=file.name%}</span></td>
+                        <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+                        <td class="error" colspan="2"><span class="label label-important">{%=errorTr%}</span> {%=file.error%}</td>
+                    {% } else { %}
+                        <td class="name">
+                            {%=file.name%}
+                        </td>
+                        <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
+                        <td colspan="2"><span>{%=file.folder%}</span></td>
+                    {% } %}
+                </tr>
+            {% } %}
+
+        </script>
+        {% endverbatim %}
+    </div>
+    <script>
+        require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function () {
+            var mediaGrid = window['{{ config.id }}_grid'];
+            //max_import_file_size
+            $('#f-import-upload').fileupload({
+                url: '{{ APP.href("importexport/import") | raw }}',
+                multiple: false,
+                acceptFileTypes: /(\.|\/)(json|txt|js)$/i
+            })
+                    .bind('fileuploadalways', function (e, data) {
+
+                        if (data.result.id) {
+                            //get self media grid
+
+                            //insert uploaded file in media grid and get selected
+                            var newRow = data.result;
+
+                            //if multiselect config param is set, we insert  new uploaded rows in library grid with checked.
+                            {% if config.multiSelAllowed %}
+                            newRow.selected = true;
+                            {{config.id}}_grid.getSelectedRows().add(data.result);
+                            {% endif %}
+
+                            {{config.id}}_grid.getRows().add(newRow, {merge: true}).trigger('render');
+
+                            $('td.name span').each(function (i) {
+                                if ($(this).html() === data.result.file_name) {
+                                    $(this).parents('tr:first').remove();
+                                }
+                            });
+                        }
+                    });
+        });
+    </script>
+</div>
