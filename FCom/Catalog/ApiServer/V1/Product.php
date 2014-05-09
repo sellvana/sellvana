@@ -26,7 +26,7 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_ApiServer_Controller_Abstra
         $this->ok($result);
     }
 
-    public function action_index__post()
+    public function action_index__POST()
     {
         $post = BUtil::fromJson(BRequest::i()->rawPost());
 
@@ -64,7 +64,7 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_ApiServer_Controller_Abstra
         $this->created(['id' => $product->id]);
     }
 
-    public function action_index__put()
+    public function action_index__PUT()
     {
         $id = BRequest::i()->param('id');
         $post = BUtil::fromJson(BRequest::i()->rawPost());
@@ -92,7 +92,7 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_ApiServer_Controller_Abstra
         $this->ok();
     }
 
-    public function action_index__delete()
+    public function action_index__DELETE()
     {
         $id = BRequest::i()->param('id');
 

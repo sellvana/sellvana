@@ -148,6 +148,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
     public function action_index()
     {
         $model['export_config'] = $this->getExportConfig();
+        $model[ 'import_config' ] = $this->getImportConfig();
         $this->formMessages();
         $view = $this->view($this->_formViewName)->set('model', $model);
 
@@ -168,7 +169,38 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
 
         $this->processFormTabs($view, $model);
     }
+    public function action_import()
+    {
+        /** @var FCom_Core_ImportExport $importer */
+        $importer = FCom_Core_ImportExport::i();
+        $uploads  = $_FILES[ 'upload' ];
+        foreach ( $uploads[ 'name' ] as $i => $fileName ) {
 
+            if ( !$fileName ) {
+                continue;
+            }
+            $fullFileName = $importer->getFullPath( $fileName );
+            BUtil::ensureDir( dirname( $fullFileName ) );
+            $fileSize = 0;
+            if ( !$uploads[ 'error' ][ $i ] && @move_uploaded_file( $uploads[ 'tmp_name' ][ $i ], $fullFileName ) ) {
+                $importer->import( $fileName );
+                $error   = '';
+                $fileSize = $uploads[ 'size' ][ $i ];
+            } else {
+                $error = $uploads['error'][$i];
+            }
+
+            $row = [
+                'name'   => $fileName,
+                'size'   => $fileSize,
+                'folder' => str_replace(BConfig::i()->get('fs/root_dir'), '...',dirname( $fullFileName )),
+            ];
+            if($error){
+                $row['error'] = $error;
+            }
+            BResponse::i()->json( [ 'files' => [ $row ] ] );
+        }
+    }
     public function action_export()
     {
         $exportData = BRequest::i()->post('ie_export_grid');
@@ -188,4 +220,22 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         $result = FCom_Core_ImportExport::i()->export($models, $toFile);
         BResponse::i()->json(['result' => print_r($result, 1)]);
     }
+
+    protected function getImportConfig()
+    {
+        $config = array(
+            'max_import_file_size' => $this->_getMaxUploadSize()
+        );
+
+        return $config;
+    }
+
+    protected function _getMaxUploadSize()
+    {
+        $p   = ini_get( 'post_max_size' );
+        $u   = ini_get( 'upload_max_filesize' );
+        $max = min( $p, $u );
+        return $max;
+    }
+
 }
