@@ -63,7 +63,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
             var select2 = this.$el.find('select.variant-image');
             var self = this;
             variantThumbUrl = thumb_url = this.model.get('thumb_url');
-            var imageId = (this.model.get('file_id') == null) ? [] : this.model.get('file_id').split(',');
+            var imageId = [];
+            if (this.model.get('file_id') != null && this.model.get('file_id') != '') {
+                imageId = this.model.get('file_id').split(',');
+                self.$el.find('.list-variant-image').removeClass('hide');
+            }
             function format(state) {
                 if (!state.id) return state.text;
                 return "<img src='" + thumb_url + $(state.element[0]).attr('data-subfolder') + '/' + state.text + "'/>  " + state.text;
@@ -79,6 +83,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                      }
                     select2.append("<option class='"+ hide +"' data-subfolder='"+ obj.subfolder +"' value='"+ obj.file_id +"'>"+ obj.file_name +"</option>");
                 })
+            } else {
+                if (typeof (imagesGrid) !== 'undefined') {
+                    imagesGrid.getRows().each(function (obj) {
+                        select2.append("<option  data-subfolder='"+ obj.get('subfolder') +"' value='"+ obj.get('file_id') +"'>"+ obj.get('file_name') +"</option>");
+                    })
+                }
             }
             select2.select2({
                 formatResult: format,
@@ -102,13 +112,20 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
             var imageItem = '<li class="dd-item dd3-item"><div class="dd3-content"><img src="'+ thumb_url + option.attr('data-subfolder')+ '/' + option.text() +'"/><label>'+ option.text()
                     +'</label> <i data-id="'+ $(this).val() +'" class="icon-remove pull-right btn-link btn-delete-variant-image"></i></div></li>';
             $(this).parent().find('.list-variant-image').append(imageItem);
+            $(this).parent().find('.list-variant-image').removeClass('hide');
             option.addClass('hide');
             updateStoreVariantImageId($(this).parents('td'));
             $(this).select2('data', null);
+
         });
         bodyGrid.on('click', '.btn-delete-variant-image', function() {
-            $(this).parents('td').find('.variant-image').find('option[value="'+ $(this).attr('data-id') +'"]').removeClass('hide');
+            var td = $(this).parents('td');
+            td.find('.variant-image').find('option[value="'+ $(this).attr('data-id') +'"]').removeClass('hide');
+            td.find('.variant-image').removeClass('hide');
             updateStoreVariantImageId($(this).parents('td'));
+            if (td.find('.list-variant-image').find('li').length == 1) {
+                td.find('.list-variant-image').addClass('hide');
+            }
             $(this).parents('li').remove();
         });
     }
@@ -129,22 +146,20 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
 
     }
 
-    function resetSelect()
-    {
+    function resetSelect() {
         $('#sel_var_field').val('').select2();
     }
 
-    function vFieldGridInit()
-    {
+    function vFieldGridInit() {
         var mapField = fieldCollection.map(function (obj) {
-            return {id: obj.id, name: obj.get('name')};
+            return {id: obj.id, name: obj.get('name'), field_code: obj.get('field_code')};
         });
         vColsCollection.each(function (obj) {
             mapField.forEach(function (field) {
-                if (field.name == obj.get('name')) {
+                if (field.id == obj.get('field_id')) {
                     $("#sel_var_field option[value='"+field.id+"']").remove();
                     var fields = '<li class="dd-item dd3-item"><div class="icon-ellipsis-vertical dd-handle dd3-handle"></div><div class="dd3-content">' +
-                            '<label>'+ field.name +'</label> <i data-name="'+ field.name +'" data-id="'+ field.id +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
+                            '<label>'+ field.name +'</label> <i data-name="'+ field.name +'" data-code="'+ field.field_code +'" data-id="'+ field.id +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
                     vField.append(fields);
                 }
             });
@@ -173,8 +188,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                     options = obj.get('options');
                 }
             })
-            variant_fields.push({id: $(this).attr('data-id'), name: $(this).attr('data-name'), options: options});
-            tmp_fields.push($(this).attr('data-name'));
+            variant_fields.push({id: $(this).attr('data-id'), field_code: $(this).attr('data-code'), options: options, name: $(this).attr('data-name')});
+            tmp_fields.push($(this).attr('data-code'));
         });
         $('#vfield_ids').val(JSON.stringify(variant_fields));
         var variants = [];
@@ -194,7 +209,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                         break;
                     default :
                         var key = $(this).attr('data-col');
-                        if (tmp_fields.indexOf(key) > -1) {
+                        if (tmp_fields.indexOf(key) != -1) {
                             var key = key;
                             fvals[key] = $(this).find('[data-col="'+ key +'"]').val();
                         }
@@ -210,11 +225,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
 
     $('#btn_add_var_field').click(function() {
         var val = $('#sel_var_field').val();
-        if(!val)
+        if(!val) {
             return;
+        }
         var text = $("#sel_var_field option:selected").text();
-
-        fieldCollection.add({id: val, name: text });
+        var field_code = $("#sel_var_field option:selected").attr('data-code');
+        fieldCollection.add({id: val, name: text , field_code: field_code});
         fieldCollection.trigger('render');
 
         $("#sel_var_field option[value='"+val+"']").remove();
@@ -223,10 +239,10 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
         $.get('{{ APP.href('/customfields/fields/options?id=') | raw }}'+val,
                 function(response) {
                     if (response.success) {
-                        addColumn(text, response.options);
+                        addColumn(text, response.options, val, field_code);
                         vRowsCollection.each( function(row) { row.set(text, ''); } );
                         var fields = '<li class="dd-item dd3-item"><div class="icon-ellipsis-vertical dd-handle dd3-handle"></div><div class="dd3-content">' +
-                                '<label>'+ text +'</label> <i data-name="'+ text +'" data-id="'+ val +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
+                                '<label>'+ text +'</label> <i data-code="'+ field_code +'" data-name="'+ text +'" data-id="'+ val +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
                         vField.append(fields);
                         renderGrid();
                     }
@@ -235,9 +251,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
 
     });
 
-    function removeColumn(row)
-    {
-
+    function removeColumn(row) {
         var col = vColsCollection.findWhere({name: row.name});
         var delPos = col.get('position');
         vColsCollection.each(function(c) {
@@ -248,22 +262,21 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
 
         vColsCollection.remove(col);
         vRowsCollection.each(function(r) {
-            delete r.attributes[row.name];
+            delete r.attributes[row.field_code];
         });
 
 
     }
 
-    function renderGrid()
-    {
+    function renderGrid() {
         arrField = Array();
         vField.find('i.icon-remove').each(function () {
-            var col = vColsCollection.findWhere({name: $(this).attr('data-name')});
+            var col = vColsCollection.findWhere({name: $(this).attr('data-code')});
             removeColumn(col.attributes);
-            arrField.push({id: $(this).attr('data-id'), name: $(this).attr('data-name'), options: col.get('options')});
+            arrField.push({id: $(this).attr('data-id'), name: $(this).attr('data-code'), options: col.get('options'), label: col.get('label') });
         });
         arrField.forEach(function (data) {
-            addColumn(data.name, data.options, data.id);
+            addColumn(data.label, data.options, data.id, data.name);
         });
         valueCurrentField = Array();
         bodyGrid.find('tr').each(function () {
@@ -297,14 +310,14 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
         });
     }
 
-    function addColumn(text, options, field_id) {
+    function addColumn(text, options, field_id, field_code) {
         vColsCollection.each(function(col) {
             if (col.get('position')>0)
                 col.set(col.get('postion')+1);
         });
         vColsCollection.add({
             type: 'input',
-            name: text,
+            name: field_code,
             label: text,
             field_id: field_id,
             width: 150,
@@ -332,10 +345,10 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                 row = r.attributes;
             }
         });
-        var option = '<option value="'+row.id+'">'+row.name+'</option>';
+        var option = '<option data-code="'+ row.field_code +'" value="'+row.id+'">'+row.name+'</option>';
         $('#sel_var_field').append(option);
         resetSelect();
-        removeColumn(row);
+        removeColumn({name: row.field_code});
         $(field).parents('li').remove();
         renderGrid();
         grayGrid();

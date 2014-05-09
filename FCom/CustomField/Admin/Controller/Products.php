@@ -45,6 +45,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
                     ['name' => 'name', 'label' => 'Field Name', 'width' => 300],
+                    ['name' => 'field_code', 'label' => 'Field Code', 'width' => 300],
                     ['type' => 'btn_group',  'buttons' => [['name' => 'delete']]]
                 ],
                 'actions' => [
@@ -72,6 +73,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $f['type'] = 'input';
                 $f['options'] = FCom_CustomField_Model_FieldOption::i()->getListAssocById($f['id']);
                 $f['label'] = $f['name'];
+                $f['name'] = $f['field_code'];
                 $f['editable'] = 'inline';
                 $f['field_id'] = $f['id'];
                 $f['addable'] = true;
@@ -92,7 +94,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         $columns[] = ['type' => 'input', 'name' => 'qty', 'label' => 'QTY', 'width' => 150, 'editable' => 'inline',
                         'addable' => true, 'validation' => ['required' => true, 'number' => true], 'default' => ''];
         $columns[] = ['name' => 'image', 'label' => 'IMAGES', 'width' => 250, 'display' => 'eval',
-            'addable' => true, 'sortable' => false, 'print' => '"<input type=\"hidden\" class=\"store-variant-image-id\" value=\'"+ rc.row["file_id"] +"\'/><ol class=\"dd-list columns dd-list-axis-x list-variant-image\"></ol><select class=\"form-control variant-image\"><option value></option></select>"' ];
+            'addable' => true, 'sortable' => false, 'print' => '"<input type=\"hidden\" class=\"store-variant-image-id\" value=\'"+ rc.row["file_id"] +"\'/><ol class=\"dd-list columns dd-list-axis-x hide list-variant-image\"></ol><select class=\"form-control variant-image\"><option value></option></select>"' ];
         $columns[] = ['name' => 'file_id',  'hidden' => true];
         $columns[] = ['name' => 'list_image',  'hidden' => true, 'default' => $image];
         $columns[] = ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumbUrl];

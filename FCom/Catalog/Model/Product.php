@@ -71,8 +71,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     protected static $_importExportProfile = [
         'skip' => [
-            'create_dt',
-            'update_dt',
+            'create_at',
+            'update_at',
             'indextank_indexed',
             'indextank_indexed_at',
         ],
@@ -1041,6 +1041,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function getDataSerialized($data)
     {
         $data_serialized = BUtil::objectToArray(json_decode($this->data_serialized));
+        echo "<pre>";
+        print_r($data_serialized);
+        die;
         if ($data == 'custom_fields' && isset($data_serialized[$data])) {
             return BUtil::objectToArray(json_decode($data_serialized[$data]));
         }

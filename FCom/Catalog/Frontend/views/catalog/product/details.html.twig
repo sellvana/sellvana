@@ -92,10 +92,10 @@
                     <section class="tab-pane active" id="f-prod-tab-variant">
                         {% for field  in variants.fields %}
                             <div class="form-group" style="overflow: hidden">
-                                <label class="col-md-3 control-label">{{ field.name |_ }}</label>
+                                <label class="col-md-3 control-label">{{ field.field_code |_ }}</label>
                                 <div class="col-md-5">
                                     {% if field.options %}
-                                        <select id="{{ field.name }}" name="{{ field.name }}" class="form-control variant" style="width:auto">
+                                        <select id="{{ field.field_code }}" name="{{ field.field_code }}" class="form-control variant" style="width:auto">
                                             {% for key,val  in field.options %}
                                                 <option value="{{ key }}">{{ val|_ }}</option>
                                             {% endfor %}
