@@ -174,6 +174,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         /** @var FCom_Core_ImportExport $importer */
         $importer = FCom_Core_ImportExport::i();
         $uploads  = $_FILES[ 'upload' ];
+        $rows = [];
         foreach ( $uploads[ 'name' ] as $i => $fileName ) {
 
             if ( !$fileName ) {
@@ -198,8 +199,9 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
             if($error){
                 $row['error'] = $error;
             }
-            BResponse::i()->json( [ 'files' => [ $row ] ] );
+            $rows[] = $row;
         }
+        BResponse::i()->json( [ 'files' => $rows ] );
     }
     public function action_export()
     {
@@ -218,7 +220,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
 
         }
         $result = FCom_Core_ImportExport::i()->export($models, $toFile);
-        BResponse::i()->json(['result' => print_r($result, 1)]);
+        BResponse::i()->json(['result' => $result ? 'Success': 'Failure']);
     }
 
     protected function getImportConfig()
