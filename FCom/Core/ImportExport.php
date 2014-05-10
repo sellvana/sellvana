@@ -96,7 +96,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         $fe = $this->getWriteHandle($toFile);
 
         if (!$fe) {
-            $msg = BLocale::_("%s Could not open %s for writing, aborting export.", BDb::now(), $toFile);
+            $msg = BLocale::_("%s Could not open %s for writing, aborting export.", [BDb::now(), $toFile]);
             BDebug::log($msg);
             return false;
         }
@@ -124,7 +124,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $model   = $s[ 'model' ];
             if ($this->getUser()->getPermission($model) == false) {
                 BDebug::warning(BLocale::_('%s User: %s, cannot export "%s". Permission denied.',
-                    BDb::now(), $this->getUser()->get('username'), $model));
+                    [BDb::now(), $this->getUser()->get('username'), $model]));
                 continue;
             }
             if ( !isset( $s[ 'skip' ] ) ) {
@@ -190,7 +190,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
         $fi = $this->getReadHandle($fromFile);
         if (!$fi) {
-            $msg = BLocale::_("%s Could not find file to import. File: %s", BDb::now(), $fromFile);
+            $msg = BLocale::_("%s Could not find file to import. File: %s", [BDb::now(), $fromFile]);
             $this->channel->send(['signal' => 'problem',
                                   'problem' => $msg]);
             BDebug::log($msg);
@@ -263,8 +263,8 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 $this->currentModel   = $data[ static::DEFAULT_MODEL_KEY ];
                 if ($this->getUser()->getPermission($this->currentModel) == false) {
                     $this->canImport = false;
-                    BDebug::warning(BLocale::_('%s User: %s, cannot import "%s". Permission denied.', BDb::now(),
-                        $this->getUser()->get('username'), $model));
+                    BDebug::warning(BLocale::_('%s User: %s, cannot import "%s". Permission denied.', [BDb::now(),
+                        $this->getUser()->get('username'), $model]));
                     continue;
                 } else {
                     $this->canImport = true;
@@ -284,7 +284,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 $this->currentModelIdField = $cm::i()->getIdField();
                 $this->currentConfig  = $ieConfig[$this->currentModel];
                 if (!$this->currentConfig) {
-                    $msg = BLocale::_("%s Could not find I/E config for %s.", BDb::now(), $this->currentModel);
+                    $msg = BLocale::_("%s Could not find I/E config for %s.", [BDb::now(), $this->currentModel]);
                     $this->channel->send(['signal' => 'problem',
                                           'problem' => $msg
                     ]);
@@ -436,7 +436,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 $ieHelperId->create($ieData)->save(true, true);
                 $this->changedModels[$id] = $model;
             } else {
-                BDebug::warning(BLocale::_("%s Invalid model: %s", BDb::now() ,$id));
+                BDebug::warning(BLocale::_("%s Invalid model: %s", [BDb::now(), $id]));
             }
         }
         BEvents::i()->fire(__METHOD__ . ':afterBatch:' . $cm, ['records' => $this->changedModels]);
@@ -518,7 +518,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
                         if (!isset($tmpModel)) {
                             BDebug::log(BLocale::_("%s Could not find valid configuration for %s",
-                                BDb::now(), $node), "ie.log");
+                                [BDb::now(), $node]), "ie.log");
                             continue;
                         }
                         $this->_sort($tmpModel, $node, $models);

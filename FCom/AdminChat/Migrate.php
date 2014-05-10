@@ -4,6 +4,10 @@ class FCom_AdminChat_Migrate extends BClass
 {
     public function install__0_1_4()
     {
+        if (!FCom_Core_Model_Module::i()->load('FCom_Admin', 'module_name')) {
+            BMigrate::i()->migrateModules('FCom_Admin', true);
+        }
+
         $tChat = FCom_AdminChat_Model_Chat::table();
         $tParticipant = FCom_AdminChat_Model_Participant::table();
         $tHistory = FCom_AdminChat_Model_History::table();
