@@ -433,7 +433,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 $model = isset($oldModels[$id]) ? $oldModels[$id] : null;
             }
             unset($data['oldId']);
-            BDebug::log(sprintf("%s - memory size: %s", BDb::now(), memory_get_usage(1)));
+            //BDebug::log(sprintf("%s - memory consumption: %.2f MB", BDb::now(), memory_get_usage(1)/1024/1024));
             try {
                 if ($model) {
                     $import = [];
@@ -446,17 +446,13 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                     if (!empty($import)) {
                         $model->set($import)->save();
                         $this->updatedModels++;
-                        BDebug::log('model update save');
                     } else {
-                        BDebug::log('No save');
                         $this->notChanged++;
                     }
                 } else {
                     $model = $cm::i()->create($data)->save(false);
                     $this->newModels++;
-                    BDebug::log('New model save');
                 }
-                BDebug::log('After model save');
             } catch (PDOException $e) {
                 BDebug::logException($e);
                 $this->channel->send(['signal' => 'problem',
@@ -466,7 +462,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             if ($model) {
                 $ieData['local_id'] = $model->id();
                 $ieHelperId->create($ieData)->save(true, true);
-                $this->changedModels[$id] = $model;
+                $this->changedModels[$model->id()] = $model;
             } else {
                 BDebug::warning(BLocale::_("%s Invalid model: %s", [BDb::now(), $id]));
             }
