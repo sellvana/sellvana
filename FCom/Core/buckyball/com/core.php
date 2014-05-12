@@ -503,12 +503,19 @@ class BConfig extends BClass
     }
 
     /**
-    * Add configuration from file, stored as JSON
+    * Add configuration from file
     *
     * @param string $filename
     */
     public function addFile($filename, $toSave = false)
     {
+        if (preg_match('#^@([^/]+)(.*)#', $filename, $m)) {
+            $module = BModuleRegistry::i()->module($m[1]);
+            if (!$module) {
+                BDebug::error(BLocale::_('Invalid module name: %s', $m[1]));
+            }
+            $filename = $module->root_dir . $m[2];
+        }
         $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 #echo "<pre>"; print_r($this); echo "</pre>";
         if (!BUtil::isPathAbsolute($filename)) {
