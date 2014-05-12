@@ -175,31 +175,36 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         $importer = FCom_Core_ImportExport::i();
         $uploads  = $_FILES[ 'upload' ];
         $rows = [];
-        foreach ( $uploads[ 'name' ] as $i => $fileName ) {
+        try {
+            foreach ($uploads['name'] as $i => $fileName) {
 
-            if ( !$fileName ) {
-                continue;
-            }
-            $fullFileName = $importer->getFullPath( $fileName );
-            BUtil::ensureDir( dirname( $fullFileName ) );
-            $fileSize = 0;
-            if ( !$uploads[ 'error' ][ $i ] && @move_uploaded_file( $uploads[ 'tmp_name' ][ $i ], $fullFileName ) ) {
-                $importer->import( $fileName );
-                $error   = '';
-                $fileSize = $uploads[ 'size' ][ $i ];
-            } else {
-                $error = $uploads['error'][$i];
-            }
+                if (!$fileName) {
+                    continue;
+                }
+                $fullFileName = $importer->getFullPath($fileName);
+                BUtil::ensureDir(dirname($fullFileName));
+                $fileSize = 0;
+                if (!$uploads['error'][$i] && @move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
+                    $importer->import($fileName);
+                    $error    = '';
+                    $fileSize = $uploads['size'][$i];
+                } else {
+                    $error = $uploads['error'][$i];
+                }
 
-            $row = [
-                'name'   => $fileName,
-                'size'   => $fileSize,
-                'folder' => str_replace(BConfig::i()->get('fs/root_dir'), '...',dirname( $fullFileName )),
-            ];
-            if($error){
-                $row['error'] = $error;
+                $row = [
+                    'name'   => $fileName,
+                    'size'   => $fileSize,
+                    'folder' => str_replace(BConfig::i()->get('fs/root_dir'), '...', dirname($fullFileName)),
+                ];
+                if ($error) {
+                    $row['error'] = $error;
+                }
+                $rows[] = $row;
             }
-            $rows[] = $row;
+        } catch(Exception $e) {
+            BDebug::logException($e);
+            BResponse::i()->json(['error' => $e->getMessage()]);
         }
         BResponse::i()->json( [ 'files' => $rows ] );
     }
