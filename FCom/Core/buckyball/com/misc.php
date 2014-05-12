@@ -943,7 +943,7 @@ class BUtil extends BClass
     * @param array $data
     * @return string
     */
-    public static function remoteHttp($method, $url, $data = [])
+    public static function remoteHttp($method, $url, $data = [], $headers = [])
     {
         $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: ' . $method . ' ' . $url));
         $timeout = 5;
@@ -1000,6 +1000,12 @@ class BUtil extends BClass
                     CURLOPT_PUT => 1,
                 ];
             }
+
+            if (!empty($headers)) {
+                $curlOpt += [
+                    CURLOPT_HTTPHEADER => array_values($headers),
+                ];
+            }
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
@@ -1017,6 +1023,9 @@ class BUtil extends BClass
                 'timeout' => $timeout,
                 'header' => "User-Agent: {$userAgent}\r\n",
             ]];
+            if ($headers) {
+                $opts['http']['header'] .= join("\r\n", array_values($headers)) . "\r\n";
+            }
             if ($method === 'POST' || $method === 'PUT') {
                 $multipart = false;
                 if (is_array($data)) {
@@ -1063,7 +1072,7 @@ class BUtil extends BClass
                     ];
                 }
             }
-            $response = @file_get_contents($url, false, stream_context_create($opts));
+            $response = file_get_contents($url, false, stream_context_create($opts));
 
             static::$_lastRemoteHttpInfo = []; //TODO: emulate curl data?
             $respHeaders = isset($http_response_header) ? $http_response_header : [];
