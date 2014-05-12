@@ -1,0 +1,19 @@
+bitbucket:
+    version: "1.0"
+    request: "https://bitbucket.org/api/1.0/oauth/request_token"
+    auth: "https://bitbucket.org/api/1.0/oauth/authenticate"
+    access: "POST https://bitbucket.org/api/1.0/oauth/access_token"
+    api: "https://api.bitbucket.org/1.0/"
+
+github:
+    version: "2.0"
+    auth: "https://github.com/login/oauth/authorize"
+    access: "https://github.com/login/oauth/access_token"
+    api: "https://api.github.com/"
+
+twitter:
+    version: "1.0"
+    request: "https://api.twitter.com/oauth/request_token"
+    auth: "https://api.twitter.com/oauth/authenticate"
+    access: "https://api.twitter.com/oauth/access_token"
+    api: "https://api.twitter.com/1/account/verify_credentials.json"

@@ -2084,11 +2084,11 @@ class BModel extends Model
      * @param boolean $cache
      * @return BModel
      */
-    public static function loadOrCreate($id, $field, $cache = false)
+    public static function loadOrCreate($id, $field = null, $cache = false)
     {
         $model = static::load($id, $field, $cache);
         if (!$model) {
-            $model = static::create();
+            $model = static::create(is_array($id) ? $id : []);
         }
         return $model;
     }
