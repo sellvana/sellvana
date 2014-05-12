@@ -6,6 +6,9 @@ class FCom_OAuth_Controller extends FCom_Core_Controller_Abstract
     {
         $hlp = FCom_OAuth_Main::i();
         $returnUrl = BRequest::i()->get('redirect_to');
+        if (!$returnUrl) {
+            $returnUrl = BApp::href('login');
+        }
         $providerName = BRequest::i()->param('provider', true);
         if ($returnUrl) {
             $hlp->setReturnUrl($returnUrl);
@@ -15,7 +18,8 @@ class FCom_OAuth_Controller extends FCom_Core_Controller_Abstract
             $authUrl = $hlp->loginAction();
             BResponse::i()->redirect($authUrl);
         } catch (Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error');
+            $area = BApp::i()->get('area') === 'FCom_Admin' ? 'admin' : 'frontend';
+            BSession::i()->addMessage($e->getMessage(), 'error', $area);
             BResponse::i()->redirect($returnUrl);
         }
     }
@@ -27,7 +31,8 @@ class FCom_OAuth_Controller extends FCom_Core_Controller_Abstract
         try {
             $hlp->callbackAction();
         } catch (Exception $e) {
-            BSession::i()->addMessage($e->getMessage(), 'error');
+            $area = BApp::i()->get('area') === 'FCom_Admin' ? 'admin' : 'frontend';
+            BSession::i()->addMessage($e->getMessage(), 'error', $area);
         }
         BResponse::i()->redirect($returnUrl);
     }
