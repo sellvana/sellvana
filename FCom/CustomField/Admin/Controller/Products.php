@@ -76,11 +76,11 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $f['field_id'] = $f['id'];
                 $f['addable'] = true;
                 $f['mass-editable'] = true;
-                $f['width'] = 150;
+                $f['width'] = 200;
                 $f['position'] = $pos++;
                 $f['validation'] = ['required' => true];
                 $f['display'] = 'eval';
-                $f['print'] = '"<p style=\"overflow:hidden\"><input type=\"hidden\" name=\''. $f['name'].'\' class=\"select-value-field\" style=\"width: 130px\" /></p><p style=\"overflow:hidden\"><input type=\"hidden\" name=\''. $f['name'].'\' class=\"select-value-field\" style=\"width: 130px\" /></p>"';
+                $f['print'] = '"<p style=\"overflow:hidden\"><input type=\"hidden\" name=\''. $f['name'].'\' class=\"select-value-field\" style=\"width: 170px\" /></p><p style=\"overflow:hidden\"><input type=\"hidden\" name=\''. $f['name'].'\' class=\"input-value-field\" style=\"width: 170px\" /></p>"';
                 $f['default'] = '';
                 $columns[] = $f;
             }
