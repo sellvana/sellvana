@@ -10,6 +10,11 @@ class FCom_Catalog_Model_ProductLink extends FCom_Core_Model_Abstract
         'related' => [
             'product_id'        => 'FCom_Catalog_Model_Product.id',
             'linked_product_id' => 'FCom_Catalog_Model_Product.id',
+        ],
+        'unique_key' => [
+            'product_id',
+            'linked_product_id',
+            'link_type'
         ]
     ];
 
