@@ -105,6 +105,7 @@
 </script>
 
 <script>
+var prodVariantGrid = null;
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
     var _mainForm = $('#catalog-products-form');
     var _submitted = false; //flag for prevent infitive loop
