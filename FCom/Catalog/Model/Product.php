@@ -71,8 +71,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     protected static $_importExportProfile = [
         'skip' => [
-            'create_dt',
-            'update_dt',
+            'create_at',
+            'update_at',
             'indextank_indexed',
             'indextank_indexed_at',
         ],

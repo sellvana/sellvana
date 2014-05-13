@@ -720,10 +720,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 _deleteRow: function (ev) {
 
                     var confirm;
-                    if ($(ev.target).closest('button').hasClass('noconfirm'))
+                    if ($(ev.target).closest('button').hasClass('noconfirm')) {
                         confirm = true;
-                    else
+                    } else {
                         confirm = window.confirm("Do you want to really delete?");
+                    }
 
                     if (confirm) {
                         rowsCollection.remove(this.model/*, {silent: true}*/);
@@ -2122,10 +2123,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
 
                         var confirm;
-                        if ($(this).hasClass('noconfirm'))
+                        if ($(this).hasClass('noconfirm')) {
                             confirm = true;
-                        else
+                        } else {
                             confirm = window.confirm("Do you really want to delete selected rows?");
+                        }
 
                         if (confirm) {
 
@@ -2142,7 +2144,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                             rowsCollection.remove(selectedRows.models, {silent: true});
                             $('select.' + config.id + '.js-sel').val('');
+
                             gridView.render();
+                            if (typeof (config.afterMassDelete) !== 'undefined') {
+                                eval(config.afterMassDelete + '()');
+                            }
                             selectedRows.reset();
                         }
                     });

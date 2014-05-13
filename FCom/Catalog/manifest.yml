@@ -8,7 +8,7 @@ modules:
         description: "Categories and products management, admin and frontend"
         auto_use: [ bootstrap, views, layout ]
         observe:
-            - [ "FCom_Core_ImportExport::import:afterModel:FCom_Catalog_Model_Category", "FCom_Catalog_Model_Category::onImportAfterModel" ]
+            - [ "FCom_Core_ImportExport::import:afterModel:FCom_Catalog_Model_Category", "FCom_Catalog_Model_Category.onImportAfterModel" ]
 
         areas:
             FCom_Admin:
