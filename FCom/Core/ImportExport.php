@@ -214,8 +214,11 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $batchData[]  = (array)json_decode($line);
             if ($cnt % $bs == 0) {
                 $this->import($batchData, $bs);
+                $batchData = [];
             }
         }
+
+        $this->import($batchData, $bs);
         if (!feof($fi)) {
             $msg = BLocale::_("%s Error: unexpected file fail", BDb::now());
             $channel->send([
@@ -800,12 +803,12 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $importID   = static::DEFAULT_STORE_ID;
             $importMeta = array_shift($data);
             if ($importMeta) {
-                $meta = is_string($importMeta)? json_decode($importMeta): $importMeta;
-                if (isset($meta->{static::STORE_UNIQUE_ID_KEY})) {
-                    $importID = $meta->{static::STORE_UNIQUE_ID_KEY};
+                $meta = is_string($importMeta)? json_decode($importMeta, true): $importMeta;
+                if (isset($meta[static::STORE_UNIQUE_ID_KEY])) {
+                    $importID = $meta[static::STORE_UNIQUE_ID_KEY];
                     $channel->send(['signal' => 'info', 'msg' => "Store id: $importID"]);
                 } else {
-                    $msg = BLocale::_("%s Unique store id is not found, using '%s' as key", BDb::now(), $importID);
+                    $msg = BLocale::_("%s Unique store id is not found, using '%s' as key", [BDb::now(), $importID]);
                     $channel->send(
                         [
                             'signal'  => 'problem',

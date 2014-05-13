@@ -185,7 +185,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 BUtil::ensureDir(dirname($fullFileName));
                 $fileSize = 0;
                 if (!$uploads['error'][$i] && @move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
-                    $importer->import($fileName);
+                    $importer->importFile($fileName);
                     $error    = '';
                     $fileSize = $uploads['size'][$i];
                 } else {
