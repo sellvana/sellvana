@@ -1072,7 +1072,9 @@ class BUtil extends BClass
                     ];
                 }
             }
+            $oldErrorReporting = error_reporting(0);
             $response = file_get_contents($url, false, stream_context_create($opts));
+            error_reporting($oldErrorReporting);
 
             static::$_lastRemoteHttpInfo = []; //TODO: emulate curl data?
             $respHeaders = isset($http_response_header) ? $http_response_header : [];
