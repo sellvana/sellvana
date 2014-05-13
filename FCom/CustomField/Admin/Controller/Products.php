@@ -70,7 +70,13 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         if ($vFields !== null) {
             $pos = 2;
             foreach ($vFields as $f) {
-                $f['options'] = FCom_CustomField_Model_FieldOption::i()->getListAssocById($f['id']);
+                $op = FCom_CustomField_Model_FieldOption::i()->getListAssocById($f['id']);
+                if (!isset($f['options'])) {
+                    $f['options'] = $op;
+                    $f['new_value'] = [];
+                } else {
+                    $f['new_value'] = array_diff($f['options'], $op);
+                }
                 $f['label'] = $f['name'];
                 $f['name'] = $f['field_code'];
                 $f['field_id'] = $f['id'];
@@ -96,6 +102,8 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
             'addable' => true, 'sortable' => false, 'print' => '"<input type=\"hidden\" class=\"store-variant-image-id\" value=\'"+ rc.row["file_id"] +"\'/><ol class=\"dd-list columns dd-list-axis-x hide list-variant-image\"></ol><select class=\"form-control variant-image\"><option value></option></select>"' ];
         $columns[] = ['name' => 'file_id',  'hidden' => true];
         $columns[] = ['name' => 'list_image',  'hidden' => true, 'default' => $image];
+        $columns[] = ['name' => 'new_value',  'hidden' => true, 'default' => ''];
+        $columns[] = ['name' => 'fields',  'hidden' => true, 'default' => ''];
         $columns[] = ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumbUrl];
         $columns[] = ['type' => 'btn_group',  'buttons' => [['name' => 'delete']] ];
 
@@ -106,10 +114,12 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         if ($variants !== null) {
             $index = 0;
             foreach ($variants as $v) {
+                $v['fields']['fields'] = $v['fields'];
                 $v['fields']['sku'] = $v['sku'];
                 $v['fields']['qty'] = $v['qty'];
                 $v['fields']['price'] = $v['price'];
                 $v['fields']['file_id'] = $v['file_id'];
+                $v['fields']['new_value'] = $v['new_value'];
                 $v['fields']['id'] = $index++;
                 $data[] = $v['fields'];
             }
