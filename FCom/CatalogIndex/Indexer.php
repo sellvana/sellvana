@@ -450,7 +450,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                                     $facets[$fName]['values'][$vVal]['parent'] = 1;
                                 }
                                 if ($showCount) {
-                                    $facetFilters[$fName]['count_value_ids'][$value1['id']] = $value1['id'];
+                                    $facetFilters[$fName]['count_value_ids'][$vId1] = $vId1;
                                 }
                             }
                         }
@@ -538,20 +538,21 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                         $orm->select_expr("(SUM(IF(value_id={$vId},1,0)))", $vId);
                     }
                 }
-                if ($counts = $orm->find_one()) {
-                    $counts = $counts->as_array();
-                }
-                if ($counts) {
-                    foreach ($counts as $vId => $cnt) {
-                        if (!isset($filterValues[$vId]) || !is_array($v)
-                            || !isset($filterFields[$filterFieldNamesById[$v['field_id']]])
-                        ) {
-                            continue;
+                if ($countsModel = $orm->find_one()) {
+                    $counts = $countsModel->as_array();
+                    if ($counts) {
+                        foreach ($counts as $vId => $cnt) {
+                            if (!isset($filterValues[$vId]) || !is_array($filterValues[$vId])) {
+                                continue;
+                            }
+                            $v = $filterValues[$vId];
+                            if (!isset($filterFields[$filterFieldNamesById[$v['field_id']]])) {
+                                continue;
+                            }
+                            $f = $filterFields[$filterFieldNamesById[$v['field_id']]];
+                            $facets[$f['field_name']]['values'][$v['val']]['display'] = !empty($v['display']) ? $v['display'] : $v['val'];
+                            $facets[$f['field_name']]['values'][$v['val']]['cnt'] = $cnt;
                         }
-                        $v = $filterValues[$vId];
-                        $f = $filterFields[$filterFieldNamesById[$v['field_id']]];
-                        $facets[$f['field_name']]['values'][$v['val']]['display'] = !empty($v['display']) ? $v['display'] : $v['val'];
-                        $facets[$f['field_name']]['values'][$v['val']]['cnt'] = $cnt;
                     }
                 }
             } else { // TODO: benchmark whether vertical count is faster than horizontal
