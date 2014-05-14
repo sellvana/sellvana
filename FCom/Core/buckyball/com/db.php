@@ -1216,6 +1216,20 @@ class BORM extends ORMWrapper
     }
 
     /**
+     * Get original model class name
+     *
+     * @return string
+     */
+    protected function _origClass()
+    {
+        $class = $this->_class_name;
+        if (method_exists($class, 'origClass') && $class::origClass()) {
+            $class = $class::origClass();
+        }
+        return $class;
+    }
+
+    /**
      * Find one row
      *
      * @param int|null $id
@@ -1223,10 +1237,7 @@ class BORM extends ORMWrapper
      */
     public function find_one($id = null)
     {
-        $class = $this->_class_name;
-        if (method_exists($class, 'origClass') && $class::origClass()) {
-            $class = $class::origClass();
-        }
+        $class = $this->_origClass();
         BEvents::i()->fire($class . '::find_one:orm', ['orm' => $this, 'class' => $class, 'id' => $id]);
         $result = parent::find_one($id);
         BEvents::i()->fire($class . '::find_one:after', ['result' => &$result, 'class' => $class, 'id' => $id]);
@@ -1240,10 +1251,7 @@ class BORM extends ORMWrapper
     */
     public function find_many()
     {
-        $class = $this->_class_name;
-        if (method_exists($class, 'origClass') && $class::origClass()) {
-            $class = $class::origClass();
-        }
+        $class = $this->_origClass();
         BEvents::i()->fire($class . '::find_many:orm', ['orm' => $this, 'class' => $class]);
         $result = parent::find_many();
         BEvents::i()->fire($class . '::find_many:after', ['result' => &$result, 'class' => $class]);
@@ -1382,7 +1390,7 @@ class BORM extends ORMWrapper
                 $result = $this->_save($replace);
             #}
         } else {
-            echo $this->_class_name . '[' . $this->id . ']: ';
+            echo $this->_className() . '[' . $this->id() . ']: ';
             print_r($this->_data);
             echo 'FROM: '; print_r($this->_old_values);
             echo 'TO: '; print_r($this->_dirty_fields); echo "\n\n";
@@ -1806,6 +1814,13 @@ class BModel extends Model
     protected static $_flags = [];
 
     /**
+     * Collection class name
+     *
+     * @var string
+     */
+    protected static $_collectionClass = 'BCollection';
+
+    /**
     * Retrieve original class name
     *
     * @return string
@@ -1911,6 +1926,16 @@ class BModel extends Model
         }
         BEvents::i()->fire(static::$_origClass . '::orm', ['orm' => $orm, 'alias' => $alias]);
         return $orm;
+    }
+
+    public static function collection($alias = null)
+    {
+        $collectionClass = static::$_collectionClass;
+        $orm = $this->orm($alias);
+        $collection = $collectionClass::i(true)->setModelClass(static::$_origClass)->setOrm($orm);
+
+        BEvents::i()->fire(static::$_origClass . '::collection', ['collection' => $this, 'orm' => $orm, 'alias' => $alias]);
+        return $collection;
     }
 
     /**
@@ -2768,9 +2793,15 @@ class BModel extends Model
  *
  * Should be (almost) drop in replacement for current straight arrays implementation
  */
-class BCollection extends BData
+class BCollection extends ArrayIterator
 {
     protected $_orm;
+    protected $_modelClass = 'BModel';
+
+    public function __construct($rows)
+    {
+        parent::__construct($rows);
+    }
 
     public function setOrm($orm)
     {
@@ -2778,16 +2809,45 @@ class BCollection extends BData
         return $this;
     }
 
-    public function load($assoc = false)
+    public function getOrm()
     {
-        $method = $assoc ? 'find_many_assoc' : 'find_many';
-        $this->_data = $this->_orm->$method();
+        return $this->_orm;
+    }
+
+    public function setModelClass($class)
+    {
+        $this->_modelClass = $class;
+        return $this;
+    }
+
+    public function getModelClass()
+    {
+        return $this->_modelClass;
+    }
+
+    public function loadAll($assoc = false, $key = null, $labelColumn = null, $options = [])
+    {
+        if ($assoc) {
+            $data = $this->_orm->find_many_assoc($key, $labelColumn, $options);
+        } else {
+            $data = $this->_orm->find_many();
+        }
+        $this->setData($data);
+        return $this;
+    }
+
+    public function setData($data)
+    {
+        //TODO: clear dbplus_first(relation, tuple)
+        foreach ($rows as $k => $row) {
+            $this->offsetSet($k, $row);
+        }
         return $this;
     }
 
     public function modelsAsArray()
     {
-        return BDb::many_as_array($this->_data);
+        return BDb::many_as_array($this);
     }
 }
 

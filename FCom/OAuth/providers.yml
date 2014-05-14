@@ -1,5 +1,8 @@
+# http://www.cheatography.com/kayalshri/cheat-sheets/oauth-end-points/
+
 bitbucket:
     version: "1.0"
+    params_method: body
     request: "https://bitbucket.org/api/1.0/oauth/request_token"
     auth: "https://bitbucket.org/api/1.0/oauth/authenticate"
     access: "POST https://bitbucket.org/api/1.0/oauth/access_token"
@@ -38,3 +41,10 @@ facebook:
     auth: "https://www.facebook.com/dialog/oauth"
     access: "https://graph.facebook.com/oauth/access_token"
     user_api: "https://graph.connect.facebook.com/me/"
+
+dropbox:
+    version: "2.0"
+    scope: dropbox
+    auth: "https://www.dropbox.com/1/oauth2/authorize"
+    access: "https://api.dropbox.com/1/oauth2/token"
+    user_api: "https://api.dropbox.com/1/account/info"
