@@ -58,7 +58,6 @@ require(['jquery','underscore','backbone', 'fcom.backbonegrid'], function($, _) 
         var confirmDelete = $('#confirm-delete-product-images');
         var selfRow;
         all_prod_images_grid.getGridSkeleton().Views.RowView.prototype._deleteRow = function (ev) {
-            console.log("est");
             selfRow = this;
             var text = (this.model.get('associated_products') > 0) ?
                     "This image is associated with "+ this.model.get('associated_products') +" of products. Are you sure you want to delete?" : "Are you sure you want to delete?";
