@@ -8,6 +8,7 @@ base:
             - [ css, "@FCom_Core/css/flags.css" ]
             - [ css, "@FCom_LibJsCommon/js/css/jquery.rateit.css" ]
             - [ css, "@FCom_FrontendThemeBootSimple/Frontend/css/fulleron-base.css" ]
+            #- [ css, "@FCom_FrontendThemeBootSimple/Frontend/css/fulleron-theme.css" ]
 
             - [ js, //html5shim.googlecode.com/svn/trunk/html5.js, { if: lt IE 9 } ]
 

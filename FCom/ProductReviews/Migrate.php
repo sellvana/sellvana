@@ -42,10 +42,12 @@ class FCom_ProductReviews_Migrate extends BClass
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
-        BDb::run("
-            ALTER TABLE {$tProduct} ADD COLUMN avg_rating decimal(5,2) NULL,
-            ADD COLUMN num_reviews int NULL;
-        ");
+        BDb::ddlTableDef($tProduct, [
+            'COLUMNS' => [
+                'avg_rating' => 'decimal(5,2) null',
+                'num_reviews' => 'int null',
+            ],
+        ]);
 
         BDb::run("CREATE TABLE IF NOT EXISTS {$tReviewFlag}  (
             `id` int unsigned not null auto_increment primary key,

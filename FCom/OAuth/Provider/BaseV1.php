@@ -19,12 +19,15 @@ class FCom_OAuth_Provider_BaseV1 extends FCom_OAuth_Provider_Abstract
     {
         $response = $this->_signAndCall('request');
         parse_str($response, $result);
-        if (empty($result['oauth_callback_confirmed']) || empty($result['oauth_token']) || empty($result['oauth_secret'])) {
+        if (empty($result['oauth_callback_confirmed']) || empty($result['oauth_token']) || empty($result['oauth_token_secret'])) {
             throw new BException('OAuth getRequestToken error: '.print_r($result, 1));
         }
 
+        $hlp = FCom_OAuth_Main::i();
+        $providerName = $hlp->getProvider();
+        $consumerSess =& $hlp->getConsumerSession($providerName);
         $consumerSess['request_token'] = $result['oauth_token'];
-        $consumerSess['request_token_secret'] = $result['oauth_secret'];
+        $consumerSess['request_token_secret'] = $result['oauth_token_secret'];
         return $result['oauth_token'];
     }
 
@@ -57,13 +60,13 @@ class FCom_OAuth_Provider_BaseV1 extends FCom_OAuth_Provider_Abstract
     {
         $response = $this->_signAndCall('access');
         parse_str($response, $result);
-        if (empty($result['oauth_token']) || empty($result['oauth_secret'])) {
+        if (empty($result['oauth_token']) || empty($result['oauth_token_secret'])) {
             throw new BException('OAuth getRequestToken error: '.print_r($result, 1));
         }
 
         $token = $result['oauth_token'];
-        $secret = $result['oauth_secret'];
-        unset($result['oauth_token'], $result['oauth_secret']);
+        $secret = $result['oauth_token_secret'];
+        unset($result['oauth_token'], $result['oauth_token_secret']);
 
         $modelData = ['provider' => $providerName, 'token' => $token];
         $tokenModel = FCom_OAuth_Model_ConsumerToken::i()->loadOrCreate($modelData);
@@ -92,12 +95,12 @@ class FCom_OAuth_Provider_BaseV1 extends FCom_OAuth_Provider_Abstract
             $reqInfo = ['url' => $reqInfo];
         }
         $url = $reqInfo['url'];
-        $method = !empty($reqInfo['method']) ? $reqInfo['method'] : 'POST';
+        $method = !empty($reqInfo['method']) ? $reqInfo['method'] : 'GET';
         #$f = $this->_getReqFields($stage, $providerInfo);
 
         $params = [];
         $params['oauth_consumer_key'] = $consumerConf['consumer_key'];
-        $params['oauth_nonce'] = BUtil::randomString(16);
+        $params['oauth_nonce'] = BUtil::randomString(32);
         $params['oauth_timestamp'] = time();
         $params['oauth_signature_method'] = 'HMAC-SHA1';
         $params['oauth_version'] = !empty($providerInfo['version']) ? $providerInfo['version'] : '1.0';
@@ -112,9 +115,8 @@ class FCom_OAuth_Provider_BaseV1 extends FCom_OAuth_Provider_Abstract
                 break;
         }
 
-        $signatureBaseArr = [$this->_oauthEscape($method), $this->_oauthEscape($url)];
+        $signatureBaseArr = [];
         ksort($params);
-        $authHeaderArr = [];
         foreach ($params as $k => $v) {
             if ($k === 'oauth_signature') {
                 continue;
@@ -122,27 +124,47 @@ class FCom_OAuth_Provider_BaseV1 extends FCom_OAuth_Provider_Abstract
             if (is_array($v)) {
                 sort($v);
                 foreach ($v as $v1) {
-                    $signatureBaseArr[] = $this->_oauthEscape($k . '=' . $v1);
-                    $authHeaderArr[] = $k . '="' . $this->_oauthEscape($v1) . '"';
+                    $signatureBaseArr[] = $k . '=' . $this->_oauthEscape($v1);
                 }
             } else {
-                $signatureBaseArr[] = $this->_oauthEscape($k . '=' . $v);
-                $authHeaderArr[] = $k . '="' . $this->_oauthEscape($v) . '"';
+                $signatureBaseArr[] = $k . '=' . $this->_oauthEscape($v);
             }
         }
-        $signatureBase = join('&', $signatureBaseArr);
+        $signatureBase = $this->_oauthEscape($method) . '&' . $this->_oauthEscape($url) . '&'
+            . $this->_oauthEscape(join('&', $signatureBaseArr));
         $signatureKeyArr = [
             $this->_oauthEscape($consumerConf['consumer_secret']),
             !empty($consumerSess['request_token_secret']) ? $this->_oauthEscape($consumerSess['request_token_secret']) : '',
         ];
         $signatureKey = join('&', $signatureKeyArr);
-echo "<pre>";
-var_dump(http_build_query($params));
         $params['oauth_signature'] = base64_encode(hash_hmac('sha1', $signatureBase, $signatureKey, true));
-        $headers['authorization'] = 'Authorization: OAuth ' . join(', ', $authHeaderArr);
-var_dump($method, $url, $params, $headers, $signatureBase, $signatureKey);
-        $response = BUtil::remoteHttp($method, $url, $params, $headers);
-var_dump($response); exit;
+
+        $authHeaderArr = [];
+        foreach ($params as $k => $v) {
+            if (is_array($v)) {
+                sort($v);
+                foreach ($v as $v1) {
+                    $authHeaderArr[] = $k . '="' . $this->_oauthEscape($v1) . '"';
+                }
+            } else {
+                $authHeaderArr[] = $k . '="' . $this->_oauthEscape($v) . '"';
+            }
+        }
+        $postMethod = !empty($providerInfo['post_method']) ? $providerInfo['post_method'] : 'header';
+        $postParams = [];
+        $headers = [];
+        switch ($postMethod) {
+            case 'url':
+                $url .= '?' . http_build_query($params);
+                break;
+            case 'header':
+                $headers[] = 'Authorization: OAuth ' . join(',', $authHeaderArr);
+                break;
+            case 'body':
+                $postParams = $params;
+                break;
+        }
+        $response = BUtil::remoteHttp($method, $url, $postParams, $headers, ['curl' => 1]);
         if (!$response) {
             throw new BException('OAuth getRequestToken HTTP error'); //TODO: more info
         }
@@ -152,11 +174,14 @@ var_dump($response); exit;
 
     protected function _oauthEscape($string)
     {
+        return str_replace(['%7E', '+'], ['~', ' '], rawurlencode($string));
+        /*
         return str_replace(
             ['%7E', '+',   '!',   '*',   '\'',  '(',   ')'  ],
             ['~',   '%20', '%21', '%2A', '%27', '%28', '%29'],
             rawurlencode($string)
         );
+        */
     }
 
     protected function _getReqFields($stage, $providerInfo)
