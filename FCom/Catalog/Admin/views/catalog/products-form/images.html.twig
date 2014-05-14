@@ -2,6 +2,22 @@
 {% set prodImagesConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
 <script>
 var all_prod_images_grid, imagesGrid;
+function afterMassDelete() {
+    if (prodVariantGrid != null) {
+        var image = [];
+        imagesGrid.getSelectedRows().forEach(function (row) {
+            image.push({
+                file_id: row.get('file_id'),
+                subfolder: row.get('subfolder'),
+                file_name: row.get('file_name')
+            })
+        });
+        updateListVariantImage({
+            add: false,
+            image: image
+        });
+    }
+}
 require(['jquery','underscore','backbone', 'fcom.backbonegrid'], function($, _) {
     var originIds, removedIds = [];
     var rowsAllImages;
@@ -42,7 +58,6 @@ require(['jquery','underscore','backbone', 'fcom.backbonegrid'], function($, _) 
         var confirmDelete = $('#confirm-delete-product-images');
         var selfRow;
         all_prod_images_grid.getGridSkeleton().Views.RowView.prototype._deleteRow = function (ev) {
-            console.log("est");
             selfRow = this;
             var text = (this.model.get('associated_products') > 0) ?
                     "This image is associated with "+ this.model.get('associated_products') +" of products. Are you sure you want to delete?" : "Are you sure you want to delete?";
@@ -70,9 +85,11 @@ require(['jquery','underscore','backbone', 'fcom.backbonegrid'], function($, _) 
 
         $('.btn_all_prod_images_add').click(function() {
             var gridView = imagesGrid.getGridView();
+            var image = [];
             grid.getSelectedRows().forEach(function (row) {
                 if (!imagesGrid.getRows().findWhere({file_id: row.get('id')})) {
-                    var addedRow = row;
+                    var addedRow = _.clone(row);
+                    var id = row.get('id');
                     addedRow.set('_new', true);
                     addedRow.set('file_id', row.id);
                     addedRow.set('update_at', dateTimeNow());
@@ -80,9 +97,20 @@ require(['jquery','underscore','backbone', 'fcom.backbonegrid'], function($, _) 
                     addedRow.set('id', guid());
                     addedRow.set('selected', false);
                     gridView.collection.add(addedRow.toJSON(), {silent: true});
+                    image.push({
+                        file_id: row.get('file_id'),
+                        subfolder: row.get('subfolder'),
+                        file_name: row.get('file_name')
+                    })
+                    row.set('id', id);
                 }
             });
-
+            if (prodVariantGrid != null) {
+                updateListVariantImage({
+                    add: true,
+                    image: image
+                });
+            }
             gridView.render();
             grid.getGridView().clearSelectedRows();
             $('#all_prod_images_modal').modal('hide');
@@ -102,6 +130,32 @@ require(['jquery','underscore','backbone', 'fcom.backbonegrid'], function($, _) 
             if (mainThumb.val() == this.model.get('id')) {
                 input.prop('checked', true);
             }
+        }
+
+        imagesGrid.getGridSkeleton().Views.RowView.prototype._deleteRow = function (ev) {
+
+            var confirm;
+            if ($(ev.target).closest('button').hasClass('noconfirm')) {
+                confirm = true;
+            } else {
+                confirm = window.confirm("Do you want to really delete?");
+            }
+            if (confirm) {
+                imagesGrid.getRows().remove(this.model);
+                imagesGrid.getSelectedRows().remove(this.model, {silent: true});
+                var image = [{
+                    file_id: this.model.get('file_id'),
+                    subfolder: this.model.get('subfolder'),
+                    file_name: this.model.get('file_name')
+                }];
+                if (prodVariantGrid != null) {
+                    updateListVariantImage({
+                        add: false,
+                        image: image
+                    });
+                }
+            }
+
         }
 
         imagesGrid.build();

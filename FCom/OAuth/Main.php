@@ -78,10 +78,11 @@ class FCom_OAuth_Main extends BClass
     {
         $providerName = $this->getProvider();
         $providerInfo = $this->getProviderInfo($providerName);
+        $version = !empty($providerInfo['version']) ? $providerInfo['version'] : '1.0';
         if (empty($providerInfo['class'])) {
             $className = 'FCom_OAuth_Provider_' . strtoupper($providerName);
             if (!class_exists($className)) {
-                $className = 'FCom_OAuth_Provider_Base';
+                $className = 'FCom_OAuth_Provider_BaseV' . $version[0];
             }
         } else {
             $className = $providerInfo['class'];

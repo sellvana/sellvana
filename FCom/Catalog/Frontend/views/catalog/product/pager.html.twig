@@ -26,6 +26,7 @@
 <form class="form-inline" method="get" action="{{ url }}">
   <fieldset class="f-prod-listing-toolbar">
     <input type="hidden" name="q" value="{{ REQUEST.get('q') }}">
+    <input type="hidden" name="view" value="{{ REQUEST.get('view') }}">
     <div class="form-group pull-right">
       <label for="#" class="control-label">Sort by:</label>
       <select name="sc" onchange="this.form.submit()" class="form-control">

@@ -1,6 +1,6 @@
 modules:
     FCom_OAuth:
-        version: 0.1.0
+        version: 0.1.1
 
         areas:
             FCom_Admin:

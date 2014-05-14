@@ -46,14 +46,24 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
             BResponse::i()->redirect(BRequest::i()->referrer());
             return;
         }
-        $user = FCom_Admin_Model_User::i()->orm()
-            ->where(['OR' => [
-                'email' => $form['email'],
-                'username' => $form['email'],
-            ]])
-            ->find_one();
-        if ($user) {
-            $user->recoverPassword();
+        $notLocked = BLoginThrottle::i()->init('admin:password_recover', BRequest::i()->ip());
+        if ($notLocked) {
+            $hlp = FCom_Admin_Model_User::i();
+            $user = $hlp->orm()->where(['OR' => ['email' => $form['email'], 'username' => $form['email']]])->find_one();
+            if ($user) {
+                BLoginThrottle::i()->success();
+                $user->recoverPassword();
+                sleep(1); // equalize time for success and failure
+            } else {
+                if (BDebug::is('DEBUG') && !$hlp->orm()->find_one()) {
+                    $hlp->create(['username' => 'admin', 'email' => $form['email'], 'is_superadmin' => 1])
+                        ->save()->recoverPassword();
+                } else {
+                    BLoginThrottle::i()->failure(1);
+                }
+            }
+        } else {
+            sleep(1); // equalize time for success and failure
         }
         $this->message('If the email address was correct, you should receive an email shortly with password recovery instructions.');
         BResponse::i()->redirect('');

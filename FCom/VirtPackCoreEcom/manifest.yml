@@ -25,7 +25,6 @@ modules:
                 FCom_Feedback: 0.1.0
                 FCom_FreshBooks: 0.1.0
                 FCom_Frontend: 0.1.0
-                FCom_FrontendCP: 0.1.0
                 FCom_FrontendThemeBootSimple: 0.1.0
                 FCom_Geo: 0.1.0
                 FCom_MarketClient: 0.1.0

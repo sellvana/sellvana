@@ -80,7 +80,7 @@
         <div class="form-group">
             <label for="review-text">{{ 'Review Text'|_ }}</label>
             <div class="controls">
-                <textarea name="review[text]" id="prodreview-text" placeholder="{{"Your review here" | _ }}" class="form-control" style="resize:vertical">{% if pr %}{{ pr.get('text')}}{% else %}{{ validator is defined ? validator.fieldValue('text') : '' }}{% endif %}</textarea><br/>
+                <textarea name="review[text]" id="prodreview-text" rows="8" placeholder="{{"Your review here" | _ }}" class="form-control" style="resize:vertical">{% if pr %}{{ pr.get('text')}}{% else %}{{ validator is defined ? validator.fieldValue('text') : '' }}{% endif %}</textarea><br/>
             </div>
         </div>
         <input type="submit" class="btn btn-primary" id="review_save">
@@ -88,7 +88,7 @@
             <input type="button" class="btn btn-link-cancel" data-dismiss="modal" value="{{ 'Cancel'|_ }}" />
         {% endif %}
         {% if (THIS.get('isModalBox') != 1) %}
-            <a href="{{ prod.url() }}" class="btn">{{ "Return product"|_ }}</a>
+            <a href="{{ prod.url() }}" class="btn">{{ "Return to product"|_ }}</a>
         {% endif %}
     </form>
 {% endif %}

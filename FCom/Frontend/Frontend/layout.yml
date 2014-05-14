@@ -8,8 +8,23 @@ base:
     - view: head
         do:
             - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
+            - [ meta, viewport, "width=device-width, initial-scale=1.0" ]
+            #- [ meta, X-UA-Compatible, IE=100, true ]
             - [ icon, @FCom_Core/favicon.ico ]
+            - [ css, "//fonts.googleapis.com/css?family=Lato:400,700,900,400italic,700italic,900italic" ]
+            - [ css, "@FCom_Frontend/Frontend/css/bootstrap.css" ]
+            - [ css, "@FCom_Core/css/flags.css" ]
+            - [ css, "@FCom_LibJsCommon/js/css/jquery.rateit.css" ]
+            - [ css, "@FCom_Frontend/Frontend/css/fulleron-base.css" ]
+            - [ js, //html5shim.googlecode.com/svn/trunk/html5.js, { if: lt IE 9 } ]
 
+            - [ requireJs, bootstrap, "@FCom_Frontend/Frontend/js/bootstrap", { deps: [ jquery ] } ]
+            - [ requireJs, responsiveslides, "@FCom_Frontend/Frontend/js/vendor/responsiveslides.min", { deps: [ jquery ] } ]
+            - [ requireJs, typeahead, "@FCom_Frontend/Frontend/js/vendor/typeahead.min", { deps: [ jquery ] } ]
+
+            - [ requireJs, fcom.core, "@FCom_Core/js/fcom.core" ]
+            - [ requireJs, fcom.frontend, "@FCom_Frontend/Frontend/js/fcom.frontend" ]
+            - [ requireRun, fcom.frontend ]
 
     - { include: common_js_libs }
 
@@ -30,7 +45,6 @@ base:
 
 /:
     - { include: base }
-    - view: head
-        do:
-            - [ title, Home Page ]
+    - { view: root, do: [[ addBodyClass, "f-page-home" ]] }
+    - { view: head, do: [[ title, "Home Page" ]] }
     - { hook: main, views: static/index, use_meta: true }
