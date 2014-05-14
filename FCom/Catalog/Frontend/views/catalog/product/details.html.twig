@@ -230,7 +230,7 @@
             }
             $('#prod-in-stock').html(variants[0].qty + ' Items In Stock.');
             for (var val in variants[0].fields ) {
-                $('select [name="'+ val +'"]').find('option [value="'+ variants[0].fields[val] +'"]').attr('selected', 'selected');
+                $('#'+ val).find('option[value="'+ variants[0].fields[val] +'"]').attr('selected', 'selected');
             }
         }
         function displayImage(image) {
@@ -270,21 +270,21 @@
             })
             var image = [];
             displayAllImage.addClass('hidden');
-            if (find == null || find.qty == 0) {
+            if (find == null || find.qty == 0 || find.qty == '') {
                 priceVariant.html("$0.00");
                 quantityVariant.val(0);
                 $('#prod-in-stock').html('Items not available.');
                 $('#prod-add-to-card').prop('disabled', true);
             } else {
-                priceVariant.html(find.price);
                 quantityVariant.val(1);
                 $('#prod-in-stock').html(find.qty + ' Items In Stock.');
-                if (find.file_id != '') {
-                    image = find.file_id.split(',');
-                    displayAllImage.removeClass('hidden');
-                }
                 $('#prod-add-to-card').prop('disabled', false);
 
+            }
+            if (find != null && find.file_id != '') {
+                priceVariant.html(find.price);
+                image = find.file_id.split(',');
+                displayAllImage.removeClass('hidden');
             }
             displayImage(image);
         });
