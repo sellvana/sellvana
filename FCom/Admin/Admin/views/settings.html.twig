@@ -176,11 +176,11 @@
 <script type="template" id="ip-mode-template">
     <div  class="row ip-mode" style="margin-bottom: 15px">
         <div class="col-md-3 text-right">
-            <% if (typeof (default_mode) !== 'undefined') { %>
+            <% if (typeof (arguments[0].default_mode) !== 'undefined') { %>
                 <label class="control-label">{{ "Default"|_ }}</label>
-                <input type="hidden" class="default"  name="<%- name %>"/>
+                <input type="hidden" class="default"  name="<%- arguments[0].name %>"/>
             <% } else { %>
-                <input type="text" name="<%- name %>" class="form-control text-ip-mode" id="<%- name %>"/>
+                <input type="text" name="<%- arguments[0].name %>" class="form-control text-ip-mode" id="<%- arguments[0].name %>"/>
             <% } %>
         </div>
         <div class="col-md-3">
@@ -188,15 +188,16 @@
                 {{ UTIL.optionsHtml(APP.instance('FCom_Admin_Controller_Settings').getAllMode())|raw }}
             </select>
         </div>
-        <div class="col-md-6">
-            <button class="btn  btn-xs <%- class_button %>" style="margin-top: 5px;" type="button">
-                <% if (typeof (default_mode) !== 'undefined') { %>
+	<div class="col-md-6">
+            <button class="btn  btn-xs <%- arguments[0].class_button  %>" style="margin-top: 5px;" type="button">
+                <% if (typeof (arguments[0].default_mode) !== 'undefined') { %>
                     <i class="icon-plus"></i>
                 <% } else { %>
                     <i class="icon-remove"></i> 
                 <% } %>
             </button>
         </div>
+        
     </div>
 
 </script>
