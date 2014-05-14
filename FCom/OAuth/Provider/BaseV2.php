@@ -58,9 +58,10 @@ class FCom_OAuth_Provider_BaseV2 extends FCom_OAuth_Provider_Abstract
         $params['client_id'] = $consumerConf['consumer_key'];
         $params['client_secret'] = $consumerConf['consumer_secret'];
         $params['code'] = $consumerSess['code'];
+        unset($consumerSess['code']);
         $params['grant_type'] = 'authorization_code';
         $params['redirect_uri'] = BApp::href('oauth/callback');
-        $response = BUtil::remoteHttp('POST', $providerInfo['access'], $params);
+        $response = BUtil::remoteHttp('POST', $providerInfo['access'], $params, ['curl' => 1]);
         if (!$response) {
             throw new BException('Error during access_token HTTP request');
         }
