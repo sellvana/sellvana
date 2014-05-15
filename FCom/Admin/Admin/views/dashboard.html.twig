@@ -82,6 +82,7 @@
     </div>
 
     <div class="pull-right btn-group">
+      <button class="btn btn-default btn-filter-date" data-date="all">{{ 'All'|_ }}</button>
       <button class="btn btn-default btn-filter-date" data-date="month">{{ 'Last month'|_ }}</button>
       <button class="btn btn-default btn-filter-date" data-date="week">{{ 'Last week'|_ }}</button>
       <button class="btn btn-default btn-filter-date" data-date="today">{{ 'Today'|_ }}</button>
@@ -198,6 +199,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
                   $('button[data-date="today"]').click();
                   break;
               case 'all':
+                  $('button[data-date="all"]').click();
                   break;
               default:
                   $('a[data-id="'+ response.filter.type +'"]').click();
@@ -206,6 +208,8 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
                   $('.update').click();
                   break;
           }
+      } else {
+          $('button[data-date="all"]').click();
       }
     });
   }
@@ -250,6 +254,9 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
               data['range'] = 'not_range';
               data['date'] = 'today';
               filterDate(data);
+              break;
+          case 'all':
+              filterDate({type: 'default', date: 'all', range: 'range'});
               break;
           default:
               break;
@@ -331,7 +338,6 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
                 break;
             default :break;
         }
-        console.log(option);
         select.append(option);
 
         check_avail_status();
