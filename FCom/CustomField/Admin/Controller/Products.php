@@ -73,9 +73,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $op = FCom_CustomField_Model_FieldOption::i()->getListAssocById($f['id']);
                 if (!isset($f['options'])) {
                     $f['options'] = $op;
-                    $f['new_value'] = [];
                 } else {
-                    $f['new_value'] = array_diff($f['options'], $op);
                 }
                 $f['label'] = $f['name'];
                 $f['name'] = $f['field_code'];
@@ -86,7 +84,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $f['position'] = $pos++;
                 $f['validation'] = ['required' => true];
                 $f['display'] = 'eval';
-                $f['print'] = '"<p style=\"overflow:hidden\"><input type=\"hidden\" name=\''. $f['name'].'\' class=\"select-value-field required\" style=\"width: 170px\" /></p><p style=\"overflow:hidden\"><input type=\"hidden\" name=\''. $f['name'].'\' class=\"input-value-field\" style=\"width: 170px\" /></p>"';
+                $f['print'] = '"<p style=\"overflow:hidden\"><input type=\"hidden\" name=\''. $f['name'].'\' class=\"select-value-field required\" style=\"width: 170px\" /></p>"';
                 $f['default'] = '';
                 $columns[] = $f;
             }
@@ -102,7 +100,6 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
             'addable' => true, 'sortable' => false, 'print' => '"<input type=\"hidden\" class=\"store-variant-image-id\" value=\'"+ rc.row["file_id"] +"\'/><ol class=\"dd-list columns dd-list-axis-x hide list-variant-image\"></ol><select class=\"form-control variant-image\"><option value></option></select>"' ];
         $columns[] = ['name' => 'file_id',  'hidden' => true];
         $columns[] = ['name' => 'list_image',  'hidden' => true, 'default' => $image];
-        $columns[] = ['name' => 'new_value',  'hidden' => true, 'default' => ''];
         $columns[] = ['name' => 'fields',  'hidden' => true, 'default' => ''];
         $columns[] = ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumbUrl];
         $columns[] = ['type' => 'btn_group',  'buttons' => [['name' => 'delete']] ];
@@ -119,7 +116,6 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $v['fields']['qty'] = $v['qty'];
                 $v['fields']['price'] = $v['price'];
                 $v['fields']['file_id'] = $v['file_id'];
-                $v['fields']['new_value'] = $v['new_value'];
                 $v['fields']['id'] = $index++;
                 $data[] = $v['fields'];
             }
