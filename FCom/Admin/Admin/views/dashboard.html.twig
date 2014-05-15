@@ -229,6 +229,8 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
   });
   $('.btn-filter-date').click(function () {
       var data = {};
+      $('button.active-button').removeClass('active-button');
+      $(this).addClass('active-button');
       resetFilterDate();
       switch ($(this).attr('data-date')) {
           case 'month':

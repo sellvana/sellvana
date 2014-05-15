@@ -3692,3 +3692,6 @@ body.error .error-container-footer a {
 .list-variant-image img {
     position: absolute;
 }
+.btn-filter-date.active-button {
+    background-color: #e4e4e4;
+}
