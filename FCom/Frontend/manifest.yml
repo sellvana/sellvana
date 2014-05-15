@@ -8,7 +8,7 @@ modules:
         default_config:
             modules:
                 FCom_Frontend:
-                    theme: FCom_FrontendThemeBlue
+                    theme: FCom_FrontendThemeBootSimple
                     nav_top: { root_cms: 1, root_category: 1, type: categories_root }
 
         areas:
