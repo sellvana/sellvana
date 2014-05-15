@@ -268,7 +268,8 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
         closeFilter.removeClass('hidden');
         custom.children('button').addClass('filter');
         custom.find('.custom-filter-value').html(filter.attr('data-text') +' "' + date + '"');
-        filterDate(data)
+        filterDate(data);
+        $('button.active-button').removeClass('active-button');
     }
   });
   closeFilter.click(function (){
