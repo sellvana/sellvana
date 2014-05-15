@@ -186,6 +186,27 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
           $('#dashboard-widget__'+widget.key+' .widget-contents').html(widget.html);
         }
       });
+      if (Object.keys(response.filter).length !== 0) {
+          switch (response.filter.date) {
+              case 'last-month':
+                  $('button[data-date="month"]').click();
+                  break;
+              case 'last-week':
+                  $('button[data-date="week"]').click();
+                  break;
+              case 'today':
+                  $('button[data-date="today"]').click();
+                  break;
+              case 'all':
+                  break;
+              default:
+                  $('a[data-id="'+ response.filter.type +'"]').click();
+                  var range = (response.filter.range == 'range') ? $('div.range'): $('div.not_range');
+                  range.find('input.date-filter').val(response.filter.date);
+                  $('.update').click();
+                  break;
+          }
+      }
     });
   }
   {% if asyncWidgets %}
