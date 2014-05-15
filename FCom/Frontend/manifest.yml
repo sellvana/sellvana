@@ -4,7 +4,6 @@ modules:
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCommon: 0.1.0, FCom_LibTwig: 0.1.0 } }
         description: "Base Frontend functionality"
-        before_bootstrap: FCom_Frontend_Frontend::beforeBootstrap
         default_config:
             modules:
                 FCom_Frontend:
