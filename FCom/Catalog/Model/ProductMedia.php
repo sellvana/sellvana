@@ -9,7 +9,10 @@ class FCom_Catalog_Model_ProductMedia extends FCom_Core_Model_Abstract
         'related' => [
             'product_id' => 'FCom_Catalog_Model_Product.id',
             'file_id'    => 'FCom_Core_Model_MediaLibrary.id',
-        ]
+        ],
+        'unique_key' => [
+            'product_id', 'file_id'
+        ],
     ];
     public function getUrl()
     {

@@ -2,11 +2,8 @@ modules:
     FCom_Admin:
         version: 0.1.7
         channel: beta
-        require: { module: { FCom_Core: 0.1.0, FCom_LibJsCommon: 0.1.0, FCom_LibTwig: 0.1.0 } }
         description: Base Admin functionality
-
-        default_config:
-            modules/FCom_Admin/theme: FCom_Admin_DefaultTheme
+        require: { module: { FCom_Core: 0.1.0, FCom_LibJsCommon: 0.1.0, FCom_LibTwig: 0.1.0, FCom_Frontend: 0.1.0 } }
 
         areas:
             FCom_Admin:
@@ -62,13 +59,16 @@ modules:
                     - [ /generate_sitemap, FCom_Admin_Controller.generate_sitemap ]
 
                 observe:
-                    - [ "FCom_Admin_Controller_Settings::action_index__POST", FCom_Admin_Admin.onSettingsPost ]
-                    - [ "FCom_Admin_View_Dashboard::getWidgets", FCom_Admin_Admin.onGetDashboardWidgets ]
+                    - [ "FCom_Admin_Controller_Settings::action_index__POST", "FCom_Admin_Admin.onSettingsPost" ]
+                    - [ "FCom_Admin_View_Dashboard::getWidgets", "FCom_Admin_Admin.onGetDashboardWidgets" ]
+
                 security:
                     request_fields_whitelist:
                         /settings:
                             POST/config/modules/FCom_Admin/add_js_code: "*"
                             POST/config/modules/FCom_Frontend/add_js_code: "*"
+                default_config:
+                    modules/FCom_Admin/theme: FCom_Admin_DefaultTheme
 
         provides:
             themes:

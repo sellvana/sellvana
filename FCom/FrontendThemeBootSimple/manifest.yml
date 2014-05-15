@@ -3,10 +3,7 @@ modules:
         version: 0.1.0
         channel: beta
         description: Bootstrap 3.x simple theme
-
-        areas:
-            FCom_Frontend:
-                auto_use: [ views, layout ]
+        require: { module: { FCom_Frontend: 0.1.0 } }
 
         provides:
             themes:

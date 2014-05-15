@@ -2,14 +2,6 @@
 
 class FCom_Frontend_Frontend extends BClass
 {
-    static public function beforeBootstrap()
-    {
-        $defaultTheme = BConfig::i()->get('modules/FCom_Frontend/theme');
-        BLayout::i()
-            ->defaultTheme($defaultTheme ? $defaultTheme : 'FCom_Frontend_DefaultTheme')
-        ;
-    }
-
     public static function bootstrap()
     {
         if (BRequest::i()->https()) {

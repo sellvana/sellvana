@@ -9,7 +9,7 @@
 #}
 {% set viewAs = REQUEST.get('view') ? REQUEST.get('view') : 'grid' %}
 
-{% set psOptions = { 10:10, 25:25, 50:50, 100:100 } %}
+{% set psOptions = { 12:12, 24:24, 48:48, 96:96 } %}
 {% set sortOptions = THIS.get("sort_options") %}
 {% if not sortOptions %}
     {% set sortOptions = {
@@ -26,6 +26,7 @@
 <form class="form-inline" method="get" action="{{ url }}">
   <fieldset class="f-prod-listing-toolbar">
     <input type="hidden" name="q" value="{{ REQUEST.get('q') }}">
+    <input type="hidden" name="view" value="{{ REQUEST.get('view') }}">
     <div class="form-group pull-right">
       <label for="#" class="control-label">Sort by:</label>
       <select name="sc" onchange="this.form.submit()" class="form-control">

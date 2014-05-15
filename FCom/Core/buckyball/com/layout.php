@@ -1042,7 +1042,7 @@ class BLayout extends BClass
 
         $modRootDir = !empty($theme['module_name']) ? BApp::m($theme['module_name'])->root_dir . '/' : '';
         if (!empty($theme['layout'])) {
-            $this->loadLayoutAfterTheme($modRootDir . $theme['layout'], true);
+            $this->loadLayout($modRootDir . $theme['layout']);
         }
         if (!empty($theme['views'])) {
             $this->addAllViews($modRootDir . $theme['views']);

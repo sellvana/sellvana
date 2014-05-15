@@ -2,7 +2,7 @@
 
 class FCom_Sales_Migrate extends BClass
 {
-    public function install__0_2_10()
+    public function install__0_2_11()
     {
         $tOrder = FCom_Sales_Model_Order::table();
         BDb::run("
@@ -104,14 +104,14 @@ class FCom_Sales_Migrate extends BClass
             `discount_amount` decimal(12,2) NOT NULL default 0,
             `grand_total` decimal(12,2) NOT NULL default 0,
             `session_id` varchar(100) DEFAULT NULL,
-            `customer_id` int unsigned NOT NULL,
+            `customer_id` int unsigned default NULL,
             `customer_email` varchar(100) NULL,
             `shipping_method` VARCHAR( 50 )  NULL ,
             `shipping_price` DECIMAL( 10, 2 ) NULL ,
             `shipping_service` CHAR( 2 )  NULL,
             `payment_method` VARCHAR( 50 ) NULL ,
             `payment_details` TEXT CHARACTER SET utf8   NULL,
-            `coupon_code` VARCHAR( 50 ) NOT NULL,
+            `coupon_code` VARCHAR( 50 ) default NULL,
             `status` ENUM( 'new', 'finished' ) NOT NULL DEFAULT 'new',
             `create_at` DATETIME NULL,
             `update_at` DATETIME NULL,
@@ -136,8 +136,8 @@ class FCom_Sales_Migrate extends BClass
             `tax` decimal(12,2) NOT NULL default 0,
             `discount` decimal(12,2) NOT NULL default 0,
 
-            `promo_id_buy` VARCHAR(50) NOT NULL,
-            `promo_id_get` INT(10) UNSIGNED NOT NULL,
+            `promo_id_buy` VARCHAR(50) default NULL,
+            `promo_id_get` INT(10) UNSIGNED default NULL,
             `promo_qty_used` decimal(12,2) DEFAULT NULL,
             `promo_amt_used` decimal(12,2) DEFAULT NULL,
 
@@ -626,6 +626,19 @@ class FCom_Sales_Migrate extends BClass
                 'shipping_service_title' => 'varchar(100) null',
                 'payment_method' => 'varchar(50) null',
                 'admin_id' => 'int unsigned null',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_2_10__0_2_11()
+    {
+        BDb::ddlTableDef(FCom_Sales_Model_Cart::table(), [
+            'COLUMNS' => [
+                'coupon_code' => 'varchar(50) DEFAULT NULL',
+                'promo_id_buy' => 'VARCHAR(50) DEFAULT NULL',
+                'promo_id_get' => 'INT(10) UNSIGNED DEFAULT NULL',
+                'promo_qty_used' => 'decimal(12,2) DEFAULT NULL',
+                'promo_amt_used' => 'decimal(12,2) DEFAULT NULL',
             ],
         ]);
     }
