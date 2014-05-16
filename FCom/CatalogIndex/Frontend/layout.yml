@@ -1,3 +1,6 @@
+catalog/product/pager:
+    - { callback: "FCom_CatalogIndex_Frontend.layoutSetSortOptions" }
+
 /catalog/category:
     - { hook: catalog/product/pager.fields, views: catalog/category/_pager_fields }
 

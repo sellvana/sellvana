@@ -1561,17 +1561,47 @@ class BORM extends ORMWrapper
         if (null === $r) {
             $r = BRequest::i()->request(); // GET request
         }
+#echo "<pre>"; var_dump($_GET, $_REQUEST, $r); exit;
         $d = (array)$d; // make sure it's array
-        if (!empty($r['sc']) && empty($r['s']) && empty($r['sd'])) { // sort and dir combined
+        if (empty($d['sc']) && empty($d['s']) && !empty($d['sort_options'])) { // if no default sort set, take from sort_options
+            reset($d['sort_options']);
+            $d['sc'] = key($d['sort_options']);
+        }
+        if (empty($d['ps']) && !empty($d['page_size_options'])) { // if not default page size set, take from page_size_options
+            reset($d['page_size_options']);
+            $d['ps'] = key($d['page_size_options']);
+        }
+        if (!empty($d['sc']) && empty($d['s'])) { // split default sort and dir combined
+            list($d['s'], $d['sd']) = preg_split('#[| ]#', trim($d['sc']));
+        } elseif (empty($d['sc']) && !empty($d['s'])) { // combine default sort and dir
+            $d['sc'] = $d['s'] . ' ' . (!empty($d['sd']) ? $d['sd'] : 'asc');
+        }
+
+        if (!empty($r['sc']) && empty($r['s'])) { // split request sort and dir combined
             list($r['s'], $r['sd']) = preg_split('#[| ]#', trim($r['sc']));
         }
-        if (!empty($r['s']) && !empty($d['s']) && is_array($d['s'])) { // limit by these values only
-            if (!in_array($r['s'], $d['s'])) $r['s'] = null;
-            $d['s'] = null;
+        if (!empty($r['s']) && !preg_match('#^[a-zA-Z0-9_.]+$#', $r['s'])) { // if sort contains not allowed characters
+            $r['s'] = null;
         }
-        if (!empty($r['sd']) && $r['sd'] != 'asc' && $r['sd'] != 'desc') { // only asc and desc are allowed
-            $r['sd'] = null;
+        if (empty($r['sd']) || $r['sd'] != 'asc' && $r['sd'] != 'desc') { // only asc and desc dirs are allowed
+            $r['sd'] = 'asc';
         }
+        $r['sc'] = !empty($r['s']) ? $r['s'] . ' ' . $r['sd'] : null; // combine $r['sc'] after filtering
+        if (!empty($r['sc']) && !empty($d['sort_options']) && is_array($d['sort_options'])) { // limit by these values only
+#echo "<Pre>"; var_dump($r, $d); exit;
+            if (empty($d['sort_options'][$r['sc']])) {
+                $r['sc'] = null;
+                $r['s'] = null;
+                $r['sd'] = null;
+            }
+        }
+
+        if (!empty($r['ps']) && !empty($d['page_size_options']) && is_array($d['page_size_options'])) { // limit page size
+            if (empty($d['page_size_options'][$r['ps']])) {
+                $r['ps'] = null;
+            }
+        }
+
         $s = [// state
             'p'  => !empty($r['p'])  && is_numeric($r['p']) ? $r['p']  : (!empty($d['p']) && is_numeric($d['p'])  ? $d['p']  : 1), // page
             'ps' => !empty($r['ps']) && is_numeric($r['ps']) ? $r['ps'] : (!empty($d['ps']) && is_numeric($d['ps']) ? $d['ps'] : 100), // page size
@@ -1593,9 +1623,13 @@ class BORM extends ORMWrapper
         }
 
         $s['mp'] = ceil($s['c'] / $s['ps']); // max page
-        if (($s['p']-1) * $s['ps'] > $s['c']) $s['p'] = $s['mp']; // limit to max page
-        if ($s['s']) $this-> {'order_by_' . $s['sd']}($s['s']); // sort rows if requested
-        $s['rs'] = max(0, isset($s['rs']) ? $s['rs'] : ($s['p']-1) * $s['ps']); // start from requested row or page
+        if (($s['p']-1) * $s['ps'] > $s['c']) {
+            $s['p'] = $s['mp']; // limit to max page
+        }
+        if ($s['s']) {
+            $this->{'order_by_' . $s['sd']}($s['s']); // sort rows if requested
+        }
+        $s['rs'] = max(0, isset($s['rs']) ? $s['rs'] : ($s['p'] - 1) * $s['ps']); // start from requested row or page
         if (empty($d['donotlimit'])) {
             $this->offset($s['rs'])->limit(!empty($s['rc']) ? $s['rc'] : $s['ps']); // limit rows to page
         }

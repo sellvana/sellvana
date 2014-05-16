@@ -1,3 +1,8 @@
+{% set psOptions = THIS.get('page_size_options') %}
+{% set sortOptions = THIS.get("sort_options") %}
+{% set viewAsOptions = THIS.get('view_as_options') %}
+{% set viewAs = THIS.getViewAs() %}
+
 {% set s = THIS.get('state') %}
 {% set url = REQUEST.currentUrl() %}
 {% set pageUrl = UTIL.setUrlQuery(url, {p:'-PAGE-'}) %}
@@ -7,28 +12,13 @@
   {% set startPageList = (s.p-showPageNumsHalf)|min(s.mp-showPageNums)|max(1) %}
   {% set endPageList = (startPageList+showPageNums)|min(s.mp) %}
 #}
-{% set viewAs = REQUEST.get('view') ? REQUEST.get('view') : 'grid' %}
-
-{% set psOptions = { 12:12, 24:24, 48:48, 96:96 } %}
-{% set sortOptions = THIS.get("sort_options") %}
-{% if not sortOptions %}
-    {% set sortOptions = {
-        'product_name asc': 'Product Name (A-Z)',
-        'product_name desc': 'Product Name (Z-A)',
-        'local_sku asc': 'SKU (A-Z)',
-        'local_sku desc': 'SKU (Z-A)',
-        'base_price asc': 'Price (Lower first)',
-        'base_price desc': 'Price (Higher first)'
-    } %}
-{% endif %}
-
 
 <form class="form-inline" method="get" action="{{ url }}">
   <fieldset class="f-prod-listing-toolbar">
     <input type="hidden" name="q" value="{{ REQUEST.get('q') }}">
     <input type="hidden" name="view" value="{{ REQUEST.get('view') }}">
     <div class="form-group pull-right">
-      <label for="#" class="control-label">Sort by:</label>
+      <label for="#" class="control-label">{{ 'Sort by:'|_ }}</label>
       <select name="sc" onchange="this.form.submit()" class="form-control">
         {{ UTIL.optionsHtml(sortOptions, s.sc) | raw }}
       </select>
@@ -57,11 +47,11 @@
     </div>
     {% endif %}
     <div class="form-group">
-      <label for="#" class="control-label">Go to:</label>
+      <label for="#" class="control-label">{{ 'Go to:'|_ }}</label>
       <select class="form-control" name="p" onchange="this.form.submit()">
-        <option value="">Go to:</option>
+        <option value="">{{ 'Go to:'|_ }}</option>
         {% for p in range(1, s.mp) %}
-          <option value="{{ p }}" {{ p==s.p ? 'selected'}}>Page: {{ p }}</option>
+          <option value="{{ p }}" {{ p==s.p ? 'selected'}}>{{ 'Page: %s'|_(p) }}</option>
         {% endfor %}
       </select>
       <button type="submit" tabindex="-1" class="btn btn-sm js-hidden">{{ 'Go'|_ }}</button>
