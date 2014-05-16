@@ -339,7 +339,7 @@ class BApp extends BClass
             $c = BConfig::i();
             $storeHref = $c->get('web/base_store');
             if (!$c->get('web/hide_script_name')) {
-                $storeHref .= '/index.php/';
+                $storeHref .= 'index.php';
             }
             if (!BUtil::isUrlFull($storeHref)) {
                 $storeHref = $r->scheme() . '://' . $r->httpHost() . $storeHref;
