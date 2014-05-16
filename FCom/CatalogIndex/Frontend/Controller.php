@@ -2,9 +2,16 @@
 
 class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
+
+    /**
+     * Default items per page
+     * @var int
+     */
+    public $ItemsPerPage = 12;
+
     public function action_category()
     {
-#echo "<pre>"; debug_print_backtrace(); print_r(BRouting::i()->currentRoute()); exit;
+//echo "<pre>"; debug_print_backtrace(); print_r(BRouting::i()->currentRoute()); exit;
         $catName = BRequest::i()->params('category');
         if ($catName === '' || is_null($catName)) {
             $this->forward(false);
@@ -23,7 +30,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_orm', ['orm' => $productsData['orm']]);
         $r = BRequest::i()->get();
         $r['sc'] = '';
-        $paginated = $productsData['orm']->paginate($r, ['ps' => 10]);
+        $paginated = $productsData['orm']->paginate($r, ['ps' => $this->ItemsPerPage]);
         $paginated['state']['sc'] = BRequest::i()->get('sc');
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
@@ -96,7 +103,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_orm', ['data' => $productsData['orm']]);
         $r = $req->get();
         $r['sc'] = '';
-        $paginated = $productsData['orm']->paginate($r, ['ps' => 10]);
+        $paginated = $productsData['orm']->paginate($r, ['ps' => $this->ItemsPerPage]);
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
         $productsData['state']['sc'] = $req->get('sc');
