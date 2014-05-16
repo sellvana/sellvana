@@ -9,7 +9,7 @@ class FCom_Email_Model_Message extends FCom_Core_Model_Abstract
     {
         parent::onAfterLoad();
 
-        $this->data = $this->data_serialized ? BUtil::fromJson($this->data_serialized) : array();
+        $this->data = $this->data_serialized ? BUtil::fromJson($this->data_serialized) : [];
     }
 
     public function onBeforeSave()

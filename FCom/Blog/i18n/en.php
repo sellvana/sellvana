@@ -1,5 +1,5 @@
-<?php return array('Tags:' => '',
+<?php return ['Tags:' => '',
 'Categories:' => '',
 'No posts found' => '',
 'Tags' => '',
-'Categories' => '');
+'Categories' => ''];

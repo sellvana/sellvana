@@ -1,8 +1,8 @@
 modules:
     FCom_Core:
-        version: 0.1.6
+        version: 0.1.7
         channel: beta
-        before_bootstrap: { callback: FCom_Core_Main::beforeBootstrap }
+        before_bootstrap: { callback: "FCom_Core_Main::beforeBootstrap" }
         run_level: REQUIRED
         description: "Base Sellvana classes and JS libraries"
         load_after: [ FCom_LibTwig ]
@@ -22,16 +22,16 @@ modules:
             - [ core/medialib, {view_class: FCom_Core_View_Abstract } ]
 
         observe:
-            - [ FCom_LibTwig_Main::init, FCom_Core_Main.onTwigInit ]
+            - [ "FCom_LibTwig_Main::init", FCom_Core_Main.onTwigInit ]
 
         default_config:
             db:
                 dbname: sellvana
                 username: root
-                logging: false
+                logging: true
                 implicit_migration: true
             web:
-                csrf_check_method: referrer
+                csrf_check_method: token
                 headers:
                     X-UA-Compatible: IE=edge
                     X-Frame-Options: SAMEORIGIN

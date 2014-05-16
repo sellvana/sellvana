@@ -1,0 +1,1 @@
+<?php return ['Check / Money Order' => ''];

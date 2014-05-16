@@ -4,14 +4,14 @@ class FCom_Customer_Tests_Model_CustomerTest extends FCom_Test_DatabaseTestCase
 {
     public function getDataSet()
     {
-        return $this->createFlatXmlDataSet(__DIR__.'/CustomerTest.xml');
+        return $this->createFlatXmlDataSet(__DIR__ . '/CustomerTest.xml');
     }
 
     public function testAddEntry()
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_customer'), "Pre-Condition");
 
-        $data = array('id' => 3, 'email' => "test3@test.com", 'firstname' => "Test 3");
+        $data = ['id' => 3, 'email' => "test3@test.com", 'firstname' => "Test 3"];
         FCom_Customer_Model_Customer::i()->create($data)->save();
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_customer'), "Insert failed");
@@ -31,7 +31,7 @@ class FCom_Customer_Tests_Model_CustomerTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_customer'), "Pre-Condition");
 
-        $data = array('id' => 3, 'email' => "test3@test.com", 'firstname' => "Test 3", 'password' => 123);
+        $data = ['id' => 3, 'email' => "test3@test.com", 'firstname' => "Test 3", 'password' => 123];
         $customer = FCom_Customer_Model_Customer::i()->create($data)->save();
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_customer'), "Insert failed");
@@ -43,7 +43,7 @@ class FCom_Customer_Tests_Model_CustomerTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_customer'), "Pre-Condition");
 
-        $data = array('id' => 3, 'email' => "test3@test.com", 'firstname' => "Test 3", 'password' => 123);
+        $data = ['id' => 3, 'email' => "test3@test.com", 'firstname' => "Test 3", 'password' => 123];
         FCom_Customer_Model_Customer::i()->create($data)->save();
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_customer'), "Insert failed");
@@ -74,7 +74,7 @@ class FCom_Customer_Tests_Model_CustomerTest extends FCom_Test_DatabaseTestCase
 
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_customer'), "Pre-Condition");
 
-        $data = array('email' => "test3@test.com", 'firstname' => "Test 3", 'password' => 123, 'password_confirm' => 123);
+        $data = ['email' => "test3@test.com", 'firstname' => "Test 3", 'password' => 123, 'password_confirm' => 123];
         FCom_Customer_Model_Customer::i()->register($data);
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_customer'), "Insert failed");

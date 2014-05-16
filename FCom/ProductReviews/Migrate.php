@@ -59,7 +59,7 @@ class FCom_ProductReviews_Migrate extends BClass
 
         $hlp = FCom_CatalogIndex_Model_Field::i();
         if (!$hlp->load('avg_rating', 'field_name')) {
-            $hlp->create(array(
+            $hlp->create([
                 'field_name' => 'avg_rating',
                 'field_label' => 'Average Rating',
                 'field_type' => 'varchar',
@@ -69,57 +69,57 @@ class FCom_ProductReviews_Migrate extends BClass
                 'filter_type' => 'exclusive',
                 'filter_counts' => 1,
                 'filter_order' => 10,
-            ))->save();
+            ])->save();
         }
     }
 
     public function upgrade__0_2_0__0_2_1()
     {
         $table = FCom_ProductReviews_Model_Review::table();
-        BDb::ddlTableDef($table, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($table, [
+            'COLUMNS' => [
                   'created_dt'  => 'RENAME created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
-            ),
-        ));
+            ],
+        ]);
     }
 
     public function upgrade__0_2_1__0_2_2()
     {
         $table = FCom_ProductReviews_Model_Review::table();
-        BDb::ddlTableDef($table, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($table, [
+            'COLUMNS' => [
                   'created_at'  => 'RENAME create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
-            ),
-        ));
+            ],
+        ]);
     }
 
     public function upgrade__0_2_2__0_2_3()
     {
         $table = FCom_ProductReviews_Model_Review::table();
-        BDb::ddlTableDef($table, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($table, [
+            'COLUMNS' => [
                 'rating1' => 'tinyint(1) unsigned not null after rating',
                 'rating2' => 'tinyint(1) unsigned not null after rating1',
                 'rating3' => 'tinyint(1) unsigned not null after rating2',
-            ),
-        ));
+            ],
+        ]);
     }
 
     public function upgrade__0_2_3__0_2_4()
     {
         $table = FCom_ProductReviews_Model_Review::table();
-        BDb::ddlTableDef($table, array(
-            'KEYS' => array(
+        BDb::ddlTableDef($table, [
+            'KEYS' => [
                 'IDX_product_approved' => '(product_id, approved)',
-            ),
-        ));
+            ],
+        ]);
     }
 
     public function upgrade__0_2_4__0_2_5()
     {
         $hlp = FCom_CatalogIndex_Model_Field::i();
         if (!$hlp->load('avg_rating', 'field_name')) {
-            $hlp->create(array(
+            $hlp->create([
                 'field_name' => 'avg_rating',
                 'field_label' => 'Average Rating',
                 'field_type' => 'varchar',
@@ -129,7 +129,7 @@ class FCom_ProductReviews_Migrate extends BClass
                 'filter_type' => 'exclusive',
                 'filter_counts' => 1,
                 'filter_order' => 10,
-            ))->save();
+            ])->save();
         }
     }
 }

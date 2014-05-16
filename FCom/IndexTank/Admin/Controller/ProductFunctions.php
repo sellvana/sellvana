@@ -18,19 +18,19 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
         }
 
         $config = parent::gridConfig();
-        $config['grid']['columns'] += array(
-            'number' => array('label'=>'Function Number', 'size'=>5),
-            'definition' => array('label'=>'Function definition'),
-            'name' => array('label'=>'Function code', 'editable'=>true, 'formatter'=>'showlink', 'formatoptions'=>array(
+        $config['grid']['columns'] += [
+            'number' => ['label' => 'Function Number', 'size' => 5],
+            'definition' => ['label' => 'Function definition'],
+            'name' => ['label' => 'Function code', 'editable' => true, 'formatter' => 'showlink', 'formatoptions' => [
                 'baseLinkUrl' => BApp::href('indextank/product_functions/form'), 'idName' => 'id',
-            )),
-            'use_custom_formula' => array('label'=>'Custom Function', 'options'=>array(1=>'Yes',0=>'No')),
-            'label' => array('label'=>'Sorting label'),
-            'field_name' => array('label'=>'Sorting field'),
-            'sort_order' => array('label'=>'Sorting order', 'options'=>array('asc'=>'Ascending','desc'=>'Descending')),
+            ]],
+            'use_custom_formula' => ['label' => 'Custom Function', 'options' => [1 => 'Yes', 0 => 'No']],
+            'label' => ['label' => 'Sorting label'],
+            'field_name' => ['label' => 'Sorting field'],
+            'sort_order' => ['label' => 'Sorting order', 'options' => ['asc' => 'Ascending', 'desc' => 'Descending']],
 
 
-        );
+        ];
 
         return $config;
     }
@@ -41,10 +41,10 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
 
         if ($model) {
             //setup number for new functions
-            if ( $model->number < 0 || !isset($model->number)) {
+            if ($model->number < 0 || !isset($model->number)) {
                 $functions = FCom_IndexTank_Model_ProductFunction::i()->getList();
                 $freeNumber = -1;
-                for($i = 0; $i < count($functions); $i++) {
+                for ($i = 0; $i < count($functions); $i++) {
                     if (!isset($functions[$i])) {
                         $freeNumber = $i;
                     }
@@ -63,13 +63,13 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
             if ($field) {
                 if ('asc' == $model->sort_order) {
                     $definition = "-d[{$field->var_number}]";
-                    $name = $model->field_name.'_asc';
+                    $name = $model->field_name . '_asc';
                 } else {
                     $definition = "d[{$field->var_number}]";
-                    $name = $model->field_name.'_desc';
+                    $name = $model->field_name . '_desc';
                 }
             }
-            if($model->use_custom_formula == false) {
+            if ($model->use_custom_formula == false) {
                 $model->definition = $definition;
                 $model->name = $name;
             }
@@ -87,8 +87,8 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
         $fields = $maxVarField = FCom_IndexTank_Model_ProductField::orm()->where('scoring', 1)->order_by_asc('var_number')->find_many();
         $m = $args['model'];
         $m->scoring_fields = $fields;
-        $args['view']->set(array(
-            'title' => $m->id ? 'Edit Product Function: '.$m->name: 'Create New Product Function',
-        ));
+        $args['view']->set([
+            'title' => $m->id ? 'Edit Product Function: ' . $m->name : 'Create New Product Function',
+        ]);
     }
 }

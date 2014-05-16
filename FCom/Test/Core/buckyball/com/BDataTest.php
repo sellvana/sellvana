@@ -7,9 +7,9 @@ class BDataTest extends PHPUnit_Framework_TestCase
      */
     protected $object;
 
-    protected $sampleData = array(
+    protected $sampleData = [
         1, 2, 'three', 'four' => 4
-    );
+    ];
 
     protected function setUp()
     {

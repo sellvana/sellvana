@@ -4,9 +4,9 @@ class FCom_FreshBooks_RemoteApi extends BClass
 {
     public function __construct()
     {
-        require_once __DIR__.'/lib/FreshBooks/Client.php';
-        require_once __DIR__.'/lib/FreshBooks/Invoice.php';
-        require_once __DIR__.'/lib/FreshBooks/Payment.php';
+        require_once __DIR__ . '/lib/FreshBooks/Client.php';
+        require_once __DIR__ . '/lib/FreshBooks/Invoice.php';
+        require_once __DIR__ . '/lib/FreshBooks/Payment.php';
 
         $config = BConfig::i()->get('modules/FCom_FreshBooks/api');
         FreshBooks_HttpClient::init($config['url'], $config['key']);
@@ -23,23 +23,23 @@ class FCom_FreshBooks_RemoteApi extends BClass
         return $this;
     }
 
-    public function postInvoice($order, $send=false, $paid=false, $newOrderStatus=null)
+    public function postInvoice($order, $send = false, $paid = false, $newOrderStatus = null)
     {
         $er = error_reporting();
         error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
         $client = new FreshBooks_Client();
 
-        $rows = array();
-        $resultInfo = array();
+        $rows = [];
+        $resultInfo = [];
 
-        $client->listing($rows, $resultInfo, 1, 25, array('email'=>$order->email));
+        $client->listing($rows, $resultInfo, 1, 25, ['email' => $order->email]);
         if (sizeof($rows)) {
             $client = $rows[0];
         } else {
             $client->firstName = htmlspecialchars($order->firstname);
             $client->lastName = htmlspecialchars($order->lastname);
-            $client->organization = htmlspecialchars(!empty($order->company) ? $order->company : $order->firstname.' '.$order->lastname);
+            $client->organization = htmlspecialchars(!empty($order->company) ? $order->company : $order->firstname . ' ' . $order->lastname);
 
             $client->email = $order->email;
             $client->workPhone = $order->phone;
@@ -64,16 +64,16 @@ class FCom_FreshBooks_RemoteApi extends BClass
         $invoice->clientId = $clientId;
         $invoice->number = sprintf('%07d', $order->id);
         $invoice->date = date('Y-m-d', strtotime($order->ts));
-        $invoice->notes = "Order #".$order->id;
+        $invoice->notes = "Order #" . $order->id;
         $totalAmount = 0;
         foreach ($order->items() as $item) {
             $totalAmount += $item->row_total;
-            $invoice->lines[] = array(
+            $invoice->lines[] = [
                 'name' => $item->code,
                 'description' => $item->product_name,
                 'unitCost' => $item->price,
                 'quantity' => $item->qty,
-            );
+            ];
         }
         $invoice->create();
         if ($invoice->lastError) {
@@ -85,10 +85,10 @@ class FCom_FreshBooks_RemoteApi extends BClass
         if ($paid) {
             $payment = new FreshBooks_Payment();
             $payment->invoiceId = $invoiceId;
-            $payment->date = date('Y-m-d', $order->ts!='0000-00-00 00:00:00' ? strtotime($order->ts) : time());
+            $payment->date = date('Y-m-d', $order->ts != '0000-00-00 00:00:00' ? strtotime($order->ts) : time());
             $payment->amount = $totalAmount;
             $payment->type = 'Paypal';
-            $payment->notes = 'Imported; PayPal Transaction Id: '.$order->paypal_transactionid;
+            $payment->notes = 'Imported; PayPal Transaction Id: ' . $order->paypal_transactionid;
             $payment->create();
         }
         if ($send) {

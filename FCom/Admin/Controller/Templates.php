@@ -13,42 +13,42 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
     {
         $config = parent::gridConfig();
 
-        $config['columns'] = array(
-            array('type'=>'row_select'),
+        $config['columns'] = [
+            ['type' => 'row_select'],
             //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
-            array('name' => 'view_name', 'label' => 'View Name', 'index' => 'view_name', 'width' => 100, 'overflow' => true),
-            array('name' => 'file_ext', 'label' => 'File Ext.', 'index' => 'file_ext', 'width' => 50),
-            array('name' => 'module_name', 'label' => 'Module', 'index' => 'module_name', 'width' => 100),
-            array('type'=>'btn_group',
-				'buttons' => array(
-								array('name'=>'edit', 'href'=>BApp::href('templates/form?id='), 'col'=>'view_name'),
-								array('name'=>'delete', 'caption' => 'Remove/Revert')
-								)
-			),
-		);
+            ['name' => 'view_name', 'label' => 'View Name', 'index' => 'view_name', 'width' => 100, 'overflow' => true],
+            ['name' => 'file_ext', 'label' => 'File Ext.', 'index' => 'file_ext', 'width' => 50],
+            ['name' => 'module_name', 'label' => 'Module', 'index' => 'module_name', 'width' => 100],
+            ['type' => 'btn_group',
+                  'buttons' => [
+                      ['name' => 'edit', 'href' => BApp::href('templates/form?id='), 'col' => 'view_name'],
+                      ['name' => 'delete', 'caption' => 'Remove/Revert']
+                  ]
+            ],
+        ];
 
-        $config['state'] = array('s' => 'view_name');
+        $config['state'] = ['s' => 'view_name'];
 
         $layout = $this->getAreaLayout();
-        $data = array();
+        $data = [];
         foreach ($layout->getAllViews() as $view) {
-            $row = array(
+            $row = [
                 'view_name' => $view->param('view_name'),
                 'file_ext' => $view->param('file_ext'),
                 'module_name' => $view->param('module_name')->name,
-            );
+            ];
             $data[] = $row;
         }
         $config['data'] = $data;
         $config['data_mode'] = 'local';
-        $config['filters'] = array(
-            array('field' => 'name', 'type' => 'text'),
-            array('field' => 'run_level_core', 'type' => 'multiselect')
-        );
-        $config['actions'] = array(
-            'delete' => array('caption'=>'Remove/Revert'),
-        );
-        $config['events'] = array('delete', 'mass-delete');
+        $config['filters'] = [
+            ['field' => 'name', 'type' => 'text'],
+            ['field' => 'run_level_core', 'type' => 'multiselect']
+        ];
+        $config['actions'] = [
+            'delete' => ['caption' => 'Remove/Revert'],
+        ];
+        $config['events'] = ['delete', 'mass-delete'];
 
         //$config['state'] =array(5,6,7,8);
         return $config;
@@ -58,17 +58,17 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
     {
         $areaDir = str_replace('FCom_', '', $area);
         $modules = BModuleRegistry::i()->getAllModules();
-        $viewDirs = array();
+        $viewDirs = [];
         $layout = BLayout::i(true);
         foreach ($modules as $mod) {
             /** @var BModule $mod */
             $auto = array_flip((array)$mod->auto_use);
             if (isset($auto['all']) || isset($auto['views'])) {
-                $dir = $mod->root_dir.'/views';
+                $dir = $mod->root_dir . '/views';
                 if (is_dir($dir)) {
                     $layout->addAllViews($dir, '', $mod);
                 }
-                $dir = $mod->root_dir.'/'.$areaDir.'/views';
+                $dir = $mod->root_dir . '/' . $areaDir . '/views';
                 if (is_dir($dir)) {
                     $layout->addAllViews($dir, '', $mod);
                 }
@@ -85,18 +85,20 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $tplViewFile = $tplView->getTemplateFileName();
         $tplContents = file_get_contents($tplViewFile);
 
-        $model = new BData(array(
+        $model = new BData([
             'id' => $tplViewName,
             'view_name' => $tplViewName,
             'view_contents' => $tplContents,
-        ));
+        ]);
 
         $this->formMessages();
         $view = $this->view($this->_formViewName)->set('model', $model);
-        $this->formViewBefore(array('view'=>$view, 'model'=>$model));
+        $this->formViewBefore(['view' => $view, 'model' => $model]);
 
         $actions = $view->get('actions');
-        $actions['delete'] = '<button type="submit" class="btn btn-warning" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>' .  BLocale::_('Remove/Revert') . '</span></button>';
+        $actions['delete'] = '<button type="submit" class="btn btn-warning" name="do" value="DELETE" '
+            . 'onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>'
+            .  BLocale::_('Remove/Revert') . '</span></button>';
         $view->set('actions', $actions);
 
         $this->layout($this->_formLayoutName);
@@ -118,7 +120,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $view = $layout->getView('view_name');
         $viewFile = $view->getTemplateFileName();
 
-        if ($r->post('do')==='DELETE') {
+        if ($r->post('do') === 'DELETE') {
             echo 'DELETE'; exit;
         }
         var_dump($r->post()); exit;

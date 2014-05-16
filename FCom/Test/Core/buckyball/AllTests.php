@@ -4,23 +4,23 @@ if (!defined('PHPUnit_MAIN_METHOD')) {
     define('PHPUnit_MAIN_METHOD', 'BAllTests::main');
 }
 
-require_once __DIR__.'/com/BUtilTest.php';
-require_once __DIR__.'/com/BLocaleTest.php';
-require_once __DIR__.'/com/BAppTest.php';
-require_once __DIR__.'/com/BConfigTest.php';
-require_once __DIR__.'/com/BClassRegistryTest.php';
-require_once __DIR__.'/com/BEventsTest.php';
-require_once __DIR__.'/com/BLayoutTest.php';
-require_once __DIR__.'/com/BViewTest.php';
-require_once __DIR__.'/com/BViewHeadTest.php';
-require_once __DIR__.'/com/BClassDecoratorTest.php';
-require_once __DIR__.'/com/BDbTest.php';
-require_once __DIR__.'/com/BValueTest.php';
+require_once __DIR__ . '/com/BUtilTest.php';
+require_once __DIR__ . '/com/BLocaleTest.php';
+require_once __DIR__ . '/com/BAppTest.php';
+require_once __DIR__ . '/com/BConfigTest.php';
+require_once __DIR__ . '/com/BClassRegistryTest.php';
+require_once __DIR__ . '/com/BEventsTest.php';
+require_once __DIR__ . '/com/BLayoutTest.php';
+require_once __DIR__ . '/com/BViewTest.php';
+require_once __DIR__ . '/com/BViewHeadTest.php';
+require_once __DIR__ . '/com/BClassDecoratorTest.php';
+require_once __DIR__ . '/com/BDbTest.php';
+require_once __DIR__ . '/com/BValueTest.php';
 
 //TODO: why required twice?
-$testFiles = glob(__DIR__.'/com/*Test.php');
+$testFiles = glob(__DIR__ . '/com/*Test.php');
 foreach ($testFiles as $test) {
-    if(is_readable($test) && !is_dir($test)){
+    if (is_readable($test) && !is_dir($test)) {
         require_once $test;
     }
 }

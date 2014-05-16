@@ -12,10 +12,10 @@ $timer = microtime(true);
 
         $client->processRequest($request)->checkIn()->waitForMessages()->checkOut();
 
-        $result = array(
+        $result = [
             'conn_id' => $request['conn_id'],
             'messages' => $client->getMessages(),
-        );
+        ];
 
         BResponse::i()->json($result);
     }

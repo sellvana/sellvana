@@ -4,13 +4,13 @@ class FCom_Seo_Model_UrlAlias extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_seo_urlalias';
 
-    static protected $_fieldOptions = array(
-        'redirect_type' => array(
+    static protected $_fieldOptions = [
+        'redirect_type' => [
             'FWD' => 'Forward',
             '301' => '301 Permanent',
             '302' => '302 Temporary',
-        ),
-    );
+        ],
+    ];
 
     static public function findByUrl($url)
     {
@@ -25,7 +25,7 @@ class FCom_Seo_Model_UrlAlias extends FCom_Core_Model_Abstract
         return false;
     }
 
-    public function targetUrl($full=true)
+    public function targetUrl($full = true)
     {
         $url = $this->target_url;
         if ($full && !preg_match('#^https?:#', $url)) {

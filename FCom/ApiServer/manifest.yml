@@ -9,3 +9,7 @@ modules:
         areas:
             FCom_Admin:
                 auto_use: [ views, layout ]
+            FCom_ApiServer:
+                routing:
+                    - [/v1/export, FCom_ApiServer_Controller_V1_Export.index]
+                    - [/v1/import, FCom_ApiServer_Controller_V1_Import.index]

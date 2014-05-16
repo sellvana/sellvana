@@ -4,84 +4,26 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator', m) %}
 {% set hlp = APP.instance('FCom_Admin_Model_User') %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% set fieldData = { validator:validator, model:m } %}
   <fieldset class="form-horizontal">
   <div class="f-section">
-      <div class="form-group">
-          <label class="col-md-2 control-label" for="model-username">{{ 'User Name'|_ }}</label>
-          <div class="col-md-5">
-              <input type="text" id="model-username" name="model[username]" class="required form-control" value="{{ validator.fieldValue('username') }}" />
-          </div>
-      </div>
-      <div class="form-group">
-          <label class="col-md-2 control-label" for="model-superadmin">{{ 'Super Admin'|_ }}</label>
-          <div class="col-md-5">
-              <input type="hidden" name="model[is_superadmin]" value="0" />
-              <div class="make-switch switch has-switch" data-off-label="<i class='icon-remove'></i>" data-on-label="<i class='icon-ok'></i>" data-on="primary">
-                  <input type="checkbox" id="model-superadmin" name="model[is_superadmin]"
-                         value="1" {{ validator.fieldValue('is_superadmin') == 1 ? 'checked="checked"' : ''  }} />
-              </div>
+  
+    {{ forms.input(fieldData|merge({field:'username', required:1, label:'User Name'|_})) }}
+    {{ forms.boolean(fieldData|merge({field:'is_superadmin', label:'Super Admin'|_})) }}
+    {{ forms.select(fieldData|merge({field:'role_id', label:'Role'|_, options:APP.instance('FCom_Admin_Model_Role').options() })) }}
+    {{ forms.select(fieldData|merge({field:'status', label:'Status'|_, options:hlp.fieldOptions('status') })) }}
 
-          </div>
-      </div>
-      <div class="form-group">
-          <label class="col-md-2 control-label" for="model-role-id">{{ 'Role'|_ }}</label>
-          <div class="col-md-5">
-              <select id="model-role-id" name="model[role_id]" class="form-control required">
-                  <option></option>
-                  {{ UTIL.optionsHtml(APP.instance('FCom_Admin_Model_Role').options(), validator.fieldValue('role_id'))|raw }}
-              </select>
-          </div>
-      </div>
-      <div class="form-group">
-          <label class="col-md-2 control-label" for="model-status">{{ 'Status'|_ }}</label>
-          <div class="col-md-5">
-              <select id="model-status" name="model[status]" class="form-control">
-                  {{ UTIL.optionsHtml(hlp.fieldOptions('status'), validator.fieldValue('status'))|raw }}
-              </select>
-          </div>
-      </div>
-      <div class="form-group">
-          <label class="col-md-2 control-label" for="model-email">{{ 'Email'|_ }}</label>
-          <div class="col-md-5">
-              <input type="email" id="model-email" name="model[email]" class="required form-control" value="{{ validator.fieldValue('email') }}" />
-          </div>
-      </div>
-      <div class="form-group">
-          <label class="col-md-2 control-label" for="model-password">{{ 'Password'|_ }}</label>
-          <div class="col-md-5">
-              <input type="password" class="form-control has-progress-bar" id="model-password" name="model[password]" value="" />
-          </div>
-      </div>
-      <div class="form-group">
-          <label class="col-md-2 control-label" for="model-password_confirm">{{ 'Confirm Password'|_ }}</label>
-          <div class="col-md-5">
-              <input type="password" id="model-password_confirm" name="model[password_confirm]" class="form-control" equalto="#model-password" value="" />
-          </div>
-      </div>
-      <div class="form-group">
-          <label class="col-md-2 control-label" for="model-firstname">{{ 'First Name'|_ }}</label>
-          <div class="col-md-5">
-              <input type="text" id="model-firstname" name="model[firstname]" class="required form-control" value="{{ validator.fieldValue('firstname') }}" />
-          </div>
-      </div>
-      <div class="form-group">
-          <label class="col-md-2 control-label" for="model-lastname">{{ 'Last Name'|_ }}</label>
-          <div class="col-md-5">
-              <input type="text" id="model-lastname" name="model[lastname]" class="required form-control" value="{{ validator.fieldValue('lastname') }}" />
-          </div>
-      </div>
-      <div class="form-group">
-          <label class="col-md-2 control-label" for="model-api_username">{{ 'API Username'|_ }}</label>
-          <div class="col-md-5">
-              <input type="text" class="form-control" id="model-api_username" name="model[api_username]" value="{{ validator.fieldValue('api_username') }}" />
-          </div>
-      </div>
-      <div class="form-group">
-          <label class="col-md-2 control-label" for="model-api_password">{{ 'API Password'|_ }}</label>
-          <div class="col-md-5">
-              <input type="password" class="form-control" id="model-api_password" name="model[api_password]" />
-          </div>
-      </div>
+    {{ forms.input(fieldData|merge({field:'email', required:1, label:'Email'|_, type:'email'})) }}
+    {{ forms.input(fieldData|merge({field:'password', label:'Password'|_, type:'password', value:''})) }}
+    {{ forms.input(fieldData|merge({field:'password_confirm', label:'Confirm Password'|_, type:'password', value:'', attr:'equalto="#model-password"'})) }}
+    
+    {{ forms.input(fieldData|merge({field:'firstname', required:1, label:'First Name'|_})) }}
+    {{ forms.input(fieldData|merge({field:'lastname', required:1, label:'Last Name'|_})) }}
+    
+    {{ forms.input(fieldData|merge({field:'api_username', label:'API Username'|_})) }}
+    {{ forms.input(fieldData|merge({field:'api_password', label:'API Password'|_})) }}
+    
   </div>
   </fieldset>
 

@@ -6,27 +6,46 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
 
     public function action_index()
     {
-        $result = FCom_MarketClient_RemoteApi::i()->getModulesVersions(true);
+        try {
+            $result = FCom_MarketClient_RemoteApi::i()->getModulesVersions(true);
+            foreach ($result as $modName => $modInfo) {
+                if ($modInfo['status'] !== 'mine' && $modInfo['status'] !== 'available') {
+                    unset($result[$modName]);
+                    continue;
+                }
+                if (!empty($modInfo['edit_href'])) {
+                    $result[$modName]['edit_href'] = BUtil::setUrlQuery(BApp::href('marketclient/site/connect'), [
+                        'redirect_to' => $modInfo['edit_href'],
+                    ]);
+                }
 
-        uasort($result, function($a, $b) {
-            $a1 = !empty($a['can_update']);
-            $b1 = !empty($b['can_update']);
-            if ($a1 && !$b1) return -1;
-            if ($b1 && !$a1) return 1;
+            }
+            if ($result) {
+                uasort($result, function($a, $b) {
+                    $a1 = !empty($a['can_update']);
+                    $b1 = !empty($b['can_update']);
+                    if ($a1 && !$b1) return -1;
+                    if ($b1 && !$a1) return 1;
 
-            $a2 = !empty($a['status']) && $a['status']==='available';
-            $b2 = !empty($b['status']) && $b['status']==='available';
-            if ($a2 && !$b2) return -1;
-            if ($b2 && !$a2) return 1;
+                    $a2 = !empty($a['status']) && $a['status'] === 'available';
+                    $b2 = !empty($b['status']) && $b['status'] === 'available';
+                    if ($a2 && !$b2) return -1;
+                    if ($b2 && !$a2) return 1;
 
-            return strcmp($a['name'], $b['name']);
-        });
+                    return strcmp($a['name'], $b['name']);
+                });
+            } else {
+                $this->message('No modules are available for publishing', 'warning');
+            }
 
-        $view = $this->view('marketclient/publish');
-        if (!empty($result['error'])) {
-            $this->message($result['message'], 'error');
-        } else {
-            $view->set('modules', $result);
+            $view = $this->view('marketclient/publish');
+            if (!empty($result['error'])) {
+                $this->message($result['message'], 'error');
+            } else {
+                $view->set('modules', $result);
+            }
+        } catch (Exception $e) {
+            $this->message($e->getMessage(), 'error');
         }
         $this->layout('/marketclient/publish');
     }
@@ -49,12 +68,13 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
         $hlp = FCom_MarketClient_RemoteApi::i();
         $connResult = $hlp->setupConnection();
 
-        list($action, $modName) = explode('/', BRequest::i()->post('mod_name'))+array('');
+        list($action, $modName) = explode('/', BRequest::i()->post('mod_name')) + [''];
         $versionResult = $hlp->getModulesVersions($modName);
+
         #$redirectUrl = $hlp->getUrl('market/module/edit', array('mod_name' => $modName));
         $redirectUrl = BRequest::i()->referrer();
         #var_dump($modName, $versionResult); exit;
-        if (!empty($versionResult[$modName]) && $versionResult[$modName]['status']==='available') {
+        if (!empty($versionResult[$modName]) && $versionResult[$modName]['status'] === 'available') {
             $createResult = $hlp->createModule($modName);
             if (!empty($createResult['error'])) {
                 $this->message($createResult['error'], 'error');

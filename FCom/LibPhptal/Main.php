@@ -4,7 +4,7 @@ require_once __DIR__ . 'lib/PHPTAL.php';
 
 class FCom_LibPhptal_Main extends BClass
 {
-    protected static $_singletons = array();
+    protected static $_singletons = [];
 
     protected static $_outputMode = PHPTAL::HTML5;
 
@@ -20,22 +20,22 @@ class FCom_LibPhptal_Main extends BClass
     {
         $config = BConfig::i();
 
-        static::$_phpCodeDest = $config->get('fs/cache_dir').'/phptal';
+        static::$_phpCodeDest = $config->get('fs/cache_dir') . '/phptal';
         BUtil::ensureDir(static::$_phpCodeDest);
 
         static::$_forceReparse = $config->get('modules/FCom_LibPhptal/force_reparse');
 
-        static::$_fcomVars = BData::i(true, array(
+        static::$_fcomVars = BData::i(true, [
             'request' => BRequest::i(),
             'layout' => BLayout::i(),
-        ));
+        ]);
 
-        BLayout::i()->addRenderer('FCom_LibPhptal', array(
+        BLayout::i()->addRenderer('FCom_LibPhptal', [
             'description' => 'PHPTAL',
             'callback'    => 'FCom_LibPhptal_Main::renderer',
-            'file_ext'    => array('.zpt', '.zpt.html'),
+            'file_ext'    => ['.zpt', '.zpt.html'],
             'editor'      => 'html',
-        ));
+        ]);
     }
 
     public static function singleton($class)
@@ -46,7 +46,7 @@ class FCom_LibPhptal_Main extends BClass
         return static::$_singletons[$class];
     }
 
-    public static function factory($tpl=null)
+    public static function factory($tpl = null)
     {
         $tal = new PHPTAL($tpl);
         $tal->setPhpCodeDestination(static::$_phpCodeDest);
@@ -63,7 +63,7 @@ class FCom_LibPhptal_Main extends BClass
 
         $tal->set('FCOM', static::$_fcomVars);
 
-        BEvents::i()->fire(__METHOD__, array('tal'=>$tal, 'tpl'=>$tpl));
+        BEvents::i()->fire(__METHOD__, ['tal' => $tal, 'tpl' => $tpl]);
         return $tal;
     }
 
@@ -76,14 +76,14 @@ class FCom_LibPhptal_Main extends BClass
         } else {
             $tal = static::factory();
         }
-        foreach ($view->getAllArgs() as $k=>$v) {
-            if ($k[0]!=='_') {
+        foreach ($view->getAllArgs() as $k => $v) {
+            if ($k[0] !== '_') {
                 $tal->set($k, $v);
             }
         }
         $tal->set('THIS', $view);
         if ($source) {
-            $source = '<tal:block>'.$source.'</tal:block>';
+            $source = '<tal:block>' . $source . '</tal:block>';
             $sourceName = $view->param('source_name');
             $tal->setSource($source, $sourceName ? $sourceName : __METHOD__);
         }
@@ -106,7 +106,7 @@ class FCom_LibPhptal_Main extends BClass
     {
         $view = BLayout::i()->view($src);
         if (!$view) {
-            BDebug::warning('Invalid view name: '.$src);
+            BDebug::warning('Invalid view name: ' . $src);
             return '';
         }
         return $view->render();
@@ -116,7 +116,7 @@ class FCom_LibPhptal_Main extends BClass
     {
         $block = FCom_Cms_Model_Block::i()->load($src, 'handle');
         if (!$block) {
-            BDebug::warning('Invalid CMS block handle: '.$src);
+            BDebug::warning('Invalid CMS block handle: ' . $src);
             return '';
         }
         return $block->render();
@@ -125,35 +125,35 @@ class FCom_LibPhptal_Main extends BClass
 
 function phptal_tales_view($src, $nothrow)
 {
-    return "FCom_LibPhptal_Main::talesView('".str_replace("'","\\'",$src)."')";
+    return "FCom_LibPhptal_Main::talesView('" . str_replace("'", "\\'", $src) . "')";
 }
 
 function phptal_tales_cms_block($src, $nothrow)
 {
-    return "FCom_LibPhptal_Main::talesCmsBlock('".str_replace("'","\\'",$src)."')";
+    return "FCom_LibPhptal_Main::talesCmsBlock('" . str_replace("'", "\\'", $src) . "')";
 }
 
 function phptal_tales_href($href, $nothrow)
 {
-    return "BApp::href('".str_replace("'","\\'", $href)."')";
+    return "BApp::href('" . str_replace("'", "\\'", $href) . "')";
 }
 
 function phptal_tales_src($src, $nothrow)
 {
-    return "BApp::src('".str_replace("'","\\'", $src)."')";
+    return "BApp::src('" . str_replace("'", "\\'", $src) . "')";
 }
 
 class FCom_LibPhptal_PreFilter extends PHPTAL_PreFilter
 {
     public function filter($source)
     {
-        BEvents::i()->fire(__METHOD__, array('source'=>&$source));
+        BEvents::i()->fire(__METHOD__, ['source' => &$source]);
         return $source;
     }
 
     public function filterDOM(PHPTAL_Dom_Element $element)
     {
-        BEvents::i()->fire(__METHOD__, array('element'=>$element));
+        BEvents::i()->fire(__METHOD__, ['element' => $element]);
     }
 }
 
@@ -161,7 +161,7 @@ class FCom_LibPhptal_PostFilter implements PHPTAL_Filter
 {
     public function filter($html)
     {
-        BEvents::i()->fire(__METHOD__, array('html'=>&$html));
+        BEvents::i()->fire(__METHOD__, ['html' => &$html]);
         return $html;
     }
 }
@@ -171,14 +171,14 @@ class FCom_LibPhptal_TranslationService implements PHPTAL_TranslationService
     protected $_currentLang = 'en_US';
 
     protected $_currentDomain;
-    protected $_domains = array();
+    protected $_domains = [];
 
-    private $_context = array();
+    private $_context = [];
 
     public function setLanguage()
     {
         $langs = func_get_args();
-        foreach($langs as $lang){
+        foreach ($langs as $lang) {
             // if $lang known use it and stop the loop
             $this->_currentLang = $lang;
             break;
@@ -196,7 +196,7 @@ class FCom_LibPhptal_TranslationService implements PHPTAL_TranslationService
         $this->_context[$key] = $value;
     }
 
-    public function translate($key, $htmlescape=true)
+    public function translate($key, $htmlescape = true)
     {
         $result = BLocale::_($key, $this->_context, $this->_currentDomain);
         if ($htmlescape) {

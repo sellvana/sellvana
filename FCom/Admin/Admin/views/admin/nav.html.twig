@@ -4,7 +4,7 @@
   <div class="navigation">
 
     <div class="search">
-      <form action="search_results.html" method="get">
+      <form action="{{ APP.href("header_search") }}" method="get">
         <div class="search-wrapper">
           <input value="" class="search-query form-control" placeholder="{{ "Search..." |_ }}" autocomplete="off" name="q" type="text" />
           <button class="btn btn-link icon-search" name="button" type="submit"></button>

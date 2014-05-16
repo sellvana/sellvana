@@ -2,7 +2,7 @@
 
 class FCom_Ogone_RemoteApi extends BClass
 {
-    static protected $_brandsMap = array(
+    static protected $_brandsMap = [
         'Acceptgiro' => 'Acceptgiro',
         'AIRPLUS' => 'CreditCard',
         'American Express' => 'CreditCard',
@@ -51,50 +51,50 @@ class FCom_Ogone_RemoteApi extends BClass
         'UNEUROCOM' => 'UNEUROCOM',
         'VISA' => 'CreditCard',
         'Wallie' => 'Wallie',
-    );
+    ];
 
-    static protected $_allowedCurrencies = array(
+    static protected $_allowedCurrencies = [
         'AED', 'ANG', 'ARS', 'AUD', 'AWG', 'BGN', 'BRL', 'BYR', 'CAD', 'CHF',
         'CNY', 'CZK', 'DKK', 'EEK', 'EGP', 'EUR', 'GBP', 'GEL', 'HKD', 'HRK',
         'HUF', 'ILS', 'ISK', 'JPY', 'KRW', 'LTL', 'LVL', 'MAD', 'MXN', 'NOK',
         'NZD', 'PLN', 'RON', 'RUB', 'SEK', 'SGD', 'SKK', 'THB', 'TRY', 'UAH',
         'USD', 'XAF', 'XOF', 'XPF', 'ZAR'
-    );
+    ];
 
-    static protected $_allowedLanguages = array(
+    static protected $_allowedLanguages = [
         'en_US' => 'English', 'cs_CZ' => 'Czech', 'de_DE' => 'German',
         'dk_DK' => 'Danish', 'el_GR' => 'Greek', 'es_ES' => 'Spanish',
         'fr_FR' => 'French', 'it_IT' => 'Italian', 'ja_JP' => 'Japanese',
         'nl_BE' => 'Flemish', 'nl_NL' => 'Dutch', 'no_NO' => 'Norwegian',
         'pl_PL' => 'Polish', 'pt_PT' => 'Portugese', 'ru_RU' => 'Russian',
         'se_SE' => 'Swedish', 'sk_SK' => 'Slovak', 'tr_TR' => 'Turkish'
-    );
+    ];
 
-    static protected $_apiUrl = array(
+    static protected $_apiUrl = [
         'TEST' => "https://secure.ogone.com/ncol/test/orderstandard_utf8.asp",
         'PROD' => "https://secure.ogone.com/ncol/prod/orderstandard_utf8.asp",
-    );
+    ];
 
-    static public $shaMethods = array(
+    static public $shaMethods = [
         'sha1' => 'SHA-1',
         'sha256' => 'SHA-256',
         'sha512' => 'SHA-512',
-    );
+    ];
 
     public function prepareRequestData()
     {
-        return array();
+        return [];
         $conf = new BData(BConfig::i()->get('modules/FCom_Ogone'));
-        $order = new BData(array()); // order
-        $cust = new BData(array()); // customer
-        $ogoneOrder = new BData(array()); // order
+        $order = new BData([]); // order
+        $cust = new BData([]); // customer
+        $ogoneOrder = new BData([]); // order
         //$ogoneOrder = FCom_Ogone_Model_Order::i()->load($order->id, 'order_id');
 
         $complus = '';
-        $paramplus = array('amountOfProducts' => '5', 'usedCoupon' => 1); //?
+        $paramplus = ['amountOfProducts' => '5', 'usedCoupon' => 1]; //?
         $homeUrl = FCom_Frontend_Main::i()->href('');
         $callbackUrl = FCom_Frontend_Main::i()->href('ogone/callback');
-        $data = array(
+        $data = [
             'RL' => 'ncol_2.0',
             'PSPID' => $conf->pspid,
             'ORDERID' => $order->increment_id,
@@ -136,18 +136,18 @@ class FCom_Ogone_RemoteApi extends BClass
             'COMPLUS' => $complus,
             'PARAMPLUS' => http_build_query($paramplus),
             //'PARAMVAR' => 'PARAMVAR',
-        );
+        ];
         $data['SHASIGN'] = $this->_sha($data, 'in');
 
         $ogoneOrder->set('shasign', $data['SHASIGN'])->save();
 
         $url = static::$_apiUrl[$conf->mode_prod ? 'PROD' : 'TEST'];
-        return array('form_url'=>$url, 'data'=>$data);
+        return ['form_url' => $url, 'data' => $data];
     }
 
-    public function processResult($data=null)
+    public function processResult($data = null)
     {
-        if (is_null($data)) {
+        if (null === $data) {
             $data = BRequest::i()->request();
         }
         if (empty($data['SHASIGN']) || $this->_sha($data, 'out') != $data['SHASIGN']) {
@@ -164,7 +164,7 @@ class FCom_Ogone_RemoteApi extends BClass
         // Process response
         $statusCode = $data['STATUS'];
 
-        $ogoneOrder->set(array('error'=>0, 'status_code'=>$statusCode))->save();
+        $ogoneOrder->set(['error' => 0, 'status_code' => $statusCode])->save();
         $update = null;
         $comment = null;
         $notifyCustomer = false;
@@ -173,28 +173,28 @@ class FCom_Ogone_RemoteApi extends BClass
         switch ($statusCode) {
         // SUCCESS
         case 9: // Capture accepted
-            $update = array('custom_status' => $conf->order_status_captured, 'payment_status' => 'CAPTURED');
+            $update = ['custom_status' => $conf->order_status_captured, 'payment_status' => 'CAPTURED'];
             $comment = 'Ogone capture accepted';
             $notifyCustomer = true;
             $status = true;
             break;
 
         case 91: // Capture pending
-            $update = array('custom_status' => $conf->order_status_captpend, 'payment_status' => 'CAPTURE_PENDING');
+            $update = ['custom_status' => $conf->order_status_captpend, 'payment_status' => 'CAPTURE_PENDING'];
             $comment = 'Ogone capture pending';
             $notifyCustomer = true;
             $status = true;
             break;
 
         case 5: // Authorized
-            $update = array('custom_status' => $conf->order_status_authorized, 'payment_status' => 'AUTHORIZED');
+            $update = ['custom_status' => $conf->order_status_authorized, 'payment_status' => 'AUTHORIZED'];
             $comment = 'Ogone authorized';
             $notifyCustomer = true;
             $status = true;
             break;
 
         case 51: // Authorization pending
-            $update = array('custom_status' => $conf->order_status_authpend, 'payment_status' => 'AUTH_PENDING');
+            $update = ['custom_status' => $conf->order_status_authpend, 'payment_status' => 'AUTH_PENDING'];
             $comment = 'Ogone authorization pending';
             $notifyCustomer = true;
             $status = true;
@@ -217,7 +217,7 @@ class FCom_Ogone_RemoteApi extends BClass
             // If you were to resend the the same transaction details, it would be automatically refused by Ogone, even
             // if you entered proper payment details.
             // However, opencart 1.5.x generates a new orderID on checkout confirm, so no harm in resubmitting.
-            $update = array('payment_status' => 'AUTH_FAILED');
+            $update = ['payment_status' => 'AUTH_FAILED'];
             $comment = 'Ogone payment failed authorization';
             break;
 
@@ -225,14 +225,14 @@ class FCom_Ogone_RemoteApi extends BClass
         case 92:
             // In both cases 52 and 92 Ogone recommends not reprocessing the transaction, becos it could result in double payment
             // Therefore we are confirming the order.
-            $update = array('custom_status' => $conf->order_status_uncertain, 'payment_status' => 'UNCERTAIN');
+            $update = ['custom_status' => $conf->order_status_uncertain, 'payment_status' => 'UNCERTAIN'];
             $comment = 'Ogone payment uncertain status';
             $notifyCustomer = true;
             $status = true;
             break;
 
         default: // Shouldn't happen, but anyways
-            $update = array('custom_status' => $conf->order_status_uncertain, 'payment_status' => 'UNCERTAIN');
+            $update = ['custom_status' => $conf->order_status_uncertain, 'payment_status' => 'UNCERTAIN'];
             $comment = 'Ogone payment uncertain status';
             $status = true;
             break;
@@ -257,12 +257,12 @@ class FCom_Ogone_RemoteApi extends BClass
         ksort($data);
         array_walk($data, 'trim');
         $data = array_filter($data, function($value) { return (bool) strlen($value); });
-        $shaPass = BConfig::i()->get('modules/FCom_Ogone/passphrase_'.$dir);
+        $shaPass = BConfig::i()->get('modules/FCom_Ogone/passphrase_' . $dir);
         $shaMethod = BConfig::i()->get('modules/FCom_Ogone/sha_method');
         if (!$shaMethod) $shaMethod = 'sha512';
         $shaData = '';
-        foreach ($data as $k=>$v) {
-            $shaData .= $k.'='.$v.$shaPass;
+        foreach ($data as $k => $v) {
+            $shaData .= $k . '=' . $v . $shaPass;
         }
         return strtoupper(hash($shaMethod, $shaData));
     }

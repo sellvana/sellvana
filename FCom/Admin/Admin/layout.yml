@@ -1,216 +1,217 @@
 base:
-  - { root: root }
-  - { hook: head, views: head }
-  - { hook: header, views: admin/header }
-  - { hook: top-nav, views: admin/nav }
-  - { hook: before_body_end, views: bottom_scripts }
-  - { view: core/messages, set: { namespace: admin } }
+    - { root: root }
+    - { hook: head, views: head }
+    - { hook: header, views: admin/header }
+    - { hook: top-nav, views: admin/nav }
+    - { hook: before_body_end, views: bottom_scripts }
+    - { view: core/messages, set: { namespace: admin } }
 
-  - view: head
-    do:
-      - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
-      - [ icon, @FCom_Core/favicon.ico ]
-      - [ js, @FCom_Admin/Admin/theme1/assets/javascripts/ie/html5shiv.js, { if: lt IE 9 } ]
-      - [ js, @FCom_Admin/Admin/theme1/assets/javascripts/ie/respond.min.js, { if: lt IE 9 } ]
+    - view: head
+        do:
+            - [ meta, Content-Type, "text/html; charset=UTF-8", true ]
+            - [ icon, "@FCom_Core/favicon.ico" ]
+            - [ js, "@FCom_Admin/Admin/theme1/assets/javascripts/ie/html5shiv.js", { if: lt IE 9 } ]
+            - [ js, "@FCom_Admin/Admin/theme1/assets/javascripts/ie/respond.min.js", { if: lt IE 9 } ]
 
-      - [ css, @FCom_Core/css/fcom.core.css ]
-      - [ requireJs, jquery.cookie, @FCom_LibJsCommon/js/jquery.cookie, { deps: [ jquery ] } ]
-      - [ requireJs, jquery.hotkeys, @FCom_LibJsCommon/js/jquery.hotkeys, { deps: [ jquery ] } ]
-      - [ requireJs, jquery.contextmenu, @FCom_LibJsCommon/js/jqGrid/plugins/jquery.contextmenu, { deps: [ jquery ] } ]
+            - [ css, "@FCom_Core/css/fcom.core.css" ]
+            - [ requireJs, jquery.cookie, "@FCom_LibJsCommon/js/jquery.cookie", { deps: [ jquery ] } ]
+            - [ requireJs, jquery.hotkeys, "@FCom_LibJsCommon/js/jquery.hotkeys", { deps: [ jquery ] } ]
+            - [ requireJs, jquery.contextmenu, "@FCom_LibJsCommon/js/jqGrid/plugins/jquery.contextmenu", { deps: [ jquery ] } ]
 
-      - [ requireJs, jquery.splitter, @FCom_LibJsCommon/js/splitter/jquery.splitter, { deps: [ jquery ] } ]
-      - [ css, @FCom_LibJsCommon/js/splitter/jquery.splitter.css ]
+            - [ requireJs, jquery.splitter, "@FCom_LibJsCommon/js/splitter/jquery.splitter", { deps: [ jquery ] } ]
+            - [ css, "@FCom_LibJsCommon/js/splitter/jquery.splitter.css" ]
 
-      - [ requireJs, jquery.equalHeights, @FCom_LibJsCommon/js/jquery.equalHeights, { deps: [ jquery ] } ]
+            - [ requireJs, jquery.equalHeights, "@FCom_LibJsCommon/js/jquery.equalHeights", { deps: [ jquery ] } ]
 
-      - [ requireJs, fcom.admin, @FCom_Admin/Admin/js/fcom.admin ]
-      - [ requireJs, fcom.admin.dynatree, @FCom_Admin/Admin/js/fcom/fcom.admin.dynatree ]
-      - [ requireJs, fcom.admin.form, @FCom_Admin/Admin/js/fcom.admin.form ]
-      - [ requireRun, fcom.admin ]
+            - [ requireJs, fcom.admin, "@FCom_Admin/Admin/js/fcom.admin" ]
+            - [ requireJs, fcom.admin.dynatree, "@FCom_Admin/Admin/js/fcom/fcom.admin.dynatree" ]
+            - [ requireJs, fcom.admin.form, "@FCom_Admin/Admin/js/fcom.admin.form" ]
+            - [ requireRun, fcom.admin ]
 
-      #- [ requireJs, dynatree, @FCom_Admin/Admin/js/dynatree/jquery.dynatree.min, { deps: [ jquery ] } ]
-      #- [ css, @FCom_Admin/Admin/js/dynatree/skin-vista/ui.dynatree.css ]
+            #- [ requireJs, dynatree, "@FCom_Admin/Admin/js/dynatree/jquery.dynatree.min", { deps: [ jquery ] } ]
+            #- [ css, "@FCom_Admin/Admin/js/dynatree/skin-vista/ui.dynatree.css" ]
 
-  - { include: common_js_libs }
-  - { include: lib_admin_theme1 }
+    - { include: common_js_libs }
+    - { include: lib_admin_theme1 }
 
-  - view: admin/nav
-    do:
-      - [ addNav, dashboard, { label: Dashboard, href: /, pos: 10, icon_class: icon-dashboard } ]
-      - [ addNav, modules, { label: Modules, pos: 800, icon_class: icon-puzzle-piece } ]
-      - [ addNav, modules/installed, { label: Manage Modules, href: /modules } ]
-      - [ addNav, system, { label: System, pos: 900, icon_class: icon-cog } ]
-      - [ addNav, system/users, { label: Users, href: /users  } ]
-      - [ addNav, system/roles, { label: Roles & Permissions, href: /roles  } ]
-      - [ addNav, system/templates, { label: Templates, href: /templates  } ]
-      - [ addNav, system/backups, { label: Backups, href: /backups  } ]
-      - [ addNav, system/settings, { label: Settings, href: /settings, class: system-settings } ]
+    - view: admin/nav
+        do:
+            - [ addNav, dashboard, { label: Dashboard, href: /, pos: 10, icon_class: icon-dashboard } ]
+            - [ addNav, modules, { label: Modules, pos: 800, icon_class: icon-puzzle-piece } ]
+            - [ addNav, modules/installed, { label: Manage Modules, href: /modules } ]
+            - [ addNav, system, { label: System, pos: 900, icon_class: icon-cog } ]
+            - [ addNav, system/users, { label: Users, href: /users  } ]
+            - [ addNav, system/roles, { label: Roles & Permissions, href: /roles  } ]
+            - [ addNav, system/templates, { label: Templates, href: /templates  } ]
+            - [ addNav, system/backups, { label: Backups, href: /backups  } ]
+            - [ addNav, system/importexport, { label: Import/Export, href: /importexport  } ]
+            - [ addNav, system/settings, { label: Settings, href: /settings, class: system-settings } ]
 
-  - view: admin/header
-    do:
-      - [ addShortcut, system/users, { label: New User, href: /users/form } ]
+    - view: admin/header
+        do:
+            - [ addShortcut, system/users, { label: New User, href: /users/form } ]
 
-  - { callback: FCom_Core_Main::defaultThemeCustomLayout }
-  - { callback: FCom_Admin_Admin::layout }
+    - { callback: "FCom_Core_Main::defaultThemeCustomLayout" }
+    - { callback: "FCom_Admin_Admin::layout" }
 
 
 common_js_libs:
-  - view: head
-    do:
-      - [ requireJs, transparency, @FCom_LibJsCommon/js/transparency.min ]
-      - [ requireJs, date, @FCom_LibJsCommon/js/date, { exports: Date } ]
+    - view: head
+        do:
+            - [ requireJs, transparency, "@FCom_LibJsCommon/js/transparency.min" ]
+            - [ requireJs, date, "@FCom_LibJsCommon/js/date", { exports: Date } ]
 
-      #- [ requireJs, jquery, [ //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min, @FCom_LibJsCommon/js/jquery.min ], { exports: [ $, jQuery ] } ]
-      #- [ requireJs, select2, @FCom_Core/js/select2/select2, { deps: [ jquery ] } ]
-      - [ requireJs, jquery.form, @FCom_LibJsCommon/js/jquery.form, { deps: [ jquery ] } ]
-      - [ requireJs, jquery-ui, [ //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min, @FCom_LibJsCommon/js/jquery-ui.min ], { deps: [ jquery ] } ]
+            #- [ requireJs, jquery, [ //ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min, "@FCom_LibJsCommon/js/jquery.min" ], { exports: [ $, jQuery ] } ]
+            #- [ requireJs, select2, "@FCom_Core/js/select2/select2", { deps: [ jquery ] } ]
+            - [ requireJs, jquery.form, "@FCom_LibJsCommon/js/jquery.form", { deps: [ jquery ] } ]
+            - [ requireJs, jquery-ui, [ //ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min, "@FCom_LibJsCommon/js/jquery-ui.min" ], { deps: [ jquery ] } ]
 
-      #- [ requireJs, nicedit, @FCom_LibJsCommon/js/nicEdit ]
+            #- [ requireJs, nicedit, "@FCom_LibJsCommon/js/nicEdit" ]
 
-      - [ requireJs, underscore, @FCom_LibJsCommon/js/underscore, { exports: _ } ]
-      - [ requireJs, bacon, @FCom_LibJsCommon/js/bacon.min, { exports: Bacon } ]
-      - [ requireJs, backbone, @FCom_LibJsCommon/js/backbone, { deps: [ jquery, underscore ], exports: Backbone } ]
-      #- [ requireJs, backbone.modelbinder, @FCom_LibJsCommon/js/backbone.modelbinder.min, { deps: [ backbone ], exports: Backbone.ModelBinder } ]
-      #- [ requireJs, marionette, @FCom_LibJsCommon/js/backbone.marionette.min, { deps: [ backbone ], exports: Backbone.Marionette } ]
-      #- [ requireJs, backbone-pageable, @FCom_LibJsCommon/js/backbone-pageable, { deps: [ backbone ], exports: Backbone.PageableCollection } ]
-      #- [ requireJs, backbone.bootstrap-modal, @FCom_LibJsCommon/js/backbone.bootstrap-Modal, { deps: [ backbone ], exports: Backbone.BootstrapModal } ]
-      #- [ requireJs, memento, @FCom_LibJsCommon/js/backbone.memento.min, { deps: [ backbone ], exports: Backbone.Memento } ]
-      #- [ requireJs, backbone.forms, @FCom_LibJsCommon/js/backbone-forms, { deps: [ backbone ], exports: Backbone.Form } ]
+            - [ requireJs, underscore, "@FCom_LibJsCommon/js/underscore"  , { exports: _ } ]
+            - [ requireJs, bacon, "@FCom_LibJsCommon/js/bacon.min", { exports: Bacon } ]
+            - [ requireJs, backbone, "@FCom_LibJsCommon/js/backbone", { deps: [ jquery, underscore ], exports: Backbone } ]
+            #- [ requireJs, backbone.modelbinder, "@FCom_LibJsCommon/js/backbone.modelbinder.min", { deps: [ backbone ], exports: Backbone.ModelBinder } ]
+            #- [ requireJs, marionette, "@FCom_LibJsCommon/js/backbone.marionette.min", { deps: [ backbone ], exports: Backbone.Marionette } ]
+            #- [ requireJs, backbone-pageable, "@FCom_LibJsCommon/js/backbone-pageable", { deps: [ backbone ], exports: Backbone.PageableCollection } ]
+            #- [ requireJs, backbone.bootstrap-modal, "@FCom_LibJsCommon/js/backbone.bootstrap-Modal", { deps: [ backbone ], exports: Backbone.BootstrapModal } ]
+            #- [ requireJs, memento, "@FCom_LibJsCommon/js/backbone.memento.min", { deps: [ backbone ], exports: Backbone.Memento } ]
+            #- [ requireJs, backbone.forms, "@FCom_LibJsCommon/js/backbone-forms", { deps: [ backbone ], exports: Backbone.Form } ]
 
-      - [ requireJs, jquery.bootstrap-growl, @FCom_LibJsCommon/js/jquery.bootstrap-growl.min, { deps: [ jquery, bootstrap ] } ]
+            - [ requireJs, jquery.bootstrap-growl, "@FCom_LibJsCommon/js/jquery.bootstrap-growl.min", { deps: [ jquery, bootstrap ] } ]
 
-      - [ requireJs, mustache, @FCom_LibJsCommon/js/mustache ]
-      - [ requireJs, recline, @FCom_LibJsCommon/js/recline, { deps: [ underscore, backbone, jquery, mustache, bootstrap ] } ]
+            - [ requireJs, mustache, "@FCom_LibJsCommon/js/mustache" ]
+            - [ requireJs, recline, "@FCom_LibJsCommon/js/recline", { deps: [ underscore, backbone, jquery, mustache, bootstrap ] } ]
 
-      #- [ requireJs, colResizable, @FCom_LibJsCommon/js/colResizable-1.3.source, { deps: [ jquery ] } ]
-      #- [ requireJs, jquery.dragtable, @FCom_LibJsCommon/js/jquery.dragtable-akottr, { deps: [ jquery, jquery-ui ] } ]
-      - [ requireJs, lunr, @FCom_LibJsCommon/js/lunr.min, { exports: lunr } ]
-      - [ requireJs, moment, @FCom_LibJsCommon/js/moment.min, { exports: moment } ]
+            #- [ requireJs, colResizable, "@FCom_LibJsCommon/js/colResizable-1.3.source", { deps: [ jquery ] } ]
+            #- [ requireJs, jquery.dragtable, "@FCom_LibJsCommon/js/jquery.dragtable-akottr", { deps: [ jquery, jquery-ui ] } ]
+            - [ requireJs, lunr, "@FCom_LibJsCommon/js/lunr.min", { exports: lunr } ]
+            - [ requireJs, moment, "@FCom_LibJsCommon/js/moment.min", { exports: moment } ]
 
-      - [ requireJs, angular, [ //ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min, @FCom_LibJsCommon/js/angular.min ], { deps: [ jquery ], exports: angular } ]
+            - [ requireJs, angular, [ //ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min, "@FCom_LibJsCommon/js/angular.min" ], { deps: [ jquery ], exports: angular } ]
 
-      - [ requireJs, fcom.core, @FCom_Core/js/fcom.core ]
-      - [ requireJs, fcom.backbonegrid, @FCom_Core/js/fcom/fcom.backbonegrid ]
+            - [ requireJs, fcom.core, "@FCom_Core/js/fcom.core" ]
+            - [ requireJs, fcom.backbonegrid, "@FCom_Core/js/fcom/fcom.backbonegrid" ]
 
 lib_admin_theme1:
-  - view: head
-    do:
-      - [ css, //ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/smoothness/jquery-ui.min.css ]
-      - [ css, @FCom_Admin/Admin/theme1/assets/stylesheets/plugins/bootstrap_daterangepicker/bootstrap-daterangepicker.css ]
-      - [ css, @FCom_Admin/Admin/theme1/assets/stylesheets/plugins/bootstrap_datetimepicker/bootstrap-datetimepicker.min.css ]
-      - [ css, @FCom_Admin/Admin/theme1/assets/stylesheets/plugins/fullcalendar/fullcalendar.css ]
-      #- [ css, @FCom_Admin/Admin/theme1/assets/stylesheets/plugins/dynatree/ui.dynatree.css ]
-      - [ css, @FCom_Admin/Admin/theme1/assets/stylesheets/plugins/bootstrap_switch/bootstrap-switch.css ]
-      - [ css, @FCom_Admin/Admin/theme1/assets/stylesheets/plugins/common/bootstrap-wysihtml5.css ]
-      - [ css, @FCom_Admin/Admin/theme1/assets/stylesheets/bootstrap/bootstrap.css ]
-      - [ css, @FCom_Admin/Admin/theme1/assets/stylesheets/bootstrap/fontawesome.css ]
-      - [ css, @FCom_Admin/Admin/theme1/assets/stylesheets/plugins/select2/select2.css ]
-      - [ css, @FCom_Admin/Admin/theme1/assets/stylesheets/plugins/jquery_fileupload/jquery.fileupload-ui.css ]
-      #- [ css, @FCom_Admin/Admin/theme1/assets/stylesheets/theme-colors.css ]
-      #- [ css, @FCom_Admin/Admin/theme1/assets/stylesheets/light-theme.css ]
-      - [ css, @FCom_Admin/Admin/theme1/assets/stylesheets/fulleron-base.css ]
+    - view: head
+        do:
+            - [ css, //ajax.aspnetcdn.com/ajax/jquery.ui/1.10.3/themes/smoothness/jquery-ui.min.css ]
+            - [ css, "@FCom_Admin/Admin/theme1/assets/stylesheets/plugins/bootstrap_daterangepicker/bootstrap-daterangepicker.css" ]
+            - [ css, "@FCom_Admin/Admin/theme1/assets/stylesheets/plugins/bootstrap_datetimepicker/bootstrap-datetimepicker.min.css" ]
+            - [ css, "@FCom_Admin/Admin/theme1/assets/stylesheets/plugins/fullcalendar/fullcalendar.css" ]
+            #- [ css, "@FCom_Admin/Admin/theme1/assets/stylesheets/plugins/dynatree/ui.dynatree.css" ]
+            - [ css, "@FCom_Admin/Admin/theme1/assets/stylesheets/plugins/bootstrap_switch/bootstrap-switch.css" ]
+            - [ css, "@FCom_Admin/Admin/theme1/assets/stylesheets/plugins/common/bootstrap-wysihtml5.css" ]
+            - [ css, "@FCom_Admin/Admin/theme1/assets/stylesheets/bootstrap/bootstrap.css" ]
+            - [ css, "@FCom_Admin/Admin/theme1/assets/stylesheets/bootstrap/fontawesome.css" ]
+            - [ css, "@FCom_Admin/Admin/theme1/assets/stylesheets/plugins/select2/select2.css" ]
+            - [ css, "@FCom_Admin/Admin/theme1/assets/stylesheets/plugins/jquery_fileupload/jquery.fileupload-ui.css" ]
+            #- [ css, "@FCom_Admin/Admin/theme1/assets/stylesheets/theme-colors.css" ]
+            #- [ css, "@FCom_Admin/Admin/theme1/assets/stylesheets/light-theme.css" ]
+            - [ css, "@FCom_Admin/Admin/theme1/assets/stylesheets/fulleron-base.css" ]
 
-      - [ requireJs, autosize, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/autosize/jquery.autosize-min, { deps: [ jquery ] } ]
-      - [ requireJs, bootbox, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/bootbox/bootbox.min, { deps: [ jquery ] } ]
-      - [ requireJs, daterangepicker, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/bootstrap_daterangepicker/bootstrap-daterangepicker, { deps: [ jquery ] } ]
-      - [ requireJs, datetimepicker, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/bootstrap_datetimepicker/bootstrap-datetimepicker, { deps: [ jquery ] } ]
-      - [ requireJs, hoverdropdown, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/bootstrap_hover_dropdown/twitter-bootstrap-hover-dropdown.min, { deps: [ jquery ] } ]
-      - [ requireJs, maxlength, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/bootstrap_maxlength/bootstrap-maxlength.min, { deps: [ jquery ] } ]
-      - [ requireJs, switch, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/bootstrap_switch/bootstrapSwitch.min, { deps: [ jquery ] } ]
-      - [ requireJs, charcount, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/charCount/charCount, { deps: [ jquery ] } ]
-      #- [ requireJs, ckeditor, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/ckeditor/ckeditor, { deps: [ jquery ] } ]
-      #- [ requireJs, wysihtml5, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/common/wysihtml5.min, { deps: [ jquery ] } ]
-      - [ requireJs, moment, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/common/moment.min ]
-      - [ requireJs, bootstrap-wysihtml5, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/common/bootstrap-wysihtml5, { deps: [ wysihtml5, bootstrap ] } ]
-      #- [ requireJs, dynatree, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/dynatree/jquery.dynatree.min, { deps: [ jquery ] } ]
-      - [ requireJs, fileinput, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileinput/bootstrap-fileinput.min, { deps: [ jquery ] } ]
+            - [ requireJs, autosize, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/autosize/jquery.autosize-min", { deps: [ jquery ] } ]
+            - [ requireJs, bootbox, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/bootbox/bootbox.min", { deps: [ jquery ] } ]
+            - [ requireJs, daterangepicker, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/bootstrap_daterangepicker/bootstrap-daterangepicker", { deps: [ jquery ] } ]
+            - [ requireJs, datetimepicker, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/bootstrap_datetimepicker/bootstrap-datetimepicker", { deps: [ jquery ] } ]
+            - [ requireJs, hoverdropdown, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/bootstrap_hover_dropdown/twitter-bootstrap-hover-dropdown.min", { deps: [ jquery ] } ]
+            - [ requireJs, maxlength, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/bootstrap_maxlength/bootstrap-maxlength.min", { deps: [ jquery ] } ]
+            - [ requireJs, switch, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/bootstrap_switch/bootstrapSwitch.min", { deps: [ jquery ] } ]
+            - [ requireJs, charcount, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/charCount/charCount", { deps: [ jquery ] } ]
+            #- [ requireJs, ckeditor, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/ckeditor/ckeditor", { deps: [ jquery ] } ]
+            #- [ requireJs, wysihtml5, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/common/wysihtml5.min", { deps: [ jquery ] } ]
+            - [ requireJs, moment, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/common/moment.min" ]
+            - [ requireJs, bootstrap-wysihtml5, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/common/bootstrap-wysihtml5", { deps: [ wysihtml5, bootstrap ] } ]
+            #- [ requireJs, dynatree, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/dynatree/jquery.dynatree.min", { deps: [ jquery ] } ]
+            - [ requireJs, fileinput, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileinput/bootstrap-fileinput.min", { deps: [ jquery ] } ]
 
-      - [ requireJs, tmpl, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileupload/tmpl.min, {deps: [ jquery ] } ]
-      - [ requireJs, load-image, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileupload/load-image.min, { deps: [ tmpl ] } ]
-      - [ requireJs, canvas-to-blob, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileupload/canvas-to-blob.min, { deps: [ tmpl ] } ]
-      - [ requireJs, iframe-transport, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileupload/jquery.iframe-transport.min, { deps: [ tmpl ] } ]
-      - [ requireJs, jquery.fileupload, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileupload/jquery.fileupload.min, { deps: [tmpl ] } ]
-      - [ requireJs, jquery.fileupload-fp, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileupload/jquery.fileupload-fp.min, { deps: [ jquery.fileupload ] } ]
-      - [ requireJs, jquery.fileupload-ui, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileupload/jquery.fileupload-ui.min, { deps: [ jquery.fileupload ] } ]
-      - [ requireJs, jquery.fileupload-init, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileupload/jquery.fileupload-init, { deps: [ jquery.fileupload ] } ]
+            - [ requireJs, tmpl, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileupload/tmpl.min", {deps: [ jquery ] } ]
+            - [ requireJs, load-image, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileupload/load-image.min", { deps: [ tmpl ] } ]
+            - [ requireJs, canvas-to-blob, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileupload/canvas-to-blob.min", { deps: [ tmpl ] } ]
+            - [ requireJs, iframe-transport, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileupload/jquery.iframe-transport.min", { deps: [ tmpl ] } ]
+            - [ requireJs, jquery.fileupload, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileupload/jquery.fileupload.min", { deps: [tmpl ] } ]
+            - [ requireJs, jquery.fileupload-fp, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileupload/jquery.fileupload-fp.min", { deps: [ jquery.fileupload ] } ]
+            - [ requireJs, jquery.fileupload-ui, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileupload/jquery.fileupload-ui.min", { deps: [ jquery.fileupload ] } ]
+            - [ requireJs, jquery.fileupload-init, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/fileupload/jquery.fileupload-init", { deps: [ jquery.fileupload ] } ]
 
-      - [ requireJs, fuelux.wizard, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/fuelux/wizard, { deps: [ jquery ] } ]
-      - [ requireJs, fullcalendar, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/fullcalendar/fullcalendar, { deps: [ jquery ] } ]
-      - [ requireJs, inputmask, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/input_mask/bootstrap-inputmask.min, { deps: [ jquery ] } ]
-      - [ requireJs, jgrowl, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/jgrowl/jquery.jgrowl.min, { deps: [ jquery ] } ]
-      - [ requireJs, touchpunch, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/jquery_ui_touch_punch/jquery.ui.touch-punch.min, { deps: [ jquery, jquery-ui ] } ]
-      - [ requireJs, lightbox, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/lightbox/lightbox.min, { deps: [ jquery ] } ]
-      - [ requireJs, mention, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/mention/mention.min, { deps: [ jquery ] } ]
-      - [ requireJs, modernizr, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/modernizr/modernizr.min ]
-      - [ requireJs, mention, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/mention/mention.min, { deps: [ jquery ] } ]
-      - [ requireJs, nestable, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/nestable/jquery.nestable, { deps: [ jquery ] } ]
-      - [ requireJs, pwstrength, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/nestable/jpwstrength, { deps: [ jquery ] } ]
-      - [ requireJs, retina, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/retina/retina ]
-      - [ requireJs, select2, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/select2/select2, { deps: [ jquery ] } ]
-      - [ requireJs, slidernav, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/slider_nav/slidernav-min, { deps: [ jquery ] } ]
-      - [ requireJs, slimscroll, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/slimscroll/jquery.slimscroll.min, { deps: [ jquery ] } ]
-      - [ requireJs, sparklines, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/sparklines/jquery.sparkline.min, { deps: [ jquery ] } ]
-      - [ requireJs, tabdrop, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/tabdrop/bootstrap-tabdrop, { deps: [ jquery ] } ]
-      - [ requireJs, timeago, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/timeago/jquery.timeago, { deps: [ jquery ] } ]
-      - [ requireJs, typeahead, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/typeahead/typeahead, { deps: [ jquery ] } ]
-      - [ requireJs, jquery.validate, @FCom_Admin/Admin/theme1/assets/javascripts/plugins/validate/jquery.validate.min, { deps: [ jquery ] } ]
+            - [ requireJs, fuelux.wizard, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/fuelux/wizard", { deps: [ jquery ] } ]
+            - [ requireJs, fullcalendar, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/fullcalendar/fullcalendar", { deps: [ jquery ] } ]
+            - [ requireJs, inputmask, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/input_mask/bootstrap-inputmask.min", { deps: [ jquery ] } ]
+            - [ requireJs, jgrowl, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/jgrowl/jquery.jgrowl.min", { deps: [ jquery ] } ]
+            - [ requireJs, touchpunch, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/jquery_ui_touch_punch/jquery.ui.touch-punch.min", { deps: [ jquery, jquery-ui ] } ]
+            - [ requireJs, lightbox, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/lightbox/lightbox.min", { deps: [ jquery ] } ]
+            - [ requireJs, mention, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/mention/mention.min", { deps: [ jquery ] } ]
+            - [ requireJs, modernizr, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/modernizr/modernizr.min" ]
+            - [ requireJs, mention, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/mention/mention.min", { deps: [ jquery ] } ]
+            - [ requireJs, nestable, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/nestable/jquery.nestable", { deps: [ jquery ] } ]
+            - [ requireJs, pwstrength, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/nestable/jpwstrength", { deps: [ jquery ] } ]
+            - [ requireJs, retina, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/retina/retina" ]
+            - [ requireJs, select2, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/select2/select2", { deps: [ jquery ] } ]
+            - [ requireJs, slidernav, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/slider_nav/slidernav-min", { deps: [ jquery ] } ]
+            - [ requireJs, slimscroll, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/slimscroll/jquery.slimscroll.min", { deps: [ jquery ] } ]
+            - [ requireJs, sparklines, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/sparklines/jquery.sparkline.min", { deps: [ jquery ] } ]
+            - [ requireJs, tabdrop, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/tabdrop/bootstrap-tabdrop", { deps: [ jquery ] } ]
+            - [ requireJs, timeago, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/timeago/jquery.timeago", { deps: [ jquery ] } ]
+            - [ requireJs, typeahead, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/typeahead/typeahead", { deps: [ jquery ] } ]
+            - [ requireJs, jquery.validate, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/validate/jquery.validate.min", { deps: [ jquery ] } ]
 
-      - [ js, @FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery.min.js, { alias: jquery } ]
-      - [ requireJs, jquery-mobile, @FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery.mobile.custom.min, { deps: [ jquery ] } ]
-      #- [ requireJs, jquery-ui, @FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery-ui.min, { deps: [ jquery ] } ]
-      - [ requireJs, jquery-migrate, @FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery-migrate.min, { deps: [ jquery ] } ]
-      - [ requireJs, bootstrap, @FCom_Admin/Admin/theme1/assets/javascripts/bootstrap/bootstrap.min, { deps: [ jquery ] } ]
+            - [ js, "@FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery.min.js", { alias: jquery } ]
+            - [ requireJs, jquery-mobile, "@FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery.mobile.custom.min", { deps: [ jquery ] } ]
+            #- [ requireJs, jquery-ui, "@FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery-ui.min", { deps: [ jquery ] } ]
+            - [ requireJs, jquery-migrate, "@FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery-migrate.min", { deps: [ jquery ] } ]
+            - [ requireJs, bootstrap, "@FCom_Admin/Admin/theme1/assets/javascripts/bootstrap/bootstrap.min", { deps: [ jquery ] } ]
 
-      - [ requireJs, admin.theme, @FCom_Admin/Admin/theme1/assets/javascripts/theme, { deps: [ jquery, timeago ] } ]
-      - [ requireJs, admin.demo, @FCom_Admin/Admin/theme1/assets/javascripts/demo, { deps: [ jquery ] } ]
+            - [ requireJs, admin.theme, "@FCom_Admin/Admin/theme1/assets/javascripts/theme", { deps: [ jquery, timeago ] } ]
+            - [ requireJs, admin.demo, "@FCom_Admin/Admin/theme1/assets/javascripts/demo", { deps: [ jquery ] } ]
 
-      - [ requireRun, [ jquery-mobile, jquery-migrate, jquery-ui, bootstrap, admin.theme, admin.demo] ]
+            - [ requireRun, [ jquery-mobile, jquery-migrate, jquery-ui, bootstrap, admin.theme, admin.demo] ]
 
 
 jstree:
-  - view: head
-    do:
-      - [ css, @FCom_LibJsCommon/js/themes/default/style.css ]
-      - [ requireJs, jstree, @FCom_LibJsCommon/js/jquery.jstree, { deps: [ jquery, jquery.hotkeys, jquery.cookie ] } ]
+    - view: head
+        do:
+            - [ css, "@FCom_LibJsCommon/js/themes/default/style.css" ]
+            - [ requireJs, jstree, "@FCom_LibJsCommon/js/jquery.jstree", { deps: [ jquery, jquery.hotkeys, jquery.cookie ] } ]
 
 mcdropdown:
-  - view: head
-    do:
-      - [ css, @FCom_LibJsCommon/js/css/jquery.mcdropdown.css ]
-      - [ requireJs, jquery.bgiframe, @FCom_LibJsCommon/js/jquery.bgiframe, { deps: [ jquery ] } ]
-      - [ requireJs, mcdropdown, @FCom_LibJsCommon/js/jquery.mcdropdown, { deps: [ jquery, jquery.bgiframe ] } ]
+    - view: head
+        do:
+            - [ css, "@FCom_LibJsCommon/js/css/jquery.mcdropdown.css" ]
+            - [ requireJs, jquery.bgiframe, "@FCom_LibJsCommon/js/jquery.bgiframe", { deps: [ jquery ] } ]
+            - [ requireJs, mcdropdown, "@FCom_LibJsCommon/js/jquery.mcdropdown", { deps: [ jquery, jquery.bgiframe ] } ]
 
 codemirror:
-  - view: head
-    do:
-      - [ css, @FCom_Admin/Admin/js/codemirror/lib/codemirror.css ]
-      - [ requireJs, codemirror, @FCom_Admin/Admin/js/codemirror/lib/codemirror ]
-      - [ requireJs, codemirror-loadmode, @FCom_Admin/Admin/js/codemirror/addon/mode/loadmode, { deps: [ coremirror ] } ]
+    - view: head
+        do:
+            - [ css, "@FCom_Admin/Admin/js/codemirror/lib/codemirror.css" ]
+            - [ requireJs, codemirror, "@FCom_Admin/Admin/js/codemirror/lib/codemirror" ]
+            - [ requireJs, codemirror-loadmode, "@FCom_Admin/Admin/js/codemirror/addon/mode/loadmode", { deps: [ coremirror ] } ]
 
 flot:
-  - view: head
-    do:
-      - [ requireJs, excanvas, @FCom_Admin/Admin/js/flot/excanvas.min ]
-      - [ requireJs, jquery.colorhelpers, @FCom_Admin/Admin/js/flot/jquery.colorhelpers.min, { deps: [ jquery ] } ]
-      - [ requireJs, flot, @FCom_Admin/Admin/js/flot/jquery.flot.min, { deps: [ jquery ] } ]
-      - [ requireJs, flot.canvas, @FCom_Admin/Admin/js/flot/jquery.flot.canvas.min, { deps: [ flot ] } ]
-      - [ requireJs, flot.categories, @FCom_Admin/Admin/js/flot/jquery.flot.categories.min, { deps: [ flot ] } ]
-      - [ requireJs, flot.crosshair, @FCom_Admin/Admin/js/flot/jquery.flot.crosshair.min, { deps: [ flot ] } ]
-      - [ requireJs, flot.errorbars, @FCom_Admin/Admin/js/flot/jquery.flot.errorbars.min, { deps: [ flot ] } ]
-      - [ requireJs, flot.fillbetween, @FCom_Admin/Admin/js/flot/jquery.flot.fillbetween.min, { deps: [ flot ] } ]
-      - [ requireJs, flot.image, @FCom_Admin/Admin/js/flot/jquery.flot.image.min, { deps: [ flot ] } ]
-      - [ requireJs, flot.navigate, @FCom_Admin/Admin/js/flot/jquery.flot.navigate.min, { deps: [ flot ] } ]
-      - [ requireJs, flot.pie, @FCom_Admin/Admin/js/flot/jquery.flot.pie.min, { deps: [ flot ] } ]
-      - [ requireJs, flot.resize, @FCom_Admin/Admin/js/flot/jquery.flot.resize.min, { deps: [ flot ] } ]
-      - [ requireJs, flot.selection, @FCom_Admin/Admin/js/flot/jquery.flot.selection.min, { deps: [ flot ] } ]
-      - [ requireJs, flot.stack, @FCom_Admin/Admin/js/flot/jquery.flot.stack.min, { deps: [ flot ] } ]
-      - [ requireJs, flot.symbol, @FCom_Admin/Admin/js/flot/jquery.flot.symbol.min, { deps: [ flot ] } ]
-      - [ requireJs, flot.time, @FCom_Admin/Admin/js/flot/jquery.flot.time.min, { deps: [ flot ] } ]
-      - [ requireJs, flot.threshold, @FCom_Admin/Admin/js/flot/jquery.flot.threshold.min, { deps: [ flot ] } ]
+    - view: head
+        do:
+            - [ requireJs, excanvas, "@FCom_Admin/Admin/js/flot/excanvas.min" ]
+            - [ requireJs, jquery.colorhelpers, "@FCom_Admin/Admin/js/flot/jquery.colorhelpers.min", { deps: [ jquery ] } ]
+            - [ requireJs, flot, "@FCom_Admin/Admin/js/flot/jquery.flot.min", { deps: [ jquery ] } ]
+            - [ requireJs, flot.canvas, "@FCom_Admin/Admin/js/flot/jquery.flot.canvas.min", { deps: [ flot ] } ]
+            - [ requireJs, flot.categories, "@FCom_Admin/Admin/js/flot/jquery.flot.categories.min", { deps: [ flot ] } ]
+            - [ requireJs, flot.crosshair, "@FCom_Admin/Admin/js/flot/jquery.flot.crosshair.min", { deps: [ flot ] } ]
+            - [ requireJs, flot.errorbars, "@FCom_Admin/Admin/js/flot/jquery.flot.errorbars.min", { deps: [ flot ] } ]
+            - [ requireJs, flot.fillbetween, "@FCom_Admin/Admin/js/flot/jquery.flot.fillbetween.min", { deps: [ flot ] } ]
+            - [ requireJs, flot.image, "@FCom_Admin/Admin/js/flot/jquery.flot.image.min", { deps: [ flot ] } ]
+            - [ requireJs, flot.navigate, "@FCom_Admin/Admin/js/flot/jquery.flot.navigate.min", { deps: [ flot ] } ]
+            - [ requireJs, flot.pie, "@FCom_Admin/Admin/js/flot/jquery.flot.pie.min", { deps: [ flot ] } ]
+            - [ requireJs, flot.resize, "@FCom_Admin/Admin/js/flot/jquery.flot.resize.min", { deps: [ flot ] } ]
+            - [ requireJs, flot.selection, "@FCom_Admin/Admin/js/flot/jquery.flot.selection.min", { deps: [ flot ] } ]
+            - [ requireJs, flot.stack, "@FCom_Admin/Admin/js/flot/jquery.flot.stack.min", { deps: [ flot ] } ]
+            - [ requireJs, flot.symbol, "@FCom_Admin/Admin/js/flot/jquery.flot.symbol.min", { deps: [ flot ] } ]
+            - [ requireJs, flot.time, "@FCom_Admin/Admin/js/flot/jquery.flot.time.min", { deps: [ flot ] } ]
+            - [ requireJs, flot.threshold, "@FCom_Admin/Admin/js/flot/jquery.flot.threshold.min", { deps: [ flot ] } ]
 
 default_grid:
-  - { include: base }
-  - { hook: main, views: admin/grid }
+    - { include: base }
+    - { hook: main, views: admin/grid }
 
 default_form:
     - { include: base }
@@ -218,16 +219,16 @@ default_form:
     - { hook: main, views: admin/form }
 
 form:
-  - view: head
-    do:
-      #- [ css, @FCom_LibJsCommon/js/themes/default/style.css ]
-  #- { include: jstree }
-  #- { include: lib_cleditor }
+    - view: head
+        do:
+        #- [ css, "@FCom_LibJsCommon/js/themes/default/style.css" ]
+    #- { include: jstree }
+    #- { include: lib_cleditor }
 
 
 404:
-  - { include: base }
-  - { hook: main, views: 404 }
+    - { include: base }
+    - { hook: main, views: 404 }
 
 /:
     - { include: base }
@@ -235,10 +236,10 @@ form:
     - { hook: main, views: dashboard }
     - { view: admin/nav, do: [[ setNav, dashboard ]] }
     - view: head
-      do:
-        #- [ requireJs, ModalLauncher, @FCom_Admin/Admin/js/BackboneViews/ModalLauncher ]
-        #- [ requireJs, FormView, @FCom_Admin/Admin/js/BackboneViews/FormView ]
-        - [ css, @FCom_LibJsCommon/js/css/dragtable-akottr.css ]
+        do:
+        #- [ requireJs, ModalLauncher, "@FCom_Admin/Admin/js/BackboneViews/ModalLauncher" ]
+        #- [ requireJs, FormView, "@FCom_Admin/Admin/js/BackboneViews/FormView" ]
+            - [ css, "@FCom_LibJsCommon/js/css/dragtable-akottr.css" ]
 
 /denied:
     - { include: base }
@@ -279,15 +280,15 @@ form:
     - { hook: main, views: settings }
     - { view: admin/nav, do: [[ setNav, system/settings ]] }
     - view: settings
-      set: { tab_view_prefix: settings/ }
-      do:
-        - [ addTabGroup, areas, { label: Areas, pos: 10 } ]
-        - [ addTabGroup, themes, { label: Themes, pos: 800 } ]
-        - [ addTabGroup, other, { label: Other, pos: 900 } ]
-        - [ addTab, FCom_Core, { label: Fulleron Core, group: areas, async: true, pos: 10 } ]
-        - [ addTab, FCom_Admin, { label: Fulleron Admin, group: areas, async: true, pos: 20 } ]
-        - [ addTab, FCom_Frontend, { label: Fulleron Frontend, group: areas, async: true, pos: 30 } ]
-        - [ addTab, FCom_FrontendTheme, { label: General Theme Settings, group: themes, async: true, pos: 10 } ]
+        set: { tab_view_prefix: settings/ }
+        do:
+            - [ addTabGroup, areas, { label: Areas, pos: 10 } ]
+            - [ addTabGroup, themes, { label: Themes, pos: 800 } ]
+            - [ addTabGroup, other, { label: Other, pos: 900 } ]
+            - [ addTab, FCom_Core, { label: Fulleron Core, group: areas, async: true, pos: 10 } ]
+            - [ addTab, FCom_Admin, { label: Fulleron Admin, group: areas, async: true, pos: 20 } ]
+            - [ addTab, FCom_Frontend, { label: Fulleron Frontend, group: areas, async: true, pos: 30 } ]
+            - [ addTab, FCom_FrontendTheme, { label: General Theme Settings, group: themes, async: true, pos: 10 } ]
 
 /modules:
     - { include: base }
@@ -301,3 +302,9 @@ form:
     - { hook: header, clear: true }
     - { hook: top-nav, clear: true }
     - { hook: main, views: media }
+
+/roles/form:
+    - { include: jstree }
+
+/header_search:
+    - { include: base }

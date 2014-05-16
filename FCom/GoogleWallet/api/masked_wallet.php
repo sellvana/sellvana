@@ -28,26 +28,26 @@ require_once 'util.php';
 class MaskedWallet {
 
   public static function post($input) {
-    WalletUtil::assert_input($input, array('estimatedTotalPrice', 'currencyCode'));
+    WalletUtil::assert_input($input, ['estimatedTotalPrice', 'currencyCode']);
     $now = (int)date('U');
     $estimated_total_price = WalletUtil::to_dollars($input['estimatedTotalPrice']);
-    $mwr = array(
+    $mwr = [
       'iat' => $now,
       'exp' => $now + 3600,
       'typ' => 'google/wallet/online/masked/v2/request',
       'aud' => 'Google',
       'iss' => MERCHANT_ID,
-      'request'=> array(
+      'request' => [
         'clientId' =>  CLIENT_ID,
-        'merchantName'=> MERCHANT_NAME,
-        'origin'=> ORIGIN,
-         'pay'=> array (
-           'estimatedTotalPrice'=> $estimated_total_price,
-           'currencyCode'=> $input['currencyCode'],
-          ),
-          'ship'=> new stdClass(),
-      ),
-    );
+        'merchantName' => MERCHANT_NAME,
+        'origin' => ORIGIN,
+         'pay' => [
+           'estimatedTotalPrice' => $estimated_total_price,
+           'currencyCode' => $input['currencyCode'],
+          ],
+          'ship' => new stdClass(),
+      ],
+    ];
     if (isset($input['googleTransactionId'])) {
       $mwr['request']['googleTransactionId'] = $input['googleTransactionId'];
     }
@@ -56,7 +56,7 @@ class MaskedWallet {
 
 
   public static function put($input) {
-    WalletUtil::assert_input($input, array('jwt', 'googleTransactionId'));
+    WalletUtil::assert_input($input, ['jwt', 'googleTransactionId']);
     $mwr = JWT::decode($input['jwt'], null, FALSE);
     $now = (int)date('U');
     $mwr['iat'] = $now;

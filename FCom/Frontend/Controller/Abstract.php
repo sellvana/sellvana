@@ -10,13 +10,13 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
         $r = BRequest::i();
 
         $redirect = $r->get('redirect_to');
-        if ($redirect==='CURRENT') {
+        if ($redirect === 'CURRENT') {
             $redirect = BRequest::i()->referrer();
         }
 
         if ($r->xhr()) {
             BSession::i()->set('login_orig_url', $redirect ? $redirect : $r->referrer());
-            BResponse::i()->json(array('error'=>'login'));
+            BResponse::i()->json(['error' => 'login']);
         } else {
             BSession::i()->set('login_orig_url', $redirect ? $redirect : $r->currentUrl());
             $this->layout('/customer/login');
@@ -29,13 +29,13 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
         $r = BRequest::i();
 
         $redirect = $r->get('redirect_to');
-        if ($redirect==='CURRENT') {
+        if ($redirect === 'CURRENT') {
             $redirect = BRequest::i()->referrer();
         }
 
         if ($r->xhr()) {
             BSession::i()->set('login_orig_url', $redirect ? $redirect : $r->referrer());
-            BResponse::i()->json(array('error'=>'denied'));
+            BResponse::i()->json(['error' => 'denied']);
         } else {
             BSession::i()->set('login_orig_url', $redirect ? $redirect : $r->currentUrl());
             $this->layout('/denied');
@@ -52,7 +52,7 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
         return true;
     }
 
-    public function message($msg, $type='success', $tag='frontend', $options=array())
+    public function message($msg, $type = 'success', $tag = 'frontend', $options = [])
     {
         if (is_array($msg)) {
             array_walk($msg, 'BLocale::_');
@@ -69,9 +69,9 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
     public function formMessages($formId = 'frontend')
     {
         //prepare error message
-        $messages = BSession::i()->messages('validator-errors:'.$formId);
+        $messages = BSession::i()->messages('validator-errors:' . $formId);
         if (count($messages)) {
-            $msg = array();
+            $msg = [];
             foreach ($messages as $m) {
                 $msg[] = is_array($m['msg']) ? $m['msg']['error'] : $m['msg'];
             }

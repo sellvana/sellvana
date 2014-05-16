@@ -35,6 +35,6 @@ class FCom_PushServer_Service_Abstract extends BClass implements FCom_PushServer
 
     public function onUnknownSignal()
     {
-        $this->reply(array('signal' => 'error', 'description' => 'Unknown signal'));
+        $this->reply(['signal' => 'error', 'description' => 'Unknown signal']);
     }
 }

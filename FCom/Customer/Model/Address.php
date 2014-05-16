@@ -5,39 +5,39 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_customer_address';
     protected static $_origClass = __CLASS__;
 
-    protected static $_validationRules = array(
+    protected static $_validationRules = [
         /*array('customer_id', '@required'),
         array('email', '@required'),*/
-        array('firstname', '@required'),
-        array('lastname', '@required'),
-        array('street1', '@required'),
-        array('city', '@required'),
-        array('country', '@required'),
+        ['firstname', '@required'],
+        ['lastname', '@required'],
+        ['street1', '@required'],
+        ['city', '@required'],
+        ['country', '@required'],
 //        array('region', '@required'),
-        array('postcode', '@required'),
+        ['postcode', '@required'],
 
-        array('email', '@email'),
+        ['email', '@email'],
 
-        array('customer_id', '@integer'),
-        array('lat', '@numeric'),
-        array('lng', '@numeric'),
-    );
+        ['customer_id', '@integer'],
+        ['lat', '@numeric'],
+        ['lng', '@numeric'],
+    ];
 
-    public function as_html($obj=null)
+    public function as_html($obj = null)
     {
         if (is_null($obj)) {
             $obj = $this;
         }
         $countries = FCom_Geo_Model_Country::i()->options();
         return '<address>'
-            .'<div class="f-street-address">'.$obj->street1.'</div>'
-            .($obj->street2 ? '<div class="f-extended-address">'.$obj->street2.'</div>' : '')
-            .($obj->street3 ? '<div class="f-extended-address">'.$obj->street3.'</div>' : '')
-            .'<span class="f-city">'.$obj->city.'</span>, '
-            .'<span class="f-region">'.$obj->region.'</span> '
-            .'<span class="f-postal-code">'.$obj->postcode.'</span>'
-            .'<div class="f-country-name">'.(!empty($countries[$obj->country]) ? $countries[$obj->country] : $obj->country).'</div>'
-            .'</address>';
+            . '<div class="f-street-address">' . $obj->street1 . '</div>'
+            . ($obj->street2 ? '<div class="f-extended-address">' . $obj->street2 . '</div>' : '')
+            . ($obj->street3 ? '<div class="f-extended-address">' . $obj->street3 . '</div>' : '')
+            . '<span class="f-city">' . $obj->city . '</span>, '
+            . '<span class="f-region">' . $obj->region . '</span> '
+            . '<span class="f-postal-code">' . $obj->postcode . '</span>'
+            . '<div class="f-country-name">' . (!empty($countries[$obj->country]) ? $countries[$obj->country] : $obj->country) . '</div>'
+            . '</address>';
 
     }
 
@@ -60,9 +60,9 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
 
     public function prepareApiData($customerAddress)
     {
-        $result = array();
-        foreach($customerAddress as $address) {
-            $result[] = array(
+        $result = [];
+        foreach ($customerAddress as $address) {
+            $result[] = [
                 'id' => $address->id,
                 'customer_id'       => $address->customer_id,
                 'firstname'         => $address->firstname,
@@ -75,14 +75,14 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
                 'country_code'      => $address->country,
                 'phone'             => $address->phone,
                 'fax'               => $address->fax,
-                );
+                ];
         }
         return $result;
     }
 
     public function formatApiPost($post)
     {
-        $data = array();
+        $data = [];
 
         if (!empty($post['firstname'])) {
             $data['firstname'] = $post['firstname'];
@@ -127,21 +127,21 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
 
     public function newShipping($address, $customer)
     {
-        $data = array('address' => $address);
+        $data = ['address' => $address];
         static::import($data, $customer, 'shipping');
     }
 
     public function newBilling($address, $customer)
     {
-        $data = array('address' => $address);
+        $data = ['address' => $address];
         static::import($data, $customer, 'billing');
     }
 
-    public static function import($data, $cust, $atype='billing')
+    public static function import($data, $cust, $atype = 'billing')
     {
-        $addr = static::create(array('customer_id' => $cust->id));
+        $addr = static::create(['customer_id' => $cust->id]);
 
-        if(!empty($data['address'])){
+        if (!empty($data['address'])) {
             $addr->set($data['address']);
         }
         $addr->save();

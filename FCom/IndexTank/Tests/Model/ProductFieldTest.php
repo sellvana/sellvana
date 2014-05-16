@@ -3,20 +3,20 @@ class FCom_IndexTank_Tests_Model_ProductFieldTest extends FCom_Test_DatabaseTest
 {
     public function getDataSet()
     {
-        return $this->createFlatXmlDataSet(__DIR__.'/ProductFieldTest.xml');
+        return $this->createFlatXmlDataSet(__DIR__ . '/ProductFieldTest.xml');
     }
 
     public function testAddEntry()
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_indextank_product_field'), "Pre-Condition");
 
-        $data = array(
+        $data = [
             'field_name'        => "description",
             'field_type'        => "text",
             'source_type'       => 'product',
             'source_value'      => "description",
             'search'            => 1
-        );
+        ];
         FCom_IndexTank_Model_ProductField::orm()->create($data)->save();
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_indextank_product_field'), "Insert failed");
@@ -79,7 +79,7 @@ class FCom_IndexTank_Tests_Model_ProductFieldTest extends FCom_Test_DatabaseTest
 
         $field = FCom_IndexTank_Model_ProductField::load(1);
         $this->assertEquals(0, $field->facets, "Load failed");
-        $field->facets=1;
+        $field->facets = 1;
         $field->save();
         $field = FCom_IndexTank_Model_ProductField::load(1);
         $this->assertEquals(1, $field->facets, "Update failed");

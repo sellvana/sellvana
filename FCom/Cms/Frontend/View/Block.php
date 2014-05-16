@@ -11,7 +11,7 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
      * @param array $params block view creation parameters
      * @return FCom_Cms_Frontend_View_Block
      */
-    static public function createView($block, array $params = array())
+    static public function createView($block, array $params = [])
     {
         if (!static::$_layoutHlp) {
             static::$_layoutHlp = BLayout::i();
@@ -25,7 +25,7 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
         } else {
             $params['block'] = $block;
         }
-        $viewName = '_cms_block/'.$params['block'];
+        $viewName = '_cms_block/' . $params['block'];
         $view = static::$_layoutHlp->getView($viewName);
         if (!$view instanceof FCom_Cms_Frontend_View_Block) {
             $view = static::$_layoutHlp->addView($viewName, $params)->getView($viewName);
@@ -70,13 +70,13 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
 
         $subRenderer = BLayout::i()->getRenderer($model->renderer ? $model->renderer : 'FCom_LibTwig');
 
-        $view->setParam(array(
+        $view->setParam([
             //'renderer'    => $subRenderer,
             'source'      => $model->content ? $model->content : ' ',
-            'source_name' => 'cms_block:'.get_class($model).':'.$model->handle,
+            'source_name' => 'cms_block:' . get_class($model) . ':' . $model->handle,
             'source_mtime' => $model->modified_time,
             'source_untrusted' => true,
-        ));
+        ]);
 
         $content = call_user_func($subRenderer['callback'], $view);
 

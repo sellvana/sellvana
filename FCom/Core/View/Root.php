@@ -2,7 +2,7 @@
 
 class FCom_Core_View_Root extends FCom_Core_View_Abstract
 {
-    protected $_htmlAttr = array('lang'=>'en');
+    protected $_htmlAttr = ['lang' => 'en'];
 
     public function __construct(array $params)
     {
@@ -25,16 +25,16 @@ class FCom_Core_View_Root extends FCom_Core_View_Abstract
 
     public function getHtmlAttributes()
     {
-        $xmlns = array();
-        foreach ($this->_htmlAttr as $a=>$v) {
-            $xmlns[] = $a.'="'.$this->q($v).'"';
+        $xmlns = [];
+        foreach ($this->_htmlAttr as $a => $v) {
+            $xmlns[] = $a . '="' . $this->q($v) . '"';
         }
         return join(' ', $xmlns);
     }
 
     public function xmlns($ns, $href)
     {
-        $this->_htmlAttr['xmlns:'.$ns] = $href;
+        $this->_htmlAttr['xmlns:' . $ns] = $href;
         return $this;
     }
 }

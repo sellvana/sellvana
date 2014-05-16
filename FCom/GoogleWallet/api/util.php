@@ -36,7 +36,7 @@ class WalletUtil {
   }
 
   public static function assert_input($input, $required) {
-    for($i=0; $i < sizeof($required); $i++) {
+    for ($i = 0; $i < sizeof($required); $i++) {
       if (!isset($input[$required[$i]])) {
         header('HTTP/1.0 400 Bad request', true, 400);
         echo "Did not receive $required[$i] in the request" ;

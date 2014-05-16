@@ -37,7 +37,7 @@ class BClassTest extends PHPUnit_Framework_TestCase
     public function test__call()
     {
         $obj = AClass::i(true);
-        $this->assertEquals(1, $obj->__call('method', array()));
+        $this->assertEquals(1, $obj->__call('method', []));
     }
 
     /**
@@ -45,7 +45,7 @@ class BClassTest extends PHPUnit_Framework_TestCase
      */
     public function test__callStatic()
     {
-        $this->assertTrue(1 == AClass::__callStatic('method', array()));
+        $this->assertTrue(1 == AClass::__callStatic('method', []));
     }
 }
 

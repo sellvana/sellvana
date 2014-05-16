@@ -23,20 +23,20 @@
 
 class BImport extends BClass
 {
-    protected $fields = array();
+    protected $fields = [];
     protected $dir = 'shared';
     protected $model = '';
 
     public function getFieldData()
     {
-        BEvents::i()->fire(__METHOD__, array('fields'=>&$this->fields));
+        BEvents::i()->fire(__METHOD__, ['fields' => &$this->fields]);
         return $this->fields;
     }
 
     public function getFieldOptions()
     {
-        $options = array();
-        foreach ($this->getFieldData() as $f=>$_) {
+        $options = [];
+        foreach ($this->getFieldData() as $f => $_) {
             $options[$f] = $f;
         }
         return $options;
@@ -44,7 +44,7 @@ class BImport extends BClass
 
     public function getImportDir()
     {
-        return FCom_Core_Main::i()->dir('storage/import/'.$this->dir);
+        return FCom_Core_Main::i()->dir('storage/import/' . $this->dir);
     }
 
     public function updateFieldsDueToInfo($info)
@@ -55,7 +55,7 @@ class BImport extends BClass
     public function getFileInfo($file)
     {
         // assume we know nothing about the file
-        $info = array();
+        $info = [];
         // open file for reading
         if (!file_exists($file))
             return false;
@@ -63,10 +63,10 @@ class BImport extends BClass
         // get first line in the file
         $r = fgets($fp);
         fclose($fp);
-        $row = array();
-        foreach (array("\t", ',', ';', '|') as $chr) {
+        $row = [];
+        foreach (["\t", ',', ';', '|'] as $chr) {
             $row = str_getcsv($r, $chr);
-            if (sizeof($row)>1) {
+            if (sizeof($row) > 1) {
                 $info['delim'] = $chr;
                 break;
             }
@@ -80,8 +80,8 @@ class BImport extends BClass
         // find likely column names
         $this->updateFieldsDueToInfo($info);
         $fields = $this->getFieldData();
-        foreach ($row as $i=>$v) {
-            foreach ($fields as $f=>$fd) {
+        foreach ($row as $i => $v) {
+            foreach ($fields as $f => $fd) {
                 if (!empty($fd['pattern']) && empty($fd['used'])
                     && preg_match("#{$fd['pattern']}#i", $v)
                 ) {
@@ -101,11 +101,11 @@ class BImport extends BClass
      * @param bool $update
      * @return array|bool|mixed
      */
-    public function config($config=null, $update=false)
+    public function config($config = null, $update = false)
     {
-        $dir = FCom_Core_Main::i()->dir('storage/run/'.$this->dir);
-        $file = BSession::i()->sessionId().'.json';
-        $filename = $dir.'/'.$file;
+        $dir = FCom_Core_Main::i()->dir('storage/run/' . $this->dir);
+        $file = BSession::i()->sessionId() . '.json';
+        $filename = $dir . '/' . $file;
         if ($config) { // create config lock
             if ($update) {
                 $old = $this->config();
@@ -116,7 +116,7 @@ class BImport extends BClass
             }
             file_put_contents($filename, BUtil::toJson($config));
             return true;
-        } elseif ($config===false) { // remove config lock
+        } elseif ($config === false) { // remove config lock
             unlink($filename);
             return true;
         } elseif (!file_exists($filename)) { // no config
@@ -155,8 +155,8 @@ class BImport extends BClass
             throw new BException("Model should implement import method");
         }
         $config = $this->config();
-        $filename = $this->getImportDir().'/'.$config['filename'];
-        $status = array(
+        $filename = $this->getImportDir() . '/' . $config['filename'];
+        $status = [
             'start_time' => time(),
             'status' => 'running',
             'rows_total' => sizeof(file($filename)), // file() will load entire file in memory, may be not good idea???
@@ -170,17 +170,17 @@ class BImport extends BClass
             'memory_usage' => memory_get_usage(),
             'run_time' => 0,
             'errors' => ''
-        );
+        ];
         $this->config($status, true);
         $fp = fopen($filename, 'r');
         if (!empty($config['skip_first'])) {
-            for ($i=0; $i<$config['skip_first']; $i++) {
+            for ($i = 0; $i < $config['skip_first']; $i++) {
                 fgets($fp);
                 $status['rows_skipped']++;
             }
         }
 
-        $importConfig = array();
+        $importConfig = [];
 
         $statusUpdate = 50;
         if ($config['batch_size']) {
@@ -193,20 +193,20 @@ class BImport extends BClass
             $importConfig['format']['nesting_separator'] = $config['nesting_separator'];
         }
 
-        $dataBatch = array();
+        $dataBatch = [];
         while (($r = fgetcsv($fp, 0, $config['delim']))) {
-            if (count($r) != count($config['columns']) ) {
+            if (count($r) != count($config['columns'])) {
                 continue;
             }
             $row = array_combine($config['columns'], $r);
-            foreach ($config['defaults'] as $k=>$v) {
-                if (!is_null($v) && $v!=='' && (!isset($row[$k]) || $row[$k]==='')) {
+            foreach ($config['defaults'] as $k => $v) {
+                if (!is_null($v) && $v !== '' && (!isset($row[$k]) || $row[$k] === '')) {
                     $row[$k] = $v;
                 }
             }
 
-            $data = array();
-            foreach ($row as $k=>$v) {
+            $data = [];
+            foreach ($row as $k => $v) {
                 $f = explode('.', $k);
                 if (empty($f[0]) || empty($f[1])) {
                     continue;
@@ -222,20 +222,20 @@ class BImport extends BClass
                     if (!empty($resultBatch['errors'])) {
                         $status['errors'] = $resultBatch['errors'];
                     }
-                    foreach($resultBatch as $result) {
-                        if (isset($status['rows_'.$result['status']])) {
-                            $status['rows_'.$result['status']]++;
+                    foreach ($resultBatch as $result) {
+                        if (isset($status['rows_' . $result['status']])) {
+                            $status['rows_' . $result['status']]++;
                         }
                     }
-                    $dataBatch = array();
+                    $dataBatch = [];
                 }
             } else {
                 $result = $model->import($data, $importConfig);
                 if (!empty($result['errors'])) {
                     $status['errors'] = $result['errors'];
                 }
-                if (isset($status['rows_'.$result['status']])) {
-                    $status['rows_'.$result['status']]++;
+                if (isset($status['rows_' . $result['status']])) {
+                    $status['rows_' . $result['status']]++;
                 }
             }
 
@@ -245,11 +245,11 @@ class BImport extends BClass
             if (++$status['rows_processed'] % $statusUpdate === 0) {
                 //gc_collect_cycles();
                 $update = $this->config();
-                if (!$update || $update['status']!=='running' || $update['start_time']!==$status['start_time']) {
+                if (!$update || $update['status'] !== 'running' || $update['start_time'] !== $status['start_time']) {
                     return false;
                 }
                 $status['memory_usage'] = memory_get_usage();
-                $status['run_time'] = microtime(true)-$timer;
+                $status['run_time'] = microtime(true) - $timer;
                 $this->config($status, true);
             }
         }
@@ -261,18 +261,18 @@ class BImport extends BClass
             if (!empty($resultBatch['errors'])) {
                 $status['errors'] = $resultBatch['errors'];
             }
-            foreach($resultBatch as $result) {
-                if (isset($status['rows_'.$result['status']])) {
-                    $status['rows_'.$result['status']]++;
+            foreach ($resultBatch as $result) {
+                if (isset($status['rows_' . $result['status']])) {
+                    $status['rows_' . $result['status']]++;
                 }
             }
             $status['memory_usage'] = memory_get_usage();
-            $status['run_time'] = microtime(true)-$timer;
+            $status['run_time'] = microtime(true) - $timer;
             $this->config($status, true);
         }
 
         $status['memory_usage'] = memory_get_usage();
-        $status['run_time'] = microtime(true)-$timer;
+        $status['run_time'] = microtime(true) - $timer;
         $status['status'] = 'done';
         $status['rows_processed'] = $status['rows_total'];
         $this->config($status, true);

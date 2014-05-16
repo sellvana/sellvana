@@ -7,7 +7,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         if (!parent::beforeDispatch()) {
             return false;
         }
-        if (FCom_Customer_Model_Customer::i()->isLoggedIn() && in_array($this->_action, array('login', 'register', 'password_recover'))) {
+        if (FCom_Customer_Model_Customer::i()->isLoggedIn() && in_array($this->_action, ['login', 'register', 'password_recover'])) {
             BResponse::i()->redirect('');
         }
         return true;
@@ -18,7 +18,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $this->layout('/customer/login');
 
         $redirect = BRequest::i()->get('redirect_to');
-        if ($redirect==='CURRENT') {
+        if ($redirect === 'CURRENT') {
             $redirect = BRequest::i()->referrer();
         }
         if ($redirect) {
@@ -36,7 +36,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                 $login = $r->post();
             }
             $customerModel->setLoginRules();
-            if ($customerModel->validate($login, array(), 'frontend')) {
+            if ($customerModel->validate($login, [], 'frontend')) {
                 $user = $customerModel->authenticate($login['email'], $login['password']);
                 if ($user) {
                     switch ($user->status) {
@@ -61,10 +61,10 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                         $user->login();
                         if (!empty($login['remember_me'])) {
                             $days = BConfig::i()->get('cookie/remember_days');
-                            BResponse::i()->cookie('remember_me', 1, ($days ? $days : 30)*86400);
+                            BResponse::i()->cookie('remember_me', 1, ($days ? $days : 30) * 86400);
                         }
                     } else {
-                        $this->message($errorMessage, 'error', 'frontend', array('title' => ''));
+                        $this->message($errorMessage, 'error', 'frontend', ['title' => '']);
                         BResponse::i()->redirect('login');
                         return;
                     }
@@ -76,7 +76,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             }
             if ($r->request('redirect_to')) {
                 $url = $r->request('redirect_to');
-                if ($url==='CURRENT') {
+                if ($url === 'CURRENT') {
                     $url = $r->referrer();
                 }
             } else {
@@ -101,7 +101,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $email = BRequest::i()->request('email');
             $customerModel = FCom_Customer_Model_Customer::i();
             $customerModel->setPasswordRecoverRules();
-            if ($customerModel->validate(array('email' => $email), array(), 'frontend')) {
+            if ($customerModel->validate(['email' => $email], [], 'frontend')) {
                 $user = $customerModel->load($email, 'email');
                 if ($user) {
                     $user->recoverPassword();
@@ -122,7 +122,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     public function action_password_reset()
     {
         $token = BRequest::i()->request('token');
-        if ($token && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token')) && $user->token===$token) {
+        if ($token && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token')) && $user->token === $token) {
             $this->layout('/customer/password/reset');
         } else {
             $this->message('Invalid link. It is possible your recovery link has expired.', 'error');
@@ -136,7 +136,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $token = $r->request('token');
         $password = $r->post('password');
         $confirm = $r->post('password_confirm');
-        if ($token && $password && $password===$confirm
+        if ($token && $password && $password === $confirm
             && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token'))
             && $user->get('token') === $token
         ) {
@@ -152,6 +152,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     public function action_logout()
     {
         FCom_Customer_Model_Customer::i()->logout();
+        BResponse::i()->cookie('remember_me', 0);
         BResponse::i()->redirect(BApp::baseUrl());
     }
 
@@ -168,7 +169,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $a = BRequest::i()->post('address');
             $customerModel = FCom_Customer_Model_Customer::i();
             $formId = 'register-form';
-            $emailUniqueRules = array(array('email', 'FCom_Customer_Model_Customer::ruleEmailUnique', 'An account with this email address already exists'));
+            $emailUniqueRules = [['email', 'FCom_Customer_Model_Customer::ruleEmailUnique', 'An account with this email address already exists']];
             if ($customerModel->validate($r, $emailUniqueRules, $formId)) {
                 $customer = $customerModel->register($r);
                 if ($a) {
@@ -180,7 +181,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 //                BResponse::i()->redirect('customer/myaccount');
                 BResponse::i()->redirect('customer/register');
             } else {
-                $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:'.$formId);
+                $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:' . $formId);
                 $this->formMessages($formId);
                 BResponse::i()->redirect('customer/register');
             }

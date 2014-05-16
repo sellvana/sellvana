@@ -5,9 +5,11 @@ class FCom_Geo_Model_Region extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_geo_region';
     protected static $_origClass = __CLASS__;
 
-    protected static $_optionsCache = array();
+    protected static $_optionsCache = [];
     protected static $_allOptionsLoaded;
-
+    protected static $_importExportProfile = [
+      'unique_key' => ['country', 'code',],
+    ];
     public static function options($country)
     {
         if (empty(static::$_optionsCache[$country])) {
@@ -28,7 +30,7 @@ class FCom_Geo_Model_Region extends FCom_Core_Model_Abstract
         return static::$_optionsCache;
     }
 
-    public static function findByName($country, $name, $field=null)
+    public static function findByName($country, $name, $field = null)
     {
         $result = static::orm('s')->where('country', $country)->where('name', $name)->find_one();
         if (!$result) return null;

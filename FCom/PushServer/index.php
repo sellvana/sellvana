@@ -1,7 +1,7 @@
 <?php
 
 $rootDir = dirname(dirname(__DIR__));
-require_once $rootDir.'/FCom/Core/Main.php';
+require_once $rootDir . '/FCom/Core/Main.php';
 
 $webRoot = BRequest::i()->webRoot(2);
 BConfig::i()

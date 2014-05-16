@@ -2,11 +2,7 @@
 {% set parts = category.getPageParts(true) %}
 <div class="f-site-main" role="main">
   <div class="container">
-   <!--  breadcrumb -->
-    <ul class="breadcrumb">
-      <li><a href="{{ APP.href() }}">Home</a></li>
-      <li class="active">{{ category.get('node_name') }}</li>
-    </ul>
+    {{ THIS.view('breadcrumbs') | raw }}
     <header class="f-page-header visible-xs">
       <span class="f-page-title">{{ category.get('node_name') }}</span>
       <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">{{ 'Filters'|_ }}</a>
@@ -25,9 +21,10 @@
               {% if subCategories|length %}
                   <ul>
                   {% for subCat in subCategories %}
+                      {% set image_url = (subCat.get('image_url')) ? subCat.get('image_url'): 'media/image-not-found.jpg' %}
                       <li class="col-md-6 list-unstyled">
                           <a href="{{ subCat.url() }}" title="{{ subCat.get('node_name') }}">
-                              <img src="{{ APP.instance('FCom_Core_Main').resizeUrl() }}?s=98x98&f={{ subCat.image_url }}"
+                              <img src="{{ APP.instance('FCom_Core_Main').resizeUrl() }}?s=98x98&f={{ image_url }}"
                                    alt="{{ subCat.get('node_name') }}" />
                           </a>
                           <a href="{{ subCat.url() }}" title="{{ subCat.get('node_name') }}">{{ subCat.get('node_name') }}</a>

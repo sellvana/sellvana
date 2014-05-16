@@ -33,14 +33,14 @@ class BDb
     *
     * @var array
     */
-    protected static $_namedConnections = array();
+    protected static $_namedConnections = [];
 
     /**
     * Necessary configuration for each DB connection name
     *
     * @var array
     */
-    protected static $_namedConnectionConfig = array();
+    protected static $_namedConnectionConfig = [];
 
     /**
     * Default DB connection name
@@ -61,14 +61,14 @@ class BDb
     *
     * @var array
     */
-    protected static $_config = array('table_prefix'=>'');
+    protected static $_config = ['table_prefix' => ''];
 
     /**
     * List of tables per connection
     *
     * @var array
     */
-    protected static $_tables = array();
+    protected static $_tables = [];
 
     /**
     * Shortcut to help with IDE autocompletion
@@ -76,7 +76,7 @@ class BDb
     * @param array $args
     * @return BDb
     */
-    public static function i($new=false, array $args=array())
+    public static function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
@@ -115,20 +115,20 @@ class BDb
         if (!$force && !$name && static::$_currentConnectionName) { // continue connection to current db, if no value
             return BORM::get_db();
         }
-        if (is_null($name)) { // if first time connection, connect to default db
+        if (null === $name) { // if first time connection, connect to default db
             $name = static::$_defaultConnectionName;
         }
         if (!$force && $name === static::$_currentConnectionName) { // if currently connected to requested db, return
             return BORM::get_db();
         }
         if (!$force && !empty(static::$_namedConnections[$name])) { // if connection already exists, switch to it
-            BDebug::debug('DB.SWITCH '.$name);
+            BDebug::debug('DB.SWITCH ' . $name);
             static::$_currentConnectionName = $name;
             static::$_config = static::$_namedConnectionConfig[$name];
             BORM::set_db(static::$_namedConnections[$name], static::$_config);
             return BORM::get_db();
         }
-        $config = BConfig::i()->get($name===static::$_defaultConnectionName ? 'db' : 'db/named/'.$name);
+        $config = BConfig::i()->get($name === static::$_defaultConnectionName ? 'db' : 'db/named/' . $name);
         if (!$config) {
             throw new BException(BLocale::_('Invalid or missing DB configuration: %s', $name));
         }
@@ -147,16 +147,20 @@ class BDb
             }
             $engine = !empty($config['engine']) ? $config['engine'] : 'mysql';
             $host = !empty($config['host']) ? $config['host'] : '127.0.0.1';
+            if (strpos($host, ':') !== false && $host[0] !== '[') {
+                $host = '[' . $host . ']';
+            }
+            $port = !empty($config['port']) ? $config['port'] : '3306';
             switch ($engine) {
                 case "mysql":
-                    $dsn = "mysql:host={$host};dbname={$config['dbname']};charset=UTF8";
+                    $dsn = "mysql:host={$host};port={$port};dbname={$config['dbname']};charset=UTF8";
                     break;
 
                 default:
                     throw new BException(BLocale::_('Invalid DB engine: %s', $engine));
             }
         }
-        $profile = BDebug::debug('DB.CONNECT '.$name);
+        $profile = BDebug::debug('DB.CONNECT ' . $name);
         static::$_currentConnectionName = $name;
 
         BORM::configure($dsn);
@@ -166,10 +170,10 @@ class BDb
         BORM::set_db(null);
         BORM::setup_db();
         static::$_namedConnections[$name] = BORM::get_db();
-        static::$_config = static::$_namedConnectionConfig[$name] = array(
+        static::$_config = static::$_namedConnectionConfig[$name] = [
             'dbname' => !empty($config['dbname']) ? $config['dbname'] : null,
             'table_prefix' => !empty($config['table_prefix']) ? $config['table_prefix'] : '',
-        );
+        ];
 
         $db = BORM::get_db();
         BDebug::profile($profile);
@@ -198,20 +202,20 @@ class BDb
     * @throws Exception
     * @return array
     */
-    public static function run($sql, $params=null, $options=array())
+    public static function run($sql, $params = null, $options = [])
     {
         BDb::connect();
         $queries = preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $sql);
-        $results = array();
-        foreach ($queries as $i=>$query){
+        $results = [];
+        foreach ($queries as $i => $query) {
            if (strlen(trim($query)) > 0) {
                 // try {
-                    BDebug::debug('DB.RUN: '.$query);
+                    BDebug::debug('DB.RUN: ' . $query);
                     if (!empty($options['echo'])) {
-                        echo '<hr><pre>'.$query.'<pre>';
+                        echo '<hr><pre>' . $query . '<pre>';
                     }
                     BORM::set_last_query($query);
-                    if (is_null($params)) {
+                    if (null === $params) {
                         $results[] = BORM::get_db()->exec($query);
                     } else {
                         $results[] = BORM::get_db()->prepare($query)->execute($params);
@@ -235,9 +239,9 @@ class BDb
     *
     * @param string $connectionName
     */
-    public static function transaction($connectionName=null)
+    public static function transaction($connectionName = null)
     {
-        if (!is_null($connectionName)) {
+        if (null !== $connectionName) {
             BDb::connect($connectionName);
         }
         BORM::get_db()->beginTransaction();
@@ -248,9 +252,9 @@ class BDb
     *
     * @param string $connectionName
     */
-    public static function commit($connectionName=null)
+    public static function commit($connectionName = null)
     {
-        if (!is_null($connectionName)) {
+        if (null !== $connectionName) {
             BDb::connect($connectionName);
         }
         BORM::get_db()->commit();
@@ -261,9 +265,9 @@ class BDb
     *
     * @param string $connectionName
     */
-    public static function rollback($connectionName=null)
+    public static function rollback($connectionName = null)
     {
-        if (!is_null($connectionName)) {
+        if (null !== $connectionName) {
             BDb::connect($connectionName);
         }
         BORM::get_db()->rollback();
@@ -282,7 +286,7 @@ class BDb
     {
         $a = explode('.', $tableName);
         $p = static::$_config['table_prefix'];
-        return !empty($a[1]) ? $a[0].'.'.$p.$a[1] : $p.$a[0];
+        return !empty($a[1]) ? $a[0] . '.' . $p . $a[1] : $p . $a[0];
     }
 
     /**
@@ -294,17 +298,17 @@ class BDb
     * @param boolean $maskInverse if true, do not return specified fields
     * @return array
     */
-    public static function many_as_array($rows, $method='as_array', $fields=null, $maskInverse=false)
+    public static function many_as_array($rows, $method = 'as_array', $fields = null, $maskInverse = false)
     {
-        $res = array();
-        foreach ((array)$rows as $i=>$r) {
+        $res = [];
+        foreach ((array)$rows as $i => $r) {
             if (!$r instanceof BModel) {
                 echo "Rows are not models: <pre>"; print_r($r);
                 debug_print_backtrace();
                 exit;
             }
             $row = $r->$method();
-            if (!is_null($fields)) $row = BUtil::arrayMask($row, $fields, $maskInverse);
+            if (null !== $fields) $row = BUtil::arrayMask($row, $fields, $maskInverse);
             $res[$i] = $row;
         }
         return $res;
@@ -336,55 +340,55 @@ class BDb
     * @throws BException
     * @return array (query, params)
     */
-    public static function where($conds, $or=false)
+    public static function where($conds, $or = false)
     {
         if (is_string($conds)) {
-            return array($conds, array());
+            return [$conds, []];
         }
         if (!is_array($conds)) {
             throw new BException("Invalid where parameter");
         }
-        $where = array();
-        $params = array();
-        foreach ($conds as $f=>$v) {
+        $where = [];
+        $params = [];
+        foreach ($conds as $f => $v) {
             if (is_int($f)) {
                 if (is_string($v)) { // freeform
-                    $where[] = '('.$v.')';
+                    $where[] = '(' . $v . ')';
                     continue;
                 }
                 if (is_array($v)) { // [freeform|arguments]
                     $sql = array_shift($v);
-                    if ('AND'===$sql || 'OR'===$sql || 'NOT'===$sql) {
+                    if ('AND' === $sql || 'OR' === $sql || 'NOT' === $sql) {
                         $f = $sql;
                     } else {
                         if (isset($v[0]) && is_array($v[0])) { // `field` IN (?)
                             $v = $v[0];
-                            $sql = str_replace('(?)', '('.str_pad('', sizeof($v)*2-1, '?,').')', $sql);
+                            $sql = str_replace('(?)', '(' . str_pad('', sizeof($v) * 2-1, '?,') . ')', $sql);
                         }
-                        $where[] = '('.$sql.')';
+                        $where[] = '(' . $sql . ')';
                         $params = array_merge($params, $v);
                         continue;
                     }
                 } else {
-                    throw new BException('Invalid token: '.print_r($v,1));
+                    throw new BException('Invalid token: ' . print_r($v, 1));
                 }
             }
-            if ('AND'===$f) {
+            if ('AND' === $f) {
                 list($w, $p) = static::where($v);
-                $where[] = '('.$w.')';
+                $where[] = '(' . $w . ')';
                 $params = array_merge($params, $p);
-            } elseif ('OR'===$f) {
+            } elseif ('OR' === $f) {
                 list($w, $p) = static::where($v, true);
-                $where[] = '('.$w.')';
+                $where[] = '(' . $w . ')';
                 $params = array_merge($params, $p);
-            } elseif ('NOT'===$f) {
+            } elseif ('NOT' === $f) {
                 list($w, $p) = static::where($v);
-                $where[] = 'NOT ('.$w.')';
+                $where[] = 'NOT (' . $w . ')';
                 $params = array_merge($params, $p);
             } elseif (is_array($v)) {
-                $where[] = "({$f} IN (".str_pad('', sizeof($v)*2-1, '?,')."))";
+                $where[] = "({$f} IN (" . str_pad('', sizeof($v) * 2-1, '?,') . "))";
                 $params = array_merge($params, $v);
-            } elseif (is_null($v)) {
+            } elseif (null === $v) {
                 $where[] = "({$f} IS NULL)";
             } else {
                 $where[] = "({$f}=?)";
@@ -392,7 +396,7 @@ class BDb
             }
         }
 #print_r($where); print_r($params);
-        return array(join($or ? " OR " : " AND ", $where), $params);
+        return [join($or ? " OR " : " AND ", $where), $params];
     }
 
     /**
@@ -435,18 +439,18 @@ EOT
     * Clear DDL cache
     *
     */
-    public static function ddlClearCache($fullTableName=null)
+    public static function ddlClearCache($fullTableName = null, $connectionName = null)
     {
         if ($fullTableName) {
             if (!static::dbName()) {
-                static::connect(static::$_defaultConnectionName);
+                static::connect($connectionName ? $connectionName : static::$_defaultConnectionName);
             }
             $a = explode('.', $fullTableName);
             $dbName = empty($a[1]) ? static::dbName() : $a[0];
             $tableName = empty($a[1]) ? $fullTableName : $a[1];
             static::$_tables[$dbName][$tableName] = null;
         } else {
-            static::$_tables = array();
+            static::$_tables = [];
         }
     }
 
@@ -456,24 +460,24 @@ EOT
     * @param string $fullTableName
     * @return bool
     */
-    public static function ddlTableExists($fullTableName)
+    public static function ddlTableExists($fullTableName, $connectionName = null)
     {
         if (!static::dbName()) {
-            static::connect(static::$_defaultConnectionName);
+            static::connect($connectionName ? $connectionName : static::$_defaultConnectionName);
         }
         $a = explode('.', $fullTableName);
-        $dbName = empty($a[1]) ? static::dbName() : $a[0];
-        $tableName = empty($a[1]) ? $fullTableName : $a[1];
+        $dbName = strtolower(empty($a[1]) ? static::dbName() : $a[0]);
+        $tableName = strtolower(empty($a[1]) ? $fullTableName : $a[1]);
         if (!isset(static::$_tables[$dbName])) {
-            $tables = BORM::i()->raw_query("SHOW TABLES FROM `{$dbName}`", array())->find_many();
+            $tables = BORM::i()->raw_query("SHOW TABLES FROM `{$dbName}`", [])->find_many();
             $field = "Tables_in_{$dbName}";
             foreach ($tables as $t) {
-                 static::$_tables[$dbName][$t->get($field)] = array();
+                 static::$_tables[$dbName][$t->get($field)] = [];
             }
         } elseif (!isset(static::$_tables[$dbName][$tableName])) {
-            $table = BORM::i()->raw_query("SHOW TABLES FROM `{$dbName}` LIKE ?", array($tableName))->find_one();
+            $table = BORM::i()->raw_query("SHOW TABLES FROM `{$dbName}` LIKE ?", [$tableName])->find_one();
             if ($table) {
-                static::$_tables[$dbName][$tableName] = array();
+                static::$_tables[$dbName][$tableName] = [];
             }
         }
         return isset(static::$_tables[$dbName][$tableName]);
@@ -487,28 +491,28 @@ EOT
     * @throws BException
     * @return mixed
     */
-    public static function ddlFieldInfo($fullTableName, $fieldName=null)
+    public static function ddlFieldInfo($fullTableName, $fieldName = null, $connectionName = null)
     {
-        self::checkTable($fullTableName);
+        self::checkTable($fullTableName, $connectionName);
         $a = explode('.', $fullTableName);
         $dbName = empty($a[1]) ? static::dbName() : $a[0];
         $tableName = empty($a[1]) ? $fullTableName : $a[1];
         if (!isset(static::$_tables[$dbName][$tableName]['fields'])) {
             static::$_tables[$dbName][$tableName]['fields'] = BORM::i()
-                ->raw_query("SHOW FIELDS FROM `{$dbName}`.`{$tableName}`", array())->find_many_assoc('Field');
+                ->raw_query("SHOW FIELDS FROM `{$dbName}`.`{$tableName}`", [])->find_many_assoc('Field');
 
         }
         $res = static::$_tables[$dbName][$tableName]['fields'];
-        return is_null($fieldName) ? $res : (isset($res[$fieldName]) ? $res[$fieldName] : null);
+        return null === $fieldName ? $res : (isset($res[$fieldName]) ? $res[$fieldName] : null);
     }
 
     /**
      * @param string $fullTableName
      * @throws BException
      */
-    protected static function checkTable($fullTableName)
+    protected static function checkTable($fullTableName, $connectionName = null)
     {
-        if (!static::ddlTableExists($fullTableName)) {
+        if (!static::ddlTableExists($fullTableName, $connectionName)) {
             throw new BException(BLocale::_('Invalid table name: %s', $fullTableName));
         }
     }
@@ -521,9 +525,9 @@ EOT
     * @throws BException
     * @return array|null
     */
-    public static function ddlIndexInfo($fullTableName, $indexName=null)
+    public static function ddlIndexInfo($fullTableName, $indexName = null, $connectionName = null)
     {
-        if (!static::ddlTableExists($fullTableName)) {
+        if (!static::ddlTableExists($fullTableName, $connectionName)) {
             throw new BException(BLocale::_('Invalid table name: %s', $fullTableName));
         }
         $a = explode('.', $fullTableName);
@@ -531,10 +535,10 @@ EOT
         $tableName = empty($a[1]) ? $fullTableName : $a[1];
         if (!isset(static::$_tables[$dbName][$tableName]['indexes'])) {
             static::$_tables[$dbName][$tableName]['indexes'] = BORM::i()
-                ->raw_query("SHOW KEYS FROM `{$dbName}`.`{$tableName}`", array())->find_many_assoc('Key_name');
+                ->raw_query("SHOW KEYS FROM `{$dbName}`.`{$tableName}`", [])->find_many_assoc('Key_name');
         }
         $res = static::$_tables[$dbName][$tableName]['indexes'];
-        return is_null($indexName) ? $res : (isset($res[$indexName]) ? $res[$indexName] : null);
+        return null === $indexName ? $res : (isset($res[$indexName]) ? $res[$indexName] : null);
     }
 
     /**
@@ -547,9 +551,9 @@ EOT
     * @throws BException
     * @return array|null
     */
-    public static function ddlForeignKeyInfo($fullTableName, $fkName=null)
+    public static function ddlForeignKeyInfo($fullTableName, $fkName = null, $connectionName = null)
     {
-        if (!static::ddlTableExists($fullTableName)) {
+        if (!static::ddlTableExists($fullTableName, $connectionName)) {
             throw new BException(BLocale::_('Invalid table name: %s', $fullTableName));
         }
         $a = explode('.', $fullTableName);
@@ -559,10 +563,10 @@ EOT
             static::$_tables[$dbName][$tableName]['fks'] = BORM::i()
                 ->raw_query("SELECT * FROM information_schema.TABLE_CONSTRAINTS
                     WHERE TABLE_SCHEMA='{$dbName}' AND TABLE_NAME='{$tableName}'
-                        AND CONSTRAINT_TYPE='FOREIGN KEY'", array())->find_many_assoc('CONSTRAINT_NAME');
+                        AND CONSTRAINT_TYPE='FOREIGN KEY'", [])->find_many_assoc('CONSTRAINT_NAME');
         }
         $res = static::$_tables[$dbName][$tableName]['fks'];
-        return is_null($fkName) ? $res : (isset($res[$fkName]) ? $res[$fkName] : null);
+        return null === $fkName ? $res : (isset($res[$fkName]) ? $res[$fkName] : null);
     }
 
     /**
@@ -574,7 +578,7 @@ EOT
     * @throws BException
     * @return array
     */
-    public static function ddlTableDef($fullTableName, $def)
+    public static function ddlTableDef($fullTableName, $def, $connectionName = null)
     {
         $fields = !empty($def['COLUMNS']) ? $def['COLUMNS'] : null;
         $primary = !empty($def['PRIMARY']) ? $def['PRIMARY'] : null;
@@ -582,28 +586,28 @@ EOT
         $fks = !empty($def['CONSTRAINTS']) ? $def['CONSTRAINTS'] : null;
         $options = !empty($def['OPTIONS']) ? $def['OPTIONS'] : null;
 
-        if (!static::ddlTableExists($fullTableName)) {
+        if (!static::ddlTableExists($fullTableName, $connectionName)) {
             if (!$fields) {
                 throw new BException('Missing fields definition for new table');
             }
             // temporary code duplication with ddlTable, until the other one is removed
-            $fieldsArr = array();
-            foreach ($fields as $f=>$def) {
-                $fieldsArr[] = '`'.$f.'` '.$def;
+            $fieldsArr = [];
+            foreach ($fields as $f => $def) {
+                $fieldsArr[] = '`' . $f . '` ' . $def;
             }
             $fields = null; // reset before update step
             if ($primary) {
-                $fieldsArr[] = "PRIMARY KEY ".$primary;
+                $fieldsArr[] = "PRIMARY KEY " . $primary;
                 $primary = null; // reset before update step
             }
             $engine = !empty($options['engine']) ? $options['engine'] : 'InnoDB';
             $charset = !empty($options['charset']) ? $options['charset'] : 'utf8';
             $collate = !empty($options['collate']) ? $options['collate'] : 'utf8_general_ci';
-            BORM::i()->raw_query("CREATE TABLE {$fullTableName} (".join(', ', $fieldsArr).")
-                ENGINE={$engine} DEFAULT CHARSET={$charset} COLLATE={$collate}", array())->execute();
+            BORM::i()->raw_query("CREATE TABLE {$fullTableName} (" . join(', ', $fieldsArr) . ")
+                ENGINE={$engine} DEFAULT CHARSET={$charset} COLLATE={$collate}", [])->execute();
         }
         static::ddlTableColumns($fullTableName, $fields, $indexes, $fks, $options);
-        static::ddlClearCache();
+        static::ddlClearCache(null, $connectionName);
     }
 
     /**
@@ -617,24 +621,24 @@ EOT
     *   - collate (default utf8_general_ci)
     * @return bool
     */
-    public static function ddlTable($fullTableName, $fields, $options=null)
+    public static function ddlTable($fullTableName, $fields, $options = null, $connectionName = null)
     {
-        if (static::ddlTableExists($fullTableName)) {
-            static::ddlTableColumns($fullTableName, $fields, null, null, $options); // altering options is not implemented
+        if (static::ddlTableExists($fullTableName, $connectionName)) {
+            static::ddlTableColumns($fullTableName, $fields, null, null, $options, $connectionName); // altering options is not implemented
         } else {
-            $fieldsArr = array();
-            foreach ($fields as $f=>$def) {
-                $fieldsArr[] = '`'.$f.'` '.$def;
+            $fieldsArr = [];
+            foreach ($fields as $f => $def) {
+                $fieldsArr[] = '`' . $f . '` ' . $def;
             }
             if (!empty($options['primary'])) {
-                $fieldsArr[] = "PRIMARY KEY ".$options['primary'];
+                $fieldsArr[] = "PRIMARY KEY " . $options['primary'];
             }
             $engine = !empty($options['engine']) ? $options['engine'] : 'InnoDB';
             $charset = !empty($options['charset']) ? $options['charset'] : 'utf8';
             $collate = !empty($options['collate']) ? $options['collate'] : 'utf8_general_ci';
-            BORM::i()->raw_query("CREATE TABLE {$fullTableName} (".join(', ', $fieldsArr).")
-                ENGINE={$engine} DEFAULT CHARSET={$charset} COLLATE={$collate}", array())->execute();
-            static::ddlClearCache();
+            BORM::i()->raw_query("CREATE TABLE {$fullTableName} (" . join(', ', $fieldsArr) . ")
+                ENGINE={$engine} DEFAULT CHARSET={$charset} COLLATE={$collate}", [])->execute();
+            static::ddlClearCache(null, $connectionName);
         }
         return true;
     }
@@ -654,19 +658,19 @@ EOT
     * @param array $fks
     * @return array
     */
-    public static function ddlTableColumns($fullTableName, $fields, $indexes=null, $fks=null)
+    public static function ddlTableColumns($fullTableName, $fields, $indexes = null, $fks = null, $connectionName = null)
     {
-        $tableFields = static::ddlFieldInfo($fullTableName, null);
+        $tableFields = static::ddlFieldInfo($fullTableName, null, $connectionName);
         $tableFields = array_change_key_case($tableFields, CASE_LOWER);
-        $alterArr = array();
+        $alterArr = [];
         if ($fields) {
-            foreach ($fields as $f=>$def) {
+            foreach ($fields as $f => $def) {
                 $fLower = strtolower($f);
-                if ($def==='DROP') {
+                if ($def === 'DROP') {
                     if (!empty($tableFields[$fLower])) {
                         $alterArr[] = "DROP `{$f}`";
                     }
-                } elseif (strpos($def, 'RENAME')===0) {
+                } elseif (strpos($def, 'RENAME') === 0) {
                     $a = explode(' ', $def, 3); //TODO: smarter parser, allow spaces in column name??
                     // Why not use a sprintf($def, $f) to fill in column name from $f?
                     $colName = $a[1];
@@ -683,11 +687,11 @@ EOT
             }
         }
         if ($indexes) {
-            $tableIndexes = static::ddlIndexInfo($fullTableName);
+            $tableIndexes = static::ddlIndexInfo($fullTableName, null, $connectionName);
             $tableIndexes = array_change_key_case($tableIndexes, CASE_LOWER);
-            foreach ($indexes as $idx=>$def) {
+            foreach ($indexes as $idx => $def) {
                 $idxLower = strtolower($idx);
-                if ($def==='DROP') {
+                if ($def === 'DROP') {
                     if (!empty($tableIndexes[$idxLower])) {
                         $alterArr[] = "DROP KEY `{$idx}`";
                     }
@@ -695,11 +699,11 @@ EOT
                     if (!empty($tableIndexes[$idxLower])) {
                         $alterArr[] = "DROP KEY `{$idx}`";
                     }
-                    if (strpos($def, 'PRIMARY')===0) {
+                    if (strpos($def, 'PRIMARY') === 0) {
                         $alterArr[] = "DROP PRIMARY KEY";
                         $def = substr($def, 7);
                         $alterArr[] = "ADD PRIMARY KEY `{$idx}` {$def}";
-                    } elseif (strpos($def, 'UNIQUE')===0) {
+                    } elseif (strpos($def, 'UNIQUE') === 0) {
                         $def = substr($def, 6);
                         $alterArr[] = "ADD UNIQUE KEY `{$idx}` {$def}";
                     } else {
@@ -709,15 +713,15 @@ EOT
             }
         }
         if ($fks) {
-            $tableFKs = static::ddlForeignKeyInfo($fullTableName);
+            $tableFKs = static::ddlForeignKeyInfo($fullTableName, null, $connectionName);
             $tableFKs = array_change_key_case($tableFKs, CASE_LOWER);
             // @see http://dev.mysql.com/doc/refman/5.5/en/innodb-foreign-key-constraints.html
             // You cannot add a foreign key and drop a foreign key in separate clauses of a single ALTER TABLE statement.
             // Separate statements are required.
-            $dropArr = array();
-            foreach ($fks as $idx=>$def) {
+            $dropArr = [];
+            foreach ($fks as $idx => $def) {
                 $idxLower = strtolower($idx);
-                if ($def==='DROP') {
+                if ($def === 'DROP') {
                     if (!empty($tableFKs[$idxLower])) {
                         $dropArr[] = "DROP FOREIGN KEY `{$idx}`";
                     }
@@ -730,48 +734,16 @@ EOT
                 }
             }
             if (!empty($dropArr)) {
-                BORM::i()->raw_query("ALTER TABLE {$fullTableName} ".join(", ", $dropArr), array())->execute();
-                static::ddlClearCache();
+                BORM::i()->raw_query("ALTER TABLE {$fullTableName} " . join(", ", $dropArr), [])->execute();
+                static::ddlClearCache(null, $connectionName);
             }
         }
         $result = null;
         if ($alterArr) {
-            $result = BORM::i()->raw_query("ALTER TABLE {$fullTableName} ".join(", ", $alterArr), array())->execute();
-            static::ddlClearCache();
+            $result = BORM::i()->raw_query("ALTER TABLE {$fullTableName} " . join(", ", $alterArr), [])->execute();
+            static::ddlClearCache(null, $connectionName);
         }
         return $result;
-    }
-
-    /**
-     * A convenience method to add columns to table
-     * It should check if columns exist before passing to self::ddlTableColumns
-     * $columns array should be in same format as for ddlTableColumns:
-     *
-     * array(
-     *      'field_name' => 'column definition',
-     *      'field_two' => 'column definition',
-     *      'field_three' => 'column definition',
-     * )
-     *
-     * @param string $table
-     * @param array $columns
-     * @return array|null
-     */
-    public static function ddlAddColumns($table, $columns = array())
-    {
-       if (empty($columns)) {
-           BDebug::log(__METHOD__ . ": columns array is empty.");
-           return null;
-       }
-        $pass = array();
-        $tableFields = array_keys(static::ddlFieldInfo($table));
-        foreach ($columns as $field => $def) {
-            if( in_array($field, $tableFields)) {
-                continue;
-            }
-            $pass[$field] = $def;
-        }
-        return static::ddlTableColumns($table, $pass);
     }
 
     /**
@@ -781,12 +753,12 @@ EOT
     * @param array|object $data
     * @return array
     */
-    public static function cleanForTable($table, $data)
+    public static function cleanForTable($table, $data, $connectionName = null)
     {
         $isObject = is_object($data);
-        $result = array();
-        foreach ($data as $k=>$v) {
-            if (BDb::ddlFieldInfo($table, $k)) {
+        $result = [];
+        foreach ($data as $k => $v) {
+            if (BDb::ddlFieldInfo($table, $k, $connectionName)) {
                 $result[$k] = $isObject ? $data->get($k) : $data[$k];
             }
         }
@@ -803,7 +775,7 @@ EOT
 class BPDO extends PDO
 {
     // Database drivers that support SAVEPOINTs.
-    protected static $_savepointTransactions = array("pgsql", "mysql");
+    protected static $_savepointTransactions = ["pgsql", "mysql"];
 
     // The current transaction level.
     protected $_transLevel = 0;
@@ -904,25 +876,18 @@ class BORM extends ORMWrapper
     protected $_writeConnectionName;
 
     /**
-    * Read DB name
-    *
-    * @var string
-    */
-    protected $_readDbName;
-
-    /**
-    * Write DB name
-    *
-    * @var string
-    */
-    protected $_writeDbName;
-
-    /**
     * Old values in the object before ->set()
     *
     * @var array
     */
-    protected $_old_values = array();
+    protected $_old_values = [];
+
+    /**
+     * Perform replace when building insert
+     *
+     * @var bool
+     */
+    protected $_replace;
 
     /**
     * Shortcut factory for generic instance
@@ -930,7 +895,7 @@ class BORM extends ORMWrapper
     * @param bool $new
     * @return BORM
     */
-    public static function i($new=false)
+    public static function i($new = false)
     {
         if ($new) {
             return new static('');
@@ -942,7 +907,7 @@ class BORM extends ORMWrapper
     }
 
     protected function _quote_identifier($identifier) {
-        if ($identifier[0]=='(') {
+        if ($identifier[0] == '(') {
             return $identifier;
         }
         return parent::_quote_identifier($identifier);
@@ -997,13 +962,13 @@ class BORM extends ORMWrapper
      * This is public in case the ORM should use a ready-instantiated
      * PDO object as its database connection.
      */
-    public static function set_db($db, $config=null)
+    public static function set_db($db, $config = null)
     {
-        if (!is_null($config)) {
+        if (null !== $config) {
             static::$_config = array_merge(static::$_config, $config);
         }
         static::$_db = $db;
-        if (!is_null($db)) {
+        if (null !== $db) {
             static::_setup_identifier_quote_character();
         }
     }
@@ -1015,17 +980,17 @@ class BORM extends ORMWrapper
     * @param string $write
     * @return BORMWrapper
     */
-    public function set_rw_db_names($read, $write)
+    public function set_rw_connection_names($read, $write)
     {
-        $this->_readDbName = $read;
-        $this->_writeDbName = $write;
+        $this->_readConnectionName = $read;
+        $this->_writeConnectionName = $write;
         return $this;
     }
 
     protected static function _log_query($query, $parameters)
     {
         $result = parent::_log_query($query, $parameters);
-        static::$_last_profile = BDebug::debug('DB.RUN: '.(static::$_last_query ? static::$_last_query : 'LOGGING NOT ENABLED'));
+        static::$_last_profile = BDebug::debug('DB.RUN: ' . (static::$_last_query ? static::$_last_query : 'LOGGING NOT ENABLED'));
         return $result;
     }
 
@@ -1059,9 +1024,9 @@ class BORM extends ORMWrapper
     * @param string|null $alias
     * @return BORM|string
     */
-    public function table_alias($alias=null)
+    public function table_alias($alias = null)
     {
-        if (is_null($alias)) {
+        if (null === $alias) {
             return $this->_table_alias;
         }
         $this->_table_alias = $alias;
@@ -1077,11 +1042,11 @@ class BORM extends ORMWrapper
     * @param string $alias optional alias, if $column is array, used as table name
     * @return BORM
     */
-    public function select($column, $alias=null)
+    public function select($column, $alias = null)
     {
         if (is_array($column)) {
-            foreach ($column as $k=>$v) {
-                $col = (!is_null($alias) ? $alias.'.' : '').$v;
+            foreach ($column as $k => $v) {
+                $col = (null !== $alias ? $alias . '.' : '') . $v;
                 if (is_int($k)) {
                     $this->select($col);
                 } else {
@@ -1093,9 +1058,9 @@ class BORM extends ORMWrapper
         return parent::select($column, $alias);
     }
 
-    protected $_use_index = array();
+    protected $_use_index = [];
 
-    public function use_index($index, $type='USE', $table='_')
+    public function use_index($index, $type = 'USE', $table = '_')
     {
         $this->_use_index[$table] = compact('index', 'type');
         return $this;
@@ -1105,7 +1070,7 @@ class BORM extends ORMWrapper
         $fragment = parent::_build_select_start();
         if (!empty($this->_use_index['_'])) {
             $idx = $this->_use_index['_'];
-            $fragment .= ' '.$idx['type'].' INDEX ('.$idx['index'].') ';
+            $fragment .= ' ' . $idx['type'] . ' INDEX (' . $idx['index'] . ') ';
         }
         return $fragment;
     }
@@ -1124,7 +1089,7 @@ class BORM extends ORMWrapper
 
         // Build and return the full SELECT statement by concatenating
         // the results of calling each separate builder method.
-        return $this->_join_if_not_empty(" ", array(
+        return $this->_join_if_not_empty(" ", [
             $this->_build_select_start(),
             $this->_build_join(),
             $this->_build_where(),
@@ -1133,12 +1098,12 @@ class BORM extends ORMWrapper
             $this->_build_order_by(),
             $this->_build_limit(),
             $this->_build_offset(),
-        ));
+        ]);
     }
 
 
-    protected function _add_result_column($expr, $alias=null) {
-        if (!is_null($alias)) {
+    protected function _add_result_column($expr, $alias = null) {
+        if (null !== $alias) {
             $expr .= " AS " . $this->_quote_identifier($alias);
         }
         // ADDED TO AVOID DUPLICATE FIELDS
@@ -1147,7 +1112,7 @@ class BORM extends ORMWrapper
         }
 
         if ($this->_using_default_result_columns) {
-            $this->_result_columns = array($expr);
+            $this->_result_columns = [$expr];
             $this->_using_default_result_columns = false;
         } else {
             $this->_result_columns[] = $expr;
@@ -1157,7 +1122,7 @@ class BORM extends ORMWrapper
 
     public function clear_columns()
     {
-        $this->_result_columns = array();
+        $this->_result_columns = [];
         return $this;
     }
 
@@ -1182,13 +1147,13 @@ class BORM extends ORMWrapper
     */
     public function execute()
     {
-        BDb::connect( $this->_readConnectionName );
+        BDb::connect($this->_readConnectionName);
         $query = $this->_build_select();
-        static::_log_query( $query, $this->_values );
+        static::_log_query($query, $this->_values);
         static::$_last_query = $query;
-        $statement = static::$_db->prepare( $query );
+        $statement = static::$_db->prepare($query);
 
-        $statement->execute( $this->_values );
+        $statement->execute($this->_values);
 
         return $statement;
     }
@@ -1205,7 +1170,7 @@ class BORM extends ORMWrapper
     * @param string $type
     * @return BORM
     */
-    public function iterate($callback, $type='callback')
+    public function iterate($callback, $type = 'callback')
     {
         $statement = $this->execute();
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -1225,7 +1190,7 @@ class BORM extends ORMWrapper
      * @param mixed        $value
      * @return $this|\BORM
      */
-    public function where($column_name, $value=null)
+    public function where($column_name, $value = null)
     {
         if (is_array($column_name)) {
             return $this->where_complex($column_name, !!$value);
@@ -1241,7 +1206,7 @@ class BORM extends ORMWrapper
     * @param boolean $or
     * @return BORM
     */
-    public function where_complex($conds, $or=false)
+    public function where_complex($conds, $or = false)
     {
         list($where, $params) = BDb::where($conds, $or);
         if (!$where) {
@@ -1256,15 +1221,15 @@ class BORM extends ORMWrapper
      * @param int|null $id
      * @return BModel
      */
-    public function find_one($id=null)
+    public function find_one($id = null)
     {
         $class = $this->_class_name;
         if (method_exists($class, 'origClass') && $class::origClass()) {
             $class = $class::origClass();
         }
-        BEvents::i()->fire($class.'::find_one:orm', array('orm'=>$this, 'class'=>$class, 'id'=>$id));
+        BEvents::i()->fire($class . '::find_one:orm', ['orm' => $this, 'class' => $class, 'id' => $id]);
         $result = parent::find_one($id);
-        BEvents::i()->fire($class.'::find_one:after', array('result'=>&$result, 'class'=>$class, 'id'=>$id));
+        BEvents::i()->fire($class . '::find_one:after', ['result' => &$result, 'class' => $class, 'id' => $id]);
         return $result;
     }
 
@@ -1279,9 +1244,9 @@ class BORM extends ORMWrapper
         if (method_exists($class, 'origClass') && $class::origClass()) {
             $class = $class::origClass();
         }
-        BEvents::i()->fire($class.'::find_many:orm', array('orm'=>$this, 'class'=>$class));
+        BEvents::i()->fire($class . '::find_many:orm', ['orm' => $this, 'class' => $class]);
         $result = parent::find_many();
-        BEvents::i()->fire($class.'::find_many:after', array('result'=>&$result, 'class'=>$class));
+        BEvents::i()->fire($class . '::find_many:after', ['result' => &$result, 'class' => $class]);
         return $result;
     }
 
@@ -1293,15 +1258,15 @@ class BORM extends ORMWrapper
     * @param array $options (key_lower, key_trim)
     * @return array
     */
-    public function find_many_assoc($key=null, $labelColumn=null, $options=array())
+    public function find_many_assoc($key = null, $labelColumn = null, $options = [])
     {
         $objects = $this->find_many();
-        $array = array();
+        $array = [];
         if (empty($key)) {
             $key = $this->_get_id_column_name();
         }
         foreach ($objects as $r) {
-            $value = is_null($labelColumn) ? $r : (is_array($labelColumn) ? BUtil::arrayMask($r, $labelColumn) : $r->get($labelColumn));
+            $value = null === $labelColumn ? $r : (is_array($labelColumn) ? BUtil::arrayMask($r, $labelColumn) : $r->get($labelColumn));
             if (!is_array($key)) { // save on performance for 1D keys
                 $v = $r->get($key);
                 if (!empty($options['key_lower'])) $v = strtolower($v);
@@ -1324,8 +1289,8 @@ class BORM extends ORMWrapper
      * Check whether the given field (or object itself) has been changed since this
      * object was saved.
      */
-    public function is_dirty($key=null) {
-        return is_null($key) ? !empty($this->_dirty_fields) : isset($this->_dirty_fields[$key]);
+    public function is_dirty($key = null) {
+        return null === $key ? !empty($this->_dirty_fields) : isset($this->_dirty_fields[$key]);
     }
 
     /**
@@ -1338,8 +1303,8 @@ class BORM extends ORMWrapper
             throw new BException('Key not scalar');
         }
         if (!array_key_exists($key, $this->_data)
-            || is_null($this->_data[$key]) && !is_null($value)
-            || !is_null($this->_data[$key]) && is_null($value)
+            || null === $this->_data[$key] && null !== $value
+            || null !== $this->_data[$key] && null === $value
             || is_scalar($this->_data[$key]) && is_scalar($value)
                 && ((string)$this->_data[$key] !== (string)$value)
         ) {
@@ -1358,12 +1323,12 @@ class BORM extends ORMWrapper
     *
     * @var array
     */
-    protected static $_classTableMap = array();
+    protected static $_classTableMap = [];
 
     /**
      * Add a simple JOIN source to the query
      */
-    public function _add_join_source($join_operator, $table, $constraint, $table_alias=null) {
+    public function _add_join_source($join_operator, $table, $constraint, $table_alias = null) {
         if (!isset(self::$_classTableMap[$table])) {
             if (class_exists($table) && is_subclass_of($table, 'BModel')) {
                 $class = BClassRegistry::className($table);
@@ -1375,7 +1340,28 @@ class BORM extends ORMWrapper
         if (self::$_classTableMap[$table]) {
             $table = self::$_classTableMap[$table];
         }
-        return parent::_add_join_source($join_operator, $table, $constraint, $table_alias);
+
+        $join_operator = trim("{$join_operator} JOIN");
+
+        $table = $this->_quote_identifier($table);
+
+        // Add table alias if present
+        if (null !== $table_alias) {
+            $table_alias = $this->_quote_identifier($table_alias);
+            $table .= " {$table_alias}";
+        }
+
+        // Build the constraint
+        if (is_array($constraint)) {
+            list($first_column, $operator, $second_column) = $constraint;
+            $first_column = $this->_quote_identifier($first_column);
+            $second_column = $this->_quote_identifier($second_column);
+            $constraint = "{$first_column} {$operator} {$second_column}";
+        }
+
+        // ADDED: avoid duplicate joins of the same table and alias
+        $this->_join_sources["{$join_operator} {$table} ON {$constraint}"] = "{$join_operator} {$table} ON {$constraint}";
+        return $this;
     }
 
     /**
@@ -1384,18 +1370,19 @@ class BORM extends ORMWrapper
      *
      * Connection will be switched to write, if set
      *
+     * @param bool $replace
      * @return boolean
      */
-    public function save()
+    public function save($replace = false)
     {
         BDb::connect($this->_writeConnectionName);
         $this->_dirty_fields = BDb::cleanForTable($this->_table_name, $this->_dirty_fields);
         if (true) {
             #if (array_diff_assoc($this->_old_values, $this->_dirty_fields)) {
-                $result = parent::save();
+                $result = $this->_save($replace);
             #}
         } else {
-            echo $this->_class_name.'['.$this->id.']: ';
+            echo $this->_class_name . '[' . $this->id . ']: ';
             print_r($this->_data);
             echo 'FROM: '; print_r($this->_old_values);
             echo 'TO: '; print_r($this->_dirty_fields); echo "\n\n";
@@ -1403,6 +1390,68 @@ class BORM extends ORMWrapper
         }
         //$this->_old_values = array(); // commented out to make original loaded object old values available after save
         return $result;
+    }
+
+    /**
+     * Save any fields which have been modified on this object
+     * to the database.
+     */
+    protected function _save($replace = false)
+    {
+        $values = array_values($this->_dirty_fields);
+
+
+        if (!$this->_is_new) { // UPDATE
+            // If there are no dirty values, do nothing
+
+            if (count($values) == 0) {
+                return true;
+            }
+            $query     = $this->_build_update();
+            $values[] = $this->id();
+        } else {
+            if ($replace) {
+                $query = $this->_build_replace();
+            } else { // INSERT
+                $query = $this->_build_insert();
+            }
+        }
+
+        static::_log_query($query, $values);
+#$mem = memory_get_usage();
+        $statement = static::$_db->prepare($query);
+        $success   = $statement->execute($values);
+        //$success = true;
+#echo '('.(memory_get_usage()-$mem).') ';
+
+        // If we've just inserted a new record, set the ID of this object
+        if ($this->_is_new) {
+            $this->_is_new = false;
+            if (!$this->id()) {
+                $this->_data[$this->_get_id_column_name()] = self::$_db->lastInsertId();
+            }
+        }
+
+        $this->_dirty_fields = [];
+        return $success;
+    }
+
+    /**
+     * Build an INSERT query
+     */
+    protected function _build_replace()
+    {
+
+        $operation  = "REPLACE INTO";
+        $query[]   = $operation;
+        $query[]   = $this->_quote_identifier($this->_table_name);
+        $field_list = array_map([$this, '_quote_identifier'], array_keys($this->_dirty_fields));
+        $query[]   = "(" . join(", ", $field_list) . ")";
+        $query[]   = "VALUES";
+
+        $placeholders = $this->_create_placeholders(count($this->_dirty_fields));
+        $query[]     = "({$placeholders})";
+        return join(" ", $query);
     }
 
     /**
@@ -1415,7 +1464,7 @@ class BORM extends ORMWrapper
         return $this->_dirty_fields;
     }
 
-    public function old_values($property='')
+    public function old_values($property = '')
     {
         if ($property && isset($this->_old_values[$property])) {
             return $this->_old_values[$property];
@@ -1457,7 +1506,7 @@ class BORM extends ORMWrapper
     * @param array $parameters
     * @return BORM
     */
-    public function raw_query($query, $parameters=array())
+    public function raw_query($query, $parameters = [])
     {
         if (preg_match('#^\s*(SELECT|SHOW)#i', $query)) {
             BDb::connect($this->_readConnectionName);
@@ -1499,9 +1548,9 @@ class BORM extends ORMWrapper
     * @param array $d default values and options
     * @return array
     */
-    public function paginate($r=null, $d=array())
+    public function paginate($r = null, $d = [])
     {
-        if (is_null($r)) {
+        if (null === $r) {
             $r = BRequest::i()->request(); // GET request
         }
         $d = (array)$d; // make sure it's array
@@ -1512,10 +1561,10 @@ class BORM extends ORMWrapper
             if (!in_array($r['s'], $d['s'])) $r['s'] = null;
             $d['s'] = null;
         }
-        if (!empty($r['sd']) && $r['sd']!='asc' && $r['sd']!='desc') { // only asc and desc are allowed
+        if (!empty($r['sd']) && $r['sd'] != 'asc' && $r['sd'] != 'desc') { // only asc and desc are allowed
             $r['sd'] = null;
         }
-        $s = array( // state
+        $s = [// state
             'p'  => !empty($r['p'])  && is_numeric($r['p']) ? $r['p']  : (!empty($d['p']) && is_numeric($d['p'])  ? $d['p']  : 1), // page
             'ps' => !empty($r['ps']) && is_numeric($r['ps']) ? $r['ps'] : (!empty($d['ps']) && is_numeric($d['ps']) ? $d['ps'] : 100), // page size
             's'  => !empty($r['s'])  ? $r['s']  : (isset($d['s'])  ? $d['s']  : ''), // sort by
@@ -1524,22 +1573,22 @@ class BORM extends ORMWrapper
             'rc' => !empty($r['rc']) ? $r['rc'] : null, // total rows on page
             'q'  => !empty($r['q'])  ? $r['q'] : null, // query string
             'c'  => !empty($d['c'])  ? $d['c'] : null, //total found
-        );
+        ];
 #print_r($r); print_r($d); print_r($s); exit;
-        $s['sc'] = $s['s'].' '.$s['sd']; // sort combined for state
+        $s['sc'] = $s['s'] . ' ' . $s['sd']; // sort combined for state
 
         #$s['c'] = 600000;
-        if (empty($s['c'])){
+        if (empty($s['c'])) {
             $cntOrm = clone $this; // clone ORM to count
             $s['c'] = $cntOrm->count(); // total row count
             unset($cntOrm); // free mem
         }
 
-        $s['mp'] = ceil($s['c']/$s['ps']); // max page
-        if (($s['p']-1)*$s['ps']>$s['c']) $s['p'] = $s['mp']; // limit to max page
-        if ($s['s']) $this->{'order_by_'.$s['sd']}($s['s']); // sort rows if requested
-        $s['rs'] = max(0, isset($s['rs']) ? $s['rs'] : ($s['p']-1)*$s['ps']); // start from requested row or page
-        if(empty($d['donotlimit'])){
+        $s['mp'] = ceil($s['c'] / $s['ps']); // max page
+        if (($s['p']-1) * $s['ps'] > $s['c']) $s['p'] = $s['mp']; // limit to max page
+        if ($s['s']) $this-> {'order_by_' . $s['sd']}($s['s']); // sort rows if requested
+        $s['rs'] = max(0, isset($s['rs']) ? $s['rs'] : ($s['p']-1) * $s['ps']); // start from requested row or page
+        if (empty($d['donotlimit'])) {
             $this->offset($s['rs'])->limit(!empty($s['rc']) ? $s['rc'] : $s['ps']); // limit rows to page
         }
 #BDebug::dump($s);
@@ -1556,12 +1605,12 @@ class BORM extends ORMWrapper
                 case 2: $s['rows'] = $rows; return $s;
             }
         }
-        return array('state'=>$s, 'rows'=>$rows);
+        return ['state' => $s, 'rows' => $rows];
     }
 
     const HAVING_FRAGMENT = 0;
     const HAVING_VALUES = 1;
-    protected $_having_conditions = array();
+    protected $_having_conditions = [];
     public function having($column_name, $value) {
         return $this->having_equal($column_name, $value);
     }
@@ -1610,17 +1659,17 @@ class BORM extends ORMWrapper
         $column_name = $this->_quote_identifier($column_name);
         return $this->_add_having("{$column_name} IS NOT NULL");
     }
-    public function having_raw($clause, $parameters=array()) {
+    public function having_raw($clause, $parameters = []) {
         return $this->_add_having($clause, $parameters);
     }
-    protected function _add_having($fragment, $values=array()) {
+    protected function _add_having($fragment, $values = []) {
         if (!is_array($values)) {
-            $values = array($values);
+            $values = [$values];
         }
-        $this->_having_conditions[] = array(
+        $this->_having_conditions[] = [
             static::HAVING_FRAGMENT => $fragment,
             static::HAVING_VALUES => $values,
-        );
+        ];
         return $this;
     }
     protected function _add_simple_having($column_name, $separator, $value) {
@@ -1632,12 +1681,21 @@ class BORM extends ORMWrapper
             return '';
         }
 
-        $having_conditions = array();
+        $having_conditions = [];
         foreach ($this->_having_conditions as $condition) {
             $having_conditions[] = $condition[static::HAVING_FRAGMENT];
             $this->_values = array_merge($this->_values, $condition[static::HAVING_VALUES]);
         }
         return "HAVING " . join(" AND ", $having_conditions);
+    }
+
+    public function create($data = null, $new = true)
+    {
+        $model = parent::create($data);
+        if (!$new) {
+            $this->_is_new = false;
+        }
+        return $model;
     }
 
     public function __destruct()
@@ -1692,7 +1750,7 @@ class BModel extends Model
     *
     * @var array
     */
-    protected static $_tableNames = array();
+    protected static $_tableNames = [];
 
     /**
     * Whether to enable automatic model caching on load
@@ -1710,21 +1768,21 @@ class BModel extends Model
     *
     * @var array
     */
-    protected static $_cacheFlags = array();
+    protected static $_cacheFlags = [];
 
     /**
     * Cache of model instances (for models that makes sense to keep cache)
     *
     * @var array
     */
-    protected static $_cache = array();
+    protected static $_cache = [];
 
     /**
     * Cache of instance level data values (related models)
     *
     * @var array
     */
-    protected static $_instanceCache = array();
+    protected static $_instanceCache = [];
 
     /**
     * TRUE after save if a new record
@@ -1738,14 +1796,14 @@ class BModel extends Model
      *
      * @var array
      */
-    protected static $_validationRules = array();
-    
+    protected static $_validationRules = [];
+
     /**
     * Model scope flags for internal use
-    * 
+    *
     * @var array
     */
-    protected static $_flags = array();
+    protected static $_flags = [];
 
     /**
     * Retrieve original class name
@@ -1754,14 +1812,29 @@ class BModel extends Model
     */
     public static function origClass()
     {
+        /*
+        if (null === static::$_origClass) {
+            $origClass = get_called_class();
+            $parents = class_parents($origClass);
+            foreach ($parents as $parent) {
+                if ($parent !== 'Model' && $parent !== 'BModel' && strpos($parent, 'Abstract') === false) {
+                    $origClass = $parent;
+                } else {
+                    break;
+                }
+            }
+#echo "<pre>"; var_dump(get_called_class(), $parents, static::$_origClass, $origClass); echo "</pre>";
+            static::$_origClass = $origClass;
+        }
+        */
         return static::$_origClass;
     }
-    
+
     public function setFlag($flag, $value)
     {
         static::$_flags[$flag] = $value;
     }
-    
+
     public function getFlag($flag)
     {
         return isset(static::$_flags[$flag]) ? static::$_flags[$flag] : null;
@@ -1774,6 +1847,10 @@ class BModel extends Model
     */
     public static function readDb()
     {
+        if (null === static::$_readConnectionName) {
+            $readConnection = BConfig::i()->get('db/read_connection');
+            static::$_readConnectionName = $readConnection ? $readConnection : false;
+        }
         return BDb::connect(static::$_readConnectionName ? static::$_readConnectionName : static::$_connectionName);
     }
 
@@ -1784,6 +1861,10 @@ class BModel extends Model
     */
     public static function writeDb()
     {
+        if (null === static::$_writeConnectionName) {
+            $writeConnectionName = BConfig::i()->get('db/write_connection');
+            static::$_writeConnectionName = $writeConnectionName ? $writeConnectionName : false;
+        }
         return BDb::connect(static::$_writeConnectionName ? static::$_writeConnectionName : static::$_connectionName);
     }
 
@@ -1795,9 +1876,9 @@ class BModel extends Model
     * @param string|null $class_name optional
     * @return BORM
     */
-    public static function factory($class_name=null)
+    public static function factory($class_name = null)
     {
-        if (is_null($class_name)) { // ADDED
+        if (null === $class_name) { // ADDED
             $class_name = get_called_class();
         }
         $class_name = BClassRegistry::className($class_name); // ADDED
@@ -1807,7 +1888,7 @@ class BModel extends Model
         $orm = BORM::for_table($table_name); // CHANGED
         $orm->set_class_name($class_name);
         $orm->use_id_column(static::_get_id_column_name($class_name));
-        $orm->set_rw_db_names( // ADDED
+        $orm->set_rw_connection_names(// ADDED
             static::$_readConnectionName ? static::$_readConnectionName : static::$_connectionName,
             static::$_writeConnectionName ? static::$_writeConnectionName : static::$_connectionName
         );
@@ -1821,13 +1902,14 @@ class BModel extends Model
     * @param string $alias table alias
     * @return BORM
     */
-    public static function orm($alias=null)
+    public static function orm($alias = null)
     {
         $orm = static::factory();
         static::_findOrm($orm);
         if ($alias) {
             $orm->table_alias($alias);
         }
+        BEvents::i()->fire(static::$_origClass . '::orm', ['orm' => $orm, 'alias' => $alias]);
         return $orm;
     }
 
@@ -1848,7 +1930,7 @@ class BModel extends Model
     * @param array $args
     * @return BModel
     */
-    public static function i($new=false, array $args=array())
+    public static function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(get_called_class(), $args, !$new);
     }
@@ -1861,14 +1943,14 @@ class BModel extends Model
     * @param mixed $flag if true or 'ADD', add to existing value; if null or 'IFNULL', update only if currently not set
     * @return BModel
     */
-    public function set($key, $value=null, $flag=false)
+    public function set($key, $value = null, $flag = false)
     {
         if (is_array($key)) {
-            foreach ($key as $k=>$v) {
+            foreach ($key as $k => $v) {
                 parent::set($k, $v);
             }
         } else {
-            if (true===$flag || 'ADD' === $flag) {
+            if (true === $flag || 'ADD' === $flag) {
                 $oldValue = $this->get($key);
                 if (is_array($oldValue)) {
                     $oldValue[] = $value;
@@ -1877,7 +1959,7 @@ class BModel extends Model
                     $value += $oldValue;
                 }
             }
-            if (is_scalar($key) && (!(is_null($flag) || 'IFNULL' === $flag) || is_null($this->get($key)))) {
+            if (is_scalar($key) && (!(null === $flag || 'IFNULL' === $flag) || null === $this->get($key))) {
                 parent::set($key, $value);
             }
         }
@@ -1891,7 +1973,7 @@ class BModel extends Model
      * @param int    $increment
      * @return BModel
      */
-    public function add($key, $increment=1)
+    public function add($key, $increment = 1)
     {
         return $this->set($key, $increment, 'ADD');
     }
@@ -1902,9 +1984,9 @@ class BModel extends Model
     * @param null|array $data
     * @return BModel
     */
-    public static function create($data=null)
+    public static function create($data = null, $new = true)
     {
-        $record = static::factory()->create($data);
+        $record = static::factory()->create($data, $new);
         $record->onAfterCreate();
         return $record;
     }
@@ -1916,7 +1998,7 @@ class BModel extends Model
     */
     public function onAfterCreate()
     {
-        BEvents::i()->fire($this->_origClass().'::onAfterCreate', array('model' => $this));
+        BEvents::i()->fire($this->_origClass() . '::onAfterCreate', ['model' => $this]);
         return $this;
     }
 
@@ -1948,10 +2030,10 @@ class BModel extends Model
     * @param boolean $cache
     * @return BModel
     */
-    public static function load($id, $field=null, $cache=false)
+    public static function load($id, $field = null, $cache = false)
     {
         $class = static::$_origClass ? static::$_origClass : get_called_class();
-        if (is_null($field)) {
+        if (null === $field) {
             $field = static::_get_id_column_name($class);
         }
 
@@ -1971,12 +2053,12 @@ class BModel extends Model
 
         $orm = static::factory();
         static::_loadORM($orm);
-        BEvents::i()->fire($class.'::load:orm', array('orm'=>$orm, 'class'=>$class, 'called_class'=>get_called_class()));
+        BEvents::i()->fire($class . '::load:orm', ['orm' => $orm, 'class' => $class, 'called_class' => get_called_class()]);
         if (is_array($id)) {
             $orm->where_complex($id);
         } else {
-            if (strpos($field, '.')===false && ($alias = $orm->table_alias())) {
-                $field = $alias.'.'.$field;
+            if (strpos($field, '.') === false && ($alias = $orm->table_alias())) {
+                $field = $alias . '.' . $field;
             }
             $orm->where($field, $id);
         }
@@ -1985,7 +2067,7 @@ class BModel extends Model
         if ($model) {
             $model->onAfterLoad();
             if ($cache
-                || static::$_cacheAuto===true
+                || static::$_cacheAuto === true
                 || is_array(static::$_cacheAuto) && in_array($field, static::$_cacheAuto)
             ) {
                 $model->cacheStore();
@@ -2002,9 +2084,9 @@ class BModel extends Model
      * @param boolean $cache
      * @return BModel
      */
-    public static function loadOrCreate($id, $field, $cache=false)
+    public static function loadOrCreate($id, $field, $cache = false)
     {
-        $model = static::load($id, $fied, $cache);
+        $model = static::load($id, $field, $cache);
         if (!$model) {
             $model = static::create();
         }
@@ -2018,7 +2100,7 @@ class BModel extends Model
     */
     public function onAfterLoad()
     {
-        BEvents::i()->fire($this->_origClass().'::onAfterLoad', array('model'=>$this));
+        BEvents::i()->fire($this->_origClass() . '::onAfterLoad', ['model' => $this]);
         return $this;
     }
 
@@ -2043,7 +2125,7 @@ class BModel extends Model
     */
     public function cacheClear()
     {
-        static::$_cache[$this->_origClass()] = array();
+        static::$_cache[$this->_origClass()] = [];
         return $this;
     }
 
@@ -2055,17 +2137,17 @@ class BModel extends Model
     * @param mixed $sort
     * @return BModel
     */
-    public function cachePreload($where=null, $field=null, $sort=null)
+    public function cachePreload($where = null, $field = null, $sort = null)
     {
         $orm = static::factory();
         $class = $this->_origClass();
-        if (is_null($field)) {
+        if (null === $field) {
             $field = static::_get_id_column_name($class);
         }
         $cache =& static::$_cache[$class];
         if ($where) $orm->where_complex($where);
         if ($sort) $orm->order_by_asc($sort);
-        $options = !empty(static::$_cacheFlags[$field]) ? static::$_cacheFlags[$field] : array();
+        $options = !empty(static::$_cacheFlags[$field]) ? static::$_cacheFlags[$field] : [];
         $cache[$field] = $orm->find_many_assoc($field, null, $options);
         return $this;
     }
@@ -2078,11 +2160,11 @@ class BModel extends Model
     * @param string $lk local key field
     * @return BModel
     */
-    public function cachePreloadFrom($collection, $fk='id', $lk='id')
+    public function cachePreloadFrom($collection, $fk = 'id', $lk = 'id')
     {
         if (!$collection) return $this;
         $class = $this->_origClass();
-        $keyValues = array();
+        $keyValues = [];
         $keyLower = !empty(static::$_cacheFlags[$lk]['key_lower']);
         foreach ($collection as $r) {
             $key = null;
@@ -2098,8 +2180,8 @@ class BModel extends Model
             if (!empty(static::$_cache[$class][$lk][$keyValue])) continue;
             $keyValues[$keyValue] = 1;
         }
-        $field = (strpos($lk, '.')===false ? '_main.' : '').$lk; //TODO: table alias flexibility
-        if ($keyValues) $this->cachePreload(array($field=>array_keys($keyValues)), $lk);
+        $field = (strpos($lk, '.') === false ? '_main.' : '') . $lk; //TODO: table alias flexibility
+        if ($keyValues) $this->cachePreload([$field => array_keys($keyValues)], $lk);
         return $this;
     }
 
@@ -2110,7 +2192,7 @@ class BModel extends Model
     * @param string $fromKey
     * @return BModel
     */
-    public function cacheCopy($toKey, $fromKey='id')
+    public function cacheCopy($toKey, $fromKey = 'id')
     {
         $cache =& static::$_cache[$this->_origClass()];
         $lower = !empty(static::$_cacheFlags[$toKey]['key_lower']);
@@ -2128,7 +2210,7 @@ class BModel extends Model
      * @param string $field
      * @return BModel
      */
-    public function cacheSaveDirty($field='id')
+    public function cacheSaveDirty($field = 'id')
     {
         $class = $this->_origClass();
         if (!empty(static::$_cache[$class][$field])) {
@@ -2148,13 +2230,13 @@ class BModel extends Model
      * @param mixed  $keyValue
      * @return array|BModel
      */
-    public function cacheFetch($field='id', $keyValue=null)
+    public function cacheFetch($field = 'id', $keyValue = null)
     {
         $class = $this->_origClass();
         if (empty(static::$_cache[$class])) return null;
         $cache = static::$_cache[$class];
         if (empty($cache[$field])) return null;
-        if (is_null($keyValue)) return $cache[$field];
+        if (null === $keyValue) return $cache[$field];
         if (!empty(static::$_cacheFlags[$field]['key_lower'])) $keyValue = strtolower($keyValue);
         return !empty($cache[$field][$keyValue]) ? $cache[$field][$keyValue] : null;
     }
@@ -2168,7 +2250,7 @@ class BModel extends Model
     * @param array $collection external model collection to store into cache
     * @return BModel
     */
-    public function cacheStore($field='id', $collection=null)
+    public function cacheStore($field = 'id', $collection = null)
     {
         $cache =& static::$_cache[$this->_origClass()];
         if ($collection) {
@@ -2184,7 +2266,7 @@ class BModel extends Model
             return $this;
         }
         if (strpos($field, ',')) {
-            $keyValueArr = array();
+            $keyValueArr = [];
             foreach (explode(',', $field) as $k) {
                 $keyValueArr[] = $this->get($k);
             }
@@ -2204,7 +2286,7 @@ class BModel extends Model
     */
     public function onBeforeSave()
     {
-        BEvents::i()->fire($this->origClass().'::onBeforeSave', array('model'=>$this));
+        BEvents::i()->fire($this->origClass() . '::onBeforeSave', ['model' => $this]);
         return true;
     }
 
@@ -2221,7 +2303,7 @@ class BModel extends Model
     /**
      * Check whether the given field has changed since the object was created or saved
      */
-    public function is_dirty($property=null) {
+    public function is_dirty($property = null) {
         return $this->orm->is_dirty($property);
     }
 
@@ -2230,7 +2312,7 @@ class BModel extends Model
      * @param string|\type $property
      * @return type
      */
-    public function old_values($property='')
+    public function old_values($property = '')
     {
         return $this->orm->old_values($property);
     }
@@ -2242,7 +2324,7 @@ class BModel extends Model
     * @param boolean $callBeforeAfter whether to call onBeforeSave and onAfterSave methods
     * @return BModel
     */
-    public function save($callBeforeAfter=true)
+    public function save($callBeforeAfter = true, $replace = false)
     {
         if ($callBeforeAfter) {
             try {
@@ -2256,7 +2338,8 @@ class BModel extends Model
 
         $this->_newRecord = !$this->get(static::_get_id_column_name(get_called_class()));
 
-        parent::save();
+        static::writeDb();
+        parent::save($replace);
 
         if ($callBeforeAfter) {
             $this->onAfterSave();
@@ -2274,7 +2357,7 @@ class BModel extends Model
     */
     public function onAfterSave()
     {
-        BEvents::i()->fire($this->_origClass().'::onAfterSave', array('model'=>$this));
+        BEvents::i()->fire($this->_origClass() . '::onAfterSave', ['model' => $this]);
         return $this;
     }
 
@@ -2295,7 +2378,7 @@ class BModel extends Model
     */
     public function onBeforeDelete()
     {
-        BEvents::i()->fire($this->_origClass().'::onBeforeDelete', array('model'=>$this));
+        BEvents::i()->fire($this->_origClass() . '::onBeforeDelete', ['model' => $this]);
         return true;
     }
 
@@ -2310,13 +2393,14 @@ class BModel extends Model
         }
 
         if (($cache =& static::$_cache[$this->_origClass()])) {
-            foreach ($cache as $k=>$c) {
+            foreach ($cache as $k => $c) {
                 $keyValue = $this->get($k);
                 if (!empty(static::$_cacheFlags[$k]['key_lower'])) $keyValue = strtolower($keyValue);
                 unset($cache[$k][$keyValue]);
             }
         }
 
+        static::writeDb();
         parent::delete();
 
         $this->onAfterDelete();
@@ -2326,7 +2410,7 @@ class BModel extends Model
 
     public function onAfterDelete()
     {
-        BEvents::i()->fire($this->_origClass().'::onAfterDelete', array('model'=>$this));
+        BEvents::i()->fire($this->_origClass() . '::onAfterDelete', ['model' => $this]);
         return $this;
     }
 
@@ -2337,7 +2421,7 @@ class BModel extends Model
     * @param array $params
     * @return PDOStatement
     */
-    public static function run_sql($sql, $params=array())
+    public static function run_sql($sql, $params = [])
     {
         return static::writeDb()->prepare($sql)->execute((array)$params);
     }
@@ -2360,7 +2444,7 @@ class BModel extends Model
     {
         static::$_table = $table;
         $class = get_called_class();
-        BDebug::debug('OVERRIDE TABLE: '.$class.' -> '.$table);
+        BDebug::debug('OVERRIDE TABLE: ' . $class . ' -> ' . $table);
         static::$_tableNames[$class] = null;
         $class = BClassRegistry::className($class);
         static::$_tableNames[$class] = null;
@@ -2374,42 +2458,43 @@ class BModel extends Model
      * @param array        $p params if $where string, use these params
      * @return boolean
      */
-    public static function update_many(array $data, $where = null, $p=array())
+    public static function update_many(array $data, $where = null, $p = [])
     {
-        $update = array();
-        $params = array();
-        foreach ($data as $k=>$v) {
+        $update = [];
+        $params = [];
+        foreach ($data as $k => $v) {
             $update[] = "`{$k}`=?";
             $params[] = $v;
         }
         if (is_array($where)) {
             list($where, $p) = BDb::where($where);
         }
-        $sql = "UPDATE ".static::table()." SET ".join(', ', $update) . ($where ? " WHERE {$where}" : '');
-        BDebug::debug('SQL: '.$sql);
+        $sql = "UPDATE " . static::table() . " SET " . join(', ', $update) . ($where ? " WHERE {$where}" : '');
+        BDebug::debug('SQL: ' . $sql);
         return static::run_sql($sql, array_merge($params, $p));
     }
 
     /**
      * Faster update with one statement by utilizing `case .. when .. then .. else .. end`
      *
-     * @param array format: array($id1 => array($field1 => $value1, $field2 => $value2))
-     * @param string optional ID field
-     * @param string optional field to be updated, used when $data values are not arrays
+     * @param array  $data format: array($id1 => array($field1 => $value1, $field2 => $value2))
+     * @param string $idField optional ID field
+     * @param string $updateField optional field to be updated, used when $data values are not arrays
+     * @return \PDOStatement
      */
     public static function update_many_by_id(array $data, $idField = null, $updateField = null)
     {
-        if (is_null($idField)) {
+        if (null === $idField) {
             $idField = static::_get_id_column_name(get_called_class());
         }
-        $fields = array();
+        $fields = [];
         foreach ($data as $id => $fields) {
             foreach ($fields as $f => $v) {
                 $fields[$f][$id] = $v;
             }
         }
-        $updates = array();
-        $params = array();
+        $updates = [];
+        $params = [];
         foreach ($fields as $f => $values) {
             $update = "`{$f}` = CASE `{$idField}`";
             foreach ($values as $id => $v) {
@@ -2426,7 +2511,7 @@ class BModel extends Model
 
         $sql = "UPDATE " . static::table() . " SET " . join(', ', $updates) . ' WHERE '
             . $idField . ' IN (' . join(', ', array_fill(0, sizeof($data), '?')) . ')';
-        BDebug::debug('SQL: '.$sql);
+        BDebug::debug('SQL: ' . $sql);
         return static::run_sql($sql, array_merge($params, $p));
     }
 
@@ -2437,13 +2522,13 @@ class BModel extends Model
     * @param array $params if $where string, use these params
     * @return boolean
     */
-    public static function delete_many($where, $params=array())
+    public static function delete_many($where, $params = [])
     {
         if (is_array($where)) {
             list($where, $params) = BDb::where($where);
         }
-        $sql = "DELETE FROM ".static::table()." WHERE {$where}";
-        BDebug::debug('SQL: '.$sql);
+        $sql = "DELETE FROM " . static::table() . " WHERE {$where}";
+        BDebug::debug('SQL: ' . $sql);
         return static::run_sql($sql, $params);
     }
 
@@ -2453,20 +2538,20 @@ class BModel extends Model
     * @param array $objHashes cache of object hashes to check for infinite recursion
     * @return array
     */
-    public function as_array(array $objHashes=array())
+    public function as_array(array $objHashes = [])
     {
         $objHash = spl_object_hash($this);
         if (!empty($objHashes[$objHash])) {
-            return "*** RECURSION: ".get_class($this);
+            return "*** RECURSION: " . get_class($this);
         }
         $objHashes[$objHash] = 1;
 
         $data = parent::as_array();
-        foreach ($data as $k=>$v) {
+        foreach ($data as $k => $v) {
             if ($v instanceof Model) {
                 $data[$k] = $v->as_array();
             } elseif (is_array($v) && current($v) instanceof Model) {
-                foreach ($v as $k1=>$v1) {
+                foreach ($v as $k1 => $v1) {
                     $data[$k][$k1] = $v1->as_array($objHashes);
                 }
             }
@@ -2482,10 +2567,10 @@ class BModel extends Model
     * @param mixed $value
     * @return mixed
     */
-    public function instanceCache($key, $value=null)
+    public function instanceCache($key, $value = null)
     {
         $thisHash = spl_object_hash($this);
-        if (null===$value) {
+        if (null === $value) {
             return isset(static::$_instanceCache[$thisHash][$key]) ? static::$_instanceCache[$thisHash][$key] : null;
         }
         static::$_instanceCache[$thisHash][$key] = $value;
@@ -2515,11 +2600,11 @@ class BModel extends Model
      * @param string  $foreignIdField
      * @return BModel
      */
-    public function relatedModel($modelClass, $idValue, $autoCreate=false, $cacheKey=null, $foreignIdField='id')
+    public function relatedModel($modelClass, $idValue, $autoCreate = false, $cacheKey = null, $foreignIdField = 'id')
     {
         $cacheKey = $cacheKey ? $cacheKey : $modelClass;
         $model = $this->loadInstanceCache($cacheKey);
-        if (is_null($model)) {
+        if (null === $model) {
             if (is_array($idValue)) {
                 $model = $modelClass::i()->orm()->where_complex($idValue)->find_one();
                 if ($model) $model->afterLoad();
@@ -2531,7 +2616,7 @@ class BModel extends Model
                 if (is_array($idValue)) {
                     $model = $modelClass::i()->create($idValue);
                 } else {
-                    $model = $modelClass::i()->create(array($foreignIdField=>$idValue));
+                    $model = $modelClass::i()->create([$foreignIdField => $idValue]);
                 }
             }
             $this->saveInstanceCache($cacheKey, $model);
@@ -2559,15 +2644,15 @@ class BModel extends Model
     * @param string $idField
     * @return mixed
     */
-    public function childById($var, $id, $idField='id')
+    public function childById($var, $id, $idField = 'id')
     {
         $collection = $this->get($var);
-        if (!$collection){
-            $collection = $this->{$var};
+        if (!$collection) {
+            $collection = $this-> {$var};
             if (!$collection) return null;
         }
-        foreach ($collection as $k=>$v) {
-            if ($v->get($idField)==$id) return $v;
+        foreach ($collection as $k => $v) {
+            if ($v->get($idField) == $id) return $v;
         }
         return null;
     }
@@ -2577,7 +2662,7 @@ class BModel extends Model
         if ($this->orm) {
             $class = $this->_origClass();
             if (!empty(static::$_cache[$class])) {
-                foreach (static::$_cache[$class] as $key=>$cache) {
+                foreach (static::$_cache[$class] as $key => $cache) {
                     $keyValue = $this->get($key);
                     if (!empty($cache[$keyValue])) {
                         unset(static::$_cache[$class][$keyValue]);
@@ -2589,29 +2674,29 @@ class BModel extends Model
         }
     }
 
-    public function fieldOptions($field=null, $key=null, $emptyValue=null)
+    public function fieldOptions($field = null, $key = null, $emptyValue = null)
     {
-        if (is_null($field)) {
+        if (null === $field) {
             return static::$_fieldOptions;
         }
         if (!isset(static::$_fieldOptions[$field])) {
-            BDebug::warning('Invalid field options type: '.$field);
+            BDebug::warning('Invalid field options type: ' . $field);
             return null;
         }
         $options = static::$_fieldOptions[$field];
-        if (!is_null($key)) {
+        if (null !== $key) {
             if (!isset($options[$key])) {
-                BDebug::debug('Invalid field options key: '.$field.'.'.$key);
+                BDebug::debug('Invalid field options key: ' . $field . '.' . $key);
                 return null;
             }
             return $options[$key];
         }
-        if (!is_null($emptyValue) && false !== $emptyValue) {
+        if (null !== $emptyValue && false !== $emptyValue) {
             if (true === $emptyValue) {
                 $emptyValue = 'Please select...';
             }
             if (is_scalar($emptyValue)) {
-                $emptyValue = array('' => $emptyValue);
+                $emptyValue = ['' => $emptyValue];
             }
             if (is_array($emptyValue)) {
                 $options = $emptyValue + $options;
@@ -2626,12 +2711,12 @@ class BModel extends Model
         if ($sortBy) {
             $sortArr = explode(' ', $sortBy);
             if (empty($sortArr[1])) $sortArr[1] = 'asc';
-            $sortMethod = 'order_by_'.$sortArr[1];
+            $sortMethod = 'order_by_' . $sortArr[1];
             $orm->$sortMethod($sortArr[0]);
         } else {
             $orm->order_by_asc($labelField);
         }
-        $values = array();
+        $values = [];
         foreach ($orm->find_many() as $m) {
             $values[$m->get($idField)] = $m->get($labelField);
         }
@@ -2652,16 +2737,16 @@ class BModel extends Model
      * @param string $formName
      * @return bool
      */
-    public function validate($data = array(), $rules = array(), $formName = 'admin')
+    public function validate($data = [], $rules = [], $formName = 'admin')
     {
         if (!$data && $this->orm) {
             $data = $this->as_array();
         }
         $rules = array_merge(static::$_validationRules, $rules);
-        BEvents::i()->fire($this->_origClass()."::validate:before", array("rules" => &$rules, "data" => &$data));
+        BEvents::i()->fire($this->_origClass() . "::validate:before", ["rules" => &$rules, "data" => &$data]);
         $valid = BValidate::i()->validateInput($data, $rules, $formName);
         if (!$valid) {
-            BEvents::i()->fire($this->_origClass()."::validate:failed", array("rules" => &$rules, "data" => &$data));
+            BEvents::i()->fire($this->_origClass() . "::validate:failed", ["rules" => &$rules, "data" => &$data]);
         }
 
         return $valid;
@@ -2723,11 +2808,11 @@ class BModelUser extends BModel
 
     public static function sessionUserId()
     {
-        $userId = BSession::i()->get(static::$_sessionUserNamespace.'_id');
+        $userId = BSession::i()->get(static::$_sessionUserNamespace . '_id');
         return $userId ? $userId : false;
     }
 
-    public static function sessionUser($reset=false)
+    public static function sessionUser($reset = false)
     {
         if (!static::isLoggedIn()) {
             return false;
@@ -2769,7 +2854,7 @@ class BModelUser extends BModel
     static public function authenticate($username, $password)
     {
         /** @var FCom_Admin_Model_User */
-        $user = static::orm()->where(array('OR'=>array('username'=>$username, 'email'=>$username)))->find_one();
+        $user = static::orm()->where(['OR' => ['username' => $username, 'email' => $username]])->find_one();
         if (!$user || !$user->validatePassword($password)) {
             return false;
         }
@@ -2780,10 +2865,10 @@ class BModelUser extends BModel
     {
         $this->set('last_login', BDb::now())->save();
 
-        BSession::i()->set(array(
-            static::$_sessionUserNamespace.'_id' => $this->id,
+        BSession::i()->set([
+            static::$_sessionUserNamespace . '_id' => $this->id,
             static::$_sessionUserNamespace => serialize($this->as_array()),
-        ));
+        ]);
         static::$_sessionUser = $this;
 
         if ($this->locale) {
@@ -2792,13 +2877,13 @@ class BModelUser extends BModel
         if ($this->timezone) {
             date_default_timezone_set($this->timezone);
         }
-        BEvents::i()->fire(__METHOD__.':after', array('user'=>$this));
+        BEvents::i()->fire(__METHOD__ . ':after', ['user' => $this]);
         return $this;
     }
 
-    public function authorize($role, $args=null)
+    public function authorize($role, $args = null)
     {
-        if (is_null($args)) {
+        if (null === $args) {
             // check authorization
             return true;
         }
@@ -2808,23 +2893,23 @@ class BModelUser extends BModel
 
     public static function logout()
     {
-        BSession::i()->set(static::$_sessionUserNamespace.'_id', false);
-        BEvents::i()->fire(__METHOD__.':after', array('user' => static::$_sessionUser));
+        BSession::i()->set(static::$_sessionUserNamespace . '_id', false);
+        BEvents::i()->fire(__METHOD__ . ':after', ['user' => static::$_sessionUser]);
         static::$_sessionUser = null;
     }
 
-    public function recoverPassword($emailView='email/user-password-recover')
+    public function recoverPassword($emailView = 'email/user-password-recover')
     {
-        $this->set(array('password_nonce'=>BUtil::randomString(20)))->save();
+        $this->set(['password_nonce' => BUtil::randomString(20)])->save();
         if (($view = BLayout::i()->view($emailView))) {
             $view->set('user', $this)->email();
         }
         return $this;
     }
 
-    public function resetPassword($password, $emailView='email/user-password-reset')
+    public function resetPassword($password, $emailView = 'email/user-password-reset')
     {
-        $this->set(array('password_nonce'=>null))->setPassword($password)->save()->login();
+        $this->set(['password_nonce' => null])->setPassword($password)->save()->login();
         if (($view = BLayout::i()->view($emailView))) {
             $view->set('user', $this)->email();
         }
@@ -2836,7 +2921,7 @@ class BModelUser extends BModel
         $r = (array)$r;
         if (empty($r['email'])
             || empty($r['password']) || empty($r['password_confirm'])
-            || $r['password']!=$r['password_confirm']
+            || $r['password'] != $r['password_confirm']
         ) {
             throw new Exception('Incomplete or invalid form data.');
         }

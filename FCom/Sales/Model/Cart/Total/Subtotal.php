@@ -23,11 +23,11 @@ class FCom_Sales_Model_Cart_Total_Subtotal extends FCom_Sales_Model_Cart_Total_A
         }
 
         $this->_value = $subtotal;
-        $this->_cart->set(array(
+        $this->_cart->set([
             'item_num' => $itemNum,
             'item_qty' => $itemQty,
             'subtotal' => $subtotal,
-        ));
+        ]);
         return $this;
     }
 }

@@ -4,7 +4,7 @@ class FCom_Customer_Tests_Model_AddressTest extends FCom_Test_DatabaseTestCase
 {
     public function getDataSet()
     {
-        return $this->createFlatXmlDataSet(__DIR__.'/AddressTest.xml');
+        return $this->createFlatXmlDataSet(__DIR__ . '/AddressTest.xml');
     }
 
     public function testAddEntry()
@@ -12,7 +12,7 @@ class FCom_Customer_Tests_Model_AddressTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_customer_address'), "Pre-Condition");
 
         $cust = FCom_Customer_Model_Customer::i()->load(1);
-        $data = array('id' => 3, 'city' => "Big city", 'country' =>'US', 'region' => 'California', 'firstname' => "Test 1");
+        $data = ['id' => 3, 'city' => "Big city", 'country' => 'US', 'region' => 'California', 'firstname' => "Test 1"];
         FCom_Customer_Model_Address::import($data, $cust, 'billing');
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_customer_address'), "Insert failed");
@@ -23,7 +23,7 @@ class FCom_Customer_Tests_Model_AddressTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_customer_address'), "Pre-Condition");
 
         $cust = FCom_Customer_Model_Customer::i()->load(1);
-        $data = array('id' => 3, 'city' => "Big city", 'country' =>'US', 'region' => 'California', 'firstname' => "Test 1");
+        $data = ['id' => 3, 'city' => "Big city", 'country' => 'US', 'region' => 'California', 'firstname' => "Test 1"];
         $address = FCom_Customer_Model_Address::import($data, $cust, 'billing');
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_customer_address'), "Insert failed");
@@ -35,7 +35,7 @@ class FCom_Customer_Tests_Model_AddressTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_customer_address'), "Pre-Condition");
 
         $cust = FCom_Customer_Model_Customer::i()->load(1);
-        $data = array('id' => 3, 'city' => "Big city", 'country' =>'US', 'region' => 'California', 'firstname' => "Test 1");
+        $data = ['id' => 3, 'city' => "Big city", 'country' => 'US', 'region' => 'California', 'firstname' => "Test 1"];
         $address = FCom_Customer_Model_Address::import($data, $cust, 'billing');
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_customer_address'), "Insert failed");

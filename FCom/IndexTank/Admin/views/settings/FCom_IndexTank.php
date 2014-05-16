@@ -23,7 +23,7 @@
                     <td>
                         <input type="hidden" name="config[modules][FCom_IndexTank][save_filter]" value="0" />
                         <input size="50" type="checkbox" name="config[modules][FCom_IndexTank][save_filter]"
-                               <?=($c->get('modules/FCom_IndexTank/save_filter')==1)?'checked':''?> value="1"/>
+                               <?=($c->get('modules/FCom_IndexTank/save_filter') == 1) ? 'checked' : ''?> value="1"/>
                     </td>
                 </tr>
                 <tr>
@@ -37,7 +37,7 @@
                     <td>
                         <input type="hidden" name="config[modules][FCom_IndexTank][disable_auto_indexing]" value="0" />
                         <input size="50" type="checkbox" name="config[modules][FCom_IndexTank][disable_auto_indexing]"
-                               <?=($c->get('modules/FCom_IndexTank/disable_auto_indexing')==1)?'checked':''?> value="1"/>
+                               <?=($c->get('modules/FCom_IndexTank/disable_auto_indexing') == 1) ? 'checked' : ''?> value="1"/>
                     </td>
                 </tr>
             </table>

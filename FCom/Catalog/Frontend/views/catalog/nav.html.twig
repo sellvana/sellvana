@@ -1,13 +1,12 @@
 {% set categories = APP.instance('FCom_Catalog_Model_Category').getTopNavCategories(2) %}
-{% set activeCategory = 'home' %}
+{% set activeIds = THIS.get('active_ids') %}
 
 <nav class="f-catalog-navbar navbar" role="navigation">
     <div class="container">
         <ul class="nav navbar-nav collapse">
 {% for cat in categories %}
-<!-- TODO: correct active category -->
-            <li class="dropdown">
-                <a class="dropdown-toggle disabled {{ activeCategory == cat.get('url_path') ? 'active' }}"
+            <li class="dropdown {{ cat.id() in activeIds ? 'active' }}">
+                <a class="dropdown-toggle disabled"
                     href="{{ cat.url() }}" data-toggle="dropdown">{{ cat.get('node_name') }}</a>
 {% if cat.get('children') %}
                 <ul class="dropdown-menu">

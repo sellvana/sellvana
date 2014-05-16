@@ -17,7 +17,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         $countriesList = implode(',', $countriesList);
         $countries = FCom_Geo_Model_Country::options($countriesList);
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
-        if (!$cart->id()){
+        if (!$cart->id()) {
             $href = BApp::href('cart');
             BResponse::i()->redirect($href);
             return;
@@ -29,7 +29,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             $addressType = 'billing';
         }
 
-        $address = FCom_Sales_Model_Cart_Address::i()->orm()->where("cart_id",$cart->id())->where('atype',$addressType)->find_one();
+        $address = FCom_Sales_Model_Cart_Address::i()->orm()->where("cart_id", $cart->id())->where('atype', $addressType)->find_one();
         if (!$address) {
             $address = FCom_Sales_Model_Cart_Address::i()->orm()->create();
             $address->cart_id = $cart->id();
@@ -47,14 +47,14 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         } else {
             $breadCrumbLabel = 'Billing address';
         }
-        $layout->view('breadcrumbs')->set('crumbs', array(
-            array('label'=>'Home', 'href'=>  BApp::baseUrl()),
-            array('label'=>'Checkout', 'href'=>  BApp::href("checkout")),
-            array('label'=>$breadCrumbLabel, 'active'=>true)));
+        $layout->view('breadcrumbs')->set('crumbs', [
+            ['label' => 'Home', 'href' =>  BApp::baseUrl()],
+            ['label' => 'Checkout', 'href' =>  BApp::href("checkout")],
+            ['label' => $breadCrumbLabel, 'active' => true]]);
         if ($layout->view('geo/embed')) {
             $layout->view('geo/embed')->set('countries', $countriesList);
         }
-        $layout->view('checkout/address')->set(array('address' => $address, 'address_type' => $atype, 'countries' => $countries));
+        $layout->view('checkout/address')->set(['address' => $address, 'address_type' => $atype, 'countries' => $countries]);
         $this->layout('/checkout/address');
     }
 
@@ -76,7 +76,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         }
 
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
-        if (!$cart->id()){
+        if (!$cart->id()) {
             $href = BApp::href('cart');
             BResponse::i()->redirect($href);
             return;
@@ -86,8 +86,8 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         if (!$address) {
             $address = FCom_Sales_Model_Cart_Address::i()->orm()->create();
         }
-        if(!$address->validate($r, array(), 'address-form')) {
-            BResponse::i()->redirect("checkout/address?t=". $atype);
+        if (!$address->validate($r, [], 'address-form')) {
+            BResponse::i()->redirect("checkout/address?t=" . $atype);
             return;
         }
 
@@ -130,7 +130,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             }
         }
 
-        $href = BApp::href('checkout').'?guest=yes';
+        $href = BApp::href('checkout') . '?guest=yes';
         BResponse::i()->redirect($href);
     }
 

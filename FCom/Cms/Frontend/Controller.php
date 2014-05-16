@@ -9,7 +9,7 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $this->forward(false);
             return;
         }
-        $block = FCom_Cms_Model_Block::i()->load(array('page_enabled' => 1, 'page_url' => $pageUrl));
+        $block = FCom_Cms_Model_Block::i()->load(['page_enabled' => 1, 'page_url' => $pageUrl]);
         if (!$block || !$block->validateBlock()) {
             $this->forward(false);
             return;
@@ -21,14 +21,14 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         BLayout::i()->hookView('main', $view->param('view_name'));
 
         if (($root = BLayout::i()->view('root'))) {
-            $root->addBodyClass('cms-'.$block->handle)
-                ->addBodyClass('page-'.$block->handle);
+            $root->addBodyClass('cms-' . $block->handle)
+                ->addBodyClass('page-' . $block->handle);
         }
 
         if (($head = BLayout::i()->view('head'))) {
             $head->addTitle($block->page_title);
             foreach (explode(',', 'title,description,keywords') as $f) {
-                if (($v = $block->get('meta_'.$f))) {
+                if (($v = $block->get('meta_' . $f))) {
                     $head->meta($f, $v);
                 }
             }
@@ -59,14 +59,14 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
         if (($root = BLayout::i()->view('root'))) {
             $htmlClass = BUtil::simplifyString($nav->url_path);
-            $root->addBodyClass('cms-'.$htmlClass)
-                ->addBodyClass('page-'.$htmlClass);
+            $root->addBodyClass('cms-' . $htmlClass)
+                ->addBodyClass('page-' . $htmlClass);
         }
 
         if (($head = BLayout::i()->view('head'))) {
             $head->addTitle($nav->title);
             foreach (explode(',', 'title,description,keywords') as $f) {
-                if (($v = $nav->get('meta_'.$f))) {
+                if (($v = $nav->get('meta_' . $f))) {
                     $head->meta($f, $v);
                 }
             }

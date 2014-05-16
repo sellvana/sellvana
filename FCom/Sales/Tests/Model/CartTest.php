@@ -4,7 +4,7 @@ class FCom_Sales_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
 {
     public function getDataSet()
     {
-        return $this->createFlatXmlDataSet(__DIR__.'/CartTest.xml');
+        return $this->createFlatXmlDataSet(__DIR__ . '/CartTest.xml');
     }
 
     public function testAddEntry()
@@ -12,7 +12,7 @@ class FCom_Sales_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Pre-Condition");
 
         $cart = FCom_Sales_Model_Cart::i()->sessionCart();
-        $cart->addProduct(4, array('qty' => 2, 'price'=>5));
+        $cart->addProduct(4, ['qty' => 2, 'price' => 5]);
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_cart'), "Insert failed");
     }
@@ -25,7 +25,7 @@ class FCom_Sales_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(2, count($cart->items()), "Items count is not correct");
         $this->assertEquals(5, $cart->itemQty(), "Items count is not correct");
 
-        $cart->addProduct(3, array('qty' => 2, 'price'=>5));
+        $cart->addProduct(3, ['qty' => 2, 'price' => 5]);
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Update cart failed");
         $this->assertEquals(3, count($cart->items()), "Items count is not correct");
         $this->assertEquals(7, $cart->itemQty(), "Items count is not correct");
@@ -39,7 +39,7 @@ class FCom_Sales_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(2, count($cart->items()), "Items count is not correct");
         $this->assertEquals(5, $cart->itemQty(), "Items count is not correct");
 
-        $cart->addProduct(0, array('qty' => 2, 'price'=>5));
+        $cart->addProduct(0, ['qty' => 2, 'price' => 5]);
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Update cart failed");
         $this->assertEquals(3, count($cart->items()), "Items count is not correct");
         $this->assertEquals(7, $cart->itemQty(), "Items count is not correct");
@@ -53,7 +53,7 @@ class FCom_Sales_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(2, count($cart->items()), "Items count is not correct");
         $this->assertEquals(5, $cart->itemQty(), "Items count is not correct");
 
-        $cart->addProduct(2, array('qty' => 2, 'price'=>5));
+        $cart->addProduct(2, ['qty' => 2, 'price' => 5]);
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Update cart failed");
         $this->assertEquals(2, count($cart->items()), "Update cart items failed");
         $this->assertEquals(7, $cart->itemQty(), "Update cart items failed");
@@ -80,7 +80,7 @@ class FCom_Sales_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
         $cart = FCom_Sales_Model_Cart::i()->load(1);
         $this->assertEquals(2, count($cart->items()), "Items count is not correct");
 
-        foreach($cart->items() as $item) {
+        foreach ($cart->items() as $item) {
             $cart->removeItem($item);
         }
 

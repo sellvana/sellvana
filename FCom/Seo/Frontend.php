@@ -13,15 +13,15 @@ class FCom_Seo_Frontend extends BClass
         if (empty($referrer)) {
             $url = BRequest::i()->referrer();
             if (!$url) {
-                $referrer = array(
+                $referrer = [
                     'url' => null,
-                );
+                ];
             } else {
                 $parts = parse_url($url);
                 $source = null;
                 $keywords = null;
                 $searchEngines = 'google|yahoo|yandex|baidu|bing|ask|aol|alltheweb|duckduckgo|startpage|ixquick';
-                if (preg_match('/\b('.$searchEngines.')\.com$/', $parts['host'], $match)) {
+                if (preg_match('/\b(' . $searchEngines . ')\.com$/', $parts['host'], $match)) {
                     $source = $match[1];
                 }
                 if ($source && !empty($parts['query'])) {
@@ -44,12 +44,12 @@ class FCom_Seo_Frontend extends BClass
                         $keywords = preg_split('/\W+/', $keywords);
                     }
                 }
-                $referrer = array(
+                $referrer = [
                     'url' => $url,
                     'source_host' => $parts['host'],
                     'source' => $source,
                     'keywords' => $keywords,
-                );
+                ];
             }
         }
     }

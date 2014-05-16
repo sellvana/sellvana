@@ -4,7 +4,7 @@ class FCom_MarketClient_Main extends BClass
 {
     public function progress($data = null, $reset = false)
     {
-        $progress = !$reset ? BCache::i()->load('marketclient_progress') : array();
+        $progress = !$reset ? BCache::i()->load('marketclient_progress') : [];
         if (!empty($data)) {
             $progress = BUtil::arrayMerge($progress, $data);
             BCache::i()->save('marketclient_progress', $progress);
@@ -15,21 +15,28 @@ class FCom_MarketClient_Main extends BClass
     public function downloadAndInstall($modules, $force = false)
     {
         $progress = $this->progress();
-        if (!$force && !empty($progress['status']) && in_array($progress['status'], array('ACTIVE'))) {
+        if (!$force && !empty($progress['status']) && in_array($progress['status'], ['ACTIVE'])) {
             return;
         }
-
+        foreach ($modules as $modName => $modInfo) {
+            if (!$modInfo || $modInfo === '-' 
+                || (!empty($modInfo['version']) && ($modInfo['version'] === '' || $modInfo['version'] === '-'))
+            ) {
+                unset($modules[$modName]);
+            }
+        }
+        
         $configUpdated = false;
         $i = 0;
         $cnt = sizeof($modules);
         $uid = mt_rand();
 
-        $this->progress(array(
+        $this->progress([
             'status' => 'ACTIVE',
             'cnt' => $cnt,
             'cur' => 0,
             'uid' => $uid,
-        ), true);
+        ], true);
         if (is_string($modules)) {
             $modules = explode(',', $modules);
         }
@@ -39,65 +46,65 @@ class FCom_MarketClient_Main extends BClass
                 break;
             }
             if ($progress['status'] === 'STOP') {
-                $this->progress(array('status' => 'STOPPED'));
+                $this->progress(['status' => 'STOPPED']);
                 break;
             }
             $i++;
 
             if (is_numeric($modName)) {
                 $modName = $modInfo;
-                $modInfo = array('version' => '*');
+                $modInfo = ['version' => '*'];
             } elseif (is_string($modInfo)) {
-                $modInfo = array('version' => $modInfo);
+                $modInfo = ['version' => $modInfo];
             }
-
-            $this->progress(array(
+            
+            $this->progress([
                 'cur' => $i,
-                'modules' => array(
-                    $modName => BLocale::_('[%d/%d] Downloading: %s...', array($i, $cnt, $modName)),
-                ),
-            ));
+                'modules' => [
+                    $modName => BLocale::_('[%d/%d] Downloading: %s...', [$i, $cnt, $modName]),
+                ],
+            ]);
 
             $filename = FCom_MarketClient_RemoteApi::i()->downloadPackage($modName, $modInfo['version']);
             if (!$filename) {
-                $this->progress(array(
-                    'errors' => array(
-                        'Could not download module package file: '.$modName.' ('.$modInfo['version'].')',
-                    ),
-                ));
-                $this->message('Could not download module package file: '.$modName.' ('.$modInfo['version'].')');
+                $this->progress([
+                    'errors' => [
+                        'Could not download module package file: ' . $modName . ' (' . $modInfo['version'] . ')',
+                    ],
+                ]);
+                $this->message('Could not download module package file: ' . $modName . ' (' . $modInfo['version'] . ')');
                 continue;
             }
             $modNameArr = explode('_', $modName);
-            $targetDir = BConfig::i()->get('fs/dlc_dir') . '/' . $modNameArr[0] .'/'. $modNameArr[1];
+            $targetDir = BConfig::i()->get('fs/dlc_dir') . '/' . $modNameArr[0] . '/' . $modNameArr[1];
             BUtil::ensureDir($targetDir);
 
-            $this->progress(array(
-                'modules' => array(
-                    $modName => BLocale::_('[%d/%d] Downloading: %s... Installing...', array($i, $cnt, $modName)),
-                ),
-            ));
+            $this->progress([
+                'modules' => [
+                    $modName => BLocale::_('[%d/%d] Downloading: %s... Installing...', [$i, $cnt, $modName]),
+                ],
+            ]);
 
             if (!BUtil::zipExtract($filename, $targetDir)) {
-                $this->progress(array(
-                    'errors' => array(
-                        'Could not extract module package file: '.$modName.' ('.$modInfo['version'].')',
-                    ),
-                ));
-                $this->message('Could not extract module package file: '.$modName.' ('.$modInfo['version'].')');
+                $this->progress([
+                    'errors' => [
+                        'Could not extract module package file: ' . $modName . ' (' . $modInfo['version'] . ')',
+                    ],
+                ]);
+                $this->message('Could not extract module package file: ' . $modName . ' (' . $modInfo['version'] . ')');
                 continue;
             }
             if (!empty($modInfo['enable'])) {
                 $configUpdated = true;
-                BConfig::i()->set('module_run_levels/FCom_Core/'.$modName, 'REQUESTED', false, true);
+                BConfig::i()->set('module_run_levels/FCom_Core/' . $modName, 'REQUESTED', false, true);
             }
-            $this->progress(array(
-                'modules' => array(
-                    $modName => BLocale::_('[%d/%d] Downloading: %s... Installing... DONE', array($i, $cnt, $modName)),
-                ),
-            ));
+            $this->progress([
+                'modules' => [
+                    $modName => BLocale::_('[%d/%d] Downloading: %s... Installing... DONE', [$i, $cnt, $modName]),
+                ],
+            ]);
         }
-        $this->progress(array('status' => 'DONE'));
+        $this->progress(['status' => 'DONE']);
         if ($configUpdated) {
             FCom_Core_Main::i()->writeConfigFiles();
         }
@@ -105,7 +112,7 @@ class FCom_MarketClient_Main extends BClass
 
     public function stopDownloading()
     {
-        $this->progress(array('status' => 'STOP'));
+        $this->progress(['status' => 'STOP']);
         return $this;
     }
 }

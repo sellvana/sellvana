@@ -2,9 +2,9 @@
 
 class FCom_LibRecaptcha_Main extends BClass
 {
-    static public function html($error=null)
+    static public function html($error = null)
     {
-        require_once __DIR__.'/recaptchalib.php';
+        require_once __DIR__ . '/recaptchalib.php';
         $publicKey = BConfig::i()->get('modules/FCom_LibRecaptcha/public_key');
         return recaptcha_get_html($publicKey, $error);
     }

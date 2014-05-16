@@ -2,12 +2,12 @@
 
 class FCom_Customer_Frontend_View_Sidebar extends FCom_Core_View_Abstract
 {
-    protected $_navItems = array();
+    protected $_navItems = [];
 
     public function addNavItem($itemKey, $item)
     {
         if (empty($item['position'])) {
-            $item['position'] = 1+array_reduce($this->_navItems, function($a, $b) {
+            $item['position'] = 1 + array_reduce($this->_navItems, function($a, $b) {
                 return max($a['position'], $b['position']);
             });
         }

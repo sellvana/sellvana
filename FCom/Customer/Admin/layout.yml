@@ -6,7 +6,7 @@ base:
             - [ addNav, customer/import, { label: Import Customers, href: /customers/import/index, pos: 40 } ]
     - view: head
         do:
-            - [ requireJs, fcom.customer, @FCom_Customer/Admin/js/fcom.customer ]
+            - [ requireJs, fcom.customer, "@FCom_Customer/Admin/js/fcom.customer" ]
             - [ requireRun, fcom.customer ]
 
 /customers/import:
@@ -20,3 +20,10 @@ base:
         do:
             - [ addTabGroup, customers, { label: Customers, pos: 50 } ]
             - [ addTab, FCom_Customer, { label: Customers, group: customers, async: true } ]
+
+/customers:
+    - { include: base }
+    - { hook: main, views: ['customer/customers', 'admin/grid'] }
+
+/header_search:
+    - { hook: main, views: 'header-search/FCom_Customer' }

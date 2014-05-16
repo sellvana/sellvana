@@ -32,7 +32,7 @@ class FCom_PaymentIdeal_Frontend_Controller
     public function action_return()
     {
         $transactionId = BRequest::get('transaction_id');
-        if($transactionId){
+        if ($transactionId) {
             /* @var $paymentMethod FCom_PaymentIdeal_PaymentMethod */
             $paymentMethod = FCom_PaymentIdeal_PaymentMethod::i();
             $order = $paymentMethod->loadOrderByTransactionId($transactionId);

@@ -12,7 +12,7 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
 
     protected function _rateApiCall($shipNumber, $tozip, $service, $length, $width, $height, $weight)
     {
-        include_once __DIR__ .'/lib/UpsRate.php';
+        include_once __DIR__ . '/lib/UpsRate.php';
 
         $config = BConfig::i()->get('modules/FCom_ShippingUps');
         $password = !empty($config['password']) ? $config['password'] : '';
@@ -28,7 +28,7 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
         }
 
         $this->_rate = new UpsRate($rateApiUrl);
-        $this->_rate->setUpsParams($accessKey,$account, $password, $shipNumber);
+        $this->_rate->setUpsParams($accessKey, $account, $password, $shipNumber);
         $this->_rate->getRate($fromzip, $tozip, $service, $length, $width, $height, $weight);
         return true;
     }
@@ -56,7 +56,7 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
      */
     public function getServices()
     {
-        return array(
+        return [
             '01' => 'UPS Next Day Air',
             '02' => 'UPS Second Day Air',
             '03' => 'UPS Ground',
@@ -69,20 +69,20 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
             '54' => 'UPS Worldwide Express Plus',
             '59' => 'UPS Second Day Air AM',
             '65' => 'UPS Saver'
-        );
+        ];
     }
 
     public function getDefaultService()
     {
-        return array('03' => 'UPS Ground');
+        return ['03' => 'UPS Ground'];
     }
 
     public function getServicesSelected()
     {
         $c = BConfig::i();
-        $selected = array();
-        foreach($this->getServices() as $sId => $sName) {
-            if ($c->get('modules/FCom_ShippingUps/services/s'.$sId) == 1) {
+        $selected = [];
+        foreach ($this->getServices() as $sId => $sName) {
+            if ($c->get('modules/FCom_ShippingUps/services/s' . $sId) == 1) {
                 $selected[$sId] = $sName;
             }
         }
@@ -110,16 +110,16 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
         //package dimension
         $items = $cart->items();
         $length = $width = $height = 10;
-        $packages = array();
+        $packages = [];
         $packageId = 0;
         $groupPackageId = 0;
-        foreach($items as $item) {
+        foreach ($items as $item) {
             $itemWeight = $item->getItemWeight();
-            if ( $itemWeight > 250 ||  $itemWeight == 0 ) {
+            if ($itemWeight > 250 ||  $itemWeight == 0) {
                 continue;
             }
             for ($i = 0; $i < $item->getQty(); $i++) {
-                if ($item->isGroupAble()){
+                if ($item->isGroupAble()) {
                     if (!empty($packages[$groupPackageId]) && $itemWeight + $packages[$groupPackageId] >= 150) {
                         $packageId++;
                         $groupPackageId = $packageId;
@@ -139,11 +139,15 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
         //package weight
         $total = 0;
         foreach($packages as $pack) {
-            $this->_rateApiCall($cart->id(), $tozip, $service, $length, $width, $height, $pack);
-            if ($this->_rate->isError()) {
-                 continue;
+            // Returns false if no credentials are configured.
+            // As a side effect, $this->_rate will be NULL.
+            if ($this->_rateApiCall($cart->id(), $tozip, $service, $length, 
+                $width, $height, $pack)) {
+                if ($this->_rate->isError()) {
+                     continue;
+                }
+                $total += $this->_rate->getTotal();
             }
-            $total += $this->_rate->getTotal();
         }
         return $total;
     }

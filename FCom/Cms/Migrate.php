@@ -25,24 +25,24 @@ class FCom_Cms_Migrate extends BClass
             `layout_update` text,
             PRIMARY KEY (`id`),
             CONSTRAINT `FK_{$tNav}_parent` FOREIGN KEY (`parent_id`) REFERENCES {$tNav} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
         $tPage = FCom_Cms_Model_Page::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tPage} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `handle` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-            `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-            `content` text COLLATE utf8_unicode_ci NOT NULL,
-            `layout_update` text COLLATE utf8_unicode_ci,
+            `handle` varchar(255)  NOT NULL,
+            `title` varchar(255)  NOT NULL,
+            `content` text  NOT NULL,
+            `layout_update` text ,
             `create_dt` datetime DEFAULT NULL,
             `update_dt` datetime DEFAULT NULL,
             `version` int(11) unsigned NOT NULL,
-            `meta_title` text COLLATE utf8_unicode_ci,
-            `meta_description` text COLLATE utf8_unicode_ci,
-            `meta_keywords` text COLLATE utf8_unicode_ci,
+            `meta_title` text ,
+            `meta_description` text ,
+            `meta_keywords` text ,
             PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
         ");
 
@@ -53,23 +53,23 @@ class FCom_Cms_Migrate extends BClass
             `page_id` int(10) unsigned NOT NULL,
             `version` int(11) unsigned NOT NULL,
             `user_id` int(11) unsigned null,
-            `username` varchar(50) COLLATE utf8_unicode_ci NULL,
-            `data` text COLLATE utf8_unicode_ci NOT NULL,
-            `comments` text COLLATE utf8_unicode_ci NOT NULL,
+            `username` varchar(50)  NULL,
+            `data` text  NOT NULL,
+            `comments` text  NOT NULL,
             `ts` datetime not null,
             PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
 */
         $tBlock = FCom_Cms_Model_Block::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tBlock} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `handle` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-            `description` text COLLATE utf8_unicode_ci,
+            `handle` varchar(100)  NOT NULL,
+            `description` text ,
             `renderer` varchar(100) null,
-            `content` text COLLATE utf8_unicode_ci,
-            `layout_update` text COLLATE utf8_unicode_ci,
+            `content` text ,
+            `layout_update` text ,
             `version` int(11) NOT NULL,
             `create_at` datetime DEFAULT NULL,
             `update_at` datetime DEFAULT NULL,
@@ -83,7 +83,7 @@ class FCom_Cms_Migrate extends BClass
             PRIMARY KEY (`id`),
             UNIQUE KEY `UNQ_handle` (`handle`),
             UNIQUE KEY `UNQ_page_url` (`page_enabled`,`page_url`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
 
         $tBlock = FCom_Cms_Model_Block::table();
@@ -94,20 +94,20 @@ class FCom_Cms_Migrate extends BClass
             `block_id` int(10) unsigned NOT NULL,
             `version` int(11) unsigned NOT NULL,
             `user_id` int(11) unsigned null,
-            `username` varchar(50) COLLATE utf8_unicode_ci NULL,
-            `data` text COLLATE utf8_unicode_ci NOT NULL,
-            `comments` text COLLATE utf8_unicode_ci NOT NULL,
+            `username` varchar(50)  NULL,
+            `data` text  NOT NULL,
+            `comments` text  NOT NULL,
             `ts` datetime not null,
             PRIMARY KEY (`id`),
             CONSTRAINT `FK_{$tBlockHistory}_block` FOREIGN KEY (`block_id`) REFERENCES {$tBlock} (`id`) ON UPDATE CASCADE ON DELETE CASCADE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
 
         $tForm = FCom_Cms_Model_Form::table();
         $tFormData = FCom_Cms_Model_FormData::table();
 
-        BDb::ddlTableDef($tForm, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($tForm, [
+            'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'form_name' => 'varchar(100)',
                 'form_url' => 'varchar(255)',
@@ -115,15 +115,15 @@ class FCom_Cms_Migrate extends BClass
                 'validation_rules' => 'text',
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
-            ),
+            ],
             'PRIMARY' => '(id)',
-            'KEYS' => array(
+            'KEYS' => [
                 'UNQ_form_name' => 'UNIQUE (form_name)'
-            ),
-        ));
+            ],
+        ]);
 
-        BDb::ddlTableDef($tFormData, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($tFormData, [
+            'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'form_id' => 'int unsigned not null',
                 'customer_id' => 'int unsigned',
@@ -134,20 +134,20 @@ class FCom_Cms_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
                 'data_serialized' => 'text',
-            ),
+            ],
             'PRIMARY' => '(id)',
-            'CONSTRAINTS' => array(
+            'CONSTRAINTS' => [
                 "FK_{$tFormData}_form" => "FOREIGN KEY (form_id) REFERENCES {$tForm} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-            ),
-        ));
+            ],
+        ]);
 
         //BDb::run("REPLACE INTO {$tNav} (id,id_path) VALUES (1,1)");
     }
 
     public function upgrade__0_1_0__0_1_1()
     {
-        BDb::ddlTableDef(FCom_Cms_Model_Block::table(), array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef(FCom_Cms_Model_Block::table(), [
+            'COLUMNS' => [
                 'renderer' => 'varchar(100) null after content',
                 'page_enabled' => 'TINYINT DEFAULT 0 NOT NULL',
                 'page_url' => 'VARCHAR (100) NULL',
@@ -156,12 +156,12 @@ class FCom_Cms_Migrate extends BClass
                 'meta_description' => 'TEXT NULL',
                 'meta_keywords' => 'TEXT NULL',
                 'modified_time' => 'int unsigned',
-            ),
-            'KEYS' => array(
+            ],
+            'KEYS' => [
                 'UNQ_handle' => 'UNIQUE (handle)',
                 'UNQ_page_url' => 'UNIQUE (page_enabled, page_url)',
-            ),
-        ));
+            ],
+        ]);
         /*
         BDb::ddlTableDef(FCom_Cms_Model_Nav::table(), array(
             'COLUMNS' => array(
@@ -191,12 +191,12 @@ class FCom_Cms_Migrate extends BClass
     public function upgrade__0_1_1__0_1_2()
     {
         $table = FCom_Cms_Model_Block::table();
-        BDb::ddlTableDef($table, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($table, [
+            'COLUMNS' => [
                   'create_dt'      => 'RENAME create_at datetime DEFAULT NULL',
                   'update_dt'      => 'RENAME update_at datetime DEFAULT NULL',
-            ),
-        ));
+            ],
+        ]);
     }
 
     public function upgrade__0_1_2__0_1_3()
@@ -204,8 +204,8 @@ class FCom_Cms_Migrate extends BClass
         $tForm = FCom_Cms_Model_Form::table();
         $tFormData = FCom_Cms_Model_FormData::table();
 
-        BDb::ddlTableDef($tForm, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($tForm, [
+            'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'form_name' => 'varchar(100)',
                 'form_url' => 'varchar(255)',
@@ -213,15 +213,15 @@ class FCom_Cms_Migrate extends BClass
                 'validation_rules' => 'text',
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
-            ),
+            ],
             'PRIMARY' => '(id)',
-            'KEYS' => array(
+            'KEYS' => [
                 'UNQ_form_name' => 'UNIQUE (form_name)',
-            ),
-        ));
+            ],
+        ]);
 
-        BDb::ddlTableDef($tFormData, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($tFormData, [
+            'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'form_id' => 'int unsigned not null',
                 'customer_id' => 'int unsigned',
@@ -232,13 +232,13 @@ class FCom_Cms_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
                 'data_serialized' => 'text',
-            ),
+            ],
             'PRIMARY' => '(id)',
-            'KEYS' => array(
-            ),
-            'CONSTRAINTS' => array(
+            'KEYS' => [
+            ],
+            'CONSTRAINTS' => [
                 "FK_{$tFormData}_form" => "FOREIGN KEY (form_id) REFERENCES {$tForm} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-            ),
-        ));
+            ],
+        ]);
     }
 }

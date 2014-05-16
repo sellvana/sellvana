@@ -2,16 +2,16 @@
 
 class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
-    public function authenticate($args=array())
+    public function authenticate($args = [])
     {
-        return FCom_Customer_Model_Customer::i()->isLoggedIn() || BRequest::i()->rawPath()=='/login';
+        return FCom_Customer_Model_Customer::i()->isLoggedIn() || BRequest::i()->rawPath() == '/login';
     }
 
 
     public function action_index()
     {
         $layout = BLayout::i();
-        $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Wishlist', 'active'=>true));
+        $layout->view('breadcrumbs')->crumbs = ['home', ['label' => 'Wishlist', 'active' => true]];
         $wishlist = FCom_Wishlist_Model_Wishlist::i()->sessionWishlist();
         $layout->view('wishlist')->wishlist = $wishlist;
         $this->layout('/wishlist');
@@ -23,20 +23,20 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $post = BRequest::i()->post();
         $wishlist = FCom_Wishlist_Model_Wishlist::i()->sessionWishlist();
         if (BRequest::i()->xhr()) {
-            $result = array();
+            $result = [];
             switch ($post['action']) {
             case 'add':
                 $p = FCom_Catalog_Model_Product::i()->load($post['id']);
-                if (!$p){
-                    BResponse::i()->json(array('title'=>"Incorrect product id"));
+                if (!$p) {
+                    BResponse::i()->json(['title' => "Incorrect product id"]);
                     return;
                 }
                 $wishlist->addItem($p->id());
-                $result = array(
+                $result = [
                     'title' => 'Added to wishlist',
-                    'html' => '<img src="'.$p->thumbUrl(35, 35).'" width="35" height="35" style="float:left"/> '.htmlspecialchars($p->product_name)
-                        .'<br><br><a href="'.$wishlistHref.'" class="button">Go to wishlist</a>'
-                );
+                    'html' => '<img src="' . $p->thumbUrl(35, 35) . '" width="35" height="35" style="float:left"/> ' . htmlspecialchars($p->product_name)
+                        . '<br><br><a href="' . $wishlistHref . '" class="button">Go to wishlist</a>'
+                ];
                 break;
             }
             BResponse::i()->json($result);

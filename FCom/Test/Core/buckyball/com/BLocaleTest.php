@@ -15,9 +15,9 @@ class BLocale_Test extends PHPUnit_Framework_TestCase
         $this->assertEquals("abc-def-123", BLocale::transliterate($str));
 
         $str = "aBc dEf 123_[]$%";
-        $this->assertEquals("abc_def_123", BLocale::transliterate($str,'_'));
+        $this->assertEquals("abc_def_123", BLocale::transliterate($str, '_'));
 
         $str = "aBc dEf 123_[]$% ";
-        $this->assertEquals("abcrdefr123", BLocale::transliterate($str,'R'));
+        $this->assertEquals("abcrdefr123", BLocale::transliterate($str, 'R'));
     }
 }

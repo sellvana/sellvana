@@ -28,7 +28,7 @@ class FCom_Core_Model_Abstract extends BModel
      *
      * @var array
      */
-    static protected $_dataFieldsMap = array();
+    static protected $_dataFieldsMap = [];
 
     static protected $_importExportProfile;
 
@@ -43,12 +43,12 @@ class FCom_Core_Model_Abstract extends BModel
      */
     public function getData($path = null)
     {
-        if (is_null($this->get(static::$_dataCustomField))) {
+        if (null === $this->get(static::$_dataCustomField)) {
             $dataJson = $this->get(static::$_dataSerializedField);
-            $this->set(static::$_dataCustomField, $dataJson ? BUtil::fromJson($dataJson) : array());
+            $this->set(static::$_dataCustomField, $dataJson ? BUtil::fromJson($dataJson) : []);
         }
         $data = $this->get(static::$_dataCustomField);
-        if (is_null($path)) {
+        if (null === $path) {
             return $data;
         }
         $pathArr = explode('/', $path);
@@ -123,11 +123,11 @@ class FCom_Core_Model_Abstract extends BModel
         return true;
     }
 
-    public function registerImportExport( &$config )
+    public function registerImportExport(&$config)
     {
-        if ( !empty(static::$_importExportProfile) ) {
-            $config[ static::$_origClass ] = static::$_importExportProfile;
-            $config[ static::$_origClass ]['model'] = static::$_origClass;
+        if (!empty(static::$_importExportProfile)) {
+            $config[static::$_origClass] = static::$_importExportProfile;
+            $config[static::$_origClass]['model'] = static::$_origClass;
         }
     }
 
@@ -135,6 +135,6 @@ class FCom_Core_Model_Abstract extends BModel
     {
         $class = static::$_origClass ? static::$_origClass : get_called_class();
 
-        return static::_get_id_column_name( $class );
+        return static::_get_id_column_name($class);
     }
 }

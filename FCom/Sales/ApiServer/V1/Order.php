@@ -33,7 +33,7 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
         if (empty($post['customer_id'])) {
             $this->badRequest("Customer id is required");
         }
-        if (empty($post['status']) || !in_array($post['status'], array('new','paid'))) {
+        if (empty($post['status']) || !in_array($post['status'], ['new', 'paid'])) {
             $this->badRequest("Status is required");
         }
         if (empty($post['item_qty'])) {
@@ -43,7 +43,7 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
             $this->badRequest("Items collection is required");
         }
 
-        foreach($post['items'] as $item) {
+        foreach ($post['items'] as $item) {
             if (empty($item['product_id'])) {
                 $this->internalError("Can't create an order item. Product id is missing");
             }
@@ -64,10 +64,10 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
             $this->internalError("Can't create an order");
         }
 
-        foreach($post['items'] as $item) {
+        foreach ($post['items'] as $item) {
             $product = FCom_Catalog_Model_Product::i()->load($item['product_id']);
 
-            $orderItem = array();
+            $orderItem = [];
             $orderItem['order_id'] = $order->id();
             $orderItem['product_id'] = $item['product_id'];
             $orderItem['qty'] = $item['qty'];
@@ -77,7 +77,7 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
             FCom_Sales_Model_Order_Item::i()->addNew($orderItem);
         }
 
-        $this->created(array('id' => $order->id));
+        $this->created(['id' => $order->id]);
     }
 
     public function action_index__PUT()
@@ -90,7 +90,7 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
         }
 
         if (!empty($post['items'])) {
-            foreach($post['items'] as $item) {
+            foreach ($post['items'] as $item) {
                 if (empty($item['product_id'])) {
                     $this->internalError("Can't create an order item. Product id is missing");
                 }
@@ -111,10 +111,10 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
         $order->set($data)->save();
 
         if (!empty($post['items'])) {
-            foreach($post['items'] as $item) {
+            foreach ($post['items'] as $item) {
                 $product = FCom_Catalog_Model_Product::i()->load($item['product_id']);
 
-                $orderItem = array();
+                $orderItem = [];
                 $orderItem['order_id'] = $order->id();
                 $orderItem['product_id'] = $item['product_id'];
                 $orderItem['qty'] = $item['qty'];

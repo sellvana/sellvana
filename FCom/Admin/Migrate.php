@@ -61,14 +61,14 @@ class FCom_Admin_Migrate extends BClass
         $tActivity = FCom_Admin_Model_Activity::table();
         $tActivityUser = FCom_Admin_Model_ActivityUser::table();
 
-        BDb::ddlTableDef($tUser, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($tUser, [
+            'COLUMNS' => [
                 'data_serialized' => 'text',
-            ),
-        ));
+            ],
+        ]);
 
-        BDb::ddlTableDef($tActivity, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($tActivity, [
+            'COLUMNS' => [
                 'id' => "int unsigned not null auto_increment",
                 'status' => "enum('new', 'recent', 'archived') not null default 'new'",
                 'type' => "enum('workflow', 'alert') not null default 'workflow'",
@@ -79,33 +79,33 @@ class FCom_Admin_Migrate extends BClass
                 'order_id' => 'int unsigned',
                 'create_at' => 'datetime not null',
                 'data_serialized' => 'text',
-            ),
+            ],
             'PRIMARY' => '(id)',
-            'KEYS' => array(
+            'KEYS' => [
                 'IDX_status_type_create' => '(`status`, `type`, `create_at`)',
-            ),
-        ));
+            ],
+        ]);
 
-        BDb::ddlTableDef($tActivityUser, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($tActivityUser, [
+            'COLUMNS' => [
                 'id' => "int unsigned not null auto_increment",
                 'activity_id' => "int unsigned not null",
                 'user_id' => "int unsigned not null",
                 'alert_user_status' => "enum('new', 'read', 'dismissed') not null default 'new'",
-            ),
+            ],
             'PRIMARY' => '(id)',
-            'KEYS' => array(
+            'KEYS' => [
                 'IDX_activity_user_status' => 'UNIQUE (`activity_id`, `user_id`, `alert_user_status`)',
-            ),
-            'CONSTRAINTS' => array(
+            ],
+            'CONSTRAINTS' => [
                 "FK_{$tActivityUser}_activity" => "FOREIGN KEY (activity_id) REFERENCES {$tActivity} (id) ON UPDATE CASCADE ON DELETE CASCADE",
                 "FK_{$tActivityUser}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-            ),
-        ));
+            ],
+        ]);
 
         $tAggregate = FCom_Admin_Model_Aggregate::table();
-        BDb::ddlTableDef($tAggregate, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($tAggregate, [
+            'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'data_type' => 'varchar(20) not null',
                 'data_args' => 'varchar(50) not null',
@@ -113,12 +113,12 @@ class FCom_Admin_Migrate extends BClass
                 //'range_type' => "enum('day') default 'day' not null",
                 //'range_start' => 'date not null',
                 'amount' => 'decimal(12,2) not null',
-            ),
+            ],
             'PRIMARY' => '(id)',
-            'KEYS' => array(
+            'KEYS' => [
                 'IDX_data_type_args_day' => '(data_type, data_args, data_day)',
-            ),
-        ));
+            ],
+        ]);
     }
 
     public function upgrade__0_1_0__0_1_1()
@@ -179,24 +179,24 @@ class FCom_Admin_Migrate extends BClass
 
     public function upgrade__0_1_3__0_1_4()
     {
-        BDb::ddlTableDef(FCom_Admin_Model_User::table(), array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef(FCom_Admin_Model_User::table(), [
+            'COLUMNS' => [
                 'api_password' => 'DROP',
                 'api_password_hash' => 'varchar(255) null',
-            ),
-        ));
+            ],
+        ]);
     }
 
     public function upgrade__0_1_4__0_1_5()
     {
         $table = FCom_Admin_Model_User::table();
-        BDb::ddlTableDef($table, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($table, [
+            'COLUMNS' => [
                   'create_dt'  => 'RENAME create_at datetime NOT NULL',
                   'update_dt'  => 'RENAME update_at datetime DEFAULT NULL',
                   'token_dt'   => 'RENAME token_at datetime DEFAULT NULL',
-            ),
-        ));
+            ],
+        ]);
     }
 
     public function upgrade__0_1_5__0_1_6()
@@ -205,14 +205,14 @@ class FCom_Admin_Migrate extends BClass
         $tActivityUser = FCom_Admin_Model_ActivityUser::table();
         $tUser = FCom_Admin_Model_User::table();
 
-        BDb::ddlTableDef($tUser, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($tUser, [
+            'COLUMNS' => [
                 'data_serialized' => 'text',
-            ),
-        ));
+            ],
+        ]);
 
-        BDb::ddlTableDef($tActivity, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($tActivity, [
+            'COLUMNS' => [
                 'id' => "int unsigned not null auto_increment",
                 'status' => "enum('new', 'recent', 'archived') not null default 'new'",
                 'type' => "enum('workflow', 'alert') not null default 'workflow'",
@@ -223,36 +223,36 @@ class FCom_Admin_Migrate extends BClass
                 'order_id' => 'int unsigned',
                 'create_at' => 'datetime not null',
                 'data_serialized' => 'text',
-            ),
+            ],
             'PRIMARY' => '(id)',
-            'KEYS' => array(
+            'KEYS' => [
                 'IDX_status_type_create' => '(`status`, `type`, `create_at`)',
-            ),
-        ));
+            ],
+        ]);
 
-        BDb::ddlTableDef($tActivityUser, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($tActivityUser, [
+            'COLUMNS' => [
                 'id' => "int unsigned not null auto_increment",
                 'activity_id' => "int unsigned not null",
                 'user_id' => "int unsigned not null",
                 'alert_user_status' => "enum('new', 'read', 'dismissed') not null default 'new'",
-            ),
+            ],
             'PRIMARY' => '(id)',
-            'KEYS' => array(
+            'KEYS' => [
                 'IDX_activity_user_status' => 'UNIQUE (`activity_id`, `user_id`, `alert_user_status`)',
-            ),
-            'CONSTRAINTS' => array(
+            ],
+            'CONSTRAINTS' => [
                 "FK_{$tActivityUser}_activity" => "FOREIGN KEY (activity_id) REFERENCES {$tActivity} (id) ON UPDATE CASCADE ON DELETE CASCADE",
                 "FK_{$tActivityUser}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-            ),
-        ));
+            ],
+        ]);
     }
 
     public function upgrade__0_1_6__0_1_7()
     {
         $tAggregate = FCom_Admin_Model_Aggregate::table();
-        BDb::ddlTableDef($tAggregate, array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef($tAggregate, [
+            'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'data_type' => 'varchar(20) not null',
                 'data_args' => 'varchar(50) not null',
@@ -260,11 +260,11 @@ class FCom_Admin_Migrate extends BClass
                 //'range_type' => "enum('day') default 'day' not null",
                 //'range_start' => 'date not null',
                 'amount' => 'decimal(12,2) not null',
-            ),
+            ],
             'PRIMARY' => '(id)',
-            'KEYS' => array(
+            'KEYS' => [
                 'IDX_data_type_args_day' => '(data_type, data_args, data_day)',
-            ),
-        ));
+            ],
+        ]);
     }
 }

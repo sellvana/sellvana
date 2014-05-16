@@ -1,74 +1,32 @@
 {% set c = THIS.get('model') %}
-{% set mode = c.get("mode_by_ip/FCom_Frontend")|split("\n")|join('|') %}
+{% set fieldData = { model: c, id_prefix:'FCom_Frontend', name_prefix:'config[modules][FCom_Frontend]' } %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
+
 <h2>{{ "FrontEnd Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-FCom_Frontend'}) }}
+    {{ forms.accordion_panel_start({label:'HTML'|_, id:'settings-FCom_Frontend-group0', in:1}) }}
+        {{ forms.select(fieldData|merge({field:'theme', label:'Theme'|_, options:LAYOUT.getThemes("FCom_Frontend", true), value:c.get('modules/FCom_Frontend/theme')})) }}
+        {{ forms.textarea(fieldData|merge({field:'add_js_files', label:'Additional JS Files'|_, value:c.get('modules/FCom_Frontend/add_js_files'), raw:1 })) }}
+        {{ forms.textarea(fieldData|merge({field:'add_css_files', label:'Additional CSS Files'|_, value:c.get('modules/FCom_Frontend/add_css_files'), raw:1 })) }}
+        {{ forms.textarea(fieldData|merge({field:'add_js_code', label:'Additional JS Code'|_, value:c.get('modules/FCom_Frontend/add_js_code'), raw:1 })) }}
+        {{ forms.textarea(fieldData|merge({field:'add_css_style', label:'Additional CSS Style'|_, value:c.get('modules/FCom_Frontend/add_css_style'), raw:1 })) }}
+    {{ forms.accordion_panel_end }}
 
-<div class="accordion accordion-blue panel-group" id="settings-FCom_Frontend">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a class="accordion-toggle" href="#">{{ "HTML"|_ }}</a>
-        </div>
-        <div class="panel-collapse accordion-body in" id="settings-FCom_Frontend-group0">
-            <div class="panel-body">
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ "Theme"|_ }}</label>
-                    <div class="col-md-5">
-                        <select class="form-control" name="config[modules][FCom_Frontend][theme]">
-                            {{ UTIL.optionsHtml(LAYOUT.getThemes('FCom_Frontend', true), c.get('modules/FCom_Frontend/theme'))|raw }}
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ "Additional JS Files"|_ }}</label>
-                    <div class="col-md-5">
-                        <textarea class="form-control" name="config[modules][FCom_Frontend][add_js_files]" rows="5">{{ c.get('modules/FCom_Frontend/add_js_files') }}</textarea>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ "Additional CSS Files"|_ }}</label>
-                    <div class="col-md-5">
-                        <textarea class="form-control" name="config[modules][FCom_Frontend][add_css_files]" rows="5">{{ c.get('modules/FCom_Frontend/add_css_files') }}</textarea>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ "Additional JS Code"|_ }}</label>
-                    <div class="col-md-5">
-                        <textarea class="form-control js-code-editor" name="config[modules][FCom_Frontend][add_js_code]" rows="5" data-mode="javascript">{{ c.get('modules/FCom_Frontend/add_js_code') }}</textarea>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ "Additional CSS Style"|_ }}</label>
-                    <div class="col-md-5">
-                        <textarea class="form-control js-code-editor" name="config[modules][FCom_Frontend][add_css_style]" rows="5" data-mode="css"> {{ c.get('modules/FCom_Frontend/add_css_style') }}</textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a class="accordion-toggle" href="#">{{ "Area Settings"|_ }}</a>
+    {{ forms.accordion_panel_start({label:'Area Settings'|_, id:'settings-FCom_Frontend-group1'}) }}
+        <div class="form-group" >
+            {{ forms.label({label:'IP: mode'|_}) }}
+            <div class="col-md-8 group-ip-mode"></div>
         </div>
-        <div class="panel-collapse accordion-body" id="settings-FCom_Frontend-group1">
-            <div class="panel-body">
-                <div class="form-group" >
-                    <label class="col-md-2 control-label">{{ "IP: Mode"|_ }}</label>
-                    <div class="col-md-8 group-ip-mode"></div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ "Modules to run in RECOVERY mode"|_ }}</label>
-                    <div class="col-md-5">
-                        <input class="form-control" type="text" name="config[recovery_modules][FCom_Frontend]" value="{{ c.get('recovery_modules/FCom_Frontend') }}" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
+        {{ forms.textarea(fieldData|merge({name:'config[recovery_modules][FCom_Frontend]', id:'recovery_modules-FCom_Frontend',
+            label:'Modules to run in RECOVERY mode'|_, value:c.get('recovery_modules/FCom_Frontend'), raw:1 })) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}
+
 <script  type="text/javascript">
     require(['backbone', 'jquery', 'fcom.ipmode','select2'], function(Backbone, $, ipMode) {
-        var mode = '{{ mode }}';
-        mode = mode.split('|');
+        var mode = {{ UTIL.toJson(c.get("mode_by_ip/FCom_Frontend")|split("\n")) | raw }};
         ipMode.initMode({el: $('#settings-FCom_Frontend-group1').find('.group-ip-mode'), name: 'config[mode_by_ip][FCom_Frontend]', mode: mode});
     })
 </script>

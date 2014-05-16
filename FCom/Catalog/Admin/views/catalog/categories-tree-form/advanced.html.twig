@@ -1,8 +1,6 @@
 {% set m = THIS.get('model') %}
+{% set validator = THIS.get('validator') %}
+{% set fieldData = { validator:validator } %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 
-<div class="form-group">
-    <label class="col-md-2 control-label" for="main-layout_update">{{ 'Layout Update'|_ }}</label>
-    <div class="col-md-10">
-        <textarea id="main-layout_update" class="form-control" rows="5" name="model[layout_update]">{{ m.get('layout_update') }}</textarea>
-    </div>
-</div>
+{{ forms.textarea(fieldData|merge({field:'layout_update', label:'Layout Update'|_, input_div_class:'col-md-10'})) }}

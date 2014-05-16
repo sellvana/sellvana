@@ -20,19 +20,19 @@ class FCom_Dev_Translations extends BClass
         }
 
         //find all BLocale::_ calls and extract first parameter - translation key
-        $keys = array();
-        foreach($files as $file) {
+        $keys = [];
+        foreach ($files as $file) {
             $source = file_get_contents($file);
             $source = static::getTwigSource($file, $source);
             $tokens = token_get_all($source);
             $func = 0;
             $class = 0;
             $sep = 0;
-            foreach($tokens as $token) {
-                if (empty($token[1])){
+            foreach ($tokens as $token) {
+                if (empty($token[1])) {
                     continue;
                 }
-                if ($token[1] =='BLocale') {
+                if ($token[1] == 'BLocale') {
                     $class = 1;
                     continue;
                 }
@@ -46,7 +46,7 @@ class FCom_Dev_Translations extends BClass
                     $func = 1;
                     continue;
                 }
-                if($func) {
+                if ($func) {
                     $token[1] = trim($token[1], "'\"");
                     $keys[$token[1]] = '';
                     $func = 0;
@@ -63,15 +63,15 @@ class FCom_Dev_Translations extends BClass
 
         //find undefined translations
         foreach ($keys as $key => $v) {
-            if(isset($translations[$key])) {
+            if (isset($translations[$key])) {
                 unset($keys[$key]);
             }
         }
         //add undefined translation to $targetFile
-        $newTranslations = array();
+        $newTranslations = [];
         if ($translations) {
-            foreach($translations as $trKey => $tr){
-                list(,$newTranslations[$trKey]) = each($tr);
+            foreach ($translations as $trKey => $tr) {
+                list(, $newTranslations[$trKey]) = each($tr);
             }
         }
         $newTranslations = array_merge($newTranslations, $keys);
@@ -99,11 +99,11 @@ class FCom_Dev_Translations extends BClass
     static protected function saveToPHP($targetFile, $array)
     {
         $code = '';
-        foreach($array as $k => $v) {
+        foreach ($array as $k => $v) {
             if (!empty($code)) {
                 $code .= ",\n";
             }
-            $code .= "'{$k}' => '".addslashes($v)."'";
+            $code .= "'{$k}' => '" . addslashes($v) . "'";
         }
         $code = "<?php return array({$code});";
         file_put_contents($targetFile, $code);
@@ -120,7 +120,7 @@ class FCom_Dev_Translations extends BClass
         $handle = fopen($targetFile, "w");
         foreach ($array as $k => $v) {
             $k = trim($k, '"');
-            fputcsv($handle, array($k, $v));
+            fputcsv($handle, [$k, $v]);
         }
         fclose($handle);
     }
@@ -149,7 +149,7 @@ class FCom_Dev_Translations extends BClass
             try {
                 $source = $stringTwig->compile($stringTwig->parse($stringTwig->tokenize($source)));
             } catch (Twig_Error_Syntax $e) {
-                BDebug::log(sprintf("\n\n%s: Exception %s in file %s",date("Y-m-d H:i:s"), get_class($e), $file),
+                BDebug::log(sprintf("\n\n%s: Exception %s in file %s", date("Y-m-d H:i:s"), get_class($e), $file),
                             "translations_error.log");
                 BDebug::log($e->getMessage(), "translations_error.log");
                 return "";
@@ -160,7 +160,7 @@ class FCom_Dev_Translations extends BClass
     protected static $twig;
     protected static function initTwig()
     {
-        if(!static::$twig){
+        if (!static::$twig) {
             BEvents::i()->on("FCom_LibTwig_Main::init", __CLASS__ . "::setTwigEnv");
             $bDir = BModuleRegistry::i()->module("FCom_Core")->baseDir();
             echo $bDir;

@@ -12,14 +12,14 @@ modules:
                     - [ /promo, FCom_Promo_Admin_Controller.index ]
                     - [ /promo/.action, FCom_Promo_Admin_Controller ]
 
-                    - [ /promo/form/:id/products, FCom_Promo_Admin_Controller.form_products ]
-                    - [ /promo/form/:id/group, FCom_Promo_Admin_Controller.form_group ]
+                    - [ "/promo/form/:id/products", FCom_Promo_Admin_Controller.form_products ]
+                    - [ "/promo/form/:id/group", FCom_Promo_Admin_Controller.form_group ]
 
             FCom_Frontend:
                 auto_use: [ views, layout ]
                 routing:
                     - [ /promo/media, FCom_Promo_Frontend_Controller.media ]
                 observe:
-                    - [ FCom_Sales_Model_Cart::calculateTotals, FCom_Promo_Frontend::onPromoCartValidate ]
-                    - [ FCom_Sales_Model_Cart::addProduct, FCom_Promo_Frontend::onPromoCartAddProduct ]
-                    - [ BLayout::hook:promotions, FCom_Promo_Frontend_Controller.hook_promotions ]
+                    - [ "FCom_Sales_Model_Cart::calculateTotals", "FCom_Promo_Frontend::onPromoCartValidate" ]
+                    - [ "FCom_Sales_Model_Cart::addProduct", "FCom_Promo_Frontend::onPromoCartAddProduct" ]
+                    - [ "BLayout::hook:promotions", FCom_Promo_Frontend_Controller.hook_promotions ]

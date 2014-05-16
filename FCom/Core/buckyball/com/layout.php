@@ -31,7 +31,7 @@ class BLayout extends BClass
      *
      * @var array
      */
-    protected $_themes = array();
+    protected $_themes = [];
 
     /**
      * Default theme name (current area / main module)
@@ -45,35 +45,35 @@ class BLayout extends BClass
      *
      * @var array
      */
-    protected $_loadLayoutFiles = array();
+    protected $_loadLayoutFiles = [];
 
     /**
      * Add view templates from these dirs after theme
      *
      * @var array
      */
-    protected $_addViewsDirs = array();
+    protected $_addViewsDirs = [];
 
     /**
      * Add view templates from these files after theme
      *
      * @var array
      */
-    protected $_addViewsFiles = array();
+    protected $_addViewsFiles = [];
 
     /**
      * Layouts declarations registry
      *
      * @var array
      */
-    protected $_layouts = array();
+    protected $_layouts = [];
 
     /**
      * View objects registry
      *
      * @var array
      */
-    protected $_views = array();
+    protected $_views = [];
 
     /**
      * Main (root) view to be rendered first
@@ -99,23 +99,23 @@ class BLayout extends BClass
     /**
      * @var array
      */
-    protected static $_metaDirectives = array(
+    protected static $_metaDirectives = [
         'remove'   => 'BLayout::metaDirectiveRemoveCallback',
         'callback' => 'BLayout::metaDirectiveCallback',
         'include'  => 'BLayout::metaDirectiveIncludeCallback',
         'root'     => 'BLayout::metaDirectiveRootCallback',
         'hook'     => 'BLayout::metaDirectiveHookCallback',
         'view'     => 'BLayout::metaDirectiveViewCallback',
-    );
+    ];
 
-    protected static $_renderers = array();
+    protected static $_renderers = [];
 
     /**
      * @var array
      */
-    protected static $_extRenderers = array(
-        '.php' => array('callback' => null),
-    );
+    protected static $_extRenderers = [
+        '.php' => ['callback' => null],
+    ];
 
     /**
      * @var string
@@ -124,6 +124,8 @@ class BLayout extends BClass
 
     protected $_rememberOverrides = false;
 
+    protected $_currentViewStack = array();
+
     /**
      * Shortcut to help with IDE autocompletion
      *
@@ -131,7 +133,7 @@ class BLayout extends BClass
      * @param array $args
      * @return BLayout
      */
-    public static function i($new = false, array $args = array())
+    public static function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
@@ -156,9 +158,9 @@ class BLayout extends BClass
      * @param $rootDir
      * @return $this
      */
-    public function setViewRootDir($rootDir, $module=null)
+    public function setViewRootDir($rootDir, $module = null)
     {
-        if (is_null($module)) {
+        if (null === $module) {
             $module = BModuleRegistry::i()->currentModule();
         }
         $isAbsPath = strpos($rootDir, '/') === 0 || strpos($rootDir, ':') === 1;
@@ -185,7 +187,7 @@ class BLayout extends BClass
     public function addRenderer($name, $params)
     {
         if (is_string($name) && is_string($params)) {
-            $params = array('file_ext' => array($name), 'callback' => $params);
+            $params = ['file_ext' => [$name], 'callback' => $params];
         }
         if (is_string($params['file_ext'])) {
             $params['file_ext'] = explode(';', $params['file_ext']);
@@ -200,15 +202,15 @@ class BLayout extends BClass
             static::$_extRenderers[$ext] = $params;
         }
         static::$_extRegex = join('|', array_map('preg_quote', array_keys(static::$_extRenderers)));
-        BDebug::debug('ADD RENDERER: '.join('; ', $params['file_ext']));
+        BDebug::debug('ADD RENDERER: ' . join('; ', $params['file_ext']));
         return $this;
     }
 
-    public function getAllRenderers($asOptions=false)
+    public function getAllRenderers($asOptions = false)
     {
         if ($asOptions) {
-            $options = array();
-            foreach (static::$_renderers as $k=>$r) {
+            $options = [];
+            foreach (static::$_renderers as $k => $r) {
                 $options[$k] = !empty($r['description']) ? $r['description'] : $k;
             }
             asort($options);
@@ -224,11 +226,11 @@ class BLayout extends BClass
 
     public function addAllViewsDir($rootDir = null, $prefix = '', $curModule = null)
     {
-        if (is_null($curModule)) {
+        if (null === $curModule) {
             $curModule = BModuleRegistry::i()->currentModule();
         }
-        $this->_addViewsDirs[] = array($rootDir, $prefix, $curModule);
-        BEvents::i()->fire(__METHOD__, array('root_dir'=>$rootDir, 'prefix'=>$prefix, 'module'=>$curModule));
+        $this->_addViewsDirs[] = [$rootDir, $prefix, $curModule];
+        BEvents::i()->fire(__METHOD__, ['root_dir' => $rootDir, 'prefix' => $prefix, 'module' => $curModule]);
         return $this;
     }
 
@@ -245,7 +247,7 @@ class BLayout extends BClass
         $rootDir1 = str_replace('\\', '/', realpath($rootDir));
 
         if (!$rootDir1) {
-            BDebug::warning('Invalid root view dir: '.$rootDir);
+            BDebug::warning('Invalid root view dir: ' . $rootDir);
         }
         return $rootDir1;
     }
@@ -259,7 +261,7 @@ class BLayout extends BClass
     public function collectAllViewsFiles($area = null)
     {
         $t = BDebug::debug(__METHOD__);
-        if (is_null($area)) {
+        if (null === $area) {
             $area = BApp::i()->get('area');
         }
         $cacheKey = 'ALL_VIEWS-' . $area;
@@ -292,13 +294,13 @@ class BLayout extends BClass
                     }*/
                     if (preg_match($re, $file, $m)) {
                         $viewName = $prefix . $m[2];
-                        $viewParams = array(
+                        $viewParams = [
                             'template' => $file,
                             'file_ext' => $m[3],
                             'module_name' => $dirData[2]->name, // module
                             'renderer' => static::$_extRenderers[$m[3]]['callback'],
-                            'overrides' => array(),
-                        );
+                            'overrides' => [],
+                        ];
                         if ($this->_rememberOverrides && !empty($this->_addViewsFiles[$viewName])) {
                             $oldViewParams = $this->_addViewsFiles[$viewName];
                             $viewParams['overrides'] = $oldViewParams['overrides'];
@@ -309,7 +311,7 @@ class BLayout extends BClass
                     }
                 }
             }
-            $this->_addViewsDirs = array();
+            $this->_addViewsDirs = [];
             if ($useCache) {
                 BCache::i()->save($cacheKey, $this->_addViewsFiles);
             } else {
@@ -320,7 +322,7 @@ class BLayout extends BClass
         foreach ($this->_addViewsFiles as $viewName => $viewParams) {
             $this->addView($viewName, $viewParams);
         }
-        $this->_addViewsFiles = array();
+        $this->_addViewsFiles = [];
         return $this;
     }
 
@@ -336,7 +338,7 @@ class BLayout extends BClass
      */
     public function addAllViews($rootDir, $prefix = '', $curModule = null)
     {
-        if (is_null($curModule)) {
+        if (null === $curModule) {
             $curModule = BModuleRegistry::i()->currentModuleName();
         }
         $rootDir = $this->processRootDir($rootDir, $curModule);
@@ -360,17 +362,17 @@ class BLayout extends BClass
             }*/
             if (preg_match($re, $file, $m)) {
                 //$this->view($prefix.$m[2], array('template'=>$m[2].$m[3]));
-                $viewParams = array(
+                $viewParams = [
                     'template' => $file,
                     'file_ext' => $m[3],
                     'module_name' => $curModule,
                     'renderer' => static::$_extRenderers[$m[3]]['callback'],
-                );
+                ];
                 $this->addView($prefix . $m[2], $viewParams);
             }
         }
 
-        BEvents::i()->fire(__METHOD__, array('root_dir'=>$rootDir, 'prefix'=>$prefix, 'module'=>$curModule));
+        BEvents::i()->fire(__METHOD__, ['root_dir' => $rootDir, 'prefix' => $prefix, 'module' => $curModule]);
 
         return $this;
     }
@@ -388,11 +390,10 @@ class BLayout extends BClass
     /**
      * Set default view class
      *
-     * @todo rename to setDefaultViewClass()
      * @param mixed $className
      * @return BLayout
      */
-    public function defaultViewClass($className)
+    public function setDefaultViewClass($className)
     {
         $this->_defaultViewClass = $className;
         return $this;
@@ -438,7 +439,7 @@ class BLayout extends BClass
      * @return $this
      * @throws BException
      */
-    public function addView($viewName, $params = array(), $reset = false)
+    public function addView($viewName, $params = [], $reset = false)
     {
         if (is_array($viewName)) {
             foreach ($viewName as $i => $view) {
@@ -451,7 +452,7 @@ class BLayout extends BClass
             return $this;
         }
         if (is_string($params)) {
-            $params = array('view_class' => $params);
+            $params = ['view_class' => $params];
         }
         if (empty($params['module_name']) && ($moduleName = BModuleRegistry::i()->currentModuleName())) {
             $params['module_name'] = $moduleName;
@@ -498,7 +499,7 @@ class BLayout extends BClass
      */
     public function findViewsRegex($re)
     {
-        $views = array();
+        $views = [];
         foreach ($this->_views as $viewName => $view) {
             if (preg_match($re, $viewName)) {
                 $views[$viewName] = $view;
@@ -545,7 +546,7 @@ class BLayout extends BClass
      */
     public function cloneView($from, $to = null)
     {
-        if (is_null($to)) {
+        if (null === $to) {
             $to = $from . '-copy';
             for ($i = 2; !empty($this->_views[$to]); $i++) {
                 $to = $from . '-copy' . $i;
@@ -565,7 +566,7 @@ class BLayout extends BClass
      * @param array  $args
      * @return $this
      */
-    public function hook($hookName, $callback, $args = array(), $alias = null)
+    public function hook($hookName, $callback, $args = [], $alias = null)
     {
         BEvents::i()->on('BLayout::hook:' . $hookName, $callback, $args, $alias);
 
@@ -582,7 +583,7 @@ class BLayout extends BClass
      * @param array $args
      * @return $this
      */
-    public function hookView($hookName, $viewName, $args = array())
+    public function hookView($hookName, $viewName, $args = [])
     {
         if (is_array($viewName)) {
             $params   = $viewName;
@@ -622,7 +623,7 @@ class BLayout extends BClass
      */
     public function layout($layoutName, $layout = null)
     {
-        if (is_array($layoutName) || !is_null($layout)) {
+        if (is_array($layoutName) || null !== $layout) {
             $this->addLayout($layoutName, $layout);
         } else {
             $this->applyLayout($layoutName);
@@ -644,15 +645,15 @@ class BLayout extends BClass
         if (!BUtil::isPathAbsolute($layoutFilename)) {
             $mod = BModuleRegistry::i()->currentModule();
             if ($mod) {
-                $layoutFilename = $mod->root_dir.'/'.$layoutFilename;
+                $layoutFilename = $mod->root_dir . '/' . $layoutFilename;
             }
         }
-        BDebug::debug('LAYOUT.LOAD: '.$layoutFilename);
+        BDebug::debug('LAYOUT.LOAD: ' . $layoutFilename);
         switch ($ext) {
             case 'yml': case 'yaml': $layoutData = BYAML::i()->load($layoutFilename); break;
             case 'json': $layoutData = json_decode(file_get_contents($layoutFilename)); break;
             case 'php': $layoutData = include($layoutFilename); break;
-            default: throw new BException('Unknown layout file type: '.$layoutFilename);
+            default: throw new BException('Unknown layout file type: ' . $layoutFilename);
         }
         //$this->_layoutDataCache[$layoutFilename] = $layoutData;
         $this->addLayout($layoutData);
@@ -670,7 +671,7 @@ class BLayout extends BClass
         if (!BUtil::isPathAbsolute($layoutFilename)) {
             $mod = BModuleRegistry::i()->currentModule();
             if ($mod) {
-                $layoutFilename = $mod->root_dir.'/'.$layoutFilename;
+                $layoutFilename = $mod->root_dir . '/' . $layoutFilename;
             }
         }
         if ($first) {
@@ -690,7 +691,7 @@ class BLayout extends BClass
     public function loadLayoutFilesFromAllModules()
     {
         $t = BDebug::debug(__METHOD__);
-        $cacheKey = 'LAYOUTS-'.BApp::i()->get('area'); //TODO: more flexible key
+        $cacheKey = 'LAYOUTS-' . BApp::i()->get('area'); //TODO: more flexible key
         $cacheConfig = BConfig::i()->get('core/cache/layout_files');
         $useCache = !$cacheConfig && BDebug::is('STAGING,PRODUCTION') || $cacheConfig === 'enable';
         if ($useCache) {
@@ -702,7 +703,7 @@ class BLayout extends BClass
             foreach ($this->_loadLayoutFiles as $layoutFile) {
                 $this->loadLayout($layoutFile);
             }
-            $this->_loadLayoutFiles = array();
+            $this->_loadLayoutFiles = [];
             if ($useCache) {
                 BCache::i()->save($cacheKey, $this->_layouts);
             } else {
@@ -756,7 +757,7 @@ class BLayout extends BClass
         BDebug::debug('LAYOUT.APPLY ' . $layoutName);
 
         // collect callbacks
-        $callbacks = array();
+        $callbacks = [];
         foreach ($this->_layouts[$layoutName] as $d) {
             $d['layout_name'] = $layoutName;
             if (!empty($d['if'])) {
@@ -771,7 +772,7 @@ class BLayout extends BClass
                 if (!empty($d[0])) {
                     $d['type'] = $d[0];
                 } else {
-                    foreach ($d as $k=>$n) {
+                    foreach ($d as $k => $n) {
                         if (!empty(self::$_metaDirectives[$k])) {
                             $d['type'] = $k;
                             $d['name'] = $n;
@@ -780,7 +781,7 @@ class BLayout extends BClass
                     }
                 }
                 if (empty($d['type'])) {
-                    BDebug::error('Unknown directive: '.print_r($d, 1));
+                    BDebug::error('Unknown directive: ' . print_r($d, 1));
                     continue;
                 }
             }
@@ -799,10 +800,10 @@ class BLayout extends BClass
             if ($d['type'] === 'remove') {
                 if ($d['name'] === 'ALL') { //TODO: allow removing specific instructions
                     BDebug::debug('LAYOUT.REMOVE');
-                    $callbacks = array();
+                    $callbacks = [];
                 }
             } else {
-                $callbacks[] = array($callback, $d);
+                $callbacks[] = [$callback, $d];
             }
         }
 
@@ -840,7 +841,7 @@ class BLayout extends BClass
 
             return;
         }
-        static $layoutsApplied = array();
+        static $layoutsApplied = [];
         if (!empty($layoutsApplied[$d['name']]) && empty($d['repeat'])) {
             return;
         }
@@ -861,7 +862,7 @@ class BLayout extends BClass
      */
     public function metaDirectiveHookCallback($d)
     {
-        $args = !empty($d['args']) ? $d['args'] : array();
+        $args = !empty($d['args']) ? $d['args'] : [];
         if (!empty($d['position'])) {
             $args['position'] = $d['position'];
         }
@@ -903,8 +904,10 @@ class BLayout extends BClass
             foreach ($d['do'] as $args) {
                 $method = array_shift($args);
                 BDebug::debug('LAYOUT.view.do ' . $method .
-                    (!empty($args[0]) ? (' ('.print_r($args[0],1).(!empty($args[1]) ? (', '.json_encode($args[1])) : '').')') : ''));
-                call_user_func_array(array($view, $method), $args);
+                    (!empty($args[0]) ? (' (' . print_r($args[0], 1) . (
+                        !empty($args[1]) ? (', ' . json_encode($args[1])) : '') . ')') : ''
+                    ));
+                call_user_func_array([$view, $method], $args);
             }
         }
     }
@@ -917,7 +920,7 @@ class BLayout extends BClass
      */
     public function defaultTheme($themeName = null)
     {
-        if (is_null($themeName)) {
+        if (null === $themeName) {
             return $this->_defaultTheme;
         }
         $this->_defaultTheme = $themeName;
@@ -966,10 +969,10 @@ class BLayout extends BClass
      */
     public function getThemes($area = null, $asOptions = false)
     {
-        if (is_null($area)) {
+        if (null === $area) {
             return $this->_themes;
         }
-        $themes = array();
+        $themes = [];
         foreach ($this->_themes as $name => $theme) {
             if (!empty($theme['area']) && $theme['area'] === $area) {
                 if ($asOptions) {
@@ -989,7 +992,7 @@ class BLayout extends BClass
      */
     public function applyTheme($themeName = null)
     {
-        if (is_null($themeName)) {
+        if (null === $themeName) {
             if (!$this->_defaultTheme) {
                 BDebug::error('Empty theme supplied and no default theme is set');
             }
@@ -1002,12 +1005,12 @@ class BLayout extends BClass
             return $this;
         }
         BDebug::debug('THEME.APPLY ' . $themeName);
-        BEvents::i()->fire('BLayout::applyTheme:before', array('theme_name' => $themeName));
+        BEvents::i()->fire('BLayout::applyTheme:before', ['theme_name' => $themeName]);
 
         $this->loadTheme($themeName);
         $this->loadLayoutFilesFromAllModules();
 
-        BEvents::i()->fire('BLayout::applyTheme:after', array('theme_name' => $themeName));
+        BEvents::i()->fire('BLayout::applyTheme:after', ['theme_name' => $themeName]);
 
         return $this;
     }
@@ -1035,20 +1038,20 @@ class BLayout extends BClass
             }
         }
 
-        BEvents::i()->fire('BLayout::loadTheme:before', array('theme_name' => $themeName, 'theme' => $theme));
+        BEvents::i()->fire('BLayout::loadTheme:before', ['theme_name' => $themeName, 'theme' => $theme]);
 
-        $modRootDir = !empty($theme['module_name']) ? BApp::m($theme['module_name'])->root_dir.'/' : '';
+        $modRootDir = !empty($theme['module_name']) ? BApp::m($theme['module_name'])->root_dir . '/' : '';
         if (!empty($theme['layout'])) {
-            $this->loadLayoutAfterTheme($modRootDir.$theme['layout'], true);
+            $this->loadLayoutAfterTheme($modRootDir . $theme['layout'], true);
         }
         if (!empty($theme['views'])) {
-            $this->addAllViews($modRootDir.$theme['views']);
+            $this->addAllViews($modRootDir . $theme['views']);
         }
         if (!empty($theme['callback'])) {
             BUtil::i()->call($theme['callback']);
         }
 
-        BEvents::i()->fire('BLayout::loadTheme:after', array('theme_name' => $themeName, 'theme' => $theme));
+        BEvents::i()->fire('BLayout::loadTheme:after', ['theme_name' => $themeName, 'theme' => $theme]);
 
         return true;
     }
@@ -1077,9 +1080,9 @@ class BLayout extends BClass
      * @param mixed $args
      * @return array
      */
-    public function dispatch($eventName, $routeName = null, $args = array())
+    public function dispatch($eventName, $routeName = null, $args = [])
     {
-        if (is_null($routeName) && ($route = BRouting::i()->currentRoute())) {
+        if (null === $routeName && ($route = BRouting::i()->currentRoute())) {
             $args['route_name'] = $routeName = $route->route_name;
         }
         $result = BEvents::i()->fire("BLayout::{$eventName}", $args);
@@ -1101,7 +1104,7 @@ class BLayout extends BClass
      * @param array  $args Render arguments
      * @return mixed
      */
-    public function render($routeName = null, $args = array())
+    public function render($routeName = null, $args = [])
     {
         $this->dispatch('render:before', $routeName, $args);
 
@@ -1118,6 +1121,35 @@ class BLayout extends BClass
         //BSession::i()->dirty(false); // disallow session change during layout render
 
         return $result;
+    }
+
+    public function viewStackOn($view)
+    {
+        array_push($this->_currentViewStack, $view);
+        return $this;
+    }
+
+    public function viewStackOff($view)
+    {
+        $lastView = array_pop($this->_currentViewStack);
+        $lastViewName = $lastView->getParam('view_name');
+        $viewName = $view->getParam('view_name');
+        if ($lastViewName !== $viewName) {
+            BDebug::debug('Wrong view stack off: ' . $viewName . ', expected: ' . $lastViewName);
+        }
+        return $this;
+    }
+
+    public function getViewStack($formatted = false)
+    {
+        if (!$formatted) {
+            return $this->_currentViewStack;
+        }
+        $output = array();
+        foreach ($this->_currentViewStack as $i => $view) {
+            $output[] = "#{$i}: @{$view->getParam('module_name')}/{$view->getParam('view_name')}";
+        }
+        return join("\n", $output);
     }
 
     /**
@@ -1176,7 +1208,7 @@ class BView extends BClass
      * @param array  $params
      * @return BView
      */
-    static public function factory($viewName, array $params = array())
+    static public function factory($viewName, array $params = [])
     {
         $params['view_name'] = $viewName;
         $className           = !empty($params['view_class']) ? $params['view_class'] : get_called_class();
@@ -1204,7 +1236,7 @@ class BView extends BClass
      */
     public function param($key = null)
     {
-        if (is_null($key)) {
+        if (null === $key) {
             return $this->_params;
         }
 
@@ -1272,7 +1304,7 @@ class BView extends BClass
      */
     public function getAllArgs()
     {
-        return !empty($this->_params['args']) ? $this->_params['args'] : array();
+        return !empty($this->_params['args']) ? $this->_params['args'] : [];
     }
 
     /**
@@ -1350,7 +1382,7 @@ class BView extends BClass
      * @param array  $args
      * @return string
      */
-    public function hook($hookName, $args = array())
+    public function hook($hookName, $args = [])
     {
         $args['_viewname'] = $this->param('view_name');
         $result = '';
@@ -1360,11 +1392,11 @@ class BView extends BClass
             $result .= "<!-- START HOOK: {$hookName} -->\n";
         }
 
-        $result .= join('', BEvents::i()->fire('BView::hook:before', array('view' => $this, 'name' => $hookName)));
+        $result .= join('', BEvents::i()->fire('BView::hook:before', ['view' => $this, 'name' => $hookName]));
 
         $result .= join('', BEvents::i()->fire('BLayout::hook:' . $hookName, $args));
 
-        $result .= join('', BEvents::i()->fire('BView::hook:after', array('view' => $this, 'name' => $hookName)));
+        $result .= join('', BEvents::i()->fire('BView::hook:after', ['view' => $this, 'name' => $hookName]));
 
         if ($debug) {
             $result .= "<!-- END HOOK: {$hookName} -->\n";
@@ -1380,7 +1412,7 @@ class BView extends BClass
      */
     public function getTemplateFileName($fileExt = null, $quiet = false)
     {
-        if (is_null($fileExt)) {
+        if (null === $fileExt) {
             $fileExt = $this->getParam('file_ext');
         }
         $template = $this->param('template');
@@ -1429,9 +1461,11 @@ class BView extends BClass
     {
         $renderer = $this->getParam('renderer');
         if ($renderer) {
+            BDebug::debug('VIEW.RENDER "' . $this->param('view_name') . '" USING ' . print_r($renderer, 1));
             return call_user_func($renderer, $this);
         }
 
+        BDebug::debug('VIEW.RENDER "' . $this->param('view_name') . '" USING PHP');
         ob_start();
         include $this->getTemplateFileName();
         return ob_get_clean();
@@ -1444,7 +1478,7 @@ class BView extends BClass
      * @param bool  $retrieveMetaData
      * @return string
      */
-    public function render(array $args = array(), $retrieveMetaData = false)
+    public function render(array $args = [], $retrieveMetaData = false)
     {
         $debug = BDebug::is('DEBUG') && !$this->get('no_debug');
         $viewName = $this->param('view_name');
@@ -1468,12 +1502,16 @@ class BView extends BClass
             return $result;
         }
 
-        $showDebugTags = $debug && $modName && $viewName && BLayout::i()->getRootViewName()!==$viewName;
+        $showDebugTags = $debug && $modName && $viewName && BLayout::i()->getRootViewName() !== $viewName;
 
         if ($showDebugTags) {
             $result .= "<!-- START VIEW: @{$modName}/{$viewName} -->\n";
         }
-        $result .= join('', BEvents::i()->fire('BView::render:before', array('view' => $this)));
+
+        // TODO: link views with layouts
+        BLayout::i()->viewStackOn($this);
+
+        $result .= join('', BEvents::i()->fire('BView::render:before', ['view' => $this]));
 
         $viewContent = $this->_render();
 
@@ -1483,7 +1521,9 @@ class BView extends BClass
         }
 
         $result .= $viewContent;
-        $result .= join('', BEvents::i()->fire('BView::render:after', array('view' => $this)));
+        $result .= join('', BEvents::i()->fire('BView::render:after', ['view' => $this]));
+
+        BLayout::i()->viewStackOff($this);
 
         if ($showDebugTags) {
             $result .= "<!-- END VIEW: @{$modName}/{$viewName} -->\n";
@@ -1500,9 +1540,9 @@ class BView extends BClass
 
     public function collectMetaData($viewContent = null)
     {
-        $t = BDebug::debug('COLLECT META DATA: '.$this->getParam('view_name'));
+        $t = BDebug::debug('COLLECT META DATA: ' . $this->getParam('view_name'));
 
-        if (is_null($viewContent)) {
+        if (null === $viewContent) {
             $prerendered = false;
             $viewContent = $this->getParam('source');
             if (!$viewContent) {
@@ -1529,15 +1569,15 @@ class BView extends BClass
             $metaOutput = $metaContent;
         } else {
             // create a view with only meta tags
-            $metaView = BView::i()->factory($this->getParam('view_name').'__meta', array(
+            $metaView = BView::i()->factory($this->getParam('view_name') . '__meta', [
                 'renderer' => $this->getParam('renderer'),
                 'source' => $metaContent,
-            ));
+            ]);
             // render the meta view for variables interpolation
             $metaOutput = $metaView->_render();
         }
         // collect meta data
-        $metaData = array();
+        $metaData = [];
         if (preg_match_all(static::$_metaDataRegex, $metaOutput, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $m) {
                 $metaData[$m[1]] = $m[2];
@@ -1568,13 +1608,13 @@ class BView extends BClass
                 BLayout::i()->addLayout('viewproxy-metadata', $layoutData)->applyLayout('viewproxy-metadata');
             }
             if (($head = $this->view('head'))) {
-                foreach ($metaData as $k=>$v) {
+                foreach ($metaData as $k => $v) {
                     $k = strtolower($k);
                     switch ($k) {
                     case 'title':
                         $head->addTitle($v); break;
                     case 'meta_title': case 'meta_description': case 'meta_keywords':
-                        $head->meta(str_replace('meta_','',$k), $v); break;
+                        $head->meta(str_replace('meta_', '', $k), $v); break;
                     }
                 }
             }
@@ -1643,9 +1683,9 @@ class BView extends BClass
      * @param array  $args
      * @return string
      */
-    public function q($str, $args = array())
+    public function q($str, $args = [])
     {
-        if (is_null($str)) {
+        if (null === $str) {
             return '';
         }
         if (!is_scalar($str)) {
@@ -1699,15 +1739,15 @@ class BView extends BClass
      * @param array|string $p if string, used as "To:" header
      * @return bool true if successful
      */
-    public function email($p = array())
+    public function email($p = [])
     {
         if (is_string($p)) {
-            $p = array('to' => $p);
+            $p = ['to' => $p];
         }
 
         $body = $this->render($p, true);
 
-        $metaData = $this->param('meta_data') ? array_change_key_case($this->param('meta_data'), CASE_LOWER) : array();
+        $metaData = $this->param('meta_data') ? array_change_key_case($this->param('meta_data'), CASE_LOWER) : [];
         $data = array_merge($metaData, array_change_key_case($p, CASE_LOWER));
         $data['body'] = $body;
 
@@ -1722,7 +1762,7 @@ class BView extends BClass
      * @param string $module if null, try to get current view module
      * @return \false|string
      */
-    public function _($string, $params = array(), $module = null)
+    public function _($string, $params = [], $module = null)
     {
         if (empty($module) && !empty($this->_params['module_name'])) {
             $module = $this->_params['module_name'];
@@ -1731,17 +1771,22 @@ class BView extends BClass
         return BLocale::_($string, $params, $module);
     }
 
-    protected $_validators = array();
+    protected $_validators = [];
 
     public function validator($formName, $data = null)
     {
         if (empty($this->_validators[$formName])) {
-            $this->_validators[$formName] = BValidateViewHelper::i(true, array(
+            $this->_validators[$formName] = BValidateViewHelper::i(true, [
                 'form' => $formName,
                 'data' => $data,
-            ));
+            ]);
         }
         return $this->_validators[$formName];
+    }
+
+    public function twigName()
+    {
+        return "@{$this->_params['module_name']}/{$this->_params['view_name']}{$this->_params['file_ext']}";
     }
 }
 
@@ -1750,7 +1795,7 @@ class BView extends BClass
  */
 class BViewEmpty extends BView
 {
-    public function render(array $args = array(), $retrieveMetaData = true)
+    public function render(array $args = [], $retrieveMetaData = true)
     {
         return '';
     }
@@ -1764,7 +1809,7 @@ class BViewHead extends BView
     /**
      * @var array
      */
-    protected $_title = array();
+    protected $_title = [];
 
     /**
      * @var string
@@ -1781,21 +1826,21 @@ class BViewHead extends BView
      *
      * @var array
      */
-    protected $_subst = array();
+    protected $_subst = [];
 
     /**
      * Meta tags
      *
      * @var array
      */
-    protected $_meta = array();
+    protected $_meta = [];
 
     /**
      * External resources (JS and CSS)
      *
      * @var array
      */
-    protected $_elements = array();
+    protected $_elements = [];
 
     /**
      * Support for head.js
@@ -1803,7 +1848,7 @@ class BViewHead extends BView
      * @see http://headjs.com/
      * @var array
      */
-    protected $_headJs = array('enabled' => false, 'loaded' => false, 'jquery' => null, 'scripts' => array());
+    protected $_headJs = ['enabled' => false, 'loaded' => false, 'jquery' => null, 'scripts' => []];
 
     /**
      * Support for require.js
@@ -1811,14 +1856,14 @@ class BViewHead extends BView
      * @see http://requirejs.org/
      * @var array
      */
-    protected $_requireJs = array('config' => array(), 'run' => array());
+    protected $_requireJs = ['config' => [], 'run' => []];
 
     /**
      * Default tag templates for JS and CSS resources
      *
      * @var array
      */
-    protected $_defaultTag = array(
+    protected $_defaultTag = [
         'js'      => '<script type="text/javascript" src="%s" %a></script>',
         'js_raw'  => '<script type="text/javascript" %a>%c</script>',
         'css'     => '<link rel="stylesheet" type="text/css" href="%s" %a/>',
@@ -1826,7 +1871,7 @@ class BViewHead extends BView
         //'less' => '<link rel="stylesheet" type="text/less" href="%s" %a/>',
         'less'    => '<link rel="stylesheet/less" type="text/css" href="%s" %a/>',
         'icon'    => '<link rel="icon" href="%s" type="image/x-icon" %a/><link rel="shortcut icon" href="%s" type="image/x-icon" %a/>',
-    );
+    ];
 
     /**
      * Current IE <!--[if]--> context
@@ -1842,7 +1887,7 @@ class BViewHead extends BView
      */
     public function subst($from, $to = null)
     {
-        if (is_null($to)) {
+        if (null === $to) {
             return str_replace(array_keys($this->_subst), array_values($this->_subst), $from);
         }
         $this->_subst['{' . $from . '}'] = $to;
@@ -1888,7 +1933,7 @@ class BViewHead extends BView
      */
     public function meta($name = null, $content = null, $httpEquiv = false)
     {
-        if (is_null($content)) {
+        if (null === $content) {
             return $this->getMeta($name);
         }
         $this->addMeta($name, $content, $httpEquiv);
@@ -1909,7 +1954,7 @@ class BViewHead extends BView
      */
     public function canonical($href)
     {
-        $this->addElement('link', 'canonical', array('tag' => '<link rel="canonical" href="' . $href . '"/>'));
+        $this->addElement('link', 'canonical', ['tag' => '<link rel="canonical" href="' . $href . '"/>']);
 
         return $this;
     }
@@ -1921,7 +1966,7 @@ class BViewHead extends BView
      */
     public function rss($href)
     {
-        $this->addElement('link', 'rss', array('tag' => '<link rel="alternate" type="application/rss+xml" title="RSS" href="' . $href . '">'));
+        $this->addElement('link', 'rss', ['tag' => '<link rel="alternate" type="application/rss+xml" title="RSS" href="' . $href . '">']);
     }
 
     /**
@@ -1935,7 +1980,7 @@ class BViewHead extends BView
     {
         if (!empty($this->_defaultTag[$name])) {
             array_unshift($args, $name);
-            return call_user_func_array(array($this, 'addElement'), $args);
+            return call_user_func_array([$this, 'addElement'], $args);
         } else {
             BDebug::error('Invalid method: ' . $name);
         }
@@ -1943,8 +1988,8 @@ class BViewHead extends BView
 
     public function removeAll()
     {
-        $this->_elements = array();
-        $this->_headJs = array();
+        $this->_elements = [];
+        $this->_headJs = [];
         return $this;
     }
 
@@ -1959,13 +2004,13 @@ class BViewHead extends BView
     {
         if ($type === 'js' && $this->_headJs['loaded']) {
             foreach ($this->_headJs['scripts'] as $i => $file) {
-                if (true===$pattern || strpos($file, $pattern) !== false) {
+                if (true === $pattern || strpos($file, $pattern) !== false) {
                     unset($this->_headJs['scripts'][$i]);
                 }
             }
         }
         foreach ($this->_elements as $k => $args) {
-            if (strpos($k, $type) === 0 && (true===$pattern || strpos($k, $pattern) !== false)) {
+            if (strpos($k, $type) === 0 && (true === $pattern || strpos($k, $pattern) !== false)) {
                 unset($this->_elements[$k]);
             }
         }
@@ -1982,7 +2027,7 @@ class BViewHead extends BView
      */
     public function setTitle($title)
     {
-        $this->_title = array($title);
+        $this->_title = [$title];
         return $this;
     }
 
@@ -2054,7 +2099,7 @@ if (BDebug::is('DEBUG')) {
     #var_dump($this->_title); exit;
 }
         $this->_title = array_filter($this->_title, function ($val) use ($pattern) {
-            return !preg_match('#'.$pattern.'#', $val);
+            return !preg_match('#' . $pattern . '#', $val);
         });
         return $this;
     }
@@ -2069,7 +2114,7 @@ if (BDebug::is('DEBUG')) {
      */
     public function getMeta($name = null)
     {
-        if (is_null($name)) {
+        if (null === $name) {
             return join("\n", $this->_meta);
         }
 
@@ -2102,12 +2147,12 @@ if (BDebug::is('DEBUG')) {
      * @param array $args
      * @return $this
      */
-    public function addElement($type, $name, $args = array())
+    public function addElement($type, $name, $args = [])
     {
 //echo "<pre>"; debug_print_backtrace(); echo "</pre>";
 //var_dump($type, $name, $args);
         if (is_string($args)) {
-            $args = array('content' => $args);
+            $args = ['content' => $args];
         }
         if (!empty($args['alias'])) {
             $args['file'] = trim($name);
@@ -2125,7 +2170,7 @@ if (BDebug::is('DEBUG')) {
         } else {
             $this->_elements = BUtil::arrayInsert(
                 $this->_elements,
-                array($type . ':' . $name => (array)$args),
+                [$type . ':' . $name => (array)$args],
                 $args['position']
             );
 #echo "<pre>"; print_r($this->_elements); echo "</pre>";
@@ -2145,8 +2190,8 @@ if (BDebug::is('DEBUG')) {
     public function src($file, $ts = false)
     {
         if (is_array($file)) {
-            $files = array();
-            foreach ($file as $k=>$f) {
+            $files = [];
+            foreach ($file as $k => $f) {
                 $files[$k] = $this->src($f, $ts);
             }
             return $files;
@@ -2227,8 +2272,8 @@ if (BDebug::is('DEBUG')) {
      */
     public function getAllElements()
     {
-        $result = array();
-        $res1   = array();
+        $result = [];
+        $res1   = [];
         foreach ($this->_elements as $typeName => $els) {
             list($type, $name) = explode(':', $typeName, 2);
             //$result[] = $this->getElement($type, $name);
@@ -2258,16 +2303,16 @@ if (BDebug::is('DEBUG')) {
 
     public function requireModulePath($name = null, $path = null)
     {
-        if (is_null($name)) {
+        if (null === $name) {
             $m = BApp::m();
             $name = $m->name;
         } else {
             $m = BApp::m($name);
         }
-        if (is_null($path)) {
-            $path = trim($m->base_src, '/').'/js';
+        if (null === $path) {
+            $path = trim($m->base_src, '/') . '/js';
         }
-        BDebug::debug(__METHOD__.':'.$name.':'.$path);
+        BDebug::debug(__METHOD__ . ':' . $name . ':' . $path);
         $this->_requireJs['config']['paths'][$name] = $path;
         return $this;
     }
@@ -2275,7 +2320,7 @@ if (BDebug::is('DEBUG')) {
     public function requireJs($name, $path, $shim = null)
     {
         $this->_requireJs['config']['paths'][$name] = $path;
-        if (!is_null($shim)) {
+        if (null !== $shim) {
             $this->_requireJs['config']['shim'][$name] = $shim;
         }
         return $this;
@@ -2295,7 +2340,7 @@ if (BDebug::is('DEBUG')) {
 
     public function renderRequireJs()
     {
-        $jsArr = array();
+        $jsArr = [];
         if (!empty($this->_requireJs['config'])) {
             $config = $this->_requireJs['config'];
             if (empty($config['baseUrl'])) {
@@ -2309,7 +2354,7 @@ if (BDebug::is('DEBUG')) {
             // if (BDebug::is('DEBUG')) {
             //     $config['urlArgs'] = 'bust='.time();
             // }
-            $jsArr[] = "require.config(".BUtil::toJavaScript($config)."); ";
+            $jsArr[] = "require.config(" . BUtil::toJavaScript($config) . "); ";
         }
         if (!empty($this->_requireJs['run'])) {
             $jsArr[] = "require(['" . join("', '", $this->_requireJs['run']) . "']);";
@@ -2326,12 +2371,12 @@ if (BDebug::is('DEBUG')) {
      * @param bool  $retrieveMetaData
      * @return string
      */
-    public function render(array $args = array(), $retrieveMetaData = true)
+    public function render(array $args = [], $retrieveMetaData = true)
     {
         if (!$this->param('template')) {
             $html = $this->getTitle() . "\n" . $this->getMeta() . "\n" . $this->getAllElements();
 
-            $scriptsArr = array();
+            $scriptsArr = [];
             if ($this->_headJs['scripts'] || $this->_headJs['jquery']) {
                 if ($this->_headJs['scripts']) {
                     $scriptsArr[] = 'head.js("' . join('", "', $this->_headJs['scripts']) . '");';
@@ -2369,7 +2414,7 @@ class BViewList extends BView
      *
      * @var array
      */
-    protected $_children = array();
+    protected $_children = [];
 
     /**
      * Last registered position to sort children
@@ -2385,7 +2430,7 @@ class BViewList extends BView
      * @param array        $params
      * @return BViewList
      */
-    public function append($viewname, array $params = array())
+    public function append($viewname, array $params = [])
     {
         if (is_string($viewname)) {
             $viewname = explode(',', $viewname);
@@ -2414,7 +2459,7 @@ class BViewList extends BView
     {
         $layout = BLayout::i();
         for ($viewname = md5(mt_rand()); $layout->getView($viewname);) ;
-        $layout->addView($viewname, array('raw_text' => (string)$text));
+        $layout->addView($viewname, ['raw_text' => (string)$text]);
         $this->append($viewname);
 
         return $this;
@@ -2449,7 +2494,7 @@ class BViewList extends BView
     public function remove($viewname)
     {
         if (true === $viewname) {
-            $this->_children = array();
+            $this->_children = [];
 
             return $this;
         }
@@ -2471,10 +2516,10 @@ class BViewList extends BView
      * @throws BException
      * @return string
      */
-    public function render(array $args = array(), $retrieveMetaData = true)
+    public function render(array $args = [], $retrieveMetaData = true)
     {
-        $output = array();
-        uasort($this->_children, array($this, 'sortChildren'));
+        $output = [];
+        uasort($this->_children, [$this, 'sortChildren']);
         $layout = BLayout::i();
         foreach ($this->_children as $child) {
             $childView = $layout->getView($child['name']);

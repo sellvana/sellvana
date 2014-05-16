@@ -5,14 +5,14 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_cms_block';
     protected static $_origClass = __CLASS__;
 
-    protected static $_validationRules = array(
-        array('handle', '@required'),
+    protected static $_validationRules = [
+        ['handle', '@required'],
         /*array('version', '@required'),*/
 
-        array('version', '@integer'),
-        array('page_enabled', '@integer'),
-        array('page_url', 'FCom_Cms_Model_Block::rulePageUrlUnique', 'Duplicate URL Key'),
-    );
+        ['version', '@integer'],
+        ['page_enabled', '@integer'],
+        ['page_url', 'FCom_Cms_Model_Block::rulePageUrlUnique', 'Duplicate URL Key'],
+    ];
 
     public function validateBlock()
     {
@@ -41,7 +41,7 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
         $this->set('update_at', BDb::now());
         $this->set('modified_time', time()); // attempt to compare with filemtime() for caching
 
-        if ($this->get('page_url')==='') {
+        if ($this->get('page_url') === '') {
             $this->set('page_url', null);
         }
         return true;
@@ -52,7 +52,7 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
         parent::onAfterSave();
 
         $user = FCom_Admin_Model_User::i()->sessionUser();
-        $hist = FCom_Cms_Model_BlockHistory::i()->create(array(
+        $hist = FCom_Cms_Model_BlockHistory::i()->create([
             'block_id' => $this->id,
             'user_id' => $user ? $user->id : null,
             'username' => $user ? $user->username : null,
@@ -60,7 +60,7 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
             'comments' => $this->version_comments ? $this->version_comments : 'version ' . $this->version,
             'ts' => BDb::now(),
             'data' => BUtil::toJson(BUtil::arrayMask($this->as_array(), 'content')), // more fields?
-        ))->save();
+        ])->save();
     }
 
     /**
@@ -84,7 +84,7 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
         return true;
     }
 
-    public function createView($params = array())
+    public function createView($params = [])
     {
         return FCom_Cms_Frontend_View_Block::i()->createView($this, $params);
     }

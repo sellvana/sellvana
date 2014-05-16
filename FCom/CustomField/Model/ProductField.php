@@ -4,18 +4,20 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_product_custom';
+    protected static $_importExportProfile = ['skip' => [],
+     'related' => ['product_id' => 'FCom_Catalog_Model_Product.id',],  ];
 
-    public function productFields($p, $r=array())
+    public function productFields($p, $r = [])
     {
-        $where = array();
+        $where = [];
         if ($p->get('_fieldset_ids') || !empty($r['add_fieldset_ids'])) {
             $addSetIds = BUtil::arrayCleanInt($p->get('_fieldset_ids'));
             if (!empty($r['add_fieldset_ids'])) {
                 //$addSetIds += BUtil::arrayCleanInt($r['add_fieldset_ids']);
                 $addSetIds = array_merge($addSetIds, BUtil::arrayCleanInt($r['add_fieldset_ids']));
             }
-            $where['OR'][] = "f.id IN (SELECT field_id FROM ".FCom_CustomField_Model_SetField::table()
-                ." WHERE set_id IN (".join(',', $addSetIds)."))";
+            $where['OR'][] = "f.id IN (SELECT field_id FROM " . FCom_CustomField_Model_SetField::table()
+                . " WHERE set_id IN (" . join(',', $addSetIds) . "))";
                 $p->set('_fieldset_ids', join(',', array_unique($addSetIds)));
         }
 
@@ -26,7 +28,7 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
                 $addFieldIds = array_merge($addFieldIds, BUtil::arrayCleanInt($r['add_field_ids']));
             }
 
-            $where['OR'][] = "f.id IN (".join(',', $addFieldIds).")";
+            $where['OR'][] = "f.id IN (" . join(',', $addFieldIds) . ")";
             $p->set('_add_field_ids', join(',', array_unique($addFieldIds)));
         }
 
@@ -36,19 +38,19 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
                 //$hideFieldIds += BUtil::arrayCleanInt($r['hide_field_ids']);
                 $hideFieldIds = array_merge($hideFieldIds, BUtil::arrayCleanInt($r['hide_field_ids']));
             }
-            if (!empty($r['add_field_ids'])){
+            if (!empty($r['add_field_ids'])) {
                 //don't hide hidden fileds which user wants to add even
                 $addFieldIdsUnset = BUtil::arrayCleanInt($p->_add_field_ids);
                 $hideFieldIds = array_diff($hideFieldIds, $addFieldIdsUnset);
             }
-            if (!empty($hideFieldIds)){
-                $where[] = "f.id NOT IN (".join(',', $hideFieldIds).")";
+            if (!empty($hideFieldIds)) {
+                $where[] = "f.id NOT IN (" . join(',', $hideFieldIds) . ")";
             }
             $p->set('_hide_field_ids', join(',', array_unique($hideFieldIds)));
         }
 
         if (!$where) {
-            $fields = array();
+            $fields = [];
         } else {
             $fields = FCom_CustomField_Model_Field::i()->orm('f')
                     ->select("f.*")
@@ -95,16 +97,16 @@ class FCom_CustomField_Model_ProductField extends FCom_Core_Model_Abstract
 
         $field_unset = false;
         if ($p->get('_add_field_ids')) {
-            $add_fields = explode(",",$p->get('_add_field_ids'));
-            foreach($add_fields as $id => $af){
-                if($af == $hide_field){
+            $add_fields = explode(",", $p->get('_add_field_ids'));
+            foreach ($add_fields as $id => $af) {
+                if ($af == $hide_field) {
                     $field_unset = true;
                     unset($add_fields[$id]);
                 }
             }
             $p->set('_add_field_ids', implode(",", $add_fields));
         }
-        if (false == $field_unset){
+        if (false == $field_unset) {
             if ($p->get('_hide_field_ids')) {
                 $p->set('_hide_field_ids', $p->get('_hide_field_ids') . ',' . $hide_field);
             } else {

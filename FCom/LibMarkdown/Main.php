@@ -8,19 +8,19 @@ class FCom_LibMarkdown_Main extends BClass
 
     static public function bootstrap()
     {
-        BLayout::i()->addRenderer('FCom_LibMarkdown', array(
+        BLayout::i()->addRenderer('FCom_LibMarkdown', [
             'description' => 'Markdown Extra',
-            'callback' => 'FCom_LibMarkdown::renderer',
-            'file_ext' => array('.md'),
-        ));
+            'callback' => 'FCom_LibMarkdown_Main::renderer',
+            'file_ext' => ['.md'],
+        ]);
     }
 
     static public function parser()
     {
         if (!static::$_parser) {
-            require_once __DIR__.'/lib/markdown.php';
+            require_once __DIR__ . '/lib/markdown.php';
             static::$_parser = new MarkdownExtra_Parser;
-            static::$_cacheDir = BConfig::i()->get('fs/cache_dir').'/markdown';
+            static::$_cacheDir = BConfig::i()->get('fs/cache_dir') . '/markdown';
             BUtil::ensureDir(static::$_cacheDir);
         }
         return static::$_parser;
@@ -29,7 +29,7 @@ class FCom_LibMarkdown_Main extends BClass
     static public function renderer($view)
     {
         $viewName = $view->param('view_name');
-        $pId = BDebug::debug('BMarkdown render: '.$viewName);
+        $pId = BDebug::debug('BMarkdown render: ' . $viewName);
         $parser = static::parser();
 
         $source = $view->getParam('source');
@@ -43,8 +43,8 @@ class FCom_LibMarkdown_Main extends BClass
             $mtime = filemtime($sourceFile);
         }
 
-        $cacheDir = static::$_cacheDir.'/'.substr($md5, 0, 2);
-        $cacheFilename = $cacheDir.'/.'.$md5.'.php.cache'; // to help preventing direct php run
+        $cacheDir = static::$_cacheDir . '/' . substr($md5, 0, 2);
+        $cacheFilename = $cacheDir . '/.' . $md5 . '.php.cache'; // to help preventing direct php run
         if (!file_exists($cacheFilename) || $mtime > filemtime($cacheFilename)) {
             BUtil::ensureDir($cacheDir);
             if (!$source) {

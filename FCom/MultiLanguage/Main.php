@@ -13,12 +13,12 @@ class FCom_MultiLanguage_Main extends BClass
     public static function bootstrap()
     {
         $lang = static::getLanguage();
-        if(!empty($lang)){
+        if (!empty($lang)) {
             BSession::i()->set('_language', $lang);
         }
-        FCom_Admin_Model_Role::i()->createPermission(array(
+        FCom_Admin_Model_Role::i()->createPermission([
             'translations' => 'Translations',
-        ));
+        ]);
 
     }
 
@@ -45,7 +45,7 @@ class FCom_MultiLanguage_Main extends BClass
         return $this->modelLoadLocale($args, static::ENTITY_TYPE_CATEGORY);
     }
 
-    public function categoryCollectionLoadLocale($args){
+    public function categoryCollectionLoadLocale($args) {
         return $this->modelCollectionLoadLocale($args, static::ENTITY_TYPE_CATEGORY);
     }
 
@@ -69,14 +69,14 @@ class FCom_MultiLanguage_Main extends BClass
         return true;
     }
 
-    public function modelCollectionLoadLocale($args, $entityType){
+    public function modelCollectionLoadLocale($args, $entityType) {
         $lang = static::getLanguage();
         if (!$lang || count($args['result']) == 0) {
             return false;
         }
         $result  = $args['result'];
-        $modelIds   = array();
-        $modelIdIdx = array();
+        $modelIds   = [];
+        $modelIdIdx = [];
         foreach ($result as $idx => $model) {
             /* @var FCom_Core_Model_Abstract $model */
             $id = $model->get('id');
@@ -112,15 +112,15 @@ class FCom_MultiLanguage_Main extends BClass
      * @param array            $fields
      * @return array
      */
-    protected function getTranslations($id, $entityId, $lang, $fields = array())
+    protected function getTranslations($id, $entityId, $lang, $fields = [])
     {
         /* @var $orm BORM */
         $orm = FCom_MultiLanguage_Model_Translation::i()
             ->orm('ml')
-            ->select(array('entity_id', 'field', 'value', 'data_serialized'), 'ml')
-            ->where(array('entity_id' => $id, 'entity_type' => $entityId, 'locale' => $lang));
+            ->select(['entity_id', 'field', 'value', 'data_serialized'], 'ml')
+            ->where(['entity_id' => $id, 'entity_type' => $entityId, 'locale' => $lang]);
         if (!empty($fields)) {
-            $orm->where(array('field' => $fields));
+            $orm->where(['field' => $fields]);
         }
         $localized = $orm->find_many();
         return $localized;

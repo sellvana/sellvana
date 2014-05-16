@@ -9,7 +9,7 @@ class FCom_IndexTank_Model_IndexingStatus extends FCom_Core_Model_Abstract
     *
     * @return FCom_IndexTank_Model_IndexingStatus
     */
-    public static function i($new=false, array $args=array())
+    public static function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
@@ -41,7 +41,7 @@ class FCom_IndexTank_Model_IndexingStatus extends FCom_Core_Model_Abstract
                 ->where('indextank_indexed', 0)
                 ->count();
         $countTotal = FCom_Catalog_Model_Product::orm()->count();
-        $percent =  (($countTotal - $countNotIndexed)/$countTotal)*100;
+        $percent =  (($countTotal - $countNotIndexed) / $countTotal) * 100;
         $indexed = $countTotal - $countNotIndexed;
 
         $status = FCom_IndexTank_Index_Product::i()->status();

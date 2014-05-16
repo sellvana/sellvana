@@ -2,10 +2,9 @@
 {% set priceView = THIS.view('catalog/product/price') %}
 {% set addToCartUrl = THIS.url('cart/add') %}
 
-<div class="f-prod-listing f-prod-listing-rows">
 {% for p in THIS.get('products') %}
-{% set productName = p.get('product_name') %}
-{% set productUrl = p.url(THIS.get('category')) %}
+    {% set productName = p.get('product_name') %}
+    {% set productUrl = p.url(THIS.get('category')) %}
   <div class="row">
     {% if p.get('base_price') != p.get('sale_price') and p.get('sale_price') != 0 %}
         <span class="sale tooltip-test">Sale</span>
@@ -58,5 +57,4 @@
     </div>
   </div>
 {% endfor %}
-</div>
 

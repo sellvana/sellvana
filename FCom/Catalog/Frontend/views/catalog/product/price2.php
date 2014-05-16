@@ -4,7 +4,7 @@
         <div class="old-price"><span class="title"><?=$this->_('Was:')?></span><span class="price"><?=BLocale::currency($basePrice)?></span></div>
         <div class="new-price"><span class="title"><?=$this->_('Now:')?></span><span class="price"><?=BLocale::currency($salePrice)?></span></div>
     </div>
-<?php else: ?>
+<?php else : ?>
     <div class="price-box">
         <span class="price"><?=BLocale::currency($basePrice)?></span>
     </div>

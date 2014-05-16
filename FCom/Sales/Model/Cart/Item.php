@@ -63,7 +63,7 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     public function onAfterLoad()
     {
         parent::onAfterLoad();
-        $this->data = !empty($this->data_serialized) ? BUtil::fromJson($this->data_serialized) : array();
+        $this->data = !empty($this->data_serialized) ? BUtil::fromJson($this->data_serialized) : [];
     }
 }
 

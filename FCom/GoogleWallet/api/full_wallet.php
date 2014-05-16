@@ -30,34 +30,34 @@ class FullWallet {
     $total_price = WalletUtil::to_dollars($cart_data['totalPrice']);
     $currency_code = $cart_data['currencyCode'];
     $line_items = $cart_data['lineItems'];
-    for($i=0; $i<sizeof($line_items); $i++) {
-      if(isset($line_items[$i]['totalPrice'])) {
+    for ($i = 0; $i < sizeof($line_items); $i++) {
+      if (isset($line_items[$i]['totalPrice'])) {
         $line_items[$i]['totalPrice'] =
           WalletUtil::to_dollars($line_items[$i]['totalPrice']);
       }
-      if(isset($line_items[$i]['unitPrice'])) {
+      if (isset($line_items[$i]['unitPrice'])) {
         $line_items[$i]['unitPrice'] =
           WalletUtil::to_dollars($line_items[$i]['unitPrice']);
       }
     }
 
-    $fwr = array(
+    $fwr = [
       'iat' => $now,
       'exp' => $now + 3600,
       'typ' => 'google/wallet/online/full/v2/request',
       'aud' => 'Google',
       'iss' => MERCHANT_ID,
-      'request'=> array(
-        'merchantName'=> MERCHANT_NAME,
+      'request' => [
+        'merchantName' => MERCHANT_NAME,
         'googleTransactionId' => $input['googleTransactionId'],
-        'origin'=> ORIGIN,
-        'cart' => array(
+        'origin' => ORIGIN,
+        'cart' => [
           'totalPrice' => $total_price,
           'currencyCode' => $currency_code,
           'lineItems' => $line_items
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
     $json = str_replace('\/', '/', json_encode($fwr));
     WalletUtil::encode_send_jwt($fwr);
   }

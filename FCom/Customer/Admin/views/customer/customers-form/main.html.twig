@@ -6,6 +6,7 @@
     {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptions() %}
 {% endif %}
 {% set validator = THIS.get('validator') %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 {# APP.instance('FCom_Geo_Model_Country').options() | debug #}
 {# APP.instance('FCom_Geo_Model_Region').allOptions() | debug #}
 {#<script>
@@ -128,70 +129,22 @@
 <div class="col-md-12">
     <fieldset class="f-fieldset-group">
         <h3 class="f-fieldset-group-title">{{ "Personal Information"|_ }}</h3>
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="model-firstname">{{ 'First Name'|_ }}</label>
-            <div class="col-md-5">
-                <input id="model-firstname" class="form-control required" type="text" name="model[firstname]" value="{{ validator.fieldValue('firstname') }}" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="model-lastname">{{ 'Last Name'|_ }}</label>
-            <div class="col-md-5">
-                <input id="model-lastname" class="form-control required" type="text" name="model[lastname]" value="{{ validator.fieldValue('lastname') }}" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="model-email">{{ 'Email'|_ }}</label>
-            <div class="col-md-5">
-                <input id="model-email" class="form-control required" type="email" name="model[email]" value="{{ validator.fieldValue('email') }}" />
-            </div>
-        </div>
+        {{ forms.input({label: 'First Name'|_,  required: 1, name: "model[firstname]", value: validator.fieldValue('firstname'), id: "model-firstname" }) }}
+        {{ forms.input({label: 'Last Name'|_,  required: 1, name: "model[lastname]", value: validator.fieldValue('lastname'), id: "model-lastname" }) }}
+        {{ forms.input({label: 'Email'|_, type: "email", required: 1, name: "model[email]", value: validator.fieldValue('email'), id: "model-email" }) }}
         {% if customerGroups is defined %}
-            <div class="form-group">
-                <label class="col-md-2 control-label" for="model-group">{{ 'Customer Group'|_ }}</label>
-                <div class="col-md-5">
-                    <select class="form-control" name="model[customer_group]" id="model-group">
-                        {{ UTIL.optionsHtml(customerGroups, validator.fieldValue('customer_group'))|raw }}
-                    </select>
-                </div>
-            </div>
+            {{ forms.select({label: 'Customer Group'|_, options: customerGroups, value: validator.fieldValue('customer_group'), name: "model[status]", id: "model-customer_group" }) }}
         {% endif %}
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="model-phone">{{ 'Daytime Phone'|_ }}</label>
-            <div class="col-md-5">
-                <input id="model-phone" class="form-control" type="text" name="model[phone]" value="{{ validator.fieldValue('phone') }}" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="model-phone_evening">{{ 'Evening Phone'|_ }}</label>
-            <div class="col-md-5">
-                <input id="model-phone_evening" class="form-control" type="text" name="model[phone_evening]" value="{{ validator.fieldValue('phone_evening') }}" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="model-status">{{ 'Status'|_ }}</label>
-            <div class="col-md-5">
-                <select class="form-control" name="model[status]" id="model-status">
-                    {{ UTIL.optionsHtml(m.fieldOptions('status'), validator.fieldValue('status'))|raw }}
-                </select>
-            </div>
-        </div>
+        {{ forms.input({label: 'Daytime Phone'|_, name: "model[phone]", value: validator.fieldValue('phone'), id: "model-phone" }) }}
+        {{ forms.input({label: 'Evening Phone'|_, name: "model[phone_evening]", value: validator.fieldValue('phone_evening'), id: "model-phone_evening" }) }}
+        {{ forms.select({label: 'Status'|_, options: m.fieldOptions('status'), value: m.fieldOptions('status'), name: "model[status]", id: "model-status" }) }}
     </fieldset>
 
     <fieldset class="f-fieldset-group">
         <h3 class="f-fieldset-group-title">{{ 'Password Reset'|_ }}</h3>
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="model-password">{{ 'New Password'|_ }}</label>
-            <div class="col-md-5">
-                <input id="model-password" type="password" class="form-control has-progress-bar" name="model[password]" />
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="model-password_confirm">{{ 'Confirm Password'|_ }}</label>
-            <div class="col-md-5">
-                <input id="model-password_confirm" type="password" class="form-control" name="model[password_confirm]" />
-            </div>
-        </div>
+
+        {{ forms.input({label: 'New Password'|_, type: "password",name: "model[password]", value: validator.fieldValue('password')}) }}
+        {{ forms.input({label: 'Confirm Password'|_, type: "password",name: "model[password_confirm]", value: validator.fieldValue('password_confirm')}) }}
     </fieldset>
 
 {#    <div class="col-customer-address">

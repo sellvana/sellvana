@@ -1,45 +1,21 @@
 {% set c = THIS.get('model') %}
-
+{% set fieldData = { model: c, id_prefix:'FCom_Disqus', name_prefix:'config[modules][FCom_Disqus]' } %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
 <h2>{{ "Disqus Settings"|_}}</h2>
-
-<div class="accordion accordion-blue panel-group" id="settings-FCom_Disqus">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <a href="#" class="accordion-toggle">{{ 'Disqus Settings'|_ }}</a>
-        </div>
-        <div class="panel-collapse accordion-body in" id="settings-FCom_Disqus-group0">
-            <div class="panel-body">
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ 'Show on all pages'|_ }}</label>
-                    <div class="col-md-5">
-                        <input type="hidden" name="config[modules][FCom_Disqus][show_on_all_pages]" value="0"/>
-                        <input class="switch-cbx" name="config[modules][FCom_Disqus][show_on_all_pages]" {% if c.get("modules/FCom_Disqus/show_on_all_pages") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ 'Show on product pages'|_ }}</label>
-                    <div class="col-md-5">
-                        <input type="hidden" name="config[modules][FCom_Disqus][show_on_product]" value="0"/>
-                        <input class="switch-cbx" name="config[modules][FCom_Disqus][show_on_product]" {% if c.get("modules/FCom_Disqus/show_on_product") == 1 %}checked="checked"{% endif %} value='1' type='checkbox'>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ 'Comments Javascript Code'|_ }}</label>
-                    <div class="col-md-5">
-                        <textarea class="form-control" class="js-code-editor" name="config[modules][FCom_Disqus][comments_code]" data-mode="javascript" rows="5">{{ c.get('modules/FCom_Disqus/comments_code') }}</textarea>
-                        <p><a href="http://disqus.com/admin/settings/universalcode/" target="_blank">{{ 'Get your code here (requires disqus.com account)' | raw }} </a>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ 'Counts Javascript Code'|_ }}</label>
-                    <div class="col-md-5">
-                        <textarea class="form-control" class="js-code-editor"name="config[modules][FCom_Disqus][counts_code]" data-mode="javascript" rows="5">{{ c.get('modules/FCom_Disqus/counts_code') }}</textarea>
-                    </div>
-                </div>
+{{ forms.accordion_start({id:'settings-FCom_Disqus'}) }}
+     {{ forms.accordion_panel_start({label:'Disqus Settings'|_, id:'settings-FCom_Disqus-group0', in:1}) }}
+        {{ forms.boolean(fieldData|merge({field:'show_on_all_pages', label:'Show on all pages'|_, value: c.get("modules/FCom_Disqus/show_on_all_pages")})) }}
+        {{ forms.boolean(fieldData|merge({field:'show_on_product', label:'Show on product pages'|_, value: c.get("modules/FCom_Disqus/show_on_product")})) }}
+        <div class="form-group">
+            <label class="col-md-2 control-label">{{ 'Comments JavaScript Code'|_ }}</label>
+            <div class="col-md-5">
+                <textarea class="form-control" class="js-code-editor" name="config[modules][FCom_Disqus][comments_code]" data-mode="javascript" rows="5">{{ c.get('modules/FCom_Disqus/comments_code') }}</textarea>
+                <p><a href="http://disqus.com/admin/settings/universalcode/" target="_blank">{{ 'Get your code here (requires disqus.com account)' | raw }} </a>
             </div>
         </div>
-    </div>
-</div>
+        {{ forms.textarea(fieldData|merge({field:'counts_code', label:'Counts JavaScript Code'|_})) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}
 <script type="text/javascript">
     require(['jquery', 'fcom.admin'], function($) {
         $(function() { FCom.Admin.initCodeEditors() })

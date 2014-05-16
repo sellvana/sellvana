@@ -4,27 +4,27 @@ class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
 {
     public function __construct()
     {
-        $this->default_config = array(
-            'grid' => array(
-                'prmNames'      => array(
+        $this->default_config = [
+            'grid' => [
+                'prmNames'      => [
                     'page'          => 'p',
                     'rows'          => 'ps',
                     'sort'          => 's',
                     'order'         => 'sd',
-                ),
+                ],
                 'datatype'      => 'json',
-                'jsonReader'    => array(
+                'jsonReader'    => [
                     'root'          => 'rows',
                     'page'          => 'p',
                     'total'         => 'mp',
                     'records'       => 'c',
                     'repeatitems'   => false,
                     'id'            => 'id',
-                ),
+                ],
                 'sortname'      => 'id',
                 'sortorder'     => 'asc',
                 'rowNum'        => 20,
-                'rowList'       => array(10, 20, 50, 100, 200),
+                'rowList'       => [10, 20, 50, 100, 200],
                 'pager'         => true,
                 'toppager'      => true,
                 'gridview'      => true,
@@ -37,11 +37,11 @@ class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
                 'height'        => '100%',
                 'multiselectWidth' => 30,
                 'ignoreCase'    => true,
-           ),
-           'navGrid' => array('add'=>false, 'edit'=>false, 'del'=>false, 'refresh'=>true, 'prm'=>array(
-                'search'=>array('multipleSearch'=>true, 'multipleGroup'=>true),
-           )),
-        );
+           ],
+           'navGrid' => ['add' => false, 'edit' => false, 'del' => false, 'refresh' => true, 'prm' => [
+                'search' => ['multipleSearch' => true, 'multipleGroup' => true],
+           ]],
+        ];
     }
 
     protected function _processState($cfg)
@@ -59,13 +59,13 @@ class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
             if (!empty($r['sd'])) $cfg['grid']['sortorder'] = $r['sd'];
             if (!empty($r['filters'])) {
                 $f = $r['filters'];
-                $cfg['grid']['postData'] = array('_search'=>true, 'filters'=>BUtil::toJson($f));
-                if (!empty($f['groupOp']) && $f['groupOp']==='AND' && !empty($f['rules'])) {
+                $cfg['grid']['postData'] = ['_search' => true, 'filters' => BUtil::toJson($f)];
+                if (!empty($f['groupOp']) && $f['groupOp'] === 'AND' && !empty($f['rules'])) {
                     $cfg['grid']['search'] = true;
                     foreach ($f['rules'] as $rule) {
                         $idx = $rule['field'];
-                        foreach ($cfg['grid']['columns'] as $colId=>&$col) {
-                            if ($colId===$idx || !empty($col['index']) && $col['index']===$idx && $rule['data']!=='') {
+                        foreach ($cfg['grid']['columns'] as $colId => &$col) {
+                            if ($colId === $idx || !empty($col['index']) && $col['index'] === $idx && $rule['data'] !== '') {
                                 $col['searchoptions']['defaultValue'] = $rule['data'];
                                 break;
                             }
@@ -80,13 +80,13 @@ class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
     protected function _processPersonalization($cfg)
     {
         if (!empty($cfg['custom']['columnChooser'])) {
-            $cfg[] = array('navButtonAdd',
+            $cfg[] = ['navButtonAdd',
                 'caption' => '',
                 //'modal' => true,
                 'title' => 'Customize Columns',
                 'buttonicon' => 'ui-icon-calculator',
                 'onClickButton' => "function() { $('#{$cfg['grid']['id']}').jqGrid('columnChooser') }",
-            );
+            ];
         }
         if (!empty($cfg['custom']['personalize'])) {
             $gridId = is_string($cfg['custom']['personalize'])
@@ -94,7 +94,7 @@ class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
             $pers = FCom_Admin_Model_User::i()->personalize();
             if (!empty($pers['grid'][$gridId]['columns'])) {
                 $persCols = $pers['grid'][$gridId]['columns'];
-                foreach ($persCols as $k=>$c) {
+                foreach ($persCols as $k => $c) {
                     if (empty($cfg['grid']['columns'][$k])) {
                         unset($persCols[$k]);
                     }
@@ -109,7 +109,7 @@ class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
                     col:cols[index].name, width:newwidth
                 });
             }";
-            $cfg[] = array('navButtonAdd',
+            $cfg[] = ['navButtonAdd',
                 'caption' => '',
                 'title' => 'Customize Columns',
                 'buttonicon' => 'ui-icon-calculator',
@@ -125,11 +125,11 @@ class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
                             }
                         }
                     });
-                }");
+                }"];
         }
 
         if (!empty($cfg['grid']['columns'])) {
-            foreach ($cfg['grid']['columns'] as $colName=>$col) {
+            foreach ($cfg['grid']['columns'] as $colName => $col) {
                 if (empty($col['name'])) {
                     $col['name'] = $colName;
                 }
@@ -146,15 +146,15 @@ class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
         if (!empty($cfg['subGrid']) && is_array($cfg['subGrid'])) {
             $cfg['grid']['gridview'] = true;
             $cfg['grid']['subGrid'] = true;
-            $cfg['grid']['subGridOptions'] = array(
+            $cfg['grid']['subGridOptions'] = [
                 'plusicon' => 'ui-icon-triangle-1-e',
                 'minusicon' => 'ui-icon-triangle-1-s',
                 'openicon' => 'ui-icon-arrowreturn-1-e',
                 'reloadOnExpand' => false,
                 'selectOnExpand' => false,
-            );
+            ];
             if (!empty($cfg['subGrid']['grid']['url'])) {
-                $cfg['subGrid']['grid']['url'] = new BType('"'.$cfg['subGrid']['grid']['url'].'"+row_id');
+                $cfg['subGrid']['grid']['url'] = new BType('"' . $cfg['subGrid']['grid']['url'] . '"+row_id');
             }
             $cfg['subGrid']['grid']['pager'] = new BType('pager_id');
             $cfg['subGrid']['isSubGrid'] = true;
@@ -163,7 +163,7 @@ class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
             if (!empty($cfg['subGrid']['grid']['editurl'])) {
                 $jsAfter .= "subgrid.jqGrid('setGridParam', {editurl:subgrid.jqGrid('getGridParam', 'editurl')+row_id});";
             }
-            $subGridView = static::i()->factory($cfg['grid']['id'].'_subgrid', array())->set('config', $cfg['subGrid']);
+            $subGridView = static::i()->factory($cfg['grid']['id'] . '_subgrid', [])->set('config', $cfg['subGrid']);
             $cfg['grid']['subGridRowExpanded'] = "function(subgrid_id, row_id) {
 var subgrid_table_id = subgrid_id+'_t', pager_id = 'p_'+subgrid_table_id;
 $('#'+subgrid_id).html('<table id=\"'+subgrid_table_id+'\" class=\"scroll\"></table><div id=\"'+pager_id+'\" class=\"scroll\"></div>');
@@ -184,7 +184,7 @@ var subgrid = $('#'+subgrid_table_id);
         $cfg = $this->_processSubGridConfig($cfg);
 
         $pos = 0;
-        $editableOnlyNew = array();
+        $editableOnlyNew = [];
         foreach ($cfg['grid']['colModel'] as &$col) {
             if (!empty($col['position'])) {
                 $pos = $col['position'];
@@ -200,7 +200,7 @@ var subgrid = $('#'+subgrid_table_id);
                 case 'date':
                     //$col['editoptions'] = array();
                     $col['editrules']['date'] = true;
-                    if (!isset($col['searchoptions']['sopt'])) $col['searchoptions']['sopt'] = array('eq','ne','lt','le','gt','ge');
+                    if (!isset($col['searchoptions']['sopt'])) $col['searchoptions']['sopt'] = ['eq', 'ne', 'lt', 'le', 'gt', 'ge'];
                     if (!isset($col['searchoptions']['dataInit'])) $col['searchoptions']['dataInit'] = "function(el) {
 $(el).datepicker({dateFormat:'yy-mm-dd'});
                     }";
@@ -210,40 +210,40 @@ $(el).datepicker({dateFormat:'yy-mm-dd'});
                 }
             }
             if (!empty($col['options'])) {
-                $optArr = array();
-                foreach ($col['options'] as $k=>$v) {
-                    $optArr[] = $k.':'.$v;
+                $optArr = [];
+                foreach ($col['options'] as $k => $v) {
+                    $optArr[] = $k . ':' . $v;
                 }
                 $options = join(';', $optArr);
                 if (!isset($col['formatter'])) $col['formatter'] = 'select';
                 if (!isset($col['stype'])) $col['stype'] = 'select';
                 if (!isset($col['edittype'])) $col['edittype'] = 'select';
                 if (!isset($col['editoptions']['value'])) $col['editoptions']['value'] = $options;
-                if (!isset($col['searchoptions']['value'])) $col['searchoptions']['value'] = ':;'.$options;
+                if (!isset($col['searchoptions']['value'])) $col['searchoptions']['value'] = ':;' . $options;
                 if (!isset($col['searchoptions']['defaultValue'])) $col['searchoptions']['defaultValue'] = '';
                 unset($col['options']);
             }
-            if (!empty($col['editable']) && $col['editable']==='new') {
+            if (!empty($col['editable']) && $col['editable'] === 'new') {
                 $col['editable'] = true;
                 $editableOnlyNew[] = $col['name'];
             }
         }
         unset($col);
         if (!empty($editableOnlyNew)) {
-            $jsEditArr = array();
-            $jsAddArr = array();
+            $jsEditArr = [];
+            $jsAddArr = [];
             foreach ($editableOnlyNew as $name) {
                 $jsText = "$('#tr_{$name} input, #tr_{$name} select', form).attr('readonly', ";
-                $jsEditArr[] = $jsText."'readonly');";
-                $jsAddArr[] = $jsText."false);";
+                $jsEditArr[] = $jsText . "'readonly');";
+                $jsAddArr[] = $jsText . "false);";
             }
             //TODO: jqGrid edit events don't trigger ?!?!
-            $cfg['navGrid']['prm']['edit']['beforeShowForm'] = "function(form) { console.log('edit'); ".join('', $jsEditArr)." }";
-            $cfg['navGrid']['prm']['add']['beforeShowForm'] = "function(form) { console.log('add'); ".join('', $jsAddArr)." }";
+            $cfg['navGrid']['prm']['edit']['beforeShowForm'] = "function(form) { console.log('edit'); " . join('', $jsEditArr) . " }";
+            $cfg['navGrid']['prm']['add']['beforeShowForm'] = "function(form) { console.log('add'); " . join('', $jsAddArr) . " }";
         }
 
         usort($cfg['grid']['colModel'], function($a, $b) {
-            $i = $a['position']; $j = $b['position']; return $i<$j ? -1 : ($i>$j ? 1 : 0);
+            $i = $a['position']; $j = $b['position']; return $i < $j ? -1 : ($i > $j ? 1 : 0);
         });
         if (!empty($cfg['custom']['dblClickHref'])) {
             $cfg['grid']['ondblClickRow'] = "function(rowid, iRow, iCol, e) { location.href = '{$cfg['custom']['dblClickHref']}'+rowid; }";
@@ -251,28 +251,28 @@ $(el).datepicker({dateFormat:'yy-mm-dd'});
             $cfg['grid']['ondblClickRow'] = "function(rowid, iRow, iCol, e) { $(this).jqGrid('editGridRow', rowid); e.stopPropagation(); }";
         }
         if (!empty($cfg['custom']['autoresize'])) {
-            if ($cfg['custom']['autoresize']===true) {
+            if ($cfg['custom']['autoresize'] === true) {
                 $cfg[] = "$('html').css({overflow:'hidden'});
 var top = $('#{$cfg['grid']['id']}').offset().top, pager = $('#pager-{$cfg['grid']['id']}').height();
 $('#{$cfg['grid']['id']}').resizeWithWindow({x:true, dX:0, dY:top+pager});";
             } else {
                 $cfg[] = "
-$('#{$cfg['grid']['id']}').resizeWithWindow({initBy:'".addslashes($cfg['custom']['autoresize'])."', jqGrid:true});";
+$('#{$cfg['grid']['id']}').resizeWithWindow({initBy:'" . addslashes($cfg['custom']['autoresize']) . "', jqGrid:true});";
             }
         }
         if (!empty($cfg['custom']['export'])) {
             if (!empty($cfg['grid']['export_url'])) {
                 $exportUrl =  $cfg['grid']['export_url'];
             } else {
-                $exportUrl = BUtil::setUrlQuery($cfg['grid']['url'], array('export'=>'csv'));
+                $exportUrl = BUtil::setUrlQuery($cfg['grid']['url'], ['export' => 'csv']);
             }
-            $cfg[] = array('navButtonAdd',
+            $cfg[] = ['navButtonAdd',
                 'caption' => '',
                 'title' => 'Export to CSV',
                 'buttonicon' => 'ui-icon-copy',
                 'onClickButton' => "function() {
                     $('body').append('<iframe src=\"{$exportUrl}\" display=\"none\"></iframe');
-                }");
+                }"];
         }
         /*
         if (!empty($cfg['custom']['hashState'])) {
@@ -323,7 +323,7 @@ return [true, 'Testing error'];
             $html = '';
             $html .= "<table id=\"{$id}\"></table>";
             if (!empty($cfg['grid']['pager'])) {
-                $pagerId = true===$cfg['grid']['pager'] ? "pager-{$id}" : $cfg['grid']['pager'];
+                $pagerId = true === $cfg['grid']['pager'] ? "pager-{$id}" : $cfg['grid']['pager'];
                 $cfg['grid']['pager'] = false;
                 $cfg['grid']['toppager'] = $pagerId;
                 $html .= "<div id=\"{$pagerId}\"></div>";
@@ -335,13 +335,13 @@ return [true, 'Testing error'];
             unset($cfg['isSubGrid']);
         }
 
-        $extraJS = array();
-        $extraHTML = array();
+        $extraJS = [];
+        $extraHTML = [];
         foreach ($cfg as $k => $opt) {
-            if ($k==='html') {
+            if ($k === 'html') {
                 $extraHTML[] = join('', (array)$opt);
                 continue;
-            } elseif ($k==='js' || is_string($opt)) {
+            } elseif ($k === 'js' || is_string($opt)) {
                 $extraJS[] = join('', (array)$opt);
                 continue;
             }
@@ -353,7 +353,7 @@ return [true, 'Testing error'];
                     $localPagerId = $opt['_pager'];
                     unset($opt['_pager']);
                 } else {
-                    $localPagerId = $id.'_toppager'; #$pagerId;
+                    $localPagerId = $id . '_toppager'; #$pagerId;
                 }
                 $quotedPagerId = "'#{$localPagerId}'";
             }
@@ -364,7 +364,7 @@ return [true, 'Testing error'];
                 $prm = $opt['prm'];
                 unset($opt['prm']);
             } else {
-                $prm = array();
+                $prm = [];
             }
             $optJS = BUtil::toJavaScript($opt);
             switch ($k) {
@@ -378,7 +378,7 @@ return [true, 'Testing error'];
                 break;
 
             case 'navGrid':
-                foreach (array('edit', 'add', 'del', 'search', 'view') as $t) {
+                foreach (['edit', 'add', 'del', 'search', 'view'] as $t) {
                     if (!empty($prm[$t])) {
                         $prmJS[$t] = BUtil::toJavaScript($prm[$t]);
                     } else {
@@ -386,8 +386,8 @@ return [true, 'Testing error'];
                     }
                 }
                 $html .= ".jqGrid('navGrid', {$quotedPagerId}, {$optJS},"
-                    ." {$prmJS['edit']}, {$prmJS['add']}, {$prmJS['del']},"
-                    ." {$prmJS['search']}, {$prmJS['view']})\n";
+                    . " {$prmJS['edit']}, {$prmJS['add']}, {$prmJS['del']},"
+                    . " {$prmJS['search']}, {$prmJS['view']})\n";
                 break;
 
             default:
@@ -396,7 +396,7 @@ return [true, 'Testing error'];
         }
 
         if (!$isSubGrid) {
-            $html .= "; ".join("\n", $extraJS)." }) })</script>".join('', $extraHTML);
+            $html .= "; " . join("\n", $extraJS) . " }) })</script>" . join('', $extraHTML);
         }
 
         return $html;
@@ -404,33 +404,33 @@ return [true, 'Testing error'];
 
     protected function _processFilters($filter)
     {
-        static $map = array(
-            'eq'=>'=?','ne'=>'!=?','lt'=>'<?','le'=>'<=?','gt'=>'>?','ge'=>'>=?',
-            'in'=>'IN (?)','ni'=>'NOT IN (?)',
-        );
-        $where = array();
+        static $map = [
+            'eq' => '=?', 'ne' => '!=?', 'lt' => '<?', 'le' => '<=?', 'gt' => '>?', 'ge' => '>=?',
+            'in' => 'IN (?)', 'ni' => 'NOT IN (?)',
+        ];
+        $where = [];
         if (!empty($filter['rules'])) {
             foreach ($filter['rules'] as $r) {
                 $data = $r['data'];
-                if ($data==='') {
+                if ($data === '') {
                     continue;
                 }
                 switch ($r['op']) {
-                    case 'bw': $part = array($r['field'].' LIKE ?', $data.'%'); break;
-                    case 'bn': $part = array($r['field'].' NOT LIKE ?', $data.'%'); break;
-                    case 'ew': $part = array($r['field'].' LIKE ?', '%'.$data); break;
-                    case 'en': $part = array($r['field'].' NOT LIKE ?', '%'.$data); break;
+                    case 'bw': $part = [$r['field'] . ' LIKE ?', $data . '%']; break;
+                    case 'bn': $part = [$r['field'] . ' NOT LIKE ?', $data . '%']; break;
+                    case 'ew': $part = [$r['field'] . ' LIKE ?', '%' . $data]; break;
+                    case 'en': $part = [$r['field'] . ' NOT LIKE ?', '%' . $data]; break;
                     case 'cn': case 'nc': //$part = array($r['field'].' LIKE ?', '%'.$data.'%'); break;
                         $terms = explode(' ', $data);
-                        $part = array('AND');
+                        $part = ['AND'];
                         foreach ($terms as $term) {
-                            $part[] = array($r['field'].' LIKE ?', '%'.$term.'%');
+                            $part[] = [$r['field'] . ' LIKE ?', '%' . $term . '%'];
                         }
-                        if ($r['op']==='nc') {
-                            $part = array('NOT'=>$part);
+                        if ($r['op'] === 'nc') {
+                            $part = ['NOT' => $part];
                         }
                         break;
-                    default: $part = array($r['field'].' '.$map[$r['op']], $data);
+                    default: $part = [$r['field'] . ' ' . $map[$r['op']], $data];
                 }
                 $where[$filter['groupOp']][] = $part;
             }
@@ -443,7 +443,7 @@ return [true, 'Testing error'];
         return $where;
     }
 
-    public function processORM($orm, $method=null, $stateKey=null, $forceRequest=array())
+    public function processORM($orm, $method = null, $stateKey = null, $forceRequest = [])
     {
         $r = BRequest::i()->request();
         if (!empty($r['hash'])) {
@@ -468,7 +468,7 @@ return [true, 'Testing error'];
         }
         if (!is_null($method)) {
             //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
-            BEvents::i()->fire($method.'.orm', array('orm'=>$orm));
+            BEvents::i()->fire($method . '.orm', ['orm' => $orm]);
         }
         $data = $orm->jqGridData($r);
 #print_r(BORM::get_last_query());
@@ -476,16 +476,16 @@ return [true, 'Testing error'];
         //$data['hash'] = base64_encode(BUtil::toJson(BUtil::arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);
         if (!is_null($method)) {
-            BEvents::i()->fire($method.'.data', array('data'=>&$data));
+            BEvents::i()->fire($method . '.data', ['data' => &$data]);
         }
 
         return $data;
     }
 
-    public function export($orm, $class=null)
+    public function export($orm, $class = null)
     {
         if ($class) {
-            BEvents::i()->fire($class.'::action_grid_data.orm', array('orm'=>$orm));
+            BEvents::i()->fire($class . '::action_grid_data.orm', ['orm' => $orm]);
         }
         $r = BRequest::i()->request();
         if (!empty($r['filters'])) {
@@ -500,19 +500,19 @@ return [true, 'Testing error'];
             $orm->where($where);
         }
         if (!empty($r['s'])) {
-            $orm->{'order_by_'.$r['sd']}($r['s']);
+            $orm-> {'order_by_' . $r['sd']}($r['s']);
         }
 
         $cfg = BUtil::arrayMerge($this->default_config, $this->config);
         $cfg = $this->_processConfig($cfg);
         $columns = $cfg['grid']['colModel'];
-        $headers = array();
-        foreach ($columns as $i=>$col) {
+        $headers = [];
+        foreach ($columns as $i => $col) {
             if (!empty($col['hidden'])) continue;
             $headers[] = !empty($col['label']) ? $col['label'] : $col['name'];
             if (!empty($col['editoptions']['value']) && is_string($col['editoptions']['value'])) {
                 $options = explode(';', $col['editoptions']['value']);
-                $col['editoptions']['value'] = array();
+                $col['editoptions']['value'] = [];
                 foreach ($options as $o) {
                     list($k, $v) = explode(':', $o);
                     $col['editoptions']['value'][$k] = $v;
@@ -520,17 +520,17 @@ return [true, 'Testing error'];
                 $columns[$i] = $col;
             }
         }
-        $dir = BConfig::i()->get('fs/storage_dir').'/export';
+        $dir = BConfig::i()->get('fs/storage_dir') . '/export';
         BUtil::ensureDir($dir);
-        $filename = $dir.'/'.$cfg['grid']['id'].'.csv';
+        $filename = $dir . '/' . $cfg['grid']['id'] . '.csv';
         $fp = fopen($filename, 'w');
         fputcsv($fp, $headers);
         $orm->iterate(function($row) use($columns, $fp) {
             if ($class) {
                 //TODO: any faster solution?
-                BEvents::i()->fire($class.'::action_grid_data.data_row', array('row'=>$row, 'columns'=>$columns));
+                BEvents::i()->fire($class . '::action_grid_data.data_row', ['row' => $row, 'columns' => $columns]);
             }
-            $data = array();
+            $data = [];
             foreach ($columns as $col) {
                 if (!empty($col['hidden'])) continue;
                 $k = $col['name'];

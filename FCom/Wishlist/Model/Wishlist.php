@@ -11,14 +11,14 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
     public function sessionWishlist()
     {
         $customer = FCom_Customer_Model_Customer::i()->sessionUser();
-        if (!$customer){
+        if (!$customer) {
             return false;
         }
         if (!$this->_sessionWishlist) {
-            $wishlist = static::i()->load(array("customer_id", $customer->id()));
+            $wishlist = static::i()->load(["customer_id", $customer->id()]);
             if (!$wishlist) {
                 $this->orm()->create()->set("customer_id", $customer->id())->save();
-                $wishlist = static::i()->load(array("customer_id", $customer->id()));
+                $wishlist = static::i()->load(["customer_id", $customer->id()]);
             }
 
             $this->_sessionWishlist = $wishlist;
@@ -26,11 +26,11 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
         return $this->_sessionWishlist;
     }
 
-    public function items($refresh=false)
+    public function items($refresh = false)
     {
         if (!$this->items || $refresh) {
             $items = FCom_Wishlist_Model_WishlistItem::i()->orm()->where('wishlist_id', $this->id())->find_many_assoc();
-            foreach($items as $ik => $item) {
+            foreach ($items as $ik => $item) {
                 if (!$item->product()) {
                     $this->removeItem($item);
                     unset($items[$ik]);
@@ -43,7 +43,7 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
 
     public function addItem($productId)
     {
-        $item = FCom_Wishlist_Model_WishlistItem::i()->load(array('wishlist_id'=>$this->id(), 'product_id'=>$productId));
+        $item = FCom_Wishlist_Model_WishlistItem::i()->load(['wishlist_id' => $this->id(), 'product_id' => $productId]);
         if (!$item) {
             $item = FCom_Wishlist_Model_WishlistItem::i()->orm()->create();
             $item->set('wishlist_id', $this->id())

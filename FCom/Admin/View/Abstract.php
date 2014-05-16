@@ -6,14 +6,14 @@ class FCom_Admin_View_Abstract extends FCom_Core_View_Abstract
     {
         $tabs = (array)$this->tabs;
         if (!isset($params['view'])) {
-            $params['view'] = $this->get('tab_view_prefix').$id;
+            $params['view'] = $this->get('tab_view_prefix') . $id;
         }
         if (!isset($params['pos'])) {
             $pos = 0;
             foreach ($tabs as $tab) {
                 $pos = max($pos, !empty($tab['pos']) ? $tab['pos'] : 0);
             }
-            $params['pos'] = $pos+10;
+            $params['pos'] = $pos + 10;
         }
         if (empty($params['group'])) {
             $params['group'] = 'other';
@@ -29,7 +29,7 @@ class FCom_Admin_View_Abstract extends FCom_Core_View_Abstract
             $tabs = (array)$this->tabs;
         }
         uasort($tabs, function($a, $b) {
-            return $a['pos']<$b['pos'] ? -1 : ($a['pos']>$b['pos'] ? 1 : 0);
+            return $a['pos'] < $b['pos'] ? -1 : ($a['pos'] > $b['pos'] ? 1 : 0);
         });
         #$this->tabs = $tabs;
         return $tabs;
@@ -44,7 +44,7 @@ class FCom_Admin_View_Abstract extends FCom_Core_View_Abstract
             foreach ($tabGroups as $tabGroup) {
                 $pos = max($pos, !empty($tabGroup['pos']) ? $tabGroup['pos'] : 0);
             }
-            $params['pos'] = $pos+10;
+            $params['pos'] = $pos + 10;
         }
         $tabGroups[$id] = $params;
         $this->tab_groups = $tabGroups;
@@ -55,7 +55,7 @@ class FCom_Admin_View_Abstract extends FCom_Core_View_Abstract
     {
         $tabGroups = (array)$this->tab_groups;
         uasort($tabGroups, function($a, $b) {
-            return $a['pos']<$b['pos'] ? -1 : ($a['pos']>$b['pos'] ? 1 : 0);
+            return $a['pos'] < $b['pos'] ? -1 : ($a['pos'] > $b['pos'] ? 1 : 0);
         });
         #$this->tabs = $tabs;
         return $tabGroups;

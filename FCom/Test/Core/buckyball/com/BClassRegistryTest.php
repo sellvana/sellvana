@@ -27,7 +27,7 @@ class BClassRegistry_Test extends PHPUnit_Framework_TestCase
         $class = 'BClassRegistry_Test_A';
         $method = 'sayA';
 
-        BClassRegistry::overrideMethod($class, $method, array('BClassRegistry_Test_B', 'sayB'));
+        BClassRegistry::overrideMethod($class, $method, ['BClassRegistry_Test_B', 'sayB']);
 
         $a = $class::i();
 
@@ -40,7 +40,7 @@ class BClassRegistry_Test extends PHPUnit_Framework_TestCase
         $class = 'BClassRegistry_Test_A';
         $method = 'augmentA';
 
-        BClassRegistry::augmentMethod($class, $method, array('BClassRegistry_Test_B', 'augmentB'));
+        BClassRegistry::augmentMethod($class, $method, ['BClassRegistry_Test_B', 'augmentB']);
 
         $a = $class::i();
 
@@ -99,7 +99,7 @@ class BClassRegistry_Test_B extends BClass
         return 'B';
     }
 
-    static public function sayB($origObject=null)
+    static public function sayB($origObject = null)
     {
         return 'B';
     }
@@ -120,6 +120,6 @@ class BClassRegistry_Test_AugmentProperty extends BClass
 
     static public function newGetter($object, $property, $prevResult)
     {
-        return $prevResult+10;
+        return $prevResult + 10;
     }
 }

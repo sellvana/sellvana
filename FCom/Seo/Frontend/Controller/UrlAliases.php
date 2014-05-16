@@ -5,7 +5,7 @@ class FCom_Seo_Frontend_Controller_UrlAliases extends FCom_Frontend_Controller_A
     public function action_index()
     {
         $url = BRequest::i()->param('url');
-        if ($url==='' || is_null($url)) {
+        if ($url === '' || null === $url) {
             $this->forward(false);
             return;
         }

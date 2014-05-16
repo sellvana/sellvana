@@ -782,6 +782,15 @@ body.login .login-container input.form-control {
   margin:0; 
   }
 
+/* Module */
+.f-admin-main > form > .list-group {
+  margin-top:-21px;
+  }
+.f-admin-main > form > .list-group > .list-group-item:first-child {
+  border-radius:0;
+  }
+
+
 
 /* ==========================================================================
 MODULE
@@ -1001,7 +1010,8 @@ a.dropdown-toggle { outline:none; }
   
   
 /* Forms */
-.form-horizontal label[class^='col-'] { 
+.form-horizontal label[class^='col-'],
+.form-horizontal label[class*=' col-'] { 
   padding-right:0; 
   }
 label.control-label.required:after {
@@ -1300,6 +1310,8 @@ fieldset[disabled] .btn {
   font-size:16px; 
   }
 .modal-content .modal-header .close { 
+
+
   margin-top:-5px;
   font-size:25px; 
   }
@@ -2902,9 +2914,19 @@ h1 [class^="icon-"] { color:#aaa; }
   
   
 /* ==========================================================================
-STATE
+PER PAGE
 ========================================================================== */
 
+.f-install-modules { border:1px solid #ddd; margin-top:-21px; margin-bottom:15px; }
+.f-install-modules tbody tr td { vertical-align:middle; border-color:#ddd !important; font-size:14px; }
+.f-install-modules tbody tr td:first-of-type { padding-left:15px; }
+.f-install-modules .f-skip td { background: #f0f0f0; }
+.f-install-modules .f-install td { background: #FFF; }
+.f-install-modules .f-install .f-module-name { font-weight: bold; }
+.f-install-modules-version option { background: #FFF; }
+.f-install-modules-version option[data-action=skip] { background: #DDD; }
+.f-install-modules-version option[data-action=install] { background: #FFF; }
+.f-install-modules + .btns-container { padding:0 15px; }
 
 
 
@@ -3163,12 +3185,6 @@ FULLERON
 .f-base-font {
   font-family:'Helvetica Neue', Helvetica, Arial, sans-serif !important;
   }
-/*.no-mg-t { margin-top:0 !important; }
-.no-mg-b { margin-bottom:0 !important; } 
-.center-block {
-  margin-left:auto;
-  margin-right:auto;
-  }*/
 
 
 /* ==========================================================================

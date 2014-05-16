@@ -19,13 +19,13 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $page = BRequest::i()->get('p');
         $resultPerPage = BRequest::i()->get('ps');
 
-        if (empty($f['category'])){
+        if (empty($f['category'])) {
             $categoryKey = FCom_IndexTank_Index_Product::i()->getCategoryKey($category);
-            $f['category'] = $categoryKey. ":".$category->node_name;
+            $f['category'] = $categoryKey . ":" . $category->node_name;
         }
 
         $productsData = FCom_IndexTank_Search::i()->search($q, $sc, $f, $v, $page, $resultPerPage);
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_data', array('data'=>&$productsData));
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_data', ['data' => &$productsData]);
 
         BApp::i()
             ->set('current_category', $category)
@@ -35,14 +35,14 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         FCom_Core_Main::i()->lastNav(true);
 
         $head = $this->view('head');
-        $crumbs = array('home');
+        $crumbs = ['home'];
         foreach ($category->ascendants() as $c) {
             if ($c->node_name) {
-                $crumbs[] = array('label'=>$c->node_name, 'href'=>$c->url());
+                $crumbs[] = ['label' => $c->node_name, 'href' => $c->url()];
                 $head->addTitle($c->node_name);
             }
         }
-        $crumbs[] = array('label'=>$category->node_name, 'active'=>true);
+        $crumbs[] = ['label' => $category->node_name, 'active' => true];
         $head->addTitle($category->node_name);
         $layout->view('breadcrumbs')->crumbs = $crumbs;
 
@@ -50,7 +50,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $layout->view('catalog/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
         $layout->view('catalog/search')->index_name = FCom_IndexTank_Search::i()->indexName();
 
-        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='list' ? 'list' : 'grid');
+        $rowsViewName = 'catalog/product/' . (BRequest::i()->get('view') == 'list' ? 'list' : 'grid');
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->category = $category;
@@ -77,12 +77,12 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $page = $req->get('p');
         $resultPerPage = $req->get('ps');
 
-        if(false == BConfig::i()->get('modules/FCom_IndexTank/index_name')){
+        if (false == BConfig::i()->get('modules/FCom_IndexTank/index_name')) {
             die('Please set up correct API URL at Admin Setting page');
         }
 
         $productsData = FCom_IndexTank_Search::i()->search($q, $sc, $f, $v, $page, $resultPerPage);
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', array('data'=>&$productsData));
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', ['data' => &$productsData]);
 
         BApp::i()
             ->set('current_query', $q)
@@ -90,12 +90,12 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
         FCom_Core_Main::i()->lastNav(true);
         $layout = BLayout::i();
-        $layout->view('breadcrumbs')->crumbs = array('home', array('label'=>'Search: '.$q, 'active'=>true));
+        $layout->view('breadcrumbs')->crumbs = ['home', ['label' => 'Search: ' . $q, 'active' => true]];
         $layout->view('catalog/search')->query = $q;
         $layout->view('catalog/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
         $layout->view('catalog/search')->index_name = FCom_IndexTank_Search::i()->indexName();
 
-        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='list' ? 'list' : 'grid');
+        $rowsViewName = 'catalog/product/' . (BRequest::i()->get('view') == 'list' ? 'list' : 'grid');
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->products_data = $productsData;

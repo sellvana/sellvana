@@ -12,28 +12,28 @@ class FCom_Catalog_Admin extends BClass
 
             /** @todo initialize these events only when needed */
             ->on('FCom_Admin_Controller_MediaLibrary::gridConfig:media/product/attachment',
-                'FCom_Catalog_Admin_Controller_Products.onMediaGridConfig', array('type'=>'A'))
+                'FCom_Catalog_Admin_Controller_Products.onMediaGridConfig', ['type' => 'A'])
 
             ->on('FCom_Admin_Controller_MediaLibrary::action_grid_get:media/product/attachment.orm',
-                'FCom_Catalog_Admin_Controller_Products.onMediaGridGetORM', array('type'=>'A'))
+                'FCom_Catalog_Admin_Controller_Products.onMediaGridGetORM', ['type' => 'A'])
 
             ->on('FCom_Admin_Controller_MediaLibrary::processGridPost:media/product/attachment.upload',
-                'FCom_Catalog_Admin_Controller_Products.onMediaGridUpload', array('type'=>'A'))
+                'FCom_Catalog_Admin_Controller_Products.onMediaGridUpload', ['type' => 'A'])
 
             ->on('FCom_Admin_Controller_MediaLibrary::processGridPost:media/product/attachment.edit',
-                'FCom_Catalog_Admin_Controller_Products.onMediaGridEdit', array('type'=>'A'))
+                'FCom_Catalog_Admin_Controller_Products.onMediaGridEdit', ['type' => 'A'])
 
             ->on('FCom_Admin_Controller_MediaLibrary::gridConfig:media/product/image',
-                'FCom_Catalog_Admin_Controller_Products.onMediaGridConfig', array('type'=>'I'))
+                'FCom_Catalog_Admin_Controller_Products.onMediaGridConfig', ['type' => 'I'])
 
             ->on('FCom_Admin_Controller_MediaLibrary::action_grid_get:media/product/image.orm',
-                'FCom_Catalog_Admin_Controller_Products.onMediaGridGetORM', array('type'=>'I'))
+                'FCom_Catalog_Admin_Controller_Products.onMediaGridGetORM', ['type' => 'I'])
 
             ->on('FCom_Admin_Controller_MediaLibrary::processGridPost:media/product/image.upload',
-                'FCom_Catalog_Admin_Controller_Products.onMediaGridUpload', array('type'=>'I'))
+                'FCom_Catalog_Admin_Controller_Products.onMediaGridUpload', ['type' => 'I'])
 
             ->on('FCom_Admin_Controller_MediaLibrary::processGridPost:media/product/image.edit',
-                'FCom_Catalog_Admin_Controller_Products.onMediaGridEdit', array('type'=>'I'))
+                'FCom_Catalog_Admin_Controller_Products.onMediaGridEdit', ['type' => 'I'])
 
             ->on('FCom_Cms_Admin_Controller_Nav::action_tree_form', 'FCom_Catalog_Admin::onNavTreeForm')
         ;
@@ -44,13 +44,13 @@ class FCom_Catalog_Admin extends BClass
             ->allowFolder('storage/import/products')
         ;
 
-        FCom_Admin_Model_Role::i()->createPermission(array(
+        FCom_Admin_Model_Role::i()->createPermission([
             'catalog' => 'Catalog',
             'catalog/products' => 'Manage Products',
             'catalog/categories' => 'Manage Categories',
             'catalog/families' => 'Manage Families',
             'catalog/stocks' => 'Manage Stocks',
-        ));
+        ]);
     }
 
     public static function onProductsEditPost($args)
@@ -65,23 +65,23 @@ print_r($args); exit;
 
     public function getAvailableViews()
     {
-        $template = array();
+        $template = [];
         $allViews = FCom_Frontend_Main::i()->getLayout()->getAllViews();
         foreach ($allViews as $view) {
             $tmp = $view->param('view_name');
-            if ($tmp !='') {
-                $template['view:'.$tmp] = $tmp;
+            if ($tmp != '') {
+                $template['view:' . $tmp] = $tmp;
             }
         }
-        $cmsBlocks = array();
+        $cmsBlocks = [];
         $blocks = BDb::many_as_array(FCom_Cms_Model_Block::i()->orm()->select('id')->select('description')->find_many());
         foreach ($blocks as $block) {
-            $cmsBlocks['block:'.$block['id']] = $block['description'];
+            $cmsBlocks['block:' . $block['id']] = $block['description'];
         }
-        return array(
+        return [
             '' => '',
             '@CMS Pages' => $cmsBlocks,
             '@Templates' => $template,
-        );
+        ];
     }
 }

@@ -27,13 +27,13 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     protected static $_table = 'fcom_customer';
     protected static $_origClass = __CLASS__;
 
-    protected static $_fieldOptions = array(
-        'status' => array(
+    protected static $_fieldOptions = [
+        'status' => [
             'review'   => 'Review',
             'active'   => 'Active',
             'disabled' => 'Disabled',
-        ),
-    );
+        ],
+    ];
 
     protected static $_sessionUser;
     protected $defaultShipping = null;
@@ -41,22 +41,22 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     private static $lastImportedCustomer = 0;
 
-    protected static $_validationRules = array(
-        array('email', '@required'),
-        array('firstname', '@required'),
-        array('lastname', '@required'),
+    protected static $_validationRules = [
+        ['email', '@required'],
+        ['firstname', '@required'],
+        ['lastname', '@required'],
         //array('password', '@required'),
-        array('password_confirm', '@password_confirm'),
+        ['password_confirm', '@password_confirm'],
         /*array('payment_method', '@required'),
         array('payment_details', '@required'),*/
 
-        array('email', '@email'),
+        ['email', '@email'],
 
-        array('default_shipping_id', '@integer'),
-        array('default_billing_id', '@integer'),
-        array('password', 'FCom_Customer_Model_Customer::validatePasswordSecurity'),
+        ['default_shipping_id', '@integer'],
+        ['default_billing_id', '@integer'],
+        ['password', 'FCom_Customer_Model_Customer::validatePasswordSecurity'],
         /*array('customer_group', '@integer'),*/
-    );
+    ];
     //todo: set rules password minimum length
 
     /**
@@ -64,7 +64,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
      * @param array $args
      * @return FCom_Customer_Model_Customer
      */
-    public static function i($new=false, array $args=array())
+    public static function i($new = false, array $args = [])
     {
         return parent::i($new, $args);
     }
@@ -74,11 +74,11 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
      */
     public function setLoginRules()
     {
-        static::$_validationRules =  array(
-            array('email', '@required'),
-            array('password', '@required'),
-            array('email', '@email'),
-        );
+        static::$_validationRules =  [
+            ['email', '@required'],
+            ['password', '@required'],
+            ['email', '@email'],
+        ];
     }
 
     /**
@@ -86,42 +86,42 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
      */
     public function setPasswordRecoverRules()
     {
-        static::$_validationRules =  array(
-            array('email', '@required'),
-            array('email', '@email'),
-        );
+        static::$_validationRules =  [
+            ['email', '@required'],
+            ['email', '@email'],
+        ];
     }
 
     public function setAccountEditRules($incChangePassword = false)
     {
-        static::$_validationRules = array(
-            array('email', '@required'),
-            array('firstname', '@required'),
-            array('lastname', '@required'),
-        );
+        static::$_validationRules = [
+            ['email', '@required'],
+            ['firstname', '@required'],
+            ['lastname', '@required'],
+        ];
 
         if ($incChangePassword) {
-            static::$_validationRules[] = array('password', '@required');
-            static::$_validationRules[] = array('password_confirm', '@password_confirm');
+            static::$_validationRules[] = ['password', '@required'];
+            static::$_validationRules[] = ['password_confirm', '@password_confirm'];
         }
     }
 
     public function setChangePasswordRules()
     {
-        static::$_validationRules = array(
-            array('current_password', '@required'),
-            array('password', '@required'),
-            array('password_confirm', '@password_confirm'),
-        );
+        static::$_validationRules = [
+            ['current_password', '@required'],
+            ['password', '@required'],
+            ['password_confirm', '@password_confirm'],
+        ];
     }
 
     public function setSimpleRegisterRules()
     {
-        static::$_validationRules = array(
-            array('email', '@required'),
-            array('password', '@required'),
-            array('password_confirm', '@password_confirm'),
-        );
+        static::$_validationRules = [
+            ['email', '@required'],
+            ['password', '@required'],
+            ['password_confirm', '@password_confirm'],
+        ];
     }
 
     public function setPassword($password)
@@ -132,14 +132,14 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public function recoverPassword()
     {
-        $this->set(array('token'=>BUtil::randomString(20)))->save();
+        $this->set(['token' => BUtil::randomString(20)])->save();
         BLayout::i()->view('email/customer-password-recover')->set('customer', $this)->email();
         return $this;
     }
 
     public function resetPassword($password)
     {
-        $this->set(array('token'=>null))->setPassword($password)->save()->login();
+        $this->set(['token' => null])->setPassword($password)->save()->login();
         BLayout::i()->view('email/customer-password-reset')->set('customer', $this)->email();
         return $this;
     }
@@ -165,36 +165,36 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         }
 
         if ($this->_newRecord) {
-            FCom_PushServer_Model_Channel::i()->getChannel('customers_feed', true)->send(array(
+            FCom_PushServer_Model_Channel::i()->getChannel('customers_feed', true)->send([
                 'signal' => 'new_customer',
-                'customer' => array(
+                'customer' => [
                     'id' => $this->id(),
                     'email' => $this->email,
                     'name' => $this->firstname . ' ' . $this->lastname,
-                ),
-            ));
+                ],
+            ]);
         }
     }
 
     public function prepareApiData($customers)
     {
-        $result = array();
-        foreach($customers as $customer) {
-            $result[] = array(
+        $result = [];
+        foreach ($customers as $customer) {
+            $result[] = [
                 'id'                => $customer->id,
                 'email'             => $customer->email,
                 'firstname'         => $customer->firstname,
                 'lastname'          => $customer->lastname,
                 'shipping_address_id'  => $customer->default_shipping_id,
                 'billing_address_id'   => $customer->default_billing_id
-            );
+            ];
         }
         return $result;
     }
 
     public function formatApiPost($post)
     {
-        $data = array();
+        $data = [];
 
         if (!empty($post['email'])) {
             $data['email'] = $post['email'];
@@ -217,7 +217,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $data;
     }
 
-    public function as_array(array $objHashes=array())
+    public function as_array(array $objHashes = [])
     {
         $data = parent::as_array();
         unset($data['password_hash']);
@@ -245,7 +245,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
      * @param bool $reset
      * @return bool|FCom_Customer_Model_Customer
      */
-    static public function sessionUser($reset=false)
+    static public function sessionUser($reset = false)
     {
         if ($reset || !static::$_sessionUser) {
             $data = BSession::i()->get('customer_user');
@@ -295,13 +295,13 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         if ($this->timezone) {
             date_default_timezone_set($this->timezone);
         }
-        BEvents::i()->fire(__METHOD__.':after', array('user'=>$this));
+        BEvents::i()->fire(__METHOD__ . ':after', ['user' => $this]);
         return $this;
     }
 
     static public function logout()
     {
-        BEvents::i()->fire(__METHOD__.':before', array('user'=> static::sessionUser()));
+        BEvents::i()->fire(__METHOD__ . ':before', ['user' => static::sessionUser()]);
 
         BSession::i()->set('customer_user', false);
         static::$_sessionUser = null;
@@ -311,7 +311,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         if (empty($r['email'])
             || empty($r['password']) || empty($r['password_confirm'])
-            || $r['password']!=$r['password_confirm']
+            || $r['password'] != $r['password_confirm']
         ) {
             throw new Exception('Incomplete or invalid form data.');
         }
@@ -327,7 +327,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public static function import($data)
     {
-        BEvents::i()->fire(__METHOD__.':before', array('data'=>&$data));
+        BEvents::i()->fire(__METHOD__ . ':before', ['data' => &$data]);
 
         if (!empty($data['customer']['id'])) {
             $cust = static::load($data['customer']['id']);
@@ -339,7 +339,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
                     $cust = static::$lastImportedCustomer;
                     $result['status'] = 'updated';
                 } else {
-                    $result = array('status'=>'error', 'message'=>'Missing email address');
+                    $result = ['status' => 'error', 'message' => 'Missing email address'];
                     return $result;
                 }
             } else {
@@ -363,7 +363,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
         $result['addr'] = FCom_Customer_Model_Address::i()->import($data, $cust);
 
-        BEvents::i()->fire(__METHOD__.':after', array('data'=>$data, 'result'=>&$result));
+        BEvents::i()->fire(__METHOD__ . ':after', ['data' => $data, 'result' => &$result]);
 
         return $result;
     }
@@ -424,7 +424,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function getOptionsData($labelIncId = false)
     {
         $results = $this->orm('p')->find_many();
-        $data = array();
+        $data = [];
         if (count($results)) {
             foreach ($results as $r) {
                 $fullname = $r->firstname . ' ' . $r->lastname;
@@ -461,15 +461,15 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
      */
     public function saleStatistics()
     {
-        $statistics = array(
+        $statistics = [
             'lifetime' => 0,
             'avg'      => 0,
-        );
+        ];
         if (BModuleRegistry::i()->isLoaded('FCom_Sales')) {
             $orders = FCom_Sales_Model_Order::i()->orm()->where('customer_id', $this->id)->find_many();
             if ($orders) {
                 $cntOrders = count($orders);
-                foreach($orders as $order) {
+                foreach ($orders as $order) {
                     $statistics['lifetime'] += $order->grandtotal;
                 }
                 $statistics['avg'] = $statistics['lifetime'] / $cntOrders;

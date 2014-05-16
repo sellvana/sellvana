@@ -3,7 +3,7 @@
 class FCom_AuthorizeNet_AimApi extends BClass
 {
     const AUTHORIZENET_LOG_FILE = "authorize.net.log";
-    protected $response_vars = array();
+    protected $response_vars = [];
 
     /**
      * @var AuthorizeNetAIM
@@ -171,7 +171,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
             if ($data->get('debug') && !defined('AUTHORIZENET_LOG_FILE')) {
                 define('AUTHORIZENET_LOG_FILE', static::AUTHORIZENET_LOG_FILE);
             }
-            BClassAutoload::i(true, array('root_dir', __DIR__ . '/lib'));
+            BClassAutoload::i(true, ['root_dir', __DIR__ . '/lib']);
             $this->api = new AuthorizeNetAIM();
 /* API is missing currency code !!!!
             if($data->get('currency')){
@@ -196,10 +196,10 @@ class FCom_AuthorizeNet_AimApi extends BClass
      */
     public function responseAsArray($response)
     {
-        $result = array();
+        $result = [];
         foreach ($this->getResponseVariables($response) as $name) {
-            if (!empty($response->{$name})) {
-                $result[$name] = $response->{$name};
+            if (!empty($response-> {$name})) {
+                $result[$name] = $response-> {$name};
             }
         }
         return $result;
@@ -215,7 +215,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
      */
     protected function getResponseVariables($response)
     {
-        if(empty($this->response_vars)){
+        if (empty($this->response_vars)) {
             $vars = get_object_vars($response);
             if ($vars) {
                 foreach (array_keys($vars) as $k) {

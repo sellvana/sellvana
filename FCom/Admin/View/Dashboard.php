@@ -16,7 +16,7 @@ class FCom_Admin_View_Dashboard extends FCom_Admin_View_Abstract
 
     public function getWidgets()
     {
-        BEvents::i()->fire(__METHOD__, array('view' => $this));
+        BEvents::i()->fire(__METHOD__, ['view' => $this]);
 
         $widgets = (array)$this->get('widgets');
 
@@ -34,7 +34,8 @@ class FCom_Admin_View_Dashboard extends FCom_Admin_View_Abstract
                 }
             }
             uasort($widgets, function($a, $b) {
-                return $a['state']['pos'] < $b['state']['pos'] ? -1 : ($a['state']['pos'] > $b['state']['pos'] ? 1 : 0);
+                return $a['state']['pos'] < $b['state']['pos'] ? -1
+                    : ($a['state']['pos'] > $b['state']['pos'] ? 1 : 0);
             });
         }
         return $widgets;

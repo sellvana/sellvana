@@ -32,7 +32,7 @@ class FCom_LibGanon_Main extends BClass
      * @param array $args
      * @return FCom_LibGanon_Main
      */
-    public static function i($new=false, array $args=array())
+    public static function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
@@ -43,35 +43,35 @@ class FCom_LibGanon_Main extends BClass
         //$args['doc'] = $this->doc();
         $args['current_path'] = BRequest::i()->rawPath();
         BEvents::i()->fire('FCom_LibGanon::render', $args);
-        BEvents::i()->fire('FCom_LibGanon::render:'.$args['current_path'], $args);
+        BEvents::i()->fire('FCom_LibGanon::render:' . $args['current_path'], $args);
 
         if ($this->_doc) {
             $args['output'] = (string)$this->_doc;
         }
     }
 
-    public function ready($callback, $args=array())
+    public function ready($callback, $args = [])
     {
         if (empty($args['on_path'])) {
             BEvents::i()->on('FCom_LibGanon_Main::render', $callback, $args);
         } else {
             foreach ((array)$args['on_path'] as $path) {
-                BEvents::i()->on('FCom_LibGanon_Main::render:'.$path, $callback, $args);
+                BEvents::i()->on('FCom_LibGanon_Main::render:' . $path, $callback, $args);
             }
         }
         return $this;
     }
 
-    public function doc($html=null)
+    public function doc($html = null)
     {
-        if (is_null($this->_doc)) {
-            require_once __DIR__ . "ganon.php";
+        if (null === $this->_doc) {
+            require_once __DIR__ . "/lib/ganon.php";
         }
-        if (!is_null($html) || is_null($this->_doc)) {
-            if (is_null($html) && is_null($this->_doc)) {
+        if (null !== $html || null === $this->_doc) {
+            if (null === $html && null === $this->_doc) {
                 $html = $this->_html;
                 unset($this->_html);
-            } elseif (!is_null($html) && !is_null($this->_doc)) {
+            } elseif (null !== $html && null !== $this->_doc) {
                 unset($this->_doc);
             }
             $a = new HTML_Parser_HTML5($html);
@@ -85,7 +85,7 @@ class FCom_LibGanon_Main extends BClass
         return $this->doc(file_get_contents($filename));
     }
 
-    public function find($selector, $idx=null)
+    public function find($selector, $idx = null)
     {
         $root = $this->doc();
         return $root($selector, $idx);

@@ -1,0 +1,10 @@
+<?php return ['Credit Card' => '',
+'Card Type' => '',
+'Visa' => '',
+'MasterCard' => '',
+'Card number' => '',
+'Name on card' => '',
+'Expires' => '',
+'Choose' => '',
+'CVV' => '',
+'Apply changes' => ''];

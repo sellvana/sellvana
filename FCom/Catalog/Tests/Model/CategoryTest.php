@@ -4,7 +4,7 @@ class FCom_Catalog_Tests_Model_CategoryTest extends FCom_Test_DatabaseTestCase
 {
     public function getDataSet()
     {
-        return $this->createFlatXmlDataSet(__DIR__.'/CategoryTest.xml');
+        return $this->createFlatXmlDataSet(__DIR__ . '/CategoryTest.xml');
     }
 
     public function testAddEntry()

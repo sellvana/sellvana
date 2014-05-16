@@ -5,9 +5,9 @@ if (!defined('PHPUnit_MAIN_METHOD')) {
     define('PHPUnit_MAIN_METHOD', 'AllTests::main');
 }
 
-require_once __DIR__.'/../../../../tests/index.php';
+require_once __DIR__ . '/../../../../tests/index.php';
 
-require_once __DIR__.'/buckyball/AllTests.php';
+require_once __DIR__ . '/buckyball/AllTests.php';
 
 class AllTests_Buckyball
 {

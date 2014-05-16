@@ -101,7 +101,7 @@
             type: "GET",
             url: "<?=BApp::href('indextank/products/index')?>"
             }
-        ).done(function( ) {
+        ).done(function() {
             manageInterval('start');
             updateIndexingStatus();
         });
@@ -115,7 +115,7 @@
             type: "GET",
             url: "<?=BApp::href('indextank/products/index-resume')?>"
             }
-        ).done(function( ) {
+        ).done(function() {
             manageInterval('start');
             updateIndexingStatus();
         });
@@ -128,7 +128,7 @@
             type: "GET",
             url: "<?=BApp::href('indextank/products/index-pause')?>"
             }
-        ).done(function( ) {
+        ).done(function() {
             manageInterval('stop');
             updateIndexingStatus();
         });

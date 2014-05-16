@@ -5,17 +5,17 @@ class FCom_Feedback_Controller extends FCom_Core_Controller_Abstract
     public function action_index__POST()
     {
         $r = BRequest::i();
-        $result = array();
+        $result = [];
         try {
             $data = BUtil::arrayMask($r->post('feedback'), 'name,email,comments');
             $data['url'] = $r->referrer();
             if (BConfig::i()->get('modules/FCom_Feedback/send_mod_versions')) {
                 foreach (BModuleRegistry::i()->getAllModules() as $modName => $mod) {
                     if ($mod->run_status === 'LOADED') {
-                        $data['mod_versions'][$modName] = array(
+                        $data['mod_versions'][$modName] = [
                             'version' => $mod->version,
                             'channel' => $mod->channel,
-                        );
+                        ];
                     }
                 }
             }
@@ -24,10 +24,10 @@ class FCom_Feedback_Controller extends FCom_Core_Controller_Abstract
             if (!$result) {
                 $info = BUtil::lastRemoteHttpInfo();
 //echo '<pre>'; var_dump($info); exit;
-                throw new Exception('Server error ('.$info['headers']['status'].')');
+                throw new Exception('Server error (' . $info['headers']['status'] . ')');
             }
         } catch (Exception $e) {
-            $result['msg'] = 'Sending Feedback: '.$e->getMessage();
+            $result['msg'] = 'Sending Feedback: ' . $e->getMessage();
             $result['error'] = true;
         }
         if ($r->xhr()) {

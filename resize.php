@@ -53,7 +53,7 @@ class ImageResizer
 
         $this->useCache = isset( $p[ 'cache' ] ) ? (bool)$p[ 'cache' ] : true;
 
-        $this->size     = !empty( $p[ 's' ] ) ? explode( 'x', $p[ 's' ] ) : array();
+        $this->size     = !empty( $p[ 's' ] ) ? explode( 'x', $p[ 's' ] ) : [];
         $this->dw       = !empty( $this->size[ 0 ] ) ? $this->size[ 0 ] : 500;
         $this->dh       = !empty( $this->size[ 1 ] ) ? $this->size[ 1 ] : $this->dw;
         $this->quality  = !empty( $p[ 'q' ] ) ? (int)$p[ 'q' ] : 95;
@@ -67,7 +67,9 @@ class ImageResizer
             if ( !$this->file || !is_file( $this->file ) ) {
                 $this->file = realpath( $this->default );
             }
-
+            if (!is_dir($this->cacheDir)) {
+                mkdir($this->cacheDir, 0777, true);
+            }
             if ( !$this->file || strpos( $this->file, __DIR__ ) !== 0 ) {
                 $this->outputEmptyImage();
             }
@@ -213,6 +215,7 @@ class ImageResizer
                     $in = imagecreatefrompng( $this->file );
                     break;
                 default:
+                    break;
 
             }
             if ( $in ) {

@@ -54,7 +54,7 @@ class FCom_PaymentIdeal_PaymentMethod
         } else {
             $status = 'error';
         }
-        $paymentData = array(
+        $paymentData = [
             'method'           => 'ideal',
             'parent_id'        => $this->get('transaction_id'),
             'order_id'         => $this->salesEntity->id(),
@@ -63,16 +63,16 @@ class FCom_PaymentIdeal_PaymentMethod
             'transaction_id'   => $this->get('transaction_id'),
             'transaction_type' => 'sale',
             'online'           => 1,
-        );
+        ];
 
         $paymentModel = FCom_Sales_Model_Order_Payment::i()->addNew($paymentData);
         $paymentModel->setData('response', $this->getPublicData());
         $paymentModel->save();
     }
 
-    public function setDetails($details = array())
+    public function setDetails($details = [])
     {
-        if(isset($details['ideal'])){
+        if (isset($details['ideal'])) {
             $this->details = $details['ideal'];
         }
         return $this;
@@ -104,11 +104,11 @@ class FCom_PaymentIdeal_PaymentMethod
 
     protected function getBanks()
     {
-        $banks_array     = array();
-        $query_variables = array(
+        $banks_array     = [];
+        $query_variables = [
             'a'          => 'banklist',
             'partner_id' => $this->config()->get('partner_id'),
-        );
+        ];
 
         if ($this->config()->get('test')) {
             $query_variables['testmode'] = 'true';
@@ -137,26 +137,26 @@ class FCom_PaymentIdeal_PaymentMethod
     protected function createPayment($bankId, $amount, $description, $returnUrl, $reportUrl)
     {
         if (!$this->setBankId($bankId)) {
-            throw new Exception(BLocale::_("Bank id: %s is not valid.", array($bankId)));
+            throw new Exception(BLocale::_("Bank id: %s is not valid.", [$bankId]));
         }
 
         if (!$this->setDescription($description)) {
-            throw new Exception(BLocale::_("Provided description \"%s\" cannot be used.", array($description)));
+            throw new Exception(BLocale::_("Provided description \"%s\" cannot be used.", [$description]));
         }
 
         if (!$this->setAmount($amount)) {
-            throw new Exception(BLocale::_("Invalid amount: %s", array($amount)));
+            throw new Exception(BLocale::_("Invalid amount: %s", [$amount]));
         }
 
         if (!$returnUrl = filter_var($returnUrl, FILTER_VALIDATE_URL)) {
-            throw new Exception(BLocale::_("Incorrect return url: %s", array($returnUrl)));
+            throw new Exception(BLocale::_("Incorrect return url: %s", [$returnUrl]));
         }
 
         if (!$reportUrl = filter_var($reportUrl, FILTER_VALIDATE_URL)) {
-            throw new Exception(BLocale::_("Incorrect report url: %s", array($reportUrl)));
+            throw new Exception(BLocale::_("Incorrect report url: %s", [$reportUrl]));
         }
 
-        $query_variables = array(
+        $query_variables = [
             'a'           => 'fetch',
             'partnerid'   => $this->config()->get('partner_id'),
             'bank_id'     => $this->get('bank_id'),
@@ -164,7 +164,7 @@ class FCom_PaymentIdeal_PaymentMethod
             'description' => $this->get('description'),
             'reporturl'   => $reportUrl,
             'returnurl'   => $returnUrl,
-        );
+        ];
 
         if ($key = $this->config()->get('profile_key')) {
             $query_variables['profile_key'] = $key;
@@ -194,11 +194,11 @@ class FCom_PaymentIdeal_PaymentMethod
             throw new Exception("Transaction ID missing");
         }
 
-        $query_variables = array(
+        $query_variables = [
             'a'              => 'check',
             'partnerid'      => $this->config()->get('partner_id'),
             'transaction_id' => $transaction_id,
-        );
+        ];
 
         if ($this->config()->get('test')) {
             $query_variables['testmode'] = 'true';
@@ -219,7 +219,7 @@ class FCom_PaymentIdeal_PaymentMethod
         $this->set('paid_status', (bool)($check_object->order->payed == 'true'));
         $this->set('status', (string)$check_object->order->status);
         $this->set('amount', (int)$check_object->order->amount);
-        $this->set('consumer_info', (isset($check_object->order->consumer)) ? (array)$check_object->order->consumer : array());
+        $this->set('consumer_info', (isset($check_object->order->consumer)) ? (array)$check_object->order->consumer : []);
         $payment = $this->loadPaymentByTransactionId($transaction_id);
         $payment->set('status', 'paid')->save();
         return true;
@@ -231,13 +231,13 @@ class FCom_PaymentIdeal_PaymentMethod
             throw new Exception("Invalid description or amount");
         }
 
-        $query_variables = array(
+        $query_variables = [
             'a'           => 'create-link',
             'partnerid'   => $this->config()->get('partner_id'),
             'amount'      => $this->get('amount'),
             'description' => $this->get('description'),
             'profile_key' => $this->config()->get('profile_key'),
-        );
+        ];
 
         $create_xml = $this->_sendRequest(
             '/xml/ideal/',
@@ -259,7 +259,7 @@ class FCom_PaymentIdeal_PaymentMethod
     {
         $order = $this->loadOrderByTransactionId($transactionId);
         // update order
-        if($this->get('paid_status')){
+        if ($this->get('paid_status')) {
             $order->set('status', 'paid')->save();
         }
     }
@@ -337,10 +337,10 @@ class FCom_PaymentIdeal_PaymentMethod
     protected function getResponseError($xml)
     {
         if (empty($xml)) {
-            return array(
+            return [
                 'error_message' => "Empty response",
                 'error_code'    => 100,
-            );
+            ];
         }
         /*
          * Normal API errors
@@ -348,18 +348,18 @@ class FCom_PaymentIdeal_PaymentMethod
         if (isset($xml->item)) {
             $attributes = $xml->item->attributes();
             if ($attributes['type'] == 'error') {
-                return array(
+                return [
                     'error_message' => (string)$xml->item->message,
                     'error_code'    => (string)$xml->item->errorcode
-                );
+                ];
             }
         }
 
         if (isset($xml->order->error) && (string)$xml->order->error == "true") {
-            return array(
+            return [
                 'error_message' => (string)$xml->order->message,
                 'error_code'    => -1
-            );
+            ];
         }
 
         return false;

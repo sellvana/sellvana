@@ -2,7 +2,7 @@
 
 class FCom_Catalog_Frontend_ControlPanel extends BClass
 {
-    static protected $_models = array();
+    static protected $_models = [];
 
     static public function getModel($class, $id)
     {
@@ -16,36 +16,36 @@ class FCom_Catalog_Frontend_ControlPanel extends BClass
     {
         $model = static::getModel('FCom_Catalog_Model_Product', $params['data']['model_id']);
         if (!$model) {
-            return array('error' => 'Product not found');
+            return ['error' => 'Product not found'];
         }
         $field = $params['data']['field'];
         $value = isset($params['value']) ? $params['value'] : null;
-        if ($params['type']==='image') {
+        if ($params['type'] === 'image') {
             //TODO: ugly, but is there a better way?
             if (preg_match('/resize\.php\?f=media%2F([^&]+)/', $params['attributes']['src'], $m)) { 
                 $src = urldecode($m[1]);
-                if ($src!=='image-not-found.jpg') {
+                if ($src !== 'image-not-found.jpg') {
                     $value = $src;
                 }
             } else {
-                return array('error' => 'Invalid image source');
+                return ['error' => 'Invalid image source'];
             }
         }
         $model->set($field, $value);
 
-        return array('success' => true);
+        return ['success' => true];
     }
 
     static public function categoryEntityHandler($params)
     {
         $model = static::getModel('FCom_Catalog_Model_Category', $params['data']['model_id']);
         if (!$model) {
-            return array('error' => 'Category not found');
+            return ['error' => 'Category not found'];
         }
         $field = $params['data']['field'];
         $value = isset($params['value']) ? $params['value'] : null;
         $model->set($field, $value);
-        return array('success' => true);
+        return ['success' => true];
     }
 
     static public function onAfterUpdate($args)

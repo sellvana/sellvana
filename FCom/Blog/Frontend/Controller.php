@@ -19,9 +19,9 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 $this->forward(false);
             }
         }
-        $this->view('head')->rss($tag->getUrl().'/feed.rss');
+        $this->view('head')->rss($tag->getUrl() . '/feed.rss');
         $posts = FCom_Blog_Model_Post::i()->getPostsOrm()
-            ->join('FCom_Blog_Model_PostTag', array('pt.post_id','=','p.id'), 'pt')
+            ->join('FCom_Blog_Model_PostTag', ['pt.post_id', '=', 'p.id'], 'pt')
             ->where('pt.tag_id', $tag->id)
             ->find_many();
         $this->view('blog/posts')->set('posts', $posts);
@@ -38,9 +38,9 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 $this->forward(false);
             }
         }
-        $this->view('head')->rss($cat->getUrl().'/feed.rss');
+        $this->view('head')->rss($cat->getUrl() . '/feed.rss');
         $posts = FCom_Blog_Model_Post::i()->getPostsOrm()
-            ->join('FCom_Blog_Model_PostCategory', array('pc.post_id','=','p.id'), 'pc')
+            ->join('FCom_Blog_Model_PostCategory', ['pc.post_id', '=', 'p.id'], 'pc')
             ->where('pc.category_id', $cat->id)
             ->find_many();
         $this->view('blog/posts')->set('posts', $posts);
@@ -61,8 +61,8 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             ->where('p.author_user_id', $user->id)
             ->find_many();
         $this->view('blog/posts')->set('posts', $posts);
-        $this->view('head')->rss(BApp::href('blog').'/author/'.$userName.'/feed.rss');
-        $this->view('head')->addTitle($user->firstname.' '.$user->lastname);
+        $this->view('head')->rss(BApp::href('blog') . '/author/' . $userName . '/feed.rss');
+        $this->view('head')->addTitle($user->firstname . ' ' . $user->lastname);
         $this->layout('/blog/author');
     }
 
@@ -77,10 +77,10 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $m = $r->param('month');
         $postsOrm = FCom_Blog_Model_Post::i()->getPostsOrm();
         if ($m) {
-            $postsOrm->where('create_ym', $y.$m);
-            $this->view('head')->addTitle($y.'/'.$m);
+            $postsOrm->where('create_ym', $y . $m);
+            $this->view('head')->addTitle($y . '/' . $m);
         } else {
-            $postsOrm->where_like('create_ym', $y.'%');
+            $postsOrm->where_like('create_ym', $y . '%');
             $this->view('head')->addTitle($y);
         }
         $this->view('blog/posts')->set('posts', $postsOrm->find_many());
@@ -124,7 +124,7 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 $this->forward(false);
             }
             $postsOrm
-                ->join('FCom_Blog_Model_PostTag', array('pt.post_id','=','p.id'), 'pt')
+                ->join('FCom_Blog_Model_PostTag', ['pt.post_id', '=', 'p.id'], 'pt')
                 ->where('pt.tag_id', $tag->id());
         }
 
@@ -135,7 +135,7 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 $this->forward(false);
             }
             $postsOrm
-                ->join('FCom_Blog_Model_PostCategory', array('pc.post_id','=','p.id'), 'pc')
+                ->join('FCom_Blog_Model_PostCategory', ['pc.post_id', '=', 'p.id'], 'pc')
                 ->where('pc.category_id', $cat->id());
         }
 
@@ -147,18 +147,18 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             }
             $postsOrm->where('author_user_id', $user->id());
         }
-        $data = array(
+        $data = [
             'title' => BConfig::i()->get('modules/FCom_Blog/blog_title'),
             'link' => $tagKey ? $tag->getUrl() : BApp::href('blog'),
-            'items' => array(),
-        );
+            'items' => [],
+        ];
         foreach ($postsOrm->find_many() as $p) {
-            $data['items'][] = array(
+            $data['items'][] = [
                 'link' => $p->getUrl(),
                 'pubDate' => date('D, d M Y H:i:s O', strtotime($p->create_at)),
                 'title' => $p->title,
                 'description' => $p->preview,
-            );
+            ];
         }
         echo BUtil::toRss($data);
         exit;

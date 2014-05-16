@@ -5,12 +5,12 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     protected static $_origClass;
     protected $_permission;
 
-    public function authenticate($args=array())
+    public function authenticate($args = [])
     {
         return FCom_Admin_Model_User::i()->isLoggedIn();
     }
 
-    public function authorize($args=array())
+    public function authorize($args = [])
     {
         if (!parent::authorize($args)) {
             return false;
@@ -30,7 +30,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         $r = BRequest::i();
         if ($r->xhr()) {
             BSession::i()->set('admin_login_orig_url', $r->referrer());
-            BResponse::i()->json(array('error'=>'login'));
+            BResponse::i()->json(['error' => 'login']);
         } else {
             BSession::i()->set('admin_login_orig_url', $r->currentUrl());
             $this->layout('/login');
@@ -43,7 +43,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         $r = BRequest::i();
         if ($r->xhr()) {
             BSession::i()->set('admin_login_orig_url', $r->referrer());
-            BResponse::i()->json(array('error'=>'denied'));
+            BResponse::i()->json(['error' => 'denied']);
         } else {
             BSession::i()->set('admin_login_orig_url', $r->currentUrl());
             $this->layout('/denied');
@@ -60,7 +60,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         return true;
     }
 
-    public function processFormTabs($view, $model=null, $mode='edit', $allowed=null)
+    public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
     {
         $r = BRequest::i();
         if ($r->xhr() && !is_null($r->get('tabs'))) {
@@ -71,7 +71,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         return $this;
     }
 
-    public function message($msg, $type='success', $tag='admin', $options=array())
+    public function message($msg, $type = 'success', $tag = 'admin', $options = [])
     {
         if (is_array($msg)) {
             array_walk($msg, 'BLocale::_');
@@ -82,7 +82,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         return $this;
     }
 
-    public function initFormTabs($view, $model, $mode='view', $allowed=null)
+    public function initFormTabs($view, $model, $mode = 'view', $allowed = null)
     {
 
         $r = BRequest::i();
@@ -97,8 +97,8 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
         $tabs = $view->tab_groups ? $view->tabs : $view->sortedTabs();
         if ($tabs) {
-            foreach ($tabs as $k=>&$tab) {
-                if (!is_null($allowed) && $allowed!=='ALL' && !in_array($k, $allowed)) {
+            foreach ($tabs as $k => &$tab) {
+                if (!is_null($allowed) && $allowed !== 'ALL' && !in_array($k, $allowed)) {
                     $tab['disabled'] = true;
                     continue;
                 }
@@ -109,13 +109,13 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                 if (!empty($tab['view'])) {
                     $tabView = $layout->view($tab['view']);
                     if ($tabView) {
-                        $tabView->set(array(
+                        $tabView->set([
                             'model' => $model,
                             #'validator' => $validator,
                             'mode' => $mode,
-                        ));
+                        ]);
                     } else {
-                        BDebug::warning('MISSING VIEW: '.$tab['view']);
+                        BDebug::warning('MISSING VIEW: ' . $tab['view']);
                     }
                 }
             }
@@ -137,7 +137,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                     unset($tabGroups[$k]);
                 } else {
                     uasort($tabGroup['tabs'], function($a, $b) {
-                        return $a['pos']<$b['pos'] ? -1 : ($a['pos']>$b['pos'] ? 1 : 0);
+                        return $a['pos'] < $b['pos'] ? -1 : ($a['pos'] > $b['pos'] ? 1 : 0);
                     });
                     if (!$curTab) {
                         foreach ($tabGroup['tabs'] as $tabId => &$tab) {
@@ -167,18 +167,18 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             }
         }
 
-        $view->set(array(
+        $view->set([
             'tabs' => $tabs,
             'model' => $model,
             'mode' => $mode,
             'cur_tab' => $curTab,
-        ));
+        ]);
         return $this;
     }
 
     public function collectFormTabs($formView)
     {
-        $views = BLayout::i()->findViewsRegex('#^'.$formView->get('tab_view_prefix').'#');
+        $views = BLayout::i()->findViewsRegex('#^' . $formView->get('tab_view_prefix') . '#');
         foreach ($views as $viewName => $view) {
             $id = basename($viewName);
             if (!empty($formView->tabs[$id])) {
@@ -200,7 +200,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         return $this;
     }
 
-    public function outFormTabsJson($view, $model, $defMode='view')
+    public function outFormTabsJson($view, $model, $defMode = 'view')
     {
         $r = BRequest::i();
         $mode = $r->request('mode');
@@ -208,33 +208,33 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             $mode = $defMode;
         }
         $outTabs = $r->request('tabs');
-        if ($outTabs && $outTabs!=='ALL' && is_string($outTabs)) {
+        if ($outTabs && $outTabs !== 'ALL' && is_string($outTabs)) {
             $outTabs = explode(',', $outTabs);
         }
-        $out = array();
+        $out = [];
         if ($outTabs) {
             $layout = BLayout::i();
             $tabs = $view->tabs;
-            foreach ($tabs as $k=>$tab) {
-                if ($outTabs!=='ALL' && !in_array($k, $outTabs)) {
+            foreach ($tabs as $k => $tab) {
+                if ($outTabs !== 'ALL' && !in_array($k, $outTabs)) {
                     continue;
                 }
                 $view = $layout->view($tab['view']);
                 if (!$view) {
-                    BDebug::error('MISSING VIEW: '.$tabs[$k]['view']);
+                    BDebug::error('MISSING VIEW: ' . $tabs[$k]['view']);
                     continue;
                 }
-                $out['tabs'][$k] = (string)$view->set(array(
+                $out['tabs'][$k] = (string)$view->set([
                     'model' => $model,
                     'mode' => $mode,
-                ));
+                ]);
             }
         }
         $out['messages'] = BSession::i()->messages('admin');
         BResponse::i()->json($out);
     }
 
-    protected function _processGridDataPost($class, $defData = array())
+    protected function _processGridDataPost($class, $defData = [])
     {
         $r = BRequest::i();
         $id = $r->post('id');
@@ -242,7 +242,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         $hlp = $class::i();
         unset($data['id'], $data['oper']);
 
-        $args = array('data' => &$data, 'oper' => $r->post('oper'), 'helper' => $hlp);
+        $args = ['data' => &$data, 'oper' => $r->post('oper'), 'helper' => $hlp];
         $this->gridPostBefore($args);
 
         switch ($args['oper']) {
@@ -260,15 +260,15 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
         case 'del':
             $args['model'] = $hlp->load($id)->delete();
-            $result = array('success'=>true);
+            $result = ['success' => true];
             break;
 
         case 'mass-delete':
             $args['ids'] = explode(",", $id);
-            foreach($args['ids'] as $id) {
+            foreach ($args['ids'] as $id) {
                 $hlp->load($id)->delete();
             }
-            $result = array('success'=>true);
+            $result = ['success' => true];
             break;
 
         case 'mass-edit':
@@ -281,7 +281,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                     $args['models'][] = $hlp->load($id)->set($data)->save();
                 }
             }
-            $result = array('success'=>true);
+            $result = ['success' => true];
             break;
         }
 
@@ -294,11 +294,11 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     public function gridPostBefore($args)
     {
-        BEvents::i()->fire(static::$_origClass.'::gridPostBefore', $args);
+        BEvents::i()->fire(static::$_origClass . '::gridPostBefore', $args);
     }
 
     public function gridPostAfter($args)
     {
-        BEvents::i()->fire(static::$_origClass.'::gridPostAfter', $args);
+        BEvents::i()->fire(static::$_origClass . '::gridPostAfter', $args);
     }
 }

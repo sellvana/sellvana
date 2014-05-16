@@ -14,7 +14,7 @@ abstract class FCom_Test_DatabaseTestCase extends PHPUnit_Extensions_Database_Te
         if ($this->conn === null) {
             $config = BConfig::i()->get('db');
             if (self::$pdo == null) {
-                self::$pdo = new PDO('mysql:dbname='.$config['dbname'].';host='.$config['host'], $config['username'], $config['password']);
+                self::$pdo = new PDO('mysql:dbname=' . $config['dbname'] . ';host=' . $config['host'], $config['username'], $config['password']);
 
             }
             $this->conn = $this->createDefaultDBConnection(static::$pdo, $config['dbname']);

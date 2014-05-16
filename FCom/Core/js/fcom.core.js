@@ -1,6 +1,6 @@
-define(["jquery", "backbone", "transparency", "jquery.widgets"],
+define(["jquery"/*, "backbone", "transparency", "jquery.widgets"*/],
 
-function($, Backbone) {
+function($/*, Backbone*/) {
     /*
     FCom.tabs = function(options) {
         var tabs = $(options.tabs);
@@ -55,7 +55,7 @@ function($, Backbone) {
     FCom._ = function (str) {
         return FCom.i18n[str] || str;
     };
-
+    /*
     FCom.TransparencyView = Backbone.View.extend({
         constructor: function (options) {
             Backbone.View.prototype.constructor.apply(this, arguments);
@@ -67,7 +67,7 @@ function($, Backbone) {
             Transparency.render(this.el, this.model.toJSON());
         }
     });
-
+    */
     $(function () {
         $('form').append($('<input type="hidden" name="X-CSRF-TOKEN"/>').val(csrfToken));
         if ($.fn.select2) {

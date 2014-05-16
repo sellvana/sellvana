@@ -25,9 +25,9 @@ class FCom_MarketClient_Admin_Controller_Site extends FCom_Admin_Controller_Abst
                 }
             }
             if (!empty($upgradeModNames)) {
-                $this->message('Upgrades found: '.join(', ', $upgradeModNames));
+                $this->message('Upgrades found: ' . join(', ', $upgradeModNames));
                 if (BRequest::i()->get('install')) {
-                    $redirectUrl = 'marketclient/module/install?mod_name='.join(',', $upgradeModNames);
+                    $redirectUrl = 'marketclient/module/install?mod_name=' . join(',', $upgradeModNames);
                 }
             } else {
                 $this->message('No upgrades were found');

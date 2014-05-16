@@ -4,14 +4,14 @@ class FCom_Wishlist_Tests_Model_WishlistTest extends FCom_Test_DatabaseTestCase
 {
     public function getDataSet()
     {
-        return $this->createFlatXmlDataSet(__DIR__.'/WishlistTest.xml');
+        return $this->createFlatXmlDataSet(__DIR__ . '/WishlistTest.xml');
     }
 
     public function testAddEntry()
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_wishlist'), "Pre-Condition");
 
-        $data = array('customer_id' => 3);
+        $data = ['customer_id' => 3];
         FCom_Wishlist_Model_Wishlist::i()->create($data)->save();
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_wishlist'), "Insert failed");
@@ -46,7 +46,7 @@ class FCom_Wishlist_Tests_Model_WishlistTest extends FCom_Test_DatabaseTestCase
         $wishlist = FCom_Wishlist_Model_Wishlist::i()->load(1);
         $this->assertEquals(2, count($wishlist->items()), "Items count is not correct");
 
-        foreach($wishlist->items() as $item) {
+        foreach ($wishlist->items() as $item) {
             $wishlist->removeItem($item);
         }
 

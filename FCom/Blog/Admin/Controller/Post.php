@@ -16,41 +16,44 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
     {
         $config = parent::gridConfig();
 
-        $config['columns'] = array(
-            array('type' => 'row_select'),
-            array('name' => 'id', 'label' => 'ID'),
-            array('name' => 'author', 'label'=>'Author'),
-            array('type' => 'input', 'name' => 'status', 'label' => 'Status', 'edit_inline' => false, 'editable' => true, 'mass-editable' => true, 'editor' => 'select','mass-editable-show' => true,
-                  'options' => FCom_Blog_Model_Post::i()->fieldOptions('status'), 'index' => $this->_mainTableAlias.'.status'),
-            array('type'=>'input', 'name' => 'title', 'label'=>'Title','editable' => true, 'edit_inline' => true, 'validation' => array('required' => true)
+        $config['columns'] = [
+            ['type' => 'row_select'],
+            ['name' => 'id', 'label' => 'ID'],
+            ['name' => 'author', 'label' => 'Author'],
+            ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'edit_inline' => false, 'editable' => true,
+                'mass-editable' => true, 'editor' => 'select', 'mass-editable-show' => true,
+                'options' => FCom_Blog_Model_Post::i()->fieldOptions('status'),
+                'index' => $this->_mainTableAlias . '.status'],
+            ['type' => 'input', 'name' => 'title', 'label' => 'Title', 'editable' => true, 'edit_inline' => true,
+                'validation' => ['required' => true]
 //                'href' => BApp::href('blog/post/form/?id=:id')
-            ),
-            array('name' => 'url_key', 'label'=>'Url Key', 'hidden' => true),
-            array('name' => 'meta_title', 'label'=>'Meta Title', 'hidden' => true),
-            array('name' => 'meta_description', 'label'=>'Meta Description', 'hidden' => true),
-            array('name' => 'meta_keywords', 'label'=>'Meta Keywords', 'hidden' => true),
-            array('name' => 'create_ym', 'label'=>'Create ym' , 'hidden' => true),
-            array('name' => 'create_at', 'label'=>'Created', 'cell'=>'date'),
-            array('name' => 'update_at', 'label'=>'Updated', 'cell'=>'date'),
-            array('type' => 'btn_group', 'buttons' => array(
-                array('name' => 'edit'),
-                array('name' => 'delete', 'edit_inline' => false)
-            ))
-        );
+            ],
+            ['name' => 'url_key', 'label' => 'Url Key', 'hidden' => true],
+            ['name' => 'meta_title', 'label' => 'Meta Title', 'hidden' => true],
+            ['name' => 'meta_description', 'label' => 'Meta Description', 'hidden' => true],
+            ['name' => 'meta_keywords', 'label' => 'Meta Keywords', 'hidden' => true],
+            ['name' => 'create_ym', 'label' => 'Create ym' , 'hidden' => true],
+            ['name' => 'create_at', 'label' => 'Created', 'cell' => 'date'],
+            ['name' => 'update_at', 'label' => 'Updated', 'cell' => 'date'],
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit'],
+                ['name' => 'delete', 'edit_inline' => false]
+            ]]
+        ];
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {
-                $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias.'.*');
+                $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias . '.*');
             }
             $this->gridOrmConfig($config['orm']);
         }
-        $config['actions'] = array(
+        $config['actions'] = [
             'edit' => true,
             'delete' => true
-        );
-        $config['filters'] = array(
-            array('field' => 'title', 'type' => 'text'),
-            array('field' => 'status', 'type' => 'multiselect'),
-        );
+        ];
+        $config['filters'] = [
+            ['field' => 'title', 'type' => 'text'],
+            ['field' => 'status', 'type' => 'multiselect'],
+        ];
 
         return $config;
     }
@@ -59,7 +62,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
     {
         parent::gridOrmConfig($orm);
         $r = BRequest::i()->get();
-        $orm->join('FCom_Admin_Model_User', array('p.author_user_id', '=', 'u.id'), 'u')
+        $orm->join('FCom_Admin_Model_User', ['p.author_user_id', '=', 'u.id'], 'u')
             ->select_expr('CONCAT_WS(" ", u.firstname,u.lastname)', 'author');
         if (!BRequest::i()->xhr()) {
             BSession::i()->pop('categoryBlogPost');
@@ -68,7 +71,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             BSession::i()->set('categoryBlogPost', $r['category']);
         }
         if (BSession::i()->get('categoryBlogPost')) {
-            $orm->join('FCom_Blog_Model_PostCategory', array($this->_mainTableAlias.'.id', '=', 'c.post_id'), 'c')
+            $orm->join('FCom_Blog_Model_PostCategory', [$this->_mainTableAlias . '.id', '=', 'c.post_id'], 'c')
                 ->where('c.category_id', BSession::i()->get('categoryBlogPost'))
             ;
         }
@@ -78,9 +81,9 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
     {
         parent::formViewBefore($args);
         $m = $args['model'];
-        $args['view']->set(array(
-            'title' => $m->id ? 'Edit Blog Post: '.$m->title : 'Create New Blog Post',
-        ));
+        $args['view']->set([
+            'title' => $m->id ? 'Edit Blog Post: ' . $m->title : 'Create New Blog Post',
+        ]);
         $tagOptions = FCom_Blog_Model_Tag::i()->orm()->order_by_asc('tag_name')
             ->select('tag_key', 'id')->select('tag_name', 'name')->find_many();
         $tagOptionsJson = BUtil::toJson(BDb::many_as_array($tagOptions));
@@ -96,64 +99,64 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         $config = parent::gridConfig();
         //$config['id'] = 'category_all_prods_grid-'.$model->id;
         $config['id'] = 'category_all_post_grid';
-        $config['columns'] = array(
-            array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
-            array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>55),
-            array('name' => 'author', 'label'=>'Author'),
-            array('name' => 'title', 'label'=>'Title', 'href' => BApp::href('blog/post/form/?id=:id')),
-            array('name' => 'status', 'label' => 'Status', 'editable' => true, 'mass-editable' => true, 'editor' => 'select',
-                'options' => FCom_Blog_Model_Post::i()->fieldOptions('status')),
-        );
-        $config['actions'] = array(
-            'add' => array('caption'=>'Add selected posts', 'modal' => true)
-        );
-        $config['filters'] = array(
-            array('field' => 'title', 'type' => 'text'),
-            array('field' => 'status', 'type' => 'multiselect'),
-        );
+        $config['columns'] = [
+            ['cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40],
+            ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55],
+            ['name' => 'author', 'label' => 'Author'],
+            ['name' => 'title', 'label' => 'Title', 'href' => BApp::href('blog/post/form/?id=:id')],
+            ['name' => 'status', 'label' => 'Status', 'editable' => true, 'mass-editable' => true, 'editor' => 'select',
+                'options' => FCom_Blog_Model_Post::i()->fieldOptions('status')],
+        ];
+        $config['actions'] = [
+            'add' => ['caption' => 'Add selected posts', 'modal' => true]
+        ];
+        $config['filters'] = [
+            ['field' => 'title', 'type' => 'text'],
+            ['field' => 'status', 'type' => 'multiselect'],
+        ];
         $config['orm'] = FCom_Blog_Model_Post::i()->orm('p')
             ->select('p.*')
-            ->join('FCom_Admin_Model_User', array('p.author_user_id', '=', 'u.id'), 'u')
+            ->join('FCom_Admin_Model_User', ['p.author_user_id', '=', 'u.id'], 'u')
             ->select_expr('CONCAT_WS(" ", u.firstname,u.lastname)', 'author');
-        $config['events'] = array('add');
+        $config['events'] = ['add'];
         /*$config['_callbacks'] = "{
             'add':'categoryProdsMng.addSelectedProds'
         }";*/
 
 
-        return array('config' =>$config);
+        return ['config' => $config];
     }
 
     public function postGridConfig($model)
     {
         $orm = FCom_Blog_Model_Post::i()->orm()->table_alias('p')
-            ->select(array('p.id', 'p.author_user_id', 'p.status', 'p.title'));
-        $orm->join('FCom_Admin_Model_User', array('p.author_user_id','=','u.id'), 'u')
+            ->select(['p.id', 'p.author_user_id', 'p.status', 'p.title']);
+        $orm->join('FCom_Admin_Model_User', ['p.author_user_id', '=', 'u.id'], 'u')
             ->select_expr('CONCAT_WS(" ", u.firstname,u.lastname)', 'author');
-        $orm->join('FCom_Blog_Model_PostCategory', array('p.id','=','cp.post_id'), 'cp')
+        $orm->join('FCom_Blog_Model_PostCategory', ['p.id', '=', 'cp.post_id'], 'cp')
             ->where('category_id', $model->id);
-        $config = array(
+        $config = [
             'id'           => 'post_category',
-            'data'         =>null,
-            'data_mode'     =>'local',
+            'data'         => null,
+            'data_mode'     => 'local',
             //'caption'      =>$caption,
-            'columns'      =>array(
-                array('cell'=>'select-row', 'headerCell'=>'select-all', 'width'=>40),
-                array('name'=>'id', 'label'=>'ID', 'index'=>'p.id', 'width'=>80, 'hidden'=>true),
-                array('name' => 'author', 'label'=>'Author', 'index' => 'u.author_user_id'),
-                array('name' => 'title', 'label'=>'Title'),
-                array('name' => 'status', 'label' => 'Status'),
-            ),
-            'actions'=>array(
-                'add'=>array('caption'=>'Add Posts'),
-                'delete'=>array('caption'=>'Remove')
-            ),
-            'filters'=>array(
-                array('field' => 'title', 'type' => 'text'),
-                array('field' => 'status', 'type' => 'multiselect'),
-            ),
-            'events'=>array('init', 'add','mass-delete')
-        );
+            'columns'      => [
+                ['cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40],
+                ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
+                ['name' => 'author', 'label' => 'Author', 'index' => 'u.author_user_id'],
+                ['name' => 'title', 'label' => 'Title'],
+                ['name' => 'status', 'label' => 'Status'],
+            ],
+            'actions' => [
+                'add' => ['caption' => 'Add Posts'],
+                'delete' => ['caption' => 'Remove']
+            ],
+            'filters' => [
+                ['field' => 'title', 'type' => 'text'],
+                ['field' => 'status', 'type' => 'multiselect'],
+            ],
+            'events' => ['init', 'add', 'mass-delete']
+        ];
 
 
         //BEvents::i()->fire(__METHOD__.':orm', array('type'=>$type, 'orm'=>$orm));
@@ -171,7 +174,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         $config['data'] = $data;
 
         //BEvents::i()->fire(__METHOD__.':config', array('type'=>$type, 'config'=>&$config));
-        return array('config'=>$config);
+        return ['config' => $config];
     }
 
     public function formPostAfter($args)
@@ -182,17 +185,17 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         if (isset($r['category-id'])) {
             $cp = FCom_Blog_Model_PostCategory::i();
 
-            $cp->delete_many(array(
+            $cp->delete_many([
                 'post_id' => $model->id,
-            ));
+            ]);
 
             if ($r['category-id'] != '') {
                 $tmp = explode(',', $r['category-id']);
                 foreach ($tmp as $categoryId) {
-                    $cp->create(array(
+                    $cp->create([
                         'post_id' => $model->id,
                         'category_id' => $categoryId,
-                    ))->save();
+                    ])->save();
                 }
             }
 

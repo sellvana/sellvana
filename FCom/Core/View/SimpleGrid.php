@@ -2,11 +2,11 @@
 
 class FCom_Core_View_SimpleGrid extends FCom_Core_View_HtmlGrid
 {
-    static protected $_defaultActions = array(
+    static protected $_defaultActions = [
         'refresh' => true,
         'link_to_page' => false,
         'sort' => true,
-    );
+    ];
 
     public function rowsHtml($rows = null)
     {
@@ -15,37 +15,37 @@ class FCom_Core_View_SimpleGrid extends FCom_Core_View_HtmlGrid
         $gridId = $grid['config']['id'];
         $columns = $grid['config']['columns'];
 
-        $trArr = array();
+        $trArr = [];
         foreach ($rows as $rowId => $row) {
             $row->_id = $rowId;
-            $trAttr = array();
+            $trAttr = [];
             $trAttr['id'] = "data-row--{$gridId}--{$rowId}";
             $trAttr['data-id'] = $row->get($grid['config']['row_id_column']);
             $trAttr['class'][] = $rowId % 2 ? 'odd' : 'even';
 
-            $tdArr = array();
+            $tdArr = [];
             foreach ($columns as $colId => $col) {
                 $cellData = $this->cellData($row, $col);
-                $tdArr[$colId] = array('attr' => $cellData['attr'], 'html' => $cellData['html']);
+                $tdArr[$colId] = ['attr' => $cellData['attr'], 'html' => $cellData['html']];
                 if (!empty($cellData['row_attr'])) {
                     $trAttr = array_merge_recursive($cellData['row_attr']);
                 }
             }
-            $trArr[$rowId] = array('attr' => $trAttr, 'cells' =>$tdArr);
+            $trArr[$rowId] = ['attr' => $trAttr, 'cells' => $tdArr];
         }
 
         if (!empty($grid['config']['format_callback'])) {
             $cb = $grid['config']['format_callback'];
             if (is_callable($cb)) {
-                call_user_func($cb, array('grid' => $grid, 'rows' => &$trArr));
+                call_user_func($cb, ['grid' => $grid, 'rows' => &$trArr]);
             } else {
                 BDebug::warning('Invalid grid format_callback');
             }
         }
 
-        $trHtmlArr = array();
+        $trHtmlArr = [];
         foreach ($trArr as $rowId => $tr) {
-            $tdHtmlArr = array();
+            $tdHtmlArr = [];
             foreach ($tr['cells'] as $colId => $cell) {
                 $tdHtmlArr[] = BUtil::tagHtml('td', $cell['attr'], $cell['html']);
             }

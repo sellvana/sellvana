@@ -2,7 +2,7 @@
 
 class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
 {
-    public function authenticate($args=array())
+    public function authenticate($args = [])
     {
         return true;
     }
@@ -17,7 +17,7 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
                     $user->login();
                     if (!empty($r['remember_me'])) {
                         $days = BConfig::i()->get('cookie/remember_days');
-                        BResponse::i()->cookie('remember_me', 1, ($days ? $days : 30)*86400);
+                        BResponse::i()->cookie('remember_me', 1, ($days ? $days : 30) * 86400);
                     }
                 } else {
                     $this->message('Invalid user name or password.', 'error');
@@ -47,10 +47,10 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
             return;
         }
         $user = FCom_Admin_Model_User::i()->orm()
-            ->where(array('OR' => array(
+            ->where(['OR' => [
                 'email' => $form['email'],
                 'username' => $form['email'],
-            )))
+            ]])
             ->find_one();
         if ($user) {
             $user->recoverPassword();
@@ -80,11 +80,13 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
         $password = !empty($form['password']) ? $form['password'] : null;
         $confirm = !empty($form['password_confirm']) ? $form['password_confirm'] : null;
         $returnUrl = BRequest::i()->referrer();
-        if (!($token && ($user = FCom_Admin_Model_User::i()->load($token, 'token')) && $user->get('token') === $token)) {
+        if (!($token && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))
+            && $user->get('token') === $token)
+        ) {
             $this->message('Invalid token', 'error');
             BResponse::i()->redirect($returnUrl);
             return;
-        } elseif (!($password && $confirm && $password === $confirm)) {
+        } elseif (!($password && $confirm && ($password === $confirm))) {
             $this->message('Invalid password or confirmation', 'error');
             BResponse::i()->redirect($returnUrl);
             return;
@@ -97,6 +99,7 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
     public function action_logout()
     {
         FCom_Admin_Model_User::i()->logout();
+        BResponse::i()->cookie('remember_me', 0);
         BResponse::i()->redirect('');
     }
 }

@@ -18,62 +18,65 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         //$formUrl = BApp::href("prodreviews/form");
         $reviewConfigs = FCom_ProductReviews_Model_Review::i()->config();
         $config = parent::gridConfig();
-        $columns = array(
-            array('type'=>'row_select'),
-            array('name'=>'id','label'=>'ID', 'width'=>55, 'hidden'=>true),
-            array('type'=>'input', 'name'=>'title', 'label'=>'Title', 'width'=>250, 'addable' => true, 'editable'=>true, 'validation' => array('required' => true)),
-            array('type'=>'input', 'name'=>'text', 'label'=>'Comment', 'width'=>250, 'addable' => true, 'editable'=>true, 'editor' => 'textarea'),
-            array('type'=>'input', 'name'=>'rating', 'label' => 'Total Rating', 'width' => 60, 'addable' => true, 'editable' => true,
-                  'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating"]+"\'></div>"',
-                  'element_print' => $this->inputRatingHtml('rating'),
-                  /*'validation' => array('required' => true, 'number' => true, 'range' => array($reviewConfigs['min'], $reviewConfigs['max']))*/),
-            array('type'=>'input', 'name'=>'rating1', 'label'=>'Value Rating', 'width'  => 60, 'hidden' => true, 'addable' => true, 'editable' => true,
-                  'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating1"]+"\'></div>"',
-                  'element_print' => $this->inputRatingHtml('rating1'),
-                  /*'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])*/),
-            array('type'=>'input', 'name'=>'rating2', 'label'=>'Features Rating', 'width'=>60, 'hidden' => true, 'addable' => true, 'editable' => true,
-                  'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating2"]+"\'></div>"',
-                  'element_print' => $this->inputRatingHtml('rating2'),
-                  /*'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])*/),
-            array('type'=>'input', 'name'=>'rating3', 'label'=>'Quality Rating', 'width'=>60, 'hidden' => true, 'addable' => true, 'editable'=>true,
-                  'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating3"]+"\'></div>"',
-                  'element_print' => $this->inputRatingHtml('rating3'),
-                  /*'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])*/),
-            array('type'=>'input', 'name'=>'helpful','label'=>'Helpful', 'width'=>60, 'addable' => true, 'editable'=>true, 'validation' => array('number' => true)),
-            array('type'=>'input', 'name'=>'approved', 'label'=>'Approved', 'addable' => true, 'editable'=>true, 'mass-editable'=>true,
-                  'options'=>array('1'=>'Yes','0'=>'No'),'editor' => 'select'),
-            array('type'=>'input', 'name'=>'product_id', 'label'=>'Product', 'addable' => true, 'hidden' => true,
-                  'options'=>FCom_Catalog_Model_Product::i()->getOptionsData(), 'editor' => 'select',
-                  'validation' => array('required' => true)),
-            array('type'=>'input', 'name'=>'customer_id', 'label'=>'Customer', 'addable' => true, 'hidden' => true,
-                  'options'=>FCom_Customer_Model_Customer::i()->getOptionsData(), 'editor' => 'select',
-                  'validation' => array('required' => true))
-        );
+        $columns = [
+            ['type' => 'row_select'],
+            ['name' => 'id', 'label' => 'ID', 'width' => 55, 'hidden' => true],
+            ['type' => 'input', 'name' => 'title', 'label' => 'Title', 'width' => 250, 'addable' => true,
+                'editable' => true, 'validation' => ['required' => true]],
+            ['type' => 'input', 'name' => 'text', 'label' => 'Comment', 'width' => 250, 'addable' => true,
+                'editable' => true, 'editor' => 'textarea'],
+            ['type' => 'input', 'name' => 'rating', 'label' => 'Total Rating', 'width' => 60, 'addable' => true,
+                'editable' => true, 'element_print' => $this->inputRatingHtml('rating'),
+                'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating"]+"\'></div>"',
+                /*'validation' => array('required' => true, 'number' => true, 'range' => array($reviewConfigs['min'], $reviewConfigs['max']))*/],
+            ['type' => 'input', 'name' => 'rating1', 'label' => 'Value Rating', 'width'  => 60, 'hidden' => true,
+                'addable' => true, 'editable' => true, 'element_print' => $this->inputRatingHtml('rating1'),
+                'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating1"]+"\'></div>"',
+                /*'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])*/],
+            ['type' => 'input', 'name' => 'rating2', 'label' => 'Features Rating', 'width' => 60, 'hidden' => true,
+                'addable' => true, 'editable' => true, 'element_print' => $this->inputRatingHtml('rating2'),
+                'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating2"]+"\'></div>"',
+                /*'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])*/],
+            ['type' => 'input', 'name' => 'rating3', 'label' => 'Quality Rating', 'width' => 60, 'hidden' => true,
+                'addable' => true, 'editable' => true, 'element_print' => $this->inputRatingHtml('rating3'),
+                'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating3"]+"\'></div>"',
+                /*'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])*/],
+            ['type' => 'input', 'name' => 'helpful', 'label' => 'Helpful', 'width' => 60, 'addable' => true,
+                'editable' => true, 'validation' => ['number' => true]],
+            ['type' => 'input', 'name' => 'approved', 'label' => 'Approved', 'addable' => true, 'editable' => true,
+                'mass-editable' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
+            ['type' => 'input', 'name' => 'product_id', 'label' => 'Product', 'addable' => true, 'hidden' => true,
+                'options' => FCom_Catalog_Model_Product::i()->getOptionsData(), 'editor' => 'select',
+                'validation' => ['required' => true]],
+            ['type' => 'input', 'name' => 'customer_id', 'label' => 'Customer', 'addable' => true, 'hidden' => true,
+                'options' => FCom_Customer_Model_Customer::i()->getOptionsData(), 'editor' => 'select',
+                'validation' => ['required' => true]]
+        ];
 
-        $config['filters'] = array(
-            array('field'=>'title', 'type'=>'text'),
-            array('field'=>'text', 'type'=>'text'),
-            array('field'=>'rating', 'type'=>'number-range'),
-            array('field'=>'rating1', 'type'=>'number-range'),
-            array('field'=>'rating2', 'type'=>'number-range'),
-            array('field'=>'rating3', 'type'=>'number-range'),
-            array('field'=>'helpful', 'type'=>'text'),
-            array('field'=>'approved', 'type' => 'multiselect'),
-            array('field'=>'product_id', 'type' => 'multiselect'),
-            array('field'=>'customer_id', 'type' => 'multiselect'),
-            array('field'=>'create_at', 'type' => 'date-range'),
-            '_quick'=>array('expr'=>'title like ? or id=?', 'args'=>array('%?%', '?'))
-        );
-        $config['actions'] = array();
+        $config['filters'] = [
+            ['field' => 'title', 'type' => 'text'],
+            ['field' => 'text', 'type' => 'text'],
+            ['field' => 'rating', 'type' => 'number-range'],
+            ['field' => 'rating1', 'type' => 'number-range'],
+            ['field' => 'rating2', 'type' => 'number-range'],
+            ['field' => 'rating3', 'type' => 'number-range'],
+            ['field' => 'helpful', 'type' => 'text'],
+            ['field' => 'approved', 'type' => 'multiselect'],
+            ['field' => 'product_id', 'type' => 'multiselect'],
+            ['field' => 'customer_id', 'type' => 'multiselect'],
+            ['field' => 'create_at', 'type' => 'date-range'],
+            '_quick' => ['expr' => 'title like ? or id=?', 'args' => ['%?%', '?']]
+        ];
+        $config['actions'] = [];
         if (!$productModel) {
 //            $config['actions']['new'] = array('caption' => 'New Product Review', 'modal' => true);
         }
-        $config['actions'] = array(
+        $config['actions'] = [
             'export'  => true,
             'delete'  => true,
-            'deny'    => array('class'=>'btn btn-warning disabled', 'id'=>"prod-reviews-deny", 'caption'=>'Deny'),
-            'approve' => array('class'=>"btn btn-primary disabled", 'id'=>"prod-reviews-approve", 'caption'=>'Approve'),
-        );
+            'deny'    => ['class' => 'btn btn-warning disabled', 'id' => "prod-reviews-deny", 'caption' => 'Deny'],
+            'approve' => ['class' => "btn btn-primary disabled", 'id' => "prod-reviews-approve", 'caption' => 'Approve'],
+        ];
 
 
         //$config['autowidth'] = false;
@@ -85,17 +88,17 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
 
         if ($productModel) {
             $config['id'] = 'products_reviews';
-            $i = BUtil::arrayFind($config['columns'], array('name' => '_actions'));
+            $i = BUtil::arrayFind($config['columns'], ['name' => '_actions']);
             $config['columns'][$i]['data']['edit']['href'] = BApp::href('/prodreviews/form_only?id=');
             $config['columns'][$i]['data']['edit']['async_edit'] = true;
-            $config['columns'][] = array('name'=>'customer', 'label'=>'Customer', 'width'=>250);
+            $config['columns'][] = ['name' => 'customer', 'label' => 'Customer', 'width' => 250];
             $config['data_mode'] = 'local';
             $config['edit_url_required'] = true;
             //$config['filters'][] = array('field'=>'product_name', 'type'=>'text');
-            $config['custom'] = array('personalize'=>true);
+            $config['custom'] = ['personalize' => true];
             $orm = FCom_ProductReviews_Model_Review::orm('pr')->where('product_id', $productModel->id())
-                ->join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
-                ->left_outer_join('FCom_Customer_Model_Customer', array('c.id','=','pr.customer_id'), 'c')
+                ->join('FCom_Catalog_Model_Product', ['p.id', '=', 'pr.product_id'], 'p')
+                ->left_outer_join('FCom_Customer_Model_Customer', ['c.id', '=', 'pr.customer_id'], 'c')
                 ->select('pr.*')->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as customer');
 
             $data = BDb::many_as_array($orm->find_many());
@@ -110,41 +113,37 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             }*/
             //print_r($data);
             unset($config['columns'][6]['data']['edit']);
-            $config['columns'][6]['data']['custom']=array('caption'=>'Edit...');
+            $config['columns'][6]['data']['custom'] = ['caption' => 'Edit...'];
             $config['data'] = $data;
         } else {
             //$config['custom'] = array('personalize'=>true, 'autoresize'=>true, 'hashState'=>true, 'export'=>true, 'dblClickHref'=>$formUrl.'?id=');
             $config['id'] = 'products_reviews_grid';
-            $config['columns'][] = array('name'=>'product_name', 'label'=>'Product name', 'width'=>250);
-            $config['columns'][] = array('name'=>'customer', 'label'=>'Customer', 'width'=>250);
-            $config['columns'][] = array('name'=>'create_at', 'label'=>'Created');
+            $config['columns'][] = ['name' => 'product_name', 'label' => 'Product name', 'width' => 250];
+            $config['columns'][] = ['name' => 'customer', 'label' => 'Customer', 'width' => 250];
+            $config['columns'][] = ['name' => 'create_at', 'label' => 'Created'];
             $config['orm'] = FCom_ProductReviews_Model_Review::i()->orm('pr')->select('pr.*')
-                ->left_outer_join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
-                ->left_outer_join('FCom_Customer_Model_Customer', array('c.id','=','pr.customer_id'), 'c')
+                ->left_outer_join('FCom_Catalog_Model_Product', ['p.id', '=', 'pr.product_id'], 'p')
+                ->left_outer_join('FCom_Customer_Model_Customer', ['c.id', '=', 'pr.customer_id'], 'c')
                 ->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as customer');
         }
 
-        $config['columns'][] = array('type' =>'btn_group', 'name'=>'_actions', 'label' => 'Actions', 'sortable' => false,
-                                        'buttons' => array(
-                                            array('name'=>'edit'),
-                                            array('name'=>'delete')
-                                        )
-                                    );
+        $config['columns'][] = ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false,
+            'buttons' => [['name' => 'edit'], ['name' => 'delete']]];
 
         $callbacks = '$(".rateit").rateit();
-                      $("#'.$config['id'].'-modal-form").on("show.bs.modal", function(){ $(".rateit").rateit(); });';
-        $config['callbacks'] = array('after_gridview_render' => $callbacks);
-        $config['new_button'] = '#add_new_product_review';
+            $("#' . $config['id'] . '-modal-form").on("show.bs.modal", function(){ $(".rateit").rateit(); });';
+        $config['callbacks'] = ['after_gridview_render' => $callbacks];
+//        $config['new_button'] = '#add_new_product_review';
 
-        $config['grid_before_create'] = $config['id'].'_register';
+        $config['grid_before_create'] = $config['id'] . '_register';
         return $config;
     }
 
     public function gridOrmConfig($orm)
     {
         parent::gridOrmConfig($orm);
-        $orm->left_outer_join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')
-            ->left_outer_join('FCom_Customer_Model_Customer', array('c.id','=','pr.customer_id'), 'c')
+        $orm->left_outer_join('FCom_Catalog_Model_Product', ['p.id', '=', 'pr.product_id'], 'p')
+            ->left_outer_join('FCom_Customer_Model_Customer', ['c.id', '=', 'pr.customer_id'], 'c')
             ->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as author');
     }
 
@@ -152,14 +151,18 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     {
         parent::formViewBefore($args);
         $m = $args['model'];
-        $args['view']->set(array(
-            'title'=>$m->id ? 'Edit Product Review: '.$m->title : 'Create New Product Review',
-            'actions'=>array(
-                'back'=>'<button type="button" class="st3 sz2 btn" onclick="location.href=\''.BApp::href("prodreviews").'\'"><span>' .  BLocale::_('Back to list') . '</span></button>',
-                'delete'=>'<button type="submit" class="st2 sz2 btn" name="do" value="DELETE" onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>' .  BLocale::_('Delete') . '</span></button>',
-                'save'=>'<button type="submit" class="st1 sz2 btn btn-primary" onclick="return adminForm.saveAll(this)"><span>' .  BLocale::_('Save') . '</span></button>',
-            ),
-        ));
+        $args['view']->set([
+            'title' => $m->id ? 'Edit Product Review: ' . $m->title : 'Create New Product Review',
+            'actions' => [
+                'back' => '<button type="button" class="st3 sz2 btn" onclick="location.href=\''
+                    . BApp::href("prodreviews") . '\'"><span>' .  BLocale::_('Back to list') . '</span></button>',
+                'delete' => '<button type="submit" class="st2 sz2 btn" name="do" value="DELETE" '
+                    . 'onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>'
+                    . BLocale::_('Delete') . '</span></button>',
+                'save' => '<button type="submit" class="st1 sz2 btn btn-primary" onclick="return adminForm.saveAll(this)"><span>'
+                    . BLocale::_('Save') . '</span></button>',
+            ],
+        ]);
 
     }
 
@@ -167,18 +170,18 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     {
         parent::gridViewBefore($args);
         BLayout::i()->applyLayout('prodreviews');
-        $this->view('prodreviews/grid')->set(array(
-                'title' => $this->_gridTitle,
-                'actions' => array('new' => '<button id="add_new_product_review" class="btn grid-new btn-primary _modal" type="button">'.BLocale::_('New Product Review').'</button>')
-            ));
+        $this->view('prodreviews/grid')->set([
+            'title' => $this->_gridTitle,
+            'actions' => []
+        ]);
     }
 
     public function inputRatingHtml($name)
     {
         $config = FCom_ProductReviews_Model_Review::i()->config();
         return '<input name="' . $name . '" id="' . $name . '" type="range" min="' . $config['min'] . '"
-                max="' . $config['max'] . '" step="' . $config['step'] . '" value="" />
-                <div class="rateit" data-rateit-backingfld="#' . $name . '"></div>';
+            max="' . $config['max'] . '" step="' . $config['step'] . '" value="" />
+            <div class="rateit" data-rateit-backingfld="#' . $name . '"></div>';
     }
 
     /**
@@ -189,57 +192,60 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     public function customerReviewsGridConfig($customer)
     {
         $config = parent::gridConfig();
-        $config['id'] = 'customer_reviews_grid_'.$customer->id;
-        $config['columns'] = array(
-            array('type'=>'row_select'),
-            array('name'=>'id','label'=>'ID', 'width'=>55, 'hidden'=>true),
-            array('type'=>'input', 'name'=>'title', 'label'=>'Title', 'width'=>250, 'addable' => true, 'editable'=>true, 'validation' => array('required' => true)),
-            array('type'=>'input', 'name'=>'text', 'label'=>'Comment', 'width'=>250, 'addable' => true, 'editable'=>true, 'editor' => 'textarea'),
-            array('type'=>'input', 'name'=>'rating', 'label' => 'Total Rating', 'width' => 60, 'addable' => true, 'editable' => true,
-                  'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating"]+"\'></div>"',
-                  'element_print' => $this->inputRatingHtml('rating'),
-                /*'validation' => array('required' => true, 'number' => true, 'range' => array($reviewConfigs['min'], $reviewConfigs['max']))*/),
-            array('type'=>'input', 'name'=>'rating1', 'label'=>'Value Rating', 'width'  => 60, 'hidden' => true, 'addable' => true, 'editable' => true,
-                  'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating1"]+"\'></div>"',
-                  'element_print' => $this->inputRatingHtml('rating1'),
-                /*'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])*/),
-            array('type'=>'input', 'name'=>'rating2', 'label'=>'Features Rating', 'width'=>60, 'hidden' => true, 'addable' => true, 'editable' => true,
-                  'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating2"]+"\'></div>"',
-                  'element_print' => $this->inputRatingHtml('rating2'),
-                /*'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])*/),
-            array('type'=>'input', 'name'=>'rating3', 'label'=>'Quality Rating', 'width'=>60, 'hidden' => true, 'addable' => true, 'editable'=>true,
-                  'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating3"]+"\'></div>"',
-                  'element_print' => $this->inputRatingHtml('rating3'),
-                /*'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])*/),
-            array('type'=>'input', 'name'=>'helpful','label'=>'Helpful', 'width'=>60, 'addable' => true, 'editable'=>true, 'validation' => array('number' => true)),
-            array('type'=>'input', 'name'=>'approved', 'label'=>'Approved', 'addable' => true, 'editable'=>true, 'mass-editable'=>true,
-                  'options'=>array('1'=>'Yes','0'=>'No'),'editor' => 'select'),
-            array('type'=>'input', 'name'=>'product_id', 'label'=>'Product', 'addable' => true, 'hidden' => true,
-                  'options'=>FCom_Catalog_Model_Product::i()->getOptionsData(), 'editor' => 'select',
-                  'validation' => array('required' => true)),
-            array('name'=>'product_name', 'label'=>'Product name', 'width'=>250),
-            array('name'=>'create_at', 'label'=>'Created')
-        );
+        $config['id'] = 'customer_reviews_grid_' . $customer->id;
+        $config['columns'] = [
+            ['type' => 'row_select'],
+            ['name' => 'id', 'label' => 'ID', 'width' => 55, 'hidden' => true],
+            ['type' => 'input', 'name' => 'title', 'label' => 'Title', 'width' => 250, 'addable' => true,
+                'editable' => true, 'validation' => ['required' => true]],
+            ['type' => 'input', 'name' => 'text', 'label' => 'Comment', 'width' => 250, 'addable' => true,
+                'editable' => true, 'editor' => 'textarea'],
+            ['type' => 'input', 'name' => 'rating', 'label' => 'Total Rating', 'width' => 60, 'addable' => true,
+                'editable' => true, 'element_print' => $this->inputRatingHtml('rating'),
+                'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating"]+"\'></div>"',
+                /*'validation' => array('required' => true, 'number' => true, 'range' => array($reviewConfigs['min'], $reviewConfigs['max']))*/],
+            ['type' => 'input', 'name' => 'rating1', 'label' => 'Value Rating', 'width'  => 60, 'hidden' => true,
+                'addable' => true, 'editable' => true, 'element_print' => $this->inputRatingHtml('rating1'),
+                'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating1"]+"\'></div>"',
+                /*'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])*/],
+            ['type' => 'input', 'name' => 'rating2', 'label' => 'Features Rating', 'width' => 60, 'hidden' => true,
+                'addable' => true, 'editable' => true, 'element_print' => $this->inputRatingHtml('rating2'),
+                'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating2"]+"\'></div>"',
+                /*'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])*/],
+            ['type' => 'input', 'name' => 'rating3', 'label' => 'Quality Rating', 'width' => 60, 'hidden' => true,
+                'addable' => true, 'editable' => true, 'element_print' => $this->inputRatingHtml('rating3'),
+                'print' => '"<div class=\'rateit\' data-rateit-readonly=\'true\' data-rateit-value=\'"+rc.row["rating3"]+"\'></div>"',
+                /*'validation' => array('number' => true), 'range' => array($reviewConfigs['min'], $reviewConfigs['max'])*/],
+            ['type' => 'input', 'name' => 'helpful', 'label' => 'Helpful', 'width' => 60, 'addable' => true,
+                'editable' => true, 'validation' => ['number' => true]],
+            ['type' => 'input', 'name' => 'approved', 'label' => 'Approved', 'addable' => true, 'editable' => true,
+                'mass-editable' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
+            ['type' => 'input', 'name' => 'product_id', 'label' => 'Product', 'addable' => true, 'hidden' => true,
+                  'options' => FCom_Catalog_Model_Product::i()->getOptionsData(), 'editor' => 'select',
+                  'validation' => ['required' => true]],
+            ['name' => 'product_name', 'label' => 'Product name', 'width' => 250],
+            ['name' => 'create_at', 'label' => 'Created']
+        ];
 
-        $config['filters'] = array(
-            array('field'=>'title', 'type'=>'text'),
-            array('field'=>'approved', 'type' => 'multiselect'),
-            '_quick'=>array('expr'=>'title like ? or id=?', 'args'=>array('%?%', '?'))
-        );
+        $config['filters'] = [
+            ['field' => 'title', 'type' => 'text'],
+            ['field' => 'approved', 'type' => 'multiselect'],
+            '_quick' => ['expr' => 'title like ? or id=?', 'args' => ['%?%', '?']]
+        ];
 
-        $config['actions'] = array('delete' => true);
+        $config['actions'] = ['delete' => true];
 
-        $config['columns'][] = array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80,
-                                     'data' => array('edit' => true, 'delete' => true));
+        $config['columns'][] = ['name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80,
+            'data' => ['edit' => true, 'delete' => true]];
 
         $config['orm'] = FCom_ProductReviews_Model_Review::i()->orm('pr')->select('pr.*')->where('customer_id', $customer->id)
-            ->left_outer_join('FCom_Catalog_Model_Product', array('p.id','=','pr.product_id'), 'p')->select('p.product_name');
+            ->left_outer_join('FCom_Catalog_Model_Product', ['p.id', '=', 'pr.product_id'], 'p')->select('p.product_name');
 
         $callbacks = '$(".rateit").rateit();
-                      $("#'.$config['id'].'-modal-form").on("show.bs.modal", function(){ $(".rateit").rateit(); });';
-        $config['callbacks'] = array('after_gridview_render' => $callbacks);
+            $("#' . $config['id'] . '-modal-form").on("show.bs.modal", function(){ $(".rateit").rateit(); });';
+        $config['callbacks'] = ['after_gridview_render' => $callbacks];
 
-        return array('config' => $config);
+        return ['config' => $config];
 
     }
 }

@@ -12,20 +12,20 @@ class FCom_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
     * @param array $args
     * @return FCom_Sales_Model_Order_Item
     */
-    public static function i($new=false, array $args=array())
+    public static function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(get_called_class(), $args, !$new);
     }
 
     public function addNew($data)
     {
-        BEvents::i()->fire(__CLASS__.'.addNew', array('orderItem'=>$data));
+        BEvents::i()->fire(__CLASS__ . '.addNew', ['orderItem' => $data]);
         return $this->create($data)->save();
     }
 
     public function update($data)
     {
-        BEvents::i()->fire(__CLASS__.'.update', array('orderItem'=>$data));
+        BEvents::i()->fire(__CLASS__ . '.update', ['orderItem' => $data]);
         return $this->set($data)->save();
     }
 

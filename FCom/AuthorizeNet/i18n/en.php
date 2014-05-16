@@ -1,4 +1,4 @@
-<?php return array('Credit card type' => '',
+<?php return ['Credit card type' => '',
 'Select Card Type' => '',
 'Credit Card Number' => '',
 'Expiration date' => '',
@@ -6,4 +6,4 @@
 'Select Expiration Year' => '',
 'Month' => '',
 'Select Expiration Month' => '',
-'Card Verification Number' => '');
+'Card Verification Number' => ''];

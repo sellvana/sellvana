@@ -27,10 +27,10 @@ class FCom_Wishlist_Migrate extends BClass
 
     public function upgrade__0_1_0__0_1_1()
     {
-        BDb::ddlTableDef(FCom_Wishlist_Model_Wishlist::table(), array(
-            'COLUMNS' => array(
+        BDb::ddlTableDef(FCom_Wishlist_Model_Wishlist::table(), [
+            'COLUMNS' => [
                 'user_id' => 'RENAME customer_id int(10) unsigned not null',
-            ),
-        ));
+            ],
+        ]);
     }
 }

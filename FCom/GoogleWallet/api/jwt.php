@@ -55,9 +55,9 @@ class JWT
      */
     public static function encode($payload, $key, $algo = 'HS256')
     {
-        $header = array('typ' => 'JWT', 'alg' => $algo);
+        $header = ['typ' => 'JWT', 'alg' => $algo];
 
-        $segments = array();
+        $segments = [];
         $segments[] = JWT::urlsafeB64Encode(JWT::jsonEncode($header));
         $segments[] = JWT::urlsafeB64Encode(JWT::jsonEncode($payload));
         $signing_input = implode('.', $segments);
@@ -78,11 +78,11 @@ class JWT
      */
     public static function sign($msg, $key, $method = 'HS256')
     {
-        $methods = array(
+        $methods = [
             'HS256' => 'sha256',
             'HS384' => 'sha384',
             'HS512' => 'sha512',
-        );
+        ];
         if (empty($methods[$method])) {
             throw new DomainException('Algorithm not supported');
         }
@@ -159,11 +159,11 @@ class JWT
      */
     private static function handleJsonError($errno)
     {
-        $messages = array(
+        $messages = [
             JSON_ERROR_DEPTH => 'Maximum stack depth exceeded',
             JSON_ERROR_CTRL_CHAR => 'Unexpected control character found',
             JSON_ERROR_SYNTAX => 'Syntax error, malformed JSON'
-        );
+        ];
         throw new DomainException(isset($messages[$errno])
             ? $messages[$errno]
             : 'Unknown JSON error: ' . $errno

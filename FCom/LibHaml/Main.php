@@ -19,11 +19,11 @@ class FCom_LibHaml_Main extends BClass
 
     static public function bootstrap()
     {
-        BLayout::i()->addRenderer('FCom_LibHaml', array(
+        BLayout::i()->addRenderer('FCom_LibHaml', [
             'description' => 'HAML',
             'callback' => 'FCom_LibHaml_Main::renderer',
-            'file_ext' => array('.haml'),
-        ));
+            'file_ext' => ['.haml'],
+        ]);
     }
 
     /**
@@ -37,7 +37,7 @@ class FCom_LibHaml_Main extends BClass
             $c = BConfig::i();
             $options = (array)$c->get('modules/FCom_LibHaml/haml');
             static::$_haml = new MtHaml\Environment('php', $options);
-            static::$_cacheDir = $c->get('fs/cache_dir').'/haml';
+            static::$_cacheDir = $c->get('fs/cache_dir') . '/haml';
             BUtil::ensureDir(static::$_cacheDir);
         }
         return static::$_haml;
@@ -46,7 +46,7 @@ class FCom_LibHaml_Main extends BClass
     static public function renderer($view)
     {
         $viewName = $view->param('view_name');
-        $pId = BDebug::debug('FCom_LibHaml render: '.$viewName);
+        $pId = BDebug::debug('FCom_LibHaml render: ' . $viewName);
         $haml = static::haml();
 
         $source = $view->getParam('source');
@@ -60,8 +60,8 @@ class FCom_LibHaml_Main extends BClass
             $mtime = filemtime($sourceFile);
         }
 
-        $cacheDir = static::$_cacheDir.'/'.substr($md5, 0, 2);
-        $cacheFilename = $cacheDir.'/.'.$md5.'.php.cache'; // to help preventing direct php run
+        $cacheDir = static::$_cacheDir . '/' . substr($md5, 0, 2);
+        $cacheFilename = $cacheDir . '/.' . $md5 . '.php.cache'; // to help preventing direct php run
         if (!file_exists($cacheFilename) || $mtime > filemtime($cacheFilename)) {
             BUtil::ensureDir($cacheDir);
             if (!$source) {

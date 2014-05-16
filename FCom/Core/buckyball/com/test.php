@@ -23,7 +23,7 @@
 
 class BTest extends BClass
 {
-    protected $_runners = array();
+    protected $_runners = [];
 
     /**
      * Shortcut to help with IDE autocompletion
@@ -32,7 +32,7 @@ class BTest extends BClass
      * @param array $args
      * @return BTest
      */
-    public static function i($new=false, array $args=array())
+    public static function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
@@ -62,8 +62,8 @@ class BTestException extends BException
 class BTestRunner extends BClass
 {
     protected $_params;
-    protected $_errors = array();
-    protected $_suites = array();
+    protected $_errors = [];
+    protected $_suites = [];
 
     public function __construct($params)
     {
@@ -77,7 +77,7 @@ class BTestRunner extends BClass
 
     public function describe($suite, $f)
     {
-        $this->_suites[] = $suite = BTestSuite::i(true, array('runner'=>$this, 'description'=>$suite, 'callback'=>$f));
+        $this->_suites[] = $suite = BTestSuite::i(true, ['runner' => $this, 'description' => $suite, 'callback' => $f]);
         return $suite;
     }
 
@@ -94,10 +94,10 @@ class BTestRunner extends BClass
     public function error($expectation)
     {
         $trace = debug_backtrace();
-        $this->_errors[] = array(
+        $this->_errors[] = [
             'expectation' => $expectation,
             'step' => $trace[2],
-        );
+        ];
         return $this;
     }
 }
@@ -105,7 +105,7 @@ class BTestRunner extends BClass
 class BTestSuite extends BClass
 {
     protected $_params;
-    protected $_specs = array();
+    protected $_specs = [];
 
     public function __construct($params)
     {
@@ -124,7 +124,7 @@ class BTestSuite extends BClass
 
     public function it($spec, $f)
     {
-        BTestSpec::i(true, array('suite'=>$this, 'description'=>$spec, 'callback'=>$f));
+        BTestSpec::i(true, ['suite' => $this, 'description' => $spec, 'callback' => $f]);
         return $spec;
     }
 
@@ -142,8 +142,8 @@ class BTestSuite extends BClass
 class BTestSpec extends BClass
 {
     protected $_suite;
-    protected $_expectations = array();
-    protected $_spies = array();
+    protected $_expectations = [];
+    protected $_spies = [];
 
     public function __construct($params)
     {
@@ -162,13 +162,13 @@ class BTestSpec extends BClass
 
     public function expect($x)
     {
-        $this->_expectations[] = $expectation = BTestExpectation::i(true, array('spec'=>$this, 'value'=>$x));
+        $this->_expectations[] = $expectation = BTestExpectation::i(true, ['spec' => $this, 'value' => $x]);
         return $expect;
     }
 
     public function spyOn($class, $method)
     {
-        $this->_spies[] = $spy = BTestSpy::i(true, array('spec'=>$this, 'class'=>$class, 'method'=>$method));
+        $this->_spies[] = $spy = BTestSpy::i(true, ['spec' => $this, 'class' => $class, 'method' => $method]);
         return $spy;
     }
 }
@@ -351,7 +351,7 @@ BTest::i()->run(function($runner) {
             $spec->expect($counter)->toEqual(2);
 
             $spec->spyOn('Class', 'method1')->andCallThrough();
-            $spec->expect('Class', 'method1')->toHaveBeenCalledWith(array(1, 2, 3));
+            $spec->expect('Class', 'method1')->toHaveBeenCalledWith([1, 2, 3]);
 
             $spec->spyOn('Class', 'method2');
             $spec->expect('Class', 'method2')->not()->toHaveBeenCalled();

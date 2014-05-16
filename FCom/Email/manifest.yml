@@ -11,7 +11,7 @@ modules:
             modules/FCom_Email/default_handler: FCom_Email
 
         observe:
-            - [ BEmail::send:before, FCom_Email_Main::onEmailSendBefore ]
+            - [ "BEmail::send:before", "FCom_Email_Main::onEmailSendBefore" ]
 
         areas:
             FCom_Admin:

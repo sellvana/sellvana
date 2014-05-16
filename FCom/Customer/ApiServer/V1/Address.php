@@ -17,8 +17,9 @@ class FCom_Customer_ApiServer_V1_Address extends FCom_ApiServer_Controller_Abstr
 
         if ($id) {
             $customerAddress[] = FCom_Customer_Model_Address::i()->load($id);
-        } else if($customerId) {
-            $customerAddress = FCom_Customer_Model_Address::orm()->where('customer_id', $customerId)->limit($len, $start)->find_many();
+        } else if ($customerId) {
+            $customerAddress = FCom_Customer_Model_Address::orm()->where('customer_id', $customerId)
+                ->limit($len, $start)->find_many();
         } else {
             $customerAddress = FCom_Customer_Model_Address::orm()->limit($len, $start)->find_many();
         }
@@ -46,7 +47,7 @@ class FCom_Customer_ApiServer_V1_Address extends FCom_ApiServer_Controller_Abstr
             $this->internalError("Can't create a customer address");
         }
 
-        $this->created(array('id' => $address->id));
+        $this->created(['id' => $address->id]);
     }
 
     public function action_index__PUT()

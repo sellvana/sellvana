@@ -4,14 +4,14 @@ class FCom_Sales_Tests_Model_OrderTest extends FCom_Test_DatabaseTestCase
 {
     public function getDataSet()
     {
-        return $this->createFlatXmlDataSet(__DIR__.'/OrderTest.xml');
+        return $this->createFlatXmlDataSet(__DIR__ . '/OrderTest.xml');
     }
 
     public function testAddEntry()
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_sales_order'), "Pre-Condition");
 
-        $data = array('cart_id' => 3, 'customer_id' => 2);
+        $data = ['cart_id' => 3, 'customer_id' => 2];
         FCom_Sales_Model_Order::i()->addNew($data);
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_sales_order'), "Insert failed");
@@ -34,7 +34,7 @@ class FCom_Sales_Tests_Model_OrderTest extends FCom_Test_DatabaseTestCase
         $order = FCom_Sales_Model_Order::i()->load(2);
         $this->assertEquals(1, count($order->items()), "Before add failed");
 
-        $orderItem = array('order_id' => $order->id(), 'product_id' => 1, 'qty' => 1, 'total' => 10);
+        $orderItem = ['order_id' => $order->id(), 'product_id' => 1, 'qty' => 1, 'total' => 10];
         FCom_Sales_Model_Order_Item::i()->addNew($orderItem);
 
         $this->assertEquals(2, count($order->items()), "After add failed");
@@ -47,7 +47,7 @@ class FCom_Sales_Tests_Model_OrderTest extends FCom_Test_DatabaseTestCase
         $order = FCom_Sales_Model_Order::i()->load(2);
         $this->assertEquals(1, count($order->items()), "Before add failed");
 
-        $orderItem = array('order_id' => $order->id(), 'product_id' => 1, 'qty' => 1, 'total' => 10);
+        $orderItem = ['order_id' => $order->id(), 'product_id' => 1, 'qty' => 1, 'total' => 10];
         FCom_Sales_Model_Order_Item::i()->addNew($orderItem);
 
         $this->assertEquals(2, count($order->items()), "After add failed");

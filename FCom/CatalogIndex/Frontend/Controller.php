@@ -19,16 +19,16 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $layout = BLayout::i();
         $q = BRequest::i()->get('q');
 
-        $productsData = FCom_CatalogIndex_Indexer::i()->searchProducts(null, null, null, array('category'=>$category));
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_orm', array('data'=>$productsData['orm']));
+        $productsData = FCom_CatalogIndex_Indexer::i()->searchProducts(null, null, null, ['category' => $category]);
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_orm', ['orm' => $productsData['orm']]);
         $r = BRequest::i()->get();
         $r['sc'] = '';
-        $paginated = $productsData['orm']->paginate($r, array('ps'=>10));
+        $paginated = $productsData['orm']->paginate($r, ['ps' => 10]);
         $paginated['state']['sc'] = BRequest::i()->get('sc');
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
         $productsData['state']['sc'] = BRequest::i()->get('sc');
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_data', array('data'=>&$productsData));
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_data', ['data' => &$productsData]);
 
         BApp::i()
             ->set('current_category', $category)
@@ -38,26 +38,37 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         FCom_Core_Main::i()->lastNav(true);
 
         $head = $this->view('head');
-        $crumbs = array('home');
+        $crumbs = ['home'];
+        $activeCatIds = [$category->id()];
         foreach ($category->ascendants() as $c) {
             $nodeName = $c->get('node_name');
             if ($nodeName) {
-                $crumbs[] = array('label'=>$nodeName, 'href'=>$c->url());
+                $activeCatIds[] = $c->id();
+                $crumbs[] = ['label' => $nodeName, 'href' => $c->url()];
                 $head->addTitle($nodeName);
+
             }
         }
-        $crumbs[] = array('label'=>$category->get('node_name'), 'active'=>true);
+        $crumbs[] = ['label' => $category->get('node_name'), 'active' => true];
+        $category->set('is_active', 1);
+
         $head->addTitle($category->get('node_name'));
         $layout->view('breadcrumbs')->set('crumbs', $crumbs);
 
         $layout->view('catalog/search')->set('query', $q);
 
-        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='list' ? 'list' : 'grid');
+        $rowsViewName = 'catalog/product/' . (BRequest::i()->get('view') == 'list' ? 'list' : 'grid');
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->category = $category;
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
+
+        $layout->view('catalog/nav')->set([
+            'category' => $category,
+            'active_ids' => $activeCatIds,
+            'home_url' => BConfig::i()->get('modules/FCom_Catalog/url_prefix'),
+        ]);
 
         $layout->view('catalog/product/pager')->set('sort_options', FCom_CatalogIndex_Model_Field::i()->getSortingArray());
         $layout->view('catalog/category/sidebar')->set('products_data', $productsData);
@@ -82,14 +93,14 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         }
 
         $productsData = FCom_CatalogIndex_Indexer::i()->searchProducts($q);
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_orm', array('data'=>$productsData['orm']));
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_orm', ['data' => $productsData['orm']]);
         $r = $req->get();
         $r['sc'] = '';
-        $paginated = $productsData['orm']->paginate($r, array('ps'=>10));
+        $paginated = $productsData['orm']->paginate($r, ['ps' => 10]);
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
         $productsData['state']['sc'] = $req->get('sc');
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', array('data'=>&$productsData));
+        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', ['data' => &$productsData]);
 
         BApp::i()
             ->set('current_query', $q)
@@ -97,10 +108,10 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         FCom_Core_Main::i()->lastNav(true);
         $layout = BLayout::i();
-        $layout->view('breadcrumbs')->set('crumbs', array('home', array('label'=>'Search: '.$q, 'active'=>true)));
+        $layout->view('breadcrumbs')->set('crumbs', ['home', ['label' => 'Search: ' . $q, 'active' => true]]);
         $layout->view('catalog/search')->set('query', $q);
 
-        $rowsViewName = 'catalog/product/'.(BRequest::i()->get('view')=='list' ? 'list' : 'grid');
+        $rowsViewName = 'catalog/product/' . (BRequest::i()->get('view') == 'list' ? 'list' : 'grid');
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->products_data = $productsData;

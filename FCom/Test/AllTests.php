@@ -16,26 +16,26 @@ class FCom_Test_AllTests extends BClass
     public static function suite()
     {
         $sapi_type = php_sapi_name();
-        if (substr($sapi_type, 0, 3) == 'cgi' || substr($sapi_type, 0, 3) == 'cli' ) {
+        if (substr($sapi_type, 0, 3) == 'cgi' || substr($sapi_type, 0, 3) == 'cli') {
             require_once dirname(dirname(__DIR__)) . '/tests/index.php';
         }
         $suite = new PHPUnit_Framework_TestSuite('All Fulleron Tests');
 
         $modules = BModuleRegistry::i()->getAllModules();
 
-        $testModules = array();
+        $testModules = [];
         foreach ($modules as $module) {
             if ((isset($module->auto['all']) || isset($module->auto['tests']))) { //TODO: move to tests
-                $module->tests = $module->name.'_Tests_AllTests';
+                $module->tests = $module->name . '_Tests_AllTests';
             }
-            if(!empty($module->tests) && class_exists($module->tests)){
+            if (!empty($module->tests) && class_exists($module->tests)) {
                 $testModules[] = $module;
                 //print_R($module->tests);
-                $suite->addTestSuite(call_user_func(array($module->tests, 'suite')));
+                $suite->addTestSuite(call_user_func([$module->tests, 'suite']));
             }
         }
 
-        require_once FULLERON_ROOT_DIR.'/FCom/Test/Core/buckyball/AllTests.php';
+        require_once FULLERON_ROOT_DIR . '/FCom/Test/Core/buckyball/AllTests.php';
         $suite->addTest(BAllTests::suite());
 
         return $suite;

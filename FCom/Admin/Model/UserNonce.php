@@ -15,20 +15,20 @@ class FCom_Admin_Model_UserNonce extends FCom_Core_Model_Abstract
 
     static public function generateNonce($userId)
     {
-        for ($i=0; $i<10; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $nonce = BUtil::randomString(20);
             if (!static::load($nonce, 'nonce')) {
                 break;
             }
         }
-        if ($i===10) {
+        if ($i === 10) {
             throw new BException('Unable to find available nonce'); //???
         }
-        $nonceRecord = static::create(array(
+        $nonceRecord = static::create([
             'user_id' => $userId,
             'nonce' => $nonce,
             'create_at' => BDb::now(),
-        ))->save();
+        ])->save();
         return $nonce;
     }
 
@@ -53,6 +53,6 @@ class FCom_Admin_Model_UserNonce extends FCom_Core_Model_Abstract
 
     static public function gc()
     {
-        static::delete_many('create_at < ' . date('Y-m-d H:i:s', time()-60*60*24*7));
+        static::delete_many('create_at < ' . date('Y-m-d H:i:s', time()-60 * 60 * 24 * 7));
     }
 }

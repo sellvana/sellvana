@@ -13,7 +13,7 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
         $widgetKeys = explode(',', $r->get('widgets'));
         $wrapped = $r->get('wrapped');
         $add = $r->get('add');
-        $result = array();
+        $result = [];
         if ($add) {
             $persData = FCom_Admin_Model_User::i()->personalize();
             $pos = 100;
@@ -24,7 +24,7 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
                     }
                 }
             }
-            $persData = array();
+            $persData = [];
         }
         foreach ($widgetKeys as $wKey) {
             if (empty($widgets[$wKey])) {
@@ -40,7 +40,7 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
                 $widgets[$wKey]['async'] = false;
                 $html = $this->view('dashboard/widget')->set('widget', $widgets[$wKey])->render();
             }
-            $result['widgets'][] = array('key' => $wKey, 'html' => $html);
+            $result['widgets'][] = ['key' => $wKey, 'html' => $html];
             if ($add) {
                 $persData['dashboard']['widgets'][$wKey]['closed'] = false;
                 $persData['dashboard']['widgets'][$wKey]['collapsed'] = false;
@@ -79,13 +79,15 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
             }
         }
         $widgets = FCom_Admin_View_Dashboard::i()->getWidgets();
-        $result = array();
+        $result = [];
         foreach ($widgets as $key => $widget) {
-            if (isset($widget['async']) && $widget['async'] == true && isset($widget['filter']) && $widget['filter'] == true ) {
+            if (isset($widget['async']) && $widget['async'] == true
+                && isset($widget['filter']) && $widget['filter'] == true
+            ) {
                 if (!isset($widget['state']['closed']) || $widget['state']['closed']  == false) {
                     $widget['async'] = false;
                     $html = $this->view($widget['view'])->set('filter', $p)->render();
-                    $result[] = array('key' => $key, 'html' => $html);
+                    $result[] = ['key' => $key, 'html' => $html];
                 }
             }
         }

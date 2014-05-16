@@ -3,24 +3,24 @@ class FCom_IndexTank_Tests_Model_ProductFunctionTest extends FCom_Test_DatabaseT
 {
     public function getDataSet()
     {
-        return $this->createFlatXmlDataSet(__DIR__.'/ProductFunctionTest.xml');
+        return $this->createFlatXmlDataSet(__DIR__ . '/ProductFunctionTest.xml');
     }
 
     public function testAddEntry()
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_indextank_product_function'), "Pre-Condition");
 
-        $data = array(
+        $data = [
             'name'        => "base_price_asc",
             'number'        => "2",
             'definition'       => '-d[0]'
-        );
+        ];
         FCom_IndexTank_Model_ProductFunction::orm()->create($data)->save();
-        $data = array(
+        $data = [
             'name'        => "base_price_desc",
             'number'        => "3",
             'definition'       => 'd[0]'
-        );
+        ];
         FCom_IndexTank_Model_ProductFunction::orm()->create($data)->save();
 
         $this->assertEquals(4, $this->getConnection()->getRowCount('fcom_indextank_product_function'), "Insert failed");
@@ -49,7 +49,7 @@ class FCom_IndexTank_Tests_Model_ProductFunctionTest extends FCom_Test_DatabaseT
 
         $func = FCom_IndexTank_Model_ProductFunction::load(1);
         $this->assertEquals("age", $func->name, "Load failed");
-        $func->name="seconds";
+        $func->name = "seconds";
         $func->save();
         $func = FCom_IndexTank_Model_ProductFunction::load(1);
         $this->assertEquals("seconds", $func->name, "Update failed");

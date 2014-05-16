@@ -44,11 +44,11 @@ class FCom_Cms_Frontend_View_Page extends FCom_Core_View_Abstract
         }
 
         $renderer = $page->renderer ? $page->renderer : 'FCom_LibTwig_Main::renderer';
-        $view->setParam(array(
+        $view->setParam([
             //'renderer'    => $block->renderer ? $block->renderer : 'FCom_LibTwig_Main::renderer',
             'source'      => $page->content ? $page->content : ' ',
-            'source_name' => 'cms_block:'.$page->handle.':'.strtotime($page->update_at),
-        ));
+            'source_name' => 'cms_block:' . $page->handle . ':' . strtotime($page->update_at),
+        ]);
 
         $content = call_user_func($renderer, $view);
 

@@ -7,7 +7,7 @@ class FCom_Admin_Admin extends BClass
         $defaultTheme = BConfig::i()->get('modules/FCom_Admin/theme');
         BLayout::i()
             ->setDefaultTheme($defaultTheme ? $defaultTheme : 'FCom_Admin_DefaultTheme')
-            ->defaultViewClass('FCom_Admin_View_Default')
+            ->setDefaultViewClass('FCom_Admin_View_Default')
         ;
     }
 
@@ -26,10 +26,10 @@ class FCom_Admin_Admin extends BClass
         if (($head = BLayout::i()->view('head'))) {
             $head->js_raw('admin_init', '
 FCom.Admin = {};
-FCom.Admin.baseUrl = "'.rtrim(BConfig::i()->get('web/base_src'), '/') . '/'.'";
-FCom.Admin.codemirrorBaseUrl = "'.BApp::src('@FCom_Admin/Admin/js/codemirror').'";
-FCom.Admin.upload_href = "'.BApp::href('upload').'";
-FCom.Admin.personalize_href = "'.BApp::href('my_account/personalize').'";
+FCom.Admin.baseUrl = "' . rtrim(BConfig::i()->get('web/base_src'), '/') . '/' . '";
+FCom.Admin.codemirrorBaseUrl = "' . BApp::src('@FCom_Admin/Admin/js/codemirror') . '";
+FCom.Admin.upload_href = "' . BApp::href('upload') . '";
+FCom.Admin.personalize_href = "' . BApp::href('my_account/personalize') . '";
             ');
 
             $config = BConfig::i()->get('modules/FCom_Admin');
@@ -61,15 +61,15 @@ FCom.Admin.personalize_href = "'.BApp::href('my_account/personalize').'";
     {
         if (!empty($args['post']['config']['db'])) {
             $db =& $args['post']['config']['db'];
-            if (empty($db['password']) || $db['password']==='*****') {
+            if (empty($db['password']) || $db['password'] === '*****') {
                 unset($db['password']);
             }
         }
 
         $ip = BRequest::i()->ip();
-        foreach (array('Frontend','Admin') as $area) {
-            if (!empty($args['post']['config']['mode_by_ip']['FCom_'.$area])) {
-                $modes =& $args['post']['config']['mode_by_ip']['FCom_'.$area];
+        foreach (['Frontend', 'Admin'] as $area) {
+            if (!empty($args['post']['config']['mode_by_ip']['FCom_' . $area])) {
+                $modes =& $args['post']['config']['mode_by_ip']['FCom_' . $area];
                 $modes = str_replace('@', $ip, $modes);
                 unset($modes);
             }
@@ -79,12 +79,12 @@ FCom.Admin.personalize_href = "'.BApp::href('my_account/personalize').'";
     public function onGetDashboardWidgets($args)
     {
         $view = $args['view'];
-        $view->addWidget('visitors-totals', array(
+        $view->addWidget('visitors-totals', [
             'title' => 'Visitors',
             'icon' => 'group',
             'view' => 'dashboard/visitors-totals',
             'cols' => 2,
             'async' => true,
-        ));
+        ]);
     }
 }

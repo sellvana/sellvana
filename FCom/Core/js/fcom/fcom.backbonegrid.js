@@ -65,6 +65,14 @@ function filesizeFormat(size) {
     return size;
 }
 
+function dateTimeNow() {
+    var d = new Date();
+    var dateTime = d.getFullYear()+ '-' + toString((d.getMonth() + 1)) + '-' + toString(d.getDate())+ ' '+ toString(d.getHours())+ ':' + toString(d.getMinutes()) + ':' + toString(d.getSeconds());
+    function toString(val) {
+       return (val <  10) ? '0' + val: val;
+    }
+    return dateTime;
+}
 
 define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
     'jquery.quicksearch', 'unique', 'jquery.validate', 'datetimepicker', 'jquery-ui', 'moment', 'daterangepicker'],
@@ -556,6 +564,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return this;
 
                 },
+
                 saveLocalState: function() {
                     //only if local_personalize configuration flag is true, we can personalize
                     if (BackboneGrid.local_personalize) {
@@ -566,7 +575,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                     's': BackboneGrid.currentState.s,
                                     'sd': BackboneGrid.currentState.sd,
                                     'p': BackboneGrid.currentState.p,
-                                    'ps': BackboneGrid.currentState.ps,
+                                    'ps': BackboneGrid.currentState.ps
                             }
                         );
                     }
@@ -719,7 +728,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     if (confirm) {
                         rowsCollection.remove(this.model/*, {silent: true}*/);
                         selectedRows.remove(this.model, {silent: true});
-                        this._destorySelf();
+//                        this._destorySelf();
                     }
                 },
                 _destorySelf: function () {
@@ -1478,15 +1487,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         BackboneGrid.modalElementVals[key] = val;
                     });
                     modalForm.formEl.validate();
-                    if (!modalForm.formEl.valid())
+                    if (!modalForm.formEl.valid()) {
                         return false;
+                    }
 
-                    /*for (var key in BackboneGrid.modalElementVals) {
-                        if (BackboneGrid.modalElementVals[key] === '' || BackboneGrid.modalElementVals[key] === null) {
-                            delete BackboneGrid.modalElementVals[key];
-                        }
-
-                    }*/
                     if (modalForm.modalType === 'mass-editable') {
 
                         var ids = selectedRows.pluck('id').join(",");
@@ -1500,9 +1504,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                     .done(function (data) {
                                         if (data.success) {
                                             $.bootstrapGrowl("Successfully saved.", { type: 'success', align: 'center', width: 'auto' });
-                                            selectedRows.each(function(model) {
-                                                model.trigger('render');
-                                            });
+                                            gridView.render();
                                         } else {
                                             $.bootstrapGrowl(data.error, { type: 'danger', align: 'center', width: 'auto' });
                                         }
@@ -1522,8 +1524,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 })
                             }
                         });
-                        if (BackboneGrid.data_mode === 'local')
+                        if (BackboneGrid.data_mode === 'local') {
                             rowsCollection.trigger('mass_changed');
+                        }
                     }
 
                     if (modalForm.modalType === 'addable') {
@@ -1544,7 +1547,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
 
                     if (modalForm.modalType === 'editable') {
-                        for (key in BackboneGrid.modalElementVals) {
+                        for (var key in BackboneGrid.modalElementVals) {
                             BackboneGrid.currentRow.set(key, BackboneGrid.modalElementVals[key], {silent: true});
                         }
                         BackboneGrid.currentRow.save();
@@ -1562,7 +1565,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 },
                 render: function () {
                     this.$el.html('');
-
+                    $(BackboneGrid.modalFormId).find('.well').parent().remove();
                     var header;
                     switch (this.modalType) {
                         case 'addable':
@@ -1579,22 +1582,21 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
                     $(BackboneGrid.modalFormId).find('h4').html(header);
                     BackboneGrid.modalElementVals = {};
-                    if (this.modalType == 'mass-editable') {
+                    if (this.modalType === 'mass-editable') {
                         var elementView = new BackboneGrid.Views.ModalMassGridElement({collection: this.collection});
-                        $(BackboneGrid.modalFormId).find('.well').parent().remove();
                         $(BackboneGrid.modalFormId).find('.modal-header').after(elementView.render({ modalType: this.modalType}).el);
                         $(BackboneGrid.modalFormId).find('.well select').select2({
                             placeholder: "Select a Field",
                             allowClear: true
                         });
-
                     } else {
                         this.collection.each(this.addElementDiv, this);
                     }
-                    /*if (this.modalType === 'addable' || this.modalType ==='mass-editable')
-                        $(BackboneGrid.modalFormId).find('select').val('');*/
-                    if (this.modalType === 'mass-editable')
+
+                    if (this.modalType === 'mass-editable') {
                         $(BackboneGrid.modalFormId).find('select').val('');
+                    }
+
 
                     if (this.$el.is("form")) {
                         this.formEl = this.$el;
@@ -1616,11 +1618,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             }
                         }
                     });
-
-                    /*//focus to first input when modal shown
-                    $(BackboneGrid.modalFormId).on('shown.bs.modal', function() {
-                        $('input:text:visible:first', this).focus();
-                    });*/
 
                     return this;
 
@@ -1687,6 +1684,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                     elementView.$el.find('#' + model.get('name')).addClass('valid required');
                                     $(BackboneGrid.Views.ModalForm.prototype.el).append($(tmp).append(button));
                                     elementView.$el.find('select#' + model.get('name')).val('');
+                                    if (typeof(model.get('validation')) !== 'undefined' && typeof(model.get('validation').unique) !== 'undefined') {
+                                        validateUnique(modalForm.$el.find('#' + model.get('name')), model, false);
+                                    }
                                 }
                             }
                         });
@@ -1914,7 +1914,6 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     // }
                 }
                 var fCollection = [];
-                console.log(filters);
                 for (var i in filters) {
                     var filter = filters[i];
                     if (typeof(filter.type) !== 'undefined') {
@@ -2033,10 +2032,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 gridView = new BackboneGrid.Views.GridView({collection: rowsCollection});
 
-                /*if (BackboneGrid.data_mode == 'local') {
+                //TODO: find other solutions when state.p=NaN and state.mp=NaN.
+                if (BackboneGrid.data_mode == 'local' && isNaN(state.p)) {
                     BackboneGrid.currentState.p = 1;
                     BackboneGrid.currentState.ps = 10;
-                }*/
+                }
                 gridView.render();
 
 
@@ -2142,42 +2142,12 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                             rowsCollection.remove(selectedRows.models, {silent: true});
                             $('select.' + config.id + '.js-sel').val('');
-                            if (config.data_mode == 'local') {
-                                gridView.render({deleteRows: {models: selectedRows.models}})
-                            } else {
-                                gridView.render();
-                            }
+                            gridView.render();
                             selectedRows.reset();
                         }
                     });
                 }
 
-                /*if ($(BackboneGrid.AddButton).length > 0) {
-                    $(BackboneGrid.AddButton).on('click', function (ev) {
-
-                        ev.preventDefault();
-                        ev.stopPropagation();
-
-                        return false;
-                    });
-                }*/
-
-                //validation
-                /*if (BackboneGrid.validation === true) {
-                    gridView.form = gridView.$el.parents('form:first');
-
-                    gridView.form.submit(function(ev) {
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                        if(!gridView.form.valid()) {
-
-
-                            return false;
-                        }
-
-                        return true;
-                    });
-                }*/
 
 
                 //quick search

@@ -2,9 +2,9 @@
 
 class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller_Abstract
 {
-    public function authenticate($args=array())
+    public function authenticate($args = [])
     {
-        return FCom_Customer_Model_Customer::i()->isLoggedIn() || BRequest::i()->rawPath()=='/login';
+        return FCom_Customer_Model_Customer::i()->isLoggedIn() || BRequest::i()->rawPath() == '/login';
     }
 
     public function action_index()
@@ -12,8 +12,8 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         $customer = FCom_Customer_Model_Customer::i()->sessionUser();
         $addresses = $customer->addresses();
 
-        $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
-        $crumbs[] = array('label'=>'View Addresses', 'active'=>true);
+        $crumbs[] = ['label' => 'Account', 'href' => Bapp::href('customer/myaccount')];
+        $crumbs[] = ['label' => 'View Addresses', 'active' => true];
         $this->view('breadcrumbs')->crumbs = $crumbs;
         $this->view('customer/address/list')->customer = $customer;
         $this->view('customer/address/list')->addresses = $addresses;
@@ -56,13 +56,13 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         $layout->view('customer/address/edit')->default_billing = $defaultBilling;*/
 
         $this->view('geo/embed')->set('countries', $countriesList);
-        $varSet = array(
+        $varSet = [
             'countries'        => FCom_Geo_Model_Country::options($countriesList),
             'address'          => $address,
             'default_shipping' => $defaultShipping,
             'default_billing'  => $defaultBilling,
             'formId'           => 'address-form',
-        );
+        ];
         $this->view('customer/address/edit')->set($varSet);
         $this->layout('/customer/address/edit');
     }
@@ -87,7 +87,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
                 $this->message('You don\'t have permission to update this address', 'error');
                 //$response->redirect('unauthorized');
             }
-            if ($address->validate($post, array(), $formId)) {
+            if ($address->validate($post, [], $formId)) {
                 $address->set($post)->save();
                 //update customer
                 if (!empty($post['address_default_shipping'])) {
@@ -100,14 +100,14 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
                 $this->message('Address saved successful');
                 $response->redirect(BApp::href('customer/address'));
             } else {
-                $this->message('Invalid address data, please fix above errors.', 'error', 'validator-errors:'.$formId);
+                $this->message('Invalid address data, please fix above errors.', 'error', 'validator-errors:' . $formId);
                 $this->formMessages($formId);
-                $response->redirect(BApp::href('customer/address/edit').($id ? '?id='.$id : ''));
+                $response->redirect(BApp::href('customer/address/edit') . ($id ? '?id=' . $id : ''));
             }
         } catch (Exception $e) {
             BDebug::logException($e);
             $this->message($e->getMessage(), 'error');
-            $response->redirect(BApp::href('customer/address/edit').($id ? '?id='.$id : ''));
+            $response->redirect(BApp::href('customer/address/edit') . ($id ? '?id=' . $id : ''));
         }
     }
 
@@ -160,16 +160,16 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             $label = "Choose billing address";
         }
 
-        $crumbs[] = array('label'=>'Checkout', 'href'=>Bapp::href('checkout'));
-        $crumbs[] = array('label'=>$label, 'active'=>true);
+        $crumbs[] = ['label' => 'Checkout', 'href' => Bapp::href('checkout')];
+        $crumbs[] = ['label' => $label, 'active' => true];
         $this->view('breadcrumbs')->crumbs = $crumbs;
         $this->view('customer/address/choose')->set(
-            array(
+            [
                 'type'      => $type,
                 'header'    => $label,
                 'customer'  => $customer,
                 'addresses' => $addresses,
-            )
+            ]
         );
         $this->layout('/customer/address/choose');
     }

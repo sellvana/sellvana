@@ -9,8 +9,8 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
     public function action_run()
     {
 
-        $path = realpath(dirname(__FILE__).'/../..');
-        $pathBB = FULLERON_ROOT_DIR.'/FCom/buckyball/tests';
+        $path = realpath(dirname(__FILE__) . '/../..');
+        $pathBB = FULLERON_ROOT_DIR . '/FCom/buckyball/tests';
 
         $res = exec("phpunit {$path}/AllTests.php", $output);
 

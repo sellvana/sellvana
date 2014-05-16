@@ -14,17 +14,17 @@ class FCom_LibTwig_Main extends BClass
 
     public static function bootstrap()
     {
-        BLayout::i()->addRenderer('FCom_LibTwig', array(
+        BLayout::i()->addRenderer('FCom_LibTwig', [
             'description' => 'Twig (HTML)',
             'callback'    => 'FCom_LibTwig_Main::renderer',
-            'file_ext'    => array('.html.twig', '.twig.html'),
+            'file_ext'    => ['.html.twig', '.twig.html'],
             'editor'      => 'html',
-        ));
+        ]);
     }
 
-    public static function init($path=null)
+    public static function init($path = null)
     {
-        BClassAutoload::i(true, array('root_dir' => __DIR__.'/lib'));
+        BClassAutoload::i(true, ['root_dir' => __DIR__ . '/lib']);
         /*
         require_once __DIR__.'/lib/Twig/Autoloader.php';
         Twig_Autoloader::register();
@@ -32,16 +32,16 @@ class FCom_LibTwig_Main extends BClass
 
         $config = BConfig::i();
 
-        static::$_cacheDir = $config->get('fs/cache_dir').'/twig';
+        static::$_cacheDir = $config->get('fs/cache_dir') . '/twig';
         BUtil::ensureDir(static::$_cacheDir);
         $cacheConfig = BConfig::i()->get('core/cache/twig');
         $useCache = !$cacheConfig && BDebug::is('DEBUG,DEVELOPMENT') || $cacheConfig === 'enable';
-        $options = array(
+        $options = [
             'cache' => $useCache ? static::$_cacheDir : false,
-            'debug' => false,#$config->get('modules/FCom_LibTwig/debug'),
+            'debug' => false, #$config->get('modules/FCom_LibTwig/debug'),
             'auto_reload' => true, #$useCache ? false : true, #$config->get('modules/FCom_LibTwig/auto_reload'),
             'optimizations' => -1,
-        );
+        ];
 
         static::$_fileLoader = new Twig_Loader_Filesystem($path); //TODO: possible not to add path?
         static::$_fileTwig = new Twig_Environment(static::$_fileLoader, $options);
@@ -54,20 +54,20 @@ class FCom_LibTwig_Main extends BClass
             static::$_stringTwig->addExtension(new Twig_Extension_Debug());
         }
 
-        foreach (array(
+        foreach ([
             '_' => 'BLocale::_',
             'currency' => 'BLocale::currency',
             'min' => 'min',
             'max' => 'max',
             'floor' => 'floor',
             'debug' => function($v) { echo "<pre>"; print_r($v); echo "</pre>"; },
-        ) as $filterName => $filterCallback) {
+        ] as $filterName => $filterCallback) {
             $filter = new Twig_SimpleFilter($filterName, $filterCallback);
             static::$_fileTwig->addFilter($filter);
             static::$_stringTwig->addFilter($filter);
         }
 
-        foreach (array(
+        foreach ([
             'APP' => 'BApp',
             'CONFIG' => 'BConfig',
             'LAYOUT' => 'BLayout',
@@ -77,17 +77,17 @@ class FCom_LibTwig_Main extends BClass
             'DEBUG' => 'BDebug',
             'MODULES' => 'BModuleRegistry',
             'LOCALE' => 'BLocale'
-        ) as $global => $class) {
+        ] as $global => $class) {
             $instance = $class::i();
             static::$_fileTwig->addGlobal($global, $instance);
             static::$_stringTwig->addGlobal($global, $instance);
         }
 
-        BEvents::i()->fire(__METHOD__, array(
+        BEvents::i()->fire(__METHOD__, [
             'options' => $options,
             'file_adapter' => static::$_fileTwig,
             'string_adapter' => static::$_stringTwig,
-        ));
+        ]);
     }
 
     public static function onLayoutAddAllViews($args)
@@ -109,7 +109,7 @@ class FCom_LibTwig_Main extends BClass
     {
         $viewName = $view->getParam('view_name');
 
-        $pId = BDebug::debug('FCom_LibTwig render: '.$viewName);
+        $pId = BDebug::debug('FCom_LibTwig render: ' . $viewName);
 
         $source = $view->getParam('source');
         $args = $view->getAllArgs();
@@ -118,9 +118,7 @@ class FCom_LibTwig_Main extends BClass
 
         if (!$source) {
 
-            //$filename = $view->getTemplateFileName(static::$_defaultFileExt);
-            $modName = $view->getParam('module_name');
-            $template = static::$_fileTwig->loadTemplate('@'.$modName.'/'.$viewName . $view->getParam('file_ext'));
+            $template = static::$_fileTwig->loadTemplate($view->twigName());
             $output = $template->render($args);
 
         } else {

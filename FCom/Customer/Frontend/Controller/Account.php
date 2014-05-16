@@ -2,9 +2,9 @@
 
 class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller_Abstract
 {
-    public function authenticate($args=array())
+    public function authenticate($args = [])
     {
-        return FCom_Customer_Model_Customer::i()->isLoggedIn() || BRequest::i()->rawPath()=='/login';
+        return FCom_Customer_Model_Customer::i()->isLoggedIn() || BRequest::i()->rawPath() == '/login';
     }
 
     public function action_index()
@@ -12,7 +12,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
         $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $customer = FCom_Customer_Model_Customer::i()->load($customerId);
         $this->view('customer/account')->set('customer', $customer);
-        $crumbs[] = array('label'=>'Account', 'active'=>true);
+        $crumbs[] = ['label' => 'Account', 'active' => true];
         $this->view('breadcrumbs')->set('crumbs', $crumbs);
         $this->layout('/customer/account');
     }
@@ -22,7 +22,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
         $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $customer = FCom_Customer_Model_Customer::i()->load($customerId);
         $formId = 'account-edit';
-        $this->view('customer/account/edit')->set(array('customer' => $customer, 'formId' => $formId));
+        $this->view('customer/account/edit')->set(['customer' => $customer, 'formId' => $formId]);
         /*$post = BRequest::i()->post();
             if ($post) {
                 $r = $post['model'];
@@ -59,9 +59,9 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
             $customer->setAccountEditRules(false);
 
             //set rule email unique if customer update email
-            $expandRules = array();
+            $expandRules = [];
             if ($customer->get('email') != $r['email']) {
-                $expandRules = array(array('email', 'FCom_Customer_Model_Customer::ruleEmailUnique', 'Email is exist'));
+                $expandRules = [['email', 'FCom_Customer_Model_Customer::ruleEmailUnique', 'Email is exist']];
             }
 
             if ($customer->validate($r, $expandRules, $formId)) {
@@ -125,7 +125,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
             $formId = 'change-password';
             $customer->setChangePasswordRules();
 
-            if ($customer->validate($r, array(), $formId)) {
+            if ($customer->validate($r, [], $formId)) {
                 if (!Bcrypt::verify($r['current_password'], $customer->get('password_hash'))) {
                     $this->message('Current password is not correct, please try again', 'error');
                     BResponse::i()->redirect('customer/myaccount/editpassword');

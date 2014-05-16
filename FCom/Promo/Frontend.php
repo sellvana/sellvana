@@ -4,11 +4,11 @@ class FCom_Promo_Frontend extends BClass
 {
     static public function layout()
     {
-        BLayout::i()->layout(array(
-            '/promo/media' => array(
-                array( 'hook', 'main', 'views' => array( 'promo/media' ) )
-            ),
-        ));
+        BLayout::i()->layout([
+            '/promo/media' => [
+                ['hook', 'main', 'views' => ['promo/media']]
+            ],
+        ]);
     }
 
     public static function onPromoCartValidate($args)
@@ -19,14 +19,14 @@ class FCom_Promo_Frontend extends BClass
         $items = $cart->items();
         if (!$items) {
             $allCartPromo = FCom_Promo_Model_Cart::orm()->where('cart_id', $cart->id)->find_many();
-            foreach($allCartPromo as $cartPromo) {
+            foreach ($allCartPromo as $cartPromo) {
                 $cartPromo->delete();
             }
             return;
         }
 
-        $productIds = array();
-        foreach($items as $item) {
+        $productIds = [];
+        foreach ($items as $item) {
             /* @var $item FCom_Sales_Model_Cart_Item */
             if ($item->promo_id_get) {
                 continue;
@@ -41,14 +41,14 @@ class FCom_Promo_Frontend extends BClass
             return;
         }
 
-        $activePromo = array();
-        $activePromoIds = array();
+        $activePromo = [];
+        $activePromoIds = [];
         $promoList = FCom_Promo_Model_Promo::i()->getActive();
         if (!$promoList) {
             return;
         }
 
-        foreach($promoList as $promo) {
+        foreach ($promoList as $promo) {
             $promoProductsInGroup = FCom_Promo_Model_Product::orm('p')
                     ->select('p.product_id')
                     ->select('p.group_id')
@@ -66,26 +66,27 @@ class FCom_Promo_Frontend extends BClass
             if ('qty' == $promo->buy_type) {
                 //FROM Single group
                 if ('one' == $promo->buy_group) {
-                    $groupProducts = array();
-                    $groupQty = array();
-                    foreach($promoProductsInGroup as $product) {
+                    $groupProducts = [];
+                    $groupQty = [];
+                    foreach ($promoProductsInGroup as $product) {
                         if (!isset($groupProducts[$product->group_id])) {
-                            $groupProducts[$product->group_id] = array();
+                            $groupProducts[$product->group_id] = [];
                              $groupQty[$product->group_id] = 0;
                         }
                         if (!empty($productIds[$product->product_id])) {
                             $groupProducts[$product->group_id][] = $productIds[$product->product_id];
-                            $groupQty[$product->group_id] += ($productIds[$product->product_id]->qty - $productIds[$product->product_id]->promo_qty_used);
+                            $groupQty[$product->group_id] += ($productIds[$product->product_id]->qty
+                                - $productIds[$product->product_id]->promo_qty_used);
                         }
-                        if ($promo->buy_amount <= $groupQty[$product->group_id] ) {
+                        if ($promo->buy_amount <= $groupQty[$product->group_id]) {
                             //save how many
                             $activePromo[] = $promo;
                             $activePromoIds[] = $promo->id;
                             $promoBuyAmount = $promo->buy_amount;
-                            foreach($groupProducts[$product->group_id] as $groupItem) {
+                            foreach ($groupProducts[$product->group_id] as $groupItem) {
                                 if (!empty($groupItem->promo_id_buy)) {
                                     $promoIds = explode(",", $groupItem->promo_id_buy);
-                                    if(!in_array($promo->id, $promoIds)){
+                                    if (!in_array($promo->id, $promoIds)) {
                                         $promoIds[] = $promo->id;
                                     }
                                     $groupItem->promo_id_buy = implode(",", $promoIds);
@@ -111,21 +112,22 @@ class FCom_Promo_Frontend extends BClass
                 }
                 //FROM Any Group
                 if ('any' == $promo->buy_group) {
-                    $groupItems = array();
+                    $groupItems = [];
                     $productQty = 0;
-                    foreach($promoProductsInGroup as $product) {
+                    foreach ($promoProductsInGroup as $product) {
                         if (!empty($productIds[$product->product_id])) {
                             $groupItems[] = $productIds[$product->product_id];
-                            $productQty += ($productIds[$product->product_id]->qty - $productIds[$product->product_id]->promo_qty_used);
+                            $productQty += ($productIds[$product->product_id]->qty
+                                - $productIds[$product->product_id]->promo_qty_used);
                         }
-                        if ($promo->buy_amount <= $productQty ) {
+                        if ($promo->buy_amount <= $productQty) {
                             $activePromo[] = $promo;
                             $activePromoIds[] = $promo->id;
                             $promoBuyAmount = $promo->buy_amount;
-                            foreach($groupItems as $groupItem) {
+                            foreach ($groupItems as $groupItem) {
                                 if (!empty($groupItem->promo_id_buy)) {
                                     $promoIds = explode(",", $groupItem->promo_id_buy);
-                                    if(!in_array($promo->id, $promoIds)){
+                                    if (!in_array($promo->id, $promoIds)) {
                                         $promoIds[] = $promo->id;
                                     }
                                     $groupItem->promo_id_buy = implode(",", $promoIds);
@@ -151,27 +153,28 @@ class FCom_Promo_Frontend extends BClass
             }
             if ('$' == $promo->buy_type) {
                 if ('one' == $promo->buy_group) {
-                    $groupProducts = array();
-                    $groupQty = array();
+                    $groupProducts = [];
+                    $groupQty = [];
 
-                    foreach($promoProductsInGroup as $product) {
+                    foreach ($promoProductsInGroup as $product) {
                         if (!isset($groupProducts[$product->group_id])) {
-                            $groupProducts[$product->group_id] = array();
+                            $groupProducts[$product->group_id] = [];
                             $groupAmt[$product->group_id] = 0;
                         }
                         //TODO: validate that the logic is correct (!empty)
                         if (!empty($productIds[$product->product_id])) {
                             $groupProducts[$product->group_id][] = $productIds[$product->product_id];
-                            $groupAmt[$product->group_id] += ($productIds[$product->product_id]->qty*$productIds[$product->product_id]->price - $productIds[$product->product_id]->promo_amt_used);
+                            $groupAmt[$product->group_id] += ($productIds[$product->product_id]->qty * $productIds[$product->product_id]->price
+                                - $productIds[$product->product_id]->promo_amt_used);
                         }
-                        if ($promo->buy_amount <= $groupAmt[$product->group_id] ) {
+                        if ($promo->buy_amount <= $groupAmt[$product->group_id]) {
                             $activePromo[] = $promo;
                             $activePromoIds[] = $promo->id;
                             $promoBuyAmount = $promo->buy_amount;
-                            foreach($groupProducts[$product->group_id] as $groupItem) {
+                            foreach ($groupProducts[$product->group_id] as $groupItem) {
                                 if (!empty($groupItem->promo_id_buy)) {
                                     $promoIds = explode(",", $groupItem->promo_id_buy);
-                                    if(!in_array($promo->id, $promoIds)){
+                                    if (!in_array($promo->id, $promoIds)) {
                                         $promoIds[] = $promo->id;
                                     }
                                     $groupItem->promo_id_buy = implode(",", $promoIds);
@@ -179,13 +182,13 @@ class FCom_Promo_Frontend extends BClass
                                     $groupItem->promo_id_buy = $promo->id;
                                 }
                                 if ($promoBuyAmount > 0) {
-                                    $amtUsed = $groupItem->qty*$groupItem->price - $promoBuyAmount;
+                                    $amtUsed = $groupItem->qty * $groupItem->price - $promoBuyAmount;
                                     if ($amtUsed <= 0) {
-                                        $groupItem->promo_amt_used = $groupItem->qty*$groupItem->price;
+                                        $groupItem->promo_amt_used = $groupItem->qty * $groupItem->price;
                                     } else {
                                         $groupItem->promo_amt_used = $promoBuyAmount;
                                     }
-                                    $promoBuyAmount -= $groupItem->qty*$groupItem->price;
+                                    $promoBuyAmount -= $groupItem->qty * $groupItem->price;
                                 }
                                 $groupItem->save();
                             }
@@ -194,23 +197,24 @@ class FCom_Promo_Frontend extends BClass
                 }
                 if ('any' == $promo->buy_group) {
                     $productPrice = 0;
-                    $groupItems = array();
-                    foreach($promoProductsInGroup as $product) {
+                    $groupItems = [];
+                    foreach ($promoProductsInGroup as $product) {
                         if (!empty($productIds[$product->product_id])) {
                             $groupItems[] = $productIds[$product->product_id];
-                            $productPrice += $productIds[$product->product_id]->price*$productIds[$product->product_id]->qty - $productIds[$product->product_id]->promo_amt_used;
+                            $productPrice += $productIds[$product->product_id]->price * $productIds[$product->product_id]->qty
+                                - $productIds[$product->product_id]->promo_amt_used;
                         }
                     }
 
-                    if ($promo->buy_amount <= $productPrice ) {
+                    if ($promo->buy_amount <= $productPrice) {
                         $activePromo[] = $promo;
                         $activePromoIds[] = $promo->id;
 
                         $promoBuyAmount = $promo->buy_amount;
-                        foreach($groupItems as $groupItem) {
+                        foreach ($groupItems as $groupItem) {
                             if (!empty($groupItem->promo_id_buy)) {
                                 $promoIds = explode(",", $groupItem->promo_id_buy);
-                                if(!in_array($promo->id, $promoIds)){
+                                if (!in_array($promo->id, $promoIds)) {
                                     $promoIds[] = $promo->id;
                                 }
                                 $groupItem->promo_id_buy = implode(",", $promoIds);
@@ -218,13 +222,13 @@ class FCom_Promo_Frontend extends BClass
                                 $groupItem->promo_id_buy = $promo->id;
                             }
                             if ($promoBuyAmount > 0) {
-                                $amtUsed = $groupItem->qty*$groupItem->price - $promoBuyAmount;
+                                $amtUsed = $groupItem->qty * $groupItem->price - $promoBuyAmount;
                                 if ($amtUsed <= 0) {
-                                    $groupItem->promo_amt_used = $groupItem->qty*$groupItem->price;
+                                    $groupItem->promo_amt_used = $groupItem->qty * $groupItem->price;
                                 } else {
                                     $groupItem->promo_amt_used = $promoBuyAmount;
                                 }
-                                $promoBuyAmount -= $groupItem->qty*$groupItem->price;
+                                $promoBuyAmount -= $groupItem->qty * $groupItem->price;
                             }
                             $groupItem->save();
                         }
@@ -234,8 +238,9 @@ class FCom_Promo_Frontend extends BClass
         }
 
         //check cart promo items
-        $allCartItemPromo = FCom_Sales_Model_Cart_Item::orm()->where('cart_id', $cart->id)->where_not_equal('promo_id_get', 0)->find_many();
-        foreach($allCartItemPromo as $promoItem) {
+        $allCartItemPromo = FCom_Sales_Model_Cart_Item::orm()->where('cart_id', $cart->id)
+            ->where_not_equal('promo_id_get', 0)->find_many();
+        foreach ($allCartItemPromo as $promoItem) {
             if (!in_array($promoItem->promo_id_get, $activePromoIds)) {
                 $promoItem->delete();
             }
@@ -243,18 +248,18 @@ class FCom_Promo_Frontend extends BClass
 
         //check cart promos
         $allCartPromo = FCom_Promo_Model_Cart::orm()->where('cart_id', $cart->id)->find_many();
-        foreach($allCartPromo as $cartPromo) {
+        foreach ($allCartPromo as $cartPromo) {
             if (!in_array($cartPromo->promo_id, $activePromoIds)  || time() > strtotime($cartPromo->update_at) + 3600) {
                 $cartPromo->delete();
             }
         }
         if (!empty($activePromo)) {
-            foreach($activePromo as $promo) {
+            foreach ($activePromo as $promo) {
                 $promoCart = FCom_Promo_Model_Cart::orm()->where('cart_id', $cart->id)
                         ->where('promo_id', $promo->id)
                     ->find_one();
                 if (!$promoCart) {
-                    $promoCart = FCom_Promo_Model_Cart::i()->create(array('cart_id'=>$cart->id, 'promo_id'=>$promo->id));
+                    $promoCart = FCom_Promo_Model_Cart::i()->create(['cart_id' => $cart->id, 'promo_id' => $promo->id]);
                 }
                 $promoCart->set('update_at', date("Y-m-d H:i:s"));
                 $promoCart->save();
@@ -277,20 +282,20 @@ class FCom_Promo_Frontend extends BClass
             return;
         }
 
-        $promoList = array();
-        foreach($items as $item) {
-            if ( !$item->promo_id_buy ) {
+        $promoList = [];
+        foreach ($items as $item) {
+            if (!$item->promo_id_buy) {
                 continue;
             }
-            if ( $item->qty - $item->promo_qty_used == 0 ) {
+            if ($item->qty - $item->promo_qty_used == 0) {
                 continue;
             }
-            if ( $item->price * $item->qty - $item->promo_amt_used < $item->price ) {
+            if ($item->price * $item->qty - $item->promo_amt_used < $item->price) {
                 continue;
             }
-            $promoIds = explode( ",", $item->promo_id_buy );
-            foreach ( $promoIds as $promoId ) {
-                $promoList[ $promoId ] = FCom_Promo_Model_Promo::i()->load( $promoId );
+            $promoIds = explode(",", $item->promo_id_buy);
+            foreach ($promoIds as $promoId) {
+                $promoList[$promoId] = FCom_Promo_Model_Promo::i()->load($promoId);
             }
         }
 
@@ -298,22 +303,23 @@ class FCom_Promo_Frontend extends BClass
             return;
         }
 
-        foreach($promoList as $promo) {
+        foreach ($promoList as $promo) {
             //GET QTY
             if ($promo->get_type == 'qty') {
                 //FROM Any Group
                 if ($promo->get_group == 'any_group') {
                     $promoItemQtyTotal = 0;
-                    foreach($items as $item) {
+                    foreach ($items as $item) {
                         if ($item->promo_id_get == $promo->id) {
                             $promoItemQtyTotal += $item->qty;
                         }
                     }
 
-                    $item = FCom_Sales_Model_Cart_Item::i()->load(array(
-                            'cart_id'      => $cart->id,
-                            'product_id'   => $currentItem->product_id,
-                            'promo_id_get' => $promo->id));
+                    $item = FCom_Sales_Model_Cart_Item::i()->load([
+                        'cart_id'      => $cart->id,
+                        'product_id'   => $currentItem->product_id,
+                        'promo_id_get' => $promo->id
+                    ]);
 
                     //IF GET QTY < Item Qty then add 1
                     if ($item && $promo->get_amount > $item->qty) {
@@ -327,12 +333,13 @@ class FCom_Promo_Frontend extends BClass
                             $item->price = 0;
                         } else {
                             //if not then add new promo item and decrase qty of current item
-                            $item = FCom_Sales_Model_Cart_Item::i()->create(array(
-                                    'cart_id'      => $cart->id,
-                                    'product_id'   => $currentItem->product_id,
-                                    'qty'          => 1,
-                                    'price'        => 0,
-                                    'promo_id_get' => $promo->id));
+                            $item = FCom_Sales_Model_Cart_Item::i()->create([
+                                'cart_id'      => $cart->id,
+                                'product_id'   => $currentItem->product_id,
+                                'qty'          => 1,
+                                'price'        => 0,
+                                'promo_id_get' => $promo->id
+                            ]);
 
                             $currentItem->qty -= 1;
                             $currentItem->save();
@@ -346,7 +353,7 @@ class FCom_Promo_Frontend extends BClass
                 if ($promo->get_group == 'same_group') {
 
                     $promoItemQtyTotal = 0;
-                    foreach($items as $item) {
+                    foreach ($items as $item) {
                         if ($item->promo_id_get == $promo->id) {
                             $promoItemQtyTotal += $item->qty;
                         }
@@ -360,13 +367,13 @@ class FCom_Promo_Frontend extends BClass
                         continue;
                     }
                     $sameGroup = false;
-                    foreach($items as $item) {
+                    foreach ($items as $item) {
                         if ($item->promo_id_get) {
                             continue;
                         }
                         $groupProductItem = FCom_Promo_Model_Product::orm()->where('promo_id', $promo->id())
                             ->where('product_id', $item->product_id)
-                                ->where('group_id', $groupProduct->group_id)->find_one();
+                            ->where('group_id', $groupProduct->group_id)->find_one();
                         if ($groupProductItem) {
                             $sameGroup = true;
                             break;
@@ -374,11 +381,11 @@ class FCom_Promo_Frontend extends BClass
                     }
                     if ($sameGroup) {
                         /* @var $item FCom_Sales_Model_Cart_Item */
-                         $item = FCom_Sales_Model_Cart_Item::i()->load(array(
-                                 'cart_id'      => $cart->id,
-                                 'product_id'   => $currentItem->product_id,
-                                 'promo_id_get' => $promo->id
-                             ));
+                         $item = FCom_Sales_Model_Cart_Item::i()->load([
+                             'cart_id'      => $cart->id,
+                             'product_id'   => $currentItem->product_id,
+                             'promo_id_get' => $promo->id
+                         ]);
 
                         //IF GET QTY < Item Qty then add 1
                         if ($item && $promo->get_amount > $item->qty) {
@@ -392,13 +399,13 @@ class FCom_Promo_Frontend extends BClass
                                 $item->price = 0;
                             } else {
                                 //if not then add new promo item and decrease qty of current item
-                                $item = FCom_Sales_Model_Cart_Item::i()->create(array(
-                                        'cart_id'      => $cart->id,
-                                        'product_id'   => $currentItem->product_id,
-                                        'qty'          => 1,
-                                        'price'        => 0,
-                                        'promo_id_get' => $promo->id
-                                    ));
+                                $item = FCom_Sales_Model_Cart_Item::i()->create([
+                                    'cart_id'      => $cart->id,
+                                    'product_id'   => $currentItem->product_id,
+                                    'qty'          => 1,
+                                    'price'        => 0,
+                                    'promo_id_get' => $promo->id
+                                ]);
 
                                 $currentItem->qty -= 1;
                                 $currentItem->save();
@@ -412,17 +419,18 @@ class FCom_Promo_Frontend extends BClass
                 }
                 if ($promo->get_group == 'same_prod') {
                     $promoItemQtyTotal = 0;
-                    foreach($items as $item) {
+                    foreach ($items as $item) {
                         if ($item->promo_id_get == $promo->id) {
                             $promoItemQtyTotal += $item->qty;
                         }
                     }
 
                     if ($currentItem->qty > 1 && $promo->get_amount > $promoItemQtyTotal) {
-                         $item = FCom_Sales_Model_Cart_Item::i()->load(array(
-                                 'cart_id'      => $cart->id,
-                                 'product_id'   => $currentItem->product_id,
-                                 'promo_id_get' => $promo->id));
+                         $item = FCom_Sales_Model_Cart_Item::i()->load([
+                             'cart_id'      => $cart->id,
+                             'product_id'   => $currentItem->product_id,
+                             'promo_id_get' => $promo->id
+                         ]);
 
                         //IF GET QTY < Item Qty then add 1
                         if ($item) {
@@ -437,12 +445,13 @@ class FCom_Promo_Frontend extends BClass
                             } else {
                                 //file_put_contents("/tmp/data",print_r($currentItem,1));exit;
                                 //if not then add new promo item and decrase qty of current item
-                                $item = FCom_Sales_Model_Cart_Item::i()->create(array(
-                                        'cart_id'      => $cart->id,
-                                        'product_id'   => $currentItem->product_id,
-                                        'qty'          => 1,
-                                        'price'        => 0,
-                                        'promo_id_get' => $promo->id));
+                                $item = FCom_Sales_Model_Cart_Item::i()->create([
+                                    'cart_id'      => $cart->id,
+                                    'product_id'   => $currentItem->product_id,
+                                    'qty'          => 1,
+                                    'price'        => 0,
+                                    'promo_id_get' => $promo->id
+                                ]);
 
                                 $currentItem->qty -= 1;
                                 $currentItem->save();
@@ -456,37 +465,37 @@ class FCom_Promo_Frontend extends BClass
 
                 //from different group
                 if ('diff_group' == $promo->get_group) {
-                    $groupIds = array();
-                    foreach($items as $item) {
+                    $groupIds = [];
+                    foreach ($items as $item) {
 
                         $groupProductsBuy = FCom_Promo_Model_Product::orm('p')
-                                ->select('p.group_id')
-                                ->join(FCom_Promo_Model_Group::table(), "g.id = p.group_id", "g")
-                                ->where('p.promo_id', $promo->id())
-                                ->where('p.product_id', $item->product_id)
-                                ->where('g.group_type', 'buy')
-                                ->find_many();
+                            ->select('p.group_id')
+                            ->join(FCom_Promo_Model_Group::table(), "g.id = p.group_id", "g")
+                            ->where('p.promo_id', $promo->id())
+                            ->where('p.product_id', $item->product_id)
+                            ->where('g.group_type', 'buy')
+                            ->find_many();
                         if ($groupProductsBuy) {
-                            foreach($groupProductsBuy as $gp) {
+                            foreach ($groupProductsBuy as $gp) {
                                 $groupIds[$gp->group_id] = $gp->group_id;
                             }
                         }
                     }
 
                     $groupProductGet = FCom_Promo_Model_Product::orm('p')
-                            ->select('p.group_id')
-                            ->join(FCom_Promo_Model_Group::table(), "g.id = p.group_id", "g")
-                            ->where('p.promo_id', $promo->id())
-                            ->where('p.product_id', $currentItem->product_id)
-                            ->where_not_in("p.group_id", $groupIds)
-                            ->where('g.group_type', 'get')
-                            ->find_many();
+                        ->select('p.group_id')
+                        ->join(FCom_Promo_Model_Group::table(), "g.id = p.group_id", "g")
+                        ->where('p.promo_id', $promo->id())
+                        ->where('p.product_id', $currentItem->product_id)
+                        ->where_not_in("p.group_id", $groupIds)
+                        ->where('g.group_type', 'get')
+                        ->find_many();
 
                     if ($groupProductGet) {
-                        $item = FCom_Sales_Model_Cart_Item::i()->load(array(
+                        $item = FCom_Sales_Model_Cart_Item::i()->load([
                                 'cart_id'      => $cart->id,
                                 'product_id'   => $currentItem->product_id,
-                                'promo_id_get' => $promo->id));
+                                'promo_id_get' => $promo->id]);
 
                         //IF GET QTY < Item Qty then add 1
                         if ($item && $promo->get_amount > $item->qty) {
@@ -500,12 +509,13 @@ class FCom_Promo_Frontend extends BClass
                                 $item->price = 0;
                             } else {
                                 //if not then add new promo item and decrase qty of current item
-                                $item = FCom_Sales_Model_Cart_Item::i()->create(array(
-                                        'cart_id'      => $cart->id,
-                                        'product_id'   => $currentItem->product_id,
-                                        'qty'          => 1,
-                                        'price'        => 0,
-                                        'promo_id_get' => $promo->id));
+                                $item = FCom_Sales_Model_Cart_Item::i()->create([
+                                    'cart_id'      => $cart->id,
+                                    'product_id'   => $currentItem->product_id,
+                                    'qty'          => 1,
+                                    'price'        => 0,
+                                    'promo_id_get' => $promo->id
+                                ]);
 
                                 $currentItem->qty -= 1;
                                 $currentItem->save();
@@ -521,14 +531,14 @@ class FCom_Promo_Frontend extends BClass
             //GET AMT
             if ($promo->get_type == '$') {
                 //FROM Any Group
-                if ( $promo->get_group == 'any_group' ) {
+                if ($promo->get_group == 'any_group') {
                     $promoItemAmtTotal = 0;
-                    foreach ( $items as $item ) {
-                        if ( $item->promo_id_get == $promo->id ) {
+                    foreach ($items as $item) {
+                        if ($item->promo_id_get == $promo->id) {
                             $promoItemAmtTotal += $item->qty * $item->price;
                         }
                         //IF GET AMT < Item AMT total then accept discount
-                        if ( $promo->get_amount > $promoItemAmtTotal ) {
+                        if ($promo->get_amount > $promoItemAmtTotal) {
                             //add discount for $promo->get_amt
                             //$cart->
                             break;

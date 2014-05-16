@@ -5,7 +5,7 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
     static protected $_table = 'fcom_pushserver_channel';
     static protected $_origClass = __CLASS__;
 
-    static protected $_channelCache = array();
+    static protected $_channelCache = [];
 
     /**
      * - id
@@ -29,21 +29,29 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
      *   - message_queue
      */
 
-    public function getChannel($channel, $create=false)
+    public function getChannel($channel, $create = false, $session = false)
     {
         if (is_object($channel) && ($channel instanceof FCom_PushServer_Model_Channel)) {
             return $channel;
+        } elseif (!is_string($channel)) {
+            throw new BException('Invalid channel identifier: ' . print_r($channel, 1));
         }
-        if (!empty(static::$_channelCache[$channel])) {
-            return static::$_channelCache[$channel];
+        $channelName = $channel;
+        if (!empty(static::$_channelCache[$channelName])) {
+            return static::$_channelCache[$channelName];
         }
-        if (is_string($channel)) {
-            $channelName = $channel;
-            $channel = static::load($channel, 'channel_name');
-            if (!$channel) {
-                $channel = static::create(array('channel_name' => $channelName))->save();
-            }
-            static::$_channelCache[$channelName] = $channel;
+        $sessData =& BSession::i()->dataToUpdate();
+        if (!empty($sessData['pushserver']['channels'][$channelName])) {
+            static::$_channelCache[$channelName] = static::create($sessData['pushserver']['channels'][$channelName], false);
+            return static::$_channelCache[$channelName];
+        }
+        $channel = static::load($channelName, 'channel_name');
+        if (!$channel) {
+            $channel = static::create(['channel_name' => $channelName])->save();
+        }
+        static::$_channelCache[$channelName] = $channel;
+        if ($session) {
+            $sessData['pushserver']['channels'][$channelName] = $channel->as_array();
         }
         return $channel;
     }
@@ -58,11 +66,21 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
         return true;
     }
 
+    public function onAfterSave()
+    {
+        parent::onAfterSave();
+
+        $sessData =& BSession::i()->dataToUpdate();
+        if (!empty($sessData['pushserver']['channels'][$this->channel_name])) {
+            $sessData['pushserver']['channels'][$this->channel_name] = $this->as_array();
+        }
+    }
+
     public function onBeforeDelete()
     {
         if (!parent::onBeforeDelete()) return false;
 
-        $this->send(array('signal' => 'delete'));
+        $this->send(['signal' => 'delete']);
 
         return true;
     }
@@ -94,28 +112,28 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
 
 
 if (FCom_PushServer_Main::isDebugMode()) {
-    BDebug::log("SEND1: ".print_r($message,1));
+    BDebug::log("SEND1: " . print_r($message, 1));
 }
-        BEvents::i()->fire(__METHOD__ . ':' . $this->get('channel_name'), array(
+        BEvents::i()->fire(__METHOD__ . ':' . $this->get('channel_name'), [
             'channel' => $this,
             'message' => $message,
             'client'  => $fromClient,
-        ));
+        ]);
 
         $clientHlp = FCom_PushServer_Model_Client::i();
         $fromWindowName = $clientHlp->getWindowName();
         $fromConnId = $clientHlp->getConnId();
         $msgHlp = FCom_PushServer_Model_Message::i();
-        $msgIds = array();
+        $msgIds = [];
 
         $toClients = FCom_PushServer_Model_Client::i()->orm('c')
-            ->join('FCom_PushServer_Model_Subscriber', array('c.id','=','s.client_id'), 's')
+            ->join('FCom_PushServer_Model_Subscriber', ['c.id', '=', 's.client_id'], 's')
             ->where('s.channel_id', $this->id())
             ->select('s.id', 'sub_id')->select('c.id')->select('c.data_serialized')
             ->find_many();
 
 if (FCom_PushServer_Main::isDebugMode()) {
-    BDebug::log('SEND2: '.sizeof($toClients).': '.print_r($this->as_array(),1));
+    BDebug::log('SEND2: ' . sizeof($toClients) . ': ' . print_r($this->as_array(), 1));
 }
 
         foreach ($toClients as $toClient) {
@@ -125,7 +143,7 @@ if (FCom_PushServer_Main::isDebugMode()) {
             $windows = (array)$toClient->getData('windows');
             foreach ($windows as $toWindowName => $toWindowData) {
                 $toConnId = !empty($toWindowData['connections']) ? key($toWindowData['connections']) : null;
-                $msg = $msgHlp->create(array(
+                $msg = $msgHlp->create([
                     'seq' => !empty($message['seq']) ? $message['seq'] : null,
                     'channel_id' => $this->id(),
                     'subscriber_id' => $toClient->get('sub_id'),
@@ -133,16 +151,16 @@ if (FCom_PushServer_Main::isDebugMode()) {
                     'window_name' => $toWindowName,
                     'conn_id' => $toConnId,
                     'status' => 'published',
-                ))->setData($message)->save();
+                ])->setData($message)->save();
                 //$msgIds[] = $msg->id;
 
 if (FCom_PushServer_Main::isDebugMode()) {
-    BDebug::log("SEND3: ".print_r($msg->as_array(),1));
+    BDebug::log("SEND3: " . print_r($msg->as_array(), 1));
 }
             }
         }
         if ($msgIds) {
-            $msgHlp->update_many(array('status' => 'published'), array('id' => $msgIds));
+            $msgHlp->update_many(['status' => 'published'], ['id' => $msgIds]);
         }
         return $this;
     }

@@ -1,35 +1,55 @@
+<!--{ title: Install Modules and Dependencies }-->
 
 <div class="f-admin-main-view">
   <div class="page-header f-admin-page-header">
     <h1 class="f-page-title">{{ 'Install Module' }}</h1>
   </div>
   <div class="f-admin-main">
-      {{ THIS.view('core/messages') | raw }}
-      <div class="panel">
-        <div class="panel-body">
-
-<form method="post" target="iframe-download" action="{{ APP.href('marketclient/download') }}">
+    {{ THIS.view('core/messages') | raw }}
+    <form method="post" target="iframe-download" action="{{ APP.href('marketclient/download') }}">
+        <table class="table f-install-modules">
     {% for modName, modInfo in THIS.get('install') %}
-        <div class="row">
-            <strong>{{ modName }}</strong>
-            <select name="modules[{{ modName }}][version]">
+        <tr>
+          <td class="f-module-name">{{ modName }}</td>
+          <td>
+            <select name="modules[{{ modName }}][version]" class="form-control f-install-modules-version">
+                {% if modInfo.status == 'latest' %}
+                    <option value="-" data-action="skip">Skip, installed latest ({{ modInfo.local_channel }} {{ modInfo.local_version }})</option>
+                {% endif %}
+                {% if modInfo.status == 'upgrade' %}
+                    <option value="-" data-action="skip">Skip, newer available ({{ modInfo.local_channel }} {{ modInfo.local_version }})</option>
+                {% endif %}
                 {% for cn, c in modInfo.channels %}
-                    <option value="{{ cn }}">{{ c.name ~ ': ' ~ c.version ~ (c.published_at ? ' (' ~ c.published_at ~ ')') }}</option>
+                    <option value="{{ cn }}" data-action="install">Install: [{{ c.name ~ ': ' ~ c.version ~ (c.published_at ? ' (' ~ c.published_at ~ ')') }}]</option>
                 {% endfor %}
             </select>
-            [{{ modInfo.status }}]
+          </td>
+          <td><span class="badge">{{ modInfo.status }}</span></td>
+          <td>
             {% if modInfo.status == 'requested' %}
               <label>{{ 'Auto-enable:'|_ }} <input type="checkbox" name="install[{{ modName }}][enable]" value="1"/></label>
             {% endif %}
-        </div>
-    {% endfor %}
-    <button type="submit" class="btn btn-primary">{{ 'Install'|_ }}</button>
-</form>
-
-          <iframe id="iframe-download" style="width:100%; height:400px; border:0">
-
-          </iframe>
-        </div>
+          </td>
+        </tr>
+      {% endfor %}
+      </table>
+      <div class="btns-container">
+        <input type="hidden" name="redirect_to" value="{{ APP.href('modules') }}">
+        <button type="submit" class="btn btn-primary">{{ 'Install Modules'|_ }}</button>
       </div>
+    </form>
+
+      <iframe id="iframe-download" src="{{ APP.href('blank') }}" style="width:100%; height:400px; border:0"></iframe>
     </div>
 </div>
+<script>
+    function setSelectBackground(ev) {
+        var $select = $(this), $curOption = $(this).find(':selected'), $tr = $select.parents('tr');
+        $select.css({background: $curOption.css('background')});
+        switch ($curOption.data('action')) {
+            case 'skip': $tr.removeClass('f-install').addClass('f-skip'); break;
+            case 'install': $tr.removeClass('f-skip').addClass('f-install'); break;
+        }
+    }
+    $('.f-install-modules-version').change(setSelectBackground).each(setSelectBackground);
+</script>

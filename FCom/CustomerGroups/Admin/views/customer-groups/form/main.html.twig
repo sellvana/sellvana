@@ -2,16 +2,6 @@
 {% set validator = THIS.get('validator') %}
 
 <fieldset>
-    <div class="form-group">
-        <label class="col-md-2 label-control" for="model-title">{{ 'Group Title'|_ }}</label>
-        <div class="col-md-5">
-            <input id="model-title" class="form-control" type="text" name="model[title]" value="{{ validator.fieldValue('title') }}" />
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-md-2 label-control" for="model-code">{{ 'Group Code'|_ }}</label>
-        <div class="col-md-5">
-            <input id="model-code" class="form-control" type="text" name="model[code]" value="{{ validator.fieldValue('code') }}" />
-        </div>
-    </div>
+    {{ forms.input({label: 'Group Title'|_, name: "model[title]", value: validator.fieldValue('title'), id: "model-title" }) }}
+    {{ forms.input({label: 'Group Code'|_, name: "model[code]", value: validator.fieldValue('code'), id: "model-code" }) }}
 </fieldset>

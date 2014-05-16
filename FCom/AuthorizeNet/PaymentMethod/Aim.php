@@ -43,23 +43,23 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
                 break;
         }
         $success = $response['response_code'] == 1;
-        if($success){
+        if ($success) {
             $this->setDetail($response['transaction_id'], $response);
             $this->setDetail('transaction_id', $response['transaction_id']);
-            $status = $action == 'AUTH_ONLY'? 'authorized': 'paid';
+            $status = $action == 'AUTH_ONLY' ? 'authorized' : 'paid';
         } else {
             $status = 'error';
         }
-        $paymentData = array(
+        $paymentData = [
             'method'           => static::PAYMENT_METHOD_KEY,
             'parent_id'        => $response['transaction_id'],
             'order_id'         => $this->getOrder()->id(),
             'amount'           => $this->getDetail('amount_due'),
             'status'           => $status,
             'transaction_id'   => $response['transaction_id'],
-            'transaction_type' => $action == 'AUTH_ONLY'? 'authorize': 'sale',
+            'transaction_type' => $action == 'AUTH_ONLY' ? 'authorize' : 'sale',
             'online'           => 1,
-        );
+        ];
         $this->clear();
         $paymentModel = FCom_Sales_Model_Order_Payment::i()->addNew($paymentData);
         $paymentModel->setData('response', $response);
@@ -112,7 +112,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
 
     public function setDetails($details)
     {
-        $details = isset($details[static::PAYMENT_METHOD_KEY]) ? $details[static::PAYMENT_METHOD_KEY] : array();
+        $details = isset($details[static::PAYMENT_METHOD_KEY]) ? $details[static::PAYMENT_METHOD_KEY] : [];
 
         if (isset($details['expire'], $details['expire']['month'], $details['expire']['year'])) {
             $details['card_exp_date'] = $details['expire']['month'] . '/' . $details['expire']['year'];
@@ -155,7 +155,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
     {
         $data = parent::asArray();
         $data = BUtil::arrayMerge($data, $this->getPublicData());
-        return array( static::PAYMENT_METHOD_KEY => $data);
+        return [static::PAYMENT_METHOD_KEY => $data];
     }
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../../../tests/index.php';
+require_once __DIR__ . '/../../../tests/index.php';
 
 class FCom_CustomerGroups_Tests_AllTests
 {
