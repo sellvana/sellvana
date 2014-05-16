@@ -38,7 +38,6 @@ modules:
                     #- [ /customer/address/billing, FCom_Customer_Frontend_Controller_Address.billing ]
                 observe:
                     - [ "FCom_Sales_Model_Cart::addProduct", "FCom_Customer_Model_Customer::onAddProductToCart" ]
-                    - [ "FCom_Admin_View_Dashboard::getWidgets", FCom_Customer_Admin.onGetDashboardWidgets ]
                 views:
                     - [ customer/account/sidebar, { view_class: FCom_Customer_Frontend_View_Sidebar } ]
 

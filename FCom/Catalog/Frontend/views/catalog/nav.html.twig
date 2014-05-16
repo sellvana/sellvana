@@ -3,7 +3,7 @@
 
 <nav class="f-catalog-navbar navbar" role="navigation">
     <div class="container">
-        <ul class="nav navbar-nav collapse">
+        <ul class="nav navbar-nav navbar-collapse collapse">
 {% for cat in categories %}
             <li class="dropdown {{ cat.id() in activeIds ? 'active' }}">
                 <a class="dropdown-toggle disabled"

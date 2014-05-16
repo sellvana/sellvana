@@ -7,6 +7,39 @@
     require(['jquery'], function ($) {
         window.modelsGridRegister = function (grid) {
             grid.build();
+            $('#' + grid.id).find('input[type=checkbox]').on('click', function(){
+                var val = this.checked;
+                var id = this.name.replace(grid.id + '[checked][','').replace(']','');
+
+                var rowsCol = grid.getRows();
+
+                var row = rowsCol.get(id);
+
+                var children = row.get('children');
+
+                if(children) {
+                    _.each(children, function (o) {
+                        var chName = grid.id + '[checked][' + o + ']';
+                        var $chBox = $('input[name="' + chName + '"]');
+                        if (val && !$chBox.is(':checked')) {
+                            $chBox.click();
+                        } else if (!val && $chBox.is(':checked')) {
+                            $chBox.click();
+                        }
+                    });
+                }
+                if (!val) {
+                    var parent = row.get('parent');
+
+                    if (parent) {
+                        var pName = grid.id + '[checked][' + parent + ']';
+                        $('input[name="' + pName + '"]').prop('checked', false);
+                        if (parent != 'FCom') {
+                            $('input[name="' + grid.id + '[checked][FCom]' + '"]').prop('checked', false);
+                        }
+                    }
+                }
+            });
             $('#btn_export_start').click(function(e){
                 e.preventDefault();
                 var url = '{{ APP.href('importexport/export') }}';

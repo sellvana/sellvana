@@ -82,6 +82,7 @@
     </div>
 
     <div class="pull-right btn-group">
+      <button class="btn btn-default btn-filter-date" data-date="all">{{ 'All'|_ }}</button>
       <button class="btn btn-default btn-filter-date" data-date="month">{{ 'Last month'|_ }}</button>
       <button class="btn btn-default btn-filter-date" data-date="week">{{ 'Last week'|_ }}</button>
       <button class="btn btn-default btn-filter-date" data-date="today">{{ 'Today'|_ }}</button>
@@ -186,6 +187,30 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
           $('#dashboard-widget__'+widget.key+' .widget-contents').html(widget.html);
         }
       });
+      if (Object.keys(response.filter).length !== 0) {
+          switch (response.filter.date) {
+              case 'last-month':
+                  $('button[data-date="month"]').click();
+                  break;
+              case 'last-week':
+                  $('button[data-date="week"]').click();
+                  break;
+              case 'today':
+                  $('button[data-date="today"]').click();
+                  break;
+              case 'all':
+                  $('button[data-date="all"]').click();
+                  break;
+              default:
+                  $('a[data-id="'+ response.filter.type +'"]').click();
+                  var range = (response.filter.range == 'range') ? $('div.range'): $('div.not_range');
+                  range.find('input.date-filter').val(response.filter.date);
+                  $('.update').click();
+                  break;
+          }
+      } else {
+          $('button[data-date="all"]').click();
+      }
     });
   }
   {% if asyncWidgets %}
@@ -208,6 +233,8 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
   });
   $('.btn-filter-date').click(function () {
       var data = {};
+      $('button.active-button').removeClass('active-button');
+      $(this).addClass('active-button');
       resetFilterDate();
       switch ($(this).attr('data-date')) {
           case 'month':
@@ -228,6 +255,9 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
               data['date'] = 'today';
               filterDate(data);
               break;
+          case 'all':
+              filterDate({type: 'default', date: 'all', range: 'range'});
+              break;
           default:
               break;
       }
@@ -245,7 +275,8 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
         closeFilter.removeClass('hidden');
         custom.children('button').addClass('filter');
         custom.find('.custom-filter-value').html(filter.attr('data-text') +' "' + date + '"');
-        filterDate(data)
+        filterDate(data);
+        $('button.active-button').removeClass('active-button');
     }
   });
   closeFilter.click(function (){
@@ -307,7 +338,6 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
                 break;
             default :break;
         }
-        console.log(option);
         select.append(option);
 
         check_avail_status();

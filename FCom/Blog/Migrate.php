@@ -4,6 +4,10 @@ class FCom_Blog_Migrate extends BClass
 {
     public function install__0_1_4()
     {
+        if (!FCom_Core_Model_Module::i()->load('FCom_Admin', 'module_name')) {
+            BMigrate::i()->migrateModules('FCom_Admin', true);
+        }
+
         $tPost = FCom_Blog_Model_Post::table();
         $tTag = FCom_Blog_Model_Tag::table();
         $tPostTag = FCom_Blog_Model_PostTag::table();

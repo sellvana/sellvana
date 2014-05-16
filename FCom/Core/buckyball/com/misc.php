@@ -943,7 +943,7 @@ class BUtil extends BClass
     * @param array $data
     * @return string
     */
-    public static function remoteHttp($method, $url, $data = [])
+    public static function remoteHttp($method, $url, $data = [], $headers = [], $options = [])
     {
         $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: ' . $method . ' ' . $url));
         $timeout = 5;
@@ -958,8 +958,8 @@ class BUtil extends BClass
             $url .= (strpos($url, '?') === false ? '?' : '&') . $request;
         }
 
-        // curl disabled because file upload doesn't work for some reason. TODO: figure out why
-        if (false && function_exists('curl_init') || ini_get('safe_mode')) {
+        // curl disabled by default because file upload doesn't work for some reason. TODO: figure out why
+        if (!empty($options['curl']) && function_exists('curl_init') || ini_get('safe_mode')) {
             $curlOpt = [
                 CURLOPT_USERAGENT => $userAgent,
                 CURLOPT_URL => $url,
@@ -1000,11 +1000,18 @@ class BUtil extends BClass
                     CURLOPT_PUT => 1,
                 ];
             }
+
+            if (!empty($headers)) {
+                $curlOpt += [
+                    CURLOPT_HTTPHEADER => array_values($headers),
+                ];
+            }
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
             list($headers, $response) = explode("\r\n\r\n", $rawResponse, 2);
             static::$_lastRemoteHttpInfo = curl_getinfo($ch);
+#echo "<xmp>"; var_dump($rawResponse, static::$_lastRemoteHttpInfo); echo "</xmp>";
             $respHeaders = explode("\r\n", $headers);
             if (curl_errno($ch) != 0) {
                 static::$_lastRemoteHttpInfo['errno'] = curl_errno($ch);
@@ -1012,11 +1019,14 @@ class BUtil extends BClass
             }
             curl_close($ch);
         } else {
-            $opts = ['http' => [
+            $streamOptions = ['http' => [
                 'method' => $method,
                 'timeout' => $timeout,
                 'header' => "User-Agent: {$userAgent}\r\n",
             ]];
+            if ($headers) {
+                $streamOptions['http']['header'] .= join("\r\n", array_values($headers)) . "\r\n";
+            }
             if ($method === 'POST' || $method === 'PUT') {
                 $multipart = false;
                 if (is_array($data)) {
@@ -1029,42 +1039,47 @@ class BUtil extends BClass
                 }
                 if (!$multipart) {
                     $contentType = 'application/x-www-form-urlencoded';
-                    $opts['http']['content'] = is_array($data) ? http_build_query($data) : $data;
+                    $streamOptions['http']['content'] = is_array($data) ? http_build_query($data) : $data;
                 } else {
                     $boundary = '--------------------------' . microtime(true);
                     $contentType = 'multipart/form-data; boundary=' . $boundary;
-                    $opts['http']['content'] = '';
+                    $streamOptions['http']['content'] = '';
                     //TODO: implement recursive forms
                     foreach ($data as $k => $v) {
                         if (is_string($v) && $v[0] === '@') {
                             $filename = substr($v, 1);
                             $fileContents = file_get_contents($filename);
-                            $opts['http']['content'] .= "--{$boundary}\r\n" .
+                            $streamOptions['http']['content'] .= "--{$boundary}\r\n" .
                                 "Content-Disposition: form-data; name=\"{$k}\"; filename=\"" . basename($filename) . "\"\r\n" .
                                 "Content-Type: application/zip\r\n" .
                                 "\r\n" .
                                 "{$fileContents}\r\n";
                         } else {
-                            $opts['http']['content'] .= "--{$boundary}\r\n" .
+                            $streamOptions['http']['content'] .= "--{$boundary}\r\n" .
                                 "Content-Disposition: form-data; name=\"{$k}\"\r\n" .
                                 "\r\n" .
                                 "{$v}\r\n";
                         }
                     }
-                    $opts['http']['content'] .= "--{$boundary}--\r\n";
+                    $streamOptions['http']['content'] .= "--{$boundary}--\r\n";
                 }
-                $opts['http']['header'] .= "Content-Type: {$contentType}\r\n";
+                $streamOptions['http']['header'] .= "Content-Type: {$contentType}\r\n";
                     //."Content-Length: ".strlen($request)."\r\n";
                 if (preg_match('#^(ssl|ftps|https):#', $url)) {
-                    $opts['ssl'] = [
+                    $streamOptions['ssl'] = [
                         'verify_peer' => true,
                         'cafile' => dirname(__DIR__) . '/ssl/ca-bundle.crt',
                         'verify_depth' => 5,
                     ];
                 }
             }
-            $response = @file_get_contents($url, false, stream_context_create($opts));
-
+            if (empty($options['debug'])) {
+                $oldErrorReporting = error_reporting(0);
+            }
+            $response = file_get_contents($url, false, stream_context_create($streamOptions));
+            if (empty($options['debug'])) {
+                error_reporting($oldErrorReporting);
+            }
             static::$_lastRemoteHttpInfo = []; //TODO: emulate curl data?
             $respHeaders = isset($http_response_header) ? $http_response_header : [];
         }
@@ -3228,6 +3243,8 @@ class BLoginThrottle extends BClass
 
     public function init($area, $username)
     {
+        usleep(mt_rand(0, 10000)); // timing side channel attack protection, 10ms should be enough to cover db calls
+
         $now = time();
         $c = $this->_config;
 
