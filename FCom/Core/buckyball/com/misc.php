@@ -522,6 +522,7 @@ class BUtil extends BClass
     *
     * Note: code repetition is for better iteration performance
     *
+    * @todo normalize where syntax
     * @param array $array The original container array
     * @param array $items Items to be inserted
     * @param string $where
@@ -529,6 +530,7 @@ class BUtil extends BClass
     *   - end
     *   - offset==$key
     *   - key.(before|after)==$key
+    *   - key.(before|after)~=$key
     *   - obj.(before|after).$object_property==$key
     *   - arr.(before|after).$item_array_key==$key
     * @return array resulting array
@@ -536,8 +538,8 @@ class BUtil extends BClass
     static public function arrayInsert($array, $items, $where)
     {
         $result = [];
-        $w1 = explode('==', $where, 2);
-        $w2 = explode('.', $w1[0], 3);
+        preg_match('#^(.*?)\s*(~=|==)\s*(.*)$#', $where, $w1);
+        $w2 = explode('.', $w1[1], 3);
 
         switch ($w2[0]) {
         case 'start':
@@ -549,7 +551,7 @@ class BUtil extends BClass
             break;
 
         case 'offset': // for associative only
-            $key = $w1[1];
+            $key = $w1[3];
             $i = 0;
             foreach ($array as $k => $v) {
                 if ($key === $i++) {
@@ -563,9 +565,10 @@ class BUtil extends BClass
 
         case 'key': // for associative only
             $rel = $w2[1];
-            $key = $w1[1];
+            $key = $w1[3];
+            $op = $w1[2];
             foreach ($array as $k => $v) {
-                if ($key === $k) {
+                if ($op === '==' && $key === $k || $op === '~=' && preg_match('#' . preg_quote($key) . '#', $k)) {
                     if ($rel === 'after') {
                         $result[$k] = $v;
                     }
@@ -584,7 +587,7 @@ class BUtil extends BClass
         case 'obj':
             $rel = $w2[1];
             $f = $w2[2];
-            $key = $w1[1];
+            $key = $w1[3];
             foreach ($array as $k => $v) {
                 if ($key === $v->$f) {
                     if ($rel === 'after') {
@@ -605,7 +608,7 @@ class BUtil extends BClass
         case 'arr':
             $rel = $w2[1];
             $f = $w2[2];
-            $key = $w1[1];
+            $key = $w1[3];
             $isAssoc = empty($array[0]);
             foreach ($array as $k => $v) {
                 if (!isset($v[$f])) {
