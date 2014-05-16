@@ -88,19 +88,14 @@
           <div class="f-prod-select">
             {{ THIS.hook('catalog/product/details:before_add_cart') | raw }}
             <div class="f-prod-add-cart">
-                {% if variants.fields %}
+                {% if variants.variants_fields %}
                     <section class="tab-pane active" id="f-prod-tab-variant">
-                        {% for field  in variants.fields %}
+                        {% for field  in variants.variants_fields %}
                             <div class="form-group" style="overflow: hidden">
                                 <label class="col-md-3 control-label">{{ field.field_code |_ }}</label>
                                 <div class="col-md-5">
-                                    {% if field.options %}
-                                        <select id="{{ field.field_code }}" name="{{ field.field_code }}" class="form-control variant" style="width:auto">
-                                            {% for key,val  in field.options %}
-                                                <option value="{{ key }}">{{ val|_ }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    {% endif %}
+                                    <select id="{{ field.field_code }}" name="{{ field.field_code }}" class="form-control variant" style="width:auto">
+                                    </select>
                                 </div>
                             </div>
                         {% endfor %}
@@ -222,16 +217,34 @@
 
         $('#product-rslides li').addClass('zoom').zoom();
         var variants = $.parseJSON('{{ UTIL.toJson(variants.variants)|raw }}');
-        if (variants != null) {
-            priceVariant.html(variants[0].price);
-            if (variants[0].qty == 0) {
-                quantityVariant.val(0);
-                $('#prod-add-to-card').prop('disabled', true);
-            }
-            $('#prod-in-stock').html(variants[0].qty + ' Items In Stock.');
-            for (var val in variants[0].fields ) {
-                $('#'+ val).find('option[value="'+ variants[0].fields[val] +'"]').attr('selected', 'selected');
-            }
+        var fields = $.parseJSON('{{ UTIL.toJson(variants.variants_fields)|raw }}');
+        function setUpField(before, data) {
+            $('.variant').each(function () {
+                var self = this;
+                if ($(this).attr('name').indexOf(before) == -1 && $(this).attr('name') == data.field_code) {
+                    $(this).html('');
+                    var first = (before.length == 0);
+
+                    variants.forEach(function (obj) {
+                        if(first) {
+                            $(self).append("<option value='"+ obj.fields[data.field_code] +"'>"+ obj.fields[data.field_code] +"</option>")
+                        } else {
+                            var flag = true;
+                            before.forEach(function(val) {
+                                if(obj.fields[val] != $('#' + val).val()) {
+                                    flag = false;
+                                }
+                            })
+                            if (flag) {
+
+                            }
+                        }
+                    })
+                }
+            });
+            variants.forEach(function (obj) {
+
+            })
         }
         function displayImage(image) {
 
@@ -257,6 +270,17 @@
 
         $('.variant').change(function () {
             var find = null;
+            var self = this;
+            var beforeFlag = true;
+            var beforeField = [];
+            fields.forEach(function (obj) {
+                var data = { field_code: obj.field_code, value: null };
+                if (obj.field_code == $(self).attr('name')) {
+                    data.value = $('#' + obj.field_code).val()
+                }
+                setUpField(beforeField, data);
+                beforeField.push(obj.field_code);
+            })
             variants.forEach(function (obj) {
                 var correct = true;
                 $('.variant').each(function () {
