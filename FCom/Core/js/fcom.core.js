@@ -69,7 +69,7 @@ function($/*, Backbone*/) {
     });
     */
     $(function () {
-        $('form').append($('<input type="hidden" name="X-CSRF-TOKEN"/>').val(csrfToken));
+        $('form[method=POST],form[method=PUT],form[method=DELETE]').append($('<input type="hidden" name="X-CSRF-TOKEN"/>').val(csrfToken));
         if ($.fn.select2) {
             $('.select2').select2({width: 'other values', minimumResultsForSearch: 20, dropdownAutoWidth: true});
         }

@@ -74,10 +74,10 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
                 $l2 = !empty($labels[1]) ? trim($labels[1]) : null;
                 $sortBoth = $sortType == 'both';
                 if ($sortType == 'asc' || $sortBoth) {
-                    static::$_sortingArray[$field->get('field_name') . ' asc'] = $l1 . (($sortBoth && empty($l2)) ? ' (Asc)' : '');
+                    static::$_sortingArray['sort_' . $field->get('field_name') . ' asc'] = $l1 . (($sortBoth && empty($l2)) ? ' (Asc)' : '');
                 }
                 if ($sortType == 'desc' || $sortBoth) {
-                    static::$_sortingArray[$field->get('field_name') . ' desc'] = $sortBoth ? (empty($l2) ? $l1 . ' (Desc)' : $l2) : $l1;
+                    static::$_sortingArray['sort_' . $field->get('field_name') . ' desc'] = $sortBoth ? (empty($l2) ? $l1 . ' (Desc)' : $l2) : $l1;
                 }
             }
         }

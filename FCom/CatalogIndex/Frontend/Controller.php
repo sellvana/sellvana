@@ -72,6 +72,8 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $rowsView->category = $category;
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
+        $pagerView->state = $productsData['state'];
+        $pagerView->setCanonicalPrevNext();
 
         $layout->view('catalog/nav')->set([
             'category' => $category,
@@ -134,6 +136,8 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
+        $pagerView->state = $productsData['state'];
+        $pagerView->setCanonicalPrevNext();
 
         FCom_Catalog_Model_SearchHistory::i()->addSearchHit($q, $productsData['state']['c']);
 
