@@ -12,11 +12,18 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
 
         foreach ($tabViews as $tabViewName => $tabView) {
             $tabName = preg_replace('#^settings/#', '', $tabViewName);
+            $parts = explode('/', $tabName, 2);
+            if (sizeof($parts) === 2) {
+                list($group, $tabName) = $parts;
+            } else {
+                $group = null;
+            }
             if (empty($view->tabs[$tabName])) {
                 $view->addTab($tabName, [
-                    'async' => true, 
-                    'label' => str_replace('_', ' ', $tabName), 
+                    'async' => true,
+                    'label' => str_replace('_', ' ', $tabName),
                     'view'  => $tabViewName,
+                    'group' => $group,
                 ]);
             }
         }
