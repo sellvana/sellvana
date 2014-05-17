@@ -4,8 +4,6 @@
 {% set viewAs = THIS.getViewAs() %}
 
 {% set s = THIS.get('state') %}
-{% set url = REQUEST.currentUrl() %}
-{% set pageUrl = UTIL.setUrlQuery(url, {p:'-PAGE-'}) %}
 {#
   {% set showPageNums = 4 %}
   {% set showPageNumsHalf = (showPageNums/2)|floor %}
@@ -33,7 +31,7 @@
       <ul class="pagination">
       {% for ps in psOptions %}
           <li {{ ps == s.ps ? 'class="active"' }}>
-              <a href="{{ UTIL.setUrlQuery(url, {ps:ps}) }}">{{ ps }}</a>
+              <a href="{{ THIS.getPageUrl({ps:ps}) }}">{{ ps }}</a>
           </li>
       {% endfor %}
       </ul>
@@ -41,8 +39,8 @@
     {% if not THIS.get('hide_display_selector') %}
     <div class="form-group hidden-xs">
       <div class="btn-group">
-        <a href="{{ UTIL.setUrlQuery(url, {view:'grid'}) }}" class="{{ viewAs=='grid'?'btn active':'btn' }}"><i class="glyphicon glyphicon-th {{ viewAs=='grid'?'icon-white' }}"></i></a>
-        <a href="{{ UTIL.setUrlQuery(url, {view:'list'}) }}" class="{{ viewAs=='list'?'btn active':'btn' }}"><i class="glyphicon glyphicon-th-list {{ viewAs=='list'?'icon-white' }}"></i></a>
+        <a href="{{ THIS.getPageUrl({view:'grid'}) }}" class="{{ viewAs=='grid'?'btn active':'btn' }}"><i class="glyphicon glyphicon-th {{ viewAs=='grid'?'icon-white' }}"></i></a>
+        <a href="{{ THIS.getPageUrl({view:'list'}) }}" class="{{ viewAs=='list'?'btn active':'btn' }}"><i class="glyphicon glyphicon-th-list {{ viewAs=='list'?'icon-white' }}"></i></a>
       </div>
     </div>
     {% endif %}
