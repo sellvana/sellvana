@@ -27,4 +27,5 @@ modules:
                 security:
                     request_fields_whitelist:
                         /blog/post/form:
+                            POST/model/preview: "*"
                             POST/model/content: "*"

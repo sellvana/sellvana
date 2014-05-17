@@ -1947,16 +1947,21 @@ class BViewHead extends BView
         return $this;
     }
 
+    public function link($rel, $href)
+    {
+        $this->addElement('link', $rel, ['tag' => '<link rel="'. $rel . '" href="' . $href . '"/>']);
+        return $this;
+    }
+
     /**
      * Add canonical link
+     * @deprecated by link()
      * @param $href
      * @return $this
      */
     public function canonical($href)
     {
-        $this->addElement('link', 'canonical', ['tag' => '<link rel="canonical" href="' . $href . '"/>']);
-
-        return $this;
+        return $this->link('canonical', $href);
     }
 
     /**

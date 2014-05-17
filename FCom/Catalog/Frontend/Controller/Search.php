@@ -66,6 +66,8 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $rowsView->category = $category;
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
+        $pagerView->state = $productsData['state'];
+        $pagerView->setCanonicalPrevNext();
 
         $layout->view('catalog/product/pager')->set(['query' => $q, 'filters' => $filter]);
         $layout->view('catalog/nav')->set([
@@ -111,13 +113,15 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
+        $pagerView->state = $productsData['state'];
+        $pagerView->setCanonicalPrevNext();
 
         FCom_Catalog_Model_SearchHistory::i()->addSearchHit($q, $productsData['state']['c']);
 
         $layout->view('breadcrumbs')->set('crumbs', ['home', ['label' => 'Search: ' . $q, 'active' => true]]);
         $layout->view('catalog/search')->set('query', $q);
-        $layout->view('catalog/product/pager')->set('filters', $filter);
-        $layout->view('catalog/product/pager')->set('query', $q);
+        $pagerView->set('filters', $filter);
+        $pagerView->set('query', $q);
 
         FCom_Core_Main::i()->lastNav(true);
     }
