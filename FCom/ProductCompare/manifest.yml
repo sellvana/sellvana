@@ -1,0 +1,19 @@
+modules:
+    FCom_ProductCompare:
+        version: 0.1.0
+        channel: beta
+        require: { module: { FCom_Catalog: 0.1.0, FCom_Customer: 0.1.3 } }
+        translations: { en: en.php }
+        description: "Product comparison"
+
+        auto_use: [ layout, views ]
+
+        areas:
+            FCom_Admin:
+                auto_use: [ bootstrap ]
+                routing:
+                    - [ /prodcompare/?.action, FCom_ProductCompare_Admin_Controller.index ]
+
+            FCom_Frontend:
+                routing:
+                    - [ /catalog/compare/?.action, FCom_ProductCompare_Frontend_Controller ]

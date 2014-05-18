@@ -1,43 +1,22 @@
 {% set c = THIS.get('model') %}
-{% set fieldData = { model: c, id_prefix:'FCom_Paypal', name_prefix:'config[modules][FCom_Paypal]' } %}
 {% import THIS.view('admin/form-elements').twigName() as forms %}
 <h2>{{ "Paypal Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Paypal'}) }}
-     {{ forms.accordion_panel_start({label:'Production'|_, id:'settings-FCom_Paypal-group0', in:1}) }}
-        {{ forms.input(fieldData|merge({field:'username', label:'Username'|_, attr: 'size="50"', value: THIS.q(c.get('modules/FCom_PayPal/production/username'))})) }}
-        {{ forms.input(fieldData|merge({field:'password', label:'Password'|_, attr: 'size="50"', type: "password", value: THIS.q(c.get('modules/FCom_PayPal/production/password'))})) }}
-        {{ forms.input(fieldData|merge({field:'signature', label:'Signature'|_, attr: 'size="50"', value: THIS.q(c.get('modules/FCom_PayPal/production/signature'))})) }}
-        <div class="form-group">
-            <label class="col-md-2 control-label">{{ 'Show shipping address on PayPal'|_ }}</label>
-            <div class="col-md-10">
-                <label class="radio radio-inline">
-                    <input type="radio" name="config[modules][FCom_PayPal][show_shipping]"
-                           value="on" {% if c.get('modules/FCom_PayPal/show_shipping') == 'on' %}checked="checked"{% endif %} /> Yes
-                </label>
-                <label class="radio radio-inline">
-                    <input type="radio" name="config[modules][FCom_PayPal][show_shipping]"
-                           value="off" {% if c.get('modules/FCom_PayPal/show_shipping') == 'off' %}checked="checked"{% endif %} /> No
-                </label>
-            </div>
-        </div>
+
+    {% set fieldData = { model: c, id_prefix:'FCom_Paypal-production', name_prefix:'config[modules][FCom_Paypal][production]', get_prefix:'modules/FCom_Paypal/production' } %}
+    {{ forms.accordion_panel_start({label:'Production'|_, id:'settings-FCom_Paypal-group0', in:1}) }}
+        {{ forms.input(fieldData|merge({field:'username', label:'Username'|_, attr: 'size="50"' })) }}
+        {{ forms.input(fieldData|merge({field:'password', label:'Password'|_, attr: 'size="50"', type: "password" })) }}
+        {{ forms.input(fieldData|merge({field:'signature', label:'Signature'|_, attr: 'size="50"' })) }}
+        {{ forms.boolean(fieldData|merge({field:'show_shipping', label:'Show shipping address on PayPal'|_ })) }}
     {{ forms.accordion_panel_end }}
+
+    {% set fieldData = { model: c, id_prefix:'FCom_Paypal-sandbox', name_prefix:'config[modules][FCom_Paypal][sandbox]', get_prefix:'modules/FCom_Paypal/sandbox' } %}
     {{ forms.accordion_panel_start({label:'Sandbox'|_, id:'settings-FCom_Paypal-group1'}) }}
-        <div class="form-group">
-            <label class="col-md-2 control-label">{{ 'Sandbox mode'|_ }}</label>
-            <div class="col-md-10">
-                <label class="radio radio-inline">
-                    <input type="radio" name="config[modules][FCom_PayPal][sandbox][mode]"
-                           value="on" {% if c.get('modules/FCom_PayPal/sandbox/mode') == 'on' %}checked="checked"{% endif %} /> Yes
-                </label>
-                <label class="radio radio-inline">
-                    <input type="radio" name="config[modules][FCom_PayPal][sandbox][mode]"
-                           value="off" {% if c.get('modules/FCom_PayPal/sandbox/mode') == 'off' %}checked="checked"{% endif %} /> No
-                </label>
-            </div>
-        </div>
-        {{ forms.input(fieldData|merge({field:'username', label:'Username'|_, attr: 'size="50"', value: THIS.q(c.get('modules/FCom_PayPal/sandbox/username'))})) }}
-        {{ forms.input(fieldData|merge({field:'password', label:'Password'|_, attr: 'size="50"', type: "password", value: THIS.q(c.get('modules/sandbox/production/password'))})) }}
-        {{ forms.input(fieldData|merge({field:'signature', label:'Signature'|_, attr: 'size="50"', value: THIS.q(c.get('modules/FCom_PayPal/sandbox/signature'))})) }}
+        {{ forms.boolean(fieldData|merge({field:'mode', label:'Sandbox mode'|_ })) }}
+        {{ forms.input(fieldData|merge({field:'username', label:'Username'|_, attr: 'size="50"' })) }}
+        {{ forms.input(fieldData|merge({field:'password', label:'Password'|_, attr: 'size="50"', type: "password" })) }}
+        {{ forms.input(fieldData|merge({field:'signature', label:'Signature'|_, attr: 'size="50"' })) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
 

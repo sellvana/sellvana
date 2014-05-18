@@ -171,6 +171,16 @@ class FCom_Core_Main extends BClass
 
         $config->add($localConfig);
 
+        $extLoaded = array_flip(get_loaded_extensions());
+        foreach ([
+            'bcmath', 'date', 'hash', 'iconv', 'json', 'SPL', 'pcre', 'session',
+            'zip', 'pdo_mysql', 'curl', 'gd', 'exif'
+        ] as $ext) {
+            if (empty($extLoaded[$ext])) {
+                $errors['phpext'][] = $ext;
+            }
+        }
+
         if ($errors) {
             BLayout::i()
                 ->addView('core/errors', ['template' => __DIR__ . '/views/core/errors.php'])

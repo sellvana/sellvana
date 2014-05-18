@@ -1,17 +1,17 @@
 {% set c = THIS.get('model') %}
-{% set fieldData = { model: c, id_prefix:'FCom_Admin', name_prefix:'config[modules][FCom_Admin]' } %}
 {% import THIS.view('admin/form-elements').twigName() as forms %}
 
 <h2>{{ "Admin Settings"|_}}</h2>
+{% set fieldData = { model: c, settings_module:'FCom_Admin' } %}
 {{ forms.accordion_start({id:'settings-FCom_Admin'}) }}
     {{ forms.accordion_panel_start({label:'HTML'|_, id:'settings-FCom_Admin-group0', in:1}) }}
-        {{ forms.select(fieldData|merge({field:'theme', label:'Theme'|_, options:LAYOUT.getThemes("FCom_Admin", true), value:c.get('modules/FCom_Admin/theme')})) }}
-        {{ forms.textarea(fieldData|merge({field:'add_js_files', label:'Additional JS Files'|_, value:c.get('modules/FCom_Admin/add_js_files'), raw:1 })) }}
-        {{ forms.textarea(fieldData|merge({field:'add_css_files', label:'Additional CSS Files'|_, value:c.get('modules/FCom_Admin/add_css_files'), raw:1 })) }}
-        {{ forms.textarea(fieldData|merge({field:'add_js_code', label:'Additional JS Code'|_, value:c.get('modules/FCom_Admin/add_js_code'), raw:1 })) }}
-        {{ forms.textarea(fieldData|merge({field:'add_css_style', label:'Additional CSS Style'|_, value:c.get('modules/FCom_Admin/add_css_style'), raw:1 })) }}
+        {{ forms.select(fieldData|merge({field:'theme', label:'Theme'|_, options:LAYOUT.getThemes("FCom_Admin", true) })) }}
+        {{ forms.textarea(fieldData|merge({field:'add_js_files', label:'Additional JS Files'|_, raw:1 })) }}
+        {{ forms.textarea(fieldData|merge({field:'add_css_files', label:'Additional CSS Files'|_, raw:1 })) }}
+        {{ forms.textarea(fieldData|merge({field:'add_js_code', label:'Additional JS Code'|_, raw:1 })) }}
+        {{ forms.textarea(fieldData|merge({field:'add_css_style', label:'Additional CSS Style'|_, raw:1 })) }}
     {{ forms.accordion_panel_end }}
-    
+
     {{ forms.accordion_panel_start({label:'Area Settings'|_, id:'settings-FCom_Admin-group1'}) }}
         <div class="form-group">
             {{ forms.label({label:'IP: mode'|_}) }}
@@ -20,10 +20,10 @@
         {{ forms.textarea(fieldData|merge({name:'config[recovery_modules][FCom_Admin]', id:'recovery_modules-FCom_Admin',
             label:'Modules to run in RECOVERY mode'|_, value:c.get('recovery_modules/FCom_Admin'), raw:1 })) }}
     {{ forms.accordion_panel_end }}
-    
-    
+
+
     {{ forms.accordion_panel_start({label:'Users'|_, id:'settings-FCom_Admin-group2'}) }}
-        {{ forms.boolean(fieldData|merge({field:'password_strength', label:'Strong Password Security'|_, value:c.get('modules/FCom_Admin/password_strength')})) }}
+        {{ forms.boolean(fieldData|merge({field:'password_strength', label:'Strong Password Security'|_ })) }}
     {{ forms.accordion_panel_end }}
 
     {{ forms.accordion_panel_start({label:'Site Map'|_, id:'settings-FCom_Admin-group3'}) }}
