@@ -1077,9 +1077,10 @@ class BORM extends ORMWrapper
 
     /**
     * Added _build_having()
+    * Extended with argument for options skipping of values calculation
     *
     */
-    protected function _build_select() {
+    protected function _build_select($calculate_values = true) {
         // If the query is raw, just set the $this->_values to be
         // the raw query parameters and return the raw query
         if ($this->_is_raw_query) {
@@ -1092,7 +1093,7 @@ class BORM extends ORMWrapper
         return $this->_join_if_not_empty(" ", [
             $this->_build_select_start(),
             $this->_build_join(),
-            $this->_build_where(),
+            $this->_build_where($calculate_values),
             $this->_build_group_by(),
             $this->_build_having(),
             $this->_build_order_by(),
@@ -1128,12 +1129,13 @@ class BORM extends ORMWrapper
 
     /**
     * Return select sql statement built from the ORM object
+    * Extended with argument for options skipping of values calculation
     *
     * @return string
     */
-    public function as_sql()
+    public function as_sql($calculate_values = true)
     {
-        return $this->_build_select();
+        return $this->_build_select($calculate_values);
     }
 
     /**
@@ -1618,8 +1620,15 @@ class BORM extends ORMWrapper
         #$s['c'] = 600000;
         if (empty($s['c'])) {
             $cntOrm = clone $this; // clone ORM to count
-            $s['c'] = $cntOrm->count(); // total row count
-            unset($cntOrm); // free mem
+            $cntQuery = $this->as_sql(false);  
+            $cntFilters = $this->_build_values();
+            // Change the way we calculate count if grouping is detected in query
+            if ( count($cntOrm->_group_by) ) {
+                $s[ 'c' ] = BORM::i()->raw_query( "SELECT COUNT(*) AS count FROM ($cntQuery) AS cntCount", $cntFilters )->find_one()->count;
+            } else {         
+                $s[ 'c' ] = $cntOrm->count(); // total row count
+            }        
+            unset( $cntOrm, $cntQuery, $cntFilters ); // free mem
         }
 
         $s['mp'] = ceil($s['c'] / $s['ps']); // max page
@@ -1648,6 +1657,44 @@ class BORM extends ORMWrapper
             }
         }
         return ['state' => $s, 'rows' => $rows];
+    }
+
+    /**
+    * Build the WHERE clause(s)
+    * Extended with argument for options skipping of values calculation
+    */
+    protected function _build_where($calculate_values = true) {
+            // If there are no WHERE clauses, return empty string
+            if (count($this->_where_conditions) === 0) {
+                return '';
+            }
+
+            $where_conditions = [];
+            foreach ($this->_where_conditions as $condition) {
+                $where_conditions[] = $condition[static::WHERE_FRAGMENT];
+                if($calculate_values){
+                    $this->_values = array_merge($this->_values, $condition[static::WHERE_VALUES]);
+                }
+            }
+
+            return "WHERE " . join(" AND ", $where_conditions);
+    }
+
+    /**
+    * Build the WHERE clause Values array if not build already inside _build_where()
+    */
+    protected function _build_values() {
+        // If there are no WHERE clauses, return empty array
+        if (count($this->_where_conditions) === 0) {
+            return [];
+        }
+        
+        $values = [];
+        foreach ($this->_where_conditions as $condition) {
+                $values[] = $condition[static::WHERE_VALUES][0];
+        }
+
+        return $values;
     }
 
     const HAVING_FRAGMENT = 0;
