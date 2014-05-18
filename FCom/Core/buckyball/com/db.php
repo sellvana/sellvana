@@ -1629,7 +1629,7 @@ class BORM extends ORMWrapper
             } else {         
                 $s[ 'c' ] = $cntOrm->count(); // total row count
             }        
-            unset( $cntOrm, $cntQuery, $cntFilters ); // free mem
+            unset( $cntOrm ); // free mem
         }
 
         $s['mp'] = ceil($s['c'] / $s['ps']); // max page
