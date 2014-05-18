@@ -1619,12 +1619,13 @@ class BORM extends ORMWrapper
 
         #$s['c'] = 600000;
         if (empty($s['c'])) {
-            $cntOrm = clone $this; // clone ORM to count
-            $cntQuery = $this->as_sql(false);  
-            $cntFilters = $this->_build_values();
+            $cntOrm = clone $this; // clone ORM to count              
             // Change the way we calculate count if grouping is detected in query
             if ( count($cntOrm->_group_by) ) {
+                $cntQuery = $this->as_sql(false);
+                $cntFilters = $this->_build_values();
                 $s[ 'c' ] = BORM::i()->raw_query( "SELECT COUNT(*) AS count FROM ($cntQuery) AS cntCount", $cntFilters )->find_one()->count;
+                unset( $cntQuery, $cntFilters ); // free mem
             } else {         
                 $s[ 'c' ] = $cntOrm->count(); // total row count
             }        
