@@ -3,13 +3,13 @@
 <!--{ pos: 100 }-->
 
 {% set c = THIS.get('model') %}
-{% set fieldData = { model: c, id_prefix:'FCom_Feedback', name_prefix:'config[modules][FCom_Feedback]' } %}
+{% set fieldData = { model: c, settings_module:'FCom_Feedback' } %}
 {% import THIS.view('admin/form-elements').twigName() as forms %}
 <h2>{{ "Feedback Tool"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Feedback'}) }}
      {{ forms.accordion_panel_start({label:'General Settings'|_, id:'settings-FCom_Feedback-group0', in:1}) }}
-        {{ forms.boolean(fieldData|merge({field:'enable_FCom_Admin', label:'Enable for Admin'|_, value: c.get("modules/FCom_Feedback/enable_FCom_Admin")})) }}
-        {{ forms.boolean(fieldData|merge({field:'enable_FCom_Frontend', label:'Enable for Frontend'|_, value: c.get("modules/FCom_Feedback/enable_FCom_Frontend")})) }}
-        {{ forms.boolean(fieldData|merge({field:'send_mod_versions', label:'Send enabled modules versions'|_, value: c.get("modules/FCom_Feedback/send_mod_versions")})) }}
+        {{ forms.boolean(fieldData|merge({field:'enable_FCom_Admin', label:'Enable for Admin'|_ })) }}
+        {{ forms.boolean(fieldData|merge({field:'enable_FCom_Frontend', label:'Enable for Frontend'|_ })) }}
+        {{ forms.boolean(fieldData|merge({field:'send_mod_versions', label:'Send enabled modules versions'|_ })) }}
      {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

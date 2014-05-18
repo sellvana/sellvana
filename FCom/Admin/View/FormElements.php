@@ -11,9 +11,12 @@ class FCom_Admin_View_FormElements extends FCom_Admin_View_Abstract
         if (empty($p['field'])) {
             return '';
         }
+        if (!empty($p['settings_module']) && empty($p['id_prefix'])) {
+            return 'modules-' . $p['settings_module'] . '-' . $p['field'];
+        }
         return (!empty($p['id_prefix']) ? $p['id_prefix'] : 'model') . '-' . $p['field'];
     }
-    
+
     public function getInputName($p)
     {
         if (!empty($p['name'])) {
@@ -22,9 +25,12 @@ class FCom_Admin_View_FormElements extends FCom_Admin_View_Abstract
         if (empty($p['field'])) {
             return '';
         }
+        if (!empty($p['settings_module']) && empty($p['name_prefix'])) {
+            return 'config[modules][' . $p['settings_module'] . '][' . $p['field'] . ']';
+        }
         return (!empty($p['name_prefix']) ? $p['name_prefix'] : 'model') . '[' . $p['field'] . ']';
     }
-    
+
     public function getInputValue($p)
     {
         if (isset($p['value'])) {
@@ -37,7 +43,14 @@ class FCom_Admin_View_FormElements extends FCom_Admin_View_Abstract
             return $p['validator']->fieldValue($p['field']);
         }
         if (!empty($p['model'])) {
-            return $p['model']->get($p['field']);
+            if (!empty($p['settings_module']) && empty($p['get_prefix'])) {
+                $prefix = 'modules/' . $p['settings_module'] . '/';
+            } elseif (!empty($p['get_prefix'])) {
+                $prefix = $p['get_prefix'] . '/';
+            } else {
+                $prefix = '';
+            }
+            return $p['model']->get($prefix . $p['field']);
         }
         return '';
     }
