@@ -45,6 +45,7 @@ modules:
                     - [ "FCom_FrontendCP_Frontend_Controller::action_update:after", "FCom_Catalog_Frontend_ControlPanel::onAfterUpdate" ]
                     - [ "FCom_Core_View_BackboneGrid::getPageRowsData", "FCom_Catalog_Admin_Controller_Products::processInitalData" ]
                 views:
+                    - [ catalog/product/pager, { view_class: FCom_Catalog_Frontend_View_Pager } ]
                     - [ catalog/product/price, { view_class: FCom_Catalog_Frontend_View_Price } ]
 
             FCom_ApiServer:

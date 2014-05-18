@@ -4,7 +4,6 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
 {
     public function action_category()
     {
-        $layout = BLayout::i();
         $q = BRequest::i()->get('q');
         $filter = BRequest::i()->get('f');
 
@@ -19,9 +18,18 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
             return $this;
         }
 
+        $this->layout('/catalog/category');
+        $layout = BLayout::i();
+        $pagerView = $layout->view('catalog/product/pager');
+
         $productsORM = FCom_Catalog_Model_Product::i()->searchProductOrm($q, $filter, $category);
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_orm', ['orm' => $productsORM]);
-        $productsData = $productsORM->paginate(null, ['ps' => 25]);
+        $productsData = $productsORM->paginate(null, [
+            'ps' => $pagerView->default_page_size,
+            'sc' => $pagerView->default_sort,
+            'sort_options'  => $pagerView->sort_options,
+            'page_size_options' => $pagerView->page_size_options,
+        ]);
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_data', ['data' => &$productsData]);
 
         BApp::i()
@@ -52,12 +60,14 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
             }
         }
 
-        $rowsViewName = 'catalog/product/' . (BRequest::i()->get('view') == 'list' ? 'list' : 'grid');
+        $rowsViewName = 'catalog/product/' . $pagerView->getViewAs();
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->category = $category;
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
+        $pagerView->state = $productsData['state'];
+        $pagerView->setCanonicalPrevNext();
 
         $layout->view('catalog/product/pager')->set(['query' => $q, 'filters' => $filter]);
         $layout->view('catalog/nav')->set([
@@ -69,20 +79,27 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
 
         FCom_Core_Main::i()->lastNav(true);
 
-        $this->layout('/catalog/category');
     }
 
     public function action_search()
     {
-        $layout = BLayout::i();
         $q = BRequest::i()->get('q');
         $filter = BRequest::i()->get('f');
+
+        $this->layout('/catalog/category');
+        $layout = BLayout::i();
+        $pagerView = $layout->view('catalog/product/pager');
 
         $q = FCom_Catalog_Model_SearchAlias::i()->processSearchQuery($q);
 
         $productsORM = FCom_Catalog_Model_Product::i()->searchProductOrm($q, $filter);
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_orm', ['data' => $productsORM]);
-        $productsData = $productsORM->paginate(null, ['ps' => 25]);
+        $productsData = $productsORM->paginate(null, [
+            'ps' => $pagerView->default_page_size,
+            'sc' => $pagerView->default_sort,
+            'sort_options'  => $pagerView->sort_options,
+            'page_size_options' => $pagerView->page_size_options,
+        ]);
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', ['data' => &$productsData]);
 
         $category = FCom_Catalog_Model_Category::i()->orm()->where_null('parent_id')->find_one();
@@ -91,21 +108,22 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
             ->set('current_category', $category)
             ->set('products_data', $productsData);
 
-        $rowsViewName = 'catalog/product/' . (BRequest::i()->get('view') == 'list' ? 'list' : 'grid');
+        $rowsViewName = 'catalog/product/' . $pagerView->getViewAs();
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
+        $pagerView->state = $productsData['state'];
+        $pagerView->setCanonicalPrevNext();
 
         FCom_Catalog_Model_SearchHistory::i()->addSearchHit($q, $productsData['state']['c']);
 
         $layout->view('breadcrumbs')->set('crumbs', ['home', ['label' => 'Search: ' . $q, 'active' => true]]);
         $layout->view('catalog/search')->set('query', $q);
-        $layout->view('catalog/product/pager')->set('filters', $filter);
-        $layout->view('catalog/product/pager')->set('query', $q);
+        $pagerView->set('filters', $filter);
+        $pagerView->set('query', $q);
 
         FCom_Core_Main::i()->lastNav(true);
-        $this->layout('/catalog/search');
     }
 
 

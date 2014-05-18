@@ -1,28 +1,22 @@
 {% set c = THIS.get('model') %}
 {% set services = APP.instance('FCom_ShippingUps_ShippingMethod').getServices() %}
-{% set fieldData = { model: c, id_prefix:'FCom_ShippingUps', name_prefix:'config[modules][FCom_ShippingUps]' } %}
 {% import THIS.view('admin/form-elements').twigName() as forms %}
+
 <h2>{{ "ShippingUPS Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_ShippingUps'}) }}
-     {{ forms.accordion_panel_start({label:'UPS API'|_, id:'settings-FCom_ShippingUps-group0', in:1}) }}
-        {{ forms.input(fieldData|merge({field:'access_key', attr: 'size="50"', label:'Access Key'|_, value:c.get('modules/FCom_ShippingUps/access_key')})) }}
-        {{ forms.input(fieldData|merge({field:'account', attr: 'size="50"', label:'UPS Account'|_, value:c.get('modules/FCom_ShippingUps/account')})) }}
-        {{ forms.input(fieldData|merge({field:'password', attr: 'size="50"', label:'Password'|_, value:c.get('modules/FCom_ShippingUps/password')})) }}
-        {{ forms.input(fieldData|merge({field:'rate_api_url', attr: 'size="50"', label:'Rate API URL'|_, value:c.get('modules/FCom_ShippingUps/rate_api_url')})) }}
-        <div class="form-group">
-            <label class="col-md-2 control-label">{{ 'Shipping services'|_ }}</label>
-            <div class="col-md-5">
-                {% for sId, sName in services %}
-                    <div class="col-md-12" style="padding: 0; overflow: hidden; margin-bottom: 5px">
-                        <select class="form-control pull-left" style="width: auto" name="config[modules][FCom_ShippingUps][services][s{{ sId }}]" value="{{ c.get('modules/FCom_ShippingUps/services/s'~sId) }}">
-                            <option value="0">{{ "no"|_ }}</option>
-                            <option value="1" {% if c.get('modules/FCom_ShippingUps/services/s'~sId) == 1  %} selected {% endif %}>{{ "YES"|_ }}</option>
-                        </select>
-                        <label style="text-align: left" class="control-label col-md-7 pull-left">{{ sName }}</label>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-     {{ forms.accordion_panel_end }}
+    {% set fieldData = { model: c, settings_module: 'FCom_ShippingUps' } %}
+    {{ forms.accordion_panel_start({label:'UPS API'|_, id:'settings-FCom_ShippingUps-group0', in:1}) }}
+        {{ forms.input(fieldData|merge({field:'access_key', attr: 'size="50"', label:'Access Key'|_ })) }}
+        {{ forms.input(fieldData|merge({field:'account', attr: 'size="50"', label:'UPS Account'|_ })) }}
+        {{ forms.input(fieldData|merge({field:'password', attr: 'size="50"', label:'Password'|_ })) }}
+        {{ forms.input(fieldData|merge({field:'rate_api_url', attr: 'size="50"', label:'Rate API URL'|_ })) }}
+    {{ forms.accordion_panel_end }}
+
+    {% set fieldData = { model: c, id_prefix:'FCom_ShippingUps-services', name_prefix:'config[modules][FCom_ShippingUps][services]', get_prefix:'modules/FCom_ShippingUps/services' } %}
+    {{ forms.accordion_panel_start({label:'Shipping services'|_, id:'settings-FCom_ShippingUps-group1' }) }}
+        {% for sId, sName in services %}
+            {{ forms.boolean(fieldData|merge({field: 's' ~ sId, label: sName })) }}
+        {% endfor %}
+    {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
 
