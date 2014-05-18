@@ -4,16 +4,15 @@ modules:
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCommon: 0.1.0, FCom_LibTwig: 0.1.0 } }
         description: "Base Frontend functionality"
-        before_bootstrap: FCom_Frontend_Frontend::beforeBootstrap
-        auto_use: [ views ]
         default_config:
             modules:
                 FCom_Frontend:
-                    theme: FCom_FrontendThemeBlue
+                    theme: FCom_FrontendThemeBootSimple
                     nav_top: { root_cms: 1, root_category: 1, type: categories_root }
 
         areas:
             FCom_Frontend:
+                auto_use: [ views ]
                 views:
                     - [ root, { view_class: FCom_Frontend_View_Root } ]
                     - [ breadcrumbs, { view_class: FCom_Frontend_View_Breadcrumbs } ]
@@ -26,5 +25,6 @@ modules:
         provides:
             themes:
                 FCom_Frontend_DefaultTheme:
+                    name: Default Frontend Theme
                     area: FCom_Frontend
                     layout: Frontend/layout.yml

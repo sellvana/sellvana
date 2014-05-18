@@ -1,14 +1,14 @@
 {% set c = THIS.get('model') %}
-{% set fieldData = { model: c, id_prefix:'FCom_Ogone', name_prefix:'config[modules][FCom_Ogone]' } %}
+{% set fieldData = { model: c, settings_module:'FCom_Ogone' } %}
 {% import THIS.view('admin/form-elements').twigName() as forms %}
 <h2>{{ "Ogone Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Ogone'}) }}
      {{ forms.accordion_panel_start({label:'Ogone API'|_, id:'settings-FCom_Ogone-group0', in:1}) }}
-        {{ forms.select(fieldData|merge({field:'mode', label:'Test/Live Mode'|_, options: {0:'Test', 1:'Live'}, value:c.get('modules/FCom_Ogone/mode')})) }}
-        {{ forms.input(fieldData|merge({field:'pspid', label:'PSPID'|_, value:c.get('modules/FCom_Ogone/pspid')})) }}
-        {{ forms.input(fieldData|merge({field:'feedback_message', label:'Feedback Message'|_,  value:c.get('modules/FCom_Ogone/feedback_message')})) }}
+        {{ forms.select(fieldData|merge({field:'mode', label:'Test/Live Mode'|_, options: {0:'Test', 1:'Live'} })) }}
+        {{ forms.input(fieldData|merge({field:'pspid', label:'PSPID'|_ })) }}
+        {{ forms.input(fieldData|merge({field:'feedback_message', label:'Feedback Message'|_ })) }}
     {{ forms.accordion_panel_end }}
     {{ forms.accordion_panel_start({label:'Owner Information'|_, id:'settings-FCom_Ogone-group1'}) }}
-        {{ forms.input(fieldData|merge({field:'owner_address', label:'Address'|_,  value: c.get('modules/FCom_Ogone/owner_address')})) }}
+        {{ forms.input(fieldData|merge({field:'owner_address', label:'Address'|_ })) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

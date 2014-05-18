@@ -4,10 +4,12 @@ class FCom_Geo_Model_Country extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_geo_country';
     protected static $_origClass = __CLASS__;
+    protected static $_id_column = 'iso';
 
     protected static $_optionsCache = [];
     protected static $_importExportProfile = [
-      'unique_key' => ['iso',],
+        'unique_key'                          => ['iso',],
+        FCom_Core_ImportExport::AUTO_MODEL_ID => false,
     ];
     public static function options($limit = null)
     {

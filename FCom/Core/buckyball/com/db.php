@@ -1216,6 +1216,20 @@ class BORM extends ORMWrapper
     }
 
     /**
+     * Get original model class name
+     *
+     * @return string
+     */
+    protected function _origClass()
+    {
+        $class = $this->_class_name;
+        if (method_exists($class, 'origClass') && $class::origClass()) {
+            $class = $class::origClass();
+        }
+        return $class;
+    }
+
+    /**
      * Find one row
      *
      * @param int|null $id
@@ -1223,10 +1237,7 @@ class BORM extends ORMWrapper
      */
     public function find_one($id = null)
     {
-        $class = $this->_class_name;
-        if (method_exists($class, 'origClass') && $class::origClass()) {
-            $class = $class::origClass();
-        }
+        $class = $this->_origClass();
         BEvents::i()->fire($class . '::find_one:orm', ['orm' => $this, 'class' => $class, 'id' => $id]);
         $result = parent::find_one($id);
         BEvents::i()->fire($class . '::find_one:after', ['result' => &$result, 'class' => $class, 'id' => $id]);
@@ -1240,10 +1251,7 @@ class BORM extends ORMWrapper
     */
     public function find_many()
     {
-        $class = $this->_class_name;
-        if (method_exists($class, 'origClass') && $class::origClass()) {
-            $class = $class::origClass();
-        }
+        $class = $this->_origClass();
         BEvents::i()->fire($class . '::find_many:orm', ['orm' => $this, 'class' => $class]);
         $result = parent::find_many();
         BEvents::i()->fire($class . '::find_many:after', ['result' => &$result, 'class' => $class]);
@@ -1382,7 +1390,7 @@ class BORM extends ORMWrapper
                 $result = $this->_save($replace);
             #}
         } else {
-            echo $this->_class_name . '[' . $this->id . ']: ';
+            echo $this->_className() . '[' . $this->id() . ']: ';
             print_r($this->_data);
             echo 'FROM: '; print_r($this->_old_values);
             echo 'TO: '; print_r($this->_dirty_fields); echo "\n\n";
@@ -1553,17 +1561,47 @@ class BORM extends ORMWrapper
         if (null === $r) {
             $r = BRequest::i()->request(); // GET request
         }
+#echo "<pre>"; var_dump($_GET, $_REQUEST, $r); exit;
         $d = (array)$d; // make sure it's array
-        if (!empty($r['sc']) && empty($r['s']) && empty($r['sd'])) { // sort and dir combined
+        if (empty($d['sc']) && empty($d['s']) && !empty($d['sort_options'])) { // if no default sort set, take from sort_options
+            reset($d['sort_options']);
+            $d['sc'] = key($d['sort_options']);
+        }
+        if (empty($d['ps']) && !empty($d['page_size_options'])) { // if not default page size set, take from page_size_options
+            reset($d['page_size_options']);
+            $d['ps'] = key($d['page_size_options']);
+        }
+        if (!empty($d['sc']) && empty($d['s'])) { // split default sort and dir combined
+            list($d['s'], $d['sd']) = preg_split('#[| ]#', trim($d['sc']));
+        } elseif (empty($d['sc']) && !empty($d['s'])) { // combine default sort and dir
+            $d['sc'] = $d['s'] . ' ' . (!empty($d['sd']) ? $d['sd'] : 'asc');
+        }
+
+        if (!empty($r['sc']) && empty($r['s'])) { // split request sort and dir combined
             list($r['s'], $r['sd']) = preg_split('#[| ]#', trim($r['sc']));
         }
-        if (!empty($r['s']) && !empty($d['s']) && is_array($d['s'])) { // limit by these values only
-            if (!in_array($r['s'], $d['s'])) $r['s'] = null;
-            $d['s'] = null;
+        if (!empty($r['s']) && !preg_match('#^[a-zA-Z0-9_.]+$#', $r['s'])) { // if sort contains not allowed characters
+            $r['s'] = null;
         }
-        if (!empty($r['sd']) && $r['sd'] != 'asc' && $r['sd'] != 'desc') { // only asc and desc are allowed
-            $r['sd'] = null;
+        if (empty($r['sd']) || $r['sd'] != 'asc' && $r['sd'] != 'desc') { // only asc and desc dirs are allowed
+            $r['sd'] = 'asc';
         }
+        $r['sc'] = !empty($r['s']) ? $r['s'] . ' ' . $r['sd'] : null; // combine $r['sc'] after filtering
+        if (!empty($r['sc']) && !empty($d['sort_options']) && is_array($d['sort_options'])) { // limit by these values only
+#echo "<Pre>"; var_dump($r, $d); exit;
+            if (empty($d['sort_options'][$r['sc']])) {
+                $r['sc'] = null;
+                $r['s'] = null;
+                $r['sd'] = null;
+            }
+        }
+
+        if (!empty($r['ps']) && !empty($d['page_size_options']) && is_array($d['page_size_options'])) { // limit page size
+            if (empty($d['page_size_options'][$r['ps']])) {
+                $r['ps'] = null;
+            }
+        }
+
         $s = [// state
             'p'  => !empty($r['p'])  && is_numeric($r['p']) ? $r['p']  : (!empty($d['p']) && is_numeric($d['p'])  ? $d['p']  : 1), // page
             'ps' => !empty($r['ps']) && is_numeric($r['ps']) ? $r['ps'] : (!empty($d['ps']) && is_numeric($d['ps']) ? $d['ps'] : 100), // page size
@@ -1585,9 +1623,13 @@ class BORM extends ORMWrapper
         }
 
         $s['mp'] = ceil($s['c'] / $s['ps']); // max page
-        if (($s['p']-1) * $s['ps'] > $s['c']) $s['p'] = $s['mp']; // limit to max page
-        if ($s['s']) $this-> {'order_by_' . $s['sd']}($s['s']); // sort rows if requested
-        $s['rs'] = max(0, isset($s['rs']) ? $s['rs'] : ($s['p']-1) * $s['ps']); // start from requested row or page
+        if (($s['p']-1) * $s['ps'] > $s['c']) {
+            $s['p'] = $s['mp']; // limit to max page
+        }
+        if ($s['s']) {
+            $this->{'order_by_' . $s['sd']}($s['s']); // sort rows if requested
+        }
+        $s['rs'] = max(0, isset($s['rs']) ? $s['rs'] : ($s['p'] - 1) * $s['ps']); // start from requested row or page
         if (empty($d['donotlimit'])) {
             $this->offset($s['rs'])->limit(!empty($s['rc']) ? $s['rc'] : $s['ps']); // limit rows to page
         }
@@ -1806,6 +1848,13 @@ class BModel extends Model
     protected static $_flags = [];
 
     /**
+     * Collection class name
+     *
+     * @var string
+     */
+    protected static $_collectionClass = 'BCollection';
+
+    /**
     * Retrieve original class name
     *
     * @return string
@@ -1911,6 +1960,16 @@ class BModel extends Model
         }
         BEvents::i()->fire(static::$_origClass . '::orm', ['orm' => $orm, 'alias' => $alias]);
         return $orm;
+    }
+
+    public static function collection($alias = null)
+    {
+        $collectionClass = static::$_collectionClass;
+        $orm = $this->orm($alias);
+        $collection = $collectionClass::i(true)->setModelClass(static::$_origClass)->setOrm($orm);
+
+        BEvents::i()->fire(static::$_origClass . '::collection', ['collection' => $this, 'orm' => $orm, 'alias' => $alias]);
+        return $collection;
     }
 
     /**
@@ -2084,11 +2143,11 @@ class BModel extends Model
      * @param boolean $cache
      * @return BModel
      */
-    public static function loadOrCreate($id, $field, $cache = false)
+    public static function loadOrCreate($id, $field = null, $cache = false)
     {
         $model = static::load($id, $field, $cache);
         if (!$model) {
-            $model = static::create();
+            $model = static::create(is_array($id) ? $id : []);
         }
         return $model;
     }
@@ -2768,9 +2827,15 @@ class BModel extends Model
  *
  * Should be (almost) drop in replacement for current straight arrays implementation
  */
-class BCollection extends BData
+class BCollection extends ArrayIterator
 {
     protected $_orm;
+    protected $_modelClass = 'BModel';
+
+    public function __construct($rows)
+    {
+        parent::__construct($rows);
+    }
 
     public function setOrm($orm)
     {
@@ -2778,16 +2843,45 @@ class BCollection extends BData
         return $this;
     }
 
-    public function load($assoc = false)
+    public function getOrm()
     {
-        $method = $assoc ? 'find_many_assoc' : 'find_many';
-        $this->_data = $this->_orm->$method();
+        return $this->_orm;
+    }
+
+    public function setModelClass($class)
+    {
+        $this->_modelClass = $class;
+        return $this;
+    }
+
+    public function getModelClass()
+    {
+        return $this->_modelClass;
+    }
+
+    public function loadAll($assoc = false, $key = null, $labelColumn = null, $options = [])
+    {
+        if ($assoc) {
+            $data = $this->_orm->find_many_assoc($key, $labelColumn, $options);
+        } else {
+            $data = $this->_orm->find_many();
+        }
+        $this->setData($data);
+        return $this;
+    }
+
+    public function setData($data)
+    {
+        //TODO: clear dbplus_first(relation, tuple)
+        foreach ($rows as $k => $row) {
+            $this->offsetSet($k, $row);
+        }
         return $this;
     }
 
     public function modelsAsArray()
     {
-        return BDb::many_as_array($this->_data);
+        return BDb::many_as_array($this);
     }
 }
 
