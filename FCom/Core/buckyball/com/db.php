@@ -747,12 +747,13 @@ EOT
     }
 
     /**
-    * Clean array or object fields based on table columns and return an array
-    *
-    * @param string $table
-    * @param array|object $data
-    * @return array
-    */
+     * Clean array or object fields based on table columns and return an array
+     *
+     * @param string       $table
+     * @param array|object $data
+     * @param null         $connectionName
+     * @return array
+     */
     public static function cleanForTable($table, $data, $connectionName = null)
     {
         $isObject = is_object($data);
