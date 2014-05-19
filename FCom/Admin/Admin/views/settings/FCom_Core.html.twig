@@ -4,47 +4,50 @@
 <h2>{{ "Core Settings"|_}}</h2>
 
 {{ forms.accordion_start({id:'settings-FCom_Core'}) }}
+    {% set fieldData = { model: c, id_prefix:'db', name_prefix:'config[db]', get_prefix:'db' } %}
     {{ forms.accordion_panel_start({label:'DB Settings'|_, id:'settings-FCom_Core-group0', in:1}) }}
-        {{ forms.input({ name:'config[db][host]', label:'Host'|_, value:c.get('db/host') }) }}
-        {{ forms.input({ name:'config[db][port]', label:'Port'|_, value:c.get('db/port') }) }}
-        {{ forms.input({ name:'config[db][dbname]', label:'Database'|_, value:c.get('db/dbname') }) }}
-        {{ forms.input({ name:'config[db][username]', label:'Username'|_, value:c.get('db/username')}) }}
-        {{ forms.input({ name:'config[db][password]', label:'Password'|_, value:c.get('db/password')?'*****':'', type:'password', placeholder:'*****' }) }}
-        {{ forms.boolean({ name:'config[db][logging]', label:'Enable Logging'|_, value:c.get('db/logging') }) }}
-        {{ forms.boolean({ name:'config[db][implicit_migration]', label:'Implicit Migration'|_, value:c.get('db/implicit_migration') }) }}
+        {{ forms.input(fieldData|merge({ field:'host', label:'Host'|_ })) }}
+        {{ forms.input(fieldData|merge({ field:'port', label:'Port'|_ })) }}
+        {{ forms.input(fieldData|merge({ field:'dbname', label:'Database'|_ })) }}
+        {{ forms.input(fieldData|merge({ field:'username', label:'Username'|_ })) }}
+        {{ forms.input(fieldData|merge({ field:'password', label:'Password'|_, value:c.get('db/password')?'*****':'', type:'password', placeholder:'*****' })) }}
+        {{ forms.boolean(fieldData|merge({ field:'logging', label:'Enable Logging'|_ })) }}
+        {{ forms.boolean(fieldData|merge({ field:'implicit_migration', label:'Implicit Migration'|_ })) }}
     {{ forms.accordion_panel_end }}
 
+    {% set fieldData = { model:c, settings_module: 'FCom_Core' } %}
     {{ forms.accordion_panel_start({label:'Website'|_, id:'settings-FCom_Core-group1'}) }}
-        {% set fieldData = { name_prefix: 'config[modules][FCom_Core]', id_prefix: 'config-modules-FCom_Core' } %}
-        {{ forms.input(fieldData|merge({field:'company_name', label:'Company Name'|_, value:c.get('modules/FCom_Core/company_name') })) }}
-        {{ forms.input(fieldData|merge({field:'site_title', label:'Site Title'|_, value:c.get('modules/FCom_Core/site_title') })) }}
-        {{ forms.input(fieldData|merge({field:'admin_email', label:'Admin Email'|_, value:c.get('modules/FCom_Core/admin_email'), type:'email' })) }}
-        {{ forms.input(fieldData|merge({field:'sales_name', label:'Sales Name'|_, value:c.get('modules/FCom_Core/sales_name') })) }}
-        {{ forms.input(fieldData|merge({field:'sales_email', label:'Sales Email'|_, value:c.get('modules/FCom_Core/sales_email'), type:'email' })) }}
-        {{ forms.input(fieldData|merge({field:'support_name', label:'Support Name'|_, value:c.get('modules/FCom_Core/support_name') })) }}
-        {{ forms.input(fieldData|merge({field:'support_email', label:'Support Email'|_, value:c.get('modules/FCom_Core/support_email'), type:'email' })) }}
-        {{ forms.input(fieldData|merge({field:'copyright_message', label:'Copyright Message'|_, value:c.get('modules/FCom_Core/copyright_message') })) }}
+        {{ forms.input(fieldData|merge({ field:'company_name', label:'Company Name'|_ })) }}
+        {{ forms.input(fieldData|merge({ field:'site_title', label:'Site Title'|_ })) }}
+        {{ forms.input(fieldData|merge({ field:'admin_email', label:'Admin Email'|_, type:'email' })) }}
+        {{ forms.input(fieldData|merge({ field:'sales_name', label:'Sales Name'|_ })) }}
+        {{ forms.input(fieldData|merge({ field:'sales_email', label:'Sales Email'|_, type:'email' })) }}
+        {{ forms.input(fieldData|merge({ field:'support_name', label:'Support Name'|_ })) }}
+        {{ forms.input(fieldData|merge({ field:'support_email', label:'Support Email'|_, type:'email' })) }}
+        {{ forms.input(fieldData|merge({ field:'copyright_message', label:'Copyright Message'|_ })) }}
     {{ forms.accordion_panel_end }}
 
+    {% set fieldData = { model: c, id_prefix:'config-cookie', name_prefix:'config[cookie]', get_prefix:'cookie' } %}
     {{ forms.accordion_panel_start({label:'Session'|_, id:'settings-FCom_Core-group2'}) }}
-        {{ forms.select({ name:'config[cookie][session_handler]', label:'Session Handler'|_, options:SESSION.getHandlers(), value:c.get('cookie/session_handler') }) }}
-        {{ forms.input({ name:'config[cookie][remember_days]', label:'Remember Me Timeout (days)'|_, value:c.get('cookie/remember_days') }) }}
-        {{ forms.input({ name:'config[cookie][domain]', label:'Cookie Domain'|_, value:c.get('cookie/domain') }) }}
-        {{ forms.input({ name:'config[cookie][path]', label:'Cookie Path'|_, value:c.get('cookie/path') }) }}
-        {{ forms.input({ name:'config[cookie][session_namespace]', label:'Cookie Namespace'|_, value:c.get('cookie/session_namespace') }) }}
-        {{ forms.boolean({ name:'config[cookie][session_check_ip]', label:'Verify Session IP'|_, value:c.get('cookie/session_check_ip') }) }}
+        {{ forms.select(fieldData|merge({ field:'session_handler', label:'Session Handler'|_, options:SESSION.getHandlers() })) }}
+        {{ forms.input(fieldData|merge({ field:'remember_days', label:'Remember Me Timeout (days)'|_ })) }}
+        {{ forms.input(fieldData|merge({ field:'domain', label:'Cookie Domain'|_ })) }}
+        {{ forms.input(fieldData|merge({ field:'path', label:'Cookie Path'|_ })) }}
+        {{ forms.input(fieldData|merge({ field:'session_namespace', label:'Cookie Namespace'|_ })) }}
+        {{ forms.boolean(fieldData|merge({ field:'session_check_ip', label:'Verify Session IP'|_ })) }}
     {{ forms.accordion_panel_end }}
 
     {{ forms.accordion_panel_start({label:'System'|_, id:'settings-FCom_Core-group3'}) }}
         {{ forms.boolean({ name:'config[web][hide_script_name]', label:'Hide script file name in URL'|_, value:c.get('web/hide_script_name') }) }}
     {{ forms.accordion_panel_end }}
 
+    {% set fieldData = { model:c, name_prefix: 'config[core][cache]', id_prefix: 'config-core-cache', get_prefix:'core/cache',
+        options:{'':'Enable in staging or production modes'|_, 'enable':'Enable always'|_, 'disable':'Disable always'|_} } %}
     {{ forms.accordion_panel_start({label:'Optimizations'|_, id:'settings-FCom_Core-group4'}) }}
-        {% set fieldData = { name_prefix: 'config[core][cache]', id_prefix: 'config-core-cache', options:{'':'Enable in staging or production modes'|_, 'enable':'Enable always'|_, 'disable':'Disable always'|_} } %}
-        {{ forms.select(fieldData|merge({field:'manifest_files', label:'Module Manifest Files Cache'|_, value:c.get('core/cache/manifest_files') })) }}
-        {{ forms.select(fieldData|merge({field:'layout_files', label:'Layout Files Cache'|_, value:c.get('core/cache/layout_files') })) }}
-        {{ forms.select(fieldData|merge({field:'view_files', label:'View Template Files Cache'|_, value:c.get('core/cache/view_files') })) }}
-        {{ forms.select(fieldData|merge({field:'twig', label:'Twig Cache'|_, value:c.get('core/cache/twig') })) }}
+        {{ forms.select(fieldData|merge({field:'manifest_files', label:'Module Manifest Files Cache'|_ })) }}
+        {{ forms.select(fieldData|merge({field:'layout_files', label:'Layout Files Cache'|_ })) }}
+        {{ forms.select(fieldData|merge({field:'view_files', label:'View Template Files Cache'|_ })) }}
+        {{ forms.select(fieldData|merge({field:'twig', label:'Twig Cache'|_ })) }}
     {{ forms.accordion_panel_end }}
 
     {{ forms.accordion_panel_start({label:'CSRF Protection'|_, id:'settings-FCom_Core-group5'}) }}

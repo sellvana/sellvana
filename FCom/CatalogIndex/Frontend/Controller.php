@@ -16,18 +16,27 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
             return $this;
         }
 
+        $this->layout('/catalog/category');
         $layout = BLayout::i();
+        $pagerView = $layout->view('catalog/product/pager');
+
         $q = BRequest::i()->get('q');
 
-        $productsData = FCom_CatalogIndex_Indexer::i()->searchProducts(null, null, null, ['category' => $category]);
+        $productsData = FCom_CatalogIndex_Indexer::i()->searchProducts(null, null, false, [
+            'category' => $category,
+        ]);
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_orm', ['orm' => $productsData['orm']]);
         $r = BRequest::i()->get();
-        $r['sc'] = '';
-        $paginated = $productsData['orm']->paginate($r, ['ps' => 10]);
-        $paginated['state']['sc'] = BRequest::i()->get('sc');
+        $paginated = $productsData['orm']->paginate($r, [
+            'ps' => $pagerView->default_page_size,
+            'page_size_options' => $pagerView->page_size_options,
+            'sc' => $pagerView->default_sort,
+            'sort_options'  => $pagerView->sort_options,
+        ]);
+        //$paginated['state']['sc'] = BRequest::i()->get('sc');
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
-        $productsData['state']['sc'] = BRequest::i()->get('sc');
+        //$productsData['state']['sc'] = BRequest::i()->get('sc');
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_data', ['data' => &$productsData]);
 
         BApp::i()
@@ -37,7 +46,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         FCom_Core_Main::i()->lastNav(true);
 
-        $head = $this->view('head');
+        $head = $layout->view('head');
         $crumbs = ['home'];
         $activeCatIds = [$category->id()];
         foreach ($category->ascendants() as $c) {
@@ -57,12 +66,14 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         $layout->view('catalog/search')->set('query', $q);
 
-        $rowsViewName = 'catalog/product/' . (BRequest::i()->get('view') == 'list' ? 'list' : 'grid');
+        $rowsViewName = 'catalog/product/' . $pagerView->getViewAs();
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->category = $category;
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
+        $pagerView->state = $productsData['state'];
+        $pagerView->setCanonicalPrevNext();
 
         $layout->view('catalog/nav')->set([
             'category' => $category,
@@ -70,9 +81,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
             'home_url' => BConfig::i()->get('modules/FCom_Catalog/url_prefix'),
         ]);
 
-        $layout->view('catalog/product/pager')->set('sort_options', FCom_CatalogIndex_Model_Field::i()->getSortingArray());
         $layout->view('catalog/category/sidebar')->set('products_data', $productsData);
-        $this->layout('/catalog/category');
 
         if ($category->layout_update) {
             $layoutUpdate = BYAML::parse($category->layout_update);
@@ -92,14 +101,24 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
             $q = FCom_Catalog_Model_SearchAlias::i()->processSearchQuery($q);
         }
 
-        $productsData = FCom_CatalogIndex_Indexer::i()->searchProducts($q);
+        $this->layout('/catalog/search');
+        $layout = BLayout::i();
+        $pagerView = $layout->view('catalog/product/pager');
+        $pagerView->set('sort_options', FCom_CatalogIndex_Model_Field::i()->getSortingArray());
+
+        $productsData = FCom_CatalogIndex_Indexer::i()->searchProducts($q, null, false);
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_orm', ['data' => $productsData['orm']]);
         $r = $req->get();
-        $r['sc'] = '';
-        $paginated = $productsData['orm']->paginate($r, ['ps' => 10]);
+        #$r['sc'] = '';
+        $paginated = $productsData['orm']->paginate($r, [
+            'ps' => $pagerView->default_page_size,
+            'page_size_options' => $pagerView->page_size_options,
+            'sc' => $pagerView->default_sort,
+            'sort_options'  => $pagerView->sort_options,
+        ]);
         $productsData['rows'] = $paginated['rows'];
         $productsData['state'] = $paginated['state'];
-        $productsData['state']['sc'] = $req->get('sc');
+        #$productsData['state']['sc'] = $req->get('sc');
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', ['data' => &$productsData]);
 
         BApp::i()
@@ -107,21 +126,21 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
             ->set('products_data', $productsData);
 
         FCom_Core_Main::i()->lastNav(true);
-        $layout = BLayout::i();
+
+
         $layout->view('breadcrumbs')->set('crumbs', ['home', ['label' => 'Search: ' . $q, 'active' => true]]);
         $layout->view('catalog/search')->set('query', $q);
 
-        $rowsViewName = 'catalog/product/' . (BRequest::i()->get('view') == 'list' ? 'list' : 'grid');
+        $rowsViewName = 'catalog/product/' . $pagerView->getViewAs();
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
+        $pagerView->state = $productsData['state'];
+        $pagerView->setCanonicalPrevNext();
 
         FCom_Catalog_Model_SearchHistory::i()->addSearchHit($q, $productsData['state']['c']);
 
-        $layout->view('catalog/product/pager')->set('sort_options', FCom_CatalogIndex_Model_Field::i()->getSortingArray());
         $layout->view('catalog/category/sidebar')->set('products_data', $productsData);
-
-        $this->layout('/catalog/search');
     }
 }

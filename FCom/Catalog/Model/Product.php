@@ -1047,7 +1047,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($data == 'variants' && isset($data_serialized['variants_fields']) && isset($data_serialized['variants'])) {
             foreach ($data_serialized['variants'] as &$vr) {
                 if (isset($vr['fields'])) {
-                    $vr['price'] = BLocale::currency($vr['price']);
+                    $price = ($vr['price'] != '') ? $vr['price']: 0;
+                    $vr['price'] = BLocale::currency($price);
                 }
             }
             return ['variants' => $data_serialized['variants'], 'fields' => $data_serialized['variants_fields']];

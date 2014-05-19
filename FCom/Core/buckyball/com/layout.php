@@ -1042,7 +1042,7 @@ class BLayout extends BClass
 
         $modRootDir = !empty($theme['module_name']) ? BApp::m($theme['module_name'])->root_dir . '/' : '';
         if (!empty($theme['layout'])) {
-            $this->loadLayoutAfterTheme($modRootDir . $theme['layout'], true);
+            $this->loadLayout($modRootDir . $theme['layout']);
         }
         if (!empty($theme['views'])) {
             $this->addAllViews($modRootDir . $theme['views']);
@@ -1947,16 +1947,21 @@ class BViewHead extends BView
         return $this;
     }
 
+    public function link($rel, $href)
+    {
+        $this->addElement('link', $rel, ['tag' => '<link rel="'. $rel . '" href="' . $href . '"/>']);
+        return $this;
+    }
+
     /**
      * Add canonical link
+     * @deprecated by link()
      * @param $href
      * @return $this
      */
     public function canonical($href)
     {
-        $this->addElement('link', 'canonical', ['tag' => '<link rel="canonical" href="' . $href . '"/>']);
-
-        return $this;
+        return $this->link('canonical', $href);
     }
 
     /**

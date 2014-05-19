@@ -68,7 +68,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                 vColsCollection = grid.getCols();
             }
             var colsJson = vColsCollection.toJSON();
-            this.$el.find('.select-value-field').each(function(obj) {
+            this.$el.find('input.select-value-field').each(function(obj) {
                 var name = $(this).attr('name');
                 var field = self.model.get('fields');
                 var tmp = _.findWhere(colsJson, {name: name}).options;
@@ -83,11 +83,34 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                     allowClear: true,
                     data: function() {
                         return {results: _.findWhere(options, {name: name}).options};
+                    },
+                    createSearchChoice:function(term, data) {
+                        if ( $(data).filter( function() {
+                            return this.text.localeCompare(term)===0;
+                        }).length===0) {
+                            return {id:term, text:term};
+                        }
                     }
                 });
                 if (field != '' && typeof (field[name]) !== 'undefined') {
                     $(this).select2('val', field[name]);
                 }
+            });
+            this.$el.find('input.select-value-field').on('change', function(e) {
+                var el = $(e.target);
+                var name = el.attr('name');
+                var val = $(this).val();
+                if (val != '' && typeof (_.findWhere(_.findWhere(options, {name: name}).options, {id: val, text: val})) === 'undefined') {
+                    var confirm = window.confirm("Do you want to really create new value?");
+                    if (confirm) {
+                        _.findWhere(options, {name: name}).options.push({id: val, text: val});
+                    } else {
+                        $(this).select2('val', '');
+                    }
+
+                }
+            }).on('select2-open', function(val, obj) {
+                $('ul.select2-results').find('.select2-result-label').append('<i onclick="test11()" class="icon-remove" style="float:right;"></i>');
             });
             variantThumbUrl = thumb_url = this.model.get('thumb_url');
             var imageId = [];
@@ -121,67 +144,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                 formatResult: format,
                 formatSelection: format
             });
-            this.$el.find('input.input-value-field').each(function() {
-                var name = $(this).attr('name');
-                var new_value = self.model.get('new_value');
-                $(this).val(new_value[name]);
-                if (typeof (_.findWhere(objNewValueField, {name: name})) === 'undefined') {
-                    var tmp = _.findWhere(colsJson, {name: name}).new_value;
-                    var arr = [];
-                    if (tmp != '') {
-                        arr = $.map(tmp, function(value, key) {
-                            return [{id: key, text: value}];
-                        });
-                    }
-                    objNewValueField.push({name: name, options: arr});
-                }
-               $(this).select2({
-                   createSearchChoice: function(term, data) {
-                       var currOptions =  _.findWhere(options, {name: name}).options;
-                       var val = {id: term, text: term};
-                       if ($(data).filter(function() { return this.text.localeCompare(term)===0; }).length === 0 && typeof (_.findWhere(currOptions, val)) === 'undefined') {
-                           return val;
-                       }
-                   },
-                   allowClear: true,
-                   multiple: true,
-                   data: function() {
-                       return {results: _.findWhere(objNewValueField, {name: name}).options};
-                   }
-               })
-            });
-            this.$el.find('input.input-value-field').on('change', function(e) {
-                        var el = $(e.target);
-                        var name = el.attr('name');
-                        var currValueField = _.findWhere(objNewValueField, {name: name}).options;
-                        var currOptions =  _.findWhere(options, {name: name}).options;
-                        if (typeof (e.added) !== 'undefined') {
-                            var val = {id: e.added.id, text: e.added.text};
-                            if (typeof (_.findWhere(currValueField, val)) === 'undefined') {
-                                currValueField.push(val);
-                                currOptions.push(val);
-                            }
-                        }
-                        if (typeof (e.removed) !== 'undefined') {
-                            var flag = true;
-                            bodyGrid.find('.input-value-field').each(function() {
-                                if ($(this).attr('name') == name && $(this).val() != '') {
-                                    if ($(this).val().split(',').indexOf(e.removed.text) != -1) {
-                                        flag = false;
-                                    };
-                                }
-                            });
-                            if (flag) {
-                                currValueField = _.filter(currValueField, function (obj) {
-                                    return (obj.text != e.removed.text);
-                                });
-                                currOptions = _.filter(currOptions, function (obj) {
-                                    return (obj.text != e.removed.text);
-                                });
-                            }
-                        }
-                        self.model.get('new_value')[name] = $(this).val();
-                    });
+
             this.$el.find('input.select-value-field').each(function () {
                 $(this).addClass('variantUnique');
                 $(this).attr('id', guid());
@@ -288,7 +251,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
         bodyGrid.find('tr').each(function () {
             var variant = {};
             var fvals = {};
-            var new_vals = {};
            $(this).find('td').each(function () {
                 var col = $(this).attr('data-col');
                 switch (col) {
@@ -298,14 +260,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                     default :
                         if (tmp_fields.indexOf(col) != -1) {
                             fvals[col] = $(this).find('input.select-value-field').val();
-                            new_vals[col] = $(this).find('input.input-value-field').val();
                         }
                 }
            });
            updateStoreVariantImageId($(this));
            variant.file_id =  $(this).find('.store-variant-image-id').val();
            variant.fields = fvals;
-           variant.new_value = new_vals;
            variants.push(variant);
         });
         $('#variants').val(JSON.stringify(variants));
@@ -370,7 +330,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
         });
         valueCurrentField = [];
         bodyGrid.find('tr').each(function () {
-            var new_value = {};
             var fields =  {};
             var id = (!isNaN($(this).attr('id'))) ? Number($(this).attr('id')): $(this).attr('id');
             var row = _.findWhere(vRowsCollection.toJSON(), {id : id});
@@ -399,14 +358,12 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                         arrField.forEach(function (data) {
                             if (data.name == $(self).attr('data-col')) {
                                 fields[data.name] = $(self).find('input.select-value-field').val();
-                                new_value[data.name] = $(self).find('input.input-value-field').val();
                             }
                         });
                         break;
                 }
             });
             row.fields = fields;
-            row.new_value = new_value;
             vRowsCollection.each(function(obj) {
                 if (obj.get('id') == row.id) {
                     obj.attributes = row;
@@ -426,14 +383,13 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
         });
         vColsCollection.add({
             name: field_code,
-            new_value: '',
             label: text,
             field_id: field_id,
             width: 200,
             addable: true,
             position: 1,
             display: 'eval',
-            print: '"<p style=\'overflow: hidden\'><input type=\'hidden\' name=\''+ field_code +'\' class=\'select-value-field required\' style=\'width: 170px;\' /></p><p style=\'overflow: hidden\'><input type=\'hidden\' name=\''+ field_code +'\' class=\'input-value-field\' style=\'width: 170px\' /></p>"',
+            print: '"<p style=\'overflow: hidden\'><input type=\'hidden\' name=\''+ field_code +'\' class=\'select-value-field required\' style=\'width: 170px;\' /></p>"',
             options: options,
             'default': ''
         });

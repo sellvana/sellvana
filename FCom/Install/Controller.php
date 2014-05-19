@@ -87,7 +87,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         BLayout::i()->applyLayout('/step1');
         $sData =& BSession::i()->dataToUpdate();
         if (empty($sData['w']['db'])) {
-            $sData['w']['db'] = ['host' => '127.0.0.1', 'dbname' => 'sellvana', 'username' => 'root', 'password' => '', 'table_prefix' => ''];
+            $sData['w']['db'] = ['host' => '127.0.0.1', 'port' => '3306', 'dbname' => 'sellvana', 'username' => 'root', 'password' => '', 'table_prefix' => ''];
         }
     }
 
