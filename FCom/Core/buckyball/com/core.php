@@ -306,25 +306,6 @@ class BApp extends BClass
         return $baseUrl[$key];
     }
 
-    /**
-    * Shortcut to generate URL of module base and custom path
-    *
-    * @deprecated by href() and src()
-    * @param string $modName
-    * @param string $url
-    * @param string $method
-    * @return string
-    */
-    public static function url($modName, $url = '', $method = 'baseHref')
-    {
-        $m = BApp::m($modName);
-        if (!$m) {
-            BDebug::error('Invalid module: ' . $modName);
-            return '';
-        }
-        return $m->$method() . $url;
-    }
-
     public static function href($url = '', $full = true, $method = self::USE_CONFIG)
     {
         return BApp::baseUrl($full, $method)
@@ -358,7 +339,11 @@ class BApp extends BClass
             $c = BConfig::i();
             $storeHref = $c->get('web/base_store');
             if (!$c->get('web/hide_script_name')) {
-                $storeHref .= '/index.php/';
+                if ($storeHref === '' || $storeHref === '/') {
+                    $storeHref = '/index.php/';
+                } else {
+                    $storeHref .= '/index.php/';
+                }
             }
             if (!BUtil::isUrlFull($storeHref)) {
                 $storeHref = $r->scheme() . '://' . $r->httpHost() . $storeHref;
@@ -388,12 +373,32 @@ class BApp extends BClass
             }
             return $r->scheme() . '://' . $r->httpHost() . $webRoot . '/' . $url;
         }
-        $m = BApp::m($modName);
+        $m = BModuleRegistry::i()->module($modName);
         if (!$m) {
             BDebug::error('Invalid module: ' . $modName);
             return '';
         }
         return $m->$method() . '/' . rtrim($url, '/');
+    }
+
+    public static function file($path)
+    {
+        if ($path[0] === '@') {
+            list($modName, $path) = explode('/', substr($path, 1), 2);
+        }
+        if (empty($modName)) {
+            if (BUtil::isPathAbsolute($path)) {
+                return $path;
+            }
+            $rootDir = BConfig::i()->get('fs/root_dir');
+            return $rootDir . '/' . $path;
+        }
+        $m = BModuleRegistry::i()->module($modName);
+        if (!$m) {
+            BDebug::error('Invalid module: ' . $modName);
+            return '';
+        }
+        return $m->root_dir . '/' . $path;
     }
 
     public function set($key, $val, $const = false)
@@ -1027,6 +1032,8 @@ class BClassRegistry extends BClass
             }
             return (bool)static::findMethodInfo(get_class($cb[0]), $cb[1]);
         } elseif (is_string($cb[0])) { // static?
+
+
             return (bool)static::findMethodInfo($cb[0], $cb[1], 1);
         } else { // unknown?
             return false;

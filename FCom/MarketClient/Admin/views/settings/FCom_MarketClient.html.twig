@@ -1,5 +1,5 @@
 {% set c = THIS.get('model') %}
-{% set fieldData = { model: c, id_prefix:'FCom_MarketClient', name_prefix:'config[modules][FCom_MarketClient]' } %}
+{% set fieldData = { model: c, settings_module:'FCom_MarketClient' } %}
 {% import THIS.view('admin/form-elements').twigName() as forms %}
 <h2>{{ "MarketClient Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Disqus'}) }}

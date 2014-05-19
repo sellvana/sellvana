@@ -1,12 +1,12 @@
 {% set c = THIS.get('model') %}
-{% set fieldData = { model: c, id_prefix:'FCom_Customer', name_prefix:'config[modules][FCom_Customer]' } %}
+{% set fieldData = { model: c, settings_module:'FCom_Customer' } %}
 {% import THIS.view('admin/form-elements').twigName() as forms %}
 <h2>{{ "Customer Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Customer'}) }}
      {{ forms.accordion_panel_start({label:'General Settings'|_, id:'settings-FCom_Customer-group0', in:1}) }}
-        {{ forms.boolean(fieldData|merge({field:'use_gravatar', label:'Use Gravatar'|_, value: c.get('modules/FCom_Customer/use_gravatar')})) }}
-        {{ forms.boolean(fieldData|merge({field:'password_strength', label:'Strong Password Security'|_, value: c.get('modules/FCom_Customer/password_strength')})) }}
-        {{ forms.input(fieldData|merge({field:'recent_day', label:'Customer Recent Days'|_, attr: 'data-rule-number="true"', value:c.get('modules/FCom_Customer/recent_day')})) }}
+        {{ forms.boolean(fieldData|merge({field:'use_gravatar', label:'Use Gravatar'|_ })) }}
+        {{ forms.boolean(fieldData|merge({field:'password_strength', label:'Strong Password Security'|_ })) }}
+        {{ forms.input(fieldData|merge({field:'recent_day', label:'Customer Recent Days'|_, attr: 'data-rule-number="true"' })) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
 

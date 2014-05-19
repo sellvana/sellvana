@@ -1,7 +1,7 @@
 {#
 INITIALIZATION:
 
-{% set fieldData = { model:model, validator:validator, id_prefix:'model', name_prefix:'model' } %}
+{% set fieldData = { model:model, validator:validator, id_prefix:'model', name_prefix:'model', get_prefix:'config/prefix' } %}
 {% include THIS.view('admin/form-elements').twigName() as forms %}
 
 EXAMPLES:
@@ -33,6 +33,7 @@ Using custom id/name:
                 class="form-control {{ p.input_class }} {{ p.required ? 'required' }}"
                 style="{{ p.style }}"
                 value="{{ view.getInputValue(p) }}"
+                placeholder="{{ p.placeholder }}"
                 {{ p.required ? 'data-rule-required="true"' }}
                 {{ p.attr | raw }}
             />
@@ -88,6 +89,7 @@ Using custom id/name:
                 name="{{ view.getInputName(p) }}"
                 class="form-control {{ p.input_class }} {{ p.required ? 'required' }}"
                 style="{{ p.style }}"
+                placeholder="{{ p.placeholder }}"
                 {{ p.required ? 'data-rule-required="true"' }}
                 {{ p.attr | raw }}
            >{{ p.raw ? value|raw : value }}</textarea>

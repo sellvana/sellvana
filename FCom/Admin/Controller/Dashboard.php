@@ -14,8 +14,8 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
         $wrapped = $r->get('wrapped');
         $add = $r->get('add');
         $result = [];
+        $persData = FCom_Admin_Model_User::i()->personalize();
         if ($add) {
-            $persData = FCom_Admin_Model_User::i()->personalize();
             $pos = 100;
             if (!empty($persData['dashboard']['widgets'])) {
                 foreach ($persData['dashboard']['widgets'] as $wKey => $wState) {
@@ -47,6 +47,7 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
                 $persData['dashboard']['widgets'][$wKey]['pos'] = ++$pos;
             }
         }
+        $result['filter'] = (isset($persData['dashboard']['filter'])) ? $persData['dashboard']['filter']: [];
         if ($add && $persData) {
             FCom_Admin_Model_User::i()->personalize($persData);
         }
@@ -56,6 +57,8 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
     public function action_data__POST()
     {
         $p = BRequest::i()->post();
+        $persData = FCom_Admin_Model_User::i()->personalize();
+        $persData['dashboard']['filter'] = $p;
         if ($p['range'] == 'range') {
             switch ($p['date']) {
                 case 'last-month':
@@ -80,6 +83,7 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
         }
         $widgets = FCom_Admin_View_Dashboard::i()->getWidgets();
         $result = [];
+        FCom_Admin_Model_User::i()->personalize($persData);
         foreach ($widgets as $key => $widget) {
             if (isset($widget['async']) && $widget['async'] == true
                 && isset($widget['filter']) && $widget['filter'] == true

@@ -154,7 +154,9 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if (empty($username) || empty($password)) {
             return false;
         }
-        BLoginThrottle::i()->init('FCom_Admin_Model_User', $username);
+        if (!BLoginThrottle::i()->init('FCom_Admin_Model_User', $username)) {
+            return false;
+        }
         /** @var FCom_Admin_Model_User */
         $user = static::i()->orm()->where(['OR' => ['username' => $username, 'email' => $username]])->find_one();
         if (!$user || !$user->validatePassword($password)) {

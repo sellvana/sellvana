@@ -271,7 +271,12 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     static public function authenticate($username, $password)
     {
-        BLoginThrottle::i()->init('FCom_Customer_Model_Customer', $username);
+        if (empty($username) || empty($password)) {
+            return false;
+        }
+        if (!BLoginThrottle::i()->init('FCom_Customer_Model_Customer', $username)) {
+            return false;
+        }
         /** @var FCom_Admin_Model_User */
         $user = static::i()->orm()->where('email', $username)->find_one();
         if (!$user || !$user->validatePassword($password)) {
