@@ -782,12 +782,13 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
     }
 
     /**
+     * @param string $channelName
      * @return FCom_PushServer_Model_Channel $channel
      */
-    protected function getChannel()
+    protected function getChannel($channelName = 'import')
     {
-        if(empty($this->channel)){
-            $this->channel = FCom_PushServer_Model_Channel::i()->getChannel('import', true);
+        if (empty($this->channel)) {
+            $this->channel = FCom_PushServer_Model_Channel::i()->getChannel($channelName, true);
         }
         return $this->channel;
     }
