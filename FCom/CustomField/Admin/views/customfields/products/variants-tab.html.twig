@@ -32,7 +32,6 @@ function updateListVariantImage(imageObject) {
         });
     }
 }
-
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.validate'], function(Backbone, _, $) {
     var fieldCollection = null;
     var vColsCollection = null;
@@ -70,6 +69,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
             var colsJson = vColsCollection.toJSON();
             this.$el.find('input.select-value-field').each(function(obj) {
                 var name = $(this).attr('name');
+                var selfValue = this;
                 var field = self.model.get('fields');
                 var tmp = _.findWhere(colsJson, {name: name}).options;
                 var arr = $.map(tmp, function(value, key) {
@@ -78,7 +78,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                 if (typeof (_.findWhere(options, {name: name})) === 'undefined') {
                     options.push({name: name, options: arr});
                 }
-                $(this).select2({
+                var sel2 = $(this).select2({
                     placeholder: 'Select field value',
                     allowClear: true,
                     data: function() {
@@ -91,26 +91,47 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                             return {id:term, text:term};
                         }
                     }
-                });
+                }).data('select2');
+                sel2.onSelect = (function(fn) {
+                    return function(data, op) {
+                        var target;
+
+                        if (op != null) {
+                            target = $(op.target);
+                        }
+
+                        if (target && target.hasClass('remove-value-field')) {
+                            if (data.id == $(selfValue).val()) {
+                                $(selfValue).select2('val', '');
+                            }
+                            _.findWhere(options, {name: name}).options = _.filter(_.findWhere(options, {name: name}).options, function (num) {
+                                return num.text != data.text;
+                            });
+                            target.parents('li').addClass('hide');
+                        } else {
+                            return fn.apply(this, arguments);
+                        }
+                    }
+                })(sel2.onSelect);
                 if (field != '' && typeof (field[name]) !== 'undefined') {
                     $(this).select2('val', field[name]);
                 }
             });
+
             this.$el.find('input.select-value-field').on('change', function(e) {
                 var el = $(e.target);
                 var name = el.attr('name');
                 var val = $(this).val();
                 if (val != '' && typeof (_.findWhere(_.findWhere(options, {name: name}).options, {id: val, text: val})) === 'undefined') {
-                    var confirm = window.confirm("Do you want to really create new value?");
+                    var confirm = window.confirm("Do you want to really create this value?");
                     if (confirm) {
                         _.findWhere(options, {name: name}).options.push({id: val, text: val});
                     } else {
                         $(this).select2('val', '');
                     }
-
                 }
             }).on('select2-open', function(val, obj) {
-                $('ul.select2-results').find('.select2-result-label').append('<i onclick="test11()" class="icon-remove" style="float:right;"></i>');
+               // $('ul.select2-results').find('.select2-result-label').append('<i class="icon-remove remove-value-field" style="float:right;color: #aaa"></i>');
             });
             variantThumbUrl = thumb_url = this.model.get('thumb_url');
             var imageId = [];

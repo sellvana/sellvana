@@ -70,11 +70,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         if ($vFields !== null) {
             $pos = 2;
             foreach ($vFields as $f) {
-                $op = FCom_CustomField_Model_FieldOption::i()->getListAssocById($f['id']);
-                if (!isset($f['options'])) {
-                    $f['options'] = $op;
-                } else {
-                }
+                $f['options'] = (!isset($f['options'])) ? FCom_CustomField_Model_FieldOption::i()->getListAssocById($f['id']) : $f['options'];
                 $f['label'] = $f['name'];
                 $f['name'] = $f['field_code'];
                 $f['field_id'] = $f['id'];

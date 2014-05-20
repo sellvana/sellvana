@@ -88,19 +88,14 @@
           <div class="f-prod-select">
             {{ THIS.hook('catalog/product/details:before_add_cart') | raw }}
             <div class="f-prod-add-cart">
-                {% if variants.fields %}
+                {% if variants.variants_fields %}
                     <section class="tab-pane active" id="f-prod-tab-variant">
-                        {% for field  in variants.fields %}
+                        {% for field  in variants.variants_fields %}
                             <div class="form-group" style="overflow: hidden">
                                 <label class="col-md-3 control-label">{{ field.field_code |_ }}</label>
                                 <div class="col-md-5">
-                                    {% if field.options %}
-                                        <select id="{{ field.field_code }}" name="{{ field.field_code }}" class="form-control variant" style="width:auto">
-                                            {% for key,val  in field.options %}
-                                                <option value="{{ key }}">{{ val|_ }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    {% endif %}
+                                    <select id="{{ field.field_code }}" name="{{ field.field_code }}" class="form-control variant" style="width:auto">
+                                    </select>
                                 </div>
                             </div>
                         {% endfor %}
@@ -222,16 +217,78 @@
 
         $('#product-rslides li').addClass('zoom').zoom();
         var variants = $.parseJSON('{{ UTIL.toJson(variants.variants)|raw }}');
-        if (variants != null) {
-            priceVariant.html(variants[0].price);
-            if (variants[0].qty == 0) {
+        var fields = Object.keys(variants[0].fields);
+        var vr = [];
+        var firstOptions = [];
+        var beforeField = [];
+
+        if (variants.length > 0) {
+
+            variants.forEach(function(obj) {
+                if (obj.fields[fields[0]] == variants[0].fields[fields[0]]) {
+                    vr.push(obj);
+                }
+                if (firstOptions.indexOf(obj.fields[fields[0]].trim()) == -1) {
+                    $('#'+ fields[0]).append("<option value='"+ obj.fields[fields[0]] +"'>"+ obj.fields[fields[0]] +"</option>");
+                    firstOptions.push(obj.fields[fields[0]].trim());
+                }
+            })
+            if (variants[0].qty == 0 || variants[0].qty == '') {
+                priceVariant.html("$0.00");
                 quantityVariant.val(0);
+                $('#prod-in-stock').html('Items not available.');
                 $('#prod-add-to-card').prop('disabled', true);
+            } else {
+                quantityVariant.val(1);
+                priceVariant.html(variants[0].price);
+                $('#prod-in-stock').html(variants[0].qty + ' Items In Stock.');
+                $('#prod-add-to-card').prop('disabled', false);
+
             }
-            $('#prod-in-stock').html(variants[0].qty + ' Items In Stock.');
-            for (var val in variants[0].fields ) {
-                $('#'+ val).find('option[value="'+ variants[0].fields[val] +'"]').attr('selected', 'selected');
-            }
+            fields.forEach(function (key) {
+                setUpField(beforeField, { field_code: key, value: variants[0].fields[key], current: null });
+                beforeField.push(key);
+            })
+        }
+
+
+        function setUpField(before, data) {
+            $('.variant').each(function () {
+                var self = this;
+
+                if (($(this).attr('name').indexOf(before) == -1 || before.length == 0) && $(this).attr('name') == data.field_code) {
+                    var first = true;
+                     if(before.length > 0) {
+                        first = false;
+                         $(self).html('');
+                     };
+                    var op = [];
+                    vr.forEach(function (obj) {
+                        if(first) {
+                            if (op.length == 0 && firstOptions.indexOf(data.value) != -1) {
+                                $(self).find('option[value="'+ obj.fields[data.field_code] +'"]').prop('selected', true);
+                            }
+                            op.push(obj.fields[data.field_code]);
+                        } else {
+                                var flag = true
+                                before.forEach(function(val) {
+                                    if (obj.fields[val] != $('#'+ val).val()) {
+                                        flag = false;
+                                    }
+                                })
+                                if (flag) {
+                                    if (op.indexOf(obj.fields[data.field_code]) == -1) {
+                                        $(self).append("<option value='"+ obj.fields[data.field_code] +"'>"+ obj.fields[data.field_code] +"</option>");
+                                    }
+                                    op.push(obj.fields[data.field_code]);
+                                }
+                        }
+                    })
+                    if (data.value != null) {
+                        $(self).find('option[value="'+ data.value +'"]').prop('selected', true);
+                    }
+                }
+            });
         }
         function displayImage(image) {
 
@@ -257,6 +314,31 @@
 
         $('.variant').change(function () {
             var find = null;
+            var self = this;
+            var beforeFlag = true;
+            beforeField = [];
+            vr = [];
+            variants.forEach(function(obj) {
+                if (obj.fields[$(self).attr('name')] == $(self).val()) {
+                    vr.push(obj);
+                }
+            })
+
+            fields.forEach(function (key) {
+                var data = { field_code: key, value: null, current: null };
+                if (beforeFlag) {
+                    beforeField.push(key);
+                    if (key == $(self).attr('name')) {
+//                    data.value = $('#' + key).val();
+//                    data.current = key;
+                      beforeFlag = false;
+                    }
+                } else {
+                    setUpField(beforeField, data);
+                }
+
+
+            });
             variants.forEach(function (obj) {
                 var correct = true;
                 $('.variant').each(function () {
@@ -281,10 +363,13 @@
                 $('#prod-add-to-card').prop('disabled', false);
 
             }
-            if (find != null && find.file_id != '') {
+            if (find != null) {
                 priceVariant.html(find.price);
-                image = find.file_id.split(',');
-                displayAllImage.removeClass('hidden');
+                if (find.file_id != '') {
+                    image = find.file_id.split(',');
+                    displayAllImage.removeClass('hidden');
+                }
+
             }
             displayImage(image);
         });
