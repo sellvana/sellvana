@@ -1071,7 +1071,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                             }
                         }
                     }
-                    $price = ($vr['price'] != '') ? $vr['price']: 0;
+                    $price = ($vr['price'] != '') ? $vr['price']: $this->base_price;
+                    $vr['sku'] = ($vr['sku'] == '')? $this->local_sku : $vr['sku'];
                     $vr['price'] = BLocale::currency($price);
                 }
             }

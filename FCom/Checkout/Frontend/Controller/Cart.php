@@ -32,19 +32,37 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
             switch ($post['action']) {
             case 'add':
                 $p = FCom_Catalog_Model_Product::i()->load($post['id']);
-                if (!$p) {
-                    // todo add message to be displayed
-                    BResponse::i()->redirect('/');
-                    return;
+                $validate = true;
+                $data_serialized = BUtil::objectToArray(json_decode($p->data_serialized));
+                if (isset($data_serialized['variants'])) {
+                   foreach($data_serialized['variants'] as $variant) {
+                       foreach ($variant['fields'] as $key => $val) {
+                           if ($post[$key] != $val) {
+                               $validate = false;
+                           }
+                       }
+
+                   }
                 }
-                $qty = !empty($post['qty']) ? $post['qty'] : 1;
-                $options = ['qty' => $qty, 'price' => $p->base_price];
-                if (Bapp::m('FCom_Customer') && FCom_Customer_Model_Customer::isLoggedIn()) {
-                    $cart->customer_id = FCom_Customer_Model_Customer::sessionUserId();
-                    $cart->save();
+                if ($validate) {
+                    $p = FCom_Catalog_Model_Product::i()->load($post['id']);
+                    if (!$p) {
+                        // todo add message to be displayed
+                        BResponse::i()->redirect('/');
+                        return;
+                    }
+                    $qty = !empty($post['qty']) ? $post['qty'] : 1;
+                    $options = ['qty' => $qty, 'price' => $p->base_price];
+                    if (Bapp::m('FCom_Customer') && FCom_Customer_Model_Customer::isLoggedIn()) {
+                        $cart->customer_id = FCom_Customer_Model_Customer::sessionUserId();
+                        $cart->save();
+                    }
+                    $cart->addProduct($p->id(), $options)->calculateTotals()->save();
+                    $this->message('The product has been added to your cart');
+                } else {
+                    $this->message('This product not exists.', 'error');
                 }
-                $cart->addProduct($p->id(), $options)->calculateTotals()->save();
-                $this->message('The product has been added to your cart');
+
                 break;
             }
         } else {

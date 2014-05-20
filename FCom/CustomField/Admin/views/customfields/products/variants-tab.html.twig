@@ -88,7 +88,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                         if ( $(data).filter( function() {
                             return this.text.localeCompare(term)===0;
                         }).length===0) {
-                            return {id:term, text:term};
+                            return {id:term.toLowerCase(), text:term.toLowerCase()};
                         }
                     }
                 }).data('select2');

@@ -941,3 +941,7 @@ label.error {
   display: table;
   content: " ";
   }
+
+.overflow-hidden {
+    overflow: hidden !important;
+}
