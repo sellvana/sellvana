@@ -10,4 +10,20 @@ class FCom_Frontend_View_Root extends FCom_Core_View_Root
         return $this;
     }
 
+    public function getCol($colName)
+    {
+        $cols = $this->get('col_' . $colName);
+        $default = $this->get('col_' . $colName . '_default');
+        if (!$default) {
+            $default = 3;
+        }
+        if (!$cols) {
+            return 0;
+        }
+        if (true === $cols) {
+            return $default;
+        }
+        return $cols;
+    }
+
 }

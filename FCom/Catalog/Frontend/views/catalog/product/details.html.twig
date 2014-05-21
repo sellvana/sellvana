@@ -13,8 +13,7 @@
 {% set variants = prod.getDataSerialized('variants') %}
 {% set productLink = prod.getProductLink() %}
 {% set recentlyViewed = APP.instance('FCom_Catalog_Frontend').getRecentlyViewedProducts() %}
-<div class="f-site-main" role="main">
-  <div class="container">
+
     {{ THIS.view('breadcrumbs') | raw }}
     <div class="row">
       <!-- Product Image Column -->
@@ -32,7 +31,7 @@
           <li class="col-md-2 col-xs-2"><a href="#"><img data-id="{{ img.id() }}" src="{{ img.getUrl() }}" alt="" title=""></a></li>
 {% endfor %}
         </ul>
-          <a href="#" class="hidden" id="display-all-image"><i class="glyphicon glyphicon-refresh"></i> {{ "Display all images"|_ }}</a>
+        <a href="#" class="hidden" id="display-all-image"><i class="glyphicon glyphicon-refresh"></i> {{ "Display all images"|_ }}</a>
       </div>
       <!-- /.f-col-prod-img -->
 
@@ -136,81 +135,79 @@
             </div>
           </div> <!-- /.f-prod-select -->
         </form>
-        </div> <!-- /.f-col-prod-select -->
-      </div> <!-- /.row -->
-      <div class="f-prod-info">
-        <div class="tab-content">
-            {% if shopper %}
-                <section class="tab-pane active" id="f-prod-tab-description2">
-                    <div class="f-tab-heading">
-                        <h5 class="f-tab-title">{{ 'Shopper'|_ }}</h5>
-                    </div>
-
-                    {% for sh in shopper %}
-                        <div class="form-group" style="overflow: hidden">
-                            <label class="col-md-2 control-label">{{ sh.label|_ }}</label>
-                            {% set options = sh.options|split(',') %}
-                            <div class="col-md-3">
-                                <select name="{{ sh.name }}" class="form-control">
-                                    {% for op in options %}
-                                        <option value="{{ op }}">{{ op|_ }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <label class="col-md-3 control-label">{{ "Price: "~sh.price |_ }}</label>
-                        </div>
-                    {% endfor %}
-
-                </section>
-            {% endif %}
-          <section class="tab-pane active" id="f-prod-tab-description">
-            <div class="f-tab-heading">
-              <h5 class="f-tab-title">{{ 'Product Description'|_ }}</h5>
-            </div>
-            {{ prod.get('description') | raw }}
-              {% if customFields %}
+      </div> <!-- /.f-col-prod-select -->
+    </div> <!-- /.row -->
+    <div class="f-prod-info">
+      <div class="tab-content">
+          {% if shopper %}
+              <section class="tab-pane active" id="f-prod-tab-description2">
                   <div class="f-tab-heading">
-                      <h5 class="f-tab-title">{{ 'Additional Info'|_ }}</h5>
+                      <h5 class="f-tab-title">{{ 'Shopper'|_ }}</h5>
                   </div>
-                  {% for cf in customFields %}
+
+                  {% for sh in shopper %}
                       <div class="form-group" style="overflow: hidden">
-                          <label class="col-md-2 control-label">{{ cf.set_name |_ }}</label> <br>
-                          {% for field in cf.fields %}
-                              <div class="col-md-12">
-                                  <label class="control-label">{{ field.field_name ~": "~ field.value |_ }}</label>
-                              </div>
-                          {% endfor %}
+                          <label class="col-md-2 control-label">{{ sh.label|_ }}</label>
+                          {% set options = sh.options|split(',') %}
+                          <div class="col-md-3">
+                              <select name="{{ sh.name }}" class="form-control">
+                                  {% for op in options %}
+                                      <option value="{{ op }}">{{ op|_ }}</option>
+                                  {% endfor %}
+                              </select>
+                          </div>
+                          <label class="col-md-3 control-label">{{ "Price: "~sh.price |_ }}</label>
                       </div>
                   {% endfor %}
-              {% endif %}
-          </section>
-          {{ THIS.view('prodreviews/product-details').set('prod', prod) | raw }}
-          </div>
-        </div><!-- /.f-prod-info -->
-      <br/>
-      {% for product in productLink %}
-          {% if product.product  %}
-              <div class="f-widget f-widget-featured-prods">
-                  <header class="f-widget-header">
-                      <strong class="f-widget-title">{{ product.title }}</strong>
-                  </header>
-                  {{ THIS.view('catalog/product/grid-tiles').set('products', product.product) | raw }}
-              </div><!-- /.f-widget -->
-          {% endif %}
-      {% endfor %}
 
-      {% if recentlyViewed %}
-        <!-- You may also like -->
-        <div class="f-widget f-widget-featured-prods">
-          <header class="f-widget-header">
-            <strong class="f-widget-title">{{ "You recently viewed these items"|_ }}</strong>
-          </header>
-          {{ THIS.view('catalog/product/grid-tiles').set('products', recentlyViewed) | raw }}
+              </section>
+          {% endif %}
+        <section class="tab-pane active" id="f-prod-tab-description">
+          <div class="f-tab-heading">
+            <h5 class="f-tab-title">{{ 'Product Description'|_ }}</h5>
+          </div>
+          {{ prod.get('description') | raw }}
+            {% if customFields %}
+                <div class="f-tab-heading">
+                    <h5 class="f-tab-title">{{ 'Additional Info'|_ }}</h5>
+                </div>
+                {% for cf in customFields %}
+                    <div class="form-group" style="overflow: hidden">
+                        <label class="col-md-2 control-label">{{ cf.set_name |_ }}</label> <br>
+                        {% for field in cf.fields %}
+                            <div class="col-md-12">
+                                <label class="control-label">{{ field.field_name ~": "~ field.value |_ }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </section>
+        {{ THIS.view('prodreviews/product-details').set('prod', prod) | raw }}
         </div>
-      {% endif %}
-    </div>
-    {{ THIS.hook('after_product_details') | raw }}
-</div>
+      </div><!-- /.f-prod-info -->
+    <br/>
+    {% for product in productLink %}
+        {% if product.product  %}
+            <div class="f-widget f-widget-featured-prods">
+                <header class="f-widget-header">
+                    <strong class="f-widget-title">{{ product.title }}</strong>
+                </header>
+                {{ THIS.view('catalog/product/grid-tiles').set('products', product.product) | raw }}
+            </div><!-- /.f-widget -->
+        {% endif %}
+    {% endfor %}
+
+    {% if recentlyViewed %}
+      <!-- You may also like -->
+      <div class="f-widget f-widget-featured-prods">
+        <header class="f-widget-header">
+          <strong class="f-widget-title">{{ "You recently viewed these items"|_ }}</strong>
+        </header>
+        {{ THIS.view('catalog/product/grid-tiles').set('products', recentlyViewed) | raw }}
+      </div>
+    {% endif %}
+
 {{ THIS.view('catalog/product/quickview') | raw }}
 <script>
     require(['jquery', 'responsiveslides', 'jquery.zoom'], function ($) {

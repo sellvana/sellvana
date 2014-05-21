@@ -1,8 +1,7 @@
 {% set order = THIS.get('order') %}
 {% set orderItems = order.items %}
 {% set addresses = order.addresses %}
-<div class="f-site-main" role="main">
-    <div class="container">
+
         <div class="row f-mb-slideout-menu">
             <div class="col-sm-9 f-col-main">
                 <header class="f-page-header">
@@ -85,8 +84,7 @@
             </div>
             {{ THIS.view('customer/account/sidebar').set('current', 'orders') | raw }}
         </div>
-    </div>
-</div>
+
 <script>
     require(['jquery'], function($) {
         $( "#button" ).click(function() {
