@@ -7,10 +7,10 @@
     <header class="f-page-header">
       <h1 class="f-page-title">{{ 'Shopping Cart' }}</h1>
     </header>
+      {{ THIS.view('core/messages') | raw }}
 {% if false == cartItems %}
     {{ THIS.view('core/messages').set('messages', [{type:'info', msg:"Your cart is empty. "|_}]) | raw }}
 {% else %}
-    {{ THIS.view('core/messages') | raw }}
     <div class="row">
       <div class="f-widget f-widget-cart f-col-cart-content col-md-9">
         <header class="f-widget-header">
@@ -53,7 +53,7 @@
                         <td class="f-cart-col-price text-right">
                           <div class="f-price-group {{ loggedIn ? 'logged-in' : 'logged-out' }}">
                             <span class="f-reg-price">
-                              <span class="f-price">{{ p.get('base_price') | currency }}</span>
+                              <span class="f-price">{{ item.get('price') | currency }}</span>
                             </span>
                           </div>
                         </td>
