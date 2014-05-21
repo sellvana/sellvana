@@ -1,6 +1,5 @@
 {% set validator = THIS.validator(THIS.get('formId'), customer) %}
-<div class="f-site-main" role="main">
-  <div class="container">
+
     <div class="row f-mb-slideout-menu">
       <div class="col-sm-9 f-col-main">
         <header class="f-page-header">
@@ -42,8 +41,7 @@
       </div>
       {{ THIS.view('customer/account/sidebar').set('current', 'edit') | raw }}
     </div>
-  </div>
-</div>
+
 <script>
 require(['jquery', 'jquery.validate'], function($) {
     $(function() {

@@ -1,7 +1,6 @@
 {% set order = THIS.get('order') %}
 {% set addresses = order.addresses %}
-<div class="f-site-main" role="main">
-    <div class="container">
+
         <header class="f-page-header">
             <h1 class="f-page-title">{{ 'Thank you for your order!'|_ }}</h1>
         </header>
@@ -63,6 +62,3 @@
                 <p><strong>{{ "Grand Total" | _ }}:</strong>{{ order.get('grandtotal') }}</p>
             </div>
         </div>
-
-    </div>
-</div>
