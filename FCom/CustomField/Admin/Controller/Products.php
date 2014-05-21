@@ -46,6 +46,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
                     ['name' => 'name', 'label' => 'Field Name', 'width' => 300],
                     ['name' => 'field_code', 'label' => 'Field Code', 'width' => 300],
+                    ['name' => 'frontend_label', 'label' => 'Frontend Label', 'width' => 300],
                     ['type' => 'btn_group',  'buttons' => [['name' => 'delete']]]
                 ],
                 'actions' => [

@@ -226,14 +226,14 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
 
     function vFieldGridInit() {
         var mapField = fieldCollection.map(function (obj) {
-            return {id: obj.id, name: obj.get('name'), field_code: obj.get('field_code')};
+            return {id: obj.id, name: obj.get('name'), field_code: obj.get('field_code'), frontend_label: obj.get('frontend_label')};
         });
         vColsCollection.each(function (obj) {
             mapField.forEach(function (field) {
                 if (field.id == obj.get('field_id')) {
                     $("#sel_var_field option[value='"+field.id+"']").remove();
                     var fields = '<li class="dd-item dd3-item"><div class="icon-ellipsis-vertical dd-handle dd3-handle"></div><div class="dd3-content">' +
-                            '<label>'+ field.name +'</label> <i data-name="'+ field.name +'" data-code="'+ field.field_code +'" data-id="'+ field.id +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
+                            '<label>'+ field.name +'</label> <i data-frontend-label="'+ field.frontend_label +'"  data-name="'+ field.name +'" data-code="'+ field.field_code +'" data-id="'+ field.id +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
                     vField.append(fields);
                 }
             });
@@ -263,7 +263,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                 id: $(this).attr('data-id'),
                 field_code: $(this).attr('data-code'),
                 options: op,
-                name: $(this).attr('data-name')
+                name: $(this).attr('data-name'),
+                frontend_label: $(this).attr('data-frontend-label')
             });
             tmp_fields.push($(this).attr('data-code'));
         });
@@ -301,7 +302,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
         }
         var text = selected.text();
         var field_code = selected.attr('data-code');
-        fieldCollection.add({id: val, name: text , field_code: field_code});
+        var frontend_label = selected.attr('data-frontend-label');
+        fieldCollection.add({id: val, name: text , field_code: field_code, frontend_label: frontend_label});
         fieldCollection.trigger('render');
 
         $("#sel_var_field option[value='"+val+"']").remove();
@@ -313,7 +315,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                         addColumn(text, response.options, val, field_code);
                         vRowsCollection.each( function(row) { row.set(text, ''); } );
                         var fields = '<li class="dd-item dd3-item"><div class="icon-ellipsis-vertical dd-handle dd3-handle"></div><div class="dd3-content">' +
-                                '<label>'+ text +'</label> <i data-code="'+ field_code +'" data-name="'+ text +'" data-id="'+ val +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
+                                '<label>'+ text +'</label> <i data-frontend-label="'+ frontend_label +'"  data-code="'+ field_code +'" data-name="'+ text +'" data-id="'+ val +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
                         vField.append(fields);
                         renderGrid();
                     }
@@ -429,7 +431,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                 row = r.attributes;
             }
         });
-        var option = '<option data-code="'+ row.field_code +'" value="'+row.id+'">'+row.name+'</option>';
+        var option = '<option data-frontend-label="'+ row.field_code +'" data-code="'+ row.field_code +'" value="'+row.id+'">'+row.name+'</option>';
         $('#sel_var_field').append(option);
         resetSelect();
         removeColumn({name: row.field_code});
