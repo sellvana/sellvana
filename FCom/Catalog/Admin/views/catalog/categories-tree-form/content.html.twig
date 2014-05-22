@@ -13,11 +13,11 @@
         </ol>
     </div>
 </div>
-    {{ forms.boolean(fieldData|merge({field:'show_content', label:'Show Custom Content'|_})) }}
+    {{ forms.boolean(fieldData, {field:'show_content', label:'Show Custom Content'|_}) }}
 
 
     <div class="form-group">
-        {{ forms.label(fieldData|merge({field:'show_view', label:'Show Block / Page'|_})) }}
+        {{ forms.label(fieldData, {field:'show_view', label:'Show Block / Page'|_}) }}
         <div class="col-md-3">
             <select style="float: left; width: auto" class="form-control" name="model[show_view]" value="{{ c.get('modules/FCom_ShippingUps/services/s'~sId) }}">
                 <option value="0">{{ "no"|_ }}</option>
@@ -30,9 +30,9 @@
             </select>
         </div>
     </div>
-    {{ forms.boolean(fieldData|merge({field:'show_sub_cat', label:'Show Subcategories'|_})) }}
-    {{ forms.boolean(fieldData|merge({field:'show_products', label:'Show Products'|_})) }}
-    {{ forms.boolean(fieldData|merge({field:'show_sidebar', label:'Show Sidebar'|_})) }}
+    {{ forms.boolean(fieldData, {field:'show_sub_cat', label:'Show Subcategories'|_}) }}
+    {{ forms.boolean(fieldData, {field:'show_products', label:'Show Products'|_}) }}
+    {{ forms.boolean(fieldData, {field:'show_sidebar', label:'Show Sidebar'|_}) }}
 
     {{ forms.textarea({label: 'Custom Content'|_, name: "model[content]", input_div_class: "col-md-10", value:  m.get('content'), id: "model-content", input_class: "ckeditor" }) }}
 <script>

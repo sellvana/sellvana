@@ -5,11 +5,11 @@
 {% set fieldData = { model: c, settings_module:'FCom_Admin' } %}
 {{ forms.accordion_start({id:'settings-FCom_Admin'}) }}
     {{ forms.accordion_panel_start({label:'HTML'|_, id:'settings-FCom_Admin-group0', in:1}) }}
-        {{ forms.select(fieldData|merge({field:'theme', label:'Theme'|_, options:LAYOUT.getThemes("FCom_Admin", true) })) }}
-        {{ forms.textarea(fieldData|merge({field:'add_js_files', label:'Additional JS Files'|_, raw:1 })) }}
-        {{ forms.textarea(fieldData|merge({field:'add_css_files', label:'Additional CSS Files'|_, raw:1 })) }}
-        {{ forms.textarea(fieldData|merge({field:'add_js_code', label:'Additional JS Code'|_, raw:1 })) }}
-        {{ forms.textarea(fieldData|merge({field:'add_css_style', label:'Additional CSS Style'|_, raw:1 })) }}
+        {{ forms.select(fieldData, {field:'theme', label:'Theme'|_, options:LAYOUT.getThemes("FCom_Admin", true) }) }}
+        {{ forms.textarea(fieldData, {field:'add_js_files', label:'Additional JS Files'|_, raw:1 }) }}
+        {{ forms.textarea(fieldData, {field:'add_css_files', label:'Additional CSS Files'|_, raw:1 }) }}
+        {{ forms.textarea(fieldData, {field:'add_js_code', label:'Additional JS Code'|_, raw:1 }) }}
+        {{ forms.textarea(fieldData, {field:'add_css_style', label:'Additional CSS Style'|_, raw:1 }) }}
     {{ forms.accordion_panel_end }}
 
     {{ forms.accordion_panel_start({label:'Area Settings'|_, id:'settings-FCom_Admin-group1'}) }}
@@ -23,7 +23,7 @@
 
 
     {{ forms.accordion_panel_start({label:'Users'|_, id:'settings-FCom_Admin-group2'}) }}
-        {{ forms.boolean(fieldData|merge({field:'password_strength', label:'Strong Password Security'|_ })) }}
+        {{ forms.boolean(fieldData, {field:'password_strength', label:'Strong Password Security'|_ }) }}
     {{ forms.accordion_panel_end }}
 
     {{ forms.accordion_panel_start({label:'Site Map'|_, id:'settings-FCom_Admin-group3'}) }}

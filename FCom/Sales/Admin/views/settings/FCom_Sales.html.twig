@@ -7,12 +7,12 @@
 <h2>{{ "Sales Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Sales'}) }}
      {{ forms.accordion_panel_start({label:'Defaults'|_, id:'settings-FCom_Sales-group0', in:1}) }}
-        {{ forms.select(fieldData|merge({field:'default_shipping_method', label:'Default Shipping Method'|_, options: shippingMethods })) }}
-        {{ forms.select(fieldData|merge({field:'default_payment_method', label:'Default Payment Method'|_, options: paymentMethods })) }}
-        {{ forms.input(fieldData|merge({field:'recent_day', label:'Orders Recent Days'|_, attr: 'data-rule-number="true"' })) }}
+        {{ forms.select(fieldData, {field:'default_shipping_method', label:'Default Shipping Method'|_, options: shippingMethods }) }}
+        {{ forms.select(fieldData, {field:'default_payment_method', label:'Default Payment Method'|_, options: paymentMethods }) }}
+        {{ forms.input(fieldData, {field:'recent_day', label:'Orders Recent Days'|_, attr: 'data-rule-number="true"' }) }}
     {{ forms.accordion_panel_end }}
     {{ forms.accordion_panel_start({label:'Orders'|_, id:'settings-FCom_Sales-group1'}) }}
-        {{ forms.input(fieldData|merge({field:'order_number', label:'Define starting order number'|_, required:1,attr: 'data-rule-number="true"', value: orderNumber})) }}
+        {{ forms.input(fieldData, {field:'order_number', label:'Define starting order number'|_, required:1,attr: 'data-rule-number="true"', value: orderNumber}) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
 

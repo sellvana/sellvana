@@ -5,11 +5,11 @@
 {% set fieldData = { model: c, settings_module:'FCom_Frontend' } %}
 {{ forms.accordion_start({id:'settings-FCom_Frontend'}) }}
     {{ forms.accordion_panel_start({label:'HTML'|_, id:'settings-FCom_Frontend-group0', in:1}) }}
-        {{ forms.select(fieldData|merge({field:'theme', label:'Theme'|_, options:LAYOUT.getThemes("FCom_Frontend", true) })) }}
-        {{ forms.textarea(fieldData|merge({field:'add_js_files', label:'Additional JS Files'|_, raw:1 })) }}
-        {{ forms.textarea(fieldData|merge({field:'add_css_files', label:'Additional CSS Files'|_, raw:1 })) }}
-        {{ forms.textarea(fieldData|merge({field:'add_js_code', label:'Additional JS Code'|_, raw:1 })) }}
-        {{ forms.textarea(fieldData|merge({field:'add_css_style', label:'Additional CSS Style'|_, raw:1 })) }}
+        {{ forms.select(fieldData, {field:'theme', label:'Theme'|_, options:LAYOUT.getThemes("FCom_Frontend", true) }) }}
+        {{ forms.textarea(fieldData, {field:'add_js_files', label:'Additional JS Files'|_, raw:1 }) }}
+        {{ forms.textarea(fieldData, {field:'add_css_files', label:'Additional CSS Files'|_, raw:1 }) }}
+        {{ forms.textarea(fieldData, {field:'add_js_code', label:'Additional JS Code'|_, raw:1 }) }}
+        {{ forms.textarea(fieldData, {field:'add_css_style', label:'Additional CSS Style'|_, raw:1 }) }}
     {{ forms.accordion_panel_end }}
 
 
