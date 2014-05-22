@@ -598,6 +598,16 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function processVariantPost($model, $data)
     {
         if (!empty($data['vfields'])) {
+            $modelFieldOption = FCom_CustomField_Model_FieldOption::i();
+            $vfields = json_decode($data['vfields'], true);
+            foreach ($vfields as $f) {
+                $op = FCom_CustomField_Model_FieldOption::i()->getListAssocById($f['id']);
+                $arr_diff = array_diff($f['options'], $op);
+                foreach($arr_diff as $val) {
+                    $modelFieldOption->create(['field_id' => $f['id'], 'label' => $val])->save();
+                }
+            }
+
             $model->setData('variants_fields', json_decode($data['vfields'], true));
         }
         if (!empty($data['variants'])) {

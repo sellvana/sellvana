@@ -359,12 +359,23 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
     {
         $p = BRequest::i()->post();
         $model = FCom_CustomField_Model_FieldOption::i();
-        $model->delete_many(['field_id' => $p['field_id']]);
+        $op = 0;
+//        $model->delete_many(['field_id' => $p['field_id']]);
         foreach ($p['rows'] as $row) {
-            $data = ['field_id' => $p['field_id'], 'label' => $row['label']];
-            $model->create($data)->save();
+            $fieldOption = $model->orm()->where('id', $row['id'])->find_one();
+            if ($fieldOption) {
+                $fieldOption->set('label', $row['label'])->save();
+                $op++;
+            } else {
+                $data = ['field_id' => $p['field_id'], 'label' => $row['label']];
+                if (!$model->orm()->where($data)->find_one()) {
+                    $model->create($data)->save();
+                    $op++;
+                }
+
+            }
         }
-        BResponse::i()->json(['success' => true]);
+        BResponse::i()->json(['success' => true, 'options' => $op]);
         //$this->_processGridDataPost('FCom_CustomField_Model_FieldOption', array('field_id'=>BRequest::i()->get('field_id')));
     }
 

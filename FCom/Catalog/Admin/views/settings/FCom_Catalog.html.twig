@@ -1,1 +1,15 @@
-{{ "FCOM CATALOG"|_ }}
+{% set c = THIS.get('model') %}
+{% set fieldData = { model: c, settings_module:'FCom_Catalog', attr: 'data-rule-number="true"' } %}
+{% set prod = APP.instance('FCom_Catalog_Model_Product') %}
+{% set backOrders = prod.backOrders() %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
+<h2>{{ "Catalog Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-FCom_Catalog'}) }}
+     {{ forms.accordion_panel_start({label:'Stock Management'|_, id:'settings-FCom_Catalog-group0', in:1}) }}
+        {{ forms.boolean(fieldData|merge({field:'manage_stock', label:'Manage Stock'|_ })) }}
+        {{ forms.select(fieldData|merge({field:'back_order', label:'Back Orders'|_, options: backOrders })) }}
+        {{ forms.input(fieldData|merge({field:'maximum_quantity_shopping', label:'Maximum Quantity Allowed in Shopping'|_ })) }}
+        {{ forms.input(fieldData|merge({field:'quantity_items_status', label:'Quantity for Item\'s Status to Become Out of Stock'|_})) }}
+        {{ forms.input(fieldData|merge({field:'notify_administrator_quantity', label:'Notify Administrator for Quantity Below'|_ })) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

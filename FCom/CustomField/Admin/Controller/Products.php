@@ -46,6 +46,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
                     ['name' => 'name', 'label' => 'Field Name', 'width' => 300],
                     ['name' => 'field_code', 'label' => 'Field Code', 'width' => 300],
+                    ['name' => 'frontend_label', 'label' => 'Frontend Label', 'width' => 300],
                     ['type' => 'btn_group',  'buttons' => [['name' => 'delete']]]
                 ],
                 'actions' => [
@@ -70,7 +71,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         if ($vFields !== null) {
             $pos = 2;
             foreach ($vFields as $f) {
-                $f['options'] = (!isset($f['options'])) ? FCom_CustomField_Model_FieldOption::i()->getListAssocById($f['id']) : $f['options'];
+                $f['options'] = FCom_CustomField_Model_FieldOption::i()->getListAssocById($f['id']);
                 $f['label'] = $f['name'];
                 $f['name'] = $f['field_code'];
                 $f['field_id'] = $f['id'];
