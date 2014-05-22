@@ -7,13 +7,13 @@
 {% set fieldData = { validator: validator } %}
 <div class="f-section">
 <fieldset class="form-horizontal">
-    {{ forms.select(fieldData|merge({field:'status', label:'Status'|_, options: m.fieldOptions('status') })) }}
-    {{ forms.input(fieldData|merge({field:'title', label:'Title'|_, required: 1})) }}
-    {{ forms.textarea(fieldData|merge({field:'tags', label:'Tags'|_,rows: 2, value:  validator.fieldValue('tags') ? validator.fieldValue('tags') : m.getTagsString()})) }}
-    {{ forms.input(fieldData|merge({field:'url_key', label:'URL Key optional'|_, required: 1})) }}
-    {{ forms.textarea(fieldData|merge({field:'meta_keywords', label:'Meta Keywords'|_,rows: 2})) }}
-    {{ forms.wysiwyg(fieldData|merge({field:'preview', label:'Preview'|_, input_div_class: "col-md-10" })) }}
-    {{ forms.wysiwyg(fieldData|merge({field:'content', label:'Content'|_, input_div_class: "col-md-10" })) }}
+    {{ forms.select(fieldData, {field:'status', label:'Status'|_, options: m.fieldOptions('status') }) }}
+    {{ forms.input(fieldData, {field:'title', label:'Title'|_, required: 1}) }}
+    {{ forms.textarea(fieldData, {field:'tags', label:'Tags'|_,rows: 2, value:  validator.fieldValue('tags') ? validator.fieldValue('tags') : m.getTagsString()}) }}
+    {{ forms.input(fieldData, {field:'url_key', label:'URL Key optional'|_, required: 1}) }}
+    {{ forms.textarea(fieldData, {field:'meta_keywords', label:'Meta Keywords'|_,rows: 2}) }}
+    {{ forms.wysiwyg(fieldData, {field:'preview', label:'Preview'|_, input_div_class: "col-md-10" }) }}
+    {{ forms.wysiwyg(fieldData, {field:'content', label:'Content'|_, input_div_class: "col-md-10" }) }}
 </fieldset>
 </div>
 <script>

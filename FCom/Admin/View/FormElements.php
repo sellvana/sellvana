@@ -2,6 +2,14 @@
 
 class FCom_Admin_View_FormElements extends FCom_Admin_View_Abstract
 {
+    public function merge(array $p1, array $p2 = null)
+    {
+        if (!$p2) {
+            return $p1;
+        }
+        return array_merge_recursive($p1, $p2);
+    }
+
     public function getInputId($p)
     {
         //p.id|default(p.id_prefix|default('model') ~ '-' ~ p.field)

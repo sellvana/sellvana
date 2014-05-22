@@ -3,7 +3,7 @@
 {% import THIS.view('admin/form-elements').twigName() as forms %}
 {% set fieldData = { validator: validator } %}
 <fieldset>
-    {{ forms.input(fieldData|merge({field:'email', label:'Email'|_})) }}
-    {{ forms.boolean(fieldData|merge({field:'unsub_all', label:'Un Subscribe All'|_})) }}
-    {{ forms.boolean(fieldData|merge({field:'sub_newsletter', label:'Subscribe Newsletter'|_})) }}
+    {{ forms.input(fieldData, {field:'email', label:'Email'|_}) }}
+    {{ forms.boolean(fieldData, {field:'unsub_all', label:'Un Subscribe All'|_}) }}
+    {{ forms.boolean(fieldData, {field:'sub_newsletter', label:'Subscribe Newsletter'|_}) }}
 </fieldset>

@@ -15,6 +15,10 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             $parts = explode('/', $tabName, 2);
             if (sizeof($parts) === 2) {
                 list($group, $tabName) = $parts;
+                if (empty($view->tab_groups[$group])) {
+                    $groupName = ucwords(str_replace('_', ' ', $group));
+                    $view->addTabGroup($group, ['label' => $groupName]);
+                }
             } else {
                 $group = null;
             }

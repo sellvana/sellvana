@@ -5,17 +5,17 @@
 
 <fieldset name="main-product">
   <div class="f-section">
-    {{ forms.input(fieldData|merge({field:'cost', label:'Cost'|_})) }}
+    {{ forms.input(fieldData, {field:'cost', label:'Cost'|_}) }}
 
-    {{ forms.input(fieldData|merge({field:'msrp', label:'MSRP'|_})) }}
+    {{ forms.input(fieldData, {field:'msrp', label:'MSRP'|_}) }}
 
-    {{ forms.input(fieldData|merge({field:'map', label:'MAP'|_})) }}
+    {{ forms.input(fieldData, {field:'map', label:'MAP'|_}) }}
 
-    {{ forms.input(fieldData|merge({field:'base_price', label:'Regular Price'|_, required:1})) }}
+    {{ forms.input(fieldData, {field:'base_price', label:'Regular Price'|_, required:1}) }}
 
-    {{ forms.input(fieldData|merge({field:'sale_price', label:'Special Price'|_})) }}
+    {{ forms.input(fieldData, {field:'sale_price', label:'Special Price'|_}) }}
 
-    {{ forms.input(fieldData|merge({field:'markup', label:'Default Markup'|_})) }}
+    {{ forms.input(fieldData, {field:'markup', label:'Default Markup'|_}) }}
   </div>
 </fieldset>
 
