@@ -79,7 +79,9 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                     $cart->addProduct($p->id(), $options)->calculateTotals()->save();
                     $this->message('The product has been added to your cart');
                 } else {
-                    $this->message('This product variant does not exists.', 'error');
+                    $this->message('This product variant does not exists. Please choose other', 'error');
+                    BResponse::i()->redirect(BApp::href($p->local_sku));
+                    return;
                 }
 
                 break;
