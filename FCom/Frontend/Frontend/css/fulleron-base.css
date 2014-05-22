@@ -618,7 +618,7 @@ label.error {
    RESPONSIVE
 \*------------------------------------*/
 
-/* Mobile devices (larger phones) */
+/* Large Phones */
 @media (max-width: 767px) {
   /* Header */
   .f-site-header-top .navbar-header,
@@ -742,7 +742,7 @@ label.error {
     }
 }
 
-/* Small devices (tablets, 768px and up) */
+/* Tablets */
 @media (min-width: 768px) {
   /* Header */
   .f-site-header-top .navbar-brand img {
@@ -886,7 +886,6 @@ label.error {
     z-index:9;
   }
 }
-/* Medium devices (desktops, 992px and up) */
 @media (min-width: 992px) {
   /* Header */
   .f-site-header .nav li.open.dropdown > a {
