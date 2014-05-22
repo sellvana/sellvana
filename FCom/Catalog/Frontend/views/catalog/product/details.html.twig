@@ -229,7 +229,7 @@
         var variants = $.parseJSON('{{ UTIL.toJson(variants.variants)|raw }}');
         var fields = Object.keys(variants[0].fields);
         var base_price = '{{ prod.get('base_price')| currency }}';
-        var sku_prod = '{{ prod.get('local_sku')|_ }}';
+        var sku_prod = '{{ prod.get('local_sku')}}';
         var vr = [];
         var firstOptions = [];
         var beforeField = [];
