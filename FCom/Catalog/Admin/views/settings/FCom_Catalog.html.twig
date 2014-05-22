@@ -1,7 +1,7 @@
 {% set c = THIS.get('model') %}
 {% set fieldData = { model: c, settings_module:'FCom_Catalog' } %}
-{% set stockSettings = APP.instance('FCom_Stock_Model_Sku') %}
-{% set backOrders = stockSettings.backOrders() %}
+{% set prod = APP.instance('FCom_Catalog_Model_Product') %}
+{% set backOrders = prod.backOrders() %}
 {% import THIS.view('admin/form-elements').twigName() as forms %}
 <h2>{{ "Catalog Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Catalog'}) }}

@@ -1080,4 +1080,12 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         }
         return isset($data_serialized[$data]) ? $data_serialized[$data] : array();
     }
+
+    public static function backOrders()
+    {
+        return [
+            "NOT_BACK_ORDERS"         => BLocale::i()->_("No Back Orders"),
+            "ALLOW_QUANTITY_BELOW" => BLocale::i()->_("Allow Quantity Below 0")
+        ];
+    }
 }
