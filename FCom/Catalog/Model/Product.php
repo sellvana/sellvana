@@ -1071,12 +1071,21 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                             }
                         }
                     }
-                    $price = ($vr['price'] != '') ? $vr['price']: 0;
+                    $price = ($vr['price'] != '') ? $vr['price']: $this->base_price;
+                    $vr['sku'] = ($vr['sku'] == '')? $this->local_sku : $vr['sku'];
                     $vr['price'] = BLocale::currency($price);
                 }
             }
             return ['variants' => $data_serialized['variants'], 'variants_fields' => $data_serialized['variants_fields'], 'fields' => $fields];
         }
         return isset($data_serialized[$data]) ? $data_serialized[$data] : array();
+    }
+
+    public static function backOrders()
+    {
+        return [
+            "NOT_BACK_ORDERS"         => BLocale::i()->_("No Back Orders"),
+            "ALLOW_QUANTITY_BELOW" => BLocale::i()->_("Allow Quantity Below 0")
+        ];
     }
 }

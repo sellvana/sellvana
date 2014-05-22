@@ -8,22 +8,22 @@
 {% set fieldData = { validator:validator, model:m } %}
   <fieldset class="form-horizontal">
   <div class="f-section">
-  
-    {{ forms.input(fieldData|merge({field:'username', required:1, label:'User Name'|_})) }}
-    {{ forms.boolean(fieldData|merge({field:'is_superadmin', label:'Super Admin'|_})) }}
-    {{ forms.select(fieldData|merge({field:'role_id', label:'Role'|_, options:APP.instance('FCom_Admin_Model_Role').options() })) }}
-    {{ forms.select(fieldData|merge({field:'status', label:'Status'|_, options:hlp.fieldOptions('status') })) }}
 
-    {{ forms.input(fieldData|merge({field:'email', required:1, label:'Email'|_, type:'email'})) }}
-    {{ forms.input(fieldData|merge({field:'password', label:'Password'|_, type:'password', value:''})) }}
-    {{ forms.input(fieldData|merge({field:'password_confirm', label:'Confirm Password'|_, type:'password', value:'', attr:'equalto="#model-password"'})) }}
-    
-    {{ forms.input(fieldData|merge({field:'firstname', required:1, label:'First Name'|_})) }}
-    {{ forms.input(fieldData|merge({field:'lastname', required:1, label:'Last Name'|_})) }}
-    
-    {{ forms.input(fieldData|merge({field:'api_username', label:'API Username'|_})) }}
-    {{ forms.input(fieldData|merge({field:'api_password', label:'API Password'|_})) }}
-    
+    {{ forms.input(fieldData, {field:'username', required:1, label:'User Name'|_}) }}
+    {{ forms.boolean(fieldData, {field:'is_superadmin', label:'Super Admin'|_}) }}
+    {{ forms.select(fieldData, {field:'role_id', label:'Role'|_, options:APP.instance('FCom_Admin_Model_Role').options() }) }}
+    {{ forms.select(fieldData, {field:'status', label:'Status'|_, options:hlp.fieldOptions('status') }) }}
+
+    {{ forms.input(fieldData, {field:'email', required:1, label:'Email'|_, type:'email'}) }}
+    {{ forms.input(fieldData, {field:'password', label:'Password'|_, type:'password', value:''}) }}
+    {{ forms.input(fieldData, {field:'password_confirm', label:'Confirm Password'|_, type:'password', value:'', attr:'equalto="#model-password"'}) }}
+
+    {{ forms.input(fieldData, {field:'firstname', required:1, label:'First Name'|_}) }}
+    {{ forms.input(fieldData, {field:'lastname', required:1, label:'Last Name'|_}) }}
+
+    {{ forms.input(fieldData, {field:'api_username', label:'API Username'|_}) }}
+    {{ forms.input(fieldData, {field:'api_password', label:'API Password'|_}) }}
+
   </div>
   </fieldset>
 

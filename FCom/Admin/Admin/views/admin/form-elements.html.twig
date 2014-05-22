@@ -6,7 +6,7 @@ INITIALIZATION:
 
 EXAMPLES:
 
-{{ forms.input(fieldData|merge({field:'name', label:'Label'|_, required:1})) }}
+{{ forms.input(fieldData, {field:'name', label:'Label'|_, required:1}) }}
 
 Using custom id/name:
 
@@ -15,14 +15,16 @@ Using custom id/name:
 
 #}
 
-{% macro label(p) %}
+{% macro label(p1, p2) %}
     {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
     <label class="control-label {{ p.label_class|default('col-md-2') }} {{ p.required ? 'required' }}"
         for="{{ view.getInputId(p) }}">{{ p.label }}</label>
 {% endmacro %}
 
-{% macro input(p) %}
+{% macro input(p1, p2) %}
     {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
     {% import _self as forms %}
     <div class="form-group {{ p.form_group_class }}">
         {{ forms.label(p) }}
@@ -41,8 +43,9 @@ Using custom id/name:
     </div>
 {% endmacro %}
 
-{% macro select(p) %}
+{% macro select(p1, p2) %}
     {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
     {% import _self as forms %}
     <div class="form-group {{ p.form_group_class }}">
         {{ forms.label(p) }}
@@ -61,8 +64,10 @@ Using custom id/name:
     </div>
 {% endmacro %}
 
-{% macro boolean(p) %}
-    {% set p = p|merge({options: { 0: 'no'|_, 1: 'YES'|_ }, style:'width:auto' }) %}
+{% macro boolean(p1, p2) %}
+    {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set p = view.merge(p1, {options: { 0: 'no'|_, 1: 'YES'|_ }, style:'width:auto' }) %}
+    {% set p = view.merge(p, p2) %}
     {% import _self as forms %}
     {{ forms.select(p) }}
 {% endmacro %}
@@ -77,8 +82,9 @@ Using custom id/name:
     </div>
 #}
 
-{% macro textarea(p) %}
+{% macro textarea(p1, p2) %}
     {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
     {% set value = view.getInputValue(p) %}
     {% import _self as forms %}
     <div class="form-group {{ p.form_group_class }}">
@@ -97,8 +103,9 @@ Using custom id/name:
     </div>
 {% endmacro %}
 
-{% macro wysiwyg(p) %}
+{% macro wysiwyg(p1, p2) %}
     {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
     {% set value = view.getInputValue(p) %}
     {% import _self as forms %}
     <div class="form-group {{ p.form_group_class }}">

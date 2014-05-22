@@ -55,7 +55,7 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
                         rows: rows
                     },
                     function (data) {
-                                        selectedRow.set('num_options', rows.length);
+                                        selectedRow.set('num_options', data.options);
                                         selectedRow.trigger('render');
                                         $('button.field-modal-close').trigger('click');
                                     }

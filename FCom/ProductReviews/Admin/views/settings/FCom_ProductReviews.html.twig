@@ -4,6 +4,6 @@
 <h2>{{ "Product Reviews Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_ProductReviews'}) }}
      {{ forms.accordion_panel_start({label:'General Settings'|_, id:'settings-FCom_ProductReviews-group0', in:1}) }}
-        {{ forms.boolean(fieldData|merge({field:'need_approve', label:'Custom Order Status On Payment'|_ })) }}
+        {{ forms.boolean(fieldData, {field:'need_approve', label:'Custom Order Status On Payment'|_ }) }}
      {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
