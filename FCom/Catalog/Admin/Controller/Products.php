@@ -415,6 +415,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
+
         $model = $args['model'];
         $data = BRequest::i()->post();
 
@@ -427,6 +428,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 $this->processLinkedProductsPost($model, $data);
                 $this->processMediaPost($model, $data);
                 $this->processCustomFieldPost($model, $data);
+                $this->processStockPolicyPost($model, $data);
                 $this->processVariantPost($model, $data);
                 $this->processSystemLangFieldsPost($model, $data);
                 $this->processFrontendPost($model, $data);
@@ -593,6 +595,14 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
 
         $model->save();
+    }
+
+    public function processStockPolicyPost($model, $data)
+    {
+        if (!empty($data['stock_policy'])) {
+            $model->setData('stock_policy', $data['stock_policy']);
+            $model->save();
+        }
     }
 
     public function processVariantPost($model, $data)
