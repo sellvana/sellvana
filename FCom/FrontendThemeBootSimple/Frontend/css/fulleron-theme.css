@@ -465,7 +465,7 @@ a.btn-link { text-transform:none; }
    RESPONSIVE
 \*------------------------------------*/
 
-/* Extra small devices (phones, up to 480px) */
+/* Small Phones */
 @media (max-width: 480px) {
   .f-site-header-top .navbar-brand img {
     max-width:100px;
@@ -487,7 +487,7 @@ a.btn-link { text-transform:none; }
     }
 }
 
-/* Mobile devices (larger phones) */
+/* Larger Phones */
 @media (max-width: 767px) {
   body { font-size:16px; }
 
@@ -566,7 +566,8 @@ a.btn-link { text-transform:none; }
     margin-left:15px;
   }
 }
-/* Small devices (tablets, 768px and up) */
+
+/* Tablets */
 @media (min-width: 768px) {
   /* Bootstrap */
   .navbar-toggle { display:block; }
@@ -643,7 +644,7 @@ a.btn-link { text-transform:none; }
     }
 }
 
-/* Large devices (large desktops, 1200px and up) */
+/* Desktop+ */
 @media (min-width: 1200px) {
 }
 
