@@ -140,9 +140,6 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function resetPassword($password)
     {
         $this->set(['token' => null])->setPassword($password)->save();
-        if ($this->status === 'active') {
-            $this->login();
-        }
         BLayout::i()->view('email/customer-password-reset')->set('customer', $this)->email();
         return $this;
     }
