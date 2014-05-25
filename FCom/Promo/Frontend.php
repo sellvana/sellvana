@@ -315,7 +315,7 @@ class FCom_Promo_Frontend extends BClass
                         }
                     }
 
-                    $item = FCom_Sales_Model_Cart_Item::i()->load([
+                    $item = FCom_Sales_Model_Cart_Item::i()->loadWhere([
                         'cart_id'      => $cart->id,
                         'product_id'   => $currentItem->product_id,
                         'promo_id_get' => $promo->id
@@ -381,7 +381,7 @@ class FCom_Promo_Frontend extends BClass
                     }
                     if ($sameGroup) {
                         /* @var $item FCom_Sales_Model_Cart_Item */
-                         $item = FCom_Sales_Model_Cart_Item::i()->load([
+                         $item = FCom_Sales_Model_Cart_Item::i()->loadWhere([
                              'cart_id'      => $cart->id,
                              'product_id'   => $currentItem->product_id,
                              'promo_id_get' => $promo->id
@@ -426,7 +426,7 @@ class FCom_Promo_Frontend extends BClass
                     }
 
                     if ($currentItem->qty > 1 && $promo->get_amount > $promoItemQtyTotal) {
-                         $item = FCom_Sales_Model_Cart_Item::i()->load([
+                         $item = FCom_Sales_Model_Cart_Item::i()->loadWhere([
                              'cart_id'      => $cart->id,
                              'product_id'   => $currentItem->product_id,
                              'promo_id_get' => $promo->id
@@ -492,7 +492,7 @@ class FCom_Promo_Frontend extends BClass
                         ->find_many();
 
                     if ($groupProductGet) {
-                        $item = FCom_Sales_Model_Cart_Item::i()->load([
+                        $item = FCom_Sales_Model_Cart_Item::i()->loadWhere([
                                 'cart_id'      => $cart->id,
                                 'product_id'   => $currentItem->product_id,
                                 'promo_id_get' => $promo->id]);

@@ -894,7 +894,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function isAlreadyReviewed($customerId)
     {
-        return FCom_ProductReviews_Model_Review::i()->load(['product_id' => $this->id, 'customer_id' => $customerId]);
+        return FCom_ProductReviews_Model_Review::i()->loadWhere(['product_id' => $this->id, 'customer_id' => $customerId]);
     }
 
     /**
@@ -990,7 +990,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         foreach ($imagesNames as $fileName) {
             $pathInfo  = pathinfo($fileName);
             $subFolder = $pathInfo['dirname'] == '.' ? null : $pathInfo['dirname'];
-            $att       = $mediaLib->load([
+            $att       = $mediaLib->loadWhere([
                 'folder'    => $imageFolder,
                 'subfolder' => $subFolder,
                 'file_name' => $pathInfo['basename']

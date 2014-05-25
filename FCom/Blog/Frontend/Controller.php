@@ -17,6 +17,7 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $tag = FCom_Blog_Model_Tag::i()->load($tagName, 'tag_name');
             if (!$tag) {
                 $this->forward(false);
+                return;
             }
         }
         $this->view('head')->rss($tag->getUrl() . '/feed.rss');
@@ -36,6 +37,7 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $cat = FCom_Blog_Model_Category::i()->load($catName, 'url_key');
             if (!$cat) {
                 $this->forward(false);
+                return;
             }
         }
         $this->view('head')->rss($cat->getUrl() . '/feed.rss');
@@ -55,6 +57,7 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $user = FCom_Admin_Model_User::i()->load($userName, 'username');
             if (!$user) {
                 $this->forward(false);
+                return;
             }
         }
         $posts = FCom_Blog_Model_Post::i()->getPostsOrm()
@@ -122,6 +125,7 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $tag = FCom_Blog_Model_Tag::i()->load($tagKey, 'tag_key');
             if (!$tag) {
                 $this->forward(false);
+                return;
             }
             $postsOrm
                 ->join('FCom_Blog_Model_PostTag', ['pt.post_id', '=', 'p.id'], 'pt')
@@ -133,6 +137,7 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $cat = FCom_Blog_Model_Category::i()->load($catKey, 'url_key');
             if (!$cat) {
                 $this->forward(false);
+                return;
             }
             $postsOrm
                 ->join('FCom_Blog_Model_PostCategory', ['pc.post_id', '=', 'p.id'], 'pc')
@@ -144,6 +149,7 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $user = FCom_Admin_Model_User::i()->load($userName, 'username');
             if (!$user) {
                 $this->forward(false);
+                return;
             }
             $postsOrm->where('author_user_id', $user->id());
         }

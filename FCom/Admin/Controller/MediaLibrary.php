@@ -193,7 +193,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 if (!$uploads['error'][$i]
                     && @move_uploaded_file($uploads['tmp_name'][$i], $targetDir . '/' . $fileName)
                 ) {
-                    $att = $attModel->load(['folder' => $folder, 'file_name' => $fileName]);
+                    $att = $attModel->loadWhere(['folder' => $folder, 'file_name' => $fileName]);
 
                     if (!$att) {
                         $att = $attModel->create([

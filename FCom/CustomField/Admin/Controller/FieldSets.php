@@ -317,7 +317,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 if ($field_ids !== '') {
                     $arr = explode(',', $field_ids);
                     foreach ($arr as $i => $fId) {
-                        if (!$model->load(['set_id' => $data['id'], 'field_id' => $fId])) {
+                        if (!$model->loadWhere(['set_id' => $data['id'], 'field_id' => $fId])) {
                             $model->create(['set_id' => $data['id'], 'field_id' => $fId, 'position' => $i])->save();
                         }
                     }
@@ -400,19 +400,6 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $this->initFormTabs($view, $model, $model->id ? 'view' : 'create', $model->id ? null : 'main');
     }
 
-    public function action_form_tab()
-    {
-        $r = BRequest::i();
-        $id = $r->params('id');
-        if (!$id) {
-            $id = $r->request('id');
-        }
-        $this->layout('denteva_promo_form_tabs');
-        $view = BLayout::i()->view('denteva/promo/form');
-        $promo = Denteva_Model_Promo::i()->load($id);
-        $this->outFormTabsJson($view, $promo);
-    }
-
     public function action_form__POST()
     {
         $r = BRequest::i();
@@ -421,9 +408,9 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
         try {
             if ($id) {
-                $model = Denteva_Model_Promo::i()->load($id);
+                $model = FCom_CustomField_Model_Set::i()->load($id);
             } else {
-                $model = Denteva_Model_Promo::i()->create();
+                $model = FCom_CustomField_Model_Set::i()->create();
             }
             $data['model'] = BLocale::i()->parseRequestDates($data['model'], 'from_date,to_date');
             $model->set($data['model']);

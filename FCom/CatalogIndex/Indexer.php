@@ -179,7 +179,7 @@ class FCom_CatalogIndex_Indexer extends BClass
                     $vVal = BUtil::simplifyString(trim($v1[0]), '#[^a-z0-9/-]+#');
                     $vDisplay = !empty($v1[1]) ? trim($v1[1]) : $v1[0];
                     if (empty(static::$_filterValues[$fId][$vVal])) {
-                        $fieldValue = $fieldValueHlp->load(['field_id' => $fId, 'val' => $vVal]);
+                        $fieldValue = $fieldValueHlp->loadWhere(['field_id' => $fId, 'val' => $vVal]);
                         if (!$fieldValue) {
                             $fieldValue = $fieldValueHlp->create([
                                 'field_id' => $fId,

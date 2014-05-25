@@ -2294,6 +2294,7 @@ class BActionController extends BClass
                 $actionMethod = $tmpMethod;
             } elseif (BRouting::i()->currentRoute()->multi_method) {
                 $this->forward(false); // If route has multiple methods, require method suffix
+                return $this;
             }
         }
         //echo $actionMethod;exit;

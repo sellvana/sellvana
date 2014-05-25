@@ -2139,6 +2139,11 @@ class BModel extends Model
     */
     public static function load($id, $field = null, $cache = false)
     {
+        if (true !== $field && is_array($id)) {
+            BDebug::warning('Invalid usage of load(), use loadWhere()');
+            return false;
+        }
+
         $class = static::$_origClass ? static::$_origClass : get_called_class();
         if (null === $field) {
             $field = static::_get_id_column_name($class);
@@ -2181,6 +2186,14 @@ class BModel extends Model
             }
         }
         return $model;
+    }
+
+    /** 
+     * Temporary implementation using load()
+     */ 
+    public static function loadWhere($where)
+    {
+        return $this->load($where, true);
     }
 
     /**
