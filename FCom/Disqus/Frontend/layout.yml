@@ -2,5 +2,5 @@ base:
     - { hook: before_footer, views: disqus/embed, if: "FCom_Disqus_Frontend::isLayoutEnabled" }
 
 /catalog/product:
-    - { hook: after_product_details, views: disqus/embed, if: "FCom_Disqus_Frontend::isLayoutEnabled" }
+    - { hook: after_main, views: disqus/embed, if: "FCom_Disqus_Frontend::isLayoutEnabled" }
 

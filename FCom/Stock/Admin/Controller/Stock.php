@@ -44,6 +44,46 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
         return $config;
     }
 
+    public function productStockPolicy($model)
+    {
+        $stock_policy = [
+            'manage_stock' => 0,
+            'stock_qty' => '',
+            'out_stock' => 'keep_selling',
+            'maximum_quantity_shopping' => '',
+            'quantity_items_status' => '',
+            'notify_administrator_quantity' => '',
+        ];
+        if (isset($model->data_serialized)) {
+            $data = BUtil::objectToArray(json_decode($model->data_serialized));
+            if (isset($data['stock_policy'])) {
+                $stock_policy = $data['stock_policy'];
+            }
+        }
+        return $stock_policy;
+    }
+
+    public function action_restore_stock_policy()
+    {
+        $post = BRequest::i()->post();
+        $config = BConfig::i()->get('modules/FCom_Catalog');
+        $result = '';
+        if (isset($post['restore'])) {
+            switch($post['restore']) {
+                case 'maximum_quantity_shopping':case 'quantity_items_status':case 'notify_administrator_quantity':
+                    if ($config) {
+                        $result = $config[$post['restore']];
+                    }
+                     break;
+                case 'out_stock':
+                    $result = 'back_order';
+                    break;
+                default:
+                    break;
+            }
+        }
+        BResponse::i()->json(['result' => $result]);
+    }
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);

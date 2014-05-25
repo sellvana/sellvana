@@ -4,11 +4,11 @@
 <h2>{{ "Ogone Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Ogone'}) }}
      {{ forms.accordion_panel_start({label:'Ogone API'|_, id:'settings-FCom_Ogone-group0', in:1}) }}
-        {{ forms.select(fieldData|merge({field:'mode', label:'Test/Live Mode'|_, options: {0:'Test', 1:'Live'} })) }}
-        {{ forms.input(fieldData|merge({field:'pspid', label:'PSPID'|_ })) }}
-        {{ forms.input(fieldData|merge({field:'feedback_message', label:'Feedback Message'|_ })) }}
+        {{ forms.select(fieldData, {field:'mode', label:'Test/Live Mode'|_, options: {0:'Test', 1:'Live'} }) }}
+        {{ forms.input(fieldData, {field:'pspid', label:'PSPID'|_ }) }}
+        {{ forms.input(fieldData, {field:'feedback_message', label:'Feedback Message'|_ }) }}
     {{ forms.accordion_panel_end }}
     {{ forms.accordion_panel_start({label:'Owner Information'|_, id:'settings-FCom_Ogone-group1'}) }}
-        {{ forms.input(fieldData|merge({field:'owner_address', label:'Address'|_ })) }}
+        {{ forms.input(fieldData, {field:'owner_address', label:'Address'|_ }) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

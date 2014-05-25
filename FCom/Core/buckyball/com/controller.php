@@ -1377,7 +1377,7 @@ class BResponse extends BClass
     */
     public function httpSTS()
     {
-        static::header('Strict-Transport-Security: max-age=500; includeSubDomains');
+        static::header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
         return $this;
     }
 

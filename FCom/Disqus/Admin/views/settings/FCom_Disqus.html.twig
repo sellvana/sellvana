@@ -4,10 +4,10 @@
 <h2>{{ "Disqus Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Disqus'}) }}
      {{ forms.accordion_panel_start({label:'Disqus Settings'|_, id:'settings-FCom_Disqus-group0', in:1}) }}
-        {{ forms.boolean(fieldData|merge({field:'show_on_all_pages', label:'Show on all pages'|_ })) }}
-        {{ forms.boolean(fieldData|merge({field:'show_on_product', label:'Show on product pages'|_ })) }}
-        {{ forms.textarea(fieldData|merge({field:'comments_code', label:'Comments JavaScript Code'|_})) }}
-        {{ forms.textarea(fieldData|merge({field:'counts_code', label:'Counts JavaScript Code'|_})) }}
+        {{ forms.boolean(fieldData, {field:'show_on_all_pages', label:'Show on all pages'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'show_on_product', label:'Show on product pages'|_ }) }}
+        {{ forms.textarea(fieldData, {field:'comments_code', label:'Comments JavaScript Code'|_}) }}
+        {{ forms.textarea(fieldData, {field:'counts_code', label:'Counts JavaScript Code'|_}) }}
         <p><a href="http://disqus.com/admin/settings/universalcode/" target="_blank">{{ 'Get your code here (requires disqus.com account)' | raw }} </a></p>
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

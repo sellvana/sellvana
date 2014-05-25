@@ -13,9 +13,9 @@
 {% set variants = prod.getDataSerialized('variants') %}
 {% set productLink = prod.getProductLink() %}
 {% set recentlyViewed = APP.instance('FCom_Catalog_Frontend').getRecentlyViewedProducts() %}
-<div class="f-site-main" role="main">
-  <div class="container">
+
     {{ THIS.view('breadcrumbs') | raw }}
+    {{ THIS.view('core/messages') | raw }}
     <div class="row">
       <!-- Product Image Column -->
       <div class="col-md-5 f-col-prod-img">
@@ -32,7 +32,7 @@
           <li class="col-md-2 col-xs-2"><a href="#"><img data-id="{{ img.id() }}" src="{{ img.getUrl() }}" alt="" title=""></a></li>
 {% endfor %}
         </ul>
-          <a href="#" class="hidden" id="display-all-image"><i class="glyphicon glyphicon-refresh"></i> {{ "Display all images"|_ }}</a>
+        <a href="#" class="hidden" id="display-all-image"><i class="glyphicon glyphicon-refresh"></i> {{ "Display all images"|_ }}</a>
       </div>
       <!-- /.f-col-prod-img -->
 
@@ -88,23 +88,29 @@
           <div class="f-prod-select">
             {{ THIS.hook('catalog/product/details:before_add_cart') | raw }}
             <div class="f-prod-add-cart">
-                {% if variants.fields %}
+                {% if variants.variants_fields %}
                     <section class="tab-pane active" id="f-prod-tab-variant">
-                        {% for field  in variants.fields %}
+                        {% for field  in variants.variants_fields %}
                             <div class="form-group" style="overflow: hidden">
-                                <label class="col-md-3 control-label">{{ field.field_code |_ }}</label>
+                                <label class="col-md-3 control-label">{{ field.frontend_label |_ }}</label>
                                 <div class="col-md-5">
-                                    {% if field.options %}
-                                        <select id="{{ field.field_code }}" name="{{ field.field_code }}" class="form-control variant" style="width:auto">
-                                            {% for key,val  in field.options %}
-                                                <option value="{{ key }}">{{ val|_ }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    {% endif %}
+                                    <select id="{{ field.field_code }}" name="{{ field.field_code }}" class="form-control variant" style="width:auto">
+                                        {% for key in field.options %}
+                                            <option value="{{ key|_ }}">{{ key |_ }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                             </div>
                         {% endfor %}
-                        <div class="form-group" style="overflow: hidden">
+                        <div class="form-group overflow-hidden">
+                            <label class="col-md-3 control-label ">{{ 'Sku: ' |_ }}</label>
+                            <div class="col-md-5 f-price-group" style="margin: 0px;">
+                                <div class="f-reg-price">
+                                    <span class="f-price" id="sku-variant">{{ prod.get('local_sku') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group overflow-hidden">
                             <label class="col-md-3 control-label ">{{ 'Price: ' |_ }}</label>
                             <div class="col-md-2 f-price-group" style="margin: 0px;">
                                 <div class="f-reg-price">
@@ -112,10 +118,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group" style="overflow: hidden">
+                        <div class="form-group overflow-hidden">
                             <label class="col-md-3 control-label">{{ 'Quantity: ' |_ }}</label>
                             <div class="col-md-2">
-                                <input type="text" class="form-control col-md-2" id="quantity-variant" value="1"/>
+                                <input type="text" name="qty" class="form-control col-md-2" id="quantity-variant" value="1"/>
                             </div>
                         </div>
                     </section>
@@ -130,87 +136,86 @@
             </div>
           </div> <!-- /.f-prod-select -->
         </form>
-        </div> <!-- /.f-col-prod-select -->
-      </div> <!-- /.row -->
-      <div class="f-prod-info">
-        <div class="tab-content">
-            {% if shopper %}
-                <section class="tab-pane active" id="f-prod-tab-description2">
-                    <div class="f-tab-heading">
-                        <h5 class="f-tab-title">{{ 'Shopper'|_ }}</h5>
-                    </div>
-
-                    {% for sh in shopper %}
-                        <div class="form-group" style="overflow: hidden">
-                            <label class="col-md-2 control-label">{{ sh.label|_ }}</label>
-                            {% set options = sh.options|split(',') %}
-                            <div class="col-md-3">
-                                <select name="{{ sh.name }}" class="form-control">
-                                    {% for op in options %}
-                                        <option value="{{ op }}">{{ op|_ }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <label class="col-md-3 control-label">{{ "Price: "~sh.price |_ }}</label>
-                        </div>
-                    {% endfor %}
-
-                </section>
-            {% endif %}
-          <section class="tab-pane active" id="f-prod-tab-description">
-            <div class="f-tab-heading">
-              <h5 class="f-tab-title">{{ 'Product Description'|_ }}</h5>
-            </div>
-            {{ prod.get('description') | raw }}
-              {% if customFields %}
+      </div> <!-- /.f-col-prod-select -->
+    </div> <!-- /.row -->
+    <div class="f-prod-info">
+      <div class="tab-content">
+          {% if shopper %}
+              <section class="tab-pane active" id="f-prod-tab-description2">
                   <div class="f-tab-heading">
-                      <h5 class="f-tab-title">{{ 'Additional Info'|_ }}</h5>
+                      <h5 class="f-tab-title">{{ 'Shopper'|_ }}</h5>
                   </div>
-                  {% for cf in customFields %}
+
+                  {% for sh in shopper %}
                       <div class="form-group" style="overflow: hidden">
-                          <label class="col-md-2 control-label">{{ cf.set_name |_ }}</label> <br>
-                          {% for field in cf.fields %}
-                              <div class="col-md-12">
-                                  <label class="control-label">{{ field.field_name ~": "~ field.value |_ }}</label>
-                              </div>
-                          {% endfor %}
+                          <label class="col-md-2 control-label">{{ sh.label|_ }}</label>
+                          {% set options = sh.options|split(',') %}
+                          <div class="col-md-3">
+                              <select name="{{ sh.name }}" class="form-control">
+                                  {% for op in options %}
+                                      <option value="{{ op }}">{{ op|_ }}</option>
+                                  {% endfor %}
+                              </select>
+                          </div>
+                          <label class="col-md-3 control-label">{{ "Price: "~sh.price |_ }}</label>
                       </div>
                   {% endfor %}
-              {% endif %}
-          </section>
-          {{ THIS.view('prodreviews/product-details').set('prod', prod) | raw }}
-          </div>
-        </div><!-- /.f-prod-info -->
-      <br/>
-      {% for product in productLink %}
-          {% if product.product  %}
-              <div class="f-widget f-widget-featured-prods">
-                  <header class="f-widget-header">
-                      <strong class="f-widget-title">{{ product.title }}</strong>
-                  </header>
-                  {{ THIS.view('catalog/product/grid-tiles').set('products', product.product) | raw }}
-              </div><!-- /.f-widget -->
-          {% endif %}
-      {% endfor %}
 
-      {% if recentlyViewed %}
-        <!-- You may also like -->
-        <div class="f-widget f-widget-featured-prods">
-          <header class="f-widget-header">
-            <strong class="f-widget-title">{{ "You recently viewed these items"|_ }}</strong>
-          </header>
-          {{ THIS.view('catalog/product/grid-tiles').set('products', recentlyViewed) | raw }}
+              </section>
+          {% endif %}
+        <section class="tab-pane active" id="f-prod-tab-description">
+          <div class="f-tab-heading">
+            <h5 class="f-tab-title">{{ 'Product Description'|_ }}</h5>
+          </div>
+          {{ prod.get('description') | raw }}
+            {% if customFields %}
+                <div class="f-tab-heading">
+                    <h5 class="f-tab-title">{{ 'Additional Info'|_ }}</h5>
+                </div>
+                {% for cf in customFields %}
+                    <div class="form-group" style="overflow: hidden">
+                        <label class="col-md-2 control-label">{{ cf.set_name |_ }}</label> <br>
+                        {% for field in cf.fields %}
+                            <div class="col-md-12">
+                                <label class="control-label">{{ field.field_name ~": "~ field.value |_ }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </section>
+        {{ THIS.view('prodreviews/product-details').set('prod', prod) | raw }}
         </div>
-      {% endif %}
-    </div>
-    {{ THIS.hook('after_product_details') | raw }}
-</div>
+      </div><!-- /.f-prod-info -->
+    <br/>
+    {% for product in productLink %}
+        {% if product.product  %}
+            <div class="f-widget f-widget-featured-prods">
+                <header class="f-widget-header">
+                    <strong class="f-widget-title">{{ product.title }}</strong>
+                </header>
+                {{ THIS.view('catalog/product/grid-tiles').set('products', product.product) | raw }}
+            </div><!-- /.f-widget -->
+        {% endif %}
+    {% endfor %}
+
+    {% if recentlyViewed %}
+      <!-- You may also like -->
+      <div class="f-widget f-widget-featured-prods">
+        <header class="f-widget-header">
+          <strong class="f-widget-title">{{ "You recently viewed these items"|_ }}</strong>
+        </header>
+        {{ THIS.view('catalog/product/grid-tiles').set('products', recentlyViewed) | raw }}
+      </div>
+    {% endif %}
+
 {{ THIS.view('catalog/product/quickview') | raw }}
 <script>
     require(['jquery', 'responsiveslides', 'jquery.zoom'], function ($) {
         var pager = $('#product-rslides-pager');
         var quantityVariant = $('#quantity-variant');
         var priceVariant = $('#price-variant');
+        var skuVariant = $('#sku-variant');
         var displayAllImage = $('#display-all-image');
         $("#product-rslides").responsiveSlides({
             auto: false,
@@ -222,16 +227,75 @@
 
         $('#product-rslides li').addClass('zoom').zoom();
         var variants = $.parseJSON('{{ UTIL.toJson(variants.variants)|raw }}');
-        if (variants != null) {
-            priceVariant.html(variants[0].price);
-            if (variants[0].qty == 0) {
+        var fields = Object.keys(variants[0].fields);
+        var base_price = '{{ prod.get('base_price')| currency }}';
+        var sku_prod = '{{ prod.get('local_sku')}}';
+        var vr = [];
+        var firstOptions = [];
+        var beforeField = [];
+
+        if (variants.length > 0) {
+            variants.forEach(function(obj) {
+                if (obj.fields[fields[0]] == variants[0].fields[fields[0]]) {
+                    vr.push(obj);
+                }
+            })
+            if (variants[0].qty == 0 || variants[0].qty == '') {
                 quantityVariant.val(0);
+                $('#prod-in-stock').html('Items not available.');
                 $('#prod-add-to-card').prop('disabled', true);
+            } else {
+                quantityVariant.val(1);
+                $('#prod-in-stock').html(variants[0].qty + ' Items In Stock.');
+                $('#prod-add-to-card').prop('disabled', false);
+
             }
-            $('#prod-in-stock').html(variants[0].qty + ' Items In Stock.');
-            for (var val in variants[0].fields ) {
-                $('#'+ val).find('option[value="'+ variants[0].fields[val] +'"]').attr('selected', 'selected');
-            }
+            priceVariant.html(variants[0].price);
+            skuVariant.html(variants[0].sku);
+            fields.forEach(function (key) {
+                setUpField(beforeField, { field_code: key, value: variants[0].fields[key], current: null });
+                beforeField.push(key);
+            })
+        }
+
+
+        function setUpField(before, data) {
+            $('.variant').each(function () {
+                var self = this;
+
+                if (($(this).attr('name').indexOf(before) == -1 || before.length == 0) && $(this).attr('name') == data.field_code) {
+                    var first = true;
+                     if(before.length > 0) {
+                        first = false;
+                         $(self).html('');
+                     };
+                    var op = [];
+                    vr.forEach(function (obj) {
+                        if(first) {
+                            if (op.length == 0 && firstOptions.indexOf(data.value) != -1) {
+                                $(self).find('option[value="'+ obj.fields[data.field_code] +'"]').prop('selected', true);
+                            }
+                            op.push(obj.fields[data.field_code]);
+                        } else {
+                                var flag = true
+                                before.forEach(function(val) {
+                                    if (obj.fields[val] != $('#'+ val).val()) {
+                                        flag = false;
+                                    }
+                                })
+                                if (flag) {
+                                    if (op.indexOf(obj.fields[data.field_code]) == -1) {
+                                        $(self).append("<option value='"+ obj.fields[data.field_code] +"'>"+ obj.fields[data.field_code] +"</option>");
+                                    }
+                                    op.push(obj.fields[data.field_code]);
+                                }
+                        }
+                    })
+                    if (data.value != null) {
+                        $(self).find('option[value="'+ data.value +'"]').prop('selected', true);
+                    }
+                }
+            });
         }
         function displayImage(image) {
 
@@ -257,6 +321,31 @@
 
         $('.variant').change(function () {
             var find = null;
+            var self = this;
+            var beforeFlag = true;
+            beforeField = [];
+            vr = [];
+            variants.forEach(function(obj) {
+                if (obj.fields[$(self).attr('name')] == $(self).val()) {
+                    vr.push(obj);
+                }
+            })
+
+            fields.forEach(function (key) {
+                var data = { field_code: key, value: null, current: null };
+                if (beforeFlag) {
+                    beforeField.push(key);
+                    if (key == $(self).attr('name')) {
+//                    data.value = $('#' + key).val();
+//                    data.current = key;
+                      beforeFlag = false;
+                    }
+                } else {
+                    setUpField(beforeField, data);
+                }
+
+
+            });
             variants.forEach(function (obj) {
                 var correct = true;
                 $('.variant').each(function () {
@@ -271,20 +360,25 @@
             var image = [];
             displayAllImage.addClass('hidden');
             if (find == null || find.qty == 0 || find.qty == '') {
-                priceVariant.html("$0.00");
                 quantityVariant.val(0);
+                skuVariant.html(sku_prod);
+                if (find == null || find.price == '') {
+                    priceVariant.html(base_price);
+                }
                 $('#prod-in-stock').html('Items not available.');
                 $('#prod-add-to-card').prop('disabled', true);
             } else {
                 quantityVariant.val(1);
                 $('#prod-in-stock').html(find.qty + ' Items In Stock.');
                 $('#prod-add-to-card').prop('disabled', false);
-
             }
-            if (find != null && find.file_id != '') {
+            if (find != null) {
                 priceVariant.html(find.price);
-                image = find.file_id.split(',');
-                displayAllImage.removeClass('hidden');
+                skuVariant.html(find.sku);
+                if (find.file_id != '') {
+                    image = find.file_id.split(',');
+                    displayAllImage.removeClass('hidden');
+                }
             }
             displayImage(image);
         });

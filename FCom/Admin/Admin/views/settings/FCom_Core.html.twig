@@ -6,35 +6,35 @@
 {{ forms.accordion_start({id:'settings-FCom_Core'}) }}
     {% set fieldData = { model: c, id_prefix:'db', name_prefix:'config[db]', get_prefix:'db' } %}
     {{ forms.accordion_panel_start({label:'DB Settings'|_, id:'settings-FCom_Core-group0', in:1}) }}
-        {{ forms.input(fieldData|merge({ field:'host', label:'Host'|_ })) }}
-        {{ forms.input(fieldData|merge({ field:'port', label:'Port'|_ })) }}
-        {{ forms.input(fieldData|merge({ field:'dbname', label:'Database'|_ })) }}
-        {{ forms.input(fieldData|merge({ field:'username', label:'Username'|_ })) }}
-        {{ forms.input(fieldData|merge({ field:'password', label:'Password'|_, value:c.get('db/password')?'*****':'', type:'password', placeholder:'*****' })) }}
-        {{ forms.boolean(fieldData|merge({ field:'logging', label:'Enable Logging'|_ })) }}
-        {{ forms.boolean(fieldData|merge({ field:'implicit_migration', label:'Implicit Migration'|_ })) }}
+        {{ forms.input(fieldData, { field:'host', label:'Host'|_ }) }}
+        {{ forms.input(fieldData, { field:'port', label:'Port'|_ }) }}
+        {{ forms.input(fieldData, { field:'dbname', label:'Database'|_ }) }}
+        {{ forms.input(fieldData, { field:'username', label:'Username'|_ }) }}
+        {{ forms.input(fieldData, { field:'password', label:'Password'|_, value:c.get('db/password')?'*****':'', type:'password', placeholder:'*****' }) }}
+        {{ forms.boolean(fieldData, { field:'logging', label:'Enable Logging'|_ }) }}
+        {{ forms.boolean(fieldData, { field:'implicit_migration', label:'Implicit Migration'|_ }) }}
     {{ forms.accordion_panel_end }}
 
     {% set fieldData = { model:c, settings_module: 'FCom_Core' } %}
     {{ forms.accordion_panel_start({label:'Website'|_, id:'settings-FCom_Core-group1'}) }}
-        {{ forms.input(fieldData|merge({ field:'company_name', label:'Company Name'|_ })) }}
-        {{ forms.input(fieldData|merge({ field:'site_title', label:'Site Title'|_ })) }}
-        {{ forms.input(fieldData|merge({ field:'admin_email', label:'Admin Email'|_, type:'email' })) }}
-        {{ forms.input(fieldData|merge({ field:'sales_name', label:'Sales Name'|_ })) }}
-        {{ forms.input(fieldData|merge({ field:'sales_email', label:'Sales Email'|_, type:'email' })) }}
-        {{ forms.input(fieldData|merge({ field:'support_name', label:'Support Name'|_ })) }}
-        {{ forms.input(fieldData|merge({ field:'support_email', label:'Support Email'|_, type:'email' })) }}
-        {{ forms.input(fieldData|merge({ field:'copyright_message', label:'Copyright Message'|_ })) }}
+        {{ forms.input(fieldData, { field:'company_name', label:'Company Name'|_ }) }}
+        {{ forms.input(fieldData, { field:'site_title', label:'Site Title'|_ }) }}
+        {{ forms.input(fieldData, { field:'admin_email', label:'Admin Email'|_, type:'email' }) }}
+        {{ forms.input(fieldData, { field:'sales_name', label:'Sales Name'|_ }) }}
+        {{ forms.input(fieldData, { field:'sales_email', label:'Sales Email'|_, type:'email' }) }}
+        {{ forms.input(fieldData, { field:'support_name', label:'Support Name'|_ }) }}
+        {{ forms.input(fieldData, { field:'support_email', label:'Support Email'|_, type:'email' }) }}
+        {{ forms.input(fieldData, { field:'copyright_message', label:'Copyright Message'|_ }) }}
     {{ forms.accordion_panel_end }}
 
     {% set fieldData = { model: c, id_prefix:'config-cookie', name_prefix:'config[cookie]', get_prefix:'cookie' } %}
     {{ forms.accordion_panel_start({label:'Session'|_, id:'settings-FCom_Core-group2'}) }}
-        {{ forms.select(fieldData|merge({ field:'session_handler', label:'Session Handler'|_, options:SESSION.getHandlers() })) }}
-        {{ forms.input(fieldData|merge({ field:'remember_days', label:'Remember Me Timeout (days)'|_ })) }}
-        {{ forms.input(fieldData|merge({ field:'domain', label:'Cookie Domain'|_ })) }}
-        {{ forms.input(fieldData|merge({ field:'path', label:'Cookie Path'|_ })) }}
-        {{ forms.input(fieldData|merge({ field:'session_namespace', label:'Cookie Namespace'|_ })) }}
-        {{ forms.boolean(fieldData|merge({ field:'session_check_ip', label:'Verify Session IP'|_ })) }}
+        {{ forms.select(fieldData, { field:'session_handler', label:'Session Handler'|_, options:SESSION.getHandlers() }) }}
+        {{ forms.input(fieldData, { field:'remember_days', label:'Remember Me Timeout (days)'|_ }) }}
+        {{ forms.input(fieldData, { field:'domain', label:'Cookie Domain'|_ }) }}
+        {{ forms.input(fieldData, { field:'path', label:'Cookie Path'|_ }) }}
+        {{ forms.input(fieldData, { field:'session_namespace', label:'Cookie Namespace'|_ }) }}
+        {{ forms.boolean(fieldData, { field:'session_check_ip', label:'Verify Session IP'|_ }) }}
     {{ forms.accordion_panel_end }}
 
     {{ forms.accordion_panel_start({label:'System'|_, id:'settings-FCom_Core-group3'}) }}
@@ -44,10 +44,10 @@
     {% set fieldData = { model:c, name_prefix: 'config[core][cache]', id_prefix: 'config-core-cache', get_prefix:'core/cache',
         options:{'':'Enable in staging or production modes'|_, 'enable':'Enable always'|_, 'disable':'Disable always'|_} } %}
     {{ forms.accordion_panel_start({label:'Optimizations'|_, id:'settings-FCom_Core-group4'}) }}
-        {{ forms.select(fieldData|merge({field:'manifest_files', label:'Module Manifest Files Cache'|_ })) }}
-        {{ forms.select(fieldData|merge({field:'layout_files', label:'Layout Files Cache'|_ })) }}
-        {{ forms.select(fieldData|merge({field:'view_files', label:'View Template Files Cache'|_ })) }}
-        {{ forms.select(fieldData|merge({field:'twig', label:'Twig Cache'|_ })) }}
+        {{ forms.select(fieldData, {field:'manifest_files', label:'Module Manifest Files Cache'|_ }) }}
+        {{ forms.select(fieldData, {field:'layout_files', label:'Layout Files Cache'|_ }) }}
+        {{ forms.select(fieldData, {field:'view_files', label:'View Template Files Cache'|_ }) }}
+        {{ forms.select(fieldData, {field:'twig', label:'Twig Cache'|_ }) }}
     {{ forms.accordion_panel_end }}
 
     {{ forms.accordion_panel_start({label:'CSRF Protection'|_, id:'settings-FCom_Core-group5'}) }}

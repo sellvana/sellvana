@@ -11,9 +11,9 @@
         </div>
     {{ forms.accordion_panel_end }}
     {{ forms.accordion_panel_start({label:'Cron Dispatch'|_, id:'settings-FCom_Cron-group1'}) }}
-        {{ forms.input(fieldData|merge({field:'leeway_mins', label:'Leeway Minutes'|_ })) }}
-        {{ forms.input(fieldData|merge({field:'timeout_mins', label:'Timeout Minutes'|_ })) }}
-        {{ forms.input(fieldData|merge({field:'wait_sec', label:'Wait Seconds'|_ })) }}
+        {{ forms.input(fieldData, {field:'leeway_mins', label:'Leeway Minutes'|_ }) }}
+        {{ forms.input(fieldData, {field:'timeout_mins', label:'Timeout Minutes'|_ }) }}
+        {{ forms.input(fieldData, {field:'wait_sec', label:'Wait Seconds'|_ }) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
 

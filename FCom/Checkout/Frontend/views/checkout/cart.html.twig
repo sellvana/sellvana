@@ -3,8 +3,7 @@
 {% set cartItems = cart.items() %}
 {% set shipping_estimates = SESSION.get('shipping_estimate') %}
 {% set checkout_methods = APP.instance('FCom_Sales_Main').getCheckoutMethods() %}
-<div class="f-site-main" role="main">
-  <div class="container">
+
     <header class="f-page-header">
       <h1 class="f-page-title">{{ 'Shopping Cart' }}</h1>
     </header>
@@ -54,7 +53,7 @@
                         <td class="f-cart-col-price text-right">
                           <div class="f-price-group {{ loggedIn ? 'logged-in' : 'logged-out' }}">
                             <span class="f-reg-price">
-                              <span class="f-price">{{ p.get('base_price') | currency }}</span>
+                              <span class="f-price">{{ item.get('price') | currency }}</span>
                             </span>
                           </div>
                         </td>
@@ -115,6 +114,5 @@
       </div>
     </div>
 {% endif %}
-  </div>
-</div>
+
 

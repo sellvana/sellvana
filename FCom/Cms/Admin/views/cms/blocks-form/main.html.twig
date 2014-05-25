@@ -7,10 +7,10 @@
 {% set fieldData = { validator: validator } %}
 <fieldset class="form-horizontal">
     <div class="f-section">
-        {{ forms.input(fieldData|merge({field:'handle', label:'Handle'|_, required: 1})) }}
-        {{ forms.input(fieldData|merge({field:'description', label:'Description'|_})) }}
-        {{ forms.select(fieldData|merge({field:'renderer', label:'Content Format'|_, options: LAYOUT.getAllRenderers(true)})) }}
-        {{ forms.textarea(fieldData|merge({field:'content', label:'Content'|_,  input_class: "ckeditor", input_div_class: "col-md-10"})) }}
+        {{ forms.input(fieldData, {field:'handle', label:'Handle'|_, required: 1}) }}
+        {{ forms.input(fieldData, {field:'description', label:'Description'|_}) }}
+        {{ forms.select(fieldData, {field:'renderer', label:'Content Format'|_, options: LAYOUT.getAllRenderers(true)}) }}
+        {{ forms.textarea(fieldData, {field:'content', label:'Content'|_,  input_class: "ckeditor", input_div_class: "col-md-10"}) }}
     </div>
 </fieldset>
 

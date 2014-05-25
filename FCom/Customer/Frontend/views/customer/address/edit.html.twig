@@ -1,7 +1,6 @@
 {% set validator = THIS.validator('address-form', THIS.get('address')) %}
 {% set address = THIS.get('address') %}
-<div class="f-site-main" role="main">
-  <div class="container">
+
     <div class="row f-mb-slideout-menu">
       <div class="col-sm-9 f-col-main">
         <header class="f-page-header">
@@ -109,8 +108,7 @@
       </div> <!-- /.f-col-main -->
       {{ THIS.view('customer/account/sidebar').set('current', 'addresses') | raw }}
     </div>
-  </div>
-</div>
+
 <script>
   require(['jquery', 'jquery.validate'], function($) {
     $( "#button" ).click(function() {
