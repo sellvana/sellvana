@@ -1,7 +1,6 @@
 {% set validator = THIS.validator(THIS.get('formId')) %}
 {% set password_strength = CONFIG.get('modules/FCom_Customer/password_strength') ? 'true' : 'false' %}
-<div class="f-site-main" role="main">
-  <div class="container">
+
     {{ THIS.view('core/messages') | raw }}
     <form action="{{ APP.href('customer/register') }}" method="post" id="register-form" role="form">
       <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
@@ -63,8 +62,7 @@
         </div>
       </fieldset>
     </form>
-  </div>
-</div>
+
 <script>
 require(['jquery', 'jquery.validate', 'fcom.password'], function($) {
     $(function() {

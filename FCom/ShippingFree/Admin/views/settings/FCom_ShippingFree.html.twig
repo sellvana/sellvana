@@ -4,6 +4,6 @@
 <h2>{{ "Free shipping settings" | _}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_ShippingFree'}) }}
      {{ forms.accordion_panel_start({label:'Free shipping'|_, id:'settings-FCom_ShippingFree-group0', in:1}) }}
-        {{ forms.boolean(fieldData|merge({field:'active', label:'Enabled'|_ })) }}
+        {{ forms.boolean(fieldData, {field:'active', label:'Enabled'|_ }) }}
      {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

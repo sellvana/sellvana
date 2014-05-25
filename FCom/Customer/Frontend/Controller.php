@@ -122,6 +122,12 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     public function action_password_reset()
     {
         $token = BRequest::i()->request('token');
+        if ($token) {
+            $sessData =& BSession::i()->dataToUpdate();
+            $sessData['password_reset_token'] = $token;
+            BResponse::i()->redirect('customer/password/reset');
+        }
+        $token = BSession::i()->get('password_reset_token');
         if ($token && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token')) && $user->token === $token) {
             $this->layout('/customer/password/reset');
         } else {
@@ -133,16 +139,25 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     public function action_password_reset__POST()
     {
         $r = BRequest::i();
-        $token = $r->request('token');
+        $token = BSession::i()->get('password_reset_token');
         $password = $r->post('password');
         $confirm = $r->post('password_confirm');
         if ($token && $password && $password === $confirm
             && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token'))
             && $user->get('token') === $token
         ) {
+            $sessData =& BSession::i()->dataToUpdate();
+            $sessData['password_reset_token'] = null;
+
             $user->resetPassword($password);
-            $this->message('Password has been reset');
-            BResponse::i()->redirect(BApp::baseUrl());
+            if ($user->status === 'active') {
+                $this->message('Password has been reset');
+                $user->login();
+                BResponse::i()->redirect(BApp::baseUrl());
+            } else {
+                $this->message('Password has been reset. You will be able to login after your account is approved');
+                BResponse::i()->redirect('login');
+            }
         } else {
             $this->message('Invalid form data', 'error');
             BResponse::i()->redirect('login');

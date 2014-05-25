@@ -415,6 +415,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
+
         $model = $args['model'];
         $data = BRequest::i()->post();
 
@@ -427,6 +428,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 $this->processLinkedProductsPost($model, $data);
                 $this->processMediaPost($model, $data);
                 $this->processCustomFieldPost($model, $data);
+                $this->processStockPolicyPost($model, $data);
                 $this->processVariantPost($model, $data);
                 $this->processSystemLangFieldsPost($model, $data);
                 $this->processFrontendPost($model, $data);
@@ -595,9 +597,27 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $model->save();
     }
 
+    public function processStockPolicyPost($model, $data)
+    {
+        if (!empty($data['stock_policy'])) {
+            $model->setData('stock_policy', $data['stock_policy']);
+            $model->save();
+        }
+    }
+
     public function processVariantPost($model, $data)
     {
         if (!empty($data['vfields'])) {
+            $modelFieldOption = FCom_CustomField_Model_FieldOption::i();
+            $vfields = json_decode($data['vfields'], true);
+            foreach ($vfields as $f) {
+                $op = FCom_CustomField_Model_FieldOption::i()->getListAssocById($f['id']);
+                $arr_diff = array_diff($f['options'], $op);
+                foreach($arr_diff as $val) {
+                    $modelFieldOption->create(['field_id' => $f['id'], 'label' => $val])->save();
+                }
+            }
+
             $model->setData('variants_fields', json_decode($data['vfields'], true));
         }
         if (!empty($data['variants'])) {

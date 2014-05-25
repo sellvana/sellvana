@@ -1,6 +1,5 @@
 {% set validator = THIS.validator('address-form', THIS.get('address')) %}
-<div class="f-site-main" role="main">
-  <div class="container">
+
     <div class="f-checkout-form">
       <header class="f-page-header">
         <h1 class="f-page-title">{{ 'Shipping Address'|_ }}</h1>
@@ -96,8 +95,7 @@
         </fieldset>
       </form>
     </div>
-  </div>
-</div>
+
 <script>
 require(['jquery', 'jquery.validate'], function($) {
     $(function() {

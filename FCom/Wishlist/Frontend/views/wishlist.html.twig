@@ -1,6 +1,5 @@
 {% set wishlist = THIS.get('wishlist').items() %}
-<div class="f-site-main" role="main">
-    <div class="container">
+
         <div class="row f-mb-slideout-menu">
             <div class="col-sm-9 f-col-main">
             <header class="f-page-header">
@@ -59,11 +58,10 @@
             {% else %}
                 <div class="alert alert-info">{{ "There are no products in wishlist" | _ }}.</div>
             {% endif %}
+            </div>
+            {{ THIS.view('customer/account/sidebar').set('current', 'wishlist') | raw }}
         </div>
-        {{ THIS.view('customer/account/sidebar').set('current', 'wishlist') | raw }}
-    </div>
-  </div>
-</div>
+
 <script>
   require(['jquery'], function($) {
     $( "#button" ).click(function() {

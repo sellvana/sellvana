@@ -1,7 +1,6 @@
 {% set category = APP.get('current_category') %}
 {% set parts = category.getPageParts(true) %}
-<div class="f-site-main" role="main">
-  <div class="container">
+
     {{ THIS.view('breadcrumbs') | raw }}
     <header class="f-page-header visible-xs">
       <span class="f-page-title">{{ category.get('node_name') }}</span>
@@ -74,8 +73,7 @@
         <!-- Sidebar End -->
       {% endif %}
     </div>
-  </div>
-</div>
+
 <script>
   require(['jquery'], function($) {
     $( "#button" ).click(function() {

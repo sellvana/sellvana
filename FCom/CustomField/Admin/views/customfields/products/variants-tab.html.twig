@@ -32,7 +32,6 @@ function updateListVariantImage(imageObject) {
         });
     }
 }
-
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.validate'], function(Backbone, _, $) {
     var fieldCollection = null;
     var vColsCollection = null;
@@ -70,6 +69,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
             var colsJson = vColsCollection.toJSON();
             this.$el.find('input.select-value-field').each(function(obj) {
                 var name = $(this).attr('name');
+                var selfValue = this;
                 var field = self.model.get('fields');
                 var tmp = _.findWhere(colsJson, {name: name}).options;
                 var arr = $.map(tmp, function(value, key) {
@@ -78,7 +78,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                 if (typeof (_.findWhere(options, {name: name})) === 'undefined') {
                     options.push({name: name, options: arr});
                 }
-                $(this).select2({
+                var sel2 = $(this).select2({
                     placeholder: 'Select field value',
                     allowClear: true,
                     data: function() {
@@ -88,29 +88,50 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                         if ( $(data).filter( function() {
                             return this.text.localeCompare(term)===0;
                         }).length===0) {
-                            return {id:term, text:term};
+                            return {id:term.toLowerCase(), text:term.toLowerCase()};
                         }
                     }
-                });
+                }).data('select2');
+                sel2.onSelect = (function(fn) {
+                    return function(data, op) {
+                        var target;
+
+                        if (op != null) {
+                            target = $(op.target);
+                        }
+
+                        if (target && target.hasClass('remove-value-field')) {
+                            if (data.id == $(selfValue).val()) {
+                                $(selfValue).select2('val', '');
+                            }
+                            _.findWhere(options, {name: name}).options = _.filter(_.findWhere(options, {name: name}).options, function (num) {
+                                return num.text != data.text;
+                            });
+                            target.parents('li').addClass('hide');
+                        } else {
+                            return fn.apply(this, arguments);
+                        }
+                    }
+                })(sel2.onSelect);
                 if (field != '' && typeof (field[name]) !== 'undefined') {
                     $(this).select2('val', field[name]);
                 }
             });
+
             this.$el.find('input.select-value-field').on('change', function(e) {
                 var el = $(e.target);
                 var name = el.attr('name');
                 var val = $(this).val();
                 if (val != '' && typeof (_.findWhere(_.findWhere(options, {name: name}).options, {id: val, text: val})) === 'undefined') {
-                    var confirm = window.confirm("Do you want to really create new value?");
+                    var confirm = window.confirm("Do you want to really create this value?");
                     if (confirm) {
                         _.findWhere(options, {name: name}).options.push({id: val, text: val});
                     } else {
                         $(this).select2('val', '');
                     }
-
                 }
             }).on('select2-open', function(val, obj) {
-                $('ul.select2-results').find('.select2-result-label').append('<i onclick="test11()" class="icon-remove" style="float:right;"></i>');
+               // $('ul.select2-results').find('.select2-result-label').append('<i class="icon-remove remove-value-field" style="float:right;color: #aaa"></i>');
             });
             variantThumbUrl = thumb_url = this.model.get('thumb_url');
             var imageId = [];
@@ -205,14 +226,14 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
 
     function vFieldGridInit() {
         var mapField = fieldCollection.map(function (obj) {
-            return {id: obj.id, name: obj.get('name'), field_code: obj.get('field_code')};
+            return {id: obj.id, name: obj.get('name'), field_code: obj.get('field_code'), frontend_label: obj.get('frontend_label')};
         });
         vColsCollection.each(function (obj) {
             mapField.forEach(function (field) {
                 if (field.id == obj.get('field_id')) {
                     $("#sel_var_field option[value='"+field.id+"']").remove();
                     var fields = '<li class="dd-item dd3-item"><div class="icon-ellipsis-vertical dd-handle dd3-handle"></div><div class="dd3-content">' +
-                            '<label>'+ field.name +'</label> <i data-name="'+ field.name +'" data-code="'+ field.field_code +'" data-id="'+ field.id +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
+                            '<label>'+ field.name +'</label> <i data-frontend-label="'+ field.frontend_label +'"  data-name="'+ field.name +'" data-code="'+ field.field_code +'" data-id="'+ field.id +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
                     vField.append(fields);
                 }
             });
@@ -242,7 +263,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                 id: $(this).attr('data-id'),
                 field_code: $(this).attr('data-code'),
                 options: op,
-                name: $(this).attr('data-name')
+                name: $(this).attr('data-name'),
+                frontend_label: $(this).attr('data-frontend-label')
             });
             tmp_fields.push($(this).attr('data-code'));
         });
@@ -280,7 +302,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
         }
         var text = selected.text();
         var field_code = selected.attr('data-code');
-        fieldCollection.add({id: val, name: text , field_code: field_code});
+        var frontend_label = selected.attr('data-frontend-label');
+        fieldCollection.add({id: val, name: text , field_code: field_code, frontend_label: frontend_label});
         fieldCollection.trigger('render');
 
         $("#sel_var_field option[value='"+val+"']").remove();
@@ -292,7 +315,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                         addColumn(text, response.options, val, field_code);
                         vRowsCollection.each( function(row) { row.set(text, ''); } );
                         var fields = '<li class="dd-item dd3-item"><div class="icon-ellipsis-vertical dd-handle dd3-handle"></div><div class="dd3-content">' +
-                                '<label>'+ text +'</label> <i data-code="'+ field_code +'" data-name="'+ text +'" data-id="'+ val +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
+                                '<label>'+ text +'</label> <i data-frontend-label="'+ frontend_label +'"  data-code="'+ field_code +'" data-name="'+ text +'" data-id="'+ val +'" class="icon-remove pull-right btn-link btn-delete-field"></i></div></li>';
                         vField.append(fields);
                         renderGrid();
                     }
@@ -408,7 +431,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                 row = r.attributes;
             }
         });
-        var option = '<option data-code="'+ row.field_code +'" value="'+row.id+'">'+row.name+'</option>';
+        var option = '<option data-frontend-label="'+ row.field_code +'" data-code="'+ row.field_code +'" value="'+row.id+'">'+row.name+'</option>';
         $('#sel_var_field').append(option);
         resetSelect();
         removeColumn({name: row.field_code});

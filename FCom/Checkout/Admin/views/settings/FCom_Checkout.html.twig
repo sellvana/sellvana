@@ -4,9 +4,9 @@
 <h2>{{ "Checkout Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Checkout'}) }}
      {{ forms.accordion_panel_start({label:'Store Origin'|_, id:'settings-FCom_Checkout-group0', in:1}) }}
-        {{ forms.input(fieldData|merge({field:'store_city', label:'Store City'|_ })) }}
-        {{ forms.input(fieldData|merge({field:'store_region', label:'Store State / Region'|_ })) }}
-        {{ forms.input(fieldData|merge({field:'store_postcode', label:'Store Zip / Postal Code'|_ })) }}
+        {{ forms.input(fieldData, {field:'store_city', label:'Store City'|_ }) }}
+        {{ forms.input(fieldData, {field:'store_region', label:'Store State / Region'|_ }) }}
+        {{ forms.input(fieldData, {field:'store_postcode', label:'Store Zip / Postal Code'|_ }) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
 

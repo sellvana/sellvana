@@ -7,8 +7,8 @@
 {% set fieldData = { validator: validator } %}
 <div class="f-section">
 <fieldset class="form-horizontal">
-    {{ forms.input(fieldData|merge({field:'name', label:'Name'|_, required: 1 })) }}
-    {{ forms.input(fieldData|merge({field:'url_key', label:'URL Key'|_, required: 1 })) }}
-    {{ forms.textarea(fieldData|merge({field:'description', label:'Description'|_, input_class: "ckeditor", input_div_class: "col-md-10" })) }}
+    {{ forms.input(fieldData, {field:'name', label:'Name'|_, required: 1 }) }}
+    {{ forms.input(fieldData, {field:'url_key', label:'URL Key'|_, required: 1 }) }}
+    {{ forms.textarea(fieldData, {field:'description', label:'Description'|_, input_class: "ckeditor", input_div_class: "col-md-10" }) }}
 </fieldset>
 </div>

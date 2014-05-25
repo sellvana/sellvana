@@ -13,47 +13,47 @@
 
     {% set fieldData = { model: c, id_prefix: 'authorizenet_aim', name_prefix: 'config[modules][FCom_AuthorizeNet][aim]', get_prefix:'modules/FCom_AuthorizeNet/aim' } %}
     {{ forms.accordion_panel_start({label:'Authorize.net API'|_, id:'settings-FCom_AuthorizeNet-group0', in:1}) }}
-        {{ forms.boolean(fieldData|merge({field:'active', label:'Enabled'|_ })) }}
-        {{ forms.input(fieldData|merge(  {field:'sort_order', label:'Payment Method Order'|_ })) }}
-        {{ forms.input(fieldData|merge(  {field:'title', label:'Title'|_ })) }}
-        {{ forms.input(fieldData|merge(  {field:'login', label:'API Login ID'|_, type: "password" })) }}
-        {{ forms.input(fieldData|merge(  {field:'trans_key', label:'API Transaction Key'|_, type: "password" })) }}
-        {{ forms.select(fieldData|merge( {field:'payment_action', label:'Payment Action'|_, options: paymentActions })) }}
-        {{ forms.select(fieldData|merge( {field:'order_status', label:'New Order Status'|_, options: orderStatuses })) }}
-        {{ forms.boolean(fieldData|merge({field:'test', label:'Sandbox Mode'|_ })) }}
-        {{ forms.input(fieldData|merge(  {field:'cgi_url', label:'Gateway URL'|_, attr: 'data-rule-number="true"', value: gatewayUrl })) }}
-        {{ forms.select(fieldData|merge( {field:'currency', label:'Accepted Currency'|_, options: currencies })) }}
-        {{ forms.boolean(fieldData|merge({field:'email_customer', label:'Email Customer'|_ })) }}
-        {{ forms.input(fieldData|merge(  {field:'merchant_email', label:'Merchant\'s Email'|_, attr: 'data-rule-number="true"' })) }}
-        {{ forms.select(fieldData|merge( {field:'cctypes', label:'Credit Card Types'|_, options: cardTypes, attr: 'multiple="multiple"'})) }}
-        {{ forms.boolean(fieldData|merge({field:'useccv', label:'Credit Card Verification'|_ })) }}
-        {{ forms.select(fieldData|merge( {field:'allowspecific', label:'Payment from Applicable Countries'|_, options: {0:'All Allowed Countries', 1:'Specific Countries'} })) }}
-        {{ forms.select(fieldData|merge( {field:'specific_country', label:'Payment from Specific Countries'|_, options: countries, attr: 'multiple="multiple"'})) }}
-        {{ forms.boolean(fieldData|merge({field:'allow_partial_authorization', label:'Allow Partial Authorization'|_ })) }}
+        {{ forms.boolean(fieldData, {field:'active', label:'Enabled'|_ }) }}
+        {{ forms.input(fieldData,   {field:'sort_order', label:'Payment Method Order'|_ }) }}
+        {{ forms.input(fieldData,   {field:'title', label:'Title'|_ }) }}
+        {{ forms.input(fieldData,   {field:'login', label:'API Login ID'|_, type: "password" }) }}
+        {{ forms.input(fieldData,   {field:'trans_key', label:'API Transaction Key'|_, type: "password" }) }}
+        {{ forms.select(fieldData,  {field:'payment_action', label:'Payment Action'|_, options: paymentActions }) }}
+        {{ forms.select(fieldData,  {field:'order_status', label:'New Order Status'|_, options: orderStatuses }) }}
+        {{ forms.boolean(fieldData, {field:'test', label:'Sandbox Mode'|_ }) }}
+        {{ forms.input(fieldData,   {field:'cgi_url', label:'Gateway URL'|_, attr: 'data-rule-number="true"', value: gatewayUrl }) }}
+        {{ forms.select(fieldData,  {field:'currency', label:'Accepted Currency'|_, options: currencies }) }}
+        {{ forms.boolean(fieldData, {field:'email_customer', label:'Email Customer'|_ }) }}
+        {{ forms.input(fieldData,   {field:'merchant_email', label:'Merchant\'s Email'|_, attr: 'data-rule-number="true"' }) }}
+        {{ forms.select(fieldData,  {field:'cctypes', label:'Credit Card Types'|_, options: cardTypes, attr: 'multiple="multiple"'}) }}
+        {{ forms.boolean(fieldData, {field:'useccv', label:'Credit Card Verification'|_ }) }}
+        {{ forms.select(fieldData,  {field:'allowspecific', label:'Payment from Applicable Countries'|_, options: {0:'All Allowed Countries', 1:'Specific Countries'} }) }}
+        {{ forms.select(fieldData,  {field:'specific_country', label:'Payment from Specific Countries'|_, options: countries, attr: 'multiple="multiple"'}) }}
+        {{ forms.boolean(fieldData, {field:'allow_partial_authorization', label:'Allow Partial Authorization'|_ }) }}
     {{ forms.accordion_panel_end }}
 
     {% set fieldData = { model: c, id_prefix: 'authorizenet_dpm', name_prefix: 'config[modules][FCom_AuthorizeNet][dpm]', get_prefix:'modules/FCom_AuthorizeNet/dpm' } %}
     {{ forms.accordion_panel_start({label:'Authorize.net Direct Post Method API'|_, id:'settings-FCom_AuthorizeNet-group1'}) }}
-        {{ forms.boolean(fieldData|merge({field:'active', label:'Enabled'|_ })) }}
-        {{ forms.input(fieldData|merge(  {field:'title', label:'Title'|_ })) }}
-        {{ forms.input(fieldData|merge(  {field:'login', label:'API Login ID'|_, type: "password" })) }}
-        {{ forms.input(fieldData|merge(  {field:'trans_key', label:'Transaction Key'|_, type: "password" })) }}
-        {{ forms.input(fieldData|merge(  {field:'trans_md5', label:'Merchant MD5'|_, type: "password" })) }}
-        {{ forms.select(fieldData|merge( {field:'payment_action', label:'Payment Action'|_, options: paymentActions })) }}
-        {{ forms.select(fieldData|merge( {field:'order_status', label:'New Order Status'|_, options: orderStatuses })) }}
-        {{ forms.boolean(fieldData|merge({field:'test', label:'Test Mode'|_ })) }}
-        {{ forms.input(fieldData|merge(  {field:'cgi_url', label:'Gateway URL'|_, value: gatewayUrl })) }}
-        {{ forms.select(fieldData|merge( {field:'currency', label:'Accepted Currency'|_, options: currencies })) }}
-        {{ forms.boolean(fieldData|merge({field:'debug', label:'Debug'|_ })) }}
-        {{ forms.boolean(fieldData|merge({field:'email_customer', label:'Email Customer'|_ })) }}
-        {{ forms.input(fieldData|merge(  {field:'merchant_email', label:'Merchant\'s Email'|_ })) }}
-        {{ forms.select(fieldData|merge( {field:'cctypes', label:'Credit Card Types'|_, attr: ' multiple="multiple"', options: cardTypes })) }}
-        {{ forms.boolean(fieldData|merge({field:'useccv', label:'Credit Card Verification'|_ })) }}
-        {{ forms.select(fieldData|merge( {field:'allowspecific', label:'Payment from Applicable Countries'|_, options: {0:'All Allowed Countries', 1:'Specific Countries'} })) }}
-        {{ forms.select(fieldData|merge( {field:'specificcountry', label:'Payment from Specific Countries'|_, attr: 'multiple="multiple"', options: countries })) }}
-        {{ forms.input(fieldData|merge(  {field:'min_order_total', label:'Minimum Order Total'|_ })) }}
-        {{ forms.input(fieldData|merge(  {field:'max_order_total', label:'Maximum Order Total'|_ })) }}
-        {{ forms.input(fieldData|merge(  {field:'sort_order', label:'Sort Order'|_ })) }}
+        {{ forms.boolean(fieldData, {field:'active', label:'Enabled'|_ }) }}
+        {{ forms.input(fieldData,   {field:'title', label:'Title'|_ }) }}
+        {{ forms.input(fieldData,   {field:'login', label:'API Login ID'|_, type: "password" }) }}
+        {{ forms.input(fieldData,   {field:'trans_key', label:'Transaction Key'|_, type: "password" }) }}
+        {{ forms.input(fieldData,   {field:'trans_md5', label:'Merchant MD5'|_, type: "password" }) }}
+        {{ forms.select(fieldData,  {field:'payment_action', label:'Payment Action'|_, options: paymentActions }) }}
+        {{ forms.select(fieldData,  {field:'order_status', label:'New Order Status'|_, options: orderStatuses }) }}
+        {{ forms.boolean(fieldData, {field:'test', label:'Test Mode'|_ }) }}
+        {{ forms.input(fieldData,   {field:'cgi_url', label:'Gateway URL'|_, value: gatewayUrl }) }}
+        {{ forms.select(fieldData,  {field:'currency', label:'Accepted Currency'|_, options: currencies }) }}
+        {{ forms.boolean(fieldData, {field:'debug', label:'Debug'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'email_customer', label:'Email Customer'|_ }) }}
+        {{ forms.input(fieldData,   {field:'merchant_email', label:'Merchant\'s Email'|_ }) }}
+        {{ forms.select(fieldData,  {field:'cctypes', label:'Credit Card Types'|_, attr: ' multiple="multiple"', options: cardTypes }) }}
+        {{ forms.boolean(fieldData, {field:'useccv', label:'Credit Card Verification'|_ }) }}
+        {{ forms.select(fieldData,  {field:'allowspecific', label:'Payment from Applicable Countries'|_, options: {0:'All Allowed Countries', 1:'Specific Countries'} }) }}
+        {{ forms.select(fieldData,  {field:'specificcountry', label:'Payment from Specific Countries'|_, attr: 'multiple="multiple"', options: countries }) }}
+        {{ forms.input(fieldData,   {field:'min_order_total', label:'Minimum Order Total'|_ }) }}
+        {{ forms.input(fieldData,   {field:'max_order_total', label:'Maximum Order Total'|_ }) }}
+        {{ forms.input(fieldData,   {field:'sort_order', label:'Sort Order'|_ }) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
 

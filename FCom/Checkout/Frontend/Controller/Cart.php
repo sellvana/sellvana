@@ -32,19 +32,58 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
             switch ($post['action']) {
             case 'add':
                 $p = FCom_Catalog_Model_Product::i()->load($post['id']);
-                if (!$p) {
-                    // todo add message to be displayed
-                    BResponse::i()->redirect('/');
+                $data_serialized = BUtil::objectToArray(json_decode($p->data_serialized));
+                $price = $p->base_price;
+                $qty = !empty($post['qty']) ? $post['qty'] : 1;
+                if (isset($data_serialized['variants'])) {
+                   $validate = false;
+                   foreach($data_serialized['variants'] as $variant) {
+                       $tmp = [];
+                       foreach ($variant['fields'] as $key => $val) {
+                           if ($post[$key] == $val) {
+                               $tmp[$key] = $val;
+                           }
+                       }
+                       if (in_array($tmp, $variant)) {
+                           $validate = true;
+                           $price = ($variant['price'] != '')? $variant['price'] : $price;
+                           if ($variant['qty'] == '' || $variant['qty'] == 0) {
+                               $validate = false;
+                           }
+                           if ($qty > $variant['qty']) {
+                               $qty = $variant['qty'];
+                               $this->message('This product variant current has '.$qty.' items in stock .', 'info');
+                           }
+                           if ($qty == 0) {
+                               $this->message('Quantity must be larger 0.', 'error');
+                               $validate = false;
+                           }
+                       }
+                   }
+                } else {
+                    $validate = true;
+                }
+                if ($validate) {
+                    $p = FCom_Catalog_Model_Product::i()->load($post['id']);
+                    if (!$p) {
+                        // todo add message to be displayed
+                        BResponse::i()->redirect('/');
+                        return;
+                    }
+
+                    $options = ['qty' => $qty, 'price' => $price];
+                    if (Bapp::m('FCom_Customer') && FCom_Customer_Model_Customer::isLoggedIn()) {
+                        $cart->customer_id = FCom_Customer_Model_Customer::sessionUserId();
+                        $cart->save();
+                    }
+                    $cart->addProduct($p->id(), $options)->calculateTotals()->save();
+                    $this->message('The product has been added to your cart');
+                } else {
+                    $this->message('This product variant does not exists. Please choose other', 'error');
+                    BResponse::i()->redirect(BApp::href($p->local_sku));
                     return;
                 }
-                $qty = !empty($post['qty']) ? $post['qty'] : 1;
-                $options = ['qty' => $qty, 'price' => $p->base_price];
-                if (Bapp::m('FCom_Customer') && FCom_Customer_Model_Customer::isLoggedIn()) {
-                    $cart->customer_id = FCom_Customer_Model_Customer::sessionUserId();
-                    $cart->save();
-                }
-                $cart->addProduct($p->id(), $options)->calculateTotals()->save();
-                $this->message('The product has been added to your cart');
+
                 break;
             }
         } else {

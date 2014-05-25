@@ -3,14 +3,14 @@
 {% import THIS.view('admin/form-elements').twigName() as forms %}
 {{ forms.accordion_start({id:'settings-FCom_PaymentIdeal'}) }}
      {{ forms.accordion_panel_start({label:'iDEAL Settings'|_, id:'settings-FCom_PaymentIdeal-group0', in:1}) }}
-        {{ forms.boolean(fieldData|merge({field:'active', label:'Enabled'|_ })) }}
-        {{ forms.input(fieldData|merge({field:'title', label:'Display Title'|_ })) }}
-        {{ forms.input(fieldData|merge({field:'partner_id', label:'Pertner ID'|_ })) }}
-        {{ forms.input(fieldData|merge({field:'profile_key', label:'Profile Key'|_ })) }}
-        {{ forms.input(fieldData|merge({field:'sort_order', label:'Payment Method Sort Order'|_ })) }}
-        {{ forms.select(fieldData|merge({field:'order_status', label:'New Order Status'|_, options: {'':'Select One', 'processing':'Processing'} })) }}
-        {{ forms.input(fieldData|merge({field:'recent_day', label:'Orders Recent Days'|_, attr: 'data-rule-number="true"' })) }}
-        {{ forms.boolean(fieldData|merge({field:'test', label:'Test Mode'|_ })) }}
+        {{ forms.boolean(fieldData, {field:'active', label:'Enabled'|_ }) }}
+        {{ forms.input(fieldData, {field:'title', label:'Display Title'|_ }) }}
+        {{ forms.input(fieldData, {field:'partner_id', label:'Pertner ID'|_ }) }}
+        {{ forms.input(fieldData, {field:'profile_key', label:'Profile Key'|_ }) }}
+        {{ forms.input(fieldData, {field:'sort_order', label:'Payment Method Sort Order'|_ }) }}
+        {{ forms.select(fieldData, {field:'order_status', label:'New Order Status'|_, options: {'':'Select One', 'processing':'Processing'} }) }}
+        {{ forms.input(fieldData, {field:'recent_day', label:'Orders Recent Days'|_, attr: 'data-rule-number="true"' }) }}
+        {{ forms.boolean(fieldData, {field:'test', label:'Test Mode'|_ }) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
 

@@ -103,20 +103,23 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 
     static public function getTopNavCategories($maxLevel = 1)
     {
+        $orm = static::orm()->order_by_asc('sort_order');
         if (BConfig::i()->get('modules/FCom_Frontend/nav_top/type') == 'categories_root') {
             $rootId = BConfig::i()->get('modules/FCom_Frontend/nav_top/root_category');
             if (!$rootId) {
                 $rootId = 1;
             }
-            $categories = static::orm()->where('parent_id', $rootId)->find_many_assoc();
+            $orm->where('parent_id', $rootId);
         } else {
-            $categories = static::orm()->where('top_menu', 1)->find_many_assoc();
+            $orm->where('top_menu', 1);
         }
+        $categories = $orm->find_many_assoc();
         if ($maxLevel === 2) {
             if (sizeof($categories) === 0) {
                 $subcats = [];
             } else {
-                $subcats = static::orm()->where_in('parent_id', array_keys($categories))->find_many();
+                $subcats = static::orm()->where_in('parent_id', array_keys($categories))
+                    ->order_by_asc('parent_id')->order_by_asc('sort_order')->find_many();
             }
             $children = [];
             foreach ($subcats as $sc) {
