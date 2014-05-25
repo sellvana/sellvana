@@ -1619,16 +1619,16 @@ class BORM extends ORMWrapper
 
         #$s['c'] = 600000;
         if (empty($s['c'])) {
-            $cntOrm = clone $this; // clone ORM to count              
+            $cntOrm = clone $this; // clone ORM to count
             // Change the way we calculate count if grouping is detected in query
             if ( count($cntOrm->_group_by) ) {
                 $cntQuery = $this->as_sql(false);
                 $cntFilters = $this->_build_values();
                 $s[ 'c' ] = BORM::i()->raw_query( "SELECT COUNT(*) AS count FROM ($cntQuery) AS cntCount", $cntFilters )->find_one()->count;
                 unset( $cntQuery, $cntFilters ); // free mem
-            } else {         
+            } else {
                 $s[ 'c' ] = $cntOrm->count(); // total row count
-            }        
+            }
             unset( $cntOrm ); // free mem
         }
 
@@ -1689,7 +1689,7 @@ class BORM extends ORMWrapper
         if (count($this->_where_conditions) === 0) {
             return [];
         }
-        
+
         $values = [];
         foreach ($this->_where_conditions as $condition) {
                 $values[] = $condition[static::WHERE_VALUES][0];
@@ -2188,12 +2188,12 @@ class BModel extends Model
         return $model;
     }
 
-    /** 
+    /**
      * Temporary implementation using load()
-     */ 
+     */
     public static function loadWhere($where)
     {
-        return $this->load($where, true);
+        return static::load($where, true);
     }
 
     /**

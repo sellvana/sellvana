@@ -11,6 +11,7 @@ class FCom_Catalog_Admin extends BClass
             ->on('FCom_Catalog_Admin_Controller_Products::action_edit_post', 'FCom_Catalog_Admin::onProductsEditPost')
 
             /** @todo initialize these events only when needed */
+            /*
             ->on('FCom_Admin_Controller_MediaLibrary::gridConfig:media/product/attachment',
                 'FCom_Catalog_Admin_Controller_Products.onMediaGridConfig', ['type' => 'A'])
 
@@ -36,6 +37,7 @@ class FCom_Catalog_Admin extends BClass
                 'FCom_Catalog_Admin_Controller_Products.onMediaGridEdit', ['type' => 'I'])
 
             ->on('FCom_Cms_Admin_Controller_Nav::action_tree_form', 'FCom_Catalog_Admin::onNavTreeForm')
+            */
         ;
 
         FCom_Admin_Controller_MediaLibrary::i()
