@@ -6,6 +6,9 @@ class FCom_OAuth_Controller extends FCom_Core_Controller_Abstract
     {
         $hlp = FCom_OAuth_Main::i();
         $returnUrl = BRequest::i()->get('redirect_to');
+        if (!$r->isUrlLocal($returnUrl)) {
+            $returnUrl = '';
+        }
         if (!$returnUrl) {
             $returnUrl = BApp::href('login');
         }

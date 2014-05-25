@@ -85,14 +85,14 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         try {
             if ($id) {
                 $address = FCom_Customer_Model_Address::i()->load($id);
+                //check this address is belong to this user
+                if ($address && $address->customer_id != $customer->id()) {
+                    $this->message('You don\'t have permission to update this address', 'error');
+                    $this->forward('unauthorized');
+                    return;
+                }
             } else {
-                $address = FCom_Customer_Model_Address::i()->orm()->create();
-                $address->customer_id = $customer->id();
-            }
-            //check this address is belong to this user
-            if ($id && $address && $address->customer_id != $customer->id()) {
-                $this->message('You don\'t have permission to update this address', 'error');
-                //$response->redirect('unauthorized');
+                $address = FCom_Customer_Model_Address::i()->create(['customer_id' => $customer->id()]);
             }
             if ($address->validate($post, [], $formId)) {
                 $address->set($post)->save();

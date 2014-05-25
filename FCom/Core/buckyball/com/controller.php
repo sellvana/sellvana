@@ -721,6 +721,27 @@ class BRequest extends BClass
     }
 
     /**
+     * Validate that URL is within boundaries of domain and webroot
+     */
+    public static function isUrlLocal($url, $checkPath = false)
+    {
+        if (!$url) {
+            return null;
+        }
+        $parsed = parse_url($url);
+        if ($parsed['host'] !== static::httpHost(false)) {
+            return false;
+        }
+        if ($checkPath) {
+            $webRoot = BConfig::i()->get('web/root_dir');
+            if (!preg_match('#^' . preg_quote($webRoot) . '#', $parsed['path'])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
     * Initialize route parameters
     *
     * @param array $params
