@@ -13,9 +13,9 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     public function getFolder()
     {
         $folder = BRequest::i()->get('folder');
-        /*if (empty($this->_allowedFolders[$folder])) {
-            BDebug::error('Folder '.$folder.' is not allowed');
-        }*/
+        if (empty($this->_allowedFolders[$folder])) {
+            throw new BException('Folder ' . $folder . ' is not allowed');
+        }
         return $folder;
     }
     public function test() {
@@ -132,6 +132,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $r = BRequest::i();
             $fileName = basename($r->get('file'));
             $fullName = FCom_Core_Main::i()->dir($folder) . '/' . $fileName;
+
             BResponse::i()->sendFile($fullName, $fileName, $r->get('inline') ? 'inline' : 'attachment');
             break;
         }

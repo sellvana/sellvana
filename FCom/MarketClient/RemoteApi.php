@@ -20,10 +20,15 @@ final class FCom_MarketClient_RemoteApi extends BClass
     public function setupConnection()
     {
         $siteKey = BConfig::i()->get('modules/FCom_MarketClient/site_key');
+        $redirect = BRequest::i()->get('redirect_to');
+        if (!$r->isUrlLocal($redirect)) {
+            $redirect = '';
+        }
+
         $url = $this->getUrl('api/v1/market/site/connect', [
             'admin_url' => BApp::href(),
             'retry_url' => BApp::href('marketclient/site/connect'),
-            'redirect_to' => BRequest::i()->get('redirect_to'),
+            'redirect_to' => $redirect,
             'site_key' => $siteKey,
         ]);
         $response = BUtil::remoteHttp('GET', $url);

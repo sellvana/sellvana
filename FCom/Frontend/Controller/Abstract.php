@@ -10,6 +10,9 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
         $r = BRequest::i();
 
         $redirect = $r->get('redirect_to');
+        if (!$r->isUrlLocal($redirect)) {
+            $redirect = '';
+        }
         if ($redirect === 'CURRENT') {
             $redirect = BRequest::i()->referrer();
         }
@@ -29,6 +32,9 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
         $r = BRequest::i();
 
         $redirect = $r->get('redirect_to');
+        if (!$r->isUrlLocal($redirect)) {
+            $redirect = '';
+        }
         if ($redirect === 'CURRENT') {
             $redirect = BRequest::i()->referrer();
         }

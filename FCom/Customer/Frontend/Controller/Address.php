@@ -19,6 +19,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         $this->view('customer/address/list')->addresses = $addresses;
         $this->layout('/customer/address/list');
     }
+
     public function action_edit()
     {
         /*$layout = BLayout::i();*/
@@ -26,9 +27,15 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         $id              = BRequest::i()->get('id');
         $defaultShipping = false;
         $defaultBilling  = false;
-
         if ($id) {
             $address = FCom_Customer_Model_Address::i()->load($id);
+            if ($address && $address->customer_id !== $customer->id()) {
+                $this->forward(false);
+                return;
+            }
+        }
+
+        if (!empty($address)) {
             if ($customer->default_shipping_id == $address->id) {
                 $defaultShipping = true;
             }
@@ -78,14 +85,14 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         try {
             if ($id) {
                 $address = FCom_Customer_Model_Address::i()->load($id);
+                //check this address is belong to this user
+                if ($address && $address->customer_id != $customer->id()) {
+                    $this->message('You don\'t have permission to update this address', 'error');
+                    $this->forward('unauthorized');
+                    return;
+                }
             } else {
-                $address = FCom_Customer_Model_Address::i()->orm()->create();
-                $address->customer_id = $customer->id();
-            }
-            //check this address is belong to this user
-            if ($id && $address && $address->customer_id != $customer->id()) {
-                $this->message('You don\'t have permission to update this address', 'error');
-                //$response->redirect('unauthorized');
+                $address = FCom_Customer_Model_Address::i()->create(['customer_id' => $customer->id()]);
             }
             if ($address->validate($post, [], $formId)) {
                 $address->set($post)->save();

@@ -3458,7 +3458,7 @@ class BValidate extends BClass
             'message' => 'Invalid URL',
         ],
         'email'     => [
-            'rule'    => '/^([\w-\.\+]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/',
+            'rule'    => 'BValidate::ruleEmail',
             'message' => 'Invalid Email',
         ],
         'string'    => [
@@ -3675,6 +3675,19 @@ class BValidate extends BClass
         }
         if (!empty($args['max']) && strlen($value) > $args['max']) {
             return 'The field can not exceed ' . $args['max'] . ' characters: :field';
+        }
+        return true;
+    }
+
+    static public function ruleEmail($data, $args)
+    {
+        if (!isset($data[$args['field']])) {
+            return true;
+        }
+        $value = $data[$args['field']];
+        $re = '/^([\w-\.\+]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/';
+        if (strlen($value) > 255 || !preg_match($re, $value)) {
+            return false;
         }
         return true;
     }
