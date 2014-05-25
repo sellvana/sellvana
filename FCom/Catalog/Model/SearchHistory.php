@@ -18,7 +18,7 @@ class FCom_Catalog_Model_SearchHistory extends FCom_Core_Model_Abstract
         $sData['search_history'][$query] = $query;
         //TODO: add 'W'ord functionality
         $data = ['term_type' => 'F', 'query' => $query];
-        $record = static::load($data);
+        $record = static::loadWhere($data);
         if ($record) {
             $record->add('num_searches');
         } else {

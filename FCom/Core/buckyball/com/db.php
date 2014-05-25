@@ -2140,7 +2140,7 @@ class BModel extends Model
     public static function load($id, $field = null, $cache = false)
     {
         if (true !== $field && is_array($id)) {
-            BDebug::warning('Invalid usage of load(), use loadWhere()');
+            BDebug::notice('Invalid usage of load(), use loadWhere()');
             return false;
         }
 
@@ -2206,7 +2206,7 @@ class BModel extends Model
      */
     public static function loadOrCreate($id, $field = null, $cache = false)
     {
-        $model = static::load($id, $field, $cache);
+        $model = static::loadWhere($id, $field, $cache);
         if (!$model) {
             $model = static::create(is_array($id) ? $id : []);
         }

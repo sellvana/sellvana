@@ -147,8 +147,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if (!$this->create_at) $this->create_at = BDb::now();
-        $this->update_at = BDb::now();
+        $this->set('create_at', BDb::now(), 'IFNULL');
+        $this->set('update_at', BDb::now());
         if ($this->password) {
             $this->password_hash = BUtil::fullSaltedHash($this->password);
         }
