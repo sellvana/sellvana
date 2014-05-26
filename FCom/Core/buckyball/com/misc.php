@@ -984,7 +984,7 @@ class BUtil extends BClass
                 ];
             }
             if (false) { // TODO: figure out cookies handling
-                $cookieDir = BConfig::i()->get('fs/storage_dir') . '/cache';
+                $cookieDir = BConfig::i()->get('core/storage_random_dir') . '/cache';
                 BUtil::ensureDir($cookieDir);
                 $cookie = tempnam($cookieDir, 'CURLCOOKIE');
                 $curlOpt += [

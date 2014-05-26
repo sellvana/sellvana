@@ -17,6 +17,7 @@ class FCom_Core_Main extends BClass
             BDebug::i()->registerErrorHandlers();
 
             $this->initConfig($area);
+            $this->initDebug();
             $this->initModules();
 
             return BApp::i();
@@ -155,20 +156,6 @@ class FCom_Core_Main extends BClass
         #    $config->set('fs/storage_dir', $storageDir);
         #}
 
-        // cache files
-        $cacheDir = $config->get('fs/cache_dir');
-        if (!$cacheDir) {
-            $cacheDir = $storageDir . '/cache';
-            $config->set('fs/cache_dir', $cacheDir);
-        }
-
-        // log files
-        $logDir = $config->get('fs/log_dir');
-        if (!$logDir) {
-            $logDir = $storageDir . '/log';
-            $config->set('fs/log_dir', $logDir);
-        }
-
         $config->add($localConfig);
 
         $extLoaded = array_flip(get_loaded_extensions());
@@ -190,8 +177,42 @@ class FCom_Core_Main extends BClass
             exit;
         }
 
-#echo "<Pre>"; print_r($config->get()); exit;
-        // add area module
+        $configDir = $config->get('fs/config_dir');
+        if (file_exists($configDir . '/core.php')) {
+            $config->addFile('core.php', true);
+        }
+
+        $randomDir = $config->get('core/storage_random_dir');
+        if (!$randomDir) {
+            $relStorageDir = preg_replace('#^' . preg_quote($rootDir) . '/#', '', $storageDir);
+            $randomDirGlob = glob($storageDir . '/random-*');
+            if ($randomDirGlob) {
+                $randomDir = $relStorageDir . '/' . basename($randomDirGlob[0]);
+            } else {
+                $randomDir = $relStorageDir . '/random-' . BUtil::randomString(16);
+                BUtil::ensureDir($randomDir);
+            }
+            $config->set('core/storage_random_dir', $randomDir, false, true);
+            $this->writeConfigFiles('core');
+        }
+        if (!BUtil::isPathAbsolute($randomDir)) {
+            $randomDir = $rootDir . '/' . $randomDir;
+        }
+
+        // cache files
+        $cacheDir = $config->get('fs/cache_dir');
+        if (!$cacheDir) {
+            $cacheDir = $randomDir . '/cache';
+            $config->set('fs/cache_dir', $cacheDir);
+        }
+
+        // log files
+        $logDir = $config->get('fs/log_dir');
+        if (!$logDir) {
+            $logDir = $randomDir . '/log';
+            $config->set('fs/log_dir', $logDir);
+        }
+
         BApp::i()->set('area', $area, true);
 
         return $this;
@@ -262,16 +283,8 @@ class FCom_Core_Main extends BClass
     {
         $config = BConfig::i();
         $area = BApp::i()->get('area');
-
-        $configDir = $config->get('fs/config_dir');
-        if (file_exists($configDir . '/core.php')) {
-            $config->addFile('core.php', true);
-        }
-
-        $this->initDebug();
-        #$this->runConfigMigration();
-
         $mode = BDebug::mode();
+        $configDir = $config->get('fs/config_dir');
 
         if ('DISABLED' === $mode) {
             BResponse::i()->status('404', 'Page not found', 'Page not found');
@@ -331,7 +344,7 @@ class FCom_Core_Main extends BClass
                 // $this->_modulesDirs[] = BUCKYBALL_ROOT_DIR.'/plugins';
                 // if minified version used, need to load plugins manually
             // }
-            $this->_modulesDirs[] = $dirConf['storage_dir'] . '/custom'; // Custom module
+            $this->_modulesDirs[] = $config->get('core/storage_random_dir') . '/custom'; // Custom module
             $this->_modulesDirs[] = $dirConf['local_dir'] . '/*/*'; // Local modules
             $this->_modulesDirs[] = $dirConf['dlc_dir'] . '/*/*'; // Downloaded modules
             $this->_modulesDirs[] = $dirConf['root_dir'] . '/FCom/*'; // Core modules

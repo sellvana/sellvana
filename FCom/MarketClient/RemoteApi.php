@@ -136,7 +136,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
         if (!$mod) {
             return ['error' => true, 'message' => 'Invalid package: ' . $moduleName];
         }
-        $packageDir = BConfig::i()->get('fs/storage_dir') . '/marketclient/upload';
+        $packageDir = BConfig::i()->get('core/storage_random_dir') . '/marketclient/upload';
         BUtil::ensureDir($packageDir);
         $packageFilename = "{$packageDir}/{$moduleName}-{$mod->version}.zip";
         @unlink($packageFilename);
@@ -171,7 +171,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
         if (!$response) {
             throw new BException("Problem downloading the package ({$moduleName})");
         }
-        $dir = BConfig::i()->get('fs/storage_dir') . '/marketclient/download';
+        $dir = BConfig::i()->get('core/storage_random_dir') . '/marketclient/download';
         BUtil::ensureDir($dir);
         if (!is_writable($dir)) {
             throw new BException("Problem with write permissions ({$dir})");

@@ -1774,7 +1774,7 @@ class BSession extends BClass
         }
         //session_set_cookie_params($ttl, $path, $domain);
         session_name(!empty($config['name']) ? $config['name'] : $this->_defaultSessionCookieName);
-        if (($dir = BConfig::i()->get('fs/storage_dir'))) {
+        if (($dir = BConfig::i()->get('core/storage_random_dir'))) {
             $dir .= '/session';
             BUtil::ensureDir($dir);
             session_save_path($dir);

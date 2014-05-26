@@ -25,7 +25,7 @@ class FCom_FrontendCP_Main extends BClass
 
     public function saveCustomViewTemplate($viewName, $content, $options = [])
     {
-        $rootDir = BConfig::i()->get('fs/storage_dir') . '/custom';
+        $rootDir = BConfig::i()->get('core/storage_random_dir') . '/custom';
         $area = !empty($options['area']) ? $options['area'] : 'FCom_Frontend';
         $viewsDir = $dir . '/' . $area . '/views';
         if (!file_exists($rootDir)) {
