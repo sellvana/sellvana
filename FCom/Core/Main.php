@@ -195,6 +195,7 @@ class FCom_Core_Main extends BClass
             $this->writeConfigFiles('core');
         }
         $randomDir = $storageDir . '/' . $randomDirName;
+        BUtil::ensureDir($randomDir);
 
         // cache files
         $cacheDir = $config->get('fs/cache_dir');
@@ -208,6 +209,13 @@ class FCom_Core_Main extends BClass
         if (!$logDir) {
             $logDir = $randomDir . '/log';
             $config->set('fs/log_dir', $logDir);
+        }
+
+        // session files
+        $logDir = $config->get('fs/session_dir');
+        if (!$logDir) {
+            $logDir = $randomDir . '/session';
+            $config->set('fs/session_dir', $logDir);
         }
 
         BApp::i()->set('area', $area, true);
