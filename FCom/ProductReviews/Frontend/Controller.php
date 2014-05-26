@@ -41,7 +41,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         $post = BRequest::i()->post();
         //check if customer have debug
         $pr = FCom_ProductReviews_Model_Review::i()->loadWhere([
-            'product_id' => $post['pid'],
+            'product_id' => (int)$post['pid'],
             'customer_id' => FCom_Customer_Model_Customer::i()->sessionUserId()
         ]);
 
@@ -120,8 +120,8 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             }
             $customer = FCom_Customer_Model_Customer::i()->sessionUser();
             $record = FCom_ProductReviews_Model_ReviewFlag::i()->loadWhere([
-                'customer_id' => $customer->id,
-                'review_id' => $review->id,
+                'customer_id' => $customer->id(),
+                'review_id' => $review->id(),
             ]);
 
             if (!$record) {
@@ -151,8 +151,8 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
 
         $customer = FCom_Customer_Model_Customer::i()->sessionUser();
         $record = FCom_ProductReviews_Model_ReviewFlag::i()->loadWhere([
-            'customer_id' => $customer->id,
-            'review_id' => $review->id
+            'customer_id' => $customer->id(),
+            'review_id' => $review->id(),
         ]);
         if (!$record) {
             $review->offensive++;
@@ -239,7 +239,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         $post = BRequest::i()->post();
         $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $pr = FCom_ProductReviews_Model_Review::i()->loadWhere([
-            'id'          => $post['rid'],
+            'id'          => (int)$post['rid'],
             'customer_id' => $customerId
         ]);
         $prod = FCom_Catalog_Model_Product::i()->load($pr->product_id);
@@ -286,7 +286,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         $post = BRequest::i()->post();
         $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
         $pr = FCom_ProductReviews_Model_Review::i()->loadWhere([
-            'id'          => $post['rid'],
+            'id'          => (int)$post['rid'],
             'customer_id' => $customerId
         ]);
         if (!$pr) {

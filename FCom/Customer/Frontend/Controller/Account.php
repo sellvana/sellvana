@@ -52,8 +52,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
     public function action_edit__POST()
     {
         try {
-            $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
-            $customer   = FCom_Customer_Model_Customer::i()->load($customerId);
+            $customer = FCom_Customer_Model_Customer::i()->sessionUser();
             $r      = BRequest::i()->post('model');
             $formId = 'account-edit';
             $customer->setAccountEditRules(false);
@@ -65,9 +64,14 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
             }
 
             if ($customer->validate($r, $expandRules, $formId)) {
-                $customer->set($r)->save();
-                $this->message('Your account info has been updated');
-                BResponse::i()->redirect('customer/myaccount');
+                if (empty($r['current_password']) || !Bcrypt::verify($r['current_password'], $customer->get('password_hash'))) {
+                    $this->message('Current password is not correct, please try again', 'error');
+                    BResponse::i()->redirect('customer/myaccount/edit');
+                } else {
+                    $customer->set($r)->save();
+                    $this->message('Your account info has been updated');
+                    BResponse::i()->redirect('customer/myaccount');
+                }
             } else {
                 $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:' . $formId);
                 $this->formMessages($formId);
@@ -126,7 +130,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
             $customer->setChangePasswordRules();
 
             if ($customer->validate($r, [], $formId)) {
-                if (!Bcrypt::verify($r['current_password'], $customer->get('password_hash'))) {
+                if (empty($r['current_password']) || !Bcrypt::verify($r['current_password'], $customer->get('password_hash'))) {
                     $this->message('Current password is not correct, please try again', 'error');
                     BResponse::i()->redirect('customer/myaccount/editpassword');
                 } else {

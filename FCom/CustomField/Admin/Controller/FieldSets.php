@@ -317,7 +317,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 if ($field_ids !== '') {
                     $arr = explode(',', $field_ids);
                     foreach ($arr as $i => $fId) {
-                        if (!$model->loadWhere(['set_id' => $data['id'], 'field_id' => $fId])) {
+                        if (!$model->loadWhere(['set_id' => (int)$data['id'], 'field_id' => (int)$fId])) {
                             $model->create(['set_id' => $data['id'], 'field_id' => $fId, 'position' => $i])->save();
                         }
                     }
