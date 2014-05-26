@@ -109,6 +109,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     {
         if (!BRequest::i()->xhr()) {
             $this->forward(false);
+            return;
         }
         $this->layout('/catalog/quickview');
         $product = FCom_Catalog_Model_Product::i()->load(BRequest::i()->get('id'));

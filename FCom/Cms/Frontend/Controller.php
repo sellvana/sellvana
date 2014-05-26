@@ -9,7 +9,7 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $this->forward(false);
             return;
         }
-        $block = FCom_Cms_Model_Block::i()->load(['page_enabled' => 1, 'page_url' => $pageUrl]);
+        $block = FCom_Cms_Model_Block::i()->loadWhere(['page_enabled' => 1, 'page_url' => $pageUrl]);
         if (!$block || !$block->validateBlock()) {
             $this->forward(false);
             return;

@@ -721,6 +721,27 @@ class BRequest extends BClass
     }
 
     /**
+     * Validate that URL is within boundaries of domain and webroot
+     */
+    public static function isUrlLocal($url, $checkPath = false)
+    {
+        if (!$url) {
+            return null;
+        }
+        $parsed = parse_url($url);
+        if ($parsed['host'] !== static::httpHost(false)) {
+            return false;
+        }
+        if ($checkPath) {
+            $webRoot = BConfig::i()->get('web/root_dir');
+            if (!preg_match('#^' . preg_quote($webRoot) . '#', $parsed['path'])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
     * Initialize route parameters
     *
     * @param array $params
@@ -1377,7 +1398,7 @@ class BResponse extends BClass
     */
     public function httpSTS()
     {
-        static::header('Strict-Transport-Security: max-age=500; includeSubDomains');
+        static::header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
         return $this;
     }
 
@@ -2294,6 +2315,7 @@ class BActionController extends BClass
                 $actionMethod = $tmpMethod;
             } elseif (BRouting::i()->currentRoute()->multi_method) {
                 $this->forward(false); // If route has multiple methods, require method suffix
+                return $this;
             }
         }
         //echo $actionMethod;exit;

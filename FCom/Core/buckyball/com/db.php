@@ -1619,16 +1619,16 @@ class BORM extends ORMWrapper
 
         #$s['c'] = 600000;
         if (empty($s['c'])) {
-            $cntOrm = clone $this; // clone ORM to count              
+            $cntOrm = clone $this; // clone ORM to count
             // Change the way we calculate count if grouping is detected in query
             if ( count($cntOrm->_group_by) ) {
                 $cntQuery = $this->as_sql(false);
                 $cntFilters = $this->_build_values();
                 $s[ 'c' ] = BORM::i()->raw_query( "SELECT COUNT(*) AS count FROM ($cntQuery) AS cntCount", $cntFilters )->find_one()->count;
                 unset( $cntQuery, $cntFilters ); // free mem
-            } else {         
+            } else {
                 $s[ 'c' ] = $cntOrm->count(); // total row count
-            }        
+            }
             unset( $cntOrm ); // free mem
         }
 
@@ -1689,7 +1689,7 @@ class BORM extends ORMWrapper
         if (count($this->_where_conditions) === 0) {
             return [];
         }
-        
+
         $values = [];
         foreach ($this->_where_conditions as $condition) {
                 $values[] = $condition[static::WHERE_VALUES][0];
@@ -2139,6 +2139,11 @@ class BModel extends Model
     */
     public static function load($id, $field = null, $cache = false)
     {
+        if (true !== $field && is_array($id)) {
+            BDebug::notice('Invalid usage of load(), use loadWhere()');
+            return false;
+        }
+
         $class = static::$_origClass ? static::$_origClass : get_called_class();
         if (null === $field) {
             $field = static::_get_id_column_name($class);
@@ -2184,6 +2189,14 @@ class BModel extends Model
     }
 
     /**
+     * Temporary implementation using load()
+     */
+    public static function loadWhere($where)
+    {
+        return static::load($where, true);
+    }
+
+    /**
      * Load a model or create an empty one if doesn't exist
      *
      * @param int|string|array $id
@@ -2193,7 +2206,7 @@ class BModel extends Model
      */
     public static function loadOrCreate($id, $field = null, $cache = false)
     {
-        $model = static::load($id, $field, $cache);
+        $model = static::loadWhere($id, $field, $cache);
         if (!$model) {
             $model = static::create(is_array($id) ? $id : []);
         }

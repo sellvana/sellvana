@@ -95,7 +95,7 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
 
         $hlp = FCom_AdminChat_Model_Participant::i();
         $data = ['chat_id' => $this->id(), 'user_id' => $user->id()];
-        $participant = $hlp->load($data);
+        $participant = $hlp->loadWhere($data);
         if (!$participant) {
             $data['status'] = 'open';
             $data = array_merge($data, $extraData);

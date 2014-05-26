@@ -6,9 +6,14 @@ class FCom_MarketClient_Controller_Download extends FCom_Core_Controller_Abstrac
     {
         #echo 1; exit;
         BLayout::i()->setRootView('marketclient/container');
+        $redirect = BRequest::i()->request('redirect_to');
+        if (!$r->isUrlLocal($redirect)) {
+            $redirect = '';
+        }
+
         $this->view('marketclient/container')->set([
             'modules' => BRequest::i()->request('modules'),
-            'redirect_to' => BRequest::i()->request('redirect_to'),
+            'redirect_to' => $redirect,
         ]);
         FCom_MarketClient_Main::i()->progress([], true);
     }

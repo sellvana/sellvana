@@ -19,7 +19,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             $this->forward('unauthenticated');
             return;
         }
-        $pr = FCom_ProductReviews_Model_Review::i()->load([
+        $pr = FCom_ProductReviews_Model_Review::i()->loadWhere([
             'product_id' => $r['pid'],
             'customer_id' => FCom_Customer_Model_Customer::i()->sessionUserId()
         ]);
@@ -40,7 +40,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
     {
         $post = BRequest::i()->post();
         //check if customer have debug
-        $pr = FCom_ProductReviews_Model_Review::i()->load([
+        $pr = FCom_ProductReviews_Model_Review::i()->loadWhere([
             'product_id' => $post['pid'],
             'customer_id' => FCom_Customer_Model_Customer::i()->sessionUserId()
         ]);
@@ -119,7 +119,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
                 $mark = 1;
             }
             $customer = FCom_Customer_Model_Customer::i()->sessionUser();
-            $record = FCom_ProductReviews_Model_ReviewFlag::i()->load([
+            $record = FCom_ProductReviews_Model_ReviewFlag::i()->loadWhere([
                 'customer_id' => $customer->id,
                 'review_id' => $review->id,
             ]);
@@ -150,7 +150,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         $review = FCom_ProductReviews_Model_Review::i()->load($rid);
 
         $customer = FCom_Customer_Model_Customer::i()->sessionUser();
-        $record = FCom_ProductReviews_Model_ReviewFlag::i()->load([
+        $record = FCom_ProductReviews_Model_ReviewFlag::i()->loadWhere([
             'customer_id' => $customer->id,
             'review_id' => $review->id
         ]);
@@ -207,7 +207,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
     {
         $r = BRequest::i()->get();
         $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
-        $pr = FCom_ProductReviews_Model_Review::i()->load([
+        $pr = FCom_ProductReviews_Model_Review::i()->loadWhere([
             'id'          => $r['rid'],
             'customer_id' => $customerId
         ]);
@@ -238,7 +238,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
     {
         $post = BRequest::i()->post();
         $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
-        $pr = FCom_ProductReviews_Model_Review::i()->load([
+        $pr = FCom_ProductReviews_Model_Review::i()->loadWhere([
             'id'          => $post['rid'],
             'customer_id' => $customerId
         ]);
@@ -285,7 +285,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
     {
         $post = BRequest::i()->post();
         $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
-        $pr = FCom_ProductReviews_Model_Review::i()->load([
+        $pr = FCom_ProductReviews_Model_Review::i()->loadWhere([
             'id'          => $post['rid'],
             'customer_id' => $customerId
         ]);

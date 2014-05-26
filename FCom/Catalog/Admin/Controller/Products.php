@@ -497,7 +497,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             }
             if (isset($data[$typeName])) {
                 foreach ($data[$typeName] as $key => $arr) {
-                    $productLink = $hlp->load(['product_id' => $model->id, 'linked_product_id' => $key, 'link_type' => $type]);
+                    $productLink = $hlp->loadWhere(['product_id' => $model->id, 'linked_product_id' => $key, 'link_type' => $type]);
                     $position = (is_numeric($data[$typeName][$key]['product_link_position']))
                         ? (int) $data[$typeName][$key]['product_link_position'] : 0;
                     if ($productLink) {
@@ -644,6 +644,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
 
     }
+    /*
     public function onMediaGridConfig($args)
     {
         array_splice($args['config']['grid']['colModel'], -1, 0, [
@@ -662,7 +663,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $hlp = FCom_Catalog_Model_ProductMedia::i();
         $id = $args['model']->id;
-        if (!$hlp->load(['product_id' => null, 'file_id' => $id])) {
+        if (!$hlp->loadWhere(['product_id' => null, 'file_id' => $id])) {
             $hlp->create(['file_id' => $id, 'media_type' => $args['type']])->save();
         }
     }
@@ -670,17 +671,18 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function onMediaGridEdit($args)
     {
         $r = BRequest::i();
-        $m = Denteva_Model_Vendor::i()->load([
+        $m = Denteva_Model_Vendor::i()->loadWhere([
             'is_manuf' => 1,
             'vendor_name' => $r->post('manuf_vendor_name')
         ]);
         FCom_Catalog_Model_ProductMedia::i()
-            ->load(['product_id' => null, 'file_id' => $args['model']->id])
+            ->loadWhere(['product_id' => null, 'file_id' => $args['model']->id])
             ->set([
                 'manuf_vendor_id' => $m ? $m->id : null,
             ])
             ->save();
     }
+    */
 
     public function action_duplicate()
     {
