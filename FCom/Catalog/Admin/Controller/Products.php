@@ -497,7 +497,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             }
             if (isset($data[$typeName])) {
                 foreach ($data[$typeName] as $key => $arr) {
-                    $productLink = $hlp->loadWhere(['product_id' => $model->id, 'linked_product_id' => $key, 'link_type' => $type]);
+                    $productLink = $hlp->loadWhere(['product_id' => $model->id(), 'linked_product_id' => (int)$key, 'link_type' => (string)$type]);
                     $position = (is_numeric($data[$typeName][$key]['product_link_position']))
                         ? (int) $data[$typeName][$key]['product_link_position'] : 0;
                     if ($productLink) {

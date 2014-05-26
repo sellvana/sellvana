@@ -2,7 +2,7 @@
 
 class FCom_Customer_Migrate extends BClass
 {
-    public function install__0_1_9()
+    public function install__0_1_10()
     {
         $tCustomer = FCom_Customer_Model_Customer::table();
         BDb::run("
@@ -21,6 +21,7 @@ class FCom_Customer_Migrate extends BClass
             `payment_method` varchar(20)  DEFAULT NULL,
             `payment_details` text ,
             `status` enum('review','active','disabled') NOT NULL DEFAULT 'review',
+            `password_session_token` varchar(16),
             PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
@@ -178,6 +179,16 @@ class FCom_Customer_Migrate extends BClass
         BDb::ddlTableDef($table, [
             'COLUMNS' => [
                 'email' => 'varchar(255)',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_1_9__0_1_10()
+    {
+        $table = FCom_Customer_Model_Customer::table();
+        BDb::ddlTableDef($table, [
+            'COLUMNS' => [
+                'password_session_token' => 'varchar(16)',
             ],
         ]);
     }

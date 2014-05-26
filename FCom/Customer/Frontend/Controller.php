@@ -41,6 +41,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $customerModel->setLoginRules();
             if ($customerModel->validate($login, [], 'frontend')) {
                 $user = $customerModel->authenticate($login['email'], $login['password']);
+
                 if ($user) {
                     switch ($user->status) {
                         case 'active':
@@ -169,6 +170,11 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_logout()
     {
+        $reqCsrfToken = BRequest::i()->get('X-CSRF-TOKEN');
+        if ($reqCsrfToken !== BSession::i()->csrfToken()) {
+            BResponse::i()->redirect('');
+            return;
+        }
         FCom_Customer_Model_Customer::i()->logout();
         BResponse::i()->cookie('remember_me', 0);
         BResponse::i()->redirect(BApp::baseUrl());

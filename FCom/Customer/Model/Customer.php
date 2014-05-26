@@ -126,7 +126,14 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public function setPassword($password)
     {
-        $this->password_hash = BUtil::fullSaltedHash($password);
+        $token = BUtil::randomString(16);
+        $this->set([
+            'password_hash' => BUtil::fullSaltedHash($password),
+            'password_session_token' => $token,
+        ]);
+        if ($this->id() === static::sessionUserId()) {
+            BSession::i()->set('admin_user_password_token', $token);
+        }
         return $this;
     }
 
@@ -147,11 +154,11 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
+        if ($this->get('password')) {
+            $this->setPassword($this->get('password'));
+        }
         $this->set('create_at', BDb::now(), 'IFNULL');
         $this->set('update_at', BDb::now());
-        if ($this->password) {
-            $this->password_hash = BUtil::fullSaltedHash($this->password);
-        }
         return true;
     }
 
@@ -241,6 +248,11 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return BUtil::validateSaltedHash($password, $this->password_hash);
     }
 
+    static public function sessionUserId()
+    {
+        return BSession::i()->get('customer_id');
+    }
+
     /**
      * @param bool $reset
      * @return bool|FCom_Customer_Model_Customer
@@ -248,25 +260,32 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     static public function sessionUser($reset = false)
     {
         if ($reset || !static::$_sessionUser) {
-            $data = BSession::i()->get('customer_user');
-            if (is_string($data)) {
-                static::$_sessionUser = $data ? unserialize($data) : false;
-            } else {
+            $sessData =& BSession::i()->dataToUpdate();
+            if (empty($sessData['customer_id'])) {
                 return false;
+            }
+            $userId = $sessData['customer_id'];
+            $user = static::$_sessionUser = static::load($userId);
+            $token = $user->get('password_session_token');
+            if (!$token) {
+                $token = BUtil::randomString(16);
+                $user->set('password_session_token', $token)->save();
+            }
+            if (empty($sessData['customer_password_token'])) {
+                $sessData['customer_password_token'] = $token;
+            } elseif ($sessData['customer_password_token'] !== $token) {
+                $user->logout();
+                BResponse::i()->cookie('remember_me', 0);
+                BResponse::i()->redirect('');
+                return;
             }
         }
         return static::$_sessionUser;
     }
 
-    static public function sessionUserId()
-    {
-        $user = static::sessionUser();
-        return !empty($user) ? $user->id() : false;
-    }
-
     static public function isLoggedIn()
     {
-        return static::sessionUser() ? true : false;
+        return static::sessionUserId() ? true : false;
     }
 
     static public function authenticate($username, $password)
@@ -291,9 +310,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         $this->set('last_login', BDb::now())->save();
 
-        BSession::i()->set('customer_user', serialize($this));
+        BSession::i()->set('customer_id', $this->id());
         static::$_sessionUser = $this;
-
         if ($this->locale) {
             setlocale(LC_ALL, $this->locale);
         }
@@ -308,7 +326,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         BEvents::i()->fire(__METHOD__ . ':before', ['user' => static::sessionUser()]);
 
-        BSession::i()->set('customer_user', false);
+        $sessData =& BSession::i()->dataToUpdate();
+        $sessData = [];
         static::$_sessionUser = null;
     }
 

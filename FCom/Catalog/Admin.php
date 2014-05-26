@@ -41,6 +41,7 @@ class FCom_Catalog_Admin extends BClass
         ;
 
         FCom_Admin_Controller_MediaLibrary::i()
+            ->allowFolder('media/category/images')
             ->allowFolder('media/product/image')
             ->allowFolder('media/product/attachment')
             ->allowFolder('storage/import/products')

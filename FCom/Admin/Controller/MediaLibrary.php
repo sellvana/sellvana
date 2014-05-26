@@ -214,7 +214,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     $status = 'ERROR';
                     $message = 'Unable to save the file';
                 } else {
-                    $att = $attModel->loadWhere(['folder' => $folder, 'file_name' => $fileName]);
+                    $att = $attModel->loadWhere(['folder' => (string)$folder, 'file_name' => (string)$fileName]);
 
                     if (!$att) {
                         $att = $attModel->create([

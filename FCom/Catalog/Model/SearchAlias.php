@@ -13,7 +13,7 @@ class FCom_Catalog_Model_SearchAlias extends FCom_Core_Model_Abstract
             return $sData['search_alias'][$query];
         }
         //TODO: implement 'W'ord aliases
-        $data = ['alias_type' => 'F', 'alias_term' => $query];
+        $data = ['alias_type' => 'F', 'alias_term' => (string)$query];
         $record = static::loadWhere($data);
         if (!$record) {
             $sData['search_alias'][$query] = $query;
