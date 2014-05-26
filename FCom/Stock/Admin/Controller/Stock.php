@@ -6,7 +6,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
     protected $_permission = 'catalog/stocks';
     protected $_modelClass = 'FCom_Stock_Model_Sku';
     protected $_gridHref = 'stock';
-    protected $_gridTitle = 'Stock Inventory';
+    protected $_gridTitle = 'Stock Management';
     protected $_recordName = 'SKU';
     protected $_mainTableAlias = 's';
     protected $_navPath = 'catalog/stock';
@@ -14,25 +14,58 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
     public function gridConfig()
     {
         $config = parent::gridConfig();
+        unset($config['form_url']);
+        $data = [];
+        $callback = function ($row) use (&$data) {
+            $data_serialized = BUtil::objectToArray(json_decode($row->get('data_serialized')));
+            $qty = '';
+            $out_stock = 'back_order';
+            if (isset($data_serialized['stock_policy'])) {
+                $qty = $data_serialized['stock_policy']['stock_qty'];
+                $out_stock = $data_serialized['stock_policy']['out_stock'];
+            }
+            $tmp = [
+                'id' => $row->get('id'),
+                'sku' => $row->get('sku'),
+                'cost' => $row->get('cost'),
+                'product_name' => $row->get('product_name'),
+                'status' => $row->get('status'),
+                'qty' => $qty,
+                'out_stock' => $out_stock,
+            ];
+            array_push($data, $tmp);
+        };
+        FCom_Stock_Model_Sku::i()->orm($this->_mainTableAlias)->select(array($this->_mainTableAlias.'.*', 'p.data_serialized', 'p.cost', 'p.product_name'))
+            ->left_outer_join('FCom_Catalog_Model_Product', [ 'p.local_sku', '=', $this->_mainTableAlias . '.sku'], 'p')
+            ->select_expr('p.product_name', 'product_name')
+            ->select_expr('p.cost', 'cost')->iterate($callback);
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'width' => 50, 'index' => 's.id'],
-            ['type' => 'input', 'name' => 'sku', 'label' => 'SKU', 'width' => 300, 'index' => 's.sku',
+            ['type' => 'input', 'name' => 'sku', 'label' => 'SKU', 'width' => 300, 'index' => $this->_mainTableAlias.'.sku',
                     'editable' => true, 'addable' => true, 'edit_inline' => true, 'editor' => 'text',
                     'validation' => ['required' => true, 'unique' => BApp::href('stock/unique')]],
-            ['type' => 'input', 'name' => 'qty_in_stock', 'label' => 'Qty In Stock', 'width' => 300,
-                    'index' => 's.qty_in_stock', 'editable' => true, 'addable' => true, 'edit_inline' => true,
-                    'editor' => 'text', 'validation' => ['required' => true, 'number' => true]],
+            ['name' => 'product_name', 'label' => 'Product Name', 'width' => 300],
+            ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'width' => 150,
+                'index' => $this->_mainTableAlias.'.status', 'editable' => true, 'edit_inline' => true,
+                'editor' => 'select', 'options' => FCom_Stock_Model_Sku::i()->statusOptions() ],
+            ['type' => 'input', 'name' => 'out_stock', 'label' => 'Out of Stock Policy', 'width' => 150,
+                'editable' => true, 'edit_inline' => true, 'editor' => 'select', 'options' => FCom_Stock_Model_Sku::i()->outStockOptions()],
+            ['type' => 'input', 'name' => 'cost', 'label' => 'Cost', 'width' => 300,
+                'editable' => true, 'edit_inline' => true,'editor' => 'text', 'validation' => ['required' => true, 'number' => true]],
+            ['type' => 'input', 'name' => 'qty', 'label' => 'Quantity', 'width' => 150,
+                'editable' => true, 'edit_inline' => true,
+                'editor' => 'text', 'validation' => ['required' => true, 'number' => true]],
             ['type' => 'btn_group',
                   'buttons' => [
-                                    ['name' => 'edit'],
+                                    ['name' => 'edit', 'icon' => 'icon-pencil btn-edit-inline'],
                                     ['name' => 'delete'],
-                                    ['name' => 'edit_inline']
                                 ]
                 ]
         ];
+        $config['data_mode'] = 'local';
+        $config['data'] = $data;
         $config['actions'] = [
-//            'new' => array('caption' => 'Add New Customer Group', 'modal' => true),
             'edit' => true,
             'delete' => true
         ];
@@ -40,7 +73,6 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
             ['field' => 'sku', 'type' => 'text'],
             ['field' => 'qty_in_stock', 'type' => 'number-range'],
         ];
-        $config['new_button'] = '#add_new_sku';
         return $config;
     }
 

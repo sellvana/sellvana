@@ -2,7 +2,7 @@
 
 class FCom_Stock_Migrate extends BClass
 {
-    public function install__0_1_1()
+    public function install__0_1_2()
     {
         $tSku = FCom_Stock_Model_Sku::table();
         $tBin = FCom_Stock_Model_Bin::table();
@@ -46,6 +46,12 @@ class FCom_Stock_Migrate extends BClass
             ]
         );
 
+        BDb::ddlTableDef($sTable, [
+                'COLUMNS' => [
+                    'status'  => 'TINYINT(1) not null default 0',
+                ],
+            ]
+        );
         $productWeights = FCom_Catalog_Model_Product::orm()
             ->select(['local_sku', 'net_weight', 'ship_weight'])
             ->where(['OR' => ["`net_weight` IS NOT NULL", "`ship_weight` IS NOT NULL"]])
@@ -147,5 +153,16 @@ class FCom_Stock_Migrate extends BClass
         } catch (Exception $e) {
             //TODO: fix checking for existing fields on DROP
         }
+    }
+
+    public function upgrade__0_1_1__0_1_2()
+    {
+        $sTable = FCom_Stock_Model_Sku::table();
+        BDb::ddlTableDef($sTable, [
+                'COLUMNS' => [
+                    'status'  => 'TINYINT(1) not null default 0',
+                ],
+            ]
+        );
     }
 }
