@@ -190,14 +190,15 @@ class FCom_Core_Main extends BClass
                 $randomDir = $relStorageDir . '/' . basename($randomDirGlob[0]);
             } else {
                 $randomDir = $relStorageDir . '/random-' . BUtil::randomString(16);
-                BUtil::ensureDir($randomDir);
             }
             $config->set('core/storage_random_dir', $randomDir, false, true);
             $this->writeConfigFiles('core');
         }
         if (!BUtil::isPathAbsolute($randomDir)) {
             $randomDir = $rootDir . '/' . $randomDir;
+            $config->set('core/storage_random_dir', $randomDir);
         }
+        BUtil::ensureDir($randomDir);
 
         // cache files
         $cacheDir = $config->get('fs/cache_dir');
@@ -211,6 +212,13 @@ class FCom_Core_Main extends BClass
         if (!$logDir) {
             $logDir = $randomDir . '/log';
             $config->set('fs/log_dir', $logDir);
+        }
+
+        // session files
+        $logDir = $config->get('fs/session_dir');
+        if (!$logDir) {
+            $logDir = $randomDir . '/session';
+            $config->set('fs/session_dir', $logDir);
         }
 
         BApp::i()->set('area', $area, true);
