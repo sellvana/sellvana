@@ -221,7 +221,7 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
                 $columns[$i] = $col;
             }
         }
-        $dir = BConfig::i()->get('fs/storage_dir') . '/export';
+        $dir = BConfig::i()->get('core/storage_random_dir') . '/export';
         BUtil::ensureDir($dir);
         $filename = $dir . '/' . $cfg['grid']['id'] . '.csv';
         $fp = fopen($filename, 'w');

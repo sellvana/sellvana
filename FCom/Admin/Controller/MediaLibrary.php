@@ -18,9 +18,11 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         }
         return $folder;
     }
+
     public function test() {
         return ['test' => 'test'];
     }
+
     public function gridConfig($options = [])
     {
         $id = !empty($options['id']) ? $options['id'] : 'media_library';
@@ -82,16 +84,16 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         if ($options['mode'] && $options['mode'] === 'link') {
             $download_url = BApp::href('/media/grid/download?folder=' . $folder . '&file=');
             $config['config']['columns'] = [
-                    ['type' => 'row_select'],
-                    ['name' => 'download_url',  'hidden' => true, 'default' => $download_url],
-                    ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
-                    ['name' => 'file_name', 'label' => 'File Name', 'width' => 200, 'display' => 'eval',
-                        'print' => '"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' '
-                            . 'href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'],
-                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
-                        'display' => 'file_size']
-                    //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
-                ];
+                ['type' => 'row_select'],
+                ['name' => 'download_url',  'hidden' => true, 'default' => $download_url],
+                ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
+                ['name' => 'file_name', 'label' => 'File Name', 'width' => 200, 'display' => 'eval',
+                    'print' => '"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' '
+                        . 'href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'],
+                ['name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
+                    'display' => 'file_size']
+                //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
+            ];
         }
         //BEvents::i()->fire(__METHOD__, array('config'=>&$config));
         //BEvents::i()->fire(__METHOD__.':'.$folder, array('config'=>&$config));
@@ -127,6 +129,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     BDb::many_as_array($data['rows']),
                 ]);
             break;
+
         case 'download':
             $folder = $this->getFolder();
             $r = BRequest::i();
@@ -184,6 +187,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             //ob_implicit_flush();
             //ignore_user_abort(true);
             $uploads = $_FILES['upload'];
+            $rows = [];
             foreach ($uploads['name'] as $i => $fileName) {
 
                 if (!$fileName) {
@@ -191,9 +195,25 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 }
                 $associatedProducts = 0;
                 $fileSize = 0;
-                if (!$uploads['error'][$i]
-                    && @move_uploaded_file($uploads['tmp_name'][$i], $targetDir . '/' . $fileName)
-                ) {
+                $message = '';
+
+                if (!empty($uploads['error'][$i])) {
+                    $id = '';
+                    $status = 'ERROR';
+                    $message = $uploads['error'][$i];
+                } elseif (pathinfo($fileName, PATHINFO_EXTENSION) === 'php') {
+                    $id = '';
+                    $status = 'ERROR';
+                    $message = 'Illegal file extension';
+                } elseif (preg_match('#\.(gif|jpe?g|png)$#', $fileName) && !@getimagesize($uploads['tmp_name'][$i])) {
+                    $id = '';
+                    $status = 'ERROR';
+                    $message = 'Invalid image uploaded';
+                } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $targetDir . '/' . $fileName)) {
+                    $id = '';
+                    $status = 'ERROR';
+                    $message = 'Unable to save the file';
+                } else {
                     $att = $attModel->loadWhere(['folder' => $folder, 'file_name' => $fileName]);
 
                     if (!$att) {
@@ -207,8 +227,8 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                         ])->save();
                     } else {
                         $associatedProducts = FCom_Catalog_Model_ProductMedia::i()->orm()
-                                              ->select_expr('COUNT(*)', 'associated_products')
-                                              ->where('file_id', $att->get('id'))->find_one();
+                            ->select_expr('COUNT(*)', 'associated_products')
+                            ->where('file_id', $att->get('id'))->find_one();
                         $associatedProducts = $associatedProducts->get('associated_products');
                         $att->set(['file_size' => $uploads['size'][$i], 'update_at' =>  BDb::now()])->save();
                     }
@@ -219,14 +239,10 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     $id = $att->id;
                     $fileSize = $att->file_size;
                     $status = '';
-                } else {
-                    $id = '';
-                    $status = 'ERROR';
                 }
 
-                $row = ['id' => $id, 'file_name' => $fileName, 'file_size' => $fileSize, 'act' => $status,
+                $rows[] = ['id' => $id, 'file_name' => $fileName, 'file_size' => $fileSize, 'act' => $status,
                     'folder' => $folder, 'subfolder' => '', 'associated_products' => $associatedProducts];
-                BResponse::i()->json($row);
 
                 //echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".BUtil::toJson($row)."); </script>";
                 // TODO: properly refresh grid after file upload
@@ -236,6 +252,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 //echo "<script>parent.\$('#$gridId').trigger( 'reloadGrid' ); </script>";
 
             }
+            BResponse::i()->json($rows);
             break;
 
         case 'edit':
