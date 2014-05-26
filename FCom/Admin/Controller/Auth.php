@@ -109,7 +109,7 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
     public function action_logout()
     {
         $reqCsrfToken = BRequest::i()->get('X-CSRF-TOKEN');
-        if ($reqCsrfToken !== BSession::i()->csrfToken()) {
+        if (!BSession::i()->validateCsrfToken($reqCsrfToken)) {
             BResponse::i()->redirect('');
             return;
         }

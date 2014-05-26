@@ -182,22 +182,19 @@ class FCom_Core_Main extends BClass
             $config->addFile('core.php', true);
         }
 
-        $randomDir = $config->get('core/storage_random_dir');
-        if (!$randomDir) {
-            $relStorageDir = preg_replace('#^' . preg_quote($rootDir) . '/#', '', $storageDir);
+        $randomDirName = $config->get('core/storage_random_dir');
+        if (!$randomDirName || strpos($randomDirName, 'storage/') !== false) {
             $randomDirGlob = glob($storageDir . '/random-*');
             if ($randomDirGlob) {
-                $randomDir = $relStorageDir . '/' . basename($randomDirGlob[0]);
+                $randomDirName = basename($randomDirGlob[0]);
             } else {
-                $randomDir = $relStorageDir . '/random-' . BUtil::randomString(16);
-                BUtil::ensureDir($randomDir);
+                $randomDirName = 'random-' . BUtil::randomString(16);
+                BUtil::ensureDir($storageDir . '/' . $randomDirName);
             }
-            $config->set('core/storage_random_dir', $randomDir, false, true);
+            $config->set('core/storage_random_dir', $randomDirName, false, true);
             $this->writeConfigFiles('core');
         }
-        if (!BUtil::isPathAbsolute($randomDir)) {
-            $randomDir = $rootDir . '/' . $randomDir;
-        }
+        $randomDir = $storageDir . '/' . $randomDirName;
 
         // cache files
         $cacheDir = $config->get('fs/cache_dir');
@@ -537,7 +534,7 @@ class FCom_Core_Main extends BClass
         $cookieConfig = BConfig::i()->get('cookie');
         $head = BLayout::i()->view('head');
 
-        $head->meta('csrf-token', BSession::i()->csrfToken());
+        $head->csrf_token();
         $head->js_raw('js_init', ['content' => "
 FCom = {};
 FCom.cookie_options = " . BUtil::toJson([

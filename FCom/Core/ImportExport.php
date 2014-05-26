@@ -603,7 +603,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         if (BUtil::isPathAbsolute($file)) {
             return $file;
         }
-        $path = BConfig::i()->get( 'core/storage_random_dir' ) . '/export';
+        $path = BApp::i()->storageRandomDir() . '/export';
 
         BUtil::ensureDir($path);
         $file = $path . '/' . trim($file, '\\/');

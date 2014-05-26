@@ -431,6 +431,12 @@ class BApp extends BClass
     {
         return $class::i($new, $args);
     }
+
+    public function storageRandomDir()
+    {
+        $c = BConfig::i();
+        return $c->get('fs/storage_dir') . '/' . $c->get('core/storage_random_dir');
+    }
 }
 
 
@@ -1774,7 +1780,7 @@ class BSession extends BClass
         }
         //session_set_cookie_params($ttl, $path, $domain);
         session_name(!empty($config['name']) ? $config['name'] : $this->_defaultSessionCookieName);
-        if (($dir = BConfig::i()->get('core/storage_random_dir'))) {
+        if (($dir = BApp::i()->storageRandomDir())) {
             $dir .= '/session';
             BUtil::ensureDir($dir);
             session_save_path($dir);
