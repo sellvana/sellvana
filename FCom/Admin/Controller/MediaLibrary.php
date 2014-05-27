@@ -209,7 +209,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     $id = '';
                     $status = 'ERROR';
                     $message = $uploads['error'][$i];
-                } elseif (!empty($blacklistExt[$ext]) {
+                } elseif (!empty($blacklistExt[$ext])) {
                     $id = '';
                     $status = 'ERROR';
                     $message = 'Illegal file extension';
