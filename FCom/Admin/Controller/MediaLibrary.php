@@ -181,7 +181,10 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $attModel = !empty($options['model_class']) ? $options['model_class'] : 'FCom_Core_Model_MediaLibrary';
         $attModel = is_string($attModel) ? $attModel::i() : $attModel;
 
-        $blacklistExt = ['php' => 1, 'html' => 1, 'htm' => 1, 'js' => 1, 'css' => 1];
+        $blacklistExt = [
+            'php' => 1, 'php3' => 1, 'php4' => 1, 'php5' => 1, 'htaccess' => 1,
+            'phtml' => 1, 'html' => 1, 'htm' => 1, 'js' => 1, 'css' => 1, 'swf' => 1,
+        ];
         if (!empty($options['whitelist_ext'])) {
             foreach ($options['whitelist_ext'] as $ext) {
                 unset($blacklistExt[$ext]);
