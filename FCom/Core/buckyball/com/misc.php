@@ -3204,7 +3204,7 @@ class BFtpClient extends BClass
 * Throttle invalid login attempts and potentially notify user and admin
 *
 * Usage:
-* - BEFORE AUTH: BLoginThrottle::i()->init('FCom_Customer_Model_Customer', $username);
+* - BEFORE AUTH: if (!BLoginThrottle::i()->init('FCom_Customer_Model_Customer', $username)) return false;
 * - ON FAILURE:  BLoginThrottle::i()->failure();
 * - ON SUCCESS:  BloginThrottle::i()->success();
 */

@@ -1631,7 +1631,7 @@ class BEvents extends BClass
                 foreach (['.', '->'] as $sep) {
                     $r = explode($sep, $cb);
                     if (sizeof($r) == 2) {
-if (!class_exists($r[0])) {
+if (!class_exists($r[0]) && BDebug::is('DEBUG')) {
     echo "<pre>"; debug_print_backtrace(); echo "</pre>";
 }
                         $cb = [$r[0]::i(), $r[1]];
