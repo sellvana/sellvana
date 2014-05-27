@@ -18,6 +18,8 @@ class FCom_Admin_Admin extends BClass
         if (BRequest::i()->https()) {
             BResponse::i()->httpSTS();
         }
+
+        BResponse::i()->nocache();
         //BConfig::i()->set('web/hide_script_name', 0);
     }
 

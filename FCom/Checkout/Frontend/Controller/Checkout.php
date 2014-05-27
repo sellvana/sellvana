@@ -6,6 +6,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         '/checkout/login',
         '/checkout/success',
     ];
+
     public function authenticate($args = [])
     {
         $r = BRequest::i();
@@ -18,6 +19,13 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             return;
         }
         return parent::authenticate($args);
+    }
+
+    public function beforeDispatch()
+    {
+        if (!parent::beforeDispatch()) return false;
+
+        BResponse::i()->nocache();
     }
 
     public function action_checkout_login()

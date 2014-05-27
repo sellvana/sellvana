@@ -2,6 +2,13 @@
 
 class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
+    public function beforeDispatch()
+    {
+        if (!parent::beforeDispatch()) return false;
+
+        BResponse::i()->nocache();
+    }
+
     public function action_cart()
     {
         $layout = BLayout::i();

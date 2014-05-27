@@ -958,6 +958,7 @@ class BRequest extends BClass
             if (is_array($v)) {
                 $this->stripTagsRecursive($v,  $forUrlPath, $childPath);
             } elseif (!empty($v) && !is_numeric($v)) {
+                //$v = str_replace(chr(0137), '', (string)$v);
                 if (empty($this->_postTagsWhitelist[$forUrlPath][$childPath])) {
                     $v = strip_tags($v);
                 } else {
