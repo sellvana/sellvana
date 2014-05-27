@@ -7,6 +7,8 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         if (!parent::beforeDispatch()) return false;
 
         BResponse::i()->nocache();
+
+        return true;
     }
 
     public function action_index()

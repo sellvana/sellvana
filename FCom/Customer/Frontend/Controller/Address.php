@@ -7,6 +7,8 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         if (!parent::beforeDispatch()) return false;
 
         BResponse::i()->nocache();
+
+        return true;
     }
 
     public function authenticate($args = [])

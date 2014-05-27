@@ -7,6 +7,8 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         if (!parent::beforeDispatch()) return false;
 
         BResponse::i()->nocache();
+
+        return true;
     }
 
     public function authenticate($args = [])

@@ -26,6 +26,8 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         if (!parent::beforeDispatch()) return false;
 
         BResponse::i()->nocache();
+
+        return true;
     }
 
     public function action_checkout_login()
