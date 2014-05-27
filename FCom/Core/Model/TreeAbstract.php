@@ -38,7 +38,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         $sep = static::$_separator;
 
         if (is_string($name)) {
-            $name = preg_split('#\s*' . preg_quote($sep) . '\s*#', $name, 0, PREG_SPLIT_NO_EMPTY);
+            $name = preg_split('#\s*' . preg_quote($sep, '#') . '\s*#', $name, 0, PREG_SPLIT_NO_EMPTY);
         }
 
         $childName = ($this->get('full_name') ? $this->get('full_name') . $sep : '') . $name[0];
@@ -415,7 +415,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         if ($create) {
             $sep = static::$_separator;
             if (is_string($newName)) {
-                $newName = preg_split('#\s*' . preg_quote($sep) . '\s*#', $newName, 0, PREG_SPLIT_NO_EMPTY);
+                $newName = preg_split('#\s*' . preg_quote($sep, '#') . '\s*#', $newName, 0, PREG_SPLIT_NO_EMPTY);
             }
             $childName = ($this->get('full_name') ? $this->get('full_name') . $sep : '') . $newName[0];
         }

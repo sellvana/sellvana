@@ -391,7 +391,7 @@ class BRequest extends BClass
 
             // nginx rewrite fix
             $basename = basename(static::scriptName());
-            $path = preg_replace('#^/.*?' . preg_quote($basename) . '#', '', $path);
+            $path = preg_replace('#^/.*?' . preg_quote($basename, '#') . '#', '', $path);
 
             if (BConfig::i()->get('web/language_in_url') && preg_match('#^/([a-z]{2})(/.*|$)#', $path, $match)) {
                 static::$_language = $match[1];
@@ -734,7 +734,7 @@ class BRequest extends BClass
         }
         if ($checkPath) {
             $webRoot = BConfig::i()->get('web/root_dir');
-            if (!preg_match('#^' . preg_quote($webRoot) . '#', $parsed['path'])) {
+            if (!preg_match('#^' . preg_quote($webRoot, '#') . '#', $parsed['path'])) {
                 return false;
             }
         }

@@ -568,7 +568,7 @@ class BUtil extends BClass
             $key = $w1[3];
             $op = $w1[2];
             foreach ($array as $k => $v) {
-                if ($op === '==' && $key === $k || $op === '~=' && preg_match('#' . preg_quote($key) . '#', $k)) {
+                if ($op === '==' && $key === $k || $op === '~=' && preg_match('#' . preg_quote($key, '#') . '#', $k)) {
                     if ($rel === 'after') {
                         $result[$k] = $v;
                     }
