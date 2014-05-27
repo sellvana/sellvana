@@ -2604,7 +2604,7 @@ class BDebug extends BClass
 <div id="buckyball-debug-console" style="display:none"><?php
         echo "DELTA: " . BDebug::i()->delta() . ', PEAK: ' . memory_get_peak_usage(true) . ', EXIT: ' . memory_get_usage(true);
         echo "<pre>";
-        print_r(BORM::get_query_log());
+        print_r(array_map('htmlspecialchars', BORM::get_query_log()));
         //BEvents::i()->debug();
         echo "</pre>";
         //print_r(static::$_events);

@@ -206,6 +206,8 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     public function login()
     {
+        //session_regenerate_id(true);
+
         $this->set('last_login', BDb::now())->save();
 
         BSession::i()->set('admin_user_id', $this->id());
@@ -229,6 +231,9 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         #BSession::i()->set('admin_user_password_token', null);
         $sessData =& BSession::i()->dataToUpdate();
         $sessData = [];
+
+        BSession::i()->regenerateId();
+
         static::$_sessionUser = null;
     }
 
