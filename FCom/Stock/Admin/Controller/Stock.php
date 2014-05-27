@@ -58,8 +58,10 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
             ['name' => 'product_name', 'label' => 'Product Name', 'width' => 300],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'width' => 150,
                 'index' => $this->_mainTableAlias.'.status', 'editable' => true, 'edit_inline' => true,
+                'mass-editable-show' => true, 'mass-editable' => true,
                 'editor' => 'select', 'options' => FCom_Stock_Model_Sku::i()->statusOptions() ],
             ['type' => 'input', 'name' => 'out_stock', 'label' => 'Out of Stock Policy', 'width' => 150,
+                'mass-editable-show' => true, 'mass-editable' => true,
                 'editable' => true, 'edit_inline' => true, 'editor' => 'select', 'options' => FCom_Stock_Model_Sku::i()->outStockOptions()],
             ['type' => 'input', 'name' => 'cost', 'label' => 'Cost', 'width' => 300,
                 'editable' => true, 'edit_inline' => true,'editor' => 'text', 'validation' => ['number' => true]],
@@ -201,7 +203,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
                 } else {
                     $data_serialized['stock_policy']['stock_qty'] = $p['stock_qty'];
                     $data_serialized['stock_policy']['out_stock'] = $p['out_stock'];
-                    $data_serialized['stock_policy']['manage_stock'] = $p['manage_stock'];
+                    $data_serialized['stock_policy']['manage_stock'] = $p['status'];
                 }
                 $prod->setData('stock_policy', $data_serialized['stock_policy']);
                 $prod->set('cost', $p['cost']);
