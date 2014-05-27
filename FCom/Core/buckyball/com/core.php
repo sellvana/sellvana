@@ -1793,11 +1793,12 @@ class BSession extends BClass
         if (headers_sent()) {
             BDebug::warning("Headers already sent, can't start session");
         } else {
-            session_set_cookie_params($ttl, $path, $domain);
+            $https = BRequest::i()->https();
+            session_set_cookie_params($ttl, $path, $domain, $https, true);
             session_start();
             // update session cookie expiration to reflect current visit
             // @see http://www.php.net/manual/en/function.session-set-cookie-params.php#100657
-            setcookie(session_name(), session_id(), time() + $ttl, $path, $domain);
+            setcookie(session_name(), session_id(), time() + $ttl, $path, $domain, $https, true);
         }
         $this->_phpSessionOpen = true;
         $this->_sessionId = session_id();
@@ -1954,6 +1955,7 @@ BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
 
     public function destroy()
     {
+        $this->open();
         session_destroy();
     }
 
