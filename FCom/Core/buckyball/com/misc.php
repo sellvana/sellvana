@@ -568,7 +568,7 @@ class BUtil extends BClass
             $key = $w1[3];
             $op = $w1[2];
             foreach ($array as $k => $v) {
-                if ($op === '==' && $key === $k || $op === '~=' && preg_match('#' . preg_quote($key) . '#', $k)) {
+                if ($op === '==' && $key === $k || $op === '~=' && preg_match('#' . preg_quote($key, '#') . '#', $k)) {
                     if ($rel === 'after') {
                         $result[$k] = $v;
                     }
@@ -2604,7 +2604,7 @@ class BDebug extends BClass
 <div id="buckyball-debug-console" style="display:none"><?php
         echo "DELTA: " . BDebug::i()->delta() . ', PEAK: ' . memory_get_peak_usage(true) . ', EXIT: ' . memory_get_usage(true);
         echo "<pre>";
-        print_r(BORM::get_query_log());
+        print_r(array_map('htmlspecialchars', BORM::get_query_log()));
         //BEvents::i()->debug();
         echo "</pre>";
         //print_r(static::$_events);
@@ -3204,7 +3204,7 @@ class BFtpClient extends BClass
 * Throttle invalid login attempts and potentially notify user and admin
 *
 * Usage:
-* - BEFORE AUTH: BLoginThrottle::i()->init('FCom_Customer_Model_Customer', $username);
+* - BEFORE AUTH: if (!BLoginThrottle::i()->init('FCom_Customer_Model_Customer', $username)) return false;
 * - ON FAILURE:  BLoginThrottle::i()->failure();
 * - ON SUCCESS:  BloginThrottle::i()->success();
 */

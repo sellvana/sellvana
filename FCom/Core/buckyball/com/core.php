@@ -1631,7 +1631,7 @@ class BEvents extends BClass
                 foreach (['.', '->'] as $sep) {
                     $r = explode($sep, $cb);
                     if (sizeof($r) == 2) {
-if (!class_exists($r[0])) {
+if (!class_exists($r[0]) && BDebug::is('DEBUG')) {
     echo "<pre>"; debug_print_backtrace(); echo "</pre>";
 }
                         $cb = [$r[0]::i(), $r[1]];
@@ -1735,9 +1735,37 @@ class BSession extends BClass
         return $handlers ? array_combine($handlers, $handlers) : [];
     }
 
+    public function getCookieDomain()
+    {
+        $confDomain = BConfig::i()->get('cookie/domain');
+        $httpHost = BRequest::i()->httpHost(false);
+        if (!empty($confDomain)) {
+            $allowedDomains = explode('|', $confDomain);
+            if (in_array($httpHost, $allowedDomains)) {
+                $domain = $httpHost;
+            } else {
+                $domain = $allowedDomains[0];
+            }
+        } else {
+            $domain = $httpHost;
+        }
+        return $domain;
+    }
+
+    public function getCookiePath()
+    {
+        $confPath = BConfig::i()->get('cookie/path');
+        $path = $confPath ? $confPath : BConfig::i()->get('web/base_store');
+        if (empty($path)) {
+            $path = BRequest::i()->webRoot();
+        }
+        return $path;
+    }
+
     /**
      * Open session
      *
+     * @todo work around multiple cookies in header bug: https://bugs.php.net/bug.php?id=38104
      * @param string|null $id Optional session ID
      * @param bool        $autoClose
      * @return $this
@@ -1759,20 +1787,8 @@ class BSession extends BClass
             $ttl = !empty($config['timeout']) ? $config['timeout'] : 3600;
         }
 
-        $path = !empty($config['path']) ? $config['path'] : BConfig::i()->get('web/base_store');
-        if (empty($path)) $path = BRequest::i()->webRoot();
-
-        $httpHost = BRequest::i()->httpHost(false);
-        if (!empty($config['domain'])) {
-            $allowedDomains = explode('|', $config['domain']);
-            if (in_array($httpHost, $allowedDomains)) {
-                $domain = $httpHost;
-            } else {
-                $domain = $allowedDomains[0];
-            }
-        } else {
-            $domain = $httpHost;
-        }
+        $domain = $this->getCookieDomain();
+        $path = $this->getCookiePath();
 
         if (!empty($config['session_handler']) && !empty($this->_availableHandlers[$config['session_handler']])) {
             $class = $this->_availableHandlers[$config['session_handler']];
@@ -1786,7 +1802,6 @@ class BSession extends BClass
             session_save_path($dir);
         }
         #ini_set('session.gc_maxlifetime', $rememberMeTtl); // moved to .haccess
-
         if (!empty($id) || ($id = BRequest::i()->get('SID'))) {
             session_id($id);
         }
@@ -1799,8 +1814,8 @@ class BSession extends BClass
             // update session cookie expiration to reflect current visit
             // @see http://www.php.net/manual/en/function.session-set-cookie-params.php#100657
             setcookie(session_name(), session_id(), time() + $ttl, $path, $domain, $https, true);
+            $this->_phpSessionOpen = true;
         }
-        $this->_phpSessionOpen = true;
         $this->_sessionId = session_id();
 
         if (!empty($config['session_check_ip'])) {
@@ -1946,17 +1961,58 @@ BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
             if (!$namespace) $namespace = 'default';
             $_SESSION[$namespace] = $this->data;
         }
+        // TODO: i think having problem with https://bugs.php.net/bug.php?id=38104
+        /*
+        if ($this->get('_regenerate_id')) {
+            session_regenerate_id(true);
+            $this->set('_regenerate_id', 0);
+        }
+        */
         BDebug::debug(__METHOD__, 1);
         session_write_close();
         $this->_phpSessionOpen = false;
+        /*
+echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
+        $sessionCookie = null;
+        $otherCookies = [];
+        foreach (headers_list() as $header) {
+            if (preg_match('/^set-cookie: (' . preg_quote(session_name()) . '=)?(.*)$/i', $header, $m)) {
+                if ($m[1]) { // not session cookie
+                    $sessionCookie = $m[0];
+                } else {
+                    $otherCookies[] = $m[0];
+                }
+            }
+        }
+        header($sessionCookie, true);
+        foreach ($otherCookies as $cookie) {
+            header($cookie, false);
+        }
+        */
         //$this->setDirty();
         return $this;
     }
 
     public function destroy()
     {
-        $this->open();
+        $path = $this->getCookiePath();
+        $domain = $this->getCookieDomain();
+        $https = BRequest::i()->https();
+        if (!isset($_SESSION) && !headers_sent()) {
+            session_set_cookie_params(0, $path, $domain, $https, true);
+            session_start();
+        }
         session_destroy();
+        setcookie(session_name(), '', time() - 3600, $this->getCookiePath(), $this->getCookieDomain(), $https, true);
+#echo "<pre>"; var_dump($_SESSION, $_COOKIE, session_name(), $this->getCookiePath(), $this->getCookieDomain()); exit;
+        return $this;
+    }
+
+    public function regenerateId()
+    {
+        //session_regenerate_id();
+        BSession::i()->set('_regenerate_id', 1);
+        return $this;
     }
 
     /**

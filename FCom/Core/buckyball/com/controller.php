@@ -391,7 +391,7 @@ class BRequest extends BClass
 
             // nginx rewrite fix
             $basename = basename(static::scriptName());
-            $path = preg_replace('#^/.*?' . preg_quote($basename) . '#', '', $path);
+            $path = preg_replace('#^/.*?' . preg_quote($basename, '#') . '#', '', $path);
 
             if (BConfig::i()->get('web/language_in_url') && preg_match('#^/([a-z]{2})(/.*|$)#', $path, $match)) {
                 static::$_language = $match[1];
@@ -734,7 +734,7 @@ class BRequest extends BClass
         }
         if ($checkPath) {
             $webRoot = BConfig::i()->get('web/root_dir');
-            if (!preg_match('#^' . preg_quote($webRoot) . '#', $parsed['path'])) {
+            if (!preg_match('#^' . preg_quote($webRoot, '#') . '#', $parsed['path'])) {
                 return false;
             }
         }
@@ -958,6 +958,7 @@ class BRequest extends BClass
             if (is_array($v)) {
                 $this->stripTagsRecursive($v,  $forUrlPath, $childPath);
             } elseif (!empty($v) && !is_numeric($v)) {
+                //$v = str_replace(chr(0137), '', (string)$v);
                 if (empty($this->_postTagsWhitelist[$forUrlPath][$childPath])) {
                     $v = strip_tags($v);
                 } else {
