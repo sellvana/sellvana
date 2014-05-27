@@ -119,6 +119,24 @@ class BRequest extends BClass
         return $a[0];
     }
 
+    public static function validateHttpHost($whitelist = null)
+    {
+        if (null === $whitelist) {
+            $whitelist = BConfig::i()->get('web/http_host_whitelist');
+        }
+        if (!$whitelist) {
+            return true;
+        }
+        $httpHost = static::httpHost(false);
+
+        foreach (explode(',', $whitelist) as $allowedHost) {
+            if (preg_match('/(^|\.)' . preg_quote(trim($allowedHost, ' .')) .'$/i', $httpHost)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
     * Port from request headers
     *
