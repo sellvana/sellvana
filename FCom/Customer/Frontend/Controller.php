@@ -171,7 +171,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     public function action_logout()
     {
         $reqCsrfToken = BRequest::i()->get('X-CSRF-TOKEN');
-        if ($reqCsrfToken !== BSession::i()->csrfToken()) {
+        if (!BSession::i()->validateCsrfToken($reqCsrfToken)) {
             BResponse::i()->redirect('');
             return;
         }

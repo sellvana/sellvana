@@ -66,7 +66,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         $this->layout('/reports');
     }
 
-    public function action_personalize()
+    public function action_personalize__POST()
     {
         $r = BRequest::i()->request();
         $data = [];
