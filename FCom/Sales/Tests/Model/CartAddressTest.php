@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Sales_Tests_Model_CartAddressTest extends FCom_Test_DatabaseTestCase
 {

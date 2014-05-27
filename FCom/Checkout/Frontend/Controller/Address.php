@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller_Abstract
 {

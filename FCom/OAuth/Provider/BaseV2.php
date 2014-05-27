@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_OAuth_Provider_BaseV2 extends FCom_OAuth_Provider_Abstract
 {

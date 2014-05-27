@@ -1,5 +1,4 @@
-<?php
-
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_IndexTank_Search extends BClass
 {

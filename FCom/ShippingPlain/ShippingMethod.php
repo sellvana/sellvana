@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_ShippingPlain_ShippingMethod extends FCom_Sales_Method_Shipping_Abstract
 {

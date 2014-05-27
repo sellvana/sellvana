@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 $data = $this->gridData();
 $config = $this->grid['config'];
 $s = $data['result']['state'];

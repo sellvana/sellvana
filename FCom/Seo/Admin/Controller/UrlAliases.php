@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Seo_Admin_Controller_UrlAliases extends FCom_Admin_Controller_Abstract_GridForm
 {

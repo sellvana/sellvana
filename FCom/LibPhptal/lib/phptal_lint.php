@@ -1,5 +1,6 @@
 #!/usr/bin/env php
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
  * This is lint tool for checking corectness of template syntax.
  * 

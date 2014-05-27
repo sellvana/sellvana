@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Catalog_ApiServer_V1_Product extends FCom_ApiServer_Controller_Abstract
 {

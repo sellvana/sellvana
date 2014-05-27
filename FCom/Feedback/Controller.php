@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Feedback_Controller extends FCom_Core_Controller_Abstract
 {

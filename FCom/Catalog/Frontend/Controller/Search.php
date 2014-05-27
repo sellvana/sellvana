@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_Abstract
 {

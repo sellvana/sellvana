@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
  * Model class for table 'fcom_customer'
  * The followings are the available columns in table 'fcom_customer':
