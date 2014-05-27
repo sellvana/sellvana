@@ -2140,8 +2140,7 @@ class BModel extends Model
     public static function load($id, $field = null, $cache = false)
     {
         if (true !== $field && is_array($id)) {
-            BDebug::notice('Invalid usage of load(), use loadWhere()');
-            return false;
+            throw new BException('Invalid ID parameter');
         }
 
         $class = static::$_origClass ? static::$_origClass : get_called_class();
