@@ -190,12 +190,9 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
     {
         $p = BRequest::i()->post();
         $p['tmp_cost'] = $p['cost'];
-        if ($p['cost'] != '') {
-            $p['cost'] = BLocale::currency($p['cost']);
-        }
         if (isset($p['sku'])) {
-            $prod = FCom_Catalog_Model_Product::i()->loadWhere(['local_sku' => $p['sku']]);
-            FCom_Stock_Model_Sku::i()->loadWhere(['id' => $p['id']])->set('status', $p['status'])->save();
+            $prod = FCom_Catalog_Model_Product::i()->load($p['sku'], 'local_sku');
+            FCom_Stock_Model_Sku::i()->load($p['id'])->set('status', $p['status'])->save();
             if ($prod) {
                 $data_serialized = BUtil::objectToArray(json_decode($prod->get('data_serialized')));
                 if (!isset($data_serialized['stock_policy']))  {
@@ -209,6 +206,9 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
                 $prod->set('cost', $p['cost']);
                 $prod->save();
             }
+        }
+        if ($p['cost'] != '') {
+            $p['cost'] = BLocale::currency($p['cost']);
         }
         BResponse::i()->json($p);
     }
