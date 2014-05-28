@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
  * Ganon single file version - PHP5+ version
  * Generated on 20 Oct 2012
@@ -1669,6 +1670,8 @@ class HTML_Node {
                             case 'ends_with':
                                 $res = ((substr($val, -strlen($match['value'])) === $match['value']) === $match['match']);
                                 if ($res) break 1; else break 2;
+
+
                             case '^=':
                             case 'starts_with':
                                 $res = ((substr($val, 0, strlen($match['value'])) === $match['value']) === $match['match']);

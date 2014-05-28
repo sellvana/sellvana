@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 abstract class FCom_Sales_Model_Cart_Total_Abstract extends BCLass implements FCom_Sales_Model_Cart_Total_Interface
 {

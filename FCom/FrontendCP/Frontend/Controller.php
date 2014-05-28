@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abstract
 {

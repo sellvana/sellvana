@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Controller_Abstract_GridForm
 {

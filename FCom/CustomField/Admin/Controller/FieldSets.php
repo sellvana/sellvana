@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_Abstract
 {

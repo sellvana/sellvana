@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
 {

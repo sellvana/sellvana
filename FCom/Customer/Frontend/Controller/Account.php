@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller_Abstract
 {

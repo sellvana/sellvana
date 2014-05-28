@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
@@ -70,6 +70,10 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
     {
         $r = BRequest::i()->request();
         $data = [];
+        if (empty($r['do'])) {
+            BResponse::i()->json(['error' => true, 'r' => $r]);
+            return;
+        }
         switch ($r['do']) {
         case 'grid.col.width':
             if (empty($r['grid']) || empty($r['width'])) {

@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 class FCom_Wishlist_Migrate extends BClass
 {
     public function install__0_1_1()
@@ -22,7 +23,7 @@ class FCom_Wishlist_Migrate extends BClass
             PRIMARY KEY (`id`),
             KEY `wishlist_id` (`wishlist_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");    
+        ");
     }
 
     public function upgrade__0_1_0__0_1_1()

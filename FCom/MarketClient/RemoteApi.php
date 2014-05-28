@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 final class FCom_MarketClient_RemoteApi extends BClass
 {

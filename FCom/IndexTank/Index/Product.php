@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 {

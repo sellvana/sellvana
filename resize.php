@@ -54,8 +54,8 @@ class ImageResizer
         $this->useCache = isset($p['cache']) ? (bool)$p['cache'] : true;
 
         $this->size     = !empty($p['s']) ? explode('x', $p['s']) : [];
-        $this->dw       = !empty($this->size[0]) && is_numeric($this->size[0]) ? max($this->size[0], 1000) : 500;
-        $this->dh       = !empty($this->size[1]) && is_numeric($this->size[1]) ? max($this->size[1], 1000) : $this->dw;
+        $this->dw       = !empty($this->size[0]) && is_numeric($this->size[0]) ? min($this->size[0], 1000) : 500;
+        $this->dh       = !empty($this->size[1]) && is_numeric($this->size[1]) ? min($this->size[1], 1000) : $this->dw;
         $this->quality  = !empty($p['q']) ? (int)$p['q'] : 95;
         $this->bg       = !empty($p['bg']) ? $p['bg'] : 'FFFFFF';
         $this->txtColor = !empty($p['c']) ? $p['c'] : '888888';

@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Ogone_CheckoutMethod extends FCom_Sales_Method_Checkout_Abstract
 {

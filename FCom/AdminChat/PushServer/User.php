@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_AdminChat_PushServer_User extends FCom_PushServer_Service_Abstract
 {

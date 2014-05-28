@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Blog_Model_Tag extends FCom_Core_Model_Abstract
 {

@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
 * Copyright 2014 Boris Gurvich
 *
@@ -116,6 +117,24 @@ class BRequest extends BClass
         }
         $a = explode(':', $_SERVER['HTTP_HOST']);
         return $a[0];
+    }
+
+    public static function validateHttpHost($whitelist = null)
+    {
+        if (null === $whitelist) {
+            $whitelist = BConfig::i()->get('web/http_host_whitelist');
+        }
+        if (!$whitelist) {
+            return true;
+        }
+        $httpHost = static::httpHost(false);
+
+        foreach (explode(',', $whitelist) as $allowedHost) {
+            if (preg_match('/(^|\.)' . preg_quote(trim($allowedHost, ' .')) .'$/i', $httpHost)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -638,12 +657,13 @@ class BRequest extends BClass
 
         if (null === $checkMethod) {
             $m = $c->get('web/csrf_check_method');
-            $checkMethod = $m ? $m : 'referrer';
+            $checkMethod = $m ? $m : 'token';
         }
 
         switch ($checkMethod) {
             case 'referrer':
-                if (!($ref = static::referrer())) {
+                $ref = static::referrer();
+                if (!$ref) {
                     return true; // no referrer sent, high prob. csrf
                 }
                 $p = parse_url($ref);
@@ -660,6 +680,18 @@ class BRequest extends BClass
                 }
                 return false; // not csrf
 
+            case 'origin':
+                $origin = static::httpOrigin();
+                if (!$origin) {
+                    return true;
+                }
+                $p = parse_url($origin);
+                if ($p['host'] !== static::httpHost(false)) {
+                    return true;
+                }
+                return false;
+                break;
+
             case 'token':
                 if (!empty($_SERVER['HTTP_X_CSRF_TOKEN'])) {
                     $receivedToken = $_SERVER['HTTP_X_CSRF_TOKEN'];
@@ -667,6 +699,7 @@ class BRequest extends BClass
                     $receivedToken = $_POST['X-CSRF-TOKEN'];
                 }
                 return empty($receivedToken) || !BSession::i()->validateCsrfToken($receivedToken);
+
 
             default:
                 throw new BException('Invalid CSRF check method: ' . $checkMethod);

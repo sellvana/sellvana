@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_MarketClient_Controller_Download extends FCom_Core_Controller_Abstract
 {

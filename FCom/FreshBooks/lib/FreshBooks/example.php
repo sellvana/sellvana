@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 //include particular file for entity you need (Client, Invoice, Category...)
 include_once "library/FreshBooks/Client.php";
 

@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 class FCom_IndexTank_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
     static public function bootstrap()

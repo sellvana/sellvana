@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
  * Class FCom_CatalogIndex_Indexer
@@ -396,6 +396,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 }
                 // 3. add filter condition to products ORM
                 $productsOrm->where($whereArr);
+
 
                 foreach ($fReqValues as $v) {
                     $v = strtolower($v);

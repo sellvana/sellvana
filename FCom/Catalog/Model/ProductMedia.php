@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Catalog_Model_ProductMedia extends FCom_Core_Model_Abstract
 {

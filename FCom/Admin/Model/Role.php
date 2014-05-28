@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
  * @method static FCom_Admin_Model_Role i()
