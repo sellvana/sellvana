@@ -2454,7 +2454,6 @@ class BDebug extends BClass
         }
 
         $message = "{$e['level']}: {$e['msg']}" . (isset($e['file']) ? " ({$e['file']}:{$e['line']})" : '');
-
         if (($moduleName = BModuleRegistry::i()->currentModuleName())) {
             $e['module'] = $moduleName;
         }
@@ -2502,10 +2501,12 @@ class BDebug extends BClass
         $l = static::$_level[static::OUTPUT];
         if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
             echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
-            //ob_start();
+            ob_start();
             echo htmlspecialchars($message) . "\n";
             debug_print_backtrace();
-            //echo ob_get_clean();
+            $output = ob_get_clean();
+            $output = str_replace(['\\', FULLERON_ROOT_DIR . '/'], ['/', ''], $output);
+            echo $output;
             echo '</xmp>';
         }
 /*

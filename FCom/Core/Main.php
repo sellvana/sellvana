@@ -285,6 +285,13 @@ class FCom_Core_Main extends BClass
                 BDebug::mode($ipModes['*']);
             }
         }
+        if (BDebug::is('DEBUG')) {
+            ini_set('display_errors', 1);
+            error_reporting(E_ALL | E_STRICT);
+        } else {
+            ini_set('display_errors', 0);
+            error_reporting(0);
+        }
 #print_r(BDebug::mode());
         return $this;
     }
