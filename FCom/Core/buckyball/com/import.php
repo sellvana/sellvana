@@ -57,6 +57,13 @@ class BImport extends BClass
     {
         // assume we know nothing about the file
         $info = [];
+
+        $importDir = str_replace('\\', '/', $this->getImportDir());
+        $realFile = str_replace('\\', '/', realpath($file));
+        if (!preg_match('#^' . preg_quote($importDir, '#') . '#', $realFile)) {
+            return false;
+        }
+
         // open file for reading
         if (!file_exists($file))
             return false;
