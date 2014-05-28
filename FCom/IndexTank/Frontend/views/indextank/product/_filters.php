@@ -16,12 +16,12 @@ $s = $this->state;
             <ul>
             <?php foreach ($data as $obj): ?>
                 <?php if (!empty($s['filter_selected'][$obj->key]) && in_array($obj->name, $s['filter_selected'][$obj->key])):?>
-                    <li><a class="active" href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), [$obj->param => ''])?>"><span class="icon"></span><?=$obj->name?> <span class="badge">(<?=$obj->count?>)</span></a></li>
+                    <li><a class="active" href="<?=$this->q(BUtil::setUrlQuery(BRequest::currentUrl(), [$obj->param => '']))?>"><span class="icon"></span><?=$obj->name?> <span class="badge">(<?=$obj->count?>)</span></a></li>
                     <?php if (true == $s['save_filter']):?>
                         <input type="hidden" name="<?=$obj->param?>" value="<?=$obj->name?>" />
                     <?php endif; ?>
                 <?php else :?>
-                    <li><a href="<?=BUtil::setUrlQuery(BRequest::currentUrl(), [$obj->param => $obj->name])?>"><span class="icon"></span><?=$obj->name?> <span class="badge">(<?=$obj->count?>)</span></a></li>
+                    <li><a href="<?=$this->q(BUtil::setUrlQuery(BRequest::currentUrl(), [$obj->param => $obj->name]))?>"><span class="icon"></span><?=$obj->name?> <span class="badge">(<?=$obj->count?>)</span></a></li>
                 <?php endif; ?>
             <?php endforeach ?>
             </ul>
