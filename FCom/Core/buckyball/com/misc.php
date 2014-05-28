@@ -2503,7 +2503,7 @@ class BDebug extends BClass
         if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
             echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
             //ob_start();
-            echo $message . "\n";
+            echo htmlspecialchars($message) . "\n";
             debug_print_backtrace();
             //echo ob_get_clean();
             echo '</xmp>';
