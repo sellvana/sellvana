@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMethod_Aim
 {

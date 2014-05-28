@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Frontend_View_Breadcrumbs extends BView
 {

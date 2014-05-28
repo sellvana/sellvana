@@ -1,7 +1,16 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller_Abstract
 {
+    public function beforeDispatch()
+    {
+        if (!parent::beforeDispatch()) return false;
+
+        BResponse::i()->nocache();
+
+        return true;
+    }
+
     public function action_address()
     {
         $atype = BRequest::i()->get('t');

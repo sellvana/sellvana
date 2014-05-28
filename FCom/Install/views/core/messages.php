@@ -1,3 +1,5 @@
+<?php defined('BUCKYBALL_ROOT_DIR') || die(); ?>
+
 <?php foreach ($this->getMessages() as $msg): ?>
     <div class="alert alert-dismissable alert-<?= !empty($msg['class']) ? $this->q($msg['class']) : '' ?>">
         <a class="close" data-dismiss="alert" href="#">&times;</a>

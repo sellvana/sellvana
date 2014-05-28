@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class BEvents_Test extends PHPUnit_Framework_TestCase
 {

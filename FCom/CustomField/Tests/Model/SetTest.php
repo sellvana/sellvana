@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_CustomField_Tests_Model_SetTest extends FCom_Test_DatabaseTestCase
 {

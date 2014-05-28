@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_PushServer_Service_Abstract extends BClass implements FCom_PushServer_Service_Interface
 {

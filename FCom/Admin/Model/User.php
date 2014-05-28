@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 {
@@ -191,7 +191,9 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if (empty($username) || empty($password)) {
             return false;
         }
-        BLoginThrottle::i()->init('FCom_Admin', $username);
+        if (!BLoginThrottle::i()->init('FCom_ApiServer', $username)) {
+            return false;
+        }
         /** @var FCom_Admin_Model_User */
         $user = static::i()->orm()->where('api_username', $username)->find_one();
         if (!$user || !$user->validatePassword($password, 'api_password_hash')) {
@@ -204,6 +206,8 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     public function login()
     {
+        //session_regenerate_id(true);
+
         $this->set('last_login', BDb::now())->save();
 
         BSession::i()->set('admin_user_id', $this->id());
@@ -227,6 +231,9 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         #BSession::i()->set('admin_user_password_token', null);
         $sessData =& BSession::i()->dataToUpdate();
         $sessData = [];
+
+        BSession::i()->regenerateId();
+
         static::$_sessionUser = null;
     }
 

@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
  * Model class for table 'fcom_customer'
  * The followings are the available columns in table 'fcom_customer':
@@ -329,6 +330,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         $sessData =& BSession::i()->dataToUpdate();
         $sessData = [];
         static::$_sessionUser = null;
+
+        BSession::i()->regenerateId();
     }
 
     static public function register($r)

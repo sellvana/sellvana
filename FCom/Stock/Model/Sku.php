@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Stock_Model_Sku extends FCom_Core_Model_Abstract
 {
@@ -15,8 +15,8 @@ class FCom_Stock_Model_Sku extends FCom_Core_Model_Abstract
 
     public function manageStockOptions() {
         return [
-            0 => BLocale::_('Manage stock for this product'),
-            1 => BLocale::_('Don\'t manage stock for this product'),
+            0 => BLocale::_('Don\'t manage stock for this product'),
+            1 => BLocale::_('Manage stock for this product'),
         ];
     }
 

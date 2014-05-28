@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 {
@@ -229,7 +229,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                                 if (!empty($grid['config']['form_url']) && empty($btn['href'])) {
                                     $btn['href'] = $grid['config']['form_url'] . '?' . $btn['col'] . '=';
                                 }
-                                $btn['cssClass'] = ' btn-xs btn-edit ';
+                                $btn['cssClass'] = (isset($btn['cssClass'])) ? $btn['cssClass']: ' btn-xs btn-edit ';
+//                                $btn['cssClass'] = ' btn-xs btn-edit ';
                                 break;
 
                             case 'delete':

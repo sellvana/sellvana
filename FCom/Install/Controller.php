@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 {
@@ -106,6 +106,19 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         }
         try {
             $w = BRequest::i()->post('w');
+            if (empty($w['db']) || !BValidate::i()->validateInput($w['db'], [
+                ['host', '@required'],
+                ['host', '/^[A-Za-z0-9.\[\]:-]+$/'],
+                ['port', '@required'],
+                ['port', '@numeric'],
+                ['dbname', '@required'],
+                ['dbname', '/^[A-Za-z0-9_]+$/'],
+                ['username', '@required'],
+                ['username', '/^[A-Za-z0-9_]+$/'],
+                ['table_prefix', '/^[A-Za-z0-9_]+$/'],
+            ])) {
+                throw new BException('Invalid form data');
+            }
             BConfig::i()->add(['db' => $w['db']], true);
             BDb::connect(null, true);
             FCom_Core_Main::i()->writeConfigFiles('db');
@@ -146,6 +159,19 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         }
         try {
             $w = BRequest::i()->post('w');
+            if (empty($w['admin']) || !BValidate::i()->validateInput($w['admin'], [
+                ['firstname', '@required'],
+                ['lastname', '@required'],
+                ['email', '@required'],
+                ['email', '@email'],
+                ['username', '@required'],
+                ['username', '/^[A-Za-z0-9_.@-]+$/'],
+                ['password', '@required'],
+                ['password_confirm', '@required'],
+                ['password_confirm', '@password_confirm'],
+            ])) {
+                throw new BException('Invalid form data');
+            }
             BMigrate::i()->migrateModules('FCom_Admin', true);
             FCom_Admin_Model_User::i()
                 ->create($w['admin'])

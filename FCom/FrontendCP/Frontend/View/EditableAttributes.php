@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_FrontendCP_Frontend_View_EditableAttributes extends FCom_Core_View_Abstract
 {

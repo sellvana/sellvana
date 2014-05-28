@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 require_once "PHPUnit/Extensions/Database/TestCase.php";
 
 abstract class FCom_Test_DatabaseTestCase extends PHPUnit_Extensions_Database_TestCase

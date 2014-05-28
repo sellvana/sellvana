@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
 * Copyright 2014 Boris Gurvich
 *
@@ -211,7 +212,7 @@ class BDb
            if (strlen(trim($query)) > 0) {
                 // try {
                     BDebug::debug('DB.RUN: ' . $query);
-                    if (!empty($options['echo'])) {
+                    if (!empty($options['echo']) && BDebug::is('DEBUG')) {
                         echo '<hr><pre>' . $query . '<pre>';
                     }
                     BORM::set_last_query($query);

@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 class FCom_CatalogIndex_Migrate extends BClass
 {
     public function install__0_1_9()
