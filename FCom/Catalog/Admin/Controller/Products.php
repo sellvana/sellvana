@@ -95,8 +95,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $m = $args['model'];
         $newAction = [];
         if ($m->id) {
-            $newAction['duplicate'] = '<a href="' . BApp::href($this->_gridHref . '/duplicate?id=' . $m->id) .
-                '" title="Duplicate" class="btn btn-primary"><span>' .  BLocale::_('Duplicate') . '</span></a>';
+            $newAction['duplicate'] = '<button type="submit" class="btn btn-primary ignore-validate" name="do" value="DUPLICATE" '
+                . 'onclick="return confirm(\'Are you sure?\')"><span>' .  $this->_('Duplicate') . '</span></button>';
         }
         $newAction['saveAndContinue'] = '<button type="submit" class="btn btn-primary" name="do" value="saveAndContinue"><span>'
             . BLocale::_('Save And Continue') . '</span></button>';
@@ -107,6 +107,14 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             'actions' => $actions
         ]);
         $this->_formTitle = $m->id ? 'Edit Product: ' . $m->product_name : 'Create New Product';
+    }
+
+    public function formPostBefore($args)
+    {
+        if ($args['do'] == 'DUPLICATE') {
+            $this->duplicateProduct($args['id']);
+            exit();
+        }
     }
 
     public function openCategoriesData($model)
@@ -684,9 +692,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     }
     */
 
-    public function action_duplicate()
+    public function duplicateProduct($id = '')
     {
-        $id = BRequest::i()->param('id', true);
+        if (empty($id)) {
+            $id = BRequest::i()->param('id', true);
+        }
         $redirectUrl = BApp::href($this->_formHref) . '?id=' . $id;
         try {
             $oldModel = FCom_Catalog_Model_Product::i()->load($id);
