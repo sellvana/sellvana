@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_Abstract
 {
@@ -84,6 +84,9 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
     public function action_search()
     {
         $q = BRequest::i()->get('q');
+        if (is_array($q)) {
+            $q = join(' ', $q);
+        }
         $filter = BRequest::i()->get('f');
 
         $this->layout('/catalog/category');
@@ -118,6 +121,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
 
         FCom_Catalog_Model_SearchHistory::i()->addSearchHit($q, $productsData['state']['c']);
 
+        $layout->view('header')->set('query', $q);
         $layout->view('breadcrumbs')->set('crumbs', ['home', ['label' => 'Search: ' . $q, 'active' => true]]);
         $layout->view('catalog/search')->set('query', $q);
         $pagerView->set('filters', $filter);

@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
@@ -18,6 +18,9 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $this->layout('/customer/login');
 
         $redirect = BRequest::i()->get('redirect_to');
+        if (!BRequest::i()->isUrlLocal($redirect)) {
+            $redirect = '';
+        }
         if ($redirect === 'CURRENT') {
             $redirect = BRequest::i()->referrer();
         }
@@ -38,6 +41,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $customerModel->setLoginRules();
             if ($customerModel->validate($login, [], 'frontend')) {
                 $user = $customerModel->authenticate($login['email'], $login['password']);
+
                 if ($user) {
                     switch ($user->status) {
                         case 'active':
@@ -74,8 +78,11 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             } else {
                 $this->formMessages();
             }
-            if ($r->request('redirect_to')) {
-                $url = $r->request('redirect_to');
+            $url = $r->request('redirect_to');
+            if (!$r->isUrlLocal($url)) {
+                $url = '';
+            }
+            if ($url) {
                 if ($url === 'CURRENT') {
                     $url = $r->referrer();
                 }
@@ -150,14 +157,11 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $sessData['password_reset_token'] = null;
 
             $user->resetPassword($password);
-            if ($user->status === 'active') {
-                $this->message('Password has been reset');
-                $user->login();
-                BResponse::i()->redirect(BApp::baseUrl());
-            } else {
-                $this->message('Password has been reset. You will be able to login after your account is approved');
-                BResponse::i()->redirect('login');
+            $this->message('Password has been reset.');
+            if ($user->status === 'review') {
+                $this->message('You will be able to login after your account is approved', 'warning');
             }
+            BResponse::i()->redirect('login');
         } else {
             $this->message('Invalid form data', 'error');
             BResponse::i()->redirect('login');
@@ -166,6 +170,11 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_logout()
     {
+        $reqCsrfToken = BRequest::i()->get('X-CSRF-TOKEN');
+        if (!BSession::i()->validateCsrfToken($reqCsrfToken)) {
+            BResponse::i()->redirect('');
+            return;
+        }
         FCom_Customer_Model_Customer::i()->logout();
         BResponse::i()->cookie('remember_me', 0);
         BResponse::i()->redirect(BApp::baseUrl());

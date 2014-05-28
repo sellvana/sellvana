@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -6,7 +6,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
     protected $_permission = 'catalog/stocks';
     protected $_modelClass = 'FCom_Stock_Model_Sku';
     protected $_gridHref = 'stock';
-    protected $_gridTitle = 'Stock Inventory';
+    protected $_gridTitle = 'Stock Management';
     protected $_recordName = 'SKU';
     protected $_mainTableAlias = 's';
     protected $_navPath = 'catalog/stock';
@@ -14,33 +14,103 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
     public function gridConfig()
     {
         $config = parent::gridConfig();
+        unset($config['form_url']);
+        $data = [];
+        $settings = BConfig::i()->get('modules/FCom_Catalog');
+        $callback = function ($row) use (&$data) {
+            $data_serialized = BUtil::objectToArray(json_decode($row->get('data_serialized')));
+            $qty = '';
+            //$tmp_cost use when edit inline
+            //@TODO: find solution other when edit inline cost only display number instead include symbol currency
+            $cost = $tmp_cost = '';
+            if ($row->get('cost')) {
+                $tmp_cost = $row->get('cost');
+                $cost = BLocale::currency($tmp_cost);
+            }
+            $out_stock = (isset($settings['out_stock']))? 'back_order': '';
+            if (isset($data_serialized['stock_policy'])) {
+                $qty = $data_serialized['stock_policy']['stock_qty'];
+                $out_stock = $data_serialized['stock_policy']['out_stock'];
+            }
+            $tmp = [
+                'id' => $row->get('id'),
+                'sku' => $row->get('sku'),
+                'cost' => $cost,
+                'tmp_cost' => $tmp_cost,
+                'product_name' => $row->get('product_name'),
+                'status' => $row->get('status'),
+                'stock_qty' => $qty,
+                'out_stock' => $out_stock,
+            ];
+            array_push($data, $tmp);
+        };
+        FCom_Stock_Model_Sku::i()->orm($this->_mainTableAlias)->select(array($this->_mainTableAlias.'.*', 'p.data_serialized', 'p.cost', 'p.product_name'))
+            ->left_outer_join('FCom_Catalog_Model_Product', [ 'p.local_sku', '=', $this->_mainTableAlias . '.sku'], 'p')
+            ->select_expr('p.product_name', 'product_name')
+            ->select_expr('p.cost', 'cost')->iterate($callback);
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'width' => 50, 'index' => 's.id'],
-            ['type' => 'input', 'name' => 'sku', 'label' => 'SKU', 'width' => 300, 'index' => 's.sku',
-                    'editable' => true, 'addable' => true, 'edit_inline' => true, 'editor' => 'text',
-                    'validation' => ['required' => true, 'unique' => BApp::href('stock/unique')]],
-            ['type' => 'input', 'name' => 'qty_in_stock', 'label' => 'Qty In Stock', 'width' => 300,
-                    'index' => 's.qty_in_stock', 'editable' => true, 'addable' => true, 'edit_inline' => true,
-                    'editor' => 'text', 'validation' => ['required' => true, 'number' => true]],
+            ['type' => 'input', 'name' => 'sku', 'label' => 'SKU', 'width' => 300, 'index' => $this->_mainTableAlias.'.sku',
+                    //'editable' => true, 'addable' => true, 'editor' => 'text',
+                    //'validation' => ['required' => true, 'unique' => BApp::href('stock/unique')]
+            ],
+            ['name' => 'product_name', 'label' => 'Product Name', 'width' => 300],
+            ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'width' => 150,
+                'index' => $this->_mainTableAlias.'.status', 'editable' => true, 'edit_inline' => true,
+                'mass-editable-show' => true, 'mass-editable' => true,
+                'editor' => 'select', 'options' => FCom_Stock_Model_Sku::i()->statusOptions() ],
+            ['type' => 'input', 'name' => 'out_stock', 'label' => 'Out of Stock Policy', 'width' => 150,
+                'mass-editable-show' => true, 'mass-editable' => true,
+                'editable' => true, 'edit_inline' => true, 'editor' => 'select', 'options' => FCom_Stock_Model_Sku::i()->outStockOptions()],
+            ['type' => 'input', 'name' => 'cost', 'label' => 'Cost', 'width' => 300,
+                'editable' => true, 'edit_inline' => true,'editor' => 'text', 'validation' => ['number' => true]],
+            ['type' => 'input', 'name' => 'stock_qty', 'label' => 'Quantity', 'width' => 150,
+                'editable' => true, 'edit_inline' => true,
+                'editor' => 'text', 'validation' => ['required' => true, 'number' => true]],
             ['type' => 'btn_group',
                   'buttons' => [
-                                    ['name' => 'edit'],
+                                    ['name' => 'edit', 'icon' => 'icon-pencil ', 'cssClass' => 'btn-xs btn-edit-inline'],
+                                    ['name' => 'save-inline', 'icon' => ' icon-ok-sign', 'cssClass' => 'btn-xs btn-save-inline hide'],
                                     ['name' => 'delete'],
-                                    ['name' => 'edit_inline']
                                 ]
                 ]
         ];
+        $config['data_mode'] = 'local';
+        $config['data'] = $data;
         $config['actions'] = [
-//            'new' => array('caption' => 'Add New Customer Group', 'modal' => true),
             'edit' => true,
             'delete' => true
         ];
+        $config['callbacks']['before_edit_inline'] = '
+            this.$el.find("input").addClass("input-stock");
+            this.$el.find("input[name=\'cost\']").val(this.model.get("tmp_cost"));
+            function stockInputValidate(value, elem, params) {
+                if (value < 0) {
+                    return false;
+                }
+                return true;
+            }
+            $.validator.addMethod("stockInputValidate",stockInputValidate , function(params, element) {
+                if ($(element).attr("name") == "cost") {
+                    return "'.BLocale::_('The cost of an item cannot be less than zero').'";
+                }
+                if ($(element).attr("name") == "stock_qty") {
+                    return "'.BLocale::_('Stock Item cannot have less than 0 quantity in stock').'";
+                }
+
+            });
+            $.validator.addClassRules("input-stock", {
+                stockInputValidate: true
+            });
+        ';
         $config['filters'] = [
             ['field' => 'sku', 'type' => 'text'],
-            ['field' => 'qty_in_stock', 'type' => 'number-range'],
+            ['field' => 'product_name', 'type' => 'text'],
+            ['field' => 'status', 'type' => 'select'],
+            ['field' => 'out_stock', 'type' => 'select'],
+            ['field' => 'stock_qty', 'type' => 'number-range'],
         ];
-        $config['new_button'] = '#add_new_sku';
         return $config;
     }
 
@@ -114,5 +184,32 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
         } else {
             $this->_processGridDataPost($this->_modelClass);
         }
+    }
+
+    public function action_index__POST()
+    {
+        $p = BRequest::i()->post();
+        $p['tmp_cost'] = $p['cost'];
+        if (isset($p['sku'])) {
+            $prod = FCom_Catalog_Model_Product::i()->load($p['sku'], 'local_sku');
+            FCom_Stock_Model_Sku::i()->load($p['id'])->set('status', $p['status'])->save();
+            if ($prod) {
+                $data_serialized = BUtil::objectToArray(json_decode($prod->get('data_serialized')));
+                if (!isset($data_serialized['stock_policy']))  {
+                    $data_serialized['stock_policy'] = ['stock_qty' => $p['stock_qty'], 'out_stock' => $p['out_stock'], 'manage_stock' => $p['manage_stock']];
+                } else {
+                    $data_serialized['stock_policy']['stock_qty'] = $p['stock_qty'];
+                    $data_serialized['stock_policy']['out_stock'] = $p['out_stock'];
+                    $data_serialized['stock_policy']['manage_stock'] = $p['status'];
+                }
+                $prod->setData('stock_policy', $data_serialized['stock_policy']);
+                $prod->set('cost', $p['cost']);
+                $prod->save();
+            }
+        }
+        if ($p['cost'] != '') {
+            $p['cost'] = BLocale::currency($p['cost']);
+        }
+        BResponse::i()->json($p);
     }
 }

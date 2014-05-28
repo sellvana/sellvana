@@ -98,7 +98,7 @@
           </li>
           <li class="divider"></li>
           <li>
-            <a href="{{ APP.href("logout") }}">{{ "Sign out" |_ }}</a>
+            <a href="{{ APP.href("logout") ~ '?X-CSRF-TOKEN=' ~ SESSION.csrfToken() }}">{{ "Sign out" |_ }}</a>
           </li>
         </ul>
       </li>

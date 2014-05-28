@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
 {
@@ -15,10 +15,10 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
             return false;
         }
         if (!$this->_sessionWishlist) {
-            $wishlist = static::i()->load(["customer_id", $customer->id()]);
+            $wishlist = static::i()->loadWhere(["customer_id" => $customer->id()]);
             if (!$wishlist) {
                 $this->orm()->create()->set("customer_id", $customer->id())->save();
-                $wishlist = static::i()->load(["customer_id", $customer->id()]);
+                $wishlist = static::i()->loadWhere(["customer_id" => $customer->id()]);
             }
 
             $this->_sessionWishlist = $wishlist;
@@ -43,7 +43,7 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
 
     public function addItem($productId)
     {
-        $item = FCom_Wishlist_Model_WishlistItem::i()->load(['wishlist_id' => $this->id(), 'product_id' => $productId]);
+        $item = FCom_Wishlist_Model_WishlistItem::i()->loadWhere(['wishlist_id' => $this->id(), 'product_id' => $productId]);
         if (!$item) {
             $item = FCom_Wishlist_Model_WishlistItem::i()->orm()->create();
             $item->set('wishlist_id', $this->id())

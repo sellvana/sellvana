@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -95,8 +95,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $m = $args['model'];
         $newAction = [];
         if ($m->id) {
-            $newAction['duplicate'] = '<a href="' . BApp::href($this->_gridHref . '/duplicate?id=' . $m->id) .
-                '" title="Duplicate" class="btn btn-primary"><span>' .  BLocale::_('Duplicate') . '</span></a>';
+            $newAction['duplicate'] = '<button type="submit" class="btn btn-primary ignore-validate" name="do" value="DUPLICATE" '
+                . 'onclick="return confirm(\'Are you sure?\')"><span>' .  $this->_('Duplicate') . '</span></button>';
         }
         $newAction['saveAndContinue'] = '<button type="submit" class="btn btn-primary" name="do" value="saveAndContinue"><span>'
             . BLocale::_('Save And Continue') . '</span></button>';
@@ -107,6 +107,14 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             'actions' => $actions
         ]);
         $this->_formTitle = $m->id ? 'Edit Product: ' . $m->product_name : 'Create New Product';
+    }
+
+    public function formPostBefore($args)
+    {
+        if ($args['do'] == 'DUPLICATE') {
+            $this->duplicateProduct($args['id']);
+            exit();
+        }
     }
 
     public function openCategoriesData($model)
@@ -497,7 +505,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             }
             if (isset($data[$typeName])) {
                 foreach ($data[$typeName] as $key => $arr) {
-                    $productLink = $hlp->load(['product_id' => $model->id, 'linked_product_id' => $key, 'link_type' => $type]);
+                    $productLink = $hlp->loadWhere(['product_id' => $model->id(), 'linked_product_id' => (int)$key, 'link_type' => (string)$type]);
                     $position = (is_numeric($data[$typeName][$key]['product_link_position']))
                         ? (int) $data[$typeName][$key]['product_link_position'] : 0;
                     if ($productLink) {
@@ -644,6 +652,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
 
     }
+    /*
     public function onMediaGridConfig($args)
     {
         array_splice($args['config']['grid']['colModel'], -1, 0, [
@@ -662,7 +671,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $hlp = FCom_Catalog_Model_ProductMedia::i();
         $id = $args['model']->id;
-        if (!$hlp->load(['product_id' => null, 'file_id' => $id])) {
+        if (!$hlp->loadWhere(['product_id' => null, 'file_id' => $id])) {
             $hlp->create(['file_id' => $id, 'media_type' => $args['type']])->save();
         }
     }
@@ -670,21 +679,24 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function onMediaGridEdit($args)
     {
         $r = BRequest::i();
-        $m = Denteva_Model_Vendor::i()->load([
+        $m = Denteva_Model_Vendor::i()->loadWhere([
             'is_manuf' => 1,
             'vendor_name' => $r->post('manuf_vendor_name')
         ]);
         FCom_Catalog_Model_ProductMedia::i()
-            ->load(['product_id' => null, 'file_id' => $args['model']->id])
+            ->loadWhere(['product_id' => null, 'file_id' => $args['model']->id])
             ->set([
                 'manuf_vendor_id' => $m ? $m->id : null,
             ])
             ->save();
     }
+    */
 
-    public function action_duplicate()
+    public function duplicateProduct($id = '')
     {
-        $id = BRequest::i()->param('id', true);
+        if (empty($id)) {
+            $id = BRequest::i()->param('id', true);
+        }
         $redirectUrl = BApp::href($this->_formHref) . '?id=' . $id;
         try {
             $oldModel = FCom_Catalog_Model_Product::i()->load($id);

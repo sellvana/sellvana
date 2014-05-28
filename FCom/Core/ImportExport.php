@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
  * Created by pp
@@ -603,7 +603,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         if (BUtil::isPathAbsolute($file)) {
             return $file;
         }
-        $path = BConfig::i()->get( 'fs/storage_dir' ) . '/export';
+        $path = BApp::i()->storageRandomDir() . '/export';
 
         BUtil::ensureDir($path);
         $file = $path . '/' . trim($file, '\\/');

@@ -272,9 +272,10 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
       }
     if (date != '') {
         var data = {type: filter.val(), date: date , range: filter.attr('data-range')};
+
         closeFilter.removeClass('hidden');
         custom.children('button').addClass('filter');
-        custom.find('.custom-filter-value').html(filter.attr('data-text') +' "' + date + '"');
+        custom.find('.custom-filter-value').html(filter.attr('data-text') +' "' + $('<div/>').text(date).html() + '"');
         filterDate(data);
         $('button.active-button').removeClass('active-button');
     }

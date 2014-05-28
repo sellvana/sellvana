@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
  * @property int id
@@ -137,7 +137,7 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
         }
 
         $hlp = FCom_Admin_Model_ActivityUser::i();
-        $actUser = $hlp->load(['activity_id' => $this->id(), 'user_id' => $userId]);
+        $actUser = $hlp->loadWhere(['activity_id' => $this->id(), 'user_id' => $userId]);
         $actUser->set('alert_user_status', 'read')->save();
 
         return $this;

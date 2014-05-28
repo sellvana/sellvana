@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
  * model class for table "fcom_sales_cart"
@@ -102,9 +102,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         // get session cart id
         $sessCartId = static::sessionCartId();
         // try to load customer cart which is new (not abandoned or converted to order)
-        $custCart = FCom_Sales_Model_Cart::i()->load([$customer->id => 'customer_id', 'status' => 'new']);
+        $custCart = FCom_Sales_Model_Cart::i()->loadWhere(['customer_id' => $customer->id(), 'status' => 'new']);
 
-        if ($sessCartId && $custCart && $sessCartId !== $custCart->id) {
+        if ($sessCartId && $custCart && $sessCartId !== $custCart->id()) {
 
             // if both current session cart and customer cart exist and they're different carts
             $custCart->merge($sessCartId)->save(); // merge them into customer cart
@@ -113,11 +113,11 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
         } elseif ($sessCartId && !$custCart) { // if only session cart exist
 
-            static::sessionCart()->set('customer_id', $customer->id)->save(); // assign it to customer
+            static::sessionCart()->set('customer_id', $customer->id())->save(); // assign it to customer
 
         } elseif (!$sessCartId && $custCart) { // if only customer cart exist
 
-            static::sessionCartId($custCart->id); // set it as session cart
+            static::sessionCartId($custCart->id()); // set it as session cart
             static::$_sessionCart = $custCart;
 
         }
@@ -226,7 +226,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         } else {
             $params['price'] = $params['price']; //$params['price'] * $params['qty']; // ??
         }
-        $item = FCom_Sales_Model_Cart_Item::i()->load(['cart_id' => $this->id, 'product_id' => $productId]);
+        $item = FCom_Sales_Model_Cart_Item::i()->loadWhere(['cart_id' => $this->id, 'product_id' => $productId]);
         if ($item && $item->promo_id_get == 0) {
             $item->add('qty', $params['qty']);
             $item->set('price', $params['price']);

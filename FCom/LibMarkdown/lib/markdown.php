@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 #
 # Markdown Extra  -  A text-to-HTML conversion tool for web writers
 #

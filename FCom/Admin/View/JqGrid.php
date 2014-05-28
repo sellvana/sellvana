@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
 {
@@ -520,7 +520,7 @@ return [true, 'Testing error'];
                 $columns[$i] = $col;
             }
         }
-        $dir = BConfig::i()->get('fs/storage_dir') . '/export';
+        $dir = BApp::i()->storageRandomDir() . '/export';
         BUtil::ensureDir($dir);
         $filename = $dir . '/' . $cfg['grid']['id'] . '.csv';
         $fp = fopen($filename, 'w');

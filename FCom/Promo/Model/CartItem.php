@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Promo_Model_CartItem extends FCom_Core_Model_Abstract
 {

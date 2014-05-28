@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_PaymentBasic_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 {

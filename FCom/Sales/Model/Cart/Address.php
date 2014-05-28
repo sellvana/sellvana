@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
  * model class for table "fcom_sales_cart_address".
  * The followings are the available columns in table 'fcom_sales_cart_address':

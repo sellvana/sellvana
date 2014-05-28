@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -330,7 +331,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     {
         $hlp = FCom_Promo_Model_Media::i();
         $id = $args['model']->id;
-        if (!$hlp->load(['promo_id' => null, 'file_id' => $id])) {
+        if (!$hlp->loadWhere(['promo_id' => null, 'file_id' => $id])) {
             $hlp->create(['file_id' => $id])->save();
         }
     }
@@ -339,7 +340,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     {
         $r = BRequest::i();
         FCom_Promo_Model_Media::i()
-            ->load(['promo_id' => null, 'file_id' => $args['model']->id])
+            ->loadWhere(['promo_id' => null, 'file_id' => $args['model']->id])
             ->set([
                 'promo_status' => $r->post('promo_status'),
             ])

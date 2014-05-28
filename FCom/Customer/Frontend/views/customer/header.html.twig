@@ -12,7 +12,7 @@
     <li><a href="{{ APP.href('customer/order') }}">{{ 'Order Status'|_ }}</a></li>
     <li><a href="{{ APP.href('wishlist') }}">{{ 'Wishlist'|_ }}</a></li>
     <li class="divider"></li>
-    <li><a href="{{ APP.href('logout') }}">{{ 'Log Out'|_ }}</a></li>
+    <li><a href="{{ APP.href('logout') ~ '?X-CSRF-TOKEN=' ~ SESSION.csrfToken() }}">{{ 'Log Out'|_ }}</a></li>
   </ul>
 {% else %}
   <a href="{{ APP.href('login') }}">

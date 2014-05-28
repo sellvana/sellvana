@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
  * @method FCom_Sales_Main i() i($new=false, array $args=array())
  * Class FCom_Sales_Main

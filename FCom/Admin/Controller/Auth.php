@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
 {
@@ -108,6 +108,11 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
 
     public function action_logout()
     {
+        $reqCsrfToken = BRequest::i()->get('X-CSRF-TOKEN');
+        if (!BSession::i()->validateCsrfToken($reqCsrfToken)) {
+            BResponse::i()->redirect('');
+            return;
+        }
         FCom_Admin_Model_User::i()->logout();
         BResponse::i()->cookie('remember_me', 0);
         BResponse::i()->redirect('');

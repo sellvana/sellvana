@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_AdminChat_Admin extends BClass
 {
@@ -49,7 +49,7 @@ class FCom_AdminChat_Admin extends BClass
 
         $chats = [];
 
-        $reUsername = '#(^|\s*,\s*)' . preg_quote($userName) . '(\s*,\s*|$)#';
+        $reUsername = '#(^|\s*,\s*)' . preg_quote($userName, '#') . '(\s*,\s*|$)#';
         $chatModels = FCom_AdminChat_Model_Chat::i()->orm('c')
             ->join('FCom_AdminChat_Model_Participant', ['c.id', '=', 'p.chat_id'], 'p')->where('p.user_id', $userId)
             ->select('c.id')
