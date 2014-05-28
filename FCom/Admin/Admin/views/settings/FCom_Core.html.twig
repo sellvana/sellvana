@@ -50,7 +50,7 @@
     {{ forms.accordion_panel_start({label:'Web Settings'|_, id:'settings-FCom_Core-group3'}) }}
         {{ forms.boolean(fieldData, { field:'hide_script_name', label:'Hide script file name in URL'|_ }) }}
         {{ forms.input(fieldData,   { field:'http_host_whitelist', label:'HTTP Host Whitelist (comma separated)'|_ }) }}
-        {{ forms.select(fieldData,  { field:'csrf_check_method', label:'CSRF Check Method'|_, options:{'referrer':'Referrer', 'token':'Token'} }) }}
+        {{ forms.select(fieldData,  { field:'csrf_check_method', label:'CSRF Check Method'|_, options:{'token':'Token', 'origin':'Origin', 'referrer':'Referrer'} }) }}
         {{ forms.input(fieldData,   { field:'csrf_web_root', label:'CSRF Referrer Web Root Path (optional)'|_ }) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
