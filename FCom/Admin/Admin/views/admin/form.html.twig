@@ -77,7 +77,7 @@
             });
             // prevent validate when delete item
             $('button[type="submit"]').click(function () {
-                if ($(this).hasClass('ignore-validate') == '1') {
+                if ($(this).hasClass('ignore-validate')) {
                     $('#' + mainForm).validate().currentForm = '';
                     return true;
                 }

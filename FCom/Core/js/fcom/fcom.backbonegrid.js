@@ -843,8 +843,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 self.model.set($(this).attr('data-col'), tmp.val());
                             }
                             if ($(this).attr('data-edit') == 'input' || $(this).attr('data-edit') == 'textarea') {
-                                self.model.set($(this).attr('data-col'), $(this).children().val());
-                                $(this).html($(this).children().val());
+                                var text = html2text($(this).children().val());
+                                self.model.set($(this).attr('data-col'), text);
+                                $(this).html(text);
                             }
                             if ($(this).attr('data-edit') == 'input[range]') {
                                 self.model.set($(this).attr('data-col'), $(this).children().val());
@@ -1191,7 +1192,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             html = str.substring(0, str.length - 1);
                         }
                     }
-                    this.$el.find('span.f-grid-filter-value').html($('<div/>').text(html).html());
+                    this.$el.find('span.f-grid-filter-value').html(html2text(html));
                 }
             });
             BackboneGrid.Views.FilterTextCell = BackboneGrid.Views.FilterCell.extend({
@@ -1485,7 +1486,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     modalForm.$el.find('textarea, input, select').each(function () {
                         var key = $(this).attr('id');
                         var val = $(this).val();
-                        BackboneGrid.modalElementVals[key] = val;
+                        BackboneGrid.modalElementVals[key] = html2text(val);
                     });
                     modalForm.formEl.validate();
                     if (!modalForm.formEl.valid()) {
@@ -1762,6 +1763,10 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 else
                     caption = 'No data found';
                 $('.' + BackboneGrid.id + '-pagination').html(caption);
+            }
+
+            function html2text(val) {
+                return $('<div/>').text(val).html();
             }
 
             /*
