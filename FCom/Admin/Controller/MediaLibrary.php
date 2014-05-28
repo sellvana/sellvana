@@ -206,7 +206,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 $associatedProducts = 0;
                 $fileSize = 0;
                 $message = '';
-                $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+                $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
                 if (!empty($uploads['error'][$i])) {
                     $id = '';
