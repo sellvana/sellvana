@@ -1638,7 +1638,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         if (BackboneGrid.currentRow) {
                             var name = model.get('name');
                             var val = (typeof(BackboneGrid.currentRow.get(name)) !== 'undefined' ? BackboneGrid.currentRow.get(name) : '');
-                            elementView.$el.find('#' + name).val(val);
+                            elementView.$el.find('#' + name).val(text2html(val));
                         }
                     }
                 }
@@ -1767,6 +1767,11 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
             function html2text(val) {
                 return $('<div/>').text(val).html();
+            }
+
+            function text2html(val) {
+                var text = $.parseHTML(val);
+                return text[0].data;
             }
 
             /*
