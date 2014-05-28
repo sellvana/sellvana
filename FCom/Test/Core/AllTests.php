@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 
 if (!defined('PHPUnit_MAIN_METHOD')) {

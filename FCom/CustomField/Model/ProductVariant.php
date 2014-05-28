@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
  * @property string  field_values    (field1=value1&field2=value2&field3=value3)

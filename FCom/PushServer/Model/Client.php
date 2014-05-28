@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 {
@@ -375,7 +375,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         }
         $hlp = FCom_PushServer_Model_Subscriber::i();
         $data = ['client_id' => $this->id(), 'channel_id' => $channel->id()];
-        $subscriber = $hlp->load($data);
+        $subscriber = $hlp->loadWhere($data);
         if (!$subscriber) {
             $subscriber = $hlp->create($data)->save();
         }

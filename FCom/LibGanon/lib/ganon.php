@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
  * Ganon single file version - PHP5+ version
  * Generated on 20 Oct 2012
@@ -1486,7 +1487,7 @@ class HTML_Node {
         }
     }
     function hasClass($className) {
-        return ($className && preg_match('`\b'.preg_quote($className).'\b`si', $class = $this->class));
+        return ($className && preg_match('`\b'.preg_quote($className, '`').'\b`si', $class = $this->class));
     }
     function addClass($className) {
         if (!is_array($className)) {
@@ -1494,7 +1495,7 @@ class HTML_Node {
         }
         $class = $this->class;
         foreach ($className as $c) {
-            if (!(preg_match('`\b'.preg_quote($c).'\b`si', $class) > 0)) {
+            if (!(preg_match('`\b'.preg_quote($c, '`').'\b`si', $class) > 0)) {
                 $class .= ' '.$c;
             }
         }
@@ -1506,7 +1507,7 @@ class HTML_Node {
         }
         $class = $this->class;
         foreach ($className as $c) {
-            $class = reg_replace('`\b'.preg_quote($c).'\b`si', '', $class);
+            $class = reg_replace('`\b'.preg_quote($c, '`').'\b`si', '', $class);
         }
         if ($class) {
             $this->class = $class;
@@ -1655,11 +1656,11 @@ class HTML_Node {
                                 if ($res) break 1; else break 2;
                             case '|=':
                             case 'contains_prefix':
-                                $res = ((preg_match('`\b'.preg_quote($match['value']).'[\-\s]?`s', $val) > 0) === $match['match']);
+                                $res = ((preg_match('`\b'.preg_quote($match['value'], '`').'[\-\s]?`s', $val) > 0) === $match['match']);
                                 if ($res) break 1; else break 2;
                             case '~=':
                             case 'contains_word':
-                                $res = ((preg_match('`\b'.preg_quote($match['value']).'\b`s', $val) > 0) === $match['match']);
+                                $res = ((preg_match('`\b'.preg_quote($match['value'], '`').'\b`s', $val) > 0) === $match['match']);
                                 if ($res) break 1; else break 2;
                             case '*=':
                             case 'contains':
@@ -1669,6 +1670,8 @@ class HTML_Node {
                             case 'ends_with':
                                 $res = ((substr($val, -strlen($match['value'])) === $match['value']) === $match['match']);
                                 if ($res) break 1; else break 2;
+
+
                             case '^=':
                             case 'starts_with':
                                 $res = ((substr($val, 0, strlen($match['value'])) === $match['value']) === $match['match']);

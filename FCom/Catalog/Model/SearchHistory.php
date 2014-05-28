@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Catalog_Model_SearchHistory extends FCom_Core_Model_Abstract
 {
@@ -17,8 +17,8 @@ class FCom_Catalog_Model_SearchHistory extends FCom_Core_Model_Abstract
         }
         $sData['search_history'][$query] = $query;
         //TODO: add 'W'ord functionality
-        $data = ['term_type' => 'F', 'query' => $query];
-        $record = static::load($data);
+        $data = ['term_type' => 'F', 'query' => (string)$query];
+        $record = static::loadWhere($data);
         if ($record) {
             $record->add('num_searches');
         } else {

@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
  * Author:: Diego Buthay (<dbuthay@gmail.com>)
  * Copyright:: Copyright (c) 2011 indextank.com

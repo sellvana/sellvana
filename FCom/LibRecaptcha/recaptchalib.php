@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /*
  * This is a PHP library that handles calling reCAPTCHA.
  *    - Documentation and latest version

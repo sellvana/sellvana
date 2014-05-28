@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
@@ -97,6 +97,9 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
     {
         $req = BRequest::i();
         $q = $req->get('q');
+        if (is_array($q)) {
+            $q = join(' ', $q);
+        }
         if ($q !== '' && !is_null($q)) {
             $q = FCom_Catalog_Model_SearchAlias::i()->processSearchQuery($q);
         }
@@ -127,7 +130,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         FCom_Core_Main::i()->lastNav(true);
 
-
+        $layout->view('header')->set('query', $q);
         $layout->view('breadcrumbs')->set('crumbs', ['home', ['label' => 'Search: ' . $q, 'active' => true]]);
         $layout->view('catalog/search')->set('query', $q);
 

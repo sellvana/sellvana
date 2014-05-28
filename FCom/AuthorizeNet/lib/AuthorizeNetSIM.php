@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
  * Easily use the Authorize.Net Server Integration Method(SIM).
  *

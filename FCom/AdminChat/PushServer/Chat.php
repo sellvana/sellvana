@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
 {
@@ -25,7 +25,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
             return;
         }
         $chat = FCom_AdminChat_Model_Chat::i()->openWithUser($user);
-        $participant = FCom_AdminChat_Model_Participant::i()->load([
+        $participant = FCom_AdminChat_Model_Participant::i()->loadWhere([
             'chat_id' => $chat->id(),
             'user_id' => FCom_Admin_Model_User::i()->sessionUserId(),
         ]);

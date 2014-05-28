@@ -2,6 +2,12 @@ Options -Indexes +FollowSymLinks -MultiViews
 
 Order deny,allow
 <FilesMatch "\.(yml|twig)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "^\.">
+    Order allow,deny
     Deny from all
 </FilesMatch>
 
