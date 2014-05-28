@@ -36,8 +36,12 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                     */
                 } else {
                     $node = $class::i()->load($r->get('id'));
-                    $node->descendants();
-                    $result = $this->_nodeChildren($node, 100);
+                    if ($node) {
+                        $node->descendants();
+                        $result = $this->_nodeChildren($node, 100);
+                    } else {
+                        $result = [];
+                    }
                 }
                 break;
         }
