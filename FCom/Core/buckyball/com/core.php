@@ -1803,11 +1803,16 @@ class BSession extends BClass
             session_save_path($dir);
         }
         #ini_set('session.gc_maxlifetime', $rememberMeTtl); // moved to .haccess
-        if (!empty($id) || ($id = BRequest::i()->get('SID'))) {
-            session_id($id);
+        if (!$id) {
+            $id = BRequest::i()->get('SID');
+            if (!$id && !empty($_COOKIE[session_name()])) {
+                $id = $_COOKIE[session_name()];
+            }
         }
-        if (!preg_match('#^[A-Za-z0-9]+$#', session_id())) {
-            session_id(BUtil::randomString(32));
+        if (preg_match('#^[A-Za-z0-9]{26,60}$#', $id)) {
+            session_id($id);
+        } else {
+            $this->regenerateId();
         }
         if (headers_sent()) {
             BDebug::warning("Headers already sent, can't start session");
