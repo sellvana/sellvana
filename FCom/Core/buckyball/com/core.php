@@ -1816,6 +1816,11 @@ class BSession extends BClass
             // @see http://www.php.net/manual/en/function.session-set-cookie-params.php#100657
             setcookie(session_name(), session_id(), time() + $ttl, $path, $domain, $https, true);
             $this->_phpSessionOpen = true;
+            if (!preg_match('#^[A-Za-z0-9]+$#', session_id())) {
+                session_destroy();
+                session_id(BUtil::randomString(32));
+                session_start();
+            }
         }
         $this->_sessionId = session_id();
 
@@ -1963,15 +1968,17 @@ BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
             $_SESSION[$namespace] = $this->data;
         }
         // TODO: i think having problem with https://bugs.php.net/bug.php?id=38104
-        /*
-        if ($this->get('_regenerate_id')) {
-            session_regenerate_id(true);
-            $this->set('_regenerate_id', 0);
-        }
-        */
+
         BDebug::debug(__METHOD__, 1);
         session_write_close();
         $this->_phpSessionOpen = false;
+
+        if ($this->get('_regenerate_id')) {
+            #session_regenerate_id(true);
+            session_id(BUtil::randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
+            $this->set('_regenerate_id', 0);
+        }
+
         /*
 echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         $sessionCookie = null;
@@ -2004,6 +2011,7 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
             session_start();
         }
         session_destroy();
+
         setcookie(session_name(), '', time() - 3600, $this->getCookiePath(), $this->getCookieDomain(), $https, true);
 #echo "<pre>"; var_dump($_SESSION, $_COOKIE, session_name(), $this->getCookiePath(), $this->getCookieDomain()); exit;
         return $this;
@@ -2012,7 +2020,8 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
     public function regenerateId()
     {
         //session_regenerate_id();
-        BSession::i()->set('_regenerate_id', 1);
+        //BSession::i()->set('_regenerate_id', 1);
+        session_id(BUtil::randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
         return $this;
     }
 

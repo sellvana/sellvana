@@ -14,6 +14,7 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
             if (!empty($r['username']) && !empty($r['password'])) {
                 $user = FCom_Admin_Model_User::i()->authenticate($r['username'], $r['password']);
                 if ($user) {
+                    BSession::i()->regenerateId();
                     $user->login();
                     if (!empty($r['remember_me'])) {
                         $days = BConfig::i()->get('cookie/remember_days');
@@ -102,6 +103,7 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
             return;
         }
         $user->resetPassword($password);
+        BSession::i()->regenerateId();
         $this->message('Password has been reset');
         BResponse::i()->redirect('');
     }
