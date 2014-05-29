@@ -134,6 +134,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $sessData =& BSession::i()->dataToUpdate();
             $sessData['password_reset_token'] = $token;
             BResponse::i()->redirect('customer/password/reset');
+            return;
         }
         $token = BSession::i()->get('password_reset_token');
         if ($token && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token')) && $user->token === $token) {
@@ -146,28 +147,39 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_password_reset__POST()
     {
+        if (FCom_Admin_Model_User::i()->isLoggedIn()) {
+            BResponse::i()->redirect('');
+            return;
+        }
         $r = BRequest::i();
         $token = BSession::i()->get('password_reset_token');
         $password = $r->post('password');
         $confirm = $r->post('password_confirm');
-        if ($token && $password && $password === $confirm
-            && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token'))
-            && $user->get('token') === $token
-        ) {
-            $sessData =& BSession::i()->dataToUpdate();
-            $sessData['password_reset_token'] = null;
-
-            $user->resetPassword($password);
-            BSession::i()->regenerateId();
-            $this->message('Password has been reset.');
-            if ($user->status === 'review') {
-                $this->message('You will be able to login after your account is approved', 'warning');
-            }
-            BResponse::i()->redirect('login');
-        } else {
-            $this->message('Invalid form data', 'error');
-            BResponse::i()->redirect('login');
+        $returnUrl = 'login';
+        if (!($password && $confirm && $password === $confirm)) {
+            $this->message('Invalid password or confirmation', 'error');
+            BResponse::i()->redirect($returnUrl);
+            return;
         }
+
+        $user = FCom_Customer_Model_Customer::i()->validateResetToken($token);
+        if (!$user) {
+            $this->message('Invalid token', 'error');
+            BResponse::i()->redirect($returnUrl);
+            return;
+        }
+
+        $sessData =& BSession::i()->dataToUpdate();
+        $sessData['password_reset_token'] = null;
+
+        $user->resetPassword($password);
+        BSession::i()->regenerateId();
+
+        $this->message('Password has been reset.');
+        if ($user->status === 'review') {
+            $this->message('You will be able to login after your account is approved', 'warning');
+        }
+        BResponse::i()->redirect($returnUrl);
     }
 
     public function action_logout()

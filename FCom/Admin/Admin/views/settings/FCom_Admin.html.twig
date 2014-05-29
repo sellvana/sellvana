@@ -24,6 +24,7 @@
 
     {{ forms.accordion_panel_start({label:'Users'|_, id:'settings-FCom_Admin-group2'}) }}
         {{ forms.boolean(fieldData, {field:'password_strength', label:'Strong Password Security'|_ }) }}
+        {{ forms.input(fieldData, {field:'password_reset_token_ttl_hr', label:'Password Reset Token TTL (hours, default 24)'|_ }) }}
     {{ forms.accordion_panel_end }}
 
     {{ forms.accordion_panel_start({label:'Site Map'|_, id:'settings-FCom_Admin-group3'}) }}

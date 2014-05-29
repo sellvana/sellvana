@@ -140,14 +140,34 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public function recoverPassword()
     {
-        $this->set(['token' => BUtil::randomString(20)])->save();
+        $this->set(['token' => BUtil::randomString(20), 'token_at' => BDb::now()])->save();
         BLayout::i()->view('email/customer-password-recover')->set('customer', $this)->email();
         return $this;
     }
 
+    public function validateResetToken($token)
+    {
+        if (!$token) {
+            return false;
+        }
+        $user = $this->load($token, 'token');
+        if (!$user || $user->get('token') !== $token) {
+            return false;
+        }
+        $tokenTtl = BConfig::i()->get('modules/FCom_Customer/password_reset_token_ttl_hr');
+        if (!$tokenTtl) {
+            $tokenTtl = 24;
+        }
+        if (strtotime($user->get('token_at')) < time() - $tokenTtl * 3600) {
+            $user->set(['token' => null, 'token_at' => null])->save();
+            return false;
+        }
+        return true;
+    }
+
     public function resetPassword($password)
     {
-        $this->set(['token' => null])->setPassword($password)->save();
+        $this->set(['token' => null, 'token_at' => null])->setPassword($password)->save();
         BLayout::i()->view('email/customer-password-reset')->set('customer', $this)->email();
         return $this;
     }

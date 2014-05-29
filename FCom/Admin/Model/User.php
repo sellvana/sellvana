@@ -244,6 +244,26 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function validateResetToken($token)
+    {
+        if (!$token) {
+            return false;
+        }
+        $user = $this->load($token, 'token');
+        if (!$user || $user->get('token') !== $token) {
+            return false;
+        }
+        $tokenTtl = BConfig::i()->get('modules/FCom_Admin/password_reset_token_ttl_hr');
+        if (!$tokenTtl) {
+            $tokenTtl = 24;
+        }
+        if (strtotime($user->get('token_at')) < time() - $tokenTtl * 3600) {
+            $user->set(['token' => null, 'token_at' => null])->save();
+            return false;
+        }
+        return true;
+    }
+
     public function resetPassword($password)
     {
         $this->set(['token' => null, 'token_at' => null])->setPassword($password)->save();
