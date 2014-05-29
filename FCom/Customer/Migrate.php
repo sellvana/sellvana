@@ -2,7 +2,7 @@
 
 class FCom_Customer_Migrate extends BClass
 {
-    public function install__0_1_10()
+    public function install__0_1_11()
     {
         $tCustomer = FCom_Customer_Model_Customer::table();
         BDb::run("
@@ -18,6 +18,7 @@ class FCom_Customer_Migrate extends BClass
             `update_at` datetime NOT NULL,
             `last_login` datetime DEFAULT NULL,
             `token` varchar(20) DEFAULT NULL,
+            `token_at` datetime default null,
             `payment_method` varchar(20)  DEFAULT NULL,
             `payment_details` text ,
             `status` enum('review','active','disabled') NOT NULL DEFAULT 'review',
@@ -189,6 +190,16 @@ class FCom_Customer_Migrate extends BClass
         BDb::ddlTableDef($table, [
             'COLUMNS' => [
                 'password_session_token' => 'varchar(16)',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_1_10__0_1_11()
+    {
+        $table = FCom_Customer_Model_Customer::table();
+        BDb::ddlTableDef($table, [
+            'COLUMNS' => [
+                'token_at' => 'datetime default null after token',
             ],
         ]);
     }
