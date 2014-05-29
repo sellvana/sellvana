@@ -822,6 +822,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                     if (!empty($indexes[$f['field']])) {
                         $f['field'] = $indexes[$f['field']];
                     }
+                    if (!preg_match('#^[A-Za-z0-9_.]+$#', $f['field'])) {
+                        unset($filters[$fId]);
+                    }
                 }
             }
             unset($f);

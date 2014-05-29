@@ -99,12 +99,18 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         //BEvents::i()->fire(__METHOD__.':'.$folder, array('config'=>&$config));
         return $config;
     }
+
     public function action_index()
     {
          $this->layout('/media');
     }
+
     public function action_grid_data()
     {
+        if (!BRequest::i()->xhr()) {
+            BResponse::i()->status('403', 'Available only for XHR', 'Available only for XHR');
+            return;
+        }
         switch (BRequest::i()->params('do')) {
         case 'data':
             $folder = $this->getFolder();

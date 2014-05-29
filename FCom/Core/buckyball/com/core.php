@@ -1803,8 +1803,16 @@ class BSession extends BClass
             session_save_path($dir);
         }
         #ini_set('session.gc_maxlifetime', $rememberMeTtl); // moved to .haccess
-        if (!empty($id) || ($id = BRequest::i()->get('SID'))) {
+        if (!$id) {
+            $id = BRequest::i()->get('SID');
+            if (!$id && !empty($_COOKIE[session_name()])) {
+                $id = $_COOKIE[session_name()];
+            }
+        }
+        if (preg_match('#^[A-Za-z0-9]{26,60}$#', $id)) {
             session_id($id);
+        } else {
+            $this->regenerateId();
         }
         if (headers_sent()) {
             BDebug::warning("Headers already sent, can't start session");
@@ -1824,6 +1832,7 @@ class BSession extends BClass
             if (empty($_SESSION['_ip'])) {
                 $_SESSION['_ip'] = $ip;
             } elseif ($_SESSION['_ip'] !== $ip) {
+                $_SESSION = [];
                 session_destroy();
                 session_start();
                 //BResponse::i()->status(403, "Remote IP doesn't match session", "Remote IP doesn't match session");
@@ -1963,15 +1972,17 @@ BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
             $_SESSION[$namespace] = $this->data;
         }
         // TODO: i think having problem with https://bugs.php.net/bug.php?id=38104
-        /*
-        if ($this->get('_regenerate_id')) {
-            session_regenerate_id(true);
-            $this->set('_regenerate_id', 0);
-        }
-        */
+
         BDebug::debug(__METHOD__, 1);
         session_write_close();
         $this->_phpSessionOpen = false;
+
+        if ($this->get('_regenerate_id')) {
+            #session_regenerate_id(true);
+            session_id(BUtil::randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
+            $this->set('_regenerate_id', 0);
+        }
+
         /*
 echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         $sessionCookie = null;
@@ -2004,6 +2015,7 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
             session_start();
         }
         session_destroy();
+
         setcookie(session_name(), '', time() - 3600, $this->getCookiePath(), $this->getCookieDomain(), $https, true);
 #echo "<pre>"; var_dump($_SESSION, $_COOKIE, session_name(), $this->getCookiePath(), $this->getCookieDomain()); exit;
         return $this;
@@ -2012,7 +2024,8 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
     public function regenerateId()
     {
         //session_regenerate_id();
-        BSession::i()->set('_regenerate_id', 1);
+        //BSession::i()->set('_regenerate_id', 1);
+        session_id(BUtil::randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
         return $this;
     }
 
