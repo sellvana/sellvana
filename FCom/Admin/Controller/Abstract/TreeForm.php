@@ -17,6 +17,11 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
 
     public function action_tree_data()
     {
+        if (!BRequest::i()->xhr()) {
+            BResponse::i()->status('403', 'Available only for XHR', 'Available only for XHR');
+            return;
+        }
+
         $class = $this->_navModelClass;
         $r = BRequest::i();
         $result = null;
