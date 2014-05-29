@@ -1806,6 +1806,9 @@ class BSession extends BClass
         if (!empty($id) || ($id = BRequest::i()->get('SID'))) {
             session_id($id);
         }
+        if (!preg_match('#^[A-Za-z0-9]+$#', session_id())) {
+            session_id(BUtil::randomString(32));
+        }
         if (headers_sent()) {
             BDebug::warning("Headers already sent, can't start session");
         } else {
@@ -1816,11 +1819,6 @@ class BSession extends BClass
             // @see http://www.php.net/manual/en/function.session-set-cookie-params.php#100657
             setcookie(session_name(), session_id(), time() + $ttl, $path, $domain, $https, true);
             $this->_phpSessionOpen = true;
-            if (!preg_match('#^[A-Za-z0-9]+$#', session_id())) {
-                session_destroy();
-                session_id(BUtil::randomString(32));
-                session_start();
-            }
         }
         $this->_sessionId = session_id();
 
@@ -1829,6 +1827,7 @@ class BSession extends BClass
             if (empty($_SESSION['_ip'])) {
                 $_SESSION['_ip'] = $ip;
             } elseif ($_SESSION['_ip'] !== $ip) {
+                $_SESSION = [];
                 session_destroy();
                 session_start();
                 //BResponse::i()->status(403, "Remote IP doesn't match session", "Remote IP doesn't match session");

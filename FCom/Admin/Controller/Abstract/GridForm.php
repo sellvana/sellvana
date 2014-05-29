@@ -140,6 +140,11 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function action_grid_data()
     {
+        if (!BRequest::i()->xhr()) {
+            BResponse::i()->status('403', 'Available only for XHR', 'Available only for XHR');
+            return;
+        }
+
         $view = $this->gridView();
         $grid = $view->get('grid');
 
