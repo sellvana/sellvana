@@ -1161,7 +1161,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return false;
                 },
                 render: function () {
-                    this.$el.html(this.template(this.model.toJSON()));
+                    var model = this.model.toJSON();
+                    model.val = html2text(model.val);
+                    this.$el.html(this.template(model));
                     if (this.model.get('val') !== '') {
                         this.$el.addClass('f-grid-filter-val');
                     }
