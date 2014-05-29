@@ -62,6 +62,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                             break;
                     }
                     if ($allowLogin) {
+                        BSession::i()->regenerateId();
                         $user->login();
                         if (!empty($login['remember_me'])) {
                             $days = BConfig::i()->get('cookie/remember_days');
@@ -157,6 +158,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $sessData['password_reset_token'] = null;
 
             $user->resetPassword($password);
+            BSession::i()->regenerateId();
             $this->message('Password has been reset.');
             if ($user->status === 'review') {
                 $this->message('You will be able to login after your account is approved', 'warning');
