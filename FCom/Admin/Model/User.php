@@ -26,7 +26,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     protected static $_validationRules = [
         ['username', '@required'],
-        ['username', '/^[A-Za-z0-9._@-]+$/', 'Username allowed characters are letters, numbers, dot, underscore, hyphen and @'],
+        ['username', '/^[A-Za-z0-9._@-]{1,255}$/', 'Username allowed characters are letters, numbers, dot, underscore, hyphen and @'],
         ['email', '@required'],
         ['email', '@email'],
         ['password', 'FCom_Admin_Model_User::validatePasswordSecurity'],
