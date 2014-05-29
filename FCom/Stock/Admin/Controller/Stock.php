@@ -16,7 +16,8 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
         $config = parent::gridConfig();
         unset($config['form_url']);
         $data = [];
-        $settings = BConfig::i()->get('modules/FCom_Catalog');
+        $config['edit_url'] = BApp::href($this->_gridHref . '/grid_data');
+        $config['edit_url_required'] = true;
         $callback = function ($row) use (&$data) {
             $data_serialized = BUtil::objectToArray(json_decode($row->get('data_serialized')));
             $qty = '';
@@ -77,6 +78,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
                 ]
         ];
         $config['data_mode'] = 'local';
+        $config['local_personalize'] = true;
         $config['data'] = $data;
         $config['actions'] = [
             'edit' => true,
@@ -107,10 +109,11 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
         $config['filters'] = [
             ['field' => 'sku', 'type' => 'text'],
             ['field' => 'product_name', 'type' => 'text'],
-            ['field' => 'status', 'type' => 'select'],
-            ['field' => 'out_stock', 'type' => 'select'],
+            ['field' => 'status', 'type' => 'multiselect'],
+            ['field' => 'out_stock', 'type' => 'multiselect'],
             ['field' => 'stock_qty', 'type' => 'number-range'],
         ];
+        $config['grid_before_create'] = 'stockGridRegister';
         return $config;
     }
 
@@ -173,43 +176,60 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
     public function action_grid_data__POST()
     {
         $r = BRequest::i();
-        if ($r->post('oper') == 'edit') {
-            $data = $r->post();
-            // avoid error when edit
-            unset($data['id'], $data['oper'], $data['bin_id']);
-            $set = FCom_Stock_Model_Sku::i()->load($r->post('id'))->set($data)->save();
-            $result = $set->as_array();
-
-            BResponse::i()->json($result);
-        } else {
-            $this->_processGridDataPost($this->_modelClass);
-        }
-    }
-
-    public function action_index__POST()
-    {
-        $p = BRequest::i()->post();
-        $p['tmp_cost'] = $p['cost'];
-        if (isset($p['sku'])) {
-            $prod = FCom_Catalog_Model_Product::i()->load($p['sku'], 'local_sku');
-            FCom_Stock_Model_Sku::i()->load($p['id'])->set('status', $p['status'])->save();
-            if ($prod) {
-                $data_serialized = BUtil::objectToArray(json_decode($prod->get('data_serialized')));
-                if (!isset($data_serialized['stock_policy']))  {
-                    $data_serialized['stock_policy'] = ['stock_qty' => $p['stock_qty'], 'out_stock' => $p['out_stock'], 'manage_stock' => $p['manage_stock']];
-                } else {
-                    $data_serialized['stock_policy']['stock_qty'] = $p['stock_qty'];
-                    $data_serialized['stock_policy']['out_stock'] = $p['out_stock'];
-                    $data_serialized['stock_policy']['manage_stock'] = $p['status'];
+        $p = $r->post();
+        switch ($p['oper']) {
+            case 'edit':
+                // avoid error when edit
+                $p['tmp_cost'] = $p['cost'];
+                unset($p['oper']);
+                if (isset($p['sku'])) {
+                    $prod = FCom_Catalog_Model_Product::i()->load($p['sku'], 'local_sku');
+                    FCom_Stock_Model_Sku::i()->load($p['id'])->set('status', $p['status'])->save();
+                    if ($prod) {
+                        $data_serialized = BUtil::objectToArray(json_decode($prod->get('data_serialized')));
+                        if (!isset($data_serialized['stock_policy']))  {
+                            $data_serialized['stock_policy'] = ['stock_qty' => $p['stock_qty'], 'out_stock' => $p['out_stock'], 'manage_stock' => $p['manage_stock']];
+                        } else {
+                            $data_serialized['stock_policy']['stock_qty'] = $p['stock_qty'];
+                            $data_serialized['stock_policy']['out_stock'] = $p['out_stock'];
+                            $data_serialized['stock_policy']['manage_stock'] = $p['status'];
+                        }
+                        $prod->setData('stock_policy', $data_serialized['stock_policy']);
+                        $prod->set('cost', $p['cost']);
+                        $prod->save();
+                    }
                 }
-                $prod->setData('stock_policy', $data_serialized['stock_policy']);
-                $prod->set('cost', $p['cost']);
-                $prod->save();
-            }
+                if ($p['cost'] != '') {
+                    $p['cost'] = BLocale::currency($p['cost']);
+                }
+                BResponse::i()->json($p);
+                break;
+            case 'mass-edit':
+                $id = $p['id'];
+                $args['ids'] = explode(',', $id);
+                $data = $p;
+                $hlp = FCom_Stock_Model_Sku::i();
+                foreach ($args['ids'] as $id) {
+                        $stock = $hlp->load($id);
+                        $stock->set('status', $data['status'])->save();
+                        $prod = FCom_Catalog_Model_Product::i()->load($stock->get('sku'), 'local_sku');
+                        if ($prod) {
+                            $data_serialized = BUtil::objectToArray(json_decode($prod->get('data_serialized')));
+                            if (!isset($data_serialized['stock_policy']))  {
+                                $data_serialized['stock_policy'] = ['out_stock' => $p['out_stock'], 'manage_stock' => $p['manage_stock']];
+                            } else {
+                                $data_serialized['stock_policy']['out_stock'] = $p['out_stock'];
+                                $data_serialized['stock_policy']['manage_stock'] = $p['status'];
+                            }
+                            $prod->setData('stock_policy', $data_serialized['stock_policy']);
+                            $prod->save();
+                        }
+                }
+                BResponse::i()->json(['success' => true]);
+                break;
+            default:
+                $this->_processGridDataPost($this->_modelClass);
+                break;
         }
-        if ($p['cost'] != '') {
-            $p['cost'] = BLocale::currency($p['cost']);
-        }
-        BResponse::i()->json($p);
     }
 }
