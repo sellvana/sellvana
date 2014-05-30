@@ -2208,7 +2208,7 @@ class BModel extends Model
     {
         $model = static::loadWhere($where, $field, $cache);
         if (!$model) {
-            $model = static::create(is_array($id) ? $id : []);
+            $model = static::create($where);
         }
         return $model;
     }
