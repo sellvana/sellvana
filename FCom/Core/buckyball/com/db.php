@@ -2204,9 +2204,9 @@ class BModel extends Model
      * @param boolean $cache
      * @return BModel
      */
-    public static function loadOrCreate($id, $field = null, $cache = false)
+    public static function loadOrCreate($where, $field = null, $cache = false)
     {
-        $model = static::loadWhere($id, $field, $cache);
+        $model = static::loadWhere($where, $field, $cache);
         if (!$model) {
             $model = static::create(is_array($id) ? $id : []);
         }

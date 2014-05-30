@@ -1212,8 +1212,8 @@ class BView extends BClass
     static public function factory($viewName, array $params = [])
     {
         $params['view_name'] = $viewName;
-        $className           = !empty($params['view_class']) ? $params['view_class'] : get_called_class();
-        $view                = BClassRegistry::instance($className, $params);
+        $className = !empty($params['view_class']) ? $params['view_class'] : get_called_class();
+        $view = BClassRegistry::instance($className, [$params]);
 
         return $view;
     }
@@ -1224,7 +1224,7 @@ class BView extends BClass
      * @param array $params
      * @return BView
      */
-    public function __construct(array $params)
+    public function __construct(array $params = [])
     {
         $this->_params = $params;
     }

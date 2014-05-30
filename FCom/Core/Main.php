@@ -10,6 +10,19 @@ class FCom_Core_Main extends BClass
 {
     protected $_modulesDirs = [];
 
+    protected $_iDebug;
+    protected $_iRequest;
+    protected $_iResponse;
+    protected $_iConfig;
+
+    public function __construct(BDebug $debug, BRequest $request, BResponse $response, BConfig $config)
+    {
+        $this->_iDebug = $debug;
+        $this->_iRequest = $request;
+        $this->_iResponse = $response;
+        $this->_iConfig = $config;
+    }
+
     public function init($area)
     {
         try {
@@ -398,9 +411,9 @@ class FCom_Core_Main extends BClass
             $config->addFile('local.php', true);
         }
 
-        BClassAutoload::i(true, ['root_dir' => $dirConf['local_dir']]);
-        BClassAutoload::i(true, ['root_dir' => $dirConf['dlc_dir']]);
-        BClassAutoload::i(true, ['root_dir' => $dirConf['root_dir']]);
+        BClassAutoload::i(true, [$dirConf['local_dir']]);
+        BClassAutoload::i(true, [$dirConf['dlc_dir']]);
+        BClassAutoload::i(true, [$dirConf['root_dir']]);
 
         return $this;
     }

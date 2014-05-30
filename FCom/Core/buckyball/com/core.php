@@ -1216,7 +1216,9 @@ class BClassRegistry extends BClass
         if (!class_exists($className, true)) {
             BDebug::error(BLocale::_('Invalid class name: %s', $className));
         }
-        $instance = new $className($args);
+        $args = static::processDI($className, $args);
+        $reflClass = new ReflectionClass($className);
+        $instance = $reflClass->newInstanceArgs($args);
 
         // if any methods are overridden or augmented, get decorator
         if (!empty(static::$_decoratedClasses[$class])) {
@@ -1229,6 +1231,37 @@ class BClassRegistry extends BClass
         }
 
         return $instance;
+    }
+
+    static public function processDI($className, $args = [])
+    {
+        static $paramsCache = [];
+
+        if (!isset($paramsCache[$className])) {
+            $class = new ReflectionClass($className);
+            $params = [];
+            $constructor = $class->getConstructor();
+            if ($constructor) {
+                $constructorParams = $constructor->getParameters();
+                if ($constructorParams) {
+                    foreach ($constructorParams as $i => $param) {
+                        $paramClass = $param->getClass();
+                        $params[$i] = $paramClass ? $paramClass->getName() : false;
+                    }
+                }
+            }
+            $paramsCache[$className] = $params;
+        } else {
+            $params = $paramsCache[$className];
+        }
+
+        foreach ($params as $i => $paramClassName) {
+            if (empty($args[$i]) && is_string($paramClassName)) {
+                $args[$i] = static::instance($paramClassName, [], true);
+            }
+        }
+
+        return $args;
     }
 
     static public function unsetInstance()
@@ -1395,14 +1428,15 @@ class BClassDecorator
 class BClassAutoload extends BClass
 {
     public $root_dir;
-    public $filename_cb;
     public $module_name;
+    public $filename_cb;
 
-    public function __construct($params)
+    public function __construct($root_dir, $module_name = null, $filename_cb = null)
     {
-        foreach ($params as $k => $v) {
-            $this->$k = $v;
-        }
+        $this->root_dir = $root_dir;
+        $this->module_name = $module_name;
+        $this->filename_cb = $filename_cb;
+
         spl_autoload_register([$this, 'callback'], false);
         BDebug::debug('AUTOLOAD: ' . print_r($this, 1));
     }

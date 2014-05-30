@@ -120,7 +120,7 @@ class BModuleRegistry extends BClass
             $this->_modules[$modName]->update($params);
         } else {
             $params['name'] = $modName;
-            $this->_modules[$modName] = BModule::i(true, $params);
+            $this->_modules[$modName] = BModule::i(true, [$params]);
         }
         return $this;
     }
@@ -1115,11 +1115,7 @@ if (!isset($o[0]) || !isset($o[1])) {
         } elseif (!BUtil::isPathAbsolute($rootDir)) {
             $rootDir = $this->root_dir . '/' . $rootDir;
         }
-        BClassAutoload::i(true, [
-            'module_name' => $this->name,
-            'root_dir' => rtrim($rootDir, '/'),
-            'filename_cb' => $callback,
-        ]);
+        BClassAutoload::i(true, [rtrim($rootDir, '/'), $this->name, $callback]);
         return $this;
     }
 
