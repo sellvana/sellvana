@@ -60,6 +60,11 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_add()
     {
+        if (BRequest::i()->csrf('referrer', 'GET')) {
+            $this->message('CSRF detected');
+            BResponse::i()->redirect('wishlist');
+            return;
+        }
         $id = BRequest::i()->get('id');
         $p = FCom_Catalog_Model_Product::i()->load($id);
         if (!$p) {

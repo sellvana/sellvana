@@ -634,14 +634,17 @@ class BRequest extends BClass
     public static function csrf($checkMethod = null, $httpMethods = null)
     {
         $c = BConfig::i();
-
-
         if (null === $httpMethods) {
             $m = $c->get('web/csrf_http_methods');
-            $httpMethods = $m ? (is_string($m) ? explode(',', $m) : $m) : ['POST', 'PUT', 'DELETE'];
         }
-
-        if (is_array($httpMethods) && !in_array(static::method(), $httpMethods)) {
+        if (!$httpMethods) {
+            $httpMethods = ['POST', 'PUT', 'DELETE'];
+        } elseif (is_string($httpMethods)) {
+            $httpMethods = array_map('trim', explode(',', $httpMethods));
+        } elseif (!is_array($httpMethods)) {
+            throw new BException('Invalid HTTP Methods argument');
+        }
+        if (!in_array(static::method(), $httpMethods)) {
             return false; // not one of checked methods, pass
         }
 
