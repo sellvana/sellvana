@@ -22,7 +22,7 @@ class FCom_OAuth_Controller extends FCom_Core_Controller_Abstract
             BResponse::i()->redirect($authUrl);
         } catch (Exception $e) {
 echo "<pre>"; print_r($e); exit;
-            $area = BApp::i()->get('area') === 'FCom_Admin' ? 'admin' : 'frontend';
+            $area = BRequest::i()->area() === 'FCom_Admin' ? 'admin' : 'frontend';
             BSession::i()->addMessage($e->getMessage(), 'error', $area);
             BResponse::i()->redirect($returnUrl);
         }
@@ -36,7 +36,7 @@ echo "<pre>"; print_r($e); exit;
             $hlp->callbackAction();
         } catch (Exception $e) {
 echo "<pre>"; print_r($e); exit;
-            $area = BApp::i()->get('area') === 'FCom_Admin' ? 'admin' : 'frontend';
+            $area = BRequest::i()->area() === 'FCom_Admin' ? 'admin' : 'frontend';
             BSession::i()->addMessage($e->getMessage(), 'error', $area);
         }
         BResponse::i()->redirect($returnUrl);

@@ -263,7 +263,7 @@ class BLayout extends BClass
     {
         $t = BDebug::debug(__METHOD__);
         if (null === $area) {
-            $area = BApp::i()->get('area');
+            $area = BRequest::i()->area();
         }
         $cacheKey = 'ALL_VIEWS-' . $area;
         $cacheConfig = BConfig::i()->get('core/cache/view_files');
@@ -692,7 +692,7 @@ class BLayout extends BClass
     public function loadLayoutFilesFromAllModules()
     {
         $t = BDebug::debug(__METHOD__);
-        $cacheKey = 'LAYOUTS-' . BApp::i()->get('area'); //TODO: more flexible key
+        $cacheKey = 'LAYOUTS-' . BRequest::i()->area(); //TODO: more flexible key
         $cacheConfig = BConfig::i()->get('core/cache/layout_files');
         $useCache = !$cacheConfig && BDebug::is('STAGING,PRODUCTION') || $cacheConfig === 'enable';
         if ($useCache) {
@@ -1025,7 +1025,7 @@ class BLayout extends BClass
 
         $theme = $this->_themes[$themeName];
 
-        $area = BApp::i()->get('area');
+        $area = BRequest::i()->area();
         if (!empty($theme['area']) && !in_array($area, (array)$theme['area'])) {
             BDebug::debug('Theme ' . $themeName . ' can not be used in ' . $area);
             return false;

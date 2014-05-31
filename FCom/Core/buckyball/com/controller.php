@@ -44,6 +44,13 @@ class BRequest extends BClass
     protected static $_language;
 
     /**
+     * Area of the current request
+     *
+     * @var string
+     */
+    protected $_area;
+
+    /**
      * Shortcut to help with IDE autocompletion
      *
      * @param bool  $new
@@ -70,6 +77,28 @@ class BRequest extends BClass
         if (!empty($_SERVER['ORIG_SCRIPT_FILENAME'])) {
             $_SERVER['ORIG_SCRIPT_FILENAME'] = str_replace('/index.php/index.php', '/index.php', $_SERVER['ORIG_SCRIPT_FILENAME']);
         }
+    }
+
+    /**
+     * Returns area of the current request
+     *
+     * @var string
+     */
+    public function area()
+    {
+        return $this->_area;
+    }
+
+    /**
+     * Set area of the current request
+     *
+     * @param string $area
+     * @return BRequest
+     */
+    public function setArea($area)
+    {
+        $this->_area = $area;
+        return $this;
     }
 
     /**
@@ -744,7 +773,7 @@ class BRequest extends BClass
     public static function currentUrl()
     {
         $host = static::scheme() . '://' . static::httpHost(true);
-        if (BConfig::i()->get('web/hide_script_name') && BApp::i()->get('area') !== 'FCom_Admin') {
+        if (BConfig::i()->get('web/hide_script_name') && BRequest::i()->area() !== 'FCom_Admin') {
             $root = static::webRoot();
         } else {
             $root = static::scriptName();

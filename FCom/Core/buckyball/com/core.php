@@ -291,7 +291,7 @@ class BApp extends BClass
                     break;
             }
 
-            if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name') && BApp::i()->get('area') !== 'FCom_Admin')) {
+            if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name') && BRequest::i()->area() !== 'FCom_Admin')) {
                 $url = rtrim($url, "\\"); //for windows installation
                 $url = rtrim($url, '/') . '/' . $scriptPath['basename'];
             }

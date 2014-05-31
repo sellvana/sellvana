@@ -3791,6 +3791,35 @@ class BValidateViewHelper extends BClass
     }
 }
 
+class BEnv extends BClass
+{
+    public $app;
+    public $autoload;
+    public $config;
+    public $debug;
+    public $layout;
+    public $modReg;
+    public $request;
+    public $response;
+    public $session;
+    public $util;
+
+    public function __construct(BApp $app, BClassAutoload $autoload, BConfig $config, BDebug $debug, BLayout $layout,
+        BModuleRegistry $modReg, BRequest $request, BResponse $response, BSession $session, BUtil $util)
+    {
+        $this->app = $app;
+        $this->autoload = $autoload;
+        $this->config = $config;
+        $this->debug = $debug;
+        $this->layout = $layout;
+        $this->modReg = $modReg;
+        $this->request = $request;
+        $this->response = $response;
+        $this->session = $session;
+        $this->util = $util;
+    }
+}
+
 /**
  * If FISMA/FIPS/NIST compliance required, use PBKDF2
  *

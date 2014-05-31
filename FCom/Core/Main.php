@@ -10,52 +10,33 @@ class FCom_Core_Main extends BClass
 {
     protected $_modulesDirs = [];
 
-    protected $BApp;
-    protected $BClassAutoload;
-    protected $BConfig;
-    protected $BDebug;
-    protected $BLayout;
-    protected $BModuleRegistry;
-    protected $BRequest;
-    protected $BResponse;
-    protected $BSession;
-    protected $BUtil;
+    protected $_env;
 
-    public function __construct(BApp $app, BClassAutoload $autoload, BConfig $config, BDebug $debug, BLayout $layout,
-        BModuleRegistry $modReg, BRequest $request, BResponse $response, BSession $session, BUtil $util)
+    public function __construct(BEnv $env)
     {
-        $this->BApp = $app;
-        $this->BClassAutoload = $autoload;
-        $this->BConfig = $config;
-        $this->BDebug = $debug;
-        $this->BLayout = $layout;
-        $this->BModuleRegistry = $modReg;
-        $this->BRequest = $request;
-        $this->BResponse = $response;
-        $this->BSession = $session;
-        $this->BUtil = $util;
+        $this->_env = $env;
     }
 
     public function init($area)
     {
         try {
             // initialize start time and register error/exception handlers
-            $this->BDebug->registerErrorHandlers();
+            $this->_env->debug->registerErrorHandlers();
 
             $this->initConfig($area);
             $this->initDebug();
             $this->initModules();
 
-            if (!$this->BRequest->validateHttpHost()) {
-                $this->BResponse->status(404, 'Unapproved HTTP Host header', 'Host not found');
+            if (!$this->_env->request->validateHttpHost()) {
+                $this->_env->response->status(404, 'Unapproved HTTP Host header', 'Host not found');
                 die();
             }
 
-            return $this->BApp;
+            return $this->_env->app;
 
         } catch (Exception $e) {
-            $this->BDebug->dumpLog();
-            $this->BDebug->exceptionHandler($e);
+            $this->_env->debug->dumpLog();
+            $this->_env->debug->exceptionHandler($e);
         }
     }
 
@@ -63,27 +44,27 @@ class FCom_Core_Main extends BClass
     {
         $this->init($area);
         try {
-            $this->BApp->run();
+            $this->_env->app->run();
         } catch (Exception $e) {
-            $this->BDebug->dumpLog();
-            $this->BDebug->exceptionHandler($e);
+            $this->_env->debug->dumpLog();
+            $this->_env->debug->exceptionHandler($e);
         }
     }
 
     public function initConfig($area)
     {
-        $req = $this->BRequest;
+        $req = $this->_env->request;
 
         // Chrome has a bug of not storing cookies for localhost domain
         if ($req->httpHost(false) === 'localhost' && $req->userAgent('/chrome/i')) {
             $url = str_replace('//localhost', '//127.0.0.1', $req->currentUrl());
-            $this->BResponse->redirect($url);
+            $this->_env->response->redirect($url);
             exit;
         }
 
         date_default_timezone_set('UTC');
 
-        $config = $this->BConfig;
+        $config = $this->_env->config;
 
         // $localConfig used to override saved config with settings from entry point
         $localConfig = [];
@@ -100,7 +81,7 @@ class FCom_Core_Main extends BClass
         }
         $localConfig['fs']['root_dir'] = $rootDir = str_replace('\\', '/', $rootDir);
 
-        $this->BDebug->debug('ROOTDIR=' . $rootDir);
+        $this->_env->debug->debug('ROOTDIR=' . $rootDir);
 
         $docRoot = $req->docRoot();
         $webRoot = $req->webRoot();
@@ -111,17 +92,17 @@ class FCom_Core_Main extends BClass
 
         if (!$baseHref) {
             $baseHref = $webRoot;
-        } elseif (!$this->BUtil->isPathAbsolute($baseHref)) {
+        } elseif (!$this->_env->util->isPathAbsolute($baseHref)) {
             $baseHref = $webRootTrimmed . '/' . $baseHref;
         }
         if (!$baseSrc) {
             $baseSrc = $baseHref;
-        } elseif (!$this->BUtil->isPathAbsolute($baseSrc)) {
+        } elseif (!$this->_env->util->isPathAbsolute($baseSrc)) {
             $baseSrc = $webRootTrimmed . '/' . $baseSrc;
         }
         if (!$baseStore) {
             $baseStore = $baseHref;
-        } elseif (!$this->BUtil->isPathAbsolute($baseStore)) {
+        } elseif (!$this->_env->util->isPathAbsolute($baseStore)) {
             $baseStore = $webRootTrimmed . '/' . $baseStore;
         }
         $localConfig['web']['base_href'] = $baseHref;
@@ -200,11 +181,11 @@ class FCom_Core_Main extends BClass
         }
 
         if ($errors) {
-            $this->BLayout
+            $this->_env->layout
                 ->addView('core/errors', ['template' => __DIR__ . '/views/core/errors.php'])
                 ->setRootView('core/errors');
-            $this->BLayout->view('core/errors')->set('errors', $errors);
-            $this->BResponse->output();
+            $this->_env->layout->view('core/errors')->set('errors', $errors);
+            $this->_env->response->output();
             exit;
         }
 
@@ -219,14 +200,14 @@ class FCom_Core_Main extends BClass
             if ($randomDirGlob) {
                 $randomDirName = basename($randomDirGlob[0]);
             } else {
-                $randomDirName = 'random-' . $this->BUtil->randomString(16);
-                $this->BUtil->ensureDir($storageDir . '/' . $randomDirName);
+                $randomDirName = 'random-' . $this->_env->util->randomString(16);
+                $this->_env->util->ensureDir($storageDir . '/' . $randomDirName);
             }
             $config->set('core/storage_random_dir', $randomDirName, false, true);
             $this->writeConfigFiles('core');
         }
         $randomDir = $storageDir . '/' . $randomDirName;
-        $this->BUtil->ensureDir($randomDir);
+        $this->_env->util->ensureDir($randomDir);
 
         // cache files
         $cacheDir = $config->get('fs/cache_dir');
@@ -249,27 +230,27 @@ class FCom_Core_Main extends BClass
             $config->set('fs/session_dir', $logDir);
         }
 
-        $this->BApp->set('area', $area, true);
+        $this->_env->request->setArea($area);
 
         return $this;
     }
 
     public function initDebug()
     {
-        #$this->BDebug->mode('production');
-        #$this->BDebug->mode('development');
-        #$this->BDebug->mode('debug');
+        #$this->_env->debug->mode('production');
+        #$this->_env->debug->mode('development');
+        #$this->_env->debug->mode('debug');
 
-        $config = $this->BConfig;
+        $config = $this->_env->config;
         // Initialize debugging mode and levels
-        $this->BDebug->logDir($config->get('fs/log_dir'));
+        $this->_env->debug->logDir($config->get('fs/log_dir'));
 
-        $this->BDebug->adminEmail($config->get('admin_email'));
+        $this->_env->debug->adminEmail($config->get('admin_email'));
 
-        $area = $this->BApp->get('area');
+        $area = $this->_env->request->area();
 
-        if ($area === 'FCom_Admin' && $this->BRequest->get('RECOVERY') === '') {
-            $this->BDebug->mode('RECOVERY');
+        if ($area === 'FCom_Admin' && $this->_env->request->get('RECOVERY') === '') {
+            $this->_env->debug->mode('RECOVERY');
             return $this;
         }
 
@@ -289,48 +270,48 @@ class FCom_Core_Main extends BClass
                 }
                 $ipModes[trim($a[0])] = strtoupper(trim($a[1]));
             }
-            $ip = $this->BRequest->ip();
+            $ip = $this->_env->request->ip();
             if (PHP_SAPI === 'cli' && !empty($ipModes['$'])) {
-                $this->BDebug->mode($ipModes['$']);
+                $this->_env->debug->mode($ipModes['$']);
                 return $this;
             }
             if (!empty($ipModes[$ip])) {
-                $this->BDebug->mode($ipModes[$ip]);
+                $this->_env->debug->mode($ipModes[$ip]);
                 return $this;
             }
             if (!empty($ipPatterns)) {
                 foreach ($ipPatterns as $pat => $mode) {
                     $pat = str_replace('*', '.*', str_replace('.', '\\.', $pat));
                     if (preg_match('#^' . $pat . '$#', $ip)) {
-                        $this->BDebug->mode($mode);
+                        $this->_env->debug->mode($mode);
                         return $this;
                     }
                 }
             }
             if (!empty($ipModes['*'])) {
-                $this->BDebug->mode($ipModes['*']);
+                $this->_env->debug->mode($ipModes['*']);
             }
         }
-        if ($this->BDebug->is('DEBUG')) {
+        if ($this->_env->debug->is('DEBUG')) {
             ini_set('display_errors', 1);
             error_reporting(E_ALL | E_STRICT);
         } else {
             ini_set('display_errors', 0);
             error_reporting(0);
         }
-#print_r($this->BDebug->mode());
+#print_r($this->_env->debug->mode());
         return $this;
     }
 
     public function initModules()
     {
-        $config = $this->BConfig;
-        $area = $this->BApp->get('area');
-        $mode = $this->BDebug->mode();
+        $config = $this->_env->config;
+        $area = $this->_env->request->area();
+        $mode = $this->_env->debug->mode();
         $configDir = $config->get('fs/config_dir');
 
         if ('DISABLED' === $mode) {
-            $this->BResponse->status('404', 'Page not found', 'Page not found');
+            $this->_env->response->status('404', 'Page not found', 'Page not found');
             die;
         }
 
@@ -344,11 +325,11 @@ class FCom_Core_Main extends BClass
                 'FCom_MarketClient' => 'REQUESTED',
             ];
             $area = 'FCom_Install';
-            $this->BApp->set('area', $area, true);
+            $this->_env->request->setArea($area);
         }
-        $this->BDebug->debug('AREA: ' . $area . ', MODE: ' . $mode);
+        $this->_env->debug->debug('AREA: ' . $area . ', MODE: ' . $mode);
         if ('RECOVERY' === $mode) { // load manifests for RECOVERY mode
-            $recoveryModules = $this->BConfig->get('recovery_modules/' . $area);
+            $recoveryModules = $this->_env->config->get('recovery_modules/' . $area);
             if ($recoveryModules) {
                 $moduleNames = preg_split('#\s*(,|\n)\s*#', $recoveryModules);
                 foreach ($moduleNames as $modName) {
@@ -362,10 +343,10 @@ class FCom_Core_Main extends BClass
         }
         $config->add(['module_run_levels' => ['request' => $runLevels]]);
 
-#$d = $this->BDebug->debug('SCANNING MANIFESTS');
+#$d = $this->_env->debug->debug('SCANNING MANIFESTS');
 
         $dirConf = $config->get('fs');
-        $modReg = $this->BModuleRegistry;
+        $modReg = $this->_env->modReg;
 
         //TODO: Figure out how to load db config only once
         if (file_exists($configDir . '/db.php')) {
@@ -408,7 +389,7 @@ class FCom_Core_Main extends BClass
             }
             $modReg->processRequires();
         }
-#$this->BDebug->profile($d);
+#$this->_env->debug->profile($d);
 
         $modReg->processDefaultConfig();
 
@@ -423,9 +404,9 @@ class FCom_Core_Main extends BClass
             $config->addFile('local.php', true);
         }
 
-        $this->BClassAutoload->i(true, [$dirConf['local_dir']]);
-        $this->BClassAutoload->i(true, [$dirConf['dlc_dir']]);
-        $this->BClassAutoload->i(true, [$dirConf['root_dir']]);
+        $this->_env->autoload->i(true, [$dirConf['local_dir']]);
+        $this->_env->autoload->i(true, [$dirConf['dlc_dir']]);
+        $this->_env->autoload->i(true, [$dirConf['root_dir']]);
 
         return $this;
     }
@@ -438,7 +419,7 @@ class FCom_Core_Main extends BClass
 
     public function beforeBootstrap()
     {
-        $this->BLayout->setDefaultViewClass('FCom_Core_View_Base');
+        $this->_env->layout->setDefaultViewClass('FCom_Core_View_Base');
     }
 
     public function writeConfigFiles($files = null)
@@ -451,7 +432,7 @@ class FCom_Core_Main extends BClass
             $files = explode(',', strtolower($files));
         }
 
-        $config = $this->BConfig;
+        $config = $this->_env->config;
         $c = $config->get(null, null, true);
 
         if (in_array('core', $files)) {
@@ -475,7 +456,7 @@ class FCom_Core_Main extends BClass
         }
         if (in_array('local', $files)) {
             // the rest of configuration
-            $local = $this->BUtil->arrayMask($c, 'db,install_status,module_run_levels,recovery_modules,mode_by_ip,cache,core', true);
+            $local = $this->_env->util->arrayMask($c, 'db,install_status,module_run_levels,recovery_modules,mode_by_ip,cache,core', true);
             $config->writeFile('local.php', $local);
         }
         return $this;
@@ -483,7 +464,7 @@ class FCom_Core_Main extends BClass
 
     public function getConfigVersionHash()
     {
-        $dir = $this->BConfig->get('fs/config_dir');
+        $dir = $this->_env->config->get('fs/config_dir');
         $hash = '';
         foreach (['core', 'db', 'local'] as $f) {
             $hash += filemtime($dir . '/' . $f);
@@ -499,9 +480,9 @@ class FCom_Core_Main extends BClass
         unset($params['full_url']);
         if (empty($scriptPath[$full])) {
             if ($full) {
-                $dir = $this->BApp->baseUrl(true);
+                $dir = $this->_env->app->baseUrl(true);
             } else {
-                $dir = rtrim($this->BConfig->get('web/base_src'), '/');
+                $dir = rtrim($this->_env->config->get('web/base_src'), '/');
             }
             $scriptPath[$full] = $dir . '/resize.php';
 
@@ -522,14 +503,14 @@ class FCom_Core_Main extends BClass
 
     public function thumbSrc($module, $path, $size)
     {
-        $url = $this->BApp->src($module, $path);
-        $path = str_replace($this->BApp->baseUrl(true), '', $url);
+        $url = $this->_env->app->src($module, $path);
+        $path = str_replace($this->_env->app->baseUrl(true), '', $url);
         return $this->resizeUrl($path, ['s' => $size]);
     }
 
     public function dir($path, $autocreate = true, $mode = 0777)
     {
-        $dir = $this->BConfig->get('fs/root_dir') . '/' . $path;
+        $dir = $this->_env->config->get('fs/root_dir') . '/' . $path;
         if ($autocreate && !file_exists($dir)) {
             mkdir($dir, $mode, true);
         }
@@ -543,52 +524,52 @@ class FCom_Core_Main extends BClass
     */
     public function getUrlKey($str)
     {
-        return $this->BLocale->transliterate($str);
+        return $this->_env->locale->transliterate($str);
     }
 
     public function url($type, $args)
     {
         if (is_string($args)) {
-            return $this->BApp->href('' . $type . '/' . $args);
+            return $this->_env->app->href('' . $type . '/' . $args);
         }
         return false;
     }
 
     public function frontendHref($url = '')
     {
-        $r = $this->BRequest;
+        $r = $this->_env->request;
 
-        $href = $r->scheme() . '://' . $r->httpHost() . $this->BConfig->get('web/base_store');
+        $href = $r->scheme() . '://' . $r->httpHost() . $this->_env->config->get('web/base_store');
         return trim(rtrim($href, '/') . '/' . ltrim($url, '/'), '/');
     }
 
 
     public function lastNav($save = false)
     {
-        $s = $this->BSession;
-        $r = $this->BRequest;
+        $s = $this->_env->session;
+        $r = $this->_env->request;
         if ($save) {
             $s->set('lastNav', [$r->rawPath(), $r->get()]);
         } else {
             $d = $s->get('lastNav');
-            return $this->BApp->href() . ($d ? $d[0] . '?' . http_build_query((array)$d[1]) : '');
+            return $this->_env->app->href() . ($d ? $d[0] . '?' . http_build_query((array)$d[1]) : '');
         }
     }
 
     public function defaultThemeCustomLayout()
     {
-        $cookieConfig = $this->BConfig->get('cookie');
-        $head = $this->BLayout->view('head');
+        $cookieConfig = $this->_env->config->get('cookie');
+        $head = $this->_env->layout->view('head');
 
         $head->csrf_token();
         $head->js_raw('js_init', ['content' => "
 FCom = {};
-FCom.cookie_options = " . $this->BUtil->toJson([
+FCom.cookie_options = " . $this->_env->util->toJson([
     'domain' => !empty($cookieConfig['domain']) ? $cookieConfig['domain'] : null,
     'path' => !empty($cookieConfig['path']) ? $cookieConfig['path'] : null,
 ]) . ";
-FCom.base_href = '" . $this->BApp->baseUrl() . "';
-FCom.base_src = '" . $this->BConfig->get('web/base_src') . "';
+FCom.base_href = '" . $this->_env->app->baseUrl() . "';
+FCom.base_src = '" . $this->_env->config->get('web/base_src') . "';
         "]);
     }
 
@@ -596,13 +577,13 @@ FCom.base_src = '" . $this->BConfig->get('web/base_src') . "';
     {
         $fa = $args['file_adapter'];
         $fa->addFunction(new Twig_SimpleFunction('fcom_htmlgrid', function($config) {
-            return $this->BLayout->view('core/htmlgrid-wrapper')->set('config', $config);
+            return $this->_env->layout->view('core/htmlgrid-wrapper')->set('config', $config);
         }));
     }
 
     public function runConfigMigration()
     {
-        $ver = $this->BConfig->get('core/patch_version');
+        $ver = $this->_env->config->get('core/patch_version');
 
     }
 }
