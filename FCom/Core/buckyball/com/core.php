@@ -46,6 +46,34 @@ class BClass
     static protected $_origClass;
 
     /**
+     * Lazy DI configuration
+     *
+     * [
+     *    '_env' => 'BEnv',
+     * ]
+     *
+     * @var array
+     */
+    static protected $_diConfig = [
+        '_env' => 'BEnv',
+        '*' => 'ALL',
+    ];
+
+    /**
+     * Lazy DI Global Instances
+     *
+     * @var array
+     */
+    static protected $_diGlobal = [];
+
+    /**
+     * Lazy DI Local Instances
+     *
+     * @var array
+     */
+    protected $_diLocal = [];
+
+    /**
     * Retrieve original class name
     *
     * @return string
@@ -82,6 +110,45 @@ class BClass
     public static function __callStatic($name, $args)
     {
         return BClassRegistry::callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
+    }
+
+    public function __get($name)
+    {
+        if (isset($this->_diLocal[$name])) {
+            return $this->_diLocal[$name];
+        }
+        $di = $this->getGlobalDependencyInstance($name);
+        if ($di) {
+            return $di;
+        }
+        BDebug::notice('Invalid property name: ' . $name);
+        return null;
+    }
+
+    public function setDependencyInstances(array $instances)
+    {
+        foreach ($instances as $name => $instance) {
+            $this->_diLocal[$name] = $instance;
+        }
+        return $this;
+    }
+
+    public function getGlobalDependencyInstance($name)
+    {
+        if (isset(static::$_diGlobal[$name])) {
+            return static::$_diGlobal[$name];
+        }
+        if (empty(static::$_diConfig[$name])) {
+            if (!empty(static::$_diConfig['*']) && class_exists($name)) {
+                static::$_diGlobal[$name] = BClassRegistry::instance($name, [], true);
+            } else {
+                static::$_diGlobal[$name] = false;
+            }
+        } else {
+            $class = static::$_diConfig[$name];
+            static::$_diGlobal[$name] = BClassRegistry::instance($class, [], true);
+        }
+        return static::$_diGlobal[$name];
     }
 }
 

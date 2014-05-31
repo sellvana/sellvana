@@ -1316,6 +1316,13 @@ class BView extends BClass
      */
     public function __get($name)
     {
+        if (isset($this->_diLocal[$name])) {
+            return $this->_diLocal[$name];
+        }
+        $di = $this->getGlobalDependencyInstance($name);
+        if ($di) {
+            return $di;
+        }
         return $this->get($name);
     }
 

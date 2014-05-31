@@ -108,7 +108,7 @@ class BCache extends BClass
             }
             $config = (array)BConfig::i()->get('cache/' . $type);
             $backend->init($config);
-            $this->_backendsStatus[$type] = true;
+            $this->_backendStatus[$type] = true;
         }
         return $this->_backends[$type];
     }

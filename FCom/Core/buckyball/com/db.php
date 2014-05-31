@@ -1904,6 +1904,13 @@ class BModel extends Model
     protected static $_collectionClass = 'BCollection';
 
     /**
+     * Local DI instances
+     *
+     * @var array
+     */
+    protected $_diLocal = [];
+
+    /**
     * Retrieve original class name
     *
     * @return string
@@ -2881,6 +2888,38 @@ class BModel extends Model
     {
         return BClassRegistry::callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
     }
+
+    public function __get($property)
+    {
+        /*
+        // TODO: Figure out security implications
+        static $BClass;
+
+        if (isset($this->_diLocal[$property])) {
+            return $this->_diLocal[$property];
+        }
+        if (!$BClass) {
+            $BClass = BClass::i();
+        }
+        $di = $BClass->getGlobalDependencyInstance($property);
+        if ($di) {
+            return $di;
+        }
+        */
+        if (!is_object($this->orm)) {
+            BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);
+        }
+        return $this->orm->get($property);
+    }
+    /*
+    public function setDependencyInstances(array $instances)
+    {
+        foreach ($instances as $name => $instance) {
+            $this->_diLocal[$name] = $instance;
+        }
+        return $this;
+    }
+    */
 }
 
 /**
