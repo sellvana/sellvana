@@ -1319,8 +1319,9 @@ class BView extends BClass
         if (isset($this->_diLocal[$name])) {
             return $this->_diLocal[$name];
         }
-        $di = $this->getGlobalDependencyInstance($name);
+        $di = $this->getGlobalDependencyInstance($name, static::$_diConfig);
         if ($di) {
+            $this->_diLocal[$name] = $di;
             return $di;
         }
         return $this->get($name);

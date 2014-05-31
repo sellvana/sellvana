@@ -117,8 +117,9 @@ class BClass
         if (isset($this->_diLocal[$name])) {
             return $this->_diLocal[$name];
         }
-        $di = $this->getGlobalDependencyInstance($name);
+        $di = $this->getGlobalDependencyInstance($name, static::$_diConfig);
         if ($di) {
+            $this->_diLocal[$name] = $di;
             return $di;
         }
         BDebug::notice('Invalid property name: ' . $name);
@@ -133,22 +134,28 @@ class BClass
         return $this;
     }
 
-    public function getGlobalDependencyInstance($name)
+    public function getGlobalDependencyInstance($name, $diConfig)
     {
         if (isset(static::$_diGlobal[$name])) {
             return static::$_diGlobal[$name];
         }
-        if (empty(static::$_diConfig[$name])) {
-            if (!empty(static::$_diConfig['*']) && class_exists($name)) {
-                static::$_diGlobal[$name] = BClassRegistry::instance($name, [], true);
+        if (empty($diConfig[$name])) {
+            $class = $name;
+            if (isset($diConfig['*']) && class_exists($class)) {
+                static::$_diGlobal[$class] = BClassRegistry::instance($class, [], true);
             } else {
-                static::$_diGlobal[$name] = false;
+                static::$_diGlobal[$class] = false;
             }
         } else {
-            $class = static::$_diConfig[$name];
-            static::$_diGlobal[$name] = BClassRegistry::instance($class, [], true);
+            if (is_array($diConfig[$name])) {
+                $class = $diConfig[$name][0];
+                //TODO: do we need to validate preconfigured class for interface?
+            } else {
+                $class = $diConfig[$name];
+            }
+            static::$_diGlobal[$class] = BClassRegistry::instance($class, [], true);
         }
-        return static::$_diGlobal[$name];
+        return static::$_diGlobal[$class];
     }
 }
 

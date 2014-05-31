@@ -1904,6 +1904,20 @@ class BModel extends Model
     protected static $_collectionClass = 'BCollection';
 
     /**
+     * Lazy DI configuration
+     *
+     * [
+     *    '_env' => 'BEnv',
+     * ]
+     *
+     * @var array
+     */
+    protected static $_diConfig = [
+        #'_env' => 'BEnv',
+        #'*' => 'ALL',
+    ];
+
+    /**
      * Local DI instances
      *
      * @var array
@@ -2891,8 +2905,6 @@ class BModel extends Model
 
     public function __get($property)
     {
-        /*
-        // TODO: Figure out security implications
         static $BClass;
 
         if (isset($this->_diLocal[$property])) {
@@ -2901,17 +2913,18 @@ class BModel extends Model
         if (!$BClass) {
             $BClass = BClass::i();
         }
-        $di = $BClass->getGlobalDependencyInstance($property);
+        $di = $BClass->getGlobalDependencyInstance($property, static::$_diConfig);
         if ($di) {
+            $this->_diLocal[$property] = $di;
             return $di;
         }
-        */
+
         if (!is_object($this->orm)) {
             BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);
         }
         return $this->orm->get($property);
     }
-    /*
+
     public function setDependencyInstances(array $instances)
     {
         foreach ($instances as $name => $instance) {
@@ -2919,7 +2932,6 @@ class BModel extends Model
         }
         return $this;
     }
-    */
 }
 
 /**
