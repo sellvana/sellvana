@@ -362,7 +362,6 @@ class FCom_Core_Main extends BClass
         }
         $config->add(['module_run_levels' => ['request' => $runLevels]]);
 
-        //FCom::i()->registerBundledModules();
 #$d = $this->BDebug->debug('SCANNING MANIFESTS');
 
         $dirConf = $config->get('fs');

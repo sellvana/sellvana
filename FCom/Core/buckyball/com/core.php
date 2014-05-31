@@ -1233,7 +1233,7 @@ class BClassRegistry extends BClass
 
     static public function processDI($className, $args = [])
     {
-        static $paramsCache = [];
+        static $paramsCache = [], $diStack = [];
 
         if (!isset($paramsCache[$className])) {
             $class = new ReflectionClass($className);
@@ -1255,7 +1255,12 @@ class BClassRegistry extends BClass
 
         foreach ($params as $i => $paramClassName) {
             if (empty($args[$i]) && is_string($paramClassName)) {
+                if (!empty($diStack[$paramClassName])) {
+                    throw new BException('DI circular reference detected: ' . $className . ' -> ' . $paramClassName);
+                }
+                $diStack[$paramClassName] = 1;
                 $args[$i] = static::instance($paramClassName, [], true);
+                unset($diStack[$paramClassName]);
             }
         }
 
