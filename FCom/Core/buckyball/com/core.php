@@ -83,8 +83,6 @@ class BClass
     {
         return BClassRegistry::callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
     }
-
-
 }
 
 /**
@@ -1431,14 +1429,16 @@ class BClassAutoload extends BClass
     public $module_name;
     public $filename_cb;
 
-    public function __construct($root_dir, $module_name = null, $filename_cb = null)
+    public function __construct($root_dir = null, $module_name = null, $filename_cb = null)
     {
-        $this->root_dir = $root_dir;
-        $this->module_name = $module_name;
-        $this->filename_cb = $filename_cb;
+        if (null !== $root_dir) {
+            $this->root_dir = $root_dir;
+            $this->module_name = $module_name;
+            $this->filename_cb = $filename_cb;
 
-        spl_autoload_register([$this, 'callback'], false);
-        BDebug::debug('AUTOLOAD: ' . print_r($this, 1));
+            spl_autoload_register([$this, 'callback'], false);
+            BDebug::debug('AUTOLOAD: ' . print_r($this, 1));
+        }
     }
 
     /**

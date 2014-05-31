@@ -135,7 +135,7 @@ class FCom_Cron_Main extends BClass
 
             try {
                 // run task callback
-                call_user_func($task['callback'], $task);
+                BUtil::call($task['callback'], $task);
                 // if everything ok, mark task as success
                 $dbTask->set(['status' => 'success']);
             } catch (Exception $e) {

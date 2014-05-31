@@ -1262,7 +1262,7 @@ if (!isset($o[0]) || !isset($o[1])) {
         }
         if (!empty($bb['callback'])) {
             $start = BDebug::debug(BLocale::_('Start BEFORE bootstrap for %s', [$this->name]));
-            call_user_func($bb['callback']);
+            BUtil::call($bb['callback']);
             #$mod->run_status = BModule::LOADED;
             BDebug::profile($start);
             BDebug::debug(BLocale::_('End BEFORE bootstrap for %s', [$this->name]));
@@ -1299,7 +1299,7 @@ if (!isset($o[0]) || !isset($o[1])) {
             }
             if (!empty($this->bootstrap['callback'])) {
                 $start = BDebug::debug(BLocale::_('Start bootstrap for %s', [$this->name]));
-                call_user_func($this->bootstrap['callback']);
+                BUtil::call($this->bootstrap['callback']);
                 #$mod->run_status = BModule::LOADED;
                 BDebug::profile($start);
                 BDebug::debug(BLocale::_('End bootstrap for %s', [$this->name]));
@@ -1538,7 +1538,7 @@ class BMigrate extends BClass
                         BDb::ddlClearCache(); // clear DDL cache before each migration step
                         BDebug::debug('DB.MIGRATE ' . $view->q($script));
                         if (is_callable($script)) {
-                            $result = call_user_func($script);
+                            $result = BUtil::call($script);
                         } elseif (is_file($module->root_dir . '/' . $script)) {
                             $result = include_once($module->root_dir . '/' . $script);
                         } elseif (is_dir($module->root_dir . '/' . $script)) {
@@ -1673,7 +1673,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         // call install migration script
         try {
             if (is_callable($callback)) {
-                $result = call_user_func($callback);
+                $result = BUtil::call($callback);
             } elseif (is_file($callback)) {
                 $result = include $callback;
             } elseif (is_string($callback)) {
@@ -1742,7 +1742,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         // call upgrade migration script
         try {
             if (is_callable($callback)) {
-                $result = call_user_func($callback);
+                $result = BUtil::call($callback);
             } elseif (is_file($callback)) {
                 $result = include $callback;
             } elseif (is_string($callback)) {
@@ -1790,7 +1790,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         $callback = $mod->uninstall_callback; //TODO: implement
         // call uninstall migration script
         if (is_callable($callback)) {
-            call_user_func($callback);
+            BUtil::call($callback);
         } elseif (is_file($callback)) {
             include $callback;
         } elseif (is_string($callback)) {

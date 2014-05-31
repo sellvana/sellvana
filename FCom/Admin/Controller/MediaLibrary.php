@@ -251,7 +251,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     }
                     BEvents::i()->fire(__METHOD__ . ':' . $folder . ':upload', ['model' => $att]);
                     if (!empty($options['on_upload'])) {
-                        call_user_func($options['on_upload'], $att);
+                        BUtil::call($options['on_upload'], $att);
                     }
                     $id = $att->id;
                     $fileSize = $att->file_size;
@@ -285,7 +285,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 $att->set('file_name', $fileName)->save();
                 BEvents::i()->fire(__METHOD__ . ':' . $folder . ':edit', ['model' => $att]);
                 if (!empty($options['on_edit'])) {
-                    call_user_func($options['on_edit'], $att);
+                    BUtil::call($options['on_edit'], $att);
                 }
                 BResponse::i()->json(['success' => true]);
             } else {
@@ -302,7 +302,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $attModel->delete_many($args);
             BEvents::i()->fire(__METHOD__ . ':' . $folder . ':delete', ['files' => $files]);
             if (!empty($options['on_delete'])) {
-                call_user_func($options['on_delete'], $args);
+                BUtil::call($options['on_delete'], $args);
             }
             BResponse::i()->json(['success' => true]);
             break;
