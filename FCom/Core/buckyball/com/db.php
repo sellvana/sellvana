@@ -2915,7 +2915,7 @@ class BModel extends Model
         }
         $di = $BClass->getGlobalDependencyInstance($property, static::$_diConfig);
         if ($di) {
-            $this->_diLocal[$property] = $di;
+            #$this->_diLocal[$property] = $di;
             return $di;
         }
 

@@ -119,7 +119,7 @@ class BClass
         }
         $di = $this->getGlobalDependencyInstance($name, static::$_diConfig);
         if ($di) {
-            $this->_diLocal[$name] = $di;
+            #$this->_diLocal[$name] = $di;
             return $di;
         }
         BDebug::notice('Invalid property name: ' . $name);
