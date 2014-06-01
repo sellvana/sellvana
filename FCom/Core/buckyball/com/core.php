@@ -2136,9 +2136,9 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
 
     public function regenerateId()
     {
-        //session_regenerate_id();
+        session_regenerate_id(true);
         //BSession::i()->set('_regenerate_id', 1);
-        session_id(BUtil::randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
+        //session_id(BUtil::randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
         return $this;
     }
 
