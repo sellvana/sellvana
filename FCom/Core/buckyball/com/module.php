@@ -200,7 +200,7 @@ class BModuleRegistry extends BClass
 
         $data = [];
         foreach ($this->_modules as $modName => $mod) {
-            $data[$modName] = (array)$mod;
+            $data[$modName] = $mod->asArray();
             $data[$modName]['is_cached'] = true;
             unset($data['run_level']);
         }
@@ -1214,6 +1214,9 @@ if (!isset($o[0]) || !isset($o[1])) {
     {
         if (is_array($key)) {
             foreach ($key as $k => $v) {
+                if ($k[0] === "\0") { // protected properties, for cache saved on previous commit
+                    continue;
+                }
                 $this->$k = $v;
             }
             return $this;
@@ -1308,6 +1311,17 @@ if (!isset($o[0]) || !isset($o[1])) {
 
         $this->run_status = BModule::LOADED;
         return $this;
+    }
+
+    public function asArray()
+    {
+        $a = (array)$this;
+        foreach ($a as $k => $v) {
+            if ($k[0] === "\0") {
+                unset($a[$k]);
+            }
+        }
+        return $a;
     }
 }
 
