@@ -1011,6 +1011,7 @@ class BRequest extends BClass
             return;
         }
         $data = ['GET' => & $_GET, 'POST' => & $_POST, 'REQUEST' => & $_REQUEST, 'COOKIE' => & $_COOKIE];
+        mb_internal_encoding('UTF-8');
         $this->stripTagsRecursive($data, static::rawPath());
         $alreadyStripped = true;
         return $this;
@@ -1023,8 +1024,9 @@ class BRequest extends BClass
             if (is_array($v)) {
                 $this->stripTagsRecursive($v,  $forUrlPath, $childPath);
             } elseif (!empty($v) && !is_numeric($v)) {
-                //$v = str_replace(chr(0137), '', (string)$v);
-                if (empty($this->_postTagsWhitelist[$forUrlPath][$childPath])) {
+                if (!mb_check_encoding($v)) {
+                    $v = null;
+                } elseif (empty($this->_postTagsWhitelist[$forUrlPath][$childPath])) {
                     $v = strip_tags($v);
                 } else {
                     $tags = $this->_postTagsWhitelist[$forUrlPath][$childPath];
