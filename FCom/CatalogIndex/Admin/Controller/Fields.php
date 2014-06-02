@@ -86,6 +86,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
         });';
         $config['callbacks'] = ['after_modalForm_render' => $callbacks];
         $config['new_button'] = '#add_new_index_field';
+        $config['grid_before_create'] = 'indexFieldGridRegister';
         return $config;
     }
 
