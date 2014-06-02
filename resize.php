@@ -96,20 +96,27 @@ class ImageResizer
     protected function validate()
     {
         if (empty($_SERVER['HTTP_REFERER'])) {
-            #$this->restrict();
-        }
-        return;
-        $webFolder = preg_replace('#' . __FILE__ . '$#', '', $_SERVER['SCRIPT_NAME']);
-        $re        = '#^(http(s):)?//' . preg_quote($_SERVER['HTTP_HOST'] . $webFolder, '#') . '#';
-        if (!preg_match($re, $_SERVER['HTTP_REFERER'])) {
             $this->restrict();
+        }
+        $scriptName = !empty($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_NAME']) :
+            (!empty($_SERVER['ORIG_SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['ORIG_SCRIPT_NAME']) : null);
+        if (!$scriptName) {
+            $this->restrict();
+        }
+        $httpHost = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
+        $webFolder = preg_replace('#' . preg_quote(basename(__FILE__), '#') . '$#', '', $scriptName);
+        $regex = '#^(https?:)?//' . preg_quote($httpHost . $webFolder, '#') . '#';
+        $referrer = $_SERVER['HTTP_REFERER'];
+        if (!$httpHost || !preg_match($regex, $referrer)) {
+            $this->restrict($msg);
         }
     }
 
-    protected function restrict()
+    protected function restrict($msg = null)
     {
         header('HTTP/1.0 403 Restricted');
         header('Status: 403 Restricted');
+        if ($msg) header('X-Reason: ' . $msg);
         echo '403 Restricted';
         exit;
     }

@@ -4,10 +4,10 @@ class FCom_Core_View_Root extends FCom_Core_View_Abstract
 {
     protected $_htmlAttr = ['lang' => 'en'];
 
-    public function __construct(array $params)
+    public function __construct(array $params, BRequest $req)
     {
         parent::__construct($params);
-        $this->addBodyClass(strtolower(trim(preg_replace('#[^a-z0-9]+#i', '-', BRequest::i()->rawPath()), '-')));
+        $this->addBodyClass(strtolower(trim(preg_replace('#[^a-z0-9]+#i', '-', $req->rawPath()), '-')));
     }
 
     public function addBodyClass($class)
