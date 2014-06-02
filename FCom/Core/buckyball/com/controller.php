@@ -794,6 +794,9 @@ class BRequest extends BClass
             return null;
         }
         $parsed = parse_url($url);
+        if (empty($parsed['host'])) {
+            return true;
+        }
         if ($parsed['host'] !== static::httpHost(false)) {
             return false;
         }
