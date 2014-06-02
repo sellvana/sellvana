@@ -46,6 +46,34 @@ class BClass
     static protected $_origClass;
 
     /**
+     * Lazy DI configuration
+     *
+     * [
+     *    '_env' => 'BEnv',
+     * ]
+     *
+     * @var array
+     */
+    static protected $_diConfig = [
+        '_env' => 'BEnv',
+        '*' => 'ALL',
+    ];
+
+    /**
+     * Lazy DI Global Instances
+     *
+     * @var array
+     */
+    static protected $_diGlobal = [];
+
+    /**
+     * Lazy DI Local Instances
+     *
+     * @var array
+     */
+    protected $_diLocal = [];
+
+    /**
     * Retrieve original class name
     *
     * @return string
@@ -84,7 +112,51 @@ class BClass
         return BClassRegistry::callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
     }
 
+    public function __get($name)
+    {
+        if (isset($this->_diLocal[$name])) {
+            return $this->_diLocal[$name];
+        }
+        $di = $this->getGlobalDependencyInstance($name, static::$_diConfig);
+        if ($di) {
+            #$this->_diLocal[$name] = $di;
+            return $di;
+        }
+        BDebug::notice('Invalid property name: ' . $name);
+        return null;
+    }
 
+    public function setDependencyInstances(array $instances)
+    {
+        foreach ($instances as $name => $instance) {
+            $this->_diLocal[$name] = $instance;
+        }
+        return $this;
+    }
+
+    public function getGlobalDependencyInstance($name, $diConfig)
+    {
+        if (isset(static::$_diGlobal[$name])) {
+            return static::$_diGlobal[$name];
+        }
+        if (empty($diConfig[$name])) {
+            $class = $name;
+            if (isset($diConfig['*']) && class_exists($class)) {
+                static::$_diGlobal[$class] = BClassRegistry::instance($class, [], true);
+            } else {
+                static::$_diGlobal[$class] = false;
+            }
+        } else {
+            if (is_array($diConfig[$name])) {
+                $class = $diConfig[$name][0];
+                //TODO: do we need to validate preconfigured class for interface?
+            } else {
+                $class = $diConfig[$name];
+            }
+            static::$_diGlobal[$class] = BClassRegistry::instance($class, [], true);
+        }
+        return static::$_diGlobal[$class];
+    }
 }
 
 /**
@@ -293,7 +365,7 @@ class BApp extends BClass
                     break;
             }
 
-            if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name') && BApp::i()->get('area') !== 'FCom_Admin')) {
+            if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name') && BRequest::i()->area() !== 'FCom_Admin')) {
                 $url = rtrim($url, "\\"); //for windows installation
                 $url = rtrim($url, '/') . '/' . $scriptPath['basename'];
             }
@@ -1216,7 +1288,9 @@ class BClassRegistry extends BClass
         if (!class_exists($className, true)) {
             BDebug::error(BLocale::_('Invalid class name: %s', $className));
         }
-        $instance = new $className($args);
+        $args = static::processDI($className, $args);
+        $reflClass = new ReflectionClass($className);
+        $instance = $reflClass->newInstanceArgs($args);
 
         // if any methods are overridden or augmented, get decorator
         if (!empty(static::$_decoratedClasses[$class])) {
@@ -1229,6 +1303,42 @@ class BClassRegistry extends BClass
         }
 
         return $instance;
+    }
+
+    static public function processDI($className, $args = [])
+    {
+        static $paramsCache = [], $diStack = [];
+
+        if (!isset($paramsCache[$className])) {
+            $class = new ReflectionClass($className);
+            $params = [];
+            $constructor = $class->getConstructor();
+            if ($constructor) {
+                $constructorParams = $constructor->getParameters();
+                if ($constructorParams) {
+                    foreach ($constructorParams as $i => $param) {
+                        $paramClass = $param->getClass();
+                        $params[$i] = $paramClass ? $paramClass->getName() : false;
+                    }
+                }
+            }
+            $paramsCache[$className] = $params;
+        } else {
+            $params = $paramsCache[$className];
+        }
+
+        foreach ($params as $i => $paramClassName) {
+            if (empty($args[$i]) && is_string($paramClassName)) {
+                if (!empty($diStack[$paramClassName])) {
+                    throw new BException('DI circular reference detected: ' . $className . ' -> ' . $paramClassName);
+                }
+                $diStack[$paramClassName] = 1;
+                $args[$i] = static::instance($paramClassName, [], true);
+                unset($diStack[$paramClassName]);
+            }
+        }
+
+        return $args;
     }
 
     static public function unsetInstance()
@@ -1395,16 +1505,19 @@ class BClassDecorator
 class BClassAutoload extends BClass
 {
     public $root_dir;
-    public $filename_cb;
     public $module_name;
+    public $filename_cb;
 
-    public function __construct($params)
+    public function __construct($root_dir = null, $module_name = null, $filename_cb = null)
     {
-        foreach ($params as $k => $v) {
-            $this->$k = $v;
+        if (null !== $root_dir) {
+            $this->root_dir = $root_dir;
+            $this->module_name = $module_name;
+            $this->filename_cb = $filename_cb;
+
+            spl_autoload_register([$this, 'callback'], false);
+            BDebug::debug('AUTOLOAD: ' . print_r($this, 1));
         }
-        spl_autoload_register([$this, 'callback'], false);
-        BDebug::debug('AUTOLOAD: ' . print_r($this, 1));
     }
 
     /**
@@ -2023,9 +2136,9 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
 
     public function regenerateId()
     {
-        //session_regenerate_id();
+        session_regenerate_id(true);
         //BSession::i()->set('_regenerate_id', 1);
-        session_id(BUtil::randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
+        //session_id(BUtil::randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
         return $this;
     }
 

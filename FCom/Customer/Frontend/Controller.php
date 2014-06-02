@@ -147,7 +147,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_password_reset__POST()
     {
-        if (FCom_Admin_Model_User::i()->isLoggedIn()) {
+        if (FCom_Customer_Model_Customer::i()->isLoggedIn()) {
             BResponse::i()->redirect('');
             return;
         }
@@ -168,7 +168,6 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             BResponse::i()->redirect($returnUrl);
             return;
         }
-
         $sessData =& BSession::i()->dataToUpdate();
         $sessData['password_reset_token'] = null;
 

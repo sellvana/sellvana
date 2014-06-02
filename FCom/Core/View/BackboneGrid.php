@@ -47,7 +47,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
     public function callUserFunc($cb, $args)
     {
-        return call_user_func_array($cb, $args);
+        return BUtil::call($cb, $args, true);
     }
 
     public function multiselectToggleOptions()

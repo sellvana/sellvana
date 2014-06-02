@@ -44,6 +44,13 @@ class BRequest extends BClass
     protected static $_language;
 
     /**
+     * Area of the current request
+     *
+     * @var string
+     */
+    protected $_area;
+
+    /**
      * Shortcut to help with IDE autocompletion
      *
      * @param bool  $new
@@ -70,6 +77,28 @@ class BRequest extends BClass
         if (!empty($_SERVER['ORIG_SCRIPT_FILENAME'])) {
             $_SERVER['ORIG_SCRIPT_FILENAME'] = str_replace('/index.php/index.php', '/index.php', $_SERVER['ORIG_SCRIPT_FILENAME']);
         }
+    }
+
+    /**
+     * Returns area of the current request
+     *
+     * @var string
+     */
+    public function area()
+    {
+        return $this->_area;
+    }
+
+    /**
+     * Set area of the current request
+     *
+     * @param string $area
+     * @return BRequest
+     */
+    public function setArea($area)
+    {
+        $this->_area = $area;
+        return $this;
     }
 
     /**
@@ -634,14 +663,17 @@ class BRequest extends BClass
     public static function csrf($checkMethod = null, $httpMethods = null)
     {
         $c = BConfig::i();
-
-
         if (null === $httpMethods) {
             $m = $c->get('web/csrf_http_methods');
-            $httpMethods = $m ? (is_string($m) ? explode(',', $m) : $m) : ['POST', 'PUT', 'DELETE'];
         }
-
-        if (is_array($httpMethods) && !in_array(static::method(), $httpMethods)) {
+        if (!$httpMethods) {
+            $httpMethods = ['POST', 'PUT', 'DELETE'];
+        } elseif (is_string($httpMethods)) {
+            $httpMethods = array_map('trim', explode(',', $httpMethods));
+        } elseif (!is_array($httpMethods)) {
+            throw new BException('Invalid HTTP Methods argument');
+        }
+        if (!in_array(static::method(), $httpMethods)) {
             return false; // not one of checked methods, pass
         }
 
@@ -741,7 +773,7 @@ class BRequest extends BClass
     public static function currentUrl()
     {
         $host = static::scheme() . '://' . static::httpHost(true);
-        if (BConfig::i()->get('web/hide_script_name') && BApp::i()->get('area') !== 'FCom_Admin') {
+        if (BConfig::i()->get('web/hide_script_name') && BRequest::i()->area() !== 'FCom_Admin') {
             $root = static::webRoot();
         } else {
             $root = static::scriptName();
@@ -979,6 +1011,7 @@ class BRequest extends BClass
             return;
         }
         $data = ['GET' => & $_GET, 'POST' => & $_POST, 'REQUEST' => & $_REQUEST, 'COOKIE' => & $_COOKIE];
+        mb_internal_encoding('UTF-8');
         $this->stripTagsRecursive($data, static::rawPath());
         $alreadyStripped = true;
         return $this;
@@ -991,8 +1024,9 @@ class BRequest extends BClass
             if (is_array($v)) {
                 $this->stripTagsRecursive($v,  $forUrlPath, $childPath);
             } elseif (!empty($v) && !is_numeric($v)) {
-                //$v = str_replace(chr(0137), '', (string)$v);
-                if (empty($this->_postTagsWhitelist[$forUrlPath][$childPath])) {
+                if (!mb_check_encoding($v)) {
+                    $v = null;
+                } elseif (empty($this->_postTagsWhitelist[$forUrlPath][$childPath])) {
                     $v = strip_tags($v);
                 } else {
                     $tags = $this->_postTagsWhitelist[$forUrlPath][$childPath];

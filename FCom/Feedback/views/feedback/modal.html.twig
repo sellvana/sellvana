@@ -1,8 +1,8 @@
 {% set c = CONFIG.get('modules/FCom_Feedback') %}
-{% if APP.get('area')=='FCom_Admin' %}
+{% if REQUEST.area()=='FCom_Admin' %}
   {% set u = APP.instance('FCom_Admin_Model_User').sessionUser() %}
 {% endif %}
-{% if c['enable_' ~ APP.get('area')] %}
+{% if c['enable_' ~ REQUEST.area()] %}
 <style>
 
 /* Feedback button */

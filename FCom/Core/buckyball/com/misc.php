@@ -1370,14 +1370,28 @@ class BUtil extends BClass
 
     public static function extCallback($callback)
     {
+        static $callbackMapCache = [];
+
         if (is_string($callback)) {
-            if (strpos($callback, '.') !== false) {
-                list($class, $method) = explode('.', $callback);
-            } elseif (strpos($callback, '->')) {
-                list($class, $method) = explode('->', $callback);
-            }
-            if (!empty($class)) {
-                $callback = [$class::i(), $method];
+            if (isset($callbackMapCache[$callback])) {
+                $callback = $callbackMapCache[$callback];
+            } else {
+                $origCallback = $callback;
+                if (strpos($callback, '::') !== false) {
+                    list($class, $method) = explode('::', $callback);
+                    $reflMethod = new ReflectionMethod($class, $method);
+                    if ($reflMethod->isStatic()) {
+                        $class = null; // proceed with usual callback
+                    }
+                } elseif (strpos($callback, '.') !== false) {
+                    list($class, $method) = explode('.', $callback);
+                } elseif (strpos($callback, '->')) {
+                    list($class, $method) = explode('->', $callback);
+                }
+                if (!empty($class)) {
+                    $callback = [$class::i(), $method];
+                }
+                $callbackMapCache[$origCallback] = $callback;
             }
         }
         return $callback;
@@ -3774,6 +3788,35 @@ class BValidateViewHelper extends BClass
         }
 
         return $html;
+    }
+}
+
+class BEnv extends BClass
+{
+    public $app;
+    public $autoload;
+    public $config;
+    public $debug;
+    public $layout;
+    public $modReg;
+    public $request;
+    public $response;
+    public $session;
+    public $util;
+
+    public function __construct(BApp $app, BClassAutoload $autoload, BConfig $config, BDebug $debug, BLayout $layout,
+        BModuleRegistry $modReg, BRequest $request, BResponse $response, BSession $session, BUtil $util)
+    {
+        $this->app = $app;
+        $this->autoload = $autoload;
+        $this->config = $config;
+        $this->debug = $debug;
+        $this->layout = $layout;
+        $this->modReg = $modReg;
+        $this->request = $request;
+        $this->response = $response;
+        $this->session = $session;
+        $this->util = $util;
     }
 }
 

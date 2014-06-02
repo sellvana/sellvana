@@ -261,7 +261,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             $user->set(['token' => null, 'token_at' => null])->save();
             return false;
         }
-        return true;
+        return $user;
     }
 
     public function resetPassword($password)
