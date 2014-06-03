@@ -1389,7 +1389,8 @@ class BUtil extends BClass
                     list($class, $method) = explode('->', $callback);
                 }
                 if (!empty($class)) {
-                    $callback = [$class::i(), $method];
+                    $instance = BClassRegistry::i()->instance($class, [], true);
+                    $callback = [$instance, $method];
                 }
                 $callbackMapCache[$origCallback] = $callback;
             }
@@ -1918,7 +1919,7 @@ class BEmail extends BClass
 
         $callback = static::$_handlers[static::$_defaultHandler]['callback'];
         if (is_callable($callback)) {
-            $result = call_user_func($callback, $emailData);
+            $result = BUtil::call($callback, $emailData);
         } else {
             BDebug::warning('Default email handler is not callable');
             $result = false;
