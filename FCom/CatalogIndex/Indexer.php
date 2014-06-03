@@ -80,6 +80,7 @@ class FCom_CatalogIndex_Indexer extends BClass
 
         //TODO: for less memory usage chunk the products data
         static::_indexFetchProductsData($products);
+        static::_indexFetchVariantsData($products);
         static::$_cnt_reindexed += count($products);
         unset($products);
         static::_indexSaveDocs();
@@ -124,6 +125,35 @@ class FCom_CatalogIndex_Indexer extends BClass
                 break;
             default:
                 throw new BException('Invalid source type');
+            }
+        }
+    }
+
+    static protected function _indexFetchVariantsData($products)
+    {
+        if (!BModuleRegistry::i()->isLoaded('FCom_CatalogIndex')) {
+            return;
+        }
+        foreach ($products as $p) {
+            $pId = $p->id();
+            $vFields = $p->getData('variants_fields');
+            $variants = $p->getData('variants');
+
+            foreach ($variants as $variant) {
+                $fValues = [];
+                foreach ($variant['fields'] as $field => $value) {
+                    if (empty($fValues[$field])) {
+                        if (empty(static::$_indexData[$pId][$field])) {
+                            $fValues[$field] = [];
+                        } else {
+                            $fValues[$field] = (array)static::$_indexData[$pId][$field];
+                        }
+                    }
+                    $fValues[$field][] = $value;
+                }
+                foreach ($fValues as $field => $values) {
+                    static::$_indexData[$pId][$field] = array_unique($values);
+                }
             }
         }
     }

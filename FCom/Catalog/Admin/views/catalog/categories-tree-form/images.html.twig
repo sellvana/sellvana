@@ -1,0 +1,121 @@
+{% set m = THIS.get('model') %}
+{% set fieldData = { model:m } %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% set resizeUrl = APP.instance('FCom_Core_Main').resizeUrl('--IMAGE--', {s:150, cache:0}) %}
+
+{% for field, label in {
+    'image_url': 'Subcategory Image',
+    'featured_image_url': 'Featured Image',
+    'nav_callout_image_url': 'Navigation Callout Image',
+} %}
+<div class='form-group'>
+    <label class="col-md-2 control-label" for="model-image">{{ label|_ }}</label>
+    <div class='col-md-10'  id='cat-image-fileupload'>
+        <div class='box-content' id="content-image">
+            <div class='row fileupload-buttonbar' id="btn-select-img">
+                <div class='col-sm-12'>
+                    <span class='btn btn-primary fileinput-button' id='btn_add_image'>
+                        <i class='icon-plus icon-white'></i>
+                        <span id="btn_add_text">
+                        {% if m.get(field) %}
+                            {{ 'Change Image...'|_ }}
+                        {% else %}
+                            {{ 'Add Image...'|_ }}
+                        {% endif %}
+                        </span>
+                        <input id="model-image-url" type="hidden" name="model[{{ field }}]" value="{{ m.get(field) }}"/>
+                    </span>
+                    <span class='btn btn-primary fileinput-button' id='btn_remove_image'
+                        style='display: {% if m.get(field) %} block; {% else %} none; {% endif %}'>
+                        × {{ 'Remove Image...'|_ }}
+                    </span>
+                </div>
+            </div>
+            <br>
+            <div id="current-image">
+                {% if m.get(field) %}
+                    <img src="{{ resizeUrl|replace({'--IMAGE--': m.get(field)}) }}">
+                {% endif %}
+            </div>
+            <table class='table table-striped' role='presentation' id="table-image">
+                <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+{% endfor %}
+
+
+<script>
+require(['jquery'], function($) {
+    {% if m.get('image_url') %}
+        $('.btn_category_images_add').html('{{ 'Change'|_ }}');
+    {% endif %}
+
+    $('#btn_add_image').click(function() {
+        $('.btn_category_images_add').addClass('disabled');
+        $('#category_images_modal').modal();
+    });
+
+    $('#btn_remove_image').click(function() {
+        $('#btn_add_text').html('{{ 'Add Image...'|_ }}');
+        $('#btn_remove_image').css('display', 'none');
+        $('#current-image').html('');
+        $('#model-image-url').val('');
+        $('.btn_category_images_add').html('{{ 'Add'|_ }}');
+    });
+});
+
+var category_images_grid;
+require(['jquery','underscore','backbone'], function($, _) {
+
+    /*
+    *MediaGrid registery function
+    */
+    window.category_images_register = function(grid) {
+        category_images_grid = grid;
+        grid.getGridSkeleton().Views.RowView.prototype._selectRow = function(ev) {
+            var selectedRows = grid.getSelectedRows();
+
+            var checked = $(ev.target).is(':checked');
+            $('.select-row').prop('checked', false);
+            $(ev.target).prop('checked', checked);
+
+            this.model.set('selected', checked);
+            selectedRows.reset();
+            console.log(selectedRows.length);
+            if (checked) {
+                selectedRows.add(this.model);
+                $('.btn_category_images_add').removeClass('disabled');
+            } else {
+
+                $('.btn_category_images_add').addClass('disabled');
+            }
+            console.log(selectedRows.length);
+            ev.stopPropagation();
+            ev.preventDefault();
+
+            return;
+        }
+
+        grid.build();
+
+        $('.btn_category_images_add').click(function() {
+            var row = category_images_grid.getSelectedRows().at(0);
+            var path = row.get("folder") + row.get("subfolder") + "/" + row.get("file_name");
+            var imageTag = '<img src="{{ resizeUrl }}" />'.replace(/--IMAGE--/, path);
+            $('#model-image-url').val(path);
+            $('#current-image').html(imageTag);
+            category_images_grid.getGridView().clearSelectedRows();
+            $('#btn_add_text').html('{{ 'Change Image...'|_ }}');
+            $('#btn_remove_image').css('display', 'block');
+            $('.btn_category_images_add').html('{{ 'Change'|_ }}');
+        });
+    }
+});
+</script>
+
+
+{{ THIS.view('core/medialib').set('config', {'id': 'category_images', 'folder': 'media/category/images', title: 'Category Image'}) | raw }}
+
