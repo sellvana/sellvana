@@ -1418,7 +1418,7 @@ class BMigrate extends BClass
     *   - true: migrate only enabled modules in current request
     *   - array or comma separated string: migrate only specified modules
     */
-    public static function migrateModules($limitModules = false, $force = false, $redirectUrl = null)
+    public function migrateModules($limitModules = false, $force = false, $redirectUrl = null)
     {
         if (!$force) {
             $conf = BConfig::i();
