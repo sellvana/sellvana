@@ -21,7 +21,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
     {
         $siteKey = $this->BConfig->get('modules/FCom_MarketClient/site_key');
         $redirect = $this->BRequest->get('redirect_to');
-        if (!$r->isUrlLocal($redirect)) {
+        if (!$this->BRequest->isUrlLocal($redirect)) {
             $redirect = '';
         }
 
