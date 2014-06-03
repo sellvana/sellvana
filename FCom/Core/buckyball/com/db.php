@@ -1924,7 +1924,7 @@ class BModel extends Model
      */
     protected static $_diConfig = [
         #'_env' => 'BEnv',
-        #'*' => 'ALL',
+        '*' => 'ALL',
     ];
 
     /**
@@ -2169,7 +2169,7 @@ class BModel extends Model
     * @param boolean $cache
     * @return BModel
     */
-    public static function load($id, $field = null, $cache = false)
+    public function load($id, $field = null, $cache = false)
     {
         if (true !== $field && is_array($id)) {
             throw new BException('Invalid ID parameter');
@@ -2222,9 +2222,9 @@ class BModel extends Model
     /**
      * Temporary implementation using load()
      */
-    public static function loadWhere($where)
+    public function loadWhere($where)
     {
-        return static::load($where, true);
+        return $this->load($where, true);
     }
 
     /**
@@ -2235,11 +2235,11 @@ class BModel extends Model
      * @param boolean $cache
      * @return BModel
      */
-    public static function loadOrCreate($where, $field = null, $cache = false)
+    public function loadOrCreate($where, $field = null, $cache = false)
     {
-        $model = static::loadWhere($where, $field, $cache);
+        $model = $this->loadWhere($where, $field, $cache);
         if (!$model) {
-            $model = static::create($where);
+            $model = $this->create($where);
         }
         return $model;
     }

@@ -4,19 +4,19 @@ class FCom_Core_Controller_Abstract extends BActionController
 {
     public function beforeDispatch()
     {
-        if (BRequest::i()->csrf() && false == static::i()->isApiCall()) {
-            BResponse::i()->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
+        if ($this->BRequest->csrf() && false == $this->isApiCall()) {
+            $this->BResponse->status(403, 'Possible CSRF detected', 'Possible CSRF detected');
         }
 
-        if (($root = BLayout::i()->view('root'))) {
-            $root->body_class = BRequest::i()->path(0, 1);
+        if (($root = $this->BLayout->view('root'))) {
+            $root->body_class = $this->BRequest->path(0, 1);
         }
         return parent::beforeDispatch();
     }
 
     public function afterDispatch()
     {
-        BResponse::i()->render();
+        $this->BResponse->render();
     }
 
     /**
@@ -24,11 +24,11 @@ class FCom_Core_Controller_Abstract extends BActionController
      */
     public function layout($name = null)
     {
-        $theme = BConfig::i()->get('modules/' . BRequest::i()->area() . '/theme');
+        $theme = $this->BConfig->get('modules/' . $this->BRequest->area() . '/theme');
         if (!$theme) {
-            $theme = BLayout::i()->getDefaultTheme();
+            $theme = $this->BLayout->getDefaultTheme();
         }
-        $layout = BLayout::i();
+        $layout = $this->BLayout;
         if ($theme) {
             $layout->applyTheme($theme);
         }

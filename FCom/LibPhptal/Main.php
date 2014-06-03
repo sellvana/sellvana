@@ -16,21 +16,21 @@ class FCom_LibPhptal_Main extends BClass
 
     protected static $_fcomVars;
 
-    public static function bootstrap()
+    public function bootstrap()
     {
-        $config = BConfig::i();
+        $config = $this->BConfig;
 
         static::$_phpCodeDest = $config->get('fs/cache_dir') . '/phptal';
-        BUtil::ensureDir(static::$_phpCodeDest);
+        $this->BUtil->ensureDir(static::$_phpCodeDest);
 
         static::$_forceReparse = $config->get('modules/FCom_LibPhptal/force_reparse');
 
         static::$_fcomVars = BData::i(true, [[
-            'request' => BRequest::i(),
-            'layout' => BLayout::i(),
+            'request' => $this->BRequest,
+            'layout' => $this->BLayout,
         ]]);
 
-        BLayout::i()->addRenderer('FCom_LibPhptal', [
+        $this->BLayout->addRenderer('FCom_LibPhptal', [
             'description' => 'PHPTAL',
             'callback'    => 'FCom_LibPhptal_Main::renderer',
             'file_ext'    => ['.zpt', '.zpt.html'],
@@ -38,7 +38,7 @@ class FCom_LibPhptal_Main extends BClass
         ]);
     }
 
-    public static function singleton($class)
+    public function singleton($class)
     {
         if (empty(static::$_singletons[$class])) {
             static::$_singletons[$class] = new $class;
@@ -46,15 +46,15 @@ class FCom_LibPhptal_Main extends BClass
         return static::$_singletons[$class];
     }
 
-    public static function factory($tpl = null)
+    public function factory($tpl = null)
     {
         $tal = new PHPTAL($tpl);
         $tal->setPhpCodeDestination(static::$_phpCodeDest);
         $tal->setOutputMode(static::$_outputMode);
 
-        $tal->addPreFilter(static::singleton('FCom_LibPhptal_PreFilter'));
-        $tal->setPostFilter(static::singleton('FCom_LibPhptal_PostFilter'));
-        #$tal->setTranslator(static::singleton('FCom_LibPhptal_TranslationService'));
+        $tal->addPreFilter($this->singleton('FCom_LibPhptal_PreFilter'));
+        $tal->setPostFilter($this->singleton('FCom_LibPhptal_PostFilter'));
+        #$tal->setTranslator($this->singleton('FCom_LibPhptal_TranslationService'));
         $tal->setTranslator(new FCom_LibPhptal_TranslationService);
 
         if (static::$_forceReparse) {
@@ -67,14 +67,14 @@ class FCom_LibPhptal_Main extends BClass
         return $tal;
     }
 
-    public static function renderer($view)
+    public function renderer($view)
     {
         $source = $view->param('source');
         if (!$source) {
             $template = $view->getTemplateFileName();
-            $tal = static::factory($template);
+            $tal = $this->factory($template);
         } else {
-            $tal = static::factory();
+            $tal = $this->factory();
         }
         foreach ($view->getAllArgs() as $k => $v) {
             if ($k[0] !== '_') {
@@ -90,9 +90,9 @@ class FCom_LibPhptal_Main extends BClass
         return $tal->execute();
     }
 
-    public static function onLayoutLoadThemeBefore($args)
+    public function onLayoutLoadThemeBefore($args)
     {
-        $root = BLayout::i()->view('root');
+        $root = $this->BLayout->view('root');
         if ($root) {
             $root->xmlns('tal', 'http://xml.zope.org/namespaces/tal')
                 ->xmlns('metal', 'http://xml.zope.org/namespaces/metal')
@@ -102,21 +102,21 @@ class FCom_LibPhptal_Main extends BClass
         }
     }
 
-    public static function talesView($src)
+    public function talesView($src)
     {
-        $view = BLayout::i()->view($src);
+        $view = $this->BLayout->view($src);
         if (!$view) {
-            BDebug::warning('Invalid view name: ' . $src);
+            $this->BDebug->warning('Invalid view name: ' . $src);
             return '';
         }
         return $view->render();
     }
 
-    public static function talesCmsBlock($src)
+    public function talesCmsBlock($src)
     {
-        $block = FCom_Cms_Model_Block::i()->load($src, 'handle');
+        $block = $this->FCom_Cms_Model_Block->load($src, 'handle');
         if (!$block) {
-            BDebug::warning('Invalid CMS block handle: ' . $src);
+            $this->BDebug->warning('Invalid CMS block handle: ' . $src);
             return '';
         }
         return $block->render();
@@ -125,22 +125,22 @@ class FCom_LibPhptal_Main extends BClass
 
 function phptal_tales_view($src, $nothrow)
 {
-    return "FCom_LibPhptal_Main::talesView('" . str_replace("'", "\\'", $src) . "')";
+    return "$this->FCom_LibPhptal_Main->talesView('" . str_replace("'", "\\'", $src) . "')";
 }
 
 function phptal_tales_cms_block($src, $nothrow)
 {
-    return "FCom_LibPhptal_Main::talesCmsBlock('" . str_replace("'", "\\'", $src) . "')";
+    return "$this->FCom_LibPhptal_Main->talesCmsBlock('" . str_replace("'", "\\'", $src) . "')";
 }
 
 function phptal_tales_href($href, $nothrow)
 {
-    return "BApp::href('" . str_replace("'", "\\'", $href) . "')";
+    return "$this->BApp->href('" . str_replace("'", "\\'", $href) . "')";
 }
 
 function phptal_tales_src($src, $nothrow)
 {
-    return "BApp::src('" . str_replace("'", "\\'", $src) . "')";
+    return "$this->BApp->src('" . str_replace("'", "\\'", $src) . "')";
 }
 
 class FCom_LibPhptal_PreFilter extends PHPTAL_PreFilter

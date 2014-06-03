@@ -10,19 +10,19 @@ class FCom_Geo_Model_Region extends FCom_Core_Model_Abstract
     protected static $_importExportProfile = [
       'unique_key' => ['country', 'code',],
     ];
-    public static function options($country)
+    public function options($country)
     {
         if (empty(static::$_optionsCache[$country])) {
-            static::$_optionsCache[$country] = static::orm('s')
+            static::$_optionsCache[$country] = $this->orm('s')
                 ->where('country', $country)->find_many_assoc('code', 'name');
         }
         return static::$_optionsCache[$country];
     }
 
-    public static function allOptions()
+    public function allOptions()
     {
         if (!static::$_allOptionsLoaded) {
-            $regions = static::orm('s')->find_many();
+            $regions = $this->orm('s')->find_many();
             foreach ($regions as $r) {
                 static::$_optionsCache[$r->country][$r->code] = $r->name;
             }
@@ -30,9 +30,9 @@ class FCom_Geo_Model_Region extends FCom_Core_Model_Abstract
         return static::$_optionsCache;
     }
 
-    public static function findByName($country, $name, $field = null)
+    public function findByName($country, $name, $field = null)
     {
-        $result = static::orm('s')->where('country', $country)->where('name', $name)->find_one();
+        $result = $this->orm('s')->where('country', $country)->where('name', $name)->find_one();
         if (!$result) return null;
         return $field ? $result->$field : $result;
     }

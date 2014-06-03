@@ -51,7 +51,7 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
         if (is_null($obj)) {
             $obj = $this;
         }
-        $countries = FCom_Geo_Model_Country::i()->options();
+        $countries = $this->FCom_Geo_Model_Country->options();
         return '<div class="adr">'
             . '<div class="street-address">' . $obj->street1 . '</div>'
             . ($obj->street2 ? '<div class="extended-address">' . $obj->street2 . '</div>' : '')
@@ -67,8 +67,8 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if (!$this->create_at) $this->create_at = BDb::now();
-        $this->update_at = BDb::now();
+        if (!$this->create_at) $this->create_at = $this->BDb->now();
+        $this->update_at = $this->BDb->now();
         return true;
     }
 }

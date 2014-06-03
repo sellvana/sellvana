@@ -19,9 +19,9 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
     ];
 
 
-    static public function getPostsOrm()
+    public function getPostsOrm()
     {
-        return FCom_Blog_Model_Post::i()->orm('p')
+        return $this->FCom_Blog_Model_Post->orm('p')
             ->select('p.*')
             ->join('FCom_Admin_Model_User', ['p.author_user_id', '=', 'u.id'], 'u')
             ->select('u.firstname')->select('u.lastname')
@@ -29,7 +29,7 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
             ->order_by_desc('create_at');
     }
 
-    static public function getArchiveTree()
+    public function getArchiveTree()
     {
 
     }
@@ -39,9 +39,9 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
         if (!parent::onBeforeSave()) return false;
 
         if (!$this->create_at) {
-            $this->set(['create_at' => BDb::now(), 'create_ym' => date('Ym')]);
+            $this->set(['create_at' => $this->BDb->now(), 'create_ym' => date('Ym')]);
         }
-        $this->set('update_at', BDb::now());
+        $this->set('update_at', $this->BDb->now());
 
 
         if (!$this->url_key) {
@@ -49,7 +49,7 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
         }
 
         if (!$this->author_user_id) {
-            $this->author_user_id = FCom_Admin_Model_User::i()->sessionUserId();
+            $this->author_user_id = $this->FCom_Admin_Model_User->sessionUserId();
         }
 
         return true;
@@ -58,31 +58,31 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
     public function onAfterSave()
     {
         parent::onAfterSave();
-        FCom_Blog_Model_PostTag::i()->delete_many(['post_id' => $this->id]);
+        $this->FCom_Blog_Model_PostTag->delete_many(['post_id' => $this->id]);
         if ($this->tags) {
             $tagNames = preg_split('#[ ,;]+#', $this->tags);
-            $exists = FCom_Blog_Model_Tag::i()->orm()->where_in('tag_name', $tagNames)->find_many_assoc('tag_name');
+            $exists = $this->FCom_Blog_Model_Tag->orm()->where_in('tag_name', $tagNames)->find_many_assoc('tag_name');
             foreach ($tagNames as $t) {
                 if (isset($exists[$t])) {
                     $tagId = $exists[$t]->id;
                 } else {
-                    $tag = FCom_Blog_Model_Tag::i()->create(['tag_key' => $t, 'tag_name' => $t])->save();
+                    $tag = $this->FCom_Blog_Model_Tag->create(['tag_key' => $t, 'tag_name' => $t])->save();
                     $tagId = $tag->id;
                 }
-                FCom_Blog_Model_PostTag::i()->create(['post_id' => $this->id, 'tag_id' => $tagId])->save();
+                $this->FCom_Blog_Model_PostTag->create(['post_id' => $this->id, 'tag_id' => $tagId])->save();
             }
         }
     }
 
     public function getUrl()
     {
-        return BApp::href('blog/' . $this->get('url_key'));
+        return $this->BApp->href('blog/' . $this->get('url_key'));
     }
 
     public function getAuthor()
     {
         if (!$this->author) {
-            $this->author = FCom_Admin_Model_User::i()->load($this->get('author_user_id'));
+            $this->author = $this->FCom_Admin_Model_User->load($this->get('author_user_id'));
         }
         return $this->author;
     }
@@ -96,7 +96,7 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
     public function getTags()
     {
         if (!$this->tag_models) {
-            $this->tag_models = FCom_Blog_Model_Tag::i()->orm('t')
+            $this->tag_models = $this->FCom_Blog_Model_Tag->orm('t')
                 ->join('FCom_Blog_Model_PostTag', ['pt.tag_id', '=', 't.id'], 'pt')
                 ->where('pt.post_id', $this->id())
                 ->find_many();
@@ -107,7 +107,7 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
     public function getCategories()
     {
         if (!$this->category_models) {
-            $this->category_models = FCom_Blog_Model_Category::i()->orm('c')
+            $this->category_models = $this->FCom_Blog_Model_Category->orm('c')
                 ->join('FCom_Blog_Model_PostCategory', ['pc.category_id', '=', 'c.id'], 'pc')
                 ->where('pc.post_id', $this->id())
                 ->find_many();
@@ -117,7 +117,7 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
 
     public function getTagsString()
     {
-        return join(' ', BUtil::arrayToOptions(BDb::many_as_array($this->getTags()), 'tag_name'));
+        return join(' ', $this->BUtil->arrayToOptions($this->BDb->many_as_array($this->getTags()), 'tag_name'));
     }
 
     public function getRelatedPosts()
@@ -125,7 +125,7 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
         return [];
     }
 
-    public static function validateDupUrlKey($data, $args)
+    public function validateDupUrlKey($data, $args)
     {
         if (!empty(static::$_flags['skip_duplicate_checks'])) {
             return true;
@@ -133,7 +133,7 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
         if (empty($data[$args['field']])) {
             return true;
         }
-        $orm = static::orm('p')->where('url_key', $data[$args['field']]);
+        $orm = $this->orm('p')->where('url_key', $data[$args['field']]);
         if (!empty($data['id'])) {
             $orm->where_not_equal('p.id', $data['id']);
         }

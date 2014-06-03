@@ -2,10 +2,10 @@
 
 class FCom_MultiSite_Main extends BClass
 {
-    static public function beforeBootstrap()
+    public function beforeBootstrap()
     {
-        if (BConfig::i()->get('install_status') === 'installed') {
-            $siteData = FCom_MultiSite_Model_Site::i()->findByDomain();
+        if ($this->BConfig->get('install_status') === 'installed') {
+            $siteData = $this->FCom_MultiSite_Model_Site->findByDomain();
             if (!$siteData) {
                 return;
             }

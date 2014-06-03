@@ -20,7 +20,7 @@ class FCom_Catalog_Model_CategoryProduct extends FCom_Core_Model_Abstract
     public function category()
     {
         if (!$this->category) {
-            $this->category = FCom_Catalog_Model_Category::i()->load($this->category_id);
+            $this->category = $this->FCom_Catalog_Model_Category->load($this->category_id);
         }
         return $this->category;
     }

@@ -17,7 +17,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'index' => 'o.id', 'label' => 'Order id', 'width' => 70,
-                'href' => BApp::href('orders/form/?id=:id')],
+                'href' => $this->BApp->href('orders/form/?id=:id')],
             ['name' => 'admin_name', 'index' => 'o.admin_id', 'label' => 'Assisted by'],
             ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date'],
             ['name' => 'billing_name', 'label' => 'Bill to Name', 'index' => 'billing_name'],
@@ -29,7 +29,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
             //todo: confirm with Boris about status should be stored as id_status
             ['name' => 'status', 'label' => 'Status', 'index' => 'o.status',
-                'options' => FCom_Sales_Model_Order_Status::i()->statusOptions()],
+                'options' => $this->FCom_Sales_Model_Order_Status->statusOptions()],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
             ]],
@@ -86,28 +86,28 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
 
     public function action_form()
     {
-        $orderId = BRequest::i()->param('id', true);
-        $act = BRequest::i()->param('act', true);
+        $orderId = $this->BRequest->param('id', true);
+        $act = $this->BRequest->param('act', true);
 
-        $order = FCom_Sales_Model_Order::i()->load($orderId);
+        $order = $this->FCom_Sales_Model_Order->load($orderId);
         if (empty($order)) {
-            $order = FCom_Sales_Model_Order::i()->create();
+            $order = $this->FCom_Sales_Model_Order->create();
         }
-        $shipping = FCom_Sales_Model_Order_Address::i()->findByOrder($orderId, 'shipping');
-        $billing = FCom_Sales_Model_Order_Address::i()->findByOrder($orderId, 'billing');
+        $shipping = $this->FCom_Sales_Model_Order_Address->findByOrder($orderId, 'shipping');
+        $billing = $this->FCom_Sales_Model_Order_Address->findByOrder($orderId, 'billing');
         if ($shipping) {
             $order->shipping_name = $shipping->firstname . ' ' . $shipping->lastname;
-            $order->shipping_address = FCom_Sales_Model_Order_Address::i()->as_html($shipping);
+            $order->shipping_address = $this->FCom_Sales_Model_Order_Address->as_html($shipping);
             $order->shipping = $shipping;
         }
         if ($billing) {
             $order->billing_name = $billing->firstname . ' ' . $billing->lastname;
-            $order->billing_address = FCom_Sales_Model_Order_Address::i()->as_html($billing);
+            $order->billing_address = $this->FCom_Sales_Model_Order_Address->as_html($billing);
             $order->billing = $billing;
         }
 
         if ($order->customer_id) {
-            $customer = FCom_Customer_Model_Customer::i()->load($order->customer_id);
+            $customer = $this->FCom_Customer_Model_Customer->load($order->customer_id);
             $customer->guest = false;
         } else {
             $customer = new stdClass();
@@ -133,7 +133,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $act = $m->act;
         if ('edit' == $act) {
             $actions = [
-                'back' => '<a class="btn btn-link" href=\'' . BApp::href($this->_gridHref) . '\'><span>'
+                'back' => '<a class="btn btn-link" href=\'' . $this->BApp->href($this->_gridHref) . '\'><span>'
                     . BLocale::_('Back to list') . '</span></a>',
                 'delete' => '<button type="submit" class="st2 sz2 btn btn-danger" name="do" value="DELETE" '
                     . 'onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>'
@@ -143,8 +143,8 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ];
         } else {
             $actions = [
-                'back' => '<a class="btn btn-link" href=\'' . BApp::href($this->_gridHref) . '\'><span>Back to list</span></a>',
-                'edit' => '<a class="btn btn-primary" href=\'' . BApp::href('orders/form') . '?id=' . $m->id . '&act=edit' . '\'><span>Edit</span></a>',
+                'back' => '<a class="btn btn-link" href=\'' . $this->BApp->href($this->_gridHref) . '\'><span>Back to list</span></a>',
+                'edit' => '<a class="btn btn-primary" href=\'' . $this->BApp->href('orders/form') . '?id=' . $m->id . '&act=edit' . '\'><span>Edit</span></a>',
             ];
         }
         if ($m->id) {
@@ -158,7 +158,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         }
         $args['view']->set([
             'form_id' => BLocale::transliterate($this->_formLayoutName),
-            'form_url' => BApp::href($this->_formHref) . '?id=' . $m->id,
+            'form_url' => $this->BApp->href($this->_formHref) . '?id=' . $m->id,
             'actions' => $actions,
             'title' => $title,
         ]);
@@ -170,9 +170,9 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         parent::formPostAfter($args);
         if ($args['do'] !== 'DELETE') {
             $order = $args['model'];
-            $addrPost = BRequest::i()->post('address');
-            if (($newData = BUtil::fromJson($addrPost['data_json']))) {
-                $oldModels = FCom_Sales_Model_Order_Address::i()->orm('a')->where('order_id', $order->id)
+            $addrPost = $this->BRequest->post('address');
+            if (($newData = $this->BUtil->fromJson($addrPost['data_json']))) {
+                $oldModels = $this->FCom_Sales_Model_Order_Address->orm('a')->where('order_id', $order->id)
                     ->find_many_assoc();
                 foreach ($newData as $data) {
                     if (empty($data['id'])) {
@@ -183,18 +183,18 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                         $addr->set($data)->save();
                     } elseif ($data['id'] < 0) {
                         unset($data['id']);
-                        $addr = FCom_Sales_Model_Order_Address::i()->newAddress($order->id(), $data);
+                        $addr = $this->FCom_Sales_Model_Order_Address->newAddress($order->id(), $data);
                     }
                 }
             }
-            if (($del = BUtil::fromJson($addrPost['del_json']))) {
-                FCom_Sales_Model_Order_Address::i()->delete_many(['id' => $del, 'order_id' => $order->id]);
+            if (($del = $this->BUtil->fromJson($addrPost['del_json']))) {
+                $this->FCom_Sales_Model_Order_Address->delete_many(['id' => $del, 'order_id' => $order->id]);
             }
 
-            $modelPost = BRequest::i()->post('model');
+            $modelPost = $this->BRequest->post('model');
             $items = $modelPost['items'];
             if ($items) {
-                $oldItems = FCom_Sales_Model_Order_Item::i()->orm('i')->where('order_id', $order->id)
+                $oldItems = $this->FCom_Sales_Model_Order_Item->orm('i')->where('order_id', $order->id)
                     ->find_many_assoc();
                 foreach ($items as $id => $itemData) {
                     if (empty($id)) {
@@ -219,7 +219,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $items = $order->items();
         if ($items) {
             foreach ($items as $item) {
-                $product_info = BUtil::fromJson($item->product_info);
+                $product_info = $this->BUtil->fromJson($item->product_info);
                 $product = [
                     'id'           => $item->id,
                     'product_name' => $product_info['product_name'],
@@ -278,7 +278,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['name' => 'balance', 'label' => 'Paid', 'index' => 'o.balance'],
             ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
             ['name' => 'status', 'label' => 'Status', 'index' => 'o.status',
-                'options' => FCom_Sales_Model_Order_Status::i()->statusOptions()],
+                'options' => $this->FCom_Sales_Model_Order_Status->statusOptions()],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
             ]],
@@ -298,9 +298,9 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
 
     public function getOrderRecent()
     {
-        $dayRecent = (BConfig::i()->get('modules/FCom_Sales/recent_day')) ? BConfig::i()->get('modules/FCom_Sales/recent_day') : 7;
+        $dayRecent = ($this->BConfig->get('modules/FCom_Sales/recent_day')) ? $this->BConfig->get('modules/FCom_Sales/recent_day') : 7;
         $recent = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s')) - $dayRecent * 86400);
-        $result = FCom_Sales_Model_Order::i()->orm('o')
+        $result = $this->FCom_Sales_Model_Order->orm('o')
             ->join('FCom_Customer_Model_Customer', ['o.customer_id', '=', 'c.id'], 'c')
             ->where_gte('o.create_at', $recent)
             ->select(['o.*',  'c.firstname', 'c.lastname'])->find_many();
@@ -310,7 +310,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
 
     public function getOrderTotal($filter)
     {
-        $orderTotal = FCom_Sales_Model_Order_Status::i()->orm('s')
+        $orderTotal = $this->FCom_Sales_Model_Order_Status->orm('s')
             ->left_outer_join('FCom_Sales_Model_Order', ['o.status', '=', 's.name'], 'o')
             ->group_by('s.id')
             ->select_expr('COUNT(o.id)', 'order')
@@ -349,13 +349,13 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
 
     public function action_validate_order_number__POST()
     {
-        $r = BRequest::i()->post('config');
-        $seq = FCom_Core_Model_Seq::i()->orm()->where('entity_type', 'order')->find_one();
+        $r = $this->BRequest->post('config');
+        $seq = $this->FCom_Core_Model_Seq->orm()->where('entity_type', 'order')->find_one();
         $result = ['status' => true, 'messages' => ''];
         if ($seq) {
             if (isset($r['modules']['FCom_Sales']['order_number'])) {
                 $orderNumber = '1' . $r['modules']['FCom_Sales']['order_number'];
-                $configOrderNumber = BConfig::i()->get('modules/FCom_Sales/order_number');
+                $configOrderNumber = $this->BConfig->get('modules/FCom_Sales/order_number');
                 if ($configOrderNumber != null) {
                     $configOrderNumber = '1' . $configOrderNumber;
                 }
@@ -365,14 +365,14 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                 }
             }
         }
-        BResponse::i()->json($result);
+        $this->BResponse->json($result);
     }
 
     public function onSaveAdminSettings($args)
     {
         if (isset($args['post']['config']['modules']['FCom_Sales']['order_number'])) {
-            $seq = FCom_Core_Model_Seq::i()->orm()->where('entity_type', 'order')->find_one();
-            $configOrderNumber = BConfig::i()->get('modules/FCom_Sales/order_number');
+            $seq = $this->FCom_Core_Model_Seq->orm()->where('entity_type', 'order')->find_one();
+            $configOrderNumber = $this->BConfig->get('modules/FCom_Sales/order_number');
             $orderNumber = $args['post']['config']['modules']['FCom_Sales']['order_number'];
             if ($seq && ($configOrderNumber != null || $orderNumber != $configOrderNumber)) {
                 $seq->set('current_seq_id', '1' . $orderNumber)->save();
@@ -382,10 +382,10 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
 
     public function onHeaderSearch($args)
     {
-        $r = BRequest::i()->get();
+        $r = $this->BRequest->get();
         if (isset($r['q']) && $r['q'] != '') {
             $value = '%' . $r['q'] . '%';
-            $result = FCom_Sales_Model_Order::i()->orm()
+            $result = $this->FCom_Sales_Model_Order->orm()
                 ->where(['OR' => [
                     ['id like ?', $value],
                     ['customer_email like ?', $value],
@@ -396,7 +396,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             if ($result) {
                 $args['result']['order'] = [
                     'priority' => 20,
-                    'url' => BApp::href($this->_formHref) . '?id=' . $result->id()
+                    'url' => $this->BApp->href($this->_formHref) . '?id=' . $result->id()
                 ];
             }
         }

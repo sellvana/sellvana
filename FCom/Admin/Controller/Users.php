@@ -23,10 +23,10 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             ['name' => 'firstname', 'label' => 'First Name', 'width' => 150],
             ['name' => 'lastname', 'label' => 'Last Name', 'width' => 150],
             ['type' => 'input', 'name' => 'is_superadmin', 'label' => 'SuperAdmin', 'width' => 100, 'editable' => true,
-                'editor' => 'select', 'options' => FCom_Admin_Model_User::i()->fieldOptions('is_superadmin')],
+                'editor' => 'select', 'options' => $this->FCom_Admin_Model_User->fieldOptions('is_superadmin')],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'width' => 100, 'editor' => 'select',
                 'editable' => true, 'mass-editable' => true,
-                'options' => FCom_Admin_Model_User::i()->fieldOptions('status')],
+                'options' => $this->FCom_Admin_Model_User->fieldOptions('status')],
             ['name' => 'create_at', 'label' => 'Created', 'width' => 100],
             ['name' => 'update_at', 'label' => 'Updated', 'width' => 100],
             ['type' => 'btn_group', 'width' => 85, 'buttons' => [
@@ -55,7 +55,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
         parent::formViewBefore($args);
         $m = $args['model'];
         $args['view']->set([
-            'sidebar_img' => BUtil::gravatar($m->email),
+            'sidebar_img' => $this->BUtil->gravatar($m->email),
             'title' => $m->id ? 'Edit User: ' . $m->username : 'Create New User',
         ]);
     }
@@ -96,7 +96,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             ['name' => 'email', 'label' => 'Email', 'index' => 'au.email', 'width' => 200],
             ['name' => 'status', 'label' => 'Status', 'index' => 'au.status', 'width' => 200, 'editable' => true,
                 'mass-editable' => true, 'editor' => 'select',
-                'options' => FCom_Admin_Model_User::i()->fieldOptions('status')]
+                'options' => $this->FCom_Admin_Model_User->fieldOptions('status')]
         ];
         $config['actions'] = [
             'add' => ['caption' => 'Add user'],
@@ -131,7 +131,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             ['name' => 'email', 'label' => 'Email', 'index' => 'au.email', 'width' => 100],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'au.status', 'width' => 100,
                 'editable' => true, 'mass-editable' => true, 'editor' => 'select',
-                'options' => FCom_Admin_Model_User::i()->fieldOptions('status')]
+                'options' => $this->FCom_Admin_Model_User->fieldOptions('status')]
         ];
         $config['actions'] = [
             'add' => ['caption' => 'Add selected users']
@@ -143,7 +143,7 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
             '_quick' => ['expr' => 'username like ? or email like ? or au.id=?', 'args' => ['?%', '%?%', '?']]
         ];
         if ($filterAdmin) {
-            $config['orm'] = FCom_Admin_Model_User::i()->orm()->where('is_superadmin', 0);
+            $config['orm'] = $this->FCom_Admin_Model_User->orm()->where('is_superadmin', 0);
         }
         $config['grid_before_create'] = 'userGridRegister';
         $config['events'] = ['add'];

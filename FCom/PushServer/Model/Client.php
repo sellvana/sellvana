@@ -24,34 +24,34 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     /**
      * Get or create client record for current browser session
      */
-    static public function sessionClient()
+    public function sessionClient()
     {
-        $sessId = BSession::i()->sessionId();
+        $sessId = $this->BSession->sessionId();
         if (!empty(static::$_clientCache[$sessId])) {
             return static::$_clientCache[$sessId];
         }
 
-        $sessData =& BSession::i()->dataToUpdate();
+        $sessData =& $this->BSession->dataToUpdate();
         if (!empty($sessData['pushserver']['client'])) {
-            static::$_clientCache[$sessId] = static::create($sessData['pushserver']['client'], false);
+            static::$_clientCache[$sessId] = $this->create($sessData['pushserver']['client'], false);
             return static::$_clientCache[$sessId];
         }
 
-        $client = static::load($sessId, 'session_id');
+        $client = $this->load($sessId, 'session_id');
         if (!$client) {
-            $client = static::create([
+            $client = $this->create([
                 'session_id' => $sessId,
-                'remote_ip' => BRequest::i()->ip(),
+                'remote_ip' => $this->BRequest->ip(),
             ]);
         }
         if (!$client->get('admin_user_id') && class_exists('FCom_Admin_Model_User')) {
-            $userId = FCom_Admin_Model_User::i()->sessionUserId();
+            $userId = $this->FCom_Admin_Model_User->sessionUserId();
             if ($userId) {
                 $client->set('admin_user_id', $userId);
             }
         }
         if (!$client->get('customer_id') && class_exists('FCom_Customer_Model_Customer')) {
-            $custId = FCom_Customer_Model_Customer::i()->sessionUserId();
+            $custId = $this->FCom_Customer_Model_Customer->sessionUserId();
             if ($custId) {
                 $client->set('customer_id', $custId);
             }
@@ -65,7 +65,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     /**
      * Get client by id or session_id
      */
-    static public function getClient($clientId)
+    public function getClient($clientId)
     {
         if (is_object($clientId) && $clientId instanceof FCom_PushServer_Model_Client) {
             return $clientId;
@@ -75,54 +75,54 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         }
         $client = false;
         if (is_numeric($clientId)) {
-            $client = static::load($clientId);
+            $client = $this->load($clientId);
         } elseif (is_string($clientId)) {
-            $client = static::load($clientId, 'session_id');
+            $client = $this->load($clientId, 'session_id');
         }
         static::$_clientCache[$clientId] = $client;
         return $client;
     }
 
-    static public function getWindowName()
+    public function getWindowName()
     {
         return static::$_windowName;
     }
 
-    static public function getConnId()
+    public function getConnId()
     {
         return static::$_connId;
     }
 
-    static public function findByAdminUser($user)
+    public function findByAdminUser($user)
     {
         if (is_object($user)) {
             $user = $user->id;
         }
-        $result = static::orm()->where('admin_user_id', $user)->find_many_assoc('session_id');
+        $result = $this->orm()->where('admin_user_id', $user)->find_many_assoc('session_id');
         return $result;
     }
 
-    static public function findByCustomer($customer)
+    public function findByCustomer($customer)
     {
         if (is_object($customer)) {
             $customer = $customer->id;
         }
-        return static::orm()->where('customer_id', $customer)->find_many_assoc('session_id');
+        return $this->orm()->where('customer_id', $customer)->find_many_assoc('session_id');
     }
 
     public function onAfterSave()
     {
         parent::onAfterSave();
 
-        if ($this->session_id === BSession::i()->sessionId()) {
-            $sessData =& BSession::i()->dataToUpdate();
+        if ($this->session_id === $this->BSession->sessionId()) {
+            $sessData =& $this->BSession->dataToUpdate();
             $sessData['pushserver']['client'] = $this->as_array();
         }
     }
 
     public function processRequest($request)
     {
-        $client = FCom_PushServer_Model_Client::i()->sessionClient();
+        $client = $this->FCom_PushServer_Model_Client->sessionClient();
 
         if (!isset($request['window_name']) || !isset($request['conn_id'])) {
             $client->send([
@@ -137,7 +137,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         if (empty($request['messages'])) {
             return $this;
         }
-        $services = FCom_PushServer_Main::i()->getServices();
+        $services = $this->FCom_PushServer_Main->getServices();
         foreach ($request['messages'] as $message) {
             try {
                 foreach ($services as $service) {
@@ -175,8 +175,8 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
                         $method = 'onUnknownSignal';
                     }
 
-                    if (FCom_PushServer_Main::isDebugMode()) {
-                        BDebug::log("RECEIVE: " . get_class($instance) . '::' . $method . ': ' . print_r($message, 1));
+                    if ($this->FCom_PushServer_Main->isDebugMode()) {
+                        $this->BDebug->log("RECEIVE: " . get_class($instance) . '::' . $method . ': ' . print_r($message, 1));
                     }
                     $instance->$method();
 
@@ -241,14 +241,14 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
                 usleep(300000);
             }
         }
-//BDebug::dump($this->getData('windows'));
+//$this->BDebug->dump($this->getData('windows'));
         return $this;
     }
 
     public function waitForMessages()
     {
-        $delay = BConfig::i()->get('modules/FCom_PushServer/delay_microsec', 100000);
-        $timeout = BConfig::i()->get('modules/FCom_PushServer/poll_timeout', 50);
+        $delay = $this->BConfig->get('modules/FCom_PushServer/delay_microsec', 100000);
+        $timeout = $this->BConfig->get('modules/FCom_PushServer/poll_timeout', 50);
         $start = time();
         while (true) {
             if (time() - $start > $timeout) { // timeout for connection to counteract default gateway timeouts
@@ -272,7 +272,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
      */
     public function sync()
     {
-        $msgHlp = FCom_PushServer_Model_Message::i();
+        $msgHlp = $this->FCom_PushServer_Model_Message;
         $where = ['client_id' => $this->get('id'), 'window_name' => static::$_windowName, 'status' => 'published'];
         $msgHlp->update_many(['status' => 'locked'], $where);
         $where['status'] = 'locked';
@@ -280,12 +280,12 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         $messages = [];
         foreach ($messageModels as $msg) {
 
-            if (FCom_PushServer_Main::isDebugMode()) {
-                BDebug::log("SYNC: " . print_r($msg->as_array(), 1));
+            if ($this->FCom_PushServer_Main->isDebugMode()) {
+                $this->BDebug->log("SYNC: " . print_r($msg->as_array(), 1));
             }
 
             //$msg->set('status', 'sent')->save();
-            $message = (array) BUtil::fromJson($msg->get('data_serialized'));
+            $message = (array) $this->BUtil->fromJson($msg->get('data_serialized'));
             //$message['ts'] = $model->get('create_at');
             $messages[] = $message;
             // if (empty($message['seq'])) {
@@ -338,9 +338,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 
     public function fetchCustomData()
     {
-        $clientUpdate = static::orm()->select('data_serialized')->where('id', $this->get('id'))->find_one();
+        $clientUpdate = $this->orm()->select('data_serialized')->where('id', $this->get('id'))->find_one();
         if ($clientUpdate) { // another connection just connected
-            $data = (array) BUtil::fromJson($clientUpdate->get('data_serialized'));
+            $data = (array) $this->BUtil->fromJson($clientUpdate->get('data_serialized'));
             $this->set(static::$_dataCustomField, $data);
         }
         return $this;
@@ -361,19 +361,19 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         if (null === $channel) {
             $channel = $this->getChannel();
         }
-        $isSessionClient = $this->session_id === BSession::i()->sessionId();
+        $isSessionClient = $this->session_id === $this->BSession->sessionId();
         if (!is_object($channel)) {
-            $channel = FCom_PushServer_Model_Channel::i()->getChannel($channel, true, $isSessionClient);
+            $channel = $this->FCom_PushServer_Model_Channel->getChannel($channel, true, $isSessionClient);
         }
         if ($isSessionClient) {
-            $sessData =& BSession::i()->dataToUpdate();
+            $sessData =& $this->BSession->dataToUpdate();
             if (!empty($sessData['pushserver']['subscribed'][$channel->channel_name])) {
                 return $this;
             } else {
                 $sessData['pushserver']['subscribed'][$channel->channel_name] = true;
             }
         }
-        $hlp = FCom_PushServer_Model_Subscriber::i();
+        $hlp = $this->FCom_PushServer_Model_Subscriber;
         $data = ['client_id' => $this->id(), 'channel_id' => $channel->id()];
         $subscriber = $hlp->loadWhere($data);
         if (!$subscriber) {
@@ -394,13 +394,13 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     public function unsubscribe($channel)
     {
         if (!is_object($channel)) {
-            $channel = FCom_PushServer_Model_Channel::i()->getChannel($channel, true);
+            $channel = $this->FCom_PushServer_Model_Channel->getChannel($channel, true);
         }
         $data = ['client_id' => $this->id(), 'channel_id' => $channel->id()];
-        FCom_PushServer_Model_Subscriber::i()->delete_many($data);
+        $this->FCom_PushServer_Model_Subscriber->delete_many($data);
 
-        if ($this->session_id === BSession::i()->sessionId()) {
-            $sessData =& BSession::i()->dataToUpdate();
+        if ($this->session_id === $this->BSession->sessionId()) {
+            $sessData =& $this->BSession->dataToUpdate();
             unset($sessData['pushserver']['channels'][$channel->channel_name]);
             unset($sessData['pushserver']['subscribed'][$channel->channel_name]);
         }
@@ -419,7 +419,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 
     public function getChannel()
     {
-        return FCom_PushServer_Model_Channel::i()->getChannel('client:' . $this->id(), true, true);
+        return $this->FCom_PushServer_Model_Channel->getChannel('client:' . $this->id(), true, true);
     }
 
     public function getMessages()

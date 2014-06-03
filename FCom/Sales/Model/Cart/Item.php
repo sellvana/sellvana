@@ -20,7 +20,7 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
 
     public function rowTotal($id)
     {
-        $data_serialized = BUtil::objectToArray(json_decode($this->data_serialized));
+        $data_serialized = $this->BUtil->objectToArray(json_decode($this->data_serialized));
         $variant = $data_serialized['variants'][$id];
         return $variant['price'] * $variant['qty'];
     }
@@ -56,16 +56,16 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if (!$this->create_at) $this->create_at = BDb::now();
-        $this->update_at = BDb::now();
-        $this->data_serialized = BUtil::toJson($this->data);
+        if (!$this->create_at) $this->create_at = $this->BDb->now();
+        $this->update_at = $this->BDb->now();
+        $this->data_serialized = $this->BUtil->toJson($this->data);
         return true;
     }
 
     public function onAfterLoad()
     {
         parent::onAfterLoad();
-        $this->data = !empty($this->data_serialized) ? BUtil::fromJson($this->data_serialized) : [];
+        $this->data = !empty($this->data_serialized) ? $this->BUtil->fromJson($this->data_serialized) : [];
     }
 }
 

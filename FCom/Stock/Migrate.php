@@ -4,10 +4,10 @@ class FCom_Stock_Migrate extends BClass
 {
     public function install__0_1_2()
     {
-        $tSku = FCom_Stock_Model_Sku::table();
-        $tBin = FCom_Stock_Model_Bin::table();
+        $tSku = $this->FCom_Stock_Model_Sku->table();
+        $tBin = $this->FCom_Stock_Model_Bin->table();
 
-        BDb::ddlTableDef($tBin, [
+        $this->BDb->ddlTableDef($tBin, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'title' => 'varchar(50)',
@@ -18,7 +18,7 @@ class FCom_Stock_Migrate extends BClass
             'PRIMARY' => '(id)',
         ]);
 
-        BDb::ddlTableDef($tSku, [
+        $this->BDb->ddlTableDef($tSku, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'sku' => 'varchar(128) not null',
@@ -36,9 +36,9 @@ class FCom_Stock_Migrate extends BClass
             ],
         ]);
 
-        $pTable = FCom_Catalog_Model_Product::table();
-        $sTable = FCom_Stock_Model_Sku::table();
-        BDb::ddlTableDef($sTable, [
+        $pTable = $this->FCom_Catalog_Model_Product->table();
+        $sTable = $this->FCom_Stock_Model_Sku->table();
+        $this->BDb->ddlTableDef($sTable, [
                 'COLUMNS' => [
                     'net_weight'  => 'decimal(12,2) null default null',
                     'ship_weight' => 'decimal(12,2) null default null',
@@ -46,19 +46,19 @@ class FCom_Stock_Migrate extends BClass
             ]
         );
 
-        BDb::ddlTableDef($sTable, [
+        $this->BDb->ddlTableDef($sTable, [
                 'COLUMNS' => [
                     'status'  => 'TINYINT(1) not null default 0',
                 ],
             ]
         );
-        $productWeights = FCom_Catalog_Model_Product::orm()
+        $productWeights = $this->FCom_Catalog_Model_Product->orm()
             ->select(['local_sku', 'net_weight', 'ship_weight'])
             ->where(['OR' => ["`net_weight` IS NOT NULL", "`ship_weight` IS NOT NULL"]])
             ->find_many();
 
         if ($productWeights) {
-            $prodStocks = FCom_Stock_Model_Sku::orm()->find_many_assoc('sku');
+            $prodStocks = $this->FCom_Stock_Model_Sku->orm()->find_many_assoc('sku');
             foreach ($productWeights as $product) {
                 /** @var FCom_Catalog_Model_Product $product */
                 $k = $product->get('local_sku');
@@ -72,7 +72,7 @@ class FCom_Stock_Migrate extends BClass
                         ]
                     )->save();
                 } else {
-                    FCom_Stock_Model_Sku::create(
+                    $this->FCom_Stock_Model_Sku->create(
                         [
                             'sku' => $k,
                             'qty_in_stock' => 0,
@@ -85,7 +85,7 @@ class FCom_Stock_Migrate extends BClass
         } // end if products
 
         try {
-            BDb::ddlTableDef($pTable, [
+            $this->BDb->ddlTableDef($pTable, [
                     'COLUMNS' => [
                         'net_weight'  => 'DROP',
                         'ship_weight' => 'DROP',
@@ -100,9 +100,9 @@ class FCom_Stock_Migrate extends BClass
     public function upgrade__0_1_0__0_1_1()
     {
         // todo move net_weight and ship_weight from fcom_product to fcom_stock_sku table
-        $pTable = FCom_Catalog_Model_Product::table();
-        $sTable = FCom_Stock_Model_Sku::table();
-        BDb::ddlTableDef($sTable, [
+        $pTable = $this->FCom_Catalog_Model_Product->table();
+        $sTable = $this->FCom_Stock_Model_Sku->table();
+        $this->BDb->ddlTableDef($sTable, [
                 'COLUMNS' => [
                     'net_weight'  => 'decimal(12,2) null default null',
                     'ship_weight' => 'decimal(12,2) null default null',
@@ -110,13 +110,13 @@ class FCom_Stock_Migrate extends BClass
             ]
         );
 
-        $productWeights = FCom_Catalog_Model_Product::orm()
+        $productWeights = $this->FCom_Catalog_Model_Product->orm()
             ->select(['local_sku', 'net_weight', 'ship_weight'])
             ->where(['OR' => ["`net_weight` IS NOT NULL", "`ship_weight` IS NOT NULL"]])
             ->find_many();
 
         if ($productWeights) {
-            $prodStocks = FCom_Stock_Model_Sku::orm()->find_many_assoc('sku');
+            $prodStocks = $this->FCom_Stock_Model_Sku->orm()->find_many_assoc('sku');
             foreach ($productWeights as $product) {
                 /** @var FCom_Catalog_Model_Product $product */
                 $k = $product->get('local_sku');
@@ -130,7 +130,7 @@ class FCom_Stock_Migrate extends BClass
                           ]
                     )->save();
                 } else {
-                    FCom_Stock_Model_Sku::create(
+                    $this->FCom_Stock_Model_Sku->create(
                         [
                             'sku' => $k,
                             'qty_in_stock' => 0,
@@ -143,7 +143,7 @@ class FCom_Stock_Migrate extends BClass
         } // end if products
 
         try {
-            BDb::ddlTableDef($pTable, [
+            $this->BDb->ddlTableDef($pTable, [
                     'COLUMNS' => [
                         'net_weight'  => 'DROP',
                         'ship_weight' => 'DROP',
@@ -157,8 +157,8 @@ class FCom_Stock_Migrate extends BClass
 
     public function upgrade__0_1_1__0_1_2()
     {
-        $sTable = FCom_Stock_Model_Sku::table();
-        BDb::ddlTableDef($sTable, [
+        $sTable = $this->FCom_Stock_Model_Sku->table();
+        $this->BDb->ddlTableDef($sTable, [
                 'COLUMNS' => [
                     'status'  => 'TINYINT(1) not null default 0',
                 ],

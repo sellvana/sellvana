@@ -23,7 +23,7 @@ class FCom_Core_View_Messages extends FCom_Core_View_Abstract
         $namespace = $this->get('namespace');
         $messages = $this->get('messages');
         if (!$messages && $namespace) {
-            $messages = BSession::i()->messages($namespace);
+            $messages = $this->BSession->messages($namespace);
         }
         $out = [];
         foreach ((array)$messages as $m) {

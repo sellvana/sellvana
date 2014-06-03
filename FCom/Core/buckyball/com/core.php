@@ -55,7 +55,7 @@ class BClass
      * @var array
      */
     static protected $_diConfig = [
-        '_env' => 'BEnv',
+        #'_env' => 'BEnv',
         '*' => 'ALL',
     ];
 

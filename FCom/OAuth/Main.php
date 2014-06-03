@@ -14,7 +14,7 @@ class FCom_OAuth_Main extends BClass
     {
         $providerInfo = $this->getProviderInfo($providerName);
         if ($providerInfo) {
-            BDebug::debug('Overriding existing provider: ' . $providerName);
+            $this->BDebug->debug('Overriding existing provider: ' . $providerName);
         }
         $this->_providersConfig[$providerName] = $providerInfo;
         return $this;
@@ -24,7 +24,7 @@ class FCom_OAuth_Main extends BClass
     {
         static $providersConfig;
         if (!$this->_providersConfig) {
-            $this->_providersConfig = BConfig::i(true)->addFile('@FCom_OAuth/providers.yml');
+            $this->_providersConfig = $this->BConfig->i(true)->addFile('@FCom_OAuth/providers.yml');
         }
         if (!$providerName) {
             $providerName = $this->getProvider();
@@ -39,14 +39,14 @@ class FCom_OAuth_Main extends BClass
             throw new BException('Undefined provider: ' . $providerName);
         }
         $this->_currentProvider = $providerName;
-        BSession::i()->set('oauth_current_provider', $providerName);
+        $this->BSession->set('oauth_current_provider', $providerName);
         return $this;
     }
 
     public function getProvider()
     {
         if (!$this->_currentProvider) {
-            $this->_currentProvider = BSession::i()->get('oauth_current_provider');
+            $this->_currentProvider = $this->BSession->get('oauth_current_provider');
         }
         return $this->_currentProvider;
     }
@@ -56,7 +56,7 @@ class FCom_OAuth_Main extends BClass
         if (!$providerName) {
             $providerName = $this->getProvider();
         }
-        $sessData =& BSession::i()->dataToUpdate();
+        $sessData =& $this->BSession->dataToUpdate();
         if (empty($sessData['oauth'][$providerName])) {
             $sessData['oauth'][$providerName] = [];
         }
@@ -65,13 +65,13 @@ class FCom_OAuth_Main extends BClass
 
     public function setReturnUrl($url)
     {
-        BSession::i()->set('oauth_return_url', $url);
+        $this->BSession->set('oauth_return_url', $url);
         return $this;
     }
 
     public function getReturnUrl()
     {
-        return BSession::i()->get('oauth_return_url');
+        return $this->BSession->get('oauth_return_url');
     }
 
     public function getProviderInstance()
@@ -102,7 +102,7 @@ class FCom_OAuth_Main extends BClass
 
     public function onAdminUserLogin($args)
     {
-        $tokenModel = FCom_OAuth_Model_ConsumerToken::i()->sessionToken();
+        $tokenModel = $this->FCom_OAuth_Model_ConsumerToken->sessionToken();
         if ($tokenModel) {
             $tokenModel->set('admin_id', $args['user']->id())->save();
         }
@@ -110,7 +110,7 @@ class FCom_OAuth_Main extends BClass
 
     public function onCustomerLogin($args)
     {
-        $tokenModel = FCom_OAuth_Model_ConsumerToken::i()->sessionToken();
+        $tokenModel = $this->FCom_OAuth_Model_ConsumerToken->sessionToken();
         if ($tokenModel) {
             $tokenModel->set('customer_id', $args['customer']->id())->save();
         }

@@ -2,11 +2,11 @@
 
 class FCom_Admin_Main extends BClass
 {
-    static public function bootstrap()
+    public function bootstrap()
     {
-        FCom_Admin_Model_User::i();
+        $this->FCom_Admin_Model_User;
 
-        FCom_Admin_Model_Role::i()->createPermission([
+        $this->FCom_Admin_Model_Role->createPermission([
             'system/users' => 'Manage Users',
             'system/roles' => 'Manage Roles and Permissions',
             'system/settings' => 'Update Settings',
@@ -17,13 +17,13 @@ class FCom_Admin_Main extends BClass
         ]);
     }
 
-    public static function href($url = '')
+    public function href($url = '')
     {
-        return BApp::adminHref($url);
+        return $this->BApp->adminHref($url);
     }
 
-    public static function frontendHref($url = '')
+    public function frontendHref($url = '')
     {
-        return BApp::frontendHref($url);
+        return $this->BApp->frontendHref($url);
     }
 }

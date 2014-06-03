@@ -19,8 +19,8 @@ class FCom_AdminChat_Model_Participant extends FCom_Core_Model_Abstract
     {
         if (!parent::onBeforeSave()) return false;
 
-        $this->set('create_at', BDb::now(), 'IFNULL');
-        $this->set('update_at', BDb::now());
+        $this->set('create_at', $this->BDb->now(), 'IFNULL');
+        $this->set('update_at', $this->BDb->now());
 
         return true;
     }

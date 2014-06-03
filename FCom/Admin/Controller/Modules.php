@@ -15,15 +15,15 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
 
     public function getModulesData()
     {
-        $config = BConfig::i();
+        $config = $this->BConfig;
         $coreLevels = $config->get('module_run_levels/FCom_Core');
         $adminLevels = $config->get('module_run_levels/FCom_Admin');
         $frontendLevels = $config->get('module_run_levels/FCom_Frontend');
-        $modules = BModuleRegistry::i()->getAllModules();
+        $modules = $this->BModuleRegistry->getAllModules();
         $autoRunLevelMods = array_flip(explode(',', 'FCom_Core,FCom_Admin,FCom_Frontend,FCom_Install'));
 
         try {
-            $schemaVersions = FCom_Core_Model_Module::i()->orm()->find_many_assoc('module_name');
+            $schemaVersions = $this->FCom_Core_Model_Module->orm()->find_many_assoc('module_name');
             $schemaModules = [];
             foreach (BMigrate::getMigrationData() as $connection => $migrationModules) {
                 foreach ($migrationModules as $modName => $migrData) {
@@ -31,14 +31,14 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                 }
             }
         } catch (Exception $e) {
-            BDebug::logException($e);
+            $this->BDebug->logException($e);
         }
 
         $data = [];
         $migrate = false;
         $id = 0;
         foreach ($modules as $modName => $mod) {
-            $r = BUtil::arrayMask((array)$mod, 'name,description,version,channel,run_status,run_level,require,children_copy,errors');
+            $r = $this->BUtil->arrayMask((array)$mod, 'name,description,version,channel,run_status,run_level,require,children_copy,errors');
             $reqs = [];
             if (!empty($r['require']['module'])) {
                 foreach ($r['require']['module'] as $req) {
@@ -68,13 +68,13 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             $data[] = $r;
         }
 
-        $r = (array)BRequest::i()->get('s');
+        $r = (array)$this->BRequest->get('s');
 
         $gridId = 'modules';
-        $pers = FCom_Admin_Model_User::i()->personalize();
+        $pers = $this->FCom_Admin_Model_User->personalize();
         $s = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : [];
 
-        //BDebug::dump($pers); exit;
+        //$this->BDebug->dump($pers); exit;
         if (!empty($s['s'])) {
             usort($data, function($a, $b) use($s) {
                 $a1 = !empty($a[$s['s']]) ? $a[$s['s']] : '';
@@ -89,13 +89,13 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
 
     public function gridConfig()
     {
-        $modules = BModuleRegistry::i()->getAllModules();
+        $modules = $this->BModuleRegistry->getAllModules();
         $moduleNames = array_keys($modules);
         $moduleNames = array_combine($moduleNames, $moduleNames);
 
-        $coreRunLevelOptions = FCom_Core_Model_Module::i()->fieldOptions('core_run_level');
-        $areaRunLevelOptions = FCom_Core_Model_Module::i()->fieldOptions('core_run_level');
-        $runStatusOptions = FCom_Core_Model_Module::i()->fieldOptions('run_status');
+        $coreRunLevelOptions = $this->FCom_Core_Model_Module->fieldOptions('core_run_level');
+        $areaRunLevelOptions = $this->FCom_Core_Model_Module->fieldOptions('core_run_level');
+        $runStatusOptions = $this->FCom_Core_Model_Module->fieldOptions('run_status');
         $config = parent::gridConfig();
 
         $config['columns'] = [
@@ -123,12 +123,12 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                 /*
                     array(
                         'type'=>'link','name'=>'required',
-                        'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
+                        'href'  => $this->BApp->href($this->_gridHref . '/history?id='), 'col' => 'id',
                         'icon' => 'icon-check-sign', 'type' => 'link', 'title' => $this->_('Required')
                     ),
                     array(
                         'type'=>'link','name'=>'ondemand',
-                        'href'  => BApp::href($this->_gridHref . '/history?id='), 'col' => 'id',
+                        'href'  => $this->BApp->href($this->_gridHref . '/history?id='), 'col' => 'id',
                         'icon' => 'icon-check-empty', 'type' => 'link', 'title' => $this->_('On Demand')
                     ),
                 */
@@ -170,7 +170,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         $actions = (array)$view->get('actions');
         $actions += [
             'run_migration' => '<button class="btn btn-primary" type="button" onclick="$(\'#util-form\').attr(\'action\', \''
-                . BApp::href('modules/migrate') . '\').submit()"><span>' . BLocale::_('Run Migration Scripts')
+                . $this->BApp->href('modules/migrate') . '\').submit()"><span>' . BLocale::_('Run Migration Scripts')
                 . '</span></button>',
         ];
         unset($actions['new']);
@@ -180,18 +180,18 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     /*
     public function action_index()
     {
-        BLayout::i()->view('modules')->set('form_url', BApp::href('modules').(BRequest::i()->get('RECOVERY')==='' ? '?RECOVERY' : ''));
-        $grid = BLayout::i()->view('core/backgrid')->set('grid', $this->gridConfig());
+        $this->BLayout->view('modules')->set('form_url', $this->BApp->href('modules').($this->BRequest->get('RECOVERY')==='' ? '?RECOVERY' : ''));
+        $grid = $this->BLayout->view('core/backgrid')->set('grid', $this->gridConfig());
         BEvents::i()->fire('FCom_Admin_Controller_Modules::action_index', array('grid_view'=>$grid));
         $this->layout('/modules');
     }*/
 
     public function action_index__POST()
     {
-        if (BRequest::i()->xhr()) {
-            $r = BRequest::i()->post();
+        if ($this->BRequest->xhr()) {
+            $r = $this->BRequest->post();
             if (isset($r['async'])) {
-                $allModules = BModuleRegistry::i()->getAllModules();
+                $allModules = $this->BModuleRegistry->getAllModules();
                 $data = [];
                 foreach ($r['data'] as $arr => $key) {
                     $module = $allModules[$key['module_name']];
@@ -202,21 +202,21 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                     ];
                     array_push($data, $tmp);
                 }
-                BResponse::i()->json(['data' => $data]);
+                $this->BResponse->json(['data' => $data]);
                 return;
             }
             if (isset($r['data'])) {
                 foreach ($r['data'] as $arr => $key) {
-                   BConfig::i()->set('module_run_levels/FCom_Core/' . $key['module_name'], $key['run_level_core'], false, true);
-                   FCom_Core_Main::i()->writeConfigFiles('core');
+                   $this->BConfig->set('module_run_levels/FCom_Core/' . $key['module_name'], $key['run_level_core'], false, true);
+                   $this->FCom_Core_Main->writeConfigFiles('core');
                 }
-                BResponse::i()->json(['success' => true]);
+                $this->BResponse->json(['success' => true]);
                 return;
             }
         }
         try {
             $areas = ['FCom_Core', 'FCom_Admin', 'FCom_Frontend'];
-            $levels = BRequest::i()->post('module_run_levels');
+            $levels = $this->BRequest->post('module_run_levels');
             foreach ($areas as $area) {
                 if (empty($levels[$area])) {
                     continue;
@@ -226,15 +226,15 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                         unset($levels[$area][$modName]);
                     }
                 }
-                BConfig::i()->set('module_run_levels/' . $area, $levels[$area], false, true);
+                $this->BConfig->set('module_run_levels/' . $area, $levels[$area], false, true);
             }
-            FCom_Core_Main::i()->writeConfigFiles('core');
+            $this->FCom_Core_Main->writeConfigFiles('core');
             $this->message('Run levels updated');
         } catch (Exception $e) {
-            BDebug::logException($e);
+            $this->BDebug->logException($e);
             $this->message($e->getMessage(), 'error');
         }
-        BResponse::i()->redirect('modules');
+        $this->BResponse->redirect('modules');
     }
 
     public function action_migrate__POST()
@@ -243,9 +243,9 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             BMigrate::i()->migrateModules(true, true);
             $this->message('Migration complete');
         } catch (Exception $e) {
-            BDebug::logException($e);
+            $this->BDebug->logException($e);
             $this->message($e->getMessage(), 'error');
         }
-        BResponse::i()->redirect('modules');
+        $this->BResponse->redirect('modules');
     }
 }

@@ -7,12 +7,12 @@ class FCom_Cms_Frontend_View_Page extends FCom_Core_View_Abstract
         if (!$this->getParam('page_model')) {
             $page = $this->get('page');
             if (is_numeric($page)) {
-                $page = FCom_Cms_Model_Page::i()->load($page);
+                $page = $this->FCom_Cms_Model_Page->load($page);
             } elseif (is_string($page)) {
-                $page = FCom_Cms_Model_Page::i()->load($page, 'handle');
+                $page = $this->FCom_Cms_Model_Page->load($page, 'handle');
             }
             if (!$page || !is_object($page) || !$page instanceof FCom_Cms_Model_Page) {
-                BDebug::warning('CMS Page not found or invalid');
+                $this->BDebug->warning('CMS Page not found or invalid');
                 return false;
             }
             $this->setParam('page_model', $page);
@@ -27,7 +27,7 @@ class FCom_Cms_Frontend_View_Page extends FCom_Core_View_Abstract
      */
     public function _render()
     {
-        return static::renderer($this);
+        return $this->renderer($this);
     }
 
     /**
@@ -36,7 +36,7 @@ class FCom_Cms_Frontend_View_Page extends FCom_Core_View_Abstract
      * @param BView $view
      * @return string
      */
-    static public function renderer($view)
+    public function renderer($view)
     {
         $page = $this->getPageModel($view);
         if (!$page) {

@@ -33,7 +33,7 @@ class FCom_LibGanon_Main extends BClass
      * @param array $args
      * @return FCom_LibGanon_Main
      */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
@@ -42,7 +42,7 @@ class FCom_LibGanon_Main extends BClass
     {
         $this->_html = $args['output'];# : '<!DOCTYPE html><html><head></head><body></body></html>';
         //$args['doc'] = $this->doc();
-        $args['current_path'] = BRequest::i()->rawPath();
+        $args['current_path'] = $this->BRequest->rawPath();
         BEvents::i()->fire('FCom_LibGanon::render', $args);
         BEvents::i()->fire('FCom_LibGanon::render:' . $args['current_path'], $args);
 

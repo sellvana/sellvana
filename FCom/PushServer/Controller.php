@@ -4,11 +4,11 @@ class FCom_PushServer_Controller extends FCom_Core_Controller_Abstract
 {
     public function action_index__POST()
     {
-        BResponse::i()->nocache()->startLongResponse(false);
+        $this->BResponse->nocache()->startLongResponse(false);
 
-        $client = FCom_PushServer_Model_Client::i()->sessionClient();
+        $client = $this->FCom_PushServer_Model_Client->sessionClient();
 
-        $request = BRequest::i()->json();
+        $request = $this->BRequest->json();
 
         $client->processRequest($request)->checkIn()->waitForMessages()->checkOut();
 
@@ -17,6 +17,6 @@ class FCom_PushServer_Controller extends FCom_Core_Controller_Abstract
             'messages' => $client->getMessages(),
         ];
 
-        BResponse::i()->json($result);
+        $this->BResponse->json($result);
     }
 }

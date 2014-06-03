@@ -14,14 +14,14 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
     {
         include_once __DIR__ . '/lib/UpsRate.php';
 
-        $config = BConfig::i()->get('modules/FCom_ShippingUps');
+        $config = $this->BConfig->get('modules/FCom_ShippingUps');
         $password = !empty($config['password']) ? $config['password'] : '';
         $account = !empty($config['account']) ? $config['account'] : '';
         $accessKey = !empty($config['access_key']) ? $config['access_key'] : '';
         $rateApiUrl = !empty($config['rate_api_url']) ? $config['rate_api_url'] : '';
 
         //todo: notify if fromzip is not set
-        $fromzip = BConfig::i()->get('modules/FCom_Checkout/store_zip');
+        $fromzip = $this->BConfig->get('modules/FCom_Checkout/store_zip');
 
         if (empty($accessKey) || empty($account) || empty($password)) {
             return false;
@@ -36,7 +36,7 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
     public function getEstimate()
     {
         if (!$this->_rate) {
-            $cart = FCom_Sales_Model_Cart::i()->sessionCart();
+            $cart = $this->FCom_Sales_Model_Cart->sessionCart();
             $this->getRateCallback($cart);
             if (!$this->_rate) {
                 return 'Unable to calculate';
@@ -79,7 +79,7 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
 
     public function getServicesSelected()
     {
-        $c = BConfig::i();
+        $c = $this->BConfig;
         $selected = [];
         foreach ($this->getServices() as $sId => $sName) {
             if ($c->get('modules/FCom_ShippingUps/services/s' . $sId) == 1) {
@@ -95,7 +95,7 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
     public function getRateCallback($cart)
     {
         //address
-        $user = FCom_Customer_Model_Customer::i()->sessionUser();
+        $user = $this->FCom_Customer_Model_Customer->sessionUser();
         $shippingAddress = $cart->getAddressByType('shipping');
         if ($user && !$shippingAddress) {
             $shippingAddress = $user->defaultShipping();
@@ -141,7 +141,7 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
         foreach($packages as $pack) {
             // Returns false if no credentials are configured.
             // As a side effect, $this->_rate will be NULL.
-            if ($this->_rateApiCall($cart->id(), $tozip, $service, $length, 
+            if ($this->_rateApiCall($cart->id(), $tozip, $service, $length,
                 $width, $height, $pack)) {
                 if ($this->_rate->isError()) {
                      continue;

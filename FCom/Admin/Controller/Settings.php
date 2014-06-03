@@ -7,7 +7,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
     public function action_index()
     {
         $view = $this->view('settings');
-        $tabViews = BLayout::i()->findViewsRegex('#^settings/#');
+        $tabViews = $this->BLayout->findViewsRegex('#^settings/#');
         $tabGroups = [];
 
         foreach ($tabViews as $tabViewName => $tabView) {
@@ -32,28 +32,28 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             }
         }
         $this->layout('/settings');
-        $this->processFormTabs($view, BConfig::i());
+        $this->processFormTabs($view, $this->BConfig);
 #echo "<pre>"; var_dump($view);echo "</pre>"; exit;
     }
 
     public function action_index__POST()
     {
-        $xhr = BRequest::i()->xhr();
+        $xhr = $this->BRequest->xhr();
         try {
-            $post = BRequest::i()->post();
+            $post = $this->BRequest->post();
 
             BEvents::i()->fire(__METHOD__, ['post' => &$post]);
-            BConfig::i()->add($post['config'], true);
+            $this->BConfig->add($post['config'], true);
 
             if (!empty($post['config']['db'])) {
                 try {
-                    BDb::connect();
-                    //FCom_Core_Main::i()->writeConfigFiles('db');
+                    $this->BDb->connect();
+                    //$this->FCom_Core_Main->writeConfigFiles('db');
                 } catch (Exception $e) {
                     $this->message('Invalid DB configuration, not saved: ' . $e->getMessage(), 'error');
                 }
             }
-            FCom_Core_Main::i()->writeConfigFiles();
+            $this->FCom_Core_Main->writeConfigFiles();
 
             if (!$xhr) {
                 $this->message('Settings updated');
@@ -76,15 +76,15 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             $tab = 'FCom_Admin';
         }
         if (!$xhr) {
-            BResponse::i()->redirect('settings' . '?tab=' . $tab);
+            $this->BResponse->redirect('settings' . '?tab=' . $tab);
         } else {
-            BResponse::i()->json($result);
+            $this->BResponse->json($result);
         }
     }
 
     public function action_dismiss() {
-        $code = BRequest::i()->get('code');
-        $conf      = BConfig::i();
+        $code = $this->BRequest->get('code');
+        $conf      = $this->BConfig;
         $dismissed = $conf->get('modules/FCom_Core/dismissed/notifications');
         $dirty = false;
         if (!$dismissed) {
@@ -96,10 +96,10 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
         }
         if ($dirty) {
             $conf->set('modules/FCom_Core/dismissed/notifications', $dismissed, false, true);
-            FCom_Core_Main::i()->writeConfigFiles('local');
+            $this->FCom_Core_Main->writeConfigFiles('local');
         }
 
-        BResponse::i()->json("success");
+        $this->BResponse->json("success");
     }
 
     public function getAllMode()

@@ -4,31 +4,31 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
 {
     public function action_index()
     {
-        $id = BRequest::i()->param('id');
-        $len = BRequest::i()->get('len');
+        $id = $this->BRequest->param('id');
+        $len = $this->BRequest->get('len');
         if (!$len) {
             $len = 10;
         }
-        $start = BRequest::i()->get('start');
+        $start = $this->BRequest->get('start');
         if (!$start) {
             $start = 0;
         }
 
         if ($id) {
-            $orders[] = FCom_Sales_Model_Order::i()->load($id);
+            $orders[] = $this->FCom_Sales_Model_Order->load($id);
         } else {
-            $orders = FCom_Sales_Model_Order::orm()->limit($len, $start)->find_many();
+            $orders = $this->FCom_Sales_Model_Order->orm()->limit($len, $start)->find_many();
         }
         if (empty($orders)) {
             $this->ok();
         }
-        $result = FCom_Sales_Model_Order::i()->prepareApiData($orders, true);
+        $result = $this->FCom_Sales_Model_Order->prepareApiData($orders, true);
         $this->ok($result);
     }
 
     public function action_index__POST()
     {
-        $post = BUtil::fromJson(BRequest::i()->rawPost());
+        $post = $this->BUtil->fromJson($this->BRequest->rawPost());
 
         if (empty($post['customer_id'])) {
             $this->badRequest("Customer id is required");
@@ -47,16 +47,16 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
             if (empty($item['product_id'])) {
                 $this->internalError("Can't create an order item. Product id is missing");
             }
-            $product = FCom_Catalog_Model_Product::i()->load($item['product_id']);
+            $product = $this->FCom_Catalog_Model_Product->load($item['product_id']);
             if (!$product) {
                 $this->internalError("Can't create an order item. Product id #{$item['product_id']} not exist");
             }
         }
 
-        $data = FCom_Sales_Model_Order::i()->formatApiPost($post);
+        $data = $this->FCom_Sales_Model_Order->formatApiPost($post);
         $order = false;
         try {
-            $order = FCom_Sales_Model_Order::orm()->create($data)->save();
+            $order = $this->FCom_Sales_Model_Order->orm()->create($data)->save();
         } catch (Exception $e) {
             $this->internalError("Can't create an order");
         }
@@ -65,16 +65,16 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
         }
 
         foreach ($post['items'] as $item) {
-            $product = FCom_Catalog_Model_Product::i()->load($item['product_id']);
+            $product = $this->FCom_Catalog_Model_Product->load($item['product_id']);
 
             $orderItem = [];
             $orderItem['order_id'] = $order->id();
             $orderItem['product_id'] = $item['product_id'];
             $orderItem['qty'] = $item['qty'];
             $orderItem['total'] = $item['total'];
-            $orderItem['product_info'] = BUtil::toJson($product->as_array());
+            $orderItem['product_info'] = $this->BUtil->toJson($product->as_array());
 
-            FCom_Sales_Model_Order_Item::i()->addNew($orderItem);
+            $this->FCom_Sales_Model_Order_Item->addNew($orderItem);
         }
 
         $this->created(['id' => $order->id]);
@@ -82,8 +82,8 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
 
     public function action_index__PUT()
     {
-        $id = BRequest::i()->param('id');
-        $post = BUtil::fromJson(BRequest::i()->rawPost());
+        $id = $this->BRequest->param('id');
+        $post = $this->BUtil->fromJson($this->BRequest->rawPost());
 
         if (empty($id)) {
             $this->badRequest("Order id is required");
@@ -94,16 +94,16 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
                 if (empty($item['product_id'])) {
                     $this->internalError("Can't create an order item. Product id is missing");
                 }
-                $product = FCom_Catalog_Model_Product::i()->load($item['product_id']);
+                $product = $this->FCom_Catalog_Model_Product->load($item['product_id']);
                 if (!$product) {
                     $this->internalError("Can't create an order item. Product id #{$item['product_id']} not exist");
                 }
             }
         }
 
-        $data = FCom_Sales_Model_Order::i()->formatApiPost($post);
+        $data = $this->FCom_Sales_Model_Order->formatApiPost($post);
 
-        $order = FCom_Sales_Model_Order::i()->load($id);
+        $order = $this->FCom_Sales_Model_Order->load($id);
         if (!$order) {
             $this->notFound("Order id #{$id} not found");
         }
@@ -112,20 +112,20 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
 
         if (!empty($post['items'])) {
             foreach ($post['items'] as $item) {
-                $product = FCom_Catalog_Model_Product::i()->load($item['product_id']);
+                $product = $this->FCom_Catalog_Model_Product->load($item['product_id']);
 
                 $orderItem = [];
                 $orderItem['order_id'] = $order->id();
                 $orderItem['product_id'] = $item['product_id'];
                 $orderItem['qty'] = $item['qty'];
                 $orderItem['total'] = $item['total'];
-                $orderItem['product_info'] = BUtil::toJson($product->as_array());
+                $orderItem['product_info'] = $this->BUtil->toJson($product->as_array());
 
-                $testItem = FCom_Sales_Model_Order_Item::i()->isItemExist($order->id(), $item['product_id']);
+                $testItem = $this->FCom_Sales_Model_Order_Item->isItemExist($order->id(), $item['product_id']);
                 if ($testItem) {
                     $testItem->update($orderItem);
                 } else {
-                    FCom_Sales_Model_Order_Item::i()->addNew($orderItem);
+                    $this->FCom_Sales_Model_Order_Item->addNew($orderItem);
                 }
             }
         }
@@ -135,13 +135,13 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
 
     public function action_index__DELETE()
     {
-        $id = BRequest::i()->param('id');
+        $id = $this->BRequest->param('id');
 
         if (empty($id)) {
             $this->notFound("Order id is required");
         }
 
-        $order = FCom_Sales_Model_Order::i()->load($id);
+        $order = $this->FCom_Sales_Model_Order->load($id);
         if (!$order) {
             $this->notFound("Order id #{$id} not found");
         }

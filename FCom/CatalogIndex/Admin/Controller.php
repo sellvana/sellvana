@@ -4,44 +4,44 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
     public function action_reindex__POST()
     {
-        BResponse::i()->startLongResponse();
-        BDebug::mode('PRODUCTION');
+        $this->BResponse->startLongResponse();
+        $this->BDebug->mode('PRODUCTION');
         BORM::configure('logging', 0);
-        BConfig::i()->set('db/logging', 0);
+        $this->BConfig->set('db/logging', 0);
 
         echo "<pre>Starting...\n";
-        if (BRequest::i()->request('CLEAR')) {
-            //FCom_CatalogIndex_Indexer::i()->indexDropDocs(true);
-            FCom_CatalogIndex_Model_Doc::i()->update_many(['flag_reindex' => 1]);
+        if ($this->BRequest->request('CLEAR')) {
+            //$this->FCom_CatalogIndex_Indexer->indexDropDocs(true);
+            $this->FCom_CatalogIndex_Model_Doc->update_many(['flag_reindex' => 1]);
         }
-        FCom_CatalogIndex_Indexer::i()->indexProducts(true);
-        FCom_CatalogIndex_Indexer::i()->indexGC();
+        $this->FCom_CatalogIndex_Indexer->indexProducts(true);
+        $this->FCom_CatalogIndex_Indexer->indexGC();
         echo 'DONE';
         exit;
     }
 
     public function action_test()
     {
-        if (!BDebug::is('DEBUG,DEVELOPMENT')) {
+        if (!$this->BDebug->is('DEBUG,DEVELOPMENT')) {
             echo "DENIED";
             exit;
         }
-        BResponse::i()->startLongResponse();
-        FCom_CatalogIndex_Main::i()->autoReindex(false);
-        FCom_Catalog_Model_Product::i()->setFlag('skip_duplicate_checks', true);
+        $this->BResponse->startLongResponse();
+        $this->FCom_CatalogIndex_Main->autoReindex(false);
+        $this->FCom_Catalog_Model_Product->setFlag('skip_duplicate_checks', true);
 
         // create categories / subcategories
         if (true) {
             echo '<p>Creating categories...</p>';
-            $root = FCom_Catalog_Model_Category::i()->load(1);
+            $root = $this->FCom_Catalog_Model_Category->load(1);
             for ($i = 1; $i <= 9; $i++) {
                 $root->createChild('Category ' . $i);
             }
         }
         if (true) {
             echo '<p>Creating subcategories...</p>';
-            //$root = FCom_Catalog_Model_Category::i()->load(1);
-            $cats = FCom_Catalog_Model_Category::i()->orm()->where('parent_id', 1)->find_many();
+            //$root = $this->FCom_Catalog_Model_Category->load(1);
+            $cats = $this->FCom_Catalog_Model_Category->orm()->where('parent_id', 1)->find_many();
             foreach ($cats as $c) {
                 for ($i = 1; $i <= 10; $i++) {
                     $c->createChild('Subcategory ' . $c->id . '-' . $i);
@@ -56,15 +56,15 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
 
             $colors = explode(',', 'White,Yellow,Red,Blue,Cyan,Magenta,Brown,Black,Silver,Gold,Beige,Green,Pink');
             $sizes = explode(',', 'Extra Small,Small,Medium,Large,Extra Large');
-            FCom_CustomField_Main::i()->disable(true);
-            $max = FCom_Catalog_Model_Product::i()->orm()->select_expr('(max(id))', 'id')->find_one();
-            FCom_CustomField_Main::i()->disable(false);
+            $this->FCom_CustomField_Main->disable(true);
+            $max = $this->FCom_Catalog_Model_Product->orm()->select_expr('(max(id))', 'id')->find_one();
+            $this->FCom_CustomField_Main->disable(false);
             $maxId = $max->id();
-//            $categories = FCom_Catalog_Model_Category::i()->orm()->where_raw("id_path like '1/%/%'")->select('id')->find_many();
+//            $categories = $this->FCom_Catalog_Model_Category->orm()->where_raw("id_path like '1/%/%'")->select('id')->find_many();
             $products = [];
             for ($i = 0; $i < 1000; $i++) {
                 ++$maxId;
-                $product = FCom_Catalog_Model_Product::i()->create([
+                $product = $this->FCom_Catalog_Model_Product->create([
                     'local_sku' => 'test-' . $maxId,
                     'product_name' => 'Product ' . $maxId,
                     'short_description' => 'Short Description ' . $maxId,
@@ -90,14 +90,14 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
         if (true) {
             echo '<p>Assigning products to categories...</p>';
 
-            BDb::run("TRUNCATE fcom_category_product");
-            $categories = FCom_Catalog_Model_Category::i()->orm()->where_raw("id_path like '1/%/%'")
+            $this->BDb->run("TRUNCATE fcom_category_product");
+            $categories = $this->FCom_Catalog_Model_Category->orm()->where_raw("id_path like '1/%/%'")
                 ->find_many_assoc('id', 'url_path');
             $catIds = array_keys($categories);
-            $hlp = FCom_Catalog_Model_CategoryProduct::i();
+            $hlp = $this->FCom_Catalog_Model_CategoryProduct;
 
-            FCom_CustomField_Main::i()->disable(true);
-            FCom_Catalog_Model_Product::i()->orm()->select('id')->iterate(function($row) use($catIds, $exists, $hlp) {
+            $this->FCom_CustomField_Main->disable(true);
+            $this->FCom_Catalog_Model_Product->orm()->select('id')->iterate(function($row) use($catIds, $exists, $hlp) {
                 $pId = $row->id;
                 $exists = [];
                 for ($i = 0; $i < 5; $i++) {
@@ -108,32 +108,32 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
                     $exists[$pId . '-' . $cId] = true;
                 }
             });
-            FCom_CustomField_Main::i()->disable(false);
+            $this->FCom_CustomField_Main->disable(false);
         }
 
         // reindex products
         if (true) {
             echo '<p>Reindexing...</p>';
 
-            BResponse::i()->startLongResponse();
-            BDebug::mode('PRODUCTION');
+            $this->BResponse->startLongResponse();
+            $this->BDebug->mode('PRODUCTION');
             BORM::configure('logging', 0);
-            BConfig::i()->set('db/logging', 0);
+            $this->BConfig->set('db/logging', 0);
 
             echo "<pre>Starting...\n";
-            if (BRequest::i()->request('CLEAR')) {
-                //FCom_CatalogIndex_Indexer::i()->indexDropDocs(true);
-                FCom_CatalogIndex_Model_Doc::i()->update_many(['flag_reindex' => 1]);
+            if ($this->BRequest->request('CLEAR')) {
+                //$this->FCom_CatalogIndex_Indexer->indexDropDocs(true);
+                $this->FCom_CatalogIndex_Model_Doc->update_many(['flag_reindex' => 1]);
             }
-            FCom_CatalogIndex_Indexer::i()->indexProducts(true);
-            FCom_CatalogIndex_Indexer::i()->indexGC();
+            $this->FCom_CatalogIndex_Indexer->indexProducts(true);
+            $this->FCom_CatalogIndex_Indexer->indexGC();
             echo 'DONE';
             exit;
         }
 
         // show sample search result
         if (false) {
-            $result = FCom_CatalogIndex_Indexer::i()->searchProducts('lorem', [
+            $result = $this->FCom_CatalogIndex_Indexer->searchProducts('lorem', [
                 'category' => 'category-1/subcategory-1-1',
                 'color' => 'Green',
                 'size' => 'Medium',

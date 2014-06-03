@@ -22,7 +22,7 @@ class FCom_ShippingPlain_ShippingMethod extends FCom_Sales_Method_Shipping_Abstr
 
     public function getServicesSelected()
     {
-        $c = BConfig::i();
+        $c = $this->BConfig;
         $selected = [];
         foreach ($this->getServices() as $sId => $sName) {
             if ($c->get('modules/FCom_ShippingPlain/services/s' . $sId) == 1) {

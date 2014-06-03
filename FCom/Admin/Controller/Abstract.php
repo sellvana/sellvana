@@ -7,7 +7,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     public function authenticate($args = [])
     {
-        return FCom_Admin_Model_User::i()->isLoggedIn();
+        return $this->FCom_Admin_Model_User->isLoggedIn();
     }
 
     public function authorize($args = [])
@@ -16,7 +16,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
             return false;
         }
         if (!empty($this->_permission)) {
-            $user = FCom_Admin_Model_User::i()->sessionUser();
+            $user = $this->FCom_Admin_Model_User->sessionUser();
             if (!$user) {
                 return false;
             }
@@ -27,27 +27,27 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     public function action_unauthenticated()
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         if ($r->xhr()) {
-            BSession::i()->set('admin_login_orig_url', $r->referrer());
-            BResponse::i()->json(['error' => 'login']);
+            $this->BSession->set('admin_login_orig_url', $r->referrer());
+            $this->BResponse->json(['error' => 'login']);
         } else {
-            BSession::i()->set('admin_login_orig_url', $r->currentUrl());
+            $this->BSession->set('admin_login_orig_url', $r->currentUrl());
             $this->layout('/login');
-            BResponse::i()->status(401, 'Unauthorized'); // HTTP sic
+            $this->BResponse->status(401, 'Unauthorized'); // HTTP sic
         }
     }
 
     public function action_unauthorized()
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         if ($r->xhr()) {
-            BSession::i()->set('admin_login_orig_url', $r->referrer());
-            BResponse::i()->json(['error' => 'denied']);
+            $this->BSession->set('admin_login_orig_url', $r->referrer());
+            $this->BResponse->json(['error' => 'denied']);
         } else {
-            BSession::i()->set('admin_login_orig_url', $r->currentUrl());
+            $this->BSession->set('admin_login_orig_url', $r->currentUrl());
             $this->layout('/denied');
-            BResponse::i()->status(403, 'Forbidden');
+            $this->BResponse->status(403, 'Forbidden');
         }
     }
 
@@ -55,14 +55,14 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     {
         if (!parent::beforeDispatch()) return false;
 
-        $this->view('head')->addTitle(BLocale::_('%s Admin', BConfig::i()->get('modules/FCom_Core/site_title')));
+        $this->view('head')->addTitle(BLocale::_('%s Admin', $this->BConfig->get('modules/FCom_Core/site_title')));
 
         return true;
     }
 
     public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         if ($r->xhr() && !is_null($r->get('tabs'))) {
             $this->outFormTabsJson($view, $model, $mode);
         } else {
@@ -78,15 +78,15 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         } else {
             $msg = BLocale::_($msg);
         }
-        BSession::i()->addMessage($msg, $type, $tag, $options);
+        $this->BSession->addMessage($msg, $type, $tag, $options);
         return $this;
     }
 
     public function initFormTabs($view, $model, $mode = 'view', $allowed = null)
     {
 
-        $r = BRequest::i();
-        $layout = BLayout::i();
+        $r = $this->BRequest;
+        $layout = $this->BLayout;
         $curTab = $r->request('tab');
         if (is_string($allowed)) {
             $allowed = explode(',', $allowed);
@@ -115,7 +115,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                             'mode' => $mode,
                         ]);
                     } else {
-                        BDebug::warning('MISSING VIEW: ' . $tab['view']);
+                        $this->BDebug->warning('MISSING VIEW: ' . $tab['view']);
                     }
                 }
             }
@@ -178,7 +178,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     public function collectFormTabs($formView)
     {
-        $views = BLayout::i()->findViewsRegex('#^' . $formView->get('tab_view_prefix') . '#');
+        $views = $this->BLayout->findViewsRegex('#^' . $formView->get('tab_view_prefix') . '#');
         foreach ($views as $viewName => $view) {
             $id = basename($viewName);
             if (!empty($formView->tabs[$id])) {
@@ -202,7 +202,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     public function outFormTabsJson($view, $model, $defMode = 'view')
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         $mode = $r->request('mode');
         if (!$mode) {
             $mode = $defMode;
@@ -213,7 +213,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         }
         $out = [];
         if ($outTabs) {
-            $layout = BLayout::i();
+            $layout = $this->BLayout;
             $tabs = $view->tabs;
             foreach ($tabs as $k => $tab) {
                 if ($outTabs !== 'ALL' && !in_array($k, $outTabs)) {
@@ -221,7 +221,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                 }
                 $view = $layout->view($tab['view']);
                 if (!$view) {
-                    BDebug::error('MISSING VIEW: ' . $tabs[$k]['view']);
+                    $this->BDebug->error('MISSING VIEW: ' . $tabs[$k]['view']);
                     continue;
                 }
                 $out['tabs'][$k] = (string)$view->set([
@@ -230,13 +230,13 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
                 ]);
             }
         }
-        $out['messages'] = BSession::i()->messages('admin');
-        BResponse::i()->json($out);
+        $out['messages'] = $this->BSession->messages('admin');
+        $this->BResponse->json($out);
     }
 
     protected function _processGridDataPost($class, $defData = [])
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         $id = $r->post('id');
         $data = $defData + $r->post();
         $hlp = $class::i();
@@ -288,8 +288,8 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         $args['result'] =& $result;
         $this->gridPostAfter($args);
 
-        //BResponse::i()->redirect('fieldsets/grid_data');
-        BResponse::i()->json($result);
+        //$this->BResponse->redirect('fieldsets/grid_data');
+        $this->BResponse->json($result);
     }
 
     public function gridPostBefore($args)

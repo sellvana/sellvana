@@ -20,34 +20,34 @@ class FCom_Email_Model_Pref extends FCom_Core_Model_Abstract
         ['email', '@email'],
     ];
 
-    public static function unsubAll($email)
+    public function unsubAll($email)
     {
-        $pref = static::load($email, 'email');
+        $pref = $this->load($email, 'email');
         $pref->set('unsub_all', 1)->save();
         return $pref;
     }
 
-    public static function getUrl($email, $params = [])
+    public function getUrl($email, $params = [])
     {
         if (true === $params) {
             $params = ['unsub_all' => 'true'];
         }
-        $params += ['email' => $email, 'token' => static::getToken($email)];
-        return BUtil::setUrlQuery(BApp::href('email/pref', true, 1), $params);
+        $params += ['email' => $email, 'token' => $this->getToken($email)];
+        return $this->BUtil->setUrlQuery($this->BApp->href('email/pref', true, 1), $params);
     }
 
-    public static function getToken($email, $salt = null)
+    public function getToken($email, $salt = null)
     {
-        $pref = static::load($email, 'email');
-        if (!$salt) $salt = BUtil::randomString(8);
+        $pref = $this->load($email, 'email');
+        if (!$salt) $salt = $this->BUtil->randomString(8);
         return $salt . '_' . sha1($salt . '|' . $email . '|' . ($pref ? $pref->update_at : ''));
     }
 
-    public static function validateToken($email, $token)
+    public function validateToken($email, $token)
     {
         if ($email && $token) {
             list($salt, $hash) = explode('_', $token);
-            return static::getToken($email, $salt) === $salt . '_' . $hash;
+            return $this->getToken($email, $salt) === $salt . '_' . $hash;
         }
         return false;
     }
@@ -55,8 +55,8 @@ class FCom_Email_Model_Pref extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if (!$this->create_at) $this->create_at = BDb::now();
-        $this->update_at = BDb::now();
+        if (!$this->create_at) $this->create_at = $this->BDb->now();
+        $this->update_at = $this->BDb->now();
         return true;
     }
 }

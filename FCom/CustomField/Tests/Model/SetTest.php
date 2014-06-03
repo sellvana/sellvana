@@ -15,7 +15,7 @@ class FCom_CustomField_Tests_Model_SetTest extends FCom_Test_DatabaseTestCase
             'set_type' => "product",
             'set_code' => "test3",
             'set_name' => "Test 3"];
-        FCom_CustomField_Model_Set::i()->create($data)->save();
+        $this->FCom_CustomField_Model_Set->create($data)->save();
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_fieldset'), "Insert failed");
     }
@@ -28,7 +28,7 @@ class FCom_CustomField_Tests_Model_SetTest extends FCom_Test_DatabaseTestCase
             'field_id' => 1,
             'position' => "10"];
 
-        FCom_CustomField_Model_SetField::i()->create($data)->save();
+        $this->FCom_CustomField_Model_SetField->create($data)->save();
 
         $this->assertEquals(1, $this->getConnection()->getRowCount('fcom_fieldset_field'), "Insert failed");
     }

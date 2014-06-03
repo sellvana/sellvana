@@ -43,7 +43,7 @@ class BClassDecorator_Test_A
         return 'A';
     }
 
-    static public function meStatic()
+    public function meStatic()
     {
         return 'A';
     }
