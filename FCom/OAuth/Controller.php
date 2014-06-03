@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_OAuth_Controller extends FCom_Core_Controller_Abstract
 {
@@ -6,6 +6,9 @@ class FCom_OAuth_Controller extends FCom_Core_Controller_Abstract
     {
         $hlp = FCom_OAuth_Main::i();
         $returnUrl = BRequest::i()->get('redirect_to');
+        if (!$r->isUrlLocal($returnUrl)) {
+            $returnUrl = '';
+        }
         if (!$returnUrl) {
             $returnUrl = BApp::href('login');
         }
@@ -19,7 +22,7 @@ class FCom_OAuth_Controller extends FCom_Core_Controller_Abstract
             BResponse::i()->redirect($authUrl);
         } catch (Exception $e) {
 echo "<pre>"; print_r($e); exit;
-            $area = BApp::i()->get('area') === 'FCom_Admin' ? 'admin' : 'frontend';
+            $area = BRequest::i()->area() === 'FCom_Admin' ? 'admin' : 'frontend';
             BSession::i()->addMessage($e->getMessage(), 'error', $area);
             BResponse::i()->redirect($returnUrl);
         }
@@ -33,7 +36,7 @@ echo "<pre>"; print_r($e); exit;
             $hlp->callbackAction();
         } catch (Exception $e) {
 echo "<pre>"; print_r($e); exit;
-            $area = BApp::i()->get('area') === 'FCom_Admin' ? 'admin' : 'frontend';
+            $area = BRequest::i()->area() === 'FCom_Admin' ? 'admin' : 'frontend';
             BSession::i()->addMessage($e->getMessage(), 'error', $area);
         }
         BResponse::i()->redirect($returnUrl);

@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_ProductCompare_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
@@ -34,6 +34,10 @@ class FCom_ProductCompare_Frontend_Controller extends FCom_Frontend_Controller_A
 
     public function action_add()
     {
-
+        if (BRequest::i()->csrf('referrer', 'GET')) {
+            $this->message('CSRF detected');
+            BResponse::i()->redirect('');
+            return;
+        }
     }
 }

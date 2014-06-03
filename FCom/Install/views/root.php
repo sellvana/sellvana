@@ -1,3 +1,5 @@
+<?php defined('BUCKYBALL_ROOT_DIR') || die(); ?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>

@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
     FCom_Sales_Method_Payment_Interface

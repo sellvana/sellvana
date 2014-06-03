@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_FrontendCP_Main extends BClass
 {
@@ -25,7 +25,7 @@ class FCom_FrontendCP_Main extends BClass
 
     public function saveCustomViewTemplate($viewName, $content, $options = [])
     {
-        $rootDir = BConfig::i()->get('fs/storage_dir') . '/custom';
+        $rootDir = BApp::i()->storageRandomDir() . '/custom';
         $area = !empty($options['area']) ? $options['area'] : 'FCom_Frontend';
         $viewsDir = $dir . '/' . $area . '/views';
         if (!file_exists($rootDir)) {

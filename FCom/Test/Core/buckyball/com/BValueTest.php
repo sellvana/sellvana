@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class BValueTest extends PHPUnit_Framework_TestCase
 {

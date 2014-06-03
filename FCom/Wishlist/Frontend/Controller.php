@@ -1,12 +1,20 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
+    public function beforeDispatch()
+    {
+        if (!parent::beforeDispatch()) return false;
+
+        BResponse::i()->nocache();
+
+        return true;
+    }
+
     public function authenticate($args = [])
     {
         return FCom_Customer_Model_Customer::i()->isLoggedIn() || BRequest::i()->rawPath() == '/login';
     }
-
 
     public function action_index()
     {
@@ -52,6 +60,11 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_add()
     {
+        if (BRequest::i()->csrf('referrer', 'GET')) {
+            $this->message('CSRF detected');
+            BResponse::i()->redirect('wishlist');
+            return;
+        }
         $id = BRequest::i()->get('id');
         $p = FCom_Catalog_Model_Product::i()->load($id);
         if (!$p) {

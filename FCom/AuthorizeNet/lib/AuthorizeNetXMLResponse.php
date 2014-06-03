@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
  * Base class for the AuthorizeNet ARB & CIM Responses.
  *

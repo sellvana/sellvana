@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
 * Copyright 2014 Boris Gurvich
 *
@@ -43,6 +44,13 @@ class BRequest extends BClass
     protected static $_language;
 
     /**
+     * Area of the current request
+     *
+     * @var string
+     */
+    protected $_area;
+
+    /**
      * Shortcut to help with IDE autocompletion
      *
      * @param bool  $new
@@ -69,6 +77,28 @@ class BRequest extends BClass
         if (!empty($_SERVER['ORIG_SCRIPT_FILENAME'])) {
             $_SERVER['ORIG_SCRIPT_FILENAME'] = str_replace('/index.php/index.php', '/index.php', $_SERVER['ORIG_SCRIPT_FILENAME']);
         }
+    }
+
+    /**
+     * Returns area of the current request
+     *
+     * @var string
+     */
+    public function area()
+    {
+        return $this->_area;
+    }
+
+    /**
+     * Set area of the current request
+     *
+     * @param string $area
+     * @return BRequest
+     */
+    public function setArea($area)
+    {
+        $this->_area = $area;
+        return $this;
     }
 
     /**
@@ -116,6 +146,24 @@ class BRequest extends BClass
         }
         $a = explode(':', $_SERVER['HTTP_HOST']);
         return $a[0];
+    }
+
+    public static function validateHttpHost($whitelist = null)
+    {
+        if (null === $whitelist) {
+            $whitelist = BConfig::i()->get('web/http_host_whitelist');
+        }
+        if (!$whitelist) {
+            return true;
+        }
+        $httpHost = static::httpHost(false);
+
+        foreach (explode(',', $whitelist) as $allowedHost) {
+            if (preg_match('/(^|\.)' . preg_quote(trim($allowedHost, ' .')) .'$/i', $httpHost)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -391,7 +439,7 @@ class BRequest extends BClass
 
             // nginx rewrite fix
             $basename = basename(static::scriptName());
-            $path = preg_replace('#^/.*?' . preg_quote($basename) . '#', '', $path);
+            $path = preg_replace('#^/.*?' . preg_quote($basename, '#') . '#', '', $path);
 
             if (BConfig::i()->get('web/language_in_url') && preg_match('#^/([a-z]{2})(/.*|$)#', $path, $match)) {
                 static::$_language = $match[1];
@@ -615,14 +663,17 @@ class BRequest extends BClass
     public static function csrf($checkMethod = null, $httpMethods = null)
     {
         $c = BConfig::i();
-
-
         if (null === $httpMethods) {
             $m = $c->get('web/csrf_http_methods');
-            $httpMethods = $m ? (is_string($m) ? explode(',', $m) : $m) : ['POST', 'PUT', 'DELETE'];
         }
-
-        if (is_array($httpMethods) && !in_array(static::method(), $httpMethods)) {
+        if (!$httpMethods) {
+            $httpMethods = ['POST', 'PUT', 'DELETE'];
+        } elseif (is_string($httpMethods)) {
+            $httpMethods = array_map('trim', explode(',', $httpMethods));
+        } elseif (!is_array($httpMethods)) {
+            throw new BException('Invalid HTTP Methods argument');
+        }
+        if (!in_array(static::method(), $httpMethods)) {
             return false; // not one of checked methods, pass
         }
 
@@ -638,12 +689,13 @@ class BRequest extends BClass
 
         if (null === $checkMethod) {
             $m = $c->get('web/csrf_check_method');
-            $checkMethod = $m ? $m : 'referrer';
+            $checkMethod = $m ? $m : 'token';
         }
 
         switch ($checkMethod) {
             case 'referrer':
-                if (!($ref = static::referrer())) {
+                $ref = static::referrer();
+                if (!$ref) {
                     return true; // no referrer sent, high prob. csrf
                 }
                 $p = parse_url($ref);
@@ -660,6 +712,18 @@ class BRequest extends BClass
                 }
                 return false; // not csrf
 
+            case 'origin':
+                $origin = static::httpOrigin();
+                if (!$origin) {
+                    return true;
+                }
+                $p = parse_url($origin);
+                if ($p['host'] !== static::httpHost(false)) {
+                    return true;
+                }
+                return false;
+                break;
+
             case 'token':
                 if (!empty($_SERVER['HTTP_X_CSRF_TOKEN'])) {
                     $receivedToken = $_SERVER['HTTP_X_CSRF_TOKEN'];
@@ -667,6 +731,7 @@ class BRequest extends BClass
                     $receivedToken = $_POST['X-CSRF-TOKEN'];
                 }
                 return empty($receivedToken) || !BSession::i()->validateCsrfToken($receivedToken);
+
 
             default:
                 throw new BException('Invalid CSRF check method: ' . $checkMethod);
@@ -708,7 +773,7 @@ class BRequest extends BClass
     public static function currentUrl()
     {
         $host = static::scheme() . '://' . static::httpHost(true);
-        if (BConfig::i()->get('web/hide_script_name') && BApp::i()->get('area') !== 'FCom_Admin') {
+        if (BConfig::i()->get('web/hide_script_name') && BRequest::i()->area() !== 'FCom_Admin') {
             $root = static::webRoot();
         } else {
             $root = static::scriptName();
@@ -718,6 +783,30 @@ class BRequest extends BClass
         $get = static::rawGet();
         $url = $host . '/' . ($root ? $root . '/' : '') . $path . ($get ? '?' . $get : '');
         return $url;
+    }
+
+    /**
+     * Validate that URL is within boundaries of domain and webroot
+     */
+    public static function isUrlLocal($url, $checkPath = false)
+    {
+        if (!$url) {
+            return null;
+        }
+        $parsed = parse_url($url);
+        if (empty($parsed['host'])) {
+            return true;
+        }
+        if ($parsed['host'] !== static::httpHost(false)) {
+            return false;
+        }
+        if ($checkPath) {
+            $webRoot = BConfig::i()->get('web/root_dir');
+            if (!preg_match('#^' . preg_quote($webRoot, '#') . '#', $parsed['path'])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -925,6 +1014,7 @@ class BRequest extends BClass
             return;
         }
         $data = ['GET' => & $_GET, 'POST' => & $_POST, 'REQUEST' => & $_REQUEST, 'COOKIE' => & $_COOKIE];
+        mb_internal_encoding('UTF-8');
         $this->stripTagsRecursive($data, static::rawPath());
         $alreadyStripped = true;
         return $this;
@@ -937,7 +1027,9 @@ class BRequest extends BClass
             if (is_array($v)) {
                 $this->stripTagsRecursive($v,  $forUrlPath, $childPath);
             } elseif (!empty($v) && !is_numeric($v)) {
-                if (empty($this->_postTagsWhitelist[$forUrlPath][$childPath])) {
+                if (!mb_check_encoding($v)) {
+                    $v = null;
+                } elseif (empty($this->_postTagsWhitelist[$forUrlPath][$childPath])) {
                     $v = strip_tags($v);
                 } else {
                     $tags = $this->_postTagsWhitelist[$forUrlPath][$childPath];
@@ -1377,7 +1469,7 @@ class BResponse extends BClass
     */
     public function httpSTS()
     {
-        static::header('Strict-Transport-Security: max-age=500; includeSubDomains');
+        static::header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
         return $this;
     }
 
@@ -2294,6 +2386,7 @@ class BActionController extends BClass
                 $actionMethod = $tmpMethod;
             } elseif (BRouting::i()->currentRoute()->multi_method) {
                 $this->forward(false); // If route has multiple methods, require method suffix
+                return $this;
             }
         }
         //echo $actionMethod;exit;

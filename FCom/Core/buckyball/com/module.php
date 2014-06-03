@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
 * Copyright 2014 Boris Gurvich
 *
@@ -119,7 +120,7 @@ class BModuleRegistry extends BClass
             $this->_modules[$modName]->update($params);
         } else {
             $params['name'] = $modName;
-            $this->_modules[$modName] = BModule::i(true, $params);
+            $this->_modules[$modName] = BModule::i(true, [$params]);
         }
         return $this;
     }
@@ -185,7 +186,7 @@ class BModuleRegistry extends BClass
 */
     protected function _getManifestCacheFilename()
     {
-        $area = BApp::i()->get('area');
+        $area = BRequest::i()->area();
         $fileName = BConfig::i()->get('fs/cache_dir') . '/manifests' . ($area ? '_' . $area : '') . '.data';#.'.php';
         BUtil::ensureDir(dirname($fileName));
         return $fileName;
@@ -199,7 +200,7 @@ class BModuleRegistry extends BClass
 
         $data = [];
         foreach ($this->_modules as $modName => $mod) {
-            $data[$modName] = (array)$mod;
+            $data[$modName] = $mod->asArray();
             $data[$modName]['is_cached'] = true;
             unset($data['run_level']);
         }
@@ -610,7 +611,7 @@ class BModule extends BClass
     *
     * @var array
     */
-    static protected $_env = [];
+    static protected $_envVars = [];
 
     /**
     * Default module run_level
@@ -735,7 +736,7 @@ class BModule extends BClass
     public function __construct(array $args)
     {
         #if (empty($args['area'])) {
-            $args['area'] = BApp::i()->get('area');
+            $args['area'] = BRequest::i()->area();
         #}
 /*
 if ($args['name']==="FCom_Referrals") {
@@ -891,33 +892,33 @@ if ($args['name']==="FCom_Referrals") {
     */
     protected static function _initEnvData()
     {
-        if (!empty(static::$_env)) {
+        if (!empty(static::$_envVars)) {
             return;
         }
         $r = BRequest::i();
         $c = BConfig::i();
-        static::$_env['doc_root'] = $r->docRoot();
-        static::$_env['web_root'] = $r->webRoot();
-        //static::$_env['http_host'] = $r->httpHost();
+        static::$_envVars['doc_root'] = $r->docRoot();
+        static::$_envVars['web_root'] = $r->webRoot();
+        //static::$_envVars['http_host'] = $r->httpHost();
         if (($rootDir = $c->get('fs/root_dir'))) {
-            static::$_env['root_dir'] = str_replace('\\', '/', $rootDir);
+            static::$_envVars['root_dir'] = str_replace('\\', '/', $rootDir);
         } else {
-            static::$_env['root_dir'] = str_replace('\\', '/', $r->scriptDir());
+            static::$_envVars['root_dir'] = str_replace('\\', '/', $r->scriptDir());
         }
         if (($baseSrc = $c->get('web/base_src'))) {
-            static::$_env['base_src'] = $baseSrc;//$r->scheme().'://'.static::$_env['http_host'].$baseSrc;
+            static::$_envVars['base_src'] = $baseSrc;//$r->scheme().'://'.static::$_envVars['http_host'].$baseSrc;
         } else {
-            static::$_env['base_src'] = static::$_env['web_root'];
+            static::$_envVars['base_src'] = static::$_envVars['web_root'];
         }
         if (($baseHref = $c->get('web/base_href'))) {
-            static::$_env['base_href'] = $baseHref;//$r->scheme().'://'.static::$_env['http_host'].$c->get('web/base_href');
+            static::$_envVars['base_href'] = $baseHref;//$r->scheme().'://'.static::$_envVars['http_host'].$c->get('web/base_href');
         } else {
-            static::$_env['base_href'] = static::$_env['web_root'];
+            static::$_envVars['base_href'] = static::$_envVars['web_root'];
         }
-#echo "<pre>"; var_dump(static::$_env, $_SERVER); echo "</pre>"; exit;
+#echo "<pre>"; var_dump(static::$_envVars, $_SERVER); echo "</pre>"; exit;
         foreach (static::$_manifestCache as &$m) {
-            //    $m['base_src'] = static::$_env['base_src'].str_replace(static::$_env['root_dir'], '', $m['root_dir']);
-            $m['base_src'] = rtrim(static::$_env['base_src'], '/') . str_replace(static::$_env['root_dir'], '', $m['root_dir']);
+            //    $m['base_src'] = static::$_envVars['base_src'].str_replace(static::$_envVars['root_dir'], '', $m['root_dir']);
+            $m['base_src'] = rtrim(static::$_envVars['base_src'], '/') . str_replace(static::$_envVars['root_dir'], '', $m['root_dir']);
         }
         unset($m);
     }
@@ -939,7 +940,7 @@ if ($args['name']==="FCom_Referrals") {
             $this->base_src = BUtil::normalizePath(rtrim($url, '/'));
         }
         if (empty($this->base_href)) {
-            $this->base_href = static::$_env['base_href'];
+            $this->base_href = static::$_envVars['base_href'];
             if (!empty($this->url_prefix)) {
                 $this->base_href .= '/' . $this->url_prefix;
             }
@@ -952,7 +953,7 @@ if ($args['name']==="FCom_Referrals") {
             return;
         }
         $auto = array_flip((array)$this->auto_use);
-        $area = BApp::i()->get('area');
+        $area = BRequest::i()->area();
         $areaDir = str_replace('FCom_', '', $area);
         if (isset($auto['all']) || isset($auto['bootstrap'])) { // TODO: check for is_callable() ?
             if (method_exists($this->name . '_' . $areaDir, 'bootstrap')) {
@@ -1114,11 +1115,7 @@ if (!isset($o[0]) || !isset($o[1])) {
         } elseif (!BUtil::isPathAbsolute($rootDir)) {
             $rootDir = $this->root_dir . '/' . $rootDir;
         }
-        BClassAutoload::i(true, [
-            'module_name' => $this->name,
-            'root_dir' => rtrim($rootDir, '/'),
-            'filename_cb' => $callback,
-        ]);
+        BClassAutoload::i(true, [rtrim($rootDir, '/'), $this->name, $callback]);
         return $this;
     }
 
@@ -1217,6 +1214,9 @@ if (!isset($o[0]) || !isset($o[1])) {
     {
         if (is_array($key)) {
             foreach ($key as $k => $v) {
+                if ($k[0] === "\0") { // protected properties, for cache saved on previous commit
+                    continue;
+                }
                 $this->$k = $v;
             }
             return $this;
@@ -1265,7 +1265,7 @@ if (!isset($o[0]) || !isset($o[1])) {
         }
         if (!empty($bb['callback'])) {
             $start = BDebug::debug(BLocale::_('Start BEFORE bootstrap for %s', [$this->name]));
-            call_user_func($bb['callback']);
+            BUtil::call($bb['callback']);
             #$mod->run_status = BModule::LOADED;
             BDebug::profile($start);
             BDebug::debug(BLocale::_('End BEFORE bootstrap for %s', [$this->name]));
@@ -1302,7 +1302,7 @@ if (!isset($o[0]) || !isset($o[1])) {
             }
             if (!empty($this->bootstrap['callback'])) {
                 $start = BDebug::debug(BLocale::_('Start bootstrap for %s', [$this->name]));
-                call_user_func($this->bootstrap['callback']);
+                BUtil::call($this->bootstrap['callback']);
                 #$mod->run_status = BModule::LOADED;
                 BDebug::profile($start);
                 BDebug::debug(BLocale::_('End bootstrap for %s', [$this->name]));
@@ -1311,6 +1311,17 @@ if (!isset($o[0]) || !isset($o[1])) {
 
         $this->run_status = BModule::LOADED;
         return $this;
+    }
+
+    public function asArray()
+    {
+        $a = (array)$this;
+        foreach ($a as $k => $v) {
+            if ($k[0] === "\0") {
+                unset($a[$k]);
+            }
+        }
+        return $a;
     }
 }
 
@@ -1541,7 +1552,7 @@ class BMigrate extends BClass
                         BDb::ddlClearCache(); // clear DDL cache before each migration step
                         BDebug::debug('DB.MIGRATE ' . $view->q($script));
                         if (is_callable($script)) {
-                            $result = call_user_func($script);
+                            $result = BUtil::call($script);
                         } elseif (is_file($module->root_dir . '/' . $script)) {
                             $result = include_once($module->root_dir . '/' . $script);
                         } elseif (is_dir($module->root_dir . '/' . $script)) {
@@ -1676,7 +1687,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         // call install migration script
         try {
             if (is_callable($callback)) {
-                $result = call_user_func($callback);
+                $result = BUtil::call($callback);
             } elseif (is_file($callback)) {
                 $result = include $callback;
             } elseif (is_string($callback)) {
@@ -1745,7 +1756,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         // call upgrade migration script
         try {
             if (is_callable($callback)) {
-                $result = call_user_func($callback);
+                $result = BUtil::call($callback);
             } elseif (is_file($callback)) {
                 $result = include $callback;
             } elseif (is_string($callback)) {
@@ -1793,7 +1804,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         $callback = $mod->uninstall_callback; //TODO: implement
         // call uninstall migration script
         if (is_callable($callback)) {
-            call_user_func($callback);
+            BUtil::call($callback);
         } elseif (is_file($callback)) {
             include $callback;
         } elseif (is_string($callback)) {

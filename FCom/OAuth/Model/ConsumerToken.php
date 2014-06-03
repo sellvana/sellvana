@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_OAuth_Model_ConsumerToken extends FCom_Core_Model_Abstract
 {
@@ -16,6 +16,6 @@ class FCom_OAuth_Model_ConsumerToken extends FCom_Core_Model_Abstract
         if (empty($consumerSess['access_token'])) {
             return false;
         }
-        return static::load(['provider' => $providerName, 'token' => $consumerSess['access_token']]);
+        return static::loadWhere(['provider' => (string)$providerName, 'token' => (string)$consumerSess['access_token']]);
     }
 }

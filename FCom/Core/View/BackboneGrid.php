@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 {
@@ -47,7 +47,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
     public function callUserFunc($cb, $args)
     {
-        return call_user_func_array($cb, $args);
+        return BUtil::call($cb, $args, true);
     }
 
     public function multiselectToggleOptions()
@@ -229,7 +229,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                                 if (!empty($grid['config']['form_url']) && empty($btn['href'])) {
                                     $btn['href'] = $grid['config']['form_url'] . '?' . $btn['col'] . '=';
                                 }
-                                $btn['cssClass'] = ' btn-xs btn-edit ';
+                                $btn['cssClass'] = (isset($btn['cssClass'])) ? $btn['cssClass']: ' btn-xs btn-edit ';
+//                                $btn['cssClass'] = ' btn-xs btn-edit ';
                                 break;
 
                             case 'delete':
@@ -821,6 +822,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                     if (!empty($indexes[$f['field']])) {
                         $f['field'] = $indexes[$f['field']];
                     }
+                    if (!preg_match('#^[A-Za-z0-9_.]+$#', $f['field'])) {
+                        unset($filters[$fId]);
+                    }
                 }
             }
             unset($f);
@@ -992,7 +996,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 $columns[$i] = $col;
             }*/
         }
-        $dir = BConfig::i()->get('fs/storage_dir') . '/export';
+        $dir = BApp::i()->storageRandomDir() . '/export';
         BUtil::ensureDir($dir);
         $filename = $dir . '/' . $this->grid['config']['id'] . '.csv';
         $fp = fopen($filename, 'w');

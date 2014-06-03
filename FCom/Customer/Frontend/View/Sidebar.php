@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Customer_Frontend_View_Sidebar extends FCom_Core_View_Abstract
 {

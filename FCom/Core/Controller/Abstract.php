@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Core_Controller_Abstract extends BActionController
 {
@@ -24,7 +24,7 @@ class FCom_Core_Controller_Abstract extends BActionController
      */
     public function layout($name = null)
     {
-        $theme = BConfig::i()->get('modules/' . BApp::i()->get('area') . '/theme');
+        $theme = BConfig::i()->get('modules/' . BRequest::i()->area() . '/theme');
         if (!$theme) {
             $theme = BLayout::i()->getDefaultTheme();
         }

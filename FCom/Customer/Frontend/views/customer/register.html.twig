@@ -38,13 +38,13 @@
               {% if password_strength == 'true'  %}
                 {{ "has-progress-bar" }}
               {% endif %}
-              " id="model-password"/>
+              " id="model-password" pattern=".{6,}"/>
             </div>
           </div>
           <div class="form-group col-sm-6">
             <label for="register-password_confirm" class="control-label required">{{ "Confirm Password" | _ }}</label>
             <div class="controls">
-              <input type="password" name="model[password_confirm]" class="required form-control" equalto="#model-password" id="register-password_confirm"/>
+              <input type="password" name="model[password_confirm]" class="required form-control" equalto="#model-password" id="register-password_confirm" pattern=".{6,}"/>
             </div>
           </div>
         </div>

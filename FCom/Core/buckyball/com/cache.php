@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
 * Copyright 2014 Boris Gurvich
 *
@@ -107,7 +108,7 @@ class BCache extends BClass
             }
             $config = (array)BConfig::i()->get('cache/' . $type);
             $backend->init($config);
-            $this->_backendsStatus[$type] = true;
+            $this->_backendStatus[$type] = true;
         }
         return $this->_backends[$type];
     }
@@ -570,6 +571,7 @@ class BCache_Backend_Shmop extends BClass implements BCache_Backend_Interface
     {
 
     }
+
 
     public function delete($key)
     {

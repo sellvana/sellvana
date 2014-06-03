@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
 * Copyright 2014 Boris Gurvich
 *
@@ -211,7 +212,7 @@ class BDb
            if (strlen(trim($query)) > 0) {
                 // try {
                     BDebug::debug('DB.RUN: ' . $query);
-                    if (!empty($options['echo'])) {
+                    if (!empty($options['echo']) && BDebug::is('DEBUG')) {
                         echo '<hr><pre>' . $query . '<pre>';
                     }
                     BORM::set_last_query($query);
@@ -1619,16 +1620,16 @@ class BORM extends ORMWrapper
 
         #$s['c'] = 600000;
         if (empty($s['c'])) {
-            $cntOrm = clone $this; // clone ORM to count              
+            $cntOrm = clone $this; // clone ORM to count
             // Change the way we calculate count if grouping is detected in query
             if ( count($cntOrm->_group_by) ) {
                 $cntQuery = $this->as_sql(false);
                 $cntFilters = $this->_build_values();
                 $s[ 'c' ] = BORM::i()->raw_query( "SELECT COUNT(*) AS count FROM ($cntQuery) AS cntCount", $cntFilters )->find_one()->count;
                 unset( $cntQuery, $cntFilters ); // free mem
-            } else {         
+            } else {
                 $s[ 'c' ] = $cntOrm->count(); // total row count
-            }        
+            }
             unset( $cntOrm ); // free mem
         }
 
@@ -1689,7 +1690,7 @@ class BORM extends ORMWrapper
         if (count($this->_where_conditions) === 0) {
             return [];
         }
-        
+
         $values = [];
         foreach ($this->_where_conditions as $condition) {
                 $values[] = $condition[static::WHERE_VALUES][0];
@@ -1901,6 +1902,27 @@ class BModel extends Model
      * @var string
      */
     protected static $_collectionClass = 'BCollection';
+
+    /**
+     * Lazy DI configuration
+     *
+     * [
+     *    '_env' => 'BEnv',
+     * ]
+     *
+     * @var array
+     */
+    protected static $_diConfig = [
+        #'_env' => 'BEnv',
+        #'*' => 'ALL',
+    ];
+
+    /**
+     * Local DI instances
+     *
+     * @var array
+     */
+    protected $_diLocal = [];
 
     /**
     * Retrieve original class name
@@ -2139,6 +2161,10 @@ class BModel extends Model
     */
     public static function load($id, $field = null, $cache = false)
     {
+        if (true !== $field && is_array($id)) {
+            throw new BException('Invalid ID parameter');
+        }
+
         $class = static::$_origClass ? static::$_origClass : get_called_class();
         if (null === $field) {
             $field = static::_get_id_column_name($class);
@@ -2184,6 +2210,14 @@ class BModel extends Model
     }
 
     /**
+     * Temporary implementation using load()
+     */
+    public static function loadWhere($where)
+    {
+        return static::load($where, true);
+    }
+
+    /**
      * Load a model or create an empty one if doesn't exist
      *
      * @param int|string|array $id
@@ -2191,11 +2225,11 @@ class BModel extends Model
      * @param boolean $cache
      * @return BModel
      */
-    public static function loadOrCreate($id, $field = null, $cache = false)
+    public static function loadOrCreate($where, $field = null, $cache = false)
     {
-        $model = static::load($id, $field, $cache);
+        $model = static::loadWhere($where, $field, $cache);
         if (!$model) {
-            $model = static::create(is_array($id) ? $id : []);
+            $model = static::create($where);
         }
         return $model;
     }
@@ -2868,6 +2902,36 @@ class BModel extends Model
     {
         return BClassRegistry::callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
     }
+
+    public function __get($property)
+    {
+        static $BClass;
+
+        if (isset($this->_diLocal[$property])) {
+            return $this->_diLocal[$property];
+        }
+        if (!$BClass) {
+            $BClass = BClass::i();
+        }
+        $di = $BClass->getGlobalDependencyInstance($property, static::$_diConfig);
+        if ($di) {
+            #$this->_diLocal[$property] = $di;
+            return $di;
+        }
+
+        if (!is_object($this->orm)) {
+            BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);
+        }
+        return $this->orm->get($property);
+    }
+
+    public function setDependencyInstances(array $instances)
+    {
+        foreach ($instances as $name => $instance) {
+            $this->_diLocal[$name] = $instance;
+        }
+        return $this;
+    }
 }
 
 /**
@@ -2930,153 +2994,6 @@ class BCollection extends ArrayIterator
     public function modelsAsArray()
     {
         return BDb::many_as_array($this);
-    }
-}
-
-/**
- * Basic user authentication and authorization class
- * @property mixed password_hash
- * @property mixed create_at
- * @property mixed update_at
- * @property mixed password
- * @property mixed locale
- * @property mixed timezone
- * @property mixed id
- */
-class BModelUser extends BModel
-{
-    protected static $_sessionUser;
-    protected static $_sessionUserNamespace = 'user';
-
-    public static function sessionUserId()
-    {
-        $userId = BSession::i()->get(static::$_sessionUserNamespace . '_id');
-        return $userId ? $userId : false;
-    }
-
-    public static function sessionUser($reset = false)
-    {
-        if (!static::isLoggedIn()) {
-            return false;
-        }
-        BSession::i();
-        if ($reset || !static::$_sessionUser) {
-            static::$_sessionUser = static::load(static::sessionUserId());
-        }
-        return static::$_sessionUser;
-    }
-
-    public static function isLoggedIn()
-    {
-        return static::sessionUserId() ? true : false;
-    }
-
-    public function setPassword($password)
-    {
-        $this->password_hash = BUtil::fullSaltedHash($password);
-        return $this;
-    }
-
-    public function validatePassword($password)
-    {
-        return BUtil::validateSaltedHash($password, $this->password_hash);
-    }
-
-    public function onBeforeSave()
-    {
-        if (!parent::onBeforeSave()) return false;
-        if (!$this->create_at) $this->create_at = BDb::now();
-        $this->update_at = BDb::now();
-        if ($this->password) {
-            $this->password_hash = BUtil::fullSaltedHash($this->password);
-        }
-        return true;
-    }
-
-    static public function authenticate($username, $password)
-    {
-        /** @var FCom_Admin_Model_User */
-        $user = static::orm()->where(['OR' => ['username' => $username, 'email' => $username]])->find_one();
-        if (!$user || !$user->validatePassword($password)) {
-            return false;
-        }
-        return $user;
-    }
-
-    public function login()
-    {
-        $this->set('last_login', BDb::now())->save();
-
-        BSession::i()->set([
-            static::$_sessionUserNamespace . '_id' => $this->id,
-            static::$_sessionUserNamespace => serialize($this->as_array()),
-        ]);
-        static::$_sessionUser = $this;
-
-        if ($this->locale) {
-            setlocale(LC_ALL, $this->locale);
-        }
-        if ($this->timezone) {
-            date_default_timezone_set($this->timezone);
-        }
-        BEvents::i()->fire(__METHOD__ . ':after', ['user' => $this]);
-        return $this;
-    }
-
-    public function authorize($role, $args = null)
-    {
-        if (null === $args) {
-            // check authorization
-            return true;
-        }
-        // set authorization
-        return $this;
-    }
-
-    public static function logout()
-    {
-        BSession::i()->set(static::$_sessionUserNamespace . '_id', false);
-        BEvents::i()->fire(__METHOD__ . ':after', ['user' => static::$_sessionUser]);
-        static::$_sessionUser = null;
-    }
-
-    public function recoverPassword($emailView = 'email/user-password-recover')
-    {
-        $this->set(['password_nonce' => BUtil::randomString(20)])->save();
-        if (($view = BLayout::i()->view($emailView))) {
-            $view->set('user', $this)->email();
-        }
-        return $this;
-    }
-
-    public function resetPassword($password, $emailView = 'email/user-password-reset')
-    {
-        $this->set(['password_nonce' => null])->setPassword($password)->save()->login();
-        if (($view = BLayout::i()->view($emailView))) {
-            $view->set('user', $this)->email();
-        }
-        return $this;
-    }
-
-    public static function signup($r)
-    {
-        $r = (array)$r;
-        if (empty($r['email'])
-            || empty($r['password']) || empty($r['password_confirm'])
-            || $r['password'] != $r['password_confirm']
-        ) {
-            throw new Exception('Incomplete or invalid form data.');
-        }
-
-        $r = BUtil::arrayMask($r, 'email,password');
-        $user = static::create($r)->save();
-        if (($view = BLayout::i()->view('email/user-new-user'))) {
-            $view->set('user', $user)->email();
-        }
-        if (($view = BLayout::i()->view('email/admin-new-user'))) {
-            $view->set('user', $user)->email();
-        }
-        return $user;
     }
 }
 

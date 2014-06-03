@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
 * Copyright 2014 Boris Gurvich
 *
@@ -262,7 +263,7 @@ class BLayout extends BClass
     {
         $t = BDebug::debug(__METHOD__);
         if (null === $area) {
-            $area = BApp::i()->get('area');
+            $area = BRequest::i()->area();
         }
         $cacheKey = 'ALL_VIEWS-' . $area;
         $cacheConfig = BConfig::i()->get('core/cache/view_files');
@@ -691,7 +692,7 @@ class BLayout extends BClass
     public function loadLayoutFilesFromAllModules()
     {
         $t = BDebug::debug(__METHOD__);
-        $cacheKey = 'LAYOUTS-' . BApp::i()->get('area'); //TODO: more flexible key
+        $cacheKey = 'LAYOUTS-' . BRequest::i()->area(); //TODO: more flexible key
         $cacheConfig = BConfig::i()->get('core/cache/layout_files');
         $useCache = !$cacheConfig && BDebug::is('STAGING,PRODUCTION') || $cacheConfig === 'enable';
         if ($useCache) {
@@ -1024,7 +1025,7 @@ class BLayout extends BClass
 
         $theme = $this->_themes[$themeName];
 
-        $area = BApp::i()->get('area');
+        $area = BRequest::i()->area();
         if (!empty($theme['area']) && !in_array($area, (array)$theme['area'])) {
             BDebug::debug('Theme ' . $themeName . ' can not be used in ' . $area);
             return false;
@@ -1211,8 +1212,8 @@ class BView extends BClass
     static public function factory($viewName, array $params = [])
     {
         $params['view_name'] = $viewName;
-        $className           = !empty($params['view_class']) ? $params['view_class'] : get_called_class();
-        $view                = BClassRegistry::instance($className, $params);
+        $className = !empty($params['view_class']) ? $params['view_class'] : get_called_class();
+        $view = BClassRegistry::instance($className, [$params]);
 
         return $view;
     }
@@ -1223,7 +1224,7 @@ class BView extends BClass
      * @param array $params
      * @return BView
      */
-    public function __construct(array $params)
+    public function __construct(array $params = [])
     {
         $this->_params = $params;
     }
@@ -1315,6 +1316,14 @@ class BView extends BClass
      */
     public function __get($name)
     {
+        if (isset($this->_diLocal[$name])) {
+            return $this->_diLocal[$name];
+        }
+        $di = $this->getGlobalDependencyInstance($name, static::$_diConfig);
+        if ($di) {
+            #$this->_diLocal[$name] = $di;
+            return $di;
+        }
         return $this->get($name);
     }
 

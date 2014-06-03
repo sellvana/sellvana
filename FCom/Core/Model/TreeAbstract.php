@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 {
@@ -38,7 +38,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         $sep = static::$_separator;
 
         if (is_string($name)) {
-            $name = preg_split('#\s*' . preg_quote($sep) . '\s*#', $name, 0, PREG_SPLIT_NO_EMPTY);
+            $name = preg_split('#\s*' . preg_quote($sep, '#') . '\s*#', $name, 0, PREG_SPLIT_NO_EMPTY);
         }
 
         $childName = ($this->get('full_name') ? $this->get('full_name') . $sep : '') . $name[0];
@@ -415,7 +415,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         if ($create) {
             $sep = static::$_separator;
             if (is_string($newName)) {
-                $newName = preg_split('#\s*' . preg_quote($sep) . '\s*#', $newName, 0, PREG_SPLIT_NO_EMPTY);
+                $newName = preg_split('#\s*' . preg_quote($sep, '#') . '\s*#', $newName, 0, PREG_SPLIT_NO_EMPTY);
             }
             $childName = ($this->get('full_name') ? $this->get('full_name') . $sep : '') . $newName[0];
         }
@@ -467,9 +467,10 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 //            $numberSuffix++;
 //        }
         $tmpName = $this->get('node_name') . '-';
-        $sql = 'SELECT node_name FROM ' . static::$_table . ' WHERE node_name REGEXP "' . $tmpName . '[0-9]$" '
-            . 'AND parent_id =' . $data['parent_id'] . ' ORDER BY id DESC';
-        $result = static::i()->orm()->raw_query($sql)->find_many();
+        $result = static::i()->orm()->select('node_name')->where([
+            ['node_name REGEXP ?', preg_quote($tmpName) . '[0-9]$'],
+            ['parent_id=?', $data['parent_id']]
+        ])->order_by_desc('id')->find_many();
         $numberSuffix = 1;
         if ($result) {
             $max = 0;

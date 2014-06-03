@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 {
@@ -26,6 +26,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     protected static $_validationRules = [
         ['username', '@required'],
+        ['username', '/^[A-Za-z0-9._@-]{1,255}$/', 'Username allowed characters are letters, numbers, dot, underscore, hyphen and @'],
         ['email', '@required'],
         ['email', '@email'],
         ['password', 'FCom_Admin_Model_User::validatePasswordSecurity'],
@@ -50,7 +51,14 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     public function setPassword($password)
     {
-        $this->password_hash = BUtil::fullSaltedHash($password);
+        $token = BUtil::randomString(16);
+        $this->set([
+            'password_hash' => BUtil::fullSaltedHash($password),
+            'password_session_token' => $token,
+        ]);
+        if ($this->id() === static::sessionUserId()) {
+            BSession::i()->set('admin_user_password_token', $token);
+        }
         return $this;
     }
 
@@ -59,7 +67,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if (!parent::onBeforeSave()) return false;
 
         if ($this->get('password')) {
-            $this->set('password_hash', BUtil::fullSaltedHash($this->get('password')));
+            $this->setPassword($this->get('password'));
         }
         if ($this->get('api_password')) {
             $this->set('api_password_hash', BUtil::fullSaltedHash($this->get('api_password')));
@@ -78,7 +86,6 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         parent::onAfterSave();
 
         if ($this->id() === static::sessionUserId()) {
-            BSession::i()->set('admin_user', serialize($this));
             static::$_sessionUser = $this;
         }
     }
@@ -125,28 +132,40 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $options;
     }
 
+    static public function sessionUserId()
+    {
+        return BSession::i()->get('admin_user_id');
+    }
+
     static public function sessionUser($reset = false)
     {
         if ($reset || !static::$_sessionUser) {
-            $data = BSession::i()->get('admin_user');
-            if (is_string($data)) {
-                static::$_sessionUser = $data ? unserialize($data) : false;
-            } else {
+            $sessData =& BSession::i()->dataToUpdate();
+            if (empty($sessData['admin_user_id'])) {
                 return false;
+            }
+            $userId = $sessData['admin_user_id'];
+            $user = static::$_sessionUser = static::load($userId);
+            $token = $user->get('password_session_token');
+            if (!$token) {
+                $token = BUtil::randomString(16);
+                $user->set('password_session_token', $token)->save();
+            }
+            if (empty($sessData['admin_user_password_token'])) {
+                $sessData['admin_user_password_token'] = $token;
+            } elseif ($sessData['admin_user_password_token'] !== $token) {
+                $user->logout();
+                BResponse::i()->cookie('remember_me', 0);
+                BResponse::i()->redirect('');
+                return;
             }
         }
         return static::$_sessionUser;
     }
 
-    static public function sessionUserId()
-    {
-        $user = static::sessionUser();
-        return !empty($user) ? $user->id() : false;
-    }
-
     static public function isLoggedIn()
     {
-        return static::sessionUser() ? true : false;
+        return static::sessionUserId() ? true : false;
     }
 
     static public function authenticate($username, $password)
@@ -172,7 +191,9 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if (empty($username) || empty($password)) {
             return false;
         }
-        BLoginThrottle::i()->init('FCom_Admin', $username);
+        if (!BLoginThrottle::i()->init('FCom_ApiServer', $username)) {
+            return false;
+        }
         /** @var FCom_Admin_Model_User */
         $user = static::i()->orm()->where('api_username', $username)->find_one();
         if (!$user || !$user->validatePassword($password, 'api_password_hash')) {
@@ -185,9 +206,11 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     public function login()
     {
+        //session_regenerate_id(true);
+
         $this->set('last_login', BDb::now())->save();
 
-        BSession::i()->set('admin_user', serialize($this));
+        BSession::i()->set('admin_user_id', $this->id());
         static::$_sessionUser = $this;
 
         if ($this->get('locale')) {
@@ -203,8 +226,14 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     static public function logout()
     {
-        BEvents::i()->fire(__METHOD__);
-        BSession::i()->set('admin_user', null);
+        BEvents::i()->fire(__METHOD__, ['user' => static::sessionUser()]);
+        #BSession::i()->set('admin_user_id', null);
+        #BSession::i()->set('admin_user_password_token', null);
+        $sessData =& BSession::i()->dataToUpdate();
+        $sessData = [];
+
+        BSession::i()->regenerateId();
+
         static::$_sessionUser = null;
     }
 
@@ -215,9 +244,29 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function validateResetToken($token)
+    {
+        if (!$token) {
+            return false;
+        }
+        $user = $this->load($token, 'token');
+        if (!$user || $user->get('token') !== $token) {
+            return false;
+        }
+        $tokenTtl = BConfig::i()->get('modules/FCom_Admin/password_reset_token_ttl_hr');
+        if (!$tokenTtl) {
+            $tokenTtl = 24;
+        }
+        if (strtotime($user->get('token_at')) < time() - $tokenTtl * 3600) {
+            $user->set(['token' => null, 'token_at' => null])->save();
+            return false;
+        }
+        return $user;
+    }
+
     public function resetPassword($password)
     {
-        $this->set(['token' => null, 'token_at' => null])->setPassword($password)->save()->login();
+        $this->set(['token' => null, 'token_at' => null])->setPassword($password)->save();
         BLayout::i()->view('email/admin/user-password-reset')->set('user', $this)->email();
         return $this;
     }

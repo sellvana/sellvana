@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Controller_Abstract
 {
@@ -140,6 +140,11 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function action_grid_data()
     {
+        if (!BRequest::i()->xhr()) {
+            BResponse::i()->status('403', 'Available only for XHR', 'Available only for XHR');
+            return;
+        }
+
         $view = $this->gridView();
         $grid = $view->get('grid');
 
@@ -242,7 +247,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $actions['back'] = '<button type="button" class="btn btn-link" onclick="location.href=\''
             . BApp::href($this->_gridHref) . '\'"><span>' .  BLocale::_('Back to list') . '</span></button>';
         if ($m->id) {
-            $actions['delete'] = '<button type="submit" class="btn btn-warning" name="do" value="DELETE" '
+            $actions['delete'] = '<button type="submit" class="btn btn-warning ignore-validate" name="do" value="DELETE" '
                 . 'onclick="return confirm(\'Are you sure?\')"><span>' .  BLocale::_('Delete') . '</span></button>';
         }
         $actions['save'] = '<button type="submit" class="btn btn-primary" onclick="return adminForm.saveAll(this)"><span>'

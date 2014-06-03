@@ -1,14 +1,14 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Customer_Migrate extends BClass
 {
-    public function install__0_1_8()
+    public function install__0_1_11()
     {
         $tCustomer = FCom_Customer_Model_Customer::table();
         BDb::run("
             CREATE TABLE IF NOT EXISTS {$tCustomer} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `email` varchar(100)  NOT NULL,
+            `email` varchar(255)  NOT NULL,
             `firstname` varchar(50)  NOT NULL,
             `lastname` varchar(50)  NOT NULL,
             `password_hash` text ,
@@ -18,9 +18,11 @@ class FCom_Customer_Migrate extends BClass
             `update_at` datetime NOT NULL,
             `last_login` datetime DEFAULT NULL,
             `token` varchar(20) DEFAULT NULL,
+            `token_at` datetime default null,
             `payment_method` varchar(20)  DEFAULT NULL,
             `payment_details` text ,
             `status` enum('review','active','disabled') NOT NULL DEFAULT 'review',
+            `password_session_token` varchar(16),
             PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
@@ -31,7 +33,7 @@ class FCom_Customer_Migrate extends BClass
             CREATE TABLE IF NOT EXISTS {$tAddress} (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
               `customer_id` int(11) unsigned NOT NULL,
-              `email` varchar(100)  NOT NULL,
+              `email` varchar(255)  NOT NULL,
               `firstname` varchar(50)  DEFAULT NULL,
               `lastname` varchar(50)  DEFAULT NULL,
               `middle_initial` varchar(2)  DEFAULT NULL,
@@ -162,6 +164,42 @@ class FCom_Customer_Migrate extends BClass
             'COLUMNS' => [
                 'payment_method' => 'varchar(20) null',
                 'payment_details' => 'text null',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_1_8__0_1_9()
+    {
+        $table = FCom_Customer_Model_Customer::table();
+        BDb::ddlTableDef($table, [
+            'COLUMNS' => [
+                'email' => 'varchar(255)',
+            ],
+        ]);
+        $table = FCom_Customer_Model_Address::table();
+        BDb::ddlTableDef($table, [
+            'COLUMNS' => [
+                'email' => 'varchar(255)',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_1_9__0_1_10()
+    {
+        $table = FCom_Customer_Model_Customer::table();
+        BDb::ddlTableDef($table, [
+            'COLUMNS' => [
+                'password_session_token' => 'varchar(16)',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_1_10__0_1_11()
+    {
+        $table = FCom_Customer_Model_Customer::table();
+        BDb::ddlTableDef($table, [
+            'COLUMNS' => [
+                'token_at' => 'datetime default null after token',
             ],
         ]);
     }

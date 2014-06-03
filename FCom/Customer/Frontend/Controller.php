@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
@@ -18,6 +18,9 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $this->layout('/customer/login');
 
         $redirect = BRequest::i()->get('redirect_to');
+        if (!BRequest::i()->isUrlLocal($redirect)) {
+            $redirect = '';
+        }
         if ($redirect === 'CURRENT') {
             $redirect = BRequest::i()->referrer();
         }
@@ -38,6 +41,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $customerModel->setLoginRules();
             if ($customerModel->validate($login, [], 'frontend')) {
                 $user = $customerModel->authenticate($login['email'], $login['password']);
+
                 if ($user) {
                     switch ($user->status) {
                         case 'active':
@@ -58,6 +62,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                             break;
                     }
                     if ($allowLogin) {
+                        BSession::i()->regenerateId();
                         $user->login();
                         if (!empty($login['remember_me'])) {
                             $days = BConfig::i()->get('cookie/remember_days');
@@ -74,8 +79,11 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             } else {
                 $this->formMessages();
             }
-            if ($r->request('redirect_to')) {
-                $url = $r->request('redirect_to');
+            $url = $r->request('redirect_to');
+            if (!$r->isUrlLocal($url)) {
+                $url = '';
+            }
+            if ($url) {
                 if ($url === 'CURRENT') {
                     $url = $r->referrer();
                 }
@@ -122,6 +130,13 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     public function action_password_reset()
     {
         $token = BRequest::i()->request('token');
+        if ($token) {
+            $sessData =& BSession::i()->dataToUpdate();
+            $sessData['password_reset_token'] = $token;
+            BResponse::i()->redirect('customer/password/reset');
+            return;
+        }
+        $token = BSession::i()->get('password_reset_token');
         if ($token && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token')) && $user->token === $token) {
             $this->layout('/customer/password/reset');
         } else {
@@ -132,25 +147,46 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_password_reset__POST()
     {
+        if (FCom_Customer_Model_Customer::i()->isLoggedIn()) {
+            BResponse::i()->redirect('');
+            return;
+        }
         $r = BRequest::i();
-        $token = $r->request('token');
+        $token = BSession::i()->get('password_reset_token');
         $password = $r->post('password');
         $confirm = $r->post('password_confirm');
-        if ($token && $password && $password === $confirm
-            && ($user = FCom_Customer_Model_Customer::i()->load($token, 'token'))
-            && $user->get('token') === $token
-        ) {
-            $user->resetPassword($password);
-            $this->message('Password has been reset');
-            BResponse::i()->redirect(BApp::baseUrl());
-        } else {
-            $this->message('Invalid form data', 'error');
-            BResponse::i()->redirect('login');
+        $returnUrl = 'login';
+        if (!($password && $confirm && $password === $confirm)) {
+            $this->message('Invalid password or confirmation', 'error');
+            BResponse::i()->redirect($returnUrl);
+            return;
         }
+
+        $user = FCom_Customer_Model_Customer::i()->validateResetToken($token);
+        if (!$user) {
+            $this->message('Invalid token', 'error');
+            BResponse::i()->redirect($returnUrl);
+            return;
+        }
+        $sessData =& BSession::i()->dataToUpdate();
+        $sessData['password_reset_token'] = null;
+
+        $user->resetPassword($password);
+        BSession::i()->regenerateId();
+
+        $this->message('Password has been reset.');
+        if ($user->status === 'review') {
+            $this->message('You will be able to login after your account is approved', 'warning');
+        }
+        BResponse::i()->redirect($returnUrl);
     }
 
     public function action_logout()
     {
+        if (BRequest::i()->csrf('referrer', 'GET')) {
+            BResponse::i()->redirect('');
+            return;
+        }
         FCom_Customer_Model_Customer::i()->logout();
         BResponse::i()->cookie('remember_me', 0);
         BResponse::i()->redirect(BApp::baseUrl());

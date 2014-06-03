@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_LibTwig_Main extends BClass
 {
@@ -24,7 +24,7 @@ class FCom_LibTwig_Main extends BClass
 
     public static function init($path = null)
     {
-        BClassAutoload::i(true, ['root_dir' => __DIR__ . '/lib']);
+        BClassAutoload::i(true, [__DIR__ . '/lib']);
         /*
         require_once __DIR__.'/lib/Twig/Autoloader.php';
         Twig_Autoloader::register();

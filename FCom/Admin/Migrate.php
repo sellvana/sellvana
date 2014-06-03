@@ -1,8 +1,8 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Admin_Migrate extends BClass
 {
-    public function install__0_1_7()
+    public function install__0_1_8()
     {
         $tRole = FCom_Admin_Model_Role::table();
         BDb::run("
@@ -39,6 +39,7 @@ class FCom_Admin_Migrate extends BClass
             `api_username`  varchar(100) DEFAULT '' NOT NULL,
             `api_password`  varchar(100) DEFAULT '' NOT NULL,
             `api_password_hash` varchar(255)  NULL,
+            `password_session_token` varchar(16),
             `data_serialized` text  NULL,
             PRIMARY KEY (`id`),
             UNIQUE KEY `UNQ_email` (`email`),
@@ -264,6 +265,16 @@ class FCom_Admin_Migrate extends BClass
             'PRIMARY' => '(id)',
             'KEYS' => [
                 'IDX_data_type_args_day' => '(data_type, data_args, data_day)',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_1_7__0_1_8()
+    {
+        $tUser = FCom_Admin_Model_User::table();
+        BDb::ddlTableDef($tUser, [
+            'COLUMNS' => [
+                'password_session_token' => 'varchar(16)',
             ],
         ]);
     }

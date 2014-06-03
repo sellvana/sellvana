@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
 * Copyright 2014 Boris Gurvich
 *
@@ -568,7 +569,7 @@ class BUtil extends BClass
             $key = $w1[3];
             $op = $w1[2];
             foreach ($array as $k => $v) {
-                if ($op === '==' && $key === $k || $op === '~=' && preg_match('#' . preg_quote($key) . '#', $k)) {
+                if ($op === '==' && $key === $k || $op === '~=' && preg_match('#' . preg_quote($key, '#') . '#', $k)) {
                     if ($rel === 'after') {
                         $result[$k] = $v;
                     }
@@ -984,7 +985,7 @@ class BUtil extends BClass
                 ];
             }
             if (false) { // TODO: figure out cookies handling
-                $cookieDir = BConfig::i()->get('fs/storage_dir') . '/cache';
+                $cookieDir = BApp::i()->storageRandomDir() . '/cache';
                 BUtil::ensureDir($cookieDir);
                 $cookie = tempnam($cookieDir, 'CURLCOOKIE');
                 $curlOpt += [
@@ -1369,14 +1370,28 @@ class BUtil extends BClass
 
     public static function extCallback($callback)
     {
+        static $callbackMapCache = [];
+
         if (is_string($callback)) {
-            if (strpos($callback, '.') !== false) {
-                list($class, $method) = explode('.', $callback);
-            } elseif (strpos($callback, '->')) {
-                list($class, $method) = explode('->', $callback);
-            }
-            if (!empty($class)) {
-                $callback = [$class::i(), $method];
+            if (isset($callbackMapCache[$callback])) {
+                $callback = $callbackMapCache[$callback];
+            } else {
+                $origCallback = $callback;
+                if (strpos($callback, '::') !== false) {
+                    list($class, $method) = explode('::', $callback);
+                    $reflMethod = new ReflectionMethod($class, $method);
+                    if ($reflMethod->isStatic()) {
+                        $class = null; // proceed with usual callback
+                    }
+                } elseif (strpos($callback, '.') !== false) {
+                    list($class, $method) = explode('.', $callback);
+                } elseif (strpos($callback, '->')) {
+                    list($class, $method) = explode('->', $callback);
+                }
+                if (!empty($class)) {
+                    $callback = [$class::i(), $method];
+                }
+                $callbackMapCache[$origCallback] = $callback;
             }
         }
         return $callback;
@@ -2453,7 +2468,6 @@ class BDebug extends BClass
         }
 
         $message = "{$e['level']}: {$e['msg']}" . (isset($e['file']) ? " ({$e['file']}:{$e['line']})" : '');
-
         if (($moduleName = BModuleRegistry::i()->currentModuleName())) {
             $e['module'] = $moduleName;
         }
@@ -2501,10 +2515,12 @@ class BDebug extends BClass
         $l = static::$_level[static::OUTPUT];
         if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
             echo '<xmp style="text-align:left; border:solid 1px red; font-family:monospace;">';
-            //ob_start();
-            echo $message . "\n";
+            ob_start();
+            echo htmlspecialchars($message) . "\n";
             debug_print_backtrace();
-            //echo ob_get_clean();
+            $output = ob_get_clean();
+            $output = str_replace(['\\', FULLERON_ROOT_DIR . '/'], ['/', ''], $output);
+            echo $output;
             echo '</xmp>';
         }
 /*
@@ -2604,7 +2620,7 @@ class BDebug extends BClass
 <div id="buckyball-debug-console" style="display:none"><?php
         echo "DELTA: " . BDebug::i()->delta() . ', PEAK: ' . memory_get_peak_usage(true) . ', EXIT: ' . memory_get_usage(true);
         echo "<pre>";
-        print_r(BORM::get_query_log());
+        print_r(array_map('htmlspecialchars', BORM::get_query_log()));
         //BEvents::i()->debug();
         echo "</pre>";
         //print_r(static::$_events);
@@ -3204,7 +3220,7 @@ class BFtpClient extends BClass
 * Throttle invalid login attempts and potentially notify user and admin
 *
 * Usage:
-* - BEFORE AUTH: BLoginThrottle::i()->init('FCom_Customer_Model_Customer', $username);
+* - BEFORE AUTH: if (!BLoginThrottle::i()->init('FCom_Customer_Model_Customer', $username)) return false;
 * - ON FAILURE:  BLoginThrottle::i()->failure();
 * - ON SUCCESS:  BloginThrottle::i()->success();
 */
@@ -3458,7 +3474,7 @@ class BValidate extends BClass
             'message' => 'Invalid URL',
         ],
         'email'     => [
-            'rule'    => '/^([\w-\.\+]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/',
+            'rule'    => 'BValidate::ruleEmail',
             'message' => 'Invalid Email',
         ],
         'string'    => [
@@ -3678,6 +3694,19 @@ class BValidate extends BClass
         }
         return true;
     }
+
+    static public function ruleEmail($data, $args)
+    {
+        if (!isset($data[$args['field']])) {
+            return true;
+        }
+        $value = $data[$args['field']];
+        $re = '/^([\w-\.\+]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/';
+        if (strlen($value) > 255 || !preg_match($re, $value)) {
+            return false;
+        }
+        return true;
+    }
 }
 
 /**
@@ -3759,6 +3788,35 @@ class BValidateViewHelper extends BClass
         }
 
         return $html;
+    }
+}
+
+class BEnv extends BClass
+{
+    public $app;
+    public $autoload;
+    public $config;
+    public $debug;
+    public $layout;
+    public $modReg;
+    public $request;
+    public $response;
+    public $session;
+    public $util;
+
+    public function __construct(BApp $app, BClassAutoload $autoload, BConfig $config, BDebug $debug, BLayout $layout,
+        BModuleRegistry $modReg, BRequest $request, BResponse $response, BSession $session, BUtil $util)
+    {
+        $this->app = $app;
+        $this->autoload = $autoload;
+        $this->config = $config;
+        $this->debug = $debug;
+        $this->layout = $layout;
+        $this->modReg = $modReg;
+        $this->request = $request;
+        $this->response = $response;
+        $this->session = $session;
+        $this->util = $util;
     }
 }
 

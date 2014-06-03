@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
 * Copyright 2014 Boris Gurvich
 *
@@ -45,6 +46,34 @@ class BClass
     static protected $_origClass;
 
     /**
+     * Lazy DI configuration
+     *
+     * [
+     *    '_env' => 'BEnv',
+     * ]
+     *
+     * @var array
+     */
+    static protected $_diConfig = [
+        '_env' => 'BEnv',
+        '*' => 'ALL',
+    ];
+
+    /**
+     * Lazy DI Global Instances
+     *
+     * @var array
+     */
+    static protected $_diGlobal = [];
+
+    /**
+     * Lazy DI Local Instances
+     *
+     * @var array
+     */
+    protected $_diLocal = [];
+
+    /**
     * Retrieve original class name
     *
     * @return string
@@ -83,7 +112,51 @@ class BClass
         return BClassRegistry::callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
     }
 
+    public function __get($name)
+    {
+        if (isset($this->_diLocal[$name])) {
+            return $this->_diLocal[$name];
+        }
+        $di = $this->getGlobalDependencyInstance($name, static::$_diConfig);
+        if ($di) {
+            #$this->_diLocal[$name] = $di;
+            return $di;
+        }
+        BDebug::notice('Invalid property name: ' . $name);
+        return null;
+    }
 
+    public function setDependencyInstances(array $instances)
+    {
+        foreach ($instances as $name => $instance) {
+            $this->_diLocal[$name] = $instance;
+        }
+        return $this;
+    }
+
+    public function getGlobalDependencyInstance($name, $diConfig)
+    {
+        if (isset(static::$_diGlobal[$name])) {
+            return static::$_diGlobal[$name];
+        }
+        if (empty($diConfig[$name])) {
+            $class = $name;
+            if (isset($diConfig['*']) && class_exists($class)) {
+                static::$_diGlobal[$class] = BClassRegistry::instance($class, [], true);
+            } else {
+                static::$_diGlobal[$class] = false;
+            }
+        } else {
+            if (is_array($diConfig[$name])) {
+                $class = $diConfig[$name][0];
+                //TODO: do we need to validate preconfigured class for interface?
+            } else {
+                $class = $diConfig[$name];
+            }
+            static::$_diGlobal[$class] = BClassRegistry::instance($class, [], true);
+        }
+        return static::$_diGlobal[$class];
+    }
 }
 
 /**
@@ -292,7 +365,7 @@ class BApp extends BClass
                     break;
             }
 
-            if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name') && BApp::i()->get('area') !== 'FCom_Admin')) {
+            if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name') && BRequest::i()->area() !== 'FCom_Admin')) {
                 $url = rtrim($url, "\\"); //for windows installation
                 $url = rtrim($url, '/') . '/' . $scriptPath['basename'];
             }
@@ -430,6 +503,12 @@ class BApp extends BClass
     public function instance($class, $new = false, $args = [])
     {
         return $class::i($new, $args);
+    }
+
+    public function storageRandomDir()
+    {
+        $c = BConfig::i();
+        return $c->get('fs/storage_dir') . '/' . $c->get('core/storage_random_dir');
     }
 }
 
@@ -1209,7 +1288,9 @@ class BClassRegistry extends BClass
         if (!class_exists($className, true)) {
             BDebug::error(BLocale::_('Invalid class name: %s', $className));
         }
-        $instance = new $className($args);
+        $args = static::processDI($className, $args);
+        $reflClass = new ReflectionClass($className);
+        $instance = $reflClass->newInstanceArgs($args);
 
         // if any methods are overridden or augmented, get decorator
         if (!empty(static::$_decoratedClasses[$class])) {
@@ -1222,6 +1303,42 @@ class BClassRegistry extends BClass
         }
 
         return $instance;
+    }
+
+    static public function processDI($className, $args = [])
+    {
+        static $paramsCache = [], $diStack = [];
+
+        if (!isset($paramsCache[$className])) {
+            $class = new ReflectionClass($className);
+            $params = [];
+            $constructor = $class->getConstructor();
+            if ($constructor) {
+                $constructorParams = $constructor->getParameters();
+                if ($constructorParams) {
+                    foreach ($constructorParams as $i => $param) {
+                        $paramClass = $param->getClass();
+                        $params[$i] = $paramClass ? $paramClass->getName() : false;
+                    }
+                }
+            }
+            $paramsCache[$className] = $params;
+        } else {
+            $params = $paramsCache[$className];
+        }
+
+        foreach ($params as $i => $paramClassName) {
+            if (empty($args[$i]) && is_string($paramClassName)) {
+                if (!empty($diStack[$paramClassName])) {
+                    throw new BException('DI circular reference detected: ' . $className . ' -> ' . $paramClassName);
+                }
+                $diStack[$paramClassName] = 1;
+                $args[$i] = static::instance($paramClassName, [], true);
+                unset($diStack[$paramClassName]);
+            }
+        }
+
+        return $args;
     }
 
     static public function unsetInstance()
@@ -1388,16 +1505,19 @@ class BClassDecorator
 class BClassAutoload extends BClass
 {
     public $root_dir;
-    public $filename_cb;
     public $module_name;
+    public $filename_cb;
 
-    public function __construct($params)
+    public function __construct($root_dir = null, $module_name = null, $filename_cb = null)
     {
-        foreach ($params as $k => $v) {
-            $this->$k = $v;
+        if (null !== $root_dir) {
+            $this->root_dir = $root_dir;
+            $this->module_name = $module_name;
+            $this->filename_cb = $filename_cb;
+
+            spl_autoload_register([$this, 'callback'], false);
+            BDebug::debug('AUTOLOAD: ' . print_r($this, 1));
         }
-        spl_autoload_register([$this, 'callback'], false);
-        BDebug::debug('AUTOLOAD: ' . print_r($this, 1));
     }
 
     /**
@@ -1625,7 +1745,7 @@ class BEvents extends BClass
                 foreach (['.', '->'] as $sep) {
                     $r = explode($sep, $cb);
                     if (sizeof($r) == 2) {
-if (!class_exists($r[0])) {
+if (!class_exists($r[0]) && BDebug::is('DEBUG')) {
     echo "<pre>"; debug_print_backtrace(); echo "</pre>";
 }
                         $cb = [$r[0]::i(), $r[1]];
@@ -1729,9 +1849,37 @@ class BSession extends BClass
         return $handlers ? array_combine($handlers, $handlers) : [];
     }
 
+    public function getCookieDomain()
+    {
+        $confDomain = BConfig::i()->get('cookie/domain');
+        $httpHost = BRequest::i()->httpHost(false);
+        if (!empty($confDomain)) {
+            $allowedDomains = explode('|', $confDomain);
+            if (in_array($httpHost, $allowedDomains)) {
+                $domain = $httpHost;
+            } else {
+                $domain = $allowedDomains[0];
+            }
+        } else {
+            $domain = $httpHost;
+        }
+        return $domain;
+    }
+
+    public function getCookiePath()
+    {
+        $confPath = BConfig::i()->get('cookie/path');
+        $path = $confPath ? $confPath : BConfig::i()->get('web/base_store');
+        if (empty($path)) {
+            $path = BRequest::i()->webRoot();
+        }
+        return $path;
+    }
+
     /**
      * Open session
      *
+     * @todo work around multiple cookies in header bug: https://bugs.php.net/bug.php?id=38104
      * @param string|null $id Optional session ID
      * @param bool        $autoClose
      * @return $this
@@ -1753,20 +1901,8 @@ class BSession extends BClass
             $ttl = !empty($config['timeout']) ? $config['timeout'] : 3600;
         }
 
-        $path = !empty($config['path']) ? $config['path'] : BConfig::i()->get('web/base_store');
-        if (empty($path)) $path = BRequest::i()->webRoot();
-
-        $httpHost = BRequest::i()->httpHost(false);
-        if (!empty($config['domain'])) {
-            $allowedDomains = explode('|', $config['domain']);
-            if (in_array($httpHost, $allowedDomains)) {
-                $domain = $httpHost;
-            } else {
-                $domain = $allowedDomains[0];
-            }
-        } else {
-            $domain = $httpHost;
-        }
+        $domain = $this->getCookieDomain();
+        $path = $this->getCookiePath();
 
         if (!empty($config['session_handler']) && !empty($this->_availableHandlers[$config['session_handler']])) {
             $class = $this->_availableHandlers[$config['session_handler']];
@@ -1774,26 +1910,34 @@ class BSession extends BClass
         }
         //session_set_cookie_params($ttl, $path, $domain);
         session_name(!empty($config['name']) ? $config['name'] : $this->_defaultSessionCookieName);
-        if (($dir = BConfig::i()->get('fs/storage_dir'))) {
+        if (($dir = BApp::i()->storageRandomDir())) {
             $dir .= '/session';
             BUtil::ensureDir($dir);
             session_save_path($dir);
         }
         #ini_set('session.gc_maxlifetime', $rememberMeTtl); // moved to .haccess
-
-        if (!empty($id) || ($id = BRequest::i()->get('SID'))) {
+        if (!$id) {
+            $id = BRequest::i()->get('SID');
+            if (!$id && !empty($_COOKIE[session_name()])) {
+                $id = $_COOKIE[session_name()];
+            }
+        }
+        if (preg_match('#^[A-Za-z0-9]{26,60}$#', $id)) {
             session_id($id);
+        } else {
+            $this->regenerateId();
         }
         if (headers_sent()) {
             BDebug::warning("Headers already sent, can't start session");
         } else {
-            session_set_cookie_params($ttl, $path, $domain);
+            $https = BRequest::i()->https();
+            session_set_cookie_params($ttl, $path, $domain, $https, true);
             session_start();
             // update session cookie expiration to reflect current visit
             // @see http://www.php.net/manual/en/function.session-set-cookie-params.php#100657
-            setcookie(session_name(), session_id(), time() + $ttl, $path, $domain);
+            setcookie(session_name(), session_id(), time() + $ttl, $path, $domain, $https, true);
+            $this->_phpSessionOpen = true;
         }
-        $this->_phpSessionOpen = true;
         $this->_sessionId = session_id();
 
         if (!empty($config['session_check_ip'])) {
@@ -1801,6 +1945,7 @@ class BSession extends BClass
             if (empty($_SESSION['_ip'])) {
                 $_SESSION['_ip'] = $ip;
             } elseif ($_SESSION['_ip'] !== $ip) {
+                $_SESSION = [];
                 session_destroy();
                 session_start();
                 //BResponse::i()->status(403, "Remote IP doesn't match session", "Remote IP doesn't match session");
@@ -1939,16 +2084,62 @@ BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
             if (!$namespace) $namespace = 'default';
             $_SESSION[$namespace] = $this->data;
         }
+        // TODO: i think having problem with https://bugs.php.net/bug.php?id=38104
+
         BDebug::debug(__METHOD__, 1);
         session_write_close();
         $this->_phpSessionOpen = false;
+
+        if ($this->get('_regenerate_id')) {
+            #session_regenerate_id(true);
+            session_id(BUtil::randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
+            $this->set('_regenerate_id', 0);
+        }
+
+        /*
+echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
+        $sessionCookie = null;
+        $otherCookies = [];
+        foreach (headers_list() as $header) {
+            if (preg_match('/^set-cookie: (' . preg_quote(session_name()) . '=)?(.*)$/i', $header, $m)) {
+                if ($m[1]) { // not session cookie
+                    $sessionCookie = $m[0];
+                } else {
+                    $otherCookies[] = $m[0];
+                }
+            }
+        }
+        header($sessionCookie, true);
+        foreach ($otherCookies as $cookie) {
+            header($cookie, false);
+        }
+        */
         //$this->setDirty();
         return $this;
     }
 
     public function destroy()
     {
+        $path = $this->getCookiePath();
+        $domain = $this->getCookieDomain();
+        $https = BRequest::i()->https();
+        if (!isset($_SESSION) && !headers_sent()) {
+            session_set_cookie_params(0, $path, $domain, $https, true);
+            session_start();
+        }
         session_destroy();
+
+        setcookie(session_name(), '', time() - 3600, $this->getCookiePath(), $this->getCookieDomain(), $https, true);
+#echo "<pre>"; var_dump($_SESSION, $_COOKIE, session_name(), $this->getCookiePath(), $this->getCookieDomain()); exit;
+        return $this;
+    }
+
+    public function regenerateId()
+    {
+        session_regenerate_id(true);
+        //BSession::i()->set('_regenerate_id', 1);
+        //session_id(BUtil::randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
+        return $this;
     }
 
     /**

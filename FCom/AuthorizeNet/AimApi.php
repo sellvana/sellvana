@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_AuthorizeNet_AimApi extends BClass
 {
@@ -171,7 +171,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
             if ($data->get('debug') && !defined('AUTHORIZENET_LOG_FILE')) {
                 define('AUTHORIZENET_LOG_FILE', static::AUTHORIZENET_LOG_FILE);
             }
-            BClassAutoload::i(true, ['root_dir', __DIR__ . '/lib']);
+            BClassAutoload::i(true, [__DIR__ . '/lib']);
             $this->api = new AuthorizeNetAIM();
 /* API is missing currency code !!!!
             if($data->get('currency')){

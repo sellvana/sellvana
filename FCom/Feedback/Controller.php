@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Feedback_Controller extends FCom_Core_Controller_Abstract
 {
@@ -34,7 +34,7 @@ class FCom_Feedback_Controller extends FCom_Core_Controller_Abstract
             BResponse::i()->json($result);
         } else {
             $status = !empty($result['error']) ? 'error' : 'success';
-            $tag = BApp::i()->get('area') === 'FCom_Admin' ? 'admin' : 'frontend';
+            $tag = BRequest::i()->area() === 'FCom_Admin' ? 'admin' : 'frontend';
             BSession::i()->addMessage($result['msg'], $status, $tag);
             BResponse::i()->redirect($r->referrer());
         }

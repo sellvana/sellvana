@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
 {
@@ -14,6 +14,7 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
             if (!empty($r['username']) && !empty($r['password'])) {
                 $user = FCom_Admin_Model_User::i()->authenticate($r['username'], $r['password']);
                 if ($user) {
+                    BSession::i()->regenerateId();
                     $user->login();
                     if (!empty($r['remember_me'])) {
                         $days = BConfig::i()->get('cookie/remember_days');
@@ -72,6 +73,13 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
     public function action_password_reset()
     {
         $token = BRequest::i()->request('token');
+        if ($token) {
+            $sessData =& BSession::i()->dataToUpdate();
+            $sessData['password_reset_token'] = $token;
+            BResponse::i()->redirect('customer/password/reset');
+            return;
+        }
+        $token = BSession::i()->get('password_reset_token');
         if ($token && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))
             && ($user->get('token') === $token)
         ) {
@@ -84,30 +92,46 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
 
     public function action_password_reset__POST()
     {
+        if (FCom_Admin_Model_User::i()->isLoggedIn()) {
+            BResponse::i()->redirect('');
+            return;
+        }
         $r = BRequest::i();
-        $token = $r->request('token');
+        $token = BSession::i()->get('password_reset_token');
         $form = $r->post('model');
+
         $password = !empty($form['password']) ? $form['password'] : null;
         $confirm = !empty($form['password_confirm']) ? $form['password_confirm'] : null;
-        $returnUrl = BRequest::i()->referrer();
-        if (!($token && ($user = FCom_Admin_Model_User::i()->load($token, 'token'))
-            && $user->get('token') === $token)
-        ) {
-            $this->message('Invalid token', 'error');
-            BResponse::i()->redirect($returnUrl);
-            return;
-        } elseif (!($password && $confirm && ($password === $confirm))) {
+        if (!($password && $confirm && ($password === $confirm))) {
             $this->message('Invalid password or confirmation', 'error');
             BResponse::i()->redirect($returnUrl);
             return;
         }
+
+        $returnUrl = BRequest::i()->referrer();
+        $user = FCom_Admin_Model_User::i()->validateResetToken($token);
+        if (!$user) {
+            $this->message('Invalid token', 'error');
+            BResponse::i()->redirect($returnUrl);
+            return;
+        }
+        $sessData =& BSession::i()->dataToUpdate();
+        $sessData['password_reset_token'] = null;
+
         $user->resetPassword($password);
+        BSession::i()->regenerateId();
+
         $this->message('Password has been reset');
         BResponse::i()->redirect('');
     }
 
     public function action_logout()
     {
+        $reqCsrfToken = BRequest::i()->get('X-CSRF-TOKEN');
+        if (!BSession::i()->validateCsrfToken($reqCsrfToken)) {
+            BResponse::i()->redirect('');
+            return;
+        }
         FCom_Admin_Model_User::i()->logout();
         BResponse::i()->cookie('remember_me', 0);
         BResponse::i()->redirect('');
