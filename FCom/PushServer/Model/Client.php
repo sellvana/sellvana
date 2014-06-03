@@ -377,7 +377,13 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         $data = ['client_id' => $this->id(), 'channel_id' => $channel->id()];
         $subscriber = $hlp->loadWhere($data);
         if (!$subscriber) {
-            $subscriber = $hlp->create($data)->save();
+            try {
+                $subscriber = $hlp->create($data)->save();
+            } catch (Exception $e) {
+                $this->resave();
+                $channel->resave();
+                $subscriber = $hlp->create($data)->save();
+            }
         }
         return $this;
     }

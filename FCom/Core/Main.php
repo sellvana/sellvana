@@ -15,12 +15,14 @@ class FCom_Core_Main extends BClass
     public function __construct(BEnv $env)
     {
         $this->_env = $env;
+        $env->debug->mode('DEBUG');
     }
 
     public function init($area)
     {
         try {
             // initialize start time and register error/exception handlers
+
             $this->_env->debug->registerErrorHandlers();
 
             $this->initConfig($area);
@@ -237,9 +239,9 @@ class FCom_Core_Main extends BClass
 
     public function initDebug()
     {
-        #$this->_env->debug->mode('production');
-        #$this->_env->debug->mode('development');
-        #$this->_env->debug->mode('debug');
+        #$this->_env->debug->mode('PRODUCTION');
+        #$this->_env->debug->mode('DEVELOPMENT');
+        #$this->_env->debug->mode('DEBUG');
 
         $config = $this->_env->config;
         // Initialize debugging mode and levels

@@ -1375,6 +1375,15 @@ class BORM extends ORMWrapper
         return $this;
     }
 
+    public function set_dirty_fields($data, $isNew = null)
+    {
+        $this->_dirty_fields = $data;
+        if (null !== $isNew) {
+            $this->_is_new = $isNew;
+        }
+        return $this;
+    }
+
     /**
      * Save any fields which have been modified on this object
      * to the database.
@@ -1850,6 +1859,7 @@ class BModel extends Model
     * @var boolean|array
     */
     protected static $_cacheAuto = false;
+
 
     /**
     * Fields used in cache, that require values to be case insensitive or trimmed
@@ -2490,6 +2500,12 @@ class BModel extends Model
             $this->cacheStore();
         }
         return $this;
+    }
+
+    public function resave($asNew = false)
+    {
+        $this->orm->set_dirty_fields($this->as_array(), true);
+        $this->save(true);
     }
 
     /**
