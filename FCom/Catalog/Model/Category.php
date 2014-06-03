@@ -132,6 +132,11 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return array_values($categories);
     }
 
+    static public function getFeaturedCategories()
+    {
+        return static::orm()->where('is_featured', 1)->find_many();
+    }
+
     public function onAfterCreate()
     {
         parent::onAfterCreate();

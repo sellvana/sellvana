@@ -32,15 +32,15 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
             switch ($post['action']) {
             case 'add':
                 $p = FCom_Catalog_Model_Product::i()->load($post['id']);
-                $data_serialized = BUtil::objectToArray(json_decode($p->data_serialized));
+                $variants = $p->getData('variants');
                 $price = $p->base_price;
                 $qty = !empty($post['qty']) ? $post['qty'] : 1;
-                if (isset($data_serialized['variants'])) {
+                if ($variants) {
                    $validate = false;
-                   foreach($data_serialized['variants'] as $variant) {
+                   foreach ($variants as $variant) {
                        $tmp = [];
                        foreach ($variant['fields'] as $key => $val) {
-                           if ($post[$key] == $val) {
+                           if (!empty($post[$key]) && $post[$key] == $val) {
                                $tmp[$key] = $val;
                            }
                        }
@@ -52,10 +52,10 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                            }
                            if ($qty > $variant['qty']) {
                                $qty = $variant['qty'];
-                               $this->message('This product variant current has '.$qty.' items in stock .', 'info');
+                               $this->message('This product variant currently has '.$qty.' items in stock .', 'info');
                            }
                            if ($qty == 0) {
-                               $this->message('Quantity must be larger 0.', 'error');
+                               $this->message('The variant is not in stock', 'error');
                                $validate = false;
                            }
                        }
@@ -80,7 +80,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                     $this->message('The product has been added to your cart');
                 } else {
                     $this->message('This product variant does not exists. Please choose other', 'error');
-                    BResponse::i()->redirect(BApp::href($p->local_sku));
+                    BResponse::i()->redirect($p->url());
                     return;
                 }
 

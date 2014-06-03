@@ -895,6 +895,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function isAlreadyReviewed($customerId)
     {
         return FCom_ProductReviews_Model_Review::i()->load(['product_id' => $this->id, 'customer_id' => $customerId]);
+
     }
 
     /**
@@ -1045,7 +1046,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($data == 'custom_fields' && isset($data_serialized[$data])) {
             return BUtil::objectToArray(json_decode($data_serialized[$data]));
         }
-        if ($data == 'variants' && isset($data_serialized['variants_fields']) && isset($data_serialized['variants'])) {
+        if ($data == 'variants' && isset($data_serialized['variants_fields'][0]) && isset($data_serialized['variants'])) {
             $field_code = $data_serialized['variants_fields'][0]['field_code'];
             $fields = [ $field_code => [] ];
             foreach ($data_serialized['variants'] as &$vr) {

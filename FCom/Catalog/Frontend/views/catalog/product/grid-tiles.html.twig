@@ -62,7 +62,7 @@
                 <a href="{{ APP.href('wishlist/add?id=') ~ p.id() }}" class="btn btn-link btn-sm" rel="nofollow">{{ 'Add to Wishlist'|_ }}</a>
               {% endif %}
               {% if THIS.get('add_compare') %}
-                <a href="{{ APP.href('catalog/compare/add?id=') ~ p.id() }}" class="btn btn-link btn-sm" rel="nofollow">{{ 'Add to Compare'|_ }}</a>
+                <a href="{{ APP.href('catalog/compare/add?id=') ~ p.id() }}" class="btn btn-link btn-sm btn-compare" rel="nofollow"><span class="glyphicon glyphicon-unchecked"></span>{{ 'Add to Compare'|_ }}</a>
               {% endif %}
             </p>
           </form>
