@@ -2901,7 +2901,7 @@ class BModel extends Model
         }
         $rules = array_merge(static::$_validationRules, $rules);
         BEvents::i()->fire($this->_origClass() . "::validate:before", ["rules" => &$rules, "data" => &$data]);
-        $valid = BValidate::i()->validateInput($data, $rules, $formName);
+        $valid = $this->BValidate->validateInput($data, $rules, $formName);
         if (!$valid) {
             BEvents::i()->fire($this->_origClass() . "::validate:failed", ["rules" => &$rules, "data" => &$data]);
         }

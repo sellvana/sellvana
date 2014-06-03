@@ -57,7 +57,7 @@
   </style>
 </head>
 <body>
-    <h1><?= BLocale::_('Downloading and installing packages...') ?></h1>
+    <h1><?= $this->BLocale->_('Downloading and installing packages...') ?></h1>
     <!--
     <button id="progress-stop" type="button"><?= $this->q('STOP') ?></button>
     <button id="progress-restart" type="button"><?= $this->q('RESTART') ?></button>

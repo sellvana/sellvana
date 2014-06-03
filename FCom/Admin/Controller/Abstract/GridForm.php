@@ -245,16 +245,16 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $actions = [];
 
         $actions['back'] = '<button type="button" class="btn btn-link" onclick="location.href=\''
-            . $this->BApp->href($this->_gridHref) . '\'"><span>' .  BLocale::_('Back to list') . '</span></button>';
+            . $this->BApp->href($this->_gridHref) . '\'"><span>' .  $this->BLocale->_('Back to list') . '</span></button>';
         if ($m->id) {
             $actions['delete'] = '<button type="submit" class="btn btn-warning ignore-validate" name="do" value="DELETE" '
-                . 'onclick="return confirm(\'Are you sure?\')"><span>' .  BLocale::_('Delete') . '</span></button>';
+                . 'onclick="return confirm(\'Are you sure?\')"><span>' .  $this->BLocale->_('Delete') . '</span></button>';
         }
         $actions['save'] = '<button type="submit" class="btn btn-primary" onclick="return adminForm.saveAll(this)"><span>'
-            . BLocale::_('Save') . '</span></button>';
+            . $this->BLocale->_('Save') . '</span></button>';
 
         $id = method_exists($m, 'id') ? $m->id() : $m->id;
-        $title = $id ? BLocale::_('Edit %s: %s', [$this->_recordName, $m->title]) : BLocale::_('Create New %s', [$this->_recordName]);
+        $title = $id ? $this->BLocale->_('Edit %s: %s', [$this->_recordName, $m->title]) : $this->BLocale->_('Create New %s', [$this->_recordName]);
 
         $args['view']->set([
             'form_id' => $this->formId(),
@@ -336,7 +336,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
      */
     public function formId()
     {
-        return BLocale::transliterate($this->_formLayoutName);
+        return $this->BLocale->transliterate($this->_formLayoutName);
     }
 
     /**

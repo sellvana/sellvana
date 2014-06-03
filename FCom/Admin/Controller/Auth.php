@@ -47,12 +47,12 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
             $this->BResponse->redirect($this->BRequest->referrer());
             return;
         }
-        $notLocked = BLoginThrottle::i()->init('admin:password_recover', $this->BRequest->ip());
+        $notLocked = $this->BLoginThrottle->init('admin:password_recover', $this->BRequest->ip());
         if ($notLocked) {
             $hlp = $this->FCom_Admin_Model_User;
             $user = $hlp->orm()->where(['OR' => ['email' => $form['email'], 'username' => $form['email']]])->find_one();
             if ($user) {
-                BLoginThrottle::i()->success();
+                $this->BLoginThrottle->success();
                 $user->recoverPassword();
                 sleep(1); // equalize time for success and failure
             } else {
@@ -60,7 +60,7 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
                     $hlp->create(['username' => 'admin', 'email' => $form['email'], 'is_superadmin' => 1])
                         ->save()->recoverPassword();
                 } else {
-                    BLoginThrottle::i()->failure(1);
+                    $this->BLoginThrottle->failure(1);
                 }
             }
         } else {

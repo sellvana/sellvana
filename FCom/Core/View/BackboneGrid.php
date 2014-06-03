@@ -329,46 +329,46 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                     case 'refresh':
                         $action = ['html' => $this->BUtil->tagHtml('a',
                             ['href' => '#', 'class' => 'js-change-url grid-refresh btn'],
-                            isset($action['caption']) ? $action['caption'] : BLocale::_('Refresh')
+                            isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Refresh')
                         )];
                         break;
                     case 'export':
                         $action = ['html' => $this->BUtil->tagHtml('button',
                             ['type' => 'button', 'class' => 'grid-export btn'],
-                            isset($action['caption']) ? $action['caption'] : BLocale::_('Export')
+                            isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Export')
                         )];
                         break;
                     case 'link_to_page':
                         $action = ['html' => $this->BUtil->tagHtml('a',
                             ['href' => $this->BRequest->currentUrl(), 'class' => 'grid-link_to_page btn'],
-                            isset($action['caption']) ? $action['caption'] : BLocale::_('Link')
+                            isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Link')
                         )];
                         break;
                     case 'edit':
                         $action = ['html' => $this->BUtil->tagHtml('a',
                             ['class' => 'btn grid-mass-edit btn-success disabled', 'data-toggle' => 'modal',
                                 'href' => '#' . $grid['config']['id'] . '-mass-edit', 'role' => 'button'],
-                            isset($action['caption']) ? $action['caption'] : BLocale::_('Edit')
+                            isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Edit')
                         )];
                         break;
                     case 'delete':
                         $action = ['html' => $this->BUtil->tagHtml('button',
                             ['class' => 'btn grid-mass-delete btn-danger disabled' . ((isset($action['confirm'])
                                 && $action['confirm'] === false) ? ' noconfirm' : ''), 'type' => 'button'],
-                            isset($action['caption']) ? $action['caption'] : BLocale::_('Delete')
+                            isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Delete')
                         )];
                         break;
                     case 'add':
                         $action = ['html' => $this->BUtil->tagHtml('button',
                             ['class' => 'btn grid-add btn-primary', 'type' => 'button'],
-                            isset($action['caption']) ? $action['caption'] : BLocale::_('Add')
+                            isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Add')
                         )];
                         break;
                     case 'new':
                         $action = ['html' => $this->BUtil->tagHtml('button',
                             ['class' => "btn grid-new btn-primary " . (isset($action['modal'])
                                 && $action['modal'] ? '_modal' : ''), 'type' => 'button'],
-                            isset($action['caption']) ? $action['caption'] : BLocale::_('Add')
+                            isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Add')
                         )];
                         break;
                     default:
@@ -383,7 +383,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                             'type' => 'button',
                             'id' => isset($action['id']) ? $action['id'] : ''
                         ],
-                        isset($action['caption']) ? $action['caption'] : BLocale::_('Add')
+                        isset($action['caption']) ? $action['caption'] : $this->BLocale->_('Add')
                     )
                 ];
             }

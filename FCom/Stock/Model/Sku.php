@@ -15,16 +15,16 @@ class FCom_Stock_Model_Sku extends FCom_Core_Model_Abstract
 
     public function manageStockOptions() {
         return [
-            0 => BLocale::_('Don\'t manage stock for this product'),
-            1 => BLocale::_('Manage stock for this product'),
+            0 => $this->BLocale->_('Don\'t manage stock for this product'),
+            1 => $this->BLocale->_('Manage stock for this product'),
         ];
     }
 
     public function outStockOptions() {
         return [
-          'keep_selling' => BLocale::_('Keep Selling'),
-          'stop_selling' => BLocale::_('Stop Selling'),
-          'back_order' => BLocale::_('Back Order')
+          'keep_selling' => $this->BLocale->_('Keep Selling'),
+          'stop_selling' => $this->BLocale->_('Stop Selling'),
+          'back_order' => $this->BLocale->_('Back Order')
         ];
     }
 }

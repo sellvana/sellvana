@@ -109,7 +109,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $orm->where_not_equal('p.id', $data['id']);
         }
         if ($orm->find_one()) {
-            return BLocale::_('The SKU number entered is already in use. Please enter a valid SKU number.');
+            return $this->BLocale->_('The SKU number entered is already in use. Please enter a valid SKU number.');
         }
         return true;
     }
@@ -127,7 +127,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $orm->where_not_equal('p.id', $data['id']);
         }
         if ($orm->find_one()) {
-            return BLocale::_('The URL Key entered is already in use. Please enter a valid URL Key.');
+            return $this->BLocale->_('The URL Key entered is already in use. Please enter a valid URL Key.');
         }
         return true;
     }
@@ -246,7 +246,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         //$key = $this->manuf()->manuf_name.'-'.$this->local_sku.'-'.$this->product_name;
         $key = $this->product_name;
-        $urlKey = BLocale::transliterate($key);
+        $urlKey = $this->BLocale->transliterate($key);
         $t = static::$_table;
         $existsSql = "SELECT COUNT(*) as cnt from {$t} WHERE url_key=?";
         if ($this->id()) {
@@ -858,9 +858,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             ->left_outer_join('FCom_Catalog_Model_ProductLink', ['p.id', '=', 'pl.linked_product_id'], 'pl')
             ->where('pl.product_id', $this->id)->find_many();
         $productLink = [
-            'related'=> ['title' => BLocale::_('Related Products'), 'product' => [] ],
-            'similar' => ['title' => BLocale::_('You may also like these items'), 'product' => [] ],
-            'cross_sell' => ['title' => BLocale::_('You may also like these items'), 'product' => [] ]
+            'related'=> ['title' => $this->BLocale->_('Related Products'), 'product' => [] ],
+            'similar' => ['title' => $this->BLocale->_('You may also like these items'), 'product' => [] ],
+            'cross_sell' => ['title' => $this->BLocale->_('You may also like these items'), 'product' => [] ]
         ];
         foreach ($arrProduct as $product) {
             if (isset($productLink[$product->get('link_type')])) {
@@ -1074,7 +1074,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     }
                     $price = ($vr['price'] != '') ? $vr['price']: $this->base_price;
                     $vr['sku'] = ($vr['sku'] == '')? $this->local_sku : $vr['sku'];
-                    $vr['price'] = BLocale::currency($price);
+                    $vr['price'] = $this->BLocale->currency($price);
                 }
             }
             return ['variants' => $data_serialized['variants'], 'variants_fields' => $data_serialized['variants_fields'], 'fields' => $fields];
@@ -1085,8 +1085,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function backOrders()
     {
         return [
-            "NOT_BACK_ORDERS"         => BLocale::i()->_("No Back Orders"),
-            "ALLOW_QUANTITY_BELOW" => BLocale::i()->_("Allow Quantity Below 0")
+            "NOT_BACK_ORDERS"         => $this->BLocale->_("No Back Orders"),
+            "ALLOW_QUANTITY_BELOW" => $this->BLocale->_("Allow Quantity Below 0")
         ];
     }
 }

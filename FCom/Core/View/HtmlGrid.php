@@ -203,13 +203,13 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
                     case 'refresh':
                         $action = ['html' => $this->BUtil->tagHtml('a',
                             ['href' => $this->BRequest->currentUrl(), 'class' => 'js-change-url grid-refresh btn'],
-                            BLocale::_('Refresh')
+                            $this->BLocale->_('Refresh')
                         )];
                         break;
                     case 'link_to_page':
                         $action = ['html' => $this->BUtil->tagHtml('a',
                             ['href' => $this->BRequest->currentUrl(), 'class' => 'grid-link_to_page btn'],
-                            BLocale::_('Link')
+                            $this->BLocale->_('Link')
                         )];
                         break;
 
@@ -465,8 +465,8 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             if (is_string($col['format'])) {
                 switch ($col['format']) {
                     case 'boolean': $value = $value ? 1 : 0; break;
-                    case 'date': $value = $value ? BLocale::i()->datetimeDbToLocal($value) : ''; break;
-                    case 'datetime': $value = $value ? BLocale::i()->datetimeDbToLocal($value, true) : ''; break;
+                    case 'date': $value = $value ? $this->BLocale->datetimeDbToLocal($value) : ''; break;
+                    case 'datetime': $value = $value ? $this->BLocale->datetimeDbToLocal($value, true) : ''; break;
                     case 'currency': $value = $value ? '$' . number_format($value, 2) : ''; break;
                     default: $this->BDebug->warning('Grid value format not implemented: ' . $col['format']);
                 }

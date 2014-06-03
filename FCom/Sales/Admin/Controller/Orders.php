@@ -134,12 +134,12 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         if ('edit' == $act) {
             $actions = [
                 'back' => '<a class="btn btn-link" href=\'' . $this->BApp->href($this->_gridHref) . '\'><span>'
-                    . BLocale::_('Back to list') . '</span></a>',
+                    . $this->BLocale->_('Back to list') . '</span></a>',
                 'delete' => '<button type="submit" class="st2 sz2 btn btn-danger" name="do" value="DELETE" '
                     . 'onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>'
-                    . BLocale::_('Delete') . '</span></button>',
+                    . $this->BLocale->_('Delete') . '</span></button>',
                 'save' => '<button type="submit" class="st1 sz2 btn btn-primary" onclick="return adminForm.saveAll(this)"><span>'
-                    . BLocale::_('Save') . '</span></button>',
+                    . $this->BLocale->_('Save') . '</span></button>',
             ];
         } else {
             $actions = [
@@ -157,7 +157,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             $title = 'Create New Order';
         }
         $args['view']->set([
-            'form_id' => BLocale::transliterate($this->_formLayoutName),
+            'form_id' => $this->BLocale->transliterate($this->_formLayoutName),
             'form_url' => $this->BApp->href($this->_formHref) . '?id=' . $m->id,
             'actions' => $actions,
             'title' => $title,
@@ -361,7 +361,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                 }
                 if ($configOrderNumber && $orderNumber != $configOrderNumber  && $orderNumber < $seq->current_seq_id) {
                     $result['status'] = false;
-                    $result['messages'] = BLocale::_('Order number must larger than order current: ' . $seq->current_seq_id);
+                    $result['messages'] = $this->BLocale->_('Order number must larger than order current: ' . $seq->current_seq_id);
                 }
             }
         }

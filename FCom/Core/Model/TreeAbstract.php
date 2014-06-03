@@ -360,7 +360,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     public function generateUrlKey()
     {
-        $this->set('url_key', BLocale::transliterate($this->get('node_name')));
+        $this->set('url_key', $this->BLocale->transliterate($this->get('node_name')));
         return $this;
     }
 

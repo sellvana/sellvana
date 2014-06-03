@@ -198,7 +198,7 @@ class FCom_LibPhptal_TranslationService implements PHPTAL_TranslationService
 
     public function translate($key, $htmlescape = true)
     {
-        $result = BLocale::_($key, $this->_context, $this->_currentDomain);
+        $result = $this->BLocale->_($key, $this->_context, $this->_currentDomain);
         if ($htmlescape) {
             $result = htmlspecialchars($result);
         }

@@ -49,7 +49,7 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
         parent::gridViewBefore($args);
         $this->view('admin/grid')->set(['actions' => [
             'new' => '<button type="button" id="add_new_customer_group" class="btn grid-new btn-primary _modal">'
-                . BLocale::_('Add New Customer Group') . '</button>']]);
+                . $this->BLocale->_('Add New Customer Group') . '</button>']]);
     }
 
     public function formViewBefore($args)

@@ -99,7 +99,7 @@ class FCom_CatalogIndex_Indexer extends BClass
         }
     }
 
-    static protected function _indexFetchProductsData($products)
+    protected function _indexFetchProductsData($products)
     {
         $fields = $this->FCom_CatalogIndex_Model_Field->getFields();
         static::$_indexData = [];
@@ -129,7 +129,7 @@ class FCom_CatalogIndex_Indexer extends BClass
         }
     }
 
-    static protected function _indexFetchVariantsData($products)
+    protected function _indexFetchVariantsData($products)
     {
         if (!$this->BModuleRegistry->isLoaded('FCom_CatalogIndex')) {
             return;
@@ -138,27 +138,28 @@ class FCom_CatalogIndex_Indexer extends BClass
             $pId = $p->id();
             $vFields = $p->getData('variants_fields');
             $variants = $p->getData('variants');
-
-            foreach ($variants as $variant) {
-                $fValues = [];
-                foreach ($variant['fields'] as $field => $value) {
-                    if (empty($fValues[$field])) {
-                        if (empty(static::$_indexData[$pId][$field])) {
-                            $fValues[$field] = [];
-                        } else {
-                            $fValues[$field] = (array)static::$_indexData[$pId][$field];
+            if ($variants) {
+                foreach ($variants as $variant) {
+                    $fValues = [];
+                    foreach ($variant['fields'] as $field => $value) {
+                        if (empty($fValues[$field])) {
+                            if (empty(static::$_indexData[$pId][$field])) {
+                                $fValues[$field] = [];
+                            } else {
+                                $fValues[$field] = (array)static::$_indexData[$pId][$field];
+                            }
                         }
+                        $fValues[$field][] = $value;
                     }
-                    $fValues[$field][] = $value;
-                }
-                foreach ($fValues as $field => $values) {
-                    static::$_indexData[$pId][$field] = array_unique($values);
+                    foreach ($fValues as $field => $values) {
+                        static::$_indexData[$pId][$field] = array_unique($values);
+                    }
                 }
             }
         }
     }
 
-    static protected function _indexSaveDocs()
+    protected function _indexSaveDocs()
     {
         $docHlp = $this->FCom_CatalogIndex_Model_Doc;
         $sortHlp = $this->FCom_CatalogIndex_Model_DocSort;
@@ -192,7 +193,7 @@ class FCom_CatalogIndex_Indexer extends BClass
         }
     }
 
-    static protected function _indexSaveFilterData()
+    protected function _indexSaveFilterData()
     {
         $fieldValueHlp = $this->FCom_CatalogIndex_Model_FieldValue;
         $docValueHlp = $this->FCom_CatalogIndex_Model_DocValue;
@@ -227,14 +228,14 @@ class FCom_CatalogIndex_Indexer extends BClass
     }
 
 
-    static protected function _retrieveTerms($string)
+    protected function _retrieveTerms($string)
     {
         $string = strtolower(strip_tags($string));
         $string = preg_replace('#[^a-z0-9 \t\n\r]#', '', $string);
         return preg_split('#[ \t\n\r]#', $string, null, PREG_SPLIT_NO_EMPTY);
     }
 
-    static protected function _indexSaveSearchData()
+    protected function _indexSaveSearchData()
     {
         $termHlp = $this->FCom_CatalogIndex_Model_Term;
         $docTermHlp = $this->FCom_CatalogIndex_Model_DocTerm;

@@ -62,7 +62,7 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
         if (is_array($msg)) {
             array_walk($msg, 'BLocale::_');
         } else {
-            $msg = BLocale::_($msg);
+            $msg = $this->BLocale->_($msg);
         }
         $this->BSession->addMessage($msg, $type, $tag, $options);
         return $this;

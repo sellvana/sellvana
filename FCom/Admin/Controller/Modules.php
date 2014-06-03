@@ -170,7 +170,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         $actions = (array)$view->get('actions');
         $actions += [
             'run_migration' => '<button class="btn btn-primary" type="button" onclick="$(\'#util-form\').attr(\'action\', \''
-                . $this->BApp->href('modules/migrate') . '\').submit()"><span>' . BLocale::_('Run Migration Scripts')
+                . $this->BApp->href('modules/migrate') . '\').submit()"><span>' . $this->BLocale->_('Run Migration Scripts')
                 . '</span></button>',
         ];
         unset($actions['new']);
