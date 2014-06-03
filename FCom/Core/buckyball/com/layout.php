@@ -810,7 +810,7 @@ class BLayout extends BClass
 
         // perform all callbacks
         foreach ($callbacks as $cb) {
-            call_user_func($cb[0], $cb[1]);
+            BUtil::call($cb[0], $cb[1]);
         }
 
         return $this;
@@ -1471,7 +1471,7 @@ class BView extends BClass
         $renderer = $this->getParam('renderer');
         if ($renderer) {
             BDebug::debug('VIEW.RENDER "' . $this->param('view_name') . '" USING ' . print_r($renderer, 1));
-            return call_user_func($renderer, $this);
+            return BUtil::call($renderer, $this);
         }
 
         BDebug::debug('VIEW.RENDER "' . $this->param('view_name') . '" USING PHP');

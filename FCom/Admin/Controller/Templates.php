@@ -21,7 +21,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
             ['name' => 'module_name', 'label' => 'Module', 'index' => 'module_name', 'width' => 100],
             ['type' => 'btn_group',
                   'buttons' => [
-                      ['name' => 'edit', 'href' => BApp::href('templates/form?id='), 'col' => 'view_name'],
+                      ['name' => 'edit', 'href' => $this->BApp->href('templates/form?id='), 'col' => 'view_name'],
                       ['name' => 'delete', 'caption' => 'Remove/Revert']
                   ]
             ],
@@ -57,9 +57,9 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
     public function getAreaLayout($area = 'FCom_Frontend')
     {
         $areaDir = str_replace('FCom_', '', $area);
-        $modules = BModuleRegistry::i()->getAllModules();
+        $modules = $this->BModuleRegistry->getAllModules();
         $viewDirs = [];
-        $layout = BLayout::i(true);
+        $layout = $this->BLayout->i(true);
         foreach ($modules as $mod) {
             /** @var BModule $mod */
             $auto = array_flip((array)$mod->auto_use);
@@ -79,7 +79,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
 
     public function action_form()
     {
-        $tplViewName = BRequest::i()->get('id');
+        $tplViewName = $this->BRequest->get('id');
         $areaLayout = $this->getAreaLayout();
         $tplView = $areaLayout->getView($tplViewName);
         $tplViewFile = $tplView->getTemplateFileName();
@@ -104,7 +104,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         $this->layout($this->_formLayoutName);
         $view->set('tab_view_prefix', $this->_formViewPrefix);
         if ($this->_useDefaultLayout) {
-            BLayout::i()->applyLayout('default_form');
+            $this->BLayout->applyLayout('default_form');
         }
         $this->processFormTabs($view, $model, 'edit');
         if ($this->_formTitle && ($head = $this->view('head'))) {
@@ -114,7 +114,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
 
     public function action_form__POST()
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         $viewName = $r->get('view_name');
         $layout = $this->getAreaLayout();
         $view = $layout->getView('view_name');

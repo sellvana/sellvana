@@ -4,7 +4,7 @@ class FCom_Catalog_Frontend_View_Pager extends FCom_Core_View_Abstract
 {
     public function getViewAs()
     {
-        $viewAs = BRequest::i()->get('view');
+        $viewAs = $this->BRequest->get('view');
         return $viewAs && in_array($viewAs, $this->view_as_options) ? $viewAs : $this->default_view_as;
     }
 
@@ -12,22 +12,22 @@ class FCom_Catalog_Frontend_View_Pager extends FCom_Core_View_Abstract
     {
         static $curUrl, $pageUrl;
         if (!$curUrl) {
-            $curUrl = BRequest::i()->currentUrl();
+            $curUrl = $this->BRequest->currentUrl();
         }
         // optimize page number urls by making simple str_replace
         if (!empty($params['p']) && sizeof($params) === 1) {
             if (!$pageUrl) {
-                $pageUrl = BUtil::setUrlQuery($curUrl, ['page' => '-PAGE-']);
+                $pageUrl = $this->BUtil->setUrlQuery($curUrl, ['page' => '-PAGE-']);
             }
             $url = str_replace('-PAGE-', $params['p'], $pageUrl);
             return $url;
         }
-        return BUtil::setUrlQuery($curUrl, $params);
+        return $this->BUtil->setUrlQuery($curUrl, $params);
     }
 
     public function setCanonicalPrevNext()
     {
-        $head = BLayout::i()->view('head');
+        $head = $this->BLayout->view('head');
         if (!$head) {
             return;
         }

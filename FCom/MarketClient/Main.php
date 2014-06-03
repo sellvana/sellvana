@@ -6,7 +6,7 @@ class FCom_MarketClient_Main extends BClass
     {
         $progress = !$reset ? BCache::i()->load('marketclient_progress') : [];
         if (!empty($data)) {
-            $progress = BUtil::arrayMerge($progress, $data);
+            $progress = $this->BUtil->arrayMerge($progress, $data);
             BCache::i()->save('marketclient_progress', $progress);
         }
         return $progress;
@@ -19,13 +19,13 @@ class FCom_MarketClient_Main extends BClass
             return;
         }
         foreach ($modules as $modName => $modInfo) {
-            if (!$modInfo || $modInfo === '-' 
+            if (!$modInfo || $modInfo === '-'
                 || (!empty($modInfo['version']) && ($modInfo['version'] === '' || $modInfo['version'] === '-'))
             ) {
                 unset($modules[$modName]);
             }
         }
-        
+
         $configUpdated = false;
         $i = 0;
         $cnt = sizeof($modules);
@@ -57,7 +57,7 @@ class FCom_MarketClient_Main extends BClass
             } elseif (is_string($modInfo)) {
                 $modInfo = ['version' => $modInfo];
             }
-            
+
             $this->progress([
                 'cur' => $i,
                 'modules' => [
@@ -65,7 +65,7 @@ class FCom_MarketClient_Main extends BClass
                 ],
             ]);
 
-            $filename = FCom_MarketClient_RemoteApi::i()->downloadPackage($modName, $modInfo['version']);
+            $filename = $this->FCom_MarketClient_RemoteApi->downloadPackage($modName, $modInfo['version']);
             if (!$filename) {
                 $this->progress([
                     'errors' => [
@@ -76,8 +76,8 @@ class FCom_MarketClient_Main extends BClass
                 continue;
             }
             $modNameArr = explode('_', $modName);
-            $targetDir = BConfig::i()->get('fs/dlc_dir') . '/' . $modNameArr[0] . '/' . $modNameArr[1];
-            BUtil::ensureDir($targetDir);
+            $targetDir = $this->BConfig->get('fs/dlc_dir') . '/' . $modNameArr[0] . '/' . $modNameArr[1];
+            $this->BUtil->ensureDir($targetDir);
 
             $this->progress([
                 'modules' => [
@@ -85,7 +85,7 @@ class FCom_MarketClient_Main extends BClass
                 ],
             ]);
 
-            if (!BUtil::zipExtract($filename, $targetDir)) {
+            if (!$this->BUtil->zipExtract($filename, $targetDir)) {
                 $this->progress([
                     'errors' => [
                         'Could not extract module package file: ' . $modName . ' (' . $modInfo['version'] . ')',
@@ -96,7 +96,7 @@ class FCom_MarketClient_Main extends BClass
             }
             if (!empty($modInfo['enable'])) {
                 $configUpdated = true;
-                BConfig::i()->set('module_run_levels/FCom_Core/' . $modName, 'REQUESTED', false, true);
+                $this->BConfig->set('module_run_levels/FCom_Core/' . $modName, 'REQUESTED', false, true);
             }
             $this->progress([
                 'modules' => [
@@ -106,7 +106,7 @@ class FCom_MarketClient_Main extends BClass
         }
         $this->progress(['status' => 'DONE']);
         if ($configUpdated) {
-            FCom_Core_Main::i()->writeConfigFiles();
+            $this->FCom_Core_Main->writeConfigFiles();
         }
     }
 

@@ -21,7 +21,7 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
     {
         $notifications = [];
         BEvents::i()->fire(__METHOD__, ['notifications' => &$notifications]);
-        $conf      = BConfig::i();
+        $conf      = $this->BConfig;
         $dismissed = $conf->get('modules/FCom_Core/dismissed/notifications');
         $result = [];
         foreach ($notifications as $k => &$item) {
@@ -38,7 +38,7 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
             if (empty($item['title'])) {
                 $item['title'] = $item['message'];
             }
-            $item['html'] = BUtil::tagHtml('a', [
+            $item['html'] = $this->BUtil->tagHtml('a', [
                 'href' => $item['href'],
                 'title' => $item['title'],
 
@@ -56,12 +56,12 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
 
     public function getLocales()
     {
-        $conf = $this->_env->config->get('modules/FCom_Admin');
+        $conf = $this->BConfig->get('modules/FCom_Admin');
         if (empty($conf['enable_locales']) || empty($conf['allowed_locales'])) {
             return false;
         }
         $locales = [];
-        $urlTpl = $this->_env->util->setUrlQuery($this->_env->app->href('switch_locale'), ['locale' => '-LOCALE-']);
+        $urlTpl = $this->BUtil->setUrlQuery($this->BApp->href('switch_locale'), ['locale' => '-LOCALE-']);
         sort($conf['allowed_locales']);
         foreach ($conf['allowed_locales'] as $locale) {
             list($flag) = explode('_', $locale);
@@ -77,10 +77,10 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
 
     public function getCurrentLocale()
     {
-        $locale = $this->_env->session->get('_locale');
+        $locale = $this->BSession->get('_locale');
 #echo "<pre>"; var_dump($locale); exit;
         if (!$locale) {
-            $locale = $this->_env->config->get('modules/FCom_Admin/default_locale');
+            $locale = $this->BConfig->get('modules/FCom_Admin/default_locale');
         }
         list($flag) = explode('_', $locale);
         return [

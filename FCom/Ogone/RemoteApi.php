@@ -84,16 +84,16 @@ class FCom_Ogone_RemoteApi extends BClass
     public function prepareRequestData()
     {
         return [];
-        $conf = new BData(BConfig::i()->get('modules/FCom_Ogone'));
+        $conf = new BData($this->BConfig->get('modules/FCom_Ogone'));
         $order = new BData([]); // order
         $cust = new BData([]); // customer
         $ogoneOrder = new BData([]); // order
-        //$ogoneOrder = FCom_Ogone_Model_Order::i()->load($order->id, 'order_id');
+        //$ogoneOrder = $this->FCom_Ogone_Model_Order->load($order->id, 'order_id');
 
         $complus = '';
         $paramplus = ['amountOfProducts' => '5', 'usedCoupon' => 1]; //?
-        $homeUrl = FCom_Frontend_Main::i()->href('');
-        $callbackUrl = FCom_Frontend_Main::i()->href('ogone/callback');
+        $homeUrl = $this->FCom_Frontend_Main->href('');
+        $callbackUrl = $this->FCom_Frontend_Main->href('ogone/callback');
         $data = [
             'RL' => 'ncol_2.0',
             'PSPID' => $conf->pspid,
@@ -123,7 +123,7 @@ class FCom_Ogone_RemoteApi extends BClass
             'CATALOGURL' => $catalogUrl,
 
             'TITLE' => $conf->title,
-            'TP' => $conf->template ? FCom_Frontend_Main::i()->href('ogone/template') : null,
+            'TP' => $conf->template ? $this->FCom_Frontend_Main->href('ogone/template') : null,
             'LOGO' => $conf->logo,
             'FONTTYPE' => $conf->fonttype,
             'BGCOLOR' => $conf->bgcolor,
@@ -148,7 +148,7 @@ class FCom_Ogone_RemoteApi extends BClass
     public function processResult($data = null)
     {
         if (null === $data) {
-            $data = BRequest::i()->request();
+            $data = $this->BRequest->request();
         }
         if (empty($data['SHASIGN']) || $this->_sha($data, 'out') != $data['SHASIGN']) {
             throw new BException('SHA-OUT missing or invalid');
@@ -156,10 +156,10 @@ class FCom_Ogone_RemoteApi extends BClass
         if (empty($data['orderID'])) {
             throw new BException('Missing orderID');
         }
-        $conf = new BData(BConfig::i()->get('modules/FCom_Ogone'));
+        $conf = new BData($this->BConfig->get('modules/FCom_Ogone'));
         $orderId = $data['orderID'];
-        $order = FCom_Sales_Model_Order::i()->load($orderId, 'increment_id');
-        $ogoneOrder = FCom_Ogone_Model_Order::i()->load($order->id, 'order_id');
+        $order = $this->FCom_Sales_Model_Order->load($orderId, 'increment_id');
+        $ogoneOrder = $this->FCom_Ogone_Model_Order->load($order->id, 'order_id');
 
         // Process response
         $statusCode = $data['STATUS'];
@@ -257,8 +257,8 @@ class FCom_Ogone_RemoteApi extends BClass
         ksort($data);
         array_walk($data, 'trim');
         $data = array_filter($data, function($value) { return (bool) strlen($value); });
-        $shaPass = BConfig::i()->get('modules/FCom_Ogone/passphrase_' . $dir);
-        $shaMethod = BConfig::i()->get('modules/FCom_Ogone/sha_method');
+        $shaPass = $this->BConfig->get('modules/FCom_Ogone/passphrase_' . $dir);
+        $shaMethod = $this->BConfig->get('modules/FCom_Ogone/sha_method');
         if (!$shaMethod) $shaMethod = 'sha512';
         $shaData = '';
         foreach ($data as $k => $v) {

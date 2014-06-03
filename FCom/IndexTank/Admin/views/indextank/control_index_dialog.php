@@ -23,7 +23,7 @@
     {
         $.ajax({
             type: "GET",
-            url: "<?=BApp::href('indextank/products/indexing-status')?>"
+            url: "<?=$this->BApp->href('indextank/products/indexing-status')?>"
         }).done(function( json ) {
             data = JSON.parse(json);
             $('#progressbar').progressbar({value: parseInt(data.percent)});
@@ -99,7 +99,7 @@
         $("#progressbar").progressbar({ value: 0 });
         $.ajax({
             type: "GET",
-            url: "<?=BApp::href('indextank/products/index')?>"
+            url: "<?=$this->BApp->href('indextank/products/index')?>"
             }
         ).done(function() {
             manageInterval('start');
@@ -113,7 +113,7 @@
         updateDialogButtons('resume');
         $.ajax({
             type: "GET",
-            url: "<?=BApp::href('indextank/products/index-resume')?>"
+            url: "<?=$this->BApp->href('indextank/products/index-resume')?>"
             }
         ).done(function() {
             manageInterval('start');
@@ -126,7 +126,7 @@
         updateDialogButtons('pause');
         $.ajax({
             type: "GET",
-            url: "<?=BApp::href('indextank/products/index-pause')?>"
+            url: "<?=$this->BApp->href('indextank/products/index-pause')?>"
             }
         ).done(function() {
             manageInterval('stop');

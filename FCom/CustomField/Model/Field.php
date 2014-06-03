@@ -54,11 +54,11 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         return $class::table();
     }
 
-    public static function fieldsInfo($type, $keysOnly = false)
+    public function fieldsInfo($type, $keysOnly = false)
     {
         if (empty(static::$_fieldsCache[$type])) {
             $class = static::$_fieldTypes[$type]['class'];
-            $fields = BDb::ddlFieldInfo($class::table());
+            $fields = $this->BDb->ddlFieldInfo($class::table());
             unset($fields['id'], $fields['product_id']);
             static::$_fieldsCache[$type] = $fields;
         }
@@ -74,9 +74,9 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
 
     public function addField($data)
     {
-        $field = static::load(BUtil::arrayMask($data, 'field_type,field_code'));
+        $field = $this->load($this->BUtil->arrayMask($data, 'field_type,field_code'));
         if (!$field) {
-            $field = static::create($data)->save();
+            $field = $this->create($data)->save();
         } else {
             $field->set($data)->save();
         }
@@ -102,7 +102,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         $fTable = $this->tableName();
         $fCode = preg_replace('#([^0-9A-Za-z_])#', '', $this->field_code);
         $fType = preg_replace('#([^0-9a-z\(\),])#', '', strtolower($this->table_field_type));
-        $field = BDb::ddlFieldInfo($fTable, $this->field_code);
+        $field = $this->BDb->ddlFieldInfo($fTable, $this->field_code);
         $columnsUpdate = [];
 
         if ($fType === '_serialized') {
@@ -119,7 +119,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
             }
         }
         if ($columnsUpdate) {
-            BDb::ddlTableDef($fTable, ['COLUMNS' => $columnsUpdate]);
+            $this->BDb->ddlTableDef($fTable, ['COLUMNS' => $columnsUpdate]);
         }
 
         $this->_oldTableFieldCode = $this->field_code;
@@ -137,13 +137,13 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
     {
         parent::onAfterDelete();
         if ($this->table_field_type !== '_serialized') {
-            BDb::ddlTableDef($this->tableName(), ['COLUMNS' => [$this->field_code => 'DROP']]);
+            $this->BDb->ddlTableDef($this->tableName(), ['COLUMNS' => [$this->field_code => 'DROP']]);
         }
     }
 
     public function products()
     {
-        return FCom_Catalog_Model_Product::i()->orm('p')->where_not_null($this->field_code)->find_many();
+        return $this->FCom_Catalog_Model_Product->orm('p')->where_not_null($this->field_code)->find_many();
     }
 
     public function getListAssoc()
@@ -158,7 +158,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
 
     public function getDropdowns()
     {
-        $fields = BDb::many_as_array($this->orm()->where('admin_input_type', 'select')->find_many());
+        $fields = $this->BDb->many_as_array($this->orm()->where('admin_input_type', 'select')->find_many());
         $res = [];
         foreach ($fields as $field) {
             $res[$field['id']] = ['text' => $field['field_name'], 'data-code' => $field['field_code'], 'data-frontend-label' => $field['frontend_label']];

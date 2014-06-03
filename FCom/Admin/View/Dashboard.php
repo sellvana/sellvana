@@ -20,7 +20,7 @@ class FCom_Admin_View_Dashboard extends FCom_Admin_View_Abstract
 
         $widgets = (array)$this->get('widgets');
 
-        $pers = FCom_Admin_Model_User::i()->personalize();
+        $pers = $this->FCom_Admin_Model_User->personalize();
         if (!empty($pers['dashboard']['widgets'])) {
             foreach ($pers['dashboard']['widgets'] as $wKey => $wState) {
                 $widgets[$wKey]['state'] = $wState;

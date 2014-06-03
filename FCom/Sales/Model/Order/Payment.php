@@ -27,7 +27,7 @@ class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
      * @param array $args
      * @return FCom_Sales_Model_Order_Payment
      */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }

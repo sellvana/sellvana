@@ -3849,6 +3849,7 @@ class BEnv extends BClass
     public $app;
     public $autoload;
     public $config;
+    public $db;
     public $debug;
     public $layout;
     public $modReg;
@@ -3857,12 +3858,14 @@ class BEnv extends BClass
     public $session;
     public $util;
 
-    public function __construct(BApp $app, BClassAutoload $autoload, BConfig $config, BDebug $debug, BLayout $layout,
-        BModuleRegistry $modReg, BRequest $request, BResponse $response, BSession $session, BUtil $util)
+    public function __construct(BApp $app, BClassAutoload $autoload, BConfig $config, BDb $db, BDebug $debug,
+        BLayout $layout, BModuleRegistry $modReg, BRequest $request, BResponse $response, BSession $session,
+        BUtil $util)
     {
         $this->app = $app;
         $this->autoload = $autoload;
         $this->config = $config;
+        $this->db = $db;
         $this->debug = $debug;
         $this->layout = $layout;
         $this->modReg = $modReg;

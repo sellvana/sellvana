@@ -7,23 +7,23 @@
 
 class FCom_CustomerGroups_Admin extends BClass
 {
-    public static function bootstrap()
+    public function bootstrap()
     {
-        FCom_Admin_Model_Role::i()->createPermission([
+        $this->FCom_Admin_Model_Role->createPermission([
             'customer_groups' => "Customer Groups"
         ]);
     }
 
-    public static function onProductAfterSave($args)
+    public function onProductAfterSave($args)
     {
         $prod = $args['model'];
 
         if ($prod->get('price_info')) {
-            $data = BUtil::fromJson($prod->get('price_info'));
+            $data = $this->BUtil->fromJson($prod->get('price_info'));
             $rows = $data['rows'];
             $remove_ids = $data['remove_ids'];
 
-            $model = FCom_CustomerGroups_Model_TierPrice::i();
+            $model = $this->FCom_CustomerGroups_Model_TierPrice;
 
             foreach ($remove_ids as $id) {
                 $r = $model->load($id);

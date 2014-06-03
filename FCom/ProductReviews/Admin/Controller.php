@@ -15,8 +15,8 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
 
     public function gridConfig($productModel = false)
     {
-        //$formUrl = BApp::href("prodreviews/form");
-        $reviewConfigs = FCom_ProductReviews_Model_Review::i()->config();
+        //$formUrl = $this->BApp->href("prodreviews/form");
+        $reviewConfigs = $this->FCom_ProductReviews_Model_Review->config();
         $config = parent::gridConfig();
         $columns = [
             ['type' => 'row_select'],
@@ -46,10 +46,10 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             ['type' => 'input', 'name' => 'approved', 'label' => 'Approved', 'addable' => true, 'editable' => true,
                 'mass-editable' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
             ['type' => 'input', 'name' => 'product_id', 'label' => 'Product', 'addable' => true, 'hidden' => true,
-                'options' => FCom_Catalog_Model_Product::i()->getOptionsData(), 'editor' => 'select',
+                'options' => $this->FCom_Catalog_Model_Product->getOptionsData(), 'editor' => 'select',
                 'validation' => ['required' => true]],
             ['type' => 'input', 'name' => 'customer_id', 'label' => 'Customer', 'addable' => true, 'hidden' => true,
-                'options' => FCom_Customer_Model_Customer::i()->getOptionsData(), 'editor' => 'select',
+                'options' => $this->FCom_Customer_Model_Customer->getOptionsData(), 'editor' => 'select',
                 'validation' => ['required' => true]]
         ];
 
@@ -88,20 +88,20 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
 
         if ($productModel) {
             $config['id'] = 'products_reviews';
-            $i = BUtil::arrayFind($config['columns'], ['name' => '_actions']);
-            $config['columns'][$i]['data']['edit']['href'] = BApp::href('/prodreviews/form_only?id=');
+            $i = $this->BUtil->arrayFind($config['columns'], ['name' => '_actions']);
+            $config['columns'][$i]['data']['edit']['href'] = $this->BApp->href('/prodreviews/form_only?id=');
             $config['columns'][$i]['data']['edit']['async_edit'] = true;
             $config['columns'][] = ['name' => 'customer', 'label' => 'Customer', 'width' => 250];
             $config['data_mode'] = 'local';
             $config['edit_url_required'] = true;
             //$config['filters'][] = array('field'=>'product_name', 'type'=>'text');
             $config['custom'] = ['personalize' => true];
-            $orm = FCom_ProductReviews_Model_Review::orm('pr')->where('product_id', $productModel->id())
+            $orm = $this->FCom_ProductReviews_Model_Review->orm('pr')->where('product_id', $productModel->id())
                 ->join('FCom_Catalog_Model_Product', ['p.id', '=', 'pr.product_id'], 'p')
                 ->left_outer_join('FCom_Customer_Model_Customer', ['c.id', '=', 'pr.customer_id'], 'c')
                 ->select('pr.*')->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as customer');
 
-            $data = BDb::many_as_array($orm->find_many());
+            $data = $this->BDb->many_as_array($orm->find_many());
             unset($config['orm']);
             /*$columnKeys = array_keys($config['grid']['columns']);
             foreach($data as &$prod){
@@ -121,7 +121,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             $config['columns'][] = ['name' => 'product_name', 'label' => 'Product name', 'width' => 250];
             $config['columns'][] = ['name' => 'customer', 'label' => 'Customer', 'width' => 250];
             $config['columns'][] = ['name' => 'create_at', 'label' => 'Created'];
-            $config['orm'] = FCom_ProductReviews_Model_Review::i()->orm('pr')->select('pr.*')
+            $config['orm'] = $this->FCom_ProductReviews_Model_Review->orm('pr')->select('pr.*')
                 ->left_outer_join('FCom_Catalog_Model_Product', ['p.id', '=', 'pr.product_id'], 'p')
                 ->left_outer_join('FCom_Customer_Model_Customer', ['c.id', '=', 'pr.customer_id'], 'c')
                 ->select('p.product_name')->select_expr('CONCAT_WS(" ", c.firstname, c.lastname) as customer');
@@ -155,7 +155,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             'title' => $m->id ? 'Edit Product Review: ' . $m->title : 'Create New Product Review',
             'actions' => [
                 'back' => '<button type="button" class="st3 sz2 btn" onclick="location.href=\''
-                    . BApp::href("prodreviews") . '\'"><span>' .  BLocale::_('Back to list') . '</span></button>',
+                    . $this->BApp->href("prodreviews") . '\'"><span>' .  BLocale::_('Back to list') . '</span></button>',
                 'delete' => '<button type="submit" class="st2 sz2 btn" name="do" value="DELETE" '
                     . 'onclick="return confirm(\'Are you sure?\') && adminForm.delete(this)"><span>'
                     . BLocale::_('Delete') . '</span></button>',
@@ -169,7 +169,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
-        BLayout::i()->applyLayout('prodreviews');
+        $this->BLayout->applyLayout('prodreviews');
         $this->view('prodreviews/grid')->set([
             'title' => $this->_gridTitle,
             'actions' => []
@@ -178,7 +178,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
 
     public function inputRatingHtml($name)
     {
-        $config = FCom_ProductReviews_Model_Review::i()->config();
+        $config = $this->FCom_ProductReviews_Model_Review->config();
         return '<input name="' . $name . '" id="' . $name . '" type="range" min="' . $config['min'] . '"
             max="' . $config['max'] . '" step="' . $config['step'] . '" value="" />
             <div class="rateit" data-rateit-backingfld="#' . $name . '"></div>';
@@ -221,7 +221,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
             ['type' => 'input', 'name' => 'approved', 'label' => 'Approved', 'addable' => true, 'editable' => true,
                 'mass-editable' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
             ['type' => 'input', 'name' => 'product_id', 'label' => 'Product', 'addable' => true, 'hidden' => true,
-                  'options' => FCom_Catalog_Model_Product::i()->getOptionsData(), 'editor' => 'select',
+                  'options' => $this->FCom_Catalog_Model_Product->getOptionsData(), 'editor' => 'select',
                   'validation' => ['required' => true]],
             ['name' => 'product_name', 'label' => 'Product name', 'width' => 250],
             ['name' => 'create_at', 'label' => 'Created']
@@ -238,7 +238,7 @@ class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstrac
         $config['columns'][] = ['name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 80,
             'data' => ['edit' => true, 'delete' => true]];
 
-        $config['orm'] = FCom_ProductReviews_Model_Review::i()->orm('pr')->select('pr.*')->where('customer_id', $customer->id)
+        $config['orm'] = $this->FCom_ProductReviews_Model_Review->orm('pr')->select('pr.*')->where('customer_id', $customer->id)
             ->left_outer_join('FCom_Catalog_Model_Product', ['p.id', '=', 'pr.product_id'], 'p')->select('p.product_name');
 
         $callbacks = '$(".rateit").rateit();

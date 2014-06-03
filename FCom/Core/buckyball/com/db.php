@@ -1375,6 +1375,15 @@ class BORM extends ORMWrapper
         return $this;
     }
 
+    public function set_dirty_fields($data, $isNew = null)
+    {
+        $this->_dirty_fields = $data;
+        if (null !== $isNew) {
+            $this->_is_new = $isNew;
+        }
+        return $this;
+    }
+
     /**
      * Save any fields which have been modified on this object
      * to the database.
@@ -1851,6 +1860,7 @@ class BModel extends Model
     */
     protected static $_cacheAuto = false;
 
+
     /**
     * Fields used in cache, that require values to be case insensitive or trimmed
     *
@@ -1914,7 +1924,7 @@ class BModel extends Model
      */
     protected static $_diConfig = [
         #'_env' => 'BEnv',
-        #'*' => 'ALL',
+        '*' => 'ALL',
     ];
 
     /**
@@ -2159,7 +2169,7 @@ class BModel extends Model
     * @param boolean $cache
     * @return BModel
     */
-    public static function load($id, $field = null, $cache = false)
+    public function load($id, $field = null, $cache = false)
     {
         if (true !== $field && is_array($id)) {
             throw new BException('Invalid ID parameter');
@@ -2212,9 +2222,9 @@ class BModel extends Model
     /**
      * Temporary implementation using load()
      */
-    public static function loadWhere($where)
+    public function loadWhere($where)
     {
-        return static::load($where, true);
+        return $this->load($where, true);
     }
 
     /**
@@ -2225,11 +2235,11 @@ class BModel extends Model
      * @param boolean $cache
      * @return BModel
      */
-    public static function loadOrCreate($where, $field = null, $cache = false)
+    public function loadOrCreate($where, $field = null, $cache = false)
     {
-        $model = static::loadWhere($where, $field, $cache);
+        $model = $this->loadWhere($where, $field, $cache);
         if (!$model) {
-            $model = static::create($where);
+            $model = $this->create($where);
         }
         return $model;
     }
@@ -2490,6 +2500,12 @@ class BModel extends Model
             $this->cacheStore();
         }
         return $this;
+    }
+
+    public function resave($asNew = false)
+    {
+        $this->orm->set_dirty_fields($this->as_array(), true);
+        $this->save(true);
     }
 
     /**

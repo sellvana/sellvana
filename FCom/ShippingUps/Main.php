@@ -2,8 +2,8 @@
 
 class FCom_ShippingUps_Main extends BClass
 {
-    public static function bootstrap()
+    public function bootstrap()
     {
-        FCom_Sales_Main::i()->addShippingMethod('ups', 'FCom_ShippingUps_ShippingMethod');
+        $this->FCom_Sales_Main->addShippingMethod('ups', 'FCom_ShippingUps_ShippingMethod');
     }
 }

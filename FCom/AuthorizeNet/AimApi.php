@@ -101,7 +101,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
         $api->invoice_num = $order->unique_id;
         $api->description = $order->getTextDescription();
 
-        if (BConfig::i()->get('modules/FCom_AuthorizeNet/aim/useccv')) {
+        if ($this->BConfig->get('modules/FCom_AuthorizeNet/aim/useccv')) {
             $api->card_code = $payment->getDetail('card_code');
         }
         $billing = $order->billing();
@@ -155,7 +155,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
                 throw new BException("Invalid Authorize.net settings.");
             }
             $data = new BData($data);
-            BDebug::log(print_r($data->as_array(), true));
+            $this->BDebug->log(print_r($data->as_array(), true));
             if (!defined('AUTHORIZENET_SANDBOX')) {
                 define('AUTHORIZENET_SANDBOX', $data->get('test'));
             }
@@ -187,7 +187,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
      */
     public function getConfig()
     {
-        return new BData(BConfig::i()->get('modules/FCom_AuthorizeNet'));
+        return new BData($this->BConfig->get('modules/FCom_AuthorizeNet'));
     }
 
     /**

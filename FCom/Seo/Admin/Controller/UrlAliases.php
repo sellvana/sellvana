@@ -23,7 +23,7 @@ class FCom_Seo_Admin_Controller_UrlAliases extends FCom_Admin_Controller_Abstrac
             'create_at' => ['label' => 'Created', 'index' => 'a.create_at', 'formatter' => 'date'],
             'update_at' => ['label' => 'Updated', 'index' => 'a.update_at', 'formatter' => 'date'],
         ]);
-        $config['custom']['dblClickHref'] = BApp::href('multisite/form/?id=');
+        $config['custom']['dblClickHref'] = $this->BApp->href('multisite/form/?id=');
         return $config;
     }
 }

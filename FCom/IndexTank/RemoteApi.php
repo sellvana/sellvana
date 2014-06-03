@@ -18,7 +18,7 @@ class FCom_IndexTank_RemoteApi extends BClass
     public function __construct()
     {
         include_once __DIR__ . '/lib/indextank.php';
-        //BApp::m()->autoload('lib');
+        //$this->BApp->m()->autoload('lib');
     }
 
     /**
@@ -28,7 +28,7 @@ class FCom_IndexTank_RemoteApi extends BClass
     public function service()
     {
         if (empty($this->indextank)) {
-            $apiUrl = BConfig::i()->get('modules/FCom_IndexTank/api_url');
+            $apiUrl = $this->BConfig->get('modules/FCom_IndexTank/api_url');
             $this->indextank = new Indextank_Api($apiUrl);
         }
         return $this->indextank;

@@ -9,16 +9,16 @@ class FCom_Email_Model_Message extends FCom_Core_Model_Abstract
     {
         parent::onAfterLoad();
 
-        $this->data = $this->data_serialized ? BUtil::fromJson($this->data_serialized) : [];
+        $this->data = $this->data_serialized ? $this->BUtil->fromJson($this->data_serialized) : [];
     }
 
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
 
-        if (!$this->create_at) $this->create_at = BDb::now();
+        if (!$this->create_at) $this->create_at = $this->BDb->now();
 
-        $this->data_serialized = BUtil::toJson($this->data);
+        $this->data_serialized = $this->BUtil->toJson($this->data);
 
         return true;
     }

@@ -38,11 +38,11 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
             ['type' => 'input', 'name' => 'street3', 'label' => 'Address Line 3', 'index' => 'a.street3', 'width' => 200,
                 'hidden' => true, 'addable' => true, 'editable' => true],
             ['type' => 'input', 'name' => 'country', 'label' => 'Country', 'index' => 'a.country', 'editor' => 'select',
-                'addable' => true, 'options' => FCom_Geo_Model_Country::i()->options(), 'editable' => true,
+                'addable' => true, 'options' => $this->FCom_Geo_Model_Country->options(), 'editable' => true,
                 'validation' => ['required' => true]],
             ['type' => 'input', 'name' => 'region', 'label' => 'State/Province/Region', 'index' => 'a.region',
                 'addable' => true, 'editable' => true, 'editor' => 'select',
-                'options' => FCom_Geo_Model_Region::i()->allOptions(),
+                'options' => $this->FCom_Geo_Model_Region->allOptions(),
 //                'validation' => [ 'required' => true ],
             ],
             ['type' => 'input', 'name' => 'city', 'label' => 'City', 'index' => 'a.city', 'addable' => true,
@@ -71,7 +71,7 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
             '_quick' => ['expr' => 'street1 like ? or company like ? or city like ? or country like ?', 'args' => ['%?%', '%?%', '%?%', '%?%']]
         ];
 
-        $config['orm'] = FCom_Customer_Model_Address::i()->orm($this->_mainTableAlias)
+        $config['orm'] = $this->FCom_Customer_Model_Address->orm($this->_mainTableAlias)
             ->select($this->_mainTableAlias . '.*')->where('customer_id', $customer->id);
         $config['callbacks'] = ['after_modalForm_render' => 'renderModalAddress', 'after_render' => 'renderAddress'];
         return ['config' => $config];
@@ -79,12 +79,12 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
 
     public function action_get_state()
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         $result = [];
         $country = $r->post('country');
         if (!empty($country)) {
-            $result = FCom_Geo_Model_Region::i()->options($country);
+            $result = $this->FCom_Geo_Model_Region->options($country);
         }
-        BResponse::i()->json($result);
+        $this->BResponse->json($result);
     }
 }

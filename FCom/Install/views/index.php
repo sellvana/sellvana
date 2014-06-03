@@ -1,5 +1,5 @@
-<form method="POST" action="<?=BApp::href('install')?>" class="form-horizontal">
-    <input type="hidden" name="X-CSRF-TOKEN" value="<?= BSession::i()->csrfToken() ?>"/>
+<form method="POST" action="<?=$this->BApp->href('install')?>" class="form-horizontal">
+    <input type="hidden" name="X-CSRF-TOKEN" value="<?= $this->BSession->csrfToken() ?>"/>
     <div class="panel-heading">
         <h1 class="panel-title"><?=BLocale::_('Welcome to Fulleron installation wizard!')?></h1>
     </div>

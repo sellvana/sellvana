@@ -45,7 +45,7 @@ class FCom_Core_Model_Abstract extends BModel
     {
         if (null === $this->get(static::$_dataCustomField)) {
             $dataJson = $this->get(static::$_dataSerializedField);
-            $this->set(static::$_dataCustomField, $dataJson ? BUtil::fromJson($dataJson) : []);
+            $this->set(static::$_dataCustomField, $dataJson ? $this->BUtil->fromJson($dataJson) : []);
         }
         $data = $this->get(static::$_dataCustomField);
         if (null === $path) {
@@ -85,7 +85,7 @@ class FCom_Core_Model_Abstract extends BModel
             $node =& $node[$key];
         }
         if ($merge) {
-            $node = BUtil::arrayMerge((array)$node, (array)$value);
+            $node = $this->BUtil->arrayMerge((array)$node, (array)$value);
         } else {
             $node = $value;
         }
@@ -117,7 +117,7 @@ class FCom_Core_Model_Abstract extends BModel
         }
 
         if (($data = $this->get(static::$_dataCustomField))) {
-            $this->set(static::$_dataSerializedField, BUtil::toJson($data));
+            $this->set(static::$_dataSerializedField, $this->BUtil->toJson($data));
         }
 
         return true;
@@ -131,10 +131,10 @@ class FCom_Core_Model_Abstract extends BModel
         }
     }
 
-    public static function getIdField()
+    public function getIdField()
     {
         $class = static::$_origClass ? static::$_origClass : get_called_class();
 
-        return static::_get_id_column_name($class);
+        return $this->_get_id_column_name($class);
     }
 }

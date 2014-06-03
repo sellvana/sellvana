@@ -16,20 +16,20 @@ class FCom_IndexTank_Tests_Model_ProductFunctionTest extends FCom_Test_DatabaseT
             'number'        => "2",
             'definition'       => '-d[0]'
         ];
-        FCom_IndexTank_Model_ProductFunction::orm()->create($data)->save();
+        $this->FCom_IndexTank_Model_ProductFunction->orm()->create($data)->save();
         $data = [
             'name'        => "base_price_desc",
             'number'        => "3",
             'definition'       => 'd[0]'
         ];
-        FCom_IndexTank_Model_ProductFunction::orm()->create($data)->save();
+        $this->FCom_IndexTank_Model_ProductFunction->orm()->create($data)->save();
 
         $this->assertEquals(4, $this->getConnection()->getRowCount('fcom_indextank_product_function'), "Insert failed");
     }
 
     public function testListCount()
     {
-        $list = FCom_IndexTank_Model_ProductFunction::i()->getList();
+        $list = $this->FCom_IndexTank_Model_ProductFunction->getList();
         $this->assertTrue(is_array($list));
         $this->assertEquals(2, count($list));
     }
@@ -38,7 +38,7 @@ class FCom_IndexTank_Tests_Model_ProductFunctionTest extends FCom_Test_DatabaseT
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_indextank_product_function'), "Pre-Condition");
 
-        $field = FCom_IndexTank_Model_ProductFunction::load(1);
+        $field = $this->FCom_IndexTank_Model_ProductFunction->load(1);
         $field->delete();
 
         $this->assertEquals(1, $this->getConnection()->getRowCount('fcom_indextank_product_function'), "Remove failed");
@@ -48,11 +48,11 @@ class FCom_IndexTank_Tests_Model_ProductFunctionTest extends FCom_Test_DatabaseT
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_indextank_product_function'), "Pre-Condition");
 
-        $func = FCom_IndexTank_Model_ProductFunction::load(1);
+        $func = $this->FCom_IndexTank_Model_ProductFunction->load(1);
         $this->assertEquals("age", $func->name, "Load failed");
         $func->name = "seconds";
         $func->save();
-        $func = FCom_IndexTank_Model_ProductFunction::load(1);
+        $func = $this->FCom_IndexTank_Model_ProductFunction->load(1);
         $this->assertEquals("seconds", $func->name, "Update failed");
     }
 }

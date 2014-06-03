@@ -5,14 +5,14 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
     public function testToJson()
     {
         $data = ['key' => 'value'];
-        $json = BUtil::toJson($data);
+        $json = $this->BUtil->toJson($data);
         $this->assertTrue(is_string($json));
     }
 
     public function testFromJson()
     {
         $json = '{"key":"value"}';
-        $data = BUtil::fromJson($json);
+        $data = $this->BUtil->fromJson($json);
         $this->assertTrue(is_array($data));
         $this->assertTrue(isset($data['key']));
     }
@@ -20,7 +20,7 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
     public function testToJavascript()
     {
         $data = ['key' => 'value'];
-        $json = BUtil::toJavaScript($data);
+        $json = $this->BUtil->toJavaScript($data);
         $this->assertTrue(is_string($json));
     }
 
@@ -28,7 +28,7 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
     {
         $obj = new stdClass();
         $obj->key = 'value';
-        $array = BUtil::objectToArray($obj);
+        $array = $this->BUtil->objectToArray($obj);
         $this->assertTrue(is_array($array));
         $this->assertTrue(isset($array['key']));
     }
@@ -36,7 +36,7 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
     public function testArrayToObject()
     {
         $array = ['key' => 'value'];
-        $obj = BUtil::arrayToObject($array);
+        $obj = $this->BUtil->arrayToObject($array);
 
         $this->assertTrue(is_object($obj));
         $this->assertTrue(isset($obj->key));
@@ -47,7 +47,7 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
     {
         $format = 'Say %hi$s %bye$s!';
         $args = ['hi' => 'Hi', 'bye' => 'Goodbye'];
-        $string = BUtil::sprintfn($format, $args);
+        $string = $this->BUtil->sprintfn($format, $args);
         $this->assertEquals('Say Hi Goodbye!', $string);
     }
 
@@ -55,7 +55,7 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
     {
         $str = 'One :two :three';
         $args = ['two' => 2, 'three' => 3];
-        $string = BUtil::injectVars($str, $args);
+        $string = $this->BUtil->injectVars($str, $args);
         $this->assertEquals('One 2 3', $string);
     }
 
@@ -63,7 +63,7 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
     {
         $a1 = [1, 2, [3, 4, 5]];
         $a2 = [1, 2, [3, 4, 5, 6]];
-        $res = BUtil::arrayCompare($a2, $a1);
+        $res = $this->BUtil->arrayCompare($a2, $a1);
         // 0 - number of parameter with difference
         // 2 - first dimenstion of array
         // 3 - second dimenstion of array
@@ -72,7 +72,7 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
 
         $a1 = [1, 2, [3, 4, 5]];
         $a2 = [1, 2, [3, 4, 5, 6]];
-        $res = BUtil::arrayCompare($a1, $a2);
+        $res = $this->BUtil->arrayCompare($a1, $a2);
         //order of parameters was changed, so we expected '1' as array key
         $expected = ['1' => ['2' => ['3' => 6]]];
         $this->assertEquals($expected, $res);
@@ -82,30 +82,30 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
     {
         $a1 = [1, 2, [3, 4, 5]];
         $a2 = [1, 2, [3, 4, 5, 6]];
-        $res = BUtil::arrayMerge($a1, $a2);
+        $res = $this->BUtil->arrayMerge($a1, $a2);
         $expected = [1, 2, [3, 4, 5], [3, 4, 5, 6]];
         $this->assertEquals($expected, $res);
 
         $a1 = [1, 2, [3, 4, 5], 6];
         $a2 = [1, 2, [3, 4, 5, 6], 7];
-        $res = BUtil::arrayMerge($a1, $a2);
+        $res = $this->BUtil->arrayMerge($a1, $a2);
         $expected = [1, 2, [3, 4, 5], 6, [3, 4, 5, 6], 7];
         $this->assertEquals($expected, $res);
     }
 
     public function testRandomStrng()
     {
-        $str = Butil::randomString();
+        $str = $this->BUtil->randomString();
         $this->assertTrue(is_string($str));
 
-        $str = Butil::randomString(4, 'a');
+        $str = $this->BUtil->randomString(4, 'a');
         $this->assertEquals('aaaa', $str);
     }
 
     public function testRandomPattern()
     {
         $pattern = "{U10}-{L5}-{D2}";
-        $res = BUtil::randomPattern($pattern);
+        $res = $this->BUtil->randomPattern($pattern);
         list($upper, $lower, $digits) = explode("-", $res);
         $this->assertTrue(strtoupper($upper) == $upper);
         $this->assertTrue(strtolower($lower) == $lower);
@@ -124,27 +124,27 @@ class BUtil_Test extends PHPUnit_Framework_TestCase
             'query' => 'a=b&c=d',
             'fragment' => 'start'
         ];
-        $url = Butil::unparseUrl($urlInfo);
+        $url = $this->BUtil->unparseUrl($urlInfo);
         $this->assertEquals('http://utest:ptest@google.com:80/i/test/?a=b&c=d#start', $url);
     }
 
     public function testSetUrlQuery()
     {
         $url = "http://google.com?a=b&c=d";
-        $urlNew = BUtil::setUrlQuery($url, ['f' => 'e']);
+        $urlNew = $this->BUtil->setUrlQuery($url, ['f' => 'e']);
         $this->assertEquals($url . '&f=e', $urlNew);
 
-        $urlNew = BUtil::setUrlQuery($url, ['c' => 'd2']);
+        $urlNew = $this->BUtil->setUrlQuery($url, ['c' => 'd2']);
         $this->assertEquals("http://google.com?a=b&c=d2", $urlNew);
     }
 
     public function testPreviewText()
     {
         $text = 'abc abc abc abc abc';
-        $textPreview = BUtil::previewText($text, 10);
+        $textPreview = $this->BUtil->previewText($text, 10);
         $this->assertEquals("abc abc ", $textPreview);
 
-        $textPreview = BUtil::previewText($text, 13);
+        $textPreview = $this->BUtil->previewText($text, 13);
         $this->assertEquals("abc abc abc ", $textPreview);
     }
 }

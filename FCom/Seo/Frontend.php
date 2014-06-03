@@ -2,16 +2,16 @@
 
 class FCom_Seo_Frontend extends BClass
 {
-    static public function bootstrap()
+    public function bootstrap()
     {
-        static::rememberReferrer();
+        $this->rememberReferrer();
     }
 
-    static public function rememberReferrer()
+    public function rememberReferrer()
     {
-        $referrer =& BSession::i()->dataToUpdate('referrer');
+        $referrer =& $this->BSession->dataToUpdate('referrer');
         if (empty($referrer)) {
-            $url = BRequest::i()->referrer();
+            $url = $this->BRequest->referrer();
             if (!$url) {
                 $referrer = [
                     'url' => null,

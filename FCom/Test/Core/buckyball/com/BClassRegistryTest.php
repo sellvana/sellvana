@@ -81,12 +81,12 @@ class BClassRegistry_Test_A extends BClass
         return 'A';
     }
 
-    static public function sayA()
+    public function sayA()
     {
         return 'A';
     }
 
-    static public function augmentA()
+    public function augmentA()
     {
         return 'A';
     }
@@ -99,12 +99,12 @@ class BClassRegistry_Test_B extends BClass
         return 'B';
     }
 
-    static public function sayB($origObject = null)
+    public function sayB($origObject = null)
     {
         return 'B';
     }
 
-    static public function augmentB($result, $origObject)
+    public function augmentB($result, $origObject)
     {
         $result = 'B';
         return $result;
@@ -113,12 +113,12 @@ class BClassRegistry_Test_B extends BClass
 
 class BClassRegistry_Test_AugmentProperty extends BClass
 {
-    static public function newSetter($object, $property, $value)
+    public function newSetter($object, $property, $value)
     {
         $object->$property = $value + 5;
     }
 
-    static public function newGetter($object, $property, $prevResult)
+    public function newGetter($object, $property, $prevResult)
     {
         return $prevResult + 10;
     }

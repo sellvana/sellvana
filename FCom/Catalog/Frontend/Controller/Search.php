@@ -4,25 +4,25 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
 {
     public function action_category()
     {
-        $q = BRequest::i()->get('q');
-        $filter = BRequest::i()->get('f');
+        $q = $this->BRequest->get('q');
+        $filter = $this->BRequest->get('f');
 
-        $catName = BRequest::i()->params('category');
+        $catName = $this->BRequest->params('category');
         if ($catName === '' || is_null($catName)) {
             $this->forward(false);
             return;
         }
-        $category = FCom_Catalog_Model_Category::i()->load($catName, 'url_path');
+        $category = $this->FCom_Catalog_Model_Category->load($catName, 'url_path');
         if (!$category) {
             $this->forward(false);
             return $this;
         }
 
         $this->layout('/catalog/category');
-        $layout = BLayout::i();
+        $layout = $this->BLayout;
         $pagerView = $layout->view('catalog/product/pager');
 
-        $productsORM = FCom_Catalog_Model_Product::i()->searchProductOrm($q, $filter, $category);
+        $productsORM = $this->FCom_Catalog_Model_Product->searchProductOrm($q, $filter, $category);
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_orm', ['orm' => $productsORM]);
         $productsData = $productsORM->paginate(null, [
             'ps' => $pagerView->default_page_size,
@@ -32,7 +32,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         ]);
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_data', ['data' => &$productsData]);
 
-        BApp::i()
+        $this->BApp->i()
             ->set('current_category', $category)
             ->set('current_query', $q)
             ->set('products_data', $productsData);
@@ -54,9 +54,9 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         if ($category->layout_update) {
             $layoutUpdate = BYAML::parse($category->layout_update);
             if (!is_null($layoutUpdate)) {
-                BLayout::i()->addLayout('category_page', $layoutUpdate)->applyLayout('category_page');
+                $this->BLayout->addLayout('category_page', $layoutUpdate)->applyLayout('category_page');
             } else {
-                BDebug::warning('Invalid layout update for CMS page');
+                $this->BDebug->warning('Invalid layout update for CMS page');
             }
         }
 
@@ -73,29 +73,29 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $layout->view('catalog/nav')->set([
             'category' => $category,
             'active_ids' => $activeCatIds,
-            'home_url' => BConfig::i()->get('modules/FCom_Catalog/url_prefix'),
+            'home_url' => $this->BConfig->get('modules/FCom_Catalog/url_prefix'),
         ]);
 
 
-        FCom_Core_Main::i()->lastNav(true);
+        $this->FCom_Core_Main->lastNav(true);
 
     }
 
     public function action_search()
     {
-        $q = BRequest::i()->get('q');
+        $q = $this->BRequest->get('q');
         if (is_array($q)) {
             $q = join(' ', $q);
         }
-        $filter = BRequest::i()->get('f');
+        $filter = $this->BRequest->get('f');
 
         $this->layout('/catalog/category');
-        $layout = BLayout::i();
+        $layout = $this->BLayout;
         $pagerView = $layout->view('catalog/product/pager');
 
-        $q = FCom_Catalog_Model_SearchAlias::i()->processSearchQuery($q);
+        $q = $this->FCom_Catalog_Model_SearchAlias->processSearchQuery($q);
 
-        $productsORM = FCom_Catalog_Model_Product::i()->searchProductOrm($q, $filter);
+        $productsORM = $this->FCom_Catalog_Model_Product->searchProductOrm($q, $filter);
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_orm', ['data' => $productsORM]);
         $productsData = $productsORM->paginate(null, [
             'ps' => $pagerView->default_page_size,
@@ -105,8 +105,8 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         ]);
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', ['data' => &$productsData]);
 
-        $category = FCom_Catalog_Model_Category::i()->orm()->where_null('parent_id')->find_one();
-        BApp::i()
+        $category = $this->FCom_Catalog_Model_Category->orm()->where_null('parent_id')->find_one();
+        $this->BApp->i()
             ->set('current_query', $q)
             ->set('current_category', $category)
             ->set('products_data', $productsData);
@@ -119,7 +119,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $pagerView->state = $productsData['state'];
         $pagerView->setCanonicalPrevNext();
 
-        FCom_Catalog_Model_SearchHistory::i()->addSearchHit($q, $productsData['state']['c']);
+        $this->FCom_Catalog_Model_SearchHistory->addSearchHit($q, $productsData['state']['c']);
 
         $layout->view('header')->set('query', $q);
         $layout->view('breadcrumbs')->set('crumbs', ['home', ['label' => 'Search: ' . $q, 'active' => true]]);
@@ -127,7 +127,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $pagerView->set('filters', $filter);
         $pagerView->set('query', $q);
 
-        FCom_Core_Main::i()->lastNav(true);
+        $this->FCom_Core_Main->lastNav(true);
     }
 
 

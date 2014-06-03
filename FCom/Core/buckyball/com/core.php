@@ -55,7 +55,7 @@ class BClass
      * @var array
      */
     static protected $_diConfig = [
-        '_env' => 'BEnv',
+        #'_env' => 'BEnv',
         '*' => 'ALL',
     ];
 
@@ -1537,9 +1537,9 @@ class BClassAutoload extends BClass
             if ($file[0] !== '/' && $file[1] !== ':') {
                 $file = $this->root_dir . '/' . $file;
             }
-            if (file_exists($file)) {
-                include ($file);
-            }
+            #if (file_exists($file)) {
+                @include ($file);
+            #}
         }
     }
 }

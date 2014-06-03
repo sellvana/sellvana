@@ -15,7 +15,7 @@ class BEvents_Test extends PHPUnit_Framework_TestCase
 
 class BEvents_Test_Callback
 {
-    static public function callback()
+    public function callback()
     {
         return 10;
     }

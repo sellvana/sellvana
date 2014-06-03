@@ -7,9 +7,9 @@ class FCom_Frontend_Main extends BClass
     public function getLayout()
     {
         if (empty($this->_layout)) {
-            $this->_layout = BLayout::i(true);
+            $this->_layout = $this->BLayout->i(true);
 
-            $modules = BModuleRegistry::i()->getAllModules();
+            $modules = $this->BModuleRegistry->getAllModules();
             foreach ($modules as $mod) {
                 $autoUse = !empty($mod->auto_use) ? array_flip((array)$mod->auto_use) : [];
                 $frontendAutoUse = !empty($mod->areas['FCom_Frontend']['auto_use'])
@@ -30,14 +30,14 @@ class FCom_Frontend_Main extends BClass
         return $this->_layout;
     }
 
-    public static function adminHref($url = '')
+    public function adminHref($url = '')
     {
-        return BApp::adminHref($url);
+        return $this->BApp->adminHref($url);
     }
 
-    public static function href($url = '')
+    public function href($url = '')
     {
-        return BApp::frontendHref($url);
+        return $this->BApp->frontendHref($url);
     }
 }
 

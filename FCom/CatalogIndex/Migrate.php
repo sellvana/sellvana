@@ -4,17 +4,17 @@ class FCom_CatalogIndex_Migrate extends BClass
 {
     public function install__0_1_9()
     {
-        $tCustField = FCom_CustomField_Model_Field::table();
-        $tProduct = FCom_Catalog_Model_Product::table();
+        $tCustField = $this->FCom_CustomField_Model_Field->table();
+        $tProduct = $this->FCom_Catalog_Model_Product->table();
 
-        $tTerm = FCom_CatalogIndex_Model_Term::table();
-        $tField = FCom_CatalogIndex_Model_Field::table();
-        $tFieldValue = FCom_CatalogIndex_Model_FieldValue::table();
-        $tDoc = FCom_CatalogIndex_Model_Doc::table();
-        $tDocValue = FCom_CatalogIndex_Model_DocValue::table();
-        $tDocTerm = FCom_CatalogIndex_Model_DocTerm::table();
-        $tDocSort = FCom_CatalogIndex_Model_DocSort::table();
-        BDb::ddlTableDef($tTerm, [
+        $tTerm = $this->FCom_CatalogIndex_Model_Term->table();
+        $tField = $this->FCom_CatalogIndex_Model_Field->table();
+        $tFieldValue = $this->FCom_CatalogIndex_Model_FieldValue->table();
+        $tDoc = $this->FCom_CatalogIndex_Model_Doc->table();
+        $tDocValue = $this->FCom_CatalogIndex_Model_DocValue->table();
+        $tDocTerm = $this->FCom_CatalogIndex_Model_DocTerm->table();
+        $tDocSort = $this->FCom_CatalogIndex_Model_DocSort->table();
+        $this->BDb->ddlTableDef($tTerm, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'term' => 'varchar(50) not null',
@@ -24,7 +24,7 @@ class FCom_CatalogIndex_Migrate extends BClass
                 'IDX_term' => 'UNIQUE (term)',
             ],
         ]);
-        BDb::ddlTableDef($tField, [
+        $this->BDb->ddlTableDef($tField, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'field_name' => 'varchar(50) not null',
@@ -51,7 +51,7 @@ class FCom_CatalogIndex_Migrate extends BClass
                 "FK_{$tField}_field" => "FOREIGN KEY (`fcom_field_id`) REFERENCES {$tCustField} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ],
         ]);
-        BDb::ddlTableDef($tFieldValue, [
+        $this->BDb->ddlTableDef($tFieldValue, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'field_id' => 'int unsigned not null',
@@ -68,7 +68,7 @@ class FCom_CatalogIndex_Migrate extends BClass
                 "FK_{$tFieldValue}_field" => "FOREIGN KEY (`field_id`) REFERENCES {$tField} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ],
         ]);
-        BDb::ddlTableDef($tDoc, [
+        $this->BDb->ddlTableDef($tDoc, [
             'COLUMNS' => [
                 'id' => 'int(10) unsigned not null auto_increment',
                 'last_indexed' => 'datetime not null',
@@ -89,7 +89,7 @@ class FCom_CatalogIndex_Migrate extends BClass
                 "FK_{$tDoc}_product" => "FOREIGN KEY (`id`) REFERENCES {$tProduct} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ],
         ]);
-        BDb::ddlTableDef($tDocTerm, [
+        $this->BDb->ddlTableDef($tDocTerm, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'doc_id' => 'int(10) unsigned NOT NULL',
@@ -104,7 +104,7 @@ class FCom_CatalogIndex_Migrate extends BClass
                 "FK_{$tDocTerm}_term" => "FOREIGN KEY (`term_id`) REFERENCES {$tTerm} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ],
         ]);
-        BDb::ddlTableDef($tDocValue, [
+        $this->BDb->ddlTableDef($tDocValue, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'doc_id' => 'int(10) unsigned NOT NULL',
@@ -123,12 +123,12 @@ class FCom_CatalogIndex_Migrate extends BClass
         ]);
 
         $this->upgrade__0_1_3__0_1_4();
-        FCom_CatalogIndex_Model_Field::i()->update_many([
+        $this->FCom_CatalogIndex_Model_Field->update_many([
             'source_type' => 'callback',
             'source_callback' => 'FCom_CatalogIndex_Model_Field::indexPrice',
         ], ['field_name' => 'price']);
 
-        BDb::ddlTableDef($tDocSort, [
+        $this->BDb->ddlTableDef($tDocSort, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'doc_id' => 'int unsigned not null',
@@ -149,7 +149,7 @@ class FCom_CatalogIndex_Migrate extends BClass
     public function upgrade__0_1_3__0_1_4()
     {
         //$this->install();
-        BDb::run("
+        $this->BDb->run("
 REPLACE  INTO `fcom_index_field`
 (`id`,`field_name`,`field_label`,`field_type`,`weight`,`fcom_field_id`,`source_type`,`source_callback`,`filter_type`,`filter_multivalue`,`filter_counts`,`filter_show_empty`,`filter_order`,`filter_custom_view`,`search_type`,`sort_type`,`sort_label`,`sort_order`)
 VALUES
@@ -166,13 +166,13 @@ VALUES
 
     public function upgrade__0_1_4__0_1_5()
     {
-        BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), [
+        $this->BDb->ddlTableDef($this->FCom_CatalogIndex_Model_Field->table(), [
             'COLUMNS' => [
                 'filter_counts' => 'tinyint unsigned NOT NULL DEFAULT 0 AFTER filter_multivalue',
             ],
         ]);
 
-        FCom_CatalogIndex_Model_Field::i()->update_many(
+        $this->FCom_CatalogIndex_Model_Field->update_many(
             ['filter_custom_view' => 'catalogindex/product/_filter_categories'],
             ['field_name' => 'category']
         );
@@ -180,7 +180,7 @@ VALUES
 
     public function upgrade__0_1_5__0_1_6()
     {
-        BDb::ddlTableDef(FCom_CatalogIndex_Model_Field::table(), [
+        $this->BDb->ddlTableDef($this->FCom_CatalogIndex_Model_Field->table(), [
             'COLUMNS' => [
                 'filter_multiselect' => 'DROP',
             ],
@@ -189,7 +189,7 @@ VALUES
 
     public function upgrade__0_1_6__0_1_7()
     {
-        BDb::ddlTableDef(FCom_CatalogIndex_Model_Doc::table(), [
+        $this->BDb->ddlTableDef($this->FCom_CatalogIndex_Model_Doc->table(), [
             'COLUMNS' => [
                 'flag_reindex' => 'tinyint not null default 0 after last_indexed',
             ],
@@ -201,11 +201,11 @@ VALUES
 
     public function upgrade__0_1_7__0_1_8()
     {
-        $tDoc = FCom_CatalogIndex_Model_Doc::table();
-        $tField = FCom_CatalogIndex_Model_Field::table();
-        $tDocSort = FCom_CatalogIndex_Model_DocSort::table();
+        $tDoc = $this->FCom_CatalogIndex_Model_Doc->table();
+        $tField = $this->FCom_CatalogIndex_Model_Field->table();
+        $tDocSort = $this->FCom_CatalogIndex_Model_DocSort->table();
 
-        BDb::ddlTableDef($tDocSort, [
+        $this->BDb->ddlTableDef($tDocSort, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'doc_id' => 'int unsigned not null',
@@ -226,7 +226,7 @@ VALUES
 
     public function upgrade__0_1_8__0_1_9()
     {
-        FCom_CatalogIndex_Model_Field::i()->update_many([
+        $this->FCom_CatalogIndex_Model_Field->update_many([
             'source_type' => 'callback',
             'source_callback' => 'FCom_CatalogIndex_Model_Field::indexPrice',
         ], ['field_name' => 'price']);

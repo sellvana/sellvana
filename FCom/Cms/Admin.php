@@ -2,9 +2,9 @@
 
 class FCom_Cms_Admin extends BClass
 {
-    public static function bootstrap()
+    public function bootstrap()
     {
-        FCom_Admin_Model_Role::i()->createPermission([
+        $this->FCom_Admin_Model_Role->createPermission([
             'cms' => 'CMS',
             'cms/pages' => 'Manage Pages',
             'cms/blocks' => 'Manage Blocks',

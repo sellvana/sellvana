@@ -5,12 +5,12 @@ require_once __DIR__ . '/../../../tests/index.php';
 class FCom_AuthorizeNet_Tests_AllTests
 {
 
-    public static function main()
+    public function main()
     {
         PHPUnit_TextUI_TestRunner::run(self::suite());
     }
 
-    public static function suite()
+    public function suite()
     {
         $suite = new PHPUnit_Framework_TestSuite('PHPUnit AuthorizeNet');
         require_once 'ApiTest.php';
@@ -19,4 +19,4 @@ class FCom_AuthorizeNet_Tests_AllTests
         return $suite;
     }
 }
-FCom_AuthorizeNet_Tests_AllTests::main();
+$this->FCom_AuthorizeNet_Tests_AllTests->main();

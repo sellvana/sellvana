@@ -29,16 +29,16 @@ class FCom_Core_Model_Module extends BDbModule
         'unique_key' => ['module_name',],
     ];
 
-    static public function getModulesData()
+    public function getModulesData()
     {
-        $config = BConfig::i()->get('module_run_levels');
+        $config = $this->BConfig->get('module_run_levels');
         $coreLevels = $config['FCom_Core'];
         $adminLevels = $config['FCom_Admin'];
         $frontendLevels = $config['FCom_Frontend'];
-        $modules = BModuleRegistry::i()->getAllModules();
+        $modules = $this->BModuleRegistry->getAllModules();
 
         try {
-            $schemaVersions = static::orm()->find_many_assoc('module_name');
+            $schemaVersions = $this->orm()->find_many_assoc('module_name');
             $schemaModules = [];
             foreach (BMigrate::getMigrationData() as $connection => $migrationModules) {
                 foreach ($migrationModules as $modName => $migrData) {
@@ -46,13 +46,13 @@ class FCom_Core_Model_Module extends BDbModule
                 }
             }
         } catch (Exception $e) {
-            BDebug::logException($e);
+            $this->BDebug->logException($e);
         }
 
         $data = [];
         $migrate = false;
         foreach ($modules as $modName => $mod) {
-            $r = BUtil::arrayMask((array)$mod, 'name,description,version,run_status,run_level,require,children_copy');
+            $r = $this->BUtil->arrayMask((array)$mod, 'name,description,version,run_status,run_level,require,children_copy');
             $reqs = [];
             if (!empty($r['require']['module'])) {
                 foreach ($r['require']['module'] as $req) {
