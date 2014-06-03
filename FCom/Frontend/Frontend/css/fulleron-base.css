@@ -491,7 +491,7 @@ label.error {
 .f-cart-col-price { width:120px; }
 .f-cart-col-total { width:80px; }
 .f-cart-col-total .checkbox { margin:0; }
-.f-input-qty { display:inline; width:30px; text-align:center; }
+.f-input-qty { display:inline; width:70px; text-align:center; }
 .f-cart-btn-group {
   padding-left:0;
   text-align:center;

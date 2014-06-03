@@ -165,4 +165,10 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         }
         return $res;
     }
+
+    public function getFrontendLabel($code)
+    {
+        $field = $this->load($code, 'field_code');
+        return $field->get('frontend_label');
+    }
 }

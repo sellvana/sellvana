@@ -18,9 +18,11 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
         return $this->product;
     }
 
-    public function rowTotal()
+    public function rowTotal($id)
     {
-        return $this->price * $this->qty;
+        $data_serialized = BUtil::objectToArray(json_decode($this->data_serialized));
+        $variant = $data_serialized['variants'][$id];
+        return $variant['price'] * $variant['qty'];
     }
 
     public function isGroupAble()

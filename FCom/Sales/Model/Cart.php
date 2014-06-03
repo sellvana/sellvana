@@ -59,6 +59,10 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $id;
     }
 
+    /**
+     * @param bool $reset
+     * @return FCom_Sales_Model_Cart
+     */
     static public function sessionCart($reset = false)
     {
         if ($reset || !static::$_sessionCart) {
@@ -234,6 +238,24 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $item = FCom_Sales_Model_Cart_Item::i()->create(['cart_id' => $this->id, 'product_id' => $productId,
                 'qty' => $params['qty'], 'price' => $params['price']]);
         }
+        if (isset($params['data'])) {
+
+            $data_serialized = BUtil::objectToArray(json_decode($item->data_serialized));
+            $flag = true;
+            if (isset($data_serialized['variants'])) {
+                foreach ($data_serialized['variants'] as &$arr) {
+                    if (in_array($params['data']['variants']['fields'], $arr)) {
+                        $flag = false;
+                        $arr['qty'] = $arr['qty'] + $params['data']['variants']['qty'];
+                    }
+                }
+            }
+            if ($flag) {
+                $data_serialized['variants'] = (isset($data_serialized['variants']))? $data_serialized['variants'] : [];
+                array_push($data_serialized['variants'], $params['data']['variants']);
+            }
+            $item->set('data', $data_serialized);
+        }
         $item->save();
         if (empty($params['no_calc_totals'])) {
             $this->calculateTotals()->save();
@@ -367,20 +389,20 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 ->find_many_assoc('atype');
         }
         switch ($atype) {
-        case 'billing':
-            return !empty($this->addresses['billing']) ? $this->addresses['billing'] : null;
+            case 'billing':
+                return !empty($this->addresses['billing']) ? $this->addresses['billing'] : null;
 
-        case 'shipping':
-            if (!empty($this->addresses['shipping'])) {
-                $this->shipping_same = 0;
-                return $this->addresses['shipping'];
-            } elseif ($this->shipping_same) {
-                return $this->getAddressByType('billing');
-            } else {
-                return null;
-            }
-        default:
-            throw new BException('Invalid cart address type: ' . $atype);
+            case 'shipping':
+                if (!empty($this->addresses['shipping'])) {
+                    $this->shipping_same = 0;
+                    return $this->addresses['shipping'];
+                } elseif ($this->shipping_same) {
+                    return $this->getAddressByType('billing');
+                } else {
+                    return null;
+                }
+            default:
+                throw new BException('Invalid cart address type: ' . $atype);
         }
     }
 

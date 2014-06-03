@@ -30,8 +30,8 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
             }
             $out_stock = (isset($settings['out_stock']))? 'back_order': '';
             if (isset($data_serialized['stock_policy'])) {
-                $qty = $data_serialized['stock_policy']['stock_qty'];
-                $out_stock = $data_serialized['stock_policy']['out_stock'];
+                $qty = (isset($data_serialized['stock_policy']['stock_qty']))? $data_serialized['stock_policy']['stock_qty'] : '';
+                $out_stock = (isset($data_serialized['stock_policy']['out_stock'])) ? $data_serialized['stock_policy']['out_stock']: '';
             }
             $tmp = [
                 'id' => $row->get('id'),
@@ -216,7 +216,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
                         if ($prod) {
                             $data_serialized = BUtil::objectToArray(json_decode($prod->get('data_serialized')));
                             if (!isset($data_serialized['stock_policy']))  {
-                                $data_serialized['stock_policy'] = ['out_stock' => $p['out_stock'], 'manage_stock' => $p['manage_stock']];
+                                $data_serialized['stock_policy'] = ['out_stock' => $p['out_stock'], 'manage_stock' => $p['status']];
                             } else {
                                 $data_serialized['stock_policy']['out_stock'] = $p['out_stock'];
                                 $data_serialized['stock_policy']['manage_stock'] = $p['status'];
