@@ -5,6 +5,10 @@ modules:
         description: Base Admin functionality
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCommon: 0.1.0, FCom_LibTwig: 0.1.0, FCom_Frontend: 0.1.0 } }
 
+        translations:
+            de: de.php
+            es: es.php
+
         areas:
             FCom_Admin:
                 views:
@@ -58,6 +62,8 @@ modules:
                     - [ /header_search, FCom_Admin_Controller_HeaderSearch.index ]
                     - [ /generate_sitemap, FCom_Admin_Controller.generate_sitemap ]
 
+                    - [ /switch_locale, FCom_Admin_Controller.switch_locale ]
+
                 observe:
                     - [ "FCom_Admin_Controller_Settings::action_index__POST", "FCom_Admin_Admin.onSettingsPost" ]
                     - [ "FCom_Admin_View_Dashboard::getWidgets", "FCom_Admin_Admin.onGetDashboardWidgets" ]
@@ -67,8 +73,12 @@ modules:
                         /settings:
                             POST/config/modules/FCom_Admin/add_js_code: "*"
                             POST/config/modules/FCom_Frontend/add_js_code: "*"
-                default_config:
-                    modules/FCom_Admin/theme: FCom_Admin_DefaultTheme
+        default_config:
+            modules:
+                FCom_Admin:
+                    theme: FCom_Admin_DefaultTheme
+                    default_locale: en_US
+
 
         provides:
             themes:

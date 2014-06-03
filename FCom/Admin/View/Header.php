@@ -53,4 +53,39 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
     {
         return [];
     }
+
+    public function getLocales()
+    {
+        $conf = $this->_env->config->get('modules/FCom_Admin');
+        if (empty($conf['enable_locales']) || empty($conf['allowed_locales'])) {
+            return false;
+        }
+        $locales = [];
+        $urlTpl = $this->_env->util->setUrlQuery($this->_env->app->href('switch_locale'), ['locale' => '-LOCALE-']);
+        sort($conf['allowed_locales']);
+        foreach ($conf['allowed_locales'] as $locale) {
+            list($flag) = explode('_', $locale);
+            $locales[] = [
+                'code' => $locale,
+                'title' => $locale,
+                'flag' => $flag,
+                'href' => str_replace('-LOCALE-', $locale, $urlTpl),
+            ];
+        }
+        return $locales;
+    }
+
+    public function getCurrentLocale()
+    {
+        $locale = $this->_env->session->get('_locale');
+#echo "<pre>"; var_dump($locale); exit;
+        if (!$locale) {
+            $locale = $this->_env->config->get('modules/FCom_Admin/default_locale');
+        }
+        list($flag) = explode('_', $locale);
+        return [
+            'title' => $locale,
+            'flag' => $flag,
+        ];
+    }
 }

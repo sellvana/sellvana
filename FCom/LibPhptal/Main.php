@@ -25,10 +25,10 @@ class FCom_LibPhptal_Main extends BClass
 
         static::$_forceReparse = $config->get('modules/FCom_LibPhptal/force_reparse');
 
-        static::$_fcomVars = BData::i(true, [
+        static::$_fcomVars = BData::i(true, [[
             'request' => BRequest::i(),
             'layout' => BLayout::i(),
-        ]);
+        ]]);
 
         BLayout::i()->addRenderer('FCom_LibPhptal', [
             'description' => 'PHPTAL',

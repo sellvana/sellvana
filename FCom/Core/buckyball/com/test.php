@@ -78,7 +78,7 @@ class BTestRunner extends BClass
 
     public function describe($suite, $f)
     {
-        $this->_suites[] = $suite = BTestSuite::i(true, ['runner' => $this, 'description' => $suite, 'callback' => $f]);
+        $this->_suites[] = $suite = BTestSuite::i(true, [['runner' => $this, 'description' => $suite, 'callback' => $f]]);
         return $suite;
     }
 
@@ -125,7 +125,7 @@ class BTestSuite extends BClass
 
     public function it($spec, $f)
     {
-        BTestSpec::i(true, ['suite' => $this, 'description' => $spec, 'callback' => $f]);
+        BTestSpec::i(true, [['suite' => $this, 'description' => $spec, 'callback' => $f]]);
         return $spec;
     }
 
@@ -163,13 +163,13 @@ class BTestSpec extends BClass
 
     public function expect($x)
     {
-        $this->_expectations[] = $expectation = BTestExpectation::i(true, ['spec' => $this, 'value' => $x]);
+        $this->_expectations[] = $expectation = BTestExpectation::i(true, [['spec' => $this, 'value' => $x]]);
         return $expect;
     }
 
     public function spyOn($class, $method)
     {
-        $this->_spies[] = $spy = BTestSpy::i(true, ['spec' => $this, 'class' => $class, 'method' => $method]);
+        $this->_spies[] = $spy = BTestSpy::i(true, [['spec' => $this, 'class' => $class, 'method' => $method]]);
         return $spy;
     }
 }

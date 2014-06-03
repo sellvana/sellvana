@@ -1785,10 +1785,10 @@ class BView extends BClass
     public function validator($formName, $data = null)
     {
         if (empty($this->_validators[$formName])) {
-            $this->_validators[$formName] = BValidateViewHelper::i(true, [
+            $this->_validators[$formName] = BValidateViewHelper::i(true, [[
                 'form' => $formName,
                 'data' => $data,
-            ]);
+            ]]);
         }
         return $this->_validators[$formName];
     }

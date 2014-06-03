@@ -66,6 +66,48 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         $this->layout('/reports');
     }
 
+    public function action_switch_locale()
+    {
+        if ($this->_env->request->csrf('referrer', 'GET')) {
+            $this->_env->response->status(403, 'CSRF detected', 'CSRF detected');
+            return;
+        }
+        $this->switchLocale();
+    }
+
+    public function action_switch_locale__POST()
+    {
+        $this->switchLocale();
+    }
+
+    public function switchLocale()
+    {
+        $req = $this->_env->request;
+        $locale = $req->request('locale');
+        $conf = $this->_env->config->get('modules/FCom_Admin');
+        $default = !empty($conf['default_locale']) ? $conf['default_locale'] : 'en_US';
+        if (empty($conf['enable_locales']) || empty($conf['allowed_locales'])) {
+            $locale = $default;
+        } else {
+            $allowed = $conf['allowed_locales'];
+            if (!in_array($locale, $conf['allowed_locales'])) {
+                $locale = $default;
+            }
+        }
+
+        list($language) = explode('_', $locale);
+        $this->_env->session->set('_locale', $locale)->set('_language', $language);
+
+        $redirectUrl = $req->request('redirect_to');
+        if (!$redirectUrl) {
+            $redirectUrl = $req->referrer();
+        }
+        if (!$req->isUrlLocal($redirectUrl) || strpos($redirectUrl, 'switch_locale') !== false) {
+            $redirectUrl = '';
+        }
+        $this->_env->response->redirect($redirectUrl);
+    }
+
     public function action_personalize__POST()
     {
         $r = BRequest::i()->request();

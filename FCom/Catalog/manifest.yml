@@ -10,6 +10,9 @@ modules:
         observe:
             - [ "FCom_Core_ImportExport::import:afterModel:FCom_Catalog_Model_Category", "FCom_Catalog_Model_Category.onImportAfterModel" ]
 
+        default_config:
+            modules/FCom_Catalog/allowed_locales: [ en_US ]
+
         areas:
             FCom_Admin:
                 routing:
