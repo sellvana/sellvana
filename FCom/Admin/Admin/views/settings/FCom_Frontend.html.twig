@@ -1,4 +1,5 @@
 {% set c = THIS.get('model') %}
+{% set locales = LOCALE.getAvailableLocaleCodes() %}
 {% import THIS.view('admin/form-elements').twigName() as forms %}
 
 <h2>{{ "FrontEnd Settings"|_}}</h2>
@@ -19,8 +20,13 @@
             <div class="col-md-8 group-ip-mode"></div>
         </div>
 
-        {{ forms.textarea(fieldData|merge({name:'config[recovery_modules][FCom_Frontend]', id:'recovery_modules-FCom_Frontend',
-            label:'Modules to run in RECOVERY mode'|_, value:c.get('recovery_modules/FCom_Frontend'), raw:1 })) }}
+        {{ forms.textarea(fieldData, {name:'config[recovery_modules][FCom_Frontend]', id:'recovery_modules-FCom_Frontend',
+            label:'Modules to run in RECOVERY mode'|_, value:c.get('recovery_modules/FCom_Frontend'), raw:1 }) }}
+
+        {{ forms.boolean(fieldData, {field:'enable_locales', label:'Enable UI Multi Locale'|_ }) }}
+        {{ forms.select(fieldData, {field:'default_locale', label:'Default Product Locale', options:locales }) }}
+        {{ forms.select(fieldData, {field:'allowed_locales', label:'Enabled Frontend UI Locales', select2: {},
+            multiple: true, options:locales }) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
 

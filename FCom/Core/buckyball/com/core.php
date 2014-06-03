@@ -1969,7 +1969,8 @@ class BSession extends BClass
             }
         }
 
-        $this->data['_locale'] = BConfig::i()->get('locale');
+        #$this->data['_locale'] = BConfig::i()->get('locale');
+        /*
         if (!empty($this->data['_locale'])) {
             if (is_array($this->data['_locale'])) {
                 foreach ($this->data['_locale'] as $c => $l) {
@@ -1981,6 +1982,8 @@ class BSession extends BClass
         } else {
             setLocale(LC_ALL, 'en_US.UTF-8');
         }
+        */
+        setLocale(LC_ALL, 'en_US.UTF-8');
 
         if (!empty($this->data['_timezone'])) {
             date_default_timezone_set($this->data['_timezone']);

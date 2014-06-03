@@ -2,7 +2,7 @@
 
 class FCom_Catalog_Migrate extends BClass
 {
-    public function install__0_2_25()
+    public function install__0_2_26()
     {
         $tProduct = FCom_Catalog_Model_Product::table();
 
@@ -111,6 +111,7 @@ class FCom_Catalog_Migrate extends BClass
                 'is_enabled' => 'TINYINT(1) UNSIGNED DEFAULT 1 ',
                 'is_virtual'    => 'TINYINT(3) UNSIGNED DEFAULT NULL',
                 'is_top_menu'   => 'TINYINT(3) UNSIGNED DEFAULT NULL',
+                'is_featured'   => 'TINYINT(3) UNSIGNED DEFAULT NULL',
                 'data_serialized' => 'mediumtext null',
                 'show_content'  => 'TINYINT(1) UNSIGNED DEFAULT NULL',
                 'content'       => 'TEXT',
@@ -133,6 +134,7 @@ class FCom_Catalog_Migrate extends BClass
                 'full_name'     => 'UNIQUE (`full_name`)',
                 'parent_id'     => 'UNIQUE (`parent_id`,`node_name`)',
                 'is_top_menu'   => '(is_top_menu)',
+                'IDX_featured'  => '(is_featured)',
             ],
             'CONSTRAINTS' => [
                 "FK_{$tCategory}_parent" => "FOREIGN KEY (`parent_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
@@ -495,6 +497,19 @@ class FCom_Catalog_Migrate extends BClass
         BDb::ddlTableDef($tProductLink, [
             'COLUMNS' => [
                 'link_type' => "varchar(20) NOT NULL",
+            ],
+        ]);
+    }
+
+    public function upgrade__0_2_25__0_2_26()
+    {
+        $tCategory = FCom_Catalog_Model_Category::table();
+        BDb::ddlTableDef($tCategory, [
+            'COLUMNS' => [
+                'is_featured'   => 'TINYINT(3) UNSIGNED DEFAULT NULL',
+            ],
+            'KEYS' => [
+                'IDX_featured'  => '(is_featured)',
             ],
         ]);
     }

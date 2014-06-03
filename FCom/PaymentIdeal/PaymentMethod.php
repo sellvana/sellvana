@@ -96,7 +96,7 @@ class FCom_PaymentIdeal_PaymentMethod
     public function config()
     {
         if (!$this->config) {
-            $this->config = BData::i(true, BConfig::i()->get('modules/FCom_PaymentIdeal'));
+            $this->config = BData::i(true, [BConfig::i()->get('modules/FCom_PaymentIdeal')]);
         }
         return $this->config;
     }

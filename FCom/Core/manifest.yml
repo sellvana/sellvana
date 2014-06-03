@@ -47,3 +47,4 @@ modules:
                     support_email: support@example.com
                     sales_name: Sales
                     sales_email: support@example.com
+                    default_tz: "America/New_York"

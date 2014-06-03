@@ -27,8 +27,12 @@
         {{ forms.input(fieldData, { field:'copyright_message', label:'Copyright Message'|_ }) }}
     {{ forms.accordion_panel_end }}
 
+    {{ forms.accordion_panel_start({label:'Timezones'|_, id:'settings-FCom_Core-group2'}) }}
+        {{ forms.select(fieldData,  { field:'default_tz', label:'Default Timezone'|_, options:LOCALE.tzOptions(true), select2: {} }) }}
+    {{ forms.accordion_panel_end }}
+
     {% set fieldData = { model: c, id_prefix:'config-cookie', name_prefix:'config[cookie]', get_prefix:'cookie' } %}
-    {{ forms.accordion_panel_start({label:'Session'|_, id:'settings-FCom_Core-group2'}) }}
+    {{ forms.accordion_panel_start({label:'Session'|_, id:'settings-FCom_Core-group3'}) }}
         {{ forms.select(fieldData,  { field:'session_handler', label:'Session Handler'|_, options:SESSION.getHandlers() }) }}
         {{ forms.input(fieldData,   { field:'remember_days', label:'Remember Me Timeout (days)'|_ }) }}
         {{ forms.input(fieldData,   { field:'domain', label:'Cookie Domain'|_ }) }}
@@ -47,7 +51,7 @@
     {{ forms.accordion_panel_end }}
 
     {% set fieldData = { model: c, id_prefix:'web', name_prefix:'config[web]', get_prefix:'web' } %}
-    {{ forms.accordion_panel_start({label:'Web Settings'|_, id:'settings-FCom_Core-group3'}) }}
+    {{ forms.accordion_panel_start({label:'Web Settings'|_, id:'settings-FCom_Core-group5'}) }}
         {{ forms.boolean(fieldData, { field:'hide_script_name', label:'Hide script file name in URL'|_ }) }}
         {{ forms.input(fieldData,   { field:'http_host_whitelist', label:'HTTP Host Whitelist (comma separated)'|_ }) }}
         {{ forms.select(fieldData,  { field:'csrf_check_method', label:'CSRF Check Method'|_, options:{'token':'Token', 'origin':'Origin', 'referrer':'Referrer'} }) }}
