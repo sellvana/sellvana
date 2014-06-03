@@ -3,18 +3,22 @@
 {% set variantConfig = ctrl.variantGridConfig(model) %}
 <script>
 var variantThumbUrl = '';
+var prodVariantRowsCollection;
 function updateListVariantImage(imageObject) {
-    console.log('abc', imageObject);
     if (prodVariantGrid.find('tr').length > 0) {
         prodVariantGrid.find('tr').each(function() {
             var self = this;
             var imageItems = $(this).find('.list-variant-image');
             var select = $(this).find('.variant-image');
+            var tmp = [];
             if (imageObject.add == false) {
+
                 imageObject.image.forEach(function (obj) {
                     imageItems.find('i[data-id="'+ obj.file_id +'"]').parents('li').remove();
                     select.find('option[value="'+ obj.file_id +'"]').remove();
+                    tmp.push(obj.file_id)
                 });
+                updateFileIdVariant(tmp, false);
             } else  {
                 imageObject.image.forEach(function (obj) {
                     var storeImageId = $(self).find('.store-variant-image-id').val().split(',');
@@ -24,13 +28,30 @@ function updateListVariantImage(imageObject) {
                                 +'</label> <i data-id="'+ obj.file_id +'" class="icon-remove pull-right btn-link btn-delete-variant-image"></i></div></li>';
                         $(self).find('.list-variant-image').append(imageItem);
                         hide = 'hide';
+                        tmp.push({file_id: obj.file_id, id: self.attr('id')});
                     }
                     $(self).find('.variant-image').append("<option class='"+ hide +"' data-subfolder='"+ obj.subfolder +"' value='"+ obj.file_id +"'>"+ obj.file_name +"</option>")
                 });
+                updateFileIdVariant(tmp, true);
             }
 
         });
     }
+}
+
+function updateFileIdVariant(arr, add) {
+    prodVariantRowsCollection.each(function (obj) {
+        var file_id = obj.get('variant_file_id').pluck(',');
+        if (add) {
+            file_id = $.map(file_id, function(val) {
+                if (arr.indexOf(val) === -1) {
+                    return val;
+                }
+            })
+        }
+
+        obj.set('variant_file_id', file_id.join(','));
+    });
 }
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.validate'], function(Backbone, _, $) {
     var fieldCollection = null;
@@ -70,7 +91,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
             this.$el.find('input.select-value-field').each(function(obj) {
                 var name = $(this).attr('name');
                 var selfValue = this;
-                var field = self.model.get('fields');
+                var field = self.model.get('field_values');
                 var tmp = _.findWhere(colsJson, {name: name}).options;
                 var arr = $.map(tmp, function(value, key) {
                     return [{id: key, text: value}];
@@ -135,8 +156,8 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
             });
             variantThumbUrl = thumb_url = this.model.get('thumb_url');
             var imageId = [];
-            if (this.model.get('file_id') != null && this.model.get('file_id') != '') {
-                imageId = this.model.get('file_id').split(',');
+            if (this.model.get('variant_file_id') != null && this.model.get('variant_file_id') != '') {
+                imageId = this.model.get('variant_file_id').split(',');
                 self.$el.find('.list-variant-image').removeClass('hide');
             }
             function format(state) {
@@ -178,7 +199,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
         }
         grid.build();
         vColsCollection = grid.getCols();
-        vRowsCollection = grid.getRows();
+        prodVariantRowsCollection = vRowsCollection = grid.getRows();
         vFieldGridInit();
         grayGrid();
         bodyGrid.on('change', '.variant-image', function (){
@@ -269,28 +290,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
             tmp_fields.push($(this).attr('data-code'));
         });
         $('#vfield_ids').val(JSON.stringify(variant_fields));
-        var variants = [];
-        bodyGrid.find('tr').each(function () {
-            var variant = {};
-            var fvals = {};
-           $(this).find('td').each(function () {
-                var col = $(this).attr('data-col');
-                switch (col) {
-                    case 'sku':case 'price':case 'qty':
-                        variant[col] = $(this).find('input[data-col="'+ col +'"]').val();
-                        break;
-                    default :
-                        if (tmp_fields.indexOf(col) != -1) {
-                            fvals[col] = $(this).find('input.select-value-field').val();
-                        }
-                }
-           });
-           updateStoreVariantImageId($(this));
-           variant.file_id =  $(this).find('.store-variant-image-id').val();
-           variant.fields = fvals;
-           variants.push(variant);
-        });
-        $('#variants').val(JSON.stringify(variants));
+        $('#variants').val( JSON.stringify(vRowsCollection.toJSON()));
         return validateVariant();
     });
 
@@ -472,8 +472,17 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                         error = false;
                     }
                 }
-            })
+            });
+            vRowsCollection.each(function(obj) {
+                if (obj.get('id') == parent.attr('id')) {
+                    var field_values = obj.get('field_values');
+                    field_values[$(elem).attr('name')] = value;
+                    obj.set('field_values', field_values);
+                }
+
+            });
         }
+
         return error;
     }
     bodyGrid.on('change', '.variantUnique', function() {

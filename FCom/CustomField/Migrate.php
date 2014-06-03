@@ -2,7 +2,7 @@
 
 class FCom_CustomField_Migrate extends BClass
 {
-    public function install__0_1_9()
+    public function install__0_2_0()
     {
         $tField = $this->FCom_CustomField_Model_Field->table();
         $this->BDb->run("
@@ -138,6 +138,8 @@ class FCom_CustomField_Migrate extends BClass
                 'sort_order' => 1,
             ])->save();
         }
+
+        $this->BDb->ddlTableDef($tProdVariant, ['COLUMNS' => ['variant_qty' => "init(11)" ]]);
     }
 
     public function upgrade__0_1_0__0_1_1()
@@ -249,5 +251,11 @@ class FCom_CustomField_Migrate extends BClass
                 'sort_order' => 1,
             ])->save();
         }
+    }
+
+    public function upgrade__0_1_9__0_2_0()
+    {
+        $tProdVariant = $this->FCom_CustomField_Model_ProductVariant->table();
+        $this->BDb->ddlTableDef($tProdVariant, ['COLUMNS' => ['variant_qty' => "int(11)" ]]);
     }
 }

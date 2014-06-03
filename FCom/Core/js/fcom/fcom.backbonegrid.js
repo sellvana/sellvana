@@ -1810,7 +1810,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
             function text2html(val) {
                 var text = $.parseHTML(val);
-                return text[0].data;
+                return (text != null) ? text[0].data: null;
             }
 
             /*
