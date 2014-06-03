@@ -764,7 +764,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function getStringToOrdinal($string)
     {
-        $string = BLocale::transliterate($string, '');
+        $string = $this->BLocale->transliterate($string, '');
 
         if (empty($string)) {
             return '';

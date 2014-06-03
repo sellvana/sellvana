@@ -105,7 +105,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         }
         $password = $data[$args['field']];
         if (strlen($password) > 0 && !preg_match('/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[~!@#$%^&*()_+=}{><;:\]\[?]).{7,}/', $password)) {
-            return BLocale::_('Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.');
+            return $this->BLocale->_('Password must be at least 7 characters in length and must include at least one letter, one capital letter, one number, and one special character.');
         }
         return true;
     }
@@ -173,16 +173,16 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if (empty($username) || empty($password)) {
             return false;
         }
-        if (!BLoginThrottle::i()->init('FCom_Admin_Model_User', $username)) {
+        if (!$this->BLoginThrottle->init('FCom_Admin_Model_User', $username)) {
             return false;
         }
         /** @var FCom_Admin_Model_User */
         $user = $this->orm()->where(['OR' => ['username' => $username, 'email' => $username]])->find_one();
         if (!$user || !$user->validatePassword($password)) {
-            BLoginThrottle::i()->failure();
+            $this->BLoginThrottle->failure();
             return false;
         }
-        BLoginThrottle::i()->success();
+        $this->BLoginThrottle->success();
         return $user;
     }
 
@@ -191,16 +191,16 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if (empty($username) || empty($password)) {
             return false;
         }
-        if (!BLoginThrottle::i()->init('FCom_ApiServer', $username)) {
+        if (!$this->BLoginThrottle->init('FCom_ApiServer', $username)) {
             return false;
         }
         /** @var FCom_Admin_Model_User */
         $user = $this->orm()->where('api_username', $username)->find_one();
         if (!$user || !$user->validatePassword($password, 'api_password_hash')) {
-            BLoginThrottle::i()->failure();
+            $this->BLoginThrottle->failure();
             return false;
         }
-        BLoginThrottle::i()->success();
+        $this->BLoginThrottle->success();
         return $user;
     }
 
@@ -273,7 +273,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     public function tzOffset()
     {
-        return BLocale::i()->tzOffset($this->get('tz'));
+        return $this->BLocale->tzOffset($this->get('tz'));
     }
 
     public function fullname()

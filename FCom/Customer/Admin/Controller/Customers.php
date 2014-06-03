@@ -99,13 +99,13 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         $actions = $args['view']->get('actions');
         if ($m->id) {
             $actions = array_merge($actions, [
-                    'create-order' => '<a class="btn btn-primary" title="' . BLocale::_('Redirect to frontend and create order')
-                        . '" href="' . $this->BApp->href('customers/create_order?id=' . $m->id) . '"><span>' . BLocale::_('Create Order') . '</span></a>'
+                    'create-order' => '<a class="btn btn-primary" title="' . $this->BLocale->_('Redirect to frontend and create order')
+                        . '" href="' . $this->BApp->href('customers/create_order?id=' . $m->id) . '"><span>' . $this->BLocale->_('Create Order') . '</span></a>'
                 ]);
         }
         $saleStatistics = $m->saleStatistics();
-        $info = $this->_('Lifetime Sales') . ' ' . BLocale::currency($saleStatistics['lifetime'])
-            . ' | ' . $this->_('Avg. Sales') . ' ' . BLocale::currency($saleStatistics['avg']);
+        $info = $this->_('Lifetime Sales') . ' ' . $this->BLocale->currency($saleStatistics['lifetime'])
+            . ' | ' . $this->_('Avg. Sales') . ' ' . $this->BLocale->currency($saleStatistics['avg']);
         $args['view']->set([
             'sidebar_img' => ($this->BConfig->get('modules/FCom_Customer/use_gravatar') ? $this->BUtil->gravatar($m->email) : $silhouetteImg),
             'title' => $m->id ? $this->_('Edit Customer: ') . $m->firstname . ' ' . $m->lastname : $this->_('Create New Customer'),

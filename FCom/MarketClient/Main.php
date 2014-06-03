@@ -61,7 +61,7 @@ class FCom_MarketClient_Main extends BClass
             $this->progress([
                 'cur' => $i,
                 'modules' => [
-                    $modName => BLocale::_('[%d/%d] Downloading: %s...', [$i, $cnt, $modName]),
+                    $modName => $this->BLocale->_('[%d/%d] Downloading: %s...', [$i, $cnt, $modName]),
                 ],
             ]);
 
@@ -81,7 +81,7 @@ class FCom_MarketClient_Main extends BClass
 
             $this->progress([
                 'modules' => [
-                    $modName => BLocale::_('[%d/%d] Downloading: %s... Installing...', [$i, $cnt, $modName]),
+                    $modName => $this->BLocale->_('[%d/%d] Downloading: %s... Installing...', [$i, $cnt, $modName]),
                 ],
             ]);
 
@@ -100,7 +100,7 @@ class FCom_MarketClient_Main extends BClass
             }
             $this->progress([
                 'modules' => [
-                    $modName => BLocale::_('[%d/%d] Downloading: %s... Installing... DONE', [$i, $cnt, $modName]),
+                    $modName => $this->BLocale->_('[%d/%d] Downloading: %s... Installing... DONE', [$i, $cnt, $modName]),
                 ],
             ]);
         }

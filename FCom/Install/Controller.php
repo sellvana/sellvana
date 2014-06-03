@@ -27,7 +27,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         if (is_array($msg)) {
             array_walk($msg, 'BLocale::_');
         } else {
-            $msg = BLocale::_($msg);
+            $msg = $this->BLocale->_($msg);
         }
         $this->BSession->addMessage($msg, $type, $tag, $options);
         return $this;
@@ -106,7 +106,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         }
         try {
             $w = $this->BRequest->post('w');
-            if (empty($w['db']) || !BValidate::i()->validateInput($w['db'], [
+            if (empty($w['db']) || !$this->BValidate->validateInput($w['db'], [
                 ['host', '@required'],
                 ['host', '/^[A-Za-z0-9.\[\]:-]+$/'],
                 ['port', '@required'],
@@ -159,7 +159,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         }
         try {
             $w = $this->BRequest->post('w');
-            if (empty($w['admin']) || !BValidate::i()->validateInput($w['admin'], [
+            if (empty($w['admin']) || !$this->BValidate->validateInput($w['admin'], [
                 ['firstname', '@required'],
                 ['lastname', '@required'],
                 ['email', '@required'],

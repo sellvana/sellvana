@@ -49,7 +49,7 @@ abstract class FCom_Sales_Model_Cart_Total_Abstract extends BCLass implements FC
 
     public function getLabel()
     {
-        return BLocale::_($this->_label);
+        return $this->BLocale->_($this->_label);
     }
 
     public function getLabelFormatted()
@@ -64,7 +64,7 @@ abstract class FCom_Sales_Model_Cart_Total_Abstract extends BCLass implements FC
 
     public function getValueFormatted()
     {
-        return BLocale::i()->currency($this->getValue(), $this->_currency);
+        return $this->BLocale->currency($this->getValue(), $this->_currency);
     }
 
     public function getCurrency()

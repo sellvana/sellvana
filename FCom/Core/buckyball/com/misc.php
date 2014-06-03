@@ -3273,9 +3273,9 @@ class BFtpClient extends BClass
 * Throttle invalid login attempts and potentially notify user and admin
 *
 * Usage:
-* - BEFORE AUTH: if (!BLoginThrottle::i()->init('FCom_Customer_Model_Customer', $username)) return false;
-* - ON FAILURE:  BLoginThrottle::i()->failure();
-* - ON SUCCESS:  BloginThrottle::i()->success();
+* - BEFORE AUTH: if (!$this->BLoginThrottle->init('FCom_Customer_Model_Customer', $username)) return false;
+* - ON FAILURE:  $this->BLoginThrottle->failure();
+* - ON SUCCESS:  $this->BloginThrottle->success();
 */
 class BLoginThrottle extends BClass
 {
@@ -3622,13 +3622,13 @@ class BValidate extends BClass
 
             } elseif (is_callable($r['rule'])) {
 
-                $result = call_user_func($r['rule'], $data, $r['args']);
+                $result = BUtil::call($r['rule'], [$data, $r['args']], true);
 
             } elseif (is_string($r['rule'])) {
 
                 $callback = BUtil::extCallback($r['rule']);
                 if ($callback !== $r['rule']) {
-                    $result = call_user_func($r['rule'], $data, $r['args']);
+                    $result = BUtil::call($r['rule'], [$data, $r['args']], true);
                 } else {
                     throw new BException('Invalid rule: ' . print_r($r['rule'], 1));
                 }

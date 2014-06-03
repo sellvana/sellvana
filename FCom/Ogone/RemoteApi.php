@@ -242,7 +242,7 @@ class FCom_Ogone_RemoteApi extends BClass
             $order->changeStatus($update);
         }
         if ($comment) {
-            $order->addComment(BLocale::i()->_($comment));
+            $order->addComment($this->BLocale->_($comment));
         }
         if ($notifyCustomer) {
             $order->notifyCustomer('ORDER_RECEIVED');

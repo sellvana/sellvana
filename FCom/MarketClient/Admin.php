@@ -16,7 +16,7 @@ class FCom_MarketClient_Admin extends BClass
         $view = $args['page_view'];
         $actions = (array)$view->get('actions');
         $actions += [
-            'check_updates' => '<button class="btn btn-primary" type="button" onclick="$(\'#util-form\').attr(\'action\', \'' . $this->BApp->href('marketclient/site/check_updates?install=true') . '\').submit()"><span>' . BLocale::_('Check For Updates') . '</span></button>',
+            'check_updates' => '<button class="btn btn-primary" type="button" onclick="$(\'#util-form\').attr(\'action\', \'' . $this->BApp->href('marketclient/site/check_updates?install=true') . '\').submit()"><span>' . $this->BLocale->_('Check For Updates') . '</span></button>',
         ];
         $view->set('actions', $actions);
     }

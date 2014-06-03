@@ -77,8 +77,8 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
     {
         if ($model && $model->id) {
-            $view->addTab("details", ['label' => BLocale::_("Details"), 'pos' => 20, 'async' => true]);
-            $view->addTab("history", ['label' => BLocale::_("History"), 'pos' => 40, 'async' => true]);
+            $view->addTab("details", ['label' => $this->BLocale->_("Details"), 'pos' => 20, 'async' => true]);
+            $view->addTab("history", ['label' => $this->BLocale->_("History"), 'pos' => 40, 'async' => true]);
         }
         return parent::processFormTabs($view, $model, $mode, $allowed);
     }
@@ -93,7 +93,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             }
         }
         if (!empty($args['data']['model'])) {
-            $args['data']['model'] = BLocale::i()->parseRequestDates($args['data']['model'], 'from_date,to_date');
+            $args['data']['model'] = $this->BLocale->parseRequestDates($args['data']['model'], 'from_date,to_date');
             $args['model']->set($args['data']['model']);
         }
     }

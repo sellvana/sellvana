@@ -17,7 +17,7 @@ class FCom_SampleData_Admin_Controller extends FCom_Admin_Controller_Abstract
             $this->BConfig->set('db/logging', 0);
 
             $this->FCom_SampleData_Admin->loadProducts();
-            $msg    = BLocale::_('Sample products imported');
+            $msg    = $this->BLocale->_('Sample products imported');
             $status = 'success';
         } catch (Exception $e) {
             $this->BDebug->logException($e);
@@ -31,7 +31,7 @@ class FCom_SampleData_Admin_Controller extends FCom_Admin_Controller_Abstract
             echo $msg;
             exit;
             $result = [
-                'message' => BLocale::_($msg),
+                'message' => $this->BLocale->_($msg),
                 'status'  => $status
             ];
             $this->BResponse->json($result);

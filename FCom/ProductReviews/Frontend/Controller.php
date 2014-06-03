@@ -68,9 +68,9 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
                 $review->notify();
             }
 
-            $successMessage = BLocale::_('Thank you for your review!');
+            $successMessage = $this->BLocale->_('Thank you for your review!');
             if ($needApprove && $valid) {
-                $successMessage = BLocale::_('Thank you for your review! We will check and approve this review in 24 hours.');
+                $successMessage = $this->BLocale->_('Thank you for your review! We will check and approve this review in 24 hours.');
             }
 
             if ($this->BRequest->xhr()) { //ajax request
@@ -187,11 +187,11 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
         if ($r->xhr()) {
             $pid = $r->param('pid', true);
             if (!$pid) {
-                $this->BDebug->error(BLocale::_('Invalid ID'));
+                $this->BDebug->error($this->BLocale->_('Invalid ID'));
                 die;
             }
             if (!($product = $this->FCom_Catalog_Model_Product->load($pid))) {
-                $this->BDebug->error(BLocale::_('Cannot load product with this id'));
+                $this->BDebug->error($this->BLocale->_('Cannot load product with this id'));
                 die;
             }
             $reviews = $product->reviews();
@@ -259,9 +259,9 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             $pr->set($post['review'])->save();
             //$pr->notify(); //todo: confirm about send notify
         }
-        $successMessage = BLocale::_('Edit review successfully!');
+        $successMessage = $this->BLocale->_('Edit review successfully!');
         if ($needApprove) {
-            $successMessage = BLocale::_('Edit review successfully! We will check and approve this review in 24 hours.');
+            $successMessage = $this->BLocale->_('Edit review successfully! We will check and approve this review in 24 hours.');
         }
         if ($this->BRequest->xhr()) { //ajax request
             if ($valid) {

@@ -1760,7 +1760,7 @@ if (!class_exists($r[0]) && BDebug::is('DEBUG')) {
             // Invoke observer
             if (is_callable($cb)) {
                 BDebug::debug('ON ' . $eventName/*.' : '.var_export($cb, 1)*/, 1);
-                $result[] = call_user_func($cb, $args);
+                $result[] = BUtil::call($cb, $args);
             } else {
                 BDebug::warning('Invalid callback: ' . var_export($cb, 1), 1);
             }

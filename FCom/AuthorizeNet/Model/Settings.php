@@ -106,8 +106,8 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
     public function paymentActions()
     {
         return [
-            "AUTH_ONLY"         => BLocale::i()->_("Authorize Only"),
-            "AUTH_CAPTURE" => BLocale::i()->_("Authorize and Capture")
+            "AUTH_ONLY"         => $this->BLocale->_("Authorize Only"),
+            "AUTH_CAPTURE" => $this->BLocale->_("Authorize and Capture")
         ];
     }
 /*
@@ -122,7 +122,7 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
             "DI" => "Discover",
             "DC" => "Diners Club",
             "JC" => "JCB",
-            "OT" => BLocale::i()->_("Other")
+            "OT" => $this->BLocale->_("Other")
         ];
     }
 
