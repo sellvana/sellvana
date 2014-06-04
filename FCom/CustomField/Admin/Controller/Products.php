@@ -106,13 +106,13 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         $variants = $this->FCom_CustomField_Model_ProductVariant->orm()->where('product_id', $model->id)->find_many();
         if ($variants !== null) {
             foreach ($variants as $v) {
-                $file_id =$v->getData('variant_file_id');
+                $file_id = $v->getData('variant_file_id');
                 $vField = [];
                 $vField['field_values'] = BUtil::objectToArray(json_decode($v->field_values));
                 $vField['variant_sku'] = $v->variant_sku;
                 $vField['variant_qty'] = $v->variant_qty;
                 $vField['variant_price'] = $v->variant_price;
-                $vField['variant_file_id'] = isset($file_id)? $file_id: '';
+                $vField['variant_file_id'] = ($file_id)? $file_id: '';
                 $vField['id'] = $v->id;
                 $data[] = $vField;
             }

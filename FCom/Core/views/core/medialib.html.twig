@@ -162,24 +162,26 @@
         })
         .bind('fileuploadalways', function(e, data) {
 
-            if(data.result.id) {
-                //get self media grid
+            if ($.isArray(data.result.files)) {
+                data.result.files.forEach(function (obj) {
+                    //get self media grid
 
-                //insert uploaded file in media grid and get selected
-                var newRow = data.result;
+                    //insert uploaded file in media grid and get selected
+                    var newRow = obj;
 
-                //if multiselect config param is set, we insert  new uploaded rows in library grid with checked.
-                {% if config.multiSelAllowed %}
+                    //if multiselect config param is set, we insert  new uploaded rows in library grid with checked.
+                    {% if config.multiSelAllowed %}
                     newRow.selected = true;
-                    {{config.id}}_grid.getSelectedRows().add(data.result);
-                {% endif %}
-                
-                {{config.id}}_grid.getRows().add(newRow,{merge: true}).trigger('render');
+                    {{config.id}}_grid.getSelectedRows().add(obj);
+                    {% endif %}
 
-                $('td.name span').each(function(i) {
-                    if($(this).html() === data.result.file_name)
-                        $(this).parents('tr:first').remove();
-                });
+                    {{config.id}}_grid.getRows().add(newRow,{merge: true}).trigger('render');
+
+                    $('td.name span').each(function(i) {
+                        if($(this).html() === obj.file_name)
+                            $(this).parents('tr:first').remove();
+                    });
+                })
             }
         });
         $('.btn-rescan-images').click(function () {
