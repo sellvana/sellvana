@@ -12,9 +12,9 @@ class FCom_LibTwig_Main extends BClass
     protected static $_stringLoader;
     protected static $_stringTwig;
 
-    public static function bootstrap()
+    public function bootstrap()
     {
-        BLayout::i()->addRenderer('FCom_LibTwig', [
+        $this->BLayout->addRenderer('FCom_LibTwig', [
             'description' => 'Twig (HTML)',
             'callback'    => 'FCom_LibTwig_Main::renderer',
             'file_ext'    => ['.html.twig', '.twig.html'],
@@ -22,7 +22,7 @@ class FCom_LibTwig_Main extends BClass
         ]);
     }
 
-    public static function init($path = null)
+    public function init($path = null)
     {
         BClassAutoload::i(true, [__DIR__ . '/lib']);
         /*
@@ -30,12 +30,12 @@ class FCom_LibTwig_Main extends BClass
         Twig_Autoloader::register();
         */
 
-        $config = BConfig::i();
+        $config = $this->BConfig;
 
         static::$_cacheDir = $config->get('fs/cache_dir') . '/twig';
-        BUtil::ensureDir(static::$_cacheDir);
-        $cacheConfig = BConfig::i()->get('core/cache/twig');
-        $useCache = !$cacheConfig && BDebug::is('DEBUG,DEVELOPMENT') || $cacheConfig === 'enable';
+        $this->BUtil->ensureDir(static::$_cacheDir);
+        $cacheConfig = $this->BConfig->get('core/cache/twig');
+        $useCache = !$cacheConfig && $this->BDebug->is('DEBUG,DEVELOPMENT') || $cacheConfig === 'enable';
         $options = [
             'cache' => $useCache ? static::$_cacheDir : false,
             'debug' => false, #$config->get('modules/FCom_LibTwig/debug'),
@@ -90,26 +90,26 @@ class FCom_LibTwig_Main extends BClass
         ]);
     }
 
-    public static function onLayoutAddAllViews($args)
+    public function onLayoutAddAllViews($args)
     {
         $moduleName = is_string($args['module']) ? $args['module'] :
             (is_object($args['module']) ? $args['module']->name : null);
-        static::addPath($args['root_dir'], $moduleName);
+        $this->addPath($args['root_dir'], $moduleName);
     }
 
-    public static function addPath($path, $namespace)
+    public function addPath($path, $namespace)
     {
         if (!static::$_fileLoader) {
-            static::init($path);
+            $this->init($path);
         }
         static::$_fileLoader->prependPath($path, $namespace);
     }
 
-    public static function renderer($view)
+    public function renderer($view)
     {
         $viewName = $view->getParam('view_name');
 
-        $pId = BDebug::debug('FCom_LibTwig render: ' . $viewName);
+        $pId = $this->BDebug->debug('FCom_LibTwig render: ' . $viewName);
 
         $source = $view->getParam('source');
         $args = $view->getAllArgs();
@@ -127,7 +127,7 @@ class FCom_LibTwig_Main extends BClass
 
         }
 
-        BDebug::profile($pId);
+        $this->BDebug->profile($pId);
         return $output;
     }
 }

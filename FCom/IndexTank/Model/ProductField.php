@@ -37,14 +37,14 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
      * @param array $args
      * @return FCom_IndexTank_Model_ProductField
      */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public function getList()
     {
-        $productFields = FCom_IndexTank_Model_ProductField::i()->orm()->find_many();
+        $productFields = $this->FCom_IndexTank_Model_ProductField->orm()->find_many();
         $result = [];
         foreach ($productFields as $p) {
             $result[$p->field_name] = $p;
@@ -54,7 +54,7 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
 
     public function getFacetsList()
     {
-        $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
+        $productFields = $this->FCom_IndexTank_Model_ProductField->orm()
                 ->where('facets', 1)
                 ->order_by_asc('sort_order')
                 ->find_many();
@@ -67,7 +67,7 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
 
     public function getSearchList()
     {
-        $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
+        $productFields = $this->FCom_IndexTank_Model_ProductField->orm()
                 ->where('search', 1)->find_many();
         $result = [];
         foreach ($productFields as $p) {
@@ -78,7 +78,7 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
 
     public function getVariablesList()
     {
-        $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
+        $productFields = $this->FCom_IndexTank_Model_ProductField->orm()
                 ->where('scoring', 1)->find_many();
         $result = [];
         foreach ($productFields as $p) {
@@ -89,7 +89,7 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
 
     public function getInclusiveList()
     {
-        $productFields = FCom_IndexTank_Model_ProductField::i()->orm()
+        $productFields = $this->FCom_IndexTank_Model_ProductField->orm()
                 ->where('filter', 'inclusive')->find_many();
         $result = [];
         foreach ($productFields as $p) {

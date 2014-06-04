@@ -6,23 +6,23 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
     public function fieldSetsGridConfig()
     {
-        $orm = FCom_CustomField_Model_Set::i()->orm('s')->select('s.*')
-            ->select('(select count(*) from ' . FCom_CustomField_Model_SetField::table() . ' where set_id=s.id)', 'num_fields');
+        $orm = $this->FCom_CustomField_Model_Set->orm('s')->select('s.*')
+            ->select('(select count(*) from ' . $this->FCom_CustomField_Model_SetField->table() . ' where set_id=s.id)', 'num_fields');
 
         ;
         $config = [
             'config' => [
                 'id'     => 'fieldsets',
                 'caption' => 'Field Sets',
-                'data_url' => BApp::href('customfields/fieldsets/grid_data'),
-                'edit_url' => BApp::href('customfields/fieldsets/grid_data'),
+                'data_url' => $this->BApp->href('customfields/fieldsets/grid_data'),
+                'edit_url' => $this->BApp->href('customfields/fieldsets/grid_data'),
                 'orm' => $orm,
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 55, 'sorttype' => 'number', 'key' => true, 'hidden' => true],
                     ['type' => 'input', 'name' => 'set_code', 'label' => 'Set Code', 'width' => 100,  'addable' => true,
                             'editable' => true, 'validation' => ['required' => true,
-                            'unique' => BApp::href('customfields/fieldsets/unique_set')]],
+                            'unique' => $this->BApp->href('customfields/fieldsets/unique_set')]],
                     ['type' => 'input', 'name' => 'set_name', 'label' => 'Set Name', 'width' => 200,  'addable' => true,
                             'editable' => true , 'validation' => ['required' => true]],
                     ['name' => 'num_fields', 'label' => 'Fields', 'width' => 30, 'default' => '0'],
@@ -112,23 +112,23 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
     public function fieldsGridConfig()
     {
-        $fld = FCom_CustomField_Model_Field::i();
-        $orm = FCom_CustomField_Model_Field::i()->orm('f')->select('f.*')
-            ->select('(select count(*) from ' . FCom_CustomField_Model_FieldOption::table() . ' where field_id=f.id)', 'num_options')
+        $fld = $this->FCom_CustomField_Model_Field;
+        $orm = $this->FCom_CustomField_Model_Field->orm('f')->select('f.*')
+            ->select('(select count(*) from ' . $this->FCom_CustomField_Model_FieldOption->table() . ' where field_id=f.id)', 'num_options')
         ;
         $config = [
             'config' => [
                 'id' => 'fields',
                 'caption' => 'Fields',
                 'orm' => $orm,
-                'data_url' => BApp::href('customfields/fieldsets/field_grid_data'),
-                'edit_url' => BApp::href('customfields/fieldsets/field_grid_data'),
+                'data_url' => $this->BApp->href('customfields/fieldsets/field_grid_data'),
+                'edit_url' => $this->BApp->href('customfields/fieldsets/field_grid_data'),
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
                     ['type' => 'input', 'name' => 'field_code', 'label' => 'Field Code', 'width' => 100, 'editable' => true, 'editor' => 'text',
                             'defualt' => '', 'addable' => true, 'mass-editable' => true, 'validation' => ['required' => true,
-                            'unique' => BApp::href('/customfields/fields/unique_field')]],
+                            'unique' => $this->BApp->href('/customfields/fields/unique_field')]],
                     ['type' => 'input', 'name' => 'field_name', 'label' => 'Field Name', 'width' => 100, 'editable' => true, 'editor' => 'text',
                             'default' => '', 'addable' => true, 'mass-editable' => true, 'validation' => ['required' => true]],
                     ['type' => 'input', 'name' => 'frontend_label', 'label' => 'Frontend Label', 'width' => 100, 'editable' => true, 'editor' => 'text',
@@ -235,23 +235,23 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $view = $this->view('core/backbonegrid');
         $view->set('grid', $this->fieldSetsGridConfig());
         $data = $view->generateOutputData();
-        BResponse::i()->json([
+        $this->BResponse->json([
             ['c' => $data['state']['c']],
-            BDb::many_as_array($data['rows']),
+            $this->BDb->many_as_array($data['rows']),
         ]);
     }
 
     public function action_set_field_grid_data()
     {
-        $orm = FCom_CustomField_Model_SetField::i()->orm('sf')
+        $orm = $this->FCom_CustomField_Model_SetField->orm('sf')
             ->join('FCom_CustomField_Model_Field', ['f.id', '=', 'sf.field_id'], 'f')
             ->select(['f.id', 'f.field_name', 'f.field_code', 'sf.position'])
-            ->where('sf.set_id', BRequest::i()->get('set_id'));
+            ->where('sf.set_id', $this->BRequest->get('set_id'));
         //TODO check when rows count is over 10.(processORM paginate)
         $data = $this->view('core/backbonegrid')->processORM($orm, __METHOD__);
-        BResponse::i()->json([
+        $this->BResponse->json([
             ['c' => $data['state']['c']],
-            BDb::many_as_array($data['rows']),
+            $this->BDb->many_as_array($data['rows']),
         ]);
     }
 
@@ -260,29 +260,29 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $view = $this->view('core/backbonegrid');
         $view->set('grid', $this->fieldsGridConfig());
         $data = $view->generateOutputData();
-        BResponse::i()->json([
+        $this->BResponse->json([
             ['c' => $data['state']['c']],
-            BDb::many_as_array($data['rows']),
+            $this->BDb->many_as_array($data['rows']),
         ]);
     }
 
     public function action_field_option_grid_data()
     {
-        $orm = FCom_CustomField_Model_FieldOption::i()->orm('fo')->select('fo.*')
-            ->where('field_id', BRequest::i()->get('field_id'));
+        $orm = $this->FCom_CustomField_Model_FieldOption->orm('fo')->select('fo.*')
+            ->where('field_id', $this->BRequest->get('field_id'));
         $data = $this->view('core/backbonegrid')->processORM($orm, __METHOD__);
-        BResponse::i()->json([
+        $this->BResponse->json([
             ['c' => $data['state']['c']],
-            BDb::many_as_array($data['rows']),
+            $this->BDb->many_as_array($data['rows']),
         ]);
     }
 
     public function action_options()
     {
-        $id = BRequest::i()->get('id');
-        $options = FCom_CustomField_Model_FieldOption::i()->getListAssocById($id);
+        $id = $this->BRequest->get('id');
+        $options = $this->FCom_CustomField_Model_FieldOption->getListAssocById($id);
 
-        BResponse::i()->json(
+        $this->BResponse->json(
             [
                 'success' => true,
                 'options' => $options
@@ -292,14 +292,14 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
     public function action_grid_data__POST()
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         $data = $r->post();
         $field_ids = $data['field_ids'];
-        $model = FCom_CustomField_Model_SetField::i();
+        $model = $this->FCom_CustomField_Model_SetField;
         switch ($r->post('oper')) {
             case 'add':
                 unset($data['id'], $data['oper'], $data['field_ids']);
-                $set = FCom_CustomField_Model_Set::i()->create($data)->save();
+                $set = $this->FCom_CustomField_Model_Set->create($data)->save();
                 $result = $set->as_array();
                 $mum_fields = 0;
                 if ($field_ids !== '') {
@@ -310,7 +310,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     }
                 }
                 $result['num_fields'] = $mum_fields;
-                BResponse::i()->json($result);
+                $this->BResponse->json($result);
                 break;
             case 'edit':
                 $model->delete_many(['set_id' => $data['id']]);
@@ -322,11 +322,11 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                         }
                     }
                 }
-                $set = FCom_CustomField_Model_Set::i()->load($data['id']);
+                $set = $this->FCom_CustomField_Model_Set->load($data['id']);
                 unset($data['id'], $data['oper'], $data['field_ids']);
                 $set->set($data)->save();
                 $result = $set->as_array();
-                BResponse::i()->json($result);
+                $this->BResponse->json($result);
                 break;
             default:
                 $this->_processGridDataPost('FCom_CustomField_Model_Set');
@@ -337,17 +337,17 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
     public function action_set_field_grid_data__POST()
     {
-        //$this->_processPost('FCom_CustomField_Model_SetField', array('set_id'=>BRequest::i()->get('set_id')));
-        //print_r(BRequest::i()->request()); exit;
-        $p = BRequest::i()->post();
-        $model = FCom_CustomField_Model_SetField::i();
+        //$this->_processPost('FCom_CustomField_Model_SetField', array('set_id'=>$this->BRequest->get('set_id')));
+        //print_r($this->BRequest->request()); exit;
+        $p = $this->BRequest->post();
+        $model = $this->FCom_CustomField_Model_SetField;
         $model->delete_many(['set_id' => $p['set_id']]);
         if ($p['field_ids'] !== '') {
             foreach (explode(',', $p['field_ids']) as $i => $fId) {
                 $model->create(['set_id' => $p['set_id'], 'field_id' => $fId, 'position' => $i])->save();
             }
         }
-        BResponse::i()->json(['success' => true]);
+        $this->BResponse->json(['success' => true]);
     }
 
     public function action_field_grid_data__POST()
@@ -357,8 +357,8 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
     public function action_field_option_grid_data__POST()
     {
-        $p = BRequest::i()->post();
-        $model = FCom_CustomField_Model_FieldOption::i();
+        $p = $this->BRequest->post();
+        $model = $this->FCom_CustomField_Model_FieldOption;
         $op = 0;
 //        $model->delete_many(['field_id' => $p['field_id']]);
         foreach ($p['rows'] as $row) {
@@ -375,44 +375,44 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
             }
         }
-        BResponse::i()->json(['success' => true, 'options' => $op]);
-        //$this->_processGridDataPost('FCom_CustomField_Model_FieldOption', array('field_id'=>BRequest::i()->get('field_id')));
+        $this->BResponse->json(['success' => true, 'options' => $op]);
+        //$this->_processGridDataPost('FCom_CustomField_Model_FieldOption', array('field_id'=>$this->BRequest->get('field_id')));
     }
 
     public function action_form()
     {
-        $id = BRequest::i()->params('id');
+        $id = $this->BRequest->params('id');
         if (!$id) {
-            $id = BRequest::i()->get('id');
+            $id = $this->BRequest->get('id');
         }
         if ($id) {
-            $model = FCom_CustomField_Model_Set::i()->load($id);
+            $model = $this->FCom_CustomField_Model_Set->load($id);
             if (empty($model)) {
                 $this->message('Invalid field set ID', 'error');
-                BResponse::i()->redirect('customfields/fieldsets');
+                $this->BResponse->redirect('customfields/fieldsets');
                 return;
             }
         } else {
-            $model = FCom_CustomField_Model_Set::i()->create();
+            $model = $this->FCom_CustomField_Model_Set->create();
         }
         $this->layout('/customfields/fieldsets/form');
-        $view = BLayout::i()->view('customfields/fieldsets/form');
+        $view = $this->BLayout->view('customfields/fieldsets/form');
         $this->initFormTabs($view, $model, $model->id ? 'view' : 'create', $model->id ? null : 'main');
     }
 
     public function action_form__POST()
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         $id = $r->params('id');
         $data = $r->post();
 
         try {
             if ($id) {
-                $model = FCom_CustomField_Model_Set::i()->load($id);
+                $model = $this->FCom_CustomField_Model_Set->load($id);
             } else {
-                $model = FCom_CustomField_Model_Set::i()->create();
+                $model = $this->FCom_CustomField_Model_Set->create();
             }
-            $data['model'] = BLocale::i()->parseRequestDates($data['model'], 'from_date,to_date');
+            $data['model'] = $this->BLocale->parseRequestDates($data['model'], 'from_date,to_date');
             $model->set($data['model']);
             BEvents::i()->fire('FCom_CustomField_Admin_Controller_FieldSets::form_post',
                 ['id' => $id, 'data' => $data, 'model' => $model]);
@@ -427,27 +427,27 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         if ($r->xhr()) {
             $this->forward('form_tab', null, ['id' => $id]);
         } else {
-            BResponse::i()->redirect('customfields/customfield/form/?id=' . $id);
+            $this->BResponse->redirect('customfields/customfield/form/?id=' . $id);
         }
     }
 
     public function action_unique_field__POST()
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         $p = $r->post();
         $name = $p['_name'];
         $val = $p[$name];
-        $rows = BDb::many_as_array(FCom_CustomField_Model_Field::i()->orm()->where($name, $val)->find_many());
-        BResponse::i()->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
+        $rows = $this->BDb->many_as_array($this->FCom_CustomField_Model_Field->orm()->where($name, $val)->find_many());
+        $this->BResponse->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
     }
 
     public function action_unique_set__POST()
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         $p = $r->post();
         $name = $p['_name'];
         $val = $p[$name];
-        $rows = BDb::many_as_array(FCom_CustomField_Model_Set::i()->orm()->where($name, $val)->find_many());
-        BResponse::i()->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
+        $rows = $this->BDb->many_as_array($this->FCom_CustomField_Model_Set->orm()->where($name, $val)->find_many());
+        $this->BResponse->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
     }
 }

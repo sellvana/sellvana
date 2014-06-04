@@ -2,9 +2,9 @@
 
 class FCom_Blog_Main extends BClass
 {
-    static public function bootstrap()
+    public function bootstrap()
     {
-        FCom_Admin_Model_Role::i()->createPermission([
+        $this->FCom_Admin_Model_Role->createPermission([
             'blog' => 'Blog',
         ]);
     }

@@ -6,7 +6,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
     {
         if (!parent::onBeforeDispatch()) return false;
 
-        if (!FCom_Admin_Model_User::i()->isLoggedIn()) {
+        if (!$this->FCom_Admin_Model_User->isLoggedIn()) {
             $this->reply(['channel' => 'client', 'signal' => 'logout']);
             return false;
         }
@@ -19,15 +19,15 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         // start the chat, receive initial history
 
         //$this->_client->send($this->_message);
-        $user = FCom_Admin_Model_User::i()->load($this->_message['user'], 'username');
+        $user = $this->FCom_Admin_Model_User->load($this->_message['user'], 'username');
         if (!$user) {
             $this->reply(['signal' => 'error', 'description' => 'Unknown username']);
             return;
         }
-        $chat = FCom_AdminChat_Model_Chat::i()->openWithUser($user);
-        $participant = FCom_AdminChat_Model_Participant::i()->loadWhere([
+        $chat = $this->FCom_AdminChat_Model_Chat->openWithUser($user);
+        $participant = $this->FCom_AdminChat_Model_Participant->loadWhere([
             'chat_id' => $chat->id(),
-            'user_id' => FCom_Admin_Model_User::i()->sessionUserId(),
+            'user_id' => $this->FCom_Admin_Model_User->sessionUserId(),
         ]);
         if ($participant->get('status') !== 'open') {
             $participant->set('status', 'open')->save();
@@ -54,15 +54,15 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
     public function signal_say()
     {
         $chan = $this->_message['channel'];
-        $chat = FCom_AdminChat_Model_Chat::i()->findByChannel($chan);
-        $channel = FCom_PushServer_Model_Channel::i()->getChannel($chan);
+        $chat = $this->FCom_AdminChat_Model_Chat->findByChannel($chan);
+        $channel = $this->FCom_PushServer_Model_Channel->getChannel($chan);
         if (!$chat) {
             $channel->send(['signal' => 'error', 'description' => 'Chat not found']);
             return;
         }
-        $user = FCom_Admin_Model_User::i()->sessionUser();
+        $user = $this->FCom_Admin_Model_User->sessionUser();
         $msg = $chat->addHistory($user, $this->_message['text']);
-#BDebug::log('ADMINCHAT: say '.print_r($this->_message, 1));
+#$this->BDebug->log('ADMINCHAT: say '.print_r($this->_message, 1));
         $channel->send([
             'signal'   => 'say',
             'text'     => $this->_message['text'],
@@ -80,9 +80,9 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
     public function signal_window_status()
     {
         $channel = $this->_message['channel'];
-        $chat = FCom_AdminChat_Model_Chat::i()->findByChannel($channel);
-        $userId = FCom_Admin_Model_User::i()->sessionUserId();
-        $hlp = FCom_AdminChat_Model_Participant::i();
+        $chat = $this->FCom_AdminChat_Model_Chat->findByChannel($channel);
+        $userId = $this->FCom_Admin_Model_User->sessionUserId();
+        $hlp = $this->FCom_AdminChat_Model_Participant;
         $data = ['chat_id' => $chat->id(), 'user_id' => $userId];
         $participant = $hlp->load($data);
         $participant->set('status', $this->_message['status'])->save();
@@ -91,11 +91,11 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
     public function signal_leave()
     {
         $channel = $this->_message['channel'];
-        $chat = FCom_AdminChat_Model_Chat::i()->findByChannel($channel);
-        $user = FCom_Admin_Model_User::i()->sessionUser();
+        $chat = $this->FCom_AdminChat_Model_Chat->findByChannel($channel);
+        $user = $this->FCom_Admin_Model_User->sessionUser();
         $chat->removeParticipant($user);
 
-        FCom_PushServer_Model_Channel::i()->getChannel($channel)
+        $this->FCom_PushServer_Model_Channel->getChannel($channel)
             ->send(['signal' => 'leave', 'username' => $user->get('username')]);
 
         $this->_client->getChannel()

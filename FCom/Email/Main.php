@@ -2,11 +2,11 @@
 
 class FCom_Email_Main extends BClass
 {
-    public static function bootstrap()
+    public function bootstrap()
     {
         BEmail::i()->addHandler('FCom_Email', 'FCom_Email_Main::handler');
 
-        $c = BConfig::i()->get('modules/FCom_Email');
+        $c = $this->BConfig->get('modules/FCom_Email');
         if (!empty($c['smtp_host'])) {
             ini_set('SMTP', $c['smtp_host']);
         }
@@ -18,31 +18,31 @@ class FCom_Email_Main extends BClass
             BEmail::i()->setDefaultHandler($c['default_handler']);
         }
 
-        FCom_Admin_Model_Role::i()->createPermission([
+        $this->FCom_Admin_Model_Role->createPermission([
             'subscriptions' => 'Email Subscriptions',
         ]);
     }
 
-    public static function onEmailSendBefore($args)
+    public function onEmailSendBefore($args)
     {
         $email = $args['email_data']['to'];
-        $pref = FCom_Email_Model_Pref::i()->load($email, 'email');
+        $pref = $this->FCom_Email_Model_Pref->load($email, 'email');
         return $pref && $pref->unsub_all ? false : true;
     }
 
-    public static function handler($data)
+    public function handler($data)
     {
-        $msg = FCom_Email_Model_Message::i()->create([
+        $msg = $this->FCom_Email_Model_Message->create([
             'recipient' => $data['to'],
             'subject' => $data['subject'],
             'body' => $data['body'],
-            'data' => BUtil::arrayMask($data, 'headers,params,files,orig_data'),
+            'data' => $this->BUtil->arrayMask($data, 'headers,params,files,orig_data'),
             'status' => 'sending',
         ])->save();
 
-        BDebug::startErrorLogger();
+        $this->BDebug->startErrorLogger();
         $result = BEmail::i()->defaultHandler($data);
-        $errors = BDebug::stopErrorLogger();
+        $errors = $this->BDebug->stopErrorLogger();
 
         if ($result) {
             $msg->set([

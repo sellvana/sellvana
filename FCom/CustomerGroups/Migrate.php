@@ -10,9 +10,9 @@ class FCom_CustomerGroups_Migrate extends BClass
 {
     public function install__0_1_2()
     {
-        $tableCustomerGroup = FCom_CustomerGroups_Model_Group::table();
+        $tableCustomerGroup = $this->FCom_CustomerGroups_Model_Group->table();
 
-        BDb::ddlTableDef($tableCustomerGroup,
+        $this->BDb->ddlTableDef($tableCustomerGroup,
             [
                 'COLUMNS' => [
                   'id'    => 'int(10) unsigned auto_increment',
@@ -26,12 +26,12 @@ class FCom_CustomerGroups_Migrate extends BClass
             ]
         );
 
-        BDb::run("
+        $this->BDb->run("
         replace INTO `{$tableCustomerGroup}` (`id`, `title`, `code`)
         VALUES (1, 'General', 'general'), (2, 'NOT LOGGED IN', 'guest'), (3, 'Retailer', 'retailer')
         ");
 
-        BDb::ddlTableDef(FCom_Customer_Model_Customer::table(),
+        $this->BDb->ddlTableDef($this->FCom_Customer_Model_Customer->table(),
             [
                  'COLUMNS' => [
                      'customer_group' => 'int(10) unsigned null default null'
@@ -42,10 +42,10 @@ class FCom_CustomerGroups_Migrate extends BClass
             ]
         );
 
-        $tableTierPrices = FCom_CustomerGroups_Model_TierPrice::table();
+        $tableTierPrices = $this->FCom_CustomerGroups_Model_TierPrice->table();
 
-        $tableProduct = FCom_Catalog_Model_Product::table();
-        BDb::ddlTableDef($tableTierPrices,
+        $tableProduct = $this->FCom_Catalog_Model_Product->table();
+        $this->BDb->ddlTableDef($tableTierPrices,
             [
                 'COLUMNS' => [
                     'id'         => 'int(10) unsigned not null auto_increment',
@@ -65,7 +65,7 @@ class FCom_CustomerGroups_Migrate extends BClass
                 ],
             ]
         );
-        BDb::run("
+        $this->BDb->run("
         replace INTO `{$tableCustomerGroup}` (`id`, `title`, `code`)
         VALUES (0, 'ALL', 'all')
         ");
@@ -73,11 +73,11 @@ class FCom_CustomerGroups_Migrate extends BClass
 
     public function upgrade__0_1_0__0_1_1()
     {
-        $tableTierPrices = FCom_CustomerGroups_Model_TierPrice::table();
+        $tableTierPrices = $this->FCom_CustomerGroups_Model_TierPrice->table();
 
-        $tableProduct = FCom_Catalog_Model_Product::table();
-        $tableCustGroups = FCom_CustomerGroups_Model_Group::table();
-        BDb::ddlTableDef($tableTierPrices,
+        $tableProduct = $this->FCom_Catalog_Model_Product->table();
+        $tableCustGroups = $this->FCom_CustomerGroups_Model_Group->table();
+        $this->BDb->ddlTableDef($tableTierPrices,
             [
                 'COLUMNS' => [
                     'id'         => 'int(10) unsigned not null auto_increment',
@@ -97,13 +97,13 @@ class FCom_CustomerGroups_Migrate extends BClass
                 ],
             ]
         );
-//        $conn = BDb::connect();
+//        $conn = $this->BDb->connect();
 //
 //        /*
 //         * If we use tier prices, we should probably populate them?
 //         */
 //        $st = $conn->query("SELECT p.id, p.base_price FROM {$tableProduct}");
-//        $gid = FCom_CustomerGroups_Model_Group::orm()->where('code', 'guest')->find_one()->id;
+//        $gid = $this->FCom_CustomerGroups_Model_Group->orm()->where('code', 'guest')->find_one()->id;
 //        $ins = $conn->prepare("INSERT INTO `$tableTierPrices`
 //        (product_id, group_id, base_price, sale_price, qty)
 //        VALUES(?, ?, ?, ?)");
@@ -122,8 +122,8 @@ class FCom_CustomerGroups_Migrate extends BClass
 
     public function upgrade__0_1_1__0_1_2()
     {
-        $tableCustomerGroup = FCom_CustomerGroups_Model_Group::table();
-        BDb::run("
+        $tableCustomerGroup = $this->FCom_CustomerGroups_Model_Group->table();
+        $this->BDb->run("
         replace INTO `{$tableCustomerGroup}` (`id`, `title`, `code`)
         VALUES (0, 'ALL', 'all')
         ");

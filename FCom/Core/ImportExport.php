@@ -51,7 +51,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
     public function getUser()
     {
         if (empty($this->user)) {
-            $this->user = FCom_Admin_Model_User::i()->sessionUser();
+            $this->user = $this->FCom_Admin_Model_User->sessionUser();
         }
         return $this->user;
     }
@@ -73,12 +73,12 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
      */
     public function collectExportableModels()
     {
-        $modules          = BModuleRegistry::i()->getAllModules();
+        $modules          = $this->BModuleRegistry->getAllModules();
         $exportableModels = [];
         foreach ($modules as $module) {
             /** @var BModule $module */
             if ($module->run_status == BModule::LOADED) {
-                $exportableModels = BUtil::arrayMerge($exportableModels, $this->collectModuleModels($module));
+                $exportableModels = $this->BUtil->arrayMerge($exportableModels, $this->collectModuleModels($module));
             }
         }
 
@@ -97,12 +97,12 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         $fe = $this->getWriteHandle($toFile);
 
         if (!$fe) {
-            $msg = BLocale::_("%s Could not open %s for writing, aborting export.", [BDb::now(), $toFile]);
-            BDebug::log($msg);
+            $msg = $this->BLocale->_("%s Could not open %s for writing, aborting export.", [$this->BDb->now(), $toFile]);
+            $this->BDebug->log($msg);
             return false;
         }
 
-        $bs = BConfig::i()->get("modules/FCom_Core/import_export/batch_size", 100);
+        $bs = $this->BConfig->get("modules/FCom_Core/import_export/batch_size", 100);
 
         if ($batch && is_numeric($batch)) {
             $bs = $batch;
@@ -124,8 +124,8 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             /** @var FCom_Core_Model_Abstract $model */
             $model   = $s[ 'model' ];
             if ($this->getUser()->getPermission($model) == false) {
-                BDebug::warning(BLocale::_('%s User: %s, cannot export "%s". Permission denied.',
-                    [BDb::now(), $this->getUser()->get('username'), $model]));
+                $this->BDebug->warning($this->BLocale->_('%s User: %s, cannot export "%s". Permission denied.',
+                    [$this->BDb->now(), $this->getUser()->get('username'), $model]));
                 continue;
             }
             if ( !isset( $s[ 'skip' ] ) ) {
@@ -133,9 +133,9 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             }
             if ($model == 'FCom_Catalog_Model_Product') {
                 // disable custom fields to avoid them adding bunch of fields to export
-                FCom_CustomField_Main::i()->disable(true);
+                $this->FCom_CustomField_Main->disable(true);
             }
-            $sample = BDb::ddlFieldInfo($model::table());
+            $sample = $this->BDb->ddlFieldInfo($model::table());
             $idField = $model::getIdField();
             $heading = [static::DEFAULT_MODEL_KEY => $model, static::DEFAULT_FIELDS_KEY => []];
             foreach ($sample as $key => $value) {
@@ -152,7 +152,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                              ->offset($offset)
                              ->find_many();
             if ($records) {
-                $this->writeLine($fe, BUtil::toJson($heading));
+                $this->writeLine($fe, $this->BUtil->toJson($heading));
                 while($records) {
                     BEvents::i()->fire(__METHOD__ . ':beforeOutput', ['records' => $records]);
                     foreach ($records as $r) {
@@ -161,7 +161,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                         $data = $r->as_array();
                         $data = array_values($data);
 
-                        $json = BUtil::toJson($data);
+                        $json = $this->BUtil->toJson($data);
                         $this->writeLine($fe, $json);
                     }
                     $offset += $bs;
@@ -182,25 +182,25 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
     {
         $start = microtime(true);
         /** @var FCom_PushServer_Model_Channel $channel */
-        $this->channel = FCom_PushServer_Model_Channel::i()->getChannel('import', true);
-        $this->channel->send(['signal' => 'start', 'msg' => BLocale::_("Import started.")]);
-        $bs = BConfig::i()->get("modules/FCom_Core/import_export/batch_size", 100);
+        $this->channel = $this->FCom_PushServer_Model_Channel->getChannel('import', true);
+        $this->channel->send(['signal' => 'start', 'msg' => $this->BLocale->_("Import started.")]);
+        $bs = $this->BConfig->get("modules/FCom_Core/import_export/batch_size", 100);
         if ($batch && is_numeric($batch)) {
             $bs = $batch;
         }
 
         $fi = $this->getReadHandle($fromFile);
         if (!$fi) {
-            $msg = BLocale::_("%s Could not find file to import. File: %s", [BDb::now(), $fromFile]);
+            $msg = $this->BLocale->_("%s Could not find file to import. File: %s", [$this->BDb->now(), $fromFile]);
             $this->channel->send(['signal' => 'problem',
                                   'problem' => $msg]);
-            BDebug::log($msg);
+            $this->BDebug->log($msg);
             return false;
         }
         $ieConfig = $this->collectExportableModels();
         $importID = static::DEFAULT_STORE_ID;
         /** @var FCom_Core_Model_ImportExport_Model $ieHelperMod */
-        $ieHelperMod = FCom_Core_Model_ImportExport_Model::i();
+        $ieHelperMod = $this->FCom_Core_Model_ImportExport_Model;
 
         $importMeta = fgets($fi);
         if ($importMeta) {
@@ -209,21 +209,21 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 $importID = $meta-> {static::STORE_UNIQUE_ID_KEY};
                 $this->channel->send(['signal' => 'info', 'msg' => "Store id: $importID"]);
             } else {
-                $msg = BLocale::_("%s Unique store id is not found, using 'default' as key", BDb::now());
+                $msg = $this->BLocale->_("%s Unique store id is not found, using 'default' as key", $this->BDb->now());
                 $this->channel->send(
                     [
                         'signal'  => 'problem',
                         'problem' => $msg
                     ]
                 );
-                BDebug::warning($msg);
+                $this->BDebug->warning($msg);
                 $this->defaultSite = true;
             }
         }
 
-        $importSite = FCom_Core_Model_ImportExport_Site::i()->load($importID, 'site_code');
+        $importSite = $this->FCom_Core_Model_ImportExport_Site->load($importID, 'site_code');
         if (!$importSite) {
-            $importSite = FCom_Core_Model_ImportExport_Site::i()->create(['site_code' => $importID])->save();
+            $importSite = $this->FCom_Core_Model_ImportExport_Site->create(['site_code' => $importID])->save();
         }
         $this->importId = $importSite->id();
 
@@ -264,7 +264,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 $this->currentModel   = $data[ static::DEFAULT_MODEL_KEY ];
                 if ($this->getUser()->getPermission($this->currentModel) == false) {
                     $this->canImport = false;
-                    BDebug::warning(BLocale::_('%s User: %s, cannot import "%s". Permission denied.', [BDb::now(),
+                    $this->BDebug->warning($this->BLocale->_('%s User: %s, cannot import "%s". Permission denied.', [$this->BDb->now(),
                         $this->getUser()->get('username'), $model]));
                     continue;
                 } else {
@@ -288,11 +288,11 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                     $this->currentConfig[static::AUTO_MODEL_ID] = true; // default case, id is auto increment
                 }
                 if (!$this->currentConfig) {
-                    $msg = BLocale::_("%s Could not find I/E config for %s.", [BDb::now(), $this->currentModel]);
+                    $msg = $this->BLocale->_("%s Could not find I/E config for %s.", [$this->BDb->now(), $this->currentModel]);
                     $this->channel->send(['signal' => 'problem',
                                           'problem' => $msg
                     ]);
-                    BDebug::warning($msg);
+                    $this->BDebug->warning($msg);
                     continue;
                 }
 
@@ -335,7 +335,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             if ($cnt % $bs != 0) {
                 continue; // accumulate batch data
             } else {
-                $this->channel->send(['signal' => 'info', 'msg' => BLocale::_("Importing # %s", $cnt)]);
+                $this->channel->send(['signal' => 'info', 'msg' => $this->BLocale->_("Importing # %s", $cnt)]);
             }
 
             $this->importBatch($batchData);
@@ -351,20 +351,20 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             ['import_id' => $importID, 'models' => $this->changedModels]
         );
         if (!feof($fi)) {
-            $msg = BLocale::_("%s Error: unexpected file fail", BDb::now());
+            $msg = $this->BLocale->_("%s Error: unexpected file fail", $this->BDb->now());
             $this->channel->send(['signal' => 'problem',
                                   'problem' => $msg
             ]);
-            BDebug::debug($msg);
+            $this->BDebug->debug($msg);
         }
         fclose($fi);
         $this->channel->send([
             'signal' => 'finished',
             'msg'    => "Done in: " . round(microtime(true) - $start) . " sec.",
             'data'   => [
-                'new_models'     => BLocale::_("Created %d new models", $this->newModels),
-                'updated_models' => BLocale::_("Updated %d models", $this->updatedModels),
-                'not_changed'    => BLocale::_("No changes for %d models", $this->notChanged)
+                'new_models'     => $this->BLocale->_("Created %d new models", $this->newModels),
+                'updated_models' => $this->BLocale->_("Updated %d models", $this->updatedModels),
+                'not_changed'    => $this->BLocale->_("No changes for %d models", $this->notChanged)
             ]
         ]);
 
@@ -379,7 +379,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
     protected function importBatch($batchData)
     {
         /** @var FCom_Core_Model_ImportExport_Id $ieHelperId */
-        $ieHelperId = FCom_Core_Model_ImportExport_Id::i();
+        $ieHelperId = $this->FCom_Core_Model_ImportExport_Id;
         $cm = $this->currentModel;
         $existing = [];
         $this->populateRelated($batchData);
@@ -410,7 +410,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
         foreach ($batchData as $id => $data) {
             if(!isset($data[$this->currentModelIdField])){
-                BDebug::warning(BLocale::_("%s Invalid data: %s", [BDb::now(), print_r($data, 1)]));
+                $this->BDebug->warning($this->BLocale->_("%s Invalid data: %s", [$this->BDb->now(), print_r($data, 1)]));
             }
             $ieData = [
                 'site_id'   => $this->importId,
@@ -418,7 +418,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 'import_id' => $data[$this->currentModelIdField],
                 'local_id'  => null,
                 'relations' => !empty($data['failed_relation']) ? json_encode($data['failed_relation']) : null,
-                'update_at' => BDb::i()->now(),
+                'update_at' => $this->BDb->now(),
             ];
 
             if ($this->currentConfig[static::AUTO_MODEL_ID] !== false) {
@@ -433,7 +433,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 $model = isset($oldModels[$id]) ? $oldModels[$id] : null;
             }
             unset($data['oldId']);
-            //BDebug::log(sprintf("%s - memory consumption: %.2f MB", BDb::now(), memory_get_usage(1)/1024/1024));
+            //$this->BDebug->log(sprintf("%s - memory consumption: %.2f MB", $this->BDb->now(), memory_get_usage(1)/1024/1024));
             try {
                 if ($model) {
                     $import = [];
@@ -454,9 +454,9 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                     $this->newModels++;
                 }
             } catch (PDOException $e) {
-                BDebug::logException($e);
+                $this->BDebug->logException($e);
                 $this->channel->send(['signal' => 'problem',
-                                      'problem' => BLocale::_("Error: unexpected file fail")]);
+                                      'problem' => $this->BLocale->_("Error: unexpected file fail")]);
             }
 
             if ($model) {
@@ -464,7 +464,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 $ieHelperId->create($ieData)->save(true, true);
                 $this->changedModels[$model->id()] = $model;
             } else {
-                BDebug::warning(BLocale::_("%s Invalid model: %s", [BDb::now(), $id]));
+                $this->BDebug->warning($this->BLocale->_("%s Invalid model: %s", [$this->BDb->now(), $id]));
             }
         }
         BEvents::i()->fire(__METHOD__ . ':afterBatch:' . $cm, ['records' => $this->changedModels]);
@@ -481,7 +481,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
     {
         $path         = $module->root_dir . '/Model/';
         $modelConfigs = [];
-        $files        = BUtil::globRecursive($path, '*.php');
+        $files        = $this->BUtil->globRecursive($path, '*.php');
         if (empty($files)) {
             return $modelConfigs;
         }
@@ -523,7 +523,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
     protected function _sort(array $model, $name, array $models)
     {
         if (isset($this->_tempSorted[$name])) {
-            BDebug::log("Circular reference, $name", "ie.log");
+            $this->BDebug->log("Circular reference, $name", "ie.log");
         } else {
             if (!isset($this->_isSorted[$name])) {
                 $this->_tempSorted[$name] = 1;
@@ -545,8 +545,8 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                         }
 
                         if (!isset($tmpModel)) {
-                            BDebug::log(BLocale::_("%s Could not find valid configuration for %s",
-                                [BDb::now(), $node]), "ie.log");
+                            $this->BDebug->log($this->BLocale->_("%s Could not find valid configuration for %s",
+                                [$this->BDb->now(), $node]), "ie.log");
                             continue;
                         }
                         $this->_sort($tmpModel, $node, $models);
@@ -561,11 +561,11 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 
     protected function storeUID()
     {
-        $sUid = BConfig::i()->get('db/store_unique_id');
+        $sUid = $this->BConfig->get('db/store_unique_id');
         if (!$sUid) {
-            $sUid = BUtil::randomString(32);
-            BConfig::i()->set('db/store_unique_id', $sUid, false, true);
-            FCom_Core_Main::i()->writeConfigFiles();
+            $sUid = $this->BUtil->randomString(32);
+            $this->BConfig->set('db/store_unique_id', $sUid, false, true);
+            $this->FCom_Core_Main->writeConfigFiles();
         }
         return $sUid;
     }
@@ -585,7 +585,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $written += fwrite($handle, trim(substr($line, $written)) . "\n");
 
             if (!$written) { // if written is false or 0, there has been an error writing.
-                BDebug::log(BLocale::_("%s Writing failed", BDb::now()), 'ie.log');
+                $this->BDebug->log($this->BLocale->_("%s Writing failed", $this->BDb->now()), 'ie.log');
                 break;
             }
         }
@@ -600,12 +600,12 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         if (!$file) {
             $file = $this->_defaultExportFile;
         }
-        if (BUtil::isPathAbsolute($file)) {
+        if ($this->BUtil->isPathAbsolute($file)) {
             return $file;
         }
-        $path = BApp::i()->storageRandomDir() . '/export';
+        $path = $this->BApp->storageRandomDir() . '/export';
 
-        BUtil::ensureDir($path);
+        $this->BUtil->ensureDir($path);
         $file = $path . '/' . trim($file, '\\/');
         $realpath = str_replace('\\', '/', realpath(dirname($file)));
         if (strpos($realpath, $path) !== 0) {
@@ -628,15 +628,15 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             /** @var BORM $orm */
             $orm = $modelName::i()->orm();
             // foreach ( $modelKeyConditions as $cond ) {
-            //   $where = BDb::where($cond);
+            //   $where = $this->BDb->where($cond);
             // $orm->where(array('OR'=>$where));
             //}
 
             $orm->where_complex(['OR' => $modelKeyConditions], true);
             $models = $orm->find_many();
         } catch(Exception $e) {
-            BDebug::log($orm->as_sql());
-            BDebug::logException($e);
+            $this->BDebug->log($orm->as_sql());
+            $this->BDebug->logException($e);
         }
 
         foreach ($models as $model) {
@@ -683,10 +683,10 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         if (!empty($related) && !$this->defaultSite) { // search related ids
             foreach ($this->currentConfig['related'] as $f => $r) {
                 list($relModel, $field) = explode('.', $r);
-                $tempRel = FCom_Core_Model_ImportExport_Id::i()->orm()
+                $tempRel = $this->FCom_Core_Model_ImportExport_Id->orm()
                                       ->select(['import_id', 'local_id'])
                                       ->join(
-                                          FCom_Core_Model_ImportExport_Model::i()->table(),
+                                          $this->FCom_Core_Model_ImportExport_Model->table(),
                                           'iem.id=model_id and iem.model_name=\'' . $relModel . '\'',
                                           'iem'
                                       )
@@ -737,9 +737,9 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         } else {
             $path = $this->getFullPath($toFile);
             if (!$path) {
-                throw new BException(BLocale::_("Could not obtain export location."));
+                throw new BException($this->BLocale->_("Could not obtain export location."));
             }
-            BUtil::ensureDir(dirname($path));
+            $this->BUtil->ensureDir(dirname($path));
         }
         $fe = fopen($path, 'w');
         return $fe;

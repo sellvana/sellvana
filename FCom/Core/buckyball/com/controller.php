@@ -1013,8 +1013,13 @@ class BRequest extends BClass
         if ($alreadyStripped) {
             return;
         }
-        $data = ['GET' => & $_GET, 'POST' => & $_POST, 'REQUEST' => & $_REQUEST, 'COOKIE' => & $_COOKIE];
+
         mb_internal_encoding('UTF-8');
+        iconv_set_encoding('input_encoding', 'UTF-8');
+        iconv_set_encoding('internal_encoding', 'UTF-8');
+        iconv_set_encoding('output_encoding', 'UTF-8');
+
+        $data = ['GET' => & $_GET, 'POST' => & $_POST, 'REQUEST' => & $_REQUEST, 'COOKIE' => & $_COOKIE];
         $this->stripTagsRecursive($data, static::rawPath());
         $alreadyStripped = true;
         return $this;

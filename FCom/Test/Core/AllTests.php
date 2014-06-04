@@ -11,7 +11,7 @@ require_once __DIR__ . '/buckyball/AllTests.php';
 
 class AllTests_Buckyball
 {
-    public static function main()
+    public function main()
     {
         PHPUnit_TextUI_TestRunner::run(self::suite());
     }
@@ -21,7 +21,7 @@ class AllTests_Buckyball
      *
      * @return PHPUnit_Framework_TestSuite
      */
-    public static function suite()
+    public function suite()
     {
         $suite = new PHPUnit_Framework_TestSuite('Buckyball');
 

@@ -17,9 +17,9 @@ class FCom_LibHaml_Main extends BClass
 
     protected static $_cacheDir;
 
-    static public function bootstrap()
+    public function bootstrap()
     {
-        BLayout::i()->addRenderer('FCom_LibHaml', [
+        $this->BLayout->addRenderer('FCom_LibHaml', [
             'description' => 'HAML',
             'callback' => 'FCom_LibHaml_Main::renderer',
             'file_ext' => ['.haml'],
@@ -29,25 +29,25 @@ class FCom_LibHaml_Main extends BClass
     /**
      * @return MtHaml\Environment
      */
-    static public function haml()
+    public function haml()
     {
         if (!static::$_haml) {
-            BApp::m('FCom_LibHaml')->autoload('lib');
+            $this->BApp->m('FCom_LibHaml')->autoload('lib');
 
-            $c = BConfig::i();
+            $c = $this->BConfig;
             $options = (array)$c->get('modules/FCom_LibHaml/haml');
             static::$_haml = new MtHaml\Environment('php', $options);
             static::$_cacheDir = $c->get('fs/cache_dir') . '/haml';
-            BUtil::ensureDir(static::$_cacheDir);
+            $this->BUtil->ensureDir(static::$_cacheDir);
         }
         return static::$_haml;
     }
 
-    static public function renderer($view)
+    public function renderer($view)
     {
         $viewName = $view->param('view_name');
-        $pId = BDebug::debug('FCom_LibHaml render: ' . $viewName);
-        $haml = static::haml();
+        $pId = $this->BDebug->debug('FCom_LibHaml render: ' . $viewName);
+        $haml = $this->haml();
 
         $source = $view->getParam('source');
         if ($source) {
@@ -63,7 +63,7 @@ class FCom_LibHaml_Main extends BClass
         $cacheDir = static::$_cacheDir . '/' . substr($md5, 0, 2);
         $cacheFilename = $cacheDir . '/.' . $md5 . '.php.cache'; // to help preventing direct php run
         if (!file_exists($cacheFilename) || $mtime > filemtime($cacheFilename)) {
-            BUtil::ensureDir($cacheDir);
+            $this->BUtil->ensureDir($cacheDir);
             if (!$source) {
                 $source = file_get_contents($sourceFile);
             }
@@ -74,7 +74,7 @@ class FCom_LibHaml_Main extends BClass
         } else {
             $output = $view->renderFile($cacheFilename);
         }
-        BDebug::profile($pId);
+        $this->BDebug->profile($pId);
         return $output;
     }
 }

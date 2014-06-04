@@ -45,7 +45,7 @@ class BImport extends BClass
 
     public function getImportDir()
     {
-        return FCom_Core_Main::i()->dir('storage/import/' . $this->dir);
+        return $this->FCom_Core_Main->dir('storage/import/' . $this->dir);
     }
 
     public function updateFieldsDueToInfo($info)
@@ -111,7 +111,7 @@ class BImport extends BClass
      */
     public function config($config = null, $update = false)
     {
-        $dir = FCom_Core_Main::i()->dir('storage/run/' . $this->dir);
+        $dir = $this->FCom_Core_Main->dir('storage/run/' . $this->dir);
         $file = BSession::i()->sessionId() . '.json';
         $filename = $dir . '/' . $file;
         if ($config) { // create config lock

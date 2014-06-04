@@ -18,7 +18,7 @@ class FCom_PaymentBasic_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 
     public function getCheckoutFormView()
     {
-        return BLayout::i()->view('check_mo/form');
+        return $this->BLayout->view('check_mo/form');
     }
 
     public function payOnCheckout()

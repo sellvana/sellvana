@@ -21,7 +21,7 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
      * @param array       $args
      * @return FCom_CustomerGroups_Admin_Controller_TierPrices
      */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return parent::i($new, $args);
     }
@@ -32,8 +32,8 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
      */
     public function getTierPricesGrid($model)
     {
-        $cgOptions = FCom_CustomerGroups_Model_Group::i()->groupsOptions();
-        $orm = FCom_CustomerGroups_Model_TierPrice::i()->orm()->where('product_id', $model->id());
+        $cgOptions = $this->FCom_CustomerGroups_Model_Group->groupsOptions();
+        $orm = $this->FCom_CustomerGroups_Model_TierPrice->orm()->where('product_id', $model->id());
         $grid = [
             'config' => [
                 'id' => 'tier-prices',
@@ -51,7 +51,7 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
                         'validation' => ['required' => true, 'number' => true], 'editable' => 'inline', 'addable' => true],
                     ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]]
                 ],
-                'data' => BDb::many_as_array($orm->find_many()),
+                'data' => $this->BDb->many_as_array($orm->find_many()),
                 'data_mode' => 'local',
                 'filters' => [
                     ['field' => 'name', 'type' => 'text'],

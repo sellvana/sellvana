@@ -1389,7 +1389,8 @@ class BUtil extends BClass
                     list($class, $method) = explode('->', $callback);
                 }
                 if (!empty($class)) {
-                    $callback = [$class::i(), $method];
+                    $instance = BClassRegistry::i()->instance($class, [], true);
+                    $callback = [$instance, $method];
                 }
                 $callbackMapCache[$origCallback] = $callback;
             }
@@ -1918,7 +1919,7 @@ class BEmail extends BClass
 
         $callback = static::$_handlers[static::$_defaultHandler]['callback'];
         if (is_callable($callback)) {
-            $result = call_user_func($callback, $emailData);
+            $result = BUtil::call($callback, $emailData);
         } else {
             BDebug::warning('Default email handler is not callable');
             $result = false;
@@ -2762,6 +2763,238 @@ class BLocale extends BClass
         return $str;
     }
 
+    public static function getAvailableLocaleCodes()
+    {
+        static $codes = [
+            'aa_DJ', 'aa_ER', 'aa_ET', 'af_ZA', 'am_ET', 'an_ES', 'ar_AE', 'ar_BH', 'ar_DZ', ' ar_EG', 'ar_IN',
+            'ar_IQ', 'ar_JO', 'ar_KW', 'ar_LB', 'ar_LY', 'ar_MA', 'ar_OM', ' ar_QA', 'ar_SA', 'ar_SD', 'ar_SY',
+            'ar_TN', 'ar_YE', 'az_AZ', 'as_IN', 'ast_ES', ' be_BY', 'bem_ZM', 'ber_DZ', 'ber_MA', 'bg_BG',
+            'bho_IN', 'bn_BD', 'bn_IN', 'bo_CN', ' bo_IN', 'br_FR', 'brx_IN', 'bs_BA', 'byn_ER', 'ca_AD',
+            'ca_ES', 'ca_FR', 'ca_IT', 'crh_UA', 'cs_CZ', 'csb_PL', 'cv_RU', 'cy_GB', 'da_DK', 'de_AT', 'de_BE',
+            'de_CH', 'de_DE', 'de_LU', 'dv_MV', 'dz_BT', 'el_GR', 'el_CY', 'en_AG', 'en_AU', 'en_BW', 'en_CA',
+            'en_DK', 'en_GB', 'en_HK', 'en_IE', 'en_IN', 'en_NG', 'en_NZ', 'en_PH', 'en_SG', 'en_US', 'en_ZA',
+            'en_ZM', 'en_ZW', 'es_AR', 'es_BO', 'es_CL', 'es_CO', 'es_CR', 'es_CU', 'es_DO', 'es_EC', 'es_ES',
+            'es_GT', 'es_HN', 'es_MX', 'es_NI', 'es_PA', 'es_PE', 'es_PR', 'es_PY', 'es_SV', 'es_US', 'es_UY',
+            'es_VE', 'et_EE', 'eu_ES', 'fa_IR', 'ff_SN', 'fi_FI', 'fil_PH', 'fo_FO', 'fr_BE', 'fr_CA', 'fr_CH',
+            'fr_FR', 'fr_LU', 'fur_IT', 'fy_NL', 'fy_DE', 'ga_IE', 'gd_GB', 'gez_ER', 'gez_ET', 'gl_ES', 'gu_IN',
+            'gv_GB', 'ha_NG', 'he_IL', 'hi_IN', 'hne_IN', 'hr_HR', 'hsb_DE', 'ht_HT', 'hu_HU', 'hy_AM', 'id_ID',
+            'ig_NG', 'ik_CA', 'is_IS', 'it_CH', 'it_IT', 'iu_CA', 'iw_IL', 'ja_JP', 'ka_GE', 'kk_KZ', 'kl_GL',
+            'km_KH', 'kn_IN', 'ko_KR', 'kok_IN', 'ks_IN', 'ku_TR', 'kw_GB', 'ky_KG', 'lb_LU', 'lg_UG', 'li_BE',
+            'li_NL', 'lij_IT', 'lo_LA', 'lt_LT', 'lv_LV', 'mag_IN', 'mai_IN', 'mg_MG', 'mhr_RU', 'mi_NZ',
+            'mk_MK', 'ml_IN', 'mn_MN', 'mr_IN', 'ms_MY', 'mt_MT', 'my_MM', 'nan_TW', 'nb_NO', 'nds_DE', 'nds_NL',
+            'ne_NP', 'nl_AW', 'nl_BE', 'nl_NL', 'nn_NO', 'nr_ZA', 'nso_ZA', 'oc_FR', 'om_ET', 'om_KE', 'or_IN',
+            'os_RU', 'pa_IN', 'pa_PK', 'pap_AN', 'pl_PL', 'ps_AF', 'pt_BR', 'pt_PT', 'ro_RO', 'ru_RU', 'ru_UA',
+            'rw_RW', 'sa_IN', 'sc_IT', 'sd_IN', 'se_NO', 'shs_CA', 'si_LK', 'sid_ET', 'sk_SK', 'sl_SI', 'so_DJ',
+            'so_ET', 'so_KE', 'so_SO', 'sq_AL', 'sq_MK', 'sr_ME', 'sr_RS', 'ss_ZA', 'st_ZA', 'sv_FI', 'sv_SE',
+            'sw_KE', 'sw_TZ', 'ta_IN', 'ta_LK', 'te_IN', 'tg_TJ', 'th_TH', 'ti_ER', 'ti_ET', 'tig_ER', 'tk_TM',
+            'tl_PH', 'tn_ZA', 'tr_CY', 'tr_TR', 'ts_ZA', 'tt_RU', 'ug_CN', 'uk_UA', 'unm_US', 'ur_IN', 'ur_PK',
+            'uz_UZ', 've_ZA', 'vi_VN', 'wa_BE', 'wae_CH', 'wal_ET', 'wo_SN', 'xh_ZA', 'yi_US', 'yo_NG', 'yue_HK',
+            'zh_CN', 'zh_HK', 'zh_SG', 'zh_TW', 'zu_ZA',
+        ];
+        return array_combine($codes, $codes);
+    }
+
+    public static function getAvailableLanguages($labelType = null)
+    {
+        static $languages = [
+            'ab' => ['Abkhaz', 'аҧсуа бызшәа, аҧсшәа'],
+            'aa' => ['Afar', 'Afaraf'],
+            'af' => ['Afrikaans', 'Afrikaans'],
+            'ak' => ['Akan', 'Akan'],
+            'sq' => ['Albanian', 'Shqip'],
+            'am' => ['Amharic', 'አማርኛ'],
+            'ar' => ['Arabic', 'العربية'],
+            'an' => ['Aragonese', 'aragonés'],
+            'hy' => ['Armenian', 'Հայերեն'],
+            'as' => ['Assamese', 'অসমীয়া'],
+            'av' => ['Avaric', 'авар мацӀ, магӀарул мацӀ'],
+            'ae' => ['Avestan', 'avesta'],
+            'ay' => ['Aymara', 'aymar aru'],
+            'az' => ['Azerbaijani', 'azərbaycan dili'],
+            'bm' => ['Bambara', 'bamanankan'],
+            'ba' => ['Bashkir', 'башҡорт теле'],
+            'eu' => ['Basque', 'euskara, euskera'],
+            'be' => ['Belarusian', 'беларуская мова'],
+            'bn' => ['Bengali, Bangla', 'বাংলা'],
+            'bh' => ['Bihari', 'भोजपुरी'],
+            'bi' => ['Bislama', 'Bislama'],
+            'bs' => ['Bosnian', 'bosanski jezik'],
+            'br' => ['Breton', 'brezhoneg'],
+            'bg' => ['Bulgarian', 'български език'],
+            'my' => ['Burmese', 'ဗမာစာ'],
+            'ca' => ['Catalan, Valencian', 'català, valencià'],
+            'ch' => ['Chamorro', 'Chamoru'],
+            'ce' => ['Chechen', 'нохчийн мотт'],
+            'ny' => ['Chichewa, Chewa, Nyanja', 'chiCheŵa, chinyanja'],
+            'zh' => ['Chinese', '中文 (Zhōngwén), 汉语, 漢語'],
+            'cv' => ['Chuvash', 'чӑваш чӗлхи'],
+            'kw' => ['Cornish', 'Kernewek'],
+            'co' => ['Corsican', 'corsu, lingua corsa'],
+            'cr' => ['Cree', 'ᓀᐦᐃᔭᐍᐏᐣ'],
+            'hr' => ['Croatian', 'hrvatski jezik'],
+            'cs' => ['Czech', 'čeština, český jazyk'],
+            'da' => ['Danish', 'dansk'],
+            'dv' => ['Divehi, Dhivehi, Maldivian', 'ދިވެހި'],
+            'nl' => ['Dutch', 'Nederlands, Vlaams'],
+            'dz' => ['Dzongkha', 'རྫོང་ཁ'],
+            'en' => ['English', 'English'],
+            'eo' => ['Esperanto', 'Esperanto'],
+            'et' => ['Estonian', 'eesti, eesti keel'],
+            'ee' => ['Ewe', 'Eʋegbe'],
+            'fo' => ['Faroese', 'føroyskt'],
+            'fj' => ['Fijian', 'vosa Vakaviti'],
+            'fi' => ['Finnish', 'suomi, suomen kieli'],
+            'fr' => ['French', 'français, langue française'],
+            'ff' => ['Fula, Fulah, Pulaar, Pular', 'Fulfulde, Pulaar, Pular'],
+            'gl' => ['Galician', 'galego'],
+            'ka' => ['Georgian', 'ქართული'],
+            'de' => ['German', 'Deutsch'],
+            'el' => ['Greek (modern)', 'ελληνικά'],
+            'gn' => ['Guaraní', 'Avañe\'ẽ'],
+            'gu' => ['Gujarati', 'ગુજરાતી'],
+            'ht' => ['Haitian, Haitian Creole', 'Kreyòl ayisyen'],
+            'ha' => ['Hausa', '(Hausa) هَوُسَ'],
+            'he' => ['Hebrew (modern)', 'עברית'],
+            'hz' => ['Herero', 'Otjiherero'],
+            'hi' => ['Hindi', 'हिन्दी, हिंदी'],
+            'ho' => ['Hiri Motu', 'Hiri Motu'],
+            'hu' => ['Hungarian', 'magyar'],
+            'ia' => ['Interlingua', 'Interlingua'],
+            'id' => ['Indonesian', 'Bahasa Indonesia'],
+            'ie' => ['Interlingue', 'Interlingue'],
+            'ga' => ['Irish', 'Gaeilge'],
+            'ig' => ['Igbo', 'Asụsụ Igbo'],
+            'ik' => ['Inupiaq', 'Iñupiaq, Iñupiatun'],
+            'io' => ['Ido', 'Ido'],
+            'is' => ['Icelandic', 'Íslenska'],
+            'it' => ['Italian', 'italiano'],
+            'iu' => ['Inuktitut', 'ᐃᓄᒃᑎᑐᑦ'],
+            'ja' => ['Japanese', '日本語 (にほんご)'],
+            'jv' => ['Javanese', 'basa Jawa'],
+            'kl' => ['Kalaallisut, Greenlandic', 'kalaallisut, kalaallit oqaasii'],
+            'kn' => ['Kannada', 'ಕನ್ನಡ'],
+            'kr' => ['Kanuri', 'Kanuri'],
+            'ks' => ['Kashmiri', 'कश्मीरी, كشميري‎'],
+            'kk' => ['Kazakh', 'қазақ тілі'],
+            'km' => ['Khmer', 'ខ្មែរ, ខេមរភាសា, ភាសាខ្មែរ'],
+            'ki' => ['Kikuyu, Gikuyu', 'Gĩkũyũ'],
+            'rw' => ['Kinyarwanda', 'Ikinyarwanda'],
+            'ky' => ['Kyrgyz', 'Кыргызча, Кыргыз тили'],
+            'kv' => ['Komi', 'коми кыв'],
+            'kg' => ['Kongo', 'Kikongo'],
+            'ko' => ['Korean', '한국어, 조선어'],
+            'ku' => ['Kurdish', 'Kurdî, كوردی‎'],
+            'kj' => ['Kwanyama, Kuanyama', 'Kuanyama'],
+            'la' => ['Latin', 'latine, lingua latina'],
+            'lb' => ['Luxembourgish, Letzeburgesch', 'Lëtzebuergesch'],
+            'lg' => ['Ganda', 'Luganda'],
+            'li' => ['Limburgish, Limburgan, Limburger', 'Limburgs'],
+            'ln' => ['Lingala', 'Lingála'],
+            'lo' => ['Lao', 'ພາສາລາວ'],
+            'lt' => ['Lithuanian', 'lietuvių kalba'],
+            'lu' => ['Luba-Katanga', 'Tshiluba'],
+            'lv' => ['Latvian', 'latviešu valoda'],
+            'gv' => ['Manx', 'Gaelg, Gailck'],
+            'mk' => ['Macedonian', 'македонски јазик'],
+            'mg' => ['Malagasy', 'fiteny malagasy'],
+            'ms' => ['Malay', 'bahasa Melayu, بهاس ملايو‎'],
+            'ml' => ['Malayalam', 'മലയാളം'],
+            'mt' => ['Maltese', 'Malti'],
+            'mi' => ['Māori', 'te reo Māori'],
+            'mr' => ['Marathi (Marāṭhī)', 'मराठी'],
+            'mh' => ['Marshallese', 'Kajin M̧ajeļ'],
+            'mn' => ['Mongolian', 'монгол'],
+            'na' => ['Nauru', 'Ekakairũ Naoero'],
+            'nv' => ['Navajo, Navaho', 'Diné bizaad, Dinékʼehǰí'],
+            'nd' => ['Northern Ndebele', 'isiNdebele'],
+            'ne' => ['Nepali', 'नेपाली'],
+            'ng' => ['Ndonga', 'Owambo'],
+            'nb' => ['Norwegian Bokmål', 'Norsk bokmål'],
+            'nn' => ['Norwegian Nynorsk', 'Norsk nynorsk'],
+            'no' => ['Norwegian', 'Norsk'],
+            'ii' => ['Nuosu', 'ꆈꌠ꒿ Nuosuhxop'],
+            'nr' => ['Southern Ndebele', 'isiNdebele'],
+            'oc' => ['Occitan', 'occitan, lenga d\òc'],
+            'oj' => ['Ojibwe, Ojibwa', 'ᐊᓂᔑᓈᐯᒧᐎᓐ'],
+            'cu' => ['Old Church Slavonic, Church Slavonic, Old Bulgarian', 'ѩзыкъ словѣньскъ'],
+            'om' => ['Oromo', 'Afaan Oromoo'],
+            'or' => ['Oriya', 'ଓଡ଼ିଆ'],
+            'os' => ['Ossetian, Ossetic', 'ирон æвзаг'],
+            'pa' => ['Panjabi, Punjabi', 'ਪੰਜਾਬੀ, پنجابی‎'],
+            'pi' => ['Pāli', 'पाऴि'],
+            'fa' => ['Persian (Farsi)', 'فارسی'],
+            'pl' => ['Polish', 'język polski, polszczyzna'],
+            'ps' => ['Pashto, Pushto', 'پښتو'],
+            'pt' => ['Portuguese', 'português'],
+            'qu' => ['Quechua', 'Runa Simi, Kichwa'],
+            'rm' => ['Romansh', 'rumantsch grischun'],
+            'rn' => ['Kirundi', 'Ikirundi'],
+            'ro' => ['Romanian', 'limba română'],
+            'ru' => ['Russian', 'русский язык'],
+            'sa' => ['Sanskrit (Saṁskṛta)', 'संस्कृतम्'],
+            'sc' => ['Sardinian', 'sardu'],
+            'sd' => ['Sindhi', 'सिन्धी, سنڌي، سندھی‎'],
+            'se' => ['Northern Sami', 'Davvisámegiella'],
+            'sm' => ['Samoan', 'gagana fa\'a Samoa'],
+            'sg' => ['Sango', 'yângâ tî sängö'],
+            'sr' => ['Serbian', 'српски језик'],
+            'gd' => ['Scottish Gaelic, Gaelic', 'Gàidhlig'],
+            'sn' => ['Shona', 'chiShona'],
+            'si' => ['Sinhala, Sinhalese', 'සිංහල'],
+            'sk' => ['Slovak', 'slovenčina, slovenský jazyk'],
+            'sl' => ['Slovene', 'slovenski jezik, slovenščina'],
+            'so' => ['Somali', 'Soomaaliga, af Soomaali'],
+            'st' => ['Southern Sotho', 'Sesotho'],
+            'es' => ['Spanish, Castilian', 'español, castellano'],
+            'su' => ['Sundanese', 'Basa Sunda'],
+            'sw' => ['Swahili', 'Kiswahili'],
+            'ss' => ['Swati', 'SiSwati'],
+            'sv' => ['Swedish', 'Svenska'],
+            'ta' => ['Tamil', 'தமிழ்'],
+            'te' => ['Telugu', 'తెలుగు'],
+            'tg' => ['Tajik', 'тоҷикӣ, toğikī, تاجیکی‎'],
+            'th' => ['Thai', 'ไทย'],
+            'ti' => ['Tigrinya', 'ትግርኛ'],
+            'bo' => ['Tibetan Standard, Tibetan, Central', 'བོད་ཡིག'],
+            'tk' => ['Turkmen', 'Türkmen, Түркмен'],
+            'tl' => ['Tagalog', 'Wikang Tagalog, ᜏᜒᜃᜅ᜔ ᜆᜄᜎᜓᜄ᜔'],
+            'tn' => ['Tswana', 'Setswana'],
+            'to' => ['Tonga (Tonga Islands)', 'faka Tonga'],
+            'tr' => ['Turkish', 'Türkçe'],
+            'ts' => ['Tsonga', 'Xitsonga'],
+            'tt' => ['Tatar', 'татар теле, tatar tele'],
+            'tw' => ['Twi', 'Twi'],
+            'ty' => ['Tahitian', 'Reo Tahiti'],
+            'ug' => ['Uyghur, Uighur', 'Uyƣurqə, ئۇيغۇرچە‎'],
+            'uk' => ['Ukrainian', 'українська мова'],
+            'ur' => ['Urdu', 'اردو'],
+            'uz' => ['Uzbek', 'O‘zbek, Ўзбек, أۇزبېك‎'],
+            've' => ['Venda', 'Tshivenḓa'],
+            'vi' => ['Vietnamese', 'Tiếng Việt'],
+            'vo' => ['Volapük', 'Volapük'],
+            'wa' => ['Walloon', 'walon'],
+            'cy' => ['Welsh', 'Cymraeg'],
+            'wo' => ['Wolof', 'Wollof'],
+            'fy' => ['Western Frisian', 'Frysk'],
+            'xh' => ['Xhosa', 'isiXhosa'],
+            'yi' => ['Yiddish', 'ייִדיש'],
+            'yo' => ['Yoruba', 'Yorùbá'],
+            'za' => ['Zhuang, Chuang', 'Saɯ cueŋƅ, Saw cuengh'],
+            'zu' => ['Zulu', 'isiZulu'],
+        ];
+        $labelType = strtolower($labelType);
+        if ($labelType === null) {
+            return $languages;
+        }
+        $result = [];
+        foreach ($languages as $k => $a) {
+            $result[$k] = ($labelType === 'latin') ? ($a[0]) : (
+                ($labelType === 'native') ? ($a[1]) : ($a[0] . ' (' . $a[1] . ')')
+            );
+        }
+        return $result;
+    }
+
     public static function setCurrentLanguage($lang)
     {
         static::$_currentLanguage = $lang;
@@ -3021,6 +3254,28 @@ class BLocale extends BClass
     }
     */
 
+    public function tzOptions($nested = false)
+    {
+        $allZones = timezone_identifiers_list();
+        asort($allZones);
+        $zones = [];
+        if ($nested) {
+            foreach ($allZones as $zone) {
+                $z = explode('/', $zone, 2);
+                if (empty($z[1])) {
+                    $zones[$z[0]] = $z[0];
+                } else {
+                    $zones['@' . $z[0]][$zone] = str_replace(['_', '/'], [' ', ' / '], $zone);
+                }
+            }
+        } else {
+            foreach ($allZones as $zone) {
+                $zones[$zone] = str_replace(['_', '/'], [' ', ' / '], $zone);
+            }
+        }
+        return $zones;
+    }
+
     /**
     * Get server timezone
     *
@@ -3220,9 +3475,9 @@ class BFtpClient extends BClass
 * Throttle invalid login attempts and potentially notify user and admin
 *
 * Usage:
-* - BEFORE AUTH: if (!BLoginThrottle::i()->init('FCom_Customer_Model_Customer', $username)) return false;
-* - ON FAILURE:  BLoginThrottle::i()->failure();
-* - ON SUCCESS:  BloginThrottle::i()->success();
+* - BEFORE AUTH: if (!$this->BLoginThrottle->init('FCom_Customer_Model_Customer', $username)) return false;
+* - ON FAILURE:  $this->BLoginThrottle->failure();
+* - ON SUCCESS:  $this->BloginThrottle->success();
 */
 class BLoginThrottle extends BClass
 {
@@ -3569,13 +3824,13 @@ class BValidate extends BClass
 
             } elseif (is_callable($r['rule'])) {
 
-                $result = call_user_func($r['rule'], $data, $r['args']);
+                $result = BUtil::call($r['rule'], [$data, $r['args']], true);
 
             } elseif (is_string($r['rule'])) {
 
                 $callback = BUtil::extCallback($r['rule']);
                 if ($callback !== $r['rule']) {
-                    $result = call_user_func($r['rule'], $data, $r['args']);
+                    $result = BUtil::call($r['rule'], [$data, $r['args']], true);
                 } else {
                     throw new BException('Invalid rule: ' . print_r($r['rule'], 1));
                 }
@@ -3796,6 +4051,7 @@ class BEnv extends BClass
     public $app;
     public $autoload;
     public $config;
+    public $db;
     public $debug;
     public $layout;
     public $modReg;
@@ -3804,12 +4060,14 @@ class BEnv extends BClass
     public $session;
     public $util;
 
-    public function __construct(BApp $app, BClassAutoload $autoload, BConfig $config, BDebug $debug, BLayout $layout,
-        BModuleRegistry $modReg, BRequest $request, BResponse $response, BSession $session, BUtil $util)
+    public function __construct(BApp $app, BClassAutoload $autoload, BConfig $config, BDb $db, BDebug $debug,
+        BLayout $layout, BModuleRegistry $modReg, BRequest $request, BResponse $response, BSession $session,
+        BUtil $util)
     {
         $this->app = $app;
         $this->autoload = $autoload;
         $this->config = $config;
+        $this->db = $db;
         $this->debug = $debug;
         $this->layout = $layout;
         $this->modReg = $modReg;

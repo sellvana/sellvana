@@ -6,8 +6,8 @@ class FCom_IndexTank_Model_IndexHelper extends FCom_Core_Model_Abstract
 
     public function productsByIndex($index)
     {
-        $helper = FCom_IndexTank_Model_IndexHelper::i()->orm()->where("index", $index)->find_one();
-        $products = FCom_Catalog_Model_Product::i()->orm()->where_gt("update_at", $helper->checkpoint)->find_many();
+        $helper = $this->FCom_IndexTank_Model_IndexHelper->orm()->where("index", $index)->find_one();
+        $products = $this->FCom_Catalog_Model_Product->orm()->where_gt("update_at", $helper->checkpoint)->find_many();
         return $products;
     }
 
@@ -16,7 +16,7 @@ class FCom_IndexTank_Model_IndexHelper extends FCom_Core_Model_Abstract
     *
     * @return FCom_IndexTank_Model_IndexHelper
     */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }

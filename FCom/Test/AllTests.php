@@ -14,7 +14,7 @@ if (!defined('PHPUnit_MAIN_METHOD')) {
 class FCom_Test_AllTests extends BClass
 {
 
-    public static function suite()
+    public function suite()
     {
         $sapi_type = php_sapi_name();
         if (substr($sapi_type, 0, 3) == 'cgi' || substr($sapi_type, 0, 3) == 'cli') {
@@ -22,7 +22,7 @@ class FCom_Test_AllTests extends BClass
         }
         $suite = new PHPUnit_Framework_TestSuite('All Fulleron Tests');
 
-        $modules = BModuleRegistry::i()->getAllModules();
+        $modules = $this->BModuleRegistry->getAllModules();
 
         $testModules = [];
         foreach ($modules as $module) {
@@ -44,5 +44,5 @@ class FCom_Test_AllTests extends BClass
 }
 
 if (PHPUnit_MAIN_METHOD == 'FCom_Test_AllTests::suite') {
-    FCom_Test_AllTests::i()->suite();
+    $this->FCom_Test_AllTests->suite();
 }

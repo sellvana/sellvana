@@ -13,7 +13,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     * @param array $args
     * @return FCom_Sales_Model_Order
     */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(get_called_class(), $args, !$new);
     }
@@ -23,7 +23,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         if (!parent::onBeforeSave()) return false;
 
         if (!$this->unique_id) {
-            $this->set('unique_id', FCom_Core_Model_Seq::i()->getNextSeqId('order'));
+            $this->set('unique_id', $this->FCom_Core_Model_Seq->getNextSeqId('order'));
         }
 
         return true;
@@ -47,7 +47,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function addNew($data)
     {
-        $status = FCom_Sales_Model_Order_Status::i()->statusNew();
+        $status = $this->FCom_Sales_Model_Order_Status->statusNew();
         $data['status'] = $status->name;
         $data['status_id'] = $status->id;
         BEvents::i()->fire(__CLASS__ . '.addNew', ['order' => $data]);
@@ -62,7 +62,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function paid()
     {
-        $status = FCom_Sales_Model_Order_Status::i()->statusPaid();
+        $status = $this->FCom_Sales_Model_Order_Status->statusPaid();
         $data = [];
         $data['status'] = $status->name;
         $data['status_id'] = $status->id;
@@ -72,7 +72,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function pending()
     {
-        $status = FCom_Sales_Model_Order_Status::i()->statusPending();
+        $status = $this->FCom_Sales_Model_Order_Status->statusPending();
         $data = [];
         $data['status'] = $status->name;
         $data['status_id'] = $status->id;
@@ -81,7 +81,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function status()
     {
-        return FCom_Sales_Model_Order_Status::i()->orm()->where('id', $this->status_id)->find_one();
+        return $this->FCom_Sales_Model_Order_Status->orm()->where('id', $this->status_id)->find_one();
     }
 
 
@@ -92,7 +92,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
      */
     public function items($assoc = true)
     {
-        $this->items = FCom_Sales_Model_Order_Item::i()->orm()->where('order_id', $this->id)->find_many_assoc();
+        $this->items = $this->FCom_Sales_Model_Order_Item->orm()->where('order_id', $this->id)->find_many_assoc();
         return $assoc ? $this->items : array_values($this->items);
     }
 
@@ -140,7 +140,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
                         'qty' => $item->qty,
                         'total' => $item->total,
                         //get product info as object and prepare data for api
-                        'product_info' => FCom_Catalog_Model_Product::i()->prepareApiData(BUtil::fromJson($item->product_info, true)),
+                        'product_info' => $this->FCom_Catalog_Model_Product->prepareApiData($this->BUtil->fromJson($item->product_info, true)),
                     ];
                 }
             }
@@ -188,7 +188,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
      * @param FCom_Sales_Model_Cart $cart
      * @return FCom_Sales_Model_Order
      */
-    protected static function _createFromCart($cart)
+    protected function _createFromCart($cart)
     {
         $shippingMethod       = $cart->getShippingMethod();
         $shippingServiceTitle = '';
@@ -213,7 +213,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         //        $orderData['total_json']             = $cart->total_json;
         $orderData['balance']    = $cart->grand_total; // this has been calculated in cart
         $orderData['grandtotal'] = $cart->grand_total; // full grand total
-        $orderData['create_at'] = $orderData['update_at'] = BDb::now();
+        $orderData['create_at'] = $orderData['update_at'] = $this->BDb->now();
 
         $data_ = [
             'totals'           => $cart->data['totals'],
@@ -222,11 +222,11 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $orderData[static::$_dataCustomField] = $data_;
 
         /* @var $salesOrder FCom_Sales_Model_Order */
-        $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
+        $salesOrder = $this->FCom_Sales_Model_Order->load($cart->id(), 'cart_id');
         if ($salesOrder) {
             $salesOrder->update($orderData);
         } else {
-            $salesOrder = FCom_Sales_Model_Order::i()->addNew($orderData);
+            $salesOrder = $this->FCom_Sales_Model_Order->addNew($orderData);
         }
         return $salesOrder;
     }
@@ -236,21 +236,21 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
      * @param array $options
      * @return FCom_Sales_Model_Order
      */
-    public static function createFromCart($cart, $options = [])
+    public function createFromCart($cart, $options = [])
     {
         $cart->calculateTotals();
-        $salesOrder = static::_createFromCart($cart);
+        $salesOrder = $this->_createFromCart($cart);
 
         $salesOrder->save(); // save to have valid unique_id
         if (isset($options['all_components']) && $options['all_components']) {
             $options['order_id'] = $salesOrder->id();
-            static::createOrderItems($cart, $options);
-            static::createOrderAddress($cart, $options);
+            $this->createOrderItems($cart, $options);
+            $this->createOrderAddress($cart, $options);
 
             //Made payment
-            $cart->setPaymentDetails(BUtil::fromJson($cart->payment_details));
+            $cart->setPaymentDetails($this->BUtil->fromJson($cart->payment_details));
             $paymentMethod = $cart->getPaymentMethod();
-            static::createOrderPayment($paymentMethod, $salesOrder, $options);
+            $this->createOrderPayment($paymentMethod, $salesOrder, $options);
         }
         BEvents::i()->fire(__METHOD__ . ':after', [
             'cart'           => $cart,
@@ -266,7 +266,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
      * @param FCom_Sales_Model_Order $salesOrder
      * @param array $options
      */
-    public static function createOrderPayment($payment, $salesOrder, $options)
+    public function createOrderPayment($payment, $salesOrder, $options)
     {
         if (!$payment instanceof FCom_Sales_Method_Payment_Interface) {
             return;
@@ -281,16 +281,16 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
      * @param FCom_Sales_Model_Cart $cart
      * @param array                 $options
      */
-    public static function createOrderAddress($cart, $options)
+    public function createOrderAddress($cart, $options)
     {
         $orderId = isset($options['order_id']) ? $options['order_id'] : $cart->id(); // ???
         $shippingAddress = $cart->getAddressByType('shipping');
         if ($shippingAddress) {
-            FCom_Sales_Model_Order_Address::i()->newAddress($orderId, $shippingAddress);
+            $this->FCom_Sales_Model_Order_Address->newAddress($orderId, $shippingAddress);
         }
         $billingAddress = $cart->getAddressByType('billing');
         if ($billingAddress) {
-            FCom_Sales_Model_Order_Address::i()->newAddress($orderId, $billingAddress);
+            $this->FCom_Sales_Model_Order_Address->newAddress($orderId, $billingAddress);
         }
     }
 
@@ -315,7 +315,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     public function getAddresses()
     {
         if (!$this->addresses) {
-            $this->addresses = FCom_Sales_Model_Order_Address::i()->orm()
+            $this->addresses = $this->FCom_Sales_Model_Order_Address->orm()
                                ->where("order_id", $this->id)
                                ->find_many_assoc('atype');
         }
@@ -326,15 +326,15 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
      * @param FCom_Sales_Model_Cart $cart
      * @param array $options
      */
-    public static function createOrderItems($cart, $options)
+    public function createOrderItems($cart, $options)
     {
         foreach ($cart->items() as $item) {
             /* @var $item FCom_Sales_Model_Cart_Item */
-            if (!static::itemAllowed($options, $item)) {
+            if (!$this->itemAllowed($options, $item)) {
                 continue;
             }
 
-            $product = FCom_Catalog_Model_Product::i()->load($item->product_id);
+            $product = $this->FCom_Catalog_Model_Product->load($item->product_id);
             $orderId = isset($options['order_id']) ? $options['order_id'] : $cart->id(); // ???
             if (!$product) {
                 continue;
@@ -344,19 +344,19 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             $orderItem['product_id']   = $item->product_id;
             $orderItem['qty']          = $item->qty;
             $orderItem['total']        = $item->rowTotal();
-            $orderItem['product_info'] = BUtil::toJson($product->as_array());
+            $orderItem['product_info'] = $this->BUtil->toJson($product->as_array());
 
             /* @var $testItem FCom_Sales_Model_Order_Item */
-            $testItem = FCom_Sales_Model_Order_Item::i()->isItemExist($orderId, $item->product_id);
+            $testItem = $this->FCom_Sales_Model_Order_Item->isItemExist($orderId, $item->product_id);
             if ($testItem) {
                 $testItem->update($orderItem);
             } else {
-                FCom_Sales_Model_Order_Item::i()->addNew($orderItem);
+                $this->FCom_Sales_Model_Order_Item->addNew($orderItem);
             }
         }
     }
 
-    protected static function itemAllowed($options, $item)
+    protected function itemAllowed($options, $item)
     {
         if (isset($options['items'])) {
             foreach ($options['items'] as $i) {
@@ -374,7 +374,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $description = [];
         foreach ($this->items() as $item) {
-            $product_data = BUtil::fromJson($item->get('product_info'));
+            $product_data = $this->BUtil->fromJson($item->get('product_info'));
             $name = isset($product_data['product_name']) ? $product_data['product_name'] : null;
             if (!isset($description[$name])) {
                 $description[$name] = $item->qty;
@@ -390,9 +390,9 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         return join("\n", $result);
     }
 
-    static public function onGetFirstSeqId($args)
+    public function onGetFirstSeqId($args)
     {
-        $orderNumber = BConfig::i()->get('modules/FCom_Sales/order_number');
+        $orderNumber = $this->BConfig->get('modules/FCom_Sales/order_number');
         if ($orderNumber) {
             //todo: confirm with Boris about add prefix 1 to order number.
             $args['seq_id'] =  '1' . $orderNumber;

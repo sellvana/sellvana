@@ -20,7 +20,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 
     public function productsORM()
     {
-        return FCom_Catalog_Model_Product::i()->orm('p')
+        return $this->FCom_Catalog_Model_Product->orm('p')
             ->join('FCom_Catalog_Model_CategoryProduct', ['pc.product_id', '=', 'p.id'], 'pc')
             ->where('pc.category_id', $this->id);
     }
@@ -30,29 +30,29 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return $this->productsORM()->find_many();
     }
 
-    static public function urlPrefix()
+    public function urlPrefix()
     {
         if (empty(static::$_urlPrefix)) {
-            static::$_urlPrefix = BConfig::i()->get('modules/FCom_Catalog/url_prefix');
+            static::$_urlPrefix = $this->BConfig->get('modules/FCom_Catalog/url_prefix');
         }
         return static::$_urlPrefix;
     }
 
     public function url()
     {
-        $prefix = static::urlPrefix();
-        return BApp::frontendHref($prefix . $this->url_path);
+        $prefix = $this->urlPrefix();
+        return $this->BApp->frontendHref($prefix . $this->url_path);
     }
 
     public function onReorderAZ($args)
     {
-        $c = static::i()->load($args['id']);
+        $c = $this->load($args['id']);
         if (!$c) {
             throw new BException('Invalid category ID: ' . $args['id']);
         }
 
         $c->reorderChildrenAZ(!empty($args['recursive']));
-        static::i()->cacheSaveDirty();
+        $this->cacheSaveDirty();
         return true;
     }
 
@@ -101,11 +101,11 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return $this->is_top_menu;
     }
 
-    static public function getTopNavCategories($maxLevel = 1)
+    public function getTopNavCategories($maxLevel = 1)
     {
-        $orm = static::orm()->order_by_asc('sort_order');
-        if (BConfig::i()->get('modules/FCom_Frontend/nav_top/type') == 'categories_root') {
-            $rootId = BConfig::i()->get('modules/FCom_Frontend/nav_top/root_category');
+        $orm = $this->orm()->order_by_asc('sort_order');
+        if ($this->BConfig->get('modules/FCom_Frontend/nav_top/type') == 'categories_root') {
+            $rootId = $this->BConfig->get('modules/FCom_Frontend/nav_top/root_category');
             if (!$rootId) {
                 $rootId = 1;
             }
@@ -118,7 +118,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             if (sizeof($categories) === 0) {
                 $subcats = [];
             } else {
-                $subcats = static::orm()->where_in('parent_id', array_keys($categories))
+                $subcats = $this->orm()->where_in('parent_id', array_keys($categories))
                     ->order_by_asc('parent_id')->order_by_asc('sort_order')->find_many();
             }
             $children = [];
@@ -130,6 +130,11 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             }
         }
         return array_values($categories);
+    }
+
+    public function getFeaturedCategories()
+    {
+        return $this->orm()->where('is_featured', 1)->find_many();
     }
 
     public function onAfterCreate()
@@ -148,7 +153,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         parent::onAfterSave();
         $addIds = explode(',', $this->get('product_ids_add'));
         $removeIds = explode(',', $this->get('product_ids_remove'));
-        $hlp = FCom_Catalog_Model_CategoryProduct::i();
+        $hlp = $this->FCom_Catalog_Model_CategoryProduct;
 
         if (sizeof($addIds) > 0 && $addIds[0] != '') {
             $exists = $hlp->orm('cp')->where('category_id', $this->id())->where_in('product_id', $addIds)
@@ -217,7 +222,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
                 $sql .= ' (' . $product->get('id') . ', ' . $cloneNode->id . '),';
             }
             $sql = substr($sql, 0, strlen($sql) - 1);
-            FCom_Catalog_Model_CategoryProduct::i()->orm()->raw_query($sql)->execute();
+            $this->FCom_Catalog_Model_CategoryProduct->orm()->raw_query($sql)->execute();
         }
         return $this;
     }
@@ -225,14 +230,14 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
     public function onImportAfterModel($args)
     {
         $importId = $args['import_id'];
-        $importSite = FCom_Core_Model_ImportExport_Site::i()->load($importId, 'site_code');
+        $importSite = $this->FCom_Core_Model_ImportExport_Site->load($importId, 'site_code');
         if (!$importSite) {
             return;
         }
         if (isset($args['models'])) {
             $toUpdate = $args['models'];
         } else {
-            $toUpdate = static::i()->orm()
+            $toUpdate = $this->orm()
                   ->where(['parent_id IS NULL', ['OR' => 'id_path IS NULL']])
                   ->find_many_assoc();
         }
@@ -243,10 +248,10 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 //            unset( $toUpdate[ 1 ] );
 //        }
         $ids = array_keys($toUpdate);
-        $importData = FCom_Core_Model_ImportExport_Id::i()->orm()
+        $importData = $this->FCom_Core_Model_ImportExport_Id->orm()
             ->join(
-              FCom_Core_Model_ImportExport_Model::i()->table(),
-              'iem.id=model_id and iem.model_name=\'' . static::origClass() . '\'',
+              $this->FCom_Core_Model_ImportExport_Model->table(),
+              'iem.id=model_id and iem.model_name=\'' . $this->origClass() . '\'',
               'iem'
             )
             ->where(['site_id' => $importSite->id()])
@@ -254,7 +259,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             ->find_many();
 
         if (empty($importData)) {
-            BDebug::log(BLocale::_("Could not update category data, missing import details"));
+            $this->BDebug->log(BLocale::_("Could not update category data, missing import details"));
             return;
         }
 
@@ -277,10 +282,10 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
                 }
             }
         }
-        $relatedData = FCom_Core_Model_ImportExport_Id::i()->orm()
+        $relatedData = $this->FCom_Core_Model_ImportExport_Id->orm()
             ->join(
-              FCom_Core_Model_ImportExport_Model::i()->table(),
-              'iem.id=model_id and iem.model_name=\'' . static::origClass() . '\'',
+              $this->FCom_Core_Model_ImportExport_Model->table(),
+              'iem.id=model_id and iem.model_name=\'' . $this->origClass() . '\'',
               'iem'
             )
             ->where(['site_id' => $importSite->id()])

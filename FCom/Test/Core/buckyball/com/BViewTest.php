@@ -38,7 +38,7 @@ class BView_Test extends PHPUnit_Framework_TestCase
     public function testGetView()
     {
         $view = BView::factory('my', ['key' => 'value']);
-        BLayout::i()->addView('new', ['key' => 'newValue']); // have to have it in layout to get it.
+        $this->BLayout->addView('new', ['key' => 'newValue']); // have to have it in layout to get it.
         $viewNew = $view->view('new', ['new' => 'value']);
         $this->assertEquals('value', $viewNew->get('new'));
     }
@@ -99,9 +99,9 @@ class BView_Test extends PHPUnit_Framework_TestCase
     public function testGetTemplateFileName()
     {
         $view = BView::factory('my', ['template' => 'test.php']);
-        $this->assertEquals(BLayout::i()->getViewRootDir() . '/test.php', $view->getTemplateFileName());
+        $this->assertEquals($this->BLayout->getViewRootDir() . '/test.php', $view->getTemplateFileName());
         $view->setParam('template', null);
-        $this->assertEquals(BLayout::i()->getViewRootDir() . '/my.php', $view->getTemplateFileName());
+        $this->assertEquals($this->BLayout->getViewRootDir() . '/my.php', $view->getTemplateFileName());
     }
 
     public function testRenderRawText()
@@ -137,7 +137,7 @@ class BView_Test extends PHPUnit_Framework_TestCase
     public function getLayoutView()
     {
         $path = realpath('../../Catalog/Frontend/views/');
-        BLayout::i()
+        $this->BLayout
             ->addAllViews($path)
             ->addLayout([
                              'base' => [
@@ -151,7 +151,7 @@ class BView_Test extends PHPUnit_Framework_TestCase
                         ]
             );
 
-        $view = BLayout::i()->getView('catalog/search');
+        $view = $this->BLayout->getView('catalog/search');
 
         return $view;
     }

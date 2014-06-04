@@ -6,29 +6,29 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
     {
         if (!parent::beforeDispatch()) return false;
 
-        BResponse::i()->nocache();
+        $this->BResponse->nocache();
 
         return true;
     }
 
     public function action_address()
     {
-        $atype = BRequest::i()->get('t');
+        $atype = $this->BRequest->get('t');
         if (empty($atype)) {
             $atype = 'b';
         }
 
-        $layout = BLayout::i();
-        $countries = FCom_Geo_Model_Country::i()->orm()->find_many();
+        $layout = $this->BLayout;
+        $countries = $this->FCom_Geo_Model_Country->orm()->find_many();
         $countriesList = array_map(function ($el) {
             return $el->get('iso');
         }, $countries);
         $countriesList = implode(',', $countriesList);
-        $countries = FCom_Geo_Model_Country::options($countriesList);
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
+        $countries = $this->FCom_Geo_Model_Country->options($countriesList);
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
         if (!$cart->id()) {
-            $href = BApp::href('cart');
-            BResponse::i()->redirect($href);
+            $href = $this->BApp->href('cart');
+            $this->BResponse->redirect($href);
             return;
         }
 
@@ -38,9 +38,9 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             $addressType = 'billing';
         }
 
-        $address = FCom_Sales_Model_Cart_Address::i()->orm()->where("cart_id", $cart->id())->where('atype', $addressType)->find_one();
+        $address = $this->FCom_Sales_Model_Cart_Address->orm()->where("cart_id", $cart->id())->where('atype', $addressType)->find_one();
         if (!$address) {
-            $address = FCom_Sales_Model_Cart_Address::i()->orm()->create();
+            $address = $this->FCom_Sales_Model_Cart_Address->orm()->create();
             $address->cart_id = $cart->id();
             if ($atype == 's') {
                 $address->atype = 'shipping';
@@ -50,15 +50,15 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         }
 
         //$address->save();
-        //$address = FCom_Sales_Model_Cart_Address::i()->load($address->id());
+        //$address = $this->FCom_Sales_Model_Cart_Address->load($address->id());
         if ('shipping' == $address->atype) {
             $breadCrumbLabel = 'Shipping address';
         } else {
             $breadCrumbLabel = 'Billing address';
         }
         $layout->view('breadcrumbs')->set('crumbs', [
-            ['label' => 'Home', 'href' =>  BApp::baseUrl()],
-            ['label' => 'Checkout', 'href' =>  BApp::href("checkout")],
+            ['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
+            ['label' => 'Checkout', 'href' =>  $this->BApp->href("checkout")],
             ['label' => $breadCrumbLabel, 'active' => true]]);
         if ($layout->view('geo/embed')) {
             $layout->view('geo/embed')->set('countries', $countriesList);
@@ -69,7 +69,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
 
     public function action_address__POST()
     {
-        $r = BRequest::i()->post();
+        $r = $this->BRequest->post();
 
         $atype = $r['t'];
         if (empty($atype)) {
@@ -84,19 +84,19 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             $addressType2 = 'shipping';
         }
 
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
         if (!$cart->id()) {
-            $href = BApp::href('cart');
-            BResponse::i()->redirect($href);
+            $href = $this->BApp->href('cart');
+            $this->BResponse->redirect($href);
             return;
         }
         /* @var FCom_Sales_Model_Cart_Address $address */
         $address = $cart->getAddressByType($addressType);
         if (!$address) {
-            $address = FCom_Sales_Model_Cart_Address::i()->orm()->create();
+            $address = $this->FCom_Sales_Model_Cart_Address->orm()->create();
         }
         if (!$address->validate($r, [], 'address-form')) {
-            BResponse::i()->redirect("checkout/address?t=" . $atype);
+            $this->BResponse->redirect("checkout/address?t=" . $atype);
             return;
         }
 
@@ -111,7 +111,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             //copy shipping address to billing address
             $addressCopy = $cart->getAddressByType($addressType2);
             if (!$addressCopy) {
-                $addressCopy = FCom_Sales_Model_Cart_Address::i()->orm()->create();
+                $addressCopy = $this->FCom_Sales_Model_Cart_Address->orm()->create();
                 $addressCopy->cart_id = $cart->id();
             }
             $addressCopy->set($r);
@@ -119,14 +119,14 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             $addressCopy->save();
         }
 
-        if (BApp::m('FCom_Customer')) {
+        if ($this->BApp->m('FCom_Customer')) {
             //todo move this code to FCom_Customer and add the trigger for this event
-            $user = FCom_Customer_Model_Customer::i()->sessionUser();
+            $user = $this->FCom_Customer_Model_Customer->sessionUser();
             if ('shipping' == $addressType) {
                 if ($user && !$user->defaultShipping()) {
                     $newAddress = $address->as_array();
                     unset($newAddress['id']);
-                    FCom_Customer_Model_Address::i()->newShipping($newAddress, $user);
+                    $this->FCom_Customer_Model_Address->newShipping($newAddress, $user);
                 }
             }
 
@@ -134,13 +134,13 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
                 if ($user && !$user->defaultBilling()) {
                     $newAddress = $address->as_array();
                     unset($newAddress['id']);
-                    FCom_Customer_Model_Address::i()->newBilling($newAddress, $user);
+                    $this->FCom_Customer_Model_Address->newBilling($newAddress, $user);
                 }
             }
         }
 
-        $href = BApp::href('checkout') . '?guest=yes';
-        BResponse::i()->redirect($href);
+        $href = $this->BApp->href('checkout') . '?guest=yes';
+        $this->BResponse->redirect($href);
     }
 
 

@@ -5,7 +5,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
     public function action_index()
     {
         $this->layout('/');
-        //BLayout::i()->layout('/');
+        //$this->BLayout->layout('/');
     }
 
     public function action_static()
@@ -21,31 +21,31 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
     public function action_noroute()
     {
         $this->layout('404');
-        BResponse::i()->status(404);
+        $this->BResponse->status(404);
     }
 
     public function action_my_account()
     {
-        $model = FCom_Admin_Model_User::i()->sessionUser();
-        BLayout::i()->view('my_account')->set('model', $model);
+        $model = $this->FCom_Admin_Model_User->sessionUser();
+        $this->BLayout->view('my_account')->set('model', $model);
         $this->layout('/my_account');
     }
 
     public function action_my_account__POST()
     {
-        $model = FCom_Admin_Model_User::i()->sessionUser();
-        $r = BRequest::i();
+        $model = $this->FCom_Admin_Model_User->sessionUser();
+        $r = $this->BRequest;
         $data = $r->post('model');
         if (empty($data['password_current']) || !$model->validatePassword($data['password_current'])) {
             $this->message('Missing or invalid current password', 'error');
-            BResponse::i()->redirect('my_account');
+            $this->BResponse->redirect('my_account');
             return;
         }
         try {
             if (!empty($data['password'])) {
                 if (empty($data['password_confirm']) || $data['password'] !== $data['password_confirm']) {
                     $this->message('Missing or not matching password confirmation', 'error');
-                    BResponse::i()->redirect('my_account');
+                    $this->BResponse->redirect('my_account');
                     return;
                 }
             }
@@ -55,23 +55,65 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             $this->message($e->getMessage(), 'error');
         }
 
-        BResponse::i()->redirect('my_account');
+        $this->BResponse->redirect('my_account');
     }
 
     public function action_reports()
     {
         //TODO add code for reports
-        // $model = FCom_Admin_Model_User::i()->sessionUser();
-        //BLayout::i()->view('my_account')->set('model', $model);
+        // $model = $this->FCom_Admin_Model_User->sessionUser();
+        //$this->BLayout->view('my_account')->set('model', $model);
         $this->layout('/reports');
+    }
+
+    public function action_switch_locale()
+    {
+        if ($this->BRequest->csrf('referrer', 'GET')) {
+            $this->BResponse->status(403, 'CSRF detected', 'CSRF detected');
+            return;
+        }
+        $this->switchLocale();
+    }
+
+    public function action_switch_locale__POST()
+    {
+        $this->switchLocale();
+    }
+
+    public function switchLocale()
+    {
+        $req = $this->BRequest;
+        $locale = $req->request('locale');
+        $conf = $this->BConfig->get('modules/FCom_Admin');
+        $default = !empty($conf['default_locale']) ? $conf['default_locale'] : 'en_US';
+        if (empty($conf['enable_locales']) || empty($conf['allowed_locales'])) {
+            $locale = $default;
+        } else {
+            $allowed = $conf['allowed_locales'];
+            if (!in_array($locale, $conf['allowed_locales'])) {
+                $locale = $default;
+            }
+        }
+
+        list($language) = explode('_', $locale);
+        $this->BSession->set('_locale', $locale)->set('_language', $language);
+
+        $redirectUrl = $req->request('redirect_to');
+        if (!$redirectUrl) {
+            $redirectUrl = $req->referrer();
+        }
+        if (!$req->isUrlLocal($redirectUrl) || strpos($redirectUrl, 'switch_locale') !== false) {
+            $redirectUrl = '';
+        }
+        $this->BResponse->redirect($redirectUrl);
     }
 
     public function action_personalize__POST()
     {
-        $r = BRequest::i()->request();
+        $r = $this->BRequest->request();
         $data = [];
         if (empty($r['do'])) {
-            BResponse::i()->json(['error' => true, 'r' => $r]);
+            $this->BResponse->json(['error' => true, 'r' => $r]);
             return;
         }
         switch ($r['do']) {
@@ -115,7 +157,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             if (is_array($r['cols'])) {
                 $cols = $r['cols'];
             } else {
-                $cols = BUtil::fromJson($r['cols']);
+                $cols = $this->BUtil->fromJson($r['cols']);
             }
 
             $columns = [];
@@ -132,7 +174,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
            if (is_array($r['cols'])) {
                 $cols = $r['cols'];
             } else {
-                $cols = BUtil::fromJson($r['cols']);
+                $cols = $this->BUtil->fromJson($r['cols']);
             }
 
             $filters = [];
@@ -148,7 +190,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             if (is_array($r['cols'])) {
                 $cols = $r['cols'];
             } else {
-                $cols = BUtil::fromJson($r['cols']);
+                $cols = $this->BUtil->fromJson($r['cols']);
             }
 
             $columns = [];
@@ -176,7 +218,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             } elseif ($r['sd']==='descending') {
                 $r['sd'] = 'desc';
             }*/
-            $data = ['grid' => [$r['grid'] => ['state' => BUtil::arrayMask($r, 'p,ps,s,sd,q')]]];
+            $data = ['grid' => [$r['grid'] => ['state' => $this->BUtil->arrayMask($r, 'p,ps,s,sd,q')]]];
 
             break;
         case 'grid.local.filters':
@@ -184,7 +226,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
                 break;
             }
             if (!is_array($r['filters'])) {
-                $r['filters'] = BUtil::fromJson($r['filters']);
+                $r['filters'] = $this->BUtil->fromJson($r['filters']);
             }
             $data = ['grid' => [$r['grid'] => ['filters' => $r['filters']]]];
 
@@ -226,17 +268,17 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
         }
         BEvents::i()->fire(__METHOD__, ['request' => $r, 'data' => &$data]);
 
-        FCom_Admin_Model_User::i()->personalize($data);
-        BResponse::i()->json(['success' => true, 'data' => $data, 'r' => $r]);
+        $this->FCom_Admin_Model_User->personalize($data);
+        $this->BResponse->json(['success' => true, 'data' => $data, 'r' => $r]);
     }
 
     public function action_generate_sitemap()
     {
-        $static_page = FCom_Admin_Controller_Templates::i()->getAreaLayout()->findViewsRegex('#^(static/)[\w\-]+$#');
+        $static_page = $this->FCom_Admin_Controller_Templates->getAreaLayout()->findViewsRegex('#^(static/)[\w\-]+$#');
         $site_map = [];
         foreach ($static_page as $view => $arr) {
             array_push($site_map, [
-                'loc' => BApp::frontendHref(preg_replace('#static/#', '', $view)),
+                'loc' => $this->BApp->frontendHref(preg_replace('#static/#', '', $view)),
                 'changefreq' => 'daily'
             ]);
         }
@@ -256,9 +298,9 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             $url_set->appendChild($url);
         }
         $xml->appendChild($url_set);
-        $xml->save(BConfig::i()->get('fs/root_dir') . "/site_map.xml");
+        $xml->save($this->BConfig->get('fs/root_dir') . "/site_map.xml");
         echo "<pre>Starting generate site map...\n";
-        echo "Location: " . BConfig::i()->get('fs/root_dir') . "/site_map.xml \n";
+        echo "Location: " . $this->BConfig->get('fs/root_dir') . "/site_map.xml \n";
         echo 'DONE';
         exit;
     }

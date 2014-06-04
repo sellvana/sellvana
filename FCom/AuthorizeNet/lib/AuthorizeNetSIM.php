@@ -200,7 +200,7 @@ class AuthorizeNetSIM_Form
      *
      * @return string The fingerprint.
      */
-    public static function getFingerprint($api_login_id, $transaction_key, $amount, $fp_sequence, $fp_timestamp)
+    public function getFingerprint($api_login_id, $transaction_key, $amount, $fp_sequence, $fp_timestamp)
     {
         $api_login_id = ($api_login_id ? $api_login_id : (defined('AUTHORIZENET_API_LOGIN_ID') ? AUTHORIZENET_API_LOGIN_ID : ""));
         $transaction_key = ($transaction_key ? $transaction_key : (defined('AUTHORIZENET_TRANSACTION_KEY') ? AUTHORIZENET_TRANSACTION_KEY : ""));

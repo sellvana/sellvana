@@ -10,15 +10,15 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
 
     public function sessionWishlist()
     {
-        $customer = FCom_Customer_Model_Customer::i()->sessionUser();
+        $customer = $this->FCom_Customer_Model_Customer->sessionUser();
         if (!$customer) {
             return false;
         }
         if (!$this->_sessionWishlist) {
-            $wishlist = static::i()->loadWhere(["customer_id" => $customer->id()]);
+            $wishlist = $this->loadWhere(["customer_id" => $customer->id()]);
             if (!$wishlist) {
                 $this->orm()->create()->set("customer_id", $customer->id())->save();
-                $wishlist = static::i()->loadWhere(["customer_id" => $customer->id()]);
+                $wishlist = $this->loadWhere(["customer_id" => $customer->id()]);
             }
 
             $this->_sessionWishlist = $wishlist;
@@ -29,7 +29,7 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
     public function items($refresh = false)
     {
         if (!$this->items || $refresh) {
-            $items = FCom_Wishlist_Model_WishlistItem::i()->orm()->where('wishlist_id', $this->id())->find_many_assoc();
+            $items = $this->FCom_Wishlist_Model_WishlistItem->orm()->where('wishlist_id', $this->id())->find_many_assoc();
             foreach ($items as $ik => $item) {
                 if (!$item->product()) {
                     $this->removeItem($item);
@@ -43,9 +43,9 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
 
     public function addItem($productId)
     {
-        $item = FCom_Wishlist_Model_WishlistItem::i()->loadWhere(['wishlist_id' => $this->id(), 'product_id' => $productId]);
+        $item = $this->FCom_Wishlist_Model_WishlistItem->loadWhere(['wishlist_id' => $this->id(), 'product_id' => $productId]);
         if (!$item) {
-            $item = FCom_Wishlist_Model_WishlistItem::i()->orm()->create();
+            $item = $this->FCom_Wishlist_Model_WishlistItem->orm()->create();
             $item->set('wishlist_id', $this->id())
                     ->set('product_id', $productId);
             $item->save();

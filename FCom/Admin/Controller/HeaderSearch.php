@@ -4,7 +4,7 @@ class FCom_Admin_Controller_HeaderSearch extends FCom_Admin_Controller_Abstract_
 {
     public function action_index()
     {
-        if (BRequest::i()->xhr()) {
+        if ($this->BRequest->xhr()) {
             return ;
         }
         $result = [];
@@ -20,7 +20,7 @@ class FCom_Admin_Controller_HeaderSearch extends FCom_Admin_Controller_Abstract_
             }
         }
         if ($url != '') {
-            BResponse::i()->redirect($url);
+            $this->BResponse->redirect($url);
         }
         $this->layout('/header_search');
     }

@@ -14,16 +14,16 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
     public function onAfterSave()
     {
         parent::onAfterSave();
-        static::i()->createDomainMap();
+        $this->createDomainMap();
     }
 
-    static public function createDomainMap()
+    public function createDomainMap()
     {
-        if (!BDb::ddlTableExists(static::table())) {
+        if (!$this->BDb->ddlTableExists($this->table())) {
             return [];
         }
         $map = [];
-        $sites = (array)static::i()->orm()->find_many();
+        $sites = (array)$this->orm()->find_many();
         foreach ($sites as $site) {
             $domains = explode("\n", $site->match_domains);
             foreach ($domains as $pattern) {
@@ -42,22 +42,22 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
         return $map;
     }
 
-    static public function getDomainMap()
+    public function getDomainMap()
     {
         $map = BCache::i()->load(static::$_mapCacheKey);
         if (!$map) {
-            $map = static::i()->createDomainMap();
+            $map = $this->createDomainMap();
         }
         return $map;
     }
 
-    static public function findByDomain($domain = null)
+    public function findByDomain($domain = null)
     {
         if (null === $domain) {
-            $domain = BRequest::i()->httpHost(false);
+            $domain = $this->BRequest->httpHost(false);
         }
         $domain = strtolower($domain);
-        $map = (array)static::i()->getDomainMap();
+        $map = (array)$this->getDomainMap();
         $site = null;
         foreach ($map as $pattern => $siteData) {
             if (preg_match('#' . $pattern . '#', $domain)) {
@@ -70,7 +70,7 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
 
     public function siteOptions()
     {
-        $sites = (array)static::i()->orm()->find_many();
+        $sites = (array)$this->orm()->find_many();
         $groups = [];
         foreach ($sites as $model) {
             $key            = $model->id;

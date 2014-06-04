@@ -15,7 +15,7 @@ class FCom_Catalog_Tests_Model_CategoryProductTest extends FCom_Test_DatabaseTes
 
         $productId = 2;
         $categoryId = 1;
-        FCom_Catalog_Model_CategoryProduct::i()->create(['product_id' => $productId, 'category_id' => $categoryId])->save();
+        $this->FCom_Catalog_Model_CategoryProduct->create(['product_id' => $productId, 'category_id' => $categoryId])->save();
 
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_category_product'), "Insert failed");
     }

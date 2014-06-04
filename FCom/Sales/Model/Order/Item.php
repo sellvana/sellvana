@@ -12,7 +12,7 @@ class FCom_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
     * @param array $args
     * @return FCom_Sales_Model_Order_Item
     */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(get_called_class(), $args, !$new);
     }

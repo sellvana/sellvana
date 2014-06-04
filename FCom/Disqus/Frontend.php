@@ -2,9 +2,9 @@
 
 class FCom_Disqus_Frontend extends BClass
 {
-    static public function isLayoutEnabled($d)
+    public function isLayoutEnabled($d)
     {
-        $config = BConfig::i()->get('modules/FCom_Disqus');
+        $config = $this->BConfig->get('modules/FCom_Disqus');
         switch ($d['layout_name']) {
         case 'base':
             return !empty($config['show_on_all_pages']);

@@ -16,7 +16,7 @@ class FCom_Admin_View_Nav extends FCom_Core_View_Abstract
             $parent = $root;
             if ($i < $l && empty($root['/'][$k])) {
                 $part = join('/', array_slice($pathArr, 0, $i + 1));
-                BDebug::warning('addNav(' . $path . '): Invalid parent path: ' . $part);
+                $this->BDebug->warning('addNav(' . $path . '): Invalid parent path: ' . $part);
             }
             $root =& $root['/'][$k];
         }
@@ -32,7 +32,7 @@ class FCom_Admin_View_Nav extends FCom_Core_View_Abstract
             $node['pos'] = $pos + 10;
         }
         if (!empty($node['href']) && !preg_match('/^https?:/', $node['href'])) {
-            $node['href'] = BApp::href($node['href']);
+            $node['href'] = $this->BApp->href($node['href']);
         }
         $root = $node;
         return $this;
@@ -62,9 +62,9 @@ class FCom_Admin_View_Nav extends FCom_Core_View_Abstract
         });
 
         if (!static::$_allPermissions) {
-            static::$_allPermissions = FCom_Admin_Model_Role::i()->getAllPermissions();
+            static::$_allPermissions = $this->FCom_Admin_Model_Role->getAllPermissions();
         }
-        $user = FCom_Admin_Model_User::i()->sessionUser();
+        $user = $this->FCom_Admin_Model_User->sessionUser();
 
         $result = [];
         foreach ($root['/'] as $k => $node) {

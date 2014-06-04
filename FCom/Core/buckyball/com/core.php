@@ -55,7 +55,7 @@ class BClass
      * @var array
      */
     static protected $_diConfig = [
-        '_env' => 'BEnv',
+        #'_env' => 'BEnv',
         '*' => 'ALL',
     ];
 
@@ -1537,9 +1537,9 @@ class BClassAutoload extends BClass
             if ($file[0] !== '/' && $file[1] !== ':') {
                 $file = $this->root_dir . '/' . $file;
             }
-            if (file_exists($file)) {
-                include ($file);
-            }
+            #if (file_exists($file)) {
+                @include ($file);
+            #}
         }
     }
 }
@@ -1760,7 +1760,7 @@ if (!class_exists($r[0]) && BDebug::is('DEBUG')) {
             // Invoke observer
             if (is_callable($cb)) {
                 BDebug::debug('ON ' . $eventName/*.' : '.var_export($cb, 1)*/, 1);
-                $result[] = call_user_func($cb, $args);
+                $result[] = BUtil::call($cb, $args);
             } else {
                 BDebug::warning('Invalid callback: ' . var_export($cb, 1), 1);
             }
@@ -1969,7 +1969,8 @@ class BSession extends BClass
             }
         }
 
-        $this->data['_locale'] = BConfig::i()->get('locale');
+        #$this->data['_locale'] = BConfig::i()->get('locale');
+        /*
         if (!empty($this->data['_locale'])) {
             if (is_array($this->data['_locale'])) {
                 foreach ($this->data['_locale'] as $c => $l) {
@@ -1981,6 +1982,8 @@ class BSession extends BClass
         } else {
             setLocale(LC_ALL, 'en_US.UTF-8');
         }
+        */
+        setLocale(LC_ALL, 'en_US.UTF-8');
 
         if (!empty($this->data['_timezone'])) {
             date_default_timezone_set($this->data['_timezone']);

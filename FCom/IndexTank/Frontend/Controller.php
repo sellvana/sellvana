@@ -5,34 +5,34 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
     public function action_category()
     {
 #echo "<pre>"; debug_print_backtrace(); print_r(BRouting::i()->currentRoute()); exit;
-        $category = FCom_Catalog_Model_Category::i()->load(BRequest::i()->params('category'), 'url_path');
+        $category = $this->FCom_Catalog_Model_Category->load($this->BRequest->params('category'), 'url_path');
         if (!$category) {
             $this->forward(false);
             return $this;
         }
 
-        $layout = BLayout::i();
-        $q = BRequest::i()->get('q');
-        $sc = BRequest::i()->get('sc');
-        $f = BRequest::i()->get('f');
-        $v = BRequest::i()->get('v');
-        $page = BRequest::i()->get('p');
-        $resultPerPage = BRequest::i()->get('ps');
+        $layout = $this->BLayout;
+        $q = $this->BRequest->get('q');
+        $sc = $this->BRequest->get('sc');
+        $f = $this->BRequest->get('f');
+        $v = $this->BRequest->get('v');
+        $page = $this->BRequest->get('p');
+        $resultPerPage = $this->BRequest->get('ps');
 
         if (empty($f['category'])) {
-            $categoryKey = FCom_IndexTank_Index_Product::i()->getCategoryKey($category);
+            $categoryKey = $this->FCom_IndexTank_Index_Product->getCategoryKey($category);
             $f['category'] = $categoryKey . ":" . $category->node_name;
         }
 
-        $productsData = FCom_IndexTank_Search::i()->search($q, $sc, $f, $v, $page, $resultPerPage);
+        $productsData = $this->FCom_IndexTank_Search->search($q, $sc, $f, $v, $page, $resultPerPage);
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_data', ['data' => &$productsData]);
 
-        BApp::i()
+        $this->BApp->i()
             ->set('current_category', $category)
             ->set('current_query', $q)
             ->set('products_data', $productsData);
 
-        FCom_Core_Main::i()->lastNav(true);
+        $this->FCom_Core_Main->lastNav(true);
 
         $head = $this->view('head');
         $crumbs = ['home'];
@@ -47,17 +47,17 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $layout->view('breadcrumbs')->crumbs = $crumbs;
 
         $layout->view('catalog/search')->query = $q;
-        $layout->view('catalog/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
-        $layout->view('catalog/search')->index_name = FCom_IndexTank_Search::i()->indexName();
+        $layout->view('catalog/search')->public_api_url = $this->FCom_IndexTank_Search->publicApiUrl();
+        $layout->view('catalog/search')->index_name = $this->FCom_IndexTank_Search->indexName();
 
-        $rowsViewName = 'catalog/product/' . (BRequest::i()->get('view') == 'list' ? 'list' : 'grid');
+        $rowsViewName = 'catalog/product/' . ($this->BRequest->get('view') == 'list' ? 'list' : 'grid');
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->category = $category;
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
 
-        $layout->view('catalog/product/pager')->sort_options = FCom_IndexTank_Model_ProductFunction::i()->getSortingArray();
+        $layout->view('catalog/product/pager')->sort_options = $this->FCom_IndexTank_Model_ProductFunction->getSortingArray();
         $layout->view('indextank/product/filters')->state = $productsData['state'];
 
 
@@ -66,10 +66,10 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
     public function action_search()
     {
-        $req = BRequest::i();
+        $req = $this->BRequest;
         $q = $req->get('q');
         if (!$q) {
-            BResponse::i()->redirect('');
+            $this->BResponse->redirect('');
         }
         $sc = $req->get('sc');
         $f = $req->get('f');
@@ -77,31 +77,31 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $page = $req->get('p');
         $resultPerPage = $req->get('ps');
 
-        if (false == BConfig::i()->get('modules/FCom_IndexTank/index_name')) {
+        if (false == $this->BConfig->get('modules/FCom_IndexTank/index_name')) {
             die('Please set up correct API URL at Admin Setting page');
         }
 
-        $productsData = FCom_IndexTank_Search::i()->search($q, $sc, $f, $v, $page, $resultPerPage);
+        $productsData = $this->FCom_IndexTank_Search->search($q, $sc, $f, $v, $page, $resultPerPage);
         BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', ['data' => &$productsData]);
 
-        BApp::i()
+        $this->BApp->i()
             ->set('current_query', $q)
             ->set('products_data', $productsData);
 
-        FCom_Core_Main::i()->lastNav(true);
-        $layout = BLayout::i();
+        $this->FCom_Core_Main->lastNav(true);
+        $layout = $this->BLayout;
         $layout->view('breadcrumbs')->crumbs = ['home', ['label' => 'Search: ' . $q, 'active' => true]];
         $layout->view('catalog/search')->query = $q;
-        $layout->view('catalog/search')->public_api_url = FCom_IndexTank_Search::i()->publicApiUrl();
-        $layout->view('catalog/search')->index_name = FCom_IndexTank_Search::i()->indexName();
+        $layout->view('catalog/search')->public_api_url = $this->FCom_IndexTank_Search->publicApiUrl();
+        $layout->view('catalog/search')->index_name = $this->FCom_IndexTank_Search->indexName();
 
-        $rowsViewName = 'catalog/product/' . (BRequest::i()->get('view') == 'list' ? 'list' : 'grid');
+        $rowsViewName = 'catalog/product/' . ($this->BRequest->get('view') == 'list' ? 'list' : 'grid');
         $rowsView = $layout->view($rowsViewName);
         $layout->hookView('main_products', $rowsViewName);
         $rowsView->products_data = $productsData;
         $rowsView->products = $productsData['rows'];
 
-        $layout->view('catalog/product/pager')->sort_options = FCom_IndexTank_Model_ProductFunction::i()->getSortingArray();
+        $layout->view('catalog/product/pager')->sort_options = $this->FCom_IndexTank_Model_ProductFunction->getSortingArray();
         $layout->view('indextank/product/filters')->state = $productsData['state'];
 
         $this->layout('/catalog/search');

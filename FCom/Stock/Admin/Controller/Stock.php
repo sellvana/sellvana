@@ -16,22 +16,22 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
         $config = parent::gridConfig();
         unset($config['form_url']);
         $data = [];
-        $config['edit_url'] = BApp::href($this->_gridHref . '/grid_data');
+        $config['edit_url'] = $this->BApp->href($this->_gridHref . '/grid_data');
         $config['edit_url_required'] = true;
         $callback = function ($row) use (&$data) {
-            $data_serialized = BUtil::objectToArray(json_decode($row->get('data_serialized')));
+            $data_serialized = $this->BUtil->objectToArray(json_decode($row->get('data_serialized')));
             $qty = '';
             //$tmp_cost use when edit inline
             //@TODO: find solution other when edit inline cost only display number instead include symbol currency
             $cost = $tmp_cost = '';
             if ($row->get('cost')) {
                 $tmp_cost = $row->get('cost');
-                $cost = BLocale::currency($tmp_cost);
+                $cost = $this->BLocale->currency($tmp_cost);
             }
             $out_stock = (isset($settings['out_stock']))? 'back_order': '';
             if (isset($data_serialized['stock_policy'])) {
-                $qty = $data_serialized['stock_policy']['stock_qty'];
-                $out_stock = $data_serialized['stock_policy']['out_stock'];
+                $qty = (isset($data_serialized['stock_policy']['stock_qty']))? $data_serialized['stock_policy']['stock_qty'] : '';
+                $out_stock = (isset($data_serialized['stock_policy']['out_stock'])) ? $data_serialized['stock_policy']['out_stock']: '';
             }
             $tmp = [
                 'id' => $row->get('id'),
@@ -45,7 +45,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
             ];
             array_push($data, $tmp);
         };
-        FCom_Stock_Model_Sku::i()->orm($this->_mainTableAlias)->select(array($this->_mainTableAlias.'.*', 'p.data_serialized', 'p.cost', 'p.product_name'))
+        $this->FCom_Stock_Model_Sku->orm($this->_mainTableAlias)->select(array($this->_mainTableAlias.'.*', 'p.data_serialized', 'p.cost', 'p.product_name'))
             ->left_outer_join('FCom_Catalog_Model_Product', [ 'p.local_sku', '=', $this->_mainTableAlias . '.sku'], 'p')
             ->select_expr('p.product_name', 'product_name')
             ->select_expr('p.cost', 'cost')->iterate($callback);
@@ -54,16 +54,16 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
             ['name' => 'id', 'label' => 'ID', 'width' => 50, 'index' => 's.id'],
             ['type' => 'input', 'name' => 'sku', 'label' => 'SKU', 'width' => 300, 'index' => $this->_mainTableAlias.'.sku',
                     //'editable' => true, 'addable' => true, 'editor' => 'text',
-                    //'validation' => ['required' => true, 'unique' => BApp::href('stock/unique')]
+                    //'validation' => ['required' => true, 'unique' => $this->BApp->href('stock/unique')]
             ],
             ['name' => 'product_name', 'label' => 'Product Name', 'width' => 300],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'width' => 150,
                 'index' => $this->_mainTableAlias.'.status', 'editable' => true, 'edit_inline' => true,
                 'mass-editable-show' => true, 'mass-editable' => true,
-                'editor' => 'select', 'options' => FCom_Stock_Model_Sku::i()->statusOptions() ],
+                'editor' => 'select', 'options' => $this->FCom_Stock_Model_Sku->statusOptions() ],
             ['type' => 'input', 'name' => 'out_stock', 'label' => 'Out of Stock Policy', 'width' => 150,
                 'mass-editable-show' => true, 'mass-editable' => true,
-                'editable' => true, 'edit_inline' => true, 'editor' => 'select', 'options' => FCom_Stock_Model_Sku::i()->outStockOptions()],
+                'editable' => true, 'edit_inline' => true, 'editor' => 'select', 'options' => $this->FCom_Stock_Model_Sku->outStockOptions()],
             ['type' => 'input', 'name' => 'cost', 'label' => 'Cost', 'width' => 300,
                 'editable' => true, 'edit_inline' => true,'editor' => 'text', 'validation' => ['number' => true]],
             ['type' => 'input', 'name' => 'stock_qty', 'label' => 'Quantity', 'width' => 150,
@@ -95,10 +95,10 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
             }
             $.validator.addMethod("stockInputValidate",stockInputValidate , function(params, element) {
                 if ($(element).attr("name") == "cost") {
-                    return "'.BLocale::_('The cost of an item cannot be less than zero').'";
+                    return "'.$this->BLocale->_('The cost of an item cannot be less than zero').'";
                 }
                 if ($(element).attr("name") == "stock_qty") {
-                    return "'.BLocale::_('Stock Item cannot have less than 0 quantity in stock').'";
+                    return "'.$this->BLocale->_('Stock Item cannot have less than 0 quantity in stock').'";
                 }
 
             });
@@ -128,7 +128,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
             'notify_administrator_quantity' => '',
         ];
         if (isset($model->data_serialized)) {
-            $data = BUtil::objectToArray(json_decode($model->data_serialized));
+            $data = $this->BUtil->objectToArray(json_decode($model->data_serialized));
             if (isset($data['stock_policy'])) {
                 $stock_policy = $data['stock_policy'];
             }
@@ -138,8 +138,8 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
 
     public function action_restore_stock_policy()
     {
-        $post = BRequest::i()->post();
-        $config = BConfig::i()->get('modules/FCom_Catalog');
+        $post = $this->BRequest->post();
+        $config = $this->BConfig->get('modules/FCom_Catalog');
         $result = '';
         if (isset($post['restore'])) {
             switch($post['restore']) {
@@ -155,27 +155,27 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
                     break;
             }
         }
-        BResponse::i()->json(['result' => $result]);
+        $this->BResponse->json(['result' => $result]);
     }
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
         $this->view('admin/grid')->set(['actions' => [
             'new' => '<button type="button" id="add_new_sku" class="btn grid-new btn-primary _modal">'
-                . BLocale::_('New Sku') . '</button>']]);
+                . $this->BLocale->_('New Sku') . '</button>']]);
     }
 
     public function action_unique__POST()
     {
-        $post = BRequest::i()->post();
+        $post = $this->BRequest->post();
         $data = each($post);
-        $rows = BDb::many_as_array(FCom_Stock_Model_Sku::i()->orm()->where($data['key'], $data['value'])->find_many());
-        BResponse::i()->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
+        $rows = $this->BDb->many_as_array($this->FCom_Stock_Model_Sku->orm()->where($data['key'], $data['value'])->find_many());
+        $this->BResponse->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
     }
 
     public function action_grid_data__POST()
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         $p = $r->post();
         switch ($p['oper']) {
             case 'edit':
@@ -183,10 +183,10 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
                 $p['tmp_cost'] = $p['cost'];
                 unset($p['oper']);
                 if (isset($p['sku'])) {
-                    $prod = FCom_Catalog_Model_Product::i()->load($p['sku'], 'local_sku');
-                    FCom_Stock_Model_Sku::i()->load($p['id'])->set('status', $p['status'])->save();
+                    $prod = $this->FCom_Catalog_Model_Product->load($p['sku'], 'local_sku');
+                    $this->FCom_Stock_Model_Sku->load($p['id'])->set('status', $p['status'])->save();
                     if ($prod) {
-                        $data_serialized = BUtil::objectToArray(json_decode($prod->get('data_serialized')));
+                        $data_serialized = $this->BUtil->objectToArray(json_decode($prod->get('data_serialized')));
                         if (!isset($data_serialized['stock_policy']))  {
                             $data_serialized['stock_policy'] = ['stock_qty' => $p['stock_qty'], 'out_stock' => $p['out_stock'], 'manage_stock' => $p['manage_stock']];
                         } else {
@@ -200,23 +200,23 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
                     }
                 }
                 if ($p['cost'] != '') {
-                    $p['cost'] = BLocale::currency($p['cost']);
+                    $p['cost'] = $this->BLocale->currency($p['cost']);
                 }
-                BResponse::i()->json($p);
+                $this->BResponse->json($p);
                 break;
             case 'mass-edit':
                 $id = $p['id'];
                 $args['ids'] = explode(',', $id);
                 $data = $p;
-                $hlp = FCom_Stock_Model_Sku::i();
+                $hlp = $this->FCom_Stock_Model_Sku;
                 foreach ($args['ids'] as $id) {
                         $stock = $hlp->load($id);
                         $stock->set('status', $data['status'])->save();
-                        $prod = FCom_Catalog_Model_Product::i()->load($stock->get('sku'), 'local_sku');
+                        $prod = $this->FCom_Catalog_Model_Product->load($stock->get('sku'), 'local_sku');
                         if ($prod) {
-                            $data_serialized = BUtil::objectToArray(json_decode($prod->get('data_serialized')));
+                            $data_serialized = $this->BUtil->objectToArray(json_decode($prod->get('data_serialized')));
                             if (!isset($data_serialized['stock_policy']))  {
-                                $data_serialized['stock_policy'] = ['out_stock' => $p['out_stock'], 'manage_stock' => $p['manage_stock']];
+                                $data_serialized['stock_policy'] = ['out_stock' => $p['out_stock'], 'manage_stock' => $p['status']];
                             } else {
                                 $data_serialized['stock_policy']['out_stock'] = $p['out_stock'];
                                 $data_serialized['stock_policy']['manage_stock'] = $p['status'];
@@ -225,7 +225,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
                             $prod->save();
                         }
                 }
-                BResponse::i()->json(['success' => true]);
+                $this->BResponse->json(['success' => true]);
                 break;
             default:
                 $this->_processGridDataPost($this->_modelClass);

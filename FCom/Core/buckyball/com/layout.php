@@ -810,7 +810,7 @@ class BLayout extends BClass
 
         // perform all callbacks
         foreach ($callbacks as $cb) {
-            call_user_func($cb[0], $cb[1]);
+            BUtil::call($cb[0], $cb[1]);
         }
 
         return $this;
@@ -856,6 +856,7 @@ class BLayout extends BClass
     public function metaDirectiveRootCallback($d)
     {
         $this->setRootView($d['name']);
+        BDebug::debug('SET ROOT VIEW: ' . $d['name']);
     }
 
     /**
@@ -1471,7 +1472,7 @@ class BView extends BClass
         $renderer = $this->getParam('renderer');
         if ($renderer) {
             BDebug::debug('VIEW.RENDER "' . $this->param('view_name') . '" USING ' . print_r($renderer, 1));
-            return call_user_func($renderer, $this);
+            return BUtil::call($renderer, $this);
         }
 
         BDebug::debug('VIEW.RENDER "' . $this->param('view_name') . '" USING PHP');
@@ -1727,6 +1728,7 @@ class BView extends BClass
         return BUtil::optionsHtml($options, $default);
     }
 
+
     /**
      * Send email using the content of the view as body using standard PHP mail()
      *
@@ -1785,10 +1787,10 @@ class BView extends BClass
     public function validator($formName, $data = null)
     {
         if (empty($this->_validators[$formName])) {
-            $this->_validators[$formName] = BValidateViewHelper::i(true, [
+            $this->_validators[$formName] = BValidateViewHelper::i(true, [[
                 'form' => $formName,
                 'data' => $data,
-            ]);
+            ]]);
         }
         return $this->_validators[$formName];
     }
