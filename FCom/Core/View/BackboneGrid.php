@@ -483,7 +483,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
 
         $grid = $this->grid;
-        BEvents::i()->fire(__METHOD__ . ':before', ['grid' => &$grid]);
+        $this->BEvents->fire(__METHOD__ . ':before', ['grid' => &$grid]);
         $this->grid = $grid;
 
         $this->_processDefaults();
@@ -493,7 +493,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         $this->_processPersonalization();
 
         $grid = $this->grid;
-        BEvents::i()->fire(__METHOD__ . ':after', ['grid' => &$grid]);
+        $this->BEvents->fire(__METHOD__ . ':after', ['grid' => &$grid]);
         $grid['_processed'] = true;
         $this->grid = $grid;
 
@@ -543,7 +543,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             if (is_string($orm)) {
                 $orm = $orm::i()->orm();
             }
-            BEvents::i()->fire(__METHOD__ . ':initORM:' . $config['id'], ['orm' => $orm, 'grid' => $grid]);
+            $this->BEvents->fire(__METHOD__ . ':initORM:' . $config['id'], ['orm' => $orm, 'grid' => $grid]);
 
 
             $gridId = $config['id'];
@@ -571,7 +571,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             //var_dump($grid['result']);exit;
             $grid['result']['state']['description'] = $this->stateDescription($grid['result']['state']);
 
-            BEvents::i()->fire(__METHOD__ . ':after:' . $config['id'], ['grid' => & $grid]);
+            $this->BEvents->fire(__METHOD__ . ':after:' . $config['id'], ['grid' => & $grid]);
         }
 
         //$mapColumns = array();
@@ -701,8 +701,8 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $this->_processGridFilters($config, $filters, $orm);
         }
         if (null !== $method) {
-            //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
-            BEvents::i()->fire($method . ':orm', ['orm' => $orm]);
+            //$this->BEvents->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
+            $this->BEvents->fire($method . ':orm', ['orm' => $orm]);
         }
 
         //TODO is there any better way to return all rows in paginate function?
@@ -717,9 +717,9 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         //$data['hash'] = base64_encode($this->BUtil->toJson($this->BUtil->arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);
         /*if (!is_null($method)) {
-            BEvents::i()->fire($method.':data', array('data'=>&$data));
+            $this->BEvents->fire($method.':data', array('data'=>&$data));
         }*/
-        BEvents::i()->fire(__METHOD__ . ':data', ['data' => &$data]);
+        $this->BEvents->fire(__METHOD__ . ':data', ['data' => &$data]);
         return $data;
     }
 
@@ -955,7 +955,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
     public function export($rows, $class = null)
     {
         /*if ($class) {
-            BEvents::i()->fire($class.'::action_grid_data.orm', array('orm'=>$orm));
+            $this->BEvents->fire($class.'::action_grid_data.orm', array('orm'=>$orm));
         }
         $r = $this->BRequest->request();
         if (!empty($r['filters'])) {
@@ -1005,7 +1005,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         /*$orm->iterate(function($row) use($columns, $fp) {
             if ($class) {
                 //TODO: any faster solution?
-                BEvents::i()->fire($class.'::action_grid_data.data_row', array('row'=>$row, 'columns'=>$columns));
+                $this->BEvents->fire($class.'::action_grid_data.data_row', array('row'=>$row, 'columns'=>$columns));
             }*/
 
 

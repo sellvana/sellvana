@@ -4,32 +4,32 @@ class BView_Test extends PHPUnit_Framework_TestCase
 {
     public function testViewIsInstanceOfBView()
     {
-        $view = BView::factory('my', []);
+        $view = $this->BView->factory('my', []);
         $this->assertInstanceOf('BView', $view, sprintf("Expected instance is 'BView', but got %s", get_class($view)));
     }
 
     public function testViewIsInstanceOfOtherView()
     {
         $class = 'stdClass';
-        $view = BView::factory('my', ['view_class' => $class]);
+        $view = $this->BView->factory('my', ['view_class' => $class]);
         $this->assertInstanceOf($class, $view, sprintf("Expected instance is %s, but got %s", $class, get_class($view)));
     }
 
     public function testViewFactory()
     {
-        $view = BView::factory('my', ['key' => 'value']);
+        $view = $this->BView->factory('my', ['key' => 'value']);
         $this->assertEquals('value', $view->param('key'));
     }
 
     public function testViewFactoryUndefinedParam()
     {
-        $view = BView::factory('my', ['key' => 'value']);
+        $view = $this->BView->factory('my', ['key' => 'value']);
         $this->assertTrue(null == $view->param('key10000'));
     }
 
     public function testCircularReferenceException()
     {
-        $view = BView::factory('my', ['key' => 'value']);
+        $view = $this->BView->factory('my', ['key' => 'value']);
         $this->setExpectedException('BException');
         $view->view('my');
     }
@@ -37,7 +37,7 @@ class BView_Test extends PHPUnit_Framework_TestCase
     //
     public function testGetView()
     {
-        $view = BView::factory('my', ['key' => 'value']);
+        $view = $this->BView->factory('my', ['key' => 'value']);
         $this->BLayout->addView('new', ['key' => 'newValue']); // have to have it in layout to get it.
         $viewNew = $view->view('new', ['new' => 'value']);
         $this->assertEquals('value', $viewNew->get('new'));
@@ -45,7 +45,7 @@ class BView_Test extends PHPUnit_Framework_TestCase
 
     public function testCanClearParams()
     {
-        $view = BView::factory('my', ['key' => 'value']);
+        $view = $this->BView->factory('my', ['key' => 'value']);
         $this->assertEquals('value', $view->param('key'));
         $view->clear();
         $this->assertNull($view->param('key'));
@@ -53,7 +53,7 @@ class BView_Test extends PHPUnit_Framework_TestCase
 
     public function testSetAndGetParams()
     {
-        $view = BView::factory('my', []);
+        $view = $this->BView->factory('my', []);
         $this->assertNull($view->getParam('test'));
         $view->setParam('test', true);
         $this->assertEquals(true, $view->getParam('test'));
@@ -61,7 +61,7 @@ class BView_Test extends PHPUnit_Framework_TestCase
 
     public function testSetGetArgParams()
     {
-        $view = BView::factory('my', []);
+        $view = $this->BView->factory('my', []);
         $this->assertNull($view->get('test'));
         $view->set('test', 'value');
         $this->assertEquals('value', $view->get('test'));
@@ -69,7 +69,7 @@ class BView_Test extends PHPUnit_Framework_TestCase
 
     public function testMagicGetSetMethods()
     {
-        $view = BView::factory('my', []);
+        $view = $this->BView->factory('my', []);
         $this->assertNull($view->test);
         $view->test =  'value';
         $this->assertEquals('value', $view->test);
@@ -77,7 +77,7 @@ class BView_Test extends PHPUnit_Framework_TestCase
 
     public function testGetAllArgs()
     {
-        $view = BView::factory('my', []);
+        $view = $this->BView->factory('my', []);
         $this->assertEmpty($view->getAllArgs());
         $view->set('test', 'value');
         $view->set('test2', 'value2');
@@ -91,14 +91,14 @@ class BView_Test extends PHPUnit_Framework_TestCase
 
     public function testHook()
     {
-        $view = BView::factory('my', []);
+        $view = $this->BView->factory('my', []);
         $result = $view->hook('testEvent', ['test' => 'value']);
         $this->assertTrue(is_string($result)); // how to setup actually a hook to get content?
     }
 
     public function testGetTemplateFileName()
     {
-        $view = BView::factory('my', ['template' => 'test.php']);
+        $view = $this->BView->factory('my', ['template' => 'test.php']);
         $this->assertEquals($this->BLayout->getViewRootDir() . '/test.php', $view->getTemplateFileName());
         $view->setParam('template', null);
         $this->assertEquals($this->BLayout->getViewRootDir() . '/my.php', $view->getTemplateFileName());
@@ -106,7 +106,7 @@ class BView_Test extends PHPUnit_Framework_TestCase
 
     public function testRenderRawText()
     {
-        $view = BView::factory('my', []);
+        $view = $this->BView->factory('my', []);
         $view->setParam('raw_text', 'Test');
         $this->assertEquals('Test', $view->render());
     }
@@ -158,14 +158,14 @@ class BView_Test extends PHPUnit_Framework_TestCase
 
     public function testToStringIsSameAsRender()
     {
-        $view = BView::factory('my', []);
+        $view = $this->BView->factory('my', []);
         $view->setParam('raw_text', 'Test');
         $this->assertEquals((string) $view, $view->render());
     }
 
     public function testStringEscape()
     {
-        $view = BView::factory('my', []);
+        $view = $this->BView->factory('my', []);
 
         $this->assertEquals('', $view->q(null));
         $this->assertEquals(' ** ERROR ** ', $view->q(['test']));
@@ -174,7 +174,7 @@ class BView_Test extends PHPUnit_Framework_TestCase
 
     public function testStripTags()
     {
-        $view = BView::factory('my', []);
+        $view = $this->BView->factory('my', []);
         $this->assertEquals('<b>Test</b>', $view->s('<pre><b>Test</b></pre>', '<b>'));
     }
 
@@ -182,7 +182,7 @@ class BView_Test extends PHPUnit_Framework_TestCase
     {
         $view = $this->getLayoutView();
         $test = $this;
-        BEvents::i()->on('BEmail::send:after', function($event) use ($view, $test) {
+        $this->BEvents->on('BEmail::send:after', function($event) use ($view, $test) {
             $ed = $event['email_data'];
             $test->assertArrayHasKey('body', $ed);
             $test->assertEquals($ed['body'], $view->render());

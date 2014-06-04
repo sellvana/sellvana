@@ -82,7 +82,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             }
         }
 
-        BEvents::i()->fire(__METHOD__ . ':after', ['models' => &$exportableModels]);
+        $this->BEvents->fire(__METHOD__ . ':after', ['models' => &$exportableModels]);
         return $exportableModels;
     }
 
@@ -154,7 +154,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             if ($records) {
                 $this->writeLine($fe, $this->BUtil->toJson($heading));
                 while($records) {
-                    BEvents::i()->fire(__METHOD__ . ':beforeOutput', ['records' => $records]);
+                    $this->BEvents->fire(__METHOD__ . ':beforeOutput', ['records' => $records]);
                     foreach ($records as $r) {
 
                         /** @var FCom_Core_Model_Abstract $r */
@@ -228,7 +228,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         $this->importId = $importSite->id();
 
         $this->importModels = $ieHelperMod->orm()->find_many_assoc('model_name');
-        BEvents::i()->fire(
+        $this->BEvents->fire(
             __METHOD__ . ':meta',
             ['import_id' => $importID, 'import_site' => $importSite, 'import_models' => &$this->importModels]
         );
@@ -255,7 +255,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 }
 
                 if ($this->currentModel) {
-                    BEvents::i()->fire(
+                    $this->BEvents->fire(
                         __METHOD__ . ':afterModel:' . $this->currentModel,
                         ['import_id' => $importID, 'models' => $this->changedModels]
                     );
@@ -346,7 +346,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $this->importBatch($batchData);
         }
 
-        BEvents::i()->fire(
+        $this->BEvents->fire(
             __METHOD__ . ':afterModel:' . $this->currentModel,
             ['import_id' => $importID, 'models' => $this->changedModels]
         );
@@ -467,7 +467,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 $this->BDebug->warning($this->BLocale->_("%s Invalid model: %s", [$this->BDb->now(), $id]));
             }
         }
-        BEvents::i()->fire(__METHOD__ . ':afterBatch:' . $cm, ['records' => $this->changedModels]);
+        $this->BEvents->fire(__METHOD__ . ':afterBatch:' . $cm, ['records' => $this->changedModels]);
     }
     protected function isArrayAssoc(array $arr)
     {

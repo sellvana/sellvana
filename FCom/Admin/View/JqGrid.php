@@ -467,8 +467,8 @@ return [true, 'Testing error'];
             $orm->where($where);
         }
         if (!is_null($method)) {
-            //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
-            BEvents::i()->fire($method . '.orm', ['orm' => $orm]);
+            //$this->BEvents->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
+            $this->BEvents->fire($method . '.orm', ['orm' => $orm]);
         }
         $data = $orm->jqGridData($r);
 #print_r(BORM::get_last_query());
@@ -476,7 +476,7 @@ return [true, 'Testing error'];
         //$data['hash'] = base64_encode($this->BUtil->toJson($this->BUtil->arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);
         if (!is_null($method)) {
-            BEvents::i()->fire($method . '.data', ['data' => &$data]);
+            $this->BEvents->fire($method . '.data', ['data' => &$data]);
         }
 
         return $data;
@@ -485,7 +485,7 @@ return [true, 'Testing error'];
     public function export($orm, $class = null)
     {
         if ($class) {
-            BEvents::i()->fire($class . '::action_grid_data.orm', ['orm' => $orm]);
+            $this->BEvents->fire($class . '::action_grid_data.orm', ['orm' => $orm]);
         }
         $r = $this->BRequest->request();
         if (!empty($r['filters'])) {
@@ -528,7 +528,7 @@ return [true, 'Testing error'];
         $orm->iterate(function($row) use($columns, $fp) {
             if ($class) {
                 //TODO: any faster solution?
-                BEvents::i()->fire($class . '::action_grid_data.data_row', ['row' => $row, 'columns' => $columns]);
+                $this->BEvents->fire($class . '::action_grid_data.data_row', ['row' => $row, 'columns' => $columns]);
             }
             $data = [];
             foreach ($columns as $col) {

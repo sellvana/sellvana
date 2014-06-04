@@ -4,10 +4,10 @@ class FCom_MarketClient_Main extends BClass
 {
     public function progress($data = null, $reset = false)
     {
-        $progress = !$reset ? BCache::i()->load('marketclient_progress') : [];
+        $progress = !$reset ? $this->BCache->load('marketclient_progress') : [];
         if (!empty($data)) {
             $progress = $this->BUtil->arrayMerge($progress, $data);
-            BCache::i()->save('marketclient_progress', $progress);
+            $this->BCache->save('marketclient_progress', $progress);
         }
         return $progress;
     }

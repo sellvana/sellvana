@@ -50,7 +50,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $config = $this->_processConfig($this->gridConfig());
         $this->gridOrmConfig($config['orm']);
         $view->set('grid', ['config' => $config]);
-        BEvents::i()->fire(static::$_origClass . '::gridView', ['view' => $view]);
+        $this->BEvents->fire(static::$_origClass . '::gridView', ['view' => $view]);
         return $view;
     }
 
@@ -120,7 +120,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     public function gridViewBefore($args)
     {
         $view = $args['page_view'];
-        $hlp = BView::i();
+        $hlp = $this->BView;
         $view->set([
             'title' => $this->_gridTitle,
             'actions' => [
@@ -130,7 +130,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                     . '</span></button>',
             ],
         ]);
-        BEvents::i()->fire(static::$_origClass . '::gridViewBefore', $args);
+        $this->BEvents->fire(static::$_origClass . '::gridViewBefore', $args);
     }
 
     public function action_grid_html()
@@ -192,13 +192,13 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function gridDataAfter($data)
     {
-        BEvents::i()->fire(static::$_origClass . '::gridDataAfter', ['data' => &$data]);
+        $this->BEvents->fire(static::$_origClass . '::gridDataAfter', ['data' => &$data]);
         return $data;
     }
 
     public function gridOrmConfig($orm)
     {
-        BEvents::i()->fire(static::$_origClass . '::gridOrmConfig', ['orm' => &$orm]);
+        $this->BEvents->fire(static::$_origClass . '::gridOrmConfig', ['orm' => &$orm]);
     }
 
     public function action_grid_data__POST()
@@ -262,7 +262,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             'title' => $title,
             'actions' => $actions,
         ]);
-        BEvents::i()->fire(static::$_origClass . '::formViewBefore', $args);
+        $this->BEvents->fire(static::$_origClass . '::formViewBefore', $args);
     }
 
     public function action_form__POST()
@@ -317,17 +317,17 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function formPostBefore($args)
     {
-        BEvents::i()->fire(static::$_origClass . '::formPostBefore', $args);
+        $this->BEvents->fire(static::$_origClass . '::formPostBefore', $args);
     }
 
     public function formPostAfter($args)
     {
-        BEvents::i()->fire(static::$_origClass . '::formPostAfter', $args);
+        $this->BEvents->fire(static::$_origClass . '::formPostAfter', $args);
     }
 
     public function formPostError($args)
     {
-        BEvents::i()->fire(static::$_origClass . '::formPostError', $args);
+        $this->BEvents->fire(static::$_origClass . '::formPostError', $args);
     }
 
     /**

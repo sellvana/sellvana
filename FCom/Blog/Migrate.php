@@ -5,7 +5,7 @@ class FCom_Blog_Migrate extends BClass
     public function install__0_1_4()
     {
         if (!$this->FCom_Core_Model_Module->load('FCom_Admin', 'module_name')) {
-            BMigrate::i()->migrateModules('FCom_Admin', true);
+            $this->BMigrate->migrateModules('FCom_Admin', true);
         }
 
         $tPost = $this->FCom_Blog_Model_Post->table();

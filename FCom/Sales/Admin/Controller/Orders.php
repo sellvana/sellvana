@@ -162,7 +162,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             'actions' => $actions,
             'title' => $title,
         ]);
-        BEvents::i()->fire(static::$_origClass . '::formViewBefore', $args);
+        $this->BEvents->fire(static::$_origClass . '::formViewBefore', $args);
     }
 
     public function formPostAfter($args)

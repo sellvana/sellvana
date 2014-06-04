@@ -32,7 +32,7 @@ class FCom_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller_Abs
         $type = $params[3];
 
         $urls = [];
-        BEvents::i()->fire('FCom_Seo_Frontend_Controller_Sitemaps.sitemap',
+        $this->BEvents->fire('FCom_Seo_Frontend_Controller_Sitemaps.sitemap',
             ['urls' => &$urls, 'page' => $page, 'filetype' => $type]);
 
         switch ($type) {
