@@ -18,11 +18,14 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
         return $this->product;
     }
 
-    public function rowTotal($id)
+    public function rowTotal($variantId = null)
     {
-        $data_serialized = $this->BUtil->objectToArray(json_decode($this->data_serialized));
-        $variant = $data_serialized['variants'][$id];
-        return $variant['price'] * $variant['qty'];
+        $variants = $this->getData('variants');
+        if ($variants && $variantId) {
+            $variant = $variants[$variantId];
+            return $variant['price'] * $variant['qty'];
+        }
+        return $this->get('row_total') ? $this->get('row_total') : $this->get('price') * $this->get('qty');
     }
 
     public function isGroupAble()

@@ -856,6 +856,7 @@ class BLayout extends BClass
     public function metaDirectiveRootCallback($d)
     {
         $this->setRootView($d['name']);
+        BDebug::debug('SET ROOT VIEW: ' . $d['name']);
     }
 
     /**
@@ -1726,6 +1727,7 @@ class BView extends BClass
     {
         return BUtil::optionsHtml($options, $default);
     }
+
 
     /**
      * Send email using the content of the view as body using standard PHP mail()
