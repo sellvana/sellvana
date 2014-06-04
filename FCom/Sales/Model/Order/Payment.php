@@ -18,7 +18,7 @@ class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
     public function addNew($data)
     {
-        BEvents::i()->fire(__CLASS__ . '.addNew', ['paymentData' => $data]);
+        $this->BEvents->fire(__CLASS__ . '.addNew', ['paymentData' => $data]);
         return $this->create($data);
     }
 

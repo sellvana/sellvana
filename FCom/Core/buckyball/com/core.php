@@ -78,7 +78,7 @@ class BClass
     *
     * @return string
     */
-    public static function origClass()
+    static public function origClass()
     {
         return static::$_origClass;
     }
@@ -91,7 +91,7 @@ class BClass
     * @param array $args
     * @return BClass
     */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         if (is_object($new)) {
             $class = get_class($new);
@@ -104,12 +104,12 @@ class BClass
 
     public function __call($name, $args)
     {
-        return BClassRegistry::callMethod($this, $name, $args, static::$_origClass);
+        return $this->BClassRegistry->callMethod($this, $name, $args, static::$_origClass);
     }
 
-    public static function __callStatic($name, $args)
+    static public function __callStatic($name, $args)
     {
-        return BClassRegistry::callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
+        return BClassRegistry::i()->callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
     }
 
     public function __get($name)
@@ -194,7 +194,7 @@ class BApp extends BClass
     * @param mixed $feature
     * @return boolean
     */
-    public static function compat($feature)
+    public function compat($feature)
     {
         if (!empty(static::$_compat[$feature])) {
             return static::$_compat[$feature];
@@ -205,7 +205,7 @@ class BApp extends BClass
             break;
 
         default:
-            BDebug::error(BLocale::_('Unknown feature: %s', $feature));
+            BDebug::error($this->BLocale->_('Unknown feature: %s', $feature));
         }
         static::$_compat[$feature] = $compat;
         return $compat;
@@ -221,7 +221,7 @@ class BApp extends BClass
      * @param array $args
      * @return BApp
      */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
@@ -248,9 +248,9 @@ class BApp extends BClass
     public function config($config)
     {
         if (is_array($config)) {
-            BConfig::i()->add($config);
+            $this->BConfig->add($config);
         } elseif (is_string($config) && is_file($config)) {
-            BConfig::i()->addFile($config);
+            $this->BConfig->addFile($config);
         } else {
             BDebug::error("Invalid configuration argument");
         }
@@ -269,7 +269,7 @@ class BApp extends BClass
         if (is_string($folders)) {
             $folders = explode(',', $folders);
         }
-        $modules = BModuleRegistry::i();
+        $modules = $this->BModuleRegistry;
         foreach ($folders as $folder) {
             $modules->scan($folder);
         }
@@ -285,20 +285,20 @@ class BApp extends BClass
     public function run()
     {
         // load session variables
-        BSession::i()->open();
+        $this->BSession->open();
 
-#echo "<pre>"; var_dump(BConfig::i()->get('cookie'), $_SESSION); exit;
+#echo "<pre>"; var_dump($this->BConfig->get('cookie'), $_SESSION); exit;
         // bootstrap modules
-        BModuleRegistry::i()->bootstrap();
+        $this->BModuleRegistry->bootstrap();
 
         // run module migration scripts if necessary
-        BMigrate::i()->migrateModules(true);
+        $this->BMigrate->migrateModules(true);
 
         // dispatch requested controller action
-        BRouting::i()->dispatch();
+        $this->BRouting->dispatch();
 
         // If session variables were changed, update session
-        BSession::i()->close();
+        $this->BSession->close();
 
         return $this;
     }
@@ -310,9 +310,9 @@ class BApp extends BClass
     * @param string|array $args Arguments for the text
     * @return string
     */
-    public static function t($string, $args = [])
+    public function t($string, $args = [])
     {
-        return Blocale::_($string, $args);
+        return $this->BLocale->_($string, $args);
     }
 
     /**
@@ -321,9 +321,9 @@ class BApp extends BClass
     * @param string $modName
     * @return BModule
     */
-    public static function m($modName = null)
+    public function m($modName = null)
     {
-        $reg = BModuleRegistry::i();
+        $reg = $this->BModuleRegistry;
         return null === $modName ? $reg->currentModule() : $reg->module($modName);
     }
 
@@ -338,15 +338,15 @@ class BApp extends BClass
      *   2 : use entry point for full url - const USE_ENTRY_URI
      * @return string
      */
-    public static function baseUrl($full = true, $method = self::USE_CONFIG)
+    public function baseUrl($full = true, $method = self::USE_CONFIG)
     {
         static $baseUrl = [];
         $full = (int)$full;
         $key  = $full . '|' . $method;
         if (empty($baseUrl[$key])) {
             /** @var BRequest */
-            $r          = BRequest::i();
-            $c          = BConfig::i();
+            $r          = $this->BRequest;
+            $c          = $this->BConfig;
             $scriptName = $r->scriptName();
             if (substr($scriptName, -1) === '/') {
                 $scriptPath = ['dirname' => $scriptName, 'basename' => basename($_SERVER['SCRIPT_FILENAME'])];
@@ -365,7 +365,7 @@ class BApp extends BClass
                     break;
             }
 
-            if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name') && BRequest::i()->area() !== 'FCom_Admin')) {
+            if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name') && $this->BRequest->area() !== 'FCom_Admin')) {
                 $url = rtrim($url, "\\"); //for windows installation
                 $url = rtrim($url, '/') . '/' . $scriptPath['basename'];
             }
@@ -379,24 +379,24 @@ class BApp extends BClass
         return $baseUrl[$key];
     }
 
-    public static function href($url = '', $full = true, $method = self::USE_CONFIG)
+    public function href($url = '', $full = true, $method = self::USE_CONFIG)
     {
-        return BApp::baseUrl($full, $method)
-               . BRouting::processHref($url);
+        return $this->BApp->baseUrl($full, $method)
+               . $this->BRouting->processHref($url);
     }
 
-    public static function adminHref($url = '')
+    public function adminHref($url = '')
     {
         static $baseAdminHref;
         if (!$baseAdminHref) {
-            $conf = BConfig::i();
-            $r = BRequest::i();
+            $conf = $this->BConfig;
+            $r = $this->BRequest;
             $adminHref = $conf->get('web/admin_href');
             if (!$adminHref) {
-                $adminHref = rtrim(BConfig::i()->get('web/base_store'), '/') . '/admin/index.php';
+                $adminHref = rtrim($this->BConfig->get('web/base_store'), '/') . '/admin/index.php';
                 $conf->set('web/admin_href', $adminHref);
             }
-            if (!BUtil::isUrlFull($adminHref)) {
+            if (!$this->BUtil->isUrlFull($adminHref)) {
                 $adminHref = $r->scheme() . '://' . $r->httpHost() . $adminHref;
             }
             $baseAdminHref = rtrim($adminHref, '/') . '/';
@@ -404,12 +404,12 @@ class BApp extends BClass
         return $baseAdminHref . ltrim($url, '/');
     }
 
-    public static function frontendHref($url = '')
+    public function frontendHref($url = '')
     {
         static $baseStoreHref;
         if (!$baseStoreHref) {
-            $r = BRequest::i();
-            $c = BConfig::i();
+            $r = $this->BRequest;
+            $c = $this->BConfig;
             $storeHref = $c->get('web/base_store');
             if (!$c->get('web/hide_script_name')) {
                 if ($storeHref === '' || $storeHref === '/') {
@@ -418,7 +418,7 @@ class BApp extends BClass
                     $storeHref .= '/index.php/';
                 }
             }
-            if (!BUtil::isUrlFull($storeHref)) {
+            if (!$this->BUtil->isUrlFull($storeHref)) {
                 $storeHref = $r->scheme() . '://' . $r->httpHost() . $storeHref;
             }
             $baseStoreHref = rtrim($storeHref, '/') . '/';
@@ -433,20 +433,20 @@ class BApp extends BClass
      * @param string $method
      * @return string
      */
-    public static function src($url = '', $method = 'baseSrc')
+    public function src($url = '', $method = 'baseSrc')
     {
         if ($url[0] === '@') {
             list($modName, $url) = explode('/', substr($url, 1), 2);
         }
         if (empty($modName)) {
-            $r = BRequest::i();
-            $webRoot = BConfig::i()->get('web/base_src');
+            $r = $this->BRequest;
+            $webRoot = $this->BConfig->get('web/base_src');
             if (!$webRoot) {
                 $webRoot = $r->webRoot();
             }
             return $r->scheme() . '://' . $r->httpHost() . $webRoot . '/' . $url;
         }
-        $m = BModuleRegistry::i()->module($modName);
+        $m = $this->BModuleRegistry->module($modName);
         if (!$m) {
             BDebug::error('Invalid module: ' . $modName);
             return '';
@@ -454,19 +454,19 @@ class BApp extends BClass
         return $m->$method() . '/' . rtrim($url, '/');
     }
 
-    public static function file($path)
+    public function file($path)
     {
         if ($path[0] === '@') {
             list($modName, $path) = explode('/', substr($path, 1), 2);
         }
         if (empty($modName)) {
-            if (BUtil::isPathAbsolute($path)) {
+            if ($this->BUtil->isPathAbsolute($path)) {
                 return $path;
             }
-            $rootDir = BConfig::i()->get('fs/root_dir');
+            $rootDir = $this->BConfig->get('fs/root_dir');
             return $rootDir . '/' . $path;
         }
-        $m = BModuleRegistry::i()->module($modName);
+        $m = $this->BModuleRegistry->module($modName);
         if (!$m) {
             BDebug::error('Invalid module: ' . $modName);
             return '';
@@ -502,12 +502,12 @@ class BApp extends BClass
      */
     public function instance($class, $new = false, $args = [])
     {
-        return $class::i($new, $args);
+        return BClassRegistry::instance($class, $args, !$new);
     }
 
     public function storageRandomDir()
     {
-        $c = BConfig::i();
+        $c = $this->BConfig;
         return $c->get('fs/storage_dir') . '/' . $c->get('core/storage_random_dir');
     }
 }
@@ -528,7 +528,7 @@ class BException extends Exception
     public function __construct($message = "", $code = 0)
     {
         parent::__construct($message, $code);
-        //BApp::log($message, array(), array('event'=>'exception', 'code'=>$code, 'file'=>$this->getFile(), 'line'=>$this->getLine()));
+        //$this->BApp->log($message, array(), array('event'=>'exception', 'code'=>$code, 'file'=>$this->getFile(), 'line'=>$this->getLine()));
     }
 }
 
@@ -565,7 +565,7 @@ class BConfig extends BClass
     *
     * @return BConfig
     */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
@@ -579,9 +579,9 @@ class BConfig extends BClass
     */
     public function add(array $config, $toSave = false)
     {
-        $this->_config = BUtil::arrayMerge($this->_config, $config);
+        $this->_config = $this->BUtil->arrayMerge($this->_config, $config);
         if ($this->_enableSaving && $toSave) {
-            $this->_configToSave = BUtil::arrayMerge($this->_configToSave, $config);
+            $this->_configToSave = $this->BUtil->arrayMerge($this->_configToSave, $config);
         }
         return $this;
     }
@@ -594,23 +594,23 @@ class BConfig extends BClass
     public function addFile($filename, $toSave = false)
     {
         if (preg_match('#^@([^/]+)(.*)#', $filename, $m)) {
-            $module = BModuleRegistry::i()->module($m[1]);
+            $module = $this->BModuleRegistry->module($m[1]);
             if (!$module) {
-                BDebug::error(BLocale::_('Invalid module name: %s', $m[1]));
+                BDebug::error($this->BLocale->_('Invalid module name: %s', $m[1]));
             }
             $filename = $module->root_dir . $m[2];
         }
         $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 #echo "<pre>"; print_r($this); echo "</pre>";
-        if (!BUtil::isPathAbsolute($filename)) {
+        if (!$this->BUtil->isPathAbsolute($filename)) {
             $configDir = $this->get('fs/config_dir');
             if (!$configDir) {
-                $configDir = BConfig::i()->get('fs/config_dir');
+                $configDir = $this->BConfig->get('fs/config_dir');
             }
             $filename = $configDir . '/' . $filename;
         }
         if (!is_readable($filename)) {
-            BDebug::error(BLocale::_('Invalid configuration file name: %s', $filename));
+            BDebug::error($this->BLocale->_('Invalid configuration file name: %s', $filename));
         }
 
         switch ($ext) {
@@ -619,15 +619,15 @@ class BConfig extends BClass
             break;
 
         case 'yml':
-            $config = BYAML::i()->load($filename);
+            $config = $this->BYAML->load($filename);
             break;
 
         case 'json':
-            $config = BUtil::fromJson(file_get_contents($filename));
+            $config = $this->BUtil->fromJson(file_get_contents($filename));
             break;
         }
         if (!is_array($config)) {
-            BDebug::error(BLocale::_('Invalid configuration contents: %s', $filename));
+            BDebug::error($this->BLocale->_('Invalid configuration contents: %s', $filename));
         }
         $this->add($config, $toSave);
         return $this;
@@ -667,7 +667,7 @@ class BConfig extends BClass
             $node =& $node[$key];
         }
         if ($merge) {
-            $node = BUtil::arrayMerge((array)$node, (array)$value);
+            $node = $this->BUtil->arrayMerge((array)$node, (array)$value);
         } else {
             $node = $value;
         }
@@ -680,7 +680,7 @@ class BConfig extends BClass
     /**
     * Get configuration data using path
     *
-    * Ex: BConfig::i()->get('some/deep/config')
+    * Ex: $this->BConfig->get('some/deep/config')
     *
     * @param string $path
     * @param mixed $default return if node not found
@@ -725,22 +725,22 @@ class BConfig extends BClass
                 break;
 
             case 'yml':
-                $contents = BYAML::i()->dump($config);
+                $contents = $this->BYAML->dump($config);
                 break;
 
             case 'json':
-                $contents = BUtil::i()->toJson($config);
+                $contents = $this->BUtil->toJson($config);
                 break;
         }
 
-        if (!BUtil::isPathAbsolute($filename)) {
+        if (!$this->BUtil->isPathAbsolute($filename)) {
             $configDir = $this->get('fs/config_dir');
             if (!$configDir) {
-                $configDir = BConfig::i()->get('fs/config_dir');
+                $configDir = $this->BConfig->get('fs/config_dir');
             }
             $filename = $configDir . '/' . $filename;
         }
-        BUtil::ensureDir(dirname($filename));
+        $this->BUtil->ensureDir(dirname($filename));
         // Write contents
         if (!file_put_contents($filename, $contents, LOCK_EX)) {
             BDebug::error('Error writing configuration file: ' . $filename);
@@ -852,7 +852,7 @@ class BClassRegistry extends BClass
     /**
     * Override a class
     *
-    * Usage: BClassRegistry::overrideClass('BaseClass', 'MyClass');
+    * Usage: $this->BClassRegistry->overrideClass('BaseClass', 'MyClass');
     *
     * Overridden class should be called one of the following ways:
     * - BClassRegistry::instance('BaseClass')
@@ -867,12 +867,12 @@ class BClassRegistry extends BClass
     * @param bool $replaceSingleton If there's already singleton of overridden class, replace with new one
     * @return BClassRegistry
     */
-    static public function overrideClass($class, $newClass, $replaceSingleton = false)
+    public function overrideClass($class, $newClass, $replaceSingleton = false)
     {
         if (is_string($newClass)) {
             static::$_classes[$class] = [
                 'class_name' => $newClass,
-                'module_name' => BModuleRegistry::i()->currentModuleName(),
+                'module_name' => $this->BModuleRegistry->currentModuleName(),
             ];
             BDebug::debug('OVERRIDE CLASS: ' . $class . ' -> ' . $newClass);
         } elseif (null === $newClass) {
@@ -904,7 +904,7 @@ class BClassRegistry extends BClass
     * @param callback $callback
     * @return BClassRegistry
     */
-    static public function addMethod($class, $method, $callback, $static = false)
+    public function addMethod($class, $method, $callback, $static = false)
     {
         $arr = explode(' ', $class);
         if (!empty($arr[1])) {
@@ -914,7 +914,7 @@ class BClassRegistry extends BClass
             $rel = 'is';
         }
         static::$_methods[$method][$static ? 1 : 0]['override'][$rel][$class] = [
-            'module_name' => BModuleRegistry::i()->currentModuleName(),
+            'module_name' => $this->BModuleRegistry->currentModuleName(),
             'callback' => $callback,
         ];
     }
@@ -924,7 +924,7 @@ class BClassRegistry extends BClass
     *
     * Already existing instances of the class will not be affected.
     *
-    * Usage: BClassRegistry::overrideMethod('BaseClass', 'someMethod', array('MyClass', 'someMethod'));
+    * Usage: $this->BClassRegistry->overrideMethod('BaseClass', 'someMethod', array('MyClass', 'someMethod'));
     *
     * Overridden class should be called one of the following ways:
     * - BClassRegistry::instance('BaseClass')
@@ -933,7 +933,7 @@ class BClassRegistry extends BClass
     * Callback method example (original method had 2 arguments):
     *
     * class MyClass {
-    *   static public function someMethod($origObject, $arg1, $arg2)
+    *   public function someMethod($origObject, $arg1, $arg2)
     *   {
     *       // do some custom stuff before call to original method here
     *
@@ -953,7 +953,7 @@ class BClassRegistry extends BClass
     * @param bool $static Whether the static method call should be overridden
     * @return BClassRegistry
     */
-    static public function overrideMethod($class, $method, $callback, $static = false)
+    public function overrideMethod($class, $method, $callback, $static = false)
     {
         static::addMethod($class, $method, $callback, $static);
         static::$_decoratedClasses[$class] = true;
@@ -968,7 +968,7 @@ class BClassRegistry extends BClass
     * Callback method example (original method had 2 arguments):
     *
     * class MyClass {
-    *   static public function someMethod($result, $origObject, $arg1, $arg2)
+    *   public function someMethod($result, $origObject, $arg1, $arg2)
     *   {
     *       // augment $result of previous object method call
     *       $result['additional_info'] = 'foo';
@@ -989,10 +989,10 @@ class BClassRegistry extends BClass
     * @param boolean $static
     * @return BClassRegistry
     */
-    static public function augmentMethod($class, $method, $callback, $static = false)
+    public function augmentMethod($class, $method, $callback, $static = false)
     {
         static::$_methods[$method][$static ? 1 : 0]['augment']['is'][$class][] = [
-            'module_name' => BModuleRegistry::i()->currentModuleName(),
+            'module_name' => $this->BModuleRegistry->currentModuleName(),
             'callback' => $callback,
         ];
         static::$_decoratedClasses[$class] = true;
@@ -1001,16 +1001,16 @@ class BClassRegistry extends BClass
     /**
     * Augment class property setter/getter
     *
-    * BClassRegistry::augmentProperty('SomeClass', 'foo', 'set', 'override', 'MyClass::newSetter');
-    * BClassRegistry::augmentProperty('SomeClass', 'foo', 'get', 'after', 'MyClass::newGetter');
+    * $this->BClassRegistry->augmentProperty('SomeClass', 'foo', 'set', 'override', 'MyClass::newSetter');
+    * $this->BClassRegistry->augmentProperty('SomeClass', 'foo', 'get', 'after', 'MyClass::newGetter');
     *
     * class MyClass {
-    *   static public function newSetter($object, $property, $value)
+    *   public function newSetter($object, $property, $value)
     *   {
     *     $object->$property = myCustomProcess($value);
     *   }
     *
-    *   static public function newGetter($object, $property, $prevResult)
+    *   public function newGetter($object, $property, $prevResult)
     *   {
     *     return $prevResult+5;
     *   }
@@ -1023,16 +1023,16 @@ class BClassRegistry extends BClass
     * @param mixed $callback
     * @return BClassRegistry
     */
-    static public function augmentProperty($class, $property, $op, $type, $callback)
+    public function augmentProperty($class, $property, $op, $type, $callback)
     {
         if ($op !== 'set' && $op !== 'get') {
-             BDebug::error(BLocale::_('Invalid property augmentation operator: %s', $op));
+             BDebug::error($this->BLocale->_('Invalid property augmentation operator: %s', $op));
         }
         if ($type !== 'override' && $type !== 'before' && $type !== 'after') {
-            BDebug::error(BLocale::_('Invalid property augmentation type: %s', $type));
+            BDebug::error($this->BLocale->_('Invalid property augmentation type: %s', $type));
         }
         $entry = [
-            'module_name' => BModuleRegistry::i()->currentModuleName(),
+            'module_name' => $this->BModuleRegistry->currentModuleName(),
             'callback' => $callback,
         ];
         if ($type === 'override') {
@@ -1044,7 +1044,7 @@ class BClassRegistry extends BClass
         static::$_decoratedClasses[$class] = true;
     }
 
-    static public function findMethodInfo($class, $method, $static = 0, $type = 'override')
+    public function findMethodInfo($class, $method, $static = 0, $type = 'override')
     {
         //static::$_methods[$method][$static ? 1 : 0]['override'][$rel][$class]
         if (!empty(static::$_methods[$method][$static][$type]['is'][$class])) {
@@ -1089,12 +1089,12 @@ class BClassRegistry extends BClass
     * @param mixed $cb
     * @return boolean
     */
-    static public function isCallable($cb)
+    public function isCallable($cb)
     {
         if (is_string($cb)) { // plain string callback?
             $cb = explode('::', $cb);
             if (empty($cb[1])) { // not static?
-                $cb = BUtil::extCallback($cb); // account for special singleton syntax
+                $cb = $this->BUtil->extCallback($cb); // account for special singleton syntax
             }
         } elseif (!is_array($cb)) { // unknown?
             return is_callable($cb);
@@ -1127,7 +1127,7 @@ class BClassRegistry extends BClass
     * @param mixed $args
     * @return mixed
     */
-    static public function callMethod($origObject, $method, array $args = [], $origClass = null)
+    public function callMethod($origObject, $method, array $args = [], $origClass = null)
     {
         //$class = $origClass ? $origClass : get_class($origObject);
         $class = get_class($origObject);
@@ -1170,7 +1170,7 @@ class BClassRegistry extends BClass
     * @param string $method
     * @param array $args
     */
-    static public function callStaticMethod($class, $method, array $args = [], $origClass = null)
+    public function callStaticMethod($class, $method, array $args = [], $origClass = null)
     {
         if (($info = static::findMethodInfo($class, $method, 1, 'override'))) {
             $callback = $info['callback'];
@@ -1202,7 +1202,7 @@ class BClassRegistry extends BClass
     * @param string $property
     * @param mixed $value
     */
-    static public function callSetter($origObject, $property, $value)
+    public function callSetter($origObject, $property, $value)
     {
         $class = get_class($origObject);
 //print_r(static::$_properties);exit;
@@ -1233,7 +1233,7 @@ class BClassRegistry extends BClass
     * @param string $property
     * @return mixed
     */
-    static public function callGetter($origObject, $property)
+    public function callGetter($origObject, $property)
     {
         $class = get_class($origObject);
 
@@ -1286,7 +1286,7 @@ class BClassRegistry extends BClass
         // get original or overridden class instance
         $className = static::className($class);
         if (!class_exists($className, true)) {
-            BDebug::error(BLocale::_('Invalid class name: %s', $className));
+            BDebug::error(BLocale::i()->_('Invalid class name: %s', $className));
         }
         $args = static::processDI($className, $args);
         $reflClass = new ReflectionClass($className);
@@ -1341,7 +1341,7 @@ class BClassRegistry extends BClass
         return $args;
     }
 
-    static public function unsetInstance()
+    public function unsetInstance()
     {
         static::$_instance = null;
     }
@@ -1387,7 +1387,7 @@ class BClassDecorator
     */
     public function __call($name, array $args)
     {
-        return BClassRegistry::callMethod($this->_decoratedComponent, $name, $args);
+        return $this->BClassRegistry->callMethod($this->_decoratedComponent, $name, $args);
     }
 
     /**
@@ -1397,9 +1397,9 @@ class BClassDecorator
     * @param mixed $args
     * @return mixed Result of callback
     */
-    public static function __callStatic($name, array $args)
+    static public function __callStatic($name, array $args)
     {
-        return BClassRegistry::callStaticMethod(get_called_class(), $name, $args);
+        return $this->BClassRegistry->callStaticMethod(get_called_class(), $name, $args);
     }
 
     /**
@@ -1411,7 +1411,7 @@ class BClassDecorator
     public function __set($name, $value)
     {
         //$this->_decoratedComponent->$name = $value;
-        BClassRegistry::callSetter($this->_decoratedComponent, $name, $value);
+        $this->BClassRegistry->callSetter($this->_decoratedComponent, $name, $value);
     }
 
     /**
@@ -1423,7 +1423,7 @@ class BClassDecorator
     public function __get($name)
     {
         //return $this->_decoratedComponent->$name;
-        return BClassRegistry::callGetter($this->_decoratedComponent, $name);
+        return $this->BClassRegistry->callGetter($this->_decoratedComponent, $name);
     }
 
     /**
@@ -1565,7 +1565,7 @@ class BEvents extends BClass
      * @param array $args
      * @return BEvents
      */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
@@ -1618,7 +1618,7 @@ class BEvents extends BClass
             $alias = $callback;
         }
         $observer = ['callback' => $callback, 'args' => $args, 'alias' => $alias];
-        if (($moduleName = BModuleRegistry::i()->currentModuleName())) {
+        if (($moduleName = $this->BModuleRegistry->currentModuleName())) {
             $observer['module_name'] = $moduleName;
         }
         //TODO: create named observers
@@ -1648,7 +1648,7 @@ class BEvents extends BClass
         $this->on($eventName, $callback, $args, $alias);
         $lastId = sizeof($this->_events[$eventName]['observers']);
         $this->on($eventName, function() use ($eventName, $lastId) {
-            BEvents::i()
+            $this->BEvents
                 ->off($eventName, $lastId-1) // remove the observer
                 ->off($eventName, $lastId) // remove the remover
             ;
@@ -1709,7 +1709,7 @@ class BEvents extends BClass
                 if (!empty($observer['args']['position']) && empty($observer['ordered'])) {
                     unset($observers[$i]);
                     $observer['ordered'] = true;
-                    $observers = BUtil::arrayInsert($observers, $observer, $observer['position']);
+                    $observers = $this->BUtil->arrayInsert($observers, $observer, $observer['position']);
                     $dirty = true;
                     break;
                 }
@@ -1726,7 +1726,7 @@ class BEvents extends BClass
 
             // Set current module to be used in observer callback
             if (!empty($observer['module_name'])) {
-                BModuleRegistry::i()->pushModule($observer['module_name']);
+                $this->BModuleRegistry->pushModule($observer['module_name']);
             }
 
             $cb = $observer['callback'];
@@ -1745,7 +1745,7 @@ class BEvents extends BClass
                 foreach (['.', '->'] as $sep) {
                     $r = explode($sep, $cb);
                     if (sizeof($r) == 2) {
-if (!class_exists($r[0]) && BDebug::is('DEBUG')) {
+if (!class_exists($r[0]) && $this->BDebug->is('DEBUG')) {
     echo "<pre>"; debug_print_backtrace(); echo "</pre>";
 }
                         $cb = [$r[0]::i(), $r[1]];
@@ -1760,13 +1760,13 @@ if (!class_exists($r[0]) && BDebug::is('DEBUG')) {
             // Invoke observer
             if (is_callable($cb)) {
                 BDebug::debug('ON ' . $eventName/*.' : '.var_export($cb, 1)*/, 1);
-                $result[] = call_user_func($cb, $args);
+                $result[] = $this->BUtil->call($cb, $args);
             } else {
                 BDebug::warning('Invalid callback: ' . var_export($cb, 1), 1);
             }
 
             if (!empty($observer['module_name'])) {
-                BModuleRegistry::i()->popModule();
+                $this->BModuleRegistry->popModule();
             }
         }
         BDebug::profile($profileStart);
@@ -1833,7 +1833,7 @@ class BSession extends BClass
     *
     * @return BSession
     */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
@@ -1851,8 +1851,8 @@ class BSession extends BClass
 
     public function getCookieDomain()
     {
-        $confDomain = BConfig::i()->get('cookie/domain');
-        $httpHost = BRequest::i()->httpHost(false);
+        $confDomain = $this->BConfig->get('cookie/domain');
+        $httpHost = $this->BRequest->httpHost(false);
         if (!empty($confDomain)) {
             $allowedDomains = explode('|', $confDomain);
             if (in_array($httpHost, $allowedDomains)) {
@@ -1868,10 +1868,10 @@ class BSession extends BClass
 
     public function getCookiePath()
     {
-        $confPath = BConfig::i()->get('cookie/path');
-        $path = $confPath ? $confPath : BConfig::i()->get('web/base_store');
+        $confPath = $this->BConfig->get('cookie/path');
+        $path = $confPath ? $confPath : $this->BConfig->get('web/base_store');
         if (empty($path)) {
-            $path = BRequest::i()->webRoot();
+            $path = $this->BRequest->webRoot();
         }
         return $path;
     }
@@ -1889,13 +1889,13 @@ class BSession extends BClass
         if (null !== $this->data) {
             return $this;
         }
-        $config = BConfig::i()->get('cookie');
+        $config = $this->BConfig->get('cookie');
         if (!empty($config['session_disable'])) {
             return $this;
         }
 
         $rememberMeTtl = 86400 * (!empty($config['remember_days']) ? $config['remember_days'] : 30);
-        if (BRequest::i()->cookie('remember_me')) {
+        if ($this->BRequest->cookie('remember_me')) {
             $ttl = $rememberMeTtl;
         } else {
             $ttl = !empty($config['timeout']) ? $config['timeout'] : 3600;
@@ -1910,14 +1910,14 @@ class BSession extends BClass
         }
         //session_set_cookie_params($ttl, $path, $domain);
         session_name(!empty($config['name']) ? $config['name'] : $this->_defaultSessionCookieName);
-        if (($dir = BApp::i()->storageRandomDir())) {
+        if (($dir = $this->BApp->storageRandomDir())) {
             $dir .= '/session';
-            BUtil::ensureDir($dir);
+            $this->BUtil->ensureDir($dir);
             session_save_path($dir);
         }
         #ini_set('session.gc_maxlifetime', $rememberMeTtl); // moved to .haccess
         if (!$id) {
-            $id = BRequest::i()->get('SID');
+            $id = $this->BRequest->get('SID');
             if (!$id && !empty($_COOKIE[session_name()])) {
                 $id = $_COOKIE[session_name()];
             }
@@ -1930,7 +1930,7 @@ class BSession extends BClass
         if (headers_sent()) {
             BDebug::warning("Headers already sent, can't start session");
         } else {
-            $https = BRequest::i()->https();
+            $https = $this->BRequest->https();
             session_set_cookie_params($ttl, $path, $domain, $https, true);
             session_start();
             // update session cookie expiration to reflect current visit
@@ -1941,14 +1941,14 @@ class BSession extends BClass
         $this->_sessionId = session_id();
 
         if (!empty($config['session_check_ip'])) {
-            $ip = BRequest::i()->ip();
+            $ip = $this->BRequest->ip();
             if (empty($_SESSION['_ip'])) {
                 $_SESSION['_ip'] = $ip;
             } elseif ($_SESSION['_ip'] !== $ip) {
                 $_SESSION = [];
                 session_destroy();
                 session_start();
-                //BResponse::i()->status(403, "Remote IP doesn't match session", "Remote IP doesn't match session");
+                //$this->BResponse->status(403, "Remote IP doesn't match session", "Remote IP doesn't match session");
             }
         }
 
@@ -1963,13 +1963,13 @@ class BSession extends BClass
         }
 
         if (empty($this->data['_language'])) {
-            $lang = BRequest::i()->language();
+            $lang = $this->BRequest->language();
             if (!empty($lang)) {
                 $this->data['_language'] = $lang;
             }
         }
 
-        #$this->data['_locale'] = BConfig::i()->get('locale');
+        #$this->data['_locale'] = $this->BConfig->get('locale');
         /*
         if (!empty($this->data['_locale'])) {
             if (is_array($this->data['_locale'])) {
@@ -2083,7 +2083,7 @@ BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
             } else {
                 session_start();
             }
-            $namespace = BConfig::i()->get('cookie/session_namespace');
+            $namespace = $this->BConfig->get('cookie/session_namespace');
             if (!$namespace) $namespace = 'default';
             $_SESSION[$namespace] = $this->data;
         }
@@ -2095,7 +2095,7 @@ BDebug::debug(__METHOD__ . ': ' . spl_object_hash($this));
 
         if ($this->get('_regenerate_id')) {
             #session_regenerate_id(true);
-            session_id(BUtil::randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
+            session_id($this->BUtil->randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
             $this->set('_regenerate_id', 0);
         }
 
@@ -2125,7 +2125,7 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
     {
         $path = $this->getCookiePath();
         $domain = $this->getCookieDomain();
-        $https = BRequest::i()->https();
+        $https = $this->BRequest->https();
         if (!isset($_SESSION) && !headers_sent()) {
             session_set_cookie_params(0, $path, $domain, $https, true);
             session_start();
@@ -2140,8 +2140,8 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
     public function regenerateId()
     {
         session_regenerate_id(true);
-        //BSession::i()->set('_regenerate_id', 1);
-        //session_id(BUtil::randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
+        //$this->BSession->set('_regenerate_id', 1);
+        //session_id($this->BUtil->randomString(26, '0123456789abcdefghijklmnopqrstuvwxyz'));
         return $this;
     }
 
@@ -2214,7 +2214,7 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
     {
         $data =& static::dataToUpdate();
         if (empty($data['_csrf_token'])) {
-            $data['_csrf_token'] = BUtil::randomString(32);
+            $data['_csrf_token'] = $this->BUtil->randomString(32);
         }
         return $data['_csrf_token'];
     }
@@ -2239,7 +2239,7 @@ class BSession_APC extends BClass
     public function __construct($params = array())
     {
         if (function_exists('apc_store')) {
-            BSession::i()->addHandler('apc', __CLASS__);
+            $this->BSession->addHandler('apc', __CLASS__);
         }
         $def = session_get_cookie_params();
         $this->_ttl = $def['lifetime'];

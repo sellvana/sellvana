@@ -13,7 +13,7 @@ class FCom_IndexTank_Admin extends BClass
         if ($this->BConfig->get('modules/FCom_IndexTank/api_url')) {
 
             if (0 == $this->BConfig->get('modules/FCom_IndexTank/disable_auto_indexing')) {
-                BEvents::i()->on('FCom_Catalog_Model_Product::onAfterSave', 'FCom_IndexTank_Admin::onProductAfterSave')
+                $this->BEvents->on('FCom_Catalog_Model_Product::onAfterSave', 'FCom_IndexTank_Admin::onProductAfterSave')
                     ->on('FCom_Catalog_Model_Product::onBeforeDelete', 'FCom_IndexTank_Admin::onProductBeforeDelete')
 
                     //for categories

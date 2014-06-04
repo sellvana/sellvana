@@ -4,7 +4,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 {
     public function action_category()
     {
-#echo "<pre>"; debug_print_backtrace(); print_r(BRouting::i()->currentRoute()); exit;
+#echo "<pre>"; debug_print_backtrace(); print_r($this->BRouting->currentRoute()); exit;
         $category = $this->FCom_Catalog_Model_Category->load($this->BRequest->params('category'), 'url_path');
         if (!$category) {
             $this->forward(false);
@@ -25,7 +25,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         }
 
         $productsData = $this->FCom_IndexTank_Search->search($q, $sc, $f, $v, $page, $resultPerPage);
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_data', ['data' => &$productsData]);
+        $this->BEvents->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_data', ['data' => &$productsData]);
 
         $this->BApp->i()
             ->set('current_category', $category)
@@ -82,7 +82,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         }
 
         $productsData = $this->FCom_IndexTank_Search->search($q, $sc, $f, $v, $page, $resultPerPage);
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', ['data' => &$productsData]);
+        $this->BEvents->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', ['data' => &$productsData]);
 
         $this->BApp->i()
             ->set('current_query', $q)

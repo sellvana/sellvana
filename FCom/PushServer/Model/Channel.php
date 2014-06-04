@@ -88,7 +88,7 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
     public function listen($callback)
     {
         $channelName = $this->channel_name;
-        BEvents::i()->on('FCom_PushServer_Model_Channel::send:' . $channelName, $callback);
+        $this->BEvents->on('FCom_PushServer_Model_Channel::send:' . $channelName, $callback);
         return $this;
     }
 
@@ -114,7 +114,7 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
 if ($this->FCom_PushServer_Main->isDebugMode()) {
     $this->BDebug->log("SEND1: " . print_r($message, 1));
 }
-        BEvents::i()->fire(__METHOD__ . ':' . $this->get('channel_name'), [
+        $this->BEvents->fire(__METHOD__ . ':' . $this->get('channel_name'), [
             'channel' => $this,
             'message' => $message,
             'client'  => $fromClient,

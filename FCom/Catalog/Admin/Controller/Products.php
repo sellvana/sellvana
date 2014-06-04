@@ -99,7 +99,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 . 'onclick="return confirm(\'Are you sure?\')"><span>' .  $this->_('Duplicate') . '</span></button>';
         }
         $newAction['saveAndContinue'] = '<button type="submit" class="btn btn-primary" name="do" value="saveAndContinue"><span>'
-            . BLocale::_('Save And Continue') . '</span></button>';
+            . $this->BLocale->_('Save And Continue') . '</span></button>';
         $actions = array_merge($args['view']->actions, $newAction);
         $args['view']->set([
             'sidebar_img' => $m->thumbUrl(98),
@@ -402,7 +402,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ];
 
 
-        //BEvents::i()->fire(__METHOD__.':orm', array('type'=>$type, 'orm'=>$orm));
+        //$this->BEvents->fire(__METHOD__.':orm', array('type'=>$type, 'orm'=>$orm));
         $data = $this->BDb->many_as_array($orm->find_many());
         //unset unused columns
         /*$columnKeys = array_keys($config['columns']);
@@ -416,7 +416,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
         $config['data'] = $data;
 
-        //BEvents::i()->fire(__METHOD__.':config', array('type'=>$type, 'config'=>&$config));
+        //$this->BEvents->fire(__METHOD__.':config', array('type'=>$type, 'config'=>&$config));
         return ['config' => $config];
     }
 

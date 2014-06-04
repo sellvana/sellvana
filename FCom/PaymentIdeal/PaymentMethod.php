@@ -138,23 +138,23 @@ class FCom_PaymentIdeal_PaymentMethod
     protected function createPayment($bankId, $amount, $description, $returnUrl, $reportUrl)
     {
         if (!$this->setBankId($bankId)) {
-            throw new Exception(BLocale::_("Bank id: %s is not valid.", [$bankId]));
+            throw new Exception($this->BLocale->_("Bank id: %s is not valid.", [$bankId]));
         }
 
         if (!$this->setDescription($description)) {
-            throw new Exception(BLocale::_("Provided description \"%s\" cannot be used.", [$description]));
+            throw new Exception($this->BLocale->_("Provided description \"%s\" cannot be used.", [$description]));
         }
 
         if (!$this->setAmount($amount)) {
-            throw new Exception(BLocale::_("Invalid amount: %s", [$amount]));
+            throw new Exception($this->BLocale->_("Invalid amount: %s", [$amount]));
         }
 
         if (!$returnUrl = filter_var($returnUrl, FILTER_VALIDATE_URL)) {
-            throw new Exception(BLocale::_("Incorrect return url: %s", [$returnUrl]));
+            throw new Exception($this->BLocale->_("Incorrect return url: %s", [$returnUrl]));
         }
 
         if (!$reportUrl = filter_var($reportUrl, FILTER_VALIDATE_URL)) {
-            throw new Exception(BLocale::_("Incorrect report url: %s", [$reportUrl]));
+            throw new Exception($this->BLocale->_("Incorrect report url: %s", [$reportUrl]));
         }
 
         $query_variables = [
@@ -302,7 +302,7 @@ class FCom_PaymentIdeal_PaymentMethod
         if (!$response) {
             $info       = $this->BUtil->lastRemoteHttpInfo();
             $error_code = isset($info['errno']) ? $info['errno'] : -1;
-            $error_msg  = isset($info['error']) ? $info['error'] : BLocale::_("An error occurred");
+            $error_msg  = isset($info['error']) ? $info['error'] : $this->BLocale->_("An error occurred");
             throw new Exception($error_msg, $error_code);
         }
 
@@ -315,7 +315,7 @@ class FCom_PaymentIdeal_PaymentMethod
         $xml_object    = simplexml_load_string($xml);
         if (!$xml_object) {
             $error_code = -2;
-            $error_msg  = BLocale::_("There was an error processing XML.");
+            $error_msg  = $this->BLocale->_("There was an error processing XML.");
             $errors     = libxml_get_errors();
             $debugError = '';
             foreach ($errors as $error) {

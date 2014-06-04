@@ -21,7 +21,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
     {
         $siteKey = $this->BConfig->get('modules/FCom_MarketClient/site_key');
         $redirect = $this->BRequest->get('redirect_to');
-        if (!$r->isUrlLocal($redirect)) {
+        if (!$this->BRequest->isUrlLocal($redirect)) {
             $redirect = '';
         }
 
@@ -42,7 +42,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
 
     public function getModulesVersions($modules, $resetCache = false)
     {
-        $cached = BCache::i()->load(static::$_modulesVersionsCacheKey);
+        $cached = $this->BCache->load(static::$_modulesVersionsCacheKey);
         if ($cached && true === $modules && !$resetCache) {
             return $cached;
         }
@@ -61,7 +61,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
         $response = $this->BUtil->remoteHttp("GET", $url);
         $modResult = $this->BUtil->fromJson($response);
         if (!empty($modResult['error'])) {
-            BCache::i()->delete(static::$_modulesVersionsCacheKey);
+            $this->BCache->delete(static::$_modulesVersionsCacheKey);
             throw new BException($modResult['message']);
         }
         foreach ($modResult['modules'] as $modName => $mod) {
@@ -76,7 +76,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
             $cached[$modName] = $mod;
         }
         if (!empty($cached)) {
-            BCache::i()->save(static::$_modulesVersionsCacheKey, $cached, 86400);
+            $this->BCache->save(static::$_modulesVersionsCacheKey, $cached, 86400);
         }
         $result = [];
         foreach ($modules as $modName) {
@@ -150,7 +150,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
         ];
         $response = $this->BUtil->remoteHttp('POST', $url, $data);
 #echo "<pre>"; var_dump($response); exit;
-        BCache::i()->delete(static::$_modulesVersionsCacheKey);
+        $this->BCache->delete(static::$_modulesVersionsCacheKey);
         return $this->BUtil->fromJson($response);
     }
 

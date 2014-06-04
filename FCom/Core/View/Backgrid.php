@@ -126,8 +126,8 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
             $orm->where($where);
         }
         if (!is_null($method)) {
-            //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
-            BEvents::i()->fire($method . ':orm', ['orm' => $orm]);
+            //$this->BEvents->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
+            $this->BEvents->fire($method . ':orm', ['orm' => $orm]);
         }
 
         $data = $orm->paginate($r);
@@ -136,7 +136,7 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
         //$data['hash'] = base64_encode($this->BUtil->toJson($this->BUtil->arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);
         if (!is_null($method)) {
-            BEvents::i()->fire($method . ':data', ['data' => &$data]);
+            $this->BEvents->fire($method . ':data', ['data' => &$data]);
         }
 
         return $data;
@@ -186,7 +186,7 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
     public function export($orm, $class = null)
     {
         if ($class) {
-            BEvents::i()->fire($class . '::action_grid_data.orm', ['orm' => $orm]);
+            $this->BEvents->fire($class . '::action_grid_data.orm', ['orm' => $orm]);
         }
         $r = $this->BRequest->request();
         if (!empty($r['filters'])) {
@@ -229,7 +229,7 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
         $orm->iterate(function($row) use($columns, $fp) {
             if ($class) {
                 //TODO: any faster solution?
-                BEvents::i()->fire($class . '::action_grid_data.data_row', ['row' => $row, 'columns' => $columns]);
+                $this->BEvents->fire($class . '::action_grid_data.data_row', ['row' => $row, 'columns' => $columns]);
             }
             $data = [];
             foreach ($columns as $col) {

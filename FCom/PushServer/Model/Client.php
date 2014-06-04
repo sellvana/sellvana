@@ -349,7 +349,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     public function setStatus($status)
     {
         $this->set('status', $status);
-        BEvents::i()->fire(__METHOD__, ['client' => $this, 'status' => $status]);
+        $this->BEvents->fire(__METHOD__, ['client' => $this, 'status' => $status]);
         return $this;
     }
 

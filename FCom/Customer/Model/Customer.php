@@ -314,16 +314,16 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         if (empty($username) || empty($password)) {
             return false;
         }
-        if (!BLoginThrottle::i()->init('FCom_Customer_Model_Customer', $username)) {
+        if (!$this->BLoginThrottle->init('FCom_Customer_Model_Customer', $username)) {
             return false;
         }
         /** @var FCom_Admin_Model_User */
         $user = $this->orm()->where('email', $username)->find_one();
         if (!$user || !$user->validatePassword($password)) {
-            BLoginThrottle::i()->failure();
+            $this->BLoginThrottle->failure();
             return false;
         }
-        BLoginThrottle::i()->success();
+        $this->BLoginThrottle->success();
         return $user;
     }
 
@@ -339,13 +339,13 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         if ($this->timezone) {
             date_default_timezone_set($this->timezone);
         }
-        BEvents::i()->fire(__METHOD__ . ':after', ['user' => $this]);
+        $this->BEvents->fire(__METHOD__ . ':after', ['user' => $this]);
         return $this;
     }
 
     public function logout()
     {
-        BEvents::i()->fire(__METHOD__ . ':before', ['user' => $this->sessionUser()]);
+        $this->BEvents->fire(__METHOD__ . ':before', ['user' => $this->sessionUser()]);
 
         $sessData =& $this->BSession->dataToUpdate();
         $sessData = [];
@@ -374,7 +374,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public function import($data)
     {
-        BEvents::i()->fire(__METHOD__ . ':before', ['data' => &$data]);
+        $this->BEvents->fire(__METHOD__ . ':before', ['data' => &$data]);
 
         if (!empty($data['customer']['id'])) {
             $cust = $this->load($data['customer']['id']);
@@ -410,7 +410,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
         $result['addr'] = $this->FCom_Customer_Model_Address->import($data, $cust);
 
-        BEvents::i()->fire(__METHOD__ . ':after', ['data' => $data, 'result' => &$result]);
+        $this->BEvents->fire(__METHOD__ . ':after', ['data' => $data, 'result' => &$result]);
 
         return $result;
     }

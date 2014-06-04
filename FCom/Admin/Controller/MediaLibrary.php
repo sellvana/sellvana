@@ -95,8 +95,8 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
             ];
         }
-        //BEvents::i()->fire(__METHOD__, array('config'=>&$config));
-        //BEvents::i()->fire(__METHOD__.':'.$folder, array('config'=>&$config));
+        //$this->BEvents->fire(__METHOD__, array('config'=>&$config));
+        //$this->BEvents->fire(__METHOD__.':'.$folder, array('config'=>&$config));
         return $config;
     }
 
@@ -249,7 +249,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                         $associatedProducts = $associatedProducts->get('associated_products');
                         $att->set(['file_size' => $uploads['size'][$i], 'update_at' =>  $this->BDb->now()])->save();
                     }
-                    BEvents::i()->fire(__METHOD__ . ':' . $folder . ':upload', ['model' => $att]);
+                    $this->BEvents->fire(__METHOD__ . ':' . $folder . ':upload', ['model' => $att]);
                     if (!empty($options['on_upload'])) {
                         $this->BUtil->call($options['on_upload'], $att);
                     }
@@ -283,7 +283,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $oldFileName = $att->file_name;
             if (@rename($targetDir . '/' . $oldFileName, $targetDir . '/' . $fileName)) {
                 $att->set('file_name', $fileName)->save();
-                BEvents::i()->fire(__METHOD__ . ':' . $folder . ':edit', ['model' => $att]);
+                $this->BEvents->fire(__METHOD__ . ':' . $folder . ':edit', ['model' => $att]);
                 if (!empty($options['on_edit'])) {
                     $this->BUtil->call($options['on_edit'], $att);
                 }
@@ -300,7 +300,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             }
             $args = ['folder' => $folder, 'file_name' => $files];
             $attModel->delete_many($args);
-            BEvents::i()->fire(__METHOD__ . ':' . $folder . ':delete', ['files' => $files]);
+            $this->BEvents->fire(__METHOD__ . ':' . $folder . ':delete', ['files' => $files]);
             if (!empty($options['on_delete'])) {
                 $this->BUtil->call($options['on_delete'], $args);
             }

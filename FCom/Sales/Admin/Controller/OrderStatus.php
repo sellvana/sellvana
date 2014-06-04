@@ -39,7 +39,7 @@ class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abst
         parent::gridViewBefore($args);
         $this->view('admin/grid')->set(['actions' => [
             'new' => '<button type="button" id="add_new_order_status" class="btn grid-new btn-primary _modal">'
-                . BLocale::_('Add New Order Status') . '</button>']]);
+                . $this->BLocale->_('Add New Order Status') . '</button>']]);
     }
 
     /**

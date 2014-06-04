@@ -55,7 +55,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     {
         if (!parent::beforeDispatch()) return false;
 
-        $this->view('head')->addTitle(BLocale::_('%s Admin', $this->BConfig->get('modules/FCom_Core/site_title')));
+        $this->view('head')->addTitle($this->BLocale->_('%s Admin', $this->BConfig->get('modules/FCom_Core/site_title')));
 
         return true;
     }
@@ -74,9 +74,9 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     public function message($msg, $type = 'success', $tag = 'admin', $options = [])
     {
         if (is_array($msg)) {
-            array_walk($msg, 'BLocale::_');
+            array_walk($msg, [$this->BLocale, '_']);
         } else {
-            $msg = BLocale::_($msg);
+            $msg = $this->BLocale->_($msg);
         }
         $this->BSession->addMessage($msg, $type, $tag, $options);
         return $this;
@@ -294,11 +294,11 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     public function gridPostBefore($args)
     {
-        BEvents::i()->fire(static::$_origClass . '::gridPostBefore', $args);
+        $this->BEvents->fire(static::$_origClass . '::gridPostBefore', $args);
     }
 
     public function gridPostAfter($args)
     {
-        BEvents::i()->fire(static::$_origClass . '::gridPostAfter', $args);
+        $this->BEvents->fire(static::$_origClass . '::gridPostAfter', $args);
     }
 }

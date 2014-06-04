@@ -26,7 +26,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
             $cost = $tmp_cost = '';
             if ($row->get('cost')) {
                 $tmp_cost = $row->get('cost');
-                $cost = BLocale::currency($tmp_cost);
+                $cost = $this->BLocale->currency($tmp_cost);
             }
             $out_stock = (isset($settings['out_stock']))? 'back_order': '';
             if (isset($data_serialized['stock_policy'])) {
@@ -95,10 +95,10 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
             }
             $.validator.addMethod("stockInputValidate",stockInputValidate , function(params, element) {
                 if ($(element).attr("name") == "cost") {
-                    return "'.BLocale::_('The cost of an item cannot be less than zero').'";
+                    return "'.$this->BLocale->_('The cost of an item cannot be less than zero').'";
                 }
                 if ($(element).attr("name") == "stock_qty") {
-                    return "'.BLocale::_('Stock Item cannot have less than 0 quantity in stock').'";
+                    return "'.$this->BLocale->_('Stock Item cannot have less than 0 quantity in stock').'";
                 }
 
             });
@@ -162,7 +162,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
         parent::gridViewBefore($args);
         $this->view('admin/grid')->set(['actions' => [
             'new' => '<button type="button" id="add_new_sku" class="btn grid-new btn-primary _modal">'
-                . BLocale::_('New Sku') . '</button>']]);
+                . $this->BLocale->_('New Sku') . '</button>']]);
     }
 
     public function action_unique__POST()
@@ -200,7 +200,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
                     }
                 }
                 if ($p['cost'] != '') {
-                    $p['cost'] = BLocale::currency($p['cost']);
+                    $p['cost'] = $this->BLocale->currency($p['cost']);
                 }
                 $this->BResponse->json($p);
                 break;

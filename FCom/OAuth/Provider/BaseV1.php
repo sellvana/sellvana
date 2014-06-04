@@ -74,7 +74,7 @@ class FCom_OAuth_Provider_BaseV1 extends FCom_OAuth_Provider_Abstract
 
         $this->onAfterGetAccessToken($tokenModel);
 
-        BEvents::i()->fire(__METHOD__ . ':after', [ 'token_model' => $tokenModel ]);
+        $this->BEvents->fire(__METHOD__ . ':after', [ 'token_model' => $tokenModel ]);
 
         return $tokenModel;
     }

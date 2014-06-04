@@ -73,7 +73,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
             }
 
             if ($customer->validate($r, $expandRules, $formId)) {
-                if (empty($r['current_password']) || !Bcrypt::verify($r['current_password'], $customer->get('password_hash'))) {
+                if (empty($r['current_password']) || !$this->Bcrypt->verify($r['current_password'], $customer->get('password_hash'))) {
                     $this->message('Current password is not correct, please try again', 'error');
                     $this->BResponse->redirect('customer/myaccount/edit');
                 } else {
@@ -139,7 +139,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
             $customer->setChangePasswordRules();
 
             if ($customer->validate($r, [], $formId)) {
-                if (empty($r['current_password']) || !Bcrypt::verify($r['current_password'], $customer->get('password_hash'))) {
+                if (empty($r['current_password']) || !$this->Bcrypt->verify($r['current_password'], $customer->get('password_hash'))) {
                     $this->message('Current password is not correct, please try again', 'error');
                     $this->BResponse->redirect('customer/myaccount/editpassword');
                 } else {

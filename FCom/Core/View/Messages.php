@@ -33,9 +33,9 @@ class FCom_Core_View_Messages extends FCom_Core_View_Abstract
                 'msgs' => !empty($m['msgs']) ? $m['msgs'] : null,
                 'class' => !empty($this->_classes[$m['type']]) ? $this->_classes[$m['type']] : $m['type'],
                 'title' => isset($m['title']) ? $m['title'] :
-                    (!empty($this->_titles[$m['type']]) ? BLocale::_($this->_titles[$m['type']]) : null),
+                    (!empty($this->_titles[$m['type']]) ? $this->BLocale->_($this->_titles[$m['type']]) : null),
                 'icon' => isset($m['icon']) ? $m['icon'] :
-                    (!empty($this->_icons[$m['type']]) ? BLocale::_($this->_icons[$m['type']]) : $m['type']),
+                    (!empty($this->_icons[$m['type']]) ? $this->BLocale->_($this->_icons[$m['type']]) : $m['type']),
             ];
         }
         return $out;

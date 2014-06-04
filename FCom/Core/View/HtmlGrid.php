@@ -203,13 +203,13 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
                     case 'refresh':
                         $action = ['html' => $this->BUtil->tagHtml('a',
                             ['href' => $this->BRequest->currentUrl(), 'class' => 'js-change-url grid-refresh btn'],
-                            BLocale::_('Refresh')
+                            $this->BLocale->_('Refresh')
                         )];
                         break;
                     case 'link_to_page':
                         $action = ['html' => $this->BUtil->tagHtml('a',
                             ['href' => $this->BRequest->currentUrl(), 'class' => 'grid-link_to_page btn'],
-                            BLocale::_('Link')
+                            $this->BLocale->_('Link')
                         )];
                         break;
 
@@ -298,7 +298,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         $this->_processPersonalization();
 
         $grid = $this->grid;
-        BEvents::i()->fire(__METHOD__ . ':after', ['grid' => &$grid]);
+        $this->BEvents->fire(__METHOD__ . ':after', ['grid' => &$grid]);
         $grid['_processed'] = true;
         $this->grid = $grid;
 
@@ -323,7 +323,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             if (is_string($orm)) {
                 $orm = $orm::i()->orm();
             }
-            BEvents::i()->fire(__METHOD__ . ':initORM:' . $config['id'], ['orm' => $orm, 'grid' => $grid]);
+            $this->BEvents->fire(__METHOD__ . ':initORM:' . $config['id'], ['orm' => $orm, 'grid' => $grid]);
 
             $this->_processGridFilters($config, $this->BRequest->get('filter'), $orm);
             try {
@@ -339,7 +339,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             }
             //var_dump($grid['result']);exit;
             $grid['result']['state']['description'] = $this->stateDescription($grid['result']['state']);
-            BEvents::i()->fire(__METHOD__ . ':after:' . $config['id'], ['grid' => & $grid]);
+            $this->BEvents->fire(__METHOD__ . ':after:' . $config['id'], ['grid' => & $grid]);
         }
 
         $this->grid = $grid;
@@ -465,8 +465,8 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             if (is_string($col['format'])) {
                 switch ($col['format']) {
                     case 'boolean': $value = $value ? 1 : 0; break;
-                    case 'date': $value = $value ? BLocale::i()->datetimeDbToLocal($value) : ''; break;
-                    case 'datetime': $value = $value ? BLocale::i()->datetimeDbToLocal($value, true) : ''; break;
+                    case 'date': $value = $value ? $this->BLocale->datetimeDbToLocal($value) : ''; break;
+                    case 'datetime': $value = $value ? $this->BLocale->datetimeDbToLocal($value, true) : ''; break;
                     case 'currency': $value = $value ? '$' . number_format($value, 2) : ''; break;
                     default: $this->BDebug->warning('Grid value format not implemented: ' . $col['format']);
                 }
@@ -558,8 +558,8 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             $orm->where($where);
         }
         if (!is_null($method)) {
-            //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
-            BEvents::i()->fire($method . ':orm', ['orm' => $orm]);
+            //$this->BEvents->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
+            $this->BEvents->fire($method . ':orm', ['orm' => $orm]);
         }
 
         $data = $orm->paginate($r);
@@ -569,7 +569,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         //$data['hash'] = base64_encode($this->BUtil->toJson($this->BUtil->arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);
         if (!is_null($method)) {
-            BEvents::i()->fire($method . ':data', ['data' => &$data]);
+            $this->BEvents->fire($method . ':data', ['data' => &$data]);
         }
 
         return $data;

@@ -45,7 +45,7 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
 
 
         if (!$this->url_key) {
-            $this->url_key = BLocale::transliterate($this->title);
+            $this->url_key = $this->BLocale->transliterate($this->title);
         }
 
         if (!$this->author_user_id) {
@@ -138,7 +138,7 @@ class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
             $orm->where_not_equal('p.id', $data['id']);
         }
         if ($orm->find_one()) {
-            return BLocale::_('The URL Key entered is already in use. Please enter a valid URL Key.');
+            return $this->BLocale->_('The URL Key entered is already in use. Please enter a valid URL Key.');
         }
         return true;
     }

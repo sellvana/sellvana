@@ -83,7 +83,7 @@ class FCom_OAuth_Provider_BaseV2 extends FCom_OAuth_Provider_Abstract
         $tokenModel = $this->FCom_OAuth_Model_ConsumerToken->loadOrCreate($modelData);
         $tokenModel->setData($result)->save();
 
-        BEvents::i()->fire(__METHOD__ . ':after', [ 'token_model' => $tokenModel ]);
+        $this->BEvents->fire(__METHOD__ . ':after', [ 'token_model' => $tokenModel ]);
 
         return $tokenModel;
     }

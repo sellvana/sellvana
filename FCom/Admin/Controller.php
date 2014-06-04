@@ -266,7 +266,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
             $data = ['dashboard' => ['widgets' => [$r['key'] => $data]]];
             break;
         }
-        BEvents::i()->fire(__METHOD__, ['request' => $r, 'data' => &$data]);
+        $this->BEvents->fire(__METHOD__, ['request' => $r, 'data' => &$data]);
 
         $this->FCom_Admin_Model_User->personalize($data);
         $this->BResponse->json(['success' => true, 'data' => $data, 'r' => $r]);
@@ -282,7 +282,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
                 'changefreq' => 'daily'
             ]);
         }
-        BEvents::i()->fire(__METHOD__, ['site_map' => &$site_map]);
+        $this->BEvents->fire(__METHOD__, ['site_map' => &$site_map]);
         $xml = new DOMDocument('1.0');
         $xml->formatOutput = true;
         $url_set = $xml->createElement("urlset");

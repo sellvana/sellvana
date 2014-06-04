@@ -7,7 +7,7 @@ class FCom_IndexTank_Cron extends BClass
         $this->FCom_Cron_Main
             ->task('* * * * *', 'FCom_IndexTank_Cron.indexAll');
 
-        BEvents::i()
+        $this->BEvents
             ->on('FCom_IndexTank_Index_Product::add', 'FCom_IndexTank_Index_Product::onProductIndexAdd');
     }
 

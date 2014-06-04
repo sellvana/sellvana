@@ -100,7 +100,7 @@ class BViewGrid extends BView
                 }
             }
         }
-        BEvents::i()->fire('BViewGrid::gridPrepareConfig:after', ['config' => &$c]);
+        $this->BEvents->fire('BViewGrid::gridPrepareConfig:after', ['config' => &$c]);
         return $c;
     }
 
@@ -149,7 +149,7 @@ class BViewGrid extends BView
             $orm->where_complex($config['where']);
         }
 
-        BEvents::i()->fire('BViewGrid::gridData:initORM: ' . $config['id'], ['orm' => $orm, 'grid' => $grid]);
+        $this->BEvents->fire('BViewGrid::gridData:initORM: ' . $config['id'], ['orm' => $orm, 'grid' => $grid]);
 
         $mapColumns = [];
 
@@ -228,7 +228,7 @@ class BViewGrid extends BView
                 }
             }
         }
-        BEvents::i()->fire('BGridView::gridData:after: ' . $config['id'], ['grid' => &$grid]);
+        $this->BEvents->fire('BGridView::gridData:after: ' . $config['id'], ['grid' => &$grid]);
 
         $this->grid = $grid;
         return $grid;
@@ -239,7 +239,7 @@ class BViewGrid extends BView
         if (is_string($format)) {
             switch ($format) {
                 case 'boolean': $value = !!$value; break;
-                case 'date': $value = $value ? BLocale::i()->datetimeDbToLocal($value) : ''; break;
+                case 'date': $value = $value ? $this->BLocale->datetimeDbToLocal($value) : ''; break;
                 case 'currency': $value = $value ? '$' . number_format($value, 2) : ''; break;
             }
         } elseif (is_callable($format)) {

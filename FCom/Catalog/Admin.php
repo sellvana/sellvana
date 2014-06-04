@@ -4,7 +4,7 @@ class FCom_Catalog_Admin extends BClass
 {
     public function bootstrap()
     {
-        BEvents::i()
+        $this->BEvents
             ->on('category_tree_post.associate.products', 'FCom_Catalog_Model_Product.onAssociateCategory')
             ->on('category_tree_post.reorderAZ', 'FCom_Catalog_Model_Category.onReorderAZ')
 
@@ -42,7 +42,7 @@ class FCom_Catalog_Admin extends BClass
 
         $this->FCom_Admin_Controller_MediaLibrary
             ->allowFolder('media/category/images')
-            ->allowFolder('media/product/image')
+            ->allowFolder('media/product/images')
             ->allowFolder('media/product/attachment')
             ->allowFolder('storage/import/products')
         ;

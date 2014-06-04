@@ -49,7 +49,7 @@ class FCom_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controller_Ab
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
-        $this->view('admin/grid')->set(['actions' => ['new' => '<button type="button" id="add_new_email_subscription" class="btn grid-new btn-primary _modal">' . BLocale::_('New Email Subscription') . '</button>']]);
+        $this->view('admin/grid')->set(['actions' => ['new' => '<button type="button" id="add_new_email_subscription" class="btn grid-new btn-primary _modal">' . $this->BLocale->_('New Email Subscription') . '</button>']]);
     }
 
     public function action_unique__POST()

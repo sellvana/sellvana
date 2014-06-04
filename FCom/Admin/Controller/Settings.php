@@ -42,7 +42,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
         try {
             $post = $this->BRequest->post();
 
-            BEvents::i()->fire(__METHOD__, ['post' => &$post]);
+            $this->BEvents->fire(__METHOD__, ['post' => &$post]);
             $this->BConfig->add($post['config'], true);
 
             if (!empty($post['config']['db'])) {
@@ -58,7 +58,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             if (!$xhr) {
                 $this->message('Settings updated');
             } else {
-                $result = ['message' => BLocale::_('Settings has been saved successfully'), 'status' => 'success'];
+                $result = ['message' => $this->BLocale->_('Settings has been saved successfully'), 'status' => 'success'];
             }
 
         } catch (Exception $e) {
@@ -67,7 +67,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             if (!$xhr) {
                 $this->message($e->getMessage(), 'error');
             } else {
-                $result = ['message' => BLocale::_($e->getMessage()), 'status' => 'error'];
+                $result = ['message' => $this->BLocale->_($e->getMessage()), 'status' => 'error'];
             }
         }
         if (!empty($post['current_tab'])) {

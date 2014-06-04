@@ -50,7 +50,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $config = $this->_processConfig($this->gridConfig());
         $this->gridOrmConfig($config['orm']);
         $view->set('grid', ['config' => $config]);
-        BEvents::i()->fire(static::$_origClass . '::gridView', ['view' => $view]);
+        $this->BEvents->fire(static::$_origClass . '::gridView', ['view' => $view]);
         return $view;
     }
 
@@ -120,7 +120,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     public function gridViewBefore($args)
     {
         $view = $args['page_view'];
-        $hlp = BView::i();
+        $hlp = $this->BView;
         $view->set([
             'title' => $this->_gridTitle,
             'actions' => [
@@ -130,7 +130,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                     . '</span></button>',
             ],
         ]);
-        BEvents::i()->fire(static::$_origClass . '::gridViewBefore', $args);
+        $this->BEvents->fire(static::$_origClass . '::gridViewBefore', $args);
     }
 
     public function action_grid_html()
@@ -140,9 +140,16 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function action_grid_data()
     {
-        if (!$this->BRequest->xhr()) {
-            $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
-            return;
+        if ($this->BRequest->get('export')) {
+            if ($this->BRequest->csrf('referrer', 'GET')) {
+                $this->BResponse->status('403', 'Invalid referrer', 'Invalid referrer');
+                return;
+            }
+        } else {
+            if (!$this->BRequest->xhr()) {
+                $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+                return;
+            }
         }
 
         $view = $this->gridView();
@@ -192,13 +199,13 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function gridDataAfter($data)
     {
-        BEvents::i()->fire(static::$_origClass . '::gridDataAfter', ['data' => &$data]);
+        $this->BEvents->fire(static::$_origClass . '::gridDataAfter', ['data' => &$data]);
         return $data;
     }
 
     public function gridOrmConfig($orm)
     {
-        BEvents::i()->fire(static::$_origClass . '::gridOrmConfig', ['orm' => &$orm]);
+        $this->BEvents->fire(static::$_origClass . '::gridOrmConfig', ['orm' => &$orm]);
     }
 
     public function action_grid_data__POST()
@@ -245,16 +252,16 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $actions = [];
 
         $actions['back'] = '<button type="button" class="btn btn-link" onclick="location.href=\''
-            . $this->BApp->href($this->_gridHref) . '\'"><span>' .  BLocale::_('Back to list') . '</span></button>';
+            . $this->BApp->href($this->_gridHref) . '\'"><span>' .  $this->BLocale->_('Back to list') . '</span></button>';
         if ($m->id) {
             $actions['delete'] = '<button type="submit" class="btn btn-warning ignore-validate" name="do" value="DELETE" '
-                . 'onclick="return confirm(\'Are you sure?\')"><span>' .  BLocale::_('Delete') . '</span></button>';
+                . 'onclick="return confirm(\'Are you sure?\')"><span>' .  $this->BLocale->_('Delete') . '</span></button>';
         }
         $actions['save'] = '<button type="submit" class="btn btn-primary" onclick="return adminForm.saveAll(this)"><span>'
-            . BLocale::_('Save') . '</span></button>';
+            . $this->BLocale->_('Save') . '</span></button>';
 
         $id = method_exists($m, 'id') ? $m->id() : $m->id;
-        $title = $id ? BLocale::_('Edit %s: %s', [$this->_recordName, $m->title]) : BLocale::_('Create New %s', [$this->_recordName]);
+        $title = $id ? $this->BLocale->_('Edit %s: %s', [$this->_recordName, $m->title]) : $this->BLocale->_('Create New %s', [$this->_recordName]);
 
         $args['view']->set([
             'form_id' => $this->formId(),
@@ -262,7 +269,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             'title' => $title,
             'actions' => $actions,
         ]);
-        BEvents::i()->fire(static::$_origClass . '::formViewBefore', $args);
+        $this->BEvents->fire(static::$_origClass . '::formViewBefore', $args);
     }
 
     public function action_form__POST()
@@ -317,17 +324,17 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function formPostBefore($args)
     {
-        BEvents::i()->fire(static::$_origClass . '::formPostBefore', $args);
+        $this->BEvents->fire(static::$_origClass . '::formPostBefore', $args);
     }
 
     public function formPostAfter($args)
     {
-        BEvents::i()->fire(static::$_origClass . '::formPostAfter', $args);
+        $this->BEvents->fire(static::$_origClass . '::formPostAfter', $args);
     }
 
     public function formPostError($args)
     {
-        BEvents::i()->fire(static::$_origClass . '::formPostError', $args);
+        $this->BEvents->fire(static::$_origClass . '::formPostError', $args);
     }
 
     /**
@@ -336,7 +343,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
      */
     public function formId()
     {
-        return BLocale::transliterate($this->_formLayoutName);
+        return $this->BLocale->transliterate($this->_formLayoutName);
     }
 
     /**

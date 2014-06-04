@@ -24,4 +24,7 @@ class FCom_Customer_Import extends BImport
 
     protected $dir = 'customers';
     protected $model = 'FCom_Customer_Model_Customer';
+
+    protected $allowedFileTypes = ['txt', 'csv'];
+
 }

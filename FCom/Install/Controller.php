@@ -25,9 +25,9 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
     public function message($msg, $type = 'success', $tag = 'install', $options = [])
     {
         if (is_array($msg)) {
-            array_walk($msg, 'BLocale::_');
+            array_walk($msg, [$this->BLocale, '_']);
         } else {
-            $msg = BLocale::_($msg);
+            $msg = $this->BLocale->_($msg);
         }
         $this->BSession->addMessage($msg, $type, $tag, $options);
         return $this;
@@ -106,7 +106,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         }
         try {
             $w = $this->BRequest->post('w');
-            if (empty($w['db']) || !BValidate::i()->validateInput($w['db'], [
+            if (empty($w['db']) || !$this->BValidate->validateInput($w['db'], [
                 ['host', '@required'],
                 ['host', '/^[A-Za-z0-9.\[\]:-]+$/'],
                 ['port', '@required'],
@@ -142,7 +142,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             $this->BApp->m('FCom_Admin')->run_status = BModule::LOADED; // for proper migration on some hosts
             $this->BDb->connect();
             $this->FCom_Core_Model_Module->init();
-            BMigrate::i()->migrateModules('FCom_Admin', true);
+            $this->BMigrate->migrateModules('FCom_Admin', true);
         }
         $this->BLayout->applyLayout('/step2');
         $sData =& $this->BSession->dataToUpdate();
@@ -159,7 +159,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
         }
         try {
             $w = $this->BRequest->post('w');
-            if (empty($w['admin']) || !BValidate::i()->validateInput($w['admin'], [
+            if (empty($w['admin']) || !$this->BValidate->validateInput($w['admin'], [
                 ['firstname', '@required'],
                 ['lastname', '@required'],
                 ['email', '@required'],
@@ -172,7 +172,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             ])) {
                 throw new BException('Invalid form data');
             }
-            BMigrate::i()->migrateModules('FCom_Admin', true);
+            $this->BMigrate->migrateModules('FCom_Admin', true);
             $this->FCom_Admin_Model_User
                 ->create($w['admin'])
                 ->set('is_superadmin', 1)
@@ -270,7 +270,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                 ],
             ],
             'cache' => [
-                'default_backend' => BCache::i()->getFastestAvailableBackend(),
+                'default_backend' => $this->BCache->getFastestAvailableBackend(),
             ],
         ], true);
 
