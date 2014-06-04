@@ -2404,7 +2404,7 @@ class BDebug extends BClass
         static::$_adminEmail = $email;
     }
 
-    public function mode($mode = null, $setLevels = true)
+    static public function mode($mode = null, $setLevels = true)
     {
         if (null === $mode) {
             return static::$_mode;
