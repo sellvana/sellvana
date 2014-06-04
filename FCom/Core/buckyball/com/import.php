@@ -55,6 +55,10 @@ class BImport extends BClass
 
     public function getFileInfo($file)
     {
+        $ext = pathinfo($file, PATHINFO_EXTENSION);
+        if(isset($this->allowedFileTypes) && !in_array($ext, $this->allowedFileTypes)){
+            return false;
+        }
         // assume we know nothing about the file
         $info = [];
 
