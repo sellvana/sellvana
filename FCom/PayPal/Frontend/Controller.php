@@ -4,18 +4,18 @@ class FCom_PayPal_Frontend_Controller extends BActionController
 {
     public function action_redirect()
     {
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
-        $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $salesOrder = $this->FCom_Sales_Model_Order->load($cart->id(), 'cart_id');
         if (!$salesOrder) {
-            $href = BApp::href('cart');
-            BResponse::i()->redirect($href);
+            $href = $this->BApp->href('cart');
+            $this->BResponse->redirect($href);
             return;
         }
 
-        $baseUrl = BApp::href('paypal');
+        $baseUrl = $this->BApp->href('paypal');
         $nvpShippingAddress = [];
-        if (BConfig::i()->get('modules/FCom_PayPal/show_shipping') == 'on') {
-            $shippingAddress = FCom_Sales_Model_Cart_Address::i()->findByCartType($cart->id(), 'shipping');
+        if ($this->BConfig->get('modules/FCom_PayPal/show_shipping') == 'on') {
+            $shippingAddress = $this->FCom_Sales_Model_Cart_Address->findByCartType($cart->id(), 'shipping');
             $nvpShippingAddress = [
                 'NOSHIPPING' => 0,
                 'REQCONFIRMSHIPPING' => 0,
@@ -43,37 +43,37 @@ class FCom_PayPal_Frontend_Controller extends BActionController
         ];
         $nvpArr = array_merge($nvpArr, $nvpShippingAddress);
         //print_r($nvpArr);exit;
-        $resArr = FCom_PayPal_RemoteApi::i()->call('SetExpressCheckout', $nvpArr);
+        $resArr = $this->FCom_PayPal_RemoteApi->call('SetExpressCheckout', $nvpArr);
 //echo "<xmp>"; print_r($resArr); echo "</xmp>"; exit;
         if (false === $resArr) {
-            throw new BException(FCom_PayPal_RemoteApi::i()->getError());
+            throw new BException($this->FCom_PayPal_RemoteApi->getError());
         }
-        $sData =& BSession::i()->dataToUpdate();
+        $sData =& $this->BSession->dataToUpdate();
         $sData['paypal']['token'] = $resArr['TOKEN'];
-        BResponse::i()->redirect(FCom_PayPal_RemoteApi::i()->getExpressCheckoutUrl($resArr['TOKEN']));
+        $this->BResponse->redirect($this->FCom_PayPal_RemoteApi->getExpressCheckoutUrl($resArr['TOKEN']));
     }
 
     public function action_return()
     {
-        $sData =& BSession::i()->dataToUpdate();
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
-        $salesOrder = FCom_Sales_Model_Order::i()->load($cart->id(), 'cart_id');
+        $sData =& $this->BSession->dataToUpdate();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $salesOrder = $this->FCom_Sales_Model_Order->load($cart->id(), 'cart_id');
         if (!$salesOrder) {
-            $href = BApp::href('cart');
-            BResponse::i()->redirect($href);
+            $href = $this->BApp->href('cart');
+            $this->BResponse->redirect($href);
             return;
         }
 
-        $resArr = FCom_PayPal_RemoteApi::i()->call('GetExpressCheckoutDetails',  ['TOKEN' => $sData['paypal']['token']]);
+        $resArr = $this->FCom_PayPal_RemoteApi->call('GetExpressCheckoutDetails',  ['TOKEN' => $sData['paypal']['token']]);
         if (false === $resArr) {
-            $this->message(FCom_PayPal_RemoteApi::i()->getError(), 'error');
-            BResponse::i()->redirect('checkout/checkout');
+            $this->message($this->FCom_PayPal_RemoteApi->getError(), 'error');
+            $this->BResponse->redirect('checkout/checkout');
             return;
         }
 
         if (empty($resArr['PAYERID'])) {
             $this->message('Payment action not initiated', 'error');
-            BResponse::i()->redirect('checkout');
+            $this->BResponse->redirect('checkout');
             return;
         }
         /*
@@ -105,8 +105,8 @@ class FCom_PayPal_Frontend_Controller extends BActionController
             //'BUTTONSOURCE'  => '',
         ];
         $nvpShipArr = [];
-        if (BConfig::i()->get('modules/FCom_PayPal/show_shipping') == 'on') {
-            $shippingAddress = FCom_Sales_Model_Cart_Address::i()->findByCartType($cart->id(), 'shipping');
+        if ($this->BConfig->get('modules/FCom_PayPal/show_shipping') == 'on') {
+            $shippingAddress = $this->FCom_Sales_Model_Cart_Address->findByCartType($cart->id(), 'shipping');
             $nvpShipArr = [
                 'PAYMENTREQUEST_0_SHIPTONAME' => $shippingAddress->firstname . ' ' . $shippingAddress->lastname,
                     'PAYMENTREQUEST_0_SHIPTOSTREET' => $shippingAddress->street1,
@@ -126,10 +126,10 @@ class FCom_PayPal_Frontend_Controller extends BActionController
          /* Make the call to PayPal to finalize payment
             If an error occured, show the resulting errors
             */
-        $resArr = FCom_PayPal_RemoteApi::i()->call('DoExpressCheckoutPayment', $nvpArr);
+        $resArr = $this->FCom_PayPal_RemoteApi->call('DoExpressCheckoutPayment', $nvpArr);
         if (false === $resArr) {
-            $this->message(FCom_PayPal_RemoteApi::i()->getError(), 'error');
-            BResponse::i()->redirect('checkout');
+            $this->message($this->FCom_PayPal_RemoteApi->getError(), 'error');
+            $this->BResponse->redirect('checkout');
         }
         /*
         $cart->set(array(
@@ -152,15 +152,15 @@ class FCom_PayPal_Frontend_Controller extends BActionController
         //unset cart
         $cart->status = 'finished';
         $cart->save();
-        FCom_Sales_Model_Cart::i()->sessionCartId(null);
+        $this->FCom_Sales_Model_Cart->sessionCartId(null);
 
-        $hrefUrl = BApp::href('checkout/success');
-        BResponse::i()->redirect($hrefUrl);
+        $hrefUrl = $this->BApp->href('checkout/success');
+        $this->BResponse->redirect($hrefUrl);
     }
 
     public function action_cancel()
     {
-        BResponse::i()->redirect(BConfig::i()->get('secure_url') . "/checkout");
+        $this->BResponse->redirect($this->BConfig->get('secure_url') . "/checkout");
     }
 
 }

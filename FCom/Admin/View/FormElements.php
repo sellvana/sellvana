@@ -34,9 +34,14 @@ class FCom_Admin_View_FormElements extends FCom_Admin_View_Abstract
             return '';
         }
         if (!empty($p['settings_module']) && empty($p['name_prefix'])) {
-            return 'config[modules][' . $p['settings_module'] . '][' . $p['field'] . ']';
+            $name = 'config[modules][' . $p['settings_module'] . '][' . $p['field'] . ']';
+        } else {
+            $name = (!empty($p['name_prefix']) ? $p['name_prefix'] : 'model') . '[' . $p['field'] . ']';
         }
-        return (!empty($p['name_prefix']) ? $p['name_prefix'] : 'model') . '[' . $p['field'] . ']';
+        if (!empty($p['multiple'])) {
+            $name .= '[]';
+        }
+        return $name;
     }
 
     public function getInputValue($p)

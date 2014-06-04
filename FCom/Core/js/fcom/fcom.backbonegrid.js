@@ -493,7 +493,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                     modelVal = modelVal.toLowerCase();
                                     var first_index = modelVal.indexOf(filterVal);
                                     var last_index = modelVal.lastIndexOf(filterVal);
-                                    for (key in check) {
+                                    for (var key in check) {
                                         switch (key) {
                                             case 'contain':
                                                 flag = flag && ((first_index !== -1) === check.contain);
@@ -523,6 +523,43 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                         flag = flag || filter_val[i].toLowerCase() === model.get(filter_key).toLowerCase();
                                     }
 
+                                    return flag;
+                                }, this);
+                                break;
+                            case 'number-range':
+                                var op = BackboneGrid.current_filters[filter_key].op;
+                                temp.models = _.filter(temp.models, function (model) {
+                                    var flag = false;
+                                    var modelVal = model.get(filter_key);
+                                    switch (op) {
+                                        case 'between':
+                                            var t_val = filter_val.split('~');
+                                            if (Number(t_val[0]) < modelVal && modelVal < Number(t_val[1])) {
+                                                flag = true;
+                                            }
+                                            break;
+                                        case 'from':
+                                            if ( filter_val < Number(modelVal)) {
+                                                flag = true;
+                                            }
+                                            break;
+                                        case 'to':
+                                            if (modelVal < Number(filter_val)) {
+                                                flag = true;
+                                            }
+                                            break;
+                                        case 'equal':
+                                            if (modelVal == Number(filter_val) ) {
+                                                flag = true;
+                                            }
+                                            break;
+                                        case 'not_in':
+                                            var t_val = filter_val.split('~');
+                                            if (Number(t_val[0]) > modelVal || Number(t_val[1]) < modelVal) {
+                                                flag = true;
+                                            }
+                                            break;
+                                    }
                                     return flag;
                                 }, this);
                                 break;
@@ -1161,7 +1198,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return false;
                 },
                 render: function () {
-                    this.$el.html(this.template(this.model.toJSON()));
+                    var model = this.model.toJSON();
+                    model.val = html2text(model.val);
+                    this.$el.html(this.template(model));
                     if (this.model.get('val') !== '') {
                         this.$el.addClass('f-grid-filter-val');
                     }

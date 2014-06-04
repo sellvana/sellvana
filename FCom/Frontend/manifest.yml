@@ -9,6 +9,7 @@ modules:
                 FCom_Frontend:
                     theme: FCom_FrontendThemeBootSimple
                     nav_top: { root_cms: 1, root_category: 1, type: categories_root }
+                    default_locale: en_US
 
         areas:
             FCom_Frontend:

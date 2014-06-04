@@ -19,7 +19,7 @@ class FCom_Cron_Main extends BClass
         $args['cron_expr_arr'] = $exprArr;
         $args['callback'] = $callback;
         if (empty($args['module_name'])) {
-            $args['module_name'] = BModuleRegistry::i()->currentModuleName();
+            $args['module_name'] = $this->BModuleRegistry->currentModuleName();
         }
         if (empty($args['handle'])) {
             $args['handle'] = $args['module_name'];
@@ -32,16 +32,16 @@ class FCom_Cron_Main extends BClass
             }
         }
         if (!empty($this->_tasks[$args['handle']])) {
-            BDebug::warning('Task re-declared: ' . $args['handle']);
+            $this->BDebug->warning('Task re-declared: ' . $args['handle']);
         }
         $this->_tasks[$args['handle']] = $args;
         return $this;
     }
 
-    static public function onBootstrapAfter()
+    public function onBootstrapAfter()
     {
-        $modules = BModuleRegistry::i()->getAllModules();
-        $hlp = static::i();
+        $modules = $this->BModuleRegistry->getAllModules();
+        $hlp = $this;
         foreach ($modules as $modName => $mod) {
             if ($mod->run_status === BModule::LOADED && $mod->crontab) {
                 foreach ($mod->crontab as $task) {
@@ -60,15 +60,15 @@ class FCom_Cron_Main extends BClass
             throw new Exception('Invalid argument: ' . print_r($handles, 1));
         }
         // fetch configuration
-        $c = BConfig::i()->get('modules/FCom_Cron');
+        $c = $this->BConfig->get('modules/FCom_Cron');
         $leewayMins = !empty($c['leeway_mins']) ? $c['leeway_mins'] * 1 : 5;
         $timeoutSecs = !empty($c['timeout_mins']) ? $c['timeout_mins'] * 60 : 3600;
         $waitSecs = !empty($c['wait_secs']) ? $c['wait_secs'] * 1 : 30;
 #print_r(compact('leewayMins','timeoutSecs','waitSecs'));
         // get running or previously ran tasks
-        $dbTasks = FCom_Cron_Model_Task::i()->orm('t')->find_many_assoc('handle');
+        $dbTasks = $this->FCom_Cron_Model_Task->orm('t')->find_many_assoc('handle');
         // cleanup stale running tasks
-        $time = strtotime(BDb::now());
+        $time = strtotime($this->BDb->now());
         $timeout = $time - $timeoutSecs;
         foreach ($dbTasks as $h => $task) {
             $task->last_start_time = strtotime($task->last_start_at);
@@ -104,7 +104,7 @@ class FCom_Cron_Main extends BClass
                 }
                 // create a new db task if never ran yet
                 if (empty($dbTasks[$h])) {
-                    $dbTasks[$h] = FCom_Cron_Model_Task::i()->create([
+                    $dbTasks[$h] = $this->FCom_Cron_Model_Task->create([
                         'handle' => $h,
                         'cron_expr' => $task['cron_expr'],
                     ]);
@@ -128,14 +128,14 @@ class FCom_Cron_Main extends BClass
             // mark task as running
             $dbTask->set([
                 'status' => 'running',
-                'last_start_at' => BDb::now(),
+                'last_start_at' => $this->BDb->now(),
                 'last_finish_at' => null,
             ])->save();
             $task = $this->_tasks[$dbTask->handle];
 
             try {
                 // run task callback
-                call_user_func($task['callback'], $task);
+                $this->BUtil->call($task['callback'], $task);
                 // if everything ok, mark task as success
                 $dbTask->set(['status' => 'success']);
             } catch (Exception $e) {
@@ -143,7 +143,7 @@ class FCom_Cron_Main extends BClass
                 $dbTask->set(['status' => 'error', 'last_error_msg' => $e->getMessage()]);
             }
             // set finishing time and save task
-            $dbTask->set(['last_finish_at' => BDb::now()])->save();
+            $dbTask->set(['last_finish_at' => $this->BDb->now()])->save();
         }
         return $this;
     }

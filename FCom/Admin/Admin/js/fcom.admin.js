@@ -846,7 +846,7 @@ define(fcomAdminDeps, function ($) {
                         { name: 'links' }
                     ],*/
                     filebrowserBrowseUrl: FCom.base_href+'media',
-                    allowedContent: true,
+                    //allowedContent: true,
                     startupMode: 'wysiwyg'
                 });
 //
@@ -1229,7 +1229,7 @@ define(fcomAdminDeps, function ($) {
             CKEDITOR.config.startupMode = 'wysiwyg';//'source';
             CKEDITOR.config.filebrowserWindowHeight = 757;
             CKEDITOR.config.filebrowserWindowWidth = 912;
-            CKEDITOR.config.allowedContent = true;
+            //CKEDITOR.config.allowedContent = true;
 
             //CKEDITOR.config.filebrowserUploadUrl = '/';
         }

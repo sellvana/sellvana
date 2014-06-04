@@ -6,36 +6,36 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_ApiServer_Controller_Abstr
 
     public function action_index()
     {
-        $id = BRequest::i()->param('id');
-        $len = BRequest::i()->get('len');
+        $id = $this->BRequest->param('id');
+        $len = $this->BRequest->get('len');
         if (!$len) {
             $len = 10;
         }
-        $start = BRequest::i()->get('start');
+        $start = $this->BRequest->get('start');
         if (!$start) {
             $start = 0;
         }
 
         if ($id) {
-            $categories[] = FCom_Catalog_Model_Category::i()->load($id);
+            $categories[] = $this->FCom_Catalog_Model_Category->load($id);
         } else {
-            $categories = FCom_Catalog_Model_Category::i()->orm()->limit($len, $start)->find_many();
+            $categories = $this->FCom_Catalog_Model_Category->orm()->limit($len, $start)->find_many();
         }
         if (empty($categories)) {
             $this->ok();
         }
-        $result = FCom_Catalog_Model_Category::i()->prepareApiData($categories);
+        $result = $this->FCom_Catalog_Model_Category->prepareApiData($categories);
         $this->ok($result);
     }
 
     public function action_index__POST()
     {
-        $post = BUtil::fromJson(BRequest::i()->rawPost());
+        $post = $this->BUtil->fromJson($this->BRequest->rawPost());
 
         if (!empty($post['parent_id'])) {
-            $category = FCom_Catalog_Model_Category::i()->load($post['parent_id']);
+            $category = $this->FCom_Catalog_Model_Category->load($post['parent_id']);
         } else {
-            $category = FCom_Catalog_Model_Category::i()->orm()->where_null('parent_id')->find_one();
+            $category = $this->FCom_Catalog_Model_Category->orm()->where_null('parent_id')->find_one();
         }
         if (!$category) {
             $this->notFound("Parent category id #{$post['parent_id']} do not found");
@@ -50,8 +50,8 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_ApiServer_Controller_Abstr
 
     public function action_index__PUT()
     {
-        $id = BRequest::i()->param('id');
-        $post = BUtil::fromJson(BRequest::i()->rawPost());
+        $id = $this->BRequest->param('id');
+        $post = $this->BUtil->fromJson($this->BRequest->rawPost());
 
         if (empty($id)) {
             $this->notFound("Category id is required");
@@ -61,7 +61,7 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_ApiServer_Controller_Abstr
             $this->badRequest("Missing parameters. Use any of the following parameters: parent_id or name to move or rename category");
         }
 
-        $category = FCom_Catalog_Model_Category::i()->load($id);
+        $category = $this->FCom_Catalog_Model_Category->load($id);
         if (!$category) {
             $this->notFound("Category id #{$id} not found");
         }
@@ -82,13 +82,13 @@ class FCom_Catalog_ApiServer_V1_Category extends FCom_ApiServer_Controller_Abstr
 
     public function action_index__DELETE()
     {
-        $id = BRequest::i()->param('id');
+        $id = $this->BRequest->param('id');
 
         if (empty($id)) {
             $this->notFound("Category id is required");
         }
 
-        $category = FCom_Catalog_Model_Category::i()->load($id);
+        $category = $this->FCom_Catalog_Model_Category->load($id);
         if (!$category) {
             $this->notFound("Category id #{$id} not found");
         }

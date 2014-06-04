@@ -9,10 +9,10 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
             $config['data_mode'] = 'server';
         }
 
-        $config['personalize_url'] = BApp::href('my_account/personalize');
+        $config['personalize_url'] = $this->BApp->href('my_account/personalize');
 
         if (empty($config['id'])) {
-            $config['id'] = BUtil::simplifyString($this->param('view_name'));
+            $config['id'] = $this->BUtil->simplifyString($this->param('view_name'));
         }
         $config['container'] = '#' . $config['id'];
 
@@ -57,10 +57,10 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
         $this->_applyPersonalization($config);
 
         if (empty($config['state'])) {
-            $config['state'] = BUtil::arrayMask(BRequest::i()->get(), 'p,ps,s,sd');
+            $config['state'] = $this->BUtil->arrayMask($this->BRequest->get(), 'p,ps,s,sd');
         }
 
-        return BUtil::toJavaScript($config);
+        return $this->BUtil->toJavaScript($config);
     }
 
     public function outputData()
@@ -94,25 +94,25 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
 
     public function processORM($orm, $method = null, $stateKey = null, $forceRequest = [])
     {
-        $r = BRequest::i()->request();
+        $r = $this->BRequest->request();
         if (!empty($r['hash'])) {
-            $r = (array)BUtil::fromJson(base64_decode($r['hash']));
+            $r = (array)$this->BUtil->fromJson(base64_decode($r['hash']));
         } elseif (!empty($r['filters'])) {
-            $r['filters'] = BUtil::fromJson($r['filters']);
+            $r['filters'] = $this->BUtil->fromJson($r['filters']);
         }
 
         $gridId = $this->grid['config']['id'];
-        $pers = FCom_Admin_Model_User::i()->personalize();
+        $pers = $this->FCom_Admin_Model_User->personalize();
         $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : [];
         foreach ($persState as $k => $v) {
             if (empty($r[$k]) && !empty($v)) {
                 $r[$k] = $v;
             }
         }
-        FCom_Admin_Model_User::i()->personalize(['grid' => [$gridId => ['state' => $r]]]);
+        $this->FCom_Admin_Model_User->personalize(['grid' => [$gridId => ['state' => $r]]]);
 
         if ($stateKey) {
-            $sess =& BSession::i()->dataToUpdate();
+            $sess =& $this->BSession->dataToUpdate();
             $sess['grid_state'][$stateKey] = $r;
         }
         if ($forceRequest) {
@@ -126,17 +126,17 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
             $orm->where($where);
         }
         if (!is_null($method)) {
-            //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
-            BEvents::i()->fire($method . ':orm', ['orm' => $orm]);
+            //$this->BEvents->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
+            $this->BEvents->fire($method . ':orm', ['orm' => $orm]);
         }
 
         $data = $orm->paginate($r);
 
         $data['filters'] = !empty($r['filters']) ? $r['filters'] : null;
-        //$data['hash'] = base64_encode(BUtil::toJson(BUtil::arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
+        //$data['hash'] = base64_encode($this->BUtil->toJson($this->BUtil->arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);
         if (!is_null($method)) {
-            BEvents::i()->fire($method . ':data', ['data' => &$data]);
+            $this->BEvents->fire($method . ':data', ['data' => &$data]);
         }
 
         return $data;
@@ -186,13 +186,13 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
     public function export($orm, $class = null)
     {
         if ($class) {
-            BEvents::i()->fire($class . '::action_grid_data.orm', ['orm' => $orm]);
+            $this->BEvents->fire($class . '::action_grid_data.orm', ['orm' => $orm]);
         }
-        $r = BRequest::i()->request();
+        $r = $this->BRequest->request();
         if (!empty($r['filters'])) {
-            $r['filters'] = BUtil::fromJson($r['filters']);
+            $r['filters'] = $this->BUtil->fromJson($r['filters']);
         }
-        $state = (array)BSession::i()->get('grid_state');
+        $state = (array)$this->BSession->get('grid_state');
         if ($class && !empty($state[$class])) {
             $r = array_replace_recursive($state[$class], $r);
         }
@@ -204,7 +204,7 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
             $orm-> {'order_by_' . $r['sd']}($r['s']);
         }
 
-        $cfg = BUtil::arrayMerge($this->default_config, $this->config);
+        $cfg = $this->BUtil->arrayMerge($this->default_config, $this->config);
         $cfg = $this->_processConfig($cfg);
         $columns = $cfg['grid']['colModel'];
         $headers = [];
@@ -221,15 +221,15 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
                 $columns[$i] = $col;
             }
         }
-        $dir = BApp::i()->storageRandomDir() . '/export';
-        BUtil::ensureDir($dir);
+        $dir = $this->BApp->storageRandomDir() . '/export';
+        $this->BUtil->ensureDir($dir);
         $filename = $dir . '/' . $cfg['grid']['id'] . '.csv';
         $fp = fopen($filename, 'w');
         fputcsv($fp, $headers);
         $orm->iterate(function($row) use($columns, $fp) {
             if ($class) {
                 //TODO: any faster solution?
-                BEvents::i()->fire($class . '::action_grid_data.data_row', ['row' => $row, 'columns' => $columns]);
+                $this->BEvents->fire($class . '::action_grid_data.data_row', ['row' => $row, 'columns' => $columns]);
             }
             $data = [];
             foreach ($columns as $col) {
@@ -244,6 +244,6 @@ class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
             fputcsv($fp, $data);
         });
         fclose($fp);
-        BResponse::i()->sendFile($filename);
+        $this->BResponse->sendFile($filename);
     }
 }

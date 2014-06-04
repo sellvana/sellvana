@@ -100,14 +100,14 @@ class BImportTest extends PHPUnit_Framework_TestCase
      */
     public function testConfig()
     {
-        BConfig::i()->add(
+        $this->BConfig->add(
             [
                  'fs' => [
                      'root_dir' => realpath(__DIR__ . DIRECTORY_SEPARATOR . '..')
                  ],
             ]
         );
-        BSession::i()->open('test');
+        $this->BSession->open('test');
         // initially config has no value
         $this->assertFalse($this->object->config());
         // prepare base config
@@ -196,7 +196,7 @@ class BImportDouble extends BImport
     /**
      * @return string
      */
-    public static function getOrigClass()
+    public function getOrigClass()
     {
         return self::$_origClass;
     }

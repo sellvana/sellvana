@@ -18,17 +18,17 @@
 
 class BUI
 {
-    static public function bootstrap()
+    public function bootstrap()
     {
-        BLayout::i()->setViewRootDir('view');
+        $this->BLayout->setViewRootDir('view');
     }
 
     public function jqgridData($orm)
     {
-        $p = BRequest::i()->request();
+        $p = $this->BRequest->request();
         $data = $orm->paginate(['p' => $p['page'], 'ps' => $p['rows'], 's' => $p['sidx'], 'sd' => $p['sord']]);
         $res = $data['state'];
-        $res['rows'] = BDb::many_as_array($data['rows']);
+        $res['rows'] = $this->BDb->many_as_array($data['rows']);
         return $res;
     }
 }
@@ -38,8 +38,8 @@ class BViewGrid extends BView
     public function gridUrl($changeRequest = [])
     {
         $grid = $this->grid;
-        $grid['request'] = BUtil::arrayMerge($grid['request'], $changeRequest);
-        return BApp::href($grid['config']['gridUrl']) . '?' . http_build_query($grid['request']);
+        $grid['request'] = $this->BUtil->arrayMerge($grid['request'], $changeRequest);
+        return $this->BApp->href($grid['config']['gridUrl']) . '?' . http_build_query($grid['request']);
     }
 
     public function sortUrl($colId)
@@ -100,7 +100,7 @@ class BViewGrid extends BView
                 }
             }
         }
-        BEvents::i()->fire('BViewGrid::gridPrepareConfig:after', ['config' => &$c]);
+        $this->BEvents->fire('BViewGrid::gridPrepareConfig:after', ['config' => &$c]);
         return $c;
     }
 
@@ -110,16 +110,16 @@ class BViewGrid extends BView
         $grid = $this->grid;
         $config =& $grid['config'];
         if (!empty($grid['serverConfig'])) {
-            $config = BUtil::arrayMerge($config, $grid['serverConfig']);
+            $config = $this->BUtil->arrayMerge($config, $grid['serverConfig']);
         }
 
         $config = $this->gridPrepareConfig($config);
 
         // fetch request parameters
         if (empty($grid['request'])) {
-            $grid['request'] = BRequest::i()->get();
+            $grid['request'] = $this->BRequest->get();
         }
-        $p = BRequest::i()->sanitize($grid['request'], [
+        $p = $this->BRequest->sanitize($grid['request'], [
             'page' => ['int', !empty($config['page']) ? $config['page'] : 1],
             'pageSize' => ['int', !empty($config['pageSize']) ? $config['pageSize'] : $config['pageSizeOptions'][0]],
             'sort' => ['lower', !empty($config['sort']) ? $config['sort'] : null],
@@ -133,7 +133,7 @@ class BViewGrid extends BView
             }
         }
 
-        BDb::connect();
+        $this->BDb->connect();
         // create collection factory
         #$orm = AModel::factory($config['model']);
         $table = $config['table'];
@@ -149,7 +149,7 @@ class BViewGrid extends BView
             $orm->where_complex($config['where']);
         }
 
-        BEvents::i()->fire('BViewGrid::gridData:initORM: ' . $config['id'], ['orm' => $orm, 'grid' => $grid]);
+        $this->BEvents->fire('BViewGrid::gridData:initORM: ' . $config['id'], ['orm' => $orm, 'grid' => $grid]);
 
         $mapColumns = [];
 
@@ -214,7 +214,7 @@ class BViewGrid extends BView
                     }
                     $grid['result']['out'][$i][$k]['value'] = $value;
                     if (!empty($f['href'])) {
-                        $grid['result']['out'][$i][$k]['href'] = BUtil::injectVars($f['href'], $r);
+                        $grid['result']['out'][$i][$k]['href'] = $this->BUtil->injectVars($f['href'], $r);
                     }
                 }
                 if (!empty($config['map'])) {
@@ -228,7 +228,7 @@ class BViewGrid extends BView
                 }
             }
         }
-        BEvents::i()->fire('BGridView::gridData:after: ' . $config['id'], ['grid' => &$grid]);
+        $this->BEvents->fire('BGridView::gridData:after: ' . $config['id'], ['grid' => &$grid]);
 
         $this->grid = $grid;
         return $grid;
@@ -239,7 +239,7 @@ class BViewGrid extends BView
         if (is_string($format)) {
             switch ($format) {
                 case 'boolean': $value = !!$value; break;
-                case 'date': $value = $value ? BLocale::i()->datetimeDbToLocal($value) : ''; break;
+                case 'date': $value = $value ? $this->BLocale->datetimeDbToLocal($value) : ''; break;
                 case 'currency': $value = $value ? '$' . number_format($value, 2) : ''; break;
             }
         } elseif (is_callable($format)) {
@@ -389,15 +389,15 @@ class BViewGrid extends BView
                     break;
 
                 case 'text-range': case 'date-range':
-                    $descr .= ' is between <u>' . BResponse::q($s['from']) . '</u> and <u>' . BResponse::q($s['to']) . '</u>';
+                    $descr .= ' is between <u>' . $this->BResponse->q($s['from']) . '</u> and <u>' . $this->BResponse->q($s['to']) . '</u>';
                     break;
 
                 case 'quick':
-                    $descr .= ' by <u>' . BResponse::q($s) . '</u>';
+                    $descr .= ' by <u>' . $this->BResponse->q($s) . '</u>';
                     break;
 
                 default:
-                    $descr .= ' contains <u>' . BResponse::q($s) . '</u>';
+                    $descr .= ' contains <u>' . $this->BResponse->q($s) . '</u>';
                 }
                 $descr .= '; ';
             }
@@ -422,7 +422,7 @@ class BViewJqGrid extends BViewGrid
             $colModel[] = $col;
         }
         $result = $o + [
-            'url' => BApp::href($c['dataUrl']),
+            'url' => $this->BApp->href($c['dataUrl']),
             'datatype' => 'json',
             'colNames' => $colNames,
             'colModel' => $colModel,
@@ -437,7 +437,7 @@ class BViewJqGrid extends BViewGrid
 
     public function jqGridData(array $o = [])
     {
-        $r = BRequest::i()->get();
+        $r = $this->BRequest->get();
         $this->grid['request'] = [
             'page' => !empty($r['page']) ? $r['page'] : null,
             'pageSize' => !empty($r['rows']) ? $r['rows'] : null,

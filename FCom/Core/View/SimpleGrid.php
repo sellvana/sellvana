@@ -39,7 +39,7 @@ class FCom_Core_View_SimpleGrid extends FCom_Core_View_HtmlGrid
             if (is_callable($cb)) {
                 call_user_func($cb, ['grid' => $grid, 'rows' => &$trArr]);
             } else {
-                BDebug::warning('Invalid grid format_callback');
+                $this->BDebug->warning('Invalid grid format_callback');
             }
         }
 
@@ -47,9 +47,9 @@ class FCom_Core_View_SimpleGrid extends FCom_Core_View_HtmlGrid
         foreach ($trArr as $rowId => $tr) {
             $tdHtmlArr = [];
             foreach ($tr['cells'] as $colId => $cell) {
-                $tdHtmlArr[] = BUtil::tagHtml('td', $cell['attr'], $cell['html']);
+                $tdHtmlArr[] = $this->BUtil->tagHtml('td', $cell['attr'], $cell['html']);
             }
-            $trHtmlArr[] = BUtil::tagHtml('tr', $tr['attr'], join("\n", $tdHtmlArr));
+            $trHtmlArr[] = $this->BUtil->tagHtml('tr', $tr['attr'], join("\n", $tdHtmlArr));
         }
 
         return join("\n", $trHtmlArr);

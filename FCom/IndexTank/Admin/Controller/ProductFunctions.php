@@ -11,10 +11,10 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
     public function gridConfig()
     {
         try {
-            $status = FCom_IndexTank_Index_Product::i()->status();
-            BLayout::i()->view('indextank/product_functions')->set('status', $status);
+            $status = $this->FCom_IndexTank_Index_Product->status();
+            $this->BLayout->view('indextank/product_functions')->set('status', $status);
         } catch (Exception $e) {
-            BLayout::i()->view('indextank/product_functions')->set('status', false);
+            $this->BLayout->view('indextank/product_functions')->set('status', false);
         }
 
         $config = parent::gridConfig();
@@ -22,7 +22,7 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
             'number' => ['label' => 'Function Number', 'size' => 5],
             'definition' => ['label' => 'Function definition'],
             'name' => ['label' => 'Function code', 'editable' => true, 'formatter' => 'showlink', 'formatoptions' => [
-                'baseLinkUrl' => BApp::href('indextank/product_functions/form'), 'idName' => 'id',
+                'baseLinkUrl' => $this->BApp->href('indextank/product_functions/form'), 'idName' => 'id',
             ]],
             'use_custom_formula' => ['label' => 'Custom Function', 'options' => [1 => 'Yes', 0 => 'No']],
             'label' => ['label' => 'Sorting label'],
@@ -42,7 +42,7 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
         if ($model) {
             //setup number for new functions
             if ($model->number < 0 || !isset($model->number)) {
-                $functions = FCom_IndexTank_Model_ProductFunction::i()->getList();
+                $functions = $this->FCom_IndexTank_Model_ProductFunction->getList();
                 $freeNumber = -1;
                 for ($i = 0; $i < count($functions); $i++) {
                     if (!isset($functions[$i])) {
@@ -56,7 +56,7 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
             }
             $definition = '';
             $name = '';
-            $field = FCom_IndexTank_Model_ProductField::orm()
+            $field = $this->FCom_IndexTank_Model_ProductField->orm()
                     ->where("field_name", $model->field_name)
                     ->where("scoring", 1)
                     ->find_one();
@@ -75,7 +75,7 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
             }
             $model->save();
 
-            FCom_IndexTank_Index_Product::i()->updateFunction($model->number, $model->definition);
+            $this->FCom_IndexTank_Index_Product->updateFunction($model->number, $model->definition);
         }
 
         parent::formPostAfter($args);
@@ -84,7 +84,7 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);
-        $fields = $maxVarField = FCom_IndexTank_Model_ProductField::orm()->where('scoring', 1)->order_by_asc('var_number')->find_many();
+        $fields = $maxVarField = $this->FCom_IndexTank_Model_ProductField->orm()->where('scoring', 1)->order_by_asc('var_number')->find_many();
         $m = $args['model'];
         $m->scoring_fields = $fields;
         $args['view']->set([

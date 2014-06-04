@@ -8,11 +8,11 @@
     <span class="f-header-util-links-label"><img src="{{ UTIL.gravatar(customer.get('email'), {s:20}) }}" width="20" height="20"> {{ 'My Account'|_ }} <b class="caret"></b></span>
   </a>
   <ul class="dropdown-menu">
-    <li><a href="{{ APP.href('customer/myaccount') }}">{{ 'Account Info'|_ }}</a></li>
-    <li><a href="{{ APP.href('customer/order') }}">{{ 'Order Status'|_ }}</a></li>
-    <li><a href="{{ APP.href('wishlist') }}">{{ 'Wishlist'|_ }}</a></li>
+    <li><a href="{{ APP.href('customer/myaccount') }}" rel="nofollow">{{ 'Account Info'|_ }}</a></li>
+    <li><a href="{{ APP.href('customer/order') }}" rel="nofollow">{{ 'Order Status'|_ }}</a></li>
+    <li><a href="{{ APP.href('wishlist') }}" rel="nofollow">{{ 'Wishlist'|_ }}</a></li>
     <li class="divider"></li>
-    <li><a href="{{ APP.href('logout') ~ '?X-CSRF-TOKEN=' ~ SESSION.csrfToken() }}">{{ 'Log Out'|_ }}</a></li>
+    <li><a href="{{ APP.href('logout') }}" rel="nofollow">{{ 'Log Out'|_ }}</a></li>
   </ul>
 {% else %}
   <a href="{{ APP.href('login') }}">

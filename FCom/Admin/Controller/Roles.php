@@ -65,7 +65,7 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
         if (!empty($data['user_ids_remove'])) {
             $user_ids = explode(",", $data['user_ids_remove']);
             foreach ($user_ids as $user_id) {
-                $user = FCom_Admin_Model_User::i()->load($user_id);
+                $user = $this->FCom_Admin_Model_User->load($user_id);
                 if ($user) {
                     $user->role_id = null;
                     $user->save();
@@ -76,7 +76,7 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
         if (!empty($data['user_ids_add'])) {
             $user_ids = explode(",", $data['user_ids_add']);
             foreach ($user_ids as $user_id) {
-                $user = FCom_Admin_Model_User::i()->load($user_id);
+                $user = $this->FCom_Admin_Model_User->load($user_id);
                 if ($user) {
                     $user->role_id = $model->id;
                     $user->save();

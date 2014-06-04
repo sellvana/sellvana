@@ -7,3 +7,8 @@ base:
     - view: settings
         do:
             - [ addTab, FCom_CatalogIndex, { label: Catalog Index, group: catalog, async: true } ]
+
+/catalogindex/fields:
+     - { include: base }
+     - { hook: main, views: fields }
+     - { view: admin/nav, do: [[ setNav, catalog/index-fields ]] }

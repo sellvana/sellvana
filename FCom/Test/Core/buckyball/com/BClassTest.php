@@ -54,7 +54,7 @@ class AClass extends BClass
 {
     protected static $_origClass = __CLASS__;
 
-    public static function method()
+    public function method()
     {
         return 1;
     }

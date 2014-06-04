@@ -20,7 +20,7 @@ class FCom_Catalog_Model_ProductLink extends FCom_Core_Model_Abstract
 
     public function productsByType($id, $type)
     {
-        $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')
+        $orm = $this->FCom_Catalog_Model_Product->orm()->table_alias('p')
             ->select('*');
         $orm->join('FCom_Catalog_Model_ProductLink', ['pl.linked_product_id', '=', 'p.id'], 'pl')
                 ->where('link_type', $type)

@@ -4,20 +4,20 @@ class FCom_ProductCompare_Frontend_Controller extends FCom_Frontend_Controller_A
 {
     public function action_index()
     {
-        $layout = BLayout::i();
-        $cookie = BRequest::i()->cookie('sellvana_compare');
-        $xhr = BRequest::i()->xhr();
-        if (!empty($cookie)) $arr = BUtil::fromJson($cookie);
+        $layout = $this->BLayout;
+        $cookie = $this->BRequest->cookie('sellvana_compare');
+        $xhr = $this->BRequest->xhr();
+        if (!empty($cookie)) $arr = $this->BUtil->fromJson($cookie);
         if (!empty($arr)) {
-            FCom_Catalog_Model_Product::i()->cachePreloadFrom($arr);
-            $products = FCom_Catalog_Model_Product::i()->cacheFetch();
+            $this->FCom_Catalog_Model_Product->cachePreloadFrom($arr);
+            $products = $this->FCom_Catalog_Model_Product->cacheFetch();
         }
         if (empty($products)) {
             if ($xhr) {
                 return;
             } else {
                 $this->message('No products to compare');
-                BResponse::i()->redirect(FCom_Core_Main::i()->lastNav());
+                $this->BResponse->redirect($this->FCom_Core_Main->lastNav());
                 return;
             }
         }
@@ -34,6 +34,10 @@ class FCom_ProductCompare_Frontend_Controller extends FCom_Frontend_Controller_A
 
     public function action_add()
     {
-
+        if ($this->BRequest->csrf('referrer', 'GET')) {
+            $this->message('CSRF detected');
+            $this->BResponse->redirect('');
+            return;
+        }
     }
 }

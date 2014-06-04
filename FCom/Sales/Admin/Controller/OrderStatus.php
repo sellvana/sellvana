@@ -19,9 +19,9 @@ class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abst
             ['type' => 'row_select'],
             ['name' => 'id', 'index' => 'o.id', 'label' => 'ID', 'width' => 70],
             ['name' => 'code', 'index' => 'code', 'label' => 'Code', 'addable' => true, 'editable' => true,
-                'validation' => ['required' => true, 'unique' => BApp::href('orderstatus/unique')]],
+                'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatus/unique')]],
             ['name' => 'name', 'index' => 'name', 'label' => 'Label', 'addable' => true, 'editable' => true,
-                'validation' => ['required' => true, /*'unique' => BApp::href('orderstatus/unique')*/]],
+                'validation' => ['required' => true, /*'unique' => $this->BApp->href('orderstatus/unique')*/]],
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]]
         ];
         $config['actions'] = [
@@ -39,7 +39,7 @@ class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abst
         parent::gridViewBefore($args);
         $this->view('admin/grid')->set(['actions' => [
             'new' => '<button type="button" id="add_new_order_status" class="btn grid-new btn-primary _modal">'
-                . BLocale::_('Add New Order Status') . '</button>']]);
+                . $this->BLocale->_('Add New Order Status') . '</button>']]);
     }
 
     /**
@@ -47,9 +47,9 @@ class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abst
      */
     public function action_unique__POST()
     {
-        $post = BRequest::i()->post();
+        $post = $this->BRequest->post();
         $data = each($post);
-        $rows = BDb::many_as_array(FCom_Sales_Model_Order_Status::i()->orm()->where($data['key'], $data['value'])->find_many());
-        BResponse::i()->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
+        $rows = $this->BDb->many_as_array($this->FCom_Sales_Model_Order_Status->orm()->where($data['key'], $data['value'])->find_many());
+        $this->BResponse->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
     }
 }

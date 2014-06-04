@@ -7,15 +7,15 @@ class FCom_Sales_Model_Order_Address extends FCom_Core_Model_Abstract
 
     public function findByOrder($orderId, $atype = 'shipping')
     {
-        return static::i()->orm()->where("order_id", $orderId)->where('atype', $atype)->find_one();
+        return $this->orm()->where("order_id", $orderId)->where('atype', $atype)->find_one();
     }
 
-    public static function as_html($obj = null)
+    public function as_html($obj = null)
     {
         if (is_null($obj)) {
             $obj = $this;
         }
-        $countries = FCom_Geo_Model_Country::i()->options();
+        $countries = $this->FCom_Geo_Model_Country->options();
         return '<div class="adr">'
             . '<div class="street-address">' . $obj->street1 . '</div>'
             . ($obj->street2 ? '<div class="extended-address">' . $obj->street2 . '</div>' : '')
@@ -31,8 +31,8 @@ class FCom_Sales_Model_Order_Address extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if (!$this->create_at) $this->create_at = BDb::now();
-        $this->update_at = BDb::now();
+        if (!$this->create_at) $this->create_at = $this->BDb->now();
+        $this->update_at = $this->BDb->now();
         return true;
     }
 
@@ -55,7 +55,7 @@ class FCom_Sales_Model_Order_Address extends FCom_Core_Model_Abstract
 
         $newAddress = $this->findByOrder($orderId, $address['atype']);
         if (!$newAddress) {
-            $newAddress = static::create($address);
+            $newAddress = $this->create($address);
         } else {
             $newAddress->set($address);
         }

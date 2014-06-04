@@ -13,9 +13,9 @@ class FCom_CustomField_Model_SetField extends FCom_Core_Model_Abstract
     ];
     public function addSetField($data)
     {
-        $link = static::load(BUtil::arrayMask($data, 'set_id,field_id'));
+        $link = $this->load($this->BUtil->arrayMask($data, 'set_id,field_id'));
         if (!$link) {
-            $link = static::create($data)->save();
+            $link = $this->create($data)->save();
         } else {
             $link->set($data)->save();
         }

@@ -30,7 +30,7 @@ class BImport extends BClass
 
     public function getFieldData()
     {
-        BEvents::i()->fire(__METHOD__, ['fields' => &$this->fields]);
+        $this->BEvents->fire(__METHOD__, ['fields' => &$this->fields]);
         return $this->fields;
     }
 
@@ -45,7 +45,7 @@ class BImport extends BClass
 
     public function getImportDir()
     {
-        return FCom_Core_Main::i()->dir('storage/import/' . $this->dir);
+        return $this->FCom_Core_Main->dir('storage/import/' . $this->dir);
     }
 
     public function updateFieldsDueToInfo($info)
@@ -111,8 +111,8 @@ class BImport extends BClass
      */
     public function config($config = null, $update = false)
     {
-        $dir = FCom_Core_Main::i()->dir('storage/run/' . $this->dir);
-        $file = BSession::i()->sessionId() . '.json';
+        $dir = $this->FCom_Core_Main->dir('storage/run/' . $this->dir);
+        $file = $this->BSession->sessionId() . '.json';
         $filename = $dir . '/' . $file;
         if ($config) { // create config lock
             if ($update) {
@@ -122,7 +122,7 @@ class BImport extends BClass
             if (empty($config['status'])) {
                 $config['status'] = 'idle';
             }
-            file_put_contents($filename, BUtil::toJson($config));
+            file_put_contents($filename, $this->BUtil->toJson($config));
             return true;
         } elseif ($config === false) { // remove config lock
             unlink($filename);
@@ -131,24 +131,24 @@ class BImport extends BClass
             return false;
         } else { // config exists
             $contents = file_get_contents($filename);
-            $config = BUtil::fromJson($contents);
+            $config = $this->BUtil->fromJson($contents);
             return $config;
         }
     }
 
     public function run()
     {
-        #BSession::i()->close();
+        #$this->BSession->close();
         session_write_close();
         ignore_user_abort(true);
         set_time_limit(0);
         ob_implicit_flush();
         //gc_enable();
-        BDb::connect();
+        $this->BDb->connect();
 
         //disable debug
-        $oldDebugMode = BDebug::i()->mode();
-        BDebug::i()->mode('DISABLED');
+        $oldDebugMode = $this->BDebug->mode();
+        $this->BDebug->mode('DISABLED');
 
         $timer = microtime(true);
 
@@ -285,7 +285,7 @@ class BImport extends BClass
         $status['rows_processed'] = $status['rows_total'];
         $this->config($status, true);
 
-        BDebug::i()->mode($oldDebugMode);
+        $this->BDebug->mode($oldDebugMode);
         return true;
     }
 }

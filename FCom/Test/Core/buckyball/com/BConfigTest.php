@@ -4,17 +4,17 @@ class BConfig_Test extends PHPUnit_Framework_TestCase
 {
     public function SetUp()
     {
-        BConfig::i()->unsetConfig();
+        $this->BConfig->unsetConfig();
     }
 
     public function tearDown()
     {
-        BConfig::i()->unsetConfig();
+        $this->BConfig->unsetConfig();
     }
 
     public function testAdd()
     {
-        $config = BConfig::i();
+        $config = $this->BConfig;
         $set = ['key' => 'value'];
         $config->add($set);
         $this->assertEquals('value', $config->get('key'));
@@ -22,13 +22,13 @@ class BConfig_Test extends PHPUnit_Framework_TestCase
 
     public function testNotSet()
     {
-        $config = BConfig::i();
+        $config = $this->BConfig;
         $this->assertTrue(null == $config->get('key'));
     }
 
     public function testDoubleReset()
     {
-        $config = BConfig::i();
+        $config = $this->BConfig;
         //set first time value
         $set = ['key' => 'value'];
         $config->add($set);

@@ -57,11 +57,19 @@ Using custom id/name:
                 style="{{ p.style }}"
                 {{ p.required ? 'data-rule-required="true"' }}
                 {{ p.attr | raw }}
+                {{ p.multiple ? 'multiple'}}
             >
                 {{ UTIL.optionsHtml(p.options, view.getInputValue(p)) | raw }}
             </select>
         </div>
     </div>
+    {% if p.select2 is defined %}
+        <script>
+            require(['jquery', 'select2'], function($) {
+                $('#{{ view.getInputId(p) }}').select2({{ p.select2 is iterable ? UTIL.toJson(p.select2) : '{}' }});
+            })
+        </script>
+    {% endif %}
 {% endmacro %}
 
 {% macro boolean(p1, p2) %}

@@ -2,39 +2,39 @@
 
 class FCom_Admin_Admin extends BClass
 {
-    public static function beforeBootstrap()
+    public function beforeBootstrap()
     {
-        $defaultTheme = BConfig::i()->get('modules/FCom_Admin/theme');
-        BLayout::i()
+        $defaultTheme = $this->BConfig->get('modules/FCom_Admin/theme');
+        $this->BLayout
             ->setDefaultTheme($defaultTheme ? $defaultTheme : 'FCom_Admin_DefaultTheme')
             ->setDefaultViewClass('FCom_Admin_View_Default')
         ;
     }
 
-    public static function bootstrap()
+    public function bootstrap()
     {
-        FCom_Admin_Main::bootstrap();
+        $this->FCom_Admin_Main->bootstrap();
 
-        if (BRequest::i()->https()) {
-            BResponse::i()->httpSTS();
+        if ($this->BRequest->https()) {
+            $this->BResponse->httpSTS();
         }
 
-        BResponse::i()->nocache();
-        //BConfig::i()->set('web/hide_script_name', 0);
+        $this->BResponse->nocache();
+        //$this->BConfig->set('web/hide_script_name', 0);
     }
 
-    public static function layout()
+    public function layout()
     {
-        if (($head = BLayout::i()->view('head'))) {
+        if (($head = $this->BLayout->view('head'))) {
             $head->js_raw('admin_init', '
 FCom.Admin = {};
-FCom.Admin.baseUrl = "' . rtrim(BConfig::i()->get('web/base_src'), '/') . '/' . '";
-FCom.Admin.codemirrorBaseUrl = "' . BApp::src('@FCom_Admin/Admin/js/codemirror') . '";
-FCom.Admin.upload_href = "' . BApp::href('upload') . '";
-FCom.Admin.personalize_href = "' . BApp::href('my_account/personalize') . '";
+FCom.Admin.baseUrl = "' . rtrim($this->BConfig->get('web/base_src'), '/') . '/' . '";
+FCom.Admin.codemirrorBaseUrl = "' . $this->BApp->src('@FCom_Admin/Admin/js/codemirror') . '";
+FCom.Admin.upload_href = "' . $this->BApp->href('upload') . '";
+FCom.Admin.personalize_href = "' . $this->BApp->href('my_account/personalize') . '";
             ');
 
-            $config = BConfig::i()->get('modules/FCom_Admin');
+            $config = $this->BConfig->get('modules/FCom_Admin');
             if (!empty($config['add_js_files'])) {
                 foreach (explode("\n", $config['add_js_files']) as $js) {
                     $head->js(trim($js));
@@ -52,9 +52,9 @@ FCom.Admin.personalize_href = "' . BApp::href('my_account/personalize') . '";
                 $head->css_raw('add_css_code', $config['add_css_style']);
             }
 
-            $pers = FCom_Admin_Model_User::i()->personalize();
+            $pers = $this->FCom_Admin_Model_User->personalize();
             if (!empty($pers['nav']['collapsed'])) {
-                BLayout::i()->view('root')->addBodyClass('main-nav-closed');
+                $this->BLayout->view('root')->addBodyClass('main-nav-closed');
             }
         }
     }
@@ -68,7 +68,7 @@ FCom.Admin.personalize_href = "' . BApp::href('my_account/personalize') . '";
             }
         }
 
-        $ip = BRequest::i()->ip();
+        $ip = $this->BRequest->ip();
         foreach (['Frontend', 'Admin'] as $area) {
             if (!empty($args['post']['config']['mode_by_ip']['FCom_' . $area])) {
                 $modes =& $args['post']['config']['mode_by_ip']['FCom_' . $area];

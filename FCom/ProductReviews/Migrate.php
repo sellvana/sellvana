@@ -4,8 +4,8 @@ class FCom_ProductReviews_Migrate extends BClass
 {
     public function upgrade__0_1_5__0_2_0()
     {
-        $tReviewFlag = FCom_ProductReviews_Model_ReviewFlag::table();
-        BDb::run("CREATE TABLE IF NOT EXISTS {$tReviewFlag}  (
+        $tReviewFlag = $this->FCom_ProductReviews_Model_ReviewFlag->table();
+        $this->BDb->run("CREATE TABLE IF NOT EXISTS {$tReviewFlag}  (
             `review_id` INT UNSIGNED NOT NULL ,
             `customer_id` INT UNSIGNED NOT NULL,
             `helpful` tinyint(1) NOT NULL default 0,
@@ -17,11 +17,11 @@ class FCom_ProductReviews_Migrate extends BClass
 
     public function install__0_2_5()
     {
-        $tReview = FCom_ProductReviews_Model_Review::table();
-        $tReviewFlag = FCom_ProductReviews_Model_ReviewFlag::table();
-        $tProduct = FCom_Catalog_Model_Product::table();
+        $tReview = $this->FCom_ProductReviews_Model_Review->table();
+        $tReviewFlag = $this->FCom_ProductReviews_Model_ReviewFlag->table();
+        $tProduct = $this->FCom_Catalog_Model_Product->table();
 
-        BDb::run("
+        $this->BDb->run("
             CREATE TABLE IF NOT EXISTS {$tReview} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
             `product_id` int(10) unsigned NOT NULL,
@@ -42,14 +42,14 @@ class FCom_ProductReviews_Migrate extends BClass
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
 
-        BDb::ddlTableDef($tProduct, [
+        $this->BDb->ddlTableDef($tProduct, [
             'COLUMNS' => [
                 'avg_rating' => 'decimal(5,2) null',
                 'num_reviews' => 'int null',
             ],
         ]);
 
-        BDb::run("CREATE TABLE IF NOT EXISTS {$tReviewFlag}  (
+        $this->BDb->run("CREATE TABLE IF NOT EXISTS {$tReviewFlag}  (
             `id` int unsigned not null auto_increment primary key,
             `review_id` INT UNSIGNED NOT NULL ,
             `customer_id` INT UNSIGNED NOT NULL,
@@ -59,7 +59,7 @@ class FCom_ProductReviews_Migrate extends BClass
             ) ENGINE = InnoDB;"
         );
 
-        $hlp = FCom_CatalogIndex_Model_Field::i();
+        $hlp = $this->FCom_CatalogIndex_Model_Field;
         if (!$hlp->load('avg_rating', 'field_name')) {
             $hlp->create([
                 'field_name' => 'avg_rating',
@@ -77,8 +77,8 @@ class FCom_ProductReviews_Migrate extends BClass
 
     public function upgrade__0_2_0__0_2_1()
     {
-        $table = FCom_ProductReviews_Model_Review::table();
-        BDb::ddlTableDef($table, [
+        $table = $this->FCom_ProductReviews_Model_Review->table();
+        $this->BDb->ddlTableDef($table, [
             'COLUMNS' => [
                   'created_dt'  => 'RENAME created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
             ],
@@ -87,8 +87,8 @@ class FCom_ProductReviews_Migrate extends BClass
 
     public function upgrade__0_2_1__0_2_2()
     {
-        $table = FCom_ProductReviews_Model_Review::table();
-        BDb::ddlTableDef($table, [
+        $table = $this->FCom_ProductReviews_Model_Review->table();
+        $this->BDb->ddlTableDef($table, [
             'COLUMNS' => [
                   'created_at'  => 'RENAME create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
             ],
@@ -97,8 +97,8 @@ class FCom_ProductReviews_Migrate extends BClass
 
     public function upgrade__0_2_2__0_2_3()
     {
-        $table = FCom_ProductReviews_Model_Review::table();
-        BDb::ddlTableDef($table, [
+        $table = $this->FCom_ProductReviews_Model_Review->table();
+        $this->BDb->ddlTableDef($table, [
             'COLUMNS' => [
                 'rating1' => 'tinyint(1) unsigned not null after rating',
                 'rating2' => 'tinyint(1) unsigned not null after rating1',
@@ -109,8 +109,8 @@ class FCom_ProductReviews_Migrate extends BClass
 
     public function upgrade__0_2_3__0_2_4()
     {
-        $table = FCom_ProductReviews_Model_Review::table();
-        BDb::ddlTableDef($table, [
+        $table = $this->FCom_ProductReviews_Model_Review->table();
+        $this->BDb->ddlTableDef($table, [
             'KEYS' => [
                 'IDX_product_approved' => '(product_id, approved)',
             ],
@@ -119,7 +119,7 @@ class FCom_ProductReviews_Migrate extends BClass
 
     public function upgrade__0_2_4__0_2_5()
     {
-        $hlp = FCom_CatalogIndex_Model_Field::i();
+        $hlp = $this->FCom_CatalogIndex_Model_Field;
         if (!$hlp->load('avg_rating', 'field_name')) {
             $hlp->create([
                 'field_name' => 'avg_rating',

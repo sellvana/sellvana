@@ -19,7 +19,7 @@ class FCom_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controller_Ab
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'index' => 'e.id'],
             ['type' => 'input', 'name' => 'email', 'label' => 'Email', 'index' => 'e.email', 'addable' => true, 'editable' => true,
-                  'validation' => ['required' => true, 'unique' => BApp::href('subscriptions/unique')]],
+                  'validation' => ['required' => true, 'unique' => $this->BApp->href('subscriptions/unique')]],
             ['type' => 'input', 'name' => 'unsub_all', 'label' => 'Un-subscribe all', 'index' => 'e.unsub_all',
                   'addable' => true, 'editable' => true, 'mass-editable' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
             ['type' => 'input', 'name' => 'sub_newsletter', 'label' => 'Subscribe newsletter', 'index' => 'e.sub_newsletter', 'addable' => true,
@@ -49,14 +49,14 @@ class FCom_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controller_Ab
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
-        $this->view('admin/grid')->set(['actions' => ['new' => '<button type="button" id="add_new_email_subscription" class="btn grid-new btn-primary _modal">' . BLocale::_('New Email Subscription') . '</button>']]);
+        $this->view('admin/grid')->set(['actions' => ['new' => '<button type="button" id="add_new_email_subscription" class="btn grid-new btn-primary _modal">' . $this->BLocale->_('New Email Subscription') . '</button>']]);
     }
 
     public function action_unique__POST()
     {
-        $post = BRequest::i()->post();
+        $post = $this->BRequest->post();
         $data = each($post);
-        $rows = BDb::many_as_array(FCom_Email_Model_Pref::i()->orm()->where($data['key'], $data['value'])->find_many());
-        BResponse::i()->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
+        $rows = $this->BDb->many_as_array($this->FCom_Email_Model_Pref->orm()->where($data['key'], $data['value'])->find_many());
+        $this->BResponse->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
     }
 }

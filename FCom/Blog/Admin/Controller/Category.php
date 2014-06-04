@@ -20,7 +20,7 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
             ['name' => 'name', 'label' => 'Name'],
             ['name' => 'description', 'label' => 'Description'],
             ['name' => 'url_key', 'label' => 'URL Key'],
-            ['name' => 'post', 'label' => 'Posts', 'href' => BApp::href('blog/post/?category=')],
+            ['name' => 'post', 'label' => 'Posts', 'href' => $this->BApp->href('blog/post/?category=')],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
                 ['name' => 'delete'],
@@ -64,9 +64,9 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
-        $cp = FCom_Blog_Model_PostCategory::i();
+        $cp = $this->FCom_Blog_Model_PostCategory;
         $model = $args['model'];
-        $data = BRequest::i()->post();
+        $data = $this->BRequest->post();
         if (!empty($data['grid']['post_category']['del'])) {
             $cp->delete_many([
                     'category_id' => $model->id,
@@ -97,12 +97,12 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
 
     public function action_category_tree()
     {
-        $r = BRequest::i()->get();
-        $categoryPosts = FCom_Blog_Model_PostCategory::i()->orm('p')
+        $r = $this->BRequest->get();
+        $categoryPosts = $this->FCom_Blog_Model_PostCategory->orm('p')
                     ->select('p.category_id')
                     ->join('FCom_Blog_Model_Post', ['p.post_id', '=', 'u.id'], 'u')
                     ->where('p.post_id', $r['post-id'])->find_many();
-        $categories = FCom_Blog_Model_Category::i()->orm('c')->select('c.*')->find_many();
+        $categories = $this->FCom_Blog_Model_Category->orm('c')->select('c.*')->find_many();
         $result = [];
         $arr_category_id = [];
         foreach ($categoryPosts as $arr) {
@@ -122,6 +122,6 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
             ];
             array_push($result, $tem);
         }
-        BResponse::i()->json($result);
+        $this->BResponse->json($result);
     }
 }

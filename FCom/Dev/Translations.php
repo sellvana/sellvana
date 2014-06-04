@@ -11,10 +11,10 @@ class FCom_Dev_Translations extends BClass
      * @return boolean - TRUE on success
      * @example BLocale::collectTranslations('/www/unirgy/fulleron/FCom/Disqus', '/www/unirgy/fulleron/FCom/Disqus/tr.csv');
      */
-    static public function collectTranslations($rootDir, $targetFile)
+    public function collectTranslations($rootDir, $targetFile)
     {
         //find files recursively
-        $files = static::getFilesFromDir($rootDir);
+        $files = $this->getFilesFromDir($rootDir);
         if (empty($files)) {
             return true;
         }
@@ -23,7 +23,7 @@ class FCom_Dev_Translations extends BClass
         $keys = [];
         foreach ($files as $file) {
             $source = file_get_contents($file);
-            $source = static::getTwigSource($file, $source);
+            $source = $this->getTwigSource($file, $source);
             $tokens = token_get_all($source);
             $func = 0;
             $class = 0;
@@ -58,8 +58,8 @@ class FCom_Dev_Translations extends BClass
         //import translation from $targetFile
 
         static::$_tr = '';
-        static::addTranslationsFile($targetFile);
-        $translations = static::getTranslations();
+        $this->addTranslationsFile($targetFile);
+        $translations = $this->getTranslations();
 
         //find undefined translations
         foreach ($keys as $key => $v) {
@@ -79,16 +79,16 @@ class FCom_Dev_Translations extends BClass
         $ext = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
         switch ($ext) {
             case 'php':
-                static::saveToPHP($targetFile, $newTranslations);
+                $this->saveToPHP($targetFile, $newTranslations);
                 break;
             case 'csv':
-                static::saveToCSV($targetFile, $newTranslations);
+                $this->saveToCSV($targetFile, $newTranslations);
                 break;
             case 'json':
-                static::saveToJSON($targetFile, $newTranslations);
+                $this->saveToJSON($targetFile, $newTranslations);
                 break;
             case 'po':
-                static::saveToJSON($targetFile, $newTranslations);
+                $this->saveToJSON($targetFile, $newTranslations);
                 break;
             default:
                 throw new Exception("Undefined format of translation targetFile. Possible formats are: json/csv/php");
@@ -96,7 +96,7 @@ class FCom_Dev_Translations extends BClass
 
     }
 
-    static protected function saveToPHP($targetFile, $array)
+    protected function saveToPHP($targetFile, $array)
     {
         $code = '';
         foreach ($array as $k => $v) {
@@ -109,13 +109,13 @@ class FCom_Dev_Translations extends BClass
         file_put_contents($targetFile, $code);
     }
 
-    static protected function saveToJSON($targetFile, $array)
+    protected function saveToJSON($targetFile, $array)
     {
         $json = json_encode($array);
         file_put_contents($targetFile, $json);
     }
 
-    static protected function saveToCSV($targetFile, $array)
+    protected function saveToCSV($targetFile, $array)
     {
         $handle = fopen($targetFile, "w");
         foreach ($array as $k => $v) {
@@ -125,7 +125,7 @@ class FCom_Dev_Translations extends BClass
         fclose($handle);
     }
 
-    static protected function saveToPO($targetFile, $array)
+    protected function saveToPO($targetFile, $array)
     {
         $handle = fopen($targetFile, "w");
         foreach ($array as $k => $v) {
@@ -140,31 +140,31 @@ class FCom_Dev_Translations extends BClass
      * @param string $source file content
      * @return Twig_Node_Module
      */
-    protected static function getTwigSource($file, $source)
+    protected function getTwigSource($file, $source)
     {
-        static::initTwig();
+        $this->initTwig();
         $info = pathinfo($file, PATHINFO_EXTENSION);
         if ($info == 'twig') {
-            $stringTwig = static::getTwigEnv();
+            $stringTwig = $this->getTwigEnv();
             try {
                 $source = $stringTwig->compile($stringTwig->parse($stringTwig->tokenize($source)));
             } catch (Twig_Error_Syntax $e) {
-                BDebug::log(sprintf("\n\n%s: Exception %s in file %s", date("Y-m-d H:i:s"), get_class($e), $file),
+                $this->BDebug->log(sprintf("\n\n%s: Exception %s in file %s", date("Y-m-d H:i:s"), get_class($e), $file),
                             "translations_error.log");
-                BDebug::log($e->getMessage(), "translations_error.log");
+                $this->BDebug->log($e->getMessage(), "translations_error.log");
                 return "";
             }
         }
         return $source;
     }
     protected static $twig;
-    protected static function initTwig()
+    protected function initTwig()
     {
         if (!static::$twig) {
-            BEvents::i()->on("FCom_LibTwig_Main::init", __CLASS__ . "::setTwigEnv");
-            $bDir = BModuleRegistry::i()->module("FCom_Core")->baseDir();
+            $this->BEvents->on("FCom_LibTwig_Main::init", __CLASS__ . "::setTwigEnv");
+            $bDir = $this->BModuleRegistry->module("FCom_Core")->baseDir();
             echo $bDir;
-            FCom_LibTwig_Main::init($bDir);
+            $this->FCom_LibTwig_Main->init($bDir);
             echo "after Initing twig event\n";
             static::$twig = 1;
         }
@@ -174,7 +174,7 @@ class FCom_Dev_Translations extends BClass
      * @var Twig_Environment
      */
     protected static $twigEnv;
-    public static function setTwigEnv($args)
+    public function setTwigEnv($args)
     {
         static::$twigEnv = $args['string_adapter'];
     }
@@ -182,7 +182,7 @@ class FCom_Dev_Translations extends BClass
     /**
      * @return null|Twig_Environment
      */
-    private static function getTwigEnv()
+    private function getTwigEnv()
     {
         return static::$twigEnv;
     }

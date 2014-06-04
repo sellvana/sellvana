@@ -103,17 +103,17 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
         "", //
     ];
 
-    public static function paymentActions()
+    public function paymentActions()
     {
         return [
-            "AUTH_ONLY"         => BLocale::i()->_("Authorize Only"),
-            "AUTH_CAPTURE" => BLocale::i()->_("Authorize and Capture")
+            "AUTH_ONLY"         => $this->BLocale->_("Authorize Only"),
+            "AUTH_CAPTURE" => $this->BLocale->_("Authorize and Capture")
         ];
     }
 /*
 
  */
-    public static function cardTypes()
+    public function cardTypes()
     {
         return [
             "AE" => "American Express",
@@ -122,7 +122,7 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
             "DI" => "Discover",
             "DC" => "Diners Club",
             "JC" => "JCB",
-            "OT" => BLocale::i()->_("Other")
+            "OT" => $this->BLocale->_("Other")
         ];
     }
 
@@ -173,11 +173,11 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
         54 => "Requested Amount",
         55 => "Balance On Card"
     ];
-    
-    public static function countries()
+
+    public function countries()
     {
         $countries = [];
-        foreach (FCom_Geo_Model_Country::i()->options() as $iso => $name) {
+        foreach ($this->FCom_Geo_Model_Country->options() as $iso => $name) {
             if (empty($iso)) {
                 continue;
             }
@@ -187,7 +187,7 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
         return $countries;
     }
 
-    public static function currencies()
+    public function currencies()
     {
         // todo - update to be dynamically built
         return [
@@ -196,7 +196,7 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
         ];
     }
 
-    public static function orderStatuses()
+    public function orderStatuses()
     {
         // todo - update to be dynamically built
         return [
@@ -209,7 +209,7 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
      * @param BConfig $config
      * @return string
      */
-    public static function gatewayUrl($config)
+    public function gatewayUrl($config)
     {
         $url = static::$gatewayUrl;
         if ($config->get('modules/FCom_AuthorizeNet/cgi_url')) {
@@ -222,8 +222,8 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
      * @param BConfig $config
      * @return string
      */
-    public static function gatewayDpmUrl($config)
+    public function gatewayDpmUrl($config)
     {
-        return static::gatewayUrl($config);
+        return $this->gatewayUrl($config);
     }
 }

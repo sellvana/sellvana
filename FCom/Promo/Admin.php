@@ -2,10 +2,10 @@
 
 class FCom_Promo_Admin extends BClass
 {
-    static public function bootstrap()
+    public function bootstrap()
     {
-        FCom_Admin_Controller_MediaLibrary::i()->allowFolder('media/promo');
-        FCom_Admin_Model_Role::i()->createPermission([
+        $this->FCom_Admin_Controller_MediaLibrary->allowFolder('media/promo');
+        $this->FCom_Admin_Model_Role->createPermission([
             'promo' => 'Promotions',
 
         ]);

@@ -58,7 +58,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     *
     * @return FCom_IndexTank_Index_Product
     */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
@@ -70,7 +70,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     {
         //scoring functions definition for IndexDen
         //todo: move them into configuration
-        $functionList  =  FCom_IndexTank_Model_ProductFunction::i()->getList();
+        $functionList  =  $this->FCom_IndexTank_Model_ProductFunction->getList();
         foreach ($functionList as $func) {
             $this->_functions[$func->name] = $func;
         }
@@ -85,13 +85,13 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     {
         if (empty($this->_model)) {
             //init index name
-            if (false != ($indexName = BConfig::i()->get('modules/FCom_IndexTank/index_name'))) {
+            if (false != ($indexName = $this->BConfig->get('modules/FCom_IndexTank/index_name'))) {
                 $this->_indexName = $indexName;
             }
             //init config
             $this->initFunctions();
             //init model
-            $this->_model = FCom_IndexTank_RemoteApi::i()->service()->get_index($this->_indexName);
+            $this->_model = $this->FCom_IndexTank_RemoteApi->service()->get_index($this->_indexName);
         }
         return $this->_model;
     }
@@ -185,7 +185,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     {
         if (!empty($query)) {
 
-            $productFields = FCom_IndexTank_Model_ProductField::i()->getSearchList();
+            $productFields = $this->FCom_IndexTank_Model_ProductField->getSearchList();
             $queryString = '';
 
             foreach ($productFields as $pfield) {
@@ -226,19 +226,19 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $this->_result = $result;
         //print_r( $this->_result);exit;
         if (!$result || $result->matches <= 0) {
-            return FCom_Catalog_Model_Product::i()->orm('p')->where_in('p.id', [-1]);
+            return $this->FCom_Catalog_Model_Product->orm('p')->where_in('p.id', [-1]);
         }
 
         $products = [];
-        //$product_model = FCom_Catalog_Model_Product::i();
+        //$product_model = $this->FCom_Catalog_Model_Product;
         foreach ($result->results as $res) {
             $products[] = $res->docid;
         }
 
         if (!$products) {
-            return FCom_Catalog_Model_Product::i()->orm('p')->where_in('p.id', [-1]);
+            return $this->FCom_Catalog_Model_Product->orm('p')->where_in('p.id', [-1]);
         }
-        $productsORM = FCom_Catalog_Model_Product::i()->orm('p')->where_in("p.id", $products)
+        $productsORM = $this->FCom_Catalog_Model_Product->orm('p')->where_in("p.id", $products)
                 ->order_by_expr("FIELD(p.id, " . implode(",", $products) . ")");
         return $productsORM;
     }
@@ -303,19 +303,19 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
             //submit every N products to IndexDen - this protect from network overloading
             if ($limit && 0 == ++$counter % $limit) {
-                BEvents::i()->fire(__METHOD__, ['docs' => &$documents]);
+                $this->BEvents->fire(__METHOD__, ['docs' => &$documents]);
                 $this->model()->add_documents($documents);
                 $documents = [];
             }
         }
 
         if ($documents) {
-            BEvents::i()->fire(__METHOD__, ['docs' => &$documents]);
+            $this->BEvents->fire(__METHOD__, ['docs' => &$documents]);
             $this->model()->add_documents($documents);
         }
     }
 
-    static public function onProductIndexAdd($args)
+    public function onProductIndexAdd($args)
     {
         // prepare products assoc array
         $products = [];
@@ -326,7 +326,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $pIds = array_keys($products);
 
         //add categories
-        $categories = FCom_Catalog_Model_CategoryProduct::orm('cp')->where_in('cp.product_id', $pIds)
+        $categories = $this->FCom_Catalog_Model_CategoryProduct->orm('cp')->where_in('cp.product_id', $pIds)
                 ->join('FCom_Catalog_Model_Category', ['c.id', '=', 'cp.category_id'], 'c')
                 ->select('c.id')->select('cp.product_id')->select('cp.category_id')->select('c.node_name')->find_many();
         if (empty($categories)) {
@@ -415,7 +415,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function updateFunctions()
     {
-        $functions = FCom_IndexTank_Model_ProductFunction::i()->getList();
+        $functions = $this->FCom_IndexTank_Model_ProductFunction->getList();
         if (!$functions) {
             return;
         }
@@ -454,10 +454,10 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $facetsData = [];
         if ($facets) {
 
-            $facetsFields = FCom_IndexTank_Model_ProductField::i()->getFacetsList();
+            $facetsFields = $this->FCom_IndexTank_Model_ProductField->getFacetsList();
 
             //todo: think how to sort custom fields
-            //$facetCustomFieldsSorted = FCom_IndexTank_Model_ProductField::i()->getCustomFieldsSorted();
+            //$facetCustomFieldsSorted = $this->FCom_IndexTank_Model_ProductField->getCustomFieldsSorted();
 
             foreach ($facetsFields as $fname => $field) {
                 if (isset($facets[$fname])) {
@@ -506,7 +506,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             if (empty($catIds)) {
                 return [];
             }
-            $categories = FCom_Catalog_Model_Category::i()->orm()->where_in('id', $catIds)->find_many_assoc();
+            $categories = $this->FCom_Catalog_Model_Category->orm()->where_in('id', $catIds)->find_many_assoc();
             // fetch all ascendants that do not have products
             /*
             $ascIds = array();
@@ -518,7 +518,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                 }
             }
             if ($ascIds) {
-                $ascendants = FCom_Catalog_Model_Category::i()->orm()->where_in('id', array_keys($ascIds))->find_many_assoc();
+                $ascendants = $this->FCom_Catalog_Model_Category->orm()->where_in('id', array_keys($ascIds))->find_many_assoc();
                 foreach ($ascendants as $id=>$cat) {
                     $categories[$id] = $cat;
                 }
@@ -618,13 +618,13 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
                     if (strpos($field->source_value, '::')) {
                         $callback = $field->source_value;
                     } elseif (strpos($field->source_value, '.')) {
-                        $callback = BUtil::extCallback($field->source_value);
+                        $callback = $this->BUtil->extCallback($field->source_value);
                     } else {
                         $callback = [$this, $field->source_value];
                     }
                     //check callback
                     if (!BClassRegistry::isCallable($callback)) {
-                        //BDebug::warning('Invalid IndexTank custom field callback: '.$field->source_value);
+                        //$this->BDebug->warning('Invalid IndexTank custom field callback: '.$field->source_value);
                         continue;
                     }
                     $valuesList = call_user_func($callback, $product, $type, $field->field_name);
@@ -648,7 +648,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     protected function _prepareFields($product)
     {
-        $fieldsList = FCom_IndexTank_Model_ProductField::i()->getSearchList();
+        $fieldsList = $this->FCom_IndexTank_Model_ProductField->getSearchList();
         $searches = $this->_processFields($fieldsList, $product, 'search');
         //add two special fields
         $searches['timestamp'] = strtotime($product->update_at);
@@ -664,7 +664,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      */
     protected function _prepareCategories($product)
     {
-        $fieldsList = FCom_IndexTank_Model_ProductField::i()->getFacetsList();
+        $fieldsList = $this->FCom_IndexTank_Model_ProductField->getFacetsList();
         $categories = $this->_processFields($fieldsList, $product, 'categories');
         return $categories;
 
@@ -672,7 +672,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     protected function _prepareVariables($product)
     {
-        $fieldsList = FCom_IndexTank_Model_ProductField::i()->getVariablesList();
+        $fieldsList = $this->FCom_IndexTank_Model_ProductField->getVariablesList();
         $variablesList = $this->_processFields($fieldsList, $product, 'variables');
 
         $variables = [];
@@ -690,15 +690,15 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     public function install()
     {
         //init index name
-        if (false != ($indexName = BConfig::i()->get('modules/FCom_IndexTank/index_name'))) {
+        if (false != ($indexName = $this->BConfig->get('modules/FCom_IndexTank/index_name'))) {
             $this->_indexName = $indexName;
         }
 
         try {
             //create an index
-            $this->_model = FCom_IndexTank_RemoteApi::i()->service()->create_index($this->_indexName);
+            $this->_model = $this->FCom_IndexTank_RemoteApi->service()->create_index($this->_indexName);
         } catch(Exception $e) {
-            $this->_model = FCom_IndexTank_RemoteApi::i()->service()->get_index($this->_indexName);
+            $this->_model = $this->FCom_IndexTank_RemoteApi->service()->get_index($this->_indexName);
         }
 
         $this->updateFunctions();
@@ -706,7 +706,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function dropIndex()
     {
-        if (false != ($indexName = BConfig::i()->get('modules/FCom_IndexTank/index_name'))) {
+        if (false != ($indexName = $this->BConfig->get('modules/FCom_IndexTank/index_name'))) {
             $this->_indexName = $indexName;
         }
         $this->model()->delete_index();
@@ -764,7 +764,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     public function getStringToOrdinal($string)
     {
-        $string = BLocale::transliterate($string, '');
+        $string = $this->BLocale->transliterate($string, '');
 
         if (empty($string)) {
             return '';

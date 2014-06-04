@@ -1,6 +1,6 @@
 modules:
     FCom_Catalog:
-        version: 0.2.25
+        version: 0.2.26
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
         categories: [ Catalog, Products ]
@@ -9,6 +9,9 @@ modules:
         auto_use: [ bootstrap, views, layout ]
         observe:
             - [ "FCom_Core_ImportExport::import:afterModel:FCom_Catalog_Model_Category", "FCom_Catalog_Model_Category.onImportAfterModel" ]
+
+        default_config:
+            modules/FCom_Catalog/allowed_locales: [ en_US ]
 
         areas:
             FCom_Admin:
