@@ -231,4 +231,9 @@ class FCom_Core_Migrate extends BClass
             ]
         );
     }
+
+    public function upgrade__0_1_7__0_1_8()
+    {
+        $this->BCache->deleteAll();
+    }
 }

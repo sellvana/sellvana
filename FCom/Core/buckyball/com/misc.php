@@ -2362,7 +2362,7 @@ class BDebug extends BClass
         }
     }
 
-    public function level($type, $level = null)
+    static public function level($type, $level = null)
     {
         if (!isset(static::$_level[$type])) {
             //TODO: check back later

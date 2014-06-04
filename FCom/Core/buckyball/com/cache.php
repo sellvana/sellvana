@@ -142,6 +142,15 @@ class BCache extends BClass
     {
         return $this->getBackend()->gc();
     }
+
+    public function deleteAll()
+    {
+        $backend = $this->getBackend();
+        if (method_exists($backend, 'deleteAll')) {
+            return $backend->deleteAll();
+        }
+        return false;
+    }
 }
 
 interface BCache_Backend_Interface
@@ -299,6 +308,12 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
     public function gc()
     {
         $this->deleteMany(false);
+        return true;
+    }
+
+    public function deleteAll()
+    {
+        $this->BUtil->rmdirRecursive_YesIHaveCheckedThreeTimes($this->_config['dir']);
         return true;
     }
 }
