@@ -140,9 +140,16 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function action_grid_data()
     {
-        if (!$this->BRequest->xhr()) {
-            $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
-            return;
+        if ($this->BRequest->get('export')) {
+            if ($this->BRequest->csrf('referrer', 'GET')) {
+                $this->BResponse->status('403', 'Invalid referrer', 'Invalid referrer');
+                return;
+            }
+        } else {
+            if (!$this->BRequest->xhr()) {
+                $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+                return;
+            }
         }
 
         $view = $this->gridView();
