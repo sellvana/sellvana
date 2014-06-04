@@ -4,7 +4,7 @@
 <div class='tab-pane' id='f-import-upload'>
     <div class="panel-body">
         <h2>{{ "Upload and import files" }}</h2>
-        <div class="help-block">Max file size allowed: <span id="max_import_file_size">{{ m.import_config.max_import_file_size }}</span></div>
+        <div class="help-block">{{"Max file size allowed:"|_}} <span id="max_import_file_size">{{ m.import_config.max_import_file_size }}</span></div>
         <div class='box-content'>
             <div class='row fileupload-buttonbar'>
                 <div class='col-sm-12'>
@@ -35,6 +35,9 @@
             <table class='table table-striped' role='presentation'>
                 <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
             </table>
+        </div>
+        <div class="box-content">
+            <div id="ie-msg-log"></div>
         </div>
         <script>
             var uploadTr = '{{ 'Upload'|_ }}';
@@ -134,6 +137,47 @@
                             });
                         }
                     });
+        });
+    </script>
+    <script type="text/javascript">
+        require(['jquery', 'fcom.pushclient'], function ($, PushClient) {
+            var $logCanvas = $('#ie-msg-log');
+            var found;
+
+            function channel_import(data) {
+                console.log(data);
+                /*
+                * signals:
+                * info
+                * problem
+                * start
+                * finished:[
+                *   'data'   => [
+                    'new_models'
+                    'updated_models'
+                    'not_changed'
+                ]]
+                * */
+                switch (data.signal) {
+                    case 'info':
+                        $logCanvas.html('<div class="alert-info">' + data.msg + '</div>');
+                        break;
+                    case 'problem':
+                        $logCanvas.append('<div class="alert-error">' + data.msg + '</div>');
+                        break;
+                    case 'finished':
+                        $logCanvas.append('<div class="alert-info">' + data.msg + '</div>');
+                            if(data.data) {
+                                for(var i in data.data) {
+                                    $logCanvas.append('<div class="alert-info">    ' + data.data[i] + '</div>');
+                                }
+                            }
+                        break;
+                }
+            }
+
+
+            PushClient.listen({channel: 'import', callback: channel_import});
         });
     </script>
 </div>
