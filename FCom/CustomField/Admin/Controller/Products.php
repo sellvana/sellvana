@@ -94,7 +94,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         $columns[] = ['type' => 'input', 'name' => 'variant_qty', 'label' => 'QTY', 'width' => 150, 'editable' => 'inline',
                         'addable' => true, 'validation' => ['number' => true], 'default' => ''];
         $columns[] = ['name' => 'image', 'label' => 'IMAGES', 'width' => 250, 'display' => 'eval',
-            'addable' => true, 'sortable' => false, 'print' => '"<input type=\"hidden\" class=\"store-variant-image-id\" value=\'"+ rc.row["file_id"] +"\'/><ol class=\"dd-list columns dd-list-axis-x hide list-variant-image\"></ol><select class=\"form-control variant-image\"><option value></option></select>"' ];
+            'addable' => true, 'sortable' => false, 'print' => '"<input type=\"hidden\" class=\"store-variant-image-id\" value=\'"+ rc.row["variant_file_id"] +"\'/><ol class=\"dd-list columns dd-list-axis-x hide list-variant-image\"></ol><select class=\"form-control variant-image\"><option value></option></select>"' ];
         $columns[] = ['name' => 'variant_file_id',  'hidden' => true];
         $columns[] = ['name' => 'list_image',  'hidden' => true, 'default' => $image];
         $columns[] = ['name' => 'field_values',  'hidden' => true, 'default' => ''];
@@ -103,16 +103,18 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
         $data = [];
 
-        $variants = $this->BDb->many_as_array($this->FCom_CustomField_Model_ProductVariant->orm()->where('product_id', $model->id)->find_many());
+        $variants = $this->FCom_CustomField_Model_ProductVariant->orm()->where('product_id', $model->id)->find_many();
         if ($variants !== null) {
             foreach ($variants as $v) {
-                $v['fields']['field_values'] = BUtil::objectToArray(json_decode($v['field_values']));
-                $v['fields']['variant_sku'] = $v['variant_sku'];
-                $v['fields']['variant_qty'] = $v['variant_qty'];
-                $v['fields']['variant_price'] = $v['variant_price'];
-                $v['fields']['variant_file_id'] = '';
-                $v['fields']['id'] = $v['id'];
-                $data[] = $v['fields'];
+                $file_id =$v->getData('variant_file_id');
+                $vField = [];
+                $vField['field_values'] = BUtil::objectToArray(json_decode($v->field_values));
+                $vField['variant_sku'] = $v->variant_sku;
+                $vField['variant_qty'] = $v->variant_qty;
+                $vField['variant_price'] = $v->variant_price;
+                $vField['variant_file_id'] = isset($file_id)? $file_id: '';
+                $vField['id'] = $v->id;
+                $data[] = $vField;
             }
         }
 
