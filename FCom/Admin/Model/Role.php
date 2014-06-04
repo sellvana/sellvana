@@ -18,9 +18,9 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
         'admin' => ['title' => 'Admin Tasks', 'level' => 1],
     ];
 
-    public static function options()
+    public function options()
     {
-        $roles = static::i()->orm()
+        $roles = $this->orm()
             ->select('id')->select('role_name')
             ->find_many();
         $options = [];
@@ -42,13 +42,13 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
             $params = ['title' => $params];
         }
         if (empty($params['module_name'])) {
-            $params['module_name'] = BModuleRegistry::i()->currentModuleName();
+            $params['module_name'] = $this->BModuleRegistry->currentModuleName();
         }
         static::$_allPermissions[$path] = $params;
         return $this;
     }
 
-    public static function getAllPermissions()
+    public function getAllPermissions()
     {
         return static::$_allPermissions;
     }
@@ -114,8 +114,8 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if (empty($this->create_at)) $this->create_at = BDb::now();
-        $this->update_at = BDb::now();
+        if (empty($this->create_at)) $this->create_at = $this->BDb->now();
+        $this->update_at = $this->BDb->now();
         $this->permissions_data = $this->permissions ? trim(join("\n", array_keys($this->permissions))) : '';
         return true;
     }

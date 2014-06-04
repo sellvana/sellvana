@@ -20,7 +20,7 @@ abstract class FCom_Sales_Model_Cart_Total_Abstract extends BCLass implements FC
         if (!$this->_configPath) {
             $this->_configPath = 'modules/FCom_Sales/cart_totals/' . $this->_code;
         }
-        $this->_config = BConfig::i()->get($this->_configPath);
+        $this->_config = $this->BConfig->get($this->_configPath);
         if (!empty($this->_config['sort_order'])) {
             $this->_sortOrder = $this->_config['sort_order'];
         }
@@ -44,12 +44,12 @@ abstract class FCom_Sales_Model_Cart_Total_Abstract extends BCLass implements FC
 
     public function getRowClass()
     {
-        return $this->_rowClass ? $this->_rowClass : 'f-' . BUtil::simplifyString($this->_label);
+        return $this->_rowClass ? $this->_rowClass : 'f-' . $this->BUtil->simplifyString($this->_label);
     }
 
     public function getLabel()
     {
-        return BLocale::_($this->_label);
+        return $this->BLocale->_($this->_label);
     }
 
     public function getLabelFormatted()
@@ -64,7 +64,7 @@ abstract class FCom_Sales_Model_Cart_Total_Abstract extends BCLass implements FC
 
     public function getValueFormatted()
     {
-        return BLocale::i()->currency($this->getValue(), $this->_currency);
+        return $this->BLocale->currency($this->getValue(), $this->_currency);
     }
 
     public function getCurrency()

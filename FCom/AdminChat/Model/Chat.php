@@ -14,23 +14,23 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
 
     public function getChannel()
     {
-        return FCom_PushServer_Model_Channel::i()->getChannel('adminchat:' . $this->id, true);
+        return $this->FCom_PushServer_Model_Channel->getChannel('adminchat:' . $this->id, true);
     }
 
-    static public function findByChannel($channel)
+    public function findByChannel($channel)
     {
         if (!preg_match('/^adminchat:(.*)$/', $channel, $m)) {
             return false;
         }
-        return FCom_AdminChat_Model_Chat::i()->load($m[1]);
+        return $this->FCom_AdminChat_Model_Chat->load($m[1]);
     }
 
-    static public function openWithUser($remoteUser)
+    public function openWithUser($remoteUser)
     {
         // get local user
-        $user = FCom_Admin_Model_User::i()->sessionUser();
+        $user = $this->FCom_Admin_Model_User->sessionUser();
         // check if there's existing chat with only 2 users
-        $chats = static::orm('c')->where('num_participants', 2)
+        $chats = $this->orm('c')->where('num_participants', 2)
             ->join('FCom_AdminChat_Model_Participant', ['p1.chat_id', '=', 'c.id'], 'p1')
             ->join('FCom_AdminChat_Model_Participant', ['p2.chat_id', '=', 'c.id'], 'p2')
             ->where('p1.user_id', $user->id())
@@ -43,7 +43,7 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
                 return $chat;
             }
         }
-        $chat = static::create([
+        $chat = $this->create([
             'owner_user_id' => $user->id(),
             'title' => $user->get('username') . ', ' . $remoteUser->get('username'),
         ])->save();
@@ -58,7 +58,7 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
 
     public function getHistoryArray()
     {
-        $history = FCom_AdminChat_Model_History::i()->orm('h')
+        $history = $this->FCom_AdminChat_Model_History->orm('h')
             ->join('FCom_Admin_Model_User', ['u.id', '=', 'h.user_id'], 'u')
             ->select('u.username')->select('h.create_at')->select('h.text')
             ->where('h.chat_id', $this->id())
@@ -77,7 +77,7 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
 
     public function addHistory($user, $text)
     {
-        $msg = FCom_AdminChat_Model_History::i()->create([
+        $msg = $this->FCom_AdminChat_Model_History->create([
             'chat_id' => $this->id(),
             'user_id' => $user->id(),
             'text' => $text,
@@ -87,14 +87,14 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
 
     public function addParticipant($user, $extraData = [])
     {
-        $clients = FCom_PushServer_Model_Client::i()->findByAdminUser($user);
+        $clients = $this->FCom_PushServer_Model_Client->findByAdminUser($user);
         $channel = $this->getChannel();
 
         foreach ($clients as $client) {
             $client->subscribe($channel);
         }
 
-        $hlp = FCom_AdminChat_Model_Participant::i();
+        $hlp = $this->FCom_AdminChat_Model_Participant;
         $data = ['chat_id' => $this->id(), 'user_id' => $user->id()];
         $participant = $hlp->loadWhere($data);
         if (!$participant) {
@@ -110,13 +110,13 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
 
     public function removeParticipant($user)
     {
-        $clients = FCom_PushServer_Model_Client::i()->findByAdminUser($user);
+        $clients = $this->FCom_PushServer_Model_Client->findByAdminUser($user);
         $channel = $this->getChannel();
         foreach ($clients as $client) {
             $client->unsubscribe($channel);
         }
 
-        FCom_AdminChat_Model_Participant::i()->delete_many([
+        $this->FCom_AdminChat_Model_Participant->delete_many([
             'chat_id' => $this->id(),
             'user_id' => $user->id(),
         ]);
@@ -135,8 +135,8 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         if (!parent::onBeforeSave()) return false;
 
         $this->set('status', 'active', 'IFNULL');
-        $this->set('create_at', BDb::now(), 'IFNULL');
-        $this->set('update_at', BDb::now());
+        $this->set('create_at', $this->BDb->now(), 'IFNULL');
+        $this->set('update_at', $this->BDb->now());
 
         return true;
     }

@@ -17,12 +17,12 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         array('url_path', '@required'),*/
     ];
 
-    public static function load($id, $field = null, $cache = false)
+    public function load($id, $field = null, $cache = false)
     {
         $cat = parent::load($id, $field, $cache);
         if ($cat) return $cat;
         if ($id === 1) {
-            return static::i()->create([
+            return $this->create([
                     'id' => 1,
                     'id_path' => 1,
                     'sort_order' => 1,
@@ -45,7 +45,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 //        $child = $this->load($childName, 'full_name');
 //        if (!$child) {
         //$class = get_class($this);
-        $child = static::i()->create([
+        $child = $this->create([
                 'parent_id' => $this->id(),
                 'node_name' => $name[0],
                 'full_name' => $childName,
@@ -309,7 +309,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
                 if (strpos($c->get('id_path'), $path) === 0) $desc[$c->id()] = $c;
             }
         }
-#echo "<pre>"; print_r(BDb::many_as_array($desc)); exit;
+#echo "<pre>"; print_r($this->BDb->many_as_array($desc)); exit;
         $numDescendants = $this->get('num_descendants');
         if (null === $numDescendants || sizeof($desc) != $numDescendants) {
             $orm = $this->orm('t')->where_like('t.id_path', $path . '%');
@@ -360,7 +360,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     public function generateUrlKey()
     {
-        $this->set('url_key', BLocale::transliterate($this->get('node_name')));
+        $this->set('url_key', $this->BLocale->transliterate($this->get('node_name')));
         return $this;
     }
 
@@ -450,7 +450,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         unset($data['url_path']);
         unset($data['full_name']);
         if ($move2node) {
-            $newParent = static::load($newParentNodeId);
+            $newParent = $this->load($newParentNodeId);
             if ($newParent) {
                 $data['parent_id'] = (int)$newParentNodeId;
             } else {
@@ -460,14 +460,14 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         //get number suffix
 //        $numberSuffix = 1;
 //        while($numberSuffix <= 20) {
-//            $result = static::i()->orm()->where(array('node_name' => $this->get('node_name').'-'.$numberSuffix, 'parent_id' => $data['parent_id']))->find_one();
+//            $result = $this->orm()->where(array('node_name' => $this->get('node_name').'-'.$numberSuffix, 'parent_id' => $data['parent_id']))->find_one();
 //            if (!$result) {
 //                break;
 //            }
 //            $numberSuffix++;
 //        }
         $tmpName = $this->get('node_name') . '-';
-        $result = static::i()->orm()->select('node_name')->where([
+        $result = $this->orm()->select('node_name')->where([
             ['node_name REGEXP ?', preg_quote($tmpName) . '[0-9]$'],
             ['parent_id=?', $data['parent_id']]
         ])->order_by_desc('id')->find_many();
@@ -484,7 +484,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         }
         $data['id_path'] = '';
         $data['node_name'] = $tmpName . $numberSuffix;
-        $cloneNode = static::i()->create($data)->save(true); /** @var FCom_Core_Model_TreeAbstract $cloneNode */
+        $cloneNode = $this->create($data)->save(true); /** @var FCom_Core_Model_TreeAbstract $cloneNode */
         $cloneNode->set(
             [
                 'id_path' => $cloneNode->parent()->get('id_path') . '/' . $cloneNode->id(),
@@ -512,7 +512,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     public function onAfterClone(&$cloneNode)
     {
-        BEvents::i()->fire($this->_origClass() . '::onAfterClone', ['node' => $this, 'cloneNode' => $cloneNode]);
+        $this->BEvents->fire($this->_origClass() . '::onAfterClone', ['node' => $this, 'cloneNode' => $cloneNode]);
         return $this;
     }
 

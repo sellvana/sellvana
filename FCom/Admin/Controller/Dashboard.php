@@ -4,17 +4,17 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
 {
     public function action_index()
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         if (!$r->xhr()) {
-            BResponse::i()->redirect('');
+            $this->BResponse->redirect('');
             return;
         }
-        $widgets = FCom_Admin_View_Dashboard::i()->getWidgets();
+        $widgets = $this->FCom_Admin_View_Dashboard->getWidgets();
         $widgetKeys = explode(',', $r->get('widgets'));
         $wrapped = $r->get('wrapped');
         $add = $r->get('add');
         $result = [];
-        $persData = FCom_Admin_Model_User::i()->personalize();
+        $persData = $this->FCom_Admin_Model_User->personalize();
         if ($add) {
             $pos = 100;
             if (!empty($persData['dashboard']['widgets'])) {
@@ -49,15 +49,15 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
         }
         $result['filter'] = (isset($persData['dashboard']['filter'])) ? $persData['dashboard']['filter']: [];
         if ($add && $persData) {
-            FCom_Admin_Model_User::i()->personalize($persData);
+            $this->FCom_Admin_Model_User->personalize($persData);
         }
-        BResponse::i()->json($result);
+        $this->BResponse->json($result);
     }
 
     public function action_data__POST()
     {
-        $p = BRequest::i()->post();
-        $persData = FCom_Admin_Model_User::i()->personalize();
+        $p = $this->BRequest->post();
+        $persData = $this->FCom_Admin_Model_User->personalize();
         $persData['dashboard']['filter'] = $p;
         if ($p['range'] == 'range') {
             switch ($p['date']) {
@@ -81,9 +81,9 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
                     break;
             }
         }
-        $widgets = FCom_Admin_View_Dashboard::i()->getWidgets();
+        $widgets = $this->FCom_Admin_View_Dashboard->getWidgets();
         $result = [];
-        FCom_Admin_Model_User::i()->personalize($persData);
+        $this->FCom_Admin_Model_User->personalize($persData);
         foreach ($widgets as $key => $widget) {
             if (isset($widget['async']) && $widget['async'] == true
                 && isset($widget['filter']) && $widget['filter'] == true
@@ -95,6 +95,6 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
                 }
             }
         }
-        BResponse::i()->json($result);
+        $this->BResponse->json($result);
     }
 }

@@ -2,7 +2,7 @@
 <!--{ pos: 10 }-->
 
 {% set m = THIS.get('model') %}
-{% set validator = THIS.get('validator', m) %}
+{% set validator = THIS.get('validator') %}
 {% set hlp = APP.instance('FCom_Admin_Model_User') %}
 {% import THIS.view('admin/form-elements').twigName() as forms %}
 {% set fieldData = { validator:validator, model:m } %}
@@ -13,6 +13,9 @@
     {{ forms.boolean(fieldData, {field:'is_superadmin', label:'Super Admin'|_}) }}
     {{ forms.select(fieldData, {field:'role_id', label:'Role'|_, options:APP.instance('FCom_Admin_Model_Role').options() }) }}
     {{ forms.select(fieldData, {field:'status', label:'Status'|_, options:hlp.fieldOptions('status') }) }}
+
+    {{ forms.select(fieldData, {field:'tz', label:'Timezone'|_, options:LOCALE.tzOptions(true), select2: {} }) }}
+    {{ forms.select(fieldData, {field:'locale', label:'Locale'|_, options:LOCALE.getAvailableLocaleCodes(), select2: {} }) }}
 
     {{ forms.input(fieldData, {field:'email', required:1, label:'Email'|_, type:'email'}) }}
     {{ forms.input(fieldData, {field:'password', label:'Password'|_, type:'password', value:''}) }}

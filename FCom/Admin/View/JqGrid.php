@@ -49,7 +49,7 @@ class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
         if (empty($cfg['grid']['id'])) {
             return $cfg;
         }
-        $state = BSession::i()->get('grid_state');
+        $state = $this->BSession->get('grid_state');
         if (!empty($state[$cfg['grid']['id']])) {
             $r = $state[$cfg['grid']['id']];
 
@@ -59,7 +59,7 @@ class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
             if (!empty($r['sd'])) $cfg['grid']['sortorder'] = $r['sd'];
             if (!empty($r['filters'])) {
                 $f = $r['filters'];
-                $cfg['grid']['postData'] = ['_search' => true, 'filters' => BUtil::toJson($f)];
+                $cfg['grid']['postData'] = ['_search' => true, 'filters' => $this->BUtil->toJson($f)];
                 if (!empty($f['groupOp']) && $f['groupOp'] === 'AND' && !empty($f['rules'])) {
                     $cfg['grid']['search'] = true;
                     foreach ($f['rules'] as $rule) {
@@ -91,7 +91,7 @@ class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
         if (!empty($cfg['custom']['personalize'])) {
             $gridId = is_string($cfg['custom']['personalize'])
                 ? $cfg['custom']['personalize'] : $cfg['grid']['id'];
-            $pers = FCom_Admin_Model_User::i()->personalize();
+            $pers = $this->FCom_Admin_Model_User->personalize();
             if (!empty($pers['grid'][$gridId]['columns'])) {
                 $persCols = $pers['grid'][$gridId]['columns'];
                 foreach ($persCols as $k => $c) {
@@ -99,10 +99,10 @@ class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
                         unset($persCols[$k]);
                     }
                 }
-                $cfg['grid']['columns'] = BUtil::arrayMerge($cfg['grid']['columns'], $persCols);
+                $cfg['grid']['columns'] = $this->BUtil->arrayMerge($cfg['grid']['columns'], $persCols);
             }
 
-            $url = BApp::href('/my_account/personalize');
+            $url = $this->BApp->href('/my_account/personalize');
             $cfg['grid']['resizeStop'] = "function(newwidth, index) {
                 var cols = $('#{$cfg['grid']['id']}').jqGrid('getGridParam', 'colModel');
                 $.post('{$url}', {'do':'grid.col.width', grid:'{$gridId}',
@@ -163,7 +163,7 @@ class FCom_Admin_View_JqGrid extends FCom_Core_View_Abstract
             if (!empty($cfg['subGrid']['grid']['editurl'])) {
                 $jsAfter .= "subgrid.jqGrid('setGridParam', {editurl:subgrid.jqGrid('getGridParam', 'editurl')+row_id});";
             }
-            $subGridView = static::i()->factory($cfg['grid']['id'] . '_subgrid', [])->set('config', $cfg['subGrid']);
+            $subGridView = $this->factory($cfg['grid']['id'] . '_subgrid', [])->set('config', $cfg['subGrid']);
             $cfg['grid']['subGridRowExpanded'] = "function(subgrid_id, row_id) {
 var subgrid_table_id = subgrid_id+'_t', pager_id = 'p_'+subgrid_table_id;
 $('#'+subgrid_id).html('<table id=\"'+subgrid_table_id+'\" class=\"scroll\"></table><div id=\"'+pager_id+'\" class=\"scroll\"></div>');
@@ -264,7 +264,7 @@ $('#{$cfg['grid']['id']}').resizeWithWindow({initBy:'" . addslashes($cfg['custom
             if (!empty($cfg['grid']['export_url'])) {
                 $exportUrl =  $cfg['grid']['export_url'];
             } else {
-                $exportUrl = BUtil::setUrlQuery($cfg['grid']['url'], ['export' => 'csv']);
+                $exportUrl = $this->BUtil->setUrlQuery($cfg['grid']['url'], ['export' => 'csv']);
             }
             $cfg[] = ['navButtonAdd',
                 'caption' => '',
@@ -313,7 +313,7 @@ return [true, 'Testing error'];
     */
     protected function _render()
     {
-        $cfg = BUtil::arrayMerge($this->default_config, $this->config);
+        $cfg = $this->BUtil->arrayMerge($this->default_config, $this->config);
 //echo "<pre>"; print_r($cfg); echo "</pre>";
         $cfg = $this->_processConfig($cfg);
 
@@ -366,7 +366,7 @@ return [true, 'Testing error'];
             } else {
                 $prm = [];
             }
-            $optJS = BUtil::toJavaScript($opt);
+            $optJS = $this->BUtil->toJavaScript($opt);
             switch ($k) {
             case 'grid':
                 $html .= ".jqGrid({$optJS})\n";
@@ -380,7 +380,7 @@ return [true, 'Testing error'];
             case 'navGrid':
                 foreach (['edit', 'add', 'del', 'search', 'view'] as $t) {
                     if (!empty($prm[$t])) {
-                        $prmJS[$t] = BUtil::toJavaScript($prm[$t]);
+                        $prmJS[$t] = $this->BUtil->toJavaScript($prm[$t]);
                     } else {
                         $prmJS[$t] = '{}';
                     }
@@ -445,15 +445,15 @@ return [true, 'Testing error'];
 
     public function processORM($orm, $method = null, $stateKey = null, $forceRequest = [])
     {
-        $r = BRequest::i()->request();
+        $r = $this->BRequest->request();
         if (!empty($r['hash'])) {
-            $r = (array)BUtil::fromJson(base64_decode($r['hash']));
+            $r = (array)$this->BUtil->fromJson(base64_decode($r['hash']));
         } elseif (!empty($r['filters'])) {
-            $r['filters'] = BUtil::fromJson($r['filters']);
+            $r['filters'] = $this->BUtil->fromJson($r['filters']);
         }
 
         if ($stateKey) {
-            $sess =& BSession::i()->dataToUpdate();
+            $sess =& $this->BSession->dataToUpdate();
             $sess['grid_state'][$stateKey] = $r;
         }
         if ($forceRequest) {
@@ -467,16 +467,16 @@ return [true, 'Testing error'];
             $orm->where($where);
         }
         if (!is_null($method)) {
-            //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
-            BEvents::i()->fire($method . '.orm', ['orm' => $orm]);
+            //$this->BEvents->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
+            $this->BEvents->fire($method . '.orm', ['orm' => $orm]);
         }
         $data = $orm->jqGridData($r);
 #print_r(BORM::get_last_query());
         $data['filters'] = !empty($r['filters']) ? $r['filters'] : null;
-        //$data['hash'] = base64_encode(BUtil::toJson(BUtil::arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
+        //$data['hash'] = base64_encode($this->BUtil->toJson($this->BUtil->arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);
         if (!is_null($method)) {
-            BEvents::i()->fire($method . '.data', ['data' => &$data]);
+            $this->BEvents->fire($method . '.data', ['data' => &$data]);
         }
 
         return $data;
@@ -485,13 +485,13 @@ return [true, 'Testing error'];
     public function export($orm, $class = null)
     {
         if ($class) {
-            BEvents::i()->fire($class . '::action_grid_data.orm', ['orm' => $orm]);
+            $this->BEvents->fire($class . '::action_grid_data.orm', ['orm' => $orm]);
         }
-        $r = BRequest::i()->request();
+        $r = $this->BRequest->request();
         if (!empty($r['filters'])) {
-            $r['filters'] = BUtil::fromJson($r['filters']);
+            $r['filters'] = $this->BUtil->fromJson($r['filters']);
         }
-        $state = (array)BSession::i()->get('grid_state');
+        $state = (array)$this->BSession->get('grid_state');
         if ($class && !empty($state[$class])) {
             $r = array_replace_recursive($state[$class], $r);
         }
@@ -503,7 +503,7 @@ return [true, 'Testing error'];
             $orm-> {'order_by_' . $r['sd']}($r['s']);
         }
 
-        $cfg = BUtil::arrayMerge($this->default_config, $this->config);
+        $cfg = $this->BUtil->arrayMerge($this->default_config, $this->config);
         $cfg = $this->_processConfig($cfg);
         $columns = $cfg['grid']['colModel'];
         $headers = [];
@@ -520,15 +520,15 @@ return [true, 'Testing error'];
                 $columns[$i] = $col;
             }
         }
-        $dir = BApp::i()->storageRandomDir() . '/export';
-        BUtil::ensureDir($dir);
+        $dir = $this->BApp->storageRandomDir() . '/export';
+        $this->BUtil->ensureDir($dir);
         $filename = $dir . '/' . $cfg['grid']['id'] . '.csv';
         $fp = fopen($filename, 'w');
         fputcsv($fp, $headers);
         $orm->iterate(function($row) use($columns, $fp) {
             if ($class) {
                 //TODO: any faster solution?
-                BEvents::i()->fire($class . '::action_grid_data.data_row', ['row' => $row, 'columns' => $columns]);
+                $this->BEvents->fire($class . '::action_grid_data.data_row', ['row' => $row, 'columns' => $columns]);
             }
             $data = [];
             foreach ($columns as $col) {
@@ -543,6 +543,6 @@ return [true, 'Testing error'];
             fputcsv($fp, $data);
         });
         fclose($fp);
-        BResponse::i()->sendFile($filename);
+        $this->BResponse->sendFile($filename);
     }
 }

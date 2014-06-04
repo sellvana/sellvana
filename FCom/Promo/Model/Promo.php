@@ -48,8 +48,8 @@ class FCom_Promo_Model_Promo extends BModel
 
     public function getPromosByCart($cartId)
     {
-        return static::orm('p')
-                ->join(FCom_Promo_Model_Cart::table(), "p.id = pc.promo_id", "pc")
+        return $this->orm('p')
+                ->join($this->FCom_Promo_Model_Cart->table(), "p.id = pc.promo_id", "pc")
                 ->where('cart_id', $cartId)
                 ->select('p.id')
                 ->select('p.description')
@@ -63,7 +63,7 @@ class FCom_Promo_Model_Promo extends BModel
 
     public function groups()
     {
-        return FCom_Promo_Model_Group::i()->orm()
+        return $this->FCom_Promo_Model_Group->orm()
             ->where('promo_id', $this->id)
             ->order_by_asc('group_type')
             ->find_many_assoc();
@@ -71,8 +71,8 @@ class FCom_Promo_Model_Promo extends BModel
 
     public function mediaORM()
     {
-        return FCom_Promo_Model_Media::i()->orm('pa')
-            ->join(FCom_Core_Model_MediaLibrary::table(), ['a.id', '=', 'pa.file_id'], 'a')
+        return $this->FCom_Promo_Model_Media->orm('pa')
+            ->join($this->FCom_Core_Model_MediaLibrary->table(), ['a.id', '=', 'pa.file_id'], 'a')
             ->select('a.id')->select('a.file_name')->select('a.folder')
             ->where('pa.promo_id', $this->id);
     }
@@ -84,10 +84,10 @@ class FCom_Promo_Model_Promo extends BModel
 
     public function createClone()
     {
-        $grHlp = FCom_Promo_Model_Group::i();
-        $prodHlp = FCom_Promo_Model_Product::i();
-        $attHlp = FCom_Promo_Model_Media::i();
-        $clone = static::i()->create($this->as_array())->set([
+        $grHlp = $this->FCom_Promo_Model_Group;
+        $prodHlp = $this->FCom_Promo_Model_Product;
+        $attHlp = $this->FCom_Promo_Model_Media;
+        $clone = $this->create($this->as_array())->set([
             'id' => 'null',
             'status' => 'pending',
         ])->save();
@@ -128,7 +128,7 @@ class FCom_Promo_Model_Promo extends BModel
         $this->setDate($this->get("from_date"), 'from_date');
         $this->setDate($this->get("to_date"), 'to_date');
         $this->set('update_at', date('Y-m-d H:i:s'));
-        if (BUtil::isEmptyDate($this->get('create_at'))) {
+        if ($this->BUtil->isEmptyDate($this->get('create_at'))) {
             $this->set('create_at', date('Y-m-d H:i:s'));
         }
         return true;
@@ -155,14 +155,14 @@ class FCom_Promo_Model_Promo extends BModel
 
         $groups = [];
         if (!$this->_newRecord) {
-            $groupsRaw = FCom_Promo_Model_Group::i()->orm()->where('promo_id', $this->id)->find_many();
+            $groupsRaw = $this->FCom_Promo_Model_Group->orm()->where('promo_id', $this->id)->find_many();
             foreach ($groupsRaw as $g) {
                 $groups[$g->group_type][] = $g;
             }
         }
         $delete = [];
         if (empty($groups['buy'])) {
-            FCom_Promo_Model_Group::i()->create([
+            $this->FCom_Promo_Model_Group->create([
                 'promo_id' => $this->id,
                 'group_type' => 'buy',
                 'group_name' => 'BUY Group',
@@ -173,7 +173,7 @@ class FCom_Promo_Model_Promo extends BModel
             }
         }
         if (empty($groups['get']) && $this->get_group === 'diff_group') {
-            FCom_Promo_Model_Group::i()->create([
+            $this->FCom_Promo_Model_Group->create([
                 'promo_id' => $this->id,
                 'group_type' => 'get',
                 'group_name' => 'GET Group',
@@ -182,13 +182,13 @@ class FCom_Promo_Model_Promo extends BModel
             $delete[] = $groups['get'][0]->id;
         }
         if (!empty($delete)) {
-            FCom_Promo_Model_Group::i()->delete_many(['id' => $delete]);
+            $this->FCom_Promo_Model_Group->delete_many(['id' => $delete]);
         }
     }
 
     public function getActive()
     {
-        return static::orm()->where('status', 'active')
+        return $this->orm()->where('status', 'active')
                 ->order_by_desc('buy_amount')
                 ->find_many();
     }

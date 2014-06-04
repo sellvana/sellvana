@@ -15,7 +15,7 @@ class FCom_AuthorizeNet_Tests_ApiTest
 
     protected function setUp()
     {
-        $this->model = FCom_AuthorizeNet_AimApi::i(true);
+        $this->model = $this->FCom_AuthorizeNet_AimApi->i(true);
     }
 
     public function testGetApi()

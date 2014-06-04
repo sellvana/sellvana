@@ -27,7 +27,7 @@ foreach ($testFiles as $test) {
 //print_r($testFiles);
 class BAllTests
 {
-    public static function main()
+    public function main()
     {
         PHPUnit_TextUI_TestRunner::run(self::suite());
     }
@@ -37,7 +37,7 @@ class BAllTests
      *
      * @return PHPUnit_Framework_TestSuite
      */
-    public static function suite()
+    public function suite()
     {
         $suite = new PHPUnit_Framework_TestSuite('Buckyball - Buckyball');
 

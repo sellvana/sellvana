@@ -33,7 +33,7 @@ class FCom_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_Grid
         ];
 
         $data = [];
-        $wishlistArr = FCom_Wishlist_Model_Wishlist::i()->orm()->where('customer_id', $customer->id)->find_many();
+        $wishlistArr = $this->FCom_Wishlist_Model_Wishlist->orm()->where('customer_id', $customer->id)->find_many();
         if ($wishlistArr) {
             foreach ($wishlistArr as $wishlist) {
                 $items = $wishlist->items();

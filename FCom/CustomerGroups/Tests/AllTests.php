@@ -5,12 +5,12 @@ require_once __DIR__ . '/../../../tests/index.php';
 class FCom_CustomerGroups_Tests_AllTests
 {
 
-    public static function main()
+    public function main()
     {
-        PHPUnit_TextUI_TestRunner::run(static::suite());
+        PHPUnit_TextUI_TestRunner::run($this->suite());
     }
 
-    public static function suite()
+    public function suite()
     {
         $suite = new PHPUnit_Framework_TestSuite('PHPUnit CustomerGroups');
         require_once 'Model/GroupTest.php';

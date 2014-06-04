@@ -9,13 +9,13 @@ class FCom_Sales_Main extends BClass
     protected $_registry = [];
     protected $_heap = [];
 
-    static public function bootstrap()
+    public function bootstrap()
     {
         foreach (['Subtotal', 'Shipping', 'Discount', 'GrandTotal'] as $total) {
-            FCom_Sales_Model_Cart::i()->registerTotalRowHandler('FCom_Sales_Model_Cart_Total_' . $total);
+            $this->FCom_Sales_Model_Cart->registerTotalRowHandler('FCom_Sales_Model_Cart_Total_' . $total);
         }
 
-        FCom_Admin_Model_Role::i()->createPermission([
+        $this->FCom_Admin_Model_Role->createPermission([
             'sales' => 'Sales',
             'sales/orders' => 'Orders',
             'sales/order_status' => 'Order Status',

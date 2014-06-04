@@ -16,7 +16,7 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
             ['name' => 'handle', 'label' => 'Handle'],
             ['name' => 'description', 'label' => 'Description', 'editable' => true],
             ['type' => 'input', 'name' => 'renderer', 'label' => 'Renderer', 'editor' => 'select',
-                  'options' => BLayout::i()->getAllRenderers(true), 'editable' => true, 'mass-editable' => true],
+                  'options' => $this->BLayout->getAllRenderers(true), 'editable' => true, 'mass-editable' => true],
             ['name' => 'version', 'label' => 'Version'],
             ['type' => 'input', 'name' => 'page_enabled', 'label' => 'Page Enable', 'editor' => 'select',
                   'options' => ['1' => 'Yes', '0' => 'No'], 'editable' => true, 'mass-editable' => true],
@@ -56,14 +56,14 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
         return [
             'grid' => [
                 'id' => 'cms_blocks_form_history',
-                'url' => BApp::href('cms/blocks/history/' . $m->id . '/grid_data'),
-                'editurl' => BApp::href('cms/blocks/history/' . $m->id . '/grid_data'),
+                'url' => $this->BApp->href('cms/blocks/history/' . $m->id . '/grid_data'),
+                'editurl' => $this->BApp->href('cms/blocks/history/' . $m->id . '/grid_data'),
                 'columns' => [
                     'id' => ['label' => 'ID', 'hidden' => true],
                     'ts' => ['label' => 'TimeStamp', 'formatter' => 'date'],
                     'version' => ['label' => 'Version'],
                     'user_id' => ['type' => 'input', 'label' => 'User', 'editor' => 'select',
-                        'options' => FCom_Admin_Model_User::i()->options()],
+                        'options' => $this->FCom_Admin_Model_User->options()],
                     'username' => ['Label' => 'User Name', 'hidden' => true],
                     'comments' => ['labl' => 'Comments'],
                 ],
@@ -75,15 +75,15 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
 
     public function action_history_grid_data()
     {
-        $id = BRequest::i()->params('id', true);
+        $id = $this->BRequest->params('id', true);
         if (!$id) {
             $data = [];
         } else {
-            $orm = FCom_Cms_Model_BlockHistory::i()->orm('bh')->select('bh.*')
+            $orm = $this->FCom_Cms_Model_BlockHistory->orm('bh')->select('bh.*')
                 ->where('block_id', $id);
-            $data = FCom_Admin_View_Grid::i()->processORM($orm, __METHOD__);
+            $data = $this->FCom_Admin_View_Grid->processORM($orm, __METHOD__);
         }
-        BResponse::i()->json($data);
+        $this->BResponse->json($data);
     }
 
     public function action_history_grid_data__POST()

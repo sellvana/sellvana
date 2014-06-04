@@ -4,7 +4,7 @@ class FCom_SampleData_Migrate extends BClass
 {
     public function install__0_1_1()
     {
-        $customField = FCom_CustomField_Model_Field::i();
+        $customField = $this->FCom_CustomField_Model_Field;
         $fields   = [
             'finish'    => [
                 'field_code'       => 'finish',
@@ -48,7 +48,7 @@ class FCom_SampleData_Migrate extends BClass
             $fieldName = $f->get('field_code');
 
             /* @var FCom_CatalogIndex_Model_Field $catalogIndexField */
-            $catalogIndexField = FCom_CatalogIndex_Model_Field::orm()->where('field_name', $fieldName)->find_one();
+            $catalogIndexField = $this->FCom_CatalogIndex_Model_Field->orm()->where('field_name', $fieldName)->find_one();
 
             if (!$catalogIndexField) {
                 $data = [
@@ -60,7 +60,7 @@ class FCom_SampleData_Migrate extends BClass
                     "search_type"   => 'none',
                     "sort_type"     => 'none',
                 ];
-                $catalogIndexField = FCom_CatalogIndex_Model_Field::orm()->create($data);
+                $catalogIndexField = $this->FCom_CatalogIndex_Model_Field->orm()->create($data);
                 $catalogIndexField->save();
             }
         }
@@ -71,7 +71,7 @@ class FCom_SampleData_Migrate extends BClass
         ];
 
         $indexFields = $customField->orm()->where_in('field_name', $fields)->find_many();
-        $nextCount = BORM::get_db()->query('SELECT max(`filter_order`) as "max" FROM ' . FCom_CatalogIndex_Model_Field::table())->fetchAll();
+        $nextCount = BORM::get_db()->query('SELECT max(`filter_order`) as "max" FROM ' . $this->FCom_CatalogIndex_Model_Field->table())->fetchAll();
         $nextCount = $nextCount[0]['max'] + 1;
 
         if ($indexFields) {
@@ -100,8 +100,8 @@ class FCom_SampleData_Migrate extends BClass
             'lead_time'
         ];
 
-        $indexFields = FCom_CatalogIndex_Model_Field::orm()->where_in('field_name', $fields)->find_many();
-        $nextCount = BORM::get_db()->query('SELECT max(`filter_order`) as "max" FROM ' . FCom_CatalogIndex_Model_Field::table())->fetchAll();
+        $indexFields = $this->FCom_CatalogIndex_Model_Field->orm()->where_in('field_name', $fields)->find_many();
+        $nextCount = BORM::get_db()->query('SELECT max(`filter_order`) as "max" FROM ' . $this->FCom_CatalogIndex_Model_Field->table())->fetchAll();
         $nextCount = $nextCount[0]['max'] + 1;
 
         if ($indexFields) {

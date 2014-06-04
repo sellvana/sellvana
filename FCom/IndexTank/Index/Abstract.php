@@ -7,7 +7,7 @@ class FCom_IndexTank_Index_Abstract extends BClass
     *
     * @return FCom_IndexTank_Index_Abstract
     */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }

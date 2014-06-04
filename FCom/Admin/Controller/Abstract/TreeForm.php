@@ -17,8 +17,13 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
 
     public function action_tree_data()
     {
+        if (!$this->BRequest->xhr()) {
+            $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+            return;
+        }
+
         $class = $this->_navModelClass;
-        $r = BRequest::i();
+        $r = $this->BRequest;
         $result = null;
         switch ($r->get('operation')) {
             case 'get_children':
@@ -36,12 +41,16 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                     */
                 } else {
                     $node = $class::i()->load($r->get('id'));
-                    $node->descendants();
-                    $result = $this->_nodeChildren($node, 100);
+                    if ($node) {
+                        $node->descendants();
+                        $result = $this->_nodeChildren($node, 100);
+                    } else {
+                        $result = [];
+                    }
                 }
                 break;
         }
-        BResponse::i()->json($result);
+        $this->BResponse->json($result);
     }
 
     protected function _nodeChildren($node, $depth = 0)
@@ -67,7 +76,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
     public function action_tree_data__POST()
     {
         $class = $this->_navModelClass;
-        $r = BRequest::i();
+        $r = $this->BRequest;
         try {
             if (!($node = $class::i()->load($r->post('id')))) {
                 throw new BException('Invalid ID');
@@ -76,7 +85,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
             $result = ['status' => 1];
 
             $eventName = static::$_origClass . '::action_tree_data__POST.' . $r->post('operation');
-            BEvents::i()->fire($eventName . ':before', $r->post());
+            $this->BEvents->fire($eventName . ':before', $r->post());
 
             switch ($r->post('operation')) {
                 case 'create_node':
@@ -141,23 +150,23 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                     $node->reorderChildrenAZ($recursive);
                     break;
                 default:
-                    if (!BEvents::i()->fire($eventName, $r->post())) {
+                    if (!$this->BEvents->fire($eventName, $r->post())) {
                         throw new BException('Not implemented');
                     }
             }
 
-            BEvents::i()->fire($eventName . ':after', $r->post());
+            $this->BEvents->fire($eventName . ':after', $r->post());
         } catch (Exception $e) {
             $result = ['status' => 0, 'message' => $e->getMessage()];
         }
-        BResponse::i()->json($result);
+        $this->BResponse->json($result);
     }
 
     public function action_tree_form()
     {
         $class = $this->_navModelClass;
         $this->layout($this->_formLayoutName);
-        if ($id = BRequest::i()->param('id', true)) {
+        if ($id = $this->BRequest->param('id', true)) {
             $id = preg_replace('#^[^0-9]+#', '', $id);
             $model = $class::i()->load($id);
             $this->_prepareTreeForm($model);
@@ -172,20 +181,20 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
         $class = $this->_navModelClass;
 
         try {
-            $id = BRequest::i()->param('id', true);
+            $id = $this->BRequest->param('id', true);
             $id = preg_replace('#^[^0-9]+#', '', $id);
             if (!$id || !($model = $class::i()->load($id))) {
                 throw new Exception('Invalid node ID');
             }
 
-            $model->set(BRequest::i()->post('model'))
+            $model->set($this->BRequest->post('model'))
                 ->set(['url_path' => null, 'full_name' => null]);
 
-            if (BRequest::i()->post('action') === 'clone') {
+            if ($this->BRequest->post('action') === 'clone') {
                 $parent = $model->parent();
                 $cloneName = $model->get('node_name') . '-1';
                 $cloned = $parent->createChild($cloneName);
-                $cloned->set(BUtil::arrayMask($model->as_array(), 'id,id_path,node_name,full_name,sort_order,url_key,url_path', true));
+                $cloned->set($this->BUtil->arrayMask($model->as_array(), 'id,id_path,node_name,full_name,sort_order,url_key,url_path', true));
                 $model = $cloned;
             }
 
@@ -204,17 +213,17 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                 $result = ['status' => 'error', 'message' => $this->getErrorMessages()];
             }
         } catch (Exception $e) {
-//BDebug::exceptionHandler($e);
+//$this->BDebug->exceptionHandler($e);
 #print_r(BORM::get_last_query());
 #print_r($e); exit;
             $result = ['status' => 'error', 'message' => $e->getMessage()];
         }
-        BResponse::i()->json($result);
+        $this->BResponse->json($result);
     }
 
     public function getErrorMessages()
     {
-        $messages = BSession::i()->messages('validator-errors:' . $this->formId);
+        $messages = $this->BSession->messages('validator-errors:' . $this->formId);
         $errorMessages = [];
         foreach ($messages as $m) {
             if (is_array($m['msg']))

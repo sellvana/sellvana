@@ -1,5 +1,5 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die(); /* Leave as PHP, renderers are not available yet at this point */ ?>
-<?php $baseSrc = BConfig::i()->get('web/base_src') ?>
+<?php $baseSrc = $this->BConfig->get('web/base_src') ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

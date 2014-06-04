@@ -6,37 +6,37 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     {
         if (!parent::beforeDispatch()) return false;
 
-        BResponse::i()->nocache();
+        $this->BResponse->nocache();
 
         return true;
     }
 
     public function authenticate($args = [])
     {
-        return FCom_Customer_Model_Customer::i()->isLoggedIn() || BRequest::i()->rawPath() == '/login';
+        return $this->FCom_Customer_Model_Customer->isLoggedIn() || $this->BRequest->rawPath() == '/login';
     }
 
     public function action_index()
     {
-        $layout = BLayout::i();
+        $layout = $this->BLayout;
         $layout->view('breadcrumbs')->crumbs = ['home', ['label' => 'Wishlist', 'active' => true]];
-        $wishlist = FCom_Wishlist_Model_Wishlist::i()->sessionWishlist();
+        $wishlist = $this->FCom_Wishlist_Model_Wishlist->sessionWishlist();
         $layout->view('wishlist')->wishlist = $wishlist;
         $this->layout('/wishlist');
     }
 
     public function action_index__POST()
     {
-        $wishlistHref = BApp::href('wishlist');
-        $post = BRequest::i()->post();
-        $wishlist = FCom_Wishlist_Model_Wishlist::i()->sessionWishlist();
-        if (BRequest::i()->xhr()) {
+        $wishlistHref = $this->BApp->href('wishlist');
+        $post = $this->BRequest->post();
+        $wishlist = $this->FCom_Wishlist_Model_Wishlist->sessionWishlist();
+        if ($this->BRequest->xhr()) {
             $result = [];
             switch ($post['action']) {
             case 'add':
-                $p = FCom_Catalog_Model_Product::i()->load($post['id']);
+                $p = $this->FCom_Catalog_Model_Product->load($post['id']);
                 if (!$p) {
-                    BResponse::i()->json(['title' => "Incorrect product id"]);
+                    $this->BResponse->json(['title' => "Incorrect product id"]);
                     return;
                 }
                 $wishlist->addItem($p->id());
@@ -47,25 +47,30 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                 ];
                 break;
             }
-            BResponse::i()->json($result);
+            $this->BResponse->json($result);
         } else {
             if (!empty($post['remove'])) {
                 foreach ($post['remove'] as $id) {
                     $wishlist->removeItem($id);
                 }
             }
-            BResponse::i()->redirect($wishlistHref);
+            $this->BResponse->redirect($wishlistHref);
         }
     }
 
     public function action_add()
     {
-        $id = BRequest::i()->get('id');
-        $p = FCom_Catalog_Model_Product::i()->load($id);
+        if ($this->BRequest->csrf('referrer', 'GET')) {
+            $this->message('CSRF detected');
+            $this->BResponse->redirect('wishlist');
+            return;
+        }
+        $id = $this->BRequest->get('id');
+        $p = $this->FCom_Catalog_Model_Product->load($id);
         if (!$p) {
             $this->message('Invalid product', 'error');
         } else {
-            $wishlist = FCom_Wishlist_Model_Wishlist::i()->sessionWishlist();
+            $wishlist = $this->FCom_Wishlist_Model_Wishlist->sessionWishlist();
             if (!$wishlist) {
                 $this->forward('unauthenticated');
                 return;
@@ -73,17 +78,17 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $wishlist->addItem($id);
             $this->message('Product was added to wishlist');
         }
-        BResponse::i()->redirect('wishlist');
+        $this->BResponse->redirect('wishlist');
     }
 
-    public static function onAddToWishlist($args)
+    public function onAddToWishlist($args)
     {
         $product = $args['product'];
         if (!$product || !$product->id()) {
             return false;
         }
 
-        $wishlist = FCom_Wishlist_Model_Wishlist::i()->wishlist();
+        $wishlist = $this->FCom_Wishlist_Model_Wishlist->wishlist();
         $wishlist->addItem($product->id());
     }
 }

@@ -13,6 +13,7 @@ base:
             - [ js, "@FCom_Admin/Admin/theme1/assets/javascripts/ie/html5shiv.js", { if: lt IE 9 } ]
             - [ js, "@FCom_Admin/Admin/theme1/assets/javascripts/ie/respond.min.js", { if: lt IE 9 } ]
 
+            - [ css, "@FCom_Core/css/flags.css" ]
             - [ css, "@FCom_Core/css/fcom.core.css" ]
             - [ requireJs, jquery.cookie, "@FCom_LibJsCommon/js/jquery.cookie", { deps: [ jquery ] } ]
             - [ requireJs, jquery.hotkeys, "@FCom_LibJsCommon/js/jquery.hotkeys", { deps: [ jquery ] } ]

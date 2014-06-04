@@ -11,6 +11,7 @@
 {% set customFields = prod.getDataSerialized('custom_fields') %}
 {% set shopper = prod.getDataSerialized('frontend_fields') %}
 {% set variants = prod.getDataSerialized('variants') %}
+{% set modelField = APP.instance('FCom_CustomField_Model_Field') %}
 {% set productLink = prod.getProductLink() %}
 {% set recentlyViewed = APP.instance('FCom_Catalog_Frontend').getRecentlyViewedProducts() %}
 
@@ -92,7 +93,7 @@
                     <section class="tab-pane active" id="f-prod-tab-variant">
                         {% for field  in variants.variants_fields %}
                             <div class="form-group" style="overflow: hidden">
-                                <label class="col-md-3 control-label">{{ field.frontend_label |_ }}</label>
+                                <label class="col-md-3 control-label">{{ modelField.getFrontendLabel(field.field_code) |_ }}</label>
                                 <div class="col-md-5">
                                     <select id="{{ field.field_code }}" name="{{ field.field_code }}" class="form-control variant" style="width:auto">
                                         {% for key in field.options %}
@@ -131,8 +132,8 @@
                   <span class="glyphicon glyphicon-shopping-cart"></span>{{ "Add to Cart"| _ }}</button>
                 <a class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ prod.id() }}"
                    rel="nofollow">{{ "Add to Wishlist"|_ }}</a>
-                <a class="btn btn-link" href="{{ APP.href('catalog/compare/add?id=') ~ prod.id() }}"
-                   rel="nofollow">{{ "Add to Compare"|_ }}</a>
+                <a class="btn btn-link btn-compare" href="{{ APP.href('catalog/compare/add?id=') ~ prod.id() }}"
+                   rel="nofollow"><span class="glyphicon glyphicon-unchecked"></span>{{ "Add to Compare"|_ }}</a>
             </div>
           </div> <!-- /.f-prod-select -->
         </form>

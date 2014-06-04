@@ -32,18 +32,18 @@ class FCom_PaymentIdeal_PaymentMethod
         $bankId      = $this->get('bank_id');
         $amount      = $this->salesEntity->get('balance') * 100;
         $description = $this->salesEntity->getTextDescription();
-        $returnUrl   = BApp::href("checkout/success");
-        $reportUrl   = BApp::href("ideal/report");
+        $returnUrl   = $this->BApp->href("checkout/success");
+        $reportUrl   = $this->BApp->href("ideal/report");
 
         try {
             $this->createPayment($bankId, $amount, $description, $returnUrl, $reportUrl);
             $bankUrl = $this->get('bank_url');
             if ($bankUrl) {
-                BSession::i()->set('redirect_url', $bankUrl);
+                $this->BSession->set('redirect_url', $bankUrl);
             }
         } catch (Exception $e) {
-            BDebug::log($e->getMessage(), static::IDEAL_LOG);
-            BDebug::log($e->getTraceAsString(), static::IDEAL_LOG);
+            $this->BDebug->log($e->getMessage(), static::IDEAL_LOG);
+            $this->BDebug->log($e->getTraceAsString(), static::IDEAL_LOG);
             $this->set('error', $e->getMessage());
         }
 
@@ -66,7 +66,7 @@ class FCom_PaymentIdeal_PaymentMethod
             'online'           => 1,
         ];
 
-        $paymentModel = FCom_Sales_Model_Order_Payment::i()->addNew($paymentData);
+        $paymentModel = $this->FCom_Sales_Model_Order_Payment->addNew($paymentData);
         $paymentModel->setData('response', $this->getPublicData());
         $paymentModel->save();
     }
@@ -82,7 +82,7 @@ class FCom_PaymentIdeal_PaymentMethod
     public function getCheckoutFormView()
     {
         $banks = $this->getBanks();
-        return BLayout::i()->view('form')
+        return $this->BLayout->view('form')
                ->set('banks', $banks)
                ->set('key', 'ideal');
     }
@@ -96,7 +96,7 @@ class FCom_PaymentIdeal_PaymentMethod
     public function config()
     {
         if (!$this->config) {
-            $this->config = BData::i(true, BConfig::i()->get('modules/FCom_PaymentIdeal'));
+            $this->config = BData::i(true, [$this->BConfig->get('modules/FCom_PaymentIdeal')]);
         }
         return $this->config;
     }
@@ -121,7 +121,7 @@ class FCom_PaymentIdeal_PaymentMethod
         );
 
         if (!empty($banks_xml)) {
-            $banks_object = $this->_XMLtoObject($banks_xml);
+            $banks_object = static::_XMLtoObject($banks_xml);
 
             if (!$banks_object || $this->getResponseError($banks_object)) {
                 $errors = $this->getResponseError($banks_object);
@@ -138,23 +138,23 @@ class FCom_PaymentIdeal_PaymentMethod
     protected function createPayment($bankId, $amount, $description, $returnUrl, $reportUrl)
     {
         if (!$this->setBankId($bankId)) {
-            throw new Exception(BLocale::_("Bank id: %s is not valid.", [$bankId]));
+            throw new Exception($this->BLocale->_("Bank id: %s is not valid.", [$bankId]));
         }
 
         if (!$this->setDescription($description)) {
-            throw new Exception(BLocale::_("Provided description \"%s\" cannot be used.", [$description]));
+            throw new Exception($this->BLocale->_("Provided description \"%s\" cannot be used.", [$description]));
         }
 
         if (!$this->setAmount($amount)) {
-            throw new Exception(BLocale::_("Invalid amount: %s", [$amount]));
+            throw new Exception($this->BLocale->_("Invalid amount: %s", [$amount]));
         }
 
         if (!$returnUrl = filter_var($returnUrl, FILTER_VALIDATE_URL)) {
-            throw new Exception(BLocale::_("Incorrect return url: %s", [$returnUrl]));
+            throw new Exception($this->BLocale->_("Incorrect return url: %s", [$returnUrl]));
         }
 
         if (!$reportUrl = filter_var($reportUrl, FILTER_VALIDATE_URL)) {
-            throw new Exception(BLocale::_("Incorrect report url: %s", [$reportUrl]));
+            throw new Exception($this->BLocale->_("Incorrect report url: %s", [$reportUrl]));
         }
 
         $query_variables = [
@@ -176,7 +176,7 @@ class FCom_PaymentIdeal_PaymentMethod
             http_build_query($query_variables, '', '&')
         );
 
-        $create_object = $this->_XMLtoObject($create_xml);
+        $create_object = static::_XMLtoObject($create_xml);
 
         if ($this->getResponseError($create_object)) {
             $errors = $this->getResponseError($create_object);
@@ -210,7 +210,7 @@ class FCom_PaymentIdeal_PaymentMethod
             http_build_query($query_variables, '', '&')
         );
 
-        $check_object = $this->_XMLtoObject($check_xml);
+        $check_object = static::_XMLtoObject($check_xml);
 
         if ($this->getResponseError($check_object)) {
             $errors = $this->getResponseError($check_object);
@@ -245,7 +245,7 @@ class FCom_PaymentIdeal_PaymentMethod
             http_build_query($query_variables, '', '&')
         );
 
-        $create_object = $this->_XMLtoObject($create_xml);
+        $create_object = static::_XMLtoObject($create_xml);
 
         if ($this->getResponseError($create_object)) {
             $errors = $this->getResponseError($create_object);
@@ -298,11 +298,11 @@ class FCom_PaymentIdeal_PaymentMethod
     protected function _sendRequest($path, $query)
     {
         $url      = rtrim($this->api_host, '/') . "{$path}";
-        $response = BUtil::remoteHttp('GET', $url, $query);
+        $response = $this->BUtil->remoteHttp('GET', $url, $query);
         if (!$response) {
-            $info       = BUtil::lastRemoteHttpInfo();
+            $info       = $this->BUtil->lastRemoteHttpInfo();
             $error_code = isset($info['errno']) ? $info['errno'] : -1;
-            $error_msg  = isset($info['error']) ? $info['error'] : BLocale::_("An error occurred");
+            $error_msg  = isset($info['error']) ? $info['error'] : $this->BLocale->_("An error occurred");
             throw new Exception($error_msg, $error_code);
         }
 
@@ -315,14 +315,14 @@ class FCom_PaymentIdeal_PaymentMethod
         $xml_object    = simplexml_load_string($xml);
         if (!$xml_object) {
             $error_code = -2;
-            $error_msg  = BLocale::_("There was an error processing XML.");
+            $error_msg  = $this->BLocale->_("There was an error processing XML.");
             $errors     = libxml_get_errors();
             $debugError = '';
             foreach ($errors as $error) {
                 $debugError .= $this->displayXmlError($error);
             }
-            BDebug::log($debugError, static::IDEAL_LOG);
-            BDebug::log($xml, static::IDEAL_LOG);
+            $this->BDebug->log($debugError, static::IDEAL_LOG);
+            $this->BDebug->log($xml, static::IDEAL_LOG);
             libxml_clear_errors();
             throw new Exception($error_msg, $error_code);
         }
@@ -406,7 +406,7 @@ class FCom_PaymentIdeal_PaymentMethod
         $payment = $this->loadPaymentByTransactionId($transactionId);
         // load order from payment method order_id
         $orderId = $payment->get('order_id');
-        $order   = FCom_Sales_Model_Order::i()->load($orderId);
+        $order   = $this->FCom_Sales_Model_Order->load($orderId);
         return $order;
     }
 
@@ -416,7 +416,7 @@ class FCom_PaymentIdeal_PaymentMethod
      */
     public function loadPaymentByTransactionId($transactionId)
     {
-        $payment = FCom_Sales_Model_Order_Payment::i()->load($transactionId, 'transaction_id');
+        $payment = $this->FCom_Sales_Model_Order_Payment->load($transactionId, 'transaction_id');
         return $payment;
     }
 }

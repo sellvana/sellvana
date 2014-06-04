@@ -58,7 +58,7 @@ class BModuleRegistry extends BClass
 
     public function __construct()
     {
-        //BEvents::i()->on('BFrontController::dispatch:before', array($this, 'onBeforeDispatch'));
+        //$this->BEvents->on('BFrontController::dispatch:before', array($this, 'onBeforeDispatch'));
     }
 
     /**
@@ -70,7 +70,7 @@ class BModuleRegistry extends BClass
      * @param array $args
      * @return BModuleRegistry
      */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         if (!$new) {
             if (!static::$_singleton) {
@@ -120,7 +120,7 @@ class BModuleRegistry extends BClass
             $this->_modules[$modName]->update($params);
         } else {
             $params['name'] = $modName;
-            $this->_modules[$modName] = BModule::i(true, $params);
+            $this->_modules[$modName] = BModule::i(true, [$params]);
         }
         return $this;
     }
@@ -176,7 +176,7 @@ class BModuleRegistry extends BClass
 /*
     public function onBeforeDispatch()
     {
-        $routing = BRouting::i();
+        $routing = $this->BRouting;
         foreach ($this->_modules as $module) {
             if ($module->run_status===BModule::LOADED && ($prefix = $module->url_prefix)) {
                 $routing->redirect('GET /'.$prefix, $prefix.'/');
@@ -186,9 +186,9 @@ class BModuleRegistry extends BClass
 */
     protected function _getManifestCacheFilename()
     {
-        $area = BApp::i()->get('area');
-        $fileName = BConfig::i()->get('fs/cache_dir') . '/manifests' . ($area ? '_' . $area : '') . '.data';#.'.php';
-        BUtil::ensureDir(dirname($fileName));
+        $area = $this->BRequest->area();
+        $fileName = $this->BConfig->get('fs/cache_dir') . '/manifests' . ($area ? '_' . $area : '') . '.data';#.'.php';
+        $this->BUtil->ensureDir(dirname($fileName));
         return $fileName;
     }
 
@@ -200,7 +200,7 @@ class BModuleRegistry extends BClass
 
         $data = [];
         foreach ($this->_modules as $modName => $mod) {
-            $data[$modName] = (array)$mod;
+            $data[$modName] = $mod->asArray();
             $data[$modName]['is_cached'] = true;
             unset($data['run_level']);
         }
@@ -243,7 +243,7 @@ class BModuleRegistry extends BClass
     * Scan can be performed multiple times on different locations, order doesn't matter for dependencies
     * Wildcards are accepted.
     *
-    * @see BApp::i()->load() for examples
+    * @see $this->BApp->load() for examples
     *
     * @param string $source
     * @return BModuleRegistry
@@ -265,7 +265,7 @@ class BModuleRegistry extends BClass
             switch ($info['extension']) {
                 case 'php':
                     if ($validateManifests) {
-                        if (BConfig::i()->isInvalidManifestPHP(file_get_contents($file))) {
+                        if ($this->BConfig->isInvalidManifestPHP(file_get_contents($file))) {
                             throw new BException('Invalid PHP Manifest File');
                         }
                     }
@@ -273,19 +273,19 @@ class BModuleRegistry extends BClass
                     break;
                 case 'yml':
                     // already should be taken care of with filemtime()
-                    $useCache = true;#!BDebug::is('DEBUG,DEVELOPMENT,INSTALLATION');
-                    $manifest = BYAML::i()->load($file, $useCache);
+                    $useCache = true;#!$this->BDebug->is('DEBUG,DEVELOPMENT,INSTALLATION');
+                    $manifest = $this->BYAML->load($file, $useCache);
                     break;
                 case 'json':
                     $json = file_get_contents($file);
-                    $manifest = BUtil::fromJson($json);
+                    $manifest = $this->BUtil->fromJson($json);
 
                     break;
                 default:
-                    throw new BException(BLocale::_("Unknown manifest file format: %s", $file));
+                    throw new BException($this->BLocale->_("Unknown manifest file format: %s", $file));
             }
             if (empty($manifest['modules']) && empty($manifest['include'])) {
-                throw new BException(BLocale::_("Invalid or empty manifest file: %s", $file));
+                throw new BException($this->BLocale->_("Invalid or empty manifest file: %s", $file));
             }
             if (!empty($manifest['modules'])) {
                 foreach ($manifest['modules'] as $modName => $params) {
@@ -315,7 +315,7 @@ class BModuleRegistry extends BClass
     public function checkRequires()
     {
         // validate required modules
-        $requestRunLevels = (array)BConfig::i()->get('module_run_levels/request');
+        $requestRunLevels = (array)$this->BConfig->get('module_run_levels/request');
         foreach ($requestRunLevels as $modName => $runLevel) {
             if (!empty($this->_modules[$modName])) {
                 $this->_modules[$modName]->run_level = $runLevel;
@@ -570,7 +570,7 @@ class BModuleRegistry extends BClass
 
     public function processDefaultConfig()
     {
-        //BUtil::arrayWalk($this->_modules, 'processDefaultConfig');
+        //$this->BUtil->arrayWalk($this->_modules, 'processDefaultConfig');
         foreach ($this->_modules as $mod) {
             $mod->processDefaultConfig();
         }
@@ -595,8 +595,8 @@ class BModuleRegistry extends BClass
             $mod->bootstrap();
             $this->popModule();
         }
-        BLayout::i()->collectAllViewsFiles(); // TODO: refactor, decide on a better place
-        BEvents::i()->fire('BModuleRegistry::bootstrap:after');
+        $this->BLayout->collectAllViewsFiles(); // TODO: refactor, decide on a better place
+        $this->BEvents->fire('BModuleRegistry::bootstrap:after');
         return $this;
     }
 }
@@ -611,7 +611,7 @@ class BModule extends BClass
     *
     * @var array
     */
-    static protected $_env = [];
+    static protected $_envVars = [];
 
     /**
     * Default module run_level
@@ -712,7 +712,7 @@ class BModule extends BClass
     *
     * @return BModule
     */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
@@ -722,7 +722,7 @@ class BModule extends BClass
     *
     * @param string $runLevel
     */
-    public static function defaultRunLevel($runLevel)
+    public function defaultRunLevel($runLevel)
     {
         static::$_defaultRunLevel = $runLevel;
     }
@@ -736,7 +736,7 @@ class BModule extends BClass
     public function __construct(array $args)
     {
         #if (empty($args['area'])) {
-            $args['area'] = BApp::i()->get('area');
+            $args['area'] = $this->BRequest->area();
         #}
 /*
 if ($args['name']==="FCom_Referrals") {
@@ -760,15 +760,15 @@ if ($args['name']==="FCom_Referrals") {
                 $this->root_dir = $m['root_dir'];
             }
             //TODO: optimize path calculations
-            if (!BUtil::isPathAbsolute($this->root_dir)) {
+            if (!$this->BUtil->isPathAbsolute($this->root_dir)) {
     //echo "{$m['root_dir']}, {$args['root_dir']}\n";
                 if ($m['root_dir'] != $this->root_dir)
-                    $this->root_dir = BUtil::normalizePath($m['root_dir'] . '/' . $this->root_dir);
+                    $this->root_dir = $this->BUtil->normalizePath($m['root_dir'] . '/' . $this->root_dir);
                 else  {
-                    $this->root_dir = BUtil::normalizePath($this->root_dir);
+                    $this->root_dir = $this->BUtil->normalizePath($this->root_dir);
                 }
 
-                //$this->root_dir = BUtil::normalizePath($this->root_dir);
+                //$this->root_dir = $this->BUtil->normalizePath($this->root_dir);
                 //echo $this->root_dir."\n";
             }
 
@@ -778,7 +778,7 @@ if ($args['name']==="FCom_Referrals") {
         $this->run_level = static::$_defaultRunLevel; // disallow declaring run_level in manifest
         /*
         if (!isset($this->run_level)) {
-            $runLevel = BConfig::i()->get('module_run_levels/request/'.$this->name);
+            $runLevel = $this->BConfig->get('module_run_levels/request/'.$this->name);
             $this->run_level = $runLevel ? $runLevel : BModule::ONDEMAND;
         }
         */
@@ -843,7 +843,7 @@ if ($args['name']==="FCom_Referrals") {
         if (empty($params['update'])) {
             $rootDir = $this->root_dir;
             $file = $this->bootstrap['file'];
-            BDebug::debug(BLocale::_('Module is already registered: %s (%s)', [$this->name, $rootDir . '/' . $file]));
+            BDebug::debug($this->BLocale->_('Module is already registered: %s (%s)', [$this->name, $rootDir . '/' . $file]));
             return $this;
         }
         unset($params['update']);
@@ -855,7 +855,7 @@ if ($args['name']==="FCom_Referrals") {
                 //TODO: make more flexible without sacrificing performance
                 switch ($k) {
                 case 'url_prefix':
-                    $this->base_href = BApp::baseUrl() . ($v ? '/' . $v : '');
+                    $this->base_href = $this->BApp->baseUrl() . ($v ? '/' . $v : '');
                     break;
                 }
             }
@@ -890,35 +890,35 @@ if ($args['name']==="FCom_Referrals") {
     *
     * @todo optional omit http(s):
     */
-    protected static function _initEnvData()
+    protected function _initEnvData()
     {
-        if (!empty(static::$_env)) {
+        if (!empty(static::$_envVars)) {
             return;
         }
-        $r = BRequest::i();
-        $c = BConfig::i();
-        static::$_env['doc_root'] = $r->docRoot();
-        static::$_env['web_root'] = $r->webRoot();
-        //static::$_env['http_host'] = $r->httpHost();
+        $r = $this->BRequest;
+        $c = $this->BConfig;
+        static::$_envVars['doc_root'] = $r->docRoot();
+        static::$_envVars['web_root'] = $r->webRoot();
+        //static::$_envVars['http_host'] = $r->httpHost();
         if (($rootDir = $c->get('fs/root_dir'))) {
-            static::$_env['root_dir'] = str_replace('\\', '/', $rootDir);
+            static::$_envVars['root_dir'] = str_replace('\\', '/', $rootDir);
         } else {
-            static::$_env['root_dir'] = str_replace('\\', '/', $r->scriptDir());
+            static::$_envVars['root_dir'] = str_replace('\\', '/', $r->scriptDir());
         }
         if (($baseSrc = $c->get('web/base_src'))) {
-            static::$_env['base_src'] = $baseSrc;//$r->scheme().'://'.static::$_env['http_host'].$baseSrc;
+            static::$_envVars['base_src'] = $baseSrc;//$r->scheme().'://'.static::$_envVars['http_host'].$baseSrc;
         } else {
-            static::$_env['base_src'] = static::$_env['web_root'];
+            static::$_envVars['base_src'] = static::$_envVars['web_root'];
         }
         if (($baseHref = $c->get('web/base_href'))) {
-            static::$_env['base_href'] = $baseHref;//$r->scheme().'://'.static::$_env['http_host'].$c->get('web/base_href');
+            static::$_envVars['base_href'] = $baseHref;//$r->scheme().'://'.static::$_envVars['http_host'].$c->get('web/base_href');
         } else {
-            static::$_env['base_href'] = static::$_env['web_root'];
+            static::$_envVars['base_href'] = static::$_envVars['web_root'];
         }
-#echo "<pre>"; var_dump(static::$_env, $_SERVER); echo "</pre>"; exit;
+#echo "<pre>"; var_dump(static::$_envVars, $_SERVER); echo "</pre>"; exit;
         foreach (static::$_manifestCache as &$m) {
-            //    $m['base_src'] = static::$_env['base_src'].str_replace(static::$_env['root_dir'], '', $m['root_dir']);
-            $m['base_src'] = rtrim(static::$_env['base_src'], '/') . str_replace(static::$_env['root_dir'], '', $m['root_dir']);
+            //    $m['base_src'] = static::$_envVars['base_src'].str_replace(static::$_envVars['root_dir'], '', $m['root_dir']);
+            $m['base_src'] = rtrim(static::$_envVars['base_src'], '/') . str_replace(static::$_envVars['root_dir'], '', $m['root_dir']);
         }
         unset($m);
     }
@@ -937,10 +937,10 @@ if ($args['name']==="FCom_Referrals") {
         if (empty($this->base_src)) {
             $url = $m['base_src'];
             $url .= str_replace($m['root_dir'], '', $this->root_dir);
-            $this->base_src = BUtil::normalizePath(rtrim($url, '/'));
+            $this->base_src = $this->BUtil->normalizePath(rtrim($url, '/'));
         }
         if (empty($this->base_href)) {
-            $this->base_href = static::$_env['base_href'];
+            $this->base_href = static::$_envVars['base_href'];
             if (!empty($this->url_prefix)) {
                 $this->base_href .= '/' . $this->url_prefix;
             }
@@ -953,7 +953,7 @@ if ($args['name']==="FCom_Referrals") {
             return;
         }
         $auto = array_flip((array)$this->auto_use);
-        $area = BApp::i()->get('area');
+        $area = $this->BRequest->area();
         $areaDir = str_replace('FCom_', '', $area);
         if (isset($auto['all']) || isset($auto['bootstrap'])) { // TODO: check for is_callable() ?
             if (method_exists($this->name . '_' . $areaDir, 'bootstrap')) {
@@ -964,7 +964,7 @@ if ($args['name']==="FCom_Referrals") {
                 $this->bootstrap = ['callback' => $this->name . '::bootstrap'];
             }
         }
-        $layout = BLayout::i();
+        $layout = $this->BLayout;
         if (isset($auto['all']) || isset($auto['views'])) {
             if (is_dir($this->root_dir . '/views')) {
                 $layout->addAllViewsDir($this->root_dir . '/views');
@@ -1001,7 +1001,7 @@ if ($args['name']==="FCom_Referrals") {
         if ($this->run_status === BModule::PENDING && !empty($this->provides['themes'])) {
             foreach ($this->provides['themes'] as $name => $params) {
                 $params['module_name'] = $this->name;
-                BLayout::i()->addTheme($name, $params);
+                $this->BLayout->addTheme($name, $params);
             }
         }
     }
@@ -1011,7 +1011,7 @@ if ($args['name']==="FCom_Referrals") {
         if (empty($this->routing)) {
             return;
         }
-        $hlp = BRouting::i();
+        $hlp = $this->BRouting;
         foreach ($this->routing as $r) {
             if ($r[0][0] === '/' || $r[0][0] === '^') {
                 $method = 'route';
@@ -1041,7 +1041,7 @@ if ($args['name']==="FCom_Referrals") {
         if (empty($this->views)) {
             return;
         }
-        $hlp = BLayout::i();
+        $hlp = $this->BLayout;
         foreach ($this->views as $v) {
             $viewName = strtolower($v[0]);
             $params = $v[1];
@@ -1054,7 +1054,7 @@ if ($args['name']==="FCom_Referrals") {
         if (empty($this->observe)) {
             return;
         }
-        $hlp = BEvents::i();
+        $hlp = $this->BEvents;
         foreach ($this->observe as $o) {
             $event = $o[0];
             $callback = $o[1];
@@ -1074,7 +1074,7 @@ if (!isset($o[0]) || !isset($o[1])) {
     BDebug::notice('Invalid override in module ' . $this->name . '(' . print_r($o, 1) . ')');
     continue;
 }
-                BClassRegistry::overrideClass($o[0], $o[1]);
+                $this->BClassRegistry->overrideClass($o[0], $o[1]);
             }
         }
     }
@@ -1082,7 +1082,7 @@ if (!isset($o[0]) || !isset($o[1])) {
     protected function _processTranslations()
     {
         //load translations
-        $language = BSession::i()->get('_language');
+        $language = $this->BSession->get('_language');
         if (!empty($language) && !empty($this->translations[$language])) {
             /*
             if (!is_array($this->translations[$language])) {
@@ -1090,14 +1090,14 @@ if (!isset($o[0]) || !isset($o[1])) {
             }
             */
             $file = $this->root_dir . '/i18n/' . $this->translations[$language];
-            BLocale::addTranslationsFile($file);
+            $this->BLocale->addTranslationsFile($file);
         }
     }
 
     protected function _processSecurity()
     {
         if (!empty($this->security['request_fields_whitelist'])) {
-            BRequest::i()->addRequestFieldsWhitelist($this->security['request_fields_whitelist']);
+            $this->BRequest->addRequestFieldsWhitelist($this->security['request_fields_whitelist']);
         }
     }
 
@@ -1112,14 +1112,10 @@ if (!isset($o[0]) || !isset($o[1])) {
     {
         if (!$rootDir) {
             $rootDir = $this->root_dir;
-        } elseif (!BUtil::isPathAbsolute($rootDir)) {
+        } elseif (!$this->BUtil->isPathAbsolute($rootDir)) {
             $rootDir = $this->root_dir . '/' . $rootDir;
         }
-        BClassAutoload::i(true, [
-            'module_name' => $this->name,
-            'root_dir' => rtrim($rootDir, '/'),
-            'filename_cb' => $callback,
-        ]);
+        $this->BClassAutoload->i(true, [rtrim($rootDir, '/'), $this->name, $callback]);
         return $this;
     }
 
@@ -1132,7 +1128,7 @@ if (!isset($o[0]) || !isset($o[1])) {
     {
         $src = $this->base_src;
         if ($full) {
-            $r = BRequest::i();
+            $r = $this->BRequest;
             $scheme = $r->scheme();
             if ($scheme == 'http') {
                 $scheme = ''; // don't force http
@@ -1148,7 +1144,7 @@ if (!isset($o[0]) || !isset($o[1])) {
     {
         $href = $this->base_href;
         if ($full) {
-            $r = BRequest::i();
+            $r = $this->BRequest;
             $scheme = $r->scheme();
             if ($scheme == 'http') {
                 $scheme = ''; // don't force http
@@ -1179,7 +1175,7 @@ if (!isset($o[0]) || !isset($o[1])) {
     {
         $this->run_level = $level;
         if ($updateConfig) {
-            BConfig::i()->set('module_run_levels/request/' . $this->name, $level);
+            $this->BConfig->set('module_run_levels/request/' . $this->name, $level);
         }
         return $this;
     }
@@ -1209,7 +1205,7 @@ if (!isset($o[0]) || !isset($o[1])) {
     {
         $tr = dgettext($this->name, $string);
         if ($args) {
-            $tr = BUtil::sprintfn($tr, $args);
+            $tr = $this->BUtil->sprintfn($tr, $args);
         }
         return $tr;
     }
@@ -1218,6 +1214,9 @@ if (!isset($o[0]) || !isset($o[1])) {
     {
         if (is_array($key)) {
             foreach ($key as $k => $v) {
+                if ($k[0] === "\0") { // protected properties, for cache saved on previous commit
+                    continue;
+                }
                 $this->$k = $v;
             }
             return $this;
@@ -1229,7 +1228,7 @@ if (!isset($o[0]) || !isset($o[1])) {
     public function processDefaultConfig()
     {
         if (!empty($this->default_config)) {
-            $cfgHlp = BConfig::i();
+            $cfgHlp = $this->BConfig;
             $config = $this->default_config;
             foreach ($config as $path => $value) {
                 if (strpos($path, '/') !== false) {
@@ -1260,16 +1259,16 @@ if (!isset($o[0]) || !isset($o[1])) {
             $bb = ['callback' => $bb];
         }
         if (!empty($bb['file'])) {
-            $includeFile = BUtil::normalizePath($this->root_dir . '/' . $bb['file']);
+            $includeFile = $this->BUtil->normalizePath($this->root_dir . '/' . $bb['file']);
             BDebug::debug('MODULE.BEFORE.BOOTSTRAP ' . $includeFile);
             require_once ($includeFile);
         }
         if (!empty($bb['callback'])) {
-            $start = BDebug::debug(BLocale::_('Start BEFORE bootstrap for %s', [$this->name]));
-            call_user_func($bb['callback']);
+            $start = BDebug::debug($this->BLocale->_('Start BEFORE bootstrap for %s', [$this->name]));
+            $this->BUtil->call($bb['callback']);
             #$mod->run_status = BModule::LOADED;
             BDebug::profile($start);
-            BDebug::debug(BLocale::_('End BEFORE bootstrap for %s', [$this->name]));
+            BDebug::debug($this->BLocale->_('End BEFORE bootstrap for %s', [$this->name]));
         }
 
         return $this;
@@ -1293,25 +1292,36 @@ if (!isset($o[0]) || !isset($o[1])) {
         $this->_processObserve();
         $this->_processSecurity();
 
-        BEvents::i()->fire('BModule::bootstrap:before', ['module' => $this]);
+        $this->BEvents->fire('BModule::bootstrap:before', ['module' => $this]);
 
         if (!empty($this->bootstrap)) {
             if (!empty($this->bootstrap['file'])) {
-                $includeFile = BUtil::normalizePath($this->root_dir . '/' . $this->bootstrap['file']);
+                $includeFile = $this->BUtil->normalizePath($this->root_dir . '/' . $this->bootstrap['file']);
                 BDebug::debug('MODULE.BOOTSTRAP ' . $includeFile);
                 require_once ($includeFile);
             }
             if (!empty($this->bootstrap['callback'])) {
-                $start = BDebug::debug(BLocale::_('Start bootstrap for %s', [$this->name]));
-                call_user_func($this->bootstrap['callback']);
+                $start = BDebug::debug($this->BLocale->_('Start bootstrap for %s', [$this->name]));
+                $this->BUtil->call($this->bootstrap['callback']);
                 #$mod->run_status = BModule::LOADED;
                 BDebug::profile($start);
-                BDebug::debug(BLocale::_('End bootstrap for %s', [$this->name]));
+                BDebug::debug($this->BLocale->_('End bootstrap for %s', [$this->name]));
             }
         }
 
         $this->run_status = BModule::LOADED;
         return $this;
+    }
+
+    public function asArray()
+    {
+        $a = (array)$this;
+        foreach ($a as $k => $v) {
+            if ($k[0] === "\0") {
+                unset($a[$k]);
+            }
+        }
+        return $a;
     }
 }
 
@@ -1334,7 +1344,7 @@ class BMigrate extends BClass
     *
     * @return BMigrate
     */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
@@ -1344,10 +1354,10 @@ class BMigrate extends BClass
     *
     * @return array
     */
-    public static function getMigrationData()
+    public function getMigrationData()
     {
         $migration = [];
-        $allModules = BModuleRegistry::i()->getAllModules();
+        $allModules = $this->BModuleRegistry->getAllModules();
         foreach ($allModules as $modName => $mod) {
             if (empty($mod->migrate) && class_exists($mod->name . '_Migrate')) {
                 $mod->migrate = $mod->name . '_Migrate';
@@ -1373,12 +1383,12 @@ class BMigrate extends BClass
     * @param string|null $moduleName if null, use current module
     */
     /*
-    public static function migrate($script='migrate.php', $moduleName=null)
+    public function migrate($script='migrate.php', $moduleName=null)
     {
         if (null === $moduleName) {
-            $moduleName = BModuleRegistry::i()->currentModuleName();
+            $moduleName = $this->BModuleRegistry->currentModuleName();
         }
-        $module = BModuleRegistry::i()->module($moduleName);
+        $module = $this->BModuleRegistry->module($moduleName);
         $connectionName = $module->db_connection_name ? $module->db_connection_name : 'DEFAULT';
         static::$_migration[$connectionName][$moduleName]['script'] = $script;
     }
@@ -1391,10 +1401,10 @@ class BMigrate extends BClass
     * @param empty $moduleName
     */
     /*
-    public static function uninstall($script, $moduleName=null)
+    public function uninstall($script, $moduleName=null)
     {
         if (null === $moduleName) {
-            $moduleName = BModuleRegistry::i()->currentModuleName();
+            $moduleName = $this->BModuleRegistry->currentModuleName();
         }
         static::$_uninstall[$moduleName]['script'] = $script;
     }
@@ -1408,11 +1418,11 @@ class BMigrate extends BClass
     *   - true: migrate only enabled modules in current request
     *   - array or comma separated string: migrate only specified modules
     */
-    public static function migrateModules($limitModules = false, $force = false, $redirectUrl = null)
+    public function migrateModules($limitModules = false, $force = false, $redirectUrl = null)
     {
         if (!$force) {
-            $conf = BConfig::i();
-            $req = BRequest::i();
+            $conf = $this->BConfig;
+            $req = $this->BRequest;
             if ($conf->get('install_status') !== 'installed'
                 || !$conf->get('db/implicit_migration')
                 || $req->xhr() && !$req->get('MIGRATE')
@@ -1421,7 +1431,7 @@ class BMigrate extends BClass
             }
         }
 
-        $modReg = BModuleRegistry::i();
+        $modReg = $this->BModuleRegistry;
         $migration = static::getMigrationData();
         if (!$migration) {
             return;
@@ -1444,10 +1454,10 @@ class BMigrate extends BClass
                     unset($modules[$modName]);
                 }
             }
-            BDb::connect($connectionName); // switch connection
-            BDbModule::i()->init(); // Ensure modules table in current connection
+            $this->BDb->connect($connectionName); // switch connection
+            $this->BDbModule->init(); // Ensure modules table in current connection
             // collect module db schema versions
-            $dbModules = BDbModule::i()->orm()->find_many();
+            $dbModules = $this->BDbModule->orm()->find_many();
             foreach ($dbModules as $m) {
                 if ($m->last_status === 'INSTALLING') { // error during last installation
                     $m->delete();
@@ -1478,35 +1488,35 @@ class BMigrate extends BClass
             return;
         }
 
-        BConfig::i()->set('db/logging', 1);
+        $this->BConfig->set('db/logging', 1);
 
         // TODO: move special cases from buckyball to fulleron
         // special case for FCom_Admin because some frontend modules require its tables
         if (empty($migration['DEFAULT']['FCom_Admin']['schema_version'])
             && empty($migration['DEFAULT']['FCom_Admin']['migrate'])
         ) {
-            BApp::m('FCom_Admin')->run_status = BModule::LOADED;
+            $this->BModuleRegistry->module('FCom_Admin')->run_status = BModule::LOADED;
             static::migrateModules('FCom_Core,FCom_Admin');
             //return;
         }
         /*
-        if (!$force && BConfig::i()->get('core/currently_migrating')) {
+        if (!$force && $this->BConfig->get('core/currently_migrating')) {
             return;
         }
-        BConfig::i()->set('core/currently_migrating', 1, false, true);
+        $this->BConfig->set('core/currently_migrating', 1, false, true);
         */
         if (class_exists('FCom_Core_Main')) {
-            FCom_Core_Main::i()->writeConfigFiles('core');
+            $this->FCom_Core_Main->writeConfigFiles('core');
         }
 
-        BResponse::i()->startLongResponse();
-        $view = BView::i();
+        $this->BResponse->startLongResponse();
+        $view = $this->BView;
         echo '<html><body><h1>Migrating modules DB structure...</h1><pre>';
         $i = 0;
         $error = false;
         try {
             foreach ($migration as $connectionName => $modules) {
-                BDb::connect($connectionName);
+                $this->BDb->connect($connectionName);
 
                 foreach ($modules as $modName => $mod) {
                     if (empty($mod['migrate'])) {
@@ -1524,7 +1534,7 @@ class BMigrate extends BClass
                     $script = $mod['script'];
                     if (is_array($script)) {
                          if (!empty($script['file'])) {
-                             $filename = BApp::m($modName)->root_dir . '/' . $script['file'];
+                             $filename = $this->BModuleRegistry->module($modName)->root_dir . '/' . $script['file'];
                              if (!file_exists($filename)) {
                                  BDebug::warning('Migration file not exists: ' . $filename);
                                  continue;
@@ -1537,12 +1547,12 @@ class BMigrate extends BClass
                     static::$_migratingModule =& $mod;
                     /*
                     try {
-                        BDb::transaction();
+                        $this->BDb->transaction();
                     */
-                        BDb::ddlClearCache(); // clear DDL cache before each migration step
+                        $this->BDb->ddlClearCache(); // clear DDL cache before each migration step
                         BDebug::debug('DB.MIGRATE ' . $view->q($script));
                         if (is_callable($script)) {
-                            $result = call_user_func($script);
+                            $result = $this->BUtil->call($script);
                         } elseif (is_file($module->root_dir . '/' . $script)) {
                             $result = include_once($module->root_dir . '/' . $script);
                         } elseif (is_dir($module->root_dir . '/' . $script)) {
@@ -1555,25 +1565,25 @@ class BMigrate extends BClass
                             }
                         }
                     /*
-                        BDb::commit();
+                        $this->BDb->commit();
                     } catch (Exception $e) {
-                        BDb::rollback();
+                        $this->BDb->rollback();
                         throw $e;
                     }
                     */
                 }
             }
             /*
-            BConfig::i()->set('core/currently_migrating', 0, false, true);
+            $this->BConfig->set('core/currently_migrating', 0, false, true);
             if (class_exists('FCom_Core_Main')) {
-                FCom_Core_Main::i()->writeConfigFiles('core');
+                $this->FCom_Core_Main->writeConfigFiles('core');
             }
             */
         } catch (Exception $e) {
             /*
-            BConfig::i()->set('core/currently_migrating', 0, false, true);
+            $this->BConfig->set('core/currently_migrating', 0, false, true);
             if (class_exists('FCom_Core_Main')) {
-                FCom_Core_Main::i()->writeConfigFiles('core');
+                $this->FCom_Core_Main->writeConfigFiles('core');
             }
             */
             $trace = $e->getTrace();
@@ -1595,7 +1605,7 @@ class BMigrate extends BClass
         $modReg->currentModule(null);
         static::$_migratingModule = null;
 
-        $url = null !== $redirectUrl ? $redirectUrl : BRequest::i()->currentUrl();
+        $url = null !== $redirectUrl ? $redirectUrl : $this->BRequest->currentUrl();
         echo '</pre>';
         if (!$error) {
             echo '<script>location.href="' . $url . '";</script>';
@@ -1608,7 +1618,7 @@ class BMigrate extends BClass
         exit;
     }
 
-    protected static function _runClassMethods($class)
+    protected function _runClassMethods($class)
     {
         $methods = get_class_methods($class);
         $installs = [];
@@ -1649,7 +1659,7 @@ class BMigrate extends BClass
      * @throws Exception
      * @return bool
      */
-    public static function install($version, $callback)
+    public function install($version, $callback)
     {
         $mod =& static::$_migratingModule;
         // if no code version set, return
@@ -1665,23 +1675,23 @@ class BMigrate extends BClass
 
 BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         // creating module before running install, so the module configuration values can be created within script
-        $module = BDbModule::i()->load($mod['module_name'], 'module_name');
+        $module = $this->BDbModule->load($mod['module_name'], 'module_name');
         if (!$module) {
-            $module = BDbModule::i()->create([
+            $module = $this->BDbModule->create([
                 'module_name' => $mod['module_name'],
                 'schema_version' => $version,
-                'last_upgrade' => BDb::now(),
+                'last_upgrade' => $this->BDb->now(),
                 'last_status' => 'INSTALLING',
             ])->save();
         }
         // call install migration script
         try {
             if (is_callable($callback)) {
-                $result = call_user_func($callback);
+                $result = $this->BUtil->call($callback);
             } elseif (is_file($callback)) {
                 $result = include $callback;
             } elseif (is_string($callback)) {
-                BDb::run($callback);
+                $this->BDb->run($callback);
                 $result = null;
             }
             if (false === $result) {
@@ -1711,7 +1721,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
      * @throws Exception
      * @return bool
      */
-    public static function upgrade($fromVersion, $toVersion, $callback)
+    public function upgrade($fromVersion, $toVersion, $callback)
     {
         $mod =& static::$_migratingModule;
 
@@ -1721,12 +1731,12 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         }
         // if schema doesn't exist, throw exception
         if (empty($mod['schema_version'])) {
-            throw new BException(BLocale::_("Can't upgrade, module schema doesn't exist yet: %s", BModuleRegistry::i()->currentModuleName()));
+            throw new BException($this->BLocale->_("Can't upgrade, module schema doesn't exist yet: %s", $this->BModuleRegistry->currentModuleName()));
         }
         $schemaVersion = $mod['schema_version'];
 
         // if module is not enable skip upgrade
-        if (!BModuleRegistry::i()->isLoaded($mod['module_name'])) {
+        if (!$this->BModuleRegistry->isLoaded($mod['module_name'])) {
             return true;
         }
         // if code version is older than target scheme version, skip
@@ -1739,18 +1749,18 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         }
         echo '^' . $toVersion . '; ';
 
-        $module = BDbModule::i()->load($mod['module_name'], 'module_name')->set([
-            'last_upgrade' => BDb::now(),
+        $module = $this->BDbModule->load($mod['module_name'], 'module_name')->set([
+            'last_upgrade' => $this->BDb->now(),
             'last_status' => 'UPGRADING',
         ])->save();
         // call upgrade migration script
         try {
             if (is_callable($callback)) {
-                $result = call_user_func($callback);
+                $result = $this->BUtil->call($callback);
             } elseif (is_file($callback)) {
                 $result = include $callback;
             } elseif (is_string($callback)) {
-                BDb::run($callback);
+                $this->BDb->run($callback);
                 $result = null;
             }
             if (false === $result) {
@@ -1776,10 +1786,10 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
     * @param string $modName
     * @return boolean
     */
-    public static function runUninstallScript($modName = null)
+    public function runUninstallScript($modName = null)
     {
         if (null === $modName) {
-            $modName = BModuleRegistry::i()->currentModuleName();
+            $modName = $this->BModuleRegistry->currentModuleName();
         }
         $mod =& static::$_migratingModule;
 
@@ -1794,14 +1804,14 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         $callback = $mod->uninstall_callback; //TODO: implement
         // call uninstall migration script
         if (is_callable($callback)) {
-            call_user_func($callback);
+            $this->BUtil->call($callback);
         } elseif (is_file($callback)) {
             include $callback;
         } elseif (is_string($callback)) {
-            BDb::run($callback);
+            $this->BDb->run($callback);
         }
         // delete module schema version from db, related configuration entries will be deleted
-        BDbModule::i()->load($mod['module_name'], 'module_name')->delete();
+        $this->BDbModule->load($mod['module_name'], 'module_name')->delete();
         return true;
     }
 }
@@ -1811,12 +1821,12 @@ class BDbModule extends BModel
 {
     protected static $_table = 'buckyball_module';
 
-    public static function init()
+    public function init()
     {
-        //BDb::connect();
+        //$this->BDb->connect();
         $table = static::table();
-        if (!BDb::ddlTableExists($table)) {
-            BDb::ddlTableDef($table, [
+        if (!$this->BDb->ddlTableExists($table)) {
+            $this->BDb->ddlTableDef($table, [
                 'COLUMNS' => [
                     'id' => 'int unsigned not null auto_increment',
                     'module_name' => 'varchar(100) not null',
@@ -1839,12 +1849,12 @@ class BDbModuleConfig extends BModel
 {
     protected static $_table = 'buckyball_module_config';
 
-    public static function init()
+    public function init()
     {
         $table = static::table();
-        $modTable = BDbModule::table();
-        if (!BDb::ddlTableExists($table)) {
-            BDb::run("
+        $modTable = $this->BDbModule->table();
+        if (!$this->BDb->ddlTableExists($table)) {
+            $this->BDb->run("
 CREATE TABLE {$table} (
 id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 module_id INT UNSIGNED NOT NULL,

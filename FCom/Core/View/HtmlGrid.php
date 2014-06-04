@@ -13,12 +13,12 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         if (!$changeRequest) {
             return $this->grid['config']['grid_url'];
         }
-        return BUtil::setUrlQuery($this->grid['config']['grid_url'], $changeRequest);
+        return $this->BUtil->setUrlQuery($this->grid['config']['grid_url'], $changeRequest);
     }
 
     public function pageSizeHref()
     {
-        return BUtil::setUrlQuery(true, ['ps' => '-VALUE-']);
+        return $this->BUtil->setUrlQuery(true, ['ps' => '-VALUE-']);
     }
 
     public function pageSizeOptions()
@@ -29,7 +29,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
 
     public function pageChangeHref()
     {
-        return BUtil::setUrlQuery(true, ['p' => '-VALUE-']);
+        return $this->BUtil->setUrlQuery(true, ['p' => '-VALUE-']);
     }
 
     public function gridActions()
@@ -78,7 +78,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         } else {
             $change = ['s' => $col['name'], 'sd' => 'asc'];
         }
-        return BUtil::setUrlQuery(true, $change);
+        return $this->BUtil->setUrlQuery(true, $change);
     }
 
     public function sortStyle($col)
@@ -113,7 +113,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         $c =& $grid['config'];
 
         if (empty($c['grid_url'])) {
-            $c['grid_url'] = BRequest::currentUrl();
+            $c['grid_url'] = $this->BRequest->currentUrl();
         }
         if (empty($c['page_size_options'])) {
             $c['page_size_options'] = [10, 25, 50, 100];
@@ -137,7 +137,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
 
         // fetch request parameters
         if (empty($grid['request'])) {
-            $grid['request'] = BRequest::i()->get();
+            $grid['request'] = $this->BRequest->get();
         }
 
         $this->grid = $grid;
@@ -158,7 +158,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
                     $col['width'] = 50;
                     $col['no_reorder'] = true;
                     $col['format'] = function($args) {
-                        return BUtil::tagHtml('input', [
+                        return $this->BUtil->tagHtml('input', [
                             'type'  => 'checkbox',
                             //'name'  => "grid[{$args['grid']['config']['id']}][sel][{$args['row']->id}]",
                             'class' => 'js-sel',
@@ -176,12 +176,12 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
                         if (!empty($col['options'])) {
                             foreach ($col['options'] as $k => $opt) {
                                 if (!empty($opt['data-href'])) {
-                                    $opt['data-href'] = BUtil::injectVars($opt['data-href'], $args['row']->as_array());
+                                    $opt['data-href'] = $this->BUtil->injectVars($opt['data-href'], $args['row']->as_array());
                                 }
                                 $options[$k] = $opt;
                             }
                         }
-                        return BUtil::tagHtml('select', ['class' => 'js-actions'], BUtil::optionsHtml($options));
+                        return $this->BUtil->tagHtml('select', ['class' => 'js-actions'], $this->BUtil->optionsHtml($options));
                     };
                     break;
             }
@@ -201,15 +201,15 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             if (true === $action && !empty(static::$_defaultActions[$k])) {
                 switch ($k) {
                     case 'refresh':
-                        $action = ['html' => BUtil::tagHtml('a',
-                            ['href' => BRequest::currentUrl(), 'class' => 'js-change-url grid-refresh btn'],
-                            BLocale::_('Refresh')
+                        $action = ['html' => $this->BUtil->tagHtml('a',
+                            ['href' => $this->BRequest->currentUrl(), 'class' => 'js-change-url grid-refresh btn'],
+                            $this->BLocale->_('Refresh')
                         )];
                         break;
                     case 'link_to_page':
-                        $action = ['html' => BUtil::tagHtml('a',
-                            ['href' => BRequest::currentUrl(), 'class' => 'grid-link_to_page btn'],
-                            BLocale::_('Link')
+                        $action = ['html' => $this->BUtil->tagHtml('a',
+                            ['href' => $this->BRequest->currentUrl(), 'class' => 'grid-link_to_page btn'],
+                            $this->BLocale->_('Link')
                         )];
                         break;
 
@@ -236,10 +236,10 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         $gridId = !empty($grid['personalize']['id']) ? $grid['personalize']['id'] : $grid['config']['id'];
 
         // retrieve current personalization
-        $pers = FCom_Admin_Model_User::i()->personalize();
+        $pers = $this->FCom_Admin_Model_User->personalize();
         $persGrid = !empty($pers['grid'][$gridId]) ? $pers['grid'][$gridId] : [];
 #var_dump($pers);
-        $req = BRequest::i()->get();
+        $req = $this->BRequest->get();
 
         // prepare array to update personalization
 
@@ -256,7 +256,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         }
         // save personalization
         if (!empty($personalize)) {
-            FCom_Admin_Model_User::i()->personalize(['grid' => [$gridId => $personalize]]);
+            $this->FCom_Admin_Model_User->personalize(['grid' => [$gridId => $personalize]]);
         }
 
         // get columns personalization
@@ -264,7 +264,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         $defPos = 0;
         foreach ($grid['config']['columns'] as $col) {
             if (!empty($col['name']) && !empty($persGrid['columns'][$col['name']])) {
-                $col = BUtil::arrayMerge($col, $persGrid['columns'][$col['name']]);
+                $col = $this->BUtil->arrayMerge($col, $persGrid['columns'][$col['name']]);
             }
             if (empty($col['position'])) {
                 $col['position'] = $defPos;
@@ -283,7 +283,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         $grid = $this->grid;
         $gridId = !empty($grid['personalize']['id']) ? $grid['personalize']['id'] : $grid['config']['id'];
         $reset = ['state' => ['p' => null, 'ps' => null, 's' => null, 'sd' => null, 'q' => null]];
-        FCom_Admin_Model_User::i()->personalize(['grid' => [$gridId => $reset]]);
+        $this->FCom_Admin_Model_User->personalize(['grid' => [$gridId => $reset]]);
     }
 
     public function getGrid()
@@ -298,7 +298,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         $this->_processPersonalization();
 
         $grid = $this->grid;
-        BEvents::i()->fire(__METHOD__ . ':after', ['grid' => &$grid]);
+        $this->BEvents->fire(__METHOD__ . ':after', ['grid' => &$grid]);
         $grid['_processed'] = true;
         $this->grid = $grid;
 
@@ -323,9 +323,9 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             if (is_string($orm)) {
                 $orm = $orm::i()->orm();
             }
-            BEvents::i()->fire(__METHOD__ . ':initORM:' . $config['id'], ['orm' => $orm, 'grid' => $grid]);
+            $this->BEvents->fire(__METHOD__ . ':initORM:' . $config['id'], ['orm' => $orm, 'grid' => $grid]);
 
-            $this->_processGridFilters($config, BRequest::i()->get('filter'), $orm);
+            $this->_processGridFilters($config, $this->BRequest->get('filter'), $orm);
             try {
                 $grid['result'] = $orm->paginate($grid['request'], [
                     's'  => !empty($config['state']['s'])  ? $config['state']['s']  : null,
@@ -339,7 +339,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             }
             //var_dump($grid['result']);exit;
             $grid['result']['state']['description'] = $this->stateDescription($grid['result']['state']);
-            BEvents::i()->fire(__METHOD__ . ':after:' . $config['id'], ['grid' => & $grid]);
+            $this->BEvents->fire(__METHOD__ . ':after:' . $config['id'], ['grid' => & $grid]);
         }
 
         $this->grid = $grid;
@@ -353,9 +353,9 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         $rows = $grid['result']['rows'];
         $gridId = $grid['config']['id'];
 
-        $pers = FCom_Admin_Model_User::i()->personalize();
+        $pers = $this->FCom_Admin_Model_User->personalize();
         $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : [];
-        $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');
+        $persState = $this->BUtil->arrayMask($persState, 's,sd,p,ps,q');
         foreach ($persState as $k => $v) {
             if (!empty($v)) {
                 $state[$k] = $v;
@@ -409,7 +409,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             if (is_callable($cb)) {
                 call_user_func($cb, ['grid' => $grid, 'rows' => &$trArr]);
             } else {
-                BDebug::warning('Invalid grid format_callback');
+                $this->BDebug->warning('Invalid grid format_callback');
             }
         }
         return $trArr;
@@ -423,9 +423,9 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         foreach ($trArr as $rowId => $tr) {
             $tdHtmlArr = [];
             foreach ($tr['cells'] as $colId => $cell) {
-                $tdHtmlArr[] = BUtil::tagHtml('td', $cell['attr'], $cell['html']);
+                $tdHtmlArr[] = $this->BUtil->tagHtml('td', $cell['attr'], $cell['html']);
             }
-            $trHtmlArr[] = BUtil::tagHtml('tr', $tr['attr'], join("\n", $tdHtmlArr));
+            $trHtmlArr[] = $this->BUtil->tagHtml('tr', $tr['attr'], join("\n", $tdHtmlArr));
         }
 
         return join("\n", $trHtmlArr);
@@ -465,10 +465,10 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             if (is_string($col['format'])) {
                 switch ($col['format']) {
                     case 'boolean': $value = $value ? 1 : 0; break;
-                    case 'date': $value = $value ? BLocale::i()->datetimeDbToLocal($value) : ''; break;
-                    case 'datetime': $value = $value ? BLocale::i()->datetimeDbToLocal($value, true) : ''; break;
+                    case 'date': $value = $value ? $this->BLocale->datetimeDbToLocal($value) : ''; break;
+                    case 'datetime': $value = $value ? $this->BLocale->datetimeDbToLocal($value, true) : ''; break;
                     case 'currency': $value = $value ? '$' . number_format($value, 2) : ''; break;
-                    default: BDebug::warning('Grid value format not implemented: ' . $col['format']);
+                    default: $this->BDebug->warning('Grid value format not implemented: ' . $col['format']);
                 }
                 $value = nl2br($this->q($value));
             } elseif (is_callable($col['format'])) {
@@ -482,7 +482,7 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
         }
 
         if (!empty($col['href'])) {
-            $value = BUtil::tagHtml('a', ['href' => BUtil::injectVars($col['href'], $row->as_array())], $value);
+            $value = $this->BUtil->tagHtml('a', ['href' => $this->BUtil->injectVars($col['href'], $row->as_array())], $value);
         }
 
         $out['html'] = $value;
@@ -523,28 +523,28 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
 
     public function processORM($orm, $method = null, $stateKey = null, $forceRequest = [])
     {
-        $r = BRequest::i()->request();
+        $r = $this->BRequest->request();
         if (!empty($r['hash'])) {
-            $r = (array)BUtil::fromJson(base64_decode($r['hash']));
+            $r = (array)$this->BUtil->fromJson(base64_decode($r['hash']));
         } elseif (!empty($r['filters'])) {
-            $r['filters'] = BUtil::fromJson($r['filters']);
+            $r['filters'] = $this->BUtil->fromJson($r['filters']);
         }
-        $r = BUtil::arrayMask($r, 's,sd,p,ps,q');
+        $r = $this->BUtil->arrayMask($r, 's,sd,p,ps,q');
 
         $gridId = $this->grid['config']['id'];
-        $pers = FCom_Admin_Model_User::i()->personalize();
+        $pers = $this->FCom_Admin_Model_User->personalize();
         $persState = !empty($pers['grid'][$gridId]['state']) ? $pers['grid'][$gridId]['state'] : [];
-        $persState = BUtil::arrayMask($persState, 's,sd,p,ps,q');
+        $persState = $this->BUtil->arrayMask($persState, 's,sd,p,ps,q');
         foreach ($persState as $k => $v) {
             if (!isset($r[$k]) && !empty($v)) {
                 $r[$k] = $v;
             }
         }
 
-        FCom_Admin_Model_User::i()->personalize(['grid' => [$gridId => ['state' => $r]]]);
+        $this->FCom_Admin_Model_User->personalize(['grid' => [$gridId => ['state' => $r]]]);
 
         if ($stateKey) {
-            $sess =& BSession::i()->dataToUpdate();
+            $sess =& $this->BSession->dataToUpdate();
             $sess['grid_state'][$stateKey] = $r;
         }
         if ($forceRequest) {
@@ -558,18 +558,18 @@ class FCom_Core_View_HtmlGrid extends FCom_Core_View_Abstract
             $orm->where($where);
         }
         if (!is_null($method)) {
-            //BEvents::i()->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
-            BEvents::i()->fire($method . ':orm', ['orm' => $orm]);
+            //$this->BEvents->fire('FCom_Admin_View_Grid::processORM', array('orm'=>$orm));
+            $this->BEvents->fire($method . ':orm', ['orm' => $orm]);
         }
 
         $data = $orm->paginate($r);
         //print_r($r);
 
         $data['filters'] = !empty($r['filters']) ? $r['filters'] : null;
-        //$data['hash'] = base64_encode(BUtil::toJson(BUtil::arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
+        //$data['hash'] = base64_encode($this->BUtil->toJson($this->BUtil->arrayMask($data, 'p,ps,s,sd,q,_search,filters')));
         $data['reloadGrid'] = !empty($r['hash']);
         if (!is_null($method)) {
-            BEvents::i()->fire($method . ':data', ['data' => &$data]);
+            $this->BEvents->fire($method . ':data', ['data' => &$data]);
         }
 
         return $data;

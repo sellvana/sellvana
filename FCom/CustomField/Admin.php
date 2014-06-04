@@ -7,11 +7,11 @@ class FCom_CustomField_Admin extends BClass
     {
         $p = $args['model'];
         $data = $p->as_array();
-        $fields = FCom_CustomField_Model_Field::i()->fieldsInfo('product', true);
+        $fields = $this->FCom_CustomField_Model_Field->fieldsInfo('product', true);
         if (array_intersect($fields, array_keys($data))) {
-            $custom = FCom_CustomField_Model_ProductField::i()->load($p->id, 'product_id');
+            $custom = $this->FCom_CustomField_Model_ProductField->load($p->id, 'product_id');
             if (!$custom) {
-                $custom = FCom_CustomField_Model_ProductField::i()->create();
+                $custom = $this->FCom_CustomField_Model_ProductField->create();
             }
             $custom->set('product_id', $p->id)->set($data)->save();
         }
@@ -20,11 +20,11 @@ class FCom_CustomField_Admin extends BClass
 */
     public function onProductGridColumns($args)
     {
-        $fields = FCom_CustomField_Model_Field::i()->orm('f')->find_many();
+        $fields = $this->FCom_CustomField_Model_Field->orm('f')->find_many();
         foreach ($fields as $f) {
             $col = ['label' => $f->field_name, 'index' => 'pcf.' . $f->field_name, 'hidden' => true];
             if ($f->admin_input_type == 'select') {
-                $col['options'] = FCom_CustomField_Model_FieldOption::i()->orm()
+                $col['options'] = $this->FCom_CustomField_Model_FieldOption->orm()
                     ->where('field_id', $f->id)
                     ->find_many_assoc(stripos($f->table_field_type, 'varchar') === 0 ? 'label' : 'id', 'label');
             }

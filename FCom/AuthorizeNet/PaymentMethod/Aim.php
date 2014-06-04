@@ -15,7 +15,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
 
     public function getCheckoutFormView()
     {
-        return BLayout::i()->view('authorizenet/aim')->set('key', static::PAYMENT_METHOD_KEY);
+        return $this->BLayout->view('authorizenet/aim')->set('key', static::PAYMENT_METHOD_KEY);
     }
 
     public function payOnCheckout()
@@ -28,7 +28,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
         $action = $config['payment_action'];
 
         /* @var $api FCom_AuthorizeNet_AimApi */
-        $api = FCom_AuthorizeNet_AimApi::i();
+        $api = $this->FCom_AuthorizeNet_AimApi;
 
         switch ($action) {
             case 'AUTH_ONLY':
@@ -61,7 +61,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
             'online'           => 1,
         ];
         $this->clear();
-        $paymentModel = FCom_Sales_Model_Order_Payment::i()->addNew($paymentData);
+        $paymentModel = $this->FCom_Sales_Model_Order_Payment->addNew($paymentData);
         $paymentModel->setData('response', $response);
         $paymentModel->save();
         return $response;
@@ -98,7 +98,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
      */
     public function cardTypes()
     {
-        return FCom_AuthorizeNet_Model_Settings::i()->cardTypes();
+        return $this->FCom_AuthorizeNet_Model_Settings->cardTypes();
     }
 
     /**
@@ -106,7 +106,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
      */
     public function config()
     {
-        $config = BConfig::i();
+        $config = $this->BConfig;
         return $config->get('modules/FCom_AuthorizeNet/aim');
     }
 
@@ -154,7 +154,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
     public function asArray()
     {
         $data = parent::asArray();
-        $data = BUtil::arrayMerge($data, $this->getPublicData());
+        $data = $this->BUtil->arrayMerge($data, $this->getPublicData());
         return [static::PAYMENT_METHOD_KEY => $data];
     }
 

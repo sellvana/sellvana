@@ -4,18 +4,18 @@ class FCom_Blog_Migrate extends BClass
 {
     public function install__0_1_4()
     {
-        if (!FCom_Core_Model_Module::i()->load('FCom_Admin', 'module_name')) {
-            BMigrate::i()->migrateModules('FCom_Admin', true);
+        if (!$this->FCom_Core_Model_Module->load('FCom_Admin', 'module_name')) {
+            $this->BMigrate->migrateModules('FCom_Admin', true);
         }
 
-        $tPost = FCom_Blog_Model_Post::table();
-        $tTag = FCom_Blog_Model_Tag::table();
-        $tPostTag = FCom_Blog_Model_PostTag::table();
-        $tUser = FCom_Admin_Model_User::table();
-        $tCategory = FCom_Blog_Model_Category::table();
-        $tPostCategory = FCom_Blog_Model_PostCategory::table();
+        $tPost = $this->FCom_Blog_Model_Post->table();
+        $tTag = $this->FCom_Blog_Model_Tag->table();
+        $tPostTag = $this->FCom_Blog_Model_PostTag->table();
+        $tUser = $this->FCom_Admin_Model_User->table();
+        $tCategory = $this->FCom_Blog_Model_Category->table();
+        $tPostCategory = $this->FCom_Blog_Model_PostCategory->table();
 
-        BDb::ddlTableDef($tPost, [
+        $this->BDb->ddlTableDef($tPost, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'author_user_id' => 'int unsigned not null',
@@ -43,7 +43,7 @@ class FCom_Blog_Migrate extends BClass
             ],
         ]);
 
-        BDb::ddlTableDef($tTag, [
+        $this->BDb->ddlTableDef($tTag, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'tag_key' => 'varchar(50)',
@@ -55,7 +55,7 @@ class FCom_Blog_Migrate extends BClass
             ],
         ]);
 
-        BDb::ddlTableDef($tPostTag, [
+        $this->BDb->ddlTableDef($tPostTag, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'tag_id' => 'int unsigned not null',
@@ -72,7 +72,7 @@ class FCom_Blog_Migrate extends BClass
         ]);
 
 
-        BDb::ddlTableDef($tCategory, [
+        $this->BDb->ddlTableDef($tCategory, [
             'COLUMNS' => [
                 'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                 'name'    => 'varchar(255) NOT NULL',
@@ -81,7 +81,7 @@ class FCom_Blog_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
         ]);
-        BDb::ddlTableDef($tPostCategory, [
+        $this->BDb->ddlTableDef($tPostCategory, [
             'COLUMNS' => [
                 'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                 'category_id'    => 'INT(10) UNSIGNED NOT NULL',
@@ -101,7 +101,7 @@ class FCom_Blog_Migrate extends BClass
 
     public function upgrade__0_1_0__0_1_1()
     {
-        BDb::run("
+        $this->BDb->run("
 SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS fcom_blog_article_tag;
 DROP TABLE IF EXISTS fcom_blog_tag;
@@ -113,11 +113,11 @@ SET FOREIGN_KEY_CHECKS=1;
 
     public function upgrade__0_1_1__0_1_2()
     {
-        $tCategory = FCom_Blog_Model_Category::table();
-        $tPost = FCom_Blog_Model_Post::table();
-        $tPostCategory = FCom_Blog_Model_PostCategory::table();
+        $tCategory = $this->FCom_Blog_Model_Category->table();
+        $tPost = $this->FCom_Blog_Model_Post->table();
+        $tPostCategory = $this->FCom_Blog_Model_PostCategory->table();
 
-        BDb::ddlTableDef($tCategory, [
+        $this->BDb->ddlTableDef($tCategory, [
                 'COLUMNS' => [
                     'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                     'name'    => 'varchar(255) NOT NULL',
@@ -126,7 +126,7 @@ SET FOREIGN_KEY_CHECKS=1;
                 ],
                 'PRIMARY' => '(id)',
             ]);
-        BDb::ddlTableDef($tPostCategory, [
+        $this->BDb->ddlTableDef($tPostCategory, [
                 'COLUMNS' => [
                     'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                     'category_id'    => 'INT(10) UNSIGNED NOT NULL',
@@ -151,6 +151,6 @@ SET FOREIGN_KEY_CHECKS=1;
 
     public function upgrade__0_1_3__0_1_4()
     {
-        //BDb::run("RENAME TABLE fcom_blog_category_post TO fcom_blog_post_category");
+        //$this->BDb->run("RENAME TABLE fcom_blog_category_post TO fcom_blog_post_category");
     }
 }

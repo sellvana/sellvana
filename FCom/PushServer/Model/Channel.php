@@ -40,14 +40,14 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
         if (!empty(static::$_channelCache[$channelName])) {
             return static::$_channelCache[$channelName];
         }
-        $sessData =& BSession::i()->dataToUpdate();
+        $sessData =& $this->BSession->dataToUpdate();
         if (!empty($sessData['pushserver']['channels'][$channelName])) {
-            static::$_channelCache[$channelName] = static::create($sessData['pushserver']['channels'][$channelName], false);
+            static::$_channelCache[$channelName] = $this->create($sessData['pushserver']['channels'][$channelName], false);
             return static::$_channelCache[$channelName];
         }
-        $channel = static::load($channelName, 'channel_name');
+        $channel = $this->load($channelName, 'channel_name');
         if (!$channel) {
-            $channel = static::create(['channel_name' => $channelName])->save();
+            $channel = $this->create(['channel_name' => $channelName])->save();
         }
         static::$_channelCache[$channelName] = $channel;
         if ($session) {
@@ -60,8 +60,8 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
     {
         if (!parent::onBeforeSave()) return false;
 
-        $this->set('create_at', BDb::now(), 'IFNULL');
-        $this->set('update_at', BDb::now());
+        $this->set('create_at', $this->BDb->now(), 'IFNULL');
+        $this->set('update_at', $this->BDb->now());
 
         return true;
     }
@@ -70,7 +70,7 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
     {
         parent::onAfterSave();
 
-        $sessData =& BSession::i()->dataToUpdate();
+        $sessData =& $this->BSession->dataToUpdate();
         if (!empty($sessData['pushserver']['channels'][$this->channel_name])) {
             $sessData['pushserver']['channels'][$this->channel_name] = $this->as_array();
         }
@@ -88,19 +88,19 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
     public function listen($callback)
     {
         $channelName = $this->channel_name;
-        BEvents::i()->on('FCom_PushServer_Model_Channel::send:' . $channelName, $callback);
+        $this->BEvents->on('FCom_PushServer_Model_Channel::send:' . $channelName, $callback);
         return $this;
     }
 
     public function subscribe($client)
     {
-        FCom_PushServer_Model_Client::i()->getClient($client)->subscribe($this);
+        $this->FCom_PushServer_Model_Client->getClient($client)->subscribe($this);
         return $this;
     }
 
     public function unsubscribe($client)
     {
-        FCom_PushServer_Model_Client::i()->getClient($client)->unsubscribe($this);
+        $this->FCom_PushServer_Model_Client->getClient($client)->unsubscribe($this);
         return $this;
     }
 
@@ -111,29 +111,29 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
         }
 
 
-if (FCom_PushServer_Main::isDebugMode()) {
-    BDebug::log("SEND1: " . print_r($message, 1));
+if ($this->FCom_PushServer_Main->isDebugMode()) {
+    $this->BDebug->log("SEND1: " . print_r($message, 1));
 }
-        BEvents::i()->fire(__METHOD__ . ':' . $this->get('channel_name'), [
+        $this->BEvents->fire(__METHOD__ . ':' . $this->get('channel_name'), [
             'channel' => $this,
             'message' => $message,
             'client'  => $fromClient,
         ]);
 
-        $clientHlp = FCom_PushServer_Model_Client::i();
+        $clientHlp = $this->FCom_PushServer_Model_Client;
         $fromWindowName = $clientHlp->getWindowName();
         $fromConnId = $clientHlp->getConnId();
-        $msgHlp = FCom_PushServer_Model_Message::i();
+        $msgHlp = $this->FCom_PushServer_Model_Message;
         $msgIds = [];
 
-        $toClients = FCom_PushServer_Model_Client::i()->orm('c')
+        $toClients = $this->FCom_PushServer_Model_Client->orm('c')
             ->join('FCom_PushServer_Model_Subscriber', ['c.id', '=', 's.client_id'], 's')
             ->where('s.channel_id', $this->id())
             ->select('s.id', 'sub_id')->select('c.id')->select('c.data_serialized')
             ->find_many();
 
-if (FCom_PushServer_Main::isDebugMode()) {
-    BDebug::log('SEND2: ' . sizeof($toClients) . ': ' . print_r($this->as_array(), 1));
+if ($this->FCom_PushServer_Main->isDebugMode()) {
+    $this->BDebug->log('SEND2: ' . sizeof($toClients) . ': ' . print_r($this->as_array(), 1));
 }
 
         foreach ($toClients as $toClient) {
@@ -154,8 +154,8 @@ if (FCom_PushServer_Main::isDebugMode()) {
                 ])->setData($message)->save();
                 //$msgIds[] = $msg->id;
 
-if (FCom_PushServer_Main::isDebugMode()) {
-    BDebug::log("SEND3: " . print_r($msg->as_array(), 1));
+if ($this->FCom_PushServer_Main->isDebugMode()) {
+    $this->BDebug->log("SEND3: " . print_r($msg->as_array(), 1));
 }
             }
         }

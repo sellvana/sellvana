@@ -131,14 +131,14 @@
           <div class="form-group">
             <label for="#" class="control-label">{{ "Password" |_ }}</label>
             <div class="controls">
-              <input type="password" id="account-password" name="account[password]" class="required form-control {{ validator.fieldClass('password') }}"/>
+              <input type="password" id="account-password" name="account[password]" class="required form-control {{ validator.fieldClass('password') }}" pattern=".{6,}"/>
                 {{ validator.errorHtml("password", "account-password") | raw }}
             </div>
           </div>
           <div class="form-group">
             <label for="#" class="control-label">{{ "Confirm Password" |_ }}</label>
             <div class="controls">
-              <input type="password" id="account-password_confirm" name="account[password_confirm]"
+              <input type="password" id="account-password_confirm" name="account[password_confirm]" pattern=".{6,}"
                      class="required form-control {{ validator.fieldClass('password_confirm') }}" equalto="#account-password"/>
                 {{ validator.errorHtml("password_confirm", "account-password_confirm") | raw }}
             </div>

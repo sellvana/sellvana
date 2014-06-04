@@ -28,7 +28,7 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         if (is_null($obj)) {
             $obj = $this;
         }
-        $countries = FCom_Geo_Model_Country::i()->options();
+        $countries = $this->FCom_Geo_Model_Country->options();
         return '<address>'
             . '<div class="f-street-address">' . $obj->street1 . '</div>'
             . ($obj->street2 ? '<div class="f-extended-address">' . $obj->street2 . '</div>' : '')
@@ -120,26 +120,26 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if (!$this->create_at) $this->create_at = BDb::now();
-        $this->update_at = BDb::now();
+        if (!$this->create_at) $this->create_at = $this->BDb->now();
+        $this->update_at = $this->BDb->now();
         return true;
     }
 
     public function newShipping($address, $customer)
     {
         $data = ['address' => $address];
-        static::import($data, $customer, 'shipping');
+        $this->import($data, $customer, 'shipping');
     }
 
     public function newBilling($address, $customer)
     {
         $data = ['address' => $address];
-        static::import($data, $customer, 'billing');
+        $this->import($data, $customer, 'billing');
     }
 
-    public static function import($data, $cust, $atype = 'billing')
+    public function import($data, $cust, $atype = 'billing')
     {
-        $addr = static::create(['customer_id' => $cust->id]);
+        $addr = $this->create(['customer_id' => $cust->id]);
 
         if (!empty($data['address'])) {
             $addr->set($data['address']);

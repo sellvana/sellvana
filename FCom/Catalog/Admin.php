@@ -2,9 +2,9 @@
 
 class FCom_Catalog_Admin extends BClass
 {
-    static public function bootstrap()
+    public function bootstrap()
     {
-        BEvents::i()
+        $this->BEvents
             ->on('category_tree_post.associate.products', 'FCom_Catalog_Model_Product.onAssociateCategory')
             ->on('category_tree_post.reorderAZ', 'FCom_Catalog_Model_Category.onReorderAZ')
 
@@ -40,14 +40,14 @@ class FCom_Catalog_Admin extends BClass
             */
         ;
 
-        FCom_Admin_Controller_MediaLibrary::i()
+        $this->FCom_Admin_Controller_MediaLibrary
             ->allowFolder('media/category/images')
-            ->allowFolder('media/product/image')
+            ->allowFolder('media/product/images')
             ->allowFolder('media/product/attachment')
             ->allowFolder('storage/import/products')
         ;
 
-        FCom_Admin_Model_Role::i()->createPermission([
+        $this->FCom_Admin_Model_Role->createPermission([
             'catalog' => 'Catalog',
             'catalog/products' => 'Manage Products',
             'catalog/categories' => 'Manage Categories',
@@ -56,12 +56,12 @@ class FCom_Catalog_Admin extends BClass
         ]);
     }
 
-    public static function onProductsEditPost($args)
+    public function onProductsEditPost($args)
     {
 print_r($args); exit;
     }
 
-    public static function onNavTreeForm($args)
+    public function onNavTreeForm($args)
     {
         $args['node_types']['category'] = 'Category';
     }
@@ -69,7 +69,7 @@ print_r($args); exit;
     public function getAvailableViews()
     {
         $template = [];
-        $allViews = FCom_Frontend_Main::i()->getLayout()->getAllViews();
+        $allViews = $this->FCom_Frontend_Main->getLayout()->getAllViews();
         foreach ($allViews as $view) {
             $tmp = $view->param('view_name');
             if ($tmp != '') {
@@ -77,7 +77,7 @@ print_r($args); exit;
             }
         }
         $cmsBlocks = [];
-        $blocks = BDb::many_as_array(FCom_Cms_Model_Block::i()->orm()->select('id')->select('description')->find_many());
+        $blocks = $this->BDb->many_as_array($this->FCom_Cms_Model_Block->orm()->select('id')->select('description')->find_many());
         foreach ($blocks as $block) {
             $cmsBlocks['block:' . $block['id']] = $block['description'];
         }

@@ -33,7 +33,7 @@ class FCom_LibGanon_Main extends BClass
      * @param array $args
      * @return FCom_LibGanon_Main
      */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
@@ -42,9 +42,9 @@ class FCom_LibGanon_Main extends BClass
     {
         $this->_html = $args['output'];# : '<!DOCTYPE html><html><head></head><body></body></html>';
         //$args['doc'] = $this->doc();
-        $args['current_path'] = BRequest::i()->rawPath();
-        BEvents::i()->fire('FCom_LibGanon::render', $args);
-        BEvents::i()->fire('FCom_LibGanon::render:' . $args['current_path'], $args);
+        $args['current_path'] = $this->BRequest->rawPath();
+        $this->BEvents->fire('FCom_LibGanon::render', $args);
+        $this->BEvents->fire('FCom_LibGanon::render:' . $args['current_path'], $args);
 
         if ($this->_doc) {
             $args['output'] = (string)$this->_doc;
@@ -54,10 +54,10 @@ class FCom_LibGanon_Main extends BClass
     public function ready($callback, $args = [])
     {
         if (empty($args['on_path'])) {
-            BEvents::i()->on('FCom_LibGanon_Main::render', $callback, $args);
+            $this->BEvents->on('FCom_LibGanon_Main::render', $callback, $args);
         } else {
             foreach ((array)$args['on_path'] as $path) {
-                BEvents::i()->on('FCom_LibGanon_Main::render:' . $path, $callback, $args);
+                $this->BEvents->on('FCom_LibGanon_Main::render:' . $path, $callback, $args);
             }
         }
         return $this;

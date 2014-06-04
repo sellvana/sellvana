@@ -91,12 +91,12 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
      * @param array $args
      * @return FCom_Catalog_Model_Product
      */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
-    public static function validateDupSku($data, $args)
+    public function validateDupSku($data, $args)
     {
         if (!empty(static::$_flags['skip_duplicate_checks'])) {
             return true;
@@ -104,17 +104,17 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (empty($data[$args['field']])) {
             return true;
         }
-        $orm = static::orm('p')->where('local_sku', $data[$args['field']]);
+        $orm = $this->orm('p')->where('local_sku', $data[$args['field']]);
         if (!empty($data['id'])) {
             $orm->where_not_equal('p.id', $data['id']);
         }
         if ($orm->find_one()) {
-            return BLocale::_('The SKU number entered is already in use. Please enter a valid SKU number.');
+            return $this->BLocale->_('The SKU number entered is already in use. Please enter a valid SKU number.');
         }
         return true;
     }
 
-    public static function validateDupUrlKey($data, $args)
+    public function validateDupUrlKey($data, $args)
     {
         if (!empty(static::$_flags['skip_duplicate_checks'])) {
             return true;
@@ -122,29 +122,29 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (empty($data[$args['field']])) {
             return true;
         }
-        $orm = static::orm('p')->where('url_key', $data[$args['field']]);
+        $orm = $this->orm('p')->where('url_key', $data[$args['field']]);
         if (!empty($data['id'])) {
             $orm->where_not_equal('p.id', $data['id']);
         }
         if ($orm->find_one()) {
-            return BLocale::_('The URL Key entered is already in use. Please enter a valid URL Key.');
+            return $this->BLocale->_('The URL Key entered is already in use. Please enter a valid URL Key.');
         }
         return true;
     }
 
-    public static function stockStatusOptions($onlyAvailable = false)
+    public function stockStatusOptions($onlyAvailable = false)
     {
-        $options = static::fieldOptions('stock_status');
+        $options = $this->fieldOptions('stock_status');
         if ($onlyAvailable) {
-            return BUtil::arrayMask($options, 'in_stock,backorder,special_order');
+            return $this->BUtil->arrayMask($options, 'in_stock,backorder,special_order');
         }
         return $options;
     }
 
-    static public function urlPrefix()
+    public function urlPrefix()
     {
         if (empty(static::$_urlPrefix)) {
-            static::$_urlPrefix = BConfig::i()->get('modules/FCom_Catalog/url_prefix');
+            static::$_urlPrefix = $this->BConfig->get('modules/FCom_Catalog/url_prefix');
         }
         return static::$_urlPrefix;
     }
@@ -155,21 +155,21 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function url($category = null)
     {
-        $prefix = static::urlPrefix();
-        return BApp::frontendHref($prefix . ($category ? $category->get('url_path') . '/' : '') . $this->get('url_key'));
+        $prefix = $this->urlPrefix();
+        return $this->BApp->frontendHref($prefix . ($category ? $category->get('url_path') . '/' : '') . $this->get('url_key'));
     }
 
     public function imageUrl($full = false)
     {
-        $media = BConfig::i()->get('web/media_dir');# ? BConfig::i()->get('web/media_dir') : 'media/';
-        $url = $full ? BApp::href('/') : '';
+        $media = $this->BConfig->get('web/media_dir');# ? $this->BConfig->get('web/media_dir') : 'media/';
+        $url = $full ? $this->BApp->href('/') : '';
         $thumbUrl = $this->get('thumb_url');
         return $url . $media . '/' . ($thumbUrl ? $thumbUrl : 'image-not-found.jpg');
     }
 
     public function thumbUrl($w, $h = null, $full = false)
     {
-        return FCom_Core_Main::i()->resizeUrl($this->imageUrl($full), ['s' => $w . 'x' . $h]);
+        return $this->FCom_Core_Main->resizeUrl($this->imageUrl($full), ['s' => $w . 'x' . $h]);
     }
 
     public function onBeforeSave()
@@ -180,8 +180,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (!$this->get('url_key')) $this->generateUrlKey();
 
 
-        if (!$this->get('create_at'))  $this->set('create_at', BDb::now());
-        $this->set('update_at', BDb::now());
+        if (!$this->get('create_at'))  $this->set('create_at', $this->BDb->now());
+        $this->set('update_at', $this->BDb->now());
 
         // Cleanup possible bad input
         if ($this->get('sale_price') === '') {
@@ -206,7 +206,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     public function onAfterLoad()
     {
         parent::onAfterLoad();
-        $thumbPath = FCom_Core_Main::i()->resizeUrl($this->imageUrl(), ['s' => 48]);
+        $thumbPath = $this->FCom_Core_Main->resizeUrl($this->imageUrl(), ['s' => 48]);
         $this->set('thumb_path', $thumbPath);
 
     }
@@ -233,7 +233,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function calcPosition()
     {
-        $maxCurrentPosition = FCom_Catalog_Model_Product::i()->orm()->select_expr('max(position) as max_pos')->find_one();
+        $maxCurrentPosition = $this->FCom_Catalog_Model_Product->orm()->select_expr('max(position) as max_pos')->find_one();
         if (!$maxCurrentPosition) {
             $maxCurrentPosition = 1;
         } else {
@@ -246,7 +246,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         //$key = $this->manuf()->manuf_name.'-'.$this->local_sku.'-'.$this->product_name;
         $key = $this->product_name;
-        $urlKey = BLocale::transliterate($key);
+        $urlKey = $this->BLocale->transliterate($key);
         $t = static::$_table;
         $existsSql = "SELECT COUNT(*) as cnt from {$t} WHERE url_key=?";
         if ($this->id()) {
@@ -307,7 +307,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             ];
             if ($includeCategories) {
                 $categories = $product->categories();
-                $result[$i]['categories'] = FCom_Catalog_Model_Category::i()->prepareApiData($categories);
+                $result[$i]['categories'] = $this->FCom_Catalog_Model_Category->prepareApiData($categories);
             }
         }
         return $result;
@@ -344,7 +344,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function categories($includeAscendants = false)
     {
-        $categories = FCom_Catalog_Model_CategoryProduct::i()->orm('cp')
+        $categories = $this->FCom_Catalog_Model_CategoryProduct->orm('cp')
             ->join('FCom_Catalog_Model_Category', ['cp.category_id', '=', 'c.id'], 'c')
             ->where('cp.product_id', $this->id())->find_many_assoc();
 
@@ -358,8 +358,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 }
             }
             if ($ascIds) {
-                $hlp = FCom_Catalog_Model_CategoryProduct::i();
-                $ascendants = FCom_Catalog_Model_Category::i()->orm()->where_in('id', array_keys($ascIds))->find_many();
+                $hlp = $this->FCom_Catalog_Model_CategoryProduct;
+                $ascendants = $this->FCom_Catalog_Model_Category->orm()->where_in('id', array_keys($ascIds))->find_many();
                 foreach ($ascendants as $cat) {
                     $categories[$cat->id] = $hlp->create($cat->as_array());
                 }
@@ -370,13 +370,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 /*
     public function customFields($product)
     {
-        return FCom_CustomField_Model_ProductField::i()->productFields($product);
+        return $this->FCom_CustomField_Model_ProductField->productFields($product);
     }
 */
     public function customFieldsShowOnFrontend()
     {
         $result = [];
-        $fields = FCom_CustomField_Model_ProductField::i()->productFields($this);
+        $fields = $this->FCom_CustomField_Model_ProductField->productFields($this);
         if ($fields) {
             foreach ($fields as $f) {
                 if ($f->get('frontend_show')) {
@@ -418,7 +418,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function mediaORM($type)
     {
-        return FCom_Catalog_Model_ProductMedia::i()->orm()->table_alias('pa')
+        return $this->FCom_Catalog_Model_ProductMedia->orm()->table_alias('pa')
             ->where('pa.product_id', $this->id)->where('pa.media_type', $type)
             //->select(array('pa.manuf_vendor_id'))
             ->join('FCom_Core_Model_MediaLibrary', ['a.id', '=', 'pa.file_id'], 'a')
@@ -441,10 +441,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (empty($data) || !is_array($data)) {
             return null;
         }
-//        BResponse::i()->startLongResponse(false);
+//        $this->BResponse->startLongResponse(false);
         //HANDLE CONFIG
 
-        BEvents::i()->fire(__METHOD__ . ':before', ['data' => &$data, 'config' => &$config]);
+        $this->BEvents->fire(__METHOD__ . ':before', ['data' => &$data, 'config' => &$config]);
 
         //multi value separator used to separate values in one column like for images
         //For example: image.png; image2.png; image3.png
@@ -512,7 +512,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $result = [];
         //$result['status'] = '';
 
-        $customFieldsOptions = FCom_CustomField_Model_FieldOption::i()->getListAssoc();
+        $customFieldsOptions = $this->FCom_CustomField_Model_FieldOption->getListAssoc();
 
         //HANDLE IMPORT
         static $cfIntersection = '';
@@ -549,7 +549,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             //HANDLE CUSTOM FIELDS
             if ($config['import']['custom_fields']['import']) {
                 //find intersection of custom fields with data fields
-                    $cfFields = FCom_CustomField_Model_Field::i()->getListAssoc();
+                    $cfFields = $this->FCom_CustomField_Model_Field->getListAssoc();
                     $cfKeys = array_keys($cfFields);
                     $dataKeys = array_keys($d);
                     $cfIntersection = array_intersect($cfKeys, $dataKeys);
@@ -564,7 +564,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                                 if (!empty($customFieldsOptions[$field->id()])) {
                                     if (!in_array($dataValue, $customFieldsOptions[$field->id()])) {
                                         try {
-                                            FCom_CustomField_Model_FieldOption::orm()
+                                            $this->FCom_CustomField_Model_FieldOption->orm()
                                                     ->create(['field_id' => $field->id(), 'label' => $dataValue])
                                                     ->save();
                                         } catch (Exception $e) {
@@ -600,7 +600,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     $p = $this->orm()->create($d)->save();
                     $result[]['status'] = 'created';
                 } catch (Exception $e) {
-                    BDebug::log($e->getMessage());
+                    $this->BDebug->log($e->getMessage());
                     $errors[] = $e->getMessage();
                     $result[]['status'] = 'error';
                     continue;
@@ -639,17 +639,17 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 static $topParentCategory = '';
                 static $categoriesList = [];
                 if (!$topParentCategory) {
-                    $topParentCategory = FCom_Catalog_Model_Category::orm()->where_null("parent_id")->find_one();
+                    $topParentCategory = $this->FCom_Catalog_Model_Category->orm()->where_null("parent_id")->find_one();
                     if (!$topParentCategory) {
                         try {
-                            $topParentCategory = FCom_Catalog_Model_Category::orm()
+                            $topParentCategory = $this->FCom_Catalog_Model_Category->orm()
                                     ->create(['parent_id' => null])
                                     ->save();
                         } catch (Exception $e) {
                             $errors[] = $e->getMessage();
                         }
                     }
-                    $categoriesList = FCom_Catalog_Model_Category::i()->parentNodeList();
+                    $categoriesList = $this->FCom_Catalog_Model_Category->parentNodeList();
                 }
                 if ($topParentCategory) {
                     //check if categories exists
@@ -667,7 +667,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                          *
                          */
                         foreach ($catNodes as $catnode) {
-                    /*        $category = FCom_Catalog_Model_Category::orm()
+                    /*        $category = $this->FCom_Catalog_Model_Category->orm()
                                         ->where('parent_id', $parent->id())
                                         ->where("node_name", $catnode)
                                         ->find_one();
@@ -701,13 +701,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     //assign products to categories
                     if (!empty($categories)) {
                         foreach ($categories as $category) {
-                            $catProduct = FCom_Catalog_Model_CategoryProduct::i()->orm()
+                            $catProduct = $this->FCom_Catalog_Model_CategoryProduct->orm()
                                     ->where('product_id', $pId)
                                     ->where('category_id', $category->id())
                                     ->find_one();
                             if (!$catProduct) {
                                 try {
-                                    FCom_Catalog_Model_CategoryProduct::orm()
+                                    $this->FCom_Catalog_Model_CategoryProduct->orm()
                                         ->create(['product_id' => $pId, 'category_id' => $category->id()])
                                         ->save();
                                 } catch (Exception $e) {
@@ -745,7 +745,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             }
 
             //get or create product custom field
-            $customsResult = FCom_CustomField_Model_ProductField::orm()->where_in("product_id", $productIds)->find_many();
+            $customsResult = $this->FCom_CustomField_Model_ProductField->orm()->where_in("product_id", $productIds)->find_many();
             foreach ($customsResult as $cus) {
                 $customsResult[$cus->product_id] = $cus;
             }
@@ -759,7 +759,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 if (!empty($customsResult[$pId])) {
                     $custom = $customsResult[$pId];
                 } else {
-                    $custom = FCom_CustomField_Model_ProductField::i()->create();
+                    $custom = $this->FCom_CustomField_Model_ProductField->create();
                 }
                 $custom->set($productCustomFields);
                 $custom->save();
@@ -780,14 +780,14 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($errors) {
             $result['errors'] = $errors;
         }
-        BEvents::i()->fire(__METHOD__ . ':after', ['product_ids' => $productIds, 'config' => &$config, 'result' => &$result]);
+        $this->BEvents->fire(__METHOD__ . ':after', ['product_ids' => $productIds, 'config' => &$config, 'result' => &$result]);
 
         return $result;
     }
 
     public function addToCategories($categoryIds)
     {
-        $hlp = FCom_Catalog_Model_CategoryProduct::i();
+        $hlp = $this->FCom_Catalog_Model_CategoryProduct;
         foreach ((array)$categoryIds as $cId) {
             $hlp->create(['product_id' => $this->id, 'category_id' => $cId])->save();
         }
@@ -796,7 +796,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function removeFromCategories($categoryIds)
     {
-        FCom_Catalog_Model_CategoryProduct::i()->delete_many(['product_id' => $this->id, 'category_id' => $categoryIds]);
+        $this->FCom_Catalog_Model_CategoryProduct->delete_many(['product_id' => $this->id, 'category_id' => $categoryIds]);
         return $this;
     }
 
@@ -812,7 +812,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function reviews($incAvgRating = true)
     {
-        $reviews = FCom_ProductReviews_Model_Review::i()->orm('pr')->select(['pr.*', 'c.firstname', 'c.lastname'])
+        $reviews = $this->FCom_ProductReviews_Model_Review->orm('pr')->select(['pr.*', 'c.firstname', 'c.lastname'])
             ->join('FCom_Customer_Model_Customer', ['pr.customer_id', '=', 'c.id'], 'c')
             ->where(['pr.product_id' => $this->id(), 'approved' => 1])->order_by_expr('pr.create_at DESC')->find_many();
 
@@ -854,13 +854,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function getProductLink()
     {
-        $arrProduct = FCom_Catalog_Model_Product::i()->orm('p')->select('pl.link_type')
+        $arrProduct = $this->FCom_Catalog_Model_Product->orm('p')->select('pl.link_type')
             ->left_outer_join('FCom_Catalog_Model_ProductLink', ['p.id', '=', 'pl.linked_product_id'], 'pl')
             ->where('pl.product_id', $this->id)->find_many();
         $productLink = [
-            'related'=> ['title' => BLocale::_('Related Products'), 'product' => [] ],
-            'similar' => ['title' => BLocale::_('You may also like these items'), 'product' => [] ],
-            'cross_sell' => ['title' => BLocale::_('You may also like these items'), 'product' => [] ]
+            'related'=> ['title' => $this->BLocale->_('Related Products'), 'product' => [] ],
+            'similar' => ['title' => $this->BLocale->_('You may also like these items'), 'product' => [] ],
+            'cross_sell' => ['title' => $this->BLocale->_('You may also like these items'), 'product' => [] ]
         ];
         foreach ($arrProduct as $product) {
             if (isset($productLink[$product->get('link_type')])) {
@@ -895,7 +895,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
      */
     public function isAlreadyReviewed($customerId)
     {
-        return FCom_ProductReviews_Model_Review::i()->loadWhere(['product_id' => $this->id, 'customer_id' => (int)$customerId]);
+        return $this->FCom_ProductReviews_Model_Review->loadWhere(['product_id' => $this->id, 'customer_id' => (int)$customerId]);
     }
 
     /**
@@ -916,7 +916,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     protected function _importRelatedProducts($relatedProducts)
     {
         $relatedIds = [];
-        $relation   = FCom_Catalog_Model_ProductLink::i();
+        $relation   = $this->FCom_Catalog_Model_ProductLink;
         $errors     = [];
         try {
             foreach ($relatedProducts as $pId => $relatedSkus) {
@@ -981,10 +981,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (is_null($p)) {
             $p = $this;
         }
-        $mediaLib     = FCom_Core_Model_MediaLibrary::i();
-        $productMedia = FCom_Catalog_Model_ProductMedia::i();
-        $rootDir      = BConfig::i()->get('fs/root_dir');
-        $imageFolder  = BConfig::i()->get('fs/image_folder');
+        $mediaLib     = $this->FCom_Core_Model_MediaLibrary;
+        $productMedia = $this->FCom_Catalog_Model_ProductMedia;
+        $rootDir      = $this->BConfig->get('fs/root_dir');
+        $imageFolder  = $this->BConfig->get('fs/image_folder');
         $thumbUrl = str_ireplace('media/product/image', '', $p->get('thumb_url'));
         $errors = [];
 
@@ -1041,10 +1041,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function getDataSerialized($data)
     {
-        $data_serialized = BUtil::objectToArray(json_decode($this->data_serialized));
+        $data_serialized = $this->BUtil->objectToArray(json_decode($this->data_serialized));
 
         if ($data == 'custom_fields' && isset($data_serialized[$data])) {
-            return BUtil::objectToArray(json_decode($data_serialized[$data]));
+            return $this->BUtil->objectToArray(json_decode($data_serialized[$data]));
         }
         if ($data == 'variants' && isset($data_serialized['variants_fields'][0]) && isset($data_serialized['variants'])) {
             $field_code = $data_serialized['variants_fields'][0]['field_code'];
@@ -1074,7 +1074,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                     }
                     $price = ($vr['price'] != '') ? $vr['price']: $this->base_price;
                     $vr['sku'] = ($vr['sku'] == '')? $this->local_sku : $vr['sku'];
-                    $vr['price'] = BLocale::currency($price);
+                    $vr['price'] = $this->BLocale->currency($price);
                 }
             }
             return ['variants' => $data_serialized['variants'], 'variants_fields' => $data_serialized['variants_fields'], 'fields' => $fields];
@@ -1082,11 +1082,11 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return isset($data_serialized[$data]) ? $data_serialized[$data] : array();
     }
 
-    public static function backOrders()
+    public function backOrders()
     {
         return [
-            "NOT_BACK_ORDERS"         => BLocale::i()->_("No Back Orders"),
-            "ALLOW_QUANTITY_BELOW" => BLocale::i()->_("Allow Quantity Below 0")
+            "NOT_BACK_ORDERS"         => $this->BLocale->_("No Back Orders"),
+            "ALLOW_QUANTITY_BELOW" => $this->BLocale->_("Allow Quantity Below 0")
         ];
     }
 }

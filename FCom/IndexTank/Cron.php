@@ -2,12 +2,12 @@
 
 class FCom_IndexTank_Cron extends BClass
 {
-    public static function bootstrap()
+    public function bootstrap()
     {
-        FCom_Cron_Main::i()
+        $this->FCom_Cron_Main
             ->task('* * * * *', 'FCom_IndexTank_Cron.indexAll');
 
-        BEvents::i()
+        $this->BEvents
             ->on('FCom_IndexTank_Index_Product::add', 'FCom_IndexTank_Index_Product::onProductIndexAdd');
     }
 
@@ -15,7 +15,7 @@ class FCom_IndexTank_Cron extends BClass
     {
         set_time_limit(0);
 
-        $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->getIndexingStatus();
+        $indexingStatus = $this->FCom_IndexTank_Model_IndexingStatus->getIndexingStatus();
         if ($indexingStatus->status == 'pause') {
             return;
         }
@@ -34,7 +34,7 @@ class FCom_IndexTank_Cron extends BClass
         $this->setProductsStatus(1, $products);
         //index
         try {
-            FCom_IndexTank_Index_Product::i()->add($products);
+            $this->FCom_IndexTank_Index_Product->add($products);
         } catch(Exception $e) {
             //do not update products index status because of exception
             return true;
@@ -42,7 +42,7 @@ class FCom_IndexTank_Cron extends BClass
         //after index
         $this->setProductsStatus(2, $products);
 
-        FCom_IndexTank_Model_IndexingStatus::i()->updateInfoStatus();
+        $this->FCom_IndexTank_Model_IndexingStatus->updateInfoStatus();
         return true;
     }
 
@@ -56,7 +56,7 @@ class FCom_IndexTank_Cron extends BClass
         $this->setProductsStatus(1, $products);
         //index
         try {
-            FCom_IndexTank_Index_Product::i()->deleteProducts($products);
+            $this->FCom_IndexTank_Index_Product->deleteProducts($products);
         } catch(Exception $e) {
             //do not update products index status because of exception
             return true;
@@ -64,7 +64,7 @@ class FCom_IndexTank_Cron extends BClass
         //after index
         $this->setProductsStatus(2, $products);
 
-        FCom_IndexTank_Model_IndexingStatus::i()->updateInfoStatus();
+        $this->FCom_IndexTank_Model_IndexingStatus->updateInfoStatus();
         return true;
     }
 
@@ -77,11 +77,11 @@ class FCom_IndexTank_Cron extends BClass
      */
     protected function gerProducts($disabled)
     {
-        $orm = FCom_Catalog_Model_Product::orm('p')->select('p.*')
+        $orm = $this->FCom_Catalog_Model_Product->orm('p')->select('p.*')
                 ->where('disabled', $disabled)
                 ->where_in("indextank_indexed", [1, 0]);
 
-        $batchSize = BConfig::i()->get('modules/FCom_IndexTank/index_products_limit');
+        $batchSize = $this->BConfig->get('modules/FCom_IndexTank/index_products_limit');
         if (!$batchSize) {
             $batchSize = 500;
         }
@@ -115,7 +115,7 @@ class FCom_IndexTank_Cron extends BClass
         } else {
             $updateQuery = ["indextank_indexed" => $status];
         }
-        FCom_Catalog_Model_Product::i()->update_many($updateQuery,
+        $this->FCom_Catalog_Model_Product->update_many($updateQuery,
                     "id in (" . implode(",", $productIds) . ")");
     }
 }

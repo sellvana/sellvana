@@ -29,7 +29,7 @@ class FCom_Catalog_ProductsImport extends BImport
 
     public function updateFieldsDueToInfo($info = null)
     {
-        $cfFields = FCom_CustomField_Model_Field::i()->getListAssoc();
+        $cfFields = $this->FCom_CustomField_Model_Field->getListAssoc();
         $cfKeys = array_keys($cfFields);
 //        $dataKeys = $info['first_row'];
         //$cfIntersection = array_intersect($cfKeys, $dataKeys);

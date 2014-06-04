@@ -37,7 +37,7 @@ class AuthorizeNetDPM extends AuthorizeNetSIM_Form
      * Implements all 3 steps of the Direct Post Method for demonstration
      * purposes.
      */
-    public static function directPostDemo($url, $api_login_id, $transaction_key, $amount = "0.00", $md5_setting = "")
+    public function directPostDemo($url, $api_login_id, $transaction_key, $amount = "0.00", $md5_setting = "")
     {
 
         // Step 1: Show checkout form to customer.
@@ -92,7 +92,7 @@ class AuthorizeNetDPM extends AuthorizeNetSIM_Form
      *
      * @return string
      */
-    public static function getRelayResponseSnippet($redirect_url)
+    public function getRelayResponseSnippet($redirect_url)
     {
         return "<html><head><script language=\"javascript\">
                 <!--
@@ -115,7 +115,7 @@ class AuthorizeNetDPM extends AuthorizeNetSIM_Form
      *
      * @return string
      */
-    public static function getCreditCardForm($amount, $fp_sequence, $relay_response_url, $api_login_id, $transaction_key, $test_mode = true, $prefill = true)
+    public function getCreditCardForm($amount, $fp_sequence, $relay_response_url, $api_login_id, $transaction_key, $test_mode = true, $prefill = true)
     {
         $time = time();
         $fp = self::getFingerprint($api_login_id, $transaction_key, $amount, $fp_sequence, $time);

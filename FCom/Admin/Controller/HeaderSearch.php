@@ -4,13 +4,13 @@ class FCom_Admin_Controller_HeaderSearch extends FCom_Admin_Controller_Abstract_
 {
     public function action_index()
     {
-        if (BRequest::i()->xhr()) {
+        if ($this->BRequest->xhr()) {
             return ;
         }
         $result = [];
         $priority = 1000000;
         $url = '';
-        BEvents::i()->fire(__METHOD__, ['result' => &$result]);
+        $this->BEvents->fire(__METHOD__, ['result' => &$result]);
         foreach ($result as $key) {
             if (is_array($key)) {
                 if (isset($key['priority']) && $key['url'] && $key['priority'] < $priority) {
@@ -20,7 +20,7 @@ class FCom_Admin_Controller_HeaderSearch extends FCom_Admin_Controller_Abstract_
             }
         }
         if ($url != '') {
-            BResponse::i()->redirect($url);
+            $this->BResponse->redirect($url);
         }
         $this->layout('/header_search');
     }

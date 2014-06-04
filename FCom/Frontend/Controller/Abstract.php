@@ -6,45 +6,45 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     public function action_unauthenticated()
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
 
         $redirect = $r->get('redirect_to');
         if (!$r->isUrlLocal($redirect)) {
             $redirect = '';
         }
         if ($redirect === 'CURRENT') {
-            $redirect = BRequest::i()->referrer();
+            $redirect = $this->BRequest->referrer();
         }
 
         if ($r->xhr()) {
-            BSession::i()->set('login_orig_url', $redirect ? $redirect : $r->referrer());
-            BResponse::i()->json(['error' => 'login']);
+            $this->BSession->set('login_orig_url', $redirect ? $redirect : $r->referrer());
+            $this->BResponse->json(['error' => 'login']);
         } else {
-            BSession::i()->set('login_orig_url', $redirect ? $redirect : $r->currentUrl());
+            $this->BSession->set('login_orig_url', $redirect ? $redirect : $r->currentUrl());
             $this->layout('/customer/login');
-            BResponse::i()->status(401, 'Unauthorized'); // HTTP sic
+            $this->BResponse->status(401, 'Unauthorized'); // HTTP sic
         }
     }
 
     public function action_unauthorized()
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
 
         $redirect = $r->get('redirect_to');
         if (!$r->isUrlLocal($redirect)) {
             $redirect = '';
         }
         if ($redirect === 'CURRENT') {
-            $redirect = BRequest::i()->referrer();
+            $redirect = $this->BRequest->referrer();
         }
 
         if ($r->xhr()) {
-            BSession::i()->set('login_orig_url', $redirect ? $redirect : $r->referrer());
-            BResponse::i()->json(['error' => 'denied']);
+            $this->BSession->set('login_orig_url', $redirect ? $redirect : $r->referrer());
+            $this->BResponse->json(['error' => 'denied']);
         } else {
-            BSession::i()->set('login_orig_url', $redirect ? $redirect : $r->currentUrl());
+            $this->BSession->set('login_orig_url', $redirect ? $redirect : $r->currentUrl());
             $this->layout('/denied');
-            BResponse::i()->status(403, 'Forbidden');
+            $this->BResponse->status(403, 'Forbidden');
         }
     }
 
@@ -52,7 +52,7 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
     {
         if (!parent::beforeDispatch()) return false;
 
-        $this->view('head')->setTitle(BConfig::i()->get('modules/FCom_Core/site_title'));
+        $this->view('head')->setTitle($this->BConfig->get('modules/FCom_Core/site_title'));
 
         return true;
     }
@@ -60,11 +60,11 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
     public function message($msg, $type = 'success', $tag = 'frontend', $options = [])
     {
         if (is_array($msg)) {
-            array_walk($msg, 'BLocale::_');
+            array_walk($msg, [$this->BLocale, '_']);
         } else {
-            $msg = BLocale::_($msg);
+            $msg = $this->BLocale->_($msg);
         }
-        BSession::i()->addMessage($msg, $type, $tag, $options);
+        $this->BSession->addMessage($msg, $type, $tag, $options);
         return $this;
     }
 
@@ -74,7 +74,7 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
     public function formMessages($formId = 'frontend')
     {
         //prepare error message
-        $messages = BSession::i()->messages('validator-errors:' . $formId);
+        $messages = $this->BSession->messages('validator-errors:' . $formId);
         if (count($messages)) {
             $msg = [];
             foreach ($messages as $m) {

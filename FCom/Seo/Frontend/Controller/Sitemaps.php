@@ -12,7 +12,7 @@ class FCom_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller_Abs
         $output = '<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
         $sitemaps = [//TODO: fetch real paginated sitemaps
-            ['loc' => BApp::href('sitemap.xml.gz')],
+            ['loc' => $this->BApp->href('sitemap.xml.gz')],
         ];
         foreach ($sitemaps as $sitemap) {
             $output .= '<sitemap>'
@@ -27,12 +27,12 @@ class FCom_Seo_Frontend_Controller_Sitemaps extends FCom_Frontend_Controller_Abs
 
     public function action_sitemap_data()
     {
-        $params = BRequest::i()->param();
+        $params = $this->BRequest->param();
         $page = $params[2];
         $type = $params[3];
 
         $urls = [];
-        BEvents::i()->fire('FCom_Seo_Frontend_Controller_Sitemaps.sitemap',
+        $this->BEvents->fire('FCom_Seo_Frontend_Controller_Sitemaps.sitemap',
             ['urls' => &$urls, 'page' => $page, 'filetype' => $type]);
 
         switch ($type) {

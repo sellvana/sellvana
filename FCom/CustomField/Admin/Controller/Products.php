@@ -8,7 +8,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
             'grid' => [
                 'id'      => 'product_fieldsets',
                 'caption' => 'Field Sets',
-                'url' => BApp::href('customfields/fieldsets/grid_data'),
+                'url' => $this->BApp->href('customfields/fieldsets/grid_data'),
                 'orm' => 'FCom_CustomField_Model_SetField',
                 'columns' => [
                     'id' => ['label' => 'ID', 'width' => 55, 'sorttype' => 'number', 'key' => true],
@@ -61,7 +61,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     public function variantGridConfig($model)
     {
-        $thumbUrl = FCom_Core_Main::i()->resizeUrl(BConfig::i()->get('web/media_dir') . '/product/images', ['s' => 30]);
+        $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 30]);
         $columns = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true, 'position' => 1]
@@ -71,7 +71,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         if ($vFields !== null) {
             $pos = 2;
             foreach ($vFields as $f) {
-                $f['options'] = FCom_CustomField_Model_FieldOption::i()->getListAssocById($f['id']);
+                $f['options'] = $this->FCom_CustomField_Model_FieldOption->getListAssocById($f['id']);
                 $f['label'] = $f['name'];
                 $f['name'] = $f['field_code'];
                 $f['field_id'] = $f['id'];
@@ -142,7 +142,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     public function variantImageGrid($model)
     {
-        $data = BDb::many_as_array($model->mediaORM('I')
+        $data = $this->BDb->many_as_array($model->mediaORM('I')
             ->left_outer_join('FCom_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'pm.file_id'], 'pm')
             ->select(['pa.id', 'pa.position',  'a.file_name'])
             ->select('a.id', 'file_id')
@@ -191,17 +191,17 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     public function formViewBefore()
     {
-        $id = BRequest::i()->params('id', true);
-        $p = FCom_Catalog_Model_Product::i()->load($id);
+        $id = $this->BRequest->params('id', true);
+        $p = $this->FCom_Catalog_Model_Product->load($id);
 
         if (!$p) {
-            return;//$p = FCom_Catalog_Model_Product::i()->create();
+            return;//$p = $this->FCom_Catalog_Model_Product->create();
         }
 
         $fields_options = [];
-        $fields = FCom_CustomField_Model_ProductField::i()->productFields($p);
+        $fields = $this->FCom_CustomField_Model_ProductField->productFields($p);
         foreach ($fields as $field) {
-            $fields_options[$field->id] = FCom_CustomField_Model_FieldOption::i()->orm()
+            $fields_options[$field->id] = $this->FCom_CustomField_Model_FieldOption->orm()
                 ->where("field_id", $field->id)->find_many();
         }
         $view = $this->view('customfields/products/fields-partial');
@@ -210,38 +210,38 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     public function action_field_remove()
     {
-        $id = BRequest::i()->params('id', true);
-        $p = FCom_Catalog_Model_Product::i()->load($id);
+        $id = $this->BRequest->params('id', true);
+        $p = $this->FCom_Catalog_Model_Product->load($id);
         if (!$p) {
             return;
         }
-        $hide_field = BRequest::i()->params('hide_field', true);
+        $hide_field = $this->BRequest->params('hide_field', true);
         if (!$hide_field) {
             return;
         }
-        FCom_CustomField_Model_ProductField::i()->removeField($p, $hide_field);
-        BResponse::i()->json('');
+        $this->FCom_CustomField_Model_ProductField->removeField($p, $hide_field);
+        $this->BResponse->json('');
     }
 
     public function action_fields_partial()
     {
-        $id = BRequest::i()->params('id', true);
-        $p = FCom_Catalog_Model_Product::i()->load($id);
+        $id = $this->BRequest->params('id', true);
+        $p = $this->FCom_Catalog_Model_Product->load($id);
         if (!$p) {
-            $p = FCom_Catalog_Model_Product::i()->create();
+            $p = $this->FCom_Catalog_Model_Product->create();
         }
 
         $fields_options = [];
-        $fields = FCom_CustomField_Model_ProductField::i()->productFields($p, BRequest::i()->request());
+        $fields = $this->FCom_CustomField_Model_ProductField->productFields($p, $this->BRequest->request());
         foreach ($fields as $field) {
-            $fields_options[$field->id] = FCom_CustomField_Model_FieldOption::i()->orm()
+            $fields_options[$field->id] = $this->FCom_CustomField_Model_FieldOption->orm()
                 ->where("field_id", $field->id)->find_many();
         }
 
         $view = $this->view('customfields/products/fields-partial');
         $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fields_options);
-        BLayout::i()->setRootView('customfields/products/fields-partial');
-        BResponse::i()->render();
+        $this->BLayout->setRootView('customfields/products/fields-partial');
+        $this->BResponse->render();
     }
 
     public function getInitialData($model)
@@ -251,80 +251,80 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
     }
     public function fieldsetAry()
     {
-        $sets = BDb::many_as_array(FCom_CustomField_Model_Set::i()->orm('s')->select('s.*')->find_many());
+        $sets = $this->BDb->many_as_array($this->FCom_CustomField_Model_Set->orm('s')->select('s.*')->find_many());
 
         return json_encode($sets);
     }
 
     public function fieldAry()
     {
-        $fields = BDb::many_as_array(FCom_CustomField_Model_SetField::i()->orm('s')->select('s.*')->find_many());
+        $fields = $this->BDb->many_as_array($this->FCom_CustomField_Model_SetField->orm('s')->select('s.*')->find_many());
 
         return json_encode($fields);
     }
 
     public function action_get_fieldset()
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         $id = $r->get('id');
-        $set = FCom_CustomField_Model_Set::i()->load($id);
-        $fields = BDb::many_as_array(FCom_CustomField_Model_SetField::i()->orm('sf')
+        $set = $this->FCom_CustomField_Model_Set->load($id);
+        $fields = $this->BDb->many_as_array($this->FCom_CustomField_Model_SetField->orm('sf')
             ->join('FCom_CustomField_Model_Field', ['f.id', '=', 'sf.field_id'], 'f')
             ->select(['f.id', 'f.field_name', 'f.admin_input_type'])
             ->where('sf.set_id', $id)->find_many()
         );
         foreach ($fields as &$field) {
             if ($field['admin_input_type'] === 'select' ||  $field['admin_input_type'] === 'multiselect') {
-                $field['options'] = FCom_CustomField_Model_FieldOption::i()->getListAssocById($field['id']);
+                $field['options'] = $this->FCom_CustomField_Model_FieldOption->getListAssocById($field['id']);
             }
         }
 
-        BResponse::i()->json(['id' => $set->id, 'set_name' => $set->set_name, 'fields' => ($fields)]);
+        $this->BResponse->json(['id' => $set->id, 'set_name' => $set->set_name, 'fields' => ($fields)]);
     }
 
     public function action_get_field()
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         $id = $r->get('id');
-        $field = FCom_CustomField_Model_Field::i()->load($id);
-        $options = FCom_CustomField_Model_FieldOption::i()->getListAssocById($field->id);
-        BResponse::i()->json(['id' => $field->id, 'field_name' => $field->field_name,
+        $field = $this->FCom_CustomField_Model_Field->load($id);
+        $options = $this->FCom_CustomField_Model_FieldOption->getListAssocById($field->id);
+        $this->BResponse->json(['id' => $field->id, 'field_name' => $field->field_name,
             'admin_input_type' => $field->admin_input_type, 'multilang' => $field->multilanguage,
             'options' => $options, 'required' => $field->required]);
     }
 
     public function action_save__POST()
     {
-         $data = BRequest::i()->post();
+         $data = $this->BRequest->post();
          $prodId = $data['id'];
          $json = $data['json'];
 
-         $res = BDb::many_as_array(FCom_CustomField_Model_ProductField::i()->orm()->where('product_id', $prodId)->find_many());
+         $res = $this->BDb->many_as_array($this->FCom_CustomField_Model_ProductField->orm()->where('product_id', $prodId)->find_many());
 
          if (empty($res)) {
-            $new = FCom_CustomField_Model_ProductField::i()->create();
+            $new = $this->FCom_CustomField_Model_ProductField->create();
             $new->product_id = $prodId;
             $new->_data_serialized = $json;
             $new->save();
             $status = 'Successfully saved.';
          } else {
 
-            $row = FCom_CustomField_Model_ProductField::i()->load($res[0]['id']);
+            $row = $this->FCom_CustomField_Model_ProductField->load($res[0]['id']);
             $row->_data_serialized = $json;
             $row->save();
             $status = 'Successfully updated.';
          }
 
-         BResponse::i()->json(['status' => $status]);
+         $this->BResponse->json(['status' => $status]);
     }
 
     public function action_get_fields__POST()
     {
         $res = [];
-        $data = BRequest::i()->post();
+        $data = $this->BRequest->post();
         $ids = explode(',', $data['ids']);
-        $optionsModel = FCom_CustomField_Model_FieldOption::i();
-        $fieldModel = FCom_CustomField_Model_Field::i();
+        $optionsModel = $this->FCom_CustomField_Model_FieldOption;
+        $fieldModel = $this->FCom_CustomField_Model_Field;
         foreach ($ids as $id) {
             $field = $fieldModel->load($id);
             $options = join(',', array_keys($optionsModel->getListAssocById($id)));
@@ -332,18 +332,18 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'input_type' => $field->admin_input_type, 'options' => $options];
         }
 
-        BResponse::i()->json($res);
+        $this->BResponse->json($res);
     }
 
     public function getFieldTypes()
     {
-        $f = FCom_CustomField_Model_Field::i();
+        $f = $this->FCom_CustomField_Model_Field;
         return $f->fieldOptions('table_field_type');
     }
 
     public function getAdminInputTypes()
     {
-        $f = FCom_CustomField_Model_Field::i();
+        $f = $this->FCom_CustomField_Model_Field;
         return $f->fieldOptions('admin_input_type');
     }
 }

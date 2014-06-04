@@ -33,13 +33,13 @@
     <div class="form-group">
         <label for="admin-password" class="control-label col-lg-4 required">{{ 'Password' |_ }}</label>
         <div class="col-lg-7">
-            <input type="password" class="form-control has-progress-bar" id="admin-password" name="w[admin][password]" value="{{w.admin.password}}" placeholder="*****" required>
+            <input type="password" class="form-control has-progress-bar" id="admin-password" name="w[admin][password]" value="{{w.admin.password}}" placeholder="*****" required pattern=".{6,}">
         </div>
     </div>
     <div class="form-group">
         <label for="admin-password_confirm" class="control-label col-lg-4 required">{{ 'Confirm Password' |_ }}</label>
         <div class="col-lg-7">
-            <input type="password" class="form-control" id="admin-password_confirm" name="w[admin][password_confirm]" value="{{w.admin.password_confirm}}" placeholder="*****" required>
+            <input type="password" class="form-control" id="admin-password_confirm" name="w[admin][password_confirm]" value="{{w.admin.password_confirm}}" placeholder="*****" required pattern=".{6,}">
         </div>
     </div>
 

@@ -26,7 +26,7 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
         require_once 'PHPUnit/Autoload.php';
         require_once 'PHPUnit/Util/Log/JSON.php';
 
-        $suite = FCom_Test_AllTests::i()->suite();
+        $suite = $this->FCom_Test_AllTests->suite();
 
         $listener = new PHPUnit_Util_Log_JSON;
         $result = new PHPUnit_Framework_TestResult;

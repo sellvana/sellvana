@@ -19,8 +19,8 @@ require(['jquery', 'ckeditor', 'fcom.admin'], function($) {
     var renderers = {{ UTIL.toJson(LAYOUT.getAllRenderers()) | raw }};
     function updateEditor() {
         switch (renderers[$('#model-renderer').val()].editor) {
-            case 'text': adminForm.wysiwygDestroy('main-content'); break;
-            case 'html': adminForm.wysiwygCreate('main-content'); break;
+            case 'text': adminForm.wysiwygDestroy('model-content'); break;
+            case 'html': adminForm.wysiwygCreate('model-content'); break;
         }
     }
     $('#model-renderer').change(updateEditor);

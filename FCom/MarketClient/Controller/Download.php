@@ -5,43 +5,43 @@ class FCom_MarketClient_Controller_Download extends FCom_Core_Controller_Abstrac
     public function action_index__POST()
     {
         #echo 1; exit;
-        BLayout::i()->setRootView('marketclient/container');
-        $redirect = BRequest::i()->request('redirect_to');
+        $this->BLayout->setRootView('marketclient/container');
+        $redirect = $this->BRequest->request('redirect_to');
         if (!$r->isUrlLocal($redirect)) {
             $redirect = '';
         }
 
         $this->view('marketclient/container')->set([
-            'modules' => BRequest::i()->request('modules'),
+            'modules' => $this->BRequest->request('modules'),
             'redirect_to' => $redirect,
         ]);
-        FCom_MarketClient_Main::i()->progress([], true);
+        $this->FCom_MarketClient_Main->progress([], true);
     }
 
     public function action_start__POST()
     {
-        BResponse::i()->startLongResponse(false);
+        $this->BResponse->startLongResponse(false);
         ignore_user_abort();
 
-        $modules = BRequest::i()->post('modules');
-        $force = BRequest::i()->post('force');
+        $modules = $this->BRequest->post('modules');
+        $force = $this->BRequest->post('force');
 
-        FCom_MarketClient_Main::i()->downloadAndInstall($modules, $force);
+        $this->FCom_MarketClient_Main->downloadAndInstall($modules, $force);
     }
 
     public function action_stop__POST()
     {
-        FCom_MarketClient_Main::i()->stopDownloading();
+        $this->FCom_MarketClient_Main->stopDownloading();
     }
 
     public function action_progress()
     {
-        if (!BRequest::i()->xhr()) {
-            BResponse::i()->status(403);
+        if (!$this->BRequest->xhr()) {
+            $this->BResponse->status(403);
         }
 
-        $progress = FCom_MarketClient_Main::i()->progress();
-        BResponse::i()->json([
+        $progress = $this->FCom_MarketClient_Main->progress();
+        $this->BResponse->json([
             'progress' => $progress,
             'html' => (string)$this->view('marketclient/progress')->set('progress', $progress),
         ]);

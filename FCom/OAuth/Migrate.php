@@ -4,9 +4,9 @@ class FCom_OAuth_Migrate extends BClass
 {
     public function install__0_1_1()
     {
-        $tConsumerToken = FCom_OAuth_Model_ConsumerToken::table();
+        $tConsumerToken = $this->FCom_OAuth_Model_ConsumerToken->table();
 
-        BDb::ddlTableDef($tConsumerToken, [
+        $this->BDb->ddlTableDef($tConsumerToken, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'provider' => 'varchar(50) not null',
@@ -28,9 +28,9 @@ class FCom_OAuth_Migrate extends BClass
 
     public function upgrade__0_1_0__0_1_1()
     {
-        $tConsumerToken = FCom_OAuth_Model_ConsumerToken::table();
+        $tConsumerToken = $this->FCom_OAuth_Model_ConsumerToken->table();
 
-        BDb::ddlTableDef($tConsumerToken, [
+        $this->BDb->ddlTableDef($tConsumerToken, [
             'COLUMNS' => [
                 'token' => 'varchar(255) binary not null',
                 'token_secret' => 'varchar(255) binary null',

@@ -9,13 +9,13 @@ class FCom_Blog_Model_Category extends FCom_Core_Model_Abstract
 
     ];
 
-    public static function validateDupUrlKey($data, $args)
+    public function validateDupUrlKey($data, $args)
     {
         if (empty($data[$args['field']])) {
             return true;
         }
         $url_key = $data[$args['field']];
-        $orm = static::orm('c')->where('url_key', $data[$args['field']]);
+        $orm = $this->orm('c')->where('url_key', $data[$args['field']]);
         if (!empty($data['id'])) {
             $orm->where_not_equal('c.id', $data['id']);
         }
@@ -24,12 +24,12 @@ class FCom_Blog_Model_Category extends FCom_Core_Model_Abstract
 
     public function getUrl()
     {
-        return BApp::href('blog/category/' . $this->get('url_key'));
+        return $this->BApp->href('blog/category/' . $this->get('url_key'));
     }
 
-    static public function getCategoryCounts()
+    public function getCategoryCounts()
     {
-        return FCom_Blog_Model_Category::i()->orm('c')
+        return $this->FCom_Blog_Model_Category->orm('c')
             ->join('FCom_Blog_Model_PostCategory', ['pc.category_id', '=', 'c.id'], 'pc')
             ->join('FCom_Blog_Model_Post', ['p.id', '=', 'pc.post_id'], 'p')
             ->where_in('p.status', ['published'])

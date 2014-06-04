@@ -8,33 +8,33 @@ class FCom_SampleData_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
     public function action_load()
     {
-        $xhr    = BRequest::i()->xhr();
+        $xhr    = $this->BRequest->xhr();
         $msg    = "Sample products not imported.";
         $status = 'error';
 
         try {
-            BResponse::i()->startLongResponse();
-            BConfig::i()->set('db/logging', 0);
+            $this->BResponse->startLongResponse();
+            $this->BConfig->set('db/logging', 0);
 
-            FCom_SampleData_Admin::i()->loadProducts();
-            $msg    = BLocale::_('Sample products imported');
+            $this->FCom_SampleData_Admin->loadProducts();
+            $msg    = $this->BLocale->_('Sample products imported');
             $status = 'success';
         } catch (Exception $e) {
-            BDebug::logException($e);
+            $this->BDebug->logException($e);
             $msg    = $e->getMessage();
             $status = 'error';
         }
         if (!$xhr) {
             $this->message($msg, $status);
-            BResponse::i()->redirect('settings?tab=other');
+            $this->BResponse->redirect('settings?tab=other');
         } else {
             echo $msg;
             exit;
             $result = [
-                'message' => BLocale::_($msg),
+                'message' => $this->BLocale->_($msg),
                 'status'  => $status
             ];
-            BResponse::i()->json($result);
+            $this->BResponse->json($result);
         }
     }
 }
