@@ -33,7 +33,7 @@ class BTest extends BClass
      * @param array $args
      * @return BTest
      */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }

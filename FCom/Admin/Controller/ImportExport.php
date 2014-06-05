@@ -185,7 +185,14 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 $this->BUtil->ensureDir(dirname($fullFileName));
                 $fileSize = 0;
                 if (!$uploads['error'][$i] && @move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
-                    $importer->import($fileName);
+                    BResponse::i()->startLongResponse();
+                    //if (function_exists('xdebug_start_trace')) {
+                    //    xdebug_start_trace();
+                    //}
+                    $importer->importFile($fileName);
+                    //if (function_exists('xdebug_stop_trace')) {
+                    //    xdebug_stop_trace();
+                    //}
                     $error    = '';
                     $fileSize = $uploads['size'][$i];
                 } else {
@@ -224,8 +231,14 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
             }
 
         }
-        $result = $this->FCom_Core_ImportExport->export($models, $toFile);
+        //if(function_exists('xdebug_start_trace')){
+        //    xdebug_start_trace();
+        //}
+        $result = FCom_Core_ImportExport::i()->export($models, $toFile);
         $this->BResponse->json(['result' => $result ? 'Success': 'Failure']);
+        //if(function_exists('xdebug_stop_trace')){
+        //    xdebug_stop_trace();
+        //}
     }
 
     protected function getImportConfig()

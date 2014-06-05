@@ -2,16 +2,16 @@
 {% set mediaLibAttachConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': config.id, 'folder': config.folder, 'config': config.config, 'mode': config.mode}) %}
 {% if config.title %}
 <div class='modal fade' id='{{config.id}}_modal' tabindex='-1'>
-    <div class='modal-dialog' style='width:900px;'>        
+    <div class='modal-dialog' style='width:900px;'>
         <div class='modal-content'>
 
             <div class='modal-header'>
                 <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
                 <h4 class="modal-title" id="myLangLabel">{{ config.title}} </h4>
             </div>
-            
+
 {% endif %}
-            <div class='modal-body'>            
+            <div class='modal-body'>
                 <div class='row'>
                     <div class='tabbable'>
                         <ul class='nav nav-tabs prod-type f-horiz-nav-tabs'>
@@ -141,13 +141,13 @@
                     </div>
                 </div>
             </div>
-{% if config.title %}     
+{% if config.title %}
             <div class='modal-footer'>
                 <button class='btn btn-primary btn-add btn_{{config.id}}_add disabled' data-dismiss='modal' type='button'>{{ "Add"|_ }}</button>
                 <button class='btn btn-default btn-close btn_{{config.id}}_close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
-            </div>            
+            </div>
         </div>
-    </div>               
+    </div>
 </div>
 {% endif %}
 <script>
@@ -158,6 +158,8 @@
             multiple:true
             {% if config.mode and config.mode == 'thumbnail' %}
                 ,acceptFileTypes:  /(\.|\/)(jpe?g|tiff|gif|png|bmp)$/i
+            {% elseif config.file_types %}
+                ,acceptFileTypes: {{ config.file_types }}
             {% endif %}
         })
         .bind('fileuploadalways', function(e, data) {
@@ -173,7 +175,7 @@
                     newRow.selected = true;
                     {{config.id}}_grid.getSelectedRows().add(data.result);
                 {% endif %}
-                
+
                 {{config.id}}_grid.getRows().add(newRow,{merge: true}).trigger('render');
 
                 $('td.name span').each(function(i) {

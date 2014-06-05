@@ -37,7 +37,7 @@ class FCom_Core_Model_Seq extends FCom_Core_Model_Abstract
     public function getFirstSeqId($entityType)
     {
         $seqId = str_pad('1', 8, '0');
-        BEvents::i()->fire(__METHOD__, ['entity_type' => $entityType, 'seq_id' => & $seqId]);
+        $this->BEvents->fire(__METHOD__, ['entity_type' => $entityType, 'seq_id' => & $seqId]);
         return $seqId;
     }
 }

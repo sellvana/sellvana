@@ -99,7 +99,7 @@ class FCom_IndexTank_Search extends BClass
         $productsData['state']['filter'] = $v;
         $productsData['state']['save_filter'] = $this->BConfig->get('modules/FCom_IndexTank/save_filter');
 
-        BEvents::i()->fire(__METHOD__, ['data' => &$productsData]);
+        $this->BEvents->fire(__METHOD__, ['data' => &$productsData]);
 
         return $productsData;
     }

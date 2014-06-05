@@ -131,7 +131,7 @@ class BDb
         }
         $config = BConfig::i()->get($name === static::$_defaultConnectionName ? 'db' : 'db/named/' . $name);
         if (!$config) {
-            throw new BException(BLocale::_('Invalid or missing DB configuration: %s', $name));
+            throw new BException($this->BLocale->_('Invalid or missing DB configuration: %s', $name));
         }
         if (!empty($config['use'])) { //TODO: Prevent circular reference
             static::connect($config['use']);
@@ -144,7 +144,7 @@ class BDb
             }
         } else {
             if (empty($config['dbname'])) {
-                throw new BException(BLocale::_("dbname configuration value is required for '%s'", $name));
+                throw new BException($this->BLocale->_("dbname configuration value is required for '%s'", $name));
             }
             $engine = !empty($config['engine']) ? $config['engine'] : 'mysql';
             $host = !empty($config['host']) ? $config['host'] : '127.0.0.1';
@@ -158,7 +158,7 @@ class BDb
                     break;
 
                 default:
-                    throw new BException(BLocale::_('Invalid DB engine: %s', $engine));
+                    throw new BException($this->BLocale->_('Invalid DB engine: %s', $engine));
             }
         }
         $profile = BDebug::debug('DB.CONNECT ' . $name);
@@ -212,7 +212,7 @@ class BDb
            if (strlen(trim($query)) > 0) {
                 // try {
                     BDebug::debug('DB.RUN: ' . $query);
-                    if (!empty($options['echo']) && BDebug::is('DEBUG')) {
+                    if (!empty($options['echo']) && $this->BDebug->is('DEBUG')) {
                         echo '<hr><pre>' . $query . '<pre>';
                     }
                     BORM::set_last_query($query);
@@ -514,7 +514,7 @@ EOT
     protected static function checkTable($fullTableName, $connectionName = null)
     {
         if (!static::ddlTableExists($fullTableName, $connectionName)) {
-            throw new BException(BLocale::_('Invalid table name: %s', $fullTableName));
+            throw new BException($this->BLocale->_('Invalid table name: %s', $fullTableName));
         }
     }
 
@@ -529,7 +529,7 @@ EOT
     public static function ddlIndexInfo($fullTableName, $indexName = null, $connectionName = null)
     {
         if (!static::ddlTableExists($fullTableName, $connectionName)) {
-            throw new BException(BLocale::_('Invalid table name: %s', $fullTableName));
+            throw new BException($this->BLocale->_('Invalid table name: %s', $fullTableName));
         }
         $a = explode('.', $fullTableName);
         $dbName = empty($a[1]) ? static::dbName() : $a[0];
@@ -555,7 +555,7 @@ EOT
     public static function ddlForeignKeyInfo($fullTableName, $fkName = null, $connectionName = null)
     {
         if (!static::ddlTableExists($fullTableName, $connectionName)) {
-            throw new BException(BLocale::_('Invalid table name: %s', $fullTableName));
+            throw new BException($this->BLocale->_('Invalid table name: %s', $fullTableName));
         }
         $a = explode('.', $fullTableName);
         $dbName = empty($a[1]) ? static::dbName() : $a[0];
@@ -748,12 +748,13 @@ EOT
     }
 
     /**
-    * Clean array or object fields based on table columns and return an array
-    *
-    * @param string $table
-    * @param array|object $data
-    * @return array
-    */
+     * Clean array or object fields based on table columns and return an array
+     *
+     * @param string       $table
+     * @param array|object $data
+     * @param null         $connectionName
+     * @return array
+     */
     public static function cleanForTable($table, $data, $connectionName = null)
     {
         $isObject = is_object($data);
@@ -947,7 +948,7 @@ class BORM extends ORMWrapper
             try { //ADDED: hide connection details from the error if not in DEBUG mode
                 $db = new BPDO($connection_string, $username, $password, $driver_options); //UPDATED
             } catch (PDOException $e) {
-                if (BDebug::is('DEBUG')) {
+                if ($this->BDebug->is('DEBUG')) {
                     throw $e;
                 } else {
                     throw new PDOException('Could not connect to database');
@@ -2137,7 +2138,7 @@ class BModel extends Model
     */
     public function onAfterCreate()
     {
-        BEvents::i()->fire($this->_origClass() . '::onAfterCreate', ['model' => $this]);
+        $this->BEvents->fire($this->_origClass() . '::onAfterCreate', ['model' => $this]);
         return $this;
     }
 
@@ -2196,7 +2197,7 @@ class BModel extends Model
 
         $orm = static::factory();
         static::_loadORM($orm);
-        BEvents::i()->fire($class . '::load:orm', ['orm' => $orm, 'class' => $class, 'called_class' => get_called_class()]);
+        $this->BEvents->fire($class . '::load:orm', ['orm' => $orm, 'class' => $class, 'called_class' => get_called_class()]);
         if (is_array($id)) {
             $orm->where_complex($id);
         } else {
@@ -2251,7 +2252,7 @@ class BModel extends Model
     */
     public function onAfterLoad()
     {
-        BEvents::i()->fire($this->_origClass() . '::onAfterLoad', ['model' => $this]);
+        $this->BEvents->fire($this->_origClass() . '::onAfterLoad', ['model' => $this]);
         return $this;
     }
 
@@ -2437,7 +2438,7 @@ class BModel extends Model
     */
     public function onBeforeSave()
     {
-        BEvents::i()->fire($this->origClass() . '::onBeforeSave', ['model' => $this]);
+        $this->BEvents->fire($this->origClass() . '::onBeforeSave', ['model' => $this]);
         return true;
     }
 
@@ -2514,7 +2515,7 @@ class BModel extends Model
     */
     public function onAfterSave()
     {
-        BEvents::i()->fire($this->_origClass() . '::onAfterSave', ['model' => $this]);
+        $this->BEvents->fire($this->_origClass() . '::onAfterSave', ['model' => $this]);
         return $this;
     }
 
@@ -2535,7 +2536,7 @@ class BModel extends Model
     */
     public function onBeforeDelete()
     {
-        BEvents::i()->fire($this->_origClass() . '::onBeforeDelete', ['model' => $this]);
+        $this->BEvents->fire($this->_origClass() . '::onBeforeDelete', ['model' => $this]);
         return true;
     }
 
@@ -2567,7 +2568,7 @@ class BModel extends Model
 
     public function onAfterDelete()
     {
-        BEvents::i()->fire($this->_origClass() . '::onAfterDelete', ['model' => $this]);
+        $this->BEvents->fire($this->_origClass() . '::onAfterDelete', ['model' => $this]);
         return $this;
     }
 
@@ -2900,10 +2901,10 @@ class BModel extends Model
             $data = $this->as_array();
         }
         $rules = array_merge(static::$_validationRules, $rules);
-        BEvents::i()->fire($this->_origClass() . "::validate:before", ["rules" => &$rules, "data" => &$data]);
+        $this->BEvents->fire($this->_origClass() . "::validate:before", ["rules" => &$rules, "data" => &$data]);
         $valid = $this->BValidate->validateInput($data, $rules, $formName);
         if (!$valid) {
-            BEvents::i()->fire($this->_origClass() . "::validate:failed", ["rules" => &$rules, "data" => &$data]);
+            $this->BEvents->fire($this->_origClass() . "::validate:failed", ["rules" => &$rules, "data" => &$data]);
         }
 
         return $valid;

@@ -81,6 +81,6 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
                 'save' => '<button type="submit" class="st1 sz2 btn" onclick="return adminForm.saveAll(this)"><span>' .  $this->BLocale->_('Save') . '</span></button>',
             ],
         ]);
-        BEvents::i()->fire(static::$_origClass . '::formViewBefore', $args);
+        $this->BEvents->fire(static::$_origClass . '::formViewBefore', $args);
     }
 }

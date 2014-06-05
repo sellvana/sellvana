@@ -85,7 +85,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
             $result = ['status' => 1];
 
             $eventName = static::$_origClass . '::action_tree_data__POST.' . $r->post('operation');
-            BEvents::i()->fire($eventName . ':before', $r->post());
+            $this->BEvents->fire($eventName . ':before', $r->post());
 
             switch ($r->post('operation')) {
                 case 'create_node':
@@ -150,12 +150,12 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                     $node->reorderChildrenAZ($recursive);
                     break;
                 default:
-                    if (!BEvents::i()->fire($eventName, $r->post())) {
+                    if (!$this->BEvents->fire($eventName, $r->post())) {
                         throw new BException('Not implemented');
                     }
             }
 
-            BEvents::i()->fire($eventName . ':after', $r->post());
+            $this->BEvents->fire($eventName . ':after', $r->post());
         } catch (Exception $e) {
             $result = ['status' => 0, 'message' => $e->getMessage()];
         }

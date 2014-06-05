@@ -14,25 +14,25 @@
         <div class='box-content' id="content-image">
             <div class='row fileupload-buttonbar' id="btn-select-img">
                 <div class='col-sm-12'>
-                    <span class='btn btn-primary fileinput-button' id='btn_add_image'>
+                    <span class='btn btn-primary fileinput-button btn_add_image'>
                         <i class='icon-plus icon-white'></i>
-                        <span id="btn_add_text">
+                        <span class="btn_add_text">
                         {% if m.get(field) %}
                             {{ 'Change Image...'|_ }}
                         {% else %}
                             {{ 'Add Image...'|_ }}
                         {% endif %}
                         </span>
-                        <input id="model-image-url" type="hidden" name="model[{{ field }}]" value="{{ m.get(field) }}"/>
+                        <input class="model-image-url" type="hidden" name="model[{{ field }}]" value="{{ m.get(field) }}"/>
                     </span>
-                    <span class='btn btn-primary fileinput-button' id='btn_remove_image'
+                    <span class='btn btn-primary fileinput-button btn_remove_image'
                         style='display: {% if m.get(field) %} block; {% else %} none; {% endif %}'>
                         × {{ 'Remove Image...'|_ }}
                     </span>
                 </div>
             </div>
             <br>
-            <div id="current-image">
+            <div class="current-image">
                 {% if m.get(field) %}
                     <img src="{{ resizeUrl|replace({'--IMAGE--': m.get(field)}) }}">
                 {% endif %}
@@ -53,16 +53,19 @@ require(['jquery'], function($) {
         $('.btn_category_images_add').html('{{ 'Change'|_ }}');
     {% endif %}
 
-    $('#btn_add_image').click(function() {
+    $('.btn_add_image').click(function() {
+        $('.btn_add_image').removeClass('active');
+        $(this).addClass('active')
         $('.btn_category_images_add').addClass('disabled');
         $('#category_images_modal').modal();
     });
 
-    $('#btn_remove_image').click(function() {
-        $('#btn_add_text').html('{{ 'Add Image...'|_ }}');
-        $('#btn_remove_image').css('display', 'none');
-        $('#current-image').html('');
-        $('#model-image-url').val('');
+    $('.btn_remove_image').click(function() {
+        var parents = $(this).parents('.form-group');
+        parents.find('.btn_add_text').html('{{ 'Add Image...'|_ }}');
+        parents.find('.btn_remove_image').css('display', 'none');
+        parents.find('.current-image').html('');
+        parents.find('.model-image-url').val('');
         $('.btn_category_images_add').html('{{ 'Add'|_ }}');
     });
 });
@@ -102,14 +105,22 @@ require(['jquery','underscore','backbone'], function($, _) {
         grid.build();
 
         $('.btn_category_images_add').click(function() {
+
             var row = category_images_grid.getSelectedRows().at(0);
             var path = row.get("folder") + row.get("subfolder") + "/" + row.get("file_name");
             var imageTag = '<img src="{{ resizeUrl }}" />'.replace(/--IMAGE--/, path);
-            $('#model-image-url').val(path);
-            $('#current-image').html(imageTag);
+
             category_images_grid.getGridView().clearSelectedRows();
-            $('#btn_add_text').html('{{ 'Change Image...'|_ }}');
-            $('#btn_remove_image').css('display', 'block');
+            $('.btn_add_image').each(function () {
+                if ($(this).hasClass('active')) {
+                    var parents = $(this).parents('.form-group');
+                    parents.find('.model-image-url').val(path);
+                    parents.find('.current-image').html(imageTag);
+                    parents.find('.btn_add_text').html('{{ 'Change Image...'|_ }}');
+                    parents.find('.btn_remove_image').css('display', 'block');
+                }
+            })
+
             $('.btn_category_images_add').html('{{ 'Change'|_ }}');
         });
     }

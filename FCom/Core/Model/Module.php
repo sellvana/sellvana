@@ -40,7 +40,7 @@ class FCom_Core_Model_Module extends BDbModule
         try {
             $schemaVersions = $this->orm()->find_many_assoc('module_name');
             $schemaModules = [];
-            foreach (BMigrate::getMigrationData() as $connection => $migrationModules) {
+            foreach ($this->BMigrate->getMigrationData() as $connection => $migrationModules) {
                 foreach ($migrationModules as $modName => $migrData) {
                     $schemaModules[$modName] = 1;
                 }

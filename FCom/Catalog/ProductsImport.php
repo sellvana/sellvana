@@ -27,6 +27,8 @@ class FCom_Catalog_ProductsImport extends BImport
     protected $dir = 'products';
     protected $model = 'FCom_Catalog_Model_Product';
 
+    protected $allowedFileTypes = ['txt', 'csv'];
+
     public function updateFieldsDueToInfo($info = null)
     {
         $cfFields = $this->FCom_CustomField_Model_Field->getListAssoc();

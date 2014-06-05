@@ -43,7 +43,7 @@ class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abstract
             $result['message'] = $e->getMessage();
         }
 
-        BEvents::i()->fire(__METHOD__ . ':after', ['request' => $request, 'result' => $result]);
+        $this->BEvents->fire(__METHOD__ . ':after', ['request' => $request, 'result' => $result]);
 
         $this->BResponse->json($result);
     }

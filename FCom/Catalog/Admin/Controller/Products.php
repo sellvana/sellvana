@@ -402,7 +402,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ];
 
 
-        //BEvents::i()->fire(__METHOD__.':orm', array('type'=>$type, 'orm'=>$orm));
+        //$this->BEvents->fire(__METHOD__.':orm', array('type'=>$type, 'orm'=>$orm));
         $data = $this->BDb->many_as_array($orm->find_many());
         //unset unused columns
         /*$columnKeys = array_keys($config['columns']);
@@ -416,7 +416,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
         $config['data'] = $data;
 
-        //BEvents::i()->fire(__METHOD__.':config', array('type'=>$type, 'config'=>&$config));
+        //$this->BEvents->fire(__METHOD__.':config', array('type'=>$type, 'config'=>&$config));
         return ['config' => $config];
     }
 
@@ -615,6 +615,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function processVariantPost($model, $data)
     {
+        $hlp = $this->FCom_CustomField_Model_ProductVariant;
         if (!empty($data['vfields'])) {
             $modelFieldOption = $this->FCom_CustomField_Model_FieldOption;
             $vfields = json_decode($data['vfields'], true);
@@ -628,9 +629,30 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
             $model->setData('variants_fields', json_decode($data['vfields'], true));
         }
-        if (!empty($data['variants'])) {
-            $model->setData('variants', json_decode($data['variants'], true));
+        if (isset($data['variants'])) {
+            $hlp->delete_many('product_id', $model->id);
+            if (count($data['variants']) > 0) {
+                $variants = BUtil::objectToArray(json_decode($data['variants']));
+                foreach($variants as $arr) {
+                    $vr = $hlp->load($arr['id']);
+                    $data =  [
+                                'product_id' => $model->id,
+                                'variant_sku' => $arr['variant_sku'],
+                                'variant_price' => $arr['variant_price'],
+                                'variant_qty' => $arr['variant_qty'],
+                                'field_values' => json_encode($arr['field_values']),
+                                'data_serialized' => json_encode(['variant_file_id' => $arr['variant_file_id']]),
+                             ];
+                    if ($vr) {
+                        $vr->set($data)->save();
+                    } else {
+                        $hlp->create($data)->save();
+                    }
+                }
+            }
+//            $model->setData('variants', json_decode($data['variants'], true));
         }
+
         $model->save();
 
     }

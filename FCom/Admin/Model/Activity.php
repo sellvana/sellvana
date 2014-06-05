@@ -47,7 +47,7 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
 
     public function registerAllFilters()
     {
-        BEvents::i()->fire(__METHOD__);
+        $this->BEvents->fire(__METHOD__);
     }
 
     public function fetchAllUsersRestrictions()

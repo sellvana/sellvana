@@ -42,7 +42,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
         try {
             $post = $this->BRequest->post();
 
-            BEvents::i()->fire(__METHOD__, ['post' => &$post]);
+            $this->BEvents->fire(__METHOD__, ['post' => &$post]);
             $this->BConfig->add($post['config'], true);
 
             if (!empty($post['config']['db'])) {

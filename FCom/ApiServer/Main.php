@@ -5,7 +5,7 @@ class FCom_ApiServer_Main extends BClass
     public function bootstrap()
     {
         /*
-        BRouting::i()
+        $this->BRouting
             ->route('GET|POST|PUT|DELETE /v1/customers/.action', 'FCom_Customer_ApiServer_Controller_Rest')
         ;
         */

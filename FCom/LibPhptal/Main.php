@@ -63,7 +63,7 @@ class FCom_LibPhptal_Main extends BClass
 
         $tal->set('FCOM', static::$_fcomVars);
 
-        BEvents::i()->fire(__METHOD__, ['tal' => $tal, 'tpl' => $tpl]);
+        $this->BEvents->fire(__METHOD__, ['tal' => $tal, 'tpl' => $tpl]);
         return $tal;
     }
 
@@ -135,25 +135,25 @@ function phptal_tales_cms_block($src, $nothrow)
 
 function phptal_tales_href($href, $nothrow)
 {
-    return "$this->BApp->href('" . str_replace("'", "\\'", $href) . "')";
+    return "BApp::href('" . str_replace("'", "\\'", $href) . "')";
 }
 
 function phptal_tales_src($src, $nothrow)
 {
-    return "$this->BApp->src('" . str_replace("'", "\\'", $src) . "')";
+    return "BApp::src('" . str_replace("'", "\\'", $src) . "')";
 }
 
 class FCom_LibPhptal_PreFilter extends PHPTAL_PreFilter
 {
     public function filter($source)
     {
-        BEvents::i()->fire(__METHOD__, ['source' => &$source]);
+        $this->BEvents->fire(__METHOD__, ['source' => &$source]);
         return $source;
     }
 
     public function filterDOM(PHPTAL_Dom_Element $element)
     {
-        BEvents::i()->fire(__METHOD__, ['element' => $element]);
+        $this->BEvents->fire(__METHOD__, ['element' => $element]);
     }
 }
 
@@ -161,7 +161,7 @@ class FCom_LibPhptal_PostFilter implements PHPTAL_Filter
 {
     public function filter($html)
     {
-        BEvents::i()->fire(__METHOD__, ['html' => &$html]);
+        $this->BEvents->fire(__METHOD__, ['html' => &$html]);
         return $html;
     }
 }

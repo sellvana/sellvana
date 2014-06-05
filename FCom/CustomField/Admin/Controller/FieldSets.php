@@ -414,7 +414,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
             }
             $data['model'] = $this->BLocale->parseRequestDates($data['model'], 'from_date,to_date');
             $model->set($data['model']);
-            BEvents::i()->fire('FCom_CustomField_Admin_Controller_FieldSets::form_post',
+            $this->BEvents->fire('FCom_CustomField_Admin_Controller_FieldSets::form_post',
                 ['id' => $id, 'data' => $data, 'model' => $model]);
             $model->save();
             if (!$id) {
