@@ -169,23 +169,35 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
 
         $this->processFormTabs($view, $model);
     }
-    public function action_import()
+    public function action_import__POST()
     {
+
+        if (empty($_FILES) || !isset($_FILES['upload'])) {
+            $this->BResponse->json(['msg' => "Nothing found"]);
+            return;
+        }
+        $this->BResponse->setContentType('application/json');
         /** @var FCom_Core_ImportExport $importer */
         $importer = $this->FCom_Core_ImportExport;
-        $uploads  = $_FILES[ 'upload' ];
-        $rows = [];
+        $uploads = $_FILES['upload'];
+        $rows    = [];
         try {
             foreach ($uploads['name'] as $i => $fileName) {
 
                 if (!$fileName) {
                     continue;
                 }
+                $fileName = preg_replace('/[^\w\d_.-]+/', '_', $fileName);
+
                 $fullFileName = $importer->getFullPath($fileName);
                 $this->BUtil->ensureDir(dirname($fullFileName));
                 $fileSize = 0;
-                if (!$uploads['error'][$i] && @move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
-                    BResponse::i()->startLongResponse();
+                if ($uploads['error'][$i]) {
+                    $error = $uploads['error'][$i];
+                } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
+                    $error = $this->_("Problem storing uploaded file.");
+                } elseif ($importer->validateImportFile($fullFileName)) {
+                    $this->BResponse->startLongResponse(false);
                     //if (function_exists('xdebug_start_trace')) {
                     //    xdebug_start_trace();
                     //}
@@ -196,13 +208,13 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                     $error    = '';
                     $fileSize = $uploads['size'][$i];
                 } else {
-                    $error = $uploads['error'][$i];
+                    $error = $this->_("Invalid import file.");
                 }
 
                 $row = [
                     'name'   => $fileName,
                     'size'   => $fileSize,
-                    'folder' => str_replace($this->BConfig->get('fs/root_dir'), '...', dirname($fullFileName)),
+                    'folder' => '.../',
                 ];
                 if ($error) {
                     $row['error'] = $error;
@@ -213,9 +225,9 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
             $this->BDebug->logException($e);
             $this->BResponse->json(['error' => $e->getMessage()]);
         }
-        $this->BResponse->json( [ 'files' => $rows ] );
+        $this->BResponse->json(['files' => $rows]);
     }
-    public function action_export()
+    public function action_export__POST()
     {
         $exportData = $this->BRequest->post('ie_export_grid');
         $toFile = isset($exportData['export_file_name']) ? $exportData['export_file_name'] : null;
@@ -234,7 +246,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         //if(function_exists('xdebug_start_trace')){
         //    xdebug_start_trace();
         //}
-        $result = FCom_Core_ImportExport::i()->export($models, $toFile);
+        $result = $this->FCom_Core_ImportExport->export($models, $toFile);
         $this->BResponse->json(['result' => $result ? 'Success': 'Failure']);
         //if(function_exists('xdebug_stop_trace')){
         //    xdebug_stop_trace();

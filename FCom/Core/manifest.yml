@@ -48,3 +48,6 @@ modules:
                     sales_name: Sales
                     sales_email: support@example.com
                     default_tz: "America/New_York"
+                    import_export:
+                        batch_size: 10
+                        delete_after_import: 1
