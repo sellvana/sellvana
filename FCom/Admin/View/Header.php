@@ -20,7 +20,7 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
     public function getNotifications()
     {
         $notifications = [];
-        BEvents::i()->fire(__METHOD__, ['notifications' => &$notifications]);
+        $this->BEvents->fire(__METHOD__, ['notifications' => &$notifications]);
         $conf      = $this->BConfig;
         $dismissed = $conf->get('modules/FCom_Core/dismissed/notifications');
         $result = [];

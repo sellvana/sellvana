@@ -4,7 +4,7 @@ class FCom_Email_Main extends BClass
 {
     public function bootstrap()
     {
-        BEmail::i()->addHandler('FCom_Email', 'FCom_Email_Main::handler');
+        $this->BEmail->addHandler('FCom_Email', 'FCom_Email_Main::handler');
 
         $c = $this->BConfig->get('modules/FCom_Email');
         if (!empty($c['smtp_host'])) {
@@ -15,7 +15,7 @@ class FCom_Email_Main extends BClass
         }
 
         if (!empty($c['default_handler'])) {
-            BEmail::i()->setDefaultHandler($c['default_handler']);
+            $this->BEmail->setDefaultHandler($c['default_handler']);
         }
 
         $this->FCom_Admin_Model_Role->createPermission([
@@ -41,7 +41,7 @@ class FCom_Email_Main extends BClass
         ])->save();
 
         $this->BDebug->startErrorLogger();
-        $result = BEmail::i()->defaultHandler($data);
+        $result = $this->BEmail->defaultHandler($data);
         $errors = $this->BDebug->stopErrorLogger();
 
         if ($result) {

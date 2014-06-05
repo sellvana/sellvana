@@ -27,7 +27,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $this->forward(false);
             return $this;
         }
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller::action_product:product', ['product' => &$product]);
+        $this->BEvents->fire('FCom_Catalog_Frontend_Controller::action_product:product', ['product' => &$product]);
         $this->BApp->set('current_product', $product);
 
         $layout->view('catalog/product/details')->set('product', $product);
@@ -69,7 +69,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $this->layout('/catalog/product');
 
         if ($product->layout_update) {
-            $layoutUpdate = BYAML::parse($product->layout_update);
+            $layoutUpdate = $this->BYAML->parse($product->layout_update);
             if (!is_null($layoutUpdate)) {
                 $this->BLayout->addLayout('product_page', $layoutUpdate)->applyLayout('product_page');
             } else {
@@ -94,11 +94,11 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $eventArgs = ['product' => &$product, 'qty' => $post['qty']];
 
         if (!empty($post['add2cart'])) {
-            BEvents::i()->fire('FCom_Catalog_Frontend_Controller::action_product:addToCart', $eventArgs);
+            $this->BEvents->fire('FCom_Catalog_Frontend_Controller::action_product:addToCart', $eventArgs);
         }
 
         if (!empty($post['add2wishlist'])) {
-            BEvents::i()->fire('FCom_Catalog_Frontend_Controller::action_product:addToWishlist', $eventArgs);
+            $this->BEvents->fire('FCom_Catalog_Frontend_Controller::action_product:addToWishlist', $eventArgs);
         }
 
 

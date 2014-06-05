@@ -219,14 +219,14 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if ($this->get('timezone')) {
             date_default_timezone_set($this->get('timezone'));
         }
-        BEvents::i()->fire('FCom_Admin_Model_User::login:after', ['user' => $this]);
+        $this->BEvents->fire('FCom_Admin_Model_User::login:after', ['user' => $this]);
 
         return $this;
     }
 
     public function logout()
     {
-        BEvents::i()->fire(__METHOD__, ['user' => $this->sessionUser()]);
+        $this->BEvents->fire(__METHOD__, ['user' => $this->sessionUser()]);
         #$this->BSession->set('admin_user_id', null);
         #$this->BSession->set('admin_user_password_token', null);
         $sessData =& $this->BSession->dataToUpdate();

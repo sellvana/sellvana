@@ -50,13 +50,13 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $status = $this->FCom_Sales_Model_Order_Status->statusNew();
         $data['status'] = $status->name;
         $data['status_id'] = $status->id;
-        BEvents::i()->fire(__CLASS__ . '.addNew', ['order' => $data]);
+        $this->BEvents->fire(__CLASS__ . '.addNew', ['order' => $data]);
         return $this->create($data);//->save();
     }
 
     public function update($data)
     {
-        BEvents::i()->fire(__CLASS__ . '.update', ['order' => $data]);
+        $this->BEvents->fire(__CLASS__ . '.update', ['order' => $data]);
         return $this->set($data);//->save();
     }
 
@@ -252,7 +252,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             $paymentMethod = $cart->getPaymentMethod();
             $this->createOrderPayment($paymentMethod, $salesOrder, $options);
         }
-        BEvents::i()->fire(__METHOD__ . ':after', [
+        $this->BEvents->fire(__METHOD__ . ':after', [
             'cart'           => $cart,
             'options'        => $options,
             'payment_method' => $paymentMethod,

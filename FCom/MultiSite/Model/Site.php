@@ -38,13 +38,13 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
                 $map[$regex] = $site->as_array();
             }
         }
-        BCache::i()->save(static::$_mapCacheKey, $map, false);
+        $this->BCache->save(static::$_mapCacheKey, $map, false);
         return $map;
     }
 
     public function getDomainMap()
     {
-        $map = BCache::i()->load(static::$_mapCacheKey);
+        $map = $this->BCache->load(static::$_mapCacheKey);
         if (!$map) {
             $map = $this->createDomainMap();
         }

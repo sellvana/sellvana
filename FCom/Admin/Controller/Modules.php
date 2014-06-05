@@ -25,7 +25,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         try {
             $schemaVersions = $this->FCom_Core_Model_Module->orm()->find_many_assoc('module_name');
             $schemaModules = [];
-            foreach (BMigrate::getMigrationData() as $connection => $migrationModules) {
+            foreach ($this->BMigrate->getMigrationData() as $connection => $migrationModules) {
                 foreach ($migrationModules as $modName => $migrData) {
                     $schemaModules[$modName] = 1;
                 }
@@ -182,7 +182,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     {
         $this->BLayout->view('modules')->set('form_url', $this->BApp->href('modules').($this->BRequest->get('RECOVERY')==='' ? '?RECOVERY' : ''));
         $grid = $this->BLayout->view('core/backgrid')->set('grid', $this->gridConfig());
-        BEvents::i()->fire('FCom_Admin_Controller_Modules::action_index', array('grid_view'=>$grid));
+        $this->BEvents->fire('FCom_Admin_Controller_Modules::action_index', array('grid_view'=>$grid));
         $this->layout('/modules');
     }*/
 
@@ -240,7 +240,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     public function action_migrate__POST()
     {
         try {
-            BMigrate::i()->migrateModules(true, true);
+            $this->BMigrate->migrateModules(true, true);
             $this->message('Migration complete');
         } catch (Exception $e) {
             $this->BDebug->logException($e);

@@ -24,7 +24,7 @@ class FCom_LibTwig_Main extends BClass
 
     public function init($path = null)
     {
-        BClassAutoload::i(true, [__DIR__ . '/lib']);
+        $this->BClassAutoload->i(true, [__DIR__ . '/lib']);
         /*
         require_once __DIR__.'/lib/Twig/Autoloader.php';
         Twig_Autoloader::register();
@@ -55,8 +55,8 @@ class FCom_LibTwig_Main extends BClass
         }
 
         foreach ([
-            '_' => 'BLocale::_',
-            'currency' => 'BLocale::currency',
+            '_' => [$this->BLocale, '_'],
+            'currency' => [$this->BLocale, 'currency'],
             'min' => 'min',
             'max' => 'max',
             'floor' => 'floor',
@@ -83,7 +83,7 @@ class FCom_LibTwig_Main extends BClass
             static::$_stringTwig->addGlobal($global, $instance);
         }
 
-        BEvents::i()->fire(__METHOD__, [
+        $this->BEvents->fire(__METHOD__, [
             'options' => $options,
             'file_adapter' => static::$_fileTwig,
             'string_adapter' => static::$_stringTwig,

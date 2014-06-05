@@ -99,7 +99,7 @@ class FCom_Core_Migrate extends BClass
             ]
         );
         if (!$this->BConfig->get('cache/default_backend')) {
-            $this->_defaultBackend = BCache::i()->getFastestAvailableBackend();
+            $this->_defaultBackend = $this->BCache->getFastestAvailableBackend();
             $this->BConfig->set('cache/default_backend', $this->_defaultBackend, false, true);
             $this->FCom_Core_Main->writeConfigFiles('core');
         }
@@ -215,7 +215,7 @@ class FCom_Core_Migrate extends BClass
     public function upgrade__0_1_5__0_1_6()
     {
         if (!$this->BConfig->get('cache/default_backend')) {
-            $this->_defaultBackend = BCache::i()->getFastestAvailableBackend();
+            $this->_defaultBackend = $this->BCache->getFastestAvailableBackend();
             $this->BConfig->set('cache/default_backend', $this->_defaultBackend, false, true);
             $this->FCom_Core_Main->writeConfigFiles('core');
         }
@@ -230,5 +230,10 @@ class FCom_Core_Migrate extends BClass
                 'KEYS' => ['uk_site_model_import_id' => "UNIQUE (site_id,model_id,import_id)"],
             ]
         );
+    }
+
+    public function upgrade__0_1_7__0_1_8()
+    {
+        $this->BCache->deleteAll();
     }
 }

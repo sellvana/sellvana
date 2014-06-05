@@ -35,7 +35,7 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         }
 
         if ($block->layout_update) {
-            $layoutUpdate = BYAML::parse($block->layout_update);
+            $layoutUpdate = $this->BYAML->parse($block->layout_update);
             if (!is_null($layoutUpdate)) {
                 $this->BLayout->addLayout('cms_page', $layoutUpdate)->applyLayout('cms_page');
             } else {
@@ -73,7 +73,7 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         }
 
         if ($nav->layout_update) {
-            $layoutUpdate = BYAML::parse($nav->layout_update);
+            $layoutUpdate = $this->BYAML->parse($nav->layout_update);
             if (!is_null($layoutUpdate)) {
                 $this->BLayout->addLayout('cms_nav', $layoutUpdate)->applyLayout('cms_nav');
             } else {

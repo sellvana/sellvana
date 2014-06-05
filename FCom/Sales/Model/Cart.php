@@ -162,9 +162,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         }
         $orm = $this->FCom_Sales_Model_Cart_Item->orm('ci')->where('ci.cart_id', $this->id())
             ->order_by_desc('ci.update_at')->limit($limit);
-        BEvents::i()->fire(__METHOD__ . ':orm', ['orm' => $orm]);
+        $this->BEvents->fire(__METHOD__ . ':orm', ['orm' => $orm]);
         $items = $orm->find_many();
-        BEvents::i()->fire(__METHOD__ . ':data', ['items' => &$items]);
+        $this->BEvents->fire(__METHOD__ . ':data', ['items' => &$items]);
         return $items;
     }
 
@@ -261,7 +261,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $this->calculateTotals()->save();
         }
 
-        BEvents::i()->fire(__METHOD__, ['model' => $this, 'item' => $item]);
+        $this->BEvents->fire(__METHOD__, ['model' => $this, 'item' => $item]);
 
         $this->sessionCartId($this->id);
         return $this;
@@ -285,7 +285,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     {
         $this->items();
         $this->removeItem($this->childById('items', $productId, 'product_id'));
-        BEvents::i()->fire(__METHOD__, ['model' => $this]);
+        $this->BEvents->fire(__METHOD__, ['model' => $this]);
         return $this;
     }
 
@@ -501,7 +501,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function setStatus($status)
     {
         $this->set('status', $status);
-        BEvents::i()->fire(__METHOD__, ['cart' => $this, 'status' => $status]);
+        $this->BEvents->fire(__METHOD__, ['cart' => $this, 'status' => $status]);
         return $this;
     }
 

@@ -444,7 +444,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 //        $this->BResponse->startLongResponse(false);
         //HANDLE CONFIG
 
-        BEvents::i()->fire(__METHOD__ . ':before', ['data' => &$data, 'config' => &$config]);
+        $this->BEvents->fire(__METHOD__ . ':before', ['data' => &$data, 'config' => &$config]);
 
         //multi value separator used to separate values in one column like for images
         //For example: image.png; image2.png; image3.png
@@ -780,7 +780,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($errors) {
             $result['errors'] = $errors;
         }
-        BEvents::i()->fire(__METHOD__ . ':after', ['product_ids' => $productIds, 'config' => &$config, 'result' => &$result]);
+        $this->BEvents->fire(__METHOD__ . ':after', ['product_ids' => $productIds, 'config' => &$config, 'result' => &$result]);
 
         return $result;
     }

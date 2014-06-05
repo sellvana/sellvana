@@ -23,14 +23,14 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $pagerView = $layout->view('catalog/product/pager');
 
         $productsORM = $this->FCom_Catalog_Model_Product->searchProductOrm($q, $filter, $category);
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_orm', ['orm' => $productsORM]);
+        $this->BEvents->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_orm', ['orm' => $productsORM]);
         $productsData = $productsORM->paginate(null, [
             'ps' => $pagerView->default_page_size,
             'sc' => $pagerView->default_sort,
             'sort_options'  => $pagerView->sort_options,
             'page_size_options' => $pagerView->page_size_options,
         ]);
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_data', ['data' => &$productsData]);
+        $this->BEvents->fire('FCom_Catalog_Frontend_Controller_Search::action_category:products_data', ['data' => &$productsData]);
 
         $this->BApp->i()
             ->set('current_category', $category)
@@ -52,7 +52,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $layout->view('breadcrumbs')->set('crumbs', $crumbs);
 
         if ($category->layout_update) {
-            $layoutUpdate = BYAML::parse($category->layout_update);
+            $layoutUpdate = $this->BYAML->parse($category->layout_update);
             if (!is_null($layoutUpdate)) {
                 $this->BLayout->addLayout('category_page', $layoutUpdate)->applyLayout('category_page');
             } else {
@@ -96,14 +96,14 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $q = $this->FCom_Catalog_Model_SearchAlias->processSearchQuery($q);
 
         $productsORM = $this->FCom_Catalog_Model_Product->searchProductOrm($q, $filter);
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_orm', ['data' => $productsORM]);
+        $this->BEvents->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_orm', ['data' => $productsORM]);
         $productsData = $productsORM->paginate(null, [
             'ps' => $pagerView->default_page_size,
             'sc' => $pagerView->default_sort,
             'sort_options'  => $pagerView->sort_options,
             'page_size_options' => $pagerView->page_size_options,
         ]);
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', ['data' => &$productsData]);
+        $this->BEvents->fire('FCom_Catalog_Frontend_Controller_Search::action_search:products_data', ['data' => &$productsData]);
 
         $category = $this->FCom_Catalog_Model_Category->orm()->where_null('parent_id')->find_one();
         $this->BApp->i()

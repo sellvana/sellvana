@@ -512,7 +512,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     public function onAfterClone(&$cloneNode)
     {
-        BEvents::i()->fire($this->_origClass() . '::onAfterClone', ['node' => $this, 'cloneNode' => $cloneNode]);
+        $this->BEvents->fire($this->_origClass() . '::onAfterClone', ['node' => $this, 'cloneNode' => $cloneNode]);
         return $this;
     }
 

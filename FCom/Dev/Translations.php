@@ -161,7 +161,7 @@ class FCom_Dev_Translations extends BClass
     protected function initTwig()
     {
         if (!static::$twig) {
-            BEvents::i()->on("FCom_LibTwig_Main::init", __CLASS__ . "::setTwigEnv");
+            $this->BEvents->on("FCom_LibTwig_Main::init", __CLASS__ . "::setTwigEnv");
             $bDir = $this->BModuleRegistry->module("FCom_Core")->baseDir();
             echo $bDir;
             $this->FCom_LibTwig_Main->init($bDir);

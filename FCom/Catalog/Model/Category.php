@@ -167,7 +167,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         if (sizeof($removeIds) > 0 && $removeIds[0] != '') {
             $hlp->delete_many(['category_id' => $this->id(), 'product_id' => $removeIds]);
         }
-        BEvents::i()->fire(__METHOD__ . ':products', ['model' => $this, 'add_ids' => $addIds, 'remove_ids' => $removeIds]);
+        $this->BEvents->fire(__METHOD__ . ':products', ['model' => $this, 'add_ids' => $addIds, 'remove_ids' => $removeIds]);
     }
 
     public function imagePath()
@@ -259,7 +259,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             ->find_many();
 
         if (empty($importData)) {
-            $this->BDebug->log(BLocale::_("Could not update category data, missing import details"));
+            $this->BDebug->log($this->BLocale->_("Could not update category data, missing import details"));
             return;
         }
 

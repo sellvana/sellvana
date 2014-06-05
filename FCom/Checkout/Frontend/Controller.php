@@ -25,7 +25,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             ['label' => 'Cart', 'active' => true]]);
 
         $cart = $this->FCom_Sales_Model_Cart->sessionCart();
-        BEvents::i()->fire('FCom_Checkout_Frontend_Controller::action_cart:cart', ['cart' => $cart]);
+        $this->BEvents->fire('FCom_Checkout_Frontend_Controller::action_cart:cart', ['cart' => $cart]);
 
         $shippingEstimate = $this->BSession->get('shipping_estimate');
         $layout->view('checkout/cart')->set('cart', $cart);
