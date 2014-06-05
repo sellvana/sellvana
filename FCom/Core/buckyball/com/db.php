@@ -948,7 +948,8 @@ class BORM extends ORMWrapper
             try { //ADDED: hide connection details from the error if not in DEBUG mode
                 $db = new BPDO($connection_string, $username, $password, $driver_options); //UPDATED
             } catch (PDOException $e) {
-                if ($this->BDebug->is('DEBUG')) {
+                $BDebug = new BDebug();
+                if ($BDebug->is('DEBUG')) {
                     throw $e;
                 } else {
                     throw new PDOException('Could not connect to database');
