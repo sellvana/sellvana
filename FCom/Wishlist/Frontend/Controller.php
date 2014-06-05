@@ -32,16 +32,25 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $wishlist = $this->FCom_Wishlist_Model_Wishlist->sessionWishlist();
         if ($this->BRequest->xhr()) {
             $result = [];
+            $p = $this->FCom_Catalog_Model_Product->load($post['id']);
+            if (!$p) {
+                $this->BResponse->json(['title' => "Incorrect product id"]);
+                return;
+            }
             switch ($post['action']) {
             case 'add':
-                $p = $this->FCom_Catalog_Model_Product->load($post['id']);
-                if (!$p) {
-                    $this->BResponse->json(['title' => "Incorrect product id"]);
-                    return;
-                }
                 $wishlist->addItem($p->id());
                 $result = [
                     'title' => 'Added to wishlist',
+                    'html' => '<img src="' . $p->thumbUrl(35, 35) . '" width="35" height="35" style="float:left"/> ' . htmlspecialchars($p->product_name)
+                        . '<br><br><a href="' . $wishlistHref . '" class="button">Go to wishlist</a>'
+                ];
+                break;
+
+            case 'remove':
+                $wishlist->removeProduct($p->id());
+                $result = [
+                    'title' => 'Removed from wishlist',
                     'html' => '<img src="' . $p->thumbUrl(35, 35) . '" width="35" height="35" style="float:left"/> ' . htmlspecialchars($p->product_name)
                         . '<br><br><a href="' . $wishlistHref . '" class="button">Go to wishlist</a>'
                 ];

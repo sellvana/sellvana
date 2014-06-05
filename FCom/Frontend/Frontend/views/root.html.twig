@@ -12,7 +12,9 @@
         {{ THIS.hook('after_header') | raw }}
 
         <div class="f-site-main" role="main">
+{% if THIS.get('use_container') %}
             <div class="container">
+{% endif %}
 
                 {% if colLeft or colRight %}
 
@@ -42,7 +44,9 @@
 
                 {% endif %}
 
+{% if THIS.get('use_container') %}
             </div>
+{% endif %}
         </div>
 
         {{ THIS.hook('before_footer') | raw }}

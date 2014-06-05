@@ -91,7 +91,7 @@
                                 <input type="hidden" name="rid" value="{{ review.get('id') }}">
                                 {{ "Was this review helpful to you" | _ }}?
                                 <button class="btn btn-primary btn-xs" type="submit" name="review_helpful" value="yes"
-                                        onclick="FCom.add_review_rating('{{ APP.href('prodreviews/helpful') }}', {{ review.get('id') }}, 'yes');">{{ "Yes" | _ }}</button>
+                                        onclick="FCom.add_review_rating("{{ APP.href('prodreviews/helpful') }}", {{ review.get('id') }}, 'yes');">{{ "Yes" | _ }}</button>
                                 <span class="badge">{{ review.get('helpful') }}</span>
                             </form>
                         </div>
@@ -111,7 +111,7 @@
                 var rid = $(this).attr('data-content');
                 $.ajax({
                     type: 'POST',
-                    url: '{{ APP.href('prodreviews/ajax_review') }}',
+                    url: "{{ APP.href('prodreviews/ajax_review') }}"",
                     data: {rid: rid},
                     success: function (data) {
                         if (data.status == 'error') {
