@@ -21,6 +21,10 @@ class FCom_Admin_Admin extends BClass
 
         $this->BResponse->nocache();
         //$this->BConfig->set('web/hide_script_name', 0);
+
+        $this->FCom_Admin_Controller_MediaLibrary
+            ->allowFolder('media/images') // for wysiwyg uploads
+        ;
     }
 
     public function layout()

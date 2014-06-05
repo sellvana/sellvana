@@ -41,6 +41,17 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
         return $this->items;
     }
 
+    public function hasItem($pId)
+    {
+        $items = $this->items();
+        foreach ($items as $item) {
+            if ($item->get('product_id') == $pId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function addItem($productId)
     {
         $item = $this->FCom_Wishlist_Model_WishlistItem->loadWhere(['wishlist_id' => $this->id(), 'product_id' => $productId]);
@@ -57,8 +68,7 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
     public function removeItem($item)
     {
         if (is_numeric($item)) {
-            $this->items();
-            $item = $this->childById('items', $item);
+            $item = $this->FCom_Wishlist_Model_WishlistItem->loadWhere(['wishlist_id' => $this->id(), 'id' => $productId]);
         }
         if ($item) {
             unset($this->items[$item->id()]);
@@ -69,7 +79,8 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
 
     public function removeProduct($productId)
     {
-        $this->removeItem($this->childById('items', $productId, 'product_id'));
+        $item = $this->FCom_Wishlist_Model_WishlistItem->loadWhere(['wishlist_id' => $this->id(), 'product_id' => $productId]);
+        $this->removeItem($item);
         return $this;
     }
 }

@@ -6,7 +6,12 @@
       {{ THIS.view('catalog/product/pager') | raw }}
 
       <div class="f-prod-listing f-prod-listing-rows">
-        {{ THIS.view('catalog/product/list-rows').set('products', THIS.get('products_data').rows).set('category', THIS.get('category')) | raw }}
+        {{ THIS.view('catalog/product/list-rows').set({
+            add_wishlist: 1,
+            add_compare: 1,
+            products: THIS.get('products_data').rows,
+            category: THIS.get('category')
+        }) | raw }}
       </div>
 
     </section>
