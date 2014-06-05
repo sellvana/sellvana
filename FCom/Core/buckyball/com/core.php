@@ -433,7 +433,7 @@ class BApp extends BClass
      * @param string $method
      * @return string
      */
-    public function src($url = '', $method = 'baseSrc')
+    public function src($url = '', $method = 'baseSrc', $full = true)
     {
         if ($url[0] === '@') {
             list($modName, $url) = explode('/', substr($url, 1), 2);
@@ -451,7 +451,7 @@ class BApp extends BClass
             BDebug::error('Invalid module: ' . $modName);
             return '';
         }
-        return $m->$method() . '/' . rtrim($url, '/');
+        return $m->$method($full) . '/' . rtrim($url, '/');
     }
 
     public function file($path)

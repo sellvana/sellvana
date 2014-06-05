@@ -1,5 +1,9 @@
 base:
-    - { view: bottom_scripts, do: [[ js, "@FCom_Wishlist/Frontend/js/fcom.wishlist.js" ]] }
+    - view: head
+        do:
+            - [ css, "@FCom_Wishlist/Frontend/css/fcom.wishlist.css" ]
+            - [ requireJs, fcom.wishlist, "@FCom_Wishlist/Frontend/js/fcom.wishlist" ]
+            - [ requireRun, fcom.wishlist ]
 
 customer_account_sidebar:
     - view: customer/account/sidebar

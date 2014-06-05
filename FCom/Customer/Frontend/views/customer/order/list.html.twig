@@ -10,6 +10,7 @@
                 </header>
                 {% if THIS.get('orders') %}
                     <table class="table">
+                      <thead>
                         <tr>
                             <th>{{ "ID" }}</th>
                             <th>{{ "Shipping" | _ }}</th>
@@ -17,6 +18,7 @@
                             <th>{{ "Status" | _ }}</th>
                             <th class="text-right">{{ "Balance" | _ }}</th>
                         </tr>
+                      </thead>
                         {% for order in THIS.get('orders')  %}
                             <tr>
                                 <td>
