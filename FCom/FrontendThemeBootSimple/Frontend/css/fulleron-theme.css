@@ -330,8 +330,16 @@ a.btn-link { text-transform:none; }
   background:#ddd;
   color:#444;
   }
+.f-prod-listing-grid .btn-primary {
+  margin-bottom:5px;
+  }
 .f-prod-listing-grid .btn-link {
+  padding-top:3px;
+  padding-bottom:3px;
   font-weight:500;
+  }
+.f-prod-listing-grid .link-wishlist {
+  float:right;
   }
 .f-widget-featured-prods {
   margin:18px 0 25px;

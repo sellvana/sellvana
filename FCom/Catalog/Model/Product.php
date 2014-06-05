@@ -161,10 +161,26 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function imageUrl($full = false)
     {
+        static $default;
+
         $media = $this->BConfig->get('web/media_dir');# ? $this->BConfig->get('web/media_dir') : 'media/';
         $url = $full ? $this->BApp->href('/') : '';
         $thumbUrl = $this->get('thumb_url');
-        return $url . $media . '/' . ($thumbUrl ? $thumbUrl : 'image-not-found.jpg');
+        if ($thumbUrl) {
+            return $url . $media . '/' . $thumbUrl;
+        }
+
+        if (!$default) {
+            $default = $this->BConfig->get('modules/FCom_Catalog/default_image');
+            if ($default) {
+                if ($default[0] === '@') {
+                    $default = $this->BApp->src($default, 'baseSrc', false);
+                }
+            } else {
+                $default = $url . $media . '/image-not-found.jpg';
+            }
+        }
+        return $default;
     }
 
     public function thumbUrl($w, $h = null, $full = false)
