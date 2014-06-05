@@ -139,7 +139,7 @@ class FCom_CustomField_Migrate extends BClass
             ])->save();
         }
 
-        $this->BDb->ddlTableDef($tProdVariant, ['COLUMNS' => ['variant_qty' => "init(11)" ]]);
+        $this->BDb->ddlTableDef($tProdVariant, ['COLUMNS' => ['variant_qty' => "int(11)" ]]);
     }
 
     public function upgrade__0_1_0__0_1_1()
