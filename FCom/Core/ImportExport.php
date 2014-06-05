@@ -227,6 +227,9 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $this->BDebug->debug($msg);
         }
         fclose($fi);
+        if($this->BConfig->get('modules/FCom_Core/import_export/delete_after_import')){
+            @unlink($this->getFullPath($fromFile));
+        }
         return true;
     }
 

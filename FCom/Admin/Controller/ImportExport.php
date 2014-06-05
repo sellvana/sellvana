@@ -176,6 +176,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
             $this->BResponse->json(['msg' => "Nothing found"]);
             return;
         }
+        $this->BResponse->setContentType('application/json');
         /** @var FCom_Core_ImportExport $importer */
         $importer = $this->FCom_Core_ImportExport;
         $uploads = $_FILES['upload'];
@@ -196,7 +197,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
                     $error = $this->_("Problem storing uploaded file.");
                 } elseif ($importer->validateImportFile($fullFileName)) {
-                    $this->BResponse->startLongResponse();
+                    $this->BResponse->startLongResponse(false);
                     //if (function_exists('xdebug_start_trace')) {
                     //    xdebug_start_trace();
                     //}
@@ -213,7 +214,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 $row = [
                     'name'   => $fileName,
                     'size'   => $fileSize,
-                    'folder' => '...' . dirname($fullFileName),
+                    'folder' => '.../',
                 ];
                 if ($error) {
                     $row['error'] = $error;
