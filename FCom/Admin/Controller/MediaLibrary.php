@@ -269,7 +269,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 //echo "<script>parent.\$('#$gridId').trigger( 'reloadGrid' ); </script>";
 
             }
-            $this->BResponse->json($rows);
+            $this->BResponse->json(['files' => $rows]);
             break;
 
         case 'edit':
