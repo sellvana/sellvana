@@ -147,7 +147,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                 $this->FCom_CustomField_Main->disable(true);
             }
             $sample = $this->BDb->ddlFieldInfo($model::table());
-            $idField = $model::getIdField();
+            $idField = $this->{$model}->getIdField();
             $heading = [static::DEFAULT_MODEL_KEY => $model, static::DEFAULT_FIELDS_KEY => []];
             foreach ($sample as $key => $value) {
                 if (!in_array($key, $s['skip']) || $idField == $key) {
@@ -227,6 +227,9 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $this->BDebug->debug($msg);
         }
         fclose($fi);
+        if($this->BConfig->get('modules/FCom_Core/import_export/delete_after_import')){
+            @unlink($this->getFullPath($fromFile));
+        }
         return true;
     }
 
@@ -834,5 +837,36 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             $this->importMetaParsed    = true;
         }
         return $this->importCode;
+    }
+
+    protected $allowedExtensions = ['json'=>1];
+    /**
+     * @param string $fullFileName
+     * @return bool
+     */
+    public function validateImportFile($fullFileName)
+    {
+        $ext   = pathinfo($fullFileName, PATHINFO_EXTENSION);
+        $valid = true;
+        if (!isset($this->allowedExtensions[$ext])) {
+            $valid = false;
+        }
+
+        $rh = $this->getReadHandle($fullFileName);
+        if (!$rh) {
+            $valid = false;
+        } else {
+            $header = fgets($rh);
+            $decodedHeader = json_decode($header, true);
+            if(!$decodedHeader || !is_array($decodedHeader)){
+                $valid = false;
+            }
+            fclose($rh);
+        }
+
+        if (!$valid) {
+            @unlink($fullFileName); // make sure invalid files are removed from the system;
+        }
+        return $valid;
     }
 }

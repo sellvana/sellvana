@@ -213,6 +213,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 $fileSize = 0;
                 $message = '';
                 $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                $fileName = preg_replace('/[^\w\d_.-]+/', '_', $fileName);
 
                 if (!empty($uploads['error'][$i])) {
                     $id = '';
