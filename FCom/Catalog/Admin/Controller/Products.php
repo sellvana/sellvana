@@ -630,7 +630,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $model->setData('variants_fields', json_decode($data['vfields'], true));
         }
         if (isset($data['variants'])) {
-            $hlp->delete_many('product_id', $model->id);
+            $hlp->delete_many(['product_id'=> $model->id]);
             if (count($data['variants']) > 0) {
                 $variants = $this->BUtil->objectToArray(json_decode($data['variants']));
                 foreach($variants as $arr) {

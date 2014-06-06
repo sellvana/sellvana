@@ -227,8 +227,6 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $params['qty'] = intval($params['qty']);
         if (empty($params['price']) || !is_numeric($params['price'])) {
             $params['price'] = 0;
-        } else {
-            $params['price'] = $params['price']; //$params['price'] * $params['qty']; // ??
         }
         $item = $this->FCom_Sales_Model_Cart_Item->loadWhere(['cart_id' => $this->id, 'product_id' => $productId]);
         if ($item && $item->promo_id_get == 0) {
@@ -244,7 +242,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $flag = true;
             if (isset($data_serialized['variants'])) {
                 foreach ($data_serialized['variants'] as &$arr) {
-                    if (in_array($params['data']['variants']['fields'], $arr)) {
+                    if (in_array($params['data']['variants']['field_values'], $arr)) {
                         $flag = false;
                         $arr['qty'] = $arr['qty'] + $params['data']['variants']['qty'];
                     }

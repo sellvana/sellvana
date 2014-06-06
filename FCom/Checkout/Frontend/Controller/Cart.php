@@ -41,26 +41,29 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
             switch ($post['action']) {
             case 'add':
                 $p = $this->FCom_Catalog_Model_Product->load($post['id']);
-                $variants = $p->getData('variants');
+                $variants = $this->BDb->many_as_array($this->FCom_CustomField_Model_ProductVariant->orm()->where('product_id', $post['id'])->find_many());
                 $price = $p->base_price;
                 $qty = !empty($post['qty']) ? $post['qty'] : 1;
+                $prod_variant = [];
                 if ($variants) {
                    $validate = false;
                    foreach ($variants as $variant) {
                        $tmp = [];
-                       foreach ($variant['fields'] as $key => $val) {
+                       $variant['field_values'] = $this->BUtil->objectToArray(json_decode($variant['field_values']));
+                       foreach ($variant['field_values'] as $key => $val) {
                            if (!empty($post[$key]) && $post[$key] == $val) {
                                $tmp[$key] = $val;
                            }
                        }
                        if (in_array($tmp, $variant)) {
                            $validate = true;
-                           $price = ($variant['price'] != '')? $variant['price'] : $price;
-                           if ($variant['qty'] == '' || $variant['qty'] == 0) {
+                           $prod_variant = $variant;
+                           $price = ($variant['variant_price'] != '')? $variant['variant_price'] : $price;
+                           if ($variant['variant_qty'] == '' || $variant['variant_qty'] == 0) {
                                $validate = false;
                            }
-                           if ($qty > $variant['qty']) {
-                               $qty = $variant['qty'];
+                           if ($qty > $variant['variant_qty']) {
+                               $qty = $variant['variant_qty'];
                                $this->message('This product variant currently has '.$qty.' items in stock .', 'info');
                            }
                            if ($qty == 0) {
@@ -79,8 +82,11 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                         $this->BResponse->redirect('/');
                         return;
                     }
-
                     $options = ['qty' => $qty, 'price' => $price];
+                    $prod_variant['variant_qty'] = $qty;
+                    if (!empty($prod_variant)) {
+                        $options['data']['variants'] = $prod_variant;
+                    }
                     if ($this->BApp->m('FCom_Customer') && $this->FCom_Customer_Model_Customer->isLoggedIn()) {
                         $cart->customer_id = $this->FCom_Customer_Model_Customer->sessionUserId();
                         $cart->save();

@@ -1091,7 +1091,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 $vr['variant_sku'] = ($vr['variant_sku'] == '')? $this->local_sku : $vr['variant_sku'];
                 $vr['variant_price'] = $this->BLocale->currency($price);
             }
-            return ['variants' => $variants, 'variants_fields' => $variants_fields, 'fields' => $fields];
+            return ['variants' => $variants, 'variants_fields' => $variants_fields];
         }
         return isset($data_serialized) ? $data_serialized : [];
     }
