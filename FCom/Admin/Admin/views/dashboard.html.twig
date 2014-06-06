@@ -157,6 +157,35 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
 
   check_avail_status();
 
+  function validateDateTime(data) {
+        var error = false;
+        if (['range', 'not_range'].indexOf(data.range) == -1) {
+            error = true;
+        }
+        switch (data.date) {
+            case 'last-month':case 'last-week':case 'today': case 'all':
+                    if (data.is_btn_filter == 0) {
+                        error = true;
+                    }
+                break;
+            default:
+                    var date = data.date.split('~');
+                    if ((data.range == 'range' && date.length < 2) || (data.range == 'not_range' && date.length > 1)) {
+                       error = true;
+                    }
+                    if (!error) {
+                        date.forEach(function (val) {
+                            if (!/^\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}$/.test(val)) {
+                                error = true;
+                            }
+                        })
+                    }
+
+                break;
+        }
+        return error;
+  }
+
   var dashboardUrl = "{{ APP.href('dashboard') }}", personalizeUrl = "{{ APP.href('my_account/personalize') }}";
   var filter =  $('#filter-text');
   var custom = $('#custom');
@@ -164,6 +193,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
   var closeFilter = custom.find('.choice-close');
   //var widgetTemplate = _.template($('#dashboard-widget-template').html());
   var select = $('#add-widget-selection');
+
 
   function check_avail_status() {
 
@@ -232,31 +262,31 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
       filter.attr('data-text', text);
   });
   $('.btn-filter-date').click(function () {
-      var data = {};
+      var dataDefault = {type: 'default', date: 'all', range: 'range', is_btn_filter: 1};
       $('button.active-button').removeClass('active-button');
       $(this).addClass('active-button');
       resetFilterDate();
       switch ($(this).attr('data-date')) {
           case 'month':
-              data['type'] = 'between';
-              data['range'] = 'range';
-              data['date']  = 'last-month';
-              filterDate(data);
+              dataDefault['type'] = 'between';
+              dataDefault['range'] = 'range';
+              dataDefault['date']  = 'last-month';
+              filterDate(dataDefault);
               break;
           case 'week':
-              data['type'] = 'between';
-              data['range'] = 'range';
-              data['date']  = 'last-week';
-              filterDate(data);
+              dataDefault['type'] = 'between';
+              dataDefault['range'] = 'range';
+              dataDefault['date']  = 'last-week';
+              filterDate(dataDefault);
               break;
           case 'today':
-              data['type'] = 'equal';
-              data['range'] = 'not_range';
-              data['date'] = 'today';
-              filterDate(data);
+              dataDefault['type'] = 'equal';
+              dataDefault['range'] = 'not_range';
+              dataDefault['date'] = 'today';
+              filterDate(dataDefault);
               break;
           case 'all':
-              filterDate({type: 'default', date: 'all', range: 'range'});
+              filterDate(dataDefault);
               break;
           default:
               break;
@@ -271,7 +301,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
           date = $(this).parents('.input-group').children('.range').children('.date-filter').val();
       }
     if (date != '') {
-        var data = {type: filter.val(), date: date , range: filter.attr('data-range')};
+        var data = {type: filter.val(), date: date , range: filter.attr('data-range'), is_btn_filter: 0};
 
         closeFilter.removeClass('hidden');
         custom.children('button').addClass('filter');
@@ -282,16 +312,19 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
   });
   closeFilter.click(function (){
       resetFilterDate();
-      filterDate({type: 'default', date: 'all', range: 'range'});
+      filterDate({type: 'default', date: 'all', range: 'range', is_btn_filter: 1});
       return false;
   });
   function filterDate(data) {
-      $.post('{{ APP.href("dashboard/data") }}', data, function(response, status, xhr) {
-          $.each(response, function(key, widget) {
-            $('#dashboard-widget__'+ widget.key+' .widget-contents').html(widget.html);
+      if (!validateDateTime(data)) {
+          $.post('{{ APP.href("dashboard/data") }}', data, function(response, status, xhr) {
+              if (typeof (response.error) === 'undefined') {
+                  $.each(response, function(key, widget) {
+                      $('#dashboard-widget__'+ widget.key+' .widget-contents').html(widget.html);
+                  });
+              }
           });
-
-      });
+      }
   }
 
   function resetFilterDate() {
