@@ -45,6 +45,7 @@ class FCom_Catalog_Admin extends BClass
             ->allowFolder('media/product/images')
             ->allowFolder('media/product/attachment')
             ->allowFolder('storage/import/products')
+            ->allowFolder('{random}/import/products')
         ;
 
         $this->FCom_Admin_Model_Role->createPermission([

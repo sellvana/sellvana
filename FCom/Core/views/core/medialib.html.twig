@@ -153,8 +153,9 @@
 <script>
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
         var mediaGrid = window['{{ config.id }}_grid'];
+        var uploadUrl = '{{ APP.href("media/grid/upload?") | raw }}{% if config.type %}{{ "type=" ~ config.type }}{% elseif config.folder %}{{ "folder=" ~ config.folder | raw}}{% endif %}';
         $('#{{config.id}}-media-upload').fileupload({
-            url: '{{ APP.href("media/grid/upload?folder=") | raw }}{{ config.folder | raw}}',
+            url: uploadUrl,
             multiple:true
             {% if config.mode and config.mode == 'thumbnail' %}
                 ,acceptFileTypes:  /(\.|\/)(jpe?g|tiff|gif|png|bmp)$/i

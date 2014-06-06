@@ -12,6 +12,11 @@ modules:
 
         default_config:
             modules/FCom_Catalog/allowed_locales: [ en_US ]
+            uploads:
+                product-import:
+                    permission: catalog/product/import
+                    filetype: csv,txt
+                    folder: {random}/import/products
 
         areas:
             FCom_Admin:
