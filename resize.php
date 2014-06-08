@@ -47,7 +47,7 @@ class ImageResizer
 
     public function __construct($p)
     {
-        $this->validate();
+        $this->validateEnvironment();
 
         $this->file    = !empty($p['f']) ? $p['f'] : null;
         $this->default = !empty($_GET['d']) ? $_GET['d'] : 'media/image-not-found.jpg';
@@ -62,24 +62,7 @@ class ImageResizer
         $this->bg       = !empty($p['bg']) ? $p['bg'] : 'FFFFFF';
         $this->txtColor = !empty($p['c']) ? $p['c'] : '888888';
 
-        if ($this->file) {
-            $this->file = str_replace("\0", '', $this->file);
-            $this->file = realpath(ltrim($this->file, '/'));
-
-            if (!$this->file || !is_file($this->file)) {
-                $this->file = realpath($this->default);
-            }
-            if (!is_dir($this->cacheDir)) {
-                mkdir($this->cacheDir, 0777, true);
-            }
-            if (!$this->file || strpos($this->file, __DIR__) !== 0) {
-                $this->outputEmptyImage();
-            }
-
-            $this->mtime      = filemtime($this->file);
-            $imgSize          = getimagesize($this->file);
-            $this->outImgType = $imgSize[2];
-        }
+        $this->validateImage();
     }
 
     public function render()
@@ -93,7 +76,7 @@ class ImageResizer
         $this->outputFile();
     }
 
-    protected function validate()
+    protected function validateEnvironment()
     {
         if (empty($_SERVER['HTTP_REFERER'])) {
             $this->restrict();
@@ -116,9 +99,33 @@ class ImageResizer
     {
         header('HTTP/1.0 403 Restricted');
         header('Status: 403 Restricted');
-        if ($msg) header('X-Reason: ' . $msg);
+        if ($msg) {
+            header('X-Reason: ' . $msg);
+        }
         echo '403 Restricted';
         exit;
+    }
+
+    protected function validateImage()
+    {
+        if ($this->file) {
+            $this->file = realpath(ltrim(str_replace(["\0", '\\'], ['', '/'], $this->file), '/'));
+            if (!$this->file || !is_file($this->file)) {
+                $this->file = realpath(ltrim(str_replace(["\0", '\\'], ['', '/'], $this->default), '/'));
+                if (!$this->file || !is_file($this->file)) {
+                    $this->outputEmptyImage();
+                }
+            }
+            $imgSize = getimagesize($this->file);
+            if (!$imgSize || strpos($this->file, str_replace('\\', '/', __DIR__)) !== 0) {
+                $this->outputEmptyImage();
+            }
+            if (!is_dir($this->cacheDir)) {
+                mkdir($this->cacheDir, 0777, true);
+            }
+            $this->mtime      = filemtime($this->file);
+            $this->outImgType = $imgSize[2];
+        }
     }
 
     protected function outputEmptyImage()
