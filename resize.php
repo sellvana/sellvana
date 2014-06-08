@@ -109,15 +109,15 @@ class ImageResizer
     protected function validateImage()
     {
         if ($this->file) {
-            $this->file = realpath(ltrim(str_replace(["\0", '\\'], ['', '/'], $this->file), '/'));
+            $this->file = realpath(ltrim(str_replace("\0", '', $this->file), '/'));
             if (!$this->file || !is_file($this->file)) {
-                $this->file = realpath(ltrim(str_replace(["\0", '\\'], ['', '/'], $this->default), '/'));
+                $this->file = realpath(ltrim(str_replace("\0", '', $this->default), '/'));
                 if (!$this->file || !is_file($this->file)) {
                     $this->outputEmptyImage();
                 }
             }
             $imgSize = getimagesize($this->file);
-            if (!$imgSize || strpos($this->file, str_replace('\\', '/', __DIR__)) !== 0) {
+            if (!$imgSize || strpos($this->file, __DIR__) !== 0) {
                 $this->outputEmptyImage();
             }
             if (!is_dir($this->cacheDir)) {
