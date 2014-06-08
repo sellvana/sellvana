@@ -108,7 +108,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
             foreach ($variants as $v) {
                 $file_id = $v->getData('variant_file_id');
                 $vField = [];
-                $vField['field_values'] = BUtil::objectToArray(json_decode($v->field_values));
+                $vField['field_values'] = $this->BUtil->objectToArray(json_decode($v->field_values));
                 $vField['variant_sku'] = $v->variant_sku;
                 $vField['variant_qty'] = $v->variant_qty;
                 $vField['variant_price'] = $v->variant_price;

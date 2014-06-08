@@ -228,33 +228,38 @@
 
         $('#product-rslides li').addClass('zoom').zoom();
         var variants = $.parseJSON('{{ UTIL.toJson(variants.variants)|raw }}');
-        var fields = Object.keys(variants[0].fields);
+        var fields = Object.keys(variants[0].field_values);
         var base_price = '{{ prod.get('base_price')| currency }}';
         var sku_prod = '{{ prod.get('local_sku')}}';
         var vr = [];
         var firstOptions = [];
         var beforeField = [];
-
         if (variants.length > 0) {
+            $('#' + fields[0]).html('');
+            var tmp_field = [];
             variants.forEach(function(obj) {
-                if (obj.fields[fields[0]] == variants[0].fields[fields[0]]) {
+                if (obj.field_values[fields[0]] == variants[0].field_values[fields[0]]) {
                     vr.push(obj);
                 }
+                if (tmp_field.indexOf(obj.field_values[fields[0]]) == -1) {
+                    $('#' + fields[0]).append("<option value='"+ obj.field_values[fields[0]] +"'>"+ obj.field_values[fields[0]] +"</option>");
+                    tmp_field.push(obj.field_values[fields[0]]);
+                }
             })
-            if (variants[0].qty == 0 || variants[0].qty == '') {
+            if (variants[0].variant_qty == 0 || variants[0].variant_qty == '') {
                 quantityVariant.val(0);
                 $('#prod-in-stock').html('Items not available.');
                 $('#prod-add-to-card').prop('disabled', true);
             } else {
                 quantityVariant.val(1);
-                $('#prod-in-stock').html(variants[0].qty + ' Items In Stock.');
+                $('#prod-in-stock').html(variants[0].variant_qty + ' Items In Stock.');
                 $('#prod-add-to-card').prop('disabled', false);
 
             }
-            priceVariant.html(variants[0].price);
-            skuVariant.html(variants[0].sku);
+            priceVariant.html(variants[0].variant_price);
+            skuVariant.html(variants[0].variant_sku);
             fields.forEach(function (key) {
-                setUpField(beforeField, { field_code: key, value: variants[0].fields[key], current: null });
+                setUpField(beforeField, { field_code: key, value: variants[0].field_values[key], current: null });
                 beforeField.push(key);
             })
         }
@@ -274,21 +279,21 @@
                     vr.forEach(function (obj) {
                         if(first) {
                             if (op.length == 0 && firstOptions.indexOf(data.value) != -1) {
-                                $(self).find('option[value="'+ obj.fields[data.field_code] +'"]').prop('selected', true);
+                                $(self).find('option[value="'+ obj.field_values[data.field_code] +'"]').prop('selected', true);
                             }
-                            op.push(obj.fields[data.field_code]);
+                            op.push(obj.field_values[data.field_code]);
                         } else {
                                 var flag = true
                                 before.forEach(function(val) {
-                                    if (obj.fields[val] != $('#'+ val).val()) {
+                                    if (obj.field_values[val] != $('#'+ val).val()) {
                                         flag = false;
                                     }
                                 })
                                 if (flag) {
-                                    if (op.indexOf(obj.fields[data.field_code]) == -1) {
-                                        $(self).append("<option value='"+ obj.fields[data.field_code] +"'>"+ obj.fields[data.field_code] +"</option>");
+                                    if (op.indexOf(obj.field_values[data.field_code]) == -1) {
+                                        $(self).append("<option value='"+ obj.field_values[data.field_code] +"'>"+ obj.field_values[data.field_code] +"</option>");
                                     }
-                                    op.push(obj.fields[data.field_code]);
+                                    op.push(obj.field_values[data.field_code]);
                                 }
                         }
                     })
@@ -327,7 +332,7 @@
             beforeField = [];
             vr = [];
             variants.forEach(function(obj) {
-                if (obj.fields[$(self).attr('name')] == $(self).val()) {
+                if (obj.field_values[$(self).attr('name')] == $(self).val()) {
                     vr.push(obj);
                 }
             })
@@ -350,7 +355,7 @@
             variants.forEach(function (obj) {
                 var correct = true;
                 $('.variant').each(function () {
-                    if (obj.fields[$(this).attr('name')] != $(this).val()) {
+                    if (obj.field_values[$(this).attr('name')] != $(this).val()) {
                         correct = false;
                     }
                 });
@@ -360,24 +365,24 @@
             })
             var image = [];
             displayAllImage.addClass('hidden');
-            if (find == null || find.qty == 0 || find.qty == '') {
+            if (find == null || find.variant_qty == 0 || find.variant_qty == '') {
                 quantityVariant.val(0);
                 skuVariant.html(sku_prod);
-                if (find == null || find.price == '') {
+                if (find == null || find.variant_price == '') {
                     priceVariant.html(base_price);
                 }
                 $('#prod-in-stock').html('Items not available.');
                 $('#prod-add-to-card').prop('disabled', true);
             } else {
                 quantityVariant.val(1);
-                $('#prod-in-stock').html(find.qty + ' Items In Stock.');
+                $('#prod-in-stock').html(find.variant_qty + ' Items In Stock.');
                 $('#prod-add-to-card').prop('disabled', false);
             }
             if (find != null) {
-                priceVariant.html(find.price);
-                skuVariant.html(find.sku);
-                if (find.file_id != '') {
-                    image = find.file_id.split(',');
+                priceVariant.html(find.variant_price);
+                skuVariant.html(find.variant_sku);
+                if (find.data_serialized.variant_file_id != '') {
+                    image = find.data_serialized.variant_file_id.split(',');
                     displayAllImage.removeClass('hidden');
                 }
             }

@@ -1057,45 +1057,43 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function getDataSerialized($data)
     {
-        $data_serialized = $this->BUtil->objectToArray(json_decode($this->data_serialized));
-
-        if ($data == 'custom_fields' && isset($data_serialized[$data])) {
-            return $this->BUtil->objectToArray(json_decode($data_serialized[$data]));
-        }
-        if ($data == 'variants' && isset($data_serialized['variants_fields'][0]) && isset($data_serialized['variants'])) {
-            $field_code = $data_serialized['variants_fields'][0]['field_code'];
+        $data_serialized = $this->getData($data);
+        if ($data == 'variants') {
+            $variants_fields = $this->getData('variants_fields');
+            $field_code = $variants_fields[0]['field_code'];
             $fields = [ $field_code => [] ];
-            foreach ($data_serialized['variants'] as &$vr) {
-                if (isset($vr['fields'])) {
-                    $tmp = [];
-                    $vm = '';
-                    foreach ($vr['fields'] as $key => $val) {
-                        if ($key == $field_code) {
-                            $vm = $val;
-                        } else {
-                            $tmp[$key] = $val;
-                        }
-                    }
-                    if (!isset($fields[$field_code][$vm])) {
-                        $fields[$field_code][$vm] = $tmp;
+            $variants = $this->BDb->many_as_array($this->FCom_CustomField_Model_ProductVariant->orm()->where('product_id', $this->id)->find_many());
+            foreach ($variants as &$vr) {
+                $tmp = [];
+                $vm = '';
+                $vr['field_values'] = $this->BUtil->objectToArray(json_decode($vr['field_values']));
+                $vr['data_serialized'] = $this->BUtil->objectToArray(json_decode($vr['data_serialized']));
+                foreach ($vr['field_values'] as $key => $val) {
+                    if ($key == $field_code) {
+                        $vm = $val;
                     } else {
-                        $curr = &$fields[$field_code][$vm];
-                        foreach ($tmp as $key => $val) {
-                            if (is_array($curr[$key])) {
-                                array_push($curr[$key], $val);
-                            } else {
-                                $curr[$key] = [$curr[$key], $val];
-                            }
+                        $tmp[$key] = $val;
+                    }
+                }
+                if (!isset($fields[$field_code][$vm])) {
+                    $fields[$field_code][$vm] = $tmp;
+                } else {
+                    $curr = &$fields[$field_code][$vm];
+                    foreach ($tmp as $key => $val) {
+                        if (is_array($curr[$key])) {
+                            array_push($curr[$key], $val);
+                        } else {
+                            $curr[$key] = [$curr[$key], $val];
                         }
                     }
-                    $price = ($vr['price'] != '') ? $vr['price']: $this->base_price;
-                    $vr['sku'] = ($vr['sku'] == '')? $this->local_sku : $vr['sku'];
-                    $vr['price'] = $this->BLocale->currency($price);
                 }
+                $price = ($vr['variant_price'] != '') ? $vr['variant_price']: $this->base_price;
+                $vr['variant_sku'] = ($vr['variant_sku'] == '')? $this->local_sku : $vr['variant_sku'];
+                $vr['variant_price'] = $this->BLocale->currency($price);
             }
-            return ['variants' => $data_serialized['variants'], 'variants_fields' => $data_serialized['variants_fields'], 'fields' => $fields];
+            return ['variants' => $variants, 'variants_fields' => $variants_fields, 'fields' => $fields];
         }
-        return isset($data_serialized[$data]) ? $data_serialized[$data] : array();
+        return isset($data_serialized) ? $data_serialized : [];
     }
 
     public function backOrders()

@@ -57,6 +57,11 @@ require(['jquery'], function($) {
         $('.btn_add_image').removeClass('active');
         $(this).addClass('active')
         $('.btn_category_images_add').addClass('disabled');
+        if ($(this).hasClass('data-change')) {
+            $('.btn_category_images_add').html('{{ 'Change'|_ }}');
+        } else {
+            $('.btn_category_images_add').html('{{ 'Add'|_ }}');
+        }
         $('#category_images_modal').modal();
     });
 
@@ -67,6 +72,7 @@ require(['jquery'], function($) {
         parents.find('.current-image').html('');
         parents.find('.model-image-url').val('');
         $('.btn_category_images_add').html('{{ 'Add'|_ }}');
+        parents.find('.btn_add_image').removeClass('data-change');
     });
 });
 
@@ -117,6 +123,7 @@ require(['jquery','underscore','backbone'], function($, _) {
                     parents.find('.model-image-url').val(path);
                     parents.find('.current-image').html(imageTag);
                     parents.find('.btn_add_text').html('{{ 'Change Image...'|_ }}');
+                    parents.find('.btn_add_image').addClass('data-change');
                     parents.find('.btn_remove_image').css('display', 'block');
                 }
             })
