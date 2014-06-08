@@ -415,8 +415,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
         $and = [];
         if ($qs) {
-            foreach ($qs as $k) $and[] = ['product_name like ?', '%' . $k . '%'];
-            $productsORM->where(['OR' => ['local_sku' => $q, 'AND' => $and]]);
+            foreach ($qs as $k) $and[] = ['product_name like ?', '%' . (string)$k . '%'];
+            $productsORM->where(['OR' => ['local_sku' => (string)$q, 'AND' => $and]]);
         }
 
         if (!empty($filter)) {

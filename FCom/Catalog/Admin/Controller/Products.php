@@ -759,9 +759,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $result = $this->FCom_Catalog_Model_Product->orm()
             ->where(['OR' => [
-                ['product_name REGEXP ?', $oldName . '-[0-9]$'],
-                ['local_sku REGEXP ?', $oldSku . '-[0-9]$'],
-                ['url_key REGEXP ?', $oldUrlKey . '-[0-9]$'],
+                ['product_name REGEXP ?', (string)$oldName . '-[0-9]$'],
+                ['local_sku REGEXP ?', (string)$oldSku . '-[0-9]$'],
+                ['url_key REGEXP ?',(string) $oldUrlKey . '-[0-9]$'],
             ]])
             ->order_by_desc('id')->find_one();
         $numberSuffix = 1;
@@ -879,10 +879,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $value = '%' . $r['q'] . '%';
             $result = $this->FCom_Catalog_Model_Product->orm('p')
                 ->where(['OR' => [
-                    ['p.id like ?', $value],
-                    ['p.local_sku like ?', $value],
-                    ['p.url_key like ?', $value],
-                    ['p.product_name like ?', $value],
+                    ['p.id like ?', (string)$value],
+                    ['p.local_sku like ?', (string)$value],
+                    ['p.url_key like ?', (string)$value],
+                    ['p.product_name like ?', (string)$value],
                 ]])->find_one();
             $args['result']['product'] = null;
             if ($result) {

@@ -2,7 +2,7 @@
     <div class="alert alert-info">{{ "There are no products matching the selection." |_ }}</div>
 {% else %}
     <section class="f-category-prod-listing">
-    
+
       <div class="f-widget f-widget-prods-compare">
           <strong class="f-widget-title">Compare up to 5 products</strong>
           <ul>
@@ -14,9 +14,10 @@
           </ul>
           <button class="btn btn-default btn-sm">Compare</button>
       </div><!-- /.f-widget-prods-compare -->
+      {{ THIS.view('catalog/compare-toolbar') | raw }}
 
       {{ THIS.view('catalog/product/pager') | raw }}
-      
+
       <div class="f-prod-listing f-prod-listing-grid">
           <div class="row">
               {{ THIS.view('catalog/product/grid-tiles').set({

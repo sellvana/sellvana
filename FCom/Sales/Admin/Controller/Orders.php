@@ -384,7 +384,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
     {
         $r = $this->BRequest->get();
         if (isset($r['q']) && $r['q'] != '') {
-            $value = '%' . $r['q'] . '%';
+            $value = '%' . (string)$r['q'] . '%';
             $result = $this->FCom_Sales_Model_Order->orm()
                 ->where(['OR' => [
                     ['id like ?', $value],
