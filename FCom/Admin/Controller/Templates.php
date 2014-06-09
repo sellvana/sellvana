@@ -108,7 +108,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
                 throw new BException('Invalid view name');
             }
             $targetDir = $this->BModuleRegistry->module('FCom_CustomModule')->root_dir . '/Frontend/views';
-            $layout = $this->getAreaLayout();
+            $layout = $this->FCom_Frontend_Main->getLayout();
             $view = $layout->getView($viewName);
             if ($view->getParam('view_name')) {
                 $targetFile = $targetDir . '/' . $view->getParam('view_name') . $view->getParam('file_ext');
