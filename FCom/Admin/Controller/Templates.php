@@ -29,13 +29,13 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
 
         $config['state'] = ['s' => 'view_name'];
 
-        $layout = $this->getAreaLayout();
+        $layout = $this->FCom_Frontend_Main->getLayout();
         $data = [];
         foreach ($layout->getAllViews() as $view) {
             $row = [
                 'view_name' => $view->param('view_name'),
                 'file_ext' => $view->param('file_ext'),
-                'module_name' => $view->param('module_name')->name,
+                'module_name' => $view->param('module_name'),
             ];
             $data[] = $row;
         }
@@ -54,37 +54,19 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
         return $config;
     }
 
-    public function getAreaLayout($area = 'FCom_Frontend')
-    {
-        $areaDir = str_replace('FCom_', '', $area);
-        $modules = $this->BModuleRegistry->getAllModules();
-        $viewDirs = [];
-        $layout = $this->BLayout->i(true);
-        foreach ($modules as $mod) {
-            /** @var BModule $mod */
-            $auto = array_flip((array)$mod->auto_use);
-            if (isset($auto['all']) || isset($auto['views'])) {
-                $dir = $mod->root_dir . '/views';
-                if (is_dir($dir)) {
-                    $layout->addAllViews($dir, '', $mod);
-                }
-                $dir = $mod->root_dir . '/' . $areaDir . '/views';
-                if (is_dir($dir)) {
-                    $layout->addAllViews($dir, '', $mod);
-                }
-            }
-        }
-        return $layout;
-    }
-
     public function action_form()
     {
         $tplViewName = $this->BRequest->get('id');
-        $areaLayout = $this->getAreaLayout();
-        $tplView = $areaLayout->getView($tplViewName);
-        $tplViewFile = $tplView->getTemplateFileName();
-        $tplContents = file_get_contents($tplViewFile);
-
+        $areaLayout = $this->FCom_Frontend_Main->getLayout();
+        if ($tplViewName) {
+            $tplView = $areaLayout->getView($tplViewName);
+            $tplViewFile = $tplView->getTemplateFileName();
+            $tplContents = file_get_contents($tplViewFile);
+        } else {
+            $tplViewName = '';
+            $tplViewName = '';
+            $tplContents = '';
+        }
         $model = new BData([
             'id' => $tplViewName,
             'view_name' => $tplViewName,
@@ -114,15 +96,50 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
 
     public function action_form__POST()
     {
-        $r = $this->BRequest;
-        $viewName = $r->get('view_name');
-        $layout = $this->getAreaLayout();
-        $view = $layout->getView('view_name');
-        $viewFile = $view->getTemplateFileName();
+        try {
+            $r = $this->BRequest;
+            $model = $r->post('model');
+            if (empty($model['view_name'])) {
+                throw new BException('Missing view name');
+            }
+            $viewName = trim($model['view_name'], '/');
+            $cleanViewName = preg_replace('[^a-z0-9_./-]', '', $viewName);
+            if ($viewName !== $cleanViewName) {
+                throw new BException('Invalid view name');
+            }
+            $targetDir = $this->BModuleRegistry->module('FCom_CustomModule')->root_dir . '/Frontend/views';
+            $layout = $this->getAreaLayout();
+            $view = $layout->getView($viewName);
+            if ($view->getParam('view_name')) {
+                $targetFile = $targetDir . '/' . $view->getParam('view_name') . $view->getParam('file_ext');
+            } else {
+                $targetFile = $targetDir . '/' . $viewName . '.html.twig';
+            }
+            if ($r->post('do') === 'DELETE') {
+                if (!$view) {
+                    throw new BException("Template doesn't exist");
+                }
+                $viewFile = $view->getTemplateFileName();
+                if (!$viewFile) {
+                    throw new BException("The view doesn't use template file");
+                }
+                if (file_exists($targetFile)) {
+                    unlink($targetFile);
+                    $this->message('Template file was reverted or removed');
+                } else {
+                    $this->message('Template file is already reverted to original', 'warning');
+                }
+                $this->BResponse->redirect('templates');
+                return;
+            }
 
-        if ($r->post('do') === 'DELETE') {
-            echo 'DELETE'; exit;
+            $this->BUtil->ensureDir(dirname($targetFile));
+            file_put_contents($targetFile, $model['view_contents']);
+            $this->message('Updated template file has been saved in custom module');
+            $this->BResponse->redirect('templates');
+        } catch (Exception $e) {
+            $this->message($e->getMessage(), 'error');
+            $this->BResponse->redirect('templates');
         }
-        var_dump($r->post()); exit;
     }
 }
