@@ -64,37 +64,7 @@
         <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
         <input type="hidden" name="id" value="{{ m.id() }}">
         <input type="hidden" name="action" value="add">
-{#
-        <div class="form-group">
-          <label for="#" class="col-md-2 control-label">Width:</label>
-          <div class="col-md-10">
-            <p class="form-control-static">M</p>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="#" class="col-md-2 control-label">Color:</label>
-          <div class="col-md-10">
-            <select class="form-control" id="#">
-              <option>Select Color</option>
-              <option>Red</option>
-              <option>Green</option>
-              <option>Blue</option>
-              <option>Black</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="#" class="col-md-2 control-label">Size:</label>
-          <div class="col-md-10">
-            <select class="form-control" id="#">
-            <option>Select Size</option>
-            <option>24</option>
-            <option>36</option>
-            <option>48</option>
-            </select>
-          </div>
-        </div>
-#}
+        {{ THIS.view('catalog/product/variants').set('product', m) | raw }}
         <div class="f-prod-add-cart">
           <button type="submit" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-shopping-cart"></span>{{ 'Add to Cart'|_ }}</button>
           <ul class="f-add-to-links">

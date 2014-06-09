@@ -1020,7 +1020,8 @@ class BRequest extends BClass
         iconv_set_encoding('output_encoding', 'UTF-8');
 
         $data = ['GET' => & $_GET, 'POST' => & $_POST, 'REQUEST' => & $_REQUEST, 'COOKIE' => & $_COOKIE];
-        $this->stripTagsRecursive($data, static::rawPath());
+        $urlPath = rtrim($this->rawPath(), '/');
+        $this->stripTagsRecursive($data, $urlPath);
         $alreadyStripped = true;
         return $this;
     }
