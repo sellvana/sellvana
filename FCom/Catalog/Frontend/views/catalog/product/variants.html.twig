@@ -1,0 +1,213 @@
+{% set prod = THIS.get('product') %}
+{% set variants = prod.getVariantsData() %}
+{% if variants.variants_fields %}
+    <div id="f-prod-tab-variant">
+        {% for field  in variants.variants_fields %}
+            <div class="form-group" style="overflow: hidden">
+                <label class="col-md-3 control-label">{{ field.frontend_label |_ }}</label>
+                <div class="col-md-5">
+                    <select id="{{ field.field_code }}" name="{{ field.field_code }}" class="form-control variant" style="width:auto">
+                        {% for key in field.options %}
+                            <option value="{{ key|_ }}">{{ key |_ }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        {% endfor %}
+        <!--<div class="form-group overflow-hidden">
+            <label class="col-md-3 control-label ">{{ 'Sku: ' |_ }}</label>
+            <div class="col-md-5 f-price-group" style="margin: 0px;">
+                <div class="f-reg-price">
+                    <span class="f-price" id="sku-variant">{{ prod.get('local_sku') }}</span>
+                </div>
+            </div>
+        </div>-->
+        <div class="form-group overflow-hidden">
+            <label class="col-md-3 control-label ">{{ 'Price:' |_ }}</label>
+            <div class="col-md-2 f-price-group" style="margin: 0px;">
+                <div class="f-reg-price">
+                    <span class="f-price" id="price-variant"></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group overflow-hidden">
+            <label class="col-md-3 control-label">{{ 'Quantity:' |_ }}</label>
+            <div class="col-md-2">
+                <input type="text" name="qty" class="form-control col-md-2" id="quantity-variant" value="1"/>
+            </div>
+        </div>
+    </div>
+
+<script>
+    require(['jquery'], function ($) {
+        var pager = $('#product-rslides-pager');
+        var quantityVariant = $('#quantity-variant');
+        var priceVariant = $('#price-variant');
+        var skuVariant = $('#sku-variant');
+        var displayAllImage = $('#display-all-image');
+        var variants = {{ UTIL.toJson(variants.variants)|raw }};
+        var fields = Object.keys(variants[0].field_values);
+        var base_price = '{{ prod.get('base_price')| currency }}';
+        var sku_prod = '{{ prod.get('local_sku')}}';
+        var vr = [];
+        var firstOptions = [];
+        var beforeField = [];
+
+        if (variants.length > 0) {
+            variants.forEach(function(obj) {
+                if (obj.field_values[fields[0]] == variants[0].field_values[fields[0]]) {
+                    vr.push(obj);
+                }
+            })
+            if (variants[0].qty == 0 || variants[0].qty == '') {
+                quantityVariant.val(0);
+                $('#prod-in-stock').html('{{ "Item not available."|_ }}').addClass('f-out-of-stock');;
+                $('#prod-add-to-card').prop('disabled', true);
+            } else {
+                quantityVariant.val(1);
+                // $('#prod-in-stock').html(variants[0].qty + ' Items in Stock.');
+                $('#prod-in-stock').html('{{ "In Stock."|_ }}').removeClass('f-out-of-stock');;
+                $('#prod-add-to-card').prop('disabled', false);
+
+            }
+            priceVariant.html(variants[0].price);
+            skuVariant.html(variants[0].sku);
+            fields.forEach(function (key) {
+                setUpField(beforeField, { field_code: key, value: variants[0].field_values[key], current: null });
+                beforeField.push(key);
+            })
+        }
+
+
+        function setUpField(before, data) {
+            $('.variant').each(function () {
+                var self = this;
+
+                if (($(this).attr('name').indexOf(before) == -1 || before.length == 0) && $(this).attr('name') == data.field_code) {
+                    var first = true;
+                     if(before.length > 0) {
+                        first = false;
+                         $(self).html('');
+                     };
+                    var op = [];
+                    vr.forEach(function (obj) {
+                        if(first) {
+                            if (op.length == 0 && firstOptions.indexOf(data.value) != -1) {
+                                $(self).find('option[value="'+ obj.field_values[data.field_code] +'"]').prop('selected', true);
+                            }
+                            op.push(obj.field_values[data.field_code]);
+                        } else {
+                                var flag = true
+                                before.forEach(function(val) {
+                                    if (obj.field_values[val] != $('#'+ val).val()) {
+                                        flag = false;
+                                    }
+                                })
+                                if (flag) {
+                                    if (op.indexOf(obj.field_values[data.field_code]) == -1) {
+                                        $(self).append("<option value='"+ obj.field_values[data.field_code] +"'>"+ obj.field_values[data.field_code] +"</option>");
+                                    }
+                                    op.push(obj.field_values[data.field_code]);
+                                }
+                        }
+                    })
+                    if (data.value != null) {
+                        $(self).find('option[value="'+ data.value +'"]').prop('selected', true);
+                    }
+                }
+            });
+        }
+        function displayImage(image) {
+
+            if (image.length == 0) {
+                pager.find('li').each(function() {
+                    $(this).removeClass('hidden');
+                });
+                $('#product-rslides').parent().find('.f_nav').removeClass('hidden');
+            } else {
+                $('#product-rslides').parent().find('.f_nav').addClass('hidden');
+                pager.find('li').each(function() {
+                    if (image.indexOf($(this).find('img').attr('data-id')) != -1) {
+                        $(this).removeClass('hidden');
+                        if ($(this).find('img').attr('data-id') == image[0]) {
+                            $(this).children().click();
+                        }
+                    } else {
+                        $(this).addClass('hidden')
+                    }
+                });
+            }
+        }
+
+        $('.variant').change(function () {
+            var find = null;
+            var self = this;
+            var beforeFlag = true;
+            beforeField = [];
+            vr = [];
+            variants.forEach(function(obj) {
+                if (obj.field_values[$(self).attr('name')] == $(self).val()) {
+                    vr.push(obj);
+                }
+            })
+
+            fields.forEach(function (key) {
+                var data = { field_code: key, value: null, current: null };
+                if (beforeFlag) {
+                    beforeField.push(key);
+                    if (key == $(self).attr('name')) {
+//                    data.value = $('#' + key).val();
+//                    data.current = key;
+                      beforeFlag = false;
+                    }
+                } else {
+                    setUpField(beforeField, data);
+                }
+
+
+            });
+            variants.forEach(function (obj) {
+                var correct = true;
+                $('.variant').each(function () {
+                    if (obj.field_values[$(this).attr('name')] != $(this).val()) {
+                        correct = false;
+                    }
+                });
+                if (correct) {
+                    find = obj;
+                }
+            })
+            var image = [];
+            displayAllImage.addClass('hidden');
+            if (find == null || find.qty == 0 || find.qty == '') {
+                quantityVariant.val(0);
+                skuVariant.html(sku_prod);
+                if (find == null || find.price == '') {
+                    priceVariant.html(base_price);
+                }
+                $('#prod-in-stock').html('{{ "Item not available."|_ }}').addClass('f-out-of-stock');
+                $('#prod-add-to-card').prop('disabled', true);
+            } else {
+                quantityVariant.val(1);
+                //$('#prod-in-stock').html(find.qty + ' Items In Stock.');
+                $('#prod-in-stock').html('{{ "In Stock."|_ }}');
+                $('#prod-add-to-card').prop('disabled', false).removeClass('f-out-of-stock');
+            }
+            if (find != null) {
+                priceVariant.html(find.price);
+                skuVariant.html(find.sku);
+                if (find.file_id != '') {
+                    image = find.file_id.split(',');
+                    displayAllImage.removeClass('hidden');
+                }
+            }
+            displayImage(image);
+        });
+        displayAllImage.click(function () {
+            displayImage([]);
+            $(this).addClass('hidden');
+        })
+    })
+</script>
+
+{% endif %}

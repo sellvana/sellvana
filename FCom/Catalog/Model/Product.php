@@ -1055,45 +1055,51 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return empty($errors) ? true : $errors;
     }
 
-    public function getDataSerialized($data)
+    public function getVariantsData()
     {
-        $data_serialized = $this->getData($data);
-        if ($data == 'variants') {
-            $variants_fields = $this->getData('variants_fields');
-            $field_code = $variants_fields[0]['field_code'];
-            $fields = [ $field_code => [] ];
-            $variants = $this->BDb->many_as_array($this->FCom_CustomField_Model_ProductVariant->orm()->where('product_id', $this->id)->find_many());
-            foreach ($variants as &$vr) {
-                $tmp = [];
-                $vm = '';
-                $vr['field_values'] = $this->BUtil->objectToArray(json_decode($vr['field_values']));
-                $vr['data_serialized'] = $this->BUtil->objectToArray(json_decode($vr['data_serialized']));
-                foreach ($vr['field_values'] as $key => $val) {
-                    if ($key == $field_code) {
-                        $vm = $val;
-                    } else {
-                        $tmp[$key] = $val;
-                    }
-                }
-                if (!isset($fields[$field_code][$vm])) {
-                    $fields[$field_code][$vm] = $tmp;
-                } else {
-                    $curr = &$fields[$field_code][$vm];
-                    foreach ($tmp as $key => $val) {
-                        if (is_array($curr[$key])) {
-                            array_push($curr[$key], $val);
-                        } else {
-                            $curr[$key] = [$curr[$key], $val];
-                        }
-                    }
-                }
-                $price = ($vr['variant_price'] != '') ? $vr['variant_price']: $this->base_price;
-                $vr['variant_sku'] = ($vr['variant_sku'] == '')? $this->local_sku : $vr['variant_sku'];
-                $vr['variant_price'] = $this->BLocale->currency($price);
-            }
-            return ['variants' => $variants, 'variants_fields' => $variants_fields, 'fields' => $fields];
+        $variantsFields = $this->getData('variants_fields');
+        if (!$variantsFields) {
+            return ['variants' => [], 'variants_fields' => [], 'fields' => []];
         }
-        return isset($data_serialized) ? $data_serialized : [];
+        $fieldCode = $variantsFields[0]['field_code'];
+        $fields = [ $fieldCode => [] ];
+        $variantModels = $this->FCom_CustomField_Model_ProductVariant->orm()->where('product_id', $this->id)->find_many();
+        $variants = [];
+        foreach ($variantModels as $variant) {
+            $vr = $variant->as_array();
+            $tmp = [];
+            $vm = '';
+            $vr['field_values'] = $this->BUtil->fromJson($vr['field_values']);
+            $customData = $variant->getData();
+            if (!empty($customData['variant_file_id'])) {
+                $vr['file_id'] = $customData['variant_file_id'];
+            }
+            foreach ($vr['field_values'] as $key => $val) {
+                if ($key === $fieldCode) {
+                    $vm = $val;
+                } else {
+                    $tmp[$key] = $val;
+                }
+            }
+            if (!isset($fields[$fieldCode][$vm])) {
+                $fields[$fieldCode][$vm] = $tmp;
+            } else {
+                $curr = &$fields[$fieldCode][$vm];
+                foreach ($tmp as $key => $val) {
+                    if (is_array($curr[$key])) {
+                        array_push($curr[$key], $val);
+                    } else {
+                        $curr[$key] = [$curr[$key], $val];
+                    }
+                }
+            }
+            $vr['variant_sku'] = ($vr['variant_sku'] === '') ? $this->local_sku : $vr['variant_sku'];
+            $price = ($vr['variant_price'] != '') ? $vr['variant_price'] : $this->base_price;
+            $vr['variant_price'] = $this->BLocale->currency($price);
+            $variants[] = $vr;
+        }
+        $data = ['variants' => $variants, 'variants_fields' => $variantsFields, 'fields' => $fields];
+        return $data;
     }
 
     public function backOrders()
