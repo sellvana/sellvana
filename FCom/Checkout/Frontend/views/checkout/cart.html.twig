@@ -45,9 +45,9 @@
                                             </td>
                                             <td class="f-cart-col-name">
                                                 <span class="product-name"><a href="{{ pUrl }}">{{ pName }}</a></span>
-                                                    {% if variant.fields is defined %}
+                                                    {% if variant.field_values is defined %}
                                                         <ul>
-                                                            {% for key, value in variant.fields %}
+                                                            {% for key, value in variant.field_values %}
                                                                 <li>{{ field.getFrontendLabel(key) }}: {{ value }}</li>
                                                             {% endfor %}
                                                         </ul>
@@ -55,7 +55,7 @@
 
                                             </td>
                                             <td class="f-cart-col-qty text-center">
-                                                <input type="text" size="3" name="qty[{{ item.id() }}]" value="{{ variant.qty*1 }}" class="f-input-qty input-sm form-control"/>
+                                                <input type="text" size="3" name="qty[{{ item.id() }}]" value="{{ variant.variant_qty*1 }}" class="f-input-qty input-sm form-control"/>
                                             </td>
                                             <td class="f-cart-col-total text-left">
                                                 <div class="checkbox">
@@ -64,7 +64,7 @@
                                             <td class="f-cart-col-price text-right">
                                                 <div class="f-price-group {{ loggedIn ? 'logged-in' : 'logged-out' }}">
                                                     <span class="f-reg-price">
-                                                      <span class="f-price">{{ variant.price | currency }}</span>
+                                                      <span class="f-price">{{ variant.variant_price | currency }}</span>
                                                     </span>
                                                                 </div>
                                                             </td>
