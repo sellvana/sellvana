@@ -1,16 +1,13 @@
 {% set prod = THIS.get('product') %}
+{% set modelField = APP.instance('FCom_CustomField_Model_Field') %}
 {% set variants = prod.getVariantsData() %}
 {% if variants.variants_fields %}
     <div id="f-prod-tab-variant">
         {% for field  in variants.variants_fields %}
             <div class="form-group" style="overflow: hidden">
-                <label class="col-md-3 control-label">{{ field.frontend_label |_ }}</label>
+                <label class="col-md-3 control-label">{{ modelField.getFrontendLabel(field.field_code) |_ }}</label>
                 <div class="col-md-5">
-                    <select id="{{ field.field_code }}" name="{{ field.field_code }}" class="form-control variant" style="width:auto">
-                        {% for key in field.options %}
-                            <option value="{{ key|_ }}">{{ key |_ }}</option>
-                        {% endfor %}
-                    </select>
+                    <select id="{{ field.field_code }}" name="{{ field.field_code }}" class="form-control variant" style="width:auto"></select>
                 </div>
             </div>
         {% endfor %}
@@ -52,16 +49,21 @@
         var vr = [];
         var firstOptions = [];
         var beforeField = [];
-
         if (variants.length > 0) {
+            $('#' + fields[0]).html('');
+            var tmp_field = [];
             variants.forEach(function(obj) {
                 if (obj.field_values[fields[0]] == variants[0].field_values[fields[0]]) {
-                    vr.push(obj);
+                        vr.push(obj);
+                }
+                if (tmp_field.indexOf(obj.field_values[fields[0]]) == -1) {
+                    $('#' + fields[0]).append("<option value='"+ obj.field_values[fields[0]] +"'>"+ obj.field_values[fields[0]] +"</option>");
+                    tmp_field.push(obj.field_values[fields[0]]);
                 }
             })
-            if (variants[0].qty == 0 || variants[0].qty == '') {
+            if (variants[0].variant_qty == 0 || variants[0].variant_qty == '') {
                 quantityVariant.val(0);
-                $('#prod-in-stock').html('{{ "Item not available."|_ }}').addClass('f-out-of-stock');;
+                $('#prod-in-stock').html('{{ "Item not available."|_ }}').addClass('f-out-of-stock');
                 $('#prod-add-to-card').prop('disabled', true);
             } else {
                 quantityVariant.val(1);
@@ -70,45 +72,42 @@
                 $('#prod-add-to-card').prop('disabled', false);
 
             }
-            priceVariant.html(variants[0].price);
-            skuVariant.html(variants[0].sku);
+            priceVariant.html(variants[0].variant_price);
+            skuVariant.html(variants[0].variant_sku);
             fields.forEach(function (key) {
                 setUpField(beforeField, { field_code: key, value: variants[0].field_values[key], current: null });
                 beforeField.push(key);
             })
         }
-
-
         function setUpField(before, data) {
             $('.variant').each(function () {
                 var self = this;
-
-                if (($(this).attr('name').indexOf(before) == -1 || before.length == 0) && $(this).attr('name') == data.field_code) {
+                if (($(this).attr('name').indexOf(before) == 1 || before.length == 0) && $(this).attr('name') == data.field_code) {
                     var first = true;
                      if(before.length > 0) {
                         first = false;
-                         $(self).html('');
+                        $(self).html('');
                      };
                     var op = [];
                     vr.forEach(function (obj) {
                         if(first) {
-                            if (op.length == 0 && firstOptions.indexOf(data.value) != -1) {
-                                $(self).find('option[value="'+ obj.field_values[data.field_code] +'"]').prop('selected', true);
+                            if (op.length == 0 && firstOptions.indexOf(data.value) != 1) {
+                                    $(self).find('option[value="'+ obj.field_values[data.field_code] +'"]').prop('selected', true);
                             }
                             op.push(obj.field_values[data.field_code]);
                         } else {
-                                var flag = true
-                                before.forEach(function(val) {
-                                    if (obj.field_values[val] != $('#'+ val).val()) {
+                            var flag = true
+                            before.forEach(function(val) {
+                                if (obj.field_values[val] != $('#'+ val).val()) {
                                         flag = false;
-                                    }
-                                })
-                                if (flag) {
-                                    if (op.indexOf(obj.field_values[data.field_code]) == -1) {
-                                        $(self).append("<option value='"+ obj.field_values[data.field_code] +"'>"+ obj.field_values[data.field_code] +"</option>");
-                                    }
-                                    op.push(obj.field_values[data.field_code]);
                                 }
+                            })
+                            if (flag) {
+                                if (op.indexOf(obj.field_values[data.field_code]) == 1) {
+                                    $(self).append("<option value='"+ obj.field_values[data.field_code] +"'>"+ obj.field_values[data.field_code] +"</option>");
+                                }
+                                op.push(obj.field_values[data.field_code]);
+                            }
                         }
                     })
                     if (data.value != null) {
@@ -179,10 +178,10 @@
             })
             var image = [];
             displayAllImage.addClass('hidden');
-            if (find == null || find.qty == 0 || find.qty == '') {
+            if (find == null || find.variant_qty == 0 || find.variant_qty == '') {
                 quantityVariant.val(0);
                 skuVariant.html(sku_prod);
-                if (find == null || find.price == '') {
+                if (find == null || find.variant_price == '') {
                     priceVariant.html(base_price);
                 }
                 $('#prod-in-stock').html('{{ "Item not available."|_ }}').addClass('f-out-of-stock');
@@ -190,14 +189,15 @@
             } else {
                 quantityVariant.val(1);
                 //$('#prod-in-stock').html(find.qty + ' Items In Stock.');
-                $('#prod-in-stock').html('{{ "In Stock."|_ }}');
+                $('#prod-in-stock').html('{{ "In Stock."|_ }}').removeClass('f-out-of-stock');
                 $('#prod-add-to-card').prop('disabled', false).removeClass('f-out-of-stock');
             }
             if (find != null) {
-                priceVariant.html(find.price);
-                skuVariant.html(find.sku);
-                if (find.file_id != '') {
-                    image = find.file_id.split(',');
+                priceVariant.html(find.variant_price);
+                skuVariant.html(find.variant_sku);
+                var variant_file_id = $.parseJSON(find.data_serialized);
+                if (variant_file_id.variant_file_id != '') {
+                    image = variant_file_id.variant_file_id.split(',');
                     displayAllImage.removeClass('hidden');
                 }
             }

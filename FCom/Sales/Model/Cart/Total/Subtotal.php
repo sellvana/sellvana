@@ -18,7 +18,14 @@ class FCom_Sales_Model_Cart_Total_Subtotal extends FCom_Sales_Model_Cart_Total_A
             $itemNum++;
             $item->qty = $item->qty;
             $itemQty += $item->qty;
-            $item->rowtotal = $item->rowTotal();
+            $variants = $item->getData('variants');
+            if (!is_null($variants)) {
+                foreach($variants as $key => $variant) {
+                    $item->rowtotal += $item->rowTotal($key);
+                }
+            } else {
+                $item->rowtotal = $item->rowTotal();
+            }
             $subtotal += $item->rowtotal;
         }
 
