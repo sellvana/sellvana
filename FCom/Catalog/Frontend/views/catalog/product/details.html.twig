@@ -227,14 +227,14 @@
         });
 
         $('#product-rslides li').addClass('zoom').zoom();
-        var variants = $.parseJSON('{{ UTIL.toJson(variants.variants)|raw }}');
-        var fields = Object.keys(variants[0].field_values);
-        var base_price = '{{ prod.get('base_price')| currency }}';
-        var sku_prod = '{{ prod.get('local_sku')}}';
-        var vr = [];
-        var firstOptions = [];
-        var beforeField = [];
+        var variants = {{ UTIL.toJson(variants.variants)|raw }};
         if (variants.length > 0) {
+            var fields = Object.keys(variants[0].field_values);
+            var base_price = '{{ prod.get('base_price')| currency }}';
+            var sku_prod = '{{ prod.get('local_sku')}}';
+            var vr = [];
+            var firstOptions = [];
+            var beforeField = [];
             $('#' + fields[0]).html('');
             var tmp_field = [];
             variants.forEach(function(obj) {

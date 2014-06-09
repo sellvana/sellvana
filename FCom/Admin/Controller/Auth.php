@@ -50,7 +50,10 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
         $notLocked = $this->BLoginThrottle->init('admin:password_recover', $this->BRequest->ip());
         if ($notLocked) {
             $hlp = $this->FCom_Admin_Model_User;
-            $user = $hlp->orm()->where(['OR' => ['email' => $form['email'], 'username' => $form['email']]])->find_one();
+            $user = $hlp->orm()->where(['OR' => [
+                'email' => (string)$form['email'],
+                'username' => (string)$form['email'],
+            ]])->find_one();
             if ($user) {
                 $this->BLoginThrottle->success();
                 $user->recoverPassword();

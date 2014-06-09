@@ -119,7 +119,7 @@ class FCom_MultiLanguage_Main extends BClass
         $orm = $this->FCom_MultiLanguage_Model_Translation
             ->orm('ml')
             ->select(['entity_id', 'field', 'value', 'data_serialized'], 'ml')
-            ->where(['entity_id' => $id, 'entity_type' => $entityId, 'locale' => $lang]);
+            ->where(['entity_id' => (int)$id, 'entity_type' => (string)$entityId, 'locale' => (string)$lang]);
         if (!empty($fields)) {
             $orm->where(['field' => $fields]);
         }

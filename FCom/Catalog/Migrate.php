@@ -2,7 +2,7 @@
 
 class FCom_Catalog_Migrate extends BClass
 {
-    public function install__0_2_26()
+    public function install__0_2_27()
     {
         $tProduct = $this->FCom_Catalog_Model_Product->table();
 
@@ -127,6 +127,8 @@ class FCom_Catalog_Migrate extends BClass
                 'view_name' => 'varchar(255)',
                 'page_parts' => 'varchar(50)',
                 'image_url' => 'TEXT NULL',
+                'featured_image_url'   => 'TEXT NULL',
+                'nav_callout_image_url'   => 'TEXT NULL',
             ],
             'PRIMARY' => '(id)',
             'KEYS' => [
@@ -510,6 +512,17 @@ class FCom_Catalog_Migrate extends BClass
             ],
             'KEYS' => [
                 'IDX_featured'  => '(is_featured)',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_2_26__0_2_27()
+    {
+        $tCategory = $this->FCom_Catalog_Model_Category->table();
+        $this->BDb->ddlTableDef($tCategory, [
+            'COLUMNS' => [
+                'featured_image_url'   => 'TEXT NULL',
+                'nav_callout_image_url'   => 'TEXT NULL',
             ],
         ]);
     }

@@ -31,8 +31,10 @@ define('BUCKYBALL_ROOT_DIR', __DIR__);
 */
 
 $comDir = __DIR__ . '/com/';
+#$t = microtime(true);
 require_once $comDir . 'core.php';
 require_once $comDir . 'misc.php';
+require_once $comDir . 'locale.php';
 require_once $comDir . 'lib/idiorm.php';
 require_once $comDir . 'lib/paris.php';
 require_once $comDir . 'db.php';
@@ -41,7 +43,7 @@ require_once $comDir . 'module.php';
 require_once $comDir . 'controller.php';
 require_once $comDir . 'layout.php';
 require_once $comDir . 'import.php';
-
+#echo microtime(true)-$t; exit;
 /**
 * Minify all components into 1 compact file.
 *
@@ -53,7 +55,7 @@ require_once $comDir . 'import.php';
 
 if (getopt('c')) {
     $minified = [];
-    foreach (['core', 'misc', 'lib/idiorm', 'lib/paris', 'db', 'cache', 'module', 'controller', 'layout', 'cache'] as $f) {
+    foreach (['core', 'misc', 'locale', 'lib/idiorm', 'lib/paris', 'db', 'cache', 'module', 'controller', 'layout', 'cache'] as $f) {
         list(, $minified[]) = explode(' ', php_strip_whitespace($comDir . $f . '.php'), 2);
     }
     $contents = "<?php define('BUCKYBALL_VERSION', '" . BUCKYBALL_VERSION . "'); " . join(' ', $minified);

@@ -13,8 +13,29 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     public function getFolder()
     {
         $folder = $this->BRequest->get('folder');
+        if(empty($folder)){
+            $type = $this->BRequest->get('type');
+            if($type){
+                $uploadConfig = $this->BConfig->get('uploads/' . $type);
+                if(empty($uploadConfig)){
+                    throw new BException("Unknown upload type.");
+                }
+                $canUpload = true;
+                if(isset($uploadConfig['permission'])){
+                    $canUpload = $this->FCom_Admin_Model_User->sessionUser()->getPermission($uploadConfig['permission']);
+                }
+                if($canUpload && isset($uploadConfig['folder'])){
+                    $folder = $uploadConfig['folder'];
+                }
+            }
+        }
         if (empty($this->_allowedFolders[$folder])) {
             throw new BException('Folder ' . $folder . ' is not allowed');
+        }
+
+        if(strpos($folder, '{random}') !== false){
+            $random = 'storage/' . $this->BConfig->get('core/storage_random_dir');
+            $folder = str_replace('{random}', $random, $folder);
         }
         return $folder;
     }
@@ -177,7 +198,6 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     */
     public function processGridPost($options = [])
     {
-
         $r = $this->BRequest;
         $gridId = $r->get('grid');
         $folder = !empty($options['folder']) ? $options['folder'] : $this->getFolder();
@@ -186,11 +206,32 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
         $attModel = !empty($options['model_class']) ? $options['model_class'] : 'FCom_Core_Model_MediaLibrary';
         $attModel = is_string($attModel) ? $attModel::i() : $attModel;
-
+        $type = $r->get('type');
+        $c = $this->BConfig;
+        $canUpload = true;// allow upload in case no permission is configured? Or deny?
+        if ($type) {
+            $uploadConfig = $c->get('uploads/' . $type);
+            if (empty($uploadConfig)) {
+                throw new BException("Unknown upload type.");
+            }
+            if (isset($uploadConfig['permission'])) {
+                $canUpload = $this->FCom_Admin_Model_User->sessionUser()->getPermission($uploadConfig['permission']);
+            }
+        }
         $blacklistExt = [
             'php' => 1, 'php3' => 1, 'php4' => 1, 'php5' => 1, 'htaccess' => 1,
             'phtml' => 1, 'html' => 1, 'htm' => 1, 'js' => 1, 'css' => 1, 'swf' => 1, 'xml' => 1,
         ];
+
+        if (isset($uploadConfig['filetype'])) {
+            $fileTypes                = explode(',', $uploadConfig['filetype']);
+            if(empty($options['whitelist_ext'])){
+                $options['whitelist_ext'] = $fileTypes;
+            } else {
+                $options['whitelist_ext'] = $this->BUtil->arrayMerge($options['whitelist_ext'], $fileTypes);
+            }
+        }
+
         if (!empty($options['whitelist_ext'])) {
             foreach ($options['whitelist_ext'] as $ext) {
                 unset($blacklistExt[$ext]);
@@ -202,75 +243,89 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             //set_time_limit(0);
             //ob_implicit_flush();
             //ignore_user_abort(true);
-            $uploads = $_FILES['upload'];
-            $rows = [];
-            foreach ($uploads['name'] as $i => $fileName) {
+            if ($canUpload) {
 
-                if (!$fileName) {
-                    continue;
-                }
-                $associatedProducts = 0;
-                $fileSize = 0;
-                $message = '';
-                $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-                $fileName = preg_replace('/[^\w\d_.-]+/', '_', $fileName);
+                $uploads = $_FILES['upload'];
+                $rows    = [];
+                foreach ($uploads['name'] as $i => $fileName) {
 
-                if (!empty($uploads['error'][$i])) {
-                    $id = '';
-                    $status = 'ERROR';
-                    $message = $uploads['error'][$i];
-                } elseif (!empty($blacklistExt[$ext])) {
-                    $id = '';
-                    $status = 'ERROR';
-                    $message = 'Illegal file extension';
-                } elseif (preg_match('#\.(gif|jpe?g|png)$#', $fileName) && !@getimagesize($uploads['tmp_name'][$i])) {
-                    $id = '';
-                    $status = 'ERROR';
-                    $message = 'Invalid image uploaded';
-                } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $targetDir . '/' . $fileName)) {
-                    $id = '';
-                    $status = 'ERROR';
-                    $message = 'Unable to save the file';
-                } else {
-                    $att = $attModel->loadWhere(['folder' => (string)$folder, 'file_name' => (string)$fileName]);
+                    if (!$fileName) {
+                        continue;
+                    }
+                    $associatedProducts = 0;
+                    $fileSize           = 0;
+                    $message            = '';
+                    $ext                = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                    $fileName           = preg_replace('/[^\w\d_.-]+/', '_', $fileName);
 
-                    if (!$att) {
-                        $att = $attModel->create([
-                            'folder'    => $folder,
-                            'subfolder' => $subfolder,
-                            'file_name' => $fileName,
-                            'file_size' => $uploads['size'][$i],
-                            'create_at' =>  $this->BDb->now(),
-                            'update_at' =>  $this->BDb->now()
-                        ])->save();
+                    if (!empty($uploads['error'][$i])) {
+                        $id      = '';
+                        $status  = 'ERROR';
+                        $message = $uploads['error'][$i];
+                    } elseif (!empty($blacklistExt[$ext]) || !in_array($ext, $options['whitelist_ext'])) {
+                        $id      = '';
+                        $status  = 'ERROR';
+                        $message = 'Illegal file extension';
+                    } elseif (preg_match('#\.(gif|jpe?g|png)$#',
+                            $fileName) && !@getimagesize($uploads['tmp_name'][$i])
+                    ) {
+                        $id      = '';
+                        $status  = 'ERROR';
+                        $message = 'Invalid image uploaded';
+                    } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $targetDir . '/' . $fileName)) {
+                        $id      = '';
+                        $status  = 'ERROR';
+                        $message = 'Unable to save the file';
                     } else {
-                        $associatedProducts = $this->FCom_Catalog_Model_ProductMedia->orm()
-                            ->select_expr('COUNT(*)', 'associated_products')
-                            ->where('file_id', $att->get('id'))->find_one();
-                        $associatedProducts = $associatedProducts->get('associated_products');
-                        $att->set(['file_size' => $uploads['size'][$i], 'update_at' =>  $this->BDb->now()])->save();
+                        $att = $attModel->loadWhere(['folder' => (string)$folder, 'file_name' => (string)$fileName]);
+
+                        if (!$att) {
+                            $att = $attModel->create([
+                                'folder'    => $folder,
+                                'subfolder' => $subfolder,
+                                'file_name' => $fileName,
+                                'file_size' => $uploads['size'][$i],
+                                'create_at' => $this->BDb->now(),
+                                'update_at' => $this->BDb->now()
+                            ])->save();
+                        } else {
+                            $associatedProducts = $this->FCom_Catalog_Model_ProductMedia
+                                    ->orm()
+                                    ->select_expr('COUNT(*)','associated_products')
+                                    ->where('file_id',$att->get('id'))
+                                    ->find_one();
+                            $associatedProducts = $associatedProducts->get('associated_products');
+                            $att->set(['file_size' => $uploads['size'][$i], 'update_at' => $this->BDb->now()])->save();
+                        }
+                        $this->BEvents->fire(__METHOD__ . ':' . $folder . ':upload', ['model' => $att]);
+                        if (!empty($options['on_upload'])) {
+                            $this->BUtil->call($options['on_upload'], $att);
+                        }
+                        $id       = $att->id;
+                        $fileSize = $att->file_size;
+                        $status   = '';
                     }
-                    $this->BEvents->fire(__METHOD__ . ':' . $folder . ':upload', ['model' => $att]);
-                    if (!empty($options['on_upload'])) {
-                        $this->BUtil->call($options['on_upload'], $att);
-                    }
-                    $id = $att->id;
-                    $fileSize = $att->file_size;
-                    $status = '';
+
+                    $rows[] = [
+                        'id'                  => $id,
+                        'file_name'           => $fileName,
+                        'file_size'           => $fileSize,
+                        'act'                 => $status,
+                        'folder'              => $folder,
+                        'subfolder'           => '',
+                        'associated_products' => $associatedProducts
+                    ];
+
+                    //echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".$this->BUtil->toJson($row)."); </script>";
+                    // TODO: properly refresh grid after file upload
+                    // solution one "addRowData method" - will work if we could prevent add new row after Upload file on client side
+                    // echo "<script>parent.\$('#$gridId').addRowData('$fileName', ".$this->BUtil->toJson($row)."); </script>";
+                    // solution two is to find a way to pass rowid to the server side
+                    //echo "<script>parent.\$('#$gridId').trigger( 'reloadGrid' ); </script>";
+
                 }
-
-                $rows[] = ['id' => $id, 'file_name' => $fileName, 'file_size' => $fileSize, 'act' => $status,
-                    'folder' => $folder, 'subfolder' => '', 'associated_products' => $associatedProducts];
-
-                //echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".$this->BUtil->toJson($row)."); </script>";
-                // TODO: properly refresh grid after file upload
-                // solution one "addRowData method" - will work if we could prevent add new row after Upload file on client side
-                // echo "<script>parent.\$('#$gridId').addRowData('$fileName', ".$this->BUtil->toJson($row)."); </script>";
-                // solution two is to find a way to pass rowid to the server side
-                //echo "<script>parent.\$('#$gridId').trigger( 'reloadGrid' ); </script>";
-
+                $this->BResponse->json(['files' => $rows]);
             }
-            $this->BResponse->json(['files' => $rows]);
             break;
 
         case 'edit':
@@ -320,7 +375,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     $fileName = $fileSPLObject->getFilename();
                     $path = $fileSPLObject->getPath();
                     $subFolder = null;
-                    if (is_file($fullFileName) && exif_imagetype($fullFileName)) {
+                    if (is_file($fullFileName) && getimagesize($fullFileName)) {
                         if ($path != $targetDir) {
                             $path = str_replace('\\', '/', $path);
                             $subFolder = trim(str_replace($targetDir . '/', '', $path));

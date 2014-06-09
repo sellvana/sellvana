@@ -1,6 +1,6 @@
 modules:
     FCom_Catalog:
-        version: 0.2.26
+        version: 0.2.27
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
         categories: [ Catalog, Products ]
@@ -12,6 +12,11 @@ modules:
 
         default_config:
             modules/FCom_Catalog/allowed_locales: [ en_US ]
+            uploads:
+                product-import:
+                    permission: catalog/product/import
+                    filetype: csv,txt
+                    folder: {random}/import/products
 
         areas:
             FCom_Admin:
