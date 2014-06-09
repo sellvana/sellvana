@@ -11,7 +11,6 @@
 {% set customFields = prod.getData('custom_fields') %}
 {% set shopper = prod.getData('frontend_fields') %}
 {% set variants = prod.getVariantsData() %}
-{% set modelField = APP.instance('FCom_CustomField_Model_Field') %}
 {% set productLink = prod.getProductLink() %}
 {% set recentlyViewed = APP.instance('FCom_Catalog_Frontend').getRecentlyViewedProducts() %}
 

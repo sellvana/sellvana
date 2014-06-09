@@ -244,13 +244,15 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 foreach ($data_serialized['variants'] as &$arr) {
                     if (in_array($params['data']['variants']['field_values'], $arr)) {
                         $flag = false;
-                        $arr['qty'] = $arr['qty'] + $params['data']['variants']['qty'];
+                        $arr['variant_qty'] = $arr['variant_qty'] + $params['data']['variants']['variant_qty'];
                     }
                 }
             }
             if ($flag) {
-                $data_serialized['variants'] = (isset($data_serialized['variants']))? $data_serialized['variants'] : [];
-                array_push($data_serialized['variants'], $params['data']['variants']);
+                if (!empty($params['data']['variants'])) {
+                    $data_serialized['variants'] = (isset($data_serialized['variants']))? $data_serialized['variants'] : [];
+                    array_push($data_serialized['variants'], $params['data']['variants']);
+                }
             }
             $item->set('data', $data_serialized);
         }

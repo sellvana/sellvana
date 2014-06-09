@@ -83,8 +83,8 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                         return;
                     }
                     $options = ['qty' => $qty, 'price' => $price];
-                    $prod_variant['variant_qty'] = $qty;
                     if (!empty($prod_variant)) {
+                        $prod_variant['variant_qty'] = $qty;
                         $options['data']['variants'] = $prod_variant;
                     }
                     if ($this->BApp->m('FCom_Customer') && $this->FCom_Customer_Model_Customer->isLoggedIn()) {
@@ -105,18 +105,41 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
             $items = $cart->items();
             if (count($items)) {
                 if (!empty($post['remove'])) {
-                    foreach ($post['remove'] as $id) {
-                        $cart->removeItem($id);
+                    foreach ($post['remove'] as $id => $arr_variant) {
+                        $item = $cart->childById('items', $id);
+                        $data_serialized = $item->getData();
+                        if (!isset($data_serialized['variants']) || count($data_serialized['variants']) == 1) {
+                            $cart->removeItem($id);
+                        }
                     }
                 }
                 if (!empty($post['qty'])) {
-                    foreach ($post['qty'] as $id => $qty) {
-                        if ($qty > 0) {
-                            $item = $cart->childById('items', $id);
-                            if ($item) {
-                                $item->set('qty', $qty)->save();
+                    foreach ($post['qty'] as $id => $arr_qty) {
+                        $item = $cart->childById('items', $id);
+                        if ($item) {
+                            $data_serialized = $item->getData();
+                            $totalQty = 0;
+                            if (isset($data_serialized['variants'])) {
+                                foreach ($arr_qty as $variantId => $qty) {
+
+                                    if ($qty > 0) {
+                                        $data_serialized['variants'][$variantId]['variant_qty'] = $qty;
+                                        $totalQty += $qty;
+                                    }
+                                    if ($qty <= 0 || isset($post['remove'][$id][$variantId])) {
+                                        unset($data_serialized['variants'][$variantId]);
+                                    }
+                                }
+                            } else {
+                                $totalQty = $arr_qty[0];
                             }
-                        } //todo: else remove item?
+                            if ($totalQty > 0) {
+                                $item->set('qty', $totalQty)->set('data', $data_serialized)->save();
+                            }
+                            if ($totalQty <= 0 || empty($data_serialized['variants'])){
+                                $cart->removeItem($id);
+                            }
+                        }
                     }
                 }
                 if (!empty($post['postcode'])) {

@@ -1098,7 +1098,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $vr['variant_price'] = $this->BLocale->currency($price);
             $variants[] = $vr;
         }
-        $data = ['variants' => $variants, 'variants_fields' => $variantsFields, 'fields' => $fields];
+        $data = ['variants' => $variants, 'variants_fields' => $variantsFields];
+        if (empty($variants)) {
+            unset($data['variants_fields']);
+        }
         return $data;
     }
 
