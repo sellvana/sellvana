@@ -5,12 +5,15 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     public function action_page()
     {
         $pageUrl = $this->BRequest->param('page');
-        if ($pageUrl === '' || is_null($pageUrl)) {
-            $this->forward(false);
-            return;
+        if (!($pageUrl === '' || is_null($pageUrl))) {
+            $block = $this->FCom_Cms_Model_Block->loadWhere(['page_enabled' => 1, 'page_url' => (string)$pageUrl]);
+        } else {
+            $pageHandle = $this->BRequest->param('block');
+            if (!($pageHandle === '' || is_null($pageHandle))) {
+                $block = $this->FCom_Cms_Model_Block->load($pageHandle, 'handle');
+            }
         }
-        $block = $this->FCom_Cms_Model_Block->loadWhere(['page_enabled' => 1, 'page_url' => (string)$pageUrl]);
-        if (!$block || !$block->validateBlock()) {
+        if (empty($block) || !$block->validateBlock()) {
             $this->forward(false);
             return;
         }

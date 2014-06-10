@@ -26,6 +26,6 @@ class FCom_Cms_Frontend extends BClass
         if (!$indexPage) {
             return;
         }
-        $args['controller']->forward('page', 'FCom_Cms_Frontend_Controller', ['page' => $indexPage]);
+        $args['controller']->forward('page', 'FCom_Cms_Frontend_Controller', ['block' => $indexPage]);
     }
 }
