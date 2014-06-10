@@ -30,7 +30,7 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
         if (($head = $this->BLayout->view('head'))) {
             $head->addTitle($block->page_title);
-            foreach (explode(',', 'title,description,keywords') as $f) {
+            foreach (['title', 'description', 'keywords'] as $f) {
                 if (($v = $block->get('meta_' . $f))) {
                     $head->meta($f, $v);
                 }
@@ -68,7 +68,7 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
         if (($head = $this->BLayout->view('head'))) {
             $head->addTitle($nav->title);
-            foreach (explode(',', 'title,description,keywords') as $f) {
+            foreach (['title', 'description', 'keywords'] as $f) {
                 if (($v = $nav->get('meta_' . $f))) {
                     $head->meta($f, $v);
                 }

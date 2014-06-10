@@ -635,14 +635,14 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 $variants = $this->BUtil->objectToArray(json_decode($data['variants']));
                 foreach($variants as $arr) {
                     $vr = $hlp->load($arr['id']);
-                    $data =  [
-                                'product_id' => $model->id,
-                                'variant_sku' => $arr['variant_sku'],
-                                'variant_price' => $arr['variant_price'],
-                                'variant_qty' => $arr['variant_qty'],
-                                'field_values' => json_encode($arr['field_values']),
-                                'data_serialized' => json_encode(['variant_file_id' => $arr['variant_file_id']]),
-                             ];
+                    $data = [
+                        'product_id' => $model->id,
+                        'variant_sku' => $arr['variant_sku'],
+                        'variant_price' => $arr['variant_price'],
+                        'variant_qty' => $arr['variant_qty'],
+                        'field_values' => json_encode($arr['field_values']),
+                        'data_serialized' => json_encode(['variant_file_id' => $arr['variant_file_id']]),
+                    ];
                     if ($vr) {
                         $vr->set($data)->save();
                     } else {

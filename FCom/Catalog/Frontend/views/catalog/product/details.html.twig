@@ -10,7 +10,6 @@
 {% set cat = THIS.get('category') %}
 {% set customFields = prod.getData('custom_fields') %}
 {% set shopper = prod.getData('frontend_fields') %}
-{% set variants = prod.getVariantsData() %}
 {% set productLink = prod.getProductLink() %}
 {% set recentlyViewed = APP.instance('FCom_Catalog_Frontend').getRecentlyViewedProducts() %}
 
@@ -29,10 +28,10 @@
         <p class="text-center"><small>{{ 'Mouse move on Image to zoom'|_ }}</small></p>
         <ul class="f-prod-more-view-imgs row" id="product-rslides-pager">
 {% for img in images %}
-          <li class="col-md-2 col-xs-2"><a href="#"><img data-id="{{ img.id() }}" src="{{ img.getUrl() }}" alt="" title=""></a></li>
+          <li class="col-md-2 col-xs-2" data-id="{{ img.id() }}"><a href="#"><img src="{{ img.getUrl() }}" alt="" title=""></a></li>
 {% endfor %}
         </ul>
-        <a href="#" class="hidden" id="display-all-image"><i class="glyphicon glyphicon-refresh"></i> {{ "Display all images"|_ }}</a>
+        <a href="#" hidden id="display-all-images"><i class="glyphicon glyphicon-refresh"></i> {{ "Display all images"|_ }}</a>
       </div>
       <!-- /.f-col-prod-img -->
 
@@ -53,44 +52,22 @@
             <a href="#f-prod-tab-reviews">{{ '%s Review(s)'|_(prod.getNumReviews()) }}</a>
           </div>
 {% endif %}
-          <div class="f-price-group">
-            <table>
-              {% if prod.get('base_price') == 0 %}
-                <tr class="f-reg-price">
-                  <th class="f-price-label">Price:</th>
-                  <td class="f-price">{{ 'FREE'|_ }}</td>
-                </tr>
-              {% elseif prod.get('base_price') != prod.get('sale_price') and prod.get('sale_price') is not null %}
-                {% if prod.get('sale_price') == 0 %}
-                  <tr class="f-reg-price">
-                    <th class="f-price-label">Price:</th>
-                    <td class="f-price">{{ 'FREE'|_ }}</td>
-                  </tr>
-                {% else %}
-                  <tr class="f-special-price">
-                    <th class="f-price-label">Price:</th>
-                    <td class="f-price">{{ prod.get('sale_price') | currency }}</td>
-                  </tr>
-                {% endif %}
-                <tr class="f-old-price">
-                  <th class="f-price-label">Was:</th>
-                  <td class="f-price">{{ prod.get('base_price') | currency }}</td>
-                </tr>
-              {% else %}
-                <tr class="f-reg-price">
-                  <th class="f-price-label">Price:</th>
-                  <td class="f-price">{{ prod.get('base_price') | currency }}</td>
-                </tr>
-              {% endif %}
-            </table>
-            {{ THIS.view('customer-groups/product-tier-prices').set('product', prod) | raw }}
-          </div> <!-- /.f-price-group -->
+          {{ THIS.view('catalog/product/price').set('product', prod) | raw }}
           <div class="f-prod-select">
             {{ THIS.hook('catalog/product/details:before_add_cart') | raw }}
             <div class="f-prod-add-cart">
               {{ THIS.view('catalog/product/variants').set('product', prod) | raw }}
-              <p class="f-stock-notice f-in-stock" id="prod-in-stock">In Stock.</p>
-              <button type="submit" class="btn btn-primary btn-lg" title="{{ "Add to Cart"| _ }}" id="prod-add-to-card">
+              
+              <p class="f-stock-notice f-in-stock">{{ 'In Stock.'|_ }}</p>
+              <p class="f-stock-notice f-out-of-stock" hidden>{{ 'Out Of Stock.'|_ }}</p>
+
+                <div class="form-group overflow-hidden">
+                    <label class="col-md-3 control-label">{{ 'Quantity:' |_ }}</label>
+                    <div class="col-md-2">
+                        <input type="text" name="qty" class="form-control col-md-3" value="1"/>
+                    </div>
+                </div>
+              <button type="submit" class="btn btn-primary btn-lg" title="{{ "Add to Cart"| _ }}" id="prod-add-to-cart">
                   <span class="glyphicon glyphicon-shopping-cart"></span>{{ "Add to Cart"| _ }}</button>
                 <a class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ prod.id() }}"
                    rel="nofollow">{{ "Add to Wishlist"|_ }}</a>
