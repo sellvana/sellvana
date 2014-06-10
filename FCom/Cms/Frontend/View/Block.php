@@ -16,16 +16,22 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
         if (!static::$_layoutHlp) {
             static::$_layoutHlp = $this->BLayout;
         }
+        if (is_array($block) && empty($params)) {
+            $params = $block;
+            $block = $params['block'];
+        }
         if (empty($params['view_class'])) {
             $params['view_class'] = static::$_origClass;
         }
         if ($block instanceof FCom_Cms_Model_Block) {
             $params['block'] = $block->handle;
             $params['model'] = $block;
-        } else {
+        } elseif (is_string($block)) {
             $params['block'] = $block;
+        } else {
+            throw new BException('Invalid block name');
         }
-        $viewName = '_cms_block/' . $params['block'];
+        $viewName = !empty($params['view_name']) ? $params['view_name'] : ('_cms_block/' . $params['block']);
         $view = static::$_layoutHlp->getView($viewName);
         if (!$view instanceof FCom_Cms_Frontend_View_Block) {
             $view = static::$_layoutHlp->addView($viewName, $params)->getView($viewName);
@@ -40,7 +46,7 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
     {
         $model = $view->getParam('model');
         if (!$model  || !is_object($model) || !$model instanceof FCom_Cms_Model_Block) {
-            $model = $view->get('block');
+            $model = $view->getParam('block');
             if (is_numeric($model)) {
                 $model = $this->FCom_Cms_Model_Block->load($model);
             } elseif (is_string($model)) {
@@ -78,7 +84,7 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
             'source_untrusted' => true,
         ]);
 
-        $content = call_user_func($subRenderer['callback'], $view);
+        $content = $this->BUtil->call($subRenderer['callback'], $view);
 
         return $content;
     }

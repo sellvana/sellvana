@@ -137,6 +137,7 @@ Using custom id/name:
             >{{ p.raw ? value|raw : value }}</textarea>
         </div>
     </div>
+    <script>require(['jquery', 'ckeditor'], function($) { CKEDITOR.replace('{{ view.getInputId(p) }}') })</script>
 {% endmacro %}
 
 {% macro accordion_start(p) %}
