@@ -41,7 +41,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             'do_not_carry' => 'Do Not Carry',
             'temp_unavail' => 'Temporarily Unavailable',
             'vendor_disc' => 'Supplier Discontinued',
-            'manuf_disc' => 'MFR Discontinued',
+            'mfr_disc' => 'MFR Discontinued',
         ],
     ];
 
@@ -1055,54 +1055,12 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return empty($errors) ? true : $errors;
     }
 
-    public function getVariantsData()
+    public function getPrice()
     {
-        $variantsFields = $this->getData('variants_fields');
-        if (!$variantsFields) {
-            return ['variants' => [], 'variants_fields' => [], 'fields' => []];
+        if ($this->get('sale_price')) {
+            return $this->get('sale_price');
         }
-        $fieldCode = $variantsFields[0]['field_code'];
-        $fields = [ $fieldCode => [] ];
-        $variantModels = $this->FCom_CustomField_Model_ProductVariant->orm()->where('product_id', $this->id)->find_many();
-        $variants = [];
-        foreach ($variantModels as $variant) {
-            $vr = $variant->as_array();
-            $tmp = [];
-            $vm = '';
-            $vr['field_values'] = $this->BUtil->fromJson($vr['field_values']);
-            $customData = $variant->getData();
-            if (!empty($customData['variant_file_id'])) {
-                $vr['file_id'] = $customData['variant_file_id'];
-            }
-            foreach ($vr['field_values'] as $key => $val) {
-                if ($key === $fieldCode) {
-                    $vm = $val;
-                } else {
-                    $tmp[$key] = $val;
-                }
-            }
-            if (!isset($fields[$fieldCode][$vm])) {
-                $fields[$fieldCode][$vm] = $tmp;
-            } else {
-                $curr = &$fields[$fieldCode][$vm];
-                foreach ($tmp as $key => $val) {
-                    if (is_array($curr[$key])) {
-                        array_push($curr[$key], $val);
-                    } else {
-                        $curr[$key] = [$curr[$key], $val];
-                    }
-                }
-            }
-            $vr['variant_sku'] = ($vr['variant_sku'] === '') ? $this->local_sku : $vr['variant_sku'];
-            $price = ($vr['variant_price'] != '') ? $vr['variant_price'] : $this->base_price;
-            $vr['variant_price'] = $this->BLocale->currency($price);
-            $variants[] = $vr;
-        }
-        $data = ['variants' => $variants, 'variants_fields' => $variantsFields];
-        if (empty($variants)) {
-            unset($data['variants_fields']);
-        }
-        return $data;
+        return $this->get('base_price');
     }
 
     public function backOrders()

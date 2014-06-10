@@ -8,6 +8,8 @@ class FCom_Frontend_Main extends BClass
     {
         if (empty($this->_layout)) {
 #echo "<pre>"; print_r($this->BLayout->view('root')); echo "</pre>";
+            //TODO: permanent solution to Twig namespaces conflict between Frontend and Admin areas
+            $this->BEvents->off('BLayout::addAllViewsDir', 'FCom_LibTwig_Main.onLayoutAddAllViews');
             $this->_layout = $this->BLayout->i(true);
             $modules = $this->BModuleRegistry->getAllModules();
             foreach ($modules as $mod) {
