@@ -16,4 +16,16 @@ class FCom_Cms_Frontend extends BClass
         }
         */
     }
+
+    public function onFrontendIndexBeforeDispatch($args)
+    {
+        if ($args['action'] !== 'index') {
+            return;
+        }
+        $indexPage = $this->BConfig->get('modules/FCom_Cms/index_page');
+        if (!$indexPage) {
+            return;
+        }
+        $args['controller']->forward('page', 'FCom_Cms_Frontend_Controller', ['page' => $indexPage]);
+    }
 }

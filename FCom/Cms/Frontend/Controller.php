@@ -4,7 +4,7 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function action_page()
     {
-        $pageUrl = $this->BRequest->params('page');
+        $pageUrl = $this->BRequest->param('page');
         if ($pageUrl === '' || is_null($pageUrl)) {
             $this->forward(false);
             return;

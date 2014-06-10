@@ -1959,7 +1959,7 @@ class BRouting extends BClass
                 list($actionName, $forwardCtrlName, $params) = $forward;
                 $controllerName = $forwardCtrlName ? $forwardCtrlName : $route->controller_name;
                 $requestRoute = '_ /forward';
-                $this->route($requestRoute, $controllerName . '.' . $actionName, [], null, false);
+                $this->route($requestRoute, $controllerName . '.' . $actionName, ['params' => $params], null, false);
             }
         }
 
@@ -2245,7 +2245,11 @@ class BRouteObserver extends BClass
         $this->BModuleRegistry->currentModule(!empty($this->args['module_name']) ? $this->args['module_name'] : null);
 
         $node = $this->route_node;
-        $this->BRequest->initParams((array)$node->params_values);
+        $params = (array)$node->params_values;
+        if (!empty($this->args['params'])) {
+            $params = array_merge_recursive($params, $this->args['params']);
+        }
+        $this->BRequest->initParams($params);
         if (is_string($this->callback) && $node->action_name) {
             // prevent envoking action_index__POST methods directly
             $actionNameArr = explode('__', $node->action_name, 2);
@@ -2468,7 +2472,9 @@ class BActionController extends BClass
     public function beforeDispatch()
     {
         $this->BEvents->fire(__METHOD__); // general beforeDispatch event for all controller
-        $this->BEvents->fire(static::$_origClass . '::beforeDispatch'); // specific controller instance
+        $className = static::$_origClass ? static::$_origClass : get_class($this);
+        $args = ['action' => $this->_action, 'controller' => $this];
+        $this->BEvents->fire($className . '::beforeDispatch', $args); // specific controller instance
         return true;
     }
 
@@ -2479,7 +2485,9 @@ class BActionController extends BClass
     public function afterDispatch()
     {
         $this->BEvents->fire(__METHOD__); // general afterDispatch event for all controller
-        $this->BEvents->fire(static::$_origClass . '::afterDispatch'); // specific controller instance
+        $className = static::$_origClass ? static::$_origClass : get_class($this);
+        $args = ['action' => $this->_action, 'controller' => $this];
+        $this->BEvents->fire($className . '::afterDispatch', $args); // specific controller instance
     }
 
     /**
@@ -2543,7 +2551,7 @@ class BActionController extends BClass
     public function viewProxy($viewPrefix, $defaultView = 'index', $hookName = 'main', $baseLayout = null)
     {
         $viewPrefix = trim($viewPrefix, '/') . '/';
-        $page = $this->BRequest->params('view');
+        $page = $this->BRequest->param('view');
         if (!$page) {
             $page = $defaultView;
         }
