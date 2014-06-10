@@ -238,23 +238,24 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         }
         if (isset($params['data'])) {
 
-            $data_serialized = $this->BUtil->objectToArray(json_decode($item->data_serialized));
+            $variants = $item->getData('variants');
             $flag = true;
-            if (isset($data_serialized['variants'])) {
-                foreach ($data_serialized['variants'] as &$arr) {
+            if (null !== $variants) {
+                foreach ($variants as &$arr) {
                     if (in_array($params['data']['variants']['field_values'], $arr)) {
                         $flag = false;
-                        $arr['variant_qty'] = $arr['variant_qty'] + $params['data']['variants']['variant_qty'];
+                        $arr['variant_qty'] = $arr['variant_qty'] + $params['qty'];
                     }
                 }
             }
             if ($flag) {
                 if (!empty($params['data']['variants'])) {
-                    $data_serialized['variants'] = (isset($data_serialized['variants']))? $data_serialized['variants'] : [];
-                    array_push($data_serialized['variants'], $params['data']['variants']);
+                    $params['data']['variants']['variant_qty'] = $params['qty'];
+                    $variants = (null !== $variants)? $variants : [];
+                    array_push($variants, $params['data']['variants']);
                 }
             }
-            $item->set('data', $data_serialized);
+            $item->setData('variants', $variants);
         }
         $item->save();
         if (empty($params['no_calc_totals'])) {

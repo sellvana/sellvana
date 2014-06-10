@@ -101,4 +101,9 @@ class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
         $variant = $this->loadWhere(['product_id' => $product->id(), 'field_values' => $valJson]);
         return $variant;
     }
+
+    public function checkEmptyVariant($product)
+    {
+        return $this->load($product, 'product_id');
+    }
 }

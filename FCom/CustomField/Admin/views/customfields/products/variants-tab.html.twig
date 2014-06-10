@@ -99,7 +99,6 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                 vColsCollection = grid.getCols();
             }
             var colsJson = vColsCollection.toJSON();
-            console.log(this.model)
             this.$el.find('input.select-value-field').each(function(obj) {
                 var name = $(this).attr('name');
                 var selfValue = this;
@@ -486,16 +485,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                     if (!flag) {
                         error = false;
                     }
-                }
-            })
-            vRowsCollection.each(function(obj) {
-                if (obj.get('id') == parent.attr('id')) {
-                    var field_values = obj.get('field_values');
+                } else {
                     field_values[$(elem).attr('name')] = value;
                     obj.set('field_values', field_values);
                 }
-
-            });
+            })
         }
 
         return error;

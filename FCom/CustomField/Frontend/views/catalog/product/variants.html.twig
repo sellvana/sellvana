@@ -2,7 +2,7 @@
 {% set modelField = APP.instance('FCom_CustomField_Model_Field') %}
 {% set varData = APP.instance('FCom_CustomField_Model_ProductVariant').fetchProductVariantsData(prod) %}
 
-{% if varData.fields %}
+{% if varData.fields and varData.variants is not empty %}
     <div id="f-prod-tab-variant">
         {% for field in varData.fields %}
             <div class="form-group" style="overflow: hidden">

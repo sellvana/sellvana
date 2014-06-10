@@ -274,7 +274,7 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
 
     public function action_generate_sitemap()
     {
-        $static_page = $this->FCom_Admin_Controller_Templates->getAreaLayout()->findViewsRegex('#^(static/)[\w\-]+$#');
+        $static_page = $this->FCom_Frontend_Main->getLayout()->findViewsRegex('#^(static/)[\w\-]+$#');
         $site_map = [];
         foreach ($static_page as $view => $arr) {
             array_push($site_map, [
