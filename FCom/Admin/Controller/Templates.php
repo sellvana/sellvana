@@ -12,7 +12,9 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
     public function gridConfig()
     {
         $config = parent::gridConfig();
-
+        unset($config['form_url']);
+        $config['edit_url'] = $this->BApp->href($this->_gridHref . '/form');
+        $config['edit_url_required'] = true;
         $config['columns'] = [
             ['type' => 'row_select'],
             //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),
@@ -49,7 +51,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
             'delete' => ['caption' => 'Remove/Revert'],
         ];
         $config['events'] = ['delete', 'mass-delete'];
-
+        $config['grid_before_create'] = 'template_grid';
         //$config['state'] =array(5,6,7,8);
         return $config;
     }
