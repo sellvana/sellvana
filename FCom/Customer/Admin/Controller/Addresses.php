@@ -18,6 +18,7 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
     {
         $config = parent::gridConfig();
         $config['id'] = 'customer_addresses_grid_' . $customer->id;
+        unset($config['form_url']);
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'index' => 'a.id', 'width' => 80, 'hidden' => true],
@@ -73,11 +74,12 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
 
         $config['orm'] = $this->FCom_Customer_Model_Address->orm($this->_mainTableAlias)
             ->select($this->_mainTableAlias . '.*')->where('customer_id', $customer->id);
-        $config['callbacks'] = ['after_modalForm_render' => 'renderModalAddress', 'after_render' => 'renderAddress'];
+        $config['callbacks'] = ['after_modalForm_render' => 'renderModalAddress'];
+        $config['grid_before_create'] = 'customer_address_grid';
         return ['config' => $config];
     }
 
-    public function action_get_state()
+    public function action_get_state__POST()
     {
         $r = $this->BRequest;
         $result = [];

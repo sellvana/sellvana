@@ -764,9 +764,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
 
                     if (confirm) {
-                        rowsCollection.remove(this.model/*, {silent: true}*/);
+                        rowsCollection.remove(this.model, {silent: true});
                         selectedRows.remove(this.model, {silent: true});
-//                        this._destorySelf();
+                        this._destorySelf();
                     }
                 },
                 _destorySelf: function () {
@@ -1596,8 +1596,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
 
                     //check this form is rendered in default view of grid or not.
-                    if (ev && $(ev.target).prev().hasClass('f-grid-modal-close'))
+                    if (ev && $(ev.target).prev().hasClass('f-grid-modal-close')) {
                         $(ev.target).prev().trigger('click');
+                    }
 
                     BackboneGrid.modalElementVals = {};
 

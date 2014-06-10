@@ -1,11 +1,20 @@
-<form id="form-modules" method="post" name="form-modules" action="{{ THIS.get('form_url') }}">
-  <div class="f-admin-main-view">
-    <header class="f-admin-page-header">
-      <span class="f-page-title">{{ 'Modules'|_ }}</span>
-    </header>
-    <div class="f-admin-main">
-      {{ THIS.view('core/messages') | raw }}
-      {{ THIS.view('core/backbonegrid') | raw }}
-    </div>
-  </div>
-</form>
+<script>
+    require(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
+        window.template_grid = function(grid) {
+            grid.getGridSkeleton().Models.Row.prototype.destroy = function () {
+                var BackboneGrid = grid.getGridSkeleton();
+                if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length > 0) {
+                    var hash = {};
+                    hash.do = 'DELETE';
+                    hash.model = {view_name: this.get('view_name')}
+                    $.post(BackboneGrid.edit_url, hash, function() {
+                        location.reload(true);
+                    });
+                }
+
+                return false;
+            }
+            grid.build();
+        }
+    })
+</script>
