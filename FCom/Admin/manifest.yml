@@ -73,6 +73,8 @@ modules:
                         /settings:
                             POST/config/modules/FCom_Admin/add_js_code: "*"
                             POST/config/modules/FCom_Frontend/add_js_code: "*"
+                        /templates/form:
+                            POST/model/view_contents: "*"
         default_config:
             modules:
                 FCom_Admin:
