@@ -162,3 +162,133 @@ Using custom id/name:
         </div>
     </div>
 {% endmacro %}
+
+{% macro button_add_image(m, arr) %}
+    {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set configId = m.configId %}
+    {% import _self as forms %}
+    {% for obj in arr %}
+        {% set p = view.merge(m, obj) %}
+        {% set value = view.getInputValue(p) %}
+        <div class='form-group {{ p.form_group_class }}'>
+            {{ forms.label(p) }}
+            <div class='{{ p.input_div_class|default('col-md-10')}}'>
+                <div class='box-content'>
+                    <div class='row fileupload-buttonbar'>
+                        <div class='col-sm-12'>
+                    <span class='btn btn-primary fileinput-button btn_add_image'>
+                        <i class='icon-plus icon-white'></i>
+                        <span class="btn_add_text">
+                        {% if value %}
+                            {{ 'Change Image...'|_ }}
+                        {% else %}
+                            {{ 'Add Image...'|_ }}
+                        {% endif %}
+                        </span>
+                        <input class="model-image-url" type="hidden" name="model[{{ p.field }}]" value="{{ value }}"/>
+                    </span>
+                    <span class='btn btn-primary fileinput-button btn_remove_image'
+                          style='display: {% if value %} block; {% else %} none; {% endif %}'>
+                        × {{ 'Remove Image...'|_ }}
+                    </span>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="current-image">
+                        {% if value %}
+                            <img src="{{ p.resizeUrl|replace({'--IMAGE--': value}) }}">
+                        {% endif %}
+                    </div>
+                    <table class='table table-striped' role='presentation'>
+                        <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+        <script>
+            if (typeof (window.image_script_inject) === 'undefined') {
+                window.image_script_inject = true;
+                require(['jquery','underscore','backbone'], function($) {
+                        var $buttonAddImage = $('.btn_{{ configId }}_add');
+                        var gridView ;
+                        $('.btn_add_image').click(function() {
+                            if (!$(this).hasClass('active')) {
+                                $('.btn_add_image').removeClass('active');
+                                $(this).addClass('active');
+                            }
+                            gridView.clearSelectedRows();
+                            $buttonAddImage.addClass('disabled');
+                            if ($(this).hasClass('data-change')) {
+                                $buttonAddImage.html('{{ 'Change'|_ }}');
+                            } else {
+                                $buttonAddImage.html('{{ 'Add'|_ }}');
+                            }
+                            $('#{{ configId }}_modal').modal();
+                        });
+
+                        $('.btn_remove_image').click(function() {
+                            processImage(this, {
+                                text: '{{ 'Add Image...'|_ }}',
+                                display: 'none',
+                                imageTag: '',
+                                path: ''
+                            });
+                            $(this).parents('.form-group').find('.btn_add_image').removeClass('data-change');
+                        });
+
+                        function processImage(el, data) {
+                            var parents = $(el).parents('.form-group');
+                            parents.find('.btn_add_text').html(data.text);
+                            parents.find('.btn_remove_image').css('display', data.display);
+                            parents.find('.current-image').html(data.imageTag);
+                            parents.find('.model-image-url').val(data.path);
+                        }
+                        /*
+                         *MediaGrid registery function
+                         */
+                        window.{{ configId }}_register = function(grid) {
+                            grid.getGridSkeleton().Views.RowView.prototype._selectRow = function(ev) {
+                                var selectedRows = grid.getSelectedRows();
+                                var checked = $(ev.target).is(':checked');
+                                $('.select-row').prop('checked', false);
+                                $(ev.target).prop('checked', checked);
+                                this.model.set('selected', checked);
+                                selectedRows.reset();
+                                if (checked) {
+                                    selectedRows.add(this.model);
+                                    $buttonAddImage.removeClass('disabled');
+                                } else {
+                                    $buttonAddImage.addClass('disabled');
+                                }
+                                ev.stopPropagation();
+                                ev.preventDefault();
+
+                                return;
+                            }
+
+                            grid.build();
+                            gridView = grid.getGridView();
+                            $buttonAddImage.click(function() {
+                                var row = grid.getSelectedRows().at(0);
+                                var path = row.get("folder") + row.get("subfolder") + "/" + row.get("file_name");
+                                var imageTag = '<img src="{{ m.resizeUrl }}" />'.replace(/--IMAGE--/, path);
+                                gridView.clearSelectedRows();
+                                $('.btn_add_image').each(function () {
+                                    if ($(this).hasClass('active')) {
+                                        processImage(this, {
+                                            text: '{{ 'Change Image...'|_ }}',
+                                            display: 'block',
+                                            imageTag: imageTag,
+                                            path: path
+                                        })
+                                        $(this).parents('.form-group').find('.btn_add_image').addClass('data-change');
+                                    }
+                                })
+                            });
+                        }
+
+                });
+            }
+        </script>
+{% endmacro %}
