@@ -29,3 +29,6 @@ modules:
                     request_fields_whitelist:
                         /cms/blocks/form:
                             POST/model/content: "*"
+            FCom_Frontend:
+                observe:
+                    - [ "FCom_Frontend_Controller::beforeDispatch", "FCom_Cms_Frontend.onFrontendIndexBeforeDispatch" ]

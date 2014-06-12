@@ -15,5 +15,25 @@ class FCom_Cms_Frontend extends BClass
             $this->BRouting->get('/' . $prefix . '*nav', 'FCom_Cms_Frontend_Controller.nav');
         }
         */
+
+        $this->BLayout->addMetaDirective('cms_block', 'FCom_Cms_Frontend.metaDirectiveCmsBlockCallback');
+    }
+
+    public function onFrontendIndexBeforeDispatch($args)
+    {
+        if ($args['action'] !== 'index') {
+            return;
+        }
+        $cmsPagesEnabled = $this->BConfig->get('modules/FCom_Cms/page_enable');
+        $indexPage = $this->BConfig->get('modules/FCom_Cms/index_page');
+        if (!$cmsPagesEnabled || !$indexPage) {
+            return;
+        }
+        $args['controller']->forward('page', 'FCom_Cms_Frontend_Controller', ['block' => $indexPage]);
+    }
+
+    public function metaDirectiveCmsBlockCallback($d)
+    {
+        $this->FCom_Cms_Frontend_View_Block->createView($d['name'], ['view_name' => $d['view_name']]);
     }
 }

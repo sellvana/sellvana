@@ -177,7 +177,10 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             return false;
         }
         /** @var FCom_Admin_Model_User */
-        $user = $this->orm()->where(['OR' => ['username' => $username, 'email' => $username]])->find_one();
+        $user = $this->orm()->where(['OR' => [
+            'username' => (string)$username,
+            'email' => (string)$username,
+        ]])->find_one();
         if (!$user || !$user->validatePassword($password)) {
             $this->BLoginThrottle->failure();
             return false;

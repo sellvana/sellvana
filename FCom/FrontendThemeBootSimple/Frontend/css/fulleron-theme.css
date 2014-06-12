@@ -356,7 +356,7 @@ a.btn-link { text-transform:none; }
 .f-prod-listing-filter dl dd .count {
   color:#999;
   }
-  
+
 /* Product Compare */
 .f-widget-prods-compare {
   margin-bottom:10px;
@@ -367,8 +367,13 @@ a.btn-link { text-transform:none; }
   padding-right:5px;
   font-size:1em;
   }
-.f-widget-prods-compare ul { 
+.f-widget-prods-compare ul {
   margin-bottom:0;
+  }
+.f-widget-prods-compare li.item {
+  width:40px;
+  height:40px;
+  vertical-align:middle;
   }
 .btn-compare .glyphicon {
   margin-right:4px;
@@ -380,7 +385,7 @@ a.btn-link { text-transform:none; }
 .btn-compare .glyphicon-check {
   color:#114c87
   }
-  
+
 /* My Account */
 .f-sidebar-nav .list-group-item { border:none; padding:5px 0; }
 .f-sidebar-nav .list-group-item.active,
@@ -534,7 +539,7 @@ a.btn-link { text-transform:none; }
     background:#f5f5f5;
     padding:15px;
     }
-    
+
   /* PAGE: Category */
   .f-catalog-sub-cats > ul > li img {
     margin-bottom:5px;
@@ -542,7 +547,7 @@ a.btn-link { text-transform:none; }
     width:100%;
   }
 }
-    
+
 /* Small Phones */
 @media (min-width: 481px) {
   /* PAGE: Category */
@@ -550,7 +555,7 @@ a.btn-link { text-transform:none; }
     float:left;
     margin-right:10px;
     }
-} 
+}
 
 /* Larger Phones */
 @media (max-width: 767px) {
@@ -666,7 +671,7 @@ a.btn-link { text-transform:none; }
   .f-site-footer dd {
     margin:3px 0;
     }
-    
+
   /* Container: Product Rating & Reviews */
   .f-prod-reviews .f-prod-review-post .f-prod-review-attrs {
     border:1px solid #eee;

@@ -46,8 +46,9 @@ base:
     - { include: base }
     - { hook: main, views: denied, use_meta: true }
 
+# Homepage
 /:
     - { include: base }
     - { view: root, do: [[ addBodyClass, "f-page-home" ]] }
     - { view: head, do: [[ title, "Home Page" ]] }
-    - { hook: main, views: static/index, use_meta: true }
+    - { hook: main, views: index, use_meta: true }

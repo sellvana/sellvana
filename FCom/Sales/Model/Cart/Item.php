@@ -21,9 +21,9 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     public function rowTotal($variantId = null)
     {
         $variants = $this->getData('variants');
-        if ($variants && $variantId) {
+        if ($variants && !is_null($variantId)) {
             $variant = $variants[$variantId];
-            return $variant['price'] * $variant['qty'];
+            return $variant['variant_price'] * $variant['variant_qty'];
         }
         return $this->get('row_total') ? $this->get('row_total') : $this->get('price') * $this->get('qty');
     }
@@ -59,9 +59,12 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if (!$this->create_at) $this->create_at = $this->BDb->now();
-        $this->update_at = $this->BDb->now();
-        $this->data_serialized = $this->BUtil->toJson($this->data);
+        if (!$this->create_at) {
+            $this->set('create_at', $this->BDb->now());
+        }
+        $this->set('update_at', $this->BDb->now());
+//        $this->update_at = $this->BDb->now();
+//        $this->data_serialized = $this->BUtil->toJson($this->data);
         return true;
     }
 

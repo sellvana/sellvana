@@ -630,19 +630,19 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $model->setData('variants_fields', json_decode($data['vfields'], true));
         }
         if (isset($data['variants'])) {
-            $hlp->delete_many('product_id', $model->id);
+            $hlp->delete_many(['product_id'=> $model->id]);
             if (count($data['variants']) > 0) {
                 $variants = $this->BUtil->objectToArray(json_decode($data['variants']));
                 foreach($variants as $arr) {
                     $vr = $hlp->load($arr['id']);
-                    $data =  [
-                                'product_id' => $model->id,
-                                'variant_sku' => $arr['variant_sku'],
-                                'variant_price' => $arr['variant_price'],
-                                'variant_qty' => $arr['variant_qty'],
-                                'field_values' => json_encode($arr['field_values']),
-                                'data_serialized' => json_encode(['variant_file_id' => $arr['variant_file_id']]),
-                             ];
+                    $data = [
+                        'product_id' => $model->id,
+                        'variant_sku' => $arr['variant_sku'],
+                        'variant_price' => $arr['variant_price'],
+                        'variant_qty' => $arr['variant_qty'],
+                        'field_values' => json_encode($arr['field_values']),
+                        'data_serialized' => json_encode(['variant_file_id' => $arr['variant_file_id']]),
+                    ];
                     if ($vr) {
                         $vr->set($data)->save();
                     } else {
@@ -759,9 +759,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $result = $this->FCom_Catalog_Model_Product->orm()
             ->where(['OR' => [
-                ['product_name REGEXP ?', $oldName . '-[0-9]$'],
-                ['local_sku REGEXP ?', $oldSku . '-[0-9]$'],
-                ['url_key REGEXP ?', $oldUrlKey . '-[0-9]$'],
+                ['product_name REGEXP ?', (string)$oldName . '-[0-9]$'],
+                ['local_sku REGEXP ?', (string)$oldSku . '-[0-9]$'],
+                ['url_key REGEXP ?',(string) $oldUrlKey . '-[0-9]$'],
             ]])
             ->order_by_desc('id')->find_one();
         $numberSuffix = 1;
@@ -879,10 +879,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $value = '%' . $r['q'] . '%';
             $result = $this->FCom_Catalog_Model_Product->orm('p')
                 ->where(['OR' => [
-                    ['p.id like ?', $value],
-                    ['p.local_sku like ?', $value],
-                    ['p.url_key like ?', $value],
-                    ['p.product_name like ?', $value],
+                    ['p.id like ?', (string)$value],
+                    ['p.local_sku like ?', (string)$value],
+                    ['p.url_key like ?', (string)$value],
+                    ['p.product_name like ?', (string)$value],
                 ]])->find_one();
             $args['result']['product'] = null;
             if ($result) {
