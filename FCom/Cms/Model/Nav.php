@@ -62,7 +62,7 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
 
             if (($head = $this->BLayout->view('head'))) {
                 $head->title($this->full_name);
-                foreach (explode(',', 'title,description,keywords') as $f) {
+                foreach (['title', 'description', 'keywords'] as $f) {
                     if (($v = $this->get('meta_' . $f))) {
                         $head->meta($f, $v);
                     }

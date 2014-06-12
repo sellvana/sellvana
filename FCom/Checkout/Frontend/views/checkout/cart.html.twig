@@ -36,48 +36,51 @@
                             {% if p %}
                                 {% set pUrl = p.url() %}{% set pName = p.get('product_name') %}
                                 {% if item.data.variants is defined %}
-                                    {% for idVariant, variant in item.data.variants %}
-                                        <tr id="tr-product-{{ p.id }}">
-                                            <td class="f-cart-col-img">
-                                                <a href="{{ pUrl }}" class="f-prod-img">
-                                                    <img src="{{ p.thumbUrl(80, 80) }}" width="80" height="80" alt="{{ pName }}"/>
-                                                </a>
-                                            </td>
-                                            <td class="f-cart-col-name">
-                                                <span class="product-name"><a href="{{ pUrl }}">{{ pName }}</a></span>
-                                                    {% if variant.fields is defined %}
-                                                        <ul>
-                                                            {% for key, value in variant.fields %}
-                                                                <li>{{ field.getFrontendLabel(key) }}: {{ value }}</li>
-                                                            {% endfor %}
-                                                        </ul>
-                                                    {% endif %}
-
-                                            </td>
-                                            <td class="f-cart-col-qty text-center">
-                                                <input type="text" size="3" name="qty[{{ item.id() }}]" value="{{ variant.qty*1 }}" class="f-input-qty input-sm form-control"/>
-                                            </td>
-                                            <td class="f-cart-col-total text-left">
-                                                <div class="checkbox">
-                                                    <label><input type="checkbox" name="remove[]" class="remove-checkbox" value="{{ item.id() }}"> Remove</label></div>
-                                            </td>
-                                            <td class="f-cart-col-price text-right">
-                                                <div class="f-price-group {{ loggedIn ? 'logged-in' : 'logged-out' }}">
-                                                    <span class="f-reg-price">
-                                                      <span class="f-price">{{ variant.price | currency }}</span>
-                                                    </span>
-                                                                </div>
-                                                            </td>
-                                                            <td class="f-cart-col-total text-right">
-                                                                <div class="f-price-group">
-                                                    <span class="f-reg-price">
-                                                      <span class="f-price">{{ item.rowTotal(idVariant) | currency }}</span>
-                                                    </span>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
+                                    {% set variants = item.data.variants %}
+                                {% else  %}
+                                    {% set variants = [{variant_price: item.get('price'), variant_qty: item.get('qty')}] %}
                                 {% endif %}
+                                {% for idVariant, variant in variants %}
+                                    <tr id="tr-product-{{ p.id }}">
+                                        <td class="f-cart-col-img">
+                                            <a href="{{ pUrl }}" class="f-prod-img">
+                                                <img src="{{ p.thumbUrl(80, 80) }}" width="80" height="80" alt="{{ pName }}"/>
+                                            </a>
+                                        </td>
+                                        <td class="f-cart-col-name">
+                                            <span class="product-name"><a href="{{ pUrl }}">{{ pName }}</a></span>
+                                                {% if variant.field_values is defined %}
+                                                    <ul>
+                                                        {% for key, value in variant.field_values %}
+                                                            <li>{{ field.getFrontendLabel(key) }}: {{ value }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% endif %}
+
+                                        </td>
+                                        <td class="f-cart-col-qty text-center">
+                                            <input min="0" type="text" size="3" name="qty[{{ item.id() }}][{{ idVariant }}]" value="{{ variant.variant_qty*1 }}" class="f-input-qty input-sm form-control"/>
+                                        </td>
+                                        <td class="f-cart-col-total text-left">
+                                            <div class="checkbox">
+                                                <label><input type="checkbox" name="remove[{{ item.id() }}][{{ idVariant }}]" class="remove-checkbox" value="{{ item.id() }}"> Remove</label></div>
+                                        </td>
+                                        <td class="f-cart-col-price text-right">
+                                            <div class="f-price-group {{ loggedIn ? 'logged-in' : 'logged-out' }}">
+                                                <span class="f-reg-price">
+                                                  <span class="f-price">{{ variant.variant_price | currency }}</span>
+                                                </span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="f-cart-col-total text-right">
+                                                            <div class="f-price-group">
+                                                <span class="f-reg-price">
+                                                  <span class="f-price">{{ item.rowTotal(idVariant) | currency }}</span>
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
                             {% endif %}
                         {% endfor %}
                         </tbody>

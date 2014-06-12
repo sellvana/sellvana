@@ -6,18 +6,6 @@
 {% set hlp = APP.instance('FCom_Customer_Admin_Controller_Addresses') %}
 {{ THIS.view('core/backbonegrid').set('grid', hlp.getCustomerAddressesGridConfig(m)) | raw }}
 <script>
-    function renderAddress(el, row, col) {
-        var column = col.findWhere({name: 'region'});
-        var options = column.get('options');
-        var region = options[row.country];
-        var td = el.find('td[data-col="region"]');
-        if (typeof (region) != 'undefined') {
-            td.html(region[row.region]);
-        } else {
-            td.html(row.region);
-        }
-    }
-
     function getState (country, rowCurrent) {
         $.post('{{ APP.href('addresses/get_state') }}', {country: country}).done(function (data) {
             var region = $('#region');
@@ -51,4 +39,21 @@
         });
         getState($('#country').val(), rowCurrent);
     }
+    require(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
+        window.customer_address_grid = function(grid) {
+            grid.getGridSkeleton().Views.RowView.prototype.afterRender = function () {
+                var row = this.model.toJSON();
+                var column = _.findWhere(grid.getCols().toJSON(), {name: 'region'});
+                var options = column.options;
+                var region = options[row.country];
+                var td = this.$el.find('td[data-col="region"]');
+                if (typeof (region) != 'undefined') {
+                    td.html(region[row.region]);
+                } else {
+                    td.html(row.region);
+                }
+            }
+            grid.build();
+        }
+    })
 </script>

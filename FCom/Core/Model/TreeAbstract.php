@@ -468,8 +468,8 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 //        }
         $tmpName = $this->get('node_name') . '-';
         $result = $this->orm()->select('node_name')->where([
-            ['node_name REGEXP ?', preg_quote($tmpName) . '[0-9]$'],
-            ['parent_id=?', $data['parent_id']]
+            ['node_name REGEXP ?', preg_quote((string)$tmpName) . '[0-9]$'],
+            ['parent_id=?', (int)$data['parent_id']]
         ])->order_by_desc('id')->find_many();
         $numberSuffix = 1;
         if ($result) {

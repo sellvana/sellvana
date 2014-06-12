@@ -309,3 +309,8 @@ form:
 
 /header_search:
     - { include: base }
+
+/templates:
+    - { include: base }
+    - { hook: main, views: templates }
+    - { view: admin/nav, do: [[ setNav, system/templates ]]}

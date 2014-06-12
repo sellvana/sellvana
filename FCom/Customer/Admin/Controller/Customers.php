@@ -250,10 +250,10 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             $value = '%' . $r['q'] . '%';
             $result = $this->FCom_Customer_Model_Customer->orm()
                 ->where(['OR' => [
-                    ['id like ?', $value],
-                    ['firstname like ?', $value],
-                    ['lastname like ?', $value],
-                    ['email like ?', $value],
+                    ['id like ?', (int)$value],
+                    ['firstname like ?', (string)$value],
+                    ['lastname like ?', (string)$value],
+                    ['email like ?', (string)$value],
                 ]])->find_one();
             $args['result']['customer'] = null;
             if ($result) {

@@ -110,8 +110,8 @@
             $('.f-prod-review-edit').click(function () {
                 var rid = $(this).attr('data-content');
                 $.ajax({
-                    type: 'POST',
-                    url: "{{ APP.href('prodreviews/ajax_review') }}"",
+                    type: 'GET',
+                    url: "{{ APP.href('prodreviews/ajax_review') }}",
                     data: {rid: rid},
                     success: function (data) {
                         if (data.status == 'error') {

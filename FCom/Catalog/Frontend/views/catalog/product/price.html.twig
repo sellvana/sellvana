@@ -1,15 +1,34 @@
-{% set p = THIS.get('prod') %}
-{% if p.get('sale_price') == 0 %}
-    <div class="price-box">
-        FREE
-    </div>
-{% elseif p.get('base_price') != p.get('sale_price') %}
-    <div class="price-box">
-        <div class="old-price"><span class="title">{{ 'Was:' |_ }}</span><span class="price">{{ p.get('base_price') | currency }}</span></div>
-        <div class="new-price"><span class="title">{{ 'Now:' |_ }}</span><span class="price">{{ p.get('sale_price') | currency }}</span></div>
-    </div>
-{% else %}
-    <div class="price-box">
-        <span class="price">{{ p.get('base_price') }}</span>
-    </div>
-{% endif %}
+{% set p = THIS.get('product') %}
+
+  <div class="f-price-group">
+    <table>
+      {% if p.get('base_price') == 0 %}
+        <tr class="f-reg-price">
+          <th class="f-price-label">{{ 'Price:'|_ }}</th>
+          <td class="f-price f-final-price">{{ 'FREE'|_ }}</td>
+        </tr>
+      {% elseif p.get('base_price') != p.get('sale_price') and p.get('sale_price') is not null %}
+        {% if p.get('sale_price') == 0 %}
+          <tr class="f-reg-price">
+            <th class="f-price-label">{{ 'Price:'|_ }}</th>
+            <td class="f-price f-final-price">{{ 'FREE'|_ }}</td>
+          </tr>
+        {% else %}
+          <tr class="f-special-price">
+            <th class="f-price-label">{{ 'Price:'|_ }}</th>
+            <td class="f-price f-final-price">{{ p.get('sale_price') | currency }}</td>
+          </tr>
+        {% endif %}
+        <tr class="f-old-price">
+          <th class="f-price-label">{{ 'Was:'|_ }}</th>
+          <td class="f-price">{{ p.get('base_price') | currency }}</td>
+        </tr>
+      {% else %}
+        <tr class="f-reg-price">
+          <th class="f-price-label">{{ 'Price:'|_ }}</th>
+          <td class="f-price f-final-price">{{ p.get('base_price') | currency }}</td>
+        </tr>
+      {% endif %}
+    </table>
+    {{ THIS.view('customer-groups/puct-tier-prices').set('product', p) | raw }}
+  </div> <!-- /.f-price-group -->

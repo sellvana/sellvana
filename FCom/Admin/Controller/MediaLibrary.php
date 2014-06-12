@@ -375,7 +375,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     $fileName = $fileSPLObject->getFilename();
                     $path = $fileSPLObject->getPath();
                     $subFolder = null;
-                    if (is_file($fullFileName) && exif_imagetype($fullFileName)) {
+                    if (is_file($fullFileName) && getimagesize($fullFileName)) {
                         if ($path != $targetDir) {
                             $path = str_replace('\\', '/', $path);
                             $subFolder = trim(str_replace($targetDir . '/', '', $path));

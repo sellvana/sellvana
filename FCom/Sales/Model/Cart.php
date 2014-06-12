@@ -227,8 +227,6 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $params['qty'] = intval($params['qty']);
         if (empty($params['price']) || !is_numeric($params['price'])) {
             $params['price'] = 0;
-        } else {
-            $params['price'] = $params['price']; //$params['price'] * $params['qty']; // ??
         }
         $item = $this->FCom_Sales_Model_Cart_Item->loadWhere(['cart_id' => $this->id, 'product_id' => $productId]);
         if ($item && $item->promo_id_get == 0) {
@@ -240,21 +238,24 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         }
         if (isset($params['data'])) {
 
-            $data_serialized = $this->BUtil->objectToArray(json_decode($item->data_serialized));
+            $variants = $item->getData('variants');
             $flag = true;
-            if (isset($data_serialized['variants'])) {
-                foreach ($data_serialized['variants'] as &$arr) {
-                    if (in_array($params['data']['variants']['fields'], $arr)) {
+            if (null !== $variants) {
+                foreach ($variants as &$arr) {
+                    if (in_array($params['data']['variants']['field_values'], $arr)) {
                         $flag = false;
-                        $arr['qty'] = $arr['qty'] + $params['data']['variants']['qty'];
+                        $arr['variant_qty'] = $arr['variant_qty'] + $params['qty'];
                     }
                 }
             }
             if ($flag) {
-                $data_serialized['variants'] = (isset($data_serialized['variants']))? $data_serialized['variants'] : [];
-                array_push($data_serialized['variants'], $params['data']['variants']);
+                if (!empty($params['data']['variants'])) {
+                    $params['data']['variants']['variant_qty'] = $params['qty'];
+                    $variants = (null !== $variants)? $variants : [];
+                    array_push($variants, $params['data']['variants']);
+                }
             }
-            $item->set('data', $data_serialized);
+            $item->setData('variants', $variants);
         }
         $item->save();
         if (empty($params['no_calc_totals'])) {

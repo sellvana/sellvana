@@ -14,34 +14,35 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
 
     public function action_upload__POST()
     {
-        $id = $this->BRequest->param('id', true);
         try {
+            $id = $this->BRequest->param('id', true);
             $model = $this->FCom_Catalog_Model_Category->load($id);
             /** @var $model FCom_Catalog_Model_Category */
-            if ($model) {
-                if (isset($_FILES['upload']) && !empty($_FILES['upload']['tmp_name'])) {
-                    //todo:should add check max size
-                    $tmp = $_FILES['upload']['tmp_name'];
-                    $needConvert = (exif_imagetype($tmp) != IMAGETYPE_JPEG) ? true : false; //check if we need convert image to jpg
-                    $dir = $this->FCom_Core_Main->dir($model->imagePath());
-                    $imageFile = $dir . $id . '.jpg';
-                    if (move_uploaded_file($tmp, $imageFile)) {
-                        $results = ['type' => 'success', 'filename' => $id . '.jpg'];
-                        if ($needConvert && !$this->BUtil->convertImage($imageFile, $imageFile, null, null, 'jpg')) {
-                            $results = ['type' => 'error', 'msg' => $this->_('An error occurred while convert image to jpg.')];
-                            $model->deleteImage(); //delete uploaded image
-                        }
-                    } else {
-                        $results = ['type' => 'error', 'msg' => $this->_('An error occurred while uploading image.')];
-                    }
-                } else {
-                    $results = ['type' => 'error', 'msg' => $this->_('No image file uploaded, please check again.')];
-                }
-            } else {
-                $results = ['type' => 'error', 'msg' => $this->_('Cannot load model.')];
+            if (!$model) {
+                throw new BException('Invalid Category ID.');
             }
+            if (!(isset($_FILES['upload']) && !empty($_FILES['upload']['tmp_name']))) {
+                throw new BException('No image file uploaded, please check again.');
+            }
+            //todo:should add check max size
+            $tmp = $_FILES['upload']['tmp_name'];
+            $imgInfo = getimagesize($tmp);
+            if (!$imgInfo) {
+                throw new BException('Invalid Image File');
+            }
+            $needConvert = ($imgInfo[2] != IMAGETYPE_JPEG) ? true : false; //check if we need convert image to jpg
+            $dir = $this->FCom_Core_Main->dir($model->imagePath());
+            $imageFile = $dir . $id . '.jpg';
+            if (!move_uploaded_file($tmp, $imageFile)) {
+                throw new BException('An error occurred while copying uploaded image.');
+            }
+            if ($needConvert && !$this->BUtil->convertImage($imageFile, $imageFile, null, null, 'jpg')) {
+                throw new BException('An error occurred while convert image to jpg.');
+                $model->deleteImage(); //delete uploaded image
+            }
+            $results = ['type' => 'success', 'filename' => $id . '.jpg'];
         } catch (Exception $e) {
-            $results = ['type' => 'error', 'msg' => $e->getMessage()];
+            $results = ['type' => 'error', 'msg' => $this->_($e->getMessage())];
         }
         $this->BResponse->json($results);
     }

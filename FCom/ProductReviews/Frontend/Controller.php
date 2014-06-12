@@ -259,9 +259,9 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             $pr->set($post['review'])->save();
             //$pr->notify(); //todo: confirm about send notify
         }
-        $successMessage = $this->BLocale->_('Edit review successfully!');
+        $successMessage = $this->BLocale->_('Your review updates have been submitted.');
         if ($needApprove) {
-            $successMessage = $this->BLocale->_('Edit review successfully! We will check and approve this review in 24 hours.');
+            $successMessage = $this->BLocale->_('Your review updates have been submitted. The changes will be visible as soon as they are approved.');
         }
         if ($this->BRequest->xhr()) { //ajax request
             if ($valid) {
@@ -274,7 +274,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
                 $this->message($successMessage);
                 $url = $prod->url();
             } else {
-                $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:' . $this->formId);
+                $this->message('Cannot save data, please fix errors above', 'error', 'validator-errors:' . $this->formId);
                 $url = $this->BApp->href('prodreviews/edit?pr=' . $pr->id());
             }
             $this->BResponse->redirect($url);
@@ -283,10 +283,10 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
 
     public function action_ajax_review()
     {
-        $post = $this->BRequest->post();
+        $req = $this->BRequest->request();
         $customerId = $this->FCom_Customer_Model_Customer->sessionUserId();
         $pr = $this->FCom_ProductReviews_Model_Review->loadWhere([
-            'id'          => (int)$post['rid'],
+            'id'          => (int)$req['rid'],
             'customer_id' => $customerId
         ]);
         if (!$pr) {

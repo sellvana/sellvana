@@ -101,12 +101,12 @@ class BLayout extends BClass
      * @var array
      */
     protected static $_metaDirectives = [
-        'remove'   => 'BLayout::metaDirectiveRemoveCallback',
-        'callback' => 'BLayout::metaDirectiveCallback',
-        'include'  => 'BLayout::metaDirectiveIncludeCallback',
-        'root'     => 'BLayout::metaDirectiveRootCallback',
-        'hook'     => 'BLayout::metaDirectiveHookCallback',
-        'view'     => 'BLayout::metaDirectiveViewCallback',
+        'remove'   => 'BLayout.metaDirectiveRemoveCallback',
+        'callback' => 'BLayout.metaDirectiveCallback',
+        'include'  => 'BLayout.metaDirectiveIncludeCallback',
+        'root'     => 'BLayout.metaDirectiveRootCallback',
+        'hook'     => 'BLayout.metaDirectiveHookCallback',
+        'view'     => 'BLayout.metaDirectiveViewCallback',
     ];
 
     protected static $_renderers = [];
@@ -171,6 +171,12 @@ class BLayout extends BClass
             $this->_viewRootDir = $rootDir;
         }
 
+        return $this;
+    }
+
+    public function addMetaDirective($name, $callback)
+    {
+        static::$_metaDirectives[$name] = $callback;
         return $this;
     }
 
@@ -366,7 +372,7 @@ class BLayout extends BClass
                 $viewParams = [
                     'template' => $file,
                     'file_ext' => $m[3],
-                    'module_name' => $curModule,
+                    'module_name' => $curModule->name,
                     'renderer' => static::$_extRenderers[$m[3]]['callback'],
                 ];
                 $this->addView($prefix . $m[2], $viewParams);
@@ -774,7 +780,7 @@ class BLayout extends BClass
                     $d['type'] = $d[0];
                 } else {
                     foreach ($d as $k => $n) {
-                        if (!empty(self::$_metaDirectives[$k])) {
+                        if (!empty(static::$_metaDirectives[$k])) {
                             $d['type'] = $k;
                             $d['name'] = $n;
                             break;
@@ -787,7 +793,7 @@ class BLayout extends BClass
                 }
             }
             $d['type'] = trim($d['type']);
-            if (empty($d['type']) || empty(self::$_metaDirectives[$d['type']])) {
+            if (empty($d['type']) || empty(static::$_metaDirectives[$d['type']])) {
                 BDebug::error('Unknown directive: ' . $d['type']);
                 continue;
             }
@@ -796,7 +802,7 @@ class BLayout extends BClass
             }
             $d['name'] = trim($d['name']);
             $d['layout_name'] = $layoutName;
-            $callback = self::$_metaDirectives[$d['type']];
+            $callback = static::$_metaDirectives[$d['type']];
 
             if ($d['type'] === 'remove') {
                 if ($d['name'] === 'ALL') { //TODO: allow removing specific instructions
