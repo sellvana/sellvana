@@ -117,7 +117,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $uploadConfig         = $this->BConfig->get('uploads/' . $type);
         $uploadConfig['type'] = $type;
         if (isset($uploadConfig['filetype'])) {
-            $uploadConfig['filetype'] = '(\.|\\/)(' . str_replace([','], '|', $uploadConfig['filetype']) . ')$/i';
+            $uploadConfig['filetype'] = '/(\\.|\\/)(' . str_replace([','], '|', $uploadConfig['filetype']) . ')$/i';
         }
 
         if (isset($uploadConfig['permission'])) {
