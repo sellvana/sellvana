@@ -109,6 +109,25 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $this->_formTitle = $m->id ? 'Edit Product: ' . $m->product_name : 'Create New Product';
     }
 
+    /**
+     * @param string $type
+     */
+    public function getUploadConfig( $type)
+    {
+        $uploadConfig         = $this->BConfig->get('uploads/' . $type);
+        $uploadConfig['type'] = $type;
+        if (isset($uploadConfig['filetype'])) {
+            $uploadConfig['filetype'] = '/(\\.|\\/)(' . str_replace([','], '|', $uploadConfig['filetype']) . ')$/i';
+        }
+
+        if (isset($uploadConfig['permission'])) {
+            $canUpload                  = $this->FCom_Admin_Model_User->sessionUser()
+                                                                      ->getPermission($uploadConfig['permission']);
+            $uploadConfig['can_upload'] = $canUpload;
+        }
+        return $uploadConfig;
+    }
+
     public function formPostBefore($args)
     {
         if ($args['do'] == 'DUPLICATE') {

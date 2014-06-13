@@ -238,7 +238,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             $toUpdate = $args['models'];
         } else {
             $toUpdate = $this->orm()
-                  ->where(['parent_id IS NULL', ['OR' => 'id_path IS NULL']])
+                  ->where(['OR' => ['parent_id IS NULL', 'id_path IS NULL']])
                   ->find_many_assoc();
         }
         if (empty($toUpdate)) {

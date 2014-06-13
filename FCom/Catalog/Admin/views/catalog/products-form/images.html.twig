@@ -170,7 +170,9 @@ require(['jquery','underscore','backbone', 'fcom.backbonegrid'], function($, _) 
 });
 </script>
 {{ THIS.view('core/backbonegrid').set('grid', prodImagesConfig) | raw }}
-{{ THIS.view('core/medialib').set('config', {'id': 'all_prod_images', 'folder': 'media/product/images', mode: 'thumbnail', title: 'Images', multiSelAllowed: true}) | raw }}
+{% set upload_config = APP.instance('FCom_Catalog_Admin_Controller_Products').getUploadConfig('product-images') %}
+{{ THIS.view('core/medialib').set('config', {'id': 'all_prod_images', 'folder': 'media/product/images',
+    mode: 'thumbnail', title: 'Images', multiSelAllowed: true, type: upload_config.type}) | raw }}
 
 <input type='hidden' name="grid[images][del]" id='prod-image-remove' />
 <input type='hidden' name="grid[images][rows]" id='prod-image-rows' />
