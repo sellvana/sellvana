@@ -238,16 +238,18 @@ class BModuleRegistry extends BClass
     }
 
     /**
-    * Scan for module manifests in a folder
-    *
-    * Scan can be performed multiple times on different locations, order doesn't matter for dependencies
-    * Wildcards are accepted.
-    *
-    * @see $this->BApp->load() for examples
-    *
-    * @param string $source
-    * @return BModuleRegistry
-    */
+     * Scan for module manifests in a folder
+     *
+     * Scan can be performed multiple times on different locations, order doesn't matter for dependencies
+     * Wildcards are accepted.
+     *
+     * @see $this->BApp->load() for examples
+     *
+     * @param string $source
+     * @param bool   $validateManifests
+     * @throws BException
+     * @return BModuleRegistry
+     */
     public function scan($source, $validateManifests = false)
     {
         // if $source does not end with .json, assume it is a folder
@@ -671,6 +673,7 @@ class BModule extends BClass
     public $security;
     public $custom;
     public $license;
+    public $uploads;
 
     public $is_cached;
     /**

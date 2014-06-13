@@ -3,6 +3,7 @@
 class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 {
     protected $_allowedFolders = [];
+    protected $_uploadConfigs;
 
     public function allowFolder($folder)
     {
@@ -174,28 +175,29 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     }
 
     /**
-    * $options = array(
-    *   'folder' => 'media/product/attachment',
-    *   'subfolder' => null,
-    *   'model_class' => 'FCom_Core_Model_MediaLibrary', (default)
-    *   'on_upload' => function() { },
-    *   'on_edit' => function() { },
-    *   'on_delete' => function() { },
-    * );
-    *
-    * $request['params'] = array(
-    *   'do' => 'upload'|'edit'|'delete'
-    * );
-    *
-    * $request['post'] = array(
-    *   'grid' => 'products', // upload
-    *   'id' => 123, // edit
-    *   'file_name' => 'abc.jpg', // edit
-    *   'delete' => array('abc.jpg', 'def.png'), // delete
-    * );
-    *
-    * @param array $options
-    */
+     * $options = array(
+     *   'folder' => 'media/product/attachment',
+     *   'subfolder' => null,
+     *   'model_class' => 'FCom_Core_Model_MediaLibrary', (default)
+     *   'on_upload' => function() { },
+     *   'on_edit' => function() { },
+     *   'on_delete' => function() { },
+     * );
+     *
+     * $request['params'] = array(
+     *   'do' => 'upload'|'edit'|'delete'
+     * );
+     *
+     * $request['post'] = array(
+     *   'grid' => 'products', // upload
+     *   'id' => 123, // edit
+     *   'file_name' => 'abc.jpg', // edit
+     *   'delete' => array('abc.jpg', 'def.png'), // delete
+     * );
+     *
+     * @param array $options
+     * @throws BException
+     */
     public function processGridPost($options = [])
     {
         $r = $this->BRequest;
@@ -397,6 +399,20 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 $this->BResponse->json(['status' => 'error', 'messages' => $e->getMessage()]);
             }
             break;
+        }
+    }
+
+
+    public function collectUploadConfig($args)
+    {
+        /** @var BModule $module */
+        $module = $args['module'];
+        if(!$module || !$module instanceof BModule){
+            return;
+        }
+        $area = $module->area;
+        if(!empty($module->areas[$area]['uploads'])){
+            $this->_uploadConfigs = $this->BUtil->arrayMerge($this->_uploadConfigs, (array)$module->areas[$area]['uploads']);
         }
     }
 }
