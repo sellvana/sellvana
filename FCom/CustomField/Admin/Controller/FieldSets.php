@@ -133,7 +133,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                             'default' => '', 'addable' => true, 'mass-editable' => true, 'validation' => ['required' => true]],
                     ['type' => 'input', 'name' => 'frontend_label', 'label' => 'Frontend Label', 'width' => 100, 'editable' => true, 'editor' => 'text',
                             'default' => '', 'addable' => true, 'mass-editable' => true, 'validation' => ['required' => true]],
-                    ['type' => 'input', 'name' => 'frontend_show', 'label' => 'Show on frontend', 'width' => 90, 'editor' => 'text',
+                    ['type' => 'input', 'name' => 'frontend_show', 'label' => 'Show on frontend', 'width' => 90,
                             'editable' => true, 'addable' => true, 'mass-editable' => true, 'validation' => ['required' => true],
                             'options' => $fld->fieldOptions('frontend_show'), 'editor' => 'select'],
                     ['type' => 'input', 'name' => 'sort_order', 'label' => 'Sort order', 'width' => 30, 'editable' => true, 'editor' => 'text',

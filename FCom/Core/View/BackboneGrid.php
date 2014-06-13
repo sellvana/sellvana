@@ -919,15 +919,6 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                 }
                 break;
 
-            case 'number-range':
-                if (!empty($filters[$fId]['from'])) {
-                    $this->_processGridFiltersOne($f, 'gte', $filters[$fId]['from'], $orm);
-                }
-                if (!empty($filters[$fId]['val'])) {
-                    $this->_processGridFiltersOne($f, 'lte', $filters[$fId]['val'], $orm);
-                }
-                break;
-
             case 'select':
                 $this->_processGridFiltersOne($f, 'equal', $filters[$fId]['val'], $orm);
                 break;

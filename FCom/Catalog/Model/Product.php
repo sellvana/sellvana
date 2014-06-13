@@ -613,7 +613,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 continue;
             } elseif (!$p) {
                 try {
-                    $p = $this->orm()->create($d)->save();
+                    $p = $this->create($d)->save();
                     $result[]['status'] = 'created';
                 } catch (Exception $e) {
                     $this->BDebug->log($e->getMessage());

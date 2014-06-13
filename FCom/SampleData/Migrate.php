@@ -60,7 +60,7 @@ class FCom_SampleData_Migrate extends BClass
                     "search_type"   => 'none',
                     "sort_type"     => 'none',
                 ];
-                $catalogIndexField = $this->FCom_CatalogIndex_Model_Field->orm()->create($data);
+                $catalogIndexField = $this->FCom_CatalogIndex_Model_Field->create($data);
                 $catalogIndexField->save();
             }
         }

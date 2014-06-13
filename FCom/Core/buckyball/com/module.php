@@ -751,7 +751,7 @@ if ($args['name']==="FCom_Referrals") {
         $m = $this->_getManifestData();
 
         if (!$this->is_cached) {
-            $args = $this->_processAreas($args);
+            $this->_processAreas($args);
 
             if (!empty($this->bootstrap) && empty($this->bootstrap['file'])) {
                 $this->bootstrap['file'] = null;

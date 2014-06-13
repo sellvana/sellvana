@@ -16,7 +16,7 @@ class FCom_Sales_Model_Cart_Total_Subtotal extends FCom_Sales_Model_Cart_Total_A
                 $this->_cart->removeProduct($item->product_id);
             }
             $itemNum++;
-            $item->qty = $item->qty;
+            //$item->qty = $item->qty; //TODO: what's up with that
             $itemQty += $item->qty;
             $variants = $item->getData('variants');
             if (!is_null($variants)) {
