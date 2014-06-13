@@ -17,6 +17,10 @@ modules:
                     permission: catalog/product/import
                     filetype: csv,txt
                     folder: {random}/import/products
+                product-images:
+                    permission: catalog/product/images
+                    filetype: jpeg,jpg,tiff,gif,png,bmp
+                    folder: media/product/images
 
         areas:
             FCom_Admin:
