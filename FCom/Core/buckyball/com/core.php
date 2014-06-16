@@ -1399,7 +1399,7 @@ class BClassDecorator
     */
     static public function __callStatic($name, array $args)
     {
-        return $this->BClassRegistry->callStaticMethod(get_called_class(), $name, $args);
+        return BClassRegistry::i()->callStaticMethod(get_called_class(), $name, $args);
     }
 
     /**
@@ -1504,20 +1504,23 @@ class BClassDecorator
 
 class BClassAutoload extends BClass
 {
-    public $root_dir;
-    public $module_name;
-    public $filename_cb;
+    protected $_pools = [];
 
-    public function __construct($root_dir = null, $module_name = null, $filename_cb = null)
+    public function __construct()
     {
-        if (null !== $root_dir) {
-            $this->root_dir = $root_dir;
-            $this->module_name = $module_name;
-            $this->filename_cb = $filename_cb;
+        spl_autoload_register([$this, 'callback'], false);
+    }
 
-            spl_autoload_register([$this, 'callback'], false);
-            BDebug::debug('AUTOLOAD: ' . print_r($this, 1));
-        }
+    public function addPath($path, $moduleName = null, $filenameCb = null)
+    {
+        $item = [
+            'path' => $path,
+            'module_name' => $moduleName,
+            'filename_cb' => $filenameCb,
+        ];
+        $this->_pools[] = $item;
+        BDebug::debug('AUTOLOAD.addPath: ' . print_r($item, 1));
+        return $this;
     }
 
     /**
@@ -1528,18 +1531,20 @@ class BClassAutoload extends BClass
     public function callback($class)
     {
 #echo $this->root_dir.' : '.$class.'<br>';
-        if ($this->filename_cb) {
-            $file = call_user_func($this->filename_cb, $class);
-        } else {
-            $file = str_replace(['_', '\\'], ['/', '/'], $class) . '.php';
-        }
-        if ($file) {
-            if ($file[0] !== '/' && $file[1] !== ':') {
-                $file = $this->root_dir . '/' . $file;
+        foreach ($this->_pools as $pool) {
+            if (!empty($pool['filename_cb'])) {
+                $file = call_user_func($pool['filename_cb'], $class);
+            } else {
+                $file = str_replace(['_', '\\'], ['/', '/'], $class) . '.php';
             }
-            #if (file_exists($file)) {
-                @include ($file);
-            #}
+            if ($file) {
+                if ($file[0] !== '/' && $file[1] !== ':') {
+                    $file = $pool['path'] . '/' . $file;
+                }
+                if (file_exists($file)) {
+                    include ($file);
+                }
+            }
         }
     }
 }
@@ -2210,18 +2215,30 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         return $msgs;
     }
 
-    public function csrfToken()
+    public function csrfToken($validating = false, $hashReferrer = null)
     {
         $data =& static::dataToUpdate();
         if (empty($data['_csrf_token'])) {
             $data['_csrf_token'] = $this->BUtil->randomString(32);
+        }
+        if (null === $hashReferrer) {
+            $hashReferrer = $this->BConfig->get('web/csrf_check_method') === 'token+referrer';
+        }
+        if ($hashReferrer) {
+            if ($validating) {
+                $url = $this->BRequest->referrer();
+            } else {
+                $url = $this->BRequest->currentUrl();
+            }
+            $url = rtrim($url, '?&#');
+            return sha1($data['_csrf_token'] . $url);
         }
         return $data['_csrf_token'];
     }
 
     public function validateCsrfToken($token)
     {
-        return $token === $this->csrfToken();
+        return $token === $this->csrfToken(true);
     }
 
     public function __destruct()

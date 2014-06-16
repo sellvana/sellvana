@@ -499,11 +499,11 @@ EOT
         $dbName = empty($a[1]) ? static::dbName() : $a[0];
         $tableName = empty($a[1]) ? $fullTableName : $a[1];
         if (!isset(static::$_tables[$dbName][$tableName]['fields'])) {
-            static::$_tables[$dbName][$tableName]['fields'] = BORM::i()
-                ->raw_query("SHOW FIELDS FROM `{$dbName}`.`{$tableName}`", [])->find_many_assoc('Field');
-
+            $res = BORM::i()->raw_query("SHOW FIELDS FROM `{$dbName}`.`{$tableName}`", [])->find_many_assoc('Field');
+            static::$_tables[$dbName][$tableName]['fields'] = $res;
+        } else {
+            $res = static::$_tables[$dbName][$tableName]['fields'];
         }
-        $res = static::$_tables[$dbName][$tableName]['fields'];
         return null === $fieldName ? $res : (isset($res[$fieldName]) ? $res[$fieldName] : null);
     }
 
@@ -760,7 +760,8 @@ EOT
         $isObject = is_object($data);
         $result = [];
         foreach ($data as $k => $v) {
-            if (BDb::ddlFieldInfo($table, $k, $connectionName)) {
+            $fieldInfo = BDb::ddlFieldInfo($table, $k, $connectionName);
+            if ($fieldInfo) {
                 $result[$k] = $isObject ? $data->get($k) : $data[$k];
             }
         }
@@ -1329,6 +1330,7 @@ class BORM extends ORMWrapper
         }
         $this->_data[$key] = $value;
 
+        #var_dump(spl_object_hash($this), get_class($this), $this->_data, $this->_dirty_fields);
     }
 
     /**
@@ -1421,7 +1423,6 @@ class BORM extends ORMWrapper
     protected function _save($replace = false)
     {
         $values = array_values($this->_dirty_fields);
-
 
         if (!$this->_is_new) { // UPDATE
             // If there are no dirty values, do nothing
@@ -2088,7 +2089,7 @@ class BModel extends Model
     {
         if (is_array($key)) {
             foreach ($key as $k => $v) {
-                parent::set($k, $v);
+                $this->set($k, $v);
             }
         } else {
             if (true === $flag || 'ADD' === $flag) {
@@ -2100,7 +2101,14 @@ class BModel extends Model
                     $value += $oldValue;
                 }
             }
-            if (is_scalar($key) && (!(null === $flag || 'IFNULL' === $flag) || null === $this->get($key))) {
+            if (!is_string($key)) {
+                throw new BException('Invalid key type' . print_r($key, 1));
+            }
+            if (null === $flag || 'IFNULL' === $flag) {
+                if (null === $this->get($key)) {
+                    parent::set($key, $value);
+                }
+            } else {
                 parent::set($key, $value);
             }
         }

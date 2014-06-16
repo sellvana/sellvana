@@ -23,14 +23,4 @@ class FCom_Catalog_Model_SearchAlias extends FCom_Core_Model_Abstract
         $sData['search_alias'][$query] = $record->get('target_term');
         return $record->get('target_term');
     }
-
-    public function onBeforeSave()
-    {
-        if (!parent::onBeforeSave()) return false;
-
-        $this->set('create_at', $this->BDb->now(), 'IFNULL');
-        $this->set('update_at', $this->BDb->now());
-
-        return true;
-    }
 }
