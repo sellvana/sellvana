@@ -342,6 +342,62 @@ define(fcomAdminDeps, function ($) {
         return el;
     }
 
+    FCom.Admin.buttonAddImage = function (dataConfig) {
+        var $buttonAddImage = $('.btn_'+ dataConfig.configId +'_add');
+        var textBtnAddImage = '.' + dataConfig.configId + '_btn_add_image';
+        var textBtnRemoveImage = '.' + dataConfig.configId + '_btn_remove_image';
+        $('body').on('click', textBtnAddImage,function() {
+            if (!$(this).hasClass('active')) {
+                $(textBtnAddImage).removeClass('active');
+                $(this).addClass('active');
+            }
+            dataConfig.grid.getGridView().clearSelectedRows();
+            $buttonAddImage.addClass('disabled');
+            if ($(this).hasClass('data-change')) {
+                $buttonAddImage.html(dataConfig.textModalChange);
+            } else {
+                $buttonAddImage.html(dataConfig.textModalAdd);
+            }
+            $('#'+ dataConfig.configId +'_modal').modal();
+
+        });
+        $('body').on('click',textBtnRemoveImage, function() {
+            processImage(this, {
+                text: dataConfig.textAddImage,
+                display: 'none',
+                imageTag: '',
+                path: ''
+            });
+            $(this).parents('.form-group').find(textBtnAddImage).removeClass('data-change');
+        });
+        function processImage(el, data) {
+            var parents = $(el).parents('.form-group');
+            parents.find('.'+ dataConfig.configId +'_btn_add_text').html(data.text);
+            parents.find(textBtnRemoveImage).css('display', data.display);
+            parents.find('.'+ dataConfig.configId +'_current_image').html(data.imageTag);
+            parents.find('.model_image_url').val(data.path);
+        }
+
+        $buttonAddImage.click(function() {
+            var row = dataConfig.grid.getSelectedRows().at(0);
+            var path = row.get("folder") + row.get("subfolder") + "/" + row.get("file_name");
+            var text = '<img src="'+ dataConfig.resizeUrl +'" />';
+            var imageTag = text.replace(/--IMAGE--/, path);
+            dataConfig.grid.getGridView().clearSelectedRows();
+            $(textBtnAddImage).each(function () {
+                if ($(this).hasClass('active')) {
+                    processImage(this, {
+                        text: dataConfig.textChangeImage,
+                        display: 'block',
+                        imageTag: imageTag,
+                        path: path
+                    });
+                    $(this).parents('.form-group').find(textBtnAddImage).addClass('data-change');
+                }
+            })
+        });
+    }
+
     FCom.Admin.ajaxCacheStorage = {}
     FCom.Admin.ajaxCache = function (url, callback) {
         if (callback === null) {

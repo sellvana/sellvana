@@ -5,3 +5,37 @@
 {{ forms.button_add_image(fieldData, [{field:'image_url', label:'Subcategory Image'|_ }, {field:'featured_image_url', label:'Featured Image'|_ }, {field:'nav_callout_image_url', label:'Navigation Callout Image'|_ }]) }}
 {{ THIS.view('core/medialib').set('config', {'id': 'category_images', 'folder': 'media/category/images', title: 'Category Image'}) | raw }}
 
+<script>
+    require(['backbone', 'underscore', 'jquery', 'fcom.admin'], function(Backbone, _, $) {
+        window.category_images_register = function(grid) {
+            grid.getGridSkeleton().Views.RowView.prototype._selectRow = function(ev) {
+                var selectedRows = grid.getSelectedRows();
+                var checked = $(ev.target).is(':checked');
+                $('.select-row').prop('checked', false);
+                $(ev.target).prop('checked', checked);
+                this.model.set('selected', checked);
+                selectedRows.reset();
+                if (checked) {
+                    selectedRows.add(this.model);
+                    $('.btn_category_images_add').removeClass('disabled');
+                } else {
+                    $('.btn_category_images_add').addClass('disabled');
+                }
+                ev.stopPropagation();
+                ev.preventDefault();
+
+                return;
+            }
+            grid.build();
+            FCom.Admin.buttonAddImage({
+                grid: grid,
+                textAddImage: '{{ "Add Image..."|_ }}',
+                textChangeImage: '{{ "Add Image..."|_ }}',
+                textModalAdd: '{{ "Add"|_ }}',
+                textModalChange: '{{ "Change"|_ }}',
+                configId: 'category_images',
+                resizeUrl: '{{ resizeUrl }}'
+            });
+        }
+    })
+</script>
