@@ -17,8 +17,7 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
         if (!$this->_sessionWishlist) {
             $wishlist = $this->loadWhere(["customer_id" => $customer->id()]);
             if (!$wishlist) {
-                $this->orm()->create()->set("customer_id", $customer->id())->save();
-                $wishlist = $this->loadWhere(["customer_id" => $customer->id()]);
+                $wishlist = $this->create(["customer_id" => $customer->id()])->save();
             }
 
             $this->_sessionWishlist = $wishlist;
@@ -56,10 +55,10 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
     {
         $item = $this->FCom_Wishlist_Model_WishlistItem->loadWhere(['wishlist_id' => $this->id(), 'product_id' => $productId]);
         if (!$item) {
-            $item = $this->FCom_Wishlist_Model_WishlistItem->orm()->create();
-            $item->set('wishlist_id', $this->id())
-                    ->set('product_id', $productId);
-            $item->save();
+            $item = $this->FCom_Wishlist_Model_WishlistItem->create([
+                'wishlist_id' => $this->id(),
+                'product_id' => $productId,
+            ])->save();
         }
 
         return $this;
@@ -68,7 +67,7 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
     public function removeItem($item)
     {
         if (is_numeric($item)) {
-            $item = $this->FCom_Wishlist_Model_WishlistItem->loadWhere(['wishlist_id' => $this->id(), 'id' => $productId]);
+            $item = $this->FCom_Wishlist_Model_WishlistItem->loadWhere(['wishlist_id' => $this->id(), 'id' => $item]);
         }
         if ($item) {
             unset($this->items[$item->id()]);

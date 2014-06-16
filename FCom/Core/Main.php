@@ -33,12 +33,12 @@ class FCom_Core_Main extends BClass
                 die();
             }
 
-            return $this->BApp;
-
         } catch (Exception $e) {
             $this->BDebug->dumpLog();
             $this->BDebug->exceptionHandler($e);
         }
+
+        return $this->BApp;
     }
 
     public function run($area)

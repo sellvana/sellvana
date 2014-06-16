@@ -105,7 +105,9 @@ require(['jquery', 'underscore', 'backbone', 'unique', 'fcom.backbonegrid'], fun
 
 
 {{ THIS.view('core/backbonegrid').set('grid', prodAttachConfig) | raw }}
-{{ THIS.view('core/medialib').set('config', {'id': 'all_attachments', 'folder': 'media/product/attachment', mode: 'link', title: 'Attachments', multiSelAllowed: true}) | raw }}
+{% set upload_config = APP.instance('FCom_Catalog_Admin_Controller_Products').getUploadConfig('product-attachments') %}
+{{ THIS.view('core/medialib').set('config', {'id': 'all_attachments', 'folder': 'media/product/attachment',
+    mode: 'link', title: 'Attachments', multiSelAllowed: true, type: upload_config.type, file_types: upload_config.filetype}) | raw }}
 
 <input type='hidden' name="grid[attachments][del]" id='prod-attach-remove' />
 <input type='hidden' name="grid[attachments][rows]" id='prod-attach-rows' />

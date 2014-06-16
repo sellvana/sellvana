@@ -131,7 +131,7 @@ class BDb
         }
         $config = BConfig::i()->get($name === static::$_defaultConnectionName ? 'db' : 'db/named/' . $name);
         if (!$config) {
-            throw new BException($this->BLocale->_('Invalid or missing DB configuration: %s', $name));
+            throw new BException(BLocale::i()->_('Invalid or missing DB configuration: %s', $name));
         }
         if (!empty($config['use'])) { //TODO: Prevent circular reference
             static::connect($config['use']);
@@ -144,7 +144,7 @@ class BDb
             }
         } else {
             if (empty($config['dbname'])) {
-                throw new BException($this->BLocale->_("dbname configuration value is required for '%s'", $name));
+                throw new BException(BLocale::i()->_("dbname configuration value is required for '%s'", $name));
             }
             $engine = !empty($config['engine']) ? $config['engine'] : 'mysql';
             $host = !empty($config['host']) ? $config['host'] : '127.0.0.1';
@@ -158,7 +158,7 @@ class BDb
                     break;
 
                 default:
-                    throw new BException($this->BLocale->_('Invalid DB engine: %s', $engine));
+                    throw new BException(BLocale::i()->_('Invalid DB engine: %s', $engine));
             }
         }
         $profile = BDebug::debug('DB.CONNECT ' . $name);
@@ -212,7 +212,7 @@ class BDb
            if (strlen(trim($query)) > 0) {
                 // try {
                     BDebug::debug('DB.RUN: ' . $query);
-                    if (!empty($options['echo']) && $this->BDebug->is('DEBUG')) {
+                    if (!empty($options['echo']) && BDebug::is('DEBUG')) {
                         echo '<hr><pre>' . $query . '<pre>';
                     }
                     BORM::set_last_query($query);
@@ -514,7 +514,7 @@ EOT
     protected static function checkTable($fullTableName, $connectionName = null)
     {
         if (!static::ddlTableExists($fullTableName, $connectionName)) {
-            throw new BException($this->BLocale->_('Invalid table name: %s', $fullTableName));
+            throw new BException(BLocale::i()->_('Invalid table name: %s', $fullTableName));
         }
     }
 
@@ -529,7 +529,7 @@ EOT
     public static function ddlIndexInfo($fullTableName, $indexName = null, $connectionName = null)
     {
         if (!static::ddlTableExists($fullTableName, $connectionName)) {
-            throw new BException($this->BLocale->_('Invalid table name: %s', $fullTableName));
+            throw new BException(BLocale::i()->_('Invalid table name: %s', $fullTableName));
         }
         $a = explode('.', $fullTableName);
         $dbName = empty($a[1]) ? static::dbName() : $a[0];
@@ -555,7 +555,7 @@ EOT
     public static function ddlForeignKeyInfo($fullTableName, $fkName = null, $connectionName = null)
     {
         if (!static::ddlTableExists($fullTableName, $connectionName)) {
-            throw new BException($this->BLocale->_('Invalid table name: %s', $fullTableName));
+            throw new BException(BLocale::i()->_('Invalid table name: %s', $fullTableName));
         }
         $a = explode('.', $fullTableName);
         $dbName = empty($a[1]) ? static::dbName() : $a[0];
@@ -2047,10 +2047,10 @@ class BModel extends Model
     public static function collection($alias = null)
     {
         $collectionClass = static::$_collectionClass;
-        $orm = $this->orm($alias);
+        $orm = static::orm($alias);
         $collection = $collectionClass::i(true)->setModelClass(static::$_origClass)->setOrm($orm);
 
-        BEvents::i()->fire(static::$_origClass . '::collection', ['collection' => $this, 'orm' => $orm, 'alias' => $alias]);
+        BEvents::i()->fire(static::$_origClass . '::collection', ['collection' => $collection, 'orm' => $orm, 'alias' => $alias]);
         return $collection;
     }
 
@@ -2671,7 +2671,7 @@ class BModel extends Model
         $sql = "UPDATE " . static::table() . " SET " . join(', ', $updates) . ' WHERE '
             . $idField . ' IN (' . join(', ', array_fill(0, sizeof($data), '?')) . ')';
         BDebug::debug('SQL: ' . $sql);
-        return static::run_sql($sql, array_merge($params, $p));
+        return static::run_sql($sql, $params);
     }
 
     /**

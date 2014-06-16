@@ -49,13 +49,14 @@ class FCom_Email_Main extends BClass
                 'status' => 'success',
             ])->save();
             return true;
-        } else if ($errors) {
+        }
+        if ($errors) {
             $msg->set([
                 'status' => 'error',
                 'error_message' => $errors[0]['message'],
                 'num_attempts' => $msg->num_attempts + 1,
             ])->save();
-            return false;
         }
+        return false;
     }
 }

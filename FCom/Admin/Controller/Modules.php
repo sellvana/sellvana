@@ -20,7 +20,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         $adminLevels = $config->get('module_run_levels/FCom_Admin');
         $frontendLevels = $config->get('module_run_levels/FCom_Frontend');
         $modules = $this->BModuleRegistry->getAllModules();
-        $autoRunLevelMods = array_flip(explode(',', 'FCom_Core,FCom_Admin,FCom_Frontend,FCom_Install'));
+        $autoRunLevelMods = ['FCom_Core' => 1, 'FCom_Admin' => 1,'FCom_Frontend' => 1, 'FCom_Install' => 1];
 
         try {
             $schemaVersions = $this->FCom_Core_Model_Module->orm()->find_many_assoc('module_name');

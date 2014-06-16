@@ -13,10 +13,10 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $isLoggedIn = $this->FCom_Customer_Model_Customer->isLoggedIn();
         if (!$isLoggedIn && $r->get('guest') != 'yes' && !in_array($r->rawPath(), $this->_authenticationFree)) {
             $this->BResponse->redirect('checkout/login');
-            return;
+            return false;
         } elseif ($isLoggedIn && $r->rawPath() == '/checkout/login') {
             $this->BResponse->redirect('checkout');
-            return;
+            return true;
         }
         return parent::authenticate($args);
     }

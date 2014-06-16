@@ -45,7 +45,7 @@ class FCom_Customer_ApiServer_V1_Customer extends FCom_ApiServer_Controller_Abst
 
         $data = $this->FCom_Customer_Model_Customer->formatApiPost($post);
 
-        $customer = $this->FCom_Customer_Model_Customer->orm()->create($data)->save();
+        $customer = $this->FCom_Customer_Model_Customer->create($data)->save();
 
         if (!$customer) {
             $this->internalError("Can't create a customer");
