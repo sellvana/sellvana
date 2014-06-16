@@ -133,9 +133,11 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         static::$_sessionCart = null;
     }
 
-    public function merge($cartId)
+    public function merge($cart)
     {
-        $cart = $this->load($cartId);
+        if (is_numeric($cart)) {
+            $cart = $this->load($cart);
+        }
         foreach ($cart->items() as $item) {
             $this->addProduct($item->product_id, ['qty' => $item->qty, 'price' => $item->price]);
         }

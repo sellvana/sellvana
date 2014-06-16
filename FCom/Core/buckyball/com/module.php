@@ -1115,7 +1115,7 @@ if (!isset($o[0]) || !isset($o[1])) {
         } elseif (!$this->BUtil->isPathAbsolute($rootDir)) {
             $rootDir = $this->root_dir . '/' . $rootDir;
         }
-        $this->BClassAutoload->i(true, [rtrim($rootDir, '/'), $this->name, $callback]);
+        $this->BClassAutoload->addPath(rtrim($rootDir, '/'), $this->name, $callback);
         return $this;
     }
 

@@ -405,9 +405,9 @@ class FCom_Core_Main extends BClass
             $config->addFile('local.php', true);
         }
 
-        $this->BClassAutoload->i(true, [$dirConf['local_dir']]);
-        $this->BClassAutoload->i(true, [$dirConf['dlc_dir']]);
-        $this->BClassAutoload->i(true, [$dirConf['root_dir']]);
+        $this->BClassAutoload->addPath($dirConf['local_dir']);
+        $this->BClassAutoload->addPath($dirConf['dlc_dir']);
+        $this->BClassAutoload->addPath($dirConf['root_dir']);
 
         return $this;
     }

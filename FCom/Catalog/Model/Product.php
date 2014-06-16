@@ -195,10 +195,6 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         //todo: check out for unique url_key before save
         if (!$this->get('url_key')) $this->generateUrlKey();
 
-
-        if (!$this->get('create_at'))  $this->set('create_at', $this->BDb->now());
-        $this->set('update_at', $this->BDb->now());
-
         // Cleanup possible bad input
         if ($this->get('sale_price') === '') {
             $this->set('sale_price', null);
