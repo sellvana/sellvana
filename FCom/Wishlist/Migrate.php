@@ -58,6 +58,8 @@ class FCom_Wishlist_Migrate extends BClass
         $tCustomer = $this->FCom_Customer_Model_Customer->table();
         $tProduct = $this->FCom_Catalog_Model_Product->table();
 
+        $this->FCom_Wishlist_Model_WishlistItem->delete_many("wishlist_id not in (select id from {$tWishlist})");
+
         $this->BDb->ddlTableDef($tWishlist, [
             'COLUMNS' => [
                 'customer_id' => 'int unsigned default null',
