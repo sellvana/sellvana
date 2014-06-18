@@ -165,7 +165,7 @@ Using custom id/name:
 
 {% macro button_add_image(m, arr) %}
     {% set view = LAYOUT.view('admin/form-elements') %}
-    {% set configId = m.configId %}
+    {% set configId = m.config_id %}
     {% import _self as forms %}
     {% for obj in arr %}
         {% set p = view.merge(m, obj) %}
@@ -196,7 +196,7 @@ Using custom id/name:
                     <br>
                     <div class="{{ configId }}_current_image">
                         {% if value %}
-                            <img src="{{ p.resizeUrl|replace({'--IMAGE--': value}) }}">
+                            <img src="{{ p.resize_url|replace({'--IMAGE--': value}) }}">
                         {% endif %}
                     </div>
                     <table class='table table-striped' role='presentation'>

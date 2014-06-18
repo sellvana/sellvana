@@ -343,9 +343,9 @@ define(fcomAdminDeps, function ($) {
     }
 
     FCom.Admin.buttonAddImage = function (dataConfig) {
-        var $buttonAddImage = $('.btn_'+ dataConfig.configId +'_add');
-        var textBtnAddImage = '.' + dataConfig.configId + '_btn_add_image';
-        var textBtnRemoveImage = '.' + dataConfig.configId + '_btn_remove_image';
+        var $buttonAddImage = $('.btn_'+ dataConfig.config_id +'_add');
+        var textBtnAddImage = '.' + dataConfig.config_id + '_btn_add_image';
+        var textBtnRemoveImage = '.' + dataConfig.config_id + '_btn_remove_image';
         $('body').on('click', textBtnAddImage,function() {
             if (!$(this).hasClass('active')) {
                 $(textBtnAddImage).removeClass('active');
@@ -354,16 +354,16 @@ define(fcomAdminDeps, function ($) {
             dataConfig.grid.getGridView().clearSelectedRows();
             $buttonAddImage.addClass('disabled');
             if ($(this).hasClass('data-change')) {
-                $buttonAddImage.html(dataConfig.textModalChange);
+                $buttonAddImage.html(dataConfig.text_modal_change);
             } else {
-                $buttonAddImage.html(dataConfig.textModalAdd);
+                $buttonAddImage.html(dataConfig.text_modal_add);
             }
-            $('#'+ dataConfig.configId +'_modal').modal();
+            $('#'+ dataConfig.config_id +'_modal').modal();
 
         });
         $('body').on('click',textBtnRemoveImage, function() {
             processImage(this, {
-                text: dataConfig.textAddImage,
+                text: dataConfig.text_add_image,
                 display: 'none',
                 imageTag: '',
                 path: ''
@@ -372,24 +372,24 @@ define(fcomAdminDeps, function ($) {
         });
         function processImage(el, data) {
             var parents = $(el).parents('.form-group');
-            parents.find('.'+ dataConfig.configId +'_btn_add_text').html(data.text);
+            parents.find('.'+ dataConfig.config_id +'_btn_add_text').html(data.text);
             parents.find(textBtnRemoveImage).css('display', data.display);
-            parents.find('.'+ dataConfig.configId +'_current_image').html(data.imageTag);
+            parents.find('.'+ dataConfig.config_id +'_current_image').html(data.image_tag);
             parents.find('.model_image_url').val(data.path);
         }
 
         $buttonAddImage.click(function() {
             var row = dataConfig.grid.getSelectedRows().at(0);
             var path = row.get("folder") + row.get("subfolder") + "/" + row.get("file_name");
-            var text = '<img src="'+ dataConfig.resizeUrl +'" />';
-            var imageTag = text.replace(/--IMAGE--/, path);
+            var fullPath = dataConfig.resize_url.replace(/--IMAGE--/, path);
+            var imageTag = $('<img/>').attr('src', $('<div/>').html(fullPath).text());
             dataConfig.grid.getGridView().clearSelectedRows();
             $(textBtnAddImage).each(function () {
                 if ($(this).hasClass('active')) {
                     processImage(this, {
-                        text: dataConfig.textChangeImage,
+                        text: dataConfig.text_change_image,
                         display: 'block',
-                        imageTag: imageTag,
+                        image_tag: imageTag,
                         path: path
                     });
                     $(this).parents('.form-group').find(textBtnAddImage).addClass('data-change');

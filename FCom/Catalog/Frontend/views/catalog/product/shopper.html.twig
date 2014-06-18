@@ -8,13 +8,19 @@
         {% for sh in shopper %}
             <div class="form-group" style="overflow: hidden">
                 <label class="col-md-2 control-label">{{ sh.label|_ }}</label>
-                {% set options = sh.options|split(',') %}
                 <div class="col-md-3">
-                    <select name="shopper[{{ sh.name }}]" class="form-control">
-                        {% for op in options %}
-                            <option value="{{ op }}">{{ op|_ }}</option>
-                        {% endfor %}
-                    </select>
+                    {% if sh.input_type == 'select' %}
+                        {% set options = sh.options|split(',') %}
+                        <select name="shopper[{{ sh.name }}]" class="form-control">
+                            {% for op in options %}
+                                <option value="{{ op }}">{{ op|_ }}</option>
+                            {% endfor %}
+                        </select>
+                    {% elseif  sh.input_type == 'textarea' %}
+                        <textarea name="shopper[{{ sh.name }}]" class="form-control" cols="3" rows="2"></textarea>
+                    {% elseif sh.input_type == 'text' %}
+                        <input type="text" name="shopper[{{ sh.name }}]" class="form-control"/>
+                    {% endif %}
                 </div>
                 <label class="col-md-3 control-label">{{ "Price: "~ sh.price|currency |_ }}</label>
             </div>
