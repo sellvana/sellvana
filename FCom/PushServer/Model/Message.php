@@ -24,8 +24,6 @@ class FCom_PushServer_Model_Message extends FCom_Core_Model_Abstract
         if (!parent::onBeforeSave()) return false;
 
         $this->set('seq', microtime(true), 'IFNULL');
-        $this->set('create_at', $this->BDb->now(), 'IFNULL');
-        $this->set('update_at', $this->BDb->now());
 
         return true;
     }

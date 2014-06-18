@@ -8,7 +8,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $catName = $this->BRequest->params('category');
         if ($catName === '' || is_null($catName)) {
             $this->forward(false);
-            return;
+            return $this;
         }
         $category = $this->FCom_Catalog_Model_Category->load($catName, 'url_path');
         if (!$category) {

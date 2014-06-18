@@ -25,7 +25,7 @@ class FCom_Seo_Frontend extends BClass
                     $source = $match[1];
                 }
                 if ($source && !empty($parts['query'])) {
-                    $query = parse_str($parts['query']);
+                    parse_str($parts['query'], $query);
                     switch ($source) {
                         case 'google': case 'bing': case 'ask': case 'aol': case 'alltheweb': case 'duckduckgo':
                             $keywords = !empty($query['q']) ? $query['q'] : null;

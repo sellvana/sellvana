@@ -165,7 +165,7 @@ class FCom_IndexTank_Migrate extends BClass
                 $data['var_number'] = 2;
             }
 
-            $this->FCom_IndexTank_Model_ProductField->orm()->create($data)->save();
+            $this->FCom_IndexTank_Model_ProductField->create($data)->save();
         }
 
         //price range field
@@ -180,7 +180,7 @@ class FCom_IndexTank_Migrate extends BClass
                     'source_type'       => 'function',
                     'source_value'      => 'fieldPriceRange'
             ];
-            $this->FCom_IndexTank_Model_ProductField->orm()->create($data)->save();
+            $this->FCom_IndexTank_Model_ProductField->create($data)->save();
         }
 
 
@@ -193,7 +193,7 @@ class FCom_IndexTank_Migrate extends BClass
                 if ($doc) {
                     continue;
                 }
-                $doc = $this->FCom_IndexTank_Model_ProductField->orm()->create();
+                $doc = $this->FCom_IndexTank_Model_ProductField->create();
 
                 $matches = [];
                 preg_match("#(\w+)#", $f->table_field_type, $matches);

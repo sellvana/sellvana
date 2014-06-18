@@ -120,6 +120,9 @@ class FCom_Core_Model_Abstract extends BModel
             $this->set(static::$_dataSerializedField, $this->BUtil->toJson($data));
         }
 
+        $now = $this->BDb->now();
+        $this->set('create_at', $now, 'IFNULL')->set('update_at', $now);
+
         return true;
     }
 

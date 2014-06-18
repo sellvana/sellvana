@@ -362,7 +362,7 @@ define(['backbone', 'underscore', 'jquery', 'jquery.cookie', 'jquery.tablesorter
 
 
             $(".dropdown_menu").sortable({
-                revert: true,
+                revert: true
             });
 //                $( ".dropdown-menu li" ).draggable({
 //                    connectToSortable: ".dropdown_menu",

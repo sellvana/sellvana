@@ -156,7 +156,7 @@ class BRequest extends BClass
         if (!$whitelist) {
             return true;
         }
-        $httpHost = static::httpHost(false);
+        $httpHost = $this->httpHost(false);
 
         foreach (explode(',', $whitelist) as $allowedHost) {
             if (preg_match('/(^|\.)' . preg_quote(trim($allowedHost, ' .')) .'$/i', $httpHost)) {
@@ -212,7 +212,7 @@ class BRequest extends BClass
 
     public function scheme()
     {
-        return static::https() ? 'https' : 'http';
+        return $this->https() ? 'https' : 'http';
     }
 
     /**
@@ -255,9 +255,9 @@ class BRequest extends BClass
     public function language()
     {
         if (null === static::$_language) {
-            static::rawPath();
+            $this->rawPath();
             if (null === static::$_language) {
-                static::$_language = static::acceptLanguage();
+                static::$_language = $this->acceptLanguage();
             }
         }
         return static::$_language;
@@ -335,7 +335,7 @@ class BRequest extends BClass
     */
     public function scriptDir()
     {
-        return ($script = static::scriptFilename()) ? dirname($script) : null;
+        return ($script = $this->scriptFilename()) ? dirname($script) : null;
     }
 
     protected static $_webRootCache = [];
@@ -353,7 +353,7 @@ class BRequest extends BClass
         if (isset(static::$_webRootCache[$parentDepth])) {
             return static::$_webRootCache[$parentDepth];
         }
-        $scriptName = static::scriptName();
+        $scriptName = $this->scriptName();
         if (empty($scriptName)) {
             return null;
         }
@@ -386,12 +386,12 @@ class BRequest extends BClass
     public function baseUrl($forceSecure = null, $includeQuery = false)
     {
         if (null === $forceSecure) {
-            $scheme = static::https() ? 'https:' : '';
+            $scheme = $this->https() ? 'https:' : '';
         } else {
             $scheme = $forceSecure ? 'https:' : '';
         }
-        $url = $scheme . '//' . static::serverName() . static::webRoot();
-        if ($includeQuery && ($query = static::rawGet())) {
+        $url = $scheme . '//' . $this->serverName() . $this->webRoot();
+        if ($includeQuery && ($query = $this->rawGet())) {
             $url .= '?' . $query;
         }
         return $url;
@@ -406,7 +406,7 @@ class BRequest extends BClass
     */
     public function path($offset, $length = null)
     {
-        $pathInfo = static::rawPath();
+        $pathInfo = $this->rawPath();
         if (empty($pathInfo)) {
             return null;
         }
@@ -438,7 +438,7 @@ class BRequest extends BClass
                 );*/
 
             // nginx rewrite fix
-            $basename = basename(static::scriptName());
+            $basename = basename($this->scriptName());
             $path = preg_replace('#^/.*?' . preg_quote($basename, '#') . '#', '', $path);
 
             if ($this->BConfig->get('web/language_in_url') && preg_match('#^/([a-z]{2})(/.*|$)#', $path, $match)) {
@@ -550,21 +550,23 @@ class BRequest extends BClass
     * @param string $path Optional cookie path, default from config
     * @param string $domain Optional cookie domain, default from config
     */
-    public function cookie($name, $value = null, $lifespan = null, $path = null, $domain = null)
+    public function cookie($name, $value = null, $lifespan = null, $path = null, $domain = null, $secure = null, $httpOnly = null)
     {
         if (null === $value) {
             return isset($_COOKIE[$name]) ? $_COOKIE[$name] : null;
         }
         if (false === $value) {
-            return static::cookie($name, '', -1000);
+            unset($_COOKIE[$name]);
+            return $this->cookie($name, '-CLEAR-', -100000);
         }
 
         $config = $this->BConfig->get('cookie');
         $lifespan = null !== $lifespan ? $lifespan : (!empty($config['timeout']) ? $config['timeout'] : null);
-        $path = null !== $path ? $path : (!empty($config['path']) ? $config['path'] : static::webRoot());
-        $domain = null !== $domain ? $domain : (!empty($config['domain']) ? $config['domain'] : static::httpHost(false));
-
-        setcookie($name, $value, time() + $lifespan, $path, $domain);
+        $path = null !== $path ? $path : (!empty($config['path']) ? $config['path'] : $this->webRoot());
+        $domain = null !== $domain ? $domain : (!empty($config['domain']) ? $config['domain'] : $this->httpHost(false));
+        $secure = null !== $secure ? $secure : $this->https();
+        $httpOnly = null !== $httpOnly ? $httpOnly : true;
+        setcookie($name, $value, time() + $lifespan, $path, $domain, $secure, $httpOnly);
     }
 
     /**
@@ -673,13 +675,13 @@ class BRequest extends BClass
         } elseif (!is_array($httpMethods)) {
             throw new BException('Invalid HTTP Methods argument');
         }
-        if (!in_array(static::method(), $httpMethods)) {
+        if (!in_array($this->method(), $httpMethods)) {
             return false; // not one of checked methods, pass
         }
 
         $whitelist = $c->get('web/csrf_path_whitelist');
         if ($whitelist) {
-            $path = static::rawPath();
+            $path = $this->rawPath();
             foreach ((array)$whitelist as $pattern) {
                 if (preg_match($pattern, $path)) {
                     return false;
@@ -694,7 +696,7 @@ class BRequest extends BClass
 
         switch ($checkMethod) {
             case 'referrer':
-                $ref = static::referrer();
+                $ref = $this->referrer();
                 if (!$ref) {
                     return true; // no referrer sent, high prob. csrf
                 }
@@ -705,26 +707,27 @@ class BRequest extends BClass
                     $webRoot = $c->get('web/base_src');
                 }
                 if (!$webRoot) {
-                    $webRoot = static::webRoot();
+                    $webRoot = $this->webRoot();
                 }
-                if ($p['host'] !== static::httpHost(false) || $webRoot && strpos($p['path'], $webRoot) !== 0) {
+                if ($p['host'] !== $this->httpHost(false) || $webRoot && strpos($p['path'], $webRoot) !== 0) {
                     return true; // referrer host or doc root path do not match, high prob. csrf
                 }
                 return false; // not csrf
 
             case 'origin':
-                $origin = static::httpOrigin();
+                $origin = $this->httpOrigin();
                 if (!$origin) {
                     return true;
                 }
                 $p = parse_url($origin);
-                if ($p['host'] !== static::httpHost(false)) {
+                if ($p['host'] !== $this->httpHost(false)) {
                     return true;
                 }
                 return false;
                 break;
 
             case 'token':
+            case 'token+referrer':
                 if (!empty($_SERVER['HTTP_X_CSRF_TOKEN'])) {
                     $receivedToken = $_SERVER['HTTP_X_CSRF_TOKEN'];
                 } elseif (!empty($_POST['X-CSRF-TOKEN'])) {
@@ -747,11 +750,11 @@ class BRequest extends BClass
     */
     public function verifyOriginHostIp($method = 'OR', $host = null)
     {
-        $ip = static::ip();
+        $ip = $this->ip();
         if (!$host) {
-            $host = static::httpHost(false);
+            $host = $this->httpHost(false);
         }
-        $origin = static::httpOrigin();
+        $origin = $this->httpOrigin();
         $hostIPs = gethostbynamel($host);
         $hostMatches = $host && $method != 'ORIGIN' ? in_array($ip, (array)$hostIPs) : false;
         $originIPs = gethostbynamel($origin);
@@ -772,15 +775,15 @@ class BRequest extends BClass
     */
     public function currentUrl()
     {
-        $host = static::scheme() . '://' . static::httpHost(true);
+        $host = $this->scheme() . '://' . $this->httpHost(true);
         if ($this->BConfig->get('web/hide_script_name') && $this->BRequest->area() !== 'FCom_Admin') {
-            $root = static::webRoot();
+            $root = $this->webRoot();
         } else {
-            $root = static::scriptName();
+            $root = $this->scriptName();
         }
         $root = trim($root, '/');
-        $path = ltrim(static::rawPath(), '/');
-        $get = static::rawGet();
+        $path = ltrim($this->rawPath(), '/');
+        $get = $this->rawGet();
         $url = $host . '/' . ($root ? $root . '/' : '') . $path . ($get ? '?' . $get : '');
         return $url;
     }
@@ -797,7 +800,7 @@ class BRequest extends BClass
         if (empty($parsed['host'])) {
             return true;
         }
-        if ($parsed['host'] !== static::httpHost(false)) {
+        if ($parsed['host'] !== $this->httpHost(false)) {
             return false;
         }
         if ($checkPath) {
@@ -876,7 +879,7 @@ class BRequest extends BClass
         }
         foreach ($data as $k => &$v) {
             $filter = is_array($config[$k]) ? $config[$k][0] : $config[$k];
-            $v = static::sanitizeOne($v, $filter);
+            $v = $this->sanitizeOne($v, $filter);
         }
         unset($v);
         foreach ($config as $k => $c) {
@@ -918,7 +921,7 @@ class BRequest extends BClass
     {
         if (is_array($v)) {
             foreach ($v as $k => &$v1) {
-                $v1 = static::sanitizeOne($v1, $filter);
+                $v1 = $this->sanitizeOne($v1, $filter);
             }
             unset($v1);
             return $v;
@@ -1313,7 +1316,7 @@ class BResponse extends BClass
             $fileName = basename($source);
         }
 
-        static::header([
+        $this->header([
             'Pragma: public',
             'Cache-Control: must-revalidate, post-check=0, pre-check=0',
             'Content-Length: ' . filesize($source),
@@ -1344,7 +1347,7 @@ class BResponse extends BClass
     {
         $this->BSession->close();
 
-        static::header([
+        $this->header([
             'Pragma: public',
             'Cache-Control: must-revalidate, post-check=0, pre-check=0',
             'Content-Type: ' . $this->fileContentType($fileName),
@@ -1375,7 +1378,7 @@ class BResponse extends BClass
         }
         $protocol = $this->BRequest->serverProtocol();
 
-        static::header([
+        $this->header([
             "{$protocol} {$status} {$message}",
             "Status: {$status} {$message}",
         ]);
@@ -1408,7 +1411,7 @@ class BResponse extends BClass
             //header('X-Frame-Options: SAMEORIGIN');
             //header('X-UA-Compatible: IE=edge');
         }
-        static::header($headers);
+        $this->header($headers);
 
         if ($this->_contentType == 'application/json') {
             if (!empty($this->_content)) {
@@ -1475,7 +1478,7 @@ class BResponse extends BClass
     */
     public function httpSTS()
     {
-        static::header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+        $this->header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
         return $this;
     }
 
@@ -1506,13 +1509,13 @@ class BResponse extends BClass
         if (!empty($options['age'])) {
             $headers[] = 'Access-Control-Max-Age: ' . $options['age'];
         }
-        static::header($headers);
+        $this->header($headers);
         return $this;
     }
 
     public function nocache()
     {
-        static::header([
+        $this->header([
             "Expires: Sat, 26 Jul 1997 05:00:00 GMT", // Date in the past
             "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT", // Current time
             "Cache-Control: no-cache, must-revalidate", // HTTP/1.1
@@ -1662,7 +1665,7 @@ class BRouting extends BClass
                 $route = $prefix . $route;
             }
         }
-        #$route = static::processHref($route); // slower than alternative (replacing keys on saveRoute)
+        #$route = $this->processHref($route); // slower than alternative (replacing keys on saveRoute)
         return $route;
     }
 

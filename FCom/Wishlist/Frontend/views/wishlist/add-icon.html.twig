@@ -2,7 +2,7 @@
 {% set wishlist = APP.instance('FCom_Wishlist_Model_Wishlist').sessionWishlist() %}
 
 <a href="{{ APP.href('wishlist/add?id=') ~ p.id() }}" rel="nofollow" data-id="{{ p.id() }}"
-    class="link-wishlist {{ wishlist.hasItem(p.id()) ? 'active' }}" title="Wishlist" data-active="{{ wishlist.hasItem(p.id()) }}">
+    class="link-wishlist {{ wishlist.hasItem(p.id()) ? 'active' }}" title="{{  'Wishlist'|_ }}" data-active="{{ wishlist.hasItem(p.id()) }}">
     <span class="if-not-active"><span class="fa fa-heart-o"></span><span class="label">{{ 'Add to Wishlist'|_ }}</span></span>
     <span class="if-active"><span class="fa fa-heart"></span><span class="label">{{ 'Remove From Wishlist'|_ }}</span></span>
 </a>

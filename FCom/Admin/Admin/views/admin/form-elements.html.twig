@@ -162,3 +162,48 @@ Using custom id/name:
         </div>
     </div>
 {% endmacro %}
+
+{% macro button_add_image(m, arr) %}
+    {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set configId = m.config_id %}
+    {% import _self as forms %}
+    {% for obj in arr %}
+        {% set p = view.merge(m, obj) %}
+        {% set value = view.getInputValue(p) %}
+        <div class='form-group {{ p.form_group_class }}'>
+            {{ forms.label(p) }}
+            <div class='{{ p.input_div_class|default('col-md-10')}}'>
+                <div class='box-content'>
+                    <div class='row fileupload-buttonbar'>
+                        <div class='col-sm-12'>
+                    <span class='btn btn-primary fileinput-button {{ configId }}_btn_add_image'>
+                        <i class='icon-plus icon-white'></i>
+                        <span class="{{ configId }}_btn_add_text">
+                        {% if value %}
+                            {{ 'Change Image...'|_ }}
+                        {% else %}
+                            {{ 'Add Image...'|_ }}
+                        {% endif %}
+                        </span>
+                        <input class="model_image_url" type="hidden" name="model[{{ p.field }}]" value="{{ value }}"/>
+                    </span>
+                    <span class='btn btn-primary fileinput-button {{ configId }}_btn_remove_image'
+                          style='display: {% if value %} block; {% else %} none; {% endif %}'>
+                        × {{ 'Remove Image...'|_ }}
+                    </span>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="{{ configId }}_current_image">
+                        {% if value %}
+                            <img src="{{ p.resize_url|replace({'--IMAGE--': value}) }}">
+                        {% endif %}
+                    </div>
+                    <table class='table table-striped' role='presentation'>
+                        <tbody class='files' data-target='#modal-gallery' data-toggle='modal-gallery'></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endmacro %}

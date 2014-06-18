@@ -9,7 +9,7 @@
 {% set images = prod.media('I') %}
 {% set cat = THIS.get('category') %}
 {% set customFields = prod.getData('custom_fields') %}
-{% set shopper = prod.getData('frontend_fields') %}
+
 {% set productLink = prod.getProductLink() %}
 {% set recentlyViewed = APP.instance('FCom_Catalog_Frontend').getRecentlyViewedProducts() %}
 
@@ -57,7 +57,7 @@
             {{ THIS.hook('catalog/product/details:before_add_cart') | raw }}
             <div class="f-prod-add-cart">
               {{ THIS.view('catalog/product/variants').set('product', prod) | raw }}
-              
+              {{ THIS.view('catalog/product/shopper').set('product', prod) | raw }}
               <p class="f-stock-notice f-in-stock">{{ 'In Stock.'|_ }}</p>
               <p class="f-stock-notice f-out-of-stock" hidden>{{ 'Out Of Stock.'|_ }}</p>
 
@@ -80,29 +80,7 @@
     </div> <!-- /.row -->
     <div class="f-prod-info">
       <div class="tab-content">
-          {% if shopper %}
-              <section class="tab-pane active" id="f-prod-tab-description2">
-                  <div class="f-tab-heading">
-                      <h5 class="f-tab-title">{{ 'Shopper'|_ }}</h5>
-                  </div>
 
-                  {% for sh in shopper %}
-                      <div class="form-group" style="overflow: hidden">
-                          <label class="col-md-2 control-label">{{ sh.label|_ }}</label>
-                          {% set options = sh.options|split(',') %}
-                          <div class="col-md-3">
-                              <select name="{{ sh.name }}" class="form-control">
-                                  {% for op in options %}
-                                      <option value="{{ op }}">{{ op|_ }}</option>
-                                  {% endfor %}
-                              </select>
-                          </div>
-                          <label class="col-md-3 control-label">{{ "Price: "~sh.price |_ }}</label>
-                      </div>
-                  {% endfor %}
-
-              </section>
-          {% endif %}
         <section class="tab-pane active" id="f-prod-tab-description">
           <div class="f-tab-heading">
             <h5 class="f-tab-title">{{ 'Product Description'|_ }}</h5>

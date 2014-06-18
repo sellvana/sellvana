@@ -56,7 +56,7 @@ class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
         $data = $this->FCom_Sales_Model_Order->formatApiPost($post);
         $order = false;
         try {
-            $order = $this->FCom_Sales_Model_Order->orm()->create($data)->save();
+            $order = $this->FCom_Sales_Model_Order->create($data)->save();
         } catch (Exception $e) {
             $this->internalError("Can't create an order");
         }

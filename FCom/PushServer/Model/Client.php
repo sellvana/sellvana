@@ -124,7 +124,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     {
         $client = $this->FCom_PushServer_Model_Client->sessionClient();
 
-        if (!isset($request['window_name']) || !isset($request['conn_id'])) {
+        if (!isset($request['window_name']) || !isset($request['conn_id'])
+            || !is_string($request['window_name']) || !is_string($request['conn_id'])
+        ) {
             $client->send([
                 'signal' => 'error',
                 'description' => 'Missing window_name or conn_id',
@@ -273,7 +275,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     public function sync()
     {
         $msgHlp = $this->FCom_PushServer_Model_Message;
-        $where = ['client_id' => $this->get('id'), 'window_name' => static::$_windowName, 'status' => 'published'];
+        $where = ['client_id' => $this->get('id'), 'window_name' => (string)static::$_windowName, 'status' => 'published'];
         $msgHlp->update_many(['status' => 'locked'], $where);
         $where['status'] = 'locked';
         $messageModels = $msgHlp->orm('m')->where($where)->find_many_assoc();
