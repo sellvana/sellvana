@@ -2,7 +2,7 @@
 {% set billing = order.billing() %}
 <!--{ Content-Type: text/html; charset=UTF-8 }-->
 <!--{ From: "{{ CONFIG.get('modules/FCom_Core/email/support_name') }}" <[{{ CONFIG.get('modules/FCom_Core/email/support_email') }}]> }-->
-<!--{ To: "{{ billing.get('firstname') ~ ' ' ~ billing.get('lastname') }}" <{{ order.get('email') }}> }-->
+<!--{ To: "{{ billing.get('firstname') ~ ' ' ~ billing.get('lastname') }}" <{{ order.get('customer_email') }}> }-->
 <!--{ Subject: Thank your for payment. }-->
 
 Hello, {{ billing.get('firstname') }}.
