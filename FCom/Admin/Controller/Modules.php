@@ -97,7 +97,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
         $areaRunLevelOptions = $this->FCom_Core_Model_Module->fieldOptions('core_run_level');
         $runStatusOptions = $this->FCom_Core_Model_Module->fieldOptions('run_status');
         $config = parent::gridConfig();
-
+        unset($config['form_url']);
         $config['columns'] = [
             ['type' => 'row_select'],
             //array('name' => 'id', 'label' => 'ID', 'index' => 'm.id', 'width' => 55, 'hidden' => true, 'cell' => 'integer'),

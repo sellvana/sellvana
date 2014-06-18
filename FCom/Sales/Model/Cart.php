@@ -242,11 +242,13 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
             $variants = $item->getData('variants');
             $flag = true;
+            $params['data']['variants']['field_values'] = $this->BUtil->fromJson($params['data']['variants']['field_values']);
             if (null !== $variants) {
                 foreach ($variants as &$arr) {
                     if (in_array($params['data']['variants']['field_values'], $arr)) {
                         $flag = false;
                         $arr['variant_qty'] = $arr['variant_qty'] + $params['qty'];
+                        $arr['shopper'] = $params['shopper'];
                     }
                 }
             }
@@ -254,6 +256,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 if (!empty($params['data']['variants'])) {
                     $params['data']['variants']['variant_qty'] = $params['qty'];
                     $variants = (null !== $variants)? $variants : [];
+                    $params['data']['variants']['shopper'] = $params['shopper'];
                     array_push($variants, $params['data']['variants']);
                 }
             }

@@ -555,7 +555,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $this->_processGridFilters($config, $persFilters, $orm);
 
             $config['state'] = $persState;
-
+            $grid['request'] = (empty($grid['request']))? $persState: $grid['request'];
             try {
                 $grid['result'] = $orm->paginate($grid['request'], [
                     's' => !empty($config['state']['s'])  ? $config['state']['s']  : null,
@@ -577,7 +577,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         //$mapColumns = array();
         //$this->_processGridJoins($config, $mapColumns, $orm, 'before_count');
 
-        foreach ($grid['config'] ['columns'] as &$column) {
+        foreach ($grid['config']['columns'] as &$column) {
             unset($column['index']);
         }
         unset($column);
