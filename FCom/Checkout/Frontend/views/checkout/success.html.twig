@@ -37,12 +37,37 @@
                                 <th>{{ "Total" | _ }}</th>
                             </tr>
                             {% for item in order.items %}
-                                <tr>
-                                    <td>{{ item.get('id') }}</td>
-                                    <td>{{ THIS.view('checkout/success/item').set('product', UTIL.fromJson(item.get('product_info'))) | raw }} </td>
-                                    <td>{{ item.get('qty') }} </td>
-                                    <td>{{ item.get('total') }} </td>
-                                </tr>
+                                {% if item.data.variants is defined %}
+                                    {% set variants = item.data.variants %}
+                                {% else  %}
+                                    {% set variants = [{variant_price: item.get('price'), variant_qty: item.get('qty')}] %}
+                                {% endif %}
+                                {% for idVariant, variant in variants %}
+                                    <tr>
+                                        <td>{{ item.get('id') }}</td>
+                                        <td>
+                                            {{ THIS.view('checkout/success/item').set('product', UTIL.fromJson(item.get('product_info'))) | raw }}
+                                            {{ dump(item) }}
+                                            {% if variant.field_values is defined %}
+                                                <ul>
+                                                    {% for key, value in variant.field_values %}
+                                                        <li>{{ field.getFrontendLabel(key) }}: {{ value }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                            {% if variant.shopper is defined %}
+                                                <label class="col-md-12 control-label">{{ "Shopper"|_ }}</label>
+                                                <ul>
+                                                    {% for key, value in variant.shopper %}
+                                                        <li>{{ field.getFrontendLabel(key) }}: {{ value }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ variant.variant_qty }} </td>
+                                        <td>{{ item.get('total') }} </td>
+                                    </tr>
+                                {% endfor %}
                             {% endfor %}
                         </table>
                     </div>

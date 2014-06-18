@@ -56,7 +56,14 @@
                                                         {% endfor %}
                                                     </ul>
                                                 {% endif %}
-
+                                                {% if variant.shopper is defined %}
+                                                    <label class="col-md-12 control-label">{{ "Shopper"|_ }}</label>
+                                                    <ul>
+                                                        {% for key, value in variant.shopper %}
+                                                            <li>{{ field.getFrontendLabel(key) }}: {{ value }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% endif %}
                                         </td>
                                         <td class="f-cart-col-qty text-center">
                                             <input min="0" type="text" size="3" name="qty[{{ item.id() }}][{{ idVariant }}]" value="{{ variant.variant_qty*1 }}" class="f-input-qty input-sm form-control"/>
