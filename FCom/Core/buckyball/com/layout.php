@@ -345,6 +345,8 @@ class BLayout extends BClass
      */
     public function addAllViews($rootDir, $prefix = '', $curModule = null)
     {
+        #$this->BDebug->debug(__METHOD__ . ': ' . $rootDir . ($curModule ? ' (' . $curModule->name . ')' : ''));
+
         if (null === $curModule) {
             $curModule = $this->BModuleRegistry->currentModuleName();
         }
@@ -965,9 +967,27 @@ class BLayout extends BClass
     public function addTheme($themeName, $params)
     {
         BDebug::debug('THEME.ADD ' . $themeName);
-        $this->_themes[$themeName] = $params;
+
+        foreach (['parent', 'layout_before', 'layout_after', 'views_before', 'views_after'] as $k) {
+            if (!empty($params[$k])) {
+                $params[$k] = (array)$params[$k];
+            }
+        }
+
+        if (empty($this->_themes[$themeName])) {
+            $this->_themes[$themeName] = $params;
+        } else {
+            $this->_themes[$themeName] = $this->BUtil->arrayMerge($this->_themes[$themeName], $params);
+        }
 
         return $this;
+    }
+
+    public function updateTheme($themeName, $params)
+    {
+        BDebug::debug('THEME.UPDATE ' . $themeName);
+        //TODO: figure out if needed a separate method for update
+        return $this->addTheme($themeName, $params);
     }
 
     /**
@@ -992,35 +1012,6 @@ class BLayout extends BClass
         }
 
         return $themes;
-    }
-
-    /**
-     * @param null $themeName
-     * @return $this
-     */
-    public function applyTheme($themeName = null)
-    {
-        if (null === $themeName) {
-            if (!$this->_defaultTheme) {
-                BDebug::error('Empty theme supplied and no default theme is set');
-            }
-            $themeName = $this->_defaultTheme;
-        }
-        if (is_array($themeName)) {
-            foreach ($themeName as $n) {
-                $this->applyTheme($n);
-            }
-            return $this;
-        }
-        BDebug::debug('THEME.APPLY ' . $themeName);
-        $this->BEvents->fire('BLayout::applyTheme:before', ['theme_name' => $themeName]);
-
-        $this->loadTheme($themeName);
-        $this->loadLayoutFilesFromAllModules();
-
-        $this->BEvents->fire('BLayout::applyTheme:after', ['theme_name' => $themeName]);
-
-        return $this;
     }
 
     public function loadTheme($themeName)
@@ -1048,12 +1039,18 @@ class BLayout extends BClass
 
         $this->BEvents->fire('BLayout::loadTheme:before', ['theme_name' => $themeName, 'theme' => $theme]);
 
-        $modRootDir = !empty($theme['module_name']) ? $this->BModuleRegistry->module($theme['module_name'])->root_dir . '/' : '';
-        if (!empty($theme['layout'])) {
-            $this->loadLayout($modRootDir . $theme['layout']);
+        $mod = !empty($theme['module_name']) ? $this->BModuleRegistry->module($theme['module_name']) : null;
+        $modRootDir = $mod ? $mod->root_dir . '/' : '';
+
+        if (!empty($theme['layout_before'])) {
+            foreach ((array)$theme['layout_before'] as $layoutBefore) {
+                $this->loadLayout($modRootDir . $layoutBefore);
+            }
         }
-        if (!empty($theme['views'])) {
-            $this->addAllViews($modRootDir . $theme['views']);
+        if (!empty($theme['views_before'])) {
+            foreach ((array)$theme['views_before'] as $viewsBefore) {
+                $this->addAllViews($modRootDir . $viewsBefore, '', $mod);
+            }
         }
         if (!empty($theme['callback'])) {
             $this->BUtil->call($theme['callback']);
@@ -1062,6 +1059,50 @@ class BLayout extends BClass
         $this->BEvents->fire('BLayout::loadTheme:after', ['theme_name' => $themeName, 'theme' => $theme]);
 
         return true;
+    }
+
+    /**
+     * @param null $themeName
+     * @return $this
+     */
+    public function applyTheme($themeName = null)
+    {
+        if (null === $themeName) {
+            if (!$this->_defaultTheme) {
+                BDebug::error('Empty theme supplied and no default theme is set');
+            }
+            $themeName = $this->_defaultTheme;
+        }
+        if (is_array($themeName)) {
+            foreach ($themeName as $n) {
+                $this->applyTheme($n);
+            }
+            return $this;
+        }
+        BDebug::debug('THEME.APPLY ' . $themeName);
+        $this->BEvents->fire('BLayout::applyTheme:before', ['theme_name' => $themeName]);
+
+        $this->loadTheme($themeName);
+        $this->loadLayoutFilesFromAllModules();
+
+        $theme = $this->_themes[$themeName];
+        $mod = !empty($theme['module_name']) ? $this->BModuleRegistry->module($theme['module_name']) : null;
+        $modRootDir = $mod ? $mod->root_dir . '/' : '';
+
+        if (!empty($theme['views_after'])) {
+             foreach ((array)$theme['views_after'] as $viewsAfter) {
+                $this->addAllViews($modRootDir . $viewsAfter, '', $mod);
+            }
+        }
+        if (!empty($theme['layout_after'])) {
+            foreach ((array)$theme['layout_after'] as $layoutAfter) {
+                $this->loadLayout($modRootDir . $layoutAfter);
+            }
+        }
+
+        $this->BEvents->fire('BLayout::applyTheme:after', ['theme_name' => $themeName]);
+
+        return $this;
     }
 
     /**

@@ -5,10 +5,9 @@ modules:
         description: Bootstrap 3.x simple theme
         require: { module: { FCom_Frontend: 0.1.0 } }
 
-        provides:
-            themes:
-                FCom_FrontendThemeBootSimple:
-                    name: Simple Bootstrap Theme
-                    area: FCom_Frontend
-                    layout: Frontend/layout.yml
-                    parent: FCom_Frontend_DefaultTheme
+        themes:
+            FCom_FrontendThemeBootSimple:
+                name: Simple Bootstrap Theme
+                area: FCom_Frontend
+                parent: FCom_Frontend_DefaultTheme
+                layout_before: Frontend/layout.yml
