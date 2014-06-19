@@ -41,7 +41,7 @@ class FCom_Customer_ApiServer_V1_Address extends FCom_ApiServer_Controller_Abstr
         $data = $this->FCom_Customer_Model_Address->formatApiPost($post);
         $data['customer_id'] = $post['customer_id'];
 
-        $address = $this->FCom_Customer_Model_Address->orm()->create($data)->save();
+        $address = $this->FCom_Customer_Model_Address->create($data)->save();
 
         if (!$address) {
             $this->internalError("Can't create a customer address");

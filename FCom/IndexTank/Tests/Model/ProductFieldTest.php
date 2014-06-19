@@ -18,7 +18,7 @@ class FCom_IndexTank_Tests_Model_ProductFieldTest extends FCom_Test_DatabaseTest
             'source_value'      => "description",
             'search'            => 1
         ];
-        $this->FCom_IndexTank_Model_ProductField->orm()->create($data)->save();
+        $this->FCom_IndexTank_Model_ProductField->create($data)->save();
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_indextank_product_field'), "Insert failed");
     }

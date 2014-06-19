@@ -75,8 +75,6 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if (!$this->get('role_id')) {
             $this->set('role_id', null);
         }
-        $this->set('create_at', $this->BDb->now(), 'IFNULL');
-        $this->set('update_at', $this->BDb->now());
 
         return true;
     }

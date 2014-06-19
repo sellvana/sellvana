@@ -227,7 +227,7 @@ class FCom_IndexTank_Admin extends BClass
         $fieldName = $this->FCom_IndexTank_Index_Product->getCustomFieldKey($cfModel);
         $doc = $this->FCom_IndexTank_Model_ProductField->orm()->where('field_name', $fieldName)->find_one();
         if (!$doc) {
-            $doc = $this->FCom_IndexTank_Model_ProductField->orm()->create();
+            $doc = $this->FCom_IndexTank_Model_ProductField->create();
             $matches = [];
             preg_match("#(\w+)#", $cfModel->table_field_type, $matches);
             $type = $matches[1];

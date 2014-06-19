@@ -40,7 +40,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
 
         $address = $this->FCom_Sales_Model_Cart_Address->orm()->where("cart_id", $cart->id())->where('atype', $addressType)->find_one();
         if (!$address) {
-            $address = $this->FCom_Sales_Model_Cart_Address->orm()->create();
+            $address = $this->FCom_Sales_Model_Cart_Address->create();
             $address->cart_id = $cart->id();
             if ($atype == 's') {
                 $address->atype = 'shipping';
@@ -93,7 +93,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         /* @var FCom_Sales_Model_Cart_Address $address */
         $address = $cart->getAddressByType($addressType);
         if (!$address) {
-            $address = $this->FCom_Sales_Model_Cart_Address->orm()->create();
+            $address = $this->FCom_Sales_Model_Cart_Address->create();
         }
         if (!$address->validate($r, [], 'address-form')) {
             $this->BResponse->redirect("checkout/address?t=" . $atype);
@@ -111,7 +111,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             //copy shipping address to billing address
             $addressCopy = $cart->getAddressByType($addressType2);
             if (!$addressCopy) {
-                $addressCopy = $this->FCom_Sales_Model_Cart_Address->orm()->create();
+                $addressCopy = $this->FCom_Sales_Model_Cart_Address->create();
                 $addressCopy->cart_id = $cart->id();
             }
             $addressCopy->set($r);

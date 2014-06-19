@@ -16,13 +16,13 @@ class FCom_IndexTank_Tests_Model_ProductFunctionTest extends FCom_Test_DatabaseT
             'number'        => "2",
             'definition'       => '-d[0]'
         ];
-        $this->FCom_IndexTank_Model_ProductFunction->orm()->create($data)->save();
+        $this->FCom_IndexTank_Model_ProductFunction->create($data)->save();
         $data = [
             'name'        => "base_price_desc",
             'number'        => "3",
             'definition'       => 'd[0]'
         ];
-        $this->FCom_IndexTank_Model_ProductFunction->orm()->create($data)->save();
+        $this->FCom_IndexTank_Model_ProductFunction->create($data)->save();
 
         $this->assertEquals(4, $this->getConnection()->getRowCount('fcom_indextank_product_function'), "Insert failed");
     }

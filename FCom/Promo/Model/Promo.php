@@ -127,10 +127,7 @@ class FCom_Promo_Model_Promo extends BModel
 
         $this->setDate($this->get("from_date"), 'from_date');
         $this->setDate($this->get("to_date"), 'to_date');
-        $this->set('update_at', date('Y-m-d H:i:s'));
-        if ($this->BUtil->isEmptyDate($this->get('create_at'))) {
-            $this->set('create_at', date('Y-m-d H:i:s'));
-        }
+
         return true;
     }
 

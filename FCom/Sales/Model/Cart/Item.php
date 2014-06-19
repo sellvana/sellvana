@@ -56,18 +56,6 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
         return $this->qty;
     }
 
-    public function onBeforeSave()
-    {
-        if (!parent::onBeforeSave()) return false;
-        if (!$this->create_at) {
-            $this->set('create_at', $this->BDb->now());
-        }
-        $this->set('update_at', $this->BDb->now());
-//        $this->update_at = $this->BDb->now();
-//        $this->data_serialized = $this->BUtil->toJson($this->data);
-        return true;
-    }
-
     public function onAfterLoad()
     {
         parent::onAfterLoad();

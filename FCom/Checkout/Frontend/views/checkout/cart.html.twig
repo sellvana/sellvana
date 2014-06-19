@@ -13,7 +13,7 @@
 {% else %}
     {{ THIS.view('core/messages') | raw }}
     <div class="row">
-        <div class="f-widget f-widget-cart f-col-cart-content col-md-9">
+        <div class="f-widget f-widget-cart f-col-cart-content col-md-8 col-lg-9">
             <header class="f-widget-header">
                 <strong class="f-widget-title">Items in cart</strong>
             </header>
@@ -97,7 +97,7 @@
                 </form>
             </div><!-- /.table-responsive -->
         </div>
-        <div class="f-col-cart-totals col-md-3">
+        <div class="f-col-cart-totals col-md-4 col-md-3">
             <table class="table">
                 {% for total in cart.getTotals() %}
                     {% if not total.isHidden() %}
