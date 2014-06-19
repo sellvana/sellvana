@@ -41,7 +41,8 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
 
     }
 
-    public function onBeforeDelete() {
+    public function onBeforeDelete()
+    {
         if (!parent::onBeforeDelete()) return false;
 
         $customer = $this->relatedModel("FCom_Customer_Model_Customer", $this->customer_id);

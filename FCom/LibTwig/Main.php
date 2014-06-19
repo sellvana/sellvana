@@ -24,7 +24,7 @@ class FCom_LibTwig_Main extends BClass
 
     public function init($path = null)
     {
-        $this->BClassAutoload->i(true, [__DIR__ . '/lib']);
+        $this->BClassAutoload->addPath(__DIR__ . '/lib');
         /*
         require_once __DIR__.'/lib/Twig/Autoloader.php';
         Twig_Autoloader::register();

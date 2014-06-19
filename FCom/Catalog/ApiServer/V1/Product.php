@@ -37,7 +37,7 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_ApiServer_Controller_Abstra
         $data = $this->FCom_Catalog_Model_Product->formatApiPost($post);
         $product = false;
         try {
-            $product = $this->FCom_Catalog_Model_Product->orm()->create($data)->save();
+            $product = $this->FCom_Catalog_Model_Product->create($data)->save();
         } catch (Exception $e) {
             if (23000 == $e->getCode()) {
                 $this->internalError("Duplicate product name");

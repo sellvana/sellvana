@@ -131,7 +131,7 @@ class BDb
         }
         $config = BConfig::i()->get($name === static::$_defaultConnectionName ? 'db' : 'db/named/' . $name);
         if (!$config) {
-            throw new BException($this->BLocale->_('Invalid or missing DB configuration: %s', $name));
+            throw new BException(BLocale::i()->_('Invalid or missing DB configuration: %s', $name));
         }
         if (!empty($config['use'])) { //TODO: Prevent circular reference
             static::connect($config['use']);
@@ -144,7 +144,7 @@ class BDb
             }
         } else {
             if (empty($config['dbname'])) {
-                throw new BException($this->BLocale->_("dbname configuration value is required for '%s'", $name));
+                throw new BException(BLocale::i()->_("dbname configuration value is required for '%s'", $name));
             }
             $engine = !empty($config['engine']) ? $config['engine'] : 'mysql';
             $host = !empty($config['host']) ? $config['host'] : '127.0.0.1';
@@ -158,7 +158,7 @@ class BDb
                     break;
 
                 default:
-                    throw new BException($this->BLocale->_('Invalid DB engine: %s', $engine));
+                    throw new BException(BLocale::i()->_('Invalid DB engine: %s', $engine));
             }
         }
         $profile = BDebug::debug('DB.CONNECT ' . $name);
@@ -212,7 +212,7 @@ class BDb
            if (strlen(trim($query)) > 0) {
                 // try {
                     BDebug::debug('DB.RUN: ' . $query);
-                    if (!empty($options['echo']) && $this->BDebug->is('DEBUG')) {
+                    if (!empty($options['echo']) && BDebug::is('DEBUG')) {
                         echo '<hr><pre>' . $query . '<pre>';
                     }
                     BORM::set_last_query($query);
@@ -499,11 +499,11 @@ EOT
         $dbName = empty($a[1]) ? static::dbName() : $a[0];
         $tableName = empty($a[1]) ? $fullTableName : $a[1];
         if (!isset(static::$_tables[$dbName][$tableName]['fields'])) {
-            static::$_tables[$dbName][$tableName]['fields'] = BORM::i()
-                ->raw_query("SHOW FIELDS FROM `{$dbName}`.`{$tableName}`", [])->find_many_assoc('Field');
-
+            $res = BORM::i()->raw_query("SHOW FIELDS FROM `{$dbName}`.`{$tableName}`", [])->find_many_assoc('Field');
+            static::$_tables[$dbName][$tableName]['fields'] = $res;
+        } else {
+            $res = static::$_tables[$dbName][$tableName]['fields'];
         }
-        $res = static::$_tables[$dbName][$tableName]['fields'];
         return null === $fieldName ? $res : (isset($res[$fieldName]) ? $res[$fieldName] : null);
     }
 
@@ -514,7 +514,7 @@ EOT
     protected static function checkTable($fullTableName, $connectionName = null)
     {
         if (!static::ddlTableExists($fullTableName, $connectionName)) {
-            throw new BException($this->BLocale->_('Invalid table name: %s', $fullTableName));
+            throw new BException(BLocale::i()->_('Invalid table name: %s', $fullTableName));
         }
     }
 
@@ -529,7 +529,7 @@ EOT
     public static function ddlIndexInfo($fullTableName, $indexName = null, $connectionName = null)
     {
         if (!static::ddlTableExists($fullTableName, $connectionName)) {
-            throw new BException($this->BLocale->_('Invalid table name: %s', $fullTableName));
+            throw new BException(BLocale::i()->_('Invalid table name: %s', $fullTableName));
         }
         $a = explode('.', $fullTableName);
         $dbName = empty($a[1]) ? static::dbName() : $a[0];
@@ -555,7 +555,7 @@ EOT
     public static function ddlForeignKeyInfo($fullTableName, $fkName = null, $connectionName = null)
     {
         if (!static::ddlTableExists($fullTableName, $connectionName)) {
-            throw new BException($this->BLocale->_('Invalid table name: %s', $fullTableName));
+            throw new BException(BLocale::i()->_('Invalid table name: %s', $fullTableName));
         }
         $a = explode('.', $fullTableName);
         $dbName = empty($a[1]) ? static::dbName() : $a[0];
@@ -760,7 +760,8 @@ EOT
         $isObject = is_object($data);
         $result = [];
         foreach ($data as $k => $v) {
-            if (BDb::ddlFieldInfo($table, $k, $connectionName)) {
+            $fieldInfo = BDb::ddlFieldInfo($table, $k, $connectionName);
+            if ($fieldInfo) {
                 $result[$k] = $isObject ? $data->get($k) : $data[$k];
             }
         }
@@ -1329,6 +1330,7 @@ class BORM extends ORMWrapper
         }
         $this->_data[$key] = $value;
 
+        #var_dump(spl_object_hash($this), get_class($this), $this->_data, $this->_dirty_fields);
     }
 
     /**
@@ -1421,7 +1423,6 @@ class BORM extends ORMWrapper
     protected function _save($replace = false)
     {
         $values = array_values($this->_dirty_fields);
-
 
         if (!$this->_is_new) { // UPDATE
             // If there are no dirty values, do nothing
@@ -2047,10 +2048,10 @@ class BModel extends Model
     public static function collection($alias = null)
     {
         $collectionClass = static::$_collectionClass;
-        $orm = $this->orm($alias);
+        $orm = static::orm($alias);
         $collection = $collectionClass::i(true)->setModelClass(static::$_origClass)->setOrm($orm);
 
-        BEvents::i()->fire(static::$_origClass . '::collection', ['collection' => $this, 'orm' => $orm, 'alias' => $alias]);
+        BEvents::i()->fire(static::$_origClass . '::collection', ['collection' => $collection, 'orm' => $orm, 'alias' => $alias]);
         return $collection;
     }
 
@@ -2088,7 +2089,7 @@ class BModel extends Model
     {
         if (is_array($key)) {
             foreach ($key as $k => $v) {
-                parent::set($k, $v);
+                $this->set($k, $v);
             }
         } else {
             if (true === $flag || 'ADD' === $flag) {
@@ -2100,7 +2101,14 @@ class BModel extends Model
                     $value += $oldValue;
                 }
             }
-            if (is_scalar($key) && (!(null === $flag || 'IFNULL' === $flag) || null === $this->get($key))) {
+            if (!is_string($key)) {
+                throw new BException('Invalid key type' . print_r($key, 1));
+            }
+            if (null === $flag || 'IFNULL' === $flag) {
+                if (null === $this->get($key)) {
+                    parent::set($key, $value);
+                }
+            } else {
                 parent::set($key, $value);
             }
         }
@@ -2671,7 +2679,7 @@ class BModel extends Model
         $sql = "UPDATE " . static::table() . " SET " . join(', ', $updates) . ' WHERE '
             . $idField . ' IN (' . join(', ', array_fill(0, sizeof($data), '?')) . ')';
         BDebug::debug('SQL: ' . $sql);
-        return static::run_sql($sql, array_merge($params, $p));
+        return static::run_sql($sql, $params);
     }
 
     /**

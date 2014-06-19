@@ -555,7 +555,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
             $this->_processGridFilters($config, $persFilters, $orm);
 
             $config['state'] = $persState;
-
+            $grid['request'] = (empty($grid['request']))? $persState: $grid['request'];
             try {
                 $grid['result'] = $orm->paginate($grid['request'], [
                     's' => !empty($config['state']['s'])  ? $config['state']['s']  : null,
@@ -577,7 +577,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         //$mapColumns = array();
         //$this->_processGridJoins($config, $mapColumns, $orm, 'before_count');
 
-        foreach ($grid['config'] ['columns'] as &$column) {
+        foreach ($grid['config']['columns'] as &$column) {
             unset($column['index']);
         }
         unset($column);
@@ -916,15 +916,6 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                             $orm->where_raw($f['field'] . ' NOT BETWEEN ? and ?', [$temp[0], $temp[1]]);
                             break;
                     }
-                }
-                break;
-
-            case 'number-range':
-                if (!empty($filters[$fId]['from'])) {
-                    $this->_processGridFiltersOne($f, 'gte', $filters[$fId]['from'], $orm);
-                }
-                if (!empty($filters[$fId]['val'])) {
-                    $this->_processGridFiltersOne($f, 'lte', $filters[$fId]['val'], $orm);
                 }
                 break;
 

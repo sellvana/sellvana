@@ -14,14 +14,4 @@ class FCom_AdminChat_Model_Participant extends FCom_Core_Model_Abstract
     static protected $_table = 'fcom_adminchat_participant';
     static protected $_origClass = __CLASS__;
 
-
-    public function onBeforeSave()
-    {
-        if (!parent::onBeforeSave()) return false;
-
-        $this->set('create_at', $this->BDb->now(), 'IFNULL');
-        $this->set('update_at', $this->BDb->now());
-
-        return true;
-    }
 }

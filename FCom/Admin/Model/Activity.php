@@ -175,7 +175,6 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
 
         $this->set('status', 'new', 'IFNULL');
         $this->set('type', 'workflow', 'IFNULL');
-        $this->set('create_at', $this->BDb->now(), 'IFNULL');
 
         if (($userId = $this->FCom_Admin_Model_User->sessionUserId())) {
             $this->set('action_user_id', $userId, 'IFNULL');

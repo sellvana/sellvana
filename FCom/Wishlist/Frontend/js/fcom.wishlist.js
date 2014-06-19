@@ -5,6 +5,9 @@ define(['jquery'], function($) {
         $.post(FCom.base_href + 'wishlist', postData, function (data) {
             console.log(data);
             //TODO: revert status if failed
+            if (!data || !data.success) {
+                $el.toggleClass('active').data('active', !$el.data('active'));
+            }
         });
         return false;
     })

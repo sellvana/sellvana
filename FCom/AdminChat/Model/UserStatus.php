@@ -59,13 +59,4 @@ class FCom_AdminChat_Model_UserStatus extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function onBeforeSave()
-    {
-        if (!parent::onBeforeSave()) return false;
-
-        $this->set('create_at', $this->BDb->now(), 'IFNULL');
-        $this->set('update_at', $this->BDb->now());
-
-        return true;
-    }
 }

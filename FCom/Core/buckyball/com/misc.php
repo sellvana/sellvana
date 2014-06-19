@@ -3335,6 +3335,7 @@ class BValidateViewHelper extends BClass
     }
 }
 
+/*
 class BEnv extends BClass
 {
     public $app;
@@ -3366,6 +3367,7 @@ class BEnv extends BClass
         $this->util = $util;
     }
 }
+*/
 
 /**
  * If FISMA/FIPS/NIST compliance required, use PBKDF2

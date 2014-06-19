@@ -754,7 +754,7 @@ if ($args['name']==="FCom_Referrals") {
         $m = $this->_getManifestData();
 
         if (!$this->is_cached) {
-            $args = $this->_processAreas($args);
+            $this->_processAreas($args);
 
             if (!empty($this->bootstrap) && empty($this->bootstrap['file'])) {
                 $this->bootstrap['file'] = null;
@@ -1118,7 +1118,7 @@ if (!isset($o[0]) || !isset($o[1])) {
         } elseif (!$this->BUtil->isPathAbsolute($rootDir)) {
             $rootDir = $this->root_dir . '/' . $rootDir;
         }
-        $this->BClassAutoload->i(true, [rtrim($rootDir, '/'), $this->name, $callback]);
+        $this->BClassAutoload->addPath(rtrim($rootDir, '/'), $this->name, $callback);
         return $this;
     }
 
