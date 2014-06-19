@@ -17,7 +17,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         if(empty($folder)){
             $type = $this->BRequest->get('type');
             if($type){
-                $uploadConfig = $this->BConfig->get('uploads/' . $type);
+                $uploadConfig = $this->uploadConfig($type);
                 if(empty($uploadConfig)){
                     throw new BException("Unknown upload type.");
                 }
@@ -212,12 +212,12 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $c = $this->BConfig;
         $canUpload = true;// allow upload in case no permission is configured? Or deny?
         if ($type) {
-            $uploadConfig = $c->get('uploads/' . $type);
+            $uploadConfig = $this->uploadConfig($type);
             if (empty($uploadConfig)) {
                 throw new BException("Unknown upload type.");
             }
-            if (isset($uploadConfig['permission'])) {
-                $canUpload = $this->FCom_Admin_Model_User->sessionUser()->getPermission($uploadConfig['permission']);
+            if (isset($uploadConfig['can_upload'])) {
+                $canUpload = $uploadConfig['can_upload'];
             }
         }
         $blacklistExt = [
@@ -225,7 +225,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             'phtml' => 1, 'html' => 1, 'htm' => 1, 'js' => 1, 'css' => 1, 'swf' => 1, 'xml' => 1,
         ];
 
-        if (isset($uploadConfig['filetype'])) {
+        if (isset($uploadConfig['filetype'])) { // todo figure out how to merge processed config file types
             $fileTypes                = explode(',', $uploadConfig['filetype']);
             if(empty($options['whitelist_ext'])){
                 $options['whitelist_ext'] = $fileTypes;
@@ -403,16 +403,42 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     }
 
 
-    public function collectUploadConfig($args)
+    public function collectUploadConfig()
     {
-        /** @var BModule $module */
-        $module = $args['module'];
-        if(!$module || !$module instanceof BModule){
-            return;
+        $modules = BModuleRegistry::i()->getAllModules();
+
+        foreach ($modules as $module) {
+            /** @var BModule $module */
+            if (!$module || !$module instanceof BModule) {
+                return;
+            }
+            $area = $module->area;
+            if (!empty($module->areas[$area]['uploads'])) {
+                $this->_uploadConfigs = $this->BUtil->arrayMerge($this->_uploadConfigs,
+                    (array)$module->areas[$area]['uploads']);
+            }
         }
-        $area = $module->area;
-        if(!empty($module->areas[$area]['uploads'])){
-            $this->_uploadConfigs = $this->BUtil->arrayMerge($this->_uploadConfigs, (array)$module->areas[$area]['uploads']);
+    }
+
+    public function uploadConfig($configId = null)
+    {
+        $uploadConfig         = [];
+        if(empty($this->_uploadConfigs)){
+            $this->collectUploadConfig();
         }
+        if (isset($this->_uploadConfigs[$configId])) {
+            $uploadConfig = $this->_uploadConfigs[$configId];
+            $uploadConfig['type'] = $configId;
+            if (isset($uploadConfig['filetype'])) {
+                $uploadConfig['filetype'] = '/(\\.|\\/)(' . str_replace([','], '|', $uploadConfig['filetype']) . ')$/i';
+            }
+
+            if (isset($uploadConfig['permission'])) {
+                $canUpload                  = $this->FCom_Admin_Model_User->sessionUser()
+                                                                          ->getPermission($uploadConfig['permission']);
+                $uploadConfig['can_upload'] = $canUpload;
+            }
+        }
+        return $uploadConfig;
     }
 }
