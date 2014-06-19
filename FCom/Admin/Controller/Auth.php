@@ -79,7 +79,7 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
         if ($token) {
             $sessData =& $this->BSession->dataToUpdate();
             $sessData['password_reset_token'] = $token;
-            $this->BResponse->redirect('customer/password/reset');
+            $this->BResponse->redirect('password/reset');
             return;
         }
         $token = $this->BSession->get('password_reset_token');
