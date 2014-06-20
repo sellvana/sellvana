@@ -318,6 +318,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                             'file_size'           => $fileSize,
                             'act'                 => $status,
                             'folder'              => $folder,
+                            'subfolder'              => '',
                             'associated_products' => $associatedProducts
                         ];
                     }
