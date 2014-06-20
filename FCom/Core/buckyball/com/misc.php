@@ -951,7 +951,10 @@ class BUtil extends BClass
     {
         $debugProfile = BDebug::debug(chunk_split('REMOTE HTTP: ' . $method . ' ' . $url));
         $timeout = 5;
-        $userAgent = 'Mozilla/5.0';
+        $userAgent = !empty($options['useragent']) ? $options['useragent'] : 'Mozilla/5.0';
+        if (preg_match('#^//#', $url)) {
+            $url = 'http:' . $url;
+        }
         if ($method === 'GET' && $data) {
             if (is_array($data)) {
                 $request = http_build_query($data, '', '&');
@@ -1010,6 +1013,12 @@ class BUtil extends BClass
                     CURLOPT_HTTPHEADER => array_values($headers),
                 ];
             }
+            if (!empty($options['proxy'])) {
+                $curlOpt += [
+                    CURLOPT_PROXY => $options['proxy'],
+                    CURLOPT_PROXYTYPE => !empty($options['proxytype']) ? $options['proxytype'] : CURLPROXY_HTTP,
+                ];
+            }
             $ch = curl_init();
             curl_setopt_array($ch, $curlOpt);
             $rawResponse = curl_exec($ch);
@@ -1030,6 +1039,9 @@ class BUtil extends BClass
             ]];
             if ($headers) {
                 $streamOptions['http']['header'] .= join("\r\n", array_values($headers)) . "\r\n";
+            }
+            if (!empty($options['proxy'])) {
+                $streamOptions['http']['proxy'] = $options['proxy'];
             }
             if ($method === 'POST' || $method === 'PUT') {
                 $multipart = false;

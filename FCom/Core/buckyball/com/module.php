@@ -661,7 +661,7 @@ class BModule extends BClass
     public $layout;
     public $routing;
     public $observe;
-    public $provides;
+    public $themes;
     public $areas;
     public $area;
     public $override;
@@ -995,13 +995,17 @@ if ($args['name']==="FCom_Referrals") {
         }
     }
 
-    protected function _processProvides()
+    protected function _processThemes()
     {
         //TODO: automatically enable theme module when it is used
-        if ($this->run_status === BModule::PENDING && !empty($this->provides['themes'])) {
-            foreach ($this->provides['themes'] as $name => $params) {
-                $params['module_name'] = $this->name;
-                $this->BLayout->addTheme($name, $params);
+        if ($this->run_status === BModule::PENDING && !empty($this->themes)) {
+            foreach ($this->themes as $name => $params) {
+                if (!empty($params['name']) && !empty($params['area'])) {
+                    $params['module_name'] = $this->name;
+                    $this->BLayout->addTheme($name, $params);
+                } else {
+                    $this->BLayout->updateTheme($name, $params);
+                }
             }
         }
     }
@@ -1238,7 +1242,7 @@ if (!isset($o[0]) || !isset($o[1])) {
             }
             $cfgHlp->add($config);
         }
-        $this->_processProvides();
+        $this->_processThemes();
         return $this;
     }
 
