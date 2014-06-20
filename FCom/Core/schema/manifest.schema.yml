@@ -8,7 +8,7 @@
 
 /modules/*:
     type: map
-    key_enum: [ version, channel, title, author, description, migrate, provides, areas ]
+    key_enum: [ version, channel, title, author, description, migrate, themes, areas ]
     include: $area
 
 /modules/*/version:
@@ -19,15 +19,21 @@
     type: str
     prefer_enum: [ stable, beta, alpha ]
 
-/modules/*/provides:
-    type: map
-    key_enum: [ themes ]
-
-/modules/*/provides/themes:
+/modules/*/themes:
     type: map
 
-/modules/*/provides/themes/*:
+/modules/*/themes/*:
     type: map
+    key_enum: [ name, area, parent, layout_before, layout_after, views_before, views_after ]
+
+/modules/*/themes/*/(name|area):
+    type: str
+
+/modules/*/themes/*/(parent|layout_before|layout_after|views_before|views_after):
+    type: seq_cast
+
+/modules/*/themes/*/(parent|layout_before|layout_after|views_before|views_after)/*:
+    type: str
 
 /modules/*/(title|author|description):
     type: str

@@ -86,9 +86,8 @@ modules:
                     theme: FCom_Admin_DefaultTheme
                     default_locale: en_US
 
-
-        provides:
-            themes:
-                FCom_Admin_DefaultTheme:
-                    area: FCom_Admin
-                    layout: Admin/layout.yml
+        themes:
+            FCom_Admin_DefaultTheme:
+                name: FCom_Admin_DefaultTheme
+                area: FCom_Admin
+                layout_before: Admin/layout.yml
