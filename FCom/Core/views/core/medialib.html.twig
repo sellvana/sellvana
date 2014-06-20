@@ -165,8 +165,8 @@
             multiple:true
             {% if config.mode and config.mode == 'thumbnail' %}
                 ,acceptFileTypes:  /(\.|\/)(jpe?g|tiff|gif|png|bmp)$/i
-            {% elseif uploadConfig.file_types %}
-                ,acceptFileTypes: {{ uploadConfig.file_types }}
+            {% elseif uploadConfig.filetype_regex %}
+                ,acceptFileTypes: {{ uploadConfig.filetype_regex }}
             {% endif %}
         })
         .bind('fileuploadalways', function(e, data) {
