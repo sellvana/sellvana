@@ -344,12 +344,14 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             if (!$product) {
                 continue;
             }
+            $productInfo = $product->as_array();
+            $productInfo['variants'] = $item->getData('variants');
             $orderItem                 = [];
             $orderItem['order_id']     = $orderId;
             $orderItem['product_id']   = $item->product_id;
             $orderItem['qty']          = $item->qty;
             $orderItem['total']        = $item->rowTotal();
-            $orderItem['product_info'] = $this->BUtil->toJson($product->as_array());
+            $orderItem['product_info'] = $this->BUtil->toJson($productInfo);
 
             /* @var $testItem FCom_Sales_Model_Order_Item */
             $testItem = $this->FCom_Sales_Model_Order_Item->isItemExist($orderId, $item->product_id);

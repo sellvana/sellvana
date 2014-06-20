@@ -13,7 +13,8 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
     {
         $config = parent::gridConfig();
         $localeOptions = [];
-        foreach ($this->FCom_Geo_Model_Country->options() as $iso => $name) {
+        $availableCountries = $this->BLocale->getAvailableCountries();
+        foreach ($availableCountries as $iso => $name) {
             $localeOptions[$iso] = $iso;
         }
         $config['columns'] = [

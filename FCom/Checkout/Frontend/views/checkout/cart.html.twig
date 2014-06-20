@@ -48,22 +48,7 @@
                                             </a>
                                         </td>
                                         <td class="f-cart-col-name">
-                                            <span class="product-name"><a href="{{ pUrl }}">{{ pName }}</a></span>
-                                                {% if variant.field_values is defined %}
-                                                    <ul>
-                                                        {% for key, value in variant.field_values %}
-                                                            <li>{{ field.getFrontendLabel(key) }}: {{ value }}</li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                {% endif %}
-                                                {% if variant.shopper is defined %}
-                                                    <label class="col-md-12 control-label">{{ "Shopper"|_ }}</label>
-                                                    <ul>
-                                                        {% for key, value in variant.shopper %}
-                                                            <li>{{ field.getFrontendLabel(key) }}: {{ value }}</li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                {% endif %}
+                                            {{ THIS.view('checkout/product_info').set({'variant': variant, 'field': field, 'product': p}) | raw }}
                                         </td>
                                         <td class="f-cart-col-qty text-center">
                                             <input min="0" type="text" size="3" name="qty[{{ item.id() }}][{{ idVariant }}]" value="{{ variant.variant_qty*1 }}" class="f-input-qty input-sm form-control"/>

@@ -1,5 +1,5 @@
 {% set m = THIS.get('model') %}
-{% set countries = APP.instance('FCom_Geo_Model_Country').options() %}
+{% set countries = APP.instance('BLocale').getAvailableCountries() %}
 
 {#<script>
     //var custModule = angular.module('custModule', []);

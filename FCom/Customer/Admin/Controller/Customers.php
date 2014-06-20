@@ -32,7 +32,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             ['name' => 'region', 'label' => 'Region', 'index' => 'a.region'],
             ['name' => 'postcode', 'label' => 'Postal Code', 'index' => 'a.postcode'],
             ['type' => 'input', 'name' => 'country', 'label' => 'Country', 'index' => 'a.country', 'editor' => 'select',
-                    'options' => $this->FCom_Geo_Model_Country->options()],
+                    'options' => $this->BLocale->getAvailableCountries()],
             ['name' => 'create_at', 'label' => 'Created', 'index' => 'c.create_at'],
             /*array('name' => 'update_at', 'label'=>'Updated', 'index'=>'c.update_at'),*/
             ['name' => 'last_login', 'label' => 'Last Login', 'index' => 'c.last_login'],

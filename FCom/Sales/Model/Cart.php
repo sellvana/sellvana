@@ -256,7 +256,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 if (!empty($params['data']['variants'])) {
                     $params['data']['variants']['variant_qty'] = $params['qty'];
                     $variants = (null !== $variants)? $variants : [];
-                    $params['data']['variants']['shopper'] = $params['shopper'];
+                    if (isset($params['shopper'])) {
+                        $params['data']['variants']['shopper'] = $params['shopper'];
+                    }
                     array_push($variants, $params['data']['variants']);
                 }
             }

@@ -77,7 +77,7 @@
             console.log(node.variant_qty, node);
             $('.f-stock-notice.f-in-stock').prop('hidden', node.variant_qty == 0);
             $('.f-stock-notice.f-out-of-stock').prop('hidden', node.variant_qty > 0);
-            $addToCart.prop('disabled', !node.variant_qty);
+            $addToCart.prop('disabled', !Number(node.variant_qty));
 
             // handle images
             if (!firstRun) {

@@ -85,22 +85,7 @@
                 {% for idVariant, variant in variants %}
                     <tr id="tr-product-{{p.get('id')}}">
                       <td>
-                          <span class="product-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.get('product_name') }}</a></span>
-                          {% if variant.field_values is defined %}
-                              <ul>
-                                  {% for key, value in variant.field_values %}
-                                      <li>{{ field.getFrontendLabel(key) }}: {{ value }}</li>
-                                  {% endfor %}
-                              </ul>
-                          {% endif %}
-                          {% if variant.shopper is defined %}
-                              <label class="col-md-12 control-label">{{ "Shopper"|_ }}</label>
-                              <ul>
-                                  {% for key, value in variant.shopper %}
-                                      <li>{{ field.getFrontendLabel(key) }}: {{ value }}</li>
-                                  {% endfor %}
-                              </ul>
-                          {% endif %}
+                          {{ THIS.view('checkout/product_info').set({'variant': variant, 'field': field, 'product': p}) | raw }}
                       </td>
                       <td>
                           <div class="price-box">
@@ -114,7 +99,7 @@
                       </td>
                       <td>
                         <span class="f-price-group">
-                          <span class="f-price">{{ item.rowTotal() | currency }}</span>
+                          <span class="f-price">{{ item.rowTotal(idVariant) | currency }}</span>
                         </span>
                       </td>
                     </tr>

@@ -38,7 +38,7 @@ class FCom_LibTwig_Main extends BClass
         $useCache = !$cacheConfig && $this->BDebug->is('DEBUG,DEVELOPMENT') || $cacheConfig === 'enable';
         $options = [
             'cache' => $useCache ? static::$_cacheDir : false,
-            'debug' => false, #$config->get('modules/FCom_LibTwig/debug'),
+            'debug' => true, #$config->get('modules/FCom_LibTwig/debug'),
             'auto_reload' => true, #$useCache ? false : true, #$config->get('modules/FCom_LibTwig/auto_reload'),
             'optimizations' => -1,
         ];

@@ -11,17 +11,18 @@
                 <div class="col-md-3">
                     {% if sh.input_type == 'select' %}
                         {% set options = sh.options|split(',') %}
-                        <select name="shopper[{{ sh.field_code }}]" class="form-control">
+                        <select name="shopper[{{ sh.field_code }}][val]" class="form-control">
                             {% for op in options %}
                                 <option value="{{ op }}">{{ op|_ }}</option>
                             {% endfor %}
                         </select>
                     {% elseif  sh.input_type == 'textarea' %}
-                        <textarea name="shopper[{{ sh.field_code }}]" class="form-control" cols="3" rows="2"></textarea>
+                        <textarea name="shopper[{{ sh.field_code }}][val]" class="form-control" cols="3" rows="2"></textarea>
                     {% elseif sh.input_type == 'text' %}
-                        <input type="text" name="shopper[{{ sh.field_code }}]" class="form-control"/>
+                        <input type="text" name="shopper[{{ sh.field_code }}][val]" class="form-control"/>
                     {% endif %}
                 </div>
+                <input type="hidden" name="shopper[{{ sh.field_code }}][price]" value="{{ sh.price }}"  class="form-control"/>
                 <label class="col-md-3 control-label">{{ "Price: "~ sh.price|currency |_ }}</label>
             </div>
         {% endfor %}
