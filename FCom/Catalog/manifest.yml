@@ -42,6 +42,10 @@ modules:
                         permission: catalog/product/images
                         filetype: jpeg,jpg,tiff,gif,png,bmp
                         folder: media/product/images
+                    category-images:
+                        permission: catalog/product/images
+                        filetype: jpeg,jpg,tiff,gif,png,bmp
+                        folder: media/product/images
                     product-attachments:
                         permission: catalog/product/attachements
                         filetype: jpeg,jpg,tiff,gif,png,bmp,pdf,doc,txt
