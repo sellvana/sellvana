@@ -3,6 +3,9 @@
 class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 {
     protected $_allowedFolders = [];
+    protected $_uploadConfigs;
+
+    const ERROR = 'ERROR';
 
     public function allowFolder($folder)
     {
@@ -16,14 +19,11 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         if(empty($folder)){
             $type = $this->BRequest->get('type');
             if($type){
-                $uploadConfig = $this->BConfig->get('uploads/' . $type);
+                $uploadConfig = $this->uploadConfig($type);
                 if(empty($uploadConfig)){
                     throw new BException("Unknown upload type.");
                 }
-                $canUpload = true;
-                if(isset($uploadConfig['permission'])){
-                    $canUpload = $this->FCom_Admin_Model_User->sessionUser()->getPermission($uploadConfig['permission']);
-                }
+                $canUpload = isset($uploadConfig['can_upload'])? $uploadConfig['can_upload']: true;
                 if($canUpload && isset($uploadConfig['folder'])){
                     $folder = $uploadConfig['folder'];
                 }
@@ -174,28 +174,29 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     }
 
     /**
-    * $options = array(
-    *   'folder' => 'media/product/attachment',
-    *   'subfolder' => null,
-    *   'model_class' => 'FCom_Core_Model_MediaLibrary', (default)
-    *   'on_upload' => function() { },
-    *   'on_edit' => function() { },
-    *   'on_delete' => function() { },
-    * );
-    *
-    * $request['params'] = array(
-    *   'do' => 'upload'|'edit'|'delete'
-    * );
-    *
-    * $request['post'] = array(
-    *   'grid' => 'products', // upload
-    *   'id' => 123, // edit
-    *   'file_name' => 'abc.jpg', // edit
-    *   'delete' => array('abc.jpg', 'def.png'), // delete
-    * );
-    *
-    * @param array $options
-    */
+     * $options = array(
+     *   'folder' => 'media/product/attachment',
+     *   'subfolder' => null,
+     *   'model_class' => 'FCom_Core_Model_MediaLibrary', (default)
+     *   'on_upload' => function() { },
+     *   'on_edit' => function() { },
+     *   'on_delete' => function() { },
+     * );
+     *
+     * $request['params'] = array(
+     *   'do' => 'upload'|'edit'|'delete'
+     * );
+     *
+     * $request['post'] = array(
+     *   'grid' => 'products', // upload
+     *   'id' => 123, // edit
+     *   'file_name' => 'abc.jpg', // edit
+     *   'delete' => array('abc.jpg', 'def.png'), // delete
+     * );
+     *
+     * @param array $options
+     * @throws BException
+     */
     public function processGridPost($options = [])
     {
         $r = $this->BRequest;
@@ -205,27 +206,24 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         $targetDir = $this->FCom_Core_Main->dir($folder);
 
         $attModel = !empty($options['model_class']) ? $options['model_class'] : 'FCom_Core_Model_MediaLibrary';
-        $attModel = is_string($attModel) ? $attModel::i() : $attModel;
+        $attModel = is_string($attModel) ? $this->{$attModel} : $attModel;
         $type = $r->get('type');
-        $c = $this->BConfig;
-        $canUpload = true;// allow upload in case no permission is configured? Or deny?
-        if ($type) {
-            $uploadConfig = $c->get('uploads/' . $type);
-            if (empty($uploadConfig)) {
-                throw new BException("Unknown upload type.");
-            }
-            if (isset($uploadConfig['permission'])) {
-                $canUpload = $this->FCom_Admin_Model_User->sessionUser()->getPermission($uploadConfig['permission']);
-            }
+        if (!$type) {
+            throw new BException("Missing upload type");
         }
+        $uploadConfig = $this->uploadConfig($type);
+        if (empty($uploadConfig)) {
+            throw new BException("Unknown upload type.");
+        }
+        $canUpload = isset($uploadConfig['can_upload'])? $uploadConfig['can_upload']: true;// allow upload in case no permission is configured? Or deny?
         $blacklistExt = [
             'php' => 1, 'php3' => 1, 'php4' => 1, 'php5' => 1, 'htaccess' => 1,
             'phtml' => 1, 'html' => 1, 'htm' => 1, 'js' => 1, 'css' => 1, 'swf' => 1, 'xml' => 1,
         ];
 
-        if (isset($uploadConfig['filetype'])) {
-            $fileTypes                = explode(',', $uploadConfig['filetype']);
-            if(empty($options['whitelist_ext'])){
+        if (isset($uploadConfig['filetype'])) { // todo figure out how to merge processed config file types
+            $fileTypes = explode(',', $uploadConfig['filetype']);
+            if (empty($options['whitelist_ext'])) {
                 $options['whitelist_ext'] = $fileTypes;
             } else {
                 $options['whitelist_ext'] = $this->BUtil->arrayMerge($options['whitelist_ext'], $fileTypes);
@@ -260,21 +258,21 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
                     if (!empty($uploads['error'][$i])) {
                         $id      = '';
-                        $status  = 'ERROR';
+                        $status  = static::ERROR;
                         $message = $uploads['error'][$i];
                     } elseif (!empty($blacklistExt[$ext]) || !in_array($ext, $options['whitelist_ext'])) {
                         $id      = '';
-                        $status  = 'ERROR';
+                        $status  = static::ERROR;
                         $message = 'Illegal file extension';
                     } elseif (preg_match('#\.(gif|jpe?g|png)$#',
                             $fileName) && !@getimagesize($uploads['tmp_name'][$i])
                     ) {
                         $id      = '';
-                        $status  = 'ERROR';
+                        $status  = static::ERROR;
                         $message = 'Invalid image uploaded';
                     } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $targetDir . '/' . $fileName)) {
                         $id      = '';
-                        $status  = 'ERROR';
+                        $status  = static::ERROR;
                         $message = 'Unable to save the file';
                     } else {
                         $att = $attModel->loadWhere(['folder' => (string)$folder, 'file_name' => (string)$fileName]);
@@ -289,12 +287,14 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                                 'update_at' => $this->BDb->now()
                             ])->save();
                         } else {
-                            $associatedProducts = $this->FCom_Catalog_Model_ProductMedia
+                            if(in_array($type, ['product-images', 'product-attachments'])) {
+                                $associatedProducts = $this->FCom_Catalog_Model_ProductMedia
                                     ->orm()
-                                    ->select_expr('COUNT(*)','associated_products')
-                                    ->where('file_id',$att->get('id'))
+                                    ->select_expr('COUNT(*)', 'associated_products')
+                                    ->where('file_id', $att->get('id'))
                                     ->find_one();
-                            $associatedProducts = $associatedProducts->get('associated_products');
+                                $associatedProducts = $associatedProducts->get('associated_products');
+                            }
                             $att->set(['file_size' => $uploads['size'][$i], 'update_at' => $this->BDb->now()])->save();
                         }
                         $this->BEvents->fire(__METHOD__ . ':' . $folder . ':upload', ['model' => $att]);
@@ -306,15 +306,22 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                         $status   = '';
                     }
 
-                    $rows[] = [
-                        'id'                  => $id,
-                        'file_name'           => $fileName,
-                        'file_size'           => $fileSize,
-                        'act'                 => $status,
-                        'folder'              => $folder,
-                        'subfolder'           => '',
-                        'associated_products' => $associatedProducts
-                    ];
+                    if($status == static::ERROR){
+                        $rows[] = [
+                            'error'     => $message,
+                            'file_name' => $fileName,
+                        ];
+                    } else {
+                        $rows[] = [
+                            'id'                  => $id,
+                            'file_name'           => $fileName,
+                            'file_size'           => $fileSize,
+                            'act'                 => $status,
+                            'folder'              => $folder,
+                            'subfolder'              => '',
+                            'associated_products' => $associatedProducts
+                        ];
+                    }
 
                     //echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".$this->BUtil->toJson($row)."); </script>";
                     // TODO: properly refresh grid after file upload
@@ -398,5 +405,45 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             }
             break;
         }
+    }
+
+
+    public function collectUploadConfig()
+    {
+        $modules = BModuleRegistry::i()->getAllModules();
+
+        foreach ($modules as $module) {
+            /** @var BModule $module */
+            if (!$module || !$module instanceof BModule) {
+                return;
+            }
+            $area = $module->area;
+            if (!empty($module->areas[$area]['uploads'])) {
+                $this->_uploadConfigs = $this->BUtil->arrayMerge($this->_uploadConfigs,
+                    (array)$module->areas[$area]['uploads']);
+            }
+        }
+    }
+
+    public function uploadConfig($configId = null)
+    {
+        $uploadConfig         = [];
+        if(empty($this->_uploadConfigs)){
+            $this->collectUploadConfig();
+        }
+        if (isset($this->_uploadConfigs[$configId])) {
+            $uploadConfig = $this->_uploadConfigs[$configId];
+            $uploadConfig['type'] = $configId;
+            if (isset($uploadConfig['filetype'])) {
+                $uploadConfig['filetype_regex'] = '/(\\.|\\/)(' . str_replace([','], '|', $uploadConfig['filetype']) . ')$/i';
+            }
+
+            if (isset($uploadConfig['permission'])) {
+                $canUpload                  = $this->FCom_Admin_Model_User->sessionUser()
+                                                                          ->getPermission($uploadConfig['permission']);
+                $uploadConfig['can_upload'] = $canUpload;
+            }
+        }
+        return $uploadConfig;
     }
 }

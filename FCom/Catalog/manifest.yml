@@ -12,19 +12,6 @@ modules:
 
         default_config:
             modules/FCom_Catalog/allowed_locales: [ en_US ]
-            uploads:
-                product-import:
-                    permission: catalog/product/import
-                    filetype: csv,txt
-                    folder: {random}/import/products
-                product-images:
-                    permission: catalog/product/images
-                    filetype: jpeg,jpg,tiff,gif,png,bmp
-                    folder: media/product/images
-                product-attachments:
-                    permission: catalog/product/attachements
-                    filetype: jpeg,jpg,tiff,gif,png,bmp,pdf,doc,txt
-                    folder: media/product/attachment
 
         areas:
             FCom_Admin:
@@ -46,6 +33,19 @@ modules:
                             POST/model/content: "*"
                         /catalog/products/form:
                             POST/model/description: "*"
+                uploads:
+                    product-import:
+                        permission: catalog/product/import
+                        filetype: csv,txt
+                        folder: {random}/import/products
+                    product-images:
+                        permission: catalog/product/images
+                        filetype: jpeg,jpg,tiff,gif,png,bmp
+                        folder: media/product/images
+                    product-attachments:
+                        permission: catalog/product/attachements
+                        filetype: jpeg,jpg,tiff,gif,png,bmp,pdf,doc,txt
+                        folder: media/product/attachment
 
             FCom_Frontend:
                 routing:
