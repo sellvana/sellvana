@@ -55,10 +55,10 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             $address = $this->FCom_Customer_Model_Address->create();
         }
 
-        $countries = $this->FCom_Geo_Model_Country->orm()->find_many();
+        $countries = $this->BLocale->getAvailableCountries();
 
         $countriesList = array_map(function ($el) {
-            return $el->get('iso');
+            return $el[0];
         }, $countries);
         $countriesList = implode(',', $countriesList);
 
@@ -71,9 +71,9 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         $layout->view('customer/address/edit')->default_shipping = $defaultShipping;
         $layout->view('customer/address/edit')->default_billing = $defaultBilling;*/
 
-        $this->view('geo/embed')->set('countries', $countriesList);
+        //$this->view('geo/embed')->set('countries', $countriesList);
         $varSet = [
-            'countries'        => $this->FCom_Geo_Model_Country->options($countriesList),
+            'countries'        => $this->BLocale->getAvailableRegions('name', $countriesList),
             'address'          => $address,
             'default_shipping' => $defaultShipping,
             'default_billing'  => $defaultBilling,

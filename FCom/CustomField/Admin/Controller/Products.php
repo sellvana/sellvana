@@ -170,6 +170,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 'columns' => [
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
+                    ['name' => 'field_code', 'label' => 'Field Code', 'width' => 150, 'hidden' => true],
                     ['name' => 'name', 'label' => 'Field Name', 'width' => 200],
                     ['name' => 'label', 'label' => 'Field Label', 'width' => 200],
                     ['name' => 'input_type', 'label' => 'Input Type', 'width' => 200],
@@ -329,7 +330,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
             $field = $fieldModel->load($id);
             $options = join(',', array_keys($optionsModel->getListAssocById($id)));
             $res[] = ['id' => $id, 'name' => $field->field_name, 'label' => $field->frontend_label,
-                'input_type' => $field->admin_input_type, 'options' => $options];
+                'input_type' => $field->admin_input_type, 'options' => $options, 'field_code' => $field->field_code];
         }
 
         $this->BResponse->json($res);

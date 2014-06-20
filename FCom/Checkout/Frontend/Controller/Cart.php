@@ -65,7 +65,9 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                         $cart->customer_id = $this->FCom_Customer_Model_Customer->sessionUserId();
                         $cart->save();
                     }
-                    $options['shopper'] = (isset($post['shopper'])) ? $post['shopper']: [];
+                    if (isset($post['shopper'])) {
+                        $options['shopper'] = $post['shopper'];
+                    };
                     $cart->addProduct($p->id(), $options)->calculateTotals()->save();
                     $this->message('The product has been added to your cart');
                 } else {

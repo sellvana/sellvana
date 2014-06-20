@@ -176,15 +176,7 @@ class FCom_AuthorizeNet_Model_Settings extends BClass
 
     public function countries()
     {
-        $countries = [];
-        foreach ($this->FCom_Geo_Model_Country->options() as $iso => $name) {
-            if (empty($iso)) {
-                continue;
-            }
-            $countries[$iso] = $name;
-        }
-
-        return $countries;
+        return $this->BLocale->getAvailableCountries();
     }
 
     public function currencies()

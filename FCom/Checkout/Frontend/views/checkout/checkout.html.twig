@@ -1,5 +1,5 @@
 {% set cart = THIS.get('cart') %}
-
+{% set field = APP.instance('FCom_CustomField_Model_Field') %}
     <header class="f-page-header">
       <h1 class="f-page-title">{{ 'Review and Place Order'|_ }}</h1>
     </header>
@@ -77,26 +77,33 @@
           {% for item in cart.items() %}
               {% set p = item.product() %}
               {% if p %}
-                <tr id="tr-product-{{p.get('id')}}">
-                  <td>
-                      <span class="product-name"><a href="{{ p.url(THIS.get('category')) }}">{{ p.get('product_name') }}</a></span>
-                  </td>
-                  <td>
-                      <div class="price-box">
-                          {{ p.get('base_price') | currency }}
-                      </div>
-                  </td>
-                  <td>
-                      <div class="price-box">
-                          {{ item.get('qty') | number_format }}
-                      </div>
-                  </td>
-                  <td>
-                    <span class="f-price-group">
-                      <span class="f-price">{{ item.rowTotal() | currency }}</span>
-                    </span>
-                  </td>
-                </tr>
+                {% if item.data.variants is defined %}
+                   {% set variants = item.data.variants %}
+                {% else  %}
+                   {% set variants = [{variant_price: item.get('price'), variant_qty: item.get('qty')}] %}
+                {% endif %}
+                {% for idVariant, variant in variants %}
+                    <tr id="tr-product-{{p.get('id')}}">
+                      <td>
+                          {{ THIS.view('checkout/product_info').set({'variant': variant, 'field': field, 'product': p}) | raw }}
+                      </td>
+                      <td>
+                          <div class="price-box">
+                              {{ variant.variant_price | currency }}
+                          </div>
+                      </td>
+                      <td>
+                          <div class="price-box">
+                              {{ variant.variant_qty | number_format }}
+                          </div>
+                      </td>
+                      <td>
+                        <span class="f-price-group">
+                          <span class="f-price">{{ item.rowTotal(idVariant) | currency }}</span>
+                        </span>
+                      </td>
+                    </tr>
+                {% endfor %}
               {% endif %}
           {% endfor %}
               </tbody>
