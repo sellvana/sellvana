@@ -73,8 +73,8 @@ require(['jquery', 'bootstrap', 'fcom.admin'], function($) {
                             <form class="form form-horizontal" method="post">
                                 <div class="form-group">
                                     <div class="col-md-12">
-                                        {{ THIS.view('core/medialib').set('config', {id: 'import_products',
-                                        folder: 'storage/import/products', mode: 'link', file_types: '/(\.|\\/)(txt|csv)$/i', type: upload_config.type}) | raw }}
+                                        {{ THIS.view('core/medialib').set('config', {id: 'import_products'
+                                                                , mode: 'link', type: 'product-import'}) | raw }}
                                     </div>
                                 </div>
                                 <div class="form-actions form-actions-padding-sm">

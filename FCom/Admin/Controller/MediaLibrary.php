@@ -23,7 +23,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 if(empty($uploadConfig)){
                     throw new BException("Unknown upload type.");
                 }
-                $canUpload = isset($uploadConfig['can_upload'])? $uploadConfig['can_upload']: true;
+                $canUpload = isset($uploadConfig['can_upload'])? $uploadConfig['can_upload']: false;
                 if($canUpload && isset($uploadConfig['folder'])){
                     $folder = $uploadConfig['folder'];
                 }
@@ -215,7 +215,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         if (empty($uploadConfig)) {
             throw new BException("Unknown upload type.");
         }
-        $canUpload = isset($uploadConfig['can_upload'])? $uploadConfig['can_upload']: true;// allow upload in case no permission is configured? Or deny?
+        $canUpload = isset($uploadConfig['can_upload'])? $uploadConfig['can_upload']: false;// allow upload in case no permission is configured? Or deny?
         $blacklistExt = [
             'php' => 1, 'php3' => 1, 'php4' => 1, 'php5' => 1, 'htaccess' => 1,
             'phtml' => 1, 'html' => 1, 'htm' => 1, 'js' => 1, 'css' => 1, 'swf' => 1, 'xml' => 1,

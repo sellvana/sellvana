@@ -17,7 +17,8 @@
                         <form class="form form-horizontal" method="post">
                             <div class="form-group">
                                 <div class="col-md-12">
-                                    {{ THIS.view('core/medialib').set('config', {id: 'import_files', folder: 'storage/import/customers', mode: 'link', file_types: '/(\.|\\/)(txt|csv)$/i'}) | raw }}
+                                    {{ THIS.view('core/medialib').set('config', {id: 'import_files'
+                                            , mode: 'link', type: 'customer-import' }) | raw }}
                                 </div>
                             </div>
                             <div class="form-actions form-actions-padding-sm">
