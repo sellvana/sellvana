@@ -45,7 +45,7 @@
                 var row = this.model.toJSON();
                 var column = _.findWhere(grid.getCols().toJSON(), {name: 'region'});
                 var options = column.options;
-                var region = options[row.country];
+                var region = options['@'+row.country];
                 var td = this.$el.find('td[data-col="region"]');
                 if (typeof (region) != 'undefined') {
                     td.html(region[row.region]);

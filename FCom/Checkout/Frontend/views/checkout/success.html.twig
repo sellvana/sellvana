@@ -1,4 +1,6 @@
 {% set order = THIS.get('order') %}
+{% set field = APP.instance('FCom_CustomField_Model_Field') %}
+{% set product = APP.instance('FCom_Catalog_Model_Product') %}
 {% set addresses = order.addresses %}
 
         <header class="f-page-header">
@@ -37,12 +39,20 @@
                                 <th>{{ "Total" | _ }}</th>
                             </tr>
                             {% for item in order.items %}
-                                <tr>
-                                    <td>{{ item.get('id') }}</td>
-                                    <td>{{ THIS.view('checkout/success/item').set('product', UTIL.fromJson(item.get('product_info'))) | raw }} </td>
-                                    <td>{{ item.get('qty') }} </td>
-                                    <td>{{ item.get('total') }} </td>
-                                </tr>
+                                {% set productInfo = UTIL.fromJson(item.get('product_info')) %}
+
+                                {% set variants = productInfo.variants %}
+                                {% for idVariant, variant in variants %}
+                                    {% set total = variant.variant_price*variant.variant_qty %}
+                                    <tr>
+                                        <td>{{ item.get('id') }}</td>
+                                        <td>
+                                            {{ THIS.view('checkout/product_info').set({'variant': variant, 'field': field, 'product': product.load(productInfo.id)}) | raw }}
+                                        </td>
+                                        <td>{{ variant.variant_qty }} </td>
+                                        <td>{{ total| currency }} </td>
+                                    </tr>
+                                {% endfor %}
                             {% endfor %}
                         </table>
                     </div>
@@ -57,8 +67,8 @@
                 <p><strong>{{ "Status" | _ }}:</strong>{{ order.get('status') }}</p>
             </div>
             <div class="col-xs-6">
-                <p><strong>{{ "Subtotal" | _ }}:</strong>{{ order.get('subtotal') }}</p>
+                <p><strong>{{ "Subtotal" | _ }}:</strong> {{ order.get('subtotal')| currency }} </p>
                 <p><strong>{{ "Tax" | _ }}:</strong>{{ order.get('tax') }}</p>
-                <p><strong>{{ "Grand Total" | _ }}:</strong>{{ order.get('grandtotal') }}</p>
+                <p><strong>{{ "Grand Total" | _ }}:</strong> {{ order.get('grandtotal')| currency }} </p>
             </div>
         </div>

@@ -39,11 +39,11 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
             ['type' => 'input', 'name' => 'street3', 'label' => 'Address Line 3', 'index' => 'a.street3', 'width' => 200,
                 'hidden' => true, 'addable' => true, 'editable' => true],
             ['type' => 'input', 'name' => 'country', 'label' => 'Country', 'index' => 'a.country', 'editor' => 'select',
-                'addable' => true, 'options' => $this->FCom_Geo_Model_Country->options(), 'editable' => true,
+                'addable' => true, 'options' => $this->BLocale->getAvailableCountries(), 'editable' => true,
                 'validation' => ['required' => true]],
             ['type' => 'input', 'name' => 'region', 'label' => 'State/Province/Region', 'index' => 'a.region',
                 'addable' => true, 'editable' => true, 'editor' => 'select',
-                'options' => $this->FCom_Geo_Model_Region->allOptions(),
+                'options' =>  $this->BLocale->getAvailableRegions(),
 //                'validation' => [ 'required' => true ],
             ],
             ['type' => 'input', 'name' => 'city', 'label' => 'City', 'index' => 'a.city', 'addable' => true,
@@ -85,7 +85,7 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
         $result = [];
         $country = $r->post('country');
         if (!empty($country)) {
-            $result = $this->FCom_Geo_Model_Region->options($country);
+            $result = $this->BLocale->getAvailableRegions('name', $country);
         }
         $this->BResponse->json($result);
     }

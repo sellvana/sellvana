@@ -28,7 +28,7 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         if (is_null($obj)) {
             $obj = $this;
         }
-        $countries = $this->FCom_Geo_Model_Country->options();
+        $countries = $this->BLocale->getAvailableCountries();
         return '<address>'
             . '<div class="f-street-address">' . $obj->street1 . '</div>'
             . ($obj->street2 ? '<div class="f-extended-address">' . $obj->street2 . '</div>' : '')

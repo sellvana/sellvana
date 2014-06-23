@@ -1,0 +1,19 @@
+{% set variant = THIS.get('variant') %}
+{% set field = THIS.get('field') %}
+{% set product = THIS.get('product') %}
+<span class="product-name"><a href="{{ product.url() }}">{{ product.get('product_name') }}</a></span>
+{% if variant.field_values is defined %}
+    <ul>
+        {% for key, value in variant.field_values %}
+            <li>{{ field.getFrontendLabel(key) }}: {{ value }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% if variant.shopper is defined %}
+    <label class="col-md-12 control-label">{{ "Shopper"|_ }}</label>
+    <ul>
+        {% for key, info in variant.shopper %}
+            <li>{{ field.getFrontendLabel(key) }}: {{ info.val }} </li>
+        {% endfor %}
+    </ul>
+{% endif %}

@@ -19,12 +19,12 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         }
 
         $layout = $this->BLayout;
-        $countries = $this->FCom_Geo_Model_Country->orm()->find_many();
-        $countriesList = array_map(function ($el) {
-            return $el->get('iso');
-        }, $countries);
-        $countriesList = implode(',', $countriesList);
-        $countries = $this->FCom_Geo_Model_Country->options($countriesList);
+//        $countries = $this->FCom_Geo_Model_Country->orm()->find_many();
+//        $countriesList = array_map(function ($el) {
+//            return $el->get('iso');
+//        }, $countries);
+//        $countriesList = implode(',', $countriesList);
+        $countries = $this->BLocale->getAvailableCountries();
         $cart = $this->FCom_Sales_Model_Cart->sessionCart();
         if (!$cart->id()) {
             $href = $this->BApp->href('cart');
@@ -60,9 +60,9 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             ['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
             ['label' => 'Checkout', 'href' =>  $this->BApp->href("checkout")],
             ['label' => $breadCrumbLabel, 'active' => true]]);
-        if ($layout->view('geo/embed')) {
-            $layout->view('geo/embed')->set('countries', $countriesList);
-        }
+//        if ($layout->view('geo/embed')) {
+//            $layout->view('geo/embed')->set('countries', $countriesList);
+//        }
         $layout->view('checkout/address')->set(['address' => $address, 'address_type' => $atype, 'countries' => $countries]);
         $this->layout('/checkout/address');
     }

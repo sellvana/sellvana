@@ -173,6 +173,19 @@ class BModuleRegistry extends BClass
         }
         return $this->_currentModuleName;
     }
+
+    public function expandPath($path)
+    {
+        if ($path[0] !== '@') {
+            return $path;
+        }
+        $parts = explode('/', $path, 2);
+        $mod = $this->module(substr($parts[0], 1));
+        if (!$mod) {
+            return $path;
+        }
+        return $mod->root_dir . '/' . $parts[1];
+    }
 /*
     public function onBeforeDispatch()
     {
@@ -1005,9 +1018,9 @@ if ($args['name']==="FCom_Referrals") {
             foreach ($this->themes as $name => $params) {
                 if (!empty($params['name']) && !empty($params['area'])) {
                     $params['module_name'] = $this->name;
-                    $this->BLayout->addTheme($name, $params);
+                    $this->BLayout->addTheme($name, $params, $this->name);
                 } else {
-                    $this->BLayout->updateTheme($name, $params);
+                    $this->BLayout->updateTheme($name, $params, $this->name);
                 }
             }
         }

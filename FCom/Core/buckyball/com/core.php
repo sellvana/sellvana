@@ -2224,13 +2224,14 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         if (null === $hashReferrer) {
             $hashReferrer = $this->BConfig->get('web/csrf_check_method') === 'token+referrer';
         }
+
         if ($hashReferrer) {
             if ($validating) {
                 $url = $this->BRequest->referrer();
             } else {
                 $url = $this->BRequest->currentUrl();
             }
-            $url = rtrim($url, '?&#');
+            $url = rtrim(str_replace('/index.php', '', $url), '/?&#');
             return sha1($data['_csrf_token'] . $url);
         }
         return $data['_csrf_token'];

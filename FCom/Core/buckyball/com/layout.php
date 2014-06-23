@@ -341,6 +341,7 @@ class BLayout extends BClass
      * @param string $rootDir Folder with view templates, relative to current module root
      *                        Can end with slash or not - make sure to specify
      * @param string $prefix Optional: add prefix to view names
+     * @param BModule $curModule
      * @return BLayout
      */
     public function addAllViews($rootDir, $prefix = '', $curModule = null)
@@ -348,7 +349,7 @@ class BLayout extends BClass
         #$this->BDebug->debug(__METHOD__ . ': ' . $rootDir . ($curModule ? ' (' . $curModule->name . ')' : ''));
 
         if (null === $curModule) {
-            $curModule = $this->BModuleRegistry->currentModuleName();
+            $curModule = $this->BModuleRegistry->currentModule();
         }
         $rootDir = $this->processRootDir($rootDir, $curModule);
         if (!$rootDir) {
@@ -962,18 +963,30 @@ class BLayout extends BClass
     /**
      * @param $themeName
      * @param $params
+     * @param $curModName
      * @return $this
      */
-    public function addTheme($themeName, $params)
+    public function addTheme($themeName, $params, $curModName = null)
     {
         BDebug::debug('THEME.ADD ' . $themeName);
 
-        foreach (['parent', 'layout_before', 'layout_after', 'views_before', 'views_after'] as $k) {
-            if (!empty($params[$k])) {
-                $params[$k] = (array)$params[$k];
+        if (!$curModName) {
+            $curModName = $this->BModuleRegistry->currentModuleName();
+        }
+        foreach (['area', 'parent', 'layout_before', 'layout_after', 'views_before', 'views_after'] as $k) {
+            if (empty($params[$k])) {
+                continue;
+            }
+            $params[$k] = (array)$params[$k];
+            if ($k === 'area' || $k === 'parent') {
+                continue;
+            }
+            foreach ($params[$k] as $i => $v) {
+                if ($v[0] !== '@') {
+                    $params[$k][$i] = '@' . $curModName . '/' . $v;
+                }
             }
         }
-
         if (empty($this->_themes[$themeName])) {
             $this->_themes[$themeName] = $params;
         } else {
@@ -983,11 +996,11 @@ class BLayout extends BClass
         return $this;
     }
 
-    public function updateTheme($themeName, $params)
+    public function updateTheme($themeName, $params, $curModName = null)
     {
         BDebug::debug('THEME.UPDATE ' . $themeName);
         //TODO: figure out if needed a separate method for update
-        return $this->addTheme($themeName, $params);
+        return $this->addTheme($themeName, $params, $curModName);
     }
 
     /**
@@ -1039,17 +1052,16 @@ class BLayout extends BClass
 
         $this->BEvents->fire('BLayout::loadTheme:before', ['theme_name' => $themeName, 'theme' => $theme]);
 
-        $mod = !empty($theme['module_name']) ? $this->BModuleRegistry->module($theme['module_name']) : null;
-        $modRootDir = $mod ? $mod->root_dir . '/' : '';
+        $modReg = $this->BModuleRegistry;
 
         if (!empty($theme['layout_before'])) {
-            foreach ((array)$theme['layout_before'] as $layoutBefore) {
-                $this->loadLayout($modRootDir . $layoutBefore);
+            foreach ($theme['layout_before'] as $layoutBefore) {
+                $this->loadLayout($modReg->expandPath($layoutBefore));
             }
         }
         if (!empty($theme['views_before'])) {
-            foreach ((array)$theme['views_before'] as $viewsBefore) {
-                $this->addAllViews($modRootDir . $viewsBefore, '', $mod);
+            foreach ($theme['views_before'] as $viewsBefore) {
+                $this->addAllViews($modReg->expandPath($viewsBefore));
             }
         }
         if (!empty($theme['callback'])) {
@@ -1086,17 +1098,16 @@ class BLayout extends BClass
         $this->loadLayoutFilesFromAllModules();
 
         $theme = $this->_themes[$themeName];
-        $mod = !empty($theme['module_name']) ? $this->BModuleRegistry->module($theme['module_name']) : null;
-        $modRootDir = $mod ? $mod->root_dir . '/' : '';
+        $modReg = $this->BModuleRegistry;
 
         if (!empty($theme['views_after'])) {
-             foreach ((array)$theme['views_after'] as $viewsAfter) {
-                $this->addAllViews($modRootDir . $viewsAfter, '', $mod);
+             foreach ($theme['views_after'] as $viewsAfter) {
+                $this->addAllViews($modReg->expandPath($viewsAfter));
             }
         }
         if (!empty($theme['layout_after'])) {
-            foreach ((array)$theme['layout_after'] as $layoutAfter) {
-                $this->loadLayout($modRootDir . $layoutAfter);
+            foreach ($theme['layout_after'] as $layoutAfter) {
+                $this->loadLayout($modReg->expandPath($layoutAfter));
             }
         }
 
@@ -2440,14 +2451,6 @@ if ($this->BDebug->is('DEBUG')) {
             $html = $this->getTitle() . "\n" . $this->getMeta() . "\n" . $this->getAllElements();
 
             $scriptsArr = [];
-            if ($this->_headJs['scripts'] || $this->_headJs['jquery']) {
-                if ($this->_headJs['scripts']) {
-                    $scriptsArr[] = 'head.js("' . join('", "', $this->_headJs['scripts']) . '");';
-                }
-                if ($this->_headJs['jquery']) {
-                    $scriptsArr[] = 'head.js({jquery:"' . $this->_headJs['jquery'] . '"}, function() { jQuery.fn.ready = head; ' . $scripts . '});';
-                }
-            }
 
             $requireJs = $this->renderRequireJs();
             if ($requireJs) {
