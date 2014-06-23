@@ -193,8 +193,8 @@
                 })
             }
         });
-        $('.btn-rescan-images').click(function () {
-            $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw}}', function (response) {
+        $('#{{ config.id }}').on('click', '.btn-rescan-images', function () {
+            $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw}}&&type={{ config.type }}', { do: 'rescan'}, function (response) {
                 if (response.status == 'success') {
                     $.bootstrapGrowl("Rescan success", { type: 'success', align: 'center', width: 'auto' });
                     mediaGrid.getRows().fetch();

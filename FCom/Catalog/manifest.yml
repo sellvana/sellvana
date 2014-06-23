@@ -34,6 +34,10 @@ modules:
                         /catalog/products/form:
                             POST/model/description: "*"
                 uploads:
+                    category-images:
+                        permission: catalog/category/images
+                        filetype: jpeg,jpg,tiff,gif,png,bmp
+                        folder: media/category/images
                     product-import:
                         permission: catalog/product/import
                         filetype: csv,txt
