@@ -22,7 +22,7 @@
                                     {{ 'Library'|_ }}
                                 </a>
                             </li>
-                            {% if uploadConfig.can_upload or uploadConfig is empty %}
+                            {% if uploadConfig.can_upload %}
                             <li>
                                 <a data-toggle='tab' href='#{{config.id}}-media-upload'>
                                     {{ 'Upload'|_ }}
@@ -34,7 +34,7 @@
                             <div class='tab-pane active' id='{{config.id}}-attach_library'>
                                 {{ THIS.view('core/backbonegrid').set('grid', mediaLibAttachConfig) | raw }}
                             </div>
-                            {% if uploadConfig.can_upload or uploadConfig is empty %}
+                            {% if uploadConfig.can_upload %}
                             <div class='tab-pane' id='{{config.id}}-media-upload'>
                                 <div class='box-content'>
                                     <div class='row fileupload-buttonbar'>

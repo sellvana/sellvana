@@ -3,7 +3,7 @@
 {% set resizeUrl = APP.instance('FCom_Core_Main').resizeUrl('--IMAGE--', {s:150, cache:0}) %}
 {% set fieldData = { model:m }|merge({config_id: 'category_images', resize_url: resizeUrl }) %}
 {{ forms.button_add_image(fieldData, [{field:'image_url', label:'Subcategory Image'|_ }, {field:'featured_image_url', label:'Featured Image'|_ }, {field:'nav_callout_image_url', label:'Navigation Callout Image'|_ }]) }}
-{{ THIS.view('core/medialib').set('config', {id: 'category_images', folder: 'media/category/images', title: 'Category Image'}) | raw }}
+{{ THIS.view('core/medialib').set('config', {id: 'category_images', title: 'Category Image', type: 'category-images'}) | raw }}
 
 <script>
     require(['backbone', 'underscore', 'jquery', 'fcom.admin'], function(Backbone, _, $) {
