@@ -13,7 +13,7 @@
     <label class="col-md-12 control-label">{{ "Shopper"|_ }}</label>
     <ul>
         {% for key, info in variant.shopper %}
-            <li>{{ field.getFrontendLabel(key) }}: {{ info.val }} ~ {{ "Price:" ~ info.price|currency }} </li>
+            <li>{{ field.getFrontendLabel(key) }}: {{ info.val }} </li>
         {% endfor %}
     </ul>
 {% endif %}

@@ -1,5 +1,5 @@
 {% set prod = THIS.get('product') %}
-{% set shopper = prod.getData('frontend_fields') %}
+{% set shopper = prod.getFrontendFields() %}
 {% if shopper %}
     <div id="f-prod-tab-shopper">
         <div class="f-tab-heading">
@@ -22,8 +22,6 @@
                         <input type="text" name="shopper[{{ sh.field_code }}][val]" class="form-control"/>
                     {% endif %}
                 </div>
-                <input type="hidden" name="shopper[{{ sh.field_code }}][price]" value="{{ sh.price }}"  class="form-control"/>
-                <label class="col-md-3 control-label">{{ "Price: "~ sh.price|currency |_ }}</label>
             </div>
         {% endfor %}
     </div>

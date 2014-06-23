@@ -173,9 +173,10 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                     ['name' => 'field_code', 'label' => 'Field Code', 'width' => 150, 'hidden' => true],
                     ['name' => 'name', 'label' => 'Field Name', 'width' => 200],
                     ['name' => 'label', 'label' => 'Field Label', 'width' => 200],
-                    ['name' => 'input_type', 'label' => 'Input Type', 'width' => 200],
-                    ['name' => 'options', 'label' => 'Options', 'width' => 200],
-                    ['type' => 'input', 'name' => 'price', 'label' => 'Price', 'width' => 200, 'editable' => 'inline',
+                    ['name' => 'input_type', 'label' => 'Field Type', 'width' => 200],
+                    ['name' => 'options', 'label' => 'Options', 'width' => 200, 'hidden' => true],
+                    ['name' => 'required', 'label' => 'Required', 'width' => 150, 'editor' => 'select', 'options' => ['0' => 'No', '1' => 'Yes']],
+                    ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 200, 'editable' => 'inline',
                         'validation' => ['number' => true]],
                     ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]]
                 ],
@@ -329,8 +330,16 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         foreach ($ids as $id) {
             $field = $fieldModel->load($id);
             $options = join(',', array_keys($optionsModel->getListAssocById($id)));
-            $res[] = ['id' => $id, 'name' => $field->field_name, 'label' => $field->frontend_label,
-                'input_type' => $field->admin_input_type, 'options' => $options, 'field_code' => $field->field_code];
+            $res[] = [
+                'id' => $id,
+                'name' => $field->field_name,
+                'label' => $field->frontend_label,
+                'input_type' => $field->admin_input_type,
+                'options' => $options,
+                'required' => $field->required,
+                'field_code' => $field->field_code,
+                'position' => ''
+            ];
         }
 
         $this->BResponse->json($res);
