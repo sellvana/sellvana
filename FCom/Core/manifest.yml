@@ -37,11 +37,7 @@ modules:
                     X-Frame-Options: SAMEORIGIN
             cookie:
                 session_check_ip: 1
-            uploads:
-                images:
-                    permission: upload/images
-                    filetype: jpeg|jpg|tiff|gif|png|bmp
-                    folder: media/images
+
             modules:
                 FCom_Core:
                     company_name: Sellvana

@@ -75,6 +75,11 @@ modules:
                             POST/config/modules/FCom_Frontend/add_js_code: "*"
                         /templates/form:
                             POST/model/view_contents: "*"
+                uploads:
+                    images:
+                        permission: upload/images
+                        filetype: jpeg,jpg,tiff,gif,png,bmp
+                        folder: media/images
         default_config:
             modules:
                 FCom_Admin:
