@@ -31,7 +31,10 @@ require(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
 
         var res = [];
         for (var i in rows) {
-            res.push(_.pick(rows[i], 'id', 'field_code', 'name', 'label', 'input_type', 'price', 'options'));
+            if (rows[i].position.length == 0) {
+                rows[i].position = 0;
+            }
+            res.push(_.pick(rows[i], 'id', 'field_code', 'name', 'label', 'input_type', 'options', 'required', 'position'));
         }
 
         $("#prod_frontend_data").val(JSON.stringify(res));
