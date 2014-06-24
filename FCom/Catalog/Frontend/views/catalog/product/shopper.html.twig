@@ -8,7 +8,7 @@
         {% for sh in shopper %}
             <div class="form-group" style="overflow: hidden">
                 <label class="col-md-2 control-label">{{ sh.label|_ }}</label>
-                <input type="hidden" name="shopper[{{ sh.name }}][label][{{ sh.label }}]" class="form-control"/>
+                <input type="hidden" name="shopper[{{ sh.name }}][label]" value="{{ sh.label }}" class="form-control"/>
                 <div class="col-md-3">
                     {% if sh.input_type == 'select' %}
                         {% set options = sh.options|split(',') %}
@@ -21,6 +21,8 @@
                         <textarea name="shopper[{{ sh.name }}][val]" class="form-control" cols="3" rows="2"></textarea>
                     {% elseif sh.input_type == 'text' %}
                         <input type="text" name="shopper[{{ sh.name }}][val]" class="form-control"/>
+                    {% elseif sh.input_type == 'checkbox' %}
+                        <input type="checkbox" name="shopper[{{ sh.name }}][val]" value="checkbox"/>
                     {% endif %}
                 </div>
             </div>
