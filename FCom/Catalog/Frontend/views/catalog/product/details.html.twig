@@ -21,14 +21,14 @@
         <div class="f-rslides-container">
           <ul class="thumbnails f-rslides f-prod-imgs" id="product-rslides">
 {% for img in images %}
-            <li><img data-id="{{ img.id() }}"  class="f-prod-img img-responsive" src="{{ img.getUrl() }}" alt=""/></li>
+            <li><img data-id="{{ img.id() }}"  class="f-prod-img img-responsive" src="{{ img.imageUrl() }}" alt=""/></li>
 {% endfor %}
           </ul>
         </div>
         <p class="text-center"><small>{{ 'Mouse move on Image to zoom'|_ }}</small></p>
         <ul class="f-prod-more-view-imgs row" id="product-rslides-pager">
 {% for img in images %}
-          <li class="col-md-2 col-xs-2" data-id="{{ img.id() }}"><a href="#"><img src="{{ img.getUrl() }}" alt="" title=""></a></li>
+          <li class="col-md-2 col-xs-2" data-id="{{ img.id() }}"><a href="#"><img src="{{ img.thumbUrl(90) }}" alt="" title=""></a></li>
 {% endfor %}
         </ul>
         <a href="#" hidden id="display-all-images"><i class="glyphicon glyphicon-refresh"></i> {{ "Display all images"|_ }}</a>
