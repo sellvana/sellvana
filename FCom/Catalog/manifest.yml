@@ -23,6 +23,9 @@ modules:
                     - [ /catalog/products/.action, FCom_Catalog_Admin_Controller_Products ]
 
                     - [ /catalog/products/import/.action, FCom_Catalog_Admin_Controller_ProductsImport ]
+
+                    - [ /catalog/searchalias, FCom_Catalog_Admin_Controller_SearchAlias.index ]
+                    - [ /catalog/searchalias/.action, FCom_Catalog_Admin_Controller_SearchAlias ]
                 observe:
                     - [ FCom_Admin_Controller_HeaderSearch::action_index, FCom_Catalog_Admin_Controller_Products.onHeaderSearch ]
                     - [ FCom_Admin_Controller::action_generate_sitemap, FCom_Catalog_Admin_Controller_Products.onGenerateSiteMap ]
