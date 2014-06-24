@@ -2921,7 +2921,7 @@ class BModel extends Model
 
     public function __call($name, $args)
     {
-        return BClassRegistry::callMethod($this, $name, $args, static::$_origClass);
+        return $this->BClassRegistry->callMethod($this, $name, $args, static::$_origClass);
     }
 
     public static function __callStatic($name, $args)
