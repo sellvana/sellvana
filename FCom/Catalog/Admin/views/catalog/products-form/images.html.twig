@@ -171,7 +171,7 @@ require(['jquery','underscore','backbone', 'fcom.backbonegrid'], function($, _) 
 </script>
 {{ THIS.view('core/backbonegrid').set('grid', prodImagesConfig) | raw }}
 {{ THIS.view('core/medialib').set('config', {'id': 'all_prod_images', mode: 'thumbnail', title: 'Images',
-        multiSelAllowed: true, type: 'product-images', folder: 'media/product/images'}) | raw }}
+        multiSelAllowed: true, type: 'product-images'}) | raw }}
 
 <input type='hidden' name="grid[images][del]" id='prod-image-remove' />
 <input type='hidden' name="grid[images][rows]" id='prod-image-rows' />

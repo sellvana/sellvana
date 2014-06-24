@@ -13,7 +13,7 @@ class FCom_Customer_Admin extends BClass
             'customers/import' => 'Import',
         ]);
 
-        $this->FCom_Admin_Controller_MediaLibrary->allowFolder('storage/import/customers');
+        $this->FCom_Admin_Controller_MediaLibrary->allowFolder('{random}/import/customers');
     }
 
     public function onGetDashboardWidgets($args)
