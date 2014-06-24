@@ -36,6 +36,7 @@ Using custom id/name:
                 style="{{ p.style }}"
                 value="{{ view.getInputValue(p) }}"
                 placeholder="{{ p.placeholder }}"
+                {{ p.autocomplete ? 'autocomplete="' ~ p.autocomplete ~ '"' }}
                 {{ p.readonly ? 'readonly' }}
                 {{ p.required ? 'data-rule-required="true"' }}
                 {{ p.attr | raw }}
