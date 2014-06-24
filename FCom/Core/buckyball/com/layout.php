@@ -1015,7 +1015,7 @@ class BLayout extends BClass
         }
         $themes = [];
         foreach ($this->_themes as $name => $theme) {
-            if (!empty($theme['area']) && $theme['area'] === $area) {
+            if (!empty($theme['area']) && in_array($area, $theme['area'])) {
                 if ($asOptions) {
                     $themes[$name] = !empty($theme['description']) ? $theme['description'] : $name;
                 } else {
@@ -1023,7 +1023,6 @@ class BLayout extends BClass
                 }
             }
         }
-
         return $themes;
     }
 
