@@ -12,7 +12,7 @@ class FCom_Checkout_Frontend extends BClass
      */
     public function initCartTotals()
     {
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         if (false == $cart->items()) {
             return;
         }

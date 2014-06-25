@@ -54,7 +54,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $customer = $this->FCom_Customer_Model_Customer->sessionUser();
 
         $cart = $this->FCom_Sales_Model_Cart->sessionCart();
-        if (!$cart || !$cart->id) {
+        if (!$cart || !$cart->id()) {
             $this->BResponse->redirect('cart');
             return;
         }
@@ -136,6 +136,10 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $post = $this->BRequest->post();
         /* @var $cart FCom_Sales_Model_Cart */
         $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        if (!$cart) {
+            $this->BResponse->redirect('cart');
+            return;
+        }
 
         if (!empty($post['create_account']) && $post['account']) {
             $r = $post['account'];
@@ -191,7 +195,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             return;
         }
         $order = $cart->placeOrder();
-        $this->FCom_Sales_Model_Cart->sessionCartId(false);
+        $this->FCom_Sales_Model_Cart->resetSessionCart();
 
         $sData =& $this->BSession->dataToUpdate();
         $sData['last_order']['id'] = $order ? $order->id : null;
