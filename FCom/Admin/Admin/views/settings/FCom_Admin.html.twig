@@ -22,7 +22,7 @@
             label:'Modules to run in RECOVERY mode'|_, value:c.get('recovery_modules/FCom_Admin'), raw:1 }) }}
 
         {{ forms.boolean(fieldData, {field:'enable_locales', label:'Enable UI Multi Locale'|_ }) }}
-        {{ forms.select(fieldData, {field:'default_locale', label:'Default Product Locale', options:locales }) }}
+        {{ forms.select(fieldData, {field:'default_locale', label:'Default Product Locale', select2: {}, options:locales }) }}
         {{ forms.select(fieldData, {field:'allowed_locales', label:'Allowed Admin UI Locales', select2: {},
             multiple: true, options:locales }) }}
     {{ forms.accordion_panel_end }}
