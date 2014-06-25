@@ -24,7 +24,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         $layout->view('breadcrumbs')->set('crumbs', [['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
             ['label' => 'Cart', 'active' => true]]);
 
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $this->BEvents->fire(__CLASS__ . '::action_cart:cart', ['cart' => $cart]);
 
         $shippingEstimate = $this->BSession->get('shipping_estimate');
@@ -36,7 +36,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
     {
         $cartHref = $this->BApp->href('cart');
         $post = $this->BRequest->post();
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         if (isset($post['action'])) {
             switch ($post['action']) {
             case 'add':
@@ -135,7 +135,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
     {
         $cartHref = $this->BApp->href('cart');
         $post = $this->BRequest->post();
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $result = [];
         switch ($post['action']) {
         case 'add':
@@ -176,7 +176,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         }
 
         $qty = !empty($qty) ? $qty : 1;
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $cart->addProduct($product->id(), ['qty' => $qty, 'price' => $product->base_price]);
     }
 }

@@ -52,47 +52,48 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     public function sessionCartId($id = null)
     {
-        if (is_null($id)) {
-            return $this->BSession->get('cart_id');
-        }
-        $this->BSession->set('cart_id', $id);
-        return $id;
+        return $this->sessionCart()->id();
     }
 
-    /**
-     * @param bool $reset
-     * @return FCom_Sales_Model_Cart
-     */
-    public function sessionCart($reset = false)
+    public function sessionCart($createAnonymousIfNeeded = false, $reset = false)
     {
-        if ($reset || !static::$_sessionCart) {
+        if (!static::$_sessionCart || $reset) {
             if ($reset instanceof FCom_Sales_Model_Cart) {
                 static::$_sessionCart = $reset;
-                $this->sessionCartId($reset->id);
+            }
+            $customer = $this->FCom_Customer_Model_Customer->sessionUser();
+            if ($customer) {
+                $cart = $this->loadOrCreate(['customer_id' => $customer->id(), "status" => "new"]);
             } else {
-                $cartId = $this->sessionCartId();
-                if ($cartId) {
-                    $cart = $this->load($cartId);
+                $cookieToken = $this->BRequest->cookie('cart');
+                if ($cookieToken) {
+                    $cart = $this->loadWhere(['cookie_token' => (string)$cookieToken, 'status' => 'new']);
+                    if (!$cart && !$createAnonymousIfNeeded) {
+                        $this->BResponse->cookie('cart', false);
+                        return false;
+                    }
                 }
-                if (!empty($cart)) {
-                    static::$_sessionCart = $cart;
-                } else {
-                    $sessionId = $this->BSession->sessionId();
-                    $cart = $this->orm()
-                        ->where('session_id', $sessionId)
-                        ->where('status', 'new')
-                        ->find_one();
-                    if ($cart) {
-                        static::$_sessionCart = $cart;
-                        $this->sessionCartId($cart->id);
+                if (empty($cart)) {
+                    if ($createAnonymousIfNeeded) {
+                        $cookieToken = $this->BUtil->randomString(32);
+                        $cart = $this->create(['cookie_token' => (string)$cookieToken, 'status' => 'new'])->save();
+                        $ttl = $this->BConfig->get('modules/FCom_Sales/cart_cookie_token_ttl_days') * 86400;
+                        $this->BResponse->cookie('cart', $cookieToken, $ttl);
                     } else {
-                        static::$_sessionCart = $this->create(['session_id' => $sessionId]);
-                        $this->sessionCartId();
+                        return false;
                     }
                 }
             }
+
+            static::$_sessionCart = $cart;
         }
         return static::$_sessionCart;
+    }
+
+    public function resetSessionCart()
+    {
+        static::$_sessionCart = null;
+        return $this;
     }
 
     public function onUserLogin()
@@ -104,32 +105,31 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             return;
         }
         // get session cart id
-        $sessCartId = $this->sessionCartId();
+        $sessCart = $this->sessionCart();
         // try to load customer cart which is new (not abandoned or converted to order)
         $custCart = $this->FCom_Sales_Model_Cart->loadWhere(['customer_id' => $customer->id(), 'status' => 'new']);
 
-        if ($sessCartId && $custCart && $sessCartId !== $custCart->id()) {
+        if ($sessCart && $custCart && $sessCart->id() !== $custCart->id()) {
 
             // if both current session cart and customer cart exist and they're different carts
-            $custCart->merge($sessCartId)->save(); // merge them into customer cart
-            $this->sessionCartId($custCart->id); // and set it as session cart
-            static::$_sessionCart = $custCart;
+            $custCart->merge($sessCart)->save(); // merge them into customer cart
+            $this->sessionCart(false, $custCart); // and set it as session cart
 
-        } elseif ($sessCartId && !$custCart) { // if only session cart exist
+        } elseif ($sessCart && !$custCart) { // if only session cart exist
 
             $this->sessionCart()->set('customer_id', $customer->id())->save(); // assign it to customer
 
-        } elseif (!$sessCartId && $custCart) { // if only customer cart exist
+        } elseif (!$sessCart && $custCart) { // if only customer cart exist
 
-            $this->sessionCartId($custCart->id()); // set it as session cart
-            static::$_sessionCart = $custCart;
+            $this->sessionCart(false, $custCart); // set it as session cart
 
         }
+        // clear cookie token
+        $this->BResponse->cookie('cart', false);
     }
 
     public function onUserLogout()
     {
-        $this->sessionCartId(false);
         static::$_sessionCart = null;
     }
 
@@ -271,7 +271,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
         $this->BEvents->fire(__METHOD__, ['model' => $this, 'item' => $item]);
 
-        $this->sessionCartId($this->id);
+        #$this->sessionCartId($this->id);7
         return $this;
     }
 

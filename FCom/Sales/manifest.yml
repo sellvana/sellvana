@@ -1,6 +1,6 @@
 modules:
     FCom_Sales:
-        version: 0.2.11
+        version: 0.2.12
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_Customer: 0.1.0 } }
         description: "Fundamental Sales functionality"
@@ -11,6 +11,8 @@ modules:
                 FCom_Sales:
                     default_payment_method: basic
                     default_shipping_method: plain
+                    order_number: "0000000"
+                    cart_cookie_token_ttl_days: 30
 
         areas:
             FCom_Admin:

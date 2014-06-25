@@ -1,2 +1,2 @@
 /settings:
-    - { view: settings, do: [[ addTab, FCom_Wishlist, { label: Wishlist, group: areas, async: true } ]] }
+    - { view: settings, do: [[ addTab, FCom_Wishlist, { label: Wishlist, group: customers, async: true } ]] }

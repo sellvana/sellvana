@@ -144,6 +144,10 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             }
             $userId = $sessData['admin_user_id'];
             $user = static::$_sessionUser = $this->load($userId);
+            if (!$user) {
+                $this->logout();
+                return false;
+            }
             $token = $user->get('password_session_token');
             if (!$token) {
                 $token = $this->BUtil->randomString(16);
@@ -155,7 +159,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
                 $user->logout();
                 $this->BResponse->cookie('remember_me', 0);
                 $this->BResponse->redirect('');
-                return;
+                return false;
             }
         }
         return static::$_sessionUser;
