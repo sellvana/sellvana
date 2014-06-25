@@ -67,6 +67,14 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                     }
                     if (isset($post['shopper'])) {
                         $options['shopper'] = $post['shopper'];
+                        foreach($options['shopper'] as $key => $value) {
+                            if (!isset($value['val']) || $value['val'] == '') {
+                                unset($options['shopper'][$key]);
+                            }
+                            if ($value['val'] == 'checkbox') {
+                                unset($options['shopper'][$key]['val']);
+                            }
+                        }
                     };
                     $cart->addProduct($p->id(), $options)->calculateTotals()->save();
                     $this->message('The product has been added to your cart');
