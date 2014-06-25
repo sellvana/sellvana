@@ -62,7 +62,8 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 static::$_sessionCart = $reset;
             }
             $customer = $this->FCom_Customer_Model_Customer->sessionUser();
-            if ($customer) {
+            //fix bug when guests login and then checkout
+            if ($customer && !$this->BRequest->cookie('cart')) {
                 $cart = $this->loadOrCreate(['customer_id' => $customer->id(), "status" => "new"]);
             } else {
                 $cookieToken = $this->BRequest->cookie('cart');
