@@ -2,7 +2,7 @@
 
 class FCom_Admin_Migrate extends BClass
 {
-    public function install__0_1_9()
+    public function install__0_1_8()
     {
         $tRole = $this->FCom_Admin_Model_Role->table();
         $this->BDb->run("
@@ -120,19 +120,6 @@ class FCom_Admin_Migrate extends BClass
                 'IDX_data_type_args_day' => '(data_type, data_args, data_day)',
             ],
         ]);
-
-        $tSystemEmail = $this->FCom_Admin_Model_SystemEmail->table();
-        $this->BDb->run("
-            CREATE TABLE IF NOT EXISTS {$tSystemEmail} (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `sender_name` varchar(255) NOT NULL,
-            `sender_email` varchar(255) NOT NULL,
-            `bcc` varchar(255) NOT NULL,
-            `template` varchar(255) NOT NULL,
-            `status` tinyint(1) NOT NULL DEFAULT '0',
-            PRIMARY KEY (`id`),
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
     }
 
     public function upgrade__0_1_0__0_1_1()
@@ -290,21 +277,5 @@ class FCom_Admin_Migrate extends BClass
                 'password_session_token' => 'varchar(16)',
             ],
         ]);
-    }
-
-    public function upgrade__0_1_8__0_1_9()
-    {
-        $tSystemEmail = $this->FCom_Admin_Model_SystemEmail->table();
-        $this->BDb->run("
-            CREATE TABLE IF NOT EXISTS {$tSystemEmail} (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `sender_name` varchar(255) NOT NULL,
-            `sender_email` varchar(255) NOT NULL,
-            `bcc` varchar(255) NOT NULL,
-            `template` varchar(255) NOT NULL,
-            `status` tinyint(1) NOT NULL DEFAULT 0,
-            PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
     }
 }
