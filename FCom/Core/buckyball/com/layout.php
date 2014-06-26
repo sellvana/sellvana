@@ -1060,7 +1060,10 @@ class BLayout extends BClass
         }
         if (!empty($theme['views_before'])) {
             foreach ($theme['views_before'] as $viewsBefore) {
-                $this->addAllViews($modReg->expandPath($viewsBefore));
+                $a = explode('/', $viewsBefore, 2);
+                $viewsMod = $modReg->module(substr($a[0], 1));
+                $viewsDir = $viewsMod->root_dir . '/' . $a[1];
+                $this->addAllViews($viewsDir, '', $viewsMod);
             }
         }
         if (!empty($theme['callback'])) {
@@ -1101,7 +1104,10 @@ class BLayout extends BClass
 
         if (!empty($theme['views_after'])) {
              foreach ($theme['views_after'] as $viewsAfter) {
-                $this->addAllViews($modReg->expandPath($viewsAfter));
+                $a = explode('/', $viewsAfter, 2);
+                $viewsMod = $modReg->module(substr($a[0], 1));
+                $viewsDir = $viewsMod->root_dir . '/' . $a[1];
+                $this->addAllViews($viewsDir, '', $viewsMod);
             }
         }
         if (!empty($theme['layout_after'])) {

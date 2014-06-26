@@ -2558,15 +2558,17 @@ class BActionController extends BClass
         if (!$page) {
             $page = $defaultView;
         }
+
+        if ($baseLayout) {
+            $this->layout($baseLayout);
+        }
+
         $view = $this->view($viewPrefix . $page);
         if ($view instanceof BViewEmpty) {
             $this->forward(false);
             return false;
         }
 
-        if ($baseLayout) {
-            $this->layout($baseLayout);
-        }
         $this->BLayout->applyLayout('view-proxy')->applyLayout($viewPrefix . $page);
         $view->useMetaData();
 
