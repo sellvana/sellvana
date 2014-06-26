@@ -2553,20 +2553,31 @@ class BActionController extends BClass
 
     public function viewProxy($viewPrefix, $defaultView = 'index', $hookName = 'main', $baseLayout = null)
     {
+        $layout = $this->BLayout;
         $viewPrefix = trim($viewPrefix, '/') . '/';
         $page = $this->BRequest->param('view');
         if (!$page) {
             $page = $defaultView;
         }
 
-        if ($baseLayout) {
-            $this->layout($baseLayout);
+        $theme = $this->BConfig->get('modules/' . $this->BRequest->area() . '/theme');
+        if (!$theme) {
+            $theme = $this->BLayout->getDefaultTheme();
         }
-
+        if ($theme) {
+            $layout->loadThemeViews($theme);
+        }
         $view = $this->view($viewPrefix . $page);
         if ($view instanceof BViewEmpty) {
             $this->forward(false);
             return false;
+        }
+
+        if ($theme) {
+            $layout->applyTheme($theme);
+        }
+        if ($baseLayout) {
+            $layout->applyLayout($baseLayout);
         }
 
         $this->BLayout->applyLayout('view-proxy')->applyLayout($viewPrefix . $page);
