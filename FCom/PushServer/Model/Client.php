@@ -251,8 +251,10 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     {
         $delay = $this->BConfig->get('modules/FCom_PushServer/delay_microsec', 100000);
         $timeout = $this->BConfig->get('modules/FCom_PushServer/poll_timeout', 50);
-        $start = time();
-        while (true) {
+        //$start = time();
+        usleep($timeout*1000000  + $delay*$timeout);
+        $this->_messages = $this->sync();
+        /*while (true) {
             if (time() - $start > $timeout) { // timeout for connection to counteract default gateway timeouts
                 break;
             }
@@ -265,7 +267,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
             } else {
                 usleep($delay);
             }
-        }
+        }*/
         return $this;
     }
 
