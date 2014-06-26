@@ -23,9 +23,9 @@ class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_A
 
         $crumbs[] = ['label' => 'Account', 'href' => $this->BApp->href('customer/myaccount')];
         $crumbs[] = ['label' => 'Orders', 'active' => true];
+        $this->layout('/customer/order/list');
         $this->view('breadcrumbs')->crumbs = $crumbs;
         $this->view('customer/order/list')->orders = $orders;
-        $this->layout('/customer/order/list');
     }
 
     public function action_view()
@@ -41,11 +41,11 @@ class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_A
         $crumbs[] = ['label' => 'Account', 'href' => $this->BApp->href('customer/myaccount')];
         $crumbs[] = ['label' => 'Orders', 'href' => $this->BApp->href('customer/order')];
         $crumbs[] = ['label' => 'View order', 'active' => true];
+        $this->layout('/customer/order/view');
         $this->view('breadcrumbs')->crumbs = $crumbs;
         $this->view('customer/order/view')->order = $order;
         $this->view('customer/order/view')->billing = $order->billing();
         $this->view('customer/order/view')->shipping = $order->shipping();
-        $this->layout('/customer/order/view');
     }
 
 }

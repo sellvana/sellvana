@@ -13,7 +13,7 @@ class FCom_Promo_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     public function action_media()
     {
         $promoId = $this->BRequest->get('id');
-        $this->view('promo/media')->promo = $this->FCom_Promo_Model_Promo->load($promoId);
         $this->layout('/promo/media');
+        $this->view('promo/media')->promo = $this->FCom_Promo_Model_Promo->load($promoId);
     }
 }

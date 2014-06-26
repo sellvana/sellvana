@@ -56,6 +56,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         } else {
             $breadCrumbLabel = 'Billing address';
         }
+        $this->layout('/checkout/address');
         $layout->view('breadcrumbs')->set('crumbs', [
             ['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
             ['label' => 'Checkout', 'href' =>  $this->BApp->href("checkout")],
@@ -64,7 +65,6 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
 //            $layout->view('geo/embed')->set('countries', $countriesList);
 //        }
         $layout->view('checkout/address')->set(['address' => $address, 'address_type' => $atype, 'countries' => $countries]);
-        $this->layout('/checkout/address');
     }
 
     public function action_address__POST()

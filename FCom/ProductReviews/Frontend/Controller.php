@@ -27,13 +27,13 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             $this->BResponse->redirect($product->url());
             return;
         }
+        $this->layout('/prodreview/form');
         $this->formMessages($this->formId);
         $this->view('prodreviews/review-form')->set([
             'prod'   => $product,
             'formId' => $this->formId,
             'action' => 'add',
         ]);
-        $this->layout('/prodreview/form');
     }
 
     public function action_add__POST()
@@ -212,6 +212,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             'customer_id' => $customerId
         ]);
         if (!$pr) {
+            $this->layout('/prodreview/form');
             $this->message('Cannot find your review, please check again', 'error', 'validator-errors:' . $this->formId);
         } else {
             $prod = $this->FCom_Catalog_Model_Product->load($pr->product_id);
@@ -221,6 +222,7 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
                 return;
             }
 
+            $this->layout('/prodreview/form');
             $this->view('prodreviews/review-form')->set([
                 'prod' => $prod,
                 'pr' => $pr,
@@ -231,7 +233,6 @@ class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_A
             'action' => 'edit',
         ]);
         $this->formMessages($this->formId);
-        $this->layout('/prodreview/form');
     }
 
     public function action_edit__POST()
