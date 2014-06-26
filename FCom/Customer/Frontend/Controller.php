@@ -194,8 +194,8 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_register()
     {
-        $this->view('customer/register')->set('formId', 'register-form');
         $this->layout('/customer/register');
+        $this->view('customer/register')->set('formId', 'register-form');
     }
 
     public function action_register__POST()

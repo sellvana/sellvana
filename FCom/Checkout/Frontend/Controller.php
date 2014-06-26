@@ -15,6 +15,8 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     {
         $layout = $this->BLayout;
 
+        $this->layout('/checkout/cart');
+
         $layout->view('checkout/cart')->set('redirectLogin', false);
         if ($this->BApp->m('FCom_Customer') && $this->FCom_Customer_Model_Customer->isLoggedIn() == false) {
             $layout->view('checkout/cart')->set('redirectLogin', true);
@@ -30,7 +32,6 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $shippingEstimate = $this->BSession->get('shipping_estimate');
         $layout->view('checkout/cart')->set('cart', $cart);
         $layout->view('checkout/cart')->set('shipping_esitmate', $shippingEstimate);
-        $this->layout('/checkout/cart');
     }
 
     public function action_cart__POST()

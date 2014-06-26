@@ -94,6 +94,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function action_index()
     {
+        $this->layout();
         if ($this->BRequest->xhr()) {
             $this->BResponse->set($this->gridView())->output();
         }
@@ -110,7 +111,6 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $view = $this->gridView();
         $this->gridViewBefore(['view' => $view, 'page_view' => $pageView]);
 
-        $this->layout();
         if ($this->_useDefaultLayout) {
             $this->BLayout->applyLayout('default_grid');
         }
@@ -224,6 +224,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         if (empty($model)) {
             $model = $class::i()->create();
         }
+        $this->layout();
         $this->formMessages();
         $view = $this->view($this->_formViewName)->set('model', $model);
         $this->formViewBefore(['view' => $view, 'model' => $model]);
@@ -236,7 +237,6 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $nav->setNav($this->_navPath);
         }
 
-        $this->layout();
         $this->BLayout->view('admin/form')->set('tab_view_prefix', $this->_formViewPrefix);
         if ($this->_useDefaultLayout) {
             $this->BLayout->applyLayout('default_form');
