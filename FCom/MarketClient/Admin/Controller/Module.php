@@ -9,8 +9,8 @@ class FCom_MarketClient_Admin_Controller_Module extends FCom_Admin_Controller_Ab
         //$result = $this->FCom_MarketClient_RemoteApi->requestSiteNonce();
         $modName = $this->BRequest->get('mod_name');
         $result = $this->FCom_MarketClient_RemoteApi->getModuleInstallInfo($modName);
-        $this->view('marketclient/install')->set('install', $result);
         $this->layout('/marketclient/module/install');
+        $this->view('marketclient/install')->set('install', $result);
     }
 
     public function action_install__POST()
