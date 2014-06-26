@@ -134,5 +134,14 @@ class FCom_Sales_Main extends BClass
             'filter' => true
         ]);
     }
+
+    public function onControllerBeforeDispatch($args)
+    {
+        if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
+            && $this->BConfig->get('modules/FCom_Sales/neworder_realtime_notification')
+        ) {
+            $this->FCom_PushServer_Model_Client->sessionClient()->subscribe('sales_feed');
+        }
+    }
 }
 

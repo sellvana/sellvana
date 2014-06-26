@@ -125,7 +125,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         $client = $this->FCom_PushServer_Model_Client->sessionClient();
 
         if (!isset($request['window_name']) || !isset($request['conn_id'])
-            || !is_string($request['window_name']) || !is_string($request['conn_id'])
+            || !is_string($request['window_name']) || !is_numeric($request['conn_id'])
         ) {
             $client->send([
                 'signal' => 'error',
