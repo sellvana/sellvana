@@ -1053,17 +1053,17 @@ class BLayout extends BClass
 
         $modReg = $this->BModuleRegistry;
 
-        if (!empty($theme['layout_before'])) {
-            foreach ($theme['layout_before'] as $layoutBefore) {
-                $this->loadLayout($modReg->expandPath($layoutBefore));
-            }
-        }
         if (!empty($theme['views_before'])) {
             foreach ($theme['views_before'] as $viewsBefore) {
                 $a = explode('/', $viewsBefore, 2);
                 $viewsMod = $modReg->module(substr($a[0], 1));
                 $viewsDir = $viewsMod->root_dir . '/' . $a[1];
                 $this->addAllViews($viewsDir, '', $viewsMod);
+            }
+        }
+        if (!empty($theme['layout_before'])) {
+            foreach ($theme['layout_before'] as $layoutBefore) {
+                $this->loadLayout($modReg->expandPath($layoutBefore));
             }
         }
         if (!empty($theme['callback'])) {
@@ -1118,6 +1118,47 @@ class BLayout extends BClass
 
         $this->BEvents->fire('BLayout::applyTheme:after', ['theme_name' => $themeName]);
 
+        return $this;
+    }
+
+    public function loadThemeViews($themeName)
+    {
+        if (empty($this->_themes[$themeName])) {
+            BDebug::warning('Invalid theme name: ' . $themeName);
+            return false;
+        }
+
+        $theme = $this->_themes[$themeName];
+        $area = $this->BRequest->area();
+        if (!empty($theme['area']) && !in_array($area, (array)$theme['area'])) {
+            BDebug::debug('Theme ' . $themeName . ' can not be used in ' . $area);
+            return false;
+        }
+
+        if (!empty($theme['parent'])) {
+            foreach ((array)$theme['parent'] as $parentThemeName) {
+                if ($this->loadThemeViews($parentThemeName)) {
+                    break; // load the first available parent theme
+                }
+            }
+        }
+        $modReg = $this->BModuleRegistry;
+        if (!empty($theme['views_before'])) {
+            foreach ($theme['views_before'] as $viewsBefore) {
+                $a = explode('/', $viewsBefore, 2);
+                $viewsMod = $modReg->module(substr($a[0], 1));
+                $viewsDir = $viewsMod->root_dir . '/' . $a[1];
+                $this->addAllViews($viewsDir, '', $viewsMod);
+            }
+        }
+        if (!empty($theme['views_after'])) {
+             foreach ($theme['views_after'] as $viewsAfter) {
+                $a = explode('/', $viewsAfter, 2);
+                $viewsMod = $modReg->module(substr($a[0], 1));
+                $viewsDir = $viewsMod->root_dir . '/' . $a[1];
+                $this->addAllViews($viewsDir, '', $viewsMod);
+            }
+        }
         return $this;
     }
 
