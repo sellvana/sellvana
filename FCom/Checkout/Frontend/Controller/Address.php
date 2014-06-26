@@ -48,6 +48,18 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
                 $address->atype = 'billing';
             }
         }
+        $customer = $this->FCom_Customer_Model_Customer->sessionUser();
+        if ($customer) {
+            if (!$address->firstname && $customer->firstname) {
+                $address->firstname = $customer->firstname;
+            }
+            if (!$address->lastname && $customer->lastname) {
+                $address->lastname = $customer->lastname;
+            }
+            if (!$address->email && $customer->email) {
+                $address->email = $customer->email;
+            }
+        }
 
         //$address->save();
         //$address = $this->FCom_Sales_Model_Cart_Address->load($address->id());
