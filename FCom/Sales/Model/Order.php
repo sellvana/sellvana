@@ -413,4 +413,23 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         }
     }
 
+    public function onAfterSave()
+    {
+        parent::onAfterSave();
+
+        if ($this->_newRecord) {
+            $pCustomerId = $this->get('customer_id');
+            $customer = $this->FCom_Customer_Model_Customer->load($pCustomerId);
+            $this->FCom_PushServer_Model_Channel->getChannel('sales_feed', true)->send([
+                    'signal' => 'new_order',
+                    'order' => [
+                        'id' => $this->id(),
+                        'email' => $customer->email,
+                        'name' => $customer->firstname . ' ' . $customer->lastname,
+                        'mes_be' => $this->BLocale->_('Order'),
+                        'mes_af' => $this->BLocale->_('has been placed by')
+                    ],
+                ]);
+        }
+    }
 }

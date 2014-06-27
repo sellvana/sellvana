@@ -5,8 +5,10 @@ base:
     - view: head
         do:
             - [ requireJs, jquery.rateit, "@FCom_LibJsCommon/js/jquery.rateit.min", { deps: [ jquery ] } ]
+            - [ requireJs, fcom.productreviews, "@FCom_ProductReviews/Admin/js/fcom.productreviews" ]
             - [ css, "@FCom_LibJsCommon/js/css/jquery.rateit.css" ]
-            - [ requireRun, jquery.rateit ]
+            - [ requireRun, jquery.rateit]
+            - [ requireRun, fcom.productreviews]
 
 catalog_product_form_tabs:
     - view: admin/form

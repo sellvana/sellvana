@@ -249,7 +249,10 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                     if (in_array($params['data']['variants']['field_values'], $arr)) {
                         $flag = false;
                         $arr['variant_qty'] = $arr['variant_qty'] + $params['qty'];
-                        $arr['shopper'] = $params['shopper'];
+                        if (isset($params['shopper'])) {
+                            $arr['shopper'] = $params['shopper'];
+                        }
+
                     }
                 }
             }
