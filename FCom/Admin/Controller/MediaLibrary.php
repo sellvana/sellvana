@@ -16,15 +16,15 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     public function getFolder()
     {
         $folder = $this->BRequest->get('folder');
-        if(empty($folder)){
+        if (empty($folder)) {
             $type = $this->BRequest->get('type');
-            if($type){
+            if ($type) {
                 $uploadConfig = $this->uploadConfig($type);
-                if(empty($uploadConfig)){
+                if (empty($uploadConfig)) {
                     throw new BException("Unknown upload type.");
                 }
-                $canUpload = isset($uploadConfig['can_upload'])? $uploadConfig['can_upload']: true;
-                if($canUpload && isset($uploadConfig['folder'])){
+                $canUpload = isset($uploadConfig['can_upload']) ? $uploadConfig['can_upload'] : true;
+                if ($canUpload && isset($uploadConfig['folder'])) {
                     $folder = $uploadConfig['folder'];
                 }
             }
@@ -33,7 +33,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             throw new BException('Folder ' . $folder . ' is not allowed');
         }
 
-        if(strpos($folder, '{random}') !== false){
+        if (strpos($folder, '{random}') !== false) {
             $random = 'storage/' . $this->BConfig->get('core/storage_random_dir');
             $folder = str_replace('{random}', $random, $folder);
         }
