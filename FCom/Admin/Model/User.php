@@ -231,7 +231,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     public function logout()
     {
-        $this->BEvents->fire(__METHOD__, ['user' => $this->sessionUser()]);
+        $this->BEvents->fire(__METHOD__);
         #$this->BSession->set('admin_user_id', null);
         #$this->BSession->set('admin_user_password_token', null);
         $sessData =& $this->BSession->dataToUpdate();
