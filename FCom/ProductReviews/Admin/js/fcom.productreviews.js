@@ -6,7 +6,7 @@ define(['jquery', 'fcom.pushclient', 'jquery.bootstrap-growl'], function ($, Pus
         switch (msg.signal) {
             case 'new_review':
                 var r = msg.review;
-                var href = FCom.base_href + 'catalog/products/form/?id=' + r.id;
+                var href = FCom.base_href + 'prodreviews/form/?id=' + r.id;
                 var cLink = '<a href="' + href + '">#' + r.id + '</a>';
                 $.bootstrapGrowl(r.name + ' ' + r.mes + ' ' + cLink, {type: 'success', align: 'center', width: 'auto'});
                 break;

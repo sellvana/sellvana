@@ -68,7 +68,7 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
         $this->FCom_PushServer_Model_Channel->getChannel('reviews_feed', true)->send([
                 'signal' => 'new_review',
                 'review' => [
-                    'id' => $pId,
+                    'id' => $this->id(),
                     'email' => $customer->email,
                     'name' => $customer->firstname . ' ' . $customer->lastname,
                     'mes' => $this->BLocale->_('has review the product')
