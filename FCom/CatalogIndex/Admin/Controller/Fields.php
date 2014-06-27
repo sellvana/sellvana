@@ -97,8 +97,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
         $gridView = $args['page_view'];
         $actions = $gridView->get('actions');
         $actions += [
-            'reindex_force' => ' <button class="btn btn-primary" type="button" onclick="$(\'#util-form\').attr(\'action\', \''
-                . $this->BApp->href('catalogindex/reindex?CLEAR=1') . '\').submit()"><span>' . $this->BLocale->_('Force Reindex')
+            'reindex_force' => ' <button class="btn btn-primary btn-progress _modal" data-toggle="modal" data-target="#progress" type="button"><span>' . $this->BLocale->_('Force Reindex')
                 . '</span></button>',
         ];
         $actions['new'] = '<button type="button" id="add_new_index_field" class="btn grid-new btn-primary _modal">'

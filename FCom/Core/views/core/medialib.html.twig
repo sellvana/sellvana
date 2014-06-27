@@ -22,7 +22,7 @@
                                     {{ 'Library'|_ }}
                                 </a>
                             </li>
-                            {% if uploadConfig.can_upload or uploadConfig is empty %}
+                            {% if uploadConfig.can_upload %}
                             <li>
                                 <a data-toggle='tab' href='#{{config.id}}-media-upload'>
                                     {{ 'Upload'|_ }}
@@ -34,7 +34,7 @@
                             <div class='tab-pane active' id='{{config.id}}-attach_library'>
                                 {{ THIS.view('core/backbonegrid').set('grid', mediaLibAttachConfig) | raw }}
                             </div>
-                            {% if uploadConfig.can_upload or uploadConfig is empty %}
+                            {% if uploadConfig.can_upload %}
                             <div class='tab-pane' id='{{config.id}}-media-upload'>
                                 <div class='box-content'>
                                     <div class='row fileupload-buttonbar'>
@@ -193,8 +193,8 @@
                 })
             }
         });
-        $('.btn-rescan-images').click(function () {
-            $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw}}', function (response) {
+        $('#{{ config.id }}').on('click', '.btn-rescan-images', function () {
+            $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw}}&&type={{ config.type }}', { do: 'rescan'}, function (response) {
                 if (response.status == 'success') {
                     $.bootstrapGrowl("Rescan success", { type: 'success', align: 'center', width: 'auto' });
                     mediaGrid.getRows().fetch();

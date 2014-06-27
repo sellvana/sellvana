@@ -204,8 +204,15 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         if ($cart->customer_email) {
             $orderData['customer_email']  =  $cart->customer_email;
         } else {
+            $billing = $this->FCom_Sales_Model_Cart_Address->loadWhere(['cart_id' => $cart->id(), 'atype' => 'billing']);
+            #var_dump($cart->id(), $billing);
+            $orderData['customer_email'] = $billing->email;
+            /*
             $customer = $this->FCom_Customer_Model_Customer->load($cart->customer_id);
-            $orderData['customer_email']  =  $customer->email;
+            if ($customer) {
+                $orderData['customer_email']  =  $customer->email;
+            }
+            */
         }
         $orderData['item_qty']        = $cart->item_qty;
         $orderData['subtotal']        = $cart->subtotal;

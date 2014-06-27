@@ -6,6 +6,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
 
     public function action_index()
     {
+        $this->layout('/settings');
         $view = $this->view('settings');
         $tabViews = $this->BLayout->findViewsRegex('#^settings/#');
         $tabGroups = [];
@@ -31,7 +32,6 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
                 ]);
             }
         }
-        $this->layout('/settings');
         $this->processFormTabs($view, $this->BConfig);
 #echo "<pre>"; var_dump($view);echo "</pre>"; exit;
     }

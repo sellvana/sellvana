@@ -2548,7 +2548,7 @@ class BDebug extends BClass
 */
         $l = static::$_level[static::STOP];
         if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
-            static::dumpLog();
+            static::i()->dumpLog();
             die;
         }
 

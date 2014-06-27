@@ -5,9 +5,9 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     public function action_index()
     {
         $posts = $this->FCom_Blog_Model_Post->getPostsOrm()->find_many();
+        $this->layout('/blog/index');
         $this->view('blog/posts')->set('posts', $posts);
         $this->view('head')->rss($this->BApp->href('blog/feed.rss'));
-        $this->layout('/blog/index');
     }
 
     public function action_tag()
@@ -20,6 +20,7 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 return;
             }
         }
+        $this->layout('/blog/tag');
         $this->view('head')->rss($tag->getUrl() . '/feed.rss');
         $posts = $this->FCom_Blog_Model_Post->getPostsOrm()
             ->join('FCom_Blog_Model_PostTag', ['pt.post_id', '=', 'p.id'], 'pt')
@@ -27,7 +28,6 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             ->find_many();
         $this->view('blog/posts')->set('posts', $posts);
         $this->view('head')->addTitle($tagName);
-        $this->layout('/blog/tag');
     }
 
     public function action_category()
@@ -40,6 +40,7 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 return;
             }
         }
+        $this->layout('/blog/category');
         $this->view('head')->rss($cat->getUrl() . '/feed.rss');
         $posts = $this->FCom_Blog_Model_Post->getPostsOrm()
             ->join('FCom_Blog_Model_PostCategory', ['pc.post_id', '=', 'p.id'], 'pc')
@@ -47,7 +48,6 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             ->find_many();
         $this->view('blog/posts')->set('posts', $posts);
         $this->view('head')->addTitle($cat->name);
-        $this->layout('/blog/category');
     }
 
     public function action_author()
@@ -60,13 +60,13 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 return;
             }
         }
+        $this->layout('/blog/author');
         $posts = $this->FCom_Blog_Model_Post->getPostsOrm()
             ->where('p.author_user_id', $user->id)
             ->find_many();
         $this->view('blog/posts')->set('posts', $posts);
         $this->view('head')->rss($this->BApp->href('blog') . '/author/' . $userName . '/feed.rss');
         $this->view('head')->addTitle($user->firstname . ' ' . $user->lastname);
-        $this->layout('/blog/author');
     }
 
     public function action_archive()
@@ -79,6 +79,7 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         }
         $m = $r->param('month');
         $postsOrm = $this->FCom_Blog_Model_Post->getPostsOrm();
+        $this->layout('/blog/archive');
         if ($m) {
             $postsOrm->where('create_ym', $y . $m);
             $this->view('head')->addTitle($y . '/' . $m);
@@ -87,7 +88,6 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $this->view('head')->addTitle($y);
         }
         $this->view('blog/posts')->set('posts', $postsOrm->find_many());
-        $this->layout('/blog/archive');
     }
 
     public function action_post()
@@ -107,13 +107,13 @@ class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $this->forward(false);
             return;
         }
+        $this->layout('/blog/post');
         $this->view('head')->canonical($post->getUrl());
         $this->view('blog/post')->set('post', $post);
         $this->view('head')->addTitle($post->get('title'));
         $this->view('head')->addMeta('title', $post->get('meta_title'));
         $this->view('head')->addMeta('description', $post->get('meta_description'));
         $this->view('head')->addMeta('keywords', $post->get('meta_keywords'));
-        $this->layout('/blog/post');
     }
 
     public function action_rss()

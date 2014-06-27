@@ -38,6 +38,7 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
                 $this->message('No modules are available for publishing', 'warning');
             }
 
+            $this->layout('/marketclient/publish');
             $view = $this->view('marketclient/publish');
             if (!empty($result['error'])) {
                 $this->message($result['message'], 'error');
@@ -45,9 +46,9 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
                 $view->set('modules', $result);
             }
         } catch (Exception $e) {
+            $this->layout('/marketclient/publish');
             $this->message($e->getMessage(), 'error');
         }
-        $this->layout('/marketclient/publish');
     }
 
     public function action_module()
@@ -58,8 +59,8 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
             $this->forward(false);
             return;
         }
-        $this->view('marketclient/publish/module')->set('mod_name', $mod);
         $this->layout('/marketclient/publish/module');
+        $this->view('marketclient/publish/module')->set('mod_name', $mod);
     }
 
     public function action_module__POST()

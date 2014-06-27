@@ -4,7 +4,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
 {
     public function action_redirect()
     {
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $salesOrder = $this->FCom_Sales_Model_Order->load($cart->id(), 'cart_id');
         if (!$salesOrder) {
             $href = $this->BApp->href('cart');
@@ -56,7 +56,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
     public function action_return()
     {
         $sData =& $this->BSession->dataToUpdate();
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $salesOrder = $this->FCom_Sales_Model_Order->load($cart->id(), 'cart_id');
         if (!$salesOrder) {
             $href = $this->BApp->href('cart');
@@ -150,9 +150,9 @@ class FCom_PayPal_Frontend_Controller extends BActionController
         $salesOrder->paid();
 
         //unset cart
-        $cart->status = 'finished';
+        $cart->status = 'ordered';
         $cart->save();
-        $this->FCom_Sales_Model_Cart->sessionCartId(null);
+        $this->FCom_Sales_Model_Cart->resetSessionCart();
 
         $hrefUrl = $this->BApp->href('checkout/success');
         $this->BResponse->redirect($hrefUrl);

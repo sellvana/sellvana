@@ -119,11 +119,11 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $model = $order;
         $model->act = $act;
 
+        $this->layout($this->_formLayoutName);
         $view = $this->view($this->_formViewName)->set('model', $model);
 
         $this->formViewBefore(['view' => $view, 'model' => $model]);
 
-        $this->layout($this->_formLayoutName);
         $this->processFormTabs($view, $model, 'edit');
     }
 

@@ -2553,10 +2553,19 @@ class BActionController extends BClass
 
     public function viewProxy($viewPrefix, $defaultView = 'index', $hookName = 'main', $baseLayout = null)
     {
+        $layout = $this->BLayout;
         $viewPrefix = trim($viewPrefix, '/') . '/';
         $page = $this->BRequest->param('view');
         if (!$page) {
             $page = $defaultView;
+        }
+
+        $theme = $this->BConfig->get('modules/' . $this->BRequest->area() . '/theme');
+        if (!$theme) {
+            $theme = $this->BLayout->getDefaultTheme();
+        }
+        if ($theme) {
+            $layout->loadThemeViews($theme);
         }
         $view = $this->view($viewPrefix . $page);
         if ($view instanceof BViewEmpty) {
@@ -2564,9 +2573,13 @@ class BActionController extends BClass
             return false;
         }
 
-        if ($baseLayout) {
-            $this->layout($baseLayout);
+        if ($theme) {
+            $layout->applyTheme($theme);
         }
+        if ($baseLayout) {
+            $layout->applyLayout($baseLayout);
+        }
+
         $this->BLayout->applyLayout('view-proxy')->applyLayout($viewPrefix . $page);
         $view->useMetaData();
 

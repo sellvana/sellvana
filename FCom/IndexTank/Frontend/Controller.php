@@ -34,6 +34,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
         $this->FCom_Core_Main->lastNav(true);
 
+        $this->layout('/catalog/category');
         $head = $this->view('head');
         $crumbs = ['home'];
         foreach ($category->ascendants() as $c) {
@@ -61,7 +62,6 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $layout->view('indextank/product/filters')->state = $productsData['state'];
 
 
-        $this->layout('/catalog/category');
     }
 
     public function action_search()
@@ -70,6 +70,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $q = $req->get('q');
         if (!$q) {
             $this->BResponse->redirect('');
+            return;
         }
         $sc = $req->get('sc');
         $f = $req->get('f');
@@ -90,6 +91,7 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
 
         $this->FCom_Core_Main->lastNav(true);
         $layout = $this->BLayout;
+        $this->layout('/catalog/search');
         $layout->view('breadcrumbs')->crumbs = ['home', ['label' => 'Search: ' . $q, 'active' => true]];
         $layout->view('catalog/search')->query = $q;
         $layout->view('catalog/search')->public_api_url = $this->FCom_IndexTank_Search->publicApiUrl();
@@ -104,7 +106,6 @@ class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstra
         $layout->view('catalog/product/pager')->sort_options = $this->FCom_IndexTank_Model_ProductFunction->getSortingArray();
         $layout->view('indextank/product/filters')->state = $productsData['state'];
 
-        $this->layout('/catalog/search');
     }
 
 

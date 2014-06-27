@@ -6,13 +6,13 @@
     <div class="row">
       <form action="{{ APP.href('checkout') }}{{ REQUEST.get('guest') == 'yes' ? '?guest=yes' : '' }}" method="post">
         <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
-        <div class="f-col-main col-sm-9">
+        <div class="f-col-main col-md-8 col-lg-9">
           <div class="alert alert-info"><strong>{{ 'Review the information below then click "Place your order"!' |_ }}</strong></div>
 
           {{ THIS.view('core/messages') | raw }}
           <div class="row">
             <div class="col-sm-6">
-                <h4>{{ "Shipping to" |_}}</h4>
+                <h4>{{ "Shipping Address" |_}}</h4>
                 {{ THIS.get('shipping_address').as_html() | raw }}
                 {% if THIS.get('guest_checkout') %}
                     <small><a href="{{ APP.href('checkout/address?t=s') }}">{{ 'Change' |_ }}</a></small>
@@ -22,12 +22,12 @@
             </div>
           {% if THIS.get('shipping_methods') %}
             <div class="col-sm-6">
-              <h4>{{ "Shipping Options" |_ }}:</h4>
+              <h4>{{ "Shipping Options" |_ }}</h4>
               <dl>
                 {% for shippingMethod, shippingClass in THIS.get('shipping_methods') %}
                   <dt>{{ shippingClass.getDescription() }} ({{ shippingClass.getEstimate() }})
                   {% for serviceKey, service in shippingClass.getServicesSelected() %}
-                    <dd>
+                    <dd class="radio">
                       <input type="radio" name="shipping" value="{{ shippingMethod ~ ':' ~ serviceKey }}"
                       {{ shippingMethod == cart.get('shipping_method') and
                               serviceKey == cart.get('shipping_service') ? 'checked' }}> {{service}}
@@ -41,7 +41,7 @@
           </div>
           <div class="row">
             <div class="col-sm-6">
-              <h4>{{ "Billing address" |_ }}</h4>
+              <h4>{{ "Billing Address" |_ }}</h4>
               {% if cart.get('shipping_same') %}
                   <p>{{ 'Same as shipping' |_ }}</p>
               {% else %}
@@ -58,7 +58,7 @@
               {{ THIS.view('checkout/payment') | raw }}
             </div>
           </div>
-          <h4>{{ "Items in cart" |_ }}</h4>
+          <h4>{{ "Items in Cart" |_ }}</h4>
           <div class="responsive-table">
             <table class="table">
               <col width="500"/>
@@ -121,7 +121,7 @@
           {% set validator = THIS.validator('checkout-register', THIS.get('address')) %}
           <div class="form-group">
             <label for="#" class="checkbox">
-              <input type="checkbox" name="create_account" value="1" class="required form-control">
+              <input type="checkbox" name="create_account" value="1" class="required checkbox">
               {{ "Create an account?" |_ }}
             </label>
           </div>
@@ -135,14 +135,14 @@
           <div class="form-group">
             <label for="#" class="control-label">{{ "Password" |_ }}</label>
             <div class="controls">
-              <input type="password" id="account-password" name="account[password]" class="required form-control {{ validator.fieldClass('password') }}" pattern=".{6,}"/>
+              <input type="password" id="account-password" name="account[password]" class="required form-control {{ validator.fieldClass('password') }}" pattern=".{6,}" autocomplete="off"/>
                 {{ validator.errorHtml("password", "account-password") | raw }}
             </div>
           </div>
           <div class="form-group">
             <label for="#" class="control-label">{{ "Confirm Password" |_ }}</label>
             <div class="controls">
-              <input type="password" id="account-password_confirm" name="account[password_confirm]" pattern=".{6,}"
+              <input type="password" id="account-password_confirm" name="account[password_confirm]" pattern=".{6,}" autocomplete="off"
                      class="required form-control {{ validator.fieldClass('password_confirm') }}" equalto="#account-password"/>
                 {{ validator.errorHtml("password_confirm", "account-password_confirm") | raw }}
             </div>
@@ -151,14 +151,14 @@
 
         </div><!-- /.f-col-main -->
 
-        <div class="f-col-sidebar f-col-cart-totals gray col-sm-3">
+        <div class="f-col-sidebar f-col-cart-totals gray col-md-4 col-lg-3">
+          <div class="content">
             {% if THIS.get('totals') %}
               <div class="form-group">
                 <label class="control-label">{{ "Enter Coupon/promo code" |_ }}</label>
                 <input type="text" name="coupon_code" class="form-control input-sm">
               </div>
-              <button type="submit" name="coupon_submit" class="btn btn-sm btn-default">{{ "Apply" |_ }}</button>
-              <hr/>
+              <p><button type="submit" name="coupon_submit" class="btn btn-sm btn-default">{{ "Apply" |_ }}</button></p>
               <table class="table">
               {% for total in THIS.get('totals') %}
                   <tr class="{{ total.getRowClass() }}">
@@ -169,8 +169,9 @@
               </table>
             {% endif %}
             <ul class="f-cart-btn-group">
-                <li><input type="submit" name="place_order" value="Order" class="btn btn-primary btn-lg"></li>
+                <li><input type="submit" name="place_order" value="Place Order" class="btn btn-primary btn-lg"></li>
             </ul>
+          </div>
         </div>
         <!-- /.f-col-sidebar -->
 

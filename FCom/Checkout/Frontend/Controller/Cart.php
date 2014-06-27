@@ -15,6 +15,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
     {
         $layout = $this->BLayout;
 
+        $this->layout('/checkout/cart');
         $layout->view('checkout/cart')->set('redirectLogin', false);
         if ($this->BApp->m('FCom_Customer') && $this->FCom_Customer_Model_Customer->isLoggedIn() == false) {
             $layout->view('checkout/cart')->set('redirectLogin', true);
@@ -24,19 +25,18 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         $layout->view('breadcrumbs')->set('crumbs', [['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
             ['label' => 'Cart', 'active' => true]]);
 
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $this->BEvents->fire(__CLASS__ . '::action_cart:cart', ['cart' => $cart]);
 
         $shippingEstimate = $this->BSession->get('shipping_estimate');
         $layout->view('checkout/cart')->set(['cart' => $cart, 'shipping_esitmate' => $shippingEstimate]);
-        $this->layout('/checkout/cart');
     }
 
     public function action_add__POST()
     {
         $cartHref = $this->BApp->href('cart');
         $post = $this->BRequest->post();
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         if (isset($post['action'])) {
             switch ($post['action']) {
             case 'add':
@@ -67,6 +67,14 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                     }
                     if (isset($post['shopper'])) {
                         $options['shopper'] = $post['shopper'];
+                        foreach($options['shopper'] as $key => $value) {
+                            if (!isset($value['val']) || $value['val'] == '') {
+                                unset($options['shopper'][$key]);
+                            }
+                            if ($value['val'] == 'checkbox') {
+                                unset($options['shopper'][$key]['val']);
+                            }
+                        }
                     };
                     $cart->addProduct($p->id(), $options)->calculateTotals()->save();
                     $this->message('The product has been added to your cart');
@@ -135,7 +143,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
     {
         $cartHref = $this->BApp->href('cart');
         $post = $this->BRequest->post();
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $result = [];
         switch ($post['action']) {
         case 'add':
@@ -176,7 +184,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         }
 
         $qty = !empty($qty) ? $qty : 1;
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $cart->addProduct($product->id(), ['qty' => $qty, 'price' => $product->base_price]);
     }
 }

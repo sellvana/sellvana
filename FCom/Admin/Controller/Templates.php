@@ -59,6 +59,7 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
     public function action_form()
     {
         $tplViewName = $this->BRequest->get('id');
+        $this->layout($this->_formLayoutName);
         $areaLayout = $this->FCom_Frontend_Main->getLayout();
         if ($tplViewName) {
             $tplView = $areaLayout->getView($tplViewName);
@@ -85,7 +86,6 @@ class FCom_Admin_Controller_Templates extends FCom_Admin_Controller_Abstract_Gri
             .  $this->BLocale->_('Remove/Revert') . '</span></button>';
         $view->set('actions', $actions);
 
-        $this->layout($this->_formLayoutName);
         $view->set('tab_view_prefix', $this->_formViewPrefix);
         if ($this->_useDefaultLayout) {
             $this->BLayout->applyLayout('default_form');
