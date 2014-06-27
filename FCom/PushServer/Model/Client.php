@@ -204,7 +204,10 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
      */
     public function checkIn()
     {
-        $oldWindows = $newWindows = (array) $this->getData('windows');
+        //@TODO: function getData('windows') work not correctly
+        $clientUpdate = $this->orm()->select('data_serialized')->where('id', $this->get('id'))->find_one();
+        $data = $this->BUtil->fromJson($clientUpdate->get('data_serialized'));
+        $oldWindows = $newWindows = $data['windows'];
         $oldConnections = !empty($oldWindows[static::$_windowName]['connections'])
             ? $oldWindows[static::$_windowName]['connections'] : [];
 
@@ -215,7 +218,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         }
 
         foreach ($oldConnections as $connId => $conn) { // reset old connections
-            $newWindows[static::$_windowName]['connections'][$connId] = 0;
+            unset($newWindows[static::$_windowName]['connections'][$connId]);
         }
         $newWindows[static::$_windowName]['connections'][static::$_connId] = 1; // set new connection
 
@@ -251,10 +254,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     {
         $delay = $this->BConfig->get('modules/FCom_PushServer/delay_microsec', 100000);
         $timeout = $this->BConfig->get('modules/FCom_PushServer/poll_timeout', 50);
-        //$start = time();
-        usleep($timeout*1000000  + $delay*$timeout);
+        $start = time();
         $this->_messages = $this->sync();
-        /*while (true) {
+        while (true) {
             if (time() - $start > $timeout) { // timeout for connection to counteract default gateway timeouts
                 break;
             }
@@ -267,7 +269,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
             } else {
                 usleep($delay);
             }
-        }*/
+        }
         return $this;
     }
 
@@ -335,7 +337,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
             $this->setStatus('offline');
         }
 
-        $this->save();
+       // $this->save();
 
         return $this;
     }
