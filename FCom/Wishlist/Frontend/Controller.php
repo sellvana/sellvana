@@ -31,6 +31,16 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             switch ($post['action']) {
             case 'add':
                 $wishlist->addItem($p->id());
+
+                $this->FCom_PushServer_Model_Channel->getChannel('wishlist_feed', true)->send([
+                        'signal' => 'new_wishlist',
+                        'wishlist_info' => [
+                            'items_id' => $wishlist->id,
+                            'p_name' => $p->get('product_name'),
+                            'mes_be' => $this->_('Item'),
+                            'mes_af' => $this->_('has been added to a wishlist')
+                        ],
+                    ]);
                 $result = [
                     'success' => true,
                     'title' => 'Added to wishlist',
@@ -38,7 +48,6 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                         . '<br><br><a href="' . $wishlistHref . '" class="button">Go to wishlist</a>'
                 ];
                 break;
-
             case 'remove':
                 $wishlist->removeProduct($p->id());
                 $result = [

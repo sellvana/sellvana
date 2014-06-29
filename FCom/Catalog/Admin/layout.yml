@@ -10,6 +10,10 @@ base:
         do:
             - [ addQuickSearch, catalog/products, { label: Products, href: /catalog/products } ]
             - [ addShortcut, catalog/products, { label: New Product, href: /catalog/products/form/ } ]
+    - view: head
+         do:
+            - [ requireJs, fcom.catalog, "@FCom_Catalog/Admin/js/fcom.catalog" ]
+            - [ requireRun, fcom.catalog]
 
 catalog_product_form_tabs:
     - view: admin/form

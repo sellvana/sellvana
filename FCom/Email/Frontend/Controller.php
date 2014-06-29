@@ -53,6 +53,13 @@ class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 $model->sub_newsletter = 1;
                 $model->unsub_all      = 0;
                 $model->save();
+                $this->FCom_PushServer_Model_Channel->getChannel('customers_feed', true)->send([
+                        'signal' => 'new_subscription',
+                        'subscription' => [
+                            'email' => $model->email,
+                            'mes' => $this->BLocale->_('has subscribed to newsletter')
+                        ],
+                    ]);
             }
             //response
             $successMessage = $this->_('Email subscribe successful.');

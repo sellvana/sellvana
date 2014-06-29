@@ -8,6 +8,9 @@ modules:
         auto_use: [ layout, views ]
 
         areas:
+            FCom_Admin:
+                observe:
+                     - [ "BActionController::beforeDispatch", FCom_Wishlist_Admin_Controller.onControllerBeforeDispatch ]
             FCom_Frontend:
                 routing:
                     - [ "/wishlist/?.action", FCom_Wishlist_Frontend_Controller ]
@@ -17,3 +20,4 @@ modules:
 
         default_config:
             modules/FCom_Wishlist/cookie_token_ttl_days: 365
+            modules/FCom_Wishlist/wishlist_realtime_notification: true
