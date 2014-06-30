@@ -1801,6 +1801,15 @@ class BORM extends ORMWrapper
  * ORM model base class
  * @property static string $_table
  * @property static array $_fieldOptions
+ * @property BApp $BApp
+ * @property BConfig $BConfig
+ * @property BEvents $BEvents
+ * @property BSession $BSession
+ * @property BRequest $BRequest
+ * @property BResponse $BResponse
+ * @property BLayout $BLayout
+ * @property BUtil $BUtil
+ * @property BDebug $BDebug
  */
 class BModel extends Model
 {
@@ -2167,7 +2176,8 @@ class BModel extends Model
     * @param int|string|array $id
     * @param string $field
     * @param boolean $cache
-    * @return BModel
+    * @return $this
+    * @throws BException
     */
     public function load($id, $field = null, $cache = false)
     {
@@ -2205,7 +2215,6 @@ class BModel extends Model
             }
             $orm->where($field, $id);
         }
-        /** @var BModel $record */
         $model = $orm->find_one();
         if ($model) {
             $model->onAfterLoad();
@@ -2230,7 +2239,7 @@ class BModel extends Model
     /**
      * Load a model or create an empty one if doesn't exist
      *
-     * @param int|string|array $id
+     * @param int|string|array $where
      * @param string $field
      * @param boolean $cache
      * @return BModel

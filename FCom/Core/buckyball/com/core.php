@@ -28,6 +28,16 @@
 * This class is used for all BuckyBall framework base classes
 *
 * @see BClassRegistry for invokation
+*
+* @property BApp $BApp
+* @property BConfig $BConfig
+* @property BEvents $BEvents
+* @property BSession $BSession
+* @property BRequest $BRequest
+* @property BResponse $BResponse
+* @property BLayout $BLayout
+* @property BUtil $BUtil
+* @property BDebug $BDebug
 */
 class BClass
 {
