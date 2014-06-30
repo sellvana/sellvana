@@ -175,7 +175,6 @@ class BDb
             'dbname' => !empty($config['dbname']) ? $config['dbname'] : null,
             'table_prefix' => !empty($config['table_prefix']) ? $config['table_prefix'] : '',
         ];
-
         $db = BORM::get_db();
         BDebug::profile($profile);
         return $db;
@@ -287,7 +286,8 @@ class BDb
     {
         $a = explode('.', $tableName);
         $p = static::$_config['table_prefix'];
-        return !empty($a[1]) ? $a[0] . '.' . $p . $a[1] : $p . $a[0];
+        $t = !empty($a[1]) ? $a[0] . '.' . $p . $a[1] : $p . $a[0];
+        return $t;
     }
 
     /**
@@ -1540,16 +1540,6 @@ class BORM extends ORMWrapper
     }
 
     /**
-    * Get table name with prefix, if configured
-    *
-    * @param string $class_name
-    * @return string
-    */
-    protected static function _get_table_name($class_name) {
-        return BDb::t(parent::_get_table_name($class_name));
-    }
-
-    /**
     * Set page constraints on collection for use in grids
     *
     * Request and result vars:
@@ -2591,6 +2581,16 @@ class BModel extends Model
     public static function run_sql($sql, $params = [])
     {
         return static::writeDb()->prepare($sql)->execute((array)$params);
+    }
+
+    /**
+    * Get table name with prefix, if configured
+    *
+    * @param string $class_name
+    * @return string
+    */
+    protected static function _get_table_name($class_name) {
+        return BDb::t(parent::_get_table_name($class_name));
     }
 
     /**
