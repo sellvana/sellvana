@@ -21,11 +21,13 @@ class FCom_ProductCompare_Frontend_Controller extends FCom_Frontend_Controller_A
                 return;
             }
         }
-        $layout->view('catalog/compare')->set('products', array_values($products));
         if ($xhr) {
             $this->layout('/catalog/compare/xhr');
         } else {
             $this->layout('/catalog/compare');
+        }
+        $layout->view('catalog/compare')->set('products', array_values($products));
+        if (!$xhr) {
             $layout->view('breadcrumbs')->set('crumbs', ['home',
                 ['label' => 'Compare ' . sizeof($products) . ' products', 'active' => true]
             ]);

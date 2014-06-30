@@ -1,7 +1,6 @@
 {% set c = THIS.get('model') %}
 {% set paymentMethods = UTIL.arrayToOptions(APP.instance('FCom_Sales_Main').getPaymentMethods(), '.getName') %}
 {% set shippingMethods = UTIL.arrayToOptions(APP.instance('FCom_Sales_Main').getShippingMethods(), '.getName') %}
-{% set orderNumber = c.get('modules/FCom_Sales/order_number', '0000000') %}
 {% set fieldData = { model: c, settings_module:'FCom_Sales' } %}
 {% import THIS.view('admin/form-elements').twigName() as forms %}
 <h2>{{ "Sales Settings"|_}}</h2>
@@ -9,10 +8,13 @@
      {{ forms.accordion_panel_start({label:'Defaults'|_, id:'settings-FCom_Sales-group0', in:1}) }}
         {{ forms.select(fieldData, {field:'default_shipping_method', label:'Default Shipping Method'|_, options: shippingMethods }) }}
         {{ forms.select(fieldData, {field:'default_payment_method', label:'Default Payment Method'|_, options: paymentMethods }) }}
-        {{ forms.input(fieldData, {field:'recent_day', label:'Orders Recent Days'|_, attr: 'data-rule-number="true"' }) }}
     {{ forms.accordion_panel_end }}
-    {{ forms.accordion_panel_start({label:'Orders'|_, id:'settings-FCom_Sales-group1'}) }}
-        {{ forms.input(fieldData, {field:'order_number', label:'Define starting order number'|_, required:1,attr: 'data-rule-number="true"', value: orderNumber}) }}
+    {{ forms.accordion_panel_start({label:'Carts'|_, id:'settings-FCom_Sales-group1'}) }}
+        {{ forms.input(fieldData, {field:'cart_cookie_token_ttl_days', label:'Cart Cookie TTL (days)'|_, attr: 'data-rule-number="true"' }) }}
+    {{ forms.accordion_panel_end }}
+    {{ forms.accordion_panel_start({label:'Orders'|_, id:'settings-FCom_Sales-group2'}) }}
+        {{ forms.input(fieldData, {field:'order_number', label:'Define starting order number'|_, required:1,attr: 'data-rule-number="true"'}) }}
+        {{ forms.input(fieldData, {field:'recent_day', label:'Dashboard Orders Recent Days'|_, attr: 'data-rule-number="true"' }) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
 

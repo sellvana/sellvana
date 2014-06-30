@@ -864,10 +864,10 @@ if ($args['name']==="FCom_Referrals") {
         }
         unset($params['update']);
         foreach ($params as $k => $v) {
-            if (is_array($this->$k)) {
-                $this->$k = array_merge_recursive((array)$this->$k, (array)$v);
+            if (is_array($this->{$k})) {
+                $this->{$k} = array_merge_recursive((array)$this->{$k}, (array)$v);
             } else {
-                $this->$k = $v;
+                $this->{$k} = $v;
                 //TODO: make more flexible without sacrificing performance
                 switch ($k) {
                 case 'url_prefix':
@@ -1237,11 +1237,11 @@ if (!isset($o[0]) || !isset($o[1])) {
                 if ($k[0] === "\0") { // protected properties, for cache saved on previous commit
                     continue;
                 }
-                $this->$k = $v;
+                $this->{$k} = $v;
             }
             return $this;
         }
-        $this->$key = $value;
+        $this->{$key} = $value;
         return $this;
     }
 

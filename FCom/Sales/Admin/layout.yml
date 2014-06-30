@@ -5,6 +5,10 @@ base:
             - [ addNav, sales/orders, { label: Orders, href: /orders } ]
             - [ addNav, sales/orderstatus, { label: Order Statuses, href: /orderstatus } ]
             - [ addNav, sales/reports, { label: Reports, href: /sales/reports } ]
+    - view: head
+            do:
+                - [ requireJs, fcom.sales, "@FCom_Sales/Admin/js/fcom.sales" ]
+                - [ requireRun, fcom.sales ]
 
 /settings:
     - view: settings

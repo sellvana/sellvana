@@ -13,7 +13,7 @@
     <label class="col-md-12 control-label">{{ "Shopper"|_ }}</label>
     <ul>
         {% for key, info in variant.shopper %}
-            <li>{{ info.label }}: {{ info.val }} </li>
+            <li>{{ info.label }} {% if info.val is defined %} {{ info.val }} {% endif %} </li>
         {% endfor %}
     </ul>
 {% endif %}

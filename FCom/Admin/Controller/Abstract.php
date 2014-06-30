@@ -232,6 +232,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         }
         $out['messages'] = $this->BSession->messages('admin');
         $this->BResponse->json($out);
+        die;
     }
 
     protected function _processGridDataPost($class, $defData = [])
@@ -239,7 +240,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         $r = $this->BRequest;
         $id = $r->post('id');
         $data = $defData + $r->post();
-        $hlp = $class::i();
+        $hlp = $this->{$class};
         unset($data['id'], $data['oper']);
 
         $args = ['data' => &$data, 'oper' => $r->post('oper'), 'helper' => $hlp];
@@ -290,6 +291,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 
         //$this->BResponse->redirect('fieldsets/grid_data');
         $this->BResponse->json($result);
+        die;
     }
 
     public function gridPostBefore($args)

@@ -1,4 +1,4 @@
-define(['jquery', 'fcom.pushclient', 'jquery.bootstrap-growl'], function($, PushClient) {
+define(['jquery', 'fcom.pushclient', 'jquery.bootstrap-growl'], function ($, PushClient) {
 
     PushClient.listen({channel: 'customers_feed', callback: channel_customers_feed});
 
@@ -8,7 +8,7 @@ define(['jquery', 'fcom.pushclient', 'jquery.bootstrap-growl'], function($, Push
                 var c = msg.customer;
                 var href = FCom.base_href + 'customers/form/?id=' + c.id;
                 var cLink = '<a href="' + href + '">' + c.name + ' (' + c.email + ')</a>';
-                $.bootstrapGrowl('New customer registration! ' + cLink, {type: 'success', align: 'center', width: 'auto'});
+                $.bootstrapGrowl(cLink + ' ' + c.mes, {type: 'success', align: 'center', width: 'auto'});
                 break;
         }
     }

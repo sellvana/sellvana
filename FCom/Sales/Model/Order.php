@@ -98,7 +98,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function getOrders($customerId)
     {
-        return $this::i()->orm()->where('customer_id', $customerId)->find_many_assoc();
+        return $this->orm()->where('customer_id', $customerId)->find_many_assoc();
 
     }
 
@@ -112,7 +112,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
      */
     public function isOrderExists($uniqueId, $customerId)
     {
-        return $this::i()->orm()->where('unique_id', $uniqueId)->where('customer_id', $customerId)->find_one();
+        return $this->orm()->where('unique_id', $uniqueId)->where('customer_id', $customerId)->find_one();
     }
 
     public function prepareApiData($orders, $includeItems = false)
@@ -204,8 +204,15 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         if ($cart->customer_email) {
             $orderData['customer_email']  =  $cart->customer_email;
         } else {
+            $billing = $this->FCom_Sales_Model_Cart_Address->loadWhere(['cart_id' => $cart->id(), 'atype' => 'billing']);
+            #var_dump($cart->id(), $billing);
+            $orderData['customer_email'] = $billing->email;
+            /*
             $customer = $this->FCom_Customer_Model_Customer->load($cart->customer_id);
-            $orderData['customer_email']  =  $customer->email;
+            if ($customer) {
+                $orderData['customer_email']  =  $customer->email;
+            }
+            */
         }
         $orderData['item_qty']        = $cart->item_qty;
         $orderData['subtotal']        = $cart->subtotal;
@@ -406,4 +413,23 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         }
     }
 
+    public function onAfterSave()
+    {
+        parent::onAfterSave();
+
+        if ($this->_newRecord) {
+            $pCustomerId = $this->get('customer_id');
+            $customer = $this->FCom_Customer_Model_Customer->load($pCustomerId);
+            $this->FCom_PushServer_Model_Channel->getChannel('sales_feed', true)->send([
+                    'signal' => 'new_order',
+                    'order' => [
+                        'id' => $this->id(),
+                        'email' => $customer->email,
+                        'name' => $customer->firstname . ' ' . $customer->lastname,
+                        'mes_be' => $this->BLocale->_('Order'),
+                        'mes_af' => $this->BLocale->_('has been placed by')
+                    ],
+                ]);
+        }
+    }
 }

@@ -27,6 +27,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $this->forward(false);
             return $this;
         }
+        $this->layout('/catalog/product');
         $this->BEvents->fire('FCom_Catalog_Frontend_Controller::action_product:product', ['product' => &$product]);
         $this->BApp->set('current_product', $product);
 
@@ -66,7 +67,6 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         }
         $layout->view('catalog/product/details')->set('user', $user);
 
-        $this->layout('/catalog/product');
 
         if ($product->layout_update) {
             $layoutUpdate = $this->BYAML->parse($product->layout_update);

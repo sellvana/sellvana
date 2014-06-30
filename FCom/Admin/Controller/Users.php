@@ -78,10 +78,10 @@ class FCom_Admin_Controller_Users extends FCom_Admin_Controller_Abstract_GridFor
     public function getRoleUsersConfig($model)
     {
         $class = $this->_modelClass;
-        $orm = $class::i()->orm()->table_alias('au')
+        $orm = $this->{$class}->orm()->table_alias('au')
             ->select(['au.id', 'au.username', 'au.email', 'au.status'])
             ->join('FCom_Admin_Model_Role', ['au.role_id', '=', 'ar.id'], 'ar')
-            ->where('au.role_id', $model ? $model->id : 0);
+            ->where('au.role_id', $model ? $model->id() : 0);
 
         $config = parent::gridConfig();
 

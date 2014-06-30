@@ -21,6 +21,7 @@ class FCom_Admin_Controller_HeaderSearch extends FCom_Admin_Controller_Abstract_
         }
         if ($url != '') {
             $this->BResponse->redirect($url);
+            return;
         }
         $this->layout('/header_search');
     }

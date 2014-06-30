@@ -199,6 +199,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
                     'id' => $this->id(),
                     'email' => $this->email,
                     'name' => $this->firstname . ' ' . $this->lastname,
+                    'mes' => $this->BLocale->_('created an account.')
                 ],
             ]);
         }
@@ -364,6 +365,11 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         }
 
         unset($r['id']);
+        if ($this->BConfig->get('modules/FCom_Customer/require_approval')) {
+            $r['status'] = 'review';
+        } else {
+            $r['status'] = 'active';
+        }
         $customer = $this->create($r)->save();
         $this->BLayout->view('email/new-customer')->set('customer', $customer)->email();
         $this->BLayout->view('email/new-admin')->set('customer', $customer)->email();

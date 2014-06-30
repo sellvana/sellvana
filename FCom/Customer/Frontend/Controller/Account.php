@@ -20,10 +20,10 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
     {
         $customerId = $this->FCom_Customer_Model_Customer->sessionUserId();
         $customer = $this->FCom_Customer_Model_Customer->load($customerId);
+        $this->layout('/customer/account');
         $this->view('customer/account')->set('customer', $customer);
         $crumbs[] = ['label' => 'Account', 'active' => true];
         $this->view('breadcrumbs')->set('crumbs', $crumbs);
-        $this->layout('/customer/account');
     }
 
     public function action_edit()
@@ -31,6 +31,7 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
         $customerId = $this->FCom_Customer_Model_Customer->sessionUserId();
         $customer = $this->FCom_Customer_Model_Customer->load($customerId);
         $formId = 'account-edit';
+        $this->layout('/customer/account/edit');
         $this->view('customer/account/edit')->set(['customer' => $customer, 'formId' => $formId]);
         /*$post = $this->BRequest->post();
             if ($post) {
@@ -55,7 +56,6 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
             $this->view('breadcrumbs')->crumbs = $crumbs;
 
             $this->view('customer/account/edit')->customer = $customer;*/
-        $this->layout('/customer/account/edit');
     }
 
     public function action_edit__POST()

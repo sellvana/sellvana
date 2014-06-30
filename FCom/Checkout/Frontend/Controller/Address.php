@@ -48,6 +48,18 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
                 $address->atype = 'billing';
             }
         }
+        $customer = $this->FCom_Customer_Model_Customer->sessionUser();
+        if ($customer) {
+            if (!$address->firstname && $customer->firstname) {
+                $address->firstname = $customer->firstname;
+            }
+            if (!$address->lastname && $customer->lastname) {
+                $address->lastname = $customer->lastname;
+            }
+            if (!$address->email && $customer->email) {
+                $address->email = $customer->email;
+            }
+        }
 
         //$address->save();
         //$address = $this->FCom_Sales_Model_Cart_Address->load($address->id());
@@ -56,6 +68,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         } else {
             $breadCrumbLabel = 'Billing address';
         }
+        $this->layout('/checkout/address');
         $layout->view('breadcrumbs')->set('crumbs', [
             ['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
             ['label' => 'Checkout', 'href' =>  $this->BApp->href("checkout")],
@@ -64,7 +77,6 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
 //            $layout->view('geo/embed')->set('countries', $countriesList);
 //        }
         $layout->view('checkout/address')->set(['address' => $address, 'address_type' => $atype, 'countries' => $countries]);
-        $this->layout('/checkout/address');
     }
 
     public function action_address__POST()
