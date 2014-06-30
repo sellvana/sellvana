@@ -217,10 +217,13 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         $channel->send(['signal' => 'start', 'msg' => $this->BLocale->_("Import started.")]);
         while(($line = fgets($fi)) !== false) {
             $cnt++;
-            $batchData[]  = (array)json_decode($line);
-            if ($cnt % $bs == 0) {
-                $this->import($batchData, $bs);
-                $batchData = [];
+            $lineData     = (array)json_decode(trim($line, ","));
+            if (!empty($lineData)) {
+                $batchData[] = $lineData;
+                if ($cnt % $bs == 0) {
+                    $this->import($batchData, $bs);
+                    $batchData = [];
+                }
             }
         }
 
