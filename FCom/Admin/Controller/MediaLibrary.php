@@ -410,7 +410,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
     public function collectUploadConfig()
     {
-        $modules = BModuleRegistry::i()->getAllModules();
+        $modules = $this->BModuleRegistry->getAllModules();
 
         foreach ($modules as $module) {
             /** @var BModule $module */

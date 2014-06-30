@@ -136,6 +136,9 @@ class BClass
 
     public function getGlobalDependencyInstance($name, $diConfig)
     {
+        if (!ctype_upper($name[0])) {
+            return false;
+        }
         if (isset(static::$_diGlobal[$name])) {
             return static::$_diGlobal[$name];
         }
@@ -656,7 +659,7 @@ class BConfig extends BClass
     public function set($path, $value, $merge = false, $toSave = false)
     {
         if (is_string($toSave) && $toSave === '_configToSave') { // limit?
-            $node =& $this->$toSave;
+            $node =& $this->{$toSave};
         } else {
             $node =& $this->_config;
         }

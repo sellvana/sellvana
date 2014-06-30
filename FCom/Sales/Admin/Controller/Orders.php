@@ -45,7 +45,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         //todo: check this in FCom_Admin_Controller_Abstract_GridForm
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {
-                $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias . '.*');
+                $config['orm'] = $this->{$config['orm']}->orm($this->_mainTableAlias)->select($this->_mainTableAlias . '.*');
             }
             $this->gridOrmConfig($config['orm']);
         }

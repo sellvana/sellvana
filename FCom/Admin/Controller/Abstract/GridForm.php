@@ -63,7 +63,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         $modelClass = $this->_modelClass;
         $config = [
             'id' => static::$_origClass,
-            'orm' => $modelClass ? $modelClass::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias . '.*') : null,
+            'orm' => $modelClass ? $this->{$modelClass}->orm($this->_mainTableAlias)->select($this->_mainTableAlias . '.*') : null,
             #'orm' => $modelClass,
             'data_url' => $gridDataUrl,
             'edit_url' => $gridDataUrl,
@@ -164,7 +164,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             //TODO: clean up and remove
             if (empty($grid['config']['orm'])) {
                 $mc = $this->_modelClass;
-                $grid['config']['orm'] = $mc::i()->orm($this->_mainTableAlias)
+                $grid['config']['orm'] = $this->{$mc}->orm($this->_mainTableAlias)
                     ->select($this->_mainTableAlias . '.*');
                 $view->set('grid', $grid);
             }
@@ -217,12 +217,12 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
     {
         $class = $this->_modelClass;
         $id = $this->BRequest->param('id', true);
-        if ($id && !($model = $class::i()->load($id))) {
+        if ($id && !($model = $this->{$class}->load($id))) {
             /*$this->BDebug->error('Invalid ID: '.$id);*/
             $this->message('This item does not exist', 'error');
         }
         if (empty($model)) {
-            $model = $class::i()->create();
+            $model = $this->{$class}->create();
         }
         $this->layout();
         $this->formMessages();
@@ -281,7 +281,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
         try {
             $class = $this->_modelClass;
             $id = $r->param('id', true);
-            $model = $id ? $class::i()->load($id) : $class::i()->create();
+            $model = $id ? $this->{$class}->load($id) : $this->{$class}->create();
             if (!$model) {
                 throw new BException("This item does not exist");
             }
@@ -299,7 +299,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                     $model->save();
                     $this->message('Changes have been saved');
                     if ($r->post('do') === 'saveAndContinue') {
-                        $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $model->id;
+                        $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $model->id();
                     }
                 } else {
                     $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:' . $formId);
