@@ -1,5 +1,9 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_PushServer_Controller
+ * @property FCom_PushServer_Model_Client FCom_PushServer_Model_Client
+ */
 class FCom_PushServer_Controller extends FCom_Core_Controller_Abstract
 {
     public function action_index__POST()

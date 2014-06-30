@@ -23,11 +23,14 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 
     /**
      * Get or create client record for current browser session
+     * @return FCom_PushServer_Model_Client
      */
     public function sessionClient()
     {
         $sessId = $this->BSession->sessionId();
-        if (!empty(static::$_clientCache[$sessId])) {
+        /*todo: because we need get data from data_serialized which be updated from different connection, so temporary disable load from cache*/
+
+        /*if (!empty(static::$_clientCache[$sessId])) {
             return static::$_clientCache[$sessId];
         }
 
@@ -35,7 +38,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         if (!empty($sessData['pushserver']['client'])) {
             static::$_clientCache[$sessId] = $this->create($sessData['pushserver']['client'], false);
             return static::$_clientCache[$sessId];
-        }
+        }*/
 
         $client = $this->load($sessId, 'session_id');
         if (!$client) {
@@ -114,10 +117,10 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     {
         parent::onAfterSave();
 
-        if ($this->session_id === $this->BSession->sessionId()) {
+        /*if ($this->session_id === $this->BSession->sessionId()) {
             $sessData =& $this->BSession->dataToUpdate();
             $sessData['pushserver']['client'] = $this->as_array();
-        }
+        }*/
     }
 
     public function processRequest($request)
@@ -204,10 +207,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
      */
     public function checkIn()
     {
-        //@TODO: function getData('windows') work not correctly
-        $clientUpdate = $this->orm()->select('data_serialized')->where('id', $this->get('id'))->find_one();
-        $data = $this->BUtil->fromJson($clientUpdate->get('data_serialized'));
-        $oldWindows = $newWindows = $data['windows'];
+        $oldWindows = $newWindows = (array) $this->getData('windows');
         $oldConnections = !empty($oldWindows[static::$_windowName]['connections'])
             ? $oldWindows[static::$_windowName]['connections'] : [];
 

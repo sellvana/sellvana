@@ -28,6 +28,56 @@
 * This class is used for all BuckyBall framework base classes
 *
 * @see BClassRegistry for invokation
+*
+* core
+* @property BApp $BApp
+* @property BException $BException
+* @property BConfig $BConfig
+* @property BClassRegistry $BClassRegistry
+* @property BClassAutoload $BClassAutoload
+* @property BEvents $BEvents
+* @property BSession $BSession
+*
+* controller
+* @property BRequest $BRequest
+* @property BResponse $BResponse
+* @property BRouting $BRouting
+*
+* layout
+* @property BLayout $BLayout
+* @property BView $BView
+* @property BViewEmpty $BViewEmpty
+* @property BViewHead $BViewHead
+* @property BViewList $BViewList
+*
+* db
+* @property BDb $BDb
+*
+* locale
+* @property BLocale $BLocale
+*
+* module
+* @property BModuleRegistry $BModuleRegistry
+* @property BModule $BModule
+* @property BMigrate $BMigrate
+* @property BDbModule $BDbModule
+*
+* cache
+* @property BCache $BCache
+*
+* misc
+* @property BUtil $BUtil
+* @property BHTML $BHTML
+* @property BEmail $BEmail
+* @property BValue $BValue
+* @property BData $BData
+* @property BDebug $BDebug
+* @property BLoginThrottle $BLoginThrottle
+* @property BYAML $BYAML
+* @property BValidate $BValidate
+* @property BValidateViewHelper $BValidateViewHelper
+* @property Bcrypt $Bcrypt
+* @property BRSA $BRSA
 */
 class BClass
 {
