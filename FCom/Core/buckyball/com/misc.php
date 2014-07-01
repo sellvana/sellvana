@@ -966,7 +966,9 @@ class BUtil extends BClass
         }
 
         // curl disabled by default because file upload doesn't work for some reason. TODO: figure out why
-        if (!empty($options['curl']) && function_exists('curl_init') || ini_get('safe_mode')) {
+        if (!empty($options['curl']) && function_exists('curl_init')
+            || ini_get('safe_mode') || !ini_get('allow_url_fopen')
+        ) {
             $curlOpt = [
                 CURLOPT_USERAGENT => $userAgent,
                 CURLOPT_URL => $url,

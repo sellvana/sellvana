@@ -159,7 +159,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
                         continue;
                     }
                     $class = $service['callback'];
-                    $instance = $class::i();
+                    $instance = $this->{$class};
                     if (!($instance instanceof FCom_PushServer_Service_Abstract)) {
                         //TODO: exception?
                         continue;

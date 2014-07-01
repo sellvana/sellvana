@@ -87,7 +87,7 @@ class FCom_OAuth_Main extends BClass
         } else {
             $className = $providerInfo['class'];
         }
-        return $className::i();
+        return $this->{$className};
     }
 
     public function loginAction()

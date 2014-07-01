@@ -7,7 +7,7 @@ class FCom_Catalog_Frontend_ControlPanel extends BClass
     public function getModel($class, $id)
     {
         if (empty(static::$_models[$class][$id])) {
-            static::$_models[$class][$id] = $class::i()->load($id);
+            static::$_models[$class][$id] = $this->{$class}->load($id);
         }
         return static::$_models[$class][$id];
     }
