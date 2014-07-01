@@ -144,6 +144,14 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         $this->FCom_Catalog_Model_SearchHistory->addSearchHit($q, $productsData['state']['c']);
 
+        $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
+                'signal' => 'new_search',
+                'search_info' => [
+                    'key' => $q,
+                    'mes_be' => $this->_('The term'),
+                    'mes_af' => $this->_('has been searched')
+                ],
+            ]);
         $layout->view('catalog/category/sidebar')->set('products_data', $productsData);
     }
 }

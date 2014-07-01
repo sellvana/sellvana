@@ -3,6 +3,7 @@ define(['jquery', 'fcom.pushclient', 'jquery.bootstrap-growl'], function ($, Pus
     PushClient.listen({channel: 'reviews_feed', callback: channel_product_reviews_feed});
 
     function channel_product_reviews_feed(msg) {
+
         switch (msg.signal) {
             case 'new_review':
                 var r = msg.review;

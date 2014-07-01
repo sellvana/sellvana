@@ -333,6 +333,17 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             return false;
         }
         $this->BLoginThrottle->success();
+
+        $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
+                'signal' => 'new_login',
+                'login_info' => [
+                    'id' => $user->id,
+                    'email' => $user->email,
+                    'name' => $user->firstname . ' ' . $user->lastname,
+                    'mes' => $this->BLocale->_('is logged in')
+                ],
+            ]);
+
         return $user;
     }
 
