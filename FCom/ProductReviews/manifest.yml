@@ -17,7 +17,7 @@ modules:
                     - [ /prodreviews/.action, FCom_ProductReviews_Admin_Controller ]
                 observe:
                     - [ "BLayout::hook:catalog/products/tab/main", FCom_ProductReviews_Admin.hookProductTab ]
-                    - [ "FCom_Admin_View_Header::getNotifications", FCom_ProductReviews_Admin.onControllerBeforeDispatch ]
+                    - [ "FCom_Admin_View_Header::getNotifications", FCom_ProductReviews_Admin.onGetHeaderNotifications ]
 
             FCom_Frontend:
                 routing:

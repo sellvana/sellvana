@@ -29,6 +29,11 @@ class FCom_Customer_Admin extends BClass
 
     public function onControllerBeforeDispatch($args)
     {
+
+    }
+
+    public function onGetHeaderNotifications()
+    {
         if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
             && $this->BConfig->get('modules/FCom_Customer/newcustomer_realtime_notification')
         ) {

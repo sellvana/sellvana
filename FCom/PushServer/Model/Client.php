@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_PushServer_Model_Client
+ * @property FCom_PushServer_Main $FCom_PushServer_Main
+ * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
+ * @property FCom_PushServer_Model_Message $FCom_PushServer_Model_Message
+ * @property FCom_PushServer_Model_Subscriber $FCom_PushServer_Model_Subscriber
+ */
 class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_pushserver_client';
@@ -28,8 +35,8 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     public function sessionClient()
     {
         $sessId = $this->BSession->sessionId();
-        /*todo: because we need get data from data_serialized which be updated from different connection, so temporary disable load from cache*/
 
+        /*todo: because we need get data from data_serialized which be updated from different connection, so temporary disable load from cache*/
         /*if (!empty(static::$_clientCache[$sessId])) {
             return static::$_clientCache[$sessId];
         }
@@ -125,7 +132,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 
     public function processRequest($request)
     {
-        $client = $this->FCom_PushServer_Model_Client->sessionClient();
+        $client = $this->sessionClient();
 
         if (!isset($request['window_name']) || !isset($request['conn_id'])
             || !is_string($request['window_name']) || !is_numeric($request['conn_id'])
@@ -208,10 +215,6 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     public function checkIn()
     {
         $oldWindows = $newWindows = (array) $this->getData('windows');
-        //@TODO: function getData('windows') work not correctly
-        $clientUpdate = $this->orm()->select('data_serialized')->where('id', $this->get('id'))->find_one();
-        $data = $this->BUtil->fromJson($clientUpdate->get('data_serialized'));
-        $oldWindows = $newWindows = $data['windows'];
         $oldConnections = !empty($oldWindows[static::$_windowName]['connections'])
             ? $oldWindows[static::$_windowName]['connections'] : [];
 
@@ -260,10 +263,9 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     {
         $delay = $this->BConfig->get('modules/FCom_PushServer/delay_microsec', 100000);
         $timeout = $this->BConfig->get('modules/FCom_PushServer/poll_timeout', 50);
-        //$start = time();
-        usleep($timeout*1000000  + $delay*$timeout);
+        $start = time();
         $this->_messages = $this->sync();
-        /*while (true) {
+        while (true) {
             if (time() - $start > $timeout) { // timeout for connection to counteract default gateway timeouts
                 break;
             }
@@ -276,7 +278,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
             } else {
                 usleep($delay);
             }
-        }*/
+        }
         return $this;
     }
 

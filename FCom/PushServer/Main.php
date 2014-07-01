@@ -28,7 +28,7 @@ class FCom_PushServer_Main extends BCLass
     public function layoutInit()
     {
         $head = $this->BLayout->view('head');
-        if ($head) {
+        if ($head && $this->FCom_Admin_Model_User->isLoggedIn()) {
             $head->js_raw('pushserver_init', ['content' => "
 FCom.pushserver_url = '" . $this->BApp->src('@FCom_PushServer/index.php') . "';
             "]);
@@ -62,7 +62,7 @@ FCom.pushserver_url = '" . $this->BApp->src('@FCom_PushServer/index.php') . "';
         return static::$_debug;
     }
 
-    public function onControllerBeforeDispatch($args)
+    public function onGetHeaderNotifications()
     {
         if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
             && $this->BConfig->get('modules/FCom_PushServer/recentactivity_realtime_notification')
