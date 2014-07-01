@@ -16,6 +16,9 @@ class FCom_Test_Test_Unit_ControllerTests_Test extends PHPUnit_Framework_TestCas
      */
     protected $obj;
 
+    /**
+     * @covers FCom_Test_Admin_Controller_Tests::collectTests
+     */
     public function testCollectTestsHasAtleastBConfigTest()
     {
         $tests = $this->obj->collectTests();
@@ -26,6 +29,9 @@ class FCom_Test_Test_Unit_ControllerTests_Test extends PHPUnit_Framework_TestCas
         $this->assertTrue(in_array($bc, $tests));
     }
 
+    /**
+     * @covers FCom_Test_Admin_Controller_Tests::runTests
+     */
     public function testCanRunCollectedTests()
     {
         $tests = $this->obj->collectTests();
