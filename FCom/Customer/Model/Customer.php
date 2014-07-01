@@ -326,7 +326,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         }
         $this->BLoginThrottle->success();
 
-        $this->FCom_PushServer_Model_Channel->getChannel('customers_feed', true)->send([
+        $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
                 'signal' => 'new_login',
                 'login_info' => [
                     'id' => $user->id,

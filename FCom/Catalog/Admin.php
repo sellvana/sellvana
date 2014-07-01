@@ -88,13 +88,4 @@ print_r($args); exit;
             '@Templates' => $template,
         ];
     }
-
-    public function onControllerBeforeDispatch($args)
-    {
-        if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
-            && $this->BConfig->get('modules/FCom_Catalog/catalog_realtime_notification')
-        ) {
-            $this->FCom_PushServer_Model_Client->sessionClient()->subscribe('catalog_feed');
-        }
-    }
 }

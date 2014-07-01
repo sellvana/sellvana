@@ -61,4 +61,13 @@ FCom.pushserver_url = '" . $this->BApp->src('@FCom_PushServer/index.php') . "';
     {
         return static::$_debug;
     }
+
+    public function onControllerBeforeDispatch($args)
+    {
+        if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
+            && $this->BConfig->get('modules/FCom_PushServer/recentactivity_realtime_notification')
+        ) {
+            $this->FCom_PushServer_Model_Client->sessionClient()->subscribe('activities_feed');
+        }
+    }
 }

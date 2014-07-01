@@ -1,7 +1,2 @@
-base:
-    - view: head
-        do:
-            - [ requireJs, fcom.wishlist, "@FCom_Wishlist/Admin/js/fcom.wishlist" ]
-            - [ requireRun, fcom.wishlist ]
 /settings:
     - { view: settings, do: [[ addTab, FCom_Wishlist, { label: Wishlist, group: customers, async: true } ]] }

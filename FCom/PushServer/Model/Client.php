@@ -208,17 +208,23 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     public function checkIn()
     {
         $oldWindows = $newWindows = (array) $this->getData('windows');
+        //@TODO: function getData('windows') work not correctly
+        $clientUpdate = $this->orm()->select('data_serialized')->where('id', $this->get('id'))->find_one();
+        $data = $this->BUtil->fromJson($clientUpdate->get('data_serialized'));
+        $oldWindows = $newWindows = $data['windows'];
         $oldConnections = !empty($oldWindows[static::$_windowName]['connections'])
             ? $oldWindows[static::$_windowName]['connections'] : [];
 
-        foreach ($newWindows as $windowName => $window) { // some cleanup
-            if (empty($window['connections'])) {
-                unset($newWindows[$windowName]);
+        if($newWindows){
+            foreach ($newWindows as $windowName => $window) { // some cleanup
+                if (empty($window['connections'])) {
+                    unset($newWindows[$windowName]);
+                }
             }
         }
 
         foreach ($oldConnections as $connId => $conn) { // reset old connections
-            $newWindows[static::$_windowName]['connections'][$connId] = 0;
+            unset($newWindows[static::$_windowName]['connections'][$connId]);
         }
         $newWindows[static::$_windowName]['connections'][static::$_connId] = 1; // set new connection
 
@@ -246,7 +252,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
                 usleep(300000);
             }
         }
-//$this->BDebug->dump($this->getData('windows'));
+        //$this->BDebug->dump($this->getData('windows'));
         return $this;
     }
 

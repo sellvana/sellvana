@@ -30,7 +30,6 @@ modules:
                     - [ FCom_Admin_Controller_HeaderSearch::action_index, FCom_Catalog_Admin_Controller_Products.onHeaderSearch ]
                     - [ FCom_Admin_Controller::action_generate_sitemap, FCom_Catalog_Admin_Controller_Products.onGenerateSiteMap ]
                     - [ FCom_Admin_Controller::action_generate_sitemap, FCom_Catalog_Admin_Controller_Categories.onGenerateSiteMap ]
-                    - [ "BActionController::beforeDispatch", FCom_Catalog_Admin.onControllerBeforeDispatch ]
                 security:
                     request_fields_whitelist:
                         /catalog/categories/tree_form:
@@ -79,5 +78,3 @@ modules:
 
                     - [ /v1/catalog/product, FCom_Catalog_ApiServer_V1_Product.index ]
                     - [ "/v1/catalog/product/:id", FCom_Catalog_ApiServer_V1_Product.index ]
-        default_config:
-            modules/FCom_Catalog/catalog_realtime_notification: true

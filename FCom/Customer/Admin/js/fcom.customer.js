@@ -10,18 +10,6 @@ define(['jquery', 'fcom.pushclient', 'jquery.bootstrap-growl'], function ($, Pus
                 var cLink = '<a href="' + href + '">' + c.name + ' (' + c.email + ')</a>';
                 $.bootstrapGrowl(cLink + ' ' + c.mes, {type: 'success', align: 'center', width: 'auto'});
                 break;
-            case 'new_login':
-                var l = msg.login_info;
-                var href = FCom.base_href + 'customers/form/?id=' + l.id;
-                var cLink = '<a href="' + href + '">' + l.name + ' (' + l.email + ')</a>';
-                $.bootstrapGrowl(cLink + ' ' + l.mes, {type: 'success', align: 'center', width: 'auto'});
-                break;
-            case 'new_subscription':
-                var s = msg.subscription;
-                var href = FCom.base_href + 'subscriptions';
-                var cLink = '<a href="' + href + '">(' + s.email + ')</a>';
-                $.bootstrapGrowl(cLink + ' ' + s.mes, {type: 'success', align: 'center', width: 'auto'});
-                break;
         }
     }
 

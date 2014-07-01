@@ -11,6 +11,7 @@ modules:
                 auto_use: [ layout ]
                 observe:
                     - [ "FCom_Admin_Model_User::logout", "FCom_PushServer_Main::onAdminUserLogout" ]
+                    - [ "FCom_Admin_View_Header::getNotifications", FCom_PushServer_Main.onControllerBeforeDispatch ]
 
             FCom_PushServer:
                 auto_use: [ bootstrap ]
@@ -19,3 +20,5 @@ modules:
 
                 default_config:
                     modules/FCom_PushServer/delay_sec: 1
+        default_config:
+            modules/FCom_PushServer/recentactivity_realtime_notification: true

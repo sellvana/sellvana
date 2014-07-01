@@ -2,5 +2,7 @@ base:
     - view: head
         do:
             - [ requireJs, fcom.pushclient, "@FCom_PushServer/js/fcom.pushclient" ]
+            - [ requireJs, fcom.activitiesfeed, "@FCom_PushServer/js/fcom.activitiesfeed" ]
+            - [ requireRun, fcom.activitiesfeed]
 
     - { callback: "FCom_PushServer_Main::layoutInit" }

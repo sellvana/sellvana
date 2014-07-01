@@ -32,7 +32,7 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             case 'add':
                 $wishlist->addItem($p->id());
 
-                $this->FCom_PushServer_Model_Channel->getChannel('wishlist_feed', true)->send([
+                $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
                         'signal' => 'new_wishlist',
                         'wishlist_info' => [
                             'items_id' => $wishlist->id,
