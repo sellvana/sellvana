@@ -3,7 +3,9 @@
   <div class="page-header f-admin-page-header">
     <h1 class="f-page-title">Developers - Test</h1>
     <div class="btn-group">
+        {% if THIS.get('can_cgi') %}
         <button class="btn" onclick="ajax_tests_run(); return false;">Run tests cgi</button>
+        {% endif %}
         <button class="btn" onclick="ajax_tests_run2(); return false;">Run tests web</button>
     </div>
   </div>

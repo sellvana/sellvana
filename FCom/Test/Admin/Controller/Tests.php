@@ -5,6 +5,7 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
     public function action_index()
     {
         $this->layout('/tests/index');
+        $this->layout()->view('tests/index')->set('can_cgi', function_exists('exec'));
     }
 
     public function action_run()
@@ -12,8 +13,11 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
 
         $path = realpath(dirname(__FILE__) . '/../..');
         $pathBB = FULLERON_ROOT_DIR . '/FCom/buckyball/tests';
-
-        $res = exec("phpunit {$path}/AllTests.php", $output);
+        if (function_exists('exec')) {
+            $res = exec("phpunit {$path}/AllTests.php", $output);
+        } else {
+            $output = [$this->_("Cannot run CLI tests from browser.")];
+        }
 
         echo "<h2>FCom tests</h2><br/>";
         echo implode("<br>", $output);
