@@ -42,7 +42,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
         ];
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {
-                $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias . '.*');
+                $config['orm'] = $this->{$config['orm']}->orm($this->_mainTableAlias)->select($this->_mainTableAlias . '.*');
             }
             $this->gridOrmConfig($config['orm']);
         }

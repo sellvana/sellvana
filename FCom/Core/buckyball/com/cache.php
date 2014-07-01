@@ -53,7 +53,7 @@ class BCache extends BClass
             if (!class_exists($backend)) {
                 throw new BException('Invalid cache backend class name: ' . $backend . ' (' . $type . ')');
             }
-            $backend = $backend::i();
+            $backend = $this->{$backend};
         }
         if (!is_object($backend)) {
             throw new BException('Invalid backend for type: ' . $type);
@@ -501,7 +501,7 @@ class BCache_Backend_Db extends BClass implements BCache_Backend_Interface
 
     public function save($key, $data, $ttl = null)
     {
-        $hlp = BCache_Backend_Db_Model_Cache::i();
+        $hlp = $this->BCache_Backend_Db_Model_Cache;
         $cache = $hlp->load($key, 'cache_key');
         if (!$cache) {
             $cache = $hlp->create(['cache_key' => $key]);
@@ -515,7 +515,7 @@ class BCache_Backend_Db extends BClass implements BCache_Backend_Interface
 
     public function delete($key)
     {
-        BCache_Backend_Db_Model_Cache::i()->delete_many(['cache_key' => $key]);
+        $this->BCache_Backend_Db_Model_Cache->delete_many(['cache_key' => $key]);
         return true;
     }
 
@@ -531,7 +531,7 @@ class BCache_Backend_Db extends BClass implements BCache_Backend_Interface
 
     public function gc()
     {
-        BCache_Backend_Db_Model_Cache::i()->delete_many('expires_at<' . time());
+        $this->BCache_Backend_Db_Model_Cache->delete_many('expires_at<' . time());
         return true;
     }
 

@@ -30,7 +30,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                 if ($r->get('id') == 'NULL') {
                     $result = $this->_nodeChildren(null, 1);
                     /*
-                    $rootNodes = $class::i()->orm()->where_null('parent_id')->find_many();
+                    $rootNodes = $this->{$class}->orm()->where_null('parent_id')->find_many();
                     $result = array(
                         'data' => $node->node_name?$node->node_name:'ROOT',
                         'attr' => array('id'=>$node->id),
@@ -40,7 +40,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                     );
                     */
                 } else {
-                    $node = $class::i()->load($r->get('id'));
+                    $node = $this->{$class}->load($r->get('id'));
                     if ($node) {
                         $node->descendants();
                         $result = $this->_nodeChildren($node, 100);
@@ -56,7 +56,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
     protected function _nodeChildren($node, $depth = 0)
     {
         $class = $this->_navModelClass;
-        $nodeChildren = $node ? $node->children() : $class::i()->orm()->where_null('parent_id')->find_many();
+        $nodeChildren = $node ? $node->children() : $this->{$class}->orm()->where_null('parent_id')->find_many();
         $children = [];
         foreach ($nodeChildren as $c) {
             $nodeName = $c->get('node_name');
@@ -78,7 +78,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
         $class = $this->_navModelClass;
         $r = $this->BRequest;
         try {
-            if (!($node = $class::i()->load($r->post('id')))) {
+            if (!($node = $this->{$class}->load($r->post('id')))) {
                 throw new BException('Invalid ID');
             }
             /** @var $node FCom_Core_Model_TreeAbstract */
@@ -168,10 +168,10 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
         $this->layout($this->_formLayoutName);
         if ($id = $this->BRequest->param('id', true)) {
             $id = preg_replace('#^[^0-9]+#', '', $id);
-            $model = $class::i()->load($id);
+            $model = $this->{$class}->load($id);
             $this->_prepareTreeForm($model);
         } else {
-            $model = $class::i()->create();
+            $model = $this->{$class}->create();
         }
         $this->processFormTabs($this->view($this->_formViewName), $model, 'edit');
     }
@@ -183,7 +183,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
         try {
             $id = $this->BRequest->param('id', true);
             $id = preg_replace('#^[^0-9]+#', '', $id);
-            if (!$id || !($model = $class::i()->load($id))) {
+            if (!$id || !($model = $this->{$class}->load($id))) {
                 throw new Exception('Invalid node ID');
             }
 

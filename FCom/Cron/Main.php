@@ -6,11 +6,7 @@ class FCom_Cron_Main extends BClass
 
     public function task($expr, $callback, $args = [])
     {
-        if (is_string($callback) && strpos($callback, '.') !== false) {
-            list($class, $method) = explode('.', $callback);
-            $callback = [$class::i(), $method];
-        }
-
+        $callback = $this->BUtil->extCallback($callback);
         $exprArr = preg_split('#\s+#', $expr, null, PREG_SPLIT_NO_EMPTY);
         if (sizeof($exprArr) !== 5) {
             throw new Exception('Invalid cron expression: ' . $expr);

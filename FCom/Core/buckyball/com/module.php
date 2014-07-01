@@ -864,10 +864,10 @@ if ($args['name']==="FCom_Referrals") {
         }
         unset($params['update']);
         foreach ($params as $k => $v) {
-            if (is_array($this->$k)) {
-                $this->$k = array_merge_recursive((array)$this->$k, (array)$v);
+            if (is_array($this->{$k})) {
+                $this->{$k} = array_merge_recursive((array)$this->{$k}, (array)$v);
             } else {
-                $this->$k = $v;
+                $this->{$k} = $v;
                 //TODO: make more flexible without sacrificing performance
                 switch ($k) {
                 case 'url_prefix':
@@ -1237,11 +1237,11 @@ if (!isset($o[0]) || !isset($o[1])) {
                 if ($k[0] === "\0") { // protected properties, for cache saved on previous commit
                     continue;
                 }
-                $this->$k = $v;
+                $this->{$k} = $v;
             }
             return $this;
         }
-        $this->$key = $value;
+        $this->{$key} = $value;
         return $this;
     }
 
@@ -1544,10 +1544,19 @@ class BMigrate extends BClass
                     }
 
                     echo '<br>[' . (++$i) . '/' . $num . '] ';
+                    $action = null;
                     if (empty($mod['schema_version'])) {
                         echo 'Installing <strong>' . $view->q($modName . ': ' . $mod['code_version']) . '</strong> ... ';
-                    } else {
-                        echo 'Upgrading  <strong>' . $view->q($modName . ': ' . $mod['schema_version'] . ' -> ' . $mod['code_version']) . '</strong> ... ';
+                        $action = 'install_upgrade';
+                    } elseif (version_compare($mod['schema_version'], $mod['code_version'], '<')) {
+                        echo 'Upgrading <strong>' . $view->q($modName . ': ' . $mod['schema_version'] . ' -> ' . $mod['code_version']) . '</strong> ... ';
+                        $action = 'install_upgrade';
+                    } elseif (version_compare($mod['schema_version'], $mod['code_version'], '>')) {
+                        echo 'Downgrading <strong>' . $view->q($modName . ': ' . $mod['schema_version'] . ' -> ' . $mod['code_version']) . '</strong> ... ';
+                        $action = 'downgrade';
+                    }
+                    if (empty($action)) {
+                        continue;
                     }
 
                     $modReg->currentModule($modName);
@@ -1578,10 +1587,18 @@ class BMigrate extends BClass
                         } elseif (is_dir($module->root_dir . '/' . $script)) {
                             //TODO: process directory of migration scripts
                         } elseif (class_exists($script, true)) {
-                            if (method_exists($script, 'run')) {
-                                $script::i()->run();
-                            } else {
-                                static::_runClassMethods($script);
+                            if ($action === 'install_upgrade') {
+                                if (method_exists($script, 'run')) {
+                                    $this->{$script}->run();
+                                } else {
+                                    static::_runInstallUpgradeClassMethods($modName, $script);
+                                }
+                            } elseif ($action === 'downgrade') {
+                                if (method_exists($script, 'downgrade')) {
+                                    $this->{$script}->downgrade();
+                                } else {
+                                    static::_runDowngradeClassMethods($modName, $script);
+                                }
                             }
                         }
                     /*
@@ -1638,7 +1655,7 @@ class BMigrate extends BClass
         exit;
     }
 
-    protected function _runClassMethods($class)
+    protected function _runInstallUpgradeClassMethods($modName, $class)
     {
         $methods = get_class_methods($class);
         $installs = [];
@@ -1649,7 +1666,7 @@ class BMigrate extends BClass
                     'method' => $method,
                     'to' => str_replace('_', '.', $m[1])
                 ];
-            } elseif (preg_match('/^upgrade__([0-9_]+)__([0-9_]+)$/', $method, $m)) {
+            } elseif (preg_match('/^upgrade__([0-9_]+)__([0-9_]+)$/', $method, $m) && version_compare($m[1], $m[2], '<')) {
                 $upgrades[] = [
                     'method' => $method,
                     'from' => str_replace('_', '.', $m[1]),
@@ -1657,16 +1674,68 @@ class BMigrate extends BClass
                 ];
             }
         }
-        usort($installs, function($a, $b) { return version_compare($a['to'], $b['to']); });
-        usort($upgrades, function($a, $b) { return version_compare($a['from'], $b['from']); });
-        end($installs); $install = current($installs);
-        $instance = $class::i();
 
-        if ($install) {
-            static::install($install['to'], [$instance, $install['method']]);
+        usort($installs, function($a, $b) { return version_compare($a['to'], $b['to']); });
+        end($installs); $install = current($installs);
+
+        $instance = $this->{$class};
+
+        $mod =& static::$_migratingModule;
+        if ($install && empty($mod['schema_version'])) {
+            $module = $this->install($install['to'], [$instance, $install['method']]);
+        } else {
+            $module = $this->BDbModule->load($modName, 'module_name');
         }
-        foreach ($upgrades as $upgrade) {
-            static::upgrade($upgrade['from'], $upgrade['to'], [$instance, $upgrade['method']]);
+        if ($upgrades) {
+            usort($upgrades, function($a, $b) { return version_compare($a['from'], $b['from']); });
+            foreach ($upgrades as $upgrade) {
+                $this->upgrade($upgrade['from'], $upgrade['to'], [$instance, $upgrade['method']], $module);
+            }
+        }
+        if ($mod['schema_version'] !== $mod['code_version']) {
+            $mod['schema_version'] = $mod['code_version'];
+            $module->set([
+                'schema_version' => $mod['code_version'],
+                'last_status' => 'SKIPPED',
+            ])->save();
+        }
+    }
+
+    protected function _runDowngradeClassMethods($modName, $class)
+    {
+        $methods = get_class_methods($class);
+        $downgrades = [];
+        foreach ($methods as $method) {
+            if (preg_match('/^downgrade__([0-9_]+)__([0-9_]+)$/', $method, $m) && version_compare($m[1], $m[2], '>')) {
+                $downgrades[] = [
+                    'method' => $method,
+                    'from' => str_replace('_', '.', $m[1]),
+                    'to' => str_replace('_', '.', $m[2]),
+                ];
+            }
+        }
+
+        $mod =& static::$_migratingModule;
+        $module = $this->BDbModule->load($modName, 'module_name');
+
+        if ($downgrades) {
+            usort($downgrades, function($a, $b) { return -version_compare($a['from'], $b['from']); });
+
+            $instance = $this->{$class};
+
+            if ($downgrades) {
+                foreach ($downgrades as $downgrade) {
+                    $this->downgrade($downgrade['from'], $downgrade['to'], [$instance, $downgrade['method']], $module);
+                }
+            }
+        }
+
+        if ($mod['schema_version'] !== $mod['code_version']) {
+            $mod['schema_version'] = $mod['code_version'];
+            $module->set([
+                'schema_version' => $mod['code_version'],
+                'last_status' => 'SKIPPED',
+            ])->save();
         }
     }
 
@@ -1727,7 +1796,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
             $module->delete();
             throw $e;
         }
-        return true;
+        return $module;
     }
 
     /**
@@ -1741,7 +1810,7 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
      * @throws Exception
      * @return bool
      */
-    public function upgrade($fromVersion, $toVersion, $callback)
+    public function upgrade($fromVersion, $toVersion, $callback, $module = null)
     {
         $mod =& static::$_migratingModule;
 
@@ -1769,7 +1838,10 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
         }
         echo '^' . $toVersion . '; ';
 
-        $module = $this->BDbModule->load($mod['module_name'], 'module_name')->set([
+        if (!$module) {
+            $module = $this->BDbModule->load($mod['module_name'], 'module_name');
+        }
+        $module->set([
             'last_upgrade' => $this->BDb->now(),
             'last_status' => 'UPGRADING',
         ])->save();
@@ -1797,7 +1869,81 @@ BDebug::debug(__METHOD__ . ': ' . var_export($mod, 1));
             $module->set(['last_status' => 'ERROR'])->save();
             throw $e;
         }
-        return true;
+        return $module;
+    }
+
+    /**
+     * Run module DB downgrade scripts for specific version difference
+     *
+     * @param string $fromVersion
+     * @param string $toVersion
+     * @param mixed  $callback SQL string, callback or file name
+     * @return bool
+     * @throws BException
+     * @throws Exception
+     * @return bool
+     */
+    public function downgrade($fromVersion, $toVersion, $callback, $module = null)
+    {
+
+        $mod =& static::$_migratingModule;
+
+        // if no code version set, return
+        if (empty($mod['code_version'])) {
+            return false;
+        }
+        // if schema doesn't exist, throw exception
+        if (empty($mod['schema_version'])) {
+            throw new BException($this->BLocale->_("Can't downgrade, module schema doesn't exist: %s", $this->BModuleRegistry->currentModuleName()));
+        }
+        $schemaVersion = $mod['schema_version'];
+
+        // if module is not enable skip downgrade
+        if (!$this->BModuleRegistry->isLoaded($mod['module_name'])) {
+            return true;
+        }
+        // if code version is newer than target scheme version, skip
+        if (version_compare($mod['code_version'], $toVersion, '>')) {
+            return true;
+        }
+        // if schema is older than requested FROM version, skip
+        if (version_compare($schemaVersion, $fromVersion, '<')) {
+            return true;
+        }
+        echo 'v' . $toVersion . '; ';
+
+        if (!$module) {
+            $module = $this->BDbModule->load($mod['module_name'], 'module_name');
+        }
+        $module->set([
+            'last_upgrade' => $this->BDb->now(),
+            'last_status' => 'DOWNGRADING',
+        ])->save();
+        // call downgrade migration script
+        try {
+            if (is_callable($callback)) {
+                $result = $this->BUtil->call($callback);
+            } elseif (is_file($callback)) {
+                $result = include $callback;
+            } elseif (is_string($callback)) {
+                $this->BDb->run($callback);
+                $result = null;
+            }
+            if (false === $result) {
+                return false;
+            }
+            // update module schema version to new one
+            $mod['schema_version'] = $toVersion;
+            $module->set([
+                'schema_version' => $toVersion,
+                'last_status' => 'DOWNGRADED',
+            ])->save();
+        } catch (Exception $e) {
+            static::$_lastQuery = BORM::get_last_query();
+            $module->set(['last_status' => 'ERROR'])->save();
+            throw $e;
+        }
+        return $module;
     }
 
     /**

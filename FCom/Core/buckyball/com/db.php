@@ -175,7 +175,6 @@ class BDb
             'dbname' => !empty($config['dbname']) ? $config['dbname'] : null,
             'table_prefix' => !empty($config['table_prefix']) ? $config['table_prefix'] : '',
         ];
-
         $db = BORM::get_db();
         BDebug::profile($profile);
         return $db;
@@ -287,7 +286,8 @@ class BDb
     {
         $a = explode('.', $tableName);
         $p = static::$_config['table_prefix'];
-        return !empty($a[1]) ? $a[0] . '.' . $p . $a[1] : $p . $a[0];
+        $t = !empty($a[1]) ? $a[0] . '.' . $p . $a[1] : $p . $a[0];
+        return $t;
     }
 
     /**
@@ -1540,16 +1540,6 @@ class BORM extends ORMWrapper
     }
 
     /**
-    * Get table name with prefix, if configured
-    *
-    * @param string $class_name
-    * @return string
-    */
-    protected static function _get_table_name($class_name) {
-        return BDb::t(parent::_get_table_name($class_name));
-    }
-
-    /**
     * Set page constraints on collection for use in grids
     *
     * Request and result vars:
@@ -1811,6 +1801,57 @@ class BORM extends ORMWrapper
  * ORM model base class
  * @property static string $_table
  * @property static array $_fieldOptions
+ *
+ * DI
+ * core
+ * @property BApp $BApp
+ * @property BException $BException
+ * @property BConfig $BConfig
+ * @property BClassRegistry $BClassRegistry
+ * @property BClassAutoload $BClassAutoload
+ * @property BEvents $BEvents
+ * @property BSession $BSession
+ *
+ * controller
+ * @property BRequest $BRequest
+ * @property BResponse $BResponse
+ * @property BRouting $BRouting
+ *
+ * layout
+ * @property BLayout $BLayout
+ * @property BView $BView
+ * @property BViewEmpty $BViewEmpty
+ * @property BViewHead $BViewHead
+ * @property BViewList $BViewList
+ *
+ * db
+ * @property BDb $BDb
+ *
+ * locale
+ * @property BLocale $BLocale
+ *
+ * module
+ * @property BModuleRegistry $BModuleRegistry
+ * @property BModule $BModule
+ * @property BMigrate $BMigrate
+ * @property BDbModule $BDbModule
+ *
+ * cache
+ * @property BCache $BCache
+ *
+ * misc
+ * @property BUtil $BUtil
+ * @property BHTML $BHTML
+ * @property BEmail $BEmail
+ * @property BValue $BValue
+ * @property BData $BData
+ * @property BDebug $BDebug
+ * @property BLoginThrottle $BLoginThrottle
+ * @property BYAML $BYAML
+ * @property BValidate $BValidate
+ * @property BValidateViewHelper $BValidateViewHelper
+ * @property Bcrypt $Bcrypt
+ * @property BRSA $BRSA
  */
 class BModel extends Model
 {
@@ -2131,7 +2172,8 @@ class BModel extends Model
     * Create a new instance of the model
     *
     * @param null|array $data
-    * @return BModel
+    * @param boolean $new is new record
+    * @return $this
     */
     public static function create($data = null, $new = true)
     {
@@ -2177,7 +2219,8 @@ class BModel extends Model
     * @param int|string|array $id
     * @param string $field
     * @param boolean $cache
-    * @return BModel
+    * @return $this
+    * @throws BException
     */
     public function load($id, $field = null, $cache = false)
     {
@@ -2215,7 +2258,6 @@ class BModel extends Model
             }
             $orm->where($field, $id);
         }
-        /** @var BModel $record */
         $model = $orm->find_one();
         if ($model) {
             $model->onAfterLoad();
@@ -2240,7 +2282,7 @@ class BModel extends Model
     /**
      * Load a model or create an empty one if doesn't exist
      *
-     * @param int|string|array $id
+     * @param int|string|array $where
      * @param string $field
      * @param boolean $cache
      * @return BModel
@@ -2591,6 +2633,16 @@ class BModel extends Model
     public static function run_sql($sql, $params = [])
     {
         return static::writeDb()->prepare($sql)->execute((array)$params);
+    }
+
+    /**
+    * Get table name with prefix, if configured
+    *
+    * @param string $class_name
+    * @return string
+    */
+    protected static function _get_table_name($class_name) {
+        return BDb::t(parent::_get_table_name($class_name));
     }
 
     /**

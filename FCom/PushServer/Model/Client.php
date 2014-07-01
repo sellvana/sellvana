@@ -23,11 +23,14 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 
     /**
      * Get or create client record for current browser session
+     * @return FCom_PushServer_Model_Client
      */
     public function sessionClient()
     {
         $sessId = $this->BSession->sessionId();
-        if (!empty(static::$_clientCache[$sessId])) {
+        /*todo: because we need get data from data_serialized which be updated from different connection, so temporary disable load from cache*/
+
+        /*if (!empty(static::$_clientCache[$sessId])) {
             return static::$_clientCache[$sessId];
         }
 
@@ -35,7 +38,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         if (!empty($sessData['pushserver']['client'])) {
             static::$_clientCache[$sessId] = $this->create($sessData['pushserver']['client'], false);
             return static::$_clientCache[$sessId];
-        }
+        }*/
 
         $client = $this->load($sessId, 'session_id');
         if (!$client) {
@@ -114,10 +117,10 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     {
         parent::onAfterSave();
 
-        if ($this->session_id === $this->BSession->sessionId()) {
+        /*if ($this->session_id === $this->BSession->sessionId()) {
             $sessData =& $this->BSession->dataToUpdate();
             $sessData['pushserver']['client'] = $this->as_array();
-        }
+        }*/
     }
 
     public function processRequest($request)
@@ -156,7 +159,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
                         continue;
                     }
                     $class = $service['callback'];
-                    $instance = $class::i();
+                    $instance = $this->{$class};
                     if (!($instance instanceof FCom_PushServer_Service_Abstract)) {
                         //TODO: exception?
                         continue;

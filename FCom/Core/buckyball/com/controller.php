@@ -2021,7 +2021,7 @@ class BRouteNode extends BClass
     public function __construct($args = [])
     {
         foreach ($args as $k => $v) {
-            $this->$k = $v;
+            $this->{$k} = $v;
         }
 
         // convert route name into regex and save param references
@@ -2234,7 +2234,7 @@ class BRouteObserver extends BClass
     public function __construct($args)
     {
         foreach ($args as $k => $v) {
-            $this->$k = $v;
+            $this->{$k} = $v;
         }
     }
 
@@ -2411,7 +2411,7 @@ class BActionController extends BClass
         $this->BRequest->stripRequestFieldsTags();
 
         // try {
-            $this->$actionMethod($args);
+            $this->{$actionMethod}($args);
         // } catch (Exception $e) {
             //BDebug::exceptionHandler($e);
             // $this->sendError($e->getMessage());

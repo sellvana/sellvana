@@ -148,9 +148,10 @@ class FCom_CatalogIndex_Migrate extends BClass
 
     public function upgrade__0_1_3__0_1_4()
     {
+        $tField = $this->FCom_CatalogIndex_Model_Field->table();
         //$this->install();
         $this->BDb->run("
-REPLACE  INTO `fcom_index_field`
+REPLACE  INTO `{$tField}`
 (`id`,`field_name`,`field_label`,`field_type`,`weight`,`fcom_field_id`,`source_type`,`source_callback`,`filter_type`,`filter_multivalue`,`filter_counts`,`filter_show_empty`,`filter_order`,`filter_custom_view`,`search_type`,`sort_type`,`sort_label`,`sort_order`)
 VALUES
 (1,'product_name','Product Name','text',0,NULL,'field',NULL,'none',0,0,0,NULL,NULL,'terms','both','Product Name (A-Z) || Product Name (Z-A)',NULL),

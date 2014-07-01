@@ -98,7 +98,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function getOrders($customerId)
     {
-        return $this::i()->orm()->where('customer_id', $customerId)->find_many_assoc();
+        return $this->orm()->where('customer_id', $customerId)->find_many_assoc();
 
     }
 
@@ -112,7 +112,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
      */
     public function isOrderExists($uniqueId, $customerId)
     {
-        return $this::i()->orm()->where('unique_id', $uniqueId)->where('customer_id', $customerId)->find_one();
+        return $this->orm()->where('unique_id', $uniqueId)->where('customer_id', $customerId)->find_one();
     }
 
     public function prepareApiData($orders, $includeItems = false)
