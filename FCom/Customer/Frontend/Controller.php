@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Customer_Frontend_Controller
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Customer_Model_Address $FCom_Customer_Model_Address
+ */
 class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function beforeDispatch()
