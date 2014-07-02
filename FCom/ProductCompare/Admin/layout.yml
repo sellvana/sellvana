@@ -1,0 +1,2 @@
+/settings:
+    - { view: settings, do: [[ addTab, FCom_ProductCompare, { label: Product Comparison, group: catalog, async: true } ]] }
