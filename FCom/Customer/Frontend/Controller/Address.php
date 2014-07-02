@@ -55,7 +55,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             $address = $this->FCom_Customer_Model_Address->create();
         }
 
-        $countries = $this->BLocale->getAvailableCountries();
+        $countries = $this->FCom_Core_Main->getAllowedCountries();
 
         $countriesList = array_map(function ($el) {
             return $el[0];
@@ -106,10 +106,11 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             if ($address->validate($post, [], $formId)) {
                 $address->set($post)->save();
                 //update customer
-                if (!empty($post['address_default_shipping'])) {
+                $numAddresses = $this->FCom_Customer_Model_Address->orm()->where('customer_id', $customer->id())->count();
+                if (!empty($post['address_default_shipping']) || $numAddresses === 1) {
                     $customer->default_shipping_id = $address->id();
                 }
-                if (!empty($post['address_default_billing'])) {
+                if (!empty($post['address_default_billing']) || $numAddresses === 1) {
                     $customer->default_billing_id = $address->id();
                 }
                 $customer->save();

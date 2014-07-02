@@ -122,7 +122,13 @@ class FCom_Core_Main extends BClass
         }
 
         if (!$config->get('web/media_dir')) {
-            $mediaUrl = str_replace($docRoot, '', $mediaDir);
+            if (strpos($mediaDir, $docRoot) === 0) {
+                $mediaUrl = str_replace($docRoot, '', $mediaDir);
+            } elseif (strpos($mediaDir, $rootDir) === 0) {
+                $mediaUrl = $baseStore . str_replace($rootDir, '', $mediaDir);
+            } else {
+                $mediaUrl = $baseStore . '/media';
+            }
             $config->set('web/media_dir', $mediaUrl);
         }
 
@@ -547,5 +553,17 @@ FCom.base_src = '" . $this->BConfig->get('web/base_src') . "';
     {
         $ver = $this->BConfig->get('core/patch_version');
 
+    }
+
+    public function getAllowedCountries()
+    {
+        $conf = $this->BConfig->get('modules/FCom_Core');
+        $limit = !empty($conf['limit_countries']) ? $conf['allowed_countries'] : null;
+        return $this->BLocale->getAvailableCountries('name', $limit);
+    }
+
+    public function getDefaultCountry()
+    {
+        return $this->BConfig->get('modules/FCom_Core/default_country');
     }
 }

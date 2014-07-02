@@ -42,7 +42,7 @@
           <div class="row">
             <div class="col-sm-6">
               <h4>{{ "Billing Address" |_ }}</h4>
-              {% if cart.get('shipping_same') %}
+              {% if cart.get('same_address') %}
                   <p>{{ 'Same as shipping' |_ }}</p>
               {% else %}
                   {{ THIS.get('billing_address').as_html() | raw }}

@@ -315,7 +315,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
                 return !empty($addresses['billing']) ? $addresses['billing'] : null;
 
             case 'shipping':
-                if ($this->shipping_same) {
+                if ($this->same_address) {
                     return $this->getAddressByType('billing');
                 }
                 return !empty($addresses['shipping']) ? $addresses['shipping'] : null;
@@ -417,19 +417,22 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         parent::onAfterSave();
 
+        //TODO: use different location, the new order record doesn't have address yet
+        /*
         if ($this->_newRecord) {
             $pCustomerId = $this->get('customer_id');
-            $customer = $this->FCom_Customer_Model_Customer->load($pCustomerId);
+            $billAddress = $this->getAddressByType('billing');
             $this->FCom_PushServer_Model_Channel->getChannel('sales_feed', true)->send([
                     'signal' => 'new_order',
                     'order' => [
                         'id' => $this->id(),
-                        'email' => $customer->email,
-                        'name' => $customer->firstname . ' ' . $customer->lastname,
+                        'email' => $this->customer_email,
+                        'name' => $billAddress->firstname . ' ' . $billAddress->lastname,
                         'mes_be' => $this->BLocale->_('Order'),
                         'mes_af' => $this->BLocale->_('has been placed by')
                     ],
                 ]);
         }
+        */
     }
 }

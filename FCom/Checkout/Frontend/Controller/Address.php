@@ -24,7 +24,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
 //            return $el->get('iso');
 //        }, $countries);
 //        $countriesList = implode(',', $countriesList);
-        $countries = $this->BLocale->getAvailableCountries();
+        $countries = $this->FCom_Core_Main->getAllowedCountries();
         $cart = $this->FCom_Sales_Model_Cart->sessionCart();
         if (!$cart->id()) {
             $href = $this->BApp->href('cart');
@@ -47,6 +47,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             } else {
                 $address->atype = 'billing';
             }
+            $address->country = $this->FCom_Core_Main->getDefaultCountry();
         }
         $customer = $this->FCom_Customer_Model_Customer->sessionUser();
         if ($customer) {
@@ -64,9 +65,9 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         //$address->save();
         //$address = $this->FCom_Sales_Model_Cart_Address->load($address->id());
         if ('shipping' == $address->atype) {
-            $breadCrumbLabel = 'Shipping address';
+            $breadCrumbLabel = $this->BLocale->_('Shipping address');
         } else {
-            $breadCrumbLabel = 'Billing address';
+            $breadCrumbLabel = $this->BLocale->_('Billing address');
         }
         $this->layout('/checkout/address');
         $layout->view('breadcrumbs')->set('crumbs', [
@@ -76,7 +77,12 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
 //        if ($layout->view('geo/embed')) {
 //            $layout->view('geo/embed')->set('countries', $countriesList);
 //        }
-        $layout->view('checkout/address')->set(['address' => $address, 'address_type' => $atype, 'countries' => $countries]);
+        $layout->view('checkout/address')->set([
+            'address' => $address,
+            'address_type' => $atype,
+            'countries' => $countries,
+            'title' => $breadCrumbLabel,
+        ]);
     }
 
     public function action_address__POST()
@@ -88,12 +94,12 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             $atype = 'b';
         }
 
-        if ('s' == $atype) {
-            $addressType = 'shipping';
-            $addressType2 = 'billing';
-        } else {
+        if ('b' == $atype || !empty($r['address_equal'])) {
             $addressType = 'billing';
             $addressType2 = 'shipping';
+        } else {
+            $addressType = 'shipping';
+            $addressType2 = 'billing';
         }
 
         $cart = $this->FCom_Sales_Model_Cart->sessionCart();
@@ -119,6 +125,12 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             $address->save();
         }
 
+        if (!$cart->customer_email) {
+            $cart->set('customer_email', $address->email);
+        }
+        $cart->set('same_address', $r['address_equal'] ? 1 : 0);
+        $cart->save();
+        /*
         if ($r['address_equal']) {
             //copy shipping address to billing address
             $addressCopy = $cart->getAddressByType($addressType2);
@@ -130,6 +142,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             $addressCopy->atype = $addressType2;
             $addressCopy->save();
         }
+        */
 
         if ($this->BApp->m('FCom_Customer')) {
             //todo move this code to FCom_Customer and add the trigger for this event

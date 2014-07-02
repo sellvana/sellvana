@@ -2,7 +2,7 @@
 
     <div class="f-checkout-form">
       <header class="f-page-header">
-        <h1 class="f-page-title">{{ 'Shipping Address'|_ }}</h1>
+        <h1 class="f-page-title">{{ THIS.title }}</h1>
       </header>
       <form action="{{ APP.href('checkout/address') }}" method="post" id="address-form" role="form">
         <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
