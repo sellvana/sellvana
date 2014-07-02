@@ -5,7 +5,7 @@ base:
             - [ addNav, catalog/categories, { label: Navigation, href: /catalog/categories } ]
             - [ addNav, catalog/products, { label: Products, href: /catalog/products } ]
             - [ addNav, catalog/products_import, { label: Products Import, href: /catalog/products/import/index } ]
-            - [ addNav, catalog/searchalias, { label: Search Terms, pos: 1, href: /catalog/searchalias } ]
+            - [ addNav, catalog/searchalias, { label: Search Terms, href: /catalog/searchalias } ]
     - view: admin/header
         do:
             - [ addQuickSearch, catalog/products, { label: Products, href: /catalog/products } ]
