@@ -205,7 +205,7 @@ class FCom_Core_Main extends BClass
                 $this->BUtil->ensureDir($storageDir . '/' . $randomDirName);
             }
             $config->set('core/storage_random_dir', $randomDirName, false, true);
-            $this->writeConfigFiles('core');
+            $config->writeConfigFiles('core');
         }
         $randomDir = $storageDir . '/' . $randomDirName;
         $this->BUtil->ensureDir($randomDir);
@@ -421,46 +421,6 @@ class FCom_Core_Main extends BClass
     public function beforeBootstrap()
     {
         $this->BLayout->setDefaultViewClass('FCom_Core_View_Base');
-    }
-
-    public function writeConfigFiles($files = null)
-    {
-        //TODO: make more flexible, to account for other (custom) file names
-        if (null === $files) {
-            $files = ['core', 'db', 'local'];
-        }
-        if (is_string($files)) {
-            $files = explode(',', strtolower($files));
-        }
-
-        $config = $this->BConfig;
-        $c = $config->get(null, null, true);
-
-        if (in_array('core', $files)) {
-            // configuration necessary for core startup
-            unset($c['module_run_levels']['request']);
-
-            $core = [
-                'install_status' => !empty($c['install_status']) ? $c['install_status'] : null,
-                'core' => !empty($c['core']) ? $c['core'] : null,
-                'module_run_levels' => !empty($c['module_run_levels']) ? $c['module_run_levels'] : [],
-                'recovery_modules' => !empty($c['recovery_modules']) ? $c['recovery_modules'] : null,
-                'mode_by_ip' => !empty($c['mode_by_ip']) ? $c['mode_by_ip'] : [],
-                'cache' => !empty($c['cache']) ? $c['cache'] : [],
-            ];
-            $config->writeFile('core.php', $core);
-        }
-        if (in_array('db', $files)) {
-            // db connections
-            $db = !empty($c['db']) ? ['db' => $c['db']] : [];
-            $config->writeFile('db.php', $db);
-        }
-        if (in_array('local', $files)) {
-            // the rest of configuration
-            $local = $this->BUtil->arrayMask($c, 'db,install_status,module_run_levels,recovery_modules,mode_by_ip,cache,core', true);
-            $config->writeFile('local.php', $local);
-        }
-        return $this;
     }
 
     public function getConfigVersionHash()
