@@ -17,11 +17,5 @@ modules:
                 routing:
                     - [ /, FCom_PushServer_Controller.index ]
 
-                default_config:
-                    modules/FCom_PushServer/delay_sec: 1
         default_config:
-            modules:
-                FCom_PushServer:
-                    neworder_realtime_notification: true
-                    newreview_realtime_notification: true
-                    newcustomer_realtime_notification: true
+            modules/FCom_PushServer/delay_sec: 1

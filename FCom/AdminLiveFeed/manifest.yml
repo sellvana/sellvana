@@ -17,7 +17,3 @@ modules:
             modules:
                 FCom_AdminLiveFeed:
                     livefeed_recent_activity: true
-                    catalog_recent_activity: true
-                    newsletter_recent_activity: true
-                    wishlist_recent_activity: true
-                    customer_recent_activity: true

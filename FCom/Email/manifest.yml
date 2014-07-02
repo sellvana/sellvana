@@ -9,6 +9,7 @@ modules:
 
         default_config:
             modules/FCom_Email/default_handler: FCom_Email
+            modules/FCom_Email/newsletter_recent_activity: true
 
         observe:
             - [ "BEmail::send:before", "FCom_Email_Main::onEmailSendBefore" ]

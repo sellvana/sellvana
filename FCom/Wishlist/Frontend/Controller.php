@@ -33,7 +33,7 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                 $wishlist->addItem($p->id());
 
                 if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
-                    && $this->BConfig->get('modules/FCom_AdminLiveFeed/wishlist_recent_activity')
+                    && $this->BConfig->get('modules/FCom_Wishlist/wishlist_recent_activity')
                 ) {
                     $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
                             'text' => $this->_('Item %s has been added to a wishlist', $p->get('product_name')),

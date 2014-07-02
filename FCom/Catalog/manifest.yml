@@ -12,6 +12,7 @@ modules:
 
         default_config:
             modules/FCom_Catalog/allowed_locales: [ en_US ]
+            modules/FCom_Catalog/catalog_recent_activity: true
 
         areas:
             FCom_Admin:

@@ -167,7 +167,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             }
 
             if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
-                && $this->BConfig->get('modules/FCom_AdminLiveFeed/catalog_recent_activity')
+                && $this->BConfig->get('modules/FCom_Catalog/catalog_recent_activity')
             ) {
                 $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
                         'text' => $this->BLocale->_('New %s of products have been added to catalog', $countItem),
