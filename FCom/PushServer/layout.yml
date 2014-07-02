@@ -7,5 +7,5 @@ base:
 /settings:
     - view: settings
         do:
-            - [ addTabGroup, pushserver, { label: Push Server } ]
-            - [ addTab, FCom_PushServer, { label: Push Server, group: pushserver, async: true } ]
+            - [ addTabGroup, pushserver, { label: Notification } ]
+            - [ addTab, FCom_PushServer, { label: Header Notification, group: pushserver, async: true } ]

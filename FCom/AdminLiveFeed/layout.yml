@@ -6,4 +6,4 @@ base:
 /settings:
     - view: settings
         do:
-            - [ addTab, FCom_AdminLiveFeed, { label: Admin Live Feed, group: pushserver, async: true } ]
+            - [ addTab, FCom_AdminLiveFeed, { label: Recent Activity, group: pushserver, async: true } ]

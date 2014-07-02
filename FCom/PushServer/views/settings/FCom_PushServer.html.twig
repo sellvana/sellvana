@@ -1,11 +1,18 @@
 {% set c = THIS.get('model') %}
 {% import THIS.view('admin/form-elements').twigName() as forms %}
 {% set fieldData = { model: c, settings_module:'FCom_PushServer' } %}
-<h2>{{ "Push Server Settings"|_}}</h2>
+{% set fieldDataCustomer = { model: c, settings_module:'FCom_Customer' } %}
+{% set fieldDataSales = { model: c, settings_module:'FCom_Sales' } %}
+{% set fieldDataProductReviews = { model: c, settings_module:'FCom_ProductReviews' } %}
+<h2>{{ "Push Server Settings"|_ }}</h2>
 {{ forms.accordion_start({id:'settings-FCom_PushServer'}) }}
-     {{ forms.accordion_panel_start({label:'Realtime Notification'|_, id:'settings-FCom_PushServer-group0', in:1}) }}
-        {{ forms.boolean(fieldData, {field:'neworder_realtime_notification', label:'Order'|_ }) }}
-        {{ forms.boolean(fieldData, {field:'newreview_realtime_notification', label:'Product Review'|_ }) }}
-        {{ forms.boolean(fieldData, {field:'newcustomer_realtime_notification', label:'Customer'|_ }) }}
-    {{ forms.accordion_panel_end }}
+     {{ forms.accordion_panel_start({label:'Sales Notification'|_, id:'settings-FCom_Sales-group0', in:1}) }}
+        {{ forms.boolean(fieldDataSales, {field:'neworder_realtime_notification', label:'Order'|_ }) }}
+     {{ forms.accordion_panel_end }}
+     {{ forms.accordion_panel_start({label:'Product Preview Notification'|_, id:'settings-FCom_ProductReviews-group0', in:1}) }}
+        {{ forms.boolean(fieldDataCustomer, {field:'newreview_realtime_notification', label:'Product Review'|_ }) }}
+     {{ forms.accordion_panel_end }}
+     {{ forms.accordion_panel_start({label:'Customer Notification'|_, id:'settings-FCom_Customer-group0', in:1}) }}
+        {{ forms.boolean(fieldDataCustomer, {field:'newcustomer_realtime_notification', label:'Customer'|_ }) }}
+     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
