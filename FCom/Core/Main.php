@@ -312,6 +312,7 @@ class FCom_Core_Main extends BClass
         $configDir = $config->get('fs/config_dir');
 
         if ('DISABLED' === $mode) {
+            $this->BResponse->header('X-Remote-IP: ' . $this->BRequest->ip());
             $this->BResponse->status('404', 'Page not found', 'Page not found');
             die;
         }

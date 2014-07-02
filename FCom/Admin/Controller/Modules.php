@@ -208,7 +208,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
             if (isset($r['data'])) {
                 foreach ($r['data'] as $arr => $key) {
                    $this->BConfig->set('module_run_levels/FCom_Core/' . $key['module_name'], $key['run_level_core'], false, true);
-                   $this->FCom_Core_Main->writeConfigFiles('core');
+                   $this->BConfig->writeConfigFiles('core');
                 }
                 $this->BResponse->json(['success' => true]);
                 return;
@@ -228,7 +228,7 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
                 }
                 $this->BConfig->set('module_run_levels/' . $area, $levels[$area], false, true);
             }
-            $this->FCom_Core_Main->writeConfigFiles('core');
+            $this->BConfig->writeConfigFiles('core');
             $this->message('Run levels updated');
         } catch (Exception $e) {
             $this->BDebug->logException($e);
