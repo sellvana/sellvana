@@ -32,7 +32,7 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function ($, _, exports
         if (typeof FCom.pushserver_url != 'undefined') {
             var data = JSON.stringify({ window_name: state.window_name, conn_id: state.conn_id++, messages: messages });
 
-            $.post(FCom.pushserver_url, data, receive);
+            $.post(FCom.pushserver_url, data, receive, 'json');
 
             messages = []; // skip checking for received messages
             //messages = _.filter(messages, function(qmsg) { return !_.isEmpty(qmsg.seq); });

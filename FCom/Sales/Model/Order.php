@@ -452,16 +452,17 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         if ($this->_newRecord) {
             $pCustomerId = $this->get('customer_id');
             $customer = $this->FCom_Customer_Model_Customer->load($pCustomerId);
-            $this->FCom_PushServer_Model_Channel->getChannel('sales_feed', true)->send([
-                    'signal' => 'new_order',
-                    'order' => [
-                        'id' => $this->id(),
-                        'email' => $customer->email,
-                        'name' => $customer->firstname . ' ' . $customer->lastname,
-                        'mes_be' => $this->BLocale->_('Order'),
-                        'mes_af' => $this->BLocale->_('has been placed by')
-                    ],
-                ]);
+            if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
+                && $this->BConfig->get('modules/FCom_PushServer/neworder_realtime_notification')
+            ) {
+                $this->FCom_PushServer_Model_Channel->getChannel('sales_feed', true)->send([
+                        'signal' => 'new_order',
+                        'order' => [
+                            'href' => 'orders/form/?id=' . $this->id(),
+                            'text' => $this->BLocale->_('Order %s has been placed by %s', [ '#' . $this->id(), $customer->firstname . ' ' . $customer->lastname]),
+                        ],
+                    ]);
+            }
         }
     }
 }

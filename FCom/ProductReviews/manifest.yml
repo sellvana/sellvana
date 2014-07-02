@@ -25,5 +25,3 @@ modules:
                     - [ /prodreviews/.action, FCom_ProductReviews_Frontend_Controller ]
                 observe:
                     - [ "BLayout::hook:prodreviews-reviews", FCom_ProductReviews_Frontend.hookReviews ]
-        default_config:
-            modules/FCom_ProductReviews/newreview_realtime_notification: true

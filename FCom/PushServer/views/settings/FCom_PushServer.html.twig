@@ -1,0 +1,11 @@
+{% set c = THIS.get('model') %}
+{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% set fieldData = { model: c, settings_module:'FCom_PushServer' } %}
+<h2>{{ "Push Server Settings"|_}}</h2>
+{{ forms.accordion_start({id:'settings-FCom_PushServer'}) }}
+     {{ forms.accordion_panel_start({label:'Realtime Notification'|_, id:'settings-FCom_PushServer-group0', in:1}) }}
+        {{ forms.boolean(fieldData, {field:'neworder_realtime_notification', label:'Order'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'newreview_realtime_notification', label:'Product Review'|_ }) }}
+        {{ forms.boolean(fieldData, {field:'newcustomer_realtime_notification', label:'Customer'|_ }) }}
+    {{ forms.accordion_panel_end }}
+{{ forms.accordion_end }}

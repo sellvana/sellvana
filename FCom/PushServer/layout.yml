@@ -2,7 +2,10 @@ base:
     - view: head
         do:
             - [ requireJs, fcom.pushclient, "@FCom_PushServer/js/fcom.pushclient" ]
-            - [ requireJs, fcom.activitiesfeed, "@FCom_PushServer/js/fcom.activitiesfeed" ]
-            - [ requireRun, fcom.activitiesfeed]
 
     - { callback: "FCom_PushServer_Main::layoutInit" }
+/settings:
+    - view: settings
+        do:
+            - [ addTabGroup, pushserver, { label: Push Server } ]
+            - [ addTab, FCom_PushServer, { label: Push Server, group: pushserver, async: true } ]

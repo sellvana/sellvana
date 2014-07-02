@@ -53,13 +53,13 @@ class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 $model->sub_newsletter = 1;
                 $model->unsub_all      = 0;
                 $model->save();
-                $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
-                        'signal' => 'new_subscription',
-                        'subscription' => [
-                            'email' => $model->email,
-                            'mes' => $this->BLocale->_('has subscribed to newsletter')
-                        ],
-                    ]);
+                if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
+                    && $this->BConfig->get('modules/FCom_AdminLiveFeed/newsletter_recent_activity')
+                ) {
+                    $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
+                            'text' =>$model->email . ' ' . $this->BLocale->_('has subscribed to newsletter'),
+                        ]);
+                }
             }
             //response
             $successMessage = $this->_('Email subscribe successful.');

@@ -1,0 +1,23 @@
+modules:
+    FCom_AdminLiveFeed:
+        version: 0.1
+        channel: beta
+        description: Admin Live Feed
+
+        require: { module: { FCom_Core: 0.1.0, FCom_PushServer: 0.1.4 } }
+
+        auto_use: [ layout, views ]
+
+        areas:
+            FCom_Admin:
+                observe:
+                    - [ "FCom_Admin_View_Header::getNotifications", FCom_AdminLiveFeed_Main.onGetHeaderNotifications ]
+
+        default_config:
+            modules:
+                FCom_AdminLiveFeed:
+                    livefeed_recent_activity: true
+                    catalog_recent_activity: true
+                    newsletter_recent_activity: true
+                    wishlist_recent_activity: true
+                    customer_recent_activity: true

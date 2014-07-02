@@ -5,10 +5,9 @@ define(['jquery', 'fcom.pushclient', 'jquery.bootstrap-growl'], function ($, Pus
     function channel_customers_feed(msg) {
         switch (msg.signal) {
             case 'new_customer':
-                var c = msg.customer;
-                var href = FCom.base_href + 'customers/form/?id=' + c.id;
-                var cLink = '<a href="' + href + '">' + c.name + ' (' + c.email + ')</a>';
-                $.bootstrapGrowl(cLink + ' ' + c.mes, {type: 'success', align: 'center', width: 'auto'});
+                var mes = msg.customer;
+                var text = mes.href ? $('<a>').attr('href', FCom.base_href + mes.href).html(mes.text) : $('<div>').html(mes.text);
+                $.bootstrapGrowl(text, mes.growl_params || {type:'success', align:'center', width:'auto'});
                 break;
         }
     }

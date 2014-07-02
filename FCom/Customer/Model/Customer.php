@@ -196,15 +196,17 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         }
 
         if ($this->_newRecord) {
-            $this->FCom_PushServer_Model_Channel->getChannel('customers_feed', true)->send([
-                'signal' => 'new_customer',
-                'customer' => [
-                    'id' => $this->id(),
-                    'email' => $this->email,
-                    'name' => $this->firstname . ' ' . $this->lastname,
-                    'mes' => $this->BLocale->_('created an account.')
-                ],
-            ]);
+            if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
+                && $this->BConfig->get('modules/FCom_PushServer/newcustomer_realtime_notification')
+            ) {
+                $this->FCom_PushServer_Model_Channel->getChannel('customers_feed', true)->send([
+                    'signal' => 'new_customer',
+                    'customer' => [
+                        'href' => 'customers/form/?id=' . $this->id(),
+                        'text' => $this->BLocale->_('%s created an account.', $this->firstname . ' ' . $this->lastname . '(' . $this->email .')')
+                    ],
+                ]);
+            }
         }
     }
 
@@ -333,17 +335,14 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             return false;
         }
         $this->BLoginThrottle->success();
-
-        $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
-                'signal' => 'new_login',
-                'login_info' => [
-                    'id' => $user->id,
-                    'email' => $user->email,
-                    'name' => $user->firstname . ' ' . $user->lastname,
-                    'mes' => $this->BLocale->_('is logged in')
-                ],
-            ]);
-
+        if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
+            && $this->BConfig->get('modules/FCom_AdminLiveFeed/customer_recent_activity')
+        ) {
+            $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
+                   'href' => 'customers/form?id=' . $user->id,
+                   'text' => $user->firstname . ' ' . $user->lastname . ' (' . $user->email . ') ' . $this->BLocale->_('is logged in'),
+                ]);
+        }
         return $user;
     }
 

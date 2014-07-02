@@ -65,15 +65,17 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
 
         $pCustomerId = $this->get('customer_id');
         $customer = $this->FCom_Customer_Model_Customer->load($pCustomerId);
-        $this->FCom_PushServer_Model_Channel->getChannel('reviews_feed', true)->send([
-                'signal' => 'new_review',
-                'review' => [
-                    'id' => $this->id(),
-                    'email' => $customer->email,
-                    'name' => $customer->firstname . ' ' . $customer->lastname,
-                    'mes' => $this->BLocale->_('has review the product')
-                ],
-            ]);
+        if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
+            && $this->BConfig->get('modules/FCom_PushServer/newreview_realtime_notification')
+        ) {
+            $this->FCom_PushServer_Model_Channel->getChannel('reviews_feed', true)->send([
+                    'signal' => 'new_review',
+                    'review' => [
+                        'href' =>  'prodreviews/form/?id=' . $this->id(),
+                        'text' => $this->BLocale->_('%s has review the product %s', [ $customer->firstname . ' ' . $customer->lastname, '#' .$this->id()])
+                    ],
+                ]);
+        }
         return $this;
     }
 

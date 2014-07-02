@@ -8,10 +8,9 @@ modules:
 
         areas:
             FCom_Admin:
-                auto_use: [ layout ]
+                auto_use: [ layout, views ]
                 observe:
                     - [ "FCom_Admin_Model_User::logout", "FCom_PushServer_Main::onAdminUserLogout" ]
-                    - [ "FCom_Admin_View_Header::getNotifications", FCom_PushServer_Main.onGetHeaderNotifications ]
 
             FCom_PushServer:
                 auto_use: [ bootstrap ]
@@ -21,4 +20,8 @@ modules:
                 default_config:
                     modules/FCom_PushServer/delay_sec: 1
         default_config:
-            modules/FCom_PushServer/recentactivity_realtime_notification: true
+            modules:
+                FCom_PushServer:
+                    neworder_realtime_notification: true
+                    newreview_realtime_notification: true
+                    newcustomer_realtime_notification: true
