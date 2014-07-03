@@ -194,20 +194,6 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             $this->BSession->set('customer_user', serialize($this));
             static::$_sessionUser = $this;
         }
-
-        if ($this->_newRecord) {
-            if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
-                && $this->BConfig->get('modules/FCom_Customer/newcustomer_realtime_notification')
-            ) {
-                $this->FCom_PushServer_Model_Channel->getChannel('customers_feed', true)->send([
-                    'signal' => 'new_customer',
-                    'customer' => [
-                        'href' => 'customers/form/?id=' . $this->id(),
-                        'text' => $this->BLocale->_('%s created an account.', $this->firstname . ' ' . $this->lastname . '(' . $this->email .')')
-                    ],
-                ]);
-            }
-        }
     }
 
     public function prepareApiData($customers)
@@ -335,15 +321,6 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             return false;
         }
         $this->BLoginThrottle->success();
-
-        if ($this->BModuleRegistry->isLoaded('FCom_AdminLiveFeed')
-            && $this->BConfig->get('modules/FCom_AdminLiveFeed/enable_customer')
-        ) {
-            $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
-                   'href' => 'customers/form?id=' . $user->id,
-                   'text' => $user->firstname . ' ' . $user->lastname . ' (' . $user->email . ') ' . $this->BLocale->_('is logged in'),
-                ]);
-        }
 
         return $user;
     }

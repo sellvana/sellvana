@@ -445,24 +445,4 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         }
     }
 
-    public function onAfterSave()
-    {
-        parent::onAfterSave();
-
-        if ($this->_newRecord) {
-            $billAddress = $this->getAddressByType('billing');
-            if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
-                && $this->BConfig->get('modules/FCom_Sales/neworder_realtime_notification')
-            ) {
-                $this->FCom_PushServer_Model_Channel->getChannel('sales_feed', true)->send([
-                        'signal' => 'new_order',
-                        'order' => [
-                            'href' => 'orders/form/?id=' . $this->id(),
-                            'text' => $this->BLocale->_('Order %s has been placed by %s',
-                                    [ '#' . $this->id(), $billAddress->firstname . ' ' . $billAddress->lastname]),
-                        ],
-                    ]);
-            }
-        }
-    }
 }

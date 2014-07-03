@@ -63,19 +63,6 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
             ->set('num_reviews', $rating->get('num'))
             ->save();
 
-        $pCustomerId = $this->get('customer_id');
-        $customer = $this->FCom_Customer_Model_Customer->load($pCustomerId);
-        if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
-            && $this->BConfig->get('modules/FCom_ProductReviews/newreview_realtime_notification')
-        ) {
-            $this->FCom_PushServer_Model_Channel->getChannel('reviews_feed', true)->send([
-                    'signal' => 'new_review',
-                    'review' => [
-                        'href' =>  'prodreviews/form/?id=' . $this->id(),
-                        'text' => $this->BLocale->_('%s has review the product %s', [ $customer->firstname . ' ' . $customer->lastname, '#' .$this->id()])
-                    ],
-                ]);
-        }
         return $this;
     }
 

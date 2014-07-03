@@ -97,6 +97,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
     {
         $req = $this->BRequest;
         $q = $req->get('q');
+
         if (is_array($q)) {
             $q = join(' ', $q);
         }
@@ -104,6 +105,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
             $q = $this->FCom_Catalog_Model_SearchAlias->processSearchQuery($q);
         }
 
+        $this->BEvents->fire(__METHOD__ . ':search_query', ['query' => &$q]);
         $this->layout('/catalog/search');
         $layout = $this->BLayout;
         $pagerView = $layout->view('catalog/product/pager');
@@ -143,13 +145,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $pagerView->setCanonicalPrevNext();
 
         $this->FCom_Catalog_Model_SearchHistory->addSearchHit($q, $productsData['state']['c']);
-        if ($this->BModuleRegistry->isLoaded('FCom_AdminLiveFeed')
-            && $this->BConfig->get('modules/FCom_AdminLiveFeed/enable_catalog')
-        ) {
-            $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
-                    'text' => $this->_('The term %s has been searched', $q),
-                ]);
-        }
+
         $layout->view('catalog/category/sidebar')->set('products_data', $productsData);
     }
 }

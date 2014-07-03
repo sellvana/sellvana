@@ -4,11 +4,6 @@ base:
             - [ addNav, customer, { label: Customers, pos: 300, icon_class: icon-user } ]
             - [ addNav, customer/customers, { label: Customers, href: /customers, pos: 10 } ]
             - [ addNav, customer/import, { label: Import Customers, href: /customers/import/index, pos: 40 } ]
-    - view: head
-        do:
-            - [ requireJs, fcom.customer, "@FCom_Customer/Admin/js/fcom.customer" ]
-            - [ requireRun, fcom.customer ]
-
 /customers/import:
     - { include: base }
     - { include: form }
