@@ -450,8 +450,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         parent::onAfterSave();
 
         if ($this->_newRecord) {
-            $pCustomerId = $this->get('customer_id');
-            $customer = $this->FCom_Customer_Model_Customer->load($pCustomerId);
+            $billAddress = $this->getAddressByType('billing');
             if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
                 && $this->BConfig->get('modules/FCom_Sales/neworder_realtime_notification')
             ) {
@@ -459,7 +458,8 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
                         'signal' => 'new_order',
                         'order' => [
                             'href' => 'orders/form/?id=' . $this->id(),
-                            'text' => $this->BLocale->_('Order %s has been placed by %s', [ '#' . $this->id(), $customer->firstname . ' ' . $customer->lastname]),
+                            'text' => $this->BLocale->_('Order %s has been placed by %s',
+                                    [ '#' . $this->id(), $billAddress->firstname . ' ' . $billAddress->lastname]),
                         ],
                     ]);
             }

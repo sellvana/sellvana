@@ -800,6 +800,47 @@ class BConfig extends BClass
         }
     }
 
+    public function writeConfigFiles($files = null)
+    {
+        //TODO: make more flexible, to account for other (custom) file names
+        if (null === $files) {
+            $files = ['core', 'db', 'local'];
+        }
+        if (is_string($files)) {
+            $files = explode(',', strtolower($files));
+        }
+
+        $c      = $this->get(null, null, true);
+
+        if (in_array('core', $files)) {
+            // configuration necessary for core startup
+            unset($c['module_run_levels']['request']);
+
+            $core = [
+                'install_status' => !empty($c['install_status'])? $c['install_status']: null,
+                'core' => !empty($c['core'])? $c['core']: null,
+                'module_run_levels' => !empty($c['module_run_levels'])? $c['module_run_levels']: [],
+                'recovery_modules' => !empty($c['recovery_modules'])? $c['recovery_modules']: null,
+                'mode_by_ip' => !empty($c['mode_by_ip'])? $c['mode_by_ip']: [],
+                'cache' => !empty($c['cache'])? $c['cache']: [],
+            ];
+            $this->writeFile('core.php', $core);
+        }
+        if (in_array('db', $files)) {
+            // db connections
+            $db = !empty($c['db'])? ['db' => $c['db']]: [];
+            $this->writeFile('db.php', $db);
+        }
+        if (in_array('local', $files)) {
+            // the rest of configuration
+            $local = $this->BUtil->arrayMask($c,
+                'db,install_status,module_run_levels,recovery_modules,mode_by_ip,cache,core',
+                true);
+            $this->writeFile('local.php', $local);
+        }
+        return $this;
+    }
+
     public function unsetConfig()
     {
         $this->_config = [];

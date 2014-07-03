@@ -584,7 +584,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         if (!$sUid) {
             $sUid = $this->BUtil->randomString(32);
             $this->BConfig->set('db/store_unique_id', $sUid, false, true);
-            $this->FCom_Core_Main->writeConfigFiles();
+            $this->BConfig->writeConfigFiles();
         }
         return $sUid;
     }

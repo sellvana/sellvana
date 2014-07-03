@@ -28,7 +28,7 @@
  * @property string $admin_id
  *
  * other property
- * @property int shipping_same flag to know shipping is same as billing
+ * @property int same_address flag to know shipping is same as billing
  */
 class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 {
@@ -48,7 +48,6 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public $addresses;
     public $items;
     public $totals;
-    protected $shipping_method;
 
     public function sessionCartId($id = null)
     {
@@ -370,6 +369,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $this->customer_id = $this->FCom_Customer_Model_Customer->sessionUserId();
         }
         $shippingMethod = $this->getShippingMethod();
+
         if ($shippingMethod) {
             $services = $shippingMethod->getDefaultService();
             $this->shipping_service = key($services);
@@ -406,9 +406,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
             case 'shipping':
                 if (!empty($this->addresses['shipping'])) {
-                    $this->shipping_same = 0;
+                    $this->same_address = 0;
                     return $this->addresses['shipping'];
-                } elseif ($this->shipping_same) {
+                } elseif ($this->same_address) {
                     return $this->getAddressByType('billing');
                 } else {
                     return null;
@@ -446,9 +446,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $this->setAddressByType('billing', $defBilling);
 
         if ($defBilling->id == $defShipping->id) {
-            $this->shipping_same = 1;
+            $this->same_address = 1;
         } else {
-            $this->shipping_same = 0;
+            $this->same_address = 0;
             $this->setAddressByType('shipping', $defShipping);
         }
         return true;

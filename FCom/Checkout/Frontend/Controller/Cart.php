@@ -47,14 +47,14 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                     return;
                 }
                 $options = [
-                    'qty' => !empty($post['qty']) ? $post['qty'] : 1, 
+                    'qty' => !empty($post['qty']) ? $post['qty'] : 1,
                     'price' => $p->getPrice(),
                     'sku' => $p->get('local_sku'),
                 ];
                 $result = [];
                 $validate = $this->BEvents->fire(__METHOD__ . ':validate', [
-                    'controller' => $this, 
-                    'product' => $p, 
+                    'controller' => $this,
+                    'product' => $p,
                     'post' => $post,
                     'options' => &$options,
                     'result' => &$result,
@@ -89,7 +89,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
             $items = $cart->items();
             if (count($items)) {
                 if (!empty($post['remove'])) {
-                    foreach ($post['remove'] as $id => $arr_variant) {
+                    foreach ($post['remove'] as $id => $arrVariant) {
                         $item = $cart->childById('items', $id);
                         $variants = $item->getData('variants');
                         if (null === $variants || count($variants) == 1) {
@@ -98,13 +98,13 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                     }
                 }
                 if (!empty($post['qty'])) {
-                    foreach ($post['qty'] as $id => $arr_qty) {
+                    foreach ($post['qty'] as $id => $arrQty) {
                         $item = $cart->childById('items', $id);
                         if ($item) {
                             $variants = $item->getData('variants');
                             $totalQty = 0;
-                            if (null !== $variants) {
-                                foreach ($arr_qty as $variantId => $qty) {
+                            if (null !== $variants && is_array($arrQty)) {
+                                foreach ($arrQty as $variantId => $qty) {
                                     if ($qty > 0) {
                                         $variants[$variantId]['variant_qty'] = $qty;
                                         $totalQty += $qty;
@@ -114,7 +114,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                                     }
                                 }
                             } else {
-                                $totalQty = $arr_qty[0];
+                                $totalQty = $arrQty[0];
                             }
                             if ($totalQty > 0) {
                                 $item->set('qty', $totalQty)->setData('variants', $variants)->save();
