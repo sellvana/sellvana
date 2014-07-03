@@ -1,6 +1,5 @@
 {% set c = THIS.get('model') %}
 {% import THIS.view('admin/form-elements').twigName() as forms %}
-{% set fieldData = { model: c, settings_module:'FCom_AdminLiveFeed' } %}
 {% set fieldDataCatalog = { model: c, settings_module:'FCom_Catalog' } %}
 {% set fieldDataEmail = { model: c, settings_module:'FCom_Email' } %}
 {% set fieldDataWishlist = { model: c, settings_module:'FCom_Wishlist' } %}
@@ -8,10 +7,9 @@
 <h2>{{ "Admin Live Feed Settings"|_ }}</h2>
 {{ forms.accordion_start({id:'settings-FCom_AdminLiveFeed'}) }}
      {{ forms.accordion_panel_start({label:'Admin Live Feed Recent Activity'|_, id:'settings-FCom_AdminLiveFeed-group0', in:1}) }}
-        {#{{ forms.boolean(fieldData, {field:'livefeed_recent_activities', label:'Livefeed'|_ }) }}#}
-        {#{{ forms.boolean(fieldDataCatalog, {field:'catalog_recent_activities', label:'Catalog'|_ }) }}#}
-        {#{{ forms.boolean(fieldDataEmail, {field:'newsletter_recent_activities', label:'Newsletter'|_ }) }}#}
-        {#{{ forms.boolean(fieldDataWishlist, {field:'wishlist_recent_activities', label:'Wishlist'|_ }) }}#}
-        {#{{ forms.boolean(fieldDataCustomer, {field:'customer_recent_activities', label:'Customer'|_ }) }}#}
+        {{ forms.boolean(fieldDataCatalog, {field:'enable_catalog', label:'Catalog'|_ }) }}
+        {{ forms.boolean(fieldDataEmail, {field:'enable_newsletter', label:'Newsletter'|_ }) }}
+        {{ forms.boolean(fieldDataWishlist, {field:'enable_wishlist', label:'Wishlist'|_ }) }}
+        {{ forms.boolean(fieldDataCustomer, {field:'enable_customer', label:'Customer'|_ }) }}
      {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

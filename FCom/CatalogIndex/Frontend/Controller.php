@@ -144,7 +144,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         $this->FCom_Catalog_Model_SearchHistory->addSearchHit($q, $productsData['state']['c']);
         if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
-            && $this->BConfig->get('modules/FCom_Catalog/catalog_recent_activities')
+            && $this->BConfig->get('modules/FCom_Catalog/enable_catalog')
         ) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
                     'text' => $this->_('The term %s has been searched', $q),
