@@ -1809,9 +1809,18 @@ class BUtil extends BClass
     }
 }
 
-class BHTML extends BClass
+class BHtml extends BClass
 {
 
+}
+
+class BUrl extends BClass
+{
+    public function hideScriptName()
+    {
+        $hideConf = $this->BConfig->get('web/hide_script_name');
+        return $hideConf == 2 || $hideConf == 1 && $this->BRequest->modRewriteEnabled();
+    }
 }
 
 /**

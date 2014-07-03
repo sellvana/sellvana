@@ -67,7 +67,8 @@
 *
 * misc
 * @property BUtil $BUtil
-* @property BHTML $BHTML
+* @property BHtml $BHtml
+* @property BUrl $BUrl
 * @property BEmail $BEmail
 * @property BValue $BValue
 * @property BData $BData
@@ -418,7 +419,7 @@ class BApp extends BClass
                     break;
             }
 
-            if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name') && $this->BRequest->area() !== 'FCom_Admin')) {
+            if (!($this->BUrl->hideScriptName() && $this->BRequest->area() !== 'FCom_Admin')) {
                 $url = rtrim($url, "\\"); //for windows installation
                 $url = rtrim($url, '/') . '/' . $scriptPath['basename'];
             }
@@ -464,7 +465,7 @@ class BApp extends BClass
             $r = $this->BRequest;
             $c = $this->BConfig;
             $storeHref = $c->get('web/base_store');
-            if (!$c->get('web/hide_script_name')) {
+            if (!$this->BUrl->hideScriptName()) {
                 if ($storeHref === '' || $storeHref === '/') {
                     $storeHref = '/index.php/';
                 } else {
