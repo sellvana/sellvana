@@ -143,7 +143,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
         $pagerView->setCanonicalPrevNext();
 
         $this->FCom_Catalog_Model_SearchHistory->addSearchHit($q, $productsData['state']['c']);
-        if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
+        if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
             && $this->BConfig->get('modules/FCom_Catalog/catalog_recent_activity')
         ) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([

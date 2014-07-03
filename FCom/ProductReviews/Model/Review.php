@@ -65,7 +65,7 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
 
         $pCustomerId = $this->get('customer_id');
         $customer = $this->FCom_Customer_Model_Customer->load($pCustomerId);
-        if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
+        if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
             && $this->BConfig->get('modules/FCom_PushServer/newreview_realtime_notification')
         ) {
             $this->FCom_PushServer_Model_Channel->getChannel('reviews_feed', true)->send([

@@ -17,7 +17,7 @@ class FCom_ProductReviews_Admin extends BClass
 
     public function onGetHeaderNotifications($args)
     {
-        if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
+        if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
             && $this->BConfig->get('modules/FCom_ProductReviews/newreview_realtime_notification')
         ) {
             $this->FCom_PushServer_Model_Client->sessionClient()->subscribe('reviews_feed');

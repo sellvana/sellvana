@@ -196,7 +196,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         }
 
         if ($this->_newRecord) {
-            if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
+            if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
                 && $this->BConfig->get('modules/FCom_Customer/newcustomer_realtime_notification')
             ) {
                 $this->FCom_PushServer_Model_Channel->getChannel('customers_feed', true)->send([
@@ -335,7 +335,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             return false;
         }
         $this->BLoginThrottle->success();
-        if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
+        if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
             && $this->BConfig->get('modules/FCom_Customer/customer_recent_activity')
         ) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([

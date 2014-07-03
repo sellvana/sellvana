@@ -137,7 +137,7 @@ class FCom_Sales_Main extends BClass
 
     public function onGetHeaderNotifications($args)
     {
-        if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
+        if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
             && $this->BConfig->get('modules/FCom_Sales/neworder_realtime_notification')
         ) {
             $this->FCom_PushServer_Model_Client->sessionClient()->subscribe('sales_feed');

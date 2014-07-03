@@ -451,7 +451,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
         if ($this->_newRecord) {
             $billAddress = $this->getAddressByType('billing');
-            if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
+            if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
                 && $this->BConfig->get('modules/FCom_Sales/neworder_realtime_notification')
             ) {
                 $this->FCom_PushServer_Model_Channel->getChannel('sales_feed', true)->send([
