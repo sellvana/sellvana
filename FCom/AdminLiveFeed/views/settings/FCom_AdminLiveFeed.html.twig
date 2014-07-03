@@ -5,21 +5,13 @@
 {% set fieldDataEmail = { model: c, settings_module:'FCom_Email' } %}
 {% set fieldDataWishlist = { model: c, settings_module:'FCom_Wishlist' } %}
 {% set fieldDataCustomer = { model: c, settings_module:'FCom_Customer' } %}
-<h2>{{ "Admin Live Feed Settings"|_}}</h2>
+<h2>{{ "Admin Live Feed Settings"|_ }}</h2>
 {{ forms.accordion_start({id:'settings-FCom_AdminLiveFeed'}) }}
      {{ forms.accordion_panel_start({label:'Admin Live Feed Recent Activity'|_, id:'settings-FCom_AdminLiveFeed-group0', in:1}) }}
-        {{ forms.boolean(fieldData, {field:'livefeed_recent_activity', label:'Livefeed'|_ }) }}
-     {{ forms.accordion_panel_end }}
-     {{ forms.accordion_panel_start({label:'Catalog Recent Activity'|_, id:'settings-FCom_Catalog-group0', in:1}) }}
-        {{ forms.boolean(fieldDataCatalog, {field:'catalog_recent_activity', label:'Catalog'|_ }) }}
-     {{ forms.accordion_panel_end }}
-     {{ forms.accordion_panel_start({label:'Newsletter Recent Activity'|_, id:'settings-FCom_Email-group0', in:1}) }}
-        {{ forms.boolean(fieldDataEmail, {field:'newsletter_recent_activity', label:'Newsletter'|_ }) }}
-     {{ forms.accordion_panel_end }}
-     {{ forms.accordion_panel_start({label:'Wishlist Recent Activity'|_, id:'settings-FCom_Wishlist-group0', in:1}) }}
-        {{ forms.boolean(fieldDataWishlist, {field:'wishlist_recent_activity', label:'Wishlist'|_ }) }}
-     {{ forms.accordion_panel_end }}
-     {{ forms.accordion_panel_start({label:'Customer Recent Activity'|_, id:'settings-FCom_Customer-group0', in:1}) }}
-        {{ forms.boolean(fieldDataCustomer, {field:'customer_recent_activity', label:'Customer'|_ }) }}
+        {#{{ forms.boolean(fieldData, {field:'livefeed_recent_activities', label:'Livefeed'|_ }) }}#}
+        {#{{ forms.boolean(fieldDataCatalog, {field:'catalog_recent_activities', label:'Catalog'|_ }) }}#}
+        {#{{ forms.boolean(fieldDataEmail, {field:'newsletter_recent_activities', label:'Newsletter'|_ }) }}#}
+        {#{{ forms.boolean(fieldDataWishlist, {field:'wishlist_recent_activities', label:'Wishlist'|_ }) }}#}
+        {#{{ forms.boolean(fieldDataCustomer, {field:'customer_recent_activities', label:'Customer'|_ }) }}#}
      {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

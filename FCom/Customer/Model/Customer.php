@@ -336,7 +336,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         }
         $this->BLoginThrottle->success();
         if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
-            && $this->BConfig->get('modules/FCom_Customer/customer_recent_activity')
+            && $this->BConfig->get('modules/FCom_Customer/customer_recent_activities')
         ) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
                    'href' => 'customers/form?id=' . $user->id,

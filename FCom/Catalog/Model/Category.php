@@ -154,7 +154,6 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         $addIds = explode(',', $this->get('product_ids_add'));
         $removeIds = explode(',', $this->get('product_ids_remove'));
         $hlp = $this->FCom_Catalog_Model_CategoryProduct;
-        $countItem = 0;
 
         if (sizeof($addIds) > 0 && $addIds[0] != '') {
             $exists = $hlp->orm('cp')->where('category_id', $this->id())->where_in('product_id', $addIds)
@@ -162,17 +161,9 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             foreach ($addIds as $pId) {
                 if (empty($exists[$pId])) {
                     $hlp->create(['category_id' => $this->id(), 'product_id' => $pId])->save();
-                    $countItem++;
                 }
             }
 
-            if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
-                && $this->BConfig->get('modules/FCom_Catalog/catalog_recent_activity')
-            ) {
-                $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
-                        'text' => $this->BLocale->_('New %s of products have been added to catalog', $countItem),
-                    ]);
-            }
         }
         if (sizeof($removeIds) > 0 && $removeIds[0] != '') {
             $hlp->delete_many(['category_id' => $this->id(), 'product_id' => $removeIds]);
