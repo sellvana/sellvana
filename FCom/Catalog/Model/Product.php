@@ -227,17 +227,6 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     {
         if (!parent::onAfterSave()) return false;
 
-        if ($this->_newRecord) {
-            if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
-                && $this->BConfig->get('modules/FCom_AdminLiveFeed/enable_catalog')
-            ) {
-                $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
-                        'href' => 'catalog/products/form?id=' . $this->id(),
-                        'text' => $this->BLocale->_('New %s of products have been added to catalog', '#' . $this->id()),
-                    ]);
-            }
-        }
-
         $saveAgain = false;
 
         //todo: setup unique uniq_id
@@ -251,7 +240,6 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($saveAgain) {
             $this->save();
         }
-
 
         return true;
     }

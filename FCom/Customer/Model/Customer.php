@@ -335,7 +335,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             return false;
         }
         $this->BLoginThrottle->success();
-        if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
+
+        if ($this->BModuleRegistry->isLoaded('FCom_AdminLiveFeed')
             && $this->BConfig->get('modules/FCom_AdminLiveFeed/enable_customer')
         ) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
@@ -343,6 +344,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
                    'text' => $user->firstname . ' ' . $user->lastname . ' (' . $user->email . ') ' . $this->BLocale->_('is logged in'),
                 ]);
         }
+
         return $user;
     }
 

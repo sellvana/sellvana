@@ -32,7 +32,7 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             case 'add':
                 $wishlist->addItem($p->id());
 
-                if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
+                if ($this->BModuleRegistry->isLoaded('FCom_AdminLiveFeed')
                     && $this->BConfig->get('modules/FCom_AdminLiveFeed/enable_wishlist')
                 ) {
                     $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([

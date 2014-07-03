@@ -3,15 +3,13 @@ modules:
         version: 0.1
         channel: beta
         description: Admin Live Feed
-
         require: { module: { FCom_Core: 0.1.0, FCom_PushServer: 0.1.4 } }
-
         auto_use: [ layout, views ]
 
-        areas:
-            FCom_Admin:
-                observe:
-                    - [ "FCom_Admin_View_Header::getNotifications", FCom_AdminLiveFeed_Main.onGetHeaderNotifications ]
+        observe:
+            - [ "FCom_Admin_View_Header::getNotifications", FCom_AdminLiveFeed_Main.onGetHeaderNotifications ]
+            - [ "FCom_Catalog_Model_Product::onAfterSave", "FCom_AdminLiveFeed_Main::onProductAfterSave" ]
+            - [ "FCom_Email_Model_Pref::onAfterSave", "FCom_AdminLiveFeed_Main::onPrefAfterSave" ]
 
         default_config:
             modules:
