@@ -16,4 +16,7 @@ modules:
         default_config:
             modules:
                 FCom_AdminLiveFeed:
-                    livefeed_recent_activities: true
+                    enable_catalog: true
+                    enable_newsletter: true
+                    enable_wishlist: true
+                    enable_customer: true

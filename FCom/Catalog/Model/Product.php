@@ -229,7 +229,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
         if ($this->_newRecord) {
             if ($this->BModuleRegistry->isLoaded('FCom_PushServer')
-                && $this->BConfig->get('modules/FCom_Catalog/enable_catalog')
+                && $this->BConfig->get('modules/FCom_AdminLiveFeed/enable_catalog')
             ) {
                 $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
                         'href' => 'catalog/products/form?id=' . $this->id(),

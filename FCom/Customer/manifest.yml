@@ -56,4 +56,3 @@ modules:
                     - [ "/v1/customer/address/:id", FCom_Customer_ApiServer_V1_Address.index ]
         default_config:
             modules/FCom_Customer/newcustomer_realtime_notification: true
-            modules/FCom_Customer/enable_customer: true
