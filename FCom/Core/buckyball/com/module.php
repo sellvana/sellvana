@@ -1526,7 +1526,7 @@ class BMigrate extends BClass
         $this->BConfig->set('core/currently_migrating', 1, false, true);
         */
         if (class_exists('FCom_Core_Main')) {
-            $this->FCom_Core_Main->writeConfigFiles('core');
+            $this->BConfig->writeConfigFiles('core');
         }
 
         $this->BResponse->startLongResponse();
@@ -1613,14 +1613,14 @@ class BMigrate extends BClass
             /*
             $this->BConfig->set('core/currently_migrating', 0, false, true);
             if (class_exists('FCom_Core_Main')) {
-                $this->FCom_Core_Main->writeConfigFiles('core');
+                $this->BConfig->writeConfigFiles('core');
             }
             */
         } catch (Exception $e) {
             /*
             $this->BConfig->set('core/currently_migrating', 0, false, true);
             if (class_exists('FCom_Core_Main')) {
-                $this->FCom_Core_Main->writeConfigFiles('core');
+                $this->BConfig->writeConfigFiles('core');
             }
             */
             $trace = $e->getTrace();

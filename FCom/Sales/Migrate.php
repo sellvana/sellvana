@@ -660,4 +660,21 @@ class FCom_Sales_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_2_12__0_2_13()
+    {
+        $tCart = $this->FCom_Sales_Model_Cart->table();
+        $this->BDb->ddlTableDef($tCart, [
+            'COLUMNS' => [
+                'same_address' => "tinyint(1) not null default 0",
+            ],
+        ]);
+
+        $tOrder= $this->FCom_Sales_Model_Order->table();
+        $this->BDb->ddlTableDef($tOrder, [
+            'COLUMNS' => [
+                'same_address' => "tinyint(1) not null default 0",
+            ],
+        ]);
+    }
 }

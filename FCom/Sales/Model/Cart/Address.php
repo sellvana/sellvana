@@ -71,4 +71,12 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
         $this->update_at = $this->BDb->now();
         return true;
     }
+
+    public function exportToCustomer($customer)
+    {
+        $data = $this->as_array();
+        $data['customer_id'] = $customer->id();
+        $custAddress = $this->FCom_Customer_Model_Address->create($data)->save();
+        return $custAddress;
+    }
 }
