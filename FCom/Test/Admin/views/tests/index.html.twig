@@ -1,4 +1,11 @@
-
+<style type="text/css">
+    .green {
+        color: green;
+    }
+    .red {
+        color: darkred;
+    }
+</style>
 <div class="f-admin-main-view">
   <div class="page-header f-admin-page-header">
     <h1 class="f-page-title">Developers - Test</h1>
@@ -12,7 +19,6 @@
   <div class="f-admin-main">
     <form class="form form-horizontal">
       <div id="results" style="display: none; max-height:480px; overflow:auto;">
-        Hello!
       </div>
     </form>
   </div>
@@ -32,20 +38,35 @@
             return false;
         }
         function ajax_tests_run2() {
-            /*
-            $.ajax({
-                type: "GET",
-                url: "{{ APP.href('tests/run2') }}"
-            }).done(function( msg ) {
-                console.log(msg);
-                $('#results').show().html(msg);
-            });
-            */
             jQuery.get("{{ APP.href('tests/run2') }}")
                     .done(function (result) {
-                        console.log(result);
+                        var $results = $('#results');
+                        $(result).each(function (i, o) {
+                            if(i == 0 && o.event == 'suiteStart' && o.suite) {
+                                var $div = $('<div class="suite-start">');
+                                $div.append('<p>{{ "Running test suite "|_ }}' + o.suite + '</p>');
+                                $div.append('<p>' + o.tests + '{{ " tests found"|_ }}');
+                                $results.html($div);
+                            } else if(o.event == 'test') {
+                                var className = 'test';
+                                var title = o.test;
+                                if(o.status == 'pass') {
+                                    className += ' green';
+                                } else {
+                                    className += ' red';
+                                    title += o.message;
+                                }
+
+                                var $span = $('<span class="' + className + '">');
+                                $span.append('<span class="glyphicon glyphicon-check" title="' + title + '"/>');
+                                $results.append($span);
+                            }
+                            console.log(i);
+                            console.log(o);
+                        });
+                        $results.show();
                     })
-                    .always(function (result, msg) {
+                    .fail(function (result, msg) {
                         console.log(msg);
                     });
             return false;
