@@ -1579,6 +1579,11 @@ class BView extends BClass
             return $this->BUtil->call($renderer, $this);
         }
 
+        if ($this->getParam('source')) {
+            BDebug::debug('VIEW.RENDER "' . $this->param('view_name') . '" RAW SOURCE');
+            return $this->getParam('source');
+        }
+
         BDebug::debug('VIEW.RENDER "' . $this->param('view_name') . '" USING PHP');
         ob_start();
         include $this->getTemplateFileName();

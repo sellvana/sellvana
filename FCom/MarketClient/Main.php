@@ -106,7 +106,7 @@ class FCom_MarketClient_Main extends BClass
         }
         $this->progress(['status' => 'DONE']);
         if ($configUpdated) {
-            $this->FCom_Core_Main->writeConfigFiles();
+            $this->BConfig->writeConfigFiles();
         }
     }
 

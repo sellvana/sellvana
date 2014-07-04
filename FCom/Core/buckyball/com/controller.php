@@ -776,7 +776,7 @@ class BRequest extends BClass
     public function currentUrl()
     {
         $host = $this->scheme() . '://' . $this->httpHost(true);
-        if ($this->BConfig->get('web/hide_script_name') && $this->BRequest->area() !== 'FCom_Admin') {
+        if ($this->BUrl->hideScriptName() && $this->BRequest->area() !== 'FCom_Admin') {
             $root = $this->webRoot();
         } else {
             $root = $this->scriptName();

@@ -48,12 +48,12 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
             if (!empty($post['config']['db'])) {
                 try {
                     $this->BDb->connect();
-                    //$this->FCom_Core_Main->writeConfigFiles('db');
+                    //$this->BConfig->writeConfigFiles('db');
                 } catch (Exception $e) {
                     $this->message('Invalid DB configuration, not saved: ' . $e->getMessage(), 'error');
                 }
             }
-            $this->FCom_Core_Main->writeConfigFiles();
+            $this->BConfig->writeConfigFiles();
 
             if (!$xhr) {
                 $this->message('Settings updated');
@@ -96,7 +96,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
         }
         if ($dirty) {
             $conf->set('modules/FCom_Core/dismissed/notifications', $dismissed, false, true);
-            $this->FCom_Core_Main->writeConfigFiles('local');
+            $this->BConfig->writeConfigFiles('local');
         }
 
         $this->BResponse->json("success");

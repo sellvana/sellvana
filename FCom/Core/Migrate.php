@@ -34,7 +34,7 @@ class FCom_Core_Migrate extends BClass
             ],
         ]);
         $this->BConfig->set('cookie/session_check_ip', 1, false, true);
-        $this->FCom_Core_Main->writeConfigFiles();
+        $this->BConfig->writeConfigFiles();
         $this->BDb->ddlTableDef($this->FCom_Core_ImportExport->table(), [
             'COLUMNS' => [
                 'id'        => 'int(11)',
@@ -101,7 +101,7 @@ class FCom_Core_Migrate extends BClass
         if (!$this->BConfig->get('cache/default_backend')) {
             $this->_defaultBackend = $this->BCache->getFastestAvailableBackend();
             $this->BConfig->set('cache/default_backend', $this->_defaultBackend, false, true);
-            $this->FCom_Core_Main->writeConfigFiles('core');
+            $this->BConfig->writeConfigFiles('core');
         }
     }
 
@@ -138,7 +138,7 @@ class FCom_Core_Migrate extends BClass
     public function upgrade__0_1_2__0_1_3()
     {
         $this->BConfig->set('cookie/session_check_ip', 1, false, true);
-        $this->FCom_Core_Main->writeConfigFiles();
+        $this->BConfig->writeConfigFiles();
     }
 
     public function upgrade__0_1_3__0_1_4()
@@ -217,7 +217,7 @@ class FCom_Core_Migrate extends BClass
         if (!$this->BConfig->get('cache/default_backend')) {
             $this->_defaultBackend = $this->BCache->getFastestAvailableBackend();
             $this->BConfig->set('cache/default_backend', $this->_defaultBackend, false, true);
-            $this->FCom_Core_Main->writeConfigFiles('core');
+            $this->BConfig->writeConfigFiles('core');
         }
     }
 
