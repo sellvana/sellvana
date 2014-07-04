@@ -742,12 +742,12 @@ class BRequest extends BClass
     }
 
     /**
-    * Verify that HTTP_HOST or HTTP_ORIGIN
-    *
-    * @param string $method (HOST|ORIGIN|OR|AND)
-    * @param string $explicitHost
-    * @return boolean
-    */
+     * Verify that HTTP_HOST or HTTP_ORIGIN
+     *
+     * @param string $method (HOST|ORIGIN|OR|AND)
+     * @param string $host
+     * @return boolean
+     */
     public function verifyOriginHostIp($method = 'OR', $host = null)
     {
         $ip = $this->ip();
