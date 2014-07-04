@@ -4,9 +4,9 @@
     <h1 class="f-page-title">Developers - Test</h1>
     <div class="btn-group">
         {% if THIS.get('can_cgi') %}
-        <button class="btn" onclick="ajax_tests_run(); return false;">Run tests cgi</button>
+        <button class="btn" id="btn-test-cgi">Run tests cgi</button>
         {% endif %}
-        <button class="btn" onclick="ajax_tests_run2(); return false;">Run tests web</button>
+        <button class="btn" id="btn-test-web">Run tests web</button>
     </div>
   </div>
   <div class="f-admin-main">
@@ -21,22 +21,37 @@
 
 
 <script type="text/javascript">
-    function ajax_tests_run() {
-        $.ajax({
-            type: "GET",
-            url: "{{ APP.href('tests/run') }}"
-        }).done(function( msg ) {
-            $('#results').show().html(msg);
-        });
-        return false;
-    }
-    function ajax_tests_run2() {
-        $.ajax({
-            type: "GET",
-            url: "{{ APP.href('tests/run2') }}"
-        }).done(function( msg ) {
-            $('#results').show().html(msg);
-        });
-        return false;
-    }
+    require(['jquery'], function($){
+        function ajax_tests_run() {
+            $.ajax({
+                type: "GET",
+                url: "{{ APP.href('tests/run') }}"
+            }).done(function( msg ) {
+                $('#results').show().html(msg);
+            });
+            return false;
+        }
+        function ajax_tests_run2() {
+            /*
+            $.ajax({
+                type: "GET",
+                url: "{{ APP.href('tests/run2') }}"
+            }).done(function( msg ) {
+                console.log(msg);
+                $('#results').show().html(msg);
+            });
+            */
+            jQuery.get("{{ APP.href('tests/run2') }}")
+                    .done(function (result) {
+                        console.log(result);
+                    })
+                    .always(function (result, msg) {
+                        console.log(msg);
+                    });
+            return false;
+        }
+
+        $('#btn-test-web').click(ajax_tests_run2);
+        $('#btn-test-cgi').click(ajax_tests_run);
+    });
 </script>
