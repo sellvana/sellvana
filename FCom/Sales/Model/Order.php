@@ -347,7 +347,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
                 return !empty($addresses['billing']) ? $addresses['billing'] : null;
 
             case 'shipping':
-                if ($this->shipping_same) {
+                if ($this->same_address) {
                     return $this->getAddressByType('billing');
                 }
                 return !empty($addresses['shipping']) ? $addresses['shipping'] : null;
