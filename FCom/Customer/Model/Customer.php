@@ -22,6 +22,9 @@
  * relations
  * @property FCom_Customer_Model_Address $default_billing
  * @property FCom_Customer_Model_Address $default_shipping
+ *
+ * DI
+ * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
  */
 class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 {
@@ -191,18 +194,6 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             $this->BSession->set('customer_user', serialize($this));
             static::$_sessionUser = $this;
         }
-
-        if ($this->_newRecord) {
-            $this->FCom_PushServer_Model_Channel->getChannel('customers_feed', true)->send([
-                'signal' => 'new_customer',
-                'customer' => [
-                    'id' => $this->id(),
-                    'email' => $this->email,
-                    'name' => $this->firstname . ' ' . $this->lastname,
-                    'mes' => $this->BLocale->_('created an account.')
-                ],
-            ]);
-        }
     }
 
     public function prepareApiData($customers)
@@ -310,6 +301,11 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $this->sessionUserId() ? true : false;
     }
 
+    /**
+     * @param $username
+     * @param $password
+     * @return FCom_Customer_Model_Customer|bool
+     */
     public function authenticate($username, $password)
     {
         if (empty($username) || empty($password)) {
@@ -318,16 +314,20 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         if (!$this->BLoginThrottle->init('FCom_Customer_Model_Customer', $username)) {
             return false;
         }
-        /** @var FCom_Admin_Model_User */
+        /** @var FCom_Admin_Model_User $user */
         $user = $this->orm()->where('email', $username)->find_one();
         if (!$user || !$user->validatePassword($password)) {
             $this->BLoginThrottle->failure();
             return false;
         }
         $this->BLoginThrottle->success();
+
         return $user;
     }
 
+    /**
+     * @return $this
+     */
     public function login()
     {
         $this->set('last_login', $this->BDb->now())->save();
@@ -355,6 +355,11 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         $this->BSession->regenerateId();
     }
 
+    /**
+     * @param array $r post data
+     * @return static
+     * @throws Exception
+     */
     public function register($r)
     {
         if (empty($r['email'])
@@ -376,8 +381,10 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $customer;
     }
 
-
-
+    /**
+     * @param array $data
+     * @return array
+     */
     public function import($data)
     {
         $this->BEvents->fire(__METHOD__ . ':before', ['data' => &$data]);

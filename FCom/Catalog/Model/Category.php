@@ -163,6 +163,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
                     $hlp->create(['category_id' => $this->id(), 'product_id' => $pId])->save();
                 }
             }
+
         }
         if (sizeof($removeIds) > 0 && $removeIds[0] != '') {
             $hlp->delete_many(['category_id' => $this->id(), 'product_id' => $removeIds]);

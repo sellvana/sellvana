@@ -17,7 +17,6 @@ modules:
                     - [ /prodreviews/.action, FCom_ProductReviews_Admin_Controller ]
                 observe:
                     - [ "BLayout::hook:catalog/products/tab/main", FCom_ProductReviews_Admin.hookProductTab ]
-                    - [ "FCom_Admin_View_Header::getNotifications", FCom_ProductReviews_Admin.onControllerBeforeDispatch ]
 
             FCom_Frontend:
                 routing:
@@ -25,5 +24,3 @@ modules:
                     - [ /prodreviews/.action, FCom_ProductReviews_Frontend_Controller ]
                 observe:
                     - [ "BLayout::hook:prodreviews-reviews", FCom_ProductReviews_Frontend.hookReviews ]
-        default_config:
-            modules/FCom_ProductReviews/newreview_realtime_notification: true

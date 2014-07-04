@@ -8,7 +8,7 @@ modules:
 
         areas:
             FCom_Admin:
-                auto_use: [ layout ]
+                auto_use: [ layout, views ]
                 observe:
                     - [ "FCom_Admin_Model_User::logout", "FCom_PushServer_Main::onAdminUserLogout" ]
 
@@ -17,5 +17,5 @@ modules:
                 routing:
                     - [ /, FCom_PushServer_Controller.index ]
 
-                default_config:
-                    modules/FCom_PushServer/delay_sec: 1
+        default_config:
+            modules/FCom_PushServer/delay_sec: 1

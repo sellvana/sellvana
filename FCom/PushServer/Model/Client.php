@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_PushServer_Model_Client
+ * @property FCom_PushServer_Main $FCom_PushServer_Main
+ * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
+ * @property FCom_PushServer_Model_Message $FCom_PushServer_Model_Message
+ * @property FCom_PushServer_Model_Subscriber $FCom_PushServer_Model_Subscriber
+ */
 class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_pushserver_client';
@@ -28,8 +35,8 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     public function sessionClient()
     {
         $sessId = $this->BSession->sessionId();
-        /*todo: because we need get data from data_serialized which be updated from different connection, so temporary disable load from cache*/
 
+        /*todo: because we need get data from data_serialized which be updated from different connection, so temporary disable load from cache*/
         /*if (!empty(static::$_clientCache[$sessId])) {
             return static::$_clientCache[$sessId];
         }
@@ -125,7 +132,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 
     public function processRequest($request)
     {
-        $client = $this->FCom_PushServer_Model_Client->sessionClient();
+        $client = $this->sessionClient();
 
         if (!isset($request['window_name']) || !isset($request['conn_id'])
             || !is_string($request['window_name']) || !is_numeric($request['conn_id'])
@@ -211,9 +218,11 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
         $oldConnections = !empty($oldWindows[static::$_windowName]['connections'])
             ? $oldWindows[static::$_windowName]['connections'] : [];
 
-        foreach ($newWindows as $windowName => $window) { // some cleanup
-            if (empty($window['connections'])) {
-                unset($newWindows[$windowName]);
+        if($newWindows){
+            foreach ($newWindows as $windowName => $window) { // some cleanup
+                if (empty($window['connections'])) {
+                    unset($newWindows[$windowName]);
+                }
             }
         }
 
@@ -246,7 +255,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
                 usleep(300000);
             }
         }
-//$this->BDebug->dump($this->getData('windows'));
+        //$this->BDebug->dump($this->getData('windows'));
         return $this;
     }
 
@@ -337,7 +346,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
             $this->setStatus('offline');
         }
 
-       // $this->save();
+        $this->save();
 
         return $this;
     }

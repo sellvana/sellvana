@@ -1,5 +1,37 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Model_Order
+ * @property string $id
+ * @property string $customer_id
+ * @property string $customer_email
+ * @property string $cart_id
+ * @property string $status
+ * @property string $item_qty
+ * @property string $subtotal
+ * @property string $shipping_method
+ * @property string $shipping_service
+ * @property string $payment_method
+ * @property string $coupon_code
+ * @property string $tax
+ * @property string $balance
+ * @property string $create_at
+ * @property string $update_at
+ * @property string $grandtotal
+ * @property string $shipping_service_title
+ * @property string $data_serialized
+ * @property string $unique_id
+ * @property string $admin_id
+ *
+ * @property array $items
+ *
+ * DI
+ * @property FCom_Core_Model_Seq $FCom_Core_Model_Seq
+ * @property FCom_Sales_Model_Order_Status $FCom_Sales_Model_Order_Status
+ * @property FCom_Sales_Model_Order_Item $FCom_Sales_Model_Order_Item
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
+ */
 class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_sales_order';
@@ -106,8 +138,8 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     /**
      * Verify if order exist if yes return the order data
      *
-     * @param $orderId
-     * @param $customerId
+     * @param int $uniqueId
+     * @param int $customerId
      * @return BModel | false
      */
     public function isOrderExists($uniqueId, $customerId)
@@ -413,26 +445,4 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         }
     }
 
-    public function onAfterSave()
-    {
-        parent::onAfterSave();
-
-        //TODO: use different location, the new order record doesn't have address yet
-        /*
-        if ($this->_newRecord) {
-            $pCustomerId = $this->get('customer_id');
-            $billAddress = $this->getAddressByType('billing');
-            $this->FCom_PushServer_Model_Channel->getChannel('sales_feed', true)->send([
-                    'signal' => 'new_order',
-                    'order' => [
-                        'id' => $this->id(),
-                        'email' => $this->customer_email,
-                        'name' => $billAddress->firstname . ' ' . $billAddress->lastname,
-                        'mes_be' => $this->BLocale->_('Order'),
-                        'mes_af' => $this->BLocale->_('has been placed by')
-                    ],
-                ]);
-        }
-        */
-    }
 }

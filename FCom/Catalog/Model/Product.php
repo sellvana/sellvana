@@ -240,6 +240,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($saveAgain) {
             $this->save();
         }
+
         return true;
     }
 

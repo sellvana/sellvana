@@ -97,6 +97,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
     {
         $req = $this->BRequest;
         $q = $req->get('q');
+
         if (is_array($q)) {
             $q = join(' ', $q);
         }
@@ -104,6 +105,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
             $q = $this->FCom_Catalog_Model_SearchAlias->processSearchQuery($q);
         }
 
+        $this->BEvents->fire(__METHOD__ . ':search_query', ['query' => &$q]);
         $this->layout('/catalog/search');
         $layout = $this->BLayout;
         $pagerView = $layout->view('catalog/product/pager');
