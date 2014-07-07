@@ -51,4 +51,5 @@ class FCom_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_Grid
         unset($config['orm']);
         return ['config' => $config];
     }
+
 }

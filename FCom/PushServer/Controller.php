@@ -12,7 +12,7 @@ class FCom_PushServer_Controller extends FCom_Core_Controller_Abstract
 
         $client = $this->FCom_PushServer_Model_Client->sessionClient();
 
-        $request = $this->BRequest->json();
+        $request = $this->BRequest->post();
 
         $client->processRequest($request)->checkIn()->waitForMessages()->checkOut();
 
