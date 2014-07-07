@@ -17,10 +17,10 @@
     </div>
   </div>
   <div class="f-admin-main">
-    <form class="form form-horizontal">
-      <div id="results" style="display: none; max-height:480px; overflow:auto;">
+    <div class="tab-content">
+      <div id="results" class="tab-pane active" style="display: none; max-height:480px; overflow:auto;">
       </div>
-    </form>
+    </div>
   </div>
 </div>
 
@@ -32,8 +32,18 @@
             $.ajax({
                 type: "GET",
                 url: "{{ APP.href('tests/run') }}"
-            }).done(function( msg ) {
-                $('#results').show().html(msg);
+            }).done(function (msg) {
+                var $results = $('#results');
+                $results.show().append("<h3>{{ "FCom Test suite CLI"|_ }}</h3>");
+                var res = "";
+                $(msg).each(function (i, o) {
+                    res += o + '\n';
+                });
+                var c = $("<pre/>").text(res);
+                $results.append(c);
+
+            }).fail(function (result, msg) {
+                console.log(msg);
             });
             return false;
         }

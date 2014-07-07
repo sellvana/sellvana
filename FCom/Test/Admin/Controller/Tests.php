@@ -11,16 +11,14 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
     public function action_run()
     {
 
-        $path = realpath(dirname(__FILE__) . '/../..');
-        $pathBB = FULLERON_ROOT_DIR . '/FCom/buckyball/tests';
+        $path = FULLERON_ROOT_DIR . '/testrun.php';
         if (function_exists('exec')) {
-            $res = exec("phpunit {$path}/AllTests.php", $output);
+            $res = exec("php -f \"$path\"", $output);
         } else {
             $output = [$this->_("Cannot run CLI tests from browser.")];
         }
-
-        echo "<h2>FCom tests</h2><br/>";
-        echo implode("<br>", $output);
+        $this->BResponse->header('Content-Type: application/json');
+        echo $this->BUtil->toJson($output);
         //echo $res;
         exit;
     }
@@ -28,7 +26,7 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
     public function action_run2()
     {
         $tests = $this->collectTests();
-        $results = $this->runTests($tests);
+        $results = $this->runTestsWeb($tests);
         $this->BResponse->header('Content-Type: application/json');
         echo $results;
         exit;
@@ -65,36 +63,12 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
         return array_unique($collection);
     }
 
-    public function runTests($tests)
+    public function runTestsWeb($tests)
     {
         $base    = $this->BConfig->get('fs/storage_dir') . '/' . $this->BConfig->get('core/storage_random_dir');
         $phpunit = $base . '/phpunit.phar';
-        if (!file_exists($phpunit)) {
-            if (touch($phpunit)) {
-                $phpunitUrl = 'https://phar.phpunit.de/phpunit.phar';
-                $raw        = $this->BUtil->remoteHttp('GET', $phpunitUrl);
-                file_put_contents($phpunit, $raw);
-
-            } else {
-                $this->BDebug->warning($this->_("Could not create $phpunit file."));
-            }
-        }
-
-        $this->puPhar = $phpunit;
-        $this->BClassAutoload->addPath($phpunit, 'FCom_Test', [$this, 'load']);
-        $suite = new PHPUnit_Framework_TestSuite("All Tests");
-
-        $original_classes = get_declared_classes();
-        foreach ($tests as $test) {
-            require_once $test;
-        }
-        $new_classes = get_declared_classes();
-        $tests       = array_diff($new_classes, $original_classes);
-        foreach ($tests as $test) {
-            if (is_subclass_of($test, 'PHPUnit_Framework_TestCase')) {
-                $suite->addTestSuite($test);
-            }
-        }
+        $this->ensurePhpunit($phpunit);
+        $suite = $this->prepareTestSuite($tests);
 
         $result = new PHPUnit_Framework_TestResult();
         $listener = new FCom_Test_Log_Json();
@@ -113,6 +87,16 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
 
         ini_set('html_errors', $html_errors);
         return $results;
+    }
+
+    public function runTestsText($tests)
+    {
+        $base    = $this->BConfig->get('fs/storage_dir') . '/' . $this->BConfig->get('core/storage_random_dir');
+        $phpunit = $base . '/phpunit.phar';
+        $this->ensurePhpunit($phpunit);
+        $suite = $this->prepareTestSuite($tests);
+        $runner = new PHPUnit_TextUI_TestRunner();
+        $runner->run($suite);
     }
 
     public function load($class)
@@ -679,4 +663,52 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
         'symfony\\component\\yaml\\yaml'                                       => '/symfony/yaml/Symfony/Component/Yaml/Yaml.php',
         'text_template'                                                        => '/php-text-template/Template.php'
     ];
+
+    /**
+     * @param string $phpunit desired phpunit filename
+     */
+    protected function ensurePhpunit($phpunit)
+    {
+        if (!file_exists($phpunit)) {
+            if (touch($phpunit)) {
+                $phpunitUrl = 'https://phar.phpunit.de/phpunit.phar';
+                $raw = $this->BUtil->remoteHttp('GET', $phpunitUrl);
+                file_put_contents($phpunit, $raw);
+                if (function_exists('chmod')) {
+                    chmod($phpunit, 0755); // make executable
+                }
+            } else {
+                $this->BDebug->warning($this->_("Could not create $phpunit file."));
+            }
+        }
+
+        $this->puPhar = $phpunit;
+        $this->BClassAutoload->addPath($phpunit, 'FCom_Test', [$this, 'load']);
+    }
+
+    /**
+     * @param array $tests
+     * @return PHPUnit_Framework_TestSuite
+     */
+    protected function prepareTestSuite($tests)
+    {
+        $suite = new PHPUnit_Framework_TestSuite("All Tests");
+
+        $original_classes = get_declared_classes();
+        foreach ($tests as $test) {
+            if (file_exists($test)) {
+                require_once $test;
+            } else {
+                $this->BDebug->log(BDb::now() . " $test does not exist");
+            }
+        }
+        $new_classes = get_declared_classes();
+        $tests = array_diff($new_classes, $original_classes);
+        foreach ($tests as $test) {
+            if (is_subclass_of($test, 'PHPUnit_Framework_TestCase')) {
+                $suite->addTestSuite($test);
+            }
+        }
+        return $suite;
+    }
 }
