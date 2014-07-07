@@ -17,23 +17,33 @@
     </div>
   </div>
   <div class="f-admin-main">
-    <form class="form form-horizontal">
-      <div id="results" style="display: none; max-height:480px; overflow:auto;">
+    <div class="tab-content">
+      <div id="results" class="tab-pane active" style="display: none; max-height:480px; overflow:auto;">
       </div>
-    </form>
+    </div>
   </div>
 </div>
 
 
-
 <script type="text/javascript">
-    require(['jquery'], function($){
+    require(['jquery'], function ($) {
         function ajax_tests_run() {
             $.ajax({
                 type: "GET",
                 url: "{{ APP.href('tests/run') }}"
-            }).done(function( msg ) {
-                $('#results').show().html(msg);
+            }).done(function (msg) {
+                var $results = $('#results');
+                $results.show().html("<h3>{{ "FCom Test suite CLI"|_ }}</h3>");
+                var res = "";
+                $(msg).each(function (i, o) {
+                    res += o + '\n';
+                });
+                var c = $("<pre/>").text(res);
+                $results.append(c);
+
+            }).fail(function (result, msg) {
+                $('#results').text("{{ "An error occurred during test run"|_ }}")
+                console.log(msg);
             });
             return false;
         }
@@ -42,15 +52,15 @@
                     .done(function (result) {
                         var $results = $('#results');
                         $(result).each(function (i, o) {
-                            if(i == 0 && o.event == 'suiteStart' && o.suite) {
+                            if (i == 0 && o.event == 'suiteStart' && o.suite) {
                                 var $div = $('<div class="suite-start">');
                                 $div.append('<p>{{ "Running test suite "|_ }}' + o.suite + '</p>');
                                 $div.append('<p>' + o.tests + '{{ " tests found"|_ }}');
                                 $results.html($div);
-                            } else if(o.event == 'test') {
+                            } else if (o.event == 'test') {
                                 var className = 'test';
                                 var title = o.test;
-                                if(o.status == 'pass') {
+                                if (o.status == 'pass') {
                                     className += ' green';
                                 } else {
                                     className += ' red';
@@ -67,6 +77,7 @@
                         $results.show();
                     })
                     .fail(function (result, msg) {
+                        $('#results').text("{{ "An error occurred during test run"|_ }}")
                         console.log(msg);
                     });
             return false;

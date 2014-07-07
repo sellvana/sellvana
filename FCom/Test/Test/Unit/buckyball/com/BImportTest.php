@@ -100,14 +100,14 @@ class BImportTest extends PHPUnit_Framework_TestCase
      */
     public function testConfig()
     {
-        $this->BConfig->add(
+        BConfig::i()->add(
             [
                  'fs' => [
                      'root_dir' => realpath(__DIR__ . DIRECTORY_SEPARATOR . '..')
                  ],
             ]
         );
-        $this->BSession->open('test');
+        BSession::i()->open('test');
         // initially config has no value
         $this->assertFalse($this->object->config());
         // prepare base config
