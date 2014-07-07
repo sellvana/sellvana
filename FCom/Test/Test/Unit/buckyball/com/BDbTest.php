@@ -5,12 +5,12 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     protected function setUp()
     {
         parent::setUp();
-        $db = $this->BDb;
+        $db = BDb::i();
         $vo = new Entity();
         $db->run("DROP TABLE IF EXISTS {$vo->fTable}");
         $db->run("DROP TABLE IF EXISTS {$vo->table}");
         $db->ddlClearCache();
-        $this->BConfig->add(
+        BConfig::i()->add(
         // config is being reset in its tests, so we have to load default config used to be able to test
             [
                  'db' => [
@@ -24,18 +24,18 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers $this->BDb->i
+     * @covers BDb::i()
      */
     public function testGetDBInstance()
     {
-        $db = $this->BDb->i(true);
+        $db = BDb::i()->i(true);
         $this->assertInstanceOf('BDb', $db);
-        $db = $this->BDb;
+        $db = BDb::i();
         $this->assertInstanceOf('BDb', $db);
     }
 
     /**
-     * @covers $this->BDb->connect
+     * @covers BDb::i()->connect
      */
     public function testNoNameConnectionIsDefaultConnection()
     {
@@ -49,24 +49,24 @@ class BDb_Test extends PHPUnit_Framework_TestCase
 
 
     /**
-     * @covers $this->BDb->connect
+     * @covers BDb::i()->connect
      */
     public function testEmptyConfigWillThrowBException()
     {
-        $this->BConfig->unsetConfig();
+        BConfig::i()->unsetConfig();
 
         $this->setExpectedException('BException');
 
-        $this->BDb->i(true)->connect('bogus');
+        BDb::i()->i(true)->connect('bogus');
     }
 
     /**
-     * @covers $this->BDb->connect
+     * @covers BDb::i()->connect
      */
     public function testWhenUseClauseIsPresentShouldSetCurrentConnectionToUse()
     {
 
-        $this->BConfig->add(
+        BConfig::i()->add(
             [
                  'db' => [
                      'named' => [
@@ -76,23 +76,23 @@ class BDb_Test extends PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->BConfig->set('db/named/test/use', 'DEFAULT');
+        BConfig::i()->set('db/named/test/use', 'DEFAULT');
 
-        $connOne = $this->BDb->connect('test');
-        $connTwo = $this->BDb->connect('DEFAULT');
+        $connOne = BDb::i()->connect('test');
+        $connTwo = BDb::i()->connect('DEFAULT');
 
         $this->assertSame($connOne, $connTwo);
 
-        $this->BConfig->set('db/named/test/use', null);
+        BConfig::i()->set('db/named/test/use', null);
     }
 
     /**
-     * @covers $this->BDb->connect
+     * @covers BDb::i()->connect
      */
     public function testSwitchingConnections()
     {
         BDbDouble::resetConnections();
-        $this->BConfig->add(
+        BConfig::i()->add(
             [
                  'db' => [
                      'named' => [
@@ -113,12 +113,12 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers $this->BDb->connect
+     * @covers BDb::i()->connect
      */
     public function testConnectWithoutDbnameThrowsException()
     {
         BDbDouble::resetConnections();
-        $this->BConfig->add(
+        BConfig::i()->add(
             [
                  'db' => [
                      'named' => [
@@ -128,18 +128,18 @@ class BDb_Test extends PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->BConfig->set('db/named/test/dbname', null);
+        BConfig::i()->set('db/named/test/dbname', null);
         $this->setExpectedException('BException');
-        $this->BDb->connect('test');
+        BDb::i()->connect('test');
     }
 
     /**
-     * @covers $this->BDb->connect
+     * @covers BDb::i()->connect
      */
     public function testConnectWithNonSupportedDbEngineThrowsException()
     {
         BDbDouble::resetConnections();
-        $this->BConfig->add(
+        BConfig::i()->add(
             [
                  'db' => [
                      'named' => [
@@ -149,18 +149,18 @@ class BDb_Test extends PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->BConfig->set('db/named/test/engine', 'pgsql');
+        BConfig::i()->set('db/named/test/engine', 'pgsql');
         $this->setExpectedException('BException');
-        $this->BDb->connect('test');
+        BDb::i()->connect('test');
     }
 
     /**
-     * @covers $this->BDb->connect
+     * @covers BDb::i()->connect
      */
     public function testConnectWithDsn()
     {
 
-        $this->BConfig->add(
+        BConfig::i()->add(
             [
                  'db' => [
                      'named' => [
@@ -170,17 +170,17 @@ class BDb_Test extends PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->BConfig->set('db/named/test/dbname', null);
-        $this->BConfig->set('db/named/test/dsn', "mysql:host=localhost;dbname=fulleron_test;charset=UTF8");
-        $this->assertInstanceOf('BPDO', $this->BDb->connect('test'));
+        BConfig::i()->set('db/named/test/dbname', null);
+        BConfig::i()->set('db/named/test/dsn', "mysql:host=localhost;dbname=fulleron_test;charset=UTF8");
+        $this->assertInstanceOf('BPDO', BDb::i()->connect('test'));
     }
 
     /**
-     * @covers $this->BDb->connect
+     * @covers BDb::i()->connect
      */
     public function testConnectingMoreThanOnceWithSameNameReturnsSameConnection()
     {
-        $this->BConfig->add(
+        BConfig::i()->add(
             [
                  'db' => [
                      'named' => [
@@ -190,33 +190,33 @@ class BDb_Test extends PHPUnit_Framework_TestCase
             ]
         );
 
-        $connOne = $this->BDb->connect('test');
-        $connTwo = $this->BDb->connect('test');
+        $connOne = BDb::i()->connect('test');
+        $connTwo = BDb::i()->connect('test');
 
         $this->assertSame($connOne, $connTwo);
     }
 
     /**
-     * @covers $this->BDb->connect
+     * @covers BDb::i()->connect
      */
     public function testGetConnectionObject()
     {
-        $conn = $this->BDb->connect();
+        $conn = BDb::i()->connect();
         $this->assertInstanceOf('PDO', $conn);
     }
 
     /**
-     * @covers $this->BDb->now
+     * @covers BDb::i()->now
      */
     public function testNow()
     {
         $now = date('Y-m-d H:i:s');
 
-        $this->assertEquals($now, $this->BDb->now());
+        $this->assertEquals($now, BDb::i()->now());
     }
 
     /**
-     * @covers $this->BDb->run
+     * @covers BDb::i()->run
      */
     public function testRunReturnsArrayAndIsNotEmpty()
     {
@@ -233,7 +233,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers $this->BDb->run
+     * @covers BDb::i()->run
      */
     public function testRunQueryWithParamsReturnsAffectedRows()
     {
@@ -246,7 +246,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers $this->BDb->run
+     * @covers BDb::i()->run
      */
     public function testRunOptionEchoEchoesOutput()
     {
@@ -261,7 +261,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers $this->BDb->run
+     * @covers BDb::i()->run
      */
     public function testRunExceptionMessageEchoed()
     {
@@ -275,7 +275,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers $this->BDb->run
+     * @covers BDb::i()->run
      */
     public function testRunExceptionReThrown()
     {
@@ -290,55 +290,55 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers $this->BDb->transaction
+     * @covers BDb::i()->transaction
      */
     public function testTransactionPutsDbObjectInTransaction()
     {
-        $this->BDb->transaction();
+        BDb::i()->transaction();
         $this->assertTrue(BORM::get_db()->inTransaction() == 1);
     }
 
     /**
-     * @covers $this->BDb->transaction
+     * @covers BDb::i()->transaction
      */
     public function testTransactionPutsDbObjectInTransactionWithConnection()
     {
-        $this->BDb->transaction('test');
+        BDb::i()->transaction('test');
         $this->assertTrue(BORM::get_db()->inTransaction() == 1);
     }
 
     /**
-     * @covers $this->BDb->commit
+     * @covers BDb::i()->commit
      */
     public function testCommitWithConnection()
     {
-        $this->BDb->commit('test');
+        BDb::i()->commit('test');
         $this->assertTrue(BORM::get_db()->inTransaction() == 0);
     }
 
     /**
-     * @covers $this->BDb->transaction
-     * @covers $this->BDb->rollback
-     * @covers $this->BDb->run
+     * @covers BDb::i()->transaction
+     * @covers BDb::i()->rollback
+     * @covers BDb::i()->run
      */
     public function testRollBackInTransaction()
     {
-        $this->BDb->transaction('test');
+        BDb::i()->transaction('test');
 
         $sql = "CREATE TABLE IF NOT EXISTS `test_table_2`(
         id int(10) not null auto_increment primary key,
         test varchar(100) null
         )";
-        $this->BDb->run($sql);
+        BDb::i()->run($sql);
         $query = "INSERT INTO `test_table_2`(test) VALUES(?),(?)";
-        $this->BDb->run($query, [2, 3]);
-        $this->BDb->rollback('test');
+        BDb::i()->run($query, [2, 3]);
+        BDb::i()->rollback('test');
         $this->assertTrue(BORM::get_db()->inTransaction() == 0);
     }
 
     /**
-     * @covers $this->BDb->cleanForTable
-     * @covers $this->BDb->run
+     * @covers BDb::i()->cleanForTable
+     * @covers BDb::i()->run
      */
     public function testCleanForTableReturnsCorrectArray()
     {
@@ -346,7 +346,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         id int(10) not null auto_increment primary key,
         test varchar(100) null
         )";
-        $this->BDb->run($sql);
+        BDb::i()->run($sql);
 
         $orig = [
             'id' => 1,
@@ -354,23 +354,23 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         ];
 
         $dirty = $orig + ['test2' => 'test', 2, 3, 4];
-        $result = $this->BDb->cleanForTable('test_table_2', $dirty);
+        $result = BDb::i()->cleanForTable('test_table_2', $dirty);
 
         $this->assertEquals($orig, $result);
     }
 
     /**
-     * @covers $this->BDb->transaction
-     * @covers $this->BDb->commit
+     * @covers BDb::i()->transaction
+     * @covers BDb::i()->commit
      */
     public function testCommitAfterTransaction()
     {
         $this->markTestSkipped("Todo: implement run tests");
-        $this->BDb->transaction();
+        BDb::i()->transaction();
         /* @var PDO $conn */
         $conn = BORM::get_db();
         $this->assertTrue($conn->inTransaction() == 1);
-        $this->BDb->commit();
+        BDb::i()->commit();
         $this->assertFalse($conn->inTransaction() == 0);
     }
 
@@ -383,13 +383,13 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     ];
 
     /**
-     * @covers $this->BDb->connect
-     * @covers $this->BDb->t
+     * @covers BDb::i()->connect
+     * @covers BDb::i()->t
      */
     public function testGetTableNameWithoutPrefix()
     {
         $table = 'test_table';
-        $this->BConfig->add(
+        BConfig::i()->add(
             [
                  'db' => [
                      'named' => [
@@ -398,18 +398,18 @@ class BDb_Test extends PHPUnit_Framework_TestCase
                  ]
             ]
         );
-        $this->BDb->connect('test');
-        $this->assertEquals($table, $this->BDb->t($table));
+        BDb::i()->connect('test');
+        $this->assertEquals($table, BDb::i()->t($table));
     }
 
     /**
-     * @covers $this->BDb->connect
-     * @covers $this->BDb->t
+     * @covers BDb::i()->connect
+     * @covers BDb::i()->t
      */
     public function testGetTableNameWithoutPrefixFromInstance()
     {
         $table = 'test_table';
-        $this->BConfig->add(
+        BConfig::i()->add(
             [
                  'db' => [
                      'named' => [
@@ -418,75 +418,75 @@ class BDb_Test extends PHPUnit_Framework_TestCase
                  ]
             ]
         );
-        $dbi = $this->BDb->i(true);
+        $dbi = BDb::i()->i(true);
         $dbi->connect('test');
         $this->assertEquals($table, $dbi->t($table));
     }
 
     /**
-     * @covers $this->BDb->connect
-     * @covers $this->BDb->t
+     * @covers BDb::i()->connect
+     * @covers BDb::i()->t
      */
     public function testGetTableNameWithPrefix()
     {
         $table  = 'test_table';
-        $config = $this->BConfig->get('db');
-        $this->assertEquals($config['table_prefix'] . $table, $this->BDb->t($table));
+        $config = BConfig::i()->get('db');
+        $this->assertEquals($config['table_prefix'] . $table, BDb::i()->t($table));
     }
 
     /**
-     * @covers $this->BDb->connect
-     * @covers $this->BDb->t
+     * @covers BDb::i()->connect
+     * @covers BDb::i()->t
      */
     public function testGetTableNameWithPrefixFromInstance()
     {
         BDbDouble::resetConnections();
         $table = 'test_table';
         $dbi   = BDbDouble::i(true);
-        $this->BConfig->add(
+        BConfig::i()->add(
             [
                  'db' => [
                      'table_prefix' => 'fl',
                  ],
             ]
         );
-        $config = $this->BConfig->get('db');
+        $config = BConfig::i()->get('db');
         BDbDouble::connect('DEFAULT');
         $this->assertEquals($config['table_prefix'] . $table, $dbi->t($table));
     }
 
     /**
-     * @covers $this->BDb->where
+     * @covers BDb::i()->where
      */
     public function testVariousWhereConditions()
     {
         $expected       = "f1 is null";
         $expectedParams = [];
-        $w              = $this->BDb->where("f1 is null");
+        $w              = BDb::i()->where("f1 is null");
         $this->assertEquals($expected, $w[0]);
         $this->assertEquals($expectedParams, $w[1]);
 
         $expected       = "(f1=?) AND (f2=?)";
         $expectedParams = ['V1', 'V2'];
-        $w              = $this->BDb->where(['f1' => 'V1', 'f2' => 'V2']);
+        $w              = BDb::i()->where(['f1' => 'V1', 'f2' => 'V2']);
         $this->assertEquals($expected, $w[0]);
         $this->assertEquals($expectedParams, $w[1]);
 
         $expected       = "(f1=?) AND (f2 LIKE ?)";
         $expectedParams = [5, '%text%'];
-        $w              = $this->BDb->where(['f1' => 5, ['f2 LIKE ?', '%text%']]);
+        $w              = BDb::i()->where(['f1' => 5, ['f2 LIKE ?', '%text%']]);
         $this->assertEquals($expected, $w[0]);
         $this->assertEquals($expectedParams, $w[1]);
 
         $expected       = "((f1!=?) OR (f2 BETWEEN ? AND ?))";
         $expectedParams = [5, 10, 20];
-        $w              = $this->BDb->where(['OR' => [['f1!=?', 5], ['f2 BETWEEN ? AND ?', 10, 20]]]);
+        $w              = BDb::i()->where(['OR' => [['f1!=?', 5], ['f2 BETWEEN ? AND ?', 10, 20]]]);
         $this->assertEquals($expected, $w[0]);
         $this->assertEquals($expectedParams, $w[1]);
 
         $expected       = "(f1 IN (?,?,?)) AND NOT (((f2 IS NULL) OR (f2=?)))";
         $expectedParams = [1, 2, 3, 10];
-        $w              = $this->BDb->where(
+        $w              = BDb::i()->where(
             [
                  'f1'  => [1, 2, 3],
                  'NOT' => ['OR' => ["f2 IS NULL", 'f2' => 10]]
@@ -497,7 +497,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
 
         $expected       = "(((A) OR (B)) AND ((C) OR (D)))";
         $expectedParams = [];
-        $w              = $this->BDb->where(
+        $w              = BDb::i()->where(
             [
                  'AND' => [
                      ['OR', 'A', 'B'], ['OR', 'C', 'D']
@@ -509,11 +509,11 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers $this->BDb->dbName
+     * @covers BDb::i()->dbName
      */
     public function testGetDbName()
     {
-        $db     = $this->BDb->i(true);
+        $db     = BDb::i()->i(true);
         $dbName = $db->dbName();
         $this->assertNotNull($dbName);
     }
@@ -533,8 +533,8 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers $this->BDb->ddlTableDef
-     * @covers $this->BDb->ddlTableExists
+     * @covers BDb::i()->ddlTableDef
+     * @covers BDb::i()->ddlTableExists
      */
     public function testDdlTableDefCanCreateTable()
     {
@@ -552,12 +552,12 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers $this->BDb->ddlTableExists
-     * @covers $this->BDb->ddlTableDef
+     * @covers BDb::i()->ddlTableExists
+     * @covers BDb::i()->ddlTableDef
      */
     public function testDdlCanCheckTableExists()
     {
-        $db = $this->BDb;
+        $db = BDb::i();
         $vo = new Entity();
         if (!$db->ddlTableExists($vo->table)) {
             $db->ddlTableDef($vo->table, $vo->tableFields);
@@ -567,7 +567,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers $this->BDb->ddlTableDef
+     * @covers BDb::i()->ddlTableDef
      */
     public function testDdlTableDefNewTableWithNoFieldsShouldThrowException()
     {
@@ -578,14 +578,14 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers $this->BDb->ddlTableDef
-     * @covers $this->BDb->ddlTableExists
-     * @covers $this->BDb->ddlFieldInfo
-     * @covers $this->BDb->ddlIndexInfo
+     * @covers BDb::i()->ddlTableDef
+     * @covers BDb::i()->ddlTableExists
+     * @covers BDb::i()->ddlFieldInfo
+     * @covers BDb::i()->ddlIndexInfo
      */
     public function testDdlCanDropColumnAndIndex()
     {
-        $db = $this->BDb;
+        $db = BDb::i();
 
         $vo = new Entity();
         BDbDouble::resetConnections();
@@ -611,12 +611,12 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers $this->BDb->ddlTableDef
-     * @covers $this->BDb->ddlTableExists
+     * @covers BDb::i()->ddlTableDef
+     * @covers BDb::i()->ddlTableExists
      */
     public function testDdlTableDefForeignKeyCreation()
     {
-        $db = $this->BDb;
+        $db = BDb::i();
         $vo = new Entity();
         BDbDouble::resetConnections();
         if (!$db->ddlTableExists($vo->table)) {
@@ -634,8 +634,8 @@ class BDb_Test extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers $this->BDb->many_as_array
-     * @covers $this->BDb->run
+     * @covers BDb::i()->many_as_array
+     * @covers BDb::i()->run
      * @covers ORMWrapper::for_table
      * @covers BORM::select
      * @covers ORMWrapper::limit
@@ -647,13 +647,13 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         id int(10) not null auto_increment primary key,
         test varchar(100) null
         )";
-        $this->BDb->run($sql);
+        BDb::i()->run($sql);
         $query = "INSERT INTO `test_table_2`(test) VALUES(?),(?)";
-        $this->BDb->run($query, [2, 3]);
+        BDb::i()->run($query, [2, 3]);
 
         $result = BORM::i()->for_table('test_table_2')->select('test')->limit(2)->find_many();
 
-        $asArray = $this->BDb->many_as_array($result);
+        $asArray = BDb::i()->many_as_array($result);
 
         $this->assertTrue(is_array($asArray));
         $this->assertTrue(count($asArray) == 2);

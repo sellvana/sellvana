@@ -9,19 +9,19 @@ class BLayout_Test extends PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->_layout = $this->BLayout->i(true);
+        $this->_layout = BLayout::i(true);
     }
 
     public function testViewRootDirSetGet()
     {
-        $this->BLayout->setViewRootDir('/tmp');
+        BLayout::i()->setViewRootDir('/tmp');
 
-        $this->assertEquals('/tmp', $this->BLayout->getViewRootDir());
+        $this->assertEquals('/tmp', BLayout::i()->getViewRootDir());
     }
 
     public function testLayoutInstance()
     {
-        $this->assertInstanceOf('BLayout', $this->BLayout);
+        $this->assertInstanceOf('BLayout', BLayout::i());
         $this->assertInstanceOf('BLayout', $this->_layout);
     }
 
