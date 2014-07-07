@@ -78,6 +78,8 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
         // parsing of test debug output
         $html_errors = ini_get('html_errors');
         ini_set('html_errors', 0);
+        $bmode = $this->BDebug->mode();
+        $this->BDebug->mode(BDebug::MODE_DISABLED);
 
         ob_start();
         $suite->run($result);
@@ -86,6 +88,7 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
         ob_end_clean();
 
         ini_set('html_errors', $html_errors);
+        $this->BDebug->mode($bmode);
         return $results;
     }
 
@@ -96,7 +99,11 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
         $this->ensurePhpunit($phpunit);
         $suite = $this->prepareTestSuite($tests);
         $runner = new PHPUnit_TextUI_TestRunner();
+
+        $bmode = $this->BDebug->mode();
+        $this->BDebug->mode(BDebug::MODE_DISABLED);
         $runner->run($suite);
+        $this->BDebug->mode($bmode);
     }
 
     public function load($class)
@@ -705,6 +712,9 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
         $new_classes = get_declared_classes();
         $tests = array_diff($new_classes, $original_classes);
         foreach ($tests as $test) {
+            if(is_a($test, 'FCom_Test_Test_Unit_ControllerTests_Test', true)){
+                continue;
+            }
             if (is_subclass_of($test, 'PHPUnit_Framework_TestCase')) {
                 $suite->addTestSuite($test);
             }

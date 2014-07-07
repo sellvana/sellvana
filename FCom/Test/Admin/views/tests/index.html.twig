@@ -25,9 +25,8 @@
 </div>
 
 
-
 <script type="text/javascript">
-    require(['jquery'], function($){
+    require(['jquery'], function ($) {
         function ajax_tests_run() {
             $.ajax({
                 type: "GET",
@@ -43,6 +42,7 @@
                 $results.append(c);
 
             }).fail(function (result, msg) {
+                $('#results').text("{{ "An error occurred during test run"|_ }}")
                 console.log(msg);
             });
             return false;
@@ -52,15 +52,15 @@
                     .done(function (result) {
                         var $results = $('#results');
                         $(result).each(function (i, o) {
-                            if(i == 0 && o.event == 'suiteStart' && o.suite) {
+                            if (i == 0 && o.event == 'suiteStart' && o.suite) {
                                 var $div = $('<div class="suite-start">');
                                 $div.append('<p>{{ "Running test suite "|_ }}' + o.suite + '</p>');
                                 $div.append('<p>' + o.tests + '{{ " tests found"|_ }}');
                                 $results.html($div);
-                            } else if(o.event == 'test') {
+                            } else if (o.event == 'test') {
                                 var className = 'test';
                                 var title = o.test;
-                                if(o.status == 'pass') {
+                                if (o.status == 'pass') {
                                     className += ' green';
                                 } else {
                                     className += ' red';
@@ -77,6 +77,7 @@
                         $results.show();
                     })
                     .fail(function (result, msg) {
+                        $('#results').text("{{ "An error occurred during test run"|_ }}")
                         console.log(msg);
                     });
             return false;
