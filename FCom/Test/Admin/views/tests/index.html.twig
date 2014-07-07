@@ -34,7 +34,7 @@
                 url: "{{ APP.href('tests/run') }}"
             }).done(function (msg) {
                 var $results = $('#results');
-                $results.show().append("<h3>{{ "FCom Test suite CLI"|_ }}</h3>");
+                $results.show().html("<h3>{{ "FCom Test suite CLI"|_ }}</h3>");
                 var res = "";
                 $(msg).each(function (i, o) {
                     res += o + '\n';
