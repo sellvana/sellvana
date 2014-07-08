@@ -34,7 +34,7 @@
         };
 
         function ajax_tests_run() {
-            var data = $('input[name^=test_grid]').serializeArray();
+            var data = $('input[name^=tests_grid]').serializeArray();
             $.post("{{ APP.href('tests/run') }}", data)
                     .done(function (msg) {
                         var $results = $('#results');
@@ -53,37 +53,46 @@
             return false;
         }
         function ajax_tests_run2() {
-            var data = $('input[name^=test_grid]').serializeArray();
-            $.post("{{ APP.href('tests/run2') }}", data)
-                    .done(function (result) {
+            var data = $('input[name^=tests_grid]').serializeArray();
+            $.post("{{ APP.href('tests/run2') }}", data, null, 'text')
+                    .done(function (response) {
                         var $results = $('#results');
-                        $(result).each(function (i, o) {
-                            if (i == 0 && o.event == 'suiteStart' && o.suite) {
-                                var $div = $('<div class="suite-start">');
-                                $div.append('<p>{{ "Running test suite "|_ }}' + o.suite + '</p>');
-                                $div.append('<p>' + o.tests + '{{ " tests found"|_ }}');
-                                $results.html($div);
-                            } else if (o.event == 'test') {
-                                var className = 'test';
-                                var title = o.test;
-                                if (o.status == 'pass') {
-                                    className += ' green';
-                                } else {
-                                    className += ' red';
-                                    title += o.message;
-                                }
+                        try {
+                            var $response = $($.parseJSON(response));
+                            $response.each(function (i, o) {
+                                if (i == 0 && o.event == 'suiteStart' && o.suite) {
+                                    var $div = $('<div class="suite-start">');
+                                    $div.append('<p>{{ "Running test suite "|_ }}' + o.suite + '</p>');
+                                    $div.append('<p>' + o.tests + '{{ " tests found"|_ }}');
+                                    $results.html($div);
+                                } else if (o.event == 'test') {
+                                    var className = 'test';
+                                    var iconClassName = "glyphicon glyphicon-";
+                                    var title = o.test;
+                                    if (o.status == 'pass') {
+                                        className += ' green';
+                                        iconClassName += "check";
+                                    } else {
+                                        className += ' red';
+                                        iconClassName += "remove";
+                                        title += ': ' + o.message;
+                                    }
 
-                                var $span = $('<span class="' + className + '">');
-                                $span.append('<span class="glyphicon glyphicon-check" title="' + title + '"/>');
-                                $results.append($span);
-                            }
-                            console.log(i);
-                            console.log(o);
-                        });
+                                    var $span = $('<span class="' + className + '">');
+                                    $span.append('<span class="' + iconClassName + '" title="' + title + '"/>');
+                                    $results.append($span);
+                                }
+                                console.log(i);
+                                console.log(o);
+                            });
+                        } catch (e) {
+                            $('#results').text("{{ "An error occurred during test run"|_ }}");
+                            console.log(response);
+                        }
                         $results.show();
                     })
                     .fail(function (result, msg) {
-                        $('#results').text("{{ "An error occurred during test run"|_ }}")
+                        $('#results').text("{{ "An error occurred during test run"|_ }}");
                         console.log(msg);
                     });
             return false;

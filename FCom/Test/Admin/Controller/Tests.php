@@ -2,6 +2,8 @@
 
 class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract_GridForm
 {
+    const TESTS_GRID_ID = 'tests_grid';
+
     public function action_index()
     {
         $this->ensurePhpunit($this->getPhpUnitExecutable());
@@ -12,11 +14,18 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract_Gr
             ->set("grid", $this->getTestsConfig());
     }
 
-    public function action_run()
+    public function action_run__POST()
     {
         $path = FULLERON_ROOT_DIR . '/testrun.php';
         if (function_exists('exec')) {
-            $res = exec("php -f \"$path\"", $output);
+            $tests = "";
+            if ($this->BRequest->post(static::TESTS_GRID_ID)) {
+                $tests = array_map(function ($item) {
+                    return '"' . $item .'"';
+                }, $this->filterTests());
+                $tests = join(' ', $tests);
+            }
+            exec("php -f \"$path\" $tests", $output);
         } else {
             $output = [$this->_("Cannot run CLI tests from browser.")];
         }
@@ -26,9 +35,9 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract_Gr
         exit;
     }
 
-    public function action_run2()
+    public function action_run2__POST()
     {
-        $tests = $this->collectTestFiles();
+        $tests = $this->filterTests();
         $results = $this->runTestsWeb($tests);
         $this->BResponse->header('Content-Type: application/json');
         echo $results;
@@ -38,7 +47,7 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract_Gr
     public function getTestsConfig()
     {
         $config = parent::gridConfig();
-        $config['id'] = 'tests_grid';
+        $config['id'] = static::TESTS_GRID_ID;
         $config['data_mode'] = 'local';
 
         $config['columns'] = [
@@ -55,10 +64,11 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract_Gr
         foreach ($suite as $test) {
             if ($test instanceof PHPUnit_Framework_TestCase ||
                 $test instanceof PHPUnit_Framework_TestSuite) {
-                $class = new ReflectionClass($this);
+                $class = new ReflectionClass($test->getName());
                 $obj['id'] = base64_encode($class->getFileName());
                 $obj['test'] = $test->getName();
                 $gridData[] = $obj;
+                unset($class);
             }
         }
 //unset($suite);
@@ -763,5 +773,30 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract_Gr
         $base = $this->BConfig->get('fs/storage_dir') . '/' . $this->BConfig->get('core/storage_random_dir');
         $phpunit = $base . '/phpunit.phar';
         return $phpunit;
+    }
+
+    /**
+     * @return array
+     */
+    protected function filterTests()
+    {
+        $tests = $this->collectTestFiles();
+        $data = $this->BRequest->post(static::TESTS_GRID_ID);
+        if(empty($data) || empty($data['checked'])){
+            return $tests;
+        }
+        $selected = [];
+        foreach ($data['checked'] as $encFile => $state) {
+            $fileName = base64_decode($encFile);
+            if ($state) {
+                $selected[] = $fileName;
+            }
+        }
+
+        if (!empty($selected)) {
+            $tests = array_intersect($tests, $selected);
+            return $tests;
+        }
+        return $tests;
     }
 }
