@@ -14,14 +14,20 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract_Gr
             ->set("grid", $this->getTestsConfig());
     }
 
+    /**
+     * Attempt to run tests on command line
+     *
+     * Executes testrun.php, it can also be manually executed
+     * If filtered tests are passed, only they will be ran
+     */
     public function action_run__POST()
     {
         $path = FULLERON_ROOT_DIR . '/testrun.php';
         if (function_exists('exec')) {
             $tests = "";
             if ($this->BRequest->post(static::TESTS_GRID_ID)) {
-                $tests = array_map(function ($item) {
-                    return '"' . $item .'"';
+                $tests = array_map(function ($item) { // make sure test files are properly escaped
+                    return escapeshellarg($item);
                 }, $this->filterTests());
                 $tests = join(' ', $tests);
             }
