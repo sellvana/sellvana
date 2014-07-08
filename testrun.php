@@ -10,7 +10,7 @@ BModuleRegistry::i()->bootstrap();
 
 /** @var FCom_Test_Admin_Controller_Tests $runner */
 $runner = FCom_Test_Admin_Controller_Tests::i();
-$tests = $runner->collectTests();
+$tests = $runner->collectTestFiles();
 if (!empty($tests)) {
     $runner->runTestsText($tests);
 }

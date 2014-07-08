@@ -1,16 +1,19 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
+class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract_GridForm
 {
     public function action_index()
     {
-        $this->layout('/tests/index');
-        $this->layout()->view('tests/index')->set('can_cgi', function_exists('exec'));
+        $this->ensurePhpunit($this->getPhpUnitExecutable());
+        $this->layout("/tests/index");
+        $this->layout()
+            ->view("tests/index")
+            ->set("can_cgi", function_exists("exec"))
+            ->set("grid", $this->getTestsConfig());
     }
 
     public function action_run()
     {
-
         $path = FULLERON_ROOT_DIR . '/testrun.php';
         if (function_exists('exec')) {
             $res = exec("php -f \"$path\"", $output);
@@ -25,14 +28,46 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
 
     public function action_run2()
     {
-        $tests = $this->collectTests();
+        $tests = $this->collectTestFiles();
         $results = $this->runTestsWeb($tests);
         $this->BResponse->header('Content-Type: application/json');
         echo $results;
         exit;
     }
 
-    public function collectTests()
+    public function getTestsConfig()
+    {
+        $config = parent::gridConfig();
+        $config['id'] = 'tests_grid';
+        $config['data_mode'] = 'local';
+
+        $config['columns'] = [
+            ['type' => 'row_select'],
+            ['name' => 'test', 'label' => "Select tests to run"],
+        ];
+        $config['filters'] = [['field' => 'test', 'type' => 'text']];
+        $config['grid_before_create'] = 'testsGridRegister';
+        $testFiles = $this->collectTestFiles();
+        ob_start();
+        $suite = $this->prepareTestSuite($testFiles);
+        ob_end_clean(); // some test files echo stuff
+        $gridData = [];
+        foreach ($suite as $test) {
+            if ($test instanceof PHPUnit_Framework_TestCase ||
+                $test instanceof PHPUnit_Framework_TestSuite) {
+                $class = new ReflectionClass($this);
+                $obj['id'] = base64_encode($class->getFileName());
+                $obj['test'] = $test->getName();
+                $gridData[] = $obj;
+            }
+        }
+//unset($suite);
+        $config['data'] = $gridData;
+
+        return ['config' => $config];
+    }
+
+    public function collectTestFiles()
     {
         $modules = $this->BModuleRegistry->getAllModules();
         $collection = [];
@@ -65,8 +100,7 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
 
     public function runTestsWeb($tests)
     {
-        $base    = $this->BConfig->get('fs/storage_dir') . '/' . $this->BConfig->get('core/storage_random_dir');
-        $phpunit = $base . '/phpunit.phar';
+        $phpunit = $this->getPhpUnitExecutable();
         $this->ensurePhpunit($phpunit);
         $suite = $this->prepareTestSuite($tests);
 
@@ -94,8 +128,7 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
 
     public function runTestsText($tests)
     {
-        $base    = $this->BConfig->get('fs/storage_dir') . '/' . $this->BConfig->get('core/storage_random_dir');
-        $phpunit = $base . '/phpunit.phar';
+        $phpunit = $this->getPhpUnitExecutable();
         $this->ensurePhpunit($phpunit);
         $suite = $this->prepareTestSuite($tests);
         $runner = new PHPUnit_TextUI_TestRunner();
@@ -720,5 +753,15 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract
             }
         }
         return $suite;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPhpUnitExecutable()
+    {
+        $base = $this->BConfig->get('fs/storage_dir') . '/' . $this->BConfig->get('core/storage_random_dir');
+        $phpunit = $base . '/phpunit.phar';
+        return $phpunit;
     }
 }

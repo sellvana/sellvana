@@ -1,3 +1,4 @@
+{% set grid = THIS.get("grid") %}
 <style type="text/css">
     .green {
         color: green;
@@ -17,9 +18,10 @@
     </div>
   </div>
   <div class="f-admin-main">
-    <div class="tab-content">
-      <div id="results" class="tab-pane active" style="display: none; max-height:480px; overflow:auto;">
-      </div>
+      <div class="tab-content">
+      <div id="results" class="tab-pane active" style="display: none; max-height:480px; overflow:auto;"></div>
+          {#{{ dump(grid) }}#}
+     {{ THIS.view('core/backbonegrid').set('grid', grid) | raw }}
     </div>
   </div>
 </div>
@@ -27,28 +29,32 @@
 
 <script type="text/javascript">
     require(['jquery'], function ($) {
-        function ajax_tests_run() {
-            $.ajax({
-                type: "GET",
-                url: "{{ APP.href('tests/run') }}"
-            }).done(function (msg) {
-                var $results = $('#results');
-                $results.show().html("<h3>{{ "FCom Test suite CLI"|_ }}</h3>");
-                var res = "";
-                $(msg).each(function (i, o) {
-                    res += o + '\n';
-                });
-                var c = $("<pre/>").text(res);
-                $results.append(c);
+        window.testsGridRegister = function (grid) {
+            grid.build();
+        };
 
-            }).fail(function (result, msg) {
-                $('#results').text("{{ "An error occurred during test run"|_ }}")
-                console.log(msg);
-            });
+        function ajax_tests_run() {
+            var data = $('input[name^=test_grid]').serializeArray();
+            $.post("{{ APP.href('tests/run') }}", data)
+                    .done(function (msg) {
+                        var $results = $('#results');
+                        $results.show().html("<h3>{{ "FCom Test suite CLI"|_ }}</h3>");
+                        var res = "";
+                        $(msg).each(function (i, o) {
+                            res += o + '\n';
+                        });
+                        var c = $("<pre/>").text(res);
+                        $results.append(c);
+
+                    }).fail(function (result, msg) {
+                        $('#results').text("{{ "An error occurred during test run"|_ }}")
+                        console.log(msg);
+                    });
             return false;
         }
         function ajax_tests_run2() {
-            jQuery.get("{{ APP.href('tests/run2') }}")
+            var data = $('input[name^=test_grid]').serializeArray();
+            $.post("{{ APP.href('tests/run2') }}", data)
                     .done(function (result) {
                         var $results = $('#results');
                         $(result).each(function (i, o) {
