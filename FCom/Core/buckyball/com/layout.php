@@ -1283,6 +1283,7 @@ class BLayout extends BClass
 
 /**
  * First parent view class
+ * @method static BView i()
  */
 class BView extends BClass
 {
