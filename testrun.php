@@ -4,6 +4,10 @@
  * @project sellvana_core
  */
 require_once 'FCom/Core/Main.php';
+if(empty($argc)){
+    BResponse::i()->status(403, null, false);
+    exit(1);
+}
 BConfig::i()->set('fs/root_dir', __DIR__);
 FCom_Core_Main::i()->init('FCom_Test');
 BModuleRegistry::i()->bootstrap();
