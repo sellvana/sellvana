@@ -12,7 +12,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
 
     public function getExportConfig()
     {
-        $config                = parent::gridConfig();
+        $config              = parent::gridConfig();
         $config['id']        = 'ie_export_grid';
         $config['data_mode'] = 'local';
 

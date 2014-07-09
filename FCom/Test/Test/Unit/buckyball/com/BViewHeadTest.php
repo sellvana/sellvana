@@ -5,6 +5,7 @@ class BViewHead_Test extends PHPUnit_Framework_TestCase
     public function testTitleSet()
     {
         //every time new object
+        /** @var BViewHead $head */
         $head = BViewHead::i(true);
         $head->setTitle("Test");
 
@@ -14,6 +15,7 @@ class BViewHead_Test extends PHPUnit_Framework_TestCase
     public function testTitleAdd()
     {
         //every time new object
+        /** @var BViewHead $head */
         $head = BViewHead::i(true);
         $head->setTitleSeparator(" - ");
         $head->addTitle("Test");
@@ -25,6 +27,7 @@ class BViewHead_Test extends PHPUnit_Framework_TestCase
     public function testMetaTagAdd()
     {
         //every time new object
+        /** @var BViewHead $head */
         $head = BViewHead::i(true);
         $head->addMeta("keywords", "test test test");
 
