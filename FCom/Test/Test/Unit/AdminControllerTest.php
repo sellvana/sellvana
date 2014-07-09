@@ -17,11 +17,11 @@ class FCom_Test_Test_Unit_ControllerTests_Test extends PHPUnit_Framework_TestCas
     protected $obj;
 
     /**
-     * @covers FCom_Test_Admin_Controller_Tests::collectTests
+     * @covers FCom_Test_Admin_Controller_Tests::collectTestFiles
      */
     public function testCollectTestsHasAtleastBConfigTest()
     {
-        $tests = $this->obj->collectTests();
+        $tests = $this->obj->collectTestFiles();
 
         $this->assertTrue(!empty($tests));
 
@@ -34,7 +34,7 @@ class FCom_Test_Test_Unit_ControllerTests_Test extends PHPUnit_Framework_TestCas
      */
     public function testCanRunCollectedTests()
     {
-        $tests = $this->obj->collectTests();
+        $tests = $this->obj->collectTestFiles();
 
         $results = $this->obj->runTestsWeb($tests);
 
