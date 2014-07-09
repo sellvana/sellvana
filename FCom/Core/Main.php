@@ -567,4 +567,11 @@ FCom.base_src = '" . $this->BConfig->get('web/base_src') . "';
     {
         return $this->BConfig->get('modules/FCom_Core/default_country');
     }
+
+    public function getAllowedRegions()
+    {
+        $conf = $this->BConfig->get('modules/FCom_Core');
+        $limit = !empty($conf['limit_countries']) ? $conf['allowed_countries'] : null;
+        return $this->BLocale->getAvailableRegions('name', $limit);
+    }
 }
