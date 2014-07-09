@@ -62,6 +62,16 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function onAfterCreate()
+    {
+        parent::onAfterCreate();
+
+        $this->set([
+            'tz' => $this->BConfig->get('modules/FCom_Core/default_tz'),
+            'locale' => $this->BConfig->get('modules/FCom_admin/default_locale'),
+        ]);
+    }
+
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
