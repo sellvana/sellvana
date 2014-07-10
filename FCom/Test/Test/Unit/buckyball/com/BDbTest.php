@@ -10,15 +10,11 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         $db->run("DROP TABLE IF EXISTS {$vo->fTable}");
         $db->run("DROP TABLE IF EXISTS {$vo->table}");
         $db->ddlClearCache();
+        $this->dbConfig = include "db_test_config.php";
         BConfig::i()->add(
         // config is being reset in its tests, so we have to load default config used to be able to test
             [
-                 'db' => [
-                     'host'     => 'localhost',
-                     'dbname'   => 'fulleron_test',
-                     'username' => 'pp',
-                     'password' => '111111',
-                 ],
+                 'db' => $this->dbConfig, // use provided sample file to quickly create actual db config
             ]
         );
     }
@@ -171,7 +167,8 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         );
 
         BConfig::i()->set('db/named/test/dbname', null);
-        BConfig::i()->set('db/named/test/dsn', "mysql:host=localhost;dbname=fulleron_test;charset=UTF8");
+        BConfig::i()->set('db/named/test/dsn',
+            sprintf("mysql:host=%s;dbname=%s;charset=UTF8", $this->dbConfig['host'], $this->dbConfig['dbname']));
         $this->assertInstanceOf('BPDO', BDb::i()->connect('test'));
     }
 
@@ -210,7 +207,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
      */
     public function testNow()
     {
-        $now = date('Y-m-d H:i:s');
+        $now = gmstrftime('%Y-%m-%d %H:%M:%S');
 
         $this->assertEquals($now, BDb::i()->now());
     }
@@ -253,10 +250,12 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         BDbDouble::resetConnections();
         $db = BDbDouble::i();
         $query = "DROP TABLE IF EXISTS `test_table_2`";
+        $debugMode = BDebug::i()->mode();
+        BDebug::i()->mode(BDebug::MODE_DEBUG);
         ob_start();
         $db->run($query, null, ['echo' => true]);
         $echo = ob_get_clean();
-
+        BDebug::i()->mode($debugMode);
         $this->assertEquals('<hr><pre>' . $query . '<pre>', $echo);
     }
 
@@ -269,6 +268,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         $db = BDbDouble::i();
         $query = "DROP TABLE IF EXISTS ";
         ob_start();
+        $this->setExpectedException('PDOException');
         $db->run($query, null, ['try' => true]);
         $echo = ob_get_clean();
         $this->assertContains('<hr>', $echo);
@@ -374,13 +374,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
         $this->assertFalse($conn->inTransaction() == 0);
     }
 
-    protected $dbConfig = [
-        'host'         => 'localhost',
-        'dbname'       => 'fulleron_test',
-        'username'     => 'pp',
-        'password'     => '111111',
-        'table_prefix' => null,
-    ];
+    protected $dbConfig = [];
 
     /**
      * @covers BDb::i()->connect
@@ -666,7 +660,7 @@ class BDb_Test extends PHPUnit_Framework_TestCase
  */
 class BDbDouble extends BDb
 {
-    public function resetConnections()
+    public static function resetConnections()
     {
         static::$_currentConnectionName = null;
         static::$_config                = ['dbname' => null];

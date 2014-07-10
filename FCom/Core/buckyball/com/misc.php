@@ -2436,6 +2436,7 @@ class BDebug extends BClass
         if ($setLevels && !empty(static::$_levelPreset[$mode])) {
             static::$_level = static::$_levelPreset[$mode];
         }
+        return null;
     }
 
     public function backtraceOn($msg)
