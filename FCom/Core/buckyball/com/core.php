@@ -1456,6 +1456,10 @@ class BClassDecorator
     protected $_decoratedComponent;
 
     /**
+     * @var BClassRegistry BClassRegistry
+     */
+    protected $BClassRegistry;
+    /**
     * Decorator constructor, creates an instance of decorated class
     *
     * @param array(object|string $class)
@@ -1466,6 +1470,7 @@ class BClassDecorator
 //echo '1: '; print_r($class);
         $class = array_shift($args);
         $this->_decoratedComponent = is_string($class) ? BClassRegistry::instance($class, $args) : $class;
+        $this->BClassRegistry = BClassRegistry::i();
     }
 
     public function __destruct()
