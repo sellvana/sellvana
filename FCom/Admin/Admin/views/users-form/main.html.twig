@@ -6,28 +6,37 @@
 {% set hlp = APP.instance('FCom_Admin_Model_User') %}
 {% import THIS.view('admin/form-elements').twigName() as forms %}
 {% set fieldData = { validator:validator, model:m } %}
-  <fieldset class="form-horizontal">
-  <div class="f-section">
+    <fieldset class="form-horizontal">
+        <div class="f-section">
+            {{ forms.input(fieldData, {field:'username', required:1, label:'User Name'|_}) }}
+            {{ forms.input(fieldData, {field:'email', required:1, label:'Email'|_, type:'email'}) }}
+        </div>
 
-    {{ forms.input(fieldData, {field:'username', required:1, label:'User Name'|_}) }}
-    {{ forms.boolean(fieldData, {field:'is_superadmin', label:'Super Admin'|_}) }}
-    {{ forms.select(fieldData, {field:'role_id', label:'Role'|_, options:APP.instance('FCom_Admin_Model_Role').options() }) }}
-    {{ forms.select(fieldData, {field:'status', label:'Status'|_, options:hlp.fieldOptions('status') }) }}
+        <div class="f-section">
+            {{ forms.select(fieldData, {field:'status', label:'Status'|_, options:hlp.fieldOptions('status') }) }}
+            {{ forms.boolean(fieldData, {field:'is_superadmin', label:'Super Admin'|_}) }}
+            {{ forms.select(fieldData, {field:'role_id', label:'Role'|_, options:APP.instance('FCom_Admin_Model_Role').options() }) }}
+        </div>
 
-    {{ forms.select(fieldData, {field:'tz', label:'Timezone'|_, options:LOCALE.tzOptions(true), select2: {} }) }}
-    {{ forms.select(fieldData, {field:'locale', label:'Locale'|_, options:LOCALE.getAvailableLocaleCodes(), select2: {} }) }}
+        <div class="f-section">
+            {{ forms.input(fieldData, {field:'firstname', required:1, label:'First Name'|_}) }}
+            {{ forms.input(fieldData, {field:'lastname', required:1, label:'Last Name'|_}) }}
+        </div>
 
-    {{ forms.input(fieldData, {field:'email', required:1, label:'Email'|_, type:'email'}) }}
-    {{ forms.input(fieldData, {field:'password', label:'Password'|_, type:'password', value:''}) }}
-    {{ forms.input(fieldData, {field:'password_confirm', label:'Confirm Password'|_, type:'password', value:'', attr:'equalto="#model-password"'}) }}
+        <div class="f-section">
+            {{ forms.input(fieldData, {field:'password', label:'Change Password'|_, type:'password', value:''}) }}
+            {{ forms.input(fieldData, {field:'password_confirm', label:'Confirm Password'|_, type:'password', value:'', attr:'equalto="#model-password"'}) }}
+        </div>
 
-    {{ forms.input(fieldData, {field:'firstname', required:1, label:'First Name'|_}) }}
-    {{ forms.input(fieldData, {field:'lastname', required:1, label:'Last Name'|_}) }}
+        <div class="f-section">
+            {{ forms.select(fieldData, {field:'tz', label:'Timezone'|_, options:LOCALE.tzOptions(true), select2: {} }) }}
+            {{ forms.select(fieldData, {field:'locale', label:'Locale'|_, options:LOCALE.getAvailableLocaleCodes(), select2: {} }) }}
+        </div>
 
-    {{ forms.input(fieldData, {field:'api_username', label:'API Username'|_}) }}
-    {{ forms.input(fieldData, {field:'api_password', label:'API Password'|_}) }}
-
-  </div>
+        <div class="f-section">
+            {{ forms.input(fieldData, {field:'api_username', label:'API Username'|_}) }}
+            {{ forms.input(fieldData, {field:'api_password', label:'API Password'|_}) }}
+        </div>
   </fieldset>
 
 <script>
