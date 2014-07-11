@@ -1,8 +1,8 @@
 <script>
 (function() {
     function main($) {
-        var geoCountries = {{ UTIL.toJson(APP.instance('BLocale').getAvailableCountries()) | raw }};
-        var geoRegions = {{ UTIL.toJson(APP.instance('BLocale').getAvailableRegions()) | raw }};
+        var geoCountries = {{ UTIL.toJson(APP.instance('FCom_Core_Main').getAllowedCountries()) | raw }};
+        var geoRegions = {{ UTIL.toJson(APP.instance('FCom_Core_Main').getAllowedRegions()) | raw }};
 
         $.fn.geoCountryRegion = function(opt) {
             opt = opt || {};

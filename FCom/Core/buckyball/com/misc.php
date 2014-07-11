@@ -1095,6 +1095,7 @@ class BUtil extends BClass
                 $oldErrorReporting = error_reporting(0);
             }
             $response = file_get_contents($url, false, stream_context_create($streamOptions));
+#var_dump($response, $url, $streamOptions, $http_response_header); exit(__METHOD__);
             if (empty($options['debug'])) {
                 error_reporting($oldErrorReporting);
             }
@@ -1104,10 +1105,16 @@ class BUtil extends BClass
         foreach ($respHeaders as $i => $line) {
             if ($i) {
                 $arr = explode(':', $line, 2);
+                static::$_lastRemoteHttpInfo['headers'][strtolower($arr[0])] = trim($arr[1]);
             } else {
-                $arr = [0, $line];
+                preg_match('#^HTTP/([0-9.]+) ([0-9]+) (.*)$#', $line, $m);
+                static::$_lastRemoteHttpInfo['headers']['http'] = [
+                    'full' => $m[0],
+                    'protocol' => $m[1],
+                    'code' => $m[2],
+                    'status' => $m[3],
+                ];
             }
-            static::$_lastRemoteHttpInfo['headers'][strtolower($arr[0])] = trim($arr[1]);
         }
         #BDebug::log(print_r(compact('method', 'url', 'data', 'response'), 1), 'remotehttp.log');
 
