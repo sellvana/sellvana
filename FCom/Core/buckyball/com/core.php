@@ -1386,7 +1386,7 @@ class BClassRegistry extends BClass
             BDebug::error(BLocale::i()->_('Invalid class name: %s', $className));
         }
         $args = static::processDI($className, $args);
-        if($className == 'BClassDecorator' && !empty($args)){
+        if ($className == 'BClassDecorator' && !empty($args)) {
             $args = [$args];
         }
         $reflClass = new ReflectionClass($className);
