@@ -10,13 +10,13 @@ abstract class FCom_Test_Model_TestCase extends PHPUnit_Framework_TestCase
      * Maximum time in milliseconds a test should run
      * @var int
      */
-    protected $timeOut;
+    protected $_timeOut;
 
     /**
      * Initial timestamp
      * @var int
      */
-    protected $start;
+    protected $_start;
 
     /**
      * Set expected time for test to run
@@ -32,23 +32,21 @@ abstract class FCom_Test_Model_TestCase extends PHPUnit_Framework_TestCase
         if (!is_integer($milliSeconds)) {
             throw new BException("Invalid argument. Pass integer for milliseconds.");
         }
-        $this->timeOut = $milliSeconds;
-        $this->start = microtime(true);
-        return $this->start;
+        $this->_timeOut = $milliSeconds;
+        $this->_start = microtime(true);
+        return $this->_start;
     }
 
     protected function assertPostConditions()
     {
-        if ($this->timeOut > 0) {
+        if ($this->_timeOut > 0) {
             $end = microtime(true);
-            $diff = ($end - $this->start) * 1000; // convert float point seconds to milliseconds
+            $diff = ($end - $this->_start) * 1000; // convert float point seconds to milliseconds
 
-            if ($diff > $this->timeOut) {
+            if ($diff > $this->_timeOut) {
                 throw new PHPUnit_Framework_AssertionFailedError(sprintf("Expected test run time exceeded. Expected: %d, actual %.03f",
-                    $this->timeOut,
+                    $this->_timeOut,
                     $diff));
-            } else {
-                printf("start: %s, end: %s, timeout: %s, diff: %s", $this->start, $end, $this->timeOut, $diff);
             }
         }
         parent::assertPostConditions();
@@ -56,7 +54,7 @@ abstract class FCom_Test_Model_TestCase extends PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        $this->timeOut = null;
+        $this->_timeOut = null;
         return parent::tearDown();
     }
 
