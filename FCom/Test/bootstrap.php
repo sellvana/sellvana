@@ -8,3 +8,6 @@ if (defined('FULLERON_ROOT_DIR')) {
 FCom_Core_Main::i()->init('FCom_Test');
 BModuleRegistry::i()->bootstrap();
 //BMigrate::migrateModules();
+
+//$bmode = BDebug::i()->mode();
+BDebug::i()->mode(BDebug::MODE_DISABLED);

@@ -136,6 +136,12 @@ class BImportTest extends FCom_Test_Model_TestCase
         $this->assertFalse($this->object->config());
     }
 
+    protected function tearDown()
+    {
+        $this->object->config(false);
+        return parent::tearDown();
+    }
+
     /**
      * @covers BImport::run
      */
