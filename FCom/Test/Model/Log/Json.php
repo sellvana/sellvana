@@ -5,7 +5,7 @@
  *
  * @project sellvana_core
  */
-class FCom_Test_Log_Json extends PHPUnit_Util_Log_JSON
+class FCom_Test_Model_Log_Json extends PHPUnit_Util_Log_JSON
 {
     protected $msgs;
     public function write($buffer)

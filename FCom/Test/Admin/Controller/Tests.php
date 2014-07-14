@@ -121,7 +121,7 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract_Gr
         $suite = $this->prepareTestSuite($tests);
 
         $result = new PHPUnit_Framework_TestResult();
-        $listener = new FCom_Test_Log_Json();
+        $listener = new FCom_Test_Model_Log_Json();
         $result->addListener($listener);
 
         // We need to temporarily turn off html_errors to ensure correct
