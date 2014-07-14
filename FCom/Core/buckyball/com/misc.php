@@ -1881,10 +1881,20 @@ class BEmail extends BClass
 
         foreach ($data as $k => $v) {
             if ($k == 'subject') {
-                $subject = $v;
+                if ($this->BConfig->get('staging/email_subject_prepend')) {
+                    $subject = $this->BConfig->get('staging/email_subject_prepend_prefix') . ' ' . $v;
+                    $headers['x-staging-original-subject'] = 'X-Staging-Original-Subject: ' . $v;
+                } else {
+                    $subject = $v;
+                }
 
             } elseif ($k == 'to') {
-                $to = $v;
+                if ($this->BConfig->get('staging/email_to_override')) {
+                    $to = $this->BConfig->get('staging/email_to_override_address');
+                    $headers['x-staging-original-to'] = 'X-Staging-Original-To: ' . $v;
+                } else {
+                    $to = $v;
+                }
 
             } elseif ($k == 'attach') {
                 foreach ((array)$v as $file) {

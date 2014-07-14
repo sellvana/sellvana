@@ -83,6 +83,7 @@ class FCom_Core_Main extends BClass
         $localConfig['fs']['root_dir'] = $rootDir = str_replace('\\', '/', $rootDir);
 
         $this->BDebug->debug('ROOTDIR=' . $rootDir);
+        $this->BDebug->debug('REMOTE=' . $this->BRequest->ip() . ', LOCAL=' . $this->BRequest->serverIp());
 
         $docRoot = $req->docRoot();
         $webRoot = $req->webRoot();
