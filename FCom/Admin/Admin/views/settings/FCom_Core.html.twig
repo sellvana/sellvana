@@ -64,4 +64,12 @@
         {{ forms.select(fieldData,  { field:'csrf_check_method', label:'CSRF Check Method'|_, options:csrfMethods }) }}
         {{ forms.input(fieldData,   { field:'csrf_web_root', label:'CSRF Referrer Web Root Path (optional)'|_ }) }}
     {{ forms.accordion_panel_end }}
+
+    {% set fieldData = { model: c, id_prefix:'staging', name_prefix:'config[staging]', get_prefix:'staging' } %}
+    {{ forms.accordion_panel_start({label:'Staging Environment'|_, id:'settings-FCom_Core-group7'}) }}
+        {{ forms.boolean(fieldData, { field:'email_to_override', label:'Override All Emails Destination'|_ }) }}
+        {{ forms.input(fieldData,   { field:'email_to_override_address', label:'Emails Destination Address'|_ }) }}
+        {{ forms.boolean(fieldData, { field:'email_subject_prepend', label:'Prepend All Emails Subject'|_ }) }}
+        {{ forms.input(fieldData,   { field:'email_subject_prepend_prefix', label:'Emails Subject Prefix'|_ }) }}
+    {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

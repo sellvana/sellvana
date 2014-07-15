@@ -126,6 +126,22 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         return true;
     }
 
+    public function onAfterSave()
+    {
+        parent::onAfterSave();
+
+        $customer = $this->FCom_Customer_Model_Customer->load($this->customer_id);
+        if (!$customer->default_billing_id) {
+            $customer->default_billing_id = $this->id();
+        }
+        if (!$customer->default_shipping_id) {
+            $customer->default_shipping_id = $this->id();
+        }
+        if ($customer->is_dirty()) {
+            $customer->save();
+        }
+    }
+
     public function newShipping($address, $customer)
     {
         $data = ['address' => $address];

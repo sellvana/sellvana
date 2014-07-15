@@ -114,6 +114,11 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         ]);
     }
 
+    /**
+    * Not used currently
+    *
+    * @param array $args
+    */
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);

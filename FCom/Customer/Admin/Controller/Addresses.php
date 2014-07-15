@@ -51,11 +51,11 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
             ['type' => 'input', 'name' => 'postcode', 'label' => 'Zip/Postal Code', 'index' => 'a.postcode',
                 'addable' => true, 'editable' => true, 'validation' => ['required' => true]],
             ['type' => 'input', 'name' => 'phone', 'label' => 'Phone', 'index' => 'a.phone', 'addable' => true,
-                'editable' => true, 'hidden' => true, 'validation' => ['required' => true]],
+                'editable' => true, 'hidden' => true],
             ['type' => 'input', 'name' => 'fax', 'label' => 'Fax', 'index' => 'a.fax', 'addable' => true,
                 'editable' => true, 'hidden' => true],
             ['type' => 'input', 'name' => 'email', 'label' => 'Email', 'index' => 'a.email', 'width' => 100,
-                'addable' => true, 'editable' => true, 'validation' => ['required' => true, 'email' => true]],
+                'addable' => true, 'editable' => true, 'validation' => ['email' => true]],
             ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115,
                 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
         ];
