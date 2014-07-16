@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<dataset>
+    <fcom_sales_cart_address id="1" cart_id="1" atype="shipping" firstname="Test 1" city="Los Angeles" region="California" country="US" />
+    <fcom_sales_cart_address id="2" cart_id="2" atype="billing" firstname="Test 2" city="California"  region="California" country="US" />
+</dataset>

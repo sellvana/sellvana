@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<dataset>
+    <fcom_field id="1" field_type="product" field_code="FeatureA" field_name="Feature A" table_field_type="varchar(255)" admin_input_type="text" frontend_label="Feature A" />
+    <fcom_field id="2" field_type="product" field_code="FeatureB" field_name="Feature B" table_field_type="varchar(255)" admin_input_type="text" frontend_label="Feature B" />
+    <fcom_field_option id="1" field_id="1" label="Feature A" />
+    <fcom_field_option id="2" field_id="2" label="Feature B" />
+</dataset>
