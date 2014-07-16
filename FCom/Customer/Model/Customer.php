@@ -256,9 +256,16 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return true;
     }
 
-    public function validatePassword($password)
+    public function validatePassword($password, $field = 'password_hash')
     {
-        return $this->BUtil->validateSaltedHash($password, $this->password_hash);
+        $hash = $this->get($field);
+        if (!$this->BUtil->validateSaltedHash($password, $hash)) {
+            return false;
+        }
+        if (!$this->BUtil->isPreferredPasswordHash($hash)) {
+            $this->set('password_hash', $this->BUtil->fullSaltedHash($password))->save();
+        }
+        return true;
     }
 
     public function sessionUserId()

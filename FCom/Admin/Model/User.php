@@ -120,7 +120,14 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     public function validatePassword($password, $field = 'password_hash')
     {
-        return $this->BUtil->validateSaltedHash($password, $this->get($field));
+        $hash = $this->get($field);
+        if (!$this->BUtil->validateSaltedHash($password, $hash)) {
+            return false;
+        }
+        if (!$this->BUtil->isPreferredPasswordHash($hash)) {
+            $this->set('password_hash', $this->BUtil->fullSaltedHash($password))->save();
+        }
+        return true;
     }
 
     public function has_role($orm, $role)

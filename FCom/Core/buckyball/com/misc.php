@@ -933,6 +933,16 @@ class BUtil extends BClass
         return $verifyHash === $knownHash;
     }
 
+    /**
+     * Used for hash regeneration of old password hashes
+     *
+     * @return string
+     */
+    public function isPreferredPasswordHash($password)
+    {
+        return strpos($password, '$2y$12$') === 0;
+    }
+
     public function sha512base64($str)
     {
         return base64_encode(pack('H*', hash('sha512', $str)));

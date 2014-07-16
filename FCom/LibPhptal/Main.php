@@ -135,12 +135,12 @@ function phptal_tales_cms_block($src, $nothrow)
 
 function phptal_tales_href($href, $nothrow)
 {
-    return "BApp::href('" . str_replace("'", "\\'", $href) . "')";
+    return "BApp::i()->href('" . str_replace("'", "\\'", $href) . "')";
 }
 
 function phptal_tales_src($src, $nothrow)
 {
-    return "BApp::src('" . str_replace("'", "\\'", $src) . "')";
+    return "BApp::i()->src('" . str_replace("'", "\\'", $src) . "')";
 }
 
 class FCom_LibPhptal_PreFilter extends PHPTAL_PreFilter
