@@ -1549,10 +1549,11 @@ class BView extends BClass
     }
 
     /**
-    * Used by external renderers to include compiled PHP file within $this context
-    *
-    * @param mixed $file
-    */
+     * Used by external renderers to include compiled PHP file within $this context
+     *
+     * @param mixed $file
+     * @return string
+     */
     public function renderFile($file)
     {
         ob_start();
