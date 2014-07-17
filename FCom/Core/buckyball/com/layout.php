@@ -249,7 +249,7 @@ class BLayout extends BClass
         if (!is_dir($rootDir)) {
             BDebug::warning('Not a valid directory: ' . $rootDir);
 
-            return $this;
+            return false;
         }
         $rootDir1 = str_replace('\\', '/', realpath($rootDir));
 

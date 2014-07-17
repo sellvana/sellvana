@@ -40,7 +40,7 @@ class BLayout_Test extends PHPUnit_Framework_TestCase
         $layout = $this->_layout;
         $layout->addAllViews('/Frontend/views');
         foreach (['test1', 'test2', 'test3',  ] as $vn) {
-            $this->assertNull($layout->getView($vn));
+            $this->assertInstanceOf('BViewEmpty', $layout->getView($vn));
         }
     }
 
@@ -57,21 +57,16 @@ class BLayout_Test extends PHPUnit_Framework_TestCase
     public function testAddGetView()
     {
         $layout = $this->_layout;
-        $this->assertNull($layout->getView('my'));
+        $this->assertInstanceOf('BViewEmpty', $layout->getView('my'));
         $layout->addView('my', []);
         $this->assertNotNull($layout->getView('my'));
-    }
-
-    public function testViewReturnsLayoutWhenInvokedWithParams()
-    {
-        $layout = $this->_layout;
-        $this->assertInstanceOf('BLayout', $layout->view('my', ['template' => 'test']));
+        $this->assertNotInstanceOf('BViewEmpty', $layout->getView('my'));
     }
 
     public function testViewReturnsNullWhenInvokedWithEmptyParams()
     {
         $layout = $this->_layout;
-        $this->assertNull($layout->view('my', []));
+        $this->assertInstanceOf('BViewEmpty', $layout->getView('my'));
     }
 
     public function testMultipleAddView()
@@ -145,7 +140,7 @@ class BLayout_Test extends PHPUnit_Framework_TestCase
             $test->assertTrue(true);
         });
 
-        $layout->dispatch('hook.main');
+        $layout->dispatch('hook:main');
     }
 
     public function testHookView()
@@ -153,7 +148,7 @@ class BLayout_Test extends PHPUnit_Framework_TestCase
         $layout = $this->_layout;
         $view = ['my', 'raw_text' => 'Called'];
         $layout->hookView('main', $view);
-        $result = $layout->dispatch('hook.main');
+        $result = $layout->dispatch('hook:main');
 
         $this->assertContains($view[1]['raw_text'], $result);
     }
