@@ -35,15 +35,15 @@ class FCom_ReviewsTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals($helpfulVoices + 1, $review->helpful_voices, "Update helpful mark failed");
     }
 
-//    public function testRemoveEntry()
-//    {
-//        $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_product_review'), "Pre-Condition");
-//        $mReview = FCom_ProductReviews_Model_Review::i(true);
-//        $review = $mReview->load(1);
-//        $review->delete();
-//
-//        $this->assertEquals(1, $this->getConnection()->getRowCount('fcom_product_review'), "Delete failed");
-//    }
+    public function testRemoveEntry()
+    {
+        $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_product_review'), "Pre-Condition");
+        $mReview = FCom_ProductReviews_Model_Review::i(true);
+        $review = $mReview->load(1);
+        $review->delete();
+
+        $this->assertEquals(1, $this->getConnection()->getRowCount('fcom_product_review'), "Delete failed");
+    }
 
 }
  
