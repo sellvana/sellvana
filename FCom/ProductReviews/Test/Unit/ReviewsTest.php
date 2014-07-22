@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_ReviewsTest extends FCom_Test_DatabaseTestCase
+class FCom_ProductReviews_Test_Unit_ReviewsTest extends FCom_Test_DatabaseTestCase
 {
 
     public function getDataSet()

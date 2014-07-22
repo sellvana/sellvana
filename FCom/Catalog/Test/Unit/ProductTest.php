@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_Catalog_ProductTest extends FCom_Test_DatabaseTestCase
+class FCom_Catalog_Test_Unit_ProductTest extends FCom_Test_DatabaseTestCase
 {
     public function getDataSet()
     {
@@ -10,7 +10,6 @@ class FCom_Catalog_ProductTest extends FCom_Test_DatabaseTestCase
     public function testAddEntry()
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_product'), "Pre-Condition");
-
 
         $data = ['id' => 3, 'product_name' => 'Product 3', 'url_key' => 'product-3'];
         FCom_Catalog_Model_Product::i()->create($data)->save();
@@ -53,17 +52,8 @@ class FCom_Catalog_ProductTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_product'), "Inserting failed");
 
         $entry = FCom_Catalog_Model_Product::i()->load(3);
-        $this->assertTrue(!empty($entry->url_key), "url_key generation failed");
-    }
+        $this->assertNotEmpty($entry->url_key, "url_key generation failed");
 
-    public function testUrlKeyAlgorithm()
-    {
-        $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_product'), "Pre-Condition");
-
-        $data = ['id' => 3, 'product_name' => 'Product 3'];
-        $entry = FCom_Catalog_Model_Product::i()->create($data)->save();
-
-        $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_product'), "Inserting failed");
         $this->assertEquals("product-3", $entry->url_key, "url_key algorithm changed");
     }
 

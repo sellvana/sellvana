@@ -5,7 +5,7 @@
  * @project fulleron
  */
 
-class FCom_CustomerGroups_GroupTest
+class FCom_CustomerGroups_Test_Unit_GroupTest
     extends PHPUnit_Framework_TestCase
 {
     /**
@@ -15,6 +15,7 @@ class FCom_CustomerGroups_GroupTest
 
     protected function setUp()
     {
+        parent::setUp();
         $this->model = FCom_CustomerGroups_Model_Group::i(true);
     }
 
