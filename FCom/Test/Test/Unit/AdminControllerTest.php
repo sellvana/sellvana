@@ -1,7 +1,6 @@
 <?php
-
 if (!defined('FULLERON_ROOT_DIR')) {
-    require_once '../../../../tests/index.php';
+    require_once '../../bootstrap.php';
 }
 defined('BUCKYBALL_ROOT_DIR') || die();
 

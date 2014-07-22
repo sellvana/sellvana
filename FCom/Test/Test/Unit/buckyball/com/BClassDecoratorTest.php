@@ -28,8 +28,8 @@ class BClassDecorator_Test extends PHPUnit_Framework_TestCase
         $a->foo = 123;
         $b = $a->getDecoratedComponent();
 
-        $this->assertEquals("123", $b->foo);
         $this->assertTrue(isset($b->foo));
+        $this->assertEquals("123", $b->foo);
 
         unset($a->foo);
         $this->assertFalse(isset($b->foo));

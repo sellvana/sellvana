@@ -5,13 +5,13 @@
  *
  * @project sellvana_core
  */
-class FCom_Test_Log_Json extends PHPUnit_Util_Log_JSON
+class FCom_Test_Model_Log_Json extends PHPUnit_Util_Log_JSON
 {
     protected $msgs;
     public function write($buffer)
     {
         $this->msgs[] = $buffer;
-        parent::write($buffer);
+        //parent::write($buffer);
     }
 
     public function getResults()
