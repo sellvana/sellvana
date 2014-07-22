@@ -12,11 +12,10 @@ class FCom_Sales_Test_Unit_CartAddressTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_sales_cart_address'), "Pre-Condition");
 
         $cartId = 1;
-        $mCartAddress = FCom_Sales_Model_Cart_Address::i(true);
-        $data = ['id' => 3, 'city' => "Big city", 'country' => 'US',
-            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave'];
+        $data = ['id'=> 3, 'city' => "Big city", 'country' => 'US',
+            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave', 'atype' => 'billing'];
 
-        $mCartAddress->newAddress($cartId, 'billing', $data);
+        FCom_Sales_Model_Cart_Address::i()->newAddress($cartId, $data);
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_sales_cart_address'), "Insert failed");
     }
@@ -26,11 +25,10 @@ class FCom_Sales_Test_Unit_CartAddressTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_sales_cart_address'), "Pre-Condition");
 
         $cartId = 1;
-        $mCartAddress = FCom_Sales_Model_Cart_Address::i(true);
         $data = ['city' => "Big city", 'country' => 'US',
-            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave'];
+            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave', 'atype' => 'shipping'];
 
-        $mCartAddress->newAddress($cartId, 'shipping', $data);
+        FCom_Sales_Model_Cart_Address::i()->newAddress($cartId, $data);
 
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_sales_cart_address'), "Update failed");
     }
@@ -40,14 +38,14 @@ class FCom_Sales_Test_Unit_CartAddressTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_sales_cart_address'), "Pre-Condition");
 
         $cartId = 1;
-        $mCartAddress = FCom_Sales_Model_Cart_Address::i(true);
+        $mCartAddress = FCom_Sales_Model_Cart_Address::i();
         $data = ['city' => "Big city", 'country' => 'US',
-            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave'];
+            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave' , 'atype' => 'shipping'];
 
         $address = $mCartAddress->findByCartType($cartId, 'shipping');
         $this->assertEquals("Los Angeles", $address->city, "Address not found");
 
-        $mCartAddress->newAddress($cartId, 'shipping', $data);
+        $mCartAddress->newAddress($cartId, $data);
 
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_sales_cart_address'), "Update failed");
 
@@ -59,12 +57,12 @@ class FCom_Sales_Test_Unit_CartAddressTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_sales_cart_address'), "Pre-Condition");
 
-        $cartId = 3;
-        $mCartAddress = FCom_Sales_Model_Cart_Address::i(true);
+        $cartId =3;
+        $mCartAddress = FCom_Sales_Model_Cart_Address::i();
         $data = ['id' => 3, 'city' => "Big city", 'country' => 'US',
-            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave'];
+            'region' => 'California', 'firstname' => "Test 3", 'street1' => '5th Ave', 'atype' => 'billing'];
 
-        $mCartAddress->newAddress($cartId, 'billing', $data);
+        $mCartAddress->newAddress($cartId, $data);
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_sales_cart_address'), "Insert failed");
     }
@@ -72,12 +70,12 @@ class FCom_Sales_Test_Unit_CartAddressTest extends FCom_Test_DatabaseTestCase
     public function testAddressBelongToCart()
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_sales_cart_address'), "Pre-Condition");
-        $mCartAddress = FCom_Sales_Model_Cart_Address::i(true);
+        $mCartAddress = FCom_Sales_Model_Cart_Address::i();
         $cartId = 3;
         $data = ['id' => 3, 'city' => "Big city", 'country' => 'US',
-            'region' => 'California', 'firstname' => "Test 1", 'street1' => '5th Ave'];
+            'region' => 'California', 'firstname' => "Test 3", 'street1' => '5th Ave', 'atype' => 'billing'];
 
-        $mCartAddress->newAddress($cartId, 'billing', $data);
+        $mCartAddress->newAddress($cartId, $data);
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_sales_cart_address'), "Insert failed");
 
         $address = $mCartAddress->findByCartType($cartId, 'billing');

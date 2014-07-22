@@ -9,6 +9,7 @@ class FCom_Catalog_Test_Unit_SeacrchAliasTest extends FCom_Test_DatabaseTestCase
 
     public function testAddEntry()
     {
+
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_search_alias'), "Pre-Condition");
 
         $data = ['alias_term' => 'Search alias 3', 'target_term' => 'blank', 'num_hits' => 33];
