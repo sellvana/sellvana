@@ -1924,7 +1924,7 @@ class BEmail extends BClass
         $origBody = $body;
 
         $this->_formatAlternative($headers, $body);
-        $body = trim(preg_replace('#<!--.*?-->#', '', $body));
+        $body = trim(preg_replace('#<!--.*?-->#', '', $body));//strip comments
 
         if ($files) {
             // $body and $headers will be updated
@@ -2463,6 +2463,7 @@ class BDebug extends BClass
         if ($setLevels && !empty(static::$_levelPreset[$mode])) {
             static::$_level = static::$_levelPreset[$mode];
         }
+        return null;
     }
 
     public function backtraceOn($msg)

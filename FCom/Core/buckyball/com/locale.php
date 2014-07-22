@@ -84,7 +84,7 @@ class BLocale extends BClass
             $str = iconv("utf-8", "us-ascii//TRANSLIT", $str); // transliterate
             $str = preg_replace('/[^' . $qFiller . 'a-z0-9]+/', '', strtolower($str)); // remove leftovers from transliteration
         }
-        $str = trim($str, $filler); // remove fillers from start and end of string
+        $str = trim($str, strtolower($filler)); // remove fillers from start and end of string|string is converted to lower case, so should be the filter char
         return $str;
     }
 
