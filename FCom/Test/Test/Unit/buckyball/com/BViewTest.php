@@ -11,7 +11,7 @@ class BView_Test extends PHPUnit_Framework_TestCase
 
     public function testViewIsInstanceOfOtherView()
     {
-        $class = 'stdClass';
+        $class = 'StdView';
         /** @var BView $view */
         $view = BView::i()->factory('my', ['view_class' => $class]);
         $this->assertInstanceOf($class, $view, sprintf("Expected instance is %s, but got %s", $class, get_class($view)));
@@ -111,7 +111,7 @@ class BView_Test extends PHPUnit_Framework_TestCase
     public function testGetTemplateFileName()
     {
         /** @var BView $view */
-        $view = BView::i()->factory('my', ['template' => 'test.php']);
+        $view = BView::i()->factory('my', ['template' => 'test.php', 'file_ext' => '.php']);
         $this->assertEquals(BLayout::i()->getViewRootDir() . '/test.php', $view->getTemplateFileName());
         $view->setParam('template', null);
         $this->assertEquals(BLayout::i()->getViewRootDir() . '/my.php', $view->getTemplateFileName());
@@ -153,7 +153,12 @@ class BView_Test extends PHPUnit_Framework_TestCase
     public function getLayoutView()
     {
         /** @var BView $view */
-        $path = realpath('../../Catalog/Frontend/views/');
+        $catalogModule = BModuleRegistry::i()->module('FCom_Catalog');
+        if($catalogModule){
+            $path = $catalogModule->root_dir . "/Frontend/views";
+        } else {
+            $path = realpath("../../../../../Catalog/Frontend/views"); // this will need to be updated if tests are moved
+        }
         BLayout::i()
                ->addAllViews($path)
                ->addLayout([
@@ -207,10 +212,13 @@ class BView_Test extends PHPUnit_Framework_TestCase
         BEvents::i()->on('BEmail::send:after', function($event) use ($view, $test) {
             $ed = $event['email_data'];
             $test->assertArrayHasKey('body', $ed);
-            $test->assertEquals($ed['body'], $view->render());
+            $render = $view->render([], true);
+            $test->assertEquals($ed['orig_body'], $render);
             $test->assertEquals($ed['to'], 'test@test.com');
         });
         $view->email('test@test.com');
     }
     //@todo test addAttachment, optionsHtml, translate
 }
+
+class StdView extends BView {}

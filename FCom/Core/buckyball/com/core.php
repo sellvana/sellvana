@@ -976,7 +976,7 @@ class BClassRegistry extends BClass
             }
             $newClass = $class;
             $class = static::$_classes[$class]['class_name'];
-            unset(static::$_classes[$class]);
+            unset(static::$_classes[$newClass]);
             BDebug::debug('CLEAR CLASS OVERRIDE: ' . $class . ' -> ' . $newClass);
         } else {
             throw new BException('Invalid argument type: ' . print_r($newClass, 1));
@@ -1075,7 +1075,7 @@ class BClassRegistry extends BClass
     * A difference between overrideModule and augmentModule is that
     * you can override only with one another method, but augment multiple times.
     *
-    * If augmented multiple times, each consequetive callback will receive result
+    * If augmented multiple times, each consecutive callback will receive result
     * changed by previous callback.
     *
     * @param string $class
@@ -1226,7 +1226,9 @@ class BClassRegistry extends BClass
     {
         //$class = $origClass ? $origClass : get_class($origObject);
         $class = get_class($origObject);
-
+        // here $class is the overriding object class, and config for methods
+        // is keyed with overridden class name, so findMethodInfo will never return true, unless
+        // overriding and overridden class are the same!
         if (($info = static::findMethodInfo($class, $method, 0, 'override'))) {
             $callback = $info['callback'];
             array_unshift($args, $origObject);
@@ -1384,6 +1386,9 @@ class BClassRegistry extends BClass
             BDebug::error(BLocale::i()->_('Invalid class name: %s', $className));
         }
         $args = static::processDI($className, $args);
+        if ($className == 'BClassDecorator' && !empty($args)) {
+            $args = [$args];
+        }
         $reflClass = new ReflectionClass($className);
         $instance = $reflClass->newInstanceArgs($args);
 
@@ -1456,6 +1461,10 @@ class BClassDecorator
     protected $_decoratedComponent;
 
     /**
+     * @var BClassRegistry BClassRegistry
+     */
+    protected $BClassRegistry;
+    /**
     * Decorator constructor, creates an instance of decorated class
     *
     * @param array(object|string $class)
@@ -1466,6 +1475,7 @@ class BClassDecorator
 //echo '1: '; print_r($class);
         $class = array_shift($args);
         $this->_decoratedComponent = is_string($class) ? BClassRegistry::instance($class, $args) : $class;
+        $this->BClassRegistry = BClassRegistry::i();
     }
 
     public function __destruct()
