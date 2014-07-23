@@ -116,6 +116,7 @@ class BImport extends BClass
     public function config($config = null, $update = false)
     {
         $dir = $this->FCom_Core_Main->dir('storage/run/' . $this->dir);
+        $this->BUtil->ensureDir($dir);
         $file = $this->BSession->sessionId() . '.json';
         $filename = $dir . '/' . $file;
         if ($config) { // create config lock
@@ -126,8 +127,7 @@ class BImport extends BClass
             if (empty($config['status'])) {
                 $config['status'] = 'idle';
             }
-            file_put_contents($filename, $this->BUtil->toJson($config));
-            return true;
+            return (boolean) file_put_contents($filename, $this->BUtil->toJson($config));
         } elseif ($config === false) { // remove config lock
             unlink($filename);
             return true;

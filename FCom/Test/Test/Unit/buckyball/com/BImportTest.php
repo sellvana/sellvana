@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class BImportTest extends PHPUnit_Framework_TestCase
+class BImportTest extends FCom_Test_Model_TestCase
 {
     /**
      * @var BImport
@@ -40,7 +40,7 @@ class BImportTest extends PHPUnit_Framework_TestCase
      */
     public function testGetImportDir()
     {
-        $dir = '/storage/import/' . $this->object->getDir();
+        $dir = FCom_Core_Main::i()->dir('storage') . '/import/' . $this->object->getDir();
 
         $this->assertEquals($dir, $this->object->getImportDir());
     }
@@ -100,13 +100,13 @@ class BImportTest extends PHPUnit_Framework_TestCase
      */
     public function testConfig()
     {
-        BConfig::i()->add(
-            [
-                 'fs' => [
-                     'root_dir' => realpath(__DIR__ . DIRECTORY_SEPARATOR . '..')
-                 ],
-            ]
-        );
+        //BConfig::i()->add(
+        //    [
+        //         'fs' => [
+        //             'root_dir' => realpath(__DIR__ . DIRECTORY_SEPARATOR . '..')
+        //         ],
+        //    ]
+        //);
         BSession::i()->open('test');
         // initially config has no value
         $this->assertFalse($this->object->config());
@@ -134,6 +134,12 @@ class BImportTest extends PHPUnit_Framework_TestCase
         // test removing config
         $this->assertTrue($this->object->config(false));
         $this->assertFalse($this->object->config());
+    }
+
+    protected function tearDown()
+    {
+        $this->object->config(false);
+        return parent::tearDown();
     }
 
     /**
@@ -168,7 +174,11 @@ class BImportTest extends PHPUnit_Framework_TestCase
             'nesting_separator' => '>',
             'defaults' => ['f1' => 'v1'],
         ];
-        $config += $this->object->getFileInfo($this->object->getImportDir() . "/" . $config['filename']);
+        $this->object->BUtil->ensureDir($this->object->getImportDir());
+        touch($this->object->getImportDir() . "/" . $config['filename']);
+        $fileInfo = $this->object->getFileInfo($this->object->getImportDir() . "/" . $config['filename']);
+        $this->assertTrue(is_array($fileInfo));
+        $config += $fileInfo;
         $this->object->config($config);
         $this->object->run();
     }

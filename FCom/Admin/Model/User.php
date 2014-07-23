@@ -85,6 +85,12 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if (!$this->get('role_id')) {
             $this->set('role_id', null);
         }
+        if (!$this->get('locale')) {
+            $this->set('locale', $this->BConfig->get('modules/FCom_Admin/default_locale'));
+        }
+        if (!$this->get('tz')) {
+            $this->set('tz', $this->BConfig->get('modules/FCom_Core/default_tz'));
+        }
 
         return true;
     }

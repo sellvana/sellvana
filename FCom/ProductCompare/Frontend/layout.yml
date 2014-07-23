@@ -1,0 +1,5 @@
+base:
+    - view: head
+        do:
+            - [ requireJs, fcom.productcompare, "@FCom_ProductCompare/Frontend/js/fcom.productcompare" ]
+            - [ requireRun, fcom.productcompare ]
