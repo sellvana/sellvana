@@ -66,5 +66,6 @@ class FCom_Wishlist_Test_Unit_WishlistTest extends FCom_Test_DatabaseTestCase
         $sessionWhishlist = $mWislist->sessionWishlist();
 
         $this->assertNotEmpty($sessionWhishlist->id());
+        BSession::i()->set('customer_id', null); // set session user
     }
 }

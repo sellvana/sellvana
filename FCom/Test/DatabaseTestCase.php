@@ -6,6 +6,12 @@ abstract class FCom_Test_DatabaseTestCase extends PHPUnit_Extensions_Database_Te
 {
     // only instantiate pdo once for test clean-up/fixture load
     static private $pdo = null;
+    protected $dbConfig = [
+        'dbname' => null,
+        'host' => null,
+        'username' => null,
+        'password' => null,
+    ];
 
     // only instantiate PHPUnit_Extensions_Database_DB_IDatabaseConnection once per test
     private $conn = null;
@@ -13,13 +19,20 @@ abstract class FCom_Test_DatabaseTestCase extends PHPUnit_Extensions_Database_Te
     final public function getConnection()
     {
         if ($this->conn === null) {
-            $config = BConfig::i()->get('db');
+            $this->dbConfig = BUtil::i()->arrayMerge($this->dbConfig, include "Test/Unit/buckyball/com/db_test_config.php");
+            BConfig::i()->add(
+                [
+                     'db' => $this->dbConfig, // use provided sample file to quickly create actual db config
+                ]
+            );
             if (self::$pdo == null) {
-                self::$pdo = new PDO('mysql:dbname=' . $config['dbname'] . ';host=' . $config['host'], $config['username'], $config['password']);
+                self::$pdo = new PDO('mysql:dbname=' . $this->dbConfig['dbname'] . ';host=' . $this->dbConfig['host'],
+                    $this->dbConfig['username'],
+                    $this->dbConfig['password']);
 
             }
 
-            $this->conn = $this->createDefaultDBConnection(self::$pdo, $config['dbname']);
+            $this->conn = $this->createDefaultDBConnection(self::$pdo, $this->dbConfig['dbname']);
         }
 
         return $this->conn;
