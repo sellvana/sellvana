@@ -20,7 +20,6 @@ class FCom_ProductCompare_Test_Unit_ProductCompareTest extends FCom_Test_Databas
         $mSetItem->create($data)->save();
 
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_compare_item'), "Inserting failed");
-
     }
 
     public function testAddByCustomer()
@@ -43,7 +42,6 @@ class FCom_ProductCompare_Test_Unit_ProductCompareTest extends FCom_Test_Databas
         $mSetItem->create($data)->save();
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_compare_item'), "Inserting failed");
-
     }
 }
  
