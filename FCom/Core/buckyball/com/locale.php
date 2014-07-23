@@ -743,6 +743,14 @@ class BLocale extends BClass
         return $result;
     }
 
+    public function getRegionCodeByName($regionName, $countryCode = 'US')
+    {
+        $regions = $this->getAvailableRegions('name', $countryCode);
+        $regions = array_flip(array_map('strtolower', $regions));
+        $regionName = strtolower($regionName);
+        return isset($regions[$regionName]) ? $regions[$regionName] : null;
+    }
+
     public function setCurrentLanguage($lang)
     {
         static::$_currentLanguage = $lang;

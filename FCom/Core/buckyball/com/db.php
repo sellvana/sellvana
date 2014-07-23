@@ -1588,7 +1588,7 @@ class BORM extends ORMWrapper
         if (!empty($r['s']) && !preg_match('#^[a-zA-Z0-9_.]+$#', $r['s'])) { // if sort contains not allowed characters
             $r['s'] = null;
         }
-        if (empty($r['sd']) || $r['sd'] != 'asc' && $r['sd'] != 'desc') { // only asc and desc dirs are allowed
+        if (empty($d['sd']) && (empty($r['sd']) || $r['sd'] != 'asc' && $r['sd'] != 'desc')) { // only asc and desc dirs are allowed
             $r['sd'] = 'asc';
         }
         $r['sc'] = !empty($r['s']) ? $r['s'] . ' ' . $r['sd'] : null; // combine $r['sc'] after filtering
