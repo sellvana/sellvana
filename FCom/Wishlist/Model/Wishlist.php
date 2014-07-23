@@ -14,6 +14,10 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
             $customer = $this->FCom_Customer_Model_Customer->sessionUser();
             if ($customer) {
                 $wishlist = $this->loadOrCreate(["customer_id" => $customer->id()]);
+                $id = $wishlist->id();
+                if(empty($id)){
+                    $wishlist->save(); // make sure wishlist has an ID
+                }
             } else {
                 $cookieToken = $this->BRequest->cookie('wishlist');
                 if ($cookieToken) {

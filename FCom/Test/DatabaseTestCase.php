@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-require_once "PHPUnit/Extensions/Database/TestCase.php";
+//require_once "PHPUnit/Extensions/Database/TestCase.php";//use autoloading or remove temporary includes/requires
 
 abstract class FCom_Test_DatabaseTestCase extends PHPUnit_Extensions_Database_TestCase
 {
