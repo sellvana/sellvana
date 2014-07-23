@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<dataset>
+    <fcom_product id="1" product_name="Product 1" local_sku="product_1" url_key="product-1" />
+    <fcom_product id="2" product_name="Product 2" local_sku="product_2" url_key="product-2" />
+</dataset>

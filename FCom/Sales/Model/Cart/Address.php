@@ -79,4 +79,36 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
         $custAddress = $this->FCom_Customer_Model_Address->create($data)->save();
         return $custAddress;
     }
+
+    public function findByCartType($cartId, $atype = 'shipping')
+    {
+        return $this->orm()->where("cart_id", $cartId)->where('atype', $atype)->find_one();
+    }
+
+    public function newAddress($cartId, $newAddress)
+    {
+        if (is_object($newAddress)) {
+            $data = $newAddress->as_array();
+        } else {
+            $data = $newAddress;
+        }
+        if (isset($data['id'])) {
+            unset($data['id']);
+        }
+        if (empty($data['atype'])) {
+            $data['atype'] = 'shipping';
+        }
+
+        $address = $data;
+        $address['cart_id'] = $cartId;
+
+        $newAddress = $this->findByCartType($cartId, $address['atype']);
+        if (!$newAddress) {
+            $newAddress = $this->create($address);
+        } else {
+            $newAddress->set($address);
+        }
+        $newAddress->save();
+        return $newAddress;
+    }
 }
