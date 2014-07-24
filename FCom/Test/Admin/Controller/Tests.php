@@ -4,9 +4,14 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract_Gr
 {
     const TESTS_GRID_ID = 'tests_grid';
 
-    public function action_index()
+    public function __construct()
     {
         $this->ensurePhpunit($this->getPhpUnitExecutable());
+        parent::__construct();
+    }
+    public function action_index()
+    {
+        //$this->ensurePhpunit($this->getPhpUnitExecutable());
         $this->layout("/tests/index");
         $this->layout()
             ->view("tests/index")
@@ -117,7 +122,7 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract_Gr
     public function runTestsWeb($tests)
     {
         $phpunit = $this->getPhpUnitExecutable();
-        $this->ensurePhpunit($phpunit);
+        //$this->ensurePhpunit($phpunit);
         $suite = $this->prepareTestSuite($tests);
 
         $result = new PHPUnit_Framework_TestResult();
@@ -144,8 +149,8 @@ class FCom_Test_Admin_Controller_Tests extends FCom_Admin_Controller_Abstract_Gr
 
     public function runTestsText($tests)
     {
-        $phpunit = $this->getPhpUnitExecutable();
-        $this->ensurePhpunit($phpunit);
+        //$phpunit = $this->getPhpUnitExecutable();
+        //$this->ensurePhpunit($phpunit);
         $suite = $this->prepareTestSuite($tests);
         $runner = new PHPUnit_TextUI_TestRunner();
 
