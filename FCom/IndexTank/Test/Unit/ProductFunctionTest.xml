@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<dataset>
+    <fcom_indextank_product_function id="1" name="age" number="0" definition="-age" />
+    <fcom_indextank_product_function id="2" name="relevance" number="1" definition="relevance" />
+
+</dataset>
