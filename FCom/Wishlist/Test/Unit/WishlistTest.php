@@ -1,4 +1,9 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
+if(!defined('BUCKYBALL_ROOT_DIR')){
+    include_once '../../../Test/bootstrap.php';
+}
+
+defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Wishlist_Test_Unit_WishlistTest extends FCom_Test_DatabaseTestCase
 {
@@ -50,5 +55,17 @@ class FCom_Wishlist_Test_Unit_WishlistTest extends FCom_Test_DatabaseTestCase
         }
 
         $this->assertEquals(0, count($wishlist->items()), "Items count is not correct");
+    }
+
+    public function testSessionWishListReturnsValidModel()
+    {
+        BSession::i()->set('customer_id', 3); // set session user
+        /** @var FCom_Wishlist_Model_Wishlist $mWislist */
+        $mWislist = FCom_Wishlist_Model_Wishlist::i(true);
+        /** @var FCom_Wishlist_Model_Wishlist $sessionWhishlist */
+        $sessionWhishlist = $mWislist->sessionWishlist();
+
+        $this->assertNotEmpty($sessionWhishlist->id());
+        BSession::i()->set('customer_id', null); // set session user
     }
 }
