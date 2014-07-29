@@ -21,7 +21,7 @@ class FCom_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
      * If $createAnonymousIfNeeded is true, a compare set for non registered user will be created.
      *
      * @param bool $createAnonymousIfNeeded
-     * @return FCom_ProductCompare_Model_Set|null
+     * @return FCom_ProductCompare_Model_Set|false
      * @throws BException
      */
     public function sessionSet($createAnonymousIfNeeded = false)

@@ -16,41 +16,33 @@ class FCom_ProductCompare_Model_SetTest extends PHPUnit_Framework_TestCase {
     protected function setUp()
     {
         parent::setUp();
-        //$this->_origReq = BRequest::i();
-        BClassRegistry::i()->overrideMethod('BRequest', 'cookie', ['BRequestDouble', 'cookie']);
-        $this->set = FCom_ProductCompare_Model_Set::i();
+        $this->set = FCom_ProductCompare_Model_Set::i(true);
+
     }
 
-    public function testSessionSetForNonRegisteredUserCanBeCreated()
-    {
-        $sessionSet = $this->set->sessionSet(true);
-        $this->assertInstanceOf('FCom_ProductCompare_Model_Set', $sessionSet);
-    }
-
+    /**
+     * Order of these tests is important, we need to test negative before positive scenario
+     * because once session set is created, we don't have a way to reset it.
+     */
     public function testSessionSetForNonRegisteredUserWillNotBeCreatedWithoutCreateAnonymousSwitch()
     {
-        $sessionSet = $this->set->sessionSet();
-        $this->assertNull($sessionSet);
+        $cookieName = 'compare';
+        $cookieValue = $this->set->BRequest->cookie($cookieName);
+        $this->set->BRequest->cookie($cookieName, false); // reset cookie$sessionSet = $this->set->sessionSet();
+        $sessionSet = $this->set->sessionSet(); // no $createAnonymousIfNeeded = true
+        $this->assertFalse($sessionSet);
+        $this->set->BRequest->cookie($cookieName, $cookieValue); // set cookie back
     }
-}
-
-
-class BRequestDouble extends BRequest
-{
-    protected $cookies = []; // cookie jar
-    public function cookie($req, $name, $value = null, $lifespan = null, $path = null, $domain = null, $secure = null, $httpOnly = null)
+    public function testSessionSetForNonRegisteredUserCanBeCreated()
     {
-
-        // override cookie
-        if (null === $value) {
-            return isset($this->cookies[$name])? $this->cookies[$name]: null;
-        }
-        if (false === $value) {
-            unset($this->cookies[$name]);
-            return $this->cookie($name, '-CLEAR-', -100000);
-        }
-
-        $this->cookies[$name] = $value;//
-        return true;
+        $cookieName = 'compare';
+        $cookieValue = $this->set->BRequest->cookie($cookieName);
+        $this->set->BRequest->cookie($cookieName, false); // reset cookie
+        $sessionSet = $this->set->sessionSet(true);
+        $this->assertInstanceOf('FCom_ProductCompare_Model_Set', $sessionSet);
+        $this->set->BRequest->cookie($cookieName, $cookieValue); // set cookie back
     }
+
 }
+
+
