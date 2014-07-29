@@ -61,8 +61,6 @@ modules:
                     - [ /catalog/quickview, FCom_Catalog_Frontend_Controller.quickview ]
                     - [ "/:product", FCom_Catalog_Frontend_Controller.product ]
                     - [ "/*category/:product", FCom_Catalog_Frontend_Controller.product ]
-                    - [ /catalog/compare, FCom_Catalog_Frontend_Controller.compare ]
-                    - [ /catalog/compare/add, FCom_Catalog_Frontend_Controller.compare_add ]
 
                 observe:
                     - [ "FCom_FrontendCP_Frontend_Controller::action_update:after", "FCom_Catalog_Frontend_ControlPanel::onAfterUpdate" ]
