@@ -1,11 +1,11 @@
 {% set s = THIS.get('pager_view').get('state') %}
 {% set filters = THIS.get('pager_view').get('filters') %}
-{% set if not filters %}
+{% if not filters %}
 {% set filters = {} %}
 {% endif %}
 {% if filters %}
     {% for fkey, fval in filters %}
-        {% if fval is itreable %}
+        {% if fval is iterable %}
             {% for fvalsingle in fval %}
                 <input type="hidden" name="f[{{ fkey }}][{{ fvalsingle }}]" value="{{ fvalsingle }}"/>
             {% endfor %}
