@@ -945,23 +945,24 @@ class BClassRegistry extends BClass
     }
 
     /**
-    * Override a class
-    *
-    * Usage: $this->BClassRegistry->overrideClass('BaseClass', 'MyClass');
-    *
-    * Overridden class should be called one of the following ways:
-    * - BClassRegistry::instance('BaseClass')
-    * - BaseClass:i() -- if it extends BClass or has the shortcut defined
-    *
-    * Remembering the module that overrode the class for debugging
-    *
-    * @todo figure out how to update events on class override
-    *
-    * @param string $class Class to be overridden
-    * @param string|null $newClass New class or clear class override
-    * @param bool $replaceSingleton If there's already singleton of overridden class, replace with new one
-    * @return BClassRegistry
-    */
+     * Override a class
+     *
+     * Usage: $this->BClassRegistry->overrideClass('BaseClass', 'MyClass');
+     *
+     * Overridden class should be called one of the following ways:
+     * - BClassRegistry::instance('BaseClass')
+     * - BaseClass:i() -- if it extends BClass or has the shortcut defined
+     *
+     * Remembering the module that overrode the class for debugging
+     *
+     * @todo figure out how to update events on class override
+     *
+     * @param string $class Class to be overridden
+     * @param string|null $newClass New class or clear class override
+     * @param bool $replaceSingleton If there's already singleton of overridden class, replace with new one
+     * @throws BException
+     * @return BClassRegistry
+     */
     public function overrideClass($class, $newClass, $replaceSingleton = false)
     {
         if (is_string($newClass)) {

@@ -6,6 +6,7 @@ abstract class FCom_Test_DatabaseTestCase extends PHPUnit_Extensions_Database_Te
 {
     // only instantiate pdo once for test clean-up/fixture load
     static private $pdo = null;
+    static protected $oldpdo;
     protected $dbConfig = [
         'dbname' => null,
         'host' => null,
@@ -31,11 +32,18 @@ abstract class FCom_Test_DatabaseTestCase extends PHPUnit_Extensions_Database_Te
                     $this->dbConfig['password']);
 
             }
-
+            self::$oldpdo = BORM::get_db();
+            BORM::set_db(self::$pdo);
             $this->conn = $this->createDefaultDBConnection(self::$pdo, $this->dbConfig['dbname']);
         }
 
         return $this->conn;
+    }
+
+    protected function closeConnection(PHPUnit_Extensions_Database_DB_IDatabaseConnection $connection)
+    {
+        BORM::set_db(self::$oldpdo);
+        parent::closeConnection($connection);
     }
 
     public function getSetUpOperation()
