@@ -21,7 +21,7 @@
         <div class="f-rslides-container">
           <ul class="thumbnails f-rslides f-prod-imgs" id="product-rslides">
 {% for img in images %}
-            <li><img data-id="{{ img.id() }}"  class="f-prod-img img-responsive" src="{{ img.imageUrl() }}" alt=""/></li>
+            <li><img data-id="{{ img.id() }}"  class="f-prod-img img-responsive" src="{{ img.imageUrl(1) }}" alt=""/></li>
 {% endfor %}
           </ul>
         </div>

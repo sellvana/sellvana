@@ -1,3 +1,5 @@
+{% set compare = APP.instance('FCom_ProductCompare_Model_Set').sessionSet().getCompareProductsDetailsJson() %}
+
 <div class="f-widget f-widget-prods-compare">
     <form method="post" action="{{ APP.href('catalog/compare') }}">
       <strong class="f-widget-title">{{ 'Compare up to 5 products'|_ }}</strong>
@@ -32,12 +34,15 @@
 <div class="overlay" id="compare-overlay"><div class="contentWrap"></div></div>
 <script>
 require(['jquery', 'fcom.catalog'], function($) {
+    var compare = {{ compare | raw}};
+    console.log(compare);
     $(function() { // let all checkboxes to load first
         $('.block-compare').data('compare', new FCom.CompareBlock({
-            thumbContainer: '.block-compare',
+            thumbContainer: '.f-widget-prods-compare',
             prodContainerPrefix: '#tr-product-',
-            checkbox: '.compare-checkbox',
-            img: '.product-image'
+            checkbox: '.btn-compare',
+            img: '.f-prod-img',
+            productIds: compare
         }));
 /*
         $("#compare-trigger").overlay({
