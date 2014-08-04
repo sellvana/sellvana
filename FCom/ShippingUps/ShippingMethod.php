@@ -96,7 +96,7 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
     {
         //address
         $user = $this->FCom_Customer_Model_Customer->sessionUser();
-        $shippingAddress = $cart->getAddressByType('shipping');
+        $shippingAddress = $cart->getShippingAddress();
         if ($user && !$shippingAddress) {
             $shippingAddress = $user->defaultShipping();
         }

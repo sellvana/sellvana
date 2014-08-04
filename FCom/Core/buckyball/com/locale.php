@@ -746,7 +746,9 @@ class BLocale extends BClass
     public function getRegionCodeByName($regionName, $countryCode = 'US')
     {
         $regions = $this->getAvailableRegions('name', $countryCode);
-        $regions = array_flip(array_map('strtolower', $regions));
+        if ($regions) {
+            $regions = array_flip(array_map('strtolower', $regions));
+        }
         $regionName = strtolower($regionName);
         return isset($regions[$regionName]) ? $regions[$regionName] : null;
     }

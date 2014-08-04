@@ -51,13 +51,13 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             return;
         }
 
-        $shipAddress = $cart->getAddressByType('shipping');
-        $billAddress = $cart->getAddressByType('billing');
+        $shipAddress = $cart->getShippingAddress();
+        $billAddress = $cart->getBillingAddress();
 
         if (!$shipAddress && $customer) {
             $cart->importAddressesFromCustomer($customer);
-            $shipAddress = $cart->getAddressByType('shipping');
-            $billAddress = $cart->getAddressByType('billing');
+            $shipAddress = $cart->getShippingAddress();
+            $billAddress = $cart->getBillingAddress();
         }
 
         if (empty($shipAddress) && !$cart->same_address) {
@@ -143,7 +143,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         if (!empty($post['create_account']) && $post['account']) {
             $r = $post['account'];
-            //$billAddress = $cart->getAddressByType('billing');
+            //$billAddress = $cart->getBillingAddress();
             //$r['email'] = $billAddress->email;
             try {
                 $modelCustomer = $this->FCom_Customer_Model_Customer;
@@ -151,13 +151,13 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
                 if ($modelCustomer->validate($r, [], 'checkout-register')) {
                     $customer = $this->FCom_Customer_Model_Customer->register($r);
                     $customer->login(); // make sure customer is logged in
-                    $billAddress = $cart->getAddressByType('billing');
+                    $billAddress = $cart->getBillingAddress();
                     $custBillAddress = $billAddress->exportToCustomer($customer);
                     $customer->default_billing_id = $custBillAddress->id();
                     if ($cart->same_address) {
                         $customer->default_shipping_id = $custBillAddress->id();
                     } else {
-                        $shipAddress = $cart->getAddressByType('shipping');
+                        $shipAddress = $cart->getShippingAddress();
                         $custShipAddress = $shipAddress->exportToCustomer($customer);
                         $customer->default_shipping_id = $custShipAddress->id();
                     }
