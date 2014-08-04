@@ -53,21 +53,21 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'width' => 50, 'index' => 's.id'],
             ['type' => 'input', 'name' => 'sku', 'label' => 'SKU', 'width' => 300, 'index' => $this->_mainTableAlias.'.sku',
-                    //'editable' => true, 'addable' => true, 'editor' => 'text',
-                    //'validation' => ['required' => true, 'unique' => $this->BApp->href('stock/unique')]
+                    'editable' => true, 'addable' => true, 'editor' => 'text',
+                    'validation' => ['required' => true, 'unique' => $this->BApp->href('stock/unique')]
             ],
             ['name' => 'product_name', 'label' => 'Product Name', 'width' => 300],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'width' => 150,
-                'index' => $this->_mainTableAlias.'.status', 'editable' => true, 'edit_inline' => true,
+                'index' => $this->_mainTableAlias.'.status', 'editable' => true, 'addable' => true, 'edit_inline' => true,
                 'mass-editable-show' => true, 'mass-editable' => true,
                 'editor' => 'select', 'options' => $this->FCom_Stock_Model_Sku->statusOptions() ],
             ['type' => 'input', 'name' => 'out_stock', 'label' => 'Out of Stock Policy', 'width' => 150,
                 'mass-editable-show' => true, 'mass-editable' => true,
-                'editable' => true, 'edit_inline' => true, 'editor' => 'select', 'options' => $this->FCom_Stock_Model_Sku->outStockOptions()],
+                'editable' => true, 'addable' => true, 'edit_inline' => true, 'editor' => 'select', 'options' => $this->FCom_Stock_Model_Sku->outStockOptions()],
             ['type' => 'input', 'name' => 'cost', 'label' => 'Cost', 'width' => 300,
-                'editable' => true, 'edit_inline' => true,'editor' => 'text', 'validation' => ['number' => true]],
+                'editable' => true, 'addable' => true, 'edit_inline' => true,'editor' => 'text', 'validation' => ['number' => true]],
             ['type' => 'input', 'name' => 'stock_qty', 'label' => 'Quantity', 'width' => 150,
-                'editable' => true, 'edit_inline' => true,
+                'editable' => true, 'addable' => true, 'edit_inline' => true,
                 'editor' => 'text', 'validation' => ['required' => true, 'number' => true]],
             ['type' => 'btn_group',
                   'buttons' => [
@@ -114,6 +114,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
             ['field' => 'stock_qty', 'type' => 'number-range'],
         ];
         $config['grid_before_create'] = 'stockGridRegister';
+        $config['new_button'] = '#add_new_sku';
         return $config;
     }
 
