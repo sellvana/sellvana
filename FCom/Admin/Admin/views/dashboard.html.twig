@@ -310,6 +310,12 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
         $('button.active-button').removeClass('active-button');
     }
   });
+  custom.click(function(e){
+    var x = e.pageX - e.target.offsetLeft;
+    if( x >= 888 && x <= 900){
+        closeFilter.trigger( "click" );
+    }
+  });
   closeFilter.click(function (){
       resetFilterDate();
       filterDate({type: 'default', date: 'all', range: 'range', is_btn_filter: 1});
