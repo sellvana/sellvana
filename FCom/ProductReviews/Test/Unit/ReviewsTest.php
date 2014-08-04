@@ -35,6 +35,15 @@ class FCom_ProductReviews_Test_Unit_ReviewsTest extends FCom_Test_DatabaseTestCa
         $this->assertEquals($helpfulVoices + 1, $review->helpful_voices, "Update helpful mark failed");
     }
 
+    public function testChangeApproved()
+    {
+        $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_product_review'), "Pre-Condition");
+        $mReview = FCom_ProductReviews_Model_Review::i(true);
+        $review = $mReview->load(2);
+        $review->set('approved', 1)->save();
+        $this->assertEquals(1, $review->approved, "Update failed");
+    }
+
     public function testRemoveEntry()
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_product_review'), "Pre-Condition");

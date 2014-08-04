@@ -20,5 +20,5 @@
             </ul>
         {% endfor %}
     {% endif %}
-    <a href="{{ APP.href('indextank/search') ~ '?q=' ~ urlencode(REQUEST.get('q') }}">{{ "Clear filters" | _ }}</a>
+    <a href="{{ APP.href('indextank/search') ~ '?q=' ~ (REQUEST.get('q')) }}">{{ "Clear filters" | _ }}</a>
 </div>
