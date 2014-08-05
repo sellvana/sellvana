@@ -62,7 +62,7 @@ class FCom_Customer_Tests_Model_CustomerTest extends FCom_Test_DatabaseTestCase
     public function testDefaultBillingAddress()
     {
         $customer = $this->FCom_Customer_Model_Customer->load(2);
-        $shippingAddress = $customer->defaultBilling();
+        $shippingAddress = $customer->getDefaultBillingAddress();
         $this->assertEquals($shippingAddress->firstname, $customer->firstname, "Billing address not found");
     }
 

@@ -19,7 +19,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
     public function action_index()
     {
         $customer = $this->FCom_Customer_Model_Customer->sessionUser();
-        $addresses = $customer->addresses();
+        $addresses = $customer->getAddresses();
 
         $crumbs[] = ['label' => 'Account', 'href' => $this->BApp->href('customer/myaccount')];
         $crumbs[] = ['label' => 'View Addresses', 'active' => true];
@@ -162,7 +162,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
                 $customer->default_billing_id = $address->id();
                 $customer->default_billing    = $address;
                 $cart->setAddressByType('billing', $address);
-                //$this->FCom_Sales_Model_Cart_Address->newBilling($cart->id(), $customer->defaultBilling(), $customer->email);
+                //$this->FCom_Sales_Model_Cart_Address->newBilling($cart->id(), $customer->getDefaultBillingAddress(), $customer->email);
             }
             $customer->save();
 
@@ -170,7 +170,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         }
 
         $customer = $this->FCom_Customer_Model_Customer->sessionUser();
-        $addresses = $customer->addresses();
+        $addresses = $customer->getAddresses();
         if ('s' == $type) {
             $label = "Choose shipping address";
         } else {

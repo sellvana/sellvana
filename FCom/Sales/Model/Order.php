@@ -66,7 +66,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
      */
     public function billing()
     {
-        return $this->getAddressByType('billing');
+        return $this->getBillingAddress();
     }
 
     /**
@@ -74,7 +74,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
      */
     public function shipping()
     {
-        return $this->getAddressByType('shipping');
+        return $this->getShippingAddress();
     }
 
     public function addNew($data)
@@ -328,31 +328,13 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     public function createOrderAddress($cart, $options)
     {
         $orderId = isset($options['order_id']) ? $options['order_id'] : $cart->id(); // ???
-        $shippingAddress = $cart->getAddressByType('shipping');
+        $shippingAddress = $cart->getShippingAddress();
         if ($shippingAddress) {
             $this->FCom_Sales_Model_Order_Address->newAddress($orderId, $shippingAddress);
         }
-        $billingAddress = $cart->getAddressByType('billing');
+        $billingAddress = $cart->getBillingAddress();
         if ($billingAddress) {
             $this->FCom_Sales_Model_Order_Address->newAddress($orderId, $billingAddress);
-        }
-    }
-
-    public function getAddressByType($type)
-    {
-        $addresses = $this->getAddresses();
-
-        switch ($type) {
-            case 'billing':
-                return !empty($addresses['billing']) ? $addresses['billing'] : null;
-
-            case 'shipping':
-                if ($this->same_address) {
-                    return $this->getAddressByType('billing');
-                }
-                return !empty($addresses['shipping']) ? $addresses['shipping'] : null;
-            default:
-                throw new BException('Invalid order address type: ' . $type);
         }
     }
 
@@ -360,10 +342,25 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         if (!$this->addresses) {
             $this->addresses = $this->FCom_Sales_Model_Order_Address->orm()
-                               ->where("order_id", $this->id)
+                               ->where("order_id", $this->id())
                                ->find_many_assoc('atype');
         }
         return $this->addresses;
+    }
+
+    public function getBillingAddress()
+    {
+        $addresses = $this->getAddresses();
+        return !empty($addresses['billing']) ? $addresses['billing'] : null;
+    }
+
+    public function getShippingAddress()
+    {
+        $addresses = $this->getAddresses();
+        if ($this->same_address) {
+            return $this->getBillingAddress();
+        }
+        return !empty($addresses['shipping']) ? $addresses['shipping'] : null;
     }
 
     /**

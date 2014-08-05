@@ -50,7 +50,7 @@ catalog_product_form_tabs:
             - [ addTab, content, { label: Page Content, pos: 20 } ]
             - [ addTab, images, { label: Images, pos: 30 } ]
             - [ addTab, products, { label: Products, pos: 40  } ]
-            - [ addTab, advanced, { label: Advanced, pos: 50 } ]
+            #- [ addTab, advanced, { label: Advanced, pos: 50 } ]
 
 /settings:
     - view: settings

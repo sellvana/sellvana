@@ -30,7 +30,7 @@ class FCom_Customer_Tests_Model_AddressTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals($cust->id(), $address->customer_id, "Address association to customer failed");
     }
 
-    public function testAddressSetAsDefaultBilling()
+    public function testAddressSetAsgetDefaultBillingAddress()
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_customer_address'), "Pre-Condition");
 
@@ -40,7 +40,7 @@ class FCom_Customer_Tests_Model_AddressTest extends FCom_Test_DatabaseTestCase
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_customer_address'), "Insert failed");
 
-        $defaultBilling = $cust->defaultBilling();
+        $defaultBilling = $cust->getDefaultBillingAddress();
         $this->assertEquals($address->id(), $defaultBilling->id(), "Billing address association with customer failed");
     }
 
