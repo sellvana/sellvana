@@ -61,14 +61,25 @@ class FCom_Seo_Admin_Controller_UrlAliases extends FCom_Admin_Controller_Abstrac
         $gridView->set('actions', $actions);
     }
 
+    /**
+     * ajax check code is unique
+     */
     public function action_unique__POST()
     {
-        $post = $this->BRequest->post();
-        $data = each($post);
-        $rows = $this->BDb->many_as_array($this->FCom_Seo_Model_UrlAlias->orm()->where($data['key'], $data['value'])
-                ->find_many());
-        $this->BResponse->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
+        try {
+            $post = $this->BRequest->post();
+            $data = each($post);
+            if (!isset($data['key']) || !isset($data['value'])) {
+                throw new BException('Invalid post data');
+            }
+            $key = $this->BDb->sanitizeFieldName($data['key']);
+            $value = $data['value'];
+            $exists = $this->FCom_Seo_Model_UrlAlias->load($value, $key);
+            $result = ['unique' => !$exists, 'id' => !$exists ? -1 : $exists->id()];
+        } catch (Exception $e) {
+            $result = ['error' => $e->getMessage()];
+        }
+        $this->BResponse->json($result);
     }
-
 
 }

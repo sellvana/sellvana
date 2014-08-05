@@ -166,12 +166,25 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
                 . $this->BLocale->_('New Sku') . '</button>']]);
     }
 
+    /**
+     * ajax check code is unique
+     */
     public function action_unique__POST()
     {
-        $post = $this->BRequest->post();
-        $data = each($post);
-        $rows = $this->BDb->many_as_array($this->FCom_Stock_Model_Sku->orm()->where($data['key'], $data['value'])->find_many());
-        $this->BResponse->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
+        try {
+            $post = $this->BRequest->post();
+            $data = each($post);
+            if (!isset($data['key']) || !isset($data['value'])) {
+                throw new BException('Invalid post data');
+            }
+            $key = $this->BDb->sanitizeFieldName($data['key']);
+            $value = $data['value'];
+            $exists = $this->FCom_Stock_Model_Sku->load($value, $key);
+            $result = ['unique' => !$exists, 'id' => !$exists ? -1 : $exists->id()];
+        } catch (Exception $e) {
+            $result = ['error' => $e->getMessage()];
+        }
+        $this->BResponse->json($result);
     }
 
     public function action_grid_data__POST()
@@ -210,21 +223,23 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
                 $args['ids'] = explode(',', $id);
                 $data = $p;
                 $hlp = $this->FCom_Stock_Model_Sku;
-                foreach ($args['ids'] as $id) {
-                        $stock = $hlp->load($id);
-                        $stock->set('status', $data['status'])->save();
-                        $prod = $this->FCom_Catalog_Model_Product->load($stock->get('sku'), 'local_sku');
-                        if ($prod) {
-                            $data_serialized = $this->BUtil->objectToArray(json_decode($prod->get('data_serialized')));
-                            if (!isset($data_serialized['stock_policy']))  {
-                                $data_serialized['stock_policy'] = ['out_stock' => $p['out_stock'], 'manage_stock' => $p['status']];
-                            } else {
-                                $data_serialized['stock_policy']['out_stock'] = $p['out_stock'];
-                                $data_serialized['stock_policy']['manage_stock'] = $p['status'];
-                            }
-                            $prod->setData('stock_policy', $data_serialized['stock_policy']);
-                            $prod->save();
+                $models = $hlp->orm()->where_in('id', $args['ids'])->find_many_assoc();
+                $skus = $this->BUtil->arrayToOptions($models, 'sku');
+                $products = $this->FCom_Catalog_Model_Product->orm()->where_in('local_sku', $skus)->find_many_assoc('local_sku');
+                foreach ($models as $stock) {
+                    $stock->set('status', $data['status'])->save();
+                    if (!empty($products[$stock->get('sku')])) {
+                        $prod = $products[$stock->get('sku')];
+                        $data_serialized = $this->BUtil->objectToArray(json_decode($prod->get('data_serialized')));
+                        if (!isset($data_serialized['stock_policy']))  {
+                            $data_serialized['stock_policy'] = ['out_stock' => $p['out_stock'], 'manage_stock' => $p['status']];
+                        } else {
+                            $data_serialized['stock_policy']['out_stock'] = $p['out_stock'];
+                            $data_serialized['stock_policy']['manage_stock'] = $p['status'];
                         }
+                        $prod->setData('stock_policy', $data_serialized['stock_policy']);
+                        $prod->save();
+                    }
                 }
                 $this->BResponse->json(['success' => true]);
                 break;
