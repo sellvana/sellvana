@@ -85,15 +85,31 @@ class FCom_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
         $details = [];
         $productIds = $this->getCompareIds();
         foreach ($productIds as $id) {
-            /** @var FCom_Catalog_Model_Product $product */
-            $product = $this->FCom_Catalog_Model_Product->load($id);
-            if ($product) {
-                $details[] = [
-                    'id' => $id,
-                    'src' => $product->imageUrl(),
-                    'alt' => $product->get('product_name'),
-                ];
+            $pDetails = $this->getProductDetails($id);
+            if (!empty($pDetails)) {
+                $details[] = $pDetails;
             }
+
+        }
+        return $details;
+    }
+
+    /**
+     * @param $id
+     * @return array
+     * @throws BException
+     */
+    public function getProductDetails($id)
+    {
+        $details = [];
+        /** @var FCom_Catalog_Model_Product $product */
+        $product = $this->FCom_Catalog_Model_Product->load($id);
+        if ($product) {
+            $details = [
+                'id' => $id,
+                'src' => $product->imageUrl(),
+                'alt' => $product->get('product_name'),
+            ];
         }
         return $details;
     }
@@ -103,4 +119,54 @@ class FCom_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
         $details = $this->getCompareProductsDetails();
         return $this->BUtil->toJson($details);
     }
+
+    /**
+     * @param $id
+     * @return FCom_ProductCompare_Model_SetItem
+     * @throws BException
+     */
+    public function addItem($id)
+    {
+        $data = [
+            'set_id' => $this->id(),
+            'product_id' => $id
+        ];
+        $item = $this->findSetItem($id);
+
+        if (!$item) {
+            $item = $this->FCom_ProductCompare_Model_SetItem->create($data);
+            $item->set('create_at', BDb::now())->save();
+        }
+        return $item;
+    }
+
+    /**
+     * @param $id
+     * @return bool
+     */
+    public function rmItem($id)
+    {
+        $item = $this->findSetItem($id);
+        if($item){
+            $item->delete();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param $id
+     * @return FCom_ProductCompare_Model_SetItem|false
+     */
+    protected function findSetItem($id)
+    {
+        $data = [
+            'set_id' => $this->id(),
+            'product_id' => $id
+        ];
+
+        $item = $this->FCom_ProductCompare_Model_SetItem->orm()->where($data)->find_one();
+        return $item;
+    }
+
 }

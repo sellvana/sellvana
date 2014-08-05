@@ -71,8 +71,7 @@
                   <span class="glyphicon glyphicon-shopping-cart"></span>{{ "Add to Cart"| _ }}</button>
                 <a class="btn btn-link" href="{{ APP.href('wishlist/add?id=') ~ prod.id() }}"
                    rel="nofollow">{{ "Add to Wishlist"|_ }}</a>
-                <a class="btn btn-link btn-compare" href="{{ APP.href('catalog/compare/add?id=') ~ prod.id() }}"
-                   rel="nofollow"><span class="glyphicon glyphicon-unchecked"></span>{{ "Add to Compare"|_ }}</a>
+                {{ THIS.view('catalog/compare-link').set('product_id', p.id()) | raw }}
             </div>
           </div> <!-- /.f-prod-select -->
         </form>
