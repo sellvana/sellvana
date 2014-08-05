@@ -25,12 +25,7 @@ class FCom_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controller_Ab
             ['type' => 'input', 'name' => 'sub_newsletter', 'label' => 'Subscribe newsletter', 'index' => 'e.sub_newsletter', 'addable' => true,
                   'editable' => true, 'mass-editable' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
             ['name' => 'create_at', 'label' => 'Created', 'index' => 'e.create_at'],
-            ['type' => 'btn_group',
-                  'buttons' => [
-                                        ['name' => 'edit'],
-                                        ['name' => 'delete']
-                                    ]
-                ]
+            ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
         ];
         $config['actions'] = [
 //            'new' => array('caption' => 'New Email Subscription', 'modal' => true),
@@ -49,14 +44,27 @@ class FCom_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controller_Ab
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);
-        $this->view('admin/grid')->set(['actions' => ['new' => '<button type="button" id="add_new_email_subscription" class="btn grid-new btn-primary _modal">' . $this->BLocale->_('New Email Subscription') . '</button>']]);
+        $this->view('admin/grid')->set(['actions' => [
+            'new' => '<button type="button" id="add_new_email_subscription" class="btn grid-new btn-primary _modal">'
+                . $this->BLocale->_('New Email Subscription') . '</button>'
+        ]]);
     }
 
     public function action_unique__POST()
     {
-        $post = $this->BRequest->post();
-        $data = each($post);
-        $rows = $this->BDb->many_as_array($this->FCom_Email_Model_Pref->orm()->where($data['key'], $data['value'])->find_many());
-        $this->BResponse->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
+        try {
+            $post = $this->BRequest->post();
+            $data = each($post);
+            if (!isset($data['value']) || !isset($data['key'])) {
+                throw new BException('Invalid post data');
+            }
+            $key = $this->BDb->sanitizeFieldName($data['key']);
+            $value = $data['value'];
+            $exists = $this->FCom_Email_Model_Pref->load($value, $key);
+            $result = ['unique' => !$exists, 'id' => !$exists ? -1 : $exists->id()];
+        } catch (Exception $e) {
+            $result = ['error' => $e->getMessage()];
+        }
+        $this->BResponse->json($result);
     }
 }

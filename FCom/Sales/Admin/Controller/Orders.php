@@ -172,7 +172,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             $order = $args['model'];
             $addrPost = $this->BRequest->post('address');
             if (($newData = $this->BUtil->fromJson($addrPost['data_json']))) {
-                $oldModels = $this->FCom_Sales_Model_Order_Address->orm('a')->where('order_id', $order->id)
+                $oldModels = $this->FCom_Sales_Model_Order_Address->orm('a')->where('order_id', $order->id())
                     ->find_many_assoc();
                 foreach ($newData as $data) {
                     if (empty($data['id'])) {
@@ -188,13 +188,13 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                 }
             }
             if (($del = $this->BUtil->fromJson($addrPost['del_json']))) {
-                $this->FCom_Sales_Model_Order_Address->delete_many(['id' => $del, 'order_id' => $order->id]);
+                $this->FCom_Sales_Model_Order_Address->delete_many(['id' => $del, 'order_id' => $order->id()]);
             }
 
             $modelPost = $this->BRequest->post('model');
             $items = $modelPost['items'];
             if ($items) {
-                $oldItems = $this->FCom_Sales_Model_Order_Item->orm('i')->where('order_id', $order->id)
+                $oldItems = $this->FCom_Sales_Model_Order_Item->orm('i')->where('order_id', $order->id())
                     ->find_many_assoc();
                 foreach ($items as $id => $itemData) {
                     if (empty($id)) {
@@ -265,7 +265,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
     public function customerOrdersGridConfig($customer)
     {
         $config = parent::gridConfig();
-        $config['id'] = 'customer_grid_orders_' . $customer->id;
+        $config['id'] = 'customer_grid_orders_' . $customer->id();
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'index' => 'o.id', 'label' => 'Order id', 'width' => 70],
@@ -290,7 +290,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['field' => 'grandtotal', 'type' => 'number-range'],
             ['field' => 'status', 'type' => 'multiselect'],
         ];
-        $config['orm'] = $config['orm']->where('customer_id', $customer->id);
+        $config['orm'] = $config['orm']->where('customer_id', $customer->id());
         $this->gridOrmConfig($config['orm']);
 
         return ['config' => $config];

@@ -75,7 +75,7 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
 
     public function action_history_grid_data()
     {
-        $id = $this->BRequest->params('id', true);
+        $id = $this->BRequest->param('id', true);
         if (!$id) {
             $data = [];
         } else {

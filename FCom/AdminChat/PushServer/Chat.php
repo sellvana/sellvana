@@ -84,7 +84,7 @@ class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
         $userId = $this->FCom_Admin_Model_User->sessionUserId();
         $hlp = $this->FCom_AdminChat_Model_Participant;
         $data = ['chat_id' => $chat->id(), 'user_id' => $userId];
-        $participant = $hlp->load($data);
+        $participant = $hlp->loadWhere($data);
         $participant->set('status', $this->_message['status'])->save();
     }
 

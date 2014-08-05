@@ -114,34 +114,6 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
         $args['view']->set(['title' => $title]);
     }
 
-    public function formPostAfter($args)
-    {
-        parent::formPostAfter($args);
-        if ($args['do'] !== 'DELETE') {
-            $customerGroup = $args['model'];
-            $addrPost = $this->BRequest->post('address');
-            if (($newData = $this->BUtil->fromJson($addrPost['data_json']))) {
-                $oldModels = $this->FCom_CustomerGroups_Model_Group->orm('a')->where('customer_id', $customerGroup->id)
-                    ->find_many_assoc();
-                foreach ($newData as $id => $data) {
-                    if (empty($data['id'])) {
-                        continue;
-                    }
-                    if (!empty($oldModels[$data['id']])) {
-                        $addr = $oldModels[$data['id']];
-                        $addr->set($data)->save();
-                    } elseif ($data['id'] < 0) {
-                        unset($data['id']);
-                        $addr = $this->FCom_Customer_Model_Address->newBilling($data, $cust);
-                    }
-                }
-            }
-            if (($del = $this->BUtil->fromJson($addrPost['del_json']))) {
-                $this->FCom_Customer_Model_Address->delete_many(['id' => $del, 'customer_id' => $customerGroup->id]);
-            }
-        }
-    }
-
     public function action_unique__POST()
     {
         $post = $this->BRequest->post();
