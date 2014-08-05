@@ -203,4 +203,21 @@ class FCom_Customer_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_1_11__0_1_12()
+    {
+        $tCustomer = $this->FCom_Customer_Model_Customer->table();
+        $tAddress = $this->FCom_Customer_Model_Address->table();
+        $this->BDb->ddlTableDef($tAddress, [
+            'COLUMNS' => [
+                'is_default_billing' => 'tinyint not null default 0',
+                'is_default_shipping' => 'tinyint not null default 0',
+            ],
+        ]);
+        $this->BDb->run("UPDATE {$tAddress} a, {$tCustomer} c
+            SET a.is_default_billing=IF(c.default_billing_id=a.id,1,0),
+                a.is_default_shipping=IF(c.default_shipping_id=a.id,1,0)
+            WHERE a.customer_id=c.id
+        ");
+    }
 }

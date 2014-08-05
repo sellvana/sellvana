@@ -94,7 +94,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             $atype = 'b';
         }
 
-        if ('b' == $atype || !empty($r['address_equal'])) {
+        if ('b' == $atype || !empty($r['same_address'])) {
             $addressType = 'billing';
             $addressType2 = 'shipping';
         } else {
@@ -109,7 +109,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             return;
         }
         /* @var FCom_Sales_Model_Cart_Address $address */
-        $address = $cart->getAddressByType($addressType);
+        $address = $addressType === 'billing' ? $cart->getBillingAddress() : $cart->getShippingAddress();
         if (!$address) {
             $address = $this->FCom_Sales_Model_Cart_Address->create();
         }
@@ -128,10 +128,10 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         if (!$cart->customer_email) {
             $cart->set('customer_email', $address->email);
         }
-        $cart->set('same_address', $r['address_equal'] ? 1 : 0);
+        $cart->set('same_address', !empty($r['same_address']));
         $cart->save();
         /*
-        if ($r['address_equal']) {
+        if ($r['same_address']) {
             //copy shipping address to billing address
             $addressCopy = $cart->getAddressByType($addressType2);
             if (!$addressCopy) {
@@ -156,7 +156,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             }
 
             if ('billing' == $addressType) {
-                if ($user && !$user->defaultBilling()) {
+                if ($user && !$user->getDefaultBillingAddress()) {
                     $newAddress = $address->as_array();
                     unset($newAddress['id']);
                     $this->FCom_Customer_Model_Address->newBilling($newAddress, $user);

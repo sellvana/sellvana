@@ -6,7 +6,7 @@
 
     function CustomerAddressesCtrl($scope)
     {
-        $scope.addresses = {{ UTIL.toJson(APP.instance('BDb').many_as_array(m.addresses()))|raw }};
+        $scope.addresses = {{ UTIL.toJson(APP.instance('BDb').many_as_array(m.getAddresses()))|raw }};
         $scope.countries = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Country').options())|raw }};
         $scope.regions = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Region').allOptions())|raw }};
 

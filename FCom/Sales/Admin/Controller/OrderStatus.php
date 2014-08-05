@@ -47,9 +47,19 @@ class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abst
      */
     public function action_unique__POST()
     {
-        $post = $this->BRequest->post();
-        $data = each($post);
-        $rows = $this->BDb->many_as_array($this->FCom_Sales_Model_Order_Status->orm()->where($data['key'], $data['value'])->find_many());
-        $this->BResponse->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
+        try {
+            $post = $this->BRequest->post();
+            $data = each($post);
+            if (!isset($data['key']) || !isset($data['value'])) {
+                throw new BException('Invalid post data');
+            }
+            $key = $this->BDb->sanitizeFieldName($data['key']);
+            $value = $data['value'];
+            $exists = $this->FCom_Sales_Model_Order_Status->load($value, $key);
+            $result = ['unique' => !$exists, 'id' => !$exists ? -1 : $exists->id()];
+        } catch (Exception $e) {
+            $result = ['error' => $e->getMessage()];
+        }
+        $this->BResponse->json($result);
     }
 }

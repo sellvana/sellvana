@@ -190,6 +190,16 @@ class BDb
         return gmstrftime('%Y-%m-%d %H:%M:%S');
     }
 
+    public static function sanitizeFieldName($f)
+    {
+        return preg_replace("#[^a-z0-9._`]#", '', $f);
+    }
+
+    public static function splitQueries($sql)
+    {
+        return preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $sql);
+    }
+
     /**
     * Shortcut to run multiple queries from migrate scripts
     *
@@ -205,7 +215,7 @@ class BDb
     public static function run($sql, $params = null, $options = [])
     {
         BDb::connect();
-        $queries = preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $sql);
+        $queries = static::splitQueries($sql);
         $results = [];
         foreach ($queries as $i => $query) {
            if (strlen(trim($query)) > 0) {
@@ -349,6 +359,7 @@ class BDb
         if (!is_array($conds)) {
             throw new BException("Invalid where parameter");
         }
+
         $where = [];
         $params = [];
         foreach ($conds as $f => $v) {
@@ -387,17 +398,25 @@ class BDb
                 $where[] = 'NOT (' . $w . ')';
                 $params = array_merge($params, $p);
             } elseif (is_array($v)) {
+                $f = static::sanitizeFieldName($f);
                 $where[] = "({$f} IN (" . str_pad('', sizeof($v) * 2-1, '?,') . "))";
                 $params = array_merge($params, $v);
             } elseif (null === $v) {
+                $f = static::sanitizeFieldName($f);
                 $where[] = "({$f} IS NULL)";
             } else {
+                $f = static::sanitizeFieldName($f);
                 $where[] = "({$f}=?)";
                 $params[] = $v;
             }
         }
+        $where = join($or ? " OR " : " AND ", $where);
+        // Additional protection against multiple queries separator
+        if (sizeof(static::splitQueries($where)) > 1) {
+            throw new BException('Invalid SQL query');
+        }
 #print_r($where); print_r($params);
-        return [join($or ? " OR " : " AND ", $where), $params];
+        return [$where, $params];
     }
 
     /**
@@ -1198,7 +1217,7 @@ class BORM extends ORMWrapper
      */
     public function where($column_name, $value = null)
     {
-        if (is_array($column_name)) {
+        if (is_array($column_name) && null === $value) {
             return $this->where_complex($column_name, !!$value);
         }
         return parent::where($column_name, $value);
@@ -2685,12 +2704,28 @@ class BModel extends Model
             $update[] = "`{$k}`=?";
             $params[] = $v;
         }
+
+        BEvents::i()->fire(static::origClass() . '::update_many:before', [
+            'data' => &$data,
+            'where' => &$where,
+            'params' => &$p
+        ]);
+
         if (is_array($where)) {
             list($where, $p) = BDb::where($where);
         }
         $sql = "UPDATE " . static::table() . " SET " . join(', ', $update) . ($where ? " WHERE {$where}" : '');
         BDebug::debug('SQL: ' . $sql);
-        return static::run_sql($sql, array_merge($params, $p));
+        $result = static::run_sql($sql, array_merge($params, $p));
+
+        BEvents::i()->fire(static::origClass() . '::update_many:after', [
+            'data' => $data,
+            'where' => $where,
+            'params' => $p,
+            'result' => &$result,
+        ]);
+
+        return $result;
     }
 
     /**
@@ -2706,6 +2741,12 @@ class BModel extends Model
         if (null === $idField) {
             $idField = static::_get_id_column_name(get_called_class());
         }
+
+        BEvents::i()->fire(static::origClass() . '::update_many_by_id:before', [
+            'data' => &$data,
+            'id_field' => &$idField,
+        ]);
+
         $fields = [];
         foreach ($data as $id => $fields) {
             foreach ($fields as $f => $v) {
@@ -2731,7 +2772,15 @@ class BModel extends Model
         $sql = "UPDATE " . static::table() . " SET " . join(', ', $updates) . ' WHERE '
             . $idField . ' IN (' . join(', ', array_fill(0, sizeof($data), '?')) . ')';
         BDebug::debug('SQL: ' . $sql);
-        return static::run_sql($sql, $params);
+        $result = static::run_sql($sql, $params);
+
+        BEvents::i()->fire(static::origClass() . '::update_many_by_id:after', [
+            'data' => $data,
+            'id_field' => $idField,
+            'result' => &$result,
+        ]);
+
+        return $result;
     }
 
     /**
@@ -2743,12 +2792,25 @@ class BModel extends Model
     */
     public static function delete_many($where, $params = [])
     {
+        BEvents::i()->fire(static::origClass() . '::delete_many:before', [
+            'where' => &$where,
+            'params' => &$params,
+        ]);
+
         if (is_array($where)) {
             list($where, $params) = BDb::where($where);
         }
         $sql = "DELETE FROM " . static::table() . " WHERE {$where}";
         BDebug::debug('SQL: ' . $sql);
-        return static::run_sql($sql, $params);
+        $result = static::run_sql($sql, $params);
+
+        BEvents::i()->fire(static::origClass() . '::delete_many:after', [
+            'where' => $where,
+            'params' => $params,
+            'result' => &$result,
+        ]);
+
+        return $result;
     }
 
     /**

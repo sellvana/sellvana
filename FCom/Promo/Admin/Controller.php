@@ -88,7 +88,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         parent::formPostBefore($args);
         if (!empty($args['data']['save_as'])) {
             switch ($args['data']['save_as']) {
-                case 'copy': $args['model'] = $args['model']->createClone(); $id = $args['model']->id; break;
+                case 'copy': $args['model'] = $args['model']->createClone(); $id = $args['model']->id(); break;
                 case 'template': $args['data']['model']['status'] = 'template'; break;
             }
         }
@@ -109,7 +109,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     {
         $groups     = $model->groups();
         $groupData  = [];
-        $groupProds = $this->FCom_Promo_Model_Product->orm()->where('promo_id', $model->id)->find_many();
+        $groupProds = $this->FCom_Promo_Model_Product->orm()->where('promo_id', $model->id())->find_many();
         foreach ($groupProds as $gp) {
             $groupData[$gp->group_id][$gp->product_id] = 1;
         }
