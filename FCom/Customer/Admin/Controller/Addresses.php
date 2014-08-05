@@ -56,6 +56,10 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
                 'editable' => true, 'hidden' => true],
             ['type' => 'input', 'name' => 'email', 'label' => 'Email', 'index' => 'a.email', 'width' => 100,
                 'addable' => true, 'editable' => true, 'validation' => ['email' => true]],
+            ['type' => 'select', 'name' => 'is_default_billing', 'options' => [0 => 'no', 1 => 'YES'], 'addable' => 1,
+                'editable' => 1],
+            ['type' => 'select', 'name' => 'is_default_shipping', 'options' => [0 => 'no', 1 => 'YES'], 'addable' => 1,
+                'editable' => 1],
             ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115,
                 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
         ];

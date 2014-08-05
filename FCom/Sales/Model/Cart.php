@@ -393,34 +393,31 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $this->data = !empty($this->data_serialized) ? $this->BUtil->fromJson($this->data_serialized) : [];
     }
 
-    public function getAddressByType($atype)
+    public function getAddresses()
     {
         if (!$this->addresses) {
             $this->addresses = $this->FCom_Sales_Model_Cart_Address->orm()
-                ->where("cart_id", $this->id)
+                ->where("cart_id", $this->id())
                 ->find_many_assoc('atype');
         }
-        switch ($atype) {
-            case 'billing':
-                return !empty($this->addresses['billing']) ? $this->addresses['billing'] : null;
+        return $this->addresses;
+    }
 
-            case 'shipping':
-                if (!empty($this->addresses['shipping'])) {
-                    $this->same_address = 0;
-                    return $this->addresses['shipping'];
-                } elseif ($this->same_address) {
-                    return $this->getAddressByType('billing');
-                } else {
-                    return null;
-                }
-            default:
-                throw new BException('Invalid cart address type: ' . $atype);
-        }
+    public function getBillingAddress()
+    {
+        $addresses = $this->getAddresses();
+        return !empty($addresses['billing']) ? $addresses['billing'] : null;
+    }
+
+    public function getShippingAddress()
+    {
+        $addresses = $this->getAddresses();
+        return !empty($addresses['shipping']) ? $addresses['shipping'] : $this->getBillingAddress();
     }
 
     public function setAddressByType($atype, $data)
     {
-        $address = $this->getAddressByType($atype);
+        $address = $atype === 'billing' ? $cart->getBillingAddress() : $cart->getShippingAddress();
         if (!$address) {
             $address = $this->FCom_Sales_Model_Cart_Address->create(['cart_id' => $this->id, 'atype' => $atype]);
         }
@@ -437,11 +434,11 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     {
         $hlp = $this->FCom_Sales_Model_Cart_Address;
 
-        $defBilling = $customer->defaultBilling();
+        $defBilling = $customer->getDefaultBillingAddress();
         if (!$defBilling) {
             return false;
         }
-        $defShipping = $customer->defaultShipping();
+        $defShipping = $customer->getDefaultShippingAddress();
 
         $this->setAddressByType('billing', $defBilling);
 

@@ -236,7 +236,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             }
         }
 
-        switch ($r->params('do')) {
+        switch ($r->param('do')) {
         case 'upload':
             //set_time_limit(0);
             //ob_implicit_flush();

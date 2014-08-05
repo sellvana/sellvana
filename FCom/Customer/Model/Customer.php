@@ -231,8 +231,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         if (!empty($post['shipping_address'])) {
             $data['shipping_address_id'] = $post['shipping_address'];
         }
-        if (!empty($post['billing_address_id'])) {
-            $data['billing_address_id'] = $post['billing_address_id'];
+        if (!empty($post['billing_address'])) {
+            $data['billing_address_id'] = $post['billing_address'];
         }
         return $data;
     }
@@ -435,25 +435,75 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $result;
     }
 
-    public function defaultBilling()
+    public function getDefaultBillingAddress()
     {
-        if ($this->default_billing_id && !$this->default_billing) {
-            $this->default_billing = $this->FCom_Customer_Model_Address->load($this->default_billing_id);
+        $addresses = $this->getAddresses();
+        foreach ($addresses as $addr) {
+            if ($addr->is_default_billing) {
+                return $addr;
+            }
         }
-        return $this->default_billing;
+        return null;
     }
 
-    public function defaultShipping()
+    public function getDefaultShippingAddress()
     {
-        if ($this->default_shipping_id && !$this->default_billing) {
-            $this->default_billing = $this->FCom_Customer_Model_Address->load($this->default_shipping_id);
+        $addresses = $this->getAddresses();
+        foreach ($addresses as $addr) {
+            if ($addr->is_default_shipping) {
+                return $addr;
+            }
         }
-        return $this->default_billing;
+        return null;
     }
 
-    public function addresses()
+    public function getAddresses($reset = false)
     {
-        return $this->FCom_Customer_Model_Address->orm('a')->where('customer_id', $this->id)->find_many();
+        if ($reset || !$this->addresses) {
+            $this->addresses = $this->FCom_Customer_Model_Address->orm('a')->where('customer_id', $this->id)->find_many();
+        }
+        return $this->addresses;
+    }
+
+    public function setDefaultAddress($address, $atype = null)
+    {
+        $addrHlp = $this->FCom_Customer_Model_Address;
+        if (is_object($address)) {
+            $addressId = $address->id();
+        } elseif (is_numeric($address)) {
+            $addressId = $address;
+            $address = $addrHlp->load($addressId);
+        }
+        if ($atype === 'billing' || $atype === true) {
+            $address->set('is_default_billing', 1);
+        }
+        if ($atype === 'shipping' || $atype === true) {
+            $address->set('is_default_shipping', 1);
+        }
+        $resetUpdate = [];
+        if ($address->is_default_billing) {
+            $resetUpdate['is_default_billing'] = 0;
+            $this->set('default_billing_id', $addressId);
+        }
+        if ($address->is_default_shipping) {
+            $resetUpdate['is_default_shipping'] = 0;
+            $this->set('default_shipping_id', $addressId);
+        }
+        if ($resetUpdate) {
+            $addrHlp->update_many($resetUpdate, ['customer_id' => $this->id(), 'NOT' => ['id' => $addressId]]);
+        }
+        $this->save();
+        $address->save();
+
+        return $this;
+    }
+
+    public function addAddress($data)
+    {
+        $data['customer_id'] = $this->id();
+        $address = $this->FCom_Customer_Model_Address->create($data);
+        $this->setDefaultAddress($address);
+        return $address;
     }
 
     public function getPaymentMethod()
