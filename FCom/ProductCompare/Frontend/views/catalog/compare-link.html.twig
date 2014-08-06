@@ -1,0 +1,4 @@
+{% set pId = THIS.get('product_id') %}
+<a href="{{ APP.href('catalog/compare/add?id=') ~ pId }}"
+   id="btn-compare-{{ pId }}" data-id="{{ pId }}" class="btn btn-link btn-sm btn-compare"
+   rel="nofollow"><span class="glyphicon glyphicon-unchecked"></span>{{ 'Add to Compare'|_ }}</a>

@@ -42,7 +42,6 @@ class FCom_ProductCompare_Model_SetTest extends PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('FCom_ProductCompare_Model_Set', $sessionSet);
         $this->set->BRequest->cookie($cookieName, $cookieValue); // set cookie back
     }
-
 }
 
 

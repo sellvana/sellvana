@@ -62,7 +62,7 @@
               <button type="submit" name="id" value="{{ p.id() }}" onclick="return true; FCom.cart.add({{ p.id() }}, 1); return false" class="btn btn-primary btn-sm">{{ 'Add to Cart'|_ }}</button>
               <a href="{{ productUrl }}" class="btn btn-link btn-sm">{{ 'View Details'|_ }}</a>
               {% if THIS.get('add_compare') %}
-                  <a href="{{ APP.href('catalog/compare/add?id=') ~ p.id() }}" class="btn btn-link btn-sm btn-compare" rel="nofollow"><span class="glyphicon glyphicon-unchecked"></span>{{ 'Add to Compare'|_ }}</a>
+                  {{ THIS.view('catalog/compare-link').set('product_id', p.id()) | raw }}
               {% endif %}
             </p>
           </form>

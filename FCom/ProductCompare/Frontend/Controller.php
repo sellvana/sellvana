@@ -64,33 +64,78 @@ class FCom_ProductCompare_Frontend_Controller extends FCom_Frontend_Controller_A
             return;
         }
 
+        /** @var FCom_ProductCompare_Model_Set $set */
+        $set = $this->FCom_ProductCompare_Model_Set->sessionSet(true);
+
+        $set->addItem($id);
+
+        $this->_addIdCookie($id);
+
+
+        $this->BResponse->redirect('/catalog/compare');
+    }
+
+    public function action_addxhr()
+    {
+        $response = [];
+        $id = $this->BRequest->get('id');
+        if (null == $id) {
+            $message = $this->_("Provide product to add.");
+            $response['error'] = $message;
+        } else {
+            /** @var FCom_ProductCompare_Model_Set $set */
+            $set = $this->FCom_ProductCompare_Model_Set->sessionSet(true);
+            $set->addItem($id);
+            $productDetails = $set->getProductDetails($id);
+            if (!empty($productDetails)) {
+                $response['product'] = $productDetails;
+            } else {
+                $response['error'] = $this->_("There was problem adding product to compare");
+            }
+        }
+
+        $this->BResponse->json($response);
+    }
+
+    public function action_rmxhr()
+    {
+        $response = [];
+        $id = $this->BRequest->get('id');
+        if (null == $id) {
+            $message = $this->_("Provide product to remove.");
+            $response['error'] = $message;
+            return;
+        } else {
+            /** @var FCom_ProductCompare_Model_Set $set */
+            $set = $this->FCom_ProductCompare_Model_Set->sessionSet(true);
+            $rm = $set->rmItem($id);
+            if ($rm) {
+                $response['success'] = $this->_("Product removed from compare");
+            } else {
+                $response['error'] = $this->_("There was problem removing product from compare");
+            }
+        }
+
+        $this->BResponse->json($response);
+    }
+
+    /**
+     * @param $id
+     */
+    protected function _addIdCookie($id)
+    {
         $cookie = $this->BRequest->cookie(static::COMPARE_COOKIE_NAME);
         $arr = [];
         if (!empty($cookie)) {
             $arr = $this->BUtil->fromJson($cookie);
         }
 
-        if(!in_array($id, $arr)){
+        if (!in_array($id, $arr)) {
             $arr[] = $id;
             $ttl = $this->BConfig->get('modules/FCom_ProductCompare/cookie_token_ttl_days') * 86400;
-            $this->BRequest->cookie(static::COMPARE_COOKIE_NAME, $this->BUtil->toJson($arr), $ttl); // if we have session set, is there point using this?
+            $this->BRequest->cookie(static::COMPARE_COOKIE_NAME,
+                $this->BUtil->toJson($arr),
+                $ttl); // if we have session set, is there point using this?
         }
-
-        /** @var FCom_ProductCompare_Model_Set $set */
-        $set = $this->FCom_ProductCompare_Model_Set->sessionSet(true);
-
-        $data = [
-            'set_id' => $set->id(),
-            'product_id' => $id
-        ];
-
-        $item = $this->FCom_ProductCompare_Model_SetItem->orm()->where($data)->find_one();
-
-        if(!$item){
-            $item = $this->FCom_ProductCompare_Model_SetItem->create($data);
-            $item->set('create_at', BDb::now())->save();
-        }
-
-        $this->BResponse->redirect('/catalog/compare');
     }
 }
