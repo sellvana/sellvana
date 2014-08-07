@@ -72,7 +72,7 @@
           <button type="submit" class="btn btn-primary btn-lg" id="prod-add-to-cart"><span class="glyphicon glyphicon-shopping-cart"></span>{{ 'Add to Cart'|_ }}</button>
           <ul class="f-add-to-links">
             <li><a href="{{ APP.href('wishlist/add?id=') ~ m.id() }}" rel="nofollow" class="btn-link">{{ 'Add to Wishlist'|_ }}</a></li>
-            <li><a href="{{ APP.href('catalog/compare/add?id=') ~ m.id() }}" rel="nofollow" class="btn-link btn-compare"><span class="glyphicon glyphicon-unchecked"></span>{{ 'Add to Compare'|_ }}</a></li>
+              {{ THIS.view('catalog/compare-link').set('product_id', m.id()) | raw }}
           </ul>
         </div>
       </form>
