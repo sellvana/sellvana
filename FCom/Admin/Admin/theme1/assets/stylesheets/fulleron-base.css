@@ -3672,6 +3672,14 @@ body.error .error-container-footer a {
 .date-range-plugin .choice-close {
     color: #bbb;
     font-size: 13px;
+    position: absolute;
+    z-index: 10;
+    left: 8px;
+    top: 8px;
+    cursor: pointer
+}
+.date-range-plugin .dropdown-toggle {
+    padding-left: 30px;
 }
 .date-range-plugin .filter {
     background: #eaedf6;
