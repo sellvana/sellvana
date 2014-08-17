@@ -4,7 +4,7 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
 {% set fieldData = {validator: validator} %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 <fieldset>
     {{ forms.input(fieldData, {field: 'name'|_, required: 1, label: "Name"}) }}
     {{ forms.textarea(fieldData, {field: 'match_domains'|_, rows: 2, label: "Domains"}) }}

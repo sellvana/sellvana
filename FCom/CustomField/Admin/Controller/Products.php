@@ -197,10 +197,11 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         return $config;
     }
 
-    public function formViewBefore()
+    public function onProductsFormViewBefore()
     {
         $id = $this->BRequest->param('id', true);
-        $p = $this->FCom_Catalog_Model_Product->load($id);
+        $p = $this->view('admin/form')->get('model');
+        #$p = $this->FCom_Catalog_Model_Product->load($id);
 
         if (!$p) {
             return;//$p = $this->FCom_Catalog_Model_Product->create();
@@ -208,9 +209,11 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
         $fields_options = [];
         $fields = $this->FCom_CustomField_Model_ProductField->productFields($p);
-        foreach ($fields as $field) {
-            $fields_options[$field->id()] = $this->FCom_CustomField_Model_FieldOption->orm()
-                ->where("field_id", $field->id())->find_many();
+        $fieldIds = $this->BUtil->arrayToOptions($fields, 'id');
+        $fieldOptionsAll = $this->FCom_CustomField_Model_FieldOption->orm()->where_in("field_id", $fieldIds)
+            ->order_by_asc('field_id')->order_by_asc('label')->find_many();
+        foreach ($fieldOptionsAll as $option) {
+            $fieldsOptions[$option->get('field_id')][] = $option;
         }
         $view = $this->view('customfields/products/fields-partial');
         $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fields_options);

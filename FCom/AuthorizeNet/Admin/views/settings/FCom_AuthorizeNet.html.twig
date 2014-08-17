@@ -1,5 +1,5 @@
 {% set c = THIS.get('model') %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 {% set authNetSettings = APP.instance('FCom_AuthorizeNet_Model_Settings') %}
 {% set paymentActions = authNetSettings.paymentActions() %}
 {% set orderStatuses = authNetSettings.orderStatuses() %}

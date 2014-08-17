@@ -1,6 +1,6 @@
 {% set m = THIS.get('model') %}
 {% set views = APP.instance('FCom_Catalog_Admin').getAvailableViews() %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 {% set fieldData = { model:m } %}
 <div class="form-group">
     <label class="col-md-2 control-label" for="main-show_order">{{ 'Show Order'|_ }}</label>

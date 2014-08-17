@@ -2,7 +2,7 @@
 INITIALIZATION:
 
 {% set fieldData = { model:model, validator:validator, id_prefix:'model', name_prefix:'model', get_prefix:'config/prefix' } %}
-{% include THIS.view('admin/form-elements').twigName() as forms %}
+{% include THIS.view('core/form-elements').twigName() as forms %}
 
 EXAMPLES:
 
@@ -16,14 +16,14 @@ Using custom id/name:
 #}
 
 {% macro label(p1, p2) %}
-    {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
     <label class="control-label {{ p.label_class|default('col-md-2') }} {{ p.required ? 'required' }}"
         for="{{ view.getInputId(p) }}">{{ p.label }}</label>
 {% endmacro %}
 
 {% macro input(p1, p2) %}
-    {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
     {% import _self as forms %}
     <div class="form-group {{ p.form_group_class }}">
@@ -46,7 +46,7 @@ Using custom id/name:
 {% endmacro %}
 
 {% macro select(p1, p2) %}
-    {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
     {% import _self as forms %}
     <div class="form-group {{ p.form_group_class }}">
@@ -76,7 +76,7 @@ Using custom id/name:
 {% endmacro %}
 
 {% macro boolean(p1, p2) %}
-    {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, {options: { 0: 'no'|_, 1: 'YES'|_ }, style:'width:auto' }) %}
     {% set p = view.merge(p, p2) %}
     {% import _self as forms %}
@@ -94,7 +94,7 @@ Using custom id/name:
 #}
 
 {% macro textarea(p1, p2) %}
-    {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
     {% set value = view.getInputValue(p) %}
     {% import _self as forms %}
@@ -116,7 +116,7 @@ Using custom id/name:
 {% endmacro %}
 
 {% macro wysiwyg(p1, p2) %}
-    {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
     {% set value = view.getInputValue(p) %}
     {% import _self as forms %}
@@ -165,7 +165,7 @@ Using custom id/name:
 {% endmacro %}
 
 {% macro button_add_image(m, arr) %}
-    {% set view = LAYOUT.view('admin/form-elements') %}
+    {% set view = LAYOUT.view('core/form-elements') %}
     {% set configId = m.config_id %}
     {% import _self as forms %}
     {% for obj in arr %}

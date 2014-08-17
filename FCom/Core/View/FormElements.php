@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_Admin_View_FormElements extends FCom_Admin_View_Abstract
+class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
 {
     public function merge(array $p1, array $p2 = null)
     {

@@ -1,5 +1,5 @@
 {% set c = THIS.get('model') %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 {% set fieldDataCustomer = { model: c, settings_module:'FCom_Customer' } %}
 {% set fieldDataSales = { model: c, settings_module:'FCom_Sales' } %}
 {% set fieldDataProductReviews = { model: c, settings_module:'FCom_ProductReviews' } %}

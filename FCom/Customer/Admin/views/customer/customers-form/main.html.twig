@@ -6,7 +6,7 @@
     {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptions() %}
 {% endif %}
 {% set validator = THIS.get('validator') %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 
 <div class="col-md-12">
     <fieldset class="f-fieldset-group">

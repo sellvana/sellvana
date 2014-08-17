@@ -1,6 +1,6 @@
 {% set c = THIS.get('model') %}
 {% set locales = LOCALE.getAvailableLocaleCodes() %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 
 <h2>{{ "FrontEnd Settings"|_}}</h2>
 {% set fieldData = { model: c, settings_module:'FCom_Frontend' } %}
