@@ -47,6 +47,22 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         }
     }
 
+    public function action_page__POST()
+    {
+        try {
+            $pageUrl = $this->BRequest->param('page');
+            if (!($pageUrl === '' || is_null($pageUrl))) {
+                $block = $this->FCom_Cms_Model_Block->loadWhere(['page_enabled' => 1, 'page_url' => (string)$pageUrl]);
+            }
+            if (empty($block) || !$block->validateBlock()) {
+                $this->forward(false);
+                return;
+            }
+        } catch (Exception $e) {
+
+        }
+    }
+
     public function action_nav()
     {
         $handle = $this->BRequest->params('nav');

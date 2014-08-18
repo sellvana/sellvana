@@ -1,4 +1,7 @@
-{% set prodCtrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
+<!--{ label: Form Fields }-->
+<!--{ pos: 30 }-->
+
+{% set blockCtrl = APP.instance('FCom_Cms_Admin_Controller_Blocks') %}
 
 <script>
 require(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
@@ -6,7 +9,7 @@ require(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
     var inputName = 'input[data-col="name"]';
     var inputOption = 'input[data-col="options"]';
     var selectFieldType = 'select[data-col="input_type"]';
-    window.frontendFieldGridRegister = function(grid) {
+    window.formFieldGridRegister = function(grid) {
         mainGrid = grid;
         grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
             var self = this;
@@ -25,7 +28,7 @@ require(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
         }
         grid.build();
     }
-    $('#catalog-products-form').submit(function (ev) {
+    $('#cms-blocks-form').submit(function (ev) {
         var rows = mainGrid.getRows().toJSON();
 
         var res = [];
@@ -36,7 +39,7 @@ require(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
             res.push(_.pick(rows[i], 'id', 'name', 'label', 'input_type', 'required', 'options', 'position'));
         }
 
-        $("#prod_frontend_data").val(JSON.stringify(res));
+        $("#block_form_fields_data").val(JSON.stringify(res));
     });
     function checkUnique(value, elem, params) {
         var error = true;
@@ -76,10 +79,12 @@ require(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
 });
 </script>
 
-<input type='hidden' id='prod_frontend_data' name='prod_frontend_data' />
+{{ forms.boolean(fieldData, {field:'form_enabled', label:'Form Enabled'|_}) }}
+
+<input type='hidden' id='block_form_fields_data' name='block_form_fields_data' />
 <div class="row">
     <div class="col-sm-10">
-        {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.frontendFieldGrid(model))| raw }}
+        {{ THIS.view('core/backbonegrid').set('grid', blockCtrl.formFieldGrid(model))| raw }}
     </div>
 </div>
 

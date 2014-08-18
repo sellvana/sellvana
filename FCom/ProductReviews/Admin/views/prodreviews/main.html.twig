@@ -1,7 +1,7 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
 {% set fieldData = { validator: validator } %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 <fieldset name="adm-section-group">
     {{ forms.input(fieldData, {field:'title', label:'Title'|_, required: 1}) }}
     {{ forms.textarea(fieldData, {field:'text', label:'Text'|_, input_class: "ckeditor", input_div_class:"col-md-10"}) }}

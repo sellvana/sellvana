@@ -15,7 +15,7 @@ modules:
                     - [ root, { view_class: FCom_Core_View_Root } ]
                     - [ admin/header, { view_class: FCom_Admin_View_Header } ]
                     - [ admin/nav, { view_class: FCom_Admin_View_Nav } ]
-                    - [ admin/form-elements, { view_class: FCom_Admin_View_FormElements } ]
+                    - [ core/form-elements, { view_class: FCom_Core_View_FormElements } ]
                     #- [ jqgrid, { view_class: FCom_Admin_View_JqGrid } ]
                     - [ dashboard, { view_class: FCom_Admin_View_Dashboard } ]
                 auto_use: [ bootstrap, views ]

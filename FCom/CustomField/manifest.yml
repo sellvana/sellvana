@@ -23,7 +23,7 @@ modules:
                     - [ /customfields/products/.action, FCom_CustomField_Admin_Controller_Products ]
                 observe:
                     - [ "FCom_Catalog_Admin_Controller_Products::gridColumns", FCom_CustomField_Admin.onProductGridColumns ]
-                    - [ "FCom_Catalog_Admin_Controller_Products::formViewBefore", FCom_CustomField_Admin_Controller_Products.formViewBefore ]
+                    - [ "FCom_Catalog_Admin_Controller_Products::formViewBefore", FCom_CustomField_Admin_Controller_Products.onProductsFormViewBefore ]
                 security:
                     request_fields_whitelist:
                         /catalog/products/form:

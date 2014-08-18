@@ -1,7 +1,7 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
 {% set fieldData = { validator:validator } %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 
 <fieldset name="main-product">
   <div class="f-section">

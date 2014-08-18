@@ -2,7 +2,7 @@
 {% set paymentMethods = UTIL.arrayToOptions(APP.instance('FCom_Sales_Main').getPaymentMethods(), '.getName') %}
 {% set shippingMethods = UTIL.arrayToOptions(APP.instance('FCom_Sales_Main').getShippingMethods(), '.getName') %}
 {% set fieldData = { model: c, settings_module:'FCom_Sales' } %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 <h2>{{ "Sales Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Sales'}) }}
      {{ forms.accordion_panel_start({label:'Defaults'|_, id:'settings-FCom_Sales-group0', in:1}) }}

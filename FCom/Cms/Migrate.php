@@ -241,4 +241,15 @@ class FCom_Cms_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_1_3__0_1_4()
+    {
+        $tBlock = $this->FCom_Cms_Model_Block->table();
+        $this->BDb->ddlTableDef($tBlock, [
+            'COLUMNS' => [
+                'form_enable' => 'tinyint not null default 0',
+                'form_fields' => 'text default null',
+            ],
+        ]);
+    }
 }
