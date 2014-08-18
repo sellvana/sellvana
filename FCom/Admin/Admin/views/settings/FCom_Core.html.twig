@@ -1,6 +1,6 @@
 {% set c = THIS.get('model') %}
 {% set csrfMethods = {'token':'Token', 'origin':'Origin', 'referrer':'Referrer', 'token+referrer':'Token & Referrer'} %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 
 <h2>{{ "Core Settings"|_}}</h2>
 

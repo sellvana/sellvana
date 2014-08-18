@@ -1,6 +1,6 @@
 {% set c = THIS.get('model') %}
 {% set fieldData = { model: c, settings_module:'FCom_ProductReviews' } %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 <h2>{{ "Product Reviews Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_ProductReviews'}) }}
      {{ forms.accordion_panel_start({label:'General Settings'|_, id:'settings-FCom_ProductReviews-group0', in:1}) }}

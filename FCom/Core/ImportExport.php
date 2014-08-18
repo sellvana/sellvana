@@ -498,8 +498,11 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
      */
     protected function collectModuleModels($module)
     {
-        $path         = $module->root_dir . '/Model/';
         $modelConfigs = [];
+        if(!empty($module->noexport)) {
+            return $modelConfigs;
+        }
+        $path         = $module->root_dir . '/Model/';
         $files        = $this->BUtil->globRecursive($path, '*.php');
         if (empty($files)) {
             return $modelConfigs;

@@ -1,5 +1,5 @@
 {% set m = THIS.get('model') %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 {% set resizeUrl = APP.instance('FCom_Core_Main').resizeUrl('--IMAGE--', {s:150, cache:0}) %}
 {% set fieldData = { model:m, config_id: 'category_images', resize_url: resizeUrl } %}
 {{ forms.button_add_image(fieldData, [

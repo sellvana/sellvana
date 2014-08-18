@@ -1,7 +1,7 @@
 {% set c = THIS.get('model') %}
 {% set mode = c.get("mode_by_ip/FCom_Cron")|split("\n")|join('|') %}
 {% set fieldData = { model: c, settings_module:'FCom_Cron' } %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 <h2>{{ "Crontab Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Cron'}) }}
      {{ forms.accordion_panel_start({label:'Area Settings'|_, id:'settings-FCom_Cron-group0', in:1}) }}

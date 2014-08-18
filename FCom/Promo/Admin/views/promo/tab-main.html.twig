@@ -7,7 +7,7 @@
 {% if APP.m('FCom_MultiSite').run_status == 'LOADED' %}
     {% set sites = APP.instance('FCom_MultiSite_Model_Site').siteOptions() %}
 {% endif %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 
 <fieldset class="adm-section-group">
     {{ forms.input({label: 'Description'|_, required: 1, name: "model[description]", value: validator.fieldValue('description'), id: "model-description" }) }}

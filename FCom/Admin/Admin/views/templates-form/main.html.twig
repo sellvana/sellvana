@@ -4,7 +4,7 @@
 {% set model = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
 
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 {% set fieldData = { validator:validator, model:model } %}
 
 <fieldset>

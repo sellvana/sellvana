@@ -3,7 +3,7 @@
 {% set fieldValidate = fieldData|merge({  attr: 'data-rule-number="true"', input_class: 'input-stock' }) %}
 {% set prod = APP.instance('FCom_Catalog_Model_Product') %}
 {% set backOrders = prod.backOrders() %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 <h2>{{ "Catalog Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Catalog'}) }}
      {{ forms.accordion_panel_start({label:'Stock Management'|_, id:'settings-FCom_Catalog-group0', in:1}) }}
