@@ -13,33 +13,16 @@
       <button type="submit" class="btn btn-default btn-sm" id="compare-trigger" rel="#compare-overlay" value="compare"><span>{{ "Compare" |_ }}</span></button>
       <button type="submit" class="btn btn-default btn-sm reset-btn" value="reset">{{ 'Reset' |_ }}</button>
     </form>
-</div><!-- /.f-widget-prods-compare -->
-
-<!--
-    <li class="item"><a href="#"><img src="" alt="" width="40" height="40"/></a></li>
-<div class="block block-compare">
-    <header class="block-title"><strong>{{ 'Compare' |_ }}</strong>{{ 'up to 4 items' |_ }}</header>
-    <div class="block-content">
-        <ul>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-        </ul>
-        <a href="{{ APP.href('catalog/compare') }}" class="button btn-aux" id="compare-trigger" rel="#compare-overlay"><span>{{ "Compare" |_ }}</span></a>
-        <a href="#" class="reset-btn">{{ 'Reset' |_ }}</a>
-    </div>
 </div>
--->
+<!-- /.f-widget-prods-compare -->
+
 <div class="overlay" id="compare-overlay"><div class="contentWrap"></div></div>
 <script>
-require(['jquery', 'fcom.catalog'], function($) {
+require(['jquery', 'fcom.productcompare'], function($) {
     var compare = {{ compare | raw }};
-    console.log(compare);
     $(function() { // let all checkboxes to load first
         $('.block-compare').data('compare', new FCom.CompareBlock({
             thumbContainer: '.f-widget-prods-compare',
-            prodContainerPrefix: '#tr-product-',
             checkbox: '.btn-compare',
             img: '.f-prod-img',
             productIds: compare,
