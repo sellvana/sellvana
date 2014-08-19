@@ -167,8 +167,10 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
             });
         }
 
-        $('[rel=#compare-overlay]', opt.thumbContainer).mousedown(function () {
+        $('.compare-trigger', opt.thumbContainer).click(function (ev) {
             if (selected.length < 2) {
+                ev.preventDefault();
+                ev.stopPropagation();
                 alert(locale._("Please select at least two products to compare"));
                 return false;
             }
