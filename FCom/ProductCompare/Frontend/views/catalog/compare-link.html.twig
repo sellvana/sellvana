@@ -1,4 +1,6 @@
 {% set pId = THIS.get('product_id') %}
+{% set inSet = APP.instance('FCom_ProductCompare_Model_Set').sessionSet().isInSet(pId) %}
+{{ dump(inSet) }}
 <a href="{{ APP.href('catalog/compare/add?id=') ~ pId }}"
    id="btn-compare-{{ pId }}" data-id="{{ pId }}" class="btn btn-link btn-sm btn-compare"
-   rel="nofollow"><span class="glyphicon glyphicon-unchecked"></span>{{ 'Add to Compare'|_ }}</a>
+   rel="nofollow"><span class="glyphicon glyphicon-{{ inSet ? "check": "unchecked" }}"></span>{{ 'Add to Compare'|_ }}</a>

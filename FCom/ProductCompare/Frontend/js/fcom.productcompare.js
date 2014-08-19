@@ -155,7 +155,6 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter', 'fcom.locale'], functio
                 ev.stopPropagation();
                 var $self = $(this);
                 var value = $self.attr('data-id');
-//                toggleLink($self);
                 return toggle(value)
             });
         }

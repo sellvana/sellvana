@@ -1,4 +1,4 @@
-{% set compare = APP.instance('FCom_ProductCompare_Model_Set').sessionSet().getCompareProductsDetailsJson() %}
+{% set compare = APP.instance('FCom_ProductCompare_Model_Set').sessionSet().getCompareProductsDetailsJson(1) %}
 
 <div class="f-widget f-widget-prods-compare">
     <form method="post" action="{{ APP.href('catalog/compare') }}">
