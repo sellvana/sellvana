@@ -207,16 +207,18 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
             return;//$p = $this->FCom_Catalog_Model_Product->create();
         }
 
-        $fields_options = [];
+        $fieldsOptions = [];
         $fields = $this->FCom_CustomField_Model_ProductField->productFields($p);
-        $fieldIds = $this->BUtil->arrayToOptions($fields, 'id');
-        $fieldOptionsAll = $this->FCom_CustomField_Model_FieldOption->orm()->where_in("field_id", $fieldIds)
-            ->order_by_asc('field_id')->order_by_asc('label')->find_many();
-        foreach ($fieldOptionsAll as $option) {
-            $fieldsOptions[$option->get('field_id')][] = $option;
+        if ($fields) {
+            $fieldIds = $this->BUtil->arrayToOptions($fields, 'id');
+            $fieldOptionsAll = $this->FCom_CustomField_Model_FieldOption->orm()->where_in("field_id", $fieldIds)
+                ->order_by_asc('field_id')->order_by_asc('label')->find_many();
+            foreach ($fieldOptionsAll as $option) {
+                $fieldsOptions[$option->get('field_id')][] = $option;
+            }
         }
         $view = $this->view('customfields/products/fields-partial');
-        $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fields_options);
+        $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fieldsOptions);
     }
 
     public function action_field_remove()
