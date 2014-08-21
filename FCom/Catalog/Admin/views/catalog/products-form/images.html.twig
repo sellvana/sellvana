@@ -1,6 +1,26 @@
 {% set m = THIS.get('model') %}
 {% set prodImagesConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
-<script>
+
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+{% set type = 'images' %}
+{% set targetType = 'product' %}
+{% set medialibConfig = {id: 'all_' ~ type, type: 'product-images'} %}
+
+{% set attachment_tab_config = {
+    type: type,
+    targetType: targetType,
+    elementContainer: '#tab-images',
+    medialibConfig: medialibConfig,
+    gridConfig: prodImagesConfig
+} %}
+
+{{ forms.attachment_tab_content(m, attachment_tab_config) | raw }}
+
+
+{#todo: write callbacks to some special action in this images grid, eg: confirm-delete#}
+
+{#<script>
 var all_prod_images_grid, imagesGrid;
 function afterMassDelete() {
     if (prodVariantGrid != null) {
@@ -191,4 +211,4 @@ require(['jquery','underscore','backbone', 'fcom.backbonegrid'], function($, _) 
             </div>
         </div>
     </div>
-</div>
+</div>#}
