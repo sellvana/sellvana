@@ -201,10 +201,14 @@
                             <input type="text" name="cols" id="cols" value="" class="form-control">
                         </div>
                     </div>
-                    <div class="form-group managed select-field select-multi-field radio-field checkbox-field">
+
+                    <div class="form-group managed select-field select-multi-field radio-field checkbox-field" id="options-group">
                         <div class="control-label col-sm-3"><label for="options">{{ "Add/Remove options"|_ }}</label></div>
-                        <div class="col-sm-9"><input type="text" name="options" id="options" class="form-control"/></div>
+                        <div class="col-sm-9"><input type="text" name="options" id="options" class="form-control"/>
+                        <p class="help-block">{{ "Comma separated list of values"|_ }}</p>
+                        </div>
                     </div>
+
                     <div class="form-group managed checkbox-field radio-field">
                         <div class="control-label col-sm-3"><label for="checked">{{ "Default checked"|_ }}</label></div>
                         <div class="col-sm-2"><input type="checkbox" name="checked" id="checked" class="form-control checkbox" value="1"/></div>
@@ -219,16 +223,19 @@
                         <div class="control-label col-sm-3"><label for="formnovalidate">{{ "No form validate"|_ }}</label></div>
                         <div class="col-sm-2"><input type="checkbox" name="formnovalidate" id="formnovalidate" class="form-control checkbox" value="1"/></div>
                     </div>
+
                     <div class="form-group managed image-field">
                         <div class="control-label col-sm-3"><label for="src">{{ "Src"|_ }}</label></div>
                         <div class="col-sm-9"><input type="text" name="src" id="src" class="form-control" value=""/></div>
                     </div>
+
                     <div class="form-group managed image-field">
                         <div class="control-label col-sm-3"><label for="height">{{ "Height"|_ }}</label></div>
                         <div class="col-sm-3"><input type="text" name="height" id="height" class="form-control" value=""/></div>
                         <div class="control-label col-sm-3"><label for="width">{{ "Width"|_ }}</label></div>
                         <div class="col-sm-3"><input type="text" name="width" id="width" class="form-control" value=""/></div>
                     </div>
+
                     <div class="form-group managed number-field date-field time-field">
                         <div class="control-label col-sm-3"><label for="min">{{ "Min value"|_ }}</label></div>
                         <div class="col-sm-2"><input type="text" name="min" id="min" class="form-control" value=""/></div>
@@ -237,6 +244,7 @@
                         <div class="control-label col-sm-1"><label for="step">{{ "Step"|_ }}</label></div>
                         <div class="col-sm-2"><input type="text" name="step" id="step" class="form-control" value=""/></div>
                     </div>
+
                     <div class="form-group managed email-field file-field">
                         <div class="control-label col-sm-3"><label for="multiple">{{ "Multiple"|_ }}</label></div>
                         <div class="col-sm-2"><input type="checkbox" name="multiple" id="multiple" class="form-control checkbox" value="1"/></div>
@@ -248,6 +256,7 @@
                         <div class="control-label col-sm-2"><label for="autocomplete">{{ "Autocomplete"|_ }}</label></div>
                         <div class="col-sm-2"><input type="checkbox" name="autocomplete" id="autocomplete" class="form-control checkbox" value="1"/></div>
                     </div>
+
                     <div class="form-group validation -rte-field -hidden-field -select-field -select-multi-field
                             -radio-field -checkbox-field">
                         <div class="control-label col-sm-3"><label for="validation">{{ "Validation"|_ }}</label></div>
@@ -275,15 +284,29 @@
                 function toggleFields($selector) {
                     var opt = $selector.val();
                     if (lastFieldType != undefined) {
-                        $(".-" + lastFieldType + '-field').show();
+                        var $lastField = $(".-" + lastFieldType + '-field');
+                        $lastField.show();
+                        $lastField.find("input, select, textarea").prop('disabled', false);
                     }
-                    $(".managed").hide();
+                    var $managed = $(".managed");
+                    $managed.hide();
+                    $managed.find("input, select, textarea").prop('disabled', true);
                     if (opt != '-') {
-                        $("." + opt + '-field').show();
-                        $(".-" + opt + '-field').hide();
+                        var $enable = $("." + opt + '-field');
+                        $enable.show();
+                        var $inputs = $enable.find("input, select, textarea");
+                        $inputs.prop('disabled', false);
+                        var $disable = $(".-" + opt + '-field');
+                        $disable.hide();
+                        $disable.find("input, select, textarea").prop('disabled', true);
                         lastFieldType = opt;
                     }
                 }
+
+                $("#options").select2({ // enable comma separated list of values with select2
+                    tags:[],
+                    tokenSeparators:[',']
+                });
 
                 toggleFields($inputType);
                 $inputType.change(function(e){
