@@ -48,6 +48,11 @@ class FCom_ProductCompare_Frontend_Controller extends FCom_Frontend_Controller_A
         }
     }
 
+    public function action_index__POST()
+    {
+        return $this->action_index();
+    }
+
     public function action_add()
     {
         if ($this->BRequest->csrf('referrer', 'GET')) {

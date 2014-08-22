@@ -18,8 +18,8 @@ require(['jquery', 'underscore', 'backbone', 'unique', 'fcom.backbonegrid'], fun
     }
 
     /*
-    *function to set attachment grid data into form fields to send them server
-    *This function is callend when 'save' button of product form is clicked.
+    * function to set attachment grid data into form fields to send them server
+    * This function is called when 'save' button of product form is clicked.
     */
     window.setAttachementsGridVals = function() {
         console.log('setAttachmentsGridVals');
@@ -32,10 +32,10 @@ require(['jquery', 'underscore', 'backbone', 'unique', 'fcom.backbonegrid'], fun
         console.log(rows);
         $('#prod-attach-rows').val(JSON.stringify(rows));
         $('#prod-attach-remove').val(removedIds.join(','));
-    }
+    };
 
     /*
-    *MediaGrid registery function
+    * MediaGrid registry function
     */
     window.all_attachments_register = function(grid) {
         all_attachments_grid = grid;
@@ -72,7 +72,7 @@ require(['jquery', 'underscore', 'backbone', 'unique', 'fcom.backbonegrid'], fun
             $('#all_attachments_modal').modal('hide');
 
         });
-    }
+    };
 
     window.attachmentGridRegister = function(grid) {
         attachmentGrid = grid;
@@ -86,7 +86,7 @@ require(['jquery', 'underscore', 'backbone', 'unique', 'fcom.backbonegrid'], fun
             $('#all_attachments_modal').modal('show');
         });
 
-    }
+    };
 
     /*function refreshGridAdd() {
         var data = getExcludeId();
