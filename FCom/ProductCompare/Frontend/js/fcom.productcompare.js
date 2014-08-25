@@ -1,13 +1,14 @@
-define(['jquery', 'jquery.cookie', 'jquery.tablesorter', 'fcom.locale'], function ($) {
+define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
 
     FCom.CompareBlock = function (opt) {
-        //console.log('FROM CATALOG.JS', $, $.cookie);
         var cookieName = opt.cookieName || 'sellvana_compare', cookie = $.cookie(cookieName);
-//        var selected = cookie ? JSON.parse(cookie) : [], ul = $('ul', opt.thumbContainer);
         var selected, ul = $('ul', opt.thumbContainer);
         var limit = opt.limitCompare || 5;
         var urlAdd = opt.url_add || '/catalog/compare/add';
         var urlRm = opt.url_remove || '/catalog/compare/rm';
+        var thumbWidth = opt.thumbWidth || 35;
+        var thumbHeight = opt.thumbHeight || 35;
+
         if (opt.productIds) {
             selected = opt.productIds;
         } else {
@@ -17,7 +18,11 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter', 'fcom.locale'], functio
 
         function thumb(s, i) {
             console.log(s, i);
-            var a = $('<a href="#" title="' + s.alt + '"><img src="' + s.src + '" width="35" height="35" alt="' + s.alt + '"/></a>');
+            var aHtml = '<a href="#" title="' + s.alt + '">' +
+                '<img src="' + s.src + '" width="' + thumbWidth + '" ' +
+                'height="' + thumbHeight + '" alt="' + s.alt + '"/>' +
+                '</a>';
+            var a = $(aHtml);
             a.click(function () {
                 remove(s.id);
                 return false
@@ -44,7 +49,7 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter', 'fcom.locale'], functio
 
         function add(id) {
             if (selected.length == limit) {
-                alert(locale._("Max number of products to compare is ") + limit);
+                alert(locale._("Max number of products to compare is  ") + limit);
                 return false;
             }
 
@@ -88,8 +93,8 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter', 'fcom.locale'], functio
             var rm = true;
             $.get(urlRm, {id: id}, function(result){
                 if(result.hasOwnProperty('success')) {
-                    $('a', ul.children().get(i)).remove();
-//                    ul.append('<li/>');
+                    ul.children().get(i).remove();
+                    ul.append('<li class="item"/>');
                     check(id, false);
                     selected.splice(i, 1);
                     $.cookie(cookieName, JSON.stringify(selected), {expires: 1});
@@ -132,16 +137,19 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter', 'fcom.locale'], functio
             return remove(id) || add(id);
         }
 
+        function toggleLink($self) {
+            var $icon = $self.find('span');
+            var checked = $icon.hasClass('glyphicon-unchecked');
+            if (checked) {
+                $icon.removeClass('glyphicon-unchecked').addClass('glyphicon-check');
+            } else {
+                $icon.removeClass('glyphicon-check').addClass('glyphicon-unchecked');
+            }
+        }
         if (opt.thumbContainer) {
-//            for (var i = 0; i < selected.length; i++) {
-//                thumb(selected[i], i);
-//                check(selected[i].id, true);
-//            }
-
             for (var i in selected) {
                 if (selected.hasOwnProperty(i)) {
                     thumb(selected[i], i);
-                    check(selected[i].id, true);
                 }
             }
             if (selected.length) {
@@ -155,23 +163,14 @@ define(['jquery', 'jquery.cookie', 'jquery.tablesorter', 'fcom.locale'], functio
                 ev.stopPropagation();
                 var $self = $(this);
                 var value = $self.attr('data-id');
-//                toggleLink($self);
                 return toggle(value)
             });
         }
 
-        function toggleLink($self) {
-            var $icon = $self.find('span');
-            var checked = $icon.hasClass('glyphicon-unchecked');
-            if (checked) {
-                $icon.removeClass('glyphicon-unchecked').addClass('glyphicon-check');
-            } else {
-                $icon.removeClass('glyphicon-check').addClass('glyphicon-unchecked');
-            }
-        }
-
-        $('[rel=#compare-overlay]', opt.thumbContainer).mousedown(function () {
+        $('.compare-trigger', opt.thumbContainer).click(function (ev) {
             if (selected.length < 2) {
+                ev.preventDefault();
+                ev.stopPropagation();
                 alert(locale._("Please select at least two products to compare"));
                 return false;
             }

@@ -14,6 +14,11 @@ class FCom_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
     protected static $_sessionSet = null;
 
     /**
+     * @var array an array of details about products belonging to the set
+     */
+    protected $_productDetails;
+
+    /**
      * Get current user compare products set
      *
      * If user is registered, fetch set for user id,
@@ -80,18 +85,21 @@ class FCom_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
         return $ids;
     }
 
-    public function getCompareProductsDetails()
+    public function getCompareProductsDetails($refresh = false)
     {
-        $details = [];
-        $productIds = $this->getCompareIds();
-        foreach ($productIds as $id) {
-            $pDetails = $this->getProductDetails($id);
-            if (!empty($pDetails)) {
-                $details[] = $pDetails;
-            }
 
+        if (empty($this->_productDetails) || $refresh) {
+            $details = [];
+            $productIds = $this->getCompareIds();
+            foreach ($productIds as $id) {
+                $pDetails = $this->getProductDetails($id);
+                if (!empty($pDetails)) {
+                    $details[] = $pDetails;
+                }
+            }
+            $this->_productDetails = $details;
         }
-        return $details;
+        return $this->_productDetails;
     }
 
     /**
@@ -114,9 +122,9 @@ class FCom_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
         return $details;
     }
 
-    public function getCompareProductsDetailsJson()
+    public function getCompareProductsDetailsJson($refresh = false)
     {
-        $details = $this->getCompareProductsDetails();
+        $details = $this->getCompareProductsDetails($refresh);
         return $this->BUtil->toJson($details);
     }
 
@@ -167,6 +175,22 @@ class FCom_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
 
         $item = $this->FCom_ProductCompare_Model_SetItem->orm()->where($data)->find_one();
         return $item;
+    }
+
+    /**
+     * Find out if product is in compare set
+     * @param $productId
+     * @return bool
+     */
+    public function isInSet($productId)
+    {
+        $details = $this->getCompareProductsDetails();
+        foreach ($details as $detail) {
+            if ($detail['id'] == $productId) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

@@ -16,6 +16,7 @@ modules:
 
             FCom_Frontend:
                 routing:
+                    - [ /catalog/compare, FCom_ProductCompare_Frontend_Controller.index ]
                     - [ /catalog/compare/?.action, FCom_ProductCompare_Frontend_Controller ]
 
         default_config:
