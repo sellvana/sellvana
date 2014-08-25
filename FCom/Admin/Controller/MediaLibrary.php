@@ -439,8 +439,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             }
 
             if (isset($uploadConfig['permission'])) {
-                $canUpload                  = $this->FCom_Admin_Model_User->sessionUser()
-                                                                          ->getPermission($uploadConfig['permission']);
+                $canUpload = $this->FCom_Admin_Model_User->sessionUser()->getPermission($uploadConfig['permission']);
                 $uploadConfig['can_upload'] = $canUpload;
             }
         }

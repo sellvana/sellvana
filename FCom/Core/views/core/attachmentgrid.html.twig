@@ -10,7 +10,7 @@
 {% set combineType = targetType ~ type %}
 
 <script>
-    var all_{{ type }}_grid, {{ combineType }}Grid;
+    var {{ medialibConfig.id }}_grid, {{ combineType }}Grid;
     require(['jquery', 'underscore', 'backbone', 'unique', 'fcom.backbonegrid'], function ($, _, Backbone) {
         var elementContainer = $('{{ elementContainer }}');
         var mediaId = '{{ medialibConfig.id }}';
@@ -53,16 +53,14 @@
          *MediaGrid registery function
          */
         window.{{ medialibConfig.id }}_register = function (grid) {
-            all_{{ type }}_grid = grid;
+            {{ medialibConfig.id }}_grid = grid;
             grid.build();
 
-            //backboneGridAllImages = all_
-            all_{{ type }}_grid.getGridSkeleton();
-            //rowsAllImages = all_
-            all_{{ type }}_grid.getRows();
+            //backboneGridAllImages = all_ {{ type }}_grid.getGridSkeleton();
+            //rowsAllImages = all_ all_ {{ type }}_grid.getRows();
             //Depending selected rows count, disable or enable add button of popup
-            all_{{ type }}_grid.getSelectedRows().on('add remove reset', function () {
-                if (all_{{ type }}_grid.getSelectedRows().length > 0) {
+            {{ medialibConfig.id }}_grid.getSelectedRows().on('add remove reset', function () {
+                if ({{ medialibConfig.id }}_grid.getSelectedRows().length > 0) {
                     $('.btn_' + mediaId + '_add').removeClass('disabled');
                 } else {
                     $('.btn_' + mediaId + '_add').addClass('disabled');
@@ -71,7 +69,7 @@
 
             $('.btn_' + mediaId + '_add').click(function () {
                 var gridView = {{ combineType }}Grid.getGridView();
-                all_{{ type }}_grid.getSelectedRows().forEach(function (row) {
+                {{ medialibConfig.id }}_grid.getSelectedRows().forEach(function (row) {
                     if (!{{ combineType }}Grid.getRows().findWhere({file_id: row.get('id')})) {
                         var addedRow = row;
                         addedRow.set('_new', true);
@@ -85,13 +83,13 @@
                 });
 
                 gridView.render();
-                all_{{ type }}_grid.getGridView().clearSelectedRows();
+                {{ medialibConfig.id }}_grid.getGridView().clearSelectedRows();
                 $('#' + mediaId + '_modal').modal('hide');
 
             });
 
             //todo:
-        }
+        };
 
         /*todo: need check why we always use function hook event grid_before_create to trigger modal */
         {% if gridConfig.config.grid_before_create != '' %}
@@ -106,7 +104,7 @@
                 $('#' + mediaId + '_modal').modal('show');
             });
 
-        }
+        };
         {% endif %}
     });
 
@@ -115,8 +113,7 @@
 
 
 {{ LAYOUT.view('core/backbonegrid').set('grid', gridConfig) | raw }}
-{% set mediaConfig = UTIL.arrayMerge(medialibConfig, {mode: 'link', title: 'Attachments', multiSelAllowed: true}) %}
-{#todo: review merge config#}
+{% set mediaConfig = UTIL.arrayMerge({mode: 'link', title: 'Attachments', multiSelAllowed: true, folder: 'media/product/attachment'}, medialibConfig) %}
 {{ LAYOUT.view('core/medialib').set('config', mediaConfig) | raw }}
 
 <input type='hidden' name="grid[{{ type }}][del]" class="target-attach-remove"/>
