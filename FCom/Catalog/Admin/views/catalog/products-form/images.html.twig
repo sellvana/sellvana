@@ -7,7 +7,7 @@
 {% set targetType = 'product' %}
 {% set medialibConfig = {id: 'all_' ~ type, type: 'product-images'} %}
 
-{% set attachment_tab_config = {
+{% set attachmentsConfig = {
     type: type,
     targetType: targetType,
     elementContainer: '#tab-images',
@@ -15,7 +15,9 @@
     gridConfig: prodImagesConfig
 } %}
 
-{{ forms.attachment_tab_content(m, attachment_tab_config) | raw }}
+{#{{ forms.attachment_tab_content(m, attachment_tab_config) | raw }}#}
+
+{{ THIS.view('core/attachmentgrid').set('config', attachmentsConfig) | raw }}
 
 
 {#todo: write callbacks to some special action in this images grid, eg: confirm-delete#}

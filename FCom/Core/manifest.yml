@@ -20,6 +20,7 @@ modules:
             - [ core/simplegrid, { view_class: FCom_Core_View_SimpleGrid } ]
             - [ core/backbonegrid, { view_class: FCom_Core_View_BackboneGrid } ]
             - [ core/medialib, {view_class: FCom_Core_View_Abstract } ]
+            - [ core/attachmentgrid, {view_class: FCom_Core_View_Abstract } ]
 
         observe:
             - [ "FCom_LibTwig_Main::init", FCom_Core_Main.onTwigInit ]
