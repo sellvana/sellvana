@@ -12,6 +12,7 @@
 <script>
     var {{ medialibConfig.id }}_grid, {{ combineType }}Grid;
     require(['jquery', 'underscore', 'backbone', 'unique', 'fcom.backbonegrid'], function ($, _, Backbone) {
+        //var afterAdd = {{ config.afterAdd }};
         var elementContainer = $('{{ elementContainer }}');
         var mediaId = '{{ medialibConfig.id }}';
 
@@ -81,6 +82,9 @@
                         gridView.collection.add(addedRow.toJSON(), {silent: true});
                     }
                 });
+                if (typeof window.afterAdd{{ type|capitalize }} == 'function') {
+                    window.afterAdd{{ type|capitalize }}(grid);
+                }
 
                 gridView.render();
                 {{ medialibConfig.id }}_grid.getGridView().clearSelectedRows();
