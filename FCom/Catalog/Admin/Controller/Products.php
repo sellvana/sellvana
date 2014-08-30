@@ -233,7 +233,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
                 ->group_by('pa.id')
                 ->find_many());
-        return [
+        $config =  [
             'config' => [
                 'id' => 'product_images',
                 'caption' => 'Product Images',
@@ -258,6 +258,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                         'editable' => 'inline', 'validation' => ['number' => true]],
                     ['name' => 'main_thumb', 'label' => 'Thumbnail', 'width' => 50, 'display' => 'eval',
                         'print' => '"<input class=\'main-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
+                            . ' "+(rc.row["main_thumb"]==1 ? checked=\'checked\' : \'\')+" '
                             . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' '
                             . 'data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"'],
                     ['name' => 'create_at', 'label' => 'Created', 'width' => 200],
@@ -281,6 +282,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
             ]
         ];
+        return $config;
+        //echo '<pre>';print_r($config);die;
     }
 
     /**
