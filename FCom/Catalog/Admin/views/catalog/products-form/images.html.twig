@@ -3,7 +3,7 @@
 
 {% set type = 'images' %}
 {% set targetType = 'product' %}
-{% set medialibConfig = {id: 'all_' ~ type, type: 'product-images', title: 'Images', folder: 'media/product/images'} %}
+{% set medialibConfig = {id: 'all_' ~ type, mode: 'images', type: 'product-images', title: 'Images', folder: 'media/product/images'} %}
 
 {% set attachmentsConfig = {
     type: type,
@@ -17,9 +17,20 @@
 
 {{ THIS.view('core/attachmentgrid').set('config', attachmentsConfig) | raw }}
 
-
-{#todo: load variants tab before update image list when add image for product #}
 <script>
+    $(document).ready(function() {
+        var id = "{{ m.id }}";
+        var url = "{{ formUrl }}?id="+id+"&tabs=variants";
+        {# load variants tab before update image list when add image for product #}
+        if (typeof(updateListVariantImage) != "function") {
+            $.getJSON(url, function (data, status, req) {
+                _.each(data.tabs, function (tabHtml, i) {
+                    $('#tab-variants').html(tabHtml).data('loaded', true);
+                    $('#tab-variants' + ' .collapse').collapse();
+                });
+            });
+        }
+    });
     window.afterAddImages = function (grid) {
         var image = [];
         grid.getSelectedRows().forEach(function (row) {
