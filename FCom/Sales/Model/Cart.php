@@ -417,7 +417,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     public function setAddressByType($atype, $data)
     {
-        $address = $atype === 'billing' ? $cart->getBillingAddress() : $cart->getShippingAddress();
+        $address = $atype === 'billing' ? $this->getBillingAddress() : $this->getShippingAddress();
         if (!$address) {
             $address = $this->FCom_Sales_Model_Cart_Address->create(['cart_id' => $this->id, 'atype' => $atype]);
         }

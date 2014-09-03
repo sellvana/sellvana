@@ -242,6 +242,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                         'FCom_PaymentBasic' => 'REQUESTED',
                         'FCom_PaymentCC' => 'REQUESTED',
                         'FCom_PayPal' => 'REQUESTED',
+                        'FCom_ProductCompare' => 'REQUESTED',
                         'FCom_ProductReviews' => 'REQUESTED',
                         'FCom_Promo' => 'REQUESTED',
                         'FCom_PushServer' => 'REQUESTED',
