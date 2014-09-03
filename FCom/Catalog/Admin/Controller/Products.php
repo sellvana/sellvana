@@ -283,7 +283,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ]
         ];
         return $config;
-        //echo '<pre>';print_r($config);die;
     }
 
     /**
