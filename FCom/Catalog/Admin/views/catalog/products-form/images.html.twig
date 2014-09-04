@@ -12,7 +12,7 @@
     medialibConfig: medialibConfig,
     gridConfig: prodImagesConfig
 } %}
-
+{% set combineType = targetType ~ type %}
 {#{{ forms.attachment_tab_content(m, attachment_tab_config) | raw }}#}
 
 {{ THIS.view('core/attachmentgrid').set('config', attachmentsConfig) | raw }}
@@ -38,11 +38,27 @@
                 file_id: row.get('file_id'),
                 subfolder: row.get('subfolder'),
                 file_name: row.get('file_name')
-            })
+            });
         });
         if (typeof(updateListVariantImage) == "function") {
             updateListVariantImage({
                 add: true,
+                image: image
+            });
+        }
+    }
+    window.afterMassDelete = function() {
+        var image = [];
+        {{ combineType }}Grid.getSelectedRows().forEach(function (row) {
+            image.push({
+                file_id: row.get('file_id'),
+                subfolder: row.get('subfolder'),
+                file_name: row.get('file_name')
+            });
+        });
+        if (typeof(updateListVariantImage) == "function") {
+            updateListVariantImage({
+                add: false,
                 image: image
             });
         }

@@ -545,9 +545,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'id'   => explode(',', $data['grid'][$typeName]['del']),
                 ]);
             }
-
-            if (!empty($data['grid'][$typeName]['rows'])) {
+            $rows = array();
+            if (isset($data['grid'][$typeName]['rows']) && $data['grid'][$typeName]['rows'] != '') {
                 $rows = $this->BUtil->fromJson($data['grid'][$typeName]['rows']);
+            }
+            if (!empty($rows)) {
                 foreach ($rows as $image) {
                     $key = $image['id'];
                     unset($image['id']);
@@ -637,6 +639,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $model->setData('variants_fields', json_decode($data['vfields'], true));
         }
         if (isset($data['variants'])) {
+            $variantsData = array();
             if ($data['variants'] != '') {
                 $variantsData = $this->BUtil->objectToArray(json_decode($data['variants']));
             }

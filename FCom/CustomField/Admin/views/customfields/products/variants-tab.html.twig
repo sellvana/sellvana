@@ -12,11 +12,13 @@ function updateListVariantImage(imageObject) {
             var imageItems = $(this).find('.list-variant-image');
             var select = $(this).find('.variant-image');
             if (imageObject.add == false) {
+                var tmp = [];
                 imageObject.image.forEach(function (obj) {
                     imageItems.find('i[data-id="'+ obj.file_id +'"]').parents('li').remove();
                     select.find('option[value="'+ obj.file_id +'"]').remove();
-                    file_id.push(obj.file_id)
+                    tmp.push(obj.file_id);
                 });
+                file_id.push({variant_id: $(self).attr('id'), file_id: tmp});
             } else  {
                 var tmp = [];
                 imageObject.image.forEach(function (obj) {
@@ -50,8 +52,8 @@ function updateFileIdVariant(arr, add) {
                 }
             })
         } else {
-            var obj = _.findWhere(arr, {variant_id: obj.get('id')});
-            file_id = $.merge(file_id, obj.file_id);
+            var objF = _.findWhere(arr, {variant_id: obj.get('id')});
+            file_id = $.merge(file_id, objF.file_id);
         }
 
         obj.set('variant_file_id', file_id.join(','));
