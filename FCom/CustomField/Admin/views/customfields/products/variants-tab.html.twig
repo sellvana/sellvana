@@ -231,11 +231,11 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
             var td = $(this).parents('td');
             td.find('.variant-image').find('option[value="'+ $(this).attr('data-id') +'"]').removeClass('hide');
             td.find('.variant-image').removeClass('hide');
-            updateStoreVariantImageId($(this).parents('td'));
             if (td.find('.list-variant-image').find('li').length == 1) {
                 td.find('.list-variant-image').addClass('hide');
             }
             $(this).parents('li').remove();
+            updateStoreVariantImageId(td);
         });
     }
     function grayGrid() {
