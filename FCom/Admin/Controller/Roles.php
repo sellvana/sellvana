@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -63,25 +63,12 @@ class FCom_Admin_Controller_Roles extends FCom_Admin_Controller_Abstract_GridFor
         $data = $args['data'];
         $model = $args['model'];
         if (!empty($data['user_ids_remove'])) {
-            $user_ids = explode(",", $data['user_ids_remove']);
-            foreach ($user_ids as $user_id) {
-                $user = FCom_Admin_Model_User::i()->load($user_id);
-                if ($user) {
-                    $user->role_id = null;
-                    $user->save();
-                }
-            }
+            $userIds = explode(",", $data['user_ids_remove']);
+            $this->FCom_Admin_Model_User->update_many(['role_id' => null], ['id' => $userIds]);
         }
-        //todo: check if can use sql executes to faster, update role_id where user_id in (user_ids_add)?
         if (!empty($data['user_ids_add'])) {
-            $user_ids = explode(",", $data['user_ids_add']);
-            foreach ($user_ids as $user_id) {
-                $user = FCom_Admin_Model_User::i()->load($user_id);
-                if ($user) {
-                    $user->role_id = $model->id;
-                    $user->save();
-                }
-            }
+            $userIds = explode(",", $data['user_ids_add']);
+            $this->FCom_Admin_Model_User->update_many(['role_id' => $model->id()], ['id' => $userIds]);
         }
     }
 

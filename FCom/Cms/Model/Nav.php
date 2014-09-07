@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
 {
@@ -14,13 +14,13 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
             if (0 === stripos($this->url_href, ['http://', 'https://'])) {
                 return $this->url_href;
             } else {
-                return FCom_Frontend_Main::i()->href($this->url_href);
+                return $this->FCom_Frontend_Main->href($this->url_href);
             }
         }
-        $config = BConfig::i()->get('modules/FCom_Cms');
+        $config = $this->BConfig->get('modules/FCom_Cms');
         $prefix = !empty($config['nav_url_prefix']) ? $config['nav_url_prefix'] . '/' : '';
 
-        return FCom_Frontend_Main::i()->href($prefix . $this->url_path);
+        return $this->FCom_Frontend_Main->href($prefix . $this->url_path);
 
     }
 
@@ -28,7 +28,7 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
     {
         switch ($this->node_type) {
         case 'cms_page':
-            $this->_page = FCom_Cms_Model_Page::i()->load($this->reference, 'handle');
+            $this->_page = $this->FCom_Cms_Model_Page->load($this->reference, 'handle');
             return $this->_page;
 
         default:
@@ -46,7 +46,7 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
 
         case 'content':
         default:
-            BLayout::i()
+            $this->BLayout
                 ->addView('cms_nav', [
                     'renderer'    => 'FCom_LibTwig_Main::renderer',
                     'source'      => $this->content ? $this->content : ' ',
@@ -55,14 +55,14 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
                 ->hookView('main', 'cms_nav')
             ;
 
-            if (($root = BLayout::i()->view('root'))) {
+            if (($root = $this->BLayout->view('root'))) {
                 $root->addBodyClass('cms-' . str_replace('/', '-', $this->url_path))
                     ->addBodyClass('page-' . str_replace('/', '-', $this->url_path));
             }
 
-            if (($head = BLayout::i()->view('head'))) {
+            if (($head = $this->BLayout->view('head'))) {
                 $head->title($this->full_name);
-                foreach (explode(',', 'title,description,keywords') as $f) {
+                foreach (['title', 'description', 'keywords'] as $f) {
                     if (($v = $this->get('meta_' . $f))) {
                         $head->meta($f, $v);
                     }
@@ -70,11 +70,11 @@ class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
             }
 
             if ($this->layout_update) {
-                $layoutUpdate = BUtil::fromJson($this->layout_update);
+                $layoutUpdate = $this->BUtil->fromJson($this->layout_update);
                 if (!is_null($layoutUpdate)) {
-                    BLayout::i()->addLayout('cms_nav', $layoutUpdate)->applyLayout('cms_nav');
+                    $this->BLayout->addLayout('cms_nav', $layoutUpdate)->applyLayout('cms_nav');
                 } else {
-                    BDebug::warning('Invalid layout update for CMS Nav');
+                    $this->BDebug->warning('Invalid layout update for CMS Nav');
                 }
             }
             break;

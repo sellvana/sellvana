@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controller_Abstract
 {
@@ -6,85 +6,88 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         '/checkout/login',
         '/checkout/success',
     ];
+
     public function authenticate($args = [])
     {
-        $r = BRequest::i();
-        $isLoggedIn = FCom_Customer_Model_Customer::i()->isLoggedIn();
+        $r = $this->BRequest;
+        $isLoggedIn = $this->FCom_Customer_Model_Customer->isLoggedIn();
         if (!$isLoggedIn && $r->get('guest') != 'yes' && !in_array($r->rawPath(), $this->_authenticationFree)) {
-            BResponse::i()->redirect('checkout/login');
-            return;
+            $this->BResponse->redirect('checkout/login');
+            return false;
         } elseif ($isLoggedIn && $r->rawPath() == '/checkout/login') {
-            BResponse::i()->redirect('checkout');
-            return;
+            $this->BResponse->redirect('checkout');
+            return true;
         }
         return parent::authenticate($args);
     }
 
+    public function beforeDispatch()
+    {
+        if (!parent::beforeDispatch()) return false;
+
+        $this->BResponse->nocache();
+
+        return true;
+    }
+
     public function action_checkout_login()
     {
-        $layout = BLayout::i();
-        $layout->view('breadcrumbs')->set('crumbs', [['label' => 'Home', 'href' => BApp::baseUrl()],
-            ['label' => 'Login or guest checkout', 'active' => true]]);
+        $layout = $this->BLayout;
         $this->layout('/checkout/login');
+        $layout->view('breadcrumbs')->set('crumbs', [['label' => 'Home', 'href' => $this->BApp->baseUrl()],
+            ['label' => 'Login or guest checkout', 'active' => true]]);
     }
 
     public function action_checkout()
     {
-        $layout = BLayout::i();
-        $layout->view('breadcrumbs')->set([
-            'crumbs' => [
-                ['label' => 'Home', 'href' => BApp::baseUrl()],
-                ['label' => 'Checkout', 'active' => true],
-            ],
-        ]);
-
         $shipAddress = null;
         $billAddress = null;
 
-        $customer = FCom_Customer_Model_Customer::i()->sessionUser();
+        $customer = $this->FCom_Customer_Model_Customer->sessionUser();
 
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
-        if (!$cart || !$cart->id) {
-            BResponse::i()->redirect('cart');
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        if (!$cart || !$cart->id()) {
+            $this->BResponse->redirect('cart');
             return;
         }
 
-        $shipAddress = $cart->getAddressByType('shipping');
-        $billAddress = $cart->getAddressByType('billing');
+        $shipAddress = $cart->getShippingAddress();
+        $billAddress = $cart->getBillingAddress();
 
         if (!$shipAddress && $customer) {
             $cart->importAddressesFromCustomer($customer);
-            $shipAddress = $cart->getAddressByType('shipping');
-            $billAddress = $cart->getAddressByType('billing');
+            $shipAddress = $cart->getShippingAddress();
+            $billAddress = $cart->getBillingAddress();
         }
 
-        if (empty($shipAddress)) {
-            $href = BApp::href('checkout/address?t=s');
-            BResponse::i()->redirect($href);
+        if (empty($shipAddress) && !$cart->same_address) {
+            $href = $this->BApp->href('checkout/address?t=s');
+            $this->BResponse->redirect($href);
             return;
         }
-        if (empty($billAddress)) {
-            $href = BApp::href('checkout/address?t=b');
-            BResponse::i()->redirect($href);
+        if (empty($billAddress) && !$cart->same_address) {
+            $href = $this->BApp->href('checkout/address?t=b');
+            $this->BResponse->redirect($href);
             return;
         }
 
+        $cart->getShippingMethod();
         if ($customer) {
             $cart->payment_method = empty($cart->payment_method) ? $customer->getPaymentMethod() : $cart->payment_method;
             $cart->payment_details = empty($cart->payment_details) ? $customer->getPaymentDetails() : $cart->payment_details;
         }
 
         if (empty($cart->payment_method)) {
-            $href = BApp::href('checkout/payment');
-            BResponse::i()->redirect($href);
+            $href = $this->BApp->href('checkout/payment');
+            $this->BResponse->redirect($href);
             return;
         }
 
         $cart->calculateTotals();
 
 
-        $shippingMethods = FCom_Sales_Main::i()->getShippingMethods();
-        $paymentMethods = FCom_Sales_Main::i()->getPaymentMethods();
+        $shippingMethods = $this->FCom_Sales_Main->getShippingMethods();
+        $paymentMethods = $this->FCom_Sales_Main->getPaymentMethods();
         $paymentMethodsHtml = [];
         if (is_array($paymentMethods)) {
             foreach ($paymentMethods as $code => $method) {
@@ -96,6 +99,14 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             }
         }
 
+        $layout = $this->BLayout;
+        $this->layout('/checkout/checkout');
+        $layout->view('breadcrumbs')->set([
+            'crumbs' => [
+                ['label' => 'Home', 'href' => $this->BApp->baseUrl()],
+                ['label' => 'Checkout', 'active' => true],
+            ],
+        ]);
 
         $layout->view('checkout/payment')->set('payment_methods', $paymentMethods)
                                          ->set('payment_html', $paymentMethodsHtml)
@@ -103,7 +114,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 /*        if (!empty($paymentMethods[$cart->payment_method])) {
             $layout->view('checkout/checkout')->set(array(
                 'payment_method' => $paymentMethods[$cart->payment_method],
-                'payment_details' => BUtil::fromJson($cart->payment_details),
+                'payment_details' => $this->BUtil->fromJson($cart->payment_details),
             ));
         }
 */
@@ -118,29 +129,43 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             'payment_html' => $paymentMethodsHtml,
             'totals' => $cart->getTotals()
         ]);
-        $this->layout('/checkout/checkout');
     }
 
     public function action_checkout__POST()
     {
-        $post = BRequest::i()->post();
+        $post = $this->BRequest->post();
         /* @var $cart FCom_Sales_Model_Cart */
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        if (!$cart) {
+            $this->BResponse->redirect('cart');
+            return;
+        }
 
         if (!empty($post['create_account']) && $post['account']) {
             $r = $post['account'];
-            //$billAddress = $cart->getAddressByType('billing');
+            //$billAddress = $cart->getBillingAddress();
             //$r['email'] = $billAddress->email;
             try {
-                $modelCustomer = FCom_Customer_Model_Customer::i();
+                $modelCustomer = $this->FCom_Customer_Model_Customer;
                 $modelCustomer->setSimpleRegisterRules();
                 if ($modelCustomer->validate($r, [], 'checkout-register')) {
-                    $customer = FCom_Customer_Model_Customer::i()->register($r);
+                    $customer = $this->FCom_Customer_Model_Customer->register($r);
                     $customer->login(); // make sure customer is logged in
+                    $billAddress = $cart->getBillingAddress();
+                    $custBillAddress = $billAddress->exportToCustomer($customer);
+                    $customer->default_billing_id = $custBillAddress->id();
+                    if ($cart->same_address) {
+                        $customer->default_shipping_id = $custBillAddress->id();
+                    } else {
+                        $shipAddress = $cart->getShippingAddress();
+                        $custShipAddress = $shipAddress->exportToCustomer($customer);
+                        $customer->default_shipping_id = $custShipAddress->id();
+                    }
+                    $customer->save();
                     $cart->customer_id = $customer->id();
                     $cart->save();
                 } else {
-                    BResponse::i()->redirect('checkout?guest=yes');
+                    $this->BResponse->redirect('checkout?guest=yes');
                     return;
                 }
             } catch (Exception $e) {
@@ -150,7 +175,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         }
 
         //set assisted user
-        $adminUserId = FCom_Admin_Model_User::i()->sessionUserId();
+        $adminUserId = $this->FCom_Admin_Model_User->sessionUserId();
         if ($adminUserId) {
             $cart->admin_id = $adminUserId;
         }
@@ -159,7 +184,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             $shipping = explode(":", $post['shipping']);
             $cart->setShippingMethod($shipping[0]);
             $cart->shipping_service = $shipping[1];
-            //$cart->shipping_price = FCom_Sales_Model_Cart::i()->getShippingMethod($post['shipping_method'])->getPrice();
+            //$cart->shipping_price = $this->FCom_Sales_Model_Cart->getShippingMethod($post['shipping_method'])->getPrice();
         }
 
         if (!empty($post['payment_method'])) {
@@ -167,7 +192,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         }
 
         if (!empty($post['payment'])) {
-            $cart->payment_details = BUtil::toJson($post['payment']);
+            $cart->payment_details = $this->BUtil->toJson($post['payment']);
             $cart->setPaymentToUser($post);
         }
         if (!empty($post['coupon_code'])) {
@@ -177,30 +202,31 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $cart->save();
 
         if (empty($post['place_order']) && empty($post['is_ajax'])) {
-            BResponse::i()->redirect('checkout');
+            $this->BResponse->redirect('checkout');
             return;
         }
         $order = $cart->placeOrder();
-        FCom_Sales_Model_Cart::i()->sessionCartId(false);
+        $this->BLayout->view('email/new-order-customer')->set('order', $order)->email();
+        $this->FCom_Sales_Model_Cart->resetSessionCart();
 
-        $sData =& BSession::i()->dataToUpdate();
+        $sData =& $this->BSession->dataToUpdate();
         $sData['last_order']['id'] = $order ? $order->id : null;
-        if (BRequest::i()->get('is_ajax') || (isset($post['is_ajax']) && $post['is_ajax'])) {
+        if ($this->BRequest->get('is_ajax') || (isset($post['is_ajax']) && $post['is_ajax'])) {
             $data = $cart->getPaymentMethod()->ajaxData();
-            BResponse::i()->json($data);
+            $this->BResponse->json($data);
         } else {
-            $redirectUrl = BSession::i()->get('redirect_url');
-            if (!$redirectUrl) $redirectUrl = BApp::href('checkout/success');
-            BSession::i()->set('redirect_url', null);
-            BResponse::i()->redirect($redirectUrl);
+            $redirectUrl = $this->BSession->get('redirect_url');
+            if (!$redirectUrl) $redirectUrl = $this->BApp->href('checkout/success');
+            $this->BSession->set('redirect_url', null);
+            $this->BResponse->redirect($redirectUrl);
         }
     }
 
     public function action_payment()
     {
-        $layout = BLayout::i();
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
-        $paymentMethods = FCom_Sales_Main::i()->getPaymentMethods();
+        $layout = $this->BLayout;
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $paymentMethods = $this->FCom_Sales_Main->getPaymentMethods();
         $paymentMethodsHtml = [];
         foreach ($paymentMethods as $code => $method) {
             $paymentMethodsHtml[$code] = $method->getCheckoutFormView()
@@ -209,73 +235,72 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
                                          ->render();
         }
 
+        $this->layout('/checkout/payment');
         $layout->view('breadcrumbs')->set('crumbs', [
-            ['label' => 'Home', 'href' =>  BApp::baseUrl()],
-            ['label' => 'Checkout', 'href' =>  BApp::href("checkout")],
+            ['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
+            ['label' => 'Checkout', 'href' =>  $this->BApp->href("checkout")],
             ['label' => 'Payment methods', 'active' => true]]);
         $layout->view('checkout/payment')->set('payment_methods', $paymentMethods)
                                          ->set('payment_html', $paymentMethodsHtml)
                                          ->set('cart', $cart);
-        $this->layout('/checkout/payment');
     }
 
     public function action_payment__POST()
     {
-        $post = BRequest::i()->post();
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
+        $post = $this->BRequest->post();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
 
         if (!empty($post['payment_method'])) {
             $cart->payment_method = $post['payment_method'];
             $cart->save();
-            if (FCom_Customer_Model_Customer::isLoggedIn()) {
-                $user = FCom_Customer_Model_Customer::i()->sessionUser();
+            if ($this->FCom_Customer_Model_Customer->isLoggedIn()) {
+                $user = $this->FCom_Customer_Model_Customer->sessionUser();
                 $user->payment_method = $post['payment_method'];
                 $user->save();
             }
         }
 
-        $href = BApp::href('checkout');
-        BResponse::i()->redirect($href);
+        $href = $this->BApp->href('checkout');
+        $this->BResponse->redirect($href);
     }
 
     public function action_shipping()
     {
-        $layout = BLayout::i();
+        $layout = $this->BLayout;
+        $this->layout('/checkout/shipping');
         $layout->view('breadcrumbs')->set('crumbs', [
-            ['label' => 'Home', 'href' =>  BApp::baseUrl()],
-            ['label' => 'Checkout', 'href' =>  BApp::href("checkout")],
+            ['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
+            ['label' => 'Checkout', 'href' =>  $this->BApp->href("checkout")],
             ['label' => 'Shipping address', 'active' => true]]);
         $layout->view('checkout/shipping')->set(['address' => [], 'methods' => []]);
-        $this->layout('/checkout/shipping');
     }
 
     public function action_shipping__POST()
     {
-        $href = BApp::href('checkout/payment');
-        BResponse::i()->redirect($href);
+        $href = $this->BApp->href('checkout/payment');
+        $this->BResponse->redirect($href);
     }
 
     public function action_success()
     {
-        $sData =& BSession::i()->dataToUpdate();
+        $sData =& $this->BSession->dataToUpdate();
         if (empty($sData['last_order']['id'])) {
-            BResponse::i()->redirect('checkout');
+            $this->BResponse->redirect('checkout');
             return;
         }
 
         $user = false;
-        if (BApp::m('FCom_Customer')) {
-            $user = FCom_Customer_Model_Customer::i()->sessionUser();
+        if ($this->BApp->m('FCom_Customer')) {
+            $user = $this->FCom_Customer_Model_Customer->sessionUser();
         }
 
-        $salesOrder = FCom_Sales_Model_Order::i()->load($sData['last_order']['id']);
+        $salesOrder = $this->FCom_Sales_Model_Order->load($sData['last_order']['id']);
 
-        BLayout::i()->view('email/new-order-customer')->set('order', $salesOrder)->email();
+        $this->layout('/checkout/success');
         $this->view('breadcrumbs')->set('crumbs', [
-            ['label' => 'Home', 'href' =>  BApp::baseUrl()],
+            ['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
             ['label' => 'Confirmation', 'active' => true],
         ]);
         $this->view('checkout/success')->set(['order' => $salesOrder, 'user' => $user]);
-        $this->layout('/checkout/success');
     }
 }

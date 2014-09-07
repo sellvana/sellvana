@@ -1,21 +1,21 @@
 {% set c = THIS.get('model') %}
 {% set services = APP.instance('FCom_ShippingUps_ShippingMethod').getServices() %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 
 <h2>{{ "ShippingUPS Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_ShippingUps'}) }}
-    {% set fieldData = { model: c, settings_module: 'FCom_ShippingUps' } %}
+    {% set fieldData = { model: c, settings_module: 'FCom_ShippingUps', attr: 'size="50"' } %}
     {{ forms.accordion_panel_start({label:'UPS API'|_, id:'settings-FCom_ShippingUps-group0', in:1}) }}
-        {{ forms.input(fieldData|merge({field:'access_key', attr: 'size="50"', label:'Access Key'|_ })) }}
-        {{ forms.input(fieldData|merge({field:'account', attr: 'size="50"', label:'UPS Account'|_ })) }}
-        {{ forms.input(fieldData|merge({field:'password', attr: 'size="50"', label:'Password'|_ })) }}
-        {{ forms.input(fieldData|merge({field:'rate_api_url', attr: 'size="50"', label:'Rate API URL'|_ })) }}
+        {{ forms.input(fieldData, {field:'access_key', label:'Access Key'|_ }) }}
+        {{ forms.input(fieldData, {field:'account', label:'UPS Account'|_ }) }}
+        {{ forms.input(fieldData, {field:'password', label:'Password'|_ }) }}
+        {{ forms.input(fieldData, {field:'rate_api_url', label:'Rate API URL'|_ }) }}
     {{ forms.accordion_panel_end }}
 
     {% set fieldData = { model: c, id_prefix:'FCom_ShippingUps-services', name_prefix:'config[modules][FCom_ShippingUps][services]', get_prefix:'modules/FCom_ShippingUps/services' } %}
     {{ forms.accordion_panel_start({label:'Shipping services'|_, id:'settings-FCom_ShippingUps-group1' }) }}
         {% for sId, sName in services %}
-            {{ forms.boolean(fieldData|merge({field: 's' ~ sId, label: sName })) }}
+            {{ forms.boolean(fieldData, {field: 's' ~ sId, label: sName }) }}
         {% endfor %}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

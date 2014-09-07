@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_PushServer_Main extends BCLass
 {
@@ -6,39 +6,39 @@ class FCom_PushServer_Main extends BCLass
 
     protected static $_debug = false;
 
-    static public function bootstrap()
+    public function bootstrap()
     {
-        static::i()
+        $this
             //->addService('/^./', 'FCom_PushServer_Main::catchAll')
             ->addService('client', 'FCom_PushServer_Service_Client')
         ;
         static::$_debug = true;
     }
 
-    static public function catchAll($message)
+    public function catchAll($message)
     {
         if (!empty($message['seq'])) {
-            FCom_PushServer_Model_Client::i()->sessionClient()->send([
+            $this->FCom_PushServer_Model_Client->sessionClient()->send([
                 'ref_seq' => $message['seq'],
                 'signal' => 'received',
             ]);
         }
     }
 
-    static public function layoutInit()
+    public function layoutInit()
     {
-        $head = BLayout::i()->view('head');
-        if ($head) {
+        $head = $this->BLayout->view('head');
+        if ($head && $this->FCom_Admin_Model_User->isLoggedIn()) {
             $head->js_raw('pushserver_init', ['content' => "
-FCom.pushserver_url = '" . BApp::src('@FCom_PushServer/index.php') . "';
+FCom.pushserver_url = '" . $this->BApp->src('@FCom_PushServer/index.php') . "';
             "]);
         }
     }
 
-    static public function onAdminUserLogout($args)
+    public function onAdminUserLogout($args)
     {
-        $userId = FCom_Admin_Model_User::i()->sessionUserId();
-        FCom_PushServer_Model_Client::i()->delete_many(['admin_user_id' => $userId]);
+        $userId = $this->FCom_Admin_Model_User->sessionUserId();
+        $this->FCom_PushServer_Model_Client->delete_many(['admin_user_id' => $userId]);
         //TODO: implement roster (online/offline) notifications
     }
 
@@ -57,8 +57,9 @@ FCom.pushserver_url = '" . BApp::src('@FCom_PushServer/index.php') . "';
         return $this->_services;
     }
 
-    static public function isDebugMode()
+    public function isDebugMode()
     {
         return static::$_debug;
     }
+
 }

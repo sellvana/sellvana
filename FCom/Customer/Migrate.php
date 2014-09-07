@@ -1,14 +1,14 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Customer_Migrate extends BClass
 {
-    public function install__0_1_8()
+    public function install__0_1_11()
     {
-        $tCustomer = FCom_Customer_Model_Customer::table();
-        BDb::run("
+        $tCustomer = $this->FCom_Customer_Model_Customer->table();
+        $this->BDb->run("
             CREATE TABLE IF NOT EXISTS {$tCustomer} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `email` varchar(100)  NOT NULL,
+            `email` varchar(255)  NOT NULL,
             `firstname` varchar(50)  NOT NULL,
             `lastname` varchar(50)  NOT NULL,
             `password_hash` text ,
@@ -18,20 +18,22 @@ class FCom_Customer_Migrate extends BClass
             `update_at` datetime NOT NULL,
             `last_login` datetime DEFAULT NULL,
             `token` varchar(20) DEFAULT NULL,
+            `token_at` datetime default null,
             `payment_method` varchar(20)  DEFAULT NULL,
             `payment_details` text ,
             `status` enum('review','active','disabled') NOT NULL DEFAULT 'review',
+            `password_session_token` varchar(16),
             PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
 
-        $tCustomer = FCom_Customer_Model_Customer::table();
-        $tAddress = FCom_Customer_Model_Address::table();
-        BDb::run("
+        $tCustomer = $this->FCom_Customer_Model_Customer->table();
+        $tAddress = $this->FCom_Customer_Model_Address->table();
+        $this->BDb->run("
             CREATE TABLE IF NOT EXISTS {$tAddress} (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
               `customer_id` int(11) unsigned NOT NULL,
-              `email` varchar(100)  NOT NULL,
+              `email` varchar(255)  NOT NULL,
               `firstname` varchar(50)  DEFAULT NULL,
               `lastname` varchar(50)  DEFAULT NULL,
               `middle_initial` varchar(2)  DEFAULT NULL,
@@ -65,13 +67,13 @@ class FCom_Customer_Migrate extends BClass
 
     public function upgrade__0_1_0__0_1_1()
     {
-        $tAddress = FCom_Customer_Model_Address::table();
-        BDb::ddlClearCache();
-        if (BDb::ddlFieldInfo($tAddress, "lat")) {
+        $tAddress = $this->FCom_Customer_Model_Address->table();
+        $this->BDb->ddlClearCache();
+        if ($this->BDb->ddlFieldInfo($tAddress, "lat")) {
             return;
         }
         try {
-            BDb::run("
+            $this->BDb->run("
                 ALTER TABLE {$tAddress}
                 ADD COLUMN `lat` DECIMAL(15,10) NULL,
                 ADD COLUMN `lng` DECIMAL(15,10) NULL;
@@ -81,13 +83,13 @@ class FCom_Customer_Migrate extends BClass
 
     public function upgrade__0_1_1__0_1_2()
     {
-        $tCustomer = FCom_Customer_Model_Customer::table();
-        BDb::ddlClearCache();
-        if (BDb::ddlFieldInfo($tCustomer, "payment_method")) {
+        $tCustomer = $this->FCom_Customer_Model_Customer->table();
+        $this->BDb->ddlClearCache();
+        if ($this->BDb->ddlFieldInfo($tCustomer, "payment_method")) {
             return;
         }
         try {
-            BDb::run("
+            $this->BDb->run("
                 ALTER TABLE {$tCustomer}
                     ADD `payment_method` VARCHAR( 20 ) NOT NULL,
                     ADD `payment_details` TEXT NOT NULL
@@ -98,7 +100,7 @@ class FCom_Customer_Migrate extends BClass
 
     public function upgrade__0_1_2__0_1_3()
     {
-        BDb::ddlTableDef(FCom_Customer_Model_Address::table(), [
+        $this->BDb->ddlTableDef($this->FCom_Customer_Model_Address->table(), [
             'COLUMNS' => [
                 'state' => 'RENAME region varchar(50)',
                 'zip' => 'RENAME postcode varchar(20)',
@@ -108,7 +110,7 @@ class FCom_Customer_Migrate extends BClass
 
     public function upgrade__0_1_3__0_1_4()
     {
-        BDb::ddlTableDef(FCom_Customer_Model_Address::table(), [
+        $this->BDb->ddlTableDef($this->FCom_Customer_Model_Address->table(), [
             'COLUMNS' => [
                 'middle_initial' => 'VARCHAR(2) NULL AFTER lastname',
                 'prefix' => 'VARCHAR(10) NULL AFTER middle_initial',
@@ -120,7 +122,7 @@ class FCom_Customer_Migrate extends BClass
 
     public function upgrade__0_1_4__0_1_5()
     {
-        BDb::ddlTableDef(FCom_Customer_Model_Address::table(), [
+        $this->BDb->ddlTableDef($this->FCom_Customer_Model_Address->table(), [
             'COLUMNS' => [
                 'email' => 'VARCHAR(100) NOT NULL AFTER customer_id',
             ],
@@ -129,15 +131,15 @@ class FCom_Customer_Migrate extends BClass
 
     public function upgrade__0_1_5__0_1_6()
     {
-        $table = FCom_Customer_Model_Customer::table();
-        BDb::ddlTableDef($table, [
+        $table = $this->FCom_Customer_Model_Customer->table();
+        $this->BDb->ddlTableDef($table, [
             'COLUMNS' => [
                   'create_dt'      => 'RENAME create_at datetime NOT NULL',
                   'update_dt'      => 'RENAME update_at datetime NOT NULL',
             ],
         ]);
-        $table = FCom_Customer_Model_Address::table();
-        BDb::ddlTableDef($table, [
+        $table = $this->FCom_Customer_Model_Address->table();
+        $this->BDb->ddlTableDef($table, [
             'COLUMNS' => [
                   'create_dt'      => 'RENAME create_at datetime NOT NULL',
                   'update_dt'      => 'RENAME update_at datetime NOT NULL',
@@ -147,8 +149,8 @@ class FCom_Customer_Migrate extends BClass
 
     public function upgrade__0_1_6__0_1_7()
     {
-        $table = FCom_Customer_Model_Customer::table();
-        BDb::ddlTableDef($table, [
+        $table = $this->FCom_Customer_Model_Customer->table();
+        $this->BDb->ddlTableDef($table, [
             'COLUMNS' => [
                 'status' => 'ENUM("review", "active", "disabled") NOT NULL DEFAULT "review"',
             ],
@@ -157,12 +159,65 @@ class FCom_Customer_Migrate extends BClass
 
     public function upgrade__0_1_7__0_1_8()
     {
-        $table = FCom_Customer_Model_Customer::table();
-        BDb::ddlTableDef($table, [
+        $table = $this->FCom_Customer_Model_Customer->table();
+        $this->BDb->ddlTableDef($table, [
             'COLUMNS' => [
                 'payment_method' => 'varchar(20) null',
                 'payment_details' => 'text null',
             ],
         ]);
+    }
+
+    public function upgrade__0_1_8__0_1_9()
+    {
+        $table = $this->FCom_Customer_Model_Customer->table();
+        $this->BDb->ddlTableDef($table, [
+            'COLUMNS' => [
+                'email' => 'varchar(255)',
+            ],
+        ]);
+        $table = $this->FCom_Customer_Model_Address->table();
+        $this->BDb->ddlTableDef($table, [
+            'COLUMNS' => [
+                'email' => 'varchar(255)',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_1_9__0_1_10()
+    {
+        $table = $this->FCom_Customer_Model_Customer->table();
+        $this->BDb->ddlTableDef($table, [
+            'COLUMNS' => [
+                'password_session_token' => 'varchar(16)',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_1_10__0_1_11()
+    {
+        $table = $this->FCom_Customer_Model_Customer->table();
+        $this->BDb->ddlTableDef($table, [
+            'COLUMNS' => [
+                'token_at' => 'datetime default null after token',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_1_11__0_1_12()
+    {
+        $tCustomer = $this->FCom_Customer_Model_Customer->table();
+        $tAddress = $this->FCom_Customer_Model_Address->table();
+        $this->BDb->ddlTableDef($tAddress, [
+            'COLUMNS' => [
+                'is_default_billing' => 'tinyint not null default 0',
+                'is_default_shipping' => 'tinyint not null default 0',
+            ],
+        ]);
+        $this->BDb->run("UPDATE {$tAddress} a, {$tCustomer} c
+            SET a.is_default_billing=IF(c.default_billing_id=a.id,1,0),
+                a.is_default_shipping=IF(c.default_shipping_id=a.id,1,0)
+            WHERE a.customer_id=c.id
+        ");
     }
 }

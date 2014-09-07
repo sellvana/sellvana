@@ -1,0 +1,25 @@
+.f-prod-listing .link-wishlist {
+  float:right;
+  margin-top:3px;
+  }
+.f-prod-listing .link-wishlist .label {
+  display:none;
+  }
+.f-prod-listing .link-wishlist .fa {
+  margin-top:3px;
+  font-size:22px;
+  }
+.f-prod-listing .link-wishlist .fa-heart-o {
+  color:#ddd;
+  }
+.f-prod-listing .link-wishlist .fa-heart-o:hover {
+  color:#aaa;
+  }
+.f-prod-listing .link-wishlist .fa-heart {
+  color:#ee8371;
+  }
+
+.link-wishlist .if-active { display: none; }
+.link-wishlist .if-not-active { display: block; }
+.link-wishlist.active .if-active { display: block; }
+.link-wishlist.active .if-not-active { display: none; }

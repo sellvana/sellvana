@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Sales_Model_Cart_Total_Subtotal extends FCom_Sales_Model_Cart_Total_Abstract
 {
@@ -16,9 +16,16 @@ class FCom_Sales_Model_Cart_Total_Subtotal extends FCom_Sales_Model_Cart_Total_A
                 $this->_cart->removeProduct($item->product_id);
             }
             $itemNum++;
-            $item->qty = $item->qty;
+            //$item->qty = $item->qty; //TODO: what's up with that
             $itemQty += $item->qty;
-            $item->rowtotal = $item->rowTotal();
+            $variants = $item->getData('variants');
+            if (!is_null($variants)) {
+                foreach($variants as $key => $variant) {
+                    $item->rowtotal += $item->rowTotal($key);
+                }
+            } else {
+                $item->rowtotal = $item->rowTotal();
+            }
             $subtotal += $item->rowtotal;
         }
 

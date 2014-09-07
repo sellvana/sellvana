@@ -3,6 +3,8 @@
 {% else %}
     <section class="f-category-prod-listing">
 
+      {{ THIS.view('catalog/compare-toolbar') | raw }}
+
       {{ THIS.view('catalog/product/pager') | raw }}
 
       <div class="f-prod-listing f-prod-listing-grid">

@@ -1,28 +1,28 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Core_Model_Config extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_core_config';
     protected $_instance_id_column = 'path';
 
-    public static function fetch($path)
+    public function fetch($path)
     {
-        return ($row = static::load($path)) ? $row->value : null;
+        return ($row = $this->load($path)) ? $row->value : null;
     }
 
-    public static function store($path, $value)
+    public function store($path, $value)
     {
-        if (($row = static::load($path))) {
+        if (($row = $this->load($path))) {
             $row->set('value', $value)->save();
         } else {
-            static::create(['path' => $path, 'value' => $value])->save();
+            $this->create(['path' => $path, 'value' => $value])->save();
         }
     }
 
-    public static function install()
+    public function install()
     {
-        BDb::run("
-CREATE TABLE IF NOT EXISTS " . static::table() . " (
+        $this->BDb->run("
+CREATE TABLE IF NOT EXISTS " . $this->table() . " (
   `path` varchar(100)  NOT NULL,
   `value` text ,
   PRIMARY KEY (`path`)

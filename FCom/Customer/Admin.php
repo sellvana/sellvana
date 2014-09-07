@@ -1,10 +1,10 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Customer_Admin extends BClass
 {
-    public static function bootstrap()
+    public function bootstrap()
     {
-        FCom_Admin_Model_Role::i()->createPermission([
+        $this->FCom_Admin_Model_Role->createPermission([
             'api/customers' => 'Customers',
             'api/customers/view' => 'View',
             'api/customers/update' => 'Update',
@@ -13,7 +13,7 @@ class FCom_Customer_Admin extends BClass
             'customers/import' => 'Import',
         ]);
 
-        FCom_Admin_Controller_MediaLibrary::i()->allowFolder('storage/import/customers');
+        $this->FCom_Admin_Controller_MediaLibrary->allowFolder('{random}/import/customers');
     }
 
     public function onGetDashboardWidgets($args)
@@ -29,10 +29,7 @@ class FCom_Customer_Admin extends BClass
 
     public function onControllerBeforeDispatch($args)
     {
-        if (BApp::m('FCom_PushServer')->run_status === BModule::LOADED
-            && BConfig::i()->get('modules/FCom_Customer/newcustomer_realtime_notification')
-        ) {
-            FCom_PushServer_Model_Client::i()->sessionClient()->subscribe('customers_feed');
-        }
+
     }
+
 }

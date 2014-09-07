@@ -1,17 +1,19 @@
 {% set config = THIS.get('config') %}
-{% set mediaLibAttachConfig = APP.instance('FCom_Admin_Controller_MediaLibrary').gridConfig({'id': config.id, 'folder': config.folder, 'config': config.config, 'mode': config.mode}) %}
+{% set mediaLib =  APP.instance('FCom_Admin_Controller_MediaLibrary') %}
+{% set mediaLibAttachConfig = mediaLib.gridConfig({'id': config.id, 'folder': config.folder, 'config': config.config, 'mode': config.mode}) %}
+{% set uploadConfig = mediaLib.uploadConfig(config.type) %}
 {% if config.title %}
 <div class='modal fade' id='{{config.id}}_modal' tabindex='-1'>
-    <div class='modal-dialog' style='width:900px;'>        
+    <div class='modal-dialog' style='width:900px;'>
         <div class='modal-content'>
 
             <div class='modal-header'>
                 <button aria-hidden="true" class="close" data-dismiss="modal" type="button">×</button>
                 <h4 class="modal-title" id="myLangLabel">{{ config.title}} </h4>
             </div>
-            
+
 {% endif %}
-            <div class='modal-body'>            
+            <div class='modal-body'>
                 <div class='row'>
                     <div class='tabbable'>
                         <ul class='nav nav-tabs prod-type f-horiz-nav-tabs'>
@@ -20,16 +22,19 @@
                                     {{ 'Library'|_ }}
                                 </a>
                             </li>
+                            {% if uploadConfig.can_upload %}
                             <li>
                                 <a data-toggle='tab' href='#{{config.id}}-media-upload'>
                                     {{ 'Upload'|_ }}
                                 </a>
                             </li>
+                            {% endif %}
                         </ul>
                         <div class='tab-content'>
                             <div class='tab-pane active' id='{{config.id}}-attach_library'>
                                 {{ THIS.view('core/backbonegrid').set('grid', mediaLibAttachConfig) | raw }}
                             </div>
+                            {% if uploadConfig.can_upload %}
                             <div class='tab-pane' id='{{config.id}}-media-upload'>
                                 <div class='box-content'>
                                     <div class='row fileupload-buttonbar'>
@@ -137,53 +142,59 @@
                                 </script>
                                 {% endverbatim %}
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
-{% if config.title %}     
+{% if config.title %}
             <div class='modal-footer'>
                 <button class='btn btn-primary btn-add btn_{{config.id}}_add disabled' data-dismiss='modal' type='button'>{{ "Add"|_ }}</button>
                 <button class='btn btn-default btn-close btn_{{config.id}}_close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
-            </div>            
+            </div>
         </div>
-    </div>               
+    </div>
 </div>
 {% endif %}
 <script>
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
         var mediaGrid = window['{{ config.id }}_grid'];
+        var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{config.type ? config.type : "" }}';
         $('#{{config.id}}-media-upload').fileupload({
-            url: '{{ APP.href("media/grid/upload?folder=") | raw }}{{ config.folder | raw}}',
+            url: uploadUrl,
             multiple:true
             {% if config.mode and config.mode == 'thumbnail' %}
                 ,acceptFileTypes:  /(\.|\/)(jpe?g|tiff|gif|png|bmp)$/i
+            {% elseif uploadConfig.filetype_regex %}
+                ,acceptFileTypes: {{ uploadConfig.filetype_regex }}
             {% endif %}
         })
         .bind('fileuploadalways', function(e, data) {
 
-            if(data.result.id) {
-                //get self media grid
+            if ($.isArray(data.result.files)) {
+                data.result.files.forEach(function (obj) {
+                    //get self media grid
 
-                //insert uploaded file in media grid and get selected
-                var newRow = data.result;
+                    //insert uploaded file in media grid and get selected
+                    var newRow = obj;
 
-                //if multiselect config param is set, we insert  new uploaded rows in library grid with checked.
-                {% if config.multiSelAllowed %}
+                    //if multiselect config param is set, we insert  new uploaded rows in library grid with checked.
+                    {% if config.multiSelAllowed %}
                     newRow.selected = true;
-                    {{config.id}}_grid.getSelectedRows().add(data.result);
-                {% endif %}
-                
-                {{config.id}}_grid.getRows().add(newRow,{merge: true}).trigger('render');
+                    {{config.id}}_grid.getSelectedRows().add(obj);
+                    {% endif %}
 
-                $('td.name span').each(function(i) {
-                    if($(this).html() === data.result.file_name)
-                        $(this).parents('tr:first').remove();
-                });
+                    {{config.id}}_grid.getRows().add(newRow,{merge: true}).trigger('render');
+
+                    $('td.name span').each(function(i) {
+                        if($(this).html() === obj.file_name)
+                            $(this).parents('tr:first').remove();
+                    });
+                })
             }
         });
-        $('.btn-rescan-images').click(function () {
-            $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw}}', function (response) {
+        $('#{{ config.id }}').on('click', '.btn-rescan-images', function () {
+            $.post('{{ APP.href("media/grid/rescan?folder=") | raw }}{{ config.folder | raw}}&&type={{ config.type }}', { do: 'rescan'}, function (response) {
                 if (response.status == 'success') {
                     $.bootstrapGrowl("Rescan success", { type: 'success', align: 'center', width: 'auto' });
                     mediaGrid.getRows().fetch();

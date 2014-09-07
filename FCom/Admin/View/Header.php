@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Admin_View_Header extends FCom_Core_View_Abstract
 {
@@ -20,8 +20,8 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
     public function getNotifications()
     {
         $notifications = [];
-        BEvents::i()->fire(__METHOD__, ['notifications' => &$notifications]);
-        $conf      = BConfig::i();
+        $this->BEvents->fire(__METHOD__, ['notifications' => &$notifications]);
+        $conf      = $this->BConfig;
         $dismissed = $conf->get('modules/FCom_Core/dismissed/notifications');
         $result = [];
         foreach ($notifications as $k => &$item) {
@@ -38,7 +38,7 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
             if (empty($item['title'])) {
                 $item['title'] = $item['message'];
             }
-            $item['html'] = BUtil::tagHtml('a', [
+            $item['html'] = $this->BUtil->tagHtml('a', [
                 'href' => $item['href'],
                 'title' => $item['title'],
 
@@ -52,5 +52,40 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
     public function getRecentActivity()
     {
         return [];
+    }
+
+    public function getLocales()
+    {
+        $conf = $this->BConfig->get('modules/FCom_Admin');
+        if (empty($conf['enable_locales']) || empty($conf['allowed_locales'])) {
+            return false;
+        }
+        $locales = [];
+        $urlTpl = $this->BUtil->setUrlQuery($this->BApp->href('switch_locale'), ['locale' => '-LOCALE-']);
+        sort($conf['allowed_locales']);
+        foreach ($conf['allowed_locales'] as $locale) {
+            list($flag) = explode('_', $locale);
+            $locales[] = [
+                'code' => $locale,
+                'title' => $locale,
+                'flag' => $flag,
+                'href' => str_replace('-LOCALE-', $locale, $urlTpl),
+            ];
+        }
+        return $locales;
+    }
+
+    public function getCurrentLocale()
+    {
+        $locale = $this->BSession->get('_locale');
+#echo "<pre>"; var_dump($locale); exit;
+        if (!$locale) {
+            $locale = $this->BConfig->get('modules/FCom_Admin/default_locale');
+        }
+        list($flag) = explode('_', $locale);
+        return [
+            'title' => $locale,
+            'flag' => $flag,
+        ];
     }
 }

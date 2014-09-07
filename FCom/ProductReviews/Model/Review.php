@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
 {
@@ -32,15 +32,15 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
 
     public function notify()
     {
-        BLayout::i()->view('email/prodreview-new-admin')->email();
-        BLayout::i()->view('email/prodreview-new-customer')->email();
+        $this->BLayout->view('email/prodreview-new-admin')->email();
+        $this->BLayout->view('email/prodreview-new-customer')->email();
         return $this;
     }
 
     public function confirm()
     {
         $this->set('approved', 1)->save();
-        BLayout::i()->view('email/prodreview-confirm-customer')->email();
+        $this->BLayout->view('email/prodreview-confirm-customer')->email();
         return $this;
     }
 
@@ -50,7 +50,7 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
 
         //TODO: condition on relevant changes only (approved, rating)
         $pId = $this->get('product_id');
-        $rating = static::i()->orm()->where('product_id', $pId)
+        $rating = $this->orm()->where('product_id', $pId)
             ->where('approved', 1)
             ->select('(avg(rating))', 'avg')
             #->select('(avg(rating1))', 'avg1')
@@ -58,10 +58,11 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
             #->select('(avg(rating3))', 'avg3')
             ->select('(count(1))', 'num')
             ->find_one();
-        FCom_Catalog_Model_Product::i()->load($pId)
+        $this->FCom_Catalog_Model_Product->load($pId)
             ->set('avg_rating', $rating->get('avg'))
             ->set('num_reviews', $rating->get('num'))
             ->save();
+
         return $this;
     }
 
@@ -78,7 +79,7 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
         return static::$_config;
     }
 
-    static public function indexAvgRating($products, $field)
+    public function indexAvgRating($products, $field)
     {
         $data = [];
         foreach ($products as $p) {

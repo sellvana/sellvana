@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_ProductReviews_Frontend extends BClass
 {
@@ -6,10 +6,10 @@ class FCom_ProductReviews_Frontend extends BClass
     {
         $product = $args['product'];
 
-        $productReviews = FCom_ProductReviews_Model_Review::i()->orm()
+        $productReviews = $this->FCom_ProductReviews_Model_Review->orm()
             ->where("product_id", $product->id())->find_many();
 
-        return BLayout::i()->view('prodreviews/reviews')
+        return $this->BLayout->view('prodreviews/reviews')
             ->set(['product' => $product, 'product_reviews' => $productReviews])
             ->render();
     }

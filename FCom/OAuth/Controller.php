@@ -1,55 +1,58 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_OAuth_Controller extends FCom_Core_Controller_Abstract
 {
     public function action_login()
     {
-        $hlp = FCom_OAuth_Main::i();
-        $returnUrl = BRequest::i()->get('redirect_to');
-        if (!$returnUrl) {
-            $returnUrl = BApp::href('login');
+        $hlp = $this->FCom_OAuth_Main;
+        $returnUrl = $this->BRequest->get('redirect_to');
+        if (!$r->isUrlLocal($returnUrl)) {
+            $returnUrl = '';
         }
-        $providerName = BRequest::i()->param('provider', true);
+        if (!$returnUrl) {
+            $returnUrl = $this->BApp->href('login');
+        }
+        $providerName = $this->BRequest->param('provider', true);
         if ($returnUrl) {
             $hlp->setReturnUrl($returnUrl);
         }
         try {
             $hlp->setProvider($providerName);
             $authUrl = $hlp->loginAction();
-            BResponse::i()->redirect($authUrl);
+            $this->BResponse->redirect($authUrl);
         } catch (Exception $e) {
 echo "<pre>"; print_r($e); exit;
-            $area = BApp::i()->get('area') === 'FCom_Admin' ? 'admin' : 'frontend';
-            BSession::i()->addMessage($e->getMessage(), 'error', $area);
-            BResponse::i()->redirect($returnUrl);
+            $area = $this->BRequest->area() === 'FCom_Admin' ? 'admin' : 'frontend';
+            $this->BSession->addMessage($e->getMessage(), 'error', $area);
+            $this->BResponse->redirect($returnUrl);
         }
     }
 
     public function action_callback()
     {
-        $hlp = FCom_OAuth_Main::i();
+        $hlp = $this->FCom_OAuth_Main;
         $returnUrl = $hlp->getReturnUrl();
         try {
             $hlp->callbackAction();
         } catch (Exception $e) {
 echo "<pre>"; print_r($e); exit;
-            $area = BApp::i()->get('area') === 'FCom_Admin' ? 'admin' : 'frontend';
-            BSession::i()->addMessage($e->getMessage(), 'error', $area);
+            $area = $this->BRequest->area() === 'FCom_Admin' ? 'admin' : 'frontend';
+            $this->BSession->addMessage($e->getMessage(), 'error', $area);
         }
-        BResponse::i()->redirect($returnUrl);
+        $this->BResponse->redirect($returnUrl);
     }
 
     public function action_test1()
     {
-        $prov = FCom_OAuth_Main::i()->setProvider('twitter')->getProviderInfo('twitter');
+        $prov = $this->FCom_OAuth_Main->setProvider('twitter')->getProviderInfo('twitter');
         $oauth = new OAuthSimple();
-        $c = BConfig::i()->get('modules/FCom_OAuth/twitter');
+        $c = $this->BConfig->get('modules/FCom_OAuth/twitter');
         $signatures = [ 'consumer_key' => $c['consumer_key'], 'shared_secret' => $c['consumer_secret']];
         $oauth->setAction('POST');
         $signed = $oauth->sign(['path' => $prov['request'], 'signatures' => $signatures]);
 echo "<pre>"; var_dump($signed);
-        //$response = BUtil::remoteHTTP('GET', $prov['request_url'], $signed['parameters'], ['Authorization: ' . $signed['header']]);
-        $response = BUtil::remoteHTTP('POST', $signed['signed_url'], [], ['Authorization: ' . $signed['header']]);
+        //$response = $this->BUtil->remoteHTTP('GET', $prov['request_url'], $signed['parameters'], ['Authorization: ' . $signed['header']]);
+        $response = $this->BUtil->remoteHTTP('POST', $signed['signed_url'], [], ['Authorization: ' . $signed['header']]);
 echo "<pre>"; var_dump($response);
 exit;
     }
@@ -59,7 +62,7 @@ exit;
         require(__DIR__.'/lib/http.php');
         require(__DIR__.'/lib/oauth_client.php');
 
-        $c = BConfig::i()->get('modules/FCom_OAuth/bitbucket');
+        $c = $this->BConfig->get('modules/FCom_OAuth/bitbucket');
 
         $client = new oauth_client_class;
         $client->debug = 1;
@@ -67,7 +70,7 @@ exit;
         $client->server = 'BitBucket';
         #$client->redirect_uri = 'http://'.$_SERVER['HTTP_HOST'].
             #dirname(strtok($_SERVER['REQUEST_URI'],'?')).'/login_with_twitter.php';
-        $client->redirect_uri = 'http://127.0.0.1/sellvana/index.php/oauth/callback';#BApp::href('oauth/callback');
+        $client->redirect_uri = 'http://127.0.0.1/sellvana/index.php/oauth/callback';#$this->BApp->href('oauth/callback');
     //    $client->redirect_uri = 'oob';
 
         $client->client_id = $c['consumer_key']; $application_line = __LINE__;

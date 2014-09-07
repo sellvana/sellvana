@@ -1,28 +1,28 @@
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
 {% set fieldData = { validator:validator } %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 
 <fieldset name="main-product">
   <div class="f-section">
-    {{ forms.input(fieldData|merge({field:'product_name', required:1, label:'Product Name'|_, form_group_class:'has-multilang'})) }}
+    {{ forms.input(fieldData, {field:'product_name', required:1, label:'Product Name'|_, form_group_class:'has-multilang'}) }}
     <div id="main-product-name-lang"></div>
 
-    {{ forms.input(fieldData|merge({field:'url_key', label:'URL Key'|_ ~ ' (' ~ 'optional'|_ ~ ')'})) }}
+    {{ forms.input(fieldData, {field:'url_key', label:'URL Key'|_ ~ ' (' ~ 'optional'|_ ~ ')'}) }}
 
-    {{ forms.input(fieldData|merge({field:'local_sku', required:1, label:'SKU'|_})) }}
+    {{ forms.input(fieldData, {field:'local_sku', required:1, label:'SKU'|_}) }}
 
-    {{ forms.textarea(fieldData|merge({field:'short_description', required:1, label:'Short Description'|_, form_group_class:'has-multilang'})) }}
+    {{ forms.textarea(fieldData, {field:'short_description', required:1, label:'Short Description'|_, form_group_class:'has-multilang'}) }}
     <div id="main-product-shortdesc-lang"></div>
 
-    {{ forms.wysiwyg(fieldData|merge({field:'description', required:1, label:'Long Description'|_, form_group_class:'has-multilang', input_div_class:'col-md-10', raw:1})) }}
+    {{ forms.wysiwyg(fieldData, {field:'description', required:1, label:'Long Description'|_, form_group_class:'has-multilang', input_div_class:'col-md-10', raw:1}) }}
     <div id="main-product-desc-lang"></div>
 
-    {{ forms.input(fieldData|merge({field:'net_weight', label:'Net Weight'|_})) }}
+    {{ forms.input(fieldData, {field:'net_weight', label:'Net Weight'|_}) }}
 
-    {{ forms.input(fieldData|merge({field:'ship_weight', label:'Shipping Weight'|_})) }}
+    {{ forms.input(fieldData, {field:'ship_weight', label:'Shipping Weight'|_}) }}
 
-    {{ forms.boolean(fieldData|merge({field:'is_hidden', label:'Hide Product'|_})) }}
+    {{ forms.boolean(fieldData, {field:'is_hidden', label:'Hide Product'|_}) }}
 
     <input type='hidden' id='name_lang_fields' name='name_lang_fields'/>
     <input type='hidden' id='short_desc_lang_fields' name='short_desc_lang_fields'/>
@@ -106,6 +106,7 @@
 
 <script>
 var prodVariantGrid = null;
+var submitCallback = [];
 require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'unique'], function(Backbone, _, $) {
     var _mainForm = $('#catalog-products-form');
     var _submitted = false; //flag for prevent infitive loop
@@ -145,9 +146,15 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery.validate', 'uniq
         $("#desc_lang_fields").val(JSON.stringify(descModel.langFields.toJSON()));
 
         //setting hidden values, 'if' statement is required to check tab is load or not.
-        if (typeof(window.setAttachementsGridVals) === 'function') {
-            setAttachementsGridVals();
+        for(var i=0; i<submitCallback.length; i++){
+            if(typeof submitCallback[i] === 'function') {
+                submitCallback[i]();
+            }
         }
+
+        /*if (typeof(window.setAttachementsGridVals) === 'function') {
+            setAttachementsGridVals();
+        }*/
 
         if (typeof(window.setImagesGridVals) === 'function') {
             setImagesGridVals();

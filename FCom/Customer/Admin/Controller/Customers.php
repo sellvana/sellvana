@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -22,17 +22,17 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             ['name' => 'lastname', 'label' => 'Last Name', 'index' => 'c.lastname'],
             ['name' => 'email', 'label' => 'Email', 'index' => 'c.email'],
             ['type' => 'input', 'name' => 'customer_group', 'label' => 'Customer Group', 'index' => 'c.customer_group',
-                  'editor' => 'select', 'options' => FCom_CustomerGroups_Model_Group::i()->groupsOptions(),
+                  'editor' => 'select', 'options' => $this->FCom_CustomerGroups_Model_Group->groupsOptions(),
                   'editable' => true, 'mass-editable' => true, 'validation' => ['required' => true]],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'c.status', 'editor' => 'select',
-                  'options' => FCom_Customer_Model_Customer::i()->fieldOptions('status'),
+                  'options' => $this->FCom_Customer_Model_Customer->fieldOptions('status'),
                   'editable' => true, 'mass-editable' => true, 'validation' => ['required' => true]],
             ['name' => 'street1', 'label' => 'Address', 'index' => 'a.street1'],
             ['name' => 'city', 'label' => 'City', 'index' => 'a.city'],
             ['name' => 'region', 'label' => 'Region', 'index' => 'a.region'],
             ['name' => 'postcode', 'label' => 'Postal Code', 'index' => 'a.postcode'],
             ['type' => 'input', 'name' => 'country', 'label' => 'Country', 'index' => 'a.country', 'editor' => 'select',
-                    'options' => FCom_Geo_Model_Country::i()->options()],
+                    'options' => $this->BLocale->getAvailableCountries()],
             ['name' => 'create_at', 'label' => 'Created', 'index' => 'c.create_at'],
             /*array('name' => 'update_at', 'label'=>'Updated', 'index'=>'c.update_at'),*/
             ['name' => 'last_login', 'label' => 'Last Login', 'index' => 'c.last_login'],
@@ -60,7 +60,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             ['field' => 'country', 'type' => 'multiselect'],
             ['field' => 'status', 'type' => 'multiselect'],
         ];
-        //$config['custom']['dblClickHref'] = BApp::href('customers/form/?id=');
+        //$config['custom']['dblClickHref'] = $this->BApp->href('customers/form/?id=');
         //todo: check this in FCom_Admin_Controller_Abstract_GridForm
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {
@@ -94,34 +94,39 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
         parent::formViewBefore($args);
         $m = $args['model'];
         /** @var $m FCom_Customer_Model_Customer */
-        $media = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media';
-        $silhouetteImg = FCom_Core_Main::i()->resizeUrl($media . '/silhouette.jpg', ['s' => 98]);
+        $media = $this->BConfig->get('web/media_dir') ? $this->BConfig->get('web/media_dir') : 'media';
+        $silhouetteImg = $this->FCom_Core_Main->resizeUrl($media . '/silhouette.jpg', ['s' => 98]);
         $actions = $args['view']->get('actions');
         if ($m->id) {
             $actions = array_merge($actions, [
-                    'create-order' => '<a class="btn btn-primary" title="' . BLocale::_('Redirect to frontend and create order')
-                        . '" href="' . BApp::href('customers/create_order?id=' . $m->id) . '"><span>' . BLocale::_('Create Order') . '</span></a>'
+                    'create-order' => '<a class="btn btn-primary" title="' . $this->BLocale->_('Redirect to frontend and create order')
+                        . '" href="' . $this->BApp->href('customers/create_order?id=' . $m->id) . '"><span>' . $this->BLocale->_('Create Order') . '</span></a>'
                 ]);
         }
         $saleStatistics = $m->saleStatistics();
-        $info = $this->_('Lifetime Sales') . ' ' . BLocale::currency($saleStatistics['lifetime'])
-            . ' | ' . $this->_('Avg. Sales') . ' ' . BLocale::currency($saleStatistics['avg']);
+        $info = $this->_('Lifetime Sales') . ' ' . $this->BLocale->currency($saleStatistics['lifetime'])
+            . ' | ' . $this->_('Avg. Sales') . ' ' . $this->BLocale->currency($saleStatistics['avg']);
         $args['view']->set([
-            'sidebar_img' => (BConfig::i()->get('modules/FCom_Customer/use_gravatar') ? BUtil::gravatar($m->email) : $silhouetteImg),
+            'sidebar_img' => ($this->BConfig->get('modules/FCom_Customer/use_gravatar') ? $this->BUtil->gravatar($m->email) : $silhouetteImg),
             'title' => $m->id ? $this->_('Edit Customer: ') . $m->firstname . ' ' . $m->lastname : $this->_('Create New Customer'),
             'otherInfo' => $m->id ? $info : '',
             'actions' => $actions,
         ]);
     }
 
+    /**
+    * Not used currently
+    *
+    * @param array $args
+    */
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
         if ($args['do'] !== 'DELETE') {
             $cust = $args['model'];
-            $addrPost = BRequest::i()->post('address');
-            if (($newData = BUtil::fromJson($addrPost['data_json']))) {
-                $oldModels = FCom_Customer_Model_Address::i()->orm('a')->where('customer_id', $cust->id)->find_many_assoc();
+            $addrPost = $this->BRequest->post('address');
+            if (($newData = $this->BUtil->fromJson($addrPost['data_json']))) {
+                $oldModels = $this->FCom_Customer_Model_Address->orm('a')->where('customer_id', $cust->id)->find_many_assoc();
                 foreach ($newData as $id => $data) {
                     if (empty($data['id'])) {
                         continue;
@@ -131,12 +136,12 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
                         $addr->set($data)->save();
                     } elseif ($data['id'] < 0) {
                         unset($data['id']);
-                        $addr = FCom_Customer_Model_Address::i()->newBilling($data, $cust);
+                        $addr = $this->FCom_Customer_Model_Address->newBilling($data, $cust);
                     }
                 }
             }
-            if (($del = BUtil::fromJson($addrPost['del_json']))) {
-                FCom_Customer_Model_Address::i()->delete_many(['id' => $del, 'customer_id' => $cust->id]);
+            if (($del = $this->BUtil->fromJson($addrPost['del_json']))) {
+                $this->FCom_Customer_Model_Address->delete_many(['id' => $del, 'customer_id' => $cust->id]);
             }
         }
     }
@@ -214,30 +219,30 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
 
     public function action_create_order()
     {
-        $id = BRequest::i()->param('id', true);
-        $r = BRequest::i();
-        $baseSrc = BConfig::i()->get('web/base_src');
+        $id = $this->BRequest->param('id', true);
+        $r = $this->BRequest;
+        $baseSrc = $this->BConfig->get('web/base_src');
         $redirectUrl = $r->scheme() . '://' . $r->httpHost() . $baseSrc;
         try {
-            $model = FCom_Customer_Model_Customer::i()->load($id);
+            $model = $this->FCom_Customer_Model_Customer->load($id);
             if (!$model) {
                 $this->message('Cannot load this customer model', 'error');
-                $redirectUrl = BApp::href($this->_formHref) . '?id=' . $id;
+                $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $id;
             } else {
                 $model->login();
             }
         } catch (Exception $e) {
             $this->message($e->getMessage(), 'error');
-            $redirectUrl = BApp::href($this->_formHref) . '?id=' . $id;
+            $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $id;
         }
 
-        BResponse::i()->redirect($redirectUrl);
+        $this->BResponse->redirect($redirectUrl);
     }
 
     public function getCustomerRecent()
     {
         $recent = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s')) - 7 * 86400);
-        $result = FCom_Customer_Model_Customer::i()->orm()
+        $result = $this->FCom_Customer_Model_Customer->orm()
             ->where_gte('create_at', $recent)
             ->select(['id' , 'email', 'firstname', 'lastname', 'create_at', 'status'])->find_many();
         return $result;
@@ -245,21 +250,21 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
 
     public function onHeaderSearch($args)
     {
-        $r = BRequest::i()->get();
+        $r = $this->BRequest->get();
         if (isset($r['q']) && $r['q'] != '') {
             $value = '%' . $r['q'] . '%';
-            $result = FCom_Customer_Model_Customer::i()->orm()
+            $result = $this->FCom_Customer_Model_Customer->orm()
                 ->where(['OR' => [
-                    ['id like ?', $value],
-                    ['firstname like ?', $value],
-                    ['lastname like ?', $value],
-                    ['email like ?', $value],
+                    ['id like ?', (int)$value],
+                    ['firstname like ?', (string)$value],
+                    ['lastname like ?', (string)$value],
+                    ['email like ?', (string)$value],
                 ]])->find_one();
             $args['result']['customer'] = null;
             if ($result) {
                 $args['result']['customer'] = [
                     'priority' => 10,
-                    'url' => BApp::href($this->_formHref) . '?id=' . $result->id()
+                    'url' => $this->BApp->href($this->_formHref) . '?id=' . $result->id()
                 ];
             }
 

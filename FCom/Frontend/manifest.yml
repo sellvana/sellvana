@@ -9,6 +9,7 @@ modules:
                 FCom_Frontend:
                     theme: FCom_FrontendThemeBootSimple
                     nav_top: { root_cms: 1, root_category: 1, type: categories_root }
+                    default_locale: en_US
 
         areas:
             FCom_Frontend:
@@ -22,9 +23,8 @@ modules:
                     - [ /, FCom_Frontend_Controller.index ]
                     - [ /*view, FCom_Frontend_Controller.static ]
 
-        provides:
-            themes:
-                FCom_Frontend_DefaultTheme:
-                    name: Default Frontend Theme
-                    area: FCom_Frontend
-                    layout: Frontend/layout.yml
+        themes:
+            FCom_Frontend_DefaultTheme:
+                name: Default Frontend Theme
+                area: FCom_Frontend
+                layout_before: Frontend/layout.yml

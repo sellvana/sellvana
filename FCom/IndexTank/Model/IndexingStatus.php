@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_IndexTank_Model_IndexingStatus extends FCom_Core_Model_Abstract
 {
@@ -9,16 +9,16 @@ class FCom_IndexTank_Model_IndexingStatus extends FCom_Core_Model_Abstract
     *
     * @return FCom_IndexTank_Model_IndexingStatus
     */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
     public function getIndexingStatus($task = 'index_all_new')
     {
-        $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->orm()->where("task", $task)->find_one();
+        $indexingStatus = $this->FCom_IndexTank_Model_IndexingStatus->orm()->where("task", $task)->find_one();
         if (!$indexingStatus) {
-            $indexingStatus = FCom_IndexTank_Model_IndexingStatus::i()->orm()->create();
+            $indexingStatus = $this->FCom_IndexTank_Model_IndexingStatus->create();
             $indexingStatus->task = $task;
             $indexingStatus->status = 'start';
             $indexingStatus->updated_at = date("Y-m-d H:i:s");
@@ -37,14 +37,14 @@ class FCom_IndexTank_Model_IndexingStatus extends FCom_Core_Model_Abstract
 
     public function updateInfoStatus()
     {
-        $countNotIndexed = FCom_Catalog_Model_Product::orm()
+        $countNotIndexed = $this->FCom_Catalog_Model_Product->orm()
                 ->where('indextank_indexed', 0)
                 ->count();
-        $countTotal = FCom_Catalog_Model_Product::orm()->count();
+        $countTotal = $this->FCom_Catalog_Model_Product->orm()->count();
         $percent =  (($countTotal - $countNotIndexed) / $countTotal) * 100;
         $indexed = $countTotal - $countNotIndexed;
 
-        $status = FCom_IndexTank_Index_Product::i()->status();
+        $status = $this->FCom_IndexTank_Index_Product->status();
         $indexSize = $status['size'];
 
         $indexingStatus = $this->getIndexingStatus();

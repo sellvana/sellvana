@@ -1,26 +1,26 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Frontend_Frontend extends BClass
 {
-    public static function bootstrap()
+    public function bootstrap()
     {
-        if (BRequest::i()->https()) {
-            BResponse::i()->httpSTS();
+        if ($this->BRequest->https()) {
+            $this->BResponse->httpSTS();
         }
 
-        if (BDebug::is('RECOVERY,MIGRATION')) {
-            BLayout::i()->setRootView('under_construction');
-            BResponse::i()->render();
+        if ($this->BDebug->is('RECOVERY,MIGRATION')) {
+            $this->BLayout->setRootView('under_construction');
+            $this->BResponse->render();
         }
     }
 
-    public static function layout($args)
+    public function layout($args)
     {
-        if (($head = BLayout::i()->view('head'))) {
+        if (($head = $this->BLayout->view('head'))) {
             $head->js_raw('frontend_init', '
 FCom.Frontend = {}
             ');
-            $config = BConfig::i()->get('modules/FCom_Frontend');
+            $config = $this->BConfig->get('modules/FCom_Frontend');
             if (!empty($config['add_js_files'])) {
                 foreach (explode("\n", $config['add_js_files']) as $js) {
                     $head->js(trim($js));

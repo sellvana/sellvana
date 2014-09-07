@@ -1,31 +1,31 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abstract
 {
     public function action_upload__POST()
     {
-        if (!FCom_Admin_Model_User::i()->sessionUser()->getPermission('frontendcp/edit')) {
-            BResponse::i()->status(403);
+        if (!$this->FCom_Admin_Model_User->sessionUser()->getPermission('frontendcp/edit')) {
+            $this->BResponse->status(403);
         }
-        $result = BRequest::i()->receiveFiles('image', BConfig::i()->get('fs/media_dir') . '/tmp');
-        $imgUrl = BConfig::i()->get('web/media_dir') . '/tmp/' . $result['image']['name'];
-        $imgUrl = FCom_Core_Main::i()->resizeUrl($imgUrl);
-        BResponse::i()->json(['image' => ['url' => $imgUrl]]);
+        $result = $this->BRequest->receiveFiles('image', $this->BConfig->get('fs/media_dir') . '/tmp');
+        $imgUrl = $this->BConfig->get('web/media_dir') . '/tmp/' . $result['image']['name'];
+        $imgUrl = $this->FCom_Core_Main->resizeUrl($imgUrl);
+        $this->BResponse->json(['image' => ['url' => $imgUrl]]);
     }
 
     public function action_update__PUT()
     {
-        if (!FCom_Admin_Model_User::i()->sessionUser()->getPermission('frontendcp/edit')) {
-            BResponse::i()->status(403);
+        if (!$this->FCom_Admin_Model_User->sessionUser()->getPermission('frontendcp/edit')) {
+            $this->BResponse->status(403);
         }
-        $request = BRequest::i()->json();
+        $request = $this->BRequest->json();
 
         $result = [];
         try {
             if (empty($request['content'])) {
                 throw new Exception('Missing content');
             }
-            $handlers = FCom_FrontendCP_Main::i()->getEntityHandlers();
+            $handlers = $this->FCom_FrontendCP_Main->getEntityHandlers();
 
             foreach ($request['content'] as $id => $params) {
                 if (empty($params['data']['entity']) || empty($handlers[$params['data']['entity']])) {
@@ -43,8 +43,8 @@ class FCom_FrontendCP_Frontend_Controller extends FCom_Admin_Controller_Abstract
             $result['message'] = $e->getMessage();
         }
 
-        BEvents::i()->fire(__METHOD__ . ':after', ['request' => $request, 'result' => $result]);
+        $this->BEvents->fire(__METHOD__ . ':after', ['request' => $request, 'result' => $result]);
 
-        BResponse::i()->json($result);
+        $this->BResponse->json($result);
     }
 }

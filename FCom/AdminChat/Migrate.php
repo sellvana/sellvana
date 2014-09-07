@@ -1,19 +1,19 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_AdminChat_Migrate extends BClass
 {
     public function install__0_1_4()
     {
-        if (!FCom_Core_Model_Module::i()->load('FCom_Admin', 'module_name')) {
-            BMigrate::i()->migrateModules('FCom_Admin', true);
+        if (!$this->FCom_Core_Model_Module->load('FCom_Admin', 'module_name')) {
+            $this->BMigrate->migrateModules('FCom_Admin', true);
         }
 
-        $tChat = FCom_AdminChat_Model_Chat::table();
-        $tParticipant = FCom_AdminChat_Model_Participant::table();
-        $tHistory = FCom_AdminChat_Model_History::table();
-        $tUser = FCom_Admin_Model_User::table();
+        $tChat = $this->FCom_AdminChat_Model_Chat->table();
+        $tParticipant = $this->FCom_AdminChat_Model_Participant->table();
+        $tHistory = $this->FCom_AdminChat_Model_History->table();
+        $tUser = $this->FCom_Admin_Model_User->table();
 
-        BDb::ddlTableDef($tChat, [
+        $this->BDb->ddlTableDef($tChat, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'status' => 'varchar(20)',
@@ -31,7 +31,7 @@ class FCom_AdminChat_Migrate extends BClass
             ],
         ]);
 
-        BDb::ddlTableDef($tParticipant, [
+        $this->BDb->ddlTableDef($tParticipant, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'chat_id' => 'int unsigned not null',
@@ -51,7 +51,7 @@ class FCom_AdminChat_Migrate extends BClass
             ],
         ]);
 
-        BDb::ddlTableDef($tHistory, [
+        $this->BDb->ddlTableDef($tHistory, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'chat_id' => 'int unsigned not null',
@@ -71,9 +71,9 @@ class FCom_AdminChat_Migrate extends BClass
             ],
         ]);
 
-        $tUserStatus = FCom_AdminChat_Model_UserStatus::table();
+        $tUserStatus = $this->FCom_AdminChat_Model_UserStatus->table();
 
-        BDb::ddlTableDef($tUserStatus, [
+        $this->BDb->ddlTableDef($tUserStatus, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'user_id' => 'int unsigned not null',
@@ -91,10 +91,10 @@ class FCom_AdminChat_Migrate extends BClass
 
     public function upgrade__0_1_0__0_1_1()
     {
-        $tChat = FCom_AdminChat_Model_Chat::table();
-        $tUser = FCom_Admin_Model_User::table();
+        $tChat = $this->FCom_AdminChat_Model_Chat->table();
+        $tUser = $this->FCom_Admin_Model_User->table();
 
-        BDb::ddlTableDef($tChat, [
+        $this->BDb->ddlTableDef($tChat, [
             'COLUMNS' => [
                 'owner_user_id' => 'int unsigned not null after `status`',
             ],
@@ -106,8 +106,8 @@ class FCom_AdminChat_Migrate extends BClass
 
     public function upgrade__0_1_1__0_1_2()
     {
-        $tHistory = FCom_AdminChat_Model_History::table();
-        BDb::ddlTableDef($tHistory, [
+        $tHistory = $this->FCom_AdminChat_Model_History->table();
+        $this->BDb->ddlTableDef($tHistory, [
             'COLUMNS' => [
                 'entry_type' => 'varchar(20) default "text" after `user_id`',
             ],
@@ -116,10 +116,10 @@ class FCom_AdminChat_Migrate extends BClass
 
     public function upgrade__0_1_2__0_1_3()
     {
-        $tUserStatus = FCom_AdminChat_Model_UserStatus::table();
-        $tUser = FCom_Admin_Model_User::table();
+        $tUserStatus = $this->FCom_AdminChat_Model_UserStatus->table();
+        $tUser = $this->FCom_Admin_Model_User->table();
 
-        BDb::ddlTableDef($tUserStatus, [
+        $this->BDb->ddlTableDef($tUserStatus, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'user_id' => 'int unsigned not null',
@@ -136,8 +136,8 @@ class FCom_AdminChat_Migrate extends BClass
     }
     public function upgrade__0_1_3__0_1_4()
     {
-        $tParticipant = FCom_AdminChat_Model_Participant::table();
-        BDb::ddlTableDef($tParticipant, [
+        $tParticipant = $this->FCom_AdminChat_Model_Participant->table();
+        $this->BDb->ddlTableDef($tParticipant, [
             'COLUMNS' => [
                 'chat_title' => 'varchar(50) null after `status`',
             ],

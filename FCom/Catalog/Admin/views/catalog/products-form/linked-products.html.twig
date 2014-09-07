@@ -159,7 +159,7 @@ require(['jquery','underscore','backbone'], function($, _) {
         <div class='modal-content'>
             <div class='modal-header'>
                 <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
-                <h4 class='modal-title' id='myModalLabel'>{{ "Add products"|_ }}</h4>
+                <h4 class='modal-title' id='myModalLabel'>{{ "Add products@@"|_ }}</h4>
             </div>
             <div class='modal-body'>
                 {{ THIS.view('core/backbonegrid').set('grid', prodCtrl.getAllProdConfig(m)) | raw }}

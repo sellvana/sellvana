@@ -1,16 +1,17 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Catalog_Admin extends BClass
 {
-    static public function bootstrap()
+    public function bootstrap()
     {
-        BEvents::i()
+        $this->BEvents
             ->on('category_tree_post.associate.products', 'FCom_Catalog_Model_Product.onAssociateCategory')
             ->on('category_tree_post.reorderAZ', 'FCom_Catalog_Model_Category.onReorderAZ')
 
             ->on('FCom_Catalog_Admin_Controller_Products::action_edit_post', 'FCom_Catalog_Admin::onProductsEditPost')
 
             /** @todo initialize these events only when needed */
+            /*
             ->on('FCom_Admin_Controller_MediaLibrary::gridConfig:media/product/attachment',
                 'FCom_Catalog_Admin_Controller_Products.onMediaGridConfig', ['type' => 'A'])
 
@@ -36,15 +37,18 @@ class FCom_Catalog_Admin extends BClass
                 'FCom_Catalog_Admin_Controller_Products.onMediaGridEdit', ['type' => 'I'])
 
             ->on('FCom_Cms_Admin_Controller_Nav::action_tree_form', 'FCom_Catalog_Admin::onNavTreeForm')
+            */
         ;
 
-        FCom_Admin_Controller_MediaLibrary::i()
-            ->allowFolder('media/product/image')
+        $this->FCom_Admin_Controller_MediaLibrary
+            ->allowFolder('media/category/images')
+            ->allowFolder('media/product/images')
             ->allowFolder('media/product/attachment')
             ->allowFolder('storage/import/products')
+            ->allowFolder('{random}/import/products')
         ;
 
-        FCom_Admin_Model_Role::i()->createPermission([
+        $this->FCom_Admin_Model_Role->createPermission([
             'catalog' => 'Catalog',
             'catalog/products' => 'Manage Products',
             'catalog/categories' => 'Manage Categories',
@@ -53,12 +57,12 @@ class FCom_Catalog_Admin extends BClass
         ]);
     }
 
-    public static function onProductsEditPost($args)
+    public function onProductsEditPost($args)
     {
 print_r($args); exit;
     }
 
-    public static function onNavTreeForm($args)
+    public function onNavTreeForm($args)
     {
         $args['node_types']['category'] = 'Category';
     }
@@ -66,7 +70,7 @@ print_r($args); exit;
     public function getAvailableViews()
     {
         $template = [];
-        $allViews = FCom_Frontend_Main::i()->getLayout()->getAllViews();
+        $allViews = $this->FCom_Frontend_Main->getLayout()->getAllViews();
         foreach ($allViews as $view) {
             $tmp = $view->param('view_name');
             if ($tmp != '') {
@@ -74,7 +78,7 @@ print_r($args); exit;
             }
         }
         $cmsBlocks = [];
-        $blocks = BDb::many_as_array(FCom_Cms_Model_Block::i()->orm()->select('id')->select('description')->find_many());
+        $blocks = $this->BDb->many_as_array($this->FCom_Cms_Model_Block->orm()->select('id')->select('description')->find_many());
         foreach ($blocks as $block) {
             $cmsBlocks['block:' . $block['id']] = $block['description'];
         }

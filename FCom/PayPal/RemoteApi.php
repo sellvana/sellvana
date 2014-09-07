@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_PayPal_RemoteApi extends BClass
 {
@@ -10,18 +10,18 @@ class FCom_PayPal_RemoteApi extends BClass
 
     public function __construct()
     {
-        if (($sUrl = BConfig::i()->get('secure_url'))) {
-            $m = BApp::m();
+        if (($sUrl = $this->BConfig->get('secure_url'))) {
+            $m = $this->BApp->m();
             $m->base_href = $sUrl . '/' . $m->url_prefix;
         }
     }
 
     public function call($methodName, $nvpArr)
     {
-        $config = BConfig::i()->get('modules/FCom_PayPal');
+        $config = $this->BConfig->get('modules/FCom_PayPal');
         $sandbox = $config['sandbox']['mode'] == 'on'
             || $config['sandbox']['mode'] == 'ip'
-                && in_array(BRequest::i()->ip(), explode(',', $config['sandbox']['ip']));
+                && in_array($this->BRequest->ip(), explode(',', $config['sandbox']['ip']));
         $apiConfig = $config[$sandbox ? 'sandbox' : 'production'];
 
         $nvpArr = array_merge([
@@ -33,7 +33,7 @@ class FCom_PayPal_RemoteApi extends BClass
             'SIGNATURE' => $apiConfig['signature'],
         ], $nvpArr);
 
-        $result = BUtil::remoteHttp('GET', self::$_apiUrl, $nvpArr);
+        $result = $this->BUtil->remoteHttp('GET', self::$_apiUrl, $nvpArr);
         parse_str($result, $resArr);
 
         $ack = 'undefined';
@@ -57,11 +57,11 @@ class FCom_PayPal_RemoteApi extends BClass
             $errorArr['short_message'] = $resArr['L_SHORTMESSAGE' . $i];
             $errorArr['long_message'] = $resArr['L_LONGMESSAGE' . $i];
         }
-        //$sData =& BSession::i()->dataToUpdate();
+        //$sData =& $this->BSession->dataToUpdate();
         //$sData['checkout_error']['message'] = "[PAYPAL ERROR {$errorArr['code']}] {$errorArr['short_message']} - {$errorArr['long_message']}";
         $this->errorArr = $errorArr;
         return false;
-        //BResponse::i()->redirect(BApp::m('FCom_Checkout')->baseHref());
+        //$this->BResponse->redirect($this->BApp->m('FCom_Checkout')->baseHref());
     }
 
     public function getError()
@@ -72,7 +72,7 @@ class FCom_PayPal_RemoteApi extends BClass
         return "[PAYPAL ERROR {$this->errorArr['code']}] {$this->errorArr['short_message']} - {$this->errorArr['long_message']}";
     }
 
-    public static function getExpressCheckoutUrl($token)
+    public function getExpressCheckoutUrl($token)
     {
         return 'https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token=' . $token;
     }

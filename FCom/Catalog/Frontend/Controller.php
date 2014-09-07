@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
@@ -6,19 +6,19 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     {
         $this->forward(false);
         return;
-        BLayout::i()->layout('/catalog/manuf');
+        $this->BLayout->layout('/catalog/manuf');
     }
 
     public function action_product()
     {
-        $layout = BLayout::i();
+        $layout = $this->BLayout;
         $crumbs = ['home'];
-        $p = BRequest::i()->params('product');
+        $p = $this->BRequest->params('product');
         if ($p === '' || is_null($p)) {
             $this->forward(false);
             return $this;
         }
-        $product = FCom_Catalog_Model_Product::i()->load($p, 'url_key');
+        $product = $this->FCom_Catalog_Model_Product->load($p, 'url_key');
         if (!$product) {
             $this->forward(false);
             return $this;
@@ -27,21 +27,22 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
             $this->forward(false);
             return $this;
         }
-        BEvents::i()->fire('FCom_Catalog_Frontend_Controller::action_product:product', ['product' => &$product]);
-        BApp::i()->set('current_product', $product);
+        $this->layout('/catalog/product');
+        $this->BEvents->fire('FCom_Catalog_Frontend_Controller::action_product:product', ['product' => &$product]);
+        $this->BApp->set('current_product', $product);
 
         $layout->view('catalog/product/details')->set('product', $product);
         $head = $layout->view('head');
 
-        $categoryPath = BRequest::i()->params('category');
+        $categoryPath = $this->BRequest->params('category');
         if ($categoryPath) {
-            $category = FCom_Catalog_Model_Category::i()->load($categoryPath, 'url_path');
+            $category = $this->FCom_Catalog_Model_Category->load($categoryPath, 'url_path');
             if (!$category) {
                 $this->forward(false);
                 return $this;
             }
 
-            BApp::i()->set('current_category', $category);
+            $this->BApp->set('current_category', $category);
 
             $layout->view('catalog/product/details')->set('category', $category);
             $head->canonical($product->url());
@@ -61,58 +62,58 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $layout->view('breadcrumbs')->set('crumbs', $crumbs);
 
         $user = false;
-        if (Bapp::m('FCom_Customer')) {
-            $user = FCom_Customer_Model_Customer::i()->sessionUser();
+        if ($this->BApp->m('FCom_Customer')) {
+            $user = $this->FCom_Customer_Model_Customer->sessionUser();
         }
         $layout->view('catalog/product/details')->set('user', $user);
 
-        $this->layout('/catalog/product');
 
         if ($product->layout_update) {
-            $layoutUpdate = BYAML::parse($product->layout_update);
+            $layoutUpdate = $this->BYAML->parse($product->layout_update);
             if (!is_null($layoutUpdate)) {
-                BLayout::i()->addLayout('product_page', $layoutUpdate)->applyLayout('product_page');
+                $this->BLayout->addLayout('product_page', $layoutUpdate)->applyLayout('product_page');
             } else {
-                BDebug::warning('Invalid layout update for CMS page');
+                $this->BDebug->warning('Invalid layout update for CMS page');
             }
         }
     }
 
     public function action_product__POST()
     {
-        $r = explode('/', BRequest::i()->params('product'));
+        $r = explode('/', $this->BRequest->params('product'));
         $href = $r[0];
 
         $p = array_pop($r);
-        $product = FCom_Catalog_Model_Product::i()->load($p, 'url_key');
+        $product = $this->FCom_Catalog_Model_Product->load($p, 'url_key');
         if (!$product) {
-            BResponse::i()->redirect($href);
+            $this->BResponse->redirect($href);
             return;
         }
 
-        $post = BRequest::post();
+        $post = $this->BRequest->post();
         $eventArgs = ['product' => &$product, 'qty' => $post['qty']];
 
         if (!empty($post['add2cart'])) {
-            BEvents::i()->fire('FCom_Catalog_Frontend_Controller::action_product:addToCart', $eventArgs);
+            $this->BEvents->fire('FCom_Catalog_Frontend_Controller::action_product:addToCart', $eventArgs);
         }
 
         if (!empty($post['add2wishlist'])) {
-            BEvents::i()->fire('FCom_Catalog_Frontend_Controller::action_product:addToWishlist', $eventArgs);
+            $this->BEvents->fire('FCom_Catalog_Frontend_Controller::action_product:addToWishlist', $eventArgs);
         }
 
 
-        BResponse::i()->redirect($href);
+        $this->BResponse->redirect($href);
     }
 
     public function action_quickview()
     {
-        if (!BRequest::i()->xhr()) {
+        if (!$this->BRequest->xhr()) {
             $this->forward(false);
+            return;
         }
         $this->layout('/catalog/quickview');
-        $product = FCom_Catalog_Model_Product::i()->load(BRequest::i()->get('id'));
-        $view = BLayout::i()->getRootView();
+        $product = $this->FCom_Catalog_Model_Product->load($this->BRequest->get('id'));
+        $view = $this->BLayout->getRootView();
         $view->set('model', $product);
     }
 

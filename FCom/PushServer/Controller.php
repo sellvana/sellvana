@@ -1,14 +1,18 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_PushServer_Controller
+ * @property FCom_PushServer_Model_Client FCom_PushServer_Model_Client
+ */
 class FCom_PushServer_Controller extends FCom_Core_Controller_Abstract
 {
     public function action_index__POST()
     {
-        BResponse::i()->nocache()->startLongResponse(false);
-$timer = microtime(true);
-        $client = FCom_PushServer_Model_Client::i()->sessionClient();
+        $this->BResponse->nocache()->startLongResponse(false);
 
-        $request = BRequest::i()->json();
+        $client = $this->FCom_PushServer_Model_Client->sessionClient();
+
+        $request = $this->BRequest->post();
 
         $client->processRequest($request)->checkIn()->waitForMessages()->checkOut();
 
@@ -17,6 +21,6 @@ $timer = microtime(true);
             'messages' => $client->getMessages(),
         ];
 
-        BResponse::i()->json($result);
+        $this->BResponse->json($result);
     }
 }

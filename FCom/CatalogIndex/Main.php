@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_CatalogIndex_Main extends BClass
 {
@@ -6,14 +6,14 @@ class FCom_CatalogIndex_Main extends BClass
     protected static $_prevAutoReindex;
     protected static $_filterParams;
 
-    static public function autoReindex($flag)
+    public function autoReindex($flag)
     {
         static::$_autoReindex = $flag;
     }
 
-    static public function parseUrl()
+    public function parseUrl()
     {
-        if (($getFilters = BRequest::i()->get('filters'))) {
+        if (($getFilters = $this->BRequest->get('filters'))) {
             $getFiltersArr = explode('.', $getFilters);
             static::$_filterParams = [];
             foreach ($getFiltersArr as $filterStr) {
@@ -36,7 +36,7 @@ class FCom_CatalogIndex_Main extends BClass
         return static::$_filterParams;
     }
 
-    static public function getUrl($add = [], $remove = [])
+    public function getUrl($add = [], $remove = [])
     {
         $filters = [];
         $params = static::$_filterParams;
@@ -59,33 +59,33 @@ class FCom_CatalogIndex_Main extends BClass
                 $filters[] = $fKey . '-' . join(' ', (array)$fValues);
             }
         }
-        return BUtil::setUrlQuery(BRequest::currentUrl(), ['filters' => join('.', $filters)]);
+        return $this->BUtil->setUrlQuery($this->BRequest->currentUrl(), ['filters' => join('.', $filters)]);
     }
 
 
-    static public function onProductAfterSave($args)
+    public function onProductAfterSave($args)
     {
         if (static::$_autoReindex) {
-            FCom_CatalogIndex_Indexer::i()->indexProducts([$args['model']]);
+            $this->FCom_CatalogIndex_Indexer->indexProducts([$args['model']]);
         }
     }
-    
-    static public function onProductBeforeImport($args)
+
+    public function onProductBeforeImport($args)
     {
         static::$_prevAutoReindex = static::$_autoReindex;
         static::$_autoReindex = false;
     }
-    
-    static public function onProductAfterImport($args)
+
+    public function onProductAfterImport($args)
     {
         static::$_autoReindex = static::$_prevAutoReindex;
-        FCom_CatalogIndex_Model_Doc::i()->flagReindex($args['product_ids']);
+        $this->FCom_CatalogIndex_Model_Doc->flagReindex($args['product_ids']);
         if (static::$_autoReindex) {
-            FCom_CatalogIndex_Indexer::i()->indexProducts(true);
+            $this->FCom_CatalogIndex_Indexer->indexProducts(true);
         }
     }
 
-    static public function onCategoryAfterSave($args)
+    public function onCategoryAfterSave($args)
     {
         $cat = $args['model'];
         $addIds = explode(',', $cat->get('product_ids_add'));
@@ -97,23 +97,23 @@ class FCom_CatalogIndex_Main extends BClass
         if (sizeof($removeIds) > 0 && $removeIds[0] != '') {
             $reindexIds += $removeIds;
         }
-        FCom_CatalogIndex_Indexer::i()->indexProducts($reindexIds);
+        $this->FCom_CatalogIndex_Indexer->indexProducts($reindexIds);
     }
 
-    static public function onCustomFieldAfterSave($args)
+    public function onCustomFieldAfterSave($args)
     {
         if (static::$_autoReindex && !$args['model']->isNewRecord()) {
-            $indexField = FCom_CatalogIndex_Model_Field::i()->load($args['model']->field_code, 'field_name');
+            $indexField = $this->FCom_CatalogIndex_Model_Field->load($args['model']->field_code, 'field_name');
             if ($indexField) {
                 //TODO when a edited field is saved, it throws error
-                //FCom_CatalogIndex_Indexer::i()->reindexField($indexField);
+                //$this->FCom_CatalogIndex_Indexer->reindexField($indexField);
             }
         }
     }
 
-    static public function bootstrap()
+    public function bootstrap()
     {
-        FCom_Admin_Model_Role::i()->createPermission([
+        $this->FCom_Admin_Model_Role->createPermission([
             'catalog_index' => 'Product Indexing',
         ]);
     }

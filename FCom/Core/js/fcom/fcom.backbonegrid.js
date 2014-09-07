@@ -493,7 +493,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                     modelVal = modelVal.toLowerCase();
                                     var first_index = modelVal.indexOf(filterVal);
                                     var last_index = modelVal.lastIndexOf(filterVal);
-                                    for (key in check) {
+                                    for (var key in check) {
                                         switch (key) {
                                             case 'contain':
                                                 flag = flag && ((first_index !== -1) === check.contain);
@@ -523,6 +523,43 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                         flag = flag || filter_val[i].toLowerCase() === model.get(filter_key).toLowerCase();
                                     }
 
+                                    return flag;
+                                }, this);
+                                break;
+                            case 'number-range':
+                                var op = BackboneGrid.current_filters[filter_key].op;
+                                temp.models = _.filter(temp.models, function (model) {
+                                    var flag = false;
+                                    var modelVal = model.get(filter_key);
+                                    switch (op) {
+                                        case 'between':
+                                            var t_val = filter_val.split('~');
+                                            if (Number(t_val[0]) < modelVal && modelVal < Number(t_val[1])) {
+                                                flag = true;
+                                            }
+                                            break;
+                                        case 'from':
+                                            if ( filter_val < Number(modelVal)) {
+                                                flag = true;
+                                            }
+                                            break;
+                                        case 'to':
+                                            if (modelVal < Number(filter_val)) {
+                                                flag = true;
+                                            }
+                                            break;
+                                        case 'equal':
+                                            if (modelVal == Number(filter_val) ) {
+                                                flag = true;
+                                            }
+                                            break;
+                                        case 'not_in':
+                                            var t_val = filter_val.split('~');
+                                            if (Number(t_val[0]) > modelVal || Number(t_val[1]) < modelVal) {
+                                                flag = true;
+                                            }
+                                            break;
+                                    }
                                     return flag;
                                 }, this);
                                 break;
@@ -727,9 +764,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
 
                     if (confirm) {
-                        rowsCollection.remove(this.model/*, {silent: true}*/);
+                        rowsCollection.remove(this.model, {silent: true});
                         selectedRows.remove(this.model, {silent: true});
-//                        this._destorySelf();
+                        this._destorySelf();
                     }
                 },
                 _destorySelf: function () {
@@ -843,8 +880,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                                 self.model.set($(this).attr('data-col'), tmp.val());
                             }
                             if ($(this).attr('data-edit') == 'input' || $(this).attr('data-edit') == 'textarea') {
-                                self.model.set($(this).attr('data-col'), $(this).children().val());
-                                $(this).html($(this).children().val());
+                                var text = html2text($(this).children().val());
+                                self.model.set($(this).attr('data-col'), text);
+                                $(this).html(text);
                             }
                             if ($(this).attr('data-edit') == 'input[range]') {
                                 self.model.set($(this).attr('data-col'), $(this).children().val());
@@ -1160,7 +1198,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     return false;
                 },
                 render: function () {
-                    this.$el.html(this.template(this.model.toJSON()));
+                    var model = this.model.toJSON();
+                    model.val = html2text(model.val);
+                    this.$el.html(this.template(model));
                     if (this.model.get('val') !== '') {
                         this.$el.addClass('f-grid-filter-val');
                     }
@@ -1191,7 +1231,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             html = str.substring(0, str.length - 1);
                         }
                     }
-                    this.$el.find('span.f-grid-filter-value').html($('<div/>').text(html).html());
+                    this.$el.find('span.f-grid-filter-value').html(html2text(html));
                 }
             });
             BackboneGrid.Views.FilterTextCell = BackboneGrid.Views.FilterCell.extend({
@@ -1485,7 +1525,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     modalForm.$el.find('textarea, input, select').each(function () {
                         var key = $(this).attr('id');
                         var val = $(this).val();
-                        BackboneGrid.modalElementVals[key] = val;
+                        BackboneGrid.modalElementVals[key] = html2text(val);
                     });
                     modalForm.formEl.validate();
                     if (!modalForm.formEl.valid()) {
@@ -1556,8 +1596,9 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
 
                     //check this form is rendered in default view of grid or not.
-                    if (ev && $(ev.target).prev().hasClass('f-grid-modal-close'))
+                    if (ev && $(ev.target).prev().hasClass('f-grid-modal-close')) {
                         $(ev.target).prev().trigger('click');
+                    }
 
                     BackboneGrid.modalElementVals = {};
 
@@ -1637,7 +1678,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         if (BackboneGrid.currentRow) {
                             var name = model.get('name');
                             var val = (typeof(BackboneGrid.currentRow.get(name)) !== 'undefined' ? BackboneGrid.currentRow.get(name) : '');
-                            elementView.$el.find('#' + name).val(val);
+                            elementView.$el.find('#' + name).val(text2html(val));
                         }
                     }
                 }
@@ -1762,6 +1803,15 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 else
                     caption = 'No data found';
                 $('.' + BackboneGrid.id + '-pagination').html(caption);
+            }
+
+            function html2text(val) {
+                return $('<div/>').text(val).html();
+            }
+
+            function text2html(val) {
+                var text = $.parseHTML(val);
+                return (text != null) ? text[0].data: null;
             }
 
             /*
@@ -2201,6 +2251,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
 
             if (typeof(config.grid_before_create) !== 'undefined') {
+                console.log(config.grid_before_create);
                 window[config.grid_before_create](this);
             } else {
                 this.build();

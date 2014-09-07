@@ -1,14 +1,14 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_AdminChat_Admin extends BClass
 {
-    static public function onAdminUserLogout($args)
+    public function onAdminUserLogout($args)
     {
-        $userId = FCom_Admin_Model_User::i()->sessionUserId();
-        FCom_AdminChat_Model_Participant::i()->delete_many(['user_id' => $userId]);
+        $userId = $this->FCom_Admin_Model_User->sessionUserId();
+        $this->FCom_AdminChat_Model_Participant->delete_many(['user_id' => $userId]);
     }
 
-    static public function onClientSetStatus($args)
+    public function onClientSetStatus($args)
     {
         return; // not needed, status set from pushclient
 
@@ -17,7 +17,7 @@ class FCom_AdminChat_Admin extends BClass
             return;
         }
         if ($args['status'] === 'offline') {
-            $clients = FCom_PushServer_Model_Client::i()->findByAdminUser($userId);
+            $clients = $this->FCom_PushServer_Model_Client->findByAdminUser($userId);
             foreach ($clients as $c) { // check other clients
                 if ($c->id !== $args['client']->id && $c->status !== 'offline') {
                     return; // if at least one of the not offline, abort
@@ -28,29 +28,29 @@ class FCom_AdminChat_Admin extends BClass
         }
 
         // send admin user status change
-        $user = FCom_Admin_Model_User::i()->load($userId);
-        FCom_PushServer_Model_Channel::i()->getChannel('adminuser:' . $user->username, true)
+        $user = $this->FCom_Admin_Model_User->load($userId);
+        $this->FCom_PushServer_Model_Channel->getChannel('adminuser:' . $user->username, true)
             ->send(['signal' => 'status', 'status' => $args['status']]);
     }
 
     public function getInitialState()
     {
-        $p = BDebug::debug('ADMINCHAT INITIAL STATE');
+        $p = $this->BDebug->debug('ADMINCHAT INITIAL STATE');
 
-        $user = FCom_Admin_Model_User::i()->sessionUser();
+        $user = $this->FCom_Admin_Model_User->sessionUser();
         if (!$user) {
             return [];
         }
         $userId = $user->id();
         $userName = $user->get('username');
 
-        $sessionClient = FCom_PushServer_Model_Client::i()->sessionClient();
+        $sessionClient = $this->FCom_PushServer_Model_Client->sessionClient();
         $sessionClient->subscribe('adminuser');
 
         $chats = [];
 
-        $reUsername = '#(^|\s*,\s*)' . preg_quote($userName) . '(\s*,\s*|$)#';
-        $chatModels = FCom_AdminChat_Model_Chat::i()->orm('c')
+        $reUsername = '#(^|\s*,\s*)' . preg_quote($userName, '#') . '(\s*,\s*|$)#';
+        $chatModels = $this->FCom_AdminChat_Model_Chat->orm('c')
             ->join('FCom_AdminChat_Model_Participant', ['c.id', '=', 'p.chat_id'], 'p')->where('p.user_id', $userId)
             ->select('c.id')
             ->select('p.status', 'chat_window_status')
@@ -68,7 +68,7 @@ class FCom_AdminChat_Admin extends BClass
             foreach ($chats as $chatId => $chat) {
                 $sessionClient->subscribe($chat['channel']);
             }
-            $history = FCom_AdminChat_Model_History::i()->orm('h')
+            $history = $this->FCom_AdminChat_Model_History->orm('h')
                 ->join('FCom_Admin_Model_User', ['u.id', '=', 'h.user_id'], 'u')
                 ->where_in('h.chat_id', array_keys($chats))
                 ->where_gt('h.create_at', date('Y-m-d', time()-86400))
@@ -87,7 +87,7 @@ class FCom_AdminChat_Admin extends BClass
         }
 
         $users = [];
-        $userModels = FCom_Admin_Model_User::i()->orm('u')
+        $userModels = $this->FCom_Admin_Model_User->orm('u')
             ->left_outer_join('FCom_AdminChat_Model_UserStatus', ['us.user_id', '=', 'u.id'], 'us')
             ->select('u.username')->select('u.firstname')->select('u.lastname')->select('us.status')
             ->select('u.email')
@@ -98,7 +98,7 @@ class FCom_AdminChat_Admin extends BClass
                 'firstname' => $user->get('firstname'),
                 'lastname' => $user->get('lastname'),
                 'status' => $user->get('status'),
-                'avatar' => BUtil::gravatar($user->get('email')),
+                'avatar' => $this->BUtil->gravatar($user->get('email')),
             ];
         }
 
@@ -107,7 +107,7 @@ class FCom_AdminChat_Admin extends BClass
             'users' => $users,
         ];
 
-        BDebug::profile($p);
+        $this->BDebug->profile($p);
 
         return $result;
     }

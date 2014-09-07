@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Customer_Import extends BImport
 {
@@ -24,4 +24,7 @@ class FCom_Customer_Import extends BImport
 
     protected $dir = 'customers';
     protected $model = 'FCom_Customer_Model_Customer';
+
+    protected $allowedFileTypes = ['txt', 'csv'];
+
 }

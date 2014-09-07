@@ -1,19 +1,19 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Promo_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function hook_promotions()
     {
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
-        $promoList = FCom_Promo_Model_Promo::i()->getPromosByCart($cart->id);
-        BLayout::i()->view('promotions')->promoList = $promoList;
-        return BLayout::i()->view('promotions')->render();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
+        $promoList = $this->FCom_Promo_Model_Promo->getPromosByCart($cart->id);
+        $this->BLayout->view('promotions')->promoList = $promoList;
+        return $this->BLayout->view('promotions')->render();
     }
 
     public function action_media()
     {
-        $promoId = BRequest::i()->get('id');
-        $this->view('promo/media')->promo = FCom_Promo_Model_Promo::i()->load($promoId);
+        $promoId = $this->BRequest->get('id');
         $this->layout('/promo/media');
+        $this->view('promo/media')->promo = $this->FCom_Promo_Model_Promo->load($promoId);
     }
 }

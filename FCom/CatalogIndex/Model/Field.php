@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
 {
@@ -35,10 +35,10 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         ],
     ];
 
-    static public function getFields($context = 'all', $where = null)
+    public function getFields($context = 'all', $where = null)
     {
         if (!static::$_indexedFields) {
-            $orm = static::orm();
+            $orm = $this->orm();
             if ($where) {
                 $orm->where($where);
             }
@@ -62,11 +62,11 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         return static::$_indexedFields[$context];
     }
 
-    static public function getSortingArray()
+    public function getSortingArray()
     {
         if (!static::$_sortingArray) {
             static::$_sortingArray = [];
-            $sortFields = static::getFields('sort');
+            $sortFields = $this->getFields('sort');
             foreach ($sortFields as $fName => $field) {
                 $sortType = $field->get('sort_type');
                 $labels = explode('||', $field->get('sort_label'));
@@ -84,7 +84,7 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         return static::$_sortingArray;
     }
 
-    static public function indexCategory($products, $field)
+    public function indexCategory($products, $field)
     {
         // TODO: prefetch categories
         $data = [];
@@ -111,7 +111,7 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         $prodCatIds = [];
         if ($pIds) {
             // fetch category - product associations
-            $catProds = FCom_Catalog_Model_CategoryProduct::i()->orm('cp')
+            $catProds = $this->FCom_Catalog_Model_CategoryProduct->orm('cp')
                 ->join('FCom_Catalog_Model_Category', ['c.id', '=', 'cp.category_id'], 'c')
                 ->select(['category_id', 'product_id', 'id_path'])
                 ->where_in('product_id', $pIds)
@@ -128,7 +128,7 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
 
         if ($catIds) {
             // fetch ascendants category names
-            $categories = FCom_Catalog_Model_Category::i()->orm('c')
+            $categories = $this->FCom_Catalog_Model_Category->orm('c')
                 ->select(['id', 'url_path', 'node_name'])
                 ->where_in('id', $catIds)
                 ->find_many_assoc('id');
@@ -146,7 +146,7 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         return $data;
     }
 
-    static public function indexPrice($products, $field)
+    public function indexPrice($products, $field)
     {
         $data = [];
         foreach ($products as $p) {
@@ -155,7 +155,7 @@ class FCom_CatalogIndex_Model_Field extends FCom_Core_Model_Abstract
         return $data;
     }
 
-    static public function indexPriceRange($products, $field)
+    public function indexPriceRange($products, $field)
     {
         $data = [];
         foreach ($products as $p) {

@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Sales_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
 {
@@ -11,7 +11,7 @@ class FCom_Sales_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Pre-Condition");
 
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
         $cart->addProduct(4, ['qty' => 2, 'price' => 5]);
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_cart'), "Insert failed");
@@ -21,7 +21,7 @@ class FCom_Sales_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Pre-Condition");
 
-        $cart = FCom_Sales_Model_Cart::i()->load(1);
+        $cart = $this->FCom_Sales_Model_Cart->load(1);
         $this->assertEquals(2, count($cart->items()), "Items count is not correct");
         $this->assertEquals(5, $cart->itemQty(), "Items count is not correct");
 
@@ -35,7 +35,7 @@ class FCom_Sales_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Pre-Condition");
 
-        $cart = FCom_Sales_Model_Cart::i()->load(1);
+        $cart = $this->FCom_Sales_Model_Cart->load(1);
         $this->assertEquals(2, count($cart->items()), "Items count is not correct");
         $this->assertEquals(5, $cart->itemQty(), "Items count is not correct");
 
@@ -49,7 +49,7 @@ class FCom_Sales_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Pre-Condition");
 
-        $cart = FCom_Sales_Model_Cart::i()->load(1);
+        $cart = $this->FCom_Sales_Model_Cart->load(1);
         $this->assertEquals(2, count($cart->items()), "Items count is not correct");
         $this->assertEquals(5, $cart->itemQty(), "Items count is not correct");
 
@@ -63,7 +63,7 @@ class FCom_Sales_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_cart_item'), "Pre-Condition");
 
-        $cart = FCom_Sales_Model_Cart::i()->load(1);
+        $cart = $this->FCom_Sales_Model_Cart->load(1);
         $this->assertEquals(2, count($cart->items()), "Items count is not correct");
         $this->assertEquals(5, $cart->itemQty(), "Items count is not correct");
 
@@ -77,7 +77,7 @@ class FCom_Sales_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Pre-Condition");
 
-        $cart = FCom_Sales_Model_Cart::i()->load(1);
+        $cart = $this->FCom_Sales_Model_Cart->load(1);
         $this->assertEquals(2, count($cart->items()), "Items count is not correct");
 
         foreach ($cart->items() as $item) {
@@ -92,7 +92,7 @@ class FCom_Sales_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Pre-Condition");
 
-        $cart = FCom_Sales_Model_Cart::i()->load(1);
+        $cart = $this->FCom_Sales_Model_Cart->load(1);
         $this->assertEquals(2, count($cart->items()), "Items count is not correct");
         $cart->merge(2);
         $this->assertEquals(3, count($cart->items()), "Items count is not correct");
@@ -104,11 +104,11 @@ class FCom_Sales_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_cart'), "Pre-Condition");
 
-        $cart = FCom_Sales_Model_Cart::i()->load(1);
+        $cart = $this->FCom_Sales_Model_Cart->load(1);
         $this->assertEquals(2, count($cart->items()), "Items count is not correct");
 
-        $reset = FCom_Sales_Model_Cart::i()->load(2);
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart($reset);
+        $reset = $this->FCom_Sales_Model_Cart->load(2);
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(false, $reset);
         $this->assertEquals(1, count($cart->items()), "Reset failed");
         $this->assertEquals(2, $cart->id(), "Reset failed");
     }

@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
 {
@@ -28,7 +28,7 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         if (is_null($obj)) {
             $obj = $this;
         }
-        $countries = FCom_Geo_Model_Country::i()->options();
+        $countries = $this->BLocale->getAvailableCountries();
         return '<address>'
             . '<div class="f-street-address">' . $obj->street1 . '</div>'
             . ($obj->street2 ? '<div class="f-extended-address">' . $obj->street2 . '</div>' : '')
@@ -41,7 +41,8 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
 
     }
 
-    public function onBeforeDelete() {
+    public function onBeforeDelete()
+    {
         if (!parent::onBeforeDelete()) return false;
 
         $customer = $this->relatedModel("FCom_Customer_Model_Customer", $this->customer_id);
@@ -120,26 +121,42 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if (!$this->create_at) $this->create_at = BDb::now();
-        $this->update_at = BDb::now();
+        if (!$this->create_at) $this->create_at = $this->BDb->now();
+        $this->update_at = $this->BDb->now();
         return true;
+    }
+
+    public function onAfterSave()
+    {
+        parent::onAfterSave();
+
+        $customer = $this->FCom_Customer_Model_Customer->load($this->customer_id);
+        if (!$customer->default_billing_id) {
+            $customer->default_billing_id = $this->id();
+        }
+        if (!$customer->default_shipping_id) {
+            $customer->default_shipping_id = $this->id();
+        }
+        if ($customer->is_dirty()) {
+            $customer->save();
+        }
     }
 
     public function newShipping($address, $customer)
     {
         $data = ['address' => $address];
-        static::import($data, $customer, 'shipping');
+        $this->import($data, $customer, 'shipping');
     }
 
     public function newBilling($address, $customer)
     {
         $data = ['address' => $address];
-        static::import($data, $customer, 'billing');
+        $this->import($data, $customer, 'billing');
     }
 
-    public static function import($data, $cust, $atype = 'billing')
+    public function import($data, $cust, $atype = 'billing')
     {
-        $addr = static::create(['customer_id' => $cust->id]);
+        $addr = $this->create(['customer_id' => $cust->id]);
 
         if (!empty($data['address'])) {
             $addr->set($data['address']);

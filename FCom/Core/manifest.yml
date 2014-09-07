@@ -1,6 +1,6 @@
 modules:
     FCom_Core:
-        version: 0.1.7
+        version: 0.1.8
         channel: beta
         before_bootstrap: { callback: "FCom_Core_Main::beforeBootstrap" }
         run_level: REQUIRED
@@ -20,6 +20,7 @@ modules:
             - [ core/simplegrid, { view_class: FCom_Core_View_SimpleGrid } ]
             - [ core/backbonegrid, { view_class: FCom_Core_View_BackboneGrid } ]
             - [ core/medialib, {view_class: FCom_Core_View_Abstract } ]
+            - [ core/attachmentgrid, {view_class: FCom_Core_View_Abstract } ]
 
         observe:
             - [ "FCom_LibTwig_Main::init", FCom_Core_Main.onTwigInit ]
@@ -37,6 +38,7 @@ modules:
                     X-Frame-Options: SAMEORIGIN
             cookie:
                 session_check_ip: 1
+
             modules:
                 FCom_Core:
                     company_name: Sellvana
@@ -47,3 +49,8 @@ modules:
                     support_email: support@example.com
                     sales_name: Sales
                     sales_email: support@example.com
+                    default_tz: "America/New_York"
+                    default_country: US
+                    import_export:
+                        batch_size: 10
+                        delete_after_import: 1

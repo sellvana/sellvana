@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Blog_Model_Tag extends FCom_Core_Model_Abstract
 {
@@ -7,12 +7,12 @@ class FCom_Blog_Model_Tag extends FCom_Core_Model_Abstract
 
     public function getUrl()
     {
-        return BApp::href('blog/tag/' . $this->get('tag_key'));
+        return $this->BApp->href('blog/tag/' . $this->get('tag_key'));
     }
 
-    static public function getTagCounts()
+    public function getTagCounts()
     {
-        return FCom_Blog_Model_Tag::i()->orm('t')
+        return $this->FCom_Blog_Model_Tag->orm('t')
             ->join('FCom_Blog_Model_PostTag', ['pt.tag_id', '=', 't.id'], 'pt')
             ->join('FCom_Blog_Model_Post', ['p.id', '=', 'pt.post_id'], 'p')
             ->where_in('p.status', ['published'])

@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_CustomField_Tests_Model_FieldOptionTest extends FCom_Test_DatabaseTestCase
 {
@@ -12,7 +12,7 @@ class FCom_CustomField_Tests_Model_FieldOptionTest extends FCom_Test_DatabaseTes
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_field_option'), "Pre-Condition");
 
         $data = ['id' => 3, 'field_id' => "1", 'label' => "Feature A2"];
-        FCom_CustomField_Model_FieldOption::orm()->create($data)->save();
+        $this->FCom_CustomField_Model_FieldOption->create($data)->save();
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_field_option'), "Insert failed");
     }
@@ -21,7 +21,7 @@ class FCom_CustomField_Tests_Model_FieldOptionTest extends FCom_Test_DatabaseTes
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_field_option'), "Pre-Condition");
 
-        $fieldOption = FCom_CustomField_Model_FieldOption::i()->load(2);
+        $fieldOption = $this->FCom_CustomField_Model_FieldOption->load(2);
         $fieldOption->delete();
 
         $this->assertEquals(1, $this->getConnection()->getRowCount('fcom_field_option'), "Delete failed");

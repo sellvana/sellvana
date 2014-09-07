@@ -1,13 +1,13 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_OAuth_Model_ConsumerToken extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_oauth_consumer_token';
     static protected $_origClass = __CLASS__;
 
-    static public function sessionToken()
+    public function sessionToken()
     {
-        $hlp = FCom_OAuth_Main::i();
+        $hlp = $this->FCom_OAuth_Main;
         $providerName = $hlp->getProvider();
         if (!$providerName) {
             return false;
@@ -16,6 +16,6 @@ class FCom_OAuth_Model_ConsumerToken extends FCom_Core_Model_Abstract
         if (empty($consumerSess['access_token'])) {
             return false;
         }
-        return static::load(['provider' => $providerName, 'token' => $consumerSess['access_token']]);
+        return $this->loadWhere(['provider' => (string)$providerName, 'token' => (string)$consumerSess['access_token']]);
     }
 }

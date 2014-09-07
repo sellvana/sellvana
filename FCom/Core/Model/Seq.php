@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Core_Model_Seq extends FCom_Core_Model_Abstract
 {
@@ -7,37 +7,37 @@ class FCom_Core_Model_Seq extends FCom_Core_Model_Abstract
     protected static $_importExportProfile = [
         'unique_key' => ['entity_type', 'current_seq_id',],];
 
-    static public function getSeqIdFormat($entityType)
+    public function getSeqIdFormat($entityType)
     {
 
     }
 
-    static public function getAllowedChars()
+    public function getAllowedChars()
     {
         return '0123456789';
     }
 
-    static public function getNextSeqId($entityType)
+    public function getNextSeqId($entityType)
     {
 
-        BDb::run('lock tables ' . static::table() . ' write');
-        $seq = static::orm(static::table())->where('entity_type', $entityType)->find_one();
+        $this->BDb->run('lock tables ' . $this->table() . ' write');
+        $seq = $this->orm($this->table())->where('entity_type', $entityType)->find_one();
         if (!$seq) {
-            $seq = static::create([
+            $seq = $this->create([
                 'entity_type' => $entityType,
-                'current_seq_id' => static::getFirstSeqId($entityType)
+                'current_seq_id' => $this->getFirstSeqId($entityType)
             ])->save();
         }
-        $nextId = BUtil::nextStringValue($seq->current_seq_id, static::getAllowedChars());
+        $nextId = $this->BUtil->nextStringValue($seq->current_seq_id, $this->getAllowedChars());
         $seq->set('current_seq_id', $nextId)->save();
-        BDb::run('unlock tables');
+        $this->BDb->run('unlock tables');
         return $nextId;
     }
 
-    static public function getFirstSeqId($entityType)
+    public function getFirstSeqId($entityType)
     {
         $seqId = str_pad('1', 8, '0');
-        BEvents::i()->fire(__METHOD__, ['entity_type' => $entityType, 'seq_id' => & $seqId]);
+        $this->BEvents->fire(__METHOD__, ['entity_type' => $entityType, 'seq_id' => & $seqId]);
         return $seqId;
     }
 }

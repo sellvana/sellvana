@@ -1,13 +1,13 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_CustomField_Main extends BClass
 {
     protected $_types;
     protected $_disabled;
 
-    static public function bootstrap()
+    public function bootstrap()
     {
-        FCom_Admin_Model_Role::i()->createPermission([
+        $this->FCom_Admin_Model_Role->createPermission([
             'custom_fields' => 'Custom Fields'
         ]);
     }
@@ -28,7 +28,7 @@ class FCom_CustomField_Main extends BClass
             ->select($tP . '.*')
             ->left_outer_join('FCom_CustomField_Model_ProductField', ['pcf.product_id', '=', $tP . '.id'], 'pcf')
         ;
-        $fields = FCom_CustomField_Model_Field::i()->fieldsInfo('product', true);
+        $fields = $this->FCom_CustomField_Model_Field->fieldsInfo('product', true);
         $args['orm']->select($fields);
     }
 
@@ -36,11 +36,11 @@ class FCom_CustomField_Main extends BClass
     {
         $p = $args['model'];
         $data = $p->as_array();
-        $fields = FCom_CustomField_Model_Field::i()->fieldsInfo('product', true);
+        $fields = $this->FCom_CustomField_Model_Field->fieldsInfo('product', true);
         if (array_intersect($fields, array_keys($data))) {
-            $custom = FCom_CustomField_Model_ProductField::i()->load($p->id, 'product_id');
+            $custom = $this->FCom_CustomField_Model_ProductField->load($p->id, 'product_id');
             if (!$custom) {
-                $custom = FCom_CustomField_Model_ProductField::i()->create();
+                $custom = $this->FCom_CustomField_Model_ProductField->create();
             }
             $dataCustomKeys = array_intersect($fields, array_keys($data));
             $dataCustom = [];
@@ -48,7 +48,7 @@ class FCom_CustomField_Main extends BClass
                 $dataCustom[$key] = $data[$key];
             }
             //print_r($dataCustom);exit;
-            $custom->set($dataCustom)->set('product_id', $p->id())->save();            
+            $custom->set($dataCustom)->set('product_id', $p->id())->save();
         }
         // not deleting to preserve meta info about fields
     }
@@ -60,7 +60,7 @@ class FCom_CustomField_Main extends BClass
             $category = $args['category'];
         }
 
-        $customFields = FCom_CustomField_Model_Field::orm()
+        $customFields = $this->FCom_CustomField_Model_Field->orm()
                 ->where_in('facet_select', ['Inclusive', 'Exclusive'])
                 ->where('frontend_show', 1)
                 ->order_by_asc('sort_order')
@@ -69,13 +69,13 @@ class FCom_CustomField_Main extends BClass
             return;
         }
 
-        $filter = BRequest::get('f');
+        $filter = $this->BRequest->get('f');
         $currentFilter = [];
         $excludeFilters = [];
         if (!empty($filter)) {
             foreach ($filter as $fkey => $fval) {
                 $fkey = urldecode($fkey);
-                $field = FCom_CustomField_Model_Field::orm()->where('field_code', $fkey)->find_one();
+                $field = $this->FCom_CustomField_Model_Field->orm()->where('field_code', $fkey)->find_one();
                 $currentFilter[$field->frontend_label][] =
                         [
                             'key' => $field->field_code,
@@ -97,7 +97,7 @@ class FCom_CustomField_Main extends BClass
             if ($category) {
                 $productOrm = $category->productsORM();
             } else {
-                $productOrm = FCom_Catalog_Model_Product::orm();
+                $productOrm = $this->FCom_Catalog_Model_Product->orm();
             }
             $products = $productOrm->where_not_equal($cf->field_code, '')->group_by($cf->field_code)->find_many();
             if (empty($products)) {
@@ -126,9 +126,9 @@ class FCom_CustomField_Main extends BClass
         if (empty($groups) && empty($currentFilter)) {
             return;
         }
-        BLayout::i()->view('customfields/filters')->selected_filters = $currentFilter;
-        BLayout::i()->view('customfields/filters')->groups = $groups;
-        return BLayout::i()->view('customfields/filters')->render();
+        $this->BLayout->view('customfields/filters')->selected_filters = $currentFilter;
+        $this->BLayout->view('customfields/filters')->groups = $groups;
+        return $this->BLayout->view('customfields/filters')->render();
     }
 }
 

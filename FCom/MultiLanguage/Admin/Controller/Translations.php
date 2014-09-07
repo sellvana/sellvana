@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -13,7 +13,8 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
     {
         $config = parent::gridConfig();
         $localeOptions = [];
-        foreach (FCom_Geo_Model_Country::i()->options() as $iso => $name) {
+        $availableCountries = $this->BLocale->getAvailableCountries();
+        foreach ($availableCountries as $iso => $name) {
             $localeOptions[$iso] = $iso;
         }
         $config['columns'] = [
@@ -25,7 +26,7 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
         ];
         $config['data_mode'] = 'local';
         $data = [];
-        $modules = BModuleRegistry::i()->getAllModules();
+        $modules = $this->BModuleRegistry->getAllModules();
         foreach ($modules as $modName => $module) {
             if (!empty($module->translations)) {
                 foreach ($module->translations as $trlocale => $trfile) {
@@ -52,21 +53,28 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
 
     public function action_form()
     {
-        $id = BRequest::i()->params('id', true);
-        list($module, $file) = explode("/", $id);
+        $id = $this->BRequest->params('id', true);
+        list($module, $file) = explode("/", $id, 2);
 
-        if (!$file) {
-            BDebug::error('Invalid Filename: ' . $id);
+        $moduleClass = $this->BApp->m($module);
+        if (!$moduleClass) {
+            $this->forward('noroute');
+            return;
         }
-        $moduleClass = BApp::m($module);
+
+        $file = basename($file);
+        if (!$file) {
+            $this->BDebug->error('Invalid Filename: ' . $id);
+        }
+
         $filename = $moduleClass->baseDir() . '/i18n/' . $file;
 
         $model = new stdClass();
         $model->id = $id;
         $model->source = file_get_contents($filename);
+        $this->layout($this->_formLayoutName);
         $view = $this->view($this->_formViewName)->set('model', $model);
         $this->formViewBefore(['view' => $view, 'model' => $model]);
-        $this->layout($this->_formLayoutName);
         $this->processFormTabs($view, $model, 'edit');
     }
 
@@ -74,13 +82,13 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
     {
         $m = $args['model'];
         $args['view']->set([
-            'form_id' => BLocale::transliterate($this->_formLayoutName),
-            'form_url' => BApp::href($this->_formHref) . '?id=' . $m->id,
+            'form_id' => $this->BLocale->transliterate($this->_formLayoutName),
+            'form_url' => $this->BApp->href($this->_formHref) . '?id=' . $m->id,
             'actions' => [
-                'back' => '<button type="button" class="st3 sz2 btn" onclick="location.href=\'' . BApp::href($this->_gridHref) . '\'"><span>' .  BLocale::_('Back to list') . '</span></button>',
-                'save' => '<button type="submit" class="st1 sz2 btn" onclick="return adminForm.saveAll(this)"><span>' .  BLocale::_('Save') . '</span></button>',
+                'back' => '<button type="button" class="st3 sz2 btn" onclick="location.href=\'' . $this->BApp->href($this->_gridHref) . '\'"><span>' .  $this->BLocale->_('Back to list') . '</span></button>',
+                'save' => '<button type="submit" class="st1 sz2 btn" onclick="return adminForm.saveAll(this)"><span>' .  $this->BLocale->_('Save') . '</span></button>',
             ],
         ]);
-        BEvents::i()->fire(static::$_origClass . '::formViewBefore', $args);
+        $this->BEvents->fire(static::$_origClass . '::formViewBefore', $args);
     }
 }

@@ -1,193 +1,50 @@
 {% set m = THIS.get('model') %}
 {% set prodImagesConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productImagesGridConfig(m) %}
+
+{% set type = 'images' %}
+{% set targetType = 'product' %}
+{% set medialibConfig = {id: 'all_' ~ type, mode: 'images', type: 'product-images', title: 'Images', folder: 'media/product/images'} %}
+
+{% set attachmentsConfig = {
+    type: type,
+    targetType: targetType,
+    elementContainer: '#tab-images',
+    medialibConfig: medialibConfig,
+    gridConfig: prodImagesConfig
+} %}
+
+{#{{ forms.attachment_tab_content(m, attachment_tab_config) | raw }}#}
+
+{{ THIS.view('core/attachmentgrid').set('config', attachmentsConfig) | raw }}
+
 <script>
-var all_prod_images_grid, imagesGrid;
-function afterMassDelete() {
-    if (prodVariantGrid != null) {
+    $(document).ready(function() {
+        var id = "{{ m.id }}";
+        var url = "{{ formUrl }}?id="+id+"&tabs=variants";
+        {# load variants tab before update image list when add image for product #}
+        if (typeof(updateListVariantImage) != "function") {
+            $.getJSON(url, function (data, status, req) {
+                _.each(data.tabs, function (tabHtml, i) {
+                    $('#tab-variants').html(tabHtml).data('loaded', true);
+                    $('#tab-variants' + ' .collapse').collapse();
+                });
+            });
+        }
+    });
+    window.afterAddImages = function (grid) {
         var image = [];
-        imagesGrid.getSelectedRows().forEach(function (row) {
+        grid.getSelectedRows().forEach(function (row) {
             image.push({
                 file_id: row.get('file_id'),
                 subfolder: row.get('subfolder'),
                 file_name: row.get('file_name')
             })
         });
-        updateListVariantImage({
-            add: false,
-            image: image
-        });
-    }
-}
-require(['jquery','underscore','backbone', 'fcom.backbonegrid'], function($, _) {
-    var originIds, removedIds = [];
-    var rowsAllImages;
-    var mainThumb = $('#main-thumb-image');
-    function _getAttachmentsDbFields(row) {
-        return {
-            id: row.id,
-            file_id: row.file_id,
-            label: row.label,
-            position: row.position,
-            create_at: row.create_at,
-            update_at: row.update_at,
-            _new: row._new
-        };
-    }
-
-    /*
-    *relect attachment grid data into form fields to send them server
-    */
-    window.setImagesGridVals = function() {
-
-        removedIds = _.difference(originIds, imagesGrid.getRows().pluck('id'));
-
-        var rows = [];
-        imagesGrid.getRows().forEach(function(row) {
-            rows.push(_getAttachmentsDbFields(row.toJSON()));
-        });
-
-        $('#prod-image-rows').val(JSON.stringify(rows));
-        $('#prod-image-remove').val(removedIds.join(','));
-    }
-
-    /*
-    *MediaGrid registery function
-    */
-    window.all_prod_images_register = function(grid) {
-        all_prod_images_grid = grid;
-        var confirmDelete = $('#confirm-delete-product-images');
-        var selfRow;
-        all_prod_images_grid.getGridSkeleton().Views.RowView.prototype._deleteRow = function (ev) {
-            selfRow = this;
-            var text = (this.model.get('associated_products') > 0) ?
-                    "This image is associated with "+ this.model.get('associated_products') +" of products. Are you sure you want to delete?" : "Are you sure you want to delete?";
-            confirmDelete.find('.modal-body').html(text);
-            confirmDelete.modal('show');
-        }
-
-        $('.prod-images-modal-delete').click(function () {
-            all_prod_images_grid.getRows().remove(selfRow.model);
-            all_prod_images_grid.getSelectedRows().remove(selfRow.model, {silent: true});
-            selfRow._destorySelf();
-            confirmDelete.modal("hide");
-        });
-        grid.build();
-
-
-        rowsAllImages = grid.getRows();
-        grid.getSelectedRows().on('add remove reset', function() {
-            if (grid.getSelectedRows().length>0) {
-                $('.btn_all_prod_images_add').removeClass('disabled');
-            } else {
-                $('.btn_all_prod_images_add').addClass('disabled');
-            }
-        });
-
-        $('.btn_all_prod_images_add').click(function() {
-            var gridView = imagesGrid.getGridView();
-            var image = [];
-            grid.getSelectedRows().forEach(function (row) {
-                if (!imagesGrid.getRows().findWhere({file_id: row.get('id')})) {
-                    var addedRow = _.clone(row);
-                    var id = row.get('id');
-                    addedRow.set('_new', true);
-                    addedRow.set('file_id', row.id);
-                    addedRow.set('update_at', dateTimeNow());
-                    addedRow.set('create_at', dateTimeNow());
-                    addedRow.set('id', guid());
-                    addedRow.set('selected', false);
-                    gridView.collection.add(addedRow.toJSON(), {silent: true});
-                    image.push({
-                        file_id: row.get('file_id'),
-                        subfolder: row.get('subfolder'),
-                        file_name: row.get('file_name')
-                    })
-                    row.set('id', id);
-                }
+        if (typeof(updateListVariantImage) == "function") {
+            updateListVariantImage({
+                add: true,
+                image: image
             });
-            if (prodVariantGrid != null) {
-                updateListVariantImage({
-                    add: true,
-                    image: image
-                });
-            }
-            gridView.render();
-            grid.getGridView().clearSelectedRows();
-            $('#all_prod_images_modal').modal('hide');
-
-        });
-    }
-
-    window.imagesGridRegister = function(grid) {
-
-        imagesGrid = grid;
-        var rowView = imagesGrid.getGridSkeleton().Views.RowView;
-        rowView.prototype.afterRender = function() {
-            var input = this.$el.find('.main-thumb');
-            if (mainThumb.val() == '' && this.model.get('main_thumb') == 1) {
-                input.prop('checked', true);
-            }
-            if (mainThumb.val() == this.model.get('id')) {
-                input.prop('checked', true);
-            }
         }
-
-        imagesGrid.getGridSkeleton().Views.RowView.prototype._deleteRow = function (ev) {
-
-            var confirm;
-            if ($(ev.target).closest('button').hasClass('noconfirm')) {
-                confirm = true;
-            } else {
-                confirm = window.confirm("Do you want to really delete?");
-            }
-            if (confirm) {
-                imagesGrid.getRows().remove(this.model);
-                imagesGrid.getSelectedRows().remove(this.model, {silent: true});
-                var image = [{
-                    file_id: this.model.get('file_id'),
-                    subfolder: this.model.get('subfolder'),
-                    file_name: this.model.get('file_name')
-                }];
-                if (prodVariantGrid != null) {
-                    updateListVariantImage({
-                        add: false,
-                        image: image
-                    });
-                }
-            }
-
-        }
-
-        imagesGrid.build();
-
-        originIds = imagesGrid.getRows().pluck('id');
-
-        $(imagesGrid.getGridSkeleton().AddButton).click(function() {
-            $('#all_prod_images_modal').modal('show');
-        });
-
     }
-});
 </script>
-{{ THIS.view('core/backbonegrid').set('grid', prodImagesConfig) | raw }}
-{{ THIS.view('core/medialib').set('config', {'id': 'all_prod_images', 'folder': 'media/product/images', mode: 'thumbnail', title: 'Images', multiSelAllowed: true}) | raw }}
-
-<input type='hidden' name="grid[images][del]" id='prod-image-remove' />
-<input type='hidden' name="grid[images][rows]" id='prod-image-rows' />
-<input type='hidden' id='main-thumb-image' value="" />
-<div class='modal fade' id='confirm-delete-product-images' tabindex='-1'>
-    <div class='modal-dialog'>
-        <div class='modal-content'>
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title">{{ "Delete"|_ }}</h4>
-                </div>
-            <div class='modal-body'>
-            </div>
-            <div class='modal-footer'>
-                <button class='btn btn-primary btn-add prod-images-modal-delete' data-dismiss='modal' type='button'>{{ "Yes"|_ }}</button>
-                <button class='btn btn-default btn-close' data-dismiss='modal' type='button'>{{ "Cancel"|_ }}</button>
-            </div>
-        </div>
-    </div>
-</div>

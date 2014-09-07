@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Wishlist_Tests_Model_WishlistTest extends FCom_Test_DatabaseTestCase
 {
@@ -12,7 +12,7 @@ class FCom_Wishlist_Tests_Model_WishlistTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_wishlist'), "Pre-Condition");
 
         $data = ['customer_id' => 3];
-        FCom_Wishlist_Model_Wishlist::i()->create($data)->save();
+        $this->FCom_Wishlist_Model_Wishlist->create($data)->save();
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_wishlist'), "Insert failed");
     }
@@ -21,7 +21,7 @@ class FCom_Wishlist_Tests_Model_WishlistTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_wishlist_items'), "Pre-Condition");
 
-        $wishlist = FCom_Wishlist_Model_Wishlist::i()->load(2);
+        $wishlist = $this->FCom_Wishlist_Model_Wishlist->load(2);
         $wishlist->addItem(4);
 
         $this->assertEquals(4, $this->getConnection()->getRowCount('fcom_wishlist_items'), "Insert failed");
@@ -31,7 +31,7 @@ class FCom_Wishlist_Tests_Model_WishlistTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_wishlist_items'), "Pre-Condition");
 
-        $wishlist = FCom_Wishlist_Model_Wishlist::i()->load(1);
+        $wishlist = $this->FCom_Wishlist_Model_Wishlist->load(1);
         $this->assertEquals(2, count($wishlist->items()), "Count items before remove");
         $wishlist->removeProduct(1);
         $this->assertEquals(1, count($wishlist->items()), "Count items after remove");
@@ -43,7 +43,7 @@ class FCom_Wishlist_Tests_Model_WishlistTest extends FCom_Test_DatabaseTestCase
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_wishlist'), "Pre-Condition");
 
-        $wishlist = FCom_Wishlist_Model_Wishlist::i()->load(1);
+        $wishlist = $this->FCom_Wishlist_Model_Wishlist->load(1);
         $this->assertEquals(2, count($wishlist->items()), "Items count is not correct");
 
         foreach ($wishlist->items() as $item) {

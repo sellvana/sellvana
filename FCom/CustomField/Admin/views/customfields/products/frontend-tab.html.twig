@@ -1,40 +1,76 @@
 {% set prodCtrl = APP.instance('FCom_CustomField_Admin_Controller_Products') %}
-{% set fieldSetsCtrl = APP.instance('FCom_CustomField_Admin_Controller_FieldSets') %}
-
 
 <script>
 require(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
-    var mainGrid, subGrid;
+    var mainGrid;
+    var inputName = 'input[data-col="name"]';
+    var inputOption = 'input[data-col="options"]';
+    var selectFieldType = 'select[data-col="input_type"]';
     window.frontendFieldGridRegister = function(grid) {
         mainGrid = grid;
+        grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
+            var self = this;
+            this.$el.find(inputName).addClass('unique');
+            this.$el.find(inputOption).addClass('requiredOptions');
+            if (this.model.get('input_type') != 'select') {
+                this.$el.find(inputOption).prop('disabled', true);
+            }
+            this.$el.find(selectFieldType).change(function() {
+                if ($(this).val() == 'select') {
+                    self.$el.find(inputOption).prop('disabled', false);
+                } else {
+                    self.$el.find(inputOption).prop('disabled', true);
+                }
+            })
+        }
         grid.build();
-        $(mainGrid.getGridSkeleton().AddButton).click(function() {
-            $('#btn_add_frontend').trigger('click');
-        });
-    }
-
-    window.addFieldGridRegister = function(grid) {
-        subGrid = grid;
-        grid.build();
-
-        $(subGrid.getGridSkeleton().AddButton).click(function() {
-            var ids = subGrid.getSelectedRows().pluck('id').join(',');
-            $.post('{{ APP.href('/customfields/products/get_fields') }}', {ids: ids}, function (response) {
-                mainGrid.getRows().add(response);
-            });
-            subGrid.getGridView().clearSelectedRows();
-            $('.btn-prod-frontend-close').trigger('click');
-        });
     }
     $('#catalog-products-form').submit(function (ev) {
         var rows = mainGrid.getRows().toJSON();
 
         var res = [];
         for (var i in rows) {
-            res.push(_.pick(rows[i], 'id', 'name', 'label', 'input_type', 'price', 'options'));
+            if (rows[i].position.length == 0) {
+                rows[i].position = 0;
+            }
+            res.push(_.pick(rows[i], 'id', 'name', 'label', 'input_type', 'required', 'options', 'position'));
         }
 
         $("#prod_frontend_data").val(JSON.stringify(res));
+    });
+    function checkUnique(value, elem, params) {
+        var error = true;
+        if (typeof (elem) !== 'undefined') {
+            var parent = $(elem).parents('tr');
+            var val = parent.find(inputName).val();
+            mainGrid.getRows().each(function (data) {
+                if (parent.attr('id') != data.get('id') && val == data.get('name')) {
+                    error = false;
+                }
+            });
+        }
+
+        return error;
+    }
+
+    $.validator.addMethod('checkUnique', checkUnique , 'Field Name are already taken place.');
+
+    $.validator.addClassRules("requiredOptions", {
+        required: function (value, elem, params) {
+            var error = true;
+            if (typeof (elem) !== 'undefined') {
+                var parent = $(elem).parents('tr');
+                if (parent.find(selectFieldType).val() == 'select' &&  value.trim().length == 0) {
+                    error = false;
+                }
+            }
+            return error;
+        }
+    });
+
+    $.validator.addClassRules("unique", {
+        required: true,
+        checkUnique: true
     });
 
 });
@@ -47,23 +83,6 @@ require(['backbone', 'underscore', 'jquery'], function(Backbone, _, $) {
     </div>
 </div>
 
-<a role="button" href="#prod-frontend-add" data-toggle="modal" style='display:none;' id='btn_add_frontend'></a>
-<div class='modal fade' id='prod-frontend-add' tabindex='-1'>
-    <div class='modal-dialog' style='width:800px;'>
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
-                <h4 class='modal-title' id='myModalLabel'>{{ "Add products"|_ }}</h4>
-            </div>
-            <div class='modal-body'>
-                {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.fieldsetModalAddGridConfig()) | raw }}
-            </div>
-            <div class='modal-footer'>
-                <button class='btn btn-default btn-close btn-prod-frontend-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 

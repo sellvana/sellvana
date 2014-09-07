@@ -17,55 +17,23 @@
         <input type="hidden" name="rid" value="{{ pr.id() }}" id="id-preview">
 
         <h1 class="f-prod-name">{{ prod.get('product_name') }}</h1>
-
-        <div class="f-prod-review-attrs">
-            <dl class="dl-horizontal">
-                <dt><strong>{{ 'Overall'|_ }}</strong></dt>
-                <dd>
-                    <input class="validate[required]" type="range" id="prodreview-rating" name="review[rating]" min="{{ min }}" max="{{ max }}"
-                            {% if pr %}
-                                value="{{ pr.get('rating')}}"
-                            {% else %}
-                                value="{{ validator is defined and validator.fieldValue('rating') ? validator.fieldValue('rating') : min }}"
-                            {% endif %}
-                           step="{{ step }}" />
-                    <div class="rateit" data-rateit-backingfld="#prodreview-rating"></div>
-                </dd>
-                <dt>{{ 'Value'|_ }}</dt>
-                <dd>
-                    <input class="required" type="range" id="prodreview-rating1" name="review[rating1]" min="{{ min }}" max="{{ max }}"
-                            {% if pr %}
-                                value="{{ pr.get('rating1')}}"
-                            {% else %}
-                                value="{{ validator is defined and validator.fieldValue('rating1') ? validator.fieldValue('rating1') : min }}"
-                            {% endif %}
-                           step="{{ step }}" />
-                    <div class="rateit required" data-rateit-backingfld="#prodreview-rating1"></div>
-                </dd>
-                <dt>{{ 'Features'|_ }}</dt>
-                <dd>
-                    <input class="required" type="range" id="prodreview-rating2" name="review[rating2]" min="{{ min }}" max="{{ max }}"
-                            {% if pr %}
-                                value="{{ pr.get('rating2')}}"
-                            {% else %}
-                                value="{{ validator is defined and validator.fieldValue('rating2') ? validator.fieldValue('rating2') : min }}"
-                            {% endif %}
-                           step="{{ step }}" />
-                    <div class="rateit " data-rateit-backingfld="#prodreview-rating2"></div>
-                </dd>
-                <dt>{{ 'Quality'|_ }}</dt>
-                <dd>
-                    <input type="range" id="prodreview-rating3" name="review[rating3]" min="{{ min }}" max="{{ max }}"
-                            {% if pr %}
-                                value="{{ pr.get('rating3')}}"
-                            {% else %}
-                                value="{{ validator is defined and validator.fieldValue('rating3') ? validator.fieldValue('rating3') : min }}"
-                            {% endif %}
-                           step="{{ step }}" />
-                    <div class="rateit" data-rateit-backingfld="#prodreview-rating3"></div>
-                </dd>
-            </dl>
+        <!--
+        <div class="f-prod-avg-rating">
+          <div class="glyphicon f-rating-stars f-lg-stars">
+            <span class="f-filled-stars" style="width:0%;"></span>
+            <span class="f-empty-stars"></span>
+          </div>
         </div>
+        -->
+        <input class="validate[required]" type="range" id="prodreview-rating" name="review[rating]" min="{{ min }}" max="{{ max }}"
+            {% if pr %}
+                value="{{ pr.get('rating')}}"
+            {% else %}
+                value="{{ validator is defined and validator.fieldValue('rating') ? validator.fieldValue('rating') : min }}"
+            {% endif %}
+           step="{{ step }}" />
+
+        <div class="rateit" data-rateit-backingfld="#prodreview-rating"></div>
         <div class="form-group">
             <label for="review-title">{{ 'Review Title'|_ }}</label>
             <div class="controls">
@@ -80,7 +48,7 @@
         <div class="form-group">
             <label for="review-text">{{ 'Review Text'|_ }}</label>
             <div class="controls">
-                <textarea name="review[text]" id="prodreview-text" rows="8" placeholder="{{"Your review here" | _ }}" class="form-control" style="resize:vertical">{% if pr %}{{ pr.get('text')}}{% else %}{{ validator is defined ? validator.fieldValue('text') : '' }}{% endif %}</textarea><br/>
+                <textarea name="review[text]" id="prodreview-text" rows="8" placeholder="{{"Your review here" | _ }}" class="form-control" style="resize:vertical">{% if pr %}{{ pr.get('text')}}{% else %}{{ validator is defined ? validator.fieldValue('text') : '' }}{% endif %}</textarea>
             </div>
         </div>
         <input type="submit" class="btn btn-primary" id="review_save">

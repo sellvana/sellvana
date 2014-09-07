@@ -1,10 +1,10 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Seo_Migrate extends BClass
 {
     public function install__0_1_1()
     {
-        BDb::ddlTableDef(FCom_Seo_Model_UrlAlias::table(), [
+        $this->BDb->ddlTableDef($this->FCom_Seo_Model_UrlAlias->table(), [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'request_url' => 'varchar(100)',
@@ -21,7 +21,7 @@ class FCom_Seo_Migrate extends BClass
             ],
         ]);
 
-        BDb::ddlTableDef(FCom_Seo_Model_Sitemap::table(), [
+        $this->BDb->ddlTableDef($this->FCom_Seo_Model_Sitemap->table(), [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'name' => 'varchar(100)',
@@ -39,15 +39,15 @@ class FCom_Seo_Migrate extends BClass
 
     public function upgrade__0_1_0__0_1_1()
     {
-        $table = FCom_Seo_Model_UrlAlias::table();
-        BDb::ddlTableDef($table, [
+        $table = $this->FCom_Seo_Model_UrlAlias->table();
+        $this->BDb->ddlTableDef($table, [
             'COLUMNS' => [
                   'create_dt'      => 'RENAME create_at datetime',
                   'update_dt'      => 'RENAME update_at datetime',
             ]
         ]);
-        $table = FCom_Seo_Model_Sitemap::table();
-        BDb::ddlTableDef($table, [
+        $table = $this->FCom_Seo_Model_Sitemap->table();
+        $this->BDb->ddlTableDef($table, [
             'COLUMNS' => [
                   'create_dt'      => 'RENAME create_at datetime',
                   'update_dt'      => 'RENAME update_at datetime',

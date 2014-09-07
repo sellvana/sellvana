@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_OAuth_Provider_BaseV1 extends FCom_OAuth_Provider_Abstract
 {
@@ -23,7 +23,7 @@ class FCom_OAuth_Provider_BaseV1 extends FCom_OAuth_Provider_Abstract
             throw new BException('OAuth getRequestToken error: '.print_r($result, 1));
         }
 
-        $hlp = FCom_OAuth_Main::i();
+        $hlp = $this->FCom_OAuth_Main;
         $providerName = $hlp->getProvider();
         $consumerSess =& $hlp->getConsumerSession($providerName);
         $consumerSess['request_token'] = $result['oauth_token'];
@@ -33,7 +33,7 @@ class FCom_OAuth_Provider_BaseV1 extends FCom_OAuth_Provider_Abstract
 
     public function getAuthUrl()
     {
-        $hlp = FCom_OAuth_Main::i();
+        $hlp = $this->FCom_OAuth_Main;
         $providerName = $hlp->getProvider();
         $consumerSess =& $hlp->getConsumerSession($providerName);
         $providerInfo = $hlp->getProviderInfo($providerName);
@@ -45,11 +45,11 @@ class FCom_OAuth_Provider_BaseV1 extends FCom_OAuth_Provider_Abstract
 
     public function getAuthToken()
     {
-        $hlp = FCom_OAuth_Main::i();
+        $hlp = $this->FCom_OAuth_Main;
         $providerName = $hlp->getProvider();
         $consumerSess =& $hlp->getConsumerSession($providerName);
-        $consumerSess['auth_verifier'] = BRequest::i()->get('oauth_verifier');
-        $authToken = BRequest::i()->get('oauth_token');
+        $consumerSess['auth_verifier'] = $this->BRequest->get('oauth_verifier');
+        $authToken = $this->BRequest->get('oauth_token');
         if (empty($consumerSess['request_token']) || $authToken !== $consumerSess['request_token']) {
             throw new BException('Invalid auth token: ' . $authToken);
         }
@@ -69,23 +69,23 @@ class FCom_OAuth_Provider_BaseV1 extends FCom_OAuth_Provider_Abstract
         unset($result['oauth_token'], $result['oauth_token_secret']);
 
         $modelData = ['provider' => $providerName, 'token' => $token];
-        $tokenModel = FCom_OAuth_Model_ConsumerToken::i()->loadOrCreate($modelData);
+        $tokenModel = $this->FCom_OAuth_Model_ConsumerToken->loadOrCreate($modelData);
         $tokenModel->set('token_secret', $secret)->setData($result)->save();
 
         $this->onAfterGetAccessToken($tokenModel);
 
-        BEvents::i()->fire(__METHOD__ . ':after', [ 'token_model' => $tokenModel ]);
+        $this->BEvents->fire(__METHOD__ . ':after', [ 'token_model' => $tokenModel ]);
 
         return $tokenModel;
     }
 
     protected function _signAndCall($stage)
     {
-        $hlp = FCom_OAuth_Main::i();
+        $hlp = $this->FCom_OAuth_Main;
         $providerName = $hlp->getProvider();
         $providerInfo = $hlp->getProviderInfo($providerName);
         $consumerSess =& $hlp->getConsumerSession($providerName);
-        $consumerConf = BConfig::i()->get('modules/FCom_OAuth/' . $providerName);
+        $consumerConf = $this->BConfig->get('modules/FCom_OAuth/' . $providerName);
         if (empty($consumerConf['consumer_key']) || empty($consumerConf['consumer_secret'])) {
             throw new BException('Missing consumer key or secret for ' . $providerName);
         }
@@ -100,14 +100,14 @@ class FCom_OAuth_Provider_BaseV1 extends FCom_OAuth_Provider_Abstract
 
         $params = [];
         $params['oauth_consumer_key'] = $consumerConf['consumer_key'];
-        $params['oauth_nonce'] = BUtil::randomString(32);
+        $params['oauth_nonce'] = $this->BUtil->randomString(32);
         $params['oauth_timestamp'] = time();
         $params['oauth_signature_method'] = 'HMAC-SHA1';
         $params['oauth_version'] = !empty($providerInfo['version']) ? $providerInfo['version'] : '1.0';
 
         switch ($stage) {
             case 'request':
-                $params['oauth_callback'] = BApp::href('oauth/callback');
+                $params['oauth_callback'] = $this->BApp->href('oauth/callback');
                 break;
             case 'access':
                 $params['oauth_token'] = $consumerSess['request_token'];
@@ -164,7 +164,7 @@ class FCom_OAuth_Provider_BaseV1 extends FCom_OAuth_Provider_Abstract
                 $postParams = $params;
                 break;
         }
-        $response = BUtil::remoteHttp($method, $url, $postParams, $headers, ['curl' => 1]);
+        $response = $this->BUtil->remoteHttp($method, $url, $postParams, $headers, ['curl' => 1]);
         if (!$response) {
             throw new BException('OAuth getRequestToken HTTP error'); //TODO: more info
         }

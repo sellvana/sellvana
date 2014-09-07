@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Promo_Model_Group extends BModel
 {
@@ -7,6 +7,6 @@ class FCom_Promo_Model_Group extends BModel
 
     public function products()
     {
-        return FCom_Promo_Model_Product::i()->orm()->where('group_id', $this->id)->find_many();
+        return $this->FCom_Promo_Model_Product->orm()->where('group_id', $this->id)->find_many();
     }
 }

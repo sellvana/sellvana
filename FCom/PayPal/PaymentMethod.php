@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_PayPal_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 {
@@ -9,12 +9,12 @@ class FCom_PayPal_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 
     public function getCheckoutFormView()
     {
-        return BLayout::i()->view('paypal/form');
+        return $this->BLayout->view('paypal/form');
     }
 
     public function payOnCheckout()
     {
-        $href = BApp::href('paypal/redirect');
-        BResponse::i()->redirect($href);
+        $href = $this->BApp->href('paypal/redirect');
+        $this->BResponse->redirect($href);
     }
 }

@@ -1,9 +1,13 @@
 modules:
     FCom_Admin:
-        version: 0.1.7
+        version: 0.1.8
         channel: beta
         description: Base Admin functionality
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCommon: 0.1.0, FCom_LibTwig: 0.1.0, FCom_Frontend: 0.1.0 } }
+
+        translations:
+            de: de.php
+            es: es.php
 
         areas:
             FCom_Admin:
@@ -11,7 +15,7 @@ modules:
                     - [ root, { view_class: FCom_Core_View_Root } ]
                     - [ admin/header, { view_class: FCom_Admin_View_Header } ]
                     - [ admin/nav, { view_class: FCom_Admin_View_Nav } ]
-                    - [ admin/form-elements, { view_class: FCom_Admin_View_FormElements } ]
+                    - [ core/form-elements, { view_class: FCom_Core_View_FormElements } ]
                     #- [ jqgrid, { view_class: FCom_Admin_View_JqGrid } ]
                     - [ dashboard, { view_class: FCom_Admin_View_Dashboard } ]
                 auto_use: [ bootstrap, views ]
@@ -58,6 +62,8 @@ modules:
                     - [ /header_search, FCom_Admin_Controller_HeaderSearch.index ]
                     - [ /generate_sitemap, FCom_Admin_Controller.generate_sitemap ]
 
+                    - [ /switch_locale, FCom_Admin_Controller.switch_locale ]
+
                 observe:
                     - [ "FCom_Admin_Controller_Settings::action_index__POST", "FCom_Admin_Admin.onSettingsPost" ]
                     - [ "FCom_Admin_View_Dashboard::getWidgets", "FCom_Admin_Admin.onGetDashboardWidgets" ]
@@ -67,11 +73,21 @@ modules:
                         /settings:
                             POST/config/modules/FCom_Admin/add_js_code: "*"
                             POST/config/modules/FCom_Frontend/add_js_code: "*"
-                default_config:
-                    modules/FCom_Admin/theme: FCom_Admin_DefaultTheme
+                        /templates/form:
+                            POST/model/view_contents: "*"
+                uploads:
+                    images:
+                        permission: upload/images
+                        filetype: jpeg,jpg,tiff,gif,png,bmp
+                        folder: media/images
+        default_config:
+            modules:
+                FCom_Admin:
+                    theme: FCom_Admin_DefaultTheme
+                    default_locale: en_US
 
-        provides:
-            themes:
-                FCom_Admin_DefaultTheme:
-                    area: FCom_Admin
-                    layout: Admin/layout.yml
+        themes:
+            FCom_Admin_DefaultTheme:
+                name: FCom_Admin_DefaultTheme
+                area: FCom_Admin
+                layout_before: Admin/layout.yml

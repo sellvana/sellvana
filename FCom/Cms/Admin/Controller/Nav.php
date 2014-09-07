@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Cms_Admin_Controller_Nav extends FCom_Admin_Controller_Abstract_TreeForm
 {
@@ -14,7 +14,7 @@ class FCom_Cms_Admin_Controller_Nav extends FCom_Admin_Controller_Abstract_TreeF
     protected function _prepareTreeForm($model)
     {
         $nodeTypes = ['content' => 'Text', 'cms_page' => 'CMS Page'];
-        BEvents::i()->fire(__METHOD__, ['node_types' => &$nodeTypes]);
+        $this->BEvents->fire(__METHOD__, ['node_types' => &$nodeTypes]);
         $this->view('cms/nav-tree-form/main')->set('node_types', $nodeTypes);
     }
 }

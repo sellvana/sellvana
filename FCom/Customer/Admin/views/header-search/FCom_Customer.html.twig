@@ -1,11 +1,4 @@
 {% set customerCtrl =  APP.instance('FCom_Customer_Admin_Controller_Customers') %}
-<script>
-    require(['jquery', 'underscore', 'backbone', 'fcom.backbonegrid'], function ($, _, Backbone) {
-        window.customerGridRegister = function (grid) {
-            grid.build();
-        }
-    })
-</script>
 <div class="f-admin-main-view">
     <div class="page-header f-admin-page-header">
         <h1 class="f-page-title">
@@ -14,6 +7,6 @@
         </h1>
     </div>
     <div class="f-admin-main">
-        {{ THIS.view('core/backbonegrid').set('grid', { "config" : customerCtrl.gridConfig()}) | raw }}
+        <p style="margin-left: 10px;margin-bottom: 15px">{{ "No results found for Customers"|_ }}</p>
     </div>
 </div>

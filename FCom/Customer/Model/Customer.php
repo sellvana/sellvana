@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
  * Model class for table 'fcom_customer'
  * The followings are the available columns in table 'fcom_customer':
@@ -21,6 +22,9 @@
  * relations
  * @property FCom_Customer_Model_Address $default_billing
  * @property FCom_Customer_Model_Address $default_shipping
+ *
+ * DI
+ * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
  */
 class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 {
@@ -64,7 +68,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
      * @param array $args
      * @return FCom_Customer_Model_Customer
      */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return parent::i($new, $args);
     }
@@ -126,32 +130,59 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public function setPassword($password)
     {
-        $this->password_hash = BUtil::fullSaltedHash($password);
+        $token = $this->BUtil->randomString(16);
+        $this->set([
+            'password_hash' => $this->BUtil->fullSaltedHash($password),
+            'password_session_token' => $token,
+        ]);
+        if ($this->id() === $this->sessionUserId()) {
+            $this->BSession->set('admin_user_password_token', $token);
+        }
         return $this;
     }
 
     public function recoverPassword()
     {
-        $this->set(['token' => BUtil::randomString(20)])->save();
-        BLayout::i()->view('email/customer-password-recover')->set('customer', $this)->email();
+        $this->set(['token' => $this->BUtil->randomString(20), 'token_at' => $this->BDb->now()])->save();
+        $this->BLayout->view('email/customer-password-recover')->set('customer', $this)->email();
         return $this;
+    }
+
+    public function validateResetToken($token)
+    {
+        if (!$token) {
+            return false;
+        }
+        $user = $this->load($token, 'token');
+        if (!$user || $user->get('token') !== $token) {
+            return false;
+        }
+        $tokenTtl = $this->BConfig->get('modules/FCom_Customer/password_reset_token_ttl_hr');
+        if (!$tokenTtl) {
+            $tokenTtl = 24;
+        }
+        if (strtotime($user->get('token_at')) < time() - $tokenTtl * 3600) {
+            $user->set(['token' => null, 'token_at' => null])->save();
+            return false;
+        }
+        return $user;
     }
 
     public function resetPassword($password)
     {
-        $this->set(['token' => null])->setPassword($password)->save()->login();
-        BLayout::i()->view('email/customer-password-reset')->set('customer', $this)->email();
+        $this->set(['token' => null, 'token_at' => null])->setPassword($password)->save();
+        $this->BLayout->view('email/customer-password-reset')->set('customer', $this)->email();
         return $this;
     }
 
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if (!$this->create_at) $this->create_at = BDb::now();
-        $this->update_at = BDb::now();
-        if ($this->password) {
-            $this->password_hash = BUtil::fullSaltedHash($this->password);
+
+        if ($this->get('password')) {
+            $this->setPassword($this->get('password'));
         }
+
         return true;
     }
 
@@ -159,20 +190,9 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         parent::onAfterSave();
 
-        if (static::sessionUserId() === $this->id()) {
-            BSession::i()->set('customer_user', serialize($this));
+        if ($this->sessionUserId() === $this->id()) {
+            $this->BSession->set('customer_user', serialize($this));
             static::$_sessionUser = $this;
-        }
-
-        if ($this->_newRecord) {
-            FCom_PushServer_Model_Channel::i()->getChannel('customers_feed', true)->send([
-                'signal' => 'new_customer',
-                'customer' => [
-                    'id' => $this->id(),
-                    'email' => $this->email,
-                    'name' => $this->firstname . ' ' . $this->lastname,
-                ],
-            ]);
         }
     }
 
@@ -211,8 +231,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         if (!empty($post['shipping_address'])) {
             $data['shipping_address_id'] = $post['shipping_address'];
         }
-        if (!empty($post['billing_address_id'])) {
-            $data['billing_address_id'] = $post['billing_address_id'];
+        if (!empty($post['billing_address'])) {
+            $data['billing_address_id'] = $post['billing_address'];
         }
         return $data;
     }
@@ -224,9 +244,9 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $data;
     }
 
-    public static function validatePasswordSecurity($data, $args)
+    public function validatePasswordSecurity($data, $args)
     {
-        if (!BConfig::i()->get('modules/FCom_Customer/password_strength')) {
+        if (!$this->BConfig->get('modules/FCom_Customer/password_strength')) {
             return true;
         }
         $password = $data[$args['field']];
@@ -236,83 +256,118 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return true;
     }
 
-    public function validatePassword($password)
+    public function validatePassword($password, $field = 'password_hash')
     {
-        return BUtil::validateSaltedHash($password, $this->password_hash);
+        $hash = $this->get($field);
+        if (!$this->BUtil->validateSaltedHash($password, $hash)) {
+            return false;
+        }
+        if (!$this->BUtil->isPreferredPasswordHash($hash)) {
+            $this->set('password_hash', $this->BUtil->fullSaltedHash($password))->save();
+        }
+        return true;
+    }
+
+    public function sessionUserId()
+    {
+        return $this->BSession->get('customer_id');
     }
 
     /**
      * @param bool $reset
      * @return bool|FCom_Customer_Model_Customer
      */
-    static public function sessionUser($reset = false)
+    public function sessionUser($reset = false)
     {
         if ($reset || !static::$_sessionUser) {
-            $data = BSession::i()->get('customer_user');
-            if (is_string($data)) {
-                static::$_sessionUser = $data ? unserialize($data) : false;
-            } else {
+            $sessData =& $this->BSession->dataToUpdate();
+            if (empty($sessData['customer_id'])) {
                 return false;
+            }
+            $userId = $sessData['customer_id'];
+            $user = static::$_sessionUser = $this->load($userId);
+            $token = $user->get('password_session_token');
+            if (!$token) {
+                $token = $this->BUtil->randomString(16);
+                $user->set('password_session_token', $token)->save();
+            }
+            if (empty($sessData['customer_password_token'])) {
+                $sessData['customer_password_token'] = $token;
+            } elseif ($sessData['customer_password_token'] !== $token) {
+                $user->logout();
+                $this->BResponse->cookie('remember_me', 0);
+                $this->BResponse->redirect('');
+                return;
             }
         }
         return static::$_sessionUser;
     }
 
-    static public function sessionUserId()
+    public function isLoggedIn()
     {
-        $user = static::sessionUser();
-        return !empty($user) ? $user->id() : false;
+        return $this->sessionUserId() ? true : false;
     }
 
-    static public function isLoggedIn()
-    {
-        return static::sessionUser() ? true : false;
-    }
-
-    static public function authenticate($username, $password)
+    /**
+     * @param $username
+     * @param $password
+     * @return FCom_Customer_Model_Customer|bool
+     */
+    public function authenticate($username, $password)
     {
         if (empty($username) || empty($password)) {
             return false;
         }
-        if (!BLoginThrottle::i()->init('FCom_Customer_Model_Customer', $username)) {
+        if (!$this->BLoginThrottle->init('FCom_Customer_Model_Customer', $username)) {
             return false;
         }
-        /** @var FCom_Admin_Model_User */
-        $user = static::i()->orm()->where('email', $username)->find_one();
+        /** @var FCom_Admin_Model_User $user */
+        $user = $this->orm()->where('email', $username)->find_one();
         if (!$user || !$user->validatePassword($password)) {
-            BLoginThrottle::i()->failure();
+            $this->BLoginThrottle->failure();
             return false;
         }
-        BLoginThrottle::i()->success();
+        $this->BLoginThrottle->success();
+
         return $user;
     }
 
+    /**
+     * @return $this
+     */
     public function login()
     {
-        $this->set('last_login', BDb::now())->save();
+        $this->set('last_login', $this->BDb->now())->save();
 
-        BSession::i()->set('customer_user', serialize($this));
+        $this->BSession->set('customer_id', $this->id());
         static::$_sessionUser = $this;
-
         if ($this->locale) {
             setlocale(LC_ALL, $this->locale);
         }
         if ($this->timezone) {
             date_default_timezone_set($this->timezone);
         }
-        BEvents::i()->fire(__METHOD__ . ':after', ['user' => $this]);
+        $this->BEvents->fire(__METHOD__ . ':after', ['user' => $this]);
         return $this;
     }
 
-    static public function logout()
+    public function logout()
     {
-        BEvents::i()->fire(__METHOD__ . ':before', ['user' => static::sessionUser()]);
+        $this->BEvents->fire(__METHOD__ . ':before', ['user' => $this->sessionUser()]);
 
-        BSession::i()->set('customer_user', false);
+        $sessData =& $this->BSession->dataToUpdate();
+        $sessData = [];
         static::$_sessionUser = null;
+
+        $this->BSession->regenerateId();
     }
 
-    static public function register($r)
+    /**
+     * @param array $r post data
+     * @return static
+     * @throws Exception
+     */
+    public function register($r)
     {
         if (empty($r['email'])
             || empty($r['password']) || empty($r['password_confirm'])
@@ -322,20 +377,27 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         }
 
         unset($r['id']);
-        $customer = static::i()->create($r)->save();
-        BLayout::i()->view('email/new-customer')->set('customer', $customer)->email();
-        BLayout::i()->view('email/new-admin')->set('customer', $customer)->email();
+        if ($this->BConfig->get('modules/FCom_Customer/require_approval')) {
+            $r['status'] = 'review';
+        } else {
+            $r['status'] = 'active';
+        }
+        $customer = $this->create($r)->save();
+        $this->BLayout->view('email/new-customer')->set('customer', $customer)->email();
+        $this->BLayout->view('email/new-admin')->set('customer', $customer)->email();
         return $customer;
     }
 
-
-
-    public static function import($data)
+    /**
+     * @param array $data
+     * @return array
+     */
+    public function import($data)
     {
-        BEvents::i()->fire(__METHOD__ . ':before', ['data' => &$data]);
+        $this->BEvents->fire(__METHOD__ . ':before', ['data' => &$data]);
 
         if (!empty($data['customer']['id'])) {
-            $cust = static::load($data['customer']['id']);
+            $cust = $this->load($data['customer']['id']);
         }
         $result['status'] = '';
         if (empty($cust)) {
@@ -348,11 +410,11 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
                     return $result;
                 }
             } else {
-                $cust = static::load($data['customer']['email'], 'email');
+                $cust = $this->load($data['customer']['email'], 'email');
             }
         }
         if (!$cust) {
-            $cust = static::create();
+            $cust = $this->create();
             $result['status'] = 'created';
         }
         $result['model'] = $cust;
@@ -366,55 +428,105 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
         static::$lastImportedCustomer = $cust;
 
-        $result['addr'] = FCom_Customer_Model_Address::i()->import($data, $cust);
+        $result['addr'] = $this->FCom_Customer_Model_Address->import($data, $cust);
 
-        BEvents::i()->fire(__METHOD__ . ':after', ['data' => $data, 'result' => &$result]);
+        $this->BEvents->fire(__METHOD__ . ':after', ['data' => $data, 'result' => &$result]);
 
         return $result;
     }
 
-    public function defaultBilling()
+    public function getDefaultBillingAddress()
     {
-        if ($this->default_billing_id && !$this->default_billing) {
-            $this->default_billing = FCom_Customer_Model_Address::i()->load($this->default_billing_id);
+        $addresses = $this->getAddresses();
+        foreach ($addresses as $addr) {
+            if ($addr->is_default_billing) {
+                return $addr;
+            }
         }
-        return $this->default_billing;
+        return null;
     }
 
-    public function defaultShipping()
+    public function getDefaultShippingAddress()
     {
-        if ($this->default_shipping_id && !$this->default_billing) {
-            $this->default_billing = FCom_Customer_Model_Address::i()->load($this->default_shipping_id);
+        $addresses = $this->getAddresses();
+        foreach ($addresses as $addr) {
+            if ($addr->is_default_shipping) {
+                return $addr;
+            }
         }
-        return $this->default_billing;
+        return null;
     }
 
-    public function addresses()
+    public function getAddresses($reset = false)
     {
-        return FCom_Customer_Model_Address::i()->orm('a')->where('customer_id', $this->id)->find_many();
+        if ($reset || !$this->addresses) {
+            $this->addresses = $this->FCom_Customer_Model_Address->orm('a')->where('customer_id', $this->id)->find_many();
+        }
+        return $this->addresses;
+    }
+
+    public function setDefaultAddress($address, $atype = null)
+    {
+        $addrHlp = $this->FCom_Customer_Model_Address;
+        if (is_object($address)) {
+            $addressId = $address->id();
+        } elseif (is_numeric($address)) {
+            $addressId = $address;
+            $address = $addrHlp->load($addressId);
+        }
+        if ($atype === 'billing' || $atype === true) {
+            $address->set('is_default_billing', 1);
+        }
+        if ($atype === 'shipping' || $atype === true) {
+            $address->set('is_default_shipping', 1);
+        }
+        $resetUpdate = [];
+        if ($address->is_default_billing) {
+            $resetUpdate['is_default_billing'] = 0;
+            $this->set('default_billing_id', $addressId);
+        }
+        if ($address->is_default_shipping) {
+            $resetUpdate['is_default_shipping'] = 0;
+            $this->set('default_shipping_id', $addressId);
+        }
+        if ($resetUpdate) {
+            $addrHlp->update_many($resetUpdate, ['customer_id' => $this->id(), 'NOT' => ['id' => $addressId]]);
+        }
+        $this->save();
+        $address->save();
+
+        return $this;
+    }
+
+    public function addAddress($data)
+    {
+        $data['customer_id'] = $this->id();
+        $address = $this->FCom_Customer_Model_Address->create($data);
+        $this->setDefaultAddress($address);
+        return $address;
     }
 
     public function getPaymentMethod()
     {
-        return static::i()->load($this->id)->payment_method;
+        return $this->load($this->id)->payment_method;
     }
 
     public function getPaymentDetails()
     {
-        return static::i()->load($this->id)->payment_details;
+        return $this->load($this->id)->payment_details;
     }
 
     public function setPaymentDetails($data)
     {
-        $this->payment_details = Butil::toJson($data);
+        $this->payment_details = $this->BUtil->toJson($data);
         $this->save();
     }
 
-    static public function onAddProductToCart($args)
+    public function onAddProductToCart($args)
     {
         $cart = $args['model'];
 
-        $user = static::sessionUser();
+        $user = $this->sessionUser();
         if ($user) {
             $user->session_cart_id = $cart->id();
             $user->save();
@@ -445,12 +557,12 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
      * @param $args
      * @return bool
      */
-    public static function ruleEmailUnique($data, $args)
+    public function ruleEmailUnique($data, $args)
     {
         if (empty($data[$args['field']])) {
             return true;
         }
-        $orm = static::i()->orm()->where('email', $data[$args['field']]);
+        $orm = $this->orm()->where('email', $data[$args['field']]);
         if (!empty($data['id'])) {
             $orm->where_not_equal('id', $data['id']);
         }
@@ -470,8 +582,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             'lifetime' => 0,
             'avg'      => 0,
         ];
-        if (BModuleRegistry::i()->isLoaded('FCom_Sales')) {
-            $orders = FCom_Sales_Model_Order::i()->orm()->where('customer_id', $this->id)->find_many();
+        if ($this->BModuleRegistry->isLoaded('FCom_Sales')) {
+            $orders = $this->FCom_Sales_Model_Order->orm()->where('customer_id', $this->id)->find_many();
             if ($orders) {
                 $cntOrders = count($orders);
                 foreach ($orders as $order) {

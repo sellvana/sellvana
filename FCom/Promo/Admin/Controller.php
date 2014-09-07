@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -23,7 +24,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             ['name' => 'to_date', 'label' => 'End Date', 'index' => 'to_date', 'formatter' => 'date'],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'p.status',
                 'editable' => true, 'mass-editable' => true, 'editor' => 'select',
-                'options' => FCom_Promo_Model_Promo::i()->fieldOptions('status')
+                'options' => $this->FCom_Promo_Model_Promo->fieldOptions('status')
             ],
             ['name' => 'details', 'label' => 'Details', 'index' => 'details', 'hidden' => true],
             ['name' => 'attachments', 'label' => 'Attachments', 'sortable' => false, 'hidden' => false],
@@ -51,7 +52,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
 
         //load attachments
         $orm->select("(select group_concat(a.file_name separator ', ') from " .
-            FCom_Promo_Model_Media::table() .
+            $this->FCom_Promo_Model_Media->table() .
             " pa inner join fcom_media_library a on a.id=pa.file_id where pa.promo_id=p.id)",
             'attachments')
         ;
@@ -68,7 +69,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         } else {
             $actions['save_as_tpl'] = '<button type="button" class="st1 sz2 btn btn-primary" onclick="if (adminForm.saveAll(this)) { $(\'#save_as\').val(\'template\'); this.form.submit(); }"><span>Save as a Template</span></button>';
         }
-        $args['view']->actions = BUtil::arrayMerge($args['view']->actions, $actions);
+        $args['view']->actions = $this->BUtil->arrayMerge($args['view']->actions, $actions);
         */
         $args['view']->title = $m->id ? 'Edit Promo: ' . $m->description : 'Create New Promo';
     }
@@ -76,8 +77,8 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
     {
         if ($model && $model->id) {
-            $view->addTab("details", ['label' => BLocale::_("Details"), 'pos' => 20, 'async' => true]);
-            $view->addTab("history", ['label' => BLocale::_("History"), 'pos' => 40, 'async' => true]);
+            $view->addTab("details", ['label' => $this->BLocale->_("Details"), 'pos' => 20, 'async' => true]);
+            $view->addTab("history", ['label' => $this->BLocale->_("History"), 'pos' => 40, 'async' => true]);
         }
         return parent::processFormTabs($view, $model, $mode, $allowed);
     }
@@ -87,12 +88,12 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         parent::formPostBefore($args);
         if (!empty($args['data']['save_as'])) {
             switch ($args['data']['save_as']) {
-                case 'copy': $args['model'] = $args['model']->createClone(); $id = $args['model']->id; break;
+                case 'copy': $args['model'] = $args['model']->createClone(); $id = $args['model']->id(); break;
                 case 'template': $args['data']['model']['status'] = 'template'; break;
             }
         }
         if (!empty($args['data']['model'])) {
-            $args['data']['model'] = BLocale::i()->parseRequestDates($args['data']['model'], 'from_date,to_date');
+            $args['data']['model'] = $this->BLocale->parseRequestDates($args['data']['model'], 'from_date,to_date');
             $args['model']->set($args['data']['model']);
         }
     }
@@ -108,13 +109,13 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     {
         $groups     = $model->groups();
         $groupData  = [];
-        $groupProds = FCom_Promo_Model_Product::i()->orm()->where('promo_id', $model->id)->find_many();
+        $groupProds = $this->FCom_Promo_Model_Product->orm()->where('promo_id', $model->id())->find_many();
         foreach ($groupProds as $gp) {
             $groupData[$gp->group_id][$gp->product_id] = 1;
         }
         if (!empty($data['_del_group_ids'])) {
             $deleteGroups = explode(',', trim($data['_del_group_ids'], ','));
-            FCom_Promo_Model_Group::i()->delete_many([
+            $this->FCom_Promo_Model_Group->delete_many([
                   'id'       => $deleteGroups,
                   'promo_id' => $model->id,
                 ]
@@ -127,7 +128,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         if (!empty($data['group'])) {
             foreach ($data['group'] as $gId => $g) {
                 if ($gId < 0) {
-                    $group  = FCom_Promo_Model_Group::i()->create([
+                    $group  = $this->FCom_Promo_Model_Group->create([
                         'promo_id'   => $model->id,
                         'group_type' => $g['group_type'],
                         'group_name' => $g['group_name'],
@@ -147,7 +148,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                         if (!empty($groupData[$gId][$pId])) {
                             continue;
                         }
-                        FCom_Promo_Model_Product::i()->create([
+                        $this->FCom_Promo_Model_Product->create([
                             'promo_id'   => $model->id,
                             'group_id'   => $gId,
                             'product_id' => $pId,
@@ -165,7 +166,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                         }
                     }
                     if ($pIds) {
-                        FCom_Promo_Model_Product::i()->delete_many([
+                        $this->FCom_Promo_Model_Product->delete_many([
                             'promo_id'   => $model->id,
                             'group_id'   => $gId,
                             'product_id' => $pIds,
@@ -181,7 +182,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
 
     public function processMediaPost($model, $data)
     {
-        $hlp = FCom_Promo_Model_Media::i();
+        $hlp = $this->FCom_Promo_Model_Media;
         if (!empty($data['grid']['promo_attachments']['del'])) {
             $hlp->delete_many([
                 'promo_id' => $model->id,
@@ -207,8 +208,8 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         static $groups = [], $groupData = [];
 
         if ($model && $model->id && empty($groups[$model->id])) {
-            $groups[$model->id] = FCom_Promo_Model_Promo::i()->load($model->id)->groups();
-            $data = FCom_Promo_Model_Product::i()->orm()->table_alias('pp')
+            $groups[$model->id] = $this->FCom_Promo_Model_Promo->load($model->id)->groups();
+            $data = $this->FCom_Promo_Model_Product->orm()->table_alias('pp')
                 ->join('FCom_Catalog_Model_Product', ['p.id', '=', 'pp.product_id'], 'p')
                 ->select('pp.group_id')
                 ->select('p.id')->select('p.product_name')->select('p.local_sku')
@@ -288,21 +289,21 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
 
     public function action_form_group()
     {
-        BResponse::i()->nocache();
-        $r = BRequest::i();
+        $this->BResponse->nocache();
+        $r = $this->BRequest;
         $this->view('jqgrid')->set('config', $this->productGridConfig(false, $r->get('type'), $r->get('group_id')));
-        BLayout::i()->setRootView('jqgrid');
+        $this->BLayout->setRootView('jqgrid');
     }
 
     public function action_form_products()
     {
-        $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')->select('p.*')
+        $orm = $this->FCom_Catalog_Model_Product->orm()->table_alias('p')->select('p.*')
             ->join('FCom_Promo_Model_Product', ['pp.product_id', '=', 'p.id'], 'pp')
             ->select('pp.qty')
             ->join('FCom_Promo_Model_Promo', ['promo.id', '=', 'pp.promo_id'], 'promo')
         ;
-        $data = FCom_Admin_View_Grid::i()->processORM($orm, 'FCom_Promo_Admin_Controller::action_form_products');
-        BResponse::i()->json($data);
+        $data = $this->FCom_Admin_View_Grid->processORM($orm, 'FCom_Promo_Admin_Controller::action_form_products');
+        $this->BResponse->json($data);
     }
 
     public function onAttachmentsGridConfig($args)
@@ -328,18 +329,18 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
 
     public function onAttachmentsGridUpload($args)
     {
-        $hlp = FCom_Promo_Model_Media::i();
+        $hlp = $this->FCom_Promo_Model_Media;
         $id = $args['model']->id;
-        if (!$hlp->load(['promo_id' => null, 'file_id' => $id])) {
+        if (!$hlp->loadWhere(['promo_id' => null, 'file_id' => $id])) {
             $hlp->create(['file_id' => $id])->save();
         }
     }
 
     public function onAttachmentsGridEdit($args)
     {
-        $r = BRequest::i();
-        FCom_Promo_Model_Media::i()
-            ->load(['promo_id' => null, 'file_id' => $args['model']->id])
+        $r = $this->BRequest;
+        $this->FCom_Promo_Model_Media
+            ->loadWhere(['promo_id' => null, 'file_id' => $args['model']->id])
             ->set([
                 'promo_status' => $r->post('promo_status'),
             ])
@@ -353,7 +354,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                 'id' => 'promo_attachments',
                 'caption' => 'Promotion Attachments',
                 'datatype' => 'local',
-                'data' => BDb::many_as_array($model->mediaORM('a')->select('a.id')->select('a.file_name')->find_many()),
+                'data' => $this->BDb->many_as_array($model->mediaORM('a')->select('a.id')->select('a.file_name')->find_many()),
                 'colModel' => [
                     ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
                     ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],

@@ -2,15 +2,12 @@ storage/
 media/
 dlc/*
 local/*
-FCom/MarketServer/
-FCom/Foundation/lib3/.sass-cache
-FCom/Foundation/lib4/.sass-cache
 index.local.php
 .idea
-/nbproject/private/
 .sass-cache/
 *.scssc
 
+/nbproject/private/
 /nbproject/project.properties
 /nbproject/project.xml
 /storage/

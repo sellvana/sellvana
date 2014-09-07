@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -29,7 +29,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ['name' => 'create_at', 'label' => 'Created', 'index' => 'p.create_at', 'width' => 100],
             ['name' => 'update_at', 'label' => 'Updated', 'index' => 'p.update_at', 'width' => 100],
             ['type' => 'btn_group', 'buttons' => [
-                  ['name' => 'edit', 'href' => BApp::href('catalog/products/form?id=')],
+                  ['name' => 'edit', 'href' => $this->BApp->href('catalog/products/form?id=')],
                   ['name' => 'delete']
             ]],
         ];
@@ -59,10 +59,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return $config;
     }
 
-    public static function afterInitialData($rows)
+    public function afterInitialData($rows)
     {
-        $mediaUrl = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media';
-        $hlp = FCom_Core_Main::i();
+        $mediaUrl = $this->BConfig->get('web/media_dir') ? $this->BConfig->get('web/media_dir') : 'media';
+        $hlp = $this->FCom_Core_Main;
         foreach ($rows as & $row) {
             $thumbUrl = $row['thumb_url'] ? $row['thumb_url'] : 'image-not-found.png';
             $row['thumb_path'] = $hlp->resizeUrl($mediaUrl . '/' . $thumbUrl, ['s' => 68]);
@@ -72,8 +72,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function gridDataAfter($data)
     {
-        $mediaUrl = BConfig::i()->get('web/media_dir') ? BConfig::i()->get('web/media_dir') : 'media';
-        $hlp = FCom_Core_Main::i();
+        $mediaUrl = $this->BConfig->get('web/media_dir') ? $this->BConfig->get('web/media_dir') : 'media';
+        $hlp = $this->FCom_Core_Main;
 
         $data = parent::gridDataAfter($data);
         foreach ($data['rows'] as $row) {
@@ -95,11 +95,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $m = $args['model'];
         $newAction = [];
         if ($m->id) {
-            $newAction['duplicate'] = '<a href="' . BApp::href($this->_gridHref . '/duplicate?id=' . $m->id) .
-                '" title="Duplicate" class="btn btn-primary"><span>' .  BLocale::_('Duplicate') . '</span></a>';
+            $newAction['duplicate'] = '<button type="submit" class="btn btn-primary ignore-validate" name="do" value="DUPLICATE" '
+                . 'onclick="return confirm(\'Are you sure?\')"><span>' .  $this->_('Duplicate') . '</span></button>';
         }
         $newAction['saveAndContinue'] = '<button type="submit" class="btn btn-primary" name="do" value="saveAndContinue"><span>'
-            . BLocale::_('Save And Continue') . '</span></button>';
+            . $this->BLocale->_('Save And Continue') . '</span></button>';
         $actions = array_merge($args['view']->actions, $newAction);
         $args['view']->set([
             'sidebar_img' => $m->thumbUrl(98),
@@ -109,15 +109,23 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $this->_formTitle = $m->id ? 'Edit Product: ' . $m->product_name : 'Create New Product';
     }
 
+    public function formPostBefore($args)
+    {
+        if ($args['do'] == 'DUPLICATE') {
+            $this->duplicateProduct($args['id']);
+            exit();
+        }
+    }
+
     public function openCategoriesData($model)
     {
-        $cp = FCom_Catalog_Model_CategoryProduct::i();
+        $cp = $this->FCom_Catalog_Model_CategoryProduct;
         $categories = $cp->orm('cp')->where('product_id', $model->id())
             ->join('FCom_Catalog_Model_Category', ['c.id', '=', 'cp.category_id'], 'c')
             ->select('c.id_path')
             ->find_many();
         if (!$categories) {
-            return BUtil::toJson([]);
+            return $this->BUtil->toJson([]);
         }
         $result = [];
         foreach ($categories as $c) {
@@ -126,21 +134,21 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 $result[] = 'category_id-' . $id;
             }
         }
-        return BUtil::toJson($result);
+        return $this->BUtil->toJson($result);
     }
 
     public function linkedCategoriesData($model)
     {
-        $cp = FCom_Catalog_Model_CategoryProduct::i();
+        $cp = $this->FCom_Catalog_Model_CategoryProduct;
         $categories = $cp->orm()->where('product_id', $model->id())->find_many();
         if (!$categories) {
-            return BUtil::toJson([]);
+            return $this->BUtil->toJson([]);
         }
         $result = [];
         foreach ($categories as $c) {
             $result[] = 'category_id-' . $c->category_id;
         }
-        return BUtil::toJson($result);
+        return $this->BUtil->toJson($result);
     }
 
     public function productLibraryGridConfig($gridId = false)
@@ -171,13 +179,13 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function productAttachmentsGridConfig($model)
     {
-        $download_url = BApp::href('/media/grid/download?folder=media/product/attachment&file=');
+        $download_url = $this->BApp->href('/media/grid/download?folder=media/product/attachment&file=');
         return [
             'config' => [
                 'id' => 'product_attachments',
                 'caption' => 'Product Attachments',
                 'data_mode' => 'local',
-                'data' => BDb::many_as_array($model->mediaORM('A')->order_by_expr('pa.position asc')
+                'data' => $this->BDb->many_as_array($model->mediaORM('A')->order_by_expr('pa.position asc')
                     ->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name',
                         'a.file_size', 'pa.create_at', 'pa.update_at'])
                     ->select('a.id', 'file_id')->find_many()),
@@ -214,9 +222,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function productImagesGridConfig($model)
     {
-        $downloadUrl = BApp::href('/media/grid/download?folder=media/product/images&file=');
-        $thumbUrl = FCom_Core_Main::i()->resizeUrl(BConfig::i()->get('web/media_dir') . '/product/images', ['s' => 100]);
-        $data = BDb::many_as_array($model->mediaORM('I')
+        $downloadUrl = $this->BApp->href('/media/grid/download?folder=media/product/images&file=');
+        $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 100]);
+        $data = $this->BDb->many_as_array($model->mediaORM('I')
                 ->order_by_expr('pa.position asc')
                 ->left_outer_join('FCom_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'pm.file_id'], 'pm')
                 ->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name',
@@ -225,7 +233,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
                 ->group_by('pa.id')
                 ->find_many());
-        return [
+        $config =  [
             'config' => [
                 'id' => 'product_images',
                 'caption' => 'Product Images',
@@ -250,6 +258,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                         'editable' => 'inline', 'validation' => ['number' => true]],
                     ['name' => 'main_thumb', 'label' => 'Thumbnail', 'width' => 50, 'display' => 'eval',
                         'print' => '"<input class=\'main-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
+                            . ' "+(rc.row["main_thumb"]==1 ? checked=\'checked\' : \'\')+" '
                             . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' '
                             . 'data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"'],
                     ['name' => 'create_at', 'label' => 'Created', 'width' => 200],
@@ -267,11 +276,13 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'filters' => [
                     ['field' => 'file_name', 'type' => 'text'],
                     ['field' => 'label', 'type' => 'text'],
+                    //TODO: remove all unused server side '_quick' filters
                     '_quick' => ['expr' => 'file_name like ? ', 'args' => ['%?%']]
                 ],
 
             ]
         ];
+        return $config;
     }
 
     /**
@@ -312,7 +323,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     */
     public function getCatProdConfig($model)
     {
-        $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')
+        $orm = $this->FCom_Catalog_Model_Product->orm()->table_alias('p')
             ->select(['p.id', 'p.product_name', 'p.local_sku'])
             ->join('FCom_Catalog_Model_CategoryProduct', ['cp.product_id', '=', 'p.id'], 'cp')
             ->where('cp.category_id', $model ? $model->id : 0)
@@ -346,7 +357,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function linkedProductGridConfig($model, $type)
     {
-        $orm = FCom_Catalog_Model_Product::i()->orm()->table_alias('p')
+        $orm = $this->FCom_Catalog_Model_Product->orm()->table_alias('p')
             ->select(['p.id', 'p.product_name', 'p.local_sku', 'p.base_price', 'p.sale_price']);
 
         switch ($type) {
@@ -394,8 +405,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ];
 
 
-        //BEvents::i()->fire(__METHOD__.':orm', array('type'=>$type, 'orm'=>$orm));
-        $data = BDb::many_as_array($orm->find_many());
+        //$this->BEvents->fire(__METHOD__.':orm', array('type'=>$type, 'orm'=>$orm));
+        $data = $this->BDb->many_as_array($orm->find_many());
         //unset unused columns
         /*$columnKeys = array_keys($config['columns']);
         foreach($data as &$prod){
@@ -408,15 +419,16 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
         $config['data'] = $data;
 
-        //BEvents::i()->fire(__METHOD__.':config', array('type'=>$type, 'config'=>&$config));
+        //$this->BEvents->fire(__METHOD__.':config', array('type'=>$type, 'config'=>&$config));
         return ['config' => $config];
     }
 
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
+
         $model = $args['model'];
-        $data = BRequest::i()->post();
+        $data = $this->BRequest->post();
 
 
         if (isset($data['do']) && $data['do'] === 'DELETE') {
@@ -427,6 +439,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 $this->processLinkedProductsPost($model, $data);
                 $this->processMediaPost($model, $data);
                 $this->processCustomFieldPost($model, $data);
+                $this->processStockPolicyPost($model, $data);
                 $this->processVariantPost($model, $data);
                 $this->processSystemLangFieldsPost($model, $data);
                 $this->processFrontendPost($model, $data);
@@ -441,15 +454,15 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function deleteRelateInfo($model)
     {
         //delete Categories
-        FCom_Catalog_Model_CategoryProduct::i()->delete_many([
+        $this->FCom_Catalog_Model_CategoryProduct->delete_many([
            'product_id' => $model->id
         ]);
         //delete Product Link
-        FCom_Catalog_Model_ProductLink::i()->delete_many([
+        $this->FCom_Catalog_Model_ProductLink->delete_many([
             'product_id' => $model->id
         ]);
         //delete Product Media
-        FCom_Catalog_Model_ProductMedia::i()->delete_many([
+        $this->FCom_Catalog_Model_ProductMedia->delete_many([
             'product_id' => $model->id
         ]);
         //todo: delete product reviews / wishlist
@@ -457,17 +470,17 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function processCategoriesPost($model)
     {
-        $post = BRequest::i()->post();
+        $post = $this->BRequest->post();
         $categories = [];
         foreach ($post as $key => $value) {
             $matches = [];
-            if (preg_match("#category_id-(\d+)#", $key, $matches)) {
+            if (preg_match('#category_id-(\d+)#', $key, $matches)) {
                 $categories[intval($matches[1])] = $value;
             }
         }
         if (!empty($categories)) {
-            $cat_product = FCom_Catalog_Model_CategoryProduct::i();
-            $category_model = FCom_Catalog_Model_Category::i();
+            $cat_product = $this->FCom_Catalog_Model_CategoryProduct;
+            $category_model = $this->FCom_Catalog_Model_Category;
 
             foreach ($categories as $cat_id => $value) {
                 $product = $cat_product->orm()->where('product_id', $model->id())->where('category_id', $cat_id)->find_one();
@@ -475,7 +488,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     $product->delete();
                 } elseif (false == $product) {
                     $data = ['product_id' => $model->id(), 'category_id' => $cat_id];
-                    FCom_Catalog_Model_CategoryProduct::i()->create($data)->save();
+                    $this->FCom_Catalog_Model_CategoryProduct->create($data)->save();
                 }
             }
         }
@@ -483,7 +496,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function processLinkedProductsPost($model, $data)
     {
         //echo "<pre>"; print_r($data); echo "</pre>";
-        $hlp = FCom_Catalog_Model_ProductLink::i();
+        $hlp = $this->FCom_Catalog_Model_ProductLink;
         foreach (['related', 'similar', 'cross_sell'] as $type) {
             $typeName = 'linked_products_' . $type;
             if (!empty($data['grid'][$typeName]['del'])) {
@@ -495,7 +508,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             }
             if (isset($data[$typeName])) {
                 foreach ($data[$typeName] as $key => $arr) {
-                    $productLink = $hlp->load(['product_id' => $model->id, 'linked_product_id' => $key, 'link_type' => $type]);
+                    $productLink = $hlp->loadWhere([
+                        'product_id' => $model->id(),
+                        'linked_product_id' => (int)$key,
+                        'link_type' => (string)$type
+                    ]);
                     $position = (is_numeric($data[$typeName][$key]['product_link_position']))
                         ? (int) $data[$typeName][$key]['product_link_position'] : 0;
                     if ($productLink) {
@@ -518,7 +535,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function processMediaPost($model, $data)
     {
-        $hlp = FCom_Catalog_Model_ProductMedia::i();
+        $hlp = $this->FCom_Catalog_Model_ProductMedia;
         foreach (['A' => 'attachments', 'I' => 'images'] as $type => $typeName) {
 
             if (!empty($data['grid'][$typeName]['del'])) {
@@ -530,7 +547,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             }
 
             if (!empty($data['grid'][$typeName]['rows'])) {
-                $rows = BUtil::fromJson($data['grid'][$typeName]['rows']);
+                $rows = $this->BUtil->fromJson($data['grid'][$typeName]['rows']);
                 foreach ($rows as $image) {
                     $key = $image['id'];
                     unset($image['id']);
@@ -561,7 +578,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                                 $image['media_type'] = $type;
 
                                 //TODO remote_url and file_path can be fetched based on file_id. Beside, file_name can be changed in media libary.
-                                //'remote_url' =>BApp::href('/media/grid/download?folder=media/product/attachment&file_='.$row['file_id']),
+                                //'remote_url' =>$this->BApp->href('/media/grid/download?folder=media/product/attachment&file_='.$row['file_id']),
                                 $hlp->create($image)->save();
                             }
                         }
@@ -575,7 +592,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ->where('main_thumb', 1)->find_one();
         $thumbUrl = NULL;
         if ($productMediaModel) {
-            $mediaLibModel = FCom_Core_Model_MediaLibrary::i()->load($productMediaModel->get('file_id'));
+            $mediaLibModel = $this->FCom_Core_Model_MediaLibrary->load($productMediaModel->get('file_id'));
             $thumbUrl = ($mediaLibModel->get('subfolder') != null)
                 ? $mediaLibModel->get('folder') . '/' . $mediaLibModel->get('subfolder') . '/' . $mediaLibModel->get('file_name')
                 : $mediaLibModel->get('folder') . '/' . $mediaLibModel->get('file_name');
@@ -595,14 +612,57 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $model->save();
     }
 
+    public function processStockPolicyPost($model, $data)
+    {
+        if (!empty($data['stock_policy'])) {
+            $model->setData('stock_policy', $data['stock_policy']);
+            $model->save();
+        }
+    }
+
     public function processVariantPost($model, $data)
     {
+        $hlp = $this->FCom_CustomField_Model_ProductVariant;
         if (!empty($data['vfields'])) {
+            $modelFieldOption = $this->FCom_CustomField_Model_FieldOption;
+            $vfields = json_decode($data['vfields'], true);
+            foreach ($vfields as $f) {
+                $op = $this->FCom_CustomField_Model_FieldOption->getListAssocById($f['id']);
+                $arr_diff = array_diff($f['options'], $op);
+                foreach($arr_diff as $val) {
+                    $modelFieldOption->create(['field_id' => $f['id'], 'label' => $val])->save();
+                }
+            }
+
             $model->setData('variants_fields', json_decode($data['vfields'], true));
         }
-        if (!empty($data['variants'])) {
-            $model->setData('variants', json_decode($data['variants'], true));
+        if (isset($data['variants'])) {
+            if ($data['variants'] != '') {
+                $variantsData = $this->BUtil->objectToArray(json_decode($data['variants']));
+            }
+            $hlp->delete_many(['product_id'=> $model->id()]);
+            if (count($variantsData) > 0) {
+                $variantIds = $this->BUtil->arrayToOptions($variantsData, 'id');
+                $variants = $hlp->orm()->where_in('id', $variantIds)->find_many_assoc();
+                foreach($variantsData as $arr) {
+                    $data = [
+                        'product_id' => $model->id(),
+                        'variant_sku' => $arr['variant_sku'],
+                        'variant_price' => $arr['variant_price'],
+                        'variant_qty' => $arr['variant_qty'],
+                        'field_values' => json_encode($arr['field_values']),
+                        'data_serialized' => json_encode(['variant_file_id' => $arr['variant_file_id']]),
+                    ];
+                    if (!empty($variants[$arr['id']])) {
+                        $variants[$arr['id']]->set($data)->save();
+                    } else {
+                        $hlp->create($data)->save();
+                    }
+                }
+            }
+//            $model->setData('variants', json_decode($data['variants'], true));
         }
+
         $model->save();
 
     }
@@ -624,6 +684,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
 
     }
+    /*
     public function onMediaGridConfig($args)
     {
         array_splice($args['config']['grid']['colModel'], -1, 0, [
@@ -640,39 +701,42 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function onMediaGridUpload($args)
     {
-        $hlp = FCom_Catalog_Model_ProductMedia::i();
+        $hlp = $this->FCom_Catalog_Model_ProductMedia;
         $id = $args['model']->id;
-        if (!$hlp->load(['product_id' => null, 'file_id' => $id])) {
+        if (!$hlp->loadWhere(['product_id' => null, 'file_id' => $id])) {
             $hlp->create(['file_id' => $id, 'media_type' => $args['type']])->save();
         }
     }
 
     public function onMediaGridEdit($args)
     {
-        $r = BRequest::i();
-        $m = Denteva_Model_Vendor::i()->load([
+        $r = $this->BRequest;
+        $m = Denteva_Model_Vendor::i()->loadWhere([
             'is_manuf' => 1,
             'vendor_name' => $r->post('manuf_vendor_name')
         ]);
-        FCom_Catalog_Model_ProductMedia::i()
-            ->load(['product_id' => null, 'file_id' => $args['model']->id])
+        $this->FCom_Catalog_Model_ProductMedia
+            ->loadWhere(['product_id' => null, 'file_id' => $args['model']->id])
             ->set([
                 'manuf_vendor_id' => $m ? $m->id : null,
             ])
             ->save();
     }
+    */
 
-    public function action_duplicate()
+    public function duplicateProduct($id = '')
     {
-        $id = BRequest::i()->param('id', true);
-        $redirectUrl = BApp::href($this->_formHref) . '?id=' . $id;
+        if (empty($id)) {
+            $id = $this->BRequest->param('id', true);
+        }
+        $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $id;
         try {
-            $oldModel = FCom_Catalog_Model_Product::i()->load($id);
+            $oldModel = $this->FCom_Catalog_Model_Product->load($id);
             /** @var $oldModel FCom_Catalog_Model_Product */
             if ($oldModel) {
                 $data = $oldModel->as_array();
                 unset($data['id']);
-                $newModel = FCom_Catalog_Model_Product::i()->create($data);
+                $newModel = $this->FCom_Catalog_Model_Product->create($data);
                 /** @var $newModel FCom_Catalog_Model_Product */
                 $number = $this->getDuplicateSuffixNumber($oldModel->product_name, $oldModel->local_sku, $oldModel->url_key);
                 $newModel->product_name = $newModel->product_name . '-' . $number;
@@ -686,7 +750,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                         && $this->duplicateProductMedia($oldModel, $newModel)
                         && $this->duplicateProductReviews($oldModel, $newModel)
                 ) {
-                    $redirectUrl = BApp::href($this->_formHref) . '?id=' . $newModel->id;
+                    $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $newModel->id;
                     $this->message('Duplicate successful');
                 } else {
                     $this->message('An error occurred while creating model.', 'error');
@@ -698,16 +762,16 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $this->message($e->getMessage(), 'error');
         }
 
-        BResponse::i()->redirect($redirectUrl);
+        $this->BResponse->redirect($redirectUrl);
     }
 
     public function getDuplicateSuffixNumber($oldName, $oldSku, $oldUrlKey)
     {
-        $result = FCom_Catalog_Model_Product::i()->orm()
+        $result = $this->FCom_Catalog_Model_Product->orm()
             ->where(['OR' => [
-                ['product_name REGEXP ?', $oldName . '-[0-9]$'],
-                ['local_sku REGEXP ?', $oldSku . '-[0-9]$'],
-                ['url_key REGEXP ?', $oldUrlKey . '-[0-9]$'],
+                ['product_name REGEXP ?', (string)$oldName . '-[0-9]$'],
+                ['local_sku REGEXP ?', (string)$oldSku . '-[0-9]$'],
+                ['url_key REGEXP ?',(string) $oldUrlKey . '-[0-9]$'],
             ]])
             ->order_by_desc('id')->find_one();
         $numberSuffix = 1;
@@ -737,7 +801,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $categoryIds = [];
             //todo: request Boris for same function _.pluck in BUtil
             foreach ($categories as $category) {
-                $categoryIds[] = $category->id;
+                $categoryIds[] = $category->id();
             }
             $new->addToCategories($categoryIds);
         }
@@ -752,12 +816,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function duplicateProductLink($old, $new)
     {
         //todo: does we need add product link similar between old and new product
-        $hlp = FCom_Catalog_Model_ProductLink::i();
-        $links = $hlp->orm('pl')->where('product_id', $old->id)->find_many();
+        $hlp = $this->FCom_Catalog_Model_ProductLink;
+        $links = $hlp->orm('pl')->where('product_id', $old->id())->find_many();
         if ($links) {
             foreach ($links as $link) {
                 $data = [
-                    'product_id'        => $new->id,
+                    'product_id'        => $new->id(),
                     'link_type'         => $link->link_type,
                     'linked_product_id' => $link->linked_product_id,
                 ];
@@ -777,13 +841,13 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
      */
     public function duplicateProductMedia($old, $new)
     {
-        $hlp = FCom_Catalog_Model_ProductMedia::i();
+        $hlp = $this->FCom_Catalog_Model_ProductMedia;
         $medias = $hlp->orm('pa')->where('pa.product_id', $old->id)->select('pa.*')->find_many();
         if ($medias) {
             foreach ($medias as $media) {
                 $data = $media->as_array();
                 unset($data['id']);
-                $data['product_id'] = $new->id;
+                $data['product_id'] = $new->id();
                 $data['create_at'] = $data['update_at'] = date('Y-m-d H:i:s');
                 if (!$hlp->create($data)->save()) {
                     $this->message('An error occurred while duplicate product medias.', 'error');
@@ -802,13 +866,13 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function duplicateProductReviews($old, $new)
     {
         //todo: confirm need duplicate product review or not
-        $hlp = FCom_ProductReviews_Model_Review::i();
+        $hlp = $this->FCom_ProductReviews_Model_Review;
         $reviews = $hlp->orm('pr')->where('product_id', $old->id)->find_many();
         if ($reviews) {
             foreach ($reviews as $r) {
                 $data = $r->as_array();
                 unset($data['id']);
-                $data['product_id'] = $new->id;
+                $data['product_id'] = $new->id();
                 if (!$hlp->create($data)->save()) {
                     $this->message('An error occurred while duplicate product reviews.', 'error');
                     return false;
@@ -820,21 +884,21 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     public function onHeaderSearch($args)
     {
-        $r = BRequest::i()->get();
+        $r = $this->BRequest->get();
         if (isset($r['q']) && $r['q'] != '') {
             $value = '%' . $r['q'] . '%';
-            $result = FCom_Catalog_Model_Product::i()->orm('p')
+            $result = $this->FCom_Catalog_Model_Product->orm('p')
                 ->where(['OR' => [
-                    ['p.id like ?', $value],
-                    ['p.local_sku like ?', $value],
-                    ['p.url_key like ?', $value],
-                    ['p.product_name like ?', $value],
+                    ['p.id like ?', (string)$value],
+                    ['p.local_sku like ?', (string)$value],
+                    ['p.url_key like ?', (string)$value],
+                    ['p.product_name like ?', (string)$value],
                 ]])->find_one();
             $args['result']['product'] = null;
             if ($result) {
                 $args['result']['product'] = [
                     'priority' => 1,
-                    'url' => BApp::href($this->_formHref) . '?id=' . $result->id()
+                    'url' => $this->BApp->href($this->_formHref) . '?id=' . $result->id()
                 ];
             }
         }
@@ -843,8 +907,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function onGenerateSiteMap($args)
     {
         $callback = function ($row) use ($args) {
-            array_push($args['site_map'], ['loc' => BApp::frontendHref($row->get('url_key')), 'changefreq' => 'daily']);
+            array_push($args['site_map'], ['loc' => $this->BApp->frontendHref($row->get('url_key')), 'changefreq' => 'daily']);
         };
-        FCom_Catalog_Model_Product::i()->orm()->select('url_key')->iterate($callback);
+        $this->FCom_Catalog_Model_Product->orm()->select('url_key')->iterate($callback);
     }
 }

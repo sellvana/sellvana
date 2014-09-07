@@ -1,7 +1,6 @@
 {% set category = APP.get('current_category') %}
 {% set parts = category.getPageParts(true) %}
-<div class="f-site-main" role="main">
-  <div class="container">
+
     {{ THIS.view('breadcrumbs') | raw }}
     <header class="f-page-header visible-xs">
       <span class="f-page-title">{{ category.get('node_name') }}</span>
@@ -17,30 +16,19 @@
           {% if part == 'sub_cat' %}
 
               {% set subCategories = category.children() %}
-              <div class="row f-catalog-sub-categories">
+              <div class="f-catalog-sub-cats">
               {% if subCategories|length %}
-                  <ul>
-                  {% for subCat in subCategories %}
-                      {% set image_url = (subCat.get('image_url')) ? subCat.get('image_url'): 'media/image-not-found.jpg' %}
-                      <li class="col-md-6 list-unstyled">
-                          <a href="{{ subCat.url() }}" title="{{ subCat.get('node_name') }}">
-                              <img src="{{ APP.instance('FCom_Core_Main').resizeUrl() }}?s=98x98&f={{ image_url }}"
-                                   alt="{{ subCat.get('node_name') }}" />
-                          </a>
-                          <a href="{{ subCat.url() }}" title="{{ subCat.get('node_name') }}">{{ subCat.get('node_name') }}</a>
-                      </li>
-                  {% endfor %}
-                  </ul>
+                {{ THIS.view('catalog/category/subcategories').set('subcategories', subCategories) | raw }}
               {% else %}
-                  <p class="col-md-12">
-                    {{ 'No sub-categories.'|_ }}
-                  </p>
+                <p>
+                  {{ 'No sub-categories.'|_ }}
+                </p>
               {% endif %}
               </div>
 
           {% elseif part == 'content' %}
 
-            <div class="f-catalog-main-content">
+            <div class="f-category-content">
                 {{ category.get('content') | raw }}
             </div>
 
@@ -74,8 +62,7 @@
         <!-- Sidebar End -->
       {% endif %}
     </div>
-  </div>
-</div>
+
 <script>
   require(['jquery'], function($) {
     $( "#button" ).click(function() {

@@ -1,29 +1,39 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller_Abstract
 {
+    public function beforeDispatch()
+    {
+        if (!parent::beforeDispatch()) return false;
+
+        $this->BResponse->nocache();
+
+        return true;
+    }
+
     public function authenticate($args = [])
     {
-        return FCom_Customer_Model_Customer::i()->isLoggedIn() || BRequest::i()->rawPath() == '/login';
+        return $this->FCom_Customer_Model_Customer->isLoggedIn() || $this->BRequest->rawPath() == '/login';
     }
 
     public function action_index()
     {
-        $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
-        $customer = FCom_Customer_Model_Customer::i()->load($customerId);
+        $customerId = $this->FCom_Customer_Model_Customer->sessionUserId();
+        $customer = $this->FCom_Customer_Model_Customer->load($customerId);
+        $this->layout('/customer/account');
         $this->view('customer/account')->set('customer', $customer);
         $crumbs[] = ['label' => 'Account', 'active' => true];
         $this->view('breadcrumbs')->set('crumbs', $crumbs);
-        $this->layout('/customer/account');
     }
 
     public function action_edit()
     {
-        $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
-        $customer = FCom_Customer_Model_Customer::i()->load($customerId);
+        $customerId = $this->FCom_Customer_Model_Customer->sessionUserId();
+        $customer = $this->FCom_Customer_Model_Customer->load($customerId);
         $formId = 'account-edit';
+        $this->layout('/customer/account/edit');
         $this->view('customer/account/edit')->set(['customer' => $customer, 'formId' => $formId]);
-        /*$post = BRequest::i()->post();
+        /*$post = $this->BRequest->post();
             if ($post) {
                 $r = $post['model'];
                 try {
@@ -32,29 +42,27 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
                     }
                     $customer->set($r)->save();
 
-                    $url = Bapp::href('customer/myaccount');
-                    BResponse::i()->redirect($url);
+                    $url = $this->BApp->href('customer/myaccount');
+                    $this->BResponse->redirect($url);
                 } catch(Exception $e) {
                     $this->message($e->getMessage(), 'error');
-                    $url = Bapp::href('customer/myaccount/edit');
-                    BResponse::i()->redirect($url);
+                    $url = $this->BApp->href('customer/myaccount/edit');
+                    $this->BResponse->redirect($url);
                 }
 
             }
-            $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
+            $crumbs[] = array('label'=>'Account', 'href'=>$this->BApp->href('customer/myaccount'));
             $crumbs[] = array('label'=>'Edit', 'active'=>true);
             $this->view('breadcrumbs')->crumbs = $crumbs;
 
             $this->view('customer/account/edit')->customer = $customer;*/
-        $this->layout('/customer/account/edit');
     }
 
     public function action_edit__POST()
     {
         try {
-            $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
-            $customer   = FCom_Customer_Model_Customer::i()->load($customerId);
-            $r      = BRequest::i()->post('model');
+            $customer = $this->FCom_Customer_Model_Customer->sessionUser();
+            $r      = $this->BRequest->post('model');
             $formId = 'account-edit';
             $customer->setAccountEditRules(false);
 
@@ -65,28 +73,33 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
             }
 
             if ($customer->validate($r, $expandRules, $formId)) {
-                $customer->set($r)->save();
-                $this->message('Your account info has been updated');
-                BResponse::i()->redirect('customer/myaccount');
+                if (empty($r['current_password']) || !$this->Bcrypt->verify($r['current_password'], $customer->get('password_hash'))) {
+                    $this->message('Current password is not correct, please try again', 'error');
+                    $this->BResponse->redirect('customer/myaccount/edit');
+                } else {
+                    $customer->set($r)->save();
+                    $this->message('Your account info has been updated');
+                    $this->BResponse->redirect('customer/myaccount');
+                }
             } else {
                 $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:' . $formId);
                 $this->formMessages($formId);
-                BResponse::i()->redirect('customer/myaccount/edit');
+                $this->BResponse->redirect('customer/myaccount/edit');
             }
 
         } catch (Exception $e) {
-            BDebug::logException($e);
+            $this->BDebug->logException($e);
             $this->message($e->getMessage(), 'error');
-            BResponse::i()->redirect('customer/myaccount/edit');
+            $this->BResponse->redirect('customer/myaccount/edit');
         }
     }
 
     public function action_editpassword()
     {
-        /*$customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
-        $customer = FCom_Customer_Model_Customer::i()->load($customerId);
+        /*$customerId = $this->FCom_Customer_Model_Customer->sessionUserId();
+        $customer = $this->FCom_Customer_Model_Customer->load($customerId);
 
-        $post = BRequest::i()->post();
+        $post = $this->BRequest->post();
         if ($post) {
             $r = $post['model'];
             try {
@@ -99,17 +112,17 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
 
                 $customer->save();
 
-                $url = Bapp::href('customer/myaccount');
-                BResponse::i()->redirect($url);
+                $url = $this->BApp->href('customer/myaccount');
+                $this->BResponse->redirect($url);
             } catch(Exception $e) {
                 $this->message($e->getMessage(), 'error');
-                $url = Bapp::href('customer/myaccount/editpassword');
-                BResponse::i()->redirect($url);
+                $url = $this->BApp->href('customer/myaccount/editpassword');
+                $this->BResponse->redirect($url);
             }
 
         }
 
-        $crumbs[] = array('label'=>'Account', 'href'=>Bapp::href('customer/myaccount'));
+        $crumbs[] = array('label'=>'Account', 'href'=>$this->BApp->href('customer/myaccount'));
         $crumbs[] = array('label'=>'Edit Password', 'active'=>true);
         $this->view('breadcrumbs')->crumbs = $crumbs;
         $this->view('customer/account/editpassword')->customer = $customer;*/
@@ -119,29 +132,29 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
     public function action_editpassword__POST()
     {
         try {
-            $customerId = FCom_Customer_Model_Customer::i()->sessionUserId();
-            $customer = FCom_Customer_Model_Customer::i()->load($customerId);
-            $r = BRequest::i()->post('model');
+            $customerId = $this->FCom_Customer_Model_Customer->sessionUserId();
+            $customer = $this->FCom_Customer_Model_Customer->load($customerId);
+            $r = $this->BRequest->post('model');
             $formId = 'change-password';
             $customer->setChangePasswordRules();
 
             if ($customer->validate($r, [], $formId)) {
-                if (!Bcrypt::verify($r['current_password'], $customer->get('password_hash'))) {
+                if (empty($r['current_password']) || !$this->Bcrypt->verify($r['current_password'], $customer->get('password_hash'))) {
                     $this->message('Current password is not correct, please try again', 'error');
-                    BResponse::i()->redirect('customer/myaccount/editpassword');
+                    $this->BResponse->redirect('customer/myaccount/editpassword');
                 } else {
                     $customer->set($r)->save();
                     $this->message('Your password has been updated');
-                    BResponse::i()->redirect('customer/myaccount');
+                    $this->BResponse->redirect('customer/myaccount');
                 }
             } else {
                 $this->formMessages($formId);
-                BResponse::i()->redirect('customer/myaccount/editpassword');
+                $this->BResponse->redirect('customer/myaccount/editpassword');
             }
         } catch(Exception $e) {
             $this->message($e->getMessage(), 'error');
-            $url = Bapp::href('customer/myaccount/editpassword');
-            BResponse::i()->redirect($url);
+            $url = $this->BApp->href('customer/myaccount/editpassword');
+            $this->BResponse->redirect($url);
         }
     }
 }

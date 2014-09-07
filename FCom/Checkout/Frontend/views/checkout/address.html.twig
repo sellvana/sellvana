@@ -1,13 +1,12 @@
 {% set validator = THIS.validator('address-form', THIS.get('address')) %}
-<div class="f-site-main" role="main">
-  <div class="container">
+
     <div class="f-checkout-form">
       <header class="f-page-header">
-        <h1 class="f-page-title">{{ 'Shipping Address'|_ }}</h1>
+        <h1 class="f-page-title">{{ THIS.title }}</h1>
       </header>
       <form action="{{ APP.href('checkout/address') }}" method="post" id="address-form" role="form">
         <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
-        <input type="hidden" name="address_equal" value="0">
+        <input type="hidden" name="same_address" value="0">
         <input type="hidden" name="t" value="{{ THIS.get('address_type') }}">
         <fieldset>
           <div class="row">
@@ -84,8 +83,8 @@
 
           {% if 's' == THIS.get('address_type') %}
           <div class="checkbox">
-            <label for="address_equal">
-              <input type="checkbox" class="checkbox" id="address_equal" name="address_equal" value="1" {{ validator.fieldValue('address_equal') ? 'checked' }}>
+            <label for="same_address">
+              <input type="checkbox" class="checkbox" id="same_address" name="same_address" value="1" {{ validator.fieldValue('same_address') ? 'checked' }}>
                     {{ "Billing address is same as shipping" |_ }}
             </label>
           </div>
@@ -96,8 +95,7 @@
         </fieldset>
       </form>
     </div>
-  </div>
-</div>
+
 <script>
 require(['jquery', 'jquery.validate'], function($) {
     $(function() {

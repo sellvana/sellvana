@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -16,7 +16,7 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
             ['name' => 'handle', 'label' => 'Handle'],
             ['name' => 'description', 'label' => 'Description', 'editable' => true],
             ['type' => 'input', 'name' => 'renderer', 'label' => 'Renderer', 'editor' => 'select',
-                  'options' => BLayout::i()->getAllRenderers(true), 'editable' => true, 'mass-editable' => true],
+                  'options' => $this->BLayout->getAllRenderers(true), 'editable' => true, 'mass-editable' => true],
             ['name' => 'version', 'label' => 'Version'],
             ['type' => 'input', 'name' => 'page_enabled', 'label' => 'Page Enable', 'editor' => 'select',
                   'options' => ['1' => 'Yes', '0' => 'No'], 'editable' => true, 'mass-editable' => true],
@@ -51,19 +51,115 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
         ]);
     }
 
+
+    /**
+     * @param $model FCom_Catalog_Model_Product
+     * @return array
+     */
+    public function formFieldGrid($model)
+    {
+        $data = $model->getData('form_fields');
+        if (!isset($data)) {
+            $data = [];
+        }
+        $config = [
+            'config' => [
+                'id' => 'frontend-field-grid',
+                'caption' => 'Frontend Field Grid',
+                'data_mode' => 'local',
+                'data' => $data,
+                'columns' => [
+                    ['type' => 'row_select'],
+                    ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
+                    [
+                        'name' => 'name',
+                        'label' => 'Field Name',
+                        'width' => 200,
+                        'editable' => 'inline',
+                        'addable' => true,
+                        'type' => 'input',
+                        'validation' => ['required' => true]
+                    ],
+                    [
+                        'name' => 'label',
+                        'label' => 'Field Label',
+                        'width' => 200,
+                        'editable' => 'inline',
+                        'addable' => true,
+                        'type' => 'input',
+                        'validation' => ['required' => true]
+                    ],
+                    [
+                        'name' => 'input_type',
+                        'label' => 'Field Type',
+                        'width' => 200,
+                        'editable' => 'inline',
+                        'editor' => 'select',
+                        'addable' => true,
+                        'type' => 'input',
+                        'validation' => ['required' => true],
+                        'default' => 'select',
+                        'options' => [
+                            'textarea' => 'Text Area',
+                            'text' => 'Text Line',
+                            'select' => 'Drop Down',
+                            'checkbox' => 'Check Box'
+                        ],
+                    ],
+                    [
+                        'name' => 'required',
+                        'label' => 'Required',
+                        'width' => 150,
+                        'editor' => 'select',
+                        'editable' => 'inline',
+                        'type' => 'input',
+                        'addable' => true,
+                        'options' => [1 => 'Yes', 0 => 'No'],
+                        'default' => 1
+                    ],
+                    [
+                        'type' => 'input',
+                        'name' => 'options',
+                        'label' => 'Options',
+                        'width' => 200,
+                        'editable' => 'inline',
+                        'addable' => true
+                    ],
+                    [
+                        'type' => 'input',
+                        'name' => 'position',
+                        'label' => 'Position',
+                        'width' => 200,
+                        'editable' => 'inline',
+                        'addable' => true,
+                        'validation' => ['number' => true]
+                    ],
+                    ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]]
+                ],
+                'actions' => [
+                    'add' => ['caption' => 'Add Fields'],
+                    'delete' => ['caption' => 'Remove']
+                ],
+                'grid_before_create' => 'formFieldGridRegister'
+            ]
+        ];
+
+        return $config;
+    }
+
     public function historyGridConfig($m)
     {
         return [
             'grid' => [
                 'id' => 'cms_blocks_form_history',
-                'url' => BApp::href('cms/blocks/history/' . $m->id . '/grid_data'),
-                'editurl' => BApp::href('cms/blocks/history/' . $m->id . '/grid_data'),
+                'url' => $this->BApp->href('cms/blocks/history/' . $m->id . '/grid_data'),
+                'editurl' => $this->BApp->href('cms/blocks/history/' . $m->id . '/grid_data'),
                 'columns' => [
                     'id' => ['label' => 'ID', 'hidden' => true],
                     'ts' => ['label' => 'TimeStamp', 'formatter' => 'date'],
                     'version' => ['label' => 'Version'],
                     'user_id' => ['type' => 'input', 'label' => 'User', 'editor' => 'select',
-                        'options' => FCom_Admin_Model_User::i()->options()],
+                        'options' => $this->FCom_Admin_Model_User->options()],
                     'username' => ['Label' => 'User Name', 'hidden' => true],
                     'comments' => ['labl' => 'Comments'],
                 ],
@@ -75,15 +171,15 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
 
     public function action_history_grid_data()
     {
-        $id = BRequest::i()->params('id', true);
+        $id = $this->BRequest->param('id', true);
         if (!$id) {
             $data = [];
         } else {
-            $orm = FCom_Cms_Model_BlockHistory::i()->orm('bh')->select('bh.*')
+            $orm = $this->FCom_Cms_Model_BlockHistory->orm('bh')->select('bh.*')
                 ->where('block_id', $id);
-            $data = FCom_Admin_View_Grid::i()->processORM($orm, __METHOD__);
+            $data = $this->FCom_Admin_View_Grid->processORM($orm, __METHOD__);
         }
-        BResponse::i()->json($data);
+        $this->BResponse->json($data);
     }
 
     public function action_history_grid_data__POST()

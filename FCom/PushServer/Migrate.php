@@ -1,15 +1,15 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_PushServer_Migrate extends BClass
 {
     public function install__0_1_3()
     {
-        $tChannel = FCom_PushServer_Model_Channel::table();
-        $tClient = FCom_PushServer_Model_Client::table();
-        $tMessage = FCom_PushServer_Model_Message::table();
-        $tSubscriber = FCom_PushServer_Model_Subscriber::table();
+        $tChannel = $this->FCom_PushServer_Model_Channel->table();
+        $tClient = $this->FCom_PushServer_Model_Client->table();
+        $tMessage = $this->FCom_PushServer_Model_Message->table();
+        $tSubscriber = $this->FCom_PushServer_Model_Subscriber->table();
 
-        BDb::ddlTableDef($tChannel, [
+        $this->BDb->ddlTableDef($tChannel, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'channel_name' => 'varchar(255) not null',
@@ -25,7 +25,7 @@ class FCom_PushServer_Migrate extends BClass
             ],
         ]);
 
-        BDb::ddlTableDef($tClient, [
+        $this->BDb->ddlTableDef($tClient, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'session_id' => 'varchar(100)',
@@ -44,7 +44,7 @@ class FCom_PushServer_Migrate extends BClass
             ],
         ]);
 
-        BDb::ddlTableDef($tSubscriber, [
+        $this->BDb->ddlTableDef($tSubscriber, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'channel_id' => 'int unsigned not null',
@@ -63,7 +63,7 @@ class FCom_PushServer_Migrate extends BClass
             ],
         ]);
 
-        BDb::ddlTableDef($tMessage, [
+        $this->BDb->ddlTableDef($tMessage, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'seq' => 'varchar(30)',
@@ -92,20 +92,20 @@ class FCom_PushServer_Migrate extends BClass
 
     public function upgrade__0_1_0__0_1_1()
     {
-        $tChannel = FCom_PushServer_Model_Channel::table();
-        $tClient = FCom_PushServer_Model_Client::table();
-        $tMessage = FCom_PushServer_Model_Message::table();
-        $tSubscriber = FCom_PushServer_Model_Subscriber::table();
+        $tChannel = $this->FCom_PushServer_Model_Channel->table();
+        $tClient = $this->FCom_PushServer_Model_Client->table();
+        $tMessage = $this->FCom_PushServer_Model_Message->table();
+        $tSubscriber = $this->FCom_PushServer_Model_Subscriber->table();
 
-        BDb::ddlTableDef($tClient, [
+        $this->BDb->ddlTableDef($tClient, [
             'COLUMNS' => [
                 'handover' => 'DROP',
             ],
         ]);
 
-        BDb::run("DROP TABLE IF EXISTS {$tMessage}");
+        $this->BDb->run("DROP TABLE IF EXISTS {$tMessage}");
 
-        BDb::ddlTableDef($tMessage, [
+        $this->BDb->ddlTableDef($tMessage, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'seq' => 'varchar(30)',
@@ -133,8 +133,8 @@ class FCom_PushServer_Migrate extends BClass
 
     public function upgrade__0_1_1__0_1_2()
     {
-        $tMessage = FCom_PushServer_Model_Message::table();
-        BDb::ddlTableDef($tMessage, [
+        $tMessage = $this->FCom_PushServer_Model_Message->table();
+        $this->BDb->ddlTableDef($tMessage, [
             'COLUMNS' => [
                 'page_id' => 'RENAME window_id varchar(30) null',
             ],
@@ -146,8 +146,8 @@ class FCom_PushServer_Migrate extends BClass
 
     public function upgrade__0_1_2__0_1_3()
     {
-        $tMessage = FCom_PushServer_Model_Message::table();
-        BDb::ddlTableDef($tMessage, [
+        $tMessage = $this->FCom_PushServer_Model_Message->table();
+        $this->BDb->ddlTableDef($tMessage, [
             'COLUMNS' => [
                 'window_id' => 'RENAME window_name varchar(30) null',
             ],
@@ -161,8 +161,8 @@ class FCom_PushServer_Migrate extends BClass
     // 39 nominal and 6 extra for embedded ipv4 as ipv6.
     public function upgrade__0_1_3__0_1_4()
     {
-        $tClient = FCom_PushServer_Model_Client::table();
-        BDb::ddlTableDef($tClient, [
+        $tClient = $this->FCom_PushServer_Model_Client->table();
+        $this->BDb->ddlTableDef($tClient, [
             'COLUMNS' => [
                 'remote_ip' => 'varchar(45)',
             ]

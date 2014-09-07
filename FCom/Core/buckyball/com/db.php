@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
 * Copyright 2014 Boris Gurvich
 *
@@ -130,7 +131,7 @@ class BDb
         }
         $config = BConfig::i()->get($name === static::$_defaultConnectionName ? 'db' : 'db/named/' . $name);
         if (!$config) {
-            throw new BException(BLocale::_('Invalid or missing DB configuration: %s', $name));
+            throw new BException(BLocale::i()->_('Invalid or missing DB configuration: %s', $name));
         }
         if (!empty($config['use'])) { //TODO: Prevent circular reference
             static::connect($config['use']);
@@ -143,7 +144,7 @@ class BDb
             }
         } else {
             if (empty($config['dbname'])) {
-                throw new BException(BLocale::_("dbname configuration value is required for '%s'", $name));
+                throw new BException(BLocale::i()->_("dbname configuration value is required for '%s'", $name));
             }
             $engine = !empty($config['engine']) ? $config['engine'] : 'mysql';
             $host = !empty($config['host']) ? $config['host'] : '127.0.0.1';
@@ -157,7 +158,7 @@ class BDb
                     break;
 
                 default:
-                    throw new BException(BLocale::_('Invalid DB engine: %s', $engine));
+                    throw new BException(BLocale::i()->_('Invalid DB engine: %s', $engine));
             }
         }
         $profile = BDebug::debug('DB.CONNECT ' . $name);
@@ -174,7 +175,6 @@ class BDb
             'dbname' => !empty($config['dbname']) ? $config['dbname'] : null,
             'table_prefix' => !empty($config['table_prefix']) ? $config['table_prefix'] : '',
         ];
-
         $db = BORM::get_db();
         BDebug::profile($profile);
         return $db;
@@ -188,6 +188,16 @@ class BDb
     public static function now()
     {
         return gmstrftime('%Y-%m-%d %H:%M:%S');
+    }
+
+    public static function sanitizeFieldName($f)
+    {
+        return preg_replace("#[^a-z0-9._`]#", '', $f);
+    }
+
+    public static function splitQueries($sql)
+    {
+        return preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $sql);
     }
 
     /**
@@ -205,13 +215,13 @@ class BDb
     public static function run($sql, $params = null, $options = [])
     {
         BDb::connect();
-        $queries = preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $sql);
+        $queries = static::splitQueries($sql);
         $results = [];
         foreach ($queries as $i => $query) {
            if (strlen(trim($query)) > 0) {
                 // try {
                     BDebug::debug('DB.RUN: ' . $query);
-                    if (!empty($options['echo'])) {
+                    if (!empty($options['echo']) && BDebug::i()->is('DEBUG')) {
                         echo '<hr><pre>' . $query . '<pre>';
                     }
                     BORM::set_last_query($query);
@@ -286,7 +296,8 @@ class BDb
     {
         $a = explode('.', $tableName);
         $p = static::$_config['table_prefix'];
-        return !empty($a[1]) ? $a[0] . '.' . $p . $a[1] : $p . $a[0];
+        $t = !empty($a[1]) ? $a[0] . '.' . $p . $a[1] : $p . $a[0];
+        return $t;
     }
 
     /**
@@ -348,6 +359,7 @@ class BDb
         if (!is_array($conds)) {
             throw new BException("Invalid where parameter");
         }
+
         $where = [];
         $params = [];
         foreach ($conds as $f => $v) {
@@ -386,17 +398,25 @@ class BDb
                 $where[] = 'NOT (' . $w . ')';
                 $params = array_merge($params, $p);
             } elseif (is_array($v)) {
+                $f = static::sanitizeFieldName($f);
                 $where[] = "({$f} IN (" . str_pad('', sizeof($v) * 2-1, '?,') . "))";
                 $params = array_merge($params, $v);
             } elseif (null === $v) {
+                $f = static::sanitizeFieldName($f);
                 $where[] = "({$f} IS NULL)";
             } else {
+                $f = static::sanitizeFieldName($f);
                 $where[] = "({$f}=?)";
                 $params[] = $v;
             }
         }
+        $where = join($or ? " OR " : " AND ", $where);
+        // Additional protection against multiple queries separator
+        if (sizeof(static::splitQueries($where)) > 1) {
+            throw new BException('Invalid SQL query');
+        }
 #print_r($where); print_r($params);
-        return [join($or ? " OR " : " AND ", $where), $params];
+        return [$where, $params];
     }
 
     /**
@@ -498,11 +518,11 @@ EOT
         $dbName = empty($a[1]) ? static::dbName() : $a[0];
         $tableName = empty($a[1]) ? $fullTableName : $a[1];
         if (!isset(static::$_tables[$dbName][$tableName]['fields'])) {
-            static::$_tables[$dbName][$tableName]['fields'] = BORM::i()
-                ->raw_query("SHOW FIELDS FROM `{$dbName}`.`{$tableName}`", [])->find_many_assoc('Field');
-
+            $res = BORM::i()->raw_query("SHOW FIELDS FROM `{$dbName}`.`{$tableName}`", [])->find_many_assoc('Field');
+            static::$_tables[$dbName][$tableName]['fields'] = $res;
+        } else {
+            $res = static::$_tables[$dbName][$tableName]['fields'];
         }
-        $res = static::$_tables[$dbName][$tableName]['fields'];
         return null === $fieldName ? $res : (isset($res[$fieldName]) ? $res[$fieldName] : null);
     }
 
@@ -513,7 +533,7 @@ EOT
     protected static function checkTable($fullTableName, $connectionName = null)
     {
         if (!static::ddlTableExists($fullTableName, $connectionName)) {
-            throw new BException(BLocale::_('Invalid table name: %s', $fullTableName));
+            throw new BException(BLocale::i()->_('Invalid table name: %s', $fullTableName));
         }
     }
 
@@ -528,7 +548,7 @@ EOT
     public static function ddlIndexInfo($fullTableName, $indexName = null, $connectionName = null)
     {
         if (!static::ddlTableExists($fullTableName, $connectionName)) {
-            throw new BException(BLocale::_('Invalid table name: %s', $fullTableName));
+            throw new BException(BLocale::i()->_('Invalid table name: %s', $fullTableName));
         }
         $a = explode('.', $fullTableName);
         $dbName = empty($a[1]) ? static::dbName() : $a[0];
@@ -554,7 +574,7 @@ EOT
     public static function ddlForeignKeyInfo($fullTableName, $fkName = null, $connectionName = null)
     {
         if (!static::ddlTableExists($fullTableName, $connectionName)) {
-            throw new BException(BLocale::_('Invalid table name: %s', $fullTableName));
+            throw new BException(BLocale::i()->_('Invalid table name: %s', $fullTableName));
         }
         $a = explode('.', $fullTableName);
         $dbName = empty($a[1]) ? static::dbName() : $a[0];
@@ -747,18 +767,20 @@ EOT
     }
 
     /**
-    * Clean array or object fields based on table columns and return an array
-    *
-    * @param string $table
-    * @param array|object $data
-    * @return array
-    */
+     * Clean array or object fields based on table columns and return an array
+     *
+     * @param string       $table
+     * @param array|object $data
+     * @param null         $connectionName
+     * @return array
+     */
     public static function cleanForTable($table, $data, $connectionName = null)
     {
         $isObject = is_object($data);
         $result = [];
         foreach ($data as $k => $v) {
-            if (BDb::ddlFieldInfo($table, $k, $connectionName)) {
+            $fieldInfo = BDb::ddlFieldInfo($table, $k, $connectionName);
+            if ($fieldInfo) {
                 $result[$k] = $isObject ? $data->get($k) : $data[$k];
             }
         }
@@ -946,7 +968,8 @@ class BORM extends ORMWrapper
             try { //ADDED: hide connection details from the error if not in DEBUG mode
                 $db = new BPDO($connection_string, $username, $password, $driver_options); //UPDATED
             } catch (PDOException $e) {
-                if (BDebug::is('DEBUG')) {
+                $BDebug = new BDebug();
+                if ($BDebug->is('DEBUG')) {
                     throw $e;
                 } else {
                     throw new PDOException('Could not connect to database');
@@ -1077,9 +1100,10 @@ class BORM extends ORMWrapper
 
     /**
     * Added _build_having()
+    * Extended with argument for options skipping of values calculation
     *
     */
-    protected function _build_select() {
+    protected function _build_select($calculate_values = true) {
         // If the query is raw, just set the $this->_values to be
         // the raw query parameters and return the raw query
         if ($this->_is_raw_query) {
@@ -1092,7 +1116,7 @@ class BORM extends ORMWrapper
         return $this->_join_if_not_empty(" ", [
             $this->_build_select_start(),
             $this->_build_join(),
-            $this->_build_where(),
+            $this->_build_where($calculate_values),
             $this->_build_group_by(),
             $this->_build_having(),
             $this->_build_order_by(),
@@ -1128,12 +1152,13 @@ class BORM extends ORMWrapper
 
     /**
     * Return select sql statement built from the ORM object
+    * Extended with argument for options skipping of values calculation
     *
     * @return string
     */
-    public function as_sql()
+    public function as_sql($calculate_values = true)
     {
-        return $this->_build_select();
+        return $this->_build_select($calculate_values);
     }
 
     /**
@@ -1192,7 +1217,7 @@ class BORM extends ORMWrapper
      */
     public function where($column_name, $value = null)
     {
-        if (is_array($column_name)) {
+        if (is_array($column_name) && null === $value) {
             return $this->where_complex($column_name, !!$value);
         }
         return parent::where($column_name, $value);
@@ -1324,6 +1349,7 @@ class BORM extends ORMWrapper
         }
         $this->_data[$key] = $value;
 
+        #var_dump(spl_object_hash($this), get_class($this), $this->_data, $this->_dirty_fields);
     }
 
     /**
@@ -1372,6 +1398,15 @@ class BORM extends ORMWrapper
         return $this;
     }
 
+    public function set_dirty_fields($data, $isNew = null)
+    {
+        $this->_dirty_fields = $data;
+        if (null !== $isNew) {
+            $this->_is_new = $isNew;
+        }
+        return $this;
+    }
+
     /**
      * Save any fields which have been modified on this object
      * to the database.
@@ -1407,7 +1442,6 @@ class BORM extends ORMWrapper
     protected function _save($replace = false)
     {
         $values = array_values($this->_dirty_fields);
-
 
         if (!$this->_is_new) { // UPDATE
             // If there are no dirty values, do nothing
@@ -1525,16 +1559,6 @@ class BORM extends ORMWrapper
     }
 
     /**
-    * Get table name with prefix, if configured
-    *
-    * @param string $class_name
-    * @return string
-    */
-    protected static function _get_table_name($class_name) {
-        return BDb::t(parent::_get_table_name($class_name));
-    }
-
-    /**
     * Set page constraints on collection for use in grids
     *
     * Request and result vars:
@@ -1583,7 +1607,7 @@ class BORM extends ORMWrapper
         if (!empty($r['s']) && !preg_match('#^[a-zA-Z0-9_.]+$#', $r['s'])) { // if sort contains not allowed characters
             $r['s'] = null;
         }
-        if (empty($r['sd']) || $r['sd'] != 'asc' && $r['sd'] != 'desc') { // only asc and desc dirs are allowed
+        if (empty($d['sd']) && (empty($r['sd']) || $r['sd'] != 'asc' && $r['sd'] != 'desc')) { // only asc and desc dirs are allowed
             $r['sd'] = 'asc';
         }
         $r['sc'] = !empty($r['s']) ? $r['s'] . ' ' . $r['sd'] : null; // combine $r['sc'] after filtering
@@ -1618,8 +1642,16 @@ class BORM extends ORMWrapper
         #$s['c'] = 600000;
         if (empty($s['c'])) {
             $cntOrm = clone $this; // clone ORM to count
-            $s['c'] = $cntOrm->count(); // total row count
-            unset($cntOrm); // free mem
+            // Change the way we calculate count if grouping is detected in query
+            if ( count($cntOrm->_group_by) ) {
+                $cntQuery = $this->as_sql(false);
+                $cntFilters = $this->_build_values();
+                $s[ 'c' ] = BORM::i()->raw_query( "SELECT COUNT(*) AS count FROM ($cntQuery) AS cntCount", $cntFilters )->find_one()->count;
+                unset( $cntQuery, $cntFilters ); // free mem
+            } else {
+                $s[ 'c' ] = $cntOrm->count(); // total row count
+            }
+            unset( $cntOrm ); // free mem
         }
 
         $s['mp'] = ceil($s['c'] / $s['ps']); // max page
@@ -1648,6 +1680,44 @@ class BORM extends ORMWrapper
             }
         }
         return ['state' => $s, 'rows' => $rows];
+    }
+
+    /**
+    * Build the WHERE clause(s)
+    * Extended with argument for options skipping of values calculation
+    */
+    protected function _build_where($calculate_values = true) {
+            // If there are no WHERE clauses, return empty string
+            if (count($this->_where_conditions) === 0) {
+                return '';
+            }
+
+            $where_conditions = [];
+            foreach ($this->_where_conditions as $condition) {
+                $where_conditions[] = $condition[static::WHERE_FRAGMENT];
+                if($calculate_values){
+                    $this->_values = array_merge($this->_values, $condition[static::WHERE_VALUES]);
+                }
+            }
+
+            return "WHERE " . join(" AND ", $where_conditions);
+    }
+
+    /**
+    * Build the WHERE clause Values array if not build already inside _build_where()
+    */
+    protected function _build_values() {
+        // If there are no WHERE clauses, return empty array
+        if (count($this->_where_conditions) === 0) {
+            return [];
+        }
+
+        $values = [];
+        foreach ($this->_where_conditions as $condition) {
+                $values[] = $condition[static::WHERE_VALUES][0];
+        }
+
+        return $values;
     }
 
     const HAVING_FRAGMENT = 0;
@@ -1750,6 +1820,57 @@ class BORM extends ORMWrapper
  * ORM model base class
  * @property static string $_table
  * @property static array $_fieldOptions
+ *
+ * DI
+ * core
+ * @property BApp $BApp
+ * @property BException $BException
+ * @property BConfig $BConfig
+ * @property BClassRegistry $BClassRegistry
+ * @property BClassAutoload $BClassAutoload
+ * @property BEvents $BEvents
+ * @property BSession $BSession
+ *
+ * controller
+ * @property BRequest $BRequest
+ * @property BResponse $BResponse
+ * @property BRouting $BRouting
+ *
+ * layout
+ * @property BLayout $BLayout
+ * @property BView $BView
+ * @property BViewEmpty $BViewEmpty
+ * @property BViewHead $BViewHead
+ * @property BViewList $BViewList
+ *
+ * db
+ * @property BDb $BDb
+ *
+ * locale
+ * @property BLocale $BLocale
+ *
+ * module
+ * @property BModuleRegistry $BModuleRegistry
+ * @property BModule $BModule
+ * @property BMigrate $BMigrate
+ * @property BDbModule $BDbModule
+ *
+ * cache
+ * @property BCache $BCache
+ *
+ * misc
+ * @property BUtil $BUtil
+ * @property BHTML $BHTML
+ * @property BEmail $BEmail
+ * @property BValue $BValue
+ * @property BData $BData
+ * @property BDebug $BDebug
+ * @property BLoginThrottle $BLoginThrottle
+ * @property BYAML $BYAML
+ * @property BValidate $BValidate
+ * @property BValidateViewHelper $BValidateViewHelper
+ * @property Bcrypt $Bcrypt
+ * @property BRSA $BRSA
  */
 class BModel extends Model
 {
@@ -1802,6 +1923,7 @@ class BModel extends Model
     */
     protected static $_cacheAuto = false;
 
+
     /**
     * Fields used in cache, that require values to be case insensitive or trimmed
     *
@@ -1853,6 +1975,27 @@ class BModel extends Model
      * @var string
      */
     protected static $_collectionClass = 'BCollection';
+
+    /**
+     * Lazy DI configuration
+     *
+     * [
+     *    '_env' => 'BEnv',
+     * ]
+     *
+     * @var array
+     */
+    protected static $_diConfig = [
+        #'_env' => 'BEnv',
+        '*' => 'ALL',
+    ];
+
+    /**
+     * Local DI instances
+     *
+     * @var array
+     */
+    protected $_diLocal = [];
 
     /**
     * Retrieve original class name
@@ -1965,10 +2108,10 @@ class BModel extends Model
     public static function collection($alias = null)
     {
         $collectionClass = static::$_collectionClass;
-        $orm = $this->orm($alias);
+        $orm = static::orm($alias);
         $collection = $collectionClass::i(true)->setModelClass(static::$_origClass)->setOrm($orm);
 
-        BEvents::i()->fire(static::$_origClass . '::collection', ['collection' => $this, 'orm' => $orm, 'alias' => $alias]);
+        BEvents::i()->fire(static::$_origClass . '::collection', ['collection' => $collection, 'orm' => $orm, 'alias' => $alias]);
         return $collection;
     }
 
@@ -2006,7 +2149,7 @@ class BModel extends Model
     {
         if (is_array($key)) {
             foreach ($key as $k => $v) {
-                parent::set($k, $v);
+                $this->set($k, $v);
             }
         } else {
             if (true === $flag || 'ADD' === $flag) {
@@ -2018,7 +2161,14 @@ class BModel extends Model
                     $value += $oldValue;
                 }
             }
-            if (is_scalar($key) && (!(null === $flag || 'IFNULL' === $flag) || null === $this->get($key))) {
+            if (!is_string($key)) {
+                throw new BException('Invalid key type' . print_r($key, 1));
+            }
+            if (null === $flag || 'IFNULL' === $flag) {
+                if (null === $this->get($key)) {
+                    parent::set($key, $value);
+                }
+            } else {
                 parent::set($key, $value);
             }
         }
@@ -2041,7 +2191,8 @@ class BModel extends Model
     * Create a new instance of the model
     *
     * @param null|array $data
-    * @return BModel
+    * @param boolean $new is new record
+    * @return $this
     */
     public static function create($data = null, $new = true)
     {
@@ -2057,7 +2208,7 @@ class BModel extends Model
     */
     public function onAfterCreate()
     {
-        BEvents::i()->fire($this->_origClass() . '::onAfterCreate', ['model' => $this]);
+        $this->BEvents->fire($this->_origClass() . '::onAfterCreate', ['model' => $this]);
         return $this;
     }
 
@@ -2087,10 +2238,15 @@ class BModel extends Model
     * @param int|string|array $id
     * @param string $field
     * @param boolean $cache
-    * @return BModel
+    * @return $this
+    * @throws BException
     */
-    public static function load($id, $field = null, $cache = false)
+    public function load($id, $field = null, $cache = false)
     {
+        if (true !== $field && is_array($id)) {
+            throw new BException('Invalid ID parameter');
+        }
+
         $class = static::$_origClass ? static::$_origClass : get_called_class();
         if (null === $field) {
             $field = static::_get_id_column_name($class);
@@ -2112,7 +2268,7 @@ class BModel extends Model
 
         $orm = static::factory();
         static::_loadORM($orm);
-        BEvents::i()->fire($class . '::load:orm', ['orm' => $orm, 'class' => $class, 'called_class' => get_called_class()]);
+        $this->BEvents->fire($class . '::load:orm', ['orm' => $orm, 'class' => $class, 'called_class' => get_called_class()]);
         if (is_array($id)) {
             $orm->where_complex($id);
         } else {
@@ -2121,7 +2277,6 @@ class BModel extends Model
             }
             $orm->where($field, $id);
         }
-        /** @var BModel $record */
         $model = $orm->find_one();
         if ($model) {
             $model->onAfterLoad();
@@ -2136,18 +2291,26 @@ class BModel extends Model
     }
 
     /**
+     * Temporary implementation using load()
+     */
+    public function loadWhere($where)
+    {
+        return $this->load($where, true);
+    }
+
+    /**
      * Load a model or create an empty one if doesn't exist
      *
-     * @param int|string|array $id
+     * @param int|string|array $where
      * @param string $field
      * @param boolean $cache
      * @return BModel
      */
-    public static function loadOrCreate($id, $field = null, $cache = false)
+    public function loadOrCreate($where, $field = null, $cache = false)
     {
-        $model = static::load($id, $field, $cache);
+        $model = $this->loadWhere($where, $field, $cache);
         if (!$model) {
-            $model = static::create(is_array($id) ? $id : []);
+            $model = $this->create($where);
         }
         return $model;
     }
@@ -2159,7 +2322,7 @@ class BModel extends Model
     */
     public function onAfterLoad()
     {
-        BEvents::i()->fire($this->_origClass() . '::onAfterLoad', ['model' => $this]);
+        $this->BEvents->fire($this->_origClass() . '::onAfterLoad', ['model' => $this]);
         return $this;
     }
 
@@ -2345,7 +2508,7 @@ class BModel extends Model
     */
     public function onBeforeSave()
     {
-        BEvents::i()->fire($this->origClass() . '::onBeforeSave', ['model' => $this]);
+        $this->BEvents->fire($this->origClass() . '::onBeforeSave', ['model' => $this]);
         return true;
     }
 
@@ -2410,13 +2573,19 @@ class BModel extends Model
         return $this;
     }
 
+    public function resave($asNew = false)
+    {
+        $this->orm->set_dirty_fields($this->as_array(), true);
+        $this->save(true);
+    }
+
     /**
     * Placeholder for after save callback
     *
     */
     public function onAfterSave()
     {
-        BEvents::i()->fire($this->_origClass() . '::onAfterSave', ['model' => $this]);
+        $this->BEvents->fire($this->_origClass() . '::onAfterSave', ['model' => $this]);
         return $this;
     }
 
@@ -2437,7 +2606,7 @@ class BModel extends Model
     */
     public function onBeforeDelete()
     {
-        BEvents::i()->fire($this->_origClass() . '::onBeforeDelete', ['model' => $this]);
+        $this->BEvents->fire($this->_origClass() . '::onBeforeDelete', ['model' => $this]);
         return true;
     }
 
@@ -2469,7 +2638,7 @@ class BModel extends Model
 
     public function onAfterDelete()
     {
-        BEvents::i()->fire($this->_origClass() . '::onAfterDelete', ['model' => $this]);
+        $this->BEvents->fire($this->_origClass() . '::onAfterDelete', ['model' => $this]);
         return $this;
     }
 
@@ -2483,6 +2652,16 @@ class BModel extends Model
     public static function run_sql($sql, $params = [])
     {
         return static::writeDb()->prepare($sql)->execute((array)$params);
+    }
+
+    /**
+    * Get table name with prefix, if configured
+    *
+    * @param string $class_name
+    * @return string
+    */
+    protected static function _get_table_name($class_name) {
+        return BDb::t(parent::_get_table_name($class_name));
     }
 
     /**
@@ -2525,12 +2704,28 @@ class BModel extends Model
             $update[] = "`{$k}`=?";
             $params[] = $v;
         }
+
+        BEvents::i()->fire(static::origClass() . '::update_many:before', [
+            'data' => &$data,
+            'where' => &$where,
+            'params' => &$p
+        ]);
+
         if (is_array($where)) {
             list($where, $p) = BDb::where($where);
         }
         $sql = "UPDATE " . static::table() . " SET " . join(', ', $update) . ($where ? " WHERE {$where}" : '');
         BDebug::debug('SQL: ' . $sql);
-        return static::run_sql($sql, array_merge($params, $p));
+        $result = static::run_sql($sql, array_merge($params, $p));
+
+        BEvents::i()->fire(static::origClass() . '::update_many:after', [
+            'data' => $data,
+            'where' => $where,
+            'params' => $p,
+            'result' => &$result,
+        ]);
+
+        return $result;
     }
 
     /**
@@ -2546,6 +2741,12 @@ class BModel extends Model
         if (null === $idField) {
             $idField = static::_get_id_column_name(get_called_class());
         }
+
+        BEvents::i()->fire(static::origClass() . '::update_many_by_id:before', [
+            'data' => &$data,
+            'id_field' => &$idField,
+        ]);
+
         $fields = [];
         foreach ($data as $id => $fields) {
             foreach ($fields as $f => $v) {
@@ -2571,7 +2772,15 @@ class BModel extends Model
         $sql = "UPDATE " . static::table() . " SET " . join(', ', $updates) . ' WHERE '
             . $idField . ' IN (' . join(', ', array_fill(0, sizeof($data), '?')) . ')';
         BDebug::debug('SQL: ' . $sql);
-        return static::run_sql($sql, array_merge($params, $p));
+        $result = static::run_sql($sql, $params);
+
+        BEvents::i()->fire(static::origClass() . '::update_many_by_id:after', [
+            'data' => $data,
+            'id_field' => $idField,
+            'result' => &$result,
+        ]);
+
+        return $result;
     }
 
     /**
@@ -2583,12 +2792,25 @@ class BModel extends Model
     */
     public static function delete_many($where, $params = [])
     {
+        BEvents::i()->fire(static::origClass() . '::delete_many:before', [
+            'where' => &$where,
+            'params' => &$params,
+        ]);
+
         if (is_array($where)) {
             list($where, $params) = BDb::where($where);
         }
         $sql = "DELETE FROM " . static::table() . " WHERE {$where}";
         BDebug::debug('SQL: ' . $sql);
-        return static::run_sql($sql, $params);
+        $result = static::run_sql($sql, $params);
+
+        BEvents::i()->fire(static::origClass() . '::delete_many:after', [
+            'where' => $where,
+            'params' => $params,
+            'result' => &$result,
+        ]);
+
+        return $result;
     }
 
     /**
@@ -2802,10 +3024,10 @@ class BModel extends Model
             $data = $this->as_array();
         }
         $rules = array_merge(static::$_validationRules, $rules);
-        BEvents::i()->fire($this->_origClass() . "::validate:before", ["rules" => &$rules, "data" => &$data]);
-        $valid = BValidate::i()->validateInput($data, $rules, $formName);
+        $this->BEvents->fire($this->_origClass() . "::validate:before", ["rules" => &$rules, "data" => &$data]);
+        $valid = $this->BValidate->validateInput($data, $rules, $formName);
         if (!$valid) {
-            BEvents::i()->fire($this->_origClass() . "::validate:failed", ["rules" => &$rules, "data" => &$data]);
+            $this->BEvents->fire($this->_origClass() . "::validate:failed", ["rules" => &$rules, "data" => &$data]);
         }
 
         return $valid;
@@ -2813,12 +3035,42 @@ class BModel extends Model
 
     public function __call($name, $args)
     {
-        return BClassRegistry::callMethod($this, $name, $args, static::$_origClass);
+        return $this->BClassRegistry->callMethod($this, $name, $args, static::$_origClass);
     }
 
     public static function __callStatic($name, $args)
     {
         return BClassRegistry::callStaticMethod(get_called_class(), $name, $args, static::$_origClass);
+    }
+
+    public function __get($property)
+    {
+        static $BClass;
+
+        if (isset($this->_diLocal[$property])) {
+            return $this->_diLocal[$property];
+        }
+        if (!$BClass) {
+            $BClass = BClass::i();
+        }
+        $di = $BClass->getGlobalDependencyInstance($property, static::$_diConfig);
+        if ($di) {
+            #$this->_diLocal[$property] = $di;
+            return $di;
+        }
+
+        if (!is_object($this->orm)) {
+            BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);
+        }
+        return $this->orm->get($property);
+    }
+
+    public function setDependencyInstances(array $instances)
+    {
+        foreach ($instances as $name => $instance) {
+            $this->_diLocal[$name] = $instance;
+        }
+        return $this;
     }
 }
 
@@ -2882,153 +3134,6 @@ class BCollection extends ArrayIterator
     public function modelsAsArray()
     {
         return BDb::many_as_array($this);
-    }
-}
-
-/**
- * Basic user authentication and authorization class
- * @property mixed password_hash
- * @property mixed create_at
- * @property mixed update_at
- * @property mixed password
- * @property mixed locale
- * @property mixed timezone
- * @property mixed id
- */
-class BModelUser extends BModel
-{
-    protected static $_sessionUser;
-    protected static $_sessionUserNamespace = 'user';
-
-    public static function sessionUserId()
-    {
-        $userId = BSession::i()->get(static::$_sessionUserNamespace . '_id');
-        return $userId ? $userId : false;
-    }
-
-    public static function sessionUser($reset = false)
-    {
-        if (!static::isLoggedIn()) {
-            return false;
-        }
-        BSession::i();
-        if ($reset || !static::$_sessionUser) {
-            static::$_sessionUser = static::load(static::sessionUserId());
-        }
-        return static::$_sessionUser;
-    }
-
-    public static function isLoggedIn()
-    {
-        return static::sessionUserId() ? true : false;
-    }
-
-    public function setPassword($password)
-    {
-        $this->password_hash = BUtil::fullSaltedHash($password);
-        return $this;
-    }
-
-    public function validatePassword($password)
-    {
-        return BUtil::validateSaltedHash($password, $this->password_hash);
-    }
-
-    public function onBeforeSave()
-    {
-        if (!parent::onBeforeSave()) return false;
-        if (!$this->create_at) $this->create_at = BDb::now();
-        $this->update_at = BDb::now();
-        if ($this->password) {
-            $this->password_hash = BUtil::fullSaltedHash($this->password);
-        }
-        return true;
-    }
-
-    static public function authenticate($username, $password)
-    {
-        /** @var FCom_Admin_Model_User */
-        $user = static::orm()->where(['OR' => ['username' => $username, 'email' => $username]])->find_one();
-        if (!$user || !$user->validatePassword($password)) {
-            return false;
-        }
-        return $user;
-    }
-
-    public function login()
-    {
-        $this->set('last_login', BDb::now())->save();
-
-        BSession::i()->set([
-            static::$_sessionUserNamespace . '_id' => $this->id,
-            static::$_sessionUserNamespace => serialize($this->as_array()),
-        ]);
-        static::$_sessionUser = $this;
-
-        if ($this->locale) {
-            setlocale(LC_ALL, $this->locale);
-        }
-        if ($this->timezone) {
-            date_default_timezone_set($this->timezone);
-        }
-        BEvents::i()->fire(__METHOD__ . ':after', ['user' => $this]);
-        return $this;
-    }
-
-    public function authorize($role, $args = null)
-    {
-        if (null === $args) {
-            // check authorization
-            return true;
-        }
-        // set authorization
-        return $this;
-    }
-
-    public static function logout()
-    {
-        BSession::i()->set(static::$_sessionUserNamespace . '_id', false);
-        BEvents::i()->fire(__METHOD__ . ':after', ['user' => static::$_sessionUser]);
-        static::$_sessionUser = null;
-    }
-
-    public function recoverPassword($emailView = 'email/user-password-recover')
-    {
-        $this->set(['password_nonce' => BUtil::randomString(20)])->save();
-        if (($view = BLayout::i()->view($emailView))) {
-            $view->set('user', $this)->email();
-        }
-        return $this;
-    }
-
-    public function resetPassword($password, $emailView = 'email/user-password-reset')
-    {
-        $this->set(['password_nonce' => null])->setPassword($password)->save()->login();
-        if (($view = BLayout::i()->view($emailView))) {
-            $view->set('user', $this)->email();
-        }
-        return $this;
-    }
-
-    public static function signup($r)
-    {
-        $r = (array)$r;
-        if (empty($r['email'])
-            || empty($r['password']) || empty($r['password_confirm'])
-            || $r['password'] != $r['password_confirm']
-        ) {
-            throw new Exception('Incomplete or invalid form data.');
-        }
-
-        $r = BUtil::arrayMask($r, 'email,password');
-        $user = static::create($r)->save();
-        if (($view = BLayout::i()->view('email/user-new-user'))) {
-            $view->set('user', $user)->email();
-        }
-        if (($view = BLayout::i()->view('email/admin-new-user'))) {
-            $view->set('user', $user)->email();
-        }
-        return $user;
     }
 }
 

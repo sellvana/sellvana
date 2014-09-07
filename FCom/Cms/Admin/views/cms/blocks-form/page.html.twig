@@ -3,16 +3,16 @@
 
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator', m) %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 {% set fieldData = { validator: validator } %}
 <fieldset class="form-horizontal">
     <div class="f-section">
-    {{ forms.boolean(fieldData|merge({field:'page_enabled', label:'Page Enabled'|_})) }}
-    {{ forms.input(fieldData|merge({field:'page_url', label:'Page URL Path'|_})) }}
-    {{ forms.input(fieldData|merge({field:'page_title', label:'Window Title'|_})) }}
-    {{ forms.textarea(fieldData|merge({field:'layout_update', label:'Page Layout Update'|_,  input_class: "ckeditor"})) }}
-    {{ forms.input(fieldData|merge({field:'meta_title', label:'Meta Title'|_})) }}
-    {{ forms.input(fieldData|merge({field:'meta_description', label:'Meta Description'|_})) }}
-    {{ forms.input(fieldData|merge({field:'meta_keywords', label:'Meta Keywords'|_})) }}
+    {{ forms.boolean(fieldData, {field:'page_enabled', label:'Page Enabled'|_}) }}
+    {{ forms.input(fieldData, {field:'page_url', label:'Page URL Path'|_}) }}
+    {{ forms.input(fieldData, {field:'page_title', label:'Window Title'|_}) }}
+    {{ forms.textarea(fieldData, {field:'layout_update', label:'Page Layout Update'|_}) }}
+    {{ forms.input(fieldData, {field:'meta_title', label:'Meta Title'|_}) }}
+    {{ forms.input(fieldData, {field:'meta_description', label:'Meta Description'|_}) }}
+    {{ forms.input(fieldData, {field:'meta_keywords', label:'Meta Keywords'|_}) }}
     </div>
 </fieldset>

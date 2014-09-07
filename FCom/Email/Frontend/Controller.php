@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
@@ -9,14 +9,14 @@ class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
     public function action_pref__POST()
     {
-        $hlp = FCom_Email_Model_Pref::i();
-        $r = BRequest::i();
+        $hlp = $this->FCom_Email_Model_Pref;
+        $r = $this->BRequest;
         $email = $r->request('email');
         try {
             if (!$hlp->validateToken($email, $r->request('token'))) {
                 throw new Exception('Invalid token');
             }
-            $data = BUtil::arrayMask($r->post('model'), 'id,email,create_at,update_at', true);
+            $data = $this->BUtil->arrayMask($r->post('model'), 'id,email,create_at,update_at', true);
             $pref = $hlp->load($email, 'email');
             if (!$pref) {
                 $pref = $hlp->create(['email' => $email]);
@@ -29,8 +29,8 @@ class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         } catch (Exception $e) {
             $this->message($e->getMessage(), 'error');
         }
-        $url = BUtil::setUrlQuery($r->currentUrl(), ['token' => $hlp->getToken($email)]);
-        BResponse::i()->redirect($url);
+        $url = $this->BUtil->setUrlQuery($r->currentUrl(), ['token' => $hlp->getToken($email)]);
+        $this->BResponse->redirect($url);
     }
 
     public function action_subscribe()
@@ -40,13 +40,13 @@ class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
     public function action_subscribe__POST()
     {
-        $r    = BRequest::i();
+        $r    = $this->BRequest;
         $post = $r->post();
         try {
-            $model = FCom_Email_Model_Pref::i()->load($post['email'], 'email');
+            $model = $this->FCom_Email_Model_Pref->load($post['email'], 'email');
             /** @var $model FCom_Email_Model_Pref */
             if (!$model) {
-                $model = FCom_Email_Model_Pref::i()->create();
+                $model = $this->FCom_Email_Model_Pref->create();
             }
             if ($valid = $model->validate($post, [], 'email-subscription')) {
                 $model->email          = $post['email'];
@@ -62,29 +62,29 @@ class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 } else {
                     $result = ['status' => 'error', 'message' => $this->getAjaxErrorMessage()];
                 }
-                BResponse::i()->json($result);
+                $this->BResponse->json($result);
             } else {
                 if ($valid) {
                     $this->message($successMessage);
                 } else {
                     $this->formMessages('email-subscription');
                 }
-                BResponse::i()->redirect('email/subscribe');
+                $this->BResponse->redirect('email/subscribe');
             }
         } catch (Exception $e) {
-            BDebug::logException($e);
+            $this->BDebug->logException($e);
             if ($r->xhr()) {
-                BResponse::i()->json(['status' => 'error', 'message' => $e->getMessage()]);
+                $this->BResponse->json(['status' => 'error', 'message' => $e->getMessage()]);
             } else {
                 $this->message($e->getMessage(), 'error');
-                BResponse::i()->redirect('email/subscribe');
+                $this->BResponse->redirect('email/subscribe');
             }
         }
     }
 
     public function getAjaxErrorMessage()
     {
-        $messages      = BSession::i()->messages('validator-errors:email-subscription');
+        $messages      = $this->BSession->messages('validator-errors:email-subscription');
         $errorMessages = [];
         foreach ($messages as $m) {
             if (is_array($m['msg'])) {

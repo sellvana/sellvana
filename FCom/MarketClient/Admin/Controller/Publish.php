@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_Abstract
 {
@@ -7,14 +7,14 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
     public function action_index()
     {
         try {
-            $result = FCom_MarketClient_RemoteApi::i()->getModulesVersions(true);
+            $result = $this->FCom_MarketClient_RemoteApi->getModulesVersions(true);
             foreach ($result as $modName => $modInfo) {
                 if ($modInfo['status'] !== 'mine' && $modInfo['status'] !== 'available') {
                     unset($result[$modName]);
                     continue;
                 }
                 if (!empty($modInfo['edit_href'])) {
-                    $result[$modName]['edit_href'] = BUtil::setUrlQuery(BApp::href('marketclient/site/connect'), [
+                    $result[$modName]['edit_href'] = $this->BUtil->setUrlQuery($this->BApp->href('marketclient/site/connect'), [
                         'redirect_to' => $modInfo['edit_href'],
                     ]);
                 }
@@ -38,6 +38,7 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
                 $this->message('No modules are available for publishing', 'warning');
             }
 
+            $this->layout('/marketclient/publish');
             $view = $this->view('marketclient/publish');
             if (!empty($result['error'])) {
                 $this->message($result['message'], 'error');
@@ -45,40 +46,40 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
                 $view->set('modules', $result);
             }
         } catch (Exception $e) {
+            $this->layout('/marketclient/publish');
             $this->message($e->getMessage(), 'error');
         }
-        $this->layout('/marketclient/publish');
     }
 
     public function action_module()
     {
-        $modName = BRequest::i()->get('mod_name');
-        $mod = BModuleRegistry::i()->module($modName);
+        $modName = $this->BRequest->get('mod_name');
+        $mod = $this->BModuleRegistry->module($modName);
         if (!$mod) {
             $this->forward(false);
             return;
         }
-        $this->view('marketclient/publish/module')->set('mod_name', $mod);
         $this->layout('/marketclient/publish/module');
+        $this->view('marketclient/publish/module')->set('mod_name', $mod);
     }
 
     public function action_module__POST()
     {
-        BResponse::i()->startLongResponse(false);
-        $hlp = FCom_MarketClient_RemoteApi::i();
+        $this->BResponse->startLongResponse(false);
+        $hlp = $this->FCom_MarketClient_RemoteApi;
         $connResult = $hlp->setupConnection();
 
-        list($action, $modName) = explode('/', BRequest::i()->post('mod_name')) + [''];
+        list($action, $modName) = explode('/', $this->BRequest->post('mod_name')) + [''];
         $versionResult = $hlp->getModulesVersions($modName);
 
         #$redirectUrl = $hlp->getUrl('market/module/edit', array('mod_name' => $modName));
-        $redirectUrl = BRequest::i()->referrer();
+        $redirectUrl = $this->BRequest->referrer();
         #var_dump($modName, $versionResult); exit;
         if (!empty($versionResult[$modName]) && $versionResult[$modName]['status'] === 'available') {
             $createResult = $hlp->createModule($modName);
             if (!empty($createResult['error'])) {
                 $this->message($createResult['error'], 'error');
-                BResponse::i()->redirect('marketclient/publish');
+                $this->BResponse->redirect('marketclient/publish');
                 return;
             }
             if (!empty($createResult['redirect_url'])) {
@@ -90,6 +91,6 @@ class FCom_MarketClient_Admin_Controller_Publish extends FCom_Admin_Controller_A
 
 #echo "<pre>"; var_dump($uploadResult); exit;
         // TODO: why $this->message() doesn't work here?
-        BResponse::i()->redirect($redirectUrl);
+        $this->BResponse->redirect($redirectUrl);
     }
 }

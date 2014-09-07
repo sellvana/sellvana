@@ -3,11 +3,11 @@
 
 {% set m = THIS.get('model') %}
 {% set validator = THIS.get('validator') %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 {% set fieldData = { validator: validator} %}
 <fieldset class="adm-section-group">
-    {{ forms.input(fieldData|merge({field:'name', label:'Name'|_})) }}
-    {{ forms.input(fieldData|merge({field:'code', label:'Code'|_})) }}
+    {{ forms.input(fieldData, {field:'name', label:'Name'|_}) }}
+    {{ forms.input(fieldData, {field:'code', label:'Code'|_}) }}
 </fieldset>
 
 <script>

@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Seo_Model_UrlAlias extends FCom_Core_Model_Abstract
 {
@@ -10,15 +10,17 @@ class FCom_Seo_Model_UrlAlias extends FCom_Core_Model_Abstract
             '301' => '301 Permanent',
             '302' => '302 Temporary',
         ],
+        'is_active' => [0 => 'No', 1 => 'Yes'],
+        'is_regexp' => [0 => 'No', 1 => 'Yes'],
     ];
 
-    static public function findByUrl($url)
+    public function findByUrl($url)
     {
-        $alias = static::i()->orm()->where('is_active', 1)->where('is_regexp', 0)->where('request_url', $url)->find_one();
+        $alias = $this->orm()->where('is_active', 1)->where('is_regexp', 0)->where('request_url', $url)->find_one();
         if ($alias) {
             return $alias;
         }
-        $alias = static::i()->orm()->where('is_active', 1)->where('is_regexp', 1)->where_raw('request_url regexp ?', $url)->find_one();
+        $alias = $this->orm()->where('is_active', 1)->where('is_regexp', 1)->where_raw('request_url regexp ?', $url)->find_one();
         if ($alias) {
             return $alias;
         }
@@ -29,7 +31,7 @@ class FCom_Seo_Model_UrlAlias extends FCom_Core_Model_Abstract
     {
         $url = $this->target_url;
         if ($full && !preg_match('#^https?:#', $url)) {
-            $url = FCom_Frontend_Main::i()->href($url);
+            $url = $this->FCom_Frontend_Main->href($url);
         }
         return $url;
     }

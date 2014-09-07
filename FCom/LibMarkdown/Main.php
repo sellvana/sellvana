@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_LibMarkdown_Main extends BClass
 {
@@ -6,31 +6,31 @@ class FCom_LibMarkdown_Main extends BClass
 
     protected static $_cacheDir;
 
-    static public function bootstrap()
+    public function bootstrap()
     {
-        BLayout::i()->addRenderer('FCom_LibMarkdown', [
+        $this->BLayout->addRenderer('FCom_LibMarkdown', [
             'description' => 'Markdown Extra',
             'callback' => 'FCom_LibMarkdown_Main::renderer',
             'file_ext' => ['.md'],
         ]);
     }
 
-    static public function parser()
+    public function parser()
     {
         if (!static::$_parser) {
             require_once __DIR__ . '/lib/markdown.php';
             static::$_parser = new MarkdownExtra_Parser;
-            static::$_cacheDir = BConfig::i()->get('fs/cache_dir') . '/markdown';
-            BUtil::ensureDir(static::$_cacheDir);
+            static::$_cacheDir = $this->BConfig->get('fs/cache_dir') . '/markdown';
+            $this->BUtil->ensureDir(static::$_cacheDir);
         }
         return static::$_parser;
     }
 
-    static public function renderer($view)
+    public function renderer($view)
     {
         $viewName = $view->param('view_name');
-        $pId = BDebug::debug('BMarkdown render: ' . $viewName);
-        $parser = static::parser();
+        $pId = $this->BDebug->debug('BMarkdown render: ' . $viewName);
+        $parser = $this->parser();
 
         $source = $view->getParam('source');
         if ($source) {
@@ -46,7 +46,7 @@ class FCom_LibMarkdown_Main extends BClass
         $cacheDir = static::$_cacheDir . '/' . substr($md5, 0, 2);
         $cacheFilename = $cacheDir . '/.' . $md5 . '.php.cache'; // to help preventing direct php run
         if (!file_exists($cacheFilename) || $mtime > filemtime($cacheFilename)) {
-            BUtil::ensureDir($cacheDir);
+            $this->BUtil->ensureDir($cacheDir);
             if (!$source) {
                 $source = file_get_contents($sourceFile);
             }
@@ -55,7 +55,7 @@ class FCom_LibMarkdown_Main extends BClass
         } else {
             $output = file_get_contents($cacheFilename);
         }
-        BDebug::profile($pId);
+        $this->BDebug->profile($pId);
 
         return $output;
     }

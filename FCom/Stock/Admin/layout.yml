@@ -2,3 +2,12 @@ base:
     - view: admin/nav
         do:
             - [ addNav, catalog/stock, { label: Stock, href: /stock } ]
+catalog_product_form_tabs:
+    - view: admin/form
+        do:
+            - [ addTab, stock, { label: Stock, pos: 26, view: products/stock, async: true } ]
+
+/stock:
+    - { include: base }
+    - { hook: main, views: stock }
+    - { view: admin/nav, do: [[ setNav, catalog/stock ]] }

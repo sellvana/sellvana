@@ -1,13 +1,12 @@
 {% set order = THIS.get('order') %}
 {% set orderItems = order.items %}
 {% set addresses = order.addresses %}
-<div class="f-site-main" role="main">
-    <div class="container">
+
         <div class="row f-mb-slideout-menu">
             <div class="col-sm-9 f-col-main">
                 <header class="f-page-header">
                     <h1 class="f-page-title">{{"Orders" | _ }} #{{ order.get('unique_id') }}</h1>
-                    <h3 class="f-page-title pull-right" >{{"Status" | _ }} : {{ order.get('status') }} </h3>
+                    <big>{{"Status" | _ }} : {{ order.get('status') }}</big>
                     <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">Menu</a>
                 </header>
 
@@ -15,12 +14,14 @@
                     <h4>{{"Order items" | _ }}</h4>
                     <div class="table-responsive">
                         <table class="table">
+                          <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>{{"Info" | _ }}</th>
                                 <th>{{"Qty" | _ }}</th>
                                 <th>{{"Total" | _ }}</th>
                             </tr>
+                          </thead>
                             {% for item in orderItems %}
                                 <tr>
                                     <td>{{ item.get('id') }}</td>
@@ -38,10 +39,12 @@
                 {% if addresses %}
                     <div class="table-responsive">
                         <table class="table">
+                          <thead>
                             <tr>
                                 <th>{{ "Your billing information" |_ }}</th>
                                 <th>{{ "Your shipping information" |_ }}</th>
                             </tr>
+                          </thead>
                             <tr>
                                 {% for address in addresses %}
                                     <td>{{ THIS.view('checkout/success/address').set('address', address) | raw }}</td>
@@ -54,11 +57,13 @@
 
                 <div class="table-responsive">
                     <table class="table">
+                          <thead>
                         <tr>
                             <th>{{"Shipping method" | _ }}</th>
                             <th>{{"Payment method" | _ }}</th>
 
                         </tr>
+                          </thead>
                         <tr>
                             <td>{{ order.get('shipping_method') }} </td>
                             <td>{{ order.get('payment_method') }} </td>
@@ -68,11 +73,13 @@
 
                 <div class="table-responsive">
                     <table class="table">
+                          <thead>
                         <tr>
                             <th>{{"Subtotal" | _ }}</th>
                             <th>{{"Balance" | _ }}</th>
                             <th>{{"Grand Total" | _ }}</th>
                         </tr>
+                          </thead>
                         <tr>
                             <td>{{ order.get('subtotal') }} </td>
                             <td>{{ order.get('balance') }} </td>
@@ -85,8 +92,7 @@
             </div>
             {{ THIS.view('customer/account/sidebar').set('current', 'orders') | raw }}
         </div>
-    </div>
-</div>
+
 <script>
     require(['jquery'], function($) {
         $( "#button" ).click(function() {

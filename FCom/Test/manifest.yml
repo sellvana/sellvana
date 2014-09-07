@@ -4,7 +4,7 @@ modules:
         channel: beta
         require: { module: { FCom_Core: 0.1.0 }, class: [ PHPUnit ] }
         description: PHPUnit tests integration
-
+        noexport: 1
         areas:
             FCom_Admin:
                 auto_use: [ layout, views ]

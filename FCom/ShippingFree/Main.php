@@ -1,22 +1,22 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_ShippingFree_Main extends BClass
 {
 
-    public static function bootstrap()
+    public function bootstrap()
     {
         // only check cart if module is enabled
-        if (BConfig::i()->get('modules/FCom_ShippingFree/active')) {
+        if ($this->BConfig->get('modules/FCom_ShippingFree/active')) {
             // get cart and check for promotions which have get_type 'free'
-            $cart = FCom_Sales_Model_Cart::i()->sessionCart();
+            $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
 
-            $promoCart = FCom_Promo_Model_Promo::orm('p')
+            $promoCart = $this->FCom_Promo_Model_Promo->orm('p')
                                                ->where('p.get_type', FCom_ShippingPlain_ShippingMethod::FREE_SHIPPING)
-                                               ->join(FCom_Promo_Model_Cart::table(), 'pc.promo_id=p.id', 'pc')
-                                               ->where('pc.cart_id', $cart->id)
+                                               ->join($this->FCom_Promo_Model_Cart->table(), 'pc.promo_id=p.id', 'pc')
+                                               ->where('pc.cart_id', $cart->id())
                                                ->find_one();
             if ($promoCart) {
-                FCom_Sales_Main::i()->addShippingMethod('free_shipping', 'FCom_ShippingFree_ShippingMethod');
+                $this->FCom_Sales_Main->addShippingMethod('free_shipping', 'FCom_ShippingFree_ShippingMethod');
             }
         }
     }

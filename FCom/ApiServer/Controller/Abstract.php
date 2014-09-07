@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_ApiServer_Controller_Abstract extends FCom_Admin_Controller_Abstract
 {
@@ -13,36 +13,36 @@ class FCom_ApiServer_Controller_Abstract extends FCom_Admin_Controller_Abstract
         foreach ($this->_authorizeActionsWhitelist as &$action) {
             $action = strtolower($action);
         }
-        BResponse::i()->setContentType('application/json');
+        $this->BResponse->setContentType('application/json');
     }
 
     public function ok($msg = null)
     {
-        BResponse::i()->set($msg);
-        BResponse::i()->status(200);
+        $this->BResponse->set($msg);
+        $this->BResponse->status(200);
     }
     public function created($msg = null)
     {
-        BResponse::i()->set($msg);
-        BResponse::i()->status(201);
+        $this->BResponse->set($msg);
+        $this->BResponse->status(201);
     }
 
     public function notFound($msg = null)
     {
-        BResponse::i()->set($msg);
-        BResponse::i()->status(404);
+        $this->BResponse->set($msg);
+        $this->BResponse->status(404);
     }
 
     public function badRequest($msg = null)
     {
-        BResponse::i()->set($msg);
-        BResponse::i()->status(400);
+        $this->BResponse->set($msg);
+        $this->BResponse->status(400);
     }
 
     public function internalError($msg = null)
     {
-        BResponse::i()->set($msg);
-        BResponse::i()->status(503);
+        $this->BResponse->set($msg);
+        $this->BResponse->status(503);
     }
 
     public function isApiCall()
@@ -52,7 +52,7 @@ class FCom_ApiServer_Controller_Abstract extends FCom_Admin_Controller_Abstract
 
     public function authenticate($args = [])
     {
-        $res = FCom_Admin_Model_User::i()->isLoggedIn();
+        $res = $this->FCom_Admin_Model_User->isLoggedIn();
         if (!$res) {
             return $this->authorize($args);
         }
@@ -79,17 +79,17 @@ class FCom_ApiServer_Controller_Abstract extends FCom_Admin_Controller_Abstract
             return true;
         }
 
-        $password = BRequest::i()->server('PHP_AUTH_PW');
-        $username = BRequest::i()->server('PHP_AUTH_USER');
-        $user = FCom_Admin_Model_User::i()->sessionUser();
+        $password = $this->BRequest->server('PHP_AUTH_PW');
+        $username = $this->BRequest->server('PHP_AUTH_USER');
+        $user = $this->FCom_Admin_Model_User->sessionUser();
         if ($user) {
             return true;
         }
-        $user = FCom_Admin_Model_User::i()->authenticateApi($username, $password);
+        $user = $this->FCom_Admin_Model_User->authenticateApi($username, $password);
         if ($user) {
             $user->login();
             return true;
         }
-        BResponse::i()->status(403, null, BUtil::toJson("Authorization required"));
+        $this->BResponse->status(403, null, $this->BUtil->toJson("Authorization required"));
     }
 }

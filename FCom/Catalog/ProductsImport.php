@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Catalog_ProductsImport extends BImport
 {
@@ -27,9 +27,11 @@ class FCom_Catalog_ProductsImport extends BImport
     protected $dir = 'products';
     protected $model = 'FCom_Catalog_Model_Product';
 
+    protected $allowedFileTypes = ['txt', 'csv'];
+
     public function updateFieldsDueToInfo($info = null)
     {
-        $cfFields = FCom_CustomField_Model_Field::i()->getListAssoc();
+        $cfFields = $this->FCom_CustomField_Model_Field->getListAssoc();
         $cfKeys = array_keys($cfFields);
 //        $dataKeys = $info['first_row'];
         //$cfIntersection = array_intersect($cfKeys, $dataKeys);

@@ -1,17 +1,17 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Seo_Frontend extends BClass
 {
-    static public function bootstrap()
+    public function bootstrap()
     {
-        static::rememberReferrer();
+        $this->rememberReferrer();
     }
 
-    static public function rememberReferrer()
+    public function rememberReferrer()
     {
-        $referrer =& BSession::i()->dataToUpdate('referrer');
+        $referrer =& $this->BSession->dataToUpdate('referrer');
         if (empty($referrer)) {
-            $url = BRequest::i()->referrer();
+            $url = $this->BRequest->referrer();
             if (!$url) {
                 $referrer = [
                     'url' => null,
@@ -25,7 +25,7 @@ class FCom_Seo_Frontend extends BClass
                     $source = $match[1];
                 }
                 if ($source && !empty($parts['query'])) {
-                    $query = parse_str($parts['query']);
+                    parse_str($parts['query'], $query);
                     switch ($source) {
                         case 'google': case 'bing': case 'ask': case 'aol': case 'alltheweb': case 'duckduckgo':
                             $keywords = !empty($query['q']) ? $query['q'] : null;

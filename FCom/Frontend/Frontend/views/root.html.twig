@@ -1,15 +1,56 @@
+{% set colLeft = THIS.getCol('left') %}
+{% set colRight = THIS.getCol('right') %}
+
 <!DOCTYPE html>
 <html {{ THIS.getHtmlAttributes() | raw }} >
     <head>
         {{ THIS.hook('head') | raw }}
     </head>
     <body class="{{ THIS.getBodyClass() }}">
-        {{ THIS.hook('body_start')      | raw }}
-        {{ THIS.hook('header')          | raw }}
-        {{ THIS.hook('after_header')    | raw }}
-        {{ THIS.hook('main')            | raw }}
-        {{ THIS.hook('before_footer')   | raw }}
-        {{ THIS.hook('footer')          | raw }}
+        {{ THIS.hook('body_start') | raw }}
+        {{ THIS.hook('header') | raw }}
+        {{ THIS.hook('after_header') | raw }}
+
+        <div class="f-site-main" role="main">
+{% if THIS.get('use_container') %}
+            <div class="container">
+{% endif %}
+
+                {% if colLeft or colRight %}
+
+                   <div class="row">
+                       {% if colLeft %}
+                           <div class="col-md-{{ colLeft }}">
+                               {{ THIS.hook('col_left') | raw }}
+                           </div>
+                       {% endif %}
+                       <div class="col-md-{{ 12-colLeft-colRight }}">
+                            {{ THIS.hook('before_main') | raw }}
+                            {{ THIS.hook('main') | raw }}
+                            {{ THIS.hook('after_main') | raw }}
+                       </div>
+                       {% if colRight %}
+                           <div class="col-md-{{ colRight }}">
+                               {{ THIS.hook('col_right') | raw }}
+                           </div>
+                       {% endif %}
+                    </div>
+
+                {% else %}
+
+                    {{ THIS.hook('before_main') | raw }}
+                    {{ THIS.hook('main') | raw }}
+                    {{ THIS.hook('after_main') | raw }}
+
+                {% endif %}
+
+{% if THIS.get('use_container') %}
+            </div>
+{% endif %}
+        </div>
+
+        {{ THIS.hook('before_footer') | raw }}
+        {{ THIS.hook('footer') | raw }}
         {{ THIS.hook('before_body_end') | raw }}
     </body>
 </html>

@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
  * Class FCom_CatalogIndex_Indexer
@@ -12,25 +12,25 @@ class FCom_CatalogIndex_Indexer extends BClass
     protected static $_filterValues;
     protected static $_cnt_reindexed;
 
-    static public function indexProducts($products)
+    public function indexProducts($products)
     {
         if (empty($products)) {
             return;
         }
         /** @var FCom_PushServer_Model_Client $pushClient */
-        $pushClient = FCom_PushServer_Model_Client::sessionClient();
+        $pushClient = $this->FCom_PushServer_Model_Client->sessionClient();
         if ($products === true) {
             $i = 0;
             //$start = 0;
             $t = time();
             do {
-                $products = FCom_Catalog_Model_Product::i()->orm('p')
+                $products = $this->FCom_Catalog_Model_Product->orm('p')
                     ->left_outer_join('FCom_CatalogIndex_Model_Doc', ['idx.id', '=', 'p.id'], 'idx')
                     ->where_complex(['OR' => ['idx.id is null', 'idx.flag_reindex=1']])
                     ->limit(static::$_maxChunkSize)
                     //->offset($start)
                     ->find_many();
-                static::indexProducts($products);
+                $this->indexProducts($products);
                 echo 'DONE CHUNK ' . ($i++) . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true)
                     . ' - ' . (time() - $t) . "s\n";
                 $t = time();
@@ -42,7 +42,7 @@ class FCom_CatalogIndex_Indexer extends BClass
         if (sizeof($products) > static::$_maxChunkSize) {
             $chunks = array_chunk($products, static::$_maxChunkSize);
             foreach ($chunks as $i => $chunk) {
-                static::indexProducts($chunk);
+                $this->indexProducts($chunk);
                 echo 'DONE CHUNK ' . $i . ': ' . memory_get_usage(true) . ' / ' . memory_get_peak_usage(true) . "\n";
             }
             return;
@@ -59,7 +59,7 @@ class FCom_CatalogIndex_Indexer extends BClass
             }
         }
         if ($loadIds) {
-            $loadProducts = FCom_Catalog_Model_Product::i()->orm('p')->where_in('p.id', $loadIds)->find_many_assoc();
+            $loadProducts = $this->FCom_Catalog_Model_Product->orm('p')->where_in('p.id', $loadIds)->find_many_assoc();
             foreach ($loadIds as $i => $p) {
                 if (!empty($loadProducts[$p])) {
                     $products[$i] = $loadProducts[$p];
@@ -69,7 +69,7 @@ class FCom_CatalogIndex_Indexer extends BClass
             }
         }
         if ($pIds) {
-            static::indexDropDocs($pIds);
+            $this->indexDropDocs($pIds);
         }
         // TODO: Improve filtering out disabled products
         foreach ($products as $i => $p) {
@@ -79,28 +79,29 @@ class FCom_CatalogIndex_Indexer extends BClass
         }
 
         //TODO: for less memory usage chunk the products data
-        static::_indexFetchProductsData($products);
+        $this->_indexFetchProductsData($products);
+        $this->_indexFetchVariantsData($products);
         static::$_cnt_reindexed += count($products);
         unset($products);
-        static::_indexSaveDocs();
-        static::_indexSaveFilterData();
-        static::_indexSaveSearchData();
-        static::indexCleanMemory();
+        $this->_indexSaveDocs();
+        $this->_indexSaveFilterData();
+        $this->_indexSaveSearchData();
+        $this->indexCleanMemory();
         $pushClient->send(['channel' => 'index', 'signal' => 'progress', 'reindexed' => static::$_cnt_reindexed]);
     }
 
-    static public function indexDropDocs($pIds)
+    public function indexDropDocs($pIds)
     {
         if ($pIds === true) {
-            return BDb::run("DELETE FROM " . FCom_CatalogIndex_Model_Doc::table());
+            return $this->BDb->run("DELETE FROM " . $this->FCom_CatalogIndex_Model_Doc->table());
         } else {
-            return FCom_CatalogIndex_Model_Doc::i()->delete_many(['id' => $pIds]);
+            return $this->FCom_CatalogIndex_Model_Doc->delete_many(['id' => $pIds]);
         }
     }
 
-    static protected function _indexFetchProductsData($products)
+    protected function _indexFetchProductsData($products)
     {
-        $fields = FCom_CatalogIndex_Model_Field::i()->getFields();
+        $fields = $this->FCom_CatalogIndex_Model_Field->getFields();
         static::$_indexData = [];
 
         foreach ($fields as $fName => $field) {
@@ -117,7 +118,7 @@ class FCom_CatalogIndex_Indexer extends BClass
                 }
                 break;
             case 'callback':
-                $fieldData = BUtil::call($source, [$products, $field], true);
+                $fieldData = $this->BUtil->call($source, [$products, $field], true);
                 foreach ($fieldData as $pId => $value) {
                     static::$_indexData[$pId][$fName] = $value;
                 }
@@ -128,12 +129,42 @@ class FCom_CatalogIndex_Indexer extends BClass
         }
     }
 
-    static protected function _indexSaveDocs()
+    protected function _indexFetchVariantsData($products)
     {
-        $docHlp = FCom_CatalogIndex_Model_Doc::i();
-        $sortHlp = FCom_CatalogIndex_Model_DocSort::i();
-        $now = BDb::now();
-        $sortFields = FCom_CatalogIndex_Model_Field::i()->getFields('sort');
+        if (!$this->BModuleRegistry->isLoaded('FCom_CatalogIndex')) {
+            return;
+        }
+        foreach ($products as $p) {
+            $pId = $p->id();
+            $vFields = $p->getData('variants_fields');
+            $variants = $p->getData('variants');
+            if ($variants) {
+                foreach ($variants as $variant) {
+                    $fValues = [];
+                    foreach ($variant['fields'] as $field => $value) {
+                        if (empty($fValues[$field])) {
+                            if (empty(static::$_indexData[$pId][$field])) {
+                                $fValues[$field] = [];
+                            } else {
+                                $fValues[$field] = (array)static::$_indexData[$pId][$field];
+                            }
+                        }
+                        $fValues[$field][] = $value;
+                    }
+                    foreach ($fValues as $field => $values) {
+                        static::$_indexData[$pId][$field] = array_unique($values);
+                    }
+                }
+            }
+        }
+    }
+
+    protected function _indexSaveDocs()
+    {
+        $docHlp = $this->FCom_CatalogIndex_Model_Doc;
+        $sortHlp = $this->FCom_CatalogIndex_Model_DocSort;
+        $now = $this->BDb->now();
+        $sortFields = $this->FCom_CatalogIndex_Model_Field->getFields('sort');
         $sortColumn = [];
         $sortJoin = [];
         foreach ($sortFields as $fName => $field) {
@@ -162,11 +193,11 @@ class FCom_CatalogIndex_Indexer extends BClass
         }
     }
 
-    static protected function _indexSaveFilterData()
+    protected function _indexSaveFilterData()
     {
-        $fieldValueHlp = FCom_CatalogIndex_Model_FieldValue::i();
-        $docValueHlp = FCom_CatalogIndex_Model_DocValue::i();
-        $filterFields = FCom_CatalogIndex_Model_Field::i()->getFields('filter');
+        $fieldValueHlp = $this->FCom_CatalogIndex_Model_FieldValue;
+        $docValueHlp = $this->FCom_CatalogIndex_Model_DocValue;
+        $filterFields = $this->FCom_CatalogIndex_Model_Field->getFields('filter');
         foreach (static::$_indexData as $pId => $pData) {
             foreach ($filterFields as $fName => $field) {
                 $fId = $field->id();
@@ -176,10 +207,10 @@ class FCom_CatalogIndex_Indexer extends BClass
                 }
                 foreach ((array)$value as $vKey => $v) {
                     $v1 = explode('==>', $v, 2);
-                    $vVal = BUtil::simplifyString(trim($v1[0]), '#[^a-z0-9/-]+#');
+                    $vVal = $this->BUtil->simplifyString(trim($v1[0]), '#[^a-z0-9/-]+#');
                     $vDisplay = !empty($v1[1]) ? trim($v1[1]) : $v1[0];
                     if (empty(static::$_filterValues[$fId][$vVal])) {
-                        $fieldValue = $fieldValueHlp->load(['field_id' => $fId, 'val' => $vVal]);
+                        $fieldValue = $fieldValueHlp->loadWhere(['field_id' => (int)$fId, 'val' => (string)$vVal]);
                         if (!$fieldValue) {
                             $fieldValue = $fieldValueHlp->create([
                                 'field_id' => $fId,
@@ -197,24 +228,24 @@ class FCom_CatalogIndex_Indexer extends BClass
     }
 
 
-    static protected function _retrieveTerms($string)
+    protected function _retrieveTerms($string)
     {
         $string = strtolower(strip_tags($string));
         $string = preg_replace('#[^a-z0-9 \t\n\r]#', '', $string);
         return preg_split('#[ \t\n\r]#', $string, null, PREG_SPLIT_NO_EMPTY);
     }
 
-    static protected function _indexSaveSearchData()
+    protected function _indexSaveSearchData()
     {
-        $termHlp = FCom_CatalogIndex_Model_Term::i();
-        $docTermHlp = FCom_CatalogIndex_Model_DocTerm::i();
+        $termHlp = $this->FCom_CatalogIndex_Model_Term;
+        $docTermHlp = $this->FCom_CatalogIndex_Model_DocTerm;
 
-        $searchFields = FCom_CatalogIndex_Model_Field::i()->getFields('search');
+        $searchFields = $this->FCom_CatalogIndex_Model_Field->getFields('search');
         $allTerms = [];
         foreach (static::$_indexData as $pId => $pData) {
             foreach ($searchFields as $fName => $field) {
                 $fId = $field->id();
-                $terms = static::_retrieveTerms($pData[$fName]);
+                $terms = $this->_retrieveTerms($pData[$fName]);
                 foreach ($terms as $i => $v) {
                     // index term per product only once
                     if (empty($allTerms[$v][$pId][$fId])) {
@@ -242,31 +273,31 @@ class FCom_CatalogIndex_Indexer extends BClass
         }
     }
 
-    static public function reindexField($field)
+    public function reindexField($field)
     {
         //TODO: implement 1 field reindexing for all affected products
     }
 
-    static public function reindexFieldValue($field, $value)
+    public function reindexFieldValue($field, $value)
     {
         //TODO: implement 1 field value reindexing
     }
 
-    static public function indexCleanMemory($all = false)
+    public function indexCleanMemory($all = false)
     {
         static::$_indexData = null;
         static::$_filterValues = null;
         gc_collect_cycles();
     }
 
-    static public function indexGC()
+    public function indexGC()
     {
-        $tFieldValue = FCom_CatalogIndex_Model_FieldValue::table();
-        $tDocValue = FCom_CatalogIndex_Model_DocValue::table();
-        $tTerm = FCom_CatalogIndex_Model_Term::table();
-        $tDocTerm = FCom_CatalogIndex_Model_DocTerm::table();
+        $tFieldValue = $this->FCom_CatalogIndex_Model_FieldValue->table();
+        $tDocValue = $this->FCom_CatalogIndex_Model_DocValue->table();
+        $tTerm = $this->FCom_CatalogIndex_Model_Term->table();
+        $tDocTerm = $this->FCom_CatalogIndex_Model_DocTerm->table();
 
-        BDb::run("
+        $this->BDb->run("
 DELETE FROM {$tFieldValue} WHERE id NOT IN (SELECT value_id FROM {$tDocValue});
 DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         ");
@@ -281,28 +312,28 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
      * @param array $options
      * @return array ['orm'=>$orm, 'facets'=>$facets]
      */
-    static public function searchProducts($search = null, $filters = null, $sort = null, $options = [])
+    public function searchProducts($search = null, $filters = null, $sort = null, $options = [])
     {
-        $config = BConfig::i()->get('modules/FCom_CatalogIndex');
+        $config = $this->BConfig->get('modules/FCom_CatalogIndex');
         if (is_null($filters)) {
-            $filters = FCom_CatalogIndex_Main::i()->parseUrl();
+            $filters = $this->FCom_CatalogIndex_Main->parseUrl();
         }
 
         // base products ORM object
-        $productsOrm = FCom_Catalog_Model_Product::i()->orm('p')
+        $productsOrm = $this->FCom_Catalog_Model_Product->orm('p')
             ->join('FCom_CatalogIndex_Model_Doc', ['d.id', '=', 'p.id'], 'd');
 
-        $req = BRequest::i();
+        $req = $this->BRequest;
         // apply term search
 
         if (is_null($search)) {
             $search = $req->get('q');
         }
         if ($search) {
-            $terms = static::_retrieveTerms($search);
+            $terms = $this->_retrieveTerms($search);
             //TODO: put weight for `position` in search relevance
-            $tDocTerm = $tDocTerm = FCom_CatalogIndex_Model_DocTerm::table();
-            $orm = FCom_CatalogIndex_Model_Term::i()->orm();
+            $tDocTerm = $tDocTerm = $this->FCom_CatalogIndex_Model_DocTerm->table();
+            $orm = $this->FCom_CatalogIndex_Model_Term->orm();
             //$orm->where_in('term', $terms);
             $orm->where_raw("term regexp '(" . join('|', $terms) . ")'");
             $termIds = $orm->find_many_assoc('term', 'id');
@@ -320,7 +351,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         $facets = [];
 
         // retrieve facet field information
-        $filterFields = BDb::many_as_array(FCom_CatalogIndex_Model_Field::i()->getFields('filter'));
+        $filterFields = $this->BDb->many_as_array($this->FCom_CatalogIndex_Model_Field->getFields('filter'));
         $filterFieldNamesById = [];
         foreach ($filterFields as $fName => $field) {
             $filterFieldNamesById[$field['id']] = $fName;
@@ -337,7 +368,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
         }
 
         // retrieve facet field values information
-        $filterValues = BDb::many_as_array(FCom_CatalogIndex_Model_FieldValue::i()->orm()
+        $filterValues = $this->BDb->many_as_array($this->FCom_CatalogIndex_Model_FieldValue->orm()
             ->where_in('field_id', array_keys($filterFieldNamesById))->find_many_assoc('id'));
         $filterValueIdsByVal = [];
         foreach ($filterValues as $vId => $v) {
@@ -358,8 +389,8 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
 
         // apply facet filters
         $facetFilters = [];
-        $tFieldValue = FCom_CatalogIndex_Model_FieldValue::table();
-        $tDocValue = FCom_CatalogIndex_Model_DocValue::table();
+        $tFieldValue = $this->FCom_CatalogIndex_Model_FieldValue->table();
+        $tDocValue = $this->FCom_CatalogIndex_Model_DocValue->table();
         foreach ($filterFields as $fName => $field) {
             $fReqValues = !empty($filters[$fName]) ? (array)$filters[$fName] : null;
             if (!empty($fReqValues)) { // request has filter by this field
@@ -396,6 +427,7 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
                 }
                 // 3. add filter condition to products ORM
                 $productsOrm->where($whereArr);
+
 
                 foreach ($fReqValues as $v) {
                     $v = strtolower($v);
@@ -484,8 +516,8 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             }
         }
 
-        if (BModuleRegistry::i()->isLoaded('FCom_CustomField')) {
-            FCom_CustomField_Main::i()->disable(true);
+        if ($this->BModuleRegistry->isLoaded('FCom_CustomField')) {
+            $this->FCom_CustomField_Main->disable(true);
         }
 
         // calculate facet value counts
@@ -570,14 +602,14 @@ DELETE FROM {$tTerm} WHERE id NOT IN (SELECT term_id FROM {$tDocTerm});
             }
         }
 
-        if (BModuleRegistry::i()->isLoaded('FCom_CustomField')) {
-            FCom_CustomField_Main::i()->disable(false);
+        if ($this->BModuleRegistry->isLoaded('FCom_CustomField')) {
+            $this->FCom_CustomField_Main->disable(false);
         }
 
         // format categories facet result
         foreach ($filterFields as $fName => $field) {
             if (empty($facets[$field['field_name']]['values'])) {
-                BDebug::debug('Empty values for facet field ' . $field['field_name']);
+                $this->BDebug->debug('Empty values for facet field ' . $field['field_name']);
                 continue;
             }
             ksort($facets[$field['field_name']]['values'], SORT_NATURAL | SORT_FLAG_CASE);

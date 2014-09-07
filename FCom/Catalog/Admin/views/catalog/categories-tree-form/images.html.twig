@@ -1,0 +1,45 @@
+{% set m = THIS.get('model') %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set resizeUrl = APP.instance('FCom_Core_Main').resizeUrl('--IMAGE--', {s:150, cache:0}) %}
+{% set fieldData = { model:m, config_id: 'category_images', resize_url: resizeUrl } %}
+{{ forms.button_add_image(fieldData, [
+    {field:'image_url', label:'Subcategory Image'|_ },
+    {field:'featured_image_url', label:'Featured Image'|_ },
+    {field:'nav_callout_image_url', label:'Navigation Callout Image'|_ }
+]) }}
+{{ THIS.view('core/medialib').set('config', {id: 'category_images', title: 'Category Image', type: 'category-images'}) | raw }}
+
+<script>
+    require(['backbone', 'underscore', 'jquery', 'fcom.admin'], function(Backbone, _, $) {
+        window.category_images_register = function(grid) {
+            grid.getGridSkeleton().Views.RowView.prototype._selectRow = function(ev) {
+                var selectedRows = grid.getSelectedRows();
+                var checked = $(ev.target).is(':checked');
+                $('.select-row').prop('checked', false);
+                $(ev.target).prop('checked', checked);
+                this.model.set('selected', checked);
+                selectedRows.reset();
+                if (checked) {
+                    selectedRows.add(this.model);
+                    $('.btn_category_images_add').removeClass('disabled');
+                } else {
+                    $('.btn_category_images_add').addClass('disabled');
+                }
+                ev.stopPropagation();
+                ev.preventDefault();
+
+                return;
+            }
+            grid.build();
+            FCom.Admin.buttonAddImage({
+                grid: grid,
+                text_add_image: '{{ "Add Image..."|_ }}',
+                text_change_image: '{{ "Add Image..."|_ }}',
+                text_modal_add: '{{ "Add"|_ }}',
+                text_modal_change: '{{ "Change"|_ }}',
+                config_id: 'category_images',
+                resize_url: '{{ resizeUrl }}'
+            });
+        }
+    })
+</script>

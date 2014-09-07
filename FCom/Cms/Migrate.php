@@ -1,12 +1,12 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Cms_Migrate extends BClass
 {
     public function install__0_1_3()
     {
 /*
-        $tNav = FCom_Cms_Model_Nav::table();
-        BDb::run("
+        $tNav = $this->FCom_Cms_Model_Nav->table();
+        $this->BDb->run("
             CREATE TABLE IF NOT EXISTS {$tNav} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
             `parent_id` int(10) unsigned DEFAULT NULL,
@@ -27,8 +27,8 @@ class FCom_Cms_Migrate extends BClass
             CONSTRAINT `FK_{$tNav}_parent` FOREIGN KEY (`parent_id`) REFERENCES {$tNav} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
-        $tPage = FCom_Cms_Model_Page::table();
-        BDb::run("
+        $tPage = $this->FCom_Cms_Model_Page->table();
+        $this->BDb->run("
             CREATE TABLE IF NOT EXISTS {$tPage} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
             `handle` varchar(255)  NOT NULL,
@@ -46,8 +46,8 @@ class FCom_Cms_Migrate extends BClass
 
         ");
 
-        $tPageHistory = FCom_Cms_Model_PageHistory::table();
-        BDb::run("
+        $tPageHistory = $this->FCom_Cms_Model_PageHistory->table();
+        $this->BDb->run("
             CREATE TABLE IF NOT EXISTS {$tPageHistory} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
             `page_id` int(10) unsigned NOT NULL,
@@ -61,8 +61,8 @@ class FCom_Cms_Migrate extends BClass
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
 */
-        $tBlock = FCom_Cms_Model_Block::table();
-        BDb::run("
+        $tBlock = $this->FCom_Cms_Model_Block->table();
+        $this->BDb->run("
             CREATE TABLE IF NOT EXISTS {$tBlock} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
             `handle` varchar(100)  NOT NULL,
@@ -86,9 +86,9 @@ class FCom_Cms_Migrate extends BClass
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
 
-        $tBlock = FCom_Cms_Model_Block::table();
-        $tBlockHistory = FCom_Cms_Model_BlockHistory::table();
-        BDb::run("
+        $tBlock = $this->FCom_Cms_Model_Block->table();
+        $tBlockHistory = $this->FCom_Cms_Model_BlockHistory->table();
+        $this->BDb->run("
             CREATE TABLE IF NOT EXISTS {$tBlockHistory} (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
             `block_id` int(10) unsigned NOT NULL,
@@ -103,10 +103,10 @@ class FCom_Cms_Migrate extends BClass
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
         ");
 
-        $tForm = FCom_Cms_Model_Form::table();
-        $tFormData = FCom_Cms_Model_FormData::table();
+        $tForm = $this->FCom_Cms_Model_Form->table();
+        $tFormData = $this->FCom_Cms_Model_FormData->table();
 
-        BDb::ddlTableDef($tForm, [
+        $this->BDb->ddlTableDef($tForm, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'form_name' => 'varchar(100)',
@@ -122,7 +122,7 @@ class FCom_Cms_Migrate extends BClass
             ],
         ]);
 
-        BDb::ddlTableDef($tFormData, [
+        $this->BDb->ddlTableDef($tFormData, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'form_id' => 'int unsigned not null',
@@ -141,12 +141,12 @@ class FCom_Cms_Migrate extends BClass
             ],
         ]);
 
-        //BDb::run("REPLACE INTO {$tNav} (id,id_path) VALUES (1,1)");
+        //$this->BDb->run("REPLACE INTO {$tNav} (id,id_path) VALUES (1,1)");
     }
 
     public function upgrade__0_1_0__0_1_1()
     {
-        BDb::ddlTableDef(FCom_Cms_Model_Block::table(), [
+        $this->BDb->ddlTableDef($this->FCom_Cms_Model_Block->table(), [
             'COLUMNS' => [
                 'renderer' => 'varchar(100) null after content',
                 'page_enabled' => 'TINYINT DEFAULT 0 NOT NULL',
@@ -163,13 +163,13 @@ class FCom_Cms_Migrate extends BClass
             ],
         ]);
         /*
-        BDb::ddlTableDef(FCom_Cms_Model_Nav::table(), array(
+        $this->BDb->ddlTableDef($this->FCom_Cms_Model_Nav->table(), array(
             'COLUMNS' => array(
                 'contents' => 'RENAME content text null',
                 'renderer' => 'varchar(100) null after content',
             ),
         ));
-        BDb::ddlTableDef(FCom_Cms_Model_Page::table(), array(
+        $this->BDb->ddlTableDef($this->FCom_Cms_Model_Page->table(), array(
             'COLUMNS' => array(
                 'renderer' => 'varchar(100) null after content',
             ),
@@ -180,7 +180,7 @@ class FCom_Cms_Migrate extends BClass
         */
 
 /*
-        $homePage = FCom_Cms_Model_Page::i()->create(array(
+        $homePage = $this->FCom_Cms_Model_Page->create(array(
             'handle' => 'home',
             'title' => 'Home Page',
             'content' => file_get_contents(__DIR__.'/Frontend/views/_default/home.twig.html'),
@@ -190,8 +190,8 @@ class FCom_Cms_Migrate extends BClass
 
     public function upgrade__0_1_1__0_1_2()
     {
-        $table = FCom_Cms_Model_Block::table();
-        BDb::ddlTableDef($table, [
+        $table = $this->FCom_Cms_Model_Block->table();
+        $this->BDb->ddlTableDef($table, [
             'COLUMNS' => [
                   'create_dt'      => 'RENAME create_at datetime DEFAULT NULL',
                   'update_dt'      => 'RENAME update_at datetime DEFAULT NULL',
@@ -201,10 +201,10 @@ class FCom_Cms_Migrate extends BClass
 
     public function upgrade__0_1_2__0_1_3()
     {
-        $tForm = FCom_Cms_Model_Form::table();
-        $tFormData = FCom_Cms_Model_FormData::table();
+        $tForm = $this->FCom_Cms_Model_Form->table();
+        $tFormData = $this->FCom_Cms_Model_FormData->table();
 
-        BDb::ddlTableDef($tForm, [
+        $this->BDb->ddlTableDef($tForm, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'form_name' => 'varchar(100)',
@@ -220,7 +220,7 @@ class FCom_Cms_Migrate extends BClass
             ],
         ]);
 
-        BDb::ddlTableDef($tFormData, [
+        $this->BDb->ddlTableDef($tFormData, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'form_id' => 'int unsigned not null',
@@ -238,6 +238,17 @@ class FCom_Cms_Migrate extends BClass
             ],
             'CONSTRAINTS' => [
                 "FK_{$tFormData}_form" => "FOREIGN KEY (form_id) REFERENCES {$tForm} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            ],
+        ]);
+    }
+
+    public function upgrade__0_1_3__0_1_4()
+    {
+        $tBlock = $this->FCom_Cms_Model_Block->table();
+        $this->BDb->ddlTableDef($tBlock, [
+            'COLUMNS' => [
+                'form_enable' => 'tinyint not null default 0',
+                'form_fields' => 'text default null',
             ],
         ]);
     }

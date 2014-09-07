@@ -1,43 +1,43 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Catalog_ApiServer_V1_Product extends FCom_ApiServer_Controller_Abstract
 {
     public function action_index()
     {
-        $id = BRequest::i()->param('id');
-        $len = BRequest::i()->get('len');
+        $id = $this->BRequest->param('id');
+        $len = $this->BRequest->get('len');
         if (!$len) {
             $len = 10;
         }
-        $start = BRequest::i()->get('start');
+        $start = $this->BRequest->get('start');
         if (!$start) {
             $start = 0;
         }
 
         if ($id) {
-            $products[] = FCom_Catalog_Model_Product::i()->load($id);
+            $products[] = $this->FCom_Catalog_Model_Product->load($id);
         } else {
-            $products = FCom_Catalog_Model_Product::i()->orm()->limit($len, $start)->find_many();
+            $products = $this->FCom_Catalog_Model_Product->orm()->limit($len, $start)->find_many();
         }
         if (empty($products)) {
             $this->ok();
         }
-        $result = FCom_Catalog_Model_Product::i()->prepareApiData($products, true);
+        $result = $this->FCom_Catalog_Model_Product->prepareApiData($products, true);
         $this->ok($result);
     }
 
     public function action_index__POST()
     {
-        $post = BUtil::fromJson(BRequest::i()->rawPost());
+        $post = $this->BUtil->fromJson($this->BRequest->rawPost());
 
         if (empty($post['product_name'])) {
             $this->badRequest("Product name is required");
         }
 
-        $data = FCom_Catalog_Model_Product::i()->formatApiPost($post);
+        $data = $this->FCom_Catalog_Model_Product->formatApiPost($post);
         $product = false;
         try {
-            $product = FCom_Catalog_Model_Product::i()->orm()->create($data)->save();
+            $product = $this->FCom_Catalog_Model_Product->create($data)->save();
         } catch (Exception $e) {
             if (23000 == $e->getCode()) {
                 $this->internalError("Duplicate product name");
@@ -54,7 +54,7 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_ApiServer_Controller_Abstra
                 $post['categories_id'] = [$post['categories_id']];
             }
             foreach ($post['categories_id'] as $catId) {
-                FCom_Catalog_Model_CategoryProduct::i()->create([
+                $this->FCom_Catalog_Model_CategoryProduct->create([
                     'category_id' => $catId,
                     'product_id' => $product->id
                 ])->save();
@@ -66,16 +66,16 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_ApiServer_Controller_Abstra
 
     public function action_index__PUT()
     {
-        $id = BRequest::i()->param('id');
-        $post = BUtil::fromJson(BRequest::i()->rawPost());
+        $id = $this->BRequest->param('id');
+        $post = $this->BUtil->fromJson($this->BRequest->rawPost());
 
         if (empty($id)) {
             $this->badRequest("Product id is required");
         }
 
-        $data = FCom_Catalog_Model_Product::i()->formatApiPost($post);
+        $data = $this->FCom_Catalog_Model_Product->formatApiPost($post);
 
-        $product = FCom_Catalog_Model_Product::i()->load($id);
+        $product = $this->FCom_Catalog_Model_Product->load($id);
         if (!$product) {
             $this->notFound("Product id #{$id} not found");
         }
@@ -94,13 +94,13 @@ class FCom_Catalog_ApiServer_V1_Product extends FCom_ApiServer_Controller_Abstra
 
     public function action_index__DELETE()
     {
-        $id = BRequest::i()->param('id');
+        $id = $this->BRequest->param('id');
 
         if (empty($id)) {
             $this->notFound("Product id is required");
         }
 
-        $product = FCom_Catalog_Model_Product::i()->load($id);
+        $product = $this->FCom_Catalog_Model_Product->load($id);
         if (!$product) {
             $this->notFound("Product id #{$id} not found");
         }

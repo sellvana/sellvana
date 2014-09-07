@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
  * Created by pp
@@ -14,9 +14,9 @@ class FCom_ApiServer_Controller_V1_Import
     public function action_index()
     {
         /** @var FCom_Core_ImportExport $exporter */
-        $exporter = FCom_Core_ImportExport::i();
+        $exporter = $this->FCom_Core_ImportExport;
         $fromFile = fopen('php://input', 'r');
-        $exporter->import($fromFile);
+        $exporter->importFile($fromFile);
         $this->created(['Done']);
     }
 }

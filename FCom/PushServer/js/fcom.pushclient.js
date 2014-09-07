@@ -29,15 +29,19 @@ define(['jquery', 'underscore', 'exports', 'fcom.core'], function ($, _, exports
     }
 
     function connect() {
-        var data = JSON.stringify({ window_name: state.window_name, conn_id: state.conn_id++, messages: messages });
+        if (typeof FCom.pushserver_url != 'undefined') {
+            var data = { window_name: state.window_name, conn_id: state.conn_id++, messages: messages };
 
-        $.post(FCom.pushserver_url, data, receive);
+            $.post(FCom.pushserver_url, data, receive, 'json');
 
-        messages = []; // skip checking for received messages
-        //messages = _.filter(messages, function(qmsg) { return !_.isEmpty(qmsg.seq); });
+            messages = []; // skip checking for received messages
+            //messages = _.filter(messages, function(qmsg) { return !_.isEmpty(qmsg.seq); });
 
-        state.conn_cnt++;
-        console.log('send', data);
+            state.conn_cnt++;
+            console.log('send', data);
+        } else {
+            console.log('need define Fcom.pushserver_url to send PushServer');
+        }
     }
 
     function receive(response, status, xhr) {

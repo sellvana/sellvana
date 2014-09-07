@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
  * @property mixed product_id
@@ -18,9 +18,14 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
         return $this->product;
     }
 
-    public function rowTotal()
+    public function rowTotal($variantId = null)
     {
-        return $this->price * $this->qty;
+        $variants = $this->getData('variants');
+        if ($variants && !is_null($variantId)) {
+            $variant = $variants[$variantId];
+            return $variant['variant_price'] * $variant['variant_qty'];
+        }
+        return $this->get('row_total') ? $this->get('row_total') : $this->get('price') * $this->get('qty');
     }
 
     public function isGroupAble()
@@ -51,19 +56,10 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
         return $this->qty;
     }
 
-    public function onBeforeSave()
-    {
-        if (!parent::onBeforeSave()) return false;
-        if (!$this->create_at) $this->create_at = BDb::now();
-        $this->update_at = BDb::now();
-        $this->data_serialized = BUtil::toJson($this->data);
-        return true;
-    }
-
     public function onAfterLoad()
     {
         parent::onAfterLoad();
-        $this->data = !empty($this->data_serialized) ? BUtil::fromJson($this->data_serialized) : [];
+        $this->data = !empty($this->data_serialized) ? $this->BUtil->fromJson($this->data_serialized) : [];
     }
 }
 

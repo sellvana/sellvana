@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
@@ -15,6 +15,6 @@ class FCom_Frontend_Controller extends FCom_Frontend_Controller_Abstract
     public function action_noroute()
     {
         $this->layout('404');
-        BResponse::i()->status(404);
+        $this->BResponse->status(404);
     }
 }

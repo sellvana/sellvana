@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 class FCom_IndexTank_Tests_Model_ProductFieldTest extends FCom_Test_DatabaseTestCase
 {
     public function getDataSet()
@@ -17,7 +18,7 @@ class FCom_IndexTank_Tests_Model_ProductFieldTest extends FCom_Test_DatabaseTest
             'source_value'      => "description",
             'search'            => 1
         ];
-        FCom_IndexTank_Model_ProductField::orm()->create($data)->save();
+        $this->FCom_IndexTank_Model_ProductField->create($data)->save();
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_indextank_product_field'), "Insert failed");
     }
@@ -26,7 +27,7 @@ class FCom_IndexTank_Tests_Model_ProductFieldTest extends FCom_Test_DatabaseTest
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_indextank_product_field'), "Pre-Condition");
 
-        $list = FCom_IndexTank_Model_ProductField::i()->getList();
+        $list = $this->FCom_IndexTank_Model_ProductField->getList();
         $this->assertTrue(is_array($list));
         $this->assertEquals(2, count($list));
     }
@@ -35,7 +36,7 @@ class FCom_IndexTank_Tests_Model_ProductFieldTest extends FCom_Test_DatabaseTest
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_indextank_product_field'), "Pre-Condition");
 
-        $list = FCom_IndexTank_Model_ProductField::i()->getFacetsList();
+        $list = $this->FCom_IndexTank_Model_ProductField->getFacetsList();
         $this->assertEquals(1, count($list));
     }
 
@@ -43,7 +44,7 @@ class FCom_IndexTank_Tests_Model_ProductFieldTest extends FCom_Test_DatabaseTest
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_indextank_product_field'), "Pre-Condition");
 
-        $list = FCom_IndexTank_Model_ProductField::i()->getSearchList();
+        $list = $this->FCom_IndexTank_Model_ProductField->getSearchList();
         $this->assertEquals(1, count($list));
     }
 
@@ -51,7 +52,7 @@ class FCom_IndexTank_Tests_Model_ProductFieldTest extends FCom_Test_DatabaseTest
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_indextank_product_field'), "Pre-Condition");
 
-        $list = FCom_IndexTank_Model_ProductField::i()->getVariablesList();
+        $list = $this->FCom_IndexTank_Model_ProductField->getVariablesList();
         $this->assertEquals(1, count($list));
     }
 
@@ -59,7 +60,7 @@ class FCom_IndexTank_Tests_Model_ProductFieldTest extends FCom_Test_DatabaseTest
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_indextank_product_field'), "Pre-Condition");
 
-        $list = FCom_IndexTank_Model_ProductField::i()->getInclusiveList();
+        $list = $this->FCom_IndexTank_Model_ProductField->getInclusiveList();
         $this->assertEquals(1, count($list));
     }
 
@@ -67,7 +68,7 @@ class FCom_IndexTank_Tests_Model_ProductFieldTest extends FCom_Test_DatabaseTest
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_indextank_product_field'), "Pre-Condition");
 
-        $field = FCom_IndexTank_Model_ProductField::load(1);
+        $field = $this->FCom_IndexTank_Model_ProductField->load(1);
         $field->delete();
 
         $this->assertEquals(1, $this->getConnection()->getRowCount('fcom_indextank_product_field'), "Remove failed");
@@ -77,11 +78,11 @@ class FCom_IndexTank_Tests_Model_ProductFieldTest extends FCom_Test_DatabaseTest
     {
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_indextank_product_field'), "Pre-Condition");
 
-        $field = FCom_IndexTank_Model_ProductField::load(1);
+        $field = $this->FCom_IndexTank_Model_ProductField->load(1);
         $this->assertEquals(0, $field->facets, "Load failed");
         $field->facets = 1;
         $field->save();
-        $field = FCom_IndexTank_Model_ProductField::load(1);
+        $field = $this->FCom_IndexTank_Model_ProductField->load(1);
         $this->assertEquals(1, $field->facets, "Update failed");
     }
 }

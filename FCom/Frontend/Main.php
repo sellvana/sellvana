@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Frontend_Main extends BClass
 {
@@ -7,9 +7,11 @@ class FCom_Frontend_Main extends BClass
     public function getLayout()
     {
         if (empty($this->_layout)) {
-            $this->_layout = BLayout::i(true);
-
-            $modules = BModuleRegistry::i()->getAllModules();
+#echo "<pre>"; print_r($this->BLayout->view('root')); echo "</pre>";
+            //TODO: permanent solution to Twig namespaces conflict between Frontend and Admin areas
+            $this->BEvents->off('BLayout::addAllViewsDir', 'FCom_LibTwig_Main.onLayoutAddAllViews');
+            $this->_layout = $this->BLayout->i(true);
+            $modules = $this->BModuleRegistry->getAllModules();
             foreach ($modules as $mod) {
                 $autoUse = !empty($mod->auto_use) ? array_flip((array)$mod->auto_use) : [];
                 $frontendAutoUse = !empty($mod->areas['FCom_Frontend']['auto_use'])
@@ -19,25 +21,26 @@ class FCom_Frontend_Main extends BClass
                     continue;
                 }
                 if (is_dir($mod->root_dir . '/views')) {
-                    $this->_layout->addAllViewsDir($mod->root_dir . '/views');
+                    $this->_layout->addAllViewsDir($mod->root_dir . '/views', '', $mod);
                 }
                 if (is_dir($mod->root_dir . '/Frontend/views')) {
-                    $this->_layout->addAllViewsDir($mod->root_dir . '/Frontend/views');
+                    $this->_layout->addAllViewsDir($mod->root_dir . '/Frontend/views', '', $mod);
                 }
             }
             $this->_layout->collectAllViewsFiles('FCom_Frontend');
         }
+#echo "<pre>"; print_r($this->BLayout->view('root')->param()); exit;
         return $this->_layout;
     }
 
-    public static function adminHref($url = '')
+    public function adminHref($url = '')
     {
-        return BApp::adminHref($url);
+        return $this->BApp->adminHref($url);
     }
 
-    public static function href($url = '')
+    public function href($url = '')
     {
-        return BApp::frontendHref($url);
+        return $this->BApp->frontendHref($url);
     }
 }
 

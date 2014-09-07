@@ -1,12 +1,12 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_MultiSite_Migrate extends BClass
 {
     public function install__0_1_1()
     {
-        $tSite = FCom_MultiSite_Model_Site::table();
+        $tSite = $this->FCom_MultiSite_Model_Site->table();
 
-        BDb::ddlTableDef($tSite, [
+        $this->BDb->ddlTableDef($tSite, [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'name' => 'varchar(100) not null',
@@ -29,8 +29,8 @@ class FCom_MultiSite_Migrate extends BClass
     }
     public function upgrade__0_1_0__0_1_1()
     {
-        $table = FCom_MultiSite_Model_Site::table();
-        BDb::ddlTableDef($table, [
+        $table = $this->FCom_MultiSite_Model_Site->table();
+        $this->BDb->ddlTableDef($table, [
             'COLUMNS' => [
                   'create_dt'      => 'RENAME create_at datetime NOT NULL',
                   'update_dt'      => 'RENAME update_at datetime NOT NULL',

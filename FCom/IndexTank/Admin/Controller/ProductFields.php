@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -11,17 +11,17 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
     public function gridConfig()
     {
         try {
-            $status = FCom_IndexTank_Index_Product::i()->status();
-            BLayout::i()->view('indextank/product_fields')->set('status', $status);
+            $status = $this->FCom_IndexTank_Index_Product->status();
+            $this->BLayout->view('indextank/product_fields')->set('status', $status);
         } catch (Exception $e) {
-            BLayout::i()->view('indextank/product_fields')->set('status', false);
+            $this->BLayout->view('indextank/product_fields')->set('status', false);
         }
 
-        $fld = FCom_IndexTank_Model_ProductField::i();
+        $fld = $this->FCom_IndexTank_Model_ProductField;
         $config = parent::gridConfig();
         $config['grid']['columns'] += [
             'field_nice_name' => ['label' => 'Name', 'editable' => true, 'formatter' => 'showlink', 'formatoptions' => [
-                'baseLinkUrl' => BApp::href('indextank/product_fields/form'), 'idName' => 'id',
+                'baseLinkUrl' => $this->BApp->href('indextank/product_fields/form'), 'idName' => 'id',
             ]],
             'search' => ['label' => 'Search', 'options' => $fld->fieldOptions('search')],
             'facets' => ['label' => 'Facets', 'options' => $fld->fieldOptions('facets')],
@@ -50,7 +50,7 @@ class FCom_IndexTank_Admin_Controller_ProductFields extends FCom_Admin_Controlle
         $model = $args['model'];
         if ($model) {
             if ($model->scoring && ($model->var_number == -1 || !isset($model->var_number))) {
-                $maxVarField = FCom_IndexTank_Model_ProductField::orm()->select_expr("max(var_number) as max_var")->find_one();
+                $maxVarField = $this->FCom_IndexTank_Model_ProductField->orm()->select_expr("max(var_number) as max_var")->find_one();
                 $model->var_number = $maxVarField->max_var + 1;
                 $model->save();
             } elseif (0 == $model->scoring && $model->var_number >= 0) {

@@ -1,6 +1,8 @@
 {% set user = APP.instance("FCom_Admin_Model_User").sessionUser() %}
 {% set notifications = THIS.getNotifications() %}
 {% set recentActivity = THIS.getRecentActivity() %}
+{% set locales = THIS.getLocales() %}
+{% set curLocale = THIS.getCurrentLocale() %}
 {% set storeName = CONFIG.get("modules/FCom_Core/store_name") %}
 
 {% set adminChatsEnabled = MODULES.isLoaded('FCom_AdminChat') %}
@@ -18,6 +20,26 @@
       -->
     </a>
     <ul class="nav">
+      {% if locales %}
+        <li class="dropdown widget">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="flag flag-{{ curLocale.flag }}"></i>
+            <div class="label">{{ curLocale.title }}</div>
+          </a>
+          <ul class="dropdown-menu" >
+            {% for item in locales %}
+              <li>
+                <a href="{{ item.href }}" title="{{ item.title }}">
+                  <div class="widget-body">
+                    <div class="pull-left icon"><i class="flag flag-{{ item.flag }}"></i></div>
+                    <div class="pull-left text">{{ item.title }}</div>
+                  </div>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </li>
+      {% endif %}
 
       {% if recentActivity %}
         <li class="dropdown widget">
@@ -98,7 +120,7 @@
           </li>
           <li class="divider"></li>
           <li>
-            <a href="{{ APP.href("logout") }}">{{ "Sign out" |_ }}</a>
+            <a href="{{ APP.href("logout") ~ '?X-CSRF-TOKEN=' ~ SESSION.csrfToken() }}">{{ "Sign out" |_ }}</a>
           </li>
         </ul>
       </li>

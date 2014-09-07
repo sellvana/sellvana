@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Frontend_View_Breadcrumbs extends BView
 {
@@ -13,7 +13,7 @@ class FCom_Frontend_View_Breadcrumbs extends BView
                     foreach ($asc as $a) {
                         if (!$a->node_name) continue;
                         $crumbs[] = [
-                            'href' => $a->url_href ? BApp::baseUrl() . trim('/' . $a->url_href, '/') : null,
+                            'href' => $a->url_href ? $this->BApp->baseUrl() . trim('/' . $a->url_href, '/') : null,
                             'title' => $a->node_name,
                             'label' => $a->node_name,
                         ];
@@ -25,8 +25,8 @@ class FCom_Frontend_View_Breadcrumbs extends BView
                 foreach ($crumbs as $i => &$c) {
                     if ($c == 'home') {
                         $url = $this->get('home_url');
-                        if (!BUtil::isUrlFull($url)) {
-                            $url = BApp::href($url);
+                        if (!$this->BUtil->isUrlFull($url)) {
+                            $url = $this->BApp->href($url);
                         }
                         $c = ['href' => $url, 'label' => 'Home', 'li_class' => 'home'];
                     }

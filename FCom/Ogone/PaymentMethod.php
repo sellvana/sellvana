@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Ogone_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 {
@@ -9,7 +9,7 @@ class FCom_Ogone_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 
     public function getCheckoutFormView()
     {
-        return BLayout::i()->view('ogone/form');
+        return $this->BLayout->view('ogone/form');
     }
 
     public function payOnCheckout()

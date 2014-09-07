@@ -1,81 +1,90 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
-    public function authenticate($args = [])
-    {
-        return FCom_Customer_Model_Customer::i()->isLoggedIn() || BRequest::i()->rawPath() == '/login';
-    }
-
-
     public function action_index()
     {
-        $layout = BLayout::i();
-        $layout->view('breadcrumbs')->crumbs = ['home', ['label' => 'Wishlist', 'active' => true]];
-        $wishlist = FCom_Wishlist_Model_Wishlist::i()->sessionWishlist();
-        $layout->view('wishlist')->wishlist = $wishlist;
+        if (!$this->FCom_Customer_Model_Customer->isLoggedIn()) {
+            $this->forward('unauthenticated');
+            return;
+        }
+        $this->BResponse->nocache();
+        $layout = $this->BLayout;
         $this->layout('/wishlist');
+        $layout->view('breadcrumbs')->crumbs = ['home', ['label' => 'Wishlist', 'active' => true]];
+        $wishlist = $this->FCom_Wishlist_Model_Wishlist->sessionWishlist();
+        $layout->view('wishlist')->wishlist = $wishlist;
     }
 
     public function action_index__POST()
     {
-        $wishlistHref = BApp::href('wishlist');
-        $post = BRequest::i()->post();
-        $wishlist = FCom_Wishlist_Model_Wishlist::i()->sessionWishlist();
-        if (BRequest::i()->xhr()) {
+        $wishlistHref = $this->BApp->href('wishlist');
+        $post = $this->BRequest->post();
+        $wishlist = $this->FCom_Wishlist_Model_Wishlist->sessionWishlist(true);
+        if ($this->BRequest->xhr()) {
             $result = [];
+            $p = $this->FCom_Catalog_Model_Product->load($post['id']);
+            if (!$p) {
+                $this->BResponse->json(['title' => "Incorrect product id"]);
+                return;
+            }
             switch ($post['action']) {
             case 'add':
-                $p = FCom_Catalog_Model_Product::i()->load($post['id']);
-                if (!$p) {
-                    BResponse::i()->json(['title' => "Incorrect product id"]);
-                    return;
-                }
                 $wishlist->addItem($p->id());
+                $this->BEvents->fire('FCom_Wishlist_Frontend_Controller::action_index:after_add', ['model'=>$p]);
                 $result = [
+                    'success' => true,
                     'title' => 'Added to wishlist',
                     'html' => '<img src="' . $p->thumbUrl(35, 35) . '" width="35" height="35" style="float:left"/> ' . htmlspecialchars($p->product_name)
                         . '<br><br><a href="' . $wishlistHref . '" class="button">Go to wishlist</a>'
                 ];
                 break;
+            case 'remove':
+                $wishlist->removeProduct($p->id());
+                $result = [
+                    'success' => true,
+                    'title' => 'Removed from wishlist',
+                    'html' => '<img src="' . $p->thumbUrl(35, 35) . '" width="35" height="35" style="float:left"/> ' . htmlspecialchars($p->product_name)
+                        . '<br><br><a href="' . $wishlistHref . '" class="button">Go to wishlist</a>'
+                ];
+                break;
             }
-            BResponse::i()->json($result);
+            $this->BResponse->json($result);
         } else {
             if (!empty($post['remove'])) {
                 foreach ($post['remove'] as $id) {
                     $wishlist->removeItem($id);
                 }
             }
-            BResponse::i()->redirect($wishlistHref);
+            $this->BResponse->redirect($wishlistHref);
         }
     }
 
     public function action_add()
     {
-        $id = BRequest::i()->get('id');
-        $p = FCom_Catalog_Model_Product::i()->load($id);
+        if ($this->BRequest->csrf('referrer', 'GET')) {
+            $this->message('CSRF detected', 'error');
+            $this->BResponse->redirect('wishlist');
+            return;
+        }
+        $id = $this->BRequest->get('id');
+        $p = $this->FCom_Catalog_Model_Product->load($id);
         if (!$p) {
             $this->message('Invalid product', 'error');
         } else {
-            $wishlist = FCom_Wishlist_Model_Wishlist::i()->sessionWishlist();
-            if (!$wishlist) {
-                $this->forward('unauthenticated');
-                return;
-            }
-            $wishlist->addItem($id);
+            $this->FCom_Wishlist_Model_Wishlist->sessionWishlist(true)->addItem($id);
             $this->message('Product was added to wishlist');
         }
-        BResponse::i()->redirect('wishlist');
+        $this->BResponse->redirect('wishlist');
     }
 
-    public static function onAddToWishlist($args)
+    public function onAddToWishlist($args)
     {
         $product = $args['product'];
         if (!$product || !$product->id()) {
             return false;
         }
 
-        $wishlist = FCom_Wishlist_Model_Wishlist::i()->wishlist();
-        $wishlist->addItem($product->id());
+        $this->FCom_Wishlist_Model_Wishlist->wishlist(true)->addItem($product->id());
     }
 }

@@ -342,6 +342,62 @@ define(fcomAdminDeps, function ($) {
         return el;
     }
 
+    FCom.Admin.buttonAddImage = function (dataConfig) {
+        var $buttonAddImage = $('.btn_'+ dataConfig.config_id +'_add');
+        var textBtnAddImage = '.' + dataConfig.config_id + '_btn_add_image';
+        var textBtnRemoveImage = '.' + dataConfig.config_id + '_btn_remove_image';
+        $('body').on('click', textBtnAddImage,function() {
+            if (!$(this).hasClass('active')) {
+                $(textBtnAddImage).removeClass('active');
+                $(this).addClass('active');
+            }
+            dataConfig.grid.getGridView().clearSelectedRows();
+            $buttonAddImage.addClass('disabled');
+            if ($(this).hasClass('data-change')) {
+                $buttonAddImage.html(dataConfig.text_modal_change);
+            } else {
+                $buttonAddImage.html(dataConfig.text_modal_add);
+            }
+            $('#'+ dataConfig.config_id +'_modal').modal();
+
+        });
+        $('body').on('click',textBtnRemoveImage, function() {
+            processImage(this, {
+                text: dataConfig.text_add_image,
+                display: 'none',
+                imageTag: '',
+                path: ''
+            });
+            $(this).parents('.form-group').find(textBtnAddImage).removeClass('data-change');
+        });
+        function processImage(el, data) {
+            var parents = $(el).parents('.form-group');
+            parents.find('.'+ dataConfig.config_id +'_btn_add_text').html(data.text);
+            parents.find(textBtnRemoveImage).css('display', data.display);
+            parents.find('.'+ dataConfig.config_id +'_current_image').html(data.image_tag);
+            parents.find('.model_image_url').val(data.path);
+        }
+
+        $buttonAddImage.click(function() {
+            var row = dataConfig.grid.getSelectedRows().at(0);
+            var path = row.get("folder") + row.get("subfolder") + "/" + row.get("file_name");
+            var fullPath = dataConfig.resize_url.replace(/--IMAGE--/, path);
+            var imageTag = $('<img/>').attr('src', $('<div/>').html(fullPath).text());
+            dataConfig.grid.getGridView().clearSelectedRows();
+            $(textBtnAddImage).each(function () {
+                if ($(this).hasClass('active')) {
+                    processImage(this, {
+                        text: dataConfig.text_change_image,
+                        display: 'block',
+                        image_tag: imageTag,
+                        path: path
+                    });
+                    $(this).parents('.form-group').find(textBtnAddImage).addClass('data-change');
+                }
+            })
+        });
+    }
+
     FCom.Admin.ajaxCacheStorage = {}
     FCom.Admin.ajaxCache = function (url, callback) {
         if (callback === null) {
@@ -846,7 +902,7 @@ define(fcomAdminDeps, function ($) {
                         { name: 'links' }
                     ],*/
                     filebrowserBrowseUrl: FCom.base_href+'media',
-                    allowedContent: true,
+                    //allowedContent: true,
                     startupMode: 'wysiwyg'
                 });
 //
@@ -1229,7 +1285,7 @@ define(fcomAdminDeps, function ($) {
             CKEDITOR.config.startupMode = 'wysiwyg';//'source';
             CKEDITOR.config.filebrowserWindowHeight = 757;
             CKEDITOR.config.filebrowserWindowWidth = 912;
-            CKEDITOR.config.allowedContent = true;
+            //CKEDITOR.config.allowedContent = true;
 
             //CKEDITOR.config.filebrowserUploadUrl = '/';
         }

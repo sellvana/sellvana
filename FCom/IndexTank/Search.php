@@ -1,5 +1,4 @@
-<?php
-
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_IndexTank_Search extends BClass
 {
@@ -15,15 +14,15 @@ class FCom_IndexTank_Search extends BClass
      */
     public function search($q, $sc, $f, $v, $page, $resultPerPage)
     {
-        $r = BRequest::i()->get(); // GET request
+        $r = $this->BRequest->get(); // GET request
         $q = trim($q);
 
         if ($sc) {
-            FCom_IndexTank_Index_Product::i()->scoringBy($sc);
+            $this->FCom_IndexTank_Index_Product->scoringBy($sc);
         }
 
-        $productFields = FCom_IndexTank_Model_ProductField::i()->getList();
-        $inclusiveFields = FCom_IndexTank_Model_ProductField::i()->getInclusiveList();
+        $productFields = $this->FCom_IndexTank_Model_ProductField->getList();
+        $inclusiveFields = $this->FCom_IndexTank_Model_ProductField->getInclusiveList();
 
         $filtersSelected = [];
 
@@ -47,25 +46,25 @@ class FCom_IndexTank_Search extends BClass
                     $values = [$values];
                 }
                 if (isset($inclusiveFields[$key])) {
-                    FCom_IndexTank_Index_Product::i()->rollupBy($key);
+                    $this->FCom_IndexTank_Index_Product->rollupBy($key);
                 }
 
                 foreach ($values as $value) {
-                    FCom_IndexTank_Index_Product::i()->filterBy($key, $value);
+                    $this->FCom_IndexTank_Index_Product->filterBy($key, $value);
                 }
                 $filtersSelected[$key] = $values;
             }
         }
 
         if ($v) {
-            $variablesFields = FCom_IndexTank_Model_ProductField::i()->getVariablesList();
+            $variablesFields = $this->FCom_IndexTank_Model_ProductField->getVariablesList();
             foreach ($v as $key => $values) {
                 if (!is_array($values)) {
                     $values = [$values];
                 }
                 if (in_array($key, $variablesFields)) {
                     if ($values['from'] < $values['to']) {
-                        FCom_IndexTank_Index_Product::i()->filterRange($variablesFields[$key]->var_number, $values['from'], $values['to']);
+                        $this->FCom_IndexTank_Index_Product->filterRange($variablesFields[$key]->var_number, $values['from'], $values['to']);
                     }
                 }
             }
@@ -79,16 +78,16 @@ class FCom_IndexTank_Search extends BClass
         }
         $start = ($page - 1) * $resultPerPage;
 
-        $productsORM = FCom_IndexTank_Index_Product::i()->search($q, $start, $resultPerPage);
-        $facets = FCom_IndexTank_Index_Product::i()->getFacets();
+        $productsORM = $this->FCom_IndexTank_Index_Product->search($q, $start, $resultPerPage);
+        $facets = $this->FCom_IndexTank_Index_Product->getFacets();
 
 
-        $productsData = FCom_IndexTank_Index_Product::i()->paginate($productsORM, $r,
-                ['ps' => 25, 'c' => FCom_IndexTank_Index_Product::i()->totalFound()]);
+        $productsData = $this->FCom_IndexTank_Index_Product->paginate($productsORM, $r,
+                ['ps' => 25, 'c' => $this->FCom_IndexTank_Index_Product->totalFound()]);
 
         //get all facets exclude categories
-        $facetsData = FCom_IndexTank_Index_Product::i()->collectFacets($facets);
-        $categoriesData = FCom_IndexTank_Index_Product::i()->collectCategories($facets, $categorySelected);
+        $facetsData = $this->FCom_IndexTank_Index_Product->collectFacets($facets);
+        $categoriesData = $this->FCom_IndexTank_Index_Product->collectCategories($facets, $categorySelected);
 
 
         $productsData['state']['fields'] = $productFields;
@@ -98,9 +97,9 @@ class FCom_IndexTank_Search extends BClass
         $productsData['state']['available_categories'] = $categoriesData;
         $productsData['state']['category_selected'] = $categorySelected;
         $productsData['state']['filter'] = $v;
-        $productsData['state']['save_filter'] = BConfig::i()->get('modules/FCom_IndexTank/save_filter');
+        $productsData['state']['save_filter'] = $this->BConfig->get('modules/FCom_IndexTank/save_filter');
 
-        BEvents::i()->fire(__METHOD__, ['data' => &$productsData]);
+        $this->BEvents->fire(__METHOD__, ['data' => &$productsData]);
 
         return $productsData;
     }
@@ -108,19 +107,19 @@ class FCom_IndexTank_Search extends BClass
     public function publicApiUrl()
     {
         $url = '';
-        if (BConfig::i()->get('modules/FCom_IndexTank/api_url')) {
-            $url = BConfig::i()->get('modules/FCom_IndexTank/api_url');
+        if ($this->BConfig->get('modules/FCom_IndexTank/api_url')) {
+            $url = $this->BConfig->get('modules/FCom_IndexTank/api_url');
             $parsed = parse_url($url);
             unset($parsed['pass']);
-            $url = BUtil::unparseUrl($parsed);
+            $url = $this->BUtil->unparseUrl($parsed);
         }
         return $url;
     }
 
     public function indexName()
     {
-        if (BConfig::i()->get('modules/FCom_IndexTank/index_name')) {
-            return BConfig::i()->get('modules/FCom_IndexTank/index_name');
+        if ($this->BConfig->get('modules/FCom_IndexTank/index_name')) {
+            return $this->BConfig->get('modules/FCom_IndexTank/index_name');
         }
         return '';
     }
@@ -130,7 +129,7 @@ class FCom_IndexTank_Search extends BClass
     *
     * @return FCom_IndexTank_Search
     */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }

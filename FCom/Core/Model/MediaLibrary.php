@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Core_Model_MediaLibrary extends FCom_Core_Model_Abstract
 {

@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMethod_Aim
 {
@@ -13,7 +13,7 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
 
     public function getCheckoutFormView()
     {
-        return BLayout::i()->view('authorizenet/dpm')->set('key', static::PAYMENT_METHOD_KEY);
+        return $this->BLayout->view('authorizenet/dpm')->set('key', static::PAYMENT_METHOD_KEY);
     }
 
     public function payOnCheckout()
@@ -52,7 +52,7 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
      */
     public function config()
     {
-        $config = BConfig::i();
+        $config = $this->BConfig;
         return $config->get('modules/FCom_AuthorizeNet/dpm');
     }
 
@@ -95,7 +95,7 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
             'x_fp_sequence'    => $order->unique_id,
             'x_fp_timestamp'   => $time,
             'x_relay_response' => "TRUE",
-            'x_relay_url'      => BApp::href("authorizenet/dpm"),
+            'x_relay_url'      => $this->BApp->href("authorizenet/dpm"),
             'x_login'          => $config['login'],
             'x_description'    => $order->getTextDescription(),
         ];
@@ -151,7 +151,7 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
             'transaction_type' => $action == 'AUTH_ONLY' ? 'authorize' : 'sale',
             'online'           => 1,
         ];
-        $paymentModel = FCom_Sales_Model_Order_Payment::i()->addNew($paymentData);
+        $paymentModel = $this->FCom_Sales_Model_Order_Payment->addNew($paymentData);
         $paymentModel->setData('response', $response);
         $paymentModel->save();
         return $response;

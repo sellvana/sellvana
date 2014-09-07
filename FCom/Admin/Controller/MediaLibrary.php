@@ -1,8 +1,11 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 {
     protected $_allowedFolders = [];
+    protected $_uploadConfigs;
+
+    const ERROR = 'ERROR';
 
     public function allowFolder($folder)
     {
@@ -12,30 +15,49 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
     public function getFolder()
     {
-        $folder = BRequest::i()->get('folder');
-        /*if (empty($this->_allowedFolders[$folder])) {
-            BDebug::error('Folder '.$folder.' is not allowed');
-        }*/
+        $folder = $this->BRequest->get('folder');
+        if (empty($folder)) {
+            $type = $this->BRequest->get('type');
+            if ($type) {
+                $uploadConfig = $this->uploadConfig($type);
+                if (empty($uploadConfig)) {
+                    throw new BException("Unknown upload type.");
+                }
+                $canUpload = isset($uploadConfig['can_upload']) ? $uploadConfig['can_upload'] : true;
+                if ($canUpload && isset($uploadConfig['folder'])) {
+                    $folder = $uploadConfig['folder'];
+                }
+            }
+        }
+        if (empty($this->_allowedFolders[$folder])) {
+            throw new BException('Folder ' . $folder . ' is not allowed');
+        }
+
+        if (strpos($folder, '{random}') !== false) {
+            $random = 'storage/' . $this->BConfig->get('core/storage_random_dir');
+            $folder = str_replace('{random}', $random, $folder);
+        }
         return $folder;
     }
+
     public function test() {
         return ['test' => 'test'];
     }
+
     public function gridConfig($options = [])
     {
         $id = !empty($options['id']) ? $options['id'] : 'media_library';
         $folder = $options['folder'];
-        $url = BApp::href('/media/grid');
-        $tProductMedia =
-        $orm = FCom_Core_Model_MediaLibrary::i()->orm()->table_alias('a')
+        $url = $this->BApp->href('/media/grid');
+        $orm = $this->FCom_Core_Model_MediaLibrary->orm()->table_alias('a')
                 ->where('folder', $folder)
                 ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size'])
                 ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
-                ->select_expr('(SELECT COUNT(*) FROM ' . FCom_Catalog_Model_ProductMedia::table()
+                ->select_expr('(SELECT COUNT(*) FROM ' . $this->FCom_Catalog_Model_ProductMedia->table()
                     . ' pm WHERE pm.file_id = a.id)', 'associated_products')
                 ->order_by_expr('id asc');
             ;
-        $baseSrc = rtrim(BConfig::i()->get('web/base_src'), '/') . '/';
+        $baseSrc = rtrim($this->BConfig->get('web/base_src'), '/') . '/';
         $config = [
             'config' => [
                 'id' => $id,
@@ -75,64 +97,93 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
         if (!empty($options['config'])) {
 
-            $config['config'] = BUtil::arrayMerge($config['config'], $options['config']);
+            $config['config'] = $this->BUtil->arrayMerge($config['config'], $options['config']);
 
         }
 
         if ($options['mode'] && $options['mode'] === 'link') {
-            $download_url = BApp::href('/media/grid/download?folder=' . $folder . '&file=');
+            $download_url = $this->BApp->href('/media/grid/download?folder=' . $folder . '&file=');
             $config['config']['columns'] = [
-                    ['type' => 'row_select'],
-                    ['name' => 'download_url',  'hidden' => true, 'default' => $download_url],
-                    ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
-                    ['name' => 'file_name', 'label' => 'File Name', 'width' => 200, 'display' => 'eval',
-                        'print' => '"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' '
-                            . 'href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'],
-                    ['name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
-                        'display' => 'file_size']
-                    //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
-                ];
+                ['type' => 'row_select'],
+                ['name' => 'download_url',  'hidden' => true, 'default' => $download_url],
+                ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
+                ['name' => 'file_name', 'label' => 'File Name', 'width' => 200, 'display' => 'eval',
+                    'print' => '"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' '
+                        . 'href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'],
+                ['name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
+                    'display' => 'file_size']
+                //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
+            ];
         }
-        //BEvents::i()->fire(__METHOD__, array('config'=>&$config));
-        //BEvents::i()->fire(__METHOD__.':'.$folder, array('config'=>&$config));
+
+        if ($options['mode'] && $options['mode'] === 'images') {
+            $download_url = $this->BApp->href('/media/grid/download?folder=' . $folder . '&file=');
+            $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 100]);
+            $config['config']['columns'] = [
+                ['type' => 'row_select'],
+                ['name' => 'download_url',  'hidden' => true, 'default' => $download_url],
+                ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumbUrl],
+                ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
+                ['name' => 'file_name', 'label' => 'File Name', 'width' => 200, 'display' => 'eval',
+                    'print' => '"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' '
+                        . 'href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'],
+                ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
+                    'print' => '"<a href=\'"+rc.row["download_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\'>'
+                        . '<img src=\'"+rc.row["thumb_url"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' '
+                        . 'alt=\'"+rc.row["file_name"]+"\' ></a>"',
+                    'sortable' => false],
+                ['name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
+                    'display' => 'file_size']
+            ];
+        }
+        //$this->BEvents->fire(__METHOD__, array('config'=>&$config));
+        //$this->BEvents->fire(__METHOD__.':'.$folder, array('config'=>&$config));
         return $config;
     }
+
     public function action_index()
     {
          $this->layout('/media');
     }
+
     public function action_grid_data()
     {
-        switch (BRequest::i()->params('do')) {
+        if (!$this->BRequest->xhr()) {
+            $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+            return;
+        }
+        switch ($this->BRequest->params('do')) {
         case 'data':
             $folder = $this->getFolder();
-//            $r = BRequest::i()->get();
-            $orm = FCom_Core_Model_MediaLibrary::i()->orm()->table_alias('a')
+//            $r = $this->BRequest->get();
+            $orm = $this->FCom_Core_Model_MediaLibrary->orm()->table_alias('a')
                 ->where('folder', $folder)
                 ->select(['a.id', 'a.folder', 'a.file_name', 'a.file_size'])
-                ->select_expr('(SELECT COUNT(*) FROM ' . FCom_Catalog_Model_ProductMedia::table()
+                ->select_expr('(SELECT COUNT(*) FROM ' . $this->FCom_Catalog_Model_ProductMedia->table()
                     . ' pm WHERE pm.file_id = a.id)', 'associated_products')
                 ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
             ;
             /*if (isset($r['filters'])) {
-                $filters = BUtil::fromJson($r['filters']);
+                $filters = $this->BUtil->fromJson($r['filters']);
                 if (isset($filters['exclude_id']) && $filters['exclude_id'] != '') {
                     $arr = explode(',', $filters['exclude_id']);
                     $orm =  $orm->where_not_in('a.id', $arr);
                 }
             }*/
-            $data = FCom_Core_View_BackboneGrid::i()->processORM($orm);
-            BResponse::i()->json([
+            $data = $this->FCom_Core_View_BackboneGrid->processORM($orm);
+            $this->BResponse->json([
                     ['c' => $data['state']['c']],
-                    BDb::many_as_array($data['rows']),
+                    $this->BDb->many_as_array($data['rows']),
                 ]);
             break;
+
         case 'download':
             $folder = $this->getFolder();
-            $r = BRequest::i();
+            $r = $this->BRequest;
             $fileName = basename($r->get('file'));
-            $fullName = FCom_Core_Main::i()->dir($folder) . '/' . $fileName;
-            BResponse::i()->sendFile($fullName, $fileName, $r->get('inline') ? 'inline' : 'attachment');
+            $fullName = $this->FCom_Core_Main->dir($folder) . '/' . $fileName;
+
+            $this->BResponse->sendFile($fullName, $fileName, $r->get('inline') ? 'inline' : 'attachment');
             break;
         }
     }
@@ -143,97 +194,164 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     }
 
     /**
-    * $options = array(
-    *   'folder' => 'media/product/attachment',
-    *   'subfolder' => null,
-    *   'model_class' => 'FCom_Core_Model_MediaLibrary', (default)
-    *   'on_upload' => function() { },
-    *   'on_edit' => function() { },
-    *   'on_delete' => function() { },
-    * );
-    *
-    * $request['params'] = array(
-    *   'do' => 'upload'|'edit'|'delete'
-    * );
-    *
-    * $request['post'] = array(
-    *   'grid' => 'products', // upload
-    *   'id' => 123, // edit
-    *   'file_name' => 'abc.jpg', // edit
-    *   'delete' => array('abc.jpg', 'def.png'), // delete
-    * );
-    *
-    * @param array $options
-    */
+     * $options = array(
+     *   'folder' => 'media/product/attachment',
+     *   'subfolder' => null,
+     *   'model_class' => 'FCom_Core_Model_MediaLibrary', (default)
+     *   'on_upload' => function() { },
+     *   'on_edit' => function() { },
+     *   'on_delete' => function() { },
+     * );
+     *
+     * $request['params'] = array(
+     *   'do' => 'upload'|'edit'|'delete'
+     * );
+     *
+     * $request['post'] = array(
+     *   'grid' => 'products', // upload
+     *   'id' => 123, // edit
+     *   'file_name' => 'abc.jpg', // edit
+     *   'delete' => array('abc.jpg', 'def.png'), // delete
+     * );
+     *
+     * @param array $options
+     * @throws BException
+     */
     public function processGridPost($options = [])
     {
-
-        $r = BRequest::i();
+        $r = $this->BRequest;
         $gridId = $r->get('grid');
         $folder = !empty($options['folder']) ? $options['folder'] : $this->getFolder();
         $subfolder = !empty($options['subfolder']) ? $options['subfolder'] : null;
-        $targetDir = FCom_Core_Main::i()->dir($folder);
+        $targetDir = $this->FCom_Core_Main->dir($folder);
 
         $attModel = !empty($options['model_class']) ? $options['model_class'] : 'FCom_Core_Model_MediaLibrary';
-        $attModel = is_string($attModel) ? $attModel::i() : $attModel;
+        $attModel = is_string($attModel) ? $this->{$attModel} : $attModel;
+        $type = $r->get('type');
+        if (!$type) {
+            throw new BException("Missing upload type");
+        }
+        $uploadConfig = $this->uploadConfig($type);
+        if (empty($uploadConfig)) {
+            throw new BException("Unknown upload type.");
+        }
+        $canUpload = isset($uploadConfig['can_upload'])? $uploadConfig['can_upload']: false;// allow upload in case no permission is configured? Or deny?
+        $blacklistExt = [
+            'php' => 1, 'php3' => 1, 'php4' => 1, 'php5' => 1, 'htaccess' => 1,
+            'phtml' => 1, 'html' => 1, 'htm' => 1, 'js' => 1, 'css' => 1, 'swf' => 1, 'xml' => 1,
+        ];
 
-        switch ($r->params('do')) {
+        if (isset($uploadConfig['filetype'])) { // todo figure out how to merge processed config file types
+            $fileTypes = explode(',', $uploadConfig['filetype']);
+            if (empty($options['whitelist_ext'])) {
+                $options['whitelist_ext'] = $fileTypes;
+            } else {
+                $options['whitelist_ext'] = $this->BUtil->arrayMerge($options['whitelist_ext'], $fileTypes);
+            }
+        }
+
+        if (!empty($options['whitelist_ext'])) {
+            foreach ($options['whitelist_ext'] as $ext) {
+                unset($blacklistExt[$ext]);
+            }
+        }
+
+        switch ($r->param('do')) {
         case 'upload':
             //set_time_limit(0);
             //ob_implicit_flush();
             //ignore_user_abort(true);
-            $uploads = $_FILES['upload'];
-            foreach ($uploads['name'] as $i => $fileName) {
+            if ($canUpload) {
 
-                if (!$fileName) {
-                    continue;
-                }
-                $associatedProducts = 0;
-                $fileSize = 0;
-                if (!$uploads['error'][$i]
-                    && @move_uploaded_file($uploads['tmp_name'][$i], $targetDir . '/' . $fileName)
-                ) {
-                    $att = $attModel->load(['folder' => $folder, 'file_name' => $fileName]);
+                $uploads = $_FILES['upload'];
+                $rows    = [];
+                foreach ($uploads['name'] as $i => $fileName) {
 
-                    if (!$att) {
-                        $att = $attModel->create([
-                            'folder'    => $folder,
-                            'subfolder' => $subfolder,
-                            'file_name' => $fileName,
-                            'file_size' => $uploads['size'][$i],
-                            'create_at' =>  BDb::now(),
-                            'update_at' =>  BDb::now()
-                        ])->save();
+                    if (!$fileName) {
+                        continue;
+                    }
+                    $associatedProducts = 0;
+                    $fileSize           = 0;
+                    $message            = '';
+                    $ext                = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                    $fileName           = preg_replace('/[^\w\d_.-]+/', '_', $fileName);
+
+                    if (!empty($uploads['error'][$i])) {
+                        $id      = '';
+                        $status  = static::ERROR;
+                        $message = $uploads['error'][$i];
+                    } elseif (!empty($blacklistExt[$ext]) || !in_array($ext, $options['whitelist_ext'])) {
+                        $id      = '';
+                        $status  = static::ERROR;
+                        $message = 'Illegal file extension';
+                    } elseif (preg_match('#\.(gif|jpe?g|png)$#',
+                            $fileName) && !@getimagesize($uploads['tmp_name'][$i])
+                    ) {
+                        $id      = '';
+                        $status  = static::ERROR;
+                        $message = 'Invalid image uploaded';
+                    } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $targetDir . '/' . $fileName)) {
+                        $id      = '';
+                        $status  = static::ERROR;
+                        $message = 'Unable to save the file';
                     } else {
-                        $associatedProducts = FCom_Catalog_Model_ProductMedia::i()->orm()
-                                              ->select_expr('COUNT(*)', 'associated_products')
-                                              ->where('file_id', $att->get('id'))->find_one();
-                        $associatedProducts = $associatedProducts->get('associated_products');
-                        $att->set(['file_size' => $uploads['size'][$i], 'update_at' =>  BDb::now()])->save();
+                        $att = $attModel->loadWhere(['folder' => (string)$folder, 'file_name' => (string)$fileName]);
+
+                        if (!$att) {
+                            $att = $attModel->create([
+                                'folder'    => $folder,
+                                'subfolder' => $subfolder,
+                                'file_name' => $fileName,
+                                'file_size' => $uploads['size'][$i],
+                                'create_at' => $this->BDb->now(),
+                                'update_at' => $this->BDb->now()
+                            ])->save();
+                        } else {
+                            if(in_array($type, ['product-images', 'product-attachments'])) {
+                                $associatedProducts = $this->FCom_Catalog_Model_ProductMedia
+                                    ->orm()
+                                    ->select_expr('COUNT(*)', 'associated_products')
+                                    ->where('file_id', $att->get('id'))
+                                    ->find_one();
+                                $associatedProducts = $associatedProducts->get('associated_products');
+                            }
+                            $att->set(['file_size' => $uploads['size'][$i], 'update_at' => $this->BDb->now()])->save();
+                        }
+                        $this->BEvents->fire(__METHOD__ . ':' . $folder . ':upload', ['model' => $att]);
+                        if (!empty($options['on_upload'])) {
+                            $this->BUtil->call($options['on_upload'], $att);
+                        }
+                        $id       = $att->id;
+                        $fileSize = $att->file_size;
+                        $status   = '';
                     }
-                    BEvents::i()->fire(__METHOD__ . ':' . $folder . ':upload', ['model' => $att]);
-                    if (!empty($options['on_upload'])) {
-                        call_user_func($options['on_upload'], $att);
+
+                    if($status == static::ERROR){
+                        $rows[] = [
+                            'error'     => $message,
+                            'file_name' => $fileName,
+                        ];
+                    } else {
+                        $rows[] = [
+                            'id'                  => $id,
+                            'file_name'           => $fileName,
+                            'file_size'           => $fileSize,
+                            'act'                 => $status,
+                            'folder'              => $folder,
+                            'subfolder'              => '',
+                            'associated_products' => $associatedProducts
+                        ];
                     }
-                    $id = $att->id;
-                    $fileSize = $att->file_size;
-                    $status = '';
-                } else {
-                    $id = '';
-                    $status = 'ERROR';
+
+                    //echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".$this->BUtil->toJson($row)."); </script>";
+                    // TODO: properly refresh grid after file upload
+                    // solution one "addRowData method" - will work if we could prevent add new row after Upload file on client side
+                    // echo "<script>parent.\$('#$gridId').addRowData('$fileName', ".$this->BUtil->toJson($row)."); </script>";
+                    // solution two is to find a way to pass rowid to the server side
+                    //echo "<script>parent.\$('#$gridId').trigger( 'reloadGrid' ); </script>";
+
                 }
-
-                $row = ['id' => $id, 'file_name' => $fileName, 'file_size' => $fileSize, 'act' => $status,
-                    'folder' => $folder, 'subfolder' => '', 'associated_products' => $associatedProducts];
-                BResponse::i()->json($row);
-
-                //echo "<script>parent.\$('#$gridId').jqGrid('setRowData', '$fileName', ".BUtil::toJson($row)."); </script>";
-                // TODO: properly refresh grid after file upload
-                // solution one "addRowData method" - will work if we could prevent add new row after Upload file on client side
-                // echo "<script>parent.\$('#$gridId').addRowData('$fileName', ".BUtil::toJson($row)."); </script>";
-                // solution two is to find a way to pass rowid to the server side
-                //echo "<script>parent.\$('#$gridId').trigger( 'reloadGrid' ); </script>";
-
+                $this->BResponse->json(['files' => $rows]);
             }
             break;
 
@@ -242,19 +360,19 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $fileName = $r->post('file_name');
             $att = $attModel->load($id);
             if (!$att) {
-                BResponse::i()->json(['error' => true]);
+                $this->BResponse->json(['error' => true]);
                 return;
             }
             $oldFileName = $att->file_name;
             if (@rename($targetDir . '/' . $oldFileName, $targetDir . '/' . $fileName)) {
                 $att->set('file_name', $fileName)->save();
-                BEvents::i()->fire(__METHOD__ . ':' . $folder . ':edit', ['model' => $att]);
+                $this->BEvents->fire(__METHOD__ . ':' . $folder . ':edit', ['model' => $att]);
                 if (!empty($options['on_edit'])) {
-                    call_user_func($options['on_edit'], $att);
+                    $this->BUtil->call($options['on_edit'], $att);
                 }
-                BResponse::i()->json(['success' => true]);
+                $this->BResponse->json(['success' => true]);
             } else {
-                BResponse::i()->json(['error' => true]);
+                $this->BResponse->json(['error' => true]);
             }
             break;
 
@@ -265,11 +383,11 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             }
             $args = ['folder' => $folder, 'file_name' => $files];
             $attModel->delete_many($args);
-            BEvents::i()->fire(__METHOD__ . ':' . $folder . ':delete', ['files' => $files]);
+            $this->BEvents->fire(__METHOD__ . ':' . $folder . ':delete', ['files' => $files]);
             if (!empty($options['on_delete'])) {
-                call_user_func($options['on_delete'], $args);
+                $this->BUtil->call($options['on_delete'], $args);
             }
-            BResponse::i()->json(['success' => true]);
+            $this->BResponse->json(['success' => true]);
             break;
         case 'rescan':
             try {
@@ -278,13 +396,13 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     RecursiveIteratorIterator::SELF_FIRST
                 );
                 $arrImages = [];
-                $records = BDb::many_as_array(FCom_Core_Model_MediaLibrary::i()->orm()
+                $records = $this->BDb->many_as_array($this->FCom_Core_Model_MediaLibrary->orm()
                     ->select(['folder', 'subfolder', 'file_name'])->where('folder', $folder)->find_many());
                 foreach ($fileSPLObjects as $fullFileName => $fileSPLObject) {
                     $fileName = $fileSPLObject->getFilename();
                     $path = $fileSPLObject->getPath();
                     $subFolder = null;
-                    if (is_file($fullFileName) && exif_imagetype($fullFileName)) {
+                    if (is_file($fullFileName) && getimagesize($fullFileName)) {
                         if ($path != $targetDir) {
                             $path = str_replace('\\', '/', $path);
                             $subFolder = trim(str_replace($targetDir . '/', '', $path));
@@ -301,11 +419,50 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                                         filesize($targetDir . '/' . $arr['file_name']);
                     $attModel->create($arr)->save();
                 }
-                BResponse::i()->json(['status' => 'success']);
+                $this->BResponse->json(['status' => 'success']);
             } catch (Exception $e) {
-                BResponse::i()->json(['status' => 'error', 'messages' => $e->getMessage()]);
+                $this->BResponse->json(['status' => 'error', 'messages' => $e->getMessage()]);
             }
             break;
         }
+    }
+
+
+    public function collectUploadConfig()
+    {
+        $modules = $this->BModuleRegistry->getAllModules();
+
+        foreach ($modules as $module) {
+            /** @var BModule $module */
+            if (!$module || !$module instanceof BModule) {
+                return;
+            }
+            $area = $module->area;
+            if (!empty($module->areas[$area]['uploads'])) {
+                $this->_uploadConfigs = $this->BUtil->arrayMerge($this->_uploadConfigs,
+                    (array)$module->areas[$area]['uploads']);
+            }
+        }
+    }
+
+    public function uploadConfig($configId = null)
+    {
+        $uploadConfig         = [];
+        if(empty($this->_uploadConfigs)){
+            $this->collectUploadConfig();
+        }
+        if (isset($this->_uploadConfigs[$configId])) {
+            $uploadConfig = $this->_uploadConfigs[$configId];
+            $uploadConfig['type'] = $configId;
+            if (isset($uploadConfig['filetype'])) {
+                $uploadConfig['filetype_regex'] = '/(\\.|\\/)(' . str_replace([','], '|', $uploadConfig['filetype']) . ')$/i';
+            }
+
+            if (isset($uploadConfig['permission'])) {
+                $canUpload = $this->FCom_Admin_Model_User->sessionUser()->getPermission($uploadConfig['permission']);
+                $uploadConfig['can_upload'] = $canUpload;
+            }
+        }
+        return $uploadConfig;
     }
 }

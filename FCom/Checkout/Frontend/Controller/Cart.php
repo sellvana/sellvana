@@ -1,101 +1,161 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Abstract
 {
+    public function beforeDispatch()
+    {
+        if (!parent::beforeDispatch()) return false;
+
+        $this->BResponse->nocache();
+
+        return true;
+    }
+
     public function action_index()
     {
-        $layout = BLayout::i();
+        $layout = $this->BLayout;
 
+        $this->layout('/checkout/cart');
         $layout->view('checkout/cart')->set('redirectLogin', false);
-        if (BApp::m('FCom_Customer') && FCom_Customer_Model_Customer::isLoggedIn() == false) {
+        if ($this->BApp->m('FCom_Customer') && $this->FCom_Customer_Model_Customer->isLoggedIn() == false) {
             $layout->view('checkout/cart')->set('redirectLogin', true);
         }
 
 
-        $layout->view('breadcrumbs')->set('crumbs', [['label' => 'Home', 'href' =>  BApp::baseUrl()],
+        $layout->view('breadcrumbs')->set('crumbs', [['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
             ['label' => 'Cart', 'active' => true]]);
 
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
-        BEvents::i()->fire(__CLASS__ . '::action_cart:cart', ['cart' => $cart]);
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
+        $this->BEvents->fire(__CLASS__ . '::action_cart:cart', ['cart' => $cart]);
 
-        $shippingEstimate = BSession::i()->get('shipping_estimate');
+        $shippingEstimate = $this->BSession->get('shipping_estimate');
         $layout->view('checkout/cart')->set(['cart' => $cart, 'shipping_esitmate' => $shippingEstimate]);
-        $this->layout('/checkout/cart');
     }
 
     public function action_add__POST()
     {
-        $cartHref = BApp::href('cart');
-        $post = BRequest::i()->post();
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
+        $cartHref = $this->BApp->href('cart');
+        $post = $this->BRequest->post();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         if (isset($post['action'])) {
             switch ($post['action']) {
             case 'add':
-                $p = FCom_Catalog_Model_Product::i()->load($post['id']);
+                $p = $this->FCom_Catalog_Model_Product->load($post['id']);
                 if (!$p) {
                     // todo add message to be displayed
-                    BResponse::i()->redirect('/');
+                    $this->BResponse->redirect('/');
                     return;
                 }
-                $qty = !empty($post['qty']) ? $post['qty'] : 1;
-                $options = ['qty' => $qty, 'price' => $p->base_price];
-                if (Bapp::m('FCom_Customer') && FCom_Customer_Model_Customer::isLoggedIn()) {
-                    $cart->customer_id = FCom_Customer_Model_Customer::sessionUserId();
-                    $cart->save();
+                $options = [
+                    'qty' => !empty($post['qty']) ? $post['qty'] : 1,
+                    'price' => $p->getPrice(),
+                    'sku' => $p->get('local_sku'),
+                ];
+                $result = [];
+                $validate = $this->BEvents->fire(__METHOD__ . ':validate', [
+                    'controller' => $this,
+                    'product' => $p,
+                    'post' => $post,
+                    'options' => &$options,
+                    'result' => &$result,
+                ]);
+
+                if (empty($result['error'])) {
+                    if ($this->BApp->m('FCom_Customer') && $this->FCom_Customer_Model_Customer->isLoggedIn()) {
+                        $cart->customer_id = $this->FCom_Customer_Model_Customer->sessionUserId();
+                        $cart->save();
+                    }
+                    if (isset($post['shopper'])) {
+                        $options['shopper'] = $post['shopper'];
+                        foreach($options['shopper'] as $key => $value) {
+                            if (!isset($value['val']) || $value['val'] == '') {
+                                unset($options['shopper'][$key]);
+                            }
+                            if ($value['val'] == 'checkbox') {
+                                unset($options['shopper'][$key]['val']);
+                            }
+                        }
+                    };
+                    $cart->addProduct($p->id(), $options)->calculateTotals()->save();
+                    $this->message('The product has been added to your cart');
+                } else {
+                    $this->message($result['error'], 'error');
+                    $this->BResponse->redirect($p->url());
+                    return;
                 }
-                $cart->addProduct($p->id(), $options)->calculateTotals()->save();
-                $this->message('The product has been added to your cart');
                 break;
             }
         } else {
             $items = $cart->items();
             if (count($items)) {
                 if (!empty($post['remove'])) {
-                    foreach ($post['remove'] as $id) {
-                        $cart->removeItem($id);
+                    foreach ($post['remove'] as $id => $arrVariant) {
+                        $item = $cart->childById('items', $id);
+                        $variants = $item->getData('variants');
+                        if (null === $variants || count($variants) == 1) {
+                            $cart->removeItem($id);
+                        }
                     }
                 }
                 if (!empty($post['qty'])) {
-                    foreach ($post['qty'] as $id => $qty) {
-                        if ($qty > 0) {
-                            $item = $cart->childById('items', $id);
-                            if ($item) {
-                                $item->set('qty', $qty)->save();
+                    foreach ($post['qty'] as $id => $arrQty) {
+                        $item = $cart->childById('items', $id);
+                        if ($item) {
+                            $variants = $item->getData('variants');
+                            $totalQty = 0;
+                            if (null !== $variants && is_array($arrQty)) {
+                                foreach ($arrQty as $variantId => $qty) {
+                                    if ($qty > 0) {
+                                        $variants[$variantId]['variant_qty'] = $qty;
+                                        $totalQty += $qty;
+                                    }
+                                    if ($qty <= 0 || isset($post['remove'][$id][$variantId])) {
+                                        unset($variants[$variantId]);
+                                    }
+                                }
+                            } else {
+                                $totalQty = $arrQty[0];
                             }
-                        } //todo: else remove item?
+                            if ($totalQty > 0) {
+                                $item->set('qty', $totalQty)->setData('variants', $variants)->save();
+                            }
+                            if ($totalQty <= 0 || empty($variants)){
+                                $cart->removeItem($id);
+                            }
+                        }
                     }
                 }
                 if (!empty($post['postcode'])) {
                     $estimate = [];
-                    foreach (FCom_Sales_Main::i()->getShippingMethods() as $shipping) {
+                    foreach ($this->FCom_Sales_Main->getShippingMethods() as $shipping) {
                         $estimate[] = ['estimate' => $shipping->getEstimate(), 'description' => $shipping->getDescription()];
                     }
-                    BSession::i()->set('shipping_estimate', $estimate);
+                    $this->BSession->set('shipping_estimate', $estimate);
                 }
                 $cart->calculateTotals()->save();
                 $this->message('Your cart has been updated');
             }
         }
-        BResponse::i()->redirect($cartHref);
+        $this->BResponse->redirect($cartHref);
     }
 
     public function action_addxhr__POST()
     {
-        $cartHref = BApp::href('cart');
-        $post = BRequest::i()->post();
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
+        $cartHref = $this->BApp->href('cart');
+        $post = $this->BRequest->post();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $result = [];
         switch ($post['action']) {
         case 'add':
-            $p = FCom_Catalog_Model_Product::i()->load($post['id']);
+            $p = $this->FCom_Catalog_Model_Product->load($post['id']);
             if (!$p) {
-                BResponse::i()->json(['title' => "Incorrect product id"]);
+                $this->BResponse->json(['title' => "Incorrect product id"]);
                 return;
             }
 
             $options = ['qty' => $post['qty'], 'price' => $p->base_price];
-            if (Bapp::m('FCom_Customer') && FCom_Customer_Model_Customer::isLoggedIn()) {
-                $cart->customer_id = FCom_Customer_Model_Customer::sessionUserId();
+            if ($this->BApp->m('FCom_Customer') && $this->FCom_Customer_Model_Customer->isLoggedIn()) {
+                $cart->customer_id = $this->FCom_Customer_Model_Customer->sessionUserId();
                 $cart->save();
             }
             $cart->addProduct($p->id(), $options)->calculateTotals()->save();
@@ -105,17 +165,17 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                     . htmlspecialchars($p->product_name)
                     . (!empty($post['qty']) && $post['qty'] > 1 ? ' (' . $post['qty'] . ')' : '')
                     . '<br><br><a href="' . $cartHref . '" class="button">Go to cart</a>',
-                'minicart_html' => BLayout::i()->view('checkout/cart/block')->render(),
+                'minicart_html' => $this->BLayout->view('checkout/cart/block')->render(),
                 'cnt' => $cart->itemQty(),
                 'subtotal' => $cart->subtotal,
             ];
             break;
         }
 
-        BResponse::i()->json($result);
+        $this->BResponse->json($result);
     }
 
-    public static function onAddToCart($args)
+    public function onAddToCart($args)
     {
         $product = $args['product'];
         $qty = $args['qty'];
@@ -124,7 +184,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         }
 
         $qty = !empty($qty) ? $qty : 1;
-        $cart = FCom_Sales_Model_Cart::i()->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $cart->addProduct($product->id(), ['qty' => $qty, 'price' => $product->base_price]);
     }
 }

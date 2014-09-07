@@ -1,12 +1,12 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Core_Migrate extends BClass
 {
     public function install__0_1_6()
     {
-        if (!BDb::ddlTableExists('fcom_media_library')) {
-            $tMediaLibrary = FCom_Core_Model_MediaLibrary::table();
-            BDb::run("
+        if (!$this->BDb->ddlTableExists('fcom_media_library')) {
+            $tMediaLibrary = $this->FCom_Core_Model_MediaLibrary->table();
+            $this->BDb->run("
                 CREATE TABLE {$tMediaLibrary} (
                   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
                   `folder` varchar(32) NOT NULL,
@@ -22,7 +22,7 @@ class FCom_Core_Migrate extends BClass
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
             ");
         }
-        BDb::ddlTableDef(FCom_Core_Model_Seq::table(), [
+        $this->BDb->ddlTableDef($this->FCom_Core_Model_Seq->table(), [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'entity_type' => 'varchar(15) not null',
@@ -33,9 +33,9 @@ class FCom_Core_Migrate extends BClass
                 'UNQ_entity_type' => 'UNIQUE (entity_type)',
             ],
         ]);
-        BConfig::i()->set('cookie/session_check_ip', 1, false, true);
-        FCom_Core_Main::i()->writeConfigFiles();
-        BDb::ddlTableDef(FCom_Core_ImportExport::table(), [
+        $this->BConfig->set('cookie/session_check_ip', 1, false, true);
+        $this->BConfig->writeConfigFiles();
+        $this->BDb->ddlTableDef($this->FCom_Core_ImportExport->table(), [
             'COLUMNS' => [
                 'id'        => 'int(11)',
                 'store_id'  => 'char(32)',
@@ -47,9 +47,9 @@ class FCom_Core_Migrate extends BClass
             ],
         ]);
 
-        BDb::run("DROP TABLE IF EXISTS fcom_import_info");
-        $tModel = FCom_Core_Model_ImportExport_Model::table();
-        BDb::ddlTableDef(
+        $this->BDb->run("DROP TABLE IF EXISTS fcom_import_info");
+        $tModel = $this->FCom_Core_Model_ImportExport_Model->table();
+        $this->BDb->ddlTableDef(
             $tModel,
             [
                 'COLUMNS' => [
@@ -63,8 +63,8 @@ class FCom_Core_Migrate extends BClass
             ]
         );
 
-        $tSite = FCom_Core_Model_ImportExport_Site::table();
-        BDb::ddlTableDef(
+        $tSite = $this->FCom_Core_Model_ImportExport_Site->table();
+        $this->BDb->ddlTableDef(
             $tSite,
             [
                 'COLUMNS' => [
@@ -79,8 +79,8 @@ class FCom_Core_Migrate extends BClass
         );
 
         //Source, model, import id, local id
-        BDb::ddlTableDef(
-            FCom_Core_Model_ImportExport_Id::table(),
+        $this->BDb->ddlTableDef(
+            $this->FCom_Core_Model_ImportExport_Id->table(),
             [
                 'COLUMNS' => [
                     'id'        => 'int unsigned not null auto_increment',
@@ -98,16 +98,16 @@ class FCom_Core_Migrate extends BClass
                 ],
             ]
         );
-        if (!BConfig::i()->get('cache/default_backend')) {
-            $this->_defaultBackend = BCache::i()->getFastestAvailableBackend();
-            BConfig::i()->set('cache/default_backend', $this->_defaultBackend, false, true);
-            FCom_Core_Main::i()->writeConfigFiles('core');
+        if (!$this->BConfig->get('cache/default_backend')) {
+            $this->_defaultBackend = $this->BCache->getFastestAvailableBackend();
+            $this->BConfig->set('cache/default_backend', $this->_defaultBackend, false, true);
+            $this->BConfig->writeConfigFiles('core');
         }
     }
 
     public function upgrade__0_1_0__0_1_1()
     {
-        BDb::ddlTableDef(FCom_Core_Model_Seq::table(), [
+        $this->BDb->ddlTableDef($this->FCom_Core_Model_Seq->table(), [
             'COLUMNS' => [
                 'id' => 'int unsigned not null auto_increment',
                 'entity_type' => 'varchar(15) not null',
@@ -122,7 +122,7 @@ class FCom_Core_Migrate extends BClass
 
     public function upgrade__0_1_1__0_1_2()
     {
-        BDb::ddlTableDef(FCom_Core_Model_MediaLibrary::table(), [
+        $this->BDb->ddlTableDef($this->FCom_Core_Model_MediaLibrary->table(), [
             'COLUMNS' => [
                 'data_json' => 'DROP',
                 'data_serialized' => 'text',
@@ -137,14 +137,14 @@ class FCom_Core_Migrate extends BClass
 
     public function upgrade__0_1_2__0_1_3()
     {
-        BConfig::i()->set('cookie/session_check_ip', 1, false, true);
-        FCom_Core_Main::i()->writeConfigFiles();
+        $this->BConfig->set('cookie/session_check_ip', 1, false, true);
+        $this->BConfig->writeConfigFiles();
     }
 
     public function upgrade__0_1_3__0_1_4()
     {
         //Source, model, import id, local id
-        BDb::ddlTableDef(FCom_Core_ImportExport::table(), [
+        $this->BDb->ddlTableDef($this->FCom_Core_ImportExport->table(), [
             'COLUMNS' => [
                 'id'        => 'int(11)',
                 'store_id'  => 'char(32)',
@@ -159,9 +159,9 @@ class FCom_Core_Migrate extends BClass
 
     public function upgrade__0_1_4__0_1_5()
     {
-        BDb::run("DROP TABLE IF EXISTS fcom_import_info");
-        $tModel = FCom_Core_Model_ImportExport_Model::table();
-        BDb::ddlTableDef(
+        $this->BDb->run("DROP TABLE IF EXISTS fcom_import_info");
+        $tModel = $this->FCom_Core_Model_ImportExport_Model->table();
+        $this->BDb->ddlTableDef(
             $tModel,
             [
                 'COLUMNS' => [
@@ -175,8 +175,8 @@ class FCom_Core_Migrate extends BClass
             ]
         );
 
-        $tSite = FCom_Core_Model_ImportExport_Site::table();
-        BDb::ddlTableDef(
+        $tSite = $this->FCom_Core_Model_ImportExport_Site->table();
+        $this->BDb->ddlTableDef(
             $tSite,
             [
                 'COLUMNS' => [
@@ -191,8 +191,8 @@ class FCom_Core_Migrate extends BClass
         );
 
         //Source, model, import id, local id
-        BDb::ddlTableDef(
-            FCom_Core_Model_ImportExport_Id::table(),
+        $this->BDb->ddlTableDef(
+            $this->FCom_Core_Model_ImportExport_Id->table(),
             [
                 'COLUMNS' => [
                     'id'        => 'int unsigned not null auto_increment',
@@ -214,21 +214,26 @@ class FCom_Core_Migrate extends BClass
 
     public function upgrade__0_1_5__0_1_6()
     {
-        if (!BConfig::i()->get('cache/default_backend')) {
-            $this->_defaultBackend = BCache::i()->getFastestAvailableBackend();
-            BConfig::i()->set('cache/default_backend', $this->_defaultBackend, false, true);
-            FCom_Core_Main::i()->writeConfigFiles('core');
+        if (!$this->BConfig->get('cache/default_backend')) {
+            $this->_defaultBackend = $this->BCache->getFastestAvailableBackend();
+            $this->BConfig->set('cache/default_backend', $this->_defaultBackend, false, true);
+            $this->BConfig->writeConfigFiles('core');
         }
     }
 
     public function upgrade__0_1_6__0_1_7()
     {
-        BDb::ddlTableDef(
-            FCom_Core_Model_ImportExport_Id::table(),
+        $this->BDb->ddlTableDef(
+            $this->FCom_Core_Model_ImportExport_Id->table(),
             [
                 'COLUMNS' => ['relations' => 'text null'],
                 'KEYS' => ['uk_site_model_import_id' => "UNIQUE (site_id,model_id,import_id)"],
             ]
         );
+    }
+
+    public function upgrade__0_1_7__0_1_8()
+    {
+        $this->BCache->deleteAll();
     }
 }

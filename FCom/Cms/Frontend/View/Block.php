@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
 {
@@ -11,10 +11,14 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
      * @param array $params block view creation parameters
      * @return FCom_Cms_Frontend_View_Block
      */
-    static public function createView($block, array $params = [])
+    public function createView($block, array $params = [])
     {
         if (!static::$_layoutHlp) {
-            static::$_layoutHlp = BLayout::i();
+            static::$_layoutHlp = $this->BLayout;
+        }
+        if (is_array($block) && empty($params)) {
+            $params = $block;
+            $block = $params['block'];
         }
         if (empty($params['view_class'])) {
             $params['view_class'] = static::$_origClass;
@@ -22,10 +26,12 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
         if ($block instanceof FCom_Cms_Model_Block) {
             $params['block'] = $block->handle;
             $params['model'] = $block;
-        } else {
+        } elseif (is_string($block)) {
             $params['block'] = $block;
+        } else {
+            throw new BException('Invalid block name');
         }
-        $viewName = '_cms_block/' . $params['block'];
+        $viewName = !empty($params['view_name']) ? $params['view_name'] : ('_cms_block/' . $params['block']);
         $view = static::$_layoutHlp->getView($viewName);
         if (!$view instanceof FCom_Cms_Frontend_View_Block) {
             $view = static::$_layoutHlp->addView($viewName, $params)->getView($viewName);
@@ -36,18 +42,18 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
     /**
      * Get block model instance for the current view
      */
-    static public function getBlockModel($view)
+    public function getBlockModel($view)
     {
         $model = $view->getParam('model');
         if (!$model  || !is_object($model) || !$model instanceof FCom_Cms_Model_Block) {
-            $model = $view->get('block');
+            $model = $view->getParam('block');
             if (is_numeric($model)) {
-                $model = FCom_Cms_Model_Block::i()->load($model);
+                $model = $this->FCom_Cms_Model_Block->load($model);
             } elseif (is_string($model)) {
-                $model = FCom_Cms_Model_Block::i()->load($model, 'handle');
+                $model = $this->FCom_Cms_Model_Block->load($model, 'handle');
             }
             if (!$model || !is_object($model) || !$model instanceof FCom_Cms_Model_Block) {
-                BDebug::warning('CMS Block not found or invalid');
+                $this->BDebug->warning('CMS Block not found or invalid');
                 return false;
             }
             $view->setParam('model', $model);
@@ -61,14 +67,14 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
      * @param BView $view
      * @return string
      */
-    static public function renderer($view)
+    public function renderer($view)
     {
-        $model = static::getBlockModel($view);
+        $model = $this->getBlockModel($view);
         if (!$model) {
             return '';
         }
 
-        $subRenderer = BLayout::i()->getRenderer($model->renderer ? $model->renderer : 'FCom_LibTwig');
+        $subRenderer = $this->BLayout->getRenderer($model->renderer ? $model->renderer : 'FCom_LibTwig');
 
         $view->setParam([
             //'renderer'    => $subRenderer,
@@ -78,7 +84,7 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
             'source_untrusted' => true,
         ]);
 
-        $content = call_user_func($subRenderer['callback'], $view);
+        $content = $this->BUtil->call($subRenderer['callback'], $view);
 
         return $content;
     }
@@ -90,6 +96,6 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
      */
     public function _render()
     {
-        return static::renderer($this);
+        return $this->renderer($this);
     }
 }

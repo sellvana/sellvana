@@ -1,9 +1,10 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_cms_block';
     protected static $_origClass = __CLASS__;
+    #protected static $_cacheAuto = ['id', 'name'];
 
     protected static $_validationRules = [
         ['handle', '@required'],
@@ -33,12 +34,9 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
             return false;
         }
 
-        if (!$this->get('create_at')) {
-            $this->set('create_at', BDb::now());
-        }
         $this->set('version', $this->version ? $this->version + 1 : '1');
 //        $this->set('version_comments', $this->version ? $this->version : '1');
-        $this->set('update_at', BDb::now());
+
         $this->set('modified_time', time()); // attempt to compare with filemtime() for caching
 
         if ($this->get('page_url') === '') {
@@ -51,15 +49,15 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
     {
         parent::onAfterSave();
 
-        $user = FCom_Admin_Model_User::i()->sessionUser();
-        $hist = FCom_Cms_Model_BlockHistory::i()->create([
+        $user = $this->FCom_Admin_Model_User->sessionUser();
+        $hist = $this->FCom_Cms_Model_BlockHistory->create([
             'block_id' => $this->id,
             'user_id' => $user ? $user->id : null,
             'username' => $user ? $user->username : null,
             'version' => $this->version,
             'comments' => $this->version_comments ? $this->version_comments : 'version ' . $this->version,
-            'ts' => BDb::now(),
-            'data' => BUtil::toJson(BUtil::arrayMask($this->as_array(), 'content')), // more fields?
+            'ts' => $this->BDb->now(),
+            'data' => $this->BUtil->toJson($this->BUtil->arrayMask($this->as_array(), 'content')), // more fields?
         ])->save();
     }
 
@@ -69,12 +67,12 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
      * @param $args
      * @return bool
      */
-    public static function rulePageUrlUnique($data, $args)
+    public function rulePageUrlUnique($data, $args)
     {
         if (empty($data[$args['field']])) {
             return true;
         }
-        $orm = static::i()->orm()->where('page_url', $data[$args['field']]);
+        $orm = $this->orm()->where('page_url', $data[$args['field']]);
         if (!empty($data['id'])) {
             $orm->where_not_equal('id', $data['id']);
         }
@@ -86,6 +84,6 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
 
     public function createView($params = [])
     {
-        return FCom_Cms_Frontend_View_Block::i()->createView($this, $params);
+        return $this->FCom_Cms_Frontend_View_Block->createView($this, $params);
     }
 }

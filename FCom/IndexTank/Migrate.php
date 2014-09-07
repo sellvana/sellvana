@@ -1,22 +1,22 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_IndexTank_Migrate extends BClass
 {
     public function install__0_2_1()
     {
-        $pIndexHelperTable = FCom_IndexTank_Model_IndexHelper::table();
-        BDb::run("
+        $pIndexHelperTable = $this->FCom_IndexTank_Model_IndexHelper->table();
+        $this->BDb->run("
             CREATE TABLE IF NOT EXISTS {$pIndexHelperTable} (
             `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
             `index` VARCHAR( 255 ) NOT NULL ,
             `checkpoint` TIMESTAMP
             ) ENGINE = InnoDB;
          ");
-        BDb::run("insert into {$pIndexHelperTable} (`index`, checkpoint) values('products', null)");
+        $this->BDb->run("insert into {$pIndexHelperTable} (`index`, checkpoint) values('products', null)");
 
         //create table
-        $pFieldsTable = FCom_IndexTank_Model_ProductField::table();
-        BDb::run("
+        $pFieldsTable = $this->FCom_IndexTank_Model_ProductField->table();
+        $this->BDb->run("
             CREATE TABLE IF NOT EXISTS {$pFieldsTable} (
             `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
             `field_name` varchar(1024) NOT NULL DEFAULT '',
@@ -34,14 +34,14 @@ class FCom_IndexTank_Migrate extends BClass
             PRIMARY KEY (`id`)
             )ENGINE=InnoDB DEFAULT CHARSET=utf8;
         ");
-        BDb::i()->ddlClearCache();
+        $this->BDb->ddlClearCache();
 
         //add initial data
         $this->installProductSchema();
 
         //create table
-        $pFunctionsTable = FCom_IndexTank_Model_ProductFunction::table();
-        BDb::run("
+        $pFunctionsTable = $this->FCom_IndexTank_Model_ProductFunction->table();
+        $this->BDb->run("
             CREATE TABLE IF NOT EXISTS {$pFunctionsTable} (
               `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
               `name` varchar(1024)  NOT NULL,
@@ -54,7 +54,7 @@ class FCom_IndexTank_Migrate extends BClass
               PRIMARY KEY (`id`)
             ) ENGINE = InnoDB;
             ");
-        BDb::i()->ddlClearCache();
+        $this->BDb->ddlClearCache();
 
         //predefined functions
         $functions  =  [
@@ -67,24 +67,24 @@ class FCom_IndexTank_Migrate extends BClass
                 'local_sku_asc'        => ['number' => 6, 'definition' => '-d[2]'  ],
                 'local_sku_desc'       => ['number' => 7, 'definition' => 'd[2]'   ],
         ];
-        $functionsList = FCom_IndexTank_Model_ProductFunction::i()->getList();
+        $functionsList = $this->FCom_IndexTank_Model_ProductFunction->getList();
         //add initial functions
         foreach ($functions as $func_name => $func) {
             //add new function only if function not exists yet
             if (!empty($functionsList[$func['number']])) {
                 continue;
             }
-            BDb::run("insert into {$pFunctionsTable}(name, number, definition) values('{$func_name}', {$func['number']}, '{$func['definition']}')");
+            $this->BDb->run("insert into {$pFunctionsTable}(name, number, definition) values('{$func_name}', {$func['number']}, '{$func['definition']}')");
         }
 
-        $productsTable = FCom_Catalog_Model_Product::table();
-        if (!BDb::ddlFieldInfo($productsTable, 'indextank_indexed')) {
-            BDb::run(" ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0,
+        $productsTable = $this->FCom_Catalog_Model_Product->table();
+        if (!$this->BDb->ddlFieldInfo($productsTable, 'indextank_indexed')) {
+            $this->BDb->run(" ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0,
             ADD indextank_indexed_at datetime not null; ");
         }
 
-        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::run("
+        $pIndexingStatusTable = $this->FCom_IndexTank_Model_IndexingStatus->table();
+        $this->BDb->run("
             CREATE TABLE IF NOT EXISTS {$pIndexingStatusTable} (
             `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
             `task` VARCHAR( 255 ) NOT NULL ,
@@ -92,8 +92,8 @@ class FCom_IndexTank_Migrate extends BClass
             `updated_at` datetime
             ) ENGINE = InnoDB;
          ");
-        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::ddlTableDef($pIndexingStatusTable, ['COLUMNS' => [
+        $pIndexingStatusTable = $this->FCom_IndexTank_Model_IndexingStatus->table();
+        $this->BDb->ddlTableDef($pIndexingStatusTable, ['COLUMNS' => [
             'status' => "enum('start', 'pause') NOT NULL DEFAULT 'start'",
             'percent' => "BIGINT( 11 ) NOT NULL",
             'indexed' => "BIGINT( 11 ) NOT NULL",
@@ -112,28 +112,28 @@ class FCom_IndexTank_Migrate extends BClass
         update {$pFunctionsTable} set label = 'Manuf SKU (A-Z)' where name='local_sku_asc';
         update {$pFunctionsTable} set label = 'Manuf SKU (Z-A)' where name='local_sku_desc';
         ";
-        BDb::run($sql);
+        $this->BDb->run($sql);
 
     }
 
     public function installProductSchema()
     {
-        $pTable = FCom_Catalog_Model_Product::table();
+        $pTable = $this->FCom_Catalog_Model_Product->table();
         //check if table exists
         try {
-            $check_table = FCom_Catalog_Model_Product::orm()->raw_query("show tables like '{$pTable}'", null)->find_one();
+            $check_table = $this->FCom_Catalog_Model_Product->orm()->raw_query("show tables like '{$pTable}'", null)->find_one();
             if (!$check_table) {
                 return false;
             }
         } catch (Exception $e) {
             return false;
         }
-        $fields = FCom_Catalog_Model_Product::orm()->raw_query("desc {$pTable}", null)->find_many();
+        $fields = $this->FCom_Catalog_Model_Product->orm()->raw_query("desc {$pTable}", null)->find_many();
         foreach ($fields as $f) {
             if ($f->Field == "indextank_indexed" || $f->Field == "indextank_indexed_at") {
                 continue;
             }
-            $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $f->Field)->find_one();
+            $doc = $this->FCom_IndexTank_Model_ProductField->orm()->where('field_name', $f->Field)->find_one();
             if ($doc) {
                 continue;
             }
@@ -165,11 +165,11 @@ class FCom_IndexTank_Migrate extends BClass
                 $data['var_number'] = 2;
             }
 
-            FCom_IndexTank_Model_ProductField::orm()->create($data)->save();
+            $this->FCom_IndexTank_Model_ProductField->create($data)->save();
         }
 
         //price range field
-        $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', 'custom_price_range')->find_one();
+        $doc = $this->FCom_IndexTank_Model_ProductField->orm()->where('field_name', 'custom_price_range')->find_one();
         if (!$doc) {
             //add price range
             $data = [
@@ -180,20 +180,20 @@ class FCom_IndexTank_Migrate extends BClass
                     'source_type'       => 'function',
                     'source_value'      => 'fieldPriceRange'
             ];
-            FCom_IndexTank_Model_ProductField::orm()->create($data)->save();
+            $this->FCom_IndexTank_Model_ProductField->create($data)->save();
         }
 
 
         //add custom fields
-        $fields = FCom_CustomField_Model_Field::i()->orm()->find_many();
+        $fields = $this->FCom_CustomField_Model_Field->orm()->find_many();
         if ($fields) {
             foreach ($fields as $f) {
-                $fieldName = FCom_IndexTank_Index_Product::i()->getCustomFieldKey($f);
-                $doc = FCom_IndexTank_Model_ProductField::orm()->where('field_name', $fieldName)->find_one();
+                $fieldName = $this->FCom_IndexTank_Index_Product->getCustomFieldKey($f);
+                $doc = $this->FCom_IndexTank_Model_ProductField->orm()->where('field_name', $fieldName)->find_one();
                 if ($doc) {
                     continue;
                 }
-                $doc = FCom_IndexTank_Model_ProductField::orm()->create();
+                $doc = $this->FCom_IndexTank_Model_ProductField->create();
 
                 $matches = [];
                 preg_match("#(\w+)#", $f->table_field_type, $matches);
@@ -214,31 +214,31 @@ class FCom_IndexTank_Migrate extends BClass
 
     public function uninstall()
     {
-        $productsTable = FCom_Catalog_Model_Product::table();
-        BDb::run(" ALTER TABLE {$productsTable} DROP indextank_indexed,
+        $productsTable = $this->FCom_Catalog_Model_Product->table();
+        $this->BDb->run(" ALTER TABLE {$productsTable} DROP indextank_indexed,
         DROP indextank_indexed_at; ");
 
-        $pIndexHelperTable = FCom_IndexTank_Model_IndexHelper::table();
-        BDb::run(" DROP TABLE {$pIndexHelperTable}; ");
+        $pIndexHelperTable = $this->FCom_IndexTank_Model_IndexHelper->table();
+        $this->BDb->run(" DROP TABLE {$pIndexHelperTable}; ");
 
-        $pFieldsTable = FCom_IndexTank_Model_ProductField::table();
-        BDb::run(" DROP TABLE {$pFieldsTable}; ");
+        $pFieldsTable = $this->FCom_IndexTank_Model_ProductField->table();
+        $this->BDb->run(" DROP TABLE {$pFieldsTable}; ");
 
-        $pFunctionsTable = FCom_IndexTank_Model_ProductFunction::table();
-        BDb::run(" DROP TABLE {$pFunctionsTable}; ");
+        $pFunctionsTable = $this->FCom_IndexTank_Model_ProductFunction->table();
+        $this->BDb->run(" DROP TABLE {$pFunctionsTable}; ");
 
     }
 
     public function upgrade__0_1_0__0_1_1()
     {
-        $productsTable = FCom_Catalog_Model_Product::table();
-        if (!BDb::ddlFieldInfo($productsTable, 'indextank_indexed')) {
-            BDb::run(" ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0,
+        $productsTable = $this->FCom_Catalog_Model_Product->table();
+        if (!$this->BDb->ddlFieldInfo($productsTable, 'indextank_indexed')) {
+            $this->BDb->run(" ALTER TABLE {$productsTable} ADD indextank_indexed tinyint(1) not null default 0,
             ADD indextank_indexed_at datetime not null; ");
         }
 
-        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::run("
+        $pIndexingStatusTable = $this->FCom_IndexTank_Model_IndexingStatus->table();
+        $this->BDb->run("
             CREATE TABLE IF NOT EXISTS {$pIndexingStatusTable} (
             `id` INT( 11 ) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
             `task` VARCHAR( 255 ) NOT NULL ,
@@ -251,27 +251,27 @@ class FCom_IndexTank_Migrate extends BClass
 
     public function upgrade__0_1_1__0_1_2()
     {
-        $pFunctionsTable = FCom_IndexTank_Model_ProductFunction::table();
-        BDb::run(" ALTER TABLE {$pFunctionsTable} MODIFY `number` int(11) NOT NULL DEFAULT '-1'");
+        $pFunctionsTable = $this->FCom_IndexTank_Model_ProductFunction->table();
+        $this->BDb->run(" ALTER TABLE {$pFunctionsTable} MODIFY `number` int(11) NOT NULL DEFAULT '-1'");
     }
 
     public function upgrade__0_1_2__0_1_3()
     {
-        $productsTable = FCom_Catalog_Model_Product::table();
-        if (!BDb::ddlFieldInfo($productsTable, 'indextank_indexed')) {
-            BDb::run(" ALTER TABLE {$productsTable} ADD INDEX (indextank_indexed); ");
+        $productsTable = $this->FCom_Catalog_Model_Product->table();
+        if (!$this->BDb->ddlFieldInfo($productsTable, 'indextank_indexed')) {
+            $this->BDb->run(" ALTER TABLE {$productsTable} ADD INDEX (indextank_indexed); ");
         }
     }
 
     public function upgrade__0_1_3__0_1_4()
     {
-        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::ddlTableDef($pIndexingStatusTable, ['COLUMNS' => [
+        $pIndexingStatusTable = $this->FCom_IndexTank_Model_IndexingStatus->table();
+        $this->BDb->ddlTableDef($pIndexingStatusTable, ['COLUMNS' => [
             'status' => "enum('start','stop','pause') NOT NULL",
             'percent' => "BIGINT( 11 ) NOT NULL",
             'indexed' => "BIGINT( 11 ) NOT NULL",
         ]]);
-//        BDb::run( " ALTER TABLE {$pIndexingStatusTable}
+//        $this->BDb->run( " ALTER TABLE {$pIndexingStatusTable}
 //        ADD `status` enum('start','stop','pause') NOT NULL,
 //        ADD `percent` BIGINT( 11 ) NOT NULL ,
 //        ADD `indexed` BIGINT( 11 ) NOT NULL ; ");
@@ -279,35 +279,35 @@ class FCom_IndexTank_Migrate extends BClass
 
     public function upgrade__0_1_4__0_1_5()
     {
-        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::run(" ALTER TABLE {$pIndexingStatusTable}
+        $pIndexingStatusTable = $this->FCom_IndexTank_Model_IndexingStatus->table();
+        $this->BDb->run(" ALTER TABLE {$pIndexingStatusTable}
         MODIFY `status` ENUM( 'start', 'pause' ) NOT NULL DEFAULT 'start'; ");
     }
 
     public function upgrade__0_1_5__0_1_6()
     {
-        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::ddlTableDef($pIndexingStatusTable, ['COLUMNS' => ['to_index' => "BIGINT( 11 ) NOT NULL"]]);
-//        BDb::run( " ALTER TABLE {$pIndexingStatusTable} ADD `to_index` BIGINT( 11 ) NOT NULL ;");
+        $pIndexingStatusTable = $this->FCom_IndexTank_Model_IndexingStatus->table();
+        $this->BDb->ddlTableDef($pIndexingStatusTable, ['COLUMNS' => ['to_index' => "BIGINT( 11 ) NOT NULL"]]);
+//        $this->BDb->run( " ALTER TABLE {$pIndexingStatusTable} ADD `to_index` BIGINT( 11 ) NOT NULL ;");
     }
 
     public function upgrade__0_1_6__0_1_7()
     {
-        $pIndexingStatusTable = FCom_IndexTank_Model_IndexingStatus::table();
-        BDb::ddlTableDef($pIndexingStatusTable, ['COLUMNS' => ['index_size' => "BIGINT( 11 ) NOT NULL"]]);
-//        BDb::run( " ALTER TABLE {$pIndexingStatusTable} ADD `index_size` BIGINT( 11 ) NOT NULL ;");
+        $pIndexingStatusTable = $this->FCom_IndexTank_Model_IndexingStatus->table();
+        $this->BDb->ddlTableDef($pIndexingStatusTable, ['COLUMNS' => ['index_size' => "BIGINT( 11 ) NOT NULL"]]);
+//        $this->BDb->run( " ALTER TABLE {$pIndexingStatusTable} ADD `index_size` BIGINT( 11 ) NOT NULL ;");
     }
 
     public function upgrade__0_1_7__0_1_8()
     {
-        $pPFTable = FCom_IndexTank_Model_ProductFunction::table();
-        BDb::ddlTableDef($pPFTable, ['COLUMNS' => ['label' => "varchar(100) NOT NULL"]]);
-//        BDb::run( " ALTER TABLE {$pPFTable} ADD `label` varchar(100) NOT NULL ;");
+        $pPFTable = $this->FCom_IndexTank_Model_ProductFunction->table();
+        $this->BDb->ddlTableDef($pPFTable, ['COLUMNS' => ['label' => "varchar(100) NOT NULL"]]);
+//        $this->BDb->run( " ALTER TABLE {$pPFTable} ADD `label` varchar(100) NOT NULL ;");
     }
 
     public function upgrade__0_1_8__0_1_9()
     {
-        $pPFTable = FCom_IndexTank_Model_ProductFunction::table();
+        $pPFTable = $this->FCom_IndexTank_Model_ProductFunction->table();
         $sql = "
         update {$pPFTable} set label = 'Newest first' where name='age';
         update {$pPFTable} set label = 'Relevance' where name='relevance';
@@ -318,13 +318,13 @@ class FCom_IndexTank_Migrate extends BClass
         update {$pPFTable} set label = 'Manuf SKU (A-Z)' where name='local_sku_asc';
         update {$pPFTable} set label = 'Manuf SKU (Z-A)' where name='local_sku_desc';
         ";
-        BDb::run($sql);
+        $this->BDb->run($sql);
     }
 
     public function upgrade__0_1_9__0_2_0()
     {
-        $pPFTable = FCom_IndexTank_Model_ProductFunction::table();
-        BDb::ddlTableColumns($pPFTable, [
+        $pPFTable = $this->FCom_IndexTank_Model_ProductFunction->table();
+        $this->BDb->ddlTableColumns($pPFTable, [
             'field_name' => "varchar(100) NOT NULL",
             'sort_order' => "enum('asc','desc') NOT NULL DEFAULT 'asc'",
             'use_custom_formula' => "tinyint(1) NOT NULL DEFAULT 0",
@@ -333,8 +333,8 @@ class FCom_IndexTank_Migrate extends BClass
 
     public function upgrade__0_2_0__0_2_1()
     {
-        $pFieldsTable = FCom_IndexTank_Model_ProductField::table();
-        BDb::ddlTableDef($pFieldsTable, ['COLUMNS' => ['sort_order' => "int(11) NOT NULL DEFAULT '0'"]]);
-//        BDb::run( " ALTER TABLE {$pFieldsTable} ADD `sort_order` int(11) NOT NULL DEFAULT '0'");
+        $pFieldsTable = $this->FCom_IndexTank_Model_ProductField->table();
+        $this->BDb->ddlTableDef($pFieldsTable, ['COLUMNS' => ['sort_order' => "int(11) NOT NULL DEFAULT '0'"]]);
+//        $this->BDb->run( " ALTER TABLE {$pFieldsTable} ADD `sort_order` int(11) NOT NULL DEFAULT '0'");
     }
 }

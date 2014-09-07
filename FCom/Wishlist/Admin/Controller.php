@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 class FCom_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -32,7 +33,7 @@ class FCom_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_Grid
         ];
 
         $data = [];
-        $wishlistArr = FCom_Wishlist_Model_Wishlist::i()->orm()->where('customer_id', $customer->id)->find_many();
+        $wishlistArr = $this->FCom_Wishlist_Model_Wishlist->orm()->where('customer_id', $customer->id)->find_many();
         if ($wishlistArr) {
             foreach ($wishlistArr as $wishlist) {
                 $items = $wishlist->items();
@@ -50,4 +51,5 @@ class FCom_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_Grid
         unset($config['orm']);
         return ['config' => $config];
     }
+
 }

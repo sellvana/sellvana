@@ -39,7 +39,7 @@
 {% if not xhr %}
     <script>
         require(['fcom.frontend'], function() {
-            var compare = new FulleronCompare({emptyUrl:'{{ APP.instance('FCom_Core_Main').lastNav() }}'});
+            {#var compare = new FulleronCompare({emptyUrl:'{{ APP.instance('FCom_Core_Main').lastNav() }}'});#}
         })
     </script>
 {% else %}

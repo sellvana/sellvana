@@ -1,15 +1,15 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_LibFirephp_Main extends BClass
 {
-    static public function bootstrap()
+    public function bootstrap()
     {
         include_once __DIR__ . '/lib/FirePHP.class.php';
         include_once __DIR__ . '/lib/fb.php';
 
         $firephp = FirePHP::getInstance(true);
 
-        $enabled = BConfig::i()->get('modules/FCom_LibFirephp/enabled');
+        $enabled = $this->BConfig->get('modules/FCom_LibFirephp/enabled');
         if (null !== $enabled) {
             $firephp->setEnabled($enabled);
         }

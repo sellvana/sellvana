@@ -1,20 +1,22 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
- * @method FCom_Sales_Main i() i($new=false, array $args=array())
  * Class FCom_Sales_Main
+ *
+ * @method FCom_Sales_Main i() static i($new=false, array $args=array())
  */
 class FCom_Sales_Main extends BClass
 {
     protected $_registry = [];
     protected $_heap = [];
 
-    static public function bootstrap()
+    public function bootstrap()
     {
         foreach (['Subtotal', 'Shipping', 'Discount', 'GrandTotal'] as $total) {
-            FCom_Sales_Model_Cart::i()->registerTotalRowHandler('FCom_Sales_Model_Cart_Total_' . $total);
+            $this->FCom_Sales_Model_Cart->registerTotalRowHandler('FCom_Sales_Model_Cart_Total_' . $total);
         }
 
-        FCom_Admin_Model_Role::i()->createPermission([
+        $this->FCom_Admin_Model_Role->createPermission([
             'sales' => 'Sales',
             'sales/orders' => 'Orders',
             'sales/order_status' => 'Order Status',
@@ -62,7 +64,7 @@ class FCom_Sales_Main extends BClass
             $this->_heap[$type] = null; // make sure key exists
             if (!empty($this->_registry[$type])) {
                 foreach ($this->_registry[$type] as $n => $class) {
-                    $this->_heap[$type][$n] = $class::i();
+                    $this->_heap[$type][$n] = $this->{$class};
                 }
                 uasort($this->_heap[$type], function ($a, $b) {
                     return $a->getSortOrder() - $b->getSortOrder();

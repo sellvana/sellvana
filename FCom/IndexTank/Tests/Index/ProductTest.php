@@ -1,11 +1,11 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_IndexTank_Tests_Index_ProductTest extends PHPUnit_Framework_TestCase
 {
     private $_model = null;
     public function setUp()
     {
-        $this->_model = FCom_IndexTank_Index_Product::i()->model();
+        $this->_model = $this->FCom_IndexTank_Index_Product->model();
     }
 
     public function testIndex()
@@ -15,7 +15,7 @@ class FCom_IndexTank_Tests_Index_ProductTest extends PHPUnit_Framework_TestCase
 
     public function testIndexStatus()
     {
-        $status = FCom_IndexTank_Index_Product::i()->status();
+        $status = $this->FCom_IndexTank_Index_Product->status();
         $this->assertTrue(is_array($status));
     }
 

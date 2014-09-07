@@ -1,19 +1,39 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Cms_Frontend extends BClass
 {
-    public static function bootstrap()
+    public function bootstrap()
     {
-        $config = BConfig::i()->get('modules/FCom_Cms');
+        $config = $this->BConfig->get('modules/FCom_Cms');
         if (!empty($config['page_enable'])) {
             $prefix = !empty($config['page_url_prefix']) ? $config['page_url_prefix'] . '/' : '';
-            BRouting::i()->route('/' . $prefix . '*page', 'FCom_Cms_Frontend_Controller.page');
+            $this->BRouting->route('/' . $prefix . '*page', 'FCom_Cms_Frontend_Controller.page');
         }
         /*
         if (!empty($config['nav_enable'])) {
             $prefix = !empty($config['nav_url_prefix']) ? $config['nav_url_prefix'] . '/' : '';
-            BRouting::i()->get('/' . $prefix . '*nav', 'FCom_Cms_Frontend_Controller.nav');
+            $this->BRouting->get('/' . $prefix . '*nav', 'FCom_Cms_Frontend_Controller.nav');
         }
         */
+
+        $this->BLayout->addMetaDirective('cms_block', 'FCom_Cms_Frontend.metaDirectiveCmsBlockCallback');
+    }
+
+    public function onFrontendIndexBeforeDispatch($args)
+    {
+        if ($args['action'] !== 'index') {
+            return;
+        }
+        $cmsPagesEnabled = $this->BConfig->get('modules/FCom_Cms/page_enable');
+        $indexPage = $this->BConfig->get('modules/FCom_Cms/index_page');
+        if (!$cmsPagesEnabled || !$indexPage) {
+            return;
+        }
+        $args['controller']->forward('page', 'FCom_Cms_Frontend_Controller', ['block' => $indexPage]);
+    }
+
+    public function metaDirectiveCmsBlockCallback($d)
+    {
+        $this->FCom_Cms_Frontend_View_Block->createView($d['name'], ['view_name' => $d['view_name']]);
     }
 }

@@ -1,34 +1,34 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Customer_ApiServer_V1_Customer extends FCom_ApiServer_Controller_Abstract
 {
     public function action_index()
     {
-        $id = BRequest::i()->param('id');
-        $len = BRequest::i()->get('len');
+        $id = $this->BRequest->param('id');
+        $len = $this->BRequest->get('len');
         if (!$len) {
             $len = 10;
         }
-        $start = BRequest::i()->get('start');
+        $start = $this->BRequest->get('start');
         if (!$start) {
             $start = 0;
         }
 
         if ($id) {
-            $customers[] = FCom_Customer_Model_Customer::i()->load($id);
+            $customers[] = $this->FCom_Customer_Model_Customer->load($id);
         } else {
-            $customers = FCom_Customer_Model_Customer::orm()->limit($len, $start)->find_many();
+            $customers = $this->FCom_Customer_Model_Customer->orm()->limit($len, $start)->find_many();
         }
         if (empty($customers)) {
             $this->ok();
         }
-        $result = FCom_Customer_Model_Customer::i()->prepareApiData($customers);
+        $result = $this->FCom_Customer_Model_Customer->prepareApiData($customers);
         $this->ok($result);
     }
 
     public function action_index__POST()
     {
-        $post = BUtil::fromJson(BRequest::i()->rawPost());
+        $post = $this->BUtil->fromJson($this->BRequest->rawPost());
 
         if (empty($post['email'])) {
             $this->badRequest("Email is required");
@@ -43,9 +43,9 @@ class FCom_Customer_ApiServer_V1_Customer extends FCom_ApiServer_Controller_Abst
             $this->badRequest("Lastname is required");
         }
 
-        $data = FCom_Customer_Model_Customer::i()->formatApiPost($post);
+        $data = $this->FCom_Customer_Model_Customer->formatApiPost($post);
 
-        $customer = FCom_Customer_Model_Customer::orm()->create($data)->save();
+        $customer = $this->FCom_Customer_Model_Customer->create($data)->save();
 
         if (!$customer) {
             $this->internalError("Can't create a customer");
@@ -56,16 +56,16 @@ class FCom_Customer_ApiServer_V1_Customer extends FCom_ApiServer_Controller_Abst
 
     public function action_index__PUT()
     {
-        $id = BRequest::i()->param('id');
-        $post = BUtil::fromJson(BRequest::i()->rawPost());
+        $id = $this->BRequest->param('id');
+        $post = $this->BUtil->fromJson($this->BRequest->rawPost());
 
         if (empty($id)) {
             $this->badRequest("Customer id is required");
         }
 
-        $data = FCom_Customer_Model_Customer::i()->formatApiPost($post);
+        $data = $this->FCom_Customer_Model_Customer->formatApiPost($post);
 
-        $customer = FCom_Customer_Model_Customer::i()->load($id);
+        $customer = $this->FCom_Customer_Model_Customer->load($id);
         if (!$customer) {
             $this->notFound("Customer id #{$id} not found");
         }
@@ -76,13 +76,13 @@ class FCom_Customer_ApiServer_V1_Customer extends FCom_ApiServer_Controller_Abst
 
     public function action_index__DELETE()
     {
-        $id = BRequest::i()->param('id');
+        $id = $this->BRequest->param('id');
 
         if (empty($id)) {
             $this->notFound("Customer id is required");
         }
 
-        $customer = FCom_Customer_Model_Customer::i()->load($id);
+        $customer = $this->FCom_Customer_Model_Customer->load($id);
         if (!$customer) {
             $this->notFound("Customer id #{$id} not found");
         }

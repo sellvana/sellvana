@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
  * Created by pp
  * @project fulleron
@@ -10,13 +11,13 @@ class FCom_MultiLanguage_Main extends BClass
 
     const ENTITY_TYPE_PRODUCT = 'product';
 
-    public static function bootstrap()
+    public function bootstrap()
     {
-        $lang = static::getLanguage();
+        $lang = $this->getLanguage();
         if (!empty($lang)) {
-            BSession::i()->set('_language', $lang);
+            $this->BSession->set('_language', $lang);
         }
-        FCom_Admin_Model_Role::i()->createPermission([
+        $this->FCom_Admin_Model_Role->createPermission([
             'translations' => 'Translations',
         ]);
 
@@ -25,9 +26,9 @@ class FCom_MultiLanguage_Main extends BClass
     /**
      * @return null|string
      */
-    protected static function getLanguage()
+    protected function getLanguage()
     {
-        return BRequest::i()->request("lang");
+        return $this->BRequest->request("lang");
     }
 
     public function productCollectionLoadLocale($args)
@@ -51,7 +52,7 @@ class FCom_MultiLanguage_Main extends BClass
 
     public function modelLoadLocale($args, $entityType)
     {
-        $lang = static::getLanguage();
+        $lang = $this->getLanguage();
         if (!$lang || !($args['result'] instanceof BModel)) { // should instance check be more strict?
             return false;
         }
@@ -70,7 +71,7 @@ class FCom_MultiLanguage_Main extends BClass
     }
 
     public function modelCollectionLoadLocale($args, $entityType) {
-        $lang = static::getLanguage();
+        $lang = $this->getLanguage();
         if (!$lang || count($args['result']) == 0) {
             return false;
         }
@@ -115,10 +116,10 @@ class FCom_MultiLanguage_Main extends BClass
     protected function getTranslations($id, $entityId, $lang, $fields = [])
     {
         /* @var $orm BORM */
-        $orm = FCom_MultiLanguage_Model_Translation::i()
+        $orm = $this->FCom_MultiLanguage_Model_Translation
             ->orm('ml')
             ->select(['entity_id', 'field', 'value', 'data_serialized'], 'ml')
-            ->where(['entity_id' => $id, 'entity_type' => $entityId, 'locale' => $lang]);
+            ->where(['entity_id' => (int)$id, 'entity_type' => (string)$entityId, 'locale' => (string)$lang]);
         if (!empty($fields)) {
             $orm->where(['field' => $fields]);
         }

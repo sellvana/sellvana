@@ -12,6 +12,12 @@
 a { color:#0452a1; }
 a:hover, a:focus { text-decoration:none; }
 
+/* Form */
+select.form-control,
+select {
+  height:25px;
+  }
+
 /* Buttons */
 .btn {
   border-radius:2px;
@@ -324,8 +330,16 @@ a.btn-link { text-transform:none; }
   background:#ddd;
   color:#444;
   }
+.f-prod-listing-grid .btn-primary {
+  margin-bottom:5px;
+  }
 .f-prod-listing-grid .btn-link {
+  padding-top:3px;
+  padding-bottom:3px;
   font-weight:500;
+  }
+.f-prod-listing-grid .link-wishlist {
+  float:right;
   }
 .f-widget-featured-prods {
   margin:18px 0 25px;
@@ -343,6 +357,35 @@ a.btn-link { text-transform:none; }
   color:#999;
   }
 
+/* Product Compare */
+.f-widget-prods-compare {
+  margin-bottom:10px;
+  padding:10px 15px;
+  background:#f9f9f9;
+  }
+.f-site-main .f-widget-prods-compare .f-widget-title {
+  padding-right:5px;
+  font-size:1em;
+  }
+.f-widget-prods-compare ul {
+  margin-bottom:0;
+  }
+.f-widget-prods-compare li.item {
+  width:40px;
+  height:40px;
+  vertical-align:middle;
+  }
+.btn-compare .glyphicon {
+  margin-right:4px;
+  font-size:14px;
+  }
+.btn-compare .glyphicon-unchecked {
+  color:#ddd;
+  }
+.btn-compare .glyphicon-check {
+  color:#114c87
+  }
+
 /* My Account */
 .f-sidebar-nav .list-group-item { border:none; padding:5px 0; }
 .f-sidebar-nav .list-group-item.active,
@@ -355,13 +398,24 @@ a.btn-link { text-transform:none; }
    CONTAINER-SPECIFIC
 \*------------------------------------*/
 
-/* Page: Home */
+/* PAGE: Home */
 .f-page-home .f-home-hero-callouts .f-callout {
   max-height:400px;
   overflow:hidden;
   }
 
-/* Page: Product View */
+/* PAGE: Category */
+.f-page-category .f-category-content,
+.f-page-category .f-catalog-sub-cats {
+  margin-top:15px;
+  margin-bottom:15px;
+  }
+.f-page-category .f-catalog-sub-cats > ul > li {
+  margin-top:10px;
+  margin-bottom:15px;
+  }
+
+/* PAGE: Product View */
 .f-col-prod-select .f-prod-name {
   margin:0 0 5px 0;
   font:400 1.75em 'Lato', sans-serif;
@@ -411,7 +465,7 @@ a.btn-link { text-transform:none; }
   text-transform:uppercase;
   }
 
-/* Page: Cart */
+/* PAGE: Cart */
 .f-col-cart-totals {
   border-radius:4px;
   border:1px solid #dbe7f1;
@@ -447,16 +501,16 @@ a.btn-link { text-transform:none; }
 .page-cart .f-site-main .f-widget-header { margin-bottom:5px; }
 .page-cart .f-site-main .f-widget-title { font-size:15px; }
 
-/* Page: Checkout */
+/* PAGE: Checkout */
 .f-checkout-form {
   margin:25px auto;
   max-width:700px;
   }
 
-/* Page: CMS */
+/* PAGE: CMS */
 .f-cms-content h4 { margin-top:20px; }
 
-/* Page: Login */
+/* PAGE: Login */
 .f-authentification-form .f-page-header { margin-bottom:5px; }
 
 
@@ -465,7 +519,7 @@ a.btn-link { text-transform:none; }
    RESPONSIVE
 \*------------------------------------*/
 
-/* Extra small devices (phones, up to 480px) */
+/* Small Phones */
 @media (max-width: 480px) {
   .f-site-header-top .navbar-brand img {
     max-width:100px;
@@ -485,9 +539,25 @@ a.btn-link { text-transform:none; }
     background:#f5f5f5;
     padding:15px;
     }
+
+  /* PAGE: Category */
+  .f-catalog-sub-cats > ul > li img {
+    margin-bottom:5px;
+    display:block;
+    width:100%;
+  }
 }
 
-/* Mobile devices (larger phones) */
+/* Small Phones */
+@media (min-width: 481px) {
+  /* PAGE: Category */
+  .f-page-category .f-catalog-sub-cats .subcat-img {
+    float:left;
+    margin-right:10px;
+    }
+}
+
+/* Larger Phones */
 @media (max-width: 767px) {
   body { font-size:16px; }
 
@@ -566,7 +636,8 @@ a.btn-link { text-transform:none; }
     margin-left:15px;
   }
 }
-/* Small devices (tablets, 768px and up) */
+
+/* Tablets */
 @media (min-width: 768px) {
   /* Bootstrap */
   .navbar-toggle { display:block; }
@@ -600,6 +671,7 @@ a.btn-link { text-transform:none; }
   .f-site-footer dd {
     margin:3px 0;
     }
+
   /* Container: Product Rating & Reviews */
   .f-prod-reviews .f-prod-review-post .f-prod-review-attrs {
     border:1px solid #eee;
@@ -625,7 +697,7 @@ a.btn-link { text-transform:none; }
   /* Bootstrap */
   .navbar-toggle { display:none; }
 
-  /* Page: Product View */
+  /* PAGE: Product View */
   .f-col-related-prods { float:left; }
   .f-col-prod-select { float:right; }
   .f-prod-info > .tab-content .f-tab-heading {
@@ -643,7 +715,7 @@ a.btn-link { text-transform:none; }
     }
 }
 
-/* Large devices (large desktops, 1200px and up) */
+/* Desktop+ */
 @media (min-width: 1200px) {
 }
 

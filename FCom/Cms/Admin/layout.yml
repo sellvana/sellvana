@@ -20,6 +20,7 @@ base:
         do:
             - [ addTab, main, { label: Navigation Node, pos: 10 } ]
             - [ addTab, content, { label: Page Content, pos: 20 } ]
+            - [ addTab, form, { label: Form Fields, pos: 30 } ]
 
 /settings:
     - { view: settings, do: [[ addTab, FCom_Cms, { label: Cms, group: catalog, async: true } ]] }

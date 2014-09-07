@@ -1,9 +1,9 @@
 {% set c = THIS.get('model') %}
 {% set fieldData = { model: c, settings_module:'FCom_Blog' } %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 <h2>{{ "Blog Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Blog'}) }}
      {{ forms.accordion_panel_start({label:'Website'|_, id:'settings-FCom_Blog-group0', in:1}) }}
-        {{ forms.input(fieldData|merge({field:'blog_title', label:'Blog Title'|_ })) }}
+        {{ forms.input(fieldData, {field:'blog_title', label:'Blog Title'|_ }) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}

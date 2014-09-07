@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_CustomField_Model_Set extends FCom_Core_Model_Abstract
 {
@@ -8,9 +8,9 @@ class FCom_CustomField_Model_Set extends FCom_Core_Model_Abstract
 
     public function addSet($data)
     {
-        $set = static::load(BUtil::arrayMask($data, 'set_type,set_code'));
+        $set = $this->load($this->BUtil->arrayMask($data, 'set_type,set_code'));
         if (!$set) {
-            $set = static::create($data)->save();
+            $set = $this->create($data)->save();
         } else {
             $set->set($data)->save();
         }

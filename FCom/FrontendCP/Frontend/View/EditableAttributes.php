@@ -1,13 +1,13 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_FrontendCP_Frontend_View_EditableAttributes extends FCom_Core_View_Abstract
 {
     public function render(array $args = [], $retrieveMetaData = true)
     {
-        if (!FCom_Admin_Model_User::i()->isLoggedIn()) {
+        if (!$this->FCom_Admin_Model_User->isLoggedIn()) {
             return '';
         }
-        if (!FCom_Admin_Model_User::i()->sessionUser()->getPermission('frontendcp/edit')) {
+        if (!$this->FCom_Admin_Model_User->sessionUser()->getPermission('frontendcp/edit')) {
             return '';
         }
 

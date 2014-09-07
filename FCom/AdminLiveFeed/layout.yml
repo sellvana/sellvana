@@ -1,0 +1,9 @@
+base:
+    - view: head
+        do:
+            - [ requireJs, fcom.adminlivefeed, "@FCom_AdminLiveFeed/js/fcom.adminlivefeed" ]
+            - [ requireRun, fcom.adminlivefeed]
+/settings:
+    - view: settings
+        do:
+            - [ addTab, FCom_AdminLiveFeed, { label: Recent Activity, group: pushserver, async: true } ]

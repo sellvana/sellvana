@@ -1,9 +1,9 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_PaymentCC_Frontend extends BClass
 {
-    static public function bootstrap()
+    public function bootstrap()
     {
-        FCom_Sales_Main::i()->addPaymentMethod('cc', 'FCom_PaymentCC_PaymentMethod');
+        $this->FCom_Sales_Main->addPaymentMethod('cc', 'FCom_PaymentCC_PaymentMethod');
     }
 }

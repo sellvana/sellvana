@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -14,7 +14,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
 
     public function gridConfig()
     {
-        $fieldHlp = FCom_CatalogIndex_Model_Field::i();
+        $fieldHlp = $this->FCom_CatalogIndex_Model_Field;
         $config = parent::gridConfig();
         unset($config['form_url']);
         $config['columns'] = [
@@ -22,7 +22,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
             ['name' => 'id', 'label' => 'ID', 'index' => 'idxf.id'],
             ['type' => 'input', 'name' => 'field_name', 'label' => 'Name', 'index' => 'idxf.field_name',
                 'editable' => true, 'addable' => true, 'validation' =>
-                    ['required' => true, 'unique' => BApp::href('catalogindex/fields/unique'), 'maxlength' => 50]],
+                    ['required' => true, 'unique' => $this->BApp->href('catalogindex/fields/unique'), 'maxlength' => 50]],
             ['type' => 'input', 'name' => 'field_label', 'label' => 'Label', 'index' => 'idxf.field_label', 'editable' => true,
                 'addable' => true, 'validation' => ['required' => true, 'maxlength' => 50]],
             ['type' => 'input', 'name' => 'field_type', 'label' => 'Type', 'index' => 'idxf.field_type', 'width' => 80,
@@ -86,6 +86,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
         });';
         $config['callbacks'] = ['after_modalForm_render' => $callbacks];
         $config['new_button'] = '#add_new_index_field';
+        $config['grid_before_create'] = 'indexFieldGridRegister';
         return $config;
     }
 
@@ -96,12 +97,11 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
         $gridView = $args['page_view'];
         $actions = $gridView->get('actions');
         $actions += [
-            'reindex_force' => ' <button class="btn btn-primary" type="button" onclick="$(\'#util-form\').attr(\'action\', \''
-                . BApp::href('catalogindex/reindex?CLEAR=1') . '\').submit()"><span>' . BLocale::_('Force Reindex')
+            'reindex_force' => ' <button class="btn btn-primary btn-progress _modal" data-toggle="modal" data-target="#progress" type="button"><span>' . $this->BLocale->_('Force Reindex')
                 . '</span></button>',
         ];
         $actions['new'] = '<button type="button" id="add_new_index_field" class="btn grid-new btn-primary _modal">'
-            . BLocale::_('Add New Index Field') . '</button>';
+            . $this->BLocale->_('Add New Index Field') . '</button>';
         $gridView->set('actions', $actions);
     }
 
@@ -114,54 +114,26 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
         $args['view']->set(['title' => $title]);
     }
 
-    public function formPostAfter($args)
-    {
-        parent::formPostAfter($args);
-        if ($args['do'] !== 'DELETE') {
-            $customerGroup = $args['model'];
-            $addrPost = BRequest::i()->post('address');
-            if (($newData = BUtil::fromJson($addrPost['data_json']))) {
-                $oldModels = FCom_CustomerGroups_Model_Group::i()->orm('a')->where('customer_id', $customerGroup->id)
-                    ->find_many_assoc();
-                foreach ($newData as $id => $data) {
-                    if (empty($data['id'])) {
-                        continue;
-                    }
-                    if (!empty($oldModels[$data['id']])) {
-                        $addr = $oldModels[$data['id']];
-                        $addr->set($data)->save();
-                    } elseif ($data['id'] < 0) {
-                        unset($data['id']);
-                        $addr = FCom_Customer_Model_Address::i()->newBilling($data, $cust);
-                    }
-                }
-            }
-            if (($del = BUtil::fromJson($addrPost['del_json']))) {
-                FCom_Customer_Model_Address::i()->delete_many(['id' => $del, 'customer_id' => $customerGroup->id]);
-            }
-        }
-    }
-
     public function action_unique__POST()
     {
-        $post = BRequest::i()->post();
+        $post = $this->BRequest->post();
         $data = each($post);
-        $rows = BDb::many_as_array(FCom_CatalogIndex_Model_Field::i()->orm()->where($data['key'], $data['value'])
+        $rows = $this->BDb->many_as_array($this->FCom_CatalogIndex_Model_Field->orm()->where($data['key'], $data['value'])
             ->find_many());
-        BResponse::i()->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
+        $this->BResponse->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
     }
 
     public function action_grid_data__POST()
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         if ($r->post('oper') == 'edit') {
             $data = $r->post();
             // avoid error when edit
             unset($data['id'], $data['oper'], $data['fcom_field_id']);
-            $set = FCom_CatalogIndex_Model_Field::i()->load($r->post('id'))->set($data)->save();
+            $set = $this->FCom_CatalogIndex_Model_Field->load($r->post('id'))->set($data)->save();
             $result = $set->as_array();
 
-            BResponse::i()->json($result);
+            $this->BResponse->json($result);
         } else {
             $this->_processGridDataPost($this->_modelClass);
         }

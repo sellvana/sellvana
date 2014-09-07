@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -12,7 +12,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
 
     public function getExportConfig()
     {
-        $config                = parent::gridConfig();
+        $config              = parent::gridConfig();
         $config['id']        = 'ie_export_grid';
         $config['data_mode'] = 'local';
 
@@ -22,7 +22,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         ];
         $config['filters']            = [['field' => 'model', 'type' => 'text']];
         $config['grid_before_create'] = 'modelsGridRegister';
-        $data                           = FCom_Core_ImportExport::i()->collectExportableModels();
+        $data                           = $this->FCom_Core_ImportExport->collectExportableModels();
         ksort($data);
         $default         = [
             'model'    => '',
@@ -97,7 +97,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
         $config['events']             = ['add'];
         $config['grid_before_create'] = 'iePermGridRegister';
 
-        $data                      = FCom_Core_ImportExport::i()->collectExportableModels();
+        $data                      = $this->FCom_Core_ImportExport->collectExportableModels();
         $permissions               = array_flip(explode("\n", $model->get('permissions_data')));
         $default                   = [
             'permission_name' => '',
@@ -149,6 +149,9 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
     {
         $model['export_config'] = $this->getExportConfig();
         $model[ 'import_config' ] = $this->getImportConfig();
+
+        $this->layout();
+
         $this->formMessages();
         $view = $this->view($this->_formViewName)->set('model', $model);
 
@@ -160,42 +163,60 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
             $nav->setNav($this->_navPath);
         }
 
-        $this->layout();
-        BLayout::i()->view('admin/form')->set('tab_view_prefix', $this->_formViewPrefix);
+        $this->BLayout->view('admin/form')->set('tab_view_prefix', $this->_formViewPrefix);
         if ($this->_useDefaultLayout) {
-            BLayout::i()->applyLayout('default_form');
+            $this->BLayout->applyLayout('default_form');
         }
-        BLayout::i()->applyLayout($this->_formLayoutName);
+        $this->BLayout->applyLayout($this->_formLayoutName);
 
         $this->processFormTabs($view, $model);
     }
-    public function action_import()
+    public function action_import__POST()
     {
+
+        if (empty($_FILES) || !isset($_FILES['upload'])) {
+            $this->BResponse->json(['msg' => "Nothing found"]);
+            return;
+        }
+        $this->BResponse->setContentType('application/json');
         /** @var FCom_Core_ImportExport $importer */
-        $importer = FCom_Core_ImportExport::i();
-        $uploads  = $_FILES[ 'upload' ];
-        $rows = [];
+        $importer = $this->FCom_Core_ImportExport;
+        $uploads = $_FILES['upload'];
+        $rows    = [];
         try {
             foreach ($uploads['name'] as $i => $fileName) {
 
                 if (!$fileName) {
                     continue;
                 }
+                $fileName = preg_replace('/[^\w\d_.-]+/', '_', $fileName);
+
                 $fullFileName = $importer->getFullPath($fileName);
-                BUtil::ensureDir(dirname($fullFileName));
+                $this->BUtil->ensureDir(dirname($fullFileName));
                 $fileSize = 0;
-                if (!$uploads['error'][$i] && @move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
-                    $importer->import($fileName);
+                if ($uploads['error'][$i]) {
+                    $error = $uploads['error'][$i];
+                } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
+                    $error = $this->_("Problem storing uploaded file.");
+                } elseif ($importer->validateImportFile($fullFileName)) {
+                    $this->BResponse->startLongResponse(false);
+                    //if (function_exists('xdebug_start_trace')) {
+                    //    xdebug_start_trace();
+                    //}
+                    $importer->importFile($fileName);
+                    //if (function_exists('xdebug_stop_trace')) {
+                    //    xdebug_stop_trace();
+                    //}
                     $error    = '';
                     $fileSize = $uploads['size'][$i];
                 } else {
-                    $error = $uploads['error'][$i];
+                    $error = $this->_("Invalid import file.");
                 }
 
                 $row = [
                     'name'   => $fileName,
                     'size'   => $fileSize,
-                    'folder' => str_replace(BConfig::i()->get('fs/root_dir'), '...', dirname($fullFileName)),
+                    'folder' => '.../',
                 ];
                 if ($error) {
                     $row['error'] = $error;
@@ -203,14 +224,14 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
                 $rows[] = $row;
             }
         } catch(Exception $e) {
-            BDebug::logException($e);
-            BResponse::i()->json(['error' => $e->getMessage()]);
+            $this->BDebug->logException($e);
+            $this->BResponse->json(['error' => $e->getMessage()]);
         }
-        BResponse::i()->json( [ 'files' => $rows ] );
+        $this->BResponse->json(['files' => $rows]);
     }
-    public function action_export()
+    public function action_export__POST()
     {
-        $exportData = BRequest::i()->post('ie_export_grid');
+        $exportData = $this->BRequest->post('ie_export_grid');
         $toFile = isset($exportData['export_file_name']) ? $exportData['export_file_name'] : null;
         $models = !empty($exportData['checked']) ? array_keys($exportData['checked']) : null;
 
@@ -224,8 +245,14 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
             }
 
         }
-        $result = FCom_Core_ImportExport::i()->export($models, $toFile);
-        BResponse::i()->json(['result' => $result ? 'Success': 'Failure']);
+        //if(function_exists('xdebug_start_trace')){
+        //    xdebug_start_trace();
+        //}
+        $result = $this->FCom_Core_ImportExport->export($models, $toFile);
+        $this->BResponse->json(['result' => $result ? 'Success': 'Failure']);
+        //if(function_exists('xdebug_stop_trace')){
+        //    xdebug_stop_trace();
+        //}
     }
 
     protected function getImportConfig()

@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_PaymentCC_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 {
@@ -14,6 +14,6 @@ class FCom_PaymentCC_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 
     public function getCheckoutFormView()
     {
-        return BLayout::i()->view('credit_card/form');
+        return $this->BLayout->view('credit_card/form');
     }
 }

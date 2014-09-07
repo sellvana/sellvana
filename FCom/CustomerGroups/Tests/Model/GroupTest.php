@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
  * Created by pp
  * @project fulleron
@@ -14,7 +15,7 @@ class FCom_CustomerGroups_Tests_Model_GroupTest
 
     protected function setUp()
     {
-        $this->model = FCom_CustomerGroups_Model_Group::i(true);
+        $this->model = $this->FCom_CustomerGroups_Model_Group->i(true);
     }
 
     /**
@@ -22,7 +23,7 @@ class FCom_CustomerGroups_Tests_Model_GroupTest
      */
     public function testGetGroupsOptionsForHtml()
     {
-        $groupOptions = FCom_CustomerGroups_Model_Group::i()->groupsOptions();
+        $groupOptions = $this->FCom_CustomerGroups_Model_Group->groupsOptions();
 
         $this->assertTrue(is_array($groupOptions));
 

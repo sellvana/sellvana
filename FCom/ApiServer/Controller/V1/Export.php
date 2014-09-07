@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
  * Created by pp
@@ -16,7 +16,7 @@ class FCom_ApiServer_Controller_V1_Export
     public function action_index()
     {
         /** @var FCom_Core_ImportExport $exporter */
-        $exporter = FCom_Core_ImportExport::i();
+        $exporter = $this->FCom_Core_ImportExport;
         $toFile = fopen('php://output', 'w');
         //header("Content-Type: application/json");
         //header('Status: 200');

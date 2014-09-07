@@ -4,10 +4,10 @@
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
   <script>
       (function($) {
-          var baseUrl = '<?= BApp::href('marketclient/download') ?>',
+          var baseUrl = '<?= $this->BApp->href('marketclient/download') ?>',
               redirectUrl = '<?= $this->q($this->redirect_to) ?>',
-              modules = <?= BUtil::toJson($this->modules) ?>,
-              csrfToken = '<?= BSession::i()->csrfToken() ?>';
+              modules = <?= $this->BUtil->toJson($this->modules) ?>,
+              csrfToken = '<?= $this->BSession->csrfToken() ?>';
 
           function start() {
               $('#progress-stop').click(stop);
@@ -57,7 +57,7 @@
   </style>
 </head>
 <body>
-    <h1><?= BLocale::_('Downloading and installing packages...') ?></h1>
+    <h1><?= $this->BLocale->_('Downloading and installing packages...') ?></h1>
     <!--
     <button id="progress-stop" type="button"><?= $this->q('STOP') ?></button>
     <button id="progress-restart" type="button"><?= $this->q('RESTART') ?></button>

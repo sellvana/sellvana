@@ -13,6 +13,7 @@ base:
             - [ js, "@FCom_Admin/Admin/theme1/assets/javascripts/ie/html5shiv.js", { if: lt IE 9 } ]
             - [ js, "@FCom_Admin/Admin/theme1/assets/javascripts/ie/respond.min.js", { if: lt IE 9 } ]
 
+            - [ css, "@FCom_Core/css/flags.css" ]
             - [ css, "@FCom_Core/css/fcom.core.css" ]
             - [ requireJs, jquery.cookie, "@FCom_LibJsCommon/js/jquery.cookie", { deps: [ jquery ] } ]
             - [ requireJs, jquery.hotkeys, "@FCom_LibJsCommon/js/jquery.hotkeys", { deps: [ jquery ] } ]
@@ -42,6 +43,7 @@ base:
             - [ addNav, system, { label: System, pos: 900, icon_class: icon-cog } ]
             - [ addNav, system/users, { label: Users, href: /users  } ]
             - [ addNav, system/roles, { label: Roles & Permissions, href: /roles  } ]
+            - [ addNav, system/emails, { label: System Emails, href: /systememails  } ]
             - [ addNav, system/templates, { label: Templates, href: /templates  } ]
             - [ addNav, system/backups, { label: Backups, href: /backups  } ]
             - [ addNav, system/importexport, { label: Import/Export, href: /importexport  } ]
@@ -308,3 +310,12 @@ form:
 
 /header_search:
     - { include: base }
+
+/templates:
+    - { include: base }
+    - { hook: main, views: templates }
+    - { view: admin/nav, do: [[ setNav, system/templates ]]}
+
+/systememails:
+    - { include: base }
+    - { view: admin/nav, do: [[ setNav, system/emails ]] }

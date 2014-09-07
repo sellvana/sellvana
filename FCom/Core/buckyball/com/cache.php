@@ -1,4 +1,5 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
+
 /**
 * Copyright 2014 Boris Gurvich
 *
@@ -32,7 +33,7 @@ class BCache extends BClass
     *
     * @return BCache
     */
-    public static function i($new = false, array $args = [])
+    static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
@@ -42,7 +43,7 @@ class BCache extends BClass
         foreach (['File', 'Shmop', 'Apc', 'Memcache', 'Db'] as $type) {
             $this->addBackend($type, 'BCache_Backend_' . $type);
         }
-        $this->_defaultBackend = BConfig::i()->get('cache/default_backend', 'file');
+        $this->_defaultBackend = $this->BConfig->get('cache/default_backend', 'file');
     }
 
     public function addBackend($type, $backend)
@@ -52,7 +53,7 @@ class BCache extends BClass
             if (!class_exists($backend)) {
                 throw new BException('Invalid cache backend class name: ' . $backend . ' (' . $type . ')');
             }
-            $backend = $backend::i();
+            $backend = $this->{$backend};
         }
         if (!is_object($backend)) {
             throw new BException('Invalid backend for type: ' . $type);
@@ -105,9 +106,9 @@ class BCache extends BClass
             if (empty($info['available'])) {
                 throw new BException('Cache backend is not available: ' . $type);
             }
-            $config = (array)BConfig::i()->get('cache/' . $type);
+            $config = (array)$this->BConfig->get('cache/' . $type);
             $backend->init($config);
-            $this->_backendsStatus[$type] = true;
+            $this->_backendStatus[$type] = true;
         }
         return $this->_backends[$type];
     }
@@ -140,6 +141,15 @@ class BCache extends BClass
     public function gc()
     {
         return $this->getBackend()->gc();
+    }
+
+    public function deleteAll()
+    {
+        $backend = $this->getBackend();
+        if (method_exists($backend, 'deleteAll')) {
+            return $backend->deleteAll();
+        }
+        return false;
     }
 }
 
@@ -174,7 +184,7 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
     public function init($config = [])
     {
         if (empty($config['dir'])) {
-            $config['dir'] = BConfig::i()->get('fs/cache_dir');
+            $config['dir'] = $this->BConfig->get('fs/cache_dir');
         }
         if (!is_writable($config['dir'])) {
             $config['dir'] = sys_get_temp_dir() . '/fulleron/' . md5(__DIR__) . '/cache';
@@ -189,7 +199,7 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
     protected function _filename($key)
     {
         $md5 = md5($key);
-        return $this->_config['dir'] . '/' . substr($md5, 0, 2) . '/' . BUtil::simplifyString($key) . '.' . substr($md5, 0, 10) . '.dat';
+        return $this->_config['dir'] . '/' . substr($md5, 0, 2) . '/' . $this->BUtil->simplifyString($key) . '.' . substr($md5, 0, 10) . '.dat';
     }
 
     public function load($key)
@@ -216,7 +226,7 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
     {
         $filename = $this->_filename($key);
         $dir = dirname($filename);
-        BUtil::ensureDir($dir);
+        $this->BUtil->ensureDir($dir);
         $meta = [
             'ts' => time(),
             'ttl' => !is_null($ttl) ? $ttl : $this->_config['default_ttl'],
@@ -245,7 +255,7 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
     */
     public function loadMany($pattern)
     {
-        $files = glob($this->_config['dir'] . '/*/*' . BUtil::simplifyString($pattern) . '*');
+        $files = glob($this->_config['dir'] . '/*/*' . $this->BUtil->simplifyString($pattern) . '*');
         if (!$files) {
             return [];
         }
@@ -272,7 +282,7 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
         if ($pattern === true || $pattern === false) { // true: remove ALL cache, false: remove EXPIRED cache
             $files = glob($this->_config['dir'] . '/*/*');
         } else {
-            $files = glob($this->_config['dir'] . '/*/*' . BUtil::simplifyString($pattern) . '*');
+            $files = glob($this->_config['dir'] . '/*/*' . $this->BUtil->simplifyString($pattern) . '*');
         }
         if (!$files) {
             return false;
@@ -298,6 +308,12 @@ class BCache_Backend_File extends BClass implements BCache_Backend_Interface
     public function gc()
     {
         $this->deleteMany(false);
+        return true;
+    }
+
+    public function deleteAll()
+    {
+        $this->BUtil->rmdirRecursive_YesIHaveCheckedThreeTimes($this->_config['dir']);
         return true;
     }
 }
@@ -461,7 +477,7 @@ class BCache_Backend_Db extends BClass implements BCache_Backend_Interface
 #echo "<pre>"; debug_print_backtrace(); exit;
         return ['available' => false];
 
-        $avail = (boolean)BConfig::i()->get('db/dbname');
+        $avail = (boolean)$this->BConfig->get('db/dbname');
         return ['available' => $avail, 'rank' => 90];
     }
 
@@ -485,7 +501,7 @@ class BCache_Backend_Db extends BClass implements BCache_Backend_Interface
 
     public function save($key, $data, $ttl = null)
     {
-        $hlp = BCache_Backend_Db_Model_Cache::i();
+        $hlp = $this->BCache_Backend_Db_Model_Cache;
         $cache = $hlp->load($key, 'cache_key');
         if (!$cache) {
             $cache = $hlp->create(['cache_key' => $key]);
@@ -499,7 +515,7 @@ class BCache_Backend_Db extends BClass implements BCache_Backend_Interface
 
     public function delete($key)
     {
-        BCache_Backend_Db_Model_Cache::i()->delete_many(['cache_key' => $key]);
+        $this->BCache_Backend_Db_Model_Cache->delete_many(['cache_key' => $key]);
         return true;
     }
 
@@ -515,15 +531,15 @@ class BCache_Backend_Db extends BClass implements BCache_Backend_Interface
 
     public function gc()
     {
-        BCache_Backend_Db_Model_Cache::i()->delete_many('expires_at<' . time());
+        $this->BCache_Backend_Db_Model_Cache->delete_many('expires_at<' . time());
         return true;
     }
 
     public function migrate()
     {
         $t = BCache_Backend_Db_Model_Cache::table();
-        if (!BDb::ddlTableExists($t)) {
-            BDb::ddlTableDef($t, [
+        if (!$this->BDb->ddlTableExists($t)) {
+            $this->BDb->ddlTableDef($t, [
                 'COLUMNS' => [
                     'id' => 'int unsigned not null auto_increment',
                     'cache_key' => 'varchar(255) not null',
@@ -570,6 +586,7 @@ class BCache_Backend_Shmop extends BClass implements BCache_Backend_Interface
     {
 
     }
+
 
     public function delete($key)
     {

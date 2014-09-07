@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 if (!defined('ENT_SUBSTITUTE')) {
     // use 0 as hhvm does not support several flags yet

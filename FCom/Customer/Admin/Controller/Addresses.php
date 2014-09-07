@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -18,6 +18,7 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
     {
         $config = parent::gridConfig();
         $config['id'] = 'customer_addresses_grid_' . $customer->id;
+        unset($config['form_url']);
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'index' => 'a.id', 'width' => 80, 'hidden' => true],
@@ -38,11 +39,11 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
             ['type' => 'input', 'name' => 'street3', 'label' => 'Address Line 3', 'index' => 'a.street3', 'width' => 200,
                 'hidden' => true, 'addable' => true, 'editable' => true],
             ['type' => 'input', 'name' => 'country', 'label' => 'Country', 'index' => 'a.country', 'editor' => 'select',
-                'addable' => true, 'options' => FCom_Geo_Model_Country::i()->options(), 'editable' => true,
+                'addable' => true, 'options' => $this->BLocale->getAvailableCountries(), 'editable' => true,
                 'validation' => ['required' => true]],
             ['type' => 'input', 'name' => 'region', 'label' => 'State/Province/Region', 'index' => 'a.region',
                 'addable' => true, 'editable' => true, 'editor' => 'select',
-                'options' => FCom_Geo_Model_Region::i()->allOptions(),
+                'options' =>  $this->BLocale->getAvailableRegions(),
 //                'validation' => [ 'required' => true ],
             ],
             ['type' => 'input', 'name' => 'city', 'label' => 'City', 'index' => 'a.city', 'addable' => true,
@@ -50,11 +51,15 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
             ['type' => 'input', 'name' => 'postcode', 'label' => 'Zip/Postal Code', 'index' => 'a.postcode',
                 'addable' => true, 'editable' => true, 'validation' => ['required' => true]],
             ['type' => 'input', 'name' => 'phone', 'label' => 'Phone', 'index' => 'a.phone', 'addable' => true,
-                'editable' => true, 'hidden' => true, 'validation' => ['required' => true]],
+                'editable' => true, 'hidden' => true],
             ['type' => 'input', 'name' => 'fax', 'label' => 'Fax', 'index' => 'a.fax', 'addable' => true,
                 'editable' => true, 'hidden' => true],
             ['type' => 'input', 'name' => 'email', 'label' => 'Email', 'index' => 'a.email', 'width' => 100,
-                'addable' => true, 'editable' => true, 'validation' => ['required' => true, 'email' => true]],
+                'addable' => true, 'editable' => true, 'validation' => ['email' => true]],
+            ['type' => 'select', 'name' => 'is_default_billing', 'options' => [0 => 'no', 1 => 'YES'], 'addable' => 1,
+                'editable' => 1],
+            ['type' => 'select', 'name' => 'is_default_shipping', 'options' => [0 => 'no', 1 => 'YES'], 'addable' => 1,
+                'editable' => 1],
             ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115,
                 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
         ];
@@ -71,20 +76,21 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
             '_quick' => ['expr' => 'street1 like ? or company like ? or city like ? or country like ?', 'args' => ['%?%', '%?%', '%?%', '%?%']]
         ];
 
-        $config['orm'] = FCom_Customer_Model_Address::i()->orm($this->_mainTableAlias)
+        $config['orm'] = $this->FCom_Customer_Model_Address->orm($this->_mainTableAlias)
             ->select($this->_mainTableAlias . '.*')->where('customer_id', $customer->id);
-        $config['callbacks'] = ['after_modalForm_render' => 'renderModalAddress', 'after_render' => 'renderAddress'];
+        $config['callbacks'] = ['after_modalForm_render' => 'renderModalAddress'];
+        $config['grid_before_create'] = 'customer_address_grid';
         return ['config' => $config];
     }
 
-    public function action_get_state()
+    public function action_get_state__POST()
     {
-        $r = BRequest::i();
+        $r = $this->BRequest;
         $result = [];
         $country = $r->post('country');
         if (!empty($country)) {
-            $result = FCom_Geo_Model_Region::i()->options($country);
+            $result = $this->BLocale->getAvailableRegions('name', $country);
         }
-        BResponse::i()->json($result);
+        $this->BResponse->json($result);
     }
 }

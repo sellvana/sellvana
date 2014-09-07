@@ -1,10 +1,10 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_AdminChat_PushServer extends FCom_PushServer_Service_Abstract
 {
-    static public function bootstrap()
+    public function bootstrap()
     {
-        FCom_PushServer_Main::i()
+        $this->FCom_PushServer_Main
             ->addService('adminchat', 'FCom_AdminChat_PushServer_Chat')
             ->addService('/^adminchat:(.*)$/', 'FCom_AdminChat_PushServer_Chat')
 

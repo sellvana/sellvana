@@ -1,137 +1,43 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_ProductReviews_Migrate extends BClass
+class FCom_ProductCompare_Migrate extends BClass
 {
-    public function upgrade__0_1_5__0_2_0()
+    public function install__0_1_0()
     {
-        $tReviewFlag = FCom_ProductReviews_Model_ReviewFlag::table();
-        BDb::run("CREATE TABLE IF NOT EXISTS {$tReviewFlag}  (
-            `review_id` INT UNSIGNED NOT NULL ,
-            `customer_id` INT UNSIGNED NOT NULL,
-            `helpful` tinyint(1) NOT NULL default 0,
-            `offensive` tinyint(1) NOT NULL default 0,
-            UNIQUE KEY `rev2cust` (`review_id`,`customer_id`)
-            ) ENGINE = InnoDB;"
-        );
-    }
+        $tSet = $this->FCom_ProductCompare_Model_Set->table();
+        $tSetItem = $this->FCom_ProductCompare_Model_SetItem->table();
+        $tCustomer = $this->FCom_Customer_Model_Customer->table();
+        $tProduct = $this->FCom_Catalog_Model_Product->table();
 
-    public function install__0_2_5()
-    {
-        $tReview = FCom_ProductReviews_Model_Review::table();
-        $tReviewFlag = FCom_ProductReviews_Model_ReviewFlag::table();
-        $tProduct = FCom_Catalog_Model_Product::table();
-
-        BDb::run("
-            CREATE TABLE IF NOT EXISTS {$tReview} (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `product_id` int(10) unsigned NOT NULL,
-            `customer_id` int(10) unsigned NOT NULL,
-            `rating` tinyint(1) unsigned not null,
-            `rating1` tinyint(1) unsigned NOT NULL,
-            `rating2` tinyint(1) unsigned NOT NULL,
-            `rating3` tinyint(1) unsigned NOT NULL,
-            `approved` int(11) not null default 0,
-            `helpful` int(11) not null DEFAULT '0',
-            `helpful_voices` bigint(11) not null DEFAULT '0',
-            `offensive` int(11) null,
-            `title` varchar(255) NOT NULL,
-            `create_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            `text` text,
-            PRIMARY KEY (`id`),
-            KEY `IDX_product_approved` (`product_id`,`approved`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-        ");
-
-        BDb::ddlTableDef($tProduct, [
+        $this->BDb->ddlTableDef($tSet, [
             'COLUMNS' => [
-                'avg_rating' => 'decimal(5,2) null',
-                'num_reviews' => 'int null',
+                'id' => 'int unsigned not null auto_increment',
+                'cookie_token' => 'varchar(40) default null',
+                'customer_id' => 'int unsigned default null',
+                'create_at' => 'datetime not null',
+                'update_at' => 'datetime not null',
             ],
-        ]);
-
-        BDb::run("CREATE TABLE IF NOT EXISTS {$tReviewFlag}  (
-            `id` int unsigned not null auto_increment primary key,
-            `review_id` INT UNSIGNED NOT NULL ,
-            `customer_id` INT UNSIGNED NOT NULL,
-            `helpful` tinyint(1) NOT NULL default 0,
-            `offensive` tinyint(1) NOT NULL default 0,
-            UNIQUE KEY `rev2cust` (`review_id`,`customer_id`)
-            ) ENGINE = InnoDB;"
-        );
-
-        $hlp = FCom_CatalogIndex_Model_Field::i();
-        if (!$hlp->load('avg_rating', 'field_name')) {
-            $hlp->create([
-                'field_name' => 'avg_rating',
-                'field_label' => 'Average Rating',
-                'field_type' => 'varchar',
-                'weight' => 0,
-                'source_type' => 'callback',
-                'source_callback' => 'FCom_ProductReviews_Model_Review::indexAvgRating',
-                'filter_type' => 'exclusive',
-                'filter_counts' => 1,
-                'filter_order' => 10,
-            ])->save();
-        }
-    }
-
-    public function upgrade__0_2_0__0_2_1()
-    {
-        $table = FCom_ProductReviews_Model_Review::table();
-        BDb::ddlTableDef($table, [
-            'COLUMNS' => [
-                  'created_dt'  => 'RENAME created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
-            ],
-        ]);
-    }
-
-    public function upgrade__0_2_1__0_2_2()
-    {
-        $table = FCom_ProductReviews_Model_Review::table();
-        BDb::ddlTableDef($table, [
-            'COLUMNS' => [
-                  'created_at'  => 'RENAME create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
-            ],
-        ]);
-    }
-
-    public function upgrade__0_2_2__0_2_3()
-    {
-        $table = FCom_ProductReviews_Model_Review::table();
-        BDb::ddlTableDef($table, [
-            'COLUMNS' => [
-                'rating1' => 'tinyint(1) unsigned not null after rating',
-                'rating2' => 'tinyint(1) unsigned not null after rating1',
-                'rating3' => 'tinyint(1) unsigned not null after rating2',
-            ],
-        ]);
-    }
-
-    public function upgrade__0_2_3__0_2_4()
-    {
-        $table = FCom_ProductReviews_Model_Review::table();
-        BDb::ddlTableDef($table, [
+            'PRIMARY' => '(id)',
             'KEYS' => [
-                'IDX_product_approved' => '(product_id, approved)',
+                'UNQ_cookie_token' => 'UNIQUE (cookie_token)',
+            ],
+            'CONSTRAINTS' => [
+                "FK_{$tSet}_customer" => "FOREIGN KEY (customer_id) REFERENCES {$tCustomer} (id) ON UPDATE CASCADE ON DELETE CASCADE",
             ],
         ]);
-    }
 
-    public function upgrade__0_2_4__0_2_5()
-    {
-        $hlp = FCom_CatalogIndex_Model_Field::i();
-        if (!$hlp->load('avg_rating', 'field_name')) {
-            $hlp->create([
-                'field_name' => 'avg_rating',
-                'field_label' => 'Average Rating',
-                'field_type' => 'varchar',
-                'weight' => 0,
-                'source_type' => 'callback',
-                'source_callback' => 'FCom_ProductReviews_Model_Review::indexAvgRating',
-                'filter_type' => 'exclusive',
-                'filter_counts' => 1,
-                'filter_order' => 10,
-            ])->save();
-        }
+        $this->BDb->ddlTableDef($tSetItem, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'set_id' => 'int unsigned not null',
+                'product_id' => 'int unsigned not null',
+                'create_at' => 'datetime not null',
+            ],
+            'PRIMARY' => '(id)',
+            'CONSTRAINTS' => [
+                "FK_{$tSetItem}_set" => "FOREIGN KEY (set_id) REFERENCES {$tSet} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "FK_{$tSetItem}_product" => "FOREIGN KEY (product_id) REFERENCES {$tProduct} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            ],
+        ]);
     }
 }

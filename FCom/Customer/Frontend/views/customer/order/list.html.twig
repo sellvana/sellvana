@@ -1,5 +1,4 @@
-<div class="f-site-main" role="main">
-    <div class="container">
+
         <div class="row f-mb-slideout-menu">
             <div class="col-sm-9 f-col-main">
                 <header class="f-page-header">
@@ -10,6 +9,7 @@
                 </header>
                 {% if THIS.get('orders') %}
                     <table class="table">
+                      <thead>
                         <tr>
                             <th>{{ "ID" }}</th>
                             <th>{{ "Shipping" | _ }}</th>
@@ -17,6 +17,7 @@
                             <th>{{ "Status" | _ }}</th>
                             <th class="text-right">{{ "Balance" | _ }}</th>
                         </tr>
+                      </thead>
                         {% for order in THIS.get('orders')  %}
                             <tr>
                                 <td>
@@ -35,8 +36,6 @@
             </div>
             {{ THIS.view('customer/account/sidebar').set('current', 'orders') | raw }}
         </div>
-    </div>
-</div>
 <script>
     require(['jquery'], function($) {
         $( "#button" ).click(function() {

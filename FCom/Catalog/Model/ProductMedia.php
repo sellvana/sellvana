@@ -1,4 +1,4 @@
-<?php
+<?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 class FCom_Catalog_Model_ProductMedia extends FCom_Core_Model_Abstract
 {
@@ -14,12 +14,42 @@ class FCom_Catalog_Model_ProductMedia extends FCom_Core_Model_Abstract
             'product_id', 'file_id'
         ],
     ];
+
     public function getUrl()
     {
         $subfolder = $this->get('subfolder');
         $path = $this->get('folder') . '/' . ($subfolder ? $subfolder . '/' : '') . $this->get('file_name');
-        return BApp::src($path);
+        return $this->BApp->src($path);
     }
 
+    public function imageUrl($full = false)
+    {
+        static $default;
 
+        $url = $full ? $this->BRequest->baseUrl() : $this->BRequest->webRoot();
+        $subfolder = $this->get('subfolder');
+        $thumbUrl = $this->get('folder') . '/' . ($subfolder ? $subfolder . '/' : '') . $this->get('file_name');
+
+        if ($thumbUrl) {
+            return $url . '/' . $thumbUrl;
+        }
+
+        if (!$default) {
+            $default = $this->BConfig->get('modules/FCom_Catalog/default_image');
+            if ($default) {
+                if ($default[0] === '@') {
+                    $default = $this->BApp->src($default, 'baseSrc', false);
+                }
+            } else {
+                $default = $url . $media . '/image-not-found.jpg';
+            }
+        }
+        return $default;
+    }
+
+    public function thumbUrl($w, $h = null, $full = false)
+    {
+        $imgUrl = $this->imageUrl(false);
+        return $this->FCom_Core_Main->resizeUrl($imgUrl, ['s' => $w . 'x' . $h, 'full_url' => $full]);
+    }
 }

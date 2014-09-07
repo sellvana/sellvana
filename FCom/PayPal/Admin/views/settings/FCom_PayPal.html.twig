@@ -1,22 +1,22 @@
 {% set c = THIS.get('model') %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 <h2>{{ "Paypal Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Paypal'}) }}
 
     {% set fieldData = { model: c, id_prefix:'FCom_Paypal-production', name_prefix:'config[modules][FCom_Paypal][production]', get_prefix:'modules/FCom_Paypal/production' } %}
     {{ forms.accordion_panel_start({label:'Production'|_, id:'settings-FCom_Paypal-group0', in:1}) }}
-        {{ forms.input(fieldData|merge({field:'username', label:'Username'|_, attr: 'size="50"' })) }}
-        {{ forms.input(fieldData|merge({field:'password', label:'Password'|_, attr: 'size="50"', type: "password" })) }}
-        {{ forms.input(fieldData|merge({field:'signature', label:'Signature'|_, attr: 'size="50"' })) }}
-        {{ forms.boolean(fieldData|merge({field:'show_shipping', label:'Show shipping address on PayPal'|_ })) }}
+        {{ forms.input(fieldData, {field:'username', label:'Username'|_, attr: 'size="50"' }) }}
+        {{ forms.input(fieldData, {field:'password', label:'Password'|_, attr: 'size="50"', type: "password" }) }}
+        {{ forms.input(fieldData, {field:'signature', label:'Signature'|_, attr: 'size="50"' }) }}
+        {{ forms.boolean(fieldData, {field:'show_shipping', label:'Show shipping address on PayPal'|_ }) }}
     {{ forms.accordion_panel_end }}
 
     {% set fieldData = { model: c, id_prefix:'FCom_Paypal-sandbox', name_prefix:'config[modules][FCom_Paypal][sandbox]', get_prefix:'modules/FCom_Paypal/sandbox' } %}
     {{ forms.accordion_panel_start({label:'Sandbox'|_, id:'settings-FCom_Paypal-group1'}) }}
-        {{ forms.boolean(fieldData|merge({field:'mode', label:'Sandbox mode'|_ })) }}
-        {{ forms.input(fieldData|merge({field:'username', label:'Username'|_, attr: 'size="50"' })) }}
-        {{ forms.input(fieldData|merge({field:'password', label:'Password'|_, attr: 'size="50"', type: "password" })) }}
-        {{ forms.input(fieldData|merge({field:'signature', label:'Signature'|_, attr: 'size="50"' })) }}
+        {{ forms.boolean(fieldData, {field:'mode', label:'Sandbox mode'|_ }) }}
+        {{ forms.input(fieldData, {field:'username', label:'Username'|_, attr: 'size="50"' }) }}
+        {{ forms.input(fieldData, {field:'password', label:'Password'|_, attr: 'size="50"', type: "password" }) }}
+        {{ forms.input(fieldData, {field:'signature', label:'Signature'|_, attr: 'size="50"' }) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
 
