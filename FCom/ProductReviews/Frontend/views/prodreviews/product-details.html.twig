@@ -40,6 +40,6 @@
         {% endif %}
     </div>
     <div id="f-prod-reviews-container">
-        {{ THIS.view('prodreviews/product-reviews-list').set({'reviews': reviews, 'userId': userId, 'prod': prod})|raw }}
+        {{ THIS.view('prodreviews/product-reviews-list').set({'reviews': reviews, 'userId': userId, 'prod': prod, 'isAlreadyReviewed': isAlreadyReviewed})|raw }}
     </div>
 </section>
