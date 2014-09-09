@@ -29,7 +29,7 @@ function updateListVariantImage(imageObject) {
                         hide = 'hide';
                         tmp.push(obj.file_id);
                     }
-                    $(self).find('.variant-image').append("<option class='"+ hide +"' data-subfolder='"+ obj.subfolder +"' value='"+ obj.file_id +"'>"+ obj.file_name +"</option>")
+                    $(self).find('select.variant-image').append("<option class='"+ hide +"' data-subfolder='"+ obj.subfolder +"' value='"+ obj.file_id +"'>"+ obj.file_name +"</option>")
                 });
                 file_id.push({variant_id: $(self).attr('id'), file_id: tmp});
             }

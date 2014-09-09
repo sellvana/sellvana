@@ -1,9 +1,9 @@
 {% set reviews = THIS.get('reviews') %}
+{% set isAlreadyReviewed = THIS.get('isAlreadyReviewed') %}
 
 {% if reviews.numReviews > 0 %}
     {% set isLoggedIn = APP.instance('FCom_Customer_Model_Customer').isLoggedIn() %}
     {% set userId = THIS.get('userId') %}
-    {% set pr = THIS.get('pr') %}
     {% set rate = APP.instance('FCom_ProductReviews_Model_Review').config() %}
     <div class="f-prod-review-avg clearfix">
         <h5>{{ "Avg. Customer Rating"|_ }} ({{ reviews.numReviews }} {{ "Reviews"|_ }}):</h5>
@@ -142,7 +142,6 @@
         })
     </script>
 {% else %}
-    {% set isAlreadyReviewed = THIS.get('prod').isAlreadyReviewed(userId) %}
     {% if isAlreadyReviewed %}
         <p>{{ "We will check and approve your review in 24 hours."|_ }}</p>
     {% else %}
