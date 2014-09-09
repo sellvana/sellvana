@@ -2251,6 +2251,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
 
             if (typeof(config.grid_before_create) !== 'undefined') {
+                console.log(config.grid_before_create);
                 window[config.grid_before_create](this);
             } else {
                 this.build();
