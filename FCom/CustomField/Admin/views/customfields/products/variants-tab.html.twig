@@ -53,7 +53,7 @@ function updateFileIdVariant(arr, add) {
             })
         } else {
             var objF = _.findWhere(arr, {variant_id: obj.get('id')});
-            file_id = $.merge(file_id, objF.file_id);
+            var file_id = _.difference(file_id, objF.file_id);
         }
 
         obj.set('variant_file_id', file_id.join(','));
