@@ -31,6 +31,23 @@
             });
         }
     });
+    window.afterBuiltImagesGrid = function(grid) {
+        //bind remove event
+        grid.getRows().bind('remove', function(row) {
+            var image = [];
+            image.push({
+                file_id: row.get('file_id'),
+                subfolder: row.get('subfolder'),
+                file_name: row.get('file_name')
+            });
+            if (typeof(updateListVariantImage) == "function") {
+                updateListVariantImage({
+                    add: false,
+                    image: image
+                });
+            }
+        })
+    };
     window.afterAddImages = function (grid) {
         var image = [];
         grid.getSelectedRows().forEach(function (row) {
@@ -43,7 +60,7 @@
         if (typeof(updateListVariantImage) == "function") {
             updateListVariantImage({
                 add: true,
-                image: image
+                image: [image]
             });
         }
     }

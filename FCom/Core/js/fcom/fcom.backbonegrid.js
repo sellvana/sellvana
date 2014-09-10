@@ -115,7 +115,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     },
                     dataFilter: function (responseString) {
                         var response = jQuery.parseJSON(responseString);
-                        currentMessage = response.Message;
+                        var currentMessage = response.Message;
                         if ((modalForm.modalType === 'editable' || editInline) && BackboneGrid.currentRow.get('id') === response.id){
                             return true;
                         }
@@ -764,8 +764,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
 
                     if (confirm) {
-                        rowsCollection.remove(this.model, {silent: true});
-                        selectedRows.remove(this.model, {silent: true});
+                        rowsCollection.remove(this.model, {silent: false});
+                        selectedRows.remove(this.model, {silent: false});
                         this._destorySelf();
                     }
                 },
@@ -1819,27 +1819,27 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             */
             this.getGridView = function() {
                 return gridView;
-            }
+            };
 
             this.getRows = function() {
                 return rowsCollection;
-            }
+            };
 
             this.getCols = function() {
                 return columnsCollection;
-            }
+            };
 
             this.getSelectedRows = function() {
                 return selectedRows;
-            }
+            };
 
             this.getGridSkeleton = function() {
                 return BackboneGrid;
-            }
+            };
 
             this.getModalForm = function() {
                 return modalForm;
-            }
+            };
 
             /*this.afterSelectionChanged = function() {
 
@@ -2243,11 +2243,14 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 });
                 //NProgress.done();
 
-
-
                 setModalHeight();
                 updatePageHtml();
-            }
+
+                //todo: consider this is necessary or need multi function grid_before_create
+                if (typeof(config.grid_after_built) !== 'undefined') {
+                    window[config.grid_after_built](this);
+                }
+            };
 
 
             if (typeof(config.grid_before_create) !== 'undefined') {

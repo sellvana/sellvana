@@ -272,6 +272,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'delete' => ['caption' => 'Remove'],
                 ],
                 'grid_before_create' => 'imagesGridRegister',
+                'grid_after_built' => 'afterBuiltImagesGrid',
                 'afterMassDelete' => 'afterMassDelete',
                 'filters' => [
                     ['field' => 'file_name', 'type' => 'text'],
