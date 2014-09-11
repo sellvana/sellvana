@@ -83,7 +83,7 @@ class FCom_Sales_Migrate extends BClass
             ],
         ]);
 
-        $tStatus = $this->FCom_Sales_Model_Order_Status->table();
+        $tStatus = $this->FCom_Sales_Model_Order_CustomStatus->table();
         $this->BDb->ddlTableDef($tStatus, [
             'COLUMNS' => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
@@ -264,7 +264,7 @@ class FCom_Sales_Migrate extends BClass
 
     public function upgrade__0_1_5__0_1_6()
     {
-        $tStatus = $this->FCom_Sales_Model_Order_Status->table();
+        $tStatus = $this->FCom_Sales_Model_Order_CustomStatus->table();
         $this->BDb->ddlTableDef($tStatus, [
             'COLUMNS' => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
@@ -277,7 +277,7 @@ class FCom_Sales_Migrate extends BClass
 
     public function upgrade__0_1_6__0_1_7()
     {
-        $tStatus = $this->FCom_Sales_Model_Order_Status->table();
+        $tStatus = $this->FCom_Sales_Model_Order_CustomStatus->table();
         $this->BDb->run("
             insert into {$tStatus}(id,name,code) values(1, 'New', 'new'),(2,'Pending','pending'),(3,'Paid','paid')
         ");

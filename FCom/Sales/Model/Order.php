@@ -35,8 +35,10 @@
 class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_sales_order';
+
     protected static $_origClass = __CLASS__;
-    protected $addresses;
+
+    protected $_addresses;
 
     /**
     * Fallback singleton/instance factory
@@ -340,12 +342,12 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function getAddresses()
     {
-        if (!$this->addresses) {
-            $this->addresses = $this->FCom_Sales_Model_Order_Address->orm()
+        if (!$this->_addresses) {
+            $this->_addresses = $this->FCom_Sales_Model_Order_Address->orm()
                                ->where("order_id", $this->id())
                                ->find_many_assoc('atype');
         }
-        return $this->addresses;
+        return $this->_addresses;
     }
 
     public function getBillingAddress()
@@ -441,5 +443,4 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             $args['seq_id'] =  '1' . $orderNumber;
         }
     }
-
 }
