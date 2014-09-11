@@ -62,56 +62,31 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
         if (!isset($data)) {
             $data = [];
         }
-        $config = [
-            'config' => [
-                'id' => 'frontend-field-grid',
-                'caption' => 'Frontend Field Grid',
-                'data_mode' => 'local',
-                'data' => $data,
-                'columns' => [
-                    ['type' => 'row_select'],
-                    ['name' => 'id', 'label' => 'ID', 'width' => 30],
-                    [
-                        'name' => 'name',
-                        'label' => 'Field Name',
-                        'width' => 200,
-                    ],
-                    [
-                        'name' => 'label',
-                        'label' => 'Field Label',
-                        'width' => 200,
-                    ],
-                    [
-                        'name' => 'input_type',
-                        'label' => 'Field Type',
-                        'width' => 200,
-                    ],
-                    [
-                        'name' => 'required',
-                        'label' => 'Required',
-                        'width' => 150,
-                    ],
-                    [
-                        'name' => 'options',
-                        'label' => 'Options',
-                        'width' => 200,
-                    ],
-                    [
-                        'name' => 'position',
-                        'label' => 'Position',
-                        'width' => 200,
-                    ],
-                    ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]]
-                ],
-                'actions' => [
-                    'add' => ['caption' => 'Add Fields'],
-                    'delete' => ['caption' => 'Remove']
-                ],
-                'grid_before_create' => 'formFieldGridRegister'
-            ]
+        $config = parent::gridConfig();
+        $config['data'] = $data;
+        $config['id'] = 'frontend-field-grid';
+        $config['caption'] = 'Frontend Field Grid';
+        $config['data_mode'] = 'local';
+        $config['columns'] = [
+            ['type' => 'row_select'],
+            ['name' => 'id', 'label' => 'ID', 'width' => 30],
+            ['name' => 'name', 'label' => 'Field Name', 'width' => 200,],
+            ['name' => 'label', 'label' => 'Field Label', 'width' => 200,],
+            ['name' => 'input_type', 'label' => 'Field Type', 'width' => 200,],
+            ['name' => 'required', 'label' => 'Required', 'width' => 150,],
+            ['name' => 'options', 'label' => 'Options', 'width' => 200,],
+            ['name' => 'position', 'label' => 'Position', 'width' => 200,],
+            ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]]
         ];
+        $config['actions'] = [
+            'add' => ['caption' => 'Add Fields'],
+            'delete' => ['caption' => 'Remove']
+        ];
+        $config['grid_before_create'] = 'formFieldGridRegister';
+        $config['edit_url'] = $this->BApp->href($this->_gridHref . '/grid_data');
+        $config['edit_url_required'] = true;
 
-        return $config;
+        return ['config' => $config];
     }
 
     public function historyGridConfig($m)
@@ -120,7 +95,7 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
             'grid' => [
                 'id' => 'cms_blocks_form_history',
                 'url' => $this->BApp->href('cms/blocks/history/' . $m->id . '/grid_data'),
-                'editurl' => $this->BApp->href('cms/blocks/history/' . $m->id . '/grid_data'),
+                'edit_url' => $this->BApp->href('cms/blocks/history/' . $m->id . '/grid_data'),
                 'columns' => [
                     'id' => ['label' => 'ID', 'hidden' => true],
                     'ts' => ['label' => 'TimeStamp', 'formatter' => 'date'],
