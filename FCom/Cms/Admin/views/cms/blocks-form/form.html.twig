@@ -11,26 +11,67 @@
         var selectFieldType = 'select[data-col="input_type"]';
         window.formFieldGridRegister = function (grid) {
             mainGrid = grid;
-            mainGrid.getGridSkeleton().Views.RowView.prototype.afterRender = function () {
-                var self = this;
-                this.$el.find(inputName).addClass('unique');
-                this.$el.find(inputOption).addClass('requiredOptions');
-                if (this.model.get('input_type') != 'select') {
-                    this.$el.find(inputOption).prop('disabled', true);
-                }
-                this.$el.find(selectFieldType).change(function () {
-                    if ($(this).val() == 'select') {
-                        self.$el.find(inputOption).prop('disabled', false);
-                    } else {
-                        self.$el.find(inputOption).prop('disabled', true);
-                    }
-                })
-            };
+//            mainGrid.getGridSkeleton().Views.RowView.prototype.afterRender = function () {
+//                var self = this;
+//                this.$el.find(inputName).addClass('unique');
+//                this.$el.find(inputOption).addClass('requiredOptions');
+//                if (this.model.get('input_type') != 'select') {
+//                    this.$el.find(inputOption).prop('disabled', true);
+//                }
+//                this.$el.find(selectFieldType).change(function () {
+//                    if ($(this).val() == 'select') {
+//                        self.$el.find(inputOption).prop('disabled', false);
+//                    } else {
+//                        self.$el.find(inputOption).prop('disabled', true);
+//                    }
+//                })
+//            };
             mainGrid.build();
-            $(mainGrid.getGridSkeleton().AddButton).click(function () {
-                var $modal = $('#frontend-field-grid-modal');
-                $modal.modal('show');
-            });
+            var $modal = $('#frontend-field-grid-modal');
+            var mainFields = {
+                name: 1,
+                label: 1,
+                input_type: 1,
+                required: 1,
+                position: 1
+            };
+
+            if ($modal[0]) {
+                var $addBtn = $modal.find('button.save');
+                var rowTpl = mainGrid.getGridSkeleton().Models.Row;
+                $addBtn.click(function (e) {
+                    var $fields = $modal.find('select,input,textarea');
+                    var temp = new rowTpl;
+                    var options = {};
+                    $fields.each(function(i, o){
+                        var $el = $(o);
+                        var disabled = $el.prop('disabled');
+                        if (!disabled) {
+                            var fieldName = $el.prop('name');
+                            var fieldType = $el.prop('type');
+                            var fieldValue = $el.val();
+                            if ((fieldType == 'checkbox' || fieldType == 'radio') && !$el.prop('checked')) {
+                                return;
+                            }
+                            if (mainFields[fieldName]) {
+                                temp.set(fieldName, fieldValue);
+                            } else {
+                                options[fieldName] = fieldValue;
+                            }
+                            console.log(temp);
+                        }
+                    });
+                    if ($.isEmptyObject(options) == false) {
+                        temp.set('options', JSON.stringify(options));
+                    }
+                    mainGrid.getRows().add(temp);
+                    $modal.modal('hide');
+                    e.preventDefault();
+                });
+                $(mainGrid.getGridSkeleton().AddButton).click(function () {
+                    $modal.modal('show');
+                });
+            }
         };
         $('#cms-blocks-form').submit(function (ev) {
             var rows = mainGrid.getRows().toJSON();
