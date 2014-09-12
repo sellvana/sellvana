@@ -64,7 +64,10 @@
                     if ($.isEmptyObject(options) == false) {
                         temp.set('options', JSON.stringify(options));
                     }
-                    mainGrid.getRows().add(temp);
+                    var rows = mainGrid.getRows();
+                    temp.set('_new', true);
+                    temp.set('id', rows.size() +1);
+                    rows.add(temp);
                     $modal.modal('hide');
                     e.preventDefault();
                 });
