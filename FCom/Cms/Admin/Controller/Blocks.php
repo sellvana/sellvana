@@ -58,11 +58,12 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
      */
     public function formFieldGrid($model)
     {
-        $data = $model->getData('form_fields');
+        $data = $this->BUtil->fromJson($model->get('form_fields'));
         if (!isset($data)) {
             $data = [];
         }
         $config = parent::gridConfig();
+        $config['orm'] = null;
         $config['data'] = $data;
         $config['id'] = 'frontend-field-grid';
         $config['caption'] = 'Frontend Field Grid';
@@ -74,8 +75,8 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
             ['name' => 'label', 'label' => 'Field Label', 'width' => 200,],
             ['name' => 'input_type', 'label' => 'Field Type', 'width' => 200,],
             ['name' => 'required', 'label' => 'Required', 'width' => 150,],
-            ['name' => 'options', 'label' => 'Options', 'width' => 200,],
             ['name' => 'position', 'label' => 'Position', 'width' => 200,],
+            ['name' => 'options', 'label' => 'Options', 'width' => 200,],
             ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]]
         ];
         $config['actions'] = [
