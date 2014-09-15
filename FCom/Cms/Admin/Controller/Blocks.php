@@ -84,8 +84,8 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
             'delete' => ['caption' => 'Remove']
         ];
         $config['grid_before_create'] = 'formFieldGridRegister';
-        $config['edit_url'] = $this->BApp->href($this->_gridHref . '/grid_data');
-        $config['edit_url_required'] = true;
+        //$config['edit_url'] = $this->BApp->href($this->_gridHref . '/grid_data');
+        //$config['edit_url_required'] = true;
 
         return ['config' => $config];
     }

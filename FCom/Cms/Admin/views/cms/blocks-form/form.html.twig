@@ -37,10 +37,10 @@
             };
 
             if ($modal[0]) {
+                var $fields = $modal.find('select,input,textarea');
                 var $addBtn = $modal.find('button.save');
                 var rowTpl = mainGrid.getGridSkeleton().Models.Row;
                 $addBtn.click(function (e) {
-                    var $fields = $modal.find('select,input,textarea');
                     var temp = new rowTpl;
                     var options = {};
                     $fields.each(function(i, o){
