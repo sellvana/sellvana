@@ -10,7 +10,9 @@
 {% set combineType = targetType ~ type %}
 
 <script>
-    var {{ medialibConfig.id }}_grid, {{ combineType }}Grid;
+    var {{ medialibConfig.id }}_grid; //grid contains all attachment (or images)
+    var {{ combineType }}Grid; //grid contains all attachment (or images) related with products (or targetType)
+
     require(['jquery', 'underscore', 'backbone', 'unique', 'fcom.backbonegrid'], function ($, _, Backbone) {
         //var afterAdd = {{ config.afterAdd }};
         var elementContainer = $('{{ elementContainer }}');
