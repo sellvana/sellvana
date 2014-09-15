@@ -2247,7 +2247,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 updatePageHtml();
 
                 //todo: consider this is necessary or need multi function grid_before_create
-                if (typeof(config.grid_after_built) !== 'undefined') {
+                if (typeof(config.grid_after_built) === 'function') {
                     window[config.grid_after_built](this);
                 }
             };
