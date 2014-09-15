@@ -269,9 +269,16 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'actions' => [
                     'refresh' => true,
                     'add' => ['caption' => 'Add images'],
+                    'quick_add' => [
+                        'html' => '<span class="btn btn-success fileinput-button" style="float: none;line-height: 23px;">
+                                     <i class="icon-plus icon-white"></i>
+                                     <span>Quick add images</span> <input type="file" name="upload[]" id="quick-add-images" multiple="">
+                                   </span>'
+                    ],
                     'delete' => ['caption' => 'Remove'],
                 ],
                 'grid_before_create' => 'imagesGridRegister',
+                'grid_after_built' => 'afterBuiltImagesGrid',
                 'afterMassDelete' => 'afterMassDelete',
                 'filters' => [
                     ['field' => 'file_name', 'type' => 'text'],
@@ -545,9 +552,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'id'   => explode(',', $data['grid'][$typeName]['del']),
                 ]);
             }
-
-            if (!empty($data['grid'][$typeName]['rows'])) {
+            $rows = array();
+            if (isset($data['grid'][$typeName]['rows']) && $data['grid'][$typeName]['rows'] != '') {
                 $rows = $this->BUtil->fromJson($data['grid'][$typeName]['rows']);
+            }
+            if (!empty($rows)) {
                 foreach ($rows as $image) {
                     $key = $image['id'];
                     unset($image['id']);
@@ -637,6 +646,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $model->setData('variants_fields', json_decode($data['vfields'], true));
         }
         if (isset($data['variants'])) {
+            $variantsData = array();
             if ($data['variants'] != '') {
                 $variantsData = $this->BUtil->objectToArray(json_decode($data['variants']));
             }
