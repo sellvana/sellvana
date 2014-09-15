@@ -374,7 +374,7 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
                     default:
                         $action = static::$_defaultActions[$k];
                 }
-            } else {
+            } elseif (!isset($action['html']) || !$action['html']) {
                 $action = [
                     'html' => $this->BUtil->tagHtml(
                         'button',

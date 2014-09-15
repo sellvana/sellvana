@@ -12,7 +12,7 @@
     medialibConfig: medialibConfig,
     gridConfig: prodImagesConfig
 } %}
-
+{% set combineType = targetType ~ type %}
 {#{{ forms.attachment_tab_content(m, attachment_tab_config) | raw }}#}
 
 {{ THIS.view('core/attachmentgrid').set('config', attachmentsConfig) | raw }}
@@ -31,6 +31,23 @@
             });
         }
     });
+    window.afterBuiltImagesGrid = function(grid) {
+        //bind remove event
+        grid.getRows().bind('remove', function(row) {
+            var image = [];
+            image.push({
+                file_id: row.get('file_id'),
+                subfolder: row.get('subfolder'),
+                file_name: row.get('file_name')
+            });
+            if (typeof(updateListVariantImage) == "function") {
+                updateListVariantImage({
+                    add: false,
+                    image: image
+                });
+            }
+        })
+    };
     window.afterAddImages = function (grid) {
         var image = [];
         grid.getSelectedRows().forEach(function (row) {
@@ -38,7 +55,7 @@
                 file_id: row.get('file_id'),
                 subfolder: row.get('subfolder'),
                 file_name: row.get('file_name')
-            })
+            });
         });
         if (typeof(updateListVariantImage) == "function") {
             updateListVariantImage({
@@ -47,4 +64,46 @@
             });
         }
     }
+    window.afterMassDelete = function() {
+        var image = [];
+        {{ combineType }}Grid.getSelectedRows().forEach(function (row) {
+            image.push({
+                file_id: row.get('file_id'),
+                subfolder: row.get('subfolder'),
+                file_name: row.get('file_name')
+            });
+        });
+        if (typeof(updateListVariantImage) == "function") {
+            updateListVariantImage({
+                add: false,
+                image: image
+            });
+        }
+    }
+
+    require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
+        var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{medialibConfig.type ? medialibConfig.type : "" }}';
+        $('#quick-add-images').fileupload({
+            url: uploadUrl,
+            multiple:true,
+            autoUpload: true
+        }).bind('fileuploadalways', function(e, data) {
+            if ($.isArray(data.result.files)) {
+                data.result.files.forEach(function (obj) {
+                    var newRow = obj;
+                    newRow.selected = true;
+                    {{ medialibConfig.id }}_grid.getSelectedRows().add(obj);
+                    {{ medialibConfig.id }}_grid.getRows().add(newRow,{merge: true}).trigger('render');
+
+                    $('#{{ medialibConfig.id }}').find('td.name span').each(function(i) {
+                        if($(this).html() === obj.file_name)
+                            $(this).parents('tr:first').remove();
+                    });
+
+                    //trigger add
+                    $('.btn_' + '{{ medialibConfig.id }}' + '_add').trigger('click');
+                })
+            }
+        });
+    });
 </script>

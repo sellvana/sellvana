@@ -29,7 +29,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
             //todo: confirm with Boris about status should be stored as id_status
             ['name' => 'status', 'label' => 'Status', 'index' => 'o.status',
-                'options' => $this->FCom_Sales_Model_Order_Status->statusOptions()],
+                'options' => $this->FCom_Sales_Model_Order_CustomStatus->statusOptions()],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
             ]],
@@ -70,7 +70,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $orm->left_outer_join('FCom_Admin_Model_User', 'o.admin_id = au.id', 'au')
             ->select_expr('CONCAT_WS(" ", au.firstname,au.lastname)', 'admin_name');
 
-        $orm->left_outer_join('FCom_Sales_Model_Order_Status', 'o.status = os.code', 'os')
+        $orm->left_outer_join('FCom_Sales_Model_Order_CustomStatus', 'o.status = os.code', 'os')
             ->select(['os_name' => 'os.name']);
     }
 
@@ -278,7 +278,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['name' => 'balance', 'label' => 'Paid', 'index' => 'o.balance'],
             ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
             ['name' => 'status', 'label' => 'Status', 'index' => 'o.status',
-                'options' => $this->FCom_Sales_Model_Order_Status->statusOptions()],
+                'options' => $this->FCom_Sales_Model_Order_CustomStatus->statusOptions()],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
             ]],
@@ -310,7 +310,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
 
     public function getOrderTotal($filter)
     {
-        $orderTotal = $this->FCom_Sales_Model_Order_Status->orm('s')
+        $orderTotal = $this->FCom_Sales_Model_Order_CustomStatus->orm('s')
             ->left_outer_join('FCom_Sales_Model_Order', ['o.status', '=', 's.name'], 'o')
             ->group_by('s.id')
             ->select_expr('COUNT(o.id)', 'order')
