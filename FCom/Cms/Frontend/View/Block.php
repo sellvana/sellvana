@@ -2,6 +2,9 @@
 
 class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
 {
+    /**
+     * @var BLayout
+     */
     static protected $_layoutHlp;
     static protected $_origClass = __CLASS__;
 
@@ -64,6 +67,7 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
         }
         return $model;
     }
+    protected $_formFieldsPlaceholder = '__FORM_FIELDS__';
 
     /**
      * Renderer for use with other views
@@ -73,6 +77,7 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
      */
     public function renderer($view)
     {
+        /** @var FCom_Cms_Model_Block $model */
         $model = $this->getBlockModel($view);
 
         if (!$model) {
@@ -81,9 +86,14 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
 
         $subRenderer = $this->BLayout->getRenderer($model->renderer ? $model->renderer : 'FCom_LibTwig');
 
+        $blockContent = $model->getContent();
+        if (strpos($blockContent, $this->_formFieldsPlaceholder) !== false) {
+            $formText = $this->_prepareFormFields();
+            $blockContent = str_replace($this->_formFieldsPlaceholder, $formText, $blockContent);
+        }
         $view->setParam([
             //'renderer'    => $subRenderer,
-            'source'      => $model->content ? $model->content : ' ',
+            'source'      => $blockContent,
             'source_name' => 'cms_block:' . get_class($model) . ':' . $model->handle,
             'source_mtime' => $model->modified_time,
             'source_untrusted' => true,
@@ -91,6 +101,31 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
 
         $content = $this->BUtil->call($subRenderer['callback'], $view);
 
+        return $content;
+    }
+
+    protected function _prepareFormFields()
+    {
+        $model = $this->getBlockModel($this);
+        $block = ['block' => 'test'];
+        $view = $this->createView($block);
+        $content = "{% include THIS.view('core/form-elements').twigName() as forms %}\n";
+        $content .= "<form method='post' >";
+        $formFields = $this->BUtil->fromJson($model->get('form_fields'));
+        foreach ($formFields as $fieldConfig) {
+            $fieldConfig['options'] = $this->BUtil->fromJson($fieldConfig['options']);
+            $content .= print_r($fieldConfig, 1);
+        }
+
+        $content .= "</form>";
+        $view->setParam([
+            //'renderer'    => $subRenderer,
+            'source'      => $content,
+            'source_name' => 'cms_block:' . 'test'. ':' . true,
+            'source_mtime' => time(),
+            'source_untrusted' => false,
+        ]);
+        $content = $view->render();
         return $content;
     }
 

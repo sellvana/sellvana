@@ -86,4 +86,13 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
     {
         return $this->FCom_Cms_Frontend_View_Block->createView($this, $params);
     }
+
+    public function getContent()
+    {
+        $content = $this->get('content');
+        if(empty($content)){
+            $content = '';
+        }
+        return $content;
+    }
 }
