@@ -62,7 +62,7 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
     }
 
     /**
-     * rule pageu url unique
+     * rule page url unique
      * @param $data
      * @param $args
      * @return bool

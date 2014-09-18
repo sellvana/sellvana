@@ -76,6 +76,7 @@ class BLocale extends BClass
     {
         $qFiller = preg_quote($filler);
         if (function_exists('transliterator_transliterate')) { // PHP >= 5.4.0
+            $str = preg_replace('/[^\\pL0-9]+/u', ' ', $str); // leave only letters and numbers, consolidate fillers
             $rules = "Any-Latin; NFD; [:Nonspacing Mark:] Remove; NFC; [:Punctuation:] Remove; Lower();";
             $str = transliterator_transliterate($rules, $str);
             $str = preg_replace('/[' . $qFiller . '\s]+/', $filler, $str); // consolidate fillers

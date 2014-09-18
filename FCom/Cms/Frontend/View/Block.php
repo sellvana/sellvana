@@ -4,11 +4,13 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
 {
     static protected $_layoutHlp;
     static protected $_origClass = __CLASS__;
+
     /**
      * Create a new block view instance within layout
      *
-     * @param string $block block handle or instance
+     * @param string|FCom_Cms_Model_Block|array $block block handle or instance
      * @param array $params block view creation parameters
+     * @throws BException
      * @return FCom_Cms_Frontend_View_Block
      */
     public function createView($block, array $params = [])
@@ -41,6 +43,8 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
 
     /**
      * Get block model instance for the current view
+     * @param $view
+     * @return bool
      */
     public function getBlockModel($view)
     {
@@ -70,6 +74,7 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
     public function renderer($view)
     {
         $model = $this->getBlockModel($view);
+
         if (!$model) {
             return '';
         }
