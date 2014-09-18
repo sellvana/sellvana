@@ -63,6 +63,8 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     ];
     //todo: set rules password minimum length
 
+    protected $_addresses;
+
     /**
      * @param bool  $new
      * @param array $args
@@ -459,10 +461,10 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public function getAddresses($reset = false)
     {
-        if ($reset || !$this->addresses) {
-            $this->addresses = $this->FCom_Customer_Model_Address->orm('a')->where('customer_id', $this->id)->find_many();
+        if ($reset || !$this->_addresses) {
+            $this->_addresses = $this->FCom_Customer_Model_Address->orm('a')->where('customer_id', $this->id)->find_many();
         }
-        return $this->addresses;
+        return $this->_addresses;
     }
 
     public function setDefaultAddress($address, $atype = null)

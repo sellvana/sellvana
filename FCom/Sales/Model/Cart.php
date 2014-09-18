@@ -45,7 +45,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         ],
     ];
 
-    public $addresses;
+    protected $_addresses;
     public $items;
     public $totals;
 
@@ -395,12 +395,12 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     public function getAddresses()
     {
-        if (!$this->addresses) {
-            $this->addresses = $this->FCom_Sales_Model_Cart_Address->orm()
+        if (!$this->_addresses) {
+            $this->_addresses = $this->FCom_Sales_Model_Cart_Address->orm()
                 ->where("cart_id", $this->id())
                 ->find_many_assoc('atype');
         }
-        return $this->addresses;
+        return $this->_addresses;
     }
 
     public function getBillingAddress()
@@ -426,7 +426,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 'street1,street2,street3,city,region,postcode,country,phone,fax,lat,lng');
         }
         $address->set($data)->save();
-        $this->addresses[$atype] = $address;
+        $this->_addresses[$atype] = $address;
         return $this;
     }
 
@@ -541,7 +541,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     public function __destruct()
     {
-        $this->addresses = null;
+        $this->_addresses = null;
         $this->items = null;
         $this->totals = null;
     }
