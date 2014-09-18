@@ -83,6 +83,7 @@
 
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
         var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{medialibConfig.type ? medialibConfig.type : "" }}';
+        var file_error = [];
         $('#quick-add-images').fileupload({
             url: uploadUrl,
             multiple:true,
@@ -90,19 +91,28 @@
         }).bind('fileuploadalways', function(e, data) {
             if ($.isArray(data.result.files)) {
                 data.result.files.forEach(function (obj) {
-                    var newRow = obj;
-                    newRow.selected = true;
-                    {{ medialibConfig.id }}_grid.getSelectedRows().add(obj);
-                    {{ medialibConfig.id }}_grid.getRows().add(newRow,{merge: true}).trigger('render');
-
-                    $('#{{ medialibConfig.id }}').find('td.name span').each(function(i) {
-                        if($(this).html() === obj.file_name)
-                            $(this).parents('tr:first').remove();
-                    });
-
-                    //trigger add
-                    $('.btn_' + '{{ medialibConfig.id }}' + '_add').trigger('click');
-                })
+                    if (!obj.error) {
+                        var newRow = obj;
+                        newRow.selected = true;
+                        {{ medialibConfig.id }}_grid.getSelectedRows().add(obj);
+                        {{ medialibConfig.id }}_grid.getRows().add(newRow,{merge: true}).trigger('render');
+                        $('#{{ medialibConfig.id }}').find('td.name span').each(function(i) {
+                            if($(this).html() === obj.file_name)
+                                $(this).parents('tr:first').remove();
+                        });
+                        //trigger add
+                        $('.btn_' + '{{ medialibConfig.id }}' + '_add').trigger('click');
+                    }
+                    else {
+                        file_error.push(obj.file_name);
+                    }
+                });
+            }
+        })
+        .bind('fileuploadstop', function(e, data) {
+            if (file_error.join(',') != '') {
+                alert('Illegal file extension: ' + file_error.join(','));
+                file_error = [];
             }
         });
     });
