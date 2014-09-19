@@ -88,6 +88,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     ['field' => 'file_name', 'type' => 'text']
                 ],
                 'grid_before_create' => $id . '_register',
+                'afterMassDelete' => 'afterMassDelete',
                 'actions' => [
                     'rescan' => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'],
                     'refresh' => true,
@@ -405,7 +406,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             foreach ($listIds as $id) {
                 $file = $attModel->load($id);
                 if ($file) {
-                    $file->delete();
+                   $file->delete();
                 }
             }
             $this->BResponse->json(['success' => true]);

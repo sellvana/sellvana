@@ -8,6 +8,7 @@
 {% set medialibConfig = config.medialibConfig %}
 
 {% set combineType = targetType ~ type %}
+{% set combineTypeId = targetType ~ '_' ~ type %}
 
 <script>
     var {{ medialibConfig.id }}_grid; //grid contains all attachment (or images)
@@ -112,9 +113,39 @@
 
         };
         {% endif %}
+        window.afterMassDelete = function() {
+            var file = [];
+            {{ medialibConfig.id }}_grid.getSelectedRows().forEach(function (row) {
+                file.push({
+                    file_id: row.get('id'),
+                    subfolder: row.get('folder'),
+                    file_name: row.get('file_name')
+                });
+            });
+            if (typeof(updateListVariantImage) == "function") {
+                updateListVariantImage({
+                    add: false,
+                    image: file
+                });
+            }
+            if (typeof(updateListFile) == "function") {
+                updateListFile({
+                    file: file
+                });
+            }
+        };
+        window.updateListFile = function(fileObject) {
+            fileObject.file.forEach(function (obj) {
+                var gridView = {{ combineType }}Grid.getGridView();
+                {{ combineType }}Grid.getRows().forEach(function (row) {
+                    if (row.get('file_id') == obj.file_id) {
+                        gridView.collection.remove(row, {silent: true});
+                        gridView.render();
+                    }
+                });
+            });
+        }
     });
-
-
 </script>
 
 
