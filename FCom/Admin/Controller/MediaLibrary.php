@@ -227,37 +227,47 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
         $attModel = !empty($options['model_class']) ? $options['model_class'] : 'FCom_Core_Model_MediaLibrary';
         $attModel = is_string($attModel) ? $this->{$attModel} : $attModel;
-        $type = $r->get('type');
-        if (!$type) {
-            throw new BException("Missing upload type");
-        }
-        $uploadConfig = $this->uploadConfig($type);
-        if (empty($uploadConfig)) {
-            throw new BException("Unknown upload type.");
-        }
-        $canUpload = isset($uploadConfig['can_upload'])? $uploadConfig['can_upload']: false;// allow upload in case no permission is configured? Or deny?
-        $blacklistExt = [
-            'php' => 1, 'php3' => 1, 'php4' => 1, 'php5' => 1, 'htaccess' => 1,
-            'phtml' => 1, 'html' => 1, 'htm' => 1, 'js' => 1, 'css' => 1, 'swf' => 1, 'xml' => 1,
-        ];
 
-        if (isset($uploadConfig['filetype'])) { // todo figure out how to merge processed config file types
-            $fileTypes = explode(',', $uploadConfig['filetype']);
-            if (empty($options['whitelist_ext'])) {
-                $options['whitelist_ext'] = $fileTypes;
-            } else {
-                $options['whitelist_ext'] = $this->BUtil->arrayMerge($options['whitelist_ext'], $fileTypes);
-            }
+        /*
+         * class GridForm: "oper" use in grid, "do" use in form
+         * todo: consider change param name from "do" to "oper".
+         */
+        $do = $r->post('oper');
+        if (empty($do)) {
+            $do = $r->param('do');
         }
 
-        if (!empty($options['whitelist_ext'])) {
-            foreach ($options['whitelist_ext'] as $ext) {
-                unset($blacklistExt[$ext]);
-            }
-        }
-
-        switch ($r->param('do')) {
+        switch ($do) {
         case 'upload':
+            $type = $r->get('type');
+            if (!$type) {
+                throw new BException("Missing upload type");
+            }
+            $uploadConfig = $this->uploadConfig($type);
+            if (empty($uploadConfig)) {
+                throw new BException("Unknown upload type.");
+            }
+            $canUpload = isset($uploadConfig['can_upload'])? $uploadConfig['can_upload']: false;// allow upload in case no permission is configured? Or deny?
+            $blacklistExt = [
+                'php' => 1, 'php3' => 1, 'php4' => 1, 'php5' => 1, 'htaccess' => 1,
+                'phtml' => 1, 'html' => 1, 'htm' => 1, 'js' => 1, 'css' => 1, 'swf' => 1, 'xml' => 1,
+            ];
+
+            if (isset($uploadConfig['filetype'])) { // todo figure out how to merge processed config file types
+                $fileTypes = explode(',', $uploadConfig['filetype']);
+                if (empty($options['whitelist_ext'])) {
+                    $options['whitelist_ext'] = $fileTypes;
+                } else {
+                    $options['whitelist_ext'] = $this->BUtil->arrayMerge($options['whitelist_ext'], $fileTypes);
+                }
+            }
+
+            if (!empty($options['whitelist_ext'])) {
+                foreach ($options['whitelist_ext'] as $ext) {
+                    unset($blacklistExt[$ext]);
+                }
+            }
+
             //set_time_limit(0);
             //ob_implicit_flush();
             //ignore_user_abort(true);
@@ -386,6 +396,17 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $this->BEvents->fire(__METHOD__ . ':' . $folder . ':delete', ['files' => $files]);
             if (!empty($options['on_delete'])) {
                 $this->BUtil->call($options['on_delete'], $args);
+            }
+            $this->BResponse->json(['success' => true]);
+            break;
+        case 'mass-delete':
+            $listIds = $r->post('id');
+            $listIds = explode(',', $listIds);
+            foreach ($listIds as $id) {
+                $file = $attModel->load($id);
+                if ($file) {
+                    $file->delete();
+                }
             }
             $this->BResponse->json(['success' => true]);
             break;

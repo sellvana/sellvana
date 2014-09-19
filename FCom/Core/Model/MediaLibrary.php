@@ -1,5 +1,16 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Core_Model_MediaLibrary
+ * @property int $id
+ * @property string $folder
+ * @property string $subfolder
+ * @property string $file_name
+ * @property string $file_size
+ * @property string $data_serialized
+ * @property string $create_at
+ * @property string $update_at
+ */
 class FCom_Core_Model_MediaLibrary extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_media_library';
@@ -21,6 +32,18 @@ class FCom_Core_Model_MediaLibrary extends FCom_Core_Model_Abstract
             $size = $size . ' Bytes';
         }
         $this->file_size = $size;
+
+        return $this;
+    }
+
+    public function onAfterDelete()
+    {
+        parent::onAfterDelete();
+
+        $file = $this->FCom_Core_Main->dir($this->folder) .'/'.$this->file_name;
+        if (file_exists($file)) {
+            @unlink($file);
+        }
 
         return $this;
     }
