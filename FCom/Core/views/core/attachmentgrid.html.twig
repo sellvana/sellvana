@@ -113,38 +113,21 @@
 
         };
         {% endif %}
-        window.afterMassDelete = function() {
-            var file = [];
+
+        window.{{ medialibConfig.id }}_afterMassDelete = function() {
+            //remove row in related grid and render again
+            var gridView = {{ combineType }}Grid.getGridView();
             {{ medialibConfig.id }}_grid.getSelectedRows().forEach(function (row) {
-                file.push({
-                    file_id: row.get('id'),
-                    subfolder: row.get('folder'),
-                    file_name: row.get('file_name')
-                });
-            });
-            if (typeof(updateListVariantImage) == "function") {
-                updateListVariantImage({
-                    add: false,
-                    image: file
-                });
-            }
-            if (typeof(updateListFile) == "function") {
-                updateListFile({
-                    file: file
-                });
-            }
-        };
-        window.updateListFile = function(fileObject) {
-            fileObject.file.forEach(function (obj) {
-                var gridView = {{ combineType }}Grid.getGridView();
-                {{ combineType }}Grid.getRows().forEach(function (row) {
-                    if (row.get('file_id') == obj.file_id) {
-                        gridView.collection.remove(row, {silent: true});
-                        gridView.render();
+                {{ combineType }}Grid.getRows().forEach(function (relatedRow) {
+                    if (relatedRow.get('file_id') == row.get('id')) {
+                        console.log('remove related row', relatedRow);
+                        gridView.collection.remove(relatedRow, {silent: false});
                     }
                 });
             });
-        }
+
+            gridView.render();
+        };
     });
 </script>
 

@@ -39,8 +39,10 @@
         }
     });
     window.afterBuiltImagesGrid = function(grid) {
+        console.log('after build image grid');
         //bind remove event
         grid.getRows().bind('remove', function(row) {
+            console.log('remove row', row);
             var image = [];
             image.push({
                 file_id: row.get('file_id'),

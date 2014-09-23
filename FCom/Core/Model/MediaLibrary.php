@@ -39,7 +39,7 @@ class FCom_Core_Model_MediaLibrary extends FCom_Core_Model_Abstract
     public function onAfterDelete()
     {
         parent::onAfterDelete();
-
+        //delete file
         $file = $this->FCom_Core_Main->dir($this->folder) .'/'.$this->file_name;
         if (file_exists($file)) {
             @unlink($file);

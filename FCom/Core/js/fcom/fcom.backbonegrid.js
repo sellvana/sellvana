@@ -2247,13 +2247,13 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 updatePageHtml();
 
                 //todo: consider this is necessary or need multi function grid_before_create
-                if (typeof(config.grid_after_built) === 'function') {
+                if (typeof(config.grid_after_built) !== 'undefined' && typeof window[config.grid_after_built] === 'function') {
                     window[config.grid_after_built](this);
                 }
             };
 
 
-            if (typeof(config.grid_before_create) !== 'undefined') {
+            if (typeof(config.grid_before_create) !== 'undefined' && typeof window[config.grid_before_create] === 'function') {
                 console.log(config.grid_before_create);
                 window[config.grid_before_create](this);
             } else {
