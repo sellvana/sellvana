@@ -3,7 +3,14 @@
 
 {% set type = 'images' %}
 {% set targetType = 'product' %}
-{% set medialibConfig = {id: 'all_' ~ type, mode: 'images', type: 'product-images', title: 'Images', folder: 'media/product/images'} %}
+{% set medialibConfig = {
+    id: 'all_' ~ type,
+    mode: 'images',
+    type: 'product-images',
+    title: 'Images',
+    folder: 'media/product/images',
+    config: {actions: {delete: {caption : 'Remove'}}}
+} %}
 
 {% set attachmentsConfig = {
     type: type,
@@ -32,8 +39,10 @@
         }
     });
     window.afterBuiltImagesGrid = function(grid) {
+        console.log('after build image grid');
         //bind remove event
         grid.getRows().bind('remove', function(row) {
+            console.log('remove row', row);
             var image = [];
             image.push({
                 file_id: row.get('file_id'),
@@ -63,7 +72,7 @@
                 image: image
             });
         }
-    }
+    };
     window.afterMassDelete = function() {
         var image = [];
         {{ combineType }}Grid.getSelectedRows().forEach(function (row) {
@@ -79,8 +88,7 @@
                 image: image
             });
         }
-    }
-
+    };
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
         var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{medialibConfig.type ? medialibConfig.type : "" }}';
         var file_error = [];
