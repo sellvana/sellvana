@@ -80,7 +80,8 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'actions' => [
                     'delete' => ['caption' => 'Remove', 'confirm' => false]
                 ],
-                'grid_before_create' => 'selectedFieldGridRegister'
+                'grid_before_create' => 'selectedFieldGridRegister',
+                'afterMassDelete' => 'afterMassDeleteSelectedGrid',
             ]
         ];
 
@@ -93,6 +94,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
             'config' => [
                 'id' => 'fieldset-modal-add-grid',
                 'caption' => 'Fields',
+                'data_url' => $this->BApp->href('customfields/fieldsets/fieldset_modal_add_grid_data'),
                 'orm' => 'FCom_CustomField_Model_Field',
                 'columns' => [
                     ['type' => 'row_select'],
@@ -110,7 +112,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'actions' => [
                     'add' => ['caption' => 'Add Selected Fields']
                 ],
-                'grid_before_create' => 'addFieldGridRegister'
+                'grid_before_create' => 'addFieldGridRegister',
             ]
         ];
 
@@ -248,7 +250,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         ]);
     }
 
-    public function action_set_field_grid_data()
+    public function action_fieldset_modal_selected_grid_data()
     {
         $orm = $this->FCom_CustomField_Model_SetField->orm('sf')
             ->join('FCom_CustomField_Model_Field', ['f.id', '=', 'sf.field_id'], 'f')
@@ -256,6 +258,17 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
             ->where('sf.set_id', $this->BRequest->get('set_id'));
         //TODO check when rows count is over 10.(processORM paginate)
         $data = $this->view('core/backbonegrid')->processORM($orm, __METHOD__);
+        $this->BResponse->json([
+            ['c' => $data['state']['c']],
+            $this->BDb->many_as_array($data['rows']),
+        ]);
+    }
+
+    public function action_fieldset_modal_add_grid_data()
+    {
+        $view = $this->view('core/backbonegrid');
+        $orm = $this->FCom_CustomField_Model_Field->orm()->select('*');
+        $data = $view->processORM($orm, __METHOD__);
         $this->BResponse->json([
             ['c' => $data['state']['c']],
             $this->BDb->many_as_array($data['rows']),
@@ -342,7 +355,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
     }
 
-    public function action_set_field_grid_data__POST()
+    public function action_fieldset_modal_selected_grid_data__POST()
     {
         //$this->_processPost('FCom_CustomField_Model_SetField', array('set_id'=>$this->BRequest->get('set_id')));
         //print_r($this->BRequest->request()); exit;
