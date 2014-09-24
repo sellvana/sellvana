@@ -26,7 +26,7 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
             });
 
             $('a#btn-fieldset-grid-modal').trigger('click');
-        }
+        };
 
         //important: change modal form element for rendering
         skeleton.Views.ModalForm.prototype.el = '#field-set-modal-form';
@@ -38,12 +38,12 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
         });*/
 
 
-    }
+    };
     window.selectedFieldGridRegister = function(grid) {
         selectedGrid = grid;
         grid.build();
 
-    }
+    };
 
     window.addFieldGridRegister = function(grid) {
         addGrid = grid;
@@ -62,7 +62,7 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
             addGrid.getGridView().clearSelectedRows();
             $('#selected_fields_tab').trigger('click');
         });
-    }
+    };
 
     $('#add_new_field_set').click(function () {
         currentFieldSetId = null;
