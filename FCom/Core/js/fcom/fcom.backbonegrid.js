@@ -417,6 +417,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     hash.id = id;
                     hash.oper = 'edit';
 
+                    delete hash[0]; //remove value of checkbox row_select
+
                     if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length > 0) {
                         if (this.get('_new')) {
                             hash.oper = 'add';
@@ -427,7 +429,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         } else {
                             $.post(BackboneGrid.edit_url, hash);
                         }
-
+                        //todo: need to show bootstrapGrowl success / fail
                     }
                     if (!not_render)
                         this.trigger('render');
