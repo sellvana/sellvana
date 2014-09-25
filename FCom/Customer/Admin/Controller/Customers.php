@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Customer_Admin_Controller_Customers
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Customer_Model_Address $FCom_Customer_Model_Address
+ * @property FCom_CustomerGroups_Model_Group $FCom_CustomerGroups_Model_Group
+ */
 class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -122,11 +128,14 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
+
+        $customer = $args['model'];
+        $hlp = $this->FCom_Customer_Model_Address;
+
         if ($args['do'] !== 'DELETE') {
-            $cust = $args['model'];
             $addrPost = $this->BRequest->post('address');
             if (($newData = $this->BUtil->fromJson($addrPost['data_json']))) {
-                $oldModels = $this->FCom_Customer_Model_Address->orm('a')->where('customer_id', $cust->id)->find_many_assoc();
+                $oldModels = $hlp->orm('a')->where('customer_id', $customer->id)->find_many_assoc();
                 foreach ($newData as $id => $data) {
                     if (empty($data['id'])) {
                         continue;
@@ -136,12 +145,31 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
                         $addr->set($data)->save();
                     } elseif ($data['id'] < 0) {
                         unset($data['id']);
-                        $addr = $this->FCom_Customer_Model_Address->newBilling($data, $cust);
+                        $hlp->newBilling($data, $customer);
                     }
                 }
             }
             if (($del = $this->BUtil->fromJson($addrPost['del_json']))) {
-                $this->FCom_Customer_Model_Address->delete_many(['id' => $del, 'customer_id' => $cust->id]);
+                $hlp->delete_many(['id' => $del, 'customer_id' => $customer->id]);
+            }
+
+            //set default billing / shipping from addressed grid
+            $data = $args['data'];
+            if ($data['default_billing_id']) {
+                $address = $hlp->load($data['default_billing_id']);
+                /** @type FCom_Customer_Model_Address $address */
+                if ($address->customer_id == $customer->id) {
+                    $hlp->update_many(['is_default_billing' => 0], ['customer_id' => $customer->id]);
+                    $address->set('is_default_billing', 1)->save();
+                }
+            }
+            if ($data['default_shipping_id']) {
+                $address = $hlp->load($data['default_billing_id']);
+                /** @type FCom_Customer_Model_Address $address */
+                if ($address->customer_id == $customer->id) {
+                    $hlp->update_many(['is_default_shipping' => 0], ['customer_id' => $customer->id]);
+                    $address->set('is_default_shipping', 1)->save();
+                }
             }
         }
     }

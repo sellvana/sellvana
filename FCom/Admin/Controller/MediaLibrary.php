@@ -69,7 +69,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 'edit_url' => $url . '/edit?folder=' . urlencode($folder),
                 'columns' => [
                     ['type' => 'row_select'],
-                    ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
+                    ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
                     ['name' => 'prev_img', 'label' => 'Preview', 'width' => 110, 'display' => 'eval',
                         'print' => '"<a href=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' target=_blank>'
                             . '<img src=\'' . $baseSrc . '"+rc.row["folder"]+rc.row["subfolder"]+"/"+rc.row["file_name"]+"\' alt=\'"+rc.row["file_name"]+"\' width=50></a>"',
@@ -88,6 +88,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                     ['field' => 'file_name', 'type' => 'text']
                 ],
                 'grid_before_create' => $id . '_register',
+                'afterMassDelete' => $id .'_afterMassDelete',
                 'actions' => [
                     'rescan' => ['caption' => 'Rescan', 'class' => 'btn-info btn-rescan-images'],
                     'refresh' => true,
@@ -106,12 +107,13 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $config['config']['columns'] = [
                 ['type' => 'row_select'],
                 ['name' => 'download_url',  'hidden' => true, 'default' => $download_url],
-                ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
+                ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
                 ['name' => 'file_name', 'label' => 'File Name', 'width' => 200, 'display' => 'eval',
                     'print' => '"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' '
                         . 'href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'],
                 ['name' => 'file_size', 'label' => 'File Size', 'width' => 260, 'search' => false,
-                    'display' => 'file_size']
+                    'display' => 'file_size'],
+                ['name' => 'associated_products', 'label' => 'Associated Products', 'width' => 50],
                 //array('name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'data' => array('edit' => array('href' => $url.'/data?folder='.urlencode($folder)),'delete' => true)),
             ];
         }
@@ -123,7 +125,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
                 ['type' => 'row_select'],
                 ['name' => 'download_url',  'hidden' => true, 'default' => $download_url],
                 ['name' => 'thumb_url',  'hidden' => true, 'default' => $thumbUrl],
-                ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
+                ['name' => 'id', 'label' => 'ID', 'width' => 50, 'hidden' => true],
                 ['name' => 'file_name', 'label' => 'File Name', 'width' => 200, 'display' => 'eval',
                     'print' => '"<a class=\'file-attachments\' data-file-id=\'"+rc.row["file_id"]+"\' '
                         . 'href=\'"+rc.row["download_url"]+rc.row["file_name"]+"\'>"+rc.row["file_name"]+"</a>"'],
@@ -227,37 +229,47 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
         $attModel = !empty($options['model_class']) ? $options['model_class'] : 'FCom_Core_Model_MediaLibrary';
         $attModel = is_string($attModel) ? $this->{$attModel} : $attModel;
-        $type = $r->get('type');
-        if (!$type) {
-            throw new BException("Missing upload type");
-        }
-        $uploadConfig = $this->uploadConfig($type);
-        if (empty($uploadConfig)) {
-            throw new BException("Unknown upload type.");
-        }
-        $canUpload = isset($uploadConfig['can_upload'])? $uploadConfig['can_upload']: false;// allow upload in case no permission is configured? Or deny?
-        $blacklistExt = [
-            'php' => 1, 'php3' => 1, 'php4' => 1, 'php5' => 1, 'htaccess' => 1,
-            'phtml' => 1, 'html' => 1, 'htm' => 1, 'js' => 1, 'css' => 1, 'swf' => 1, 'xml' => 1,
-        ];
 
-        if (isset($uploadConfig['filetype'])) { // todo figure out how to merge processed config file types
-            $fileTypes = explode(',', $uploadConfig['filetype']);
-            if (empty($options['whitelist_ext'])) {
-                $options['whitelist_ext'] = $fileTypes;
-            } else {
-                $options['whitelist_ext'] = $this->BUtil->arrayMerge($options['whitelist_ext'], $fileTypes);
-            }
+        /*
+         * class GridForm: "oper" use in grid, "do" use in form
+         * todo: consider change param name from "do" to "oper".
+         */
+        $do = $r->post('oper');
+        if (empty($do)) {
+            $do = $r->param('do');
         }
 
-        if (!empty($options['whitelist_ext'])) {
-            foreach ($options['whitelist_ext'] as $ext) {
-                unset($blacklistExt[$ext]);
-            }
-        }
-
-        switch ($r->param('do')) {
+        switch ($do) {
         case 'upload':
+            $type = $r->get('type');
+            if (!$type) {
+                throw new BException("Missing upload type");
+            }
+            $uploadConfig = $this->uploadConfig($type);
+            if (empty($uploadConfig)) {
+                throw new BException("Unknown upload type.");
+            }
+            $canUpload = isset($uploadConfig['can_upload'])? $uploadConfig['can_upload']: false;// allow upload in case no permission is configured? Or deny?
+            $blacklistExt = [
+                'php' => 1, 'php3' => 1, 'php4' => 1, 'php5' => 1, 'htaccess' => 1,
+                'phtml' => 1, 'html' => 1, 'htm' => 1, 'js' => 1, 'css' => 1, 'swf' => 1, 'xml' => 1,
+            ];
+
+            if (isset($uploadConfig['filetype'])) { // todo figure out how to merge processed config file types
+                $fileTypes = explode(',', $uploadConfig['filetype']);
+                if (empty($options['whitelist_ext'])) {
+                    $options['whitelist_ext'] = $fileTypes;
+                } else {
+                    $options['whitelist_ext'] = $this->BUtil->arrayMerge($options['whitelist_ext'], $fileTypes);
+                }
+            }
+
+            if (!empty($options['whitelist_ext'])) {
+                foreach ($options['whitelist_ext'] as $ext) {
+                    unset($blacklistExt[$ext]);
+                }
+            }
+
             //set_time_limit(0);
             //ob_implicit_flush();
             //ignore_user_abort(true);
@@ -386,6 +398,17 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             $this->BEvents->fire(__METHOD__ . ':' . $folder . ':delete', ['files' => $files]);
             if (!empty($options['on_delete'])) {
                 $this->BUtil->call($options['on_delete'], $args);
+            }
+            $this->BResponse->json(['success' => true]);
+            break;
+        case 'mass-delete':
+            $listIds = $r->post('id');
+            $listIds = explode(',', $listIds);
+            foreach ($listIds as $id) {
+                $file = $attModel->load($id);
+                if ($file) {
+                   $file->delete();
+                }
             }
             $this->BResponse->json(['success' => true]);
             break;
