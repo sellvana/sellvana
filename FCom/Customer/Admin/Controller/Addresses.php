@@ -1,5 +1,9 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Customer_Admin_Controller_Addresses
+ * @property FCom_Customer_Model_Address $FCom_Customer_Model_Address
+ */
 class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -56,10 +60,12 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
                 'editable' => true, 'hidden' => true],
             ['type' => 'input', 'name' => 'email', 'label' => 'Email', 'index' => 'a.email', 'width' => 100,
                 'addable' => true, 'editable' => true, 'validation' => ['email' => true]],
-            ['type' => 'select', 'name' => 'is_default_billing', 'options' => [0 => 'no', 1 => 'YES'], 'addable' => 1,
-                'editable' => 1],
-            ['type' => 'select', 'name' => 'is_default_shipping', 'options' => [0 => 'no', 1 => 'YES'], 'addable' => 1,
-                'editable' => 1],
+            ['name' => 'is_default_billing', 'label' => 'Is Default Billing', 'display' => 'eval',
+                'print' => '"<input type=\'radio\' value=\'"+rc.row["id"]+"\' name=\'model[default_billing_id]\' "+(rc.row["is_default_billing"] == 1 ? checked=\'checked\' : \'\')+" />"'
+            ],
+            ['name' => 'is_default_shipping', 'label' => 'Is Default Shipping', 'display' => 'eval',
+                'print' => '"<input type=\'radio\' value=\'"+rc.row["id"]+"\' name=\'model[default_shipping_id]\' "+(rc.row["is_default_shipping"] == 1 ? checked=\'checked\' : \'\')+" />"'
+            ],
             ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115,
                 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
         ];
@@ -92,5 +98,10 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
             $result = $this->BLocale->getAvailableRegions('name', $country);
         }
         $this->BResponse->json($result);
+    }
+
+    public function gridPostAfter($args)
+    {
+
     }
 }
