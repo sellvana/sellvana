@@ -28,6 +28,57 @@
 * This class is used for all BuckyBall framework base classes
 *
 * @see BClassRegistry for invokation
+*
+* core
+* @property BApp $BApp
+* @property BException $BException
+* @property BConfig $BConfig
+* @property BClassRegistry $BClassRegistry
+* @property BClassAutoload $BClassAutoload
+* @property BEvents $BEvents
+* @property BSession $BSession
+*
+* controller
+* @property BRequest $BRequest
+* @property BResponse $BResponse
+* @property BRouting $BRouting
+*
+* layout
+* @property BLayout $BLayout
+* @property BView $BView
+* @property BViewEmpty $BViewEmpty
+* @property BViewHead $BViewHead
+* @property BViewList $BViewList
+*
+* db
+* @property BDb $BDb
+*
+* locale
+* @property BLocale $BLocale
+*
+* module
+* @property BModuleRegistry $BModuleRegistry
+* @property BModule $BModule
+* @property BMigrate $BMigrate
+* @property BDbModule $BDbModule
+*
+* cache
+* @property BCache $BCache
+*
+* misc
+* @property BUtil $BUtil
+* @property BHtml $BHtml
+* @property BUrl $BUrl
+* @property BEmail $BEmail
+* @property BValue $BValue
+* @property BData $BData
+* @property BDebug $BDebug
+* @property BLoginThrottle $BLoginThrottle
+* @property BYAML $BYAML
+* @property BValidate $BValidate
+* @property BValidateViewHelper $BValidateViewHelper
+* @property Bcrypt $Bcrypt
+* @property BRSA $BRSA
 */
 class BClass
 {
@@ -136,6 +187,9 @@ class BClass
 
     public function getGlobalDependencyInstance($name, $diConfig)
     {
+        if (!ctype_upper($name[0])) {
+            return false;
+        }
         if (isset(static::$_diGlobal[$name])) {
             return static::$_diGlobal[$name];
         }
@@ -365,7 +419,7 @@ class BApp extends BClass
                     break;
             }
 
-            if (!($r->modRewriteEnabled() && $c->get('web/hide_script_name') && $this->BRequest->area() !== 'FCom_Admin')) {
+            if (!($this->BUrl->hideScriptName() && $this->BRequest->area() !== 'FCom_Admin')) {
                 $url = rtrim($url, "\\"); //for windows installation
                 $url = rtrim($url, '/') . '/' . $scriptPath['basename'];
             }
@@ -411,7 +465,7 @@ class BApp extends BClass
             $r = $this->BRequest;
             $c = $this->BConfig;
             $storeHref = $c->get('web/base_store');
-            if (!$c->get('web/hide_script_name')) {
+            if (!$this->BUrl->hideScriptName()) {
                 if ($storeHref === '' || $storeHref === '/') {
                     $storeHref = '/index.php/';
                 } else {
@@ -656,7 +710,7 @@ class BConfig extends BClass
     public function set($path, $value, $merge = false, $toSave = false)
     {
         if (is_string($toSave) && $toSave === '_configToSave') { // limit?
-            $node =& $this->$toSave;
+            $node =& $this->{$toSave};
         } else {
             $node =& $this->_config;
         }
@@ -745,6 +799,47 @@ class BConfig extends BClass
         if (!file_put_contents($filename, $contents, LOCK_EX)) {
             BDebug::error('Error writing configuration file: ' . $filename);
         }
+    }
+
+    public function writeConfigFiles($files = null)
+    {
+        //TODO: make more flexible, to account for other (custom) file names
+        if (null === $files) {
+            $files = ['core', 'db', 'local'];
+        }
+        if (is_string($files)) {
+            $files = explode(',', strtolower($files));
+        }
+
+        $c      = $this->get(null, null, true);
+
+        if (in_array('core', $files)) {
+            // configuration necessary for core startup
+            unset($c['module_run_levels']['request']);
+
+            $core = [
+                'install_status' => !empty($c['install_status'])? $c['install_status']: null,
+                'core' => !empty($c['core'])? $c['core']: null,
+                'module_run_levels' => !empty($c['module_run_levels'])? $c['module_run_levels']: [],
+                'recovery_modules' => !empty($c['recovery_modules'])? $c['recovery_modules']: null,
+                'mode_by_ip' => !empty($c['mode_by_ip'])? $c['mode_by_ip']: [],
+                'cache' => !empty($c['cache'])? $c['cache']: [],
+            ];
+            $this->writeFile('core.php', $core);
+        }
+        if (in_array('db', $files)) {
+            // db connections
+            $db = !empty($c['db'])? ['db' => $c['db']]: [];
+            $this->writeFile('db.php', $db);
+        }
+        if (in_array('local', $files)) {
+            // the rest of configuration
+            $local = $this->BUtil->arrayMask($c,
+                'db,install_status,module_run_levels,recovery_modules,mode_by_ip,cache,core',
+                true);
+            $this->writeFile('local.php', $local);
+        }
+        return $this;
     }
 
     public function unsetConfig()
@@ -850,23 +945,24 @@ class BClassRegistry extends BClass
     }
 
     /**
-    * Override a class
-    *
-    * Usage: $this->BClassRegistry->overrideClass('BaseClass', 'MyClass');
-    *
-    * Overridden class should be called one of the following ways:
-    * - BClassRegistry::instance('BaseClass')
-    * - BaseClass:i() -- if it extends BClass or has the shortcut defined
-    *
-    * Remembering the module that overrode the class for debugging
-    *
-    * @todo figure out how to update events on class override
-    *
-    * @param string $class Class to be overridden
-    * @param string|null $newClass New class or clear class override
-    * @param bool $replaceSingleton If there's already singleton of overridden class, replace with new one
-    * @return BClassRegistry
-    */
+     * Override a class
+     *
+     * Usage: $this->BClassRegistry->overrideClass('BaseClass', 'MyClass');
+     *
+     * Overridden class should be called one of the following ways:
+     * - BClassRegistry::instance('BaseClass')
+     * - BaseClass:i() -- if it extends BClass or has the shortcut defined
+     *
+     * Remembering the module that overrode the class for debugging
+     *
+     * @todo figure out how to update events on class override
+     *
+     * @param string $class Class to be overridden
+     * @param string|null $newClass New class or clear class override
+     * @param bool $replaceSingleton If there's already singleton of overridden class, replace with new one
+     * @throws BException
+     * @return BClassRegistry
+     */
     public function overrideClass($class, $newClass, $replaceSingleton = false)
     {
         if (is_string($newClass)) {
@@ -881,7 +977,7 @@ class BClassRegistry extends BClass
             }
             $newClass = $class;
             $class = static::$_classes[$class]['class_name'];
-            unset(static::$_classes[$class]);
+            unset(static::$_classes[$newClass]);
             BDebug::debug('CLEAR CLASS OVERRIDE: ' . $class . ' -> ' . $newClass);
         } else {
             throw new BException('Invalid argument type: ' . print_r($newClass, 1));
@@ -980,7 +1076,7 @@ class BClassRegistry extends BClass
     * A difference between overrideModule and augmentModule is that
     * you can override only with one another method, but augment multiple times.
     *
-    * If augmented multiple times, each consequetive callback will receive result
+    * If augmented multiple times, each consecutive callback will receive result
     * changed by previous callback.
     *
     * @param string $class
@@ -1131,7 +1227,9 @@ class BClassRegistry extends BClass
     {
         //$class = $origClass ? $origClass : get_class($origObject);
         $class = get_class($origObject);
-
+        // here $class is the overriding object class, and config for methods
+        // is keyed with overridden class name, so findMethodInfo will never return true, unless
+        // overriding and overridden class are the same!
         if (($info = static::findMethodInfo($class, $method, 0, 'override'))) {
             $callback = $info['callback'];
             array_unshift($args, $origObject);
@@ -1289,6 +1387,9 @@ class BClassRegistry extends BClass
             BDebug::error(BLocale::i()->_('Invalid class name: %s', $className));
         }
         $args = static::processDI($className, $args);
+        if ($className == 'BClassDecorator' && !empty($args)) {
+            $args = [$args];
+        }
         $reflClass = new ReflectionClass($className);
         $instance = $reflClass->newInstanceArgs($args);
 
@@ -1361,6 +1462,10 @@ class BClassDecorator
     protected $_decoratedComponent;
 
     /**
+     * @var BClassRegistry BClassRegistry
+     */
+    protected $BClassRegistry;
+    /**
     * Decorator constructor, creates an instance of decorated class
     *
     * @param array(object|string $class)
@@ -1371,6 +1476,7 @@ class BClassDecorator
 //echo '1: '; print_r($class);
         $class = array_shift($args);
         $this->_decoratedComponent = is_string($class) ? BClassRegistry::instance($class, $args) : $class;
+        $this->BClassRegistry = BClassRegistry::i();
     }
 
     public function __destruct()
@@ -2224,13 +2330,14 @@ echo "<pre style='margin-left:300px'>"; var_dump(headers_list()); echo "</pre>";
         if (null === $hashReferrer) {
             $hashReferrer = $this->BConfig->get('web/csrf_check_method') === 'token+referrer';
         }
+
         if ($hashReferrer) {
             if ($validating) {
                 $url = $this->BRequest->referrer();
             } else {
                 $url = $this->BRequest->currentUrl();
             }
-            $url = rtrim($url, '?&#');
+            $url = rtrim(str_replace('/index.php', '', $url), '/?&#');
             return sha1($data['_csrf_token'] . $url);
         }
         return $data['_csrf_token'];

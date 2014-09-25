@@ -118,6 +118,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         if ($batch && is_numeric($batch)) {
             $bs = $batch;
         }
+        $this->beginExport($fe);
 
         $this->writeLine($fe, json_encode([static::STORE_UNIQUE_ID_KEY => $this->storeUID()]));
         $exportableModels = $this->collectExportableModels();
@@ -134,9 +135,13 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         foreach ($sorted as $s) {
             /** @var FCom_Core_Model_Abstract $model */
             $model   = $s[ 'model' ];
-            if ($this->getUser()->getPermission($model) == false) {
+            $user = $this->getUser();
+            if ($user && $user->getPermission($model) == false) {
                 $this->BDebug->warning($this->BLocale->_('%s User: %s, cannot export "%s". Permission denied.',
                     [$this->BDb->now(), $this->getUser()->get('username'), $model]));
+                continue;
+            } else if (empty($user)) {
+                $this->BDebug->warning($this->BLocale->_('No user found.'));
                 continue;
             }
             if ( !isset( $s[ 'skip' ] ) ) {
@@ -162,7 +167,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                              ->offset($offset)
                              ->find_many();
             if ($records) {
-                $this->writeLine($fe, $this->BUtil->toJson($heading));
+                $this->writeLine($fe, ',' . $this->BUtil->toJson($heading));
                 while($records) {
                     $this->BEvents->fire(__METHOD__ . ':beforeOutput', ['records' => $records]);
                     foreach ($records as $r) {
@@ -172,7 +177,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                         $data = array_values($data);
 
                         $json = $this->BUtil->toJson($data);
-                        $this->writeLine($fe, $json);
+                        $this->writeLine($fe, ',' . $json);
                     }
                     $offset += $bs;
                     $records = $this->{$model}
@@ -182,9 +187,11 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                                      ->offset($offset)
                                      ->find_many();
                 }
+                //$this->writeLine($fe, '{__end: true}');
             }
         }
-
+        $this->endExport($fe);
+        fclose($fe);
         return true;
     }
     public function importFile($fromFile = null, $batch = null)
@@ -210,10 +217,13 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         $channel->send(['signal' => 'start', 'msg' => $this->BLocale->_("Import started.")]);
         while(($line = fgets($fi)) !== false) {
             $cnt++;
-            $batchData[]  = (array)json_decode($line);
-            if ($cnt % $bs == 0) {
-                $this->import($batchData, $bs);
-                $batchData = [];
+            $lineData     = (array)json_decode(trim($line, ","));
+            if (!empty($lineData)) {
+                $batchData[] = $lineData;
+                if ($cnt % $bs == 0) {
+                    $this->import($batchData, $bs);
+                    $batchData = [];
+                }
             }
         }
 
@@ -488,8 +498,11 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
      */
     protected function collectModuleModels($module)
     {
-        $path         = $module->root_dir . '/Model/';
         $modelConfigs = [];
+        if(!empty($module->noexport)) {
+            return $modelConfigs;
+        }
+        $path         = $module->root_dir . '/Model/';
         $files        = $this->BUtil->globRecursive($path, '*.php');
         if (empty($files)) {
             return $modelConfigs;
@@ -574,7 +587,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
         if (!$sUid) {
             $sUid = $this->BUtil->randomString(32);
             $this->BConfig->set('db/store_unique_id', $sUid, false, true);
-            $this->FCom_Core_Main->writeConfigFiles();
+            $this->BConfig->writeConfigFiles();
         }
         return $sUid;
     }
@@ -868,5 +881,15 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
             @unlink($fullFileName); // make sure invalid files are removed from the system;
         }
         return $valid;
+    }
+
+    protected function beginExport($handle)
+    {
+        $this->writeLine($handle, "[");
+    }
+
+    protected function endExport($handle)
+    {
+        $this->writeLine($handle, "]");
     }
 }

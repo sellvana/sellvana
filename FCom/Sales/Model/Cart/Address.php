@@ -51,7 +51,7 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
         if (is_null($obj)) {
             $obj = $this;
         }
-        $countries = $this->FCom_Geo_Model_Country->options();
+        $countries = $this->BLocale->getAvailableCountries();
         return '<div class="adr">'
             . '<div class="street-address">' . $obj->street1 . '</div>'
             . ($obj->street2 ? '<div class="extended-address">' . $obj->street2 . '</div>' : '')
@@ -70,5 +70,45 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
         if (!$this->create_at) $this->create_at = $this->BDb->now();
         $this->update_at = $this->BDb->now();
         return true;
+    }
+
+    public function exportToCustomer($customer)
+    {
+        $data = $this->as_array();
+        $data['customer_id'] = $customer->id();
+        $custAddress = $this->FCom_Customer_Model_Address->create($data)->save();
+        return $custAddress;
+    }
+
+    public function findByCartType($cartId, $atype = 'shipping')
+    {
+        return $this->orm()->where("cart_id", $cartId)->where('atype', $atype)->find_one();
+    }
+
+    public function newAddress($cartId, $newAddress)
+    {
+        if (is_object($newAddress)) {
+            $data = $newAddress->as_array();
+        } else {
+            $data = $newAddress;
+        }
+        if (isset($data['id'])) {
+            unset($data['id']);
+        }
+        if (empty($data['atype'])) {
+            $data['atype'] = 'shipping';
+        }
+
+        $address = $data;
+        $address['cart_id'] = $cartId;
+
+        $newAddress = $this->findByCartType($cartId, $address['atype']);
+        if (!$newAddress) {
+            $newAddress = $this->create($address);
+        } else {
+            $newAddress->set($address);
+        }
+        $newAddress->save();
+        return $newAddress;
     }
 }

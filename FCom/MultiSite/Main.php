@@ -5,6 +5,7 @@ class FCom_MultiSite_Main extends BClass
     public function beforeBootstrap()
     {
         if ($this->BConfig->get('install_status') === 'installed') {
+            BDb::connect();
             $siteData = $this->FCom_MultiSite_Model_Site->findByDomain();
             if (!$siteData) {
                 return;

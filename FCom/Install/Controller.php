@@ -121,7 +121,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             }
             $this->BConfig->add(['db' => $w['db']], true);
             $this->BDb->connect(null, true);
-            $this->FCom_Core_Main->writeConfigFiles('db');
+            $this->BConfig->writeConfigFiles('db');
             $sData =& $this->BSession->dataToUpdate();
             unset($sData['w']['db']['password']);
             $this->BResponse->redirect('install/step2');
@@ -242,6 +242,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                         'FCom_PaymentBasic' => 'REQUESTED',
                         'FCom_PaymentCC' => 'REQUESTED',
                         'FCom_PayPal' => 'REQUESTED',
+                        'FCom_ProductCompare' => 'REQUESTED',
                         'FCom_ProductReviews' => 'REQUESTED',
                         'FCom_Promo' => 'REQUESTED',
                         'FCom_PushServer' => 'REQUESTED',
@@ -274,7 +275,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             ],
         ], true);
 
-        $this->FCom_Core_Main->writeConfigFiles();
+        $this->BConfig->writeConfigFiles();
 
         $this->BResponse->redirect($this->BApp->adminHref(''));
     }

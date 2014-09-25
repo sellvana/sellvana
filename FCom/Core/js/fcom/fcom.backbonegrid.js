@@ -115,7 +115,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     },
                     dataFilter: function (responseString) {
                         var response = jQuery.parseJSON(responseString);
-                        currentMessage = response.Message;
+                        var currentMessage = response.Message;
                         if ((modalForm.modalType === 'editable' || editInline) && BackboneGrid.currentRow.get('id') === response.id){
                             return true;
                         }
@@ -417,6 +417,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     hash.id = id;
                     hash.oper = 'edit';
 
+                    delete hash[0]; //remove value of checkbox row_select
+
                     if (typeof(BackboneGrid.edit_url) !== 'undefined' && BackboneGrid.edit_url.length > 0) {
                         if (this.get('_new')) {
                             hash.oper = 'add';
@@ -427,7 +429,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         } else {
                             $.post(BackboneGrid.edit_url, hash);
                         }
-
+                        //todo: need to show bootstrapGrowl success / fail
                     }
                     if (!not_render)
                         this.trigger('render');
@@ -764,8 +766,8 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
 
                     if (confirm) {
-                        rowsCollection.remove(this.model, {silent: true});
-                        selectedRows.remove(this.model, {silent: true});
+                        rowsCollection.remove(this.model, {silent: false});
+                        selectedRows.remove(this.model, {silent: false});
                         this._destorySelf();
                     }
                 },
@@ -1819,27 +1821,27 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             */
             this.getGridView = function() {
                 return gridView;
-            }
+            };
 
             this.getRows = function() {
                 return rowsCollection;
-            }
+            };
 
             this.getCols = function() {
                 return columnsCollection;
-            }
+            };
 
             this.getSelectedRows = function() {
                 return selectedRows;
-            }
+            };
 
             this.getGridSkeleton = function() {
                 return BackboneGrid;
-            }
+            };
 
             this.getModalForm = function() {
                 return modalForm;
-            }
+            };
 
             /*this.afterSelectionChanged = function() {
 
@@ -2243,14 +2245,18 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                 });
                 //NProgress.done();
 
-
-
                 setModalHeight();
                 updatePageHtml();
-            }
+
+                //todo: consider this is necessary or need multi function grid_before_create
+                if (typeof(config.grid_after_built) !== 'undefined' && typeof window[config.grid_after_built] === 'function') {
+                    window[config.grid_after_built](this);
+                }
+            };
 
 
-            if (typeof(config.grid_before_create) !== 'undefined') {
+            if (typeof(config.grid_before_create) !== 'undefined' && typeof window[config.grid_before_create] === 'function') {
+                console.log(config.grid_before_create);
                 window[config.grid_before_create](this);
             } else {
                 this.build();

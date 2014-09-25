@@ -35,7 +35,7 @@ final class FCom_MarketClient_RemoteApi extends BClass
         $result = $this->BUtil->fromJson($response);
         if (!empty($result['site_key'])) {
             $this->BConfig->set('modules/FCom_MarketClient/site_key', $result['site_key'], false, true);
-            $this->FCom_Core_Main->writeConfigFiles('local');
+            $this->BConfig->writeConfigFiles('local');
         }
         return $result;
     }

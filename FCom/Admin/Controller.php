@@ -27,8 +27,8 @@ class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
     public function action_my_account()
     {
         $model = $this->FCom_Admin_Model_User->sessionUser();
-        $this->BLayout->view('my_account')->set('model', $model);
         $this->layout('/my_account');
+        $this->BLayout->view('my_account')->set('model', $model);
     }
 
     public function action_my_account__POST()

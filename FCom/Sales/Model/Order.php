@@ -1,10 +1,44 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Model_Order
+ * @property string $id
+ * @property string $customer_id
+ * @property string $customer_email
+ * @property string $cart_id
+ * @property string $status
+ * @property string $item_qty
+ * @property string $subtotal
+ * @property string $shipping_method
+ * @property string $shipping_service
+ * @property string $payment_method
+ * @property string $coupon_code
+ * @property string $tax
+ * @property string $balance
+ * @property string $create_at
+ * @property string $update_at
+ * @property string $grandtotal
+ * @property string $shipping_service_title
+ * @property string $data_serialized
+ * @property string $unique_id
+ * @property string $admin_id
+ *
+ * @property array $items
+ *
+ * DI
+ * @property FCom_Core_Model_Seq $FCom_Core_Model_Seq
+ * @property FCom_Sales_Model_Order_Status $FCom_Sales_Model_Order_Status
+ * @property FCom_Sales_Model_Order_Item $FCom_Sales_Model_Order_Item
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
+ */
 class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_sales_order';
+
     protected static $_origClass = __CLASS__;
-    protected $addresses;
+
+    protected $_addresses;
 
     /**
     * Fallback singleton/instance factory
@@ -34,7 +68,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
      */
     public function billing()
     {
-        return $this->getAddressByType('billing');
+        return $this->getBillingAddress();
     }
 
     /**
@@ -42,7 +76,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
      */
     public function shipping()
     {
-        return $this->getAddressByType('shipping');
+        return $this->getShippingAddress();
     }
 
     public function addNew($data)
@@ -98,7 +132,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function getOrders($customerId)
     {
-        return $this::i()->orm()->where('customer_id', $customerId)->find_many_assoc();
+        return $this->orm()->where('customer_id', $customerId)->find_many_assoc();
 
     }
 
@@ -106,13 +140,13 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     /**
      * Verify if order exist if yes return the order data
      *
-     * @param $orderId
-     * @param $customerId
+     * @param int $uniqueId
+     * @param int $customerId
      * @return BModel | false
      */
     public function isOrderExists($uniqueId, $customerId)
     {
-        return $this::i()->orm()->where('unique_id', $uniqueId)->where('customer_id', $customerId)->find_one();
+        return $this->orm()->where('unique_id', $uniqueId)->where('customer_id', $customerId)->find_one();
     }
 
     public function prepareApiData($orders, $includeItems = false)
@@ -204,8 +238,15 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         if ($cart->customer_email) {
             $orderData['customer_email']  =  $cart->customer_email;
         } else {
+            $billing = $this->FCom_Sales_Model_Cart_Address->loadWhere(['cart_id' => $cart->id(), 'atype' => 'billing']);
+            #var_dump($cart->id(), $billing);
+            $orderData['customer_email'] = $billing->email;
+            /*
             $customer = $this->FCom_Customer_Model_Customer->load($cart->customer_id);
-            $orderData['customer_email']  =  $customer->email;
+            if ($customer) {
+                $orderData['customer_email']  =  $customer->email;
+            }
+            */
         }
         $orderData['item_qty']        = $cart->item_qty;
         $orderData['subtotal']        = $cart->subtotal;
@@ -289,42 +330,39 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     public function createOrderAddress($cart, $options)
     {
         $orderId = isset($options['order_id']) ? $options['order_id'] : $cart->id(); // ???
-        $shippingAddress = $cart->getAddressByType('shipping');
+        $shippingAddress = $cart->getShippingAddress();
         if ($shippingAddress) {
             $this->FCom_Sales_Model_Order_Address->newAddress($orderId, $shippingAddress);
         }
-        $billingAddress = $cart->getAddressByType('billing');
+        $billingAddress = $cart->getBillingAddress();
         if ($billingAddress) {
             $this->FCom_Sales_Model_Order_Address->newAddress($orderId, $billingAddress);
         }
     }
 
-    public function getAddressByType($type)
-    {
-        $addresses = $this->getAddresses();
-
-        switch ($type) {
-            case 'billing':
-                return !empty($addresses['billing']) ? $addresses['billing'] : null;
-
-            case 'shipping':
-                if ($this->shipping_same) {
-                    return $this->getAddressByType('billing');
-                }
-                return !empty($addresses['shipping']) ? $addresses['shipping'] : null;
-            default:
-                throw new BException('Invalid order address type: ' . $type);
-        }
-    }
-
     public function getAddresses()
     {
-        if (!$this->addresses) {
-            $this->addresses = $this->FCom_Sales_Model_Order_Address->orm()
-                               ->where("order_id", $this->id)
+        if (!$this->_addresses) {
+            $this->_addresses = $this->FCom_Sales_Model_Order_Address->orm()
+                               ->where("order_id", $this->id())
                                ->find_many_assoc('atype');
         }
-        return $this->addresses;
+        return $this->_addresses;
+    }
+
+    public function getBillingAddress()
+    {
+        $addresses = $this->getAddresses();
+        return !empty($addresses['billing']) ? $addresses['billing'] : null;
+    }
+
+    public function getShippingAddress()
+    {
+        $addresses = $this->getAddresses();
+        if ($this->same_address) {
+            return $this->getBillingAddress();
+        }
+        return !empty($addresses['shipping']) ? $addresses['shipping'] : null;
     }
 
     /**
@@ -344,12 +382,14 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             if (!$product) {
                 continue;
             }
+            $productInfo = $product->as_array();
+            $productInfo['variants'] = $item->getData('variants');
             $orderItem                 = [];
             $orderItem['order_id']     = $orderId;
             $orderItem['product_id']   = $item->product_id;
             $orderItem['qty']          = $item->qty;
             $orderItem['total']        = $item->rowTotal();
-            $orderItem['product_info'] = $this->BUtil->toJson($product->as_array());
+            $orderItem['product_info'] = $this->BUtil->toJson($productInfo);
 
             /* @var $testItem FCom_Sales_Model_Order_Item */
             $testItem = $this->FCom_Sales_Model_Order_Item->isItemExist($orderId, $item->product_id);
@@ -403,5 +443,4 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             $args['seq_id'] =  '1' . $orderNumber;
         }
     }
-
 }

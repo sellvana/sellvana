@@ -1,113 +1,24 @@
 {% set m = THIS.get('model') %}
 {% set prodAttachConfig = APP.instance('FCom_Catalog_Admin_Controller_Products').productAttachmentsGridConfig(m) %}
-<script>
-var all_attachments_grid, attachmentGrid;
-require(['jquery', 'underscore', 'backbone', 'unique', 'fcom.backbonegrid'], function($, _, Backbone) {
-    var originIds, addedIds = [], removedIds = [];
-    var backboneGridAllImages, rowsAllImages;
-    function _getAttachmentsDbFields(row) {
-        return {
-            id: row.id,
-            file_id: row.file_id,
-            label: row.label,
-            position: row.position,
-            create_at: row.create_at,
-            update_at: row.update_at,
-            _new: row._new
-        };
-    }
 
-    /*
-    *function to set attachment grid data into form fields to send them server
-    *This function is callend when 'save' button of product form is clicked.
-    */
-    window.setAttachementsGridVals = function() {
-        console.log('setAttachmentsGridVals');
-        removedIds = _.difference(originIds, attachmentGrid.getRows().pluck('id'));
+{% import THIS.view('core/form-elements').twigName() as forms %}
 
-        var rows = [];
-        attachmentGrid.getRows().forEach(function(row) {
-            rows.push(_getAttachmentsDbFields(row.toJSON()));
-        });
-        console.log(rows);
-        $('#prod-attach-rows').val(JSON.stringify(rows));
-        $('#prod-attach-remove').val(removedIds.join(','));
-    }
+{% set type = 'attachments' %}
+{% set targetType = 'product' %}
+{% set medialibConfig = {
+    id: 'all_' ~ type,
+    type: 'product-attachments',
+    config: {actions: {delete: {caption : 'Remove'}}}
+} %}
 
-    /*
-    *MediaGrid registery function
-    */
-    window.all_attachments_register = function(grid) {
-        all_attachments_grid = grid;
-        grid.build();
+{% set attachmentsConfig = {
+    type: type,
+    targetType: targetType,
+    elementContainer: '#tab-attachments',
+    medialibConfig: medialibConfig,
+    gridConfig: prodAttachConfig
+} %}
 
-        backboneGridAllImages = all_attachments_grid.getGridSkeleton();
-        rowsAllImages = all_attachments_grid.getRows();
-        //Depending selected rows count, disable or enable add button of popup
-        all_attachments_grid.getSelectedRows().on('add remove reset', function() {
-            if (all_attachments_grid.getSelectedRows().length>0) {
-                $('.btn_all_attachments_add').removeClass('disabled');
-            } else {
-                $('.btn_all_attachments_add').addClass('disabled');
-            }
-        });
+{#{{ forms.attachment_tab_content(m, attachment_tab_config) | raw }}#}
 
-        $('.btn_all_attachments_add').click(function() {
-            var gridView = attachmentGrid.getGridView();
-            all_attachments_grid.getSelectedRows().forEach(function (row) {
-                if (!attachmentGrid.getRows().findWhere({file_id: row.get('id')})) {
-                    var addedRow = row;
-                    addedRow.set('_new', true);
-                    addedRow.set('file_id', row.id);
-                    addedRow.set('id', guid());
-                    addedRow.set('selected', false);
-                    addedRow.set('update_at', dateTimeNow());
-                    addedRow.set('create_at', dateTimeNow());
-                    gridView.collection.add(addedRow.toJSON(), {silent: true});
-                }
-            });
-
-            gridView.render();
-            all_attachments_grid.getGridView().clearSelectedRows();
-            $('#all_attachments_modal').modal('hide');
-
-        });
-    }
-
-    window.attachmentGridRegister = function(grid) {
-        attachmentGrid = grid;
-        attachmentGrid.build();
-
-        var attachmentConfig = attachmentGrid.getGridSkeleton();
-        originIds = attachmentGrid.getRows().pluck('id');
-
-        $(attachmentConfig.AddButton).click(function() {
-           //refreshGridAdd();
-            $('#all_attachments_modal').modal('show');
-        });
-
-    }
-
-    /*function refreshGridAdd() {
-        var data = getExcludeId();
-        backboneGridAllImages.current_filters['exclude_id'] = data;
-        rowsAllImages.fetch({reset: true});
-    }
-
-    function getExcludeId() {
-        var arr = attachmentGrid.getGridView().collection.pluck('file_id');
-        return  arr.join(',');
-    }*/
-});
-
-
-</script>
-
-
-{{ THIS.view('core/backbonegrid').set('grid', prodAttachConfig) | raw }}
-{% set upload_config = APP.instance('FCom_Catalog_Admin_Controller_Products').getUploadConfig('product-attachments') %}
-{{ THIS.view('core/medialib').set('config', {'id': 'all_attachments', 'folder': 'media/product/attachment',
-    mode: 'link', title: 'Attachments', multiSelAllowed: true, type: upload_config.type, file_types: upload_config.filetype}) | raw }}
-
-<input type='hidden' name="grid[attachments][del]" id='prod-attach-remove' />
-<input type='hidden' name="grid[attachments][rows]" id='prod-attach-rows' />
+{{ THIS.view('core/attachmentgrid').set('config', attachmentsConfig) | raw }}

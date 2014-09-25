@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CustomField_Admin_Controller_FieldSets
+ * @property FCom_CustomField_Model_Set $FCom_CustomField_Model_Set
+ * @property FCom_CustomField_Model_SetField $FCom_CustomField_Model_SetField
+ * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ * @property FCom_CustomField_Model_FieldOption $FCom_CustomField_Model_FieldOption
+ */
 class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_Abstract
 {
     protected $_permission = 'custom_fields';
@@ -73,7 +80,8 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'actions' => [
                     'delete' => ['caption' => 'Remove', 'confirm' => false]
                 ],
-                'grid_before_create' => 'selectedFieldGridRegister'
+                'grid_before_create' => 'selectedFieldGridRegister',
+                'afterMassDelete' => 'afterMassDeleteSelectedGrid',
             ]
         ];
 
@@ -86,6 +94,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
             'config' => [
                 'id' => 'fieldset-modal-add-grid',
                 'caption' => 'Fields',
+                'data_url' => $this->BApp->href('customfields/fieldsets/fieldset_modal_add_grid_data'),
                 'orm' => 'FCom_CustomField_Model_Field',
                 'columns' => [
                     ['type' => 'row_select'],
@@ -103,7 +112,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                 'actions' => [
                     'add' => ['caption' => 'Add Selected Fields']
                 ],
-                'grid_before_create' => 'addFieldGridRegister'
+                'grid_before_create' => 'addFieldGridRegister',
             ]
         ];
 
@@ -241,7 +250,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         ]);
     }
 
-    public function action_set_field_grid_data()
+    public function action_fieldset_modal_selected_grid_data()
     {
         $orm = $this->FCom_CustomField_Model_SetField->orm('sf')
             ->join('FCom_CustomField_Model_Field', ['f.id', '=', 'sf.field_id'], 'f')
@@ -249,6 +258,17 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
             ->where('sf.set_id', $this->BRequest->get('set_id'));
         //TODO check when rows count is over 10.(processORM paginate)
         $data = $this->view('core/backbonegrid')->processORM($orm, __METHOD__);
+        $this->BResponse->json([
+            ['c' => $data['state']['c']],
+            $this->BDb->many_as_array($data['rows']),
+        ]);
+    }
+
+    public function action_fieldset_modal_add_grid_data()
+    {
+        $view = $this->view('core/backbonegrid');
+        $orm = $this->FCom_CustomField_Model_Field->orm()->select('*');
+        $data = $view->processORM($orm, __METHOD__);
         $this->BResponse->json([
             ['c' => $data['state']['c']],
             $this->BDb->many_as_array($data['rows']),
@@ -335,13 +355,13 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
     }
 
-    public function action_set_field_grid_data__POST()
+    public function action_fieldset_modal_selected_grid_data__POST()
     {
         //$this->_processPost('FCom_CustomField_Model_SetField', array('set_id'=>$this->BRequest->get('set_id')));
         //print_r($this->BRequest->request()); exit;
         $p = $this->BRequest->post();
         $model = $this->FCom_CustomField_Model_SetField;
-        $model->delete_many(['set_id' => $p['set_id']]);
+        $model->delete_many(['set_id' => (int)$p['set_id']]);
         if ($p['field_ids'] !== '') {
             foreach (explode(',', $p['field_ids']) as $i => $fId) {
                 $model->create(['set_id' => $p['set_id'], 'field_id' => $fId, 'position' => $i])->save();
@@ -358,18 +378,18 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
     public function action_field_option_grid_data__POST()
     {
         $p = $this->BRequest->post();
-        $model = $this->FCom_CustomField_Model_FieldOption;
+        $hlp = $this->FCom_CustomField_Model_FieldOption;
         $op = 0;
 //        $model->delete_many(['field_id' => $p['field_id']]);
+        $models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($p['rows'], 'id'))->find_many_assoc();
         foreach ($p['rows'] as $row) {
-            $fieldOption = $model->orm()->where('id', $row['id'])->find_one();
-            if ($fieldOption) {
-                $fieldOption->set('label', $row['label'])->save();
+            if (!empty($models[$row['id']])) {
+                $models[$row['id']]->set('label', $row['label'])->save();
                 $op++;
             } else {
-                $data = ['field_id' => $p['field_id'], 'label' => $row['label']];
-                if (!$model->orm()->where($data)->find_one()) {
-                    $model->create($data)->save();
+                $data = ['field_id' => (int)$p['field_id'], 'label' => (string)$row['label']];
+                if (!$hlp->orm()->where($data)->find_one()) {
+                    $hlp->create($data)->save();
                     $op++;
                 }
 
@@ -381,10 +401,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
     public function action_form()
     {
-        $id = $this->BRequest->params('id');
-        if (!$id) {
-            $id = $this->BRequest->get('id');
-        }
+        $id = $this->BRequest->param('id', true);
         if ($id) {
             $model = $this->FCom_CustomField_Model_Set->load($id);
             if (empty($model)) {
@@ -403,7 +420,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
     public function action_form__POST()
     {
         $r = $this->BRequest;
-        $id = $r->params('id');
+        $id = $r->param('id');
         $data = $r->post();
 
         try {
@@ -435,19 +452,41 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
     {
         $r = $this->BRequest;
         $p = $r->post();
-        $name = $p['_name'];
-        $val = $p[$name];
-        $rows = $this->BDb->many_as_array($this->FCom_CustomField_Model_Field->orm()->where($name, $val)->find_many());
-        $this->BResponse->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
+        try {
+            if (empty($p['_name'])) {
+                throw new BException('Invalid field name');
+            }
+            $name = $this->BDb->sanitizeFieldName($p['_name']);
+            if (empty($p[$name])) {
+                throw new BException('Invalid field value');
+            }
+            $val = $p[$name];
+            $exists = $this->FCom_CustomField_Model_Field->orm()->where($name, $val)->find_one();
+            $result = ['unique' => !$exists, 'id' => !$exists ? -1 : $exists->id()];
+        } catch (Exception $e) {
+            $result = ['error' => $e->getMessage()];
+        }
+        $this->BResponse->json($result);
     }
 
     public function action_unique_set__POST()
     {
         $r = $this->BRequest;
         $p = $r->post();
-        $name = $p['_name'];
-        $val = $p[$name];
-        $rows = $this->BDb->many_as_array($this->FCom_CustomField_Model_Set->orm()->where($name, $val)->find_many());
-        $this->BResponse->json(['unique' => empty($rows), 'id' => (empty($rows) ? -1 : $rows[0]['id'])]);
+        try {
+            if (empty($p['_name'])) {
+                throw new BException('Invalid field name');
+            }
+            $name = $this->BDb->sanitizeFieldName($p['_name']);
+            if (empty($p[$name])) {
+                throw new BException('Invalid field value');
+            }
+            $val = $p[$name];
+            $exists = $this->FCom_CustomField_Model_Set->orm()->where($name, $val)->find_one();
+            $result = ['unique' => !$exists, 'id' => !$exists ? -1 : $exists->id()];
+        } catch (Exception $e) {
+            $result = ['error' => $e->getMessage()];
+        }
+        $this->BResponse->json($result);
     }
 }

@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<dataset>
+    <fcom_search_history id="1" query="search history 1" num_searches="1" num_products_found_last="11" />
+    <fcom_search_history id="2" query="search history 2" num_searches="2" num_products_found_last="22" />
+</dataset>

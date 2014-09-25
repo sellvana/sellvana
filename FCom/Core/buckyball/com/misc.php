@@ -933,6 +933,16 @@ class BUtil extends BClass
         return $verifyHash === $knownHash;
     }
 
+    /**
+     * Used for hash regeneration of old password hashes
+     *
+     * @return string
+     */
+    public function isPreferredPasswordHash($password)
+    {
+        return strpos($password, '$2y$12$') === 0;
+    }
+
     public function sha512base64($str)
     {
         return base64_encode(pack('H*', hash('sha512', $str)));
@@ -966,7 +976,9 @@ class BUtil extends BClass
         }
 
         // curl disabled by default because file upload doesn't work for some reason. TODO: figure out why
-        if (!empty($options['curl']) && function_exists('curl_init') || ini_get('safe_mode')) {
+        if (!empty($options['curl']) && function_exists('curl_init')
+            || ini_get('safe_mode') || !ini_get('allow_url_fopen')
+        ) {
             $curlOpt = [
                 CURLOPT_USERAGENT => $userAgent,
                 CURLOPT_URL => $url,
@@ -1093,6 +1105,7 @@ class BUtil extends BClass
                 $oldErrorReporting = error_reporting(0);
             }
             $response = file_get_contents($url, false, stream_context_create($streamOptions));
+#var_dump($response, $url, $streamOptions, $http_response_header); exit(__METHOD__);
             if (empty($options['debug'])) {
                 error_reporting($oldErrorReporting);
             }
@@ -1102,10 +1115,16 @@ class BUtil extends BClass
         foreach ($respHeaders as $i => $line) {
             if ($i) {
                 $arr = explode(':', $line, 2);
+                static::$_lastRemoteHttpInfo['headers'][strtolower($arr[0])] = trim($arr[1]);
             } else {
-                $arr = [0, $line];
+                preg_match('#^HTTP/([0-9.]+) ([0-9]+) (.*)$#', $line, $m);
+                static::$_lastRemoteHttpInfo['headers']['http'] = [
+                    'full' => $m[0],
+                    'protocol' => $m[1],
+                    'code' => $m[2],
+                    'status' => $m[3],
+                ];
             }
-            static::$_lastRemoteHttpInfo['headers'][strtolower($arr[0])] = trim($arr[1]);
         }
         #BDebug::log(print_r(compact('method', 'url', 'data', 'response'), 1), 'remotehttp.log');
 
@@ -1807,9 +1826,18 @@ class BUtil extends BClass
     }
 }
 
-class BHTML extends BClass
+class BHtml extends BClass
 {
 
+}
+
+class BUrl extends BClass
+{
+    public function hideScriptName()
+    {
+        $hideConf = $this->BConfig->get('web/hide_script_name');
+        return $hideConf == 2 || $hideConf == 1 && $this->BRequest->modRewriteEnabled();
+    }
 }
 
 /**
@@ -1863,10 +1891,20 @@ class BEmail extends BClass
 
         foreach ($data as $k => $v) {
             if ($k == 'subject') {
-                $subject = $v;
+                if ($this->BConfig->get('staging/email_subject_prepend')) {
+                    $subject = $this->BConfig->get('staging/email_subject_prepend_prefix') . ' ' . $v;
+                    $headers['x-staging-original-subject'] = 'X-Staging-Original-Subject: ' . $v;
+                } else {
+                    $subject = $v;
+                }
 
             } elseif ($k == 'to') {
-                $to = $v;
+                if ($this->BConfig->get('staging/email_to_override')) {
+                    $to = $this->BConfig->get('staging/email_to_override_address');
+                    $headers['x-staging-original-to'] = 'X-Staging-Original-To: ' . $v;
+                } else {
+                    $to = $v;
+                }
 
             } elseif ($k == 'attach') {
                 foreach ((array)$v as $file) {
@@ -1886,7 +1924,7 @@ class BEmail extends BClass
         $origBody = $body;
 
         $this->_formatAlternative($headers, $body);
-        $body = trim(preg_replace('#<!--.*?-->#', '', $body));
+        $body = trim(preg_replace('#<!--.*?-->#', '', $body));//strip comments
 
         if ($files) {
             // $body and $headers will be updated
@@ -2425,6 +2463,7 @@ class BDebug extends BClass
         if ($setLevels && !empty(static::$_levelPreset[$mode])) {
             static::$_level = static::$_levelPreset[$mode];
         }
+        return null;
     }
 
     public function backtraceOn($msg)
@@ -2548,7 +2587,7 @@ class BDebug extends BClass
 */
         $l = static::$_level[static::STOP];
         if (false !== $l && (is_array($l) && in_array($level, $l) || $l >= $level)) {
-            static::dumpLog();
+            static::i()->dumpLog();
             die;
         }
 

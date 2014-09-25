@@ -19,14 +19,15 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
             mainGrid.getModalForm().render();
             selectedGrid.getGridView().clearSelectedRows();
             //fetch linked field data of selected fieldset from server
-            var url = '{{ APP.href('customfields/fieldsets/set_field_grid_data?set_id=') | raw }}' + this.model.get('id');
+            var url = '{{ APP.href('customfields/fieldsets/fieldset_modal_selected_grid_data?set_id=') | raw }}' + this.model.get('id');
             currentFieldSetId =  this.model.get('id');
             $.get(url, function(data) {
+                addGrid.getRows().fetch({reset: true});
                 selectedGrid.getRows().reset(data[1]);
             });
 
             $('a#btn-fieldset-grid-modal').trigger('click');
-        }
+        };
 
         //important: change modal form element for rendering
         skeleton.Views.ModalForm.prototype.el = '#field-set-modal-form';
@@ -37,13 +38,13 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
             ev.set('num_fields', selectedGrid.getRows().length);
         });*/
 
+    };
 
-    }
     window.selectedFieldGridRegister = function(grid) {
         selectedGrid = grid;
         grid.build();
 
-    }
+    };
 
     window.addFieldGridRegister = function(grid) {
         addGrid = grid;
@@ -57,12 +58,34 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
                    row.set('selected', true);
                    selectedGrid.getSelectedRows().add(row.toJSON());
                    rowsSelectedGrid.add(row.toJSON());
+                   addGrid.getGridView().collection.remove(row);
                }
             });
             addGrid.getGridView().clearSelectedRows();
             $('#selected_fields_tab').trigger('click');
         });
-    }
+
+        //remove row already was selected
+        addGrid.getRows().bind('sync', function(){
+            selectedGrid.getRows().forEach(function (row) {
+                addGrid.getRows().forEach(function (addRow) {
+                    if (addRow.get('id') == row.get('id')) {
+                        addGrid.getGridView().collection.remove(addRow);
+                    }
+                });
+            });
+        });
+    };
+
+    window.afterMassDeleteSelectedGrid = function() {
+        var rowsAddGrid = addGrid.getRows();
+        selectedGrid.getSelectedRows().forEach(function(row) {
+            if (!rowsAddGrid.findWhere('id', row.get('id'))) {
+                row.set('selected', false);
+                addGrid.getGridView().collection.add(row);
+            }
+        });
+    };
 
     $('#add_new_field_set').click(function () {
         currentFieldSetId = null;
@@ -76,17 +99,17 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
     });
 
     $('button.fieldset-modal-save').click(function () {
-            if (currentFieldSetId != null) {
-                mainGrid.getRows().findWhere({id: currentFieldSetId}).set('num_fields', selectedGrid.getRows().length);
-            }
-            mainGrid.getGridSkeleton().modalElementVals = {field_ids: selectedGrid.getRows().pluck('id').join(',')};
-            if (mainGrid.getModalForm().saveChanges()) {
-                selectedGrid.getRows().reset();
-                selectedGrid.getSelectedRows().reset();
-                $('.fieldset-modal-close').trigger('click');
-                $('#fieldset_tab').trigger('click');
-                currentFieldSetId = null;
-            }
+        if (currentFieldSetId != null) {
+            mainGrid.getRows().findWhere({id: currentFieldSetId}).set('num_fields', selectedGrid.getRows().length);
+        }
+        mainGrid.getGridSkeleton().modalElementVals = {field_ids: selectedGrid.getRows().pluck('id').join(',')};
+        if (mainGrid.getModalForm().saveChanges()) {
+            selectedGrid.getRows().reset();
+            selectedGrid.getSelectedRows().reset();
+            $('.fieldset-modal-close').trigger('click');
+            $('#fieldset_tab').trigger('click');
+            currentFieldSetId = null;
+        }
 
     });
 });
@@ -124,7 +147,6 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
                                 <li class='active'>
                                     <a data-toggle='tab' href='#edit_field_set' id='fieldset_tab'>
                                         {{ "Field Sets"|_ }}
-
                                     </a>
                                 </li>
                                 <li>
@@ -134,7 +156,7 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
                                 </li>
                                 <li>
                                     <a data-toggle='tab' href='#add_fields'>
-                                        {{ "Select Different Fields"|_ }}
+                                        {{ "Add Fields"|_ }}
                                     </a>
                                 </li>
 

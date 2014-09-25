@@ -12,7 +12,7 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
 
     public function getExportConfig()
     {
-        $config                = parent::gridConfig();
+        $config              = parent::gridConfig();
         $config['id']        = 'ie_export_grid';
         $config['data_mode'] = 'local';
 
@@ -149,6 +149,9 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
     {
         $model['export_config'] = $this->getExportConfig();
         $model[ 'import_config' ] = $this->getImportConfig();
+
+        $this->layout();
+
         $this->formMessages();
         $view = $this->view($this->_formViewName)->set('model', $model);
 
@@ -160,7 +163,6 @@ class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_
             $nav->setNav($this->_navPath);
         }
 
-        $this->layout();
         $this->BLayout->view('admin/form')->set('tab_view_prefix', $this->_formViewPrefix);
         if ($this->_useDefaultLayout) {
             $this->BLayout->applyLayout('default_form');

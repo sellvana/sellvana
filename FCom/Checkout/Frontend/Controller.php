@@ -15,6 +15,8 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
     {
         $layout = $this->BLayout;
 
+        $this->layout('/checkout/cart');
+
         $layout->view('checkout/cart')->set('redirectLogin', false);
         if ($this->BApp->m('FCom_Customer') && $this->FCom_Customer_Model_Customer->isLoggedIn() == false) {
             $layout->view('checkout/cart')->set('redirectLogin', true);
@@ -24,20 +26,19 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $layout->view('breadcrumbs')->set('crumbs', [['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
             ['label' => 'Cart', 'active' => true]]);
 
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $this->BEvents->fire('FCom_Checkout_Frontend_Controller::action_cart:cart', ['cart' => $cart]);
 
         $shippingEstimate = $this->BSession->get('shipping_estimate');
         $layout->view('checkout/cart')->set('cart', $cart);
         $layout->view('checkout/cart')->set('shipping_esitmate', $shippingEstimate);
-        $this->layout('/checkout/cart');
     }
 
     public function action_cart__POST()
     {
         $cartHref = $this->BApp->href('cart');
         $post = $this->BRequest->post();
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         if ($this->BRequest->xhr() || (isset($post['action']) && $post['action'] == 'add')) {
             $result = [];
             switch ($post['action']) {
@@ -109,7 +110,7 @@ class FCom_Checkout_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         }
 
         $qty = !empty($qty) ? $qty : 1;
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $cart->addProduct($product->id(), ['qty' => $qty, 'price' => $product->base_price]);
     }
 }

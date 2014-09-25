@@ -164,7 +164,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         static $default;
 
         $media = $this->BConfig->get('web/media_dir');# ? $this->BConfig->get('web/media_dir') : 'media/';
-        $url = $full ? $this->BApp->href('/') : '';
+        $url = $full ? $this->BRequest->baseUrl() : '';
         $thumbUrl = $this->get('thumb_url');
         if ($thumbUrl) {
             return $url . $media . '/' . $thumbUrl;
@@ -185,7 +185,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function thumbUrl($w, $h = null, $full = false)
     {
-        return $this->FCom_Core_Main->resizeUrl($this->imageUrl($full), ['s' => $w . 'x' . $h]);
+        return $this->FCom_Core_Main->resizeUrl($this->imageUrl(false), ['s' => $w . 'x' . $h, 'full_url' => $full]);
     }
 
     public function onBeforeSave()
@@ -240,6 +240,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if ($saveAgain) {
             $this->save();
         }
+
         return true;
     }
 
@@ -1065,5 +1066,19 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             "NOT_BACK_ORDERS"         => $this->BLocale->_("No Back Orders"),
             "ALLOW_QUANTITY_BELOW" => $this->BLocale->_("Allow Quantity Below 0")
         ];
+    }
+
+    public function getFrontendFields()
+    {
+        $frontendFields = $this->getData('frontend_fields');
+        if ($frontendFields) {
+            usort($frontendFields, function ($a, $b) {
+                if ($a['position'] == $b['position']) {
+                    return 0;
+                }
+                return ($a['position'] < $b['position'])? -1: 1;
+            });
+        }
+        return $frontendFields;
     }
 }

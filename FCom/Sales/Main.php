@@ -64,7 +64,7 @@ class FCom_Sales_Main extends BClass
             $this->_heap[$type] = null; // make sure key exists
             if (!empty($this->_registry[$type])) {
                 foreach ($this->_registry[$type] as $n => $class) {
-                    $this->_heap[$type][$n] = $class::i();
+                    $this->_heap[$type][$n] = $this->{$class};
                 }
                 uasort($this->_heap[$type], function ($a, $b) {
                     return $a->getSortOrder() - $b->getSortOrder();

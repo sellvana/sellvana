@@ -6,38 +6,42 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
 
     protected $items = null;
-    protected $_sessionWishlist = null;
+    protected static $_sessionWishlist = null;
 
     public function sessionWishlist($createAnonymousIfNeeded = false)
     {
-        if (!$this->_sessionWishlist) {
+        if (!static::$_sessionWishlist) {
             $customer = $this->FCom_Customer_Model_Customer->sessionUser();
             if ($customer) {
-                $wishlist = $this->load($customer->id(), "customer_id");
-                if (!$wishlist) {
-                    $wishlist = $this->create(["customer_id" => $customer->id()])->save();
+                $wishlist = $this->loadOrCreate(["customer_id" => $customer->id()]);
+                $id = $wishlist->id();
+                if(empty($id)){
+                    $wishlist->save(); // make sure wishlist has an ID
                 }
             } else {
                 $cookieToken = $this->BRequest->cookie('wishlist');
                 if ($cookieToken) {
                     $wishlist = $this->load($cookieToken, 'cookie_token');
-                    if (!$wishlist) {
+                    if (!$wishlist && !$createAnonymousIfNeeded) {
                         $this->BResponse->cookie('wishlist', false);
                         return false;
                     }
-                } elseif ($createAnonymousIfNeeded) {
-                    $cookieToken = $this->BUtil->randomString(32);
-                    $wishlist = $this->create(['cookie_token' => $cookieToken])->save();
-                    $ttl = $this->BConfig->get('modules/FCom_Wishlist/cookie_token_ttl_days') * 86400;
-                    $this->BResponse->cookie('wishlist', $cookieToken, $ttl);
-                } else {
-                    return false;
+                }
+                if (empty($wishlist)) {
+                    if ($createAnonymousIfNeeded) {
+                        $cookieToken = $this->BUtil->randomString(32);
+                        $wishlist = $this->create(['cookie_token' => (string)$cookieToken])->save();
+                        $ttl = $this->BConfig->get('modules/FCom_Wishlist/cookie_token_ttl_days') * 86400;
+                        $this->BResponse->cookie('wishlist', $cookieToken, $ttl);
+                    } else {
+                        return false;
+                    }
                 }
             }
 
-            $this->_sessionWishlist = $wishlist;
+            static::$_sessionWishlist = $wishlist;
         }
-        return $this->_sessionWishlist;
+        return static::$_sessionWishlist;
     }
 
     public function onBeforeSave()

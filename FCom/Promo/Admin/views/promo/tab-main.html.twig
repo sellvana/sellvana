@@ -1,6 +1,5 @@
 {% set m = THIS.get('model') %}
 {% set promo = APP.instance('FCom_Promo_Model_Promo') %}
-{% set locale = APP.instance('BLocale') %}
 {% set validator = THIS.get('validator') %}
 {% if APP.m('FCom_CustomerGroups').run_status == 'LOADED' %}
     {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptions() %}
@@ -8,7 +7,7 @@
 {% if APP.m('FCom_MultiSite').run_status == 'LOADED' %}
     {% set sites = APP.instance('FCom_MultiSite_Model_Site').siteOptions() %}
 {% endif %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 
 <fieldset class="adm-section-group">
     {{ forms.input({label: 'Description'|_, required: 1, name: "model[description]", value: validator.fieldValue('description'), id: "model-description" }) }}
@@ -22,7 +21,7 @@
             <div>
                 <div class='datepicker input-group' id='model-from_date'>
                     <input class='form-control' id="model-from_date" data-format='mm/dd/yy' name="model[from_date]"
-                           type='text' value="{{ locale.datetimeDbToLocal(validator.fieldValue('from_date'))|raw }}"/>
+                           type='text' value="{{ LOCALE.datetimeDbToLocal(validator.fieldValue('from_date'))|raw }}"/>
                     <span class='input-group-addon'>
                         <span data-date-icon='icon-calendar' data-time-icon='icon-time'></span>
                     </span>
@@ -33,7 +32,7 @@
             <div>
                 <div class='datepicker input-group' id='model-from_date'>
                     <input class='form-control' id="model-to_date" data-format='mm/dd/yy' name="model[to_date]"
-                           type='text' value="{{ locale.datetimeDbToLocal(validator.fieldValue('to_date'))|raw }}"/>
+                           type='text' value="{{ LOCALE.datetimeDbToLocal(validator.fieldValue('to_date'))|raw }}"/>
                     <span class='input-group-addon'>
                         <span data-date-icon='icon-calendar' data-time-icon='icon-time'></span>
                     </span>

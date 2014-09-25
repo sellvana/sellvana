@@ -1,6 +1,6 @@
 {% set m = THIS.get('model') %}
 {% set fieldData = { model:m } %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 {% set resizeUrl = APP.instance('FCom_Core_Main').resizeUrl() %}
 
 <div class="form-group">

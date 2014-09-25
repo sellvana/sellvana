@@ -10,10 +10,10 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         }
         $this->BResponse->nocache();
         $layout = $this->BLayout;
+        $this->layout('/wishlist');
         $layout->view('breadcrumbs')->crumbs = ['home', ['label' => 'Wishlist', 'active' => true]];
         $wishlist = $this->FCom_Wishlist_Model_Wishlist->sessionWishlist();
         $layout->view('wishlist')->wishlist = $wishlist;
-        $this->layout('/wishlist');
     }
 
     public function action_index__POST()
@@ -31,6 +31,7 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             switch ($post['action']) {
             case 'add':
                 $wishlist->addItem($p->id());
+                $this->BEvents->fire('FCom_Wishlist_Frontend_Controller::action_index:after_add', ['model'=>$p]);
                 $result = [
                     'success' => true,
                     'title' => 'Added to wishlist',
@@ -38,7 +39,6 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                         . '<br><br><a href="' . $wishlistHref . '" class="button">Go to wishlist</a>'
                 ];
                 break;
-
             case 'remove':
                 $wishlist->removeProduct($p->id());
                 $result = [

@@ -29,7 +29,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
             //todo: confirm with Boris about status should be stored as id_status
             ['name' => 'status', 'label' => 'Status', 'index' => 'o.status',
-                'options' => $this->FCom_Sales_Model_Order_Status->statusOptions()],
+                'options' => $this->FCom_Sales_Model_Order_CustomStatus->statusOptions()],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
             ]],
@@ -45,7 +45,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         //todo: check this in FCom_Admin_Controller_Abstract_GridForm
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {
-                $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias . '.*');
+                $config['orm'] = $this->{$config['orm']}->orm($this->_mainTableAlias)->select($this->_mainTableAlias . '.*');
             }
             $this->gridOrmConfig($config['orm']);
         }
@@ -70,7 +70,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $orm->left_outer_join('FCom_Admin_Model_User', 'o.admin_id = au.id', 'au')
             ->select_expr('CONCAT_WS(" ", au.firstname,au.lastname)', 'admin_name');
 
-        $orm->left_outer_join('FCom_Sales_Model_Order_Status', 'o.status = os.code', 'os')
+        $orm->left_outer_join('FCom_Sales_Model_Order_CustomStatus', 'o.status = os.code', 'os')
             ->select(['os_name' => 'os.name']);
     }
 
@@ -119,11 +119,11 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $model = $order;
         $model->act = $act;
 
+        $this->layout($this->_formLayoutName);
         $view = $this->view($this->_formViewName)->set('model', $model);
 
         $this->formViewBefore(['view' => $view, 'model' => $model]);
 
-        $this->layout($this->_formLayoutName);
         $this->processFormTabs($view, $model, 'edit');
     }
 
@@ -172,7 +172,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             $order = $args['model'];
             $addrPost = $this->BRequest->post('address');
             if (($newData = $this->BUtil->fromJson($addrPost['data_json']))) {
-                $oldModels = $this->FCom_Sales_Model_Order_Address->orm('a')->where('order_id', $order->id)
+                $oldModels = $this->FCom_Sales_Model_Order_Address->orm('a')->where('order_id', $order->id())
                     ->find_many_assoc();
                 foreach ($newData as $data) {
                     if (empty($data['id'])) {
@@ -188,13 +188,13 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                 }
             }
             if (($del = $this->BUtil->fromJson($addrPost['del_json']))) {
-                $this->FCom_Sales_Model_Order_Address->delete_many(['id' => $del, 'order_id' => $order->id]);
+                $this->FCom_Sales_Model_Order_Address->delete_many(['id' => $del, 'order_id' => $order->id()]);
             }
 
             $modelPost = $this->BRequest->post('model');
             $items = $modelPost['items'];
             if ($items) {
-                $oldItems = $this->FCom_Sales_Model_Order_Item->orm('i')->where('order_id', $order->id)
+                $oldItems = $this->FCom_Sales_Model_Order_Item->orm('i')->where('order_id', $order->id())
                     ->find_many_assoc();
                 foreach ($items as $id => $itemData) {
                     if (empty($id)) {
@@ -265,7 +265,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
     public function customerOrdersGridConfig($customer)
     {
         $config = parent::gridConfig();
-        $config['id'] = 'customer_grid_orders_' . $customer->id;
+        $config['id'] = 'customer_grid_orders_' . $customer->id();
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'index' => 'o.id', 'label' => 'Order id', 'width' => 70],
@@ -278,7 +278,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['name' => 'balance', 'label' => 'Paid', 'index' => 'o.balance'],
             ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
             ['name' => 'status', 'label' => 'Status', 'index' => 'o.status',
-                'options' => $this->FCom_Sales_Model_Order_Status->statusOptions()],
+                'options' => $this->FCom_Sales_Model_Order_CustomStatus->statusOptions()],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
             ]],
@@ -290,7 +290,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['field' => 'grandtotal', 'type' => 'number-range'],
             ['field' => 'status', 'type' => 'multiselect'],
         ];
-        $config['orm'] = $config['orm']->where('customer_id', $customer->id);
+        $config['orm'] = $config['orm']->where('customer_id', $customer->id());
         $this->gridOrmConfig($config['orm']);
 
         return ['config' => $config];
@@ -310,7 +310,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
 
     public function getOrderTotal($filter)
     {
-        $orderTotal = $this->FCom_Sales_Model_Order_Status->orm('s')
+        $orderTotal = $this->FCom_Sales_Model_Order_CustomStatus->orm('s')
             ->left_outer_join('FCom_Sales_Model_Order', ['o.status', '=', 's.name'], 'o')
             ->group_by('s.id')
             ->select_expr('COUNT(o.id)', 'order')

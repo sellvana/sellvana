@@ -249,7 +249,7 @@ class BLayout extends BClass
         if (!is_dir($rootDir)) {
             BDebug::warning('Not a valid directory: ' . $rootDir);
 
-            return $this;
+            return false;
         }
         $rootDir1 = str_replace('\\', '/', realpath($rootDir));
 
@@ -341,12 +341,15 @@ class BLayout extends BClass
      * @param string $rootDir Folder with view templates, relative to current module root
      *                        Can end with slash or not - make sure to specify
      * @param string $prefix Optional: add prefix to view names
+     * @param BModule $curModule
      * @return BLayout
      */
     public function addAllViews($rootDir, $prefix = '', $curModule = null)
     {
+        #$this->BDebug->debug(__METHOD__ . ': ' . $rootDir . ($curModule ? ' (' . $curModule->name . ')' : ''));
+
         if (null === $curModule) {
-            $curModule = $this->BModuleRegistry->currentModuleName();
+            $curModule = $this->BModuleRegistry->currentModule();
         }
         $rootDir = $this->processRootDir($rootDir, $curModule);
         if (!$rootDir) {
@@ -960,14 +963,44 @@ class BLayout extends BClass
     /**
      * @param $themeName
      * @param $params
+     * @param $curModName
      * @return $this
      */
-    public function addTheme($themeName, $params)
+    public function addTheme($themeName, $params, $curModName = null)
     {
         BDebug::debug('THEME.ADD ' . $themeName);
-        $this->_themes[$themeName] = $params;
+
+        if (!$curModName) {
+            $curModName = $this->BModuleRegistry->currentModuleName();
+        }
+        foreach (['area', 'parent', 'layout_before', 'layout_after', 'views_before', 'views_after'] as $k) {
+            if (empty($params[$k])) {
+                continue;
+            }
+            $params[$k] = (array)$params[$k];
+            if ($k === 'area' || $k === 'parent') {
+                continue;
+            }
+            foreach ($params[$k] as $i => $v) {
+                if ($v[0] !== '@') {
+                    $params[$k][$i] = '@' . $curModName . '/' . $v;
+                }
+            }
+        }
+        if (empty($this->_themes[$themeName])) {
+            $this->_themes[$themeName] = $params;
+        } else {
+            $this->_themes[$themeName] = $this->BUtil->arrayMerge($this->_themes[$themeName], $params);
+        }
 
         return $this;
+    }
+
+    public function updateTheme($themeName, $params, $curModName = null)
+    {
+        BDebug::debug('THEME.UPDATE ' . $themeName);
+        //TODO: figure out if needed a separate method for update
+        return $this->addTheme($themeName, $params, $curModName);
     }
 
     /**
@@ -982,7 +1015,7 @@ class BLayout extends BClass
         }
         $themes = [];
         foreach ($this->_themes as $name => $theme) {
-            if (!empty($theme['area']) && $theme['area'] === $area) {
+            if (!empty($theme['area']) && in_array($area, $theme['area'])) {
                 if ($asOptions) {
                     $themes[$name] = !empty($theme['description']) ? $theme['description'] : $name;
                 } else {
@@ -990,37 +1023,7 @@ class BLayout extends BClass
                 }
             }
         }
-
         return $themes;
-    }
-
-    /**
-     * @param null $themeName
-     * @return $this
-     */
-    public function applyTheme($themeName = null)
-    {
-        if (null === $themeName) {
-            if (!$this->_defaultTheme) {
-                BDebug::error('Empty theme supplied and no default theme is set');
-            }
-            $themeName = $this->_defaultTheme;
-        }
-        if (is_array($themeName)) {
-            foreach ($themeName as $n) {
-                $this->applyTheme($n);
-            }
-            return $this;
-        }
-        BDebug::debug('THEME.APPLY ' . $themeName);
-        $this->BEvents->fire('BLayout::applyTheme:before', ['theme_name' => $themeName]);
-
-        $this->loadTheme($themeName);
-        $this->loadLayoutFilesFromAllModules();
-
-        $this->BEvents->fire('BLayout::applyTheme:after', ['theme_name' => $themeName]);
-
-        return $this;
     }
 
     public function loadTheme($themeName)
@@ -1048,12 +1051,20 @@ class BLayout extends BClass
 
         $this->BEvents->fire('BLayout::loadTheme:before', ['theme_name' => $themeName, 'theme' => $theme]);
 
-        $modRootDir = !empty($theme['module_name']) ? $this->BModuleRegistry->module($theme['module_name'])->root_dir . '/' : '';
-        if (!empty($theme['layout'])) {
-            $this->loadLayout($modRootDir . $theme['layout']);
+        $modReg = $this->BModuleRegistry;
+
+        if (!empty($theme['views_before'])) {
+            foreach ($theme['views_before'] as $viewsBefore) {
+                $a = explode('/', $viewsBefore, 2);
+                $viewsMod = $modReg->module(substr($a[0], 1));
+                $viewsDir = $viewsMod->root_dir . '/' . $a[1];
+                $this->addAllViews($viewsDir, '', $viewsMod);
+            }
         }
-        if (!empty($theme['views'])) {
-            $this->addAllViews($modRootDir . $theme['views']);
+        if (!empty($theme['layout_before'])) {
+            foreach ($theme['layout_before'] as $layoutBefore) {
+                $this->loadLayout($modReg->expandPath($layoutBefore));
+            }
         }
         if (!empty($theme['callback'])) {
             $this->BUtil->call($theme['callback']);
@@ -1062,6 +1073,93 @@ class BLayout extends BClass
         $this->BEvents->fire('BLayout::loadTheme:after', ['theme_name' => $themeName, 'theme' => $theme]);
 
         return true;
+    }
+
+    /**
+     * @param null $themeName
+     * @return $this
+     */
+    public function applyTheme($themeName = null)
+    {
+        if (null === $themeName) {
+            if (!$this->_defaultTheme) {
+                BDebug::error('Empty theme supplied and no default theme is set');
+            }
+            $themeName = $this->_defaultTheme;
+        }
+        if (is_array($themeName)) {
+            foreach ($themeName as $n) {
+                $this->applyTheme($n);
+            }
+            return $this;
+        }
+        BDebug::debug('THEME.APPLY ' . $themeName);
+        $this->BEvents->fire('BLayout::applyTheme:before', ['theme_name' => $themeName]);
+
+        $this->loadTheme($themeName);
+        $this->loadLayoutFilesFromAllModules();
+
+        $theme = $this->_themes[$themeName];
+        $modReg = $this->BModuleRegistry;
+
+        if (!empty($theme['views_after'])) {
+             foreach ($theme['views_after'] as $viewsAfter) {
+                $a = explode('/', $viewsAfter, 2);
+                $viewsMod = $modReg->module(substr($a[0], 1));
+                $viewsDir = $viewsMod->root_dir . '/' . $a[1];
+                $this->addAllViews($viewsDir, '', $viewsMod);
+            }
+        }
+        if (!empty($theme['layout_after'])) {
+            foreach ($theme['layout_after'] as $layoutAfter) {
+                $this->loadLayout($modReg->expandPath($layoutAfter));
+            }
+        }
+
+        $this->BEvents->fire('BLayout::applyTheme:after', ['theme_name' => $themeName]);
+
+        return $this;
+    }
+
+    public function loadThemeViews($themeName)
+    {
+        if (empty($this->_themes[$themeName])) {
+            BDebug::warning('Invalid theme name: ' . $themeName);
+            return false;
+        }
+
+        $theme = $this->_themes[$themeName];
+        $area = $this->BRequest->area();
+        if (!empty($theme['area']) && !in_array($area, (array)$theme['area'])) {
+            BDebug::debug('Theme ' . $themeName . ' can not be used in ' . $area);
+            return false;
+        }
+
+        if (!empty($theme['parent'])) {
+            foreach ((array)$theme['parent'] as $parentThemeName) {
+                if ($this->loadThemeViews($parentThemeName)) {
+                    break; // load the first available parent theme
+                }
+            }
+        }
+        $modReg = $this->BModuleRegistry;
+        if (!empty($theme['views_before'])) {
+            foreach ($theme['views_before'] as $viewsBefore) {
+                $a = explode('/', $viewsBefore, 2);
+                $viewsMod = $modReg->module(substr($a[0], 1));
+                $viewsDir = $viewsMod->root_dir . '/' . $a[1];
+                $this->addAllViews($viewsDir, '', $viewsMod);
+            }
+        }
+        if (!empty($theme['views_after'])) {
+             foreach ($theme['views_after'] as $viewsAfter) {
+                $a = explode('/', $viewsAfter, 2);
+                $viewsMod = $modReg->module(substr($a[0], 1));
+                $viewsDir = $viewsMod->root_dir . '/' . $a[1];
+                $this->addAllViews($viewsDir, '', $viewsMod);
+            }
+        }
+        return $this;
     }
 
     /**
@@ -1185,6 +1283,7 @@ class BLayout extends BClass
 
 /**
  * First parent view class
+ * @method static BView i()
  */
 class BView extends BClass
 {
@@ -1450,10 +1549,11 @@ class BView extends BClass
     }
 
     /**
-    * Used by external renderers to include compiled PHP file within $this context
-    *
-    * @param mixed $file
-    */
+     * Used by external renderers to include compiled PHP file within $this context
+     *
+     * @param mixed $file
+     * @return string
+     */
     public function renderFile($file)
     {
         ob_start();
@@ -1479,6 +1579,11 @@ class BView extends BClass
         if ($renderer) {
             BDebug::debug('VIEW.RENDER "' . $this->param('view_name') . '" USING ' . print_r($renderer, 1));
             return $this->BUtil->call($renderer, $this);
+        }
+
+        if ($this->getParam('source')) {
+            BDebug::debug('VIEW.RENDER "' . $this->param('view_name') . '" RAW SOURCE');
+            return $this->getParam('source');
         }
 
         BDebug::debug('VIEW.RENDER "' . $this->param('view_name') . '" USING PHP');
@@ -2399,14 +2504,6 @@ if ($this->BDebug->is('DEBUG')) {
             $html = $this->getTitle() . "\n" . $this->getMeta() . "\n" . $this->getAllElements();
 
             $scriptsArr = [];
-            if ($this->_headJs['scripts'] || $this->_headJs['jquery']) {
-                if ($this->_headJs['scripts']) {
-                    $scriptsArr[] = 'head.js("' . join('", "', $this->_headJs['scripts']) . '");';
-                }
-                if ($this->_headJs['jquery']) {
-                    $scriptsArr[] = 'head.js({jquery:"' . $this->_headJs['jquery'] . '"}, function() { jQuery.fn.ready = head; ' . $scripts . '});';
-                }
-            }
 
             $requireJs = $this->renderRequireJs();
             if ($requireJs) {

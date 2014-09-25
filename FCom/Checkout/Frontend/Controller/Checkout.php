@@ -33,52 +33,45 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
     public function action_checkout_login()
     {
         $layout = $this->BLayout;
+        $this->layout('/checkout/login');
         $layout->view('breadcrumbs')->set('crumbs', [['label' => 'Home', 'href' => $this->BApp->baseUrl()],
             ['label' => 'Login or guest checkout', 'active' => true]]);
-        $this->layout('/checkout/login');
     }
 
     public function action_checkout()
     {
-        $layout = $this->BLayout;
-        $layout->view('breadcrumbs')->set([
-            'crumbs' => [
-                ['label' => 'Home', 'href' => $this->BApp->baseUrl()],
-                ['label' => 'Checkout', 'active' => true],
-            ],
-        ]);
-
         $shipAddress = null;
         $billAddress = null;
 
         $customer = $this->FCom_Customer_Model_Customer->sessionUser();
 
         $cart = $this->FCom_Sales_Model_Cart->sessionCart();
-        if (!$cart || !$cart->id) {
+        if (!$cart || !$cart->id()) {
             $this->BResponse->redirect('cart');
             return;
         }
 
-        $shipAddress = $cart->getAddressByType('shipping');
-        $billAddress = $cart->getAddressByType('billing');
+        $shipAddress = $cart->getShippingAddress();
+        $billAddress = $cart->getBillingAddress();
 
         if (!$shipAddress && $customer) {
             $cart->importAddressesFromCustomer($customer);
-            $shipAddress = $cart->getAddressByType('shipping');
-            $billAddress = $cart->getAddressByType('billing');
+            $shipAddress = $cart->getShippingAddress();
+            $billAddress = $cart->getBillingAddress();
         }
 
-        if (empty($shipAddress)) {
+        if (empty($shipAddress) && !$cart->same_address) {
             $href = $this->BApp->href('checkout/address?t=s');
             $this->BResponse->redirect($href);
             return;
         }
-        if (empty($billAddress)) {
+        if (empty($billAddress) && !$cart->same_address) {
             $href = $this->BApp->href('checkout/address?t=b');
             $this->BResponse->redirect($href);
             return;
         }
 
+        $cart->getShippingMethod();
         if ($customer) {
             $cart->payment_method = empty($cart->payment_method) ? $customer->getPaymentMethod() : $cart->payment_method;
             $cart->payment_details = empty($cart->payment_details) ? $customer->getPaymentDetails() : $cart->payment_details;
@@ -106,6 +99,14 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             }
         }
 
+        $layout = $this->BLayout;
+        $this->layout('/checkout/checkout');
+        $layout->view('breadcrumbs')->set([
+            'crumbs' => [
+                ['label' => 'Home', 'href' => $this->BApp->baseUrl()],
+                ['label' => 'Checkout', 'active' => true],
+            ],
+        ]);
 
         $layout->view('checkout/payment')->set('payment_methods', $paymentMethods)
                                          ->set('payment_html', $paymentMethodsHtml)
@@ -128,7 +129,6 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             'payment_html' => $paymentMethodsHtml,
             'totals' => $cart->getTotals()
         ]);
-        $this->layout('/checkout/checkout');
     }
 
     public function action_checkout__POST()
@@ -136,10 +136,14 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $post = $this->BRequest->post();
         /* @var $cart FCom_Sales_Model_Cart */
         $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        if (!$cart) {
+            $this->BResponse->redirect('cart');
+            return;
+        }
 
         if (!empty($post['create_account']) && $post['account']) {
             $r = $post['account'];
-            //$billAddress = $cart->getAddressByType('billing');
+            //$billAddress = $cart->getBillingAddress();
             //$r['email'] = $billAddress->email;
             try {
                 $modelCustomer = $this->FCom_Customer_Model_Customer;
@@ -147,6 +151,17 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
                 if ($modelCustomer->validate($r, [], 'checkout-register')) {
                     $customer = $this->FCom_Customer_Model_Customer->register($r);
                     $customer->login(); // make sure customer is logged in
+                    $billAddress = $cart->getBillingAddress();
+                    $custBillAddress = $billAddress->exportToCustomer($customer);
+                    $customer->default_billing_id = $custBillAddress->id();
+                    if ($cart->same_address) {
+                        $customer->default_shipping_id = $custBillAddress->id();
+                    } else {
+                        $shipAddress = $cart->getShippingAddress();
+                        $custShipAddress = $shipAddress->exportToCustomer($customer);
+                        $customer->default_shipping_id = $custShipAddress->id();
+                    }
+                    $customer->save();
                     $cart->customer_id = $customer->id();
                     $cart->save();
                 } else {
@@ -191,7 +206,8 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
             return;
         }
         $order = $cart->placeOrder();
-        $this->FCom_Sales_Model_Cart->sessionCartId(false);
+        $this->BLayout->view('email/new-order-customer')->set('order', $order)->email();
+        $this->FCom_Sales_Model_Cart->resetSessionCart();
 
         $sData =& $this->BSession->dataToUpdate();
         $sData['last_order']['id'] = $order ? $order->id : null;
@@ -219,6 +235,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
                                          ->render();
         }
 
+        $this->layout('/checkout/payment');
         $layout->view('breadcrumbs')->set('crumbs', [
             ['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
             ['label' => 'Checkout', 'href' =>  $this->BApp->href("checkout")],
@@ -226,7 +243,6 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $layout->view('checkout/payment')->set('payment_methods', $paymentMethods)
                                          ->set('payment_html', $paymentMethodsHtml)
                                          ->set('cart', $cart);
-        $this->layout('/checkout/payment');
     }
 
     public function action_payment__POST()
@@ -251,12 +267,12 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
     public function action_shipping()
     {
         $layout = $this->BLayout;
+        $this->layout('/checkout/shipping');
         $layout->view('breadcrumbs')->set('crumbs', [
             ['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
             ['label' => 'Checkout', 'href' =>  $this->BApp->href("checkout")],
             ['label' => 'Shipping address', 'active' => true]]);
         $layout->view('checkout/shipping')->set(['address' => [], 'methods' => []]);
-        $this->layout('/checkout/shipping');
     }
 
     public function action_shipping__POST()
@@ -280,12 +296,11 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         $salesOrder = $this->FCom_Sales_Model_Order->load($sData['last_order']['id']);
 
-        $this->BLayout->view('email/new-order-customer')->set('order', $salesOrder)->email();
+        $this->layout('/checkout/success');
         $this->view('breadcrumbs')->set('crumbs', [
             ['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
             ['label' => 'Confirmation', 'active' => true],
         ]);
         $this->view('checkout/success')->set(['order' => $salesOrder, 'user' => $user]);
-        $this->layout('/checkout/success');
     }
 }

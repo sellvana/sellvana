@@ -1,6 +1,6 @@
 {% set c = THIS.get('model') %}
 {% set services = APP.instance('FCom_ShippingUps_ShippingMethod').getServices() %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 
 <h2>{{ "ShippingUPS Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_ShippingUps'}) }}

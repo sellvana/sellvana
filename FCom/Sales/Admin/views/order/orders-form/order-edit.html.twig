@@ -1,12 +1,12 @@
 {% set m = THIS.get('model') %}
-{% set countries = APP.instance('FCom_Geo_Model_Country').options() %}
+{% set countries = LOCALE.getAvailableCountries() %}
 
 {#<script>
     //var custModule = angular.module('custModule', []);
 
     function CustomerAddressesCtrl($scope)
     {
-        $scope.addresses = {{ UTIL.toJson(APP.instance('BDb').many_as_array(m.addresses()))|raw }};
+        $scope.addresses = {{ UTIL.toJson(APP.instance('BDb').many_as_array(m.getAddresses()))|raw }};
         $scope.countries = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Country').options())|raw }};
         $scope.regions = {{ UTIL.toJson(APP.instance('FCom_Geo_Model_Region').allOptions())|raw }};
 
@@ -56,7 +56,7 @@
                 <div class="col-md-5">
                     <select class="form-control" name="model[status_id]">
                         {% set status = m.status() ? m.status().get('code') : m.get('status')  %}
-                        {% for stobj in APP.instance('FCom_Sales_Model_Order_Status').statusList() %}
+                        {% for stobj in APP.instance('FCom_Sales_Model_Order_CustomStatus').statusList() %}
                             <option value="{{ stobj.get('id') }}" {% if stobj.get('code') == status %}checked="checked"{% endif %}>
                                 {{ stobj.get('name')|raw }}
                             </option>

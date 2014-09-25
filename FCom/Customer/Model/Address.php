@@ -1,5 +1,36 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Customer_Model_Address
+ * @property int $id
+ * @property int $customer_id
+ * @property string $email
+ * @property string $firstname
+ * @property string $lastname
+ * @property string $middle_initial
+ * @property string $prefix
+ * @property string $suffix
+ * @property string $company
+ * @property string $attn
+ * @property string $street1
+ * @property string $street2
+ * @property string $street3
+ * @property string $city
+ * @property string $region
+ * @property string $postcode
+ * @property string $country
+ * @property string $phone
+ * @property string $fax
+ * @property string $create_at
+ * @property string $update_at
+ * @property string $lat
+ * @property string $lng
+ * @property int $is_default_billing
+ * @property int $is_default_shipping
+ *
+ * DI
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ */
 class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_customer_address';
@@ -28,7 +59,7 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         if (is_null($obj)) {
             $obj = $this;
         }
-        $countries = $this->FCom_Geo_Model_Country->options();
+        $countries = $this->BLocale->getAvailableCountries();
         return '<address>'
             . '<div class="f-street-address">' . $obj->street1 . '</div>'
             . ($obj->street2 ? '<div class="f-extended-address">' . $obj->street2 . '</div>' : '')
@@ -46,6 +77,7 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         if (!parent::onBeforeDelete()) return false;
 
         $customer = $this->relatedModel("FCom_Customer_Model_Customer", $this->customer_id);
+        /** @type FCom_Customer_Model_Customer $customer */
 
         if ($this->id == $customer->default_shipping_id) {
             $customer->default_shipping_id = null;
@@ -124,6 +156,22 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         if (!$this->create_at) $this->create_at = $this->BDb->now();
         $this->update_at = $this->BDb->now();
         return true;
+    }
+
+    public function onAfterSave()
+    {
+        parent::onAfterSave();
+
+        $customer = $this->FCom_Customer_Model_Customer->load($this->customer_id);
+        if (!$customer->default_billing_id) {
+            $customer->default_billing_id = $this->id();
+        }
+        if (!$customer->default_shipping_id) {
+            $customer->default_shipping_id = $this->id();
+        }
+        if ($customer->is_dirty()) {
+            $customer->save();
+        }
     }
 
     public function newShipping($address, $customer)

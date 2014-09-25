@@ -28,7 +28,7 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
         ];
         if (!empty($config['orm'])) {
             if (is_string($config['orm'])) {
-                $config['orm'] = $config['orm']::i()->orm($this->_mainTableAlias)->select($this->_mainTableAlias . '.*');
+                $config['orm'] = $this->{$config['orm']}->orm($this->_mainTableAlias)->select($this->_mainTableAlias . '.*');
             }
             $this->gridOrmConfig($config['orm']);
         }
@@ -69,9 +69,9 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
         $data = $this->BRequest->post();
         if (!empty($data['grid']['post_category']['del'])) {
             $cp->delete_many([
-                    'category_id' => $model->id,
-                    'post_id' => explode(',', $data['grid']['post_category']['del']),
-                ]);
+                'category_id' => $model->id(),
+                'post_id' => explode(',', $data['grid']['post_category']['del']),
+            ]);
         }
         if (!empty($data['grid']['post_category']['add'])) {
             $oldPost = $cp->orm()->where('category_id', $model->id)->where('post_id', $model->id)
@@ -79,9 +79,9 @@ class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract
             foreach (explode(',', $data['grid']['post_category']['add']) as $postId) {
                 if ($postId && empty($oldPost[$postId])) {
                     $m = $cp->create([
-                            'category_id' => $model->id,
-                            'post_id' => $postId,
-                        ])->save();
+                        'category_id' => $model->id(),
+                        'post_id' => $postId,
+                    ])->save();
                 }
             }
         }

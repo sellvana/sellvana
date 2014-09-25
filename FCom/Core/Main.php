@@ -83,6 +83,7 @@ class FCom_Core_Main extends BClass
         $localConfig['fs']['root_dir'] = $rootDir = str_replace('\\', '/', $rootDir);
 
         $this->BDebug->debug('ROOTDIR=' . $rootDir);
+        $this->BDebug->debug('REMOTE=' . $this->BRequest->ip() . ', LOCAL=' . $this->BRequest->serverIp());
 
         $docRoot = $req->docRoot();
         $webRoot = $req->webRoot();
@@ -122,7 +123,13 @@ class FCom_Core_Main extends BClass
         }
 
         if (!$config->get('web/media_dir')) {
-            $mediaUrl = str_replace($docRoot, '', $mediaDir);
+            if (strpos($mediaDir, $docRoot) === 0) {
+                $mediaUrl = str_replace($docRoot, '', $mediaDir);
+            } elseif (strpos($mediaDir, $rootDir) === 0) {
+                $mediaUrl = $baseStore . str_replace($rootDir, '', $mediaDir);
+            } else {
+                $mediaUrl = $baseStore . '/media';
+            }
             $config->set('web/media_dir', $mediaUrl);
         }
 
@@ -173,7 +180,8 @@ class FCom_Core_Main extends BClass
 
         $extLoaded = array_flip(get_loaded_extensions());
         foreach ([
-            'bcmath', 'date', 'hash', 'iconv', 'json', 'SPL', 'pcre', 'session',
+            /*'bcmath', */
+            'date', 'hash', 'iconv', 'json', 'SPL', 'pcre', 'session',
             'zip', 'pdo_mysql', 'curl', 'gd'
         ] as $ext) {
             if (empty($extLoaded[$ext])) {
@@ -205,7 +213,7 @@ class FCom_Core_Main extends BClass
                 $this->BUtil->ensureDir($storageDir . '/' . $randomDirName);
             }
             $config->set('core/storage_random_dir', $randomDirName, false, true);
-            $this->writeConfigFiles('core');
+            $config->writeConfigFiles('core');
         }
         $randomDir = $storageDir . '/' . $randomDirName;
         $this->BUtil->ensureDir($randomDir);
@@ -312,6 +320,7 @@ class FCom_Core_Main extends BClass
         $configDir = $config->get('fs/config_dir');
 
         if ('DISABLED' === $mode) {
+            $this->BResponse->header('X-Remote-IP: ' . $this->BRequest->ip());
             $this->BResponse->status('404', 'Page not found', 'Page not found');
             die;
         }
@@ -421,46 +430,6 @@ class FCom_Core_Main extends BClass
     public function beforeBootstrap()
     {
         $this->BLayout->setDefaultViewClass('FCom_Core_View_Base');
-    }
-
-    public function writeConfigFiles($files = null)
-    {
-        //TODO: make more flexible, to account for other (custom) file names
-        if (null === $files) {
-            $files = ['core', 'db', 'local'];
-        }
-        if (is_string($files)) {
-            $files = explode(',', strtolower($files));
-        }
-
-        $config = $this->BConfig;
-        $c = $config->get(null, null, true);
-
-        if (in_array('core', $files)) {
-            // configuration necessary for core startup
-            unset($c['module_run_levels']['request']);
-
-            $core = [
-                'install_status' => !empty($c['install_status']) ? $c['install_status'] : null,
-                'core' => !empty($c['core']) ? $c['core'] : null,
-                'module_run_levels' => !empty($c['module_run_levels']) ? $c['module_run_levels'] : [],
-                'recovery_modules' => !empty($c['recovery_modules']) ? $c['recovery_modules'] : null,
-                'mode_by_ip' => !empty($c['mode_by_ip']) ? $c['mode_by_ip'] : [],
-                'cache' => !empty($c['cache']) ? $c['cache'] : [],
-            ];
-            $config->writeFile('core.php', $core);
-        }
-        if (in_array('db', $files)) {
-            // db connections
-            $db = !empty($c['db']) ? ['db' => $c['db']] : [];
-            $config->writeFile('db.php', $db);
-        }
-        if (in_array('local', $files)) {
-            // the rest of configuration
-            $local = $this->BUtil->arrayMask($c, 'db,install_status,module_run_levels,recovery_modules,mode_by_ip,cache,core', true);
-            $config->writeFile('local.php', $local);
-        }
-        return $this;
     }
 
     public function getConfigVersionHash()
@@ -586,5 +555,24 @@ FCom.base_src = '" . $this->BConfig->get('web/base_src') . "';
     {
         $ver = $this->BConfig->get('core/patch_version');
 
+    }
+
+    public function getAllowedCountries()
+    {
+        $conf = $this->BConfig->get('modules/FCom_Core');
+        $limit = !empty($conf['limit_countries']) ? $conf['allowed_countries'] : null;
+        return $this->BLocale->getAvailableCountries('name', $limit);
+    }
+
+    public function getDefaultCountry()
+    {
+        return $this->BConfig->get('modules/FCom_Core/default_country');
+    }
+
+    public function getAllowedRegions()
+    {
+        $conf = $this->BConfig->get('modules/FCom_Core');
+        $limit = !empty($conf['limit_countries']) ? $conf['allowed_countries'] : null;
+        return $this->BLocale->getAvailableRegions('name', $limit);
     }
 }

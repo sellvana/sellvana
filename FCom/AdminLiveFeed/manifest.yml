@@ -1,0 +1,27 @@
+modules:
+    FCom_AdminLiveFeed:
+        version: 0.1
+        channel: beta
+        description: Admin Live Feed
+        require: { module: { FCom_Core: 0.1.0, FCom_PushServer: 0.1.4 } }
+        auto_use: [ layout, views ]
+
+        observe:
+            - [ "FCom_Admin_View_Header::getNotifications", FCom_AdminLiveFeed_Main.onGetHeaderNotifications ]
+            - [ "FCom_Catalog_Model_Product::onAfterSave", "FCom_AdminLiveFeed_Main::onProductAfterSave" ]
+            - [ "FCom_Email_Model_Pref::onAfterSave", "FCom_AdminLiveFeed_Main::onPrefAfterSave" ]
+            - [ "FCom_Customer_Model_Customer::onAfterSave", "FCom_AdminLiveFeed_Main::onCustomerAfterSave" ]
+            - [ "FCom_ProductReviews_Model_Review::onAfterSave", "FCom_AdminLiveFeed_Main::onReviewsAfterSave" ]
+            - [ "FCom_Sales_Model_Order::onAfterSave", "FCom_AdminLiveFeed_Main::onOrderAfterSave" ]
+            - [ "FCom_CatalogIndex_Frontend_Controller::action_search:search_query", "FCom_AdminLiveFeed_Main::onSearch" ]
+            - [ "FCom_Wishlist_Frontend_Controller::action_index:after_add", "FCom_AdminLiveFeed_Main::onWishlistAfterAdd" ]
+
+        default_config:
+            modules:
+                FCom_AdminLiveFeed:
+                    enable_catalog: true
+                    enable_newsletter: true
+                    enable_wishlist: true
+                    enable_customer: true
+                    enable_product_reviews: true
+                    enable_sales: true

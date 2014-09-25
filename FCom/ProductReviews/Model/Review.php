@@ -62,6 +62,7 @@ class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
             ->set('avg_rating', $rating->get('avg'))
             ->set('num_reviews', $rating->get('num'))
             ->save();
+
         return $this;
     }
 

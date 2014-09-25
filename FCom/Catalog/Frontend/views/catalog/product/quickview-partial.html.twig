@@ -6,14 +6,14 @@
     <div class="f-rslides-container">
       <ul class="thumbnails f-rslides f-prod-imgs" id="quickview-rslides">
 {% for img in images %}
-            <li><img class="f-prod-img img-responsive" src="{{ img.getUrl() }}" alt=""/></li>
+            <li><img class="f-prod-img img-responsive" src="{{ img.imageUrl() }}" alt=""/></li>
 {% endfor %}
       </ul>
       <a href="#" hidden id="display-all-images"><i class="glyphicon glyphicon-refresh"></i> {{ "Display all images"|_ }}</a>
     </div>
     <ul class="f-prod-more-view-imgs row" id="quickview-rslides-pager">
 {% for img in images %}
-          <li class="col-md-2 col-xs-2" data-id="{{ img.id() }}"><a href="#"><img src="{{ img.getUrl() }}" alt="" title=""></a></li>
+          <li class="col-md-2 col-xs-2" data-id="{{ img.id() }}"><a href="#"><img src="{{ img.thumbUrl(50) }}" alt="" title=""></a></li>
 {% endfor %}
     </ul>
     <script>
@@ -72,7 +72,7 @@
           <button type="submit" class="btn btn-primary btn-lg" id="prod-add-to-cart"><span class="glyphicon glyphicon-shopping-cart"></span>{{ 'Add to Cart'|_ }}</button>
           <ul class="f-add-to-links">
             <li><a href="{{ APP.href('wishlist/add?id=') ~ m.id() }}" rel="nofollow" class="btn-link">{{ 'Add to Wishlist'|_ }}</a></li>
-            <li><a href="{{ APP.href('catalog/compare/add?id=') ~ m.id() }}" rel="nofollow" class="btn-link btn-compare"><span class="glyphicon glyphicon-unchecked"></span>{{ 'Add to Compare'|_ }}</a></li>
+              {{ THIS.view('catalog/compare-link').set('product_id', m.id()) | raw }}
           </ul>
         </div>
       </form>

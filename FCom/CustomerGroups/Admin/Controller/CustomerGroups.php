@@ -75,24 +75,12 @@ class FCom_CustomerGroups_Admin_Controller_CustomerGroups extends FCom_Admin_Con
         $data = $args['data'];
         $model = $args['model'];
         if (!empty($data['removed_ids'])) {
-            $customer_ids = explode(",", $data['removed_ids']);
-            foreach ($customer_ids as $id) {
-                $customer = $this->FCom_Customer_Model_Customer->load($id);
-                if ($customer) {
-                    $customer->customer_group = null;
-                    $customer->save();
-                }
-            }
+            $customerIds = explode(",", $data['removed_ids']);
+            $this->FCom_Customer_Model_Customer->update_many(['customer_group' => null], ['id' => $customerIds]);
         }
         if (!empty($data['rows'])) {
-            $customer_ids = explode(",", $data['rows']);
-            foreach ($customer_ids as $id) {
-                $customer = $this->FCom_Customer_Model_Customer->load($id);
-                if ($customer) {
-                    $customer->customer_group = $model->id;
-                    $customer->save();
-                }
-            }
+            $customerIds = explode(",", $data['rows']);
+            $this->FCom_Customer_Model_Customer->update_many(['customer_group' => $model->id()], ['id' => $customerIds]);
         }
     }
 

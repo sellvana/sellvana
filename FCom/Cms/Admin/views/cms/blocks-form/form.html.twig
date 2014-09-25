@@ -1,0 +1,296 @@
+<!--{ label: Form Fields }-->
+<!--{ pos: 30 }-->
+
+{% set blockCtrl = APP.instance('FCom_Cms_Admin_Controller_Blocks') %}
+
+<script type="text/javascript">
+    require(['backbone', 'underscore', 'jquery'], function (Backbone, _, $) {
+        var mainGrid;
+        var inputName = 'input[data-col="name"]';
+        var inputOption = 'input[data-col="options"]';
+        var selectFieldType = 'select[data-col="input_type"]';
+        window.formFieldGridRegister = function (grid) {
+            mainGrid = grid;
+            mainGrid.getGridSkeleton().Views.RowView.prototype.afterRender = function () {
+                var self = this;
+                this.$el.find(inputName).addClass('unique');
+                this.$el.find(inputOption).addClass('requiredOptions');
+                if (this.model.get('input_type') != 'select') {
+                    this.$el.find(inputOption).prop('disabled', true);
+                }
+                this.$el.find(selectFieldType).change(function () {
+                    if ($(this).val() == 'select') {
+                        self.$el.find(inputOption).prop('disabled', false);
+                    } else {
+                        self.$el.find(inputOption).prop('disabled', true);
+                    }
+                })
+            };
+            mainGrid.build();
+            $(mainGrid.getGridSkeleton().AddButton).click(function () {
+                var $modal = $('#frontend-field-grid-modal');
+                $modal.modal('show');
+            });
+        };
+        $('#cms-blocks-form').submit(function (ev) {
+            var rows = mainGrid.getRows().toJSON();
+
+            var res = [];
+            for (var i in rows) {
+                if (rows[i].position.length == 0) {
+                    rows[i].position = 0;
+                }
+                res.push(_.pick(rows[i], 'id', 'name', 'label', 'input_type', 'required', 'options', 'position'));
+            }
+
+            $("#block_form_fields_data").val(JSON.stringify(res));
+        });
+        function checkUnique(value, elem, params) {
+            var error = true;
+            if (typeof (elem) !== 'undefined') {
+                var parent = $(elem).parents('tr');
+                var val = parent.find(inputName).val();
+                mainGrid.getRows().each(function (data) {
+                    if (parent.attr('id') != data.get('id') && val == data.get('name')) {
+                        error = false;
+                    }
+                });
+            }
+
+            return error;
+        }
+
+        $.validator.addMethod('checkUnique', checkUnique, 'Field Name are already taken place.');
+
+        $.validator.addClassRules("requiredOptions", {
+            required: function (value, elem, params) {
+                var error = true;
+                if (typeof (elem) !== 'undefined') {
+                    var parent = $(elem).parents('tr');
+                    if (parent.find(selectFieldType).val() == 'select' && value.trim().length == 0) {
+                        error = false;
+                    }
+                }
+                return error;
+            }
+        });
+
+        $.validator.addClassRules("unique", {
+            required: true,
+            checkUnique: true
+        });
+
+    });
+</script>
+
+{{ forms.boolean(fieldData, {field:'form_enabled', label:'Form Enabled'|_}) }}
+
+<input type='hidden' id='block_form_fields_data' name='block_form_fields_data'/>
+<div class="row">
+    <div class="col-sm-10">
+        {#{{ THIS.view('core/backbonegrid').set('grid', blockCtrl.formFieldGrid(model))| raw }}#}
+    </div>
+</div>
+
+
+<!-- <div class='modal fade' id='frontend-field-grid-modal' tabindex='-1'> -->
+<div class='' id='frontend-field-grid-modal' tabindex='-1'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{{ "Add field"|_ }}</h4>
+            </div>
+            <div class='modal-body'>
+                <div class=" field-element-wrapper">
+                    <div class="form-group">
+                        <div class="control-label col-sm-3"><label for="input_type">{{ "Field Type"|_ }}</label></div>
+                        <div class="controls col-sm-5">
+                            <select name="input_type" class="form-control" id="input_type">
+                                <option value="-" selected>{{ "-- Select field type --"|_ }}</option>
+                                <option value="text">{{ "Single Line Text"|_ }}</option>
+                                <option value="textarea">{{ "Paragraph Text" }}</option>
+                                <option value="rte">{{ "Rich Text"|_ }}</option>
+                                <option value="number">{{ "Number"|_ }}</option>
+                                <option value="email">{{ "Email Address"|_ }}</option>
+                                <option value="url">{{ "Website/URL"|_ }}</option>
+                                <option value="image">{{ "Image URL"|_ }}</option>
+                                <option value="file">{{ "File Upload"|_ }}</option>
+                                <option value="date">{{ "Date"|_ }}</option>
+                                <option value="tel">{{ "Phone Number"|_ }}</option>
+                                <option value="hidden">{{ "Hidden Field"|_ }}</option>
+                                <option value="time">{{ "Time"|_ }}</option>
+                                <option value="password">{{ "Password"|_ }}</option>
+                                <option value="checkbox">{{ "Checkbox"|_ }}</option>
+                                <option value="radio">{{ "Radio"|_ }}</option>
+                                <option value="select">{{ "Dropdown"|_ }}</option>
+                                <option value="select-multi">{{ "Multi select"|_ }}</option>
+                            </select>
+                        </div>
+                        <div class="managed -hidden-field">
+                            <div class="control-label col-sm-2"><label for="position">{{ "Position"|_ }}</label></div>
+                            <div class="col-sm-2"><input type="text" name="position" id="position"
+                                                         class="form-control"/></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3"><label for="field_id">{{ "Field Id" }}</label></div>
+                        <div class="control-label col-sm-5">
+                            <input type="text" id="field_id" name="field_id" class="form-control">
+                        </div>
+                        <div class=" -hidden-field -select-field -select-multi-field -password-field ">
+                            <div class="control-label col-sm-2"><label for="readonly">{{ "Read Only"|_ }}</label></div>
+                            <div class="col-sm-2"><input type="checkbox" name="readonly" id="readonly"
+                                                         class="form-control checkbox" value="1"/></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="control-label col-sm-3"><label for="name">{{ "Field name"|_ }}</label></div>
+                        <div class="col-sm-5"><input type="text" name="name" id="name" class="form-control" value=""/></div>
+                        <div class=" -hidden-field">
+                            <div class="control-label col-sm-2"><label for="required">{{ "Required"|_ }}</label></div>
+                            <div class="col-sm-2"><input type="checkbox" name="required" id="required"
+                                                         class="form-control checkbox" value="1"/></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group -hidden-field">
+                            <div class="control-label col-sm-3">
+                                <label for="css_class">{{ "CSS classes"|_ }}</label></div>
+                            <div class="col-sm-9"><input type="text" name="css_class"
+                                                         id="css_class" class="form-control" value=""></div>
+                    </div>
+
+                    <div class="form-group -select-multi-field -image-field -file-field">
+                        <div class="control-label col-sm-3"><label
+                                    for="field_default_value">{{ "Default Value"|_ }}</label></div>
+                        <div class="col-sm-9"><textarea name="field_default_value"
+                                                     id="field_default_value" class="form-control text" ></textarea></div>
+                    </div>
+                    <div class="form-group managed textarea-field text-field url-field tel-field email-field password-field">
+                        <div class="control-label col-sm-3"><label
+                                    for="field_placeholder">{{ "Placeholder"|_ }}</label>
+                        </div>
+                        <div class="col-sm-9"><input type="text" name="field_placeholder"
+                                                     id="field_placeholder" class="form-control" value=""/></div>
+                    </div>
+                    <div class="form-group managed number-field date-field time-field text-field url-field
+                                                tel-field email-field password-field textarea-field select-field select-multi-field">
+                        <div class="managed textarea-field">
+                            <div class="control-label col-sm-3"><label for="maxlength">{{ "Max length"|_ }}</label>
+                            </div>
+                            <div class="col-sm-3">
+                                <input type="text" name="maxlength" value="" class="form-control" id="maxlength">
+                            </div>
+                        </div>
+                        <div class="managed number-field date-field time-field text-field url-field
+                                                    tel-field email-field password-field select-field select-multi-field">
+                            <div class="control-label col-sm-3"><label for="size">{{ "Size"|_ }}</label></div>
+                            <div class="col-sm-3">
+                                <input type="text" name="size" id="size" value="" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group managed textarea-field">
+                        <div class="control-label col-sm-3"><label for="rows">{{ "Rows"|_ }}</label></div>
+                        <div class="col-sm-3">
+                            <input type="text" name="rows" value="" class="form-control" id="cols">
+                        </div>
+                        <div class="control-label col-sm-3"><label for="cols">{{ "Cols"|_ }}</label></div>
+                        <div class="col-sm-3">
+                            <input type="text" name="cols" id="cols" value="" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group managed select-field select-multi-field radio-field checkbox-field">
+                        <div class="control-label col-sm-3"><label for="options">{{ "Add/Remove options"|_ }}</label></div>
+                        <div class="col-sm-9"><input type="text" name="options" id="options" class="form-control"/></div>
+                    </div>
+                    <div class="form-group managed checkbox-field radio-field">
+                        <div class="control-label col-sm-3"><label for="checked">{{ "Default checked"|_ }}</label></div>
+                        <div class="col-sm-2"><input type="checkbox" name="checked" id="checked" class="form-control checkbox" value="1"/></div>
+                    </div>
+
+                    <div class="form-group managed image-field submit-field">
+                        <div class="control-label col-sm-3"><label for="formaction">{{ "Form action"|_ }}</label></div>
+                        <div class="col-sm-9"><input type="text" name="formaction" id="formaction" class="form-control" value=""/></div>
+                    </div>
+
+                    <div class="form-group managed submit-field">
+                        <div class="control-label col-sm-3"><label for="formnovalidate">{{ "No form validate"|_ }}</label></div>
+                        <div class="col-sm-2"><input type="checkbox" name="formnovalidate" id="formnovalidate" class="form-control checkbox" value="1"/></div>
+                    </div>
+                    <div class="form-group managed image-field">
+                        <div class="control-label col-sm-3"><label for="src">{{ "Src"|_ }}</label></div>
+                        <div class="col-sm-9"><input type="text" name="src" id="src" class="form-control" value=""/></div>
+                    </div>
+                    <div class="form-group managed image-field">
+                        <div class="control-label col-sm-3"><label for="height">{{ "Height"|_ }}</label></div>
+                        <div class="col-sm-3"><input type="text" name="height" id="height" class="form-control" value=""/></div>
+                        <div class="control-label col-sm-3"><label for="width">{{ "Width"|_ }}</label></div>
+                        <div class="col-sm-3"><input type="text" name="width" id="width" class="form-control" value=""/></div>
+                    </div>
+                    <div class="form-group managed number-field date-field time-field">
+                        <div class="control-label col-sm-3"><label for="min">{{ "Min value"|_ }}</label></div>
+                        <div class="col-sm-2"><input type="text" name="min" id="min" class="form-control" value=""/></div>
+                        <div class="control-label col-sm-2"><label for="max">{{ "Max value"|_ }}</label></div>
+                        <div class="col-sm-2"><input type="text" name="max" id="max" class="form-control" value=""/></div>
+                        <div class="control-label col-sm-1"><label for="step">{{ "Step"|_ }}</label></div>
+                        <div class="col-sm-2"><input type="text" name="step" id="step" class="form-control" value=""/></div>
+                    </div>
+                    <div class="form-group managed email-field file-field">
+                        <div class="control-label col-sm-3"><label for="multiple">{{ "Multiple"|_ }}</label></div>
+                        <div class="col-sm-2"><input type="checkbox" name="multiple" id="multiple" class="form-control checkbox" value="1"/></div>
+                    </div>
+
+                    <div class="form-group managed text-field url-field tel-field email-field password-field">
+                        <div class="control-label col-sm-3"><label for="pattern">{{ "Pattern"|_ }}</label></div>
+                        <div class="col-sm-5"><input type="text" name="pattern" id="pattern" class="form-control" value=""/></div>
+                        <div class="control-label col-sm-2"><label for="autocomplete">{{ "Autocomplete"|_ }}</label></div>
+                        <div class="col-sm-2"><input type="checkbox" name="autocomplete" id="autocomplete" class="form-control checkbox" value="1"/></div>
+                    </div>
+                    <div class="form-group validation -rte-field -hidden-field -select-field -select-multi-field
+                            -radio-field -checkbox-field">
+                        <div class="control-label col-sm-3"><label for="validation">{{ "Validation"|_ }}</label></div>
+                        <div class="col-sm-9">
+                            <input type="text" name="validation" id="validation" value="" class="form-control">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class='modal-footer'>
+                <button class='btn btn-primary btn-add prod-images-modal-delete' data-dismiss='modal'
+                        type='button'>{{ "Yes"|_ }}</button>
+                <button class='btn btn-default btn-close' data-dismiss='modal' type='button'>{{ "Cancel"|_ }}</button>
+            </div>
+        </div>
+        <script type="text/javascript">
+            //todo add select2
+            require(['jquery', 'select2'], function ($) {
+                var $inputType = $("#input_type");
+                var lastFieldType;
+                $(".managed").hide();
+                $('select', "#frontend-field-grid-modal").select2();
+
+                function toggleFields($selector) {
+                    var opt = $selector.val();
+                    if (lastFieldType != undefined) {
+                        $(".-" + lastFieldType + '-field').show();
+                    }
+                    $(".managed").hide();
+                    if (opt != '-') {
+                        $("." + opt + '-field').show();
+                        $(".-" + opt + '-field').hide();
+                        lastFieldType = opt;
+                    }
+                }
+
+                toggleFields($inputType);
+                $inputType.change(function(e){
+                    e.stopPropagation();
+                    toggleFields($inputType);
+                });
+            });
+        </script>
+    </div>
+</div>

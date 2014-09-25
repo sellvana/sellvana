@@ -20,6 +20,7 @@ modules:
             - [ core/simplegrid, { view_class: FCom_Core_View_SimpleGrid } ]
             - [ core/backbonegrid, { view_class: FCom_Core_View_BackboneGrid } ]
             - [ core/medialib, {view_class: FCom_Core_View_Abstract } ]
+            - [ core/attachmentgrid, {view_class: FCom_Core_View_Abstract } ]
 
         observe:
             - [ "FCom_LibTwig_Main::init", FCom_Core_Main.onTwigInit ]
@@ -37,11 +38,7 @@ modules:
                     X-Frame-Options: SAMEORIGIN
             cookie:
                 session_check_ip: 1
-            uploads:
-                images:
-                    permission: upload/images
-                    filetype: jpeg|jpg|tiff|gif|png|bmp
-                    folder: media/images
+
             modules:
                 FCom_Core:
                     company_name: Sellvana
@@ -53,6 +50,7 @@ modules:
                     sales_name: Sales
                     sales_email: support@example.com
                     default_tz: "America/New_York"
+                    default_country: US
                     import_export:
                         batch_size: 10
                         delete_after_import: 1

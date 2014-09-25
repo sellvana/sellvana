@@ -13,7 +13,8 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
     {
         $config = parent::gridConfig();
         $localeOptions = [];
-        foreach ($this->FCom_Geo_Model_Country->options() as $iso => $name) {
+        $availableCountries = $this->BLocale->getAvailableCountries();
+        foreach ($availableCountries as $iso => $name) {
             $localeOptions[$iso] = $iso;
         }
         $config['columns'] = [
@@ -53,20 +54,27 @@ class FCom_MultiLanguage_Admin_Controller_Translations extends FCom_Admin_Contro
     public function action_form()
     {
         $id = $this->BRequest->params('id', true);
-        list($module, $file) = explode("/", $id);
+        list($module, $file) = explode("/", $id, 2);
 
+        $moduleClass = $this->BApp->m($module);
+        if (!$moduleClass) {
+            $this->forward('noroute');
+            return;
+        }
+
+        $file = basename($file);
         if (!$file) {
             $this->BDebug->error('Invalid Filename: ' . $id);
         }
-        $moduleClass = $this->BApp->m($module);
+
         $filename = $moduleClass->baseDir() . '/i18n/' . $file;
 
         $model = new stdClass();
         $model->id = $id;
         $model->source = file_get_contents($filename);
+        $this->layout($this->_formLayoutName);
         $view = $this->view($this->_formViewName)->set('model', $model);
         $this->formViewBefore(['view' => $view, 'model' => $model]);
-        $this->layout($this->_formLayoutName);
         $this->processFormTabs($view, $model, 'edit');
     }
 

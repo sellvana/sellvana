@@ -1,5 +1,9 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Core_Model_Abstract
+ * @property FCom_Core_Main $FCom_Core_Main
+ */
 class FCom_Core_Model_Abstract extends BModel
 {
     /**

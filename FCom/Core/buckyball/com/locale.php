@@ -84,7 +84,7 @@ class BLocale extends BClass
             $str = iconv("utf-8", "us-ascii//TRANSLIT", $str); // transliterate
             $str = preg_replace('/[^' . $qFiller . 'a-z0-9]+/', '', strtolower($str)); // remove leftovers from transliteration
         }
-        $str = trim($str, $filler); // remove fillers from start and end of string
+        $str = trim($str, strtolower($filler)); // remove fillers from start and end of string|string is converted to lower case, so should be the filter char
         return $str;
     }
 
@@ -741,6 +741,16 @@ class BLocale extends BClass
                 throw new BException('Invalid label type');
         }
         return $result;
+    }
+
+    public function getRegionCodeByName($regionName, $countryCode = 'US')
+    {
+        $regions = $this->getAvailableRegions('name', $countryCode);
+        if ($regions) {
+            $regions = array_flip(array_map('strtolower', $regions));
+        }
+        $regionName = strtolower($regionName);
+        return isset($regions[$regionName]) ? $regions[$regionName] : null;
     }
 
     public function setCurrentLanguage($lang)

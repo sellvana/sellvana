@@ -13,7 +13,7 @@ class FCom_Customer_Admin extends BClass
             'customers/import' => 'Import',
         ]);
 
-        $this->FCom_Admin_Controller_MediaLibrary->allowFolder('storage/import/customers');
+        $this->FCom_Admin_Controller_MediaLibrary->allowFolder('{random}/import/customers');
     }
 
     public function onGetDashboardWidgets($args)
@@ -29,10 +29,7 @@ class FCom_Customer_Admin extends BClass
 
     public function onControllerBeforeDispatch($args)
     {
-        if ($this->BApp->m('FCom_PushServer')->run_status === BModule::LOADED
-            && $this->BConfig->get('modules/FCom_Customer/newcustomer_realtime_notification')
-        ) {
-            $this->FCom_PushServer_Model_Client->sessionClient()->subscribe('customers_feed');
-        }
+
     }
+
 }

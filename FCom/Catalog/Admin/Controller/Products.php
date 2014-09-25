@@ -109,25 +109,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $this->_formTitle = $m->id ? 'Edit Product: ' . $m->product_name : 'Create New Product';
     }
 
-    /**
-     * @param string $type
-     */
-    public function getUploadConfig( $type)
-    {
-        $uploadConfig         = $this->BConfig->get('uploads/' . $type);
-        $uploadConfig['type'] = $type;
-        if (isset($uploadConfig['filetype'])) {
-            $uploadConfig['filetype'] = '/(\\.|\\/)(' . str_replace([','], '|', $uploadConfig['filetype']) . ')$/i';
-        }
-
-        if (isset($uploadConfig['permission'])) {
-            $canUpload                  = $this->FCom_Admin_Model_User->sessionUser()
-                                                                      ->getPermission($uploadConfig['permission']);
-            $uploadConfig['can_upload'] = $canUpload;
-        }
-        return $uploadConfig;
-    }
-
     public function formPostBefore($args)
     {
         if ($args['do'] == 'DUPLICATE') {
@@ -252,7 +233,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 ->select_expr('IF (a.subfolder is null, "", CONCAT("/", a.subfolder))', 'subfolder')
                 ->group_by('pa.id')
                 ->find_many());
-        return [
+        $config =  [
             'config' => [
                 'id' => 'product_images',
                 'caption' => 'Product Images',
@@ -277,6 +258,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                         'editable' => 'inline', 'validation' => ['number' => true]],
                     ['name' => 'main_thumb', 'label' => 'Thumbnail', 'width' => 50, 'display' => 'eval',
                         'print' => '"<input class=\'main-thumb\' value=\'"+rc.row["id"]+"\' type=\'radio\' '
+                            . ' "+(rc.row["main_thumb"]==1 ? checked=\'checked\' : \'\')+" '
                             . 'data-file-id=\'"+rc.row["file_id"]+"\' name=\'product_images[main_thumb]\' '
                             . 'data-main-thumb=\'"+rc.row["main_thumb"]+"\'/>"'],
                     ['name' => 'create_at', 'label' => 'Created', 'width' => 200],
@@ -287,18 +269,27 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'actions' => [
                     'refresh' => true,
                     'add' => ['caption' => 'Add images'],
+                    'quick_add' => [
+                        'html' => '<span class="btn btn-success fileinput-button" style="float: none;line-height: 23px;">
+                                     <i class="icon-plus icon-white"></i>
+                                     <span>Quick add images</span> <input type="file" name="upload[]" id="quick-add-images" multiple="">
+                                   </span>'
+                    ],
                     'delete' => ['caption' => 'Remove'],
                 ],
                 'grid_before_create' => 'imagesGridRegister',
+                'grid_after_built' => 'afterBuiltImagesGrid',
                 'afterMassDelete' => 'afterMassDelete',
                 'filters' => [
                     ['field' => 'file_name', 'type' => 'text'],
                     ['field' => 'label', 'type' => 'text'],
+                    //TODO: remove all unused server side '_quick' filters
                     '_quick' => ['expr' => 'file_name like ? ', 'args' => ['%?%']]
                 ],
 
             ]
         ];
+        return $config;
     }
 
     /**
@@ -490,7 +481,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $categories = [];
         foreach ($post as $key => $value) {
             $matches = [];
-            if (preg_match("#category_id-(\d+)#", $key, $matches)) {
+            if (preg_match('#category_id-(\d+)#', $key, $matches)) {
                 $categories[intval($matches[1])] = $value;
             }
         }
@@ -524,7 +515,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             }
             if (isset($data[$typeName])) {
                 foreach ($data[$typeName] as $key => $arr) {
-                    $productLink = $hlp->loadWhere(['product_id' => $model->id(), 'linked_product_id' => (int)$key, 'link_type' => (string)$type]);
+                    $productLink = $hlp->loadWhere([
+                        'product_id' => $model->id(),
+                        'linked_product_id' => (int)$key,
+                        'link_type' => (string)$type
+                    ]);
                     $position = (is_numeric($data[$typeName][$key]['product_link_position']))
                         ? (int) $data[$typeName][$key]['product_link_position'] : 0;
                     if ($productLink) {
@@ -557,9 +552,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     'id'   => explode(',', $data['grid'][$typeName]['del']),
                 ]);
             }
-
-            if (!empty($data['grid'][$typeName]['rows'])) {
+            $rows = array();
+            if (isset($data['grid'][$typeName]['rows']) && $data['grid'][$typeName]['rows'] != '') {
                 $rows = $this->BUtil->fromJson($data['grid'][$typeName]['rows']);
+            }
+            if (!empty($rows)) {
                 foreach ($rows as $image) {
                     $key = $image['id'];
                     unset($image['id']);
@@ -649,21 +646,25 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $model->setData('variants_fields', json_decode($data['vfields'], true));
         }
         if (isset($data['variants'])) {
-            $hlp->delete_many(['product_id'=> $model->id]);
-            if (count($data['variants']) > 0) {
-                $variants = $this->BUtil->objectToArray(json_decode($data['variants']));
-                foreach($variants as $arr) {
-                    $vr = $hlp->load($arr['id']);
+            $variantsData = array();
+            if ($data['variants'] != '') {
+                $variantsData = $this->BUtil->objectToArray(json_decode($data['variants']));
+            }
+            $hlp->delete_many(['product_id'=> $model->id()]);
+            if (count($variantsData) > 0) {
+                $variantIds = $this->BUtil->arrayToOptions($variantsData, 'id');
+                $variants = $hlp->orm()->where_in('id', $variantIds)->find_many_assoc();
+                foreach($variantsData as $arr) {
                     $data = [
-                        'product_id' => $model->id,
+                        'product_id' => $model->id(),
                         'variant_sku' => $arr['variant_sku'],
                         'variant_price' => $arr['variant_price'],
                         'variant_qty' => $arr['variant_qty'],
                         'field_values' => json_encode($arr['field_values']),
                         'data_serialized' => json_encode(['variant_file_id' => $arr['variant_file_id']]),
                     ];
-                    if ($vr) {
-                        $vr->set($data)->save();
+                    if (!empty($variants[$arr['id']])) {
+                        $variants[$arr['id']]->set($data)->save();
                     } else {
                         $hlp->create($data)->save();
                     }
@@ -810,7 +811,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $categoryIds = [];
             //todo: request Boris for same function _.pluck in BUtil
             foreach ($categories as $category) {
-                $categoryIds[] = $category->id;
+                $categoryIds[] = $category->id();
             }
             $new->addToCategories($categoryIds);
         }
@@ -826,11 +827,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         //todo: does we need add product link similar between old and new product
         $hlp = $this->FCom_Catalog_Model_ProductLink;
-        $links = $hlp->orm('pl')->where('product_id', $old->id)->find_many();
+        $links = $hlp->orm('pl')->where('product_id', $old->id())->find_many();
         if ($links) {
             foreach ($links as $link) {
                 $data = [
-                    'product_id'        => $new->id,
+                    'product_id'        => $new->id(),
                     'link_type'         => $link->link_type,
                     'linked_product_id' => $link->linked_product_id,
                 ];
@@ -856,7 +857,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             foreach ($medias as $media) {
                 $data = $media->as_array();
                 unset($data['id']);
-                $data['product_id'] = $new->id;
+                $data['product_id'] = $new->id();
                 $data['create_at'] = $data['update_at'] = date('Y-m-d H:i:s');
                 if (!$hlp->create($data)->save()) {
                     $this->message('An error occurred while duplicate product medias.', 'error');
@@ -881,7 +882,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             foreach ($reviews as $r) {
                 $data = $r->as_array();
                 unset($data['id']);
-                $data['product_id'] = $new->id;
+                $data['product_id'] = $new->id();
                 if (!$hlp->create($data)->save()) {
                     $this->message('An error occurred while duplicate product reviews.', 'error');
                     return false;

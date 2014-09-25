@@ -2,7 +2,7 @@
 {% set fieldData = { model: c, settings_module:'FCom_MultiLanguage', } %}
 {% set backOrders = prod.backOrders() %}
 {% set locales = LOCALE.getAvailableLocaleCodes() %}
-{% import THIS.view('admin/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 
 <h2>{{ "Locale Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Catalog'}) }}

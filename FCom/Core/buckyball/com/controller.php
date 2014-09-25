@@ -542,14 +542,15 @@ class BRequest extends BClass
     }
 
     /**
-    * Set or retrieve cookie value
-    *
-    * @param string $name Cookie name
-    * @param string $value Cookie value to be set
-    * @param int $lifespan Optional lifespan, default from config
-    * @param string $path Optional cookie path, default from config
-    * @param string $domain Optional cookie domain, default from config
-    */
+     * Set or retrieve cookie value
+     *
+     * @param string $name Cookie name
+     * @param string $value Cookie value to be set
+     * @param int $lifespan Optional lifespan, default from config
+     * @param string $path Optional cookie path, default from config
+     * @param string $domain Optional cookie domain, default from config
+     * @return bool
+     */
     public function cookie($name, $value = null, $lifespan = null, $path = null, $domain = null, $secure = null, $httpOnly = null)
     {
         if (null === $value) {
@@ -566,7 +567,7 @@ class BRequest extends BClass
         $domain = null !== $domain ? $domain : (!empty($config['domain']) ? $config['domain'] : $this->httpHost(false));
         $secure = null !== $secure ? $secure : $this->https();
         $httpOnly = null !== $httpOnly ? $httpOnly : true;
-        setcookie($name, $value, time() + $lifespan, $path, $domain, $secure, $httpOnly);
+        return setcookie($name, $value, time() + $lifespan, $path, $domain, $secure, $httpOnly);
     }
 
     /**
@@ -647,21 +648,23 @@ class BRequest extends BClass
     }
 
     /**
-    * Check whether the request can be CSRF attack
-    *
-    * Uses HTTP_REFERER header to compare with current host and path.
-    * By default only POST, DELETE, PUT requests are protected
-    * Only these methods should be used for data manipulation.
-    *
-    * The following specific cases will return csrf true:
-    * - posting from different host or web root path
-    * - posting from https to http
-    *
-    * @see http://en.wikipedia.org/wiki/Cross-site_request_forgery
-    *
-    * @param array $methods Methods to check for CSRF attack
-    * @return boolean
-    */
+     * Check whether the request can be CSRF attack
+     *
+     * Uses HTTP_REFERER header to compare with current host and path.
+     * By default only POST, DELETE, PUT requests are protected
+     * Only these methods should be used for data manipulation.
+     *
+     * The following specific cases will return csrf true:
+     * - posting from different host or web root path
+     * - posting from https to http
+     *
+     * @see http://en.wikipedia.org/wiki/Cross-site_request_forgery
+     *
+     * @param string $checkMethod
+     * @param mixed $httpMethods
+     * @throws BException
+     * @return boolean
+     */
     public function csrf($checkMethod = null, $httpMethods = null)
     {
         $c = $this->BConfig;
@@ -742,12 +745,12 @@ class BRequest extends BClass
     }
 
     /**
-    * Verify that HTTP_HOST or HTTP_ORIGIN
-    *
-    * @param string $method (HOST|ORIGIN|OR|AND)
-    * @param string $explicitHost
-    * @return boolean
-    */
+     * Verify that HTTP_HOST or HTTP_ORIGIN
+     *
+     * @param string $method (HOST|ORIGIN|OR|AND)
+     * @param string $host
+     * @return boolean
+     */
     public function verifyOriginHostIp($method = 'OR', $host = null)
     {
         $ip = $this->ip();
@@ -776,7 +779,7 @@ class BRequest extends BClass
     public function currentUrl()
     {
         $host = $this->scheme() . '://' . $this->httpHost(true);
-        if ($this->BConfig->get('web/hide_script_name') && $this->BRequest->area() !== 'FCom_Admin') {
+        if ($this->BUrl->hideScriptName() && $this->BRequest->area() !== 'FCom_Admin') {
             $root = $this->webRoot();
         } else {
             $root = $this->scriptName();
@@ -2021,7 +2024,7 @@ class BRouteNode extends BClass
     public function __construct($args = [])
     {
         foreach ($args as $k => $v) {
-            $this->$k = $v;
+            $this->{$k} = $v;
         }
 
         // convert route name into regex and save param references
@@ -2234,7 +2237,7 @@ class BRouteObserver extends BClass
     public function __construct($args)
     {
         foreach ($args as $k => $v) {
-            $this->$k = $v;
+            $this->{$k} = $v;
         }
     }
 
@@ -2411,7 +2414,7 @@ class BActionController extends BClass
         $this->BRequest->stripRequestFieldsTags();
 
         // try {
-            $this->$actionMethod($args);
+            $this->{$actionMethod}($args);
         // } catch (Exception $e) {
             //BDebug::exceptionHandler($e);
             // $this->sendError($e->getMessage());
@@ -2553,10 +2556,19 @@ class BActionController extends BClass
 
     public function viewProxy($viewPrefix, $defaultView = 'index', $hookName = 'main', $baseLayout = null)
     {
+        $layout = $this->BLayout;
         $viewPrefix = trim($viewPrefix, '/') . '/';
         $page = $this->BRequest->param('view');
         if (!$page) {
             $page = $defaultView;
+        }
+
+        $theme = $this->BConfig->get('modules/' . $this->BRequest->area() . '/theme');
+        if (!$theme) {
+            $theme = $this->BLayout->getDefaultTheme();
+        }
+        if ($theme) {
+            $layout->loadThemeViews($theme);
         }
         $view = $this->view($viewPrefix . $page);
         if ($view instanceof BViewEmpty) {
@@ -2564,9 +2576,13 @@ class BActionController extends BClass
             return false;
         }
 
-        if ($baseLayout) {
-            $this->layout($baseLayout);
+        if ($theme) {
+            $layout->applyTheme($theme);
         }
+        if ($baseLayout) {
+            $layout->applyLayout($baseLayout);
+        }
+
         $this->BLayout->applyLayout('view-proxy')->applyLayout($viewPrefix . $page);
         $view->useMetaData();
 

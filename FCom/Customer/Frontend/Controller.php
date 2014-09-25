@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Customer_Frontend_Controller
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Customer_Model_Address $FCom_Customer_Model_Address
+ */
 class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function beforeDispatch()
@@ -194,8 +199,8 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
 
     public function action_register()
     {
-        $this->view('customer/register')->set('formId', 'register-form');
         $this->layout('/customer/register');
+        $this->view('customer/register')->set('formId', 'register-form');
     }
 
     public function action_register__POST()
@@ -212,10 +217,13 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
                     $this->FCom_Customer_Model_Address->import($a, $customer);
                 }
 //                $customer->login();
-                $this->message('Thank you for your access request. We will be in touch shortly via email');
-//                $this->message('Thank you for your registration');
-//                $this->BResponse->redirect('customer/myaccount');
-                $this->BResponse->redirect('customer/register');
+                if ($customer->status === 'review') {
+                    $this->message('Thank you for your access request. We will be in touch shortly via email');
+                    $this->BResponse->redirect('customer/register');
+                } else {
+                    $this->message('Thank you for your registration');
+                    $this->BResponse->redirect('customer/myaccount');
+                }
             } else {
                 $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:' . $formId);
                 $this->formMessages($formId);

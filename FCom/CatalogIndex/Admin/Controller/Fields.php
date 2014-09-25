@@ -97,8 +97,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
         $gridView = $args['page_view'];
         $actions = $gridView->get('actions');
         $actions += [
-            'reindex_force' => ' <button class="btn btn-primary" type="button" onclick="$(\'#util-form\').attr(\'action\', \''
-                . $this->BApp->href('catalogindex/reindex?CLEAR=1') . '\').submit()"><span>' . $this->BLocale->_('Force Reindex')
+            'reindex_force' => ' <button class="btn btn-primary btn-progress _modal" data-toggle="modal" data-target="#progress" type="button"><span>' . $this->BLocale->_('Force Reindex')
                 . '</span></button>',
         ];
         $actions['new'] = '<button type="button" id="add_new_index_field" class="btn grid-new btn-primary _modal">'
@@ -113,34 +112,6 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
         $title = $m->id ? 'Edit Index Field: ' . $m->field_label : 'Create New Index Field';
         if (($head = $this->view('head'))) $head->addTitle($title);
         $args['view']->set(['title' => $title]);
-    }
-
-    public function formPostAfter($args)
-    {
-        parent::formPostAfter($args);
-        if ($args['do'] !== 'DELETE') {
-            $customerGroup = $args['model'];
-            $addrPost = $this->BRequest->post('address');
-            if (($newData = $this->BUtil->fromJson($addrPost['data_json']))) {
-                $oldModels = $this->FCom_CustomerGroups_Model_Group->orm('a')->where('customer_id', $customerGroup->id)
-                    ->find_many_assoc();
-                foreach ($newData as $id => $data) {
-                    if (empty($data['id'])) {
-                        continue;
-                    }
-                    if (!empty($oldModels[$data['id']])) {
-                        $addr = $oldModels[$data['id']];
-                        $addr->set($data)->save();
-                    } elseif ($data['id'] < 0) {
-                        unset($data['id']);
-                        $addr = $this->FCom_Customer_Model_Address->newBilling($data, $cust);
-                    }
-                }
-            }
-            if (($del = $this->BUtil->fromJson($addrPost['del_json']))) {
-                $this->FCom_Customer_Model_Address->delete_many(['id' => $del, 'customer_id' => $customerGroup->id]);
-            }
-        }
     }
 
     public function action_unique__POST()

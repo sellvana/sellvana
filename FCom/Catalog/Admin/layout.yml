@@ -5,6 +5,7 @@ base:
             - [ addNav, catalog/categories, { label: Navigation, href: /catalog/categories } ]
             - [ addNav, catalog/products, { label: Products, href: /catalog/products } ]
             - [ addNav, catalog/products_import, { label: Products Import, href: /catalog/products/import/index } ]
+            - [ addNav, catalog/searchalias, { label: Search Terms, href: /catalog/searchalias } ]
     - view: admin/header
         do:
             - [ addQuickSearch, catalog/products, { label: Products, href: /catalog/products } ]
@@ -49,7 +50,7 @@ catalog_product_form_tabs:
             - [ addTab, content, { label: Page Content, pos: 20 } ]
             - [ addTab, images, { label: Images, pos: 30 } ]
             - [ addTab, products, { label: Products, pos: 40  } ]
-            - [ addTab, advanced, { label: Advanced, pos: 50 } ]
+            #- [ addTab, advanced, { label: Advanced, pos: 50 } ]
 
 /settings:
     - view: settings
@@ -59,3 +60,8 @@ catalog_product_form_tabs:
 
 /header_search:
     - { hook: main, views: 'header-search/FCom_Products' }
+
+/catalog/searchalias:
+    - { include: base }
+    - { include: form }
+    - { view: admin/nav, do: [[ setNav, catalog/searchalias ]] }

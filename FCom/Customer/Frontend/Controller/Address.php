@@ -19,14 +19,14 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
     public function action_index()
     {
         $customer = $this->FCom_Customer_Model_Customer->sessionUser();
-        $addresses = $customer->addresses();
+        $addresses = $customer->getAddresses();
 
         $crumbs[] = ['label' => 'Account', 'href' => $this->BApp->href('customer/myaccount')];
         $crumbs[] = ['label' => 'View Addresses', 'active' => true];
+        $this->layout('/customer/address/list');
         $this->view('breadcrumbs')->crumbs = $crumbs;
         $this->view('customer/address/list')->customer = $customer;
         $this->view('customer/address/list')->addresses = $addresses;
-        $this->layout('/customer/address/list');
     }
 
     public function action_edit()
@@ -55,10 +55,10 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             $address = $this->FCom_Customer_Model_Address->create();
         }
 
-        $countries = $this->FCom_Geo_Model_Country->orm()->find_many();
+        $countries = $this->FCom_Core_Main->getAllowedCountries();
 
         $countriesList = array_map(function ($el) {
-            return $el->get('iso');
+            return $el[0];
         }, $countries);
         $countriesList = implode(',', $countriesList);
 
@@ -71,16 +71,16 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         $layout->view('customer/address/edit')->default_shipping = $defaultShipping;
         $layout->view('customer/address/edit')->default_billing = $defaultBilling;*/
 
-        $this->view('geo/embed')->set('countries', $countriesList);
+        //$this->view('geo/embed')->set('countries', $countriesList);
         $varSet = [
-            'countries'        => $this->FCom_Geo_Model_Country->options($countriesList),
+            'countries'        => $this->BLocale->getAvailableRegions('name', $countriesList),
             'address'          => $address,
             'default_shipping' => $defaultShipping,
             'default_billing'  => $defaultBilling,
             'formId'           => 'address-form',
         ];
-        $this->view('customer/address/edit')->set($varSet);
         $this->layout('/customer/address/edit');
+        $this->view('customer/address/edit')->set($varSet);
     }
 
     public function action_edit__POST()
@@ -106,10 +106,11 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             if ($address->validate($post, [], $formId)) {
                 $address->set($post)->save();
                 //update customer
-                if (!empty($post['address_default_shipping'])) {
+                $numAddresses = $this->FCom_Customer_Model_Address->orm()->where('customer_id', $customer->id())->count();
+                if (!empty($post['address_default_shipping']) || $numAddresses === 1) {
                     $customer->default_shipping_id = $address->id();
                 }
-                if (!empty($post['address_default_billing'])) {
+                if (!empty($post['address_default_billing']) || $numAddresses === 1) {
                     $customer->default_billing_id = $address->id();
                 }
                 $customer->save();
@@ -161,7 +162,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
                 $customer->default_billing_id = $address->id();
                 $customer->default_billing    = $address;
                 $cart->setAddressByType('billing', $address);
-                //$this->FCom_Sales_Model_Cart_Address->newBilling($cart->id(), $customer->defaultBilling(), $customer->email);
+                //$this->FCom_Sales_Model_Cart_Address->newBilling($cart->id(), $customer->getDefaultBillingAddress(), $customer->email);
             }
             $customer->save();
 
@@ -169,7 +170,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         }
 
         $customer = $this->FCom_Customer_Model_Customer->sessionUser();
-        $addresses = $customer->addresses();
+        $addresses = $customer->getAddresses();
         if ('s' == $type) {
             $label = "Choose shipping address";
         } else {
@@ -178,6 +179,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
 
         $crumbs[] = ['label' => 'Checkout', 'href' => $this->BApp->href('checkout')];
         $crumbs[] = ['label' => $label, 'active' => true];
+        $this->layout('/customer/address/choose');
         $this->view('breadcrumbs')->crumbs = $crumbs;
         $this->view('customer/address/choose')->set(
             [
@@ -187,6 +189,5 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
                 'addresses' => $addresses,
             ]
         );
-        $this->layout('/customer/address/choose');
     }
 }

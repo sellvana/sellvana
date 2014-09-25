@@ -62,6 +62,16 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function onAfterCreate()
+    {
+        parent::onAfterCreate();
+
+        $this->set([
+            'tz' => $this->BConfig->get('modules/FCom_Core/default_tz'),
+            'locale' => $this->BConfig->get('modules/FCom_admin/default_locale'),
+        ]);
+    }
+
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
@@ -74,6 +84,12 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         }
         if (!$this->get('role_id')) {
             $this->set('role_id', null);
+        }
+        if (!$this->get('locale')) {
+            $this->set('locale', $this->BConfig->get('modules/FCom_Admin/default_locale'));
+        }
+        if (!$this->get('tz')) {
+            $this->set('tz', $this->BConfig->get('modules/FCom_Core/default_tz'));
         }
 
         return true;
@@ -110,7 +126,14 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     public function validatePassword($password, $field = 'password_hash')
     {
-        return $this->BUtil->validateSaltedHash($password, $this->get($field));
+        $hash = $this->get($field);
+        if (!$this->BUtil->validateSaltedHash($password, $hash)) {
+            return false;
+        }
+        if (!$this->BUtil->isPreferredPasswordHash($hash)) {
+            $this->set('password_hash', $this->BUtil->fullSaltedHash($password))->save();
+        }
+        return true;
     }
 
     public function has_role($orm, $role)
@@ -144,6 +167,10 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
             }
             $userId = $sessData['admin_user_id'];
             $user = static::$_sessionUser = $this->load($userId);
+            if (!$user) {
+                $this->logout();
+                return false;
+            }
             $token = $user->get('password_session_token');
             if (!$token) {
                 $token = $this->BUtil->randomString(16);
@@ -155,7 +182,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
                 $user->logout();
                 $this->BResponse->cookie('remember_me', 0);
                 $this->BResponse->redirect('');
-                return;
+                return false;
             }
         }
         return static::$_sessionUser;
@@ -227,7 +254,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     public function logout()
     {
-        $this->BEvents->fire(__METHOD__, ['user' => $this->sessionUser()]);
+        $this->BEvents->fire(__METHOD__);
         #$this->BSession->set('admin_user_id', null);
         #$this->BSession->set('admin_user_password_token', null);
         $sessData =& $this->BSession->dataToUpdate();

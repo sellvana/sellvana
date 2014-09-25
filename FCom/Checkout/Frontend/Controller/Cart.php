@@ -15,6 +15,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
     {
         $layout = $this->BLayout;
 
+        $this->layout('/checkout/cart');
         $layout->view('checkout/cart')->set('redirectLogin', false);
         if ($this->BApp->m('FCom_Customer') && $this->FCom_Customer_Model_Customer->isLoggedIn() == false) {
             $layout->view('checkout/cart')->set('redirectLogin', true);
@@ -24,19 +25,18 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         $layout->view('breadcrumbs')->set('crumbs', [['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
             ['label' => 'Cart', 'active' => true]]);
 
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $this->BEvents->fire(__CLASS__ . '::action_cart:cart', ['cart' => $cart]);
 
         $shippingEstimate = $this->BSession->get('shipping_estimate');
         $layout->view('checkout/cart')->set(['cart' => $cart, 'shipping_esitmate' => $shippingEstimate]);
-        $this->layout('/checkout/cart');
     }
 
     public function action_add__POST()
     {
         $cartHref = $this->BApp->href('cart');
         $post = $this->BRequest->post();
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         if (isset($post['action'])) {
             switch ($post['action']) {
             case 'add':
@@ -47,14 +47,14 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                     return;
                 }
                 $options = [
-                    'qty' => !empty($post['qty']) ? $post['qty'] : 1, 
+                    'qty' => !empty($post['qty']) ? $post['qty'] : 1,
                     'price' => $p->getPrice(),
                     'sku' => $p->get('local_sku'),
                 ];
                 $result = [];
                 $validate = $this->BEvents->fire(__METHOD__ . ':validate', [
-                    'controller' => $this, 
-                    'product' => $p, 
+                    'controller' => $this,
+                    'product' => $p,
                     'post' => $post,
                     'options' => &$options,
                     'result' => &$result,
@@ -65,7 +65,17 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                         $cart->customer_id = $this->FCom_Customer_Model_Customer->sessionUserId();
                         $cart->save();
                     }
-                    $options['shopper'] = (isset($post['shopper'])) ? $post['shopper']: [];
+                    if (isset($post['shopper'])) {
+                        $options['shopper'] = $post['shopper'];
+                        foreach($options['shopper'] as $key => $value) {
+                            if (!isset($value['val']) || $value['val'] == '') {
+                                unset($options['shopper'][$key]);
+                            }
+                            if ($value['val'] == 'checkbox') {
+                                unset($options['shopper'][$key]['val']);
+                            }
+                        }
+                    };
                     $cart->addProduct($p->id(), $options)->calculateTotals()->save();
                     $this->message('The product has been added to your cart');
                 } else {
@@ -79,7 +89,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
             $items = $cart->items();
             if (count($items)) {
                 if (!empty($post['remove'])) {
-                    foreach ($post['remove'] as $id => $arr_variant) {
+                    foreach ($post['remove'] as $id => $arrVariant) {
                         $item = $cart->childById('items', $id);
                         $variants = $item->getData('variants');
                         if (null === $variants || count($variants) == 1) {
@@ -88,13 +98,13 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                     }
                 }
                 if (!empty($post['qty'])) {
-                    foreach ($post['qty'] as $id => $arr_qty) {
+                    foreach ($post['qty'] as $id => $arrQty) {
                         $item = $cart->childById('items', $id);
                         if ($item) {
                             $variants = $item->getData('variants');
                             $totalQty = 0;
-                            if (null !== $variants) {
-                                foreach ($arr_qty as $variantId => $qty) {
+                            if (null !== $variants && is_array($arrQty)) {
+                                foreach ($arrQty as $variantId => $qty) {
                                     if ($qty > 0) {
                                         $variants[$variantId]['variant_qty'] = $qty;
                                         $totalQty += $qty;
@@ -104,7 +114,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                                     }
                                 }
                             } else {
-                                $totalQty = $arr_qty[0];
+                                $totalQty = $arrQty[0];
                             }
                             if ($totalQty > 0) {
                                 $item->set('qty', $totalQty)->setData('variants', $variants)->save();
@@ -133,7 +143,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
     {
         $cartHref = $this->BApp->href('cart');
         $post = $this->BRequest->post();
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $result = [];
         switch ($post['action']) {
         case 'add':
@@ -174,7 +184,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         }
 
         $qty = !empty($qty) ? $qty : 1;
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $cart->addProduct($product->id(), ['qty' => $qty, 'price' => $product->base_price]);
     }
 }

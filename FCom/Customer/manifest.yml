@@ -1,6 +1,6 @@
 modules:
     FCom_Customer:
-        version: 0.1.11
+        version: 0.1.12
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_Geo: 0.1.0, FCom_PushServer: 0.1.0 } }
         translations: { en: en.php }
@@ -17,6 +17,11 @@ modules:
                     - [ "BActionController::beforeDispatch", FCom_Customer_Admin.onControllerBeforeDispatch ]
                     - [ "FCom_Admin_View_Dashboard::getWidgets", FCom_Customer_Admin.onGetDashboardWidgets ]
                     - [ "FCom_Admin_Controller_HeaderSearch::action_index", FCom_Customer_Admin_Controller_Customers.onHeaderSearch ]
+                uploads:
+                    customer-import:
+                        permission: customer/import
+                        filetype: csv,txt
+                        folder: {random}/import/customers
 
             FCom_Frontend:
                 auto_use: [ layout, views ]
@@ -48,6 +53,3 @@ modules:
 
                     - [ /v1/customer/address, FCom_Customer_ApiServer_V1_Address.index ]
                     - [ "/v1/customer/address/:id", FCom_Customer_ApiServer_V1_Address.index ]
-
-        default_config:
-            modules/FCom_Customer/newcustomer_realtime_notification: true
