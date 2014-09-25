@@ -128,8 +128,10 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
+
         $customer = $args['model'];
         $hlp = $this->FCom_Customer_Model_Address;
+
         if ($args['do'] !== 'DELETE') {
             $addrPost = $this->BRequest->post('address');
             if (($newData = $this->BUtil->fromJson($addrPost['data_json']))) {
@@ -150,16 +152,25 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             if (($del = $this->BUtil->fromJson($addrPost['del_json']))) {
                 $hlp->delete_many(['id' => $del, 'customer_id' => $customer->id]);
             }
-        }
 
-        $customer_address = $this->BRequest->post('customer_address');
-        if ($customer_address['default_billing_id']) {
-            $hlp->update_many(['is_default_billing' => 0], ['customer_id' => $customer->id]);
-            $hlp->load($customer_address['default_billing_id'])->set('is_default_billing', 1)->save();
-        }
-        if ($customer_address['default_shipping_id']) {
-            $hlp->update_many(['is_default_shipping' => 0], ['customer_id' => $customer->id]);
-            $hlp->load($customer_address['default_shipping_id'])->set('is_default_shipping', 1)->save();
+            //set default billing / shipping from addressed grid
+            $data = $args['data'];
+            if ($data['default_billing_id']) {
+                $address = $hlp->load($data['default_billing_id']);
+                /** @type FCom_Customer_Model_Address $address */
+                if ($address->customer_id == $customer->id) {
+                    $hlp->update_many(['is_default_billing' => 0], ['customer_id' => $customer->id]);
+                    $address->set('is_default_billing', 1)->save();
+                }
+            }
+            if ($data['default_shipping_id']) {
+                $address = $hlp->load($data['default_billing_id']);
+                /** @type FCom_Customer_Model_Address $address */
+                if ($address->customer_id == $customer->id) {
+                    $hlp->update_many(['is_default_shipping' => 0], ['customer_id' => $customer->id]);
+                    $address->set('is_default_shipping', 1)->save();
+                }
+            }
         }
     }
 

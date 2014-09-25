@@ -61,10 +61,10 @@ class FCom_Customer_Admin_Controller_Addresses extends FCom_Admin_Controller_Abs
             ['type' => 'input', 'name' => 'email', 'label' => 'Email', 'index' => 'a.email', 'width' => 100,
                 'addable' => true, 'editable' => true, 'validation' => ['email' => true]],
             ['name' => 'is_default_billing', 'label' => 'Is Default Billing', 'display' => 'eval',
-                'print' => '"<input type=\'radio\' value=\'"+rc.row["id"]+"\' name=\'customer_address[default_billing_id]\' "+(rc.row["is_default_billing"] == 1 ? checked=\'checked\' : \'\')+" />"'
+                'print' => '"<input type=\'radio\' value=\'"+rc.row["id"]+"\' name=\'model[default_billing_id]\' "+(rc.row["is_default_billing"] == 1 ? checked=\'checked\' : \'\')+" />"'
             ],
             ['name' => 'is_default_shipping', 'label' => 'Is Default Shipping', 'display' => 'eval',
-                'print' => '"<input type=\'radio\' value=\'"+rc.row["id"]+"\' name=\'customer_address[default_shipping_id]\' "+(rc.row["is_default_shipping"] == 1 ? checked=\'checked\' : \'\')+" />"'
+                'print' => '"<input type=\'radio\' value=\'"+rc.row["id"]+"\' name=\'model[default_shipping_id]\' "+(rc.row["is_default_shipping"] == 1 ? checked=\'checked\' : \'\')+" />"'
             ],
             ['type' => 'btn_group', 'name' => '_actions', 'label' => 'Actions', 'sortable' => false, 'width' => 115,
                 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
