@@ -5,7 +5,11 @@
 
 {% set type = 'attachments' %}
 {% set targetType = 'product' %}
-{% set medialibConfig = {id: 'all_' ~ type, type: 'product-attachments'} %}
+{% set medialibConfig = {
+    id: 'all_' ~ type,
+    type: 'product-attachments',
+    config: {actions: {delete: {caption : 'Remove'}}}
+} %}
 
 {% set attachmentsConfig = {
     type: type,

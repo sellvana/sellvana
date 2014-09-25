@@ -3,7 +3,14 @@
 
 {% set type = 'images' %}
 {% set targetType = 'product' %}
-{% set medialibConfig = {id: 'all_' ~ type, mode: 'images', type: 'product-images', title: 'Images', folder: 'media/product/images'} %}
+{% set medialibConfig = {
+    id: 'all_' ~ type,
+    mode: 'images',
+    type: 'product-images',
+    title: 'Images',
+    folder: 'media/product/images',
+    config: {actions: {delete: {caption : 'Remove'}}}
+} %}
 
 {% set attachmentsConfig = {
     type: type,
@@ -32,8 +39,10 @@
         }
     });
     window.afterBuiltImagesGrid = function(grid) {
+        console.log('after build image grid');
         //bind remove event
         grid.getRows().bind('remove', function(row) {
+            console.log('remove row', row);
             var image = [];
             image.push({
                 file_id: row.get('file_id'),
@@ -63,7 +72,7 @@
                 image: image
             });
         }
-    }
+    };
     window.afterMassDelete = function() {
         var image = [];
         {{ combineType }}Grid.getSelectedRows().forEach(function (row) {
@@ -79,10 +88,10 @@
                 image: image
             });
         }
-    }
-
+    };
     require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload','jquery.fileupload-fp','jquery.fileupload-ui'], function() {
         var uploadUrl = '{{ APP.href("media/grid/upload?type=") | raw }}{{medialibConfig.type ? medialibConfig.type : "" }}';
+        var file_error = [];
         $('#quick-add-images').fileupload({
             url: uploadUrl,
             multiple:true,
@@ -90,19 +99,28 @@
         }).bind('fileuploadalways', function(e, data) {
             if ($.isArray(data.result.files)) {
                 data.result.files.forEach(function (obj) {
-                    var newRow = obj;
-                    newRow.selected = true;
-                    {{ medialibConfig.id }}_grid.getSelectedRows().add(obj);
-                    {{ medialibConfig.id }}_grid.getRows().add(newRow,{merge: true}).trigger('render');
-
-                    $('#{{ medialibConfig.id }}').find('td.name span').each(function(i) {
-                        if($(this).html() === obj.file_name)
-                            $(this).parents('tr:first').remove();
-                    });
-
-                    //trigger add
-                    $('.btn_' + '{{ medialibConfig.id }}' + '_add').trigger('click');
-                })
+                    if (!obj.error) {
+                        var newRow = obj;
+                        newRow.selected = true;
+                        {{ medialibConfig.id }}_grid.getSelectedRows().add(obj);
+                        {{ medialibConfig.id }}_grid.getRows().add(newRow,{merge: true}).trigger('render');
+                        $('#{{ medialibConfig.id }}').find('td.name span').each(function(i) {
+                            if($(this).html() === obj.file_name)
+                                $(this).parents('tr:first').remove();
+                        });
+                        //trigger add
+                        $('.btn_' + '{{ medialibConfig.id }}' + '_add').trigger('click');
+                    }
+                    else {
+                        file_error.push(obj.file_name);
+                    }
+                });
+            }
+        })
+        .bind('fileuploadstop', function(e, data) {
+            if (file_error.join(',') != '') {
+                alert('Illegal file extension: ' + file_error.join(','));
+                file_error = [];
             }
         });
     });
