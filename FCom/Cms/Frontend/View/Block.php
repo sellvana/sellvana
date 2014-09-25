@@ -36,7 +36,7 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
         } else {
             throw new BException('Invalid block name');
         }
-        $viewName = !empty($params['view_name']) ? $params['view_name'] : ('_cms_block/' . $params['block']);
+        $viewName = !empty($params['view_name'])? $params['view_name']: ('_cms_block/' . $params['block']);
         $view = static::$_layoutHlp->getView($viewName);
         if (!$view instanceof FCom_Cms_Frontend_View_Block) {
             $view = static::$_layoutHlp->addView($viewName, $params)->getView($viewName);
@@ -52,7 +52,7 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
     public function getBlockModel($view)
     {
         $model = $view->getParam('model');
-        if (!$model  || !is_object($model) || !$model instanceof FCom_Cms_Model_Block) {
+        if (!$model || !is_object($model) || !$model instanceof FCom_Cms_Model_Block) {
             $model = $view->getParam('block');
             if (is_numeric($model)) {
                 $model = $this->FCom_Cms_Model_Block->load($model);
@@ -67,6 +67,7 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
         }
         return $model;
     }
+
     protected $_formFieldsPlaceholder = '__FORM_FIELDS__';
 
     /**
@@ -84,7 +85,7 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
             return '';
         }
 
-        $subRenderer = $this->BLayout->getRenderer($model->renderer ? $model->renderer : 'FCom_LibTwig');
+        $subRenderer = $this->BLayout->getRenderer($model->renderer? $model->renderer: 'FCom_LibTwig');
 
         $blockContent = $model->getContent();
         if (strpos($blockContent, $this->_formFieldsPlaceholder) !== false) {
@@ -93,7 +94,7 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
         }
         $view->setParam([
             //'renderer'    => $subRenderer,
-            'source'      => $blockContent,
+            'source' => $blockContent,
             'source_name' => 'cms_block:' . get_class($model) . ':' . $model->handle,
             'source_mtime' => $model->modified_time,
             'source_untrusted' => true,
@@ -107,24 +108,11 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
     protected function _prepareFormFields()
     {
         $model = $this->getBlockModel($this);
-        $block = ['block' => 'test'];
+        $block = ['block' => 'form_fields', 'view_class' => 'FCom_Cms_Frontend_View_FormFields'];
+        /** @var FCom_Cms_Frontend_View_FormFields $view */
         $view = $this->createView($block);
-        $content = "{% include THIS.view('core/form-elements').twigName() as forms %}\n";
-        $content .= "<form method='post' >";
-        $formFields = $this->BUtil->fromJson($model->get('form_fields'));
-        foreach ($formFields as $fieldConfig) {
-            $fieldConfig['options'] = $this->BUtil->fromJson($fieldConfig['options']);
-            $content .= print_r($fieldConfig, 1);
-        }
+        $view->generateContent($model);
 
-        $content .= "</form>";
-        $view->setParam([
-            //'renderer'    => $subRenderer,
-            'source'      => $content,
-            'source_name' => 'cms_block:' . 'test'. ':' . true,
-            'source_mtime' => time(),
-            'source_untrusted' => false,
-        ]);
         $content = $view->render();
         return $content;
     }
