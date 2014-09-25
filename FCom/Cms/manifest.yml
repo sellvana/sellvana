@@ -30,5 +30,7 @@ modules:
                         /cms/blocks/form:
                             POST/model/content: "*"
             FCom_Frontend:
+                views:
+                    - [ cms/form-fields, { view_class: FCom_Cms_Frontend_View_FormFields } ]
                 observe:
                     - [ "FCom_Frontend_Controller::beforeDispatch", "FCom_Cms_Frontend.onFrontendIndexBeforeDispatch" ]

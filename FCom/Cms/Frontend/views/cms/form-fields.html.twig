@@ -1,0 +1,29 @@
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set fieldOptions = THIS.getParam("fieldOptions") %}
+{% set formElements = ['text','hidden', 'select', 'boolean', 'textarea', 'wysiwyg'] %}
+<form class="cms-block-form" method="post">
+    {% for field in fieldOptions %}
+        {% set name = field.name %}
+        {% set label = field.label %}
+        {% set type = field.input_type %}
+        {% set required = field.required %}
+        {% set id = field.options.field_id %}
+        {% set value = field.options.field_default_value %}
+        {% if type in formElements %}
+            {% if type == 'text' %}
+                {{ forms.input({field:id, required: required, label: label|_, name: name, type: type, value: value, placeholder: 'test'}) }}
+            {% elseif type == 'hidden' %}
+                {{ forms.hidden({field:id, name: name, type: type, value: value}) }}
+            {% elseif type == 'select' %}
+                {{ forms.select({field:id, required: required, label: label|_, name: name, type: type, value: value, placeholder: 'test'}) }}
+            {% elseif type == 'boolean' %}
+                {{ forms.boolean({field:id, required: required, label: label|_, name: name, type: type, value: value, placeholder: 'test'}) }}
+            {% elseif type == 'textarea' %}
+                {{ forms.textarea({field:id, required: required, label: label|_, name: name, type: type, value: value, placeholder: 'test'}) }}
+            {% elseif type == 'wysiwyg' %}
+                {{ forms.wysiwyg({field:id, required: required, label: label|_, name: name, type: type, value: value, placeholder: 'test'}) }}
+            {% endif %}
+        {% endif %}
+        {#{{ dump(field) }}#}
+    {% endfor %}
+</form>

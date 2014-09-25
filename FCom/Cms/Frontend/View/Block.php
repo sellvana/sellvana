@@ -108,9 +108,14 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
     protected function _prepareFormFields()
     {
         $model = $this->getBlockModel($this);
-        $block = ['block' => 'form_fields', 'view_class' => 'FCom_Cms_Frontend_View_FormFields'];
+        $block = [
+            'block' => 'form_fields',
+            'view_class' => 'FCom_Cms_Frontend_View_FormFields',
+            'view_name' => 'cms/form-fields'
+        ];
         /** @var FCom_Cms_Frontend_View_FormFields $view */
-        $view = $this->createView($block);
+        //$view = $this->createView($block);
+        $view = $this->BLayout->getView('cms/form-fields');
         $view->generateContent($model);
 
         $content = $view->render();

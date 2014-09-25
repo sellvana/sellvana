@@ -15,6 +15,7 @@ modules:
             - [ core/messages, { view_class: FCom_Core_View_Messages } ]
             - [ bottom_scripts, { view_class: FCom_Core_View_Head } ]
             - [ core/htmlgrid, { view_class: FCom_Core_View_HtmlGrid } ]
+            - [ core/form-elements, { view_class: FCom_Core_View_FormElements } ]
             - [ core/backgrid, { view_class: FCom_Core_View_Backgrid } ]
             - [ core/slickgrid, { view_class: FCom_Core_View_Slickgrid } ]
             - [ core/simplegrid, { view_class: FCom_Core_View_SimpleGrid } ]
