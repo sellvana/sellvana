@@ -1,5 +1,9 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_Controller_Abstract_TreeForm
+ * @property FCom_Core_Model_TreeAbstract $FCom_Core_Model_TreeAbstract
+ */
 abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Controller_Abstract
 {
     protected $_permission;
@@ -53,6 +57,11 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
         $this->BResponse->json($result);
     }
 
+    /**
+     * @param $node FCom_Core_Model_TreeAbstract
+     * @param int $depth
+     * @return array
+     */
     protected function _nodeChildren($node, $depth = 0)
     {
         $class = $this->_navModelClass;

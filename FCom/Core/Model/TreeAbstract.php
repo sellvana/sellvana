@@ -1,5 +1,23 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Core_Model_TreeAbstract
+ * @property int $id
+ * @property int $parent_id
+ * @property string $id_path
+ * @property int $level
+ * @property int $sort_order
+ * @property string $node_name
+ * @property string $full_name
+ * @property string $url_key
+ * @property string $url_path
+ * @property int $num_children
+ * @property int $num_descendants
+ * @property int $num_products
+ * @property int $is_enabled
+ * @property int $is_virtual
+ * @property mixed $data_serialized
+ */
 class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 {
     protected static $_separator = '|';
