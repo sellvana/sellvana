@@ -1,5 +1,16 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Catalog_Admin_Controller_Products
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_CustomField_Model_ProductVariant $FCom_CustomField_Model_ProductVariant
+ * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ * @property FCom_Catalog_Model_CategoryProduct $FCom_Catalog_Model_CategoryProduct
+ * @property FCom_Catalog_Model_ProductLink $FCom_Catalog_Model_ProductLink
+ * @property FCom_Catalog_Model_ProductMedia $FCom_Catalog_Model_ProductMedia
+ * @property FCom_CustomField_Model_FieldOption $FCom_CustomField_Model_FieldOption
+ * @property FCom_ProductReviews_Model_Review $FCom_ProductReviews_Model_Review
+ */
 class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -10,6 +21,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     protected $_mainTableAlias = 'p';
     protected $_permission = 'catalog/products';
 
+    /**
+     * @return array
+     */
     public function gridConfig()
     {
         $config = parent::gridConfig();
@@ -59,6 +73,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return $config;
     }
 
+    /**
+     * @param $rows
+     * @return mixed
+     */
     public function afterInitialData($rows)
     {
         $mediaUrl = $this->BConfig->get('web/media_dir') ? $this->BConfig->get('web/media_dir') : 'media';
@@ -70,6 +88,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return $rows;
     }
 
+    /**
+     * @param $data
+     * @return mixed
+     */
     public function gridDataAfter($data)
     {
         $mediaUrl = $this->BConfig->get('web/media_dir') ? $this->BConfig->get('web/media_dir') : 'media';
@@ -77,6 +99,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
         $data = parent::gridDataAfter($data);
         foreach ($data['rows'] as $row) {
+            /** @var FCom_Catalog_Model_Product $row */
             $customRowData = $row->getData();
             if ($customRowData) {
                 $row->set($customRowData);
@@ -89,9 +112,13 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return $data;
     }
 
+    /**
+     * @param array $args
+     */
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);
+        /** @var FCom_Catalog_Model_Product $m */
         $m = $args['model'];
         $newAction = [];
         if ($m->id) {
@@ -109,6 +136,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $this->_formTitle = $m->id ? 'Edit Product: ' . $m->product_name : 'Create New Product';
     }
 
+    /**
+     * @param array $args
+     */
     public function formPostBefore($args)
     {
         if ($args['do'] == 'DUPLICATE') {
@@ -117,6 +147,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
     }
 
+    /**
+     * @param $model
+     * @return string
+     */
     public function openCategoriesData($model)
     {
         $cp = $this->FCom_Catalog_Model_CategoryProduct;
@@ -137,6 +171,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return $this->BUtil->toJson($result);
     }
 
+    /**
+     * @param $model FCom_Catalog_Model_Product
+     * @return string
+     */
     public function linkedCategoriesData($model)
     {
         $cp = $this->FCom_Catalog_Model_CategoryProduct;
@@ -151,6 +189,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return $this->BUtil->toJson($result);
     }
 
+    /**
+     * @param bool $gridId
+     * @return array
+     */
     public function productLibraryGridConfig($gridId = false)
     {
         $config = $this->gridConfig();
@@ -177,6 +219,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return ['config' => $config];
     }
 
+    /**
+     * @param $model FCom_Catalog_Model_Product
+     * @return array
+     */
     public function productAttachmentsGridConfig($model)
     {
         $download_url = $this->BApp->href('/media/grid/download?folder=media/product/attachment&file=');
@@ -220,6 +266,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         ];
     }
 
+    /**
+     * @param $model FCom_Catalog_Model_Product
+     * @return array
+     */
     public function productImagesGridConfig($model)
     {
         $downloadUrl = $this->BApp->href('/media/grid/download?folder=media/product/images&file=');
@@ -293,8 +343,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     }
 
     /**
-    * modal grid on category/product tab
-    */
+     * modal grid on category/product tab
+     * @param $model FCom_Catalog_Model_Product
+     * @return array
+     */
     public function getAllProdConfig($model)
     {
 
@@ -325,9 +377,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return ['config' => $config];
     }
 
-    /*
-    *main grid on category/product tab
-    */
+    /**
+     * main grid on category/product tab
+     * @param $model FCom_Catalog_Model_Category
+     * @return array
+     */
     public function getCatProdConfig($model)
     {
         $orm = $this->FCom_Catalog_Model_Product->orm()->table_alias('p')
@@ -362,6 +416,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return ['config' => $config];
     }
 
+    /**
+     * @param $model
+     * @param $type
+     * @return array
+     */
     public function linkedProductGridConfig($model, $type)
     {
         $orm = $this->FCom_Catalog_Model_Product->orm()->table_alias('p')
@@ -475,6 +534,9 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         //todo: delete product reviews / wishlist
     }
 
+    /**
+     * @param $model FCom_Catalog_Model_Product
+     */
     public function processCategoriesPost($model)
     {
         $post = $this->BRequest->post();
@@ -500,6 +562,13 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             }
         }
     }
+
+    /**
+     * @param $model FCom_Catalog_Model_Product
+     * @param $data
+     * @return $this
+     * @throws BException
+     */
     public function processLinkedProductsPost($model, $data)
     {
         //echo "<pre>"; print_r($data); echo "</pre>";
@@ -540,6 +609,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return $this;
     }
 
+    /**
+     * @param $model FCom_Catalog_Model_Product
+     * @param $data
+     * @return $this
+     * @throws BException
+     */
     public function processMediaPost($model, $data)
     {
         $hlp = $this->FCom_Catalog_Model_ProductMedia;
@@ -611,6 +686,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         return $this;
     }
 
+    /**
+     * @param FCom_Catalog_Model_Product $model
+     * @param $data
+     */
     public function processCustomFieldPost($model, $data)
     {
 
@@ -621,6 +700,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $model->save();
     }
 
+    /**
+     * @param FCom_Catalog_Model_Product $model
+     * @param $data
+     */
     public function processStockPolicyPost($model, $data)
     {
         if (!empty($data['stock_policy'])) {
@@ -629,6 +712,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         }
     }
 
+    /**
+     * @param FCom_Catalog_Model_Product $model
+     * @param $data
+     */
     public function processVariantPost($model, $data)
     {
         $hlp = $this->FCom_CustomField_Model_ProductVariant;
@@ -677,6 +764,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     }
 
+    /**
+     * @param FCom_Catalog_Model_Product $model
+     * @param $data
+     */
     public function processSystemLangFieldsPost($model, $data)
     {
         $model->setData('name_lang_fields', $data['name_lang_fields']);
@@ -686,6 +777,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     }
 
+    /**
+     * @param FCom_Catalog_Model_Product $model
+     * @param $data
+     */
     public function processFrontendPost($model, $data)
     {
         if (!empty($data['prod_frontend_data'])) {
@@ -734,6 +829,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     }
     */
 
+    /**
+     * process duplicate product
+     * @param $id
+     */
     public function duplicateProduct($id = '')
     {
         if (empty($id)) {
@@ -775,6 +874,12 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $this->BResponse->redirect($redirectUrl);
     }
 
+    /**
+     * @param $oldName
+     * @param $oldSku
+     * @param $oldUrlKey
+     * @return int
+     */
     public function getDuplicateSuffixNumber($oldName, $oldSku, $oldUrlKey)
     {
         $result = $this->FCom_Catalog_Model_Product->orm()

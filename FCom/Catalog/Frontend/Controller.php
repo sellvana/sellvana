@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Catalog_Frontend_Controller
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ */
 class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function action_manuf()
@@ -37,6 +42,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
         $categoryPath = $this->BRequest->params('category');
         if ($categoryPath) {
             $category = $this->FCom_Catalog_Model_Category->load($categoryPath, 'url_path');
+            /** @var FCom_Catalog_Model_Category $category */
             if (!$category) {
                 $this->forward(false);
                 return $this;

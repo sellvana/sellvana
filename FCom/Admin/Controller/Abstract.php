@@ -3,6 +3,10 @@
 /**
  * Class FCom_Admin_Controller_Abstract
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Core_Main $FCom_Core_Main
+ * @property FCom_Core_Model_Config $FCom_Core_Model_Config
+ * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
+ * @property FCom_Core_Model_Module $FCom_Core_Model_Module
  */
 class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
 {
@@ -245,6 +249,7 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         $id = $r->post('id');
         $data = $defData + $r->post();
         $hlp = $this->{$class};
+        /** @type BModel $hlp */
         unset($data['id'], $data['oper']);
 
         $args = ['data' => &$data, 'oper' => $r->post('oper'), 'helper' => $hlp];
