@@ -35,6 +35,13 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         array('url_path', '@required'),*/
     ];
 
+    /**
+     * @param array|int|string $id
+     * @param null $field
+     * @param bool $cache
+     * @return $this|bool
+     * @throws BException
+     */
     public function load($id, $field = null, $cache = false)
     {
         $cat = parent::load($id, $field, $cache);

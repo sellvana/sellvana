@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Catalog_ApiServer_V1_Category
+ *
+ * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ */
 class FCom_Catalog_ApiServer_V1_Category extends FCom_ApiServer_Controller_Abstract
 {
     //protected $_authorizeActionsWhitelist = array('Put');
