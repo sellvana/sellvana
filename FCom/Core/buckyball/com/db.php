@@ -1258,7 +1258,7 @@ class BORM extends ORMWrapper
      * Find one row
      *
      * @param int|null $id
-     * @return BModel
+     * @return $this
      */
     public function find_one($id = null)
     {
@@ -1272,7 +1272,7 @@ class BORM extends ORMWrapper
     /**
     * Find many rows (SELECT)
     *
-    * @return array
+    * @return $this[]
     */
     public function find_many()
     {
