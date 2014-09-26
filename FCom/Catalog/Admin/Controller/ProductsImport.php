@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Catalog_Admin_Controller_ProductsImport
+ * @property FCom_Admin_Controller_MediaLibrary $FCom_Admin_Controller_MediaLibrary
+ * @property FCom_Catalog_ProductsImport $FCom_Catalog_ProductsImport
+ */
 class FCom_Catalog_Admin_Controller_ProductsImport extends FCom_Admin_Controller_Abstract
 {
     //protected $_permission = 'catalog/products/import';

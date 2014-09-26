@@ -27,6 +27,17 @@
  * @property string  $data_serialized
  * @property string  $avg_rating
  * @property integer $num_reviews
+ *
+ * DI
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ * @property FCom_Catalog_Model_CategoryProduct $FCom_Catalog_Model_CategoryProduct
+ * @property FCom_Catalog_Model_ProductLink $FCom_Catalog_Model_ProductLink
+ * @property FCom_CustomField_Model_ProductField $FCom_CustomField_Model_ProductField
+ * @property FCom_Catalog_Model_ProductMedia $FCom_Catalog_Model_ProductMedia
+ * @property FCom_CustomField_Model_FieldOption $FCom_CustomField_Model_FieldOption
+ * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ * @property FCom_ProductReviews_Model_Review $FCom_ProductReviews_Model_Review
  */
 class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 {
@@ -301,6 +312,11 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         //todo
     }
 
+    /**
+     * @param $products
+     * @param bool $includeCategories
+     * @return array
+     */
     public function prepareApiData($products, $includeCategories = false)
     {
         if (!is_array($products)) {
@@ -386,6 +402,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $this->FCom_CustomField_Model_ProductField->productFields($product);
     }
 */
+
+    /**
+     * @return array
+     */
     public function customFieldsShowOnFrontend()
     {
         $result = [];
@@ -400,6 +420,12 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    /**
+     * @param string $q
+     * @param array $filter
+     * @param null $category
+     * @return BORM
+     */
     public function searchProductOrm($q = '', $filter = [], $category = null)
     {
         $qs = preg_split('#\s+#', $q, 0, PREG_SPLIT_NO_EMPTY);
@@ -429,6 +455,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     }
 
 
+    /**
+     * @param $type
+     * @return ORM
+     */
     public function mediaORM($type)
     {
         return $this->FCom_Catalog_Model_ProductMedia->orm()->table_alias('pa')
@@ -439,6 +469,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             ->order_by_asc('position');
     }
 
+    /**
+     * @param $type
+     * @return mixed
+     */
     public function media($type)
     {
         return $this->mediaORM($type)->find_many_assoc();
@@ -798,6 +832,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    /**
+     * @param $categoryIds
+     * @return $this
+     */
     public function addToCategories($categoryIds)
     {
         $hlp = $this->FCom_Catalog_Model_CategoryProduct;
@@ -807,22 +845,36 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param $categoryIds
+     * @return $this
+     */
     public function removeFromCategories($categoryIds)
     {
         $this->FCom_Catalog_Model_CategoryProduct->delete_many(['product_id' => $this->id, 'category_id' => $categoryIds]);
         return $this;
     }
 
+    /**
+     * @return float
+     */
     public function getAverageStars()
     {
         return $this->get('avg_rating') / 5 * 100;
     }
 
+    /**
+     * @return mixed
+     */
     public function getNumReviews()
     {
         return $this->get('num_reviews');
     }
 
+    /**
+     * @param bool $incAvgRating
+     * @return array
+     */
     public function reviews($incAvgRating = true)
     {
         $reviews = $this->FCom_ProductReviews_Model_Review->orm('pr')->select(['pr.*', 'c.firstname', 'c.lastname'])
@@ -839,6 +891,10 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         ];
     }
 
+    /**
+     * @param array $reviews
+     * @return array
+     */
     public function calcAverageRating($reviews = [])
     {
         $rs = [
@@ -865,6 +921,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $rs;
     }
 
+    /**
+     * @return array
+     */
     public function getProductLink()
     {
         $arrProduct = $this->FCom_Catalog_Model_Product->orm('p')->select('pl.link_type')
@@ -1052,6 +1111,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return empty($errors) ? true : $errors;
     }
 
+    /**
+     * @return mixed
+     */
     public function getPrice()
     {
         if ($this->get('sale_price')) {
@@ -1060,6 +1122,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         return $this->get('base_price');
     }
 
+    /**
+     * @return array
+     */
     public function backOrders()
     {
         return [
@@ -1068,6 +1133,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         ];
     }
 
+    /**
+     * @return mixed
+     */
     public function getFrontendFields()
     {
         $frontendFields = $this->getData('frontend_fields');

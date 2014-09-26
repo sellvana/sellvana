@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Catalog_Admin
+ * @property FCom_Admin_Controller_MediaLibrary $FCom_Admin_Controller_MediaLibrary
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ * @property FCom_Frontend_Main $FCom_Frontend_Main
+ * @property FCom_Cms_Model_Block $FCom_Cms_Model_Block
+ */
 class FCom_Catalog_Admin extends BClass
 {
     public function bootstrap()

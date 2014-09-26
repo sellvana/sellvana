@@ -1,5 +1,9 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Catalog_Admin_Controller_Categories
+ * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ */
 class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abstract_TreeForm
 {
     protected static $_origClass = __CLASS__;
@@ -17,7 +21,7 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
         try {
             $id = $this->BRequest->param('id', true);
             $model = $this->FCom_Catalog_Model_Category->load($id);
-            /** @var $model FCom_Catalog_Model_Category */
+            /** @var FCom_Catalog_Model_Category $model */
             if (!$model) {
                 throw new BException('Invalid Category ID.');
             }
@@ -37,8 +41,8 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
                 throw new BException('An error occurred while copying uploaded image.');
             }
             if ($needConvert && !$this->BUtil->convertImage($imageFile, $imageFile, null, null, 'jpg')) {
-                throw new BException('An error occurred while convert image to jpg.');
                 $model->deleteImage(); //delete uploaded image
+                throw new BException('An error occurred while convert image to jpg.');
             }
             $results = ['type' => 'success', 'filename' => $id . '.jpg'];
         } catch (Exception $e) {
