@@ -3,7 +3,7 @@
 window.import_products_register = function(grid) {
     import_products_grid = grid;
     grid.build();
-}
+};
 
 require(['jquery', 'bootstrap', 'fcom.admin'], function($) {
     $(function() {
@@ -61,7 +61,6 @@ require(['jquery', 'bootstrap', 'fcom.admin'], function($) {
       </h1>
   </div>
   <div class="f-admin-main">
-      {% set upload_config = THIS.get('upload_config') %}
             <div class="accordion accordion-blue panel-group" id="import-accordion">
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -69,7 +68,6 @@ require(['jquery', 'bootstrap', 'fcom.admin'], function($) {
                     </div>
                     <div class="panel-collapse collapse in" id="import-accordion-group0">
                         <div class="panel-body">
-                            {% if upload_config.can_upload %}
                             <form class="form form-horizontal" method="post">
                                 <div class="form-group">
                                     <div class="col-md-12">
@@ -85,9 +83,6 @@ require(['jquery', 'bootstrap', 'fcom.admin'], function($) {
                                     </div>
                                 </div>
                             </form>
-                            {% else %}
-                            <p>{{ "You cannot upload new files to import, select another file."|_ }}</p>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
