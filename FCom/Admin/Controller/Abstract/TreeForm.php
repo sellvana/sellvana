@@ -45,6 +45,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                     */
                 } else {
                     $node = $this->{$class}->load($r->get('id'));
+                    /** @var FCom_Core_Model_TreeAbstract $node */
                     if ($node) {
                         $node->descendants();
                         $result = $this->_nodeChildren($node, 100);
@@ -65,6 +66,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
     protected function _nodeChildren($node, $depth = 0)
     {
         $class = $this->_navModelClass;
+        /** @var FCom_Core_Model_TreeAbstract[] $nodeChildren */
         $nodeChildren = $node ? $node->children() : $this->{$class}->orm()->where_null('parent_id')->find_many();
         $children = [];
         foreach ($nodeChildren as $c) {
@@ -196,6 +198,7 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
                 throw new Exception('Invalid node ID');
             }
 
+            /** @var FCom_Core_Model_TreeAbstract $model */
             $model->set($this->BRequest->post('model'))
                 ->set(['url_path' => null, 'full_name' => null]);
 
@@ -252,7 +255,8 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
     /**
      * @param FCom_Core_Model_TreeAbstract $node
      * @param string $recursiveType 0: only this node, 1: plus immediately children, 2: plus all descendant
-     * @return bool|FCom_Core_Model_TreeAbstract
+     * @param boolean $returnID
+     * @return int|FCom_Core_Model_TreeAbstract
      * @throws BException
      */
     public function cloneNode($node, $recursiveType, $returnID = false)

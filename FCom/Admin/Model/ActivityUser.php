@@ -1,10 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * @property int id
- * @property int activity_id
- * @property int user_id
- * @property enum alert_status (new, read, dismissed)
+ * @property int $id
+ * @property int $activity_id
+ * @property int $user_id
+ * @property string $alert_user_status (new|read|dismissed)
  */
 class FCom_Admin_Model_ActivityUser extends FCom_Core_Model_Abstract
 {
