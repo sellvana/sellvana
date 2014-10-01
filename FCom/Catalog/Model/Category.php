@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Catalog_Model_Category
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Catalog_Model_CategoryProduct $FCom_Catalog_Model_CategoryProduct
+ */
 class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 {
     protected static $_origClass = __CLASS__;
@@ -103,6 +108,7 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 
     public function getTopNavCategories($maxLevel = 1)
     {
+        /** @var BORM $orm */
         $orm = $this->orm()->order_by_asc('sort_order');
         if ($this->BConfig->get('modules/FCom_Frontend/nav_top/type') == 'categories_root') {
             $rootId = $this->BConfig->get('modules/FCom_Frontend/nav_top/root_category');

@@ -64,6 +64,10 @@ final class FCom_MarketClient_RemoteApi extends BClass
             $this->BCache->delete(static::$_modulesVersionsCacheKey);
             throw new BException($modResult['message']);
         }
+        if (empty($modResult['modules'])) {
+            //throw new BException('Unable to retrieve marketplace modules information');
+            return []; //TODO: proper notifications and errors handling
+        }
         foreach ($modResult['modules'] as $modName => $mod) {
             if ($mod && empty($mod['name'])) {
                 $mod['name'] = $modName;

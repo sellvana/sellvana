@@ -1,5 +1,16 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Catalog_Model_ProductLink
+ * @property int $id
+ * @property string $link_type
+ * @property int $product_id
+ * @property int $linked_product_id
+ * @property int $position
+ *
+ * DI
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ */
 class FCom_Catalog_Model_ProductLink extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_product_link';
@@ -18,6 +29,11 @@ class FCom_Catalog_Model_ProductLink extends FCom_Core_Model_Abstract
         ]
     ];
 
+    /**
+     * @param int $id
+     * @param string $type
+     * @return $this[]
+     */
     public function productsByType($id, $type)
     {
         $orm = $this->FCom_Catalog_Model_Product->orm()->table_alias('p')
