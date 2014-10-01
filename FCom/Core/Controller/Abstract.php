@@ -1,5 +1,18 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Core_Controller_Abstract
+ *
+ * core class
+ * @property FCom_Core_Main $FCom_Core_Main
+ * @property FCom_Core_Model_ImportExport_Site $FCom_Core_Model_ImportExport_Site
+ * @property FCom_Core_Model_ImportExport_Model $FCom_Core_Model_ImportExport_Model
+ * @property FCom_Core_Model_ImportExport_Id $FCom_Core_Model_ImportExport_Id
+ * @property FCom_Core_Model_Config $FCom_Core_Model_Config
+ * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
+ * @property FCom_Core_Model_Module $FCom_Core_Model_Module
+ * @property FCom_Core_Model_Seq $FCom_Core_Model_Seq
+ */
 class FCom_Core_Controller_Abstract extends BActionController
 {
     public function beforeDispatch()

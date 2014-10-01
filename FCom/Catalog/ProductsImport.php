@@ -1,5 +1,9 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Catalog_ProductsImport
+ * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ */
 class FCom_Catalog_ProductsImport extends BImport
 {
     protected $fields = [

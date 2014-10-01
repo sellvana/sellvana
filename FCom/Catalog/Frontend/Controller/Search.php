@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Catalog_Frontend_Controller_Search
+ *
+ * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Catalog_Model_SearchAlias $FCom_Catalog_Model_SearchAlias
+ * @property FCom_Catalog_Model_SearchHistory $FCom_Catalog_Model_SearchHistory
+ */
 class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_Abstract
 {
     public function action_category()
@@ -20,6 +28,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
 
         $this->layout('/catalog/category');
         $layout = $this->BLayout;
+        /** @var FCom_Catalog_Frontend_View_Pager $pagerView */
         $pagerView = $layout->view('catalog/product/pager');
 
         $productsORM = $this->FCom_Catalog_Model_Product->searchProductOrm($q, $filter, $category);
@@ -91,6 +100,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
 
         $this->layout('/catalog/category');
         $layout = $this->BLayout;
+        /** @var FCom_Catalog_Frontend_View_Pager $pagerView */
         $pagerView = $layout->view('catalog/product/pager');
 
         $q = $this->FCom_Catalog_Model_SearchAlias->processSearchQuery($q);

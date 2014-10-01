@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Catalog_Frontend
+ * @property FCom_FrontendCP_Main $FCom_FrontendCP_Main
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ */
 class FCom_Catalog_Frontend extends BClass
 {
     public function bootstrap()

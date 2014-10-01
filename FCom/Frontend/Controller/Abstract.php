@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Frontend_Controller_Abstract
+ *
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Frontend_Main $FCom_Frontend_Main
+ */
 class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
 {
     protected static $_postSanitized = false;
@@ -57,6 +63,13 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
         return true;
     }
 
+    /**
+     * @param $msg
+     * @param string $type
+     * @param string $tag
+     * @param array $options
+     * @return $this
+     */
     public function message($msg, $type = 'success', $tag = 'frontend', $options = [])
     {
         if (is_array($msg)) {
@@ -70,6 +83,7 @@ class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract
 
     /**
      * convert validate error messages to frontend messages to show
+     * @param string $formId
      */
     public function formMessages($formId = 'frontend')
     {

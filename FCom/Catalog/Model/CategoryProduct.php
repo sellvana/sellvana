@@ -1,5 +1,18 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Catalog_Model_CategoryProduct
+ * @property int $id
+ * @property int $product_id
+ * @property int $category_id
+ * @property int $sort_order
+ *
+ * relations
+ * @property FCom_Catalog_Model_Category $category
+ *
+ * DI
+ * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ */
 class FCom_Catalog_Model_CategoryProduct extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
