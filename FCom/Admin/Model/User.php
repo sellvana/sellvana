@@ -11,6 +11,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_admin_user';
 
+    /** @var  FCom_Admin_Model_User $_sessionUser */
     protected static $_sessionUser;
 
     protected static $_fieldOptions = [
@@ -158,6 +159,11 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $this->BSession->get('admin_user_id');
     }
 
+    /**
+     * @param bool $reset
+     * @return bool|FCom_Admin_Model_User
+     * @throws BException
+     */
     public function sessionUser($reset = false)
     {
         if ($reset || !static::$_sessionUser) {
@@ -193,6 +199,11 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $this->sessionUserId() ? true : false;
     }
 
+    /**
+     * @param string $username
+     * @param string $password
+     * @return FCom_Admin_Model_User|bool
+     */
     public function authenticate($username, $password)
     {
         if (empty($username) || empty($password)) {
@@ -201,7 +212,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if (!$this->BLoginThrottle->init('FCom_Admin_Model_User', $username)) {
             return false;
         }
-        /** @var FCom_Admin_Model_User */
+        /** @var FCom_Admin_Model_User $user */
         $user = $this->orm()->where(['OR' => [
             'username' => (string)$username,
             'email' => (string)$username,
@@ -222,7 +233,7 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         if (!$this->BLoginThrottle->init('FCom_ApiServer', $username)) {
             return false;
         }
-        /** @var FCom_Admin_Model_User */
+        /** @var FCom_Admin_Model_User $user */
         $user = $this->orm()->where('api_username', $username)->find_one();
         if (!$user || !$user->validatePassword($password, 'api_password_hash')) {
             $this->BLoginThrottle->failure();

@@ -441,7 +441,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         $addresses = $this->getAddresses();
         foreach ($addresses as $addr) {
-            if ($addr->is_default_billing) {
+            if ($addr->is_default_billing || $this->default_billing_id === $addr->id()) {
                 return $addr;
             }
         }
@@ -452,7 +452,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         $addresses = $this->getAddresses();
         foreach ($addresses as $addr) {
-            if ($addr->is_default_shipping) {
+            if ($addr->is_default_shipping || $this->default_shipping_id === $addr->id()) {
                 return $addr;
             }
         }

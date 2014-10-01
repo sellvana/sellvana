@@ -27,7 +27,7 @@
  *
  * DI
  * @property FCom_Core_Model_Seq $FCom_Core_Model_Seq
- * @property FCom_Sales_Model_Order_Status $FCom_Sales_Model_Order_Status
+ * @property FCom_Sales_Model_Order_CustomStatus $FCom_Sales_Model_Order_CustomStatus
  * @property FCom_Sales_Model_Order_Item $FCom_Sales_Model_Order_Item
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
@@ -81,7 +81,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function addNew($data)
     {
-        $status = $this->FCom_Sales_Model_Order_Status->statusNew();
+        $status = $this->FCom_Sales_Model_Order_CustomStatus->statusNew();
         $data['status'] = $status->name;
         $data['status_id'] = $status->id;
         $this->BEvents->fire(__CLASS__ . '.addNew', ['order' => $data]);
@@ -96,7 +96,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function paid()
     {
-        $status = $this->FCom_Sales_Model_Order_Status->statusPaid();
+        $status = $this->FCom_Sales_Model_Order_CustomStatus->statusPaid();
         $data = [];
         $data['status'] = $status->name;
         $data['status_id'] = $status->id;
@@ -106,7 +106,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function pending()
     {
-        $status = $this->FCom_Sales_Model_Order_Status->statusPending();
+        $status = $this->FCom_Sales_Model_Order_CustomStatus->statusPending();
         $data = [];
         $data['status'] = $status->name;
         $data['status_id'] = $status->id;
@@ -115,7 +115,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function status()
     {
-        return $this->FCom_Sales_Model_Order_Status->orm()->where('id', $this->status_id)->find_one();
+        return $this->FCom_Sales_Model_Order_CustomStatus->orm()->where('id', $this->status_id)->find_one();
     }
 
 

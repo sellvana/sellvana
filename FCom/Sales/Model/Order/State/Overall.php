@@ -1,15 +1,24 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_Sales_Model_Order_State_Overall extends FCom_Sales_Model_Order_State_Abstract
+class FCom_Sales_Model_Order_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
 {
     protected $_valueLabels = [
         'new' => 'New',
         'review' => 'Under Review',
+        'fraud' => 'Fraud',
+        'legit' => 'Passed Verification',
         'processing' => 'Processing',
         'complete' => 'Complete',
         'canceled' => 'Canceled',
-        'fraud' => 'Fraud',
         'archived' => 'Archived',
+    ];
+
+    protected $_setValueNotificationTemplates =[
+        'new' => 'email/sales/order-state-overall-new',
+        'review' => 'email/sales/order-state-overall-review',
+        'fraud' => 'email/sales/order-state-overall-fraud',
+        'legit' => 'email/sales/order-state-overall-legit',
+        'canceled' => 'email/sales/order-state-overall-canceled',
     ];
 
     public function setNew()
@@ -20,6 +29,16 @@ class FCom_Sales_Model_Order_State_Overall extends FCom_Sales_Model_Order_State_
     public function setReview()
     {
         return $this->changeState('review');
+    }
+
+    public function setLegit()
+    {
+        return $this->changeState('legit');
+    }
+
+    public function setFraud()
+    {
+        return $this->changeState('fraud');
     }
 
     public function setProcessing()
@@ -35,11 +54,6 @@ class FCom_Sales_Model_Order_State_Overall extends FCom_Sales_Model_Order_State_
     public function setCanceled()
     {
         return $this->changeState('canceled');
-    }
-
-    public function setFraud()
-    {
-        return $this->changeState('fraud');
     }
 
     public function setArchived()
