@@ -1,15 +1,15 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_Sales_Model_Order_State_Payment extends FCom_Core_Model_Abstract_State_Concrete
+class FCom_Sales_Model_Order_Item_State_Payment extends FCom_Core_Model_Abstract_State_Concrete
 {
     protected $_valueLabels = [
         'new' => 'New',
         'free' => 'Free',
         'processing' => 'Processing',
-        'partial' => 'Partial',
         'paid' => 'Paid',
         'outstanding' => 'Outstanding',
         'canceled' => 'Canceled',
+        'partial' => 'Partial',
     ];
 
     public function setNew()
@@ -25,11 +25,6 @@ class FCom_Sales_Model_Order_State_Payment extends FCom_Core_Model_Abstract_Stat
     public function setProcessing()
     {
         return $this->changeState('processing');
-    }
-
-    public function setPartial()
-    {
-        return $this->changeState('partial');
     }
 
     public function setPaid()
