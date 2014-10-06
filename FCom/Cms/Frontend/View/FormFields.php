@@ -15,6 +15,10 @@ class FCom_Cms_Frontend_View_FormFields extends FCom_Core_View_Abstract
         $fieldOptions = [];
         foreach ($formFields as $fieldConfig) {
             $fieldConfig['options'] = $this->BUtil->fromJson($fieldConfig['options']);
+            if(!empty($fieldConfig['options']['options'])){
+                $options = explode(',', $fieldConfig['options']['options']);
+                $fieldConfig['options']['options'] = array_combine($options, $options);
+            }
             $fieldOptions[] = $fieldConfig;
         }
 

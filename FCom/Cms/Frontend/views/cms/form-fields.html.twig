@@ -15,6 +15,7 @@
         {% set ro = options.readonly %}
         {% set atr = options.attributes %}
         {% set cls = options.css_class|replace({',': ' '}) %}
+        {{ dump(cls) }}
         {% if typ in formElements %}
             {% if typ == 'text' %}
                 {{ forms.input({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val,
@@ -22,7 +23,9 @@
             {% elseif typ == 'hidden' %}
                 {{ forms.hidden({id: id, name: nm, type: typ, value: val}) }}
             {% elseif typ == 'select' %}
-                {{ forms.select({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val, placeholder: ph}) }}
+                {% set opts = options.options %}
+                {{ forms.select({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val,
+                    input_class: cls, readonly: ro, attr: atr, options: opts}) }}
             {% elseif typ == 'boolean' %}
                 {{ forms.boolean({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val, placeholder: ph}) }}
             {% elseif typ == 'textarea' %}
