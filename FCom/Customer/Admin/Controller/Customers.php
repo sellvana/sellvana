@@ -155,7 +155,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
 
             //set default billing / shipping from addressed grid
             $data = $args['data'];
-            if ($data['default_billing_id']) {
+            if (!empty($data['default_billing_id'])) {
                 $address = $hlp->load($data['default_billing_id']);
                 /** @type FCom_Customer_Model_Address $address */
                 if ($address->customer_id == $customer->id) {
@@ -163,7 +163,7 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
                     $address->set('is_default_billing', 1)->save();
                 }
             }
-            if ($data['default_shipping_id']) {
+            if (!empty($data['default_shipping_id'])) {
                 $address = $hlp->load($data['default_billing_id']);
                 /** @type FCom_Customer_Model_Address $address */
                 if ($address->customer_id == $customer->id) {
