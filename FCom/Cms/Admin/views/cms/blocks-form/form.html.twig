@@ -94,7 +94,7 @@
                                 }
                                 if (mainFields[fieldName]) {
                                     temp.set(fieldName, fieldValue);
-                                } else {
+                                } else if(fieldName != ''){
                                     options[fieldName] = fieldValue;
                                 }
                                 console.log(temp);
@@ -104,8 +104,15 @@
                             temp.set('options', JSON.stringify(options));
                         }
                         var rows = mainGrid.getRows();
+                        var rowsSize = rows.size();
+                        var id = 1;
+                        if(rowsSize != 0) {
+                            // some rows in collection
+                            var last = rows.at(rowsSize - 1);
+                            id = last.get('id') - 0; // make sure it is number
+                        }
                         temp.set('_new', true);
-                        temp.set('id', rows.size() + 1);
+                        temp.set('id', id + 1);
                         rows.add(temp);
                         $modal.modal('hide');
                         e.preventDefault();
