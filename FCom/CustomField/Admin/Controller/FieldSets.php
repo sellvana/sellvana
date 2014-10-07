@@ -125,6 +125,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         $orm = $this->FCom_CustomField_Model_Field->orm('f')->select('f.*')
             ->select('(select count(*) from ' . $this->FCom_CustomField_Model_FieldOption->table() . ' where field_id=f.id)', 'num_options')
         ;
+        
         $config = [
             'config' => [
                 'id' => 'fields',
@@ -136,7 +137,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
                     ['type' => 'input', 'name' => 'field_code', 'label' => 'Field Code', 'width' => 100, 'editable' => true, 'editor' => 'text',
-                            'defualt' => '', 'addable' => true, 'mass-editable' => true, 'validation' => ['required' => true,
+                            'default' => '', 'addable' => true, 'mass-editable' => true, 'validation' => ['required' => true,
                             'unique' => $this->BApp->href('/customfields/fields/unique_field')]],
                     ['type' => 'input', 'name' => 'field_name', 'label' => 'Field Name', 'width' => 100, 'editable' => true, 'editor' => 'text',
                             'default' => '', 'addable' => true, 'mass-editable' => true, 'validation' => ['required' => true]],
@@ -166,8 +167,8 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                         'editor' => 'select', 'addable' => true, 'mass-editable' => true, 'validation' => ['required' => true],
                         'options' => ['1' => 'Yes', '0' => 'No']],
                     ['type' => 'btn_group', 'buttons' => [
-                        ['name' => 'custom', 'caption' => 'options...', 'cssClass' => 'btn-custom'],
-                        ['name' => 'edit'],
+                        ['name' => 'edit_custom', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom'],
+                        //['name' => 'edit'],
                         ['name' => 'delete']
                     ]]
                 ],
@@ -185,13 +186,11 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     '_quick' => ['expr' => 'field_code like ? or id like ', 'args' => ['%?%', '%?%']]
                 ],
                 'actions' => [
-                    //'new'=>array('caption'=>'Add a field', 'modal'=>true),
                     'edit' => true,
                     'delete' => true
                 ],
-                //'callbacks'=>array('after_render'=>'afterRowRenderFieldsGrid'),
                 'grid_before_create' => 'fieldsGridRegister',
-                'new_button' => '#add_new_field'
+                //'new_button' => '#add_new_field'
             ]
         ];
         return $config;
@@ -222,7 +221,8 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     'new' => ['caption' => 'Insert New Option'],
                     'delete' => ['caption' => 'Remove', 'confirm' => false]
                 ],
-                'grid_before_create' => 'optionsGridRegister'
+                'grid_before_create' => 'optionsGridRegister',
+                'after_modalForm_render' => 'optionsGridRendered'
             ]
         ];
 
@@ -372,15 +372,44 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
     public function action_field_grid_data__POST()
     {
+    	$p = $this->BRequest->post();
+        $hlp = $this->FCom_CustomField_Model_FieldOption;
+        $op = 0;
+        
+        // In case field is dropdown
+        if (($p['admin_input_type'] == 'select' || $p['admin_input_type'] == 'multiselect') && !empty($p['rows'])) {
+        	$models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($p['rows'], 'id'))->find_many_assoc();
+        	
+	        foreach ($p['rows'] as $row) {
+	            if (!empty($models[$row['id']])) {
+	                $models[$row['id']]->set('label', $row['label'])->save();
+	                $op++;
+	            } else {
+	                $data = ['field_id' => (int)$p['id'], 'label' => (string)$row['label']];
+	                if (!$hlp->orm()->where($data)->find_one()) {
+	                    $hlp->create($data)->save();
+	                    $op++;
+	                }
+	
+	            }
+	        }
+        } else {
+        	// Delete all options
+        	$hlp->delete_many(['field_id' => (int)$p['id']]);
+        }
+        
+        //$this->BResponse->json(['success' => true, 'options' => $op]);
         $this->_processGridDataPost('FCom_CustomField_Model_Field');
     }
 
     public function action_field_option_grid_data__POST()
     {
+    	print_r($_POST);
+    	die();
         $p = $this->BRequest->post();
         $hlp = $this->FCom_CustomField_Model_FieldOption;
         $op = 0;
-//        $model->delete_many(['field_id' => $p['field_id']]);
+        
         $models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($p['rows'], 'id'))->find_many_assoc();
         foreach ($p['rows'] as $row) {
             if (!empty($models[$row['id']])) {
