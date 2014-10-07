@@ -1,6 +1,7 @@
 {% import THIS.view('core/form-elements').twigName() as forms %}
 {% set fieldOptions = THIS.getParam("fieldOptions") %}
 {% set formElements = ['text','hidden', 'select', 'boolean', 'textarea', 'wysiwyg'] %}
+{% set inputElements = ['number','email', 'url', 'date', 'time'] %}
 <form class="cms-block-form" method="post">
     {% for field in fieldOptions %}
         {% set nm = field.name %}
@@ -15,7 +16,7 @@
         {% set ro = options.readonly %}
         {% set atr = options.attributes %}
         {% set cls = options.css_class|replace({',': ' '}) %}
-        {{ dump(cls) }}
+        <!--{{ dump(cls) }}-->
         {% if typ in formElements %}
             {% if typ == 'text' %}
                 {{ forms.input({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val,
@@ -27,13 +28,20 @@
                 {{ forms.select({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val,
                     input_class: cls, readonly: ro, attr: atr, options: opts}) }}
             {% elseif typ == 'boolean' %}
-                {{ forms.boolean({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val, placeholder: ph}) }}
+                {{ forms.boolean({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val}) }}
             {% elseif typ == 'textarea' %}
-                {{ forms.textarea({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val, placeholder: ph}) }}
+                {% set rws = options.rows %}
+                {% set cols = options.cols %}
+                {{ forms.textarea({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val, placeholder: ph,
+                    input_class: cls, readonly: ro, attr: atr, rows: rws, cols:cols }) }}
             {% elseif typ == 'wysiwyg' %}
-                {{ forms.wysiwyg({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val, placeholder: ph}) }}
+                {% set rws = options.rows %}
+                {{ forms.wysiwyg({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val, placeholder: ph,
+                        input_class: cls, readonly: ro, attr: atr, rows: rws, cols:cols }) }}
             {% endif %}
+        {% elseif typ in inputElements %}
+            {{ forms.input({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val,
+                placeholder: ph, input_class: cls, autocomplete: auto, readonly: ro, attr: atr}) }}
         {% endif %}
-        {#{{ dump(field) }}#}
     {% endfor %}
 </form>
