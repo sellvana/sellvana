@@ -1,5 +1,15 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Catalog_Frontend_View_Pager
+ *
+ * @property $default_page_size
+ * @property $page_size_options
+ * @property $view_as_options
+ * @property $default_view_as
+ * @property $sort_options
+ * @property $default_sort
+ */
 class FCom_Catalog_Frontend_View_Pager extends FCom_Core_View_Abstract
 {
     public function getViewAs()

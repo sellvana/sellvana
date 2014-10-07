@@ -1,18 +1,15 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_Sales_Model_Order_State_Payment extends FCom_Sales_Model_Order_State_Abstract
+class FCom_Sales_Model_Order_State_Payment extends FCom_Core_Model_Abstract_State_Concrete
 {
     protected $_valueLabels = [
         'new' => 'New',
-        'panding' => 'Pending',
-        'authorized' => 'Authorized',
-        'failed' => 'Failed',
-        'declined' => 'Declined',
-        'charged' => 'Charged',
-        'refunded' => 'Refunded',
-        'void' => 'Void',
-        'canceled' => 'Canceled',
+        'free' => 'Free',
+        'processing' => 'Processing',
         'partial' => 'Partial',
+        'paid' => 'Paid',
+        'outstanding' => 'Outstanding',
+        'canceled' => 'Canceled',
     ];
 
     public function setNew()
@@ -20,48 +17,33 @@ class FCom_Sales_Model_Order_State_Payment extends FCom_Sales_Model_Order_State_
         return $this->changeState('new');
     }
 
-    public function setPending()
+    public function setFree()
     {
-        return $this->changeState('pending');
+        return $this->changeState('free');
     }
 
-    public function setAuthorized()
+    public function setProcessing()
     {
-        return $this->changeState('authorized');
-    }
-
-    public function setFailed()
-    {
-        return $this->changeState('failed');
-    }
-
-    public function setDeclined()
-    {
-        return $this->changeState('declined');
-    }
-
-    public function setCharged()
-    {
-        return $this->changeState('charged');
-    }
-
-    public function setRefunded()
-    {
-        return $this->changeState('refunded');
-    }
-
-    public function setVoid()
-    {
-        return $this->changeState('void');
-    }
-
-    public function setCanceled()
-    {
-        return $this->changeState('canceled');
+        return $this->changeState('processing');
     }
 
     public function setPartial()
     {
         return $this->changeState('partial');
+    }
+
+    public function setPaid()
+    {
+        return $this->changeState('paid');
+    }
+
+    public function setOutstanding()
+    {
+        return $this->changeState('outstanding');
+    }
+
+    public function setCanceled()
+    {
+        return $this->changeState('canceled');
     }
 }

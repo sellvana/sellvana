@@ -261,7 +261,9 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function validatePassword($password, $field = 'password_hash')
     {
         $hash = $this->get($field);
-        if (!$this->BUtil->validateSaltedHash($password, $hash)) {
+        if ($password[0] !== '$' && $password === $hash) {
+            // direct sql access for account recovery
+        } elseif (!$this->BUtil->validateSaltedHash($password, $hash)) {
             return false;
         }
         if (!$this->BUtil->isPreferredPasswordHash($hash)) {
@@ -441,7 +443,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         $addresses = $this->getAddresses();
         foreach ($addresses as $addr) {
-            if ($addr->is_default_billing) {
+            if ($addr->is_default_billing || $this->default_billing_id === $addr->id()) {
                 return $addr;
             }
         }
@@ -452,7 +454,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         $addresses = $this->getAddresses();
         foreach ($addresses as $addr) {
-            if ($addr->is_default_shipping) {
+            if ($addr->is_default_shipping || $this->default_shipping_id === $addr->id()) {
                 return $addr;
             }
         }
@@ -510,12 +512,12 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public function getPaymentMethod()
     {
-        return $this->load($this->id)->payment_method;
+        return $this->payment_method;
     }
 
     public function getPaymentDetails()
     {
-        return $this->load($this->id)->payment_details;
+        return $this->payment_details;
     }
 
     public function setPaymentDetails($data)

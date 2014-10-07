@@ -505,7 +505,7 @@ class BLayout extends BClass
      * Find a view by matching its name to a regular expression
      *
      * @param string $re
-     * @return array
+     * @return BView[]
      */
     public function findViewsRegex($re)
     {
@@ -643,11 +643,12 @@ class BLayout extends BClass
     }
 
     /**
-    * Load layout update from file
-    *
-    * @param string $layoutFilename
-    * @return BLayout
-    */
+     * Load layout update from file
+     *
+     * @param string $layoutFilename
+     * @throws BException
+     * @return BLayout
+     */
     public function loadLayout($layoutFilename)
     {
 #echo "<pre>"; debug_print_backtrace(); echo "</pre>";
@@ -1121,6 +1122,10 @@ class BLayout extends BClass
         return $this;
     }
 
+    /**
+     * @param $themeName
+     * @return $this
+     */
     public function loadThemeViews($themeName)
     {
         if (empty($this->_themes[$themeName])) {
@@ -1229,12 +1234,20 @@ class BLayout extends BClass
         return $result;
     }
 
+    /**
+     * @param $view
+     * @return $this
+     */
     public function viewStackOn($view)
     {
         array_push($this->_currentViewStack, $view);
         return $this;
     }
 
+    /**
+     * @param $view
+     * @return $this
+     */
     public function viewStackOff($view)
     {
         $lastView = array_pop($this->_currentViewStack);
@@ -1246,6 +1259,10 @@ class BLayout extends BClass
         return $this;
     }
 
+    /**
+     * @param bool $formatted
+     * @return array|string
+     */
     public function getViewStack($formatted = false)
     {
         if (!$formatted) {
@@ -1659,6 +1676,10 @@ class BView extends BClass
         return $result;
     }
 
+    /**
+     * @param null $viewContent
+     * @return mixed|null|string
+     */
     public function collectMetaData($viewContent = null)
     {
         $t = BDebug::debug('COLLECT META DATA: ' . $this->getParam('view_name'));
@@ -1906,6 +1927,9 @@ class BView extends BClass
         return $this->_validators[$formName];
     }
 
+    /**
+     * @return string
+     */
     public function twigName()
     {
         return "@{$this->_params['module_name']}/{$this->_params['view_name']}{$this->_params['file_ext']}";
@@ -2063,6 +2087,9 @@ class BViewHead extends BView
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function csrf_token()
     {
         $this->addMeta('csrf-token', $this->BSession->csrfToken());
@@ -2113,6 +2140,9 @@ class BViewHead extends BView
         }
     }
 
+    /**
+     * @return $this
+     */
     public function removeAll()
     {
         $this->_elements = [];
@@ -2428,6 +2458,11 @@ if ($this->BDebug->is('DEBUG')) {
         return $this;
     }
 
+    /**
+     * @param null $name
+     * @param null $path
+     * @return $this
+     */
     public function requireModulePath($name = null, $path = null)
     {
         if (null === $name) {
@@ -2444,6 +2479,12 @@ if ($this->BDebug->is('DEBUG')) {
         return $this;
     }
 
+    /**
+     * @param $name
+     * @param $path
+     * @param null $shim
+     * @return $this
+     */
     public function requireJs($name, $path, $shim = null)
     {
         $this->_requireJs['config']['paths'][$name] = $path;
@@ -2453,18 +2494,29 @@ if ($this->BDebug->is('DEBUG')) {
         return $this;
     }
 
+    /**
+     * @param $config
+     * @return $this
+     */
     public function requireConfig($config)
     {
         $this->_requireJs['config'] = $this->BUtil->arrayMerge($this->_requireJs['config'], $config);
         return $this;
     }
 
+    /**
+     * @param $names
+     * @return $this
+     */
     public function requireRun($names)
     {
         $this->_requireJs['run'] = array_merge($this->_requireJs['run'], (array)$names);
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function renderRequireJs()
     {
         $jsArr = [];

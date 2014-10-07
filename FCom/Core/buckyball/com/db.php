@@ -1258,7 +1258,7 @@ class BORM extends ORMWrapper
      * Find one row
      *
      * @param int|null $id
-     * @return BModel
+     * @return $this
      */
     public function find_one($id = null)
     {
@@ -1272,7 +1272,7 @@ class BORM extends ORMWrapper
     /**
     * Find many rows (SELECT)
     *
-    * @return array
+    * @return $this[]
     */
     public function find_many()
     {
@@ -1818,8 +1818,9 @@ class BORM extends ORMWrapper
 
 /**
  * ORM model base class
- * @property static string $_table
- * @property static array $_fieldOptions
+ * @property string $_table
+ * @property array $_fieldOptions
+ * @property BORM $orm
  *
  * DI
  * core
@@ -2138,13 +2139,14 @@ class BModel extends Model
     }
 
     /**
-    * Enhanced set method, allowing to set multiple values, and returning $this for chaining
-    *
-    * @param string|array $key
-    * @param mixed $value
-    * @param mixed $flag if true or 'ADD', add to existing value; if null or 'IFNULL', update only if currently not set
-    * @return BModel
-    */
+     * Enhanced set method, allowing to set multiple values, and returning $this for chaining
+     *
+     * @param string|array $key
+     * @param mixed $value
+     * @param mixed $flag if true or 'ADD', add to existing value; if null or 'IFNULL', update only if currently not set
+     * @throws BException
+     * @return $this
+     */
     public function set($key, $value = null, $flag = false)
     {
         if (is_array($key)) {
@@ -2180,7 +2182,7 @@ class BModel extends Model
      *
      * @param string $key
      * @param int    $increment
-     * @return BModel
+     * @return $this
      */
     public function add($key, $increment = 1)
     {
@@ -2304,7 +2306,7 @@ class BModel extends Model
      * @param int|string|array $where
      * @param string $field
      * @param boolean $cache
-     * @return BModel
+     * @return $this
      */
     public function loadOrCreate($where, $field = null, $cache = false)
     {
@@ -2318,7 +2320,7 @@ class BModel extends Model
     /**
     * Placeholder for after load callback
     *
-    * @return BModel
+    * @return $this
     */
     public function onAfterLoad()
     {
@@ -2330,7 +2332,7 @@ class BModel extends Model
     * Apply afterLoad() to all models in collection
     *
     * @param array $arr Model collection
-    * @return BModel
+    * @return $this
     */
     public function mapAfterLoad($arr)
     {
@@ -2343,7 +2345,7 @@ class BModel extends Model
     /**
     * Clear model cache
     *
-    * @return BModel
+    * @return $this
     */
     public function cacheClear()
     {
@@ -2357,7 +2359,7 @@ class BModel extends Model
     * @param mixed $where complex where @see BORM::where_complex()
     * @param mixed $field cache key
     * @param mixed $sort
-    * @return BModel
+    * @return $this
     */
     public function cachePreload($where = null, $field = null, $sort = null)
     {
@@ -2380,7 +2382,7 @@ class BModel extends Model
     * @param array $collection
     * @param string $fk foreign key field
     * @param string $lk local key field
-    * @return BModel
+    * @return $this
     */
     public function cachePreloadFrom($collection, $fk = 'id', $lk = 'id')
     {
@@ -2412,7 +2414,7 @@ class BModel extends Model
     *
     * @param string $toKey
     * @param string $fromKey
-    * @return BModel
+    * @return $this
     */
     public function cacheCopy($toKey, $fromKey = 'id')
     {
@@ -2430,7 +2432,7 @@ class BModel extends Model
      * Save all dirty models in cache
      *
      * @param string $field
-     * @return BModel
+     * @return $this
      */
     public function cacheSaveDirty($field = 'id')
     {
@@ -2470,7 +2472,7 @@ class BModel extends Model
     *
     * @param string|array $field one or more fields to store the cache for
     * @param array $collection external model collection to store into cache
-    * @return BModel
+    * @return $this
     */
     public function cacheStore($field = 'id', $collection = null)
     {
@@ -2541,10 +2543,9 @@ class BModel extends Model
 
     /**
     * Save method returns the model object for chaining
-    *
-    *
     * @param boolean $callBeforeAfter whether to call onBeforeSave and onAfterSave methods
-    * @return BModel
+    * @param boolean $replace
+    * @return $this
     */
     public function save($callBeforeAfter = true, $replace = false)
     {
@@ -2573,6 +2574,9 @@ class BModel extends Model
         return $this;
     }
 
+    /**
+     * @param bool $asNew
+     */
     public function resave($asNew = false)
     {
         $this->orm->set_dirty_fields($this->as_array(), true);
@@ -2610,6 +2614,9 @@ class BModel extends Model
         return true;
     }
 
+    /**
+     * @return $this
+     */
     public function delete()
     {
         try {
@@ -2636,6 +2643,9 @@ class BModel extends Model
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function onAfterDelete()
     {
         $this->BEvents->fire($this->_origClass() . '::onAfterDelete', ['model' => $this]);
@@ -2846,7 +2856,7 @@ class BModel extends Model
     * @deprecated
     * @param string $key
     * @param mixed $value
-    * @return mixed
+    * @return $this
     */
     public function instanceCache($key, $value = null)
     {
@@ -2858,6 +2868,11 @@ class BModel extends Model
         return $this;
     }
 
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
     public function saveInstanceCache($key, $value)
     {
         $thisHash = spl_object_hash($this);
@@ -2955,6 +2970,12 @@ class BModel extends Model
         }
     }
 
+    /**
+     * @param string $field
+     * @param string $key
+     * @param string $emptyValue
+     * @return array
+     */
     public function fieldOptions($field = null, $key = null, $emptyValue = null)
     {
         if (null === $field) {
@@ -2986,6 +3007,12 @@ class BModel extends Model
         return $options;
     }
 
+    /**
+     * @param $labelField
+     * @param string $idField
+     * @param null $sortBy
+     * @return array
+     */
     static public function as_values($labelField, $idField = 'id', $sortBy = null)
     {
         $orm = static::orm()->select($idField)->select($labelField);
@@ -3057,6 +3084,9 @@ class BModel extends Model
         if ($di) {
             #$this->_diLocal[$property] = $di;
             return $di;
+        }
+        if (preg_match('#^[A-Z][A-Za-z0-9]+_[A-Z][A-Za-z0-9_]+$#', $property)) {
+            BDebug::error("Invalid DI class name: " . $property);
         }
 
         if (!is_object($this->orm)) {
