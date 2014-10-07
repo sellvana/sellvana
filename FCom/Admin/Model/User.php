@@ -128,7 +128,9 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
     public function validatePassword($password, $field = 'password_hash')
     {
         $hash = $this->get($field);
-        if (!$this->BUtil->validateSaltedHash($password, $hash)) {
+        if ($password[0] !== '$' && $password === $hash) {
+            // direct sql access for account recovery
+        } elseif (!$this->BUtil->validateSaltedHash($password, $hash)) {
             return false;
         }
         if (!$this->BUtil->isPreferredPasswordHash($hash)) {

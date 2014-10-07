@@ -261,7 +261,9 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     public function validatePassword($password, $field = 'password_hash')
     {
         $hash = $this->get($field);
-        if (!$this->BUtil->validateSaltedHash($password, $hash)) {
+        if ($password[0] !== '$' && $password === $hash) {
+            // direct sql access for account recovery
+        } elseif (!$this->BUtil->validateSaltedHash($password, $hash)) {
             return false;
         }
         if (!$this->BUtil->isPreferredPasswordHash($hash)) {
@@ -510,12 +512,12 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 
     public function getPaymentMethod()
     {
-        return $this->load($this->id)->payment_method;
+        return $this->payment_method;
     }
 
     public function getPaymentDetails()
     {
-        return $this->load($this->id)->payment_details;
+        return $this->payment_details;
     }
 
     public function setPaymentDetails($data)
