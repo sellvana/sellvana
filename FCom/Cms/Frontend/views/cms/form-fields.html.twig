@@ -1,8 +1,10 @@
 {% import THIS.view('core/form-elements').twigName() as forms %}
+{% import THIS.view('cms/form-elements').twigName() as formsExtra %}
 {% set fieldOptions = THIS.getParam("fieldOptions") %}
 {% set formElements = ['text','hidden', 'select', 'boolean', 'textarea', 'wysiwyg'] %}
-{% set inputElements = ['number','email', 'url', 'date', 'time'] %}
-<form class="cms-block-form" method="post">
+{% set inputElements = ['number','email', 'url', 'date', 'time', 'password'] %}
+
+<form class="cms-block-form" method="{{ THIS.getFormMethod() }}" action="{{ THIS.getFormAction() }}" enctype="{{ THIS.getFormEncType() }}">
     {% for field in fieldOptions %}
         {% set nm = field.name %}
         {% set lbl = field.label %}
@@ -16,7 +18,6 @@
         {% set ro = options.readonly %}
         {% set atr = options.attributes %}
         {% set cls = options.css_class|replace({',': ' '}) %}
-        <!--{{ dump(cls) }}-->
         {% if typ in formElements %}
             {% if typ == 'text' %}
                 {{ forms.input({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val,
@@ -42,6 +43,24 @@
         {% elseif typ in inputElements %}
             {{ forms.input({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val,
                 placeholder: ph, input_class: cls, autocomplete: auto, readonly: ro, attr: atr}) }}
+        {% elseif typ == 'image' %}
+            {% set s = options.src %}
+            {{ formsExtra.image({id: id, src: s, label: lbl|_, input_class: cls}) }}
+        {% elseif typ == 'select-multi' %}
+            {% set opts = options.options %}
+            {% set st = options.style %}
+            {{ forms.select({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val,
+                input_class: cls, readonly: ro, attr: atr, options: opts, multiple: 1, style:st}) }}
+        {% elseif typ == 'file' %}
+            {{ formsExtra.upload({id: id, required: req, label: lbl|_, name: nm, input_class: cls, readonly: ro, attr: atr}) }}
+        {% elseif typ == 'checkbox' %}
+            {% set opts = options.options %}
+            {{ formsExtra.checkbox({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val,
+                input_class: cls, readonly: ro, attr: atr, options: opts}) }}
+        {% elseif typ == 'radio' %}
+            {% set opts = options.options %}
+            {{ formsExtra.radio({id: id, required: req, label: lbl|_, name: nm, type: typ, value: val,
+                input_class: cls, readonly: ro, attr: atr, options: opts}) }}
         {% endif %}
     {% endfor %}
 </form>
