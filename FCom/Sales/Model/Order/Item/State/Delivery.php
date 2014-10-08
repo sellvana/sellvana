@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_Sales_Model_Order_State_Delivery extends FCom_Core_Model_Abstract_State_Concrete
+class FCom_Sales_Model_Order_Item_State_Delivery extends FCom_Core_Model_Abstract_State_Concrete
 {
     protected $_valueLabels = [
         'virtual' => 'Virtual',
@@ -13,9 +13,9 @@ class FCom_Sales_Model_Order_State_Delivery extends FCom_Core_Model_Abstract_Sta
     ];
 
     protected $_setValueNotificationTemplates =[
-        'shipped' => 'email/sales/order-state-delivery-shipped',
-        'delivered' => 'email/sales/order-state-delivery-delivered',
-        'returned' => 'email/sales/order-state-delivery-returned',
+        'shipped' => 'email/sales/order-item-state-delivery-shipped',
+        'delivered' => 'email/sales/order-item-state-delivery-delivered',
+        'returned' => 'email/sales/order-item-state-delivery-returned',
     ];
 
     public function setPending()

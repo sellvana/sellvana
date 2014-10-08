@@ -3085,6 +3085,9 @@ class BModel extends Model
             #$this->_diLocal[$property] = $di;
             return $di;
         }
+        if (preg_match('#^[A-Z][A-Za-z0-9]+_[A-Z][A-Za-z0-9_]+$#', $property)) {
+            BDebug::error("Invalid DI class name: " . $property);
+        }
 
         if (!is_object($this->orm)) {
             BDebug::error("Calling ".__FUNCTION__."() without \$orm setup: ", 1, true);

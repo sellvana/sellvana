@@ -55,7 +55,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $billAddress = $cart->getBillingAddress();
 
         if (!$shipAddress && $customer) {
-            $cart->importAddressesFromCustomer($customer);
+            $result = $cart->importAddressesFromCustomer($customer);
             $shipAddress = $cart->getShippingAddress();
             $billAddress = $cart->getBillingAddress();
         }
@@ -153,7 +153,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
                     $customer->login(); // make sure customer is logged in
                     $billAddress = $cart->getBillingAddress();
                     $custBillAddress = $billAddress->exportToCustomer($customer);
-                    $customer->default_billing_id = $custBillAddress->id();
+                    $customer->set('default_billing_id', $custBillAddress->id());
                     if ($cart->same_address) {
                         $customer->default_shipping_id = $custBillAddress->id();
                     } else {
