@@ -10,10 +10,6 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
     	optionsGrid = grid;
     	optionsGrid.build();
     };
-    
-    window.optionsGridRendered = function(el) {
-    	console.log('saaaaaa');
-    };
 
     window.fieldsGridRegister = function(grid) {
         fieldsGrid = grid;
@@ -29,7 +25,12 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
                 reset: true,
                 success: function () {
                     optionsGrid.getGridView().render();
-                    $('#options-form').validate();
+                    if (optionsGrid.getRows().length > 0) {
+                        $('#options-form').validate();
+                        $(optionsGrid.getGridSkeleton().NewButton).removeClass('disabled');
+                    } else {
+                        $(optionsGrid.getGridSkeleton().NewButton).addClass('disabled');
+                    }
                 }
             });
 			
@@ -56,13 +57,14 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
     $('button.field-modal-save').click(function() {
         if (optionForm.valid() && fieldForm.valid()) {
             var dataForm = optionForm.serializeArray();
-            rows = optionsGrid.getRows().toJSON();
-            rows.forEach(function (data, index) {
+            var rows = optionsGrid.getRows().toJSON();
+            /*rows.forEach(function (data, index) {
                 data.label =  dataForm[index]['value'];
-            });
+            });*/
             
             fieldsGrid.getGridSkeleton().modalElementVals = {'rows': rows};
             if (fieldsGrid.getModalForm().saveChanges()) {
+                selectedRow.set('num_options', optionsGrid.getRows().length);
             	selectedRow.trigger('render');
             	$('button.field-modal-close').trigger('click');
             }

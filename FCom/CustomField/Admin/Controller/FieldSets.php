@@ -222,7 +222,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
                     'delete' => ['caption' => 'Remove', 'confirm' => false]
                 ],
                 'grid_before_create' => 'optionsGridRegister',
-                'after_modalForm_render' => 'optionsGridRendered'
+                //'after_modalForm_render' => 'optionsGridRendered'
             ]
         ];
 
@@ -399,13 +399,11 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
         }
         
         //$this->BResponse->json(['success' => true, 'options' => $op]);
-        $this->_processGridDataPost('FCom_CustomField_Model_Field');
+        $this->_processGridDataPost('FCom_CustomField_Model_Field', array('num_options' => $op));
     }
 
     public function action_field_option_grid_data__POST()
     {
-    	print_r($_POST);
-    	die();
         $p = $this->BRequest->post();
         $hlp = $this->FCom_CustomField_Model_FieldOption;
         $op = 0;
