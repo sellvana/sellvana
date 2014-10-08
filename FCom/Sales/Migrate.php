@@ -2,7 +2,7 @@
 
 class FCom_Sales_Migrate extends BClass
 {
-    public function install__0_2_12()
+    public function install__0_2_14()
     {
         $tOrder = $this->FCom_Sales_Model_Order->table();
         $this->BDb->ddlTableDef($tOrder, [
@@ -27,6 +27,11 @@ class FCom_Sales_Migrate extends BClass
                 'data_serialized' => "text",
                 'unique_id' => "varchar(15) NOT NULL",
                 'admin_id' => "int(10) unsigned DEFAULT NULL",
+                'same_address' => "tinyint(1) not null default 0",
+                'state_overall' => "varchar(15) not null default 'new'",
+                'state_delivery' => "varchar(15) not null default 'pending'",
+                'state_payment' => "varchar(15) not null default 'new'",
+                'state_custom' => "varchar(15) not null default ''",
             ],
             'PRIMARY' => '(id)',
             'KEYS' => [
@@ -124,6 +129,7 @@ class FCom_Sales_Migrate extends BClass
                 'data_serialized' => "text NULL",
                 'last_calc_at' => "int unsigned",
                 'admin_id' => "int(10) unsigned  NULL",
+                'same_address' => "tinyint(1) not null default 0",
             ],
             'PRIMARY' => '(id)',
             'KEYS' => [
@@ -196,7 +202,8 @@ class FCom_Sales_Migrate extends BClass
                 "FK_{$tAddress}_cart" => "FOREIGN KEY (`cart_id`) REFERENCES {$tCart} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ],
         ]);
-        $this->BDb->ddlTableDef($this->FCom_Sales_Model_Order_Payment->table(), [
+        $tOrderPayment = $this->FCom_Sales_Model_Order_Payment->table();
+        $this->BDb->ddlTableDef($tOrderPayment, [
             'COLUMNS' => [
                 'id'               => 'int (10) unsigned not null auto_increment',
                 'create_at'        => 'datetime not null',
@@ -220,7 +227,7 @@ class FCom_Sales_Migrate extends BClass
                 'transaction_type' => '(transaction_type)',
             ],
             'CONSTRAINTS' => [
-                'fk_payment_order' => "FOREIGN KEY (order_id) REFERENCES {$tOrder}(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                "FK_{$tOrderPayment}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE RESTRICT ON UPDATE CASCADE",
             ],
         ]);
     }
@@ -559,8 +566,9 @@ class FCom_Sales_Migrate extends BClass
 
     public function upgrade__0_2_6__0_2_7()
     {
-        $oTable = $this->FCom_Sales_Model_Order->table();
-        $this->BDb->ddlTableDef($this->FCom_Sales_Model_Order_Payment->table(), [
+        $tOrder = $this->FCom_Sales_Model_Order->table();
+        $tOrderPayment = $this->FCom_Sales_Model_Order_Payment->table();
+        $this->BDb->ddlTableDef($tOrderPayment, [
             'COLUMNS' => [
                 'id'               => 'int (10) unsigned not null auto_increment',
                 'create_at'        => 'datetime not null',
@@ -584,7 +592,7 @@ class FCom_Sales_Migrate extends BClass
                 'transaction_type' => '(transaction_type)',
             ],
             'CONSTRAINTS' => [
-                'fk_payment_order' => "FOREIGN KEY (order_id) REFERENCES {$oTable}(id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                "FK_{$tOrderPayment}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE RESTRICT ON UPDATE CASCADE",
             ],
         ]);
     }
@@ -674,6 +682,67 @@ class FCom_Sales_Migrate extends BClass
         $this->BDb->ddlTableDef($tOrder, [
             'COLUMNS' => [
                 'same_address' => "tinyint(1) not null default 0",
+            ],
+        ]);
+    }
+
+    public function upgrade__0_2_13__0_2_14()
+    {
+        $tOrder = $this->FCom_Sales_Model_Order->table();
+        $tOrderItem = $this->FCom_Sales_Model_Order_Item->table();
+        $tOrderShipment = $this->FCom_Sales_Model_Order_Shipment->table();
+        $tOrderReturn = $this->FCom_Sales_Model_Order_Return->table();
+        $tOrderReturnItem = $this->FCom_Sales_Model_Order_Return_Item->table();
+        $tOrderRefund = $this->FCom_Sales_Model_Order_Refund->table();
+        $tOrderReturnItem = $this->FCom_Sales_Model_Order_Refund_Item->table();
+        $tOrderHistory = $this->FCom_Sales_Model_Order_History->table();
+
+        $this->BDb->ddlTableDef($tOrder, [
+            'COLUMNS' => [
+                'state_overall' => "varchar(10) not null default 'new'",
+                'state_delivery' => "varchar(10) not null default 'pending'",
+                'state_payment' => "varchar(10) not null default 'new'",
+                'state_custom' => "varchar(10) not null default ''",
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderItem, [
+            'COLUMNS' => [
+                'state_overall' => "varchar(10) not null default 'new'",
+                'state_delivery' => "varchar(10) not null default 'pending'",
+                'state_payment' => "varchar(10) not null default 'new'",
+                'state_custom' => "varchar(10) not null default ''",
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderShipment, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned not null',
+                'state_overall' => "varchar(10) not null default 'new'",
+                'state_custom' => "varchar(10) not null default 'new'",
+                'carrier_code' => 'varchar(20)',
+                'carrier_desc' => 'varchar(50)',
+                'service_code' => 'varchar(20)',
+                'service_desc' => 'varchar(50)',
+                'carrier_price' => 'decimal(12,2)',
+                'customer_price' => 'decimal(12,2)',
+                'shipping_size' => 'varchar(30)',
+                'shipping_weight' => 'decimal(12,2)',
+                'num_items' => 'smallint',
+                'create_at' => 'datetime not null',
+                'packed_at' => 'datetime',
+                'estimated_ship_at' => 'datetime',
+                'shipped_at' => 'datetime',
+                'estimated_delivery_at' => 'datetime',
+                'delivered_at' => 'datetime',
+            ],
+            'PRIMARY' => '(id)',
+            'KEYS' => [
+
+            ],
+            'CONSTRAINTS' => [
+
             ],
         ]);
     }

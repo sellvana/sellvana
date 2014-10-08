@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_Sales_Model_Order_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
+class FCom_Sales_Model_Order_Item_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
 {
     protected $_valueLabels = [
         'new' => 'New',
@@ -14,11 +14,11 @@ class FCom_Sales_Model_Order_State_Overall extends FCom_Core_Model_Abstract_Stat
     ];
 
     protected $_setValueNotificationTemplates =[
-        'new' => 'email/sales/order-state-overall-new',
-        'review' => 'email/sales/order-state-overall-review',
-        'fraud' => 'email/sales/order-state-overall-fraud',
-        'legit' => 'email/sales/order-state-overall-legit',
-        'canceled' => 'email/sales/order-state-overall-canceled',
+        'new' => 'email/sales/order-item-state-overall-new',
+        'review' => 'email/sales/order-item-state-overall-review',
+        'fraud' => 'email/sales/order-item-state-overall-fraud',
+        'legit' => 'email/sales/order-item-state-overall-legit',
+        'canceled' => 'email/sales/order-item-state-overall-canceled',
     ];
 
     public function setNew()
