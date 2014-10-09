@@ -389,18 +389,27 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
             if (!empty($data['admin_input_type']) && in_array($data['admin_input_type'], ['select', 'multiselect']) && !empty($data['rows'])) {
                 $models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($data['rows'], 'id'))->find_many_assoc();
 
+                $rowDeleteIds = !empty($data['rowsDelete']) ? $data['rowsDelete'] : [];
+
                 foreach ($data['rows'] as $row) {
-                    if (!empty($models[$row['id']])) { //update option
-                        $models[$row['id']]->set('label', $row['label'])->save();
-                        $op++;
-                    } else { //create option
-                        $rowData = ['field_id' => $model->id, 'label' => (string)$row['label']];
-                        if (!$hlp->orm()->where($rowData)->find_one()) {
-                            $hlp->create($rowData)->save();
+                    if (!in_array($row['id'], $rowDeleteIds)) { //make sure this row is not in rows will be deleted
+                        if (!empty($models[$row['id']])) { //update option
+                            $models[$row['id']]->set('label', $row['label'])->save();
                             $op++;
+                        } else { //create option
+                            $rowData = ['field_id' => $model->id, 'label' => (string)$row['label']];
+                            if (!$hlp->orm()->where($rowData)->find_one()) {
+                                $hlp->create($rowData)->save();
+                                $op++;
+                            }
                         }
                     }
                 }
+
+                if ($rowDeleteIds) {
+                    $hlp->delete_many(['id' => $rowDeleteIds]);
+                }
+
             } else {
                 // Delete all options
                 $hlp->delete_many(['field_id' => $model->id]);

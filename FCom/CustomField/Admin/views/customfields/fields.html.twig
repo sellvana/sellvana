@@ -2,7 +2,7 @@
 
 <script>
 require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, Backbone) {
-    var fieldsGrid, optionsGrid, addGrid, selectedRow;
+    var fieldsGrid, optionsGrid, selectedRow, originOptionIds, removedOptionIds;
     var optionForm = $('#options-form');
     var fieldForm = $('#field-modal-form');
     
@@ -24,6 +24,7 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
             optionsGrid.getRows().fetch({
                 reset: true,
                 success: function () {
+                    originOptionIds = optionsGrid.getRows().pluck('id');
                     optionsGrid.getGridView().render();
                     if (optionsGrid.getRows().length > 0) {
                         $('#options-form').validate();
@@ -61,8 +62,12 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
             /*rows.forEach(function (data, index) {
                 data.label =  dataForm[index]['value'];
             });*/
+
+            //delete option
+            removedOptionIds = _.difference(originOptionIds, optionsGrid.getRows().pluck('id'));
+            console.log(removedOptionIds);
             
-            fieldsGrid.getGridSkeleton().modalElementVals = {'rows': rows};
+            fieldsGrid.getGridSkeleton().modalElementVals = {'rows': rows, 'rowsDelete': removedOptionIds};
             if (fieldsGrid.getModalForm().saveChanges()) {
                 selectedRow.set('num_options', optionsGrid.getRows().length);
             	selectedRow.trigger('render');
