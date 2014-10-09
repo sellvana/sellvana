@@ -372,34 +372,42 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
     public function action_field_grid_data__POST()
     {
-    	$p = $this->BRequest->post();
-        $hlp = $this->FCom_CustomField_Model_FieldOption;
-        $op = 0;
-        
-        // In case field is dropdown
-        if (($p['admin_input_type'] == 'select' || $p['admin_input_type'] == 'multiselect') && !empty($p['rows'])) {
-        	$models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($p['rows'], 'id'))->find_many_assoc();
-        	
-	        foreach ($p['rows'] as $row) {
-	            if (!empty($models[$row['id']])) {
-	                $models[$row['id']]->set('label', $row['label'])->save();
-	                $op++;
-	            } else {
-	                $data = ['field_id' => (int)$p['id'], 'label' => (string)$row['label']];
-	                if (!$hlp->orm()->where($data)->find_one()) {
-	                    $hlp->create($data)->save();
-	                    $op++;
-	                }
-	
-	            }
-	        }
-        } else {
-        	// Delete all options
-        	$hlp->delete_many(['field_id' => (int)$p['id']]);
-        }
-        
         //$this->BResponse->json(['success' => true, 'options' => $op]);
-        $this->_processGridDataPost('FCom_CustomField_Model_Field', array('num_options' => $op));
+        $this->_processGridDataPost('FCom_CustomField_Model_Field');
+    }
+
+    public function gridPostAfter($args)
+    {
+        if ($this->getAction() == 'field_grid_data') {
+            /** @var FCom_CustomField_Model_Field $model */
+            $data = $args['data'];
+            $model = $args['model'];
+            $hlp = $this->FCom_CustomField_Model_FieldOption;
+            $op = 0;
+
+            // save options in case field is dropdown
+            if (!empty($data['admin_input_type']) && in_array($data['admin_input_type'], ['select', 'multiselect']) && !empty($data['rows'])) {
+                $models = $hlp->orm()->where_in('id', $this->BUtil->arrayToOptions($data['rows'], 'id'))->find_many_assoc();
+
+                foreach ($data['rows'] as $row) {
+                    if (!empty($models[$row['id']])) { //update option
+                        $models[$row['id']]->set('label', $row['label'])->save();
+                        $op++;
+                    } else { //create option
+                        $rowData = ['field_id' => $model->id, 'label' => (string)$row['label']];
+                        if (!$hlp->orm()->where($rowData)->find_one()) {
+                            $hlp->create($rowData)->save();
+                            $op++;
+                        }
+                    }
+                }
+            } else {
+                // Delete all options
+                $hlp->delete_many(['field_id' => $model->id]);
+            }
+
+            $args['result']['num_options'] = $op;
+        }
     }
 
     public function action_field_option_grid_data__POST()
