@@ -1,5 +1,26 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CustomField_Model_Field
+ *
+ * @property int $id
+ * @property string $field_type (product|will be add more value)
+ * @property string $field_code
+ * @property string $table_field_type
+ * @property string $admin_input_type
+ * @property string $frontend_label
+ * @property int $frontend_show
+ * @property string $config_json
+ * @property int $sort_order
+ * @property string $facet_select (No|Exclusive|Inclusive)
+ * @property int $system
+ * @property int $multilanguage
+ * @property string $validation
+ * @property int $required
+ *
+ * DI
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ */
 class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;

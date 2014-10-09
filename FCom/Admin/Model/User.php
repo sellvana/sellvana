@@ -1,5 +1,33 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_Model_User
+ *
+ * @property int $id
+ * @property int $superior_id
+ * @property string $username
+ * @property int $is_superadmin
+ * @property int $role_id
+ * @property string $email
+ * @property string $password_hash
+ * @property string $firstname
+ * @property string $lastname
+ * @property string $phone
+ * @property string $phone_ext
+ * @property string $fax
+ * @property int $status
+ * @property string $tz
+ * @property string $locale
+ * @property string $create_at
+ * @property string $update_at
+ * @property string $token
+ * @property string $token_at
+ * @property string $api_username
+ * @property string $api_password
+ * @property string $api_password_hash
+ * @property string $data_serialized
+ * @property string $password_session_token
+ */
 class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 {
     const
@@ -42,6 +70,9 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 
     protected $_permissions;
 
+    /**
+     * @return array
+     */
     public function statusOptions()
     {
         return [
@@ -50,6 +81,11 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         ];
     }
 
+    /**
+     * @param $password
+     * @return FCom_Admin_Model_User
+     * @throws BException
+     */
     public function setPassword($password)
     {
         $token = $this->BUtil->randomString(16);
@@ -105,6 +141,10 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         }
     }
 
+    /**
+     * @param array $objHashes
+     * @return array
+     */
     public function as_array(array $objHashes = [])
     {
         $data = parent::as_array();
@@ -113,6 +153,12 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $data;
     }
 
+    /**
+     * validate password strength
+     * @param $data
+     * @param $args
+     * @return bool|false|string
+     */
     public function validatePasswordSecurity($data, $args)
     {
         if (!$this->BConfig->get('modules/FCom_Admin/password_strength')) {
@@ -125,6 +171,13 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return true;
     }
 
+    /**
+     * validate password
+     * @param string $password
+     * @param string $field
+     * @return bool
+     * @throws BException
+     */
     public function validatePassword($password, $field = 'password_hash')
     {
         $hash = $this->get($field);
@@ -139,13 +192,22 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return true;
     }
 
+    /**
+     * @param $orm
+     * @param $role
+     * @return mixed
+     */
     public function has_role($orm, $role)
     {
         return $orm->where('role', $role);
     }
 
+    /**
+     * @return array
+     */
     public function options()
     {
+        /** @var FCom_Admin_Model_User[] $users */
         $users = $this->orm()
             ->select('id')->select('firstname')->select('lastname')
             ->find_many();
@@ -156,6 +218,9 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $options;
     }
 
+    /**
+     * @return int user_id
+     */
     public function sessionUserId()
     {
         return $this->BSession->get('admin_user_id');
@@ -196,6 +261,9 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return static::$_sessionUser;
     }
 
+    /**
+     * @return bool
+     */
     public function isLoggedIn()
     {
         return $this->sessionUserId() ? true : false;
@@ -227,6 +295,11 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $user;
     }
 
+    /**
+     * @param $username
+     * @param $password
+     * @return bool|FCom_Admin_Model_User
+     */
     public function authenticateApi($username, $password)
     {
         if (empty($username) || empty($password)) {
@@ -245,6 +318,10 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $user;
     }
 
+    /**
+     * @return FCom_Admin_Model_User
+     * @throws BException
+     */
     public function login()
     {
         //session_regenerate_id(true);
@@ -278,6 +355,10 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         static::$_sessionUser = null;
     }
 
+    /**
+     * @return FCom_Admin_Model_User
+     * @throws BException
+     */
     public function recoverPassword()
     {
         $this->set(['token' => $this->BUtil->randomString(), 'token_at' => $this->BDb->now()])->save();
@@ -285,6 +366,11 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param $token
+     * @return FCom_Admin_Model_User|bool
+     * @throws BException
+     */
     public function validateResetToken($token)
     {
         if (!$token) {
@@ -305,6 +391,11 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $user;
     }
 
+    /**
+     * @param $password
+     * @return FCom_Admin_Model_User
+     * @throws BException
+     */
     public function resetPassword($password)
     {
         $this->set(['token' => null, 'token_at' => null])->setPassword($password)->save();
@@ -312,16 +403,27 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @return int
+     */
     public function tzOffset()
     {
         return $this->BLocale->tzOffset($this->get('tz'));
     }
 
+    /**
+     * @return string
+     */
     public function fullname()
     {
         return $this->get('firstname') . ' ' . $this->get('lastname');
     }
 
+    /**
+     * @param $w
+     * @param null $h
+     * @return string
+     */
     public function thumb($w, $h = null)
     {
         return $this->BUtil->gravatar($this->get('email'));
@@ -366,6 +468,11 @@ class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param $paths
+     * @return bool
+     * @throws BException
+     */
     public function getPermission($paths)
     {
         if ($this->get('is_superadmin')) {
