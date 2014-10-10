@@ -2344,7 +2344,7 @@ class BActionController extends BClass
     *
     * @param string $actionName
     * @param array $args Action arguments
-    * @return forward information
+    * @return mixed forward information
     */
     public function dispatch($actionName, $args = [])
     {
@@ -2381,11 +2381,12 @@ class BActionController extends BClass
     }
 
     /**
-    * Try to dispatch action and catch exception if any
-    *
-    * @param string $actionName
-    * @param array $args
-    */
+     * Try to dispatch action and catch exception if any
+     *
+     * @param string $actionName
+     * @param array $args
+     * @return $this
+     */
     public function tryDispatch($actionName, $args)
     {
         if (!is_string($actionName) && is_callable($actionName)) {

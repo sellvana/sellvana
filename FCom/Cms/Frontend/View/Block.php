@@ -105,16 +105,18 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
         return $content;
     }
 
+    /**
+     * @return string
+     */
     protected function _prepareFormFields()
     {
+
         $model = $this->getBlockModel($this);
-        $block = [
-            'block' => 'form_fields',
-            'view_class' => 'FCom_Cms_Frontend_View_FormFields',
-            'view_name' => 'cms/form-fields'
-        ];
+        $formEnable = $model->get('form_enable');
+        if (!$formEnable) {
+            return '';
+        }
         /** @var FCom_Cms_Frontend_View_FormFields $view */
-        //$view = $this->createView($block);
         $view = $this->BLayout->getView('cms/form-fields');
         $view->generateContent($model);
 

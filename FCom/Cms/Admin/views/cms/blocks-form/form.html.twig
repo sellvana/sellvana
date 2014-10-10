@@ -3,7 +3,11 @@
 
 {% set blockCtrl = APP.instance('FCom_Cms_Admin_Controller_Blocks') %}
 {% set grid = blockCtrl.formFieldGrid(model) %}
-
+{% set validator = THIS.get('validator') %}
+{% set fieldData = { validator:validator } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
+<fieldset class="form-horizontal">
+<div class="f-section">
 <script type="text/javascript">
     require(['backbone', 'underscore', 'jquery'], function (Backbone, _, $) {
 
@@ -186,7 +190,7 @@
     });
 </script>
 
-{{ forms.boolean(fieldData, {field:'form_enabled', label:'Form Enabled'|_}) }}
+{{ forms.boolean(fieldData, {field:'form_enable', label:'Form Enabled'|_, select2:true}) }}
 <input type='hidden' id='block_form_fields_data' name='model[form_fields]'/>
 
 {#<div class='' id='frontend-field-grid-modal' tabindex='-1'>#}
@@ -461,4 +465,5 @@
         {{ THIS.view('core/backbonegrid').set('grid', blockCtrl.formFieldGrid(model))| raw }}
     </div>
 </div>
-
+</div>
+</fieldset>

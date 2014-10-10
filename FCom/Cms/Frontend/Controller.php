@@ -59,7 +59,7 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 return;
             }
         } catch (Exception $e) {
-
+            $this->BDebug->logException($e);
         }
     }
 
