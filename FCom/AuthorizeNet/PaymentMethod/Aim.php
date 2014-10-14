@@ -55,7 +55,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
             'parent_id'        => $response['transaction_id'],
             'order_id'         => $this->getOrder()->id(),
             'amount'           => $this->getDetail('amount_due'),
-            'status'           => $status,
+            'transaction_status' => $status,
             'transaction_id'   => $response['transaction_id'],
             'transaction_type' => $action == 'AUTH_ONLY' ? 'authorize' : 'sale',
             'online'           => 1,

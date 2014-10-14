@@ -2,11 +2,11 @@
 
 class FCom_CustomField_Frontend extends BClass
 {
-    public function onCheckoutCartAddValidate($args)
+    public function onCartWorkflowCustomerAddsItemsValidate($args)
     {
         $p = $args['product'];
         $defaultVariant = [
-            'product_id' => $args['post']['id'],
+            'product_id' => $p->id(),
             'variant_qty' => $args['options']['qty'],
             'variant_price' => $args['options']['price'],
             'field_values' => ""
@@ -43,6 +43,18 @@ class FCom_CustomField_Frontend extends BClass
             }
         }
         $args['options']['data']['variants'] = $defaultVariant;
+
+        if (isset($args['post']['shopper'])) {
+            $options['shopper'] = $args['post']['shopper'];
+            foreach ($options['shopper'] as $key => $value) {
+                if (!isset($value['val']) || $value['val'] == '') {
+                    unset($options['shopper'][$key]);
+                }
+                if ($value['val'] == 'checkbox') {
+                    unset($options['shopper'][$key]['val']);
+                }
+            }
+        }
         return true;
     }
 }

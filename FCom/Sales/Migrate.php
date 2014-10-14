@@ -55,8 +55,8 @@ class FCom_Sales_Migrate extends BClass
             ],
         ]);
 
-        $tAddress = $this->FCom_Sales_Model_Order_Address->table();
-        $this->BDb->ddlTableDef($tAddress, [
+        $tOrderAddress = $this->FCom_Sales_Model_Order_Address->table();
+        $this->BDb->ddlTableDef($tOrderAddress, [
             'COLUMNS' => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
                 'order_id' => "int(11) unsigned NOT NULL",
@@ -84,7 +84,7 @@ class FCom_Sales_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tAddress}_cart" => "FOREIGN KEY (`order_id`) REFERENCES {$tOrder} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderAddress}_cart" => "FOREIGN KEY (`order_id`) REFERENCES {$tOrder} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ],
         ]);
 
@@ -103,7 +103,7 @@ class FCom_Sales_Migrate extends BClass
 
         $tCart = $this->FCom_Sales_Model_Cart->table();
         $tCartItem = $this->FCom_Sales_Model_Cart_Item->table();
-        $tAddress = $this->FCom_Sales_Model_Cart_Address->table();
+        $tCartAddress = $this->FCom_Sales_Model_Cart_Address->table();
 
         $this->BDb->ddlTableDef($tCart, [
             'COLUMNS' => [
@@ -117,13 +117,13 @@ class FCom_Sales_Migrate extends BClass
                 'cookie_token' => 'varchar(40) default null',
                 'customer_id' => "int unsigned default NULL",
                 'customer_email' => "varchar(100) NULL",
-                'shipping_method' => "VARCHAR( 50 )  NULL ",
-                'shipping_price' => "DECIMAL( 10, 2 ) NULL ",
-                'shipping_service' => "CHAR( 2 )  NULL",
-                'payment_method' => "VARCHAR( 50 ) NULL ",
+                'shipping_method' => "VARCHAR(50)  NULL ",
+                'shipping_price' => "DECIMAL(10, 2) NULL ",
+                'shipping_service' => "CHAR(2)  NULL",
+                'payment_method' => "VARCHAR(50) NULL ",
                 'payment_details' => "TEXT CHARACTER SET utf8   NULL",
-                'coupon_code' => "VARCHAR( 50 ) default NULL",
-                'status' => "ENUM( 'new', 'finished' ) NOT NULL DEFAULT 'new'",
+                'coupon_code' => "VARCHAR(50) default NULL",
+                'status' => "ENUM('new', 'finished') NOT NULL DEFAULT 'new'",
                 'create_at' => "DATETIME NULL",
                 'update_at' => "DATETIME NULL",
                 'data_serialized' => "text NULL",
@@ -170,7 +170,7 @@ class FCom_Sales_Migrate extends BClass
             ],
         ]);
 
-        $this->BDb->ddlTableDef($tAddress, [
+        $this->BDb->ddlTableDef($tCartAddress, [
             'COLUMNS' => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
                 'cart_id' => "int(11) unsigned NOT NULL",
@@ -199,7 +199,7 @@ class FCom_Sales_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tAddress}_cart" => "FOREIGN KEY (`cart_id`) REFERENCES {$tCart} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tCartAddress}_cart" => "FOREIGN KEY (`cart_id`) REFERENCES {$tCart} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ],
         ]);
         $tOrderPayment = $this->FCom_Sales_Model_Order_Payment->table();
@@ -324,7 +324,7 @@ class FCom_Sales_Migrate extends BClass
 
         $tCart = $this->FCom_Sales_Model_Cart->table();
         $tCartItem = $this->FCom_Sales_Model_Cart_Item->table();
-        $tAddress = $this->FCom_Sales_Model_Cart_Address->table();
+        $tCartAddress = $this->FCom_Sales_Model_Cart_Address->table();
 
         $this->BDb->ddlTableDef($tCart, [
             'COLUMNS' => [
@@ -384,7 +384,7 @@ class FCom_Sales_Migrate extends BClass
             ],
         ]);
 
-        $this->BDb->ddlTableDef($tAddress, [
+        $this->BDb->ddlTableDef($tCartAddress, [
             'COLUMNS' => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
                 'cart_id' => "int(11) unsigned NOT NULL",
@@ -409,7 +409,7 @@ class FCom_Sales_Migrate extends BClass
             ],
             'PRIMARY' => '(`id`)',
             'CONSTRAINTS' => [
-                "FK_{$tAddress}_cart" => "FOREIGN KEY (`cart_id`) REFERENCES {$tCart} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tCartAddress}_cart" => "FOREIGN KEY (`cart_id`) REFERENCES {$tCart} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
             ],
         ]);
     }
@@ -686,16 +686,45 @@ class FCom_Sales_Migrate extends BClass
         ]);
     }
 
-    public function upgrade__0_2_13__0_2_14()
+    public function upgrade__0_2_13__0_3_0()
     {
+        $tUser = $this->FCom_Admin_Model_User->table();
+        $tCart = $this->FCom_Sales_Model_Cart->table();
         $tOrder = $this->FCom_Sales_Model_Order->table();
         $tOrderItem = $this->FCom_Sales_Model_Order_Item->table();
         $tOrderShipment = $this->FCom_Sales_Model_Order_Shipment->table();
+        $tOrderShipmentItem = $this->FCom_Sales_Model_Order_Shipment_Item->table();
+        $tOrderPayment = $this->FCom_Sales_Model_Order_Payment->table();
+        $tOrderPaymentItem = $this->FCom_Sales_Model_Order_Payment_Item->table();
         $tOrderReturn = $this->FCom_Sales_Model_Order_Return->table();
         $tOrderReturnItem = $this->FCom_Sales_Model_Order_Return_Item->table();
         $tOrderRefund = $this->FCom_Sales_Model_Order_Refund->table();
-        $tOrderReturnItem = $this->FCom_Sales_Model_Order_Refund_Item->table();
+        $tOrderRefundItem = $this->FCom_Sales_Model_Order_Refund_Item->table();
         $tOrderHistory = $this->FCom_Sales_Model_Order_History->table();
+
+        $this->BDb->ddlTableDef($tCart, [
+            'COLUMNS' => [
+                'status' => "RENAME state_overall varchar(10) not null default ''",
+
+                'billing_firstname' => 'varchar(50)',
+                'billing_lastname' => 'varchar(50)',
+                'billing_street' => 'varchar(255)',
+                'billing_city' => 'varchar(50)',
+                'billing_region' => 'varchar(50)',
+                'billing_postcode' => 'varchar(20)',
+                'billing_country' => 'char(2)',
+                'billing_phone' => 'varchar(50)',
+
+                'shipping_firstname' => 'varchar(50)',
+                'shipping_lastname' => 'varchar(50)',
+                'shipping_street' => 'varchar(255)',
+                'shipping_city' => 'varchar(50)',
+                'shipping_region' => 'varchar(50)',
+                'shipping_postcode' => 'varchar(20)',
+                'shipping_country' => 'char(2)',
+                'shipping_phone' => 'varchar(50)',
+            ],
+        ]);
 
         $this->BDb->ddlTableDef($tOrder, [
             'COLUMNS' => [
@@ -703,6 +732,24 @@ class FCom_Sales_Migrate extends BClass
                 'state_delivery' => "varchar(10) not null default 'pending'",
                 'state_payment' => "varchar(10) not null default 'new'",
                 'state_custom' => "varchar(10) not null default ''",
+
+                'billing_firstname' => 'varchar(50)',
+                'billing_lastname' => 'varchar(50)',
+                'billing_street' => 'varchar(255)',
+                'billing_city' => 'varchar(50)',
+                'billing_region' => 'varchar(50)',
+                'billing_postcode' => 'varchar(20)',
+                'billing_country' => 'char(2)',
+                'billing_phone' => 'varchar(50)',
+
+                'shipping_firstname' => 'varchar(50)',
+                'shipping_lastname' => 'varchar(50)',
+                'shipping_street' => 'varchar(255)',
+                'shipping_city' => 'varchar(50)',
+                'shipping_region' => 'varchar(50)',
+                'shipping_postcode' => 'varchar(20)',
+                'shipping_country' => 'char(2)',
+                'shipping_phone' => 'varchar(50)',
             ],
         ]);
 
@@ -722,8 +769,8 @@ class FCom_Sales_Migrate extends BClass
                 'state_overall' => "varchar(10) not null default 'new'",
                 'state_custom' => "varchar(10) not null default 'new'",
                 'carrier_code' => 'varchar(20)',
-                'carrier_desc' => 'varchar(50)',
                 'service_code' => 'varchar(20)',
+                'carrier_desc' => 'varchar(50)',
                 'service_desc' => 'varchar(50)',
                 'carrier_price' => 'decimal(12,2)',
                 'customer_price' => 'decimal(12,2)',
@@ -742,7 +789,143 @@ class FCom_Sales_Migrate extends BClass
 
             ],
             'CONSTRAINTS' => [
+                "FK_{$tOrderShipment}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+            ],
+        ]);
 
+        $this->BDb->ddlTableDef($tOrderShipmentItem, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned not null',
+                'order_item_id' => 'int unsigned not null',
+            ],
+            'PRIMARY' => '(id)',
+            'CONSTRAINTS' => [
+                "FK_{$tOrderShipmentItem}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderShipmentItem}_order_item" => "FOREIGN KEY (order_item_id) REFERENCES {$tOrderItem} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderPayment, [
+            'COLUMNS' => [
+                'method'           => 'RENAME payment_method varchar(50) not null',
+                'amount'           => 'RENAME amount_authorized decimal(12,2)',
+                'amount_due'       => 'decimal(12,2)',
+                'amount_captured'  => 'decimal(12,2)',
+                'amount_refunded'  => 'decimal(12,2)',
+                'status'           => 'RENAME transaction_status varchar(50)',
+                'state_overall'    => "varchar(20) not null default 'new'",
+                'transaction_fee'  => 'decimal(12,2)',
+            ],
+            'KEYS'  => [
+                'method'           => 'DROP',
+                'order_id'         => 'DROP',
+                'status'           => 'DROP',
+                'transaction_id'   => 'DROP',
+                'transaction_type' => 'DROP',
+
+                'IDX_method_status' => '(payment_method, transaction_status)',
+                'IDX_order'         => '(order_id)',
+                'IDX_state_overall' => '(state_overall)',
+                'IDX_transaction_id' => '(transaction_id)',
+                'IDX_transaction_type' => '(transaction_type)',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderPaymentItem, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned not null',
+                'order_item_id' => 'int unsigned not null',
+            ],
+            'PRIMARY' => '(id)',
+            'CONSTRAINTS' => [
+                "FK_{$tOrderPaymentItem}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderPaymentItem}_order_item" => "FOREIGN KEY (order_item_id) REFERENCES {$tOrderItem} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderReturn, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned not null',
+                'state_overall' => "varchar(10) not null default 'new'",
+                'state_custom' => "varchar(10) not null default 'new'",
+            ],
+            'PRIMARY' => '(id)',
+            'KEYS' => [
+
+            ],
+            'CONSTRAINTS' => [
+                "FK_{$tOrderShipment}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderReturnItem, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned not null',
+                'order_item_id' => 'int unsigned not null',
+            ],
+            'PRIMARY' => '(id)',
+            'CONSTRAINTS' => [
+                "FK_{$tOrderReturnItem}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderReturnItem}_order_item" => "FOREIGN KEY (order_item_id) REFERENCES {$tOrderItem} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderRefund, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned not null',
+                'state_overall' => "varchar(10) not null default 'new'",
+                'state_custom' => "varchar(10) not null default 'new'",
+            ],
+            'PRIMARY' => '(id)',
+            'KEYS' => [
+
+            ],
+            'CONSTRAINTS' => [
+                "FK_{$tOrderShipment}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderRefundItem, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned not null',
+                'order_item_id' => 'int unsigned not null',
+            ],
+            'PRIMARY' => '(id)',
+            'CONSTRAINTS' => [
+                "FK_{$tOrderRefundItem}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderRefundItem}_order_item" => "FOREIGN KEY (order_item_id) REFERENCES {$tOrderItem} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderHistory, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned not null',
+                'entity_type' => "varchar(20) not null default 'order'",
+                'entity_id' => 'int unsigned default null',
+                'event_type' => 'varchar(50) not null',
+                'event_description' => 'text',
+                'event_at' => 'datetime',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'user_id' => 'int unsigned default null',
+                'data_serialized' => 'text',
+            ],
+            'PRIMARY' => '(id)',
+            'KEYS' => [
+                'IDX_order_entity_id' => '(order_id, entity_type, entity_id, event_at)',
+                'IDX_event_at' => '(event_at)',
+                'IDX_event_type_at' => '(event_type, event_at)',
+            ],
+            'CONSTRAINTS' => [
+                "FK_{$tOrderHistory}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderHistory}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON DELETE CASCADE ON UPDATE CASCADE",
             ],
         ]);
     }

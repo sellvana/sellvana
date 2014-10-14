@@ -38,6 +38,10 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     protected static $_origClass = __CLASS__;
 
+    protected $_cart;
+
+    protected $_state;
+
     protected $_addresses;
 
     /**
@@ -61,6 +65,14 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         }
 
         return true;
+    }
+
+    public function state()
+    {
+        if (!$this->_state) {
+            $this->_state = $this->BClassRegistry->instance('FCom_Sales_Model_Order_State', true, [$this]);
+        }
+        return $this->_state;
     }
 
     /**
@@ -218,18 +230,27 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $data;
     }
 
-    /**
-     * @param FCom_Sales_Model_Cart $cart
-     * @return FCom_Sales_Model_Order
-     */
-    protected function _createFromCart($cart)
+    public function importDataFromCart($cart)
     {
-        $shippingMethod       = $cart->getShippingMethod();
-        $shippingServiceTitle = '';
-        if (is_object($shippingMethod)) {
-            $shippingServiceTitle = $shippingMethod->getService($cart->shipping_service);
-        }
+        $this->_cart = $cart;
+        $this
+            ->_importBasicFieldsFromCart()
+            ->save() // create unique id
 
+            ->_importAddressDataFromCart()
+            ->_importItemsDataFromCart()
+            ->_importTotalsDataFromCart()
+            ->_importShippingDataFromCart()
+            ->_importPaymentDataFromCart()
+            ->_importCouponDataFromCart()
+            ->save()
+        ;
+        return $this;
+    }
+
+    protected function _importBasicFieldsFromCart()
+    {
+        $cart = $this->_cart;
 
         $orderData                    = [];
         $orderData['cart_id']         = $cart->id();
@@ -248,33 +269,123 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             }
             */
         }
-        $orderData['item_qty']        = $cart->item_qty;
-        $orderData['subtotal']        = $cart->subtotal;
+        $orderData['create_at'] = $orderData['update_at'] = $this->BDb->now();
+
+        $this->set($orderData);
+        return $this;
+    }
+
+    protected function _importAddressDataFromCart()
+    {
+        $cart = $this->_cart;
+        $shippingAddress = $cart->getShippingAddress();
+        if ($shippingAddress) {
+            $this->FCom_Sales_Model_Order_Address->newAddress($this->id(), $shippingAddress);
+        }
+        $billingAddress = $cart->getBillingAddress();
+        if ($billingAddress) {
+            $this->FCom_Sales_Model_Order_Address->newAddress($this->id(), $billingAddress);
+        }
+        return $this;
+    }
+
+    protected function _importItemsDataFromCart()
+    {
+        $cart = $this->_cart;
+
+        foreach ($cart->items() as $item) {
+            /* @var $item FCom_Sales_Model_Cart_Item */
+            if (!$this->itemAllowed($options, $item)) {
+                continue;
+            }
+
+            $product = $item->product();
+            if (!$product) {
+                continue;
+            }
+            $productInfo = $product->as_array();
+            $productInfo['variants'] = $item->getData('variants');
+            $orderItem                 = [];
+            $orderItem['order_id']     = $this->id();
+            $orderItem['product_id']   = $item->product_id;
+            $orderItem['qty']          = $item->qty;
+            $orderItem['total']        = $item->rowTotal();
+            $orderItem['product_info'] = $this->BUtil->toJson($productInfo);
+
+            /* @var $testItem FCom_Sales_Model_Order_Item */
+            $testItem = $this->FCom_Sales_Model_Order_Item->isItemExist($orderId, $item->product_id);
+            if ($testItem) {
+                $testItem->update($orderItem);
+            } else {
+                $this->FCom_Sales_Model_Order_Item->addNew($orderItem);
+            }
+        }
+        return $this;
+    }
+
+    protected function _importTotalsDataFromCart()
+    {
+        $cart = $this->_cart;
+
+        $orderData = [];
+        $orderData['item_qty'] = $cart->item_qty;
+        $orderData['subtotal'] = $cart->subtotal;
+        $orderData['tax']      = $cart->tax;
+        //$orderData['total_json'] = $cart->total_json;
+        $orderData['balance']    = $cart->grand_total; // this has been calculated in cart
+        $orderData['grandtotal'] = $cart->grand_total; // full grand total
+
+        $this->set($orderData);
+
+        $this->setData('totals', $cart->getData('totals'));
+        $this->setData('shipping_service', $cart->get('shipping_service'));
+        return $this;
+    }
+
+    protected function _importShippingDataFromCart()
+    {
+        $cart = $this->_cart;
+
+        $shippingMethod       = $cart->getShippingMethod();
+        $shippingServiceTitle = '';
+        if (is_object($shippingMethod)) {
+            $shippingServiceTitle = $shippingMethod->getService($cart->shipping_service);
+        }
+        $orderData = [];
         $orderData['shipping_method'] = $cart->shipping_method;
         //        $orderData['shipping_service']       = $cart->shipping_service;
         $orderData['shipping_service_title'] = $shippingServiceTitle;
+        $this->set($orderData);
+        return $this;
+    }
+
+    protected function _importPaymentDataFromCart()
+    {
+        $cart = $this->_cart;
+
+        $orderData = [];
         $orderData['payment_method']         = $cart->payment_method;
+        $this->set($orderData);
+        return $this;
+    }
+
+    protected function _importCouponDataFromCart()
+    {
+        $cart = $this->_cart;
+
+        $orderData = [];
         $orderData['coupon_code']            = $cart->coupon_code;
-        $orderData['tax']                    = $cart->tax;
-        //        $orderData['total_json']             = $cart->total_json;
-        $orderData['balance']    = $cart->grand_total; // this has been calculated in cart
-        $orderData['grandtotal'] = $cart->grand_total; // full grand total
-        $orderData['create_at'] = $orderData['update_at'] = $this->BDb->now();
+        $this->set($orderData);
+        return $this;
+    }
 
-        $data_ = [
-            'totals'           => $cart->data['totals'],
-            'shipping_service' => $cart->shipping_service
-        ];
-        $orderData[static::$_dataCustomField] = $data_;
-
-        /* @var $salesOrder FCom_Sales_Model_Order */
-        $salesOrder = $this->FCom_Sales_Model_Order->load($cart->id(), 'cart_id');
-        if ($salesOrder) {
-            $salesOrder->update($orderData);
-        } else {
-            $salesOrder = $this->FCom_Sales_Model_Order->addNew($orderData);
-        }
-        return $salesOrder;
+    protected function _setDefaultStates()
+    {
+        $state = $this->state();
+        $state->overall()->setNew();
+        $state->delivery()->setNew();
+        $state->payment()->setNew();
+        $state->custom()->setDefault();
     }
 
     /**
@@ -329,15 +440,6 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
      */
     public function createOrderAddress($cart, $options)
     {
-        $orderId = isset($options['order_id']) ? $options['order_id'] : $cart->id(); // ???
-        $shippingAddress = $cart->getShippingAddress();
-        if ($shippingAddress) {
-            $this->FCom_Sales_Model_Order_Address->newAddress($orderId, $shippingAddress);
-        }
-        $billingAddress = $cart->getBillingAddress();
-        if ($billingAddress) {
-            $this->FCom_Sales_Model_Order_Address->newAddress($orderId, $billingAddress);
-        }
     }
 
     public function getAddresses()
@@ -363,42 +465,6 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             return $this->getBillingAddress();
         }
         return !empty($addresses['shipping']) ? $addresses['shipping'] : null;
-    }
-
-    /**
-     * @param FCom_Sales_Model_Cart $cart
-     * @param array $options
-     */
-    public function createOrderItems($cart, $options)
-    {
-        foreach ($cart->items() as $item) {
-            /* @var $item FCom_Sales_Model_Cart_Item */
-            if (!$this->itemAllowed($options, $item)) {
-                continue;
-            }
-
-            $product = $this->FCom_Catalog_Model_Product->load($item->product_id);
-            $orderId = isset($options['order_id']) ? $options['order_id'] : $cart->id(); // ???
-            if (!$product) {
-                continue;
-            }
-            $productInfo = $product->as_array();
-            $productInfo['variants'] = $item->getData('variants');
-            $orderItem                 = [];
-            $orderItem['order_id']     = $orderId;
-            $orderItem['product_id']   = $item->product_id;
-            $orderItem['qty']          = $item->qty;
-            $orderItem['total']        = $item->rowTotal();
-            $orderItem['product_info'] = $this->BUtil->toJson($productInfo);
-
-            /* @var $testItem FCom_Sales_Model_Order_Item */
-            $testItem = $this->FCom_Sales_Model_Order_Item->isItemExist($orderId, $item->product_id);
-            if ($testItem) {
-                $testItem->update($orderItem);
-            } else {
-                $this->FCom_Sales_Model_Order_Item->addNew($orderItem);
-            }
-        }
     }
 
     protected function itemAllowed($options, $item)
@@ -442,5 +508,10 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             //todo: confirm with Boris about add prefix 1 to order number.
             $args['seq_id'] =  '1' . $orderNumber;
         }
+    }
+
+    public function __destruct()
+    {
+        unset($this->_cart, $this->_addresses);
     }
 }

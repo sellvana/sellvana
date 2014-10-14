@@ -17,4 +17,9 @@ class FCom_PayPal_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
         $href = $this->BApp->href('paypal/redirect');
         $this->BResponse->redirect($href);
     }
+
+    public function workflowCustomerPlacesOrder($args)
+    {
+
+    }
 }

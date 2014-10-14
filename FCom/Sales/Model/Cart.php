@@ -39,9 +39,11 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     protected static $_totalRowHandlers = [];
 
     protected static $_fieldOptions = [
-        'status' => [
-            'new'     => 'New',
+        'state_overall' => [
+            'active'  => 'Active',
             'ordered' => 'Ordered',
+            'abandoned' => 'Abandoned',
+            'archived' => 'Archived',
         ],
     ];
 
@@ -63,11 +65,11 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $customer = $this->FCom_Customer_Model_Customer->sessionUser();
             //fix bug when guests login and then checkout
             if ($customer && !$this->BRequest->cookie('cart')) {
-                $cart = $this->loadOrCreate(['customer_id' => $customer->id(), "status" => "new"]);
+                $cart = $this->loadOrCreate(['customer_id' => $customer->id(), 'state_overall' => 'active']);
             } else {
                 $cookieToken = $this->BRequest->cookie('cart');
                 if ($cookieToken) {
-                    $cart = $this->loadWhere(['cookie_token' => (string)$cookieToken, 'status' => 'new']);
+                    $cart = $this->loadWhere(['cookie_token' => (string)$cookieToken, 'state_overall' => 'active']);
                     if (!$cart && !$createAnonymousIfNeeded) {
                         $this->BResponse->cookie('cart', false);
                         return false;
@@ -76,7 +78,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 if (empty($cart)) {
                     if ($createAnonymousIfNeeded) {
                         $cookieToken = $this->BUtil->randomString(32);
-                        $cart = $this->create(['cookie_token' => (string)$cookieToken, 'status' => 'new'])->save();
+                        $cart = $this->create(['cookie_token' => (string)$cookieToken, 'state_overall' => 'active'])->save();
                         $ttl = $this->BConfig->get('modules/FCom_Sales/cart_cookie_token_ttl_days') * 86400;
                         $this->BResponse->cookie('cart', $cookieToken, $ttl);
                     } else {
@@ -107,7 +109,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         // get session cart id
         $sessCart = $this->sessionCart();
         // try to load customer cart which is new (not abandoned or converted to order)
-        $custCart = $this->FCom_Sales_Model_Cart->loadWhere(['customer_id' => $customer->id(), 'status' => 'new']);
+        $custCart = $this->FCom_Sales_Model_Cart->loadWhere(['customer_id' => $customer->id(), 'state_overall' => 'active']);
 
         if ($sessCart && $custCart && $sessCart->id() !== $custCart->id()) {
 
@@ -215,6 +217,10 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this->get('item_qty') * 1;
     }
 
+    /**
+     * @todo combine variants and shopper fields into structure grouped differently, i.e. all output in the same array
+     * @todo move variants to FCom_CustomField
+     */
     public function addProduct($productId, $params = [])
     {
         //save cart to DB on add first product
@@ -239,7 +245,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 'qty' => $params['qty'], 'price' => $params['price']]);
         }
         if (isset($params['data'])) {
-
+//TODO: move "variants" logic to FCom_CustomFields
             $variants = $item->getData('variants');
             $flag = true;
             $params['data']['variants']['field_values'] = $this->BUtil->fromJson($params['data']['variants']['field_values']);
@@ -267,6 +273,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             }
             $item->setData('variants', $variants);
         }
+
         $item->save();
         if (empty($params['no_calc_totals'])) {
             $this->calculateTotals()->save();
@@ -507,15 +514,18 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function setStatus($status)
+    public function setStatus($state)
     {
-        $this->set('status', $status);
-        $this->BEvents->fire(__METHOD__, ['cart' => $this, 'status' => $status]);
+        if ($this->get('state_overall') !== $state) {
+            $this->set('state_overall', $state);
+            $this->BEvents->fire(__METHOD__, ['cart' => $this, 'state_overall' => $status]);
+        }
         return $this;
     }
 
     public function placeOrder()
     {
+
         $cart = $this->orm ? $this : $this->sessionCart();
         try {
             /* @var $cart FCom_Sales_Model_Cart */
@@ -529,7 +539,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             //$order->save();
             // $payment = $this->FCom_Sales_Model_Order_Payment->createFromCart($cart);
 //            $order->pay();
-            $cart->setStatus('ordered')->save();
+            $cart->setState('ordered')->save();
             return $order;
         } catch (Exception $e) {
             // if something failed, like bad payment method
@@ -539,11 +549,28 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return false;
     }
 
-    public function __destruct()
+    public function setStatusActive()
     {
-        $this->_addresses = null;
-        $this->items = null;
-        $this->totals = null;
+        $cart->setStateOverall('active');
+        return $this;
+    }
+
+    public function setStatusOrdered()
+    {
+        $cart->setStateOverall('ordered');
+        return $this;
+    }
+
+    public function setStatusAbandoned()
+    {
+        $cart->setStateOverall('abandoned');
+        return $this;
+    }
+
+    public function setStatusArchived()
+    {
+        $cart->setStateOverall('archived');
+        return $this;
     }
 
     public function setPaymentDetails($data = [])
@@ -565,4 +592,12 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         }
 
     }
+
+    public function __destruct()
+    {
+        $this->_addresses = null;
+        $this->items = null;
+        $this->totals = null;
+    }
+
 }

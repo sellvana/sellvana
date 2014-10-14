@@ -16,6 +16,9 @@ class FCom_Sales_Main extends BClass
             $this->FCom_Sales_Model_Cart->registerTotalRowHandler('FCom_Sales_Model_Cart_Total_' . $total);
         }
 
+        $this->FCom_Sales_Workflow_Cart->registerWorkflow();
+        $this->FCom_Sales_Workflow_Order->registerWorkflow();
+
         $this->FCom_Admin_Model_Role->createPermission([
             'sales' => 'Sales',
             'sales/orders' => 'Orders',

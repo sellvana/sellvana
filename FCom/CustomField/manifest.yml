@@ -33,4 +33,4 @@ modules:
                 auto_use: [ views ]
                 observe:
                     - [ "BLayout::hook:custom-fields-filters", FCom_CustomField_Main.hookCustomFieldFilters ]
-                    - [ "FCom_Checkout_Frontend_Controller_Cart::action_add__POST:validate", FCom_CustomField_Frontend.onCheckoutCartAddValidate ]
+                    - [ "FCom_Sales_Workflow_Cart::customerAddsItems:validate", FCom_CustomField_Frontend.onCartWorkflowCustomerAddsItemsValidate ]
