@@ -1,0 +1,15 @@
+<form class="navbar-form f-header-search-form {{ THIS.get('for_mobile') ? 'visible-xs' : 'hidden-xs' }}" role="search" action="{{ APP.href('catalog/search') }}">
+  <input type="text" class="form-control typeahead" placeholder="{{ 'Search the store'|_ }}" name="q" value="{{ THIS.get('query') }}">
+  <button type="submit" class="btn btn-default {{ THIS.get('for_mobile') ? 'btn-sm' }}"><span class="glyphicon glyphicon-search"></span></button>
+</form>
+{% if not THIS.get('for_mobile') %}
+  <script type="text/javascript">
+    require(['jquery', 'typeahead'], function($) {
+      $('.header-search-form input.typeahead').typeahead({
+        name: 'countries',
+        prefetch: 'test-countries.json',
+        limit: 10
+      });
+    })
+  </script>
+{% endif %}

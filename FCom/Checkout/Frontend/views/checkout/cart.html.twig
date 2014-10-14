@@ -9,6 +9,7 @@
     <h1 class="f-page-title">{{ 'Shopping Cart' }}</h1>
 </header>
 {% if false == cartItems %}
+    {{ THIS.view('core/messages') | raw }}
     {{ THIS.view('core/messages').set('messages', [{type:'info', msg:"Your cart is empty. "|_}]) | raw }}
 {% else %}
     {{ THIS.view('core/messages') | raw }}

@@ -1,3 +1,6 @@
+base:
+    - { hook: header-top-search, views: catalog/header-search }
+
 catalog/product/pager:
     - view: catalog/product/pager
         set:
