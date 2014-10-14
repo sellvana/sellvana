@@ -1,3 +1,6 @@
+base:
+  - { hook: footer-widget, views: subscription/newsletter-block }
+
 /email/pref:
     - { include: base }
     - { hook: main, views: subscription/email-pref }

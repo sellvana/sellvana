@@ -22,19 +22,7 @@
                 <dd><a href="#">Shipping Policy</a></dd>
                 <dd><a href="#">Help</a></dd>
             </dl>
-            {# consider the way to add widget to themes #}
-            {% if APP.m('FCom_Email').run_status == 'LOADED' %}
-            <form class="col-md-3 col-sm-3 f-mini-newsletter" role="form" action="{{ APP.href('email/subscribe') }}"
-                  method="post">
-                <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
-
-                <div class="form-group">
-                    <label for="newsletter-email" class="f-col-title">{{ "Subscribe to our newsletter"|_ }}</label>
-                    <input type="email" name="email" class="form-control required" id="newsletter-email" placeholder="Enter your email">
-                </div>
-                <button type="submit" class="btn btn-default btn-sm">{{ "Subscribe"|_ }}</button>
-            </form>
-            {% endif %}
+            {{ THIS.hook('footer-widget') | raw }}
         </div>
         <p class="f-copyright">&copy; {{ 'now'|date('Y') }} {{ CONFIG.get('modules/FCom_Core/copyright_message') }} {{ "All rights reserved."|_ }}
             <a href="{{ APP.href('privacy') }}">{{ "Privacy Notice"|_ }}</a>
@@ -42,21 +30,3 @@
         </p>
     </div>
 </div>
-
-{% if APP.m('FCom_Email').run_status == 'LOADED' %}
-<script>
-    require(['jquery', 'jquery.validate'], function($) {
-        var newsletterForm = $('form.f-mini-newsletter');
-        newsletterForm.validate({
-            submitHandler: function (form) {
-                newsletterForm.find('label.error, label.success').remove();
-                var inputEmail = newsletterForm.find('#newsletter-email');
-                $.post(newsletterForm.attr('action'), newsletterForm.serialize(), function(data, status, xhr) {
-                    var label = $('<label/>').attr('for', inputEmail.attr('id')).addClass(data.status).text(data.message);
-                    inputEmail.after(label);
-                });
-            }
-        });
-    })
-</script>
-{% endif %}
