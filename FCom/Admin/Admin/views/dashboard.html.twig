@@ -123,7 +123,7 @@
             <div class="form-group col-sm-12">
                 <div class="alert alert-danger alert-dismissable" id="wigets-avail-status">
                     <h4>
-                        <b>All available widgets have been added.</b>
+                        <b>{{ 'All available widgets have been added.'|_ }}</b>
                         <br><br>
                     </h4>
                 </div>
@@ -248,7 +248,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
 
   $('#add-widget-submit').click(function(ev) {
     load(select.val(), true, true);
-    $('#add-widget-selection option[value="'+ select.val() +'"]').remove();
+    $('#add-widget-selection').find('option[value="'+ select.val() +'"]').remove();
     select.val('');
     $('#add-widget-modal').modal('hide');
 
@@ -348,7 +348,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
       })
     }
     //delay: 100,
-  })
+  });
 
   sortable.on('click', '.js-remove', function(idx, el) {
     var $el = $(this);
@@ -375,7 +375,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
 
         check_avail_status();
     });
-  })
+  });
 
   sortable.on('click', '.js-collapse', function(idx, el) {
     var $el = $(this);
@@ -383,7 +383,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
     $.post(personalizeUrl, postData, function(response, status, xhr) {
       console.log(response);
     });
-  })
+  });
   $(".datepicker").datetimepicker({
       pickTime: false
   });
