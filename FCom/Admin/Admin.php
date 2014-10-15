@@ -36,6 +36,7 @@ FCom.Admin.baseUrl = "' . rtrim($this->BConfig->get('web/base_src'), '/') . '/' 
 FCom.Admin.codemirrorBaseUrl = "' . $this->BApp->src('@FCom_Admin/Admin/js/codemirror') . '";
 FCom.Admin.upload_href = "' . $this->BApp->href('upload') . '";
 FCom.Admin.personalize_href = "' . $this->BApp->href('my_account/personalize') . '";
+FCom.Admin.current_mode = "'.BDebug::mode().'";
             ');
 
             $config = $this->BConfig->get('modules/FCom_Admin');
