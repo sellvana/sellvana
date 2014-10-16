@@ -1,11 +1,11 @@
 {% import THIS.view('core/form-elements').twigName() as forms %}
 {% set hlp = APP.instance('FCom_Customer_Import') %}
 {% set info = hlp.getFileInfo(THIS.get('dir') ~ '/' ~ THIS.get('file')) %}
-{#{% if not info %}#}
-    {#<div class="panel-body">#}
-        {#{{ 'Invalid file format, please go back and select another file'|_ }}#}
-    {#</div>#}
-{#{% else %}#}
+{% if not info %}
+    <div class="panel-body">
+        {{ 'Invalid file format, please go back and select another file'|_ }}
+    </div>
+{% else %}
     <div class="panel-body">
         <form id="import-columns-form" class="form form-horizontal" method="post">
             <input type="hidden" name="config[filename]" value="{{ THIS.get('file') }}" />
@@ -69,4 +69,4 @@
             </div>
         </form>
     </div>
-{#{% endif %}#}
+{% endif %}
