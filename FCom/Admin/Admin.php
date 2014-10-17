@@ -40,8 +40,8 @@ class FCom_Admin_Admin extends BClass
             /** @type FCom_Core_View_Head $head */
             $head->js_raw('admin_init', '
 FCom.Admin = {};
-FCom.Admin.baseUrl = "' . rtrim($this->BConfig->get('web/base_src'), '/') . '/' . '";
-FCom.Admin.codemirrorBaseUrl = "' . $this->BApp->src('@FCom_Admin/Admin/js/codemirror') . '";
+FCom.Admin.base_url = "' . rtrim($this->BConfig->get('web/base_src'), '/') . '/' . '";
+FCom.Admin.code_mirror_base_url = "' . $this->BApp->src('@FCom_Admin/Admin/js/codemirror') . '";
 FCom.Admin.upload_href = "' . $this->BApp->href('upload') . '";
 FCom.Admin.personalize_href = "' . $this->BApp->href('my_account/personalize') . '";
 FCom.Admin.current_mode = "'.$this->BDebug->mode().'";

@@ -1204,7 +1204,7 @@ define(fcomAdminDeps, function ($) {
     FCom.Admin.initCodeEditors = function () {
         if (typeof CodeMirror == 'undefined') return;
 
-        var scriptBaseUrl = FCom.Admin.codemirrorBaseUrl;
+        var scriptBaseUrl = FCom.Admin.code_mirror_base_url;
 
         CodeMirror.modeURL = scriptBaseUrl + '/mode/%N/%N.js';
 
