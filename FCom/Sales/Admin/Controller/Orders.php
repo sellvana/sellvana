@@ -97,12 +97,12 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $billing = $this->FCom_Sales_Model_Order_Address->findByOrder($orderId, 'billing');
         if ($shipping) {
             $order->shipping_name = $shipping->firstname . ' ' . $shipping->lastname;
-            $order->shipping_address = $this->FCom_Sales_Model_Order_Address->as_html($shipping);
+            $order->shipping_address = $order->addressAsHtml('shipping');
             $order->shipping = $shipping;
         }
         if ($billing) {
             $order->billing_name = $billing->firstname . ' ' . $billing->lastname;
-            $order->billing_address = $this->FCom_Sales_Model_Order_Address->as_html($billing);
+            $order->billing_address = $order->addressAsHtml('billing');
             $order->billing = $billing;
         }
 

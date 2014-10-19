@@ -18,6 +18,11 @@ class FCom_Sales_Main extends BClass
 
         $this->FCom_Sales_Workflow_Cart->registerWorkflow();
         $this->FCom_Sales_Workflow_Order->registerWorkflow();
+        $this->FCom_Sales_Workflow_Payment->registerWorkflow();
+        $this->FCom_Sales_Workflow_Shipment->registerWorkflow();
+        $this->FCom_Sales_Workflow_Return->registerWorkflow();
+        $this->FCom_Sales_Workflow_Refund->registerWorkflow();
+        $this->FCom_Sales_Workflow_Comment->registerWorkflow();
 
         $this->FCom_Admin_Model_Role->createPermission([
             'sales' => 'Sales',

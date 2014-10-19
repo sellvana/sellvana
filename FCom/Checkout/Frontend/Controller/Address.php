@@ -38,15 +38,8 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             $addressType = 'billing';
         }
 
-        $address = $this->FCom_Sales_Model_Cart_Address->orm()->where("cart_id", $cart->id())->where('atype', $addressType)->find_one();
-        if (!$address) {
-            $address = $this->FCom_Sales_Model_Cart_Address->create();
-            $address->cart_id = $cart->id();
-            if ($atype == 's') {
-                $address->atype = 'shipping';
-            } else {
-                $address->atype = 'billing';
-            }
+        $address = $cart->addressAsObject($addressType);
+        if (!$address->country) {
             $address->country = $this->FCom_Core_Main->getDefaultCountry();
         }
         $customer = $this->FCom_Customer_Model_Customer->sessionUser();
@@ -108,21 +101,14 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
             $this->BResponse->redirect($href);
             return;
         }
-        /* @var FCom_Sales_Model_Cart_Address $address */
-        $address = $addressType === 'billing' ? $cart->getBillingAddress() : $cart->getShippingAddress();
-        if (!$address) {
-            $address = $this->FCom_Sales_Model_Cart_Address->create();
-        }
-        if (!$address->validate($r, [], 'address-form')) {
+        if (!$cart->validateAddress($r, [], 'address-form')) {
             $this->BResponse->redirect("checkout/address?t=" . $atype);
             return;
         }
 
-        if ($address) {
-            $address->set($r);
-            $address->atype = $addressType;
-            $address->cart_id = $cart->id();
-            $address->save();
+        $cart->importAddressFromArray($r, $addressType);
+        if (!empty($r['same_address']) {
+            $cart->importAddressFromArray($r, $addressType2);
         }
 
         if (!$cart->customer_email) {
@@ -130,37 +116,19 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         }
         $cart->set('same_address', !empty($r['same_address']));
         $cart->save();
-        /*
-        if ($r['same_address']) {
-            //copy shipping address to billing address
-            $addressCopy = $cart->getAddressByType($addressType2);
-            if (!$addressCopy) {
-                $addressCopy = $this->FCom_Sales_Model_Cart_Address->create();
-                $addressCopy->cart_id = $cart->id();
-            }
-            $addressCopy->set($r);
-            $addressCopy->atype = $addressType2;
-            $addressCopy->save();
-        }
-        */
 
-        if ($this->BApp->m('FCom_Customer')) {
-            //todo move this code to FCom_Customer and add the trigger for this event
-            $user = $this->FCom_Customer_Model_Customer->sessionUser();
-            if ('shipping' == $addressType) {
-                if ($user && !$user->defaultShipping()) {
-                    $newAddress = $address->as_array();
-                    unset($newAddress['id']);
-                    $this->FCom_Customer_Model_Address->newShipping($newAddress, $user);
-                }
+        // TODO: move this code to FCom_Customer and add the trigger for this event
+        $user = $this->FCom_Customer_Model_Customer->sessionUser();
+        if ($user) {
+            if ('shipping' == $addressType && !$user->defaultShipping()) {
+                $newAddress = $address->as_array();
+                unset($newAddress['id']);
+                $this->FCom_Customer_Model_Address->newShipping($newAddress, $user);
             }
-
-            if ('billing' == $addressType) {
-                if ($user && !$user->getDefaultBillingAddress()) {
-                    $newAddress = $address->as_array();
-                    unset($newAddress['id']);
-                    $this->FCom_Customer_Model_Address->newBilling($newAddress, $user);
-                }
+            if ('billing' == $addressType && !$user->getDefaultBillingAddress()) {
+                $newAddress = $address->as_array();
+                unset($newAddress['id']);
+                $this->FCom_Customer_Model_Address->newBilling($newAddress, $user);
             }
         }
 

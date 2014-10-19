@@ -3,6 +3,7 @@
 class FCom_Sales_Model_Order_Item_State_Delivery extends FCom_Core_Model_Abstract_State_Concrete
 {
     protected $_valueLabels = [
+        'new' => 'New',
         'virtual' => 'Virtual',
         'pending' => 'Pending',
         'packed' => 'Packed',
@@ -17,6 +18,16 @@ class FCom_Sales_Model_Order_Item_State_Delivery extends FCom_Core_Model_Abstrac
         'delivered' => 'email/sales/order-item-state-delivery-delivered',
         'returned' => 'email/sales/order-item-state-delivery-returned',
     ];
+
+    public function setNew()
+    {
+        return $this->changeState('new');
+    }
+
+    public function setVirtual()
+    {
+        return $this->changeState('virtual');
+    }
 
     public function setPending()
     {

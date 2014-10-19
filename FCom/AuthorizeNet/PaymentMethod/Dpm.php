@@ -112,12 +112,9 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
     {
         $order = $this->getOrder();
         $data['order'] = $order->as_array();
-        if ($order->billing()) {
-            $data['billing']  = $order->billing()->as_array();
-        }
-        if ($order->shipping()) {
-            $data['shipping'] = $order->shipping()->as_array();
-        }
+        //TODO: check for duplicate fields, if necessary
+        $data['billing']  = $order->addressAsArray('billing');
+        $data['shipping'] = $order->addressAsArray('shipping');
         $data['x_fields'] = $this->hiddenFields();
         return $data;
     }

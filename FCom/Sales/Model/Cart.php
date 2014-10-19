@@ -32,6 +32,8 @@
  */
 class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 {
+    use FCom_Sales_Model_Trait_Address;
+
     protected static $_table = 'fcom_sales_cart';
     protected static $_origClass = __CLASS__;
 
@@ -400,61 +402,29 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $this->data = !empty($this->data_serialized) ? $this->BUtil->fromJson($this->data_serialized) : [];
     }
 
-    public function getAddresses()
-    {
-        if (!$this->_addresses) {
-            $this->_addresses = $this->FCom_Sales_Model_Cart_Address->orm()
-                ->where("cart_id", $this->id())
-                ->find_many_assoc('atype');
-        }
-        return $this->_addresses;
-    }
-
     public function getBillingAddress()
     {
-        $addresses = $this->getAddresses();
-        return !empty($addresses['billing']) ? $addresses['billing'] : null;
+        return $this->addressAsObject('billing');
     }
 
     public function getShippingAddress()
     {
-        $addresses = $this->getAddresses();
-        return !empty($addresses['shipping']) ? $addresses['shipping'] : $this->getBillingAddress();
-    }
-
-    public function setAddressByType($atype, $data)
-    {
-        $address = $atype === 'billing' ? $this->getBillingAddress() : $this->getShippingAddress();
-        if (!$address) {
-            $address = $this->FCom_Sales_Model_Cart_Address->create(['cart_id' => $this->id, 'atype' => $atype]);
-        }
-        if ($data instanceof FCom_Customer_Model_Address) {
-            $data = $this->BUtil->arrayMask($data->as_array(), 'firstname,lastname,attn,' .
-                'street1,street2,street3,city,region,postcode,country,phone,fax,lat,lng');
-        }
-        $address->set($data)->save();
-        $this->_addresses[$atype] = $address;
-        return $this;
+        return $this->addressAsObject('shipping');
     }
 
     public function importAddressesFromCustomer($customer)
     {
-        $hlp = $this->FCom_Sales_Model_Cart_Address;
-
         $defBilling = $customer->getDefaultBillingAddress();
         if (!$defBilling) {
             return false;
         }
         $defShipping = $customer->getDefaultShippingAddress();
 
-        $this->setAddressByType('billing', $defBilling);
+        $this->importAddressFromObject($defBilling, 'billing');
+        $this->importAddressFromObject($defBilling, 'shipping');
 
-        if ($defBilling->id == $defShipping->id) {
-            $this->same_address = 1;
-        } else {
-            $this->same_address = 0;
-            $this->setAddressByType('shipping', $defShipping);
-        }
+        $this->same_address = $defBilling->id == $defShipping->id;
+
         return true;
     }
 

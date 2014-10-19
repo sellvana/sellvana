@@ -156,13 +156,11 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
             if ('s' == $type) {
                 $customer->default_shipping_id = $address->id();
                 $customer->default_shipping    = $address;
-                $cart->setAddressByType('shipping', $address);
-                //$this->FCom_Sales_Model_Cart_Address->newShipping($cart->id(), $customer->defaultShipping());
+                $cart->importAddressFromObject($address, 'shipping');
             } else {
                 $customer->default_billing_id = $address->id();
                 $customer->default_billing    = $address;
-                $cart->setAddressByType('billing', $address);
-                //$this->FCom_Sales_Model_Cart_Address->newBilling($cart->id(), $customer->getDefaultBillingAddress(), $customer->email);
+                $cart->importAddressFromObject($address, 'billing');
             }
             $customer->save();
 

@@ -766,6 +766,15 @@ EOT
         return $result;
     }
 
+    public function ddlDropTable($fullTableName, $connectionName = null)
+    {
+        if (static::ddlTableExists($fullTableName, $connectionName)) {
+            $result = BORM::i()->raw_query("DROP TABLE {$fullTableName}")->execute();
+            static::ddlClearCache(null, $connectionName);
+        }
+        return $result;
+    }
+
     /**
      * Clean array or object fields based on table columns and return an array
      *
@@ -2670,7 +2679,8 @@ class BModel extends Model
     * @param string $class_name
     * @return string
     */
-    protected static function _get_table_name($class_name) {
+    protected static function _get_table_name($class_name)
+    {
         return BDb::t(parent::_get_table_name($class_name));
     }
 

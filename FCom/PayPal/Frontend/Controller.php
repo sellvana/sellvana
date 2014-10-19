@@ -15,7 +15,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
         $baseUrl = $this->BApp->href('paypal');
         $nvpShippingAddress = [];
         if ($this->BConfig->get('modules/FCom_PayPal/show_shipping') == 'on') {
-            $shippingAddress = $this->FCom_Sales_Model_Cart_Address->findByCartType($cart->id(), 'shipping');
+            $shippingAddress = $cart->addressAsObject('shipping');
             $nvpShippingAddress = [
                 'NOSHIPPING' => 0,
                 'REQCONFIRMSHIPPING' => 0,
@@ -106,7 +106,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
         ];
         $nvpShipArr = [];
         if ($this->BConfig->get('modules/FCom_PayPal/show_shipping') == 'on') {
-            $shippingAddress = $this->FCom_Sales_Model_Cart_Address->findByCartType($cart->id(), 'shipping');
+            $shippingAddress = $$cart->addressAsObject('shipping');
             $nvpShipArr = [
                 'PAYMENTREQUEST_0_SHIPTONAME' => $shippingAddress->firstname . ' ' . $shippingAddress->lastname,
                     'PAYMENTREQUEST_0_SHIPTOSTREET' => $shippingAddress->street1,

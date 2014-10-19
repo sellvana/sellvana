@@ -41,4 +41,9 @@ class FCom_Sales_Model_Order_Item_State_Payment extends FCom_Core_Model_Abstract
     {
         return $this->changeState('canceled');
     }
+
+    public function setPartial()
+    {
+        return $this->changeState('partial');
+    }
 }

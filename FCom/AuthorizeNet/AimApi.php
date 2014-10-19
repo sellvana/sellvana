@@ -105,33 +105,33 @@ class FCom_AuthorizeNet_AimApi extends BClass
             $api->card_code = $payment->getDetail('card_code');
         }
         $billing = $order->billing();
-        if ($billing->firstname) {
-            $api->first_name = $billing->firstname;
+        if ($order->billing_firstname) {
+            $api->first_name = $order->billing_firstname;
         }
-        if ($billing->lastname) {
-            $api->last_name = $billing->lastname;
+        if ($order->billing_lastname) {
+            $api->last_name = $order->billing_lastname;
         }
-        if ($billing->company) {
-            $api->company = $billing->company;
+        if ($order->billing_company) {
+            $api->company = $order->billing_company;
         }
-        $api->address = $billing->getFullAddress();
-        if ($billing->city) {
-            $api->city = $billing->city;
+        $api->address = $order->get('billing_street');
+        if ($order->billing_city) {
+            $api->city = $order->billing_city;
         }
-        if ($billing->region) {
-            $api->state = $billing->region;
+        if ($order->billing_region) {
+            $api->state = $order->billing_region;
         }
-        if ($billing->postcode) {
-            $api->zip = $billing->postcode;
+        if ($order->billing_postcode) {
+            $api->zip = $order->billing_postcode;
         }
-        if ($billing->country) {
-            $api->country = $billing->country;
+        if ($order->billing_country) {
+            $api->country = $order->billing_country;
         }
-        if ($billing->phone) {
-            $api->phone = $billing->phone;
+        if ($order->billing_phone) {
+            $api->phone = $order->billing_billing_phone;
         }
-        if ($billing->fax) {
-            $api->fax = $billing->fax;
+        if ($order->billing_fax) {
+            $api->fax = $order->billing_fax;
         }
         if ($order->customer_email) {
             $api->email = $order->customer_email;

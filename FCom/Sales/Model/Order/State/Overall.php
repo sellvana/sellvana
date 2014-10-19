@@ -4,7 +4,8 @@ class FCom_Sales_Model_Order_State_Overall extends FCom_Core_Model_Abstract_Stat
 {
     protected $_valueLabels = [
         'new' => 'New',
-        'review' => 'Under Review',
+        'review' => 'Review',
+        'placed' => 'Placed',
         'fraud' => 'Fraud',
         'legit' => 'Passed Verification',
         'processing' => 'Processing',
@@ -14,7 +15,7 @@ class FCom_Sales_Model_Order_State_Overall extends FCom_Core_Model_Abstract_Stat
     ];
 
     protected $_setValueNotificationTemplates =[
-        'new' => 'email/sales/order-state-overall-new',
+        'placed' => 'email/sales/order-state-overall-placed',
         'review' => 'email/sales/order-state-overall-review',
         'fraud' => 'email/sales/order-state-overall-fraud',
         'legit' => 'email/sales/order-state-overall-legit',
@@ -24,6 +25,11 @@ class FCom_Sales_Model_Order_State_Overall extends FCom_Core_Model_Abstract_Stat
     public function setNew()
     {
         return $this->changeState('new');
+    }
+
+    public function setPlaced()
+    {
+        return $this->changeState('placed');
     }
 
     public function setReview()

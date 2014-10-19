@@ -25,9 +25,8 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
 
         'customerUpdatesShippingMethod',
         'customerUpdatesBillingMethod',
-
-        'customerAbandonsCart',
 */
+        'customerAbandonsCart',
 
         'customerPlacesOrder',
     ];
@@ -272,8 +271,28 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
 
             //TODO: handle payment exception
         }
-        $cart->setStatusOrdered()->save();
+        $cart->setStateOrdered()->save();
 
         $args['result']['order'] = $order;
+    }
+
+    protected function _getCart($args, $createIfNeeded = false)
+    {
+        if (!empty($args['cart'])) {
+            $cart = $args['cart'];
+        } else {
+            $cart = $this->FCom_Sales_Model_Cart->sessionCart($createIfNeeded);
+        }
+        return $cart;
+    }
+
+    protected function _getCustomer($args)
+    {
+        if (!empty($args['customer'])) {
+            $customer = $args['customer'];
+        } else {
+            $customer = $this->FCom_Customer_Model_Customer->sessionUser();
+        }
+        return $customer;
     }
 }

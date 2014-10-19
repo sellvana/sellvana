@@ -7,36 +7,17 @@ class FCom_Sales_Workflow_Order extends FCom_Sales_Workflow_Abstract
     protected $_localHooks = [
         'customerPlacesOrder',
 
-        'customerPostsOrderComment',
-
         'customerCancelsOrder',
         'customerCancelsOrderItems',
-        'customerRequestsOrderShippingAddressUpdate',
-        'customerRequestsOrderBillingAddressUpdate',
-        'customerRequestsRMA',
 
-        'adminPostsOrderComment',
+        'adminCancelsOrder',
+        'adminCancelsOrderItems',
 
         'adminUpdatesOrderShippingAddress',
         'adminUpdatesOrderBillingAddress',
         'adminCreatesChangeOrder',
 
-        'adminCancelsAuthorization',
-        'adminCapturesPayment',
-        'adminRefundsPayment',
-        'adminVoidsPayment',
-
-        'adminCreatesShipment',
-        'adminUpdatesShipment',
-        'adminPrintsShippingLabels',
-
         'adminMarksOrderAsFraud',
-
-        'adminCancelsOrder',
-        'adminCancelsOrderItems',
-        'adminCreatesRMA',
-        'adminApprovesRMA',
-        'adminCreatesReturnDocument',
 
         'adminChangesCustomState',
     ];
@@ -57,16 +38,6 @@ class FCom_Sales_Workflow_Order extends FCom_Sales_Workflow_Abstract
 
 
     public function customerCancelsOrderItems($args)
-    {
-    }
-
-
-    public function customerRequestsOrderShippingAddressUpdate($args)
-    {
-    }
-
-
-    public function customerRequestsOrderBillingAddressUpdate($args)
     {
     }
 

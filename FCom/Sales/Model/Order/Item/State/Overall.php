@@ -4,20 +4,13 @@ class FCom_Sales_Model_Order_Item_State_Overall extends FCom_Core_Model_Abstract
 {
     protected $_valueLabels = [
         'new' => 'New',
-        'review' => 'Under Review',
-        'fraud' => 'Fraud',
-        'legit' => 'Passed Verification',
+        'backordered' => 'Backordered',
         'processing' => 'Processing',
         'complete' => 'Complete',
         'canceled' => 'Canceled',
-        'archived' => 'Archived',
     ];
 
-    protected $_setValueNotificationTemplates =[
-        'new' => 'email/sales/order-item-state-overall-new',
-        'review' => 'email/sales/order-item-state-overall-review',
-        'fraud' => 'email/sales/order-item-state-overall-fraud',
-        'legit' => 'email/sales/order-item-state-overall-legit',
+    protected $_setValueNotificationTemplates = [
         'canceled' => 'email/sales/order-item-state-overall-canceled',
     ];
 
@@ -26,19 +19,9 @@ class FCom_Sales_Model_Order_Item_State_Overall extends FCom_Core_Model_Abstract
         return $this->changeState('new');
     }
 
-    public function setReview()
+    public function setBackordered()
     {
-        return $this->changeState('review');
-    }
-
-    public function setLegit()
-    {
-        return $this->changeState('legit');
-    }
-
-    public function setFraud()
-    {
-        return $this->changeState('fraud');
+        return $this->changeState('backordered');
     }
 
     public function setProcessing()
@@ -54,10 +37,5 @@ class FCom_Sales_Model_Order_Item_State_Overall extends FCom_Core_Model_Abstract
     public function setCanceled()
     {
         return $this->changeState('canceled');
-    }
-
-    public function setArchived()
-    {
-        return $this->changeState('archived');
     }
 }

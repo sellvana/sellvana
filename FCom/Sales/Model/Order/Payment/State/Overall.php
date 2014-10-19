@@ -12,8 +12,8 @@ class FCom_Sales_Model_Order_Payment_State_Overall extends FCom_Core_Model_Abstr
     ];
 
     protected $_setValueNotificationTemplates =[
-        'refunded' => 'email/sales/order-state-payment-refunded',
-        'void' => 'email/sales/order-state-overall-void',
+        'refunded' => 'email/sales/order-payment-state-overall-refunded',
+        'void' => 'email/sales/order-payment-state-overall-void',
     ];
 
     public function setPending()

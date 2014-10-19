@@ -34,6 +34,8 @@
  */
 class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 {
+    use FCom_Sales_Model_Trait_Address;
+
     protected static $_table = 'fcom_sales_order';
 
     protected static $_origClass = __CLASS__;
@@ -256,19 +258,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $orderData['cart_id']         = $cart->id();
         $orderData['admin_id']        = $cart->admin_id;
         $orderData['customer_id']     = $cart->customer_id;
-        if ($cart->customer_email) {
-            $orderData['customer_email']  =  $cart->customer_email;
-        } else {
-            $billing = $this->FCom_Sales_Model_Cart_Address->loadWhere(['cart_id' => $cart->id(), 'atype' => 'billing']);
-            #var_dump($cart->id(), $billing);
-            $orderData['customer_email'] = $billing->email;
-            /*
-            $customer = $this->FCom_Customer_Model_Customer->load($cart->customer_id);
-            if ($customer) {
-                $orderData['customer_email']  =  $customer->email;
-            }
-            */
-        }
+        $orderData['customer_email']  =  $cart->customer_email;
         $orderData['create_at'] = $orderData['update_at'] = $this->BDb->now();
 
         $this->set($orderData);
@@ -278,13 +268,11 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     protected function _importAddressDataFromCart()
     {
         $cart = $this->_cart;
-        $shippingAddress = $cart->getShippingAddress();
-        if ($shippingAddress) {
-            $this->FCom_Sales_Model_Order_Address->newAddress($this->id(), $shippingAddress);
-        }
-        $billingAddress = $cart->getBillingAddress();
-        if ($billingAddress) {
-            $this->FCom_Sales_Model_Order_Address->newAddress($this->id(), $billingAddress);
+        foreach (['billing', 'shipping'] as $atype) {
+            foreach (['company', 'attn', 'firstname', 'lastname', 'street', 'city', 'region', 'postcode', 'country', 'phone', 'fax'] as $f) {
+                $field = $atype . '_' . $f;
+                $this->set($field, $cart->get($field));
+            }
         }
         return $this;
     }
@@ -454,17 +442,12 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     public function getBillingAddress()
     {
-        $addresses = $this->getAddresses();
-        return !empty($addresses['billing']) ? $addresses['billing'] : null;
+        return $this->addressAsObject('billing');
     }
 
     public function getShippingAddress()
     {
-        $addresses = $this->getAddresses();
-        if ($this->same_address) {
-            return $this->getBillingAddress();
-        }
-        return !empty($addresses['shipping']) ? $addresses['shipping'] : null;
+        return $this->addressAsObject('shipping');
     }
 
     protected function itemAllowed($options, $item)

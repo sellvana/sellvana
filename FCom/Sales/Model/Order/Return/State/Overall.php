@@ -1,22 +1,23 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_Sales_Model_Order_Payment_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
+class FCom_Sales_Model_Order_Return_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
 {
     protected $_valueLabels = [
         'new' => 'New',
         'rma_sent' => 'RMA Sent',
         'expired' => 'Expired',
         'canceled' => 'Canceled',
+        'received' => 'Received',
         'accepted' => 'Accepted',
-        'verified' => 'Verified',
         'restocked' => 'Re-stocked',
-        'invalid' => 'Invalid',
-        'damaged' => 'Damaged',
+        'declined' => 'Declined',
     ];
 
     protected $_setValueNotificationTemplates =[
-        'refunded' => 'email/sales/order-state-payment-refunded',
-        'void' => 'email/sales/order-state-overall-void',
+        'rma_sent' => 'email/sales/order-return-state-overall-rma_sent',
+        'received' => 'email/sales/order-return-state-overall-received',
+        'accepted' => 'email/sales/order-return-state-overall-accepted',
+        'declined' => 'email/sales/order-return-state-overall-declined',
     ];
 
     public function setNew()
@@ -54,13 +55,8 @@ class FCom_Sales_Model_Order_Payment_State_Overall extends FCom_Core_Model_Abstr
         return $this->changeState('restocked');
     }
 
-    public function setInvalid()
+    public function setDeclined()
     {
-        return $this->changeState('invalid');
-    }
-
-    public function setDamaged()
-    {
-        return $this->changeState('damaged');
+        return $this->changeState('declined');
     }
 }
