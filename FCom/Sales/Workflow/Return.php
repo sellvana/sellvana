@@ -10,4 +10,16 @@ class FCom_Sales_Workflow_Return extends FCom_Sales_Workflow_Abstract
         'adminApprovesRMA',
         'adminRefundsPayment',
     ];
+
+    public function customerRequestsRMA($args)
+    {
+    }
+
+    public function adminCreatesRMA($args)
+    {
+    }
+
+    public function adminApprovesRMA($args)
+    {
+    }
 }

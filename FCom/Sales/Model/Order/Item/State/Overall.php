@@ -11,6 +11,7 @@ class FCom_Sales_Model_Order_Item_State_Overall extends FCom_Core_Model_Abstract
     ];
 
     protected $_setValueNotificationTemplates = [
+        'backordered' => 'email/sales/order-item-state-overall-backordered',
         'canceled' => 'email/sales/order-item-state-overall-canceled',
     ];
 

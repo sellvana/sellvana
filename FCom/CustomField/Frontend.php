@@ -2,7 +2,7 @@
 
 class FCom_CustomField_Frontend extends BClass
 {
-    public function onCartWorkflowCustomerAddsItemsValidate($args)
+    public function onWorkflowCustomerAddsItemsValidate($args)
     {
         $p = $args['product'];
         $defaultVariant = [

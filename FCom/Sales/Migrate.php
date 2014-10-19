@@ -792,7 +792,7 @@ class FCom_Sales_Migrate extends BClass
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
                 'state_overall' => "varchar(10) not null default 'new'",
-                'state_custom' => "varchar(10) not null default 'new'",
+                'state_custom' => "varchar(10) not null default ''",
                 'carrier_code' => 'varchar(20)',
                 'service_code' => 'varchar(20)',
                 'carrier_desc' => 'varchar(50)',
@@ -844,8 +844,9 @@ class FCom_Sales_Migrate extends BClass
                 'amount_refunded'  => 'decimal(12,2)',
                 'status'           => 'RENAME transaction_status varchar(50)',
                 'state_overall'    => "varchar(20) not null default 'new'",
+                'state_custom'     => "varchar(20) not null default ''",
                 'transaction_fee'  => 'decimal(12,2)',
-                'data_serialized' => 'text',
+                'data_serialized'  => 'text',
             ],
             'KEYS'  => [
                 'method'           => 'DROP',
@@ -882,7 +883,7 @@ class FCom_Sales_Migrate extends BClass
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
                 'state_overall' => "varchar(10) not null default 'new'",
-                'state_custom' => "varchar(10) not null default 'new'",
+                'state_custom' => "varchar(10) not null default ''",
                 'data_serialized' => 'text',
             ],
             'PRIMARY' => '(id)',
@@ -891,7 +892,7 @@ class FCom_Sales_Migrate extends BClass
                 'IDX_state_custom' => '(state_custom)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tOrderShipment}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderReturn}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE SET NULL ON UPDATE CASCADE",
             ],
         ]);
 
@@ -914,7 +915,7 @@ class FCom_Sales_Migrate extends BClass
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
                 'state_overall' => "varchar(10) not null default 'new'",
-                'state_custom' => "varchar(10) not null default 'new'",
+                'state_custom' => "varchar(10) not null default ''",
                 'data_serialized' => 'text',
             ],
             'PRIMARY' => '(id)',
@@ -923,7 +924,7 @@ class FCom_Sales_Migrate extends BClass
                 'IDX_state_custom' => '(state_custom)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tOrderShipment}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE SET NULL ON UPDATE CASCADE",
+                "FK_{$tOrderRefund}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE SET NULL ON UPDATE CASCADE",
             ],
         ]);
 
@@ -983,44 +984,61 @@ class FCom_Sales_Migrate extends BClass
             'PRIMARY' => '(id)',
         ]);
 
-        $addresses = $this->BORM->for_table($this->BDb->t('fcom_sales_cart_address'))->find_many();
-        foreach ($addresses as $a) {
-            $prefix = $a->get('atype') . '_';
-            $this->FCom_Sales_Model_Cart->load($a->get('cart_id'))->set([
-                $prefix . 'firstname' => $a->firstname,
-                $prefix . 'lastname' => $a->lastname,
-                $prefix . 'company' => $a->company,
-                $prefix . 'attn' => $a->attn,
-                $prefix . 'street' => trim($a->street1 . "\n" . $a->street2 . "\n" . $a->street3),
-                $prefix . 'city' => $a->city,
-                $prefix . 'region' => $a->region,
-                $prefix . 'postcode' => $a->postcode,
-                $prefix . 'country' => $a->country,
-                $prefix . 'phone' => $a->phone,
-                $prefix . 'fax' => $a->fax,
-            ])->save();
+        $tCartAddress = $this->FCom_Sales_Migrate_Model_Cart_Address->table();
+        if ($this->BDb->ddlTableExists($tCartAddress)) {
+            $addresses = $this->FCom_Sales_Migrate_Model_Cart_Address->orm()->find_many();
+            foreach ($addresses as $a) {
+                $prefix = $a->get('atype') . '_';
+                $this->FCom_Sales_Model_Cart->load($a->get('cart_id'))->set([
+                    $prefix . 'firstname' => $a->firstname,
+                    $prefix . 'lastname' => $a->lastname,
+                    $prefix . 'company' => $a->company,
+                    $prefix . 'attn' => $a->attn,
+                    $prefix . 'street' => trim($a->street1 . "\n" . $a->street2 . "\n" . $a->street3),
+                    $prefix . 'city' => $a->city,
+                    $prefix . 'region' => $a->region,
+                    $prefix . 'postcode' => $a->postcode,
+                    $prefix . 'country' => $a->country,
+                    $prefix . 'phone' => $a->phone,
+                    $prefix . 'fax' => $a->fax,
+                ])->save();
+            }
+            $this->BDb->ddlDropTable($tCartAddress);
         }
 
-        $addresses = $this->BORM->for_table($this->BDb->t('fcom_sales_order_address'))->find_many();
-        foreach ($addresses as $a) {
-            $prefix = $a->get('atype') . '_';
-            $this->FCom_Sales_Model_Order->load($a->get('order_id'))->set([
-                $prefix . 'firstname' => $a->firstname,
-                $prefix . 'lastname' => $a->lastname,
-                $prefix . 'company' => $a->company,
-                $prefix . 'attn' => $a->attn,
-                $prefix . 'street' => trim($a->street1 . "\n" . $a->street2 . "\n" . $a->street3),
-                $prefix . 'city' => $a->city,
-                $prefix . 'region' => $a->region,
-                $prefix . 'postcode' => $a->postcode,
-                $prefix . 'country' => $a->country,
-                $prefix . 'phone' => $a->phone,
-                $prefix . 'fax' => $a->fax,
-            ])->save();
+        $tOrderAddress = $this->FCom_Sales_Migrate_Model_Order_Address->table();
+        if ($this->BDb->ddlTableExists($tOrderAddress)) {
+            $addresses = $this->FCom_Sales_Migrate_Model_Order_Address->orm()->find_many();
+            foreach ($addresses as $a) {
+                $prefix = $a->get('atype') . '_';
+                $this->FCom_Sales_Model_Order->load($a->get('order_id'))->set([
+                    $prefix . 'firstname' => $a->firstname,
+                    $prefix . 'lastname' => $a->lastname,
+                    $prefix . 'company' => $a->company,
+                    $prefix . 'attn' => $a->attn,
+                    $prefix . 'street' => trim($a->street1 . "\n" . $a->street2 . "\n" . $a->street3),
+                    $prefix . 'city' => $a->city,
+                    $prefix . 'region' => $a->region,
+                    $prefix . 'postcode' => $a->postcode,
+                    $prefix . 'country' => $a->country,
+                    $prefix . 'phone' => $a->phone,
+                    $prefix . 'fax' => $a->fax,
+                ])->save();
+            }
+            $this->BDb->ddlDropTable($tOrderAddress);
         }
 
         $this->BDb->ddlDropTable($this->BDb->t('fcom_sales_order_status'));
-        $this->BDb->ddlDropTable($this->BDb->t('fcom_sales_order_address'));
-        $this->BDb->ddlDropTable($this->BDb->t('fcom_sales_cart_address'));
     }
 }
+
+class FCom_Sales_Migrate_Model_Cart_Address extends BModel
+{
+    protected static $_table = 'fcom_sales_cart_address';
+}
+
+class FCom_Sales_Migrate_Model_Order_Address extends BModel
+{
+    protected static $_table = 'fcom_sales_order_address';
+}
+

@@ -4,6 +4,8 @@ class FCom_Sales_Model_Order_Payment_State_Overall extends FCom_Core_Model_Abstr
 {
     protected $_valueLabels = [
         'pending' => 'Pending',
+        'canceled' => 'Canceled',
+        'processing' => 'Processing',
         'paid' => 'Paid',
         'failed' => 'Failed',
         'refunded' => 'Refunded',
@@ -12,6 +14,7 @@ class FCom_Sales_Model_Order_Payment_State_Overall extends FCom_Core_Model_Abstr
     ];
 
     protected $_setValueNotificationTemplates =[
+        'failed' => 'email/sales/order-payment-state-overall-failed',
         'refunded' => 'email/sales/order-payment-state-overall-refunded',
         'void' => 'email/sales/order-payment-state-overall-void',
     ];
@@ -19,6 +22,16 @@ class FCom_Sales_Model_Order_Payment_State_Overall extends FCom_Core_Model_Abstr
     public function setPending()
     {
         return $this->changeState('pending');
+    }
+
+    public function setCanceled()
+    {
+        return $this->changeState('canceled');
+    }
+
+    public function setProcessing()
+    {
+        return $this->changeState('processing');
     }
 
     public function setPaid()

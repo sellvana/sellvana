@@ -53,12 +53,12 @@ trait FCom_Sales_Model_Trait_Address
     {
         $a = $this->addressAsArray($atype);
         //return new stdClass($a);
-        return $this->BData->i(true, [$a]);
+        return new BData($a);
     }
 
     public function importAddressFromArray($a, $atype = null)
     {
-        return $this->importAddressFromObject($a, $this->BData->i(true, [$a]));
+        return $this->importAddressFromObject($a, new BData($a));
     }
 
     public function importAddressFromObject($a, $atype = null)

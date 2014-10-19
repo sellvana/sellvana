@@ -38,7 +38,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         if (isset($post['action'])) {
             switch ($post['action']) {
             case 'add':
-                $this->BEvents->fire('FCom_Sales_Workflow_Cart::customerAddsItems', [
+                $this->BEvents->fire('FCom_Sales_Workflow::customerAddsItems', [
                     'post' => $post,
                     'result' => &$result,
                 ]);
@@ -58,7 +58,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                 break;
             }
         } else {
-            $this->BEvents->fire('FCom_Sales_Workflow_Cart::customerUpdatesCart', [
+            $this->BEvents->fire('FCom_Sales_Workflow::customerUpdatesCart', [
                 'post' => $post,
                 'result' => &$result,
             ]);
@@ -90,7 +90,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         $result = [];
         switch ($post['action']) {
         case 'add':
-            $this->BEvents->fire('FCom_Sales_Workflow_Cart::customerAddsItems', [
+            $this->BEvents->fire('FCom_Sales_Workflow::customerAddsItems', [
                 'post' => $post,
                 'result' => &$result,
             ]);

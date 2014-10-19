@@ -207,14 +207,14 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         }
 
         $result = [];
-        $this->BEvents->fire('FCom_Sales_Workflow_Cart::customerPlacesOrder', [
+        $this->BEvents->fire('FCom_Sales_Workflow::customerPlacesOrder', [
             'post' => $post,
             'result' => &$result,
         ]);
         $order = $result['order'];
 
         $result = [];
-        $this->BEvents->fire('FCom_Sales_Workflow_Order::customerPlacesOrder', [
+        $this->BEvents->fire('FCom_Sales_Workflow::customerPlacesOrder', [
             'post' => $post,
             'order' => $order,
             'result' => &$result,

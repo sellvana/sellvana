@@ -3,12 +3,13 @@
 class FCom_Sales_Model_Order_Return_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
 {
     protected $_valueLabels = [
+        'requested' => 'Requested',
         'new' => 'New',
         'rma_sent' => 'RMA Sent',
         'expired' => 'Expired',
         'canceled' => 'Canceled',
         'received' => 'Received',
-        'accepted' => 'Accepted',
+        'approved' => 'Approved',
         'restocked' => 'Re-stocked',
         'declined' => 'Declined',
     ];
@@ -16,9 +17,14 @@ class FCom_Sales_Model_Order_Return_State_Overall extends FCom_Core_Model_Abstra
     protected $_setValueNotificationTemplates =[
         'rma_sent' => 'email/sales/order-return-state-overall-rma_sent',
         'received' => 'email/sales/order-return-state-overall-received',
-        'accepted' => 'email/sales/order-return-state-overall-accepted',
+        'approved' => 'email/sales/order-return-state-overall-approved',
         'declined' => 'email/sales/order-return-state-overall-declined',
     ];
+
+    public function setRequested()
+    {
+        return $this->changeState('new');
+    }
 
     public function setNew()
     {
@@ -45,9 +51,9 @@ class FCom_Sales_Model_Order_Return_State_Overall extends FCom_Core_Model_Abstra
         return $this->changeState('received');
     }
 
-    public function setAccepted()
+    public function setApproved()
     {
-        return $this->changeState('accepted');
+        return $this->changeState('approved');
     }
 
     public function setRestocked()

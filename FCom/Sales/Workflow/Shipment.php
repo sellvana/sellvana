@@ -9,4 +9,16 @@ class FCom_Sales_Workflow_Shipment extends FCom_Sales_Workflow_Abstract
         'adminUpdatesShipment',
         'adminPrintsShippingLabels',
     ];
+
+    public function adminCreatesShipment($args)
+    {
+    }
+
+    public function adminUpdatesShipment($args)
+    {
+    }
+
+    public function adminPrintsShippingLabels($args)
+    {
+    }
 }

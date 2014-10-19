@@ -8,5 +8,28 @@ class FCom_Sales_Workflow_Comment extends FCom_Sales_Workflow_Abstract
         'customerPostsOrderComment',
         'adminAcknowledgesOrderComment',
         'adminPostsOrderComment',
+        'adminClosesOrderComment',
+        'timedAutoCloseOrderComment',
     ];
+
+    public function customerPostsOrderComment($args)
+    {
+    }
+
+    public function adminAcknowledgesOrderComment($args)
+    {
+    }
+
+    public function adminPostsOrderComment($args)
+    {
+    }
+
+    public function adminClosesOrderComment($args)
+    {
+    }
+
+    public function timedAutoCloseOrderComment($args)
+    {
+    }
+
 }

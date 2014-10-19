@@ -434,8 +434,8 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         if (!$this->_addresses) {
             $this->_addresses = $this->FCom_Sales_Model_Order_Address->orm()
-                               ->where("order_id", $this->id())
-                               ->find_many_assoc('atype');
+                ->where("order_id", $this->id())
+                ->find_many_assoc('atype');
         }
         return $this->_addresses;
     }
