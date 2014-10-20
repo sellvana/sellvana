@@ -38,10 +38,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         if (isset($post['action'])) {
             switch ($post['action']) {
             case 'add':
-                $this->BEvents->fire('FCom_Sales_Workflow::customerAddsItems', [
-                    'post' => $post,
-                    'result' => &$result,
-                ]);
+                $this->FCom_Sales_Main->workflowAction('customerAddsItems', ['post' => $post, 'result' => &$result]);
 
                 $item = $result['items'][0];
                 if (!empty($item['status']) && $item['status'] === 'added') {
@@ -58,10 +55,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                 break;
             }
         } else {
-            $this->BEvents->fire('FCom_Sales_Workflow::customerUpdatesCart', [
-                'post' => $post,
-                'result' => &$result,
-            ]);
+            $this->FCom_Sales_Main->workflowAction('customerUpdatesCart', ['post' => $post, 'result' => &$result]);
             if (!empty($result['items'])) {
                 foreach ($result['items'] as $item) {
                     if (!empty($item['status'])) {
@@ -90,10 +84,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         $result = [];
         switch ($post['action']) {
         case 'add':
-            $this->BEvents->fire('FCom_Sales_Workflow::customerAddsItems', [
-                'post' => $post,
-                'result' => &$result,
-            ]);
+            $this->FCom_Sales_Main->workflowAction('customerAddsItems', ['post' => $post, 'result' => &$result]);
 
             $item = $result['items'][0];
             if (empty($item['error'])) {

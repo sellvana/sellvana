@@ -207,18 +207,11 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         }
 
         $result = [];
-        $this->BEvents->fire('FCom_Sales_Workflow::customerPlacesOrder', [
-            'post' => $post,
-            'result' => &$result,
-        ]);
+        $this->FCom_Sales_Main->workflowAction('customerPlacesOrder', ['post' => $post, 'result' => &$result]);
         $order = $result['order'];
 
         $result = [];
-        $this->BEvents->fire('FCom_Sales_Workflow::customerPlacesOrder', [
-            'post' => $post,
-            'order' => $order,
-            'result' => &$result,
-        ]);
+        $this->FCom_Sales_Main->workflowAction('customerPlacesOrder', ['post' => $post, 'order' => $order, 'result' => &$result]);
 
         $this->BLayout->view('email/new-order-customer')->set('order', $order)->email();
         $this->FCom_Sales_Model_Cart->resetSessionCart();

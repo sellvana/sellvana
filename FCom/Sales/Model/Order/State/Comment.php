@@ -5,6 +5,8 @@ class FCom_Sales_Model_Order_State_Comment extends FCom_Core_Model_Abstract_Stat
     protected $_valueLabels = [
         'none' => 'None',
         'received' => 'Received (Waiting for admin)',
+        'processing' => 'Processing',
+        'delegated' => 'Delegated',
         'sent' => 'Sent (Waiting for customer)',
         'closed' => 'Closed',
         'auto_closed' => 'Auto-Closed',
@@ -15,6 +17,7 @@ class FCom_Sales_Model_Order_State_Comment extends FCom_Core_Model_Abstract_Stat
             'email/sales/order-state-comment-received',
             'email/sales/order-state-comment-received-admin',
         ],
+        'delegated' => 'email/sales/order-state-comment-delegated-admin',
         'sent' => 'email/sales/order-state-comment-sent',
         'auto_closed' => 'email/sales/order-state-comment-auto_closed',
     ];
@@ -27,6 +30,11 @@ class FCom_Sales_Model_Order_State_Comment extends FCom_Core_Model_Abstract_Stat
     public function setReceived()
     {
         return $this->changeState('received');
+    }
+
+    public function setDelegated()
+    {
+        return $this->changeState('delegated');
     }
 
     public function setSent()

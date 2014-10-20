@@ -23,4 +23,14 @@ abstract class FCom_Sales_Workflow_Abstract extends BClass
 
         return $this;
     }
+
+    protected function _getCustomer($args)
+    {
+        if (!empty($args['customer'])) {
+            $customer = $args['customer'];
+        } else {
+            $customer = $this->FCom_Customer_Model_Customer->sessionUser();
+        }
+        return $customer;
+    }
 }

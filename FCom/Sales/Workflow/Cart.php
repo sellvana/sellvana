@@ -264,13 +264,11 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
 
         $order->importDataFromCart($cart);
 
-        $paymentMethod = $order->getPaymentMethod();
-        try {
-            $paymentMethod->workflowCustomerPlacesOrder($order);
-        } catch (Exception $e) {
+        $this->FCom_Sales_Main->workflowAction('customerSubmitsPayment', [
+            'order' => $order,
+            'result' => &$result,
+        ]);
 
-            //TODO: handle payment exception
-        }
         $cart->setStateOrdered()->save();
 
         $args['result']['order'] = $order;
@@ -284,15 +282,5 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
             $cart = $this->FCom_Sales_Model_Cart->sessionCart($createIfNeeded);
         }
         return $cart;
-    }
-
-    protected function _getCustomer($args)
-    {
-        if (!empty($args['customer'])) {
-            $customer = $args['customer'];
-        } else {
-            $customer = $this->FCom_Customer_Model_Customer->sessionUser();
-        }
-        return $customer;
     }
 }

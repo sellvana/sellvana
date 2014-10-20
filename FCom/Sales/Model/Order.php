@@ -77,6 +77,24 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $this->_state;
     }
 
+    public function addHistoryEvent($type, $description, $params = null)
+    {
+        $history = $this->FCom_Sales_Model_Order_History->create([
+            'order_id' => $this->id(),
+            'entity_type' => 'order',
+            'entity_id' => $this->id(),
+            'event_type' => $type,
+            'event_description' => $description,
+            'event_at' => isset($params['event_at']) ? $params['event_at'] : $this->BDb->now(),
+            'user_id' => isset($params['user_id']) ? $params['user_id'] : $this->FCom_Admin_Model_User->sessionUserId(),
+        ]);
+        if (isset($params['data'])) {
+            $history->setData($params['data']);
+        }
+        $history->save();
+        return $this;
+    }
+
     /**
      * @return null|FCom_Sales_Model_Order_Address
      */
@@ -491,6 +509,15 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             //todo: confirm with Boris about add prefix 1 to order number.
             $args['seq_id'] =  '1' . $orderNumber;
         }
+    }
+
+    public function getLastCustomerComment()
+    {
+        return $this->FCom_Sales_Model_Order_Comment->orm()
+            ->where('order_id', $this->id())
+            ->where('from_admin', 0)
+            ->order_by_desc('create_at')
+            ->find_one();
     }
 
     public function __destruct()

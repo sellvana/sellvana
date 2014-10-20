@@ -565,9 +565,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     public function __destruct()
     {
-        $this->_addresses = null;
-        $this->items = null;
-        $this->totals = null;
+        unset($this->_addresses, $this->items, $this->totals);
     }
 
 }

@@ -701,6 +701,7 @@ class FCom_Sales_Migrate extends BClass
         $tOrderRefund = $this->FCom_Sales_Model_Order_Refund->table();
         $tOrderRefundItem = $this->FCom_Sales_Model_Order_Refund_Item->table();
         $tOrderHistory = $this->FCom_Sales_Model_Order_History->table();
+        $tOrderComment = $this->FCom_Sales_Model_Order_Comment->table();
         $tStateCustom = $this->FCom_Sales_Model_StateCustom->table();
 
         $this->BDb->ddlTableDef($tCart, [
@@ -816,7 +817,7 @@ class FCom_Sales_Migrate extends BClass
                 'IDX_state_custom' => '(state_custom)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tOrderShipment}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE SET NULL ON UPDATE CASCADE",
+                "FK_{$tOrderShipment}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
             ],
         ]);
 
@@ -873,7 +874,7 @@ class FCom_Sales_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tOrderPaymentItem}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE SET NULL ON UPDATE CASCADE",
+                "FK_{$tOrderPaymentItem}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
                 "FK_{$tOrderPaymentItem}_order_item" => "FOREIGN KEY (order_item_id) REFERENCES {$tOrderItem} (id) ON DELETE CASCADE ON UPDATE CASCADE",
             ],
         ]);
@@ -892,7 +893,7 @@ class FCom_Sales_Migrate extends BClass
                 'IDX_state_custom' => '(state_custom)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tOrderReturn}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE SET NULL ON UPDATE CASCADE",
+                "FK_{$tOrderReturn}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
             ],
         ]);
 
@@ -924,7 +925,7 @@ class FCom_Sales_Migrate extends BClass
                 'IDX_state_custom' => '(state_custom)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tOrderRefund}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE SET NULL ON UPDATE CASCADE",
+                "FK_{$tOrderRefund}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
             ],
         ]);
 
@@ -966,9 +967,32 @@ class FCom_Sales_Migrate extends BClass
                 'IDX_event_type_at' => '(event_type, event_at)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tOrderHistory}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE SET NULL ON UPDATE CASCADE",
+                "FK_{$tOrderHistory}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
                 "FK_{$tOrderHistory}_order_item" => "FOREIGN KEY (order_item_id) REFERENCES {$tOrderItem} (id) ON DELETE SET NULL ON UPDATE CASCADE",
                 "FK_{$tOrderHistory}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON DELETE SET NULL ON UPDATE CASCADE",
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderComment, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned default null',
+                'comment_text' => 'text',
+                'from_admin' => 'tinyint not null',
+                'is_internal' => 'tinyint not null',
+                'user_id' => 'int unsigned default null',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'data_serialized' => 'text',
+            ],
+            'PRIMARY' => '(id)',
+            'KEYS' => [
+                'IDX_order_create' => '(order_id, create_at)',
+                'IDX_admin_user' => '(from_admin, user_id)',
+            ],
+            'CONSTRAINTS' => [
+                "FK_{$tOrderComment}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderComment}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON DELETE SET NULL ON UPDATE CASCADE",
             ],
         ]);
 

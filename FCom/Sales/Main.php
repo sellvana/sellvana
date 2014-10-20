@@ -33,6 +33,12 @@ class FCom_Sales_Main extends BClass
         ]);
     }
 
+    public function workflowAction($action, $args)
+    {
+        $this->BEvents->fire('FCom_Sales_Workflow::' . $action, $args);
+        return $this;
+    }
+
     public function addPaymentMethod($name, $class = null)
     {
         if (is_null($class)) $class = $name;
