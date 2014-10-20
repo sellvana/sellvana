@@ -76,8 +76,8 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
             ['name' => 'input_type', 'label' => 'Field Type', 'width' => 200,],
             ['name' => 'required', 'label' => 'Required', 'width' => 150,],
             ['name' => 'position', 'label' => 'Position', 'width' => 200,],
-            ['name' => 'options', 'label' => 'Options', 'width' => 200,],
-            ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]]
+            ['name' => 'options', 'label' => 'Options', 'width' => 200, 'hidden' => true],
+            ['type' => 'btn_group', 'buttons' => [['name' => 'delete'], ['name' => 'edit']]]
         ];
         $config['actions'] = [
             'add' => ['caption' => 'Add Fields'],

@@ -101,7 +101,7 @@
                                 } else if(fieldName != ''){
                                     options[fieldName] = fieldValue;
                                 }
-                                console.log(temp);
+//                                console.log(temp);
                             }
                         });
                         if ($.isEmptyObject(options) == false) {
@@ -125,6 +125,11 @@
                     $modal.modal('show');
                 });
             }
+            var $btn = $(".btn-edit");
+            $btn.click(function (e) {
+                editField(this);
+                e.preventDefault();
+            });
         };
         $('#cms-blocks-form').submit(function (ev) {
             var rows = mainGrid.getRows().toJSON();
@@ -139,6 +144,7 @@
 
             $("#block_form_fields_data").val(JSON.stringify(res));
         });
+
         function checkUnique(value, elem, params) {
             var error = true;
             if (typeof (elem) !== 'undefined') {
@@ -152,6 +158,16 @@
             }
 
             return error;
+        }
+
+
+        function editField(btn) {
+            var $btn = $(btn);
+            var $tr = $btn.closest('tr');
+            var id = $tr.attr('id');
+            var row = mainGrid.getRows().get(id);
+            console.log(row.pairs());
+            return false;
         }
 
         $.validator.addMethod('checkUnique', checkUnique, '{{ "Field Name are already taken place."|_ }}');
