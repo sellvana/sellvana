@@ -69,6 +69,11 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
         return $this->_context->getState($this->_type);
     }
 
+    public function getDefaultValue()
+    {
+        return $this->_defaultValue;
+    }
+
     public function getValue()
     {
         return $this->_value;
@@ -79,8 +84,11 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
         return $this->_value === $value;
     }
 
-    public function getValueLabel($value)
+    public function getValueLabel($value = null)
     {
+        if (null === $value) {
+            $value = $this->getValue();
+        }
         return !empty($this->_valueLabels[$value]) ? $this->_valueLabels[$value] : null;
     }
 

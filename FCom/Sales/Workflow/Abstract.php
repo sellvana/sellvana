@@ -33,4 +33,14 @@ abstract class FCom_Sales_Workflow_Abstract extends BClass
         }
         return $customer;
     }
+
+    protected function _getCart($args, $createIfNeeded = false)
+    {
+        if (!empty($args['cart'])) {
+            $cart = $args['cart'];
+        } else {
+            $cart = $this->FCom_Sales_Model_Cart->sessionCart($createIfNeeded);
+        }
+        return $cart;
+    }
 }

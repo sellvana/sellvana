@@ -18,6 +18,7 @@ class FCom_Sales_Main extends BClass
 
         $this->FCom_Sales_Workflow_Cart->registerWorkflow();
         $this->FCom_Sales_Workflow_Order->registerWorkflow();
+        $this->FCom_Sales_Workflow_OrderItem->registerWorkflow();
         $this->FCom_Sales_Workflow_Payment->registerWorkflow();
         $this->FCom_Sales_Workflow_Shipment->registerWorkflow();
         $this->FCom_Sales_Workflow_Return->registerWorkflow();
@@ -29,7 +30,7 @@ class FCom_Sales_Main extends BClass
             'sales/orders' => 'Orders',
             'sales/order_status' => 'Order Status',
             'sales/carts' => 'Carts',
-            'sales/reports' => 'Reports'
+            'sales/reports' => 'Reports',
         ]);
     }
 

@@ -23,28 +23,28 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
 
     public function getOrder()
     {
-        return $this->salesEntity;
+        return $this->_order;
     }
 
     public function getCardNumber()
     {
-        if (isset($this->details['cc_num'])) {
-            return $this->details['cc_num'];
+        if (isset($this->_details['cc_num'])) {
+            return $this->_details['cc_num'];
         }
         return null;
     }
 
     public function getDetail($key)
     {
-        if (isset($this->details[$key])) {
-            return $this->details[$key];
+        if (isset($this->_details[$key])) {
+            return $this->_details[$key];
         }
         return null;
     }
 
     public function setDetail($key, $value)
     {
-        $this->details[$key] = $value;
+        $this->_details[$key] = $value;
     }
 
     /**
@@ -65,7 +65,7 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
 
     public function getPublicData()
     {
-        return $this->details;
+        return $this->_details;
     }
 
     public function asArray()

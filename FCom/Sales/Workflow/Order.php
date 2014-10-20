@@ -8,12 +8,10 @@ class FCom_Sales_Workflow_Order extends FCom_Sales_Workflow_Abstract
         'customerPlacesOrder',
 
         'customerCancelsOrder',
-        'customerCancelsOrderItems',
 
         'adminPlacesOrder',
 
         'adminCancelsOrder',
-        'adminCancelsOrderItems',
 
         'adminUpdatesOrderShippingAddress',
         'adminUpdatesOrderBillingAddress',
@@ -44,15 +42,6 @@ class FCom_Sales_Workflow_Order extends FCom_Sales_Workflow_Abstract
         $args['order']->state()->overall()->setCancelRequested();
         $args['order']->addHistoryEvent('cancel_req', 'Customer has requested order cancellation');
         $args['order']->save();
-    }
-
-    public function customerCancelsOrderItems($args)
-    {
-        foreach ($args['items'] as $item) {
-            $item->state()->overall()->setCancelRequested();
-            $item->addHistoryEvent('cancel_req', 'Customer has requested item cancellation');
-            $item->save();
-        }
     }
 
     public function adminPlacesOrder($args)
@@ -90,12 +79,15 @@ class FCom_Sales_Workflow_Order extends FCom_Sales_Workflow_Abstract
     {
         $args['order']->state()->overall()->setLegit();
         $args['order']->addHistoryEvent('legit', 'Admin user has marked the order as legitimate');
+        $args['order']->state()->overall()->setProcessing();;
+        $args['order']->save();
     }
 
     public function adminMarksOrderAsFraud($args)
     {
         $args['order']->state()->overall()->setFraud();
         $args['order']->addHistoryEvent('fraud', 'Admin user has marked the order as fraud');
+        $args['order']->save();
     }
 
     public function adminCancelsOrder($args)
@@ -104,18 +96,11 @@ class FCom_Sales_Workflow_Order extends FCom_Sales_Workflow_Abstract
         $args['order']->save();
     }
 
-    public function adminCancelsOrderItems($args)
+    public function adminChangesOrderCustomState($args)
     {
-        foreach ($args['items'] as $item) {
-            $item->state()->overall()->setCanceled();
-            $item->addHistoryEvent('canceled', 'Admin has canceled item');
-            $item->save();
-        }
-    }
-
-    public function adminChangesCustomState($args)
-    {
-        $args['order']->state()->custom()->setState($args['state']);
-        $args['order']->addHistoryEvent('fraud', 'Admin user has changed custom order state to "' . $args['state'] . '"');
+        $newState = $args['order']->state()->custom()->setState($args['state']);
+        $label = $newState->getValueLabel();
+        $args['order']->addHistoryEvent('custom_state', 'Admin user has changed custom order state to "' . $label . '"');
+        $args['order']->save();
     }
 }

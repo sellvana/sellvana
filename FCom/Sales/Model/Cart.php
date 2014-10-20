@@ -493,32 +493,6 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    public function placeOrder()
-    {
-
-        $cart = $this->orm ? $this : $this->sessionCart();
-        try {
-            /* @var $cart FCom_Sales_Model_Cart */
-            $order = $this->FCom_Sales_Model_Order->createFromCart($cart, ['all_components' => true]);
-            $order->save();
-
-            //$order->importAllComponentsFromCart($cart);
-            //$order->importItemsFromCart($cart);
-            //$order->importAddressesFromCart($cart);
-            //$order->importPaymentFromCart($cart);
-            //$order->save();
-            // $payment = $this->FCom_Sales_Model_Order_Payment->createFromCart($cart);
-//            $order->pay();
-            $cart->setState('ordered')->save();
-            return $order;
-        } catch (Exception $e) {
-            // if something failed, like bad payment method
-            // set some error message in session and do nothing
-            $this->BDebug->logException($e);
-        }
-        return false;
-    }
-
     public function setStatusActive()
     {
         $cart->setStateOverall('active');

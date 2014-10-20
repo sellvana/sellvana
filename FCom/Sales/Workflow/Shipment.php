@@ -8,6 +8,7 @@ class FCom_Sales_Workflow_Shipment extends FCom_Sales_Workflow_Abstract
         'adminCreatesShipment',
         'adminUpdatesShipment',
         'adminPrintsShippingLabels',
+        'adminChangesShipmentCustomState',
     ];
 
     public function adminCreatesShipment($args)
@@ -20,5 +21,13 @@ class FCom_Sales_Workflow_Shipment extends FCom_Sales_Workflow_Abstract
 
     public function adminPrintsShippingLabels($args)
     {
+    }
+
+    public function adminChangesShipmentCustomState($args)
+    {
+        $newState = $args['shipment']->state()->custom()->setState($args['state']);
+        $label = $newState->getValueLabel();
+        $args['shipment']->addHistoryEvent('custom_state', 'Admin user has changed custom shipment state to "' . $label . '"');
+        $args['shipment']->save();
     }
 }

@@ -370,7 +370,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $cart = $this->_cart;
 
         $orderData = [];
-        $orderData['payment_method']         = $cart->payment_method;
+        $orderData['payment_method'] = $cart->payment_method;
         $this->set($orderData);
         return $this;
     }
@@ -380,7 +380,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $cart = $this->_cart;
 
         $orderData = [];
-        $orderData['coupon_code']            = $cart->coupon_code;
+        $orderData['coupon_code'] = $cart->coupon_code;
         $this->set($orderData);
         return $this;
     }
@@ -405,16 +405,15 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $salesOrder = $this->_createFromCart($cart);
 
         $salesOrder->save(); // save to have valid unique_id
-        if (isset($options['all_components']) && $options['all_components']) {
-            $options['order_id'] = $salesOrder->id();
-            $this->createOrderItems($cart, $options);
-            $this->createOrderAddress($cart, $options);
 
-            //Made payment
-            $cart->setPaymentDetails($this->BUtil->fromJson($cart->payment_details));
-            $paymentMethod = $cart->getPaymentMethod();
-            $this->createOrderPayment($paymentMethod, $salesOrder, $options);
-        }
+        $options['order_id'] = $salesOrder->id();
+        $this->createOrderItems($cart, $options);
+
+        //Made payment
+        $cart->setPaymentDetails($this->BUtil->fromJson($cart->payment_details));
+        $paymentMethod = $cart->getPaymentMethod();
+        $this->createOrderPayment($paymentMethod, $salesOrder, $options);
+
         $this->BEvents->fire(__METHOD__ . ':after', [
             'cart'           => $cart,
             'options'        => $options,
@@ -435,17 +434,9 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             return;
         }
         /* @var $payment FCom_Sales_Method_Payment_Abstract */
-        $payment->setSalesEntity($salesOrder, $options)
+        $payment->setSalesOrder($salesOrder, $options)
                 ->payOnCheckout();
         $salesOrder->setData('payment_details', $payment->asArray());
-    }
-
-    /**
-     * @param FCom_Sales_Model_Cart $cart
-     * @param array                 $options
-     */
-    public function createOrderAddress($cart, $options)
-    {
     }
 
     public function getAddresses()

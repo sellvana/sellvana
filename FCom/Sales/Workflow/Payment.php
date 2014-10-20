@@ -11,17 +11,26 @@ class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
         'adminCapturesPayment',
         'adminRefundsPayment',
         'adminVoidsPayment',
+        'adminChangesPaymentCustomState',
     ];
 
     public function customerSubmitsPayment($args)
     {
         try {
+            $cart = $this->_getCart($args);
+            $methods = $this->FCom_Sales_Main->getPaymentMethods();
+            $methodCode = $cart->get('payment_method');
+            if (empty($methods[$methodCode])) {
+                throw new BException('Invalid payment method: ' . $methodCode);
+            }
+            $method = $methods[$methodCode];
+            $method = $payment->getMethodObject();
+            $result = $method->workflowCustomerSubmitsPayment($args['order']);
+
             $payment = $this->FCom_Sales_Model_Order_Payment->create([
                 'order_id' => $args['order']->id(),
 
             ])->save();
-            $method = $payment->getMethodObject();
-            $method->workflowCustomerSubmitsPayment($payment);
         } catch (Exception $e) {
 
             //TODO: handle payment exception
@@ -46,5 +55,13 @@ class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
 
     public function adminVoidsPayment($args)
     {
+    }
+
+    public function adminChangesPaymentCustomState($args)
+    {
+        $newState = $args['payment']->state()->custom()->setState($args['state']);
+        $label = $newState->getValueLabel();
+        $args['payment']->addHistoryEvent('custom_state', 'Admin user has changed custom payment state to "' . $label . '"');
+        $args['payment']->save();
     }
 }

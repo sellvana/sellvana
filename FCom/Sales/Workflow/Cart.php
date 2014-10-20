@@ -265,6 +265,7 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
         $order->importDataFromCart($cart);
 
         $this->FCom_Sales_Main->workflowAction('customerSubmitsPayment', [
+            'cart' => $cart,
             'order' => $order,
             'result' => &$result,
         ]);
@@ -272,15 +273,5 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
         $cart->setStateOrdered()->save();
 
         $args['result']['order'] = $order;
-    }
-
-    protected function _getCart($args, $createIfNeeded = false)
-    {
-        if (!empty($args['cart'])) {
-            $cart = $args['cart'];
-        } else {
-            $cart = $this->FCom_Sales_Model_Cart->sessionCart($createIfNeeded);
-        }
-        return $cart;
     }
 }

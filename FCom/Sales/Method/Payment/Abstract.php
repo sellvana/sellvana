@@ -3,10 +3,10 @@
 abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
     FCom_Sales_Method_Payment_Interface
 {
-    protected $cart;
-    protected $salesOptions;
-    protected $salesEntity;
-    protected $details;
+    protected $_cart;
+    protected $_order;
+    protected $_orderOptions;
+    protected $_details;
     protected $_sortOrder = 50;
     protected $_name;
 
@@ -48,10 +48,10 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
      * @param $options
      * @return $this
      */
-    public function setSalesEntity($order, $options)
+    public function setSalesOrder($order, $options)
     {
-        $this->salesEntity = $order;
-        $this->salesOptions = $options;
+        $this->_order = $order;
+        $this->_orderOptions = $options;
 
         return $this;
     }
@@ -63,7 +63,7 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
      */
     public function setDetails($details)
     {
-        $this->details = $details;
+        $this->_details = $details;
         return $this;
     }
 
@@ -75,7 +75,7 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
      */
     public function getPublicData()
     {
-        return $this->details;
+        return $this->_details;
     }
 
     /**
@@ -85,7 +85,7 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
      */
     public function setCartEntity($cart)
     {
-        $this->cart = $cart;
+        $this->_cart = $cart;
         return $this;
     }
 
@@ -96,11 +96,11 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
 
     public function set($name, $value)
     {
-        return $this->details[$name] = $value;
+        return $this->_details[$name] = $value;
     }
 
     public function get($name, $default = null)
     {
-        return isset($this->details[$name]) ? $this->details[$name] : $default;
+        return isset($this->_details[$name]) ? $this->_details[$name] : $default;
     }
 }
