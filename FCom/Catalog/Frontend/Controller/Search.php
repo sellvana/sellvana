@@ -131,7 +131,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
 
         $this->FCom_Catalog_Model_SearchHistory->addSearchHit($q, $productsData['state']['c']);
 
-        $layout->view('header')->set('query', $q);
+        $layout->view('header-top')->set('query', $q);
         $layout->view('breadcrumbs')->set('crumbs', ['home', ['label' => 'Search: ' . $q, 'active' => true]]);
         $layout->view('catalog/search')->set('query', $q);
         $pagerView->set('filters', $filter);

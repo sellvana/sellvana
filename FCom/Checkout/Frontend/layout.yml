@@ -4,6 +4,12 @@ base:
             - [ requireJs, fcom.checkout, "@FCom_Checkout/Frontend/js/fcom.checkout" ]
             - [ requireRun, fcom.checkout]
 
+checkout/base:
+    - { include: base }
+    - { hook: header-components, clear: [ header-nav, header-callouts ] }
+    - { hook: header-top-util, clear: ALL }
+    - { hook: header-top-search, clear: ALL }
+
 /checkout/cart:
     - { include: base }
     - { hook: main, views: checkout/cart }
@@ -15,7 +21,7 @@ base:
             - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
 
 /checkout/checkout:
-    - { include: base }
+    - { include: checkout/base }
     - view: head
         do:
             - [ title, Checkout ]
@@ -23,7 +29,7 @@ base:
     - { hook: main, views: checkout/checkout }
 
 /checkout/login:
-    - { include: base }
+    - { include: checkout/base }
     - view: head
         do:
             - [ title, Checkout Login ]
@@ -31,21 +37,21 @@ base:
     - { hook: main, views: checkout/login }
 
 /checkout/payment:
-    - { include: base }
+    - { include: checkout/base }
     - view: head
         do:
             - [ title, Checkout Payment Method ]
     - { hook: main, views: checkout/payment }
 
 /checkout/shipping:
-    - { include: base }
+    - { include: checkout/base }
     - view: head
         do:
             - [ title, Checkout Shipping Method ]
     - { hook: main, views: checkout/shipping }
 
 /checkout/address:
-    - { include: base }
+    - { include: checkout/base }
     - view: head
         do:
             - [ title, Checkout Address ]

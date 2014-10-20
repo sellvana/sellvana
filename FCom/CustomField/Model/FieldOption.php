@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CustomField_Model_FieldOption
+ *
+ * @property int $id
+ * @property int $field_id
+ * @property string $label
+ * @property string $locale
+ */
 class FCom_CustomField_Model_FieldOption extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;

@@ -2,66 +2,77 @@
 
 <script>
 require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, Backbone) {
-    var fieldsGrid, optionsGrid, selectedRow;
+    var fieldsGrid, optionsGrid, selectedRow, originOptionIds, removedOptionIds;
     var optionForm = $('#options-form');
+    var fieldForm = $('#field-modal-form');
+    
     window.optionsGridRegister = function(grid) {
-            optionsGrid = grid;
-            optionsGrid.build();
+    	optionsGrid = grid;
+    	optionsGrid.build();
     };
 
     window.fieldsGridRegister = function(grid) {
         fieldsGrid = grid;
         fieldsGrid.getGridSkeleton().Views.RowView.prototype._callbackCustom = function (ev) {
-
             selectedRow = this.model;
-
-            optionsGrid.getRows().url = '{{ APP.href('customfields/fieldsets/field_option_grid_data?field_id=') | raw }}'
-                                                    + selectedRow.get('id');
+			
+    		fieldsGrid.getModalForm().modalType = 'editable';
+    		fieldsGrid.getGridSkeleton().currentRow = this.model;
+    		fieldsGrid.getModalForm().render();
+            
+            optionsGrid.getRows().url = '{{ APP.href('customfields/fieldsets/field_option_grid_data?field_id=') | raw }}' + selectedRow.get('id');
             optionsGrid.getRows().fetch({
                 reset: true,
                 success: function () {
-                    console.log('success');
+                    originOptionIds = optionsGrid.getRows().pluck('id');
                     optionsGrid.getGridView().render();
-                    $('#btn-field-grid-modal').trigger('click');
-                    $('#options-form').validate();
+                    if (optionsGrid.getRows().length > 0) {
+                        $('#options-form').validate();
+                        $(optionsGrid.getGridSkeleton().NewButton).removeClass('disabled');
+                    } else {
+                        $(optionsGrid.getGridSkeleton().NewButton).addClass('disabled');
+                    }
                 }
             });
-
+			
             $('#field-modal-header').html(selectedRow.get('field_name'));
+			$('#btn-field-grid-modal').trigger('click');
         }
-
-        fieldsGrid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
-            var inputType = this.model.get('admin_input_type');
-            console.log(inputType);
-            if (inputType !== 'select' && inputType !== 'multiselect') {
-                this.$el.find('button.btn-custom').remove();
-            }
-        }
-
+        
+        fieldsGrid.getGridSkeleton().Views.ModalForm.prototype.el = '#field-modal-form';
         fieldsGrid.build();
     };
+    
+    $('#add_new_field').click(function () {
+    	optionsGrid.getRows().reset();
+    	optionsGrid.getGridView().clearSelectedRows();
+    	
+        fieldsGrid.getModalForm().modalType = 'addable';
+        fieldsGrid.getModalForm().render();
+        $('.tabbable #options_tab').hide();
+        
+        $('#field-modal-header').html('Add Field');
+        $('#btn-field-grid-modal').trigger('click');
+    });
 
     $('button.field-modal-save').click(function() {
-        if (optionForm.valid()) {
+        if (optionForm.valid() && fieldForm.valid()) {
             var dataForm = optionForm.serializeArray();
-            rows = optionsGrid.getRows().toJSON();
-            rows.forEach(function (data, index) {
+            var rows = optionsGrid.getRows().toJSON();
+            /*rows.forEach(function (data, index) {
                 data.label =  dataForm[index]['value'];
-            });
+            });*/
 
-            $.post('{{ APP.href('customfields/fieldsets/field_option_grid_data') | raw }}',
-                    {
-                        field_id: selectedRow.get('id'),
-                        rows: rows
-                    },
-                    function (data) {
-                                        selectedRow.set('num_options', data.options);
-                                        selectedRow.trigger('render');
-                                        $('button.field-modal-close').trigger('click');
-                                    }
-            );
-
-
+            //delete option
+            removedOptionIds = _.difference(originOptionIds, optionsGrid.getRows().pluck('id'));
+            console.log(removedOptionIds);
+            
+            fieldsGrid.getGridSkeleton().modalElementVals = {'rows': rows, 'rowsDelete': removedOptionIds};
+            if (fieldsGrid.getModalForm().saveChanges()) {
+                selectedRow.set('num_options', optionsGrid.getRows().length);
+            	selectedRow.trigger('render');
+            	$('button.field-modal-close').trigger('click');
+            }
         }
     });
 });
@@ -95,13 +106,31 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
                 <h4 class='modal-title' id='field-modal-header'> {{ "Options" |_ }}</h4>
             </div>
             <div class='modal-body'>
-                <form action="#" id="options-form">
-                    <div class='row'>
-                        <div class='col-sm-12'>
-                            {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.optionsGridConfig()) | raw }}
+                <div class='tabbable'>
+                    <ul class='nav nav-tabs prod-type f-horiz-nav-tabs'>
+                        <li class='active'>
+                            <a data-toggle='tab' href='#edit_field_set' id='fieldset_tab'>
+                                {{ "Field Sets"|_ }}
+                            </a>
+                        </li>
+                        <li>
+                            <a data-toggle='tab' href='#options' id='options_tab'>
+                                {{ "Options"|_ }}
+                            </a>
+                        </li>
+                    </ul>
+                    <div class='tab-content'>
+                        <div class='tab-pane active' id='edit_field_set'>
+                            <form class="form form-horizontal validate-form" id="field-modal-form" novalidate="novalidate">
+							</form>
+                        </div>
+                        <div class='tab-pane' id='options'>
+                            <form action="#" id="options-form">
+								{{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.optionsGridConfig()) | raw }}
+			                </form>
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
              <div class='modal-footer'>
                 <button class='btn btn-primary field-modal-save' type='button'>{{ "Save"|_ }}</button>
