@@ -51,10 +51,11 @@
         var inputName = 'input[data-col="name"]';
         var inputOption = 'input[data-col="options"]';
         var selectFieldType = 'select[data-col="input_type"]';
+        var $modal;
         window.formFieldGridRegister = function (grid) {
             mainGrid = grid;
             mainGrid.build();
-            var $modal = $('#{{grid.config.id}}-custom-form');
+            $modal = $('#{{grid.config.id}}-custom-form');
             var mainFields = {
                 name: 1,
                 label: 1,
@@ -127,8 +128,10 @@
             }
             var $btn = $(".btn-edit");
             $btn.click(function (e) {
-                editField(this);
                 e.preventDefault();
+                e.stopPropagation();
+                editField(this);
+                return false;
             });
         };
         $('#cms-blocks-form').submit(function (ev) {
@@ -166,7 +169,28 @@
             var $tr = $btn.closest('tr');
             var id = $tr.attr('id');
             var row = mainGrid.getRows().get(id);
-            console.log(row.pairs());
+            var pairs = row.pairs();
+            $(pairs).each(function(inx, pair){
+                var f = pair[0];
+                var val = pair[1];
+
+                if(!f || $.trim(f) === "" || f == 0){
+                    return;
+                }
+
+                var $field = $modal.find("#" + f);
+                if($field.length > 0) {
+                    $field.val(val);
+                }
+
+                if(f == 'options') {
+                    var $options = $.parseJSON(val);
+                    console.log($options);
+                }
+            });
+
+            $modal.modal('show');
+            $modal.find('#type').change();
             return false;
         }
 
