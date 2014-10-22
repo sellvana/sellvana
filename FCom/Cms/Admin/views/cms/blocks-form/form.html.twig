@@ -80,47 +80,60 @@
                 $selects.select2();
                 var $fields = $modal.find('select,input,textarea');
                 var $addBtn = $modal.find('button.save');
+                var $id = $modal.find("#id");
                 var rowTpl = mainGrid.getGridSkeleton().Models.Row;
                 $addBtn.click(function (e) {
-                        if (!$('#{{ grid.config.id }}-new-form').valid()) {
-                            return;
-                        }
-                        var temp = new rowTpl;
-                        var options = {};
-                        $fields.each(function (i, o) {
-                            var $el = $(o);
-                            var disabled = $el.prop('disabled');
-                            if (!disabled) {
-                                var fieldName = $el.prop('name');
-                                var fieldType = $el.prop('type');
-                                var fieldValue = $el.val();
-                                if ((fieldType == 'checkbox' || fieldType == 'radio') && !$el.prop('checked')) {
-                                    return;
-                                }
-                                if (mainFields[fieldName]) {
-                                    temp.set(fieldName, fieldValue);
-                                } else if(fieldName != ''){
-                                    options[fieldName] = fieldValue;
-                                }
-//                                console.log(temp);
+                    if (!$('#{{ grid.config.id }}-new-form').valid()) {
+                        return;
+                    }
+                    var temp;
+                    var rows = mainGrid.getRows();
+                    if(parseInt($id.val()) != 0) {
+                        temp = rows.get($id.val());
+                    }
+
+                    if(!temp) {
+                        temp = new rowTpl;
+                        temp.set('id', 0);
+                    }
+
+                    var options = {};
+                    $fields.each(function (i, o) {
+                        var $el = $(o);
+                        var disabled = $el.prop('disabled');
+                        if (!disabled) {
+                            var fieldName = $el.prop('name');
+                            var fieldType = $el.prop('type');
+                            var fieldValue = $el.val();
+                            if ((fieldType == 'checkbox' || fieldType == 'radio') && !$el.prop('checked')) {
+                                return;
                             }
-                        });
-                        if ($.isEmptyObject(options) == false) {
-                            temp.set('options', JSON.stringify(options));
+                            if (mainFields[fieldName]) {
+                                temp.set(fieldName, fieldValue);
+                            } else if (fieldName != '') {
+                                options[fieldName] = fieldValue;
+                            }
+//                                console.log(temp);
                         }
-                        var rows = mainGrid.getRows();
+                    });
+                    if ($.isEmptyObject(options) == false) {
+                        temp.set('options', JSON.stringify(options));
+                    }
+                    if (temp.get('id') == 0) {
                         var rowsSize = rows.size();
                         var id = 1;
-                        if(rowsSize != 0) {
+                        if (rowsSize != 0) {
                             // some rows in collection
                             var last = rows.at(rowsSize - 1);
                             id = last.get('id') - 0; // make sure it is number
                         }
                         temp.set('_new', true);
                         temp.set('id', id + 1);
-                        rows.add(temp);
-                        $modal.modal('hide');
-                        e.preventDefault();
+                    }
+                    rows.add(temp);
+
+                    $modal.modal('hide');
+                    e.preventDefault();
                 });
                 $(mainGrid.getGridSkeleton().AddButton).click(function () {
                     $modal.modal('show');
@@ -177,20 +190,52 @@
                 if(!f || $.trim(f) === "" || f == 0){
                     return;
                 }
+                var isSelect2 = false;
+                if (f == 'options') { // if data field name is options, parse the json and populate fields.
+                    var options = $.parseJSON(val);
+                    for (var field in options) {
+                        if (!field || $.trim(field) === "" || field == 0) {
+                            continue;
+                        }
+                        $field = $modal.find("#" + field);
+                        val = options[field];
+                        isSelect2 = false;
+                        if ($field.length > 0) {
+                            $field.val(val);
+                            isSelect2 = $field.hasClass("select2-offscreen");
+                            if (isSelect2) { // if field is select2 control, use select2 api to set value
+                                if (field == "options") {
+                                    $field.select2({ // enable comma separated list of values with select2
+                                        tags: val.split(","),
+                                        tokenSeparators: [',']
+                                    });
+                                } else if(field == "css_class") {
+                                    $field.select2({ // enable comma separated list of values with select2
+                                        tags: val.split(/[,\s]+/),
+                                        tokenSeparators: [',', ' ', '\t', '\n']
+                                    });
+                                } else {
+                                    $field.select2("val", val);
+                                }
+                            }
+                        }
+                    }
+                } else { // else set fields values
+                    var $field = $modal.find("#" + f);
 
-                var $field = $modal.find("#" + f);
-                if($field.length > 0) {
-                    $field.val(val);
-                }
-
-                if(f == 'options') {
-                    var $options = $.parseJSON(val);
-                    console.log($options);
+                    if ($field.length > 0) {
+                        $field.val(val);
+                        isSelect2 = $field.hasClass("select2-offscreen");
+                        if (isSelect2) {
+                            $field.select2("val", val).trigger("change");
+                        }
+                    }
                 }
             });
 
             $modal.modal('show');
-            $modal.find('#type').change();
+            var $typeField = $modal.find('#input_type'); // trigger change event in order correct fields to show
+            $typeField.trigger('change');
             return false;
         }
 
@@ -243,6 +288,7 @@
         <h4 class="modal-title">{{ "Add field"|_ }}</h4>
     </div>
     <div class='modal-body'>
+        <input type="hidden" name="id" value="0" id="id"/>
         <div class=" field-element-wrapper">
             <div class="form-group">
                 <label for="input_type" class="col-sm-3 control-label required">{{ "Field Type"|_ }}</label>
@@ -461,7 +507,6 @@
     </div>
     </div>
     <script type="text/javascript">
-        //todo add select2
         require(['jquery', 'select2'], function ($) {
             var $inputType = $("#input_type");
             var lastFieldType;
