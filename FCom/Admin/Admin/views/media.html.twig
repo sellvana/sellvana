@@ -5,7 +5,7 @@
         $('#main-nav').remove();
     });
     window.ckeditor_all_images_register = function(grid) {
-        ckeditor_all_images_grid = grid;
+        var ckeditor_all_images_grid = grid;
         grid.getGridSkeleton().Views.RowView.prototype._selectRow = function(ev) {
             var selectedRows = grid.getSelectedRows();
 
@@ -28,7 +28,7 @@
             ev.preventDefault();
 
             return;
-        }
+        };
 
         grid.build();
         $('.row:first').append("<div class='modal-footer'>"+
@@ -38,7 +38,7 @@
         $('.btn_media_add').click(function() {
             var row = ckeditor_all_images_grid.getSelectedRows().at(0);
             var funcNum = '{{ REQUEST.get('CKEditorFuncNum') }}';
-            var path = FCom.Admin.baseUrl + row.get("folder") + row.get("subfolder") + "/" + row.get("file_name");
+            var path = FCom.Admin.base_url + row.get("folder") + row.get("subfolder") + "/" + row.get("file_name");
             window.opener.CKEDITOR.tools.callFunction(funcNum, path);
             window.close();
         });
@@ -49,7 +49,6 @@
 </script>
 <div class='row'>
     <div class='col-sm-12'>
-        {{ THIS.view('core/medialib').set('config', { 'id': 'ckeditor_all_images',
-                'type': 'images', mode: 'thumbnail'}) | raw }}
+        {{ THIS.view('core/medialib').set('config', { 'id': 'ckeditor_all_images', 'type': 'images', mode: 'thumbnail'}) | raw }}
     </div>
 </div>

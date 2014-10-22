@@ -10,6 +10,13 @@ define(fcomAdminDeps, function ($) {
      $interpolateProvider.endSymbol("%>");
      });
      */
+
+    FCom.Admin.log = function (text) {
+        if (FCom.Admin.current_mode == 'DEBUG') {
+            console.log(text);
+        }
+    };
+
     FCom.Admin.Accordion = function (containerId, options) {
         var $container = $('#' + containerId);
         $container.find('.accordion-toggle').each(function (i, headingEl) {
@@ -19,7 +26,7 @@ define(fcomAdminDeps, function ($) {
         $container.find('.accordion-body').each(function (i, bodyEl) {
             $(bodyEl).attr('id', containerId + '-group' + i).addClass('collapse');
         });
-    }
+    };
 
     FCom.Admin.Tabs = function (containerSel, options) {
         var $container = $(containerSel);
@@ -45,7 +52,7 @@ define(fcomAdminDeps, function ($) {
         if (options.cur_tab) {
             $('[href="#tab-' + options.cur_tab + '"]').tab('show');
         }
-    }
+    };
 
     FCom.Admin.MediaLibrary = function (options) {
         var grid = $(options.grid || '#media-library'), container = grid.parents('.ui-jqgrid').parent();
@@ -196,11 +203,11 @@ define(fcomAdminDeps, function ($) {
         $(container).append('<iframe id="upload-target" name="upload-target" src="" style="width:0;height:0;border:0"></iframe>');
 
         $('#upload-input', container).change(function (ev) {
-            console.log(this.files);
+            FCom.Admin.log(this.files);
             var form = $(this).parents('form'), action = form.attr('action'), i, file;
             for (i = 0; i < this.files.length; i++) {
                 file = this.files[i];
-                console.log(file);
+                FCom.Admin.log(file);
                 grid.jqGrid('addRowData', file.fileName, {file_name: file.fileName, file_size: file.fileSize, status: '...'});
             }
             form.attr('action', options.url + '/upload?grid=' + grid.attr('id') + '&folder=' + encodeURIComponent(options.folder))
@@ -219,7 +226,7 @@ define(fcomAdminDeps, function ($) {
             setOptions: setOptions,
             getSelectedRows: getSelectedRows
         };
-    }
+    };
 
     FCom.Admin.TargetGrid = function (options) {
         var source = $(options.source), target = $(options.target);
@@ -287,19 +294,19 @@ define(fcomAdminDeps, function ($) {
         toolbar.find('.ui-icon-trash').parents('.ui-pg-button').click(removeRows);
 
         return {}
-    }
+    };
 
     FCom.Admin.load = function (collection, el) {
         el = $(el);
         var uid = el.data('uid');
         return FCom.Admin[collection][uid];
-    }
+    };
 
     FCom.Admin.save = function (collection, el, object) {
         var uid = Math.random();
         el.data('uid', uid);
         FCom.Admin[collection][uid] = object || el;
-    }
+    };
 
     FCom.Admin.checkboxButton = function (id, opt) {
         var el = $(id);
@@ -318,7 +325,7 @@ define(fcomAdminDeps, function ($) {
                 if (opt.click) opt.click.bind(this)(ev);
             });
         return el;
-    }
+    };
 
     FCom.Admin.buttonsetTabs = function (id, opt) {
         var el = $(id), id1 = id.replace(/^#/, ''), pane;
@@ -340,7 +347,7 @@ define(fcomAdminDeps, function ($) {
         });
         el.buttonset(el);
         return el;
-    }
+    };
 
     FCom.Admin.buttonAddImage = function (dataConfig) {
         var $buttonAddImage = $('.btn_'+ dataConfig.config_id +'_add');
@@ -396,7 +403,7 @@ define(fcomAdminDeps, function ($) {
                 }
             })
         });
-    }
+    };
 
     FCom.Admin.ajaxCacheStorage = {}
     FCom.Admin.ajaxCache = function (url, callback) {
@@ -426,7 +433,7 @@ define(fcomAdminDeps, function ($) {
         } else {
             callback(FCom.Admin.ajaxCacheStorage[url]);
         }
-    }
+    };
 
     FCom.Admin.layouts = {}
     FCom.Admin.layout = function (id, opt) {
@@ -459,7 +466,7 @@ define(fcomAdminDeps, function ($) {
             $(window).resize(resize);
         }
         return layout;
-    }
+    };
 
     FCom.Admin.trees = {}
     FCom.Admin.tree = function (el, opt) {
@@ -501,7 +508,7 @@ define(fcomAdminDeps, function ($) {
         }
 
         function reorder(node) {
-            console.log('node', node);
+            FCom.Admin.log('node', node);
             if (!checkLock()) return;
             function postReorder(recursive) {
                 $.post(opt.url, {
@@ -839,7 +846,7 @@ define(fcomAdminDeps, function ($) {
                 if (!confirm('Are you sure you want to ' + (copy ? 'copy' : 'move') + ' ' + dd.count + ' row(s) to ' + e.target.innerText)) {
                     return;
                 }
-                console.log(dd, $(dd.drag).parents('.grid-container'));
+                FCom.Admin.log(dd, $(dd.drag).parents('.grid-container'));
                 for (var i = 0; i < dd.rows.length; i++) {
                     rowIDs.push(dd.grid.getDataItem(dd.rows[i]).id);
                 }
@@ -850,7 +857,7 @@ define(fcomAdminDeps, function ($) {
                         'copy': copy
                     },
                     function (r) {
-                        console.log(r);
+                        FCom.Admin.log(r);
                     }
                 );
 
@@ -863,13 +870,13 @@ define(fcomAdminDeps, function ($) {
 
         function toggleExpand() {
             $('#1 li', el).each(function (idx, li) {
-                console.log(idx, li);
+                FCom.Admin.log(idx, li);
                 el.jstree('toggle_node', li);
             });
         }
 
         return {toggleExpand: toggleExpand};
-    }
+    };
 
     FCom.Admin.forms = {}
     FCom.Admin.form = function (options) {
@@ -892,7 +899,7 @@ define(fcomAdminDeps, function ($) {
 
         function wysiwygCreate(id) {
             if (!editors[id] && CKEDITOR !== 'undefined' && !CKEDITOR.instances[id]) {
-                console.log(id, 'wysiwygcreate');
+                FCom.Admin.log(id, 'wysiwygcreate');
                 editors[id] = true; // prevent double loading
 
                 CKEDITOR.replace(id, {
@@ -1002,7 +1009,7 @@ define(fcomAdminDeps, function ($) {
             var postData = form.serializeArray();
             var url_post = options.url_get + (options.url_post.match(/\?/) ? '&' : '?');
             $.post(url_post + 'tabs=ALL&mode=view', postData, function (data, status, req) {
-                console.log(data);
+                FCom.Admin.log(data);
                 $.pnotify({
                     pnotify_title: data.message || 'The form has been saved',
                     pnotify_type: data.status == 'error' ? 'error' : null,
@@ -1082,7 +1089,7 @@ define(fcomAdminDeps, function ($) {
             saveAll: saveAll,
             deleteForm: deleteForm
         };
-    }
+    };
 
     if ($.jgrid) {
         $.extend($.jgrid.defaults, {
@@ -1114,23 +1121,23 @@ define(fcomAdminDeps, function ($) {
         });
     }
 
-    FCom.Admin.jqGrid = {}
+    FCom.Admin.jqGrid = {};
 
     FCom.Admin.jqGrid.fmtHiddenInput = function (cellvalue, options, rowObject) {
-        console.log(cellvalue, options, rowObject);
+        FCom.Admin.log(cellvalue, options, rowObject);
         // do something here
         return cellvalue ? cellvalue : '';
-    }
+    };
 
     FCom.Admin.jqGrid.fmtNewWindow = function (val, opt, obj) {
         return "<a href='javascript:window.open(\"" + val + "\", \"vendor_website_url\", \"width=800,height=600\")'>" + val + "</a>";
-    }
+    };
 
     FCom.Admin.jqGrid.fmtRadioButton = function (val, opt, obj) {
         var id = opt.colModel.inputId || opt.gid + '-' + opt.colModel.name + '-' + val;
         var name = opt.colModel.inputName || opt.gid + '[' + opt.colModel.name + ']';
         return '<input type="radio" id="' + id + '" name="' + name + '" value="' + val + '"/>';
-    }
+    };
 
     $.widget('ui.fcom_autocomplete', {
         _create: function () {
@@ -1197,7 +1204,7 @@ define(fcomAdminDeps, function ($) {
     FCom.Admin.initCodeEditors = function () {
         if (typeof CodeMirror == 'undefined') return;
 
-        var scriptBaseUrl = FCom.Admin.codemirrorBaseUrl;
+        var scriptBaseUrl = FCom.Admin.code_mirror_base_url;
 
         CodeMirror.modeURL = scriptBaseUrl + '/mode/%N/%N.js';
 
@@ -1226,7 +1233,7 @@ define(fcomAdminDeps, function ($) {
             }
             $(el).data('editor', editor);
         });
-    }
+    };
 
     $.fn.resizeWithWindow = function (options) {
         var settings = $.extend({ x: false, y: true, dX: null, dX: null, initBy: null, jqGrid: null }, options || {});
@@ -1270,7 +1277,7 @@ define(fcomAdminDeps, function ($) {
 
         resize();
         $win.resize(resize);
-    }
+    };
 
     $(function () {
         if ($.jgrid) {
@@ -1301,7 +1308,7 @@ define(fcomAdminDeps, function ($) {
         $('header .navbar .toggle-nav').click(function (ev) {
             var postData = { do: 'nav.collapse', collapsed: $('body').hasClass('main-nav-closed') ? 1 : 0 };
             $.post(FCom.Admin.personalize_href, postData, function (response, status, xhr) {
-                console.log(response);
+                FCom.Admin.log(response);
             });
         })
         $('.nav-group header').click(function (ev) {
@@ -1319,4 +1326,4 @@ define(fcomAdminDeps, function ($) {
 
         $.fn.foundationCustomForms && $(".foundation-forms").foundationCustomForms();
     })
-})
+});
