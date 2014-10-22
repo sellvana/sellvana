@@ -1949,6 +1949,14 @@ class BViewEmpty extends BView
 
 /**
  * View dedicated for rendering HTML HEAD tags
+ *
+ * default tag templates method
+ * @method js()
+ * @method js_raw()
+ * @method css()
+ * @method css_raw()
+ * @method less()
+ * @method icon()
  */
 class BViewHead extends BView
 {

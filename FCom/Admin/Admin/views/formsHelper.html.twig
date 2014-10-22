@@ -1,3 +1,0 @@
-{% macro input(name, value, type, class, id, size) %}
-    <input type="{{ type|default('text') }}"{{  id ? ' id="'~id~'"' : '' }}{{ class ? ' class='~class : '' }} name="{{ name }}" value="{{ value|e }}"{{ size ? ' size="'~size~'"' : '' }} />
-{% endmacro %}
