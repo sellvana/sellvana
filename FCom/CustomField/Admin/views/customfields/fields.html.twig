@@ -26,7 +26,7 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
                 success: function () {
                     originOptionIds = optionsGrid.getRows().pluck('id');
                     optionsGrid.getGridView().render();
-                    if (optionsGrid.getRows().length > 0) {
+                    if (selectedRow.get('admin_input_type') == 'select') {
                         $('#options-form').validate();
                         $(optionsGrid.getGridSkeleton().NewButton).removeClass('disabled');
                     } else {
