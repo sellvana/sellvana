@@ -2256,7 +2256,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
 
             if (typeof(config.grid_before_create) !== 'undefined' && typeof window[config.grid_before_create] === 'function') {
-                FCom.Admin.log(config.grid_before_create);
+                //FCom.Admin.log(config.grid_before_create); //sometimes FCom.Admin.log undefined
                 window[config.grid_before_create](this);
             } else {
                 this.build();

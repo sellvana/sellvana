@@ -159,23 +159,138 @@
 <script>
 require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], function($) {
 
-  check_avail_status();
+    FCom.Admin.Dashboard = function () {
 
-  function validateDateTime(data) {
-        var error = false;
-        if (['range', 'not_range'].indexOf(data.range) == -1) {
-            error = true;
+        var dashboardUrl = "{{ APP.href('dashboard') }}";
+        var personalizeUrl = "{{ APP.href('my_account/personalize') }}";
+        var filter =  $('#filter-text');
+        var custom = $('#custom');
+        var sortable = $('.js-sortable-container');
+        var closeFilter = custom.find('.choice-close');
+        //var widgetTemplate = _.template($('#dashboard-widget-template').html());
+        var select = $('#add-widget-selection');
+
+        function init() {
+            check_avail_status();
+
+            $('#add-widget-submit').click(function(ev) {
+                load(select.val(), true, true);
+                $('#add-widget-selection').find('option[value="'+ select.val() +'"]').remove();
+                select.val('');
+                $('#add-widget-modal').modal('hide');
+
+                check_avail_status();
+            });
+            custom.find('.filter_op').click(function () {
+                filter.val($(this).attr('data-id'));
+                filter.attr('data-range', $(this).attr('data-range'));
+                var text = $(this).text().charAt(0).toUpperCase() + $(this).text().slice(1);
+                filter.attr('data-text', text);
+            });
+            $('.btn-filter-date').click(function () {
+                var dataDefault = {type: 'default', date: 'all', range: 'range', is_btn_filter: 1};
+                $('button.active-button').removeClass('active-button');
+                $(this).addClass('active-button');
+                resetFilterDate();
+                switch ($(this).attr('data-date')) {
+                    case 'month':
+                        dataDefault['type'] = 'between';
+                        dataDefault['range'] = 'range';
+                        dataDefault['date']  = 'last-month';
+                        filterDate(dataDefault);
+                        break;
+                    case 'week':
+                        dataDefault['type'] = 'between';
+                        dataDefault['range'] = 'range';
+                        dataDefault['date']  = 'last-week';
+                        filterDate(dataDefault);
+                        break;
+                    case 'today':
+                        dataDefault['type'] = 'equal';
+                        dataDefault['range'] = 'not_range';
+                        dataDefault['date'] = 'today';
+                        filterDate(dataDefault);
+                        break;
+                    case 'all':
+                        filterDate(dataDefault);
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+            custom.find('.update').click(function () {
+                var date = '';
+                if (filter.attr('data-range') == 'not_range') {
+                    date = $(this).parents('.input-group').children('.not_range').children('.date-filter').val();
+                } else {
+                    date = $(this).parents('.input-group').children('.range').children('.date-filter').val();
+                }
+                if (date != '') {
+                    var data = {type: filter.val(), date: date , range: filter.attr('data-range'), is_btn_filter: 0};
+
+                    closeFilter.removeClass('hidden');
+                    custom.children('button').addClass('filter');
+                    custom.find('.custom-filter-value').html(filter.attr('data-text') +' "' + $('<div/>').text(date).html() + '"');
+                    filterDate(data);
+                    $('button.active-button').removeClass('active-button');
+                }
+            });
+            closeFilter.click(function (){
+                resetFilterDate();
+                filterDate({type: 'default', date: 'all', range: 'range', is_btn_filter: 1});
+                return false;
+            });
+
+            custom.on('click', 'input', function (ev) {
+                ev.stopPropagation();
+                ev.preventDefault();
+                return false;
+            });
+            custom.find('.filter-text-sub').click(function () {
+                $(this).parents('div.dropdown:first').toggleClass('open');
+                return false;
+            });
+            custom.find('a.filter_op').click(function (ev) {
+                if ($(ev.target).attr('data-range') == 'range') {
+                    custom.find('.range').css('display', 'table');
+                    custom.find('.not_range').css('display', 'none');
+                } else {
+                    custom.find('.range').css('display', 'none');
+                    custom.find('.not_range').css('display', 'table');
+                }
+                var text = $(ev.target).html();
+                text = text.charAt(0).toUpperCase() + text.slice(1);
+                custom.find('button.filter-text-sub').html(text + "<span class='caret'></span>");
+                custom.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
+
+                return false;
+            });
+
+            {% if asyncWidgets %}
+            load({{ UTIL.toJson(asyncWidgets)|raw }}.join(','));
+            {% endif %}
         }
-        switch (data.date) {
-            case 'last-month':case 'last-week':case 'today': case 'all':
+
+        function validateDateTime(data)
+        {
+            var error = false;
+            if (['range', 'not_range'].indexOf(data.range) == -1) {
+                error = true;
+            }
+            switch (data.date) {
+                case 'last-month':
+                case 'last-week':
+                case 'today':
+                case 'all':
                     if (data.is_btn_filter == 0) {
                         error = true;
                     }
-                break;
-            default:
+                    break;
+                default:
                     var date = data.date.split('~');
                     if ((data.range == 'range' && date.length < 2) || (data.range == 'not_range' && date.length > 1)) {
-                       error = true;
+                        error = true;
                     }
                     if (!error) {
                         date.forEach(function (val) {
@@ -185,245 +300,161 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
                         })
                     }
 
-                break;
+                    break;
+            }
+            return error;
         }
-        return error;
-  }
 
-    var dashboardUrl = "{{ APP.href('dashboard') }}", personalizeUrl = "{{ APP.href('my_account/personalize') }}";
-    var filter =  $('#filter-text');
-    var custom = $('#custom');
-    var sortable = $('.js-sortable-container');
-    var closeFilter = custom.find('.choice-close');
-    //var widgetTemplate = _.template($('#dashboard-widget-template').html());
-    var select = $('#add-widget-selection');
-
-  function check_avail_status() {
-
-    if ($('#add-widget-selection option').length > 1) {
-        $('#wigets-avail-status').css('display', 'none');
-        $('#add-widget-submit').removeClass('disabled');
-        $('#add-widget-selection').prop('disabled', false);
-    } else {
-        $('#wigets-avail-status').css('display', 'block');
-        $('#add-widget-submit').addClass('disabled');
-        $('#add-widget-selection').prop('disabled', 'disabled');
-    }
-  }
-
-  function load(widgets, wrapped, add) {
-    $.get(dashboardUrl, { widgets:widgets, wrapped:wrapped||'', add:add||'' }, function(response, status, xhr) {
-      $.each(response.widgets, function(key, widget) {
-        if (wrapped) {
-          $('#dashboard-widgets-container').append(widget.html);
-        } else {
-          $('#dashboard-widget__'+widget.key+' .widget-contents').html(widget.html);
+        function check_avail_status()
+        {
+            if (select.find('option').length > 1) {
+                $('#wigets-avail-status').css('display', 'none');
+                $('#add-widget-submit').removeClass('disabled');
+                select.prop('disabled', false);
+            } else {
+                $('#wigets-avail-status').css('display', 'block');
+                $('#add-widget-submit').addClass('disabled');
+                $('#add-widget-selection').prop('disabled', 'disabled');
+            }
         }
-      });
-      if (Object.keys(response.filter).length !== 0) {
-          switch (response.filter.date) {
-              case 'last-month':
-                  $('button[data-date="month"]').click();
-                  break;
-              case 'last-week':
-                  $('button[data-date="week"]').click();
-                  break;
-              case 'today':
-                  $('button[data-date="today"]').click();
-                  break;
-              case 'all':
-                  $('button[data-date="all"]').click();
-                  break;
-              default:
-                  $('a[data-id="'+ response.filter.type +'"]').click();
-                  var range = (response.filter.range == 'range') ? $('div.range'): $('div.not_range');
-                  range.find('input.date-filter').val(response.filter.date);
-                  $('.update').click();
-                  break;
-          }
-      } else {
-          $('button[data-date="all"]').click();
-      }
-    });
-  }
-  {% if asyncWidgets %}
-    load({{ UTIL.toJson(asyncWidgets)|raw }}.join(','));
-  {% endif %}
 
-  $('#add-widget-submit').click(function(ev) {
-    load(select.val(), true, true);
-    $('#add-widget-selection').find('option[value="'+ select.val() +'"]').remove();
-    select.val('');
-    $('#add-widget-modal').modal('hide');
-
-    check_avail_status();
-  });
-  custom.find('.filter_op').click(function () {
-      filter.val($(this).attr('data-id'));
-      filter.attr('data-range', $(this).attr('data-range'));
-      var text = $(this).text().charAt(0).toUpperCase() + $(this).text().slice(1);
-      filter.attr('data-text', text);
-  });
-  $('.btn-filter-date').click(function () {
-      var dataDefault = {type: 'default', date: 'all', range: 'range', is_btn_filter: 1};
-      $('button.active-button').removeClass('active-button');
-      $(this).addClass('active-button');
-      resetFilterDate();
-      switch ($(this).attr('data-date')) {
-          case 'month':
-              dataDefault['type'] = 'between';
-              dataDefault['range'] = 'range';
-              dataDefault['date']  = 'last-month';
-              filterDate(dataDefault);
-              break;
-          case 'week':
-              dataDefault['type'] = 'between';
-              dataDefault['range'] = 'range';
-              dataDefault['date']  = 'last-week';
-              filterDate(dataDefault);
-              break;
-          case 'today':
-              dataDefault['type'] = 'equal';
-              dataDefault['range'] = 'not_range';
-              dataDefault['date'] = 'today';
-              filterDate(dataDefault);
-              break;
-          case 'all':
-              filterDate(dataDefault);
-              break;
-          default:
-              break;
-      }
-  });
-
-  custom.find('.update').click(function () {
-    var date = '';
-      if (filter.attr('data-range') == 'not_range') {
-          date = $(this).parents('.input-group').children('.not_range').children('.date-filter').val();
-      } else {
-          date = $(this).parents('.input-group').children('.range').children('.date-filter').val();
-      }
-    if (date != '') {
-        var data = {type: filter.val(), date: date , range: filter.attr('data-range'), is_btn_filter: 0};
-
-        closeFilter.removeClass('hidden');
-        custom.children('button').addClass('filter');
-        custom.find('.custom-filter-value').html(filter.attr('data-text') +' "' + $('<div/>').text(date).html() + '"');
-        filterDate(data);
-        $('button.active-button').removeClass('active-button');
-    }
-  });
-  closeFilter.click(function (){
-      resetFilterDate();
-      filterDate({type: 'default', date: 'all', range: 'range', is_btn_filter: 1});
-      return false;
-  });
-  function filterDate(data) {
-      if (!validateDateTime(data)) {
-          $.post('{{ APP.href("dashboard/data") }}', data, function(response, status, xhr) {
-              if (typeof (response.error) === 'undefined') {
-                  $.each(response, function(key, widget) {
-                      $('#dashboard-widget__'+ widget.key+' .widget-contents').html(widget.html);
-                  });
-              }
-          });
-      }
-  }
-
-  function resetFilterDate() {
-      closeFilter.addClass('hidden');
-      custom.children('button').removeClass('filter');
-      custom.find('.custom-filter-value').html('All');
-      $('.date-filter').val('');
-  }
-
-  sortable.sortable({
-    connectWith: '.js-sortable-container',
-    handle: '.js-sortable-handle',
-    update: function(ev, ui) {
-      //console.log(this, ev, ui);
-      var widgetIds = [];
-      $(this).children().each(function(idx, el) {
-        widgetIds.push($(el).data('id'));
-      });
-      var postData = { do:'dashboard.widget.pos', widgets:widgetIds };
-      $.post(personalizeUrl, postData, function(response, status, xhr) {
-        console.log(response);
-      })
-    }
-    //delay: 100,
-  });
-
-  sortable.on('click', '.js-remove', function(idx, el) {
-    var $el = $(this);
-    var postData = { do:'dashboard.widget.close', key:$el.parents('li').data('id') };
-    $.post(personalizeUrl, postData, function(response, status, xhr) {
-        var option = '';
-        switch (response.r.key) {
-            case 'orders-list':
-                option = "<option value='orders-list'>Recent Orders</option>";
-                break;
-            case 'customers-list':
-                option = "<option value='customers-list'>Recent Customers</option>";
-                break;
-            case 'visitors-totals':
-                option = "<option value='visitors-totals'>Visitors</option>";
-                break;
-            case 'orders-totals':
-                $('.date-filter').val('');
-                option = "<option value='orders-totals'>Order Totals</option>";
-                break;
-            default :break;
+        function load(widgets, wrapped, add)
+        {
+            $.get(dashboardUrl, {widgets: widgets, wrapped: wrapped || '', add: add || ''}, function (response, status, xhr) {
+                $.each(response.widgets, function (key, widget) {
+                    if (wrapped) {
+                        $('#dashboard-widgets-container').append(widget.html);
+                    } else {
+                        $('#dashboard-widget__' + widget.key + ' .widget-contents').html(widget.html);
+                    }
+                });
+                if (Object.keys(response.filter).length !== 0) {
+                    switch (response.filter.date) {
+                        case 'last-month':
+                            $('button[data-date="month"]').click();
+                            break;
+                        case 'last-week':
+                            $('button[data-date="week"]').click();
+                            break;
+                        case 'today':
+                            $('button[data-date="today"]').click();
+                            break;
+                        case 'all':
+                            $('button[data-date="all"]').click();
+                            break;
+                        default:
+                            $('a[data-id="' + response.filter.type + '"]').click();
+                            var range = (response.filter.range == 'range') ? $('div.range') : $('div.not_range');
+                            range.find('input.date-filter').val(response.filter.date);
+                            $('.update').click();
+                            break;
+                    }
+                } else {
+                    $('button[data-date="all"]').click();
+                }
+            });
         }
-        select.append(option);
 
-        check_avail_status();
-    });
-  });
+        function filterDate(data)
+        {
+            if (!validateDateTime(data)) {
+                $.post('{{ APP.href("dashboard/data") }}', data, function (response, status, xhr) {
+                    if (typeof (response.error) === 'undefined') {
+                        $.each(response, function (key, widget) {
+                            $('#dashboard-widget__' + widget.key + ' .widget-contents').html(widget.html);
+                        });
+                    }
+                });
+            }
+        }
 
-  sortable.on('click', '.js-collapse', function(idx, el) {
-    var $el = $(this);
-    var postData = { do:'dashboard.widget.collapse', key:$el.parents('li').data('id'), 'collapsed':!$el.parents('.box-collapsed').get(0) };
-    $.post(personalizeUrl, postData, function(response, status, xhr) {
-      console.log(response);
-    });
-  });
-  $(".datepicker").datetimepicker({
-      pickTime: false
-  });
-  $("#daterange2").daterangepicker({
-    format: "YYYY-MM-DD"
-  },function (start, end) {
-    return $("#data-range-picker-text").val(start.format("YYYY-MM-DD") + "~" + end.format("YYYY-MM-DD"));
-  });
-  $('.daterangepicker').on('click', function (ev) {
-    ev.stopPropagation();
-    ev.preventDefault();
-    return false;
-  });
-  custom.on('click', 'input', function (ev) {
-      ev.stopPropagation();
-      ev.preventDefault();
-      return false;
-  });
-  custom.find('.filter-text-sub').click(function () {
-     $(this).parents('div.dropdown:first').toggleClass('open');
-     return false;
-  });
-  custom.find('a.filter_op').click(function (ev) {
-      if ($(ev.target).attr('data-range') == 'range') {
-          custom.find('.range').css('display', 'table');
-          custom.find('.not_range').css('display', 'none');
-      } else {
-          custom.find('.range').css('display', 'none');
-          custom.find('.not_range').css('display', 'table');
-      }
-      var text = $(ev.target).html();
-      text = text.charAt(0).toUpperCase() + text.slice(1);
-      custom.find('button.filter-text-sub').html(text + "<span class='caret'></span>");
-      custom.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
+        function resetFilterDate()
+        {
+            closeFilter.addClass('hidden');
+            custom.children('button').removeClass('filter');
+            custom.find('.custom-filter-value').html('All');
+            $('.date-filter').val('');
+        }
 
-      return false;
-  });
+        function sortable_init()
+        {
+            sortable.sortable({
+                connectWith: '.js-sortable-container',
+                handle: '.js-sortable-handle',
+                update: function(ev, ui) {
+                    //console.log(this, ev, ui);
+                    var widgetIds = [];
+                    $(this).children().each(function(idx, el) {
+                        widgetIds.push($(el).data('id'));
+                    });
+                    var postData = { do:'dashboard.widget.pos', widgets:widgetIds };
+                    $.post(personalizeUrl, postData, function(response, status, xhr) {
+                        FCom.Admin.log(response);
+                    })
+                }
+                //delay: 100,
+            });
+
+            sortable.on('click', '.js-remove', function(idx, el) {
+                var $el = $(this);
+                var postData = { do:'dashboard.widget.close', key:$el.parents('li').data('id') };
+                $.post(personalizeUrl, postData, function(response, status, xhr) {
+                    var option = '';
+                    switch (response.r.key) {
+                        case 'orders-list':
+                            option = "<option value='orders-list'>Recent Orders</option>";
+                            break;
+                        case 'customers-list':
+                            option = "<option value='customers-list'>Recent Customers</option>";
+                            break;
+                        case 'visitors-totals':
+                            option = "<option value='visitors-totals'>Visitors</option>";
+                            break;
+                        case 'orders-totals':
+                            $('.date-filter').val('');
+                            option = "<option value='orders-totals'>Order Totals</option>";
+                            break;
+                        default :break;
+                    }
+                    select.append(option);
+
+                    check_avail_status();
+                });
+            });
+
+            sortable.on('click', '.js-collapse', function(idx, el) {
+                var $el = $(this);
+                var postData = { do:'dashboard.widget.collapse', key:$el.parents('li').data('id'), 'collapsed':!$el.parents('.box-collapsed').get(0) };
+                $.post(personalizeUrl, postData, function(response, status, xhr) {
+                    FCom.Admin.log(response);
+                });
+            });
+        }
+
+        function datepicker_init()
+        {
+            $(".datepicker").datetimepicker({
+                pickTime: false
+            });
+            $("#daterange2").daterangepicker({
+                format: "YYYY-MM-DD"
+            },function (start, end) {
+                return $("#data-range-picker-text").val(start.format("YYYY-MM-DD") + "~" + end.format("YYYY-MM-DD"));
+            });
+            $('.daterangepicker').on('click', function (ev) {
+                ev.stopPropagation();
+                ev.preventDefault();
+                return false;
+            });
+        }
+
+        init();
+        sortable_init();
+        datepicker_init();
+
+        //todo: return some properties or functions so other widget can re-use it
+    };
+
+    FCom.Admin.Dashboard();
 })
 </script>
