@@ -164,29 +164,24 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
         var dashboardUrl = "{{ APP.href('dashboard') }}";
         var personalizeUrl = "{{ APP.href('my_account/personalize') }}";
         var filter =  $('#filter-text');
-        var custom = $('#custom');
+        var customFilter = $('#custom');
         var sortable = $('.js-sortable-container');
-        var closeFilter = custom.find('.choice-close');
+        var closeFilter = customFilter.find('.choice-close');
         //var widgetTemplate = _.template($('#dashboard-widget-template').html());
         var select = $('#add-widget-selection');
+        var addWidgetModal = $('#add-widget-modal');
 
         function init() {
-            check_avail_status();
+            checkAddWigetAvailableStatus();
 
             $('#add-widget-submit').click(function(ev) {
                 load(select.val(), true, true);
                 $('#add-widget-selection').find('option[value="'+ select.val() +'"]').remove();
                 select.val('');
-                $('#add-widget-modal').modal('hide');
+                addWidgetModal.modal('hide');
+                checkAddWigetAvailableStatus();
+            });
 
-                check_avail_status();
-            });
-            custom.find('.filter_op').click(function () {
-                filter.val($(this).attr('data-id'));
-                filter.attr('data-range', $(this).attr('data-range'));
-                var text = $(this).text().charAt(0).toUpperCase() + $(this).text().slice(1);
-                filter.attr('data-text', text);
-            });
             $('.btn-filter-date').click(function () {
                 var dataDefault = {type: 'default', date: 'all', range: 'range', is_btn_filter: 1};
                 $('button.active-button').removeClass('active-button');
@@ -194,21 +189,21 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
                 resetFilterDate();
                 switch ($(this).attr('data-date')) {
                     case 'month':
-                        dataDefault['type'] = 'between';
-                        dataDefault['range'] = 'range';
-                        dataDefault['date']  = 'last-month';
+                        dataDefault.type = 'between';
+                        dataDefault.range = 'range';
+                        dataDefault.date = 'last-month';
                         filterDate(dataDefault);
                         break;
                     case 'week':
-                        dataDefault['type'] = 'between';
-                        dataDefault['range'] = 'range';
-                        dataDefault['date']  = 'last-week';
+                        dataDefault.type = 'between';
+                        dataDefault.range = 'range';
+                        dataDefault.date = 'last-week';
                         filterDate(dataDefault);
                         break;
                     case 'today':
-                        dataDefault['type'] = 'equal';
-                        dataDefault['range'] = 'not_range';
-                        dataDefault['date'] = 'today';
+                        dataDefault.type = 'equal';
+                        dataDefault.range = 'not_range';
+                        dataDefault.date = 'today';
                         filterDate(dataDefault);
                         break;
                     case 'all':
@@ -219,7 +214,13 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
                 }
             });
 
-            custom.find('.update').click(function () {
+            customFilter.find('.filter_op').click(function () {
+                filter.val($(this).attr('data-id'));
+                filter.attr('data-range', $(this).attr('data-range'));
+                var text = $(this).text().charAt(0).toUpperCase() + $(this).text().slice(1);
+                filter.attr('data-text', text);
+            });
+            customFilter.find('.update').click(function () {
                 var date = '';
                 if (filter.attr('data-range') == 'not_range') {
                     date = $(this).parents('.input-group').children('.not_range').children('.date-filter').val();
@@ -230,11 +231,35 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
                     var data = {type: filter.val(), date: date , range: filter.attr('data-range'), is_btn_filter: 0};
 
                     closeFilter.removeClass('hidden');
-                    custom.children('button').addClass('filter');
-                    custom.find('.custom-filter-value').html(filter.attr('data-text') +' "' + $('<div/>').text(date).html() + '"');
+                    customFilter.children('button').addClass('filter');
+                    customFilter.find('.custom-filter-value').html(filter.attr('data-text') +' "' + $('<div/>').text(date).html() + '"');
                     filterDate(data);
                     $('button.active-button').removeClass('active-button');
                 }
+            });
+            customFilter.on('click', 'input', function (ev) {
+                ev.stopPropagation();
+                ev.preventDefault();
+                return false;
+            });
+            customFilter.find('.filter-text-sub').click(function () {
+                $(this).parents('div.dropdown:first').toggleClass('open');
+                return false;
+            });
+            customFilter.find('a.filter_op').click(function (ev) {
+                if ($(ev.target).attr('data-range') == 'range') {
+                    customFilter.find('.range').css('display', 'table');
+                    customFilter.find('.not_range').css('display', 'none');
+                } else {
+                    customFilter.find('.range').css('display', 'none');
+                    customFilter.find('.not_range').css('display', 'table');
+                }
+                var text = $(ev.target).html();
+                text = text.charAt(0).toUpperCase() + text.slice(1);
+                customFilter.find('button.filter-text-sub').html(text + "<span class='caret'></span>");
+                customFilter.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
+
+                return false;
             });
             closeFilter.click(function (){
                 resetFilterDate();
@@ -242,33 +267,8 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
                 return false;
             });
 
-            custom.on('click', 'input', function (ev) {
-                ev.stopPropagation();
-                ev.preventDefault();
-                return false;
-            });
-            custom.find('.filter-text-sub').click(function () {
-                $(this).parents('div.dropdown:first').toggleClass('open');
-                return false;
-            });
-            custom.find('a.filter_op').click(function (ev) {
-                if ($(ev.target).attr('data-range') == 'range') {
-                    custom.find('.range').css('display', 'table');
-                    custom.find('.not_range').css('display', 'none');
-                } else {
-                    custom.find('.range').css('display', 'none');
-                    custom.find('.not_range').css('display', 'table');
-                }
-                var text = $(ev.target).html();
-                text = text.charAt(0).toUpperCase() + text.slice(1);
-                custom.find('button.filter-text-sub').html(text + "<span class='caret'></span>");
-                custom.find('button.filter-text-sub').parents('div.dropdown:first').toggleClass('open');
-
-                return false;
-            });
-
             {% if asyncWidgets %}
-            load({{ UTIL.toJson(asyncWidgets)|raw }}.join(','));
+                load({{ UTIL.toJson(asyncWidgets)|raw }}.join(','));
             {% endif %}
         }
 
@@ -305,7 +305,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
             return error;
         }
 
-        function check_avail_status()
+        function checkAddWigetAvailableStatus()
         {
             if (select.find('option').length > 1) {
                 $('#wigets-avail-status').css('display', 'none');
@@ -371,12 +371,12 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
         function resetFilterDate()
         {
             closeFilter.addClass('hidden');
-            custom.children('button').removeClass('filter');
-            custom.find('.custom-filter-value').html('All');
+            customFilter.children('button').removeClass('filter');
+            customFilter.find('.custom-filter-value').html('All');
             $('.date-filter').val('');
         }
 
-        function sortable_init()
+        function initSortable()
         {
             sortable.sortable({
                 connectWith: '.js-sortable-container',
@@ -418,7 +418,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
                     }
                     select.append(option);
 
-                    check_avail_status();
+                    checkAddWigetAvailableStatus();
                 });
             });
 
@@ -431,7 +431,7 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
             });
         }
 
-        function datepicker_init()
+        function initDatepicker()
         {
             $(".datepicker").datetimepicker({
                 pickTime: false
@@ -449,8 +449,8 @@ require(['jquery', 'jquery-ui', 'datetimepicker', 'moment', 'daterangepicker'], 
         }
 
         init();
-        sortable_init();
-        datepicker_init();
+        initSortable();
+        initDatepicker();
 
         //todo: return some properties or functions so other widget can re-use it
     };
