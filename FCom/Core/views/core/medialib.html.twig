@@ -1,7 +1,8 @@
 {% set config = THIS.get('config') %}
 {% set mediaLib =  APP.instance('FCom_Admin_Controller_MediaLibrary') %}
-{% set mediaLibAttachConfig = mediaLib.gridConfig({'id': config.id, 'folder': config.folder, 'config': config.config, 'mode': config.mode}) %}
 {% set uploadConfig = mediaLib.uploadConfig(config.type) %}
+{% set mediaLibAttachConfig = mediaLib.gridConfig({'id': config.id, 'folder': uploadConfig.folder, 'config': config.config, 'mode': config.mode}) %}
+{#{{ dump(uploadConfig) }}#}
 {% if config.title %}
 <div class='modal fade' id='{{config.id}}_modal' tabindex='-1'>
     <div class='modal-dialog' style='width:900px;'>

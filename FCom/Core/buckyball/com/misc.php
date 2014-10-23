@@ -2333,6 +2333,7 @@ class BDebug extends BClass
         E_USER_NOTICE => self::NOTICE,
         E_STRICT => self::NOTICE,
         E_RECOVERABLE_ERROR => self::ERROR,
+        E_DEPRECATED => self::WARNING,
     ];
 
     static protected $_verboseBacktrace = [];
