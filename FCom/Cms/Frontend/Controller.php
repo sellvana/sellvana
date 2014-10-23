@@ -49,8 +49,8 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
     public function action_page__POST()
     {
+        $pageUrl = $this->BRequest->param('page');
         try {
-            $pageUrl = $this->BRequest->param('page');
             if (!($pageUrl === '' || is_null($pageUrl))) {
                 $block = $this->FCom_Cms_Model_Block->loadWhere(['page_enabled' => 1, 'page_url' => (string)$pageUrl]);
             }
@@ -58,9 +58,12 @@ class FCom_Cms_Frontend_Controller extends FCom_Frontend_Controller_Abstract
                 $this->forward(false);
                 return;
             }
+            // todo save form data to fcom_cms_form_data ?
+            // send email
         } catch (Exception $e) {
             $this->BDebug->logException($e);
         }
+        $this->BResponse->redirect($pageUrl);
     }
 
     public function action_nav()
