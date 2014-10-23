@@ -112,6 +112,18 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
         ];
     }
 
+    public function getEmailOptions()
+    {
+        $emailOptions = [
+            'admin_email' => 'Admin Email',
+            'sales_email' => 'Sales Email',
+            'support_email' => 'Support Email',
+            'other' => 'Custom email'
+        ];
+
+        return $emailOptions;
+    }
+
     public function action_history_grid_data()
     {
         $id = $this->BRequest->param('id', true);

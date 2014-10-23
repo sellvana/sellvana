@@ -275,9 +275,33 @@
     });
 </script>
 
-{{ forms.boolean(fieldData, {field:'form_enable', label:'Form Enabled'|_, select2:true}) }}
-<input type='hidden' id='block_form_fields_data' name='model[form_fields]'/>
+<div class="form-group">
+    {% set emailOptions = blockCtrl.getEmailOptions() %}
 
+    {{ forms.boolean(fieldData, {field:'form_enable', label:'Form Enabled'|_, select2:true}) }}
+    {{ forms.select(fieldData, {field:'form_email', label:'Send form data to'|_, select2: true, options:emailOptions}) }}
+    {{ forms.input(fieldData, {field:'form_custom_email', label:'Custom email'|_, attr:'disabled', input_class:"email"}) }}
+    <script type="text/javascript">
+        require(['jquery', 'select2'], function ($) {
+            $(function () {
+                var $formCustomEmail = $('#model-form_custom_email');
+                var $formEmail = $("#model-form_email");
+                if($formEmail.val() == 'other') {
+                    $formCustomEmail.prop('disabled', false);
+                }
+                $formEmail.on("change", function (e) {
+                    var val = $(this).val();
+                    if (val == 'other') {
+                        $formCustomEmail.prop('disabled', false);
+                    } else {
+                        $formCustomEmail.prop('disabled', true);
+                    }
+                });
+            })
+        });
+    </script>
+    <input type='hidden' id='block_form_fields_data' name='model[form_fields]'/>
+</div>
 {#<div class='' id='frontend-field-grid-modal' tabindex='-1'>#}
 <div id="{{grid.config.id}}-custom-modal">
     <div class='modal fade in' id='{{grid.config.id}}-custom-form' tabindex='-1'>

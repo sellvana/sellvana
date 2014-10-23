@@ -1,6 +1,6 @@
 modules:
     FCom_Cms:
-        version: 0.1.4
+        version: 0.1.5
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_LibTwig: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
         translations: { en: en.php }
