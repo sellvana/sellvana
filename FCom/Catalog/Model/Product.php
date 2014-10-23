@@ -96,17 +96,6 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     protected static $_urlPrefix;
 
-    /**
-     * Shortcut to help with IDE autocompletion
-     * @param bool  $new
-     * @param array $args
-     * @return FCom_Catalog_Model_Product
-     */
-    static public function i($new = false, array $args = [])
-    {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
-    }
-
     public function validateDupSku($data, $args)
     {
         if (!empty(static::$_flags['skip_duplicate_checks'])) {

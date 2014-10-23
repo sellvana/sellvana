@@ -45,6 +45,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
 
         $customer = $this->FCom_Customer_Model_Customer->sessionUser();
 
+        /** @var FCom_Sales_Model_Cart $cart */
         $cart = $this->FCom_Sales_Model_Cart->sessionCart();
         if (!$cart || !$cart->id()) {
             $this->BResponse->redirect('cart');
@@ -55,7 +56,7 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $billAddress = $cart->getBillingAddress();
 
         if (!$shipAddress && $customer) {
-            $result = $cart->importAddressesFromCustomer($customer);
+            $cart->importAddressesFromCustomer($customer);
             $shipAddress = $cart->getShippingAddress();
             $billAddress = $cart->getBillingAddress();
         }
@@ -72,19 +73,17 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         }
 
         $cart->getShippingMethod();
-        if ($customer) {
-            $cart->payment_method = empty($cart->payment_method) ? $customer->getPaymentMethod() : $cart->payment_method;
-            $cart->payment_details = empty($cart->payment_details) ? $customer->getPaymentDetails() : $cart->payment_details;
+        if (!$cart->payment_method && $customer) {
+            $cart->importPaymentMethodFromCustomer($customer);
         }
 
-        if (empty($cart->payment_method)) {
+        if (!$cart->get('payment_method')) {
             $href = $this->BApp->href('checkout/payment');
             $this->BResponse->redirect($href);
             return;
         }
 
         $cart->calculateTotals();
-
 
         $shippingMethods = $this->FCom_Sales_Main->getShippingMethods();
         $paymentMethods = $this->FCom_Sales_Main->getPaymentMethods();
@@ -210,16 +209,13 @@ class FCom_Checkout_Frontend_Controller_Checkout extends FCom_Frontend_Controlle
         $this->FCom_Sales_Main->workflowAction('customerPlacesOrder', ['post' => $post, 'result' => &$result]);
         $order = $result['order'];
 
-        $result = [];
-        $this->FCom_Sales_Main->workflowAction('customerPlacesOrder', ['post' => $post, 'order' => $order, 'result' => &$result]);
-
         $this->BLayout->view('email/new-order-customer')->set('order', $order)->email();
         $this->FCom_Sales_Model_Cart->resetSessionCart();
 
         $sData =& $this->BSession->dataToUpdate();
         $sData['last_order']['id'] = $order ? $order->id : null;
         if ($this->BRequest->get('is_ajax') || (isset($post['is_ajax']) && $post['is_ajax'])) {
-            $data = $cart->getPaymentMethod()->ajaxData();
+            $data = $order->getPaymentMethod()->ajaxData();
             $this->BResponse->json($data);
         } else {
             $redirectUrl = $this->BSession->get('redirect_url');

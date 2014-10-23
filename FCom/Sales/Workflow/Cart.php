@@ -1,13 +1,25 @@
 <?php
 
+/**
+ * Class FCom_Sales_Workflow_Cart
+ *
+ * Uses:
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Sales_Main $FCom_Sales_Main
+ * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
+ */
 class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;
 
     protected $_localHooks = [
-        'customerAddsItems',
+        'customerAddsItemsToCart',
         'customerUpdatesCart',
-/*
+
+        'customerAbandonsCart',
+
+        'customerPlacesOrder',
+        /*
         'customerUpdatesItems',
         'customerRemovesItems',
 
@@ -25,16 +37,26 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
 
         'customerUpdatesShippingMethod',
         'customerUpdatesBillingMethod',
-*/
-        'customerAbandonsCart',
-
-        'customerPlacesOrder',
+        */
     ];
 
     /**
+     * STEP: Customer Adds Items To Cart
+     *
+     * Handles default logic of adding item from post data as cart item
+     * Fires event to calculate details for variants, frontend fields, bundles, etc.
+     *
      * @todo normalize API
+     *
+     * @param array $args
+     *      post:
+     *          id:
+     *          qty:
+     *      result:
+     *          items:
+     *              - { status: added|error }
      */
-    public function customerAddsItems($args)
+    public function customerAddsItemsToCart($args)
     {
         $cart = $this->_getCart($args, true);
         $post = !empty($args['post']) ? $args['post'] : null;
@@ -44,7 +66,7 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
         } else {
             $reqItems = [$post];
         }
-        $items = [];
+        $itemsData = [];
         $ids = [];
         foreach ($reqItems as $reqItem) {
             if (is_array($reqItem)) {
@@ -62,57 +84,53 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
             } elseif ($reqItem instanceof FCom_Catalog_Model_Product) {
                 $item = ['id' => $reqItem->getId(), 'qty' => 1, 'product' => $reqItem];
             }
-            $items[] = $item;
+            $itemsData[] = $item;
         }
 
         // retrieve product records
         $products = $this->FCom_Catalog_Model_Product->orm('p')
             ->where_in('p.id', $ids)->find_many_assoc();
-        foreach ($items as $i => $item) {
+        foreach ($itemsData as $i => &$item) {
             if (!empty($item['error'])) {
                 continue;
             }
             if (empty($products[$item['id']])) {
-                $items[$i]['product'] = false;
-                $items[$i]['error'] = 'Invalid product to add to cart';
+                $item['product'] = false;
+                $item['error'] = 'Invalid product to add to cart';
                 continue;
             }
-            $items[$i]['product'] = $products[$item['id']];
-        }
-
-        // add items to cart
-        foreach ($items as &$item) {
-            if (!empty($item['error'])) {
-                continue;
-            }
-            $p = $item['product'];
-            $options = [
+            $p = $item['product'] = $products[$item['id']];
+            $item['details'] = [
                 'qty' => $item['qty'],
                 'price' => $p->getPrice(),
-                'sku' => $p->get('local_sku'),
+                'local_sku' => $p->get('local_sku'),
+                'stock_sku' => $p->get('stock_sku'),
             ];
-            $result = [];
-            $this->BEvents->fire(__METHOD__ . ':validate', [
-                'product' => $p,
-                'post' => $post,
-                'options' => &$options,
-                'result' => &$result,
-            ]);
-            if (!empty($result['error'])) {
-                $item['error'] = $result['error'];
-                continue;
-            }
-            $customer = $this->_getCustomer($args);
-            if ($customer && !$cart->get('customer_id')) {
-                $cart->set('customer_id', $customer->id());
-            }
-            $cart->addProduct($p->id(), $options);
-            $item['status'] = 'added';
         }
         unset($item);
+
+        $this->BEvents->fire(__METHOD__ . ':calcDetails', [
+            'post' => $post,
+            'items' => &$itemsData,
+        ]);
+
+        // add items to cart
+        foreach ($itemsData as &$item) {
+            if (empty($item['error'])) {
+                $cart->addProduct($item['product'], $item['details']);
+                $item['status'] = 'added';
+            }
+        }
+        unset($item);
+
+        $customer = $this->_getCustomer($args);
+        if ($customer && !$cart->get('customer_id')) {
+            $cart->set('customer_id', $customer->id());
+        }
+
         $cart->calculateTotals()->save();
 
-        $args['result']['items'] = $items;
+        $args['result']['items'] = $itemsData;
     }
 
     /**
@@ -192,7 +210,7 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
 
         $args['result']['items'] = $items;
     }
-
+    /*
     public function customerUpdatesItems($args)
     {
 
@@ -247,7 +265,7 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
     public function customerUpdatesBillingMethod($args)
     {
     }
-
+    */
     public function customerAbandonsCart($args)
     {
         $cart = $this->_getCart($args);
@@ -257,18 +275,25 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
 
     public function customerPlacesOrder($args)
     {
+        /** @var FCom_Customer_Model_Customer $customer */
         $customer = $this->_getCustomer($args);
+
+        /** @var FCom_Sales_Model_Cart $cart */
         $cart = $this->_getCart($args);
 
+        /** @var FCom_Sales_Model_Order $order */
         $order = $this->FCom_Sales_Model_Order->create();
 
         $order->importDataFromCart($cart);
 
-        $this->FCom_Sales_Main->workflowAction('customerSubmitsPayment', [
-            'cart' => $cart,
-            'order' => $order,
-            'result' => &$result,
-        ]);
+        if ($order->isPayable()) {
+            $result = [];
+            $this->FCom_Sales_Main->workflowAction('customerPaysOnCheckout', [
+                'cart' => $cart,
+                'order' => $order,
+                'result' => &$result,
+            ]);
+        }
 
         $cart->setStateOrdered()->save();
 

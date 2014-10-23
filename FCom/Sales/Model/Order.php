@@ -46,18 +46,6 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 
     protected $_addresses;
 
-    /**
-    * Fallback singleton/instance factory
-    *
-    * @param bool $new if true returns a new instance, otherwise singleton
-    * @param array $args
-    * @return FCom_Sales_Model_Order
-    */
-    static public function i($new = false, array $args = [])
-    {
-        return BClassRegistry::instance(get_called_class(), $args, !$new);
-    }
-
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
@@ -262,7 +250,8 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             ->_importTotalsDataFromCart()
             ->_importShippingDataFromCart()
             ->_importPaymentDataFromCart()
-            ->_importCouponDataFromCart()
+            ->_importDiscountDataFromCart()
+            ->_setDefaultStates()
             ->save()
         ;
         return $this;
@@ -375,7 +364,7 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    protected function _importCouponDataFromCart()
+    protected function _importDiscountDataFromCart()
     {
         $cart = $this->_cart;
 
@@ -390,8 +379,15 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         $state = $this->state();
         $state->overall()->setNew();
         $state->delivery()->setNew();
-        $state->payment()->setNew();
+
+        if ($this->isPayable()) {
+            $state->payment()->setUnpaid();
+        } else {
+            $state->payment()->setFree();
+        }
+
         $state->custom()->setDefault();
+        return $this;
     }
 
     /**
@@ -509,6 +505,21 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
             ->where('from_admin', 0)
             ->order_by_desc('create_at')
             ->find_one();
+    }
+
+    public function isShippable()
+    {
+        foreach ($this->items() as $item) {
+            if ($item->isShippable()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function isPayable()
+    {
+        return $this->get('amount_due') > 0;
     }
 
     public function __destruct()

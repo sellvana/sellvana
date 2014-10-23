@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Checkout_Frontend_Controller_Cart
+ *
+ * Uses:
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Sales_Main $FCom_Sales_Main
+ */
 class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Abstract
 {
     public function beforeDispatch()
@@ -28,34 +35,39 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         $this->BEvents->fire(__CLASS__ . '::action_cart:cart', ['cart' => $cart]);
 
         $shippingEstimate = $cart->getData('shipping_estimate');
-        $layout->view('checkout/cart')->set(['cart' => $cart, 'shipping_esitmate' => $shippingEstimate]);
+        $layout->view('checkout/cart')->set(['cart' => $cart, 'shipping_estimate' => $shippingEstimate]);
     }
 
     public function action_add__POST()
     {
-        $cartHref = $this->BApp->href('cart');
+        $redirHref = $this->BApp->href('cart');
         $post = $this->BRequest->post();
+        $result = [];
         if (isset($post['action'])) {
             switch ($post['action']) {
             case 'add':
-                $this->FCom_Sales_Main->workflowAction('customerAddsItems', ['post' => $post, 'result' => &$result]);
+                // FCom_Sales_Workflow_Cart -> FCom_CustomField_Frontend -> FCom_Sales_Model_Cart
+                $this->FCom_Sales_Main->workflowAction('customerAddsItemsToCart', ['post' => $post, 'result' => &$result]);
 
                 $item = $result['items'][0];
                 if (!empty($item['status']) && $item['status'] === 'added') {
                     $this->message('The product has been added to your cart');
                 } elseif (!empty($item['error'])) {
                     $this->message($item['error'], 'error');
-                    $this->BResponse->redirect($item['product'] ? $item['product']->url() : $cartHref);
-                    return;
+                    if (!empty($item['product'])) {
+                        $redirHref = $item['product']->url();
+                    }
                 } else {
                     $this->message("Unknown error, couldn't add item to cart", 'error');
-                    $this->BResponse->redirect($item['product'] ? $item['product']->url() : $cartHref);
-                    return;
+                    if (!empty($item['product'])) {
+                        $redirHref = $item['product']->url();
+                    }
                 }
                 break;
             }
         } else {
             $this->FCom_Sales_Main->workflowAction('customerUpdatesCart', ['post' => $post, 'result' => &$result]);
+
             if (!empty($result['items'])) {
                 foreach ($result['items'] as $item) {
                     if (!empty($item['status'])) {
@@ -74,7 +86,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
                 }
             }
         }
-        $this->BResponse->redirect($cartHref);
+        $this->BResponse->redirect($redirHref);
     }
 
     public function action_addxhr__POST()

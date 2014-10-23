@@ -26,15 +26,16 @@ class FCom_Sales_Workflow_Order extends FCom_Sales_Workflow_Abstract
 
     public function customerPlacesOrder($args)
     {
-        $args['order']->state()->overall()->setPlaced();
-        $args['order']->addHistoryEvent('placed', 'Order was placed by a customer');
+        $order = $args['result']['order'];
+        $order->state()->overall()->setPlaced();
+        $order->addHistoryEvent('placed', 'Order was placed by a customer');
 
         if ($this->BConfig->get('modules/FCom_Sales/review_all_orders')) {
-            $args['order']->state()->overall()->setReview();
-            $args['order']->addHistoryEvent('auto_review', 'Order was sent for review as per default policy');
+            $order->state()->overall()->setReview();
+            $order->addHistoryEvent('auto_review', 'Order was sent for review as per default policy');
         }
 
-        $args['order']->save();
+        $order->save();
     }
 
     public function customerCancelsOrder($args)

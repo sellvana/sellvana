@@ -5,59 +5,61 @@ class FCom_Customer_Migrate extends BClass
     public function install__0_1_11()
     {
         $tCustomer = $this->FCom_Customer_Model_Customer->table();
-        $this->BDb->run("
-            CREATE TABLE IF NOT EXISTS {$tCustomer} (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `email` varchar(255)  NOT NULL,
-            `firstname` varchar(50)  NOT NULL,
-            `lastname` varchar(50)  NOT NULL,
-            `password_hash` text ,
-            `default_shipping_id` int(11) unsigned DEFAULT NULL,
-            `default_billing_id` int(11) unsigned DEFAULT NULL,
-            `create_at` datetime NOT NULL,
-            `update_at` datetime NOT NULL,
-            `last_login` datetime DEFAULT NULL,
-            `token` varchar(20) DEFAULT NULL,
-            `token_at` datetime default null,
-            `payment_method` varchar(20)  DEFAULT NULL,
-            `payment_details` text ,
-            `status` enum('review','active','disabled') NOT NULL DEFAULT 'review',
-            `password_session_token` varchar(16),
-            PRIMARY KEY (`id`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
-        ");
-
-        $tCustomer = $this->FCom_Customer_Model_Customer->table();
         $tAddress = $this->FCom_Customer_Model_Address->table();
-        $this->BDb->run("
-            CREATE TABLE IF NOT EXISTS {$tAddress} (
-              `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-              `customer_id` int(11) unsigned NOT NULL,
-              `email` varchar(255)  NOT NULL,
-              `firstname` varchar(50)  DEFAULT NULL,
-              `lastname` varchar(50)  DEFAULT NULL,
-              `middle_initial` varchar(2)  DEFAULT NULL,
-              `prefix` varchar(10)  DEFAULT NULL,
-              `suffix` varchar(10)  DEFAULT NULL,
-              `company` varchar(50)  DEFAULT NULL,
-              `attn` varchar(50)  DEFAULT NULL,
-              `street1` text  NOT NULL,
-              `street2` text ,
-              `street3` text ,
-              `city` varchar(50)  NOT NULL,
-              `region` varchar(50)  DEFAULT NULL,
-              `postcode` varchar(20)  DEFAULT NULL,
-              `country` char(2)  NOT NULL,
-              `phone` varchar(50)  DEFAULT NULL,
-              `fax` varchar(50)  DEFAULT NULL,
-              `create_at` datetime NOT NULL,
-              `update_at` datetime NOT NULL,
-              `lat` decimal(15,10) DEFAULT NULL,
-              `lng` decimal(15,10) DEFAULT NULL,
-              PRIMARY KEY (`id`),
-              CONSTRAINT `FK_{$tAddress}_customer` FOREIGN KEY (`customer_id`) REFERENCES {$tCustomer} (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
-        ");
+
+        $this->BDb->ddlTableDef($tCustomer, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'email' => 'varchar(255) not null',
+                'firstname' => 'varchar(50) not null',
+                'lastname' => 'varchar(50) not null',
+                'password_hash' => 'text',
+                'default_shipping_id' => 'int unsigned default null',
+                'default_billing_id' => 'int unsigned default null',
+                'create_at' => 'datetime not null',
+                'update_at' => 'datetime not null',
+                'last_login' => 'datetime default null',
+                'token' => 'varchar(20) default null',
+                'token_at' => 'datetime default null',
+                'payment_method' => 'varchar(20) default null',
+                'payment_details' => 'text',
+                'status' => "varchar(10) not null default 'review'",
+                'password_session_token' => 'varchar(16)',
+            ],
+            'PRIMARY' => '(id)',
+        ]);
+
+        $this->BDb->ddlTableDef($tAddress, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'customer_id' => 'int unsigned not null',
+                'email' => 'varchar(255) not null',
+                'firstname' => 'varchar(50) not null',
+                'lastname' => 'varchar(50) not null',
+                'middle_initial' => 'varchar(2) default null',
+                'prefix' => 'varchar(10) default null',
+                'suffix' => 'varchar(10) default null',
+                'company' => 'varchar(50) default null',
+                'attn' => 'varchar(50) default null',
+                'street1' => 'text not null',
+                'street2' => 'text',
+                'street3' => 'text',
+                'city' => 'varchar(50) not null',
+                'region' => 'varchar(50) default null',
+                'postcode' => 'varchar(20) default null',
+                'country' => 'char(2) not null',
+                'phone' => 'varchar(50) default null',
+                'fax' => 'varchar(50) default null',
+                'create_at' => 'datetime not null',
+                'update_at' => 'datetime not null',
+                'lat' => 'decimal(15,10) default null',
+                'lng' => 'decimal(15,10) default null',
+            ],
+            'PRIMARY' => '(id)',
+            'CONSTRAINTS' => [
+                "FK_{$tAddress}_customer" => "FOREIGN KEY (customer_id) references {$tCustomer} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+            ]
+        ]);
             /*
         ALTER TABLE {$tCustomer}
         ADD CONSTRAINT `FK_{$tCustomer}_billing` FOREIGN KEY (`default_billing_id`) REFERENCES {$tAddress} (`id`) ON DELETE SET NULL ON UPDATE CASCADE,

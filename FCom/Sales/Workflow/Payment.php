@@ -5,7 +5,7 @@ class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
     static protected $_origClass = __CLASS__;
 
     protected $_localHooks = [
-        'customerSubmitsPayment',
+        'customerPaysOnCheckout',
         'adminPlacesOrder',
         'adminCancelsAuthorization',
         'adminCapturesPayment',
@@ -14,7 +14,7 @@ class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
         'adminChangesPaymentCustomState',
     ];
 
-    public function customerSubmitsPayment($args)
+    public function customerPaysOnCheckout($args)
     {
         try {
             $cart = $this->_getCart($args);
@@ -24,8 +24,7 @@ class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
                 throw new BException('Invalid payment method: ' . $methodCode);
             }
             $method = $methods[$methodCode];
-            $method = $payment->getMethodObject();
-            $result = $method->workflowCustomerSubmitsPayment($args['order']);
+            $result = $method->payOnCheckout($args['order']);
 
             $payment = $this->FCom_Sales_Model_Order_Payment->create([
                 'order_id' => $args['order']->id(),

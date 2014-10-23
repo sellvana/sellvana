@@ -24,6 +24,10 @@ abstract class FCom_Sales_Workflow_Abstract extends BClass
         return $this;
     }
 
+    /**
+     * @param $args
+     * @return FCom_Customer_Model_Customer
+     */
     protected function _getCustomer($args)
     {
         if (!empty($args['customer'])) {
@@ -34,6 +38,11 @@ abstract class FCom_Sales_Workflow_Abstract extends BClass
         return $customer;
     }
 
+    /**
+     * @param $args
+     * @param bool $createIfNeeded
+     * @return FCom_Sales_Model_Cart
+     */
     protected function _getCart($args, $createIfNeeded = false)
     {
         if (!empty($args['cart'])) {

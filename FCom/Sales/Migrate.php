@@ -1054,6 +1054,44 @@ class FCom_Sales_Migrate extends BClass
 
         $this->BDb->ddlDropTable($this->BDb->t('fcom_sales_order_status'));
     }
+
+    public function upgrade__0_3_0__0_3_1()
+    {
+        $tCartItem = $this->FCom_Sales_Model_Cart_Item->table();
+        $tOrderItem = $this->FCom_Sales_Model_Order_Item->table();
+
+        $this->BDb->ddlTableDef($tCartItem, [
+            'COLUMNS' => [
+                'stock_sku' => 'varchar(100) default null after local_sku',
+                'parent_item_id' => 'int unsigned default null',
+                'shipping_size' => 'varchar(30)',
+                'shipping_weight' => 'decimal(12,2)',
+                'is_separate' => 'tinyint not null default 0',
+                'unique_hash' => 'bigint default null',
+            ],
+            'KEYS' => [
+                'cart_id' => 'DROP',
+                'IDX_cart_product_separate_hash' => '(cart_id, product_id, is_separate, unique_hash)',
+            ],
+            'CONSTRAINTS' => [
+                "FK_{$tCartItem}_parent_item" => "FOREIGN KEY (parent_item_id) REFERENCES {$tCartItem} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderItem, [
+            'COLUMNS' => [
+                'cart_item_id' => 'int unsigned default null',
+                'local_sku' => 'varchar(100) default null',
+                'stock_sku' => 'varchar(100) default null',
+                'parent_item_id' => 'int unsigned default null',
+                'shipping_size' => 'varchar(30)',
+                'shipping_weight' => 'decimal(12,2)',
+            ],
+            'CONSTRAINTS' => [
+                "FK_{$tOrderItem}_parent_item" => "FOREIGN KEY (parent_item_id) REFERENCES {$tOrderItem} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+            ],
+        ]);
+    }
 }
 
 class FCom_Sales_Migrate_Model_Cart_Address extends BModel

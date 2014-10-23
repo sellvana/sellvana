@@ -4,16 +4,6 @@ class FCom_IndexTank_Model_IndexingStatus extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_indextank_indexing_status';
 
-    /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @return FCom_IndexTank_Model_IndexingStatus
-    */
-    static public function i($new = false, array $args = [])
-    {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
-    }
-
     public function getIndexingStatus($task = 'index_all_new')
     {
         $indexingStatus = $this->FCom_IndexTank_Model_IndexingStatus->orm()->where("task", $task)->find_one();

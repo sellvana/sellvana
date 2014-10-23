@@ -2,24 +2,12 @@
 
 class FCom_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
 {
-    use FCom_Sales_Trait_Order;
+    use FCom_Sales_Model_Trait_Order;
 
     protected static $_table = 'fcom_sales_order_item';
     protected static $_origClass = __CLASS__;
 
     protected $_state;
-
-    /**
-    * Fallback singleton/instance factory
-    *
-    * @param bool $new if true returns a new instance, otherwise singleton
-    * @param array $args
-    * @return FCom_Sales_Model_Order_Item
-    */
-    static public function i($new = false, array $args = [])
-    {
-        return BClassRegistry::instance(get_called_class(), $args, !$new);
-    }
 
     public function state()
     {
@@ -64,6 +52,11 @@ class FCom_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
     {
         return $this->orm()->where("order_id", $orderId)
                         ->where("product_id", $product_id)->find_one();
+    }
+
+    public function isShippable()
+    {
+        return $this->get('shipping_weight') > 0;
     }
 
     public function __destruct()

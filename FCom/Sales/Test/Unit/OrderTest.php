@@ -62,7 +62,7 @@ class FCom_Sales_Test_Unit_OrderTest extends FCom_Test_DatabaseTestCase
     public function testAddPaymentMethod()
     {
         FCom_Sales_Main::i()->addPaymentMethod('paypal', 'FCom_PayPal_Frontend');
-        $methods = FCom_Sales_Main::i()->getPaymentMethods();
+        $methods = $this->FCom_Sales_Main->getPaymentMethods();
         $this->assertTrue(isset($methods['paypal']));
     }
 

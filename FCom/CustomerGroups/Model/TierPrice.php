@@ -11,16 +11,6 @@ class FCom_CustomerGroups_Model_TierPrice
     protected static $_table = "fcom_tier_prices";
     protected static $_origClass = __CLASS__;
 
-    /**
-     * @param bool  $new
-     * @param array $args
-     * @return FCom_CustomerGroups_Model_TierPrice
-     */
-    static public function i($new = false, array $args = [])
-    {
-        return parent::i($new, $args); // auto completion helper
-    }
-
     public function getProductTiers($product)
     {
         $tiers = $this->orm('tp')->where('product_id', $product->id())->find_many();

@@ -2,7 +2,7 @@
 
 class FCom_Sales_Model_Order_Comment extends FCom_Core_Model_Abstract
 {
-    use FCom_Sales_Trait_Order;
+    use FCom_Sales_Model_Trait_Order;
 
     static protected $_table = 'fcom_sales_order_comment';
     protected static $_origClass = __CLASS__;
