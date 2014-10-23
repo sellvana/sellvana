@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_Admin
+ *
+ * @property FCom_Admin_Main $FCom_Admin_Main
+ * @property FCom_Admin_Controller_MediaLibrary $FCom_Admin_Controller_MediaLibrary
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ */
 class FCom_Admin_Admin extends BClass
 {
     public function beforeBootstrap()
@@ -30,12 +37,14 @@ class FCom_Admin_Admin extends BClass
     public function layout()
     {
         if (($head = $this->BLayout->view('head'))) {
+            /** @type FCom_Core_View_Head $head */
             $head->js_raw('admin_init', '
 FCom.Admin = {};
-FCom.Admin.baseUrl = "' . rtrim($this->BConfig->get('web/base_src'), '/') . '/' . '";
-FCom.Admin.codemirrorBaseUrl = "' . $this->BApp->src('@FCom_Admin/Admin/js/codemirror') . '";
+FCom.Admin.base_url = "' . rtrim($this->BConfig->get('web/base_src'), '/') . '/' . '";
+FCom.Admin.code_mirror_base_url = "' . $this->BApp->src('@FCom_Admin/Admin/js/codemirror') . '";
 FCom.Admin.upload_href = "' . $this->BApp->href('upload') . '";
 FCom.Admin.personalize_href = "' . $this->BApp->href('my_account/personalize') . '";
+FCom.Admin.current_mode = "'.$this->BDebug->mode().'";
             ');
 
             $config = $this->BConfig->get('modules/FCom_Admin');

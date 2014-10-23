@@ -7,7 +7,7 @@ require(['jquery', 'backbone', 'underscore'], function($, Backbone, _) {
         var data = [];
         for (var i in rows) {
             data.push({module_name: rows[i].name, run_level_core: rows[i].run_level_core});
-        };
+        }
 
         $.post("{{ THIS.get('form_url') }}", {data: data}, function(response, status, xhr) {
 
