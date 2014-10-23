@@ -27,7 +27,6 @@
  *
  * DI
  * @property FCom_Core_Model_Seq $FCom_Core_Model_Seq
- * @property FCom_Sales_Model_Order_CustomStatus $FCom_Sales_Model_Order_CustomStatus
  * @property FCom_Sales_Model_Order_Item $FCom_Sales_Model_Order_Item
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
@@ -83,17 +82,11 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    /**
-     * @return null|FCom_Sales_Model_Order_Address
-     */
     public function billing()
     {
         return $this->getBillingAddress();
     }
 
-    /**
-     * @return null|FCom_Sales_Model_Order_Address
-     */
     public function shipping()
     {
         return $this->getShippingAddress();

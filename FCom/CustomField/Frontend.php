@@ -21,11 +21,11 @@ class FCom_CustomField_Frontend extends BClass
      *  - items: (SEQUENCE ARRAY, UPDATABLE) per item post data. if single, copied from `post`
      *    - id: product_id
      *      product: FCom_Catalog_Model_Product
+     *      qty: item qty (optional, default: 1)
      *      details: resulting details data structure
-     *          qty: item qty (optional, default: 1)
      *          price: item price (optional, default: $product->getPrice() )
      *          local_sku: local catalog product unique id
-     *          stock_sku: mfr sku (depends on variant)
+     *          mfr_sku: manufacturer or wholesale sku (depends on variant)
      *          data:
      *              variants: (DEPRECATED)
      *                  product_id:
@@ -49,95 +49,91 @@ class FCom_CustomField_Frontend extends BClass
      */
     public function onWorkflowCustomerAddsItemsCalcDetails($args)
     {
-        $item = $args['item'];
-        $p = $item['product'];
         $post = $args['post'];
         // TODO: Use for child items for bundles
         $cart = !empty($args['cart']) ? $args['cart'] : $this->FCom_Sales_Model_Cart->sessionCart();
 
-        $defaultVariant = [
-            'product_id' => $p->id(),
-            'variant_qty' => $args['options']['qty'],
-            'variant_price' => $args['options']['price'],
-            'field_values' => ""
-        ];
-        if ($p->getData('variants_fields')) {
-            $varValues = $item['variant_select'];
-            /** @var FCom_CustomField_Model_ProductVariant $variantHlp */
-            $variantHlp = $this->FCom_CustomField_Model_ProductVariant;
-            $variant = $variantHlp->findByProductFieldValues($p, $varValues);
+        foreach ($args['items'] as &$item) {
+            $p = $item['product'];
+            if ($p->getData('variants_fields')) {
+                $varValues = $item['variant_select'];
+                /** @var FCom_CustomField_Model_ProductVariant $variantHlp */
+                $variantHlp = $this->FCom_CustomField_Model_ProductVariant;
 
+                if ($variantHlp->checkEmptyVariant($item['id'])) {
+                    //TODO: validate when product empty variant
+                    // is this situation common?
+                    continue;
+                }
+                if (empty($item['variant_select'])) {
+                    $item['error'] = $this->BLocale->_('Please specify the product variant');
+                    continue;
+                }
+                $variant = $variantHlp->findByProductFieldValues($p, $varValues);
+                if (!$variant) {
+                    $item['error'] = $this->BLocale->_('Invalid variant');
+                    continue;
+                }
+                $availQty = $variant->get('variant_qty');
+                if (!$availQty) { //TODO: allow empty qty
+                    $item['error'] = $this->BLocale->_('The variant is out of stock');
+                    continue;
+                }
+                if ($availQty < $item['qty']) {
+                    $item['error'] = $this->BLocale->_('The variant currently has only %s items in stock', $variant->variant_qty);
+                    continue;
+                }
 
-            if ($variantHlp->checkEmptyVariant($args['post']['id'])) {
-                if (empty($args['post']['variant_select'])) {
-                    $args['result']['error'] = $this->BLocale->_('Please specify the product variant');
-                    return false;
-                } else {
-                    if (!$variant) {
-                        $args['result']['error'] = $this->BLocale->_('Invalid variant');
-                        return false;
-                    }
-                }
-                if (!$variant->variant_qty) { //TODO: allow empty qty
-                    $args['result']['error'] = $this->BLocale->_('The variant is out of stock');
-                    return false;
-                }
-                if ($variant->variant_qty < $args['options']['qty']) {
-                    $args['result']['error'] = $this->BLocale->_('The variant currently has only %s items in stock', $variant->variant_qty);
-                    return false;
-                }
-
-                if ($variant->variant_price > 0) { //TODO: allow free variants
+                if ($variant->get('variant_price') > 0) { //TODO: allow free variants
                     $args['options']['price'] = $variant->variant_price;
                 }
-                $defaultVariant = $variant->as_array();
-            } else {
-                //TODO: validate when product empty variant
+                $item['details']['variant'] = $variant->as_array();
             }
-        }
-        $args['options']['data']['variants'] = $defaultVariant;
+            $args['options']['data']['variants'] = $defaultVariant;
 
-        if (isset($args['post']['shopper'])) {
-            $options['shopper'] = $args['post']['shopper'];
-            foreach ($options['shopper'] as $key => $value) {
-                if (!isset($value['val']) || $value['val'] == '') {
-                    unset($options['shopper'][$key]);
-                }
-                if ($value['val'] == 'checkbox') {
-                    unset($options['shopper'][$key]['val']);
+            if (isset($args['post']['shopper'])) {
+                $options['shopper'] = $args['post']['shopper'];
+                foreach ($options['shopper'] as $key => $value) {
+                    if (!isset($value['val']) || $value['val'] == '') {
+                        unset($options['shopper'][$key]);
+                    }
+                    if ($value['val'] == 'checkbox') {
+                        unset($options['shopper'][$key]['val']);
+                    }
                 }
             }
-        }
 
-        // FROM Cart::addProduct()
-        if (isset($params['data'])) {
-            $variants = $item->getData('variants');
-            $flag = true;
-            $params['data']['variants']['field_values'] = $this->BUtil->fromJson($params['data']['variants']['field_values']);
-            if (null !== $variants) {
-                foreach ($variants as &$arr) {
-                    if (in_array($params['data']['variants']['field_values'], $arr)) {
-                        $flag = false;
-                        $arr['variant_qty'] = $arr['variant_qty'] + $params['qty'];
-                        if (isset($params['shopper'])) {
-                            $arr['shopper'] = $params['shopper'];
+            // FROM Cart::addProduct()
+            if (isset($params['data'])) {
+                $variants = $item->getData('variants');
+                $flag = true;
+                $params['data']['variants']['field_values'] = $this->BUtil->fromJson($params['data']['variants']['field_values']);
+                if (null !== $variants) {
+                    foreach ($variants as &$arr) {
+                        if (in_array($params['data']['variants']['field_values'], $arr)) {
+                            $flag = false;
+                            $arr['variant_qty'] = $arr['variant_qty'] + $params['qty'];
+                            if (isset($params['shopper'])) {
+                                $arr['shopper'] = $params['shopper'];
+                            }
+
                         }
-
                     }
                 }
-            }
-            if ($flag) {
-                if (!empty($params['data']['variants'])) {
-                    $params['data']['variants']['variant_qty'] = $params['qty'];
-                    $variants = (null !== $variants)? $variants : [];
-                    if (isset($params['shopper'])) {
-                        $params['data']['variants']['shopper'] = $params['shopper'];
+                if ($flag) {
+                    if (!empty($params['data']['variants'])) {
+                        $params['data']['variants']['variant_qty'] = $params['qty'];
+                        $variants = (null !== $variants) ? $variants : [];
+                        if (isset($params['shopper'])) {
+                            $params['data']['variants']['shopper'] = $params['shopper'];
+                        }
+                        array_push($variants, $params['data']['variants']);
                     }
-                    array_push($variants, $params['data']['variants']);
                 }
+                $item->setData('variants', $variants);
             }
-            $item->setData('variants', $variants);
         }
+        unset($item);
 
         return true;
     }

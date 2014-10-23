@@ -11,7 +11,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
     protected $api;
 
     /**
-     * @param FCom_AuthorizeNet_PaymentMethod $payment
+     * @param FCom_AuthorizeNet_PaymentMethod_Aim $payment
      * @return array
      */
     public function sale($payment)
@@ -25,7 +25,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
     }
 
     /**
-     * @param FCom_AuthorizeNet_PaymentMethod $payment
+     * @param FCom_AuthorizeNet_PaymentMethod_Aim $payment
      * @return array
      */
     public function authorize($payment)
@@ -40,7 +40,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
     }
 
     /**
-     * @param FCom_AuthorizeNet_PaymentMethod $payment
+     * @param FCom_AuthorizeNet_PaymentMethod_Aim $payment
      * @return array
      */
     public function capture($payment)
@@ -56,7 +56,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
     }
 
     /**
-     * @param FCom_AuthorizeNet_PaymentMethod $payment
+     * @param FCom_AuthorizeNet_PaymentMethod_Aim $payment
      * @return array
      */
     public function credit($payment)
@@ -75,7 +75,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
     }
 
     /**
-     * @param FCom_AuthorizeNet_PaymentMethod $payment
+     * @param FCom_AuthorizeNet_PaymentMethod_Aim $payment
      * @return array
      */
     public function void($payment)

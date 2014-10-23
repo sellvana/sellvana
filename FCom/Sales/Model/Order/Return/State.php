@@ -1,11 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_Sales_Model_Order_Payment_State extends FCom_Core_Model_Abstract_State_Context
+class FCom_Sales_Model_Order_Return_State extends FCom_Core_Model_Abstract_State_Context
 {
     /**
      * Order linked
      *
-     * @var FCom_Sales_Model_Order_Payment
+     * @var FCom_Sales_Model_Order_Return
      */
     protected $_model;
 
