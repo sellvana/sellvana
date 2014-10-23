@@ -278,4 +278,14 @@ class FCom_Admin_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_1_8__0_1_9()
+    {
+        $tMedia = $this->FCom_Core_Model_MediaLibrary->table();
+        $this->BDb->ddlTableDef($tMedia, [
+            'COLUMNS' => [
+                'folder' => 'varchar(255) NOT NULL',
+            ],
+        ]);
+    }
 }
