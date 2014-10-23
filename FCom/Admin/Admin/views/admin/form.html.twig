@@ -18,9 +18,11 @@
                 url_get:  '{{ formUrl }}',
                 url_post: '{{ formUrl }}'
             });
-            var mainForm = '{{ formId }}';
 
-            $('#' + mainForm).on('keypress', 'input', function (e) {
+            var mainForm = '{{ formId }}';
+            var mainFormEle = $('#' + mainForm);
+
+            mainFormEle.on('keypress', 'input', function (e) {
                 var charCode = e.charCode || e.keyCode || e.which;
                 if (charCode == 13) {
                     //enter will submit instead call first input type submit
@@ -32,11 +34,11 @@
                 }
             });
 
-            $('#' + mainForm).validate({
+            mainFormEle.validate({
                 ignore: [],//for invisible elements
                 invalidHandler: function(event, validator) {
                     var info = {};
-                    console.log(validator.invalid);
+                    FCom.Admin.log(validator.invalid);
                     for(key in validator.invalid) {
                         var element = jQuery('input[name="'+key+'"], textarea[name="'+key+'"], select[name="'+key+'"]');
                         if (element.length>0) {
@@ -72,13 +74,13 @@
 
                 }
             });
-            $('#' + mainForm).find('input, textarea, select').on('change', function () {
+            mainFormEle.find('input, textarea, select').on('change', function () {
                 flagEdit();
             });
             // prevent validate when delete item
             $('button[type="submit"]').click(function () {
                 if ($(this).hasClass('ignore-validate')) {
-                    $('#' + mainForm).validate().currentForm = '';
+                    mainFormEle.validate().currentForm = '';
                     return true;
                 }
             });

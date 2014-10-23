@@ -1,4 +1,4 @@
-{% import "@FCom_Admin/formsHelper.html.twig" as formsHp %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 {% set hlp = APP.instance('FCom_Catalog_ProductsImport') %}
 {% set info = hlp.getFileInfo(THIS.get('dir')~'/'~THIS.get('file')) %}
 {% if not info %}
@@ -8,38 +8,13 @@
 {% else %}
     <div class="panel-body">
         <form id="import-columns-form" class="form form-horizontal" method="post">
-            {{ formsHp.input('config[filename]', THIS.get('file'), 'hidden') }}
+            <input type="hidden" name="config[filename]" value="{{ THIS.get('file') }}" />
             <fieldset>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ 'Field Delimiter'|_ }}</label>
-                    <div class="col-md-5">
-                        {{ formsHp.input('config[delim]', info.delim, 'text', 'form-control') }}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ 'Skip First Lines'|_ }}</label>
-                    <div class="col-md-5">
-                        {{ formsHp.input('config[skip_first]', info.skip_first, 'text', 'form-control') }}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ 'Batch Size'|_ }}</label>
-                    <div class="col-md-5">
-                        {{ formsHp.input('config[batch_size]', info.batch_size ?: 100, 'text', 'form-control') }}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ 'Multi Value Delimiter'|_ }}</label>
-                    <div class="col-md-5">
-                        {{ formsHp.input('config[multivalue_separator]', info.multivalue_separator ?: ';', 'text', 'form-control') }}
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-2 control-label">{{ 'Nesting Level Delimiter'|_ }}</label>
-                    <div class="col-md-5">
-                        {{ formsHp.input('config[nesting_separator]', info.nesting_separator ?: '>', 'text', 'form-control') }}
-                    </div>
-                </div>
+                {{ forms.input({ field:'delim', label: 'Field Delimiter'|_, value: info.delim, name_prefix:'config' }) }}
+                {{ forms.input({ field:'skip_first', label: 'Skip First Lines'|_, value: info.skip_first, name_prefix:'config' }) }}
+                {{ forms.input({ field:'batch_size', label: 'Batch Size'|_, value: info.batch_size ?: 100, name_prefix:'config' }) }}
+                {{ forms.input({ field:'multivalue_separator', label: 'Multi Value Delimiter'|_, value: info.multivalue_separator, name_prefix:'config' }) }}
+                {{ forms.input({ field:'nesting_separator', label: 'Nesting Level Delimiter'|_, value: info.nesting_separator ?: '>', name_prefix:'config' }) }}
             </fieldset>
 
             <fieldset>
