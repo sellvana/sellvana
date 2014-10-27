@@ -51,7 +51,7 @@ class FCom_Sales_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tOrderItem}_cart" => "FOREIGN KEY (`order_id`) REFERENCES {$tOrder} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderItem}_cart" => ['order_id', $tOrder],
             ],
         ]);
 
@@ -84,7 +84,7 @@ class FCom_Sales_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tOrderAddress}_cart" => "FOREIGN KEY (`order_id`) REFERENCES {$tOrder} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderAddress}_cart" => ['order_id', $tOrder],
             ],
         ]);
 
@@ -166,7 +166,7 @@ class FCom_Sales_Migrate extends BClass
                 'cart_id' => "UNIQUE (`cart_id`,`product_id`)",
             ],
             'CONSTRAINTS' => [
-                "FK_{$tCartItem}_cart" => "FOREIGN KEY (`cart_id`) REFERENCES {$tCart} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tCartItem}_cart" => ['cart_id', $tCart],
             ],
         ]);
 
@@ -199,7 +199,7 @@ class FCom_Sales_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tCartAddress}_cart" => "FOREIGN KEY (`cart_id`) REFERENCES {$tCart} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tCartAddress}_cart" => ['cart_id', $tCart],
             ],
         ]);
         $tOrderPayment = $this->FCom_Sales_Model_Order_Payment->table();
@@ -227,7 +227,7 @@ class FCom_Sales_Migrate extends BClass
                 'transaction_type' => '(transaction_type)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tOrderPayment}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                "FK_{$tOrderPayment}_order" => ['order_id', $tOrder, 'id', 'RESTRICT', 'CASCADE'],
             ],
         ]);
     }
@@ -380,7 +380,7 @@ class FCom_Sales_Migrate extends BClass
                 'UNQ_cart_id' => "UNIQUE (`cart_id`,`product_id`)",
             ],
             'CONSTRAINTS' => [
-                "FK_{$tCartItem}_cart" => "FOREIGN KEY (`cart_id`) REFERENCES {$tCart} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tCartItem}_cart" => ['cart_id', $tCart],
             ],
         ]);
 
@@ -409,7 +409,7 @@ class FCom_Sales_Migrate extends BClass
             ],
             'PRIMARY' => '(`id`)',
             'CONSTRAINTS' => [
-                "FK_{$tCartAddress}_cart" => "FOREIGN KEY (`cart_id`) REFERENCES {$tCart} (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tCartAddress}_cart" => ['cart_id', $tCart],
             ],
         ]);
     }
@@ -592,7 +592,7 @@ class FCom_Sales_Migrate extends BClass
                 'transaction_type' => '(transaction_type)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tOrderPayment}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE RESTRICT ON UPDATE CASCADE",
+                "FK_{$tOrderPayment}_order" => ['order_id', $tOrder, 'id', 'RESTRICT', 'CASCADE'],
             ],
         ]);
     }
@@ -817,7 +817,7 @@ class FCom_Sales_Migrate extends BClass
                 'IDX_state_custom' => '(state_custom)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tOrderShipment}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderShipment}_order" => ['order_id', $tOrder],
             ],
         ]);
 
@@ -830,8 +830,8 @@ class FCom_Sales_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tOrderShipmentItem}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
-                "FK_{$tOrderShipmentItem}_order_item" => "FOREIGN KEY (order_item_id) REFERENCES {$tOrderItem} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderShipmentItem}_order" => ['order_id', $tOrder],
+                "FK_{$tOrderShipmentItem}_order_item" => ['order_item_id', $tOrderItem],
             ],
         ]);
 
@@ -874,8 +874,8 @@ class FCom_Sales_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tOrderPaymentItem}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
-                "FK_{$tOrderPaymentItem}_order_item" => "FOREIGN KEY (order_item_id) REFERENCES {$tOrderItem} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderPaymentItem}_order" => ['order_id', $tOrder],
+                "FK_{$tOrderPaymentItem}_order_item" => ['order_item_id', $tOrderItem],
             ],
         ]);
 
@@ -893,7 +893,7 @@ class FCom_Sales_Migrate extends BClass
                 'IDX_state_custom' => '(state_custom)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tOrderReturn}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderReturn}_order" => ['order_id', $tOrder],
             ],
         ]);
 
@@ -906,8 +906,8 @@ class FCom_Sales_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tOrderReturnItem}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
-                "FK_{$tOrderReturnItem}_order_item" => "FOREIGN KEY (order_item_id) REFERENCES {$tOrderItem} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderReturnItem}_order" => ['order_id', $tOrder],
+                "FK_{$tOrderReturnItem}_order_item" => ['order_item_id', $tOrderItem],
             ],
         ]);
 
@@ -925,7 +925,7 @@ class FCom_Sales_Migrate extends BClass
                 'IDX_state_custom' => '(state_custom)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tOrderRefund}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderRefund}_order" => ['order_id', $tOrder],
             ],
         ]);
 
@@ -938,8 +938,8 @@ class FCom_Sales_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tOrderRefundItem}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
-                "FK_{$tOrderRefundItem}_order_item" => "FOREIGN KEY (order_item_id) REFERENCES {$tOrderItem} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderRefundItem}_order" => ['order_id', $tOrder],
+                "FK_{$tOrderRefundItem}_order_item" => ['order_item_id', $tOrderItem],
             ],
         ]);
 
@@ -967,9 +967,9 @@ class FCom_Sales_Migrate extends BClass
                 'IDX_event_type_at' => '(event_type, event_at)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tOrderHistory}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
-                "FK_{$tOrderHistory}_order_item" => "FOREIGN KEY (order_item_id) REFERENCES {$tOrderItem} (id) ON DELETE SET NULL ON UPDATE CASCADE",
-                "FK_{$tOrderHistory}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON DELETE SET NULL ON UPDATE CASCADE",
+                "FK_{$tOrderHistory}_order" => ['order_id', $tOrder],
+                "FK_{$tOrderHistory}_order_item" => ['order_item_id', $tOrderItem, 'id', 'SET NULL', 'CASCADE'],
+                "FK_{$tOrderHistory}_user" => ['user_id', $tUser, 'id', 'SET NULL', 'CASCADE'],
             ],
         ]);
 
@@ -991,8 +991,8 @@ class FCom_Sales_Migrate extends BClass
                 'IDX_admin_user' => '(from_admin, user_id)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tOrderComment}_order" => "FOREIGN KEY (order_id) REFERENCES {$tOrder} (id) ON DELETE CASCADE ON UPDATE CASCADE",
-                "FK_{$tOrderComment}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON DELETE SET NULL ON UPDATE CASCADE",
+                "FK_{$tOrderComment}_order" => ['order_id', $tOrder],
+                "FK_{$tOrderComment}_user" => ['user_id', $tUser, 'id', 'SET NULL', 'CASCADE'],
             ],
         ]);
 
@@ -1074,7 +1074,7 @@ class FCom_Sales_Migrate extends BClass
                 'IDX_cart_product_separate_hash' => '(cart_id, product_id, is_separate, unique_hash)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tCartItem}_parent_item" => "FOREIGN KEY (parent_item_id) REFERENCES {$tCartItem} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tCartItem}_parent_item" => ['parent_item_id', $tCartItem],
             ],
         ]);
 
@@ -1088,7 +1088,7 @@ class FCom_Sales_Migrate extends BClass
                 'shipping_weight' => 'decimal(12,2)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tOrderItem}_parent_item" => "FOREIGN KEY (parent_item_id) REFERENCES {$tOrderItem} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tOrderItem}_parent_item" => ['parent_item_id', $tOrderItem],
             ],
         ]);
     }

@@ -741,6 +741,17 @@ EOT
             $dropArr = [];
             foreach ($fks as $idx => $def) {
                 $idxLower = strtolower($idx);
+                if (is_array($def)) {
+                    if (empty($def[0]) || empty($def[1])) {
+                        throw new BException('Incomplete FK definition: ' . print_r($def));
+                    }
+                    $lk = $def[0];
+                    $ft = $def[1];
+                    $fk = !empty($def[2]) ? $def[2] : 'id';
+                    $ou = !empty($def[3]) ? $def[3] : 'CASCADE';
+                    $od = !empty($def[4]) ? $def[4] : 'CASCADE';
+                    $def = "FOREIGN KEY ({$lk}) REFERENCES {$ft} ({$fk}) ON UPDATE {$ou} ON DELETE {$od}";
+                }
                 if ($def === 'DROP') {
                     if (!empty($tableFKs[$idxLower])) {
                         $dropArr[] = "DROP FOREIGN KEY `{$idx}`";

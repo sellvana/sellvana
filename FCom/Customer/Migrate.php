@@ -57,7 +57,7 @@ class FCom_Customer_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tAddress}_customer" => "FOREIGN KEY (customer_id) references {$tCustomer} (id) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tAddress}_customer" => ['customer_id', $tCustomer],
             ]
         ]);
             /*
