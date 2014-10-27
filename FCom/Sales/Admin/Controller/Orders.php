@@ -29,7 +29,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
             //todo: confirm with Boris about status should be stored as id_status
             ['name' => 'status', 'label' => 'Status', 'index' => 'o.status',
-                'options' => $this->FCom_Sales_Model_Order_CustomStatus->statusOptions()],
+                'options' => $this->FCom_Sales_Model_Order_StateCustom->optionsByType('order')],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
             ]],
@@ -278,7 +278,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['name' => 'balance', 'label' => 'Paid', 'index' => 'o.balance'],
             ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
             ['name' => 'status', 'label' => 'Status', 'index' => 'o.status',
-                'options' => $this->FCom_Sales_Model_Order_CustomStatus->statusOptions()],
+                'options' => $this->FCom_Sales_Model_Order_StateCustom->optionsByType('order')],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
             ]],
@@ -310,12 +310,15 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
 
     public function getOrderTotal($filter)
     {
+        /*
+        // TODO: redo the whole thing
         $orderTotal = $this->FCom_Sales_Model_Order_CustomStatus->orm('s')
             ->left_outer_join('FCom_Sales_Model_Order', ['o.status', '=', 's.name'], 'o')
             ->group_by('s.id')
             ->select_expr('COUNT(o.id)', 'order')
             ->select(['s.id', 'name']);
         $tmp = $result = $orderTotal->find_many();
+        $tmp = [];
         switch ($filter['type']) {
             case 'between':
                 $tmp = $orderTotal->where_gte('o.create_at', $filter['min'])->where_lte('o.create_at', $filter['max'])->find_many();
@@ -344,6 +347,8 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             }
             $obj->set('order', $order);
         }
+        */
+        $result = [];
         return $result;
     }
 

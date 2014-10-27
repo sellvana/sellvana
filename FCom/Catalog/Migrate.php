@@ -78,8 +78,8 @@ class FCom_Catalog_Migrate extends BClass
 
             ],
             'CONSTRAINTS' => [
-                "FK_{$tMedia}_product" => "FOREIGN KEY (`product_id`) REFERENCES `{$tProduct}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
-                "FK_{$tMedia}_file" => "FOREIGN KEY (`file_id`) REFERENCES `{$tMediaLibrary}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tMedia}_product" => ['product_id', $tProduct],
+                "FK_{$tMedia}_file" => ['file_id', $tMediaLibrary],
             ],
         ]);
 
@@ -139,7 +139,7 @@ class FCom_Catalog_Migrate extends BClass
                 'IDX_featured'  => '(is_featured)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tCategory}_parent" => "FOREIGN KEY (`parent_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tCategory}_parent" => ['parent_id', $tCategory],
             ],
         ]);
 
@@ -157,8 +157,8 @@ class FCom_Catalog_Migrate extends BClass
                 'category_id__sort_order' => '(`category_id`,`sort_order`)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tCategoryProduct}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
-                "FK_{$tCategoryProduct}_product" => "FOREIGN KEY (`product_id`) REFERENCES `{$tProduct}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                "FK_{$tCategoryProduct}_category" => ['category_id', $tCategory],
+                "FK_{$tCategoryProduct}_product" => ['product_id', $tProduct],
             ],
         ]);
 

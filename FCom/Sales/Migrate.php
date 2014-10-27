@@ -88,6 +88,7 @@ class FCom_Sales_Migrate extends BClass
             ],
         ]);
 
+        /*
         $tStatus = $this->FCom_Sales_Model_Order_CustomStatus->table();
         $this->BDb->ddlTableDef($tStatus, [
             'COLUMNS' => [
@@ -100,6 +101,7 @@ class FCom_Sales_Migrate extends BClass
         $this->BDb->run("
             insert into {$tStatus} (id,name,code) values(1, 'New', 'new'),(2,'Pending','pending'),(3,'Paid','paid')
         ");
+        */
 
         $tCart = $this->FCom_Sales_Model_Cart->table();
         $tCartItem = $this->FCom_Sales_Model_Cart_Item->table();
@@ -271,6 +273,7 @@ class FCom_Sales_Migrate extends BClass
 
     public function upgrade__0_1_5__0_1_6()
     {
+        /*
         $tStatus = $this->FCom_Sales_Model_Order_CustomStatus->table();
         $this->BDb->ddlTableDef($tStatus, [
             'COLUMNS' => [
@@ -280,14 +283,17 @@ class FCom_Sales_Migrate extends BClass
             ],
             'PRIMARY' => '(`id`)',
         ]);
+        */
     }
 
     public function upgrade__0_1_6__0_1_7()
     {
+        /*
         $tStatus = $this->FCom_Sales_Model_Order_CustomStatus->table();
         $this->BDb->run("
             insert into {$tStatus}(id,name,code) values(1, 'New', 'new'),(2,'Pending','pending'),(3,'Paid','paid')
         ");
+        */
     }
 
     public function upgrade__0_1_7__0_1_8()
