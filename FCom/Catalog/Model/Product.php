@@ -5,7 +5,7 @@
  *
  * The followings are the available columns in table 'fcom_product':
  * @property string  $id
- * @property string  $local_sku
+ * @property string  $product_sku
  * @property string  $product_name
  * @property string  $short_description
  * @property string  $description
@@ -59,9 +59,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     protected static $_validationRules = [
         ['product_name', '@required'],
         ['base_price', '@required'],
-        ['local_sku', '@required'],
-        ['local_sku', '@string', null, ['max' => 100]],
-        ['local_sku', 'FCom_Catalog_Model_Product::validateDupSku'],
+        ['product_sku', '@required'],
+        ['product_sku', '@string', null, ['max' => 100]],
+        ['product_sku', 'FCom_Catalog_Model_Product::validateDupSku'],
         ['url_key', 'FCom_Catalog_Model_Product::validateDupUrlKey'],
         //TODO validation fails on is_hidden field
         /*array('is_hidden', '@required'),*/
@@ -88,7 +88,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             'indextank_indexed',
             'indextank_indexed_at',
         ],
-        'unique_key' => 'local_sku'
+        'unique_key' => 'product_sku'
     ];
 
     protected $_importErrors = null;
@@ -104,7 +104,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         if (empty($data[$args['field']])) {
             return true;
         }
-        $orm = $this->orm('p')->where('local_sku', $data[$args['field']]);
+        $orm = $this->orm('p')->where('product_sku', $data[$args['field']]);
         if (!empty($data['id'])) {
             $orm->where_not_equal('p.id', $data['id']);
         }
@@ -230,8 +230,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $saveAgain = false;
 
         //todo: setup unique uniq_id
-        if (!$this->get('local_sku')) {
-            $this->set('local_sku', $this->id);
+        if (!$this->get('product_sku')) {
+            $this->set('product_sku', $this->id);
             $saveAgain = true;
         }
         if (!$this->get('position')) {
@@ -257,7 +257,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
     public function generateUrlKey()
     {
-        //$key = $this->manuf()->manuf_name.'-'.$this->local_sku.'-'.$this->product_name;
+        //$key = $this->manuf()->manuf_name.'-'.$this->product_sku.'-'.$this->product_name;
         $key = $this->product_name;
         $urlKey = $this->BLocale->transliterate($key);
         $t = static::$_table;
@@ -316,7 +316,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $result[$i] = [
                 'id'                => $product->id,
                 'product_name'      => $product->product_name,
-                'sku'               => $product->local_sku,
+                'sku'               => $product->product_sku,
                 'price'             => $product->base_price,
                 'url'               => $product->url_key,
                 'weight'            => $product->weight,
@@ -338,7 +338,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             $data['product_name'] = $post['product_name'];
         }
         if (!empty($post['sku'])) {
-            $data['local_sku'] = $post['sku'];
+            $data['product_sku'] = $post['sku'];
         }
         if (!empty($post['price'])) {
             $data['base_price'] = $post['price'];
@@ -428,7 +428,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $and = [];
         if ($qs) {
             foreach ($qs as $k) $and[] = ['product_name like ?', '%' . (string)$k . '%'];
-            $productsORM->where(['OR' => ['local_sku' => (string)$q, 'AND' => $and]]);
+            $productsORM->where(['OR' => ['product_sku' => (string)$q, 'AND' => $and]]);
         }
 
         if (!empty($filter)) {
@@ -559,7 +559,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         for ($i = 0, $c = count($data); $i < $c; $i++) {
             $d = $data[$i];
             //if must have fields not defined then skip the record
-            if (empty($d['product_name']) && empty($d['local_sku']) && empty($d['url_key'])) {
+            if (empty($d['product_name']) && empty($d['product_sku']) && empty($d['url_key'])) {
                 continue;
             }
 
@@ -618,8 +618,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             if ('create_or_update' == $config['import']['actions'] ||
                     'update' == $config['import']['actions']
                     ) {
-                if (isset($d['local_sku'])) {
-                    $p = $this->orm()->where("local_sku", $d['local_sku'])->find_one();
+                if (isset($d['product_sku'])) {
+                    $p = $this->orm()->where("product_sku", $d['product_sku'])->find_one();
                 }
 //                if (!$p && isset($d['product_name'])) {
 //                    $p = $this->orm()->where("product_name", $d['product_name'])->find_one();
@@ -996,13 +996,13 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 
                 if (!empty($temp)) {
                     // fetch related sku objects
-                    $related = $this->orm()->where_in("local_sku", $temp)
+                    $related = $this->orm()->where_in("product_sku", $temp)
                                     ->find_many();
 
                     foreach ($related as $r) {
                         /* @var FCom_Catalog_Model_Product $r */
                         $linked[] = $r->id();
-                        $relatedIds[$r->local_sku] = $r->id();
+                        $relatedIds[$r->product_sku] = $r->id();
                     }
                 }
 

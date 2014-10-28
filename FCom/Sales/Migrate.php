@@ -146,7 +146,7 @@ class FCom_Sales_Migrate extends BClass
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
                 'cart_id' => "int(10) unsigned DEFAULT NULL",
                 'product_id' => "int(10) unsigned DEFAULT NULL",
-                'local_sku' => "varchar(100) DEFAULT NULL",
+                'product_sku' => "varchar(100) DEFAULT NULL",
                 'product_name' => "varchar(255) DEFAULT NULL",
                 'qty' => "decimal(12,2) DEFAULT NULL",
                 'price' => "decimal(12,2) NOT NULL DEFAULT '0.0000'",
@@ -455,8 +455,8 @@ class FCom_Sales_Migrate extends BClass
 
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Cart_Item->table(), [
             'COLUMNS' => [
-                'local_sku' => 'varchar(100) null after product_id',
-                'product_name' => 'varchar(255) null after local_sku',
+                'product_sku' => 'varchar(100) null after product_id',
+                'product_name' => 'varchar(255) null after product_sku',
                 'tax' => 'decimal(12,2) not null default 0 after rowtotal',
                 'discount' => 'decimal(12,2) not null default 0 after tax',
                 'data_serialized' => 'text after update_dt',
@@ -1068,16 +1068,17 @@ class FCom_Sales_Migrate extends BClass
 
         $this->BDb->ddlTableDef($tCartItem, [
             'COLUMNS' => [
-                'stock_sku' => 'varchar(100) default null after local_sku',
+                'product_sku' => 'varchar(100) not null',
+                'inventory_sku' => 'varchar(100) default null after product_sku',
                 'parent_item_id' => 'int unsigned default null',
                 'shipping_size' => 'varchar(30)',
                 'shipping_weight' => 'decimal(12,2)',
-                'is_separate' => 'tinyint not null default 0',
+                'pack_separate' => 'tinyint not null default 0',
                 'unique_hash' => 'bigint default null',
             ],
             'KEYS' => [
                 'cart_id' => 'DROP',
-                'IDX_cart_product_separate_hash' => '(cart_id, product_id, is_separate, unique_hash)',
+                'IDX_cart_product_separate_hash' => '(cart_id, product_id, pack_separate, unique_hash)',
             ],
             'CONSTRAINTS' => [
                 "FK_{$tCartItem}_parent_item" => ['parent_item_id', $tCartItem],
@@ -1087,7 +1088,7 @@ class FCom_Sales_Migrate extends BClass
         $this->BDb->ddlTableDef($tOrderItem, [
             'COLUMNS' => [
                 'cart_item_id' => 'int unsigned default null',
-                'local_sku' => 'varchar(100) default null',
+                'product_sku' => 'varchar(100) default null',
                 'stock_sku' => 'varchar(100) default null',
                 'parent_item_id' => 'int unsigned default null',
                 'shipping_size' => 'varchar(30)',

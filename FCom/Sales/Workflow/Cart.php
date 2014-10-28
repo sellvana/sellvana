@@ -103,7 +103,7 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
             $item['details'] = [
                 'qty' => $item['qty'],
                 'price' => $p->getPrice(),
-                'local_sku' => $p->get('local_sku'),
+                'product_sku' => $p->get('product_sku'),
                 'stock_sku' => $p->get('stock_sku'),
             ];
         }

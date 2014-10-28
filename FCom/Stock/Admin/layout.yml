@@ -2,6 +2,7 @@ base:
     - view: admin/nav
         do:
             - [ addNav, catalog/stock, { label: Stock, href: /stock } ]
+
 catalog_product_form_tabs:
     - view: admin/form
         do:

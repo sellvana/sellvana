@@ -46,7 +46,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
             array_push($data, $tmp);
         };
         $this->FCom_Stock_Model_Sku->orm($this->_mainTableAlias)->select(array($this->_mainTableAlias.'.*', 'p.data_serialized', 'p.cost', 'p.product_name'))
-            ->left_outer_join('FCom_Catalog_Model_Product', [ 'p.local_sku', '=', $this->_mainTableAlias . '.sku'], 'p')
+            ->left_outer_join('FCom_Catalog_Model_Product', [ 'p.product_sku', '=', $this->_mainTableAlias . '.sku'], 'p')
             ->select_expr('p.product_name', 'product_name')
             ->select_expr('p.cost', 'cost')->iterate($callback);
         $config['columns'] = [
@@ -197,7 +197,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
                 $p['tmp_cost'] = $p['cost'];
                 unset($p['oper']);
                 if (isset($p['sku'])) {
-                    $prod = $this->FCom_Catalog_Model_Product->load($p['sku'], 'local_sku');
+                    $prod = $this->FCom_Catalog_Model_Product->load($p['sku'], 'product_sku');
                     $this->FCom_Stock_Model_Sku->load($p['id'])->set('status', $p['status'])->save();
                     if ($prod) {
                         $data_serialized = $this->BUtil->objectToArray(json_decode($prod->get('data_serialized')));
@@ -225,7 +225,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
                 $hlp = $this->FCom_Stock_Model_Sku;
                 $models = $hlp->orm()->where_in('id', $args['ids'])->find_many_assoc();
                 $skus = $this->BUtil->arrayToOptions($models, 'sku');
-                $products = $this->FCom_Catalog_Model_Product->orm()->where_in('local_sku', $skus)->find_many_assoc('local_sku');
+                $products = $this->FCom_Catalog_Model_Product->orm()->where_in('product_sku', $skus)->find_many_assoc('product_sku');
                 foreach ($models as $stock) {
                     $stock->set('status', $data['status'])->save();
                     if (!empty($products[$stock->get('sku')])) {

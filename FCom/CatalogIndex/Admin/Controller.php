@@ -65,7 +65,7 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
             for ($i = 0; $i < 1000; $i++) {
                 ++$maxId;
                 $product = $this->FCom_Catalog_Model_Product->create([
-                    'local_sku' => 'test-' . $maxId,
+                    'product_sku' => 'test-' . $maxId,
                     'product_name' => 'Product ' . $maxId,
                     'short_description' => 'Short Description ' . $maxId,
                     'description' => 'Long Description ' . $maxId,

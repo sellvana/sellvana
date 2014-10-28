@@ -20,7 +20,7 @@ class FCom_Catalog_Migrate extends BClass
         $this->BDb->ddlTableDef($tProduct, [
             'COLUMNS' => [
                 'id'            => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
-                'local_sku'     => 'VARCHAR(100) NOT NULL',
+                'product_sku'     => 'VARCHAR(100) NOT NULL',
                 'product_name'  => 'VARCHAR(255) NOT NULL',
                 'short_description' => 'TEXT',
                 'description'   => 'TEXT',
@@ -47,7 +47,7 @@ class FCom_Catalog_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'KEYS' => [
-                'UNQ_local_sku' => 'UNIQUE (local_sku)',
+                'UNQ_product_sku' => 'UNIQUE (product_sku)',
                 'UNQ_url_key'   => 'UNIQUE (url_key)',
 //                'UNQ_product_name' => 'UNIQUE (product_name)',
                 'is_hidden'     => '(is_hidden)',
@@ -204,7 +204,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $this->BDb->ddlTableDef($this->FCom_Catalog_Model_Product->table(), [
             'COLUMNS' => [
-                'unique_id'     => 'RENAME local_sku varchar(100) not null',
+                'unique_id'     => 'RENAME product_sku varchar(100) not null',
                 'disabled'      => 'RENAME is_hidden tinyint not null default 0',
                 'image_url'     => 'RENAME thumb_url text',
                 'images_data'   => 'text',
@@ -525,5 +525,107 @@ class FCom_Catalog_Migrate extends BClass
                 'nav_callout_image_url'   => 'TEXT NULL',
             ],
         ]);
+    }
+
+    public function upgrade__0_2_27__0_3_0()
+    {
+        $tProduct = $this->FCom_Catalog_Model_Product->table();
+        $tBin = $this->FCom_Catalog_Model_InventoryBin->table();
+        $tSku = $this->FCom_Catalog_Model_InventorySku->table();
+        $tSkuHistory = $this->FCom_Catalog_Model_InventorySkuHistory->table();
+        $tProdHistory = $this->FCom_Catalog_Model_ProductHistory->table();
+
+        $this->BDb->ddlTableDef($tProduct, [
+            'COLUMNS' => [
+                'local_sku' => 'RENAME product_sku varchar(100) not null',
+                'inventory_sku' => 'varchar(100) default null',
+            ],
+            'KEYS' => [
+                'IDX_inventory_sku' => '(inventory_sku)',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tBin, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'title' => 'varchar(50)',
+                'description' => 'text',
+                'create_at' => 'datetime not null',
+                'update_at' => 'datetime not null',
+                'data_serialized' => 'text',
+            ],
+            'PRIMARY' => '(id)',
+        ]);
+
+        $this->BDb->ddlTableDef($tSku, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'inventory_sku' => 'varchar(50) not null',
+                'title' => 'varchar(255) not null',
+                'description' => 'text',
+                'bin_id' => 'int unsigned null',
+                'unit_cost' => 'decimal(12,2)',
+                'net_weight'  => 'decimal(12,2) null default null',
+                'shipping_weight' => 'decimal(12,2) null default null',
+                'shipping_size' => 'varchar(30)',
+                'pack_separate' => 'tinyint not null default 0',
+                'qty_in_stock' => 'int not null',
+                'qty_warn_customer' => 'int unsigned null',
+                'qty_notify_admin' => 'int unsigned null',
+                'qty_cart_min' => 'int unsigned null',
+                'qty_cart_inc' => 'int unsigned not null default 1',
+                'qty_buffer' => 'int unsigned not null',
+                'create_at' => 'datetime not null',
+                'update_at' => 'datetime not null',
+                'data_serialized' => 'text',
+            ],
+            'PRIMARY' => '(id)',
+            'KEYS' => [
+                'UNQ_inventory_sku' => 'UNIQUE (inventory_sku)',
+            ],
+            'CONSTRAINTS' => [
+                "FK_{$tSku}_bin" => ['bin_id', $tBin],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tSkuHistory, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'sku_id' => 'int unsigned not null',
+                'unit_cost' => 'decimal(12,2)',
+                'create_at' => 'datetime not null',
+                'update_at' => 'datetime not null',
+                'data_serialized' => 'text',
+            ],
+            'PRIMARY' => '(id)',
+            'KEYS' => [
+                'IDX_create' => '(create_at)',
+                'IDX_sku_create' => '(sku_id, create_at)',
+            ],
+            'CONSTRAINTS' => [
+                "FK_{$tSkuHistory}_sku" => ['sku_id', $tSku],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tProdHistory, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'product_id' => 'int unsigned not null',
+                'version_code' => 'varchar(50)',
+                'version_notes' => 'text',
+                'create_at' => 'datetime not null',
+                'update_at' => 'datetime not null',
+                'data_serialized' => 'text',
+            ],
+            'PRIMARY' => '(id)',
+            'KEYS' => [
+                'IDX_create' => '(create_at)',
+                'IDX_product_create' => '(product_id, create_at)',
+            ],
+            'CONSTRAINTS' => [
+                "FK_{$tProdHistory}_product" => ['product_id', $tProduct],
+            ],
+        ]);
+
     }
 }

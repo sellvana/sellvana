@@ -64,8 +64,8 @@ class FCom_IndexTank_Migrate extends BClass
                 'base_price_desc'       => ['number' => 3, 'definition' => 'd[0]'   ],
                 'product_name_asc'        => ['number' => 4, 'definition' => '-d[1]'  ],
                 'product_name_desc'       => ['number' => 5, 'definition' => 'd[1]'   ],
-                'local_sku_asc'        => ['number' => 6, 'definition' => '-d[2]'  ],
-                'local_sku_desc'       => ['number' => 7, 'definition' => 'd[2]'   ],
+                'product_sku_asc'        => ['number' => 6, 'definition' => '-d[2]'  ],
+                'product_sku_desc'       => ['number' => 7, 'definition' => 'd[2]'   ],
         ];
         $functionsList = $this->FCom_IndexTank_Model_ProductFunction->getList();
         //add initial functions
@@ -109,8 +109,8 @@ class FCom_IndexTank_Migrate extends BClass
         update {$pFunctionsTable} set label = 'Price (Higher first)' where name='base_price_desc';
         update {$pFunctionsTable} set label = 'Product name (A-Z)' where name='product_name_asc';
         update {$pFunctionsTable} set label = 'Product name (Z-A)' where name='product_name_desc';
-        update {$pFunctionsTable} set label = 'Manuf SKU (A-Z)' where name='local_sku_asc';
-        update {$pFunctionsTable} set label = 'Manuf SKU (Z-A)' where name='local_sku_desc';
+        update {$pFunctionsTable} set label = 'Manuf SKU (A-Z)' where name='product_sku_asc';
+        update {$pFunctionsTable} set label = 'Manuf SKU (Z-A)' where name='product_sku_desc';
         ";
         $this->BDb->run($sql);
 
@@ -160,7 +160,7 @@ class FCom_IndexTank_Migrate extends BClass
                 $data['scoring'] = 1;
                 $data['var_number'] = 1;
             }
-            if ($f->Field == "local_sku") {
+            if ($f->Field == "product_sku") {
                 $data['scoring'] = 1;
                 $data['var_number'] = 2;
             }
@@ -315,8 +315,8 @@ class FCom_IndexTank_Migrate extends BClass
         update {$pPFTable} set label = 'Price (Higher first)' where name='base_price_desc';
         update {$pPFTable} set label = 'Product name (A-Z)' where name='product_name_asc';
         update {$pPFTable} set label = 'Product name (Z-A)' where name='product_name_desc';
-        update {$pPFTable} set label = 'Manuf SKU (A-Z)' where name='local_sku_asc';
-        update {$pPFTable} set label = 'Manuf SKU (Z-A)' where name='local_sku_desc';
+        update {$pPFTable} set label = 'Manuf SKU (A-Z)' where name='product_sku_asc';
+        update {$pPFTable} set label = 'Manuf SKU (Z-A)' where name='product_sku_desc';
         ";
         $this->BDb->run($sql);
     }

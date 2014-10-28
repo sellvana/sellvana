@@ -40,7 +40,7 @@ class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
             $vr['field_values'] = $this->BUtil->fromJson($vr['field_values']);
             $imgIds = $m->getData('variant_file_id');
             $vr['img_ids'] = $imgIds ? explode(',', $imgIds) : [];
-            $vr['variant_sku'] = ($vr['variant_sku'] === '') ? $product->local_sku : $vr['variant_sku'];
+            $vr['variant_sku'] = ($vr['variant_sku'] === '') ? $product->product_sku : $vr['variant_sku'];
             $price = ($vr['variant_price'] > 0) ? $vr['variant_price'] : $product->base_price;
             $vr['variant_price'] = $this->BLocale->currency($price);
             $vrKeyArr = [];

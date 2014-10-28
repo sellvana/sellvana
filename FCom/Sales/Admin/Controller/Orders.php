@@ -223,7 +223,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                 $product = [
                     'id'           => $item->id,
                     'product_name' => $product_info['product_name'],
-                    'local_sku'    => $product_info['local_sku'],
+                    'product_sku'    => $product_info['product_sku'],
                     'price'        => $product_info['base_price'],
                     'qty'          => $item->qty,
                     'total'        => $item->total,
@@ -243,7 +243,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 80, 'hidden' => true],
                     ['name' => 'product_name', 'label' => 'Name', 'width' => 400],
-                    ['name' => 'local_sku', 'label' => 'SKU', 'width' => 200],
+                    ['name' => 'product_sku', 'label' => 'SKU', 'width' => 200],
                     ['name' => 'price', 'label' => 'Price', 'width' => 100],
                     ['name' => 'qty', 'label' => 'Qty', 'width' => 100],
                     ['name' => 'total', 'label' => 'Total', 'width' => 150],

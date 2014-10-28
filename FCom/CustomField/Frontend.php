@@ -24,7 +24,7 @@ class FCom_CustomField_Frontend extends BClass
      *      qty: item qty (optional, default: 1)
      *      details: resulting details data structure
      *          price: item price (optional, default: $product->getPrice() )
-     *          local_sku: local catalog product unique id
+     *          product_sku: local catalog product unique id
      *          mfr_sku: manufacturer or wholesale sku (depends on variant)
      *          data:
      *              variants: (DEPRECATED)

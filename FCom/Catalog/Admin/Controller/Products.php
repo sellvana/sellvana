@@ -33,7 +33,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ['display' => 'eval', 'name' => 'thumb_path', 'label' => 'Thumbnail', 'width' => 48, 'sortable' => false,
                 'print' => '"<img src=\'"+rc.row["thumb_path"]+"\' alt=\'"+rc.row["product_name"]+"\' >"'],
             ['name' => 'product_name', 'label' => 'Name', 'width' => 250],
-            ['name' => 'local_sku', 'label' => 'SKU', 'index' => 'p.local_sku', 'width' => 100],
+            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
             ['name' => 'short_description', 'label' => 'Description',  'width' => 200],
             ['name' => 'base_price', 'label' => 'Base Price',  'width' => 100, 'hidden' => true],
             ['name' => 'sale_price', 'label' => 'Sale Price',  'width' => 100, 'hidden' => true],
@@ -55,7 +55,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         ];
         $config['filters'] = [
             ['field' => 'product_name', 'type' => 'text'],
-            ['field' => 'local_sku', 'type' => 'text'],
+            ['field' => 'product_sku', 'type' => 'text'],
             ['field' => 'short_description', 'type' => 'text'],
             ['field' => 'base_price', 'type' => 'number-range'],
             ['field' => 'sale_price', 'type' => 'number-range'],
@@ -63,7 +63,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ['field' => 'ship_weight', 'type' => 'number-range'],
             ['field' => 'create_at', 'type' => 'date-range'],
             ['field' => 'update_at', 'type' => 'date-range'],
-            '_quick' => ['expr' => 'product_name like ? or local_sku like ? or p.id=?', 'args' => ['?%', '%?%', '?']]
+            '_quick' => ['expr' => 'product_name like ? or product_sku like ? or p.id=?', 'args' => ['?%', '%?%', '?']]
         ];
         $config['format_callback'] = function($args) {
             foreach ($args['rows'] as $row) {
@@ -201,7 +201,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
             ['name' => 'product_name', 'label'   => 'Name', 'index'   => 'p.product_name',
                    'width' => 450, 'addable' => true],
-            ['name' => 'local_sku', 'label' => 'SKU', 'index' => 'p.local_sku', 'width' => 70],
+            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 70],
         ];
 
 //        unset( $config[ 'columns' ][ 'product_name' ][ 'formatter' ], $config[ 'columns' ][ 'product_name' ][ 'formatoptions' ] );
@@ -357,15 +357,15 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55, 'hidden' => true],
             ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 250],
-            ['name' => 'local_sku', 'label' => 'SKU', 'index' => 'p.local_sku', 'width' => 100],
+            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 100],
         ];
         $config['actions'] = [
             'add' => ['caption' => 'Add selected products']
         ];
         $config['filters'] = [
             ['field' => 'product_name', 'type' => 'text'],
-            ['field' => 'local_sku', 'type' => 'text'],
-            '_quick' => ['expr' => 'product_name like ? or local_sku like ? or p.id=?', 'args' => ['?%', '%?%', '?']]
+            ['field' => 'product_sku', 'type' => 'text'],
+            '_quick' => ['expr' => 'product_name like ? or product_sku like ? or p.id=?', 'args' => ['?%', '%?%', '?']]
         ];
 
         $config['grid_before_create'] = 'allProdGridRegister';
@@ -385,7 +385,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function getCatProdConfig($model)
     {
         $orm = $this->FCom_Catalog_Model_Product->orm()->table_alias('p')
-            ->select(['p.id', 'p.product_name', 'p.local_sku'])
+            ->select(['p.id', 'p.product_name', 'p.product_sku'])
             ->join('FCom_Catalog_Model_CategoryProduct', ['cp.product_id', '=', 'p.id'], 'cp')
             ->where('cp.category_id', $model ? $model->id : 0)
         ;
@@ -400,7 +400,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
             ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400],
-            ['name' => 'local_sku', 'label' => 'SKU', 'index' => 'p.local_sku', 'width' => 200]
+            ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 200]
         ];
         $config['actions'] = [
             'add' => ['caption' => 'Add products'],
@@ -408,7 +408,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         ];
         $config['filters'] = [
             ['field' => 'product_name', 'type' => 'text'],
-            ['field' => 'local_sku', 'type' => 'text']
+            ['field' => 'product_sku', 'type' => 'text']
         ];
         $config['data_mode'] = 'local';
         $config['grid_before_create'] = 'catProdGridRegister';
@@ -424,7 +424,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     public function linkedProductGridConfig($model, $type)
     {
         $orm = $this->FCom_Catalog_Model_Product->orm()->table_alias('p')
-            ->select(['p.id', 'p.product_name', 'p.local_sku', 'p.base_price', 'p.sale_price']);
+            ->select(['p.id', 'p.product_name', 'p.product_sku', 'p.base_price', 'p.sale_price']);
 
         switch ($type) {
         case 'related': case 'similar':case 'cross_sell':
@@ -452,7 +452,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
                     ['name' => 'product_name', 'label' => 'Name', 'index' => 'p.product_name', 'width' => 400],
-                    ['name' => 'local_sku', 'label' => 'SKU', 'index' => 'p.local_sku', 'width' => 200],
+                    ['name' => 'product_sku', 'label' => 'SKU', 'index' => 'p.product_sku', 'width' => 200],
                     ['name' => 'base_price', 'label' => 'Base Price', 'index' => 'p.base_price'],
                     ['name' => 'sale_price', 'label' => 'Sale Price', 'index' => 'p.sale_price'],
                     ['name' => 'product_link_position', 'label' => 'Position', 'index' => 'pl.position', 'width' => 50,
@@ -464,7 +464,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 ],
                 'filters' => [
                     ['field' => 'product_name', 'type' => 'text'],
-                    ['field' => 'local_sku', 'type' => 'text']
+                    ['field' => 'product_sku', 'type' => 'text']
                 ],
                 'events' => ['init', 'add', 'mass-delete'],
                 'grid_before_create' => $gridId . '_register'
@@ -847,10 +847,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 unset($data['id']);
                 $newModel = $this->FCom_Catalog_Model_Product->create($data);
                 /** @var $newModel FCom_Catalog_Model_Product */
-                $number = $this->getDuplicateSuffixNumber($oldModel->product_name, $oldModel->local_sku, $oldModel->url_key);
+                $number = $this->getDuplicateSuffixNumber($oldModel->product_name, $oldModel->product_sku, $oldModel->url_key);
                 $newModel->product_name = $newModel->product_name . '-' . $number;
                 $newModel->url_key = $newModel->url_key . '-' . $number;
-                $newModel->local_sku = $newModel->local_sku . '-' . $number;
+                $newModel->product_sku = $newModel->product_sku . '-' . $number;
                 $newModel->create_at = $newModel->update_at = date('Y-m-d H:i:s');
                 $newModel->is_hidden = 1;
                 if ($newModel->save()
@@ -885,7 +885,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $result = $this->FCom_Catalog_Model_Product->orm()
             ->where(['OR' => [
                 ['product_name REGEXP ?', (string)$oldName . '-[0-9]$'],
-                ['local_sku REGEXP ?', (string)$oldSku . '-[0-9]$'],
+                ['product_sku REGEXP ?', (string)$oldSku . '-[0-9]$'],
                 ['url_key REGEXP ?',(string) $oldUrlKey . '-[0-9]$'],
             ]])
             ->order_by_desc('id')->find_one();
@@ -893,7 +893,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         if ($result) {
             foreach ($result as $arr) {
                 $tmpName = explode($oldName . '-', $arr->get('product_name'));
-                $tmpSku = explode($oldSku . '-', $arr->get('local_sku'));
+                $tmpSku = explode($oldSku . '-', $arr->get('product_sku'));
                 $tmpKey = explode($oldUrlKey . '-', $arr->get('url_key'));
                 $max = $tmpName[1];
                 $tmpSku[1] = ($tmpSku[1] < $tmpKey[1]) ? $tmpKey[1] : $tmpSku[1];
@@ -1005,7 +1005,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $result = $this->FCom_Catalog_Model_Product->orm('p')
                 ->where(['OR' => [
                     ['p.id like ?', (string)$value],
-                    ['p.local_sku like ?', (string)$value],
+                    ['p.product_sku like ?', (string)$value],
                     ['p.url_key like ?', (string)$value],
                     ['p.product_name like ?', (string)$value],
                 ]])->find_one();
