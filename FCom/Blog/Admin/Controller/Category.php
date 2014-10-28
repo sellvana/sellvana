@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Blog_Admin_Controller_Category
+ *
+ * @property FCom_Blog_Model_PostCategory $FCom_Blog_Model_PostCategory
+ * @property FCom_Blog_Model_Category $FCom_Blog_Model_Category
+ */
 class FCom_Blog_Admin_Controller_Category extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;

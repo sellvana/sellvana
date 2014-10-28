@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Blog_Frontend_Controller
+ *
+ * @property FCom_Blog_Model_Post $FCom_Blog_Model_Post
+ * @property FCom_Blog_Model_Tag $FCom_Blog_Model_Tag
+ * @property FCom_Blog_Model_Category $FCom_Blog_Model_Category
+ */
 class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function action_index()
