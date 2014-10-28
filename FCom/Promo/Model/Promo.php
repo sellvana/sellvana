@@ -1,5 +1,23 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Promo_Model_Promo
+ *
+ * @property FCom_Promo_Model_Cart $FCom_Promo_Model_Cart
+ * @property FCom_Promo_Model_Group $FCom_Promo_Model_Group
+ * @property FCom_Promo_Model_Media $FCom_Promo_Model_Media
+ * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
+ * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
+ *
+ * @property int id
+ * @property string from_date promo start date
+ * @property string to_date promo end date
+ * @property string status promo status - 'template','pending','active','expired'
+ * @property null create_at promo create date
+ * @property string update_at promo update date
+ * @property string buy_group for which product group the promo is valid - 'one','any','all','cat','anyp'
+ * @property string get_group from which product group you get a product 'same_prod','same_group','any_group','diff_group'
+ */
 class FCom_Promo_Model_Promo extends BModel
 {
     protected static $_origClass = __CLASS__;
@@ -61,6 +79,9 @@ class FCom_Promo_Model_Promo extends BModel
         //todo: load vendors here
     }
 
+    /**
+     * @return FCom_Promo_Model_Group[]|null
+     */
     public function groups()
     {
         return $this->FCom_Promo_Model_Group->orm()
@@ -77,6 +98,9 @@ class FCom_Promo_Model_Promo extends BModel
             ->where('pa.promo_id', $this->id);
     }
 
+    /**
+     * @return FCom_Promo_Model_Media[]
+     */
     public function media()
     {
         return $this->mediaORM()->find_many();
@@ -87,27 +111,31 @@ class FCom_Promo_Model_Promo extends BModel
         $grHlp = $this->FCom_Promo_Model_Group;
         $prodHlp = $this->FCom_Promo_Model_Product;
         $attHlp = $this->FCom_Promo_Model_Media;
+
         $clone = $this->create($this->as_array())->set([
             'id' => 'null',
             'status' => 'pending',
         ])->save();
+
         foreach ($this->groups() as $gr) {
             $clGr = $grHlp->create($gr->as_array())->set([
                 'id' => null,
-                'promo_id' => $clone->id,
+                'promo_id' => $clone->id(),
             ])->save();
+
             foreach ($gr->products() as $gp) {
-                $clProd = $prodHlp->create($gp->as_array())->set([
+                $prodHlp->create($gp->as_array())->set([
                     'id' => null,
-                    'promo_id' => $clone->id,
-                    'group_id' => $clGr->id,
+                    'promo_id' => $clone->id(),
+                    'group_id' => $clGr->id(),
                 ])->save();
             }
         }
+
         foreach ($this->media() as $att) {
             $attHlp->create($att->as_array())->set([
                 'id' => null,
-                'promo_id' => $clone->id,
+                'promo_id' => $clone->id(),
             ])->save();
         }
         return $clone;
@@ -127,6 +155,8 @@ class FCom_Promo_Model_Promo extends BModel
 
         $this->setDate($this->get("from_date"), 'from_date');
         $this->setDate($this->get("to_date"), 'to_date');
+        if (!$this->create_at) $this->create_at = $this->BDb->now();
+        $this->update_at = $this->BDb->now();
 
         return true;
     }

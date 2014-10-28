@@ -10,6 +10,7 @@
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
 <fieldset class="adm-section-group">
+    <div class="f-section">
     {{ forms.input({label: 'Description'|_, required: 1, name: "model[description]", value: validator.fieldValue('description'), id: "model-description" }) }}
     {{ forms.input({label: 'Coupon code'|_, name: "model[coupon]", value: validator.fieldValue('coupon'), id: "model-coupon" }) }}
     {{ forms.select({label: 'Status'|_, options: promo.fieldOptions('status'), name: "model[status]", value: validator.fieldValue('status'), id: "model-status" }) }}
@@ -17,9 +18,9 @@
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-from_date">{{ 'Date Range'|_ }}</label>
         <div class="col-md-5">
-            {{ 'Start:'|_ }}
+            <label for="model-from_date">{{ 'Start:'|_ }}</label>
             <div>
-                <div class='datepicker input-group' id='model-from_date'>
+                <div class='datepicker input-group' id='model-from_date_container'>
                     <input class='form-control' id="model-from_date" data-format='mm/dd/yy' name="model[from_date]"
                            type='text' value="{{ LOCALE.datetimeDbToLocal(validator.fieldValue('from_date'))|raw }}"/>
                     <span class='input-group-addon'>
@@ -28,9 +29,9 @@
                 </div>
             </div>
             <br />
-            {{ ' End:'|_ }}
+            <label for="model-to_date">{{ ' End:'|_ }}</label>
             <div>
-                <div class='datepicker input-group' id='model-from_date'>
+                <div class='datepicker input-group' id='model-to_date_container'>
                     <input class='form-control' id="model-to_date" data-format='mm/dd/yy' name="model[to_date]"
                            type='text' value="{{ LOCALE.datetimeDbToLocal(validator.fieldValue('to_date'))|raw }}"/>
                     <span class='input-group-addon'>
@@ -44,17 +45,21 @@
     <div class="form-group">
         <label class="col-md-2 control-label" for="model-from_date">{{ 'Promotion Structure'|_ }}</label>
         <div class="col-md-5">
-            {{ 'BUY'|_ }}
+            <label>{{ 'BUY'|_ }}
             <select class="form-control" name="model[buy_type]">{{ UTIL.optionsHtml(promo.fieldOptions('buy_type'), validator.fieldValue('buy_type'))|raw }}</select>
+            </label>
             <br />
-            {{ 'FROM'|_ }}
+            <label>{{ 'FROM'|_ }}
             <select class="form-control" name="model[buy_group]">{{ UTIL.optionsHtml(promo.fieldOptions('buy_group'), validator.fieldValue('buy_group'))|raw }}</select>
+            </label>
             <br />
-            {{ 'GET'|_ }}
+            <label>{{ 'GET'|_ }}
             <select class="form-control" name="model[get_type]">{{ UTIL.optionsHtml(promo.fieldOptions('get_type'), validator.fieldValue('get_type'))|raw }}</select>
+            </label>
             <br />
-            {{ 'OF'|_ }}
+            <label>{{ 'OF'|_ }}
             <select class="form-control" name="model[get_group]">{{ UTIL.optionsHtml(promo.fieldOptions('get_group'), validator.fieldValue('get_group'))|raw }}</select>
+            </label>
         </div>
     </div>
 
@@ -76,7 +81,7 @@
             {% endif %}
         </div>
     </div>
-
+</div>
 </fieldset>
 <script>
     require(['jquery', 'bootstrap', 'datetimepicker', 'fcom.admin.form'], function($) {
