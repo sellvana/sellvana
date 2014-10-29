@@ -1,3 +1,4 @@
+/** noinspection JSUnresolvedVariable */
 define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
 
     FCom.CompareBlock = function (opt) {
@@ -17,7 +18,7 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
         var added = {}; // to avoid duplicate notifications
 
         function thumb(s, i) {
-            console.log(s, i);
+            //console.log(s, i);
             var aHtml = '<a href="#" title="' + s.alt + '">' +
                 '<img src="' + s.src + '" width="' + thumbWidth + '" ' +
                 'height="' + thumbHeight + '" alt="' + s.alt + '"/>' +
@@ -27,7 +28,7 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
                 remove(s.id);
                 return false
             });
-            $(ul.children().get(i)).append(a);
+            $(ul.children().get(i)).html(a);
         }
 
         function check(id, value) {
@@ -64,9 +65,9 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
                     $.cookie(cookieName, JSON.stringify(selected), {expires: 1});
                     $('.compare-num-products').html(selected.length);
                     $(opt.thumbContainer).addClass('set');
-                    console.log('animate start');
+                    //console.log('animate start');
                     $(opt.thumbContainer).stop().animate({boxShadow: '0px 0px 15px #A2C2EA'}, 1000, function () {
-                        console.log('animate stop');
+                        //console.log('animate stop');
                         $(opt.thumbContainer).stop().animate({boxShadow: '0px 0px'}, 1000);
                     });
                     //humanMsg.displayMsg('<img src="'+s.src+'" width="35" height="35"/> Added to compare: '+s.alt);
@@ -129,7 +130,10 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
                 if (!selected.length) {
                     break;
                 }
-                remove(selected[0].id);
+
+                if (selected.hasOwnProperty(i)) {
+                    remove(selected[i].id);
+                }
             }
         }
 
@@ -146,6 +150,7 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
                 $icon.removeClass('glyphicon-check').addClass('glyphicon-unchecked');
             }
         }
+
         if (opt.thumbContainer) {
             for (var i in selected) {
                 if (selected.hasOwnProperty(i)) {
@@ -176,6 +181,7 @@ define(['jquery', 'fcom.locale', 'jquery.cookie'], function ($, locale) {
             }
             return true;
         });
+
         $('.reset-btn', opt.thumbContainer).click(function () {
             reset();
             return false;
