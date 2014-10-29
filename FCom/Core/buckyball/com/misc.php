@@ -73,8 +73,10 @@ class BUtil extends BClass
     protected static $_defaultCharPool = '23456789abdefghijklmnopqrstuvwxyzABDEFGHJKLMNOPQRSTUVWXYZ';
 
     /**
-    * Shortcut to help with IDE autocompletion
+    * Shortcut to help with IDE auto-completion
     *
+    * @param bool $new
+    * @param array $args
     * @return BUtil
     */
     static public function i($new = false, array $args = [])
@@ -101,12 +103,13 @@ class BUtil extends BClass
     }
 
     /**
-    * Parse JSON into PHP data
-    *
-    * @param string $json
-    * @param bool $asObject if false will attempt to convert to array,
-    *                       otherwise standard combination of objects and arrays
-    */
+     * Parse JSON into PHP data
+     *
+     * @param string $json
+     * @param bool $asObject if false will attempt to convert to array,
+     *                       otherwise standard combination of objects and arrays
+     * @return array|mixed
+     */
     public function fromJson($json, $asObject = false)
     {
         $obj = json_decode($json);
@@ -213,6 +216,10 @@ class BUtil extends BClass
         return '"UNSUPPORTED TYPE"';
     }
 
+    /**
+     * @param array $data
+     * @return string
+     */
     public function toRss($data)
     {
         $lang = !empty($data['language']) ? $data['language'] : 'en-us';
@@ -401,11 +408,12 @@ class BUtil extends BClass
      }
 
     /**
-    * Compare 2 arrays recursively
-    *
-    * @param array $array1
-    * @param array $array2
-    */
+     * Compare 2 arrays recursively
+     *
+     * @param array $array1
+     * @param array $array2
+     * @return bool
+     */
     public function arrayCompare(array $array1, array $array2)
     {
         $diff = false;
@@ -671,6 +679,13 @@ class BUtil extends BClass
         return $result;
     }
 
+    /**
+     * @param $source
+     * @param $labelField
+     * @param null $keyField
+     * @param null $emptyLabel
+     * @return array
+     */
     public function arrayToOptions($source, $labelField, $keyField = null, $emptyLabel = null)
     {
         $options = [];
@@ -696,6 +711,9 @@ class BUtil extends BClass
 
     /**
      * @todo consolidate with arraySeqToMap()
+     * @param array $source
+     * @param string $keyField
+     * @return array
      */
     public function arrayMakeAssoc($source, $keyField)
     {
@@ -775,11 +793,12 @@ class BUtil extends BClass
     }
 
     /**
-    * Generate random string
-    *
-    * @param int $strLen length of resulting string
-    * @param string $chars allowed characters to be used
-    */
+     * Generate random string
+     *
+     * @param int $strLen length of resulting string
+     * @param string $chars allowed characters to be used
+     * @return string
+     */
     public function randomString($strLen = 8, $chars = null)
     {
         if (null === $chars) {
@@ -816,6 +835,11 @@ class BUtil extends BClass
         return $pattern;
     }
 
+    /**
+     * @param string $string
+     * @param null $chars
+     * @return string
+     */
     public function nextStringValue($string = '', $chars = null)
     {
         if (null === $chars) {
@@ -840,10 +864,11 @@ class BUtil extends BClass
     }
 
     /**
-    * Set or retrieve current hash algorithm
-    *
-    * @param string $algo
-    */
+     * Set or retrieve current hash algorithm
+     *
+     * @param string $algo
+     * @return string
+     */
     public function hashAlgo($algo = null)
     {
         if (null === $algo) {
@@ -852,6 +877,10 @@ class BUtil extends BClass
         static::$_hashAlgo = $algo;
     }
 
+    /**
+     * @param null $iter
+     * @return int
+     */
     public function hashIter($iter = null)
     {
         if (null === $iter) {
@@ -876,16 +905,17 @@ class BUtil extends BClass
     }
 
     /**
-    * Generate fully composed salted hash
-    *
-    * Ex: $sha512$2$<salt1>$<salt2>$<double-hashed-string-here>
-    *
-    * @deprecated by Bcrypt
-    * @param string $string
-    * @param string $salt
-    * @param string $algo
-    * @param integer $iter
-    */
+     * Generate fully composed salted hash
+     *
+     * Ex: $sha512$2$<salt1>$<salt2>$<double-hashed-string-here>
+     *
+     * @deprecated by Bcrypt
+     * @param string $string
+     * @param string $salt
+     * @param string $algo
+     * @param integer $iter
+     * @return string
+     */
     public function fullSaltedHash($string, $salt = null, $algo = null, $iter = null)
     {
         $algo = null !== $algo ? $algo : static::$_hashAlgo;
@@ -943,11 +973,18 @@ class BUtil extends BClass
         return strpos($password, '$2y$12$') === 0;
     }
 
+    /**
+     * @param $str
+     * @return string
+     */
     public function sha512base64($str)
     {
         return base64_encode(pack('H*', hash('sha512', $str)));
     }
 
+    /**
+     * @var
+     */
     static protected $_lastRemoteHttpInfo;
     /**
     * Send simple POST request to external server and retrieve response
@@ -1132,11 +1169,18 @@ class BUtil extends BClass
         return $response;
     }
 
+    /**
+     * @return mixed
+     */
     public function lastRemoteHttpInfo()
     {
         return static::$_lastRemoteHttpInfo;
     }
 
+    /**
+     * @param $path
+     * @return mixed|string
+     */
     public function normalizePath($path)
     {
         $path = str_replace('\\', '/', $path);
@@ -1151,6 +1195,12 @@ class BUtil extends BClass
         return $path;
     }
 
+    /**
+     * @param $dir
+     * @param null $pattern
+     * @param int $flags
+     * @return array
+     */
     public function globRecursive($dir, $pattern = null, $flags = 0)
     {
         /**/
@@ -1189,17 +1239,28 @@ class BUtil extends BClass
         /**/
     }
 
+    /**
+     * @param $path
+     * @return bool
+     */
     public function isPathAbsolute($path)
     {
         return !empty($path) && ($path[0] === '/' || $path[0] === '\\') // starting with / or \
             || !empty($path[1]) && $path[1] === ':'; // windows drive letter C:
     }
 
+    /**
+     * @param $url
+     * @return int
+     */
     public function isUrlFull($url)
     {
         return preg_match('#^(https?:)?//#', $url);
     }
 
+    /**
+     * @param $dir
+     */
     public function ensureDir($dir)
     {
         if (is_file($dir)) {
@@ -1272,6 +1333,12 @@ class BUtil extends BClass
         return static::unparseUrl($parsed);
     }
 
+    /**
+     * @param $url
+     * @param $state
+     * @param $field
+     * @return string
+     */
     public function paginateSortUrl($url, $state, $field)
     {
         return static::setUrlQuery($url, [
@@ -1280,6 +1347,13 @@ class BUtil extends BClass
         ]);
     }
 
+    /**
+     * @param $url
+     * @param $state
+     * @param $field
+     * @param string $class
+     * @return string
+     */
     public function paginateSortAttr($url, $state, $field, $class = '')
     {
         return 'href="' . static::paginateSortUrl($url, $state, $field)
@@ -1374,6 +1448,10 @@ class BUtil extends BClass
         return $matches[1];
     }
 
+    /**
+     * @param $date
+     * @return bool
+     */
     public function isEmptyDate($date)
     {
         return preg_replace('#[0 :-]#', '', (string)$date) === '';
@@ -1399,6 +1477,10 @@ class BUtil extends BClass
             . ($params ? '?' . http_build_query($params) : '');
     }
 
+    /**
+     * @param $callback
+     * @return array
+     */
     public function extCallback($callback)
     {
         static $callbackMapCache = [];
@@ -1429,6 +1511,12 @@ class BUtil extends BClass
         return $callback;
     }
 
+    /**
+     * @param $callback
+     * @param array $args
+     * @param bool $array
+     * @return mixed
+     */
     public function call($callback, $args = [], $array = false)
     {
         $callback = static::extCallback($callback);
@@ -1439,6 +1527,10 @@ class BUtil extends BClass
         }
     }
 
+    /**
+     * @param $var
+     * @return int
+     */
     public function varSize($var)
     {
         /*
@@ -1484,6 +1576,11 @@ class BUtil extends BClass
         return memory_get_usage() - $old;
     }
 
+    /**
+     * @param $source
+     * @param string $format
+     * @return mixed
+     */
     public function formatDateRecursive($source, $format = 'm/d/Y')
     {
         foreach ($source as $i => $val) {
@@ -1499,6 +1596,12 @@ class BUtil extends BClass
         return $source;
     }
 
+    /**
+     * @param $ptime
+     * @param null $now
+     * @param bool $long
+     * @return string
+     */
     public function timeAgo($ptime, $now = null, $long = false)
     {
         if (!is_numeric($ptime)) {
@@ -1613,6 +1716,11 @@ class BUtil extends BClass
         return rmdir($dir);
     }
 
+    /**
+     * @param array $array
+     * @param array $args
+     * @return array
+     */
     public function topoSort(array $array, array $args = [])
     {
         if (empty($array)) {
@@ -1698,6 +1806,12 @@ class BUtil extends BClass
         return true;
     }
 
+    /**
+     * @param $filename
+     * @param $sourceDir
+     * @return bool
+     * @throws BException
+     */
     public function zipCreateFromDir($filename, $sourceDir)
     {
         if (!class_exists('ZipArchive')) {
@@ -1724,6 +1838,9 @@ class BUtil extends BClass
         return true;
     }
 
+    /**
+     * @return mixed
+     */
     public function getMemoryLimit()
     {
         preg_match('#^([0-9]+)([GMK]?)$#', ini_get('memory_limit'), $val);
@@ -1826,13 +1943,22 @@ class BUtil extends BClass
     }
 }
 
+/**
+ * Class BHtml
+ */
 class BHtml extends BClass
 {
 
 }
 
+/**
+ * Class BUrl
+ */
 class BUrl extends BClass
 {
+    /**
+     * @return bool
+     */
     public function hideScriptName()
     {
         $hideConf = $this->BConfig->get('web/hide_script_name');
@@ -1845,14 +1971,27 @@ class BUrl extends BClass
  */
 class BEmail extends BClass
 {
+    /**
+     * @var array
+     */
     static protected $_handlers = [];
+    /**
+     * @var string
+     */
     static protected $_defaultHandler = 'default';
 
+    /**
+     *
+     */
     public function __construct()
     {
         $this->addHandler('default', [$this, 'defaultHandler']);
     }
 
+    /**
+     * @param $name
+     * @param $params
+     */
     public function addHandler($name, $params)
     {
         if (is_callable($params)) {
@@ -1864,16 +2003,26 @@ class BEmail extends BClass
         static::$_handlers[$name] = $params;
     }
 
+    /**
+     * @return array
+     */
     public function getHandlers()
     {
         return static::$_handlers;
     }
 
+    /**
+     * @param $name
+     */
     public function setDefaultHandler($name)
     {
         static::$_defaultHandler = $name;
     }
 
+    /**
+     * @param $data
+     * @return bool|mixed
+     */
     public function send($data)
     {
         static $allowedHeadersRegex = '/^(to|from|cc|bcc|reply-to|return-path|content-type|list-unsubscribe|x-.*)$/';
@@ -1949,6 +2098,10 @@ class BEmail extends BClass
         return $this->_dispatch($emailData);
     }
 
+    /**
+     * @param $emailData
+     * @return bool|mixed
+     */
     protected function _dispatch($emailData)
     {
         try {
@@ -1981,6 +2134,11 @@ class BEmail extends BClass
         return $result;
     }
 
+    /**
+     * @param $headers
+     * @param $body
+     * @return bool
+     */
     protected function _formatAlternative(&$headers, &$body)
     {
         if (!preg_match('#<!--=+-->#', $body)) {
@@ -2039,6 +2197,10 @@ class BEmail extends BClass
         return true;
     }
 
+    /**
+     * @param $data
+     * @return bool
+     */
     public function defaultHandler($data)
     {
         return mail($data['to'], $data['subject'], $data['body'],
@@ -2051,20 +2213,36 @@ class BEmail extends BClass
 */
 class BValue
 {
+    /**
+     * @var
+     */
     public $content;
+    /**
+     * @var string
+     */
     public $type;
 
+    /**
+     * @param $content
+     * @param string $type
+     */
     public function __construct($content, $type = 'string')
     {
         $this->content = $content;
         $this->type = $type;
     }
 
+    /**
+     * @return mixed
+     */
     public function toPlain()
     {
         return $this->content;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return (string)$this->toPlain();
@@ -2076,10 +2254,20 @@ class BValue
 */
 class BType extends BValue {}
 
+/**
+ * Class BData
+ */
 class BData extends BClass implements ArrayAccess
 {
+    /**
+     * @var array
+     */
     protected $_data;
 
+    /**
+     * @param $data
+     * @param bool $recursive
+     */
     public function __construct($data, $recursive = false)
     {
         if (!is_array($data)) {
@@ -2095,6 +2283,10 @@ class BData extends BClass implements ArrayAccess
         $this->_data = $data;
     }
 
+    /**
+     * @param bool $recursive
+     * @return array
+     */
     public function as_array($recursive = false)
     {
         $data = $this->_data;
@@ -2108,16 +2300,28 @@ class BData extends BClass implements ArrayAccess
         return $data;
     }
 
+    /**
+     * @param $name
+     * @return null
+     */
     public function __get($name)
     {
         return isset($this->_data[$name]) ? $this->_data[$name] : null;
     }
 
+    /**
+     * @param $name
+     * @param $value
+     */
     public function __set($name, $value)
     {
         $this->_data[$name] = $value;
     }
 
+    /**
+     * @param mixed $offset
+     * @param mixed $value
+     */
     public function offsetSet($offset, $value)
     {
         if (null === $offset) {
@@ -2127,25 +2331,45 @@ class BData extends BClass implements ArrayAccess
         }
     }
 
+    /**
+     * @param mixed $offset
+     * @return bool
+     */
     public function offsetExists($offset) {
         return isset($this->_data[$offset]);
     }
 
+    /**
+     * @param mixed $offset
+     */
     public function offsetUnset($offset)
     {
         unset($this->_data[$offset]);
     }
 
+    /**
+     * @param mixed $offset
+     * @return null
+     */
     public function offsetGet($offset)
     {
         return isset($this->_data[$offset]) ? $this->_data[$offset] : null;
     }
 
+    /**
+     * @param $name
+     * @return null
+     */
     public function get($name)
     {
         return isset($this->_data[$name]) ? $this->_data[$name] : null;
     }
 
+    /**
+     * @param $name
+     * @param $value
+     * @return $this
+     */
     public function set($name, $value)
     {
         $this->_data[$name] = $value;
@@ -2153,11 +2377,28 @@ class BData extends BClass implements ArrayAccess
     }
 }
 
+/**
+ * Class BErrorException
+ */
 class BErrorException extends Exception
 {
+    /**
+     * @var null
+     */
     public $context;
+    /**
+     * @var int
+     */
     public $stackPop;
 
+    /**
+     * @param string $code
+     * @param int $message
+     * @param Exception $file
+     * @param $line
+     * @param null $context
+     * @param int $stackPop
+     */
     public function __construct($code, $message, $file, $line, $context = null, $stackPop = 1)
     {
         parent::__construct($message, $code);
@@ -2175,6 +2416,30 @@ class BErrorException extends Exception
 */
 class BDebug extends BClass
 {
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
     const EMERGENCY = 0,
         ALERT       = 1,
         CRITICAL    = 2,
@@ -2184,6 +2449,9 @@ class BDebug extends BClass
         INFO        = 6,
         DEBUG       = 7;
 
+    /**
+     * @var array
+     */
     static protected $_levelLabels = [
         self::EMERGENCY => 'EMERGENCY',
         self::ALERT     => 'ALERT',
@@ -2195,6 +2463,27 @@ class BDebug extends BClass
         self::DEBUG     => 'DEBUG',
     ];
 
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
     const MEMORY  = 0,
         FILE      = 1,
         SYSLOG    = 2,
@@ -2203,6 +2492,30 @@ class BDebug extends BClass
         EXCEPTION = 16,
         STOP      = 4096;
 
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
+    /**
+     *
+     */
     const MODE_DEBUG      = 'DEBUG',
         MODE_DEVELOPMENT  = 'DEVELOPMENT',
         MODE_STAGING      = 'STAGING',
@@ -2228,6 +2541,9 @@ class BDebug extends BClass
     */
     static protected $_level;
 
+    /**
+     * @var array
+     */
     static protected $_levelPreset = [
         self::MODE_PRODUCTION => [
             self::MEMORY    => false,
@@ -2303,14 +2619,32 @@ class BDebug extends BClass
         ],
     ];
 
+    /**
+     * @var array
+     */
     static protected $_modules = [];
 
+    /**
+     * @var string
+     */
     static protected $_mode = 'PRODUCTION';
 
+    /**
+     * @var
+     */
     static protected $_startTime;
+    /**
+     * @var array
+     */
     static protected $_events = [];
 
+    /**
+     * @var null
+     */
     static protected $_logDir = null;
+    /**
+     * @var array
+     */
     static protected $_logFile = [
         self::EMERGENCY => 'error.log',
         self::ALERT     => 'error.log',
@@ -2322,8 +2656,14 @@ class BDebug extends BClass
         self::DEBUG     => 'debug.log',
     ];
 
+    /**
+     * @var null
+     */
     static protected $_adminEmail = null;
 
+    /**
+     * @var array
+     */
     static protected $_phpErrorMap = [
         E_ERROR => self::ERROR,
         E_WARNING => self::WARNING,
@@ -2336,10 +2676,19 @@ class BDebug extends BClass
         E_DEPRECATED => self::WARNING,
     ];
 
+    /**
+     * @var array
+     */
     static protected $_verboseBacktrace = [];
 
+    /**
+     * @var array
+     */
     static protected $_collectedErrors = [];
 
+    /**
+     * @var array
+     */
     static protected $_errorHandlerLog = [];
 
     /**
@@ -2365,6 +2714,9 @@ class BDebug extends BClass
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
+    /**
+     *
+     */
     public function registerErrorHandlers()
     {
         set_error_handler('BDebug::errorHandler');
@@ -2372,23 +2724,45 @@ class BDebug extends BClass
         register_shutdown_function('BDebug::shutdownHandler');
     }
 
+    /**
+     *
+     */
     public function startErrorLogger()
     {
         static::$_errorHandlerLog = [];
         set_error_handler('BDebug::errorHandlerLogger');
     }
 
+    /**
+     * @return array
+     */
     public function stopErrorLogger()
     {
         set_error_handler('BDebug::errorHandler');
         return static::$_errorHandlerLog;
     }
 
+    /**
+     * @param $code
+     * @param $message
+     * @param $file
+     * @param $line
+     * @param null $context
+     * @return array
+     */
     public function errorHandlerLogger($code, $message, $file, $line, $context = null)
     {
         return static::$_errorHandlerLog[] = compact('code', 'message', 'file', 'line', 'context');
     }
 
+    /**
+     * @param $code
+     * @param $message
+     * @param $file
+     * @param $line
+     * @param null $context
+     * @throws Exception
+     */
     static public function errorHandler($code, $message, $file, $line, $context = null)
     {
         if (!(error_reporting() & $code)) {
@@ -2398,6 +2772,10 @@ class BDebug extends BClass
         //throw new BErrorException(static::$_phpErrorMap[$code], $message, $file, $line, $context);
     }
 
+    /**
+     * @param $e
+     * @throws Exception
+     */
     static public function exceptionHandler($e)
     {
 #echo "<pre>"; print_r($e); exit;
@@ -2405,6 +2783,9 @@ class BDebug extends BClass
         static::trigger(static::ERROR, $e, 1, true);
     }
 
+    /**
+     * @throws Exception
+     */
     static public function shutdownHandler()
     {
         $e = error_get_last();
@@ -2413,6 +2794,11 @@ class BDebug extends BClass
         }
     }
 
+    /**
+     * @param $type
+     * @param null $level
+     * @return mixed
+     */
     static public function level($type, $level = null)
     {
         if (!isset(static::$_level[$type])) {
@@ -2428,12 +2814,20 @@ class BDebug extends BClass
         static::$_level[$type] = $level;
     }
 
+    /**
+     * @param $dir
+     */
     public function logDir($dir)
     {
         $this->BUtil->ensureDir($dir);
         static::$_logDir = $dir;
     }
 
+    /**
+     * @param $msg
+     * @param string $file
+     * @param bool $backtrace
+     */
     public function log($msg, $file = 'debug.log', $backtrace = false)
     {
         $file = static::$_logDir . '/' . $file;
@@ -2445,16 +2839,27 @@ class BDebug extends BClass
         }
     }
 
+    /**
+     * @param $e
+     */
     public function logException($e)
     {
         static::log(print_r($e, 1), 'exceptions.log');
     }
 
+    /**
+     * @param $email
+     */
     public function adminEmail($email)
     {
         static::$_adminEmail = $email;
     }
 
+    /**
+     * @param null $mode
+     * @param bool $setLevels
+     * @return null|string
+     */
     static public function mode($mode = null, $setLevels = true)
     {
         if (null === $mode) {
@@ -2467,6 +2872,9 @@ class BDebug extends BClass
         return null;
     }
 
+    /**
+     * @param $msg
+     */
     public function backtraceOn($msg)
     {
         foreach ((array)$msg as $m) {
@@ -2474,6 +2882,14 @@ class BDebug extends BClass
         }
     }
 
+    /**
+     * @param $level
+     * @param $msg
+     * @param int $stackPop
+     * @param bool $backtrace
+     * @return int|null
+     * @throws Exception
+     */
     static public function trigger($level, $msg, $stackPop = 0, $backtrace = false)
     {
         if ($level !== static::DEBUG) {
@@ -2595,42 +3011,95 @@ class BDebug extends BClass
         return isset($id) ? $id : null;
     }
 
+    /**
+     * @param $msg
+     * @param int $stackPop
+     * @param bool $backtrace
+     * @return int|null
+     * @throws Exception
+     */
     static public function alert($msg, $stackPop = 0, $backtrace = false)
     {
         return static::trigger(static::ALERT, $msg, $stackPop + 1);
     }
 
+    /**
+     * @param $msg
+     * @param int $stackPop
+     * @param bool $backtrace
+     * @return int|null
+     * @throws Exception
+     */
     static public function critical($msg, $stackPop = 0, $backtrace = false)
     {
         return static::trigger(static::CRITICAL, $msg, $stackPop + 1);
     }
 
+    /**
+     * @param $msg
+     * @param int $stackPop
+     * @param bool $backtrace
+     * @return int|null
+     * @throws Exception
+     */
     static public function error($msg, $stackPop = 0, $backtrace = false)
     {
         return static::trigger(static::ERROR, $msg, $stackPop + 1);
     }
 
+    /**
+     * @param $msg
+     * @param int $stackPop
+     * @param bool $backtrace
+     * @return int|null
+     * @throws Exception
+     */
     static public function warning($msg, $stackPop = 0, $backtrace = false)
     {
         return static::trigger(static::WARNING, $msg, $stackPop + 1);
     }
 
+    /**
+     * @param $msg
+     * @param int $stackPop
+     * @param bool $backtrace
+     * @return int|null
+     * @throws Exception
+     */
     static public function notice($msg, $stackPop = 0, $backtrace = false)
     {
         return static::trigger(static::NOTICE, $msg, $stackPop + 1);
     }
 
+    /**
+     * @param $msg
+     * @param int $stackPop
+     * @param bool $backtrace
+     * @return int|null
+     * @throws Exception
+     */
     static public function info($msg, $stackPop = 0, $backtrace = false)
     {
         return static::trigger(static::INFO, $msg, $stackPop + 1);
     }
 
+    /**
+     * @param $msg
+     * @param int $stackPop
+     * @param bool $backtrace
+     * @return int|null
+     * @throws Exception
+     */
     static public function debug($msg, $stackPop = 0, $backtrace = false)
     {
         if ('DEBUG' !== static::$_mode) return; // to speed things up
         return static::trigger(static::DEBUG, $msg, $stackPop + 1);
     }
 
+    /**
+     * @param int $type
+     * @return mixed
+     */
     public function getCollectedErrors($type = self::ERROR)
     {
         if (!empty(static::$_collectedErrors[$type])) {
@@ -2638,6 +3107,9 @@ class BDebug extends BClass
         }
     }
 
+    /**
+     * @param $id
+     */
     static public function profile($id)
     {
         if ($id && !empty(static::$_events[$id])) {
@@ -2646,12 +3118,20 @@ class BDebug extends BClass
         }
     }
 
+    /**
+     * @param $modes
+     * @return bool
+     */
     public function is($modes)
     {
         if (is_string($modes)) $modes = explode(',', $modes);
         return in_array(static::$_mode, $modes);
     }
 
+    /**
+     * @param bool $return
+     * @return string
+     */
     public function dumpLog($return = false)
     {
         if (!(static::$_mode === static::MODE_DEBUG || static::$_mode === static::MODE_DEVELOPMENT)
@@ -2706,6 +3186,9 @@ class BDebug extends BClass
         return microtime(true) - static::$_startTime;
     }
 
+    /**
+     * @param $var
+     */
     public function dump($var)
     {
         if (is_array($var) && current($var) instanceof Model) {
@@ -2720,6 +3203,9 @@ class BDebug extends BClass
         }
     }
 
+    /**
+     * @param $args
+     */
     public function afterOutput($args)
     {
         static::dumpLog();
@@ -2727,15 +3213,39 @@ class BDebug extends BClass
     }
 }
 
+/**
+ * Class BFtpClient
+ */
 class BFtpClient extends BClass
 {
+    /**
+     * @var int
+     */
     protected $_ftpDirMode = 0775;
+    /**
+     * @var int
+     */
     protected $_ftpFileMode = 0664;
+    /**
+     * @var string
+     */
     protected $_ftpHost = '';
+    /**
+     * @var int
+     */
     protected $_ftpPort = 21;
+    /**
+     * @var string
+     */
     protected $_ftpUsername = '';
+    /**
+     * @var string
+     */
     protected $_ftpPassword = '';
 
+    /**
+     * @param $config
+     */
     public function __construct($config)
     {
         if (!empty($config['hostname'])) {
@@ -2752,6 +3262,12 @@ class BFtpClient extends BClass
         }
     }
 
+    /**
+     * @param $from
+     * @param $to
+     * @return array
+     * @throws BException
+     */
     public function upload($from, $to)
     {
         if (!extension_loaded('ftp')) {
@@ -2778,6 +3294,12 @@ class BFtpClient extends BClass
         return $errors;
     }
 
+    /**
+     * @param $conn
+     * @param $source
+     * @param string $ftpPath
+     * @return array
+     */
     public function uploadDir($conn, $source, $ftpPath = '')
     {
         $errors = [];
@@ -2822,12 +3344,33 @@ class BFtpClient extends BClass
 */
 class BLoginThrottle extends BClass
 {
+    /**
+     * @var
+     */
     protected $_all;
+    /**
+     * @var
+     */
     protected $_area;
+    /**
+     * @var
+     */
     protected $_username;
+    /**
+     * @var
+     */
     protected $_rec;
+    /**
+     * @var mixed
+     */
     protected $_config;
+    /**
+     * @var array
+     */
     protected $_blockedIPs = [];
+    /**
+     * @var string
+     */
     protected $_cachePrefix = 'BLoginThrottle/';
 
     /**
@@ -2840,6 +3383,9 @@ class BLoginThrottle extends BClass
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
+    /**
+     *
+     */
     public function __construct()
     {
         $c = $this->BConfig->get('modules/BLoginThrottle');
@@ -2851,11 +3397,19 @@ class BLoginThrottle extends BClass
         $this->_config = $c;
     }
 
+    /**
+     * @param $config
+     */
     public function config($config)
     {
         $this->_config = $this->BUtil->arrayMerge($this->_config, $config);
     }
 
+    /**
+     * @param $area
+     * @param $username
+     * @return bool
+     */
     public function init($area, $username)
     {
         usleep(mt_rand(0, 10000)); // timing side channel attack protection, 10ms should be enough to cover db calls
@@ -2885,6 +3439,9 @@ class BLoginThrottle extends BClass
         return true; // init OK
     }
 
+    /**
+     * @return bool
+     */
     public function success()
     {
         $this->_fire('success');
@@ -2892,6 +3449,10 @@ class BLoginThrottle extends BClass
         return true;
     }
 
+    /**
+     * @param null $sleepSec
+     * @return bool
+     */
     public function failure($sleepSec = null)
     {
         $username = $this->_username;
@@ -2920,6 +3481,9 @@ class BLoginThrottle extends BClass
         return true; // normal response
     }
 
+    /**
+     * @param $event
+     */
     protected function _fire($event)
     {
         $this->BEvents->fire('BLoginThrottle::' . $event, [
@@ -2930,24 +3494,36 @@ class BLoginThrottle extends BClass
         ]);
     }
 
+    /**
+     * @return mixed
+     */
     protected function _load()
     {
         $key = $this->_area . '/' . $this->_username;
         return $this->BCache->load($this->_cachePrefix . $key);
     }
 
+    /**
+     * @return mixed
+     */
     protected function _save()
     {
         $key = $this->_area . '/' . $this->_username;
         return $this->BCache->save($this->_cachePrefix . $key, $this->_rec, $this->_config['reset_time']);
     }
 
+    /**
+     * @return mixed
+     */
     protected function _reset()
     {
         $key = $this->_area . '/' . $this->_username;
         return $this->BCache->delete($key);
     }
 
+    /**
+     * @return bool
+     */
     protected function _gc()
     {
 
@@ -2961,9 +3537,20 @@ class BLoginThrottle extends BClass
 */
 class BYAML extends BCLass
 {
+    /**
+     * @var null
+     */
     static protected $_peclYaml = null;
+    /**
+     * @var null
+     */
     static protected $_peclSyck = null;
 
+    /**
+     * @param $filename
+     * @param bool $cache
+     * @return array
+     */
     public function load($filename, $cache = true)
     {
         //$filename1 = realpath($filename);
@@ -2994,6 +3581,9 @@ class BYAML extends BCLass
         return $arrayData;
     }
 
+    /**
+     * @return bool
+     */
     public function init()
     {
         if (null === static::$_peclYaml) {
@@ -3022,6 +3612,10 @@ class BYAML extends BCLass
         return true;
     }
 
+    /**
+     * @param $yamlData
+     * @return array
+     */
     public function parse($yamlData)
     {
         static::init();
@@ -3039,6 +3633,10 @@ class BYAML extends BCLass
         }
     }
 
+    /**
+     * @param $arrayData
+     * @return string
+     */
     public function dump($arrayData)
     {
         static::init();
@@ -3057,9 +3655,18 @@ class BYAML extends BCLass
     }
 }
 
+/**
+ * Class BValidate
+ */
 class BValidate extends BClass
 {
+    /**
+     * @var string
+     */
     protected $_reRegex = '#^([/\#~&,%])(.*)(\1)[imsxADSUXJu]*$#';
+    /**
+     * @var array
+     */
     protected $_defaultRules = [
         'required' => [
             'rule'    => 'BValidate::ruleRequired',
@@ -3100,9 +3707,18 @@ class BValidate extends BClass
         ],
     ];
 
+    /**
+     * @var string
+     */
     protected $_defaultMessage = "Validation failed for: :field";
+    /**
+     * @var array
+     */
     protected $_expandedRules = [];
 
+    /**
+     * @var array
+     */
     protected $_validateErrors = [];
 
     /**
@@ -3115,12 +3731,21 @@ class BValidate extends BClass
         return BClassRegistry::instance(__CLASS__, $args, !$new);
     }
 
+    /**
+     * @param $name
+     * @param $rule
+     * @return $this
+     */
     public function addValidator($name, $rule)
     {
         $this->_defaultRules[$name] = $rule;
         return $this;
     }
 
+    /**
+     * @param $rules
+     * @throws BException
+     */
     protected function _expandRules($rules)
     {
         $this->_expandedRules = [];
@@ -3148,6 +3773,10 @@ class BValidate extends BClass
         }
     }
 
+    /**
+     * @param $data
+     * @throws BException
+     */
     protected function _validateRules($data)
     {
         $this->_validateErrors = [];
@@ -3254,11 +3883,19 @@ class BValidate extends BClass
         return $this->_validateErrors ? false : true;
     }
 
+    /**
+     * @return array
+     */
     public function validateErrors()
     {
         return $this->_validateErrors;
     }
 
+    /**
+     * @param $data
+     * @param $args
+     * @return bool
+     */
     public function ruleRequired($data, $args)
     {
         if (!isset($data[$args['field']])) {
@@ -3270,12 +3907,22 @@ class BValidate extends BClass
         return !empty($data[$args['field']]);
     }
 
+    /**
+     * @param $data
+     * @param $args
+     * @return bool
+     */
     public function rulePasswordConfirm($data, $args)
     {
         return empty($data[$args['original']])
             || !empty($data[$args['field']]) && $data[$args['field']] === $data[$args['original']];
     }
 
+    /**
+     * @param $data
+     * @param $args
+     * @return bool|string
+     */
     public function ruleString($data, $args)
     {
         if (!isset($data[$args['field']])) {
@@ -3291,6 +3938,11 @@ class BValidate extends BClass
         return true;
     }
 
+    /**
+     * @param $data
+     * @param $args
+     * @return bool
+     */
     public function ruleEmail($data, $args)
     {
         if (!isset($data[$args['field']])) {
@@ -3312,9 +3964,18 @@ class BValidate extends BClass
  */
 class BValidateViewHelper extends BClass
 {
+    /**
+     * @var array
+     */
     protected $_errors = [];
+    /**
+     * @var array
+     */
     protected $_data = [];
 
+    /**
+     * @param $args
+     */
     public function __construct($args)
     {
         if (!isset($args['form'])) {
@@ -3340,6 +4001,10 @@ class BValidateViewHelper extends BClass
         }
     }
 
+    /**
+     * @param $field
+     * @return string
+     */
     public function fieldClass($field)
     {
         if (empty($this->_errors[$field]['type'])) {
@@ -3348,11 +4013,19 @@ class BValidateViewHelper extends BClass
         return $this->_errors[$field]['type'];
     }
 
+    /**
+     * @param $field
+     * @return null
+     */
     public function fieldValue($field)
     {
         return !empty($this->_data[$field]) ? $this->_data[$field] : null;
     }
 
+    /**
+     * @param $field
+     * @return string
+     */
     public function messageClass($field)
     {
         if (empty($this->_errors[$field]['type'])) {
@@ -3361,6 +4034,10 @@ class BValidateViewHelper extends BClass
         return $this->_errors[$field]['type'];
     }
 
+    /**
+     * @param $field
+     * @return false|string
+     */
     public function messageText($field)
     {
         if (empty($this->_errors[$field]['msg']['error'])) {
@@ -3428,6 +4105,9 @@ class BEnv extends BClass
  */
 class Bcrypt extends BClass
 {
+    /**
+     * @throws Exception
+     */
     public function __construct()
     {
         if (CRYPT_BLOWFISH != 1 && !function_exists('password_hash')) {
@@ -3435,18 +4115,30 @@ class Bcrypt extends BClass
         }
     }
 
+    /**
+     * @param $input
+     * @return bool|string
+     */
     public function hash($input)
     {
         $hash = crypt($input, $this->getSalt());
         return strlen($hash) > 13 ? $hash : false;
     }
 
+    /**
+     * @param $input
+     * @param $existingHash
+     * @return bool
+     */
     public function verify($input, $existingHash)
     {
         // md5 for protection against timing side channel attack (needed)
         return md5(crypt($input, $existingHash)) === md5($existingHash);
     }
 
+    /**
+     * @return string
+     */
     private function getSalt()
     {
         // The security weakness between 5.3.7 affects password with 8-bit characters only
@@ -3456,7 +4148,15 @@ class Bcrypt extends BClass
         return $salt;
     }
 
+    /**
+     * @var
+     */
     private $randomState;
+
+    /**
+     * @param $count
+     * @return string
+     */
     private function getRandomBytes($count)
     {
         $bytes = '';
@@ -3494,6 +4194,10 @@ class Bcrypt extends BClass
         return $bytes;
     }
 
+    /**
+     * @param $input
+     * @return string
+     */
     private function encodeBytes($input)
     {
         // The following is code from the PHP Password Hashing Framework
@@ -3525,14 +4229,35 @@ class Bcrypt extends BClass
     }
 }
 
+/**
+ * Class BRSA
+ */
 class BRSA extends BClass
 {
+    /**
+     * @var string
+     */
     protected $_configPath = 'modules/BRSA';
+    /**
+     * @var array
+     */
     protected $_config = [];
+    /**
+     * @var
+     */
     protected $_publicKey;
+    /**
+     * @var
+     */
     protected $_privateKey;
+    /**
+     * @var array
+     */
     protected $_cache = [];
 
+    /**
+     * @throws BException
+     */
     public function __construct()
     {
         if (!function_exists('openssl_pkey_new')) {
@@ -3548,6 +4273,9 @@ class BRSA extends BClass
         $this->_config = array_merge($defConf, $conf);
     }
 
+    /**
+     * @return $this
+     */
     public function generateKey()
     {
         $config = $this->BUtil->arrayMask($this->_config, 'digest_alg,x509_extensions,req_extensions,'
@@ -3565,6 +4293,10 @@ class BRSA extends BClass
         return $this;
     }
 
+    /**
+     * @return mixed
+     * @throws BException
+     */
     protected  function _getPublicKey()
     {
         if (!$this->_publicKey) {
@@ -3576,6 +4308,10 @@ class BRSA extends BClass
         return $this->_publicKey;
     }
 
+    /**
+     * @return string
+     * @throws BException
+     */
     protected function _getPrivateKeyFileName()
     {
         $configDir = $this->BConfig->get('fs/config_dir');
@@ -3585,6 +4321,10 @@ class BRSA extends BClass
         return $configDir . '/private-' . md5($this->_getPublicKey()) . '.key';
     }
 
+    /**
+     * @return string
+     * @throws BException
+     */
     protected function _getPrivateKey()
     {
         if (!$this->_privateKey) {
@@ -3597,18 +4337,31 @@ class BRSA extends BClass
         return $this->_privateKey;
     }
 
+    /**
+     * @param $key
+     * @return $this
+     */
     public function setPublicKey($key)
     {
         $this->_publicKey = $key;
         return $this;
     }
 
+    /**
+     * @param $key
+     * @return $this
+     */
     public function setPrivateKey($key)
     {
         $this->_privateKey = $key;
         return $this;
     }
 
+    /**
+     * @param $plain
+     * @return mixed
+     * @throws BException
+     */
     public function encrypt($plain)
     {
         openssl_public_encrypt($plain, $encrypted, $this->_getPublicKey());
@@ -3655,6 +4408,11 @@ if (!function_exists('xmlentities')) {
         $not_in_list = "A-Z0-9a-z\s_-";
         return preg_replace_callback("/[^{$not_in_list}]/" , 'get_xml_entity_at_index_0' , $string);
     }
+
+    /**
+     * @param $CHAR
+     * @return string
+     */
     function get_xml_entity_at_index_0($CHAR) {
         if (!is_string($CHAR[0]) || (strlen($CHAR[0]) > 1)) {
             die("function: 'get_xml_entity_at_index_0' requires data type: 'char' (single character). '{$CHAR[0]}' does not match this type.");
@@ -3666,6 +4424,11 @@ if (!function_exists('xmlentities')) {
                 return numeric_entity_4_char($CHAR[0]);                break;
         }
     }
+
+    /**
+     * @param $char
+     * @return string
+     */
     function numeric_entity_4_char($char) {
         return "&#" . str_pad(ord($char), 3, '0', STR_PAD_LEFT) . ";";
     }
@@ -3682,6 +4445,11 @@ if (!function_exists('password_hash')) {
         return $this->Bcrypt->hash($password);
     }
 
+    /**
+     * @param $password
+     * @param $hash
+     * @return mixed
+     */
     function password_verify($password, $hash)
     {
         return $this->Bcrypt->verify($password, $hash);

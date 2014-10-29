@@ -75,8 +75,7 @@ class FCom_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
     {
         $ids = [];
         if ($this->id()) {
-            $items = $this->FCom_ProductCompare_Model_SetItem->orm()->select('product_id')->where('set_id', $this->id())
-                                                             ->find_many();
+            $items = $this->_getSetItems();
             foreach ($items as $item) {
                 /** @var FCom_ProductCompare_Model_SetItem $item */
                 $ids[] = $item->get('product_id');
@@ -163,6 +162,23 @@ class FCom_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
     }
 
     /**
+     * Clear all compare items
+     */
+    public function clearSet()
+    {
+        try {
+            $setItems = $this->_getSetItems();
+            foreach ($setItems as $item) {
+                $item->delete();
+            }
+        } catch(Exception $e) {
+            $this->BDebug->logException($e);
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * @param $id
      * @return FCom_ProductCompare_Model_SetItem|false
      */
@@ -191,6 +207,16 @@ class FCom_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
             }
         }
         return false;
+    }
+
+    /**
+     * @return BModel[]
+     */
+    protected function _getSetItems()
+    {
+        $items = $this->FCom_ProductCompare_Model_SetItem->orm()->where('set_id', $this->id())
+                                                         ->find_many();
+        return $items;
     }
 
 }

@@ -1,5 +1,15 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Blog_Model_Tag
+ *
+ * @property int $id
+ * @property int $tag_key
+ * @property int $tag_name
+ *
+ * DI
+ * @property FCom_Blog_Model_Tag $FCom_Blog_Model_Tag
+ */
 class FCom_Blog_Model_Tag extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_blog_tag';
