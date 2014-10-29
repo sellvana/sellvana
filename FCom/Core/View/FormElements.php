@@ -1,7 +1,15 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Core_View_FormElements
+ */
 class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
 {
+    /**
+     * @param array $p1
+     * @param array $p2
+     * @return array
+     */
     public function merge(array $p1, array $p2 = null)
     {
         if (!$p2) {
@@ -10,6 +18,10 @@ class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
         return array_merge_recursive($p1, $p2);
     }
 
+    /**
+     * @param $p
+     * @return string
+     */
     public function getInputId($p)
     {
         //p.id|default(p.id_prefix|default('model') ~ '-' ~ p.field)
@@ -25,6 +37,10 @@ class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
         return (!empty($p['id_prefix']) ? $p['id_prefix'] : 'model') . '-' . $p['field'];
     }
 
+    /**
+     * @param $p
+     * @return string
+     */
     public function getInputName($p)
     {
         if (!empty($p['name'])) {
@@ -44,6 +60,10 @@ class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
         return $name;
     }
 
+    /**
+     * @param $p
+     * @return string
+     */
     public function getInputValue($p)
     {
         if (isset($p['value'])) {
