@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_ProductReviews_Admin_Controller
+ *
+ * @property FCom_ProductReviews_Model_Review $FCom_ProductReviews_Model_Review
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ */
 class FCom_ProductReviews_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;

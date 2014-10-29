@@ -39,10 +39,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             throw new BException('Folder ' . $folder . ' is not allowed');
         }
 
-        if (strpos($folder, '{random}') !== false) {
-            $random = 'storage/' . $this->BConfig->get('core/storage_random_dir');
-            $folder = str_replace('{random}', $random, $folder);
-        }
+        $folder = $this->_parseFolder($folder);
         return $folder;
     }
 
@@ -53,7 +50,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
     public function gridConfig($options = [])
     {
         $id = !empty($options['id']) ? $options['id'] : 'media_library';
-        $folder = $options['folder'];
+        $folder = $this->_parseFolder($options['folder']);
         $url = $this->BApp->href('/media/grid');
         $orm = $this->FCom_Core_Model_MediaLibrary->orm()->table_alias('a')
                 ->where('folder', $folder)
@@ -494,5 +491,18 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
             }
         }
         return $uploadConfig;
+    }
+
+    /**
+     * @param string $folder
+     * @return mixed
+     */
+    protected function _parseFolder($folder)
+    {
+        if (strpos($folder, '{random}') !== false) {
+            $random = 'storage/' . $this->BConfig->get('core/storage_random_dir');
+            $folder = str_replace('{random}', $random, $folder);
+        }
+        return $folder;
     }
 }
