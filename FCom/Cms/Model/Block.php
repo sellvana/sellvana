@@ -62,7 +62,7 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
     }
 
     /**
-     * rule pageu url unique
+     * rule page url unique
      * @param $data
      * @param $args
      * @return bool
@@ -85,5 +85,14 @@ class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
     public function createView($params = [])
     {
         return $this->FCom_Cms_Frontend_View_Block->createView($this, $params);
+    }
+
+    public function getContent()
+    {
+        $content = $this->get('content');
+        if(empty($content)){
+            $content = '';
+        }
+        return $content;
     }
 }

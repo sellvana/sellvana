@@ -1017,13 +1017,16 @@ class BRequest extends BClass
     {
         static $alreadyStripped;
         if ($alreadyStripped) {
-            return;
+            return null;
         }
 
         mb_internal_encoding('UTF-8');
-        iconv_set_encoding('input_encoding', 'UTF-8');
-        iconv_set_encoding('internal_encoding', 'UTF-8');
-        iconv_set_encoding('output_encoding', 'UTF-8');
+        if (version_compare(PHP_VERSION, '5.6.0', '<')) {
+            // bellow emits deprecated errors on php 5.6
+            iconv_set_encoding('input_encoding', 'UTF-8');
+            iconv_set_encoding('internal_encoding', 'UTF-8');
+            iconv_set_encoding('output_encoding', 'UTF-8');
+        }
 
         $data = ['GET' => & $_GET, 'POST' => & $_POST, 'REQUEST' => & $_REQUEST, 'COOKIE' => & $_COOKIE];
         $urlPath = rtrim($this->rawPath(), '/');
@@ -2341,7 +2344,7 @@ class BActionController extends BClass
     *
     * @param string $actionName
     * @param array $args Action arguments
-    * @return forward information
+    * @return mixed forward information
     */
     public function dispatch($actionName, $args = [])
     {
@@ -2378,11 +2381,12 @@ class BActionController extends BClass
     }
 
     /**
-    * Try to dispatch action and catch exception if any
-    *
-    * @param string $actionName
-    * @param array $args
-    */
+     * Try to dispatch action and catch exception if any
+     *
+     * @param string $actionName
+     * @param array $args
+     * @return $this
+     */
     public function tryDispatch($actionName, $args)
     {
         if (!is_string($actionName) && is_callable($actionName)) {

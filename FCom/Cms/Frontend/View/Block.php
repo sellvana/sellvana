@@ -2,13 +2,18 @@
 
 class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
 {
+    /**
+     * @var BLayout
+     */
     static protected $_layoutHlp;
     static protected $_origClass = __CLASS__;
+
     /**
      * Create a new block view instance within layout
      *
-     * @param string $block block handle or instance
+     * @param string|FCom_Cms_Model_Block|array $block block handle or instance
      * @param array $params block view creation parameters
+     * @throws BException
      * @return FCom_Cms_Frontend_View_Block
      */
     public function createView($block, array $params = [])
@@ -31,7 +36,7 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
         } else {
             throw new BException('Invalid block name');
         }
-        $viewName = !empty($params['view_name']) ? $params['view_name'] : ('_cms_block/' . $params['block']);
+        $viewName = !empty($params['view_name'])? $params['view_name']: ('_cms_block/' . $params['block']);
         $view = static::$_layoutHlp->getView($viewName);
         if (!$view instanceof FCom_Cms_Frontend_View_Block) {
             $view = static::$_layoutHlp->addView($viewName, $params)->getView($viewName);
@@ -41,11 +46,13 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
 
     /**
      * Get block model instance for the current view
+     * @param $view
+     * @return bool
      */
     public function getBlockModel($view)
     {
         $model = $view->getParam('model');
-        if (!$model  || !is_object($model) || !$model instanceof FCom_Cms_Model_Block) {
+        if (!$model || !is_object($model) || !$model instanceof FCom_Cms_Model_Block) {
             $model = $view->getParam('block');
             if (is_numeric($model)) {
                 $model = $this->FCom_Cms_Model_Block->load($model);
@@ -61,6 +68,8 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
         return $model;
     }
 
+    protected $_formFieldsPlaceholder = '__FORM_FIELDS__';
+
     /**
      * Renderer for use with other views
      *
@@ -69,16 +78,23 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
      */
     public function renderer($view)
     {
+        /** @var FCom_Cms_Model_Block $model */
         $model = $this->getBlockModel($view);
+
         if (!$model) {
             return '';
         }
 
-        $subRenderer = $this->BLayout->getRenderer($model->renderer ? $model->renderer : 'FCom_LibTwig');
+        $subRenderer = $this->BLayout->getRenderer($model->renderer? $model->renderer: 'FCom_LibTwig');
 
+        $blockContent = $model->getContent();
+        if (strpos($blockContent, $this->_formFieldsPlaceholder) !== false) {
+            $formText = $this->_prepareFormFields();
+            $blockContent = str_replace($this->_formFieldsPlaceholder, $formText, $blockContent);
+        }
         $view->setParam([
             //'renderer'    => $subRenderer,
-            'source'      => $model->content ? $model->content : ' ',
+            'source' => $blockContent,
             'source_name' => 'cms_block:' . get_class($model) . ':' . $model->handle,
             'source_mtime' => $model->modified_time,
             'source_untrusted' => true,
@@ -86,6 +102,25 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
 
         $content = $this->BUtil->call($subRenderer['callback'], $view);
 
+        return $content;
+    }
+
+    /**
+     * @return string
+     */
+    protected function _prepareFormFields()
+    {
+
+        $model = $this->getBlockModel($this);
+        $formEnable = $model->get('form_enable');
+        if (!$formEnable) {
+            return '';
+        }
+        /** @var FCom_Cms_Frontend_View_FormFields $view */
+        $view = $this->BLayout->getView('cms/form-fields');
+        $view->generateContent($model);
+
+        $content = $view->render();
         return $content;
     }
 
