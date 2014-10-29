@@ -3,8 +3,8 @@
 class FCom_Sales_Model_Order_Item_State_Payment extends FCom_Core_Model_Abstract_State_Concrete
 {
     protected $_valueLabels = [
-        'new' => 'New',
         'free' => 'Free',
+        'unpaid' => 'Unpaid',
         'processing' => 'Processing',
         'paid' => 'Paid',
         'outstanding' => 'Outstanding',
@@ -12,14 +12,14 @@ class FCom_Sales_Model_Order_Item_State_Payment extends FCom_Core_Model_Abstract
         'partial' => 'Partial',
     ];
 
-    public function setNew()
-    {
-        return $this->changeState('new');
-    }
-
     public function setFree()
     {
         return $this->changeState('free');
+    }
+
+    public function setUnpaid()
+    {
+        return $this->changeState('unpaid');
     }
 
     public function setProcessing()
@@ -40,5 +40,10 @@ class FCom_Sales_Model_Order_Item_State_Payment extends FCom_Core_Model_Abstract
     public function setCanceled()
     {
         return $this->changeState('canceled');
+    }
+
+    public function setPartial()
+    {
+        return $this->changeState('partial');
     }
 }

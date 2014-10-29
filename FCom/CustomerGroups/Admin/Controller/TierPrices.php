@@ -17,16 +17,6 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
     protected $_mainTableAlias = 'tp';
 
     /**
-     * @param bool|object $new
-     * @param array       $args
-     * @return FCom_CustomerGroups_Admin_Controller_TierPrices
-     */
-    static public function i($new = false, array $args = [])
-    {
-        return parent::i($new, $args);
-    }
-
-    /**
      * @param FCom_Catalog_Model_Product $model
      * @return array
      */

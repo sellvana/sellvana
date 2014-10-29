@@ -14,7 +14,7 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
 
     protected $_defaultValueClass;
 
-    protected $_valueLabels = [];
+    protected $_valueLabels;
 
     protected $_setValueNotificationTemplates = [];
 
@@ -27,11 +27,22 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
         $this->_value = $value;
         $this->_options = $options;
 
+        $this->_initialize();
+
         return $this;
+    }
+
+    protected function _initialize()
+    {
+        // placeholder mainly for custom states
     }
 
     public function changeState($value, $updateModelField = true)
     {
+        if (empty($this->_valueLabels[$value])) {
+            throw new BException('Invalid state value ' . $value . ' for type ' . $this->_type);
+        }
+
         $this->sendNotification(true); // Send onUnset notification (going out of state)
         $newState = $this->_context->changeState($this->_type, $value, $updateModelField);
         $newState->sendNotification(); // Send onSet notification (going into state)
@@ -58,6 +69,11 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
         return $this->_context->getState($this->_type);
     }
 
+    public function getDefaultValue()
+    {
+        return $this->_defaultValue;
+    }
+
     public function getValue()
     {
         return $this->_value;
@@ -68,8 +84,11 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
         return $this->_value === $value;
     }
 
-    public function getValueLabel($value)
+    public function getValueLabel($value = null)
     {
+        if (null === $value) {
+            $value = $this->getValue();
+        }
         return !empty($this->_valueLabels[$value]) ? $this->_valueLabels[$value] : null;
     }
 

@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Checkout_Frontend_Controller_Cart
+ *
+ * Uses:
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Sales_Main $FCom_Sales_Main
+ */
 class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Abstract
 {
     public function beforeDispatch()
@@ -21,170 +28,97 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
             $layout->view('checkout/cart')->set('redirectLogin', true);
         }
 
-
         $layout->view('breadcrumbs')->set('crumbs', [['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
             ['label' => 'Cart', 'active' => true]]);
 
         $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $this->BEvents->fire(__CLASS__ . '::action_cart:cart', ['cart' => $cart]);
 
-        $shippingEstimate = $this->BSession->get('shipping_estimate');
-        $layout->view('checkout/cart')->set(['cart' => $cart, 'shipping_esitmate' => $shippingEstimate]);
+        $shippingEstimate = $cart->getData('shipping_estimate');
+        $layout->view('checkout/cart')->set(['cart' => $cart, 'shipping_estimate' => $shippingEstimate]);
     }
 
     public function action_add__POST()
     {
-        $cartHref = $this->BApp->href('cart');
+        $redirHref = $this->BApp->href('cart');
         $post = $this->BRequest->post();
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
+        $result = [];
         if (isset($post['action'])) {
             switch ($post['action']) {
             case 'add':
-                $p = $this->FCom_Catalog_Model_Product->load($post['id']);
-                if (!$p) {
-                    // todo add message to be displayed
-                    $this->BResponse->redirect('/');
-                    return;
-                }
-                $options = [
-                    'qty' => !empty($post['qty']) ? $post['qty'] : 1,
-                    'price' => $p->getPrice(),
-                    'sku' => $p->get('local_sku'),
-                ];
-                $result = [];
-                $validate = $this->BEvents->fire(__METHOD__ . ':validate', [
-                    'controller' => $this,
-                    'product' => $p,
-                    'post' => $post,
-                    'options' => &$options,
-                    'result' => &$result,
-                ]);
+                // FCom_Sales_Workflow_Cart -> FCom_CustomField_Frontend -> FCom_Sales_Model_Cart
+                $this->FCom_Sales_Main->workflowAction('customerAddsItemsToCart', ['post' => $post, 'result' => &$result]);
 
-                if (empty($result['error'])) {
-                    if ($this->BApp->m('FCom_Customer') && $this->FCom_Customer_Model_Customer->isLoggedIn()) {
-                        $cart->customer_id = $this->FCom_Customer_Model_Customer->sessionUserId();
-                        $cart->save();
-                    }
-                    if (isset($post['shopper'])) {
-                        $options['shopper'] = $post['shopper'];
-                        foreach($options['shopper'] as $key => $value) {
-                            if (!isset($value['val']) || $value['val'] == '') {
-                                unset($options['shopper'][$key]);
-                            }
-                            if ($value['val'] == 'checkbox') {
-                                unset($options['shopper'][$key]['val']);
-                            }
-                        }
-                    };
-                    $cart->addProduct($p->id(), $options)->calculateTotals()->save();
+                $item = $result['items'][0];
+                if (!empty($item['status']) && $item['status'] === 'added') {
                     $this->message('The product has been added to your cart');
+                } elseif (!empty($item['error'])) {
+                    $this->message($item['error'], 'error');
+                    if (!empty($item['product'])) {
+                        $redirHref = $item['product']->url();
+                    }
                 } else {
-                    $this->message($result['error'], 'error');
-                    $this->BResponse->redirect($p->url());
-                    return;
+                    $this->message("Unknown error, couldn't add item to cart", 'error');
+                    if (!empty($item['product'])) {
+                        $redirHref = $item['product']->url();
+                    }
                 }
                 break;
             }
         } else {
-            $items = $cart->items();
-            if (count($items)) {
-                if (!empty($post['remove'])) {
-                    foreach ($post['remove'] as $id => $arrVariant) {
-                        $item = $cart->childById('items', $id);
-                        $variants = $item->getData('variants');
-                        if (null === $variants || count($variants) == 1) {
-                            $cart->removeItem($id);
+            $this->FCom_Sales_Main->workflowAction('customerUpdatesCart', ['post' => $post, 'result' => &$result]);
+
+            if (!empty($result['items'])) {
+                foreach ($result['items'] as $item) {
+                    if (!empty($item['status'])) {
+                        switch ($item['status']) {
+                            case 'updated':
+                                $this->message('Cart item has been updated');
+                                break;
+                            case 'removed':
+                                $this->message('Cart item has been removed');
+                                break;
+                            case 'error':
+                                $this->message($item['message'], 'error');
+                                break;
                         }
                     }
                 }
-                if (!empty($post['qty'])) {
-                    foreach ($post['qty'] as $id => $arrQty) {
-                        $item = $cart->childById('items', $id);
-                        if ($item) {
-                            $variants = $item->getData('variants');
-                            $totalQty = 0;
-                            if (null !== $variants && is_array($arrQty)) {
-                                foreach ($arrQty as $variantId => $qty) {
-                                    if ($qty > 0) {
-                                        $variants[$variantId]['variant_qty'] = $qty;
-                                        $totalQty += $qty;
-                                    }
-                                    if ($qty <= 0 || isset($post['remove'][$id][$variantId])) {
-                                        unset($variants[$variantId]);
-                                    }
-                                }
-                            } else {
-                                $totalQty = $arrQty[0];
-                            }
-                            if ($totalQty > 0) {
-                                $item->set('qty', $totalQty)->setData('variants', $variants)->save();
-                            }
-                            if ($totalQty <= 0 || empty($variants)){
-                                $cart->removeItem($id);
-                            }
-                        }
-                    }
-                }
-                if (!empty($post['postcode'])) {
-                    $estimate = [];
-                    foreach ($this->FCom_Sales_Main->getShippingMethods() as $shipping) {
-                        $estimate[] = ['estimate' => $shipping->getEstimate(), 'description' => $shipping->getDescription()];
-                    }
-                    $this->BSession->set('shipping_estimate', $estimate);
-                }
-                $cart->calculateTotals()->save();
-                $this->message('Your cart has been updated');
             }
         }
-        $this->BResponse->redirect($cartHref);
+        $this->BResponse->redirect($redirHref);
     }
 
     public function action_addxhr__POST()
     {
         $cartHref = $this->BApp->href('cart');
         $post = $this->BRequest->post();
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
         $result = [];
         switch ($post['action']) {
         case 'add':
-            $p = $this->FCom_Catalog_Model_Product->load($post['id']);
-            if (!$p) {
-                $this->BResponse->json(['title' => "Incorrect product id"]);
-                return;
+            $this->FCom_Sales_Main->workflowAction('customerAddsItems', ['post' => $post, 'result' => &$result]);
+
+            $item = $result['items'][0];
+            if (empty($item['error'])) {
+                $result = ['error' => $item['error']];
+            } else {
+                $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+                $p = $result['items'][0]->product();
+                $result = [
+                    'title' => 'Added to cart',
+                    'html' => '<img src="' . $p->thumbUrl(35, 35) . '" width="35" height="35" style="float:left"/> '
+                        . htmlspecialchars($p->product_name)
+                        . (!empty($post['qty']) && $post['qty'] > 1 ? ' (' . $post['qty'] . ')' : '')
+                        . '<br><br><a href="' . $cartHref . '" class="button">Go to cart</a>',
+                    'minicart_html' => $this->BLayout->view('checkout/cart/block')->render(),
+                    'cnt' => $cart->itemQty(),
+                    'subtotal' => $cart->subtotal,
+                ];
             }
 
-            $options = ['qty' => $post['qty'], 'price' => $p->base_price];
-            if ($this->BApp->m('FCom_Customer') && $this->FCom_Customer_Model_Customer->isLoggedIn()) {
-                $cart->customer_id = $this->FCom_Customer_Model_Customer->sessionUserId();
-                $cart->save();
-            }
-            $cart->addProduct($p->id(), $options)->calculateTotals()->save();
-            $result = [
-                'title' => 'Added to cart',
-                'html' => '<img src="' . $p->thumbUrl(35, 35) . '" width="35" height="35" style="float:left"/> '
-                    . htmlspecialchars($p->product_name)
-                    . (!empty($post['qty']) && $post['qty'] > 1 ? ' (' . $post['qty'] . ')' : '')
-                    . '<br><br><a href="' . $cartHref . '" class="button">Go to cart</a>',
-                'minicart_html' => $this->BLayout->view('checkout/cart/block')->render(),
-                'cnt' => $cart->itemQty(),
-                'subtotal' => $cart->subtotal,
-            ];
             break;
         }
 
         $this->BResponse->json($result);
-    }
-
-    public function onAddToCart($args)
-    {
-        $product = $args['product'];
-        $qty = $args['qty'];
-        if (!$product || !$product->id()) {
-            return false;
-        }
-
-        $qty = !empty($qty) ? $qty : 1;
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
-        $cart->addProduct($product->id(), ['qty' => $qty, 'price' => $product->base_price]);
     }
 }

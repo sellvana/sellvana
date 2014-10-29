@@ -30,18 +30,6 @@ class FCom_IndexTank_Model_ProductField extends FCom_Core_Model_Abstract
         ],
     ];
 
-    /**
-     * Shortcut to help with IDE autocompletion
-     *
-     * @param bool  $new
-     * @param array $args
-     * @return FCom_IndexTank_Model_ProductField
-     */
-    static public function i($new = false, array $args = [])
-    {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
-    }
-
     public function getList()
     {
         $productFields = $this->FCom_IndexTank_Model_ProductField->orm()->find_many();

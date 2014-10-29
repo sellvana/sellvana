@@ -44,8 +44,9 @@ class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_A
         $this->layout('/customer/order/view');
         $this->view('breadcrumbs')->crumbs = $crumbs;
         $this->view('customer/order/view')->order = $order;
-        $this->view('customer/order/view')->billing = $order->billing();
-        $this->view('customer/order/view')->shipping = $order->shipping();
+        // TODO: convert template to use only $order object
+        $this->view('customer/order/view')->billing = $order->addressAsArray('billing');
+        $this->view('customer/order/view')->shipping = $order->addressAsArray('shipping');
     }
 
 }

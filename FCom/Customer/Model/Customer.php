@@ -66,16 +66,6 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     protected $_addresses;
 
     /**
-     * @param bool  $new
-     * @param array $args
-     * @return FCom_Customer_Model_Customer
-     */
-    static public function i($new = false, array $args = [])
-    {
-        return parent::i($new, $args);
-    }
-
-    /**
      * override default rules for login form
      */
     public function setLoginRules()

@@ -258,4 +258,74 @@ class FCom_CustomField_Migrate extends BClass
         $tProdVariant = $this->FCom_CustomField_Model_ProductVariant->table();
         $this->BDb->ddlTableDef($tProdVariant, ['COLUMNS' => ['variant_qty' => "int(11)" ]]);
     }
+
+    public function upgrade__0_2_0__0_2_1()
+    {
+        $tProduct          = $this->FCom_Catalog_Model_Product->table();
+        $tField            = $this->FCom_CustomField_Model_Field->table();
+        $tFieldOption      = $this->FCom_CustomField_Model_FieldOption->table();
+        $tProdVariant      = $this->FCom_CustomField_Model_ProductVariant->table();
+        $tProdVarfield     = $this->FCom_CustomField_Model_ProductVarfield->table();
+        $tProdVariantField = $this->FCom_CustomField_Model_ProductVariantField->table();
+        $tProdVariantImage = $this->FCom_CustomField_Model_ProductVariantImage->table();
+        $tMediaFile        = $this->FCom_Core_Model_MediaLibrary->table();
+
+        $this->BDb->ddlTableDef($tProdVarfield, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'product_id' => 'int unsigned not null',
+                'field_id' => 'int unsigned not null',
+                'field_label' => 'varchar(50)',
+                'position' => 'tinyint unsigned not null default 0',
+            ],
+            'PRIMARY' => '(id)',
+            'KEYS' => [
+                'UNQ_product_field' => 'UNIQUE (product_id, field_id)',
+                'IDX_product_position' => '(product_id, position)',
+            ],
+            'CONSTRAINTS' => [
+                "FK_{$tProdVarfield}_product" => ['product_id', $tProduct],
+                "FK_{$tProdVarfield}_field"   => ['field_id', $tField],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tProdVariantField, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'product_id' => 'int unsigned not null',
+                'variant_id' => 'int unsigned not null',
+                'field_id' => 'int unsigned not null',
+                'varfield_id' => 'int unsigned not null',
+                'option_id' => 'int unsigned not null',
+            ],
+            'PRIMARY' => '(id)',
+            'CONSTRAINTS' => [
+                "FK_{$tProdVariantField}_product"  => ['product_id', $tProduct],
+                "FK_{$tProdVariantField}_variant"  => ['variant_id', $tProdVariant],
+                "FK_{$tProdVariantField}_field"    => ['field_id', $tField],
+                "FK_{$tProdVariantField}_varfield" => ['varfield_id', $tProdVarfield],
+                "FK_{$tProdVariantField}_option"   => ['option_id', $tFieldOption],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tProdVariantImage, [
+            'COLUMNS' => [
+                'id' => 'int unsigned not null auto_increment',
+                'product_id' => 'int unsigned not null',
+                'variant_id' => 'int unsigned not null',
+                'file_id' => 'int unsigned not null',
+                'product_media_id' => 'int unsigned not null',
+                'position' => 'tinyint unsigned not null default 0',
+            ],
+            'PRIMARY' => '(id)',
+            'KEYS' => [
+                'IDX_variant_position' => '(variant_id, position)',
+            ],
+            'CONSTRAINTS' => [
+                "FK_{$tProdVariantImage}_product" => ['product_id', $tProduct],
+                "FK_{$tProdVariantImage}_variant" => ['variant_id', $tProdVariant],
+                "FK_{$tProdVariantImage}_file"    => ['file_id', $tMediaFile],
+            ],
+        ]);
+    }
 }

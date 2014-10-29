@@ -16,6 +16,7 @@ class FCom_Sales_Model_Order_Payment_State extends FCom_Core_Model_Abstract_Stat
      */
     static protected $_defaultStateClasses = [
         'overall' => 'FCom_Sales_Model_Order_Payment_State_Overall',
+        'processor' => 'FCom_Sales_Model_Order_Payment_State_Processor',
         'custom' => 'FCom_Sales_Model_Order_Payment_State_Custom',
     ];
 

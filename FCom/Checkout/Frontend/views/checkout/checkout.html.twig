@@ -13,7 +13,7 @@
           <div class="row">
             <div class="col-sm-6">
                 <h4>{{ "Shipping Address" |_}}</h4>
-                {{ THIS.get('shipping_address').as_html() | raw }}
+                {{ cart.addressAsHtml('shipping') | raw }}
                 {% if THIS.get('guest_checkout') %}
                     <small><a href="{{ APP.href('checkout/address?t=s') }}">{{ 'Change' |_ }}</a></small>
                 {% else %}
@@ -45,7 +45,7 @@
               {% if cart.get('same_address') %}
                   <p>{{ 'Same as shipping' |_ }}</p>
               {% else %}
-                  {{ THIS.get('billing_address').as_html() | raw }}
+                  {{ cart.addressAsHtml('billing') | raw }}
               {% endif %}
 
               {% if THIS.get('guest_checkout') %}

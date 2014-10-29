@@ -16,12 +16,18 @@ class FCom_Sales_Model_Order_Shipment_State extends FCom_Core_Model_Abstract_Sta
      */
     static protected $_defaultStateClasses = [
         'overall' => 'FCom_Sales_Model_Order_Shipment_State_Overall',
+        'carrier' => 'FCom_Sales_Model_Order_Shipment_State_Carrier',
         'custom' => 'FCom_Sales_Model_Order_Shipment_State_Custom',
     ];
 
     public function overall()
     {
         return $this->_getStateObject('overall');
+    }
+
+    public function carrier()
+    {
+        return $this->_getStateObject('carrier');
     }
 
     public function custom()

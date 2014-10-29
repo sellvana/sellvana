@@ -27,7 +27,7 @@ class FCom_Wishlist_Admin_Controller extends FCom_Admin_Controller_Abstract_Grid
             ['type' => 'row_select'],
             ['name' => 'wishlist_id', 'label' => 'Wishlist ID'],
             ['name' => 'product_name', 'label' => 'Product Name'],
-            ['name' => 'local_sku', 'label' => 'SKU'],
+            ['name' => 'product_sku', 'label' => 'SKU'],
             ['name' => 'base_price', 'label' => 'Base Price'],
             ['name' => 'sale_price', 'label' => 'Sale Price'],
         ];

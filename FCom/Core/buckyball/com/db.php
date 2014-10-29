@@ -741,6 +741,17 @@ EOT
             $dropArr = [];
             foreach ($fks as $idx => $def) {
                 $idxLower = strtolower($idx);
+                if (is_array($def)) {
+                    if (empty($def[0]) || empty($def[1])) {
+                        throw new BException('Incomplete FK definition: ' . print_r($def));
+                    }
+                    $lk = $def[0];
+                    $ft = $def[1];
+                    $fk = !empty($def[2]) ? $def[2] : 'id';
+                    $ou = !empty($def[3]) ? $def[3] : 'CASCADE';
+                    $od = !empty($def[4]) ? $def[4] : 'CASCADE';
+                    $def = "FOREIGN KEY ({$lk}) REFERENCES {$ft} ({$fk}) ON UPDATE {$ou} ON DELETE {$od}";
+                }
                 if ($def === 'DROP') {
                     if (!empty($tableFKs[$idxLower])) {
                         $dropArr[] = "DROP FOREIGN KEY `{$idx}`";
@@ -761,6 +772,15 @@ EOT
         $result = null;
         if ($alterArr) {
             $result = BORM::i()->raw_query("ALTER TABLE {$fullTableName} " . join(", ", $alterArr), [])->execute();
+            static::ddlClearCache(null, $connectionName);
+        }
+        return $result;
+    }
+
+    public function ddlDropTable($fullTableName, $connectionName = null)
+    {
+        if (static::ddlTableExists($fullTableName, $connectionName)) {
+            $result = BORM::i()->raw_query("DROP TABLE {$fullTableName}")->execute();
             static::ddlClearCache(null, $connectionName);
         }
         return $result;
@@ -2670,7 +2690,8 @@ class BModel extends Model
     * @param string $class_name
     * @return string
     */
-    protected static function _get_table_name($class_name) {
+    protected static function _get_table_name($class_name)
+    {
         return BDb::t(parent::_get_table_name($class_name));
     }
 

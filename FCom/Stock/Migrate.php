@@ -53,7 +53,7 @@ class FCom_Stock_Migrate extends BClass
             ]
         );
         $productWeights = $this->FCom_Catalog_Model_Product->orm()
-            ->select(['local_sku', 'net_weight', 'ship_weight'])
+            ->select(['product_sku', 'net_weight', 'ship_weight'])
             ->where(['OR' => ["`net_weight` IS NOT NULL", "`ship_weight` IS NOT NULL"]])
             ->find_many();
 
@@ -61,7 +61,7 @@ class FCom_Stock_Migrate extends BClass
             $prodStocks = $this->FCom_Stock_Model_Sku->orm()->find_many_assoc('sku');
             foreach ($productWeights as $product) {
                 /** @var FCom_Catalog_Model_Product $product */
-                $k = $product->get('local_sku');
+                $k = $product->get('product_sku');
                 if (isset($prodStocks[$k])) {
                     /** @var FCom_Stock_Model_Sku $stock */
                     $stock = $prodStocks[$k];
@@ -111,7 +111,7 @@ class FCom_Stock_Migrate extends BClass
         );
 
         $productWeights = $this->FCom_Catalog_Model_Product->orm()
-            ->select(['local_sku', 'net_weight', 'ship_weight'])
+            ->select(['product_sku', 'net_weight', 'ship_weight'])
             ->where(['OR' => ["`net_weight` IS NOT NULL", "`ship_weight` IS NOT NULL"]])
             ->find_many();
 
@@ -119,7 +119,7 @@ class FCom_Stock_Migrate extends BClass
             $prodStocks = $this->FCom_Stock_Model_Sku->orm()->find_many_assoc('sku');
             foreach ($productWeights as $product) {
                 /** @var FCom_Catalog_Model_Product $product */
-                $k = $product->get('local_sku');
+                $k = $product->get('product_sku');
                 if (isset($prodStocks[$k])) {
                     /** @var FCom_Stock_Model_Sku $stock */
                     $stock = $prodStocks[$k];

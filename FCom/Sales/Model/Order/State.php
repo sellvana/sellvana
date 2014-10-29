@@ -18,6 +18,7 @@ class FCom_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Contex
         'overall' => 'FCom_Sales_Model_Order_State_Overall',
         'delivery' => 'FCom_Sales_Model_Order_State_Delivery',
         'payment' => 'FCom_Sales_Model_Order_State_Payment',
+        'comment' => 'FCom_Sales_Model_Order_State_Comment',
         'custom' => 'FCom_Sales_Model_Order_State_Custom',
     ];
 
@@ -34,6 +35,11 @@ class FCom_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Contex
     public function payment()
     {
         return $this->_getStateObject('payment');
+    }
+
+    public function comment()
+    {
+        return $this->_getStateObject('comment');
     }
 
     public function custom()

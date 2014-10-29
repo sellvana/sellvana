@@ -1,6 +1,6 @@
 modules:
     FCom_CustomField:
-        version: 0.2.0
+        version: 0.2.1
         channel: beta
         require: { module: { FCom_Catalog: 0.2.1 } }
         translations: { en: en.php }
@@ -33,4 +33,4 @@ modules:
                 auto_use: [ views ]
                 observe:
                     - [ "BLayout::hook:custom-fields-filters", FCom_CustomField_Main.hookCustomFieldFilters ]
-                    - [ "FCom_Checkout_Frontend_Controller_Cart::action_add__POST:validate", FCom_CustomField_Frontend.onCheckoutCartAddValidate ]
+                    - [ "FCom_Sales_Workflow::customerAddsItems:calcDetails", FCom_CustomField_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]

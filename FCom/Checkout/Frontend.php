@@ -2,11 +2,6 @@
 
 class FCom_Checkout_Frontend extends BClass
 {
-    public function bootstrap()
-    {
-        $this->FCom_Sales_Main->addCheckoutMethod('default', 'FCom_Checkout_Frontend_CheckoutMethod');
-    }
-
     /**
      * Init cart after all modules are registered
      */

@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_Sales_Model_Order_Payment_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
+class FCom_Sales_Model_Order_Refund_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
 {
     protected $_valueLabels = [
         'pending' => 'Pending',
@@ -12,10 +12,12 @@ class FCom_Sales_Model_Order_Payment_State_Overall extends FCom_Core_Model_Abstr
         'canceled' => 'Canceled',
     ];
 
-    protected $_setValueNotificationTemplates =[
+    protected $_setValueNotificationTemplates = [
+        'super_pending' => 'email/sales/order-refund-state-payment-super_pending-admin',
+        'super_auth' => 'email/sales/order-refund-state-payment-super_auth',
         'refunded' => 'email/sales/order-refund-state-payment-refunded',
         'failed' => 'email/sales/order-refund-state-overall-failed',
-        'void' => 'email/sales/order-refund-state-overall-void',
+        'canceled' => 'email/sales/order-refund-state-overall-canceled',
     ];
 
     public function setPending()

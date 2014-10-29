@@ -55,7 +55,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
             'parent_id'        => $response['transaction_id'],
             'order_id'         => $this->getOrder()->id(),
             'amount'           => $this->getDetail('amount_due'),
-            'status'           => $status,
+            'transaction_status' => $status,
             'transaction_id'   => $response['transaction_id'],
             'transaction_type' => $action == 'AUTH_ONLY' ? 'authorize' : 'sale',
             'online'           => 1,
@@ -69,28 +69,28 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
 
     public function getOrder()
     {
-        return $this->salesEntity;
+        return $this->_order;
     }
 
     public function getCardNumber()
     {
-        if (isset($this->details['cc_num'])) {
-            return $this->details['cc_num'];
+        if (isset($this->_details['cc_num'])) {
+            return $this->_details['cc_num'];
         }
         return null;
     }
 
     public function getDetail($key)
     {
-        if (isset($this->details[$key])) {
-            return $this->details[$key];
+        if (isset($this->_details[$key])) {
+            return $this->_details[$key];
         }
         return null;
     }
 
     public function setDetail($key, $value)
     {
-        $this->details[$key] = $value;
+        $this->_details[$key] = $value;
     }
 
     /**
@@ -129,7 +129,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
 
     public function getPublicData()
     {
-        $data = $this->details;
+        $data = $this->_details;
         if (!empty($data) && isset($data['cc_num'])) {
             $data['last_four'] = $this->lastFour();
         }
@@ -148,7 +148,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
     protected function clear()
     {
         $this->lastFour();
-        unset($this->details['cc_num']);
+        unset($this->_details['cc_num']);
     }
 
     public function asArray()

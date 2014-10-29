@@ -16,13 +16,28 @@ class FCom_Sales_Main extends BClass
             $this->FCom_Sales_Model_Cart->registerTotalRowHandler('FCom_Sales_Model_Cart_Total_' . $total);
         }
 
+        $this->FCom_Sales_Workflow_Cart->registerWorkflow();
+        $this->FCom_Sales_Workflow_Order->registerWorkflow();
+        $this->FCom_Sales_Workflow_OrderItem->registerWorkflow();
+        $this->FCom_Sales_Workflow_Payment->registerWorkflow();
+        $this->FCom_Sales_Workflow_Shipment->registerWorkflow();
+        $this->FCom_Sales_Workflow_Return->registerWorkflow();
+        $this->FCom_Sales_Workflow_Refund->registerWorkflow();
+        $this->FCom_Sales_Workflow_Comment->registerWorkflow();
+
         $this->FCom_Admin_Model_Role->createPermission([
             'sales' => 'Sales',
             'sales/orders' => 'Orders',
             'sales/order_status' => 'Order Status',
             'sales/carts' => 'Carts',
-            'sales/reports' => 'Reports'
+            'sales/reports' => 'Reports',
         ]);
+    }
+
+    public function workflowAction($action, $args)
+    {
+        $this->BEvents->fire('FCom_Sales_Workflow::' . $action, $args);
+        return $this;
     }
 
     public function addPaymentMethod($name, $class = null)

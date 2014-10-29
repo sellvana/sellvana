@@ -5,7 +5,10 @@
  * @property string  variant_sku     (PROD_VAL1_VAL2_VAL3)
  * @property decimal variant_price
  * @property text    data_serialized
- *   -
+ *
+ * Uses:
+ * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ * @property FCom_Catalog_Model_Product   $FCom_Catalog_Model_Product
  */
 class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
 {
@@ -37,7 +40,7 @@ class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
             $vr['field_values'] = $this->BUtil->fromJson($vr['field_values']);
             $imgIds = $m->getData('variant_file_id');
             $vr['img_ids'] = $imgIds ? explode(',', $imgIds) : [];
-            $vr['variant_sku'] = ($vr['variant_sku'] === '') ? $product->local_sku : $vr['variant_sku'];
+            $vr['variant_sku'] = ($vr['variant_sku'] === '') ? $product->product_sku : $vr['variant_sku'];
             $price = ($vr['variant_price'] > 0) ? $vr['variant_price'] : $product->base_price;
             $vr['variant_price'] = $this->BLocale->currency($price);
             $vrKeyArr = [];
@@ -97,6 +100,7 @@ class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
         foreach ($fields as $f) {
             $valArr[$f['field_code']] = $fieldValues[$f['field_code']];
         }
+        ksort($valArr);
         $valJson = $this->BUtil->toJson($valArr);
         $variant = $this->loadWhere(['product_id' => $product->id(), 'field_values' => $valJson]);
         return $variant;

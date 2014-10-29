@@ -1481,7 +1481,7 @@ class BClassDecorator
 
     public function __destruct()
     {
-        $this->_decoratedComponent = null;
+        unset($this->_decoratedComponent);
     }
 
     /**

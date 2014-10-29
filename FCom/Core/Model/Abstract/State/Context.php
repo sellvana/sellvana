@@ -66,7 +66,7 @@ abstract class FCom_Core_Model_Abstract_State_Context extends BClass
         } else {
             throw new BException('Invalid state type: ' . $type);
         }
-        if (!$class instanceof FCom_Sales_Model_model_State_Abstract) {
+        if (!$class instanceof FCom_Sales_Model_State_Abstract) {
             throw new BException('Invalid state class: ' . $class);
         }
 

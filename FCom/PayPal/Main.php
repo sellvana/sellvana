@@ -1,6 +1,6 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_PayPal_Frontend extends BClass
+class FCom_PayPal_Main extends BClass
 {
     public function bootstrap()
     {
