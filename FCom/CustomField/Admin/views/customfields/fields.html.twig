@@ -15,6 +15,12 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
         fieldsGrid = grid;
         fieldsGrid.getGridSkeleton().Views.RowView.prototype._callbackCustom = function (ev) {
             selectedRow = this.model;
+
+            if (selectedRow.get('admin_input_type') == 'select') {
+                $(optionsGrid.getGridSkeleton().NewButton).removeClass('disabled');
+            } else {
+                $(optionsGrid.getGridSkeleton().NewButton).addClass('disabled');
+            }
 			
     		fieldsGrid.getModalForm().modalType = 'editable';
     		fieldsGrid.getGridSkeleton().currentRow = this.model;
@@ -26,21 +32,23 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
                 success: function () {
                     originOptionIds = optionsGrid.getRows().pluck('id');
                     optionsGrid.getGridView().render();
-                    if (selectedRow.get('admin_input_type') == 'select') {
+                    if (optionsGrid.getRows().length > 0) {
                         $('#options-form').validate();
-                        $(optionsGrid.getGridSkeleton().NewButton).removeClass('disabled');
-                    } else {
-                        $(optionsGrid.getGridSkeleton().NewButton).addClass('disabled');
                     }
                 }
             });
 			
             $('#field-modal-header').html(selectedRow.get('field_name'));
 			$('#btn-field-grid-modal').trigger('click');
-        }
+        };
         
         fieldsGrid.getGridSkeleton().Views.ModalForm.prototype.el = '#field-modal-form';
         fieldsGrid.build();
+
+        //force show form when display modal
+        $('#field-grid-modal').on('show.bs.modal', function(e) {
+            $('#fieldset_tab').tab('show');
+        });
     };
     
     $('#add_new_field').click(function () {
@@ -49,7 +57,8 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
     	
         fieldsGrid.getModalForm().modalType = 'addable';
         fieldsGrid.getModalForm().render();
-        $('.tabbable #options_tab').hide();
+        $(optionsGrid.getGridSkeleton().NewButton).addClass('disabled');
+        //$('.tabbable #options_tab').hide();
         
         $('#field-modal-header').html('Add Field');
         $('#btn-field-grid-modal').trigger('click');

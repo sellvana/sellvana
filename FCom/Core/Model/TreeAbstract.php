@@ -21,11 +21,23 @@
  */
 class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 {
+    /**
+     * @var string
+     */
     protected static $_separator = '|';
 
+    /**
+     * @var array
+     */
     protected static $_cacheAuto = ['id', 'full_name', 'url_path'];
+    /**
+     * @var array
+     */
     protected static $_cacheFlags = ['full_name' => ['key_lower']];
 
+    /**
+     * @var array
+     */
     protected static $_validationRules = [
         /*array('parent_id', '@required'),
         array('id_path', '@required'),
@@ -127,6 +139,13 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * move node
+     * @param int $parentId
+     * @return $this
+     * @throws BException
+     * @throws Exception
+     */
     public function move($parentId)
     {
         if ($parentId != $this->get('parent_id')) {
@@ -207,6 +226,10 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @return bool
+     * @throws BException
+     */
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) {
@@ -403,6 +426,10 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $desc;
     }
 
+    /**
+     * get all descendants nodes
+     * @return FCom_Core_Model_TreeAbstract[]
+     */
     public function ascendants()
     {
         $asc = [];
@@ -413,6 +440,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     }
 
     /**
+     * get all siblings nodes
      * @return FCom_Core_Model_TreeAbstract[]
      */
     public function siblings()
@@ -445,6 +473,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     }
 
     /**
+     * generate url node url_key base on node_name value
      * @return $this
      * @throws BException
      */
@@ -612,6 +641,10 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $cloneNode;
     }
 
+    /**
+     * @param $cloneNode
+     * @return $this
+     */
     public function onAfterClone(&$cloneNode)
     {
         $this->BEvents->fire($this->_origClass() . '::onAfterClone', ['node' => $this, 'cloneNode' => $cloneNode]);
