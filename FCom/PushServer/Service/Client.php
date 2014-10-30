@@ -2,6 +2,9 @@
 
 class FCom_PushServer_Service_Client extends FCom_PushServer_Service_Abstract
 {
+    /**
+     * set signal status
+     */
     public function signal_status()
     {
         if (empty($this->_message['status'])) {
@@ -16,6 +19,9 @@ class FCom_PushServer_Service_Client extends FCom_PushServer_Service_Abstract
         //TODO: broadcast client connection?
     }
 
+    /**
+     * subscribe signal
+     */
     public function signal_subscribe()
     {
         $this->_client->subscribe($this->_message['to']);
