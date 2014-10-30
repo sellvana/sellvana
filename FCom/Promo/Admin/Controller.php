@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * @property FCom_Promo_Model_Promo $FCom_Promo_Model_Promo
+ * @property FCom_Promo_Model_Media $FCom_Promo_Model_Media
+ * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
+ * @property FCom_Promo_Model_Group $FCom_Promo_Model_Group
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Admin_View_Grid $FCom_Admin_View_Grid
+ */
 class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -27,7 +35,6 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                 'options' => $this->FCom_Promo_Model_Promo->fieldOptions('status')
             ],
             ['name' => 'details', 'label' => 'Details', 'index' => 'details', 'hidden' => true],
-            ['name' => 'attachments', 'label' => 'Attachments', 'sortable' => false, 'hidden' => false],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
                 ['name' => 'delete'],
@@ -62,21 +69,19 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     {
         parent::formViewBefore($args);
         $m = $args['model'];
-        /*
-        $actions = array('<input type="hidden" id="save_as" name="save_as" value=""/>');
-        if ($m->status==='template') {
-            $actions['save_as_new'] = '<button type="button" class="st1 sz2 btn btn-primary" onclick="if (adminForm.saveAll(this)) { $(\'#save_as\').val(\'copy\'); this.form.submit(); }"><span>Save as a New Promotion</span></button>';
-        } else {
-            $actions['save_as_tpl'] = '<button type="button" class="st1 sz2 btn btn-primary" onclick="if (adminForm.saveAll(this)) { $(\'#save_as\').val(\'template\'); this.form.submit(); }"><span>Save as a Template</span></button>';
-        }
-        $args['view']->actions = $this->BUtil->arrayMerge($args['view']->actions, $actions);
-        */
         $args['view']->title = $m->id ? 'Edit Promo: ' . $m->description : 'Create New Promo';
     }
 
+    /**
+     * @param FCom_Admin_View_Abstract $view
+     * @param BModel $model
+     * @param string $mode
+     * @param string $allowed
+     * @return $this
+     */
     public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
     {
-        if ($model && $model->id) {
+        if ($model && $model->id()) {
             $view->addTab("details", ['label' => $this->BLocale->_("Details"), 'pos' => 20, 'async' => true]);
             $view->addTab("history", ['label' => $this->BLocale->_("History"), 'pos' => 40, 'async' => true]);
         }
