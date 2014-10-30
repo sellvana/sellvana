@@ -816,10 +816,11 @@ class BRequest extends BClass
     }
 
     /**
-    * Initialize route parameters
-    *
-    * @param array $params
-    */
+     * Initialize route parameters
+     *
+     * @param array $params
+     * @return $this
+     */
     public function initParams(array $params)
     {
         $this->_params = $params;
@@ -847,12 +848,13 @@ class BRequest extends BClass
     }
 
     /**
-    * Alias for legacy code
-    *
-    * @deprecated
-    * @param mixed $key
-    * @param mixed $fallbackToGet
-    */
+     * Alias for legacy code
+     *
+     * @deprecated
+     * @param mixed $key
+     * @param mixed $fallbackToGet
+     * @return array|null|string
+     */
     public function params($key = null, $fallbackToGet = false)
     {
         return $this->param($key, $fallbackToGet);
