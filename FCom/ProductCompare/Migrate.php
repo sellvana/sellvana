@@ -22,7 +22,7 @@ class FCom_ProductCompare_Migrate extends BClass
                 'UNQ_cookie_token' => 'UNIQUE (cookie_token)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tSet}_customer" => ['customer_id', $tCustomer],
+                'customer' => ['customer_id', $tCustomer],
             ],
         ]);
 
@@ -35,8 +35,8 @@ class FCom_ProductCompare_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tSetItem}_set" => ['set_id', $tSet],
-                "FK_{$tSetItem}_product" => ['product_id', $tProduct],
+                'set' => ['set_id', $tSet],
+                'product' => ['product_id', $tProduct],
             ],
         ]);
     }

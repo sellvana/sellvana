@@ -137,7 +137,7 @@ class FCom_Cms_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tFormData}_form" => ['form_id', $tForm],
+                'form' => ['form_id', $tForm],
             ],
         ]);
 
@@ -237,7 +237,7 @@ class FCom_Cms_Migrate extends BClass
             'KEYS' => [
             ],
             'CONSTRAINTS' => [
-                "FK_{$tFormData}_form" => ['form_id', $tForm],
+                'form' => ['form_id', $tForm],
             ],
         ]);
     }

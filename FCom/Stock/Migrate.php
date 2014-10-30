@@ -32,7 +32,7 @@ class FCom_Stock_Migrate extends BClass
                 'UNQ_sku' => 'UNIQUE (sku)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tSku}_bin" => ['bin_id', $tBin],
+                'bin' => ['bin_id', $tBin],
             ],
         ]);
 

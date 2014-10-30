@@ -58,8 +58,8 @@ class FCom_PushServer_Migrate extends BClass
                 'IDX_update_at' => '(update_at)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tSubscriber}_channel" => ['channel_id', $tChannel],
-                "FK_{$tSubscriber}_client" => ['client_id', $tClient],
+                'channel' => ['channel_id', $tChannel],
+                'client' => ['client_id', $tClient],
             ],
         ]);
 
@@ -83,9 +83,9 @@ class FCom_PushServer_Migrate extends BClass
                 'IDX_client_window_status' => '(client_id, window_name, status)'
             ],
             'CONSTRAINTS' => [
-                "FK_{$tMessage}_channel" => ['channel_id', $tChannel, 'id', 'CASCADE', 'SET NULL'],
-                "FK_{$tMessage}_subscriber" => ['subscriber_id', $tSubscriber],
-                "FK_{$tMessage}_client" => ['client_id', $tClient],
+                'channel' => ['channel_id', $tChannel, 'id', 'CASCADE', 'SET NULL'],
+                'subscriber' => ['subscriber_id', $tSubscriber],
+                'client' => ['client_id', $tClient],
             ],
         ]);
     }
@@ -124,9 +124,9 @@ class FCom_PushServer_Migrate extends BClass
                 'IDX_update_at' => '(update_at)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tMessage}_channel" => ['channel_id', $tChannel, 'id', 'CASCADE', 'SET NULL'],
-                "FK_{$tMessage}_subscriber" => ['subscriber_id', $tSubscriber],
-                "FK_{$tMessage}_client" => ['client_id', $tClient],
+                'channel' => ['channel_id', $tChannel, 'id', 'CASCADE', 'SET NULL'],
+                'subscriber' => ['subscriber_id', $tSubscriber],
+                'client' => ['client_id', $tClient],
             ],
         ]);
     }

@@ -99,8 +99,8 @@ class FCom_Admin_Migrate extends BClass
                 'IDX_activity_user_status' => 'UNIQUE (`activity_id`, `user_id`, `alert_user_status`)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tActivityUser}_activity" => ['activity_id', $tActivity],
-                "FK_{$tActivityUser}_user" => ['user_id', $tUser],
+                'activity' => ['activity_id', $tActivity],
+                'user' => ['user_id', $tUser],
             ],
         ]);
 
@@ -243,8 +243,8 @@ class FCom_Admin_Migrate extends BClass
                 'IDX_activity_user_status' => 'UNIQUE (`activity_id`, `user_id`, `alert_user_status`)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tActivityUser}_activity" => ['activity_id', $tActivity],
-                "FK_{$tActivityUser}_user" => ['user_id', $tUser],
+                'activity' => ['activity_id', $tActivity],
+                'user' => ['user_id', $tUser],
             ],
         ]);
     }

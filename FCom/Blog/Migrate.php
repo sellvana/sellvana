@@ -39,7 +39,7 @@ class FCom_Blog_Migrate extends BClass
                 'IDX_create_ym' => '(status, create_ym)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tPost}_author" => ['author_user_id', $tUser],
+                'author' => ['author_user_id', $tUser],
             ],
         ]);
 
@@ -66,8 +66,8 @@ class FCom_Blog_Migrate extends BClass
                 'UNQ_post_tag' => '(post_id, tag_id)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tPostTag}_post" => ['post_id', $tPost],
-                "FK_{$tPostTag}_tag" => ['tag_id', $tTag],
+                'post' => ['post_id', $tPost],
+                'tag' => ['tag_id', $tTag],
             ],
         ]);
 
@@ -93,8 +93,8 @@ class FCom_Blog_Migrate extends BClass
                 'category_id__post_id' => '(`category_id`,`post_id`)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tPostCategory}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
-                "FK_{$tPostCategory}_post" => "FOREIGN KEY (`post_id`) REFERENCES `{$tPost}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                'category' => ['category_id', $tCategory],
+                'post' => ['post_id', $tPost],
             ],
         ]);
     }
@@ -138,8 +138,8 @@ SET FOREIGN_KEY_CHECKS=1;
                     'category_id__post_id' => '(`category_id`,`post_id`)',
                 ],
                 'CONSTRAINTS' => [
-                    "FK_{$tPostCategory}_category" => "FOREIGN KEY (`category_id`) REFERENCES `{$tCategory}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
-                    "FK_{$tPostCategory}_post" => "FOREIGN KEY (`post_id`) REFERENCES `{$tPost}` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                    'category' => ['category_id', $tCategory],
+                    'post' => ['post_id', $tPost],
                 ],
             ]);
     }

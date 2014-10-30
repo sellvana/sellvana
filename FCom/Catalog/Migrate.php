@@ -94,8 +94,8 @@ class FCom_Catalog_Migrate extends BClass
 
             ],
             'CONSTRAINTS' => [
-                "FK_{$tMedia}_product" => ['product_id', $tProduct],
-                "FK_{$tMedia}_file" => ['file_id', $tMediaLibrary],
+                'product' => ['product_id', $tProduct],
+                'file' => ['file_id', $tMediaLibrary],
             ],
         ]);
 
@@ -155,7 +155,7 @@ class FCom_Catalog_Migrate extends BClass
                 'IDX_featured'  => '(is_featured)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tCategory}_parent" => ['parent_id', $tCategory],
+                'parent' => ['parent_id', $tCategory],
             ],
         ]);
 
@@ -173,8 +173,8 @@ class FCom_Catalog_Migrate extends BClass
                 'category_id__sort_order' => '(`category_id`,`sort_order`)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tCategoryProduct}_category" => ['category_id', $tCategory],
-                "FK_{$tCategoryProduct}_product" => ['product_id', $tProduct],
+                'category' => ['category_id', $tCategory],
+                'product' => ['product_id', $tProduct],
             ],
         ]);
 
@@ -601,7 +601,7 @@ class FCom_Catalog_Migrate extends BClass
                 'UNQ_inventory_sku' => 'UNIQUE (inventory_sku)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tSku}_bin" => ['bin_id', $tBin],
+                'bin' => ['bin_id', $tBin],
             ],
         ]);
 
@@ -620,7 +620,7 @@ class FCom_Catalog_Migrate extends BClass
                 'IDX_sku_create' => '(sku_id, create_at)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tSkuHistory}_sku" => ['sku_id', $tSku],
+                'sku' => ['sku_id', $tSku],
             ],
         ]);
 
@@ -640,7 +640,7 @@ class FCom_Catalog_Migrate extends BClass
                 'IDX_product_create' => '(product_id, create_at)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tProdHistory}_product" => ['product_id', $tProduct],
+                'product' => ['product_id', $tProduct],
             ],
         ]);
 
