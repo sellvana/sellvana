@@ -233,6 +233,9 @@ abstract class FCom_Admin_Controller_Abstract_TreeForm extends FCom_Admin_Contro
         $this->BResponse->json($result);
     }
 
+    /**
+     * @return string
+     */
     public function getErrorMessages()
     {
         $messages = $this->BSession->messages('validator-errors:' . $this->formId);
