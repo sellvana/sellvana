@@ -24,7 +24,7 @@ class FCom_Wishlist_Migrate extends BClass
                 'UNQ_cookie_token' => 'UNIQUE (cookie_token)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tWishlist}_customer" => "foreign key (customer_id) references {$tCustomer} (id) on update cascade on delete cascade",
+                "FK_{$tWishlist}_customer" => ['customer_id', $tCustomer],
             ],
         ]);
 
@@ -36,8 +36,8 @@ class FCom_Wishlist_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tWishlistItem}_wishlist" => "foreign key (wishlist_id) references {$tWishlist} (id) on update cascade on delete cascade",
-                "FK_{$tWishlistItem}_product" => "foreign key (wishlist_id) references {$tProduct} (id) on update cascade on delete cascade",
+                "FK_{$tWishlistItem}_wishlist" => ['wishlist_id', $tWishlist],
+                "FK_{$tWishlistItem}_product" => ['wishlist_id', $tProduct],
             ],
         ]);
     }
@@ -73,14 +73,14 @@ class FCom_Wishlist_Migrate extends BClass
                 'UNQ_cookie_token' => 'UNIQUE (cookie_token)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tWishlist}_customer" => "foreign key (customer_id) references {$tCustomer} (id) on update cascade on delete cascade",
+                "FK_{$tWishlist}_customer" => ['customer_id', $tCustomer],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tWishlistItem, [
             'CONSTRAINTS' => [
-                "FK_{$tWishlistItem}_wishlist" => "foreign key (wishlist_id) references {$tWishlist} (id) on update cascade on delete cascade",
-                "FK_{$tWishlistItem}_product" => "foreign key (wishlist_id) references {$tProduct} (id) on update cascade on delete cascade",
+                "FK_{$tWishlistItem}_wishlist" => ['wishlist_id', $tWishlist],
+                "FK_{$tWishlistItem}_product" => ['wishlist_id', $tProduct],
             ],
         ]);
 

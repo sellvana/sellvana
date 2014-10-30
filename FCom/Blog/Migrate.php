@@ -39,7 +39,7 @@ class FCom_Blog_Migrate extends BClass
                 'IDX_create_ym' => '(status, create_ym)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tPost}_author" => "FOREIGN KEY (author_user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "FK_{$tPost}_author" => ['author_user_id', $tUser],
             ],
         ]);
 
@@ -66,8 +66,8 @@ class FCom_Blog_Migrate extends BClass
                 'UNQ_post_tag' => '(post_id, tag_id)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tPostTag}_post" => "FOREIGN KEY (post_id) REFERENCES {$tPost} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-                "FK_{$tPostTag}_tag" => "FOREIGN KEY (tag_id) REFERENCES {$tTag} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "FK_{$tPostTag}_post" => ['post_id', $tPost],
+                "FK_{$tPostTag}_tag" => ['tag_id', $tTag],
             ],
         ]);
 

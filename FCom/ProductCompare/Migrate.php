@@ -22,7 +22,7 @@ class FCom_ProductCompare_Migrate extends BClass
                 'UNQ_cookie_token' => 'UNIQUE (cookie_token)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tSet}_customer" => "FOREIGN KEY (customer_id) REFERENCES {$tCustomer} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "FK_{$tSet}_customer" => ['customer_id', $tCustomer],
             ],
         ]);
 
@@ -35,8 +35,8 @@ class FCom_ProductCompare_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tSetItem}_set" => "FOREIGN KEY (set_id) REFERENCES {$tSet} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-                "FK_{$tSetItem}_product" => "FOREIGN KEY (product_id) REFERENCES {$tProduct} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "FK_{$tSetItem}_set" => ['set_id', $tSet],
+                "FK_{$tSetItem}_product" => ['product_id', $tProduct],
             ],
         ]);
     }

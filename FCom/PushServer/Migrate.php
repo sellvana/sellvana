@@ -58,8 +58,8 @@ class FCom_PushServer_Migrate extends BClass
                 'IDX_update_at' => '(update_at)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tSubscriber}_channel" => "FOREIGN KEY (channel_id) REFERENCES {$tChannel} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-                "FK_{$tSubscriber}_client" => "FOREIGN KEY (client_id) REFERENCES {$tClient} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "FK_{$tSubscriber}_channel" => ['channel_id', $tChannel],
+                "FK_{$tSubscriber}_client" => ['client_id', $tClient],
             ],
         ]);
 
@@ -83,9 +83,9 @@ class FCom_PushServer_Migrate extends BClass
                 'IDX_client_window_status' => '(client_id, window_name, status)'
             ],
             'CONSTRAINTS' => [
-                "FK_{$tMessage}_channel" => "FOREIGN KEY (channel_id) REFERENCES {$tChannel} (id) ON UPDATE CASCADE ON DELETE SET NULL",
-                "FK_{$tMessage}_subscriber" => "FOREIGN KEY (subscriber_id) REFERENCES {$tSubscriber} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-                "FK_{$tMessage}_client" => "FOREIGN KEY (client_id) REFERENCES {$tClient} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "FK_{$tMessage}_channel" => ['channel_id', $tChannel, 'id', 'CASCADE', 'SET NULL'],
+                "FK_{$tMessage}_subscriber" => ['subscriber_id', $tSubscriber],
+                "FK_{$tMessage}_client" => ['client_id', $tClient],
             ],
         ]);
     }
@@ -124,9 +124,9 @@ class FCom_PushServer_Migrate extends BClass
                 'IDX_update_at' => '(update_at)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tMessage}_channel" => "FOREIGN KEY (channel_id) REFERENCES {$tChannel} (id) ON UPDATE CASCADE ON DELETE SET NULL",
-                "FK_{$tMessage}_subscriber" => "FOREIGN KEY (subscriber_id) REFERENCES {$tSubscriber} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-                "FK_{$tMessage}_client" => "FOREIGN KEY (client_id) REFERENCES {$tClient} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                "FK_{$tMessage}_channel" => ['channel_id', $tChannel, 'id', 'CASCADE', 'SET NULL'],
+                "FK_{$tMessage}_subscriber" => ['subscriber_id', $tSubscriber],
+                "FK_{$tMessage}_client" => ['client_id', $tClient],
             ],
         ]);
     }

@@ -1,5 +1,21 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Catalog_Migrate
+ *
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Catalog_Model_ProductMedia $FCom_Catalog_Model_ProductMedia
+ * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
+ * @property FCom_Catalog_Model_ProductLink $FCom_Catalog_Model_ProductLink
+ * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ * @property FCom_Catalog_Model_CategoryProduct $FCom_Catalog_Model_CategoryProduct
+ * @property FCom_Catalog_Model_SearchHistory $FCom_Catalog_Model_SearchHistory
+ * @property FCom_Catalog_Model_SearchAlias $FCom_Catalog_Model_SearchAlias
+ * @property FCom_Catalog_Model_ProductHistory $FCom_Catalog_Model_ProductHistory
+ * @property FCom_Catalog_Model_InventoryBin $FCom_Catalog_Model_InventoryBin
+ * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
+ * @property FCom_Catalog_Model_InventorySkuHistory $FCom_Catalog_Model_InventorySkuHistory
+ */
 class FCom_Catalog_Migrate extends BClass
 {
     public function install__0_2_27()
@@ -563,6 +579,7 @@ class FCom_Catalog_Migrate extends BClass
                 'inventory_sku' => 'varchar(50) not null',
                 'title' => 'varchar(255) not null',
                 'description' => 'text',
+                'is_salable' => 'tinyint',
                 'bin_id' => 'int unsigned null',
                 'unit_cost' => 'decimal(12,2)',
                 'net_weight'  => 'decimal(12,2) null default null',

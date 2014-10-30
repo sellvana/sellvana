@@ -229,7 +229,7 @@ class FCom_Sales_Migrate extends BClass
                 'transaction_type' => '(transaction_type)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tOrderPayment}_order" => ['order_id', $tOrder, 'id', 'RESTRICT', 'CASCADE'],
+                "FK_{$tOrderPayment}_order" => ['order_id', $tOrder, 'id', 'CASCADE', 'RESTRICT'],
             ],
         ]);
     }
@@ -598,7 +598,7 @@ class FCom_Sales_Migrate extends BClass
                 'transaction_type' => '(transaction_type)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tOrderPayment}_order" => ['order_id', $tOrder, 'id', 'RESTRICT', 'CASCADE'],
+                "FK_{$tOrderPayment}_order" => ['order_id', $tOrder, 'id', 'CASCADE', 'RESTRICT'],
             ],
         ]);
     }
@@ -974,8 +974,8 @@ class FCom_Sales_Migrate extends BClass
             ],
             'CONSTRAINTS' => [
                 "FK_{$tOrderHistory}_order" => ['order_id', $tOrder],
-                "FK_{$tOrderHistory}_order_item" => ['order_item_id', $tOrderItem, 'id', 'SET NULL', 'CASCADE'],
-                "FK_{$tOrderHistory}_user" => ['user_id', $tUser, 'id', 'SET NULL', 'CASCADE'],
+                "FK_{$tOrderHistory}_order_item" => ['order_item_id', $tOrderItem, 'id', 'CASCADE', 'SET NULL'],
+                "FK_{$tOrderHistory}_user" => ['user_id', $tUser, 'id', 'CASCADE', 'SET NULL'],
             ],
         ]);
 
@@ -998,7 +998,7 @@ class FCom_Sales_Migrate extends BClass
             ],
             'CONSTRAINTS' => [
                 "FK_{$tOrderComment}_order" => ['order_id', $tOrder],
-                "FK_{$tOrderComment}_user" => ['user_id', $tUser, 'id', 'SET NULL', 'CASCADE'],
+                "FK_{$tOrderComment}_user" => ['user_id', $tUser, 'id', 'CASCADE', 'SET NULL'],
             ],
         ]);
 
