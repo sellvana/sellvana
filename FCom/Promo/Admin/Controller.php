@@ -72,22 +72,6 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $args['view']->title = $m->id ? 'Edit Promo: ' . $m->description : 'Create New Promo';
     }
 
-    /**
-     * @param FCom_Admin_View_Abstract $view
-     * @param BModel $model
-     * @param string $mode
-     * @param string $allowed
-     * @return $this
-     */
-    public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
-    {
-        if ($model && $model->id()) {
-            $view->addTab("details", ['label' => $this->BLocale->_("Details"), 'pos' => 20, 'async' => true]);
-            $view->addTab("history", ['label' => $this->BLocale->_("History"), 'pos' => 40, 'async' => true]);
-        }
-        return parent::processFormTabs($view, $model, $mode, $allowed);
-    }
-
     public function formPostBefore($args)
     {
         parent::formPostBefore($args);
