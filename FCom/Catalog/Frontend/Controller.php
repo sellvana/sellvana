@@ -86,7 +86,7 @@ class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 
     public function action_product__POST()
     {
-        $r = explode('/', $this->BRequest->params('product'));
+        $r = explode('/', $this->BRequest->param('product'));
         $href = $r[0];
 
         $p = array_pop($r);

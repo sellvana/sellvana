@@ -13,12 +13,20 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 
     const ERROR = 'ERROR';
 
+    /**
+     * @param string $folder
+     * @return $this
+     */
     public function allowFolder($folder)
     {
         $this->_allowedFolders[$folder] = 1;
         return $this;
     }
 
+    /**
+     * @return array|mixed|null|string
+     * @throws BException
+     */
     public function getFolder()
     {
         $folder = $this->BRequest->get('folder');
@@ -101,9 +109,7 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         ];
 
         if (!empty($options['config'])) {
-
             $config['config'] = $this->BUtil->arrayMerge($config['config'], $options['config']);
-
         }
 
         if ($options['mode'] && $options['mode'] === 'link') {
@@ -472,6 +478,10 @@ class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
         }
     }
 
+    /**
+     * @param null $configId
+     * @return array
+     */
     public function uploadConfig($configId = null)
     {
         $uploadConfig         = [];

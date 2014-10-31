@@ -1,9 +1,21 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_PushServer_Main
+ *
+ * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ */
 class FCom_PushServer_Main extends BCLass
 {
+    /**
+     * @var array
+     */
     protected $_services = [];
 
+    /**
+     * @var bool
+     */
     protected static $_debug = false;
 
     public function bootstrap()
@@ -15,6 +27,9 @@ class FCom_PushServer_Main extends BCLass
         static::$_debug = true;
     }
 
+    /**
+     * @param $message
+     */
     public function catchAll($message)
     {
         if (!empty($message['seq'])) {
@@ -25,6 +40,9 @@ class FCom_PushServer_Main extends BCLass
         }
     }
 
+    /**
+     *
+     */
     public function layoutInit()
     {
         $head = $this->BLayout->view('head');
@@ -35,6 +53,9 @@ FCom.pushserver_url = '" . $this->BApp->src('@FCom_PushServer/index.php') . "';
         }
     }
 
+    /**
+     * @param $args
+     */
     public function onAdminUserLogout($args)
     {
         $userId = $this->FCom_Admin_Model_User->sessionUserId();
@@ -42,6 +63,11 @@ FCom.pushserver_url = '" . $this->BApp->src('@FCom_PushServer/index.php') . "';
         //TODO: implement roster (online/offline) notifications
     }
 
+    /**
+     * @param $channel
+     * @param $callback
+     * @return $this
+     */
     public function addService($channel, $callback)
     {
         $this->_services[] = [
@@ -52,11 +78,17 @@ FCom.pushserver_url = '" . $this->BApp->src('@FCom_PushServer/index.php') . "';
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function getServices()
     {
         return $this->_services;
     }
 
+    /**
+     * @return bool
+     */
     public function isDebugMode()
     {
         return static::$_debug;

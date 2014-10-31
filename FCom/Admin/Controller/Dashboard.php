@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_Controller_Dashboard
+ *
+ * @property FCom_Admin_View_Dashboard $FCom_Admin_View_Dashboard
+ */
 class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
 {
     public function action_index()
@@ -103,6 +108,9 @@ class FCom_Admin_Controller_Dashboard extends FCom_Admin_Controller_Abstract
         $this->BResponse->json($result);
     }
 
+    /**
+     * @return bool
+     */
     public function validateDateTime()
     {
         $p = $this->BRequest->post();

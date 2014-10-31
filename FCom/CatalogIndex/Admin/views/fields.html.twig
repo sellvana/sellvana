@@ -69,12 +69,13 @@
                 modalForm.render();
                 $('#index-field-grid-modal').modal('show');
                 return true;
-            }
+            };
 
             BackboneGrid.Views.ModalForm.prototype.render = function () {
                 var header;
                 switch (this.modalType) {
                     case 'addable':
+                    default:
                         header = 'Create Form';
                         BackboneGrid.currentRow = false;
                         break;
@@ -147,7 +148,7 @@
                 });
 
                 return this;
-            }
+            };
 
             BackboneGrid.Views.ModalForm.prototype.addElementDiv = function(model) {
                 if (model.has(this.modalType) && model.get(this.modalType)) {
@@ -174,7 +175,7 @@
                         elementView.$el.find('#' + name).val(text2html(val));
                     }
                 }
-            }
+            };
 
             function text2html(val) {
                 var text = $.parseHTML(val);
@@ -187,7 +188,7 @@
             cols = indexFieldGrid.getCols();
             rowsCollection = indexFieldGrid.getRows();
 
-        }
+        };
 
         function validateUnique(element, model ,editInline) {
             var url = model.get('validation').unique;

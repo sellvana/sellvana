@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_AdminChat_PushServer_User
+ *
+ * @property FCom_AdminChat_Model_UserStatus $FCom_AdminChat_Model_UserStatus
+ */
 class FCom_AdminChat_PushServer_User extends FCom_PushServer_Service_Abstract
 {
     public function onBeforeDispatch()

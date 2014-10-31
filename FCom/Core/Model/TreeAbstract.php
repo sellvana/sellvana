@@ -12,6 +12,7 @@
  * @property string $full_name
  * @property string $url_key
  * @property string $url_path
+ * @property string $url_href //todo: check this property
  * @property int $num_children
  * @property int $num_descendants
  * @property int $num_products
