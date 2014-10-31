@@ -8,7 +8,7 @@ require(['jquery','underscore','backbone', 'jquery.validate', 'unique'], functio
     var json = {
             rows: [],
             remove_ids: []
-        }
+        };
     window.tierPricesGridRegister = function(grid) {
         pricesGrid = grid;
         grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {

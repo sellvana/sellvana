@@ -15,11 +15,12 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $q = $this->BRequest->get('q');
         $filter = $this->BRequest->get('f');
 
-        $catName = $this->BRequest->params('category');
+        $catName = $this->BRequest->param('category');
         if ($catName === '' || is_null($catName)) {
             $this->forward(false);
             return;
         }
+        /** @var FCom_Catalog_Model_Category $category */
         $category = $this->FCom_Catalog_Model_Category->load($catName, 'url_path');
         if (!$category) {
             $this->forward(false);

@@ -284,8 +284,8 @@ class FCom_CustomField_Migrate extends BClass
                 'IDX_product_position' => '(product_id, position)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tProdVarfield}_product" => ['product_id', $tProduct],
-                "FK_{$tProdVarfield}_field"   => ['field_id', $tField],
+                'product' => ['product_id', $tProduct],
+                'field'   => ['field_id', $tField],
             ],
         ]);
 
@@ -300,11 +300,11 @@ class FCom_CustomField_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tProdVariantField}_product"  => ['product_id', $tProduct],
-                "FK_{$tProdVariantField}_variant"  => ['variant_id', $tProdVariant],
-                "FK_{$tProdVariantField}_field"    => ['field_id', $tField],
-                "FK_{$tProdVariantField}_varfield" => ['varfield_id', $tProdVarfield],
-                "FK_{$tProdVariantField}_option"   => ['option_id', $tFieldOption],
+                'product'  => ['product_id', $tProduct],
+                'variant'  => ['variant_id', $tProdVariant],
+                'field'    => ['field_id', $tField],
+                'varfield' => ['varfield_id', $tProdVarfield],
+                'option'   => ['option_id', $tFieldOption],
             ],
         ]);
 
@@ -322,9 +322,9 @@ class FCom_CustomField_Migrate extends BClass
                 'IDX_variant_position' => '(variant_id, position)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tProdVariantImage}_product" => ['product_id', $tProduct],
-                "FK_{$tProdVariantImage}_variant" => ['variant_id', $tProdVariant],
-                "FK_{$tProdVariantImage}_file"    => ['file_id', $tMediaFile],
+                'product' => ['product_id', $tProduct],
+                'variant' => ['variant_id', $tProdVariant],
+                'file'    => ['file_id', $tMediaFile],
             ],
         ]);
     }

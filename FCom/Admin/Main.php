@@ -22,11 +22,21 @@ class FCom_Admin_Main extends BClass
         ]);
     }
 
+    /**
+     * shortcut for $this->BApp->adminHref
+     * @param string $url
+     * @return string
+     */
     public function href($url = '')
     {
         return $this->BApp->adminHref($url);
     }
 
+    /**
+     * shortcut for $this->BApp->frontendHref
+     * @param string $url
+     * @return string
+     */
     public function frontendHref($url = '')
     {
         return $this->BApp->frontendHref($url);

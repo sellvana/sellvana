@@ -29,6 +29,7 @@ class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
             $params['view_class'] = static::$_origClass;
         }
         if ($block instanceof FCom_Cms_Model_Block) {
+            /** @var FCom_Cms_Model_Block $block */
             $params['block'] = $block->handle;
             $params['model'] = $block;
         } elseif (is_string($block)) {

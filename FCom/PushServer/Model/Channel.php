@@ -7,6 +7,19 @@
  * @property string $channel_name
  * @property string $channel_out
  * @property string $data_serialized
+ *   - permissions
+ *     - can_subscribe
+ *       - everyone
+ *       - admin_user
+ *       - customer
+ *       - none
+ *     - can_publish
+ *       - everyone
+ *       - admin_user
+ *       - customer
+ *       - none
+ *   - subscribers
+ *   - message_queue
  * @property string $create_at
  * @property string $update_at
  *
@@ -23,27 +36,12 @@ class FCom_PushServer_Model_Channel extends FCom_Core_Model_Abstract
     static protected $_channelCache = [];
 
     /**
-     * - id
-     * - channel_name
-     * - channel_out
-     * - create_at
-     * - update_at
-     * - data_serialized
-     *   - permissions
-     *     - can_subscribe
-     *       - everyone
-     *       - admin_user
-     *       - customer
-     *       - none
-     *     - can_publish
-     *       - everyone
-     *       - admin_user
-     *       - customer
-     *       - none
-     *   - subscribers
-     *   - message_queue
+     * @param $channel
+     * @param bool $create
+     * @param bool $session
+     * @return $this
+     * @throws BException
      */
-
     public function getChannel($channel, $create = false, $session = false)
     {
         if (is_object($channel) && ($channel instanceof FCom_PushServer_Model_Channel)) {

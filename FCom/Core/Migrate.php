@@ -93,8 +93,8 @@ class FCom_Core_Migrate extends BClass
                 ],
                 'PRIMARY' => '(id)',
                 'CONSTRAINTS' => [
-                    'Ffk_import_fk_model_id' => "FOREIGN KEY (model_id) REFERENCES {$tModel}(id) ON DELETE CASCADE ON UPDATE CASCADE",
-                    'Ffk_import_fk_site_id' => "FOREIGN KEY (site_id) REFERENCES {$tSite}(id) ON DELETE CASCADE ON UPDATE CASCADE",
+                    'model' => ['model_id', $tModel],
+                    'site' => ['site_id', $tSite],
                 ],
             ]
         );
@@ -205,8 +205,8 @@ class FCom_Core_Migrate extends BClass
                 ],
                 'PRIMARY' => '(id)',
                 'CONSTRAINTS' => [
-                    'Ffk_import_fk_model_id' => "FOREIGN KEY (model_id) REFERENCES {$tModel}(id) ON DELETE CASCADE ON UPDATE CASCADE",
-                    'Ffk_import_fk_site_id' => "FOREIGN KEY (site_id) REFERENCES {$tSite}(id) ON DELETE CASCADE ON UPDATE CASCADE",
+                    'model' => ['model_id', $tModel],
+                    'site' => ['site_id', $tSite],
                 ],
             ]
         );

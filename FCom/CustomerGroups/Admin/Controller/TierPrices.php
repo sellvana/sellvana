@@ -1,10 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * Created by pp
- * @project fulleron
+ * Class FCom_CustomerGroups_Admin_Controller_TierPrices
+ *
+ * @property FCom_CustomerGroups_Model_Group $FCom_CustomerGroups_Model_Group
+ * @property FCom_CustomerGroups_Model_TierPrice $FCom_CustomerGroups_Model_TierPrice
  */
-
 class FCom_CustomerGroups_Admin_Controller_TierPrices
     extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -57,6 +58,9 @@ class FCom_CustomerGroups_Admin_Controller_TierPrices
         return $grid;
     }
 
+    /**
+     * @param string $title
+     */
     public function addTitle($title = '')
     {
         /* @var $v BViewHead */

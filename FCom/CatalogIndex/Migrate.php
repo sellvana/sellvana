@@ -48,7 +48,7 @@ class FCom_CatalogIndex_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tField}_field" => ['1', 2, '3', '4', '5'],
+                'field' => ['fcom_field_id', $tField],
             ],
         ]);
         $this->BDb->ddlTableDef($tFieldValue, [
@@ -65,7 +65,7 @@ class FCom_CatalogIndex_Migrate extends BClass
                 'IDX_sort_order' => '(field_id, sort_order)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tFieldValue}_field" => ['field_id', $tField],
+                'field' => ['field_id', $tField],
             ],
         ]);
         $this->BDb->ddlTableDef($tDoc, [
@@ -86,7 +86,7 @@ class FCom_CatalogIndex_Migrate extends BClass
                 'IDX_sort_rating' => '(sort_rating)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tDoc}_product" => ['id', $tProduct],
+                'product' => ['id', $tProduct],
             ],
         ]);
         $this->BDb->ddlTableDef($tDocTerm, [
@@ -99,9 +99,9 @@ class FCom_CatalogIndex_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tDocTerm}_doc" => ['doc_id', $tDoc],
-                "FK_{$tDocTerm}_field" => ['field_id', $tField],
-                "FK_{$tDocTerm}_term" => ['term_id', $tTerm],
+                'doc' => ['doc_id', $tDoc],
+                'field' => ['field_id', $tField],
+                'term' => ['term_id', $tTerm],
             ],
         ]);
         $this->BDb->ddlTableDef($tDocValue, [
@@ -116,9 +116,9 @@ class FCom_CatalogIndex_Migrate extends BClass
                 'UNQ_doc_field_value' => 'UNIQUE (`doc_id`,`field_id`,`value_id`)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tDocValue}_doc" => ['doc_id', $tDoc],
-                "FK_{$tDocValue}_field" => ['field_id', $tField],
-                "FK_{$tDocValue}_value" => ['value_id', $tFieldValue],
+                'doc' => ['doc_id', $tDoc],
+                'field' => ['field_id', $tField],
+                'value' => ['value_id', $tFieldValue],
             ],
         ]);
 
@@ -140,8 +140,8 @@ class FCom_CatalogIndex_Migrate extends BClass
                 'IDX_field_value' => '(field_id, value)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tDocSort}_doc" => ['doc_id', $tDoc],
-                "FK_{$tDocSort}_field" => ['field_id', $tField],
+                'doc' => ['doc_id', $tDoc],
+                'field' => ['field_id', $tField],
             ],
         ]);
     }
@@ -218,8 +218,8 @@ VALUES
                 'IDX_field_value' => '(field_id, value)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tDocSort}_doc" => ['doc_id', $tDoc],
-                "FK_{$tDocSort}_field" => ['field_id', $tField],
+                'doc' => ['doc_id', $tDoc],
+                'field' => ['field_id', $tField],
             ],
         ]);
         //TODO: delete doc.sort_product_name

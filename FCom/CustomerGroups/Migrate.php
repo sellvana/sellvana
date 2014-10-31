@@ -37,7 +37,7 @@ class FCom_CustomerGroups_Migrate extends BClass
                      'customer_group' => 'int(10) unsigned null default null'
                  ],
                  'CONSTRAINTS'    => [
-                     'fk_customer_group' => "FOREIGN KEY (customer_group) REFERENCES {$tableCustomerGroup}(id) ON DELETE CASCADE ON UPDATE CASCADE"
+                     'group' => ['customer_group', $tableCustomerGroup],
                  ],
             ]
         );
@@ -60,8 +60,8 @@ class FCom_CustomerGroups_Migrate extends BClass
                     'UNQ_prod_group_qty' => 'UNIQUE (product_id, group_id, qty)',
                 ], // should we add unique key from product_id + group_id + qty ???
                 'CONSTRAINTS' => [
-                    "FK_{$tableTierPrices}_product" => "FOREIGN KEY (product_id) REFERENCES {$tableProduct}(id) ON DELETE CASCADE ON UPDATE CASCADE",
-                    "FK_{$tableTierPrices}_group" => "FOREIGN KEY (group_id) REFERENCES {$tableCustomerGroup}(id) ON DELETE CASCADE ON UPDATE CASCADE"
+                    'product' => ['product_id', $tableProduct],
+                    'group' => ['group_id', $tableCustomerGroup],
                 ],
             ]
         );
@@ -92,8 +92,8 @@ class FCom_CustomerGroups_Migrate extends BClass
                     'UNQ_prod_group_qty' => 'UNIQUE (product_id, group_id, qty)',
                 ], // should we add unique key from product_id + group_id + qty ???
                 'CONSTRAINTS' => [
-                    "FK_{$tableTierPrices}_product" => "FOREIGN KEY (product_id) REFERENCES {$tableProduct}(id) ON DELETE CASCADE ON UPDATE CASCADE",
-                    "FK_{$tableTierPrices}_group" => "FOREIGN KEY (group_id) REFERENCES {$tableCustGroups}(id) ON DELETE CASCADE ON UPDATE CASCADE"
+                    'product' => ['product_id', $tableProduct],
+                    'group' => ['group_id', $tableCustGroups],
                 ],
             ]
         );

@@ -32,7 +32,7 @@ class FCom_Stock_Migrate extends BClass
                 'UNQ_sku' => 'UNIQUE (sku)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tSku}_bin" => "FOREIGN KEY (bin_id) REFERENCES {$tBin} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                'bin' => ['bin_id', $tBin],
             ],
         ]);
 

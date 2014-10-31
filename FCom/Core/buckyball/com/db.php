@@ -733,6 +733,9 @@ EOT
             }
         }
         if ($fks) {
+            $tableArr = explode('.', $fullTableName);
+            $dbTableName = sizeof($tableArr) === 2 ? $tableArr[1] : $tableArr[0];
+
             $tableFKs = static::ddlForeignKeyInfo($fullTableName, null, $connectionName);
             $tableFKs = array_change_key_case($tableFKs, CASE_LOWER);
             // @see http://dev.mysql.com/doc/refman/5.5/en/innodb-foreign-key-constraints.html
@@ -741,7 +744,11 @@ EOT
             $dropArr = [];
             foreach ($fks as $idx => $def) {
                 $idxLower = strtolower($idx);
-                if (is_array($def)) {
+                if (substr($idxLower, 0, 3) !== 'fk_') { // expand fk idx from 'name' to 'FK_{$table}_{$idx}'
+                    $idx = 'FK_' . $dbTableName . '_' . $idx;
+                    $idxLower = strtolower($idx);
+                }
+                if (is_array($def)) { // expand short array form of foreign key to full string
                     if (empty($def[0]) || empty($def[1])) {
                         throw new BException('Incomplete FK definition: ' . print_r($def));
                     }

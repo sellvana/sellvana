@@ -825,7 +825,7 @@ class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
                             'problem' => $msg
                         ]
                     );
-                    BDebug::warning($msg);
+                    $this->BDebug->warning($msg);
                     $this->defaultSite = true;
                 }
             }

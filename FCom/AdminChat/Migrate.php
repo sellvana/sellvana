@@ -27,7 +27,7 @@ class FCom_AdminChat_Migrate extends BClass
                 'IDX_update_at' => '(update_at)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tChat}_owner" => "FOREIGN KEY (owner_user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                'owner' => ['owner_user_id', $tUser],
             ],
         ]);
 
@@ -46,8 +46,8 @@ class FCom_AdminChat_Migrate extends BClass
                 'IDX_update_at' => '(update_at)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tParticipant}_chat" => "FOREIGN KEY (chat_id) REFERENCES {$tChat} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-                "FK_{$tParticipant}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                'chat' => ['chat_id', $tChat],
+                'user' => ['user_id', $tUser],
             ],
         ]);
 
@@ -66,8 +66,8 @@ class FCom_AdminChat_Migrate extends BClass
                 'IDX_update_at' => '(update_at)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tHistory}_chat" => "FOREIGN KEY (chat_id) REFERENCES {$tChat} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-                "FK_{$tHistory}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                'chat' => ['chat_id', $tChat],
+                'user' => ['user_id', $tUser],
             ],
         ]);
 
@@ -84,7 +84,7 @@ class FCom_AdminChat_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tUserStatus}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                'user' => ['user_id', $tUser],
             ],
         ]);
     }
@@ -99,7 +99,7 @@ class FCom_AdminChat_Migrate extends BClass
                 'owner_user_id' => 'int unsigned not null after `status`',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tChat}_owner" => "FOREIGN KEY (owner_user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                'owner' => ['owner_user_id', $tUser],
             ],
         ]);
     }
@@ -130,7 +130,7 @@ class FCom_AdminChat_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
             'CONSTRAINTS' => [
-                "FK_{$tUserStatus}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                'user' => ['user_id', $tUser],
             ],
         ]);
     }

@@ -99,8 +99,8 @@ class FCom_Admin_Migrate extends BClass
                 'IDX_activity_user_status' => 'UNIQUE (`activity_id`, `user_id`, `alert_user_status`)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tActivityUser}_activity" => "FOREIGN KEY (activity_id) REFERENCES {$tActivity} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-                "FK_{$tActivityUser}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                'activity' => ['activity_id', $tActivity],
+                'user' => ['user_id', $tUser],
             ],
         ]);
 
@@ -243,8 +243,8 @@ class FCom_Admin_Migrate extends BClass
                 'IDX_activity_user_status' => 'UNIQUE (`activity_id`, `user_id`, `alert_user_status`)',
             ],
             'CONSTRAINTS' => [
-                "FK_{$tActivityUser}_activity" => "FOREIGN KEY (activity_id) REFERENCES {$tActivity} (id) ON UPDATE CASCADE ON DELETE CASCADE",
-                "FK_{$tActivityUser}_user" => "FOREIGN KEY (user_id) REFERENCES {$tUser} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+                'activity' => ['activity_id', $tActivity],
+                'user' => ['user_id', $tUser],
             ],
         ]);
     }
