@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Cms_Admin_Controller_Blocks
+ *
+ * @property FCom_Cms_Model_BlockHistory $FCom_Cms_Model_BlockHistory
+ * @property FCom_Admin_View_Grid $FCom_Admin_View_Grid
+ */
 class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -112,6 +118,9 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getEmailOptions()
     {
         $emailOptions = [

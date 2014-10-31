@@ -2452,24 +2452,26 @@ class BActionController extends BClass
     }
 
     /**
-    * Authenticate logic for current action controller, based on arguments
-    *
-    * Use $this->_action to fetch current action
-    *
-    * @param array $args
-    */
+     * Authenticate logic for current action controller, based on arguments
+     *
+     * Use $this->_action to fetch current action
+     *
+     * @param array $args
+     * @return bool
+     */
     public function authenticate($args = [])
     {
         return true;
     }
 
     /**
-    * Authorize logic for current action controller, based on arguments
-    *
-    * Use $this->_action to fetch current action
-    *
-    * @param array $args
-    */
+     * Authorize logic for current action controller, based on arguments
+     *
+     * Use $this->_action to fetch current action
+     *
+     * @param array $args
+     * @return bool
+     */
     public function authorize($args = [])
     {
         return true;
@@ -2606,12 +2608,13 @@ class BActionController extends BClass
     }
 
     /**
-    * Translate string within controller action
-    *
-    * @param string $string
-    * @param array $params
-    * @param string $module if null, try to get current controller module
-    */
+     * Translate string within controller action
+     *
+     * @param string $string
+     * @param array $params
+     * @param string $module if null, try to get current controller module
+     * @return false|string
+     */
     public function _($string, $params = [], $module = null)
     {
         if (empty($module)) {
