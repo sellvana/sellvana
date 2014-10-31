@@ -39,6 +39,25 @@
             input_div_class: "col-md-2"
         }) }}
 
+
+        {{ forms.input({label: 'Date Range'|_, required: 1, name: "model[date_range]",
+            value: validator.fieldValue('date_range'),
+            id: "model-date_range", help_icon: 1, help_text: 'Date Range'|_ }) }}
+        <script type="text/javascript">
+            require(['jquery', 'moment', 'daterangepicker'], function ($) {
+                var startDate = new Date();
+                var s = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate();
+                alert(s);
+                $('#model-date_range').daterangepicker(
+                        {
+                            format: 'YYYY-MM-DD',
+                            startDate: s,
+                            showDropdowns: true
+                        }
+                );
+            });
+        </script>
+
         {{ forms.select({
             label: 'Coupon Code Enter For Validity'|_,
             name: "model[use_coupon]",
