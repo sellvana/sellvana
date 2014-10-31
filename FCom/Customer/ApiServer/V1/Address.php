@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Customer_ApiServer_V1_Address
+ *
+ * @property FCom_Customer_Model_Address $FCom_Customer_Model_Address
+ */
 class FCom_Customer_ApiServer_V1_Address extends FCom_ApiServer_Controller_Abstract
 {
     public function action_index()

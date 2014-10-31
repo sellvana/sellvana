@@ -2,6 +2,27 @@
 
 /**
  * Class FCom_Catalog_Model_Category
+ *
+ * @property int $is_top_menu
+ * @property int $show_content
+ * @property string $content
+ * @property int $show_products
+ * @property int $show_sub_cat
+ * @property string $layout_update
+ * @property string $page_title
+ * @property string $description
+ * @property string $meta_description
+ * @property string $meta_keywords
+ * @property int $show_sidebar
+ * @property int $show_view
+ * @property string $view_name
+ * @property string $page_parts
+ * @property string $image_url
+ * @property int $is_featured
+ * @property string $featured_image_url
+ * @property string $nav_callout_image_url
+ *
+ * DI
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Catalog_Model_CategoryProduct $FCom_Catalog_Model_CategoryProduct
  */

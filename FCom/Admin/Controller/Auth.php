@@ -102,6 +102,7 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
         $r = $this->BRequest;
         $token = $this->BSession->get('password_reset_token');
         $form = $r->post('model');
+        $returnUrl = $this->BRequest->referrer();
 
         $password = !empty($form['password']) ? $form['password'] : null;
         $confirm = !empty($form['password_confirm']) ? $form['password_confirm'] : null;
@@ -111,7 +112,6 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
             return;
         }
 
-        $returnUrl = $this->BRequest->referrer();
         $user = $this->FCom_Admin_Model_User->validateResetToken($token);
         if (!$user) {
             $this->message('Invalid token', 'error');

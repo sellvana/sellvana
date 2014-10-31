@@ -91,6 +91,10 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param $customerAddress
+     * @return array
+     */
     public function prepareApiData($customerAddress)
     {
         $result = [];
@@ -113,6 +117,10 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    /**
+     * @param $post
+     * @return array
+     */
     public function formatApiPost($post)
     {
         $data = [];
@@ -174,18 +182,33 @@ class FCom_Customer_Model_Address extends FCom_Core_Model_Abstract
         }
     }
 
+    /**
+     * @param $address
+     * @param FCom_Customer_Model_Customer $customer
+     */
     public function newShipping($address, $customer)
     {
         $data = ['address' => $address];
         $this->import($data, $customer, 'shipping');
     }
 
+    /**
+     * @param $address
+     * @param FCom_Customer_Model_Customer $customer
+     */
     public function newBilling($address, $customer)
     {
         $data = ['address' => $address];
         $this->import($data, $customer, 'billing');
     }
 
+    /**
+     * @param $data
+     * @param FCom_Customer_Model_Customer $cust
+     * @param string $atype
+     * @return $this
+     * @throws BException
+     */
     public function import($data, $cust, $atype = 'billing')
     {
         $addr = $this->create(['customer_id' => $cust->id]);

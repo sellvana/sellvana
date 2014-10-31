@@ -13,11 +13,19 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
     protected static $_origClass;
     protected $_permission;
 
+    /**
+     * @param array $args
+     * @return bool
+     */
     public function authenticate($args = [])
     {
         return $this->FCom_Admin_Model_User->isLoggedIn();
     }
 
+    /**
+     * @param array $args
+     * @return bool
+     */
     public function authorize($args = [])
     {
         if (!parent::authorize($args)) {
@@ -59,6 +67,9 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         }
     }
 
+    /**
+     * @return bool
+     */
     public function beforeDispatch()
     {
         if (!parent::beforeDispatch()) return false;
@@ -68,6 +79,13 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         return true;
     }
 
+    /**
+     * @param $view
+     * @param null $model
+     * @param string $mode
+     * @param null $allowed
+     * @return $this
+     */
     public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
     {
         $r = $this->BRequest;
@@ -79,6 +97,13 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         return $this;
     }
 
+    /**
+     * @param $msg
+     * @param string $type
+     * @param string $tag
+     * @param array $options
+     * @return $this
+     */
     public function message($msg, $type = 'success', $tag = 'admin', $options = [])
     {
         if (is_array($msg)) {
@@ -90,6 +115,13 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         return $this;
     }
 
+    /**
+     * @param $view
+     * @param $model
+     * @param string $mode
+     * @param null $allowed
+     * @return $this
+     */
     public function initFormTabs($view, $model, $mode = 'view', $allowed = null)
     {
 
@@ -184,6 +216,10 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         return $this;
     }
 
+    /**
+     * @param $formView
+     * @return $this
+     */
     public function collectFormTabs($formView)
     {
         $views = $this->BLayout->findViewsRegex('#^' . $formView->get('tab_view_prefix') . '#');
@@ -208,6 +244,11 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         return $this;
     }
 
+    /**
+     * @param $view
+     * @param $model
+     * @param string $defMode
+     */
     public function outFormTabsJson($view, $model, $defMode = 'view')
     {
         $r = $this->BRequest;
@@ -243,6 +284,11 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         die;
     }
 
+    /**
+     * @param $class
+     * @param array $defData
+     * @throws BException
+     */
     protected function _processGridDataPost($class, $defData = [])
     {
         $r = $this->BRequest;
@@ -303,11 +349,17 @@ class FCom_Admin_Controller_Abstract extends FCom_Core_Controller_Abstract
         die;
     }
 
+    /**
+     * @param $args
+     */
     public function gridPostBefore($args)
     {
         $this->BEvents->fire(static::$_origClass . '::gridPostBefore', $args);
     }
 
+    /**
+     * @param $args
+     */
     public function gridPostAfter($args)
     {
         $this->BEvents->fire(static::$_origClass . '::gridPostAfter', $args);
