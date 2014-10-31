@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CatalogIndex_Admin_Controller_Fields
+ *
+ * @property FCom_CatalogIndex_Model_Field $FCom_CatalogIndex_Model_Field
+ */
 class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;

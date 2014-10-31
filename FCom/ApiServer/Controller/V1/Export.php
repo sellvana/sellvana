@@ -3,7 +3,11 @@
 /**
  * Created by pp
  *
+ * Class FCom_ApiServer_Controller_V1_Export
+ *
  * @project sellvana_core
+ *
+ * @property FCom_Core_ImportExport $FCom_Core_ImportExport
  */
 class FCom_ApiServer_Controller_V1_Export
     extends FCom_ApiServer_Controller_Abstract

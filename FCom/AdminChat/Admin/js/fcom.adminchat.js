@@ -372,7 +372,7 @@ define(['jquery', 'underscore', 'backbone', 'fcom.pushclient', 'exports', 'slims
 
     });
 
-    months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     //view for single chat line(item)
     ChatWindows.Views.Item = Backbone.View.extend({
         template: _.template($('#chatItemTempate').html()),

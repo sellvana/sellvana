@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Frontend_View_Breadcrumbs
+ *
+ * @property $crumbs_formatted
+ * @property $crumbs
+ * @property FCom_Core_Model_TreeAbstract $navNode
+ */
 class FCom_Frontend_View_Breadcrumbs extends BView
 {
     public function getCrumbs()

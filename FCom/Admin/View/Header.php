@@ -1,22 +1,44 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_View_Header
+ */
 class FCom_Admin_View_Header extends FCom_Core_View_Abstract
 {
+    /**
+     * @var array
+     */
     protected $_quickSearches = [];
+    /**
+     * @var array
+     */
     protected $_shortcuts = [];
 
+    /**
+     * @param string $name
+     * @param $config
+     * @return $this
+     */
     public function addQuickSearch($name, $config)
     {
         $this->_quickSearches[$name] = $config;
         return $this;
     }
 
+    /**
+     * @param string $name
+     * @param $config
+     * @return $this
+     */
     public function addShortcut($name, $config)
     {
         $this->_shortcuts[$name] = $config;
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function getNotifications()
     {
         $notifications = [];
@@ -49,11 +71,17 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
         return ['count' => sizeof($notifications), 'groups' => $result];
     }
 
+    /**
+     * @return array
+     */
     public function getRecentActivity()
     {
         return [];
     }
 
+    /**
+     * @return array
+     */
     public function getLocales()
     {
         $conf = $this->BConfig->get('modules/FCom_Admin');
@@ -75,6 +103,9 @@ class FCom_Admin_View_Header extends FCom_Core_View_Abstract
         return $locales;
     }
 
+    /**
+     * @return array
+     */
     public function getCurrentLocale()
     {
         $locale = $this->BSession->get('_locale');

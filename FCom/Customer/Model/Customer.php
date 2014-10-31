@@ -19,12 +19,17 @@
  * @property string $customer_group
  * @property string $status
  *
+ * other
+ * @property $session_cart_id
+ *
  * relations
  * @property FCom_Customer_Model_Address $default_billing
  * @property FCom_Customer_Model_Address $default_shipping
  *
  * DI
  * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
+ * @property FCom_Customer_Model_Address $FCom_Customer_Model_Address
+ * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
  */
 class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
 {
@@ -120,6 +125,11 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         ];
     }
 
+    /**
+     * @param $password
+     * @return $this
+     * @throws BException
+     */
     public function setPassword($password)
     {
         $token = $this->BUtil->randomString(16);
@@ -133,6 +143,10 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @return $this
+     * @throws BException
+     */
     public function recoverPassword()
     {
         $this->set(['token' => $this->BUtil->randomString(20), 'token_at' => $this->BDb->now()])->save();
@@ -140,6 +154,11 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param $token
+     * @return $this|bool
+     * @throws BException
+     */
     public function validateResetToken($token)
     {
         if (!$token) {
@@ -160,6 +179,11 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $user;
     }
 
+    /**
+     * @param $password
+     * @return $this
+     * @throws BException
+     */
     public function resetPassword($password)
     {
         $this->set(['token' => null, 'token_at' => null])->setPassword($password)->save();
@@ -188,6 +212,10 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         }
     }
 
+    /**
+     * @param $customers
+     * @return array
+     */
     public function prepareApiData($customers)
     {
         $result = [];
@@ -204,6 +232,10 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    /**
+     * @param $post
+     * @return array
+     */
     public function formatApiPost($post)
     {
         $data = [];
@@ -229,6 +261,10 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $data;
     }
 
+    /**
+     * @param array $objHashes
+     * @return array
+     */
     public function as_array(array $objHashes = [])
     {
         $data = parent::as_array();
@@ -236,6 +272,11 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $data;
     }
 
+    /**
+     * @param $data
+     * @param $args
+     * @return bool|string
+     */
     public function validatePasswordSecurity($data, $args)
     {
         if (!$this->BConfig->get('modules/FCom_Customer/password_strength')) {
@@ -248,6 +289,12 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return true;
     }
 
+    /**
+     * @param $password
+     * @param string $field
+     * @return bool
+     * @throws BException
+     */
     public function validatePassword($password, $field = 'password_hash')
     {
         $hash = $this->get($field);
@@ -262,6 +309,9 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return true;
     }
 
+    /**
+     * @return int
+     */
     public function sessionUserId()
     {
         return $this->BSession->get('customer_id');
@@ -297,6 +347,9 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return static::$_sessionUser;
     }
 
+    /**
+     * @return bool
+     */
     public function isLoggedIn()
     {
         return $this->sessionUserId() ? true : false;
@@ -429,6 +482,9 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    /**
+     * @return null|FCom_Customer_Model_Address
+     */
     public function getDefaultBillingAddress()
     {
         $addresses = $this->getAddresses();
@@ -440,6 +496,9 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return null;
     }
 
+    /**
+     * @return nul|FCom_Customer_Model_Address
+     */
     public function getDefaultShippingAddress()
     {
         $addresses = $this->getAddresses();
@@ -451,6 +510,10 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return null;
     }
 
+    /**
+     * @param bool $reset
+     * @return mixed
+     */
     public function getAddresses($reset = false)
     {
         if ($reset || !$this->_addresses) {
@@ -468,6 +531,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             $addressId = $address;
             $address = $addrHlp->load($addressId);
         }
+        /** @var FCom_Customer_Model_Address $address */
         if ($atype === 'billing' || $atype === true) {
             $address->set('is_default_billing', 1);
         }
@@ -534,6 +598,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
      */
     public function getOptionsData($labelIncId = false)
     {
+        /** @var FCom_Customer_Model_Customer[] $results */
         $results = $this->orm('p')->find_many();
         $data = [];
         if (count($results)) {

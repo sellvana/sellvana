@@ -1,10 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * Created by pp
- * @project fulleron
+ * Class FCom_CustomerGroups_Model_Group
+ *
+ * @property int $id
+ * @property string $title
+ * @property string $code
  */
-
 class FCom_CustomerGroups_Model_Group extends FCom_Core_Model_Abstract
 {
     protected static $_table = "fcom_customer_groups";
@@ -21,6 +23,7 @@ class FCom_CustomerGroups_Model_Group extends FCom_Core_Model_Abstract
      */
     public function groupsOptions()
     {
+        /** @var FCom_CustomerGroups_Model_Group[] $groupModels */
         $groupModels = $this->orm()->find_many();
         $groups = [];
         foreach ($groupModels as $model) {

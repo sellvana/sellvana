@@ -23,7 +23,7 @@
                         info[key]++;
                 }
             }
-            $('#cms-tree-form ul.nav-tabs').find('li a').each(function(index) {
+            $('#cms-tree-form').find('ul.nav-tabs').find('li a').each(function(index) {
                 var val = info[$(this).attr('href')];
 
                 if (typeof(val) !== 'undefined')
@@ -78,7 +78,7 @@
             }
         });
         elem.on('change', function () {
-            $('#cms-tree-form ul.nav-tabs').find('li.active').each(function () {
+            $('#cms-tree-form').find('ul.nav-tabs').find('li.active').each(function () {
                 if ($(this).children('a').find('i.icon-pencil').length === 0) {
                     if ($(this).children('a').children('i.error').length !== 0) {
                         $('<i class="icon-pencil"></i>').insertBefore($(this).children('a').children('i.error'));

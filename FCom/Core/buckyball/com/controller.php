@@ -1229,7 +1229,7 @@ class BResponse extends BClass
     public function header($header, $replace = true)
     {
         if (headers_sent($file, $line)) {
-            BDebug::notice("Can't send header: '" . print_r($header, 1) . "', output started in {$file}:{$line}");
+            $this->BDebug->notice("Can't send header: '" . print_r($header, 1) . "', output started in {$file}:{$line}");
             return $this;
         }
         if (is_string($header)) {
@@ -1536,10 +1536,10 @@ class BResponse extends BClass
     {
         // improve performance by not processing debug log
         if ($this->BDebug->is('DEBUG')) {
-            BDebug::mode('DEVELOPMENT');
+            $this->BDebug->mode('DEVELOPMENT');
         }
         // redundancy: avoid memory leakage from debug log
-        BDebug::level(BDebug::MEMORY, false);
+        $this->BDebug->level(BDebug::MEMORY, false);
         // turn off in-memory SQL log
         $this->BConfig->set('db/logging', 0);
         // remove process timeout limitation
@@ -1705,7 +1705,7 @@ class BRouting extends BClass
         if (empty($args['module_name'])) {
             $args['module_name'] = $this->BModuleRegistry->currentModuleName();
         }
-        BDebug::debug('ROUTE ' . $route);
+        $this->BDebug->debug('ROUTE ' . $route);
         if (empty($this->_routes[$route])) {
             $this->_routes[$route] = new BRouteNode(['route_name' => $route]);
         }
@@ -1722,11 +1722,11 @@ class BRouting extends BClass
     {
         if (null === $callback) {
             unset($this->_routes[$route]);
-            BDebug::debug('REMOVE ROUTE ' . $route);
+            $this->BDebug->debug('REMOVE ROUTE ' . $route);
         } else {
             if (!empty($this->_routes[$route])) {
                 $this->_routes[$route]->removeObserver($callback);
-                BDebug::debug('REMOVE ROUTE CALLBACK ' . $route . ' : ' . print_r($callback, 1));
+                $this->BDebug->debug('REMOVE ROUTE CALLBACK ' . $route . ' : ' . print_r($callback, 1));
             }
         }
         return $this;
@@ -1850,7 +1850,7 @@ class BRouting extends BClass
 
         // try first new route syntax, without method included
         if (!empty($this->_routes[$requestRoute]) && $this->_routes[$requestRoute]->validObserver()) {
-            BDebug::debug('DIRECT ROUTE: ' . $requestRoute);
+            $this->BDebug->debug('DIRECT ROUTE: ' . $requestRoute);
             return $this->_routes[$requestRoute];
         }
 
@@ -1859,11 +1859,11 @@ class BRouting extends BClass
         }
 
         if (!empty($this->_routes[$requestRoute]) && $this->_routes[$requestRoute]->validObserver()) {
-            BDebug::debug('DIRECT ROUTE: ' . $requestRoute);
+            $this->BDebug->debug('DIRECT ROUTE: ' . $requestRoute);
             return $this->_routes[$requestRoute];
         }
 
-        BDebug::debug('FIND ROUTE: ' . $requestRoute);
+        $this->BDebug->debug('FIND ROUTE: ' . $requestRoute);
         foreach ($this->_routes as $routeName => $route) {
             if ($route->match($requestRoute)) {
                 return $route;
@@ -1976,7 +1976,7 @@ class BRouting extends BClass
 
         if ($attempts >= 100) {
             echo "<pre>"; print_r($route); echo "</pre>";
-            BDebug::error($this->BLocale->_('BFrontController: Reached 100 route iterations: %s', print_r($route, 1)));
+            $this->BDebug->error($this->BLocale->_('BFrontController: Reached 100 route iterations: %s', print_r($route, 1)));
         }
     }
 
@@ -2195,7 +2195,7 @@ class BRouteNode extends BClass
             }
         }
         if ($attempts >= 100) {
-            BDebug::error($this->BLocale->_('BRouteNode: Reached 100 route iterations: %s', print_r($observer, 1)));
+            $this->BDebug->error($this->BLocale->_('BRouteNode: Reached 100 route iterations: %s', print_r($observer, 1)));
         }
         return false;
     }
@@ -2395,7 +2395,7 @@ class BActionController extends BClass
             try {
                 call_user_func($actionName);
             } catch (Exception $e) {
-                BDebug::exceptionHandler($e);
+                $this->BDebug->exceptionHandler($e);
                 $this->sendError($e->getMessage());
             }
             return $this;
@@ -2422,7 +2422,7 @@ class BActionController extends BClass
         // try {
             $this->{$actionMethod}($args);
         // } catch (Exception $e) {
-            //BDebug::exceptionHandler($e);
+            //$this->BDebug->exceptionHandler($e);
             // $this->sendError($e->getMessage());
         // }
         return $this;
@@ -2452,24 +2452,26 @@ class BActionController extends BClass
     }
 
     /**
-    * Authenticate logic for current action controller, based on arguments
-    *
-    * Use $this->_action to fetch current action
-    *
-    * @param array $args
-    */
+     * Authenticate logic for current action controller, based on arguments
+     *
+     * Use $this->_action to fetch current action
+     *
+     * @param array $args
+     * @return bool
+     */
     public function authenticate($args = [])
     {
         return true;
     }
 
     /**
-    * Authorize logic for current action controller, based on arguments
-    *
-    * Use $this->_action to fetch current action
-    *
-    * @param array $args
-    */
+     * Authorize logic for current action controller, based on arguments
+     *
+     * Use $this->_action to fetch current action
+     *
+     * @param array $args
+     * @return bool
+     */
     public function authorize($args = [])
     {
         return true;
@@ -2606,12 +2608,13 @@ class BActionController extends BClass
     }
 
     /**
-    * Translate string within controller action
-    *
-    * @param string $string
-    * @param array $params
-    * @param string $module if null, try to get current controller module
-    */
+     * Translate string within controller action
+     *
+     * @param string $string
+     * @param array $params
+     * @param string $module if null, try to get current controller module
+     * @return false|string
+     */
     public function _($string, $params = [], $module = null)
     {
         if (empty($module)) {
