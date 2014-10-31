@@ -1,4 +1,17 @@
 <!--{ label: Reviews }-->
 <!--{ pos: 10 }-->
+{% set m = THIS.get('model') %}
+{% set promo = APP.instance('FCom_Promo_Model_Promo') %}
+{% set validator = THIS.get('validator') %}
+
+{% import THIS.view('core/form-elements').twigName() as forms %}
+
+{% if APP.m('FCom_CustomerGroups').run_status == 'LOADED' %}
+    {% set customerGroups = APP.instance('FCom_CustomerGroups_Model_Group').groupsOptions() %}
+{% endif %}
+
+{% if APP.m('FCom_MultiSite').run_status == 'LOADED' %}
+    {% set sites = APP.instance('FCom_MultiSite_Model_Site').siteOptions() %}
+{% endif %}
 
 Main
