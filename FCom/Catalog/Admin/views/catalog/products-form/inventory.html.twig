@@ -1,0 +1,83 @@
+{% set m = THIS.get('model') %}
+{% set prodStock = APP.instance('FCom_Catalog_Admin_Controller_Inventory') %}
+{% set stockPolicy = prodStock.productStockPolicy(m) %}
+{% set stock = APP.instance('FCom_Catalog_Model_InventorySku') %}
+
+<fieldset name="main-product">
+    <div class="f-section">
+        <h4>{{ "Stock Control Policy"|_ }}</h4>
+        <hr/>
+        <div class="form-group ">
+            <label class="control-label col-md-2" for="stock_policy-manage_stock" style="text-align: left">{{ "Stock Management"|_ }}</label>
+            <div class="col-md-5">
+                <select id="stock_policy-manage_stock" name="stock_policy[manage_stock]" class="form-control">
+                    {{ UTIL.optionsHtml(stock.manageStockOptions(), stockPolicy.manage_stock) | raw }}
+                </select>
+            </div>
+        </div>
+        <div class="form-group ">
+            <label class="control-label col-md-2" for="stock_policy-stock_qty" style="text-align: left">{{ "Quantity"|_ }}</label>
+            <div class="col-md-2">
+                <input type="text" id="model-qty" name="stock_policy[stock_qty]" class="form-control input-stock" data-rule-number="true" value="{{ stockPolicy.stock_qty }}">
+            </div>
+        </div>
+        <div class="form-group ">
+            <label class="control-label col-md-2" style="text-align: left" for="stock_policy-out_stock">{{ "When Out of Stock"|_ }}</label>
+            <div class="col-md-3">
+                <select id="stock_policy-out_stock" name="stock_policy[out_stock]" class="form-control">
+                    {{ UTIL.optionsHtml(stock.outStockOptions(), stockPolicy.out_stock) | raw }}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-link btn-custom restore-stock-policy" data-name="out_stock" type="button">
+                    {{ "Restore to default"|_ }}
+                </button>
+            </div>
+        </div>
+        <hr/>
+        <div class="form-group ">
+            <label class="text-left control-label col-md-4"  style="text-align: left" for="stock_policy-maximum_quantity_shopping">{{ "Maximum quantity allowed in shopping cart"|_ }}</label>
+            <div class="col-md-2">
+                <input type="text" value="{{ stockPolicy.maximum_quantity_shopping }}" id="stock_policy-maximum_quantity_shopping" name="stock_policy[maximum_quantity_shopping]" class="form-control input-stock" data-rule-number="true">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-link btn-custom restore-stock-policy" data-name="maximum_quantity_shopping" type="button">
+                    {{ "Restore to default"|_ }}
+                </button>
+            </div>
+        </div>
+        <div class="form-group ">
+            <label class="text-left control-label col-md-4"  style="text-align: left" for="stock_policy-quantity_items_status">{{ "Quantity for item's status to become out of come"|_ }}</label>
+            <div class="col-md-2">
+                <input type="text" id="stock_policy-quantity_items_status" value="{{ stockPolicy.quantity_items_status }}" name="stock_policy[quantity_items_status]" class="form-control input-stock" data-rule-number="true">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-link btn-custom restore-stock-policy" data-name="quantity_items_status" type="button">
+                    {{ "Restore to default"|_ }}
+                </button>
+            </div>
+        </div>
+        <div class="form-group ">
+            <label class="text-left control-label col-md-4" style="text-align: left" for="stock_policy-notify_administrator_quantity">{{ "Notify administrator for quantity below"|_ }}</label>
+            <div class="col-md-2">
+                <input type="text" id="stock_policy-notify_administrator_quantity" value="{{ stockPolicy.notify_administrator_quantity }}" name="stock_policy[notify_administrator_quantity]" class="form-control input-stock" data-rule-number="true">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-link btn-custom restore-stock-policy" data-name="notify_administrator_quantity" type="button">
+                    {{ "Restore to default"|_ }}
+                </button>
+            </div>
+        </div>
+    </div>
+</fieldset>
+<script>
+    require(['jquery', 'jquery.validate', 'fcom.validate.ext'], function($) {
+        $('.restore-stock-policy').click(function() {
+            var name = $(this).attr('data-name');
+            var data = {restore: name};
+            $.post('{{ APP.href('stock/restore_stock_policy') }}', data, function(res) {
+               $('#stock_policy-' + name).val(res.result);
+            });
+        });
+    });
+</script>
