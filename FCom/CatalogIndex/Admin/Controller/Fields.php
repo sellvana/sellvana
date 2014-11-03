@@ -35,7 +35,7 @@ class FCom_CatalogIndex_Admin_Controller_Fields extends FCom_Admin_Controller_Ab
             ['type' => 'input', 'name' => 'filter_type', 'label' => 'Facet', 'index' => 'idxf.filter_type', 'width' => 80,
                 'editable' => true, 'addable' => true, 'editor' => 'select', 'options' => $fieldHlp->fieldOptions('filter_type')],
             ['type' => 'input', 'name' => 'filter_multivalue', 'label' => 'Multi Value', 'index' => 'idxf.filter_multivalue',
-                'width' => 80, 'addable' => true, 'editable' => true, 'mass-editable' => true, 'editor' => 'select',
+                'width' => 80, 'addable' => true, 'editable' => true, 'multirow_edit' => true, 'editor' => 'select',
                 'options' => $fieldHlp->fieldOptions('filter_multivalue')],
             ['type' => 'input', 'name' => 'filter_counts', 'label' => 'Calc Counts', 'index' => 'idxf.filter_counts',
                 'width' => 80, 'addable' => true, 'editable' => true, 'editor' => 'select',

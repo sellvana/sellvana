@@ -1,85 +1,43 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_GridForm
+/**
+ * Class FCom_Catalog_Admin_Controller_Inventory
+ *
+ * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
+ */
+class FCom_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
-    protected $_permission = 'catalog/stocks';
-    protected $_modelClass = 'FCom_Stock_Model_Sku';
-    protected $_gridHref = 'stock';
-    protected $_gridTitle = 'Stock Management';
-    protected $_recordName = 'SKU';
+    protected $_permission = 'catalog/inventory';
+    protected $_modelClass = 'FCom_Catalog_Model_InventorySku';
+    protected $_gridHref = 'catalog/inventory';
+    protected $_gridTitle = 'Inventory Management';
+    protected $_recordName = 'Inventory SKU';
     protected $_mainTableAlias = 's';
-    protected $_navPath = 'catalog/stock';
+    protected $_navPath = 'catalog/inventory';
 
     public function gridConfig()
     {
         $config = parent::gridConfig();
-        unset($config['form_url']);
-        $data = [];
-        $config['edit_url'] = $this->BApp->href($this->_gridHref . '/grid_data');
-        $config['edit_url_required'] = true;
-        $callback = function ($row) use (&$data) {
-            $data_serialized = $this->BUtil->objectToArray(json_decode($row->get('data_serialized')));
-            $qty = '';
-            //$tmp_cost use when edit inline
-            //@TODO: find solution other when edit inline cost only display number instead include symbol currency
-            $cost = $tmp_cost = '';
-            if ($row->get('cost')) {
-                $tmp_cost = $row->get('cost');
-                $cost = $this->BLocale->currency($tmp_cost);
-            }
-            $out_stock = (isset($settings['out_stock']))? 'back_order': '';
-            if (isset($data_serialized['stock_policy'])) {
-                $qty = (isset($data_serialized['stock_policy']['stock_qty']))? $data_serialized['stock_policy']['stock_qty'] : '';
-                $out_stock = (isset($data_serialized['stock_policy']['out_stock'])) ? $data_serialized['stock_policy']['out_stock']: '';
-            }
-            $tmp = [
-                'id' => $row->get('id'),
-                'sku' => $row->get('sku'),
-                'cost' => $cost,
-                'tmp_cost' => $tmp_cost,
-                'product_name' => $row->get('product_name'),
-                'status' => $row->get('status'),
-                'stock_qty' => $qty,
-                'out_stock' => $out_stock,
-            ];
-            array_push($data, $tmp);
-        };
-        $this->FCom_Stock_Model_Sku->orm($this->_mainTableAlias)->select(array($this->_mainTableAlias.'.*', 'p.data_serialized', 'p.cost', 'p.product_name'))
-            ->left_outer_join('FCom_Catalog_Model_Product', [ 'p.product_sku', '=', $this->_mainTableAlias . '.sku'], 'p')
-            ->select_expr('p.product_name', 'product_name')
-            ->select_expr('p.cost', 'cost')->iterate($callback);
         $config['columns'] = [
             ['type' => 'row_select'],
             ['name' => 'id', 'label' => 'ID', 'width' => 50, 'index' => 's.id'],
-            ['type' => 'input', 'name' => 'sku', 'label' => 'SKU', 'width' => 300, 'index' => $this->_mainTableAlias.'.sku',
+            ['type' => 'input', 'name' => 'inventory_sku', 'label' => 'SKU', 'width' => 300,
                     'editable' => true, 'addable' => true, 'editor' => 'text',
-                    'validation' => ['required' => true, 'unique' => $this->BApp->href('stock/unique')]
+                    'validation' => ['required' => true, 'unique' => $this->BApp->href('catalog/inventory/unique')]
             ],
             ['name' => 'product_name', 'label' => 'Product Name', 'width' => 300],
-            ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'width' => 150,
-                'index' => $this->_mainTableAlias.'.status', 'editable' => true, 'addable' => true, 'edit_inline' => true,
-                'multirow_edit_show' => true, 'multirow_edit' => true,
-                'editor' => 'select', 'options' => $this->FCom_Stock_Model_Sku->statusOptions() ],
-            ['type' => 'input', 'name' => 'out_stock', 'label' => 'Out of Stock Policy', 'width' => 150,
-                'multirow_edit_show' => true, 'multirow_edit' => true,
-                'editable' => true, 'addable' => true, 'edit_inline' => true, 'editor' => 'select', 'options' => $this->FCom_Stock_Model_Sku->outStockOptions()],
             ['type' => 'input', 'name' => 'cost', 'label' => 'Cost', 'width' => 300,
                 'editable' => true, 'addable' => true, 'edit_inline' => true,'editor' => 'text', 'validation' => ['number' => true]],
             ['type' => 'input', 'name' => 'stock_qty', 'label' => 'Quantity', 'width' => 150,
                 'editable' => true, 'addable' => true, 'edit_inline' => true,
                 'editor' => 'text', 'validation' => ['required' => true, 'number' => true]],
-            ['type' => 'btn_group',
-                  'buttons' => [
-                                    ['name' => 'edit', 'icon' => 'icon-pencil ', 'cssClass' => 'btn-xs btn-edit-inline'],
-                                    ['name' => 'save-inline', 'icon' => ' icon-ok-sign', 'cssClass' => 'btn-xs btn-save-inline hide'],
-                                    ['name' => 'delete'],
-                                ]
-                ]
+            ['type' => 'btn_group', 'buttons' => [
+                ['name' => 'edit', 'icon' => 'icon-pencil ', 'cssClass' => 'btn-xs btn-edit-inline'],
+                ['name' => 'save-inline', 'icon' => ' icon-ok-sign', 'cssClass' => 'btn-xs btn-save-inline hide'],
+                ['name' => 'delete'],
+            ]],
         ];
-        $config['data_mode'] = 'local';
-        $config['local_personalize'] = true;
-        $config['data'] = $data;
         $config['actions'] = [
             'edit' => true,
             'delete' => true
@@ -107,11 +65,10 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
             });
         ';
         $config['filters'] = [
-            ['field' => 'sku', 'type' => 'text'],
+            ['field' => 'inventory_sku', 'type' => 'text'],
             ['field' => 'product_name', 'type' => 'text'],
-            ['field' => 'status', 'type' => 'multiselect'],
-            ['field' => 'out_stock', 'type' => 'multiselect'],
-            ['field' => 'stock_qty', 'type' => 'number-range'],
+            ['field' => 'is_salable', 'type' => 'multiselect'],
+            ['field' => 'qty_in_stock', 'type' => 'number-range'],
         ];
         $config['grid_before_create'] = 'stockGridRegister';
         $config['new_button'] = '#add_new_sku';
@@ -198,7 +155,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
                 unset($p['oper']);
                 if (isset($p['sku'])) {
                     $prod = $this->FCom_Catalog_Model_Product->load($p['sku'], 'product_sku');
-                    $this->FCom_Stock_Model_Sku->load($p['id'])->set('status', $p['status'])->save();
+                    $this->FCom_Catalog_Model_InventorySku->load($p['id'])->set('status', $p['status'])->save();
                     if ($prod) {
                         $data_serialized = $this->BUtil->objectToArray(json_decode($prod->get('data_serialized')));
                         if (!isset($data_serialized['stock_policy']))  {
@@ -222,7 +179,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
                 $id = $p['id'];
                 $args['ids'] = explode(',', $id);
                 $data = $p;
-                $hlp = $this->FCom_Stock_Model_Sku;
+                $hlp = $this->FCom_Catalog_Model_InventorySku;
                 $models = $hlp->orm()->where_in('id', $args['ids'])->find_many_assoc();
                 $skus = $this->BUtil->arrayToOptions($models, 'sku');
                 $products = $this->FCom_Catalog_Model_Product->orm()->where_in('product_sku', $skus)->find_many_assoc('product_sku');

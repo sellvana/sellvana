@@ -54,7 +54,7 @@ class FCom_Sales_Migrate extends BClass
                 'cart' => ['order_id', $tOrder],
             ],
         ]);
-
+        /*
         $tOrderAddress = $this->FCom_Sales_Model_Order_Address->table();
         $this->BDb->ddlTableDef($tOrderAddress, [
             'COLUMNS' => [
@@ -87,7 +87,7 @@ class FCom_Sales_Migrate extends BClass
                 'cart' => ['order_id', $tOrder],
             ],
         ]);
-
+        */
         /*
         $tStatus = $this->FCom_Sales_Model_Order_CustomStatus->table();
         $this->BDb->ddlTableDef($tStatus, [
@@ -105,7 +105,7 @@ class FCom_Sales_Migrate extends BClass
 
         $tCart = $this->FCom_Sales_Model_Cart->table();
         $tCartItem = $this->FCom_Sales_Model_Cart_Item->table();
-        $tCartAddress = $this->FCom_Sales_Model_Cart_Address->table();
+        //$tCartAddress = $this->FCom_Sales_Model_Cart_Address->table();
 
         $this->BDb->ddlTableDef($tCart, [
             'COLUMNS' => [
@@ -171,7 +171,7 @@ class FCom_Sales_Migrate extends BClass
                 'cart' => ['cart_id', $tCart],
             ],
         ]);
-
+        /*
         $this->BDb->ddlTableDef($tCartAddress, [
             'COLUMNS' => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
@@ -204,6 +204,7 @@ class FCom_Sales_Migrate extends BClass
                 'cart' => ['cart_id', $tCart],
             ],
         ]);
+        */
         $tOrderPayment = $this->FCom_Sales_Model_Order_Payment->table();
         $this->BDb->ddlTableDef($tOrderPayment, [
             'COLUMNS' => [
@@ -317,12 +318,14 @@ class FCom_Sales_Migrate extends BClass
 
     public function upgrade__0_1_9__0_1_10()
     {
+        /*
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Order_Address->table(), [
             'COLUMNS' => [
                 'state' => 'RENAME region varchar(50)',
                 'zip' => 'RENAME postcode varchar(20)',
             ],
         ]);
+        */
     }
 
     public function upgrade__0_1_10__0_2_0()
@@ -330,7 +333,7 @@ class FCom_Sales_Migrate extends BClass
 
         $tCart = $this->FCom_Sales_Model_Cart->table();
         $tCartItem = $this->FCom_Sales_Model_Cart_Item->table();
-        $tCartAddress = $this->FCom_Sales_Model_Cart_Address->table();
+        //$tCartAddress = $this->FCom_Sales_Model_Cart_Address->table();
 
         $this->BDb->ddlTableDef($tCart, [
             'COLUMNS' => [
@@ -389,7 +392,7 @@ class FCom_Sales_Migrate extends BClass
                 'cart' => ['cart_id', $tCart],
             ],
         ]);
-
+        /*
         $this->BDb->ddlTableDef($tCartAddress, [
             'COLUMNS' => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
@@ -418,6 +421,7 @@ class FCom_Sales_Migrate extends BClass
                 'cart' => ['cart_id', $tCart],
             ],
         ]);
+        */
     }
 
     public function upgrade__0_2_0__0_2_1()
@@ -462,12 +466,14 @@ class FCom_Sales_Migrate extends BClass
                 'data_serialized' => 'text after update_dt',
             ],
         ]);
+        /*
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Cart_Address->table(), [
             'COLUMNS' => [
                 'state' => 'RENAME region varchar(50)',
                 'zip' => 'RENAME postcode varchar(20)',
             ],
         ]);
+        */
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Order->table(), [
             'COLUMNS' => [
                 'user_id' => 'RENAME customer_id int unsigned null',
@@ -490,6 +496,7 @@ class FCom_Sales_Migrate extends BClass
 
     public function upgrade__0_2_2__0_2_3()
     {
+        /*
         if (!$this->BDb->ddlTableExists('fcom_sales_order_address')) {
             $this->BDb->run("
                 RENAME TABLE fcom_sales_address TO fcom_sales_order_address;
@@ -503,17 +510,19 @@ class FCom_Sales_Migrate extends BClass
                 'company' => 'VARCHAR(50) NULL AFTER suffix',
             ],
         ]);
-        $this->BDb->ddlTableDef($this->FCom_Sales_Model_Order->table(), [
-            'COLUMNS' => [
-                'customer_email' => 'VARCHAR(100) NULL AFTER customer_id',
-            ],
-        ]);
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Order_Address->table(), [
             'COLUMNS' => [
                 'middle_initial' => 'VARCHAR(2) NULL AFTER lastname',
                 'prefix' => 'VARCHAR(10) NULL AFTER middle_initial',
                 'suffix' => 'VARCHAR(10) NULL AFTER prefix',
                 'company' => 'VARCHAR(50) NULL AFTER suffix',
+            ],
+        ]);
+
+        */
+        $this->BDb->ddlTableDef($this->FCom_Sales_Model_Order->table(), [
+            'COLUMNS' => [
+                'customer_email' => 'VARCHAR(100) NULL AFTER customer_id',
             ],
         ]);
     }
@@ -541,8 +550,8 @@ class FCom_Sales_Migrate extends BClass
     public function upgrade__0_2_4__0_2_5()
     {
         foreach ([$this->FCom_Sales_Model_Cart_Item->table(),
-           $this->FCom_Sales_Model_Cart_Address->table(),
-           $this->FCom_Sales_Model_Order_Address->table(),
+           //$this->FCom_Sales_Model_Cart_Address->table(),
+           //$this->FCom_Sales_Model_Order_Address->table(),
         ] as $table) {
             $this->BDb->ddlTableDef($table, [
                 'COLUMNS' => [
@@ -1013,7 +1022,7 @@ class FCom_Sales_Migrate extends BClass
             ],
             'PRIMARY' => '(id)',
         ]);
-
+        /*
         $tCartAddress = $this->FCom_Sales_Migrate_Model_Cart_Address->table();
         if ($this->BDb->ddlTableExists($tCartAddress)) {
             $addresses = $this->FCom_Sales_Migrate_Model_Cart_Address->orm()->find_many();
@@ -1057,6 +1066,7 @@ class FCom_Sales_Migrate extends BClass
             }
             $this->BDb->ddlDropTable($tOrderAddress);
         }
+        */
 
         $this->BDb->ddlDropTable($this->BDb->t('fcom_sales_order_status'));
     }

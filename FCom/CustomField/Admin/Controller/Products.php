@@ -76,7 +76,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $f['name'] = $f['field_code'];
                 $f['field_id'] = $f['id'];
                 $f['addable'] = true;
-                $f['mass-editable'] = true;
+                $f['multirow_edit'] = true;
                 $f['width'] = 200;
                 $f['position'] = $pos++;
                 $f['validation'] = ['required' => true];

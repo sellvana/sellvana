@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_ProductReviews_Migrate
+ *
+ * @property FCom_ProductReviews_Model_ReviewFlag $FCom_ProductReviews_Model_ReviewFlag
+ * @property FCom_ProductReviews_Model_Review $FCom_ProductReviews_Model_Review
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ */
 class FCom_ProductReviews_Migrate extends BClass
 {
     public function upgrade__0_1_5__0_2_0()
