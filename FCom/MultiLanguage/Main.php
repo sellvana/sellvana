@@ -1,10 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * Created by pp
- * @project fulleron
+ * Class FCom_MultiLanguage_Main
+ *
+ * @property FCom_MultiLanguage_Model_Translation $FCom_MultiLanguage_Model_Translation
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
  */
-
 class FCom_MultiLanguage_Main extends BClass
 {
     const ENTITY_TYPE_CATEGORY = 'category';
@@ -31,25 +32,47 @@ class FCom_MultiLanguage_Main extends BClass
         return $this->BRequest->request("lang");
     }
 
+    /**
+     * @param $args
+     * @return bool
+     */
     public function productCollectionLoadLocale($args)
     {
         return $this->modelCollectionLoadLocale($args, static::ENTITY_TYPE_PRODUCT);
     }
 
+    /**
+     * @param $args
+     * @return bool
+     */
     public function productLoadLocale($args)
     {
         return $this->modelLoadLocale($args, static::ENTITY_TYPE_PRODUCT);
     }
 
+    /**
+     * @param $args
+     * @return bool
+     */
     public function categoryLoadLocale($args)
     {
         return $this->modelLoadLocale($args, static::ENTITY_TYPE_CATEGORY);
     }
 
+    /**
+     * @param $args
+     * @return bool
+     */
     public function categoryCollectionLoadLocale($args) {
         return $this->modelCollectionLoadLocale($args, static::ENTITY_TYPE_CATEGORY);
     }
 
+    /**
+     * @param $args
+     * @param $entityType
+     * @return bool
+     * @throws BException
+     */
     public function modelLoadLocale($args, $entityType)
     {
         $lang = $this->getLanguage();
@@ -70,6 +93,12 @@ class FCom_MultiLanguage_Main extends BClass
         return true;
     }
 
+    /**
+     * @param $args
+     * @param $entityType
+     * @return bool
+     * @throws BException
+     */
     public function modelCollectionLoadLocale($args, $entityType) {
         $lang = $this->getLanguage();
         if (!$lang || count($args['result']) == 0) {
