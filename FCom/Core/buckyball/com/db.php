@@ -2145,7 +2145,7 @@ class BModel extends Model
      * @param mixed $value
      * @param mixed $flag if true or 'ADD', add to existing value; if null or 'IFNULL', update only if currently not set
      * @throws BException
-     * @return $this
+     * @return static
      */
     public function set($key, $value = null, $flag = false)
     {
@@ -2182,7 +2182,7 @@ class BModel extends Model
      *
      * @param string $key
      * @param int    $increment
-     * @return $this
+     * @return static
      */
     public function add($key, $increment = 1)
     {
@@ -2194,7 +2194,7 @@ class BModel extends Model
     *
     * @param null|array $data
     * @param boolean $new is new record
-    * @return $this
+    * @return static
     */
     public static function create($data = null, $new = true)
     {
@@ -2240,7 +2240,7 @@ class BModel extends Model
     * @param int|string|array $id
     * @param string $field
     * @param boolean $cache
-    * @return $this
+    * @return static
     * @throws BException
     */
     public function load($id, $field = null, $cache = false)

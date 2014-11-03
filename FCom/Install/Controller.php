@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Install_Controller
+ *
+ * @property FCom_MarketClient_RemoteApi $FCom_MarketClient_RemoteApi
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ */
 class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 {
     public function beforeDispatch()

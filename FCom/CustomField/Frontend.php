@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CustomField_Frontend
+ *
+ * @property FCom_CustomField_Model_ProductVariant $FCom_CustomField_Model_ProductVariant
+ */
 class FCom_CustomField_Frontend extends BClass
 {
     public function onCheckoutCartAddValidate($args)
@@ -13,6 +18,7 @@ class FCom_CustomField_Frontend extends BClass
         ];
         if ($p->getData('variants_fields')) {
             $varValues = $args['post']['variant_select'];
+            /** @var FCom_CustomField_Model_ProductVariant $variant */
             $variant = $this->FCom_CustomField_Model_ProductVariant->findByProductFieldValues($p, $varValues);
 
             if ($this->FCom_CustomField_Model_ProductVariant->checkEmptyVariant($args['post']['id'])) {

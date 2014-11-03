@@ -2,6 +2,10 @@
 
 class FCom_Disqus_Frontend extends BClass
 {
+    /**
+     * @param array $d
+     * @return bool
+     */
     public function isLayoutEnabled($d)
     {
         $config = $this->BConfig->get('modules/FCom_Disqus');

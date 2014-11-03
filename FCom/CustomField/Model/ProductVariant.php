@@ -1,11 +1,19 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * @property string  field_values    (field1=value1&field2=value2&field3=value3)
- * @property string  variant_sku     (PROD_VAL1_VAL2_VAL3)
- * @property decimal variant_price
- * @property text    data_serialized
- *   -
+ * Class FCom_CustomField_Model_ProductVariant
+ *
+ * @property int $id
+ * @property int $product_id
+ * @property string $field_values (field1=value1&field2=value2&field3=value3)
+ * @property string $variant_sku (PROD_VAL1_VAL2_VAL3)
+ * @property float $variant_price
+ * @property string $data_serialized
+ * @property int $variant_qty
+ *
+ * DI
+ * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  */
 class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
 {
@@ -16,6 +24,10 @@ class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
         'unique_key' => ['product_id', 'field_values'],  
     ];
 
+    /**
+     * @param FCom_Catalog_Model_Product $product
+     * @return array
+     */
     public function fetchProductVariantsData($product)
     {
         $fields = $product->getData('variants_fields');
@@ -28,6 +40,7 @@ class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
             $m = $fieldModels[$f['id']];
             $fields[$k]['frontend_label'] = $m->get('frontend_label') ? $m->get('frontend_label') : $m->get('name');
         }
+        /** @var FCom_CustomField_Model_ProductVariant[] $varModels */
         $varModels = $this->orm()->where('product_id', $product->id())->find_many();
         $variants = [];
         $fieldValues = [];
@@ -57,6 +70,12 @@ class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
         return ['fields' => $fields, 'variants' => $variants, 'variants_tree' => $varTree];
     }
 
+    /**
+     * @param array $fields
+     * @param array $variants
+     * @param array $path
+     * @return array
+     */
     protected function _buildVariantTree($fields, $variants, $path = [])
     {
         $field = array_shift($fields);
@@ -87,6 +106,12 @@ class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
         return $children;
     }
 
+    /**
+     * @param FCom_Catalog_Model_Product $product
+     * @param array $fieldValues
+     * @return BModel
+     * @throws BException
+     */
     public function findByProductFieldValues($product, $fieldValues)
     {
         if (is_numeric($product)) {

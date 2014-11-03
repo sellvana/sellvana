@@ -266,6 +266,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
     public function action_fieldset_modal_add_grid_data()
     {
+        /** @var FCom_Core_View_BackboneGrid $view */
         $view = $this->view('core/backbonegrid');
         $orm = $this->FCom_CustomField_Model_Field->orm()->select('*');
         $data = $view->processORM($orm, __METHOD__);
@@ -277,6 +278,7 @@ class FCom_CustomField_Admin_Controller_FieldSets extends FCom_Admin_Controller_
 
     public function action_field_grid_data()
     {
+        /** @var FCom_Core_View_BackboneGrid $view */
         $view = $this->view('core/backbonegrid');
         $view->set('grid', $this->fieldsGridConfig());
         $data = $view->generateOutputData();

@@ -33,11 +33,19 @@ class FCom_Frontend_Main extends BClass
         return $this->_layout;
     }
 
+    /**
+     * @param string $url
+     * @return string
+     */
     public function adminHref($url = '')
     {
         return $this->BApp->adminHref($url);
     }
 
+    /**
+     * @param string $url
+     * @return string
+     */
     public function href($url = '')
     {
         return $this->BApp->frontendHref($url);
