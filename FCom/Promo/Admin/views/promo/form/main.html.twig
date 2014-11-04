@@ -56,13 +56,6 @@
                 );
             });
         </script>
-        <script type="text/javascript">
-            require(['react', 'FCom/Promo/Admin/js/components/build/daterangepicker', 'daterangepicker'], function(React, DateRangePicker){
-                var startDate = new Date();
-                var s = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate();
-                React.render(React.createElement(DateRangePicker, {format: 'YYYY-MM-DD', startDate: s}), document.getElementById('testbed'));
-            });
-        </script>
         {{ forms.select({
             label: 'Coupon Code Enter For Validity'|_,
             name: "model[use_coupon]",
