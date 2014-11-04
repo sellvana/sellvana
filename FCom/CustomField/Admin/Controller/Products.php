@@ -76,7 +76,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 $f['name'] = $f['field_code'];
                 $f['field_id'] = $f['id'];
                 $f['addable'] = true;
-                $f['mass-editable'] = true;
+                $f['multirow_edit'] = true;
                 $f['width'] = 200;
                 $f['position'] = $pos++;
                 $f['validation'] = ['required' => true];
@@ -195,30 +195,6 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         ];
 
         return $config;
-    }
-
-    public function onProductsFormViewBefore()
-    {
-        $id = $this->BRequest->param('id', true);
-        $p = $this->view('admin/form')->get('model');
-        #$p = $this->FCom_Catalog_Model_Product->load($id);
-
-        if (!$p) {
-            return;//$p = $this->FCom_Catalog_Model_Product->create();
-        }
-
-        $fieldsOptions = [];
-        $fields = $this->FCom_CustomField_Model_ProductField->productFields($p);
-        if ($fields) {
-            $fieldIds = $this->BUtil->arrayToOptions($fields, 'id');
-            $fieldOptionsAll = $this->FCom_CustomField_Model_FieldOption->orm()->where_in("field_id", $fieldIds)
-                ->order_by_asc('field_id')->order_by_asc('label')->find_many();
-            foreach ($fieldOptionsAll as $option) {
-                $fieldsOptions[$option->get('field_id')][] = $option;
-            }
-        }
-        $view = $this->view('customfields/products/fields-partial');
-        $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fieldsOptions);
     }
 
     public function action_field_remove()

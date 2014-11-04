@@ -107,7 +107,7 @@ class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller
         }
 
         $cart->importAddressFromArray($r, $addressType);
-        if (!empty($r['same_address']) {
+        if (!empty($r['same_address'])) {
             $cart->importAddressFromArray($r, $addressType2);
         }
 

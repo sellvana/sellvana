@@ -1,6 +1,6 @@
 modules:
     FCom_Catalog:
-        version: 0.3.0
+        version: 0.3.1
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_LibJsCkeditor: 0.1.0 } }
         categories: [ Catalog, Products ]
@@ -26,6 +26,8 @@ modules:
 
                     - [ /catalog/searchalias, FCom_Catalog_Admin_Controller_SearchAlias.index ]
                     - [ /catalog/searchalias/.action, FCom_Catalog_Admin_Controller_SearchAlias ]
+
+                    - [ "/catalog/inventory/?.action", FCom_Catalog_Admin_Controller_Inventory ]
                 observe:
                     - [ FCom_Admin_Controller_HeaderSearch::action_index, FCom_Catalog_Admin_Controller_Products.onHeaderSearch ]
                     - [ FCom_Admin_Controller::action_generate_sitemap, FCom_Catalog_Admin_Controller_Products.onGenerateSiteMap ]

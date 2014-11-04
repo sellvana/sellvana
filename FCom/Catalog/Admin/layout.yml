@@ -4,6 +4,7 @@ base:
             - [ addNav, catalog, { label: Catalog, pos: 200, icon_class: icon-barcode } ]
             - [ addNav, catalog/categories, { label: Navigation, href: /catalog/categories } ]
             - [ addNav, catalog/products, { label: Products, href: /catalog/products } ]
+            - [ addNav, catalog/inventory, { label: Inventory, href: /catalog/inventory } ]
             - [ addNav, catalog/products_import, { label: Products Import, href: /catalog/products/import/index } ]
             - [ addNav, catalog/searchalias, { label: Search Terms, href: /catalog/searchalias } ]
     - view: admin/header
@@ -17,10 +18,11 @@ catalog_product_form_tabs:
         do:
             - [ addTab, main, { label: General Info, pos: 10 } ]
             - [ addTab, prices, { label: "Prices", pos: 20 } ]
-            - [ addTab, linked-products, { label: Merchandising, pos: 30, async: true } ]
-            - [ addTab, categories, { label: Categories, pos: 40, async: true } ]
-            - [ addTab, images, { label: Images, pos: 50, async: true } ]
-            - [ addTab, attachments, { label: Attachments, pos: 60, async: true } ]
+            - [ addTab, inventory, { label: "Inventory & Shipping", pos: 30, async: true } ]
+            - [ addTab, linked-products, { label: Merchandising, pos: 40, async: true } ]
+            - [ addTab, categories, { label: Categories, pos: 50, async: true } ]
+            - [ addTab, images, { label: Images, pos: 60, async: true } ]
+            - [ addTab, attachments, { label: Attachments, pos: 70, async: true } ]
 
 
 /catalog/products/form:
@@ -65,3 +67,9 @@ catalog_product_form_tabs:
     - { include: base }
     - { include: form }
     - { view: admin/nav, do: [[ setNav, catalog/searchalias ]] }
+
+
+/catalog/inventory:
+    - { include: base }
+    - { hook: main, views: catalog/inventory }
+    - { view: admin/nav, do: [[ setNav, catalog/inventory ]] }

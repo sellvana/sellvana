@@ -11,9 +11,9 @@ base:
 catalog_product_form_tabs:
     - view: admin/form
         do:
-            - [ addTab, fields, { label: Additional Info, pos: 25, view: customfields/products/fields-tab, async: true } ]
-            - [ addTab, variants, { label: Variants, pos: 27, view: customfields/products/variants-tab, async: true } ]
-            - [ addTab, frontend, { label: Shopper Editable Fields, pos: 29, view: customfields/products/frontend-tab, async: true } ]
+            - [ addTab, fields, { label: Additional Info, pos: 82, view: customfields/products/fields-tab, async: true } ]
+            - [ addTab, variants, { label: Variants, pos: 84, view: customfields/products/variants-tab, async: true } ]
+            - [ addTab, frontend, { label: Shopper Editable Fields, pos: 86, view: customfields/products/frontend-tab, async: true } ]
 
 /customfields/fieldsets:
     - { include: base }
