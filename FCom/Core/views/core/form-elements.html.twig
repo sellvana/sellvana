@@ -238,3 +238,99 @@ Using custom id/name:
         </div>
     {% endfor %}
 {% endmacro %}
+
+{% macro image(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
+    {% import _self as forms %}
+    <div class="form-group {{ p.form_group_class }}">
+        {{ forms.label(p) }}
+        <div class="{{ p.input_div_class|default('col-md-5') }}">
+            <input type="image"
+                id="{{ view.getInputId(p) }}"
+                src="{{ p.src }}"
+                class="form-control {{ p.input_class }}"
+                alt="{{ view.getInputId(p) }}"
+                style="{{ p.style }}"
+                {{ p.attr | raw }}
+            />
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro upload(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
+    {% import _self as forms %}
+    <div class="form-group {{ p.form_group_class }}">
+        {{ forms.label(p) }}
+        <div class="{{ p.input_div_class|default('col-md-5') }}">
+            <input type="file"
+                id="{{ view.getInputId(p) }}"
+                name="{{ view.getInputName(p) }}"
+                class="{{ p.input_class }} {{ p.required ? 'required' }}"
+                style="{{ p.style }}"
+                value="{{ view.getInputValue(p) }}"
+                {{ p.readonly ? 'readonly' }}
+                {{ p.required ? 'data-rule-required="true"' }}
+                {{ p.attr | raw }}
+            />
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro checkbox(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
+    {% import _self as forms %}
+    <div class="form-group {{ p.form_group_class }}">
+        {{ forms.label(p) }}
+        <div class=" {{ p.input_div_class|default('col-md-5') }}">
+        {% for cb,k in p.options %}
+            <div class="checkbox">
+                <label>
+                <input type="checkbox"
+                    id="{{ view.getInputId(p) ~ '-' ~ k }}"
+                    name="{{ view.getInputName(p) ~ '-' ~ k }}"
+                    class="{{ p.input_class }} {{ p.required ? 'required' }}"
+                    style="{{ p.style }}"
+                    value="{{ cb }}"
+                    {{ p.readonly ? 'readonly' }}
+                    {{ p.required ? 'data-rule-required="true"' }}
+                    {{ p.attr | raw }}
+                    {{ p.value == cb? "checked": "" }}
+                />{{ cb|capitalize }}
+                </label>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro radio(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
+    {% import _self as forms %}
+    <div class="form-group {{ p.form_group_class }}">
+        {{ forms.label(p) }}
+        <div class=" {{ p.input_div_class|default('col-md-5') }}">
+        {% for cb,k in p.options %}
+            <div class="radio">
+                <label>
+                <input type="radio"
+                    id="{{ view.getInputId(p) ~ '-' ~ k }}"
+                    name="{{ view.getInputName(p) }}"
+                    class="{{ p.input_class }} {{ p.required ? 'required' }}"
+                    style="{{ p.style }}"
+                    value="{{ cb }}"
+                    {{ p.readonly ? 'readonly' }}
+                    {{ p.required ? 'data-rule-required="true"' }}
+                    {{ p.attr | raw }}
+                    {{ p.value == cb? "checked": "" }}
+                />{{ cb|capitalize }}
+                </label>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
