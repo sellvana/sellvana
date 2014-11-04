@@ -4,6 +4,7 @@
  * Class FCom_Catalog_Admin_Controller_Inventory
  *
  * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  */
 class FCom_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -136,7 +137,7 @@ class FCom_Catalog_Admin_Controller_Inventory extends FCom_Admin_Controller_Abst
             }
             $key = $this->BDb->sanitizeFieldName($data['key']);
             $value = $data['value'];
-            $exists = $this->FCom_Stock_Model_Sku->load($value, $key);
+            $exists = $this->FCom_Catalog_Model_InventorySku->load($value, $key);
             $result = ['unique' => !$exists, 'id' => !$exists ? -1 : $exists->id()];
         } catch (Exception $e) {
             $result = ['error' => $e->getMessage()];

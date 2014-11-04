@@ -4,9 +4,9 @@ base:
             - [ addNav, catalog, { label: Catalog, pos: 200, icon_class: icon-barcode } ]
             - [ addNav, catalog/categories, { label: Navigation, href: /catalog/categories } ]
             - [ addNav, catalog/products, { label: Products, href: /catalog/products } ]
+            - [ addNav, catalog/inventory, { label: Inventory, href: /catalog/inventory } ]
             - [ addNav, catalog/products_import, { label: Products Import, href: /catalog/products/import/index } ]
             - [ addNav, catalog/searchalias, { label: Search Terms, href: /catalog/searchalias } ]
-            - [ addNav, catalog/inventory, { label: Inventory, href: /catalog/inventory } ]
     - view: admin/header
         do:
             - [ addQuickSearch, catalog/products, { label: Products, href: /catalog/products } ]
@@ -18,7 +18,7 @@ catalog_product_form_tabs:
         do:
             - [ addTab, main, { label: General Info, pos: 10 } ]
             - [ addTab, prices, { label: "Prices", pos: 20 } ]
-            - [ addTab, inventory, { label: Inventory, pos: 30, async: true } ]
+            - [ addTab, inventory, { label: "Inventory & Shipping", pos: 30, async: true } ]
             - [ addTab, linked-products, { label: Merchandising, pos: 40, async: true } ]
             - [ addTab, categories, { label: Categories, pos: 50, async: true } ]
             - [ addTab, images, { label: Images, pos: 60, async: true } ]

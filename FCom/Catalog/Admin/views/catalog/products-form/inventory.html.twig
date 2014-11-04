@@ -1,83 +1,27 @@
 {% set m = THIS.get('model') %}
-{% set prodStock = APP.instance('FCom_Catalog_Admin_Controller_Inventory') %}
-{% set stockPolicy = prodStock.productStockPolicy(m) %}
-{% set stock = APP.instance('FCom_Catalog_Model_InventorySku') %}
+{% set validator = THIS.get('validator') %}
+{% set fieldData = { validator:validator, id_prefix: 'inventory', name_prefix: 'inventory', label_class:'col-md-4' } %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 
 <fieldset name="main-product">
     <div class="f-section">
-        <h4>{{ "Stock Control Policy"|_ }}</h4>
-        <hr/>
-        <div class="form-group ">
-            <label class="control-label col-md-2" for="stock_policy-manage_stock" style="text-align: left">{{ "Stock Management"|_ }}</label>
-            <div class="col-md-5">
-                <select id="stock_policy-manage_stock" name="stock_policy[manage_stock]" class="form-control">
-                    {{ UTIL.optionsHtml(stock.manageStockOptions(), stockPolicy.manage_stock) | raw }}
-                </select>
-            </div>
-        </div>
-        <div class="form-group ">
-            <label class="control-label col-md-2" for="stock_policy-stock_qty" style="text-align: left">{{ "Quantity"|_ }}</label>
-            <div class="col-md-2">
-                <input type="text" id="model-qty" name="stock_policy[stock_qty]" class="form-control input-stock" data-rule-number="true" value="{{ stockPolicy.stock_qty }}">
-            </div>
-        </div>
-        <div class="form-group ">
-            <label class="control-label col-md-2" style="text-align: left" for="stock_policy-out_stock">{{ "When Out of Stock"|_ }}</label>
-            <div class="col-md-3">
-                <select id="stock_policy-out_stock" name="stock_policy[out_stock]" class="form-control">
-                    {{ UTIL.optionsHtml(stock.outStockOptions(), stockPolicy.out_stock) | raw }}
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-link btn-custom restore-stock-policy" data-name="out_stock" type="button">
-                    {{ "Restore to default"|_ }}
-                </button>
-            </div>
-        </div>
-        <hr/>
-        <div class="form-group ">
-            <label class="text-left control-label col-md-4"  style="text-align: left" for="stock_policy-maximum_quantity_shopping">{{ "Maximum quantity allowed in shopping cart"|_ }}</label>
-            <div class="col-md-2">
-                <input type="text" value="{{ stockPolicy.maximum_quantity_shopping }}" id="stock_policy-maximum_quantity_shopping" name="stock_policy[maximum_quantity_shopping]" class="form-control input-stock" data-rule-number="true">
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-link btn-custom restore-stock-policy" data-name="maximum_quantity_shopping" type="button">
-                    {{ "Restore to default"|_ }}
-                </button>
-            </div>
-        </div>
-        <div class="form-group ">
-            <label class="text-left control-label col-md-4"  style="text-align: left" for="stock_policy-quantity_items_status">{{ "Quantity for item's status to become out of come"|_ }}</label>
-            <div class="col-md-2">
-                <input type="text" id="stock_policy-quantity_items_status" value="{{ stockPolicy.quantity_items_status }}" name="stock_policy[quantity_items_status]" class="form-control input-stock" data-rule-number="true">
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-link btn-custom restore-stock-policy" data-name="quantity_items_status" type="button">
-                    {{ "Restore to default"|_ }}
-                </button>
-            </div>
-        </div>
-        <div class="form-group ">
-            <label class="text-left control-label col-md-4" style="text-align: left" for="stock_policy-notify_administrator_quantity">{{ "Notify administrator for quantity below"|_ }}</label>
-            <div class="col-md-2">
-                <input type="text" id="stock_policy-notify_administrator_quantity" value="{{ stockPolicy.notify_administrator_quantity }}" name="stock_policy[notify_administrator_quantity]" class="form-control input-stock" data-rule-number="true">
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-link btn-custom restore-stock-policy" data-name="notify_administrator_quantity" type="button">
-                    {{ "Restore to default"|_ }}
-                </button>
-            </div>
-        </div>
+        <h4>{{ "Inventory & Shipping"|_ }}</h4>
+        <hr>
+        {{ forms.boolean(fieldData, { field: 'manage_inventory', label: 'Manage Inventory'|_ }) }}
+        {{ forms.input(fieldData,   { field: 'inventory_sku', label: 'Inventory SKU (leave empty to use Product SKU)'|_ }) }}
+        {{ forms.input(fieldData,   { field: 'qty_in_stock', label: 'Qty In Stock'|_, type: 'number' }) }}
+        {{ forms.input(fieldData,   { field: 'unit_cost', label: 'Inventory Unit Cost'|_ }) }}
+        {{ forms.boolean(fieldData, { field: 'allow_backorder', label: 'Allow Backorders'|_ }) }}
+        <hr>
+        {{ forms.input(fieldData,   { field: 'qty_warn_customer', label: 'Minimal Qty to warn customer on frontend'|_, type: 'number'}) }}
+        {{ forms.input(fieldData,   { field: 'qty_notify_admin', label: 'Minimal Qty to notify admin'|_, type: 'number' }) }}
+        {{ forms.input(fieldData,   { field: 'qty_cart_min', label: 'Minimal Qty in Cart'|_, type: 'number' }) }}
+        {{ forms.input(fieldData,   { field: 'qty_cart_inc', label: 'Qty in Cart Increment'|_, type: 'number' }) }}
+        {{ forms.input(fieldData,   { field: 'qty_buffer', label: 'Buffer Qty In Stock'|_, type: 'number' }) }}
+        <hr>
+        {{ forms.boolean(fieldData, { field: 'pack_separate', label: 'Pack Separately for Shipment'|_}) }}
+        {{ forms.input(fieldData,   { field: 'net_weight', label: 'Net Weight'|_ }) }}
+        {{ forms.input(fieldData,   { field: 'shipping_weight', label: 'Shipping Weight'|_ }) }}
+        {{ forms.input(fieldData,   { field: 'shipping_size', label: 'Shipping Size (WxDxH)'|_ }) }}
     </div>
 </fieldset>
-<script>
-    require(['jquery', 'jquery.validate', 'fcom.validate.ext'], function($) {
-        $('.restore-stock-policy').click(function() {
-            var name = $(this).attr('data-name');
-            var data = {restore: name};
-            $.post('{{ APP.href('stock/restore_stock_policy') }}', data, function(res) {
-               $('#stock_policy-' + name).val(res.result);
-            });
-        });
-    });
-</script>

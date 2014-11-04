@@ -10,6 +10,7 @@
  * @property FCom_Catalog_Model_ProductMedia $FCom_Catalog_Model_ProductMedia
  * @property FCom_CustomField_Model_FieldOption $FCom_CustomField_Model_FieldOption
  * @property FCom_ProductReviews_Model_Review $FCom_ProductReviews_Model_Review
+ * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
  */
 class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -125,7 +126,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             $newAction['duplicate'] = '<button type="submit" class="btn btn-primary ignore-validate" name="do" value="DUPLICATE" '
                 . 'onclick="return confirm(\'Are you sure?\')"><span>' .  $this->_('Duplicate') . '</span></button>';
         }
-        $newAction['saveAndContinue'] = '<button type="submit" class="btn btn-primary" name="do" value="saveAndContinue"><span>'
+        $newAction['save_and_continue'] = '<button type="submit" class="btn btn-primary" name="do" value="save_and_continue"><span>'
             . $this->BLocale->_('Save And Continue') . '</span></button>';
         $actions = array_merge($args['view']->actions, $newAction);
         $args['view']->set([
@@ -498,26 +499,30 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
 
         if (isset($data['do']) && $data['do'] === 'DELETE') {
-            $this->deleteRelateInfo($model);
+            //$this->deleteRelatedInfo($model);
         } else {
-            if (!$args['validateFailed']) {
-                $this->processCategoriesPost($model);
+            if (empty($args['validate_failed'])) {
+                $this->processCategoriesPost($model, $data);
                 $this->processLinkedProductsPost($model, $data);
                 $this->processMediaPost($model, $data);
-                $this->processCustomFieldPost($model, $data);
-                $this->processStockPolicyPost($model, $data);
-                $this->processVariantPost($model, $data);
+                $this->processInventoryPost($model, $data);
                 $this->processSystemLangFieldsPost($model, $data);
-                $this->processFrontendPost($model, $data);
+                // moved to FCom_CustomFields
+                #$this->processVariantPost($model, $data);
+                #$this->processCustomFieldPost($model, $data);
+                #$this->processFrontendPost($model, $data);
+                $this->BEvents->fire(__METHOD__.':afterValidate', ['model' => $model, 'data' => $data]);
+                $model->save();
             }
         }
     }
 
     /**
      * delete all associate info with this product
+     * @deprecated Should be handled by FKs
      * @param $model
      */
-    public function deleteRelateInfo($model)
+    public function deleteRelatedInfo($model)
     {
         //delete Categories
         $this->FCom_Catalog_Model_CategoryProduct->delete_many([
@@ -537,9 +542,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     /**
      * @param $model FCom_Catalog_Model_Product
      */
-    public function processCategoriesPost($model)
+    public function processCategoriesPost($model, $post)
     {
-        $post = $this->BRequest->post();
         $categories = [];
         foreach ($post as $key => $value) {
             $matches = [];
@@ -690,78 +694,20 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
      * @param FCom_Catalog_Model_Product $model
      * @param $data
      */
-    public function processCustomFieldPost($model, $data)
+    public function processInventoryPost($model, $data)
     {
-
-        if (!empty($data['custom_fields'])) {
-            $model->setData('custom_fields', $data['custom_fields']);
-        }
-
-        $model->save();
-    }
-
-    /**
-     * @param FCom_Catalog_Model_Product $model
-     * @param $data
-     */
-    public function processStockPolicyPost($model, $data)
-    {
-        if (!empty($data['stock_policy'])) {
-            $model->setData('stock_policy', $data['stock_policy']);
-            $model->save();
-        }
-    }
-
-    /**
-     * @param FCom_Catalog_Model_Product $model
-     * @param $data
-     */
-    public function processVariantPost($model, $data)
-    {
-        $hlp = $this->FCom_CustomField_Model_ProductVariant;
-        if (!empty($data['vfields'])) {
-            $modelFieldOption = $this->FCom_CustomField_Model_FieldOption;
-            $vfields = json_decode($data['vfields'], true);
-            foreach ($vfields as $f) {
-                $op = $this->FCom_CustomField_Model_FieldOption->getListAssocById($f['id']);
-                $arr_diff = array_diff($f['options'], $op);
-                foreach($arr_diff as $val) {
-                    $modelFieldOption->create(['field_id' => $f['id'], 'label' => $val])->save();
-                }
+        if (!empty($data['inventory'])) {
+            $invSku = $model->get('inventory_sku');
+            if (empty($invSku)) {
+                $invSku = $model->get('product_sku');
+                $model->set('inventory_sku', $invSku);
             }
-
-            $model->setData('variants_fields', json_decode($data['vfields'], true));
-        }
-        if (isset($data['variants'])) {
-            $variantsData = array();
-            if ($data['variants'] != '') {
-                $variantsData = $this->BUtil->objectToArray(json_decode($data['variants']));
+            $invSkuModel = $this->FCom_Catalog_Model_InventorySku->load($invSku, 'inventory_sku');
+            if (!$invSkuModel) {
+                $invSkuModel = $this->FCom_Catalog_Model_InventorySku->create(['inventory_sku' => $invSku])->save();
             }
-            $hlp->delete_many(['product_id'=> $model->id()]);
-            if (count($variantsData) > 0) {
-                $variantIds = $this->BUtil->arrayToOptions($variantsData, 'id');
-                $variants = $hlp->orm()->where_in('id', $variantIds)->find_many_assoc();
-                foreach($variantsData as $arr) {
-                    $data = [
-                        'product_id' => $model->id(),
-                        'variant_sku' => $arr['variant_sku'],
-                        'variant_price' => $arr['variant_price'],
-                        'variant_qty' => $arr['variant_qty'],
-                        'field_values' => json_encode($arr['field_values']),
-                        'data_serialized' => json_encode(['variant_file_id' => $arr['variant_file_id']]),
-                    ];
-                    if (!empty($variants[$arr['id']])) {
-                        $variants[$arr['id']]->set($data)->save();
-                    } else {
-                        $hlp->create($data)->save();
-                    }
-                }
-            }
-//            $model->setData('variants', json_decode($data['variants'], true));
+            $invSkuModel->set($data['inventory'])->save();
         }
-
-        $model->save();
-
     }
 
     /**
@@ -773,22 +719,10 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $model->setData('name_lang_fields', $data['name_lang_fields']);
         $model->setData('short_desc_lang_fields', $data['short_desc_lang_fields']);
         $model->setData('desc_lang_fields', $data['desc_lang_fields']);
-        $model->save();
+        //$model->save();
 
     }
 
-    /**
-     * @param FCom_Catalog_Model_Product $model
-     * @param $data
-     */
-    public function processFrontendPost($model, $data)
-    {
-        if (!empty($data['prod_frontend_data'])) {
-            $model->setData('frontend_fields', json_decode($data['prod_frontend_data'], true));
-            $model->save();
-        }
-
-    }
     /*
     public function onMediaGridConfig($args)
     {

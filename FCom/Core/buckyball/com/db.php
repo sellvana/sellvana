@@ -1240,7 +1240,7 @@ class BORM extends ORMWrapper
      *
      * @param string|array $column_name if array - use where_complex() syntax
      * @param mixed        $value
-     * @return $this|\BORM
+     * @return BORM
      */
     public function where($column_name, $value = null)
     {
