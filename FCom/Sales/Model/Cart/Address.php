@@ -80,6 +80,11 @@ class FCom_Sales_Model_Cart_Address extends FCom_Core_Model_Abstract
         return $custAddress;
     }
 
+    /**
+     * @param $cartId
+     * @param string $atype
+     * @return FCom_Sales_Model_Cart_Address
+     */
     public function findByCartType($cartId, $atype = 'shipping')
     {
         return $this->orm()->where("cart_id", $cartId)->where('atype', $atype)->find_one();

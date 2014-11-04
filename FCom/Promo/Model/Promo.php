@@ -1,5 +1,34 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Promo_Model_Promo
+ *
+ * @property int $id
+ * @property string $description
+ * @property string $details
+ * @property int $manuf_vendor_id
+ * @property string $from_date
+ * @property string $to_date
+ * @property string $status enum('template','pending','active','expired')
+ * @property string $buy_type enum('qty','$')
+ * @property string $buy_group enum('one','any','all','cat','anyp')
+ * @property int $buy_amount
+ * @property string $get_type enum('qty','$','%','text','choice','free')
+ * @property string $get_group enum('same_prod','same_group','any_group','diff_group')
+ * @property int $get_amount
+ * @property string $originator enum('manuf','vendor')
+ * @property string $fulfillment enum('manuf','vendor')
+ * @property string $create_at
+ * @property string $update_at
+ * @property string $coupon
+ *
+ * DI
+ * @property FCom_Promo_Model_Cart $FCom_Promo_Model_Cart
+ * @property FCom_Promo_Model_Group $FCom_Promo_Model_Group
+ * @property FCom_Promo_Model_Media $FCom_Promo_Model_Media
+ * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
+ * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
+ */
 class FCom_Promo_Model_Promo extends BModel
 {
     protected static $_origClass = __CLASS__;
@@ -77,6 +106,9 @@ class FCom_Promo_Model_Promo extends BModel
             ->where('pa.promo_id', $this->id);
     }
 
+    /**
+     * @return FCom_Promo_Model_Media[]
+     */
     public function media()
     {
         return $this->mediaORM()->find_many();
@@ -152,6 +184,7 @@ class FCom_Promo_Model_Promo extends BModel
 
         $groups = [];
         if (!$this->_newRecord) {
+            /** @var FCom_Promo_Model_Group[] $groupsRaw */
             $groupsRaw = $this->FCom_Promo_Model_Group->orm()->where('promo_id', $this->id)->find_many();
             foreach ($groupsRaw as $g) {
                 $groups[$g->group_type][] = $g;

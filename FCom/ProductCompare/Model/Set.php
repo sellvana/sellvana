@@ -1,6 +1,15 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
+ * Class FCom_ProductCompare_Model_Set
+ *
+ * @property int $id
+ * @property string $cookie_token
+ * @property int $customer_id
+ * @property string $create_at
+ * @property string $update_at
+ *
+ * DI
  * @property FCom_ProductCompare_Model_SetItem FCom_ProductCompare_Model_SetItem
  * @property FCom_Customer_Model_Customer FCom_Customer_Model_Customer
  * @property FCom_Catalog_Model_Product FCom_Catalog_Model_Product
@@ -84,6 +93,10 @@ class FCom_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
         return $ids;
     }
 
+    /**
+     * @param bool $refresh
+     * @return array
+     */
     public function getCompareProductsDetails($refresh = false)
     {
 
@@ -121,6 +134,10 @@ class FCom_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
         return $details;
     }
 
+    /**
+     * @param bool $refresh
+     * @return string
+     */
     public function getCompareProductsDetailsJson($refresh = false)
     {
         $details = $this->getCompareProductsDetails($refresh);
@@ -210,7 +227,7 @@ class FCom_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return BModel[]
+     * @return FCom_ProductCompare_Model_SetItem[]
      */
     protected function _getSetItems()
     {
