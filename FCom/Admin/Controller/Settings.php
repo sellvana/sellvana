@@ -8,6 +8,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
     {
         $this->layout('/settings');
         $view = $this->view('settings');
+        /** @var FCom_Admin_View_Abstract $view */
         $tabViews = $this->BLayout->findViewsRegex('#^settings/#');
         $tabGroups = [];
 
@@ -63,7 +64,7 @@ class FCom_Admin_Controller_Settings extends FCom_Admin_Controller_Abstract
 
         } catch (Exception $e) {
 
-            BDebug::logException($e);
+            $this->BDebug->logException($e);
             if (!$xhr) {
                 $this->message($e->getMessage(), 'error');
             } else {

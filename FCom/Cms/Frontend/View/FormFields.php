@@ -51,6 +51,9 @@ class FCom_Cms_Frontend_View_FormFields extends FCom_Core_View_Abstract
         ]);
     }
 
+    /**
+     * @return string
+     */
     public function getFormMethod()
     {
         $method = "get";
@@ -60,11 +63,17 @@ class FCom_Cms_Frontend_View_FormFields extends FCom_Core_View_Abstract
         return $method;
     }
 
+    /**
+     * @return string
+     */
     public function getFormAction()
     {
         return "";
     }
 
+    /**
+     * @return string
+     */
     public function getFormEncType()
     {
         $encType = "application/x-www-form-urlencoded";

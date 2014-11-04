@@ -12,12 +12,19 @@
  */
 class FCom_Catalog_Frontend_View_Pager extends FCom_Core_View_Abstract
 {
+    /**
+     * @return array|null|string
+     */
     public function getViewAs()
     {
         $viewAs = $this->BRequest->get('view');
         return $viewAs && in_array($viewAs, $this->view_as_options) ? $viewAs : $this->default_view_as;
     }
 
+    /**
+     * @param array $params
+     * @return mixed|string
+     */
     public function getPageUrl($params = [])
     {
         static $curUrl, $pageUrl;
@@ -35,8 +42,12 @@ class FCom_Catalog_Frontend_View_Pager extends FCom_Core_View_Abstract
         return $this->BUtil->setUrlQuery($curUrl, $params);
     }
 
+    /**
+     *
+     */
     public function setCanonicalPrevNext()
     {
+        /** @var BViewHead $head */
         $head = $this->BLayout->view('head');
         if (!$head) {
             return;

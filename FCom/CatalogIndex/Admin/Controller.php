@@ -1,5 +1,16 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CatalogIndex_Admin_Controller
+ *
+ * @property FCom_CatalogIndex_Model_Doc $FCom_CatalogIndex_Model_Doc
+ * @property FCom_CatalogIndex_Indexer $FCom_CatalogIndex_Indexer
+ * @property FCom_CatalogIndex_Main $FCom_CatalogIndex_Main
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ * @property FCom_CustomField_Main $FCom_CustomField_Main
+ * @property FCom_Catalog_Model_CategoryProduct $FCom_Catalog_Model_CategoryProduct
+ */
 class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
     public function action_reindex__POST()
@@ -9,7 +20,7 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
         BORM::configure('logging', 0);
         $this->BConfig->set('db/logging', 0);
 
-        echo "<pre>Starting...\n";
+        echo $this->_("<pre>Starting...\n");
         if ($this->BRequest->request('CLEAR')) {
             //$this->FCom_CatalogIndex_Indexer->indexDropDocs(true);
             $this->FCom_CatalogIndex_Model_Doc->update_many(['flag_reindex' => 1]);
@@ -32,15 +43,17 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
 
         // create categories / subcategories
         if (true) {
-            echo '<p>Creating categories...</p>';
+            echo $this->_('<p>Creating categories...</p>');
+            /** @var FCom_Catalog_Model_Category $root */
             $root = $this->FCom_Catalog_Model_Category->load(1);
             for ($i = 1; $i <= 9; $i++) {
                 $root->createChild('Category ' . $i);
             }
         }
         if (true) {
-            echo '<p>Creating subcategories...</p>';
+            echo $this->_('<p>Creating subcategories...</p>');
             //$root = $this->FCom_Catalog_Model_Category->load(1);
+            /** @var FCom_Catalog_Model_Category[] $cats */
             $cats = $this->FCom_Catalog_Model_Category->orm()->where('parent_id', 1)->find_many();
             foreach ($cats as $c) {
                 for ($i = 1; $i <= 10; $i++) {
@@ -52,7 +65,7 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
         // create products
         $products = true;
         if (true) {
-            echo '<p>Creating products...</p>';
+            echo $this->_('<p>Creating products...</p>');
 
             $colors = explode(',', 'White,Yellow,Red,Blue,Cyan,Magenta,Brown,Black,Silver,Gold,Beige,Green,Pink');
             $sizes = explode(',', 'Extra Small,Small,Medium,Large,Extra Large');
@@ -88,7 +101,7 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
 
         // assign products to categories
         if (true) {
-            echo '<p>Assigning products to categories...</p>';
+            echo $this->_('<p>Assigning products to categories...</p>');
 
             $this->BDb->run("TRUNCATE fcom_category_product");
             $categories = $this->FCom_Catalog_Model_Category->orm()->where_raw("id_path like '1/%/%'")
@@ -113,7 +126,7 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
 
         // reindex products
         if (true) {
-            echo '<p>Reindexing...</p>';
+            echo $this->_('<p>Reindexing...</p>');
 
             $this->BResponse->startLongResponse();
             $this->BDebug->mode('PRODUCTION');

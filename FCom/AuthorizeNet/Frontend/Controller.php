@@ -2,7 +2,10 @@
 
 /**
  * Created by pp
+ * Class FCom_AuthorizeNet_Frontend_Controller
  * @project fulleron
+ *
+ * @property FCom_AuthorizeNet_PaymentMethod_Dpm $FCom_AuthorizeNet_PaymentMethod_Dpm
  */
 
 class FCom_AuthorizeNet_Frontend_Controller extends FCom_Core_Controller_Abstract

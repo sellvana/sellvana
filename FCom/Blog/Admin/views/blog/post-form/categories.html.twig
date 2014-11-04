@@ -52,7 +52,7 @@
                 }
             }).bind('loaded.jstree', function () {
                 getCategoryChecked();
-                var htmlLabel = '<label for="model-status"  class="error" style="display: none">You must choose one or more category.</label>';
+                var htmlLabel = '<label for="model-status"  class="error" style="display: none">{{ 'You must choose one or more category.'|_ }}</label>';
                 var htmlIcon = '<i class="icon-warning-sign error" style="display: none"></i>';
                 $('#categories-layout').prepend(htmlLabel);
                 $('a[href="#tab-categories"]').append(htmlIcon);
@@ -78,7 +78,7 @@
     <div class="f-admin-main f-admin-sidebar-view clearfix" id="categories-layout" style="min-height: 900px;">
         <div id="categories-wrapper" class="clearfix">
                 <div class="text-left">
-                    <h4>{{ "Add post to one or more categories" }}
+                    <h4>{{ "Add post to one or more categories"|_ }}
                     </h4>
                 </div>
 

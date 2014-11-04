@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Customer_Frontend_Controller_Address
+ *
+ * @property FCom_Customer_Model_Address $FCom_Customer_Model_Address
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ */
 class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller_Abstract
 {
     public function beforeDispatch()
@@ -135,6 +141,7 @@ class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller
         $customer = $this->FCom_Customer_Model_Customer->sessionUser();
 
         if (!empty($id)) {
+            /** @var FCom_Sales_Model_Cart $cart */
             $cart = $this->FCom_Sales_Model_Cart->sessionCart();
             $address = $this->FCom_Customer_Model_Address->load($id);
             //you can't change address for empty cart
