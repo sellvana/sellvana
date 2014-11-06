@@ -7,6 +7,7 @@
  * @property FCom_Promo_Model_Group $FCom_Promo_Model_Group
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Admin_View_Grid $FCom_Admin_View_Grid
+ * @property FCom_Promo_Model_Coupon $FCom_Promo_Model_Coupon
  */
 class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -361,17 +362,79 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
 
     public function action_coupons_grid()
     {
-        $html = $this->view('promo/coupons/grid')->render();
-        $this->BResponse->json(['html'=>$html]);
+        $r = $this->BRequest;
+        $id = $r->get('id');
+        if(!$id){
+            $html = $this->_("Promotion id not found");
+            $status = 'error';
+            $this->BResponse->status(400, $html, false);
+        } else {
+            $status = "success";
+            $gridDataUrl = $this->BApp->href($this->_gridHref . '/coupons_grid_data');
+            $config = [
+                'id' => $this->FCom_Promo_Model_Coupon->origClass(),
+                'orm' => $this->FCom_Promo_Model_Coupon->orm(),
+                'data_url' => $gridDataUrl,
+                'edit_url' => $gridDataUrl,
+                'grid_url' => null,
+                'form_url' => null,
+                'columns' => [
+                    ['type' => 'row_select'],
+                    ['name' => 'id', 'label' => 'ID', 'index' => 'id', 'width' => 55, 'sorttype' => 'number'],
+                    ['name' => 'code', 'label' => 'Code', 'index' => 'code', 'width' => 100],
+                    ['name' => 'uses_per_customer', 'label' => 'Uses Per Customer', 'index' => 'uses_per_customer'],
+                    ['name' => 'uses_total', 'label' => 'Uses total', 'index' => 'uses_total', 'sorttype' => 'number'],
+                    ['name' => 'total_used', 'label' => 'Used', 'index' => 'total_used', 'sorttype' => 'number'],
+                    [
+                        'type' => 'btn_group',
+                        'buttons' => [
+                            ['name' => 'delete'],
+                        ]
+                    ],
+                ]
+            ];
+            $config['actions'] = [
+                'delete' => true,
+                'add'=>true,
+                'edit'=>true,
+            ];
+            $config['filters'] = [
+                ['field' => 'code', 'type' => 'text'],
+                ['field' => 'uses_per_customer', 'type' => 'number-range'],
+                ['field' => 'uses_total', 'type' => 'number-range'],
+                ['field' => 'total_used', 'type' => 'number-range'],
+            ];
+            $html = $this->view('promo/coupons/grid')->set('grid',['config' => $config])->render();
+        }
+        $this->BResponse->json(['status' => $status, 'html'=>$html]);
     }
     public function action_coupons_generate()
     {
-        $html = $this->view('promo/coupons/generate')->render();
-        $this->BResponse->json(['html'=>$html]);
+        $r = $this->BRequest;
+        $id = $r->get('id');
+        if (!$id) {
+            $html = $this->_("Promotion id not found");
+            $status = 'error';
+            $this->BResponse->status(400, $html, false);
+        } else {
+            $status = "success";
+            $html = $this->view('promo/coupons/generate')->render();
+        }
+        $this->BResponse->json(['status' => $status, 'html' => $html]);
     }
+
     public function action_coupons_import()
     {
-        $html = $this->view('promo/coupons/import')->render();
-        $this->BResponse->json(['html'=>$html]);
+        $r = $this->BRequest;
+        $id = $r->get('id');
+        if (!$id) {
+            $html = $this->_("Promotion id not found");
+            $status = 'error';
+            $this->BResponse->status(400, $html, false);
+        } else {
+            $status = "success";
+            $html = $this->view('promo/coupons/import')->render();
+        }
+        $this->BResponse->json(['status' => $status, 'html' => $html]);
     }
 }

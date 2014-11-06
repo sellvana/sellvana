@@ -42,6 +42,11 @@ Using custom id/name:
         </script>
     {% endif %}
 {% endmacro %}
+{% macro help_block(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
+    <span class="help-block {{ p.help_block_class }}">{{ p.help_block_text }}</span>
+{% endmacro %}
 
 {% macro hidden(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
@@ -69,6 +74,9 @@ Using custom id/name:
                 {{ p.required ? 'data-rule-required="true"' }}
                 {{ p.attr | raw }}
             />
+            {% if p.help_block_text %}
+            {{ forms.help_block(p) }}
+            {% endif %}
         </div>
     </div>
 {% endmacro %}

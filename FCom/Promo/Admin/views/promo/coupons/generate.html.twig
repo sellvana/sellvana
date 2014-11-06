@@ -1,1 +1,37 @@
-generate
+{% import THIS.view('core/form-elements').twigName() as forms %}
+<div class="f-section" id="coupon-generate-container">
+    <form id="coupon-generate-form">
+        <div class="well well-sm help-block">
+            <p>{{"You can have unique coupon codes generated for you automatically if you input simple patterns."|_ }} </p>
+            <p>{{ "Pattern examples:"|_}}</p>
+            <p>{{ "<code>[A*8]</code> - 8 alpha chars - will result to something like <code>DKABWJKQ</code>"|_|raw}}</p>
+            <p>{{ "<code>[N*4]</code> - 4 numeric - will result to something like <code>5640</code>"|_|raw }}</p>
+            <p>{{ "<code>[AN*5]</code> - 5 alphanumeric - will result to something like <code>GHG76</code>"|_|raw }}</p>
+            <p>{{ "<code>CODE-[A*4]-[AN*6]</code> - <code>CODE-HQNB-8A1NO3</code>"|_|raw }}</p>
+
+        </div>
+        <div class="form-group">
+            {{ forms.input({field:'code_pattern', label:'Code Pattern'|_,
+            help_block_text:'(Leave empty to auto-generate)'|_,
+            input_div_class:'col-md-8', label_class: 'col-md-4'}) }}
+        </div>
+        <div class="form-group">
+            {{ forms.input({field: 'code_length', label: 'Coupon Code Length'|_,
+            help_block_text:'(Will be used only if auto-generating codes)'|_,
+            input_div_class:'col-md-8', label_class: 'col-md-4'}) }}
+        </div>
+        <div class="form-group">
+            {{ forms.input({field: 'code_uses_per_customer', label:'Uses Per Customer',
+            help_block_text: '(Leave empty for no limit)'|_,
+            input_div_class:'col-md-8', label_class: 'col-md-4'}) }}
+        </div>
+        <div class="form-group">
+            {{ forms.input({field: 'code_uses_total', label:'Total uses',
+            help_block_text: '(Leave empty for no limit)'|_,
+            input_div_class:'col-md-8', label_class: 'col-md-4'}) }}
+        </div>
+        <div class="form-group col-md-offset-4 col-md-8">
+            <button type="button" id="coupon-generate-btn" class="btn btn-danger">{{ "Generate"|_ }}</button>
+        </div>
+    </form>
+</div>

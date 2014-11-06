@@ -123,6 +123,8 @@ define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (Rea
         handleConfirm: function () {
             if (this.props.onConfirm) {
                 this.props.onConfirm();
+            } else {
+                this.close();
             }
         },
         getDefaultProps: function () {
@@ -164,11 +166,11 @@ define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (Rea
     var MultiCoupon = React.createClass({
         render: function () {
             var showModal = <FCom.React.Modal ref="showModal" onConfirm={this.handleShowConfirm}
-                onCancel={this.closeShowModal} url={this.props.showCouponsurl}/>;
+                onCancel={this.closeShowModal} url={this.props.showCouponsurl} title="Coupon grid"/>;
             var generateModal = <FCom.React.Modal ref="generateModal" onConfirm={this.handleGenerateConfirm}
-                onCancel={this.closeGenerateModal} url={this.props.generateCouponsurl}/>;
+                onCancel={this.closeGenerateModal} url={this.props.generateCouponsurl} title="Generate coupons"/>;
             var importModal = <FCom.React.Modal ref="importModal" onConfirm={this.handleImportConfirm}
-                onCancel={this.closeImportModal} url={this.props.importCouponsurl}/>;
+                onCancel={this.closeImportModal} url={this.props.importCouponsurl} title="Import coupons"/>;
             return (
                 <div className="multi-coupon btn-group">
                     <FCom.React.Button onClick={this.showCodes} className="btn-primary">{this.props.buttonViewLabel}</FCom.React.Button>
@@ -205,7 +207,12 @@ define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (Rea
                 $.get(url).done(function (result) {
                     if (result.hasOwnProperty('html')) {
                         $modalBody.html(result.html);
-                        $modalBody.data('content-loaded', true)
+                        //$modalBody.data('content-loaded', true)
+                    }
+                }).fail(function(result){
+                    var jsonResult = result.responseJSON;
+                    if (jsonResult.hasOwnProperty('html')) {
+                        $modalBody.html(jsonResult.html);
                     }
                 });
             }
@@ -293,8 +300,7 @@ define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (Rea
                     generateCouponsUrl = this.props.options.generateCouponsUrl ||'',
                     importCouponsUrl = this.props.options.importCouponsUrl ||'';
                 child = [<MultiCoupon key="multi-coupon" options={this.props.options} importCouponsUrl={importCouponsUrl}
-                    generateCouponsUrl={generateCouponsUrl} showCouponsUrl={showCouponsUrl}/>,
-                    <UsesBlock options={this.props.options} key="uses-block"/>]
+                    generateCouponsUrl={generateCouponsUrl} showCouponsUrl={showCouponsUrl}/>]
             }
             return (
                 <div className="form-group">
