@@ -1,6 +1,6 @@
-define(['react', 'jquery', 'select2', 'bootstrap'], function (React, $) {
+define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (React, $) {
     FCom.React = {};
-
+    var Locale = require('fcom.locale');
     FCom.React.ControlLabel = React.createClass({
         render: function () {
             var cl = "control-label " + this.props.label_class + (this.props.required ? ' required' : '');
@@ -94,7 +94,7 @@ define(['react', 'jquery', 'select2', 'bootstrap'], function (React, $) {
             }
 
             return (
-                <div className="modal fade">
+                <div className="modal">
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
@@ -128,9 +128,9 @@ define(['react', 'jquery', 'select2', 'bootstrap'], function (React, $) {
         getDefaultProps: function () {
             // component default properties
             return {
-                confirm: "OK",
-                cancel: "Cancel",
-                title: "Title"
+                confirm: Locale._("OK"),
+                cancel: Locale._("Cancel"),
+                title: Locale._("Title")
             }
         }
     });
@@ -150,7 +150,7 @@ define(['react', 'jquery', 'select2', 'bootstrap'], function (React, $) {
             return {
                 id: "model-use_coupon_code_single",
                 name: "use_coupon_code_single",
-                helpText: "(Leave empty for auto-generate)"
+                helpText: Locale._("(Leave empty for auto-generate)")
             };
         },
         getInitialState: function () {
@@ -163,9 +163,12 @@ define(['react', 'jquery', 'select2', 'bootstrap'], function (React, $) {
 
     var MultiCoupon = React.createClass({
         render: function () {
-            var showModal = <FCom.React.Modal ref="showModal" onConfirm={this.handleShowConfirm} onCancel={this.closeShowModal} ></FCom.React.Modal>;
-            var generateModal = <FCom.React.Modal ref="generateModal" onConfirm={this.handleGenerateConfirm} onCancel={this.closeGenerateModal} ></FCom.React.Modal>;
-            var importModal = <FCom.React.Modal ref="importModal" onConfirm={this.handleImportConfirm} onCancel={this.closeImportModal} ></FCom.React.Modal>;
+            var showModal = <FCom.React.Modal ref="showModal" onConfirm={this.handleShowConfirm}
+                onCancel={this.closeShowModal} url={this.props.showCouponsurl}/>;
+            var generateModal = <FCom.React.Modal ref="generateModal" onConfirm={this.handleGenerateConfirm}
+                onCancel={this.closeGenerateModal} url={this.props.generateCouponsurl}/>;
+            var importModal = <FCom.React.Modal ref="importModal" onConfirm={this.handleImportConfirm}
+                onCancel={this.closeImportModal} url={this.props.importCouponsurl}/>;
             return (
                 <div className="multi-coupon btn-group">
                     <FCom.React.Button onClick={this.showCodes} className="btn-primary">{this.props.buttonViewLabel}</FCom.React.Button>
@@ -189,25 +192,44 @@ define(['react', 'jquery', 'select2', 'bootstrap'], function (React, $) {
         getDefaultProps: function () {
             // component default properties
             return {
-                buttonViewLabel: "View (100) codes",
-                buttonGenerateLabel: "Generate New Codes",
-                buttonImportLabel: "Import Existing Codes"
+                buttonViewLabel: Locale._("View (100) codes"),
+                buttonGenerateLabel: Locale._("Generate New Codes"),
+                buttonImportLabel: Locale._("Import Existing Codes"),
+                showCouponsUrl:"",
+                generateCouponsUrl:"",
+                importCouponsUrl:""
+            }
+        },
+        loadModalContent: function ($modalBody, url) {
+            if ($modalBody.length > 0 && $modalBody.data('content-loaded') == undefined) {
+                $.get(url).done(function (result) {
+                    if (result.hasOwnProperty('html')) {
+                        $modalBody.html(result.html);
+                        $modalBody.data('content-loaded', true)
+                    }
+                });
             }
         },
         showCodes: function () {
             // component default properties
             console.log("showCodes");
             this.refs.showModal.open();
+            var $modalBody = $('.modal-body', this.refs.showModal.getDOMNode());
+            this.loadModalContent($modalBody, this.props.showCouponsUrl)
         },
         generateCodes: function () {
             // component default properties
             console.log("generateCodes");
             this.refs.generateModal.open();
+            var $modalBody = $('.modal-body', this.refs.generateModal.getDOMNode());
+            this.loadModalContent($modalBody, this.props.generateCouponsUrl);
         },
         importCodes: function () {
             // component default properties
             console.log("importCodes");
             this.refs.importModal.open();
+            var $modalBody = $('.modal-body', this.refs.importModal.getDOMNode());
+            this.loadModalContent($modalBody, this.props.importCouponsUrl);
         }
     });
 
@@ -233,12 +255,12 @@ define(['react', 'jquery', 'select2', 'bootstrap'], function (React, $) {
         getDefaultProps: function () {
             // component default properties
             return {
-                labelUpc: "Uses Per Customer",
-                labelUt: "Total Uses",
+                labelUpc: Locale._("Uses Per Customer"),
+                labelUt: Locale._("Total Uses"),
                 idUpc: "coupon_uses_per_customer",
                 idUt: "coupon_uses_total",
-                helpTextUpc: "How many times a user can use a coupon?",
-                helpTextUt: "How many total times a coupon can be used?"
+                helpTextUpc: Locale._("How many times a user can use a coupon?"),
+                helpTextUt: Locale._("How many total times a coupon can be used?")
             };
         },
         getInitialState: function () {
@@ -247,6 +269,13 @@ define(['react', 'jquery', 'select2', 'bootstrap'], function (React, $) {
                 valueUpc: '',
                 valueUt: ''
             };
+        }, componentWillMount: function () {
+            if(this.props.options.valueUpc) {
+                this.setState({valueUpc: this.props.options.valueUpc});
+            }
+            if(this.props.options.valueUt) {
+                this.setState({valueUt: this.props.options.valueUt});
+            }
         }
     });
 
@@ -254,13 +283,18 @@ define(['react', 'jquery', 'select2', 'bootstrap'], function (React, $) {
         displayName: 'CouponApp',
         render: function () {
             //noinspection BadExpressionStatementJS
-
             var child = "";
 
             if (this.state.mode == 1) {
-                child = [<SingleCoupon key="single-coupon"/>,<UsesBlock key="uses-block"/>];
+                child = [<SingleCoupon key="single-coupon" options={this.props.options}/>,
+                    <UsesBlock options={this.props.options} key="uses-block"/>];
             } else if(this.state.mode == 2) {
-                child = [<MultiCoupon key="multi-coupon"/>,<UsesBlock key="uses-block"/>]
+                var showCouponsUrl = this.props.options.showCouponsUrl ||'',
+                    generateCouponsUrl = this.props.options.generateCouponsUrl ||'',
+                    importCouponsUrl = this.props.options.importCouponsUrl ||'';
+                child = [<MultiCoupon key="multi-coupon" options={this.props.options} importCouponsUrl={importCouponsUrl}
+                    generateCouponsUrl={generateCouponsUrl} showCouponsUrl={showCouponsUrl}/>,
+                    <UsesBlock options={this.props.options} key="uses-block"/>]
             }
             return (
                 <div className="form-group">
@@ -299,7 +333,7 @@ define(['react', 'jquery', 'select2', 'bootstrap'], function (React, $) {
 
             $couponSelector.on('change', function () {
                 var selected = $(this).val();
-                React.render(<CouponApp mode={parseInt(selected)}/>, $element[0]);
+                React.render(<CouponApp mode={parseInt(selected)} options={options}/>, $element[0]);
             });
         }
     };

@@ -358,4 +358,20 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             ['navButtonAdd', 'caption' => 'Remove', 'buttonicon' => 'ui-icon-trash', 'title' => 'Remove Attachments From Promotion', 'cursor' => 'pointer'],
         ];
     }
+
+    public function action_coupons_grid()
+    {
+        $html = $this->view('promo/coupons/grid')->render();
+        $this->BResponse->json(['html'=>$html]);
+    }
+    public function action_coupons_generate()
+    {
+        $html = $this->view('promo/coupons/generate')->render();
+        $this->BResponse->json(['html'=>$html]);
+    }
+    public function action_coupons_import()
+    {
+        $html = $this->view('promo/coupons/import')->render();
+        $this->BResponse->json(['html'=>$html]);
+    }
 }
