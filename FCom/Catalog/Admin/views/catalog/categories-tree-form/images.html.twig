@@ -1,4 +1,5 @@
 {% set m = THIS.get('model') %}
+{% set mediaId = 'category_images' %}
 {% import THIS.view('core/form-elements').twigName() as forms %}
 {% set resizeUrl = APP.instance('FCom_Core_Main').resizeUrl('--IMAGE--', {s:150, cache:0}) %}
 {% set fieldData = { model:m, config_id: 'category_images', resize_url: resizeUrl } %}
@@ -7,11 +8,13 @@
     {field:'featured_image_url', label:'Featured Image'|_ },
     {field:'nav_callout_image_url', label:'Navigation Callout Image'|_ }
 ]) }}
-{{ THIS.view('core/medialib').set('config', {id: 'category_images', title: 'Category Image', type: 'category-images'}) | raw }}
+{{ THIS.view('core/medialib').set('config', {id: mediaId, title: 'Category Image', type: 'category-images'}) | raw }}
 
 <script>
+    var {{ mediaId }}_grid;
     require(['backbone', 'underscore', 'jquery', 'fcom.admin'], function(Backbone, _, $) {
-        window.category_images_register = function(grid) {
+        window.{{ mediaId }}_register = function(grid) {
+            {{ mediaId }}_grid = grid;
             grid.getGridSkeleton().Views.RowView.prototype._selectRow = function(ev) {
                 var selectedRows = grid.getSelectedRows();
                 var checked = $(ev.target).is(':checked');
@@ -29,7 +32,7 @@
                 ev.preventDefault();
 
                 return;
-            }
+            };
             grid.build();
             FCom.Admin.buttonAddImage({
                 grid: grid,

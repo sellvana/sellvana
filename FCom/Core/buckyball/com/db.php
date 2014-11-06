@@ -1366,13 +1366,78 @@ class BORM extends ORMWrapper
 
     /**
      * Add a simple JOIN source to the query
+     * Shortcut to help with IDE auto-completion
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return $this
+     */
+    public function join($table, $constraint, $table_alias = null)
+    {
+        return parent::join($table, $constraint, $table_alias);
+    }
+
+    /**
+     * Add an INNER JOIN source to the query
+     * Shortcut to help with IDE auto-completion
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return $this
+     */
+    public function inner_join($table, $constraint, $table_alias = null)
+    {
+        return parent::inner_join($table, $constraint, $table_alias);
+    }
+
+    /**
+     * Add a LEFT OUTER JOIN source to the query
+     * Shortcut to help with IDE auto-completion
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return $this
+     */
+    public function left_outer_join($table, $constraint, $table_alias = null)
+    {
+        return parent::left_outer_join($table, $constraint, $table_alias);
+    }
+
+    /**
+     * Add an RIGHT OUTER JOIN source to the query
+     * Shortcut to help with IDE auto-completion
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return \ORM
+     */
+    public function right_outer_join($table, $constraint, $table_alias = null)
+    {
+        return parent::right_outer_join($table, $constraint, $table_alias);
+    }
+
+    /**
+     * Add an FULL OUTER JOIN source to the query
+     * Shortcut to help with IDE auto-completion
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return $this
+     */
+    public function full_outer_join($table, $constraint, $table_alias = null)
+    {
+        return parent::full_outer_join($table, $constraint, $table_alias);
+    }
+
+    /**
+     * Add a simple JOIN source to the query
      * @param $join_operator
      * @param $table
      * @param $constraint
      * @param null $table_alias
      * @return $this
      */
-    public function _add_join_source($join_operator, $table, $constraint, $table_alias = null) {
+    protected function _add_join_source($join_operator, $table, $constraint, $table_alias = null) {
         if (!isset(self::$_classTableMap[$table])) {
             if (class_exists($table) && is_subclass_of($table, 'BModel')) {
                 $class = BClassRegistry::className($table);
