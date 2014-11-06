@@ -1,5 +1,8 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
+ */
 class FCom_Promo_Model_Group extends BModel
 {
     protected static $_origClass = __CLASS__;
@@ -7,6 +10,6 @@ class FCom_Promo_Model_Group extends BModel
 
     public function products()
     {
-        return $this->FCom_Promo_Model_Product->orm()->where('group_id', $this->id)->find_many();
+        return $this->FCom_Promo_Model_Product->orm()->where('group_id', $this->id())->find_many();
     }
 }
