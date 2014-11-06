@@ -66,11 +66,6 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
             ['field' => 'update_at', 'type' => 'date-range'],
             '_quick' => ['expr' => 'product_name like ? or product_sku like ? or p.id=?', 'args' => ['?%', '%?%', '?']]
         ];
-        $config['format_callback'] = function($args) {
-            foreach ($args['rows'] as $row) {
-
-            }
-        };
         return $config;
     }
 
@@ -497,9 +492,8 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         $model = $args['model'];
         $data = $this->BRequest->post();
 
-
         if (isset($data['do']) && $data['do'] === 'DELETE') {
-            //$this->deleteRelatedInfo($model);
+            $this->deleteRelatedInfo($model);
         } else {
             if (empty($args['validate_failed'])) {
                 $this->processCategoriesPost($model, $data);
@@ -519,23 +513,24 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
 
     /**
      * delete all associate info with this product
-     * @deprecated Should be handled by FKs
      * @param $model
      */
     public function deleteRelatedInfo($model)
     {
+        /*
         //delete Categories
         $this->FCom_Catalog_Model_CategoryProduct->delete_many([
-           'product_id' => $model->id
+           'product_id' => $model->id(),
         ]);
         //delete Product Link
         $this->FCom_Catalog_Model_ProductLink->delete_many([
-            'product_id' => $model->id
+            'product_id' => $model->id(),
         ]);
         //delete Product Media
         $this->FCom_Catalog_Model_ProductMedia->delete_many([
-            'product_id' => $model->id
+            'product_id' => $model->id(),
         ]);
+        */
         //todo: delete product reviews / wishlist
     }
 
@@ -696,17 +691,18 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
      */
     public function processInventoryPost($model, $data)
     {
+        // update product inventory sku if needed
+        if (!empty($data['inventory']['inventory_sku'])) {
+            $model->set('inventory_sku', $data['inventory']['inventory_sku']);
+        }
+        // find inventory model
+        $invModel = $model->getInventoryModel();
+        // update inventory model
         if (!empty($data['inventory'])) {
-            $invSku = $model->get('inventory_sku');
-            if (empty($invSku)) {
-                $invSku = $model->get('product_sku');
-                $model->set('inventory_sku', $invSku);
-            }
-            $invSkuModel = $this->FCom_Catalog_Model_InventorySku->load($invSku, 'inventory_sku');
-            if (!$invSkuModel) {
-                $invSkuModel = $this->FCom_Catalog_Model_InventorySku->create(['inventory_sku' => $invSku])->save();
-            }
-            $invSkuModel->set($data['inventory'])->save();
+            // unset key field data
+            unset($data['inventory']['id'], $data['inventory']['inventory_sku']);
+            // save inventory form data
+            $invModel->set($data['inventory'])->save();
         }
     }
 

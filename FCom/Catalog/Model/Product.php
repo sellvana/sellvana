@@ -38,6 +38,7 @@
  * @property FCom_CustomField_Model_FieldOption $FCom_CustomField_Model_FieldOption
  * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
  * @property FCom_ProductReviews_Model_Review $FCom_ProductReviews_Model_Review
+ * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
  */
 class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 {
@@ -1137,5 +1138,32 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             });
         }
         return $frontendFields;
+    }
+
+    /**
+     * @return FCom_Catalog_Model_InventorySku
+     * @throws BException
+     */
+    public function getInventoryModel()
+    {
+        $invModel = $this->get('inventory_model');
+        if ($invModel) {
+            return $invModel;
+        }
+        // get inventory SKU from inventory SKU or product SKU if not specified
+        $invSku = $this->get('inventory_sku');
+        if (null === $invSku || '' === $invSku) {
+            $invSku = $this->get('product_sku');
+            $this->set('inventory_sku', $invSku);
+        }
+        // find inventory model
+        $invHlp = $this->FCom_Catalog_Model_InventorySku;
+        $invModel = $invHlp->load($invSku, 'inventory_sku');
+        // if doesn't exist yet, create
+        if (!$invModel) {
+            $invModel = $invHlp->create(['inventory_sku' => $invSku])->save();
+        }
+        $this->set('inventory_model', $invModel);
+        return $invModel;
     }
 }
