@@ -380,33 +380,58 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                 'form_url' => null,
                 'columns' => [
                     ['type' => 'row_select'],
-                    ['name' => 'id', 'label' => 'ID', 'index' => 'id', 'width' => 55, 'sorttype' => 'number'],
-                    ['name' => 'code', 'label' => 'Code', 'index' => 'code', 'width' => 100],
-                    ['name' => 'uses_per_customer', 'label' => 'Uses Per Customer', 'index' => 'uses_per_customer'],
-                    ['name' => 'uses_total', 'label' => 'Uses total', 'index' => 'uses_total', 'sorttype' => 'number'],
-                    ['name' => 'total_used', 'label' => 'Used', 'index' => 'total_used', 'sorttype' => 'number'],
-                    [
-                        'type' => 'btn_group',
-                        'buttons' => [
-                            ['name' => 'delete'],
-                        ]
-                    ],
+                    ['name' => 'id', 'label' => 'ID', 'hidden' => true],
+                    ['name' => 'code', 'label' => 'Code', 'index' => 'code', 'width' => 100,
+                        'editable' => 'inline', 'addable' => true, 'validation' => ['required' => true]],
+                    ['name' => 'uses_per_customer', 'label' => 'Uses Per Customer', 'index' => 'uses_per_customer',
+                                            'editable' => 'inline', 'addable' => true],
+                    ['name' => 'uses_total', 'label' => 'Uses total', 'index' => 'uses_total', 'sorttype' => 'number',
+                                            'editable' => 'inline', 'addable' => true],
+                    //['name' => 'total_used', 'label' => 'Used', 'index' => 'total_used', 'sorttype' => 'number'],
+                    ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]],
+                ],
+                'actions' => [
+                    'delete' => true,
+                    'new' => ['caption' => 'Add New Coupon'],
+                    'edit' => true,
+                ],
+                'data_mode' => 'local',
+                'filters' => [
+                    ['field' => 'code', 'type' => 'text'],
+                    ['field' => 'uses_per_customer', 'type' => 'number-range'],
+                    ['field' => 'uses_total', 'type' => 'number-range'],
+                    //['field' => 'total_used', 'type' => 'number-range'],
                 ]
-            ];
-            $config['actions'] = [
-                'delete' => true,
-                'add'=>true,
-                'edit'=>true,
-            ];
-            $config['filters'] = [
-                ['field' => 'code', 'type' => 'text'],
-                ['field' => 'uses_per_customer', 'type' => 'number-range'],
-                ['field' => 'uses_total', 'type' => 'number-range'],
-                ['field' => 'total_used', 'type' => 'number-range'],
             ];
             $html = $this->view('promo/coupons/grid')->set('grid',['config' => $config])->render();
         }
         $this->BResponse->json(['status' => $status, 'html'=>$html]);
+    }
+    public function action_coupons_generate__POST()
+    {
+        $r = $this->BRequest;
+        $id = $r->get('id');
+        if (!$id) {
+            $html = $this->_("Promotion id not found");
+            $status = 'error';
+            $this->BResponse->status(400, $html, false);
+        } else {
+            $data = $r->post('model');
+            $pattern = $data['code_pattern'];
+            $length = $data['code_length'];
+            $usesPerCustomer = $data['code_uses_per_customer'];
+            $usesTotal = $data['code_uses_total'];
+            $couponCount = $data['coupon_count'];
+            $model = $this->FCom_Promo_Model_Coupon;
+            $model->generateCoupons([
+                'promo_id' => $id,
+                'pattern' => $pattern,
+                'length' => $length,
+                'uses_per_customer' => $usesPerCustomer,
+                'uses_total' => $usesTotal,
+                'count' => $couponCount
+            ]);
+        }
     }
     public function action_coupons_generate()
     {
