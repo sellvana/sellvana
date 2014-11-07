@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Stock_Admin_Controller_Stock
+ *
+ * @property FCom_Stock_Model_Sku $FCom_Stock_Model_Sku
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ */
 class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -11,6 +17,9 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
     protected $_mainTableAlias = 's';
     protected $_navPath = 'catalog/stock';
 
+    /**
+     * @return array
+     */
     public function gridConfig()
     {
         $config = parent::gridConfig();
@@ -118,6 +127,10 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
         return $config;
     }
 
+    /**
+     * @param $model
+     * @return array
+     */
     public function productStockPolicy($model)
     {
         $stock_policy = [
@@ -158,6 +171,7 @@ class FCom_Stock_Admin_Controller_Stock extends FCom_Admin_Controller_Abstract_G
         }
         $this->BResponse->json(['result' => $result]);
     }
+
     public function gridViewBefore($args)
     {
         parent::gridViewBefore($args);

@@ -1,6 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_PayPal_Main extends BClass
+/**
+ * Class FCom_PayPal_Frontend
+ *
+ * @property FCom_Sales_Main $FCom_Sales_Main
+ */
+class FCom_PayPal_Frontend extends BClass
 {
     public function bootstrap()
     {

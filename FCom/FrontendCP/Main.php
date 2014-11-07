@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_FrontendCP_Main
+ *
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ */
 class FCom_FrontendCP_Main extends BClass
 {
     static protected $_entityHandlers = [];
@@ -27,7 +32,7 @@ class FCom_FrontendCP_Main extends BClass
     {
         $rootDir = $this->BApp->storageRandomDir() . '/custom';
         $area = !empty($options['area']) ? $options['area'] : 'FCom_Frontend';
-        $viewsDir = $dir . '/' . $area . '/views';
+        $viewsDir = $rootDir . '/' . $area . '/views';
         if (!file_exists($rootDir)) {
             $this->BUtil->ensureDir($viewsDir);
             //TODO: if area is not FCom_Frontend - developer is involved - edit manifest.yml manually?

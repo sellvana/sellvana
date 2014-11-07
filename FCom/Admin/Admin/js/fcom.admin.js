@@ -367,12 +367,11 @@ define(fcomAdminDeps, function ($) {
             }
             $('#'+ dataConfig.config_id +'_modal').modal();
 
-        });
-        $('body').on('click',textBtnRemoveImage, function() {
+        }).on('click', textBtnRemoveImage, function() {
             processImage(this, {
                 text: dataConfig.text_add_image,
                 display: 'none',
-                imageTag: '',
+                image_tag: '',
                 path: ''
             });
             $(this).parents('.form-group').find(textBtnAddImage).removeClass('data-change');
@@ -405,7 +404,7 @@ define(fcomAdminDeps, function ($) {
         });
     };
 
-    FCom.Admin.ajaxCacheStorage = {}
+    FCom.Admin.ajaxCacheStorage = {};
     FCom.Admin.ajaxCache = function (url, callback) {
         if (callback === null) {
             delete FCom.Admin.ajaxCacheStorage[url];

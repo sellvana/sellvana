@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CustomField_Model_SetField
+ *
+ * @property int $id
+ * @property int $set_id
+ * @property int $field_id
+ * @property int $position
+ */
 class FCom_CustomField_Model_SetField extends FCom_Core_Model_Abstract
 {
     protected static $_origClass = __CLASS__;
@@ -11,6 +19,12 @@ class FCom_CustomField_Model_SetField extends FCom_Core_Model_Abstract
                                'field_id' => 'FCom_CustomField_Model_Field.id',
         ],
     ];
+
+    /**
+     * @param $data
+     * @return $this
+     * @throws BException
+     */
     public function addSetField($data)
     {
         $link = $this->load($this->BUtil->arrayMask($data, 'set_id,field_id'));

@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CustomField_Admin
+ *
+ * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ * @property FCom_CustomField_Model_FieldOption $FCom_CustomField_Model_FieldOption
+ */
 class FCom_CustomField_Admin extends BClass
 {
 /*
@@ -20,6 +26,7 @@ class FCom_CustomField_Admin extends BClass
 */
     public function onProductGridColumns($args)
     {
+        /** @var FCom_CustomField_Model_Field[] $fields */
         $fields = $this->FCom_CustomField_Model_Field->orm('f')->find_many();
         foreach ($fields as $f) {
             $col = ['label' => $f->field_name, 'index' => 'pcf.' . $f->field_name, 'hidden' => true];

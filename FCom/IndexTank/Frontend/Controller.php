@@ -1,11 +1,19 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_IndexTank_Frontend_Controller
+ *
+ * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ * @property FCom_IndexTank_Index_Product $FCom_IndexTank_Index_Product
+ * @property FCom_IndexTank_Search $FCom_IndexTank_Search
+ * @property FCom_IndexTank_Model_ProductFunction $FCom_IndexTank_Model_ProductFunction
+ */
 class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function action_category()
     {
 #echo "<pre>"; debug_print_backtrace(); print_r($this->BRouting->currentRoute()); exit;
-        $category = $this->FCom_Catalog_Model_Category->load($this->BRequest->params('category'), 'url_path');
+        $category = $this->FCom_Catalog_Model_Category->load($this->BRequest->param('category'), 'url_path');
         if (!$category) {
             $this->forward(false);
             return $this;

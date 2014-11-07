@@ -3,6 +3,9 @@
 /**
  * Class FCom_Sales_Main
  *
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ *
  * @method FCom_Sales_Main i() static i($new=false, array $args=array())
  */
 class FCom_Sales_Main extends BClass
@@ -16,30 +19,20 @@ class FCom_Sales_Main extends BClass
             $this->FCom_Sales_Model_Cart->registerTotalRowHandler('FCom_Sales_Model_Cart_Total_' . $total);
         }
 
-        $this->FCom_Sales_Workflow_Cart->registerWorkflow();
-        $this->FCom_Sales_Workflow_Order->registerWorkflow();
-        $this->FCom_Sales_Workflow_OrderItem->registerWorkflow();
-        $this->FCom_Sales_Workflow_Payment->registerWorkflow();
-        $this->FCom_Sales_Workflow_Shipment->registerWorkflow();
-        $this->FCom_Sales_Workflow_Return->registerWorkflow();
-        $this->FCom_Sales_Workflow_Refund->registerWorkflow();
-        $this->FCom_Sales_Workflow_Comment->registerWorkflow();
-
         $this->FCom_Admin_Model_Role->createPermission([
             'sales' => 'Sales',
             'sales/orders' => 'Orders',
             'sales/order_status' => 'Order Status',
             'sales/carts' => 'Carts',
-            'sales/reports' => 'Reports',
+            'sales/reports' => 'Reports'
         ]);
     }
 
-    public function workflowAction($action, $args)
-    {
-        $this->BEvents->fire('FCom_Sales_Workflow::' . $action, $args);
-        return $this;
-    }
-
+    /**
+     * @param $name
+     * @param null $class
+     * @return $this
+     */
     public function addPaymentMethod($name, $class = null)
     {
         if (is_null($class)) $class = $name;
@@ -47,6 +40,11 @@ class FCom_Sales_Main extends BClass
         return $this;
     }
 
+    /**
+     * @param $name
+     * @param null $class
+     * @return $this
+     */
     public function addCheckoutMethod($name, $class = null)
     {
         if (is_null($class)) $class = $name;
@@ -54,6 +52,11 @@ class FCom_Sales_Main extends BClass
         return $this;
     }
 
+    /**
+     * @param $name
+     * @param null $class
+     * @return $this
+     */
     public function addShippingMethod($name, $class = null)
     {
         if (is_null($class)) $class = $name;
@@ -61,6 +64,11 @@ class FCom_Sales_Main extends BClass
         return $this;
     }
 
+    /**
+     * @param $name
+     * @param null $class
+     * @return $this
+     */
     public function addDiscountMethod($name, $class = null)
     {
         if (is_null($class)) $class = $name;
@@ -68,11 +76,20 @@ class FCom_Sales_Main extends BClass
         return $this;
     }
 
+    /**
+     * @param $name
+     * @return null
+     */
     public function getShippingMethodClassName($name)
     {
         return !empty($this->_registry['shipping_method'][$name]) ? $this->_registry['shipping_method'][$name] : null;
     }
 
+    /**
+     * @param $type
+     * @param null $name
+     * @return null
+     */
     protected function _getHeap($type, $name = null)
     {
         if (empty($this->_heap[$type])) {
@@ -90,27 +107,42 @@ class FCom_Sales_Main extends BClass
             (!empty($this->_heap[$type][$name]) ? $this->_heap[$type][$name] : null);
     }
 
+    /**
+     * @return null
+     */
     public function getPaymentMethods()
     {
         return $this->_getHeap('payment_method');
     }
 
+    /**
+     * @return null
+     */
     public function getCheckoutMethods()
     {
         return $this->_getHeap('checkout_method');
     }
 
+    /**
+     * @return null
+     */
     public function getShippingMethods()
     {
         return $this->_getHeap('shipping_method');
     }
 
+    /**
+     * @return null
+     */
     public function getDiscountMethods()
     {
         return $this->_getHeap('discount_method');
     }
 
 
+    /**
+     * @param $args
+     */
     public function checkDefaultShippingPayment($args)
     {
         if (!$this->getShippingMethods()) {
@@ -131,6 +163,9 @@ class FCom_Sales_Main extends BClass
         }
     }
 
+    /**
+     * @param $args
+     */
     public function onGetDashboardWidgets($args)
     {
         $view = $args['view'];

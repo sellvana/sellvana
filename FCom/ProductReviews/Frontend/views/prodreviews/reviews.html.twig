@@ -31,9 +31,9 @@
                     <input type="hidden" name="rid" value="{{ review.get('id') }}">
                     {{ "Was this review helpful to you" | _ }}?
                     <button type="submit" name="review_helpful" value="yes"
-                        onclick="FCom.add_review_rating('{{ APP.href('prodreviews/helpful') }}', {{ review.get('id') }}, 'yes');">{{ "Yes" | _ }}</button>
+                        onclick="FCom.Review.AddRating('{{ APP.href('prodreviews/helpful') }}', {{ review.get('id') }}, 'yes');">{{ "Yes" | _ }}</button>
                     <button type="submit" name="review_helpful" value="no"
-                        onclick="FCom.add_review_rating('{{ APP.href('prodreviews/helpful') }}', {{ review.get('id') }}, 'no');">{{ "No" | _ }}</button>
+                        onclick="FCom.Review.AddRating('{{ APP.href('prodreviews/helpful') }}', {{ review.get('id') }}, 'no');">{{ "No" | _ }}</button>
                 </form>
             </div>
             <span id="block_review_helpful_done_{{ review.get('id') }}" style="color:green"></span>

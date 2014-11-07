@@ -1,5 +1,18 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_IndexTank_Admin
+ *
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ * @property FCom_IndexTank_Admin_Controller $FCom_IndexTank_Admin_Controller
+ * @property FCom_IndexTank_Index_Product $FCom_IndexTank_Index_Product
+ * @property FCom_IndexTank_Model_ProductFunction $FCom_IndexTank_Model_ProductFunction
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_IndexTank_Model_IndexingStatus $FCom_IndexTank_Model_IndexingStatus
+ * @property FCom_IndexTank_Cron $FCom_IndexTank_Cron
+ * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ * @property FCom_IndexTank_Model_ProductField $FCom_IndexTank_Model_ProductField
+ */
 class FCom_IndexTank_Admin extends BClass
 {
     /**
@@ -150,6 +163,7 @@ class FCom_IndexTank_Admin extends BClass
         if (empty($catIds)) {
             return;
         }
+        /** @var FCom_Catalog_Model_Category[] $categories */
         $categories = $this->FCom_Catalog_Model_Category->orm()->where_in('id', $catIds)->find_many_assoc();
         foreach ($categories as $category) {
             $products = $category->products();
@@ -159,6 +173,10 @@ class FCom_IndexTank_Admin extends BClass
             $this->FCom_IndexTank_Cron->setProductsStatus(0, $products);
         }
     }
+
+    /**
+     * @param $args
+     */
     public function onCategoryMoveBefore($args)
     {
         if (empty($args['id'])) {
@@ -170,6 +188,7 @@ class FCom_IndexTank_Admin extends BClass
         if (empty($catIds)) {
             return;
         }
+        /** @var FCom_Catalog_Model_Category[] $categories */
         $categories = $this->FCom_Catalog_Model_Category->orm()->where_in('id', $catIds)->find_many_assoc();
         foreach ($categories as $category) {
             $products = $category->products();
@@ -225,6 +244,7 @@ class FCom_IndexTank_Admin extends BClass
         $cfModel = $args['model'];
         //add custom field to the IndexTank product field table if not exists yet
         $fieldName = $this->FCom_IndexTank_Index_Product->getCustomFieldKey($cfModel);
+        /** @var FCom_IndexTank_Model_ProductField $doc */
         $doc = $this->FCom_IndexTank_Model_ProductField->orm()->where('field_name', $fieldName)->find_one();
         if (!$doc) {
             $doc = $this->FCom_IndexTank_Model_ProductField->create();
@@ -262,6 +282,7 @@ class FCom_IndexTank_Admin extends BClass
     {
         $cfModel = $args['model'];
         $fieldName = $this->FCom_IndexTank_Index_Product->getCustomFieldKey($cfModel);
+        /** @var FCom_IndexTank_Model_ProductField $doc */
         $doc = $this->FCom_IndexTank_Model_ProductField->orm()->where('field_name', $fieldName)->find_one();
         if (!$doc) {
             return;

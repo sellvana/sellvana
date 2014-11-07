@@ -1285,7 +1285,7 @@ class BORM extends ORMWrapper
      * Find one row
      *
      * @param int|null $id
-     * @return BModel
+     * @return static
      */
     public function find_one($id = null)
     {
@@ -1299,7 +1299,7 @@ class BORM extends ORMWrapper
     /**
     * Find many rows (SELECT)
     *
-    * @return BModel[]
+    * @return static[]
     */
     public function find_many()
     {
@@ -1348,6 +1348,8 @@ class BORM extends ORMWrapper
     /**
      * Check whether the given field (or object itself) has been changed since this
      * object was saved.
+     * @param null $key
+     * @return bool
      */
     public function is_dirty($key = null) {
         return null === $key ? !empty($this->_dirty_fields) : isset($this->_dirty_fields[$key]);
@@ -1357,6 +1359,9 @@ class BORM extends ORMWrapper
      * Set a property to a particular value on this object.
      * Flags that property as 'dirty' so it will be saved to the
      * database when save() is called.
+     * @param $key
+     * @param $value
+     * @throws BException
      */
     public function set($key, $value) {
         if (!is_scalar($key)) {
@@ -1388,8 +1393,78 @@ class BORM extends ORMWrapper
 
     /**
      * Add a simple JOIN source to the query
+     * Shortcut to help with IDE auto-completion
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return $this
      */
-    public function _add_join_source($join_operator, $table, $constraint, $table_alias = null) {
+    public function join($table, $constraint, $table_alias = null)
+    {
+        return parent::join($table, $constraint, $table_alias);
+    }
+
+    /**
+     * Add an INNER JOIN source to the query
+     * Shortcut to help with IDE auto-completion
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return $this
+     */
+    public function inner_join($table, $constraint, $table_alias = null)
+    {
+        return parent::inner_join($table, $constraint, $table_alias);
+    }
+
+    /**
+     * Add a LEFT OUTER JOIN source to the query
+     * Shortcut to help with IDE auto-completion
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return $this
+     */
+    public function left_outer_join($table, $constraint, $table_alias = null)
+    {
+        return parent::left_outer_join($table, $constraint, $table_alias);
+    }
+
+    /**
+     * Add an RIGHT OUTER JOIN source to the query
+     * Shortcut to help with IDE auto-completion
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return \ORM
+     */
+    public function right_outer_join($table, $constraint, $table_alias = null)
+    {
+        return parent::right_outer_join($table, $constraint, $table_alias);
+    }
+
+    /**
+     * Add an FULL OUTER JOIN source to the query
+     * Shortcut to help with IDE auto-completion
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return $this
+     */
+    public function full_outer_join($table, $constraint, $table_alias = null)
+    {
+        return parent::full_outer_join($table, $constraint, $table_alias);
+    }
+
+    /**
+     * Add a simple JOIN source to the query
+     * @param $join_operator
+     * @param $table
+     * @param $constraint
+     * @param null $table_alias
+     * @return $this
+     */
+    protected function _add_join_source($join_operator, $table, $constraint, $table_alias = null) {
         if (!isset(self::$_classTableMap[$table])) {
             if (class_exists($table) && is_subclass_of($table, 'BModel')) {
                 $class = BClassRegistry::className($table);
@@ -1425,6 +1500,11 @@ class BORM extends ORMWrapper
         return $this;
     }
 
+    /**
+     * @param $data
+     * @param null $isNew
+     * @return $this
+     */
     public function set_dirty_fields($data, $isNew = null)
     {
         $this->_dirty_fields = $data;
@@ -1465,6 +1545,8 @@ class BORM extends ORMWrapper
     /**
      * Save any fields which have been modified on this object
      * to the database.
+     * @param bool $replace
+     * @return bool
      */
     protected function _save($replace = false)
     {
@@ -1533,6 +1615,10 @@ class BORM extends ORMWrapper
         return $this->_dirty_fields;
     }
 
+    /**
+     * @param string $property
+     * @return array
+     */
     public function old_values($property = '')
     {
         if ($property && isset($this->_old_values[$property])) {
@@ -1554,8 +1640,10 @@ class BORM extends ORMWrapper
         return parent::delete();
     }
 
-     /**
+    /**
      * Add an ORDER BY expression DESC clause
+     * @param $expression
+     * @return $this
      */
      public function order_by_expr($expression) {
         $this->_order_by[] = "{$expression}";
@@ -1710,30 +1798,34 @@ class BORM extends ORMWrapper
     }
 
     /**
-    * Build the WHERE clause(s)
-    * Extended with argument for options skipping of values calculation
-    */
-    protected function _build_where($calculate_values = true) {
-            // If there are no WHERE clauses, return empty string
-            if (count($this->_where_conditions) === 0) {
-                return '';
-            }
+     * Build the WHERE clause(s)
+     * Extended with argument for options skipping of values calculation
+     * @param bool $calculate_values
+     * @return string
+     */
+    protected function _build_where($calculate_values = true)
+    {
+        // If there are no WHERE clauses, return empty string
+        if (count($this->_where_conditions) === 0) {
+            return '';
+        }
 
-            $where_conditions = [];
-            foreach ($this->_where_conditions as $condition) {
-                $where_conditions[] = $condition[static::WHERE_FRAGMENT];
-                if($calculate_values){
-                    $this->_values = array_merge($this->_values, $condition[static::WHERE_VALUES]);
-                }
+        $where_conditions = [];
+        foreach ($this->_where_conditions as $condition) {
+            $where_conditions[] = $condition[static::WHERE_FRAGMENT];
+            if ($calculate_values) {
+                $this->_values = array_merge($this->_values, $condition[static::WHERE_VALUES]);
             }
+        }
 
-            return "WHERE " . join(" AND ", $where_conditions);
+        return "WHERE " . join(" AND ", $where_conditions);
     }
 
     /**
     * Build the WHERE clause Values array if not build already inside _build_where()
     */
-    protected function _build_values() {
+    protected function _build_values()
+    {
         // If there are no WHERE clauses, return empty array
         if (count($this->_where_conditions) === 0) {
             return [];
@@ -1741,7 +1833,7 @@ class BORM extends ORMWrapper
 
         $values = [];
         foreach ($this->_where_conditions as $condition) {
-                $values[] = $condition[static::WHERE_VALUES][0];
+            $values[] = $condition[static::WHERE_VALUES][0];
         }
 
         return $values;
@@ -1750,58 +1842,167 @@ class BORM extends ORMWrapper
     const HAVING_FRAGMENT = 0;
     const HAVING_VALUES = 1;
     protected $_having_conditions = [];
-    public function having($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having($column_name, $value)
+    {
         return $this->having_equal($column_name, $value);
     }
-    public function having_equal($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having_equal($column_name, $value)
+    {
         return $this->_add_simple_having($column_name, '=', $value);
     }
-    public function having_not_equal($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having_not_equal($column_name, $value)
+    {
         return $this->_add_simple_having($column_name, '!=', $value);
     }
-    public function having_id_is($id) {
+
+    /**
+     * @param $id
+     * @return BORM
+     */
+    public function having_id_is($id)
+    {
         return $this->having($this->_get_id_column_name(), $id);
     }
-    public function having_like($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having_like($column_name, $value)
+    {
         return $this->_add_simple_having($column_name, 'LIKE', $value);
     }
-    public function having_not_like($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having_not_like($column_name, $value)
+    {
         return $this->_add_simple_having($column_name, 'NOT LIKE', $value);
     }
-    public function having_gt($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having_gt($column_name, $value)
+    {
         return $this->_add_simple_having($column_name, '>', $value);
     }
-    public function having_lt($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having_lt($column_name, $value)
+    {
         return $this->_add_simple_having($column_name, '<', $value);
     }
-    public function having_gte($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having_gte($column_name, $value)
+    {
         return $this->_add_simple_having($column_name, '>=', $value);
     }
-    public function having_lte($column_name, $value) {
+
+    /**
+     * @param $column_name
+     * @param $value
+     * @return BORM
+     */
+    public function having_lte($column_name, $value)
+    {
         return $this->_add_simple_having($column_name, '<=', $value);
     }
-    public function having_in($column_name, $values) {
+
+    /**
+     * @param $column_name
+     * @param $values
+     * @return BORM
+     */
+    public function having_in($column_name, $values)
+    {
         $column_name = $this->_quote_identifier($column_name);
         $placeholders = $this->_create_placeholders(count($values));
         return $this->_add_having("{$column_name} IN ({$placeholders})", $values);
     }
-    public function having_not_in($column_name, $values) {
+
+    /**
+     * @param $column_name
+     * @param $values
+     * @return BORM
+     */
+    public function having_not_in($column_name, $values)
+    {
         $column_name = $this->_quote_identifier($column_name);
         $placeholders = $this->_create_placeholders(count($values));
         return $this->_add_having("{$column_name} NOT IN ({$placeholders})", $values);
     }
-    public function having_null($column_name) {
+
+    /**
+     * @param $column_name
+     * @return BORM
+     */
+    public function having_null($column_name)
+    {
         $column_name = $this->_quote_identifier($column_name);
         return $this->_add_having("{$column_name} IS NULL");
     }
-    public function having_not_null($column_name) {
+
+    /**
+     * @param $column_name
+     * @return BORM
+     */
+    public function having_not_null($column_name)
+    {
         $column_name = $this->_quote_identifier($column_name);
         return $this->_add_having("{$column_name} IS NOT NULL");
     }
-    public function having_raw($clause, $parameters = []) {
+
+    /**
+     * @param $clause
+     * @param array $parameters
+     * @return BORM
+     */
+    public function having_raw($clause, $parameters = [])
+    {
         return $this->_add_having($clause, $parameters);
     }
-    protected function _add_having($fragment, $values = []) {
+
+    /**
+     * @param $fragment
+     * @param array $values
+     * @return $this
+     */
+    protected function _add_having($fragment, $values = [])
+    {
         if (!is_array($values)) {
             $values = [$values];
         }
@@ -1811,11 +2012,21 @@ class BORM extends ORMWrapper
         ];
         return $this;
     }
-    protected function _add_simple_having($column_name, $separator, $value) {
+
+    /**
+     * @param $column_name
+     * @param $separator
+     * @param $value
+     * @return BORM
+     */
+    protected function _add_simple_having($column_name, $separator, $value)
+    {
         $column_name = $this->_quote_identifier($column_name);
         return $this->_add_having("{$column_name} {$separator} ?", $value);
     }
-    protected function _build_having() {
+
+    protected function _build_having()
+    {
         if (count($this->_having_conditions) === 0) {
             return '';
         }
@@ -1828,6 +2039,11 @@ class BORM extends ORMWrapper
         return "HAVING " . join(" AND ", $having_conditions);
     }
 
+    /**
+     * @param null $data
+     * @param bool $new
+     * @return static|bool
+     */
     public function create($data = null, $new = true)
     {
         $model = parent::create($data);
@@ -2172,7 +2388,7 @@ class BModel extends Model
      * @param mixed $value
      * @param mixed $flag if true or 'ADD', add to existing value; if null or 'IFNULL', update only if currently not set
      * @throws BException
-     * @return $this
+     * @return static
      */
     public function set($key, $value = null, $flag = false)
     {
@@ -2209,7 +2425,7 @@ class BModel extends Model
      *
      * @param string $key
      * @param int    $increment
-     * @return $this
+     * @return static
      */
     public function add($key, $increment = 1)
     {
@@ -2221,7 +2437,7 @@ class BModel extends Model
     *
     * @param null|array $data
     * @param boolean $new is new record
-    * @return $this
+    * @return static
     */
     public static function create($data = null, $new = true)
     {
@@ -2267,7 +2483,7 @@ class BModel extends Model
     * @param int|string|array $id
     * @param string $field
     * @param boolean $cache
-    * @return $this
+    * @return static
     * @throws BException
     */
     public function load($id, $field = null, $cache = false)
@@ -2321,6 +2537,9 @@ class BModel extends Model
 
     /**
      * Temporary implementation using load()
+     * @param $where
+     * @throws BException
+     * @return static
      */
     public function loadWhere($where)
     {
@@ -2333,7 +2552,7 @@ class BModel extends Model
      * @param int|string|array $where
      * @param string $field
      * @param boolean $cache
-     * @return $this
+     * @return static
      */
     public function loadOrCreate($where, $field = null, $cache = false)
     {

@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Wishlist_Frontend_Controller
+ *
+ * @property FCom_Wishlist_Model_Wishlist $FCom_Wishlist_Model_Wishlist
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ */
 class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function action_index()
@@ -78,6 +84,9 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $this->BResponse->redirect('wishlist');
     }
 
+    /**
+     * @param $args
+     */
     public function onAddToWishlist($args)
     {
         $product = $args['product'];
