@@ -1,15 +1,52 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Model_Order_Address
+ *
+ * @property int $id
+ * @property int $order_id
+ * @property string $atype enum('shipping','billing')
+ * @property string $firstname
+ * @property string $lastname
+ * @property string $middle_initial
+ * @property string $prefix
+ * @property string $suffix
+ * @property string $company
+ * @property string $attn
+ * @property string $street1
+ * @property string $street2
+ * @property string $street3
+ * @property string $city
+ * @property string $region
+ * @property string $postcode
+ * @property string $country
+ * @property string $phone
+ * @property string $fax
+ * @property datetime $create_at
+ * @property datetime $update_at
+ * @property float $lat
+ * @property float $lng
+ */
 class FCom_Sales_Model_Order_Address extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_sales_order_address';
     protected static $_origClass = __CLASS__;
 
+    /**
+     * @param $orderId
+     * @param string $atype
+     * @return FCom_Sales_Model_Order_Address
+     */
     public function findByOrder($orderId, $atype = 'shipping')
     {
         return $this->orm()->where("order_id", $orderId)->where('atype', $atype)->find_one();
     }
 
+    /**
+     * @param null $obj
+     * @return string
+     * @throws BException
+     */
     public function as_html($obj = null)
     {
         if (is_null($obj)) {
@@ -36,6 +73,12 @@ class FCom_Sales_Model_Order_Address extends FCom_Core_Model_Abstract
         return true;
     }
 
+    /**
+     * @param $orderId
+     * @param $newAddress
+     * @return BModel|static
+     * @throws BException
+     */
     public function newAddress($orderId, $newAddress)
     {
         if (is_object($newAddress)) {
@@ -63,6 +106,10 @@ class FCom_Sales_Model_Order_Address extends FCom_Core_Model_Abstract
         return $newAddress;
     }
 
+    /**
+     * @param string $delim
+     * @return string
+     */
     public function getFullAddress($delim = "\n")
     {
         $addressData = [];

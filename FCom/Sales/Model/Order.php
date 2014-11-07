@@ -31,6 +31,9 @@
  * @property FCom_Sales_Model_Order_Item $FCom_Sales_Model_Order_Item
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
+ * @property FCom_Sales_Model_Order_Address $FCom_Sales_Model_Order_Address
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Sales_Model_Cart_Address $FCom_Sales_Model_Cart_Address
  */
 class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 {

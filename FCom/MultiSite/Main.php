@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_MultiSite_Main
+ *
+ * @property FCom_MultiSite_Model_Site $FCom_MultiSite_Model_Site
+ */
 class FCom_MultiSite_Main extends BClass
 {
     public function beforeBootstrap()

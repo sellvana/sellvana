@@ -51,11 +51,17 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
             ->where('pc.category_id', $this->id);
     }
 
+    /**
+     * @return FCom_Catalog_Model_Product[]
+     */
     public function products()
     {
         return $this->productsORM()->find_many();
     }
 
+    /**
+     * @return mixed
+     */
     public function urlPrefix()
     {
         if (empty(static::$_urlPrefix)) {
@@ -64,12 +70,20 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return static::$_urlPrefix;
     }
 
+    /**
+     * @return string
+     */
     public function url()
     {
         $prefix = $this->urlPrefix();
         return $this->BApp->frontendHref($prefix . $this->url_path);
     }
 
+    /**
+     * @param $args
+     * @return bool
+     * @throws BException
+     */
     public function onReorderAZ($args)
     {
         $c = $this->load($args['id']);
@@ -92,6 +106,10 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         $this->save();
     }
 
+    /**
+     * @param $categories
+     * @return array
+     */
     public function prepareApiData($categories)
     {
         $result = [];
@@ -108,6 +126,9 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return $result;
     }
 
+    /**
+     * @return array
+     */
     public function parentNodeList()
     {
         $categories = self::orm()->find_many();
@@ -122,11 +143,18 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return $result;
     }
 
+    /**
+     * @return int
+     */
     public function inMenu()
     {
         return $this->is_top_menu;
     }
 
+    /**
+     * @param int $maxLevel
+     * @return array
+     */
     public function getTopNavCategories($maxLevel = 1)
     {
         /** @var BORM $orm */
@@ -159,6 +187,9 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return array_values($categories);
     }
 
+    /**
+     * @return $this[]
+     */
     public function getFeaturedCategories()
     {
         return $this->orm()->where('is_featured', 1)->find_many();
@@ -198,21 +229,10 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         $this->BEvents->fire(__METHOD__ . ':products', ['model' => $this, 'add_ids' => $addIds, 'remove_ids' => $removeIds]);
     }
 
-    public function imagePath()
-    {
-        return 'media/category/images/';
-    }
-
-    public function deleteImage()
-    {
-        $image = $this->image('fulldir');
-        if ($image) {
-            clearstatcache(true, $image);
-            return unlink($image);
-        }
-        return true;
-    }
-
+    /**
+     * @param bool $onlyEnabled
+     * @return array
+     */
     public function getPageParts($onlyEnabled = false)
     {
         $allParts = [
@@ -239,6 +259,10 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return $result;
     }
 
+    /**
+     * @param $cloneNode
+     * @return $this
+     */
     public function onAfterClone(&$cloneNode)
     {
         //after clone categories, add products associate
@@ -255,6 +279,10 @@ class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
         return $this;
     }
 
+    /**
+     * @param $args
+     * @throws BException
+     */
     public function onImportAfterModel($args)
     {
         $importId = $args['import_id'];

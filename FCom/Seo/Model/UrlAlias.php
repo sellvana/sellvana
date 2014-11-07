@@ -1,9 +1,24 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Seo_Model_UrlAlias
+ *
+ * @property int $id
+ * @property string $request_url
+ * @property string $target_url
+ * @property int $is_active
+ * @property int $is_regexp
+ * @property string $redirect_type
+ * @property datetime $create_at
+ * @property datetime $update_at
+ */
 class FCom_Seo_Model_UrlAlias extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_seo_urlalias';
 
+    /**
+     * @var array
+     */
     static protected $_fieldOptions = [
         'redirect_type' => [
             'FWD' => 'Forward',
@@ -14,6 +29,10 @@ class FCom_Seo_Model_UrlAlias extends FCom_Core_Model_Abstract
         'is_regexp' => [0 => 'No', 1 => 'Yes'],
     ];
 
+    /**
+     * @param $url
+     * @return bool|FCom_Seo_Model_UrlAlias
+     */
     public function findByUrl($url)
     {
         $alias = $this->orm()->where('is_active', 1)->where('is_regexp', 0)->where('request_url', $url)->find_one();
@@ -27,6 +46,10 @@ class FCom_Seo_Model_UrlAlias extends FCom_Core_Model_Abstract
         return false;
     }
 
+    /**
+     * @param bool $full
+     * @return null|string
+     */
     public function targetUrl($full = true)
     {
         $url = $this->target_url;

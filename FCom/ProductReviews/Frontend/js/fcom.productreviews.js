@@ -1,5 +1,6 @@
 define(["jquery"], function ($) {
-    FCom.add_review_rating = function (url, rid, helpful) {
+    FCom.Review = {};
+    FCom.Review.AddRating = function (url, rid, helpful) {
         $.ajax({
             type: "POST",
             url: url,
@@ -11,8 +12,8 @@ define(["jquery"], function ($) {
                 }
                 if (msg['error']) {
                     $('#block_review_helpful_' + rid).hide();
-                    $('#block_review_helpful_done_' + rid).css('color', 'red');
-                    $('#block_review_helpful_done_' + rid).html(msg['error']);
+                    $('#block_review_helpful_done_' + rid).css('color', 'red').html(msg['error']);
+                    //$('#block_review_helpful_done_' + rid).html(msg['error']);
                 } else {
                     $('#block_review_helpful_' + rid).hide();
                     $('#block_review_helpful_done_' + rid).html("Thank you for your feedback!");

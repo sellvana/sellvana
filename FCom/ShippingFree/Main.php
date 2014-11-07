@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_ShippingFree_Main
+ *
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Promo_Model_Promo $FCom_Promo_Model_Promo
+ * @property FCom_Promo_Model_Cart $FCom_Promo_Model_Cart
+ * @property FCom_Sales_Main $FCom_Sales_Main
+ */
 class FCom_ShippingFree_Main extends BClass
 {
 

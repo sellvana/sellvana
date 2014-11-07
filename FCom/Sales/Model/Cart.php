@@ -28,7 +28,17 @@
  * @property string $admin_id
  *
  * other property
- * @property int same_address flag to know shipping is same as billing
+ * @property int $same_address flag to know shipping is same as billing
+ * @property array $data from json_decode data_serialized
+ *
+ * DI
+ * @property FCom_Sales_Model_Cart_Item $FCom_Sales_Model_Cart_Item
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Sales_Model_Cart_Address $FCom_Sales_Model_Cart_Address
+ * @property FCom_Sales_Main $FCom_Sales_Main
+ * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
  */
 class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 {
@@ -49,11 +59,20 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public $items;
     public $totals;
 
+    /**
+     * @param null $id
+     * @return int
+     */
     public function sessionCartId($id = null)
     {
         return $this->sessionCart()->id();
     }
 
+    /**
+     * @param bool $createAnonymousIfNeeded
+     * @param bool|FCom_Sales_Model_Cart $reset
+     * @return FCom_Sales_Model_Cart
+     */
     public function sessionCart($createAnonymousIfNeeded = false, $reset = false)
     {
         if (!static::$_sessionCart || $reset) {
@@ -90,12 +109,18 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return static::$_sessionCart;
     }
 
+    /**
+     * @return FCom_Sales_Model_Cart
+     */
     public function resetSessionCart()
     {
         static::$_sessionCart = null;
         return $this;
     }
 
+    /**
+     * @throws BException
+     */
     public function onUserLogin()
     {
         // load just logged in customer
@@ -128,11 +153,19 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $this->BResponse->cookie('cart', false);
     }
 
+    /**
+     *
+     */
     public function onUserLogout()
     {
         static::$_sessionCart = null;
     }
 
+    /**
+     * @param FCom_Sales_Model_Cart $cart
+     * @return FCom_Sales_Model_Cart
+     * @throws BException
+     */
     public function merge($cart)
     {
         if (is_numeric($cart)) {
@@ -149,7 +182,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     /**
      * Return total UNIQUE number of items in the cart
      * @param boolean $assoc
-     * @return array
+     * @return FCom_Sales_Model_Cart_Item[]
      */
     public function items($assoc = true)
     {
@@ -157,6 +190,10 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $assoc ? $this->items : array_values($this->items);
     }
 
+    /**
+     * @param int $limit
+     * @return array
+     */
     public function recentItems($limit = 3)
     {
         if (!$this->id()) {
@@ -170,6 +207,10 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $items;
     }
 
+    /**
+     * @param null $items
+     * @return FCom_Sales_Model_Cart
+     */
     public function loadProducts($items = null)
     {
         if (is_null($items)) {
@@ -194,6 +235,10 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param $cartId
+     * @return array
+     */
     public function cartItems($cartId)
     {
         $tProduct = $this->FCom_Catalog_Model_Product->table();
@@ -215,6 +260,12 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this->get('item_qty') * 1;
     }
 
+    /**
+     * @param $productId
+     * @param array $params
+     * @return $this
+     * @throws BException
+     */
     public function addProduct($productId, $params = [])
     {
         //save cart to DB on add first product
@@ -278,6 +329,10 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param $item
+     * @return $this
+     */
     public function removeItem($item)
     {
         if (is_numeric($item)) {
@@ -292,6 +347,10 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param $productId
+     * @return $this
+     */
     public function removeProduct($productId)
     {
         $this->items();
@@ -300,6 +359,11 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param $request
+     * @return $this
+     * @throws BException
+     */
     public function updateItemsQty($request)
     {
         $items = $this->items();
@@ -313,6 +377,11 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param $name
+     * @param null $class
+     * @return $this
+     */
     public function registerTotalRowHandler($name, $class = null)
     {
         if (is_null($class)) $class = $name;
@@ -320,6 +389,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function getTotalRowInstances()
     {
         if (!$this->totals) {
@@ -333,6 +405,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this->totals;
     }
 
+    /**
+     * @return $this
+     */
     public function calculateTotals()
     {
         $this->loadProducts();
@@ -347,6 +422,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function getTotals()
     {
         //TODO: price invalidate
@@ -359,6 +437,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this->getTotalRowInstances();
     }
 
+    /**
+     * @return bool
+     */
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
@@ -387,12 +468,18 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return true;
     }
 
+    /**
+     *
+     */
     public function onAfterLoad()
     {
         parent::onAfterLoad();
         $this->data = !empty($this->data_serialized) ? $this->BUtil->fromJson($this->data_serialized) : [];
     }
 
+    /**
+     * @return mixed
+     */
     public function getAddresses()
     {
         if (!$this->_addresses) {
@@ -403,18 +490,29 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this->_addresses;
     }
 
+    /**
+     * @return null
+     */
     public function getBillingAddress()
     {
         $addresses = $this->getAddresses();
         return !empty($addresses['billing']) ? $addresses['billing'] : null;
     }
 
+    /**
+     * @return null
+     */
     public function getShippingAddress()
     {
         $addresses = $this->getAddresses();
         return !empty($addresses['shipping']) ? $addresses['shipping'] : $this->getBillingAddress();
     }
 
+    /**
+     * @param $atype
+     * @param $data
+     * @return $this
+     */
     public function setAddressByType($atype, $data)
     {
         $address = $atype === 'billing' ? $this->getBillingAddress() : $this->getShippingAddress();
@@ -430,6 +528,10 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param $customer
+     * @return bool
+     */
     public function importAddressesFromCustomer($customer)
     {
         $hlp = $this->FCom_Sales_Model_Cart_Address;
@@ -451,6 +553,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return true;
     }
 
+    /**
+     * @return null
+     */
     public function getShippingMethod()
     {
         if (!$this->shipping_method) {
@@ -507,6 +612,11 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param $status
+     * @return $this
+     * @throws BException
+     */
     public function setStatus($status)
     {
         $this->set('status', $status);
@@ -514,6 +624,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function placeOrder()
     {
         $cart = $this->orm ? $this : $this->sessionCart();
@@ -539,6 +652,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return false;
     }
 
+    /**
+     *
+     */
     public function __destruct()
     {
         $this->_addresses = null;
@@ -546,6 +662,10 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $this->totals = null;
     }
 
+    /**
+     * @param array $data
+     * @return $this
+     */
     public function setPaymentDetails($data = [])
     {
         if (!empty($data)) {
@@ -557,6 +677,10 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         }
         return $this;
     }
+
+    /**
+     * @param $post
+     */
     public function setPaymentToUser($post)
     {
         if ($this->FCom_Customer_Model_Customer->isLoggedIn() && isset($post['payment'])) {

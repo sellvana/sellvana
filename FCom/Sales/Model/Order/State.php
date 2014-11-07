@@ -21,21 +21,37 @@ class FCom_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Contex
         'custom' => 'FCom_Sales_Model_Order_State_Custom',
     ];
 
+    /**
+     * @return mixed
+     * @throws BException
+     */
     public function overall()
     {
         return $this->_getStateObject('overall');
     }
 
+    /**
+     * @return mixed
+     * @throws BException
+     */
     public function delivery()
     {
         return $this->_getStateObject('delivery');
     }
 
+    /**
+     * @return mixed
+     * @throws BException
+     */
     public function payment()
     {
         return $this->_getStateObject('payment');
     }
 
+    /**
+     * @return mixed
+     * @throws BException
+     */
     public function custom()
     {
         return $this->_getStateObject('custom');
