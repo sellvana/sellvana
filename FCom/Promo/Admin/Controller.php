@@ -412,9 +412,8 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $r = $this->BRequest;
         $id = $r->get('id');
         if (!$id) {
-            $html = $this->_("Promotion id not found");
-            $status = 'error';
-            $this->BResponse->status(400, $html, false);
+            $message = $this->_("Promotion id not found");
+            $this->BResponse->status(400, $message, false);
         } else {
             $data = $r->post('model');
             $pattern = $data['code_pattern'];
@@ -423,7 +422,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $usesTotal = $data['code_uses_total'];
             $couponCount = $data['coupon_count'];
             $model = $this->FCom_Promo_Model_Coupon;
-            $model->generateCoupons([
+            $generated = $model->generateCoupons([
                 'promo_id' => $id,
                 'pattern' => $pattern,
                 'length' => $length,
@@ -431,6 +430,13 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                 'uses_total' => $usesTotal,
                 'count' => $couponCount
             ]);
+            $status = 'success';
+            $message = $this->_("%d coupons generated.", [$generated]);
+            if($generated < $couponCount){
+                $status = 'warning';
+                $message .= $this->_("\nFailed to generate %d coupons", ($couponCount - $generated));
+            }
+            $this->BResponse->json(['status'=>$status, 'message'=>$message]);
         }
     }
     public function action_coupons_generate()

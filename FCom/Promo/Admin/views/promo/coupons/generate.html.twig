@@ -1,6 +1,6 @@
 {% import THIS.view('core/form-elements').twigName() as forms %}
 <div class="f-section" id="coupon-generate-container">
-    <form id="coupon-generate-form">
+    <form id="coupon-generate-form" >
         <div class="well well-sm help-block">
             <p>{{"You can have unique coupon codes generated for you automatically if you input simple patterns."|_ }} </p>
             <p>{{ "Pattern examples:"|_}}</p>
@@ -32,7 +32,7 @@
         </div>
         <div class="form-group ">
             {{ forms.input({field: 'coupon_count', label:'How many to generate'|_, value:1, label_class: 'col-md-4', input_div_class:'col-md-5'}) }}
-            <div class="col-md-2"><button type="button" id="coupon-generate-btn" class="btn btn-danger">{{ "Generate"|_ }}</button></div>
+            <div class="col-md-2"><button type="button" id="coupon-generate-btn" class="btn btn-danger btn-post">{{ "Generate"|_ }}</button></div>
         </div>
     </form>
 </div>

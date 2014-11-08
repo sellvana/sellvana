@@ -24,7 +24,7 @@ class FCom_Promo_Model_Coupon extends BModel
      */
     public function generateCoupons($params)
     {
-        if(empty($params['promo_id'])){
+        if (empty($params['promo_id'])) {
             return null;
         }
         $data = [
@@ -33,18 +33,52 @@ class FCom_Promo_Model_Coupon extends BModel
             'uses_total' => empty($params['uses_total'])? null: (int)$params['uses_total'],
         ];
 
-        $codes = [];
-        $count = empty($params['count'])? 1: (int)$params['count'];
-        if(empty($params['pattern'])){
+        $paramsCount = empty($params['count'])? 1: (int)$params['count'];
+        if (empty($params['pattern'])) { // no pattern supplied, first generate a random pattern
             $length = empty($params['length'])? 8: (int)$params['length'];
             $pattern = $this->BUtil->randomString($length, 'UD');
-        }else{
+        } else {
             $pattern = $params['pattern'];
         }
-
-        for($i = 0; $i < $count; $i++) {
-            $code = $this->BUtil->randomPattern($pattern);
-            $codes[$code] = 1;
+        $codes = $this->prepareCodes($pattern, $paramsCount);
+        foreach ($codes as $code) {
+            $coupon = array_merge($data, ['code' => $code]);
+            static::create($coupon)->save();
         }
+        return count($codes);
+    }
+
+    /**
+     * @param $pattern
+     * @param $paramsCount
+     * @return array
+     */
+    protected function prepareCodes($pattern, $paramsCount)
+    {
+        $done = false;
+        $count = $paramsCount;
+        $codes = [];
+        $sql = "SELECT `code` FROM " . static::table() . " WHERE `code` IN "; // check if codes exist already
+        $limit = 100; // 100 tries to generate the coupons
+        while (!$done) {
+            for ($i = 0; $i < $count; $i++) {
+                $code = $this->BUtil->randomPattern($pattern);
+                if(!isset($codes[$code])){ // if code repeats, don't add it
+                    $codes[$code] = 1;
+                }
+            }
+            $place_holders = implode(',', array_fill(0, count($codes), '?'));
+            $sql .= "($place_holders)";
+            $res = BORM::get_db()->query($sql, array_keys($codes));
+            while ($row = $res->fetchObject()) {
+                unset($codes[$row->code]);
+            }
+            $count = $count - count($codes);
+            $done = (count($codes) == $paramsCount);
+            if ($limit-- == 0) {
+                break;
+            }
+        }
+        return $codes;
     }
 }

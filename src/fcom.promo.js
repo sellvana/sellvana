@@ -202,12 +202,15 @@ define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (Rea
                 importCouponsUrl:""
             }
         },
-        loadModalContent: function ($modalBody, url) {
+        loadModalContent: function ($modalBody, url, success) {
             if ($modalBody.length > 0 && $modalBody.data('content-loaded') == undefined) {
                 $.get(url).done(function (result) {
                     if (result.hasOwnProperty('html')) {
                         $modalBody.html(result.html);
                         //$modalBody.data('content-loaded', true)
+                        if(typeof success == 'function'){
+                            success($modalBody);
+                        }
                     }
                 }).fail(function(result){
                     var jsonResult = result.responseJSON;
@@ -229,7 +232,46 @@ define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (Rea
             console.log("generateCodes");
             this.refs.generateModal.open();
             var $modalBody = $('.modal-body', this.refs.generateModal.getDOMNode());
-            this.loadModalContent($modalBody, this.props.generateCouponsUrl);
+            this.loadModalContent($modalBody, this.props.generateCouponsUrl, this.postGenerate);
+        },
+        postGenerate: function($el){
+            var $form = $el.find('form');
+            var $button = $form.find('button.btn-post');
+            var $codeLength = $form.find('input[name="model[code_length]"]');
+            var $codePattern = $form.find('input[name="model[code_pattern]"]');
+            var url = this.props.generateCouponsUrl;
+            if($.trim($codePattern.val()) == ''){ // code length should be settable only if no pattern is provided
+                $codeLength.prop('disabled', false);
+            }
+            $codePattern.change(function () {
+                var val = $.trim($codePattern.val());
+                if (val == '') {
+                    $codeLength.prop('disabled', false);
+                } else {
+                    $codeLength.prop('disabled', true);
+                    $codePattern.val(val);
+                }
+            });
+            $button.click(function (e) {
+                e.preventDefault();
+                var data = {};
+                $form.find('input').each(function(){
+                    var $self = $(this);
+                    var name = $self.attr('name');
+                    data[name] = $self.val();
+                });
+                // show indication that something happens?
+                $.post(url, data)
+                    .done(function (result) {
+                        var status = result.status;
+                        var message = result.message;
+                        $el.append($('<pre>').addClass((status == 'warning')?'warning':'success').text(message));
+                    })
+                    .always(function (r) {
+                        // hide notification
+                        console.log(r);
+                    });
+            });
         },
         importCodes: function () {
             // component default properties
