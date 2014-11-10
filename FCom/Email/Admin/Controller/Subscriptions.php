@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Email_Admin_Controller_Subscriptions
+ *
+ * @property FCom_Email_Model_Pref $FCom_Email_Model_Pref
+ */
 class FCom_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;

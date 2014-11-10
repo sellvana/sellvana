@@ -3,20 +3,30 @@
 /**
  * Class FCom_Promo_Model_Promo
  *
+ * @property int $id
+ * @property string $description
+ * @property string $details
+ * @property int $manuf_vendor_id
+ * @property string $from_date
+ * @property string $to_date
+ * @property string $status enum('template','pending','active','expired')
+ * @property string $buy_type enum('qty','$')
+ * @property string $buy_group enum('one','any','all','cat','anyp')
+ * @property int $buy_amount
+ * @property string $get_type enum('qty','$','%','text','choice','free')
+ * @property string $get_group enum('same_prod','same_group','any_group','diff_group')
+ * @property int $get_amount
+ * @property string $originator enum('manuf','vendor')
+ * @property string $fulfillment enum('manuf','vendor')
+ * @property string $create_at
+ * @property string $update_at
+ * @property string $coupon
+ *
  * @property FCom_Promo_Model_Cart $FCom_Promo_Model_Cart
  * @property FCom_Promo_Model_Group $FCom_Promo_Model_Group
  * @property FCom_Promo_Model_Media $FCom_Promo_Model_Media
  * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
  * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
- *
- * @property int id
- * @property string from_date promo start date
- * @property string to_date promo end date
- * @property string status promo status - 'template','pending','active','expired'
- * @property null create_at promo create date
- * @property string update_at promo update date
- * @property string buy_group for which product group the promo is valid - 'one','any','all','cat','anyp'
- * @property string get_group from which product group you get a product 'same_prod','same_group','any_group','diff_group'
  */
 class FCom_Promo_Model_Promo extends BModel
 {
@@ -182,6 +192,7 @@ class FCom_Promo_Model_Promo extends BModel
 
         $groups = [];
         if (!$this->_newRecord) {
+            /** @var FCom_Promo_Model_Group[] $groupsRaw */
             $groupsRaw = $this->FCom_Promo_Model_Group->orm()->where('promo_id', $this->id)->find_many();
             foreach ($groupsRaw as $g) {
                 $groups[$g->group_type][] = $g;

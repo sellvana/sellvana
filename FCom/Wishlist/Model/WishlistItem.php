@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Wishlist_Model_WishlistItem
+ *
+ * @property int $id
+ * @property int $wishlist_id
+ * @property int $product_id
+ */
 class FCom_Wishlist_Model_WishlistItem extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_wishlist_items';
@@ -7,6 +14,10 @@ class FCom_Wishlist_Model_WishlistItem extends FCom_Core_Model_Abstract
 
     protected $product;
 
+    /**
+     * get related product
+     * @return FCom_Catalog_Model_Product
+     */
     public function product()
     {
         if (!$this->product) {

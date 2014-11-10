@@ -1,15 +1,34 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_ShippingUps_ShippingMethod
+ *
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ */
 class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstract
 {
     protected $_name = 'Universal post service';
     protected $_code = 'ShippingUps';
+    /**
+     * @var UpsRate
+     */
     protected $_rate;
 
     public function init()
     {
     }
 
+    /**
+     * @param $shipNumber
+     * @param $tozip
+     * @param $service
+     * @param $length
+     * @param $width
+     * @param $height
+     * @param $weight
+     * @return bool
+     */
     protected function _rateApiCall($shipNumber, $tozip, $service, $length, $width, $height, $weight)
     {
         include_once __DIR__ . '/lib/UpsRate.php';
@@ -33,6 +52,9 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
         return true;
     }
 
+    /**
+     * @return string
+     */
     public function getEstimate()
     {
         if (!$this->_rate) {
@@ -72,11 +94,17 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getDefaultService()
     {
         return ['03' => 'UPS Ground'];
     }
 
+    /**
+     * @return array
+     */
     public function getServicesSelected()
     {
         $c = $this->BConfig;
@@ -92,6 +120,10 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
         return $selected;
     }
 
+    /**
+     * @param FCom_Sales_Model_Cart $cart
+     * @return int
+     */
     public function getRateCallback($cart)
     {
         //address
@@ -152,11 +184,17 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
         return $total;
     }
 
+    /**
+     * @return mixed
+     */
     public function getError()
     {
         return $this->_rate->getError();
     }
 
+    /**
+     * @return string
+     */
     public function getDescription()
     {
         return $this->_name;

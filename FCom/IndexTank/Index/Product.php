@@ -1,5 +1,15 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_IndexTank_Index_Product
+ *
+ * @property FCom_IndexTank_Model_ProductField $FCom_IndexTank_Model_ProductField
+ * @property FCom_IndexTank_RemoteApi $FCom_IndexTank_RemoteApi
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Catalog_Model_CategoryProduct $FCom_Catalog_Model_CategoryProduct
+ * @property FCom_IndexTank_Model_ProductFunction $FCom_IndexTank_Model_ProductFunction
+ * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ */
 class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 {
     /**
@@ -54,10 +64,12 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
 
     /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @return FCom_IndexTank_Index_Product
-    */
+     * Shortcut to help with IDE autocompletion
+     *
+     * @param bool $new
+     * @param array $args
+     * @return FCom_IndexTank_Index_Product
+     */
     static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);
@@ -98,8 +110,8 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     /**
      * Set scoring function to use in current search session
-     * @param string $function
-     * @throws Exception
+     * @param string $scoringVar
+     * @internal param string $function
      */
     public function scoringBy($scoringVar)
     {
@@ -178,8 +190,10 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     /**
      *
      * @param string $query
-     * @return array $products of FCom_Catalog_Model_Product objects
+     * @param null $start
+     * @param null $len
      * @throws Exception
+     * @return array $products of FCom_Catalog_Model_Product objects
      */
     public function search($query, $start = null, $len = null)
     {
@@ -243,6 +257,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         return $productsORM;
     }
 
+    /**
+     * @return int
+     */
     public function totalFound()
     {
         return !empty($this->_result) ? $this->_result->matches : 0;
@@ -275,6 +292,7 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     /**
      * Collect all data (text fields, categoreis, variables) for $product and add it to the index
      * @param array $products of FCom_Catalog_Model_Product objects
+     * @param int $limit
      */
     public function add($products, $limit = 0)
     {
@@ -315,6 +333,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         }
     }
 
+    /**
+     * @param $args
+     */
     public function onProductIndexAdd($args)
     {
         // prepare products assoc array
@@ -342,6 +363,11 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         }
     }
 
+    /**
+     * @param $products
+     * @param $field
+     * @param $fieldValue
+     */
     public function updateTextField($products, $field, $fieldValue)
     {
         if (!is_array($products)) {
@@ -368,18 +394,29 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         }
     }
 
+    /**
+     * @param $product
+     */
     public function updateCategories($product)
     {
         $categories = $this->_prepareCategories($product);
         $this->model()->update_categories($product->id(), $categories);
     }
 
+    /**
+     * @param $category
+     * @return string
+     */
     public function getCategoryKey($category)
     {
         //return 'ct_categories___'.str_replace("/","__",$category->url_path);
         return 'ct_' . $category->id;
     }
 
+    /**
+     * @param $cf_model
+     * @return string
+     */
     public function getCustomFieldKey($cf_model)
     {
         //return 'cf_'.$cf_model->field_type.'___'.$cf_model->field_code;
@@ -407,12 +444,18 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $this->model()->update_categories($product->id(), $category);
     }
 
+    /**
+     * @param $product
+     */
     public function updateVariables($product)
     {
         $variables = $this->_prepareVariables($product);
         $this->model()->update_variables($product->id(), $variables);
     }
 
+    /**
+     *
+     */
     public function updateFunctions()
     {
         $functions = $this->FCom_IndexTank_Model_ProductFunction->getList();
@@ -423,6 +466,15 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
             $this->updateFunction($func->number, $func->definition);
         }
     }
+
+    /**
+     * @param $number
+     * @param $definition
+     * @return null|void
+     * @throws Exception
+     * @throws Indextank_Exception_HttpException
+     * @throws Indextank_Exception_InvalidDefinition
+     */
     public function updateFunction($number, $definition)
     {
         if ('' === $definition) {
@@ -432,6 +484,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         }
     }
 
+    /**
+     * @param $products
+     */
     public function deleteProducts($products)
     {
         if (!is_array($products)) {
@@ -446,8 +501,8 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     /**
      * Process facets filters to show in view
-     * @param type $facets
-     * @return type
+     * @param array $facets
+     * @return array
      */
     public function collectFacets($facets)
     {
@@ -490,6 +545,11 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         return $facetsData;
     }
 
+    /**
+     * @param $facets
+     * @param string $categorySelected
+     * @return array
+     */
     public function collectCategories($facets, $categorySelected = '')
     {
         $categoryData = [];
@@ -595,6 +655,12 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
     }
 
 
+    /**
+     * @param $fieldsList
+     * @param $product
+     * @param string $type
+     * @return array
+     */
     protected function _processFields($fieldsList, $product, $type = '')
     {
         $result = [];
@@ -646,6 +712,10 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         return $result;
     }
 
+    /**
+     * @param $product
+     * @return array
+     */
     protected function _prepareFields($product)
     {
         $fieldsList = $this->FCom_IndexTank_Model_ProductField->getSearchList();
@@ -670,6 +740,10 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
 
     }
 
+    /**
+     * @param $product
+     * @return array
+     */
     protected function _prepareVariables($product)
     {
         $fieldsList = $this->FCom_IndexTank_Model_ProductField->getVariablesList();
@@ -704,6 +778,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $this->updateFunctions();
     }
 
+    /**
+     *
+     */
     public function dropIndex()
     {
         if (false != ($indexName = $this->BConfig->get('modules/FCom_IndexTank/index_name'))) {
@@ -712,6 +789,9 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         $this->model()->delete_index();
     }
 
+    /**
+     *
+     */
     public function createIndex()
     {
         $this->install();
@@ -729,7 +809,12 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
      */
 
 
-
+    /**
+     * @param $product
+     * @param string $type
+     * @param string $field
+     * @return string
+     */
     public function fieldPriceRange($product, $type = '', $field = '')
     {
         $m = isset($product-> {$field}) ? $product-> {$field} : $product->base_price;
@@ -755,6 +840,12 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         return '$10000 or more';
     }
 
+    /**
+     * @param $product
+     * @param string $type
+     * @param string $field
+     * @return int
+     */
     public function fieldStringToOrdinal($product, $type = '', $field = '')
     {
         if (!empty($product->$field)) {
@@ -762,6 +853,10 @@ class FCom_IndexTank_Index_Product extends FCom_IndexTank_Index_Abstract
         }
     }
 
+    /**
+     * @param $string
+     * @return int
+     */
     public function getStringToOrdinal($string)
     {
         $string = $this->BLocale->transliterate($string, '');

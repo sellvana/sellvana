@@ -1,7 +1,17 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_MarketClient_Main
+ *
+ * @property FCom_MarketClient_RemoteApi $FCom_MarketClient_RemoteApi
+ */
 class FCom_MarketClient_Main extends BClass
 {
+    /**
+     * @param null $data
+     * @param bool $reset
+     * @return array
+     */
     public function progress($data = null, $reset = false)
     {
         $progress = !$reset ? $this->BCache->load('marketclient_progress') : [];
@@ -12,6 +22,11 @@ class FCom_MarketClient_Main extends BClass
         return $progress;
     }
 
+    /**
+     * @param $modules
+     * @param bool $force
+     * @throws BException
+     */
     public function downloadAndInstall($modules, $force = false)
     {
         $progress = $this->progress();
@@ -110,6 +125,9 @@ class FCom_MarketClient_Main extends BClass
         }
     }
 
+    /**
+     * @return $this
+     */
     public function stopDownloading()
     {
         $this->progress(['status' => 'STOP']);

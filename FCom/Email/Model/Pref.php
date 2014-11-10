@@ -20,6 +20,11 @@ class FCom_Email_Model_Pref extends FCom_Core_Model_Abstract
         ['email', '@email'],
     ];
 
+    /**
+     * @param string $email
+     * @return $this
+     * @throws BException
+     */
     public function unsubAll($email)
     {
         $pref = $this->load($email, 'email');
@@ -27,6 +32,11 @@ class FCom_Email_Model_Pref extends FCom_Core_Model_Abstract
         return $pref;
     }
 
+    /**
+     * @param string $email
+     * @param array $params
+     * @return string
+     */
     public function getUrl($email, $params = [])
     {
         if (true === $params) {
@@ -36,6 +46,12 @@ class FCom_Email_Model_Pref extends FCom_Core_Model_Abstract
         return $this->BUtil->setUrlQuery($this->BApp->href('email/pref', true, 1), $params);
     }
 
+    /**
+     * @param $email
+     * @param null $salt
+     * @return string
+     * @throws BException
+     */
     public function getToken($email, $salt = null)
     {
         $pref = $this->load($email, 'email');
@@ -43,6 +59,11 @@ class FCom_Email_Model_Pref extends FCom_Core_Model_Abstract
         return $salt . '_' . sha1($salt . '|' . $email . '|' . ($pref ? $pref->update_at : ''));
     }
 
+    /**
+     * @param $email
+     * @param $token
+     * @return bool
+     */
     public function validateToken($email, $token)
     {
         if ($email && $token) {

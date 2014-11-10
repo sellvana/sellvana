@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Geo_Model_Country
+ *
+ * @property string $iso
+ * @property string $iso3
+ * @property int $numcode
+ * @property string $name
+ */
 class FCom_Geo_Model_Country extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_geo_country';

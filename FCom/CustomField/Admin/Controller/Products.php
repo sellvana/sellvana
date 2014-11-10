@@ -1,7 +1,21 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CustomField_Admin_Controller_Products
+ *
+ * @property FCom_CustomField_Model_ProductField $FCom_CustomField_Model_ProductField
+ * @property FCom_CustomField_Model_ProductVariant $FCom_CustomField_Model_ProductVariant
+ * @property FCom_CustomField_Model_FieldOption $FCom_CustomField_Model_FieldOption
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_CustomField_Model_Set $FCom_CustomField_Model_Set
+ * @property FCom_CustomField_Model_SetField $FCom_CustomField_Model_SetField
+ * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ */
 class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_Abstract
 {
+    /**
+     * @return array
+     */
     public function fieldsetsGridConfig()
     {
         $config = [
@@ -31,6 +45,10 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         return $config;
     }
 
+    /**
+     * @param FCom_Catalog_Model_Product $model
+     * @return array
+     */
     public function variantFieldGridConfig($model)
     {
         $data = $model->getData('variants_fields');
@@ -59,6 +77,10 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         return $config;
     }
 
+    /**
+     * @param FCom_Catalog_Model_Product $model
+     * @return array
+     */
     public function variantGridConfig($model)
     {
         $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 30]);
@@ -103,6 +125,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
         $data = [];
 
+        /** @var FCom_CustomField_Model_ProductVariant[] $variants */
         $variants = $this->FCom_CustomField_Model_ProductVariant->orm()->where('product_id', $model->id)->find_many();
         if ($variants !== null) {
             foreach ($variants as $v) {
@@ -140,6 +163,10 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 
     }
 
+    /**
+     * @param FCom_Catalog_Model_Product $model
+     * @return array
+     */
     public function variantImageGrid($model)
     {
         $data = $this->BDb->many_as_array($model->mediaORM('I')
@@ -153,7 +180,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
     }
 
     /**
-     * @param $model FCom_Catalog_Model_Product
+     * @param FCom_Catalog_Model_Product $model
      * @return array
      */
     public function frontendFieldGrid($model)

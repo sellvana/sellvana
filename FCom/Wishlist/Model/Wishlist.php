@@ -1,5 +1,19 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Wishlist_Model_Wishlist
+ *
+ * @property int $id
+ * @property int $customer_id
+ * @property string $cookie_token
+ * @property string $remote_ip
+ * @property datetime $create_at
+ * @property datetime $update_at
+ *
+ * DI
+ * @property FCom_Wishlist_Model_WishlistItem $FCom_Wishlist_Model_WishlistItem
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ */
 class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_wishlist';
@@ -8,6 +22,11 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
     protected $items = null;
     protected static $_sessionWishlist = null;
 
+    /**
+     * @param bool $createAnonymousIfNeeded
+     * @return bool|FCom_Wishlist_Model_Wishlist
+     * @throws BException
+     */
     public function sessionWishlist($createAnonymousIfNeeded = false)
     {
         if (!static::$_sessionWishlist) {
@@ -53,6 +72,10 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
         return true;
     }
 
+    /**
+     * @param bool $refresh
+     * @return null
+     */
     public function items($refresh = false)
     {
         if (!$this->items || $refresh) {
@@ -68,6 +91,10 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
         return $this->items;
     }
 
+    /**
+     * @param $pId
+     * @return bool
+     */
     public function hasItem($pId)
     {
         $items = $this->items();
@@ -79,6 +106,10 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
         return false;
     }
 
+    /**
+     * @param $productId
+     * @return $this
+     */
     public function addItem($productId)
     {
         $item = $this->FCom_Wishlist_Model_WishlistItem->loadWhere(['wishlist_id' => $this->id(), 'product_id' => $productId]);
@@ -92,6 +123,10 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param FCom_Wishlist_Model_WishlistItem|int $item
+     * @return $this
+     */
     public function removeItem($item)
     {
         if (is_numeric($item)) {
@@ -104,6 +139,10 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param $productId
+     * @return $this
+     */
     public function removeProduct($productId)
     {
         $item = $this->FCom_Wishlist_Model_WishlistItem->loadWhere(['wishlist_id' => $this->id(), 'product_id' => $productId]);
@@ -111,6 +150,10 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param FCom_Wishlist_Model_Wishlist $sourceWishlist
+     * @return $this
+     */
     public function merge($sourceWishlist)
     {
         foreach ($sourceWishlist->items() as $item) {
@@ -123,6 +166,9 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @throws BException
+     */
     public function onUserLogin()
     {
         // get cookie wishlist token

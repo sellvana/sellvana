@@ -1,12 +1,26 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_MarketClient_RemoteApi
+ */
 final class FCom_MarketClient_RemoteApi extends BClass
 {
+    /**
+     * @var string
+     */
     protected static $_modulesVersionsCacheKey = 'marketclient_modules_versions';
 
     #protected $_apiUrl = 'https://market.sellvana.com/';
+    /**
+     * @var string
+     */
     protected $_apiUrl = 'http://market.sellvana.com/';
 
+    /**
+     * @param string $path
+     * @param array $params
+     * @return string
+     */
     public function getUrl($path = '', $params = [])
     {
         $url = $this->_apiUrl;
@@ -17,6 +31,9 @@ final class FCom_MarketClient_RemoteApi extends BClass
         return $url;
     }
 
+    /**
+     * @return array|mixed
+     */
     public function setupConnection()
     {
         $siteKey = $this->BConfig->get('modules/FCom_MarketClient/site_key');
@@ -40,6 +57,12 @@ final class FCom_MarketClient_RemoteApi extends BClass
         return $result;
     }
 
+    /**
+     * @param $modules
+     * @param bool $resetCache
+     * @return array
+     * @throws BException
+     */
     public function getModulesVersions($modules, $resetCache = false)
     {
         $cached = $this->BCache->load(static::$_modulesVersionsCacheKey);
@@ -89,6 +112,11 @@ final class FCom_MarketClient_RemoteApi extends BClass
         return $result;
     }
 
+    /**
+     * @param $modules
+     * @return mixed
+     * @throws BException
+     */
     public function getModuleInstallInfo($modules)
     {
         $url = $this->getUrl('api/v1/market/module/install_info', [
@@ -122,6 +150,10 @@ final class FCom_MarketClient_RemoteApi extends BClass
         return $modules;
     }
 
+    /**
+     * @param $modName
+     * @return array|mixed
+     */
     public function createModule($modName)
     {
         $siteKey = $this->BConfig->get('modules/FCom_MarketClient/site_key');
@@ -134,6 +166,11 @@ final class FCom_MarketClient_RemoteApi extends BClass
         return $this->BUtil->fromJson($response);
     }
 
+    /**
+     * @param $moduleName
+     * @return array|mixed
+     * @throws BException
+     */
     public function uploadPackage($moduleName)
     {
         $mod = $this->BModuleRegistry->module($moduleName);
@@ -158,6 +195,12 @@ final class FCom_MarketClient_RemoteApi extends BClass
         return $this->BUtil->fromJson($response);
     }
 
+    /**
+     * @param $moduleName
+     * @param null $version
+     * @param null $channel
+     * @throws BException
+     */
     public function downloadPackage($moduleName, $version = null, $channel = null)
     {
         if ($version === '*') {

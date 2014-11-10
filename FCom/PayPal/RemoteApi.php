@@ -16,6 +16,11 @@ class FCom_PayPal_RemoteApi extends BClass
         }
     }
 
+    /**
+     * @param $methodName
+     * @param $nvpArr
+     * @return bool
+     */
     public function call($methodName, $nvpArr)
     {
         $config = $this->BConfig->get('modules/FCom_PayPal');
@@ -64,6 +69,9 @@ class FCom_PayPal_RemoteApi extends BClass
         //$this->BResponse->redirect($this->BApp->m('FCom_Checkout')->baseHref());
     }
 
+    /**
+     * @return string
+     */
     public function getError()
     {
         if (empty($this->errorArr['code'])) {
@@ -72,6 +80,10 @@ class FCom_PayPal_RemoteApi extends BClass
         return "[PAYPAL ERROR {$this->errorArr['code']}] {$this->errorArr['short_message']} - {$this->errorArr['long_message']}";
     }
 
+    /**
+     * @param $token
+     * @return string
+     */
     public function getExpressCheckoutUrl($token)
     {
         return 'https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token=' . $token;

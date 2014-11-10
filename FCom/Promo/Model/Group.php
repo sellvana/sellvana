@@ -1,6 +1,14 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
+ * Class FCom_Promo_Model_Group
+ *
+ * @property int $id
+ * @property int $promo_id
+ * @property string $group_type enum('buy','get')
+ * @property string $group_name
+ *
+ * DI
  * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
  */
 class FCom_Promo_Model_Group extends BModel

@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_IndexTank_Cron
+ *
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Cron_Main $FCom_Cron_Main
+ * @property FCom_IndexTank_Model_IndexingStatus $FCom_IndexTank_Model_IndexingStatus
+ * @property FCom_IndexTank_Index_Product $FCom_IndexTank_Index_Product
+ */
 class FCom_IndexTank_Cron extends BClass
 {
     public function bootstrap()
@@ -11,6 +19,9 @@ class FCom_IndexTank_Cron extends BClass
             ->on('FCom_IndexTank_Index_Product::add', 'FCom_IndexTank_Index_Product::onProductIndexAdd');
     }
 
+    /**
+     *
+     */
     public function indexAll()
     {
         set_time_limit(0);
@@ -24,6 +35,9 @@ class FCom_IndexTank_Cron extends BClass
         $this->removeDisabledProducts();
     }
 
+    /**
+     * @return bool
+     */
     protected function indexActiveProducts()
     {
         $products = $this->gerProducts(0);
@@ -46,6 +60,9 @@ class FCom_IndexTank_Cron extends BClass
         return true;
     }
 
+    /**
+     * @return bool
+     */
     protected function removeDisabledProducts()
     {
         $products = $this->gerProducts(1);
@@ -95,7 +112,7 @@ class FCom_IndexTank_Cron extends BClass
 
     /**
      * Set status for list of products before/after indexing
-     * @param type $status -
+     * @param int $status status
      * if 1 - indexing status
      * if 2 - indexed status
      * @param Array $products - list of products objects

@@ -6,6 +6,9 @@ class FCom_Sales_Model_Cart_Total_Subtotal extends FCom_Sales_Model_Cart_Total_A
     protected $_label = 'Subtotal';
     protected $_sortOrder = 10;
 
+    /**
+     * @return FCom_Sales_Model_Cart_Total_Subtotal
+     */
     public function calculate()
     {
         $itemNum = 0;

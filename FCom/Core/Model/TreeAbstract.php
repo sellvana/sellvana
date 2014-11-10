@@ -53,7 +53,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
      * @param array|int|string $id
      * @param null $field
      * @param bool $cache
-     * @return $this|bool
+     * @return static|bool
      * @throws BException
      */
     public function load($id, $field = null, $cache = false)
@@ -76,7 +76,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
      * @param $name
      * @param array $params
      * @param array $saveObjects
-     * @return $this
+     * @return static
      * @throws BException
      */
     public function createChild($name, $params = [], $saveObjects = [])
@@ -123,7 +123,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     /**
      * @param string $newName
      * @param bool $resetUrl
-     * @return $this
+     * @return static
      * @throws BException
      */
     public function rename($newName, $resetUrl = false)
@@ -143,7 +143,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     /**
      * move node
      * @param int $parentId
-     * @return $this
+     * @return static
      * @throws BException
      * @throws Exception
      */
@@ -179,7 +179,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     /**
      * @param $sortOrder
-     * @return $this
+     * @return static
      * @throws BException
      */
     public function reorder($sortOrder)
@@ -204,7 +204,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     /**
      * @param bool $recursive
-     * @return $this
+     * @return static
      * @throws BException
      */
     public function reorderChildrenAZ($recursive = false)
@@ -262,7 +262,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     /**
      * @param bool $save
      * @param bool $resetUrl
-     * @return $this
+     * @return static
      * @throws BException
      */
     public function refreshDescendants($save = false, $resetUrl = false)
@@ -282,7 +282,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     /**
      * @param bool $save
-     * @return $this
+     * @return static
      * @throws BException
      */
     public function recalculateNumDescendants($save = false)
@@ -303,7 +303,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     /**
      * @param bool $save
-     * @return $this
+     * @return static
      */
     public function unregister($save = false)
     {
@@ -320,7 +320,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     /**
      * @param bool $save
-     * @return $this
+     * @return static
      */
     public function register($save = false)
     {
@@ -454,7 +454,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return $this
+     * @return static
      * @throws BException
      */
     public function generateSortOrder()
@@ -475,7 +475,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     /**
      * generate url node url_key base on node_name value
-     * @return $this
+     * @return static
      * @throws BException
      */
     public function generateUrlKey()
@@ -485,7 +485,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return $this
+     * @return static
      * @throws BException
      */
     public function generateUrlPath()
@@ -502,7 +502,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return $this
+     * @return static
      * @throws BException
      */
     public function generateIdPath()
@@ -523,7 +523,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return $this
+     * @return static
      * @throws BException
      */
     public function generateFullName()
@@ -644,7 +644,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 
     /**
      * @param $cloneNode
-     * @return $this
+     * @return static
      */
     public function onAfterClone(&$cloneNode)
     {

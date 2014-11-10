@@ -6,6 +6,9 @@ class FCom_Sales_Model_Cart_Total_GrandTotal extends FCom_Sales_Model_Cart_Total
     protected $_label = 'Grand Total';
     protected $_sortOrder = 90;
 
+    /**
+     * @return FCom_Sales_Model_Cart_Total_GrandTotal
+     */
     public function calculate()
     {
         $cart = $this->_cart;
@@ -17,6 +20,9 @@ class FCom_Sales_Model_Cart_Total_GrandTotal extends FCom_Sales_Model_Cart_Total
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function isHidden()
     {
         return false;
