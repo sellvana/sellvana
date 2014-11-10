@@ -168,7 +168,7 @@ lib_admin_theme1:
             - [ requireJs, admin.theme, "@FCom_Admin/Admin/theme1/assets/javascripts/theme", { deps: [ jquery, timeago ] } ]
             - [ requireJs, admin.demo, "@FCom_Admin/Admin/theme1/assets/javascripts/demo", { deps: [ jquery ] } ]
 
-            - [ requireRun, [ jquery-mobile, jquery-migrate, jquery-ui, bootstrap, admin.theme, admin.demo, jsxt, react] ]
+            - [ requireRun, [ jquery-mobile, jquery-migrate, jquery-ui, bootstrap, admin.theme, admin.demo] ]
 
 
 jstree:
