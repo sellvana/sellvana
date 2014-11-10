@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Email_Main
+ *
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ * @property FCom_Email_Model_Pref $FCom_Email_Model_Pref
+ * @property FCom_Email_Model_Message $FCom_Email_Model_Message
+ */
 class FCom_Email_Main extends BClass
 {
     public function bootstrap()

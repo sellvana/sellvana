@@ -1,8 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * Created by pp
- * @project fulleron
+ * Class FCom_SampleData_Admin
+ *
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
+ * @property FCom_CatalogIndex_Main $FCom_CatalogIndex_Main
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_CatalogIndex_Indexer $FCom_CatalogIndex_Indexer
  */
 class FCom_SampleData_Admin extends BClass
 {

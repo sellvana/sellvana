@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CustomField_Main
+ *
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ * @property FCom_CustomField_Model_ProductField $FCom_CustomField_Model_ProductField
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ */
 class FCom_CustomField_Main extends BClass
 {
     protected $_types;
@@ -12,12 +20,19 @@ class FCom_CustomField_Main extends BClass
         ]);
     }
 
+    /**
+     * @param $flag
+     * @return $this
+     */
     public function disable($flag)
     {
         $this->_disabled = $flag;
         return $this;
     }
 
+    /**
+     * @param $args
+     */
     public function productFindORM($args)
     {
         if ($this->_disabled) {
@@ -32,6 +47,10 @@ class FCom_CustomField_Main extends BClass
         $args['orm']->select($fields);
     }
 
+    /**
+     * @param $args
+     * @throws BException
+     */
     public function productAfterSave($args)
     {
         $p = $args['model'];
@@ -53,6 +72,10 @@ class FCom_CustomField_Main extends BClass
         // not deleting to preserve meta info about fields
     }
 
+    /**
+     * @param $args
+     * @return mixed|string
+     */
     public function hookCustomFieldFilters($args)
     {
         $category = false;
@@ -76,6 +99,7 @@ class FCom_CustomField_Main extends BClass
         if (!empty($filter)) {
             foreach ($filter as $fkey => $fval) {
                 $fkey = urldecode($fkey);
+                /** @var FCom_CustomField_Model_Field $field */
                 $field = $this->FCom_CustomField_Model_Field->orm()->where('field_code', $fkey)->find_one();
                 $currentFilter[$field->frontend_label][] = [
                     'key' => $field->field_code,

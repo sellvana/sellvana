@@ -16,12 +16,11 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
     public $formId = 'category_tree_form';
     /*public $imgDir = 'media/category/images';*/
 
-    public function action_upload__POST()
+    /*public function action_upload__POST()
     {
         try {
             $id = $this->BRequest->param('id', true);
             $model = $this->FCom_Catalog_Model_Category->load($id);
-            /** @var FCom_Catalog_Model_Category $model */
             if (!$model) {
                 throw new BException('Invalid Category ID.');
             }
@@ -49,7 +48,7 @@ class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abs
             $results = ['type' => 'error', 'msg' => $this->_($e->getMessage())];
         }
         $this->BResponse->json($results);
-    }
+    }*/
 
     public function onGenerateSiteMap($args)
     {

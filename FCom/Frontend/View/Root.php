@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Frontend_View_Root
+ *
+ * @property string $layout_class
+ * @property bool $show_left_col
+ * @property bool $show_right_col
+ */
 class FCom_Frontend_View_Root extends FCom_Core_View_Root
 {
     public function setLayoutClass($layout)

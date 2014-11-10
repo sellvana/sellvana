@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_IndexTank_Admin_Controller
+ *
+ * @property FCom_LibGanon_Main $FCom_LibGanon_Main
+ * @property FCom_IndexTank_Index_Product $FCom_IndexTank_Index_Product
+ */
 class FCom_IndexTank_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
     public function bootstrap()

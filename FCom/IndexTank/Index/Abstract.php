@@ -2,6 +2,12 @@
 
 class FCom_IndexTank_Index_Abstract extends BClass
 {
+    /**
+     * @param $orm
+     * @param $r
+     * @param array $d
+     * @return mixed
+     */
     public function paginate($orm, $r, $d = [])
     {
         $rbak = $r;

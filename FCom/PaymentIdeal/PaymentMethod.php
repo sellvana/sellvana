@@ -1,32 +1,47 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * Created by pp
- * @project fulleron
+ * Class FCom_PaymentIdeal_PaymentMethod
+ *
+ * @property FCom_Sales_Model_Order_Payment $FCom_Sales_Model_Order_Payment
+ * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
  */
-
-class FCom_PaymentIdeal_PaymentMethod
-    extends FCom_Sales_Method_Payment_Abstract
+class FCom_PaymentIdeal_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 {
     const IDEAL_LOG = 'ideal.log';
 
     const IDEAL_TEST_BANK_ID = '9999';
 
+    /**
+     * @var string
+     */
     protected $api_host = 'https://secure.mollie.nl';
+    /**
+     * @var int
+     */
     protected $api_port = 443;
     /**
      * @var BData
      */
     protected $config;
 
+    /**
+     * @var string
+     */
     protected $_name = "iDEAL";
 
+    /**
+     *
+     */
     public function __construct()
     {
         $this->_capabilities['pay_online'] = 1;
         $this->_capabilities['refund_online'] = 0;
     }
 
+    /**
+     *
+     */
     public function payOnCheckout()
     {
         $bankId      = $this->get('bank_id');
@@ -71,6 +86,10 @@ class FCom_PaymentIdeal_PaymentMethod
         $paymentModel->save();
     }
 
+    /**
+     * @param array $details
+     * @return $this
+     */
     public function setDetails($details = [])
     {
         if (isset($details['ideal'])) {
@@ -79,6 +98,10 @@ class FCom_PaymentIdeal_PaymentMethod
         return $this;
     }
 
+    /**
+     * @return mixed
+     * @throws Exception
+     */
     public function getCheckoutFormView()
     {
         $banks = $this->getBanks();
@@ -103,6 +126,10 @@ class FCom_PaymentIdeal_PaymentMethod
 
 // API methods
 
+    /**
+     * @return array
+     * @throws Exception
+     */
     protected function getBanks()
     {
         $banks_array     = [];
@@ -135,6 +162,15 @@ class FCom_PaymentIdeal_PaymentMethod
         return $banks_array;
     }
 
+    /**
+     * @param $bankId
+     * @param $amount
+     * @param $description
+     * @param $returnUrl
+     * @param $reportUrl
+     * @return bool
+     * @throws Exception
+     */
     protected function createPayment($bankId, $amount, $description, $returnUrl, $reportUrl)
     {
         if (!$this->setBankId($bankId)) {
@@ -189,6 +225,12 @@ class FCom_PaymentIdeal_PaymentMethod
         return true;
     }
 
+    /**
+     * @param $transaction_id
+     * @return bool
+     * @throws BException
+     * @throws Exception
+     */
     public function checkPayment($transaction_id)
     {
         if (empty($transaction_id)) {
@@ -226,6 +268,12 @@ class FCom_PaymentIdeal_PaymentMethod
         return true;
     }
 
+    /**
+     * @param $description
+     * @param $amount
+     * @return bool
+     * @throws Exception
+     */
     public function createPaymentLink($description, $amount)
     {
         if (!$this->setDescription($description) || !$this->setAmount($amount)) {
@@ -256,6 +304,10 @@ class FCom_PaymentIdeal_PaymentMethod
         return true;
     }
 
+    /**
+     * @param $transactionId
+     * @throws BException
+     */
     public function setOrderPaid($transactionId)
     {
         $order = $this->loadOrderByTransactionId($transactionId);
@@ -265,16 +317,23 @@ class FCom_PaymentIdeal_PaymentMethod
         }
     }
 
+    /**
+     * @param $bank_id
+     * @return bool
+     */
     protected function setBankId($bank_id)
     {
-        {
-            if (!is_numeric($bank_id) || (!$this->config()->get('test') && $bank_id == static::IDEAL_TEST_BANK_ID))
-                return false;
-
-            return ($this->set('bank_id', $bank_id));
+        if (!is_numeric($bank_id) || (!$this->config()->get('test') && $bank_id == static::IDEAL_TEST_BANK_ID)) {
+            return false;
         }
+
+        return ($this->set('bank_id', $bank_id));
     }
 
+    /**
+     * @param $description
+     * @return mixed
+     */
     protected function setDescription($description)
     {
         $description = substr($description, 0, 29);
@@ -282,6 +341,10 @@ class FCom_PaymentIdeal_PaymentMethod
         return ($this->set('description', $description));
     }
 
+    /**
+     * @param $amount
+     * @return bool
+     */
     public function setAmount($amount)
     {
         if (!is_numeric($amount)) {
@@ -295,6 +358,12 @@ class FCom_PaymentIdeal_PaymentMethod
         return ($this->set('amount', $amount));
     }
 
+    /**
+     * @param $path
+     * @param $query
+     * @return string
+     * @throws Exception
+     */
     protected function _sendRequest($path, $query)
     {
         $url      = rtrim($this->api_host, '/') . "{$path}";
@@ -309,6 +378,11 @@ class FCom_PaymentIdeal_PaymentMethod
         return $response;
     }
 
+    /**
+     * @param $xml
+     * @return SimpleXMLElement
+     * @throws Exception
+     */
     protected function _XMLtoObject($xml)
     {
         $errorHandling = libxml_use_internal_errors(true);
@@ -398,7 +472,7 @@ class FCom_PaymentIdeal_PaymentMethod
 
     /**
      * @param $transactionId
-     * @return BModel
+     * @return FCom_Sales_Model_Order
      */
     public function loadOrderByTransactionId($transactionId)
     {

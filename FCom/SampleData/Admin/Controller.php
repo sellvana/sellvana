@@ -1,8 +1,9 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * Created by pp
- * @project fulleron
+ * Class FCom_SampleData_Admin_Controller
+ *
+ * @property FCom_SampleData_Admin $FCom_SampleData_Admin
  */
 class FCom_SampleData_Admin_Controller extends FCom_Admin_Controller_Abstract
 {

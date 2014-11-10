@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_IndexTank_Search
+ *
+ * @property FCom_IndexTank_Index_Product $FCom_IndexTank_Index_Product
+ * @property FCom_IndexTank_Model_ProductField $FCom_IndexTank_Model_ProductField
+ */
 class FCom_IndexTank_Search extends BClass
 {
     /**

@@ -6,6 +6,7 @@
  * @property int $id
  * @property string $field_type (product|will be add more value)
  * @property string $field_code
+ * @property string $field_name
  * @property string $table_field_type
  * @property string $admin_input_type
  * @property string $frontend_label
@@ -75,6 +76,11 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         return $class::table();
     }
 
+    /**
+     * @param $type
+     * @param bool $keysOnly
+     * @return array
+     */
     public function fieldsInfo($type, $keysOnly = false)
     {
         if (empty(static::$_fieldsCache[$type])) {
@@ -93,6 +99,11 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         $this->_oldTableFieldType = $this->table_field_type;
     }
 
+    /**
+     * @param array $data
+     * @return FCom_CustomField_Model_Field
+     * @throws BException
+     */
     public function addField($data)
     {
         $field = $this->load($this->BUtil->arrayMask($data, 'field_type,field_code'));
@@ -162,11 +173,17 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         }
     }
 
+    /**
+     * @return array
+     */
     public function products()
     {
         return $this->FCom_Catalog_Model_Product->orm('p')->where_not_null($this->field_code)->find_many();
     }
 
+    /**
+     * @return array
+     */
     public function getListAssoc()
     {
         $result = [];
@@ -177,6 +194,9 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         return $result;
     }
 
+    /**
+     * @return array
+     */
     public function getDropdowns()
     {
         $fields = $this->BDb->many_as_array($this->orm()->where('admin_input_type', 'select')->find_many());
@@ -187,6 +207,11 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
         return $res;
     }
 
+    /**
+     * @param $code
+     * @return mixed
+     * @throws BException
+     */
     public function getFrontendLabel($code)
     {
         $field = $this->load($code, 'field_code');

@@ -1,5 +1,21 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_MultiSite_Model_Site
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $match_domains
+ * @property string $default_theme
+ * @property string $layout_update
+ * @property int $root_category_id
+ * @property string $mode_by_ip
+ * @property string $meta_title
+ * @property string $meta_description
+ * @property string $meta_keywords
+ * @property string $create_at
+ * @property string $update_at
+ */
 class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
 {
     static protected $_origClass = __CLASS__;
@@ -17,6 +33,9 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
         $this->createDomainMap();
     }
 
+    /**
+     * @return array
+     */
     public function createDomainMap()
     {
         if (!$this->BDb->ddlTableExists($this->table())) {
@@ -42,6 +61,9 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
         return $map;
     }
 
+    /**
+     * @return array
+     */
     public function getDomainMap()
     {
         $map = $this->BCache->load(static::$_mapCacheKey);
@@ -51,6 +73,10 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
         return $map;
     }
 
+    /**
+     * @param null $domain
+     * @return null
+     */
     public function findByDomain($domain = null)
     {
         if (null === $domain) {
@@ -68,6 +94,9 @@ class FCom_MultiSite_Model_Site extends FCom_Core_Model_Abstract
         return $site;
     }
 
+    /**
+     * @return array
+     */
     public function siteOptions()
     {
         $sites = (array)$this->orm()->find_many();

@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_PayPal_Frontend_Controller
+ *
+ * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Sales_Model_Cart_Address $FCom_Sales_Model_Cart_Address
+ * @property FCom_PayPal_RemoteApi $FCom_PayPal_RemoteApi
+ */
 class FCom_PayPal_Frontend_Controller extends BActionController
 {
     public function action_redirect()

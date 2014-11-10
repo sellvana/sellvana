@@ -1,6 +1,8 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
+ * Class FCom_Promo_Admin_Controller
+ *
  * @property FCom_Promo_Model_Promo $FCom_Promo_Model_Promo
  * @property FCom_Promo_Model_Media $FCom_Promo_Model_Media
  * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
@@ -21,6 +23,9 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     protected $_mainTableAlias = 'p';
     protected $_navPath = 'catalog/promo';
 
+    /**
+     * @return array
+     */
     public function gridConfig()
     {
         $config = parent::gridConfig();
@@ -54,6 +59,9 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         return $config;
     }
 
+    /**
+     * @param $orm
+     */
     public function gridOrmConfig($orm)
     {
         parent::gridOrmConfig($orm);
@@ -66,6 +74,9 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         ;
     }
 
+    /**
+     * @param $args
+     */
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);
@@ -73,6 +84,25 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $args['view']->title = $m->id ? 'Edit Promo: ' . $m->description : 'Create New Promo';
     }
 
+    /**
+     * @param $view
+     * @param null $model
+     * @param string $mode
+     * @param null $allowed
+     * @return $this
+     */
+    public function processFormTabs($view, $model = null, $mode = 'edit', $allowed = null)
+    {
+        if ($model && $model->id) {
+            $view->addTab("details", ['label' => $this->BLocale->_("Details"), 'pos' => 20, 'async' => true]);
+            $view->addTab("history", ['label' => $this->BLocale->_("History"), 'pos' => 40, 'async' => true]);
+        }
+        return parent::processFormTabs($view, $model, $mode, $allowed);
+    }
+
+    /**
+     * @param array $args
+     */
     public function formPostBefore($args)
     {
         parent::formPostBefore($args);
@@ -88,6 +118,9 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         }
     }
 
+    /**
+     * @param array $args
+     */
     public function formPostAfter($args)
     {
         parent::formPostAfter($args);
@@ -95,10 +128,16 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $this->processMediaPost($args['model'], $_POST);
     }
 
+    /**
+     * @param $model
+     * @param $data
+     * @return $this
+     */
     public function processGroupsPost($model, $data)
     {
         $groups     = $model->groups();
         $groupData  = [];
+        /** @var FCom_Promo_Model_Product[] $groupProds */
         $groupProds = $this->FCom_Promo_Model_Product->orm()->where('promo_id', $model->id())->find_many();
         foreach ($groupProds as $gp) {
             $groupData[$gp->group_id][$gp->product_id] = 1;
@@ -170,6 +209,11 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         return $this;
     }
 
+    /**
+     * @param $model
+     * @param $data
+     * @return $this
+     */
     public function processMediaPost($model, $data)
     {
         $hlp = $this->FCom_Promo_Model_Media;
@@ -193,6 +237,13 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         return $this;
     }
 
+    /**
+     * @param $model
+     * @param $type
+     * @param null $groupId
+     * @return array
+     * @throws BException
+     */
     public function productGridConfig($model, $type, $groupId = null)
     {
         static $groups = [], $groupData = [];
@@ -277,6 +328,9 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         ];
     }
 
+    /**
+     *
+     */
     public function action_form_group()
     {
         $this->BResponse->nocache();
@@ -285,6 +339,9 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $this->BLayout->setRootView('jqgrid');
     }
 
+    /**
+     *
+     */
     public function action_form_products()
     {
         $orm = $this->FCom_Catalog_Model_Product->orm()->table_alias('p')->select('p.*')
@@ -296,6 +353,9 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $this->BResponse->json($data);
     }
 
+    /**
+     * @param array $args
+     */
     public function onAttachmentsGridConfig($args)
     {
         array_splice($args['config']['grid']['colModel'], -1, 0, [
@@ -310,6 +370,9 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         ]);
     }
 
+    /**
+     * @param $args
+     */
     public function onAttachmentsGridGetORM($args)
     {
         $args['orm']->join('FCom_Promo_Model_Media', ['pa.file_id', '=', 'a.id',  ], 'pa')
@@ -317,6 +380,9 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             ->select(['pa.promo_status']);
     }
 
+    /**
+     * @param $args
+     */
     public function onAttachmentsGridUpload($args)
     {
         $hlp = $this->FCom_Promo_Model_Media;
@@ -326,6 +392,10 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         }
     }
 
+    /**
+     * @param $args
+     * @throws BException
+     */
     public function onAttachmentsGridEdit($args)
     {
         $r = $this->BRequest;
@@ -337,6 +407,10 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             ->save();
     }
 
+    /**
+     * @param $model
+     * @return array
+     */
     public function attachmentGridConfig($model)
     {
         return [
