@@ -20,6 +20,10 @@ common_js_libs:
 
             - [ requireJs, jquery.bootstrap-growl, @FCom_LibJsCommon/js/jquery.bootstrap-growl.min, { deps: [ jquery, bootstrap ] } ]
 
+            #ReactJs
+            - [requireJs, jsxt, @FCom_LibJsCommon/js/JSXTransformer]
+            - [requireJs, react, @FCom_LibJsCommon/js/react-with-addons, { deps: [ jsxt ] }]
+
             #- [ js_raw, require_config, { content: "requirejs.config({ urlArgs: 'bust='+(new Date()).getTime() })" } ]
             #- [ requireModulePath, FCom_Core ]
             #- [ requireJs, jquery.tools, @FCom_LibJsCommon/js/jquery.tools.min, { deps: [ jquery ] } ]

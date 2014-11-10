@@ -38,5 +38,4 @@ define(['jquery'], function ($) {
             return $.trim(phrase);
         }
     };
-})
-;
+});

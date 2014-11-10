@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * @property FCom_Promo_Model_Coupon $FCom_Promo_Model_Coupon
+ * @property FCom_Promo_Model_Promo $FCom_Promo_Model_Promo
+ * @property FCom_Promo_Model_Group $FCom_Promo_Model_Group
+ * @property FCom_Promo_Model_Media $FCom_Promo_Model_Media
+ * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
+ * @property FCom_Promo_Model_Cart $FCom_Promo_Model_Cart
+ */
 class FCom_Promo_Migrate extends BClass
 {
     public function install__0_1_6()
@@ -150,6 +158,26 @@ class FCom_Promo_Migrate extends BClass
             'COLUMNS' => [
                 "get_type"       => "enum('qty','$','%','text','choice','free') NOT NULL DEFAULT 'qty'"
             ],
+        ]);
+    }
+
+    public function upgrade__0_1_6__0_1_7()
+    {
+        $table = $this->FCom_Promo_Model_Coupon->table();
+
+        $this->BDb->ddlTableDef($table, [
+            'COLUMNS' => [
+                'id' => "INT(10) UNSIGNED NOT NULL AUTO_INCREMENT",
+                'promo_id' => "INT(10) UNSIGNED NOT NULL",
+                'code' => "VARCHAR(50) NOT NULL",
+                'uses_per_customer' => "INT(10) UNSIGNED NULL ",
+                'uses_total' => "INT(10) UNSIGNED NULL ",
+                'total_used' => "INT(10) UNSIGNED NULL",
+            ],
+            'PRIMARY' => '(id)',
+            'CONSTRAINTS' => [
+                "FK_{$table}_promo" => ["promo_id", $this->FCom_Promo_Model_Promo->table()]
+            ]
         ]);
     }
 }

@@ -9,6 +9,7 @@
  * @property FCom_Promo_Model_Group $FCom_Promo_Model_Group
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Admin_View_Grid $FCom_Admin_View_Grid
+ * @property FCom_Promo_Model_Coupon $FCom_Promo_Model_Coupon
  */
 class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -40,7 +41,6 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                 'options' => $this->FCom_Promo_Model_Promo->fieldOptions('status')
             ],
             ['name' => 'details', 'label' => 'Details', 'index' => 'details', 'hidden' => true],
-            ['name' => 'attachments', 'label' => 'Attachments', 'sortable' => false, 'hidden' => false],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
                 ['name' => 'delete'],
@@ -81,15 +81,6 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     {
         parent::formViewBefore($args);
         $m = $args['model'];
-        /*
-        $actions = array('<input type="hidden" id="save_as" name="save_as" value=""/>');
-        if ($m->status==='template') {
-            $actions['save_as_new'] = '<button type="button" class="st1 sz2 btn btn-primary" onclick="if (adminForm.saveAll(this)) { $(\'#save_as\').val(\'copy\'); this.form.submit(); }"><span>Save as a New Promotion</span></button>';
-        } else {
-            $actions['save_as_tpl'] = '<button type="button" class="st1 sz2 btn btn-primary" onclick="if (adminForm.saveAll(this)) { $(\'#save_as\').val(\'template\'); this.form.submit(); }"><span>Save as a Template</span></button>';
-        }
-        $args['view']->actions = $this->BUtil->arrayMerge($args['view']->actions, $actions);
-        */
         $args['view']->title = $m->id ? 'Edit Promo: ' . $m->description : 'Create New Promo';
     }
 
@@ -441,5 +432,117 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             ['navButtonAdd', 'caption' => 'Add', 'buttonicon' => 'ui-icon-plus', 'title' => 'Add Attachments to Promotion', 'cursor' => 'pointer'],
             ['navButtonAdd', 'caption' => 'Remove', 'buttonicon' => 'ui-icon-trash', 'title' => 'Remove Attachments From Promotion', 'cursor' => 'pointer'],
         ];
+    }
+
+    public function action_coupons_grid()
+    {
+        $r = $this->BRequest;
+        $id = $r->get('id');
+        if(!$id){
+            $html = $this->_("Promotion id not found");
+            $status = 'error';
+            $this->BResponse->status(400, $html, false);
+        } else {
+            $status = "success";
+            $gridDataUrl = $this->BApp->href($this->_gridHref . '/coupons_grid_data');
+            $config = [
+                'id' => $this->FCom_Promo_Model_Coupon->origClass(),
+                'orm' => $this->FCom_Promo_Model_Coupon->orm(),
+                'data_url' => $gridDataUrl,
+                'edit_url' => $gridDataUrl,
+                'grid_url' => null,
+                'form_url' => null,
+                'columns' => [
+                    ['type' => 'row_select'],
+                    ['name' => 'id', 'label' => 'ID', 'hidden' => true],
+                    ['name' => 'code', 'label' => 'Code', 'index' => 'code', 'width' => 100,
+                        'editable' => 'inline', 'addable' => true, 'validation' => ['required' => true]],
+                    ['name' => 'uses_per_customer', 'label' => 'Uses Per Customer', 'index' => 'uses_per_customer',
+                                            'editable' => 'inline', 'addable' => true],
+                    ['name' => 'uses_total', 'label' => 'Uses total', 'index' => 'uses_total', 'sorttype' => 'number',
+                                            'editable' => 'inline', 'addable' => true],
+                    //['name' => 'total_used', 'label' => 'Used', 'index' => 'total_used', 'sorttype' => 'number'],
+                    ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]],
+                ],
+                'actions' => [
+                    'delete' => true,
+                    'new' => ['caption' => 'Add New Coupon'],
+                    'edit' => true,
+                ],
+                'data_mode' => 'local',
+                'filters' => [
+                    ['field' => 'code', 'type' => 'text'],
+                    ['field' => 'uses_per_customer', 'type' => 'number-range'],
+                    ['field' => 'uses_total', 'type' => 'number-range'],
+                    //['field' => 'total_used', 'type' => 'number-range'],
+                ]
+            ];
+            $html = $this->view('promo/coupons/grid')->set('grid',['config' => $config])->render();
+        }
+        $this->BResponse->json(['status' => $status, 'html'=>$html]);
+    }
+    public function action_coupons_generate__POST()
+    {
+        $r = $this->BRequest;
+        $id = $r->get('id');
+        if (!$id) {
+            $message = $this->_("Promotion id not found");
+            $this->BResponse->status(400, $message, false);
+        } else {
+            $data = $r->post('model');
+            $pattern = isset($data['code_pattern'])?$data['code_pattern']:null;
+            $length = isset($data['code_length'])?$data['code_length']:8;
+            $usesPerCustomer = isset($data['code_uses_per_customer'])?$data['code_uses_per_customer']:1;
+            $usesTotal = isset($data['code_uses_total'])?$data['code_uses_total']:1;
+            $couponCount = isset($data['coupon_count'])?$data['coupon_count']:1;
+            $model = $this->FCom_Promo_Model_Coupon;
+            $generated = $model->generateCoupons([
+                'promo_id' => $id,
+                'pattern' => $pattern,
+                'length' => $length,
+                'uses_per_customer' => $usesPerCustomer,
+                'uses_total' => $usesTotal,
+                'count' => $couponCount
+            ]);
+            $status = 'success';
+            $message = $this->_("%d coupons generated.", [$generated]);
+            if($generated < $couponCount){
+                $status = 'warning';
+                $message .= $this->_("\nFailed to generate %d coupons", ($couponCount - $generated));
+            }
+            $this->BResponse->json(['status'=>$status, 'message'=>$message]);
+        }
+    }
+    public function action_coupons_generate()
+    {
+        $r = $this->BRequest;
+        $id = $r->get('id');
+        if (!$id) {
+            $html = $this->_("Promotion id not found");
+            $status = 'error';
+            $this->BResponse->status(400, $html, false);
+        } else {
+            /*
+             * maybe ditch the template and go for json response?
+             */
+            $status = "success";
+            $html = $this->view('promo/coupons/generate')->render();
+        }
+        $this->BResponse->json(['status' => $status, 'html' => $html]);
+    }
+
+    public function action_coupons_import()
+    {
+        $r = $this->BRequest;
+        $id = $r->get('id');
+        if (!$id) {
+            $html = $this->_("Promotion id not found");
+            $status = 'error';
+            $this->BResponse->status(400, $html, false);
+        } else {
+            $status = "success";
+            $html = $this->view('promo/coupons/import')->render();
+        }
+        $this->BResponse->json(['status' => $status, 'html' => $html]);
     }
 }

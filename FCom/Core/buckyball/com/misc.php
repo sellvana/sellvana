@@ -829,8 +829,8 @@ class BUtil extends BClass
         static $chars = ['L' => 'bcdfghjkmnpqrstvwxyz', 'U' => 'BCDFGHJKLMNPQRSTVWXYZ', 'D' => '123456789'];
 
         while (preg_match('#\{([ULD]+)([0-9]+)\}#i', $pattern, $m)) {
-            for ($i = 0, $c = ''; $i < strlen($m[1]); $i++) $c .= $chars[$m[1][$i]];
-            $pattern = preg_replace('#' . preg_quote($m[0], '#') . '#', $this->BUtil->randomString($m[2], $c), $pattern, 1);
+            for ($i = 0, $c = ''; $i < strlen($m[1]); $i++) $c .= $chars[strtoupper($m[1])[$i]];
+            $pattern = preg_replace('#' . preg_quote($m[0], '#') . '#', $this->randomString($m[2], $c), $pattern, 1);
         }
         return $pattern;
     }

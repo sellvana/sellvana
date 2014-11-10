@@ -664,20 +664,22 @@ EOT
     }
 
     /**
-    * Add or change table columns
-    *
-    * BDb::ddlTableColumns('my_table', array(
-    *   'field_to_create' => 'varchar(255) not null',
-    *   'field_to_update' => 'decimal(12,2) null',
-    *   'field_to_drop'   => 'DROP',
-    * ));
-    *
-    * @param string $fullTableName
-    * @param array $fields
-    * @param array $indexes
-    * @param array $fks
-    * @return array
-    */
+     * Add or change table columns
+     *
+     * BDb::ddlTableColumns('my_table', array(
+     *   'field_to_create' => 'varchar(255) not null',
+     *   'field_to_update' => 'decimal(12,2) null',
+     *   'field_to_drop'   => 'DROP',
+     * ));
+     *
+     * @param string $fullTableName
+     * @param array $fields
+     * @param array $indexes
+     * @param array $fks
+     * @param null $connectionName
+     * @throws BException
+     * @return array
+     */
     public static function ddlTableColumns($fullTableName, $fields, $indexes = null, $fks = null, $connectionName = null)
     {
         $tableFields = static::ddlFieldInfo($fullTableName, null, $connectionName);
@@ -765,7 +767,7 @@ EOT
                     }
                 } else {
                     if (!empty($tableFKs[$idxLower])) {
-                    // what if it is not foreign key constraint we do not doe anything to check for UNIQUE and PRIMARY constraint
+                    // what if it is not foreign key constraint we do not do anything to check for UNIQUE and PRIMARY constraint
                         $dropArr[] = "DROP FOREIGN KEY `{$idx}`";
                     }
                     $alterArr[] = "ADD CONSTRAINT `{$idx}` {$def}";

@@ -1,6 +1,8 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
+<<<<<<< HEAD
+=======
  * Class FCom_Promo_Model_Group
  *
  * @property int $id
@@ -9,6 +11,7 @@
  * @property string $group_name
  *
  * DI
+>>>>>>> c86f248f4ce79d0e03476318f0ddf9d064ce50bc
  * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
  */
 class FCom_Promo_Model_Group extends BModel
@@ -18,6 +21,6 @@ class FCom_Promo_Model_Group extends BModel
 
     public function products()
     {
-        return $this->FCom_Promo_Model_Product->orm()->where('group_id', $this->id)->find_many();
+        return $this->FCom_Promo_Model_Product->orm()->where('group_id', $this->id())->find_many();
     }
 }
