@@ -80,14 +80,14 @@ define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (Rea
 
             if (this.props.confirm) {
                 confirmButton = (
-                    <FCom.React.Button onClick={this.handleConfirm} className="btn-primary">
+                    <FCom.React.Button onClick={this.handleConfirm} className="btn-primary" type="button">
                         {this.props.confirm}
                     </FCom.React.Button>
                 );
             }
             if (this.props.cancel) {
                 cancelButton = (
-                    <FCom.React.Button onClick={this.handleCancel} className="btn-default">
+                    <FCom.React.Button onClick={this.handleCancel} className="btn-default" type="button">
                         {this.props.cancel}
                     </FCom.React.Button>
                 );
@@ -140,7 +140,7 @@ define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (Rea
     var SingleCoupon = React.createClass({
         render: function () {
             return (
-                <div className="single-coupon">
+                <div className="single-coupon col-md-3">
                     <input id={this.props.id} ref={this.props.name} value={this.state.value}
                         className="form-control"/>
                     <span className="help-block">{this.props.helpText}</span>
@@ -173,9 +173,9 @@ define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (Rea
                 onCancel={this.closeImportModal} url={this.props.importCouponsurl} title="Import coupons"/>;
             return (
                 <div className="multi-coupon btn-group">
-                    <FCom.React.Button onClick={this.showCodes} className="btn-primary">{this.props.buttonViewLabel}</FCom.React.Button>
-                    <FCom.React.Button onClick={this.generateCodes} className="btn-primary">{this.props.buttonGenerateLabel}</FCom.React.Button>
-                    <FCom.React.Button onClick={this.importCodes} className="btn-primary">{this.props.buttonImportLabel}</FCom.React.Button>
+                    <FCom.React.Button onClick={this.showCodes} className="btn-primary" type="button">{this.props.buttonViewLabel}</FCom.React.Button>
+                    <FCom.React.Button onClick={this.generateCodes} className="btn-primary" type="button">{this.props.buttonGenerateLabel}</FCom.React.Button>
+                    <FCom.React.Button onClick={this.importCodes} className="btn-primary" type="button">{this.props.buttonImportLabel}</FCom.React.Button>
                     {showModal}
                     {generateModal}
                     {importModal}
@@ -222,10 +222,15 @@ define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (Rea
         },
         showCodes: function () {
             // component default properties
+            var $self = $(this.getDOMNode());
+            var $modal = $self.closest('.modal');
+            $modal.on('hidden.bs.modal', function () {
+                this.refs.showModal.open();
+                var $modalBody = $('.modal-body', this.refs.showModal.getDOMNode());
+                this.loadModalContent($modalBody, this.props.showCouponsUrl)
+            }, this);
+            $modal.modal('hide');
             console.log("showCodes");
-            this.refs.showModal.open();
-            var $modalBody = $('.modal-body', this.refs.showModal.getDOMNode());
-            this.loadModalContent($modalBody, this.props.showCouponsUrl)
         },
         generateCodes: function () {
             // component default properties
@@ -332,25 +337,28 @@ define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (Rea
         displayName: 'CouponApp',
         render: function () {
             //noinspection BadExpressionStatementJS
-            var child = "";
-
             if (this.state.mode == 1) {
-                child = [<SingleCoupon key="single-coupon" options={this.props.options}/>,
-                    <UsesBlock options={this.props.options} key="uses-block"/>];
+                return (
+                    <FCom.React.Modal ref="singleModal" onConfirm={this.closeModals}
+                        onCancel={this.closeModals} title="Single coupon">
+                        <SingleCoupon options={this.props.options}/>
+                        <UsesBlock options={this.props.options}/>
+                    </FCom.React.Modal>
+                );
             } else if(this.state.mode == 2) {
                 var showCouponsUrl = this.props.options.showCouponsUrl ||'',
-                    generateCouponsUrl = this.props.options.generateCouponsUrl ||'',
-                    importCouponsUrl = this.props.options.importCouponsUrl ||'';
-                child = [<MultiCoupon key="multi-coupon" options={this.props.options} importCouponsUrl={importCouponsUrl}
-                    generateCouponsUrl={generateCouponsUrl} showCouponsUrl={showCouponsUrl}/>]
+                                    generateCouponsUrl = this.props.options.generateCouponsUrl ||'',
+                                    importCouponsUrl = this.props.options.importCouponsUrl ||'';
+                return (
+                    <FCom.React.Modal ref="multiModal" onConfirm={this.closeModals}
+                        onCancel={this.closeModals} title="Multiple coupons">
+                        <MultiCoupon key="multi-coupon" options={this.props.options}
+                            importCouponsUrl={importCouponsUrl} generateCouponsUrl={generateCouponsUrl} showCouponsUrl={showCouponsUrl}/>
+                    </FCom.React.Modal>
+                );
+
             }
-            return (
-                <div className="form-group">
-                    <div className="col-md-5 .col-md-offset-3">
-                        {child}
-                    </div>
-                </div>
-            );
+            return (<span/>);
         },
         getInitialState: function () {
             return {mode: 0};
@@ -360,6 +368,27 @@ define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (Rea
         },
         componentWillMount: function () {
             this.setState({mode: this.props.mode});
+        },
+        componentDidMount: function () {
+            if(this.state.mode == 1) {
+                this.refs.singleModal.open();
+            }else if(this.state.mode == 2) {
+                this.refs.multiModal.open();
+            }
+        },
+        componentDidUpdate: function () {
+            if(this.state.mode == 1) {
+                this.refs.singleModal.open();
+            }else if(this.state.mode == 2) {
+                this.refs.multiModal.open();
+            }
+        },
+        closeModals: function () {
+            if (this.state.mode == 1) {
+                this.refs.singleModal.close();
+            } else if (this.state.mode == 2) {
+                this.refs.multiModal.close();
+            }
         }
     });
 
@@ -378,9 +407,13 @@ define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (Rea
 
             var $parent = $couponSelector.closest('.form-group');
             var $element = $("<div class='form-group'/>").appendTo($parent);
+            var selected = $couponSelector.val();
+            if(selected != 0) {
+                React.render(<CouponApp mode={parseInt(selected)} options={options}/>, $element[0]);
+            }
 
             $couponSelector.on('change', function () {
-                var selected = $(this).val();
+                selected = $couponSelector.val();
                 React.render(<CouponApp mode={parseInt(selected)} options={options}/>, $element[0]);
             });
         }
