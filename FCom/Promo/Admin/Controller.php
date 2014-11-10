@@ -416,11 +416,11 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $this->BResponse->status(400, $message, false);
         } else {
             $data = $r->post('model');
-            $pattern = $data['code_pattern'];
-            $length = $data['code_length'];
-            $usesPerCustomer = $data['code_uses_per_customer'];
-            $usesTotal = $data['code_uses_total'];
-            $couponCount = $data['coupon_count'];
+            $pattern = isset($data['code_pattern'])?$data['code_pattern']:null;
+            $length = isset($data['code_length'])?$data['code_length']:8;
+            $usesPerCustomer = isset($data['code_uses_per_customer'])?$data['code_uses_per_customer']:1;
+            $usesTotal = isset($data['code_uses_total'])?$data['code_uses_total']:1;
+            $couponCount = isset($data['coupon_count'])?$data['coupon_count']:1;
             $model = $this->FCom_Promo_Model_Coupon;
             $generated = $model->generateCoupons([
                 'promo_id' => $id,
@@ -448,6 +448,9 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $status = 'error';
             $this->BResponse->status(400, $html, false);
         } else {
+            /*
+             * maybe ditch the template and go for json response?
+             */
             $status = "success";
             $html = $this->view('promo/coupons/generate')->render();
         }
