@@ -10,7 +10,4 @@ promo_form_tabs:
 
 /promo/form:
     - { include: promo_form_tabs }
-    - view: head
-        do:
-            - [ requireJs, fcom.promo, "@FCom_Promo/Admin/js/jsx/build/fcom.promo", { deps: [ react ] } ]
 

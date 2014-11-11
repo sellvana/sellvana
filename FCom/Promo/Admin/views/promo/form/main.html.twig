@@ -56,9 +56,6 @@
                 );
             });
 
-            require(['react', 'jsx!fcom.promo'], function(React, Promo) {
-                console.log(Promo);
-            })
         </script>
         {{ forms.select({
             label: 'Coupon Code Enter For Validity'|_,
@@ -69,7 +66,7 @@
             select2: 1, options: ['No coupon code required'|_, 'Single coupon code'|_, 'Multiple coupon codes'|_]
         }) }}
 
-        <script type="text/jsx;harmony=true">
+        <script type="text/javascript">
             require(['react', 'jsx!fcom.promo'], function (React, Promo) {
                 var options = {
                     coupon_select_id: 'model-use_coupon',
