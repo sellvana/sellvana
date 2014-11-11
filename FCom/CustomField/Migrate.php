@@ -1,5 +1,20 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CustomField_Migrate
+ *
+ * @property FCom_Core_Model_MediaLibrary               $FCom_Core_Model_MediaLibrary
+ * @property FCom_Catalog_Model_Product                 $FCom_Catalog_Model_Product
+ * @property FCom_CustomField_Model_Field               $FCom_CustomField_Model_Field
+ * @property FCom_CustomField_Model_FieldOption         $FCom_CustomField_Model_FieldOption
+ * @property FCom_CustomField_Model_Set                 $FCom_CustomField_Model_Set
+ * @property FCom_CustomField_Model_SetField            $FCom_CustomField_Model_SetField
+ * @property FCom_CustomField_Model_ProductField        $FCom_CustomField_Model_ProductField
+ * @property FCom_CustomField_Model_ProductVariant      $FCom_CustomField_Model_ProductVariant
+ * @property FCom_CustomField_Model_ProductVarfield     $FCom_CustomField_Model_ProductVarfield
+ * @property FCom_CustomField_Model_ProductVariantField $FCom_CustomField_Model_ProductVariantField
+ * @property FCom_CustomField_Model_ProductVariantImage $FCom_CustomField_Model_ProductVariantImage
+ */
 class FCom_CustomField_Migrate extends BClass
 {
     public function install__0_2_0()
@@ -325,6 +340,16 @@ class FCom_CustomField_Migrate extends BClass
                 'product' => ['product_id', $tProduct],
                 'variant' => ['variant_id', $tProdVariant],
                 'file'    => ['file_id', $tMediaFile],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_2_1__0_2_2()
+    {
+        $tFieldOption = $this->FCom_CustomField_Model_FieldOption->table();
+        $this->BDb->ddlTableDef($tFieldOption, [
+            'COLUMNS' => [
+                'data_serialized' => 'text', // for translations
             ],
         ]);
     }

@@ -5,6 +5,7 @@ class FCom_Sales_Model_Order_Shipment_State_Carrier extends FCom_Core_Model_Abst
     protected $_valueLabels = [
         'label' => 'Label Printed',
         'received' => 'Received',
+        'shipped' => 'Shipped',
         'in_transit' => 'In Transit',
         'exception' => 'Exception',
         'delivered' => 'Delivered',
@@ -22,7 +23,12 @@ class FCom_Sales_Model_Order_Shipment_State_Carrier extends FCom_Core_Model_Abst
         return $this->changeState('received');
     }
 
-    public function setTransit()
+    public function setShipped()
+    {
+        return $this->changeState('shipped');
+    }
+
+    public function setInTransit()
     {
         return $this->changeState('in_transit');
     }
