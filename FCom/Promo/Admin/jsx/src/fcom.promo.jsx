@@ -50,10 +50,9 @@ define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (Rea
 
     FCom.React.Button = React.createClass({
         render: function () {
-            var props = $.extend({}, this.props);
-            props.className += ' btn';
+            var {className, onClick, ...other} = this.props;
             return (
-                <button {...props}>{this.props.children}</button>
+                <button {...other} className={"btn " + className} onClick={onClick}>{this.props.children}</button>
             );
         }
     });
