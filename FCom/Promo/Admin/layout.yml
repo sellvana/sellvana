@@ -3,6 +3,7 @@ base:
     - view: head
         do:
             - [ requireJs, fcom.promo, @FCom_Promo/Admin/jsx/src/fcom.promo ]
+    - { include: lib_griddle }
 
 promo_form_tabs:
     - view: admin/form

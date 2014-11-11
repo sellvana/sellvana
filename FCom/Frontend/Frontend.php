@@ -14,7 +14,7 @@ class FCom_Frontend_Frontend extends BClass
         }
     }
 
-    public function layout($args)
+    public function layout()
     {
         /** @var FCom_Core_View_Head $head */
         $head = $this->BLayout->view('head');
