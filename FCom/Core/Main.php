@@ -529,18 +529,27 @@ class FCom_Core_Main extends BClass
     public function defaultThemeCustomLayout()
     {
         $cookieConfig = $this->BConfig->get('cookie');
+
+        /** @var FCom_Core_View_Head $head */
         $head = $this->BLayout->view('head');
 
+        /** @var FCom_Core_View_Text $script */
+        $script = $this->BLayout->view('head_script');
+
         $head->csrf_token();
-        $head->js_raw('js_init', ['content' => "
+
+        $text = "
 FCom = {};
 FCom.cookie_options = " . $this->BUtil->toJson([
-    'domain' => !empty($cookieConfig['domain']) ? $cookieConfig['domain'] : null,
-    'path' => !empty($cookieConfig['path']) ? $cookieConfig['path'] : null,
-]) . ";
+                'domain' => !empty($cookieConfig['domain']) ? $cookieConfig['domain'] : null,
+                'path' => !empty($cookieConfig['path']) ? $cookieConfig['path'] : null,
+            ]) . ";
 FCom.base_href = '" . $this->BApp->baseUrl() . "';
 FCom.base_src = '" . $this->BConfig->get('web/base_src') . "';
-        "]);
+        ";
+
+        $head->js_raw('js_init', $text);
+        $script->addText('FCom_Core:init', $text);
     }
 
     public function onTwigInit($args)

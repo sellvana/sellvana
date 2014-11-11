@@ -156,13 +156,20 @@ class BModuleRegistry extends BClass
 
     public function pushModule($name)
     {
+//echo "\n {{{ PUSH: {$name} }}}} \n";
         array_push($this->_currentModuleStack, $name);
         return $this;
     }
 
     public function popModule()
     {
-        array_pop($this->_currentModuleStack);
+        $name = array_pop($this->_currentModuleStack);
+        /*
+        echo "\n {{{ POP: {$name} }}}} \n";
+        if (sizeof($this->_currentModuleStack) > 1) {
+            echo "\n -{$name}: "; var_dump($this->_currentModuleStack); debug_print_backtrace(); echo "\n";
+        }
+        */
         return $this;
     }
 
@@ -171,7 +178,7 @@ class BModuleRegistry extends BClass
         if (!empty($this->_currentModuleStack)) {
             return $this->_currentModuleStack[sizeof($this->_currentModuleStack)-1];
         }
-        return $this->_currentModuleName;
+        return null;//$this->_currentModuleName;
     }
 
     public function expandPath($path)

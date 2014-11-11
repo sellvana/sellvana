@@ -56,9 +56,9 @@
                 );
             });
 
-//            require(['react', 'jsx!fcom.promo'], function($) {
-//                console.log('YES!');
-//            })
+            require(['react', 'jsx!fcom.promo'], function(React, Promo) {
+                console.log(Promo);
+            })
         </script>
         {{ forms.select({
             label: 'Coupon Code Enter For Validity'|_,

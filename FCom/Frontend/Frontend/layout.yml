@@ -31,8 +31,8 @@ base:
 
     - { include: common_js_libs }
 
-    - { callback: FCom_Core_Main::defaultThemeCustomLayout }
-    - { callback: FCom_Frontend_Frontend::layout }
+    - { callback: FCom_Core_Main.defaultThemeCustomLayout }
+    - { callback: FCom_Frontend_Frontend.layout }
 
     #- { hook: breadcrumbs, views: breadcrumbs }
     - { hook: header, views: header }

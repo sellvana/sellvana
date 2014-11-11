@@ -3,7 +3,7 @@ base:
         do:
             - [ requireJs, fcom.pushclient, "@FCom_PushServer/js/fcom.pushclient" ]
 
-    - { callback: "FCom_PushServer_Main::layoutInit" }
+    - { callback: FCom_PushServer_Main.layoutInit }
 /settings:
     - view: settings
         do:

@@ -21,7 +21,7 @@ common_js_libs:
             - [ requireJs, jquery.bootstrap-growl, @FCom_LibJsCommon/js/jquery.bootstrap-growl.min, { deps: [ jquery, bootstrap ] } ]
 
             #ReactJs
-            - [ requireConfig, { jsx: { fileExtension: '.jsx' } } ]
+            - [ requireConfig, { jsx: { fileExtension: '.jsx', harmony: true } } ]
             - [ requireJs, text, @FCom_LibJsCommon/js/text ]
             - [ requireJs, JSXTransformer, @FCom_LibJsCommon/js/JSXTransformer-0.12.0 ]
             - [ requireJs, react, @FCom_LibJsCommon/js/react-with-addons, { deps: [ JSXTransformer ] } ]

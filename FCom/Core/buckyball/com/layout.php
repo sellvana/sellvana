@@ -831,7 +831,7 @@ class BLayout extends BClass
      */
     public function metaDirectiveCallback($d)
     {
-        $this->BUtil->call($d['name'], $d);
+        $this->BUtil->call($d['name'], !empty($d['args']) ? $d['args'] : [], true);
     }
 
     /**
@@ -1629,13 +1629,16 @@ class BView extends BClass
             $this->_params['args'][$k] = $v;
         }
         if (($modName = $this->param('module_name'))) {
-            $this->BModuleRegistry->pushModule($modName);
+            //$this->BModuleRegistry->pushModule($modName);
         }
         $result = '';
         if (!$this->_beforeRender()) {
             BDebug::debug('BEFORE.RENDER failed');
             if ($debug) {
                 $result .= "<!-- FAILED VIEW: {$viewName} -->\n";
+            }
+            if ($modName) {
+                //$this->BModuleRegistry->popModule();
             }
             return $result;
         }
@@ -1670,7 +1673,7 @@ class BView extends BClass
 
         $this->_afterRender();
         if ($modName) {
-            $this->BModuleRegistry->popModule();
+            //$this->BModuleRegistry->popModule();
         }
 
         return $result;
@@ -2384,6 +2387,8 @@ if ($this->BDebug->is('DEBUG')) {
             if ($ts && file_exists($fsFile)) {
                 $file .= '?' . substr(md5(filemtime($fsFile)), 0, 10);
             }
+        } elseif (!preg_match('#^(http|/)#', $file)) {
+            //echo ' ***** '; var_dump($file);
         }
         return $file;
     }
@@ -2406,7 +2411,7 @@ if ($this->BDebug->is('DEBUG')) {
         if (strpos($file, 'http:') === false && strpos($file, 'https:') === false && $file[0] !== '/') {
             $module  = !empty($args['module_name']) ? $this->BModuleRegistry->module($args['module_name']) : null;
             $baseUrl = $module ? $module->baseSrc() : $this->BApp->baseUrl();
-            $file    = $baseUrl . '/' . $file;
+            $file    = rtrim($baseUrl, '/') . '/' . $file;
         }
 
         if ($type === 'js' && $this->_headJs['loaded'] && $this->_headJs['loaded'] !== $name
