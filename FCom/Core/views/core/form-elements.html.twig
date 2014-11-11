@@ -18,19 +18,18 @@ Using custom id/name:
 {% macro label(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
+    {% import _self as forms %}
     <label class="control-label {{ p.label_class|default('col-md-2') }} {{ p.required ? 'required' }}"
-        for="{{ view.getInputId(p) }}">{{ p.label }}</label>
+        for="{{ view.getInputId(p) }}">{{ p.label }}&nbsp;{{ forms.help_icon(p) }}</label>
 {% endmacro %}
 
 {% macro help_icon(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
     {% if p.help_icon %}
-        <div class="col-md-1">
-            <a id="help-{{ view.getInputId(p) }}" class="pull-right" href="#" data-toggle="popover" data-trigger="focus"
+        <a id="help-{{ view.getInputId(p) }}" class="pull-right" href="#" data-toggle="popover" data-trigger="focus"
                data-content="{{ p.help_text }}" data-container="body">
                 <span class="glyphicon glyphicon-question-sign"></span></a>
-        </div>
         <script type="text/javascript">
             require(['jquery', 'bootstrap'], function($){
                 var $help = $('#help-{{ view.getInputId(p) }}');
@@ -42,6 +41,7 @@ Using custom id/name:
         </script>
     {% endif %}
 {% endmacro %}
+
 {% macro help_block(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
@@ -60,7 +60,6 @@ Using custom id/name:
     {% import _self as forms %}
     <div class="form-group {{ p.form_group_class }}">
         {{ forms.label(p) }}
-        {{ forms.help_icon(p) }}
         <div class="{{ p.input_div_class|default('col-md-5') }}">
             <input type="{{ p.type|default('text') }}"
                 id="{{ view.getInputId(p) }}"
@@ -87,7 +86,6 @@ Using custom id/name:
     {% import _self as forms %}
     <div class="form-group {{ p.form_group_class }}">
         {{ forms.label(p) }}
-        {{ forms.help_icon(p) }}
         <div class="{{ p.input_div_class|default('col-md-5') }}">
             <select
                 id="{{ view.getInputId(p) }}"
@@ -137,7 +135,6 @@ Using custom id/name:
     {% import _self as forms %}
     <div class="form-group {{ p.form_group_class }}">
         {{ forms.label(p) }}
-        {{ forms.help_icon(p) }}
         <div class="{{ p.input_div_class|default('col-md-5') }}">
             <textarea rows="{{ p.rows|default(5) }}"
                 id="{{ view.getInputId(p) }}"

@@ -56,9 +56,9 @@
                 );
             });
 
-            require(['react', 'jsx!fcom.promo'], function($) {
-                console.log('YES!');
-            })
+//            require(['react', 'jsx!fcom.promo'], function($) {
+//                console.log('YES!');
+//            })
         </script>
         {{ forms.select({
             label: 'Coupon Code Enter For Validity'|_,
@@ -69,8 +69,8 @@
             select2: 1, options: ['No coupon code required'|_, 'Single coupon code'|_, 'Multiple coupon codes'|_]
         }) }}
 
-        <script type="text/javascript">
-            require(['react', 'fcom.promo'], function (React, Promo) {
+        <script type="text/jsx;harmony=true">
+            require(['react', 'jsx!fcom.promo'], function (React, Promo) {
                 var options = {
                     coupon_select_id: 'model-use_coupon',
                     showCouponsUrl: "{{ APP.href('promo/coupons/view?id=') ~ m.id() }}", // "/admin/promo/coupons/view?id=1",
