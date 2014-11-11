@@ -1,5 +1,8 @@
 base:
     - { view: admin/nav, do: [[ addNav, catalog/promo, { label: Promotions, href: /promo } ]] }
+    - view: head
+        do:
+            - [ requireJs, fcom.promo, @FCom_Promo/Admin/js/jsx/src/fcom.promo ]
 
 promo_form_tabs:
     - view: admin/form
