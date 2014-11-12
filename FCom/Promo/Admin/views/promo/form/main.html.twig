@@ -74,11 +74,13 @@
             help_text: "Require coupon code"|_,
             select2: 1, options: ['No coupon code required'|_, 'Single coupon code'|_, 'Multiple coupon codes'|_]
         }) }}
+        <div id="coupon-options"></div>
 
         <script type="text/javascript">
             require(['react', 'jsx!fcom.promo'], function (React, Promo) {
                 var options = {
                     coupon_select_id: 'model-use_coupon',
+                    coupon_container_id: 'coupon-options',
                     showCouponsUrl: "{{ APP.href('promo/coupons/view?id=') ~ m.id() }}", // "/admin/promo/coupons/view?id=1",
                     generateCouponsUrl: "{{ APP.href('promo/coupons/generate?id=') ~ m.id() }}", // "/admin/promo/coupons/generate?id=1",
                     importCouponsUrl: "{{ APP.href('promo/coupons/import?id=') ~ m.id() }}", // "/admin/promo/coupons/import?id=1",

@@ -1,151 +1,18 @@
 /** @jsx React.DOM */
 
-define(['react', 'jquery', 'jsx!griddle', 'select2', 'bootstrap', 'fcom.locale'], function (React, $, Griddle) {
-    FCom.React = {};
+define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'select2', 'bootstrap', 'fcom.locale'], function (React, $, Griddle, Components) {
     var Locale = require('fcom.locale');
-    FCom.React.ControlLabel = React.createClass({
-        render: function () {
-            var cl = "control-label " + this.props.label_class + (this.props.required ? ' required' : '');
-            return (
-                <label className={cl}
-                    htmlFor={ this.props.input_id }>{this.props.children}</label>
-            );
-        },
-        getDefaultProps: function () {
-            // component default properties
-            return {
-                label_class: "col-md-2",
-                required: false,
-                input_id: ''
-            };
-        }
-    });
-
-    FCom.React.HelpIcon = React.createClass({
-        render: function () {
-            return (
-                <div className="col-md-1">
-                    <a id={this.props.id} className="pull-right" href="#" ref="icon"
-                        data-toggle="popover" data-trigger="focus"
-                        data-content={this.props.content} data-container="body">
-                        <span className="glyphicon glyphicon-question-sign"></span>
-                    </a>
-                </div>
-            );
-        },
-        getDefaultProps: function () {
-            // component default properties
-            return {
-                id: '',
-                content: ''
-            };
-        },
-        componentDidMount: function () {
-            // component default properties
-            var $help = $(this.refs.icon.getDOMNode());
-            $help.popover({placement: 'auto', trigger: 'hover focus'});
-            $help.on('click', function (e) {
-                e.preventDefault();
-            });
-        }
-    });
-
-    FCom.React.Button = React.createClass({
-        render: function () {
-            var {className, onClick, ...other} = this.props;
-            return (
-                <button {...other} className={"btn " + className} onClick={onClick}>{this.props.children}</button>
-            );
-        }
-    });
-
-    FCom.React.Modal = React.createClass({
-        // The following methods are the only places we need to
-        // integrate with Bootstrap or jQuery!
-        componentDidMount: function () {
-            // When the component is added, turn it into a modal
-            $(this.getDOMNode())
-                .modal({backdrop: 'static', keyboard: false, show: false})
-        },
-        componentWillUnmount: function () {
-            $(this.getDOMNode()).off('hidden', this.handleHidden);
-        },
-        close: function () {
-            $(this.getDOMNode()).modal('hide');
-        },
-        open: function () {
-            $(this.getDOMNode()).modal('show');
-        },
-        render: function () {
-            var confirmButton = null;
-            var cancelButton = null;
-
-            if (this.props.confirm) {
-                confirmButton = (
-                    <FCom.React.Button onClick={this.handleConfirm} className="btn-primary" type="button">
-                        {this.props.confirm}
-                    </FCom.React.Button>
-                );
-            }
-            if (this.props.cancel) {
-                cancelButton = (
-                    <FCom.React.Button onClick={this.handleCancel} className="btn-default" type="button">
-                        {this.props.cancel}
-                    </FCom.React.Button>
-                );
-            }
-
-            return (
-                <div className="modal">
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <button type="button" className="close" onClick={this.handleCancel}>
-                                &times;
-                                </button>
-                                <h3>{this.props.title}</h3>
-                            </div>
-                            <div className="modal-body">
-                                {this.props.children}
-                            </div>
-                            <div className="modal-footer">
-                              {cancelButton}
-                              {confirmButton}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        },
-        handleCancel: function () {
-            if (this.props.onCancel) {
-                this.props.onCancel();
-            }
-        },
-        handleConfirm: function () {
-            if (this.props.onConfirm) {
-                this.props.onConfirm();
-            } else {
-                this.close();
-            }
-        },
-        getDefaultProps: function () {
-            // component default properties
-            return {
-                confirm: Locale._("OK"),
-                cancel: Locale._("Cancel"),
-                title: Locale._("Title")
-            }
-        }
-    });
-
     var SingleCoupon = React.createClass({
         render: function () {
             return (
-                <div className="single-coupon col-md-3">
-                    <input id={this.props.id} ref={this.props.name} value={this.state.value}
-                        className="form-control"/>
-                    <span className="help-block">{this.props.helpText}</span>
+                <div className="single-coupon">
+                    <Components.ControlLabel input_id={this.props.id}>
+                        {this.props.labelText}<Components.HelpIcon id={"help-" + this.props.id} content={this.props.helpText}/>
+                    </Components.ControlLabel>
+                    <div className="col-md-5">
+                        <input id={this.props.id} ref={this.props.name} className="form-control"/>
+                        <span className="help-block">{this.props.helpText}</span>
+                    </div>
                 </div>
             );
         },
@@ -154,7 +21,8 @@ define(['react', 'jquery', 'jsx!griddle', 'select2', 'bootstrap', 'fcom.locale']
             return {
                 id: "model-use_coupon_code_single",
                 name: "use_coupon_code_single",
-                helpText: Locale._("(Leave empty for auto-generate)")
+                helpText: Locale._("(Leave empty for auto-generate)"),
+                labelText: Locale._("Coupon Code")
             };
         },
         getInitialState: function () {
@@ -167,17 +35,18 @@ define(['react', 'jquery', 'jsx!griddle', 'select2', 'bootstrap', 'fcom.locale']
 
     var MultiCoupon = React.createClass({
         render: function () {
-            var showModal = <FCom.React.Modal ref="showModal" onConfirm={this.handleShowConfirm}
+            var showModal = <Components.Modal ref="showModal" onConfirm={this.handleShowConfirm}
                 onCancel={this.closeShowModal} url={this.props.showCouponsurl} title="Coupon grid"/>;
-            var generateModal = <FCom.React.Modal ref="generateModal" onConfirm={this.handleGenerateConfirm}
+            var generateModal = <Components.Modal ref="generateModal" onConfirm={this.handleGenerateConfirm}
                 onCancel={this.closeGenerateModal} url={this.props.generateCouponsurl} title="Generate coupons"/>;
-            var importModal = <FCom.React.Modal ref="importModal" onConfirm={this.handleImportConfirm}
+            var importModal = <Components.Modal ref="importModal" onConfirm={this.handleImportConfirm}
                 onCancel={this.closeImportModal} url={this.props.importCouponsurl} title="Import coupons"/>;
+            var style = {marginBottom: 15};
             return (
-                <div className="multi-coupon btn-group">
-                    <FCom.React.Button onClick={this.showCodes} className="btn-primary" type="button">{this.props.buttonViewLabel}</FCom.React.Button>
-                    <FCom.React.Button onClick={this.generateCodes} className="btn-primary" type="button">{this.props.buttonGenerateLabel}</FCom.React.Button>
-                    <FCom.React.Button onClick={this.importCodes} className="btn-primary" type="button">{this.props.buttonImportLabel}</FCom.React.Button>
+                <div className="multi-coupon btn-group col-md-offset-2" style={style}>
+                    <Components.Button onClick={this.showCodes} className="btn-primary" type="button">{this.props.buttonViewLabel}</Components.Button>
+                    <Components.Button onClick={this.generateCodes} className="btn-primary" type="button">{this.props.buttonGenerateLabel}</Components.Button>
+                    <Components.Button onClick={this.importCodes} className="btn-primary" type="button">{this.props.buttonImportLabel}</Components.Button>
                     {showModal}
                     {generateModal}
                     {importModal}
@@ -287,15 +156,19 @@ define(['react', 'jquery', 'jsx!griddle', 'select2', 'bootstrap', 'fcom.locale']
     var UsesBlock = React.createClass({
         render: function () {
             return (
-                <div className="row">
-                    <FCom.React.ControlLabel input_id={this.props.idUpc}>{this.props.labelUpc}</FCom.React.ControlLabel>
-                    <FCom.React.HelpIcon id={"help-" + this.props.idUpc} content={this.props.helpTextUpc}/>
+                <div className="uses-block" style={{clear: 'both'}}>
+                    <Components.ControlLabel input_id={this.props.idUpc}>
+                        {this.props.labelUpc}<Components.HelpIcon id={"help-" + this.props.idUpc} content={this.props.helpTextUpc}/>
+                    </Components.ControlLabel>
                     <div className="col-md-3">
                         <input type="text" id={this.props.idUpc} ref="uses_pc" className="form-control"
                             value={this.state.valueUpc}/>
                     </div>
-                    <FCom.React.ControlLabel input_id={this.props.idUt}>{this.props.labelUt}</FCom.React.ControlLabel>
-                    <FCom.React.HelpIcon id={"help-" + this.props.idUt} content={this.props.helpTextUt}/>
+
+                    <Components.ControlLabel input_id={this.props.idUt}>
+                        {this.props.labelUt}<Components.HelpIcon id={"help-" + this.props.idUt} content={this.props.helpTextUt}/>
+                    </Components.ControlLabel>
+
                     <div className="col-md-3">
                         <input type="text" id={this.props.idUt} ref="uses_pc" className="form-control"
                             value={this.state.valueUt}/>
@@ -344,11 +217,12 @@ define(['react', 'jquery', 'jsx!griddle', 'select2', 'bootstrap', 'fcom.locale']
                     generateCouponsUrl = this.props.options.generateCouponsUrl ||'',
                     importCouponsUrl = this.props.options.importCouponsUrl ||'';
                 child = [<MultiCoupon key="multi-coupon" options={this.props.options} importCouponsUrl={importCouponsUrl}
-                    generateCouponsUrl={generateCouponsUrl} showCouponsUrl={showCouponsUrl}/>]
+                    generateCouponsUrl={generateCouponsUrl} showCouponsUrl={showCouponsUrl}/>,
+                                        <UsesBlock options={this.props.options} key="uses-block"/>]
             }
             return (
                 <div className="form-group">
-                    <div className="col-md-5 .col-md-offset-3">
+                    <div className="coupon-group">
                         {child}
                     </div>
                 </div>
@@ -379,9 +253,8 @@ define(['react', 'jquery', 'jsx!griddle', 'select2', 'bootstrap', 'fcom.locale']
                 console.log("Use coupon dropdown not found");
                 return;
             }
-
-            var $parent = $couponSelector.closest('.form-group');
-            var $element = $("<div class='form-group'/>").appendTo($parent);
+            var containerID = options.coupon_container_id || "coupon-options";
+            var $element = $("#" + containerID);
             var selected = $couponSelector.val();
             if(selected != 0) {
                 React.render(<CouponApp mode={parseInt(selected)} options={options}/>, $element[0]);
