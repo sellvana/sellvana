@@ -29,6 +29,12 @@
 */
 class BDb
 {
+    const COLUMNS = 'COLUMNS',
+        PRIMARY = 'PRIMARY',
+        CONSTRAINTS = 'CONSTRAINTS',
+        KEYS = 'KEYS',
+        OPTIONS = 'OPTIONS',
+        DROP = 'DROP';
     /**
     * Collection of cached named DB connections
     *

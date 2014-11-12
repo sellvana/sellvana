@@ -45,7 +45,7 @@
             id: "model-date_range", help_icon: 1, help_text: 'Date Range'|_ }) }}
         <div id="testbed"></div>
         <script type="text/javascript">
-            require(['jquery', 'moment', 'daterangepicker'], function ($) {
+            require(['jquery', 'moment', 'daterangepicker', 'bootstrap'], function ($) {
                 var startDate = new Date();
                 var s = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate();
                 $('#model-date_range').daterangepicker(
@@ -54,6 +54,11 @@
                         startDate: s
                     }
                 );
+                var $help = $('.help-icon');
+                $help.popover({placement: 'auto', trigger: 'hover focus'});
+                $help.on('click', function (e) {
+                    e.preventDefault();
+                });
             });
 
             require(['react', 'jsx!fcom.promo'], function(React, Promo) {
