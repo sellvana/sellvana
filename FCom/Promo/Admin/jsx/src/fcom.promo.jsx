@@ -154,8 +154,6 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'select2', 'boo
                     $codePattern.val(val);
                 }
             });
-            //var $modalBody = $('.modal-body', this.refs.generateModal.getDOMNode());
-            //this.loadModalContent($modalBody, this.props.generateCouponsUrl, this.postGenerate);
         },
         postGenerate: function(e){
             var $form = $(this.refs.generateForm.getDOMNode()).find('form');

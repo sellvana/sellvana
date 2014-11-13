@@ -548,7 +548,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $message = $this->_("Promotion id not found");
             $status = 'error';
             $this->BResponse->status(400, $message, false);
-        } else if(empty($data)){
+        } else if (empty($data)) {
             $status = "error";
             $message = $this->_("No data received.");
             $this->BResponse->status(400, $message, $message);
@@ -577,6 +577,69 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $this->BResponse->json(['status' => $status, 'message' => $message]);
     }
 
+    public function action_coupons_import__POST()
+    {
+        $id = $this->BRequest->get('id');
+        if (!$id) {
+            $message = $this->_("Promotion id not found");
+            $this->BResponse->status(400, $message, $message);
+            return;
+        }
+        if (empty($_FILES) || !isset($_FILES['upload'])) {
+            $this->BResponse->json(['msg' => "Nothing found"]);
+            return;
+        }
+        $this->BResponse->setContentType('application/json');
+        /** @var FCom_Promo_Model_Coupon $importer */
+        $importer = $this->FCom_Promo_Model_Coupon;
+        $uploads = $_FILES['upload'];
+        $rows = [];
+        try {
+            foreach ($uploads['name'] as $i => $fileName) {
+                $error = false;
+                if (!$fileName) {
+                    continue;
+                }
+                $fileName = preg_replace('/[^\w\d_.-]+/', '_', $fileName);
+                $path = $this->BApp->storageRandomDir() . '/import/coupons';
+                $this->BUtil->ensureDir($path);
+                $fullFileName = $path . '/' . trim($fileName, '\\/');
+                $realpath = str_replace('\\', '/', realpath(dirname($file)));
+
+                $this->BUtil->ensureDir(dirname($fullFileName));
+                $fileSize = 0;
+                if (strpos($realpath, $path) !== 0) {
+                    $error = $this->_("Weird file path.");
+                } else if ($uploads['error'][$i]) {
+                    $error = $uploads['error'][$i];
+                } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
+                    $error = $this->_("Problem storing uploaded file.");
+                } elseif ($importer->validateImportFile($fullFileName)) {
+                    $this->BResponse->startLongResponse(false);
+                    $importer->importFromFile($fileName, $id);
+                    $error = '';
+                    $fileSize = $uploads['size'][$i];
+                } else {
+                    $error = $this->_("Invalid import file.");
+                }
+
+                $row = [
+                    'name' => $fileName,
+                    'size' => $fileSize,
+                    'folder' => '.../',
+                ];
+                if ($error) {
+                    $row['error'] = $error;
+                }
+                $rows[] = $row;
+            }
+        } catch(Exception $e) {
+            $this->BDebug->logException($e);
+            $this->BResponse->json(['error' => $e->getMessage()]);
+        }
+        $this->BResponse->json(['files' => $rows]);
+    }
+
     public function action_coupons_import()
     {
         $r = $this->BRequest;
@@ -586,9 +649,21 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $status = 'error';
             $this->BResponse->status(400, $html, false);
         } else {
+            $m = [
+                'config' => ['max_import_file_size' => $this->_getMaxUploadSize(), 'promoId' => $id],
+            ];
+
             $status = "success";
-            $html = $this->view('promo/coupons/import')->render();
+            $html = $this->view('promo/coupons/import')->set('model', $m)->render();
         }
         $this->BResponse->json(['status' => $status, 'html' => $html]);
+    }
+
+    protected function _getMaxUploadSize()
+    {
+        $p = ini_get('post_max_size');
+        $u = ini_get('upload_max_filesize');
+        $max = min($p, $u);
+        return $max;
     }
 }
