@@ -1,7 +1,6 @@
 /** @jsx React.DOM */
 
-define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'select2', 'bootstrap', 'fcom.locale'], function (React, $, Griddle, Components) {
-    var Locale = require('fcom.locale');
+define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 'select2', 'bootstrap'], function (React, $, Griddle, Components, Locale) {
     var SingleCoupon = React.createClass({
         render: function () {
             return (

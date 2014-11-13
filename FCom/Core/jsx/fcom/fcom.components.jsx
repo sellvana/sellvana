@@ -53,7 +53,6 @@ define(['react', 'jquery', 'bootstrap', 'fcom.locale'], function (React, $) {
                             className={className}
                             defaultValue={inputValue}
                             dataRuleRequired={ this.props.required ? "true":'' }
-                            {...this.props.attr}
                         />
                         {helpBlock}
                     </div>

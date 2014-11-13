@@ -596,7 +596,6 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $rows = [];
         try {
             foreach ($uploads['name'] as $i => $fileName) {
-                $error = false;
                 if (!$fileName) {
                     continue;
                 }
@@ -604,19 +603,20 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                 $path = $this->BApp->storageRandomDir() . '/import/coupons';
                 $this->BUtil->ensureDir($path);
                 $fullFileName = $path . '/' . trim($fileName, '\\/');
-                $realpath = str_replace('\\', '/', realpath(dirname($file)));
+                $realpath = str_replace('\\', '/', realpath(dirname($fullFileName)));
+                $imported = 0;
 
                 $this->BUtil->ensureDir(dirname($fullFileName));
                 $fileSize = 0;
                 if (strpos($realpath, $path) !== 0) {
-                    $error = $this->_("Weird file path.");
+                    $error = $this->_("Weird file path." . $realpath . '|' . $path);
                 } else if ($uploads['error'][$i]) {
                     $error = $uploads['error'][$i];
                 } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
                     $error = $this->_("Problem storing uploaded file.");
                 } elseif ($importer->validateImportFile($fullFileName)) {
                     $this->BResponse->startLongResponse(false);
-                    $importer->importFromFile($fileName, $id);
+                    $imported = $importer->importFromFile($fullFileName, $id);
                     $error = '';
                     $fileSize = $uploads['size'][$i];
                 } else {
@@ -627,6 +627,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                     'name' => $fileName,
                     'size' => $fileSize,
                     'folder' => '.../',
+                    'imported' => $imported
                 ];
                 if ($error) {
                     $row['error'] = $error;

@@ -96,7 +96,8 @@
                             {%=file.name%}
                         </td>
                         <td class="size"><span>{%=o.formatFileSize(file.size)%}</span></td>
-                        <td colspan="2"><span>{%=file.folder%}</span></td>
+                        <td ><span>{%=file.folder%}</span></td>
+                        <td ><span>Imported {%=file.imported%} codes</span></td>
                     {% } %}
                 </tr>
             {% } %}
@@ -108,7 +109,7 @@
     <script>
         require(['tmpl', 'load-image', 'canvas-to-blob', 'iframe-transport', 'jquery.fileupload', 'jquery.fileupload-fp', 'jquery.fileupload-ui'], function () {
             $('#f-import-upload').fileupload({
-                url: '{{ APP.href("promo/coupon/import?id=" ~ m.config.promoId) | raw }}',
+                url: '{{ APP.href("promo/coupons/import?id=" ~ m.config.promoId) | raw }}',
                 multiple: false,
                 acceptFileTypes: /(\.|\/)(csv|txt)$/i
             }).bind('fileuploadalways', function (e, data) {
