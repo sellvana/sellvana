@@ -538,54 +538,43 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         }
         $this->BResponse->json(['status' => $status, 'html'=>$html]);
     }
-    public function action_coupons_generate__POST()
-    {
-        $r = $this->BRequest;
-        $id = $r->get('id');
-        if (!$id) {
-            $message = $this->_("Promotion id not found");
-            $this->BResponse->status(400, $message, false);
-        } else {
-            $data = $r->post('model');
-            $pattern = isset($data['code_pattern'])?$data['code_pattern']:null;
-            $length = isset($data['code_length'])?$data['code_length']:8;
-            $usesPerCustomer = isset($data['code_uses_per_customer'])?$data['code_uses_per_customer']:1;
-            $usesTotal = isset($data['code_uses_total'])?$data['code_uses_total']:1;
-            $couponCount = isset($data['coupon_count'])?$data['coupon_count']:1;
-            $model = $this->FCom_Promo_Model_Coupon;
-            $generated = $model->generateCoupons([
-                'promo_id' => $id,
-                'pattern' => $pattern,
-                'length' => $length,
-                'uses_per_customer' => $usesPerCustomer,
-                'uses_total' => $usesTotal,
-                'count' => $couponCount
-            ]);
-            $status = 'success';
-            $message = $this->_("%d coupons generated.", [$generated]);
-            if($generated < $couponCount){
-                $status = 'warning';
-                $message .= $this->_("\nFailed to generate %d coupons", ($couponCount - $generated));
-            }
-            $this->BResponse->json(['status'=>$status, 'message'=>$message]);
-        }
-    }
     public function action_coupons_generate()
     {
         $r = $this->BRequest;
+
         $id = $r->get('id');
+        $data = $r->get('model');
         if (!$id) {
-            $html = $this->_("Promotion id not found");
+            $message = $this->_("Promotion id not found");
             $status = 'error';
-            $this->BResponse->status(400, $html, false);
+            $this->BResponse->status(400, $message, false);
+        } else if(empty($data)){
+            $status = "error";
+            $message = $this->_("No data received.");
+            $this->BResponse->status(400, $message, $message);
         } else {
-            /*
-             * maybe ditch the template and go for json response?
-             */
-            $status = "success";
-            $html = $this->view('promo/coupons/generate')->render();
+            $pattern = isset($data['code_pattern'])? $data['code_pattern']: null;
+            $length = isset($data['code_length'])? $data['code_length']: 8;
+            $usesPerCustomer = isset($data['code_uses_per_customer'])? $data['code_uses_per_customer']: 1;
+            $usesTotal = isset($data['code_uses_total'])? $data['code_uses_total']: 1;
+            $couponCount = isset($data['coupon_count'])? $data['coupon_count']: 1;
+            $model = $this->FCom_Promo_Model_Coupon;
+            $generated = $model->generateCoupons([
+                 'promo_id' => $id,
+                 'pattern' => $pattern,
+                 'length' => $length,
+                 'uses_per_customer' => $usesPerCustomer,
+                 'uses_total' => $usesTotal,
+                 'count' => $couponCount
+             ]);
+            $status = 'success';
+            $message = $this->_("%d coupons generated.", $generated['generated']);
+            if ($generated < $couponCount) {
+                $status = 'warning';
+                $message .= $this->_("\nFailed to generate %d coupons", $generated['failed']);
+            }
         }
-        $this->BResponse->json(['status' => $status, 'html' => $html]);
+        $this->BResponse->json(['status' => $status, 'message' => $message]);
     }
 
     public function action_coupons_import()

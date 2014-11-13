@@ -56,8 +56,11 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'select2', 'boo
                             inputDivClass='col-md-8' label_class='col-md-4'/>
                         <Components.Input field="coupon_count" label={Locale._("How many to generate")}
                             inputDivClass='col-md-8' label_class='col-md-4' inputValue="1" required/>
-                        <div className="col-md-2">
-                            <Components.Button type="button" id="coupon-generate-btn" className="btn-danger btn-post">{Locale._("Generate")}</Components.Button>
+                        <div className="formg-group">
+                            <Components.Button type="button" id="coupon-generate-btn" onClick={this.props.onSubmit}
+                                className="btn-danger btn-post">{Locale._("Generate")}</Components.Button>
+                            <span style={{display: 'none', marginLeft:20}} className="loading">Loading ... </span>
+                            <span style={{display: 'none', marginLeft:20}} className="result"></span>
                         </div>
                     </form>
                 </div>
@@ -70,7 +73,9 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'select2', 'boo
             var showModal = <Components.Modal ref="showModal" onConfirm={this.handleShowConfirm}
                 onCancel={this.closeShowModal} url={this.props.showCouponsurl} title="Coupon grid"/>;
             var generateModal = <Components.Modal ref="generateModal" onConfirm={this.handleGenerateConfirm}
-                onCancel={this.closeGenerateModal} url={this.props.generateCouponsurl} title="Generate coupons"><GenerateForm/></Components.Modal>;
+                onCancel={this.closeGenerateModal} url={this.props.generateCouponsurl} title="Generate coupons">
+                    <GenerateForm ref="generateForm" onSubmit={this.postGenerate}/>
+                </Components.Modal>;
             var importModal = <Components.Modal ref="importModal" onConfirm={this.handleImportConfirm}
                 onCancel={this.closeImportModal} url={this.props.importCouponsurl} title="Import coupons"/>;
             return (
@@ -133,17 +138,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'select2', 'boo
             // component default properties
             console.log("generateCodes");
             this.refs.generateModal.open();
-            //var $modalBody = $('.modal-body', this.refs.generateModal.getDOMNode());
-            //this.loadModalContent($modalBody, this.props.generateCouponsUrl, this.postGenerate);
-        },
-        postGenerate: function($el){
-            var $form = $el.find('form');
-            var $button = $form.find('button.btn-post');
-            console.log($el, $button, $form);
-            var $codeLength = $('#model-code_length');
-            var $codePattern = $('#model-code_pattern');
-            var url = this.props.generateCouponsUrl;
-            if($.trim($codePattern.val()) == ''){ // code length should be settable only if no pattern is provided
+            var $form = $(this.refs.generateForm).find('form');
+            var $codeLength = $form.find('#model-code_length');
+            var $codePattern = $form.find('#model-code_pattern');
+            if ($.trim($codePattern.val()) == '') { // code length should be settable only if no pattern is provided
                 $codeLength.prop('disabled', false);
             }
             $codePattern.change(function (e) {
@@ -156,7 +154,18 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'select2', 'boo
                     $codePattern.val(val);
                 }
             });
-            $button.click(function (e) {
+            //var $modalBody = $('.modal-body', this.refs.generateModal.getDOMNode());
+            //this.loadModalContent($modalBody, this.props.generateCouponsUrl, this.postGenerate);
+        },
+        postGenerate: function(e){
+            var $form = $(this.refs.generateForm.getDOMNode()).find('form');
+            //var $button = $form.find('button.btn-post');
+            console.log(e, $form);
+            var url = this.props.generateCouponsUrl;
+            var $progress = $form.find('.loading');
+            var $result = $form.find('.result').hide();
+            $progress.show();
+            //$button.click(function (e) {
                 e.preventDefault();
                 var data = {};
                 $form.find('input').each(function(){
@@ -169,13 +178,15 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'select2', 'boo
                     .done(function (result) {
                         var status = result.status;
                         var message = result.message;
-                        $el.append($('<pre>').addClass((status == 'warning')?'warning':'success').text(message));
+                        $result.text(message);
                     })
                     .always(function (r) {
+                        $progress.hide();
+                        $result.show();
                         // hide notification
                         console.log(r);
                     });
-            });
+            //});
         },
         importCodes: function () {
             // component default properties
