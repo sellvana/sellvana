@@ -19,6 +19,92 @@ define(['react', 'jquery', 'bootstrap', 'fcom.locale'], function (React, $) {
         }
     });
 
+    FCom.Components.HelpBlock = React.createClass({
+        render: function () {
+            return (<span className={"help-block "+ this.props.helpBlockClass}>{ this.props.text }</span>);
+        }
+    });
+
+    FCom.Components.Input = React.createClass({
+        render: function () {
+            var { formGroupClass, inputDivClass, inputClass, inputValue, ...other } = this.props;
+            var className = "form-control";
+            if(inputClass) {
+                className += " " + inputClass;
+            }
+            if(this.props.required) {
+                className += " required";
+            }
+            var helpBlock = <span/>;
+            if(this.props.helpBlockText) {
+                helpBlock = <FCom.Components.HelpBlock text={this.props.helpBlockText}/>;
+            }
+        var inputId = this.getInputId();
+
+        return (
+                <div className={"form-group " + formGroupClass}>
+                    <FCom.Components.ControlLabel {...other} input_id={inputId}>
+                        {this.props.label}
+                    </FCom.Components.ControlLabel>
+                    <div className={inputDivClass}>
+                        <input {...this.props}
+                            id={inputId}
+                            name={this.getInputName()}
+                            className={className}
+                            defaultValue={inputValue}
+                            dataRuleRequired={ this.props.required ? "true":'' }
+                            {...this.props.attr}
+                        />
+                        {helpBlock}
+                    </div>
+                </div>
+            );
+        },
+        getDefaultProps: function() {
+            // component default properties
+            return {
+                formGroupClass: '',
+                inputDivClass: 'col-md-5',
+                type: 'text',
+                inputId: '',
+                inputName: '',
+                inputClass:''
+            };
+        },
+        getInputId: function() {
+            var field = this.props.field;
+            if(this.props.id) {
+                return this.props.id
+            }
+            if (!field) {
+                return '';
+            }
+            if (this.props.settings_module && !this.props.id_prefix) {
+                return 'modules-' + this.props.settings_module + '-' + field;
+            }
+            return ((this.props.id_prefix) ? this.props.id_prefix : 'model') + '-' + field;
+        },
+        getInputName: function()
+        {
+            if ((this.props.name)) {
+                return this.props.name;
+            }
+            if (!this.props.field) {
+                return '';
+            }
+            var name;
+            if (this.props.settings_module && !this.props.name_prefix) {
+                name = 'config[modules][' + this.props.settings_module + '][' + this.props.field + ']';
+            } else {
+                name = (this.props.name_prefix ? this.props.name_prefix : 'model') + '[' + this.props.field + ']';
+            }
+            if (this.props.multiple) {
+                name += '[]';
+            }
+            return name;
+        }
+    });
+
     FCom.Components.HelpIcon = React.createClass({
         render: function () {
             return (

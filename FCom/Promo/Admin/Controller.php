@@ -433,6 +433,96 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             ['navButtonAdd', 'caption' => 'Remove', 'buttonicon' => 'ui-icon-trash', 'title' => 'Remove Attachments From Promotion', 'cursor' => 'pointer'],
         ];
     }
+    public function action_coupons_grid_data__POST()
+    {
+        $this->_processGridDataPost('FCom_Promo_Model_Coupon');
+    }
+
+    public function action_coupons_grid_data()
+    {
+        if ($this->BRequest->get('export')) {
+            if ($this->BRequest->csrf('referrer', 'GET')) {
+                $this->BResponse->status('403', 'Invalid referrer', 'Invalid referrer');
+                return;
+            }
+        } else {
+            if (!$this->BRequest->xhr()) {
+                $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+                return;
+            }
+        }
+        $view = $this->couponGridView();
+        $grid = $view->get('grid');
+        $mainTableAlias = 'pc';
+
+        if (isset($grid['config']['data']) && (!empty($grid['config']['data']))) {
+            $data = $grid['config']['data'];
+            $data = $this->gridDataAfter($data);
+            $this->BResponse->json([['c' => 1], $data]);
+        } else {
+            $r = $this->BRequest->get();
+            //TODO: clean up and remove
+            if (empty($grid['config']['orm'])) {
+                $grid['config']['orm'] = $this->FCom_Promo_Model_Coupon->orm($mainTableAlias)
+                    ->select($mainTableAlias . '.*');
+                $view->set('grid', $grid);
+            }
+            if (isset($r['filters'])) {
+                $filters = $this->BUtil->fromJson($r['filters']);
+                if (isset($filters['exclude_id']) && $filters['exclude_id'] != '') {
+                    $arr = explode(',', $filters['exclude_id']);
+                    $grid['config']['orm']->where_not_in($mainTableAlias . '.id', $arr);
+                }
+            }
+
+            $oc = $this->FCom_Promo_Model_Coupon->origClass();
+            if ($this->BRequest->request('export')) {
+                $data = $view->generateOutputData(true);
+                $view->export($data['rows'], $oc);
+            } else {
+
+                //$data = $view->processORM($orm, $oc.'::action_grid_data', $gridId);
+                $data = $view->generateOutputData();
+                $data = $this->gridDataAfter($data);
+                $this->BResponse->json([
+                    ['c' => $data['state']['c']],
+                    $this->BDb->many_as_array($data['rows']),
+                ]);
+            }
+        }
+    }
+
+    /**
+     * @return FCom_Core_View_BackboneGrid
+     */
+    protected function couponGridView()
+    {
+        $gridDataUrl = $this->BApp->href($this->_gridHref . '/coupons_grid_data');
+        $config = [
+            'id' => $this->FCom_Promo_Model_Coupon->origClass(),
+            'orm' => $this->FCom_Promo_Model_Coupon->orm('pc'),
+            'data_url' => $gridDataUrl,
+            'edit_url' => $gridDataUrl,
+            'grid_url' => null,
+            'form_url' => null,
+            'columns' => [
+                ['type' => 'row_select', 'width'=>40],
+                ['name' => 'id', 'label' => 'ID', 'hidden' => true],
+                ['name' => 'code', 'label' => 'Code', 'index' => 'code', 'width' => 400, 'sorttype' => 'string'],
+                ['name' => 'total_used', 'label' => 'Used', 'index' => 'total_used', 'sorttype' => 'number', 'width'=>40],
+                ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]],
+            ],
+            'actions' => [
+                'delete' => true,
+            ],
+            'filters' => [
+                ['field' => 'code', 'type' => 'text'],
+                ['field' => 'total_used', 'type' => 'number-range'],
+            ]
+        ];
+        $view = $this->view($this->_gridViewName)->set('grid',['config' => $config]);
+        return $view;
+    }
 
     public function action_coupons_grid()
     {
@@ -444,40 +534,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $this->BResponse->status(400, $html, false);
         } else {
             $status = "success";
-            $gridDataUrl = $this->BApp->href($this->_gridHref . '/coupons_grid_data');
-            $config = [
-                'id' => $this->FCom_Promo_Model_Coupon->origClass(),
-                'orm' => $this->FCom_Promo_Model_Coupon->orm(),
-                'data_url' => $gridDataUrl,
-                'edit_url' => $gridDataUrl,
-                'grid_url' => null,
-                'form_url' => null,
-                'columns' => [
-                    ['type' => 'row_select'],
-                    ['name' => 'id', 'label' => 'ID', 'hidden' => true],
-                    ['name' => 'code', 'label' => 'Code', 'index' => 'code', 'width' => 100,
-                        'editable' => 'inline', 'addable' => true, 'validation' => ['required' => true]],
-                    ['name' => 'uses_per_customer', 'label' => 'Uses Per Customer', 'index' => 'uses_per_customer',
-                                            'editable' => 'inline', 'addable' => true],
-                    ['name' => 'uses_total', 'label' => 'Uses total', 'index' => 'uses_total', 'sorttype' => 'number',
-                                            'editable' => 'inline', 'addable' => true],
-                    //['name' => 'total_used', 'label' => 'Used', 'index' => 'total_used', 'sorttype' => 'number'],
-                    ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]],
-                ],
-                'actions' => [
-                    'delete' => true,
-                    'new' => ['caption' => 'Add New Coupon'],
-                    'edit' => true,
-                ],
-                'data_mode' => 'local',
-                'filters' => [
-                    ['field' => 'code', 'type' => 'text'],
-                    ['field' => 'uses_per_customer', 'type' => 'number-range'],
-                    ['field' => 'uses_total', 'type' => 'number-range'],
-                    //['field' => 'total_used', 'type' => 'number-range'],
-                ]
-            ];
-            $html = $this->view('promo/coupons/grid')->set('grid',['config' => $config])->render();
+            $html = $this->couponGridView()->render();
         }
         $this->BResponse->json(['status' => $status, 'html'=>$html]);
     }

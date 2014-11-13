@@ -32,18 +32,49 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'select2', 'boo
             };
         }
     });
+    var GenerateForm = React.createClass({
+        render: function () {
+            return (
+                <div className="f-section" id="coupon-generate-container">
+                    <div className="well well-sm help-block" style={{fontSize:12}}>
+                        <p>{Locale._("You can have unique coupon codes generated for you automatically if you input simple patterns.")}</p>
+                        <p>{Locale._("Pattern examples:")}</p>
+                        <p><code>&#123;U8&#125;</code>{Locale._(" - 8 upper case alpha chars - will result to something like ")}<code>DKABWJKQ</code></p>
+                        <p><code>&#123;l6&#125;</code>{Locale._(" - 6 lower case alpha chars - will result to something like ")}<code>dkabkq</code></p>
+                        <p><code>&#123;D4&#125;</code>{Locale._(" - 4 digits - will result to something like ")}<code>5640</code></p>
+                        <p><code>&#123;UD5&#125;</code>{Locale._(" - 5 alphanumeric (upper case) - will result to something like ")}<code>GHG76</code></p>
+                        <p><code>&#123;ULD5&#125;</code>{Locale._(" - 5 alphanumeric (mixed case) - will result to something like ")}<code>GhG76</code></p>
+                        <p><code>CODE-&#123;U4&#125;-&#123;UD6&#125;</code> - <code>CODE-HQNB-8A1NO3</code></p>
+                        <p>Locale._("Note: dynamic parts of the code MUST be enclosed in &#123;&#125;")</p>
+                    </div>
+                    <form id="coupon-generate-form" >
+                        <Components.Input field="code_pattern" label={Locale._("Code Pattern")}
+                            helpBlockText={Locale._("(Leave empty to auto-generate)")}
+                            inputDivClass='col-md-8' label_class='col-md-4'/>
+                        <Components.Input field="code_length" label={Locale._("Coupon Code Length")}
+                            helpBlockText={Locale._("(Will be used only if auto-generating codes)")}
+                            inputDivClass='col-md-8' label_class='col-md-4'/>
+                        <Components.Input field="coupon_count" label={Locale._("How many to generate")}
+                            inputDivClass='col-md-8' label_class='col-md-4' inputValue="1" required/>
+                        <div className="col-md-2">
+                            <Components.Button type="button" id="coupon-generate-btn" className="btn-danger btn-post">{Locale._("Generate")}</Components.Button>
+                        </div>
+                    </form>
+                </div>
+            );
+        }
+    });
 
     var MultiCoupon = React.createClass({
         render: function () {
             var showModal = <Components.Modal ref="showModal" onConfirm={this.handleShowConfirm}
                 onCancel={this.closeShowModal} url={this.props.showCouponsurl} title="Coupon grid"/>;
             var generateModal = <Components.Modal ref="generateModal" onConfirm={this.handleGenerateConfirm}
-                onCancel={this.closeGenerateModal} url={this.props.generateCouponsurl} title="Generate coupons"/>;
+                onCancel={this.closeGenerateModal} url={this.props.generateCouponsurl} title="Generate coupons"><GenerateForm/></Components.Modal>;
             var importModal = <Components.Modal ref="importModal" onConfirm={this.handleImportConfirm}
                 onCancel={this.closeImportModal} url={this.props.importCouponsurl} title="Import coupons"/>;
-            var style = {marginBottom: 15};
             return (
-                <div className="multi-coupon btn-group col-md-offset-2" style={style}>
+                <div className="multi-coupon btn-group col-md-offset-2" style={{marginBottom: 15}}>
                     <Components.Button onClick={this.showCodes} className="btn-primary" type="button">{this.props.buttonViewLabel}</Components.Button>
                     <Components.Button onClick={this.generateCodes} className="btn-primary" type="button">{this.props.buttonGenerateLabel}</Components.Button>
                     <Components.Button onClick={this.importCodes} className="btn-primary" type="button">{this.props.buttonImportLabel}</Components.Button>
@@ -102,19 +133,21 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'select2', 'boo
             // component default properties
             console.log("generateCodes");
             this.refs.generateModal.open();
-            var $modalBody = $('.modal-body', this.refs.generateModal.getDOMNode());
-            this.loadModalContent($modalBody, this.props.generateCouponsUrl, this.postGenerate);
+            //var $modalBody = $('.modal-body', this.refs.generateModal.getDOMNode());
+            //this.loadModalContent($modalBody, this.props.generateCouponsUrl, this.postGenerate);
         },
         postGenerate: function($el){
             var $form = $el.find('form');
             var $button = $form.find('button.btn-post');
-            var $codeLength = $form.find('input[name="model[code_length]"]');
-            var $codePattern = $form.find('input[name="model[code_pattern]"]');
+            console.log($el, $button, $form);
+            var $codeLength = $('#model-code_length');
+            var $codePattern = $('#model-code_pattern');
             var url = this.props.generateCouponsUrl;
             if($.trim($codePattern.val()) == ''){ // code length should be settable only if no pattern is provided
                 $codeLength.prop('disabled', false);
             }
-            $codePattern.change(function () {
+            $codePattern.change(function (e) {
+                console.log(e);
                 var val = $.trim($codePattern.val());
                 if (val == '') {
                     $codeLength.prop('disabled', false);
@@ -132,7 +165,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'select2', 'boo
                     data[name] = $self.val();
                 });
                 // show indication that something happens?
-                $.post(url, data)
+                $.get(url, data)
                     .done(function (result) {
                         var status = result.status;
                         var message = result.message;
