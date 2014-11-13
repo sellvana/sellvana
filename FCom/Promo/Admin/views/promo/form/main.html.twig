@@ -56,8 +56,9 @@
                 );
             });
 
-            require(['react', 'jsx!fcom.promo'], function($) {
-                console.log('YES!');
+            require(['react', 'jsx!fcom.promo'], function(React, Promo) {
+                Promo.createGrid();
+                console.log(Promo);
             })
         </script>
         {{ forms.select({

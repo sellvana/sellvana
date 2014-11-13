@@ -1,4 +1,6 @@
-define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (React, $) {
+/** @jsx React.DOM */
+
+define(['react', 'jquery', 'jsx!griddle', 'select2', 'bootstrap', 'fcom.locale'], function (React, $, Griddle) {
     FCom.React = {};
     var Locale = require('fcom.locale');
     FCom.React.ControlLabel = React.createClass({
@@ -50,10 +52,9 @@ define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (Rea
 
     FCom.React.Button = React.createClass({
         render: function () {
-            var props = $.extend({}, this.props);
-            props.className += ' btn';
+            var {className, onClick, ...other} = this.props;
             return (
-                <button {...props}>{this.props.children}</button>
+                <button {...other} className={"btn " + className} onClick={onClick}>{this.props.children}</button>
             );
         }
     });
@@ -366,7 +367,10 @@ define(['react', 'jquery', 'select2', 'bootstrap', 'fcom.locale'], function (Rea
 
     var Promo = {
         createButton: function () {
-            React.render(<Button label="Hello button"/>, document.getElementById('test'));
+            React.render(<Button label="Hello button"/>, document.getElementById('testbed'));
+        },
+        createGrid: function() {
+            React.render(<Griddle/>, document.getElementById('testbed'));
         },
         init: function (options) {
             var couponSelectId = options.coupon_select_id || "model-use_coupon";
