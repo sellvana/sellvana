@@ -26,6 +26,7 @@ common_js_libs:
             - [ requireJs, JSXTransformer, @FCom_LibJsCommon/js/JSXTransformer-0.12.0 ]
             - [ requireJs, react, @FCom_LibJsCommon/js/react-with-addons, { deps: [ JSXTransformer ] } ]
             - [ requireJs, jsx, @FCom_LibJsCommon/js/jsx ]
+            - [ requireJs, fcom.components, @FCom_Core/jsx/fcom/fcom.components ]
 
             #- [ js_raw, require_config, { content: "requirejs.config({ urlArgs: 'bust='+(new Date()).getTime() })" } ]
             #- [ requireModulePath, FCom_Core ]
