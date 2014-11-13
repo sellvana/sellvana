@@ -46,7 +46,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                         <p><code>CODE-&#123;U4&#125;-&#123;UD6&#125;</code> - <code>CODE-HQNB-8A1NO3</code></p>
                         <p>Locale._("Note: dynamic parts of the code MUST be enclosed in &#123;&#125;")</p>
                     </div>
-                    <form id="coupon-generate-form" >
+                    <div id="coupon-generate-container" ref="formContainer" >
                         <Components.Input field="code_pattern" label={Locale._("Code Pattern")}
                             helpBlockText={Locale._("(Leave empty to auto-generate)")}
                             inputDivClass='col-md-8' label_class='col-md-4'/>
@@ -58,10 +58,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                         <div className="formg-group">
                             <Components.Button type="button" id="coupon-generate-btn" onClick={this.props.onSubmit}
                                 className="btn-danger btn-post">{Locale._("Generate")}</Components.Button>
-                            <span style={{display: 'none', marginLeft:20}} className="loading">Loading ... </span>
-                            <span style={{display: 'none', marginLeft:20}} className="result"></span>
+                            <span style={{display: 'none', marginLeft: 20}} className="loading">Loading ... </span>
+                            <span style={{display: 'none', marginLeft: 20}} className="result"></span>
                         </div>
-                    </form>
+                    </div>
                 </div>
             );
         }
@@ -78,10 +78,12 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             var importModal = <Components.Modal ref="importModal" onConfirm={this.handleImportConfirm}
                 onCancel={this.closeImportModal} url={this.props.importCouponsurl} title="Import coupons"/>;
             return (
-                <div className="multi-coupon btn-group col-md-offset-2" style={{marginBottom: 15}}>
-                    <Components.Button onClick={this.showCodes} className="btn-primary" type="button">{this.props.buttonViewLabel}</Components.Button>
-                    <Components.Button onClick={this.generateCodes} className="btn-primary" type="button">{this.props.buttonGenerateLabel}</Components.Button>
-                    <Components.Button onClick={this.importCodes} className="btn-primary" type="button">{this.props.buttonImportLabel}</Components.Button>
+                <div className="multi-coupon col-md-offset-2" style={{marginBottom: 15}}>
+                    <div className="btn-group">
+                        <Components.Button onClick={this.showCodes} className="btn-primary" type="button">{this.props.buttonViewLabel}</Components.Button>
+                        <Components.Button onClick={this.generateCodes} className="btn-primary" type="button">{this.props.buttonGenerateLabel}</Components.Button>
+                        <Components.Button onClick={this.importCodes} className="btn-primary" type="button">{this.props.buttonImportLabel}</Components.Button>
+                    </div>
                     {showModal}
                     {generateModal}
                     {importModal}
@@ -137,9 +139,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             // component default properties
             console.log("generateCodes");
             this.refs.generateModal.open();
-            var $form = $(this.refs.generateForm).find('form');
-            var $codeLength = $form.find('#model-code_length');
-            var $codePattern = $form.find('#model-code_pattern');
+            var $formContainer = $(this.refs.generateForm.refs.formContainer.getDOMNode());
+            //var $formContainer = $(this.refs.generateForm).find('#coupon-generate-container');
+            var $codeLength = $formContainer.find('#model-code_length');
+            var $codePattern = $formContainer.find('#model-code_pattern');
             if ($.trim($codePattern.val()) == '') { // code length should be settable only if no pattern is provided
                 $codeLength.prop('disabled', false);
             }
@@ -155,17 +158,17 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             });
         },
         postGenerate: function(e){
-            var $form = $(this.refs.generateForm.getDOMNode()).find('form');
+            var $formContainer = $(this.refs.generateForm.refs.formContainer.getDOMNode());
             //var $button = $form.find('button.btn-post');
-            console.log(e, $form);
+            console.log(e, $formContainer);
             var url = this.props.generateCouponsUrl;
-            var $progress = $form.find('.loading');
-            var $result = $form.find('.result').hide();
+            var $progress = $formContainer.find('.loading');
+            var $result = $formContainer.find('.result').hide();
             $progress.show();
             //$button.click(function (e) {
                 e.preventDefault();
                 var data = {};
-                $form.find('input').each(function(){
+                $formContainer.find('input').each(function(){
                     var $self = $(this);
                     var name = $self.attr('name');
                     data[name] = $self.val();
