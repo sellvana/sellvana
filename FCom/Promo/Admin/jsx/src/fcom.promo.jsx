@@ -1,11 +1,12 @@
 /** @jsx React.DOM */
 
 define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 'select2', 'bootstrap'], function (React, $, Griddle, Components, Locale) {
+    var labelClass = "col-md-3";
     var SingleCoupon = React.createClass({
         render: function () {
             return (
-                <div className="single-coupon">
-                    <Components.ControlLabel input_id={this.props.id}>
+                <div className="single-coupon form-group">
+                    <Components.ControlLabel input_id={this.props.id} label_class={this.props.labelClass}>
                         {this.props.labelText}<Components.HelpIcon id={"help-" + this.props.id} content={this.props.helpText}/>
                     </Components.ControlLabel>
                     <div className="col-md-5">
@@ -78,8 +79,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             var importModal = <Components.Modal ref="importModal" onConfirm={this.handleImportConfirm}
                 onCancel={this.closeImportModal} url={this.props.importCouponsurl} title="Import coupons"/>;
             return (
-                <div className="multi-coupon col-md-offset-2" style={{marginBottom: 15}}>
-                    <div className="btn-group">
+                <div className="multi-coupon form-group" style={{margin: "15px 0"}}>
+                    <div className="btn-group col-md-offset-3">
                         <Components.Button onClick={this.showCodes} className="btn-primary" type="button">{this.props.buttonViewLabel}</Components.Button>
                         <Components.Button onClick={this.generateCodes} className="btn-primary" type="button">{this.props.buttonGenerateLabel}</Components.Button>
                         <Components.Button onClick={this.importCodes} className="btn-primary" type="button">{this.props.buttonImportLabel}</Components.Button>
@@ -200,11 +201,11 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     var UsesBlock = React.createClass({
         render: function () {
             return (
-                <div className="uses-block" style={{clear: 'both'}}>
-                    <Components.ControlLabel input_id={this.props.idUpc}>
+                <div className="uses-block form-group" style={{clear: 'both'}}>
+                    <Components.ControlLabel input_id={this.props.idUpc} label_class={this.props.labelClass}>
                         {this.props.labelUpc}<Components.HelpIcon id={"help-" + this.props.idUpc} content={this.props.helpTextUpc}/>
                     </Components.ControlLabel>
-                    <div className="col-md-3">
+                    <div className="col-md-2">
                         <input type="text" id={this.props.idUpc} ref="uses_pc" className="form-control"
                             value={this.state.valueUpc}/>
                     </div>
@@ -213,7 +214,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                         {this.props.labelUt}<Components.HelpIcon id={"help-" + this.props.idUt} content={this.props.helpTextUt}/>
                     </Components.ControlLabel>
 
-                    <div className="col-md-3">
+                    <div className="col-md-2">
                         <input type="text" id={this.props.idUt} ref="uses_pc" className="form-control"
                             value={this.state.valueUt}/>
                     </div>
@@ -254,23 +255,29 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             var child = "";
 
             if (this.state.mode == 1) {
-                child = [<SingleCoupon key="single-coupon" options={this.props.options}/>,
-                    <UsesBlock options={this.props.options} key="uses-block"/>];
+                child = [<UsesBlock options={this.props.options} key="uses-block" labelClass={this.props.labelClass}/>,
+                    <SingleCoupon key="single-coupon" options={this.props.options} labelClass={this.props.labelClass}/>];
             } else if(this.state.mode == 2) {
                 var showCouponsUrl = this.props.options.showCouponsUrl ||'',
                     generateCouponsUrl = this.props.options.generateCouponsUrl ||'',
                     importCouponsUrl = this.props.options.importCouponsUrl ||'';
-                child = [<MultiCoupon key="multi-coupon" options={this.props.options} importCouponsUrl={importCouponsUrl}
-                    generateCouponsUrl={generateCouponsUrl} showCouponsUrl={showCouponsUrl}/>,
-                                        <UsesBlock options={this.props.options} key="uses-block"/>]
+                child = [<UsesBlock options={this.props.options} key="uses-block" labelClass={this.props.labelClass}/>,
+                    <MultiCoupon key="multi-coupon" options={this.props.options} importCouponsUrl={importCouponsUrl}
+                    generateCouponsUrl={generateCouponsUrl} showCouponsUrl={showCouponsUrl} labelClass={this.props.labelClass}/>]
             }
             return (
-                <div className="form-group">
+                <div className="coupon-app">
                     <div className="coupon-group">
                         {child}
                     </div>
                 </div>
             );
+        },
+        getDefaultProps: function () {
+            // component default properties
+            return {
+                labelClass: labelClass
+            }
         },
         getInitialState: function () {
             return {mode: 0};

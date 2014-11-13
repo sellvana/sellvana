@@ -1,6 +1,40 @@
-define(['react', 'jquery', 'bootstrap', 'fcom.locale'], function (React, $) {
+define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Locale) {
     FCom.Components = {};
-    var Locale = require('fcom.locale');
+
+    var formMixin = {
+        getInputId: function () {
+            var field = this.props.field;
+            if (this.props.id) {
+                return this.props.id
+            }
+            if (!field) {
+                return '';
+            }
+            if (this.props.settings_module && !this.props.id_prefix) {
+                return 'modules-' + this.props.settings_module + '-' + field;
+            }
+            return ((this.props.id_prefix) ? this.props.id_prefix : 'model') + '-' + field;
+        },
+        getInputName: function () {
+            if ((this.props.name)) {
+                return this.props.name;
+            }
+            if (!this.props.field) {
+                return '';
+            }
+            var name;
+            if (this.props.settings_module && !this.props.name_prefix) {
+                name = 'config[modules][' + this.props.settings_module + '][' + this.props.field + ']';
+            } else {
+                name = (this.props.name_prefix ? this.props.name_prefix : 'model') + '[' + this.props.field + ']';
+            }
+            if (this.props.multiple) {
+                name += '[]';
+            }
+            return name;
+        }
+    };
+
     FCom.Components.ControlLabel = React.createClass({
         render: function () {
             var cl = "control-label " + this.props.label_class + (this.props.required ? ' required' : '');
@@ -26,6 +60,7 @@ define(['react', 'jquery', 'bootstrap', 'fcom.locale'], function (React, $) {
     });
 
     FCom.Components.Input = React.createClass({
+        mixins:[formMixin],
         render: function () {
             var { formGroupClass, inputDivClass, inputClass, inputValue, ...other } = this.props;
             var className = "form-control";
@@ -69,38 +104,6 @@ define(['react', 'jquery', 'bootstrap', 'fcom.locale'], function (React, $) {
                 inputName: '',
                 inputClass:''
             };
-        },
-        getInputId: function() {
-            var field = this.props.field;
-            if(this.props.id) {
-                return this.props.id
-            }
-            if (!field) {
-                return '';
-            }
-            if (this.props.settings_module && !this.props.id_prefix) {
-                return 'modules-' + this.props.settings_module + '-' + field;
-            }
-            return ((this.props.id_prefix) ? this.props.id_prefix : 'model') + '-' + field;
-        },
-        getInputName: function()
-        {
-            if ((this.props.name)) {
-                return this.props.name;
-            }
-            if (!this.props.field) {
-                return '';
-            }
-            var name;
-            if (this.props.settings_module && !this.props.name_prefix) {
-                name = 'config[modules][' + this.props.settings_module + '][' + this.props.field + ']';
-            } else {
-                name = (this.props.name_prefix ? this.props.name_prefix : 'model') + '[' + this.props.field + ']';
-            }
-            if (this.props.multiple) {
-                name += '[]';
-            }
-            return name;
         }
     });
 

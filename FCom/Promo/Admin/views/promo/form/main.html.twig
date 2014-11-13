@@ -3,6 +3,7 @@
 {% set m = THIS.get('model') %}
 {% set promo = APP.instance('FCom_Promo_Model_Promo') %}
 {% set validator = THIS.get('validator') %}
+{% set labelClass = "col-md-3" %}
 
 {% import THIS.view('core/form-elements').twigName() as forms %}
 
@@ -17,20 +18,20 @@
 <fieldset class="adm-section-group">
     <div class="f-section">
         {{ forms.input({label: 'Admin Summary'|_, required: 1, name: "model[admin_summary]",
-            value: validator.fieldValue('admin_summary'),
+            value: validator.fieldValue('admin_summary'), label_class: labelClass,
             id: "model-admin_summary", help_icon: 1, help_text: 'Admin Summary'|_ }) }}
         {{ forms.textarea({label: 'Internal Notes'|_, name: "model[admin_notes]",
-            value: validator.fieldValue('admin_notes'),
+            value: validator.fieldValue('admin_notes'),label_class: labelClass,
             id: "model-admin_notes", help_icon: 1, help_text: 'Internal Notes'|_ }) }}
         {{ forms.input({label: 'Customer Label'|_, required: 1, name: "model[customer_label]",
-            value: validator.fieldValue('customer_label'),
+            value: validator.fieldValue('customer_label'),label_class: labelClass,
             id: "model-customer_label", help_icon: 1, help_text: 'Customer Label'|_ }) }}
         {{ forms.textarea({label: 'Details for Customers'|_, name: "model[customer_details]",
-            value: validator.fieldValue('customer_details'),
+            value: validator.fieldValue('customer_details'),label_class: labelClass,
             id: "model-customer_details", help_icon: 1, help_text: 'Details for Customers'|_ }) }}
 
         {{ forms.select({
-            label: 'Status'|_,
+            label: 'Status'|_,label_class: labelClass,
             name: "model[status]",
             value: validator.fieldValue('status'),
             id: "model-status", help_icon: 1,
@@ -41,7 +42,7 @@
 
 
         {{ forms.input({label: 'Date Range'|_, required: 1, name: "model[date_range]",
-            value: validator.fieldValue('date_range'),
+            value: validator.fieldValue('date_range'),label_class: labelClass,
             id: "model-date_range", help_icon: 1, help_text: 'Date Range'|_ }) }}
         <div id="testbed"></div>
         <script type="text/javascript">
@@ -67,7 +68,7 @@
 //            })
         </script>
         {{ forms.select({
-            label: 'Coupon Code Enter For Validity'|_,
+            label: 'Coupon Code Enter For Validity'|_,label_class: labelClass,
             name: "model[use_coupon]",
             value: validator.fieldValue('use_coupon'),
             id: "model-use_coupon", help_icon: 1,
@@ -86,7 +87,8 @@
                     importCouponsUrl: "{{ APP.href('promo/coupons/import?id=') ~ m.id() }}", // "/admin/promo/coupons/import?id=1",
                     valueUpc: '',
                     valueUt: '',
-                    singleCouponValue: ''
+                    singleCouponValue: '',
+                    labelClass: '{{ labelClass }}'
                 };
                 Promo.init(options);
             });
