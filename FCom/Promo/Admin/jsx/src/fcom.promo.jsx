@@ -47,7 +47,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                         <p><code>CODE-&#123;U4&#125;-&#123;UD6&#125;</code> - <code>CODE-HQNB-8A1NO3</code></p>
                         <p>Locale._("Note: dynamic parts of the code MUST be enclosed in &#123;&#125;")</p>
                     </div>
-                    <div id="coupon-generate-container" ref="formContainer" >
+                    <div id="coupon-generate-container" ref="formContainer" className="form-horizontal">
                         <Components.Input field="code_pattern" label={Locale._("Code Pattern")}
                             helpBlockText={Locale._("(Leave empty to auto-generate)")}
                             inputDivClass='col-md-8' label_class='col-md-4'/>
@@ -56,49 +56,40 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                             inputDivClass='col-md-8' label_class='col-md-4'/>
                         <Components.Input field="coupon_count" label={Locale._("How many to generate")}
                             inputDivClass='col-md-8' label_class='col-md-4' inputValue="1" required/>
-                        <div className="formg-group">
-                            <Components.Button type="button" id="coupon-generate-btn" onClick={this.props.onSubmit}
-                                className="btn-danger btn-post">{Locale._("Generate")}</Components.Button>
-                            <span style={{display: 'none', marginLeft: 20}} className="loading">Loading ... </span>
-                            <span style={{display: 'none', marginLeft: 20}} className="result"></span>
+                        <div className={this.props.groupClass}>
+                            <div className="col-md-offset-4">
+                                <Components.Button type="button" id="coupon-generate-btn" onClick={this.handleGenerateClick}
+                                    className="btn-danger btn-post">{Locale._("Generate")}</Components.Button>
+                                <span style={{display: 'none', marginLeft: 20}} className="loading">Loading ... </span>
+                                <span style={{display: 'none', marginLeft: 20}} className="result"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
             );
+        },
+        handleGenerateClick: function (e) {
+            this.props.onSubmit(e);
+        },
+        getDefaultProps: function () {
+            // component default properties
+            return {
+                groupClass: "form-group"
+            }
         }
     });
 
     var MultiCoupon = React.createClass({
         render: function () {
-            var showModal = <Components.Modal ref="showModal" onConfirm={this.handleShowConfirm}
-                onCancel={this.closeShowModal} url={this.props.showCouponsurl} title="Coupon grid"/>;
-            var generateModal = <Components.Modal ref="generateModal" onConfirm={this.handleGenerateConfirm}
-                onCancel={this.closeGenerateModal} url={this.props.generateCouponsurl} title="Generate coupons">
-                    <GenerateForm ref="generateForm" onSubmit={this.postGenerate}/>
-                </Components.Modal>;
-            var importModal = <Components.Modal ref="importModal" onConfirm={this.handleImportConfirm}
-                onCancel={this.closeImportModal} url={this.props.importCouponsurl} title="Import coupons"/>;
             return (
                 <div className="multi-coupon form-group" style={{margin: "15px 0"}}>
                     <div className="btn-group col-md-offset-3">
-                        <Components.Button onClick={this.showCodes} className="btn-primary" type="button">{this.props.buttonViewLabel}</Components.Button>
-                        <Components.Button onClick={this.generateCodes} className="btn-primary" type="button">{this.props.buttonGenerateLabel}</Components.Button>
-                        <Components.Button onClick={this.importCodes} className="btn-primary" type="button">{this.props.buttonImportLabel}</Components.Button>
+                        <Components.Button onClick={this.props.onShowCodes} className="btn-primary" type="button">{this.props.buttonViewLabel}</Components.Button>
+                        <Components.Button onClick={this.props.onGenerateCodes} className="btn-primary" type="button">{this.props.buttonGenerateLabel}</Components.Button>
+                        <Components.Button onClick={this.props.onImportCodes} className="btn-primary" type="button">{this.props.buttonImportLabel}</Components.Button>
                     </div>
-                    {showModal}
-                    {generateModal}
-                    {importModal}
                 </div>
             );
-        },
-        closeShowModal: function () {
-            this.refs.showModal.close();
-        },
-        closeGenerateModal: function () {
-            this.refs.generateModal.close();
-        },
-        closeImportModal: function () {
-            this.refs.importModal.close();
         },
         getDefaultProps: function () {
             // component default properties
@@ -106,95 +97,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 buttonViewLabel: Locale._("View (100) codes"),
                 buttonGenerateLabel: Locale._("Generate New Codes"),
                 buttonImportLabel: Locale._("Import Existing Codes"),
-                showCouponsUrl:"",
-                generateCouponsUrl:"",
-                importCouponsUrl:""
             }
-        },
-        loadModalContent: function ($modalBody, url, success) {
-            if ($modalBody.length > 0 && $modalBody.data('content-loaded') == undefined) {
-                $.get(url).done(function (result) {
-                    if (result.hasOwnProperty('html')) {
-                        $modalBody.html(result.html);
-                        //$modalBody.data('content-loaded', true)
-                        if(typeof success == 'function'){
-                            success($modalBody);
-                        }
-                    }
-                }).fail(function(result){
-                    var jsonResult = result.responseJSON;
-                    if (jsonResult.hasOwnProperty('html')) {
-                        $modalBody.html(jsonResult.html);
-                    }
-                });
-            }
-        },
-        showCodes: function () {
-            // component default properties
-            console.log("showCodes");
-            this.refs.showModal.open();
-            var $modalBody = $('.modal-body', this.refs.showModal.getDOMNode());
-            this.loadModalContent($modalBody, this.props.showCouponsUrl)
-        },
-        generateCodes: function () {
-            // component default properties
-            console.log("generateCodes");
-            this.refs.generateModal.open();
-            var $formContainer = $(this.refs.generateForm.refs.formContainer.getDOMNode());
-            //var $formContainer = $(this.refs.generateForm).find('#coupon-generate-container');
-            var $codeLength = $formContainer.find('#model-code_length');
-            var $codePattern = $formContainer.find('#model-code_pattern');
-            if ($.trim($codePattern.val()) == '') { // code length should be settable only if no pattern is provided
-                $codeLength.prop('disabled', false);
-            }
-            $codePattern.change(function (e) {
-                console.log(e);
-                var val = $.trim($codePattern.val());
-                if (val == '') {
-                    $codeLength.prop('disabled', false);
-                } else {
-                    $codeLength.prop('disabled', true);
-                    $codePattern.val(val);
-                }
-            });
-        },
-        postGenerate: function(e){
-            var $formContainer = $(this.refs.generateForm.refs.formContainer.getDOMNode());
-            //var $button = $form.find('button.btn-post');
-            console.log(e, $formContainer);
-            var url = this.props.generateCouponsUrl;
-            var $progress = $formContainer.find('.loading');
-            var $result = $formContainer.find('.result').hide();
-            $progress.show();
-            //$button.click(function (e) {
-                e.preventDefault();
-                var data = {};
-                $formContainer.find('input').each(function(){
-                    var $self = $(this);
-                    var name = $self.attr('name');
-                    data[name] = $self.val();
-                });
-                // show indication that something happens?
-                $.get(url, data)
-                    .done(function (result) {
-                        var status = result.status;
-                        var message = result.message;
-                        $result.text(message);
-                    })
-                    .always(function (r) {
-                        $progress.hide();
-                        $result.show();
-                        // hide notification
-                        console.log(r);
-                    });
-            //});
-        },
-        importCodes: function () {
-            // component default properties
-            console.log("importCodes");
-            this.refs.importModal.open();
-            var $modalBody = $('.modal-body', this.refs.importModal.getDOMNode());
-            this.loadModalContent($modalBody, this.props.importCouponsUrl);
         }
     });
 
@@ -258,12 +161,12 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 child = [<UsesBlock options={this.props.options} key="uses-block" labelClass={this.props.labelClass}/>,
                     <SingleCoupon key="single-coupon" options={this.props.options} labelClass={this.props.labelClass}/>];
             } else if(this.state.mode == 2) {
-                var showCouponsUrl = this.props.options.showCouponsUrl ||'',
-                    generateCouponsUrl = this.props.options.generateCouponsUrl ||'',
-                    importCouponsUrl = this.props.options.importCouponsUrl ||'';
+                var onShowCodes = this.onShowCodes ||'',
+                    onGenerateCodes = this.onGenerateCodes ||'',
+                    onImportCodes = this.onImportCodes ||'';
                 child = [<UsesBlock options={this.props.options} key="uses-block" labelClass={this.props.labelClass}/>,
-                    <MultiCoupon key="multi-coupon" options={this.props.options} importCouponsUrl={importCouponsUrl}
-                    generateCouponsUrl={generateCouponsUrl} showCouponsUrl={showCouponsUrl} labelClass={this.props.labelClass}/>]
+                    <MultiCoupon key="multi-coupon" options={this.props.options} onImportCodes={onImportCodes}
+                    onGenerateCodes={onGenerateCodes} onShowCodes={onShowCodes} labelClass={this.props.labelClass}/>]
             }
             return (
                 <div className="coupon-app">
@@ -287,6 +190,15 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         },
         componentWillMount: function () {
             this.setState({mode: this.props.mode});
+        },
+        onShowCodes: function () {
+            return this.props.showCodes();
+        },
+        onGenerateCodes: function () {
+            return this.props.generateCodes();
+        },
+        onImportCodes: function () {
+            return this.props.importCodes();
         }
     });
 
@@ -298,23 +210,164 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             React.render(<Griddle/>, document.getElementById('testbed'));
         },
         init: function (options) {
-            var couponSelectId = options.coupon_select_id || "model-use_coupon";
-            var $couponSelector = $('#' + couponSelectId);
+            $.extend(this.options, options);
+            var $couponSelector = $('#' + this.options.coupon_select_id);
             if ($couponSelector.length == 0) {
                 console.log("Use coupon dropdown not found");
                 return;
             }
-            var containerID = options.coupon_container_id || "coupon-options";
-            var $element = $("#" + containerID);
+            var $element = $("#" + this.options.coupon_container_id);
             var selected = $couponSelector.val();
+
+            var self = this;
+            var callBacks = {
+                showCodes: this.showCodes.bind(self),
+                generateCodes: this.generateCodes.bind(self),
+                importCodes: this.importCodes.bind(self)
+            };
+            var $modalContainer = $('<div/>').appendTo(document.body);
+
             if(selected != 0) {
-                React.render(<CouponApp mode={parseInt(selected)} options={options}/>, $element[0]);
+                this.createCouponApp($element[0], $modalContainer.get(0), callBacks, selected, options);
             }
 
             $couponSelector.on('change', function () {
                 selected = $couponSelector.val();
-                React.render(<CouponApp mode={parseInt(selected)} options={options}/>, $element[0]);
+                self.createCouponApp($element[0], $modalContainer.get(0), callBacks, selected, options);
             });
+        },
+        createCouponApp: function (appContainer, modalContainer, callBacks, mode, options) {
+            React.render(<CouponApp {...callBacks} mode={mode} options={options}/>, appContainer);
+            React.render(
+                <div className="modals-container">
+                    <Components.Modal onConfirm={this.handleShowConfirm} title="Coupon grid" onLoad={this.addShowCodes.bind(this)}/>
+                    <Components.Modal onConfirm={this.handleGenerateConfirm} title="Generate coupons" onLoad={this.addGenerateCodes.bind(this)}>
+                        <GenerateForm onSubmit={this.postGenerate.bind(this)}/>
+                    </Components.Modal>
+                    <Components.Modal onConfirm={this.handleImportConfirm} title="Import coupons" onLoad={this.addImportCodes.bind(this)}/>
+                </div>, modalContainer);
+        },
+        options: {
+            coupon_select_id: "model-use_coupon",
+            coupon_container_id: "coupon-options"
+        },
+        showCodesModal: null,
+        generateCodesModal: null,
+        importCodesModal: null,
+        addShowCodes: function (modal) {
+            this.showCodesModal = modal;
+        },
+        addGenerateCodes: function (modal) {
+            this.generateCodesModal = modal;
+        },
+        addImportCodes: function (modal) {
+            this.importCodesModal = modal;
+        },
+        loadModalContent: function ($modalBody, url, success) {
+            if ($modalBody.length > 0 && $modalBody.data('content-loaded') == undefined) {
+                $.get(url).done(function (result) {
+                    if (result.hasOwnProperty('html')) {
+                        $modalBody.html(result.html);
+                        $modalBody.data('content-loaded', true);
+                        if (typeof success == 'function') {
+                            success($modalBody);
+                        }
+                    }
+                }).fail(function (result) {
+                    if (!result.hasOwnProperty('responseJSON')) {
+                        console.log(result);
+                    }
+                    var jsonResult = result['responseJSON'];
+                    if (jsonResult.hasOwnProperty('html')) {
+                        $modalBody.html(jsonResult.html);
+                    }
+                });
+            }
+        },
+        showCodes: function () {
+            var modal = this.showCodesModal;
+            if(null == modal) {
+                console.log("Modal not loaded");
+                return;
+            }
+            console.log("showCodes");
+            modal.open();
+            var $modalBody = $('.modal-body', modal.getDOMNode());
+            this.loadModalContent($modalBody, this.options.showCouponsUrl)
+        },
+        generateCodes: function () {
+            var modal = this.generateCodesModal;
+            if(null == modal) {
+                console.log("Modal not loaded");
+                return;
+            }
+            // component default properties
+            console.log("generateCodes");
+            //this.refs.generateModal.open();
+            modal.open();
+            var $formContainer = $('#coupon-generate-container');
+            var $codeLength = $('#model-code_length');
+            var $codePattern = $('#model-code_pattern');
+            if ($.trim($codePattern.val()) == '') { // code length should be settable only if no pattern is provided
+                $codeLength.prop('disabled', false);
+            }
+            $codePattern.change(function (e) {
+                console.log(e);
+                var val = $.trim($codePattern.val());
+                if (val == '') {
+                    $codeLength.prop('disabled', false);
+                } else {
+                    $codeLength.prop('disabled', true);
+                    $codePattern.val(val);
+                }
+            });
+        },
+        postGenerate: function (e) {
+            var $formContainer = $('#coupon-generate-container');
+            console.log(e, $formContainer);
+            var url = this.options.generateCouponsUrl;
+            var $progress = $formContainer.find('.loading');
+            var $result = $formContainer.find('.result').hide();
+            $progress.show();
+            //$button.click(function (e) {
+            e.preventDefault();
+            var $meta = $('meta[name="csrf-token"]');
+            var data = {};
+            if($meta.length) {
+                data["X-CSRF-TOKEN"] = $meta.attr('content');
+            }
+            $formContainer.find('input').each(function () {
+                var $self = $(this);
+                var name = $self.attr('name');
+                data[name] = $self.val();
+            });
+            // show indication that something happens?
+            $.post(url, data)
+                .done(function (result) {
+                    var status = result.status;
+                    var message = result.message;
+                    $result.text(message);
+                })
+                .always(function (r) {
+                    $progress.hide();
+                    $result.show();
+                    // hide notification
+                    console.log(r);
+                });
+            //});
+        },
+        importCodes: function () {
+            var modal = this.importCodesModal;
+            if(null == modal) {
+                console.log("Modal not loaded");
+                return;
+            }
+            // component default properties
+            console.log("importCodes");
+            modal.open();
+            //this.refs.importModal.open();
+            var $modalBody = $('.modal-body', modal.getDOMNode());
+            this.loadModalContent($modalBody, this.options.importCouponsUrl);
         }
     };
     return Promo;

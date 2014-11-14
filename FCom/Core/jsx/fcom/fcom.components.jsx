@@ -148,8 +148,9 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
         // integrate with Bootstrap or jQuery!
         componentDidMount: function () {
             // When the component is added, turn it into a modal
-            $(this.getDOMNode())
-                .modal({backdrop: 'static', keyboard: false, show: false})
+            var modal =$(this.getDOMNode())
+                .modal({backdrop: 'static', keyboard: false, show: false});
+            this.props.onLoad(this);
         },
         componentWillUnmount: function () {
             $(this.getDOMNode()).off('hidden', this.handleHidden);
@@ -167,14 +168,14 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
             if (this.props.confirm) {
                 confirmButton = (
                     <FCom.Components.Button onClick={this.handleConfirm} className="btn-primary" type="button">
-                                {this.props.confirm}
+                        {this.props.confirm}
                     </FCom.Components.Button>
                 );
             }
             if (this.props.cancel) {
                 cancelButton = (
                     <FCom.Components.Button onClick={this.handleCancel} className="btn-default" type="button">
-                                {this.props.cancel}
+                        {this.props.cancel}
                     </FCom.Components.Button>
                 );
             }
@@ -190,11 +191,11 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
                                 <h3>{this.props.title}</h3>
                             </div>
                             <div className="modal-body">
-                                        {this.props.children}
+                                {this.props.children}
                             </div>
                             <div className="modal-footer">
-                                      {cancelButton}
-                                      {confirmButton}
+                                  {cancelButton}
+                                  {confirmButton}
                             </div>
                         </div>
                     </div>
@@ -204,6 +205,8 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
         handleCancel: function () {
             if (this.props.onCancel) {
                 this.props.onCancel();
+            } else {
+                this.close();
             }
         },
         handleConfirm: function () {

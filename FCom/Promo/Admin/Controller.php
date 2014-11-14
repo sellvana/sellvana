@@ -538,12 +538,12 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         }
         $this->BResponse->json(['status' => $status, 'html'=>$html]);
     }
-    public function action_coupons_generate()
+    public function action_coupons_generate__POST()
     {
         $r = $this->BRequest;
 
         $id = $r->get('id');
-        $data = $r->get('model');
+        $data = $r->post('model');
         if (!$id) {
             $message = $this->_("Promotion id not found");
             $status = 'error';
