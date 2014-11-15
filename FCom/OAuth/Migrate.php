@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_OAuth_Migrate
+ *
+ * @property FCom_OAuth_Model_ConsumerToken $FCom_OAuth_Model_ConsumerToken
+ */
+
 class FCom_OAuth_Migrate extends BClass
 {
     public function install__0_1_1()

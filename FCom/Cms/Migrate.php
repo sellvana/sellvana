@@ -1,5 +1,17 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Cms_Migrate
+ *
+ * @property FCom_Cms_Model_Block $FCom_Cms_Model_Block
+ * @property FCom_Cms_Model_BlockHistory $FCom_Cms_Model_BlockHistory
+ * @property FCom_Cms_Model_Form $FCom_Cms_Model_Form
+ * @property FCom_Cms_Model_FormData $FCom_Cms_Model_FormData
+ * @property FCom_Cms_Model_Nav $FCom_Cms_Model_Nav
+ * @property FCom_Cms_Model_Page $FCom_Cms_Model_Page
+ * @property FCom_Cms_Model_PageHistory $FCom_Cms_Model_PageHistory
+ */
+
 class FCom_Cms_Migrate extends BClass
 {
     public function install__0_1_3()

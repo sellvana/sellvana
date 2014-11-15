@@ -4,6 +4,10 @@
  * Created by pp
  * @project fulleron
  * @package FCom_CustomerGroups
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_CustomerGroups_Model_Group $FCom_CustomerGroups_Model_Group
+ * @property FCom_CustomerGroups_Model_TierPrice $FCom_CustomerGroups_Model_TierPrice
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  */
 
 class FCom_CustomerGroups_Migrate extends BClass

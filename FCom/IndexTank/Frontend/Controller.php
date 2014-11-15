@@ -7,6 +7,7 @@
  * @property FCom_IndexTank_Index_Product $FCom_IndexTank_Index_Product
  * @property FCom_IndexTank_Search $FCom_IndexTank_Search
  * @property FCom_IndexTank_Model_ProductFunction $FCom_IndexTank_Model_ProductFunction
+ * @property FCom_Core_Main $FCom_Core_Main
  */
 class FCom_IndexTank_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {

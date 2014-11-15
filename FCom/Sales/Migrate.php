@@ -1,5 +1,31 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Migrate
+ *
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Sales_Migrate_Model_Cart_Address $FCom_Sales_Migrate_Model_Cart_Address
+ * @property FCom_Sales_Migrate_Model_Order_Address $FCom_Sales_Migrate_Model_Order_Address
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Sales_Model_Cart_Address $FCom_Sales_Model_Cart_Address
+ * @property FCom_Sales_Model_Cart_Item $FCom_Sales_Model_Cart_Item
+ * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
+ * @property FCom_Sales_Model_Order_Address $FCom_Sales_Model_Order_Address
+ * @property FCom_Sales_Model_Order_Comment $FCom_Sales_Model_Order_Comment
+ * @property FCom_Sales_Model_Order_CustomStatus $FCom_Sales_Model_Order_CustomStatus
+ * @property FCom_Sales_Model_Order_History $FCom_Sales_Model_Order_History
+ * @property FCom_Sales_Model_Order_Item $FCom_Sales_Model_Order_Item
+ * @property FCom_Sales_Model_Order_Payment $FCom_Sales_Model_Order_Payment
+ * @property FCom_Sales_Model_Order_Payment_Item $FCom_Sales_Model_Order_Payment_Item
+ * @property FCom_Sales_Model_Order_Refund $FCom_Sales_Model_Order_Refund
+ * @property FCom_Sales_Model_Order_Refund_Item $FCom_Sales_Model_Order_Refund_Item
+ * @property FCom_Sales_Model_Order_Return $FCom_Sales_Model_Order_Return
+ * @property FCom_Sales_Model_Order_Return_Item $FCom_Sales_Model_Order_Return_Item
+ * @property FCom_Sales_Model_Order_Shipment $FCom_Sales_Model_Order_Shipment
+ * @property FCom_Sales_Model_Order_Shipment_Item $FCom_Sales_Model_Order_Shipment_Item
+ * @property FCom_Sales_Model_StateCustom $FCom_Sales_Model_StateCustom
+ */
+
 class FCom_Sales_Migrate extends BClass
 {
     public function install__0_2_14()

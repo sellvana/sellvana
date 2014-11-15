@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Geo_Migrate
+ *
+ * @property FCom_Geo_Model_Country $FCom_Geo_Model_Country
+ * @property FCom_Geo_Model_Region $FCom_Geo_Model_Region
+ */
+
 class FCom_Geo_Migrate extends BClass
 {
     public function install__0_1_1()

@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Stock_Migrate
+ *
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Stock_Model_Bin $FCom_Stock_Model_Bin
+ * @property FCom_Stock_Model_Sku $FCom_Stock_Model_Sku
+ */
+
 class FCom_Stock_Migrate extends BClass
 {
     public function install__0_1_2()

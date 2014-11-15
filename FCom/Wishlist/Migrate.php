@@ -1,5 +1,14 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Wishlist_Migrate
+ *
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Wishlist_Model_Wishlist $FCom_Wishlist_Model_Wishlist
+ * @property FCom_Wishlist_Model_WishlistItem $FCom_Wishlist_Model_WishlistItem
+ */
+
 class FCom_Wishlist_Migrate extends BClass
 {
     public function install__0_1_2()

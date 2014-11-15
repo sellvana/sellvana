@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Cron_Migrate
+ *
+ * @property FCom_Cron_Model_Task $FCom_Cron_Model_Task
+ */
+
 class FCom_Cron_Migrate extends BClass
 {
     public function install__0_1_1()

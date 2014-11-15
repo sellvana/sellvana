@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Dev_Translations
+ *
+ * @property FCom_LibTwig_Main $FCom_LibTwig_Main
+ */
+
 class FCom_Dev_Translations extends BClass
 {
 

@@ -3,6 +3,7 @@
 /**
  * Class FCom_PushServer_Controller
  * @property FCom_PushServer_Model_Client FCom_PushServer_Model_Client
+ * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  */
 class FCom_PushServer_Controller extends FCom_Core_Controller_Abstract
 {

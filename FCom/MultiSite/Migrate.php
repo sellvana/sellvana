@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_MultiSite_Migrate
+ *
+ * @property FCom_MultiSite_Model_Site $FCom_MultiSite_Model_Site
+ */
+
 class FCom_MultiSite_Migrate extends BClass
 {
     public function install__0_1_1()

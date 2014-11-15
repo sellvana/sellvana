@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_AuthorizeNet_PaymentMethod_Dpm
+ *
+ * @property FCom_Sales_Model_Order_Payment $FCom_Sales_Model_Order_Payment
+ */
+
 class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMethod_Aim
 {
 

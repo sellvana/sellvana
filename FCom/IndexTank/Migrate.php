@@ -1,5 +1,17 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_IndexTank_Migrate
+ *
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ * @property FCom_IndexTank_Index_Product $FCom_IndexTank_Index_Product
+ * @property FCom_IndexTank_Model_IndexHelper $FCom_IndexTank_Model_IndexHelper
+ * @property FCom_IndexTank_Model_IndexingStatus $FCom_IndexTank_Model_IndexingStatus
+ * @property FCom_IndexTank_Model_ProductField $FCom_IndexTank_Model_ProductField
+ * @property FCom_IndexTank_Model_ProductFunction $FCom_IndexTank_Model_ProductFunction
+ */
+
 class FCom_IndexTank_Migrate extends BClass
 {
     public function install__0_2_1()

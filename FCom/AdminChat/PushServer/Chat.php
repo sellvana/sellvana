@@ -6,6 +6,7 @@
  * @property FCom_AdminChat_Model_Chat $FCom_AdminChat_Model_Chat
  * @property FCom_AdminChat_Model_Participant $FCom_AdminChat_Model_Participant
  * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_AdminChat_PushServer_Chat extends FCom_PushServer_Service_Abstract
 {

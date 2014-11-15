@@ -15,6 +15,9 @@
  * @property string $transaction_id //todo: why this field is varchar?
  * @property string $transaction_type
  * @property int $online
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Sales_Main $FCom_Sales_Main
+ * @property FCom_Sales_Model_Order_History $FCom_Sales_Model_Order_History
  */
 class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 {

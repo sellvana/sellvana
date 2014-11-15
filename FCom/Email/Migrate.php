@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Email_Migrate
+ *
+ * @property FCom_Email_Model_Message $FCom_Email_Model_Message
+ * @property FCom_Email_Model_Pref $FCom_Email_Model_Pref
+ */
+
 class FCom_Email_Migrate extends BClass
 {
     public function install__0_1_2()

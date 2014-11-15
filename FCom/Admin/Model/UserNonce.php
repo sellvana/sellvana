@@ -7,6 +7,7 @@
  * @property int user_id
  * @property varchar(20) nonce
  * @property datetime create_at
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_Admin_Model_UserNonce extends FCom_Core_Model_Abstract
 {

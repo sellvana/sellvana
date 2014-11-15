@@ -8,6 +8,7 @@
  * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  * @property FCom_AdminChat_Model_Chat $FCom_AdminChat_Model_Chat
  * @property FCom_AdminChat_Model_History $FCom_AdminChat_Model_History
+ * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
  */
 class FCom_AdminChat_Admin extends BClass
 {

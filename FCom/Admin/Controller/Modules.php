@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_Controller_Modules
+ *
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Core_Model_Module $FCom_Core_Model_Module
+ */
+
 class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected $_permission = 'system/modules';

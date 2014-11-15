@@ -5,6 +5,9 @@
  *
  * @property FCom_Customer_Model_Address $FCom_Customer_Model_Address
  * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Core_Main $FCom_Core_Main
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Geo_Model_Country $FCom_Geo_Model_Country
  */
 class FCom_Customer_Frontend_Controller_Address extends FCom_Frontend_Controller_Abstract
 {

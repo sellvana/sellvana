@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_AuthorizeNet_PaymentMethod_Aim
+ *
+ * @property FCom_AuthorizeNet_AimApi $FCom_AuthorizeNet_AimApi
+ * @property FCom_AuthorizeNet_Model_Settings $FCom_AuthorizeNet_Model_Settings
+ * @property FCom_Sales_Model_Order_Payment $FCom_Sales_Model_Order_Payment
+ */
+
 class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abstract
 {
 

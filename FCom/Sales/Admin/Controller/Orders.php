@@ -1,5 +1,17 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Admin_Controller_Orders
+ *
+ * @property FCom_Core_Model_Seq $FCom_Core_Model_Seq
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
+ * @property FCom_Sales_Model_Order_Address $FCom_Sales_Model_Order_Address
+ * @property FCom_Sales_Model_Order_CustomStatus $FCom_Sales_Model_Order_CustomStatus
+ * @property FCom_Sales_Model_Order_Item $FCom_Sales_Model_Order_Item
+ * @property FCom_Sales_Model_Order_StateCustom $FCom_Sales_Model_Order_StateCustom
+ */
+
 class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;

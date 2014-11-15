@@ -10,6 +10,7 @@
  * @property FCom_CustomField_Model_Set $FCom_CustomField_Model_Set
  * @property FCom_CustomField_Model_SetField $FCom_CustomField_Model_SetField
  * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ * @property FCom_Core_Main $FCom_Core_Main
  */
 class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_Abstract
 {

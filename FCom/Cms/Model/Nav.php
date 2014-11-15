@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Cms_Model_Nav
+ *
+ * @property FCom_Cms_Model_Page $FCom_Cms_Model_Page
+ * @property FCom_Frontend_Main $FCom_Frontend_Main
+ */
+
 class FCom_Cms_Model_Nav extends FCom_Core_Model_TreeAbstract
 {
     protected static $_table = 'fcom_cms_nav';

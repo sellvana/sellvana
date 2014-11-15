@@ -1,5 +1,14 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_PushServer_Migrate
+ *
+ * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
+ * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
+ * @property FCom_PushServer_Model_Message $FCom_PushServer_Model_Message
+ * @property FCom_PushServer_Model_Subscriber $FCom_PushServer_Model_Subscriber
+ */
+
 class FCom_PushServer_Migrate extends BClass
 {
     public function install__0_1_3()

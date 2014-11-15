@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Workflow_Comment
+ *
+ * @property FCom_Sales_Model_Order_Comment $FCom_Sales_Model_Order_Comment
+ */
+
 class FCom_Sales_Workflow_Comment extends FCom_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;

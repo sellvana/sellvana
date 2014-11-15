@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Wishlist_Tests_Model_WishlistTest
+ *
+ * @property FCom_Wishlist_Model_Wishlist $FCom_Wishlist_Model_Wishlist
+ */
+
 class FCom_Wishlist_Tests_Model_WishlistTest extends FCom_Test_DatabaseTestCase
 {
     public function getDataSet()

@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Customer_Migrate
+ *
+ * @property FCom_Customer_Model_Address $FCom_Customer_Model_Address
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ */
+
 class FCom_Customer_Migrate extends BClass
 {
     public function install__0_1_11()

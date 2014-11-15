@@ -1,5 +1,17 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Blog_Migrate
+ *
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Blog_Model_Category $FCom_Blog_Model_Category
+ * @property FCom_Blog_Model_Post $FCom_Blog_Model_Post
+ * @property FCom_Blog_Model_PostCategory $FCom_Blog_Model_PostCategory
+ * @property FCom_Blog_Model_PostTag $FCom_Blog_Model_PostTag
+ * @property FCom_Blog_Model_Tag $FCom_Blog_Model_Tag
+ * @property FCom_Core_Model_Module $FCom_Core_Model_Module
+ */
+
 class FCom_Blog_Migrate extends BClass
 {
     public function install__0_1_4()

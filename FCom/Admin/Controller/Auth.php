@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_Controller_Auth
+ *
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ */
+
 class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
 {
     public function authenticate($args = [])

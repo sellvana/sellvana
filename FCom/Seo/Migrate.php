@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Seo_Migrate
+ *
+ * @property FCom_Seo_Model_Sitemap $FCom_Seo_Model_Sitemap
+ * @property FCom_Seo_Model_UrlAlias $FCom_Seo_Model_UrlAlias
+ */
+
 class FCom_Seo_Migrate extends BClass
 {
     public function install__0_1_1()

@@ -10,6 +10,7 @@
  * @property FCom_CustomField_Model_ProductVariant $FCom_CustomField_Model_ProductVariant
  * @property FCom_CustomField_Model_ProductVariantField $FCom_CustomField_Model_ProductVariantField
  * @property FCom_CustomField_Model_ProductVariantImage $FCom_CustomField_Model_ProductVariantImage
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  */
 class FCom_CustomField_Admin extends BClass
 {

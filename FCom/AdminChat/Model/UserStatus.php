@@ -12,6 +12,7 @@
  *
  * DI
  * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_AdminChat_Model_UserStatus extends FCom_Core_Model_Abstract
 {
