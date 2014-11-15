@@ -7,12 +7,9 @@
  * @property FCom_Sales_Migrate_Model_Cart_Address $FCom_Sales_Migrate_Model_Cart_Address
  * @property FCom_Sales_Migrate_Model_Order_Address $FCom_Sales_Migrate_Model_Order_Address
  * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
- * @property FCom_Sales_Model_Cart_Address $FCom_Sales_Model_Cart_Address
  * @property FCom_Sales_Model_Cart_Item $FCom_Sales_Model_Cart_Item
  * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
- * @property FCom_Sales_Model_Order_Address $FCom_Sales_Model_Order_Address
  * @property FCom_Sales_Model_Order_Comment $FCom_Sales_Model_Order_Comment
- * @property FCom_Sales_Model_Order_CustomStatus $FCom_Sales_Model_Order_CustomStatus
  * @property FCom_Sales_Model_Order_History $FCom_Sales_Model_Order_History
  * @property FCom_Sales_Model_Order_Item $FCom_Sales_Model_Order_Item
  * @property FCom_Sales_Model_Order_Payment $FCom_Sales_Model_Order_Payment
@@ -23,6 +20,8 @@
  * @property FCom_Sales_Model_Order_Return_Item $FCom_Sales_Model_Order_Return_Item
  * @property FCom_Sales_Model_Order_Shipment $FCom_Sales_Model_Order_Shipment
  * @property FCom_Sales_Model_Order_Shipment_Item $FCom_Sales_Model_Order_Shipment_Item
+ * @property FCom_Sales_Model_Order_Cancel $FCom_Sales_Model_Order_Cancel
+ * @property FCom_Sales_Model_Order_Cancel_Item $FCom_Sales_Model_Order_Cancel_Item
  * @property FCom_Sales_Model_StateCustom $FCom_Sales_Model_StateCustom
  */
 
@@ -1132,6 +1131,97 @@ class FCom_Sales_Migrate extends BClass
             ],
             BDb::CONSTRAINTS => [
                 'parent_item' => ['parent_item_id', $tOrderItem],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_1__0_3_2()
+    {
+        $tOrder             = $this->FCom_Sales_Model_Order->table();
+        $tOrderItem         = $this->FCom_Sales_Model_Order_Item->table();
+        $tOrderCancel       = $this->FCom_Sales_Model_Order_Cancel->table();
+        $tOrderCancelItem   = $this->FCom_Sales_Model_Order_Cancel_Item->table();
+        $tOrderPayment      = $this->FCom_Sales_Model_Order_Payment->table();
+        $tOrderPaymentItem  = $this->FCom_Sales_Model_Order_Payment_Item->table();
+        $tOrderShipment     = $this->FCom_Sales_Model_Order_Shipment->table();
+        $tOrderShipmentItem = $this->FCom_Sales_Model_Order_Shipment_Item->table();
+        $tOrderReturn       = $this->FCom_Sales_Model_Order_Return->table();
+        $tOrderReturnItem   = $this->FCom_Sales_Model_Order_Return_Item->table();
+        $tOrderRefund       = $this->FCom_Sales_Model_Order_Refund->table();
+        $tOrderRefundItem   = $this->FCom_Sales_Model_Order_Refund_Item->table();
+
+        $this->BDb->ddlTableDef($tOrderCancel, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned default null',
+                'state_overall' => "varchar(10) not null default 'new'",
+                'state_custom' => "varchar(10) not null default ''",
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_state_overall' => '(state_overall)',
+                'IDX_state_custom' => '(state_custom)',
+            ],
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderCancelItem, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned not null',
+                'cancel_id' => 'int unsigned not null',
+                'order_item_id' => 'int unsigned not null',
+                'qty' => 'int unsigned not null',
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+                'cancel' => ['cancel_id', $tOrderCancel],
+                'order_item' => ['order_item_id', $tOrderItem],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderPaymentItem, [
+            BDb::COLUMNS => [
+                'payment_id' => 'int unsigned not null after order_id',
+                'qty' => 'int unsigned not null after payment_id',
+            ],
+            BDb::CONSTRAINTS => [
+                'payment' => ['payment_id', $tOrderPayment],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderShipmentItem, [
+            BDb::COLUMNS => [
+                'shipment_id' => 'int unsigned not null after order_id',
+                'qty' => 'int unsigned not null after shipment_id',
+            ],
+            BDb::CONSTRAINTS => [
+                'shipment' => ['shipment_id', $tOrderShipment],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderReturnItem, [
+            BDb::COLUMNS => [
+                'return_id' => 'int unsigned not null after order_id',
+                'qty' => 'int unsigned not null after return_id',
+            ],
+            BDb::CONSTRAINTS => [
+                'return' => ['return_id', $tOrderReturn],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderRefundItem, [
+            BDb::COLUMNS => [
+                'refund_id' => 'int unsigned not null after order_id',
+                'qty' => 'int unsigned not null after refund_id',
+            ],
+            BDb::CONSTRAINTS => [
+                'refund' => ['refund_id', $tOrderRefund],
             ],
         ]);
     }
