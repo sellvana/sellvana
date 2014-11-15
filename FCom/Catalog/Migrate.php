@@ -34,7 +34,7 @@ class FCom_Catalog_Migrate extends BClass
         $tSearchAlias = $this->FCom_Catalog_Model_SearchAlias->table();
 
         $this->BDb->ddlTableDef($tProduct, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id'            => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                 'product_sku'     => 'VARCHAR(100) NOT NULL',
                 'product_name'  => 'VARCHAR(255) NOT NULL',
@@ -61,8 +61,8 @@ class FCom_Catalog_Migrate extends BClass
                 'is_popular' => 'tinyint',
                 'position' => 'SMALLINT(6) UNSIGNED DEFAULT NULL',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_product_sku' => 'UNIQUE (product_sku)',
                 'UNQ_url_key'   => 'UNIQUE (url_key)',
 //                'UNQ_product_name' => 'UNIQUE (product_name)',
@@ -73,7 +73,7 @@ class FCom_Catalog_Migrate extends BClass
         ]);
 
         $this->BDb->ddlTableDef($tMedia, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id'            => 'int unsigned NOT NULL AUTO_INCREMENT',
                 'product_id'    => 'int(10) unsigned DEFAULT NULL',
                 'media_type'    => 'char(1) NOT NULL',
@@ -87,31 +87,31 @@ class FCom_Catalog_Migrate extends BClass
                 'position' => 'smallint',
                 'main_thumb' => 'tinyint(1) unsigned default 0',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'file_id'        => '(file_id)',
                 'product_id__media_type' => '(product_id, media_type)',
 
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'product' => ['product_id', $tProduct],
                 'file' => ['file_id', $tMediaLibrary],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tProductLink, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id'            => 'int unsigned NOT NULL AUTO_INCREMENT',
                 'link_type'     => "varchar(20) NOT NULL",
                 'product_id'    => 'int(10) unsigned NOT NULL',
                 'linked_product_id' => 'int(10) unsigned NOT NULL',
                 'position' => 'smallint(6) null',
             ],
-            'PRIMARY' => '(id)',
+            BDb::PRIMARY => '(id)',
         ]);
 
         $this->BDb->ddlTableDef($tCategory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id'            => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                 'parent_id'     => 'INT(10) UNSIGNED DEFAULT NULL',
                 'id_path'       => 'VARCHAR(50)  NULL',
@@ -146,33 +146,33 @@ class FCom_Catalog_Migrate extends BClass
                 'featured_image_url'   => 'TEXT NULL',
                 'nav_callout_image_url'   => 'TEXT NULL',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'id_path'       => 'UNIQUE (`id_path`, `level`)',
                 'full_name'     => 'UNIQUE (`full_name`)',
                 'parent_id'     => 'UNIQUE (`parent_id`,`node_name`)',
                 'is_top_menu'   => '(is_top_menu)',
                 'IDX_featured'  => '(is_featured)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'parent' => ['parent_id', $tCategory],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tCategoryProduct, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                 'product_id'    => 'INT(10) UNSIGNED NOT NULL',
                 'category_id'   => 'INT(10) UNSIGNED NOT NULL',
                 'sort_order'    => 'INT(10) UNSIGNED DEFAULT NULL',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'product_id' => 'UNIQUE (`product_id`,`category_id`)',
                 'category_id__product_id' => '(`category_id`,`product_id`)',
                 'category_id__sort_order' => '(`category_id`,`sort_order`)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'category' => ['category_id', $tCategory],
                 'product' => ['product_id', $tProduct],
             ],
@@ -182,7 +182,7 @@ class FCom_Catalog_Migrate extends BClass
 
 
         $this->BDb->ddlTableDef($tSearchHistory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'term_type' => "char(1) not null default 'F'", // (F)ull or (W)ord
                 'query' => 'varchar(50) not null',
@@ -191,14 +191,14 @@ class FCom_Catalog_Migrate extends BClass
                 'num_searches' => 'int not null default 0',
                 'num_products_found_last' => 'int not null default 0',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_query' => 'UNIQUE (term_type, query)',
             ],
         ]);
 
         $this->BDb->ddlTableDef($tSearchAlias, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'alias_type' => "char(1) not null default 'F'", // (F)ull or (W)ord
                 'alias_term' => 'varchar(50) not null',
@@ -207,8 +207,8 @@ class FCom_Catalog_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_alias' => 'UNIQUE (alias_type, alias_term)',
                 'IDX_target' => '(target_term)',
             ],
@@ -219,7 +219,7 @@ class FCom_Catalog_Migrate extends BClass
     public function upgrade__0_2_1__0_2_2()
     {
         $this->BDb->ddlTableDef($this->FCom_Catalog_Model_Product->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'unique_id'     => 'RENAME product_sku varchar(100) not null',
                 'disabled'      => 'RENAME is_hidden tinyint not null default 0',
                 'image_url'     => 'RENAME thumb_url text',
@@ -232,13 +232,13 @@ class FCom_Catalog_Migrate extends BClass
     public function upgrade__0_2_2__0_2_3()
     {
         $this->BDb->ddlTableDef($this->FCom_Catalog_Model_Product->table(), [
-            'COLUMNS' => [
-                'images_data' => 'DROP',
+            BDb::COLUMNS => [
+                'images_data' => BDb::DROP,
                 'data_serialized' => 'mediumtext null',
             ],
         ]);
         $this->BDb->ddlTableDef($this->FCom_Catalog_Model_Category->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'data_serialized' => 'mediumtext null',
             ],
         ]);
@@ -248,7 +248,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $table = $this->FCom_Catalog_Model_Product->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                   'create_dt'      => 'RENAME create_at DATETIME DEFAULT NULL',
                   'update_dt'      => 'RENAME update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
             ],
@@ -258,10 +258,10 @@ class FCom_Catalog_Migrate extends BClass
     public function upgrade__0_2_4__0_2_5()
     {
         $this->BDb->ddlTableDef($this->FCom_Catalog_Model_Category->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'level' => 'tinyint null after id_path',
             ],
-            'KEYS' => [
+            BDb::KEYS => [
                 'id_path' => 'UNIQUE (`id_path`, `level`)',
             ],
         ]);
@@ -271,7 +271,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tMedia = $this->FCom_Catalog_Model_ProductMedia->table();
         $this->BDb->ddlTableDef($tMedia, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'file_id'       => 'int(11) unsigned NULL',
                 'file_path'     => 'text',
                 'remote_url'    => 'text',
@@ -285,7 +285,7 @@ class FCom_Catalog_Migrate extends BClass
         $tSearchAlias = $this->FCom_Catalog_Model_SearchAlias->table();
 
         $this->BDb->ddlTableDef($tSearchHistory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'term_type' => "char(1) not null default 'F'", // (F)ull or (W)ord
                 'query' => 'varchar(50) not null',
@@ -294,14 +294,14 @@ class FCom_Catalog_Migrate extends BClass
                 'num_searches' => 'int not null default 0',
                 'num_products_found_last' => 'int not null default 0',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_query' => 'UNIQUE (term_type, query)',
             ],
         ]);
 
         $this->BDb->ddlTableDef($tSearchAlias, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'alias_type' => "char(1) not null default 'F'", // (F)ull or (W)ord
                 'alias_term' => 'varchar(50) not null',
@@ -310,8 +310,8 @@ class FCom_Catalog_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_alias' => 'UNIQUE (alias_type, alias_term)',
                 'IDX_target' => '(target_term)',
             ],
@@ -322,7 +322,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tMedia = $this->FCom_Catalog_Model_ProductMedia->table();
         $this->BDb->ddlTableDef($tMedia, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'data_serialized'     => 'text',
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
@@ -334,7 +334,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tMedia = $this->FCom_Catalog_Model_ProductMedia->table();
         $this->BDb->ddlTableDef($tMedia, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'label' => 'text',
                 'position' => 'smallint',
             ],
@@ -345,11 +345,11 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tProduct = $this->FCom_Catalog_Model_Product->table();
         $this->BDb->ddlTableDef($tProduct, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'is_featured' => 'tinyint',
                 'is_popular' => 'tinyint',
             ],
-            'KEYS' => [
+            BDb::KEYS => [
                 'IDX_featured' => '(is_featured)',
                 'IDX_popular' => '(is_popular)',
             ],
@@ -360,7 +360,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tCategory = $this->FCom_Catalog_Model_Category->table();
         $this->BDb->ddlTableDef($tCategory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'show_content'  => 'TINYINT(1) UNSIGNED DEFAULT NULL',
                 'content'       => 'TEXT',
                 'show_products' => 'TINYINT(1) UNSIGNED DEFAULT NULL',
@@ -373,7 +373,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tCategory = $this->FCom_Catalog_Model_Category->table();
         $this->BDb->ddlTableDef($tCategory, [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'page_title' => 'VARCHAR(255) DEFAULT NULL',
                     'description'  => 'TEXT DEFAULT NULL',
                     'meta_description' => 'TEXT DEFAULT NULL',
@@ -385,7 +385,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tCategory = $this->FCom_Catalog_Model_Category->table();
         $this->BDb->ddlTableDef($tCategory, [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'show_sidebar' => 'TINYINT(1) UNSIGNED DEFAULT NULL'
                 ]]);
     }
@@ -394,7 +394,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tCategory = $this->FCom_Catalog_Model_Category->table();
         $this->BDb->ddlTableDef($tCategory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'is_enabled' => 'TINYINT(1) UNSIGNED DEFAULT 1 AFTER num_products',
             ],
             //TODO: figure out which keys are needed
@@ -406,7 +406,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tProduct = $this->FCom_Catalog_Model_Product->table();
         $this->BDb->ddlTableDef($tProduct, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'position' => 'SMALLINT(6) UNSIGNED DEFAULT NULL'
             ]
         ]);
@@ -416,7 +416,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tCategory = $this->FCom_Catalog_Model_Category->table();
         $this->BDb->ddlTableDef($tCategory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'show_view' => 'tinyint(1) unsigned default 0',
                 'view_name' => 'varchar(255)',
                 'page_parts' => 'varchar(50)',
@@ -428,7 +428,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tMedia = $this->FCom_Catalog_Model_ProductMedia->table();
         $this->BDb->ddlTableDef($tMedia, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'main_thumb' => 'tinyint(1) unsigned default 0',
             ],
         ]);
@@ -439,7 +439,7 @@ class FCom_Catalog_Migrate extends BClass
         /*
         $tCategory = $this->FCom_Catalog_Model_Category->table();
         $this->BDb->ddlTableDef($tCategory, array(
-            'COLUMNS' => array(
+            BDb::COLUMNS => array(
                 'show_cms_page' => 'tinyint(1) unsigned default null',
                 'cms_page' => 'text default null',
             ),
@@ -451,8 +451,8 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tProduct = $this->FCom_Catalog_Model_Product->table();
         $this->BDb->ddlTableDef($tProduct, [
-            'KEYS' => [
-                'UNQ_product_name' => 'DROP',
+            BDb::KEYS => [
+                'UNQ_product_name' => BDb::DROP,
             ],
         ]);
     }
@@ -461,7 +461,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tProductLink = $this->FCom_Catalog_Model_ProductLink->table();
         $this->BDb->ddlTableDef($tProductLink, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'link_type'     => "enum('related','similar', 'cross-sell') NOT NULL",
             ],
         ]);
@@ -472,7 +472,7 @@ class FCom_Catalog_Migrate extends BClass
         /*
         $tProductLink = $this->FCom_Catalog_Model_ProductLink->table();
         $this->BDb->ddlTableDef($tProductLink, array(
-            'COLUMNS' => array(
+            BDb::COLUMNS => array(
                 'link_type'     => "enum('related','similar', 'cross_sell') NOT NULL",
             ),
         ));
@@ -483,7 +483,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tCategory = $this->FCom_Catalog_Model_Category->table();
         $this->BDb->ddlTableDef($tCategory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id_path' => 'varchar(50) null',
             ],
         ]);
@@ -493,7 +493,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tCategory = $this->FCom_Catalog_Model_Category->table();
         $this->BDb->ddlTableDef($tCategory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'image_url' => 'TEXT null',
             ],
         ]);
@@ -503,7 +503,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tProductLink = $this->FCom_Catalog_Model_ProductLink->table();
         $this->BDb->ddlTableDef($tProductLink, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'position' => 'smallint(6) null',
             ],
         ]);
@@ -513,7 +513,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tProductLink = $this->FCom_Catalog_Model_ProductLink->table();
         $this->BDb->ddlTableDef($tProductLink, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'link_type' => "varchar(20) NOT NULL",
             ],
         ]);
@@ -523,10 +523,10 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tCategory = $this->FCom_Catalog_Model_Category->table();
         $this->BDb->ddlTableDef($tCategory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'is_featured'   => 'TINYINT(3) UNSIGNED DEFAULT NULL',
             ],
-            'KEYS' => [
+            BDb::KEYS => [
                 'IDX_featured'  => '(is_featured)',
             ],
         ]);
@@ -536,7 +536,7 @@ class FCom_Catalog_Migrate extends BClass
     {
         $tCategory = $this->FCom_Catalog_Model_Category->table();
         $this->BDb->ddlTableDef($tCategory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'featured_image_url'   => 'TEXT NULL',
                 'nav_callout_image_url'   => 'TEXT NULL',
             ],
@@ -552,17 +552,17 @@ class FCom_Catalog_Migrate extends BClass
         $tProdHistory = $this->FCom_Catalog_Model_ProductHistory->table();
 
         $this->BDb->ddlTableDef($tProduct, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'local_sku' => 'RENAME product_sku varchar(100) not null',
                 'inventory_sku' => 'varchar(100) default null',
             ],
-            'KEYS' => [
+            BDb::KEYS => [
                 'IDX_inventory_sku' => '(inventory_sku)',
             ],
         ]);
 
         $this->BDb->ddlTableDef($tBin, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'title' => 'varchar(50)',
                 'description' => 'text',
@@ -570,11 +570,11 @@ class FCom_Catalog_Migrate extends BClass
                 'update_at' => 'datetime not null',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
+            BDb::PRIMARY => '(id)',
         ]);
 
         $this->BDb->ddlTableDef($tSku, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'inventory_sku' => 'varchar(50) not null',
                 'title' => 'varchar(255) not null',
@@ -596,17 +596,17 @@ class FCom_Catalog_Migrate extends BClass
                 'update_at' => 'datetime not null',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_inventory_sku' => 'UNIQUE (inventory_sku)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'bin' => ['bin_id', $tBin],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tSkuHistory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'sku_id' => 'int unsigned not null',
                 'unit_cost' => 'decimal(12,2)',
@@ -614,18 +614,18 @@ class FCom_Catalog_Migrate extends BClass
                 'update_at' => 'datetime not null',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_create' => '(create_at)',
                 'IDX_sku_create' => '(sku_id, create_at)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'sku' => ['sku_id', $tSku],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tProdHistory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'product_id' => 'int unsigned not null',
                 'version_code' => 'varchar(50)',
@@ -634,12 +634,12 @@ class FCom_Catalog_Migrate extends BClass
                 'update_at' => 'datetime not null',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_create' => '(create_at)',
                 'IDX_product_create' => '(product_id, create_at)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'product' => ['product_id', $tProduct],
             ],
         ]);
@@ -652,16 +652,16 @@ class FCom_Catalog_Migrate extends BClass
         $tSku = $this->FCom_Catalog_Model_InventorySku->table();
 
         $this->BDb->ddlTableDef($tProduct, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'manage_inventory' => 'tinyint not null default 0',
             ],
-            'KEYS' => [
+            BDb::KEYS => [
                 'IDX_manage_inventory' => '(manage_inventory)',
             ],
         ]);
 
         $this->BDb->ddlTableDef($tSku, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'allow_backorder' => 'tinyint not null default 0',
             ],
         ]);

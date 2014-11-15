@@ -675,7 +675,7 @@ EOT
      * BDb::ddlTableColumns('my_table', array(
      *   'field_to_create' => 'varchar(255) not null',
      *   'field_to_update' => 'decimal(12,2) null',
-     *   'field_to_drop'   => 'DROP',
+     *   'field_to_drop'   => BDb::DROP,
      * ));
      *
      * @param string $fullTableName

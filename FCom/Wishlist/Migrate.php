@@ -10,7 +10,7 @@ class FCom_Wishlist_Migrate extends BClass
         $tProduct = $this->FCom_Catalog_Model_Product->table();
 
         $this->BDb->ddlTableDef($tWishlist, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'customer_id' => 'int unsigned default null',
                 'cookie_token' => 'varchar(40) default null',
@@ -18,24 +18,24 @@ class FCom_Wishlist_Migrate extends BClass
                 'create_at' => 'datetime not null',
                 'update_at' => 'datetime default null',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_customer_id' => '(customer_id)',
                 'UNQ_cookie_token' => 'UNIQUE (cookie_token)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'customer' => ['customer_id', $tCustomer],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tWishlistItem, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'wishlist_id' => 'int unsigned not null',
                 'product_id' => 'int unsigned not null',
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
                 'wishlist' => ['wishlist_id', $tWishlist],
                 'product' => ['wishlist_id', $tProduct],
             ],
@@ -45,7 +45,7 @@ class FCom_Wishlist_Migrate extends BClass
     public function upgrade__0_1_0__0_1_1()
     {
         $this->BDb->ddlTableDef($this->FCom_Wishlist_Model_Wishlist->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'user_id' => 'RENAME customer_id int(10) unsigned not null',
             ],
         ]);
@@ -61,24 +61,24 @@ class FCom_Wishlist_Migrate extends BClass
         $this->FCom_Wishlist_Model_WishlistItem->delete_many("wishlist_id not in (select id from {$tWishlist})");
 
         $this->BDb->ddlTableDef($tWishlist, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'customer_id' => 'int unsigned default null',
                 'cookie_token' => 'varchar(40) default null',
                 'remote_ip' => 'varchar(50) default null',
                 'create_at' => 'datetime not null',
                 'update_at' => 'datetime default null',
             ],
-            'KEYS' => [
+            BDb::KEYS => [
                 'IDX_customer_id' => '(customer_id)',
                 'UNQ_cookie_token' => 'UNIQUE (cookie_token)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'customer' => ['customer_id', $tCustomer],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tWishlistItem, [
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'wishlist' => ['wishlist_id', $tWishlist],
                 'product' => ['wishlist_id', $tProduct],
             ],

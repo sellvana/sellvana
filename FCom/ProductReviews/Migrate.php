@@ -50,7 +50,7 @@ class FCom_ProductReviews_Migrate extends BClass
         ");
 
         $this->BDb->ddlTableDef($tProduct, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'avg_rating' => 'decimal(5,2) null',
                 'num_reviews' => 'int null',
             ],
@@ -86,7 +86,7 @@ class FCom_ProductReviews_Migrate extends BClass
     {
         $table = $this->FCom_ProductReviews_Model_Review->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                   'created_dt'  => 'RENAME created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
             ],
         ]);
@@ -96,7 +96,7 @@ class FCom_ProductReviews_Migrate extends BClass
     {
         $table = $this->FCom_ProductReviews_Model_Review->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                   'created_at'  => 'RENAME create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
             ],
         ]);
@@ -106,7 +106,7 @@ class FCom_ProductReviews_Migrate extends BClass
     {
         $table = $this->FCom_ProductReviews_Model_Review->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'rating1' => 'tinyint(1) unsigned not null after rating',
                 'rating2' => 'tinyint(1) unsigned not null after rating1',
                 'rating3' => 'tinyint(1) unsigned not null after rating2',
@@ -118,7 +118,7 @@ class FCom_ProductReviews_Migrate extends BClass
     {
         $table = $this->FCom_ProductReviews_Model_Review->table();
         $this->BDb->ddlTableDef($table, [
-            'KEYS' => [
+            BDb::KEYS => [
                 'IDX_product_approved' => '(product_id, approved)',
             ],
         ]);

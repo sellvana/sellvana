@@ -24,7 +24,7 @@ class FCom_Cron_Migrate extends BClass
     {
         $table = $this->FCom_Cron_Model_Task->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                   'last_start_dt'      => 'RENAME last_start_at datetime DEFAULT NULL',
                   'last_finish_dt'      => 'RENAME last_finish_at datetime DEFAULT NULL',
             ],

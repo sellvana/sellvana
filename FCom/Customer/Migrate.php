@@ -8,7 +8,7 @@ class FCom_Customer_Migrate extends BClass
         $tAddress = $this->FCom_Customer_Model_Address->table();
 
         $this->BDb->ddlTableDef($tCustomer, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'email' => 'varchar(255) not null',
                 'firstname' => 'varchar(50) not null',
@@ -26,11 +26,11 @@ class FCom_Customer_Migrate extends BClass
                 'status' => "varchar(10) not null default 'review'",
                 'password_session_token' => 'varchar(16)',
             ],
-            'PRIMARY' => '(id)',
+            BDb::PRIMARY => '(id)',
         ]);
 
         $this->BDb->ddlTableDef($tAddress, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'customer_id' => 'int unsigned not null',
                 'email' => 'varchar(255) not null',
@@ -55,8 +55,8 @@ class FCom_Customer_Migrate extends BClass
                 'lat' => 'decimal(15,10) default null',
                 'lng' => 'decimal(15,10) default null',
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
                 'customer' => ['customer_id', $tCustomer],
             ]
         ]);
@@ -103,7 +103,7 @@ class FCom_Customer_Migrate extends BClass
     public function upgrade__0_1_2__0_1_3()
     {
         $this->BDb->ddlTableDef($this->FCom_Customer_Model_Address->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'state' => 'RENAME region varchar(50)',
                 'zip' => 'RENAME postcode varchar(20)',
             ],
@@ -113,7 +113,7 @@ class FCom_Customer_Migrate extends BClass
     public function upgrade__0_1_3__0_1_4()
     {
         $this->BDb->ddlTableDef($this->FCom_Customer_Model_Address->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'middle_initial' => 'VARCHAR(2) NULL AFTER lastname',
                 'prefix' => 'VARCHAR(10) NULL AFTER middle_initial',
                 'suffix' => 'VARCHAR(10) NULL AFTER prefix',
@@ -125,7 +125,7 @@ class FCom_Customer_Migrate extends BClass
     public function upgrade__0_1_4__0_1_5()
     {
         $this->BDb->ddlTableDef($this->FCom_Customer_Model_Address->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'email' => 'VARCHAR(100) NOT NULL AFTER customer_id',
             ],
         ]);
@@ -135,14 +135,14 @@ class FCom_Customer_Migrate extends BClass
     {
         $table = $this->FCom_Customer_Model_Customer->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                   'create_dt'      => 'RENAME create_at datetime NOT NULL',
                   'update_dt'      => 'RENAME update_at datetime NOT NULL',
             ],
         ]);
         $table = $this->FCom_Customer_Model_Address->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                   'create_dt'      => 'RENAME create_at datetime NOT NULL',
                   'update_dt'      => 'RENAME update_at datetime NOT NULL',
             ],
@@ -153,7 +153,7 @@ class FCom_Customer_Migrate extends BClass
     {
         $table = $this->FCom_Customer_Model_Customer->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'status' => 'ENUM("review", "active", "disabled") NOT NULL DEFAULT "review"',
             ],
         ]);
@@ -163,7 +163,7 @@ class FCom_Customer_Migrate extends BClass
     {
         $table = $this->FCom_Customer_Model_Customer->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'payment_method' => 'varchar(20) null',
                 'payment_details' => 'text null',
             ],
@@ -174,13 +174,13 @@ class FCom_Customer_Migrate extends BClass
     {
         $table = $this->FCom_Customer_Model_Customer->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'email' => 'varchar(255)',
             ],
         ]);
         $table = $this->FCom_Customer_Model_Address->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'email' => 'varchar(255)',
             ],
         ]);
@@ -190,7 +190,7 @@ class FCom_Customer_Migrate extends BClass
     {
         $table = $this->FCom_Customer_Model_Customer->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'password_session_token' => 'varchar(16)',
             ],
         ]);
@@ -200,7 +200,7 @@ class FCom_Customer_Migrate extends BClass
     {
         $table = $this->FCom_Customer_Model_Customer->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'token_at' => 'datetime default null after token',
             ],
         ]);
@@ -211,7 +211,7 @@ class FCom_Customer_Migrate extends BClass
         $tCustomer = $this->FCom_Customer_Model_Customer->table();
         $tAddress = $this->FCom_Customer_Model_Address->table();
         $this->BDb->ddlTableDef($tAddress, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'is_default_billing' => 'tinyint not null default 0',
                 'is_default_shipping' => 'tinyint not null default 0',
             ],

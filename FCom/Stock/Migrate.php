@@ -8,18 +8,18 @@ class FCom_Stock_Migrate extends BClass
         $tBin = $this->FCom_Stock_Model_Bin->table();
 
         $this->BDb->ddlTableDef($tBin, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'title' => 'varchar(50)',
                 'description' => 'text',
                 'create_at' => 'datetime not null',
                 'update_at' => 'datetime not null',
             ],
-            'PRIMARY' => '(id)',
+            BDb::PRIMARY => '(id)',
         ]);
 
         $this->BDb->ddlTableDef($tSku, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'sku' => 'varchar(128) not null',
                 'bin_id' => 'int unsigned null',
@@ -27,11 +27,11 @@ class FCom_Stock_Migrate extends BClass
                 'create_at' => 'datetime not null',
                 'update_at' => 'datetime not null',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_sku' => 'UNIQUE (sku)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'bin' => ['bin_id', $tBin],
             ],
         ]);
@@ -39,7 +39,7 @@ class FCom_Stock_Migrate extends BClass
         $pTable = $this->FCom_Catalog_Model_Product->table();
         $sTable = $this->FCom_Stock_Model_Sku->table();
         $this->BDb->ddlTableDef($sTable, [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'net_weight'  => 'decimal(12,2) null default null',
                     'ship_weight' => 'decimal(12,2) null default null',
                 ],
@@ -47,7 +47,7 @@ class FCom_Stock_Migrate extends BClass
         );
 
         $this->BDb->ddlTableDef($sTable, [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'status'  => 'TINYINT(1) not null default 0',
                 ],
             ]
@@ -86,9 +86,9 @@ class FCom_Stock_Migrate extends BClass
 
         try {
             $this->BDb->ddlTableDef($pTable, [
-                    'COLUMNS' => [
-                        'net_weight'  => 'DROP',
-                        'ship_weight' => 'DROP',
+                    BDb::COLUMNS => [
+                        'net_weight'  => BDb::DROP,
+                        'ship_weight' => BDb::DROP,
                     ]
                 ]
             );
@@ -103,7 +103,7 @@ class FCom_Stock_Migrate extends BClass
         $pTable = $this->FCom_Catalog_Model_Product->table();
         $sTable = $this->FCom_Stock_Model_Sku->table();
         $this->BDb->ddlTableDef($sTable, [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'net_weight'  => 'decimal(12,2) null default null',
                     'ship_weight' => 'decimal(12,2) null default null',
                 ],
@@ -144,9 +144,9 @@ class FCom_Stock_Migrate extends BClass
 
         try {
             $this->BDb->ddlTableDef($pTable, [
-                    'COLUMNS' => [
-                        'net_weight'  => 'DROP',
-                        'ship_weight' => 'DROP',
+                    BDb::COLUMNS => [
+                        'net_weight'  => BDb::DROP,
+                        'ship_weight' => BDb::DROP,
                     ]
                 ]
             );
@@ -159,7 +159,7 @@ class FCom_Stock_Migrate extends BClass
     {
         $sTable = $this->FCom_Stock_Model_Sku->table();
         $this->BDb->ddlTableDef($sTable, [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'status'  => 'TINYINT(1) not null default 0',
                 ],
             ]

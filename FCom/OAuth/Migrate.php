@@ -7,7 +7,7 @@ class FCom_OAuth_Migrate extends BClass
         $tConsumerToken = $this->FCom_OAuth_Model_ConsumerToken->table();
 
         $this->BDb->ddlTableDef($tConsumerToken, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'provider' => 'varchar(50) not null',
                 'token' => 'varchar(255) binary not null',
@@ -18,8 +18,8 @@ class FCom_OAuth_Migrate extends BClass
                 'create_at' => 'timestamp not null default current_timestamp',
                 'expire_at' => "datetime not null default '9999-12-31'",
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'unq_provider_token' => 'UNIQUE (provider, token)',
                 'idx_expire' => '(expire_at)',
             ],
@@ -31,7 +31,7 @@ class FCom_OAuth_Migrate extends BClass
         $tConsumerToken = $this->FCom_OAuth_Model_ConsumerToken->table();
 
         $this->BDb->ddlTableDef($tConsumerToken, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'token' => 'varchar(255) binary not null',
                 'token_secret' => 'varchar(255) binary null',
             ],

@@ -1207,16 +1207,15 @@ class BUtil extends BClass
         if (null === $pattern) {
             $pattern = '*';
         }
-        $files = glob($dir . '/' . $pattern, $flags);
-        if (!$files) {
+        $files = glob($dir . '/' . $pattern, $flags | GLOB_MARK);
+        $subdirs = glob($dir . '/*', $flags | GLOB_ONLYDIR | GLOB_MARK);
+        if (!$files && !$subdirs) {
             return [];
         }
-        $result = $files;
-        foreach ($files as $file) {
-            if (is_dir($file)) {
-                $subFiles = static::globRecursive($file, $pattern, $flags);
-                $result = array_merge($result, $subFiles);
-            }
+        $result = array_diff($files, $subdirs);
+        foreach ($subdirs as $subdir) {
+            $subFiles = static::globRecursive(substr($subdir, 0, -1), $pattern, $flags);
+            $result = array_merge($result, $subFiles);
         }
         return $result;
         /*

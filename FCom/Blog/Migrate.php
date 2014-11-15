@@ -16,7 +16,7 @@ class FCom_Blog_Migrate extends BClass
         $tPostCategory = $this->FCom_Blog_Model_PostCategory->table();
 
         $this->BDb->ddlTableDef($tPost, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'author_user_id' => 'int unsigned not null',
                 'status' => "varchar(10) not null default 'pending'",
@@ -32,40 +32,40 @@ class FCom_Blog_Migrate extends BClass
                 'create_at' => 'datetime not null',
                 'update_at' => 'datetime',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_url_key' => 'UNIQUE (url_key)',
                 'IDX_status_create_at' => '(status, create_at)',
                 'IDX_create_ym' => '(status, create_ym)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'author' => ['author_user_id', $tUser],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tTag, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'tag_key' => 'varchar(50)',
                 'tag_name' => 'varchar(50)',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_tag_key' => 'UNIQUE (tag_key)',
             ],
         ]);
 
         $this->BDb->ddlTableDef($tPostTag, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'tag_id' => 'int unsigned not null',
                 'post_id' => 'int unsigned not null',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_post_tag' => '(post_id, tag_id)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'post' => ['post_id', $tPost],
                 'tag' => ['tag_id', $tTag],
             ],
@@ -73,26 +73,26 @@ class FCom_Blog_Migrate extends BClass
 
 
         $this->BDb->ddlTableDef($tCategory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                 'name'    => 'varchar(255) NOT NULL',
                 'url_key'    => 'varchar(255) NOT NULL',
                 'description'    => 'text NULL',
             ],
-            'PRIMARY' => '(id)',
+            BDb::PRIMARY => '(id)',
         ]);
         $this->BDb->ddlTableDef($tPostCategory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                 'category_id'    => 'INT(10) UNSIGNED NOT NULL',
                 'post_id'   => 'INT(10) UNSIGNED NOT NULL',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'post_id' => 'UNIQUE (`post_id`,`category_id`)',
                 'category_id__post_id' => '(`category_id`,`post_id`)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'category' => ['category_id', $tCategory],
                 'post' => ['post_id', $tPost],
             ],
@@ -118,26 +118,26 @@ SET FOREIGN_KEY_CHECKS=1;
         $tPostCategory = $this->FCom_Blog_Model_PostCategory->table();
 
         $this->BDb->ddlTableDef($tCategory, [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                     'name'    => 'varchar(255) NOT NULL',
                     'url_key'    => 'varchar(255) NOT NULL',
                     'description'    => 'text NULL',
                 ],
-                'PRIMARY' => '(id)',
+                BDb::PRIMARY => '(id)',
             ]);
         $this->BDb->ddlTableDef($tPostCategory, [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'id' => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
                     'category_id'    => 'INT(10) UNSIGNED NOT NULL',
                     'post_id'   => 'INT(10) UNSIGNED NOT NULL',
                 ],
-                'PRIMARY' => '(id)',
-                'KEYS' => [
+                BDb::PRIMARY => '(id)',
+                BDb::KEYS => [
                     'post_id' => 'UNIQUE (`post_id`,`category_id`)',
                     'category_id__post_id' => '(`category_id`,`post_id`)',
                 ],
-                'CONSTRAINTS' => [
+                BDb::CONSTRAINTS => [
                     'category' => ['category_id', $tCategory],
                     'post' => ['post_id', $tPost],
                 ],

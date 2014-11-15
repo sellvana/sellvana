@@ -7,7 +7,7 @@ class FCom_MultiSite_Migrate extends BClass
         $tSite = $this->FCom_MultiSite_Model_Site->table();
 
         $this->BDb->ddlTableDef($tSite, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'name' => 'varchar(100) not null',
                 'match_domains' => 'text',
@@ -21,8 +21,8 @@ class FCom_MultiSite_Migrate extends BClass
                 'create_at' => 'datetime not null',
                 'update_at' => 'datetime not null',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_name' => '(name)',
             ],
         ]);
@@ -31,7 +31,7 @@ class FCom_MultiSite_Migrate extends BClass
     {
         $table = $this->FCom_MultiSite_Model_Site->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                   'create_dt'      => 'RENAME create_at datetime NOT NULL',
                   'update_dt'      => 'RENAME update_at datetime NOT NULL',
             ],
