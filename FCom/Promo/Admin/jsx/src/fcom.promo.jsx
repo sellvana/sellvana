@@ -96,7 +96,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return {
                 buttonViewLabel: Locale._("View (100) codes"),
                 buttonGenerateLabel: Locale._("Generate New Codes"),
-                buttonImportLabel: Locale._("Import Existing Codes"),
+                buttonImportLabel: Locale._("Import Existing Codes")
             }
         }
     });
@@ -213,7 +213,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             $.extend(this.options, options);
             var $couponSelector = $('#' + this.options.coupon_select_id);
             if ($couponSelector.length == 0) {
-                console.log("Use coupon dropdown not found");
+                this.log("Use coupon dropdown not found");
                 return;
             }
             var $element = $("#" + this.options.coupon_container_id);
@@ -249,7 +249,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         },
         options: {
             coupon_select_id: "model-use_coupon",
-            coupon_container_id: "coupon-options"
+            coupon_container_id: "coupon-options",
+            debug: false
         },
         showCodesModal: null,
         generateCodesModal: null,
@@ -275,7 +276,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                     }
                 }).fail(function (result) {
                     if (!result.hasOwnProperty('responseJSON')) {
-                        console.log(result);
+                        this.log(result);
                     }
                     var jsonResult = result['responseJSON'];
                     if (jsonResult.hasOwnProperty('html')) {
@@ -287,10 +288,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         showCodes: function () {
             var modal = this.showCodesModal;
             if(null == modal) {
-                console.log("Modal not loaded");
+                this.log("Modal not loaded");
                 return;
             }
-            console.log("showCodes");
+            this.log("showCodes");
             modal.open();
             var $modalBody = $('.modal-body', modal.getDOMNode());
             this.loadModalContent($modalBody, this.options.showCouponsUrl)
@@ -298,11 +299,11 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         generateCodes: function () {
             var modal = this.generateCodesModal;
             if(null == modal) {
-                console.log("Modal not loaded");
+                this.log("Modal not loaded");
                 return;
             }
             // component default properties
-            console.log("generateCodes");
+            this.log("generateCodes");
             //this.refs.generateModal.open();
             modal.open();
             var $formContainer = $('#coupon-generate-container');
@@ -312,7 +313,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 $codeLength.prop('disabled', false);
             }
             $codePattern.change(function (e) {
-                console.log(e);
+                this.log(e);
                 var val = $.trim($codePattern.val());
                 if (val == '') {
                     $codeLength.prop('disabled', false);
@@ -324,7 +325,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         },
         postGenerate: function (e) {
             var $formContainer = $('#coupon-generate-container');
-            console.log(e, $formContainer);
+            this.log(e, $formContainer);
             var url = this.options.generateCouponsUrl;
             var $progress = $formContainer.find('.loading');
             var $result = $formContainer.find('.result').hide();
@@ -352,22 +353,27 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                     $progress.hide();
                     $result.show();
                     // hide notification
-                    console.log(r);
+                    this.log(r);
                 });
             //});
         },
         importCodes: function () {
             var modal = this.importCodesModal;
             if(null == modal) {
-                console.log("Modal not loaded");
+                this.log("Modal not loaded");
                 return;
             }
             // component default properties
-            console.log("importCodes");
+            this.log("importCodes");
             modal.open();
             //this.refs.importModal.open();
             var $modalBody = $('.modal-body', modal.getDOMNode());
             this.loadModalContent($modalBody, this.options.importCouponsUrl);
+        },
+        log: function (msg) {
+            if(this.options.debug) {
+                console.log(msg);
+            }
         }
     };
     return Promo;
