@@ -33,6 +33,10 @@
  * @property FCom_Sales_Model_Order_Address $FCom_Sales_Model_Order_Address
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Sales_Model_Cart_Address $FCom_Sales_Model_Cart_Address
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Sales_Model_Order_Comment $FCom_Sales_Model_Order_Comment
+ * @property FCom_Sales_Model_Order_CustomStatus $FCom_Sales_Model_Order_CustomStatus
+ * @property FCom_Sales_Model_Order_History $FCom_Sales_Model_Order_History
  */
 class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
 {

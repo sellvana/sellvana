@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Cron_Migrate
+ *
+ * @property FCom_Cron_Model_Task $FCom_Cron_Model_Task
+ */
+
 class FCom_Cron_Migrate extends BClass
 {
     public function install__0_1_1()
@@ -24,7 +30,7 @@ class FCom_Cron_Migrate extends BClass
     {
         $table = $this->FCom_Cron_Model_Task->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                   'last_start_dt'      => 'RENAME last_start_at datetime DEFAULT NULL',
                   'last_finish_dt'      => 'RENAME last_finish_at datetime DEFAULT NULL',
             ],

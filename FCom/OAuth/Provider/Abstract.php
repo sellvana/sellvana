@@ -1,6 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-abstract class FCom_OAuth_Provider_Abstract extends BClass
+abstract
+
+/**
+ * Class FCom_OAuth_Provider_Abstract
+ *
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ */ class FCom_OAuth_Provider_Abstract extends BClass
 {
     public function onAfterGetAccessToken($tokenModel)
     {

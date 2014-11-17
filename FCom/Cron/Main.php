@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Cron_Main
+ *
+ * @property FCom_Cron_Model_Task $FCom_Cron_Model_Task
+ */
+
 class FCom_Cron_Main extends BClass
 {
     protected $_tasks = [];

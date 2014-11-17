@@ -4,6 +4,7 @@
  * Class FCom_AdminChat_PushServer_User
  *
  * @property FCom_AdminChat_Model_UserStatus $FCom_AdminChat_Model_UserStatus
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_AdminChat_PushServer_User extends FCom_PushServer_Service_Abstract
 {

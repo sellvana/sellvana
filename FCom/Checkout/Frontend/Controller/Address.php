@@ -1,5 +1,16 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Checkout_Frontend_Controller_Address
+ *
+ * @property FCom_Core_Main $FCom_Core_Main
+ * @property FCom_Customer_Model_Address $FCom_Customer_Model_Address
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Geo_Model_Country $FCom_Geo_Model_Country
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Sales_Model_Cart_Address $FCom_Sales_Model_Cart_Address
+ */
+
 class FCom_Checkout_Frontend_Controller_Address extends FCom_Frontend_Controller_Abstract
 {
     public function beforeDispatch()

@@ -6,6 +6,7 @@
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_ProductReviews_Model_Review $FCom_ProductReviews_Model_Review
  * @property FCom_ProductReviews_Model_ReviewFlag $FCom_ProductReviews_Model_ReviewFlag
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  */
 class FCom_ProductReviews_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {

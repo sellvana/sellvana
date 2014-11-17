@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CustomField_Tests_Model_FieldTest
+ *
+ * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ */
+
 class FCom_CustomField_Tests_Model_FieldTest extends FCom_Test_DatabaseTestCase
 {
     public function getDataSet()

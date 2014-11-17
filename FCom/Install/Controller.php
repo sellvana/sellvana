@@ -5,6 +5,8 @@
  *
  * @property FCom_MarketClient_RemoteApi $FCom_MarketClient_RemoteApi
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Core_Model_Module $FCom_Core_Model_Module
+ * @property FCom_MarketClient_Main $FCom_MarketClient_Main
  */
 class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 {

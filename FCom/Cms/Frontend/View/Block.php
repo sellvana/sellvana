@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Cms_Frontend_View_Block
+ *
+ * @property FCom_Cms_Model_Block $FCom_Cms_Model_Block
+ */
+
 class FCom_Cms_Frontend_View_Block extends FCom_Core_View_Abstract
 {
     /**

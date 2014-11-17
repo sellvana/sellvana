@@ -4,6 +4,7 @@
  * Class FCom_Customer_Frontend_Controller_Order
  *
  * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  */
 class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_Abstract
 {

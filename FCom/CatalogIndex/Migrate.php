@@ -1,5 +1,19 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CatalogIndex_Migrate
+ *
+ * @property FCom_CatalogIndex_Model_Doc $FCom_CatalogIndex_Model_Doc
+ * @property FCom_CatalogIndex_Model_DocSort $FCom_CatalogIndex_Model_DocSort
+ * @property FCom_CatalogIndex_Model_DocTerm $FCom_CatalogIndex_Model_DocTerm
+ * @property FCom_CatalogIndex_Model_DocValue $FCom_CatalogIndex_Model_DocValue
+ * @property FCom_CatalogIndex_Model_Field $FCom_CatalogIndex_Model_Field
+ * @property FCom_CatalogIndex_Model_FieldValue $FCom_CatalogIndex_Model_FieldValue
+ * @property FCom_CatalogIndex_Model_Term $FCom_CatalogIndex_Model_Term
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ */
+
 class FCom_CatalogIndex_Migrate extends BClass
 {
     public function install__0_1_9()
@@ -15,17 +29,17 @@ class FCom_CatalogIndex_Migrate extends BClass
         $tDocTerm = $this->FCom_CatalogIndex_Model_DocTerm->table();
         $tDocSort = $this->FCom_CatalogIndex_Model_DocSort->table();
         $this->BDb->ddlTableDef($tTerm, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'term' => 'varchar(50) not null',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_term' => 'UNIQUE (term)',
             ],
         ]);
         $this->BDb->ddlTableDef($tField, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'field_name' => 'varchar(50) not null',
                 'field_label' => 'varchar(50) not null',
@@ -46,30 +60,30 @@ class FCom_CatalogIndex_Migrate extends BClass
                 'sort_label' => 'varchar(255)',
                 'sort_order' => 'tinyint unsigned',
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
                 'field' => ['fcom_field_id', $tField],
             ],
         ]);
         $this->BDb->ddlTableDef($tFieldValue, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'field_id' => 'int unsigned not null',
                 'val' => 'varchar(100) not null',
                 'display' => 'varchar(100) default null',
                 'sort_order' => 'smallint unsigned default null',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'field_id' => 'UNIQUE (field_id,val)',
                 'IDX_sort_order' => '(field_id, sort_order)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'field' => ['field_id', $tField],
             ],
         ]);
         $this->BDb->ddlTableDef($tDoc, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int(10) unsigned not null auto_increment',
                 'last_indexed' => 'datetime not null',
                 'flag_reindex' => 'tinyint not null default 0',
@@ -77,45 +91,45 @@ class FCom_CatalogIndex_Migrate extends BClass
                 'sort_price' => 'decimal(12,2)',
                 'sort_rating' => 'tinyint',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_last_indexed' => '(last_indexed)',
                 'IDX_flag_reindex' => '(flag_reindex)',
                 'IDX_sort_product_name' => '(sort_product_name)',
                 'IDX_sort_price' => '(sort_price)',
                 'IDX_sort_rating' => '(sort_rating)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'product' => ['id', $tProduct],
             ],
         ]);
         $this->BDb->ddlTableDef($tDocTerm, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'doc_id' => 'int(10) unsigned NOT NULL',
                 'field_id' => 'int(10) unsigned NOT NULL',
                 'term_id' => 'int(10) unsigned NOT NULL',
                 'position' => 'int(11) DEFAULT NULL',
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
                 'doc' => ['doc_id', $tDoc],
                 'field' => ['field_id', $tField],
                 'term' => ['term_id', $tTerm],
             ],
         ]);
         $this->BDb->ddlTableDef($tDocValue, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'doc_id' => 'int(10) unsigned NOT NULL',
                 'field_id' => 'int(10) unsigned NOT NULL',
                 'value_id' => 'int(10) unsigned NOT NULL',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_doc_field_value' => 'UNIQUE (`doc_id`,`field_id`,`value_id`)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'doc' => ['doc_id', $tDoc],
                 'field' => ['field_id', $tField],
                 'value' => ['value_id', $tFieldValue],
@@ -129,17 +143,17 @@ class FCom_CatalogIndex_Migrate extends BClass
         ], ['field_name' => 'price']);
 
         $this->BDb->ddlTableDef($tDocSort, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'doc_id' => 'int unsigned not null',
                 'field_id' => 'int unsigned not null',
                 'value' => 'varchar(255) not null',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_field_value' => '(field_id, value)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'doc' => ['doc_id', $tDoc],
                 'field' => ['field_id', $tField],
             ],
@@ -168,7 +182,7 @@ VALUES
     public function upgrade__0_1_4__0_1_5()
     {
         $this->BDb->ddlTableDef($this->FCom_CatalogIndex_Model_Field->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'filter_counts' => 'tinyint unsigned NOT NULL DEFAULT 0 AFTER filter_multivalue',
             ],
         ]);
@@ -182,8 +196,8 @@ VALUES
     public function upgrade__0_1_5__0_1_6()
     {
         $this->BDb->ddlTableDef($this->FCom_CatalogIndex_Model_Field->table(), [
-            'COLUMNS' => [
-                'filter_multiselect' => 'DROP',
+            BDb::COLUMNS => [
+                'filter_multiselect' => BDb::DROP,
             ],
         ]);
     }
@@ -191,10 +205,10 @@ VALUES
     public function upgrade__0_1_6__0_1_7()
     {
         $this->BDb->ddlTableDef($this->FCom_CatalogIndex_Model_Doc->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'flag_reindex' => 'tinyint not null default 0 after last_indexed',
             ],
-            'KEYS' => [
+            BDb::KEYS => [
                 'IDX_flag_reindex' => '(flag_reindex)',
             ],
         ]);
@@ -207,17 +221,17 @@ VALUES
         $tDocSort = $this->FCom_CatalogIndex_Model_DocSort->table();
 
         $this->BDb->ddlTableDef($tDocSort, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'doc_id' => 'int unsigned not null',
                 'field_id' => 'int unsigned not null',
                 'value' => 'varchar(255) not null',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_field_value' => '(field_id, value)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'doc' => ['doc_id', $tDoc],
                 'field' => ['field_id', $tField],
             ],

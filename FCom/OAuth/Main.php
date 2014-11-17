@@ -2,6 +2,12 @@
 
 include_once __DIR__ . '/lib/OAuthSimple.php';
 
+/**
+ * Class FCom_OAuth_Main
+ *
+ * @property FCom_OAuth_Model_ConsumerToken $FCom_OAuth_Model_ConsumerToken
+ */
+
 class FCom_OAuth_Main extends BClass
 {
     protected $_providersConfig;

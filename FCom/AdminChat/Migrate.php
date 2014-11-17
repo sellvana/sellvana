@@ -1,5 +1,16 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_AdminChat_Migrate
+ *
+ * @property FCom_AdminChat_Model_Chat $FCom_AdminChat_Model_Chat
+ * @property FCom_AdminChat_Model_History $FCom_AdminChat_Model_History
+ * @property FCom_AdminChat_Model_Participant $FCom_AdminChat_Model_Participant
+ * @property FCom_AdminChat_Model_UserStatus $FCom_AdminChat_Model_UserStatus
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Core_Model_Module $FCom_Core_Model_Module
+ */
+
 class FCom_AdminChat_Migrate extends BClass
 {
     public function install__0_1_4()
@@ -14,7 +25,7 @@ class FCom_AdminChat_Migrate extends BClass
         $tUser = $this->FCom_Admin_Model_User->table();
 
         $this->BDb->ddlTableDef($tChat, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'status' => 'varchar(20)',
                 'owner_user_id' => 'int unsigned not null',
@@ -22,17 +33,17 @@ class FCom_AdminChat_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_update_at' => '(update_at)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'owner' => ['owner_user_id', $tUser],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tParticipant, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'chat_id' => 'int unsigned not null',
                 'user_id' => 'int unsigned not null',
@@ -41,18 +52,18 @@ class FCom_AdminChat_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_update_at' => '(update_at)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'chat' => ['chat_id', $tChat],
                 'user' => ['user_id', $tUser],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tHistory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'chat_id' => 'int unsigned not null',
                 'user_id' => 'int unsigned not null',
@@ -61,11 +72,11 @@ class FCom_AdminChat_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_update_at' => '(update_at)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'chat' => ['chat_id', $tChat],
                 'user' => ['user_id', $tUser],
             ],
@@ -74,7 +85,7 @@ class FCom_AdminChat_Migrate extends BClass
         $tUserStatus = $this->FCom_AdminChat_Model_UserStatus->table();
 
         $this->BDb->ddlTableDef($tUserStatus, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'user_id' => 'int unsigned not null',
                 'status' => 'varchar(20)',
@@ -82,8 +93,8 @@ class FCom_AdminChat_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
                 'user' => ['user_id', $tUser],
             ],
         ]);
@@ -95,10 +106,10 @@ class FCom_AdminChat_Migrate extends BClass
         $tUser = $this->FCom_Admin_Model_User->table();
 
         $this->BDb->ddlTableDef($tChat, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'owner_user_id' => 'int unsigned not null after `status`',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'owner' => ['owner_user_id', $tUser],
             ],
         ]);
@@ -108,7 +119,7 @@ class FCom_AdminChat_Migrate extends BClass
     {
         $tHistory = $this->FCom_AdminChat_Model_History->table();
         $this->BDb->ddlTableDef($tHistory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'entry_type' => 'varchar(20) default "text" after `user_id`',
             ],
         ]);
@@ -120,7 +131,7 @@ class FCom_AdminChat_Migrate extends BClass
         $tUser = $this->FCom_Admin_Model_User->table();
 
         $this->BDb->ddlTableDef($tUserStatus, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'user_id' => 'int unsigned not null',
                 'status' => 'varchar(20)',
@@ -128,8 +139,8 @@ class FCom_AdminChat_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
                 'user' => ['user_id', $tUser],
             ],
         ]);
@@ -138,7 +149,7 @@ class FCom_AdminChat_Migrate extends BClass
     {
         $tParticipant = $this->FCom_AdminChat_Model_Participant->table();
         $this->BDb->ddlTableDef($tParticipant, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'chat_title' => 'varchar(50) null after `status`',
             ],
         ]);

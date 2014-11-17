@@ -19,6 +19,10 @@
  *
  * DI
  * @property FCom_Blog_Model_Post $FCom_Blog_Model_Post
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Blog_Model_Category $FCom_Blog_Model_Category
+ * @property FCom_Blog_Model_PostTag $FCom_Blog_Model_PostTag
+ * @property FCom_Blog_Model_Tag $FCom_Blog_Model_Tag
  */
 class FCom_Blog_Model_Post extends FCom_Core_Model_Abstract
 {

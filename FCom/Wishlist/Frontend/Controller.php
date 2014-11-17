@@ -5,6 +5,7 @@
  *
  * @property FCom_Wishlist_Model_Wishlist $FCom_Wishlist_Model_Wishlist
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  */
 class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {

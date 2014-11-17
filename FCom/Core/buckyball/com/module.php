@@ -2000,7 +2000,7 @@ class BDbModule extends BModel
         $table = static::table();
         if (!$this->BDb->ddlTableExists($table)) {
             $this->BDb->ddlTableDef($table, [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'id' => 'int unsigned not null auto_increment',
                     'module_name' => 'varchar(100) not null',
                     'schema_version' => 'varchar(20)',
@@ -2008,8 +2008,8 @@ class BDbModule extends BModel
                     'last_upgrade' => 'datetime',
                     'last_status' => 'varchar(20)',
                 ],
-                'PRIMARY' => '(id)',
-                'KEYS' => [
+                BDb::PRIMARY => '(id)',
+                BDb::KEYS => [
                     'UNQ_module_name' => 'UNIQUE (module_name)',
                 ],
             ]);

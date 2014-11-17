@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Admin_Controller_OrderStatus
+ *
+ * @property FCom_Sales_Model_Order_StateCustom $FCom_Sales_Model_Order_StateCustom
+ */
+
 class FCom_Sales_Admin_Controller_OrderStatus extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;

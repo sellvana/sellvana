@@ -23,7 +23,7 @@ class FCom_Sales_Model_Order_Return_State_Overall extends FCom_Core_Model_Abstra
 
     public function setRequested()
     {
-        return $this->changeState('new');
+        return $this->changeState('requested');
     }
 
     public function setNew()

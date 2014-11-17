@@ -156,7 +156,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                 var name = el.attr('name');
                 var val = $(this).val();
                 if (val != '' && typeof (_.findWhere(_.findWhere(options, {name: name}).options, {id: val, text: val})) === 'undefined') {
-                    var confirm = window.confirm("Do you want to really create this value?");
+                    var confirm = window.confirm("A new field value will be created. Are you sure?");
                     if (confirm) {
                         _.findWhere(options, {name: name}).options.push({id: val, text: val});
                     } else {

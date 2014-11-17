@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Ogone_RemoteApi
+ *
+ * @property FCom_Frontend_Main $FCom_Frontend_Main
+ * @property FCom_Ogone_Model_Order $FCom_Ogone_Model_Order
+ * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
+ */
+
 class FCom_Ogone_RemoteApi extends BClass
 {
     static protected $_brandsMap = [

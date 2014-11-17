@@ -5,6 +5,7 @@
  *
  * @property FCom_Cms_Model_BlockHistory $FCom_Cms_Model_BlockHistory
  * @property FCom_Admin_View_Grid $FCom_Admin_View_Grid
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_GridForm
 {

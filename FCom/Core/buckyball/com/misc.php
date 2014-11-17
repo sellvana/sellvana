@@ -1201,22 +1201,25 @@ class BUtil extends BClass
      * @param int $flags
      * @return array
      */
-    public function globRecursive($dir, $pattern = null, $flags = 0)
+    public function globRecursive($dir, $pattern = null, $includeDirs = false)
     {
         /**/
         if (null === $pattern) {
             $pattern = '*';
         }
-        $files = glob($dir . '/' . $pattern, $flags);
-        if (!$files) {
+        $files = glob($dir . '/' . $pattern, GLOB_BRACE | GLOB_MARK);
+        $subDirs = glob($dir . '/*', GLOB_BRACE | GLOB_MARK | GLOB_ONLYDIR);
+        if (!$files && !$subDirs) {
             return [];
         }
-        $result = $files;
-        foreach ($files as $file) {
-            if (is_dir($file)) {
-                $subFiles = static::globRecursive($file, $pattern, $flags);
-                $result = array_merge($result, $subFiles);
-            }
+        if ($includeDirs) {
+            $result = array_unique(array_merge($files, $subDirs));
+        } else {
+            $result = array_diff($files, $subDirs);
+        }
+        foreach ($subDirs as $subDir) {
+            $subFiles = static::globRecursive(substr($subDir, 0, -1), $pattern, $includeDirs);
+            $result = array_merge($result, $subFiles);
         }
         return $result;
         /*

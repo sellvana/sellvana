@@ -39,6 +39,8 @@
  * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
  * @property FCom_ProductReviews_Model_Review $FCom_ProductReviews_Model_Review
  * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
+ * @property FCom_Core_Main $FCom_Core_Main
+ * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
  */
 class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
 {

@@ -3,6 +3,7 @@
 /**
  * Created by pp
  * @project fulleron
+ * @property FCom_AuthorizeNet_AimApi $FCom_AuthorizeNet_AimApi
  */
 
 class FCom_AuthorizeNet_Tests_ApiTest

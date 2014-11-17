@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Workflow_Payment
+ *
+ * @property FCom_Sales_Main $FCom_Sales_Main
+ * @property FCom_Sales_Model_Order_Payment $FCom_Sales_Model_Order_Payment
+ */
+
 class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
 {
     static protected $_origClass = __CLASS__;

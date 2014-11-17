@@ -5,6 +5,7 @@
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  * @property FCom_Customer_Model_Address $FCom_Customer_Model_Address
  * @property FCom_CustomerGroups_Model_Group $FCom_CustomerGroups_Model_Group
+ * @property FCom_Core_Main $FCom_Core_Main
  */
 class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abstract_GridForm
 {
