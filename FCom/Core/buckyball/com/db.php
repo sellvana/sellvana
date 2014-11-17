@@ -2445,7 +2445,7 @@ class BModel extends Model
     *
     * @param null|array $data
     * @param boolean $new is new record
-    * @return static
+    * @return BModel
     */
     public static function create($data = null, $new = true)
     {

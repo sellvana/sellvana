@@ -65,7 +65,7 @@ class FCom_AdminChat_Admin extends BClass
             ->select('c.id')
             ->select('p.status', 'chat_window_status')
             ->select('p.chat_title')
-            ->find_many_assoc('c.id');
+            ->find_many_assoc('id');
         foreach ($chatModels as $c) {
             $chats[$c->id()] = [
                 'channel' => 'adminchat:' . $c->id(),
