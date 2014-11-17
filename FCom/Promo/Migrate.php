@@ -7,6 +7,8 @@
  * @property FCom_Promo_Model_Media $FCom_Promo_Model_Media
  * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
  * @property FCom_Promo_Model_Cart $FCom_Promo_Model_Cart
+ * @property FCom_Promo_Model_CustomerCoupon $FCom_Promo_Model_CustomerCoupon
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  */
 class FCom_Promo_Migrate extends BClass
 {
@@ -106,20 +108,20 @@ class FCom_Promo_Migrate extends BClass
     public function upgrade__0_1_1__0_1_2()
     {
         $tCart = $this->FCom_Promo_Model_Cart->table();
-        $this->BDb->ddlTableDef($tCart, ['COLUMNS' => ['updated_dt' => "datetime"]]);
+        $this->BDb->ddlTableDef($tCart, [BDb::COLUMNS => ['updated_dt' => "datetime"]]);
     }
 
     public function upgrade__0_1_2__0_1_3()
     {
         $table = $this->FCom_Promo_Model_Cart->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                   'updated_dt'      => 'RENAME updated_at datetime NULL',
             ],
         ]);
         $table = $this->FCom_Promo_Model_Promo->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                   'create_dt'      => 'RENAME create_at datetime NOT NULL',
                   'update_dt'      => 'RENAME update_at datetime NULL',
             ],
@@ -131,7 +133,7 @@ class FCom_Promo_Migrate extends BClass
 
         $table = $this->FCom_Promo_Model_Cart->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                   'updated_at'      => 'RENAME update_at datetime NULL',
             ],
         ]);
@@ -142,7 +144,7 @@ class FCom_Promo_Migrate extends BClass
 
         $table = $this->FCom_Promo_Model_Promo->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 "coupon"          => "varchar(100)",
                 "manuf_vendor_id" => "INT(10) UNSIGNED NULL",
                 "buy_group"       => "ENUM('one', 'any', 'all', 'cat', 'anyp')  NOT NULL  DEFAULT 'one'"
@@ -155,7 +157,7 @@ class FCom_Promo_Migrate extends BClass
 
         $table = $this->FCom_Promo_Model_Promo->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 "get_type"       => "enum('qty','$','%','text','choice','free') NOT NULL DEFAULT 'qty'"
             ],
         ]);
@@ -166,7 +168,7 @@ class FCom_Promo_Migrate extends BClass
         $table = $this->FCom_Promo_Model_Coupon->table();
 
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => "INT(10) UNSIGNED NOT NULL AUTO_INCREMENT",
                 'promo_id' => "INT(10) UNSIGNED NOT NULL",
                 'code' => "VARCHAR(50) NOT NULL",
@@ -174,10 +176,52 @@ class FCom_Promo_Migrate extends BClass
                 'uses_total' => "INT(10) UNSIGNED NULL ",
                 'total_used' => "INT(10) UNSIGNED NULL",
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
                 "FK_{$table}_promo" => ["promo_id", $this->FCom_Promo_Model_Promo->table()]
             ]
         ]);
     }
+
+    public function upgrade__0_1_7__0_1_8()
+    {
+        $tCoupon = $this->FCom_Promo_Model_Coupon->table();
+        $BDb = $this->BDb;
+        $BDb->ddlTableDef($tCoupon, [
+            BDb::COLUMNS => [
+                'uses_per_customer' => BDb::DROP,
+                'uses_total' => BDb::DROP,
+            ]
+        ]);
+
+        $tPromo = $this->FCom_Promo_Model_Promo->table();
+        $BDb->ddlTableDef($tPromo, [
+            BDb::COLUMNS => [
+                'coupon_use_coupon' => 'TINYINT UNSIGNED DEFAULT 0 COMMENT 0 = Do not use, 1 = Single code, 2 = multiple codes',
+                'coupon_uses_per_customer' => "INT(10) UNSIGNED NULL DEFAULT 0",
+                'coupon_uses_total' => "INT(10) UNSIGNED NULL DEFAULT 0",
+            ]
+        ]);
+
+        $tCustomerCoupon = $this->FCom_Promo_Model_CustomerCoupon->table();
+
+        $BDb->ddlTableDef($tCustomerCoupon, [
+            BDb::COLUMNS => [
+                'id' => "INT(10) unsigned not null auto_increment",
+                'promo_id' => "INT(10) UNSIGNED NOT NULL",
+                'customer_id' => "INT(10) UNSIGNED NOT NULL",
+                'coupon_id' => "INT(10) UNSIGNED NOT NULL",
+                'created_at' => "DATETIME NOT NULL",
+                'updated_at' => "DATETIME NULL",
+                'action' => "VARCHAR(10) NOT NULL COMMENT 'apply' or 'cancel'",
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                "FK_{$tCustomerCoupon}_promo" => ["promo_id", $this->FCom_Promo_Model_Promo->table()],
+                "FK_{$tCustomerCoupon}_customer" => ["customer_id", $this->FCom_Customer_Model_Customer->table()],
+                "FK_{$tCustomerCoupon}_coupon" => ["coupon_id", $this->FCom_Promo_Model_Coupon->table()],
+            ]
+        ]);
+    }
+
 }

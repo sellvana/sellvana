@@ -8,6 +8,7 @@
  * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  * @property FCom_AdminChat_Model_Chat $FCom_AdminChat_Model_Chat
  * @property FCom_AdminChat_Model_History $FCom_AdminChat_Model_History
+ * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
  */
 class FCom_AdminChat_Admin extends BClass
 {
@@ -64,7 +65,7 @@ class FCom_AdminChat_Admin extends BClass
             ->select('c.id')
             ->select('p.status', 'chat_window_status')
             ->select('p.chat_title')
-            ->find_many_assoc('c.id');
+            ->find_many_assoc('id');
         foreach ($chatModels as $c) {
             $chats[$c->id()] = [
                 'channel' => 'adminchat:' . $c->id(),

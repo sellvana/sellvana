@@ -540,18 +540,18 @@ class BCache_Backend_Db extends BClass implements BCache_Backend_Interface
         $t = BCache_Backend_Db_Model_Cache::table();
         if (!$this->BDb->ddlTableExists($t)) {
             $this->BDb->ddlTableDef($t, [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'id' => 'int unsigned not null auto_increment',
                     'cache_key' => 'varchar(255) not null',
                     'cache_value' => 'mediumtext not null',
                     'expires_at' => 'int unsigned null',
                 ],
-                'PRIMARY' => '(id)',
-                'KEYS' => [
+                BDb::PRIMARY => '(id)',
+                BDb::KEYS => [
                     'UNQ_cache_key' => '(cache_key)',
                     'IDX_expires_at' => '(expires_at)',
                 ],
-                'OPTIONS' => [
+                BDb::OPTIONS => [
                     'engine' => 'MyISAM',
                 ],
             ]);

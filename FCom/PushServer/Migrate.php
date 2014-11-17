@@ -1,5 +1,14 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_PushServer_Migrate
+ *
+ * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
+ * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
+ * @property FCom_PushServer_Model_Message $FCom_PushServer_Model_Message
+ * @property FCom_PushServer_Model_Subscriber $FCom_PushServer_Model_Subscriber
+ */
+
 class FCom_PushServer_Migrate extends BClass
 {
     public function install__0_1_3()
@@ -10,7 +19,7 @@ class FCom_PushServer_Migrate extends BClass
         $tSubscriber = $this->FCom_PushServer_Model_Subscriber->table();
 
         $this->BDb->ddlTableDef($tChannel, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'channel_name' => 'varchar(255) not null',
                 'channel_out' => 'varchar(100)',
@@ -18,15 +27,15 @@ class FCom_PushServer_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_channel_name' => '(channel_name)',
                 'IDX_update_at' => '(update_at)',
             ],
         ]);
 
         $this->BDb->ddlTableDef($tClient, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'session_id' => 'varchar(100)',
                 'status' => 'varchar(10)',
@@ -37,15 +46,15 @@ class FCom_PushServer_Migrate extends BClass
                 'update_at' => 'datetime',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_session_id' => '(session_id)',
                 'IDX_update_at' => '(update_at)',
             ],
         ]);
 
         $this->BDb->ddlTableDef($tSubscriber, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'channel_id' => 'int unsigned not null',
                 'client_id' => 'int unsigned not null',
@@ -53,18 +62,18 @@ class FCom_PushServer_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_update_at' => '(update_at)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'channel' => ['channel_id', $tChannel],
                 'client' => ['client_id', $tClient],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tMessage, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'seq' => 'varchar(30)',
                 'channel_id' => 'int unsigned null',
@@ -77,12 +86,12 @@ class FCom_PushServer_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_update_at' => '(update_at)',
                 'IDX_client_window_status' => '(client_id, window_name, status)'
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'channel' => ['channel_id', $tChannel, 'id', 'CASCADE', 'SET NULL'],
                 'subscriber' => ['subscriber_id', $tSubscriber],
                 'client' => ['client_id', $tClient],
@@ -98,15 +107,15 @@ class FCom_PushServer_Migrate extends BClass
         $tSubscriber = $this->FCom_PushServer_Model_Subscriber->table();
 
         $this->BDb->ddlTableDef($tClient, [
-            'COLUMNS' => [
-                'handover' => 'DROP',
+            BDb::COLUMNS => [
+                'handover' => BDb::DROP,
             ],
         ]);
 
         $this->BDb->run("DROP TABLE IF EXISTS {$tMessage}");
 
         $this->BDb->ddlTableDef($tMessage, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'seq' => 'varchar(30)',
                 'channel_id' => 'int unsigned null',
@@ -119,11 +128,11 @@ class FCom_PushServer_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_update_at' => '(update_at)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'channel' => ['channel_id', $tChannel, 'id', 'CASCADE', 'SET NULL'],
                 'subscriber' => ['subscriber_id', $tSubscriber],
                 'client' => ['client_id', $tClient],
@@ -135,10 +144,10 @@ class FCom_PushServer_Migrate extends BClass
     {
         $tMessage = $this->FCom_PushServer_Model_Message->table();
         $this->BDb->ddlTableDef($tMessage, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'page_id' => 'RENAME window_id varchar(30) null',
             ],
-            'KEYS' => [
+            BDb::KEYS => [
                 'IDX_client_window_status' => '(client_id, window_id, status)',
             ],
         ]);
@@ -148,10 +157,10 @@ class FCom_PushServer_Migrate extends BClass
     {
         $tMessage = $this->FCom_PushServer_Model_Message->table();
         $this->BDb->ddlTableDef($tMessage, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'window_id' => 'RENAME window_name varchar(30) null',
             ],
-            'KEYS' => [
+            BDb::KEYS => [
                 'IDX_client_window_status' => '(client_id, window_name, status)',
             ],
         ]);
@@ -163,7 +172,7 @@ class FCom_PushServer_Migrate extends BClass
     {
         $tClient = $this->FCom_PushServer_Model_Client->table();
         $this->BDb->ddlTableDef($tClient, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'remote_ip' => 'varchar(45)',
             ]
         ]);

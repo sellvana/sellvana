@@ -27,6 +27,9 @@
  * @property string $api_password_hash
  * @property string $data_serialized
  * @property string $password_session_token
+ * @property FCom_Admin_Model_Personalize $FCom_Admin_Model_Personalize
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ * @property FCom_Core_Main $FCom_Core_Main
  */
 class FCom_Admin_Model_User extends FCom_Core_Model_Abstract
 {

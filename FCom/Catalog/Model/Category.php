@@ -25,6 +25,8 @@
  * DI
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Catalog_Model_CategoryProduct $FCom_Catalog_Model_CategoryProduct
+ * @property FCom_Core_Model_ImportExport_Id $FCom_Core_Model_ImportExport_Id
+ * @property FCom_Core_Model_ImportExport_Site $FCom_Core_Model_ImportExport_Site
  */
 class FCom_Catalog_Model_Category extends FCom_Core_Model_TreeAbstract
 {

@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_SampleData_Migrate
+ *
+ * @property FCom_CatalogIndex_Model_Field $FCom_CatalogIndex_Model_Field
+ * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ */
+
 class FCom_SampleData_Migrate extends BClass
 {
     public function install__0_1_1()

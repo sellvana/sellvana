@@ -11,6 +11,8 @@
  * @property FCom_CustomField_Model_FieldOption $FCom_CustomField_Model_FieldOption
  * @property FCom_ProductReviews_Model_Review $FCom_ProductReviews_Model_Review
  * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
+ * @property FCom_Core_Main $FCom_Core_Main
+ * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
  */
 class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstract_GridForm
 {

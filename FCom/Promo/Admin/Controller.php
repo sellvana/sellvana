@@ -433,6 +433,96 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             ['navButtonAdd', 'caption' => 'Remove', 'buttonicon' => 'ui-icon-trash', 'title' => 'Remove Attachments From Promotion', 'cursor' => 'pointer'],
         ];
     }
+    public function action_coupons_grid_data__POST()
+    {
+        $this->_processGridDataPost('FCom_Promo_Model_Coupon');
+    }
+
+    public function action_coupons_grid_data()
+    {
+        if ($this->BRequest->get('export')) {
+            if ($this->BRequest->csrf('referrer', 'GET')) {
+                $this->BResponse->status('403', 'Invalid referrer', 'Invalid referrer');
+                return;
+            }
+        } else {
+            if (!$this->BRequest->xhr()) {
+                $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+                return;
+            }
+        }
+        $view = $this->couponGridView();
+        $grid = $view->get('grid');
+        $mainTableAlias = 'pc';
+
+        if (isset($grid['config']['data']) && (!empty($grid['config']['data']))) {
+            $data = $grid['config']['data'];
+            $data = $this->gridDataAfter($data);
+            $this->BResponse->json([['c' => 1], $data]);
+        } else {
+            $r = $this->BRequest->get();
+            //TODO: clean up and remove
+            if (empty($grid['config']['orm'])) {
+                $grid['config']['orm'] = $this->FCom_Promo_Model_Coupon->orm($mainTableAlias)
+                    ->select($mainTableAlias . '.*');
+                $view->set('grid', $grid);
+            }
+            if (isset($r['filters'])) {
+                $filters = $this->BUtil->fromJson($r['filters']);
+                if (isset($filters['exclude_id']) && $filters['exclude_id'] != '') {
+                    $arr = explode(',', $filters['exclude_id']);
+                    $grid['config']['orm']->where_not_in($mainTableAlias . '.id', $arr);
+                }
+            }
+
+            $oc = $this->FCom_Promo_Model_Coupon->origClass();
+            if ($this->BRequest->request('export')) {
+                $data = $view->generateOutputData(true);
+                $view->export($data['rows'], $oc);
+            } else {
+
+                //$data = $view->processORM($orm, $oc.'::action_grid_data', $gridId);
+                $data = $view->generateOutputData();
+                $data = $this->gridDataAfter($data);
+                $this->BResponse->json([
+                    ['c' => $data['state']['c']],
+                    $this->BDb->many_as_array($data['rows']),
+                ]);
+            }
+        }
+    }
+
+    /**
+     * @return FCom_Core_View_BackboneGrid
+     */
+    protected function couponGridView()
+    {
+        $gridDataUrl = $this->BApp->href($this->_gridHref . '/coupons_grid_data');
+        $config = [
+            'id' => $this->FCom_Promo_Model_Coupon->origClass(),
+            'orm' => $this->FCom_Promo_Model_Coupon->orm('pc'),
+            'data_url' => $gridDataUrl,
+            'edit_url' => $gridDataUrl,
+            'grid_url' => null,
+            'form_url' => null,
+            'columns' => [
+                ['type' => 'row_select', 'width'=>40],
+                ['name' => 'id', 'label' => 'ID', 'hidden' => true],
+                ['name' => 'code', 'label' => 'Code', 'index' => 'code', 'width' => 400, 'sorttype' => 'string'],
+                ['name' => 'total_used', 'label' => 'Used', 'index' => 'total_used', 'sorttype' => 'number', 'width'=>40],
+                ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]],
+            ],
+            'actions' => [
+                'delete' => true,
+            ],
+            'filters' => [
+                ['field' => 'code', 'type' => 'text'],
+                ['field' => 'total_used', 'type' => 'number-range'],
+            ]
+        ];
+        $view = $this->view($this->_gridViewName)->set('grid',['config' => $config]);
+        return $view;
+    }
 
     public function action_coupons_grid()
     {
@@ -444,91 +534,110 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $this->BResponse->status(400, $html, false);
         } else {
             $status = "success";
-            $gridDataUrl = $this->BApp->href($this->_gridHref . '/coupons_grid_data');
-            $config = [
-                'id' => $this->FCom_Promo_Model_Coupon->origClass(),
-                'orm' => $this->FCom_Promo_Model_Coupon->orm(),
-                'data_url' => $gridDataUrl,
-                'edit_url' => $gridDataUrl,
-                'grid_url' => null,
-                'form_url' => null,
-                'columns' => [
-                    ['type' => 'row_select'],
-                    ['name' => 'id', 'label' => 'ID', 'hidden' => true],
-                    ['name' => 'code', 'label' => 'Code', 'index' => 'code', 'width' => 100,
-                        'editable' => 'inline', 'addable' => true, 'validation' => ['required' => true]],
-                    ['name' => 'uses_per_customer', 'label' => 'Uses Per Customer', 'index' => 'uses_per_customer',
-                                            'editable' => 'inline', 'addable' => true],
-                    ['name' => 'uses_total', 'label' => 'Uses total', 'index' => 'uses_total', 'sorttype' => 'number',
-                                            'editable' => 'inline', 'addable' => true],
-                    //['name' => 'total_used', 'label' => 'Used', 'index' => 'total_used', 'sorttype' => 'number'],
-                    ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]],
-                ],
-                'actions' => [
-                    'delete' => true,
-                    'new' => ['caption' => 'Add New Coupon'],
-                    'edit' => true,
-                ],
-                'data_mode' => 'local',
-                'filters' => [
-                    ['field' => 'code', 'type' => 'text'],
-                    ['field' => 'uses_per_customer', 'type' => 'number-range'],
-                    ['field' => 'uses_total', 'type' => 'number-range'],
-                    //['field' => 'total_used', 'type' => 'number-range'],
-                ]
-            ];
-            $html = $this->view('promo/coupons/grid')->set('grid',['config' => $config])->render();
+            $html = $this->couponGridView()->render();
         }
         $this->BResponse->json(['status' => $status, 'html'=>$html]);
-    }
-    public function action_coupons_generate__POST()
-    {
-        $r = $this->BRequest;
-        $id = $r->get('id');
-        if (!$id) {
-            $message = $this->_("Promotion id not found");
-            $this->BResponse->status(400, $message, false);
-        } else {
-            $data = $r->post('model');
-            $pattern = isset($data['code_pattern'])?$data['code_pattern']:null;
-            $length = isset($data['code_length'])?$data['code_length']:8;
-            $usesPerCustomer = isset($data['code_uses_per_customer'])?$data['code_uses_per_customer']:1;
-            $usesTotal = isset($data['code_uses_total'])?$data['code_uses_total']:1;
-            $couponCount = isset($data['coupon_count'])?$data['coupon_count']:1;
-            $model = $this->FCom_Promo_Model_Coupon;
-            $generated = $model->generateCoupons([
-                'promo_id' => $id,
-                'pattern' => $pattern,
-                'length' => $length,
-                'uses_per_customer' => $usesPerCustomer,
-                'uses_total' => $usesTotal,
-                'count' => $couponCount
-            ]);
-            $status = 'success';
-            $message = $this->_("%d coupons generated.", [$generated]);
-            if($generated < $couponCount){
-                $status = 'warning';
-                $message .= $this->_("\nFailed to generate %d coupons", ($couponCount - $generated));
-            }
-            $this->BResponse->json(['status'=>$status, 'message'=>$message]);
-        }
     }
     public function action_coupons_generate()
     {
         $r = $this->BRequest;
+
         $id = $r->get('id');
+        $data = $r->get('model');
         if (!$id) {
-            $html = $this->_("Promotion id not found");
+            $message = $this->_("Promotion id not found");
             $status = 'error';
-            $this->BResponse->status(400, $html, false);
+            $this->BResponse->status(400, $message, false);
+        } else if (empty($data)) {
+            $status = "error";
+            $message = $this->_("No data received.");
+            $this->BResponse->status(400, $message, $message);
         } else {
-            /*
-             * maybe ditch the template and go for json response?
-             */
-            $status = "success";
-            $html = $this->view('promo/coupons/generate')->render();
+            $pattern = isset($data['code_pattern'])? $data['code_pattern']: null;
+            $length = isset($data['code_length'])? $data['code_length']: 8;
+            $usesPerCustomer = isset($data['code_uses_per_customer'])? $data['code_uses_per_customer']: 1;
+            $usesTotal = isset($data['code_uses_total'])? $data['code_uses_total']: 1;
+            $couponCount = isset($data['coupon_count'])? $data['coupon_count']: 1;
+            $model = $this->FCom_Promo_Model_Coupon;
+            $generated = $model->generateCoupons([
+                 'promo_id' => $id,
+                 'pattern' => $pattern,
+                 'length' => $length,
+                 'uses_per_customer' => $usesPerCustomer,
+                 'uses_total' => $usesTotal,
+                 'count' => $couponCount
+             ]);
+            $status = 'success';
+            $message = $this->_("%d coupons generated.", $generated['generated']);
+            if ($generated < $couponCount) {
+                $status = 'warning';
+                $message .= $this->_("\nFailed to generate %d coupons", $generated['failed']);
+            }
         }
-        $this->BResponse->json(['status' => $status, 'html' => $html]);
+        $this->BResponse->json(['status' => $status, 'message' => $message]);
+    }
+
+    public function action_coupons_import__POST()
+    {
+        $id = $this->BRequest->get('id');
+        if (!$id) {
+            $message = $this->_("Promotion id not found");
+            $this->BResponse->status(400, $message, $message);
+            return;
+        }
+        if (empty($_FILES) || !isset($_FILES['upload'])) {
+            $this->BResponse->json(['msg' => "Nothing found"]);
+            return;
+        }
+        $this->BResponse->setContentType('application/json');
+        /** @var FCom_Promo_Model_Coupon $importer */
+        $importer = $this->FCom_Promo_Model_Coupon;
+        $uploads = $_FILES['upload'];
+        $rows = [];
+        try {
+            foreach ($uploads['name'] as $i => $fileName) {
+                $error = false;
+                if (!$fileName) {
+                    continue;
+                }
+                $fileName = preg_replace('/[^\w\d_.-]+/', '_', $fileName);
+                $path = $this->BApp->storageRandomDir() . '/import/coupons';
+                $this->BUtil->ensureDir($path);
+                $fullFileName = $path . '/' . trim($fileName, '\\/');
+                $realpath = str_replace('\\', '/', realpath(dirname($file)));
+
+                $this->BUtil->ensureDir(dirname($fullFileName));
+                $fileSize = 0;
+                if (strpos($realpath, $path) !== 0) {
+                    $error = $this->_("Weird file path.");
+                } else if ($uploads['error'][$i]) {
+                    $error = $uploads['error'][$i];
+                } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
+                    $error = $this->_("Problem storing uploaded file.");
+                } elseif ($importer->validateImportFile($fullFileName)) {
+                    $this->BResponse->startLongResponse(false);
+                    $importer->importFromFile($fileName, $id);
+                    $error = '';
+                    $fileSize = $uploads['size'][$i];
+                } else {
+                    $error = $this->_("Invalid import file.");
+                }
+
+                $row = [
+                    'name' => $fileName,
+                    'size' => $fileSize,
+                    'folder' => '.../',
+                ];
+                if ($error) {
+                    $row['error'] = $error;
+                }
+                $rows[] = $row;
+            }
+        } catch(Exception $e) {
+            $this->BDebug->logException($e);
+            $this->BResponse->json(['error' => $e->getMessage()]);
+        }
+        $this->BResponse->json(['files' => $rows]);
     }
 
     public function action_coupons_import()
@@ -540,9 +649,21 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $status = 'error';
             $this->BResponse->status(400, $html, false);
         } else {
+            $m = [
+                'config' => ['max_import_file_size' => $this->_getMaxUploadSize(), 'promoId' => $id],
+            ];
+
             $status = "success";
-            $html = $this->view('promo/coupons/import')->render();
+            $html = $this->view('promo/coupons/import')->set('model', $m)->render();
         }
         $this->BResponse->json(['status' => $status, 'html' => $html]);
+    }
+
+    protected function _getMaxUploadSize()
+    {
+        $p = ini_get('post_max_size');
+        $u = ini_get('upload_max_filesize');
+        $max = min($p, $u);
+        return $max;
     }
 }

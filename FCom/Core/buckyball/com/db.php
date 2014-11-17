@@ -29,6 +29,12 @@
 */
 class BDb
 {
+    const COLUMNS = 'COLUMNS',
+        PRIMARY = 'PRIMARY',
+        CONSTRAINTS = 'CONSTRAINTS',
+        KEYS = 'KEYS',
+        OPTIONS = 'OPTIONS',
+        DROP = 'DROP';
     /**
     * Collection of cached named DB connections
     *
@@ -669,7 +675,7 @@ EOT
      * BDb::ddlTableColumns('my_table', array(
      *   'field_to_create' => 'varchar(255) not null',
      *   'field_to_update' => 'decimal(12,2) null',
-     *   'field_to_drop'   => 'DROP',
+     *   'field_to_drop'   => BDb::DROP,
      * ));
      *
      * @param string $fullTableName
@@ -2439,7 +2445,7 @@ class BModel extends Model
     *
     * @param null|array $data
     * @param boolean $new is new record
-    * @return static
+    * @return BModel
     */
     public static function create($data = null, $new = true)
     {

@@ -1,12 +1,37 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Migrate
+ *
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Sales_Migrate_Model_Cart_Address $FCom_Sales_Migrate_Model_Cart_Address
+ * @property FCom_Sales_Migrate_Model_Order_Address $FCom_Sales_Migrate_Model_Order_Address
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Sales_Model_Cart_Item $FCom_Sales_Model_Cart_Item
+ * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
+ * @property FCom_Sales_Model_Order_Comment $FCom_Sales_Model_Order_Comment
+ * @property FCom_Sales_Model_Order_History $FCom_Sales_Model_Order_History
+ * @property FCom_Sales_Model_Order_Item $FCom_Sales_Model_Order_Item
+ * @property FCom_Sales_Model_Order_Payment $FCom_Sales_Model_Order_Payment
+ * @property FCom_Sales_Model_Order_Payment_Item $FCom_Sales_Model_Order_Payment_Item
+ * @property FCom_Sales_Model_Order_Refund $FCom_Sales_Model_Order_Refund
+ * @property FCom_Sales_Model_Order_Refund_Item $FCom_Sales_Model_Order_Refund_Item
+ * @property FCom_Sales_Model_Order_Return $FCom_Sales_Model_Order_Return
+ * @property FCom_Sales_Model_Order_Return_Item $FCom_Sales_Model_Order_Return_Item
+ * @property FCom_Sales_Model_Order_Shipment $FCom_Sales_Model_Order_Shipment
+ * @property FCom_Sales_Model_Order_Shipment_Item $FCom_Sales_Model_Order_Shipment_Item
+ * @property FCom_Sales_Model_Order_Cancel $FCom_Sales_Model_Order_Cancel
+ * @property FCom_Sales_Model_Order_Cancel_Item $FCom_Sales_Model_Order_Cancel_Item
+ * @property FCom_Sales_Model_StateCustom $FCom_Sales_Model_StateCustom
+ */
+
 class FCom_Sales_Migrate extends BClass
 {
     public function install__0_2_14()
     {
         $tOrder = $this->FCom_Sales_Model_Order->table();
         $this->BDb->ddlTableDef($tOrder, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
                 'customer_id' => "int(10) unsigned DEFAULT NULL",
                 'customer_email' => "varchar(100) DEFAULT NULL",
@@ -33,15 +58,15 @@ class FCom_Sales_Migrate extends BClass
                 'state_payment' => "varchar(15) not null default 'new'",
                 'state_custom' => "varchar(15) not null default ''",
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_cart_id' => 'UNIQUE (cart_id)',
             ],
         ]);
 
         $tOrderItem = $this->FCom_Sales_Model_Order_Item->table();
         $this->BDb->ddlTableDef($tOrderItem, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
                 'order_id' => "int(10) unsigned DEFAULT NULL",
                 'product_id' => "int(10) unsigned DEFAULT NULL",
@@ -49,15 +74,15 @@ class FCom_Sales_Migrate extends BClass
                 'total' => "decimal(12,2) NOT NULL DEFAULT '0.0000'",
                 'product_info' => "text",
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
                 'cart' => ['order_id', $tOrder],
             ],
         ]);
         /*
         $tOrderAddress = $this->FCom_Sales_Model_Order_Address->table();
         $this->BDb->ddlTableDef($tOrderAddress, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
                 'order_id' => "int(11) unsigned NOT NULL",
                 'atype' => "ENUM( 'shipping', 'billing' ) NOT NULL DEFAULT 'shipping'",
@@ -82,8 +107,8 @@ class FCom_Sales_Migrate extends BClass
                 'lat' => "decimal(15,10) DEFAULT NULL",
                 'lng' => "decimal(15,10) DEFAULT NULL",
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
                 'cart' => ['order_id', $tOrder],
             ],
         ]);
@@ -91,12 +116,12 @@ class FCom_Sales_Migrate extends BClass
         /*
         $tStatus = $this->FCom_Sales_Model_Order_CustomStatus->table();
         $this->BDb->ddlTableDef($tStatus, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
                 'name' => "varchar(50) NOT NULL DEFAULT ''",
                 'code' => "varchar(50) NOT NULL DEFAULT ''",
             ],
-            'PRIMARY' => '(id)',
+            BDb::PRIMARY => '(id)',
         ]);
         $this->BDb->run("
             insert into {$tStatus} (id,name,code) values(1, 'New', 'new'),(2,'Pending','pending'),(3,'Paid','paid')
@@ -108,7 +133,7 @@ class FCom_Sales_Migrate extends BClass
         //$tCartAddress = $this->FCom_Sales_Model_Cart_Address->table();
 
         $this->BDb->ddlTableDef($tCart, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
                 'item_qty' => "decimal(12,2) NOT NULL DEFAULT '0.0000'",
                 'item_num' => "smallint(6) unsigned NOT NULL DEFAULT '0'",
@@ -133,8 +158,8 @@ class FCom_Sales_Migrate extends BClass
                 'admin_id' => "int(10) unsigned  NULL",
                 'same_address' => "tinyint(1) not null default 0",
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_cookie_token' => 'UNIQUE (cookie_token)',
                 'customer_id' => "(`customer_id`)",
                 'status' => "(`status`)",
@@ -142,7 +167,7 @@ class FCom_Sales_Migrate extends BClass
         ]);
 
         $this->BDb->ddlTableDef($tCartItem, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
                 'cart_id' => "int(10) unsigned DEFAULT NULL",
                 'product_id' => "int(10) unsigned DEFAULT NULL",
@@ -163,17 +188,17 @@ class FCom_Sales_Migrate extends BClass
                 'update_at' => "DATETIME NOT NULL",
                 'data_serialized' => "text  NULL",
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'cart_id' => "UNIQUE (`cart_id`,`product_id`)",
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'cart' => ['cart_id', $tCart],
             ],
         ]);
         /*
         $this->BDb->ddlTableDef($tCartAddress, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
                 'cart_id' => "int(11) unsigned NOT NULL",
                 'atype' => "ENUM( 'shipping', 'billing' ) NOT NULL DEFAULT 'shipping'",
@@ -199,15 +224,15 @@ class FCom_Sales_Migrate extends BClass
                 'lat' => "decimal(15,10) DEFAULT NULL",
                 'lng' => "decimal(15,10) DEFAULT NULL",
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
                 'cart' => ['cart_id', $tCart],
             ],
         ]);
         */
         $tOrderPayment = $this->FCom_Sales_Model_Order_Payment->table();
         $this->BDb->ddlTableDef($tOrderPayment, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id'               => 'int (10) unsigned not null auto_increment',
                 'create_at'        => 'datetime not null',
                 'update_at'        => 'datetime null',
@@ -221,15 +246,15 @@ class FCom_Sales_Migrate extends BClass
                 'transaction_type' => 'varchar(50)',
                 'online'           => 'BOOL',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS'  => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS  => [
                 'method'           => '(method)',
                 'order_id'         => '(order_id)',
                 'status'           => '(status)',
                 'transaction_id'   => '(transaction_id)',
                 'transaction_type' => '(transaction_type)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'RESTRICT'],
             ],
         ]);
@@ -239,7 +264,7 @@ class FCom_Sales_Migrate extends BClass
     {
         $tOrder = $this->FCom_Sales_Model_Order->table();
         $this->BDb->ddlTableDef($tOrder, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'created_dt' => 'datetime NULL',
                 'purchased_dt' => 'datetime NULL',
             ]
@@ -250,7 +275,7 @@ class FCom_Sales_Migrate extends BClass
     {
         $tOrder = $this->FCom_Sales_Model_Order->table();
         $this->BDb->ddlTableDef($tOrder, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'gt_base' => 'decimal(10,2) NOT NULL',
             ],
         ]);
@@ -259,7 +284,7 @@ class FCom_Sales_Migrate extends BClass
     public function upgrade__0_1_3__0_1_4()
     {
         $tOrder = $this->FCom_Sales_Model_Order->table();
-        $this->BDb->ddlTableDef($tOrder, ['COLUMNS' => [
+        $this->BDb->ddlTableDef($tOrder, [BDb::COLUMNS => [
             'status' => "enum('new', 'paid', 'pending') not null default 'new'",
         ]]);
     }
@@ -267,7 +292,7 @@ class FCom_Sales_Migrate extends BClass
     public function upgrade__0_1_4__0_1_5()
     {
         $tOrder = $this->FCom_Sales_Model_Order->table();
-        $this->BDb->ddlTableDef($tOrder, ['COLUMNS' => [
+        $this->BDb->ddlTableDef($tOrder, [BDb::COLUMNS => [
             'shipping_service_title' => "varchar(100) not null default ''"
         ]]);
     }
@@ -277,12 +302,12 @@ class FCom_Sales_Migrate extends BClass
         /*
         $tStatus = $this->FCom_Sales_Model_Order_CustomStatus->table();
         $this->BDb->ddlTableDef($tStatus, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
                 'name' => "varchar(50) NOT NULL DEFAULT '' ",
                 'code' => "varchar(50) NOT NULL DEFAULT ''",
             ],
-            'PRIMARY' => '(`id`)',
+            BDb::PRIMARY => '(`id`)',
         ]);
         */
     }
@@ -320,7 +345,7 @@ class FCom_Sales_Migrate extends BClass
     {
         /*
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Order_Address->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'state' => 'RENAME region varchar(50)',
                 'zip' => 'RENAME postcode varchar(20)',
             ],
@@ -336,7 +361,7 @@ class FCom_Sales_Migrate extends BClass
         //$tCartAddress = $this->FCom_Sales_Model_Cart_Address->table();
 
         $this->BDb->ddlTableDef($tCart, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
                 'company_id' => "int(10) unsigned DEFAULT NULL",
                 'location_id' => "int(10) unsigned DEFAULT NULL",
@@ -359,8 +384,8 @@ class FCom_Sales_Migrate extends BClass
                 'create_dt' => "DATETIME NULL",
                 'update_dt' => "DATETIME NULL",
             ],
-            'PRIMARY' => '(`id`)',
-            'KEYS' => [
+            BDb::PRIMARY => '(`id`)',
+            BDb::KEYS => [
                 'session_id' => "UNIQUE (`session_id`)",
                 'UNQ_user_id' => "UNIQUE (`user_id`,`description`,`session_id`)",
                 'company_id' => "(`company_id`)",
@@ -368,7 +393,7 @@ class FCom_Sales_Migrate extends BClass
         ]);
 
         $this->BDb->ddlTableDef($tCartItem, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
                 'cart_id' => "int(10) unsigned DEFAULT NULL",
                 'product_id' => "int(10) unsigned DEFAULT NULL",
@@ -384,17 +409,17 @@ class FCom_Sales_Migrate extends BClass
                 'create_dt' => "DATETIME NOT NULL",
                 'update_dt' => "DATETIME NOT NULL",
             ],
-            'PRIMARY' => '(`id`)',
-            'KEYS' => [
+            BDb::PRIMARY => '(`id`)',
+            BDb::KEYS => [
                 'UNQ_cart_id' => "UNIQUE (`cart_id`,`product_id`)",
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'cart' => ['cart_id', $tCart],
             ],
         ]);
         /*
         $this->BDb->ddlTableDef($tCartAddress, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
                 'cart_id' => "int(11) unsigned NOT NULL",
                 'atype' => "ENUM( 'shipping', 'billing' ) NOT NULL DEFAULT 'shipping'",
@@ -416,8 +441,8 @@ class FCom_Sales_Migrate extends BClass
                 'lat' => "decimal(15,10) DEFAULT NULL",
                 'lng' => "decimal(15,10) DEFAULT NULL",
             ],
-            'PRIMARY' => '(`id`)',
-            'CONSTRAINTS' => [
+            BDb::PRIMARY => '(`id`)',
+            BDb::CONSTRAINTS => [
                 'cart' => ['cart_id', $tCart],
             ],
         ]);
@@ -427,21 +452,21 @@ class FCom_Sales_Migrate extends BClass
     public function upgrade__0_2_0__0_2_1()
     {
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Cart->table(), [
-            'KEYS' => [
-                'NewIndex1' => 'DROP',
-                'user_id' => 'DROP',
+            BDb::KEYS => [
+                'NewIndex1' => BDb::DROP,
+                'user_id' => BDb::DROP,
             ],
         ]);
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Cart->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'data_serialized' => 'text',
-                'company_id' => 'DROP',
-                'location_id' => 'DROP',
-                'description' => 'DROP',
-                'user_id' => 'DROP',
-                'totals_json' => 'DROP',
-                'calc_balance' => 'DROP',
-                'sort_order' => 'DROP',
+                'company_id' => BDb::DROP,
+                'location_id' => BDb::DROP,
+                'description' => BDb::DROP,
+                'user_id' => BDb::DROP,
+                'totals_json' => BDb::DROP,
+                'calc_balance' => BDb::DROP,
+                'sort_order' => BDb::DROP,
                 'discount_code' => 'RENAME coupon_code varchar(50) null',
                 'customer_id' => 'int unsigned not null after session_id',
                 'customer_email' => 'varchar(100) null after customer_id',
@@ -450,7 +475,7 @@ class FCom_Sales_Migrate extends BClass
                 'grand_total' => 'decimal(12,2) not null default 0 after discount_amount',
                 'status' => "varchar(10) not null default 'new'",
             ],
-            'KEYS' => [
+            BDb::KEYS => [
                 'session_id' => '(session_id)',
                 'customer_id' => '(customer_id)',
                 'status' => '(status)',
@@ -458,7 +483,7 @@ class FCom_Sales_Migrate extends BClass
         ]);
 
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Cart_Item->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'product_sku' => 'varchar(100) null after product_id',
                 'product_name' => 'varchar(255) null after product_sku',
                 'tax' => 'decimal(12,2) not null default 0 after rowtotal',
@@ -468,14 +493,14 @@ class FCom_Sales_Migrate extends BClass
         ]);
         /*
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Cart_Address->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'state' => 'RENAME region varchar(50)',
                 'zip' => 'RENAME postcode varchar(20)',
             ],
         ]);
         */
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Order->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'user_id' => 'RENAME customer_id int unsigned null',
                 'discount_code' => 'RENAME coupon_code varchar(50) null',
                 //'tax' => 'decimal(10,2) null'??
@@ -487,7 +512,7 @@ class FCom_Sales_Migrate extends BClass
     public function upgrade__0_2_1__0_2_2()
     {
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Cart->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'last_calc_at' => 'int unsigned',
             ],
         ]);
@@ -503,7 +528,7 @@ class FCom_Sales_Migrate extends BClass
             ");
         }
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Cart_Address->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'middle_initial' => 'VARCHAR(2) NULL AFTER lastname',
                 'prefix' => 'VARCHAR(10) NULL AFTER middle_initial',
                 'suffix' => 'VARCHAR(10) NULL AFTER prefix',
@@ -511,7 +536,7 @@ class FCom_Sales_Migrate extends BClass
             ],
         ]);
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Order_Address->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'middle_initial' => 'VARCHAR(2) NULL AFTER lastname',
                 'prefix' => 'VARCHAR(10) NULL AFTER middle_initial',
                 'suffix' => 'VARCHAR(10) NULL AFTER prefix',
@@ -521,7 +546,7 @@ class FCom_Sales_Migrate extends BClass
 
         */
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Order->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'customer_email' => 'VARCHAR(100) NULL AFTER customer_id',
             ],
         ]);
@@ -532,17 +557,17 @@ class FCom_Sales_Migrate extends BClass
         // todo update created at fields
 
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Order->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'created_dt' => 'RENAME created_at datetime DEFAULT NULL',
                 'purchased_dt' => 'RENAME updated_at datetime DEFAULT NULL',
                 'gt_base' => 'RENAME grandtotal decimal(12,2) NOT NULL',
                 'tax' => 'decimal(10,2) NULL',
                 'unique_id' => 'varchar(15) NOT NULL',
                 'status' => 'varchar(50) NOT NULL',
-                'shippping_service' => 'DROP',
-                'payment_details' => 'DROP',
-                'status_id' => 'DROP',
-                'totals_json' => 'DROP',
+                'shippping_service' => BDb::DROP,
+                'payment_details' => BDb::DROP,
+                'status_id' => BDb::DROP,
+                'totals_json' => BDb::DROP,
             ],
         ]);
     }
@@ -554,14 +579,14 @@ class FCom_Sales_Migrate extends BClass
            //$this->FCom_Sales_Model_Order_Address->table(),
         ] as $table) {
             $this->BDb->ddlTableDef($table, [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'create_dt' => 'RENAME create_at datetime NOT NULL',
                     'update_dt' => 'RENAME update_at datetime NOT NULL',
                 ],
             ]);
         }
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Cart->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'create_dt' => 'RENAME create_at datetime NULL',
                 'update_dt' => 'RENAME update_at datetime NULL',
             ],
@@ -572,7 +597,7 @@ class FCom_Sales_Migrate extends BClass
     {
 
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Order->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'created_at' => 'RENAME create_at datetime DEFAULT NULL',
                 'updated_at' => 'RENAME update_at datetime DEFAULT NULL',
             ],
@@ -584,7 +609,7 @@ class FCom_Sales_Migrate extends BClass
         $tOrder = $this->FCom_Sales_Model_Order->table();
         $tOrderPayment = $this->FCom_Sales_Model_Order_Payment->table();
         $this->BDb->ddlTableDef($tOrderPayment, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id'               => 'int (10) unsigned not null auto_increment',
                 'create_at'        => 'datetime not null',
                 'update_at'        => 'datetime null',
@@ -598,15 +623,15 @@ class FCom_Sales_Migrate extends BClass
                 'transaction_type' => 'varchar(50)',
                 'online'           => 'BOOL',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS'  => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS  => [
                 'method'           => '(method)',
                 'order_id'         => '(order_id)',
                 'status'           => '(status)',
                 'transaction_id'   => '(transaction_id)',
                 'transaction_type' => '(transaction_type)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'RESTRICT'],
             ],
         ]);
@@ -615,13 +640,13 @@ class FCom_Sales_Migrate extends BClass
     public function upgrade__0_2_7__0_2_8()
     {
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Order->table(), [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'admin_id' => 'int(10) unsigned NOT NULL',
                 ],
             ]);
 
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Cart->table(), [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'admin_id' => 'int(10) unsigned NOT NULL',
                 ],
             ]);
@@ -630,7 +655,7 @@ class FCom_Sales_Migrate extends BClass
     public function upgrade__0_2_8__0_2_9()
     {
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Cart->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'customer_id' => 'int unsigned null',
                 'shipping_method' => 'varchar(50) null',
                 'shipping_price' => 'decimal(10,2) null',
@@ -645,7 +670,7 @@ class FCom_Sales_Migrate extends BClass
     public function upgrade__0_2_9__0_2_10()
     {
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Order->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'shipping_method' => 'varchar(50) null',
                 'shipping_service' => 'varchar(50) null',
                 'shipping_service_title' => 'varchar(100) null',
@@ -658,7 +683,7 @@ class FCom_Sales_Migrate extends BClass
     public function upgrade__0_2_10__0_2_11()
     {
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Cart->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'coupon_code' => 'varchar(50) DEFAULT NULL',
                 'promo_id_buy' => 'VARCHAR(50) DEFAULT NULL',
                 'promo_id_get' => 'INT(10) UNSIGNED DEFAULT NULL',
@@ -671,13 +696,13 @@ class FCom_Sales_Migrate extends BClass
     public function upgrade__0_2_11__0_2_12()
     {
         $this->BDb->ddlTableDef($this->FCom_Sales_Model_Cart->table(), [
-            'COLUMNS' => [
-                'session_id' => 'DROP',
+            BDb::COLUMNS => [
+                'session_id' => BDb::DROP,
                 'cookie_token' => 'varchar(40) default null after grand_total',
                 'status' => "varchar(10) default 'new'",
             ],
-            'KEYS' => [
-                'session_id' => 'DROP',
+            BDb::KEYS => [
+                'session_id' => BDb::DROP,
                 'UNQ_cookie_token' => 'UNIQUE (cookie_token)',
                 'IDX_status_cookie_token' => '(`status`, cookie_token)',
             ],
@@ -688,14 +713,14 @@ class FCom_Sales_Migrate extends BClass
     {
         $tCart = $this->FCom_Sales_Model_Cart->table();
         $this->BDb->ddlTableDef($tCart, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'same_address' => "tinyint(1) not null default 0",
             ],
         ]);
 
         $tOrder= $this->FCom_Sales_Model_Order->table();
         $this->BDb->ddlTableDef($tOrder, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'same_address' => "tinyint(1) not null default 0",
             ],
         ]);
@@ -720,7 +745,7 @@ class FCom_Sales_Migrate extends BClass
         $tStateCustom = $this->FCom_Sales_Model_StateCustom->table();
 
         $this->BDb->ddlTableDef($tCart, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'status' => "RENAME state_overall varchar(10) not null default ''",
 
                 'billing_company' => 'varchar(50)',
@@ -750,7 +775,7 @@ class FCom_Sales_Migrate extends BClass
         ]);
 
         $this->BDb->ddlTableDef($tOrder, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'billing_company' => 'varchar(50)',
                 'billing_attn' => 'varchar(50)',
                 'billing_firstname' => 'varchar(50)',
@@ -787,7 +812,7 @@ class FCom_Sales_Migrate extends BClass
         ]);
 
         $this->BDb->ddlTableDef($tOrderItem, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'data_serialized' => 'text null',
 
                 'qty_ordered' => 'int not null',
@@ -804,7 +829,7 @@ class FCom_Sales_Migrate extends BClass
         ]);
 
         $this->BDb->ddlTableDef($tOrderShipment, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
                 'state_overall' => "varchar(10) not null default 'new'",
@@ -826,32 +851,32 @@ class FCom_Sales_Migrate extends BClass
                 'delivered_at' => 'datetime',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_state_overall' => '(state_overall)',
                 'IDX_state_custom' => '(state_custom)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tOrderShipmentItem, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned not null',
                 'order_item_id' => 'int unsigned not null',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder],
                 'order_item' => ['order_item_id', $tOrderItem],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tOrderPayment, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'order_id'         => 'int unsigned not null',
                 'method'           => 'RENAME payment_method varchar(50) not null',
                 'amount'           => 'RENAME amount_authorized decimal(12,2)',
@@ -864,12 +889,12 @@ class FCom_Sales_Migrate extends BClass
                 'transaction_fee'  => 'decimal(12,2)',
                 'data_serialized'  => 'text',
             ],
-            'KEYS'  => [
-                'method'           => 'DROP',
-                'order_id'         => 'DROP',
-                'status'           => 'DROP',
-                'transaction_id'   => 'DROP',
-                'transaction_type' => 'DROP',
+            BDb::KEYS  => [
+                'method'           => BDb::DROP,
+                'order_id'         => BDb::DROP,
+                'status'           => BDb::DROP,
+                'transaction_id'   => BDb::DROP,
+                'transaction_type' => BDb::DROP,
 
                 'IDX_method_status' => '(payment_method, transaction_status)',
                 'IDX_order'         => '(order_id)',
@@ -881,85 +906,85 @@ class FCom_Sales_Migrate extends BClass
         ]);
 
         $this->BDb->ddlTableDef($tOrderPaymentItem, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
                 'order_item_id' => 'int unsigned not null',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder],
                 'order_item' => ['order_item_id', $tOrderItem],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tOrderReturn, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
                 'state_overall' => "varchar(10) not null default 'new'",
                 'state_custom' => "varchar(10) not null default ''",
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_state_overall' => '(state_overall)',
                 'IDX_state_custom' => '(state_custom)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tOrderReturnItem, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned not null',
                 'order_item_id' => 'int unsigned not null',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder],
                 'order_item' => ['order_item_id', $tOrderItem],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tOrderRefund, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
                 'state_overall' => "varchar(10) not null default 'new'",
                 'state_custom' => "varchar(10) not null default ''",
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_state_overall' => '(state_overall)',
                 'IDX_state_custom' => '(state_custom)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tOrderRefundItem, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned not null',
                 'order_item_id' => 'int unsigned not null',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder],
                 'order_item' => ['order_item_id', $tOrderItem],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tOrderHistory, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
                 // order, item, shipment, payment, refund, return
@@ -974,14 +999,14 @@ class FCom_Sales_Migrate extends BClass
                 'user_id' => 'int unsigned default null',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_event_at' => '(event_at)',
                 'IDX_order_id' => '(order_id, event_at)',
                 'IDX_entity_type_id' => '(entity_type, entity_id, event_at)',
                 'IDX_event_type_at' => '(event_type, event_at)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder],
                 'order_item' => ['order_item_id', $tOrderItem, 'id', 'CASCADE', 'SET NULL'],
                 'user' => ['user_id', $tUser, 'id', 'CASCADE', 'SET NULL'],
@@ -989,7 +1014,7 @@ class FCom_Sales_Migrate extends BClass
         ]);
 
         $this->BDb->ddlTableDef($tOrderComment, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'order_id' => 'int unsigned default null',
                 'comment_text' => 'text',
@@ -1000,19 +1025,19 @@ class FCom_Sales_Migrate extends BClass
                 'update_at' => 'datetime',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_order_create' => '(order_id, create_at)',
                 'IDX_admin_user' => '(from_admin, user_id)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder],
                 'user' => ['user_id', $tUser, 'id', 'CASCADE', 'SET NULL'],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tStateCustom, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'entity_type' => 'varchar(15) not null',
                 'state_code' => 'varchar(20) not null',
@@ -1020,7 +1045,7 @@ class FCom_Sales_Migrate extends BClass
                 'concrete_class' => 'varchar(100) null',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
+            BDb::PRIMARY => '(id)',
         ]);
         /*
         $tCartAddress = $this->FCom_Sales_Migrate_Model_Cart_Address->table();
@@ -1077,7 +1102,7 @@ class FCom_Sales_Migrate extends BClass
         $tOrderItem = $this->FCom_Sales_Model_Order_Item->table();
 
         $this->BDb->ddlTableDef($tCartItem, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'product_sku' => 'varchar(100) not null',
                 'inventory_sku' => 'varchar(100) default null after product_sku',
                 'parent_item_id' => 'int unsigned default null',
@@ -1086,17 +1111,17 @@ class FCom_Sales_Migrate extends BClass
                 'pack_separate' => 'tinyint not null default 0',
                 'unique_hash' => 'bigint default null',
             ],
-            'KEYS' => [
-                'cart_id' => 'DROP',
+            BDb::KEYS => [
+                'cart_id' => BDb::DROP,
                 'IDX_cart_product_separate_hash' => '(cart_id, product_id, pack_separate, unique_hash)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'parent_item' => ['parent_item_id', $tCartItem],
             ],
         ]);
 
         $this->BDb->ddlTableDef($tOrderItem, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'cart_item_id' => 'int unsigned default null',
                 'product_sku' => 'varchar(100) default null',
                 'stock_sku' => 'varchar(100) default null',
@@ -1104,8 +1129,99 @@ class FCom_Sales_Migrate extends BClass
                 'shipping_size' => 'varchar(30)',
                 'shipping_weight' => 'decimal(12,2)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'parent_item' => ['parent_item_id', $tOrderItem],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_1__0_3_2()
+    {
+        $tOrder             = $this->FCom_Sales_Model_Order->table();
+        $tOrderItem         = $this->FCom_Sales_Model_Order_Item->table();
+        $tOrderCancel       = $this->FCom_Sales_Model_Order_Cancel->table();
+        $tOrderCancelItem   = $this->FCom_Sales_Model_Order_Cancel_Item->table();
+        $tOrderPayment      = $this->FCom_Sales_Model_Order_Payment->table();
+        $tOrderPaymentItem  = $this->FCom_Sales_Model_Order_Payment_Item->table();
+        $tOrderShipment     = $this->FCom_Sales_Model_Order_Shipment->table();
+        $tOrderShipmentItem = $this->FCom_Sales_Model_Order_Shipment_Item->table();
+        $tOrderReturn       = $this->FCom_Sales_Model_Order_Return->table();
+        $tOrderReturnItem   = $this->FCom_Sales_Model_Order_Return_Item->table();
+        $tOrderRefund       = $this->FCom_Sales_Model_Order_Refund->table();
+        $tOrderRefundItem   = $this->FCom_Sales_Model_Order_Refund_Item->table();
+
+        $this->BDb->ddlTableDef($tOrderCancel, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned default null',
+                'state_overall' => "varchar(10) not null default 'new'",
+                'state_custom' => "varchar(10) not null default ''",
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_state_overall' => '(state_overall)',
+                'IDX_state_custom' => '(state_custom)',
+            ],
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderCancelItem, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned not null',
+                'cancel_id' => 'int unsigned not null',
+                'order_item_id' => 'int unsigned not null',
+                'qty' => 'int unsigned not null',
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+                'cancel' => ['cancel_id', $tOrderCancel],
+                'order_item' => ['order_item_id', $tOrderItem],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderPaymentItem, [
+            BDb::COLUMNS => [
+                'payment_id' => 'int unsigned not null after order_id',
+                'qty' => 'int unsigned not null after payment_id',
+            ],
+            BDb::CONSTRAINTS => [
+                'payment' => ['payment_id', $tOrderPayment],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderShipmentItem, [
+            BDb::COLUMNS => [
+                'shipment_id' => 'int unsigned not null after order_id',
+                'qty' => 'int unsigned not null after shipment_id',
+            ],
+            BDb::CONSTRAINTS => [
+                'shipment' => ['shipment_id', $tOrderShipment],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderReturnItem, [
+            BDb::COLUMNS => [
+                'return_id' => 'int unsigned not null after order_id',
+                'qty' => 'int unsigned not null after return_id',
+            ],
+            BDb::CONSTRAINTS => [
+                'return' => ['return_id', $tOrderReturn],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderRefundItem, [
+            BDb::COLUMNS => [
+                'refund_id' => 'int unsigned not null after order_id',
+                'qty' => 'int unsigned not null after refund_id',
+            ],
+            BDb::CONSTRAINTS => [
+                'refund' => ['refund_id', $tOrderRefund],
             ],
         ]);
     }

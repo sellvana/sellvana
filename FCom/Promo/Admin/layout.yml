@@ -11,3 +11,4 @@ promo_form_tabs:
 
 /promo/form:
     - { include: promo_form_tabs }
+

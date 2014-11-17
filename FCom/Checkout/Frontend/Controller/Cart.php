@@ -6,6 +6,7 @@
  * Uses:
  * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
  * @property FCom_Sales_Main $FCom_Sales_Main
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  */
 class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Abstract
 {

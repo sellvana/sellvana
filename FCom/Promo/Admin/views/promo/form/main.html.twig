@@ -45,7 +45,7 @@
             id: "model-date_range", help_icon: 1, help_text: 'Date Range'|_ }) }}
         <div id="testbed"></div>
         <script type="text/javascript">
-            require(['jquery', 'moment', 'daterangepicker'], function ($) {
+            require(['jquery', 'moment', 'daterangepicker', 'bootstrap'], function ($) {
                 var startDate = new Date();
                 var s = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate();
                 $('#model-date_range').daterangepicker(
@@ -54,12 +54,17 @@
                         startDate: s
                     }
                 );
+                var $help = $('.help-icon');
+                $help.popover({placement: 'auto', trigger: 'hover focus'});
+                $help.on('click', function (e) {
+                    e.preventDefault();
+                });
             });
 
-            require(['react', 'jsx!fcom.promo'], function(React, Promo) {
-                Promo.createGrid();
-                console.log(Promo);
-            })
+//            require(['react', 'jsx!fcom.promo'], function(React, Promo) {
+//                Promo.createGrid();
+//                console.log(Promo);
+//            })
         </script>
         {{ forms.select({
             label: 'Coupon Code Enter For Validity'|_,
@@ -69,5 +74,22 @@
             help_text: "Require coupon code"|_,
             select2: 1, options: ['No coupon code required'|_, 'Single coupon code'|_, 'Multiple coupon codes'|_]
         }) }}
+        <div id="coupon-options"></div>
+
+        <script type="text/javascript">
+            require(['react', 'jsx!fcom.promo'], function (React, Promo) {
+                var options = {
+                    coupon_select_id: 'model-use_coupon',
+                    coupon_container_id: 'coupon-options',
+                    showCouponsUrl: "{{ APP.href('promo/coupons/view?id=') ~ m.id() }}", // "/admin/promo/coupons/view?id=1",
+                    generateCouponsUrl: "{{ APP.href('promo/coupons/generate?id=') ~ m.id() }}", // "/admin/promo/coupons/generate?id=1",
+                    importCouponsUrl: "{{ APP.href('promo/coupons/import?id=') ~ m.id() }}", // "/admin/promo/coupons/import?id=1",
+                    valueUpc: '',
+                    valueUt: '',
+                    singleCouponValue: ''
+                };
+                Promo.init(options);
+            });
+        </script>
     </div>
 </fieldset>

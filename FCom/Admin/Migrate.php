@@ -1,5 +1,17 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_Migrate
+ *
+ * @property FCom_Admin_Model_Activity $FCom_Admin_Model_Activity
+ * @property FCom_Admin_Model_ActivityUser $FCom_Admin_Model_ActivityUser
+ * @property FCom_Admin_Model_Aggregate $FCom_Admin_Model_Aggregate
+ * @property FCom_Admin_Model_Personalize $FCom_Admin_Model_Personalize
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
+ */
+
 class FCom_Admin_Migrate extends BClass
 {
     public function install__0_1_8()
@@ -63,13 +75,13 @@ class FCom_Admin_Migrate extends BClass
         $tActivityUser = $this->FCom_Admin_Model_ActivityUser->table();
 
         $this->BDb->ddlTableDef($tUser, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'data_serialized' => 'text',
             ],
         ]);
 
         $this->BDb->ddlTableDef($tActivity, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => "int unsigned not null auto_increment",
                 'status' => "enum('new', 'recent', 'archived') not null default 'new'",
                 'type' => "enum('workflow', 'alert') not null default 'workflow'",
@@ -81,24 +93,24 @@ class FCom_Admin_Migrate extends BClass
                 'create_at' => 'datetime not null',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_status_type_create' => '(`status`, `type`, `create_at`)',
             ],
         ]);
 
         $this->BDb->ddlTableDef($tActivityUser, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => "int unsigned not null auto_increment",
                 'activity_id' => "int unsigned not null",
                 'user_id' => "int unsigned not null",
                 'alert_user_status' => "enum('new', 'read', 'dismissed') not null default 'new'",
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_activity_user_status' => 'UNIQUE (`activity_id`, `user_id`, `alert_user_status`)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'activity' => ['activity_id', $tActivity],
                 'user' => ['user_id', $tUser],
             ],
@@ -106,7 +118,7 @@ class FCom_Admin_Migrate extends BClass
 
         $tAggregate = $this->FCom_Admin_Model_Aggregate->table();
         $this->BDb->ddlTableDef($tAggregate, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'data_type' => 'varchar(20) not null',
                 'data_args' => 'varchar(50) not null',
@@ -115,8 +127,8 @@ class FCom_Admin_Migrate extends BClass
                 //'range_start' => 'date not null',
                 'amount' => 'decimal(12,2) not null',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_data_type_args_day' => '(data_type, data_args, data_day)',
             ],
         ]);
@@ -181,8 +193,8 @@ class FCom_Admin_Migrate extends BClass
     public function upgrade__0_1_3__0_1_4()
     {
         $this->BDb->ddlTableDef($this->FCom_Admin_Model_User->table(), [
-            'COLUMNS' => [
-                'api_password' => 'DROP',
+            BDb::COLUMNS => [
+                'api_password' => BDb::DROP,
                 'api_password_hash' => 'varchar(255) null',
             ],
         ]);
@@ -192,7 +204,7 @@ class FCom_Admin_Migrate extends BClass
     {
         $table = $this->FCom_Admin_Model_User->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                   'create_dt'  => 'RENAME create_at datetime NOT NULL',
                   'update_dt'  => 'RENAME update_at datetime DEFAULT NULL',
                   'token_dt'   => 'RENAME token_at datetime DEFAULT NULL',
@@ -207,13 +219,13 @@ class FCom_Admin_Migrate extends BClass
         $tUser = $this->FCom_Admin_Model_User->table();
 
         $this->BDb->ddlTableDef($tUser, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'data_serialized' => 'text',
             ],
         ]);
 
         $this->BDb->ddlTableDef($tActivity, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => "int unsigned not null auto_increment",
                 'status' => "enum('new', 'recent', 'archived') not null default 'new'",
                 'type' => "enum('workflow', 'alert') not null default 'workflow'",
@@ -225,24 +237,24 @@ class FCom_Admin_Migrate extends BClass
                 'create_at' => 'datetime not null',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_status_type_create' => '(`status`, `type`, `create_at`)',
             ],
         ]);
 
         $this->BDb->ddlTableDef($tActivityUser, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => "int unsigned not null auto_increment",
                 'activity_id' => "int unsigned not null",
                 'user_id' => "int unsigned not null",
                 'alert_user_status' => "enum('new', 'read', 'dismissed') not null default 'new'",
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_activity_user_status' => 'UNIQUE (`activity_id`, `user_id`, `alert_user_status`)',
             ],
-            'CONSTRAINTS' => [
+            BDb::CONSTRAINTS => [
                 'activity' => ['activity_id', $tActivity],
                 'user' => ['user_id', $tUser],
             ],
@@ -253,7 +265,7 @@ class FCom_Admin_Migrate extends BClass
     {
         $tAggregate = $this->FCom_Admin_Model_Aggregate->table();
         $this->BDb->ddlTableDef($tAggregate, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'data_type' => 'varchar(20) not null',
                 'data_args' => 'varchar(50) not null',
@@ -262,8 +274,8 @@ class FCom_Admin_Migrate extends BClass
                 //'range_start' => 'date not null',
                 'amount' => 'decimal(12,2) not null',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'IDX_data_type_args_day' => '(data_type, data_args, data_day)',
             ],
         ]);
@@ -273,7 +285,7 @@ class FCom_Admin_Migrate extends BClass
     {
         $tUser = $this->FCom_Admin_Model_User->table();
         $this->BDb->ddlTableDef($tUser, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'password_session_token' => 'varchar(16)',
             ],
         ]);
@@ -283,7 +295,7 @@ class FCom_Admin_Migrate extends BClass
     {
         $tMedia = $this->FCom_Core_Model_MediaLibrary->table();
         $this->BDb->ddlTableDef($tMedia, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'folder' => 'varchar(255) NOT NULL',
             ],
         ]);

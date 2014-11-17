@@ -1,5 +1,17 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_IndexTank_Migrate
+ *
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ * @property FCom_IndexTank_Index_Product $FCom_IndexTank_Index_Product
+ * @property FCom_IndexTank_Model_IndexHelper $FCom_IndexTank_Model_IndexHelper
+ * @property FCom_IndexTank_Model_IndexingStatus $FCom_IndexTank_Model_IndexingStatus
+ * @property FCom_IndexTank_Model_ProductField $FCom_IndexTank_Model_ProductField
+ * @property FCom_IndexTank_Model_ProductFunction $FCom_IndexTank_Model_ProductFunction
+ */
+
 class FCom_IndexTank_Migrate extends BClass
 {
     public function install__0_2_1()
@@ -93,7 +105,7 @@ class FCom_IndexTank_Migrate extends BClass
             ) ENGINE = InnoDB;
          ");
         $pIndexingStatusTable = $this->FCom_IndexTank_Model_IndexingStatus->table();
-        $this->BDb->ddlTableDef($pIndexingStatusTable, ['COLUMNS' => [
+        $this->BDb->ddlTableDef($pIndexingStatusTable, [BDb::COLUMNS => [
             'status' => "enum('start', 'pause') NOT NULL DEFAULT 'start'",
             'percent' => "BIGINT( 11 ) NOT NULL",
             'indexed' => "BIGINT( 11 ) NOT NULL",
@@ -266,7 +278,7 @@ class FCom_IndexTank_Migrate extends BClass
     public function upgrade__0_1_3__0_1_4()
     {
         $pIndexingStatusTable = $this->FCom_IndexTank_Model_IndexingStatus->table();
-        $this->BDb->ddlTableDef($pIndexingStatusTable, ['COLUMNS' => [
+        $this->BDb->ddlTableDef($pIndexingStatusTable, [BDb::COLUMNS => [
             'status' => "enum('start','stop','pause') NOT NULL",
             'percent' => "BIGINT( 11 ) NOT NULL",
             'indexed' => "BIGINT( 11 ) NOT NULL",
@@ -287,21 +299,21 @@ class FCom_IndexTank_Migrate extends BClass
     public function upgrade__0_1_5__0_1_6()
     {
         $pIndexingStatusTable = $this->FCom_IndexTank_Model_IndexingStatus->table();
-        $this->BDb->ddlTableDef($pIndexingStatusTable, ['COLUMNS' => ['to_index' => "BIGINT( 11 ) NOT NULL"]]);
+        $this->BDb->ddlTableDef($pIndexingStatusTable, [BDb::COLUMNS => ['to_index' => "BIGINT( 11 ) NOT NULL"]]);
 //        $this->BDb->run( " ALTER TABLE {$pIndexingStatusTable} ADD `to_index` BIGINT( 11 ) NOT NULL ;");
     }
 
     public function upgrade__0_1_6__0_1_7()
     {
         $pIndexingStatusTable = $this->FCom_IndexTank_Model_IndexingStatus->table();
-        $this->BDb->ddlTableDef($pIndexingStatusTable, ['COLUMNS' => ['index_size' => "BIGINT( 11 ) NOT NULL"]]);
+        $this->BDb->ddlTableDef($pIndexingStatusTable, [BDb::COLUMNS => ['index_size' => "BIGINT( 11 ) NOT NULL"]]);
 //        $this->BDb->run( " ALTER TABLE {$pIndexingStatusTable} ADD `index_size` BIGINT( 11 ) NOT NULL ;");
     }
 
     public function upgrade__0_1_7__0_1_8()
     {
         $pPFTable = $this->FCom_IndexTank_Model_ProductFunction->table();
-        $this->BDb->ddlTableDef($pPFTable, ['COLUMNS' => ['label' => "varchar(100) NOT NULL"]]);
+        $this->BDb->ddlTableDef($pPFTable, [BDb::COLUMNS => ['label' => "varchar(100) NOT NULL"]]);
 //        $this->BDb->run( " ALTER TABLE {$pPFTable} ADD `label` varchar(100) NOT NULL ;");
     }
 
@@ -334,7 +346,7 @@ class FCom_IndexTank_Migrate extends BClass
     public function upgrade__0_2_0__0_2_1()
     {
         $pFieldsTable = $this->FCom_IndexTank_Model_ProductField->table();
-        $this->BDb->ddlTableDef($pFieldsTable, ['COLUMNS' => ['sort_order' => "int(11) NOT NULL DEFAULT '0'"]]);
+        $this->BDb->ddlTableDef($pFieldsTable, [BDb::COLUMNS => ['sort_order' => "int(11) NOT NULL DEFAULT '0'"]]);
 //        $this->BDb->run( " ALTER TABLE {$pFieldsTable} ADD `sort_order` int(11) NOT NULL DEFAULT '0'");
     }
 }

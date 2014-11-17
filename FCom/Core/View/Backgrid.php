@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Core_View_Backgrid
+ *
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ */
+
 class FCom_Core_View_Backgrid extends FCom_Core_View_Abstract
 {
     public function getBackgridConfigJson()

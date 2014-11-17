@@ -24,6 +24,11 @@ class FCom_Sales_Model_Order_State_Delivery extends FCom_Core_Model_Abstract_Sta
         return $this->changeState('pending');
     }
 
+    public function setVirtual()
+    {
+        return $this->changeState('virtual');
+    }
+
     public function setPending()
     {
         return $this->changeState('pending');

@@ -1,19 +1,26 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Geo_Migrate
+ *
+ * @property FCom_Geo_Model_Country $FCom_Geo_Model_Country
+ * @property FCom_Geo_Model_Region $FCom_Geo_Model_Region
+ */
+
 class FCom_Geo_Migrate extends BClass
 {
     public function install__0_1_1()
     {
         $tCountry = $this->FCom_Geo_Model_Country->table();
         $this->BDb->ddlTableDef($tCountry, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'iso' => 'char(2) not null',
                 'iso3' => 'char(3) not null',
                 'numcode' => 'smallint(3) default null',
                 'name' => 'varchar(80) not null',
             ],
-            'PRIMARY' => '(iso)',
-            'KEYS' => [
+            BDb::PRIMARY => '(iso)',
+            BDb::KEYS => [
                 'name' => '(name)',
             ]
         ]);
@@ -21,14 +28,14 @@ class FCom_Geo_Migrate extends BClass
 
         $tRegion = $this->FCom_Geo_Model_Region->table();
         $this->BDb->ddlTableDef($tRegion, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int(11) unsigned not null auto_increment',
                 'country' => 'char(2) not null',
                 'code' => 'varchar(10) default null',
                 'name' => 'varchar(40) not null'
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'country_code' => '(country, code)',
                 'name_country' => '(name, country)',
             ],

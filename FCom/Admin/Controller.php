@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_Controller
+ *
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Frontend_Main $FCom_Frontend_Main
+ */
+
 class FCom_Admin_Controller extends FCom_Admin_Controller_Abstract
 {
     public function action_index()

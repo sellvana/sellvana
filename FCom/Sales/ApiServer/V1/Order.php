@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_ApiServer_V1_Order
+ *
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
+ * @property FCom_Sales_Model_Order_Item $FCom_Sales_Model_Order_Item
+ */
+
 class FCom_Sales_ApiServer_V1_Order extends FCom_ApiServer_Controller_Abstract
 {
     public function action_index()

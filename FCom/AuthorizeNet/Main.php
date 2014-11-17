@@ -3,6 +3,7 @@
 /**
  * Created by pp
  * @project fulleron
+ * @property FCom_Sales_Main $FCom_Sales_Main
  */
 
 class FCom_AuthorizeNet_Main extends BClass

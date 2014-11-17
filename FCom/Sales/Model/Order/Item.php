@@ -9,6 +9,8 @@
  * @property int $qty
  * @property float $total
  * @property string $product_info
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Sales_Model_Order_History $FCom_Sales_Model_Order_History
  */
 class FCom_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
 {
