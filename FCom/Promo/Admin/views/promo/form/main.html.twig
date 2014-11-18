@@ -68,27 +68,60 @@
 //            })
         </script>
         {{ forms.select({
-            label: 'Coupon Code Enter For Validity'|_,label_class: labelClass,
+            label: "Coupon Code Enter For Validity"|_,label_class: labelClass,
             name: "model[use_coupon]",
-            value: validator.fieldValue('use_coupon'),
+            value: validator.fieldValue("use_coupon"),
             id: "model-use_coupon", help_icon: 1,
             help_text: "Require coupon code"|_,
-            select2: 1, options: ['No coupon code required'|_, 'Single coupon code'|_, 'Multiple coupon codes'|_]
+            select2: 1, options: ["No coupon code required"|_, "Single coupon code"|_, "Multiple coupon codes"|_]
         }) }}
         <div id="coupon-options"></div>
-
+        <div class="form-group">
+            {{ forms.hidden({field:"conditions_serialized", value: validator.fieldValue("conditions_serialized")}) }}
+            <label class="control-label col-md-3" for="s2id_autogen3">Conditions&nbsp;
+                    <a id="help-model-conditions" class="pull-right help-icon" href="#"
+                       data-toggle="popover" data-trigger="focus" data-content="Configure conditions"
+                       data-container="body">
+                        <span class="glyphicon glyphicon-question-sign"></span></a>
+            </label>
+            <div class="col-md-4">
+                <select id="model-conditions" name="model[conditions]" class="form-control to-select2">
+                    <option value="0">All Conditions Have to Match</option>
+                    <option value="1">Any Condition Has to Match</option>
+                </select></div>
+            <div class="col-md-4">
+                <select id="model-conditions_type" name="model[conditions_type]" class="form-control to-select2">
+                    <option value="-1">{{ "Add Condition Type..."|_ }}</option>
+                    <option value="skus">{{ "Products"|_ }}</option>
+                    <option value="cats">{{ "Categories"|_ }}</option>
+                    <option value="total">{{ "Cart Total"|_ }}</option>
+                    <option value="comb">{{ "Combination"|_ }}</option>
+                    <option value="shipping">{{ "Shipping Destination"|_ }}</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button class="btn btn-small btn-default" type="button" id="condition_action_add">{{ "Add Condition" }}</button>
+            </div>
+        </div>
+        <div id="conditions-options"></div>
         <script type="text/javascript">
             require(['react', 'jsx!fcom.promo'], function (React, Promo) {
+                $('.to-select2').select2();
                 var options = {
                     coupon_select_id: 'model-use_coupon',
+                    condition_select_id: 'model-conditions_type',
                     coupon_container_id: 'coupon-options',
+                    condition_container_id: 'conditions-options',
+                    condition_add_id: 'condition_action_add',
+                    conditions_serialized: 'conditions_serialized',
                     showCouponsUrl: "{{ APP.href('promo/coupons/view?id=') ~ m.id() }}", // "/admin/promo/coupons/view?id=1",
                     generateCouponsUrl: "{{ APP.href('promo/coupons/generate?id=') ~ m.id() }}", // "/admin/promo/coupons/generate?id=1",
                     importCouponsUrl: "{{ APP.href('promo/coupons/import?id=') ~ m.id() }}", // "/admin/promo/coupons/import?id=1",
-                    valueUpc: '',
-                    valueUt: '',
+                    valueUpc: '{{validator.fieldValue("uses_per_customer")}}',
+                    valueUt: '{{validator.fieldValue("uses_total")}}',
                     singleCouponValue: '',
-                    labelClass: '{{ labelClass }}'
+                    labelClass: '{{ labelClass }}',
+                    debug: true
                 };
                 Promo.init(options);
             });

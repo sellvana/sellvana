@@ -201,6 +201,47 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return this.props.importCodes();
         }
     });
+    var ConditionSkuCollection = React.createClass({
+        render: function () {
+            return (<div className="condition sku-collection">
+                    <Components.Button
+                    <Components.ControlLabel label_class={"col-md-2"}>
+                            {this.props.label}
+                    </Components.ControlLabel>
+                </div>);
+        },
+        getDefaultProps: function () {
+            return {
+                label: "Sku Collection"
+            };
+        }
+    });
+    var ConditionsApp = React.createClass({
+        render: function () {
+            return (<div className="conditions">
+                    <ConditionSkuCollection options={this.props.options}/>
+                    <ConditionAttributeCombination options={this.props.options}/>
+                    <ConditionCategories options={this.props.options}/>
+                    <ConditionTotal options={this.props.options}/>
+                    <ConditionShipping options={this.props.options}/>
+                </div> );
+        },
+        componentWillMount: function () {
+            var $conditionsSerialized = $('#'+this.props.options.conditions_serialized);
+            var data;
+            try {
+                data = JSON.parse($conditionsSerialized.val());
+                this.setProps({data: data});
+            } catch (e) {
+                this.setProps({data: {}});
+            }
+        },
+        getInitialState: function () {
+            return {
+                data: this.props.data
+            };
+        }
+    });
 
     var Promo = {
         createButton: function () {
@@ -211,30 +252,51 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         },
         init: function (options) {
             $.extend(this.options, options);
-            var $couponSelector = $('#' + this.options.coupon_select_id);
-            if ($couponSelector.length == 0) {
-                this.log("Use coupon dropdown not found");
-                return;
-            }
-            var $element = $("#" + this.options.coupon_container_id);
-            var selected = $couponSelector.val();
-
-            var self = this;
-            var callBacks = {
-                showCodes: this.showCodes.bind(self),
-                generateCodes: this.generateCodes.bind(self),
-                importCodes: this.importCodes.bind(self)
-            };
             var $modalContainer = $('<div/>').appendTo(document.body);
-
-            if(selected != 0) {
-                this.createCouponApp($element[0], $modalContainer.get(0), callBacks, selected, options);
+            this.initCouponApp(this.options.coupon_select_id, $modalContainer);
+            this.initConditionsApp(this.options.condition_select_id, $modalContainer);
+        },
+        initConditionsApp: function (selector, $modalContainer) {
+            var $conditionSelector = $('#' + selector);
+            if ($conditionSelector.length == 0) {
+                this.log("Use coupon drop-down not found");
+            } else {
+                var $container = $("#" + this.options.condition_container_id);
+                React.render(<ConditionsApp conditionType={$conditionSelector} newCondition={this.options.condition_add_id}
+                    options={this.options}/>,$container.get(0));
+                /*
+                todo: initiate interface, load data from JSON (either from validator or as json string loaded via ajax)
+                interface consists of form groups
+                    form group has:
+                    remove btn - label - actual config part
+                    app listens for conditions_add button click, takes condition_type value and creates appropriate iface
+                 */
             }
+        },
+        initCouponApp: function (selector, $modalContainer) {
+            var $couponSelector = $('#' + selector);
+            if ($couponSelector.length == 0) {
+                this.log("Use coupon drop-down not found");
+            } else {
+                var $container = $("#" + this.options.coupon_container_id);
+                var selected = $couponSelector.val();
 
-            $couponSelector.on('change', function () {
-                selected = $couponSelector.val();
-                self.createCouponApp($element[0], $modalContainer.get(0), callBacks, selected, options);
-            });
+                var self = this;
+                var callBacks = {
+                    showCodes: this.showCodes.bind(self),
+                    generateCodes: this.generateCodes.bind(self),
+                    importCodes: this.importCodes.bind(self)
+                };
+
+                if (selected != 0) {
+                    this.createCouponApp($container.get(0), $modalContainer.get(0), callBacks, selected, options);
+                }
+
+                $couponSelector.on('change', function () {
+                    selected = $couponSelector.val();
+                    self.createCouponApp($container.get(0), $modalContainer.get(0), callBacks, selected, options);
+                });
+            }
         },
         createCouponApp: function (appContainer, modalContainer, callBacks, mode, options) {
             React.render(<CouponApp {...callBacks} mode={mode} options={options}/>, appContainer);
@@ -250,6 +312,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         options: {
             coupon_select_id: "model-use_coupon",
             coupon_container_id: "coupon-options",
+            condition_select_id: 'model-conditions_type',
+            condition_container_id: 'conditions-options',
+            condition_add_id: 'condition_action_add',
+            conditions_serialized: 'conditions_serialized',
             debug: false
         },
         showCodesModal: null,
