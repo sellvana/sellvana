@@ -201,24 +201,213 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return this.props.importCodes();
         }
     });
-    var ConditionSkuCollection = React.createClass({
+
+    var DelBtn = React.createClass({
         render: function () {
-            return (<div className="condition sku-collection">
-                    <Components.Button
-                    <Components.ControlLabel label_class={"col-md-2"}>
-                            {this.props.label}
-                    </Components.ControlLabel>
-                </div>);
+            return (
+                <Components.Button className="btn-link btn-delete" type="button" style={ {paddingRight:10, paddingLeft:10} }>
+                    <span className="icon-trash"></span>
+                </Components.Button>
+            );
+        }
+    });
+
+    var ConditionsRow = React.createClass({
+        render: function () {
+            return (<div className={"form-group condition " + this.props.rowClass}>
+                <div className="col-md-3">
+                    <Components.ControlLabel label_class="pull-right">{this.props.label}<DelBtn/></Components.ControlLabel>
+                </div>
+                {this.props.children}
+            </div>);
+        }
+    });
+
+    var ConditionsCompare = React.createClass({
+        render: function () {
+            return (
+                <select className="to-select2">
+                    {this.props.opts.map(function(type){
+                        return <option value={type.id} key={type.id}>{type.label}</option>
+                    })}
+                </select>
+            );
         },
         getDefaultProps: function () {
             return {
-                label: "Sku Collection"
+                opts: [
+                    {id:"gt", label: "is greater than"},
+                    {id:"gte", label: "is greater than or equal to"},
+                    {id:"lt", label: "is less than"},
+                    {id:"lte", label: "is less than or equal to"},
+                    {id:"eq", label: "is equal to"},
+                    {id:"neq", label: "is not equal to"}
+                ]
             };
         }
     });
+
+    var ConditionsType = React.createClass({
+        render: function () {
+            var cls = this.props.select2 ? "to-select2 " : "";
+            if (this.props.className) {
+                cls += this.props.className;
+            }
+            return (
+                <div className={this.props.containerClass}>
+                    <select className={cls}>
+                        {this.props.totalType.map(function (type) {
+                            return <option value={type.id} key={type.id}>{type.label}</option>
+                        })}
+                    </select>
+                    {this.props.children}
+                </div>
+            );
+        },
+        getDefaultProps: function () {
+            return {
+                totalType: [{id:"qty", label:"TOTAL QTY"}, {id:"amt", label:"TOTAL $Amount"}],
+                select2: true,
+                containerClass: "col-md-2"
+            };
+        }
+    });
+
+    var ConditionSkuCollection = React.createClass({
+        render: function () {
+            return (
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                    <ConditionsType ref="skuCollectionType" id="skuCollectionType"> of </ConditionsType>
+                    <div className="col-md-2"><input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control"/></div>
+                    <div className="col-md-2"><ConditionsCompare ref="skuCollectionCond" id="skuCollectionCond" /></div>
+                    <div className="col-md-1"><input className="form-control" ref="skuCollectionValue" id="skuCollectionValue" type="text"/></div>
+                </ConditionsRow>
+            );
+        },
+        getDefaultProps: function () {
+            return {
+                label: "Sku Collection",
+                rowClass: "sku-collection"
+            };
+        },
+        componentDidMount: function () {
+            var skuCollectionIds = this.refs.skuCollectionIds;
+            $(skuCollectionIds.getDOMNode()).select2({
+                placeholder: "Choose products",
+                minimumInputLength: 3,
+                maximumSelectionSize: 3,
+                multiple: true,
+                closeOnSelect: false,
+                ajax: {
+                    url: "/admin/promo/products",
+                    dataType: 'json',
+                    quietMillis: 250,
+                    data: function (term, page) {
+                        return {
+                            q: term,
+                            page: page,
+                            offset: 30
+                        };
+                    },
+                    results: function (data, page) {
+                        var more = (page * 30) < data.total_count;
+                        return {results: data.items, more: more};
+                    },
+                    cache: true
+                },
+                initSelection: function (element, callback) {
+                    var ids = this.state.productIds;
+                    if (ids) {
+                        $.ajax("/admin/promo/products?ids=" + ids.join(','), {
+                            dataType: "json"
+                        }).done(function (data) {
+                            callback(data);
+                        });
+                    }
+                },
+                dropdownCssClass: "bigdrop"
+            });
+        }
+    });
+
+    var ConditionAttributeCombination = React.createClass({
+        render: function () {
+            return (
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                    <div className="col-md-5"><input type="text" readOnly="readonly" ref="attributesResume" id="attributesResume" className="form-control"/></div>
+                    <Components.Button type="button" className="btn-primary">Configure</Components.Button>
+                </ConditionsRow>
+            );
+        },
+        getDefaultProps: function () {
+            return {
+                rowClass: "attr-combination",
+                label: "Combination"
+            };
+        }
+    });
+
+    var ConditionCategories = React.createClass({
+        render: function () {
+            return (
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                    <ConditionsType ref="catProductsType" id="catProductsType" > of products in </ConditionsType>
+                    <div className="col-md-2"><input type="hidden" id="catProductsIds" ref="catProductsIds"/></div>
+                    <div className="col-md-2"><ConditionsCompare ref="catProductsCond" id="catProductsCond" /></div>
+                    <div className="col-md-1"><input ref="catProductsValue" id="catProductsValue" type="text" className="form-control"/></div>
+                </ConditionsRow>
+            );
+        },
+        getDefaultProps: function () {
+            return {
+                rowClass: "category-products",
+                label: "Categories"
+            };
+        }
+    });
+
+    var ConditionTotal = React.createClass({
+        render: function () {
+            return (
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                    <ConditionsType ref="cartTotalType" id="cartTotalType" totalType={this.props.totalType}/>
+                    <div className="col-md-2"><ConditionsCompare ref="cartTotalCond" id="cartTotalCond" /></div>
+                    <div className="col-md-1"><input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control"/></div>
+                </ConditionsRow>
+            );
+        },
+        getDefaultProps: function () {
+            return {
+                rowClass: "cart-total",
+                totalType: [{id:"qty", label:"QTY OF ITEMS"}, {id:"amt", label:"$Value/Amount OF ITEMS"}],
+                label: "Cart Total"
+            };
+        }
+    });
+
+    var ConditionShipping = React.createClass({
+        render: function () {
+            return (
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                    <div className="col-md-5"><textarea ref="shippingResume" id="shippingResume" readOnly="readonly" value={this.state.value} className="form-control"/></div>
+                    <Components.Button type="button" className="btn-primary">Configure</Components.Button>
+                </ConditionsRow>
+            );
+        },
+        getDefaultProps: function () {
+            return {
+                label: "Destination"
+            };
+        },
+        getInitialState: function () {
+            return {value: ""};
+        }
+    });
+
+
     var ConditionsApp = React.createClass({
         render: function () {
-            return (<div className="conditions">
+            return (<div className="conditions panel panel-primary">
                     <ConditionSkuCollection options={this.props.options}/>
                     <ConditionAttributeCombination options={this.props.options}/>
                     <ConditionCategories options={this.props.options}/>
@@ -226,7 +415,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                     <ConditionShipping options={this.props.options}/>
                 </div> );
         },
-        componentWillMount: function () {
+        componentDidMount: function () {
             var $conditionsSerialized = $('#'+this.props.options.conditions_serialized);
             var data;
             try {
@@ -235,6 +424,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             } catch (e) {
                 this.setProps({data: {}});
             }
+
+            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
         },
         getInitialState: function () {
             return {

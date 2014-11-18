@@ -660,6 +660,40 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $this->BResponse->json(['status' => $status, 'html' => $html]);
     }
 
+    public function action_products()
+    {
+        if (!$this->BRequest->xhr()) {
+            $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+            return;
+        }
+
+        $r = $this->BRequest;
+        $page = $r->get('page')?:1;
+        $skuTerm = $r->get('q');
+        $limit = $r->get('o')?:30;
+        $offset = $page * $limit;
+        /** @var BORM $orm */
+        $orm = $this->FCom_Catalog_Model_Product->orm()->select(['id', 'product_sku', 'product_name'])
+            ->limit((int)$limit)->offset($offset)->order_by_desc('product_name');
+        if($skuTerm) {
+            $orm->where(['OR' => [['product_sku LIKE ?', "%{$skuTerm}%"], ['product_name LIKE ?', "%{$skuTerm}%"]]]);
+        }
+        $stmt = $orm->execute();
+        $result = ['total_count' => 0, 'items' => []];
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $result['total_count'] += 1;
+            $item = [
+                'id' => $row['id'],
+                'text' => $row['product_name'],
+                'sku' => $row['product_sku'],
+            ];
+
+            $result['items'][] = $item;
+        }
+
+        $this->BResponse->json($result);
+    }
+
     protected function _getMaxUploadSize()
     {
         $p = ini_get('post_max_size');
