@@ -204,14 +204,14 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
         },
         handleCancel: function () {
             if (this.props.onCancel) {
-                this.props.onCancel();
+                this.props.onCancel(this);
             } else {
                 this.close();
             }
         },
         handleConfirm: function () {
             if (this.props.onConfirm) {
-                this.props.onConfirm();
+                this.props.onConfirm(this);
             } else {
                 this.close();
             }

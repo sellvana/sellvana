@@ -295,7 +295,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             $(skuCollectionIds.getDOMNode()).select2({
                 placeholder: "Choose products",
                 minimumInputLength: 3,
-                maximumSelectionSize: 3,
+                maximumSelectionSize: 4,
                 multiple: true,
                 closeOnSelect: false,
                 ajax: {
@@ -325,7 +325,25 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                         });
                     }
                 },
-                dropdownCssClass: "bigdrop"
+                dropdownCssClass: "bigdrop",
+                dropdownAutoWidth: true,
+                selectOnBlur: true,
+                formatSelection: function (item) {
+                    return item.sku;
+                },
+                formatResult: function (item) {
+                    var markup = '<div class="row-fluid" title="' + item.text + '">' +
+                        '<div class="span2">ID: <em>' + item.id + '</em></div>' +
+                        '<div class="span2">Name: ' + item.text.substr(0, 20);
+                        if(item.text.length > 20) {
+                            markup += '...';
+                        }
+                        markup += '</div>' +
+                        '<div class="span2">SKU: <strong>' + item.sku + '</strong></div>' +
+                        '</div>';
+
+                    return markup;
+                }
             });
         }
     });
@@ -335,7 +353,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return (
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
                     <div className="col-md-5"><input type="text" readOnly="readonly" ref="attributesResume" id="attributesResume" className="form-control"/></div>
-                    <Components.Button type="button" className="btn-primary">Configure</Components.Button>
+                    <Components.Button type="button" className="btn-primary" onClick={this.handleConfigure}>Configure</Components.Button>
                 </ConditionsRow>
             );
         },
@@ -344,6 +362,20 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 rowClass: "attr-combination",
                 label: "Combination"
             };
+        },
+        handleConfigure: function (e) {
+            Promo.log("Clicked");
+            var modal = <Components.Modal onConfirm={this.handleShippingConfirm}
+                title="Product Combination Configuration" onLoad={this.openModal}/>
+
+            React.render(modal, this.props.modalContainer.get(0));
+        },
+        handleShippingConfirm: function (modal) {
+            Promo.log('handling');
+            modal.close();
+        },
+        openModal: function (modal) {
+            modal.open();
         }
     });
 
@@ -363,6 +395,58 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 rowClass: "category-products",
                 label: "Categories"
             };
+        },
+        componentDidMount: function () {
+            var catProductsIds = this.refs.catProductsIds;
+            $(catProductsIds.getDOMNode()).select2({
+                placeholder: "Select categories",
+                minimumInputLength: 3,
+                maximumSelectionSize: 4,
+                multiple: true,
+                closeOnSelect: false,
+                ajax: {
+                    url: "/admin/promo/categories",
+                    dataType: 'json',
+                    quietMillis: 250,
+                    data: function (term, page) {
+                        return {
+                            q: term,
+                            page: page,
+                            offset: 30
+                        };
+                    },
+                    results: function (data, page) {
+                        var more = (page * 30) < data.total_count;
+                        return {results: data.items, more: more};
+                    },
+                    cache: true
+                },
+                initSelection: function (element, callback) {
+                    var ids = this.state.categoryIds;
+                    if (ids) {
+                        $.ajax("/admin/promo/categories?ids=" + ids.join(','), {
+                            dataType: "json"
+                        }).done(function (data) {
+                            callback(data);
+                        });
+                    }
+                },
+                dropdownCssClass: "bigdrop",
+                dropdownAutoWidth: true,
+                selectOnBlur: true,
+                formatResult: function (item) {
+                    var markup = '<div class="row-fluid" title="' + item.full_name + '">' +
+                        '<div class="span2">ID: <em>' + item.id + '</em></div>' +
+                        '<div class="span2">Name: <strong>' + item.full_name.substr(0, 20);
+                    if (item.full_name.length > 20) {
+                        markup += '...';
+                    }
+                    markup += '</strong></div>' +
+                    '</div>';
+
+                    return markup;
+                }
+            });
         }
     });
 
@@ -390,7 +474,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return (
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
                     <div className="col-md-5"><textarea ref="shippingResume" id="shippingResume" readOnly="readonly" value={this.state.value} className="form-control"/></div>
-                    <Components.Button type="button" className="btn-primary">Configure</Components.Button>
+                    <Components.Button type="button" className="btn-primary" ref="configure" onClick={this.handleConfigure}>Configure</Components.Button>
                 </ConditionsRow>
             );
         },
@@ -401,6 +485,20 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         },
         getInitialState: function () {
             return {value: ""};
+        },
+        handleConfigure: function (e) {
+            Promo.log("Clicked");
+            var modal = <Components.Modal onConfirm={this.handleShippingConfirm}
+                    title="Shipping Reward Configuration" onLoad={this.openModal}/>
+
+            React.render(modal, this.props.modalContainer.get(0));
+        },
+        handleShippingConfirm: function (modal) {
+            Promo.log('handling');
+            modal.close();
+        },
+        openModal: function (modal) {
+            modal.open();
         }
     });
 
@@ -409,10 +507,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         render: function () {
             return (<div className="conditions panel panel-primary">
                     <ConditionSkuCollection options={this.props.options}/>
-                    <ConditionAttributeCombination options={this.props.options}/>
+                    <ConditionAttributeCombination options={this.props.options} modalContainer={this.props.modalContainer}/>
                     <ConditionCategories options={this.props.options}/>
                     <ConditionTotal options={this.props.options}/>
-                    <ConditionShipping options={this.props.options}/>
+                    <ConditionShipping options={this.props.options} modalContainer={this.props.modalContainer}/>
                 </div> );
         },
         componentDidMount: function () {
@@ -454,7 +552,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             } else {
                 var $container = $("#" + this.options.condition_container_id);
                 React.render(<ConditionsApp conditionType={$conditionSelector} newCondition={this.options.condition_add_id}
-                    options={this.options}/>,$container.get(0));
+                    options={this.options} modalContainer={$modalContainer}/>,$container.get(0));
                 /*
                 todo: initiate interface, load data from JSON (either from validator or as json string loaded via ajax)
                 interface consists of form groups
