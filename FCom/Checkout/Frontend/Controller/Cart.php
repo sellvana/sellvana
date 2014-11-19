@@ -49,7 +49,6 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
             case 'add':
                 // FCom_Sales_Workflow_Cart -> FCom_CustomField_Frontend -> FCom_Sales_Model_Cart
                 $this->FCom_Sales_Main->workflowAction('customerAddsItemsToCart', ['post' => $post, 'result' => &$result]);
-
                 $item = $result['items'][0];
                 if (!empty($item['status']) && $item['status'] === 'added') {
                     $this->message('The product has been added to your cart');
