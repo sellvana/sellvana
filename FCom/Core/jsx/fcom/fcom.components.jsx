@@ -1,6 +1,40 @@
-define(['react', 'jquery', 'bootstrap', 'fcom.locale'], function (React, $) {
+define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Locale) {
     FCom.Components = {};
-    var Locale = require('fcom.locale');
+
+    var formMixin = {
+        getInputId: function () {
+            var field = this.props.field;
+            if (this.props.id) {
+                return this.props.id
+            }
+            if (!field) {
+                return '';
+            }
+            if (this.props.settings_module && !this.props.id_prefix) {
+                return 'modules-' + this.props.settings_module + '-' + field;
+            }
+            return ((this.props.id_prefix) ? this.props.id_prefix : 'model') + '-' + field;
+        },
+        getInputName: function () {
+            if ((this.props.name)) {
+                return this.props.name;
+            }
+            if (!this.props.field) {
+                return '';
+            }
+            var name;
+            if (this.props.settings_module && !this.props.name_prefix) {
+                name = 'config[modules][' + this.props.settings_module + '][' + this.props.field + ']';
+            } else {
+                name = (this.props.name_prefix ? this.props.name_prefix : 'model') + '[' + this.props.field + ']';
+            }
+            if (this.props.multiple) {
+                name += '[]';
+            }
+            return name;
+        }
+    };
+
     FCom.Components.ControlLabel = React.createClass({
         render: function () {
             var cl = "control-label " + this.props.label_class + (this.props.required ? ' required' : '');
@@ -26,6 +60,7 @@ define(['react', 'jquery', 'bootstrap', 'fcom.locale'], function (React, $) {
     });
 
     FCom.Components.Input = React.createClass({
+        mixins:[formMixin],
         render: function () {
             var { formGroupClass, inputDivClass, inputClass, inputValue, ...other } = this.props;
             var className = "form-control";
@@ -53,7 +88,6 @@ define(['react', 'jquery', 'bootstrap', 'fcom.locale'], function (React, $) {
                             className={className}
                             defaultValue={inputValue}
                             dataRuleRequired={ this.props.required ? "true":'' }
-                            {...this.props.attr}
                         />
                         {helpBlock}
                     </div>
@@ -70,38 +104,6 @@ define(['react', 'jquery', 'bootstrap', 'fcom.locale'], function (React, $) {
                 inputName: '',
                 inputClass:''
             };
-        },
-        getInputId: function() {
-            var field = this.props.field;
-            if(this.props.id) {
-                return this.props.id
-            }
-            if (!field) {
-                return '';
-            }
-            if (this.props.settings_module && !this.props.id_prefix) {
-                return 'modules-' + this.props.settings_module + '-' + field;
-            }
-            return ((this.props.id_prefix) ? this.props.id_prefix : 'model') + '-' + field;
-        },
-        getInputName: function()
-        {
-            if ((this.props.name)) {
-                return this.props.name;
-            }
-            if (!this.props.field) {
-                return '';
-            }
-            var name;
-            if (this.props.settings_module && !this.props.name_prefix) {
-                name = 'config[modules][' + this.props.settings_module + '][' + this.props.field + ']';
-            } else {
-                name = (this.props.name_prefix ? this.props.name_prefix : 'model') + '[' + this.props.field + ']';
-            }
-            if (this.props.multiple) {
-                name += '[]';
-            }
-            return name;
         }
     });
 
@@ -146,8 +148,9 @@ define(['react', 'jquery', 'bootstrap', 'fcom.locale'], function (React, $) {
         // integrate with Bootstrap or jQuery!
         componentDidMount: function () {
             // When the component is added, turn it into a modal
-            $(this.getDOMNode())
-                .modal({backdrop: 'static', keyboard: false, show: false})
+            var modal =$(this.getDOMNode())
+                .modal({backdrop: 'static', keyboard: false, show: false});
+            this.props.onLoad(this);
         },
         componentWillUnmount: function () {
             $(this.getDOMNode()).off('hidden', this.handleHidden);
@@ -165,14 +168,14 @@ define(['react', 'jquery', 'bootstrap', 'fcom.locale'], function (React, $) {
             if (this.props.confirm) {
                 confirmButton = (
                     <FCom.Components.Button onClick={this.handleConfirm} className="btn-primary" type="button">
-                                {this.props.confirm}
+                        {this.props.confirm}
                     </FCom.Components.Button>
                 );
             }
             if (this.props.cancel) {
                 cancelButton = (
                     <FCom.Components.Button onClick={this.handleCancel} className="btn-default" type="button">
-                                {this.props.cancel}
+                        {this.props.cancel}
                     </FCom.Components.Button>
                 );
             }
@@ -188,11 +191,11 @@ define(['react', 'jquery', 'bootstrap', 'fcom.locale'], function (React, $) {
                                 <h3>{this.props.title}</h3>
                             </div>
                             <div className="modal-body">
-                                        {this.props.children}
+                                {this.props.children}
                             </div>
                             <div className="modal-footer">
-                                      {cancelButton}
-                                      {confirmButton}
+                                  {cancelButton}
+                                  {confirmButton}
                             </div>
                         </div>
                     </div>
@@ -201,12 +204,14 @@ define(['react', 'jquery', 'bootstrap', 'fcom.locale'], function (React, $) {
         },
         handleCancel: function () {
             if (this.props.onCancel) {
-                this.props.onCancel();
+                this.props.onCancel(this);
+            } else {
+                this.close();
             }
         },
         handleConfirm: function () {
             if (this.props.onConfirm) {
-                this.props.onConfirm();
+                this.props.onConfirm(this);
             } else {
                 this.close();
             }

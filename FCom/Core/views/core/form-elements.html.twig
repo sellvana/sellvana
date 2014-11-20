@@ -18,9 +18,11 @@ Using custom id/name:
 {% macro label(p1, p2) %}
     {% set view = LAYOUT.view('core/form-elements') %}
     {% set p = view.merge(p1, p2) %}
+    {% if p.label %}
     {% import _self as forms %}
     <label class="control-label {{ p.label_class|default('col-md-2') }} {{ p.required ? 'required' }}"
         for="{{ view.getInputId(p) }}">{{ p.label }}&nbsp;{{ forms.help_icon(p) }}</label>
+    {% endif %}
 {% endmacro %}
 
 {% macro help_icon(p1, p2) %}
