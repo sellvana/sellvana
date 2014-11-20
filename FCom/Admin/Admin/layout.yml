@@ -53,8 +53,8 @@ base:
         do:
             - [ addShortcut, system/users, { label: New User, href: /users/form } ]
 
-    - { callback: FCom_Core_Main::defaultThemeCustomLayout }
-    - { callback: FCom_Admin_Admin::layout }
+    - { callback: FCom_Core_Main.defaultThemeCustomLayout }
+    - { callback: FCom_Admin_Admin.layout }
 
 
 common_js_libs:
