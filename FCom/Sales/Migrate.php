@@ -27,110 +27,36 @@
 
 class FCom_Sales_Migrate extends BClass
 {
-    public function install__0_2_14()
-    {
-        $tOrder = $this->FCom_Sales_Model_Order->table();
-        $this->BDb->ddlTableDef($tOrder, [
-            BDb::COLUMNS => [
-                'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
-                'customer_id' => "int(10) unsigned DEFAULT NULL",
-                'customer_email' => "varchar(100) DEFAULT NULL",
-                'cart_id' => "int(10) unsigned NOT NULL",
-                'status' => "varchar(50) NOT NULL",
-                'item_qty' => "int(10) unsigned NOT NULL",
-                'subtotal' => "decimal(12,2) NOT NULL DEFAULT '0.00'",
-                'shipping_method' => "varchar(50) DEFAULT NULL",
-                'shipping_service' => "varchar(50) DEFAULT NULL",
-                'payment_method' => "varchar(50) DEFAULT NULL",
-                'coupon_code' => "varchar(50) DEFAULT NULL",
-                'tax' => "decimal(10,2) DEFAULT NULL",
-                'balance' => "decimal(10,2) NOT NULL",
-                'create_at' => "datetime DEFAULT NULL",
-                'update_at' => "datetime DEFAULT NULL",
-                'grandtotal' => "decimal(12,2) NOT NULL",
-                'shipping_service_title' => "varchar(100) DEFAULT NULL",
-                'data_serialized' => "text",
-                'unique_id' => "varchar(15) NOT NULL",
-                'admin_id' => "int(10) unsigned DEFAULT NULL",
-                'same_address' => "tinyint(1) not null default 0",
-                'state_overall' => "varchar(15) not null default 'new'",
-                'state_delivery' => "varchar(15) not null default 'pending'",
-                'state_payment' => "varchar(15) not null default 'new'",
-                'state_custom' => "varchar(15) not null default ''",
-            ],
-            BDb::PRIMARY => '(id)',
-            BDb::KEYS => [
-                'UNQ_cart_id' => 'UNIQUE (cart_id)',
-            ],
-        ]);
 
-        $tOrderItem = $this->FCom_Sales_Model_Order_Item->table();
-        $this->BDb->ddlTableDef($tOrderItem, [
-            BDb::COLUMNS => [
-                'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
-                'order_id' => "int(10) unsigned DEFAULT NULL",
-                'product_id' => "int(10) unsigned DEFAULT NULL",
-                'qty' => "int(10) unsigned DEFAULT NULL",
-                'total' => "decimal(12,2) NOT NULL DEFAULT '0.0000'",
-                'product_info' => "text",
-            ],
-            BDb::PRIMARY => '(id)',
-            BDb::CONSTRAINTS => [
-                'cart' => ['order_id', $tOrder],
-            ],
-        ]);
-        /*
-        $tOrderAddress = $this->FCom_Sales_Model_Order_Address->table();
-        $this->BDb->ddlTableDef($tOrderAddress, [
-            BDb::COLUMNS => [
-                'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
-                'order_id' => "int(11) unsigned NOT NULL",
-                'atype' => "ENUM( 'shipping', 'billing' ) NOT NULL DEFAULT 'shipping'",
-                'firstname' => "varchar(50)  DEFAULT NULL",
-                'lastname' => "varchar(50)  DEFAULT NULL",
-                'middle_initial' => "varchar(2)  DEFAULT NULL",
-                'prefix' => "varchar(10)  DEFAULT NULL",
-                'suffix' => "varchar(10)  DEFAULT NULL",
-                'company' => "varchar(50)  DEFAULT NULL",
-                'attn' => "varchar(50)  DEFAULT NULL",
-                'street1' => "text  NOT NULL",
-                'street2' => "text ",
-                'street3' => "text ",
-                'city' => "varchar(50)  NOT NULL",
-                'region' => "varchar(50)  DEFAULT NULL",
-                'postcode' => "varchar(20)  DEFAULT NULL",
-                'country' => "char(2)  NOT NULL",
-                'phone' => "varchar(50)  DEFAULT NULL",
-                'fax' => "varchar(50)  DEFAULT NULL",
-                'create_at' => "datetime NOT NULL",
-                'update_at' => "datetime NOT NULL",
-                'lat' => "decimal(15,10) DEFAULT NULL",
-                'lng' => "decimal(15,10) DEFAULT NULL",
-            ],
-            BDb::PRIMARY => '(id)',
-            BDb::CONSTRAINTS => [
-                'cart' => ['order_id', $tOrder],
-            ],
-        ]);
-        */
-        /*
-        $tStatus = $this->FCom_Sales_Model_Order_CustomStatus->table();
-        $this->BDb->ddlTableDef($tStatus, [
-            BDb::COLUMNS => [
-                'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
-                'name' => "varchar(50) NOT NULL DEFAULT ''",
-                'code' => "varchar(50) NOT NULL DEFAULT ''",
-            ],
-            BDb::PRIMARY => '(id)',
-        ]);
-        $this->BDb->run("
-            insert into {$tStatus} (id,name,code) values(1, 'New', 'new'),(2,'Pending','pending'),(3,'Paid','paid')
-        ");
-        */
+    public function install__0_3_4()
+    {
+        $tUser = $this->FCom_Admin_Model_User->table();
 
         $tCart = $this->FCom_Sales_Model_Cart->table();
         $tCartItem = $this->FCom_Sales_Model_Cart_Item->table();
-        //$tCartAddress = $this->FCom_Sales_Model_Cart_Address->table();
+        $tOrder = $this->FCom_Sales_Model_Order->table();
+        $tOrderItem = $this->FCom_Sales_Model_Order_Item->table();
+
+        $tOrderShipment = $this->FCom_Sales_Model_Order_Shipment->table();
+        $tOrderShipmentItem = $this->FCom_Sales_Model_Order_Shipment_Item->table();
+
+        $tOrderPayment = $this->FCom_Sales_Model_Order_Payment->table();
+        $tOrderPaymentItem = $this->FCom_Sales_Model_Order_Payment_Item->table();
+
+        $tOrderReturn = $this->FCom_Sales_Model_Order_Return->table();
+        $tOrderReturnItem = $this->FCom_Sales_Model_Order_Return_Item->table();
+
+        $tOrderRefund = $this->FCom_Sales_Model_Order_Refund->table();
+        $tOrderRefundItem = $this->FCom_Sales_Model_Order_Refund_Item->table();
+
+        $tOrderCancel = $this->FCom_Sales_Model_Order_Cancel->table();
+        $tOrderCancelItem = $this->FCom_Sales_Model_Order_Cancel_Item->table();
+
+        $tOrderHistory = $this->FCom_Sales_Model_Order_History->table();
+
+        $tOrderComment = $this->FCom_Sales_Model_Order_Comment->table();
+
+        $tStateCustom = $this->FCom_Sales_Model_StateCustom->table();
 
         $this->BDb->ddlTableDef($tCart, [
             BDb::COLUMNS => [
@@ -157,6 +83,32 @@ class FCom_Sales_Migrate extends BClass
                 'last_calc_at' => "int unsigned",
                 'admin_id' => "int(10) unsigned  NULL",
                 'same_address' => "tinyint(1) not null default 0",
+
+                'state_overall' => "varchar(10) not null default ''",
+
+                'billing_company' => 'varchar(50)',
+                'billing_attn' => 'varchar(50)',
+                'billing_firstname' => 'varchar(50)',
+                'billing_lastname' => 'varchar(50)',
+                'billing_street' => 'varchar(255)',
+                'billing_city' => 'varchar(50)',
+                'billing_region' => 'varchar(50)',
+                'billing_postcode' => 'varchar(20)',
+                'billing_country' => 'char(2)',
+                'billing_phone' => 'varchar(50)',
+                'billing_fax' => 'varchar(50)',
+
+                'shipping_company' => 'varchar(50)',
+                'shipping_attn' => 'varchar(50)',
+                'shipping_firstname' => 'varchar(50)',
+                'shipping_lastname' => 'varchar(50)',
+                'shipping_street' => 'varchar(255)',
+                'shipping_city' => 'varchar(50)',
+                'shipping_region' => 'varchar(50)',
+                'shipping_postcode' => 'varchar(20)',
+                'shipping_country' => 'char(2)',
+                'shipping_phone' => 'varchar(50)',
+                'shipping_fax' => 'varchar(50)',
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
@@ -172,6 +124,8 @@ class FCom_Sales_Migrate extends BClass
                 'cart_id' => "int(10) unsigned DEFAULT NULL",
                 'product_id' => "int(10) unsigned DEFAULT NULL",
                 'product_sku' => "varchar(100) DEFAULT NULL",
+                'inventory_id' => 'int unsigned default null',
+                'inventory_sku' => 'varchar(100) default null',
                 'product_name' => "varchar(255) DEFAULT NULL",
                 'qty' => "decimal(12,2) DEFAULT NULL",
                 'price' => "decimal(12,2) NOT NULL DEFAULT '0.0000'",
@@ -184,79 +138,397 @@ class FCom_Sales_Migrate extends BClass
                 'promo_qty_used' => "decimal(12,2) DEFAULT NULL",
                 'promo_amt_used' => "decimal(12,2) DEFAULT NULL",
 
+                'parent_item_id' => 'int unsigned default null',
+                'shipping_size' => 'varchar(30)',
+                'shipping_weight' => 'decimal(12,2)',
+                'pack_separate' => 'tinyint not null default 0',
+                'unique_hash' => 'bigint default null',
+
                 'create_at' => "DATETIME NOT NULL",
                 'update_at' => "DATETIME NOT NULL",
                 'data_serialized' => "text  NULL",
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS => [
-                'cart_id' => "UNIQUE (`cart_id`,`product_id`)",
+                'IDX_cart_product_separate_hash' => '(cart_id, product_id, pack_separate, unique_hash)',
             ],
             BDb::CONSTRAINTS => [
                 'cart' => ['cart_id', $tCart],
+                'parent_item' => ['parent_item_id', $tCartItem],
             ],
         ]);
-        /*
-        $this->BDb->ddlTableDef($tCartAddress, [
+
+        $this->BDb->ddlTableDef($tOrder, [
+            BDb::COLUMNS => [
+                'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
+                'customer_id' => "int(10) unsigned DEFAULT NULL",
+                'customer_email' => "varchar(100) DEFAULT NULL",
+                'cart_id' => "int(10) unsigned NOT NULL",
+                'status' => "varchar(50) NOT NULL",
+                'item_qty' => "int(10) unsigned NOT NULL",
+                'subtotal' => "decimal(12,2) NOT NULL DEFAULT '0.00'",
+                'shipping_method' => "varchar(50) DEFAULT NULL",
+                'shipping_service' => "varchar(50) DEFAULT NULL",
+                'payment_method' => "varchar(50) DEFAULT NULL",
+                'coupon_code' => "varchar(50) DEFAULT NULL",
+                'tax' => "decimal(10,2) DEFAULT NULL",
+                'balance' => "decimal(10,2) NOT NULL",
+                'create_at' => "datetime DEFAULT NULL",
+                'update_at' => "datetime DEFAULT NULL",
+                'grandtotal' => "decimal(12,2) NOT NULL",
+                'shipping_service_title' => "varchar(100) DEFAULT NULL",
+                'data_serialized' => "text",
+                'unique_id' => "varchar(15) NOT NULL",
+                'admin_id' => "int(10) unsigned DEFAULT NULL",
+
+                'same_address' => "tinyint(1) not null default 0",
+
+                'billing_company' => 'varchar(50)',
+                'billing_attn' => 'varchar(50)',
+                'billing_firstname' => 'varchar(50)',
+                'billing_lastname' => 'varchar(50)',
+                'billing_street' => 'varchar(255)',
+                'billing_city' => 'varchar(50)',
+                'billing_region' => 'varchar(50)',
+                'billing_postcode' => 'varchar(20)',
+                'billing_country' => 'char(2)',
+                'billing_phone' => 'varchar(50)',
+                'billing_fax' => 'varchar(50)',
+
+                'shipping_company' => 'varchar(50)',
+                'shipping_attn' => 'varchar(50)',
+                'shipping_firstname' => 'varchar(50)',
+                'shipping_lastname' => 'varchar(50)',
+                'shipping_street' => 'varchar(255)',
+                'shipping_city' => 'varchar(50)',
+                'shipping_region' => 'varchar(50)',
+                'shipping_postcode' => 'varchar(20)',
+                'shipping_country' => 'char(2)',
+                'shipping_phone' => 'varchar(50)',
+                'shipping_fax' => 'varchar(50)',
+
+                'amount_paid' => 'decimal(12,2)',
+                'amount_due' => 'decimal(12,2)',
+                'amount_refunded' => 'decimal(12,2)',
+
+                'state_overall' => "varchar(15) not null default 'new'",
+                'state_delivery' => "varchar(15) not null default 'pending'",
+                'state_payment' => "varchar(15) not null default 'new'",
+                'state_custom' => "varchar(15) not null default ''",
+
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'UNQ_cart_id' => 'UNIQUE (cart_id)',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderItem, [
             BDb::COLUMNS => [
                 'id' => "int(10) unsigned NOT NULL AUTO_INCREMENT",
-                'cart_id' => "int(11) unsigned NOT NULL",
-                'atype' => "ENUM( 'shipping', 'billing' ) NOT NULL DEFAULT 'shipping'",
-                'firstname' => "varchar(50)  DEFAULT NULL",
-                'lastname' => "varchar(50)  DEFAULT NULL",
-                'middle_initial' => "varchar(2)  DEFAULT NULL",
-                'prefix' => "varchar(10)  DEFAULT NULL",
-                'suffix' => "varchar(10)  DEFAULT NULL",
-                'company' => "varchar(50)  DEFAULT NULL",
-                'attn' => "varchar(50)  DEFAULT NULL",
-                'street1' => "text  NOT NULL",
-                'street2' => "text ",
-                'street3' => "text ",
-                'city' => "varchar(50)  NOT NULL",
-                'region' => "varchar(50)  DEFAULT NULL",
-                'postcode' => "varchar(20)  DEFAULT NULL",
-                'country' => "char(2)  NOT NULL",
-                'phone' => "varchar(50)  DEFAULT NULL",
-                'fax' => "varchar(50)  DEFAULT NULL",
-                'email' => "VARCHAR( 100 ) NOT NULL",
-                'create_at' => "datetime NOT NULL",
-                'update_at' => "datetime NOT NULL",
-                'lat' => "decimal(15,10) DEFAULT NULL",
-                'lng' => "decimal(15,10) DEFAULT NULL",
+                'order_id' => "int(10) unsigned DEFAULT NULL",
+                'cart_item_id' => 'int unsigned default null',
+                'parent_item_id' => 'int unsigned default null',
+                'product_id' => "int(10) unsigned DEFAULT NULL",
+                'product_sku' => 'varchar(100) default null',
+                'inventory_id' => 'int unsigned default null',
+                'inventory_sku' => 'varchar(100) default null',
+                'total' => "decimal(12,2) NOT NULL DEFAULT '0.0000'",
+                'product_info' => "text",
+
+                'data_serialized' => 'text null',
+
+                'shipping_size' => 'varchar(30)',
+                'shipping_weight' => 'decimal(12,2)',
+
+                'qty_ordered' => 'int not null',
+                'qty_backordered' => 'int not null default 0',
+                'qty_canceled' => 'int not null default 0',
+                'qty_shipped' => 'int not null default 0',
+                'qty_returned' => 'int not null default 0',
+
+                'state_overall' => "varchar(10) not null default 'new'",
+                'state_delivery' => "varchar(10) not null default 'pending'",
+                'state_payment' => "varchar(10) not null default 'new'",
+                'state_custom' => "varchar(10) not null default ''",
             ],
             BDb::PRIMARY => '(id)',
             BDb::CONSTRAINTS => [
-                'cart' => ['cart_id', $tCart],
+                'cart' => ['order_id', $tOrder],
+                'parent_item' => ['parent_item_id', $tOrderItem],
             ],
         ]);
-        */
-        $tOrderPayment = $this->FCom_Sales_Model_Order_Payment->table();
+
+        $this->BDb->ddlTableDef($tOrderShipment, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned default null',
+                'state_overall' => "varchar(10) not null default 'new'",
+                'state_custom' => "varchar(10) not null default ''",
+                'carrier_code' => 'varchar(20)',
+                'service_code' => 'varchar(20)',
+                'carrier_desc' => 'varchar(50)',
+                'service_desc' => 'varchar(50)',
+                'carrier_price' => 'decimal(12,2)',
+                'customer_price' => 'decimal(12,2)',
+                'shipping_size' => 'varchar(30)',
+                'shipping_weight' => 'decimal(12,2)',
+                'num_items' => 'smallint',
+                'create_at' => 'datetime not null',
+                'packed_at' => 'datetime',
+                'estimated_ship_at' => 'datetime',
+                'shipped_at' => 'datetime',
+                'estimated_delivery_at' => 'datetime',
+                'delivered_at' => 'datetime',
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_state_overall' => '(state_overall)',
+                'IDX_state_custom' => '(state_custom)',
+            ],
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderShipmentItem, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned not null',
+                'order_item_id' => 'int unsigned not null',
+                'shipment_id' => 'int unsigned not null',
+                'qty' => 'int unsigned not null',
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+                'order_item' => ['order_item_id', $tOrderItem],
+                'shipment' => ['shipment_id', $tOrderShipment],
+            ],
+        ]);
+
         $this->BDb->ddlTableDef($tOrderPayment, [
             BDb::COLUMNS => [
                 'id'               => 'int (10) unsigned not null auto_increment',
+                'order_id'         => 'int unsigned not null',
                 'create_at'        => 'datetime not null',
                 'update_at'        => 'datetime null',
-                'method'           => 'varchar(50) not null',
+                'payment_method'   => 'varchar(50) not null',
                 'parent_id'        => 'int(10) null',
-                'order_id'         => 'int(10) unsigned not null',
-                'amount'           => 'decimal(12,2)',
+                'amount_authorized' => 'decimal(12,2)',
+                'amount_due'       => 'decimal(12,2)',
+                'amount_captured'  => 'decimal(12,2)',
+                'amount_refunded'  => 'decimal(12,2)',
                 'data_serialized'  => 'text',
-                'status'           => 'varchar(50)',
+                'transaction_status' => 'varchar(50)',
                 'transaction_id'   => 'varchar(50)',
                 'transaction_type' => 'varchar(50)',
+                'transaction_fee'  => 'decimal(12,2)',
                 'online'           => 'BOOL',
+                'state_overall'    => "varchar(20) not null default 'new'",
+                'state_custom'     => "varchar(20) not null default ''",
             ],
             BDb::PRIMARY => '(id)',
             BDb::KEYS  => [
-                'method'           => '(method)',
-                'order_id'         => '(order_id)',
-                'status'           => '(status)',
-                'transaction_id'   => '(transaction_id)',
-                'transaction_type' => '(transaction_type)',
+                'IDX_method_status' => '(payment_method, transaction_status)',
+                'IDX_order'         => '(order_id)',
+                'IDX_state_overall' => '(state_overall)',
+                'IDX_state_custom' => '(state_custom)',
+                'IDX_transaction_id' => '(transaction_id)',
+                'IDX_transaction_type' => '(transaction_type)',
             ],
             BDb::CONSTRAINTS => [
                 'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'RESTRICT'],
             ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderPaymentItem, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned default null',
+                'order_item_id' => 'int unsigned not null',
+                'payment_id' => 'int unsigned not null',
+                'qty' => 'int unsigned not null',
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+                'order_item' => ['order_item_id', $tOrderItem],
+                'payment' => ['payment_id', $tOrderPayment],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderReturn, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned default null',
+                'state_overall' => "varchar(10) not null default 'new'",
+                'state_custom' => "varchar(10) not null default ''",
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_state_overall' => '(state_overall)',
+                'IDX_state_custom' => '(state_custom)',
+            ],
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderReturnItem, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned not null',
+                'order_item_id' => 'int unsigned not null',
+                'return_id' => 'int unsigned not null',
+                'qty' => 'int unsigned not null',
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+                'order_item' => ['order_item_id', $tOrderItem],
+                'return' => ['return_id', $tOrderReturn],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderRefund, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned default null',
+                'state_overall' => "varchar(10) not null default 'new'",
+                'state_custom' => "varchar(10) not null default ''",
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_state_overall' => '(state_overall)',
+                'IDX_state_custom' => '(state_custom)',
+            ],
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderRefundItem, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned not null',
+                'order_item_id' => 'int unsigned not null',
+                'refund_id' => 'int unsigned not null',
+                'qty' => 'int unsigned not null',
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+                'order_item' => ['order_item_id', $tOrderItem],
+                'refund' => ['refund_id', $tOrderRefund],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderCancel, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned default null',
+                'state_overall' => "varchar(10) not null default 'new'",
+                'state_custom' => "varchar(10) not null default ''",
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_state_overall' => '(state_overall)',
+                'IDX_state_custom' => '(state_custom)',
+            ],
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderCancelItem, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned not null',
+                'cancel_id' => 'int unsigned not null',
+                'order_item_id' => 'int unsigned not null',
+                'qty' => 'int unsigned not null',
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+                'cancel' => ['cancel_id', $tOrderCancel],
+                'order_item' => ['order_item_id', $tOrderItem],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderHistory, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned default null',
+                // order, item, shipment, payment, refund, return
+                'entity_type' => "varchar(20) not null default 'order'",
+                'entity_id' => 'int unsigned default null',
+                'order_item_id' => 'int unsigned default null',
+                'event_type' => 'varchar(50) not null',
+                'event_description' => 'text',
+                'event_at' => 'datetime',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'user_id' => 'int unsigned default null',
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_event_at' => '(event_at)',
+                'IDX_order_id' => '(order_id, event_at)',
+                'IDX_entity_type_id' => '(entity_type, entity_id, event_at)',
+                'IDX_event_type_at' => '(event_type, event_at)',
+            ],
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+                'order_item' => ['order_item_id', $tOrderItem, 'id', 'CASCADE', 'SET NULL'],
+                'user' => ['user_id', $tUser, 'id', 'CASCADE', 'SET NULL'],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderComment, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'order_id' => 'int unsigned default null',
+                'comment_text' => 'text',
+                'from_admin' => 'tinyint not null',
+                'is_internal' => 'tinyint not null',
+                'user_id' => 'int unsigned default null',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_order_create' => '(order_id, create_at)',
+                'IDX_admin_user' => '(from_admin, user_id)',
+            ],
+            BDb::CONSTRAINTS => [
+                'order' => ['order_id', $tOrder],
+                'user' => ['user_id', $tUser, 'id', 'CASCADE', 'SET NULL'],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tStateCustom, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'entity_type' => 'varchar(15) not null',
+                'state_code' => 'varchar(20) not null',
+                'state_label' => 'varchar(50) not null',
+                'concrete_class' => 'varchar(100) null',
+                'data_serialized' => 'text',
+            ],
+            BDb::PRIMARY => '(id)',
         ]);
     }
 
@@ -1047,51 +1319,6 @@ class FCom_Sales_Migrate extends BClass
             ],
             BDb::PRIMARY => '(id)',
         ]);
-        /*
-        $tCartAddress = $this->FCom_Sales_Migrate_Model_Cart_Address->table();
-        if ($this->BDb->ddlTableExists($tCartAddress)) {
-            $addresses = $this->FCom_Sales_Migrate_Model_Cart_Address->orm()->find_many();
-            foreach ($addresses as $a) {
-                $prefix = $a->get('atype') . '_';
-                $this->FCom_Sales_Model_Cart->load($a->get('cart_id'))->set([
-                    $prefix . 'firstname' => $a->firstname,
-                    $prefix . 'lastname' => $a->lastname,
-                    $prefix . 'company' => $a->company,
-                    $prefix . 'attn' => $a->attn,
-                    $prefix . 'street' => trim($a->street1 . "\n" . $a->street2 . "\n" . $a->street3),
-                    $prefix . 'city' => $a->city,
-                    $prefix . 'region' => $a->region,
-                    $prefix . 'postcode' => $a->postcode,
-                    $prefix . 'country' => $a->country,
-                    $prefix . 'phone' => $a->phone,
-                    $prefix . 'fax' => $a->fax,
-                ])->save();
-            }
-            $this->BDb->ddlDropTable($tCartAddress);
-        }
-
-        $tOrderAddress = $this->FCom_Sales_Migrate_Model_Order_Address->table();
-        if ($this->BDb->ddlTableExists($tOrderAddress)) {
-            $addresses = $this->FCom_Sales_Migrate_Model_Order_Address->orm()->find_many();
-            foreach ($addresses as $a) {
-                $prefix = $a->get('atype') . '_';
-                $this->FCom_Sales_Model_Order->load($a->get('order_id'))->set([
-                    $prefix . 'firstname' => $a->firstname,
-                    $prefix . 'lastname' => $a->lastname,
-                    $prefix . 'company' => $a->company,
-                    $prefix . 'attn' => $a->attn,
-                    $prefix . 'street' => trim($a->street1 . "\n" . $a->street2 . "\n" . $a->street3),
-                    $prefix . 'city' => $a->city,
-                    $prefix . 'region' => $a->region,
-                    $prefix . 'postcode' => $a->postcode,
-                    $prefix . 'country' => $a->country,
-                    $prefix . 'phone' => $a->phone,
-                    $prefix . 'fax' => $a->fax,
-                ])->save();
-            }
-            $this->BDb->ddlDropTable($tOrderAddress);
-        }
-        */
 
         $this->BDb->ddlDropTable($this->BDb->t('fcom_sales_order_status'));
     }
@@ -1222,6 +1449,27 @@ class FCom_Sales_Migrate extends BClass
             ],
             BDb::CONSTRAINTS => [
                 'refund' => ['refund_id', $tOrderRefund],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_3__0_3_4()
+    {
+        $tCartItem = $this->FCom_Sales_Model_Cart_Item->table();
+        $tOrderItem = $this->FCom_Sales_Model_Order_Item->table();
+
+        $this->BDb->ddlTableDef($tCartItem, [
+            'COLUMNS' => [
+                'inventory_id' => 'int unsigned default null',
+                'inventory_sku' => 'varchar(100) default null',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderItem, [
+            BDb::COLUMNS => [
+                'product_sku' => 'varchar(100) default null',
+                'inventory_id' => 'int unsigned default null',
+                'stock_sku' => 'RENAME inventory_sku varchar(100) default null',
             ],
         ]);
     }

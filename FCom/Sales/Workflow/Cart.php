@@ -113,12 +113,14 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
             'post' => $post,
             'items' => &$itemsData,
         ]);
-
+        echo "<pre>"; var_dump($itemsData); exit;
         // add items to cart
         foreach ($itemsData as &$item) {
             if (empty($item['error'])) {
                 $cart->addProduct($item['product'], $item['details']);
                 $item['status'] = 'added';
+            } else {
+var_dump($item);
             }
         }
         unset($item);

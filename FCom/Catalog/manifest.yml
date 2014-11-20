@@ -32,6 +32,7 @@ modules:
                     - [ FCom_Admin_Controller_HeaderSearch::action_index, FCom_Catalog_Admin_Controller_Products.onHeaderSearch ]
                     - [ FCom_Admin_Controller::action_generate_sitemap, FCom_Catalog_Admin_Controller_Products.onGenerateSiteMap ]
                     - [ FCom_Admin_Controller::action_generate_sitemap, FCom_Catalog_Admin_Controller_Categories.onGenerateSiteMap ]
+                    - [ "FCom_Catalog_Admin_Controller_Products::formPostAfter:afterValidate", FCom_Catalog_Admin.onProductFormPostAfterValidate ]
                 security:
                     request_fields_whitelist:
                         /catalog/categories/tree_form:
@@ -67,6 +68,7 @@ modules:
                 observe:
                     - [ "FCom_FrontendCP_Frontend_Controller::action_update:after", "FCom_Catalog_Frontend_ControlPanel::onAfterUpdate" ]
                     - [ "FCom_Core_View_BackboneGrid::getPageRowsData", "FCom_Catalog_Admin_Controller_Products::processInitalData" ]
+                    - [ "FCom_Sales_Workflow::customerAddsItems:calcDetails", FCom_Catalog_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]
                 views:
                     - [ catalog/product/pager, { view_class: FCom_Catalog_Frontend_View_Pager } ]
                     - [ catalog/product/price, { view_class: FCom_Catalog_Frontend_View_Price } ]

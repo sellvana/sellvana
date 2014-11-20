@@ -7,11 +7,7 @@ class FCom_Sales_Workflow_Order extends FCom_Sales_Workflow_Abstract
     protected $_localHooks = [
         'customerPlacesOrder',
 
-        'customerCancelsOrder',
-
         'adminPlacesOrder',
-
-        'adminCancelsOrder',
 
         'adminUpdatesOrderShippingAddress',
         'adminUpdatesOrderBillingAddress',
@@ -36,13 +32,6 @@ class FCom_Sales_Workflow_Order extends FCom_Sales_Workflow_Abstract
         }
 
         $order->save();
-    }
-
-    public function customerCancelsOrder($args)
-    {
-        $args['order']->state()->overall()->setCancelRequested();
-        $args['order']->addHistoryEvent('cancel_req', 'Customer has requested order cancellation');
-        $args['order']->save();
     }
 
     public function adminPlacesOrder($args)
@@ -88,12 +77,6 @@ class FCom_Sales_Workflow_Order extends FCom_Sales_Workflow_Abstract
     {
         $args['order']->state()->overall()->setFraud();
         $args['order']->addHistoryEvent('fraud', 'Admin user has marked the order as fraud');
-        $args['order']->save();
-    }
-
-    public function adminCancelsOrder($args)
-    {
-        $args['order']->state()->overall()->setCanceled();
         $args['order']->save();
     }
 

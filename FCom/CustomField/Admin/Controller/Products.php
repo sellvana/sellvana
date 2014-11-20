@@ -59,6 +59,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
             ->join('FCom_CustomField_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
             ->select(['varfield_id' => 'vf.id', 'vf.field_id', 'varfield_label' => 'vf.field_label', 'vf.position'])
             ->select(['f.field_code', 'f.field_name'])
+            ->order_by_asc('vf.position')
             ->find_many_assoc('field_id');
         if ($varFields) {
             $varFieldsOptions = $this->FCom_CustomField_Model_FieldOption->orm()
@@ -123,6 +124,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
             ->join('FCom_CustomField_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
             ->select(['varfield_id' => 'vf.id', 'vf.field_id', 'varfield_label' => 'vf.field_label', 'vf.position'])
             ->select(['f.field_code', 'f.field_name'])
+            ->order_by_asc('vf.position')
             ->find_many_assoc('field_id');
 
         if ($varFields) {
