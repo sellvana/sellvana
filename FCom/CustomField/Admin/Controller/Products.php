@@ -12,7 +12,7 @@
  * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
  * @property FCom_Core_Main $FCom_Core_Main
  * @property FCom_CustomField_Model_ProductVarfield $FCom_CustomField_Model_ProductVarfield
- * @property FCom_CUstomField_Model_ProductVariantImage $FCom_CUstomField_Model_ProductVariantImage
+ * @property FCom_CustomField_Model_ProductVariantImage $FCom_CustomField_Model_ProductVariantImage
  */
 class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_Abstract
 {
