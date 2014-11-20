@@ -612,7 +612,6 @@ class FCom_Sales_Migrate extends BClass
         ");
     }
 
-
     public function upgrade__0_1_9__0_1_10()
     {
         /*
@@ -789,7 +788,6 @@ class FCom_Sales_Migrate extends BClass
             ],
         ]);
     }
-
 
     public function upgrade__0_2_2__0_2_3()
     {
