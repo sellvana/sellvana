@@ -39,12 +39,6 @@
  * @property FCom_Sales_Model_Cart_Address $FCom_Sales_Model_Cart_Address
  * @property FCom_Sales_Main $FCom_Sales_Main
  * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
- *
- * Uses:
- * @property FCom_Catalog_Model_Product     $FCom_Catalog_Model_Product
- * @property FCom_Customer_Model_Customer   $FCom_Customer_Model_Customer
- * @property FCom_Sales_Main                $FCom_Sales_Main
- * @property FCom_Sales_Model_Cart_Item     $FCom_Sales_Model_Cart_Item
  */
 class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 {
@@ -274,12 +268,12 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     public function findItemToMerge($params)
     {
-        if (!empty($params['is_separate'])) {
+        if (!empty($params['pack_separate'])) {
             return false;
         }
         $items = $this->items();
         foreach ($items as $item) {
-            if ($item->get('is_separate') || $item->get('product_id') !== $params['product_id']) {
+            if ($item->get('pack_separate') || $item->get('product_id') !== $params['product_id']) {
                 continue;
             }
 
@@ -317,11 +311,11 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
         /** @var FCom_Sales_Model_Cart_Item $item */
         $item = null;
-        if (empty($params['is_separate'])) {
+        if (empty($params['pack_separate'])) {
             $item = $this->FCom_Sales_Model_Cart_Item->loadWhere([
                 'cart_id' => $this->id(),
                 'product_id' => $productId,
-                'is_separate' => 0,
+                'pack_separate' => 0,
             ]);
             if ($item) {
                 $item->add('qty', $params['qty']);
@@ -334,7 +328,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 'product_id' => $productId,
                 'qty' => $params['qty'],
                 'price' => $params['price'],
-                'is_separate' => $params['is_separate'],
+                'pack_separate' => !empty($params['pack_separate']) ? $params['pack_separate'] : false,
             ]);
             if (!empty($params['data'])) {
                 foreach ($params['data'] as $key => $val) {

@@ -78,10 +78,6 @@ class FCom_CustomField_Admin extends BClass
             $model->setData('custom_fields', $data['custom_fields']);
         }
 
-        if (!empty($data['prod_frontend_data'])) {
-            $model->setData('frontend_fields', $this->BUtil->fromJson($data['prod_frontend_data']));
-        }
-
         // get new variant fields data from form
         $varFieldsData = [];
         if (!empty($data['vfields'])) {

@@ -6,6 +6,7 @@
  * Uses:
  * @property FCom_Sales_Model_Cart                  $FCom_Sales_Model_Cart
  * @property FCom_CustomField_Model_ProductVariant  $FCom_CustomField_Model_ProductVariant
+ * @property FCom_CustomField_Model_ProductVarfield $FCom_CustomField_Model_ProductVarfield
  */
 class FCom_CustomField_Frontend extends BClass
 {
@@ -53,23 +54,42 @@ class FCom_CustomField_Frontend extends BClass
         // TODO: Use for child items for bundles
         $cart = !empty($args['cart']) ? $args['cart'] : $this->FCom_Sales_Model_Cart->sessionCart();
 
+        $varfieldHlp = $this->FCom_CustomField_Model_ProductVarfield;
+        $variantHlp = $this->FCom_CustomField_Model_ProductVariant;
+
         foreach ($args['items'] as &$item) {
             $p = $item['product'];
-            if ($p->getData('variants_fields')) {
+            $variants = $variantHlp->orm()->where('product_id', $p->id())->find_many();
+            if ($variants) {
                 $varValues = $item['variant_select'];
-                /** @var FCom_CustomField_Model_ProductVariant $variantHlp */
-                $variantHlp = $this->FCom_CustomField_Model_ProductVariant;
 
-                if ($variantHlp->checkEmptyVariant($item['id'])) {
-                    //TODO: validate when product empty variant
-                    // is this situation common?
-                    continue;
-                }
                 if (empty($item['variant_select'])) {
                     $item['error'] = $this->BLocale->_('Please specify the product variant');
+                    $item['action'] = 'redirect_product';
                     continue;
                 }
-                $variant = $variantHlp->findByProductFieldValues($p, $varValues);
+
+                $varfields = $varfieldHlp->orm('vf')
+                    ->join('FCom_CustomField_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
+                    ->select('vf.*')
+                    ->select('f.field_code')
+                    ->where('vf.product_id', $p->id())
+                    ->find_many_assoc('field_id');
+                $valArr = [];
+                foreach ($varfields as $vf) {
+                    $code = $vf->get('field_code');
+                    $valArr[$code] = $varValues[$code];
+                }
+                ksort($valArr);
+                $valJson = $this->BUtil->toJson($valArr);
+                $variant = null;
+                foreach ($variants as $v) {
+                    if ($v->get('field_values') === $valJson) {
+                        $variant = $v;
+                        break;
+                    }
+                }
+
                 if (!$variant) {
                     $item['error'] = $this->BLocale->_('Invalid variant');
                     continue;
@@ -89,7 +109,7 @@ class FCom_CustomField_Frontend extends BClass
                 }
                 $item['details']['variant'] = $variant->as_array();
             }
-            $args['options']['data']['variants'] = $defaultVariant;
+            //$args['options']['data']['variants'] = $defaultVariant;
 
             if (isset($args['post']['shopper'])) {
                 $options['shopper'] = $args['post']['shopper'];

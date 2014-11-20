@@ -26,6 +26,10 @@ class FCom_Sales_Main extends BClass
             'sales/carts' => 'Carts',
             'sales/reports' => 'Reports'
         ]);
+
+        foreach (['Cart', 'Order', 'OrderItem', 'Payment', 'Shipment', 'Cancel', 'Return', 'Refund', 'Comment'] as $workflow) {
+            $this->{'FCom_Sales_Workflow_' . $workflow}->registerWorkflow();
+        }
     }
 
     /**
@@ -183,6 +187,11 @@ class FCom_Sales_Main extends BClass
             'async' => true,
             'filter' => true
         ]);
+    }
+
+    public function workflowAction($actionName, $args = [])
+    {
+        return $this->BEvents->fire('FCom_Sales_Workflow::' . $actionName, $args);
     }
 }
 

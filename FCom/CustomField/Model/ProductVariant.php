@@ -12,8 +12,12 @@
  * @property int $variant_qty
  *
  * DI
- * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ * @property FCom_CustomField_Model_ProductVarfield $FCom_CustomField_Model_ProductVarfield
+ * @property FCom_CustomField_Model_ProductVariant $FCom_CustomField_Model_ProductVariant
+ * @property FCom_CustomField_Model_FieldOption $FCom_CustomField_Model_FieldOption
+ * @property FCom_CustomField_Model_ProductVariantImage $FCom_CustomField_Model_ProductVariantImage
  */
 class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
 {
@@ -30,28 +34,45 @@ class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
      */
     public function fetchProductVariantsData($product)
     {
-        $fields = $product->getData('variants_fields');
-        if (!$fields) {
+        $pId = $product->id();
+        $varfieldHlp = $this->FCom_CustomField_Model_ProductVarfield;
+        $varfieldModels = $varfieldHlp->orm('vf')
+            ->join('FCom_CustomField_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
+            ->select(['vf.field_id', 'vf.field_label', 'vf.position'])
+            ->select('f.*')
+            ->where('vf.product_id', $pId)
+            ->order_by_asc('vf.position')
+            ->find_many_assoc('field_id');
+
+        if (!$varfieldModels) {
             return ['fields' => [], 'variants' => [], 'variants_tree' => []];
         }
-        $fieldIds = $this->BUtil->arrayToOptions($fields, 'id');
-        $fieldModels = $this->FCom_CustomField_Model_Field->orm()->where_in('id', $fieldIds)->find_many_assoc();
-        foreach ($fields as $k => $f) {
-            $m = $fieldModels[$f['id']];
-            $fields[$k]['frontend_label'] = $m->get('frontend_label') ? $m->get('frontend_label') : $m->get('name');
+
+        $fields = $this->BDb->many_as_array($varfieldModels);
+
+        $varModels = $this->orm()->where('product_id', $pId)->find_many_assoc();
+
+        $varImageHlp = $this->FCom_CustomField_Model_ProductVariantImage;
+        $varImageModels = $varImageHlp->orm()->where('product_id', $pId)->find_many();
+        $images = [];
+        foreach ($varImageModels as $m) {
+            $images[$m->get('variant_id')][] = $m->get('file_id');
         }
-        /** @var FCom_CustomField_Model_ProductVariant[] $varModels */
-        $varModels = $this->orm()->where('product_id', $product->id())->find_many();
+
+        foreach ($fields as &$f) {
+            $f['frontend_label'] = $f['field_label'] ? $f['field_label'] : ($f['frontend_label'] ? $f['frontend_label'] : $f['field_name']);
+        }
+        unset($f);
+
         $variants = [];
         $fieldValues = [];
         foreach ($varModels as $m) {
             $vr = $m->as_array();
             unset($vr['data_serialized']);
             $vr['field_values'] = $this->BUtil->fromJson($vr['field_values']);
-            $imgIds = $m->getData('variant_file_id');
-            $vr['img_ids'] = $imgIds ? explode(',', $imgIds) : [];
-            $vr['variant_sku'] = ($vr['variant_sku'] === '') ? $product->product_sku : $vr['variant_sku'];
-            $price = ($vr['variant_price'] > 0) ? $vr['variant_price'] : $product->base_price;
+            $vr['img_ids'] = !empty($images[$vr['id']]) ? $images[$vr['id']] : [];
+            $vr['variant_sku'] = ($vr['variant_sku'] === '') ? $product->get('product_sku') : $vr['variant_sku'];
+            $price = ($vr['variant_price'] > 0) ? $vr['variant_price'] : $product->get('base_price');
             $vr['variant_price'] = $this->BLocale->currency($price);
             $vrKeyArr = [];
             foreach ($fields as $f) {
@@ -63,9 +84,10 @@ class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
             $vrKey = join('|', $vrKeyArr);
             $variants[$vrKey] = $vr;
         }
-        foreach ($fields as $k => $field) {
-            $fields[$k]['options'] = $fieldValues[$field['field_code']];
+        foreach ($fields as &$f) {
+            $f['options'] = $fieldValues[$f['field_code']];
         }
+        unset($f);
         $varTree = $this->_buildVariantTree($fields, $variants);
         return ['fields' => $fields, 'variants' => $variants, 'variants_tree' => $varTree];
     }
