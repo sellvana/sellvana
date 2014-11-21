@@ -50,6 +50,7 @@ class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
 
         $fields = $this->BDb->many_as_array($varfieldModels);
 
+        /** @var FCom_CustomField_Model_ProductVarfield[] $varModels */
         $varModels = $this->orm()->where('product_id', $pId)->find_many_assoc();
 
         $varImageHlp = $this->FCom_CustomField_Model_ProductVariantImage;
