@@ -157,8 +157,10 @@ lib_admin_theme1:
             - [ requireJs, timeago, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/timeago/jquery.timeago", { deps: [ jquery ] } ]
             - [ requireJs, typeahead, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/typeahead/typeahead", { deps: [ jquery ] } ]
             - [ requireJs, jquery.validate, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/validate/jquery.validate.min", { deps: [ jquery ] } ]
+#            - [ requireJs, jquery.validate, "@FCom_Admin/Admin/theme1/assets/javascripts/plugins/validate/jquery.validate", { deps: [ jquery ] } ]
 
-            - [ js, "@FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery.js", { alias: jquery } ]
+            - [ js, "@FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery.min.js", { alias: jquery } ]
+#            - [ js, "@FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery.js", { alias: jquery } ]
             - [ requireJs, jquery-mobile, "@FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery.mobile.custom.min", { deps: [ jquery ] } ]
             #- [ requireJs, jquery-ui, "@FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery-ui.min", { deps: [ jquery ] } ]
             - [ requireJs, jquery-migrate, "@FCom_Admin/Admin/theme1/assets/javascripts/jquery/jquery-migrate.min", { deps: [ jquery ] } ]

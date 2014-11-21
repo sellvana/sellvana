@@ -3541,13 +3541,24 @@ class BLoginThrottle extends BClass
 class BYAML extends BCLass
 {
     /**
-     * @var null
+     * @var boolean
      */
     static protected $_peclYaml = null;
+
     /**
-     * @var null
+     * @var boolean
      */
     static protected $_peclSyck = null;
+
+    /**
+     * @var boolean
+     */
+    static protected $_syck = null;
+
+    /**
+     * @var boolean
+     */
+    static protected $_symfony = null;
 
     /**
      * @param $filename
@@ -3598,6 +3609,7 @@ class BYAML extends BCLass
 
             if (!static::$_peclYaml && !static::$_peclSyck) {
                 require_once(__DIR__ . '/lib/spyc.php');
+                static::$_spyc = true;
                 /*
                 require_once(__DIR__.'/Yaml/Exception/ExceptionInterface.php');
                 require_once(__DIR__.'/Yaml/Exception/RuntimeException.php');
@@ -3629,7 +3641,7 @@ class BYAML extends BCLass
             return syck_load($yamlData);
         }
 
-        if (class_exists('Spyc', false)) {
+        if (static::$_spyc) {
             return Spyc::YAMLLoadString($yamlData);
         } else {
             return Symfony\Component\Yaml\Yaml::parse($yamlData);
@@ -3650,7 +3662,7 @@ class BYAML extends BCLass
             return syck_dump($arrayData);
         }
 
-        if (class_exists('Spyc', false)) {
+        if (static::$_spyc) {
             return Spyc::YAMLDump($arrayData);
         } else {
             return Symfony\Component\Yaml\Yaml::dump($arrayData);

@@ -7,9 +7,11 @@
  * @property FCom_Promo_Model_Media $FCom_Promo_Model_Media
  * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
  * @property FCom_Promo_Model_Group $FCom_Promo_Model_Group
+ * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Admin_View_Grid $FCom_Admin_View_Grid
  * @property FCom_Promo_Model_Coupon $FCom_Promo_Model_Coupon
+ *
  */
 class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -538,12 +540,12 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         }
         $this->BResponse->json(['status' => $status, 'html'=>$html]);
     }
-    public function action_coupons_generate()
+    public function action_coupons_generate__POST()
     {
         $r = $this->BRequest;
 
         $id = $r->get('id');
-        $data = $r->get('model');
+        $data = $r->post('model');
         if (!$id) {
             $message = $this->_("Promotion id not found");
             $status = 'error';
@@ -596,7 +598,6 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
         $rows = [];
         try {
             foreach ($uploads['name'] as $i => $fileName) {
-                $error = false;
                 if (!$fileName) {
                     continue;
                 }
@@ -604,19 +605,20 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                 $path = $this->BApp->storageRandomDir() . '/import/coupons';
                 $this->BUtil->ensureDir($path);
                 $fullFileName = $path . '/' . trim($fileName, '\\/');
-                $realpath = str_replace('\\', '/', realpath(dirname($file)));
+                $realpath = str_replace('\\', '/', realpath(dirname($fullFileName)));
+                $imported = 0;
 
                 $this->BUtil->ensureDir(dirname($fullFileName));
                 $fileSize = 0;
                 if (strpos($realpath, $path) !== 0) {
-                    $error = $this->_("Weird file path.");
+                    $error = $this->_("Weird file path." . $realpath . '|' . $path);
                 } else if ($uploads['error'][$i]) {
                     $error = $uploads['error'][$i];
                 } elseif (!@move_uploaded_file($uploads['tmp_name'][$i], $fullFileName)) {
                     $error = $this->_("Problem storing uploaded file.");
                 } elseif ($importer->validateImportFile($fullFileName)) {
                     $this->BResponse->startLongResponse(false);
-                    $importer->importFromFile($fileName, $id);
+                    $imported = $importer->importFromFile($fullFileName, $id);
                     $error = '';
                     $fileSize = $uploads['size'][$i];
                 } else {
@@ -627,6 +629,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                     'name' => $fileName,
                     'size' => $fileSize,
                     'folder' => '.../',
+                    'imported' => $imported
                 ];
                 if ($error) {
                     $row['error'] = $error;
@@ -657,6 +660,94 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $html = $this->view('promo/coupons/import')->set('model', $m)->render();
         }
         $this->BResponse->json(['status' => $status, 'html' => $html]);
+    }
+
+    /**
+     * Fetch list of products to use in conditions
+     */
+    public function action_products()
+    {
+        if (!$this->BRequest->xhr()) {
+            $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+            return;
+        }
+
+        $r = $this->BRequest;
+        $page = $r->get('page')?:1;
+        $skuTerm = $r->get('q');
+        $limit = $r->get('o')?:30;
+        $offset = ($page - 1) * $limit;
+
+        /** @var BORM $orm */
+        $orm = $this->FCom_Catalog_Model_Product->orm('p')->select(['id', 'product_sku', 'product_name'],'p');
+        if($skuTerm) {
+            $orm->where(['OR' => [['product_sku LIKE ?', "%{$skuTerm}%"], ['product_name LIKE ?', "%{$skuTerm}%"]]]);
+        }
+
+        $countOrm = clone $orm;
+        $countOrm->select_expr('COUNT(*)', 'count');
+        $stmt = $countOrm->execute();
+        $countRes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $count = $countRes[0]['count'];
+
+        $orm->limit((int)$limit)->offset($offset)->order_by_desc('product_name');
+        $stmt = $orm->execute();
+        $result = ['total_count' => $count, 'items' => []];
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+//            $result['total_count'] += 1;
+
+            $result['items'][] = [
+                'id' => $row['id'],
+                'text' => $row['product_name'],
+                'sku' => $row['product_sku'],
+            ];
+        }
+
+        $this->BResponse->json($result);
+    }
+
+    /**
+     * Fetch list of categories to use in conditions
+     */
+    public function action_categories()
+    {
+        if (!$this->BRequest->xhr()) {
+            $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
+            return;
+        }
+
+        $r = $this->BRequest;
+        $page = $r->get('page')?:1;
+        $catTerm = $r->get('q');
+        $limit = $r->get('o')?:30;
+        $offset = ($page - 1) * $limit;
+
+        /** @var BORM $orm */
+        $orm = $this->FCom_Catalog_Model_Category->orm('c')->select(['id', 'full_name', 'node_name'],'c');
+        if($catTerm) {
+            $orm->where([['full_name LIKE ?', "%{$catTerm}%"]]);
+        }
+
+        $countOrm = clone $orm;
+        $countOrm->select_expr('COUNT(*)', 'count');
+        $stmt = $countOrm->execute();
+        $countRes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $count = $countRes[0]['count'];
+
+        $orm->limit((int)$limit)->offset($offset)->order_by_desc('node_name');
+        $stmt = $orm->execute();
+        $result = ['total_count' => $count, 'items' => []];
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+//            $result['total_count'] += 1;
+
+            $result['items'][] = [
+                'id' => $row['id'],
+                'text' => $row['node_name'],
+                'full_name' => $row['full_name'],
+            ];
+        }
+
+        $this->BResponse->json($result);
     }
 
     protected function _getMaxUploadSize()
