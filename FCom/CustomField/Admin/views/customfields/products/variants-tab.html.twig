@@ -68,7 +68,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
     var valueCurrentField = [];
     var vField = $('#variants-tab-field');
     var bodyGrid = $('#variant-grid').find('tbody');
-    var prodVariantGrid = bodyGrid;
+    prodVariantGrid = bodyGrid;
     var arrField = [];
     var field;
 
@@ -290,14 +290,14 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
         var variant_fields = [];
         var tmp_fields = [];
         vField.find('i.icon-remove').each(function () {
-            var op = {};
+            /*var op = {};
             _.findWhere(options, {name: $(this).attr('data-code')}).options.forEach(function (obj) {
                 op[obj.id] = obj.text;
-            });
+            });*/
             variant_fields.push({
                 id: $(this).attr('data-id'),
                 field_code: $(this).attr('data-code'),
-                options: op,
+                //options: op,
                 name: $(this).attr('data-name')
             });
             tmp_fields.push($(this).attr('data-code'));
