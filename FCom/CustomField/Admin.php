@@ -86,7 +86,11 @@ class FCom_CustomField_Admin extends BClass
                 $varFieldsData[(int)$vf['id']] = $vf;
             }
         }
-        $variantsData = $this->BUtil->fromJson($data['variants']);
+
+        $variantsData = [];
+        if (!empty($data['variants'])) {
+            $variantsData = $this->BUtil->fromJson($data['variants']);
+        }
         //$variantsDataIds = $this->BUtil->arrayToOptions($variantsData, 'id');
 
         #echo "<pre>"; var_dump($data, '<hr>', $varFieldsData, '<hr>', $variantsData); exit;
