@@ -3553,7 +3553,7 @@ class BYAML extends BCLass
     /**
      * @var boolean
      */
-    static protected $_syck = null;
+    static protected $_spyc = null;
 
     /**
      * @var boolean
