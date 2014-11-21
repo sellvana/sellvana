@@ -90,7 +90,7 @@ class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
         }
         unset($f);
         $varTree = $this->_buildVariantTree($fields, $variants);
-        return ['fields' => $fields, 'variants' => $variants, 'variants_tree' => $varTree];
+        return ['fields' => array_values($fields), 'variants' => $variants, 'variants_tree' => $varTree];
     }
 
     /**

@@ -73,9 +73,9 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
                 if (empty($reqItem['id']) || !is_numeric($reqItem['id'])) {
                     $item['error'] = 'Invalid item to add to cart';
                 }
-                $item = ['id' => $reqItem['id'], 'qty' => 1];
-                if (!empty($reqItem['qty'])) {
-                    $item['qty'] = $reqItem['qty'];
+                $item = $reqItem;
+                if (empty($item['qty'])) {
+                    $item['qty'] = 1;
                 }
                 $ids[] = $item['id'];
             } elseif (is_numeric($reqItem)) {
@@ -113,14 +113,13 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
             'post' => $post,
             'items' => &$itemsData,
         ]);
-        echo "<pre>"; var_dump($itemsData); exit;
+        //echo "<pre>"; var_dump($itemsData); exit;
         // add items to cart
         foreach ($itemsData as &$item) {
             if (empty($item['error'])) {
                 $cart->addProduct($item['product'], $item['details']);
                 $item['status'] = 'added';
             } else {
-var_dump($item);
             }
         }
         unset($item);

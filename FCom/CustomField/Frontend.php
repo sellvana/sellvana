@@ -61,14 +61,12 @@ class FCom_CustomField_Frontend extends BClass
             $p = $item['product'];
             $variants = $variantHlp->orm()->where('product_id', $p->id())->find_many();
             if ($variants) {
-                $varValues = $item['variant_select'];
-
                 if (empty($item['variant_select'])) {
                     $item['error'] = $this->BLocale->_('Please specify the product variant');
                     $item['action'] = 'redirect_product';
                     continue;
                 }
-
+                $varValues = $item['variant_select'];
                 $varfields = $varfieldHlp->orm('vf')
                     ->join('FCom_CustomField_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
                     ->select('vf.*')
