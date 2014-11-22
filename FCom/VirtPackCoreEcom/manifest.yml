@@ -47,5 +47,5 @@ modules:
                 FCom_Seo: 0.1.0
                 FCom_ShippingPlain: 0.1.0
                 FCom_ShippingUps: 0.1.0
-                #FCom_Stock: 0.1.0
+                FCom_ShopperFields: 0.1.0
                 FCom_Wishlist: 0.1.0

@@ -141,7 +141,7 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
             $cart->set('customer_id', $customer->id());
         }
 
-        $cart->calculateTotals()->save();
+        $cart->calculateTotals()->saveAllDetails();
 
         $args['result']['items'] = $itemsData;
     }
