@@ -214,7 +214,11 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
 
     var ConditionsRow = React.createClass({
         render: function () {
-            return (<div className={"form-group condition " + this.props.rowClass}>
+            var cls = "form-group condition";
+            if(this.props.rowClass) {
+                cls += " " + this.props.rowClass;
+            }
+            return (<div className={cls}>
                 <div className="col-md-3">
                     <Components.ControlLabel label_class="pull-right">{this.props.label}<DelBtn/></Components.ControlLabel>
                 </div>
@@ -226,7 +230,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     var ConditionsCompare = React.createClass({
         render: function () {
             return (
-                <select className="to-select2">
+                <select className="to-select2 form-control">
                     {this.props.opts.map(function(type){
                         return <option value={type.id} key={type.id}>{type.label}</option>
                     })}
@@ -473,14 +477,17 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         render: function () {
             return (
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
-                    <div className="col-md-5"><textarea ref="shippingResume" id="shippingResume" readOnly="readonly" value={this.state.value} className="form-control"/></div>
-                    <Components.Button type="button" className="btn-primary" ref="configure" onClick={this.handleConfigure}>Configure</Components.Button>
+                    <div className="col-md-5"><textarea ref="shippingResume" id="shippingResume"
+                            readOnly="readonly" value={this.state.value} className="form-control"/></div>
+                    <Components.Button type="button" className="btn-primary" ref="configure"
+                        onClick={this.handleConfigure}>Configure</Components.Button>
                 </ConditionsRow>
             );
         },
         getDefaultProps: function () {
             return {
-                label: "Destination"
+                label: "Destination",
+                modalTitle: "Shipping Reward Configuration"
             };
         },
         getInitialState: function () {
@@ -489,7 +496,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         handleConfigure: function (e) {
             Promo.log("Clicked");
             var modal = <Components.Modal onConfirm={this.handleShippingConfirm}
-                    title="Shipping Reward Configuration" onLoad={this.openModal}/>
+                    title={this.props.modalTitle} onLoad={this.openModal}><ConditionsShippingModalContent/></Components.Modal>;
 
             React.render(modal, this.props.modalContainer.get(0));
         },
@@ -502,6 +509,127 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         }
     });
 
+    var ConditionsShippingModalContent = React.createClass({
+        render: function () {
+            return (
+                <div className="shipping-combinations">
+                    <div className="form-group">
+                        <div className="col-md-4">
+                            <select ref="combinationType" className="form-control to-select2">
+                                <option value="0">All Conditions Have to Match</option>
+                                <option value="1">Any Condition Has to Match</option>
+                            </select>
+                        </div>
+                        <div className="col-md-4">
+                            <select ref="combinationField" className="form-control to-select2">
+                                <option value="">{this.props.labelCombinationField}</option>
+                                <option value="shipping_method">{this.props.labelMethod}</option>
+                                <option value="country">{this.props.labelCountry}</option>
+                                <option value="state">{this.props.labelState}</option>
+                                <option value="city">{this.props.labelCity}</option>
+                            </select>
+                        </div>
+                        <div className="col-md-4">
+                            <button className="btn btn-small btn-default" type="button" ref="fieldAdd">{Locale._("Add Field")}</button>
+                        </div>
+                    </div>
+                    <ConditionsShippingModalField label={this.props.labelMethod} url={this.props.urlMethod} />
+                    <ConditionsShippingModalField label={this.props.labelCountry} url={this.props.urlCountry} />
+                    <ConditionsShippingModalField label={this.props.labelState} url={this.props.urlState} />
+                    <ConditionsShippingModalField label={this.props.labelCity} url={this.props.urlCity} />
+                </div>
+            );
+        },
+        getDefaultProps: function () {
+            return {
+                labelMethod: Locale._("Method"),
+                labelCountry: Locale._("Country"),
+                labelState: Locale._("State/Province"),
+                labelCity: Locale._("City"),
+                labelCombinationField: Locale._("Add a Field to Condition...")
+            };
+        },
+        componentDidMount: function () {
+            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
+        }
+    });
+
+    var ConditionsShippingModalField = React.createClass({
+        render: function () {
+            return (
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                    <div className="col-md-4">
+                        <ConditionsCompare opts={this.props.opts} id="fieldCompare" ref="fieldCompare"/>
+                    </div>
+                    <div className="col-md-5"><input className="form-control" type="hidden" id="fieldCombination"
+                         ref="fieldCombination"/></div>
+                </ConditionsRow>
+            );
+        },
+        getDefaultProps: function () {
+            return {
+                label: Locale._("Unknown"),
+                url: "",
+                fcLabel: "",
+                opts: [
+                    {id:"in", label: "is one of"},
+                    {id:"not_in", label: "is not one of"},
+                ]
+            };
+        },
+        componentDidMount: function () {
+            var fieldCombination = this.refs.fieldCombination;
+            var self = this;
+            $(fieldCombination.getDOMNode()).select2({
+                placeholder: self.props.fcLabel,
+                minimumInputLength: 3,
+                maximumSelectionSize: 4,
+                multiple: true,
+                closeOnSelect: false,
+                ajax: {
+                    url: self.props.url,
+                    dataType: 'json',
+                    quietMillis: 300,
+                    data: function (term, page) {
+                        return {
+                            q: term,
+                            page: page,
+                            offset: 30
+                        };
+                    },
+                    results: function (data, page) {
+                        var more = (page * 30) < data.total_count;
+                        return {results: data.items, more: more};
+                    },
+                    cache: true
+                },
+                initSelection: function (element, callback) {
+                    var ids = this.state.categoryIds;
+                    if (ids) {
+                        $.ajax(self.props.url + "?ids=" + ids.join(','), {
+                            dataType: "json"
+                        }).done(function (data) {
+                            callback(data);
+                        });
+                    }
+                },
+                dropdownCssClass: "bigdrop",
+                dropdownAutoWidth: true,
+                selectOnBlur: true,
+                formatResult: function (item) {
+                    var markup = '<div class="row-fluid" title="' + item.text + '">' +
+                        '<div class="span2">ID: <em>' + item.id + '</em></div>' +
+                        '<div class="span2">Name: <strong>' + item.text.substr(0, 20);
+                    if (item.text.length > 20) {
+                        markup += '...';
+                    }
+                    markup += '</strong></div></div>';
+
+                    return markup;
+                }
+            });
+        }
+    });
 
     var ConditionsApp = React.createClass({
         render: function () {
