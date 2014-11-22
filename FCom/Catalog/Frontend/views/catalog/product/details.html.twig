@@ -57,7 +57,7 @@
             {{ THIS.hook('catalog/product/details:before_add_cart') | raw }}
             <div class="f-prod-add-cart">
               {{ THIS.view('catalog/product/variants').set('product', prod) | raw }}
-              {{ THIS.view('catalog/product/shopper').set('product', prod) | raw }}
+              {{ THIS.view('catalog/product/shopper_fields').set('product', prod) | raw }}
               <p class="f-stock-notice f-in-stock">{{ 'In Stock.'|_ }}</p>
               <p class="f-stock-notice f-out-of-stock" hidden>{{ 'Out Of Stock.'|_ }}</p>
 

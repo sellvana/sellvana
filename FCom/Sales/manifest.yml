@@ -1,6 +1,6 @@
 modules:
     FCom_Sales:
-        version: 0.3.4
+        version: 0.3.5
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_Customer: 0.1.0 } }
         description: "Fundamental Sales functionality"

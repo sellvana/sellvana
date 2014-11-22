@@ -89,7 +89,11 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
 
         // retrieve product records
         $products = $this->FCom_Catalog_Model_Product->orm('p')
-            ->where_in('p.id', $ids)->find_many_assoc();
+            ->where_in('p.id', $ids)
+            ->left_outer_join('FCom_Catalog_Model_InventorySku', ['i.inventory_sku', '=', 'p.inventory_sku'], 'i')
+            ->select('p.*')
+            ->select('i.id', 'inventory_id')
+            ->find_many_assoc();
         foreach ($itemsData as $i => &$item) {
             if (!empty($item['error'])) {
                 continue;
@@ -103,9 +107,17 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
             $item['details'] = [
                 'qty' => $item['qty'],
                 'price' => $p->getPrice(),
+                'product_id' => $p->id(),
                 'product_sku' => $p->get('product_sku'),
-                'stock_sku' => $p->get('stock_sku'),
+                'inventory_id' => $p->get('inventory_id'),
+                'inventory_sku' => $p->get('inventory_sku'),
             ];
+
+            $item['details']['signature'] = [
+                'product_sku' => $p->get('product_sku'),
+                'inventory_sku' => $p->get('inventory_sku'),
+            ];
+
         }
         unset($item);
 
@@ -207,7 +219,7 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
             $cart->setData('shipping_estimate', $estimate);
         }
 
-        $cart->calculateTotals()->save();
+        $cart->calculateTotals()->saveAllDetails();
 
         $args['result']['items'] = $items;
     }

@@ -1,0 +1,15 @@
+modules:
+    FCom_ShopperFields:
+        version: 0.1.0
+        require: { module: { FCom_Catalog: 0.3.2 } }
+
+        areas:
+            FCom_Frontend:
+                auto_use: [ views ]
+                observe:
+                    - [ "FCom_Sales_Workflow_Cart::customerAddsItemsToCart:calcDetails", FCom_ShopperFields_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]
+
+            FCom_Admin:
+                auto_use: [ views, layout ]
+                observe:
+                    - [ "FCom_Catalog_Admin_Controller_Products::formPostAfter:afterValidate", FCom_ShopperFields_Admin.onProductFormPostAfterValidate ]

@@ -1126,23 +1126,6 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return mixed
-     */
-    public function getFrontendFields()
-    {
-        $frontendFields = $this->getData('frontend_fields');
-        if ($frontendFields) {
-            usort($frontendFields, function ($a, $b) {
-                if ($a['position'] == $b['position']) {
-                    return 0;
-                }
-                return ($a['position'] < $b['position'])? -1: 1;
-            });
-        }
-        return $frontendFields;
-    }
-
-    /**
      * @return FCom_Catalog_Model_InventorySku
      * @throws BException
      */

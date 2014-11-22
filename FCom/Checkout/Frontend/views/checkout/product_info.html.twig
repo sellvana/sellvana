@@ -1,19 +1,15 @@
-{% set variant = THIS.get('variant') %}
-{% set field = THIS.get('field') %}
+{% set item = THIS.get('item') %}
+{% set display = item.getData('display') %}
 {% set product = THIS.get('product') %}
-<span class="product-name"><a href="{{ product.url() }}">{{ product.get('product_name') }}</a></span>
-{% if variant.field_values is defined %}
+<span class="product-name"><a href="{{ product.url() }}">{{ item.get('product_name') }}</a></span>
+{% if display %}
     <ul>
-        {% for key, value in variant.field_values %}
-            <li>{{ field.getFrontendLabel(key) }}: {{ value }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
-{% if variant.shopper is defined %}
-    <label class="col-md-12 control-label">{{ "Shopper"|_ }}</label>
-    <ul>
-        {% for key, info in variant.shopper %}
-            <li>{{ info.label }} {% if info.val is defined %} {{ info.val }} {% endif %} </li>
+        {% for row in display %}
+            {% if row.value is null %}
+                <li>{{ row.label }}</li>
+            {% else %}
+                <li>{{ row.label }}: {{ row.value }}</li>
+            {% endif %}
         {% endfor %}
     </ul>
 {% endif %}

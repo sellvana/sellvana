@@ -700,10 +700,11 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
         // find inventory model
         $invModel = $model->getInventoryModel();
         // update inventory model
-        if (!empty($data['inventory'])) {
+        if ($invModel && !empty($data['inventory'])) {
             // unset key field data
             unset($data['inventory']['id'], $data['inventory']['inventory_sku']);
             // save inventory form data
+            $data['inventory']['manage_inventory'] = $model->get('manage_inventory');
             $invModel->set($data['inventory'])->save();
         }
     }

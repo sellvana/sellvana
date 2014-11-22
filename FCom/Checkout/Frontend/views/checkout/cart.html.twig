@@ -16,7 +16,7 @@
     <div class="row">
         <div class="f-widget f-widget-cart f-col-cart-content col-md-8 col-lg-9">
             <header class="f-widget-header">
-                <strong class="f-widget-title">Items in cart</strong>
+                <strong class="f-widget-title">{{ 'Items in cart'|_ }}</strong>
             </header>
             <div class="table-responsive">
                 <form method="post" action="{{ APP.href('cart/add') }}">
@@ -34,47 +34,37 @@
                         <tbody>
                         {% for item in cartItems %}
                             {% set p = item.product() %}
-                            {% if p %}
-                                {% set pUrl = p.url() %}{% set pName = p.get('product_name') %}
-                                {% if item.data.variants is defined %}
-                                    {% set variants = item.data.variants %}
-                                {% else  %}
-                                    {% set variants = [{variant_price: item.get('price'), variant_qty: item.get('qty')}] %}
-                                {% endif %}
-                                {% for idVariant, variant in variants %}
-                                    <tr id="tr-product-{{ p.id }}">
-                                        <td class="f-cart-col-img">
-                                            <a href="{{ pUrl }}" class="f-prod-img">
-                                                <img src="{{ p.thumbUrl(80, 80) }}" width="80" height="80" alt="{{ pName }}"/>
-                                            </a>
-                                        </td>
-                                        <td class="f-cart-col-name">
-                                            {{ THIS.view('checkout/product_info').set({'variant': variant, 'field': field, 'product': p}) | raw }}
-                                        </td>
-                                        <td class="f-cart-col-qty text-center">
-                                            <input min="0" type="text" size="3" name="qty[{{ item.id() }}][{{ idVariant }}]" value="{{ variant.variant_qty*1 }}" class="f-input-qty input-sm form-control"/>
-                                        </td>
-                                        <td class="f-cart-col-total text-left">
-                                            <div class="checkbox">
-                                                <label><input type="checkbox" name="remove[{{ item.id() }}][{{ idVariant }}]" class="remove-checkbox" value="{{ item.id() }}"> Remove</label></div>
-                                        </td>
-                                        <td class="f-cart-col-price text-right">
-                                            <div class="f-price-group {{ loggedIn ? 'logged-in' : 'logged-out' }}">
-                                                <span class="f-reg-price">
-                                                  <span class="f-price">{{ variant.variant_price | currency }}</span>
-                                                </span>
-                                                            </div>
-                                                        </td>
-                                                        <td class="f-cart-col-total text-right">
-                                                            <div class="f-price-group">
-                                                <span class="f-reg-price">
-                                                  <span class="f-price">{{ item.rowTotal(idVariant) | currency }}</span>
-                                                </span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            {% endif %}
+                            <tr id="tr-product-{{ item.id() }}">
+                                <td class="f-cart-col-img">
+                                    <a href="{{ p.url() }}" class="f-prod-img">
+                                        <img src="{{ p.thumbUrl(80, 80) }}" width="80" height="80" alt="{{ item.get('product_name') }}"/>
+                                    </a>
+                                </td>
+                                <td class="f-cart-col-name">
+                                    {{ THIS.view('checkout/product_info').set({'item': item, 'product': p}) | raw }}
+                                </td>
+                                <td class="f-cart-col-qty text-center">
+                                    <input min="0" type="text" size="3" name="qty[{{ item.id() }}]" value="{{ item.qty*1 }}" class="f-input-qty input-sm form-control"/>
+                                </td>
+                                <td class="f-cart-col-total text-left">
+                                    <div class="checkbox">
+                                        <label><input type="checkbox" name="remove[{{ item.id() }}]" class="remove-checkbox" value="{{ item.id() }}"> {{ 'Remove'|_ }}</label></div>
+                                </td>
+                                <td class="f-cart-col-price text-right">
+                                    <div class="f-price-group {{ loggedIn ? 'logged-in' : 'logged-out' }}">
+                                        <span class="f-reg-price">
+                                          <span class="f-price">{{ item.price | currency }}</span>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="f-cart-col-total text-right">
+                                    <div class="f-price-group">
+                                        <span class="f-reg-price">
+                                            <span class="f-price">{{ item.rowtotal | currency }}</span>
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
                         {% endfor %}
                         </tbody>
                         <tfoot>
