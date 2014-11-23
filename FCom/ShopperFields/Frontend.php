@@ -35,7 +35,7 @@ class FCom_ShopperFields_Frontend extends BClass
                     $item['shopper'][$key]['val'] = null;
                 }
                 $item['details']['signature']['shopper_fields'][$key] = $value['val'];
-                $item['details']['shopper_fields'][$key] = $value['val'];
+                $item['details']['data']['shopper_fields'][$key] = $value['val'];
                 $item['details']['data']['display'][] = ['label' => $key, 'value' => $value['val']];
             }
         }

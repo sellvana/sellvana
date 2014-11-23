@@ -19,7 +19,7 @@
                 <strong class="f-widget-title">{{ 'Items in cart'|_ }}</strong>
             </header>
             <div class="table-responsive">
-                <form method="post" action="{{ APP.href('cart/add') }}">
+                <form method="post" action="{{ APP.href('cart/update') }}">
                     <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
                     <table class="table">
                         <thead>
@@ -105,6 +105,14 @@
                     {% endif %}
                 {% endfor %}
             </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            {{ THIS.view('checkout/cart/shipping-estimate-form') | raw }}
+        </div>
+        <div class="col-md-6">
+            {{ THIS.view('promo/coupon-form') | raw }}
         </div>
     </div>
     <div class="row">

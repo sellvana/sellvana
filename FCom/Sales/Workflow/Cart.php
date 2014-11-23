@@ -16,6 +16,8 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
         'customerAddsItemsToCart',
         'customerUpdatesCart',
 
+        'customerRequestsShippingEstimate',
+
         'customerAbandonsCart',
 
         'customerPlacesOrder',
@@ -28,7 +30,6 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
         'customerCreatesAccount',
 
         'customerAddsPromoCode',
-        'customerRequestsShippingEstimate',
 
         'customerCreatesShippingAddress',
         'customerCreatesBillingAddress',
@@ -223,6 +224,12 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
 
         $args['result']['items'] = $items;
     }
+
+    public function customerRequestsShippingEstimate($args)
+    {
+        $args['result']['status'] = 'success';
+    }
+
     /*
     public function customerUpdatesItems($args)
     {
@@ -248,10 +255,6 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
     }
 
     public function customerAddsPromoCode($args)
-    {
-    }
-
-    public function customerRequestsShippingEstimate($args)
     {
     }
 

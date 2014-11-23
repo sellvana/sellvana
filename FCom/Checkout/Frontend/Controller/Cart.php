@@ -44,48 +44,24 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         $redirHref = $this->BApp->href('cart');
         $post = $this->BRequest->post();
         $result = [];
-        if (isset($post['action'])) {
-            switch ($post['action']) {
-            case 'add':
-                // FCom_Sales_Workflow_Cart -> FCom_CustomField_Frontend -> FCom_Sales_Model_Cart
-                $this->FCom_Sales_Main->workflowAction('customerAddsItemsToCart', ['post' => $post, 'result' => &$result]);
-                $item = $result['items'][0];
-                if (!empty($item['status']) && $item['status'] === 'added') {
-                    $this->message('The product has been added to your cart');
-                } elseif (!empty($item['error'])) {
-                    $this->message($item['error'], 'error');
-                    if (!empty($item['product'])) {
-                        $redirHref = $item['product']->url();
-                    }
-                } else {
-                    $this->message("Unknown error, couldn't add item to cart", 'error');
-                    if (!empty($item['product'])) {
-                        $redirHref = $item['product']->url();
-                    }
-                }
-                break;
+
+        // FCom_Sales_Workflow_Cart -> FCom_CustomField_Frontend -> FCom_Sales_Model_Cart
+        $this->FCom_Sales_Main->workflowAction('customerAddsItemsToCart', ['post' => $post, 'result' => &$result]);
+        $item = $result['items'][0];
+        if (!empty($item['status']) && $item['status'] === 'added') {
+            $this->message('The product has been added to your cart');
+        } elseif (!empty($item['error'])) {
+            $this->message($item['error'], 'error');
+            if (!empty($item['product'])) {
+                $redirHref = $item['product']->url();
             }
         } else {
-            $this->FCom_Sales_Main->workflowAction('customerUpdatesCart', ['post' => $post, 'result' => &$result]);
-
-            if (!empty($result['items'])) {
-                foreach ($result['items'] as $item) {
-                    if (!empty($item['status'])) {
-                        switch ($item['status']) {
-                            case 'updated':
-                                $this->message('Cart item has been updated');
-                                break;
-                            case 'removed':
-                                $this->message('Cart item has been removed');
-                                break;
-                            case 'error':
-                                $this->message($item['message'], 'error');
-                                break;
-                        }
-                    }
-                }
+            $this->message("Unknown error, couldn't add item to cart", 'error');
+            if (!empty($item['product'])) {
+                $redirHref = $item['product']->url();
             }
         }
+
         $this->BResponse->redirect($redirHref);
     }
 
@@ -96,7 +72,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         $result = [];
         switch ($post['action']) {
         case 'add':
-            $this->FCom_Sales_Main->workflowAction('customerAddsItems', ['post' => $post, 'result' => &$result]);
+            $this->FCom_Sales_Main->workflowAction('customerAddsItemsToCart', ['post' => $post, 'result' => &$result]);
 
             $item = $result['items'][0];
             if (empty($item['error'])) {
@@ -120,5 +96,44 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         }
 
         $this->BResponse->json($result);
+    }
+
+    public function action_update__POST()
+    {
+        $post = $this->BRequest->post();
+        $result = [];
+
+        $this->FCom_Sales_Main->workflowAction('customerUpdatesCart', ['post' => $post, 'result' => &$result]);
+
+        if (!empty($result['items'])) {
+            foreach ($result['items'] as $item) {
+                if (!empty($item['status'])) {
+                    switch ($item['status']) {
+                        case 'updated':
+                            #$this->message('Cart item has been updated');
+                            break;
+                        case 'removed':
+                            $this->message('Cart item has been removed');
+                            break;
+                        case 'error':
+                            $this->message($item['message'], 'error');
+                            break;
+                    }
+                }
+            }
+            $this->message('Cart has been updated');
+        }
+        $this->BResponse->redirect('cart');
+    }
+
+    public function action_shipping_estimate__POST()
+    {
+        $redirUrl = 'cart';
+        $post = $this->BRequest->post();
+        $result = [];
+
+        $this->FCom_Sales_Main->workflowAction('customerRequestsShippingEstimate', ['post' => $post, 'result' => &$result]);
+
+        $this->BResponse->redirect($redirUrl);
     }
 }

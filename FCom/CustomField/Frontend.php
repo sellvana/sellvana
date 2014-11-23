@@ -42,7 +42,7 @@ class FCom_CustomField_Frontend extends BClass
      *                  - { label:"Extra", text:"Nice buttons" }
      *              variant: (NEW)
      *                  field_values: { color:blue, size:large }
-     *              shopper_fields: (NEW)
+     *              shopper_fields: (NEW, from FCom_ShopperFields)
      *                  - { label: "Label 1", value: "Val 1" }
      *      result:
      *          error:
@@ -118,6 +118,7 @@ class FCom_CustomField_Frontend extends BClass
                     $item['details']['price'] = $varArr['variant_price'];
                 }
 
+                $item['details']['data']['variant_fields'] = $valArr;
                 foreach ($varfields as $vf) {
                     $item['details']['data']['display'][] = [
                         'label' => $vf->get('field_label') ?: ($vf->get('frontend_label' ?: $vf->get('field_name'))),
