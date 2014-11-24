@@ -3,7 +3,6 @@
 /**
  * Class FCom_Checkout_Frontend_CheckoutMethod
  *
- * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  */
 
 class FCom_Checkout_Frontend_CheckoutMethod extends FCom_Sales_Method_Checkout_Abstract
@@ -11,7 +10,7 @@ class FCom_Checkout_Frontend_CheckoutMethod extends FCom_Sales_Method_Checkout_A
     public function getCartCheckoutButton()
     {
         return [
-            'href'  => $this->BApp->href($this->FCom_Customer_Model_Customer->isLoggedIn() ? 'checkout' : 'checkout/login'),
+            'href'  => $this->BApp->href('checkout'),
             'label' => 'Proceed to Checkout',
         ];
     }

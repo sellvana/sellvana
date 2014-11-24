@@ -289,6 +289,12 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
 
     public function action_form__POST()
     {
+        /*echo "<pre>";
+        print_r($_POST);
+        print_r(json_decode($_POST['vfields']));
+        print_r(json_decode($_POST['variants']));
+        echo "</pre>";
+        die;*/
         $r = $this->BRequest;
         $args = [];
         $formId = $this->formId();

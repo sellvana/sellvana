@@ -13,7 +13,6 @@ modules:
 
         areas:
             FCom_Frontend:
-                auto_use: [ views ]
                 views:
                     - [ root, { view_class: FCom_Frontend_View_Root } ]
                     - [ breadcrumbs, { view_class: FCom_Frontend_View_Breadcrumbs } ]

@@ -27,7 +27,7 @@ class FCom_Sales_Main extends BClass
             'sales/reports' => 'Reports'
         ]);
 
-        foreach (['Cart', 'Order', 'OrderItem', 'Payment', 'Shipment', 'Cancel', 'Return', 'Refund', 'Comment'] as $workflow) {
+        foreach (['Cart', 'Checkout', 'Order', 'OrderItem', 'Payment', 'Shipment', 'Cancel', 'Return', 'Refund', 'Comment'] as $workflow) {
             $this->{'FCom_Sales_Workflow_' . $workflow}->registerWorkflow();
         }
     }
@@ -192,6 +192,30 @@ class FCom_Sales_Main extends BClass
     public function workflowAction($actionName, $args = [])
     {
         return $this->BEvents->fire('FCom_Sales_Workflow::' . $actionName, $args);
+    }
+
+    /**
+     * Init cart after all modules are registered
+     *
+     * @todo deprecated?
+     */
+    public function initCartTotals()
+    {
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
+        if (false == $cart->items()) {
+            return;
+        }
+        $this->FCom_Sales_Model_Cart->addTotalRow('subtotal', ['callback' => 'FCom_Sales_Model_Cart.subtotalCallback',
+            'label' => 'Subtotal', 'after' => '']);
+        if ($cart->shipping_method) {
+            $shippingClass = $this->FCom_Sales_Main->getShippingMethodClassName($cart->shipping_method);
+            $this->FCom_Sales_Model_Cart->addTotalRow('shipping', ['callback' => $shippingClass . '.getRateCallback',
+                'label' => 'Shipping', 'after' => 'subtotal']);
+        }
+        if ($cart->coupon_code) {
+            $this->FCom_Sales_Model_Cart->addTotalRow('discount', ['callback' => 'FCom_Sales_Model_Cart.discountCallback',
+                'label' => 'Discount', 'after' => 'shipping']);
+        }
     }
 }
 

@@ -151,7 +151,7 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
                 continue;
             }
             for ($i = 0; $i < $item->getQty(); $i++) {
-                if ($item->isGroupAble()) {
+                if ($item->isGroupable()) {
                     if (!empty($packages[$groupPackageId]) && $itemWeight + $packages[$groupPackageId] >= 150) {
                         $packageId++;
                         $groupPackageId = $packageId;

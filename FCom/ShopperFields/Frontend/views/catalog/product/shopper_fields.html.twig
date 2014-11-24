@@ -1,5 +1,5 @@
 {% set prod = THIS.get('product') %}
-{% set shopper = prod.getFrontendFields() %}
+{% set shopper = APP.instance('FCom_ShopperFields_Frontend').getProductFrontendFields(prod) %}
 {% if shopper %}
     <div id="f-prod-tab-shopper">
         <div class="f-tab-heading">

@@ -1,0 +1,10 @@
+
+/cart:
+    - { include: base }
+    - { hook: main, views: cart }
+    - { hook: cart_upsell, views: cart/also-bought }
+    - { view: root, do: [[ addBodyClass, page-cart ]] }
+    - view: head
+        do:
+            - [ title, Shopping Cart ]
+            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]

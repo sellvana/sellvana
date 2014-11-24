@@ -40,7 +40,6 @@
         <form action="{{ APP.href('cart/add') }}" method="post" onsubmit="" >
           <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
           <input type="hidden" name="id" value="{{ prod.id() }}">
-          <input type="hidden" name="action" value="add">
           <h1 class="f-prod-name">{{ prod.get('product_name') }}</h1>
 
 {% if prod.getAverageStars() %}
@@ -57,7 +56,7 @@
             {{ THIS.hook('catalog/product/details:before_add_cart') | raw }}
             <div class="f-prod-add-cart">
               {{ THIS.view('catalog/product/variants').set('product', prod) | raw }}
-              {{ THIS.view('catalog/product/shopper').set('product', prod) | raw }}
+              {{ THIS.view('catalog/product/shopper_fields').set('product', prod) | raw }}
               <p class="f-stock-notice f-in-stock">{{ 'In Stock.'|_ }}</p>
               <p class="f-stock-notice f-out-of-stock" hidden>{{ 'Out Of Stock.'|_ }}</p>
 

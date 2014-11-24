@@ -16,6 +16,8 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
         'customerAddsItemsToCart',
         'customerUpdatesCart',
 
+        'customerRequestsShippingEstimate',
+
         'customerAbandonsCart',
 
         'customerPlacesOrder',
@@ -28,7 +30,6 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
         'customerCreatesAccount',
 
         'customerAddsPromoCode',
-        'customerRequestsShippingEstimate',
 
         'customerCreatesShippingAddress',
         'customerCreatesBillingAddress',
@@ -73,9 +74,9 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
                 if (empty($reqItem['id']) || !is_numeric($reqItem['id'])) {
                     $item['error'] = 'Invalid item to add to cart';
                 }
-                $item = ['id' => $reqItem['id'], 'qty' => 1];
-                if (!empty($reqItem['qty'])) {
-                    $item['qty'] = $reqItem['qty'];
+                $item = $reqItem;
+                if (empty($item['qty'])) {
+                    $item['qty'] = 1;
                 }
                 $ids[] = $item['id'];
             } elseif (is_numeric($reqItem)) {
@@ -89,7 +90,11 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
 
         // retrieve product records
         $products = $this->FCom_Catalog_Model_Product->orm('p')
-            ->where_in('p.id', $ids)->find_many_assoc();
+            ->where_in('p.id', $ids)
+            ->left_outer_join('FCom_Catalog_Model_InventorySku', ['i.inventory_sku', '=', 'p.inventory_sku'], 'i')
+            ->select('p.*')
+            ->select('i.id', 'inventory_id')
+            ->find_many_assoc();
         foreach ($itemsData as $i => &$item) {
             if (!empty($item['error'])) {
                 continue;
@@ -103,9 +108,17 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
             $item['details'] = [
                 'qty' => $item['qty'],
                 'price' => $p->getPrice(),
+                'product_id' => $p->id(),
                 'product_sku' => $p->get('product_sku'),
-                'stock_sku' => $p->get('stock_sku'),
+                'inventory_id' => $p->get('inventory_id'),
+                'inventory_sku' => $p->get('inventory_sku'),
             ];
+
+            $item['details']['signature'] = [
+                'product_sku' => $p->get('product_sku'),
+                'inventory_sku' => $p->get('inventory_sku'),
+            ];
+
         }
         unset($item);
 
@@ -113,14 +126,13 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
             'post' => $post,
             'items' => &$itemsData,
         ]);
-        echo "<pre>"; var_dump($itemsData); exit;
+        //echo "<pre>"; var_dump($itemsData); exit;
         // add items to cart
         foreach ($itemsData as &$item) {
             if (empty($item['error'])) {
                 $cart->addProduct($item['product'], $item['details']);
                 $item['status'] = 'added';
             } else {
-var_dump($item);
             }
         }
         unset($item);
@@ -130,7 +142,7 @@ var_dump($item);
             $cart->set('customer_id', $customer->id());
         }
 
-        $cart->calculateTotals()->save();
+        $cart->calculateTotals()->saveAllDetails();
 
         $args['result']['items'] = $itemsData;
     }
@@ -208,10 +220,16 @@ var_dump($item);
             $cart->setData('shipping_estimate', $estimate);
         }
 
-        $cart->calculateTotals()->save();
+        $cart->calculateTotals()->saveAllDetails();
 
         $args['result']['items'] = $items;
     }
+
+    public function customerRequestsShippingEstimate($args)
+    {
+        $args['result']['status'] = 'success';
+    }
+
     /*
     public function customerUpdatesItems($args)
     {
@@ -237,10 +255,6 @@ var_dump($item);
     }
 
     public function customerAddsPromoCode($args)
-    {
-    }
-
-    public function customerRequestsShippingEstimate($args)
     {
     }
 
@@ -273,32 +287,5 @@ var_dump($item);
         $cart = $this->_getCart($args);
         $cart->setStatusAbandoned()->save();
         $this->BLayout->view('email/sales/cart-state-abandoned.html.twig')->email();
-    }
-
-    public function customerPlacesOrder($args)
-    {
-        /** @var FCom_Customer_Model_Customer $customer */
-        $customer = $this->_getCustomer($args);
-
-        /** @var FCom_Sales_Model_Cart $cart */
-        $cart = $this->_getCart($args);
-
-        /** @var FCom_Sales_Model_Order $order */
-        $order = $this->FCom_Sales_Model_Order->create();
-
-        $order->importDataFromCart($cart);
-
-        if ($order->isPayable()) {
-            $result = [];
-            $this->FCom_Sales_Main->workflowAction('customerPaysOnCheckout', [
-                'cart' => $cart,
-                'order' => $order,
-                'result' => &$result,
-            ]);
-        }
-
-        $cart->setStateOrdered()->save();
-
-        $args['result']['order'] = $order;
     }
 }

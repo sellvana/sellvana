@@ -23,6 +23,7 @@ modules:
                 auto_use: [ views, layout ]
                 routing:
                     - [ /promo/media, FCom_Promo_Frontend_Controller.media ]
+                    - [ /promo/add, FCom_Promo_Frontend_Controller.add ]
                 observe:
                     - [ "FCom_Sales_Model_Cart::calculateTotals", "FCom_Promo_Frontend::onPromoCartValidate" ]
                     - [ "FCom_Sales_Model_Cart::addProduct", "FCom_Promo_Frontend::onPromoCartAddProduct" ]

@@ -3286,6 +3286,11 @@ class BModel extends Model
         return $values;
     }
 
+    protected function _validationRules()
+    {
+        return static::$_validationRules;
+    }
+
     /**
      * Model validation
      *
@@ -3305,7 +3310,7 @@ class BModel extends Model
         if (!$data && $this->orm) {
             $data = $this->as_array();
         }
-        $rules = array_merge(static::$_validationRules, $rules);
+        $rules = array_merge($this->_validationRules(), $rules);
         $this->BEvents->fire($this->_origClass() . "::validate:before", ["rules" => &$rules, "data" => &$data]);
         $valid = $this->BValidate->validateInput($data, $rules, $formName);
         if (!$valid) {

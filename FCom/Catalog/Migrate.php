@@ -666,4 +666,18 @@ class FCom_Catalog_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_3_1__0_3_2()
+    {
+        $tSku = $this->FCom_Catalog_Model_InventorySku->table();
+        $this->BDb->ddlTableDef($tSku, [
+            BDb::COLUMNS => [
+                'qty_reserved' => 'int unsigned not null default 0 after qty_buffer',
+                'manage_inventory' => 'tinyint not null default 0',
+            ],
+            BDb::KEYS => [
+                'IDX_manage_inventory' => '(manage_inventory)',
+            ],
+        ]);
+    }
 }

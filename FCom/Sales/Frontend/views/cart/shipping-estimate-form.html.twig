@@ -1,0 +1,5 @@
+<form method="post" action="{{ APP.href('cart/shipping_estimate') }}">
+    <label for="shipping-estimate-postcode">{{ 'Zip Code:'|_ }}</label>
+    <input type="text" id="shipping-estimate-postcode" name="shipping[postcode]" required>
+    <button type="submit" class="btn btn-default btn-xs">{{ 'Estimate'|_ }}</button>
+</form>

@@ -11,6 +11,7 @@
  * @property FCom_CustomField_Model_ProductVariantField $FCom_CustomField_Model_ProductVariantField
  * @property FCom_CustomField_Model_ProductVariantImage $FCom_CustomField_Model_ProductVariantImage
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
  */
 class FCom_CustomField_Admin extends BClass
 {
@@ -86,13 +87,17 @@ class FCom_CustomField_Admin extends BClass
                 $varFieldsData[(int)$vf['id']] = $vf;
             }
         }
-        $variantsData = $this->BUtil->fromJson($data['variants']);
+
+        $variantsData = [];
+        if (!empty($data['variants'])) {
+            $variantsData = $this->BUtil->fromJson($data['variants']);
+        }
         //$variantsDataIds = $this->BUtil->arrayToOptions($variantsData, 'id');
 
         #echo "<pre>"; var_dump($data, '<hr>', $varFieldsData, '<hr>', $variantsData); exit;
 
         $pId = $model->id();
-        
+
         // retrieve variant fields already associated to product
         $prodVarfieldHlp = $this->FCom_CustomField_Model_ProductVarfield;
         $prodVarfieldModels = $prodVarfieldHlp->orm()->where('product_id', $pId)->find_many_assoc('field_id');
@@ -144,7 +149,7 @@ class FCom_CustomField_Admin extends BClass
                 $fieldOptionsById[$m->get('field_id')][$m->id()] = $m->get('label');
                 $fieldOptionsByLabel[$m->get('field_id')][$m->get('label')] = $m->id();
             }
-            
+
             // retrieve related product variants field values and associate with variants
             $prodVariantFieldHlp = $this->FCom_CustomField_Model_ProductVariantField;
             $prodVariantFieldModels = $prodVariantFieldHlp->orm()->where('product_id', $pId)->find_many_assoc('id');
@@ -158,7 +163,11 @@ class FCom_CustomField_Admin extends BClass
 #echo "<pre>"; var_dump($prodVariantFieldsArr); echo "</pre>";
             // match variants from form data to already existing variants by key fields values
             $matchedVariants = [];
+            $variantSkus = [];
             foreach ($variantsData as $i => &$vd) {
+                if ($vd['variant_sku'] !== '') {
+                    $variantSkus[$i] = $vd['variant_sku'];
+                }
                 foreach ($prodVariantModels as $vId => $vm) {
                     if (empty($prodVariantFieldsArr[$vId])) {
                         continue;
@@ -185,6 +194,10 @@ class FCom_CustomField_Admin extends BClass
             }
             $prodVariantHlp->delete_many($where);
 
+            $invHlp = $this->FCom_Catalog_Model_InventorySku;
+            $invModels = $invHlp->orm()->where_in('inventory_sku', $variantSkus)
+                ->find_many_assoc('inventory_sku');
+
             // update matched variant models and create new variants
             foreach ($variantsData as $i => $vd) {
                 if (!empty($matchedVariants[$i])) {
@@ -192,11 +205,21 @@ class FCom_CustomField_Admin extends BClass
                 } else {
                     $m = $prodVariantHlp->create(['product_id' => $pId]);
                 }
+                if ($vd['variant_qty'] !== '') {
+                    if (empty($invModels[$vd['variant_sku']])) {
+                        $invModels[$vd['variant_sku']] = $invHlp->create([
+                            'inventory_sku' => $vd['variant_sku'],
+                        ])->save();
+                    }
+                    $invModels[$vd['variant_sku']]->set([
+                        'qty_in_stock' => $vd['variant_qty'],
+                    ])->save();
+                }
                 $m->set([
                     'field_values'  => $this->BUtil->toJson($vd['field_values']),
                     'variant_sku'   => $vd['variant_sku']   !== '' ? $vd['variant_sku']   : null,
                     'variant_price' => $vd['variant_price'] !== '' ? $vd['variant_price'] : null,
-                    'variant_qty'   => $vd['variant_qty']   !== '' ? $vd['variant_qty']   : null,
+                    'manage_inventory' => $vd['variant_qty'] !== '' ? 1 : 0,
                 ])->save();
                 if (empty($matchedVariants[$i])) {
                     $prodVariantModels[$m->id()] = $m;

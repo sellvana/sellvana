@@ -34,4 +34,4 @@ modules:
                 auto_use: [ views ]
                 observe:
                     - [ "BLayout::hook:custom-fields-filters", FCom_CustomField_Main.hookCustomFieldFilters ]
-                    - [ "FCom_Sales_Workflow::customerAddsItems:calcDetails", FCom_CustomField_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]
+                    - [ "FCom_Sales_Workflow_Cart::customerAddsItemsToCart:calcDetails", FCom_CustomField_Frontend.onWorkflowCustomerAddsItemsCalcDetails ]

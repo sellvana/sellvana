@@ -7,6 +7,7 @@
  * @property FCom_Sales_Model_Cart                  $FCom_Sales_Model_Cart
  * @property FCom_CustomField_Model_ProductVariant  $FCom_CustomField_Model_ProductVariant
  * @property FCom_CustomField_Model_ProductVarfield $FCom_CustomField_Model_ProductVarfield
+ * @property FCom_Catalog_Model_InventorySku        $FCom_Catalog_Model_InventorySku
  */
 class FCom_CustomField_Frontend extends BClass
 {
@@ -41,8 +42,8 @@ class FCom_CustomField_Frontend extends BClass
      *                  - { label:"Extra", text:"Nice buttons" }
      *              variant: (NEW)
      *                  field_values: { color:blue, size:large }
-     *              frontend_fields: (NEW)
-     *                  - { label: "Label 1", val: "Val 1" }
+     *              shopper_fields: (NEW, from FCom_ShopperFields)
+     *                  - { label: "Label 1", value: "Val 1" }
      *      result:
      *          error:
      *
@@ -50,10 +51,6 @@ class FCom_CustomField_Frontend extends BClass
      */
     public function onWorkflowCustomerAddsItemsCalcDetails($args)
     {
-        $post = $args['post'];
-        // TODO: Use for child items for bundles
-        $cart = !empty($args['cart']) ? $args['cart'] : $this->FCom_Sales_Model_Cart->sessionCart();
-
         $varfieldHlp = $this->FCom_CustomField_Model_ProductVarfield;
         $variantHlp = $this->FCom_CustomField_Model_ProductVariant;
 
@@ -61,18 +58,16 @@ class FCom_CustomField_Frontend extends BClass
             $p = $item['product'];
             $variants = $variantHlp->orm()->where('product_id', $p->id())->find_many();
             if ($variants) {
-                $varValues = $item['variant_select'];
-
                 if (empty($item['variant_select'])) {
                     $item['error'] = $this->BLocale->_('Please specify the product variant');
                     $item['action'] = 'redirect_product';
                     continue;
                 }
-
+                $varValues = $item['variant_select'];
                 $varfields = $varfieldHlp->orm('vf')
                     ->join('FCom_CustomField_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
                     ->select('vf.*')
-                    ->select('f.field_code')
+                    ->select(['f.field_code', 'f.field_name', 'f.frontend_label'])
                     ->where('vf.product_id', $p->id())
                     ->find_many_assoc('field_id');
                 $valArr = [];
@@ -89,68 +84,47 @@ class FCom_CustomField_Frontend extends BClass
                         break;
                     }
                 }
-
                 if (!$variant) {
                     $item['error'] = $this->BLocale->_('Invalid variant');
                     continue;
                 }
-                $availQty = $variant->get('variant_qty');
-                if (!$availQty) { //TODO: allow empty qty
-                    $item['error'] = $this->BLocale->_('The variant is out of stock');
-                    continue;
-                }
-                if ($availQty < $item['qty']) {
-                    $item['error'] = $this->BLocale->_('The variant currently has only %s items in stock', $variant->variant_qty);
-                    continue;
+                $varArr = $variant->as_array();
+                $invSku = $varArr['variant_sku'] !== null ? $varArr['variant_sku'] : $p->get('inventory_sku');
+                $invModel = $this->FCom_Catalog_Model_InventorySku->load($invSku, 'inventory_sku');
+
+                if ($varArr['variant_sku'] !== null && !$invModel) { // TODO: only for debugging during development
+                    $invModel = $this->FCom_Catalog_Model_InventorySku->load($p->get('inventory_sku'), 'inventory_sku');
                 }
 
-                if ($variant->get('variant_price') > 0) { //TODO: allow free variants
-                    $args['options']['price'] = $variant->variant_price;
+                if ($p->get('manage_inventory') && $invModel->get('manage_inventory')) {
+                    $availQty = $invModel->getQtyAvailable();
+                    if (!$availQty) {
+                        $item['error'] = $this->BLocale->_('The variant is out of stock');
+                        continue;
+                    }
+                    if ($availQty < $item['qty']) {
+                        $item['error'] = $this->BLocale->_('The variant currently has only %s items in stock', $availQty);
+                        continue;
+                    }
                 }
-                $item['details']['variant'] = $variant->as_array();
-            }
-            //$args['options']['data']['variants'] = $defaultVariant;
 
-            if (isset($args['post']['shopper'])) {
-                $options['shopper'] = $args['post']['shopper'];
-                foreach ($options['shopper'] as $key => $value) {
-                    if (!isset($value['val']) || $value['val'] == '') {
-                        unset($options['shopper'][$key]);
-                    }
-                    if ($value['val'] == 'checkbox') {
-                        unset($options['shopper'][$key]['val']);
-                    }
-                }
-            }
+                $item['details']['inventory_id'] = $invModel->id();
+                $item['details']['inventory_sku'] = $invModel->get('inventory_sku');
 
-            // FROM Cart::addProduct()
-            if (isset($params['data'])) {
-                $variants = $item->getData('variants');
-                $flag = true;
-                $params['data']['variants']['field_values'] = $this->BUtil->fromJson($params['data']['variants']['field_values']);
-                if (null !== $variants) {
-                    foreach ($variants as &$arr) {
-                        if (in_array($params['data']['variants']['field_values'], $arr)) {
-                            $flag = false;
-                            $arr['variant_qty'] = $arr['variant_qty'] + $params['qty'];
-                            if (isset($params['shopper'])) {
-                                $arr['shopper'] = $params['shopper'];
-                            }
+                $item['details']['signature']['inventory_sku'] = $item['details']['inventory_sku'];
+                $item['details']['signature']['variant_fields'] = $valArr;
 
-                        }
-                    }
+                if ($varArr['variant_price'] !== null) {
+                    $item['details']['price'] = $varArr['variant_price'];
                 }
-                if ($flag) {
-                    if (!empty($params['data']['variants'])) {
-                        $params['data']['variants']['variant_qty'] = $params['qty'];
-                        $variants = (null !== $variants) ? $variants : [];
-                        if (isset($params['shopper'])) {
-                            $params['data']['variants']['shopper'] = $params['shopper'];
-                        }
-                        array_push($variants, $params['data']['variants']);
-                    }
+
+                $item['details']['data']['variant_fields'] = $valArr;
+                foreach ($varfields as $vf) {
+                    $item['details']['data']['display'][] = [
+                        'label' => $vf->get('field_label') ?: ($vf->get('frontend_label' ?: $vf->get('field_name'))),
+                        'value' => $varValues[$vf->get('field_code')],
+                    ];
                 }
-                $item->setData('variants', $variants);
             }
         }
         unset($item);
