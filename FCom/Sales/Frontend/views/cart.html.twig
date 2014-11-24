@@ -53,7 +53,7 @@
                                 <td class="f-cart-col-price text-right">
                                     <div class="f-price-group {{ loggedIn ? 'logged-in' : 'logged-out' }}">
                                         <span class="f-reg-price">
-                                          <span class="f-price">{{ item.price | currency }}</span>
+                                            <span class="f-price">{{ item.price | currency }}</span>
                                         </span>
                                     </div>
                                 </td>
@@ -109,7 +109,7 @@
     </div>
     <div class="row">
         <div class="col-md-6">
-            {{ THIS.view('checkout/cart/shipping-estimate-form') | raw }}
+            {{ THIS.view('cart/shipping-estimate-form') | raw }}
         </div>
         <div class="col-md-6">
             {{ THIS.view('promo/coupon-form') | raw }}

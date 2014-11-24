@@ -8,7 +8,7 @@
  * @property FCom_Sales_Main $FCom_Sales_Main
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  */
-class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Abstract
+class FCom_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_Abstract
 {
     public function beforeDispatch()
     {
@@ -23,10 +23,10 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
     {
         $layout = $this->BLayout;
 
-        $this->layout('/checkout/cart');
-        $layout->view('checkout/cart')->set('redirectLogin', false);
+        $this->layout('/cart');
+        $layout->view('cart')->set('redirectLogin', false);
         if ($this->BApp->m('FCom_Customer') && $this->FCom_Customer_Model_Customer->isLoggedIn() == false) {
-            $layout->view('checkout/cart')->set('redirectLogin', true);
+            $layout->view('cart')->set('redirectLogin', true);
         }
 
         $layout->view('breadcrumbs')->set('crumbs', [['label' => 'Home', 'href' =>  $this->BApp->baseUrl()],
@@ -36,7 +36,7 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         $this->BEvents->fire(__CLASS__ . '::action_cart:cart', ['cart' => $cart]);
 
         $shippingEstimate = $cart->getData('shipping_estimate');
-        $layout->view('checkout/cart')->set(['cart' => $cart, 'shipping_estimate' => $shippingEstimate]);
+        $layout->view('cart')->set(['cart' => $cart, 'shipping_estimate' => $shippingEstimate]);
     }
 
     public function action_add__POST()
@@ -71,28 +71,28 @@ class FCom_Checkout_Frontend_Controller_Cart extends FCom_Frontend_Controller_Ab
         $post = $this->BRequest->post();
         $result = [];
         switch ($post['action']) {
-        case 'add':
-            $this->FCom_Sales_Main->workflowAction('customerAddsItemsToCart', ['post' => $post, 'result' => &$result]);
+            case 'add':
+                $this->FCom_Sales_Main->workflowAction('customerAddsItemsToCart', ['post' => $post, 'result' => &$result]);
 
-            $item = $result['items'][0];
-            if (empty($item['error'])) {
-                $result = ['error' => $item['error']];
-            } else {
-                $cart = $this->FCom_Sales_Model_Cart->sessionCart();
-                $p = $result['items'][0]->product();
-                $result = [
-                    'title' => 'Added to cart',
-                    'html' => '<img src="' . $p->thumbUrl(35, 35) . '" width="35" height="35" style="float:left"/> '
-                        . htmlspecialchars($p->product_name)
-                        . (!empty($post['qty']) && $post['qty'] > 1 ? ' (' . $post['qty'] . ')' : '')
-                        . '<br><br><a href="' . $cartHref . '" class="button">Go to cart</a>',
-                    'minicart_html' => $this->BLayout->view('checkout/cart/block')->render(),
-                    'cnt' => $cart->itemQty(),
-                    'subtotal' => $cart->subtotal,
-                ];
-            }
+                $item = $result['items'][0];
+                if (empty($item['error'])) {
+                    $result = ['error' => $item['error']];
+                } else {
+                    $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+                    $p = $result['items'][0]->product();
+                    $result = [
+                        'title' => 'Added to cart',
+                        'html' => '<img src="' . $p->thumbUrl(35, 35) . '" width="35" height="35" style="float:left"/> '
+                            . htmlspecialchars($p->product_name)
+                            . (!empty($post['qty']) && $post['qty'] > 1 ? ' (' . $post['qty'] . ')' : '')
+                            . '<br><br><a href="' . $cartHref . '" class="button">Go to cart</a>',
+                        'minicart_html' => $this->BLayout->view('checkout/cart/block')->render(),
+                        'cnt' => $cart->itemQty(),
+                        'subtotal' => $cart->subtotal,
+                    ];
+                }
 
-            break;
+                break;
         }
 
         $this->BResponse->json($result);
