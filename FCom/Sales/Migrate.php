@@ -4,6 +4,8 @@
  * Class FCom_Sales_Migrate
  *
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
  * @property FCom_Sales_Migrate_Model_Cart_Address $FCom_Sales_Migrate_Model_Cart_Address
  * @property FCom_Sales_Migrate_Model_Order_Address $FCom_Sales_Migrate_Model_Order_Address
  * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
@@ -31,6 +33,8 @@ class FCom_Sales_Migrate extends BClass
     public function install__0_3_4()
     {
         $tUser = $this->FCom_Admin_Model_User->table();
+        $tProduct = $this->FCom_Catalog_Model_Product->table();
+        $tInventorySku = $this->FCom_Catalog_Model_InventorySku->table();
 
         $tCart = $this->FCom_Sales_Model_Cart->table();
         $tCartItem = $this->FCom_Sales_Model_Cart_Item->table();
@@ -155,6 +159,8 @@ class FCom_Sales_Migrate extends BClass
             BDb::CONSTRAINTS => [
                 'cart' => ['cart_id', $tCart],
                 'parent_item' => ['parent_item_id', $tCartItem],
+                'product' => ['product_id', $tProduct, 'id', 'CASCADE', 'SET NULL'],
+                'inventory' => ['inventory_id', $tInventorySku, 'id', 'CASCADE', 'SET NULL'],
             ],
         ]);
 
@@ -256,6 +262,8 @@ class FCom_Sales_Migrate extends BClass
             BDb::CONSTRAINTS => [
                 'cart' => ['order_id', $tOrder],
                 'parent_item' => ['parent_item_id', $tOrderItem],
+                'product' => ['product_id', $tProduct, 'id', 'CASCADE', 'SET NULL'],
+                'inventory' => ['inventory_id', $tInventorySku, 'id', 'CASCADE', 'SET NULL'],
             ],
         ]);
 
@@ -1459,15 +1467,38 @@ class FCom_Sales_Migrate extends BClass
         $this->BDb->ddlTableDef($tCartItem, [
             'COLUMNS' => [
                 'inventory_id' => 'int unsigned default null',
-                'inventory_sku' => 'varchar(100) default null',
+                'stock_sku' => 'RENAME inventory_sku varchar(100) default null',
             ],
         ]);
 
         $this->BDb->ddlTableDef($tOrderItem, [
             BDb::COLUMNS => [
-                'product_sku' => 'varchar(100) default null',
                 'inventory_id' => 'int unsigned default null',
+                'local_sku' => 'RENAME product_sku varchar(100) default null',
                 'stock_sku' => 'RENAME inventory_sku varchar(100) default null',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_4__0_3_5()
+    {
+        $tProduct = $this->FCom_Catalog_Model_Product->table();
+        $tInventorySku = $this->FCom_Catalog_Model_InventorySku->table();
+
+        $tCartItem = $this->FCom_Sales_Model_Cart_Item->table();
+        $tOrderItem = $this->FCom_Sales_Model_Order_Item->table();
+
+        $this->BDb->ddlTableDef($tCartItem, [
+            BDb::CONSTRAINTS => [
+                'product' => ['product_id', $tProduct, 'id', 'CASCADE', 'SET NULL'],
+                'inventory' => ['inventory_id', $tInventorySku, 'id', 'CASCADE', 'SET NULL'],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderItem, [
+            BDb::CONSTRAINTS => [
+                'product' => ['product_id', $tProduct, 'id', 'CASCADE', 'SET NULL'],
+                'inventory' => ['inventory_id', $tInventorySku, 'id', 'CASCADE', 'SET NULL'],
             ],
         ]);
     }

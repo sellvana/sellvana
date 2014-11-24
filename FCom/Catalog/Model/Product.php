@@ -47,6 +47,8 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
     protected static $_origClass = __CLASS__;
     protected static $_table = 'fcom_product';
 
+    protected static $_cacheAuto = true;
+
     protected static $_fieldOptions = [
         'stock_status' => [
             'in_stock' => 'In Stock',
@@ -1123,23 +1125,6 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
             "NOT_BACK_ORDERS"         => $this->BLocale->_("No Back Orders"),
             "ALLOW_QUANTITY_BELOW" => $this->BLocale->_("Allow Quantity Below 0")
         ];
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getFrontendFields()
-    {
-        $frontendFields = $this->getData('frontend_fields');
-        if ($frontendFields) {
-            usort($frontendFields, function ($a, $b) {
-                if ($a['position'] == $b['position']) {
-                    return 0;
-                }
-                return ($a['position'] < $b['position'])? -1: 1;
-            });
-        }
-        return $frontendFields;
     }
 
     /**

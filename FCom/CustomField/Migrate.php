@@ -353,4 +353,5 @@ class FCom_CustomField_Migrate extends BClass
             ],
         ]);
     }
+
 }

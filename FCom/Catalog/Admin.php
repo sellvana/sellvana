@@ -95,14 +95,4 @@ print_r($args); exit;
             '@Templates' => $template,
         ];
     }
-
-    public function onProductFormPostAfterValidate($args)
-    {
-        $model = $args['model'];
-        $data = $args['data'];
-
-        if (!empty($data['prod_frontend_data'])) {
-            $model->setData('frontend_fields', $this->BUtil->fromJson($data['prod_frontend_data']));
-        }
-    }
 }

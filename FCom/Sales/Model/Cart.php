@@ -197,6 +197,21 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     }
 
     /**
+     * Save cart with items and other details
+     *
+     * @param array $options
+     * @return static
+     */
+    public function saveAllDetails($options = [])
+    {
+        $this->save();
+        foreach ($this->items() as $item) {
+            $item->save();
+        }
+        return $this;
+    }
+
+    /**
      * @param int $limit
      * @return array
      */
@@ -281,6 +296,13 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return false;
     }
 
+    public function calcItemSignatureHash($signature)
+    {
+        $s = $this->BUtil->toJson($signature);
+        $hash = crc32($s);
+        return $hash;
+    }
+
     /**
      * @todo combine variants and shopper fields into structure grouped differently, i.e. all output in the same array
      * @todo move variants to FCom_CustomField
@@ -294,10 +316,16 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
      */
     public function addProduct($product, $params = [])
     {
-        $productId = is_numeric($product) ? $product : $product->id();
         //save cart to DB on add first product
         if (!$this->id()) {
             $this->save();
+        }
+
+        if (is_numeric($product)) {
+            $productId = $product;
+            $product = $this->FCom_Catalog_Model_Product->load($productId);
+        } else {
+            $productId = $product->id();
         }
 
         if (empty($params['qty']) || !is_numeric($params['qty'])) {
@@ -309,14 +337,20 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $params['price'] = 0;
         }
 
+        $hash = !empty($params['signature']) ? $this->calcItemSignatureHash($params['signature']) : null;
+
         /** @var FCom_Sales_Model_Cart_Item $item */
         $item = null;
         if (empty($params['pack_separate'])) {
-            $item = $this->FCom_Sales_Model_Cart_Item->loadWhere([
+            $where = [
                 'cart_id' => $this->id(),
                 'product_id' => $productId,
                 'pack_separate' => 0,
-            ]);
+            ];
+            if (!empty($params['signature'])) {
+                $where['unique_hash'] = $hash;
+            }
+            $item = $this->FCom_Sales_Model_Cart_Item->loadWhere($where);
             if ($item) {
                 $item->add('qty', $params['qty']);
                 $item->set('price', $params['price']);
@@ -324,16 +358,21 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         }
         if (!$item) {
             $item = $this->FCom_Sales_Model_Cart_Item->create([
-                'cart_id' => $this->id,
+                'cart_id' => $this->id(),
                 'product_id' => $productId,
+                'product_name' => $product->get('product_name'),
+                'product_sku' => !empty($params['product_sku']) ? $params['product_sku'] : null,
+                'inventory_id' => !empty($params['inventory_id']) ? $params['inventory_id'] : null,
+                'inventory_sku' => !empty($params['inventory_sku']) ? $params['inventory_sku'] : null,
+                'pack_separate' => !empty($params['pack_separate']) ? $params['pack_separate'] : false,
                 'qty' => $params['qty'],
                 'price' => $params['price'],
-                'pack_separate' => !empty($params['pack_separate']) ? $params['pack_separate'] : false,
+                'unique_hash' => $hash,
             ]);
-            if (!empty($params['data'])) {
-                foreach ($params['data'] as $key => $val) {
-                    $item->setData($key, $val);
-                }
+        }
+        if (!empty($params['data'])) {
+            foreach ($params['data'] as $key => $val) {
+                $item->setData($key, $val);
             }
         }
 

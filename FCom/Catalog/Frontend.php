@@ -31,14 +31,4 @@ class FCom_Catalog_Frontend extends BClass
     {
         return [];
     }
-
-    public function onWorkflowCustomerAddsItemsCalcDetails($args)
-    {
-        $post = $args['post'];
-        foreach ($args['items'] as &$item) {
-            //TODO: move shopper fields handling from FCom_CustomField_Frontend
-        }
-        unset($item);
-        return true;
-    }
 }

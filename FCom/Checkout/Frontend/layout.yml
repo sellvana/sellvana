@@ -10,16 +10,6 @@ checkout/base:
     - { hook: header-top-util, clear: ALL }
     - { hook: header-top-search, clear: ALL }
 
-/checkout/cart:
-    - { include: base }
-    - { hook: main, views: checkout/cart }
-    - { hook: cart_upsell, views: checkout/also-bought }
-    - { view: root, do: [[ addBodyClass, page-cart ]] }
-    - view: head
-        do:
-            - [ title, Shopping Cart ]
-            - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
-
 /checkout/checkout:
     - { include: checkout/base }
     - view: head
