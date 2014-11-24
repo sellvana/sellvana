@@ -123,7 +123,10 @@
                     valueUt: '{{validator.fieldValue("uses_total")}}',
                     singleCouponValue: '',
                     labelClass: '{{ labelClass }}',
-                    debug: true
+                    debug: true,
+                    base_url: "{{ APP.href('promo/') }}",
+                    id_var: 'id',
+                    entity_id: '{{ m.id() }}'
                 };
                 Promo.init(options);
             });

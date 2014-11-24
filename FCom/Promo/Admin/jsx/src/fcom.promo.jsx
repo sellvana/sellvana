@@ -357,26 +357,35 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return (
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
                     <div className="col-md-5"><input type="text" readOnly="readonly" ref="attributesResume" id="attributesResume" className="form-control"/></div>
-                    <Components.Button type="button" className="btn-primary" onClick={this.handleConfigure}>Configure</Components.Button>
+                    <Components.Button type="button" className="btn-primary"
+                       ref={this.props.configureId} onClick={this.handleConfigure}>Configure</Components.Button>
                 </ConditionsRow>
             );
         },
         getDefaultProps: function () {
             return {
                 rowClass: "attr-combination",
-                label: "Combination"
+                label: "Combination",
+                configureId: "attributeCombinationConfigure"
             };
         },
+        modal: null,
         handleConfigure: function (e) {
-            Promo.log("Clicked");
-            var modal = <Components.Modal onConfirm={this.handleShippingConfirm}
-                title="Product Combination Configuration" onLoad={this.openModal}/>
+            Promo.log("Clicked conditions");
+            var modal = <Components.Modal onConfirm={this.handleConditionsConfirm}
+                title="Product Combination Configuration" onLoad={this.registerModal} onUpdate={this.registerModal}>
+            Conditions content
+            </Components.Modal>;
 
             React.render(modal, this.props.modalContainer.get(0));
         },
-        handleShippingConfirm: function (modal) {
+        handleConditionsConfirm: function (modal) {
             Promo.log('handling');
             modal.close();
+        },
+        registerModal: function (modal) {
+            this.modal = modal;
+            this.openModal(modal);
         },
         openModal: function (modal) {
             modal.open();
@@ -479,7 +488,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
                     <div className="col-md-5"><textarea ref="shippingResume" id="shippingResume"
                             readOnly="readonly" value={this.state.value} className="form-control"/></div>
-                    <Components.Button type="button" className="btn-primary" ref="configure"
+                    <Components.Button type="button" className="btn-primary" ref={this.props.configureId}
                         onClick={this.handleConfigure}>Configure</Components.Button>
                 </ConditionsRow>
             );
@@ -487,22 +496,31 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         getDefaultProps: function () {
             return {
                 label: "Destination",
-                modalTitle: "Shipping Reward Configuration"
+                modalTitle: "Shipping Reward Configuration",
+                configureId: "shippingCombinationConfigure"
             };
         },
         getInitialState: function () {
             return {value: ""};
         },
+        modal: null,
         handleConfigure: function (e) {
             Promo.log("Clicked");
             var modal = <Components.Modal onConfirm={this.handleShippingConfirm}
-                    title={this.props.modalTitle} onLoad={this.openModal}><ConditionsShippingModalContent/></Components.Modal>;
+                title={this.props.modalTitle} onLoad={this.openModal} onUpdate={this.openModal}>
+                <ConditionsShippingModalContent baseUrl={this.props.options.base_url} idVar={this.props.options.id_var}
+                    entityId={this.props.options.entity_id}/>
+            </Components.Modal>;
 
             React.render(modal, this.props.modalContainer.get(0));
         },
         handleShippingConfirm: function (modal) {
             Promo.log('handling');
             modal.close();
+        },
+        registerModal: function (modal) {
+            this.modal = modal;
+            this.openModal(modal);
         },
         openModal: function (modal) {
             modal.open();
@@ -511,6 +529,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
 
     var ConditionsShippingModalContent = React.createClass({
         render: function () {
+            var baseUrl = this.props.baseUrl;
+            var urlQuery = '/?' + this.props.idVar + this.props.entityId;
             return (
                 <div className="shipping-combinations">
                     <div className="form-group">
@@ -533,10 +553,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                             <button className="btn btn-small btn-default" type="button" ref="fieldAdd">{Locale._("Add Field")}</button>
                         </div>
                     </div>
-                    <ConditionsShippingModalField label={this.props.labelMethod} url={this.props.urlMethod} />
-                    <ConditionsShippingModalField label={this.props.labelCountry} url={this.props.urlCountry} />
-                    <ConditionsShippingModalField label={this.props.labelState} url={this.props.urlState} />
-                    <ConditionsShippingModalField label={this.props.labelCity} url={this.props.urlCity} />
+                    <ConditionsShippingModalField label={this.props.labelMethod} url={baseUrl + this.props.urlMethod + urlQuery } />
+                    <ConditionsShippingModalField label={this.props.labelCountry} url={baseUrl + this.props.urlCountry + urlQuery} />
+                    <ConditionsShippingModalField label={this.props.labelState} url={baseUrl + this.props.urlState + urlQuery} />
+                    <ConditionsShippingModalField label={this.props.labelCity} url={baseUrl + this.props.urlCity + urlQuery} />
                 </div>
             );
         },
@@ -546,7 +566,11 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 labelCountry: Locale._("Country"),
                 labelState: Locale._("State/Province"),
                 labelCity: Locale._("City"),
-                labelCombinationField: Locale._("Add a Field to Condition...")
+                labelCombinationField: Locale._("Add a Field to Condition..."),
+                urlMethod: "conditions/shipping_methods",
+                urlCountry: "conditions/shipping_country",
+                urlState: "conditions/shipping_state",
+                urlCity: "conditions/shipping_city"
             };
         },
         componentDidMount: function () {

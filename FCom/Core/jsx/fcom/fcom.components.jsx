@@ -152,6 +152,9 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
                 .modal({backdrop: 'static', keyboard: false, show: false});
             this.props.onLoad(this);
         },
+        componentDidUpdate: function (prevProps, prevState) {
+            this.props.onUpdate(this, prevProps, prevState);
+        },
         componentWillUnmount: function () {
             $(this.getDOMNode()).off('hidden', this.handleHidden);
         },
