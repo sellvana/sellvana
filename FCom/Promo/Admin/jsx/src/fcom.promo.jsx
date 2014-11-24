@@ -425,9 +425,6 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 url: 'conditions/attributes_list'
             };
         },
-        getInitialState: function () {
-            return {ids: []};
-        },
         componentDidMount: function () {
             var fieldCombination = this.refs.combinationField;
             var self = this;
@@ -452,16 +449,6 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                         return {results: data.items, more: more};
                     },
                     cache: true
-                },
-                initSelection: function (element, callback) {
-                    var ids = this.state.ids;
-                    if (ids) {
-                        $.ajax(url + "?ids=" + ids.join(','), {
-                            dataType: "json"
-                        }).done(function (data) {
-                            callback(data);
-                        });
-                    }
                 },
                 dropdownCssClass: "bigdrop",
                 dropdownAutoWidth: true,

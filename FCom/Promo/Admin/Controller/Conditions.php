@@ -9,6 +9,6 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
 {
     public function action_attributes_list()
     {
-        return $this->BResponse->json(['total_count' => 50, 'items' => [['id'=>1,'text'=>'one'],['id'=>2,'text'=>'two'],['id'=>3,'text'=>'three']]]);
+        return $this->BResponse->json(['total_count' => 3, 'items' => [['id'=>1,'text'=>'one'],['id'=>2,'text'=>'two'],['id'=>3,'text'=>'three']]]);
     }
 }
