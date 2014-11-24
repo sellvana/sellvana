@@ -2,6 +2,27 @@
 
 trait FCom_Sales_Model_Trait_Address
 {
+    public function addressValidationRules($type, $country = null)
+    {
+        $rules = [
+            [$type . '_firstname', '@required'],
+            [$type . '_lastname', '@required'],
+            [$type . '_street1', '@required'],
+            [$type . '_city', '@required'],
+            [$type . '_country', '@required'],
+        ];
+        if (null === $country) {
+            $country = $this->get($type . '_country');
+        }
+        if ($this->BLocale->postcodeRequired($country)) {
+            $rules[] = [$type . '_postcode', '@required'];
+        }
+        if ($this->BLocale->regionRequired($country)) {
+            $rules[] = [$type . '_region', '@required'];
+        }
+        return array_merge(static::$_validationRules, $rules);
+    }
+
     public function fullName($atype)
     {
         $name = $this->get($atype . '_firstname');

@@ -59,10 +59,20 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
 
     /**
      * @return bool
+     * @todo implement
      */
-    public function isGroupAble()
+    public function isGroupable()
     {
-        return  true;
+        return true;
+    }
+
+    /**
+     * @return bool
+     * @todo implement
+     */
+    public function isShippable()
+    {
+        return true;
     }
 
     /**

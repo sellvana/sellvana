@@ -1,0 +1,19 @@
+{% set cart = THIS.get('cart') %}
+<div class="row">
+    <div class="col-md-9">
+        {% if cart.get('same_address') %}
+
+        {% elseif cart.hasCompleteAddress('billing') %}
+            {{ THIS.view('checkout-simple/partial/address-card').set('address_type', 'payment') | raw}}
+        {% else %}
+            {{ THIS.view('checkout-simple/partial/address-form').set('address_type', 'payment') | raw}}
+        {% endif %}
+
+        {{ THIS.view('checkout-simple/partial/shipping-methods') | raw }}
+
+        {{ THIS.view('checkout-simple/partial/payment-methods') | raw }}
+    </div>
+    <div class="col-md-3">
+        {{ THIS.get('checkout-simple/partial/summary') | raw }}
+    </div>
+</div>
