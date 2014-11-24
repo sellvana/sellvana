@@ -374,7 +374,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             Promo.log("Clicked conditions");
             var modal = <Components.Modal onConfirm={this.handleConditionsConfirm}
                 title="Product Combination Configuration" onLoad={this.registerModal} onUpdate={this.registerModal}>
-            Conditions content
+                <ConditionsAttributesModalContent  baseUrl={this.props.options.base_url} idVar={this.props.options.id_var}
+                    entityId={this.props.options.entity_id}/>
             </Components.Modal>;
 
             React.render(modal, this.props.modalContainer.get(0));
@@ -389,6 +390,162 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         },
         openModal: function (modal) {
             modal.open();
+        }
+    });
+
+    var ConditionsAttributesModalContent = React.createClass({
+        render: function () {
+            var baseUrl = this.props.baseUrl;
+            var urlQuery = '/?' + this.props.idVar + this.props.entityId;
+            return (
+                <div className="attribute-combinations">
+                    <div className="form-group">
+                        <div className="col-md-5">
+                            <select ref="combinationType" className="form-control to-select2">
+                                <option value="0">All Conditions Have to Match</option>
+                                <option value="1">Any Condition Has to Match</option>
+                            </select>
+                        </div>
+                        <div className="col-md-5">
+                            <input ref="combinationField" className="form-control"/>
+                        </div>
+                        <div className="col-md-2">
+                            <button className="btn btn-small btn-default" type="button" ref="fieldAdd">{Locale._("Add Field")}</button>
+                        </div>
+                    </div>
+                    <ConditionsAttributesModalField label={this.props.labelTest} url={baseUrl + this.props.urlTest + urlQuery } />
+                </div>
+            );
+        },
+        getDefaultProps: function () {
+            return {
+                labelTest: Locale._("Test"),
+                labelCombinationField: Locale._("Add a Field to Condition..."),
+                urlTest: "conditions/attributes_test", // this must be dynamically created when condition is added
+                url: 'conditions/attributes_list'
+            };
+        },
+        getInitialState: function () {
+            return {ids: []};
+        },
+        componentDidMount: function () {
+            var fieldCombination = this.refs.combinationField;
+            var self = this;
+            var url = this.props.baseUrl + this.props.url;
+            $(fieldCombination.getDOMNode()).select2({
+                placeholder: self.props.labelCombinationField,
+                minimumInputLength: 3,
+                multiple: false,
+                closeOnSelect: false,
+                ajax: {
+                    url: url,
+                    dataType: 'json',
+                    quietMillis: 300,
+                    data: function (term, page) {
+                        return {
+                            q: term,
+                            page: page
+                        };
+                    },
+                    results: function (data, page) {
+                        var more = (page * 30) < data.total_count;
+                        return {results: data.items, more: more};
+                    },
+                    cache: true
+                },
+                initSelection: function (element, callback) {
+                    var ids = this.state.ids;
+                    if (ids) {
+                        $.ajax(url + "?ids=" + ids.join(','), {
+                            dataType: "json"
+                        }).done(function (data) {
+                            callback(data);
+                        });
+                    }
+                },
+                dropdownCssClass: "bigdrop",
+                dropdownAutoWidth: true,
+                selectOnBlur: true
+            });
+            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+        }
+    });
+
+    var ConditionsAttributesModalField = React.createClass({
+        render: function () {
+            return (
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                    <div className="col-md-4">
+                        <ConditionsCompare opts={this.props.opts} id="fieldCompare" ref="fieldCompare"/>
+                    </div>
+                    <div className="col-md-5"><input className="form-control" type="hidden" id="fieldCombination"
+                        ref="fieldCombination"/></div>
+                </ConditionsRow>
+            );
+        },
+        getDefaultProps: function () {
+            return {
+                label: Locale._("Unknown"),
+                url: "",
+                fcLabel: "",
+                opts: [
+                    {id:"is", label: "is"},
+                    {id:"is_not", label: "is not"},
+                    {id:"contains", label: "contains"}
+                ]
+            };
+        },
+        componentDidMount: function () {
+            var fieldCombination = this.refs.fieldCombination;
+            var self = this;
+            $(fieldCombination.getDOMNode()).select2({
+                placeholder: self.props.fcLabel,
+                minimumInputLength: 3,
+                maximumSelectionSize: 4,
+                multiple: true,
+                closeOnSelect: false,
+                ajax: {
+                    url: self.props.url,
+                    dataType: 'json',
+                    quietMillis: 300,
+                    data: function (term, page) {
+                        return {
+                            q: term,
+                            page: page,
+                            offset: 30
+                        };
+                    },
+                    results: function (data, page) {
+                        var more = (page * 30) < data.total_count;
+                        return {results: data.items, more: more};
+                    },
+                    cache: true
+                },
+                initSelection: function (element, callback) {
+                    var ids = this.state.ids;
+                    if (ids) {
+                        $.ajax(self.props.url + "?ids=" + ids.join(','), {
+                            dataType: "json"
+                        }).done(function (data) {
+                            callback(data);
+                        });
+                    }
+                },
+                dropdownCssClass: "bigdrop",
+                dropdownAutoWidth: true,
+                selectOnBlur: true,
+                formatResult: function (item) {
+                    var markup = '<div class="row-fluid" title="' + item.text + '">' +
+                        '<div class="span2">ID: <em>' + item.id + '</em></div>' +
+                        '<div class="span2">Name: <strong>' + item.text.substr(0, 20);
+                    if (item.text.length > 20) {
+                        markup += '...';
+                    }
+                    markup += '</strong></div></div>';
+
+                    return markup;
+                }
+            });
         }
     });
 
@@ -534,13 +691,13 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return (
                 <div className="shipping-combinations">
                     <div className="form-group">
-                        <div className="col-md-4">
+                        <div className="col-md-5">
                             <select ref="combinationType" className="form-control to-select2">
                                 <option value="0">All Conditions Have to Match</option>
                                 <option value="1">Any Condition Has to Match</option>
                             </select>
                         </div>
-                        <div className="col-md-4">
+                        <div className="col-md-5">
                             <select ref="combinationField" className="form-control to-select2">
                                 <option value="">{this.props.labelCombinationField}</option>
                                 <option value="shipping_method">{this.props.labelMethod}</option>
@@ -549,7 +706,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                                 <option value="city">{this.props.labelCity}</option>
                             </select>
                         </div>
-                        <div className="col-md-4">
+                        <div className="col-md-2">
                             <button className="btn btn-small btn-default" type="button" ref="fieldAdd">{Locale._("Add Field")}</button>
                         </div>
                     </div>
