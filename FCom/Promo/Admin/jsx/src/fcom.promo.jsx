@@ -251,6 +251,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         }
     });
 
+    // what type of condition we have, total amount or quantity
     var ConditionsType = React.createClass({
         render: function () {
             var cls = this.props.select2 ? "to-select2 " : "";
@@ -277,6 +278,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         }
     });
 
+    // condition to apply to the selection of products
     var ConditionSkuCollection = React.createClass({
         render: function () {
             return (
@@ -291,19 +293,20 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         getDefaultProps: function () {
             return {
                 label: "Sku Collection",
-                rowClass: "sku-collection"
+                rowClass: "sku-collection",
+                url: 'conditions/products'
             };
         },
         componentDidMount: function () {
             var skuCollectionIds = this.refs.skuCollectionIds;
+            var url = this.props.options.base_url + this.props.url;
             $(skuCollectionIds.getDOMNode()).select2({
                 placeholder: "Choose products",
                 minimumInputLength: 3,
-                maximumSelectionSize: 4,
                 multiple: true,
                 closeOnSelect: false,
                 ajax: {
-                    url: "/admin/promo/products",
+                    url: url,
                     dataType: 'json',
                     quietMillis: 250,
                     data: function (term, page) {
@@ -322,7 +325,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 initSelection: function (element, callback) {
                     var ids = this.state.productIds;
                     if (ids) {
-                        $.ajax("/admin/promo/products?ids=" + ids.join(','), {
+                        $.ajax(url + "?ids=" + ids.join(','), {
                             dataType: "json"
                         }).done(function (data) {
                             callback(data);
@@ -352,6 +355,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         }
     });
 
+    // condition to apply to products which match the attributes condition configured here
     var ConditionAttributeCombination = React.createClass({
         render: function () {
             return (
@@ -393,6 +397,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         }
     });
 
+    // content of the modal used to configure attribute combination
     var ConditionsAttributesModalContent = React.createClass({
         render: function () {
             var baseUrl = this.props.baseUrl;
@@ -541,7 +546,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return (
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
                     <ConditionsType ref="catProductsType" id="catProductsType" > of products in </ConditionsType>
-                    <div className="col-md-2"><input type="hidden" id="catProductsIds" ref="catProductsIds"/></div>
+                    <div className="col-md-2"><input type="hidden" id="catProductsIds" ref="catProductsIds" className="form-control"/></div>
                     <div className="col-md-2"><ConditionsCompare ref="catProductsCond" id="catProductsCond" /></div>
                     <div className="col-md-1"><input ref="catProductsValue" id="catProductsValue" type="text" className="form-control"/></div>
                 </ConditionsRow>
@@ -550,11 +555,13 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         getDefaultProps: function () {
             return {
                 rowClass: "category-products",
-                label: "Categories"
+                label: "Categories",
+                url: 'conditions/categories'
             };
         },
         componentDidMount: function () {
             var catProductsIds = this.refs.catProductsIds;
+            var url = this.props.options.base_url + this.props.url;
             $(catProductsIds.getDOMNode()).select2({
                 placeholder: "Select categories",
                 minimumInputLength: 3,
@@ -562,7 +569,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 multiple: true,
                 closeOnSelect: false,
                 ajax: {
-                    url: "/admin/promo/categories",
+                    url: url,
                     dataType: 'json',
                     quietMillis: 250,
                     data: function (term, page) {
@@ -581,7 +588,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 initSelection: function (element, callback) {
                     var ids = this.state.categoryIds;
                     if (ids) {
-                        $.ajax("/admin/promo/categories?ids=" + ids.join(','), {
+                        $.ajax(url + "?ids=" + ids.join(','), {
                             dataType: "json"
                         }).done(function (data) {
                             callback(data);
