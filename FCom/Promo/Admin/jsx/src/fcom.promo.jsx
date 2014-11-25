@@ -431,7 +431,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             var url = this.props.baseUrl + this.props.url;
             $(fieldCombination.getDOMNode()).select2({
                 placeholder: self.props.labelCombinationField,
-                minimumInputLength: 3,
+                minimumInputLength: 2,
                 multiple: false,
                 closeOnSelect: false,
                 ajax: {
