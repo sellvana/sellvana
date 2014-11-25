@@ -126,7 +126,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
 
         $orm->iterate(function ($model) use (&$results) {
             $results['items'][] = [
-                'id'   => $model->id(),
+                'id'   => $model->get('field_code'),
                 'text' => $model->get('frontend_label'),
             ];
 

@@ -205,7 +205,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     var DelBtn = React.createClass({
         render: function () {
             return (
-                <Components.Button className="btn-link btn-delete" type="button" style={ {paddingRight:10, paddingLeft:10} }>
+                <Components.Button className="btn-link btn-delete" onClick={this.props.onClick}
+                        type="button" style={ {paddingRight:10, paddingLeft:10} }>
                     <span className="icon-trash"></span>
                 </Components.Button>
             );
@@ -220,7 +221,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             }
             return (<div className={cls}>
                 <div className="col-md-3">
-                    <Components.ControlLabel label_class="pull-right">{this.props.label}<DelBtn/></Components.ControlLabel>
+                    <Components.ControlLabel label_class="pull-right">{this.props.label}<DelBtn onClick={this.props.onDelete}/></Components.ControlLabel>
                 </div>
                 {this.props.children}
             </div>);
@@ -275,6 +276,16 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 select2: true,
                 containerClass: "col-md-2"
             };
+        }
+    });
+
+    var AddFieldButton = React.createClass({
+        render: function () {
+            return (
+                <Components.Button onClick={this.props.onClick} className="btn-link" type="button" style={ {paddingRight:10, paddingLeft:10} }>
+                    <span aria-hidden="true" className="glyphicon glyphicon glyphicon-plus-sign"></span>
+                </Components.Button>
+            );
         }
     });
 
@@ -400,8 +411,9 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     // content of the modal used to configure attribute combination
     var ConditionsAttributesModalContent = React.createClass({
         render: function () {
-            var baseUrl = this.props.baseUrl;
-            var urlQuery = '/?' + this.props.idVar + this.props.entityId;
+            var fieldUrl = this.props.baseUrl + this.props.urlField;
+            var paramObj = {};
+            paramObj[this.props.idVar] = this.props.entityId;
             return (
                 <div className="attribute-combinations">
                     <div className="form-group">
@@ -415,18 +427,42 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                             <input ref="combinationField" className="form-control"/>
                         </div>
                         <div className="col-md-2">
-                            <button className="btn btn-small btn-default" type="button" ref="fieldAdd">{Locale._("Add Field")}</button>
+                            <AddFieldButton onClick={this.addField}/>
                         </div>
                     </div>
-                    <ConditionsAttributesModalField label={this.props.labelTest} url={baseUrl + this.props.urlTest + urlQuery } />
+                    {this.state.fields.map(function (field) {
+                        paramObj['field'] = field.field;
+                        var url = fieldUrl + '/?' + $.param(paramObj);
+                        return <ConditionsAttributesModalField label={field.label} url={url} key={field.field}
+                            id={field.field} removeField={this.removeField} />
+                    }.bind(this))}
                 </div>
             );
         },
+        addField: function () {
+            var fieldCombination = this.refs.combinationField.getDOMNode();
+            var fieldValue = $(fieldCombination).select2("data");
+            if(null == fieldValue || fieldValue == []) {
+                return;
+            }
+            var fields = this.state.fields;
+            fields.push({label: fieldValue.text, field: fieldValue.id});
+            this.setState({fields: fields});
+        },
+        removeField: function (id) {
+            var fields = this.state.fields;
+            fields = fields.filter(function (field) {
+                return field.field != id;
+            });
+            this.setState({fields: fields});
+        },
+        getInitialState: function () {
+            return {fields: []};
+        },
         getDefaultProps: function () {
             return {
-                labelTest: Locale._("Test"),
                 labelCombinationField: Locale._("Add a Field to Condition..."),
-                urlTest: "conditions/attributes_test", // this must be dynamically created when condition is added
+                urlField: "conditions/attributes_field",
                 url: 'conditions/attributes_list'
             };
         },
@@ -466,14 +502,19 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     var ConditionsAttributesModalField = React.createClass({
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-4">
                         <ConditionsCompare opts={this.props.opts} id="fieldCompare" ref="fieldCompare"/>
                     </div>
-                    <div className="col-md-5"><input className="form-control" type="hidden" id="fieldCombination"
+                    <div className="col-md-5"><input className="form-control required" type="hidden" id="fieldCombination"
                         ref="fieldCombination"/></div>
                 </ConditionsRow>
             );
+        },
+        remove: function () {
+            if(this.props.removeField) {
+                this.props.removeField(this.props.id);
+            }
         },
         getDefaultProps: function () {
             return {
