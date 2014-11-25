@@ -721,8 +721,9 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
 
     var ConditionsShippingModalContent = React.createClass({
         render: function () {
-            var baseUrl = this.props.baseUrl;
-            var urlQuery = '/?' + this.props.idVar + this.props.entityId;
+            var fieldUrl = this.props.baseUrl + this.props.urlField;
+            var paramObj = {};
+            paramObj[this.props.idVar] = this.props.entityId;
             return (
                 <div className="shipping-combinations">
                     <div className="form-group">
@@ -735,34 +736,62 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                         <div className="col-md-5">
                             <select ref="combinationField" className="form-control to-select2">
                                 <option value="">{this.props.labelCombinationField}</option>
-                                <option value="shipping_method">{this.props.labelMethod}</option>
-                                <option value="country">{this.props.labelCountry}</option>
-                                <option value="state">{this.props.labelState}</option>
-                                <option value="city">{this.props.labelCity}</option>
+                                {this.props.fields.map(function (field) {
+                                    return <option value={field.field} key={field.field}>{field.label}</option>
+                                })}
                             </select>
                         </div>
                         <div className="col-md-2">
-                            <button className="btn btn-small btn-default" type="button" ref="fieldAdd">{Locale._("Add Field")}</button>
+                            <AddFieldButton onClick={this.addField}/>
                         </div>
                     </div>
-                    <ConditionsShippingModalField label={this.props.labelMethod} url={baseUrl + this.props.urlMethod + urlQuery } />
-                    <ConditionsShippingModalField label={this.props.labelCountry} url={baseUrl + this.props.urlCountry + urlQuery} />
-                    <ConditionsShippingModalField label={this.props.labelState} url={baseUrl + this.props.urlState + urlQuery} />
-                    <ConditionsShippingModalField label={this.props.labelCity} url={baseUrl + this.props.urlCity + urlQuery} />
+                    {this.state.fields.map(function (field) {
+                        paramObj['field'] = field.field;
+                        var url = fieldUrl + '/?' + $.param(paramObj);
+                        return <ConditionsAttributesModalField label={field.label} url={url} key={field.field}
+                            id={field.field} removeField={this.removeField} />
+                    }.bind(this))}
                 </div>
             );
         },
+        addField: function () {
+            var fieldCombination = this.refs.combinationField.getDOMNode();
+            var fieldValue = $(fieldCombination).select2("data");
+            if(null == fieldValue || fieldValue == [] || fieldValue.id == "") {
+                return;
+            }
+            var fields = this.state.fields;
+            for(var i in fields) {
+                var f = fields[i];
+                if(f.field == fieldValue.id) {
+                    return;
+                }
+            }
+            var field = {label: fieldValue.text, field: fieldValue.id};
+            console.log(fields.indexOf(field));
+            fields.push(field);
+            this.setState({fields: fields});
+        },
+        removeField: function (id) {
+            var fields = this.state.fields;
+            fields = fields.filter(function (field) {
+                return field.field != id;
+            });
+            this.setState({fields: fields});
+        },
+        getInitialState: function () {
+            return {fields: []};
+        },
         getDefaultProps: function () {
             return {
-                labelMethod: Locale._("Method"),
-                labelCountry: Locale._("Country"),
-                labelState: Locale._("State/Province"),
-                labelCity: Locale._("City"),
+                fields: [
+                    {label: Locale._("Method"), field: 'methods'},
+                    {label: Locale._("Country"), field: 'country'},
+                    {label: Locale._("State/Province"), field: 'state'},
+                    {label: Locale._("City"), field: 'city'}
+                ],
                 labelCombinationField: Locale._("Add a Field to Condition..."),
-                urlMethod: "conditions/shipping_methods",
-                urlCountry: "conditions/shipping_country",
-                urlState: "conditions/shipping_state",
-                urlCity: "conditions/shipping_city"
+                url: "conditions/shipping",
             };
         },
         componentDidMount: function () {
@@ -773,7 +802,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     var ConditionsShippingModalField = React.createClass({
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-4">
                         <ConditionsCompare opts={this.props.opts} id="fieldCompare" ref="fieldCompare"/>
                     </div>
@@ -781,6 +810,11 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                          ref="fieldCombination"/></div>
                 </ConditionsRow>
             );
+        },
+        remove: function () {
+            if(this.props.removeField) {
+                this.props.removeField(this.props.id);
+            }
         },
         getDefaultProps: function () {
             return {
