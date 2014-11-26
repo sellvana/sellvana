@@ -4,9 +4,10 @@
  * Created by
  * User: pp
  * Date: 24.Nov14
+ *
  * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
- * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
- * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ * @property FCom_Catalog_Model_Product   $FCom_Catalog_Model_Product
+ * @property FCom_Catalog_Model_Category  $FCom_Catalog_Model_Category
  */
 class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstract
 {
@@ -23,9 +24,9 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
         }
 
         $r       = $this->BRequest;
-        $page    = $r->get('page') ?: 1;
+        $page    = $r->get('page')?: 1;
         $skuTerm = $r->get('q');
-        $limit   = $r->get('o') ?: 30;
+        $limit   = $r->get('o')?: 30;
         $offset  = ($page - 1) * $limit;
 
         /** @var BORM $orm */
@@ -40,7 +41,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
         $countRes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $count    = $countRes[0]['count'];
 
-        $orm->limit((int)$limit)->offset($offset)->order_by_desc('product_name');
+        $orm->limit((int) $limit)->offset($offset)->order_by_desc('product_name');
         $stmt   = $orm->execute();
         $result = ['total_count' => $count, 'items' => []];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -66,9 +67,9 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
         }
 
         $r       = $this->BRequest;
-        $page    = $r->get('page') ?: 1;
+        $page    = $r->get('page')?: 1;
         $catTerm = $r->get('q');
-        $limit   = $r->get('o') ?: 30;
+        $limit   = $r->get('o')?: 30;
         $offset  = ($page - 1) * $limit;
 
         /** @var BORM $orm */
@@ -83,7 +84,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
         $countRes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $count    = $countRes[0]['count'];
 
-        $orm->limit((int)$limit)->offset($offset)->order_by_desc('node_name');
+        $orm->limit((int) $limit)->offset($offset)->order_by_desc('node_name');
         $stmt   = $orm->execute();
         $result = ['total_count' => $count, 'items' => []];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -108,9 +109,9 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
         }
 
         $r      = $this->BRequest;
-        $page   = $r->get('page') ?: 1;
+        $page   = $r->get('page')?: 1;
         $term   = $r->get('q');
-        $limit  = $r->get('o') ?: 30;
+        $limit  = $r->get('o')?: 30;
         $offset = ($page - 1) * $limit;
 
         $orm = $this->FCom_CustomField_Model_Field->orm()->where('field_type', 'product');
@@ -122,7 +123,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
         $countOrm = clone $orm;
         $count    = $countOrm->count();
         $results  = ['total_count' => $count, 'items' => []];
-        $orm->limit((int)$limit)->offset($offset)->order_by_desc('frontend_label');
+        $orm->limit((int) $limit)->offset($offset)->order_by_desc('frontend_label');
 
         $orm->iterate(function ($model) use (&$results) {
             $results['items'][] = [

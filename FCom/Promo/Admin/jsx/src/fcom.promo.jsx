@@ -289,11 +289,19 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         }
     });
 
+    var removeConditionMixin = {
+        remove: function () {
+            if (this.props.removeCondition) {
+                this.props.removeCondition(this.props.id);
+            }
+        }
+    };
     // condition to apply to the selection of products
     var ConditionSkuCollection = React.createClass({
+        mixins: [removeConditionMixin],
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="skuCollectionType" id="skuCollectionType"> of </ConditionsType>
                     <div className="col-md-2"><input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control"/></div>
                     <div className="col-md-2"><ConditionsCompare ref="skuCollectionCond" id="skuCollectionCond" /></div>
@@ -305,7 +313,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return {
                 label: "Sku Collection",
                 rowClass: "sku-collection",
-                url: 'conditions/products'
+                url: 'conditions/products',
+                type: 'skus'
             };
         },
         componentDidMount: function () {
@@ -368,9 +377,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
 
     // condition to apply to products which match the attributes condition configured here
     var ConditionAttributeCombination = React.createClass({
+        mixins: [removeConditionMixin],
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-5"><input type="text" readOnly="readonly" ref="attributesResume" id="attributesResume" className="form-control"/></div>
                     <Components.Button type="button" className="btn-primary"
                        ref={this.props.configureId} onClick={this.handleConfigure}>Configure</Components.Button>
@@ -381,7 +391,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return {
                 rowClass: "attr-combination",
                 label: "Combination",
-                configureId: "attributeCombinationConfigure"
+                configureId: "attributeCombinationConfigure",
+                type: 'comb'
             };
         },
         modal: null,
@@ -583,9 +594,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     });
 
     var ConditionCategories = React.createClass({
+        mixins: [removeConditionMixin],
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="catProductsType" id="catProductsType" > of products in </ConditionsType>
                     <div className="col-md-2"><input type="hidden" id="catProductsIds" ref="catProductsIds" className="form-control"/></div>
                     <div className="col-md-2"><ConditionsCompare ref="catProductsCond" id="catProductsCond" /></div>
@@ -597,7 +609,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return {
                 rowClass: "category-products",
                 label: "Categories",
-                url: 'conditions/categories'
+                url: 'conditions/categories',
+                type: 'cats'
             };
         },
         componentDidMount: function () {
@@ -656,9 +669,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     });
 
     var ConditionTotal = React.createClass({
+        mixins: [removeConditionMixin],
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="cartTotalType" id="cartTotalType" totalType={this.props.totalType}/>
                     <div className="col-md-2"><ConditionsCompare ref="cartTotalCond" id="cartTotalCond" /></div>
                     <div className="col-md-1"><input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control"/></div>
@@ -669,15 +683,17 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return {
                 rowClass: "cart-total",
                 totalType: [{id:"qty", label:"QTY OF ITEMS"}, {id:"amt", label:"$Value/Amount OF ITEMS"}],
-                label: "Cart Total"
+                label: "Cart Total",
+                type: 'total'
             };
         }
     });
 
     var ConditionShipping = React.createClass({
+        mixins: [removeConditionMixin],
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-5"><textarea ref="shippingResume" id="shippingResume"
                             readOnly="readonly" value={this.state.value} className="form-control"/></div>
                     <Components.Button type="button" className="btn-primary" ref={this.props.configureId}
@@ -689,7 +705,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return {
                 label: "Destination",
                 modalTitle: "Shipping Reward Configuration",
-                configureId: "shippingCombinationConfigure"
+                configureId: "shippingCombinationConfigure",
+                type: 'shipping'
             };
         },
         getInitialState: function () {
@@ -883,29 +900,77 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
 
     var ConditionsApp = React.createClass({
         render: function () {
-            return (<div className="conditions panel panel-primary">
-                    <ConditionSkuCollection options={this.props.options}/>
-                    <ConditionAttributeCombination options={this.props.options} modalContainer={this.props.modalContainer}/>
-                    <ConditionCategories options={this.props.options}/>
-                    <ConditionTotal options={this.props.options}/>
-                    <ConditionShipping options={this.props.options} modalContainer={this.props.modalContainer}/>
+            return (<div className="conditions panel panel-default">
+                    {this.state.data.map(function (field, i) {
+                        //todo make a field based on field
+                        var el;
+                        var key = field.id;
+                        switch(field.type){
+                            case 'skus':
+                                el = <ConditionSkuCollection options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
+                                break;
+                            case 'cats':
+                                el = <ConditionCategories options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
+                                break;
+                            case 'total':
+                                el = <ConditionTotal options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
+                                break;
+                            case 'comb':
+                                el = <ConditionAttributeCombination options={this.props.options}
+                                    modalContainer={this.props.modalContainer} key={key} id={key} removeCondition={this.removeCondition}/>;
+                                break;
+                            case 'shipping':
+                                el = <ConditionShipping options={this.props.options}
+                                    modalContainer={this.props.modalContainer} key={key} id={key} removeCondition={this.removeCondition}/>;
+                                break;
+
+                        }
+                        return el;
+                    }, this)}
                 </div> );
         },
         componentDidMount: function () {
             var $conditionsSerialized = $('#'+this.props.options.conditions_serialized);
-            var data;
-            try {
-                data = JSON.parse($conditionsSerialized.val());
-                this.setProps({data: data});
-            } catch (e) {
-                this.setProps({data: {}});
+            var data = this.state.data;
+
+            if ($conditionsSerialized.length > 0) {
+                try {
+                    data = JSON.parse($conditionsSerialized.val());
+                    this.setProps({data: data});
+                    // todo actually update state
+                } catch (e) {
+                    Promo.log(e);
+                }
             }
+
+            $('#' + this.props.newCondition).on('click', this.addCondition);
 
             $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
         },
+        addCondition: function () {
+            // add condition data to state
+            var $conditionTypes = this.props.conditionType;
+            if($conditionTypes.length == 0) {
+                return;
+            }
+
+            var conditionType = $conditionTypes.val();
+            var data = this.state.data;
+            var condition = {type: conditionType, id: conditionType + '-' + this.state.lastConditionId};
+            data.push(condition);
+            this.setState({data: data, lastConditionId: (this.state.lastConditionId + 1)});
+        },
+        removeCondition: function (conditionId) {
+            var data = this.state.data;
+            data = data.filter(function (field) {
+                return field.id != conditionId;
+            });
+            this.setState({data: data});
+        },
         getInitialState: function () {
             return {
-                data: this.props.data
+                data: [],
+                lastConditionId: 0
             };
         }
     });
@@ -926,7 +991,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         initConditionsApp: function (selector, $modalContainer) {
             var $conditionSelector = $('#' + selector);
             if ($conditionSelector.length == 0) {
-                this.log("Use coupon drop-down not found");
+                this.log("Conditions drop-down not found");
             } else {
                 var $container = $("#" + this.options.condition_container_id);
                 React.render(<ConditionsApp conditionType={$conditionSelector} newCondition={this.options.condition_add_id}

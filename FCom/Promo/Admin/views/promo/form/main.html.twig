@@ -78,9 +78,9 @@
         <div id="coupon-options"></div>
         <div class="form-group">
             {{ forms.hidden({field:"conditions_serialized", value: validator.fieldValue("conditions_serialized")}) }}
-            <label class="control-label col-md-3" for="model-conditions">Conditions&nbsp;
+            <label class="control-label col-md-3" for="model-conditions">{{"Conditions"|_}}&nbsp;
                     <a id="help-model-conditions" class="pull-right help-icon" href="#"
-                       data-toggle="popover" data-trigger="focus" data-content="Configure conditions"
+                       data-toggle="popover" data-trigger="focus" data-content="{{"Configure conditions"|_}}"
                        data-container="body">
                         <span class="glyphicon glyphicon-question-sign"></span></a>
             </label>
@@ -108,9 +108,32 @@
             </div>
         </div>
         <div id="conditions-options"></div>
+        <div class="form-group">
+            {{ forms.hidden({field:"actions_serialized", value: validator.fieldValue("actions_serialized")}) }}
+            <label class="control-label col-md-3" for="model-conditions">{{"Add Promo Actions"|_}}&nbsp;
+                    <a id="help-model-conditions" class="pull-right help-icon" href="#"
+                       data-toggle="popover" data-trigger="focus" data-content="{{"Configure promo actions"|_}}"
+                       data-container="body">
+                        <span class="glyphicon glyphicon-question-sign"></span></a>
+            </label>
+            <div class="col-md-4">
+                <select id="model-conditions" name="model[conditions]" class="form-control to-select2">
+                    <option value="">{{"Add Promo Action..."|_}}</option>
+                    <option value="get_discount">{{"Discount"|_}}</option>
+                    <option value="get_shipping">{{"Shipping"|_}}</option>
+                    <option value="get_products">{{"Free Products"|_}}</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button class="btn btn-link" type="button" id="action_add">
+                    <span aria-hidden="true" class="glyphicon glyphicon glyphicon-plus-sign"></span>
+                </button>
+            </div>
+        </div>
+        <div id="actions-options"></div>
         <script type="text/javascript">
             require(['react', 'jsx!fcom.promo'], function (React, Promo) {
-                $('.to-select2').select2();
+                $('.to-select2').select2({minimumResultsForSearch:15});
                 var options = {
                     coupon_select_id: 'model-use_coupon',
                     condition_select_id: 'model-conditions_type',
