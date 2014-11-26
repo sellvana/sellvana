@@ -153,7 +153,9 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
             this.props.onLoad(this);
         },
         componentDidUpdate: function (prevProps, prevState) {
-            this.props.onUpdate(this, prevProps, prevState);
+            if (this.props.onUpdate) {
+                this.props.onUpdate(this, prevProps, prevState);
+            }
         },
         componentWillUnmount: function () {
             $(this.getDOMNode()).off('hidden', this.handleHidden);

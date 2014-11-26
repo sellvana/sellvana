@@ -1021,12 +1021,12 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 };
 
                 if (selected != 0) {
-                    this.createCouponApp($container.get(0), $modalContainer.get(0), callBacks, selected, options);
+                    this.createCouponApp($container.get(0), $modalContainer.get(0), callBacks, selected, this.options);
                 }
 
                 $couponSelector.on('change', function () {
                     selected = $couponSelector.val();
-                    self.createCouponApp($container.get(0), $modalContainer.get(0), callBacks, selected, options);
+                    self.createCouponApp($container.get(0), $modalContainer.get(0), callBacks, selected, this.options);
                 });
             }
         },
