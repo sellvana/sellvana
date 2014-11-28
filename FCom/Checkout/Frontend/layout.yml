@@ -10,6 +10,21 @@ checkout/base:
     - { hook: header-top-util, clear: ALL }
     - { hook: header-top-search, clear: ALL }
 
+
+/checkout-simple/step1:
+  - { include: checkout/base }
+  - { hook: main, views: checkout-simple/step1 }
+
+/checkout-simple/step2:
+  - { include: checkout/base }
+  - { hook: main, views: checkout-simple/step2 }
+
+/checkout-simple/success:
+  - { include: checkout/base }
+  - { hook: main, views: checkout-simple/success }
+
+
+
 /checkout/checkout:
     - { include: checkout/base }
     - view: head
@@ -53,4 +68,3 @@ checkout/base:
         do:
             - [ title, Checkout Success ]
     - { hook: main, views: checkout/success }
-

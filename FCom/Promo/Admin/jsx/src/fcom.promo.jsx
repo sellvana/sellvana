@@ -205,7 +205,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     var DelBtn = React.createClass({
         render: function () {
             return (
-                <Components.Button className="btn-link btn-delete" type="button" style={ {paddingRight:10, paddingLeft:10} }>
+                <Components.Button className="btn-link btn-delete" onClick={this.props.onClick}
+                        type="button" style={ {paddingRight:10, paddingLeft:10} }>
                     <span className="icon-trash"></span>
                 </Components.Button>
             );
@@ -214,9 +215,13 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
 
     var ConditionsRow = React.createClass({
         render: function () {
-            return (<div className={"form-group condition " + this.props.rowClass}>
+            var cls = "form-group condition";
+            if(this.props.rowClass) {
+                cls += " " + this.props.rowClass;
+            }
+            return (<div className={cls}>
                 <div className="col-md-3">
-                    <Components.ControlLabel label_class="pull-right">{this.props.label}<DelBtn/></Components.ControlLabel>
+                    <Components.ControlLabel label_class="pull-right">{this.props.label}<DelBtn onClick={this.props.onDelete}/></Components.ControlLabel>
                 </div>
                 {this.props.children}
             </div>);
@@ -226,7 +231,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     var ConditionsCompare = React.createClass({
         render: function () {
             return (
-                <select className="to-select2">
+                <select className="to-select2 form-control">
                     {this.props.opts.map(function(type){
                         return <option value={type.id} key={type.id}>{type.label}</option>
                     })}
@@ -247,6 +252,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         }
     });
 
+    // what type of condition we have, total amount or quantity
     var ConditionsType = React.createClass({
         render: function () {
             var cls = this.props.select2 ? "to-select2 " : "";
@@ -273,10 +279,29 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         }
     });
 
-    var ConditionSkuCollection = React.createClass({
+    var AddFieldButton = React.createClass({
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                <Components.Button onClick={this.props.onClick} className="btn-link" type="button" style={ {paddingRight:10, paddingLeft:10} }>
+                    <span aria-hidden="true" className="glyphicon glyphicon glyphicon-plus-sign"></span>
+                </Components.Button>
+            );
+        }
+    });
+
+    var removeConditionMixin = {
+        remove: function () {
+            if (this.props.removeCondition) {
+                this.props.removeCondition(this.props.id);
+            }
+        }
+    };
+    // condition to apply to the selection of products
+    var ConditionSkuCollection = React.createClass({
+        mixins: [removeConditionMixin],
+        render: function () {
+            return (
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="skuCollectionType" id="skuCollectionType"> of </ConditionsType>
                     <div className="col-md-2"><input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control"/></div>
                     <div className="col-md-2"><ConditionsCompare ref="skuCollectionCond" id="skuCollectionCond" /></div>
@@ -287,19 +312,21 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         getDefaultProps: function () {
             return {
                 label: "Sku Collection",
-                rowClass: "sku-collection"
+                rowClass: "sku-collection",
+                url: 'conditions/products',
+                type: 'skus'
             };
         },
         componentDidMount: function () {
             var skuCollectionIds = this.refs.skuCollectionIds;
+            var url = this.props.options.base_url + this.props.url;
             $(skuCollectionIds.getDOMNode()).select2({
                 placeholder: "Choose products",
                 minimumInputLength: 3,
-                maximumSelectionSize: 4,
                 multiple: true,
                 closeOnSelect: false,
                 ajax: {
-                    url: "/admin/promo/products",
+                    url: url,
                     dataType: 'json',
                     quietMillis: 250,
                     data: function (term, page) {
@@ -318,7 +345,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 initSelection: function (element, callback) {
                     var ids = this.state.productIds;
                     if (ids) {
-                        $.ajax("/admin/promo/products?ids=" + ids.join(','), {
+                        $.ajax(url + "?ids=" + ids.join(','), {
                             dataType: "json"
                         }).done(function (data) {
                             callback(data);
@@ -348,43 +375,231 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         }
     });
 
+    // condition to apply to products which match the attributes condition configured here
     var ConditionAttributeCombination = React.createClass({
+        mixins: [removeConditionMixin],
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-5"><input type="text" readOnly="readonly" ref="attributesResume" id="attributesResume" className="form-control"/></div>
-                    <Components.Button type="button" className="btn-primary" onClick={this.handleConfigure}>Configure</Components.Button>
+                    <Components.Button type="button" className="btn-primary"
+                       ref={this.props.configureId} onClick={this.handleConfigure}>Configure</Components.Button>
                 </ConditionsRow>
             );
         },
         getDefaultProps: function () {
             return {
                 rowClass: "attr-combination",
-                label: "Combination"
+                label: "Combination",
+                configureId: "attributeCombinationConfigure",
+                type: 'comb'
             };
         },
+        modal: null,
         handleConfigure: function (e) {
-            Promo.log("Clicked");
-            var modal = <Components.Modal onConfirm={this.handleShippingConfirm}
-                title="Product Combination Configuration" onLoad={this.openModal}/>
+            Promo.log("Clicked conditions");
+            var modal = <Components.Modal onConfirm={this.handleConditionsConfirm}
+                title="Product Combination Configuration" onLoad={this.registerModal} onUpdate={this.registerModal}>
+                <ConditionsAttributesModalContent  baseUrl={this.props.options.base_url} idVar={this.props.options.id_var}
+                    entityId={this.props.options.entity_id}/>
+            </Components.Modal>;
 
             React.render(modal, this.props.modalContainer.get(0));
         },
-        handleShippingConfirm: function (modal) {
+        handleConditionsConfirm: function (modal) {
             Promo.log('handling');
             modal.close();
+        },
+        registerModal: function (modal) {
+            this.modal = modal;
+            this.openModal(modal);
         },
         openModal: function (modal) {
             modal.open();
         }
     });
 
-    var ConditionCategories = React.createClass({
+    // content of the modal used to configure attribute combination
+    var ConditionsAttributesModalContent = React.createClass({
+        render: function () {
+            var fieldUrl = this.props.baseUrl + this.props.urlField;
+            var paramObj = {};
+            paramObj[this.props.idVar] = this.props.entityId;
+            return (
+                <div className="attribute-combinations">
+                    <div className="form-group">
+                        <div className="col-md-5">
+                            <select ref="combinationType" className="form-control to-select2">
+                                <option value="0">All Conditions Have to Match</option>
+                                <option value="1">Any Condition Has to Match</option>
+                            </select>
+                        </div>
+                        <div className="col-md-5">
+                            <input ref="combinationField" className="form-control"/>
+                        </div>
+                        <div className="col-md-2">
+                            <AddFieldButton onClick={this.addField}/>
+                        </div>
+                    </div>
+                    {this.state.fields.map(function (field) {
+                        paramObj['field'] = field.field;
+                        var url = fieldUrl + '/?' + $.param(paramObj);
+                        return <ConditionsAttributesModalField label={field.label} url={url} key={field.field}
+                            id={field.field} removeField={this.removeField} />
+                    }.bind(this))}
+                </div>
+            );
+        },
+        addField: function () {
+            var fieldCombination = this.refs.combinationField.getDOMNode();
+            var fieldValue = $(fieldCombination).select2("data");
+            if(null == fieldValue || fieldValue == []) {
+                return;
+            }
+            var fields = this.state.fields;
+            fields.push({label: fieldValue.text, field: fieldValue.id});
+            this.setState({fields: fields});
+        },
+        removeField: function (id) {
+            var fields = this.state.fields;
+            fields = fields.filter(function (field) {
+                return field.field != id;
+            });
+            this.setState({fields: fields});
+        },
+        getInitialState: function () {
+            return {fields: []};
+        },
+        getDefaultProps: function () {
+            return {
+                labelCombinationField: Locale._("Add a Field to Condition..."),
+                urlField: "conditions/attributes_field",
+                url: 'conditions/attributes_list'
+            };
+        },
+        componentDidMount: function () {
+            var fieldCombination = this.refs.combinationField;
+            var self = this;
+            var url = this.props.baseUrl + this.props.url;
+            $(fieldCombination.getDOMNode()).select2({
+                placeholder: self.props.labelCombinationField,
+                minimumInputLength: 2,
+                multiple: false,
+                closeOnSelect: false,
+                ajax: {
+                    url: url,
+                    dataType: 'json',
+                    quietMillis: 300,
+                    data: function (term, page) {
+                        return {
+                            q: term,
+                            page: page
+                        };
+                    },
+                    results: function (data, page) {
+                        var more = (page * 30) < data.total_count;
+                        return {results: data.items, more: more};
+                    },
+                    cache: true
+                },
+                dropdownCssClass: "bigdrop",
+                dropdownAutoWidth: true,
+                selectOnBlur: true
+            });
+            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
+        }
+    });
+
+    var ConditionsAttributesModalField = React.createClass({
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
+                    <div className="col-md-4">
+                        <ConditionsCompare opts={this.props.opts} id="fieldCompare" ref="fieldCompare"/>
+                    </div>
+                    <div className="col-md-5"><input className="form-control required" type="hidden" id="fieldCombination"
+                        ref="fieldCombination"/></div>
+                </ConditionsRow>
+            );
+        },
+        remove: function () {
+            if(this.props.removeField) {
+                this.props.removeField(this.props.id);
+            }
+        },
+        getDefaultProps: function () {
+            return {
+                label: Locale._("Unknown"),
+                url: "",
+                fcLabel: "",
+                opts: [
+                    {id:"is", label: "is"},
+                    {id:"is_not", label: "is not"},
+                    {id:"contains", label: "contains"}
+                ]
+            };
+        },
+        componentDidMount: function () {
+            var fieldCombination = this.refs.fieldCombination;
+            var self = this;
+            $(fieldCombination.getDOMNode()).select2({
+                placeholder: self.props.fcLabel,
+                minimumInputLength: 3,
+                maximumSelectionSize: 4,
+                multiple: true,
+                closeOnSelect: false,
+                ajax: {
+                    url: self.props.url,
+                    dataType: 'json',
+                    quietMillis: 300,
+                    data: function (term, page) {
+                        return {
+                            q: term,
+                            page: page,
+                            offset: 30
+                        };
+                    },
+                    results: function (data, page) {
+                        var more = (page * 30) < data.total_count;
+                        return {results: data.items, more: more};
+                    },
+                    cache: true
+                },
+                initSelection: function (element, callback) {
+                    var ids = this.state.ids;
+                    if (ids) {
+                        $.ajax(self.props.url + "?ids=" + ids.join(','), {
+                            dataType: "json"
+                        }).done(function (data) {
+                            callback(data);
+                        });
+                    }
+                },
+                dropdownCssClass: "bigdrop",
+                dropdownAutoWidth: true,
+                selectOnBlur: true,
+                formatResult: function (item) {
+                    var markup = '<div class="row-fluid" title="' + item.text + '">' +
+                        '<div class="span2">ID: <em>' + item.id + '</em></div>' +
+                        '<div class="span2">Name: <strong>' + item.text.substr(0, 20);
+                    if (item.text.length > 20) {
+                        markup += '...';
+                    }
+                    markup += '</strong></div></div>';
+
+                    return markup;
+                }
+            });
+        }
+    });
+
+    var ConditionCategories = React.createClass({
+        mixins: [removeConditionMixin],
+        render: function () {
+            return (
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="catProductsType" id="catProductsType" > of products in </ConditionsType>
-                    <div className="col-md-2"><input type="hidden" id="catProductsIds" ref="catProductsIds"/></div>
+                    <div className="col-md-2"><input type="hidden" id="catProductsIds" ref="catProductsIds" className="form-control"/></div>
                     <div className="col-md-2"><ConditionsCompare ref="catProductsCond" id="catProductsCond" /></div>
                     <div className="col-md-1"><input ref="catProductsValue" id="catProductsValue" type="text" className="form-control"/></div>
                 </ConditionsRow>
@@ -393,11 +608,14 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         getDefaultProps: function () {
             return {
                 rowClass: "category-products",
-                label: "Categories"
+                label: "Categories",
+                url: 'conditions/categories',
+                type: 'cats'
             };
         },
         componentDidMount: function () {
             var catProductsIds = this.refs.catProductsIds;
+            var url = this.props.options.base_url + this.props.url;
             $(catProductsIds.getDOMNode()).select2({
                 placeholder: "Select categories",
                 minimumInputLength: 3,
@@ -405,7 +623,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 multiple: true,
                 closeOnSelect: false,
                 ajax: {
-                    url: "/admin/promo/categories",
+                    url: url,
                     dataType: 'json',
                     quietMillis: 250,
                     data: function (term, page) {
@@ -424,7 +642,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 initSelection: function (element, callback) {
                     var ids = this.state.categoryIds;
                     if (ids) {
-                        $.ajax("/admin/promo/categories?ids=" + ids.join(','), {
+                        $.ajax(url + "?ids=" + ids.join(','), {
                             dataType: "json"
                         }).done(function (data) {
                             callback(data);
@@ -451,9 +669,10 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     });
 
     var ConditionTotal = React.createClass({
+        mixins: [removeConditionMixin],
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="cartTotalType" id="cartTotalType" totalType={this.props.totalType}/>
                     <div className="col-md-2"><ConditionsCompare ref="cartTotalCond" id="cartTotalCond" /></div>
                     <div className="col-md-1"><input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control"/></div>
@@ -464,32 +683,43 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return {
                 rowClass: "cart-total",
                 totalType: [{id:"qty", label:"QTY OF ITEMS"}, {id:"amt", label:"$Value/Amount OF ITEMS"}],
-                label: "Cart Total"
+                label: "Cart Total",
+                type: 'total'
             };
         }
     });
 
     var ConditionShipping = React.createClass({
+        mixins: [removeConditionMixin],
         render: function () {
             return (
-                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label}>
-                    <div className="col-md-5"><textarea ref="shippingResume" id="shippingResume" readOnly="readonly" value={this.state.value} className="form-control"/></div>
-                    <Components.Button type="button" className="btn-primary" ref="configure" onClick={this.handleConfigure}>Configure</Components.Button>
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
+                    <div className="col-md-5"><textarea ref="shippingResume" id="shippingResume"
+                            readOnly="readonly" value={this.state.value} className="form-control"/></div>
+                    <Components.Button type="button" className="btn-primary" ref={this.props.configureId}
+                        onClick={this.handleConfigure}>Configure</Components.Button>
                 </ConditionsRow>
             );
         },
         getDefaultProps: function () {
             return {
-                label: "Destination"
+                label: "Destination",
+                modalTitle: "Shipping Reward Configuration",
+                configureId: "shippingCombinationConfigure",
+                type: 'shipping'
             };
         },
         getInitialState: function () {
             return {value: ""};
         },
+        modal: null,
         handleConfigure: function (e) {
             Promo.log("Clicked");
             var modal = <Components.Modal onConfirm={this.handleShippingConfirm}
-                    title="Shipping Reward Configuration" onLoad={this.openModal}/>
+                title={this.props.modalTitle} onLoad={this.openModal} onUpdate={this.openModal}>
+                <ConditionsShippingModalContent baseUrl={this.props.options.base_url} idVar={this.props.options.id_var}
+                    entityId={this.props.options.entity_id}/>
+            </Components.Modal>;
 
             React.render(modal, this.props.modalContainer.get(0));
         },
@@ -497,37 +727,250 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             Promo.log('handling');
             modal.close();
         },
+        registerModal: function (modal) {
+            this.modal = modal;
+            this.openModal(modal);
+        },
         openModal: function (modal) {
             modal.open();
         }
     });
 
+    var ConditionsShippingModalContent = React.createClass({
+        render: function () {
+            var fieldUrl = this.props.baseUrl + this.props.urlField;
+            var paramObj = {};
+            paramObj[this.props.idVar] = this.props.entityId;
+            return (
+                <div className="shipping-combinations">
+                    <div className="form-group">
+                        <div className="col-md-5">
+                            <select ref="combinationType" className="form-control to-select2">
+                                <option value="0">All Conditions Have to Match</option>
+                                <option value="1">Any Condition Has to Match</option>
+                            </select>
+                        </div>
+                        <div className="col-md-5">
+                            <select ref="combinationField" className="form-control to-select2">
+                                <option value="">{this.props.labelCombinationField}</option>
+                                {this.props.fields.map(function (field) {
+                                    return <option value={field.field} key={field.field}>{field.label}</option>
+                                })}
+                            </select>
+                        </div>
+                        <div className="col-md-2">
+                            <AddFieldButton onClick={this.addField}/>
+                        </div>
+                    </div>
+                    {this.state.fields.map(function (field) {
+                        paramObj['field'] = field.field;
+                        var url = fieldUrl + '/?' + $.param(paramObj);
+                        return <ConditionsAttributesModalField label={field.label} url={url} key={field.field}
+                            id={field.field} removeField={this.removeField} />
+                    }.bind(this))}
+                </div>
+            );
+        },
+        addField: function () {
+            var fieldCombination = this.refs.combinationField.getDOMNode();
+            var fieldValue = $(fieldCombination).select2("data");
+            if(null == fieldValue || fieldValue == [] || fieldValue.id == "") {
+                return;
+            }
+            var fields = this.state.fields;
+            for(var i in fields) {
+                var f = fields[i];
+                if(f.field == fieldValue.id) {
+                    return;
+                }
+            }
+            var field = {label: fieldValue.text, field: fieldValue.id};
+            console.log(fields.indexOf(field));
+            fields.push(field);
+            this.setState({fields: fields});
+        },
+        removeField: function (id) {
+            var fields = this.state.fields;
+            fields = fields.filter(function (field) {
+                return field.field != id;
+            });
+            this.setState({fields: fields});
+        },
+        getInitialState: function () {
+            return {fields: []};
+        },
+        getDefaultProps: function () {
+            return {
+                fields: [
+                    {label: Locale._("Method"), field: 'methods'},
+                    {label: Locale._("Country"), field: 'country'},
+                    {label: Locale._("State/Province"), field: 'state'},
+                    {label: Locale._("City"), field: 'city'}
+                ],
+                labelCombinationField: Locale._("Add a Field to Condition..."),
+                url: "conditions/shipping",
+            };
+        },
+        componentDidMount: function () {
+            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
+        }
+    });
+
+    var ConditionsShippingModalField = React.createClass({
+        render: function () {
+            return (
+                <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
+                    <div className="col-md-4">
+                        <ConditionsCompare opts={this.props.opts} id="fieldCompare" ref="fieldCompare"/>
+                    </div>
+                    <div className="col-md-5"><input className="form-control" type="hidden" id="fieldCombination"
+                         ref="fieldCombination"/></div>
+                </ConditionsRow>
+            );
+        },
+        remove: function () {
+            if(this.props.removeField) {
+                this.props.removeField(this.props.id);
+            }
+        },
+        getDefaultProps: function () {
+            return {
+                label: Locale._("Unknown"),
+                url: "",
+                fcLabel: "",
+                opts: [
+                    {id:"in", label: "is one of"},
+                    {id:"not_in", label: "is not one of"},
+                ]
+            };
+        },
+        componentDidMount: function () {
+            var fieldCombination = this.refs.fieldCombination;
+            var self = this;
+            $(fieldCombination.getDOMNode()).select2({
+                placeholder: self.props.fcLabel,
+                minimumInputLength: 3,
+                maximumSelectionSize: 4,
+                multiple: true,
+                closeOnSelect: false,
+                ajax: {
+                    url: self.props.url,
+                    dataType: 'json',
+                    quietMillis: 300,
+                    data: function (term, page) {
+                        return {
+                            q: term,
+                            page: page,
+                            offset: 30
+                        };
+                    },
+                    results: function (data, page) {
+                        var more = (page * 30) < data.total_count;
+                        return {results: data.items, more: more};
+                    },
+                    cache: true
+                },
+                initSelection: function (element, callback) {
+                    var ids = this.state.categoryIds;
+                    if (ids) {
+                        $.ajax(self.props.url + "?ids=" + ids.join(','), {
+                            dataType: "json"
+                        }).done(function (data) {
+                            callback(data);
+                        });
+                    }
+                },
+                dropdownCssClass: "bigdrop",
+                dropdownAutoWidth: true,
+                selectOnBlur: true,
+                formatResult: function (item) {
+                    var markup = '<div class="row-fluid" title="' + item.text + '">' +
+                        '<div class="span2">ID: <em>' + item.id + '</em></div>' +
+                        '<div class="span2">Name: <strong>' + item.text.substr(0, 20);
+                    if (item.text.length > 20) {
+                        markup += '...';
+                    }
+                    markup += '</strong></div></div>';
+
+                    return markup;
+                }
+            });
+        }
+    });
 
     var ConditionsApp = React.createClass({
         render: function () {
-            return (<div className="conditions panel panel-primary">
-                    <ConditionSkuCollection options={this.props.options}/>
-                    <ConditionAttributeCombination options={this.props.options} modalContainer={this.props.modalContainer}/>
-                    <ConditionCategories options={this.props.options}/>
-                    <ConditionTotal options={this.props.options}/>
-                    <ConditionShipping options={this.props.options} modalContainer={this.props.modalContainer}/>
+            return (<div className="conditions panel panel-default">
+                    {this.state.data.map(function (field, i) {
+                        //todo make a field based on field
+                        var el;
+                        var key = field.id;
+                        switch(field.type){
+                            case 'skus':
+                                el = <ConditionSkuCollection options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
+                                break;
+                            case 'cats':
+                                el = <ConditionCategories options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
+                                break;
+                            case 'total':
+                                el = <ConditionTotal options={this.props.options} key={key} id={key} removeCondition={this.removeCondition}/>;
+                                break;
+                            case 'comb':
+                                el = <ConditionAttributeCombination options={this.props.options}
+                                    modalContainer={this.props.modalContainer} key={key} id={key} removeCondition={this.removeCondition}/>;
+                                break;
+                            case 'shipping':
+                                el = <ConditionShipping options={this.props.options}
+                                    modalContainer={this.props.modalContainer} key={key} id={key} removeCondition={this.removeCondition}/>;
+                                break;
+
+                        }
+                        return el;
+                    }, this)}
                 </div> );
         },
         componentDidMount: function () {
             var $conditionsSerialized = $('#'+this.props.options.conditions_serialized);
-            var data;
-            try {
-                data = JSON.parse($conditionsSerialized.val());
-                this.setProps({data: data});
-            } catch (e) {
-                this.setProps({data: {}});
+            var data = this.state.data;
+
+            if ($conditionsSerialized.length > 0) {
+                try {
+                    data = JSON.parse($conditionsSerialized.val());
+                    this.setProps({data: data});
+                    // todo actually update state
+                } catch (e) {
+                    Promo.log(e);
+                }
             }
+
+            $('#' + this.props.newCondition).on('click', this.addCondition);
 
             $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch:15});
         },
+        addCondition: function () {
+            // add condition data to state
+            var $conditionTypes = this.props.conditionType;
+            if($conditionTypes.length == 0) {
+                return;
+            }
+
+            var conditionType = $conditionTypes.val();
+            var data = this.state.data;
+            var condition = {type: conditionType, id: conditionType + '-' + this.state.lastConditionId};
+            data.push(condition);
+            this.setState({data: data, lastConditionId: (this.state.lastConditionId + 1)});
+        },
+        removeCondition: function (conditionId) {
+            var data = this.state.data;
+            data = data.filter(function (field) {
+                return field.id != conditionId;
+            });
+            this.setState({data: data});
+        },
         getInitialState: function () {
             return {
-                data: this.props.data
+                data: [],
+                lastConditionId: 0
             };
         }
     });
@@ -548,7 +991,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         initConditionsApp: function (selector, $modalContainer) {
             var $conditionSelector = $('#' + selector);
             if ($conditionSelector.length == 0) {
-                this.log("Use coupon drop-down not found");
+                this.log("Conditions drop-down not found");
             } else {
                 var $container = $("#" + this.options.condition_container_id);
                 React.render(<ConditionsApp conditionType={$conditionSelector} newCondition={this.options.condition_add_id}
@@ -578,12 +1021,12 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 };
 
                 if (selected != 0) {
-                    this.createCouponApp($container.get(0), $modalContainer.get(0), callBacks, selected, options);
+                    this.createCouponApp($container.get(0), $modalContainer.get(0), callBacks, selected, this.options);
                 }
 
                 $couponSelector.on('change', function () {
                     selected = $couponSelector.val();
-                    self.createCouponApp($container.get(0), $modalContainer.get(0), callBacks, selected, options);
+                    self.createCouponApp($container.get(0), $modalContainer.get(0), callBacks, selected, this.options);
                 });
             }
         },

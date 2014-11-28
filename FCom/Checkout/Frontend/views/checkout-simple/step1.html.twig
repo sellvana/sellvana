@@ -1,0 +1,40 @@
+<div class="row">
+    <div class="col-md-9">
+        <form action="{{ APP.href('checkout/address') }}" method="post" id="{{ type }}-form" role="form">
+
+            <div class="f-checkout-form">
+
+                <div class="row">
+                    <div class="form-group col-sm-6">
+                        <label for="customer_email" class="control-label required">{{ "E-mail" |_ }}</label>
+                        <input type="text" name="customer_email" id="customer_email" value="{{ validator.fieldValue('customer_email') }}" class="required {{ validator.fieldClass('customer_email') }} form-control">
+                        {{ validator.errorHtml("customer_email", "customer_email") | raw }}
+                    </div>
+                    <div class="col-sm-6">
+                        <p>{{ 'Already have an account?'|_ }} <a href="{{ APP.href('login?redirect_to=checkout') }}">{{ 'Login here'|_ }}</a></p>
+                    </div>
+                </div>
+
+                <header class="f-page-header">
+                    <h1 class="f-page-title">{{ 'Shipping Address'|_ }}</h1>
+                </header>
+
+                {{ THIS.view('checkout-simple/partial/address-form').set('address_type', 'shipping') | raw}}
+
+                <div class="checkbox">
+                    <label for="same_address">
+                        <input type="checkbox" class="checkbox" id="same_address" name="same_address" value="1" {{ validator.fieldValue('same_address') ? 'checked' }}>
+                        {{ "Billing address is same as shipping" |_ }}
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <button class="btn btn-primary btn-lg" type="submit">{{ "Continue" |_ }}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-3">
+        {{ THIS.get('checkout-simple/partial/summary') | raw }}
+    </div>
+</div>

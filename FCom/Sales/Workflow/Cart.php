@@ -288,31 +288,4 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
         $cart->setStatusAbandoned()->save();
         $this->BLayout->view('email/sales/cart-state-abandoned.html.twig')->email();
     }
-
-    public function customerPlacesOrder($args)
-    {
-        /** @var FCom_Customer_Model_Customer $customer */
-        $customer = $this->_getCustomer($args);
-
-        /** @var FCom_Sales_Model_Cart $cart */
-        $cart = $this->_getCart($args);
-
-        /** @var FCom_Sales_Model_Order $order */
-        $order = $this->FCom_Sales_Model_Order->create();
-
-        $order->importDataFromCart($cart);
-
-        if ($order->isPayable()) {
-            $result = [];
-            $this->FCom_Sales_Main->workflowAction('customerPaysOnCheckout', [
-                'cart' => $cart,
-                'order' => $order,
-                'result' => &$result,
-            ]);
-        }
-
-        $cart->setStateOrdered()->save();
-
-        $args['result']['order'] = $order;
-    }
 }

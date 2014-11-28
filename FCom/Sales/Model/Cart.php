@@ -570,6 +570,21 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function isShippable()
+    {
+        foreach ($this->items() as $item) {
+            if ($item->isShippable()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function hasShippingMethod()
+    {
+        return $this->get('shipping_method') ? true : false;
+    }
+
     /**
      * @return null
      */
@@ -686,6 +701,38 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if ($user && isset($post['payment'])) {
             $user->setPaymentDetails($post['payment']);
         }
+    }
+
+    /**
+     * Verify if the cart has a complete billing or shipping address
+     *
+     * @throws BException
+     * @param string $type 'billing' or 'shipping'
+     * @return boolean
+     */
+    public function hasCompleteAddress($type)
+    {
+        if ('billing' !== $type && 'shipping' !== $type) {
+            throw new BException('Invalid address type: ' . $type);
+        }
+        $country = $this->get($type . '_country');
+        if (!$country) {
+            return false;
+        }
+        $fields = ['firstname', 'lastname', 'street', 'city'];
+        if ($this->BLocale->postcodeRequired($country)) {
+            $fields[] = 'postcode';
+        }
+        if ($this->BLocale->regionRequired($country)) {
+            $fields[] = 'region';
+        }
+        foreach ($fields as $field) {
+            $val = $this->get($type . '_' . $field);
+            if (null === $val || '' === $val) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public function __destruct()
