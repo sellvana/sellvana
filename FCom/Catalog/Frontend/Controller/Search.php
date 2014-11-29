@@ -15,11 +15,12 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
         $q = $this->BRequest->get('q');
         $filter = $this->BRequest->get('f');
 
-        $catName = $this->BRequest->params('category');
+        $catName = $this->BRequest->param('category');
         if ($catName === '' || is_null($catName)) {
             $this->forward(false);
             return;
         }
+        /** @var FCom_Catalog_Model_Category $category */
         $category = $this->FCom_Catalog_Model_Category->load($catName, 'url_path');
         if (!$category) {
             $this->forward(false);
@@ -131,7 +132,7 @@ class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_A
 
         $this->FCom_Catalog_Model_SearchHistory->addSearchHit($q, $productsData['state']['c']);
 
-        $layout->view('header')->set('query', $q);
+        $layout->view('header-top')->set('query', $q);
         $layout->view('breadcrumbs')->set('crumbs', ['home', ['label' => 'Search: ' . $q, 'active' => true]]);
         $layout->view('catalog/search')->set('query', $q);
         $pagerView->set('filters', $filter);

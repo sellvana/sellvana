@@ -36,6 +36,9 @@ base:
 
     #- { hook: breadcrumbs, views: breadcrumbs }
     - { hook: header, views: header }
+    - { hook: header-components, views: [ header-top, header-nav, header-callouts ] }
+    - { hook: header-top-util, views: [ multilanguage/header, multicurrency/header, customer/header, checkout/cart/header ] }
+
     - { hook: footer, views: footer }
 
 404:

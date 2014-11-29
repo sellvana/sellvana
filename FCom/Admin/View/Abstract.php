@@ -1,7 +1,18 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_View_Abstract
+ *
+ * @property array $tabs
+ * @property array $tab_groups
+ */
 class FCom_Admin_View_Abstract extends FCom_Core_View_Abstract
 {
+    /**
+     * @param $id
+     * @param array $params
+     * @return $this
+     */
     public function addTab($id, $params)
     {
         $tabs = (array)$this->tabs;
@@ -23,6 +34,10 @@ class FCom_Admin_View_Abstract extends FCom_Core_View_Abstract
         return $this;
     }
 
+    /**
+     * @param null $tabs
+     * @return array|null
+     */
     public function sortedTabs($tabs = null)
     {
         if (is_null($tabs)) {
@@ -35,6 +50,11 @@ class FCom_Admin_View_Abstract extends FCom_Core_View_Abstract
         return $tabs;
     }
 
+    /**
+     * @param $id
+     * @param array $params
+     * @return $this
+     */
     public function addTabGroup($id, $params)
     {
         $tabGroups = (array)$this->tab_groups;
@@ -51,6 +71,9 @@ class FCom_Admin_View_Abstract extends FCom_Core_View_Abstract
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function sortedTabGroups()
     {
         $tabGroups = (array)$this->tab_groups;

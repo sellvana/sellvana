@@ -7,6 +7,9 @@ class FCom_PayPal_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
         $this->_name = 'PayPal Express Checkout';
     }
 
+    /**
+     * @return BLayout|BView
+     */
     public function getCheckoutFormView()
     {
         return $this->BLayout->view('paypal/form');

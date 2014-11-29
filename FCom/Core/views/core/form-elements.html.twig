@@ -2,7 +2,7 @@
 INITIALIZATION:
 
 {% set fieldData = { model:model, validator:validator, id_prefix:'model', name_prefix:'model', get_prefix:'config/prefix' } %}
-{% include THIS.view('core/form-elements').twigName() as forms %}
+{% import THIS.view('core/form-elements').twigName() as forms %}
 
 EXAMPLES:
 
@@ -20,6 +20,12 @@ Using custom id/name:
     {% set p = view.merge(p1, p2) %}
     <label class="control-label {{ p.label_class|default('col-md-2') }} {{ p.required ? 'required' }}"
         for="{{ view.getInputId(p) }}">{{ p.label }}</label>
+{% endmacro %}
+
+{% macro hidden(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
+    <input type="hidden" id="{{ view.getInputId(p) }}" name="{{ view.getInputName(p) }}" value="{{ view.getInputValue(p) }}"/>
 {% endmacro %}
 
 {% macro input(p1, p2) %}

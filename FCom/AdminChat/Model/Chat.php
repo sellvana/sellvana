@@ -1,22 +1,41 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-/*
-- id
-- status
-- num_participants
-- create_at // when the session was created
-- update_at // when the session had last message
-*/
+/**
+ * Class FCom_AdminChat_Model_Chat
+ *
+ * @property int $id
+ * @property string $status
+ * @property int $owner_user_id
+ * @property int $num_participants
+ * @property string $create_at when the session was created
+ * @property string $update_at when the session had last message
+ *
+ * DI
+ * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
+ * @property FCom_AdminChat_Model_Chat $FCom_AdminChat_Model_Chat
+ * @property FCom_AdminChat_Model_History $FCom_AdminChat_Model_History
+ * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
+ * @property FCom_AdminChat_Model_Participant $FCom_AdminChat_Model_Participant
+ */
 class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_adminchat_chat';
     static protected $_origClass = __CLASS__;
 
+    /**
+     * @return FCom_PushServer_Model_Channel
+     * @throws BException
+     */
     public function getChannel()
     {
         return $this->FCom_PushServer_Model_Channel->getChannel('adminchat:' . $this->id, true);
     }
 
+    /**
+     * @param $channel
+     * @return FCom_AdminChat_Model_Chat|bool
+     * @throws BException
+     */
     public function findByChannel($channel)
     {
         if (!preg_match('/^adminchat:(.*)$/', $channel, $m)) {
@@ -25,6 +44,10 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         return $this->FCom_AdminChat_Model_Chat->load($m[1]);
     }
 
+    /**
+     * @param FCom_Admin_Model_User $remoteUser
+     * @return $this
+     */
     public function openWithUser($remoteUser)
     {
         // get local user
@@ -56,6 +79,9 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         return $chat;
     }
 
+    /**
+     * @return array
+     */
     public function getHistoryArray()
     {
         $history = $this->FCom_AdminChat_Model_History->orm('h')
@@ -75,6 +101,11 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         return $text;
     }
 
+    /**
+     * @param $user
+     * @param $text
+     * @return $this
+     */
     public function addHistory($user, $text)
     {
         $msg = $this->FCom_AdminChat_Model_History->create([
@@ -85,6 +116,11 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         return $msg;
     }
 
+    /**
+     * @param $user
+     * @param array $extraData
+     * @return $this|BModel
+     */
     public function addParticipant($user, $extraData = [])
     {
         $clients = $this->FCom_PushServer_Model_Client->findByAdminUser($user);
@@ -108,6 +144,11 @@ class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
         return $participant;
     }
 
+    /**
+     * @param $user
+     * @return $this
+     * @throws BException
+     */
     public function removeParticipant($user)
     {
         $clients = $this->FCom_PushServer_Model_Client->findByAdminUser($user);

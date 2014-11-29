@@ -1,5 +1,26 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_ProductReviews_Model_Review
+ *
+ * @property int $id
+ * @property int $product_id
+ * @property int $customer_id
+ * @property int $rating
+ * @property int $rating1
+ * @property int $rating2
+ * @property int $rating3
+ * @property int $approved
+ * @property int $helpful
+ * @property int $helpful_voices
+ * @property int $offensive
+ * @property string $title
+ * @property string $create_at
+ * @property string $text
+ *
+ * DI
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ */
 class FCom_ProductReviews_Model_Review extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_product_review';

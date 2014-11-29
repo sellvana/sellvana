@@ -1,5 +1,13 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Geo_Model_Region
+ *
+ * @property int $id
+ * @property string $country
+ * @property string $code
+ * @property string $name
+ */
 class FCom_Geo_Model_Region extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_geo_region';
@@ -22,6 +30,7 @@ class FCom_Geo_Model_Region extends FCom_Core_Model_Abstract
     public function allOptions()
     {
         if (!static::$_allOptionsLoaded) {
+            /** @var FCom_Geo_Model_Region[] $regions */
             $regions = $this->orm('s')->find_many();
             foreach ($regions as $r) {
                 static::$_optionsCache[$r->country][$r->code] = $r->name;

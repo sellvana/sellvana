@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Email_Frontend_Controller
+ *
+ * @property FCom_Email_Model_Pref $FCom_Email_Model_Pref
+ */
 class FCom_Email_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function action_pref()

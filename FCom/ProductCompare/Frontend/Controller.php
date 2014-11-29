@@ -50,6 +50,14 @@ class FCom_ProductCompare_Frontend_Controller extends FCom_Frontend_Controller_A
 
     public function action_index__POST()
     {
+        $r = $this->BRequest;
+        $action = $r->post('submit');
+        if($action == "reset"){
+            $set = $this->FCom_ProductCompare_Model_Set->sessionSet();
+            if($set->clearSet()){
+                $this->message("Compare items reset");
+            }
+        }
         return $this->action_index();
     }
 
@@ -76,6 +84,34 @@ class FCom_ProductCompare_Frontend_Controller extends FCom_Frontend_Controller_A
 
         $this->_addIdCookie($id);
 
+
+        $this->BResponse->redirect('/catalog/compare');
+    }
+
+    public function action_remove()
+    {
+
+        if ($this->BRequest->csrf('referrer', 'GET')) {
+            $this->message('CSRF detected');
+            $this->BResponse->redirect($this->FCom_Core_Main->lastNav());
+            return;
+        }
+
+        $id = $this->BRequest->get('id');
+        if (null == $id) {
+            $this->message("Provide product to remove.");
+            $this->BResponse->redirect($this->FCom_Core_Main->lastNav());
+            return;
+        } else {
+            /** @var FCom_ProductCompare_Model_Set $set */
+            $set = $this->FCom_ProductCompare_Model_Set->sessionSet(true);
+            $rm = $set->rmItem($id);
+            if ($rm) {
+                $this->message("Product removed from compare");
+            } else {
+                $this->message("There was problem removing product from compare", "error");
+            }
+        }
 
         $this->BResponse->redirect('/catalog/compare');
     }

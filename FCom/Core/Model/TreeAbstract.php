@@ -2,6 +2,7 @@
 
 /**
  * Class FCom_Core_Model_TreeAbstract
+ *
  * @property int $id
  * @property int $parent_id
  * @property string $id_path
@@ -11,6 +12,7 @@
  * @property string $full_name
  * @property string $url_key
  * @property string $url_path
+ * @property string $url_href //todo: check this property
  * @property int $num_children
  * @property int $num_descendants
  * @property int $num_products
@@ -20,11 +22,23 @@
  */
 class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
 {
+    /**
+     * @var string
+     */
     protected static $_separator = '|';
 
+    /**
+     * @var array
+     */
     protected static $_cacheAuto = ['id', 'full_name', 'url_path'];
+    /**
+     * @var array
+     */
     protected static $_cacheFlags = ['full_name' => ['key_lower']];
 
+    /**
+     * @var array
+     */
     protected static $_validationRules = [
         /*array('parent_id', '@required'),
         array('id_path', '@required'),
@@ -39,7 +53,7 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
      * @param array|int|string $id
      * @param null $field
      * @param bool $cache
-     * @return $this|bool
+     * @return static|bool
      * @throws BException
      */
     public function load($id, $field = null, $cache = false)
@@ -58,6 +72,13 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return false;
     }
 
+    /**
+     * @param $name
+     * @param array $params
+     * @param array $saveObjects
+     * @return static
+     * @throws BException
+     */
     public function createChild($name, $params = [], $saveObjects = [])
     {
         $sep = static::$_separator;
@@ -99,6 +120,12 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $child;
     }
 
+    /**
+     * @param string $newName
+     * @param bool $resetUrl
+     * @return static
+     * @throws BException
+     */
     public function rename($newName, $resetUrl = false)
     {
         $pName = $this->parent()->get('full_name');
@@ -113,6 +140,13 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * move node
+     * @param int $parentId
+     * @return static
+     * @throws BException
+     * @throws Exception
+     */
     public function move($parentId)
     {
         if ($parentId != $this->get('parent_id')) {
@@ -143,6 +177,11 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param $sortOrder
+     * @return static
+     * @throws BException
+     */
     public function reorder($sortOrder)
     {
         $conflict = false;
@@ -163,6 +202,11 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param bool $recursive
+     * @return static
+     * @throws BException
+     */
     public function reorderChildrenAZ($recursive = false)
     {
         $children = $this->children();
@@ -183,6 +227,10 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @return bool
+     * @throws BException
+     */
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) {
@@ -211,6 +259,12 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return true;
     }
 
+    /**
+     * @param bool $save
+     * @param bool $resetUrl
+     * @return static
+     * @throws BException
+     */
     public function refreshDescendants($save = false, $resetUrl = false)
     {
         $children = $this->children();
@@ -226,6 +280,11 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param bool $save
+     * @return static
+     * @throws BException
+     */
     public function recalculateNumDescendants($save = false)
     {
         $children = $this->children();
@@ -242,6 +301,10 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param bool $save
+     * @return static
+     */
     public function unregister($save = false)
     {
         $this->parent()->add('num_children', -1);
@@ -255,6 +318,10 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param bool $save
+     * @return static
+     */
     public function register($save = false)
     {
         $this->parent()->add('num_children');
@@ -288,11 +355,18 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return true;
     }
 
+    /**
+     * @return FCom_Core_Model_TreeAbstract
+     */
     public function parent()
     {
         return $this->relatedModel(get_class($this), $this->get('parent_id'), false, 'parent');
     }
 
+    /**
+     * @param string $sort
+     * @return FCom_Core_Model_TreeAbstract[]
+     */
     public function children($sort = 'sort_order')
     {
         $children = [];
@@ -320,6 +394,10 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $children;
     }
 
+    /**
+     * @param string $sort
+     * @return FCom_Core_Model_TreeAbstract[]
+     */
     public function descendants($sort = 'sort_order')
     {
         $desc = [];
@@ -349,6 +427,10 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $desc;
     }
 
+    /**
+     * get all descendants nodes
+     * @return FCom_Core_Model_TreeAbstract[]
+     */
     public function ascendants()
     {
         $asc = [];
@@ -358,6 +440,10 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $asc;
     }
 
+    /**
+     * get all siblings nodes
+     * @return FCom_Core_Model_TreeAbstract[]
+     */
     public function siblings()
     {
         $siblings = [];
@@ -367,6 +453,10 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $siblings;
     }
 
+    /**
+     * @return static
+     * @throws BException
+     */
     public function generateSortOrder()
     {
         $sortOrder = 0;
@@ -383,12 +473,21 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * generate url node url_key base on node_name value
+     * @return static
+     * @throws BException
+     */
     public function generateUrlKey()
     {
         $this->set('url_key', $this->BLocale->transliterate($this->get('node_name')));
         return $this;
     }
 
+    /**
+     * @return static
+     * @throws BException
+     */
     public function generateUrlPath()
     {
         $urlKey = $this->get('url_key');
@@ -402,6 +501,10 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @return static
+     * @throws BException
+     */
     public function generateIdPath()
     {
         $idPath = $this->id();
@@ -419,6 +522,10 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @return static
+     * @throws BException
+     */
     public function generateFullName()
     {
         $parent = $this->parent();
@@ -535,6 +642,10 @@ class FCom_Core_Model_TreeAbstract extends FCom_Core_Model_Abstract
         return $cloneNode;
     }
 
+    /**
+     * @param $cloneNode
+     * @return static
+     */
     public function onAfterClone(&$cloneNode)
     {
         $this->BEvents->fire($this->_origClass() . '::onAfterClone', ['node' => $this, 'cloneNode' => $cloneNode]);

@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_IndexTank_Search
+ *
+ * @property FCom_IndexTank_Index_Product $FCom_IndexTank_Index_Product
+ * @property FCom_IndexTank_Model_ProductField $FCom_IndexTank_Model_ProductField
+ */
 class FCom_IndexTank_Search extends BClass
 {
     /**
@@ -125,10 +131,12 @@ class FCom_IndexTank_Search extends BClass
     }
 
     /**
-    * Shortcut to help with IDE autocompletion
-    *
-    * @return FCom_IndexTank_Search
-    */
+     * Shortcut to help with IDE autocompletion
+     *
+     * @param bool $new
+     * @param array $args
+     * @return FCom_IndexTank_Search
+     */
     static public function i($new = false, array $args = [])
     {
         return BClassRegistry::instance(__CLASS__, $args, !$new);

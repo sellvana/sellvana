@@ -1,10 +1,15 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * Created by pp
- * @project fulleron
+ * Class FCom_CustomerGroups_Model_TierPrice
+ *
+ * @property int $id
+ * @property int $product_id
+ * @property int $group_id
+ * @property float $base_price
+ * @property float $sale_price
+ * @property int $qty
  */
-
 class FCom_CustomerGroups_Model_TierPrice
     extends FCom_Core_Model_Abstract
 {
@@ -21,6 +26,11 @@ class FCom_CustomerGroups_Model_TierPrice
         return parent::i($new, $args); // auto completion helper
     }
 
+    /**
+     * @param $product
+     * @return array
+     * @throws BException
+     */
     public function getProductTiers($product)
     {
         $tiers = $this->orm('tp')->where('product_id', $product->id())->find_many();

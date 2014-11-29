@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_OAuth_Controller
+ *
+ * @property FCom_OAuth_Main $FCom_OAuth_Main
+ */
 class FCom_OAuth_Controller extends FCom_Core_Controller_Abstract
 {
     public function action_login()

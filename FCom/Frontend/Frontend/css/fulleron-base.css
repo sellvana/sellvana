@@ -46,6 +46,13 @@ label.error {
   font-weight: bold;
   font-size: 13px;
   }
+label.success {
+    display: block;
+    margin-top: 5px;
+    color: #468847;
+    font-weight: bold;
+    font-size: 13px;
+}
   
 /* Alerts */
 .alert {

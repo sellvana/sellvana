@@ -17,6 +17,7 @@ class FCom_Frontend_Frontend extends BClass
     public function layout($args)
     {
         if (($head = $this->BLayout->view('head'))) {
+            /** @type FCom_Core_View_Head $head */
             $head->js_raw('frontend_init', '
 FCom.Frontend = {}
             ');

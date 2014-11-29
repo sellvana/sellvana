@@ -1,7 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * @method static FCom_Admin_Model_Role i()
+ * Class FCom_Admin_Model_Role
+ *
+ * @property int $id
+ * @property string $role_name
+ * @property string $permissions_data
  */
 class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
 {
@@ -18,8 +22,12 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
         'admin' => ['title' => 'Admin Tasks', 'level' => 1],
     ];
 
+    /**
+     * @return array
+     */
     public function options()
     {
+        /** @var FCom_Admin_Model_Role[] $roles */
         $roles = $this->orm()
             ->select('id')->select('role_name')
             ->find_many();
@@ -30,6 +38,11 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
         return $options;
     }
 
+    /**
+     * @param $path
+     * @param null $params
+     * @return FCom_Admin_Model_Role
+     */
     public function createPermission($path, $params = null)
     {
         if (is_array($path)) {
@@ -48,11 +61,19 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function getAllPermissions()
     {
         return static::$_allPermissions;
     }
 
+    /**
+     * @param null $rootPath
+     * @param null $level
+     * @return array|null
+     */
     public function getAllPermissionsTree($rootPath = null, $level = null)
     {
         if (is_null($rootPath)) {
@@ -94,6 +115,9 @@ class FCom_Admin_Model_Role extends FCom_Core_Model_Abstract
         }
     }
 
+    /**
+     * @return array
+     */
     public function getPermissionIds()
     {
         $perms = [];

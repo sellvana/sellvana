@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Admin_Controller_ImportExport
+ *
+ * @property FCom_Core_ImportExport $FCom_Core_ImportExport
+ */
 class FCom_Admin_Controller_ImportExport extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected $_permission = 'system/importexport';

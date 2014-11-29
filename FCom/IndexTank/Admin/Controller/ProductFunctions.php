@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_IndexTank_Admin_Controller_ProductFunctions
+ *
+ * @property FCom_IndexTank_Index_Product $FCom_IndexTank_Index_Product
+ * @property FCom_IndexTank_Model_ProductFunction $FCom_IndexTank_Model_ProductFunction
+ * @property FCom_IndexTank_Model_ProductField $FCom_IndexTank_Model_ProductField
+ */
 class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -37,6 +44,7 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
 
     public function formPostAfter($args)
     {
+        /** @var FCom_IndexTank_Model_ProductFunction $model */
         $model = $args['model'];
 
         if ($model) {
@@ -56,6 +64,7 @@ class FCom_IndexTank_Admin_Controller_ProductFunctions extends FCom_Admin_Contro
             }
             $definition = '';
             $name = '';
+            /** @var FCom_IndexTank_Model_ProductField $field */
             $field = $this->FCom_IndexTank_Model_ProductField->orm()
                     ->where("field_name", $model->field_name)
                     ->where("scoring", 1)

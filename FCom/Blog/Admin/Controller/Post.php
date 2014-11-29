@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Blog_Admin_Controller_Post
+ *
+ * @property FCom_Blog_Model_Post $FCom_Blog_Model_Post
+ * @property FCom_Blog_Model_Tag $FCom_Blog_Model_Tag
+ * @property FCom_Blog_Model_PostCategory $FCom_Blog_Model_PostCategory
+ */
 class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -95,39 +102,41 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
      */
     public function getAllPostConfig()
     {
-
         $config = parent::gridConfig();
-        //$config['id'] = 'category_all_prods_grid-'.$model->id;
-        $config['id'] = 'category_all_post_grid';
-        $config['columns'] = [
-            ['cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40],
-            ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55],
-            ['name' => 'author', 'label' => 'Author'],
-            ['name' => 'title', 'label' => 'Title', 'href' => $this->BApp->href('blog/post/form/?id=:id')],
-            ['name' => 'status', 'label' => 'Status', 'editable' => true, 'mass-editable' => true, 'editor' => 'select',
-                'options' => $this->FCom_Blog_Model_Post->fieldOptions('status')],
-        ];
-        $config['actions'] = [
-            'add' => ['caption' => 'Add selected posts', 'modal' => true]
-        ];
-        $config['filters'] = [
-            ['field' => 'title', 'type' => 'text'],
-            ['field' => 'status', 'type' => 'multiselect'],
-        ];
-        $config['orm'] = $this->FCom_Blog_Model_Post->orm('p')
+
+        $orm = $this->FCom_Blog_Model_Post->orm('p')
             ->select('p.*')
             ->join('FCom_Admin_Model_User', ['p.author_user_id', '=', 'u.id'], 'u')
             ->select_expr('CONCAT_WS(" ", u.firstname,u.lastname)', 'author');
-        $config['events'] = ['add'];
-        /*$config['_callbacks'] = "{
-            'add':'categoryProdsMng.addSelectedProds'
-        }";*/
 
+        $config = [
+            'id' => 'category_all_post_grid',
+            'orm' => $orm,
+            'columns' => [
+                ['type' => 'row_select'],
+                ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 55],
+                ['name' => 'author', 'label' => 'Author'],
+                ['name' => 'title', 'label' => 'Title', 'href' => $this->BApp->href('blog/post/form/?id=:id')],
+                ['name' => 'status', 'label' => 'Status', 'editable' => true, 'mass-editable' => true, 'editor' => 'select',
+                    'options' => $this->FCom_Blog_Model_Post->fieldOptions('status')],
+            ],
+            'filters' => [
+                ['field' => 'title', 'type' => 'text'],
+                ['field' => 'status', 'type' => 'multiselect'],
+            ],
+            'grid_before_create' => 'postAllGridRegister'
+        ];
 
         return ['config' => $config];
     }
 
-    public function postGridConfig($model)
+    /**
+     * get all posts related or not related with category
+     * @param FCom_Blog_Model_PostCategory $model
+     * @param bool $related get all post (true:related|false:not related) with category
+     * @return array
+     */
+    public function postGridConfig($model, $related = true)
     {
         $orm = $this->FCom_Blog_Model_Post->orm()->table_alias('p')
             ->select(['p.id', 'p.author_user_id', 'p.status', 'p.title']);
@@ -141,7 +150,7 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
             'data_mode'     => 'local',
             //'caption'      =>$caption,
             'columns'      => [
-                ['cell' => 'select-row', 'headerCell' => 'select-all', 'width' => 40],
+                ['type' => 'row_select'],
                 ['name' => 'id', 'label' => 'ID', 'index' => 'p.id', 'width' => 80, 'hidden' => true],
                 ['name' => 'author', 'label' => 'Author', 'index' => 'u.author_user_id'],
                 ['name' => 'title', 'label' => 'Title'],
@@ -155,7 +164,8 @@ class FCom_Blog_Admin_Controller_Post extends FCom_Admin_Controller_Abstract_Gri
                 ['field' => 'title', 'type' => 'text'],
                 ['field' => 'status', 'type' => 'multiselect'],
             ],
-            'events' => ['init', 'add', 'mass-delete']
+            'grid_before_create' => $related ? 'postGridRegister' : 'postNotRelatedGridRegister',
+            //'events' => ['init', 'add', 'mass-delete']
         ];
 
 

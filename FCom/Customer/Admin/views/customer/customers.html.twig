@@ -53,7 +53,7 @@
                 }
                 this.formEl.validate({ignore: '.ignore-validate'});
                 return this;
-            }
+            };
 
             BackboneGrid.Views.ModalForm.prototype.saveChanges = function (ev) {
                 modalForm.$el.find('textarea, input, select').each(function () {
@@ -107,7 +107,7 @@
                 BackboneGrid.modalElementVals = {};
 
                 return true;
-            }
+            };
 
             BackboneGrid.Views.ModalMassGridElement = Backbone.View.extend({
                 className: 'form-group',

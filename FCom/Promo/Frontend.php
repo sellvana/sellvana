@@ -1,5 +1,14 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Promo_Frontend
+ *
+ * @property FCom_Promo_Model_Cart $FCom_Promo_Model_Cart
+ * @property FCom_Promo_Model_Promo $FCom_Promo_Model_Promo
+ * @property FCom_Promo_Model_Product $FCom_Promo_Model_Product
+ * @property FCom_Promo_Model_Group $FCom_Promo_Model_Group
+ * @property FCom_Sales_Model_Cart_Item $FCom_Sales_Model_Cart_Item
+ */
 class FCom_Promo_Frontend extends BClass
 {
     public function layout()

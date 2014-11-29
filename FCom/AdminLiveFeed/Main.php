@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_AdminLiveFeed_Main
+ *
+ * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
+ * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ */
 class FCom_AdminLiveFeed_Main extends BCLass
 {
     public function onGetHeaderNotifications()
@@ -11,14 +18,16 @@ class FCom_AdminLiveFeed_Main extends BCLass
 
     public function onProductAfterSave($args)
     {
-        if ($args['model']->isNewRecord()) {
+        /** @var FCom_Catalog_Model_Product $model */
+        $model = $args['model'];
+        if ($model->isNewRecord()) {
             if ($this->BConfig->get('modules/FCom_AdminLiveFeed/enable_catalog')) {
                 $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send(
                     [
-                        'href' => 'catalog/products/form?id=' . $args['model']->get('id'),
+                        'href' => 'catalog/products/form?id=' . $model->id(),
                         'text' => $this->BLocale->_(
                                 'New %s of products have been added to catalog',
-                                '#' . $args['model']->get('id')
+                                '#' . $model->id()
                             ),
                     ]
                 );
@@ -28,10 +37,12 @@ class FCom_AdminLiveFeed_Main extends BCLass
 
     public function onPrefAfterSave($args)
     {
+        /** @var FCom_Email_Model_Pref $model */
+        $model = $args['model'];
         if ($this->BConfig->get('modules/FCom_AdminLiveFeed/enable_newsletter')) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send(
                 [
-                    'text' => $args['model']->get('email') . ' ' . $this->BLocale->_('has subscribed to newsletter'),
+                    'text' => $model->email . ' ' . $this->BLocale->_('has subscribed to newsletter'),
                 ]
             );
         }
@@ -39,16 +50,16 @@ class FCom_AdminLiveFeed_Main extends BCLass
 
     public function onCustomerAfterSave($args)
     {
-        if ($args['model']->isNewRecord()) {
+        /** @var FCom_Customer_Model_Customer $model */
+        $model = $args['model'];
+        if ($model->isNewRecord()) {
             if ($this->BConfig->get('modules/FCom_AdminLiveFeed/enable_customer')) {
                 $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send(
                     [
-                        'href' => 'customers/form/?id=' . $args['model']->get('id'),
+                        'href' => 'customers/form/?id=' . $model->id(),
                         'text' => $this->BLocale->_(
                                 '%s created an account.',
-                                $args['model']->get('firstname') . ' ' . $args['model']->get(
-                                    'lastname'
-                                ) . '(' . $args['model']->get('email') . ')'
+                                $model->firstname . ' ' . $model->lastname . '(' . $model->email . ')'
                             )
                     ]
                 );
@@ -58,15 +69,17 @@ class FCom_AdminLiveFeed_Main extends BCLass
 
     public function onReviewsAfterSave($args)
     {
-        $pCustomerId = $args['model']->get('customer_id');
+        /** @var FCom_ProductReviews_Model_Review $model */
+        $model = $args['model'];
+        $pCustomerId = $model->customer_id;
         $customer = $this->FCom_Customer_Model_Customer->load($pCustomerId);
         if ($this->BConfig->get('modules/FCom_AdminLiveFeed/enable_product_reviews')) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send(
                 [
-                    'href' => 'prodreviews/form/?id=' . $args['model']->id(),
+                    'href' => 'prodreviews/form/?id=' . $model->id(),
                     'text' => $this->BLocale->_(
                             '%s has review the product %s',
-                            [$customer->firstname . ' ' . $customer->lastname, '#' . $args['model']->id()]
+                            [$customer->firstname . ' ' . $customer->lastname, '#' . $model->id()]
                         )
                 ]
             );
@@ -75,15 +88,17 @@ class FCom_AdminLiveFeed_Main extends BCLass
 
     public function onOrderAfterSave($args)
     {
-        if ($args['model']->isNewRecord()) {
+        /** @var FCom_Sales_Model_Order $model */
+        $model = $args['model'];
+        if ($model->isNewRecord()) {
             if ($this->BConfig->get('modules/FCom_AdminLiveFeed/enable_sales')) {
-                $customer = $this->FCom_Customer_Model_Customer->load($args['model']->get('customer_id'));
+                $customer = $this->FCom_Customer_Model_Customer->load($model->get('customer_id'));
                 $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send(
                     [
-                        'href' => 'orders/form/?id=' . $args['model']->id(),
+                        'href' => 'orders/form/?id=' . $model->id(),
                         'text' => $this->BLocale->_(
                                 'Order %s has been placed by %s',
-                                ['#' . $args['model']->id(), $customer->firstname . ' ' . $customer->lastname]
+                                ['#' . $model->id(), $customer->firstname . ' ' . $customer->lastname]
                             ),
                     ]
                 );
@@ -102,9 +117,11 @@ class FCom_AdminLiveFeed_Main extends BCLass
 
     public function onWishlistAfterAdd($args)
     {
+        /** @var FCom_Catalog_Model_Product $model */
+        $model = $args['model'];
         if ($this->BConfig->get('modules/FCom_AdminLiveFeed/enable_wishlist')) {
             $this->FCom_PushServer_Model_Channel->getChannel('activities_feed', true)->send([
-                    'text' => $this->BLocale->_('Item %s has been added to a wishlist', $args['model']->get('product_name')),
+                    'text' => $this->BLocale->_('Item %s has been added to a wishlist', $model->product_name),
                 ]);
         }
     }

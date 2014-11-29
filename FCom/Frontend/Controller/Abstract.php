@@ -4,6 +4,7 @@
  * Class FCom_Frontend_Controller_Abstract
  *
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property FCom_Frontend_Main $FCom_Frontend_Main
  */
 class FCom_Frontend_Controller_Abstract extends FCom_Core_Controller_Abstract

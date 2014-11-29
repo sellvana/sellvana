@@ -1,5 +1,14 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_AdminChat_Admin
+ *
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_AdminChat_Model_Participant $FCom_AdminChat_Model_Participant
+ * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
+ * @property FCom_AdminChat_Model_Chat $FCom_AdminChat_Model_Chat
+ * @property FCom_AdminChat_Model_History $FCom_AdminChat_Model_History
+ */
 class FCom_AdminChat_Admin extends BClass
 {
     public function onAdminUserLogout($args)

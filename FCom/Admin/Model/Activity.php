@@ -1,21 +1,27 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * @property int id
- * @property enum status (new, recent, archived)
- * @property enum type (workflow, alert)
- * @property varchar code (order:new:123)
- * @property varchar permissions (orders, customers, modules)
- * @property int action_user_id
- * @property int customer_id
- * @property int order_id
- * @property datetime create_at
- * @property text data_serialized
+ * class FCom_Admin_Model_Activity
+ *
+ * @property int $id
+ * @property string $status new|recent|archived
+ * @property string $type workflow|alert
+ * @property string $event_code (order:new:123)
+ * @property string $permissions (orders, customers, modules)
+ * @property int $action_user_id
+ * @property int $customer_id
+ * @property int $order_id
+ * @property string $create_at
+ * @property string data_serialized
  *     - message (?)
  *     - message_html
  *     - href
  *     - item_class
  *     - icon_class
+ *
+ * DI
+ * @property FCom_Admin_Model_ActivityUser $FCom_Admin_Model_ActivityUser
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  */
 class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
 {
@@ -75,6 +81,10 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
         }
     }
 
+    /**
+     * @param array $data
+     * @return mixed
+     */
     public function addActivity($data)
     {
         $coreFields = 'status,type,code,permissions,action_user_id,customer_id,order_id,create_at';
@@ -114,6 +124,12 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
         return $model;
     }
 
+    /**
+     * get recent activity by user
+     * @param string $type
+     * @param int $userId
+     * @return FCom_Admin_Model_Activity[]
+     */
     public function getRecentActivityByUser($type = null, $userId = null)
     {
         if (!$userId) {
@@ -131,6 +147,11 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
         return $orm->find_many();
     }
 
+    /**
+     * @param null $userId
+     * @return FCom_Admin_Model_Activity
+     * @throws BException
+     */
     public function markAsRead($userId = null)
     {
         if (!$userId) {
@@ -144,6 +165,10 @@ class FCom_Admin_Model_Activity extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * @param int $userId
+     * @return FCom_Admin_Model_Activity
+     */
     public function dismiss($userId = null)
     {
         if (!$userId) {

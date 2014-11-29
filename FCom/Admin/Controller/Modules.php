@@ -13,6 +13,9 @@ class FCom_Admin_Controller_Modules extends FCom_Admin_Controller_Abstract_GridF
     protected $_navPath = 'modules/installed';
     protected $_useDefaultLayout = false;
 
+    /**
+     * @return array
+     */
     public function getModulesData()
     {
         $config = $this->BConfig;

@@ -132,7 +132,7 @@ class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abs
 
         $this->FCom_Core_Main->lastNav(true);
 
-        $layout->view('header')->set('query', $q);
+        $layout->view('header-top')->set('query', $q);
         $layout->view('breadcrumbs')->set('crumbs', ['home', ['label' => 'Search: ' . $q, 'active' => true]]);
         $layout->view('catalog/search')->set('query', $q);
 
