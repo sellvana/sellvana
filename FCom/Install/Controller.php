@@ -239,7 +239,6 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                         'FCom_FreshBooks' => 'REQUESTED',
                         //'FCom_FrontendCP' => 'REQUESTED',
                         'FCom_FrontendThemeBootSimple' => 'REQUESTED',
-                        'FCom_Geo' => 'REQUESTED',
                         'FCom_MarketClient' => 'REQUESTED',
                         'FCom_MultiCurrency' => 'REQUESTED',
                         'FCom_MultiLanguage' => 'REQUESTED',

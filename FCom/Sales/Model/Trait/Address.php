@@ -33,12 +33,11 @@ trait FCom_Sales_Model_Trait_Address
     public function addressAsHtml($atype)
     {
         $countries = $this->BLocale->getAvailableCountries();
-        $streetArr = explode("\n", $this->get($atype . '_street'));
         $country = $this->get($atype . '_country');
         $html = '<div class="adr">'
-            . '<div class="street-address">' . $streetArr[0] . '</div>'
-            . (!empty($streetArr[1]) ? '<div class="extended-address">' . $streetArr[1] . '</div>' : '')
-            . (!empty($streetArr[2]) ? '<div class="extended-address">' . $streetArr[2] . '</div>' : '')
+            . '<div class="street-address">' . $this->get($atype . '_street1') . '</div>'
+            . ($this->get($atype . '_street2') ? '<div class="extended-address">' . $this->get($atype . '_street2') . '</div>' : '')
+            //. (!empty($streetArr[2]) ? '<div class="extended-address">' .$this->get($atype . '_street3') . '</div>' : '')
             . '<span class="locality">' . $this->get($atype . '_city') . '</span>, '
             . '<span class="region">' . $this->get($atype . '_region') . '</span> '
             . '<span class="postal-code">' . $this->get($atype . '_postcode') . '</span>'
@@ -49,7 +48,6 @@ trait FCom_Sales_Model_Trait_Address
 
     public function addressAsArray($atype)
     {
-        $streetArr = explode("\n", $this->get($atype . '_street'));
         $country = $this->get($atype . '_country');
         $arr = [
             'atype'     => $atype,
@@ -57,9 +55,9 @@ trait FCom_Sales_Model_Trait_Address
             'attn'      => $atype . '_attn',
             'firstname' => $atype . '_firstname',
             'lastname'  => $atype . '_lastname',
-            'street1'   => $streetArr[0],
-            'street2'   => !empty($streetArr[1]) ? $streetArr[1] : null,
-            'street3'   => !empty($streetArr[2]) ? $streetArr[2] : null,
+            'street1'   => $atype . '_street1',
+            'street2'   => $atype . '_street2',
+            //'street3'   => $atype . '_street3',
             'city'      => $atype . '_city',
             'region'    => $atype . '_region',
             'postcode'  => $atype . '_postcode',
@@ -84,7 +82,7 @@ trait FCom_Sales_Model_Trait_Address
 
     public function importAddressFromObject($a, $atype = null)
     {
-        if (!$a instanceof BData || !$a instanceof BModel) {
+        if (!$a instanceof BData && !$a instanceof BModel) {
             throw new BException('Invalid address parameter type');
         }
         if (null === $atype && $a->atype) {
@@ -95,7 +93,8 @@ trait FCom_Sales_Model_Trait_Address
             $atype . '_attn' => $a->attn,
             $atype . '_firstname' => $a->firstname,
             $atype . '_lastname' => $a->lastname,
-            $atype . '_street' => trim($a->street1 . "\n" . $a->street2 . "\n" . $a->street3),
+            $atype . '_street1' => $a->street1,
+            $atype . '_street2' => $a->street2,
             $atype . '_city' => $a->city,
             $atype . '_region' => $a->region,
             $atype . '_postcode' => $a->postcode,
@@ -110,9 +109,9 @@ trait FCom_Sales_Model_Trait_Address
     {
         $rules = [
             ['firstname', '@required'],
-            #array('firstname', '@alphanum'),
+            #['firstname', '@alphanum'],
             ['lastname', '@required'],
-            #array('lastname', '@alphanum'),
+            #['lastname', '@alphanum'],
             ['email', '@required'],
             ['email', '@email'],
             ["street1", '@required'],

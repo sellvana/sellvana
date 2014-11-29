@@ -30,7 +30,7 @@
 class FCom_Sales_Migrate extends BClass
 {
 
-    public function install__0_3_4()
+    public function install__0_3_6()
     {
         $tUser = $this->FCom_Admin_Model_User->table();
         $tProduct = $this->FCom_Catalog_Model_Product->table();
@@ -94,7 +94,8 @@ class FCom_Sales_Migrate extends BClass
                 'billing_attn' => 'varchar(50)',
                 'billing_firstname' => 'varchar(50)',
                 'billing_lastname' => 'varchar(50)',
-                'billing_street' => 'varchar(255)',
+                'billing_street1' => 'varchar(255)',
+                'billing_street2' => 'varchar(255)',
                 'billing_city' => 'varchar(50)',
                 'billing_region' => 'varchar(50)',
                 'billing_postcode' => 'varchar(20)',
@@ -106,7 +107,8 @@ class FCom_Sales_Migrate extends BClass
                 'shipping_attn' => 'varchar(50)',
                 'shipping_firstname' => 'varchar(50)',
                 'shipping_lastname' => 'varchar(50)',
-                'shipping_street' => 'varchar(255)',
+                'shipping_street1' => 'varchar(255)',
+                'shipping_street2' => 'varchar(255)',
                 'shipping_city' => 'varchar(50)',
                 'shipping_region' => 'varchar(50)',
                 'shipping_postcode' => 'varchar(20)',
@@ -193,7 +195,8 @@ class FCom_Sales_Migrate extends BClass
                 'billing_attn' => 'varchar(50)',
                 'billing_firstname' => 'varchar(50)',
                 'billing_lastname' => 'varchar(50)',
-                'billing_street' => 'varchar(255)',
+                'billing_street1' => 'varchar(255)',
+                'billing_street2' => 'varchar(255)',
                 'billing_city' => 'varchar(50)',
                 'billing_region' => 'varchar(50)',
                 'billing_postcode' => 'varchar(20)',
@@ -205,7 +208,8 @@ class FCom_Sales_Migrate extends BClass
                 'shipping_attn' => 'varchar(50)',
                 'shipping_firstname' => 'varchar(50)',
                 'shipping_lastname' => 'varchar(50)',
-                'shipping_street' => 'varchar(255)',
+                'shipping_street1' => 'varchar(255)',
+                'shipping_street2' => 'varchar(255)',
                 'shipping_city' => 'varchar(50)',
                 'shipping_region' => 'varchar(50)',
                 'shipping_postcode' => 'varchar(20)',
@@ -1499,6 +1503,30 @@ class FCom_Sales_Migrate extends BClass
             BDb::CONSTRAINTS => [
                 'product' => ['product_id', $tProduct, 'id', 'CASCADE', 'SET NULL'],
                 'inventory' => ['inventory_id', $tInventorySku, 'id', 'CASCADE', 'SET NULL'],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_5__0_3_6()
+    {
+        $tCart = $this->FCom_Sales_Model_Cart->table();
+        $tOrder = $this->FCom_Sales_Model_Order->table();
+
+        $this->BDb->ddlTableDef($tCart, [
+            BDb::COLUMNS => [
+                'shipping_street' => 'RENAME shipping_street1 varchar(255)',
+                'shipping_street2' => 'varchar(255) AFTER shipping_street1',
+                'billing_street' => 'RENAME billing_street1 varchar(255)',
+                'billing_street2' => 'varchar(255) AFTER billing_street1',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrder, [
+            BDb::COLUMNS => [
+                'shipping_street' => 'RENAME shipping_street1 varchar(255)',
+                'shipping_street2' => 'varchar(255) AFTER shipping_street1',
+                'billing_street' => 'RENAME billing_street1 varchar(255)',
+                'billing_street2' => 'varchar(255) AFTER billing_street1',
             ],
         ]);
     }

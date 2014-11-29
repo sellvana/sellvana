@@ -30,8 +30,30 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
     public function action_index()
     {
         $c = $this->_cart;
-        $step = !$c->isShippable() ? 2 : ($c->hasCompleteAddress('shipping') && $c->hasShippingMethod() ? 2 : 1);
+        // TODO: figure out for virtual orders ($c->isShippable())
+        $step = $c->hasCompleteAddress('shipping') ? 2 : 1;
         $this->forward('step' . $step);
+    }
+
+    public function action_index__POST()
+    {
+        switch ((int)$this->BRequest->post('checkout_step')) {
+            case 1:
+                $this->forward('step1');
+
+                break;
+            case 2:
+                $this->forward('step2');
+                break;
+
+            default:
+                $this->BResponse->redirect('checkout');
+        }
+    }
+
+    public function action_login()
+    {
+        $this->layout('/checkout-simple/login');
     }
 
     public function action_step1()
@@ -48,6 +70,8 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
             $this->FCom_Sales_Main->workflowAction('customerChoosesGuestCheckout', $args);
         }
         $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingAddress', $args);
+
+        $this->BResponse->redirect('checkout');
     }
 
     public function action_step2()
@@ -65,6 +89,8 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
         }
         $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingMethod', $args);
         $this->FCom_Sales_Main->workflowAction('customerUpdatesPaymentMethod', $args);
+
+        $this->BResponse->redirect('checkout');
     }
 
     public function action_success()

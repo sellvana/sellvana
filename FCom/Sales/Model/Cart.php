@@ -79,37 +79,61 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
      */
     public function sessionCart($createAnonymousIfNeeded = false, $reset = false)
     {
-        if (!static::$_sessionCart || $reset) {
-            if ($reset instanceof FCom_Sales_Model_Cart) {
-                static::$_sessionCart = $reset;
-            }
-            $customer = $this->FCom_Customer_Model_Customer->sessionUser();
-            //fix bug when guests login and then checkout
-            if ($customer && !$this->BRequest->cookie('cart')) {
-                $cart = $this->loadOrCreate(['customer_id' => $customer->id(), 'state_overall' => 'active']);
-            } else {
-                $cookieToken = $this->BRequest->cookie('cart');
-                if ($cookieToken) {
-                    $cart = $this->loadWhere(['cookie_token' => (string)$cookieToken, 'state_overall' => 'active']);
-                    if (!$cart && !$createAnonymousIfNeeded) {
-                        $this->BResponse->cookie('cart', false);
-                        return false;
-                    }
-                }
-                if (empty($cart)) {
-                    if ($createAnonymousIfNeeded) {
-                        $cookieToken = $this->BUtil->randomString(32);
-                        $cart = $this->create(['cookie_token' => (string)$cookieToken, 'state_overall' => 'active'])->save();
-                        $ttl = $this->BConfig->get('modules/FCom_Sales/cart_cookie_token_ttl_days') * 86400;
-                        $this->BResponse->cookie('cart', $cookieToken, $ttl);
-                    } else {
-                        return false;
-                    }
-                }
+        // if there's already session cart and no reset requested, return existin session cart
+        if (static::$_sessionCart && !$reset) {
+            return static::$_sessionCart;
+        }
+
+        // get cookie token ttl from config
+        $ttl = $this->BConfig->get('modules/FCom_Sales/cart_cookie_token_ttl_days') * 86400;
+
+        // if reset to a specific cart model is requested, set it and return
+        if ($reset instanceof FCom_Sales_Model_Cart) {
+            static::$_sessionCart = $cart = $reset;
+            $cookieToken = $cart->get('cookie_token');
+            $this->BResponse->cookie('cart', $cookieToken, $ttl);
+            return $reset;
+        }
+
+        // get unique cart token from cookie
+        $cookieToken = $this->BRequest->cookie('cart');
+
+        // get session user
+        $customer = $this->FCom_Customer_Model_Customer->sessionUser();
+
+        //TODO: make sure bug when guests login and then checkout is fixed
+
+        // if cookie cart token is set, try to load it
+        if ($cookieToken) {
+
+            static::$_sessionCart = $this->loadWhere(['cookie_token' => (string)$cookieToken, 'state_overall' => 'active']);
+
+            // if a cart with this token is not found and no need to create a new one, remove cookie cart token and return
+            if (!static::$_sessionCart && !$createAnonymousIfNeeded) {
+                $this->BResponse->cookie('cart', false);
+                return false;
             }
 
-            static::$_sessionCart = $cart;
+        } elseif ($customer) { // if no cookie cart token and customer is logged in, try to find customer cart
+
+            static::$_sessionCart = $this->loadOrCreate(['customer_id' => $customer->id(), 'state_overall' => 'active']);
+
         }
+
+        // if no cart is found and new cart creation is requested, create one and set cookie cart token
+        if (!static::$_sessionCart && $createAnonymousIfNeeded) {
+            // generate token
+            $cookieToken = $this->BUtil->randomString(32);
+            // create cart record
+            static::$_sessionCart = $this->create([
+                'cookie_token' => (string)$cookieToken,
+                'state_overall' => 'active',
+                'customer_id' => $customer ? $customer->id() : null,
+            ])->save();
+            // set cookie cart token
+            $this->BResponse->cookie('cart', $cookieToken, $ttl);
+        }
+
         return static::$_sessionCart;
     }
 
@@ -152,6 +176,14 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
             $this->sessionCart(false, $custCart); // set it as session cart
 
+        }
+
+        if (!$sessCart->hasCompleteAddress('shipping')) {
+            try {
+                $sessCart->importAddressesFromCustomer($customer)->save();
+            } catch (Exception $e) {
+                echo "<pre>"; var_dump($e); exit;
+            }
         }
         // clear cookie token
         $this->BResponse->cookie('cart', false);
@@ -522,6 +554,15 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         return true;
     }
 
+    public function onAfterCreate()
+    {
+        parent::onAfterCreate();
+
+        $this->set('same_address', 1);
+
+        return $this;
+    }
+
     /**
      *
      */
@@ -558,7 +599,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $this->importAddressFromObject($defShipping, 'shipping');
         }
 
-        $this->same_address = $defBilling && $defShipping && $defBilling->id() == $defShipping->id();
+        $this->set('same_address', $defBilling && $defShipping && $defBilling->id() == $defShipping->id());
 
         return $this;
     }
@@ -719,7 +760,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if (!$country) {
             return false;
         }
-        $fields = ['firstname', 'lastname', 'street', 'city'];
+        $fields = ['firstname', 'lastname', 'street1', 'city'];
         if ($this->BLocale->postcodeRequired($country)) {
             $fields[] = 'postcode';
         }

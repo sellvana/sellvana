@@ -1,17 +1,28 @@
-{% set cart = THIS.get('cart') %}
+{% set cart = APP.instance('FCom_Sales_Model_Cart').sessionCart() %}
 <div class="row">
     <div class="col-md-9">
-        {% if cart.get('same_address') %}
+        <form action="{{ APP.href('checkout') }}" method="post" id="{{ type }}-form" role="form">
+            <input type="hidden" name="checkout_step" value="2">
 
-        {% elseif cart.hasCompleteAddress('billing') %}
-            {{ THIS.view('checkout-simple/partial/address-card').set('address_type', 'payment') | raw}}
-        {% else %}
-            {{ THIS.view('checkout-simple/partial/address-form').set('address_type', 'payment') | raw}}
-        {% endif %}
+            <div class="f-checkout-form">
 
-        {{ THIS.view('checkout-simple/partial/shipping-methods') | raw }}
+                <header class="f-page-header">
+                    <h1 class="f-page-title">{{ 'Billing Address'|_ }}</h1>
+                </header>
 
-        {{ THIS.view('checkout-simple/partial/payment-methods') | raw }}
+                {% if cart.get('same_address') %}
+
+                {{ THIS.view('checkout-simple/partial/shipping-methods') | raw }}
+
+                {{ THIS.view('checkout-simple/partial/payment-methods') | raw }}
+
+                {% elseif cart.hasCompleteAddress('billing') %}
+                    {{ THIS.view('checkout-simple/partial/address-card').set('address_type', 'billing') | raw }}
+                {% else %}
+                    {{ THIS.view('checkout-simple/partial/address-form').set('address_type', 'billing') | raw }}
+                {% endif %}
+            </div>
+        </form>
     </div>
     <div class="col-md-3">
         {{ THIS.get('checkout-simple/partial/summary') | raw }}

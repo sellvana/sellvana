@@ -276,7 +276,8 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     {
         $cart = $this->_cart;
         foreach (['billing', 'shipping'] as $atype) {
-            foreach (['company', 'attn', 'firstname', 'lastname', 'street', 'city', 'region', 'postcode', 'country', 'phone', 'fax'] as $f) {
+            foreach (['company', 'attn', 'firstname', 'lastname', 'street1', 'street2', 'city', 'region', 'postcode',
+                      'country', 'phone', 'fax'] as $f) {
                 $field = $atype . '_' . $f;
                 $this->set($field, $cart->get($field));
             }

@@ -50,7 +50,7 @@
                   {{ validator.errorHtml("city", "address-city") | raw }}
               </div>
               <div class="form-group col-sm-6">
-                {{ THIS.view('geo/embed') | raw}}
+                {{ THIS.view('core/geo-embed') | raw}}
                 <script>
                     require(['jquery'], function($) {
                         $(function() {

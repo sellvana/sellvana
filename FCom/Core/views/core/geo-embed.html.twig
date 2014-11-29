@@ -1,8 +1,10 @@
+{% set hlp = APP.instance('FCom_Core_Main') %}
 <script>
 (function() {
     function main($) {
-        var geoCountries = {{ UTIL.toJson(APP.instance('FCom_Core_Main').getAllowedCountries()) | raw }};
-        var geoRegions = {{ UTIL.toJson(APP.instance('FCom_Core_Main').getAllowedRegions()) | raw }};
+        var geoCountries = {{ UTIL.toJson(hlp.getAllowedCountries()) | raw }};
+        var geoRegions = {{ UTIL.toJson(hlp.getAllowedRegions()) | raw }};
+        var defCountry = '{{ hlp.getDefaultCountry() | default('US') }}';
 
         $.fn.geoCountryRegion = function(opt) {
             opt = opt || {};
@@ -12,7 +14,7 @@
             var $regionSelect2 = $('#s2id_' + $regionSelect.attr('id') );// ???
             console.log($regionSelect2);
             var regionLeave = $('option', $regionSelect).length;
-            var country = opt.country || '';
+            var country = opt.country || defCountry;
             var region = opt.region || '';
             var regionDefHtml = $regionSelect.html();
 
