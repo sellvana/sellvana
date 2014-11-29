@@ -17,7 +17,7 @@
             <div class="media-body">
               <h4 class="media-heading">{{ pName }}</h4>
               <div class="f-price-group">
-                <span class="f-price">{{ item.rowTotal() | currency }}</span>
+                <span class="f-price">{{ item.get('row_total') | currency }}</span>
               </div>
               <span class="f-qty">{{ 'Quantity:'|_ }} <span>{{ item.get('qty') | number_format(0) }}</span></span>
             </div>

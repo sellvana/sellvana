@@ -1,30 +1,60 @@
 {% set cart = APP.instance('FCom_Sales_Model_Cart').sessionCart() %}
+{% set validator = THIS.validator(type ~ '-form', cart) %}
+
 <div class="row">
     <div class="col-md-9">
-        <form action="{{ APP.href('checkout') }}" method="post" id="{{ type }}-form" role="form">
+        <form action="{{ APP.href('checkout/step2') }}" method="post" id="{{ type }}-form" role="form">
+            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
             <input type="hidden" name="checkout_step" value="2">
 
             <div class="f-checkout-form">
 
-                <header class="f-page-header">
-                    <h1 class="f-page-title">{{ 'Billing Address'|_ }}</h1>
-                </header>
+                {{ THIS.view('checkout-simple/partial/address-card').set('address_type', 'shipping') | raw }}
 
-                {% if cart.get('same_address') %}
+                <a href="{{ APP.href('checkout/step1') }}">{{ 'Edit'|_ }}</a>
 
                 {{ THIS.view('checkout-simple/partial/shipping-methods') | raw }}
 
                 {{ THIS.view('checkout-simple/partial/payment-methods') | raw }}
 
-                {% elseif cart.hasCompleteAddress('billing') %}
+                <div class="checkbox">
+                    <label for="same_address">
+                        <input type="checkbox" class="checkbox" id="same_address" name="same_address" value="1" {{ validator.fieldValue('same_address') ? 'checked' }}>
+                        {{ "Billing address is same as shipping" |_ }}
+                    </label>
+                </div>
+
+                <div id="billing_address_view">
                     {{ THIS.view('checkout-simple/partial/address-card').set('address_type', 'billing') | raw }}
-                {% else %}
+                </div>
+
+                <div id="billing_address_form">
+                    <header class="f-page-header">
+                        <h1 class="f-page-title">{{ 'Billing Address'|_ }}</h1>
+                    </header>
                     {{ THIS.view('checkout-simple/partial/address-form').set('address_type', 'billing') | raw }}
-                {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <button class="btn btn-primary btn-lg" type="submit">{{ "Place Order" |_ }}</button>
+                </div>
             </div>
         </form>
     </div>
     <div class="col-md-3">
-        {{ THIS.get('checkout-simple/partial/summary') | raw }}
+        {{ THIS.view('checkout-simple/partial/summary') | raw }}
     </div>
 </div>
+
+<script>
+    require(['jquery'], function($) {
+
+        function updateBillingForm(same) {
+            $('#billing_address_view').prop('hidden', !same);
+            $('#billing_address_form').prop('hidden', same);
+            $('#billing_address_form').find('select,input').prop('disabled', same);
+        }
+        updateBillingForm($('#same_address').prop('checked'));
+        $('#same_address').click(function(ev) { updateBillingForm(this.checked); })
+    })
+</script>

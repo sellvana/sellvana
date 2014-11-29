@@ -69,7 +69,7 @@
             </div>
             <div class="col-xs-6">
                 <p><strong>{{ "Subtotal" | _ }}:</strong> {{ order.get('subtotal')| currency }} </p>
-                <p><strong>{{ "Tax" | _ }}:</strong>{{ order.get('tax') }}</p>
-                <p><strong>{{ "Grand Total" | _ }}:</strong> {{ order.get('grandtotal')| currency }} </p>
+                <p><strong>{{ "Tax" | _ }}:</strong>{{ order.get('tax_amount') }}</p>
+                <p><strong>{{ "Grand Total" | _ }}:</strong> {{ order.get('grand_total')| currency }} </p>
             </div>
         </div>

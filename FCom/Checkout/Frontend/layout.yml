@@ -25,7 +25,7 @@ checkout/base:
     - { hook: main, views: checkout-simple/step2 }
 
 /checkout-simple/success:
-    - { include: checkout/base }
+    - { include: base }
     - { hook: main, views: checkout-simple/success }
 
 

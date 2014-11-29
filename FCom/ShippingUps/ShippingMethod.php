@@ -40,7 +40,7 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
         $rateApiUrl = !empty($config['rate_api_url']) ? $config['rate_api_url'] : '';
 
         //todo: notify if fromzip is not set
-        $fromzip = $this->BConfig->get('modules/FCom_Checkout/store_zip');
+        $fromzip = $this->BConfig->get('modules/FCom_Sales/store_zip');
 
         if (empty($accessKey) || empty($account) || empty($password)) {
             return false;

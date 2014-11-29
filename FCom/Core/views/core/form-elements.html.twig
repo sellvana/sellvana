@@ -90,7 +90,7 @@ Using custom id/name:
                 {{ p.attr | raw }}
                 {{ p.multiple ? 'multiple'}}
             >
-                {{ UTIL.optionsHtml(p.options, view.getInputValue(p)) | raw }}
+                {{ UTIL.optionsHtml(p.options, view.getInputValue(p)|default(p.default)) | raw }}
             </select>
         </div>
     </div>

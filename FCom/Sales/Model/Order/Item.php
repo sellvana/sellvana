@@ -11,6 +11,7 @@
  * @property string $product_info
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property FCom_Sales_Model_Order_History $FCom_Sales_Model_Order_History
+ * @property FCom_Sales_Model_Order_Item_State $FCom_Sales_Model_Order_Item_State
  */
 class FCom_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
 {
@@ -24,7 +25,7 @@ class FCom_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
     public function state()
     {
         if (!$this->_state) {
-            $this->_state = $this->BClassRegistry->instance('FCom_Sales_Model_Order_Item_State', true, [$this]);
+            $this->_state = $this->FCom_Sales_Model_Order_Item_State->factory($this);
         }
         return $this->_state;
     }
@@ -48,26 +49,6 @@ class FCom_Sales_Model_Order_Item extends FCom_Core_Model_Abstract
         return $this;
     }
 
-    /**
-     * @param $data
-     * @return $this
-     */
-    public function addNew($data)
-    {
-        $this->BEvents->fire(__CLASS__ . '.addNew', ['orderItem' => $data]);
-        return $this->create($data)->save();
-    }
-
-    /**
-     * @param $data
-     * @return $this
-     * @throws BException
-     */
-    public function update($data)
-    {
-        $this->BEvents->fire(__CLASS__ . '.update', ['orderItem' => $data]);
-        return $this->set($data)->save();
-    }
 
     /**
      * @param $orderId

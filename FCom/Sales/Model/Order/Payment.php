@@ -18,6 +18,7 @@
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  * @property FCom_Sales_Main $FCom_Sales_Main
  * @property FCom_Sales_Model_Order_History $FCom_Sales_Model_Order_History
+ * @property FCom_Sales_Model_Order_Payment_State $FCom_Sales_Model_Order_Payment_State
  */
 class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 {
@@ -28,20 +29,10 @@ class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 
     protected $_state;
 
-    /**
-     * @param $data
-     * @return static
-     */
-    public function addNew($data)
-    {
-        $this->BEvents->fire(__CLASS__ . '.addNew', ['paymentData' => $data]);
-        return $this->create($data);
-    }
-
     public function state()
     {
         if (!$this->_state) {
-            $this->_state = $this->BClassRegistry->instance('FCom_Sales_Model_Order_Payment_State', true, [$this]);
+            $this->_state = $this->FCom_Sales_Model_Order_Payment_State->factory($this);
         }
         return $this->_state;
     }

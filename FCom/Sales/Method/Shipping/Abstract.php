@@ -23,4 +23,14 @@ abstract class FCom_Sales_Method_Shipping_Abstract extends BClass implements
         }
         return false;
     }
+
+    public function getServices()
+    {
+        return [];
+    }
+
+    public function getServicesSelected()
+    {
+        return $this->getServices();
+    }
 }

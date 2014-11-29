@@ -19,10 +19,12 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
         if (!parent::beforeDispatch()) {
             return false;
         }
-        $this->_cart = $this->FCom_Sales_Model_Cart->sessionCart();
-        if (!$this->_cart || !$this->_cart->itemQty()) {
-            $this->BResponse->redirect('cart');
-            return false;
+        if ($this->_action !== 'success') {
+            $this->_cart = $this->FCom_Sales_Model_Cart->sessionCart();
+            if (!$this->_cart || !$this->_cart->itemQty()) {
+                $this->BResponse->redirect('cart');
+                return false;
+            }
         }
         return true;
     }
@@ -84,13 +86,20 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
         $post = $this->BRequest->post();
         $result = [];
         $args = ['post' => $post, 'cart' => $this->_cart, 'result' => &$result];
-        if (!empty($post['billing'])) {
+        if (!empty($post['same_address'])) {
             $this->FCom_Sales_Main->workflowAction('customerUpdatesBillingAddress', $args);
         }
         $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingMethod', $args);
         $this->FCom_Sales_Main->workflowAction('customerUpdatesPaymentMethod', $args);
 
-        $this->BResponse->redirect('checkout');
+        $this->FCom_Sales_Main->workflowAction('customerPlacesOrder', $args);
+
+        if (!empty($result['success'])) {
+            $this->BSession->set('last_order_unique_id', $result['order']->get('unique_id'));
+            $this->BResponse->redirect('checkout/success');
+        } else {
+            $this->BResponse->redirect('checkout');
+        }
     }
 
     public function action_success()

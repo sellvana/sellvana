@@ -21,7 +21,7 @@ class FCom_Sales_Tests_Model_OrderTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_sales_order'), "Pre-Condition");
 
         $data = ['cart_id' => 3, 'customer_id' => 2];
-        $this->FCom_Sales_Model_Order->addNew($data);
+        $this->FCom_Sales_Model_Order->create($data)->save();
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_sales_order'), "Insert failed");
     }
@@ -44,7 +44,7 @@ class FCom_Sales_Tests_Model_OrderTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(1, count($order->items()), "Before add failed");
 
         $orderItem = ['order_id' => $order->id(), 'product_id' => 1, 'qty' => 1, 'total' => 10];
-        $this->FCom_Sales_Model_Order_Item->addNew($orderItem);
+        $this->FCom_Sales_Model_Order_Item->create($orderItem)->save();
 
         $this->assertEquals(2, count($order->items()), "After add failed");
     }
@@ -57,7 +57,7 @@ class FCom_Sales_Tests_Model_OrderTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(1, count($order->items()), "Before add failed");
 
         $orderItem = ['order_id' => $order->id(), 'product_id' => 1, 'qty' => 1, 'total' => 10];
-        $this->FCom_Sales_Model_Order_Item->addNew($orderItem);
+        $this->FCom_Sales_Model_Order_Item->create($orderItem)->save();
 
         $this->assertEquals(2, count($order->items()), "After add failed");
 
