@@ -19,10 +19,12 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
         if (!parent::beforeDispatch()) {
             return false;
         }
-        $this->_cart = $this->FCom_Sales_Model_Cart->sessionCart();
-        if (!$this->_cart || !$this->_cart->itemQty()) {
-            $this->BResponse->redirect('cart');
-            return false;
+        if ($this->_action !== 'success') {
+            $this->_cart = $this->FCom_Sales_Model_Cart->sessionCart();
+            if (!$this->_cart || !$this->_cart->itemQty()) {
+                $this->BResponse->redirect('cart');
+                return false;
+            }
         }
         return true;
     }
@@ -30,8 +32,30 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
     public function action_index()
     {
         $c = $this->_cart;
-        $step = !$c->isShippable() ? 2 : ($c->hasCompleteAddress('shipping') && $c->hasShippingMethod() ? 2 : 1);
+        // TODO: figure out for virtual orders ($c->isShippable())
+        $step = $c->hasCompleteAddress('shipping') ? 2 : 1;
         $this->forward('step' . $step);
+    }
+
+    public function action_index__POST()
+    {
+        switch ((int)$this->BRequest->post('checkout_step')) {
+            case 1:
+                $this->forward('step1');
+
+                break;
+            case 2:
+                $this->forward('step2');
+                break;
+
+            default:
+                $this->BResponse->redirect('checkout');
+        }
+    }
+
+    public function action_login()
+    {
+        $this->layout('/checkout-simple/login');
     }
 
     public function action_step1()
@@ -48,6 +72,8 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
             $this->FCom_Sales_Main->workflowAction('customerChoosesGuestCheckout', $args);
         }
         $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingAddress', $args);
+
+        $this->BResponse->redirect('checkout');
     }
 
     public function action_step2()
@@ -60,11 +86,20 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
         $post = $this->BRequest->post();
         $result = [];
         $args = ['post' => $post, 'cart' => $this->_cart, 'result' => &$result];
-        if (!empty($post['billing'])) {
+        if (!empty($post['same_address'])) {
             $this->FCom_Sales_Main->workflowAction('customerUpdatesBillingAddress', $args);
         }
         $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingMethod', $args);
         $this->FCom_Sales_Main->workflowAction('customerUpdatesPaymentMethod', $args);
+
+        $this->FCom_Sales_Main->workflowAction('customerPlacesOrder', $args);
+
+        if (!empty($result['success'])) {
+            $this->BSession->set('last_order_unique_id', $result['order']->get('unique_id'));
+            $this->BResponse->redirect('checkout/success');
+        } else {
+            $this->BResponse->redirect('checkout');
+        }
     }
 
     public function action_success()

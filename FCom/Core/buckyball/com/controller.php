@@ -2288,7 +2288,7 @@ class BRouteObserver extends BClass
         }
 #var_dump($controllerName, $actionName);
         /** @var BActionController */
-        $controller = BClassRegistry::instance($controllerName, [], true);
+        $controller = $this->BClassRegistry->instance($controllerName, [], true);
 
         return $controller->dispatch($actionName, $this->args);
     }
@@ -2401,7 +2401,7 @@ class BActionController extends BClass
             return $this;
         }
         $actionMethod = $this->_actionMethodPrefix . $actionName;
-        $reqMethod = $this->BRequest->method();
+        $reqMethod = !empty($args['method']) ? $args['method'] : $this->BRequest->method();
         if ($reqMethod !== 'GET') {
             $tmpMethod = $actionMethod . '__' . $reqMethod;
             if (method_exists($this, $tmpMethod)) {

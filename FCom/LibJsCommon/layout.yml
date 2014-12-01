@@ -33,6 +33,9 @@ common_js_libs:
             #- [ requireJs, jquery.tools, @FCom_LibJsCommon/js/jquery.tools.min, { deps: [ jquery ] } ]
             - [ css, @FCom_LibJsCommon/js/css/ngprogress.css ]
 
+            #- [ css, "@FCom_LibJsCommon/js/css/select2.css" ]
+            #- [ requireJs, select2, "@FCom_LibJsCommon/js/select2", { deps: [ jquery ] } ]
+
 lib_visualsearch:
     - view: head
         do:

@@ -42,7 +42,7 @@ class FCom_PayPal_Frontend_Controller extends BActionController
 
         $nvpArr = [
             'INVNUM'                            => $salesOrder->id(),
-            'PAYMENTREQUEST_0_AMT'              => number_format($salesOrder->balance, 2),
+            'PAYMENTREQUEST_0_AMT'              => number_format($salesOrder->amount_due, 2),
             'PAYMENTREQUEST_0_PAYMENTACTION'    => 'Sale',
             'PAYMENTREQUEST_0_CURRENCYCODE'     => 'USD',
             'RETURNURL'                         => $baseUrl . '/return',
@@ -106,8 +106,8 @@ class FCom_PayPal_Frontend_Controller extends BActionController
             'TOKEN'         => $resArr['TOKEN'],
             'PAYERID'       => $resArr['PAYERID'],
             'PAYMENTREQUEST_0_PAYMENTACTION' => 'Sale',
-            'PAYMENTREQUEST_0_AMT'           => number_format($salesOrder->balance, 2),
-//            'PAYMENTREQUEST_0_ITEMAMT'           => number_format($salesOrder->balance, 2),
+            'PAYMENTREQUEST_0_AMT'           => number_format($salesOrder->amount_due, 2),
+//            'PAYMENTREQUEST_0_ITEMAMT'           => number_format($salesOrder->amount_due, 2),
             'PAYMENTREQUEST_0_CURRENCYCODE'  => 'USD',
             'IPADDRESS'     => $_SERVER['SERVER_NAME'],
             //'BUTTONSOURCE'  => '',

@@ -30,7 +30,7 @@
 class FCom_Sales_Migrate extends BClass
 {
 
-    public function install__0_3_4()
+    public function install__0_3_7()
     {
         $tUser = $this->FCom_Admin_Model_User->table();
         $tProduct = $this->FCom_Catalog_Model_Product->table();
@@ -94,7 +94,8 @@ class FCom_Sales_Migrate extends BClass
                 'billing_attn' => 'varchar(50)',
                 'billing_firstname' => 'varchar(50)',
                 'billing_lastname' => 'varchar(50)',
-                'billing_street' => 'varchar(255)',
+                'billing_street1' => 'varchar(255)',
+                'billing_street2' => 'varchar(255)',
                 'billing_city' => 'varchar(50)',
                 'billing_region' => 'varchar(50)',
                 'billing_postcode' => 'varchar(20)',
@@ -106,7 +107,8 @@ class FCom_Sales_Migrate extends BClass
                 'shipping_attn' => 'varchar(50)',
                 'shipping_firstname' => 'varchar(50)',
                 'shipping_lastname' => 'varchar(50)',
-                'shipping_street' => 'varchar(255)',
+                'shipping_street1' => 'varchar(255)',
+                'shipping_street2' => 'varchar(255)',
                 'shipping_city' => 'varchar(50)',
                 'shipping_region' => 'varchar(50)',
                 'shipping_postcode' => 'varchar(20)',
@@ -131,11 +133,11 @@ class FCom_Sales_Migrate extends BClass
                 'inventory_id' => 'int unsigned default null',
                 'inventory_sku' => 'varchar(100) default null',
                 'product_name' => "varchar(255) DEFAULT NULL",
-                'qty' => "decimal(12,2) DEFAULT NULL",
-                'price' => "decimal(12,2) NOT NULL DEFAULT '0.0000'",
-                'rowtotal' => "decimal(12,2) NULL",
-                'tax' => "decimal(12,2) NOT NULL default 0",
-                'discount' => "decimal(12,2) NOT NULL default 0",
+                'qty' => 'decimal(12,2) DEFAULT NULL',
+                'price' => 'decimal(12,2) NOT NULL DEFAULT 0',
+                'row_total' => "decimal(12,2) NULL",
+                'row_tax' => "decimal(12,2) NOT NULL default 0",
+                'row_discount' => "decimal(12,2) NOT NULL default 0",
 
                 'promo_id_buy' => "VARCHAR(50) default NULL",
                 'promo_id_get' => "INT(10) UNSIGNED default NULL",
@@ -146,6 +148,7 @@ class FCom_Sales_Migrate extends BClass
                 'shipping_size' => 'varchar(30)',
                 'shipping_weight' => 'decimal(12,2)',
                 'pack_separate' => 'tinyint not null default 0',
+                'show_separate' => 'tinyint not null default 0',
                 'unique_hash' => 'bigint default null',
 
                 'create_at' => "DATETIME NOT NULL",
@@ -177,11 +180,12 @@ class FCom_Sales_Migrate extends BClass
                 'shipping_service' => "varchar(50) DEFAULT NULL",
                 'payment_method' => "varchar(50) DEFAULT NULL",
                 'coupon_code' => "varchar(50) DEFAULT NULL",
-                'tax' => "decimal(10,2) DEFAULT NULL",
-                'balance' => "decimal(10,2) NOT NULL",
+                'shipping_price' => 'decimal(12,2) not null default 0',
+                'tax_amount' => "decimal(12,2) DEFAULT NULL",
+                'discount_amount' => 'decimal(12,2) default null',
                 'create_at' => "datetime DEFAULT NULL",
                 'update_at' => "datetime DEFAULT NULL",
-                'grandtotal' => "decimal(12,2) NOT NULL",
+                'grand_total' => "decimal(12,2) NOT NULL",
                 'shipping_service_title' => "varchar(100) DEFAULT NULL",
                 'data_serialized' => "text",
                 'unique_id' => "varchar(15) NOT NULL",
@@ -193,7 +197,8 @@ class FCom_Sales_Migrate extends BClass
                 'billing_attn' => 'varchar(50)',
                 'billing_firstname' => 'varchar(50)',
                 'billing_lastname' => 'varchar(50)',
-                'billing_street' => 'varchar(255)',
+                'billing_street1' => 'varchar(255)',
+                'billing_street2' => 'varchar(255)',
                 'billing_city' => 'varchar(50)',
                 'billing_region' => 'varchar(50)',
                 'billing_postcode' => 'varchar(20)',
@@ -205,7 +210,8 @@ class FCom_Sales_Migrate extends BClass
                 'shipping_attn' => 'varchar(50)',
                 'shipping_firstname' => 'varchar(50)',
                 'shipping_lastname' => 'varchar(50)',
-                'shipping_street' => 'varchar(255)',
+                'shipping_street1' => 'varchar(255)',
+                'shipping_street2' => 'varchar(255)',
                 'shipping_city' => 'varchar(50)',
                 'shipping_region' => 'varchar(50)',
                 'shipping_postcode' => 'varchar(20)',
@@ -239,13 +245,18 @@ class FCom_Sales_Migrate extends BClass
                 'product_sku' => 'varchar(100) default null',
                 'inventory_id' => 'int unsigned default null',
                 'inventory_sku' => 'varchar(100) default null',
-                'total' => "decimal(12,2) NOT NULL DEFAULT '0.0000'",
-                'product_info' => "text",
+                'product_name' => 'varchar(255) default null',
+                'price' => 'decimal(12,2) not null default 0',
+                'row_total' => 'decimal(12,2) NOT NULL DEFAULT 0',
+                'row_tax' => 'decimal(12,2) not null default 0',
+                'row_discount' => 'decimal(12,2) not null default 0',
 
                 'data_serialized' => 'text null',
 
                 'shipping_size' => 'varchar(30)',
                 'shipping_weight' => 'decimal(12,2)',
+                'pack_separate' => 'tinyint not null default 0',
+                'show_separate' => 'tinyint not null default 0',
 
                 'qty_ordered' => 'int not null',
                 'qty_backordered' => 'int not null default 0',
@@ -1499,6 +1510,72 @@ class FCom_Sales_Migrate extends BClass
             BDb::CONSTRAINTS => [
                 'product' => ['product_id', $tProduct, 'id', 'CASCADE', 'SET NULL'],
                 'inventory' => ['inventory_id', $tInventorySku, 'id', 'CASCADE', 'SET NULL'],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_5__0_3_6()
+    {
+        $tCart = $this->FCom_Sales_Model_Cart->table();
+        $tOrder = $this->FCom_Sales_Model_Order->table();
+
+        $this->BDb->ddlTableDef($tCart, [
+            BDb::COLUMNS => [
+                'shipping_street' => 'RENAME shipping_street1 varchar(255)',
+                'shipping_street2' => 'varchar(255) AFTER shipping_street1',
+                'billing_street' => 'RENAME billing_street1 varchar(255)',
+                'billing_street2' => 'varchar(255) AFTER billing_street1',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrder, [
+            BDb::COLUMNS => [
+                'shipping_street' => 'RENAME shipping_street1 varchar(255)',
+                'shipping_street2' => 'varchar(255) AFTER shipping_street1',
+                'billing_street' => 'RENAME billing_street1 varchar(255)',
+                'billing_street2' => 'varchar(255) AFTER billing_street1',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_6__0_3_7()
+    {
+        $tOrder = $this->FCom_Sales_Model_Order->table();
+        $tCartItem = $this->FCom_Sales_Model_Cart_Item->table();
+        $tOrderItem = $this->FCom_Sales_Model_Order_Item->table();
+
+        $this->BDb->ddlTableDef($tOrder, [
+            BDb::COLUMNS => [
+                'grandtotal' => 'RENAME grand_total decimal(12,2) not null default 0',
+                'tax' => 'RENAME tax_amount decimal(12,2) not null default 0',
+                'discount_amount' => 'decimal(12,2) not null default 0',
+                'shipping_price' => 'decimal(12,2) not null default 0',
+                'balance' => BDb::DROP,
+            ],
+            BDb::KEYS => [
+                'UNQ_cart_id' => BDb::DROP,
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tCartItem, [
+            BDb::COLUMNS => [
+                'rowtotal' => 'RENAME row_total decimal(12,2) not null default 0',
+                'tax' => 'RENAME row_tax decimal(12,2) not null default 0',
+                'discount' => 'RENAME row_discount decimal(12,2) not null default 0',
+                'show_separate' => 'tinyint not null default 0',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderItem, [
+            BDb::COLUMNS => [
+                'product_info' => BDb::DROP,
+                'product_name' => 'varchar(255) default null',
+                'price' => 'decimal(12,2) not null default 0',
+                'total' => 'RENAME row_total decimal(12,2) not null default 0',
+                'row_tax' => 'decimal(12,2) not null default 0',
+                'row_discount' => 'decimal(12,2) not null default 0',
+                'show_separate' => 'tinyint not null default 0',
+                'pack_separate' => 'tinyint not null default 0',
             ],
         ]);
     }

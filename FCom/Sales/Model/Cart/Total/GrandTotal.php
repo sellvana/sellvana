@@ -2,7 +2,7 @@
 
 class FCom_Sales_Model_Cart_Total_GrandTotal extends FCom_Sales_Model_Cart_Total_Abstract
 {
-    protected $_code = 'grandtotal';
+    protected $_code = 'grand_total';
     protected $_label = 'Grand Total';
     protected $_sortOrder = 90;
 

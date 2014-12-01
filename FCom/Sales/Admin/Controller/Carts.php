@@ -48,7 +48,7 @@ class FCom_Sales_Admin_Controller_Carts extends FCom_Admin_Controller_Abstract_G
         ];
         $config['filters'] = [
             ['field' => 'create_at', 'type' => 'date-range'],
-            ['field' => 'grandtotal', 'type' => 'number-range'],
+            ['field' => 'grand_total', 'type' => 'number-range'],
             ['field' => 'status', 'type' => 'multiselect'],
         ];
         $config['orm'] = $config['orm']->where('customer_id', $customer->id);

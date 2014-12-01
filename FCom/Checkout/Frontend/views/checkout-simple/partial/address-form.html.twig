@@ -1,8 +1,8 @@
+{% set cart = APP.instance('FCom_Sales_Model_Cart').sessionCart() %}
 {% set type = THIS.get('address_type') %}
-{% set validator = THIS.validator(type ~ '-form', THIS.get('address')) %}
+{% set validator = THIS.validator(type ~ '-form', cart) %}
 
 <fieldset>
-    <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
     <input type="hidden" name="{{ type }}[same_address]" value="0">
     <input type="hidden" name="{{ type }}[address_type]" value="{{ type }}">
 
@@ -40,7 +40,7 @@
             {{ validator.errorHtml(field, field) | raw }}
         </div>
 
-        {{ THIS.view('geo/embed') | raw }}
+        {{ THIS.view('core/geo-embed') | raw }}
 
         <div class="form-group col-sm-6">
             {% set field = type ~ '_country' %}
@@ -70,6 +70,15 @@
             {% set field = type ~ '_postcode' %}
             <label for="{{ field }}" class="control-label required">{{ "Zip / Postal Code" |_ }}</label>
             <input type="text" name="{{ type }}[postcode]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" class="required {{ validator.fieldClass(field) }} form-control">
+            {{ validator.errorHtml(field, field) | raw }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group col-sm-6">
+            {% set field = type ~ '_phone' %}
+            <label for="{{ field }}" class="control-label required">{{ "Phone" |_ }}</label>
+            <input type="text" name="{{ type }}[phone]" id="{{ field }}" value="{{ validator.fieldValue(field) }}" class="required {{ validator.fieldClass(field) }} form-control">
             {{ validator.errorHtml(field, field) | raw }}
         </div>
     </div>

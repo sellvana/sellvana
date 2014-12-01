@@ -5,7 +5,9 @@
  *
  * Uses:
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  * @property FCom_Sales_Main $FCom_Sales_Main
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
  * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
  */
 class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
@@ -13,6 +15,9 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
     static protected $_origClass = __CLASS__;
 
     protected $_localHooks = [
+        'customerLogsIn',
+        'customerLogsOut',
+
         'customerAddsItemsToCart',
         'customerUpdatesCart',
 
@@ -20,8 +25,8 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
 
         'customerAbandonsCart',
 
-        'customerPlacesOrder',
         /*
+        'customerPlacesOrder',
         'customerUpdatesItems',
         'customerRemovesItems',
 
@@ -40,6 +45,54 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
         'customerUpdatesBillingMethod',
         */
     ];
+
+    /**
+     * @throws BException
+     */
+    public function customerLogsIn($args)
+    {
+        // load just logged in customer
+        $customer = $this->FCom_Customer_Model_Customer->sessionUser();
+        // something wrong, abort abort!
+        if (!$customer) {
+            return;
+        }
+        $cartHlp = $this->FCom_Sales_Model_Cart;
+        // get session cart id
+        $sessCart = $cartHlp->sessionCart();
+        // try to load customer cart which is new (not abandoned or converted to order)
+        $custCart = $cartHlp->loadWhere(['customer_id' => $customer->id(), 'state_overall' => 'active']);
+
+        if ($sessCart && $custCart && $sessCart->id() !== $custCart->id()) {
+
+            // if both current session cart and customer cart exist and they're different carts
+            $custCart->merge($sessCart); // merge them into customer cart
+            $cartHlp->sessionCart(false, $custCart); // and set it as session cart
+
+        } elseif ($sessCart && !$custCart) { // if only session cart exist
+
+            $sessCart->set('customer_id', $customer->id())->save(); // assign it to customer
+
+        } elseif (!$sessCart && $custCart) { // if only customer cart exist
+
+            $cartHlp->sessionCart(false, $custCart); // set it as session cart
+
+        }
+
+        if (!$sessCart->hasCompleteAddress('shipping')) {
+            $sessCart->importAddressesFromCustomer($customer)->save();
+        }
+        // clear cookie token
+        $this->BResponse->cookie('cart', false);
+    }
+
+    /**
+     *
+     */
+    public function customerLogsOut($args)
+    {
+        $this->FCom_Sales_Model_Cart->resetSessionCart();
+    }
 
     /**
      * STEP: Customer Adds Items To Cart

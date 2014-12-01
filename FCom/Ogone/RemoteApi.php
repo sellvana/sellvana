@@ -5,6 +5,7 @@
  *
  * @property FCom_Frontend_Main $FCom_Frontend_Main
  * @property FCom_Ogone_Model_Order $FCom_Ogone_Model_Order
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
  * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
  */
 
@@ -91,16 +92,22 @@ class FCom_Ogone_RemoteApi extends BClass
 
     public function prepareRequestData()
     {
-        return [];
         $conf = new BData($this->BConfig->get('modules/FCom_Ogone'));
+        $url = static::$_apiUrl[$conf->mode_prod ? 'PROD' : 'TEST'];
+        $data = [];
+
+        return ['form_url' => $url, 'data' => $data];
+
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
         $order = new BData([]); // order
         $cust = new BData([]); // customer
-        $ogoneOrder = new BData([]); // order
-        //$ogoneOrder = $this->FCom_Ogone_Model_Order->load($order->id, 'order_id');
+
+        $ogoneOrder = $this->FCom_Ogone_Model_Order->loadOrCreate(['order_id' => $cart->id()]);
 
         $complus = '';
         $paramplus = ['amountOfProducts' => '5', 'usedCoupon' => 1]; //?
         $homeUrl = $this->FCom_Frontend_Main->href('');
+        $catalogUrl = $this->FCom_Frontend_Main->href('');
         $callbackUrl = $this->FCom_Frontend_Main->href('ogone/callback');
         $data = [
             'RL' => 'ncol_2.0',
@@ -109,8 +116,8 @@ class FCom_Ogone_RemoteApi extends BClass
             'CURRENCY' => $order->order_currency,
             'LANGUAGE' => $order->language,
             'AMOUNT' => intval($order->amount_due * 100),
-            'CN' => $cust ? $cust->fullName() : null,
-            'EMAIL' => $cust ? $cust->email : null,
+            'CN' => $cart->firstname . ' ' . $cart->lastname,
+            'EMAIL' => $cart->customer_email,
             'COM' => $order->getTextDescription(),
             //'PM' => static::$_brandsMap[$ogoneOrder->brand],
             //'BRAND' => $ogoneOrder->brand,
@@ -149,7 +156,6 @@ class FCom_Ogone_RemoteApi extends BClass
 
         $ogoneOrder->set('shasign', $data['SHASIGN'])->save();
 
-        $url = static::$_apiUrl[$conf->mode_prod ? 'PROD' : 'TEST'];
         return ['form_url' => $url, 'data' => $data];
     }
 
@@ -266,8 +272,7 @@ class FCom_Ogone_RemoteApi extends BClass
         array_walk($data, 'trim');
         $data = array_filter($data, function($value) { return (bool) strlen($value); });
         $shaPass = $this->BConfig->get('modules/FCom_Ogone/passphrase_' . $dir);
-        $shaMethod = $this->BConfig->get('modules/FCom_Ogone/sha_method');
-        if (!$shaMethod) $shaMethod = 'sha512';
+        $shaMethod = $this->BConfig->get('modules/FCom_Ogone/sha_method', 'sha512');
         $shaData = '';
         foreach ($data as $k => $v) {
             $shaData .= $k . '=' . $v . $shaPass;

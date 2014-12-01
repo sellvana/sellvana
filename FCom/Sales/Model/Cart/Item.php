@@ -10,7 +10,7 @@
  * @property string $product_name
  * @property float $qty
  * @property float $price
- * @property float $rowtotal
+ * @property float $row_total
  * @property float $tax
  * @property float $discount
  * @property int $promo_id_buy //todo: ??? why varchar in db
@@ -47,14 +47,9 @@ class FCom_Sales_Model_Cart_Item extends FCom_Core_Model_Abstract
      * @param null $variantId
      * @return mixed
      */
-    public function rowTotal($variantId = null)
+    public function calcRowTotal()
     {
-        $variants = $this->getData('variants');
-        if ($variants && !is_null($variantId)) {
-            $variant = $variants[$variantId];
-            return $variant['variant_price'] * $variant['variant_qty'];
-        }
-        return $this->get('row_total') ? $this->get('row_total') : $this->get('price') * $this->get('qty');
+        return $this->get('price') * $this->get('qty');
     }
 
     /**

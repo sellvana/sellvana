@@ -69,7 +69,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
             'online'           => 1,
         ];
         $this->clear();
-        $paymentModel = $this->FCom_Sales_Model_Order_Payment->addNew($paymentData);
+        $paymentModel = $this->FCom_Sales_Model_Order_Payment->create($paymentData)->save();
         $paymentModel->setData('response', $response);
         $paymentModel->save();
         return $response;
@@ -131,7 +131,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
 
     public function setSalesEntity($order, $options)
     {
-        $this->setDetail('amount_due', $order->balance);
+        $this->setDetail('amount_due', $order->amount_due);
         return parent::setSalesEntity($order, $options);
     }
 

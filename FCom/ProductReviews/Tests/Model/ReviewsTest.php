@@ -19,8 +19,8 @@ class FCom_ProductReviews_Tests_Model_ReviewsTest extends FCom_Test_DatabaseTest
 
         $customerId = 1;
         $productId = 1;
-        $data = ['title' => 'Review 3', 'text' => 'review 3', 'rating' => 4];
-        $this->FCom_ProductReviews_Model_Review->addNew($customerId, $productId, $data);
+        $data = ['title' => 'Review 3', 'text' => 'review 3', 'rating' => 4, 'customer_id' => $customerId, 'product_id' => $productId];
+        $this->FCom_ProductReviews_Model_Review->create($data)->save();
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_product_review'), "Inserting failed");
     }

@@ -36,8 +36,8 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['name' => 'billing_address', 'label' => 'Bill to Address', 'index' => 'billing_address'],
             ['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'shipping_name'],
             ['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'shipping_address'],
-            ['name' => 'grandtotal', 'label' => 'Order Total', 'index' => 'o.grandtotal'],
-            ['name' => 'balance', 'label' => 'Paid', 'index' => 'o.balance'],
+            ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total'],
+            ['name' => 'amount_due', 'label' => 'Paid', 'index' => 'o.amount_due'],
             ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
             //todo: confirm with Boris about status should be stored as id_status
             ['name' => 'status', 'label' => 'Status', 'index' => 'o.status',
@@ -50,7 +50,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['field' => 'create_at', 'type' => 'date-range'],
             ['field' => 'billing_name', 'type' => 'text', 'having' => true],
             ['field' => 'shipping_name', 'type' => 'text', 'having' => true],
-            ['field' => 'grandtotal', 'type' => 'number-range'],
+            ['field' => 'grand_total', 'type' => 'number-range'],
             ['field' => 'status', 'type' => 'multiselect'],
         ];
 
@@ -286,8 +286,8 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['name' => 'billing_address', 'label' => 'Bill to Address', 'index' => 'ab.billing_address'],
             ['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'as.shipping_name'],
             ['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'as.shipping_address'],
-            ['name' => 'grandtotal', 'label' => 'Order Total', 'index' => 'o.grandtotal'],
-            ['name' => 'balance', 'label' => 'Paid', 'index' => 'o.balance'],
+            ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total'],
+            ['name' => 'amount_due', 'label' => 'Paid', 'index' => 'o.amount_due'],
             ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
             ['name' => 'status', 'label' => 'Status', 'index' => 'o.status',
                 'options' => $this->FCom_Sales_Model_Order_StateCustom->optionsByType('order')],
@@ -299,7 +299,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['field' => 'create_at', 'type' => 'date-range'],
             ['field' => 'billing_name', 'type' => 'text'],
             ['field' => 'shipping_name', 'type' => 'text'],
-            ['field' => 'grandtotal', 'type' => 'number-range'],
+            ['field' => 'grand_total', 'type' => 'number-range'],
             ['field' => 'status', 'type' => 'multiselect'],
         ];
         $config['orm'] = $config['orm']->where('customer_id', $customer->id());
