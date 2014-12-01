@@ -22,6 +22,7 @@ modules:
             - [ core/slickgrid, { view_class: FCom_Core_View_Slickgrid } ]
             - [ core/simplegrid, { view_class: FCom_Core_View_SimpleGrid } ]
             - [ core/backbonegrid, { view_class: FCom_Core_View_BackboneGrid } ]
+            - [ core/griddle, { view_class: FCom_Core_View_BackboneGrid } ]
             - [ core/medialib, { view_class: FCom_Core_View_Base } ]
             - [ core/attachmentgrid, { view_class: FCom_Core_View_Base } ]
 
