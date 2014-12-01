@@ -1,13 +1,12 @@
 <?php
 
-abstract
-
 /**
  * Class FCom_Sales_Workflow_Abstract
  *
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
- */ class FCom_Sales_Workflow_Abstract extends BClass
+ */
+abstract class FCom_Sales_Workflow_Abstract extends BClass
 {
     protected $_flagRegistered = false;
     protected $_localHooks = [];

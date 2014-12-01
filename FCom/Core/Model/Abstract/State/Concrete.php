@@ -20,7 +20,7 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
 
     protected $_unsetValueNotificationTemplates = [];
 
-    public function __construct($context, $type, $value, $options)
+    public function __construct($context = null, $type = null, $value = null, $options = null)
     {
         $this->_context = $context;
         $this->_type = $type;
@@ -101,6 +101,11 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
             $value = $this->getValue();
         }
         return !empty($this->_valueLabels[$value]) ? $this->_valueLabels[$value] : null;
+    }
+
+    public function getAllValueLabels()
+    {
+        return $this->_valueLabels;
     }
 
     public function __destruct()
