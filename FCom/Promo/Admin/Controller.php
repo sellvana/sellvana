@@ -82,8 +82,12 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);
+        /** @var FCom_Promo_Model_Promo $m */
         $m = $args['model'];
-        $args['view']->title = $m->id ? 'Edit Promo: ' . $m->description : 'Create New Promo';
+        $args['view']->title = $m->id() ? 'Edit Promo: ' . $m->description : 'Create New Promo';
+        if (!$m->id()) {
+            // todo initiate promo with status 'incomplete'
+        }
     }
 
     /**

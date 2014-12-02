@@ -129,8 +129,8 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
         $orm->iterate(function ($model) use (&$results) {
             /** @var $model BModel */
             $result = [
-                'id'   => $model->get('field_code'),
-                'text' => $model->get('frontend_label'),
+                'id'   => 'field' . '.' . $model->get('field_code'),
+                'text' => $model->get('frontend_label') . ' (field)',
             ];
             switch ($model->get('admin_input_type')) {
                 case 'text':
@@ -163,7 +163,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
         $baseExclude         = ['id', 'images_data', 'data_serialized'];
         if (!empty($base_product_fields)) {
             foreach ($base_product_fields as $field => $fieldData) {
-                $result = $this->prepareField($field, $fieldData, $baseExclude);
+                $result = $this->prepareField($field, $fieldData, $baseExclude, 'static');
                 if ($result) {
                     $results['items'][] = $result;
                 }
