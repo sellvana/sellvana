@@ -1,4 +1,34 @@
-{% set orderId = SESSION.get('last_order_unique_id') %}
+{% set order = THIS.get('order') %}
+{% set emailCustomer = THIS.get('email_customer') %}
+{% set sessCustomer = THIS.get('sess_customer') %}
+{% set email = order.get('customer_email') %}
 
-<h1>Thank you for your order!</h1>
-<h4>Your order number is #{{ orderId }}</h4>
+<h1>{{ 'Thank you for your order!'|_ }}</h1>
+
+<h4>{{ 'Your order number is #%s'|_(order.unique_id) }}</h4>
+
+{% if not sessCustomer %}
+    {% if emailCustomer %}
+        {% set loginUrl = UTIL.setUrlQuery(APP.href('login'), { redirect_to: APP.href('orders/view?id=' ~ order.unique_id) }) %}
+        <p>{{ 'Our records indicate that you already have an account with this email: %s.'|_(email) }}</p>
+        <p>{{ 'If you like to merge this order into your account please <a href="%s">login here</a>.'|_(loginUrl) | raw }}</p>
+    {% else %}
+        <p>{{ "If you'd like to save your customer information and track your orders in one place, please enter the password to create an account for this email address: %s"|_(email) }}</p>
+
+        {{ THIS.view('core/messages') | raw }}
+
+        <form action="{{ APP.href('guest/create_account') }}" method="post">
+            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+            <fieldset>
+                <div class="row">
+                    <div class="col-md-2"><label for="password">{{ 'Password'|_ }}</label></div>
+                    <div class="col-md-10"><input type="password" name="password" id="password"/></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2"><label for="password_confirm">{{ 'Confirm Password'|_ }}</label></div>
+                    <div class="col-md-10"><input type="password" name="password_confirm" id="password_confirm"/></div>
+                </div>
+            </fieldset>
+        </form>
+    {% endif %}
+{% endif %}

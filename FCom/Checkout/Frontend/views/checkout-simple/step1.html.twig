@@ -14,7 +14,7 @@
                     <div class="row">
                         <div class="form-group col-sm-6">
                             <label for="customer_email" class="control-label required">{{ "E-mail" |_ }}</label>
-                            <input type="text" name="customer_email" id="customer_email" value="{{ validator.fieldValue('customer_email') }}" class="required {{ validator.fieldClass('customer_email') }} form-control">
+                            <input type="text" name="customer_email" id="customer_email" value="{{ validator.fieldValue('customer_email') }}" required class="required {{ validator.fieldClass('customer_email') }} form-control">
                             {{ validator.errorHtml("customer_email", "customer_email") | raw }}
                         </div>
                         <div class="col-sm-6">

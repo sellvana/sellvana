@@ -35,9 +35,6 @@ modules:
                     - [ /customer/myaccount, FCom_Customer_Frontend_Controller_Account.index ]
                     - [ /customer/myaccount/.action, FCom_Customer_Frontend_Controller_Account ]
 
-                    - [ /customer/order, FCom_Customer_Frontend_Controller_Order.index ]
-                    - [ /customer/order/.action, FCom_Customer_Frontend_Controller_Order ]
-
                     - [ /customer/address, FCom_Customer_Frontend_Controller_Address.index ]
                     - [ /customer/address/.action, FCom_Customer_Frontend_Controller_Address ]
                     #- [ /customer/address/billing, FCom_Customer_Frontend_Controller_Address.billing ]
