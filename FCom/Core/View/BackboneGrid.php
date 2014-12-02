@@ -695,14 +695,28 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
         //var_dump($state);
 
+        $options = [];
+        foreach ($grid['config']['columns'] as $col) {
+            if (!empty($col['name']) && !empty($col['options'])) {
+                $options[$col['name']] = $col['options'];
+            }
+        }
+
         $data = [];
 
         foreach ($rows as $rowId => $row) {
-            $data[] = is_array($row) ? $row : $row->as_array();
+            $r = is_array($row) ? $row : $row->as_array();
+            foreach ($r as $k => $v) {
+                if (!empty($options[$k][$v])) {
+                    $r[$k] = $options[$k][$v];
+                }
+            }
+            $data[] = $r;
         }
 
-        if (class_exists($gridId) && method_exists($gridId, 'afterInitialData')) {
-            $data = $this->{$gridId}->afterInitialData($data);
+        if (!empty($grid['config']['page_rows_data_callback'])) {
+            $callback = $this->BUtil->extCallback($grid['config']['page_rows_data_callback']);
+            $data = call_user_func($callback, $data);
         }
 
         return ['state' => $state, 'data' => $data];
