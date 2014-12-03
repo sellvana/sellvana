@@ -47,6 +47,7 @@ class FCom_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_Abstr
 
         // FCom_Sales_Workflow_Cart -> FCom_CustomField_Frontend -> FCom_Sales_Model_Cart
         $this->FCom_Sales_Main->workflowAction('customerAddsItemsToCart', ['post' => $post, 'result' => &$result]);
+
         $item = $result['items'][0];
         if (!empty($item['status']) && $item['status'] === 'added') {
             $this->message('The product has been added to your cart');
@@ -133,6 +134,17 @@ class FCom_Sales_Frontend_Controller_Cart extends FCom_Frontend_Controller_Abstr
         $result = [];
 
         $this->FCom_Sales_Main->workflowAction('customerRequestsShippingEstimate', ['post' => $post, 'result' => &$result]);
+
+        $this->BResponse->redirect($redirUrl);
+    }
+
+    public function action_shipping_method__POST()
+    {
+        $redirUrl = 'cart';
+        $post = $this->BRequest->post();
+        $result = [];
+
+        $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingMethod', ['post' => $post, 'result' => &$result]);
 
         $this->BResponse->redirect($redirUrl);
     }

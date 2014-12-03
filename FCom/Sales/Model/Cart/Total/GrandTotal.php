@@ -12,11 +12,7 @@ class FCom_Sales_Model_Cart_Total_GrandTotal extends FCom_Sales_Model_Cart_Total
     public function calculate()
     {
         $cart = $this->_cart;
-        $total = $cart->subtotal;
-        $total += $cart->shipping_price;
-        $total += $cart->tax_amount;
-        $total -= $cart->discount_amount;
-        $this->_value = $cart->grand_total = $total;
+        $this->_value = $cart->grand_total;
         return $this;
     }
 

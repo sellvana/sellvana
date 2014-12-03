@@ -94,7 +94,7 @@ abstract class FCom_Sales_Model_Cart_Total_Abstract extends BCLass implements FC
      */
     public function getValueFormatted()
     {
-        return $this->BLocale->currency($this->getValue(), $this->_currency);
+        return $this->BLocale->currency($this->getValue());
     }
 
     /**

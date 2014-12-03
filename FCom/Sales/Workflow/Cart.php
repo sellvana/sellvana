@@ -24,26 +24,6 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
         'customerRequestsShippingEstimate',
 
         'customerAbandonsCart',
-
-        /*
-        'customerPlacesOrder',
-        'customerUpdatesItems',
-        'customerRemovesItems',
-
-        'customerLogsIn',
-        'customerChoosesGuestCheckout',
-        'customerCreatesAccount',
-
-        'customerAddsPromoCode',
-
-        'customerCreatesShippingAddress',
-        'customerCreatesBillingAddress',
-        'customerUpdatesShippingAddress',
-        'customerUpdatesBillingAddress',
-
-        'customerUpdatesShippingMethod',
-        'customerUpdatesBillingMethod',
-        */
     ];
 
     /**
@@ -146,7 +126,9 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
             ->where_in('p.id', $ids)
             ->left_outer_join('FCom_Catalog_Model_InventorySku', ['i.inventory_sku', '=', 'p.inventory_sku'], 'i')
             ->select('p.*')
-            ->select('i.id', 'inventory_id')
+            ->select(['inventory_id' => 'i.id', 'i.unit_cost', 'i.net_weight', 'i.shipping_weight', 'i.shipping_size',
+                    'i.pack_separate', 'i.qty_in_stock', 'i.qty_cart_min', 'i.qty_cart_inc', 'i.qty_buffer', 'i.qty_reserved',
+                    'i.allow_backorder'])
             ->find_many_assoc();
         foreach ($itemsData as $i => &$item) {
             if (!empty($item['error'])) {
@@ -195,7 +177,7 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
             $cart->set('customer_id', $customer->id());
         }
 
-        $cart->calculateTotals()->saveAllDetails();
+        $cart->set('recalc_shipping_rates', 1)->calculateTotals()->saveAllDetails();
 
         $args['result']['items'] = $itemsData;
     }
@@ -264,77 +246,19 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
             }
         }
 
-        // update postcode and estimate shipping
-        if (!empty($post['postcode'])) {
-            $estimate = [];
-            foreach ($this->FCom_Sales_Main->getShippingMethods() as $shipping) {
-                $estimate[] = ['estimate' => $shipping->getEstimate(), 'description' => $shipping->getDescription()];
-            }
-            $cart->setData('shipping_estimate', $estimate);
-        }
-
-        $cart->calculateTotals()->saveAllDetails();
+        $cart->set('recalc_shipping_rates', 1)->calculateTotals()->saveAllDetails();
 
         $args['result']['items'] = $items;
     }
 
     public function customerRequestsShippingEstimate($args)
     {
+        $postcode = $args['post']['shipping']['postcode'];
+        $cart = $this->_getCart($args);
+        $cart->set(['shipping_postcode' => $postcode, 'recalc_shipping_rates' => 1])->calculateTotals()->saveAllDetails();
         $args['result']['status'] = 'success';
     }
 
-    /*
-    public function customerUpdatesItems($args)
-    {
-
-    }
-
-    public function customerRemovesItems($args)
-    {
-
-    }
-
-    public function customerLogsIn($args)
-    {
-
-    }
-
-    public function customerChoosesGuestCheckout($args)
-    {
-    }
-
-    public function customerCreatesAccount($args)
-    {
-    }
-
-    public function customerAddsPromoCode($args)
-    {
-    }
-
-    public function customerCreatesShippingAddress($args)
-    {
-    }
-
-    public function customerCreatesBillingAddress($args)
-    {
-    }
-
-    public function customerUpdatesShippingAddress($args)
-    {
-    }
-
-    public function customerUpdatesBillingAddress($args)
-    {
-    }
-
-    public function customerUpdatesShippingMethod($args)
-    {
-    }
-
-    public function customerUpdatesBillingMethod($args)
-    {
-    }
-    */
     public function customerAbandonsCart($args)
     {
         $cart = $this->_getCart($args);

@@ -33,6 +33,7 @@ class FCom_Sales_Model_Cart_Total_Subtotal extends FCom_Sales_Model_Cart_Total_A
             'item_num' => $itemNum,
             'item_qty' => $itemQty,
             'subtotal' => $subtotal,
+            'grand_total' => $subtotal,
         ]);
         return $this;
     }
