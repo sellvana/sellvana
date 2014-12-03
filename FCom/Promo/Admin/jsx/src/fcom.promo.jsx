@@ -231,7 +231,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     var ConditionsCompare = React.createClass({
         render: function () {
             return (
-                <select className="to-select2 form-control">
+                <select className="to-select2 form-control" onChange={this.props.onChange}>
                     {this.props.opts.map(function(type){
                         return <option value={type.id} key={type.id}>{type.label}</option>
                     })}
@@ -519,6 +519,26 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 opts = opts.concat(this.props.opts_text);
             } else if(this.props.numeric_inputs.indexOf(inputType) != -1) {
                 opts = opts.concat(this.props.opts_numeric);
+                if (inputType == 'number') {
+                    if(this.state.range === false) {
+                        input = <input className="form-control required" type="number" step="any" id="fieldCombination" ref="fieldCombination" style={{width: "auto"}}/>;
+                    } else {
+                        input = <div id="fieldCombination" ref="fieldCombination" className="input-group">
+                            <input className="form-control required" type="number" step="any" placeholder="Min" style={{width: "50%"}}/>
+                            <input className="form-control required" type="number" step="any" placeholder="Max" style={{width: "50%"}}/>
+                        </div>;
+                    }
+                } else if (inputType == 'date' || inputType == 'time') {
+                    var singleMode = true;
+                    if (this.state.range === true) {
+                        singleMode = false;
+                    }
+                    input = <div className="input-group">
+                            <span className="input-group-addon"><i className="glyphicon glyphicon-calendar"></i></span>
+                            <input className="form-control required" type="text" id="fieldCombination" ref="fieldCombination" dataMode={singleMode} />
+                        </div>
+                }
+
             } else if(inputType == 'select'){
                 input = <input className="form-control required" type="hidden" id="fieldCombination" ref="fieldCombination"/>;
             } else if(this.props.bool_inputs.indexOf(inputType) != -1) {
@@ -527,7 +547,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return (
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-4">
-                        <ConditionsCompare opts={ opts } id="fieldCompare" ref="fieldCompare"/>
+                        <ConditionsCompare opts={ opts } id="fieldCompare" ref="fieldCompare" onChange={this.onCompareChange}/>
                     </div>
                     <div className="col-md-5">{input}</div>
                 </ConditionsRow>
@@ -537,6 +557,11 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             if(this.props.removeField) {
                 this.props.removeField(this.props.id);
             }
+        },
+        getInitialState: function () {
+            return {
+                range: false
+            };
         },
         getDefaultProps: function () {
             return {
@@ -576,18 +601,31 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             }
 
         },
+        componentDidUpdate: function () {
+            this.componentDidMount();
+        },
+        onCompareChange: function (e) {
+            if(this.props.numeric_inputs.indexOf(this.props.input) == -1){
+                return;
+            }
+            var target = e.target;
+            var state = {range: false};
+            state.range = (target.value =='between');
+            this.setState(state);
+        },
         initDateInput: function () {
             var startDate = new Date();
             var s = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate();
             var fieldCombination = this.refs.fieldCombination;
             var $input = $(fieldCombination.getDOMNode());
+            var mode = fieldCombination.props.dataMode;
             var parent = $input.closest('.modal');
             $input.daterangepicker(
                 {
                     format: 'YYYY-MM-DD',
                     startDate: s,
-                    parentEl: parent,
-                    singleDatePicker: true
+                    singleDatePicker: mode,
+                    parentEl: parent
                 }
             );
         },

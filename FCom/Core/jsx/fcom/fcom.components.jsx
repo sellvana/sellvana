@@ -152,6 +152,7 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
             };
         }
     });
+
     FCom.Components.Button = React.createClass({
         render: function () {
             var { className, onClick, ...other } = this.props;
