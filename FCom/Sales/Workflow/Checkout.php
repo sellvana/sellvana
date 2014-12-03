@@ -17,22 +17,35 @@ class FCom_Sales_Workflow_Checkout extends FCom_Sales_Workflow_Abstract
         'customerUpdatesBillingAddress',
         'customerUpdatesPaymentMethod',
         'customerPlacesOrder',
-        'customerRegistersAfterOrder',
+        'customerCreatesAccountFromOrder',
+        'customerMergesOrderToAccount',
     ];
 
     public function customerChoosesGuestCheckout($args)
     {
-
+        $args['cart']->set('customer_email', $args['post']['customer_email']);
     }
 
     public function customerUpdatesShippingAddress($args)
     {
-
+        $same = $args['cart']->get('same_address');
+        foreach ($args['post']['shipping'] as $k => $v) {
+            $args['cart']->set('shipping_' . $k, $v);
+            if ($same) {
+                $args['cart']->set('billing_' . $k, $v);
+            }
+        }
     }
 
     public function customerUpdatesBillingAddress($args)
     {
-
+        $same = $args['cart']->get('same_address');
+        foreach ($args['post']['billing'] as $k => $v) {
+            $args['cart']->set('billing_' . $k, $v);
+            if ($same) {
+                $args['cart']->set('shipping_' . $k, $v);
+            }
+        }
     }
 
     public function customerUpdatesShippingMethod($args)
@@ -85,11 +98,18 @@ class FCom_Sales_Workflow_Checkout extends FCom_Sales_Workflow_Abstract
 
         $cart->setStatusOrdered()->save();
 
+        $this->BSession->set('last_order_id', $order->id());
+
         $args['result']['order'] = $order;
         $args['result']['success'] = true;
     }
 
-    public function customerRegistersAfterOrder($args)
+    public function customerCreatesAccountFromOrder($args)
+    {
+
+    }
+
+    public function customerMergesOrderToAccount($args)
     {
 
     }

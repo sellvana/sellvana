@@ -48,7 +48,7 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
      * @param $options
      * @return $this
      */
-    public function setSalesOrder($order, $options)
+    public function setSalesOrder($order, $options = null)
     {
         $this->_order = $order;
         $this->_orderOptions = $options;

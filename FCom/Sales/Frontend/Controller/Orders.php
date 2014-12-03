@@ -1,12 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * Class FCom_Customer_Frontend_Controller_Order
+ * Class FCom_Sales_Frontend_Controller_Order
  *
  * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  */
-class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_Abstract
+class FCom_Sales_Frontend_Controller_Orders extends FCom_Frontend_Controller_Abstract
 {
     public function beforeDispatch()
     {
@@ -19,7 +19,13 @@ class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_A
 
     public function authenticate($args = [])
     {
-        return $this->FCom_Customer_Model_Customer->isLoggedIn() || $this->BRequest->rawPath() == '/login';
+        if ($this->FCom_Customer_Model_Customer->isLoggedIn()) {
+            return true;
+        }
+        if ($this->_action === 'view' && $this->BSession->get('allowed_orders')) {
+            return true;
+        }
+        return false;
     }
 
     public function action_index()
@@ -29,30 +35,38 @@ class FCom_Customer_Frontend_Controller_Order extends FCom_Frontend_Controller_A
 
         $crumbs[] = ['label' => 'Account', 'href' => $this->BApp->href('customer/myaccount')];
         $crumbs[] = ['label' => 'Orders', 'active' => true];
-        $this->layout('/customer/order/list');
+        $this->layout('/orders/list');
         $this->view('breadcrumbs')->crumbs = $crumbs;
-        $this->view('customer/order/list')->orders = $orders;
+        $this->view('order/list')->orders = $orders;
     }
 
     public function action_view()
     {
         $uniqueId = $this->BRequest->get('id');
         $customerId = $this->FCom_Customer_Model_Customer->sessionUserId();
-        $order = $this->FCom_Sales_Model_Order->isOrderExists($uniqueId, $customerId);
+
+        $order = null;
+        $allowedOrders = $this->BSession->get('allowed_orders');
+        if (!empty($allowedOrders[$uniqueId])) {
+            $order = $this->FCom_Sales_Model_Order->load($allowedOrders[$uniqueId]);
+        }
+        if (!$order && $customerId) {
+            $order = $this->FCom_Sales_Model_Order->isOrderExists($uniqueId, $customerId);
+        }
         if (!$order) {
-            $this->BResponse->redirect('customer/order');
+            $this->BResponse->redirect('orders');
             return;
         }
 
         $crumbs[] = ['label' => 'Account', 'href' => $this->BApp->href('customer/myaccount')];
-        $crumbs[] = ['label' => 'Orders', 'href' => $this->BApp->href('customer/order')];
+        $crumbs[] = ['label' => 'Orders', 'href' => $this->BApp->href('orders')];
         $crumbs[] = ['label' => 'View order', 'active' => true];
-        $this->layout('/customer/order/view');
+        $this->layout('/orders/view');
         $this->view('breadcrumbs')->crumbs = $crumbs;
-        $this->view('customer/order/view')->order = $order;
+        $this->view('order/view')->order = $order;
         // TODO: convert template to use only $order object
-        $this->view('customer/order/view')->billing = $order->addressAsArray('billing');
-        $this->view('customer/order/view')->shipping = $order->addressAsArray('shipping');
+        $this->view('order/view')->billing = $order->addressAsArray('billing');
+        $this->view('order/view')->shipping = $order->addressAsArray('shipping');
     }
 
 }

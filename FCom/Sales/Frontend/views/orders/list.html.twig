@@ -21,7 +21,7 @@
                         {% for order in THIS.get('orders')  %}
                             <tr>
                                 <td>
-                                    <a href="{{ APP.href('customer/order/view') }}?id={{ order.get('unique_id') }}">
+                                    <a href="{{ APP.href('orders/view') }}?id={{ order.get('unique_id') }}">
                                         {{ order.get('unique_id') }}
                                     </a>
                                 </td>

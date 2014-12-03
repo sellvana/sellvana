@@ -1363,14 +1363,13 @@ class BUtil extends BClass
             . '" class="' . $class . ' ' . ($state['s'] == $field ? $state['sd'] : '') . '"';
     }
 
-    /**
-     * @param string $tag
-     * @param array  $attrs
-     * @param null   $content
-     * @return string
-     */
-    public function tagHtml($tag, $attrs = [], $content = null)
+    public function tagAttributes($attrs)
     {
+        if (!$attrs) {
+            return '';
+        } elseif (is_string($attrs)) {
+            return $attrs;
+        }
         $attrsHtmlArr = [];
         foreach ($attrs as $k => $v) {
             if (null === $v || false === $v) {
@@ -1398,7 +1397,19 @@ class BUtil extends BClass
             }
             $attrsHtmlArr[] = $k . '="' . htmlspecialchars($v, ENT_QUOTES, 'UTF-8') . '"';
         }
-        return '<' . $tag . ' ' . join(' ', $attrsHtmlArr) . '>' . $content . '</' . $tag . '>';
+        return join(' ', $attrsHtmlArr);
+    }
+
+
+    /**
+     * @param string $tag
+     * @param array  $attrs
+     * @param null   $content
+     * @return string
+     */
+    public function tagHtml($tag, $attrs = [], $content = null)
+    {
+        return '<' . $tag . ' ' . $this->tagAttributes($attrs) . '>' . $content . '</' . $tag . '>';
     }
 
     /**
@@ -3991,7 +4002,14 @@ class BValidateViewHelper extends BClass
     /**
      * @param $args
      */
-    public function __construct($args)
+    public function __construct($args = null)
+    {
+        if ($args) {
+            $this->initialize($args);
+        }
+    }
+
+    public function initialize($args)
     {
         if (!isset($args['form'])) {
             return;
@@ -4014,6 +4032,7 @@ class BValidateViewHelper extends BClass
             $error['value']        = !empty($formData[$field]) ? $formData[$field] : null;
             $this->_errors[$field] = $error;
         }
+        return $this;
     }
 
     /**
@@ -4066,7 +4085,7 @@ class BValidateViewHelper extends BClass
      * @param string $fieldId form field ID
      * @return string
      */
-    public function errorHtml($field, $fieldId)
+    public function errorHtml($field, $fieldId = null)
     {
         $html = '';
 

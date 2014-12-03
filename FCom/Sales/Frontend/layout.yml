@@ -1,3 +1,9 @@
+customer_account_sidebar:
+    - view: customer/account/sidebar
+        do:
+            - [ addNavItem, orders, { label: My Orders, position: 20, href: orders } ]
+            #- [ addNavItem, downloads, { label: Downloads, position: 40, href: customer/downloads } ]
+            #- [ addNavItem, returns, { label: Returns, position: 50, href: customer/returns } ]
 
 /cart:
     - { include: base }
@@ -8,3 +14,17 @@
         do:
             - [ title, Shopping Cart ]
             - [ meta, ROBOTS, "NOINDEX,NOFOLLOW" ]
+
+/orders/list:
+    - { include: base }
+    - { hook: main, views: orders/list }
+    - { include: customer_account_sidebar }
+
+/orders/view:
+    - { include: base }
+    - { hook: main, views: orders/view }
+    - { include: customer_account_sidebar }
+
+/guest/find_order:
+    - { include: base }
+    - { hook: main, views: guest/find-order }

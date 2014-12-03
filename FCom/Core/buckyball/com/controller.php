@@ -1226,17 +1226,17 @@ class BResponse extends BClass
         return $this;
     }
 
-    public function header($header, $replace = true)
+    public function header($header, $replace = true, $httpResponseCode = null)
     {
         if (headers_sent($file, $line)) {
             $this->BDebug->notice("Can't send header: '" . print_r($header, 1) . "', output started in {$file}:{$line}");
             return $this;
         }
         if (is_string($header)) {
-            header($header, $replace);
+            header($header, $replace, $httpResponseCode);
         } elseif (is_array($header)) {
             foreach ($header as $h) {
-                header($h, $replace);
+                header($h, $replace, $httpResponseCode);
             }
         }
         return $this;
@@ -1470,7 +1470,7 @@ class BResponse extends BClass
         } elseif (!$this->BUtil->isUrlFull($url)) {
             $url = $this->BApp->href($url);
         }
-        header("Location: {$url}", null, $status);
+        $this->header("Location: {$url}", true, $status);
         $this->shutdown(__METHOD__);
     }
 

@@ -24,19 +24,25 @@ class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
     public function customerPaysOnCheckout($args)
     {
         try {
-            $cart = $this->_getCart($args);
+            $order = $args['order'];
             $methods = $this->FCom_Sales_Main->getPaymentMethods();
-            $methodCode = $cart->get('payment_method');
+            $methodCode = $order->get('payment_method');
             if (empty($methods[$methodCode])) {
                 throw new BException('Invalid payment method: ' . $methodCode);
             }
             $method = $methods[$methodCode];
-            $result = $method->payOnCheckout($args['order']);
+
+            $result = $method->setSalesOrder($order)->payOnCheckout();
+
+            if (!empty($result['redirect_to'])) {
+                $args['result']['payment'] = $result;
+            }
 
             $payment = $this->FCom_Sales_Model_Order_Payment->create([
-                'order_id' => $args['order']->id(),
+                'order_id' => $order->id(),
 
             ])->save();
+            $args['result']['payment']['model'] = $payment;
         } catch (Exception $e) {
 
             //TODO: handle payment exception
