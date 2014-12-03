@@ -19,9 +19,12 @@ function(React, $, Griddle, Backbone) {
                 }
             },
             render: function() {
-                var content = <Griddle getExternalResults={FComDataMethod} showFilter={true} showSettings={true} resultsPerPage={this.props.resultsPerPage}
+                var content = <Griddle
                     tableClassName="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable"
+                    getExternalResults={FComDataMethod} resultsPerPage={this.props.resultsPerPage}
                     useCustomPager="true" customPager={FComGriddlePager}
+                    showFilter={true} useCustomFilter="true" customFilter={FComGriddleFilter} filterPlaceholderText={"Quick Search"}
+                    showSettings={true}
                 />;
 
                 return (
@@ -109,10 +112,10 @@ function(React, $, Griddle, Backbone) {
                 var next = "";
                 var last = "";
 
-                first = <li className="first"><a href="#" className="js-change-url" onClick={this.pageFirst}>«</a></li>
-                previous = <li className="prev"><a href="#" className="js-change-url" onClick={this.pagePrevious}>‹</a></li>
-                next = <li className="next"><a class="js-change-url" href="#" onClick={this.pageNext}>›</a></li>
-                last = <li class="last"><a class="js-change-url" href="#" onClick={this.pageLast}>{this.props.maxPage} »</a></li>
+                first = <li className="first"><a href="#" className="js-change-url" onClick={this.pageFirst}>«</a></li>;
+                previous = <li className="prev"><a href="#" className="js-change-url" onClick={this.pagePrevious}>‹</a></li>;
+                next = <li className="next"><a class="js-change-url" href="#" onClick={this.pageNext}>›</a></li>;
+                last = <li class="last"><a class="js-change-url" href="#" onClick={this.pageLast}>{this.props.maxPage} »</a></li>;
 
                 var options = [];
 
@@ -151,6 +154,122 @@ function(React, $, Griddle, Backbone) {
                         </ul>
                     </div>
                 )
+            }
+        });
+
+        var FComGriddleFilter = React.createClass({
+            getDefaultProps: function(){
+                return {
+                    "placeholderText": "Quick Search",
+                    "operations": [
+                        {
+                            "operation": "contains",
+                            "display": "contains"
+                        },
+                        {
+                            "operation": "not",
+                            "display": "does not contain"
+                        },
+                        {
+                            "operation": "equal",
+                            "display": "is equal to"
+                        },
+                        {
+                            "operation": "start",
+                            "display": "start with"
+                        },
+                        {
+                            "operation": "end",
+                            "display": "end with"
+                        }
+                    ],
+                    "filters": [
+                        // Example filters, remove later
+                        {
+                            "column": "title",
+                            "display": "Title"
+                        },
+                        {
+                            "column": "name",
+                            "display": "Name"
+                        }
+                    ]
+                }
+            },
+            handleChange: function(event){
+                this.props.changeFilter(event.target.value);
+            },
+            render: function() {
+                var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder={this.props.placeholderText} onChange={this.handleChange} />;
+
+                var filterOperations = [];
+                for (var i=0; i<this.props.operations.length; i++) {
+                    var op = this.props.operations[i];
+                    filterOperations.push(<li><a href="#" data-id={op.operation} className="filter_op">{op.display}</a></li>);
+                }
+
+                var filterOptions = [];
+                var filters = [];
+
+                for (var i=0; i<this.props.filters.length; i++) {
+                    var filter = this.props.filters[i];
+                    filterOptions.push(
+                        <li data-id="title" class="dd-item dd3-item">
+                            <div class="icon-ellipsis-vertical dd-handle dd3-handle"></div>
+                            <div class="dd3-content">
+                                <label><input type="checkbox" checked="" datid={filter.column} className="showhide_column" />{filter.display}</label>
+                            </div>
+                        </li>
+                    );
+                    filters.push(
+                        <div className="btn-group dropdown f-grid-filter">
+                            <button data-toggle="dropdown" className="btn dropdown-toggle filter-text-main">
+                                <span className="f-grid-filter-field">{filter.display}</span>:
+                                <span className="f-grid-filter-value">All</span>
+                                <span className="caret"></span>
+                            </button>
+
+                            <ul className="dropdown-menu filter-box">
+                                <li>
+                                    <div className="input-group">
+                                        <div className="input-group-btn dropdown">
+                                            <button data-toggle="dropdown" className="btn btn-default dropdown-toggle filter-text-sub">
+                                        {this.props.operations[0].display}<span className="caret"></span>
+                                            </button>
+
+                                            <ul className="dropdown-menu filter-sub">
+                                        {filterOperations}
+                                            </ul>
+                                        </div>
+
+                                        <input type="text" value="" className="form-control" />
+                                        <div className="input-group-btn">
+                                            <button className="btn btn-primary update" type="button">Update</button>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <abbr className="select2-search-choice-close"></abbr>
+                        </div>
+                    );
+                }
+
+                return (
+                    <div className="f-grid-top f-grid-toolbar clearfix">
+                        <div className="f-col-filters-selection pull-left">
+                    {quickSearch}
+                            <span className="dropdown">
+                                <a href="#" className="btn dropdown-toggle showhide_columns" data-toggle="dropdown">Filters<b className="caret"></b></a>
+                                <ul className="dd-list dropdown-menu filters ui-sortable">{filterOptions}</ul>
+                            </span>
+                        </div>
+
+                        <span className="f-filter-btns">
+                    {filters}
+                        </span>
+                    </div>
+                );
             }
         });
 
