@@ -28,27 +28,31 @@ class FCom_Sales_Workflow_Checkout extends FCom_Sales_Workflow_Abstract
 
     public function customerUpdatesShippingAddress($args)
     {
-        $same = $args['cart']->get('same_address');
-        foreach ($args['post']['shipping'] as $k => $v) {
-            $args['cart']->set('shipping_' . $k, $v);
-            if ($same) {
-                $args['cart']->set('billing_' . $k, $v);
+        if (!empty($args['post']['shipping'])) {
+            $same = $args['cart']->get('same_address');
+            foreach ($args['post']['shipping'] as $k => $v) {
+                $args['cart']->set('shipping_' . $k, $v);
+                if ($same) {
+                    $args['cart']->set('billing_' . $k, $v);
+                }
             }
+            $args['cart']->set('recalc_shipping_rates', 1);
         }
-        $args['cart']->set('recalc_shipping_rates', 1);
     }
 
     public function customerUpdatesBillingAddress($args)
     {
-        $same = $args['cart']->get('same_address');
-        foreach ($args['post']['billing'] as $k => $v) {
-            $args['cart']->set('billing_' . $k, $v);
-            if ($same) {
-                $args['cart']->set('shipping_' . $k, $v);
+        if (!empty($args['post']['billing'])) {
+            $same = $args['cart']->get('same_address');
+            foreach ($args['post']['billing'] as $k => $v) {
+                $args['cart']->set('billing_' . $k, $v);
+                if ($same) {
+                    $args['cart']->set('shipping_' . $k, $v);
+                }
             }
-        }
-        if ($same) {
-            $args['cart']->set('recalc_shipping_rates', 1);
+            if ($same) {
+                $args['cart']->set('recalc_shipping_rates', 1);
+            }
         }
     }
 
@@ -62,7 +66,7 @@ class FCom_Sales_Workflow_Checkout extends FCom_Sales_Workflow_Abstract
         if (sizeof($method) !== 2) {
             throw new BException('Shipping method is invalid');
         }
-        $cart->setShippingMethod($method[0], $method[1])->save();
+        $cart->setShippingMethod($method[0], $method[1])->calculateTotals()->save();
     }
 
     public function customerUpdatesPaymentMethod($args)

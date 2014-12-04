@@ -86,7 +86,7 @@ abstract class FCom_Sales_Model_Cart_Total_Abstract extends BClass implements FC
      */
     public function getValue()
     {
-        return $this->_cartField ? $this->_cart[$this->_cartField] : $this->_value;
+        return $this->_cartField ? $this->_cart->get($this->_cartField) : $this->_value;
     }
 
     /**
@@ -118,7 +118,9 @@ abstract class FCom_Sales_Model_Cart_Total_Abstract extends BClass implements FC
      */
     public function isHidden()
     {
-        return !$this->_value;
+        $value = $this->getValue();
+        $value = is_numeric($value) ? (float)$value : $value;
+        return !$value;
     }
 
     /**

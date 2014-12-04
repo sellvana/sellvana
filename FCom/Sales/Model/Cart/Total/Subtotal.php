@@ -4,6 +4,7 @@ class FCom_Sales_Model_Cart_Total_Subtotal extends FCom_Sales_Model_Cart_Total_A
 {
     protected $_code = 'subtotal';
     protected $_label = 'Subtotal';
+    protected $_cartField = 'subtotal';
     protected $_sortOrder = 10;
 
     /**
