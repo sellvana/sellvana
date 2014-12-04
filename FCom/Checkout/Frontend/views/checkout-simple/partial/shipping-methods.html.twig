@@ -1,15 +1,19 @@
-{% set methods = APP.instance('FCom_Sales_Main').getAllSelectedShippingServices() %}
+{% set cart = APP.instance('FCom_Sales_Model_Cart').sessionCart() %}
+{% set rates = cart.getShippingRates() %}
 
 <h4>{{ 'Shipping Methods'|_ }}</h4>
 <dl>
-{% for method in methods %}
-    <dt>{{ method.description |_ }}</dt>
+{% for method in rates %}
+    <dt>{{ method.title |_ }}</dt>
     {% for service in method.services %}
         <dd>
             <label for="shipping_method-{{ service.value }}">
                 <input type="radio" name="shipping_method" id="shipping_method-{{ service.value }}" required
-                       value="{{ service.value }}" {{ service.selected ? 'checked' }}
-                > {{ service.label |_ }}</label>
+                       value="{{ service.value }}" {{ service.selected ? 'checked' }}>
+                {{ service.title |_ }}
+                {{ service.price ? service.price|currency : 'FREE' }}
+                {% if service.max_days %}({{ service.max_days }} days){% endif %}
+            </label>
         </dd>
     {% endfor %}
 {% endfor %}

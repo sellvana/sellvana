@@ -13,6 +13,8 @@ class FCom_ShippingFree_Main extends BClass
 
     public function bootstrap()
     {
+        return;
+
         // only check cart if module is enabled
         if ($this->BConfig->get('modules/FCom_ShippingFree/active')) {
             // get cart and check for promotions which have get_type 'free'

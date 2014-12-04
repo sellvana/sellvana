@@ -135,6 +135,7 @@ class FCom_Sales_Migrate extends BClass
                 'product_name' => "varchar(255) DEFAULT NULL",
                 'qty' => 'decimal(12,2) DEFAULT NULL',
                 'price' => 'decimal(12,2) NOT NULL DEFAULT 0',
+                'cost' => 'decimal(12,2) default null',
                 'row_total' => "decimal(12,2) NULL",
                 'row_tax' => "decimal(12,2) NOT NULL default 0",
                 'row_discount' => "decimal(12,2) NOT NULL default 0",
@@ -247,6 +248,7 @@ class FCom_Sales_Migrate extends BClass
                 'inventory_sku' => 'varchar(100) default null',
                 'product_name' => 'varchar(255) default null',
                 'price' => 'decimal(12,2) not null default 0',
+                'cost' => 'decimal(12,2) default null',
                 'row_total' => 'decimal(12,2) NOT NULL DEFAULT 0',
                 'row_tax' => 'decimal(12,2) not null default 0',
                 'row_discount' => 'decimal(12,2) not null default 0',
@@ -1576,6 +1578,31 @@ class FCom_Sales_Migrate extends BClass
                 'row_discount' => 'decimal(12,2) not null default 0',
                 'show_separate' => 'tinyint not null default 0',
                 'pack_separate' => 'tinyint not null default 0',
+            ],
+        ]);
+    }
+
+    public function upgrade__0_3_7__0_3_8()
+    {
+        $tCart = $this->FCom_Sales_Model_Cart->table();
+        $tCartItem = $this->FCom_Sales_Model_Cart_Item->table();
+        $tOrderItem = $this->FCom_Sales_Model_Order_Item->table();
+
+        $this->BDb->ddlTableDef($tCart, [
+            BDb::COLUMNS => [
+                'recalc_shipping_rates' => 'tinyint not null default 0',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tCartItem, [
+            BDb::COLUMNS => [
+                'cost' => 'decimal(12,2) default null',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderItem, [
+            BDb::COLUMNS => [
+                'cost' => 'decimal(12,2) default null',
             ],
         ]);
     }

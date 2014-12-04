@@ -9,6 +9,7 @@ class FCom_ShippingPlain_ShippingMethod extends FCom_Sales_Method_Shipping_Abstr
      * @var string
      */
     protected $_name = 'Plain Shipping';
+    protected $_code = 'plain';
     /**
      *
      */
@@ -17,9 +18,15 @@ class FCom_ShippingPlain_ShippingMethod extends FCom_Sales_Method_Shipping_Abstr
     /**
      * @return string
      */
-    public function getEstimate()
+    public function _fetchRates($data)
     {
-        return '2-4 days';
+        return [
+            'success' => 1,
+            'rates' => [
+                '01' => ['price' => 10, 'max_days' => 2],
+                '02' => ['price' => 0, 'max_days' => 5],
+            ],
+        ];
     }
 
     /**
@@ -28,56 +35,5 @@ class FCom_ShippingPlain_ShippingMethod extends FCom_Sales_Method_Shipping_Abstr
     public function getServices()
     {
         return ['01' => 'Air', '02' => 'Ground'];
-    }
-
-    /**
-     * @return array
-     */
-    public function getDefaultService()
-    {
-        return ['02' => 'Ground'];
-    }
-
-    /**
-     * @return array
-     */
-    public function getServicesSelected()
-    {
-        $c = $this->BConfig;
-        $selected = [];
-        foreach ($this->getServices() as $sId => $sName) {
-            if ($c->get('modules/FCom_ShippingPlain/services/s' . $sId) == 1) {
-                $selected[$sId] = $sName;
-            }
-        }
-        if (empty($selected)) {
-            $selected = $this->getDefaultService();
-        }
-        return $selected;
-    }
-
-    /**
-     * @param $cart
-     * @return int
-     */
-    public function getRateCallback($cart)
-    {
-        return 100;
-    }
-
-    /**
-     * @return string
-     */
-    public function getError()
-    {
-        return '';
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescription()
-    {
-        return 'Standard Shipping';
     }
 }

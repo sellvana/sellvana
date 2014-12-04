@@ -36,6 +36,7 @@
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
  * @property FCom_Sales_Model_Cart_Address $FCom_Sales_Model_Cart_Address
  * @property FCom_Sales_Main $FCom_Sales_Main
  * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
@@ -348,6 +349,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 $item->set('price', $params['price']);
             }
         }
+        $skuModel = $this->FCom_Catalog_Model_InventorySku->load($params['inventory_id']);
         if (!$item) {
             $item = $this->FCom_Sales_Model_Cart_Item->create([
                 'cart_id' => $this->id(),
@@ -357,6 +359,10 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 'inventory_id' => !empty($params['inventory_id']) ? $params['inventory_id'] : null,
                 'inventory_sku' => !empty($params['inventory_sku']) ? $params['inventory_sku'] : null,
                 'show_separate' => !empty($params['show_separate']) ? $params['show_separate'] : false,
+                'pack_separate' => $skuModel->get('pack_separate'),
+                'shipping_weight' => $skuModel->get('shipping_weight'),
+                'shipping_size' => $skuModel->get('shipping_size'),
+                'cost' => $skuModel->get('unit_cost'),
                 'qty' => $params['qty'],
                 'price' => $params['price'],
                 'unique_hash' => $hash,
@@ -443,7 +449,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if (!$this->totals) {
             $this->totals = [];
             foreach (static::$_totalRowHandlers as $name => $class) {
-                $inst = $class::i(true)->init($this);
+                $inst = $this->BClassRegistry->instance($class)->init($this);
                 $this->totals[$inst->getCode()] = $inst;
             }
             uasort($this->totals, function($a, $b) { return $a->getSortOrder() - $b->getSortOrder(); });
@@ -734,6 +740,48 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             }
         }
         return true;
+    }
+
+    public function getShippingRates()
+    {
+        $ratesArr = $this->getData('shipping_rates');
+        if (!$ratesArr) {
+            return false;
+        }
+        $result = [];
+        $selMethod = $this->get('shipping_method');
+        $selService = $this->get('shipping_service');
+
+        $allMethods = $this->FCom_Sales_Main->getShippingMethods();
+        foreach ($allMethods as $methodCode => $method) {
+            if (empty($ratesArr[$methodCode])) {
+                continue;
+            }
+            $servicesArr = $ratesArr[$methodCode];
+            if (!empty($servicesArr['error'])) {
+                continue;
+            }
+            $allServices = $method->getServices();
+            $services = [];
+            foreach ($servicesArr as $serviceCode => $serviceRate) {
+                $serviceTitle = $allServices[$serviceCode];
+                $services[$serviceCode] = [
+                    'value' => $methodCode . ':' . $serviceCode,
+                    'title' => $serviceTitle,
+                    'price' => $serviceRate['price'],
+                    'max_days' => $serviceRate['max_days'],
+                    'selected' => $selMethod == $methodCode && $selService == $serviceCode,
+                ];
+            }
+            if ($services) {
+                $result[$methodCode] = [
+                    'title' => $method->getDescription(),
+                    'services' => $services,
+                ];
+            }
+        }
+
+        return $result;
     }
 
     public function __destruct()

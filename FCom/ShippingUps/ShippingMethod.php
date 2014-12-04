@@ -3,73 +3,120 @@
 /**
  * Class FCom_ShippingUps_ShippingMethod
  *
- * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  */
 class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstract
 {
     protected $_name = 'Universal post service';
-    protected $_code = 'ShippingUps';
-    /**
-     * @var UpsRate
-     */
-    protected $_rate;
+    protected $_code = 'ups';
+    protected $_configPath = 'modules/FCom_ShippingUps';
 
-    public function init()
+    protected function _fetchRates($data)
     {
-    }
-
-    /**
-     * @param $shipNumber
-     * @param $tozip
-     * @param $service
-     * @param $length
-     * @param $width
-     * @param $height
-     * @param $weight
-     * @return bool
-     */
-    protected function _rateApiCall($shipNumber, $tozip, $service, $length, $width, $height, $weight)
-    {
-        include_once __DIR__ . '/lib/UpsRate.php';
-
         $config = $this->BConfig->get('modules/FCom_ShippingUps');
-        $password = !empty($config['password']) ? $config['password'] : '';
-        $account = !empty($config['account']) ? $config['account'] : '';
-        $accessKey = !empty($config['access_key']) ? $config['access_key'] : '';
-        $rateApiUrl = !empty($config['rate_api_url']) ? $config['rate_api_url'] : '';
+        $data = array_merge($config, $data);
 
-        //todo: notify if fromzip is not set
-        $fromzip = $this->BConfig->get('modules/FCom_Sales/store_zip');
+        $data = $this->_applyDefaultPackageConfig($data);
 
-        if (empty($accessKey) || empty($account) || empty($password)) {
-            return false;
+        if (empty($data['rate_api_url'])) {
+            $data['rate_api_url'] = 'https://onlinetools.ups.com/ups.app/xml/Rate';
+        }
+        if (empty($data['pickup_type'])) {
+            $data['pickup_type'] = '01';
+        }
+        if (empty($data['packaging_type'])) {
+            $data['packaging_type'] = '02';
+        }
+        if (empty($data['dimension_units'])) {
+            $data['dimension_units'] = 'IN';
+        }
+        if (empty($data['weight_units'])) {
+            $data['weight_units'] = 'LBS';
         }
 
-        $this->_rate = new UpsRate($rateApiUrl);
-        $this->_rate->setUpsParams($accessKey, $account, $password, $shipNumber);
-        $this->_rate->getRate($fromzip, $tozip, $service, $length, $width, $height, $weight);
-        return true;
-    }
+        $request ="<?xml version=\"1.0\"?>
+<AccessRequest xml:lang=\"en-US\">
+    <AccessLicenseNumber>" . addslashes($data['access_key']) . "</AccessLicenseNumber>
+    <UserId>" . addslashes($data['user_id']) . "</UserId>
+    <Password>" . addslashes($data['password']) . "</Password>
+</AccessRequest>
+<?xml version=\"1.0\"?>
+<RatingServiceSelectionRequest xml:lang=\"en-US\">
+    <Request>
+        <TransactionReference>
+            <CustomerContext>" . addslashes($data['customer_context']) . "</CustomerContext>
+            <XpciVersion>1.0001</XpciVersion>
+        </TransactionReference>
+        <RequestAction>Rate</RequestAction>
+        <RequestOption>Shop</RequestOption>
+    </Request>
+    <PickupType>
+        <Code>" . addslashes($data['pickup_type']) . "</Code>
+    </PickupType>
+    <Shipment>
+        <Shipper>
+            <Address>
+                <PostalCode>" . addslashes($data['from_postcode']) . "</PostalCode>
+                <CountryCode>" . addslashes($data['from_country']) . "</CountryCode>
+            </Address>
+            <ShipperNumber>" . addslashes($data['shipper_number']) . "</ShipperNumber>
+        </Shipper>
+        <ShipFrom>
+            <Address>
+                <PostalCode>" . addslashes($data['from_postcode']) . "</PostalCode>
+                <CountryCode>" . addslashes($data['from_country']) . "</CountryCode>
+            </Address>
+        </ShipFrom>
+        <ShipTo>
+            <Address>
+                <PostalCode>" . addslashes($data['to_postcode']) . "</PostalCode>
+                <CountryCode>" . addslashes($data['to_country']) . "</CountryCode>
+                " . ($data['residential'] ? "<ResidentialAddressIndicator/>" : '') . "
+            </Address>
+        </ShipTo>
+        <Package>
+            <PackagingType>
+                <Code>" . addslashes($data['packaging_type']) . "</Code>
+            </PackagingType>
+            <Dimensions>
+                <UnitOfMeasurement>
+                    <Code>" . addslashes($data['dimension_units']) . "</Code>
+                </UnitOfMeasurement>
+                <Length>" . addslashes($data['length']) . "</Length>
+                <Width>" . addslashes($data['width']) . "</Width>
+                <Height>" . addslashes($data['height']) . "</Height>
+            </Dimensions>
+            <PackageWeight>
+                <UnitOfMeasurement>
+                    <Code>" . addslashes($data['weight_units']) . "</Code>
+                </UnitOfMeasurement>
+                <Weight>" . addslashes($data['weight']) . "</Weight>
+            </PackageWeight>
+        </Package>
+    </Shipment>
+</RatingServiceSelectionRequest>";
 
-    /**
-     * @return string
-     */
-    public function getEstimate()
-    {
-        if (!$this->_rate) {
-            $cart = $this->FCom_Sales_Model_Cart->sessionCart();
-            $this->getRateCallback($cart);
-            if (!$this->_rate) {
-                return 'Unable to calculate';
+        $response = $this->BUtil->remoteHttp('POST', $data['rate_api_url'], $request);
+        //echo '<!-- '. $response. ' -->'; // THIS LINE IS FOR DEBUG PURPOSES ONLY-IT WILL SHOW IN HTML COMMENTS
+        $parsed = new SimpleXMLElement($response);
+
+        $result = [];
+        if ($parsed->Response->ResponseStatusCode == 1) { //success
+            $result['success'] = 1;
+            foreach ($parsed->RatedShipment as $rate) {
+                $code = (string)$rate->Service->Code;
+                $result['rates'][$code] = [
+                    'price' => (float)$rate->TotalCharges->MonetaryValue,
+                    'max_days' => (int)$rate->GuaranteedDaysToDelivery,
+                ];
             }
+            $this->_lastError = null;
+        } else { // error
+            $result['error'] = 1;
+            $result['message'] = $parsed->Response->Error->ErrorDescription;
+            $this->_lastError = $result['message'];
         }
-        $estimate = $this->_rate->getEstimate();
-        if (!$estimate) {
-            return 'Unable to calculate';
-        }
-        $days = ($estimate == 1) ? ' day' : ' days';
-        return $estimate . $days;
+        return $result;
     }
 
     /**
@@ -92,111 +139,5 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
             '59' => 'UPS Second Day Air AM',
             '65' => 'UPS Saver'
         ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getDefaultService()
-    {
-        return ['03' => 'UPS Ground'];
-    }
-
-    /**
-     * @return array
-     */
-    public function getServicesSelected()
-    {
-        $c = $this->BConfig;
-        $selected = [];
-        foreach ($this->getServices() as $sId => $sName) {
-            if ($c->get('modules/FCom_ShippingUps/services/s' . $sId) == 1) {
-                $selected[$sId] = $sName;
-            }
-        }
-        if (empty($selected)) {
-            $selected = $this->getDefaultService();
-        }
-        return $selected;
-    }
-
-    /**
-     * @param FCom_Sales_Model_Cart $cart
-     * @return int
-     */
-    public function getRateCallback($cart)
-    {
-        //address
-        $user = $this->FCom_Customer_Model_Customer->sessionUser();
-        $shippingAddress = $cart->getShippingAddress();
-        if ($user && !$shippingAddress) {
-            $shippingAddress = $user->defaultShipping();
-        }
-        $tozip = $shippingAddress->postcode;
-        //service
-        if ($cart->shipping_method == $this->_code) {
-            $service = $cart->shipping_service;
-        } else {
-            $service = '01';
-        }
-        //package dimension
-        $items = $cart->items();
-        $length = $width = $height = 10;
-        $packages = [];
-        $packageId = 0;
-        $groupPackageId = 0;
-        foreach ($items as $item) {
-            $itemWeight = $item->getItemWeight();
-            if ($itemWeight > 250 ||  $itemWeight == 0) {
-                continue;
-            }
-            for ($i = 0; $i < $item->getQty(); $i++) {
-                if ($item->isGroupable()) {
-                    if (!empty($packages[$groupPackageId]) && $itemWeight + $packages[$groupPackageId] >= 150) {
-                        $packageId++;
-                        $groupPackageId = $packageId;
-                    }
-                    if (!empty($packages[$groupPackageId])) {
-                        $packages[$groupPackageId] += $itemWeight;
-                    } else {
-                        $packages[$groupPackageId] = $itemWeight;
-                    }
-
-                } else {
-                    $packageId++;
-                    $packages[$packageId] = $itemWeight;
-                }
-            }
-        }
-        //package weight
-        $total = 0;
-        foreach($packages as $pack) {
-            // Returns false if no credentials are configured.
-            // As a side effect, $this->_rate will be NULL.
-            if ($this->_rateApiCall($cart->id(), $tozip, $service, $length,
-                $width, $height, $pack)) {
-                if ($this->_rate->isError()) {
-                     continue;
-                }
-                $total += $this->_rate->getTotal();
-            }
-        }
-        return $total;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getError()
-    {
-        return $this->_rate->getError();
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->_name;
     }
 }

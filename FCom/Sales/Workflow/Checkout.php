@@ -35,6 +35,7 @@ class FCom_Sales_Workflow_Checkout extends FCom_Sales_Workflow_Abstract
                 $args['cart']->set('billing_' . $k, $v);
             }
         }
+        $args['cart']->set('recalc_shipping_rates', 1);
     }
 
     public function customerUpdatesBillingAddress($args)
@@ -45,6 +46,9 @@ class FCom_Sales_Workflow_Checkout extends FCom_Sales_Workflow_Abstract
             if ($same) {
                 $args['cart']->set('shipping_' . $k, $v);
             }
+        }
+        if ($same) {
+            $args['cart']->set('recalc_shipping_rates', 1);
         }
     }
 
@@ -76,19 +80,14 @@ class FCom_Sales_Workflow_Checkout extends FCom_Sales_Workflow_Abstract
 
     public function customerPlacesOrder($args)
     {
-        /** @var FCom_Customer_Model_Customer $customer */
-        $customer = $this->_getCustomer($args);
-
         /** @var FCom_Sales_Model_Cart $cart */
         $cart = $this->_getCart($args);
 
         /** @var FCom_Sales_Model_Order $order */
-        $order = $this->FCom_Sales_Model_Order->create();
+        $order = $this->FCom_Sales_Model_Order->create()->importDataFromCart($cart);
 
-        $order->importDataFromCart($cart);
-
+        $result = [];
         if ($order->isPayable()) {
-            $result = [];
             $this->FCom_Sales_Main->workflowAction('customerPaysOnCheckout', [
                 'cart' => $cart,
                 'order' => $order,

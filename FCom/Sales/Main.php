@@ -158,6 +158,9 @@ class FCom_Sales_Main extends BClass
 
         $services = [];
         foreach ($this->getShippingMethods() as $mKey => $method) {
+            if (!$method->getConfig('enabled')) {
+                continue;
+            }
             foreach ($method->getServicesSelected() as $sKey => $sLabel) {
                 $services[$mKey]['services'][$sKey]['value'] = $mKey . ':' . $sKey;
                 $services[$mKey]['services'][$sKey]['label'] = $sLabel;
@@ -228,38 +231,14 @@ class FCom_Sales_Main extends BClass
         return $this->BEvents->fire('FCom_Sales_Workflow::' . $actionName, $args);
     }
 
-    /**
-     * Init cart after all modules are registered
-     *
-     * @todo deprecated?
-     */
-    public function initCartTotals()
-    {
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
-        if (false == $cart->items()) {
-            return;
-        }
-        $this->FCom_Sales_Model_Cart->addTotalRow('subtotal', ['callback' => 'FCom_Sales_Model_Cart.subtotalCallback',
-            'label' => 'Subtotal', 'after' => '']);
-        if ($cart->shipping_method) {
-            $shippingClass = $this->FCom_Sales_Main->getShippingMethodClassName($cart->shipping_method);
-            $this->FCom_Sales_Model_Cart->addTotalRow('shipping', ['callback' => $shippingClass . '.getRateCallback',
-                'label' => 'Shipping', 'after' => 'subtotal']);
-        }
-        if ($cart->coupon_code) {
-            $this->FCom_Sales_Model_Cart->addTotalRow('discount', ['callback' => 'FCom_Sales_Model_Cart.discountCallback',
-                'label' => 'Discount', 'after' => 'shipping']);
-        }
-    }
-
     public function onCustomerLogIn($args)
     {
-        $this->workflowAction('customerLogsIn');
+        $this->workflowAction('customerLogsIn', $args);
     }
 
     public function onCustomerLogOut($args)
     {
-        $this->workflowAction('customerLogsOut');
+        $this->workflowAction('customerLogsOut', $args);
     }
 }
 
