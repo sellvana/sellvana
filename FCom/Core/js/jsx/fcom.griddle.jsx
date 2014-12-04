@@ -199,6 +199,34 @@ function(React, $, Griddle, Backbone) {
             handleChange: function(event){
                 this.props.changeFilter(event.target.value);
             },
+            toggleDropdown: function(event) {
+                event.preventDefault();
+
+                var selected = event.target;
+                var parent = $(selected).parent();
+
+                if (!$(parent).hasClass('open')) {
+                    $('<div class="dropdown-backdrop"/>').insertAfter($(selected)).on('click', this.clearMenus);
+                }
+
+                $(parent).toggleClass('open').trigger('shown.bs.dropdown');
+            },
+            clearMenus: function() {
+                $('.dropdown-backdrop').remove()
+
+                $('.dropdown-toggle').each(function (e) {
+                    var parent = $(this).parent();
+                    if (!$(parent).hasClass('open')) {
+                        return;
+                    }
+                    $(parent).trigger(e = $.Event('hide.bs.dropdown'));
+
+                    if (e.isDefaultPrevented()) {
+                        return;
+                    }
+                    $(parent).removeClass('open').trigger('hidden.bs.dropdown');
+                })
+            },
             render: function() {
                 var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder={this.props.placeholderText} onChange={this.handleChange} />;
 
@@ -221,24 +249,23 @@ function(React, $, Griddle, Backbone) {
                             </div>
                         </li>
                     );
+
                     filters.push(
-                        <div className="btn-group dropdown f-grid-filter">
-                            <button data-toggle="dropdown" className="btn dropdown-toggle filter-text-main">
-                                <span className="f-grid-filter-field">{filter.display}</span>:
-                                <span className="f-grid-filter-value">All</span>
-                                <span className="caret"></span>
+                        <div className="btn-group f-grid-filter dropdown">
+                            <button className="btn dropdown-toggle filter-text-main" onClick={this.toggleDropdown}>
+                                <span className="f-grid-filter-field">{filter.display}</span>: <span className="f-grid-filter-value">All</span> <span className="caret"></span>
                             </button>
 
                             <ul className="dropdown-menu filter-box">
                                 <li>
                                     <div className="input-group">
                                         <div className="input-group-btn dropdown">
-                                            <button data-toggle="dropdown" className="btn btn-default dropdown-toggle filter-text-sub">
-                                        {this.props.operations[0].display}<span className="caret"></span>
+                                            <button className="btn btn-default dropdown-toggle filter-text-sub" onClick={this.toggleDropdown}>
+                                                {this.props.operations[0].display} <span className="caret"></span>
                                             </button>
 
                                             <ul className="dropdown-menu filter-sub">
-                                        {filterOperations}
+                                                {filterOperations}
                                             </ul>
                                         </div>
 
@@ -258,15 +285,17 @@ function(React, $, Griddle, Backbone) {
                 return (
                     <div className="f-grid-top f-grid-toolbar clearfix">
                         <div className="f-col-filters-selection pull-left">
-                    {quickSearch}
+                            {quickSearch}
                             <span className="dropdown">
-                                <a href="#" className="btn dropdown-toggle showhide_columns" data-toggle="dropdown">Filters<b className="caret"></b></a>
+                                <button className="btn dropdown-toggle showhide_columns" onClick={this.toggleDropdown}>
+                                    Filters <span className="caret"></span>
+                                </button>
                                 <ul className="dd-list dropdown-menu filters ui-sortable">{filterOptions}</ul>
                             </span>
                         </div>
 
                         <span className="f-filter-btns">
-                    {filters}
+                            {filters}
                         </span>
                     </div>
                 );
