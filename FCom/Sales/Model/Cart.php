@@ -463,14 +463,12 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function calculateTotals()
     {
         $this->loadProducts();
-        $data = $this->data;
-        $data['totals'] = [];
+        $totals = [];
         foreach ($this->getTotalRowInstances() as $total) {
             $total->init($this)->calculate();
-            $data['totals'][$total->getCode()] = $total->asArray();
+            $totals[$total->getCode()] = $total->asArray();
         }
-        $data['last_calc_at'] = time();
-        $this->data = $data;
+        $this->set('last_calc_at', time())->setData('totals', $totals);
         return $this;
     }
 
@@ -480,9 +478,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function getTotals()
     {
         //TODO: price invalidate
-        if (empty($this->data['totals']) || empty($this->data['last_calc_at'])
-            || $this->data['last_calc_at'] < time() - 86400
-        ) {
+        if (!$this->getData('totals') || !$this->get('last_calc_at') || $this->get('last_calc_at') < time() - 86400) {
             $this->calculateTotals()->save();
         }
 
@@ -510,19 +506,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         parent::onAfterCreate();
 
         $this->set('same_address', 1);
-        $this->setShippingMethod(true);
         $this->setPaymentMethod(true);
 
         return $this;
-    }
-
-    /**
-     *
-     */
-    public function onAfterLoad()
-    {
-        parent::onAfterLoad();
-        $this->data = !empty($this->data_serialized) ? $this->BUtil->fromJson($this->data_serialized) : [];
     }
 
     /**
@@ -603,19 +589,14 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
      * @param string $shippingMethod
      * @return $this
      */
-    public function setShippingMethod($method, $service = null)
+    public function setShippingMethod($method, $service)
     {
         $methods = $this->FCom_Sales_Main->getShippingMethods();
-        if (true === $method) {
-            $method = $this->BConfig->get('modules/FCom_Sales/default_shipping_method');
-        } elseif (empty($methods[$method])) {
+        if (empty($methods[$method])) {
             throw new BException('Invalid shipping method: '. $method);
         }
         $services = $methods[$method]->getServices();
-        if (null === $service) {
-            $serviceArr = $methods[$method]->getDefaultService();
-            $service = key($serviceArr);
-        } elseif (empty($services[$service])) {
+        if (empty($services[$service])) {
             throw new BException('Invalid shipping service: ' . $service . '(' . $method . ')');
         }
         $this->set('shipping_method', $method)->set('shipping_service', $service);

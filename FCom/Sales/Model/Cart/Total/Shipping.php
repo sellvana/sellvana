@@ -24,34 +24,36 @@ class FCom_Sales_Model_Cart_Total_Shipping extends FCom_Sales_Model_Cart_Total_A
                     $weight = $rates[$methodCode]['weight'];
                 }
             }
-            $cart->setData('shipping_rates', $rates);
+            $cart->set([
+                'shipping_weight' => $weight,
+                'recalc_shipping_rates' => 0,
+            ])->setData('shipping_rates', $rates);
         } else {
-            $weight = $cart->get('shipping_weight');
             $rates = $cart->getData('shipping_rates');
         }
 
-        list($selMethod, $selService) = $this->_findAndSetMethodService($rates);
+        list($selMethod, $selService) = $this->_findSelectedMethodService($rates);
 
-        $this->_value = $rates[$selMethod][$selService]['price'];
+        $this->_value = $selMethod && $selService ? $rates[$selMethod][$selService]['price'] : 0;
+
         $cart->set([
             'shipping_method' => $selMethod,
             'shipping_service' => $selService,
             'shipping_price' => $this->_value,
-            'shipping_weight' => $weight,
-            'recalc_shipping_rates' => 0,
             'grand_total' => $cart->get('grand_total') + $this->_value,
         ]);
 
         return $this;
     }
 
-    protected function _findAndSetMethodService($rates)
+    protected function _findSelectedMethodService($rates)
     {
         $minRates = [];
         foreach ($rates as $methodCode => $methodRates) {
             if (!empty($rates[$methodCode]['error'])) {
                 continue;
             }
+            $minService = null;
             $minPrice = 99999;
             foreach ($methodRates as $serviceCode => $serviceRate) {
                 if ($serviceRate['price'] < $minPrice) {
@@ -59,7 +61,9 @@ class FCom_Sales_Model_Cart_Total_Shipping extends FCom_Sales_Model_Cart_Total_A
                     $minPrice = $serviceRate['price'];
                 }
             }
-            $minRates[$methodCode] = ['service' => $minService, 'price' => $minPrice];
+            if ($minService) {
+                $minRates[$methodCode] = ['service' => $minService, 'price' => $minPrice];
+            }
         }
 
         $defMethod = $this->BConfig->get('modules/FCom_Sales/default_shipping_method');
@@ -79,15 +83,15 @@ class FCom_Sales_Model_Cart_Total_Shipping extends FCom_Sales_Model_Cart_Total_A
             } else { // or set it as selected
                 $selMethod = $defMethod;
             }
-            $selService = null; // set cheapest method service as selected
+            $selService = null; // request to find cheapest service for selected method
 
         } elseif (empty($rates[$selMethod][$selService])) { // if selected service is not available
 
-            $selService = null;
+            $selService = null; // request to find cheapest service for selected method
 
         }
 
-        if (!$selService) { // if service is not set or was reset, set to cheapest
+        if (!$selService && $selMethod && !empty($minRates[$selMethod])) { // if service is not set or was reset, set to cheapest
             $selService = $minRates[$selMethod]['service'];
         }
 
