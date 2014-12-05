@@ -13,6 +13,12 @@ class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
 
     protected $_localHooks = [
         'customerPaysOnCheckout',
+        'customerStartsExternalPayment',
+        'customerReturnsFromExternalPayment',
+        'customerCompletesPayment',
+        'customerFailsPayment',
+        'customerGetsPaymentError',
+
         'adminPlacesOrder',
         'adminCancelsAuthorization',
         'adminCapturesPayment',
@@ -25,28 +31,101 @@ class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
     {
         try {
             $order = $args['order'];
-            $methods = $this->FCom_Sales_Main->getPaymentMethods();
-            $methodCode = $order->get('payment_method');
-            if (empty($methods[$methodCode])) {
-                throw new BException('Invalid payment method: ' . $methodCode);
-            }
-            $method = $methods[$methodCode];
 
-            $result = $method->setSalesOrder($order)->payOnCheckout();
+            $payment = $this->FCom_Sales_Model_Order_Payment->create()->importFromOrder($order);
+            $result = $payment->payOnCheckout();
 
-            if (!empty($result['redirect_to'])) {
-                $args['result']['payment'] = $result;
-            }
-
-            $payment = $this->FCom_Sales_Model_Order_Payment->create([
-                'order_id' => $order->id(),
-
-            ])->save();
+            $args['result']['payment'] = $result;
             $args['result']['payment']['model'] = $payment;
         } catch (Exception $e) {
 
             //TODO: handle payment exception
         }
+    }
+
+    public function customerStartsExternalPayment($args)
+    {
+        /** @var FCom_Sales_Model_Order_Payment $payment */
+        $payment = $args['payment'];
+        $order = $payment->order();
+        $cart = $order->cart();
+
+        $payment->state()->overall()->setProcessing();
+        $payment->state()->processor()->setExtRedirected();
+
+        $order->state()->payment()->setProcessing();
+
+        $cart->state()->payment()->setExternal();
+
+        $payment->save();
+        $order->save();
+        $cart->save();
+    }
+
+    public function customerReturnsFromExternalPayment($args)
+    {
+        /** @var FCom_Sales_Model_Order_Payment $payment */
+        $payment = $args['payment'];
+
+        $payment->state()->processor()->setExtReturned();
+        $payment->save();
+    }
+
+    public function customerCompletesPayment($args)
+    {
+        /** @var FCom_Sales_Model_Order_Payment $payment */
+        $payment = $args['payment'];
+        $order = $payment->order();
+        $cart = $order->cart();
+        $authOnly = !empty($args['auth_only']);
+
+        $payment->state()->overall()->setPaid();
+        $order->state()->overall()->setPlaced();
+
+        if ($authOnly) {
+            $payment->state()->processor()->setAuthorized();
+            $order->state()->payment()->setProcessing();
+        } else {
+            $payment->state()->processor()->setCaptured();
+            $order->state()->payment()->setPaid();
+        }
+
+        $cart->state()->overall()->setOrdered();
+        $cart->state()->payment()->setPaid();
+
+        $payment->save();
+        $order->save();
+        $cart->save();
+    }
+
+    public function customerFailsPayment($args)
+    {
+        /** @var FCom_Sales_Model_Order_Payment $payment */
+        $payment = $args['payment'];
+        $order = $payment->order();
+        $cart = $order->cart();
+
+        $payment->state()->overall()->setFailed();
+        $cart->state()->payment()->setFailed();
+
+        $payment->save();
+        $cart->save();
+    }
+
+    public function customerGetsPaymentError($args)
+    {
+        /** @var FCom_Sales_Model_Order_Payment $payment */
+        $payment = $args['payment'];
+        $order = $payment->order();
+        $cart = $order->cart();
+
+        $payment->state()->overall()->setFailed();
+        $payment->state()->processor()->setError();
+
+        $cart->state()->payment()->setFailed();
+
+        $payment->save();
+        $cart->save();
     }
 
     public function adminPlacesOrder($args)

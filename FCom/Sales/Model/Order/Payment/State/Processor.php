@@ -4,13 +4,15 @@ class FCom_Sales_Model_Order_Payment_State_Processor extends FCom_Core_Model_Abs
 {
     protected $_valueLabels = [
         'pending' => 'Pending',
+        'ext_redirected' => 'External Redirected',
+        'ext_returned' => 'External Returned',
         'authorizing' => 'Authorizing', // while in process
         'authorized' => 'Authorized',
         'refused' => 'Refused',
         'expired' => 'Expired',
         'captured' => 'Captured',
         'declined' => 'Declined',
-        'failed' => 'Failed', // if there was an error
+        'error' => 'Error',
         'chargeback' => 'Charged Back',
         'refunded' => 'Refunded',
         'void' => 'Void',
@@ -20,6 +22,16 @@ class FCom_Sales_Model_Order_Payment_State_Processor extends FCom_Core_Model_Abs
     public function setPending()
     {
         return $this->changeState('pending');
+    }
+
+    public function setExtRedirected()
+    {
+        return $this->changeState('ext_redirected');
+    }
+
+    public function setExtReturned()
+    {
+        return $this->changeState('ext_returned');
     }
 
     public function setAuthorizing()
@@ -47,9 +59,9 @@ class FCom_Sales_Model_Order_Payment_State_Processor extends FCom_Core_Model_Abs
         return $this->changeState('declined');
     }
 
-    public function setFailed()
+    public function setError()
     {
-        return $this->changeState('failed');
+        return $this->changeState('error');
     }
 
     public function setChargedBack()

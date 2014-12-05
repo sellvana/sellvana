@@ -14,6 +14,13 @@ class FCom_Sales_Model_Cart_Total_GrandTotal extends FCom_Sales_Model_Cart_Total
     {
         $cart = $this->_cart;
         $this->_value = $cart->get('grand_total');
+
+        if ($this->_value) {
+            $cart->state()->payment()->setUnpaid();
+        } else {
+            $cart->state()->payment()->setFree();
+        }
+
         return $this;
     }
 

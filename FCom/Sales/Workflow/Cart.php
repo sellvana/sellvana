@@ -15,6 +15,8 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
     static protected $_origClass = __CLASS__;
 
     protected $_localHooks = [
+        'customerCreatesNewCart',
+
         'customerLogsIn',
         'customerLogsOut',
 
@@ -26,6 +28,37 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
         'customerAbandonsCart',
     ];
 
+    public function customerCreatesNewCart($args)
+    {
+        // get cookie token ttl from config
+        $ttl = $this->BConfig->get('modules/FCom_Sales/cart_cookie_token_ttl_days') * 86400;
+        // get logged in customer
+        $customer = $this->FCom_Customer_Model_Customer->sessionUser();
+        // generate token
+        $cookieToken = $this->BUtil->randomString(32);
+
+        // create cart record
+        /** @var FCom_Sales_Model_Cart $cart */
+        $cart = $this->FCom_Sales_Model_Cart->create([
+            'cookie_token' => (string)$cookieToken,
+        ]);
+        $cart->state()->overall()->setActive();
+
+        if ($customer) {
+            $cart->set([
+                'customer_id' => $customer->id(),
+                'customer_email' => $customer->get('email'),
+            ])->importAddressesFromCustomer($customer)->calculateTotals();
+        }
+
+        $cart->save();
+
+        $this->FCom_Sales_Model_Cart->resetSessionCart($cart);
+
+        // set cookie cart token
+        $this->BResponse->cookie('cart', $cookieToken, $ttl);
+    }
+
     /**
      * @throws BException
      */
@@ -35,6 +68,7 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
         $customer = $this->FCom_Customer_Model_Customer->sessionUser();
         // something wrong, abort abort!
         if (!$customer) {
+            $this->BDebug->warning('Customer model expected');
             return;
         }
         $cartHlp = $this->FCom_Sales_Model_Cart;
@@ -47,23 +81,24 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
 
             // if both current session cart and customer cart exist and they're different carts
             $custCart->merge($sessCart); // merge them into customer cart
-            $cartHlp->sessionCart(false, $custCart); // and set it as session cart
+            $cartHlp->resetSessionCart($custCart); // and set it as session cart
 
         } elseif ($sessCart && !$custCart) { // if only session cart exist
 
-            $sessCart->set('customer_id', $customer->id())->save(); // assign it to customer
+            $sessCart->set([
+                'customer_id' => $customer->id(),
+                'customer_email' => $customer->get('email'),
+            ])->save(); // assign it to customer
 
         } elseif (!$sessCart && $custCart) { // if only customer cart exist
 
-            $cartHlp->sessionCart(false, $custCart); // set it as session cart
+            $cartHlp->resetSessionCart($custCart); // set it as session cart
 
         }
 
         if (!$sessCart->hasCompleteAddress('shipping')) {
-            $sessCart->importAddressesFromCustomer($customer)->save();
+            $sessCart->importAddressesFromCustomer($customer)->calculateTotals()->save();
         }
-        // clear cookie token
-        $this->BResponse->cookie('cart', false);
     }
 
     /**
@@ -262,7 +297,8 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
     public function customerAbandonsCart($args)
     {
         $cart = $this->_getCart($args);
-        $cart->setStatusAbandoned()->save();
+        $cart->state()->overall()->setAbandoned();
+        $cart->save();
         $this->BLayout->view('email/sales/cart-state-abandoned.html.twig')->email();
     }
 }
