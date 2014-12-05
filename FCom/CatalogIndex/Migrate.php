@@ -62,7 +62,7 @@ class FCom_CatalogIndex_Migrate extends BClass
             ],
             BDb::PRIMARY => '(id)',
             BDb::CONSTRAINTS => [
-                'field' => ['fcom_field_id', $tField],
+                'field' => ['fcom_field_id', $tCustField],
             ],
         ]);
         $this->BDb->ddlTableDef($tFieldValue, [
