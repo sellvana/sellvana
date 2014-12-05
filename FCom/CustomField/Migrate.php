@@ -368,6 +368,6 @@ class FCom_CustomField_Migrate extends BClass
                 'IDX_product_sku' => '(product_sku)',
             ],
         ]);
-        $this->BDb->run("UPDATE {$tProdVariant} SET product_sku=variant_sku");
+        $this->BDb->run("UPDATE {$tProdVariant} SET product_sku=inventory_sku");
     }
 }
