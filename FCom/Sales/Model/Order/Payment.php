@@ -19,6 +19,7 @@
  * @property FCom_Sales_Main $FCom_Sales_Main
  * @property FCom_Sales_Model_Order_History $FCom_Sales_Model_Order_History
  * @property FCom_Sales_Model_Order_Payment_State $FCom_Sales_Model_Order_Payment_State
+ * @property FCom_Sales_Model_Order_Payment_Item $FCom_Sales_Model_Order_Payment_Item
  */
 class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 {
@@ -64,6 +65,15 @@ class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             'payment_method' => $order->get('payment_method'),
             'amount_due' => $order->get('amount_due'),
         ])->save();
+
+        foreach ($order->items() as $item) {
+            $this->FCom_Sales_Model_Order_Payment_Item->create([
+                'order_id' => $order->id(),
+                'payment_id' => $this->id(),
+                'order_item_id' => $item->id(),
+                'qty' => $item->get('qty_ordered'),
+            ])->save();
+        }
 
         $this->state()->overall()->setPending();
         $this->state()->custom()->setDefault();
