@@ -55,6 +55,21 @@ class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $this;
     }
 
+    public function importFromOrder($order)
+    {
+        $this->order($order);
+
+        $this->set([
+            'order_id' => $order->id(),
+            'payment_method' => $order->get('payment_method'),
+            'amount_due' => $order->get('amount_due'),
+        ])->save();
+
+        $this->state()->overall()->setPending();
+        $this->state()->custom()->setDefault();
+        return $this;
+    }
+
     public function getMethodObject()
     {
         $methods = $this->FCom_Sales_Main->getPaymentMethods();
@@ -63,6 +78,14 @@ class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
             throw new BException('Invalid payment method');
         }
         return $methods[$code];
+    }
+
+    public function payOnCheckout()
+    {
+        $method = $this->getMethodObject();
+        $result = $method->setPaymentModel($this)->payOnCheckout();
+
+        return $result;
     }
 
     public function __destruct()

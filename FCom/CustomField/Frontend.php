@@ -89,10 +89,10 @@ class FCom_CustomField_Frontend extends BClass
                     continue;
                 }
                 $varArr = $variant->as_array();
-                $invSku = $varArr['variant_sku'] !== null ? $varArr['variant_sku'] : $p->get('inventory_sku');
+                $invSku = $varArr['inventory_sku'] !== null ? $varArr['inventory_sku'] : $p->get('inventory_sku');
                 $invModel = $this->FCom_Catalog_Model_InventorySku->load($invSku, 'inventory_sku');
 
-                if ($varArr['variant_sku'] !== null && !$invModel) { // TODO: only for debugging during development
+                if ($varArr['inventory_sku'] !== null && !$invModel) { // TODO: only for debugging during development
                     $invModel = $this->FCom_Catalog_Model_InventorySku->load($p->get('inventory_sku'), 'inventory_sku');
                 }
 

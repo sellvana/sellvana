@@ -32,14 +32,13 @@
  * @property array $data from json_decode data_serialized
  *
  * DI
- * @property FCom_Sales_Model_Cart_Item $FCom_Sales_Model_Cart_Item
- * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
- * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
- * @property FCom_Sales_Model_Cart_Address $FCom_Sales_Model_Cart_Address
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  * @property FCom_Sales_Main $FCom_Sales_Main
- * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Sales_Model_Cart_Item $FCom_Sales_Model_Cart_Item
+ * @property FCom_Sales_Model_Cart_State $FCom_Sales_Model_Cart_State
  */
 class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 {
@@ -75,25 +74,13 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     /**
      * @param bool $createAnonymousIfNeeded
-     * @param bool|FCom_Sales_Model_Cart $reset
      * @return FCom_Sales_Model_Cart
      */
-    public function sessionCart($createAnonymousIfNeeded = false, $reset = false)
+    public function sessionCart($createAnonymousIfNeeded = false)
     {
-        // if there's already session cart and no reset requested, return existin session cart
-        if (static::$_sessionCart && !$reset) {
+        // if there's already session cart, return existing session cart
+        if (static::$_sessionCart) {
             return static::$_sessionCart;
-        }
-
-        // get cookie token ttl from config
-        $ttl = $this->BConfig->get('modules/FCom_Sales/cart_cookie_token_ttl_days') * 86400;
-
-        // if reset to a specific cart model is requested, set it and return
-        if ($reset instanceof FCom_Sales_Model_Cart) {
-            static::$_sessionCart = $cart = $reset;
-            $cookieToken = $cart->get('cookie_token');
-            $this->BResponse->cookie('cart', $cookieToken, $ttl);
-            return $reset;
         }
 
         // get unique cart token from cookie
@@ -108,54 +95,48 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             static::$_sessionCart = $this->loadWhere(['cookie_token' => (string)$cookieToken, 'state_overall' => 'active']);
 
             // if a cart with this token is not found and no need to create a new one, remove cookie cart token and return
-            if (!static::$_sessionCart && !$createAnonymousIfNeeded) {
-                $this->BResponse->cookie('cart', false);
-                return false;
+            if (!static::$_sessionCart) {
+                if ($createAnonymousIfNeeded) {
+                    $this->FCom_Sales_Main->workflowAction('customerCreatesNewCart');
+                } else {
+                    $this->resetSessionCart();
+                    return false;
+                }
             }
 
         } elseif ($customer) { // if no cookie cart token and customer is logged in, try to find customer cart
 
-            $data = ['customer_id' => $customer->id(), 'state_overall' => 'active'];
-            static::$_sessionCart = $this->loadWhere($data);
+            $cart = $this->loadWhere(['customer_id' => $customer->id(), 'state_overall' => 'active']);
 
-            if (!static::$_sessionCart) {
-                // generate token
-                $data['cookie_token'] = $this->BUtil->randomString(32);
-                static::$_sessionCart = $this->create($data)->save();
+            if (static::$_sessionCart) {
+                $this->resetSessionCart($cart);
+            } else {
+                // create new cart
+                $this->FCom_Sales_Main->workflowAction('customerCreatesNewCart');
             }
-
-            if (!static::$_sessionCart->hasCompleteAddress('shipping')) {
-                static::$_sessionCart->importAddressesFromCustomer($customer)->save();
-            }
-
-            // set cookie cart token
-            $this->BResponse->cookie('cart', static::$_sessionCart->get('cookie_token'), $ttl);
-        }
-
-        // if no cart is found and new cart creation is requested, create one and set cookie cart token
-        if (!static::$_sessionCart && $createAnonymousIfNeeded) {
-            // generate token
-            $cookieToken = $this->BUtil->randomString(32);
-            // create cart record
-            static::$_sessionCart = $this->create([
-                'cookie_token' => (string)$cookieToken,
-                'state_overall' => 'active',
-                'customer_id' => $customer ? $customer->id() : null,
-            ])->save();
-            // set cookie cart token
-            $this->BResponse->cookie('cart', $cookieToken, $ttl);
         }
 
         return static::$_sessionCart;
     }
 
     /**
+     * @param FCom_Sales_Model_Cart
      * @return FCom_Sales_Model_Cart
      */
-    public function resetSessionCart()
+    public function resetSessionCart(FCom_Sales_Model_Cart $cart = null)
     {
-        static::$_sessionCart = null;
-        return $this;
+        static::$_sessionCart = $cart;
+
+        if ($cart) {
+            // get cookie token ttl from config
+            $ttl = $this->BConfig->get('modules/FCom_Sales/cart_cookie_token_ttl_days') * 86400;
+            // set cookie cart token for found cart
+            $this->BResponse->cookie('cart', $cart->get('cookie_token'), $ttl);
+        } else {
+            $this->BResponse->cookie('cart', false);
+        }
+
+        return $cart;
     }
 
     /**
@@ -463,14 +444,12 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function calculateTotals()
     {
         $this->loadProducts();
-        $data = $this->data;
-        $data['totals'] = [];
+        $totals = [];
         foreach ($this->getTotalRowInstances() as $total) {
             $total->init($this)->calculate();
-            $data['totals'][$total->getCode()] = $total->asArray();
+            $totals[$total->getCode()] = $total->asArray();
         }
-        $data['last_calc_at'] = time();
-        $this->data = $data;
+        $this->set('last_calc_at', time())->setData('totals', $totals);
         return $this;
     }
 
@@ -480,9 +459,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function getTotals()
     {
         //TODO: price invalidate
-        if (empty($this->data['totals']) || empty($this->data['last_calc_at'])
-            || $this->data['last_calc_at'] < time() - 86400
-        ) {
+        if (!$this->getData('totals') || !$this->get('last_calc_at') || $this->get('last_calc_at') < time() - 86400) {
             $this->calculateTotals()->save();
         }
 
@@ -512,17 +489,9 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $this->set('same_address', 1);
         $this->setShippingMethod(true);
         $this->setPaymentMethod(true);
+        $this->state()->overall()->setActive();
 
         return $this;
-    }
-
-    /**
-     *
-     */
-    public function onAfterLoad()
-    {
-        parent::onAfterLoad();
-        $this->data = !empty($this->data_serialized) ? $this->BUtil->fromJson($this->data_serialized) : [];
     }
 
     /**
@@ -552,7 +521,10 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $this->importAddressFromObject($defShipping, 'shipping');
         }
 
-        $this->set('same_address', $defBilling && $defShipping && $defBilling->id() == $defShipping->id());
+        $this->set([
+            'same_address' => $defBilling && $defShipping && $defBilling->id() == $defShipping->id(),
+            'recalc_shipping_rates' => 1,
+        ]);
 
         return $this;
     }
@@ -600,7 +572,8 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
      *
      * Check if provided code is valid shipping method and apply it
      * @throws BException
-     * @param string $shippingMethod
+     * @param string $method
+     * @param string $service
      * @return $this
      */
     public function setShippingMethod($method, $service = null)
@@ -608,14 +581,12 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         $methods = $this->FCom_Sales_Main->getShippingMethods();
         if (true === $method) {
             $method = $this->BConfig->get('modules/FCom_Sales/default_shipping_method');
-        } elseif (empty($methods[$method])) {
+        }
+        if (empty($methods[$method])) {
             throw new BException('Invalid shipping method: '. $method);
         }
         $services = $methods[$method]->getServices();
-        if (null === $service) {
-            $serviceArr = $methods[$method]->getDefaultService();
-            $service = key($serviceArr);
-        } elseif (empty($services[$service])) {
+        if (null !== $service && empty($services[$service])) {
             throw new BException('Invalid shipping service: ' . $service . '(' . $method . ')');
         }
         $this->set('shipping_method', $method)->set('shipping_service', $service);
@@ -650,39 +621,6 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             throw new BException('Invalid payment method: ' . $method);
         }
         $this->set('payment_method', $method);
-        return $this;
-    }
-
-    public function setStatus($state)
-    {
-        if ($this->get('state_overall') !== $state) {
-            $this->set('state_overall', $state);
-            $this->BEvents->fire(__METHOD__, ['cart' => $this, 'state_overall' => $state]);
-        }
-        return $this;
-    }
-
-    public function setStatusActive()
-    {
-        $this->setStatus('active');
-        return $this;
-    }
-
-    public function setStatusOrdered()
-    {
-        $this->setStatus('ordered');
-        return $this;
-    }
-
-    public function setStatusAbandoned()
-    {
-        $this->setStatus('abandoned');
-        return $this;
-    }
-
-    public function setStatusArchived()
-    {
-        $this->setStatus('archived');
         return $this;
     }
 
@@ -782,6 +720,17 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         }
 
         return $result;
+    }
+
+    /**
+     * @return FCom_Sales_Model_Cart_State
+     */
+    public function state()
+    {
+        if (!$this->_state) {
+            $this->_state = $this->FCom_Sales_Model_Cart_State->factory($this);
+        }
+        return $this->_state;
     }
 
     public function __destruct()

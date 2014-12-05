@@ -3,6 +3,7 @@
 
 <div class="row">
     <div class="col-md-9">
+        {{ THIS.view('core/messages') | raw }}
         <form action="{{ APP.href('checkout/step2') }}" method="post" id="{{ type }}-form" role="form">
             <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
             <input type="hidden" name="checkout_step" value="2">

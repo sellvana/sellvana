@@ -1,15 +1,36 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Method_Payment_Abstract
+ *
+ * @property FCom_Sales_Main $FCom_Sales_Main
+ */
 abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
     FCom_Sales_Method_Payment_Interface
 {
-    protected $_cart;
-    protected $_order;
-    protected $_orderOptions;
+    /**
+     * @var FCom_Sales_Model_Order_Payment
+     */
+    protected $_payment;
+
+    /**
+     * @var array
+     */
     protected $_details;
+
+    /**
+     * @var int
+     */
     protected $_sortOrder = 50;
+
+    /**
+     * @var string
+     */
     protected $_name;
 
+    /**
+     * @var array
+     */
     protected $_capabilities = [
         'pay'           => 1,
         'refund'        => 1,
@@ -40,23 +61,6 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
     }
 
     /**
-     * Assign sales entity
-     *
-     * Prepare to pay for sales object here
-     *
-     * @param $order
-     * @param $options
-     * @return $this
-     */
-    public function setSalesOrder($order, $options = null)
-    {
-        $this->_order = $order;
-        $this->_orderOptions = $options;
-
-        return $this;
-    }
-
-    /**
      * Set any details gathered during checkout process
      * @param array $details
      * @return $this
@@ -83,9 +87,9 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
      * @return $this
      * @internal This replaces initCart in basic payment
      */
-    public function setCartEntity($cart)
+    public function setPaymentModel(FCom_Sales_Model_Order_Payment $payment)
     {
-        $this->_cart = $cart;
+        $this->_payment = $payment;
         return $this;
     }
 
@@ -102,5 +106,13 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
     public function get($name, $default = null)
     {
         return isset($this->_details[$name]) ? $this->_details[$name] : $default;
+    }
+
+    /**
+     * Shortcut for payment gateway error
+     */
+    protected function _setErrorStatus()
+    {
+        $this->FCom_Sales_Main->workflowAction('customerGetsPaymentError', ['payment' => $this->_payment]);
     }
 }

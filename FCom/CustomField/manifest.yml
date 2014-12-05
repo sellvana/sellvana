@@ -1,6 +1,6 @@
 modules:
     FCom_CustomField:
-        version: 0.2.2
+        version: 0.2.3
         channel: beta
         require: { module: { FCom_Catalog: 0.2.1 } }
         translations: { en: en.php }

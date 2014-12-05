@@ -1606,6 +1606,30 @@ class FCom_Sales_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_3_8__0_3_9()
+    {
+        $tCart = $this->FCom_Sales_Model_Cart->table();
+        $tOrderPayment = $this->FCom_Sales_Model_Order_Payment->table();
+
+        $this->BDb->ddlTableDef($tCart, [
+            BDb::COLUMNS => [
+                'state_payment' => 'varchar(20)',
+            ],
+            BDb::KEYS => [
+                'IDX_state_payment' => '(state_payment)',
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderPayment, [
+            BDb::COLUMNS => [
+                'transaction_token' => 'varchar(50)',
+            ],
+            BDb::KEYS => [
+                'IDX_transaction_token' => '(transaction_token)',
+            ],
+        ]);
+    }
 }
 
 class FCom_Sales_Migrate_Model_Cart_Address extends BModel

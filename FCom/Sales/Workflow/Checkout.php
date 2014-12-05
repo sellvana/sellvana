@@ -11,6 +11,7 @@ class FCom_Sales_Workflow_Checkout extends FCom_Sales_Workflow_Abstract
     static protected $_origClass = __CLASS__;
 
     protected $_localHooks = [
+        'customerStartsCheckout',
         'customerChoosesGuestCheckout',
         'customerUpdatesShippingAddress',
         'customerUpdatesShippingMethod',
@@ -21,34 +22,58 @@ class FCom_Sales_Workflow_Checkout extends FCom_Sales_Workflow_Abstract
         'customerMergesOrderToAccount',
     ];
 
+    public function customerStartsCheckout($args)
+    {
+        // TODO: figure out for virtual orders ($c->isShippable())
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+
+        if ($cart->hasCompleteAddress('shipping')) {
+            return;
+        }
+
+        $customer = $this->FCom_Customer_Model_Customer->sessionUser();
+        if ($customer) {
+            $cart->importAddressesFromCustomer($customer)
+                ->set([
+                    'recalc_shipping_rates' => 1
+                ])
+                ->calculateTotals()
+                ->save();
+        }
+    }
+
     public function customerChoosesGuestCheckout($args)
     {
-        $args['cart']->set('customer_email', $args['post']['customer_email']);
+
     }
 
     public function customerUpdatesShippingAddress($args)
     {
-        $same = $args['cart']->get('same_address');
-        foreach ($args['post']['shipping'] as $k => $v) {
-            $args['cart']->set('shipping_' . $k, $v);
-            if ($same) {
-                $args['cart']->set('billing_' . $k, $v);
+        if (!empty($args['post']['shipping'])) {
+            $same = $args['cart']->get('same_address');
+            foreach ($args['post']['shipping'] as $k => $v) {
+                $args['cart']->set('shipping_' . $k, $v);
+                if ($same) {
+                    $args['cart']->set('billing_' . $k, $v);
+                }
             }
+            $args['cart']->set('recalc_shipping_rates', 1);
         }
-        $args['cart']->set('recalc_shipping_rates', 1);
     }
 
     public function customerUpdatesBillingAddress($args)
     {
-        $same = $args['cart']->get('same_address');
-        foreach ($args['post']['billing'] as $k => $v) {
-            $args['cart']->set('billing_' . $k, $v);
-            if ($same) {
-                $args['cart']->set('shipping_' . $k, $v);
+        if (!empty($args['post']['billing'])) {
+            $same = $args['cart']->get('same_address');
+            foreach ($args['post']['billing'] as $k => $v) {
+                $args['cart']->set('billing_' . $k, $v);
+                if ($same) {
+                    $args['cart']->set('shipping_' . $k, $v);
+                }
             }
-        }
-        if ($same) {
-            $args['cart']->set('recalc_shipping_rates', 1);
+            if ($same) {
+                $args['cart']->set('recalc_shipping_rates', 1);
+            }
         }
     }
 
@@ -62,7 +87,7 @@ class FCom_Sales_Workflow_Checkout extends FCom_Sales_Workflow_Abstract
         if (sizeof($method) !== 2) {
             throw new BException('Shipping method is invalid');
         }
-        $cart->setShippingMethod($method[0], $method[1])->save();
+        $cart->setShippingMethod($method[0], $method[1])->calculateTotals()->save();
     }
 
     public function customerUpdatesPaymentMethod($args)
@@ -83,6 +108,15 @@ class FCom_Sales_Workflow_Checkout extends FCom_Sales_Workflow_Abstract
         /** @var FCom_Sales_Model_Cart $cart */
         $cart = $this->_getCart($args);
 
+        /** @var FCom_Sales_Model_Order[] $oldOrdersFromCart */
+        $oldOrdersFromCart = $this->FCom_Sales_Model_Order->orm()->where('cart_id', $cart->id())->find_many();
+        if ($oldOrdersFromCart) {
+            foreach ($oldOrdersFromCart as $o) {
+                $o->state()->overall()->setCanceled();
+                $o->save();
+            }
+        }
+
         /** @var FCom_Sales_Model_Order $order */
         $order = $this->FCom_Sales_Model_Order->create()->importDataFromCart($cart);
 
@@ -93,12 +127,17 @@ class FCom_Sales_Workflow_Checkout extends FCom_Sales_Workflow_Abstract
                 'order' => $order,
                 'result' => &$result,
             ]);
+
+            if (!empty($result['payment']['complete'])) {
+                $cart->state()->overall()->setOrdered();
+                $cart->save();
+            }
+            if (!empty($result['payment']['redirect_to'])) {
+                $args['result']['redirect_to'] = $result['payment']['redirect_to'];
+            }
         }
 
-        $cart->setStatusOrdered()->save();
-
         $this->BSession->set('last_order_id', $order->id());
-
         $args['result']['order'] = $order;
         $args['result']['success'] = true;
     }

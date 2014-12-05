@@ -111,6 +111,6 @@ abstract class FCom_Core_Model_Abstract_State_Context extends BClass
 
     public function __destruct()
     {
-        unset($this->_model, $this->_stateObjects, $this->_stateValues);
+        unset($this->_model, $this->_stateObjects);
     }
 }

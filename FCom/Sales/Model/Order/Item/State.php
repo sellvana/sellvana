@@ -21,21 +21,37 @@ class FCom_Sales_Model_Order_Item_State extends FCom_Core_Model_Abstract_State_C
         'custom' => 'FCom_Sales_Model_Order_Item_State_Custom',
     ];
 
+    /**
+     * @return FCom_Sales_Model_Order_Item_State_Overall
+     * @throws BException
+     */
     public function overall()
     {
         return $this->_getStateObject('overall');
     }
 
+    /**
+     * @return FCom_Sales_Model_Order_Item_State_Delivery
+     * @throws BException
+     */
     public function delivery()
     {
         return $this->_getStateObject('delivery');
     }
 
+    /**
+     * @return FCom_Sales_Model_Order_Item_State_Payment
+     * @throws BException
+     */
     public function payment()
     {
         return $this->_getStateObject('payment');
     }
 
+    /**
+     * @return FCom_Sales_Model_Order_Item_State_Custom
+     * @throws BException
+     */
     public function custom()
     {
         return $this->_getStateObject('custom');

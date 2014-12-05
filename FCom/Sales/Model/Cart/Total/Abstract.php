@@ -3,7 +3,7 @@
 /**
  * Class FCom_Sales_Model_Cart_Total_Abstract
  */
-abstract class FCom_Sales_Model_Cart_Total_Abstract extends BCLass implements FCom_Sales_Model_Cart_Total_Interface
+abstract class FCom_Sales_Model_Cart_Total_Abstract extends BClass implements FCom_Sales_Model_Cart_Total_Interface
 {
     /** @var FCom_Sales_Model_Cart $_cart */
     protected $_cart;
@@ -24,7 +24,7 @@ abstract class FCom_Sales_Model_Cart_Total_Abstract extends BCLass implements FC
     public function init($cart)
     {
         $this->_cart = $cart;
-        $this->_currency = $this->_cart->cart_currency;
+        $this->_currency = $this->_cart->get('cart_currency');
         if (!$this->_configPath) {
             $this->_configPath = 'modules/FCom_Sales/cart_totals/' . $this->_code;
         }
@@ -86,7 +86,7 @@ abstract class FCom_Sales_Model_Cart_Total_Abstract extends BCLass implements FC
      */
     public function getValue()
     {
-        return $this->_cartField ? $this->_cart[$this->_cartField] : $this->_value;
+        return $this->_cartField ? $this->_cart->get($this->_cartField) : $this->_value;
     }
 
     /**
@@ -118,7 +118,9 @@ abstract class FCom_Sales_Model_Cart_Total_Abstract extends BCLass implements FC
      */
     public function isHidden()
     {
-        return !$this->_value;
+        $value = $this->getValue();
+        $value = is_numeric($value) ? (float)$value : $value;
+        return !$value;
     }
 
     /**

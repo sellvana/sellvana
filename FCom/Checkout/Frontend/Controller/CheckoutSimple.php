@@ -31,10 +31,13 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
 
     public function action_index()
     {
-        $c = $this->_cart;
-        // TODO: figure out for virtual orders ($c->isShippable())
-        $step = $c->hasCompleteAddress('shipping') ? 2 : 1;
-        $this->forward('step' . $step);
+        $this->FCom_Sales_Main->workflowAction('customerStartsCheckout');
+
+        if ($this->_cart->hasCompleteAddress('shipping')) {
+            $this->forward('step2');
+        } else {
+            $this->forward('step1');
+        }
     }
 
     public function action_index__POST()

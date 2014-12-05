@@ -31,7 +31,7 @@ class FCom_Sales_Frontend_Controller_Orders extends FCom_Frontend_Controller_Abs
     public function action_index()
     {
         $customerId = $this->FCom_Customer_Model_Customer->sessionUserId();
-        $orders = $this->FCom_Sales_Model_Order->getOrders($customerId);
+        $orders = $this->FCom_Sales_Model_Order->findCustomerOrders($customerId);
 
         $crumbs[] = ['label' => 'Account', 'href' => $this->BApp->href('customer/myaccount')];
         $crumbs[] = ['label' => 'Orders', 'active' => true];

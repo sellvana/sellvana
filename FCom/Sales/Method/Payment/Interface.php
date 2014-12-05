@@ -2,14 +2,11 @@
 
 interface FCom_Sales_Method_Payment_Interface
 {
-    public function payOnCheckout();
-
     /**
-     * @param $order
-     * @param $options
-     * @return $this
+     * @param FCom_Sales_Model_Order_Payment $payment
+     * @return mixed
      */
-    public function setSalesOrder($order, $options);
+    public function payOnCheckout();
 
     /**
      * Set any details gathered during checkout process

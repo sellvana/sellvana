@@ -163,10 +163,10 @@ class FCom_CustomField_Admin extends BClass
 #echo "<pre>"; var_dump($prodVariantFieldsArr); echo "</pre>";
             // match variants from form data to already existing variants by key fields values
             $matchedVariants = [];
-            $variantSkus = [];
+            $variantInventorySkus = [];
             foreach ($variantsData as $i => &$vd) {
-                if ($vd['variant_sku'] !== '') {
-                    $variantSkus[$i] = $vd['variant_sku'];
+                if ($vd['inventory_sku'] !== '') {
+                    $variantInventorySkus[$i] = $vd['inventory_sku'];
                 }
                 foreach ($prodVariantModels as $vId => $vm) {
                     if (empty($prodVariantFieldsArr[$vId])) {
@@ -195,8 +195,7 @@ class FCom_CustomField_Admin extends BClass
             $prodVariantHlp->delete_many($where);
 
             $invHlp = $this->FCom_Catalog_Model_InventorySku;
-            $invModels = $invHlp->orm()->where_in('inventory_sku', $variantSkus)
-                ->find_many_assoc('inventory_sku');
+            $invModels = $invHlp->orm()->where_in('inventory_sku', $variantInventorySkus)->find_many_assoc('inventory_sku');
 
             // update matched variant models and create new variants
             foreach ($variantsData as $i => $vd) {
@@ -206,18 +205,19 @@ class FCom_CustomField_Admin extends BClass
                     $m = $prodVariantHlp->create(['product_id' => $pId]);
                 }
                 if ($vd['variant_qty'] !== '') {
-                    if (empty($invModels[$vd['variant_sku']])) {
-                        $invModels[$vd['variant_sku']] = $invHlp->create([
-                            'inventory_sku' => $vd['variant_sku'],
+                    if (empty($invModels[$vd['inventory_sku']])) {
+                        $invModels[$vd['inventory_sku']] = $invHlp->create([
+                            'inventory_sku' => $vd['inventory_sku'],
                         ])->save();
                     }
-                    $invModels[$vd['variant_sku']]->set([
+                    $invModels[$vd['inventory_sku']]->set([
                         'qty_in_stock' => $vd['variant_qty'],
                     ])->save();
                 }
                 $m->set([
                     'field_values'  => $this->BUtil->toJson($vd['field_values']),
-                    'variant_sku'   => $vd['variant_sku']   !== '' ? $vd['variant_sku']   : null,
+                    'product_sku'   => $vd['product_sku']   !== '' ? $vd['product_sku']   : null,
+                    'inventory_sku' => $vd['inventory_sku'] !== '' ? $vd['inventory_sku'] : null,
                     'variant_price' => $vd['variant_price'] !== '' ? $vd['variant_price'] : null,
                     'manage_inventory' => $vd['variant_qty'] !== '' ? 1 : 0,
                 ])->save();
