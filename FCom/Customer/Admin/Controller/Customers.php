@@ -19,6 +19,8 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     protected $_navPath = 'customer/customers';
     protected $_formViewPrefix = 'customer/customers-form/';
 
+    protected $_gridViewName = 'core/griddle';
+
     public function gridConfig()
     {
         $config = parent::gridConfig();
