@@ -235,16 +235,29 @@ function(React, $, Griddle, Backbone, Components) {
                     $(parent).find('.buttondropdown-backdrop').remove();
                 })
             },
-            updateFilter: function(event) {
+            clearFilter: function(event) {
                 var target = event.target;
-                $(target).parents('.f-grid-filter').addClass('f-grid-filter-val');
 
-                var caption = $(target).parents('.f-grid-filter').find('.selected-operator').html() + ' "' +
-                    $(target).parents('.f-grid-filter').find('.selected-value').val() + '"';
-
-                $(target).parents('.f-grid-filter').find('.filter-text-main .f-grid-filter-value').html(caption);
+                $(target).parents('.f-grid-filter').removeClass('f-grid-filter-val');
+                $(target).parents('.f-grid-filter').find('.filter-text-main .f-grid-filter-value').html('All');
                 $(target).parents('.f-grid-filter').removeClass('open').trigger('hidden.bs.dropdown');
                 $('.buttondropdown-backdrop').remove();
+            },
+            updateFilter: function(event) {
+                var target = event.target;
+
+                if ($.trim($(target).parents('.f-grid-filter').find('.selected-value').val()) != '') {
+                    var caption = $(target).parents('.f-grid-filter').find('.selected-operator').html() + ' "' +
+                        $(target).parents('.f-grid-filter').find('.selected-value').val() + '"';
+                    $(target).parents('.f-grid-filter').addClass('f-grid-filter-val');
+                    $(target).parents('.f-grid-filter').find('.filter-text-main .f-grid-filter-value').html(caption);
+                } else {
+                    $(target).parents('.f-grid-filter').removeClass('f-grid-filter-val');
+                    $(target).parents('.f-grid-filter').find('.filter-text-main .f-grid-filter-value').html('All');
+                }
+                $(target).parents('.f-grid-filter').removeClass('open').trigger('hidden.bs.dropdown');
+                $('.buttondropdown-backdrop').remove();
+
             },
             toggleFilter: function(event) {
                 var target = event.target;
@@ -320,7 +333,7 @@ function(React, $, Griddle, Backbone, Components) {
                                 </li>
                             </ul>
 
-                            <abbr className="select2-search-choice-close"></abbr>
+                            <abbr className="select2-search-choice-close" onClick={this.clearFilter}></abbr>
                         </div>
                     );
                 }
