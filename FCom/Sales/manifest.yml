@@ -1,6 +1,6 @@
 modules:
     FCom_Sales:
-        version: 0.3.5
+        version: 0.3.9
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_Customer: 0.1.0 } }
         description: "Fundamental Sales functionality"
@@ -37,11 +37,12 @@ modules:
                 auto_use: [ layout, views ]
                 routing:
                     - [ "/cart/?.action", FCom_Sales_Frontend_Controller_Cart ]
-                    - [ "/orders/?.action", FCom_Sales_Frontend_Controller_Orders ]
-                    - [ "/orderstatus/?.action", FCom_Sales_Frontend_Controller_OrderStatus ]
+                    - [ /orders/?.action, FCom_Sales_Frontend_Controller_Orders ]
+                    - [ /guest/?.action, FCom_Sales_Frontend_Controller_Guest ]
+
                 observe:
-                    - [ "FCom_Customer_Model_Customer::login:after", "FCom_Sales_Model_Cart::onUserLogin" ]
-                    - [ "FCom_Customer_Model_Customer::logout:before", "FCom_Sales_Model_Cart::onUserLogout" ]
+                    - [ "FCom_Customer_Model_Customer::login:after", "FCom_Sales_Main::onCustomerLogIn" ]
+                    - [ "FCom_Customer_Model_Customer::logout:before", "FCom_Sales_Main::onCustomerLogOut" ]
                     - [ "FCom_Core_Model_Seq::getFirstSeqId", FCom_Sales_Model_Order.onGetFirstSeqId ]
             FCom_Cron:
                 crontab:

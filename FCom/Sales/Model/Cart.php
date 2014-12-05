@@ -32,13 +32,13 @@
  * @property array $data from json_decode data_serialized
  *
  * DI
- * @property FCom_Sales_Model_Cart_Item $FCom_Sales_Model_Cart_Item
- * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
- * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
- * @property FCom_Sales_Model_Cart_Address $FCom_Sales_Model_Cart_Address
+ * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  * @property FCom_Sales_Main $FCom_Sales_Main
- * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
+ * @property FCom_Sales_Model_Cart_Item $FCom_Sales_Model_Cart_Item
+ * @property FCom_Sales_Model_Cart_State $FCom_Sales_Model_Cart_State
  */
 class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 {
@@ -60,6 +60,12 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     ];
 
     protected $_addresses;
+
+    /**
+     * @var FCom_Sales_Model_Cart_State
+     */
+    protected $_state;
+
     public $items;
     public $totals;
 
@@ -74,95 +80,57 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     /**
      * @param bool $createAnonymousIfNeeded
-     * @param bool|FCom_Sales_Model_Cart $reset
      * @return FCom_Sales_Model_Cart
      */
-    public function sessionCart($createAnonymousIfNeeded = false, $reset = false)
+    public function sessionCart($createAnonymousIfNeeded = false)
     {
-        if (!static::$_sessionCart || $reset) {
-            if ($reset instanceof FCom_Sales_Model_Cart) {
-                static::$_sessionCart = $reset;
-            }
-            $customer = $this->FCom_Customer_Model_Customer->sessionUser();
-            //fix bug when guests login and then checkout
-            if ($customer && !$this->BRequest->cookie('cart')) {
-                $cart = $this->loadOrCreate(['customer_id' => $customer->id(), 'state_overall' => 'active']);
-            } else {
-                $cookieToken = $this->BRequest->cookie('cart');
-                if ($cookieToken) {
-                    $cart = $this->loadWhere(['cookie_token' => (string)$cookieToken, 'state_overall' => 'active']);
-                    if (!$cart && !$createAnonymousIfNeeded) {
-                        $this->BResponse->cookie('cart', false);
-                        return false;
-                    }
-                }
-                if (empty($cart)) {
-                    if ($createAnonymousIfNeeded) {
-                        $cookieToken = $this->BUtil->randomString(32);
-                        $cart = $this->create(['cookie_token' => (string)$cookieToken, 'state_overall' => 'active'])->save();
-                        $ttl = $this->BConfig->get('modules/FCom_Sales/cart_cookie_token_ttl_days') * 86400;
-                        $this->BResponse->cookie('cart', $cookieToken, $ttl);
-                    } else {
-                        return false;
-                    }
-                }
-            }
-
-            static::$_sessionCart = $cart;
+        // if there's already session cart, return existing session cart
+        if (static::$_sessionCart) {
+            return static::$_sessionCart;
         }
+
+        // get unique cart token from cookie
+        $cookieToken = $this->BRequest->cookie('cart');
+
+        // get session user
+        $customer = $this->FCom_Customer_Model_Customer->sessionUser();
+
+        // if cookie cart token is set, try to load it
+        if ($cookieToken) {
+            $cart = $this->loadWhere(['cookie_token' => (string)$cookieToken, 'state_overall' => 'active']);
+            $this->resetSessionCart($cart);
+        }
+        if (!$cart && $customer) { // if no cookie cart token and customer is logged in, try to find customer cart
+            $cart = $this->loadWhere(['customer_id' => $customer->id(), 'state_overall' => 'active']);
+            if ($cart) {
+                $this->resetSessionCart($cart);
+            }
+        }
+        if (!$cart && ($customer || $createAnonymousIfNeeded)) {
+            $this->FCom_Sales_Main->workflowAction('customerCreatesNewCart');
+        }
+
         return static::$_sessionCart;
     }
 
     /**
+     * @param FCom_Sales_Model_Cart
      * @return FCom_Sales_Model_Cart
      */
-    public function resetSessionCart()
+    public function resetSessionCart($cart = null)
     {
-        static::$_sessionCart = null;
-        return $this;
-    }
+        static::$_sessionCart = $cart;
 
-    /**
-     * @throws BException
-     */
-    public function onUserLogin()
-    {
-        // load just logged in customer
-        $customer = $this->FCom_Customer_Model_Customer->sessionUser();
-        // something wrong, abort abort!
-        if (!$customer) {
-            return;
+        if ($cart) {
+            // get cookie token ttl from config
+            $ttl = $this->BConfig->get('modules/FCom_Sales/cart_cookie_token_ttl_days') * 86400;
+            // set cookie cart token for found cart
+            $this->BResponse->cookie('cart', $cart->get('cookie_token'), $ttl);
+        } else {
+            $this->BResponse->cookie('cart', false);
         }
-        // get session cart id
-        $sessCart = $this->sessionCart();
-        // try to load customer cart which is new (not abandoned or converted to order)
-        $custCart = $this->FCom_Sales_Model_Cart->loadWhere(['customer_id' => $customer->id(), 'state_overall' => 'active']);
 
-        if ($sessCart && $custCart && $sessCart->id() !== $custCart->id()) {
-
-            // if both current session cart and customer cart exist and they're different carts
-            $custCart->merge($sessCart)->save(); // merge them into customer cart
-            $this->sessionCart(false, $custCart); // and set it as session cart
-
-        } elseif ($sessCart && !$custCart) { // if only session cart exist
-
-            $this->sessionCart()->set('customer_id', $customer->id())->save(); // assign it to customer
-
-        } elseif (!$sessCart && $custCart) { // if only customer cart exist
-
-            $this->sessionCart(false, $custCart); // set it as session cart
-
-        }
-        // clear cookie token
-        $this->BResponse->cookie('cart', false);
-    }
-
-    /**
-     *
-     */
-    public function onUserLogout()
-    {
-        static::$_sessionCart = null;
+        return $cart;
     }
 
     /**
@@ -179,7 +147,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $this->addProduct($item->product_id, ['qty' => $item->qty, 'price' => $item->price]);
         }
         $cart->delete();
-        $this->calculateTotals()->save();
+        $this->calculateTotals()->saveAllDetails();
         return $this;
     }
 
@@ -283,12 +251,12 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     public function findItemToMerge($params)
     {
-        if (!empty($params['pack_separate'])) {
+        if (!empty($params['show_separate'])) {
             return false;
         }
         $items = $this->items();
         foreach ($items as $item) {
-            if ($item->get('pack_separate') || $item->get('product_id') !== $params['product_id']) {
+            if ($item->get('show_separate') || $item->get('product_id') !== $params['product_id']) {
                 continue;
             }
 
@@ -341,11 +309,11 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
         /** @var FCom_Sales_Model_Cart_Item $item */
         $item = null;
-        if (empty($params['pack_separate'])) {
+        if (empty($params['show_separate'])) {
             $where = [
                 'cart_id' => $this->id(),
                 'product_id' => $productId,
-                'pack_separate' => 0,
+                'show_separate' => 0,
             ];
             if (!empty($params['signature'])) {
                 $where['unique_hash'] = $hash;
@@ -356,6 +324,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 $item->set('price', $params['price']);
             }
         }
+        $skuModel = $this->FCom_Catalog_Model_InventorySku->load($params['inventory_id']);
         if (!$item) {
             $item = $this->FCom_Sales_Model_Cart_Item->create([
                 'cart_id' => $this->id(),
@@ -364,7 +333,11 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 'product_sku' => !empty($params['product_sku']) ? $params['product_sku'] : null,
                 'inventory_id' => !empty($params['inventory_id']) ? $params['inventory_id'] : null,
                 'inventory_sku' => !empty($params['inventory_sku']) ? $params['inventory_sku'] : null,
-                'pack_separate' => !empty($params['pack_separate']) ? $params['pack_separate'] : false,
+                'show_separate' => !empty($params['show_separate']) ? $params['show_separate'] : false,
+                'pack_separate' => $skuModel->get('pack_separate'),
+                'shipping_weight' => $skuModel->get('shipping_weight'),
+                'shipping_size' => $skuModel->get('shipping_size'),
+                'cost' => $skuModel->get('unit_cost'),
                 'qty' => $params['qty'],
                 'price' => $params['price'],
                 'unique_hash' => $hash,
@@ -451,7 +424,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if (!$this->totals) {
             $this->totals = [];
             foreach (static::$_totalRowHandlers as $name => $class) {
-                $inst = $class::i(true)->init($this);
+                $inst = $this->BClassRegistry->instance($class)->init($this);
                 $this->totals[$inst->getCode()] = $inst;
             }
             uasort($this->totals, function($a, $b) { return $a->getSortOrder() - $b->getSortOrder(); });
@@ -465,14 +438,12 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function calculateTotals()
     {
         $this->loadProducts();
-        $data = $this->data;
-        $data['totals'] = [];
+        $totals = [];
         foreach ($this->getTotalRowInstances() as $total) {
             $total->init($this)->calculate();
-            $data['totals'][$total->getCode()] = $total->asArray();
+            $totals[$total->getCode()] = $total->asArray();
         }
-        $data['last_calc_at'] = time();
-        $this->data = $data;
+        $this->set('last_calc_at', time())->setData('totals', $totals);
         return $this;
     }
 
@@ -482,9 +453,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function getTotals()
     {
         //TODO: price invalidate
-        if (empty($this->data['totals']) || empty($this->data['last_calc_at'])
-            || $this->data['last_calc_at'] < time() - 86400
-        ) {
+        if (!$this->getData('totals') || !$this->get('last_calc_at') || $this->get('last_calc_at') < time() - 86400) {
             $this->calculateTotals()->save();
         }
 
@@ -497,38 +466,26 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     public function onBeforeSave()
     {
         if (!parent::onBeforeSave()) return false;
-        if (!$this->create_at) {
-            $this->create_at = $this->BDb->now();
-        }
-        if (!$this->customer_id && $this->FCom_Customer_Model_Customer->isLoggedIn()) {
-            $this->customer_id = $this->FCom_Customer_Model_Customer->sessionUserId();
-        }
-        $shippingMethod = $this->getShippingMethod();
 
-        if ($shippingMethod) {
-            $services = $shippingMethod->getDefaultService();
-            $this->shipping_service = key($services);
-        } else {
-            // handle orders with no shipping needed
-            #throw new BException("No shipping methods configured.");
+        $customerId = $this->FCom_Customer_Model_Customer->sessionUserId();
+
+        if (!$this->get('customer_id') && $customerId) {
+            $this->set('customer_id', $customerId);
         }
 
-        if (!$this->payment_method) {
-            $this->payment_method = $this->BConfig->get('modules/FCom_Sales/default_payment_method');
-        }
-
-        $this->update_at = $this->BDb->now();
-        $this->data_serialized = $this->BUtil->toJson($this->data);
         return true;
     }
 
-    /**
-     *
-     */
-    public function onAfterLoad()
+    public function onAfterCreate()
     {
-        parent::onAfterLoad();
-        $this->data = !empty($this->data_serialized) ? $this->BUtil->fromJson($this->data_serialized) : [];
+        parent::onAfterCreate();
+
+        $this->set('same_address', 1);
+        $this->setShippingMethod(true);
+        $this->setPaymentMethod(true);
+        $this->state()->overall()->setActive();
+
+        return $this;
     }
 
     /**
@@ -558,7 +515,10 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             $this->importAddressFromObject($defShipping, 'shipping');
         }
 
-        $this->same_address = $defBilling && $defShipping && $defBilling->id() == $defShipping->id();
+        $this->set([
+            'same_address' => $defBilling && $defShipping && $defBilling->id() == $defShipping->id(),
+            'recalc_shipping_rates' => 1,
+        ]);
 
         return $this;
     }
@@ -606,15 +566,24 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
      *
      * Check if provided code is valid shipping method and apply it
      * @throws BException
-     * @param string $shippingMethod
+     * @param string $method
+     * @param string $service
      * @return $this
      */
-    public function setShippingMethod($shippingMethod)
+    public function setShippingMethod($method, $service = null)
     {
-        if (!in_array($shippingMethod, $this->FCom_Sales_Main->getShippingMethods())) {
-            throw new BException('Invalid shipping method: '. $shippingMethod);
+        $methods = $this->FCom_Sales_Main->getShippingMethods();
+        if (true === $method) {
+            $method = $this->BConfig->get('modules/FCom_Sales/default_shipping_method');
         }
-        $this->set('shipping_method', $shippingMethod);
+        if (empty($methods[$method])) {
+            throw new BException('Invalid shipping method: '. $method);
+        }
+        $services = $methods[$method]->getServices();
+        if (null !== $service && empty($services[$service])) {
+            throw new BException('Invalid shipping service: ' . $service . '(' . $method . ')');
+        }
+        $this->set('shipping_method', $method)->set('shipping_service', $service);
         return $this;
     }
     /**
@@ -637,45 +606,15 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
      * @param string $paymentMethod
      * @return $this
      */
-    public function setPaymentMethod($paymentMethod)
+    public function setPaymentMethod($method)
     {
-        if (!array_key_exists($paymentMethod, $this->FCom_Sales_Main->getPaymentMethods())) {
-            throw new BException('Invalid payment method: ' . $paymentMethod);
+        $methods = $this->FCom_Sales_Main->getPaymentMethods();
+        if (true === $method) {
+            $method = $this->BConfig->get('modules/FCom_Sales/default_payment_method');
+        } elseif (empty($methods[$method])) {
+            throw new BException('Invalid payment method: ' . $method);
         }
-        $this->set('payment_method', $paymentMethod);
-        return $this;
-    }
-
-    public function setStatus($state)
-    {
-        if ($this->get('state_overall') !== $state) {
-            $this->set('state_overall', $state);
-            $this->BEvents->fire(__METHOD__, ['cart' => $this, 'state_overall' => $state]);
-        }
-        return $this;
-    }
-
-    public function setStatusActive()
-    {
-        $this->setStatus('active');
-        return $this;
-    }
-
-    public function setStatusOrdered()
-    {
-        $this->setStatus('ordered');
-        return $this;
-    }
-
-    public function setStatusAbandoned()
-    {
-        $this->setStatus('abandoned');
-        return $this;
-    }
-
-    public function setStatusArchived()
-    {
-        $this->setStatus('archived');
+        $this->set('payment_method', $method);
         return $this;
     }
 
@@ -719,7 +658,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if (!$country) {
             return false;
         }
-        $fields = ['firstname', 'lastname', 'street', 'city'];
+        $fields = ['firstname', 'lastname', 'street1', 'city'];
         if ($this->BLocale->postcodeRequired($country)) {
             $fields[] = 'postcode';
         }
@@ -733,6 +672,59 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
             }
         }
         return true;
+    }
+
+    public function getShippingRates()
+    {
+        $ratesArr = $this->getData('shipping_rates');
+        if (!$ratesArr) {
+            return false;
+        }
+        $result = [];
+        $selMethod = $this->get('shipping_method');
+        $selService = $this->get('shipping_service');
+
+        $allMethods = $this->FCom_Sales_Main->getShippingMethods();
+        foreach ($allMethods as $methodCode => $method) {
+            if (empty($ratesArr[$methodCode])) {
+                continue;
+            }
+            $servicesArr = $ratesArr[$methodCode];
+            if (!empty($servicesArr['error'])) {
+                continue;
+            }
+            $allServices = $method->getServices();
+            $services = [];
+            foreach ($servicesArr as $serviceCode => $serviceRate) {
+                $serviceTitle = $allServices[$serviceCode];
+                $services[$serviceCode] = [
+                    'value' => $methodCode . ':' . $serviceCode,
+                    'title' => $serviceTitle,
+                    'price' => $serviceRate['price'],
+                    'max_days' => $serviceRate['max_days'],
+                    'selected' => $selMethod == $methodCode && $selService == $serviceCode,
+                ];
+            }
+            if ($services) {
+                $result[$methodCode] = [
+                    'title' => $method->getDescription(),
+                    'services' => $services,
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return FCom_Sales_Model_Cart_State
+     */
+    public function state()
+    {
+        if (!$this->_state) {
+            $this->_state = $this->FCom_Sales_Model_Cart_State->factory($this);
+        }
+        return $this->_state;
     }
 
     public function __destruct()

@@ -72,7 +72,7 @@
             });
 
             // handle current variant price and stock data
-            $sku.html(node.variant_sku);
+            $sku.html(node.product_sku);
             $price.html(node.variant_price);
             console.log(node.variant_qty, node);
             $('.f-stock-notice.f-in-stock').prop('hidden', node.variant_qty == 0);

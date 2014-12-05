@@ -9,7 +9,7 @@
         <p>{{ "Your order has successfully been submitted." |_ }}
             <br/>
             {{ "Your order number is" |_ }} #
-            {% if THIS.get('user') %}<a href="{{ APP.href('customer/order/view') ~ '?id=' ~ order.id() }}">{% endif %}
+            {% if THIS.get('user') %}<a href="{{ APP.href('orders/view') ~ '?id=' ~ order.id() }}">{% endif %}
             {{ order.unique_id }}
             {% if THIS.get('user') %}</a>{% endif %}. Please note for your record.
         </p>
@@ -69,7 +69,7 @@
             </div>
             <div class="col-xs-6">
                 <p><strong>{{ "Subtotal" | _ }}:</strong> {{ order.get('subtotal')| currency }} </p>
-                <p><strong>{{ "Tax" | _ }}:</strong>{{ order.get('tax') }}</p>
-                <p><strong>{{ "Grand Total" | _ }}:</strong> {{ order.get('grandtotal')| currency }} </p>
+                <p><strong>{{ "Tax" | _ }}:</strong>{{ order.get('tax_amount') }}</p>
+                <p><strong>{{ "Grand Total" | _ }}:</strong> {{ order.get('grand_total')| currency }} </p>
             </div>
         </div>

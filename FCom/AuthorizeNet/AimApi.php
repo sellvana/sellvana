@@ -114,7 +114,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
         if ($order->billing_company) {
             $api->company = $order->billing_company;
         }
-        $api->address = $order->get('billing_street');
+        $api->address = $order->get('billing_street1');
         if ($order->billing_city) {
             $api->city = $order->billing_city;
         }

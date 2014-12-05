@@ -4,7 +4,11 @@ trait FCom_Sales_Model_Trait_Order
 {
     protected $_order;
 
-    public function order($order = null)
+    /**
+     * @param FCom_Sales_Model_Order $order
+     * @return FCom_Sales_Model_Order
+     */
+    public function order(FCom_Sales_Model_Order $order = null)
     {
         if (!empty($order)) {
             $this->_order = $order;

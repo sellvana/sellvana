@@ -81,7 +81,7 @@ class FCom_PaymentIdeal_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
             'online'           => 1,
         ];
 
-        $paymentModel = $this->FCom_Sales_Model_Order_Payment->addNew($paymentData);
+        $paymentModel = $this->FCom_Sales_Model_Order_Payment->create($paymentData)->save();
         $paymentModel->setData('response', $this->getPublicData());
         $paymentModel->save();
     }

@@ -19,19 +19,46 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
         if (!parent::beforeDispatch()) {
             return false;
         }
-        $this->_cart = $this->FCom_Sales_Model_Cart->sessionCart();
-        if (!$this->_cart || !$this->_cart->itemQty()) {
-            $this->BResponse->redirect('cart');
-            return false;
+        if ($this->_action !== 'success') {
+            $this->_cart = $this->FCom_Sales_Model_Cart->sessionCart();
+            if (!$this->_cart || !$this->_cart->itemQty()) {
+                $this->BResponse->redirect('cart');
+                return false;
+            }
         }
         return true;
     }
 
     public function action_index()
     {
-        $c = $this->_cart;
-        $step = !$c->isShippable() ? 2 : ($c->hasCompleteAddress('shipping') && $c->hasShippingMethod() ? 2 : 1);
-        $this->forward('step' . $step);
+        $this->FCom_Sales_Main->workflowAction('customerStartsCheckout');
+
+        if ($this->_cart->hasCompleteAddress('shipping')) {
+            $this->forward('step2');
+        } else {
+            $this->forward('step1');
+        }
+    }
+
+    public function action_index__POST()
+    {
+        switch ((int)$this->BRequest->post('checkout_step')) {
+            case 1:
+                $this->forward('step1');
+
+                break;
+            case 2:
+                $this->forward('step2');
+                break;
+
+            default:
+                $this->BResponse->redirect('checkout');
+        }
+    }
+
+    public function action_login()
+    {
+        $this->layout('/checkout-simple/login');
     }
 
     public function action_step1()
@@ -48,6 +75,10 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
             $this->FCom_Sales_Main->workflowAction('customerChoosesGuestCheckout', $args);
         }
         $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingAddress', $args);
+
+        $args['cart']->calculateTotals()->saveAllDetails();
+
+        $this->BResponse->redirect('checkout');
     }
 
     public function action_step2()
@@ -60,15 +91,40 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
         $post = $this->BRequest->post();
         $result = [];
         $args = ['post' => $post, 'cart' => $this->_cart, 'result' => &$result];
-        if (!empty($post['billing'])) {
+        if (!empty($post['same_address'])) {
             $this->FCom_Sales_Main->workflowAction('customerUpdatesBillingAddress', $args);
         }
         $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingMethod', $args);
         $this->FCom_Sales_Main->workflowAction('customerUpdatesPaymentMethod', $args);
+
+        $args['cart']->calculateTotals()->saveAllDetails();
+
+        $this->FCom_Sales_Main->workflowAction('customerPlacesOrder', $args);
+
+        if (!empty($result['redirect_to'])) {
+            $href = $result['redirect_to'];
+        } elseif (!empty($result['success'])) {
+            $href = 'checkout/success';
+        } else {
+            $href = 'checkout';
+        }
+        $this->BResponse->redirect($href);
     }
 
     public function action_success()
     {
+        $orderId = $this->BSession->get('last_order_id');
+        if (!$orderId) {
+            $this->BResponse->redirect('');
+            return;
+        }
+        $order = $this->FCom_Sales_Model_Order->load($orderId);
+        $custHlp = $this->FCom_Customer_Model_Customer;
+        $this->view('checkout-simple/success')->set([
+            'order' => $order,
+            'email_customer' => $custHlp->load($order->get('customer_email'), 'email'),
+            'sess_customer' => $custHlp->sessionUser(),
+        ]);
         $this->layout('/checkout-simple/success');
     }
 
@@ -76,6 +132,7 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
     {
         if (!$this->BRequest->xhr()) {
             $this->BResponse->redirect('checkout');
+            return;
         }
 
         $result = [];
@@ -87,6 +144,7 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
     {
         if (!$this->BRequest->xhr()) {
             $this->BResponse->redirect('checkout');
+            return;
         }
 
         $result = [];
@@ -98,6 +156,7 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
     {
         if (!$this->BRequest->xhr()) {
             $this->BResponse->redirect('checkout');
+            return;
         }
 
         $result = [];

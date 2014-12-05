@@ -39,7 +39,9 @@ class FCom_Sales_Main extends BClass
      */
     public function addPaymentMethod($name, $class = null)
     {
-        if (is_null($class)) $class = $name;
+        if (is_null($class)) {
+            $class = $name;
+        }
         $this->_registry['payment_method'][$name] = $class;
         return $this;
     }
@@ -51,7 +53,9 @@ class FCom_Sales_Main extends BClass
      */
     public function addCheckoutMethod($name, $class = null)
     {
-        if (is_null($class)) $class = $name;
+        if (is_null($class)) {
+            $class = $name;
+        }
         $this->_registry['checkout_method'][$name] = $class;
         return $this;
     }
@@ -63,7 +67,9 @@ class FCom_Sales_Main extends BClass
      */
     public function addShippingMethod($name, $class = null)
     {
-        if (is_null($class)) $class = $name;
+        if (is_null($class)) {
+            $class = $name;
+        }
         $this->_registry['shipping_method'][$name] = $class;
         return $this;
     }
@@ -75,7 +81,9 @@ class FCom_Sales_Main extends BClass
      */
     public function addDiscountMethod($name, $class = null)
     {
-        if (is_null($class)) $class = $name;
+        if (is_null($class)) {
+            $class = $name;
+        }
         $this->_registry['discount_method'][$name] = $class;
         return $this;
     }
@@ -143,6 +151,35 @@ class FCom_Sales_Main extends BClass
         return $this->_getHeap('discount_method');
     }
 
+    public function getAllSelectedShippingServices()
+    {
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        $estimates = $cart->getData('shipping_estimates');
+
+        $services = [];
+        foreach ($this->getShippingMethods() as $mKey => $method) {
+            if (!$method->getConfig('enabled')) {
+                continue;
+            }
+            foreach ($method->getServicesSelected() as $sKey => $sLabel) {
+                $services[$mKey]['services'][$sKey]['value'] = $mKey . ':' . $sKey;
+                $services[$mKey]['services'][$sKey]['label'] = $sLabel;
+                if ($estimates && !empty($estimates[$mKey][$sKey])) {
+                    $services[$mKey]['services'][$sKey]['estimate'] = $estimates[$mKey][$sKey];
+                }
+                //var_dump($mKey, $sKey, $cart->get('shipping_method'), $cart->get('shipping_service'), '<hr>');
+                if ($cart && $cart->get('shipping_method') == $mKey && $cart->get('shipping_service') == $sKey) {
+                    $services[$mKey]['services'][$sKey]['selected'] = true;
+                }
+            }
+            if (!empty($services[$mKey]['services'])) {
+                $services[$mKey]['name'] = $method->getName();
+                $services[$mKey]['description'] = $method->getDescription();
+            }
+        }
+        return $services;
+    }
+
 
     /**
      * @param $args
@@ -194,28 +231,14 @@ class FCom_Sales_Main extends BClass
         return $this->BEvents->fire('FCom_Sales_Workflow::' . $actionName, $args);
     }
 
-    /**
-     * Init cart after all modules are registered
-     *
-     * @todo deprecated?
-     */
-    public function initCartTotals()
+    public function onCustomerLogIn($args)
     {
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart(true);
-        if (false == $cart->items()) {
-            return;
-        }
-        $this->FCom_Sales_Model_Cart->addTotalRow('subtotal', ['callback' => 'FCom_Sales_Model_Cart.subtotalCallback',
-            'label' => 'Subtotal', 'after' => '']);
-        if ($cart->shipping_method) {
-            $shippingClass = $this->FCom_Sales_Main->getShippingMethodClassName($cart->shipping_method);
-            $this->FCom_Sales_Model_Cart->addTotalRow('shipping', ['callback' => $shippingClass . '.getRateCallback',
-                'label' => 'Shipping', 'after' => 'subtotal']);
-        }
-        if ($cart->coupon_code) {
-            $this->FCom_Sales_Model_Cart->addTotalRow('discount', ['callback' => 'FCom_Sales_Model_Cart.discountCallback',
-                'label' => 'Discount', 'after' => 'shipping']);
-        }
+        $this->workflowAction('customerLogsIn', $args);
+    }
+
+    public function onCustomerLogOut($args)
+    {
+        $this->workflowAction('customerLogsOut', $args);
     }
 }
 

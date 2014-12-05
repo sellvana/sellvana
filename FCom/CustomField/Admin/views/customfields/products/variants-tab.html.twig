@@ -378,7 +378,7 @@ require(['backbone', 'underscore', 'jquery', 'select2', 'jquery-ui', 'jquery.val
                 var self = this;
                 var col = $(this).attr('data-col');
                 switch (col) {
-                    case 'variant_sku':case 'variant_price':case 'variant_qty':
+                    case 'product_sku':case 'inventory_sku':case 'variant_price':case 'variant_qty':
                         row[col] = $(this).find('input').val();
                         break;
                     case 'image':

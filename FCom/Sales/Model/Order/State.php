@@ -23,7 +23,7 @@ class FCom_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Contex
     ];
 
     /**
-     * @return mixed
+     * @return FCom_Sales_Model_Order_State_Overall
      * @throws BException
      */
     public function overall()
@@ -32,7 +32,7 @@ class FCom_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Contex
     }
 
     /**
-     * @return mixed
+     * @return FCom_Sales_Model_Order_State_Delivery
      * @throws BException
      */
     public function delivery()
@@ -41,7 +41,7 @@ class FCom_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Contex
     }
 
     /**
-     * @return mixed
+     * @return FCom_Sales_Model_Order_State_Payment
      * @throws BException
      */
     public function payment()
@@ -49,13 +49,17 @@ class FCom_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Contex
         return $this->_getStateObject('payment');
     }
 
+    /**
+     * @return FCom_Sales_Model_Order_State_Comment
+     * @throws BException
+     */
     public function comment()
     {
         return $this->_getStateObject('comment');
     }
 
     /**
-     * @return mixed
+     * @return FCom_Sales_Model_Order_State_Custom
      * @throws BException
      */
     public function custom()

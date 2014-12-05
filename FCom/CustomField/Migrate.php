@@ -354,4 +354,20 @@ class FCom_CustomField_Migrate extends BClass
         ]);
     }
 
+    public function upgrade__0_2_2__0_2_3()
+    {
+        $tProdVariant = $this->FCom_CustomField_Model_ProductVariant->table();
+        $this->BDb->ddlTableDef($tProdVariant, [
+            BDb::COLUMNS => [
+                'variant_sku' => 'RENAME inventory_sku varchar(50)',
+                'product_sku' => 'varchar(50)',
+            ],
+            BDb::KEYS => [
+                'IDX_sku' => BDb::DROP,
+                'IDX_inventory_sku' => '(inventory_sku)',
+                'IDX_product_sku' => '(product_sku)',
+            ],
+        ]);
+        $this->BDb->run("UPDATE {$tProdVariant} SET product_sku=inventory_sku");
+    }
 }

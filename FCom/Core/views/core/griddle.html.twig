@@ -1,0 +1,12 @@
+{% set config = THIS.getGridConfig() %}
+
+{#{{ dump(config) }}#}
+
+<div class="fcom-htmlgrid responsive-table f-grid-wrapper" id="{{ config.id }}" style="min-height:520px;">
+</div>
+
+<script type="text/javascript">
+require(['react', 'jsx!fcom.griddle'], function(React, $, Griddle, Backbone) {
+    new FCom.Griddle({{ UTIL.toJson(config) | raw }});
+});
+</script>

@@ -6,13 +6,15 @@
  * @property int $id
  * @property int $product_id
  * @property string $field_values (field1=value1&field2=value2&field3=value3)
- * @property string $variant_sku (PROD_VAL1_VAL2_VAL3)
+ * @property string $product_sku (PROD_VAL1_VAL2_VAL3)
+ * @property string $inventory_sku (PROD_VAL1_VAL2_VAL3)
  * @property float $variant_price
  * @property string $data_serialized
  * @property int $variant_qty
  *
  * DI
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
  * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
  * @property FCom_CustomField_Model_ProductVarfield $FCom_CustomField_Model_ProductVarfield
  * @property FCom_CustomField_Model_ProductVariant $FCom_CustomField_Model_ProductVariant
@@ -53,6 +55,15 @@ class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
         /** @var FCom_CustomField_Model_ProductVarfield[] $varModels */
         $varModels = $this->orm()->where('product_id', $pId)->find_many_assoc();
 
+        $invSkus = [$product->get('inventory_sku')];
+        foreach ($varModels as $vm) {
+            if ($vm->get('inventory_sku')) {
+                $invSkus[] = $vm->get('inventory_sku');
+            }
+        }
+        array_unique($invSkus);
+        $invModels = $this->FCom_Catalog_Model_InventorySku->orm()->where_in('inventory_sku', $invSkus)->find_many_assoc('inventory_sku');
+
         $varImageHlp = $this->FCom_CustomField_Model_ProductVariantImage;
         $varImageModels = $varImageHlp->orm()->where('product_id', $pId)->find_many();
         $images = [];
@@ -72,9 +83,11 @@ class FCom_CustomField_Model_ProductVariant extends FCom_Core_Model_Abstract
             unset($vr['data_serialized']);
             $vr['field_values'] = $this->BUtil->fromJson($vr['field_values']);
             $vr['img_ids'] = !empty($images[$vr['id']]) ? $images[$vr['id']] : [];
-            $vr['variant_sku'] = ($vr['variant_sku'] === '') ? $product->get('product_sku') : $vr['variant_sku'];
+            $vr['product_sku'] = ($vr['product_sku'] === '') ? $product->get('product_sku') : $vr['product_sku'];
+            $vr['inventory_sku'] = ($vr['inventory_sku'] === '') ? $product->get('inventory_sku') : $vr['inventory_sku'];
             $price = ($vr['variant_price'] > 0) ? $vr['variant_price'] : $product->get('base_price');
             $vr['variant_price'] = $this->BLocale->currency($price);
+            $vr['variant_qty'] = !empty($invModels[$vr['inventory_sku']]) ? $invModels[$vr['inventory_sku']]->get('qty_in_stock') : 0;
             $vrKeyArr = [];
             foreach ($fields as $f) {
                 $k = $f['field_code'];

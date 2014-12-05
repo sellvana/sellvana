@@ -6,6 +6,7 @@
  * @property FCom_Wishlist_Model_Wishlist $FCom_Wishlist_Model_Wishlist
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
  */
 class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
@@ -58,9 +59,22 @@ class FCom_Wishlist_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             }
             $this->BResponse->json($result);
         } else {
-            if (!empty($post['remove'])) {
-                foreach ($post['remove'] as $id) {
-                    $wishlist->removeItem($id);
+            if (!empty($post['selected'])) {
+                switch ($post['do']) {
+                    case 'add_to_cart':
+                        foreach ($post['selected'] as $id) {
+                            $wishlist->moveItemToCart($id);
+                            $wishlist->removeItem($id);
+                        }
+                        $this->FCom_Sales_Model_Cart->sessionCart()->calculateTotals()->saveAllDetails();
+                        break;
+
+                    case 'remove':
+                        foreach ($post['selected'] as $id) {
+                            $wishlist->moveItemToCart($id);
+                            $wishlist->removeItem($id);
+                        }
+                        break;
                 }
             }
             $this->BResponse->redirect($wishlistHref);

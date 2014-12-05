@@ -4,6 +4,7 @@
  * Class FCom_Sales_Model_Order_Cancel
  *
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Sales_Model_Order_Cancel_State $FCom_Sales_Model_Order_Cancel_State
  * @property FCom_Sales_Model_Order_History $FCom_Sales_Model_Order_History
  */
 
@@ -19,7 +20,7 @@ class FCom_Sales_Model_Order_Cancel extends FCom_Core_Model_Abstract
     public function state()
     {
         if (!$this->_state) {
-            $this->_state = $this->BClassRegistry->instance('FCom_Sales_Model_Order_Cancel_State', true, [$this]);
+            $this->_state = $this->FCom_Sales_Model_Order_Cancel_State->factory($this);
         }
         return $this->_state;
     }

@@ -12,16 +12,21 @@ checkout/base:
 
 
 /checkout-simple/step1:
-  - { include: checkout/base }
-  - { hook: main, views: checkout-simple/step1 }
+    - { include: checkout/base }
+    - { hook: main, views: checkout-simple/step1 }
+
+/checkout-simple/login:
+    - { include: checkout/base }
+    - { hook: main, views: customer/login }
+    - { view: customer/login, set: { redirect_to: checkout } }
 
 /checkout-simple/step2:
-  - { include: checkout/base }
-  - { hook: main, views: checkout-simple/step2 }
+    - { include: checkout/base }
+    - { hook: main, views: checkout-simple/step2 }
 
 /checkout-simple/success:
-  - { include: checkout/base }
-  - { hook: main, views: checkout-simple/success }
+    - { include: base }
+    - { hook: main, views: checkout-simple/success }
 
 
 

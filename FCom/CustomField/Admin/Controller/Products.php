@@ -158,8 +158,10 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
 #var_dump($columns); exit;
         }
         $image = $this->variantImageGrid($model);
-        $columns[] = ['type' => 'input', 'name' => 'variant_sku', 'label' => 'SKU', 'width' => 150, 'editable' => 'inline',
-                        'addable' => true, 'default' => ''];
+        $columns[] = ['type' => 'input', 'name' => 'product_sku', 'label' => 'Variant SKU', 'width' => 150, 'editable' => 'inline',
+            'addable' => true, 'default' => ''];
+        $columns[] = ['type' => 'input', 'name' => 'inventory_sku', 'label' => 'Inventory SKU', 'width' => 150, 'editable' => 'inline',
+            'addable' => true, 'default' => ''];
         $columns[] = ['type' => 'input', 'name' => 'variant_price', 'label' => 'PRICE', 'width' => 150, 'editable' => 'inline',
                         'addable' => true, 'validation' => ['number' => true], 'default' => ''];
         $columns[] = ['type' => 'input', 'name' => 'variant_qty', 'label' => 'QTY', 'width' => 150, 'editable' => 'inline',
@@ -187,7 +189,8 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
                 }
                 $vField = [];
                 $vField['field_values'] = $this->BUtil->fromJson($v->field_values);
-                $vField['variant_sku'] = $v->variant_sku;
+                $vField['product_sku'] = $v->product_sku;
+                $vField['inventory_sku'] = $v->inventory_sku;
                 $vField['variant_qty'] = $v->variant_qty;
                 $vField['variant_price'] = $v->variant_price;
                 $vField['variant_file_id'] = join(',', $fileIds);

@@ -64,7 +64,7 @@ Using custom id/name:
                 {{ p.autocomplete ? 'autocomplete="' ~ p.autocomplete ~ '"' }}
                 {{ p.readonly ? 'readonly' }}
                 {{ p.required ? 'data-rule-required="true"' }}
-                {{ p.attr | raw }}
+                {{ view.attributes(p.attr) | raw }}
             />
             {% if p.help_block_text %}
             {{ forms.help_block(p) }}
@@ -87,10 +87,10 @@ Using custom id/name:
                 style="{{ p.style }}"
                 {{ p.readonly ? 'readonly' }}
                 {{ p.required ? 'data-rule-required="true"' }}
-                {{ p.attr | raw }}
+                {{ view.attributes(p.attr) | raw }}
                 {{ p.multiple ? 'multiple'}}
             >
-                {{ UTIL.optionsHtml(p.options, view.getInputValue(p)) | raw }}
+                {{ UTIL.optionsHtml(p.options, view.getInputValue(p)|default(p.default)) | raw }}
             </select>
         </div>
     </div>
@@ -155,14 +155,14 @@ Using custom id/name:
                 class="form-control ckeditor js-desc-wysiwyg {{ p.input_class }}"
                 id="{{ view.getInputId(p) }}"
                 name="{{ view.getInputName(p) }}"
-                {{ p.attr_wysiwyg | raw }}
+                {{ view.attributes(p.attr_wysiwyg) | raw }}
             >{{ p.raw ? value|raw : value }}</textarea>
             <textarea
                 class="form-control js-desc-wysiwyg"
                 id="{{ view.getInputId(p) }}-validation"
                 style="display:none;"
                 {{ p.required ? 'data-rule-required="true"' }}
-                {{ p.attr | raw }}
+                {{ view.attributes(p.attr) | raw }}
             >{{ p.raw ? value|raw : value }}</textarea>
         </div>
     </div>
@@ -217,7 +217,7 @@ Using custom id/name:
                         <input class="model_image_url" type="hidden" name="model[{{ p.field }}]" value="{{ value }}"/>
                     </span>
                     <span class='btn btn-primary fileinput-button {{ configId }}_btn_remove_image'
-                          style='display: {% if value %} block; {% else %} none; {% endif %}'>
+                          style='display: {{ value ? 'block' : 'none' }}'>
                         × {{ 'Remove Image...'|_ }}
                     </span>
                         </div>
@@ -250,7 +250,7 @@ Using custom id/name:
                 class="form-control {{ p.input_class }}"
                 alt="{{ view.getInputId(p) }}"
                 style="{{ p.style }}"
-                {{ p.attr | raw }}
+                {{ view.attributes(p.attr) | raw }}
             />
         </div>
     </div>
@@ -271,7 +271,7 @@ Using custom id/name:
                 value="{{ view.getInputValue(p) }}"
                 {{ p.readonly ? 'readonly' }}
                 {{ p.required ? 'data-rule-required="true"' }}
-                {{ p.attr | raw }}
+                {{ view.attributes(p.attr) | raw }}
             />
         </div>
     </div>
@@ -295,7 +295,7 @@ Using custom id/name:
                     value="{{ cb }}"
                     {{ p.readonly ? 'readonly' }}
                     {{ p.required ? 'data-rule-required="true"' }}
-                    {{ p.attr | raw }}
+                    {{ view.attributes(p.attr) | raw }}
                     {{ p.value == cb? "checked": "" }}
                 />{{ cb|capitalize }}
                 </label>
@@ -323,12 +323,34 @@ Using custom id/name:
                     value="{{ cb }}"
                     {{ p.readonly ? 'readonly' }}
                     {{ p.required ? 'data-rule-required="true"' }}
-                    {{ p.attr | raw }}
+                    {{ view.attributes(p.attr) | raw }}
                     {{ p.value == cb? "checked": "" }}
                 />{{ cb|capitalize }}
                 </label>
             </div>
         {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro button(p1, p2) %}
+    {% set view = LAYOUT.view('core/form-elements') %}
+    {% set p = view.merge(p1, p2) %}
+    {% import _self as forms %}
+    <div class="form-group {{ p.form_group_class }}">
+        {{ forms.label(p) }}
+        <div class="{{ p.input_div_class|default('col-md-5') }}">
+            <button type="{{ p.type|default('submit') }}"
+                   id="{{ view.getInputId(p) }}"
+                   name="{{ view.getInputName(p) }}"
+                   class="btn {{ p.button_class }}
+                   style="{{ p.style }}"
+                   value="{{ view.getInputValue(p) }}"
+                    {{ view.attributes(p.attr) | raw }}
+                    >{{ p.text }}</button>
+            {% if p.help_block_text %}
+                {{ forms.help_block(p) }}
+            {% endif %}
         </div>
     </div>
 {% endmacro %}

@@ -2,6 +2,13 @@
 {% set orderItems = order.items %}
 {% set addresses = order.addresses %}
 
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set mergeFieldData = { id_prefix:'merge', name_prefix:'merge' } %}
+{% set sessCustomer = APP.instance('FCom_Customer_Model_Customer').sessionUser() %}
+{% if not sessCustomer %}
+    {% set emailCustomer = APP.instance('FCom_Customer_Model_Customer').load(order.get('customer_email'), 'email') %}
+{% endif %}
+
         <div class="row f-mb-slideout-menu">
             <div class="col-sm-9 f-col-main">
                 <header class="f-page-header">
@@ -25,7 +32,7 @@
                             {% for item in orderItems %}
                                 <tr>
                                     <td>{{ item.get('id') }}</td>
-                                    <td>{{ THIS.view('customer/order/item').set('product', UTIL.fromJson(item.get('product_info'))) | raw}} </td>
+                                    <td>{{ THIS.view('orders/item').set('product', UTIL.fromJson(item.get('product_info'))) | raw}} </td>
                                     <td>{{ item.get('qty') }} </td>
                                     <td>{{ item.get('total') }} </td>
                                 </tr>
@@ -82,12 +89,47 @@
                           </thead>
                         <tr>
                             <td>{{ order.get('subtotal') }} </td>
-                            <td>{{ order.get('balance') }} </td>
-                            <td>{{ order.get('grandtotal') }} </td>
+                            <td>{{ order.get('grand_total') }} </td>
+                            <td>{{ order.get('amount_due') }} </td>
                         </tr>
                     </table>
                 </div>
 
+<!-- START: Merging order into account -->
+{% if not sessCustomer %}
+    {% if emailCustomer %}
+
+        <form method="post" role="form" action="{{ APP.href('guest/merge_order') }}" class="form-horizontal">
+            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+            <fieldset>
+                {{ forms.button(mergeFieldData, { text: 'Login to merge this order' }) }}
+            </fieldset>
+        </form>
+
+    {% else %}
+
+        <form method="post" role="form" action="{{ APP.href('guest/create_account') }}" class="form-horizontal">
+            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+            <fieldset>
+                {{ forms.input(mergeFieldData, { type:'password', field:'password', attr: { required: true } }) }}
+                {{ forms.button(mergeFieldData, { label:' ', text:'Create a new account' }) }}
+            </fieldset>
+        </form>
+
+    {% endif %}
+{% else %}
+    {% if sessCustomer.id() != order.get('customer_id') %}
+
+        <form method="post" role="form" action="{{ APP.href('guest/merge_order') }}" class="form-horizontal">
+            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+            <fieldset>
+                {{ forms.button(mergeFieldData, { text: 'Merge with this account' }) }}
+            </fieldset>
+        </form>
+
+    {% endif %}
+{% endif %}
+<!-- END: Merging order into account -->
 
             </div>
             {{ THIS.view('customer/account/sidebar').set('current', 'orders') | raw }}

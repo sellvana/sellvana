@@ -44,7 +44,7 @@
               <input type="text" name="city" id="address-city" value="{{ validator.fieldValue('city') }}" class="required{{ ' ' ~ validator.fieldClass('city') }} form-control">
                 {{ validator.errorHtml("city", "address-city") | raw }}
             </div>
-              {{ THIS.view('geo/embed') | raw }}
+              {{ THIS.view('core/geo-embed') | raw }}
             <script>
               require(['jquery'], function($) {
                 $(function() {

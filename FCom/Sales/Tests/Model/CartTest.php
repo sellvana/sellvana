@@ -114,7 +114,7 @@ class FCom_Sales_Tests_Model_CartTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(2, count($cart->items()), "Items count is not correct");
 
         $reset = $this->FCom_Sales_Model_Cart->load(2);
-        $cart = $this->FCom_Sales_Model_Cart->sessionCart(false, $reset);
+        $cart = $this->FCom_Sales_Model_Cart->resetSessionCart($reset);
         $this->assertEquals(1, count($cart->items()), "Reset failed");
         $this->assertEquals(2, $cart->id(), "Reset failed");
     }

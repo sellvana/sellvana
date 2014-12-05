@@ -330,6 +330,10 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             }
             $userId = $sessData['customer_id'];
             $user = static::$_sessionUser = $this->load($userId);
+            if (!$user) {
+                $sessData['customer_id'] = null;
+                return false;
+            }
             $token = $user->get('password_session_token');
             if (!$token) {
                 $token = $this->BUtil->randomString(16);
@@ -646,7 +650,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
             if ($orders) {
                 $cntOrders = count($orders);
                 foreach ($orders as $order) {
-                    $statistics['lifetime'] += $order->grandtotal;
+                    $statistics['lifetime'] += $order->grand_total;
                 }
                 $statistics['avg'] = $statistics['lifetime'] / $cntOrders;
             }
