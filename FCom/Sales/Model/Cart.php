@@ -60,6 +60,12 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     ];
 
     protected $_addresses;
+
+    /**
+     * @var FCom_Sales_Model_Cart_State
+     */
+    protected $_state;
+
     public $items;
     public $totals;
 
@@ -91,29 +97,17 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
         // if cookie cart token is set, try to load it
         if ($cookieToken) {
-
-            static::$_sessionCart = $this->loadWhere(['cookie_token' => (string)$cookieToken, 'state_overall' => 'active']);
-
-            // if a cart with this token is not found and no need to create a new one, remove cookie cart token and return
-            if (!static::$_sessionCart) {
-                if ($createAnonymousIfNeeded) {
-                    $this->FCom_Sales_Main->workflowAction('customerCreatesNewCart');
-                } else {
-                    $this->resetSessionCart();
-                    return false;
-                }
-            }
-
-        } elseif ($customer) { // if no cookie cart token and customer is logged in, try to find customer cart
-
+            $cart = $this->loadWhere(['cookie_token' => (string)$cookieToken, 'state_overall' => 'active']);
+            $this->resetSessionCart($cart);
+        }
+        if (!$cart && $customer) { // if no cookie cart token and customer is logged in, try to find customer cart
             $cart = $this->loadWhere(['customer_id' => $customer->id(), 'state_overall' => 'active']);
-
-            if (static::$_sessionCart) {
+            if ($cart) {
                 $this->resetSessionCart($cart);
-            } else {
-                // create new cart
-                $this->FCom_Sales_Main->workflowAction('customerCreatesNewCart');
             }
+        }
+        if (!$cart && ($customer || $createAnonymousIfNeeded)) {
+            $this->FCom_Sales_Main->workflowAction('customerCreatesNewCart');
         }
 
         return static::$_sessionCart;
@@ -123,7 +117,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
      * @param FCom_Sales_Model_Cart
      * @return FCom_Sales_Model_Cart
      */
-    public function resetSessionCart(FCom_Sales_Model_Cart $cart = null)
+    public function resetSessionCart($cart = null)
     {
         static::$_sessionCart = $cart;
 
