@@ -3709,3 +3709,11 @@ body.error .error-container-footer a {
     margin-top: 0;
     margin-bottom: 0;
 }
+.buttondropdown-backdrop {
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 990;
+}

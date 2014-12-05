@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
-define(['react', 'jquery', 'jsx!griddle', 'backbone', 'underscore', 'bootstrap'],
-function(React, $, Griddle, Backbone) {
+define(['react', 'jquery', 'jsx!griddle', 'backbone', 'underscore', 'bootstrap', 'jsx!fcom.components'],
+function(React, $, Griddle, Backbone, Components) {
 
     /**
      *
@@ -114,8 +114,8 @@ function(React, $, Griddle, Backbone) {
 
                 first = <li className="first"><a href="#" className="js-change-url" onClick={this.pageFirst}>«</a></li>;
                 previous = <li className="prev"><a href="#" className="js-change-url" onClick={this.pagePrevious}>‹</a></li>;
-                next = <li className="next"><a class="js-change-url" href="#" onClick={this.pageNext}>›</a></li>;
-                last = <li class="last"><a class="js-change-url" href="#" onClick={this.pageLast}>{this.props.maxPage} »</a></li>;
+                next = <li className="next"><a className="js-change-url" href="#" onClick={this.pageNext}>›</a></li>;
+                last = <li className="last"><a className="js-change-url" href="#" onClick={this.pageLast}>{this.props.maxPage} »</a></li>;
 
                 var options = [];
 
@@ -127,7 +127,7 @@ function(React, $, Griddle, Backbone) {
 
                 for (var i = startIndex; i < endIndex ; i++){
                     var selected = this.props.currentPage == i ? "page active" : "page";
-                    options.push(<li className={selected}><a href="#" data-value={i} onClick={this.pageChange} class="js-change-url">{i + 1}</a></li>);
+                    options.push(<li className={selected}><a href="#" data-value={i} onClick={this.pageChange} className="js-change-url">{i + 1}</a></li>);
                 }
 
                 var pageSizeHtml = [];
@@ -187,11 +187,17 @@ function(React, $, Griddle, Backbone) {
                         // Example filters, remove later
                         {
                             "column": "title",
-                            "display": "Title"
+                            "display": "Title",
+                            "defaultCheck": "checked",
+                            "defaultValue": "",
+                            "defaultOperator": ""
                         },
                         {
                             "column": "name",
-                            "display": "Name"
+                            "display": "Name",
+                            "defaultCheck": "checked",
+                            "defaultValue": "",
+                            "defaultOperator": ""
                         }
                     ]
                 }
@@ -206,14 +212,14 @@ function(React, $, Griddle, Backbone) {
                 var parent = $(selected).parent();
 
                 if (!$(parent).hasClass('open')) {
-                    $('<div class="dropdown-backdrop"/>').insertAfter($(selected)).on('click', this.clearMenus);
+                    if ($('.buttondropdown-backdrop').length == 0) {
+                        $(parent).append($('<div class="buttondropdown-backdrop"/>').on('click', this.clearMenus));
+                    }
                 }
 
                 $(parent).toggleClass('open').trigger('shown.bs.dropdown');
             },
             clearMenus: function() {
-                $('.dropdown-backdrop').remove()
-
                 $('.dropdown-toggle').each(function (e) {
                     var parent = $(this).parent();
                     if (!$(parent).hasClass('open')) {
@@ -224,16 +230,42 @@ function(React, $, Griddle, Backbone) {
                     if (e.isDefaultPrevented()) {
                         return;
                     }
+
                     $(parent).removeClass('open').trigger('hidden.bs.dropdown');
+                    $(parent).find('.buttondropdown-backdrop').remove();
                 })
+            },
+            updateFilter: function(event) {
+                var target = event.target;
+                $(target).parents('.f-grid-filter').addClass('f-grid-filter-val');
+
+                var caption = $(target).parents('.f-grid-filter').find('.selected-operator').html() + ' "' +
+                    $(target).parents('.f-grid-filter').find('.selected-value').val() + '"';
+
+                $(target).parents('.f-grid-filter').find('.filter-text-main .f-grid-filter-value').html(caption);
+                $(target).parents('.f-grid-filter').removeClass('open').trigger('hidden.bs.dropdown');
+                $('.buttondropdown-backdrop').remove();
+            },
+            toggleFilter: function(event) {
+                var target = event.target;
+                var dataId = $(target).attr('data-id');
+
+                $('#' + dataId).toggleClass('hide');
+            },
+            selectOperator: function(event) {
+                event.preventDefault();
+
+                var target = event.target;
+                $(target).parents('.operator-dropdown').find('.selected-operator').html($(target).text());
+                $(target).parents('.operator-dropdown').removeClass('open').trigger('hidden.bs.dropdown');
             },
             render: function() {
                 var quickSearch = <input type="text" className="f-grid-quick-search form-control" placeholder={this.props.placeholderText} onChange={this.handleChange} />;
 
-                var filterOperations = [];
+                var filterOperators = [];
                 for (var i=0; i<this.props.operations.length; i++) {
                     var op = this.props.operations[i];
-                    filterOperations.push(<li><a href="#" data-id={op.operation} className="filter_op">{op.display}</a></li>);
+                    filterOperators.push(<li><a href="#" data-id={op.operation} className="filter_op" onClick={this.selectOperator}>{op.display}</a></li>);
                 }
 
                 var filterOptions = [];
@@ -241,37 +273,48 @@ function(React, $, Griddle, Backbone) {
 
                 for (var i=0; i<this.props.filters.length; i++) {
                     var filter = this.props.filters[i];
+                    var dataId = 'filter-' + filter.column;
+
+                    // Create checkbox to enable/disable filter
                     filterOptions.push(
-                        <li data-id="title" class="dd-item dd3-item">
-                            <div class="icon-ellipsis-vertical dd-handle dd3-handle"></div>
-                            <div class="dd3-content">
-                                <label><input type="checkbox" checked="" datid={filter.column} className="showhide_column" />{filter.display}</label>
+                        <li data-id="title" className="dd-item dd3-item">
+                            <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
+                            <div className="dd3-content">
+                                <label><input type="checkbox" defaultChecked={filter.defaultCheck} data-id={dataId} className="showhide_column" onChange={this.toggleFilter}/> {filter.display}</label>
                             </div>
                         </li>
                     );
 
+                    // Create filter by column item
                     filters.push(
-                        <div className="btn-group f-grid-filter dropdown">
-                            <button className="btn dropdown-toggle filter-text-main" onClick={this.toggleDropdown}>
-                                <span className="f-grid-filter-field">{filter.display}</span>: <span className="f-grid-filter-value">All</span> <span className="caret"></span>
-                            </button>
+                        <div className="btn-group f-grid-filter dropdown" id={dataId}>
+                            <FCom.Components.Button type="button" className="dropdown-toggle filter-text-main" onClick={this.toggleDropdown}>
+                                <span className="f-grid-filter-field">{filter.display}</span>:&nbsp;
+                                <span className="f-grid-filter-value">All</span>&nbsp;
+                                <span className="caret"></span>
+                            </FCom.Components.Button>
 
                             <ul className="dropdown-menu filter-box">
                                 <li>
                                     <div className="input-group">
-                                        <div className="input-group-btn dropdown">
-                                            <button className="btn btn-default dropdown-toggle filter-text-sub" onClick={this.toggleDropdown}>
-                                                {this.props.operations[0].display} <span className="caret"></span>
-                                            </button>
+                                        <div className="input-group-btn operator-dropdown dropdown">
+                                            <FCom.Components.Button type="button" className="btn-default dropdown-toggle filter-text-sub" onClick={this.toggleDropdown}>
+                                                <span className="selected-operator">
+                                                    {filter.defaultOperator != '' ? filter.defaultOperator : this.props.operations[0].display}
+                                                </span>&nbsp;
+                                                <span className="caret"></span>
+                                            </FCom.Components.Button>
 
                                             <ul className="dropdown-menu filter-sub">
-                                                {filterOperations}
+                                                {filterOperators}
                                             </ul>
                                         </div>
 
-                                        <input type="text" value="" className="form-control" />
+                                        <input type="text" defaultValue={filter.defaultValue} className="form-control selected-value" />
                                         <div className="input-group-btn">
-                                            <button className="btn btn-primary update" type="button">Update</button>
+                                            <FCom.Components.Button type="button" className="btn-primary update" onClick={this.updateFilter}>
+                                                Update
+                                            </FCom.Components.Button>
                                         </div>
                                     </div>
                                 </li>
@@ -283,7 +326,7 @@ function(React, $, Griddle, Backbone) {
                 }
 
                 return (
-                    <div className="f-grid-top f-grid-toolbar clearfix">
+                    <div className="f-grid-top f-grid-toolbar f-grid-filters clearfix">
                         <div className="f-col-filters-selection pull-left">
                             {quickSearch}
                             <span className="dropdown">
@@ -305,6 +348,5 @@ function(React, $, Griddle, Backbone) {
         React.render(
             <FComGriddleComponent resultsPerPage={config.state.ps} />, document.getElementById(config.id)
         );
-
     };
 });
