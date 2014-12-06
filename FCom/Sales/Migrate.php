@@ -1630,6 +1630,19 @@ class FCom_Sales_Migrate extends BClass
             ],
         ]);
     }
+
+    public function upgrade__0_3_9__0_3_10()
+    {
+        $tOrderPayment = $this->FCom_Sales_Model_Order_Payment->table();
+        $this->BDb->ddlTableDef($tOrderPayment, [
+            BDb::COLUMNS => [
+                'state_children' => 'varchar(20)',
+            ],
+            BDb::KEYS => [
+                'IDX_state_children' => '(state_children)',
+            ]
+        ]);
+    }
 }
 
 class FCom_Sales_Migrate_Model_Cart_Address extends BModel

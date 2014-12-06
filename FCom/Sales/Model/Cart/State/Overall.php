@@ -2,11 +2,16 @@
 
 class FCom_Sales_Model_Cart_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
 {
+    const ACTIVE = 'active',
+        ORDERED = 'ordered',
+        ABANDONED = 'abandoned',
+        ARCHIVED = 'archived';
+
     protected $_valueLabels = [
-        'active' => 'Active',
-        'ordered' => 'Ordered',
-        'abandoned' => 'Abandoned',
-        'archived' => 'Archived',
+        self::ACTIVE => 'Active',
+        self::ORDERED => 'Ordered',
+        self::ABANDONED => 'Abandoned',
+        self::ARCHIVED => 'Archived',
     ];
 
     public function setActive()

@@ -41,7 +41,7 @@
                                     </a>
                                 </td>
                                 <td class="f-cart-col-name">
-                                    {{ THIS.view('checkout/product_info').set({'item': item, 'product': p}) | raw }}
+                                    {{ THIS.view('cart/product_info').set({'item': item, 'product': p}) | raw }}
                                 </td>
                                 <td class="f-cart-col-qty text-center">
                                     <input min="0" type="text" size="3" name="qty[{{ item.id() }}]" value="{{ item.qty*1 }}" class="f-input-qty input-sm form-control"/>

@@ -9,7 +9,7 @@
 class FCom_PushServer_Main extends BCLass
 {
     /**
-     * @var array
+     * @var FCom_PushServer_Service_Abstract[]
      */
     protected $_services = [];
 

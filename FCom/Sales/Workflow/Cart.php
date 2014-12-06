@@ -75,7 +75,10 @@ class FCom_Sales_Workflow_Cart extends FCom_Sales_Workflow_Abstract
         // get session cart id
         $sessCart = $cartHlp->sessionCart();
         // try to load customer cart which is new (not abandoned or converted to order)
-        $custCart = $cartHlp->loadWhere(['customer_id' => $customer->id(), 'state_overall' => 'active']);
+        $custCart = $cartHlp->loadWhere([
+            'customer_id' => $customer->id(),
+            'state_overall' => FCom_Sales_Model_Cart_State_Overall::ACTIVE
+        ]);
 
         if ($sessCart && $custCart && $sessCart->id() !== $custCart->id()) {
 

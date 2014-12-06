@@ -35,7 +35,7 @@ class BModuleRegistry extends BClass
     /**
     * Module information collected from manifests
     *
-    * @var array
+    * @var BModule[]
     */
     protected $_modules = [];
 
@@ -355,6 +355,7 @@ class BModuleRegistry extends BClass
             // iterate over require for modules
             if (!empty($mod->require['module'])) {
                 foreach ($mod->require['module'] as &$req) {
+                    /** @var BModule $reqMod */
                     $reqMod = !empty($this->_modules[$req['name']]) ? $this->_modules[$req['name']] : false;
                     // is the module missing
                     if (!$reqMod) {
@@ -832,7 +833,7 @@ if ($args['name']==="FCom_Referrals") {
                     } elseif (is_string($reqVer) || is_float($reqVer)) {
                         $from = '';
                         $to = '';
-                        $reqVerAr = explode(";", (string)$reqVer);
+                        $reqVerAr = explode("~", (string)$reqVer);
                         if (!empty($reqVerAr[0])) {
                             $from = $reqVerAr[0];
                         }

@@ -1577,7 +1577,7 @@ class BRouting extends BClass
     /**
     * Array of routes
     *
-    * @var array
+    * @var BRouteNode[]
     */
     protected $_routes = [];
 
@@ -2012,7 +2012,7 @@ class BRouteNode extends BClass
     /**
     * Route Observers
     *
-    * @var array(BRouteObserver)
+    * @var BRouteObserver[]
     */
     protected $_observers = [];
 

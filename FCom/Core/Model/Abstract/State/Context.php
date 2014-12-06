@@ -12,14 +12,14 @@ abstract class FCom_Core_Model_Abstract_State_Context extends BClass
     /**
      * Concrete state objects for this model
      *
-     * @var array
+     * @var FCom_Core_Model_Abstract_State_Concrete[]
      */
     protected $_stateObjects = [];
 
     /**
      * Default classes for each type of model state
      *
-     * @var array
+     * @var string[]
      */
     static protected $_defaultStateClasses = [];
 

@@ -2,67 +2,78 @@
 
 class FCom_Sales_Model_Order_Return_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
 {
+
+    const REQUESTED = 'requested',
+        PENDING = 'pending',
+        RMA_SENT = 'rma_sent',
+        EXPIRED = 'expired',
+        CANCELED = 'canceled',
+        RECEIVED = 'received',
+        APPROVED = 'approved',
+        RESTOCKED = 'restocked',
+        DECLINED = 'declined';
+
     protected $_valueLabels = [
-        'requested' => 'Requested',
-        'new' => 'New',
-        'rma_sent' => 'RMA Sent',
-        'expired' => 'Expired',
-        'canceled' => 'Canceled',
-        'received' => 'Received',
-        'approved' => 'Approved',
-        'restocked' => 'Re-stocked',
-        'declined' => 'Declined',
+        self::REQUESTED => 'Requested',
+        self::PENDING => 'Pending',
+        self::RMA_SENT => 'RMA Sent',
+        self::EXPIRED => 'Expired',
+        self::CANCELED => 'Canceled',
+        self::received => 'Received',
+        self::APPROVED => 'Approved',
+        self::RESTOCKED => 'Re-stocked',
+        self::DECLINED => 'Declined',
     ];
 
     protected $_setValueNotificationTemplates =[
-        'rma_sent' => 'email/sales/order-return-state-overall-rma_sent',
-        'received' => 'email/sales/order-return-state-overall-received',
-        'approved' => 'email/sales/order-return-state-overall-approved',
-        'declined' => 'email/sales/order-return-state-overall-declined',
+        self::RMA_SENT => 'email/sales/order-return-state-overall-rma_sent',
+        self::RECEIVED => 'email/sales/order-return-state-overall-received',
+        self::APPROVED => 'email/sales/order-return-state-overall-approved',
+        self::DECLINED => 'email/sales/order-return-state-overall-declined',
     ];
 
     public function setRequested()
     {
-        return $this->changeState('requested');
+        return $this->changeState(self::REQUESTED);
     }
 
-    public function setNew()
+    public function setPending()
     {
-        return $this->changeState('new');
+        return $this->changeState(self::PENDING);
     }
 
     public function setRMASent()
     {
-        return $this->changeState('rma_sent');
+        return $this->changeState(self::RMA_SENT);
     }
 
     public function setExpired()
     {
-        return $this->changeState('expired');
+        return $this->changeState(self::EXPIRED);
     }
 
     public function setCanceled()
     {
-        return $this->changeState('canceled');
+        return $this->changeState(self::CANCELED);
     }
 
     public function setReceived()
     {
-        return $this->changeState('received');
+        return $this->changeState(self::RECEIVED);
     }
 
     public function setApproved()
     {
-        return $this->changeState('approved');
+        return $this->changeState(self::APPROVED);
     }
 
     public function setRestocked()
     {
-        return $this->changeState('restocked');
+        return $this->changeState(self::RESTOCKED);
     }
 
     public function setDeclined()
     {
-        return $this->changeState('declined');
+        return $this->changeState(self::DECLINED);
     }
 }
