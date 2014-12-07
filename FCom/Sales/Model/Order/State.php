@@ -2,6 +2,12 @@
 
 class FCom_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Context
 {
+    const OVERALL = 'overall',
+        DELIVERY = 'delivery',
+        PAYMENT = 'payment',
+        COMMENT = 'comment',
+        CUSTOM = 'custom';
+
     /**
      * Order linked
      *
@@ -15,11 +21,11 @@ class FCom_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Contex
      * @var array
      */
     static protected $_defaultStateClasses = [
-        'overall' => 'FCom_Sales_Model_Order_State_Overall',
-        'delivery' => 'FCom_Sales_Model_Order_State_Delivery',
-        'payment' => 'FCom_Sales_Model_Order_State_Payment',
-        'comment' => 'FCom_Sales_Model_Order_State_Comment',
-        'custom' => 'FCom_Sales_Model_Order_State_Custom',
+        self::OVERALL => 'FCom_Sales_Model_Order_State_Overall',
+        self::DELIVERY => 'FCom_Sales_Model_Order_State_Delivery',
+        self::PAYMENT => 'FCom_Sales_Model_Order_State_Payment',
+        self::COMMENT => 'FCom_Sales_Model_Order_State_Comment',
+        self::CUSTOM => 'FCom_Sales_Model_Order_State_Custom',
     ];
 
     /**
@@ -28,7 +34,7 @@ class FCom_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Contex
      */
     public function overall()
     {
-        return $this->_getStateObject('overall');
+        return $this->_getStateObject(self::OVERALL);
     }
 
     /**
@@ -37,7 +43,7 @@ class FCom_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Contex
      */
     public function delivery()
     {
-        return $this->_getStateObject('delivery');
+        return $this->_getStateObject(self::DELIVERY);
     }
 
     /**
@@ -46,7 +52,7 @@ class FCom_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Contex
      */
     public function payment()
     {
-        return $this->_getStateObject('payment');
+        return $this->_getStateObject(self::PAYMENT);
     }
 
     /**
@@ -55,7 +61,7 @@ class FCom_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Contex
      */
     public function comment()
     {
-        return $this->_getStateObject('comment');
+        return $this->_getStateObject(self::COMMENT);
     }
 
     /**
@@ -64,7 +70,7 @@ class FCom_Sales_Model_Order_State extends FCom_Core_Model_Abstract_State_Contex
      */
     public function custom()
     {
-        return $this->_getStateObject('custom');
+        return $this->_getStateObject(self::CUSTOM);
     }
 
 }

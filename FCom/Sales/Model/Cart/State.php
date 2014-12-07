@@ -2,6 +2,9 @@
 
 class FCom_Sales_Model_Cart_State extends FCom_Core_Model_Abstract_State_Context
 {
+    const OVERALL = 'overall',
+        PAYMENT = 'payment';
+
     /**
      * Order linked
      *
@@ -15,8 +18,8 @@ class FCom_Sales_Model_Cart_State extends FCom_Core_Model_Abstract_State_Context
      * @var array
      */
     static protected $_defaultStateClasses = [
-        'overall' => 'FCom_Sales_Model_Cart_State_Overall',
-        'payment' => 'FCom_Sales_Model_Cart_State_Payment',
+        self::OVERALL => 'FCom_Sales_Model_Cart_State_Overall',
+        self::PAYMENT => 'FCom_Sales_Model_Cart_State_Payment',
     ];
 
     /**
@@ -25,7 +28,7 @@ class FCom_Sales_Model_Cart_State extends FCom_Core_Model_Abstract_State_Context
      */
     public function overall()
     {
-        return $this->_getStateObject('overall');
+        return $this->_getStateObject(self::OVERALL);
     }
 
     /**
@@ -34,6 +37,6 @@ class FCom_Sales_Model_Cart_State extends FCom_Core_Model_Abstract_State_Context
      */
     public function payment()
     {
-        return $this->_getStateObject('payment');
+        return $this->_getStateObject(self::PAYMENT);
     }
 }

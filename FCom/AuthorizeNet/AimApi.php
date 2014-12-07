@@ -104,7 +104,7 @@ class FCom_AuthorizeNet_AimApi extends BClass
         if ($this->BConfig->get('modules/FCom_AuthorizeNet/aim/useccv')) {
             $api->card_code = $payment->getDetail('card_code');
         }
-        $billing = $order->billing();
+
         if ($order->billing_firstname) {
             $api->first_name = $order->billing_firstname;
         }

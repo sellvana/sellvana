@@ -2,7 +2,7 @@
 
 class FCom_Sales_Model_Order_History extends FCom_Core_Model_Abstract
 {
-    use FCom_Sales_Model_Trait_Order;
+    use FCom_Sales_Model_Trait_OrderChild;
 
     protected static $_table = 'fcom_sales_order_history';
     protected static $_origClass = __CLASS__;

@@ -77,25 +77,38 @@ class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
         $payment = $args['payment'];
         $order = $payment->order();
         $cart = $order->cart();
+        $infoOnly = !empty($args['info_only']); // for payment methods like COD/check/MO/PO
         $authOnly = !empty($args['auth_only']);
 
-        $payment->state()->overall()->setPaid();
-        $order->state()->overall()->setPlaced();
-
-        if ($authOnly) {
-            $payment->state()->processor()->setAuthorized();
-            $order->state()->payment()->setProcessing();
+        if ($infoOnly) {
+            $payment->state()->overall()->setPending();
+            $payment->state()->processor()->setNA();
+            $order->state()->payment()->setOutstanding();
         } else {
-            $payment->state()->processor()->setCaptured();
-            $order->state()->payment()->setPaid();
+            $payment->state()->overall()->setPaid();
+
+            if ($authOnly) {
+                $payment->state()->processor()->setAuthorized();
+                $order->state()->payment()->setProcessing();
+            } else {
+                $payment->state()->processor()->setCaptured();
+                $order->state()->payment()->setPaid();
+            }
         }
 
+        $order->state()->overall()->setPlaced();
+
         $cart->state()->overall()->setOrdered();
-        $cart->state()->payment()->setPaid();
+        $cart->state()->payment()->setAccepted();
 
         $payment->save();
         $order->save();
         $cart->save();
+
+        $payment->addHistoryEvent('complete',
+            $this->BLocale->_('Customer completed payment by %s', $order->get('payment_method')),
+            ['entity_id' => $payment->id()]
+        );
     }
 
     public function customerFailsPayment($args)
@@ -110,6 +123,11 @@ class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
 
         $payment->save();
         $cart->save();
+
+        $order->addHistoryEvent('failed',
+            $this->BLocale->_('Customer failed payment by %s', $order->get('payment_method')),
+            ['entity_id' => $payment->id()]
+        );
     }
 
     public function customerGetsPaymentError($args)
@@ -126,6 +144,11 @@ class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
 
         $payment->save();
         $cart->save();
+
+        $order->addHistoryEvent('error',
+            $this->BLocale->_('Customer received payment error from %s', $order->get('payment_method')),
+            ['entity_id' => $payment->id()]
+        );
     }
 
     public function adminPlacesOrder($args)

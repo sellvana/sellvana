@@ -12,10 +12,12 @@ class FCom_Sales_Workflow_Comment extends FCom_Sales_Workflow_Abstract
 
     protected $_localHooks = [
         'customerPostsOrderComment',
+
         'adminAcknowledgesOrderComment',
         'adminDelegatesOrderComment',
         'adminPostsOrderComment',
         'adminClosesOrderComment',
+
         'timedAutoCloseOrderComment',
     ];
 

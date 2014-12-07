@@ -2,56 +2,64 @@
 
 class FCom_Sales_Model_Order_Refund_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
 {
+    const PENDING = 'pending',
+        SUPERVISOR_PENDING = 'super_pending',
+        SUPERVISOR_AUTHORIZED = 'super_auth',
+        PARTIAL = 'partial',
+        REFUNDED = 'refunded',
+        FAILED = 'failed',
+        CANCELED = 'canceled';
+
     protected $_valueLabels = [
-        'pending' => 'Pending',
-        'super_pending' => 'Pending Supervisor',
-        'super_auth' => 'Supervisor Authorized',
-        'partial' => 'Partial',
-        'refunded' => 'Refunded',
-        'failed' => 'Failed',
-        'canceled' => 'Canceled',
+        self::PENDING => 'Pending',
+        self::SUPERVISOR_PENDING => 'Pending Supervisor',
+        self::SUPERVISOR_AUTHORIZED => 'Supervisor Authorized',
+        self::PARTIAL => 'Partial',
+        self::REFUNDED => 'Refunded',
+        self::FAILED => 'Failed',
+        self::CANCELED => 'Canceled',
     ];
 
     protected $_setValueNotificationTemplates = [
-        'super_pending' => 'email/sales/order-refund-state-payment-super_pending-admin',
-        'super_auth' => 'email/sales/order-refund-state-payment-super_auth',
-        'refunded' => 'email/sales/order-refund-state-payment-refunded',
-        'failed' => 'email/sales/order-refund-state-overall-failed',
-        'canceled' => 'email/sales/order-refund-state-overall-canceled',
+        self::SUPERVISOR_PENDING => 'email/sales/order-refund-state-payment-super_pending-admin',
+        self::SUPERVISOR_AUTHORIZED => 'email/sales/order-refund-state-payment-super_auth',
+        self::REFUNDED => 'email/sales/order-refund-state-payment-refunded',
+        self::FAILED => 'email/sales/order-refund-state-overall-failed',
+        self::CANCELED => 'email/sales/order-refund-state-overall-canceled',
     ];
 
     public function setPending()
     {
-        return $this->changeState('pending');
+        return $this->changeState(self::PENDING);
     }
 
     public function setSuperPending()
     {
-        return $this->changeState('super_pending');
+        return $this->changeState(self::SUPERVISOR_PENDING);
     }
 
     public function setSuperAuth()
     {
-        return $this->changeState('super_auth');
+        return $this->changeState(self::SUPERVISOR_AUTHORIZED);
     }
 
     public function setPartial()
     {
-        return $this->changeState('void');
+        return $this->changeState(self::VOID);
     }
 
     public function setRefunded()
     {
-        return $this->changeState('refunded');
+        return $this->changeState(self::REFUNDED);
     }
 
     public function setFailed()
     {
-        return $this->changeState('failed');
+        return $this->changeState(self::FAILED);
     }
 
     public function setCanceled()
     {
-        return $this->changeState('canceled');
+        return $this->changeState(self::CANCELED);
     }
 }

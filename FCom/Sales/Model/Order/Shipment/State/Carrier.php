@@ -2,54 +2,63 @@
 
 class FCom_Sales_Model_Order_Shipment_State_Carrier extends FCom_Core_Model_Abstract_State_Custom
 {
+    const LABEL = 'label',
+        RECEIVED = 'received',
+        SHIPPED = 'shipped',
+        IN_TRANSIT = 'in_transit',
+        EXCEPTION = 'exception',
+        DELIVERED = 'delivered',
+        REFUSED = 'refused',
+        RETURNED = 'returned';
+
     protected $_valueLabels = [
-        'label' => 'Label Printed',
-        'received' => 'Received',
-        'shipped' => 'Shipped',
-        'in_transit' => 'In Transit',
-        'exception' => 'Exception',
-        'delivered' => 'Delivered',
-        'refused' => 'Refused',
-        'returned' => 'Returned',
+        self::LABEL => 'Label Printed',
+        self::RECEIVED => 'Received',
+        self::SHIPPED => 'Shipped',
+        self::IN_TRANSIT => 'In Transit',
+        self::EXCEPTION => 'Exception',
+        self::DELIVERED => 'Delivered',
+        self::REFUSED => 'Refused',
+        self::RETURNED => 'Returned',
     ];
 
     public function setLabel()
     {
-        return $this->changeState('label');
+        return $this->changeState(self::LABEL);
     }
 
     public function setReceived()
     {
-        return $this->changeState('received');
+        return $this->changeState(self::RECEIVED);
     }
 
     public function setShipped()
     {
-        return $this->changeState('shipped');
+        return $this->changeState(self::SHIPPED);
     }
 
     public function setInTransit()
     {
-        return $this->changeState('in_transit');
+        return $this->changeState(self::IN_TRANSIT);
     }
 
     public function setException()
     {
-        return $this->changeState('exception');
+        return $this->changeState(self::EXCEPTION);
     }
 
     public function setDelivered()
     {
-        return $this->changeState('delivered');
+        return $this->changeState(self::DELIVERED);
     }
 
     public function setRefused()
     {
-        return $this->changeState('refused');
+        return $this->changeState(self::REFUSED);
     }
 
     public function setReturned()
     {
-        return $this->changeState('returned');
+        return $this->changeState(self::RETURNED);
     }
 }
