@@ -230,7 +230,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
                 'id' => 'product_attachments',
                 'caption' => 'Product Attachments',
                 'data_mode' => 'local',
-                'data' => $this->BDb->many_as_array($model->mediaORM('A')->order_by_expr('pa.position asc')
+                'data' => $this->BDb->many_as_array($model->mediaORM(FCom_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTCH)->order_by_expr('pa.position asc')
                     ->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name',
                         'a.file_size', 'pa.create_at', 'pa.update_at'])
                     ->select('a.id', 'file_id')->find_many()),
@@ -273,7 +273,7 @@ class FCom_Catalog_Admin_Controller_Products extends FCom_Admin_Controller_Abstr
     {
         $downloadUrl = $this->BApp->href('/media/grid/download?folder=media/product/images&file=');
         $thumbUrl = $this->FCom_Core_Main->resizeUrl($this->BConfig->get('web/media_dir') . '/product/images', ['s' => 100]);
-        $data = $this->BDb->many_as_array($model->mediaORM('I')
+        $data = $this->BDb->many_as_array($model->mediaORM(FCom_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG)
                 ->order_by_expr('pa.position asc')
                 ->left_outer_join('FCom_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'pm.file_id'], 'pm')
                 ->select(['pa.id', 'pa.product_id', 'pa.remote_url', 'pa.position', 'pa.label', 'a.file_name',

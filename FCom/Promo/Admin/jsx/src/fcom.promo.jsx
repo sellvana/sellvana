@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 'select2', 'bootstrap'], function (React, $, Griddle, Components, Locale) {
+define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 'select2', 'bootstrap','moment', 'daterangepicker',], function (React, $, Griddle, Components, Locale) {
     var labelClass = "col-md-3";
     var SingleCoupon = React.createClass({
         render: function () {
@@ -231,7 +231,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     var ConditionsCompare = React.createClass({
         render: function () {
             return (
-                <select className="to-select2 form-control">
+                <select className="to-select2 form-control" onChange={this.props.onChange}>
                     {this.props.opts.map(function(type){
                         return <option value={type.id} key={type.id}>{type.label}</option>
                     })}
@@ -426,7 +426,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             var paramObj = {};
             paramObj[this.props.idVar] = this.props.entityId;
             return (
-                <div className="attribute-combinations">
+                <div className="attribute-combinations form-horizontal">
                     <div className="form-group">
                         <div className="col-md-5">
                             <select ref="combinationType" className="form-control to-select2">
@@ -445,7 +445,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                         paramObj['field'] = field.field;
                         var url = fieldUrl + '/?' + $.param(paramObj);
                         return <ConditionsAttributesModalField label={field.label} url={url} key={field.field}
-                            id={field.field} removeField={this.removeField} />
+                            id={field.field} input={field.input} removeField={this.removeField} />
                     }.bind(this))}
                 </div>
             );
@@ -457,7 +457,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 return;
             }
             var fields = this.state.fields;
-            fields.push({label: fieldValue.text, field: fieldValue.id});
+            fields.push({label: fieldValue.text, field: fieldValue.id, input: fieldValue.input});
             this.setState({fields: fields});
         },
         removeField: function (id) {
@@ -512,13 +512,44 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
 
     var ConditionsAttributesModalField = React.createClass({
         render: function () {
+            var inputType = this.props.input;
+            var opts = this.props.opts;
+            var input = <input className="form-control required" type="text" id="fieldCombination" ref="fieldCombination"/>;
+            if(inputType == 'text') {
+                opts = opts.concat(this.props.opts_text);
+            } else if(this.props.numeric_inputs.indexOf(inputType) != -1) {
+                opts = opts.concat(this.props.opts_numeric);
+                if (inputType == 'number') {
+                    if(this.state.range === false) {
+                        input = <input className="form-control required" type="number" step="any" id="fieldCombination" ref="fieldCombination" style={{width: "auto"}}/>;
+                    } else {
+                        input = <div id="fieldCombination" ref="fieldCombination" className="input-group">
+                            <input className="form-control required" type="number" step="any" placeholder="Min" style={{width: "50%"}}/>
+                            <input className="form-control required" type="number" step="any" placeholder="Max" style={{width: "50%"}}/>
+                        </div>;
+                    }
+                } else if (inputType == 'date' || inputType == 'time') {
+                    var singleMode = true;
+                    if (this.state.range === true) {
+                        singleMode = false;
+                    }
+                    input = <div className="input-group">
+                            <span className="input-group-addon"><i className="glyphicon glyphicon-calendar"></i></span>
+                            <input className="form-control required" type="text" id="fieldCombination" ref="fieldCombination" dataMode={singleMode} />
+                        </div>
+                }
+
+            } else if(inputType == 'select'){
+                input = <input className="form-control required" type="hidden" id="fieldCombination" ref="fieldCombination"/>;
+            } else if(this.props.bool_inputs.indexOf(inputType) != -1) {
+                input = <Components.YesNo  id="fieldCombination" ref="fieldCombination" />;
+            }
             return (
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-4">
-                        <ConditionsCompare opts={this.props.opts} id="fieldCompare" ref="fieldCompare"/>
+                        <ConditionsCompare opts={ opts } id="fieldCompare" ref="fieldCompare" onChange={this.onCompareChange}/>
                     </div>
-                    <div className="col-md-5"><input className="form-control required" type="hidden" id="fieldCombination"
-                        ref="fieldCombination"/></div>
+                    <div className="col-md-5">{input}</div>
                 </ConditionsRow>
             );
         },
@@ -527,19 +558,78 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 this.props.removeField(this.props.id);
             }
         },
+        getInitialState: function () {
+            return {
+                range: false
+            };
+        },
         getDefaultProps: function () {
             return {
                 label: Locale._("Unknown"),
                 url: "",
                 fcLabel: "",
-                opts: [
+                opts: [ // base options, for bool and select fields
                     {id:"is", label: "is"},
                     {id:"is_not", label: "is not"},
+                    {id:"empty", label: "has no value"}
+                ],
+                opts_text:[ // add to base for text fields
                     {id:"contains", label: "contains"}
-                ]
+                ],
+                opts_numeric: [ // add to base for numeral fields
+                    {id: "lt", label: "less than"},
+                    {id: "lte", label: "less than or equal"},
+                    {id: "gt", label: "greater than"},
+                    {id: "gte", label: "greater than or equal"},
+                    {id: "between", label: "between"}
+                ],
+                numeric_inputs: ['number', 'date', 'time'],
+                bool_inputs: ['yes_no']
             };
         },
         componentDidMount: function () {
+            var inputType = this.props.input;
+            switch (inputType) {
+                case 'select':
+                    this.initSelectInput();
+                    break;
+                case 'date':
+                    this.initDateInput();
+                    break;
+                default :
+                    break;
+            }
+
+        },
+        componentDidUpdate: function () {
+            this.componentDidMount();
+        },
+        onCompareChange: function (e) {
+            if(this.props.numeric_inputs.indexOf(this.props.input) == -1){
+                return;
+            }
+            var target = e.target;
+            var state = {range: false};
+            state.range = (target.value =='between');
+            this.setState(state);
+        },
+        initDateInput: function () {
+            var startDate = new Date();
+            var s = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate();
+            var fieldCombination = this.refs.fieldCombination;
+            var $input = $(fieldCombination.getDOMNode());
+            var mode = fieldCombination.props.dataMode;
+            var parent = $input.closest('.modal');
+            $input.daterangepicker(
+                {
+                    format: 'YYYY-MM-DD',
+                    startDate: s,
+                    singleDatePicker: mode,
+                    parentEl: parent
+                }
+            );
+        },
+        initSelectInput: function () {
             var fieldCombination = this.refs.fieldCombination;
             var self = this;
             $(fieldCombination.getDOMNode()).select2({
@@ -742,7 +832,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             var paramObj = {};
             paramObj[this.props.idVar] = this.props.entityId;
             return (
-                <div className="shipping-combinations">
+                <div className="shipping-combinations form-horizontal">
                     <div className="form-group">
                         <div className="col-md-5">
                             <select ref="combinationType" className="form-control to-select2">

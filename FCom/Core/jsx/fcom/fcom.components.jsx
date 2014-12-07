@@ -134,6 +134,25 @@ define(['react', 'jquery', 'fcom.locale', 'bootstrap'], function (React, $, Loca
         }
     });
 
+    FCom.Components.YesNo = React.createClass({
+        render: function () {
+            return (
+                <select id={this.props.id} className={"form-control to-select2 " + this.props.className} style={this.props.style} defaultValue={this.props.value}>
+                    <option value="0">{this.props.optNo}</option>
+                    <option value="1">{this.props.optYes}</option>
+                </select>
+            )
+        },
+        getDefaultProps: function () {
+            return {
+                style: {width: "auto"},
+                optYes: "YES",
+                optNo: "no",
+                value: "1"
+            };
+        }
+    });
+
     FCom.Components.Button = React.createClass({
         render: function () {
             var { className, onClick, ...other } = this.props;

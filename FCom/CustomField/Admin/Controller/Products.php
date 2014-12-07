@@ -227,7 +227,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function variantImageGrid($model)
     {
-        $data = $this->BDb->many_as_array($model->mediaORM('I')
+        $data = $this->BDb->many_as_array($model->mediaORM(FCom_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG)
             ->left_outer_join('FCom_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'pm.file_id'], 'pm')
             ->select(['pa.id', 'pa.position',  'a.file_name'])
             ->select('a.id', 'file_id')
