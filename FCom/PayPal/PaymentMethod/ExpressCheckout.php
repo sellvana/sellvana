@@ -11,9 +11,6 @@ class FCom_PayPal_PaymentMethod_ExpressCheckout extends FCom_Sales_Method_Paymen
     protected static $_apiVersion = '72.0';
     protected $_name = 'PayPal Express Checkout';
 
-    protected $_request;
-    protected $_response;
-
     /**
      * @return BLayout|BView
      */
@@ -126,38 +123,43 @@ class FCom_PayPal_PaymentMethod_ExpressCheckout extends FCom_Sales_Method_Paymen
         $payment->save();
 
         $result = $this->_callDoExpressCheckoutPayment();
+
         if (!empty($result['error'])) {
             $this->_setErrorStatus();
             return $result;
         }
-        $authOnly = $this->getConfig('payment_action') === 'Authorize';
-        $r = $result['response'];
-        $payment->set([
-            'transaction_token' => null, // for security?
-            'transaction_id'    => $r['PAYMENTINFO_0_TRANSACTIONID'],
-            'transaction_fee'   => $r['PAYMENTINFO_0_FEEAMT'],
-        ]);
-        $transData = [
-            'timestamp'        => $r['TIMESTAMP'],
-            'transaction_type' => $r['PAYMENTINFO_0_TRANSACTIONTYPE'],
-            'payment_type'     => $r['PAYMENTINFO_0_PAYMENTTYPE'],
-            'payment_status'   => $r['PAYMENTINFO_0_PAYMENTSTATUS'],
-            'reason_code'      => $r['PAYMENTINFO_0_REASONCODE'],
-        ];
-        $status = strtoupper($transData['payment_status']);
-        switch ($status) {
-            case 'PENDING':
-                $transData['pending_reason'] = $r['PAYMENTINFO_0_PENDINGREASON'];
-                break;
-            case 'COMPLETED-FUNDS-HELD':
-                $transData['hold_decision'] = $r['PAYMENTINFO_0_HOLDDECISION'];
-                break;
-        };
+        $paymentAction = $this->getConfig('payment_action');
 
-        $pendingReason = !empty($transData['pending_reason']) ? strtoupper($transData['pending_reason']) : null;
-        $successStatuses = ['COMPLETED', 'PROCESSED', 'IN-PROGRESS', 'REFUNDED', 'PARTIALLY-REFUNDED', 'CANCELED-REVERSAL'];
-        $result['success'] = in_array($status, $successStatuses)
-            || ($status === 'PENDING' && in_array($pendingReason, ['AUTHORIZATION', 'ORDER']));
+        switch ($paymentAction) {
+            case 'Order':
+                $this->_parseTransactionResponse($payment, $result['response'], 0);
+                $this->authorize();
+                $this->capture();
+                exit;
+                $payment->setupRootOrder();
+                break;
+
+            case 'Authorization':
+                $this->_parseTransactionResponse($payment, $result['response'], 0);
+                $this->_payment->set('amount_authorized', $this->_payment->get('amount_due'));
+                $this->capture();
+                exit;
+
+                $payment->setupRootOrder();
+                $child = $payment->createChildPayment();
+                $child->authorize();
+                break;
+
+            case 'Sale':
+                $this->_parseTransactionResponse($payment, $result['response'], 0);
+                exit;
+
+                $payment->authorize();
+                $payment->capture();
+                break;
+        }
+
+        $r = $result['response'];
 
         if ($result['success']) {
             $transData['amount_due'] = 0;
@@ -177,6 +179,152 @@ class FCom_PayPal_PaymentMethod_ExpressCheckout extends FCom_Sales_Method_Paymen
         }
 
         return $result;
+    }
+
+    public function authorize($amount = null)
+    {
+        //$authPayment = $this->_payment->createChildPayment($amount);
+        //$this->setPaymentModel($authPayment);
+        $authPayment = $this->_payment;
+
+        $this->_onBeforeAuthorization();
+
+        $result = $this->_callDoAuthorization();
+
+        if (!empty($result['error'])) {
+            $this->_setErrorStatus();
+            return $result;
+        }
+
+        $r = $result['response'];
+
+        $authPayment->setData('transaction', [
+            'authorization_id' => $r['TRANSACTIONID'],
+            'payment_status' => $r['PAYMENTSTATUS'],
+            'pending_reason' => $r['PENDINGREASON'],
+        ]);
+
+        $this->_onSuccessfulAuthorization();
+
+        return $result;
+    }
+
+    public function capture($complete = false)
+    {
+        $this->_payment->setData('transaction/complete', $complete);
+
+        $this->_onBeforeCapture();
+
+        $result = $this->_callDoCapture();
+
+        if (!empty($result['error'])) {
+            $this->_setErrorStatus();
+            return $result;
+        }
+
+        $this->_onSuccessfulCapture();
+
+        return $result;
+    }
+
+    public function void()
+    {
+
+    }
+
+    public function refund()
+    {
+
+    }
+
+    protected function _parseTransactionResponse($payment, $r, $n = null)
+    {
+        /**
+         * when payment_action == order:
+         *
+         *  DoExpressCheckoutPayment
+         *      TRANSACTIONTYPE = cart
+         *      PAYMENTTYPE = None
+         *      PAYMENTSTATUS = Pending
+         *      PENDINGREASON = order
+         *      REASONCODE = None
+         *      TRANSACTIONID = O-7A6278984U0648222
+         *
+         *  DoAuthorization
+         *      TRANSACTIONID = 3R649296UH3305615
+         *      PAYMENTSTATUS = Pending
+         *      PENDINGREASON = authorization
+         *
+         *  DoCapture (AUTHORIZATIONID = O-7A6278984U0648222)
+         *      AUTHORIZATIONID = O-7A6278984U0648222
+         *      TRANSACTIONID = 1C839870TG745882Y
+         *      PARENTTRANSACTIONID = O-7A6278984U0648222
+         *      TRANSACTIONTYPE = cart
+         *      PAYMENTTYPE = instant
+         *
+         * when payment_action == authorize
+         *
+         *  DoExpressCheckoutPayment
+         *      PAYMENTTYPE = instant
+         *      TRANSACTIONTYPE = cart
+         *      PAYMENTSTATUS = Pending
+         *      PENDINGREASON = authorization
+         *      REASONCODE = None
+         *      TRANSACTIONID = 5LF51400HN526230S
+         *
+         *  DoCapture (AUTHORIZATIONID = 5LF51400HN526230S)
+         *      AUTHORIZATIONID = 5LF51400HN526230S
+         *      TRANSACTIONID = 1B436522FM238025K
+         *      PARENTTRANSACTIONID = 5LF51400HN526230S
+         *      TRANSACTIONTYPE = cart
+         *      PAYMENTTYPE = instant
+         *      PAYMENTSTATUS = Completed
+         *      PENDINGREASON = None
+         *      REASONCODE = None
+         *
+         * when payment_action = sale
+         *
+         *  DoExpressCheckoutPayment
+         *      TRANSACTIONID = 3B916209JT754125Y
+         *      TRANSACTIONTYPE = cart
+         *      PAYMENTTYPE = instant
+         *      PAYMENTSTATUS = Completed
+         *      PENDINGREASON = None
+         *      REASONCODE = None
+         *
+         */
+        $p = null === $n ? '' : 'PAYMENTINFO_' . $n . '_';
+        $status = strtoupper($r[$p . 'PAYMENTSTATUS']);
+        $paymentType = strtoupper($r[$p . 'PAYMENTTYPE']);
+        $payment->set([
+            'transaction_token' => null, // for security?
+            'transaction_id'    => $r[$p . 'TRANSACTIONID'],
+            'transaction_fee'   => !empty($r[$p . 'FEEAMT']) ? $r[$p . 'FEEAMT'] : null,
+        ]);
+        $transData = [
+            'timestamp'        => $r['TIMESTAMP'],
+            'transaction_type' => $r[$p . 'TRANSACTIONTYPE'],
+            'payment_type'     => $r[$p . 'PAYMENTTYPE'],
+            'payment_status'   => $r[$p . 'PAYMENTSTATUS'],
+            'reason_code'      => $r[$p . 'REASONCODE'],
+        ];
+
+        $pendingReason = null;
+        switch ($status) {
+            case 'PENDING':
+                $transData['pending_reason'] = $r[$p . 'PENDINGREASON'];
+                $pendingReason = strtoupper($transData['pending_reason']);
+                break;
+            case 'COMPLETED-FUNDS-HELD':
+                $transData['hold_decision'] = $r[$p . 'HOLDDECISION'];
+                break;
+        };
+
+        $successStatuses = ['COMPLETED', 'PROCESSED', 'IN-PROGRESS', 'REFUNDED', 'PARTIALLY-REFUNDED', 'CANCELED-REVERSAL'];
+        $transData['success'] = in_array($status, $successStatuses)
+            || ($status === 'PENDING' && in_array($pendingReason, ['AUTHORIZATION', 'ORDER']));
+
+        $payment->setData('transaction', $transData, true);
     }
 
     protected function _callSetExpressCheckout()
@@ -235,7 +383,33 @@ class FCom_PayPal_PaymentMethod_ExpressCheckout extends FCom_Sales_Method_Paymen
 
         return $result;
     }
-    
+
+    protected function _callDoAuthorization()
+    {
+        $request = [
+            'TRANSACTIONID' => $this->_payment->get('transaction_id'),
+            'CURRENCYCODE' => $this->_payment->order()->get('order_currency'),
+            'AMT' => $this->_payment->get('amount_due'),
+        ];
+
+        $result = $this->_call('DoAuthorization', $request);
+
+        return $result;
+    }
+
+    protected function _callDoCapture()
+    {
+        $request = [
+            'AUTHORIZATIONID' => $this->_payment->get('transaction_id'),
+            'AMT' => $this->_payment->get('amount_authorized'),
+            'CURRENCYCODE' => $this->_payment->order()->get('order_currency'),
+            'COMPLETETYPE' => $this->_payment->getData('transaction/complete') ? 'Complete' : 'NotComplete',
+        ];
+        $result = $this->_call('DoCapture', $request);
+
+        return $result;
+    }
+
     protected function _addOrderInfo($request, $n = 0)
     {
         $order = $this->_payment->order();
@@ -266,7 +440,7 @@ class FCom_PayPal_PaymentMethod_ExpressCheckout extends FCom_Sales_Method_Paymen
         }
         return $request;
     }
-    
+
     protected function _addShippingInfo($request, $n = 0)
     {
         $order = $this->_payment->order();
@@ -323,6 +497,11 @@ class FCom_PayPal_PaymentMethod_ExpressCheckout extends FCom_Sales_Method_Paymen
                 if ($this->BDebug->is('DEBUG')) {
                     $this->_payment->setData('last_api_call', $result);
                 }
+                if ($methodName !== 'SetExpressCheckout') {
+                    echo "<pre>";
+                    var_dump($result);
+                    echo "<pre>";
+                }
                 return $result;
             }
         }
@@ -342,7 +521,7 @@ class FCom_PayPal_PaymentMethod_ExpressCheckout extends FCom_Sales_Method_Paymen
         if ($this->BDebug->is('DEBUG')) {
             $this->_payment->setData('last_api_call', $result);
         }
-
+        echo "<pre>"; var_dump($result); echo "<pre>";
         return $result;
     }
 }

@@ -5,32 +5,7 @@
  */
 class FCom_PaymentBasic_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 {
-    /**
-     * @var
-     */
-    protected $_cart;
-    /**
-     * @var
-     */
-    protected $_order;
-
-    /**
-     * construct
-     */
-    function __construct()
-    {
-        $this->_name = 'Check / Money Order';
-    }
-
-    /**
-     * @param $cart
-     * @return $this
-     */
-    public function initCart($cart)
-    {
-        $this->_cart = $cart;
-        return $this;
-    }
+    protected $_name = 'Check / Money Order';
 
     /**
      * @return BLayout|BView
@@ -41,27 +16,41 @@ class FCom_PaymentBasic_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
     }
 
     /**
-     * @return $this
+     * @return array
      */
     public function payOnCheckout()
     {
-        $this->authorize();
-        return $this;
+        // if using external checkout like paypal
+        // $this->FCom_Sales_Main->workflowAction('customerStartsExternalPayment', ['payment' => $this->_payment]);
+
+        // call this when returning from external checkout
+        // $this->FCom_Sales_Main->workflowAction('customerReturnsFromExternalPayment', ['payment' => $payment]);
+
+        $result = $this->authorize();
+        return $result;
     }
 
     /**
-     * @return bool
+     * @return array
      */
     public function authorize()
     {
-        return true;
+        $this->FCom_Sales_Main->workflowAction('customerCompletesPayment', [
+            'payment' => $this->_payment,
+            'info_only' => true,
+            //'auth_only' => true,
+        ]);
+
+        // call this if payment failed
+        // $this->FCom_Sales_Main->workflowAction('customerFailsPayment', ['payment' => $payment]);
+        return [];
     }
 
     /**
-     * @return bool
+     * @return array
      */
     public function capture()
     {
-        return true;
+        return [];
     }
 }

@@ -31,7 +31,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     static protected $_connId;
 
     /**
-     * @var array
+     * @var FCom_PushServer_Model_Message[]
      */
     protected $_messages = [];
 

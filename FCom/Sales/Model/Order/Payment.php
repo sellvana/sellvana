@@ -23,13 +23,29 @@
  */
 class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 {
-    use FCom_Sales_Model_Trait_Order;
+    use FCom_Sales_Model_Trait_OrderChild;
 
     protected static $_table = 'fcom_sales_order_payment';
     protected static $_origClass = __CLASS__;
 
+    /**
+     * @var FCom_Sales_Model_Order_Payment_State
+     */
     protected $_state;
 
+    /**
+     * @var FCom_Sales_Model_Order_Payment
+     */
+    protected $_parent;
+
+    /**
+     * @var FCom_Sales_Model_Order_Payment[]
+     */
+    protected $_children;
+
+    /**
+     * @return FCom_Sales_Model_Order_Payment_State
+     */
     public function state()
     {
         if (!$this->_state) {
@@ -38,25 +54,27 @@ class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $this->_state;
     }
 
-    public function addHistoryEvent($type, $description, $params = null)
+    /**
+     * @return FCom_Sales_Model_Order_Payment
+     */
+    public function parent()
     {
-        $history = $this->FCom_Sales_Model_Order_History->create([
-            'order_id' => $this->get('order_id'),
-            'entity_type' => 'payment',
-            'entity_id' => $this->id(),
-            'event_type' => $type,
-            'event_description' => $description,
-            'event_at' => isset($params['event_at']) ? $params['event_at'] : $this->BDb->now(),
-            'user_id' => isset($params['user_id']) ? $params['user_id'] : $this->FCom_Admin_Model_User->sessionUserId(),
-        ]);
-        if (isset($params['data'])) {
-            $history->setData($params['data']);
+        if (!$this->_parent && $this->get('parent_id')) {
+            $this->_parent = $this->load($this->get('parent_id'));
         }
-        $history->save();
-        return $this;
+        return $this->_parent;
     }
 
-    public function importFromOrder($order)
+    public function children()
+    {
+
+        if (!$this->_children) {
+            $this->_children = $this->orm()->where('parent_id', $this->id())->find_many();
+        }
+        return $this->_children;
+    }
+
+    public function importFromOrder(FCom_Sales_Model_Order $order)
     {
         $this->order($order);
 
@@ -76,8 +94,122 @@ class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         }
 
         $this->state()->overall()->setPending();
+        $this->state()->children()->setNone();
         $this->state()->custom()->setDefault();
         return $this;
+    }
+
+    public function setupRootOrder()
+    {
+        $this->state()->processor()->setRootOrder();
+        $this->state()->children()->setPending();
+        return $this;
+    }
+
+    public function createChildPayment($amount = 0)
+    {
+        if (!in_array($this->get('state_children'), [
+            FCom_Sales_Model_Order_Payment_State_Children::PENDING,
+            FCom_Sales_Model_Order_Payment_State_Children::PARTIAL,
+        ])) {
+            throw new BException('Parent payment state_children should be pending or partial');
+        }
+
+        if ($amount > $this->get('amount_due')) {
+            throw new BException('Attempting to create a child payment with amount bigger than amount due');
+        }
+
+        if (null === $amount) {
+            $amount = $this->get('amount_due');
+        }
+
+        /** @var FCom_Sales_Model_Order_Payment $child */
+        $child = $this->create([
+            'parent_id' => $this->id(),
+            'order_id' => $this->get('order_id'),
+            'payment_method' => $this->get('payment_method'),
+            'online' => $this->get('online'),
+            'amount_due' => $amount,
+        ]);
+
+        $this->add('amount_due', -$amount);
+
+        if ($this->get('amount_due')) {
+            $this->state()->children()->setPartial();
+        } else {
+            $this->state()->children()->setComplete();
+        }
+        $child->state()->overall()->setPending();
+        $child->state()->processor()->setPending();
+
+        $child->save();
+        return $child;
+    }
+
+    public function fetchChildrenAmounts()
+    {
+        $a = [
+            'children_amount_due'        => 0,
+            'children_amount_authorized' => 0,
+            'children_amount_captured'   => 0,
+            'children_amount_refunded'   => 0,
+            'children_amount_void'       => 0,
+        ];
+        foreach ($this->children() as $child) {
+            $a['children_amount_due']        += $child->get('amount_due');
+            $a['children_amount_authorized'] += $child->get('amount_authorized');
+            $a['children_amount_captured']   += $child->get('amount_captured');
+            $a['children_amount_refunded']   += $child->get('amount_refunded');
+            $a['children_amount_void']       += $child->get('amount_void');
+        }
+        $this->set($a);
+        return $this;
+    }
+
+    public function authorize($amount = null)
+    {
+        if (null === $amount) {
+            $amount = $this->get('amount_due');
+        }
+        $this->set('amount_authorized', $amount);
+        return $this;
+    }
+
+    public function expireAuthorization($amount = null)
+    {
+        if (null === $amount) {
+            $amount = $this->set('amount_authorized');
+        }
+        $this->add('amount_authorized', -$amount);
+        if ($this->get('parent_id')) {
+
+        }
+        $this->state()->processor()->setExpired();
+        return $this;
+    }
+
+    public function capture($amount = null)
+    {
+        if (null === $amount) {
+            $amount = $this->get('amount_authorized');
+        }
+        $this->add('amount_captured', $amount);
+        $this->add('amount_authorized', -$amount);
+        $this->add('amount_due', -$amount);
+
+        if ($this->get('amount_due') === 0) {
+            $this->state()->overall()->setPaid();
+            $this->state()->processor()->setCaptured();
+        } else {
+            $this->state()->overall()->setPartial();
+            //$this->state()->processor()->set
+        }
+    //}
+
+        if ($this->get('parent_id')) {
+            $parent = $this->parent();
+
+        }
     }
 
     public function getMethodObject()

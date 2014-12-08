@@ -13,9 +13,6 @@
  * @property FCom_ProductCompare_Model_SetItem FCom_ProductCompare_Model_SetItem
  * @property FCom_Customer_Model_Customer FCom_Customer_Model_Customer
  * @property FCom_Catalog_Model_Product FCom_Catalog_Model_Product
- * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
- * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
- * @property FCom_ProductCompare_Model_SetItem $FCom_ProductCompare_Model_SetItem
  */
 class FCom_ProductCompare_Model_Set extends FCom_Core_Model_Abstract
 {

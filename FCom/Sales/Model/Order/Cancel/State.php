@@ -2,6 +2,9 @@
 
 class FCom_Sales_Model_Order_Cancel_State extends FCom_Core_Model_Abstract_State_Context
 {
+    const OVERALL = 'overall',
+        CUSTOM = 'custom';
+    
     /**
      * Order linked
      *
@@ -15,18 +18,18 @@ class FCom_Sales_Model_Order_Cancel_State extends FCom_Core_Model_Abstract_State
      * @var array
      */
     static protected $_defaultStateClasses = [
-        'overall' => 'FCom_Sales_Model_Order_Cancel_State_Overall',
-        'custom' => 'FCom_Sales_Model_Order_Cancel_State_Custom',
+        self::OVERALL => 'FCom_Sales_Model_Order_Cancel_State_Overall',
+        self::CUSTOM => 'FCom_Sales_Model_Order_Cancel_State_Custom',
     ];
 
     public function overall()
     {
-        return $this->_getStateObject('overall');
+        return $this->_getStateObject(self::OVERALL);
     }
 
     public function custom()
     {
-        return $this->_getStateObject('custom');
+        return $this->_getStateObject(self::CUSTOM);
     }
 
 }

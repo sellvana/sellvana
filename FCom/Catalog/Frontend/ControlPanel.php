@@ -6,7 +6,7 @@
 class FCom_Catalog_Frontend_ControlPanel extends BClass
 {
     /**
-     * @var array
+     * @var FCom_Core_Model_Abstract[]
      */
     static protected $_models = [];
 

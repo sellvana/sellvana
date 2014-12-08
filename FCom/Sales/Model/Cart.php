@@ -95,13 +95,20 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         // get session user
         $customer = $this->FCom_Customer_Model_Customer->sessionUser();
 
+        $cart = null;
         // if cookie cart token is set, try to load it
         if ($cookieToken) {
-            $cart = $this->loadWhere(['cookie_token' => (string)$cookieToken, 'state_overall' => 'active']);
+            $cart = $this->loadWhere([
+                'cookie_token' => (string)$cookieToken,
+                'state_overall' => FCom_Sales_Model_Cart_State_Overall::ACTIVE
+            ]);
             $this->resetSessionCart($cart);
         }
         if (!$cart && $customer) { // if no cookie cart token and customer is logged in, try to find customer cart
-            $cart = $this->loadWhere(['customer_id' => $customer->id(), 'state_overall' => 'active']);
+            $cart = $this->loadWhere([
+                'customer_id' => $customer->id(),
+                'state_overall' => FCom_Sales_Model_Cart_State_Overall::ACTIVE
+            ]);
             if ($cart) {
                 $this->resetSessionCart($cart);
             }
@@ -324,24 +331,34 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
                 $item->set('price', $params['price']);
             }
         }
-        $skuModel = $this->FCom_Catalog_Model_InventorySku->load($params['inventory_id']);
+        if (!empty($params['inventory_id'])) {
+            $skuModel = $this->FCom_Catalog_Model_InventorySku->load($params['inventory_id']);
+        } else {
+            $skuModel = $this->FCom_Catalog_Model_InventorySku->load($product->get('inventory_sku'), 'inventory_sku');
+        }
+
         if (!$item) {
-            $item = $this->FCom_Sales_Model_Cart_Item->create([
+            $itemData = [
                 'cart_id' => $this->id(),
                 'product_id' => $productId,
                 'product_name' => $product->get('product_name'),
-                'product_sku' => !empty($params['product_sku']) ? $params['product_sku'] : null,
-                'inventory_id' => !empty($params['inventory_id']) ? $params['inventory_id'] : null,
-                'inventory_sku' => !empty($params['inventory_sku']) ? $params['inventory_sku'] : null,
+                'product_sku' => !empty($params['product_sku']) ? $params['product_sku'] : $this->get('product_sku'),
+                'inventory_sku' => $product->get('inventory_sku'),
                 'show_separate' => !empty($params['show_separate']) ? $params['show_separate'] : false,
-                'pack_separate' => $skuModel->get('pack_separate'),
-                'shipping_weight' => $skuModel->get('shipping_weight'),
-                'shipping_size' => $skuModel->get('shipping_size'),
-                'cost' => $skuModel->get('unit_cost'),
                 'qty' => $params['qty'],
                 'price' => $params['price'],
                 'unique_hash' => $hash,
-            ]);
+            ];
+            if ($skuModel) {
+                $itemData = array_merge($itemData, [
+                    'inventory_id' => $skuModel->id(),
+                    'pack_separate' => $skuModel->get('pack_separate'),
+                    'shipping_weight' => $skuModel->get('shipping_weight'),
+                    'shipping_size' => $skuModel->get('shipping_size'),
+                    'cost' => $skuModel->get('unit_cost'),
+                ]);
+            }
+            $item = $this->FCom_Sales_Model_Cart_Item->create($itemData);
         }
         if (!empty($params['data'])) {
             foreach ($params['data'] as $key => $val) {
@@ -489,7 +506,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return null
+     * @return BData
      */
     public function getBillingAddress()
     {
@@ -497,7 +514,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
     }
 
     /**
-     * @return null
+     * @return BData
      */
     public function getShippingAddress()
     {

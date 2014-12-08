@@ -2,6 +2,10 @@
 
 class FCom_Sales_Model_Order_Payment_State extends FCom_Core_Model_Abstract_State_Context
 {
+    const OVERALL = 'overall',
+        PROCESSOR = 'processor',
+        CHILDREN = 'children',
+        CUSTOM = 'custom';
     /**
      * Order linked
      *
@@ -15,9 +19,10 @@ class FCom_Sales_Model_Order_Payment_State extends FCom_Core_Model_Abstract_Stat
      * @var array
      */
     static protected $_defaultStateClasses = [
-        'overall' => 'FCom_Sales_Model_Order_Payment_State_Overall',
-        'processor' => 'FCom_Sales_Model_Order_Payment_State_Processor',
-        'custom' => 'FCom_Sales_Model_Order_Payment_State_Custom',
+        self::OVERALL => 'FCom_Sales_Model_Order_Payment_State_Overall',
+        self::PROCESSOR => 'FCom_Sales_Model_Order_Payment_State_Processor',
+        self::CHILDREN => 'FCom_Sales_Model_Order_Payment_State_Children',
+        self::CUSTOM => 'FCom_Sales_Model_Order_Payment_State_Custom',
     ];
 
     /**
@@ -26,7 +31,7 @@ class FCom_Sales_Model_Order_Payment_State extends FCom_Core_Model_Abstract_Stat
      */
     public function overall()
     {
-        return $this->_getStateObject('overall');
+        return $this->_getStateObject(self::OVERALL);
     }
 
     /**
@@ -35,7 +40,16 @@ class FCom_Sales_Model_Order_Payment_State extends FCom_Core_Model_Abstract_Stat
      */
     public function processor()
     {
-        return $this->_getStateObject('processor');
+        return $this->_getStateObject(self::PROCESSOR);
+    }
+
+    /**
+     * @return FCom_Sales_Model_Order_Payment_State_Children
+     * @throws BException
+     */
+    public function children()
+    {
+        return $this->_getStateObject(self::CHILDREN);
     }
 
     /**
@@ -44,7 +58,7 @@ class FCom_Sales_Model_Order_Payment_State extends FCom_Core_Model_Abstract_Stat
      */
     public function custom()
     {
-        return $this->_getStateObject('custom');
+        return $this->_getStateObject(self::CUSTOM);
     }
 
 }

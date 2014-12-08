@@ -563,8 +563,9 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
         $relatedProducts = [];
         for ($i = 0, $c = count($data); $i < $c; $i++) {
             $d = $data[$i];
-            //if must have fields not defined then skip the record
-            if (empty($d['product_name']) && empty($d['product_sku']) && empty($d['url_key'])) {
+            // if must have fields not defined, then skip the record
+            if (empty($d['product_name']) || empty($d['product_sku'])) {
+                $errors[] = sprintf("Missing product name or product sku: %s ...", substr(print_r($d, 1), 0, 50));
                 continue;
             }
 
@@ -1091,7 +1092,7 @@ class FCom_Catalog_Model_Product extends FCom_Core_Model_Abstract
                 try {
                     $productMedia->create([
                         'product_id' => $p->id(),
-                        'media_type' => 'images',
+                        'media_type' => FCom_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG,
                         'file_id'    => $att->id(),
                         'main_thumb' => $isThumb ? 1 : 0
                     ])->save();

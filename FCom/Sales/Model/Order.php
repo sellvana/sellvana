@@ -118,16 +118,6 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
         return $this->addressAsObject('shipping');
     }
 
-    public function billing()
-    {
-        return $this->getBillingAddress();
-    }
-
-    public function shipping()
-    {
-        return $this->getShippingAddress();
-    }
-
     /**
      * Return the order items
      * @param boolean $assoc
@@ -365,8 +355,8 @@ class FCom_Sales_Model_Order extends FCom_Core_Model_Abstract
     protected function _setDefaultStates()
     {
         $state = $this->state();
-        $state->overall()->setNew();
-        $state->delivery()->setNew();
+        $state->overall()->setPending();
+        $state->delivery()->setPending();
 
         if ($this->isPayable()) {
             $state->payment()->setUnpaid();

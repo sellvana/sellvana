@@ -79,7 +79,13 @@ class FCom_SampleData_Admin extends BClass
 
             if ($i == $batchSize) {
                 echo "* ";
-                $this->FCom_Catalog_Model_Product->import($rows);
+                $result = $this->FCom_Catalog_Model_Product->import($rows);
+                if (!empty($result['errors'])) {
+                    foreach ($result['errors'] as $error) {
+                        $client->send(['channel' => 'import', 'signal' => 'error', 'details' => $error]);
+                    }
+
+                }
                 $client->send(['channel' => 'import', 'signal' => 'progress', 'progress' => $remaining]);
                 $rows = [];
                 $i = 0;

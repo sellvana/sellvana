@@ -2,36 +2,42 @@
 
 class FCom_Sales_Model_Cart_State_Payment extends FCom_Core_Model_Abstract_State_Concrete
 {
+    const FREE = 'free',
+        UNPAID = 'unpaid',
+        EXTERNAL = 'external',
+        ACCEPTED = 'accepted',
+        FAILED = 'failed';
+
     protected $_valueLabels = [
-        'free' => 'Free',
-        'unpaid' => 'Unpaid',
-        'external' => 'External',
-        'paid' => 'Paid',
-        'failed' => 'Failed',
+        self::FREE => 'Free',
+        self::UNPAID => 'Unpaid',
+        self::EXTERNAL => 'External',
+        self::ACCEPTED => 'Accepted',
+        self::FAILED => 'Failed',
     ];
 
     public function setFree()
     {
-        return $this->changeState('free');
+        return $this->changeState(self::FREE);
     }
 
     public function setUnpaid()
     {
-        return $this->changeState('unpaid');
+        return $this->changeState(self::UNPAID);
     }
 
     public function setExternal()
     {
-        return $this->changeState('external');
+        return $this->changeState(self::EXTERNAL);
     }
 
-    public function setPaid()
+    public function setAccepted()
     {
-        return $this->changeState('paid');
+        return $this->changeState(self::ACCEPTED);
     }
 
     public function setFailed()
     {
-        return $this->changeState('failed');
+        return $this->changeState(self::FAILED);
     }
 }

@@ -31,6 +31,11 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
     /**
      * @var array
      */
+    protected $_config;
+
+    /**
+     * @var array
+     */
     protected $_capabilities = [
         'pay'           => 1,
         'refund'        => 1,
@@ -114,5 +119,65 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
     protected function _setErrorStatus()
     {
         $this->FCom_Sales_Main->workflowAction('customerGetsPaymentError', ['payment' => $this->_payment]);
+    }
+
+    protected function _onBeforeAuthorization()
+    {
+        $p = $this->_payment;
+        $p->state()->overall()->setPending();
+        $p->state()->processor()->setAuthorizing();
+        $p->save();
+    }
+
+    protected function _onSuccessfulAuthorization()
+    {
+        $p = $this->_payment;
+        $amt = $p->get('amount_due');
+        $p->set('amount_authorized', $amt);
+        $p->state()->overall()->setProcessing();
+        $p->state()->processor()->setAuthorized();
+        $p->save();
+    }
+
+    protected function _onBeforeCapture()
+    {
+
+    }
+
+    protected function _onSuccessfulCapture()
+    {
+        $p = $this->_payment;
+        $amt = $p->get('amount_authorized');
+        $p->set([
+            'amount_captured' => $amt,
+            'amount_due' => $p->get('amount_due') - $amt,
+        ]);
+
+        $p->state()->overall()->setPaid();
+        $p->state()->processor()->setCaptured();
+        $p->save();
+
+        $order = $p->order();
+
+    }
+
+    protected function _onBeforeVoid()
+    {
+
+    }
+
+    protected function _onSuccessfulVoid()
+    {
+
+    }
+
+    protected function _onBeforeRefund()
+    {
+
+    }
+
+    protected function _onSuccessfulRefund()
+    {
+
     }
 }

@@ -510,13 +510,14 @@ EOT
     }
 
     /**
-    * Get table field info
-    *
-    * @param string $fullTableName
-    * @param string $fieldName if null return all fields
-    * @throws BException
-    * @return mixed
-    */
+     * Get table field info
+     *
+     * @param string $fullTableName
+     * @param string $fieldName if null return all fields
+     * @param string|null $connectionName
+     * @return mixed
+     * @throws BException
+     */
     public static function ddlFieldInfo($fullTableName, $fieldName = null, $connectionName = null)
     {
         self::checkTable($fullTableName, $connectionName);

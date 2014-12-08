@@ -82,8 +82,12 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     public function formViewBefore($args)
     {
         parent::formViewBefore($args);
+        /** @var FCom_Promo_Model_Promo $m */
         $m = $args['model'];
-        $args['view']->title = $m->id ? 'Edit Promo: ' . $m->description : 'Create New Promo';
+        $args['view']->title = $m->id() ? 'Edit Promo: ' . $m->description : 'Create New Promo';
+        if (!$m->id()) {
+            // todo initiate promo with status 'incomplete'
+        }
     }
 
     /**
@@ -420,7 +424,7 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
                 'id' => 'promo_attachments',
                 'caption' => 'Promotion Attachments',
                 'datatype' => 'local',
-                'data' => $this->BDb->many_as_array($model->mediaORM('a')->select('a.id')->select('a.file_name')->find_many()),
+                'data' => $this->BDb->many_as_array($model->mediaORM(FCom_Catalog_Model_ProductMedia::MEDIA_TYPE_ATTCH)->select('a.id')->select('a.file_name')->find_many()),
                 'colModel' => [
                     ['name' => 'id', 'label' => 'ID', 'width' => 400, 'hidden' => true],
                     ['name' => 'file_name', 'label' => 'File Name', 'width' => 400],
