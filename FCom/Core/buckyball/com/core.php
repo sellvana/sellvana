@@ -669,6 +669,9 @@ class BConfig extends BClass
 
         switch ($ext) {
         case 'php':
+            if ($this->BDebug->is(['DEBUG', 'DEVELOPMENT']) && function_exists('opcache_invalidate')) {
+                opcache_invalidate($filename);
+            }
             $config = include($filename);
             break;
 

@@ -661,10 +661,21 @@ class BLayout extends BClass
         }
         BDebug::debug('LAYOUT.LOAD: ' . $layoutFilename);
         switch ($ext) {
-            case 'yml': case 'yaml': $layoutData = $this->BYAML->load($layoutFilename); break;
-            case 'json': $layoutData = json_decode(file_get_contents($layoutFilename)); break;
-            case 'php': $layoutData = include($layoutFilename); break;
-            default: throw new BException('Unknown layout file type: ' . $layoutFilename);
+            case 'yml':
+            case 'yaml':
+                $layoutData = $this->BYAML->load($layoutFilename);
+                break;
+            case 'json':
+                $layoutData = json_decode(file_get_contents($layoutFilename));
+                break;
+            case 'php':
+                if ($this->BDebug->is(['DEBUG', 'DEVELOPMENT']) && function_exists('opcache_invalidate')) {
+                    opcache_invalidate($layoutFilename);
+                }
+                $layoutData = include($layoutFilename);
+                break;
+            default:
+                throw new BException('Unknown layout file type: ' . $layoutFilename);
         }
         //$this->_layoutDataCache[$layoutFilename] = $layoutData;
         $this->addLayout($layoutData);

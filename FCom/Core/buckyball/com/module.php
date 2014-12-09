@@ -291,6 +291,9 @@ class BModuleRegistry extends BClass
                             throw new BException('Invalid PHP Manifest File');
                         }
                     }
+                    if ($this->BDebug->is(['DEBUG', 'DEVELOPMENT']) && function_exists('opcache_invalidate')) {
+                        opcache_invalidate($file);
+                    }
                     $manifest = include($file);
                     break;
                 case 'yml':

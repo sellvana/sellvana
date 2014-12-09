@@ -150,7 +150,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             $this->BApp->m('FCom_Admin')->run_status = BModule::LOADED; // for proper migration on some hosts
             $this->BDb->connect();
             $this->FCom_Core_Model_Module->init();
-            $this->BMigrate->migrateModules('FCom_Admin', true);
+            $this->BMigrate->migrateModules(['FCom_Core', 'FCom_Admin'], true);
         }
         $this->BLayout->applyLayout('/step2');
         $sData =& $this->BSession->dataToUpdate();
