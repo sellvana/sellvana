@@ -55,7 +55,7 @@ lib_griddle:
             - [ requireJs, griddle.customFormatContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customFormatContainer ]
             - [ requireJs, griddle.customPaginationContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customPaginationContainer ]
             - [ requireJs, griddle.customFilterContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customFilterContainer ]
-            - [ requireJs, griddle.customGridContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customGridContainer ]
+            - [ requireJs, griddle.customSettingsContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customSettingsContainer ]
             - [ requireJs, griddle.customGridContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customGridContainer ]
             - [ requireJs, griddle.customRowContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customRowContainer ]
             - [ requireJs, griddle.customRow, @FCom_LibJsCommon/jsx/griddle/scripts/customRow ]

@@ -23,7 +23,8 @@ function (React, $, Griddle, Backbone, Components) {
                 var content = <Griddle showTableHeading={false} useCustomGrid={true} columns={allColumns}
                 tableClassName="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable"
                 getExternalResults={FComDataMethod} resultsPerPage={this.props.resultsPerPage}
-                useCustomPager="true" customPager={FComPager} showSettings={true}
+                useCustomPager="true" customPager={FComPager}
+                showSettings={true} useCustomSettings={true} customSettings={FComSettings}
                 showFilter={true} useCustomFilter="true" customFilter={FComFilter} filterPlaceholderText={"Quick Search"}
                 />;
 
@@ -150,19 +151,19 @@ function (React, $, Griddle, Backbone, Components) {
 
                 return (
 
-                    <div className="col-sm-12 text-right pagination">
+                    <div className="col-sm-12 text-right">
                         <span className="f-grid-pagination">{totalResults} record(s)</span>
 
                         <ul className="pagination pagination-sm pagination-griddle pagesize">
-                        {pageSizeHtml}
+                            {pageSizeHtml}
                         </ul>
 
                         <ul className="pagination pagination-sm pagination-griddle page">
-                        {first}
-                        {previous}
-                        {options}
-                        {next}
-                        {last}
+                            {first}
+                            {previous}
+                            {options}
+                            {next}
+                            {last}
                         </ul>
                     </div>
                 )
@@ -381,6 +382,59 @@ function (React, $, Griddle, Backbone, Components) {
                         </span>
                     </div>
                 );
+            }
+        });
+
+
+        var FComSettings = React.createClass({
+            getDefaultProps: function() {
+                return {
+                    "className": ""
+                }
+            },
+            toggleColumn: function(event) {
+                var selected = event.target;
+
+                var dataId = $(selected).attr("data-id");
+                $(".dataTable").find("thead tr th").each(function() {
+                    if ($(this).attr("data-id") == dataId) {
+                        if ($(selected).is(":checked")) {
+                            $(this).width($(this).width());
+                        } else {
+                            $(this).attr("beforeWidth", $(this).width());
+                            $(this).width(0);
+                        }
+                    }
+                })
+            },
+            render: function () {
+                var options = [];
+                for (var i=0; i<allColumns.length; i++) {
+                    if (allColumns[i] != "0") {
+                        options.push(
+                            <li data-id={allColumns[i]} className="dd-item dd3-item">
+                                <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
+                                <div className="dd3-content">
+                                    <label><input type="checkbox" defaultChecked={true} data-id={allColumns[i]} className="showhide_column" onChange={this.toggleColumn}/> {allColumns[i]}</label>
+                                </div>
+                            </li>
+                        );
+                    }
+                }
+                return (
+                    <div className="col-sm-12">
+                        <span className="dropdown dd dd-nestable columns-span">
+                            <a href="#" className="btn dropdown-toggle showhide_columns" data-toggle="dropdown">
+                                Columns <b className="caret"></b>
+                            </a>
+                            <ol className="dd-list dropdown-menu columns ui-sortable">
+                                {options}
+                            </ol>
+                        </span>
+                        <a className="btn grid-mass-edit btn-success disabled" role="button" href="#" >Edit</a>
+                        <button className="btn grid-mass-delete btn-danger disabled" type="button">Delete</button>
+                    </div>
+                )
             }
         });
 
