@@ -898,7 +898,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                     {label: Locale._("City"), field: 'city'}
                 ],
                 labelCombinationField: Locale._("Add a Field to Condition..."),
-                url: "conditions/shipping",
+                url: "conditions/shipping"
             };
         },
         componentDidMount: function () {
@@ -1088,11 +1088,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                     options={this.options} modalContainer={$modalContainer}/>,$container.get(0));
                 /*
                 todo: initiate interface, load data from JSON (either from validator or as json string loaded via ajax)
-                interface consists of form groups
-                    form group has:
-                    remove btn - label - actual config part
-                    app listens for conditions_add button click, takes condition_type value and creates appropriate iface
-                 */
+                */
             }
         },
         initCouponApp: function (selector, $modalContainer) {
@@ -1111,12 +1107,12 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 };
 
                 if (selected != 0) {
-                    this.createCouponApp($container.get(0), $modalContainer.get(0), callBacks, selected, this.options);
+                    this.createCouponApp($container.get(0), $modalContainer.get(0), callBacks, selected, self.options);
                 }
 
                 $couponSelector.on('change', function () {
                     selected = $couponSelector.val();
-                    self.createCouponApp($container.get(0), $modalContainer.get(0), callBacks, selected, this.options);
+                    self.createCouponApp($container.get(0), $modalContainer.get(0), callBacks, selected, self.options);
                 });
             }
         },
@@ -1124,11 +1120,11 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             React.render(<CouponApp {...callBacks} mode={mode} options={options}/>, appContainer);
             React.render(
                 <div className="modals-container">
-                    <Components.Modal onConfirm={this.handleShowConfirm} title="Coupon grid" onLoad={this.addShowCodes.bind(this)}/>
-                    <Components.Modal onConfirm={this.handleGenerateConfirm} title="Generate coupons" onLoad={this.addGenerateCodes.bind(this)}>
+                    <Components.Modal title="Coupon grid" onLoad={this.addShowCodes.bind(this)}/>
+                    <Components.Modal title="Generate coupons" onLoad={this.addGenerateCodes.bind(this)}>
                         <GenerateForm onSubmit={this.postGenerate.bind(this)}/>
                     </Components.Modal>
-                    <Components.Modal onConfirm={this.handleImportConfirm} title="Import coupons" onLoad={this.addImportCodes.bind(this)}/>
+                    <Components.Modal title="Import coupons" onLoad={this.addImportCodes.bind(this)}/>
                 </div>, modalContainer);
         },
         options: {
@@ -1201,7 +1197,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 $codeLength.prop('disabled', false);
             }
             $codePattern.change(function (e) {
-                this.log(e);
+                Promo.log(e);
                 var val = $.trim($codePattern.val());
                 if (val == '') {
                     $codeLength.prop('disabled', false);
@@ -1213,7 +1209,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
         },
         postGenerate: function (e) {
             var $formContainer = $('#coupon-generate-container');
-            this.log(e, $formContainer);
+            Promo.log(e, $formContainer);
             var url = this.options.generateCouponsUrl;
             var $progress = $formContainer.find('.loading');
             var $result = $formContainer.find('.result').hide();
@@ -1241,7 +1237,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                     $progress.hide();
                     $result.show();
                     // hide notification
-                    this.log(r);
+                    Promo.log(r);
                 });
             //});
         },

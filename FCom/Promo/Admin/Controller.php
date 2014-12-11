@@ -542,19 +542,17 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
             $status = "success";
             $html = $this->couponGridView()->render();
         }
-        $this->BResponse->json(['status' => $status, 'html'=>$html]);
+        $this->BResponse->json(['status' => $status, 'html' => $html]);
     }
+
     public function action_coupons_generate__POST()
     {
         $r = $this->BRequest;
 
         $id = $r->get('id');
         $data = $r->post('model');
-        if (!$id) {
-            $message = $this->_("Promotion id not found");
-            $status = 'error';
-            $this->BResponse->status(400, $message, false);
-        } else if (empty($data)) {
+
+        if (empty($data)) {
             $status = "error";
             $message = $this->_("No data received.");
             $this->BResponse->status(400, $message, $message);
@@ -586,11 +584,6 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
     public function action_coupons_import__POST()
     {
         $id = $this->BRequest->get('id');
-        if (!$id) {
-            $message = $this->_("Promotion id not found");
-            $this->BResponse->status(400, $message, $message);
-            return;
-        }
         if (empty($_FILES) || !isset($_FILES['upload'])) {
             $this->BResponse->json(['msg' => "Nothing found"]);
             return;
@@ -649,20 +642,14 @@ class FCom_Promo_Admin_Controller extends FCom_Admin_Controller_Abstract_GridFor
 
     public function action_coupons_import()
     {
-        $r = $this->BRequest;
+        $r  = $this->BRequest;
         $id = $r->get('id');
-        if (!$id) {
-            $html = $this->_("Promotion id not found");
-            $status = 'error';
-            $this->BResponse->status(400, $html, false);
-        } else {
-            $m = [
-                'config' => ['max_import_file_size' => $this->_getMaxUploadSize(), 'promoId' => $id],
-            ];
+        $m  = [
+            'config' => ['max_import_file_size' => $this->_getMaxUploadSize(), 'promoId' => $id],
+        ];
 
-            $status = "success";
-            $html = $this->view('promo/coupons/import')->set('model', $m)->render();
-        }
+        $status = "success";
+        $html   = $this->view('promo/coupons/import')->set('model', $m)->render();
         $this->BResponse->json(['status' => $status, 'html' => $html]);
     }
 
