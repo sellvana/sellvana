@@ -108,16 +108,17 @@
             </div>
         </div>
         <div id="conditions-options"></div>
+
         <div class="form-group">
             {{ forms.hidden({field:"actions_serialized", value: validator.fieldValue("actions_serialized")}) }}
-            <label class="control-label col-md-3" for="model-conditions">{{"Add Promo Actions"|_}}&nbsp;
-                    <a id="help-model-conditions" class="pull-right help-icon" href="#"
+            <label class="control-label col-md-3" for="model-actions">{{"Add Promo Actions"|_}}&nbsp;
+                    <a id="help-model-actions" class="pull-right help-icon" href="#"
                        data-toggle="popover" data-trigger="focus" data-content="{{"Configure promo actions"|_}}"
                        data-container="body">
                         <span class="glyphicon glyphicon-question-sign"></span></a>
             </label>
             <div class="col-md-4">
-                <select id="model-conditions" name="model[conditions]" class="form-control to-select2">
+                <select id="model-actions" name="model[actions]" class="form-control to-select2">
                     <option value="">{{"Add Promo Action..."|_}}</option>
                     <option value="get_discount">{{"Discount"|_}}</option>
                     <option value="get_shipping">{{"Shipping"|_}}</option>
@@ -131,6 +132,46 @@
             </div>
         </div>
         <div id="actions-options"></div>
+
+        <div id="select2-test">
+            <input type="hidden" id="sel2-test"/>
+            <script type="text/javascript" charset="utf-8">
+                require(['jquery', 'select2'], function ($) {
+                    function search(params, url, callback) {
+                        params.term = params.term || '*'; // '*' means default search
+                        params.page = params.page || 1;
+                        params.limit = params.limit || 100;
+
+                        params.searchedTerms = params.searchedTerms || {};
+                        var termStatus = params.searchedTerms[params.term];
+                        if (termStatus == undefined || termStatus == 1) {
+                            if (termStatus == 1) {
+                                params.page++; // search for next page
+                            }
+                            $.get(url, params)
+                                    .done(function (result) {
+                                        if (result.hasOwnProperty('total_count')) {
+                                            var more = params.page * params.limit < result['total_count'];
+                                            params.searchedTerms[params.term] = (more) ? 1 : 2; // 1 means more results to be fetched, 2 means all fetched
+                                        }
+                                        callback(result, params);
+                                    })
+                                    .fail(function (result) {
+                                        callback(result, params);
+                                    });
+                        } else if (termStatus == 2) {
+                            callback('local', params); // find results from local storage
+                        } else {
+                            console.error("UNKNOWN search status.")
+                        }
+                    }
+
+                    function searchLocal(term, values) {
+                        var regex = /term/;
+                    }
+                });
+            </script>
+        </div>
         <script type="text/javascript">
             require(['react', 'jsx!fcom.promo'], function (React, Promo) {
                 $('.to-select2').select2({minimumResultsForSearch:15});
