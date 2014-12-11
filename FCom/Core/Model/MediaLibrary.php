@@ -10,6 +10,7 @@
  * @property string $data_serialized
  * @property string $create_at
  * @property string $update_at
+ * @property FCom_Core_Main $FCom_Core_Main
  */
 class FCom_Core_Model_MediaLibrary extends FCom_Core_Model_Abstract
 {

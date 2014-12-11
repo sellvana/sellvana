@@ -1,5 +1,12 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_OAuth_Provider_BaseV2
+ *
+ * @property FCom_OAuth_Main $FCom_OAuth_Main
+ * @property FCom_OAuth_Model_ConsumerToken $FCom_OAuth_Model_ConsumerToken
+ */
+
 class FCom_OAuth_Provider_BaseV2 extends FCom_OAuth_Provider_Abstract
 {
     public function loginAction()

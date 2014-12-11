@@ -3,6 +3,7 @@
 /**
  * Class FCom_Catalog_Admin_Controller_Categories
  * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ * @property FCom_Core_Main $FCom_Core_Main
  */
 class FCom_Catalog_Admin_Controller_Categories extends FCom_Admin_Controller_Abstract_TreeForm
 {

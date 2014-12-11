@@ -26,9 +26,9 @@ class FCom_Email_Admin_Controller_Subscriptions extends FCom_Admin_Controller_Ab
             ['type' => 'input', 'name' => 'email', 'label' => 'Email', 'index' => 'e.email', 'addable' => true, 'editable' => true,
                   'validation' => ['required' => true, 'unique' => $this->BApp->href('subscriptions/unique')]],
             ['type' => 'input', 'name' => 'unsub_all', 'label' => 'Un-subscribe all', 'index' => 'e.unsub_all',
-                  'addable' => true, 'editable' => true, 'mass-editable' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
+                  'addable' => true, 'editable' => true, 'multirow_edit' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
             ['type' => 'input', 'name' => 'sub_newsletter', 'label' => 'Subscribe newsletter', 'index' => 'e.sub_newsletter', 'addable' => true,
-                  'editable' => true, 'mass-editable' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
+                  'editable' => true, 'multirow_edit' => true, 'options' => ['1' => 'Yes', '0' => 'No'], 'editor' => 'select'],
             ['name' => 'create_at', 'label' => 'Created', 'index' => 'e.create_at'],
             ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]],
         ];

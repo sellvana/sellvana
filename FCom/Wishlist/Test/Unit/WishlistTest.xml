@@ -4,10 +4,10 @@
     <fcom_customer id="2" email="test2@test.com" firstname="Test 2" />
     <fcom_customer id="3" email="test3@test.com" firstname="Test 3" />
 
-    <fcom_product id="1" product_name="Product 1" local_sku="product1" url_key="product-1" base_price="2" />
-    <fcom_product id="2" product_name="Product 2" local_sku="product2" url_key="product-2" base_price="2" />
-    <fcom_product id="3" product_name="Product 3" local_sku="product3" url_key="product-3" base_price="3" />
-    <fcom_product id="4" product_name="Product 4" local_sku="product4" url_key="product-4" base_price="5" />
+    <fcom_product id="1" product_name="Product 1" product_sku="product1" url_key="product-1" base_price="2" />
+    <fcom_product id="2" product_name="Product 2" product_sku="product2" url_key="product-2" base_price="2" />
+    <fcom_product id="3" product_name="Product 3" product_sku="product3" url_key="product-3" base_price="3" />
+    <fcom_product id="4" product_name="Product 4" product_sku="product4" url_key="product-4" base_price="5" />
 
     <fcom_wishlist id="1" customer_id="1" />
     <fcom_wishlist id="2" customer_id="2" />

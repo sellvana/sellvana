@@ -1519,7 +1519,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
             });
             BackboneGrid.Views.ModalForm = Backbone.View.extend({
                 initialize: function () {
-                    this.modalType = 'mass-editable';
+                    this.modalType = 'multirow_edit';
                     this.$el.parents('div.modal-dialog:first').find('button.save').click(this.saveChanges);
                 },
                 saveChanges: function (ev) {
@@ -1534,7 +1534,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         return false;
                     }
 
-                    if (modalForm.modalType === 'mass-editable') {
+                    if (modalForm.modalType === 'multirow_edit') {
 
                         var ids = selectedRows.pluck('id').join(",");
 
@@ -1616,7 +1616,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                             header = 'Create Form';
                             BackboneGrid.currentRow = false;
                             break;
-                        case 'mass-editable':
+                        case 'multirow_edit':
                             BackboneGrid.currentRow = false;
                             header = 'Mass Edit Form';
                             break;
@@ -1626,7 +1626,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     }
                     $(BackboneGrid.modalFormId).find('h4').html(header);
                     BackboneGrid.modalElementVals = {};
-                    if (this.modalType === 'mass-editable') {
+                    if (this.modalType === 'multirow_edit') {
                         var elementView = new BackboneGrid.Views.ModalMassGridElement({collection: this.collection});
                         $(BackboneGrid.modalFormId).find('.modal-header').after(elementView.render({ modalType: this.modalType}).el);
                         $(BackboneGrid.modalFormId).find('.well select').select2({
@@ -1637,7 +1637,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                         this.collection.each(this.addElementDiv, this);
                     }
 
-                    if (this.modalType === 'mass-editable') {
+                    if (this.modalType === 'multirow_edit') {
                         $(BackboneGrid.modalFormId).find('select').val('');
                     }
 
@@ -1691,7 +1691,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
                     var show = [];
                     this.collection.each(function (model) {
                         if (model.has(data.modalType) && model.get(data.modalType)) {
-                            if (model.has('mass-editable-show') && model.get('mass-editable-show')) {
+                            if (model.has('multirow_edit_show') && model.get('multirow_edit_show')) {
                                 show.push(model);
                             } else {
                                 mod.push({name: model.get('name'), label: model.get('label')});
@@ -2164,7 +2164,7 @@ define(['backbone', 'underscore', 'jquery', 'ngprogress', 'select2',
 
                 if ($(BackboneGrid.MassEditButton).length > 0) {
                     $(BackboneGrid.MassEditButton).on('click', function (ev) {
-                        modalForm.modalType = 'mass-editable';
+                        modalForm.modalType = 'multirow_edit';
                         modalForm.render();
                         $(BackboneGrid.modalShowBtnId).trigger('click');
                     });

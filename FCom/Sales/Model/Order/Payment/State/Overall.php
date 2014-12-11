@@ -2,47 +2,88 @@
 
 class FCom_Sales_Model_Order_Payment_State_Overall extends FCom_Core_Model_Abstract_State_Concrete
 {
+    const PENDING = 'pending',
+        EXT_SENT = 'ext_sent',
+        EXT_RETURNED = 'ext_returned',
+        FAILED = 'failed',
+        CANCELED = 'canceled',
+        PROCESSING = 'processing',
+        PARTIAL_PAID = 'partial_paid',
+        PAID = 'paid',
+        PARTIAL_REFUNDED = 'partial_refunded',
+        REFUNDED = 'refunded',
+        CHARGEDBACK = 'chargedback';
+
     protected $_valueLabels = [
-        'pending' => 'Pending',
-        'paid' => 'Paid',
-        'failed' => 'Failed',
-        'refunded' => 'Refunded',
-        'void' => 'Void',
-        'partial' => 'Partial',
+        self::PENDING => 'Pending',
+        self::EXT_SENT => 'Sent to External Checkout',
+        self::EXT_RETURNED => 'Returned from External Checkout',
+        self::FAILED => 'Failed',
+        self::CANCELED => 'Canceled',
+        self::PROCESSING => 'Processing',
+        self::PARTIAL_PAID => 'Partial Paid',
+        self::PAID => 'Paid',
+        self::PARTIAL_REFUNDED => 'Partial Refunded',
+        self::REFUNDED => 'Refunded',
+        self::CHARGEDBACK => 'Charged Back',
     ];
 
-    protected $_setValueNotificationTemplates =[
-        'refunded' => 'email/sales/order-state-payment-refunded',
-        'void' => 'email/sales/order-state-overall-void',
+    protected $_setValueNotificationTemplates = [
+        self::REFUNDED => 'email/sales/order-payment-state-overall-refunded',
     ];
 
     public function setPending()
     {
-        return $this->changeState('pending');
+        return $this->changeState(self::PENDING);
     }
 
-    public function setPaid()
+    public function setExtSent()
     {
-        return $this->changeState('paid');
+        return $this->changeState(self::EXT_SENT);
+    }
+
+    public function setExtReturned()
+    {
+        return $this->changeState(self::EXT_RETURNED);
     }
 
     public function setFailed()
     {
-        return $this->changeState('failed');
+        return $this->changeState(self::FAILED);
+    }
+
+    public function setCanceled()
+    {
+        return $this->changeState(self::CANCELED);
+    }
+
+    public function setProcessing()
+    {
+        return $this->changeState(self::PROCESSING);
+    }
+
+    public function setPartialPaid()
+    {
+        return $this->changeState(self::PARTIAL_PAID);
+    }
+
+    public function setPaid()
+    {
+        return $this->changeState(self::PAID);
+    }
+
+    public function setPartialRefunded()
+    {
+        return $this->changeState(self::PARTIAL_REFUNDED);
     }
 
     public function setRefunded()
     {
-        return $this->changeState('refunded');
+        return $this->changeState(self::REFUNDED);
     }
 
-    public function setVoid()
+    public function setChargedBack()
     {
-        return $this->changeState('void');
-    }
-
-    public function setPartial()
-    {
-        return $this->changeState('partial');
+        return $this->changeState(self::CHARGEDBACK);
     }
 }

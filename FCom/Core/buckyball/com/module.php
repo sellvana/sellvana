@@ -35,7 +35,7 @@ class BModuleRegistry extends BClass
     /**
     * Module information collected from manifests
     *
-    * @var array
+    * @var BModule[]
     */
     protected $_modules = [];
 
@@ -156,13 +156,20 @@ class BModuleRegistry extends BClass
 
     public function pushModule($name)
     {
+//echo "\n {{{ PUSH: {$name} }}}} \n";
         array_push($this->_currentModuleStack, $name);
         return $this;
     }
 
     public function popModule()
     {
-        array_pop($this->_currentModuleStack);
+        $name = array_pop($this->_currentModuleStack);
+        /*
+        echo "\n {{{ POP: {$name} }}}} \n";
+        if (sizeof($this->_currentModuleStack) > 1) {
+            echo "\n -{$name}: "; var_dump($this->_currentModuleStack); debug_print_backtrace(); echo "\n";
+        }
+        */
         return $this;
     }
 
@@ -171,7 +178,7 @@ class BModuleRegistry extends BClass
         if (!empty($this->_currentModuleStack)) {
             return $this->_currentModuleStack[sizeof($this->_currentModuleStack)-1];
         }
-        return $this->_currentModuleName;
+        return null;//$this->_currentModuleName;
     }
 
     public function expandPath($path)
@@ -284,11 +291,14 @@ class BModuleRegistry extends BClass
                             throw new BException('Invalid PHP Manifest File');
                         }
                     }
+                    if ($this->BDebug->is(['DEBUG', 'DEVELOPMENT']) && function_exists('opcache_invalidate')) {
+                        opcache_invalidate($file);
+                    }
                     $manifest = include($file);
                     break;
                 case 'yml':
                     // already should be taken care of with filemtime()
-                    $useCache = true;#!$this->BDebug->is('DEBUG,DEVELOPMENT,INSTALLATION');
+                    $useCache = true;#!$this->BDebug->is(['DEBUG', 'DEVELOPMENT', 'INSTALLATION']);
                     $manifest = $this->BYAML->load($file, $useCache);
                     break;
                 case 'json':
@@ -348,6 +358,7 @@ class BModuleRegistry extends BClass
             // iterate over require for modules
             if (!empty($mod->require['module'])) {
                 foreach ($mod->require['module'] as &$req) {
+                    /** @var BModule $reqMod */
                     $reqMod = !empty($this->_modules[$req['name']]) ? $this->_modules[$req['name']] : false;
                     // is the module missing
                     if (!$reqMod) {
@@ -825,7 +836,7 @@ if ($args['name']==="FCom_Referrals") {
                     } elseif (is_string($reqVer) || is_float($reqVer)) {
                         $from = '';
                         $to = '';
-                        $reqVerAr = explode(";", (string)$reqVer);
+                        $reqVerAr = explode("~", (string)$reqVer);
                         if (!empty($reqVerAr[0])) {
                             $from = $reqVerAr[0];
                         }
@@ -1993,7 +2004,7 @@ class BDbModule extends BModel
         $table = static::table();
         if (!$this->BDb->ddlTableExists($table)) {
             $this->BDb->ddlTableDef($table, [
-                'COLUMNS' => [
+                BDb::COLUMNS => [
                     'id' => 'int unsigned not null auto_increment',
                     'module_name' => 'varchar(100) not null',
                     'schema_version' => 'varchar(20)',
@@ -2001,8 +2012,8 @@ class BDbModule extends BModel
                     'last_upgrade' => 'datetime',
                     'last_status' => 'varchar(20)',
                 ],
-                'PRIMARY' => '(id)',
-                'KEYS' => [
+                BDb::PRIMARY => '(id)',
+                BDb::KEYS => [
                     'UNQ_module_name' => 'UNIQUE (module_name)',
                 ],
             ]);

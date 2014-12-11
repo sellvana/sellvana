@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Catalog_Model_ProductMedia
+ *
+ * @property FCom_Core_Main $FCom_Core_Main
+ */
+
 class FCom_Catalog_Model_ProductMedia extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_product_media';
@@ -14,6 +20,9 @@ class FCom_Catalog_Model_ProductMedia extends FCom_Core_Model_Abstract
             'product_id', 'file_id'
         ],
     ];
+
+    const MEDIA_TYPE_IMG = "I"
+        , MEDIA_TYPE_ATTCH = "A"; // any other media types?
 
     public function getUrl()
     {

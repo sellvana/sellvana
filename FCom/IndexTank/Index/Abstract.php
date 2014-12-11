@@ -3,18 +3,6 @@
 class FCom_IndexTank_Index_Abstract extends BClass
 {
     /**
-     * Shortcut to help with IDE autocompletion
-     *
-     * @param bool $new
-     * @param array $args
-     * @return FCom_IndexTank_Index_Abstract
-     */
-    static public function i($new = false, array $args = [])
-    {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
-    }
-
-    /**
      * @param $orm
      * @param $r
      * @param array $d

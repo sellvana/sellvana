@@ -5,6 +5,7 @@
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  * @property FCom_Customer_Model_Address $FCom_Customer_Model_Address
  * @property FCom_CustomerGroups_Model_Group $FCom_CustomerGroups_Model_Group
+ * @property FCom_Core_Main $FCom_Core_Main
  */
 class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -18,6 +19,8 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
     protected $_navPath = 'customer/customers';
     protected $_formViewPrefix = 'customer/customers-form/';
 
+    protected $_gridViewName = 'core/griddle';
+
     public function gridConfig()
     {
         $config = parent::gridConfig();
@@ -29,10 +32,10 @@ class FCom_Customer_Admin_Controller_Customers extends FCom_Admin_Controller_Abs
             ['name' => 'email', 'label' => 'Email', 'index' => 'c.email'],
             ['type' => 'input', 'name' => 'customer_group', 'label' => 'Customer Group', 'index' => 'c.customer_group',
                   'editor' => 'select', 'options' => $this->FCom_CustomerGroups_Model_Group->groupsOptions(),
-                  'editable' => true, 'mass-editable' => true, 'validation' => ['required' => true]],
+                  'editable' => true, 'multirow_edit' => true, 'validation' => ['required' => true]],
             ['type' => 'input', 'name' => 'status', 'label' => 'Status', 'index' => 'c.status', 'editor' => 'select',
                   'options' => $this->FCom_Customer_Model_Customer->fieldOptions('status'),
-                  'editable' => true, 'mass-editable' => true, 'validation' => ['required' => true]],
+                  'editable' => true, 'multirow_edit' => true, 'validation' => ['required' => true]],
             ['name' => 'street1', 'label' => 'Address', 'index' => 'a.street1'],
             ['name' => 'city', 'label' => 'City', 'index' => 'a.city'],
             ['name' => 'region', 'label' => 'Region', 'index' => 'a.region'],

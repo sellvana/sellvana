@@ -151,7 +151,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
             }
         }
         if ($columnsUpdate) {
-            $this->BDb->ddlTableDef($fTable, ['COLUMNS' => $columnsUpdate]);
+            $this->BDb->ddlTableDef($fTable, [BDb::COLUMNS => $columnsUpdate]);
         }
 
         $this->_oldTableFieldCode = $this->field_code;
@@ -169,7 +169,7 @@ class FCom_CustomField_Model_Field extends FCom_Core_Model_Abstract
     {
         parent::onAfterDelete();
         if ($this->table_field_type !== '_serialized') {
-            $this->BDb->ddlTableDef($this->tableName(), ['COLUMNS' => [$this->field_code => 'DROP']]);
+            $this->BDb->ddlTableDef($this->tableName(), [BDb::COLUMNS => [$this->field_code => BDb::DROP]]);
         }
     }
 

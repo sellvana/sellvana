@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Test_Unit_OrderTest
+ *
+ * @property FCom_Sales_Main $FCom_Sales_Main
+ */
+
 class FCom_Sales_Test_Unit_OrderTest extends FCom_Test_DatabaseTestCase
 {
     public function getDataSet()
@@ -12,7 +18,7 @@ class FCom_Sales_Test_Unit_OrderTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(2, $this->getConnection()->getRowCount('fcom_sales_order'), "Pre-Condition");
 
         $data = ['cart_id' => 3, 'customer_id' => 2];
-        FCom_Sales_Model_Order::i()->addNew($data)->save();
+        FCom_Sales_Model_Order::i()->create($data)->save();
 
         $this->assertEquals(3, $this->getConnection()->getRowCount('fcom_sales_order'), "Insert failed");
     }
@@ -35,7 +41,7 @@ class FCom_Sales_Test_Unit_OrderTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(1, count($order->items()), "Before add failed");
 
         $orderItem = ['order_id' => $order->id(), 'product_id' => 1, 'qty' => 1, 'total' => 10];
-        FCom_Sales_Model_Order_Item::i()->addNew($orderItem);
+        FCom_Sales_Model_Order_Item::i()->create($orderItem)->save();
 
         $this->assertEquals(2, count($order->items()), "After add failed");
     }
@@ -48,7 +54,7 @@ class FCom_Sales_Test_Unit_OrderTest extends FCom_Test_DatabaseTestCase
         $this->assertEquals(1, count($order->items()), "Before add failed");
 
         $orderItem = ['order_id' => $order->id(), 'product_id' => 1, 'qty' => 1, 'total' => 10];
-        FCom_Sales_Model_Order_Item::i()->addNew($orderItem);
+        FCom_Sales_Model_Order_Item::i()->create($orderItem)->save();
 
         $this->assertEquals(2, count($order->items()), "After add failed");
 
@@ -62,7 +68,7 @@ class FCom_Sales_Test_Unit_OrderTest extends FCom_Test_DatabaseTestCase
     public function testAddPaymentMethod()
     {
         FCom_Sales_Main::i()->addPaymentMethod('paypal', 'FCom_PayPal_Frontend');
-        $methods = FCom_Sales_Main::i()->getPaymentMethods();
+        $methods = $this->FCom_Sales_Main->getPaymentMethods();
         $this->assertTrue(isset($methods['paypal']));
     }
 

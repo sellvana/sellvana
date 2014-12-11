@@ -1,5 +1,9 @@
-<form action="{{ APP.href('login') }}" method="post" id="login-form" role="form">
+{% set formUrl = THIS.get('form_url') ?: 'login' %}
+
+<form action="{{ APP.href(formUrl) }}" method="post" id="login-form" role="form">
   <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+  <input type="hidden" name="redirect_to" value="{{ THIS.get('redirect_to') }}"/>
+
   <fieldset class="f-authentification-form">
     <header class="f-page-header">
       <h1 class="f-page-title">{{ 'Login' |_ }}</h1>

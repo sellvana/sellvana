@@ -10,6 +10,9 @@
  * @property FCom_CustomField_Model_Set $FCom_CustomField_Model_Set
  * @property FCom_CustomField_Model_SetField $FCom_CustomField_Model_SetField
  * @property FCom_CustomField_Model_Field $FCom_CustomField_Model_Field
+ * @property FCom_Core_Main $FCom_Core_Main
+ * @property FCom_CustomField_Model_ProductVarfield $FCom_CustomField_Model_ProductVarfield
+ * @property FCom_CustomField_Model_ProductVariantImage $FCom_CustomField_Model_ProductVariantImage
  */
 class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_Abstract
 {
@@ -51,8 +54,34 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function variantFieldGridConfig($model)
     {
-        $data = $model->getData('variants_fields');
+        //$data = $model->getData('variants_fields');
+        $varFields = $this->FCom_CustomField_Model_ProductVarfield->orm('vf')
+            ->join('FCom_CustomField_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
+            ->select(['varfield_id' => 'vf.id', 'vf.field_id', 'varfield_label' => 'vf.field_label', 'vf.position'])
+            ->select(['f.field_code', 'f.field_name'])
+            ->order_by_asc('vf.position')
+            ->find_many_assoc('field_id');
+        if ($varFields) {
+            $varFieldsOptions = $this->FCom_CustomField_Model_FieldOption->orm()
+                ->where_in('field_id', array_keys($varFields))
+                ->find_many_assoc();
+            $options = [];
+            foreach ($varFieldsOptions as $vfo) {
+                $options[$vfo->get('field_id')][$vfo->id()] = $vfo->get('label');
+            }
+        }
 
+        $data = [];
+        foreach ($varFields as $vf) {
+            $fId = $vf->get('field_id');
+            $data[] = [
+                'id'          => $fId,
+                'varfield_id' => $vf->get('varfield_id'),
+                'field_code'  => $vf->get('field_code'),
+                'name'        => $vf->get('field_name'),
+                'options'     => !empty($options[$fId]) ? $options[$fId] : [],
+            ];
+        }
         $config = [
             'config' => [
                 'id' => 'variable-field-grid',
@@ -89,28 +118,50 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
             ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true, 'position' => 1]
         ];
 
-        $vFields = $model->getData('variants_fields');
-        if ($vFields !== null) {
+        //$vFields = $model->getData('variants_fields');
+
+        $varFields = $this->FCom_CustomField_Model_ProductVarfield->orm('vf')
+            ->join('FCom_CustomField_Model_Field', ['f.id', '=', 'vf.field_id'], 'f')
+            ->select(['varfield_id' => 'vf.id', 'vf.field_id', 'varfield_label' => 'vf.field_label', 'vf.position'])
+            ->select(['f.field_code', 'f.field_name'])
+            ->order_by_asc('vf.position')
+            ->find_many_assoc('field_id');
+
+        if ($varFields) {
+            $varFieldsOptions = $this->FCom_CustomField_Model_FieldOption->orm()
+                ->where_in('field_id', array_keys($varFields))
+                ->find_many_assoc();
+            $options = [];
+            foreach ($varFieldsOptions as $vfo) {
+                $options[$vfo->get('field_id')][$vfo->get('label')] = $vfo->get('label');
+            }
+        }
+
+        if ($varFields) {
             $pos = 2;
-            foreach ($vFields as $f) {
-                $f['options'] = $this->FCom_CustomField_Model_FieldOption->getListAssocById($f['id']);
-                $f['label'] = $f['name'];
-                $f['name'] = $f['field_code'];
-                $f['field_id'] = $f['id'];
+            foreach ($varFields as $fId => $vf) {
+                $f = [];
+                $f['options'] = !empty($options[$fId]) ? $options[$fId] : [];
+                $f['label'] = $vf->get('field_name');
+                $f['name'] = $vf->get('field_code');
+                $f['field_id'] = $fId;
                 $f['addable'] = true;
-                $f['mass-editable'] = true;
+                $f['multirow_edit'] = true;
                 $f['width'] = 200;
                 $f['position'] = $pos++;
                 $f['validation'] = ['required' => true];
                 $f['display'] = 'eval';
-                $f['print'] = '"<p style=\"overflow:hidden\"><input type=\"hidden\" name=\''. $f['name'].'\' class=\"select-value-field required\" style=\"width: 170px\" /></p>"';
+                $f['print'] = '"<p style=\"overflow:hidden\"><input type=\"hidden\" name=\''. $vf->get('field_code').'\' class=\"select-value-field required\" style=\"width: 170px\" /></p>"';
                 $f['default'] = '';
                 $columns[] = $f;
             }
+#var_dump($columns); exit;
         }
         $image = $this->variantImageGrid($model);
-        $columns[] = ['type' => 'input', 'name' => 'variant_sku', 'label' => 'SKU', 'width' => 150, 'editable' => 'inline',
-                        'addable' => true, 'default' => ''];
+        $columns[] = ['type' => 'input', 'name' => 'product_sku', 'label' => 'Variant SKU', 'width' => 150, 'editable' => 'inline',
+            'addable' => true, 'default' => ''];
+        $columns[] = ['type' => 'input', 'name' => 'inventory_sku', 'label' => 'Inventory SKU', 'width' => 150, 'editable' => 'inline',
+            'addable' => true, 'default' => ''];
         $columns[] = ['type' => 'input', 'name' => 'variant_price', 'label' => 'PRICE', 'width' => 150, 'editable' => 'inline',
                         'addable' => true, 'validation' => ['number' => true], 'default' => ''];
         $columns[] = ['type' => 'input', 'name' => 'variant_qty', 'label' => 'QTY', 'width' => 150, 'editable' => 'inline',
@@ -126,17 +177,24 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
         $data = [];
 
         /** @var FCom_CustomField_Model_ProductVariant[] $variants */
-        $variants = $this->FCom_CustomField_Model_ProductVariant->orm()->where('product_id', $model->id)->find_many();
+        $variants = $this->FCom_CustomField_Model_ProductVariant->orm()->where('product_id', $model->id())->find_many();
+        $images = $this->FCom_CustomField_Model_ProductVariantImage->orm()->where('product_id', $model->id())->find_many();
         if ($variants !== null) {
             foreach ($variants as $v) {
-                $file_id = $v->getData('variant_file_id');
+                $fileIds = [];
+                foreach ($images as $img) {
+                    if ($img->get('variant_id') == $v->id()) {
+                        $fileIds[] = $img->get('file_id');
+                    }
+                }
                 $vField = [];
-                $vField['field_values'] = $this->BUtil->objectToArray(json_decode($v->field_values));
-                $vField['variant_sku'] = $v->variant_sku;
+                $vField['field_values'] = $this->BUtil->fromJson($v->field_values);
+                $vField['product_sku'] = $v->product_sku;
+                $vField['inventory_sku'] = $v->inventory_sku;
                 $vField['variant_qty'] = $v->variant_qty;
                 $vField['variant_price'] = $v->variant_price;
-                $vField['variant_file_id'] = ($file_id)? $file_id: '';
-                $vField['id'] = $v->id;
+                $vField['variant_file_id'] = join(',', $fileIds);
+                $vField['id'] = $v->id();
                 $data[] = $vField;
             }
         }
@@ -169,7 +227,7 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
      */
     public function variantImageGrid($model)
     {
-        $data = $this->BDb->many_as_array($model->mediaORM('I')
+        $data = $this->BDb->many_as_array($model->mediaORM(FCom_Catalog_Model_ProductMedia::MEDIA_TYPE_IMG)
             ->left_outer_join('FCom_Catalog_Model_ProductMedia', ['pa.file_id', '=', 'pm.file_id'], 'pm')
             ->select(['pa.id', 'pa.position',  'a.file_name'])
             ->select('a.id', 'file_id')
@@ -177,75 +235,6 @@ class FCom_CustomField_Admin_Controller_Products extends FCom_Admin_Controller_A
             ->group_by('pa.id')
             ->find_many());
         return $data;
-    }
-
-    /**
-     * @param FCom_Catalog_Model_Product $model
-     * @return array
-     */
-    public function frontendFieldGrid($model)
-    {
-        $data = $model->getData('frontend_fields');
-        if (!isset($data))
-            $data = [];
-        $config = [
-            'config' => [
-                'id' => 'frontend-field-grid',
-                'caption' => 'Frontend Field Grid',
-                'data_mode' => 'local',
-                'data' => $data,
-                'columns' => [
-                    ['type' => 'row_select'],
-                    ['name' => 'id', 'label' => 'ID', 'width' => 30, 'hidden' => true],
-                    ['name' => 'name', 'label' => 'Field Name', 'width' => 200, 'editable' => 'inline',
-                        'addable' => true, 'type' => 'input' , 'validation' => ['required' => true]],
-                    ['name' => 'label', 'label' => 'Field Label', 'width' => 200, 'editable' => 'inline',
-                        'addable' => true, 'type' => 'input' , 'validation' => ['required' => true]],
-                    ['name' => 'input_type', 'label' => 'Field Type', 'width' => 200, 'editable' => 'inline','editor' => 'select',
-                        'addable' => true, 'type' => 'input' , 'validation' => ['required' => true], 'default' => 'select',
-                        'options' => ['textarea' => 'Text Area', 'text' => 'Text Line', 'select' => 'Drop Down', 'checkbox' => 'Check Box'],
-                    ],
-                    ['name' => 'required', 'label' => 'Required', 'width' => 150, 'editor' => 'select',
-                        'editable' => 'inline', 'type' => 'input', 'addable' => true, 'options' => [1 => 'Yes', 0 => 'No'], 'default' => 1],
-                    ['type' => 'input', 'name' => 'options', 'label' => 'Options', 'width' => 200, 'editable' => 'inline',
-                        'addable' => true],
-                    ['type' => 'input', 'name' => 'position', 'label' => 'Position', 'width' => 200, 'editable' => 'inline',
-                        'addable' => true, 'validation' => ['number' => true]],
-                    ['type' => 'btn_group', 'buttons' => [['name' => 'delete']]]
-                ],
-                'actions' => [
-                    'new' => ['caption' => 'Add Fields'],
-                    'delete' => ['caption' => 'Remove']
-                ],
-                'grid_before_create' => 'frontendFieldGridRegister'
-            ]
-        ];
-
-        return $config;
-    }
-
-    public function onProductsFormViewBefore()
-    {
-        $id = $this->BRequest->param('id', true);
-        $p = $this->view('admin/form')->get('model');
-        #$p = $this->FCom_Catalog_Model_Product->load($id);
-
-        if (!$p) {
-            return;//$p = $this->FCom_Catalog_Model_Product->create();
-        }
-
-        $fieldsOptions = [];
-        $fields = $this->FCom_CustomField_Model_ProductField->productFields($p);
-        if ($fields) {
-            $fieldIds = $this->BUtil->arrayToOptions($fields, 'id');
-            $fieldOptionsAll = $this->FCom_CustomField_Model_FieldOption->orm()->where_in("field_id", $fieldIds)
-                ->order_by_asc('field_id')->order_by_asc('label')->find_many();
-            foreach ($fieldOptionsAll as $option) {
-                $fieldsOptions[$option->get('field_id')][] = $option;
-            }
-        }
-        $view = $this->view('customfields/products/fields-partial');
-        $view->set('model', $p)->set('fields', $fields)->set('fields_options', $fieldsOptions);
     }
 
     public function action_field_remove()

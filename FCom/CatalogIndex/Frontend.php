@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CatalogIndex_Frontend
+ *
+ * @property FCom_CatalogIndex_Model_Field $FCom_CatalogIndex_Model_Field
+ */
+
 class FCom_CatalogIndex_Frontend extends BClass
 {
     public function layoutSetSortOptions()

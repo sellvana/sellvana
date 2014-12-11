@@ -7,7 +7,7 @@
 class FCom_Catalog_ProductsImport extends BImport
 {
     protected $fields = [
-        'product.local_sku' => ['pattern' => 'sku'],
+        'product.product_sku' => ['pattern' => 'sku'],
         'product.product_name' => ['pattern' => 'product.*name|name'],
         'product.short_description' => ['pattern' => 'short.*description'],
         'product.description' => ['pattern' => 'description'],

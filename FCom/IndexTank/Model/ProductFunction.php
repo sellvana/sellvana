@@ -19,18 +19,6 @@ class FCom_IndexTank_Model_ProductFunction extends FCom_Core_Model_Abstract
 {
     protected static $_table = 'fcom_indextank_product_function';
 
-    /**
-     * Shortcut to help with IDE autocompletion
-     *
-     * @param bool $new
-     * @param array $args
-     * @return FCom_IndexTank_Model_ProductFunction
-     */
-    static public function i($new = false, array $args = [])
-    {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
-    }
-
     public function getList()
     {
         /** @var FCom_IndexTank_Model_ProductFunction[] $functions */

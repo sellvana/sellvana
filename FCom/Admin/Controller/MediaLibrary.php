@@ -5,6 +5,9 @@
  *
  * @property FCom_Catalog_Model_ProductMedia $FCom_Catalog_Model_ProductMedia
  * @property FCom_Core_View_BackboneGrid $FCom_Core_View_BackboneGrid
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Core_Main $FCom_Core_Main
+ * @property FCom_Core_Model_MediaLibrary $FCom_Core_Model_MediaLibrary
  */
 class FCom_Admin_Controller_MediaLibrary extends FCom_Admin_Controller_Abstract
 {

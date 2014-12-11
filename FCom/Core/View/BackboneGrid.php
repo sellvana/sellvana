@@ -695,14 +695,28 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         }
         //var_dump($state);
 
+        $options = [];
+        foreach ($grid['config']['columns'] as $col) {
+            if (!empty($col['name']) && !empty($col['options'])) {
+                $options[$col['name']] = $col['options'];
+            }
+        }
+
         $data = [];
 
         foreach ($rows as $rowId => $row) {
-            $data[] = is_array($row) ? $row : $row->as_array();
+            $r = is_array($row) ? $row : $row->as_array();
+            foreach ($r as $k => $v) {
+                if (!empty($options[$k][$v])) {
+                    $r[$k] = $options[$k][$v];
+                }
+            }
+            $data[] = $r;
         }
 
-        if (class_exists($gridId) && method_exists($gridId, 'afterInitialData')) {
-            $data = $this->{$gridId}->afterInitialData($data);
+        if (!empty($grid['config']['page_rows_data_callback'])) {
+            $callback = $this->BUtil->extCallback($grid['config']['page_rows_data_callback']);
+            $data = call_user_func($callback, $data);
         }
 
         return ['state' => $state, 'data' => $data];
@@ -721,6 +735,13 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
         //$orm = $this->grid['orm'];
         #$data = $this->grid['orm']->paginate();
 
+        $options = [];
+        foreach ($grid['config']['columns'] as $col) {
+            if (!empty($col['name']) && !empty($col['options'])) {
+                $options[$col['name']] = $col['options'];
+            }
+        }
+
         if (isset($config['orm'])) {
             $orm = $config['orm'];
         }
@@ -733,20 +754,29 @@ class FCom_Core_View_BackboneGrid extends FCom_Core_View_Abstract
 
         foreach ($data['rows'] as $row) {
             foreach ($config['columns'] as $col) {
-                if (!empty($col['cell']) && !empty($col['name'])) {
-                    $field = $col['name'];
-                    $value = $row->get($field);
+                if (empty($col['name'])) {
+                    continue;
+                }
+                $field = $col['name'];
+                $oldValue = $value = $row->get($field);
+
+                if (!empty($options[$field][$value])) {
+                    $value = $options[$field][$value];
+                }
+
+                if (!empty($col['cell'])) {
                     switch ($col['cell']) {
                         case 'number':
-                            $value1 = floatval($value);
+                            $value = floatval($value);
                             break;
                         case 'integer':
-                            $value1 = intval($value);
+                            $value = intval($value);
                             break;
                     }
-                    if (isset($value1) && $value !== $value1) {
-                        $row->set($field, $value1);
-                    }
+                }
+
+                if ($oldValue !== $value) {
+                    $row->set($field, $value);
                 }
             }
         }

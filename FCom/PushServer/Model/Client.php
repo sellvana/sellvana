@@ -19,6 +19,7 @@
  * @property FCom_PushServer_Model_Message $FCom_PushServer_Model_Message
  * @property FCom_PushServer_Model_Subscriber $FCom_PushServer_Model_Subscriber
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
 {
@@ -30,7 +31,7 @@ class FCom_PushServer_Model_Client extends FCom_Core_Model_Abstract
     static protected $_connId;
 
     /**
-     * @var array
+     * @var FCom_PushServer_Model_Message[]
      */
     protected $_messages = [];
 

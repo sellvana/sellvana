@@ -403,6 +403,7 @@ class FCom_Promo_Frontend extends BClass
                             //if it is single item of product then mark it as promo
                             if ($currentItem->qty == 1) {
                                 $item = $currentItem;
+                                $item->show_separate = 1;
                                 $item->promo_id_get = $promo->id;
                                 $item->promo_id_buy = '';
                                 $item->price = 0;

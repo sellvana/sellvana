@@ -1,11 +1,18 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Email_Migrate
+ *
+ * @property FCom_Email_Model_Message $FCom_Email_Model_Message
+ * @property FCom_Email_Model_Pref $FCom_Email_Model_Pref
+ */
+
 class FCom_Email_Migrate extends BClass
 {
     public function install__0_1_2()
     {
         $this->BDb->ddlTableDef($this->FCom_Email_Model_Pref->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
                 'email' => 'varchar(100)  NOT NULL',
                 'unsub_all' => 'tinyint(4) NOT NULL',
@@ -13,13 +20,13 @@ class FCom_Email_Migrate extends BClass
                 'create_at' => 'datetime NOT NULL',
                 'update_at' => 'datetime NOT NULL',
             ],
-            'PRIMARY' => '(`id`)',
-            'KEYS' => [
+            BDb::PRIMARY => '(`id`)',
+            BDb::KEYS => [
                 'email' => 'UNIQUE (`email`)',
             ],
         ]);
         $this->BDb->ddlTableDef($this->FCom_Email_Model_Message->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
                 'recipient' => 'varchar(100) NOT NULL',
                 'subject' => 'varchar(255) NOT NULL',
@@ -31,8 +38,8 @@ class FCom_Email_Migrate extends BClass
                 'create_at' => 'datetime NOT NULL',
                 'resent_at' => 'datetime NULL',
             ],
-            'PRIMARY' => '(`id`)',
-            'KEYS' => [
+            BDb::PRIMARY => '(`id`)',
+            BDb::KEYS => [
                 'recipient' => '(`recipient`)',
             ],
         ]);
@@ -41,7 +48,7 @@ class FCom_Email_Migrate extends BClass
     public function upgrade__0_1_0__0_1_1()
     {
         $this->BDb->ddlTableDef($this->FCom_Email_Model_Message->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int(10) unsigned NOT NULL AUTO_INCREMENT',
                 'recipient' => 'varchar(100) NOT NULL',
                 'subject' => 'varchar(255) NOT NULL',
@@ -53,8 +60,8 @@ class FCom_Email_Migrate extends BClass
                 'create_dt' => 'datetime NOT NULL',
                 'resent_dt' => 'datetime NULL',
             ],
-            'PRIMARY' => '(`id`)',
-            'KEYS' => [
+            BDb::PRIMARY => '(`id`)',
+            BDb::KEYS => [
                 'recipient' => '(`recipient`)',
             ],
         ]);
@@ -64,14 +71,14 @@ class FCom_Email_Migrate extends BClass
     {
         $table = $this->FCom_Email_Model_Message->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                   'create_dt'      => 'RENAME create_at datetime NOT NULL',
                   'resent_dt'      => 'RENAME resent_at datetime NULL',
             ],
         ]);
         $table = $this->FCom_Email_Model_Pref->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                   'create_dt'      => 'RENAME create_at datetime NOT NULL',
                   'update_dt'      => 'RENAME update_at datetime NOT NULL',
             ],

@@ -2,6 +2,12 @@
 
 require_once __DIR__ . '/../../../tests/index.php';
 
+/**
+ * Class FCom_AuthorizeNet_Tests_AllTests
+ *
+ * @property FCom_AuthorizeNet_Tests_AllTests $FCom_AuthorizeNet_Tests_AllTests
+ */
+
 class FCom_AuthorizeNet_Tests_AllTests
 {
 

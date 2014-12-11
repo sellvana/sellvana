@@ -13,6 +13,7 @@
  * DI
  * @property FCom_Wishlist_Model_WishlistItem $FCom_Wishlist_Model_WishlistItem
  * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Sales_Model_Cart $FCom_Sales_Model_Cart
  */
 class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
 {
@@ -121,6 +122,18 @@ class FCom_Wishlist_Model_Wishlist extends FCom_Core_Model_Abstract
         }
 
         return $this;
+    }
+
+    public function moveItemToCart($item)
+    {
+        if (is_numeric($item)) {
+            $item = $this->FCom_Wishlist_Model_WishlistItem->loadWhere(['wishlist_id' => $this->id(), 'id' => $item]);
+        }
+        //$this->FCom_Sales_Main->workflowAction('customerAddsProductToCart', [[$item->get('product_id')]]);
+        //TODO: implement variants in wishlist
+        $this->FCom_Sales_Model_Cart->sessionCart()->addProduct($item->get('product_id'));
+        $this->removeItem($item);
+        return $this;;
     }
 
     /**

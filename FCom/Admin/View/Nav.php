@@ -2,6 +2,8 @@
 
 /**
  * Class FCom_Admin_View_Nav
+ * @property FCom_Admin_Model_Role $FCom_Admin_Model_Role
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_Admin_View_Nav extends FCom_Core_View_Abstract
 {
