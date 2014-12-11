@@ -22,7 +22,7 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
         return $this->BLayout->view('authorizenet/dpm')->set('key', static::PAYMENT_METHOD_KEY);
     }
 
-    public function payOnCheckout()
+    public function payOnCheckout(FCom_Sales_Model_Order_Payment $payment)
     {
         return [];
     }

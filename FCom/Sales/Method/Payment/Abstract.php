@@ -14,6 +14,11 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
     protected $_payment;
 
     /**
+     * @var FCom_Sales_Model_Order_Transaction
+     */
+    protected $_transaction;
+
+    /**
      * @var array
      */
     protected $_details;
@@ -37,14 +42,19 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
      * @var array
      */
     protected $_capabilities = [
-        'pay'           => 1,
-        'refund'        => 1,
-        'void'          => 1,
-        'recurring'     => 0,
-        'pay_partial'   => 0,
-        'pay_online'    => 0,
-        'refund_online' => 0,
-        'void_online'   => 0,
+        'pay'             => 1,
+        'pay_online'      => 0,
+        'auth'            => 0,
+        'auth_partial'    => 0,
+        'reauth'          => 0,
+        'void'            => 0,
+        'void_online'     => 0,
+        'capture'         => 0,
+        'capture_partial' => 0,
+        'refund'          => 0,
+        'refund_partial'  => 0,
+        'refund_online'   => 0,
+        'recurring'       => 0,
     ];
 
     public function can($capability)
@@ -65,39 +75,6 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
         return $this->_sortOrder;
     }
 
-    /**
-     * Set any details gathered during checkout process
-     * @param array $details
-     * @return $this
-     */
-    public function setDetails($details)
-    {
-        $this->_details = $details;
-        return $this;
-    }
-
-    /**
-     * Get public data
-     *
-     * Get data which can be saved, should not include any sensitive data such as credit card numbers, personal ids, etc.
-     * @return array
-     */
-    public function getPublicData()
-    {
-        return $this->_details;
-    }
-
-    /**
-     * @param $cart
-     * @return $this
-     * @internal This replaces initCart in basic payment
-     */
-    public function setPaymentModel(FCom_Sales_Model_Order_Payment $payment)
-    {
-        $this->_payment = $payment;
-        return $this;
-    }
-
     public function asArray()
     {
         return ["name" => $this->getName()];
@@ -114,70 +91,54 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
     }
 
     /**
-     * Shortcut for payment gateway error
+     * @param FCom_Sales_Model_Order_Payment $payment
+     * @return mixed
      */
-    protected function _setErrorStatus()
-    {
-        $this->FCom_Sales_Main->workflowAction('customerGetsPaymentError', ['payment' => $this->_payment]);
-    }
-
-    protected function _onBeforeAuthorization()
-    {
-        $p = $this->_payment;
-        $p->state()->overall()->setPending();
-        $p->state()->processor()->setAuthorizing();
-        $p->save();
-    }
-
-    protected function _onSuccessfulAuthorization()
-    {
-        $p = $this->_payment;
-        $amt = $p->get('amount_due');
-        $p->set('amount_authorized', $amt);
-        $p->state()->overall()->setProcessing();
-        $p->state()->processor()->setAuthorized();
-        $p->save();
-    }
-
-    protected function _onBeforeCapture()
+    public function payOnCheckout(FCom_Sales_Model_Order_Payment $payment)
     {
 
     }
 
-    protected function _onSuccessfulCapture()
+    public function authorize(FCom_Sales_Model_Order_Payment_Transaction $transaction)
     {
-        $p = $this->_payment;
-        $amt = $p->get('amount_authorized');
-        $p->set([
-            'amount_captured' => $amt,
-            'amount_due' => $p->get('amount_due') - $amt,
+
+    }
+
+    public function reauthorize(FCom_Sales_Model_Order_Payment_Transaction $transaction)
+    {
+
+    }
+
+    public function void(FCom_Sales_Model_Order_Payment_Transaction $transaction)
+    {
+
+    }
+
+    public function capture(FCom_Sales_Model_Order_Payment_Transaction $transaction)
+    {
+
+    }
+
+    public function refund(FCom_Sales_Model_Order_Payment_Transaction $transaction)
+    {
+
+    }
+
+    /**
+     * Shortcut for payment gateway error
+     *
+     * @param array $result
+     */
+    protected function _setErrorStatus($result = null)
+    {
+        $this->FCom_Sales_Main->workflowAction('customerGetsPaymentError', [
+            'payment' => $this->_payment,
+            'result' => $result,
         ]);
-
-        $p->state()->overall()->setPaid();
-        $p->state()->processor()->setCaptured();
-        $p->save();
-
-        $order = $p->order();
-
     }
 
-    protected function _onBeforeVoid()
+    public function __destruct()
     {
-
-    }
-
-    protected function _onSuccessfulVoid()
-    {
-
-    }
-
-    protected function _onBeforeRefund()
-    {
-
-    }
-
-    protected function _onSuccessfulRefund()
-    {
-
+        unset($this->_payment, $this->_transaction);
     }
 }

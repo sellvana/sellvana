@@ -26,7 +26,7 @@ class FCom_AuthorizeNet_PaymentMethod_Aim extends FCom_Sales_Method_Payment_Abst
         return $this->BLayout->view('authorizenet/aim')->set('key', static::PAYMENT_METHOD_KEY);
     }
 
-    public function payOnCheckout()
+    public function payOnCheckout(FCom_Sales_Model_Order_Payment $payment)
     {
         $config = $this->config();
         if (!$config['active']) {

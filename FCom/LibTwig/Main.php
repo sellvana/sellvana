@@ -35,7 +35,7 @@ class FCom_LibTwig_Main extends BClass
         static::$_cacheDir = $config->get('fs/cache_dir') . '/twig';
         $this->BUtil->ensureDir(static::$_cacheDir);
         $cacheConfig = $this->BConfig->get('core/cache/twig');
-        $useCache = !$cacheConfig && $this->BDebug->is('DEBUG,DEVELOPMENT') || $cacheConfig === 'enable';
+        $useCache = !$cacheConfig && $this->BDebug->is(['DEBUG', 'DEVELOPMENT']) || $cacheConfig === 'enable';
         $options = [
             'cache' => $useCache ? static::$_cacheDir : false,
             'debug' => false, #$config->get('modules/FCom_LibTwig/debug'),

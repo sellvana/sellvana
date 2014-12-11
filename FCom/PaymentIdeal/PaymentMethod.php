@@ -40,9 +40,10 @@ class FCom_PaymentIdeal_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
     }
 
     /**
-     *
+     * @param FCom_Sales_Model_Order_Payment $payment
+     * @return static
      */
-    public function payOnCheckout()
+    public function payOnCheckout(FCom_Sales_Model_Order_Payment $payment)
     {
         $bankId      = $this->get('bank_id');
         $amount      = $this->_order->get('balance') * 100;
@@ -84,6 +85,8 @@ class FCom_PaymentIdeal_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
         $paymentModel = $this->FCom_Sales_Model_Order_Payment->create($paymentData)->save();
         $paymentModel->setData('response', $this->getPublicData());
         $paymentModel->save();
+
+        return $this;
     }
 
     /**

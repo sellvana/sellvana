@@ -12,7 +12,7 @@ class FCom_Ogone_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
         return $this->BLayout->view('ogone/form');
     }
 
-    public function payOnCheckout()
+    public function payOnCheckout(FCom_Sales_Model_Order_Payment $payment)
     {
         die("Ogone payment not imlemented yet");
     }

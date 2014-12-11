@@ -3304,14 +3304,17 @@ class BModel extends Model
      * @param array $data
      * @param array $rules
      * @param string $formName
+     * @param boolean $ignoreModelRules
      * @return bool
      */
-    public function validate($data = [], $rules = [], $formName = 'admin')
+    public function validate($data = [], $rules = [], $formName = 'admin', $ignoreModelRules = false)
     {
         if (!$data && $this->orm) {
             $data = $this->as_array();
         }
-        $rules = array_merge($this->_validationRules(), $rules);
+        if (!$ignoreModelRules) {
+            $rules = array_merge($this->_validationRules(), $rules);
+        }
         $this->BEvents->fire($this->_origClass() . "::validate:before", ["rules" => &$rules, "data" => &$data]);
         $valid = $this->BValidate->validateInput($data, $rules, $formName);
         if (!$valid) {

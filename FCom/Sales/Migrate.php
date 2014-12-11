@@ -16,6 +16,7 @@
  * @property FCom_Sales_Model_Order_Item $FCom_Sales_Model_Order_Item
  * @property FCom_Sales_Model_Order_Payment $FCom_Sales_Model_Order_Payment
  * @property FCom_Sales_Model_Order_Payment_Item $FCom_Sales_Model_Order_Payment_Item
+ * @property FCom_Sales_Model_Order_Payment_Transaction $FCom_Sales_Model_Order_Payment_Transaction
  * @property FCom_Sales_Model_Order_Refund $FCom_Sales_Model_Order_Refund
  * @property FCom_Sales_Model_Order_Refund_Item $FCom_Sales_Model_Order_Refund_Item
  * @property FCom_Sales_Model_Order_Return $FCom_Sales_Model_Order_Return
@@ -1641,6 +1642,59 @@ class FCom_Sales_Migrate extends BClass
             BDb::KEYS => [
                 'IDX_state_children' => '(state_children)',
             ]
+        ]);
+    }
+
+    public function upgrade__0_3_10__0_3_11()
+    {
+        $tOrder = $this->FCom_Sales_Model_Order->table();
+        $tOrderPayment = $this->FCom_Sales_Model_Order_Payment->table();
+        $tOrderPaymentTransaction = $this->FCom_Sales_Model_Order_Payment_Transaction->table();
+        $tOrderRefund = $this->FCom_Sales_Model_Order_Refund->table();
+
+        $this->BDb->ddlTableDef($tOrderPaymentTransaction, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'payment_id' => 'int unsigned default null',
+                'order_id' => 'int unsigned default null',
+                'parent_id' => 'int unsigned default null',
+                'payment_method' => 'varchar(20)',
+                'transaction_type' => 'varchar(20) not null',
+                'transaction_id' => 'varchar(50) default null',
+                'parent_transaction_id' => 'varchar(50) default null',
+                'transaction_fee' => 'decimal(12,2) default 0',
+                'transaction_status' => 'varchar(20) default null',
+                'amount' => 'decimal(12,2) not null',
+                'create_at' => 'datetime',
+                'update_at' => 'datetime',
+                'data_serialized' => 'text default null',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_transaction_type_method_order' => '(transaction_type, payment_method, order_id)',
+                'IDX_transaction_id_method_order' => '(transaction_id, payment_method, order_id)',
+            ],
+            BDb::CONSTRAINTS => [
+                'payment' => ['payment_id', $tOrderPayment, 'id', 'CASCADE', 'SET NULL'],
+                'order' => ['order_id', $tOrder, 'id', 'CASCADE', 'SET NULL'],
+                'parent' => ['parent_id', $tOrderPaymentTransaction],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderPayment, [
+            BDb::COLUMNS => [
+                'state_children' => BDb::DROP,
+                'state_processor' => BDb::DROP,
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tOrderRefund, [
+            BDb::COLUMNS => [
+                'payment_id' => 'int unsigned default null',
+            ],
+            BDb::CONSTRAINTS => [
+                'payment' => ['payment_id', $tOrderPayment],
+            ],
         ]);
     }
 }
