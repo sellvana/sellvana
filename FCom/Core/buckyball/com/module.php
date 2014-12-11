@@ -298,7 +298,7 @@ class BModuleRegistry extends BClass
                     break;
                 case 'yml':
                     // already should be taken care of with filemtime()
-                    $useCache = true;#!$this->BDebug->is('DEBUG,DEVELOPMENT,INSTALLATION');
+                    $useCache = true;#!$this->BDebug->is(['DEBUG', 'DEVELOPMENT', 'INSTALLATION']);
                     $manifest = $this->BYAML->load($file, $useCache);
                     break;
                 case 'json':

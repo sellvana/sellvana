@@ -18,7 +18,7 @@ class FCom_PaymentCC_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
     /**
      * @return array
      */
-    public function payOnCheckout()
+    public function payOnCheckout(FCom_Sales_Model_Order_Payment $payment)
     {
         // if using external checkout like paypal
         // $this->FCom_Sales_Main->workflowAction('customerStartsExternalPayment', ['payment' => $this->_payment]);
@@ -33,23 +33,23 @@ class FCom_PaymentCC_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
     /**
      * @return array
      */
-    public function authorize()
+    public function authorize(FCom_Sales_Model_Order_Payment_Transaction $transaction)
     {
-        $this->FCom_Sales_Main->workflowAction('customerCompletesPayment', [
+        $this->FCom_Sales_Main->workflowAction('customerCompletesCheckoutPayment', [
             'payment' => $this->_payment,
             'info_only' => true,
             //'auth_only' => true,
         ]);
 
         // call this if payment failed
-        // $this->FCom_Sales_Main->workflowAction('customerFailsPayment', ['payment' => $payment]);
+        // $this->FCom_Sales_Main->workflowAction('customerFailsCheckoutPayment', ['payment' => $payment]);
         return [];
     }
 
     /**
      * @return array
      */
-    public function capture()
+    public function capture(FCom_Sales_Model_Order_Payment_Transaction $transaction)
     {
         return [];
     }

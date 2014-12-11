@@ -20,6 +20,7 @@
  * @property FCom_Sales_Model_Order_History $FCom_Sales_Model_Order_History
  * @property FCom_Sales_Model_Order_Payment_State $FCom_Sales_Model_Order_Payment_State
  * @property FCom_Sales_Model_Order_Payment_Item $FCom_Sales_Model_Order_Payment_Item
+ * @property FCom_Sales_Model_Order_Payment_Transaction $FCom_Sales_Model_Order_Payment_Transaction
  */
 class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
 {
@@ -39,9 +40,14 @@ class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     protected $_parent;
 
     /**
-     * @var FCom_Sales_Model_Order_Payment[]
+     * @var FCOM_Sales_Model_Order_Payment_Item[]
      */
-    protected $_children;
+    protected $_items;
+
+    /**
+     * @var FCom_Sales_Model_Order_Payment_Transaction[]
+     */
+    protected $_transactions;
 
     /**
      * @return FCom_Sales_Model_Order_Payment_State
@@ -65,13 +71,14 @@ class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         return $this->_parent;
     }
 
-    public function children()
+    public function transactions()
     {
 
-        if (!$this->_children) {
-            $this->_children = $this->orm()->where('parent_id', $this->id())->find_many();
+        if (!$this->_transactions) {
+            $this->_transactions = $this->FCom_Sales_Model_Order_Payment_Transaction()
+                ->where('parent_id', $this->id())->find_many();
         }
-        return $this->_children;
+        return $this->_transactions;
     }
 
     public function importFromOrder(FCom_Sales_Model_Order $order)
@@ -94,124 +101,149 @@ class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
         }
 
         $this->state()->overall()->setPending();
-        $this->state()->children()->setNone();
         $this->state()->custom()->setDefault();
         return $this;
     }
 
-    public function setupRootOrder()
+    /**
+     * @param string $type
+     * @param float $amount
+     * @param FCom_Sales_Model_Order_Payment_Transaction $parent
+     * @return FCom_Sales_Model_Order_Payment_Transaction
+     * @throws BException
+     */
+    public function createTransaction($type, $amount = null, FCom_Sales_Model_Order_Payment_Transaction $parent = null)
     {
-        $this->state()->processor()->setRootOrder();
-        $this->state()->children()->setPending();
-        return $this;
-    }
-
-    public function createChildPayment($amount = 0)
-    {
-        if (!in_array($this->get('state_children'), [
-            FCom_Sales_Model_Order_Payment_State_Children::PENDING,
-            FCom_Sales_Model_Order_Payment_State_Children::PARTIAL,
-        ])) {
-            throw new BException('Parent payment state_children should be pending or partial');
+        $hlp = $this->FCom_Sales_Model_Order_Payment_Transaction;
+        $transTypes = $hlp->fieldOptions('transaction_type');
+        if (empty($transTypes[$type])) {
+            throw new BException('Invalid transaction type');
         }
-
-        if ($amount > $this->get('amount_due')) {
-            throw new BException('Attempting to create a child payment with amount bigger than amount due');
+        if ($parent && $parent->get('payment_id') !== $this->id()) {
+            throw new BException('Invalid parent transaction');
         }
-
         if (null === $amount) {
-            $amount = $this->get('amount_due');
+            if ($parent) {
+                $amount = $parent->get('amount');
+            } else {
+                switch ($type) {
+                    case FCom_Sales_Model_Order_Payment_Transaction::SALE:
+                    case FCom_Sales_Model_Order_Payment_Transaction::ORDER:
+                    case FCom_Sales_Model_Order_Payment_Transaction::AUTHORIZATION:
+                        $amount = $this->get('amount_due');
+                        break;
+
+                    case FCom_Sales_Model_Order_Payment_Transaction::VOID:
+                    case FCom_Sales_Model_Order_Payment_Transaction::REAUTHORIZATION:
+                    case FCom_Sales_Model_Order_Payment_Transaction::CAPTURE:
+                        $amount = $this->get('amount_authorized');
+                        break;
+
+                    case FCom_Sales_Model_Order_Payment_Transaction::REFUND:
+                        $amount = $this->get('amount_captured');
+                        break;
+                }
+            }
         }
 
-        /** @var FCom_Sales_Model_Order_Payment $child */
-        $child = $this->create([
-            'parent_id' => $this->id(),
+        if (!$amount) {
+            throw new BException('Transaction amount is required');
+        }
+
+        $trans = $hlp->create([
+            'payment_id' => $this->id(),
             'order_id' => $this->get('order_id'),
+            'parent_id' => $parent ? $parent->id() : null,
             'payment_method' => $this->get('payment_method'),
-            'online' => $this->get('online'),
-            'amount_due' => $amount,
+            'transaction_type' => $type,
+            'parent_transaction_id' => $parent ? $parent->get('transaction_id') : null,
+            'transaction_status' => 'new',
+            'amount' => $amount,
         ]);
 
-        $this->add('amount_due', -$amount);
-
-        if ($this->get('amount_due')) {
-            $this->state()->children()->setPartial();
-        } else {
-            $this->state()->children()->setComplete();
-        }
-        $child->state()->overall()->setPending();
-        $child->state()->processor()->setPending();
-
-        $child->save();
-        return $child;
+        return $trans;
     }
 
-    public function fetchChildrenAmounts()
+    /**
+     * @param string|array $type
+     * @param string $status
+     * @param float $amount
+     * @return FCom_Sales_Model_Order_Payment_Transaction
+     * @throws BException
+     */
+    public function findTransaction($type, $status = null, $amount = null)
+    {
+        $orm = $this->FCom_Sales_Model_Order_Payment_Transaction->orm();
+        if (is_string($type)) {
+            $orm->where('transaction_type', $type);
+        } elseif (is_array($type)) {
+            $orm->where_in('transaction_type', $type);
+        } else {
+            throw new BException('Invalid transaction type argument');
+        }
+
+        if ($status === true) { // open transaction
+            $orm->where('transaction_status', 'pending');
+        } elseif ($status === false) { // closed transaction
+            $orm->where_not_equal('transaction_status', 'pending');
+        } elseif (null !== $status) { // any status
+            $orm->where('transaction_status', $status);
+        }
+
+        if (null !== $amount) {
+            $orm->where('amount', $amount);
+        }
+
+        $transaction = $orm->find_one();
+        return $transaction;
+    }
+
+    public function fetchTransactionsTotalAmounts()
     {
         $a = [
-            'children_amount_due'        => 0,
-            'children_amount_authorized' => 0,
-            'children_amount_captured'   => 0,
-            'children_amount_refunded'   => 0,
-            'children_amount_void'       => 0,
+            'amount_ordered'      => 0,
+            'amount_authorized'   => 0,
+            'amount_reauthorized' => 0,
+            'amount_void'         => 0,
+            'amount_captured'     => 0,
+            'amount_refunded'     => 0,
         ];
-        foreach ($this->children() as $child) {
-            $a['children_amount_due']        += $child->get('amount_due');
-            $a['children_amount_authorized'] += $child->get('amount_authorized');
-            $a['children_amount_captured']   += $child->get('amount_captured');
-            $a['children_amount_refunded']   += $child->get('amount_refunded');
-            $a['children_amount_void']       += $child->get('amount_void');
+        foreach ($this->transactions() as $trans) {
+            $amount = $trans->get('amount');
+            switch ($trans->get('transaction_type')) {
+                case 'order':
+                    $a['amount_ordered'] += $amount;
+                    break;
+
+                case 'auth':
+                    $a['amount_authorized'] += $amount;
+                    break;
+
+                case 'reauth':
+                    $a['amount_reauthorized'] += $amount;
+                    break;
+
+                case 'void':
+                    $a['amount_void'] += $amount;
+                    break;
+
+                case 'capture':
+                    $a['amount_captured'] += $amount;
+                    break;
+
+                case 'refund':
+                    $a['amount_refunded'] += $amount;
+                    break;
+            }
         }
-        $this->set($a);
+        $this->setData('totals', $a, true);
         return $this;
     }
 
-    public function authorize($amount = null)
-    {
-        if (null === $amount) {
-            $amount = $this->get('amount_due');
-        }
-        $this->set('amount_authorized', $amount);
-        return $this;
-    }
-
-    public function expireAuthorization($amount = null)
-    {
-        if (null === $amount) {
-            $amount = $this->set('amount_authorized');
-        }
-        $this->add('amount_authorized', -$amount);
-        if ($this->get('parent_id')) {
-
-        }
-        $this->state()->processor()->setExpired();
-        return $this;
-    }
-
-    public function capture($amount = null)
-    {
-        if (null === $amount) {
-            $amount = $this->get('amount_authorized');
-        }
-        $this->add('amount_captured', $amount);
-        $this->add('amount_authorized', -$amount);
-        $this->add('amount_due', -$amount);
-
-        if ($this->get('amount_due') === 0) {
-            $this->state()->overall()->setPaid();
-            $this->state()->processor()->setCaptured();
-        } else {
-            $this->state()->overall()->setPartial();
-            //$this->state()->processor()->set
-        }
-    //}
-
-        if ($this->get('parent_id')) {
-            $parent = $this->parent();
-
-        }
-    }
-
+    /**
+     * @return FCom_Sales_Method_Payment_Abstract
+     * @throws BException
+     */
     public function getMethodObject()
     {
         $methods = $this->FCom_Sales_Main->getPaymentMethods();
@@ -225,13 +257,108 @@ class FCom_Sales_Model_Order_Payment extends FCom_Core_Model_Abstract
     public function payOnCheckout()
     {
         $method = $this->getMethodObject();
-        $result = $method->setPaymentModel($this)->payOnCheckout();
+        $result = $method->payOnCheckout($this);
 
         return $result;
     }
 
+    public function authorize($amount = null)
+    {
+        $method = $this->getMethodObject();
+
+        $parent = $this->findTransaction('order', true);
+
+        $transaction = $this->createTransaction('auth', $amount, $parent)->start();
+
+        $method->authorize($transaction);
+
+        $transaction->complete();
+
+        $this->FCom_Sales_Main->workflowAction('adminAuthorizesPayment', [
+            'transaction' => $transaction,
+        ]);
+
+        return $this;
+    }
+
+    public function reauthorize($amount = null)
+    {
+        $method = $this->getMethodObject();
+
+        $parent = $this->findTransaction('auth', true);
+
+        $transaction = $this->createTransaction('reauth', $amount, $parent)->start();
+
+        $method->reauthorize($transaction);
+
+        $transaction->complete();
+
+        $this->FCom_Sales_Main->workflowAction('adminReAuthorizesPayment', [
+            'transaction' => $transaction,
+        ]);
+
+        return $this;
+    }
+
+    public function void()
+    {
+        $method = $this->getMethodObject();
+
+        $parent = $this->findTransaction(['auth', 'reauth'], true);
+
+        $transaction = $this->createTransaction('void', null, $parent)->start();
+
+        $method->void($transaction);
+
+        $transaction->complete();
+
+        $this->FCom_Sales_Main->workflowAction('adminVoidsAuthorization', [
+            'transaction' => $transaction,
+        ]);
+
+        return $this;
+    }
+
+    public function capture($amount = null)
+    {
+        $method = $this->getMethodObject();
+
+        $parent = $this->findTransaction(['auth', 'reauth'], true);
+
+        $transaction = $this->createTransaction('capture', $amount, $parent)->start();
+
+        $method->capture($transaction);
+
+        $transaction->complete();
+
+        $this->FCom_Sales_Main->workflowAction('adminCapturesPayment', [
+            'transaction' => $transaction,
+        ]);
+
+        return $this;
+    }
+
+    public function refund($amount = null)
+    {
+        $method = $this->getMethodObject();
+
+        $parent = $this->findTransaction('capture', true);
+
+        $transaction = $this->createTransaction('refund', $amount, $parent)->start();
+
+        $method->refund($transaction);
+
+        $transaction->complete();
+
+        $this->FCom_Sales_Main->workflowAction('adminRefundsPayment', [
+            'transaction' => $transaction,
+        ]);
+
+        return $this;
+    }
+
     public function __destruct()
     {
-        unset($this->_order, $this->_state);
+        unset($this->_order, $this->_state, $this->_items, $this->_transactions);
     }
 }

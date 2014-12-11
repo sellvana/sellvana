@@ -23,7 +23,7 @@ class FCom_Core_View_Text extends FCom_Core_View_Abstract
     public function render(array $args = [], $retrieveMetaData = false)
     {
         $output = '';
-        $isDebug = $this->BDebug->is('DEBUG,DEVELOPMENT');
+        $isDebug = $this->BDebug->is(['DEBUG', 'DEVELOPMENT']);
         foreach ($this->_parts as $name => $params) {
             if ($isDebug) {
                 $output .= "\n/* " .$name;

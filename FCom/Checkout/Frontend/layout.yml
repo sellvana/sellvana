@@ -18,7 +18,7 @@ checkout/base:
 /checkout-simple/login:
     - { include: checkout/base }
     - { hook: main, views: customer/login }
-    - { view: customer/login, set: { redirect_to: checkout } }
+    - { view: customer/login, set: { form_url: checkout/login, redirect_to: checkout } }
 
 /checkout-simple/step2:
     - { include: checkout/base }

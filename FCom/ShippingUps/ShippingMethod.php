@@ -18,6 +18,14 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
 
         $data = $this->_applyDefaultPackageConfig($data);
 
+        if (empty($data['access_key']) || empty($data['user_id']) || empty($data['password'])) {
+            $result = [
+                'error' => 1,
+                'message' => 'Incomplete UPS User Authentication configuration',
+            ];
+            return $result;
+        }
+
         if (empty($data['rate_api_url'])) {
             $data['rate_api_url'] = 'https://onlinetools.ups.com/ups.app/xml/Rate';
         }
@@ -116,6 +124,7 @@ class FCom_ShippingUps_ShippingMethod extends FCom_Sales_Method_Shipping_Abstrac
             $result['message'] = $parsed->Response->Error->ErrorDescription;
             $this->_lastError = $result['message'];
         }
+        //echo "<pre>"; var_dump($result); exit;
         return $result;
     }
 

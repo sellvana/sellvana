@@ -16,9 +16,10 @@ class FCom_PaymentBasic_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
     }
 
     /**
-     * @return array
+     * @param FCom_Sales_Model_Order_Payment $payment
+     * @return array|mixed
      */
-    public function payOnCheckout()
+    public function payOnCheckout(FCom_Sales_Model_Order_Payment $payment)
     {
         // if using external checkout like paypal
         // $this->FCom_Sales_Main->workflowAction('customerStartsExternalPayment', ['payment' => $this->_payment]);
@@ -26,31 +27,11 @@ class FCom_PaymentBasic_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
         // call this when returning from external checkout
         // $this->FCom_Sales_Main->workflowAction('customerReturnsFromExternalPayment', ['payment' => $payment]);
 
-        $result = $this->authorize();
+        $payment->state()->overall()->setPending();
+        $payment->save();
+
+        $result = [];
+
         return $result;
-    }
-
-    /**
-     * @return array
-     */
-    public function authorize()
-    {
-        $this->FCom_Sales_Main->workflowAction('customerCompletesPayment', [
-            'payment' => $this->_payment,
-            'info_only' => true,
-            //'auth_only' => true,
-        ]);
-
-        // call this if payment failed
-        // $this->FCom_Sales_Main->workflowAction('customerFailsPayment', ['payment' => $payment]);
-        return [];
-    }
-
-    /**
-     * @return array
-     */
-    public function capture()
-    {
-        return [];
     }
 }

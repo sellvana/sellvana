@@ -17,21 +17,21 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
     {
         try {
             $r = $this->BRequest->post('login');
-            if (!empty($r['username']) && !empty($r['password'])) {
-                $user = $this->FCom_Admin_Model_User->authenticate($r['username'], $r['password']);
-                if ($user) {
-                    $this->BSession->regenerateId();
-                    $user->login();
-                    if (!empty($r['remember_me'])) {
-                        $days = $this->BConfig->get('cookie/remember_days');
-                        $this->BResponse->cookie('remember_me', 1, ($days ? $days : 30) * 86400);
-                    }
-                } else {
-                    $this->message('Invalid user name or password.', 'error');
-                }
-            } else {
+            if (empty($r['username']) || empty($r['password'])) {
                 $this->message('Username and password cannot be blank.', 'error');
             }
+
+            $user = $this->FCom_Admin_Model_User->authenticate($r['username'], $r['password']);
+            if (!$user) {
+                $this->message('Invalid user name or password.', 'error');
+            }
+
+            $user->login();
+            if (!empty($r['remember_me'])) {
+                $days = $this->BConfig->get('cookie/remember_days');
+                $this->BResponse->cookie('remember_me', 1, ($days ? $days : 30) * 86400);
+            }
+
             $url = $this->BSession->get('admin_login_orig_url');
         } catch (Exception $e) {
             $this->BDebug->logException($e);
@@ -128,7 +128,6 @@ class FCom_Admin_Controller_Auth extends FCom_Admin_Controller_Abstract
         $sessData['password_reset_token'] = null;
 
         $user->resetPassword($password);
-        $this->BSession->regenerateId();
 
         $this->message('Password has been reset');
         $this->BResponse->redirect('');
