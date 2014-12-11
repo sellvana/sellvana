@@ -1,5 +1,17 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Cms_Migrate
+ *
+ * @property FCom_Cms_Model_Block $FCom_Cms_Model_Block
+ * @property FCom_Cms_Model_BlockHistory $FCom_Cms_Model_BlockHistory
+ * @property FCom_Cms_Model_Form $FCom_Cms_Model_Form
+ * @property FCom_Cms_Model_FormData $FCom_Cms_Model_FormData
+ * @property FCom_Cms_Model_Nav $FCom_Cms_Model_Nav
+ * @property FCom_Cms_Model_Page $FCom_Cms_Model_Page
+ * @property FCom_Cms_Model_PageHistory $FCom_Cms_Model_PageHistory
+ */
+
 class FCom_Cms_Migrate extends BClass
 {
     public function install__0_1_3()
@@ -107,7 +119,7 @@ class FCom_Cms_Migrate extends BClass
         $tFormData = $this->FCom_Cms_Model_FormData->table();
 
         $this->BDb->ddlTableDef($tForm, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'form_name' => 'varchar(100)',
                 'form_url' => 'varchar(255)',
@@ -116,14 +128,14 @@ class FCom_Cms_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_form_name' => 'UNIQUE (form_name)'
             ],
         ]);
 
         $this->BDb->ddlTableDef($tFormData, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'form_id' => 'int unsigned not null',
                 'customer_id' => 'int unsigned',
@@ -135,9 +147,9 @@ class FCom_Cms_Migrate extends BClass
                 'update_at' => 'datetime',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'CONSTRAINTS' => [
-                "FK_{$tFormData}_form" => "FOREIGN KEY (form_id) REFERENCES {$tForm} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                'form' => ['form_id', $tForm],
             ],
         ]);
 
@@ -147,7 +159,7 @@ class FCom_Cms_Migrate extends BClass
     public function upgrade__0_1_0__0_1_1()
     {
         $this->BDb->ddlTableDef($this->FCom_Cms_Model_Block->table(), [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'renderer' => 'varchar(100) null after content',
                 'page_enabled' => 'TINYINT DEFAULT 0 NOT NULL',
                 'page_url' => 'VARCHAR (100) NULL',
@@ -157,23 +169,23 @@ class FCom_Cms_Migrate extends BClass
                 'meta_keywords' => 'TEXT NULL',
                 'modified_time' => 'int unsigned',
             ],
-            'KEYS' => [
+            BDb::KEYS => [
                 'UNQ_handle' => 'UNIQUE (handle)',
                 'UNQ_page_url' => 'UNIQUE (page_enabled, page_url)',
             ],
         ]);
         /*
         $this->BDb->ddlTableDef($this->FCom_Cms_Model_Nav->table(), array(
-            'COLUMNS' => array(
+            BDb::COLUMNS => array(
                 'contents' => 'RENAME content text null',
                 'renderer' => 'varchar(100) null after content',
             ),
         ));
         $this->BDb->ddlTableDef($this->FCom_Cms_Model_Page->table(), array(
-            'COLUMNS' => array(
+            BDb::COLUMNS => array(
                 'renderer' => 'varchar(100) null after content',
             ),
-            'KEYS' => array(
+            BDb::KEYS => array(
                 'UNQ_handle' => 'UNIQUE (handle)',
             ),
         ));
@@ -192,7 +204,7 @@ class FCom_Cms_Migrate extends BClass
     {
         $table = $this->FCom_Cms_Model_Block->table();
         $this->BDb->ddlTableDef($table, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                   'create_dt'      => 'RENAME create_at datetime DEFAULT NULL',
                   'update_dt'      => 'RENAME update_at datetime DEFAULT NULL',
             ],
@@ -205,7 +217,7 @@ class FCom_Cms_Migrate extends BClass
         $tFormData = $this->FCom_Cms_Model_FormData->table();
 
         $this->BDb->ddlTableDef($tForm, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'form_name' => 'varchar(100)',
                 'form_url' => 'varchar(255)',
@@ -214,14 +226,14 @@ class FCom_Cms_Migrate extends BClass
                 'create_at' => 'datetime',
                 'update_at' => 'datetime',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_form_name' => 'UNIQUE (form_name)',
             ],
         ]);
 
         $this->BDb->ddlTableDef($tFormData, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'form_id' => 'int unsigned not null',
                 'customer_id' => 'int unsigned',
@@ -233,11 +245,11 @@ class FCom_Cms_Migrate extends BClass
                 'update_at' => 'datetime',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
             ],
-            'CONSTRAINTS' => [
-                "FK_{$tFormData}_form" => "FOREIGN KEY (form_id) REFERENCES {$tForm} (id) ON UPDATE CASCADE ON DELETE CASCADE",
+            BDb::CONSTRAINTS => [
+                'form' => ['form_id', $tForm],
             ],
         ]);
     }
@@ -246,7 +258,7 @@ class FCom_Cms_Migrate extends BClass
     {
         $tBlock = $this->FCom_Cms_Model_Block->table();
         $this->BDb->ddlTableDef($tBlock, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'form_enable' => 'tinyint not null default 0',
                 'form_fields' => 'text default null',
             ],
@@ -257,7 +269,7 @@ class FCom_Cms_Migrate extends BClass
     {
         $tBlock = $this->FCom_Cms_Model_Block->table();
         $this->BDb->ddlTableDef($tBlock, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'form_email' => 'varchar(20)',
                 'form_custom_email' => 'varchar(100)',
             ],

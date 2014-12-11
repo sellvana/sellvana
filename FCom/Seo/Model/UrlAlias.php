@@ -11,6 +11,7 @@
  * @property string $redirect_type
  * @property datetime $create_at
  * @property datetime $update_at
+ * @property FCom_Frontend_Main $FCom_Frontend_Main
  */
 class FCom_Seo_Model_UrlAlias extends FCom_Core_Model_Abstract
 {

@@ -29,6 +29,12 @@
 */
 class BDb
 {
+    const COLUMNS = 'COLUMNS',
+        PRIMARY = 'PRIMARY',
+        CONSTRAINTS = 'CONSTRAINTS',
+        KEYS = 'KEYS',
+        OPTIONS = 'OPTIONS',
+        DROP = 'DROP';
     /**
     * Collection of cached named DB connections
     *
@@ -504,13 +510,14 @@ EOT
     }
 
     /**
-    * Get table field info
-    *
-    * @param string $fullTableName
-    * @param string $fieldName if null return all fields
-    * @throws BException
-    * @return mixed
-    */
+     * Get table field info
+     *
+     * @param string $fullTableName
+     * @param string $fieldName if null return all fields
+     * @param string|null $connectionName
+     * @return mixed
+     * @throws BException
+     */
     public static function ddlFieldInfo($fullTableName, $fieldName = null, $connectionName = null)
     {
         self::checkTable($fullTableName, $connectionName);
@@ -664,20 +671,22 @@ EOT
     }
 
     /**
-    * Add or change table columns
-    *
-    * BDb::ddlTableColumns('my_table', array(
-    *   'field_to_create' => 'varchar(255) not null',
-    *   'field_to_update' => 'decimal(12,2) null',
-    *   'field_to_drop'   => 'DROP',
-    * ));
-    *
-    * @param string $fullTableName
-    * @param array $fields
-    * @param array $indexes
-    * @param array $fks
-    * @return array
-    */
+     * Add or change table columns
+     *
+     * BDb::ddlTableColumns('my_table', array(
+     *   'field_to_create' => 'varchar(255) not null',
+     *   'field_to_update' => 'decimal(12,2) null',
+     *   'field_to_drop'   => BDb::DROP,
+     * ));
+     *
+     * @param string $fullTableName
+     * @param array $fields
+     * @param array $indexes
+     * @param array $fks
+     * @param null $connectionName
+     * @throws BException
+     * @return array
+     */
     public static function ddlTableColumns($fullTableName, $fields, $indexes = null, $fks = null, $connectionName = null)
     {
         $tableFields = static::ddlFieldInfo($fullTableName, null, $connectionName);
@@ -733,6 +742,9 @@ EOT
             }
         }
         if ($fks) {
+            $tableArr = explode('.', $fullTableName);
+            $dbTableName = sizeof($tableArr) === 2 ? $tableArr[1] : $tableArr[0];
+
             $tableFKs = static::ddlForeignKeyInfo($fullTableName, null, $connectionName);
             $tableFKs = array_change_key_case($tableFKs, CASE_LOWER);
             // @see http://dev.mysql.com/doc/refman/5.5/en/innodb-foreign-key-constraints.html
@@ -741,13 +753,28 @@ EOT
             $dropArr = [];
             foreach ($fks as $idx => $def) {
                 $idxLower = strtolower($idx);
+                if (substr($idxLower, 0, 3) !== 'fk_') { // expand fk idx from 'name' to 'FK_{$table}_{$idx}'
+                    $idx = 'FK_' . $dbTableName . '_' . $idx;
+                    $idxLower = strtolower($idx);
+                }
+                if (is_array($def)) { // expand short array form of foreign key to full string
+                    if (empty($def[0]) || empty($def[1])) {
+                        throw new BException('Incomplete FK definition: ' . print_r($def));
+                    }
+                    $lk = $def[0];
+                    $ft = $def[1];
+                    $fk = !empty($def[2]) ? $def[2] : 'id';
+                    $ou = !empty($def[3]) ? $def[3] : 'CASCADE';
+                    $od = !empty($def[4]) ? $def[4] : 'CASCADE';
+                    $def = "FOREIGN KEY ({$lk}) REFERENCES {$ft} ({$fk}) ON UPDATE {$ou} ON DELETE {$od}";
+                }
                 if ($def === 'DROP') {
                     if (!empty($tableFKs[$idxLower])) {
                         $dropArr[] = "DROP FOREIGN KEY `{$idx}`";
                     }
                 } else {
                     if (!empty($tableFKs[$idxLower])) {
-                    // what if it is not foreign key constraint we do not doe anything to check for UNIQUE and PRIMARY constraint
+                    // what if it is not foreign key constraint we do not do anything to check for UNIQUE and PRIMARY constraint
                         $dropArr[] = "DROP FOREIGN KEY `{$idx}`";
                     }
                     $alterArr[] = "ADD CONSTRAINT `{$idx}` {$def}";
@@ -761,6 +788,15 @@ EOT
         $result = null;
         if ($alterArr) {
             $result = BORM::i()->raw_query("ALTER TABLE {$fullTableName} " . join(", ", $alterArr), [])->execute();
+            static::ddlClearCache(null, $connectionName);
+        }
+        return $result;
+    }
+
+    public function ddlDropTable($fullTableName, $connectionName = null)
+    {
+        if (static::ddlTableExists($fullTableName, $connectionName)) {
+            $result = BORM::i()->raw_query("DROP TABLE {$fullTableName}")->execute();
             static::ddlClearCache(null, $connectionName);
         }
         return $result;
@@ -1213,7 +1249,7 @@ class BORM extends ORMWrapper
      *
      * @param string|array $column_name if array - use where_complex() syntax
      * @param mixed        $value
-     * @return $this|\BORM
+     * @return BORM
      */
     public function where($column_name, $value = null)
     {
@@ -2410,7 +2446,7 @@ class BModel extends Model
     *
     * @param null|array $data
     * @param boolean $new is new record
-    * @return static
+    * @return BModel
     */
     public static function create($data = null, $new = true)
     {
@@ -2889,7 +2925,8 @@ class BModel extends Model
     * @param string $class_name
     * @return string
     */
-    protected static function _get_table_name($class_name) {
+    protected static function _get_table_name($class_name)
+    {
         return BDb::t(parent::_get_table_name($class_name));
     }
 
@@ -3250,6 +3287,11 @@ class BModel extends Model
         return $values;
     }
 
+    protected function _validationRules()
+    {
+        return static::$_validationRules;
+    }
+
     /**
      * Model validation
      *
@@ -3262,14 +3304,17 @@ class BModel extends Model
      * @param array $data
      * @param array $rules
      * @param string $formName
+     * @param boolean $ignoreModelRules
      * @return bool
      */
-    public function validate($data = [], $rules = [], $formName = 'admin')
+    public function validate($data = [], $rules = [], $formName = 'admin', $ignoreModelRules = false)
     {
         if (!$data && $this->orm) {
             $data = $this->as_array();
         }
-        $rules = array_merge(static::$_validationRules, $rules);
+        if (!$ignoreModelRules) {
+            $rules = array_merge($this->_validationRules(), $rules);
+        }
         $this->BEvents->fire($this->_origClass() . "::validate:before", ["rules" => &$rules, "data" => &$data]);
         $valid = $this->BValidate->validateInput($data, $rules, $formName);
         if (!$valid) {

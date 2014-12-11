@@ -6,6 +6,7 @@
  * @property FCom_Blog_Model_Post $FCom_Blog_Model_Post
  * @property FCom_Blog_Model_Tag $FCom_Blog_Model_Tag
  * @property FCom_Blog_Model_Category $FCom_Blog_Model_Category
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_Blog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {

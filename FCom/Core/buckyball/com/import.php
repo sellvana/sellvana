@@ -22,6 +22,12 @@
 * @license http://www.apache.org/licenses/LICENSE-2.0.html
 */
 
+/**
+ * Class BImport
+ *
+ * @property FCom_Core_Main $FCom_Core_Main
+ */
+
 class BImport extends BClass
 {
     protected $fields = [];

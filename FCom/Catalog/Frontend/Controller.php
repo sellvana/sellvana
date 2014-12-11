@@ -4,6 +4,7 @@
  * Class FCom_Catalog_Frontend_Controller
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
  */
 class FCom_Catalog_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {

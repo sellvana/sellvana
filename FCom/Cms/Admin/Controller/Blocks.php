@@ -5,6 +5,7 @@
  *
  * @property FCom_Cms_Model_BlockHistory $FCom_Cms_Model_BlockHistory
  * @property FCom_Admin_View_Grid $FCom_Admin_View_Grid
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_GridForm
 {
@@ -22,10 +23,10 @@ class FCom_Cms_Admin_Controller_Blocks extends FCom_Admin_Controller_Abstract_Gr
             ['name' => 'handle', 'label' => 'Handle'],
             ['name' => 'description', 'label' => 'Description', 'editable' => true],
             ['type' => 'input', 'name' => 'renderer', 'label' => 'Renderer', 'editor' => 'select',
-                  'options' => $this->BLayout->getAllRenderers(true), 'editable' => true, 'mass-editable' => true],
+                  'options' => $this->BLayout->getAllRenderers(true), 'editable' => true, 'multirow_edit' => true],
             ['name' => 'version', 'label' => 'Version'],
             ['type' => 'input', 'name' => 'page_enabled', 'label' => 'Page Enable', 'editor' => 'select',
-                  'options' => ['1' => 'Yes', '0' => 'No'], 'editable' => true, 'mass-editable' => true],
+                  'options' => ['1' => 'Yes', '0' => 'No'], 'editable' => true, 'multirow_edit' => true],
             ['name' => 'page_url', 'label' => 'Page Url'],
             ['name' => 'page_title', 'label' => 'Page Title'],
             ['name' => 'meta_title', 'label' => 'Meta Title', 'hidden' => true],

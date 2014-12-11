@@ -13,8 +13,8 @@ catalog/product/pager:
             sort_options:
                 'product_name asc': 'Product Name (A-Z)'
                 'product_name desc': 'Product Name (Z-A)'
-                'local_sku asc': 'SKU (A-Z)'
-                'local_sku desc': 'SKU (Z-A)'
+                'product_sku asc': 'SKU (A-Z)'
+                'product_sku desc': 'SKU (Z-A)'
                 'base_price asc': 'Price (Lower first)'
                 'base_price desc': 'Price (Higher first)'
             default_sort: "product_name asc"

@@ -1,5 +1,20 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CustomField_Migrate
+ *
+ * @property FCom_Core_Model_MediaLibrary               $FCom_Core_Model_MediaLibrary
+ * @property FCom_Catalog_Model_Product                 $FCom_Catalog_Model_Product
+ * @property FCom_CustomField_Model_Field               $FCom_CustomField_Model_Field
+ * @property FCom_CustomField_Model_FieldOption         $FCom_CustomField_Model_FieldOption
+ * @property FCom_CustomField_Model_Set                 $FCom_CustomField_Model_Set
+ * @property FCom_CustomField_Model_SetField            $FCom_CustomField_Model_SetField
+ * @property FCom_CustomField_Model_ProductField        $FCom_CustomField_Model_ProductField
+ * @property FCom_CustomField_Model_ProductVariant      $FCom_CustomField_Model_ProductVariant
+ * @property FCom_CustomField_Model_ProductVarfield     $FCom_CustomField_Model_ProductVarfield
+ * @property FCom_CustomField_Model_ProductVariantField $FCom_CustomField_Model_ProductVariantField
+ * @property FCom_CustomField_Model_ProductVariantImage $FCom_CustomField_Model_ProductVariantImage
+ */
 class FCom_CustomField_Migrate extends BClass
 {
     public function install__0_2_0()
@@ -84,7 +99,7 @@ class FCom_CustomField_Migrate extends BClass
 
         $tProdVariant = $this->FCom_CustomField_Model_ProductVariant->table();
         $this->BDb->ddlTableDef($tProdVariant, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'product_id' => 'int unsigned not null',
                 'field_values' => 'varchar(255)',
@@ -92,8 +107,8 @@ class FCom_CustomField_Migrate extends BClass
                 'variant_price' => 'decimal(12,2)',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_product' => 'UNIQUE (product_id, field_values)',
                 'IDX_sku' => '(variant_sku)',
             ],
@@ -109,7 +124,7 @@ class FCom_CustomField_Migrate extends BClass
         }
 
         $this->BDb->ddlTableDef($tField->table(), [
-            'KEYS' => [
+            BDb::KEYS => [
                 'UNQ_field_code' => 'UNIQUE (field_code)',
             ],
         ]);
@@ -139,7 +154,7 @@ class FCom_CustomField_Migrate extends BClass
             ])->save();
         }
 
-        $this->BDb->ddlTableDef($tProdVariant, ['COLUMNS' => ['variant_qty' => "int(11)" ]]);
+        $this->BDb->ddlTableDef($tProdVariant, [BDb::COLUMNS => ['variant_qty' => "int(11)" ]]);
     }
 
     public function upgrade__0_1_0__0_1_1()
@@ -155,32 +170,32 @@ class FCom_CustomField_Migrate extends BClass
     public function upgrade__0_1_1__0_1_2()
     {
         $tField = $this->FCom_CustomField_Model_Field->table();
-        $this->BDb->ddlTableDef($tField, ['COLUMNS' => ['sort_order' => "int not null default '0'"]]);
+        $this->BDb->ddlTableDef($tField, [BDb::COLUMNS => ['sort_order' => "int not null default '0'"]]);
     }
 
     public function upgrade__0_1_2__0_1_3()
     {
         $tField = $this->FCom_CustomField_Model_Field->table();
-        $this->BDb->ddlTableDef($tField, ['COLUMNS' => ['facet_select' => "enum('No', 'Exclusive', 'Inclusive') NOT NULL DEFAULT 'No'"]]);
+        $this->BDb->ddlTableDef($tField, [BDb::COLUMNS => ['facet_select' => "enum('No', 'Exclusive', 'Inclusive') NOT NULL DEFAULT 'No'"]]);
     }
 
     public function upgrade__0_1_3__0_1_4()
     {
         $tField = $this->FCom_CustomField_Model_Field->table();
-        $this->BDb->ddlTableDef($tField, ['COLUMNS' => ['system' => "tinyint(1) NOT NULL DEFAULT '0'"]]);
+        $this->BDb->ddlTableDef($tField, [BDb::COLUMNS => ['system' => "tinyint(1) NOT NULL DEFAULT '0'"]]);
     }
 
     public function upgrade__0_1_4__0_1_5()
     {
         $tProdField = $this->FCom_CustomField_Model_ProductField->table();
-        $this->BDb->ddlTableDef($tProdField, ['COLUMNS' => ['_data_serialized' => "text null AFTER _hide_field_ids"]]);
+        $this->BDb->ddlTableDef($tProdField, [BDb::COLUMNS => ['_data_serialized' => "text null AFTER _hide_field_ids"]]);
     }
 
     public function upgrade__0_1_5__0_1_6()
     {
         $tProdVariant = $this->FCom_CustomField_Model_ProductVariant->table();
         $this->BDb->ddlTableDef($tProdVariant, [
-            'COLUMNS' => [
+            BDb::COLUMNS => [
                 'id' => 'int unsigned not null auto_increment',
                 'product_id' => 'int unsigned not null',
                 'field_values' => 'varchar(255)',
@@ -188,8 +203,8 @@ class FCom_CustomField_Migrate extends BClass
                 'variant_price' => 'decimal(12,2)',
                 'data_serialized' => 'text',
             ],
-            'PRIMARY' => '(id)',
-            'KEYS' => [
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
                 'UNQ_product' => 'UNIQUE (product_id, field_values)',
                 'IDX_sku' => '(variant_sku)',
             ],
@@ -199,13 +214,13 @@ class FCom_CustomField_Migrate extends BClass
     public function upgrade__0_1_6__0_1_7()
     {
         $tProdField = $this->FCom_CustomField_Model_Field->table();
-        $this->BDb->ddlTableDef($tProdField, ['COLUMNS' => ['validation' => "varchar(100) null"]]);
+        $this->BDb->ddlTableDef($tProdField, [BDb::COLUMNS => ['validation' => "varchar(100) null"]]);
     }
 
     public function upgrade__0_1_7__0_1_8()
     {
         $tProdField = $this->FCom_CustomField_Model_Field->table();
-        $this->BDb->ddlTableDef($tProdField, ['COLUMNS' => ['required' => "tinyint(1) NOT NULL DEFAULT '1'"]]);
+        $this->BDb->ddlTableDef($tProdField, [BDb::COLUMNS => ['required' => "tinyint(1) NOT NULL DEFAULT '1'"]]);
     }
 
     public function upgrade__0_1_8__0_1_9()
@@ -222,7 +237,7 @@ class FCom_CustomField_Migrate extends BClass
         }
 
         $this->BDb->ddlTableDef($fieldHlp->table(), [
-            'KEYS' => [
+            BDb::KEYS => [
                 'UNQ_field_code' => 'UNIQUE (field_code)',
             ],
         ]);
@@ -256,6 +271,103 @@ class FCom_CustomField_Migrate extends BClass
     public function upgrade__0_1_9__0_2_0()
     {
         $tProdVariant = $this->FCom_CustomField_Model_ProductVariant->table();
-        $this->BDb->ddlTableDef($tProdVariant, ['COLUMNS' => ['variant_qty' => "int(11)" ]]);
+        $this->BDb->ddlTableDef($tProdVariant, [BDb::COLUMNS => ['variant_qty' => "int(11)" ]]);
+    }
+
+    public function upgrade__0_2_0__0_2_1()
+    {
+        $tProduct          = $this->FCom_Catalog_Model_Product->table();
+        $tField            = $this->FCom_CustomField_Model_Field->table();
+        $tFieldOption      = $this->FCom_CustomField_Model_FieldOption->table();
+        $tProdVariant      = $this->FCom_CustomField_Model_ProductVariant->table();
+        $tProdVarfield     = $this->FCom_CustomField_Model_ProductVarfield->table();
+        $tProdVariantField = $this->FCom_CustomField_Model_ProductVariantField->table();
+        $tProdVariantImage = $this->FCom_CustomField_Model_ProductVariantImage->table();
+        $tMediaFile        = $this->FCom_Core_Model_MediaLibrary->table();
+
+        $this->BDb->ddlTableDef($tProdVarfield, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'product_id' => 'int unsigned not null',
+                'field_id' => 'int unsigned not null',
+                'field_label' => 'varchar(50)',
+                'position' => 'tinyint unsigned not null default 0',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'UNQ_product_field' => 'UNIQUE (product_id, field_id)',
+                'IDX_product_position' => '(product_id, position)',
+            ],
+            BDb::CONSTRAINTS => [
+                'product' => ['product_id', $tProduct],
+                'field'   => ['field_id', $tField],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tProdVariantField, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'product_id' => 'int unsigned not null',
+                'variant_id' => 'int unsigned not null',
+                'field_id' => 'int unsigned not null',
+                'varfield_id' => 'int unsigned not null',
+                'option_id' => 'int unsigned not null',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::CONSTRAINTS => [
+                'product'  => ['product_id', $tProduct],
+                'variant'  => ['variant_id', $tProdVariant],
+                'field'    => ['field_id', $tField],
+                'varfield' => ['varfield_id', $tProdVarfield],
+                'option'   => ['option_id', $tFieldOption],
+            ],
+        ]);
+
+        $this->BDb->ddlTableDef($tProdVariantImage, [
+            BDb::COLUMNS => [
+                'id' => 'int unsigned not null auto_increment',
+                'product_id' => 'int unsigned not null',
+                'variant_id' => 'int unsigned not null',
+                'file_id' => 'int unsigned not null',
+                'product_media_id' => 'int unsigned not null',
+                'position' => 'tinyint unsigned not null default 0',
+            ],
+            BDb::PRIMARY => '(id)',
+            BDb::KEYS => [
+                'IDX_variant_position' => '(variant_id, position)',
+            ],
+            BDb::CONSTRAINTS => [
+                'product' => ['product_id', $tProduct],
+                'variant' => ['variant_id', $tProdVariant],
+                'file'    => ['file_id', $tMediaFile],
+            ],
+        ]);
+    }
+
+    public function upgrade__0_2_1__0_2_2()
+    {
+        $tFieldOption = $this->FCom_CustomField_Model_FieldOption->table();
+        $this->BDb->ddlTableDef($tFieldOption, [
+            BDb::COLUMNS => [
+                'data_serialized' => 'text', // for translations
+            ],
+        ]);
+    }
+
+    public function upgrade__0_2_2__0_2_3()
+    {
+        $tProdVariant = $this->FCom_CustomField_Model_ProductVariant->table();
+        $this->BDb->ddlTableDef($tProdVariant, [
+            BDb::COLUMNS => [
+                'variant_sku' => 'RENAME inventory_sku varchar(50)',
+                'product_sku' => 'varchar(50)',
+            ],
+            BDb::KEYS => [
+                'IDX_sku' => BDb::DROP,
+                'IDX_inventory_sku' => '(inventory_sku)',
+                'IDX_product_sku' => '(product_sku)',
+            ],
+        ]);
+        $this->BDb->run("UPDATE {$tProdVariant} SET product_sku=inventory_sku");
     }
 }

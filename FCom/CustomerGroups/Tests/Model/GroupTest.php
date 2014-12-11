@@ -3,6 +3,7 @@
 /**
  * Created by pp
  * @project fulleron
+ * @property FCom_CustomerGroups_Model_Group $FCom_CustomerGroups_Model_Group
  */
 
 class FCom_CustomerGroups_Tests_Model_GroupTest

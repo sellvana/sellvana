@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Cms_Frontend_View_Page
+ *
+ * @property FCom_Cms_Model_Page $FCom_Cms_Model_Page
+ */
+
 class FCom_Cms_Frontend_View_Page extends FCom_Core_View_Abstract
 {
     public function getBlockModel($view)
@@ -11,7 +17,7 @@ class FCom_Cms_Frontend_View_Page extends FCom_Core_View_Abstract
             } elseif (is_string($page)) {
                 $page = $this->FCom_Cms_Model_Page->load($page, 'handle');
             }
-            if (!$page || !is_object($page) || !$page instanceof FCom_Cms_Model_Page) {
+            if (!$page || !is_object($page) || !$page instanceof FCom_Cms_Model_Block) {
                 $this->BDebug->warning('CMS Page not found or invalid');
                 return false;
             }

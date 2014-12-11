@@ -1,7 +1,7 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 namespace MtHaml\NodeVisitor;
-
+defined('BUCKYBALL_ROOT_DIR') || die();
 use MtHaml\Node\Insert;
 use MtHaml\Node\Run;
 use MtHaml\Node\InterpolatedString;
@@ -54,7 +54,7 @@ class PhpRenderer extends RendererAbstract
             $fmt = '<?php echo %s; ?>';
 
             //ADDED: FULLERON
-            if (!\$this->BApp->get('modules/FCom_LibHaml/disable_escaping') && $node->getEscaping()->isEnabled()) {
+            if (!$this->BConfig->get('modules/FCom_LibHaml/disable_escaping') && $node->getEscaping()->isEnabled()) {
                 if ($node->getEscaping()->isOnce()) {
                     $fmt = "<?php echo htmlspecialchars(%s,ENT_QUOTES,'%s',false); ?>";
                 } else {

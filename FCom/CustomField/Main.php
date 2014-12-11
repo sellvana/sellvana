@@ -84,10 +84,11 @@ class FCom_CustomField_Main extends BClass
         }
 
         $customFields = $this->FCom_CustomField_Model_Field->orm()
-                ->where_in('facet_select', ['Inclusive', 'Exclusive'])
-                ->where('frontend_show', 1)
-                ->order_by_asc('sort_order')
-                ->find_many();
+            ->where_in('facet_select', ['Inclusive', 'Exclusive'])
+            ->where('frontend_show', 1)
+            ->order_by_asc('sort_order')
+            ->find_many();
+
         if (!$customFields) {
             return;
         }
@@ -100,15 +101,15 @@ class FCom_CustomField_Main extends BClass
                 $fkey = urldecode($fkey);
                 /** @var FCom_CustomField_Model_Field $field */
                 $field = $this->FCom_CustomField_Model_Field->orm()->where('field_code', $fkey)->find_one();
-                $currentFilter[$field->frontend_label][] =
-                        [
-                            'key' => $field->field_code,
-                            'facet_select' => $field->facet_select,
-                            'value' => $fval
-                            ];
+                $currentFilter[$field->frontend_label][] = [
+                    'key' => $field->field_code,
+                    'facet_select' => $field->facet_select,
+                    'value' => $fval,
+                ];
                 if (is_array($fval)) {
-                    foreach ($fval as $fvalsingle)
-                    $excludeFilters[$field->frontend_label][] = $fvalsingle;
+                    foreach ($fval as $fvalsingle) {
+                        $excludeFilters[$field->frontend_label][] = $fvalsingle;
+                    }
                 } else {
                     $excludeFilters[$field->frontend_label][] = $fval;
                 }
@@ -130,7 +131,7 @@ class FCom_CustomField_Main extends BClass
             $values = [];
             foreach ($products as $p) {
                 if (isset($excludeFilters[$cf->frontend_label]) &&
-                        in_array($p-> {$cf->field_code}, $excludeFilters[$cf->frontend_label])
+                    in_array($p-> {$cf->field_code}, $excludeFilters[$cf->frontend_label])
                 ) {
                     continue;
                 }
@@ -143,7 +144,7 @@ class FCom_CustomField_Main extends BClass
                 'key' => $cf->field_code,
                 'facet_select' => $cf->facet_select,
                 'values' => $values
-                ];
+            ];
         }
 
 

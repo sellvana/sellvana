@@ -87,4 +87,9 @@ class FCom_Core_View_FormElements extends FCom_Core_View_Abstract
         }
         return '';
     }
+
+    public function attributes($attrs)
+    {
+        return $this->BUtil->tagAttributes($attrs);
+    }
 }

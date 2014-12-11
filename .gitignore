@@ -17,3 +17,4 @@ index.local.php
 *.log
 *.sql
 composer.*
+notes.txt

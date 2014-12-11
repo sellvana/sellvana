@@ -40,13 +40,14 @@ class FCom_PaymentIdeal_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
     }
 
     /**
-     *
+     * @param FCom_Sales_Model_Order_Payment $payment
+     * @return static
      */
-    public function payOnCheckout()
+    public function payOnCheckout(FCom_Sales_Model_Order_Payment $payment)
     {
         $bankId      = $this->get('bank_id');
-        $amount      = $this->salesEntity->get('balance') * 100;
-        $description = $this->salesEntity->getTextDescription();
+        $amount      = $this->_order->get('balance') * 100;
+        $description = $this->_order->getTextDescription();
         $returnUrl   = $this->BApp->href("checkout/success");
         $reportUrl   = $this->BApp->href("ideal/report");
 
@@ -65,15 +66,15 @@ class FCom_PaymentIdeal_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
         $success = !$this->get('error');
         if ($success) {
             $status = 'processing';
-            $this->salesEntity->set('status', $this->config()->get('order_status'));
-            $this->salesEntity->save();
+            $this->_order->set('status', $this->config()->get('order_status'));
+            $this->_order->save();
         } else {
             $status = 'error';
         }
         $paymentData = [
             'method'           => 'ideal',
             'parent_id'        => $this->get('transaction_id'),
-            'order_id'         => $this->salesEntity->id(),
+            'order_id'         => $this->_order->id(),
             'amount'           => $amount,
             'status'           => $status,
             'transaction_id'   => $this->get('transaction_id'),
@@ -81,9 +82,11 @@ class FCom_PaymentIdeal_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
             'online'           => 1,
         ];
 
-        $paymentModel = $this->FCom_Sales_Model_Order_Payment->addNew($paymentData);
+        $paymentModel = $this->FCom_Sales_Model_Order_Payment->create($paymentData)->save();
         $paymentModel->setData('response', $this->getPublicData());
         $paymentModel->save();
+
+        return $this;
     }
 
     /**
@@ -93,7 +96,7 @@ class FCom_PaymentIdeal_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
     public function setDetails($details = [])
     {
         if (isset($details['ideal'])) {
-            $this->details = $details['ideal'];
+            $this->_details = $details['ideal'];
         }
         return $this;
     }

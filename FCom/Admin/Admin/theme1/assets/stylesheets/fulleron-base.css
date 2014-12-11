@@ -3703,3 +3703,9 @@ body.error .error-container-footer a {
 .btn-filter-date.active-button {
     background-color: #e4e4e4;
 }
+
+/* griddle component */
+.pagination-griddle {
+    margin-top: 0;
+    margin-bottom: 0;
+}

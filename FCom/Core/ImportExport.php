@@ -3,6 +3,12 @@
 /**
  * Created by pp
  * @project sellvana_core
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Core_Model_ImportExport_Id $FCom_Core_Model_ImportExport_Id
+ * @property FCom_Core_Model_ImportExport_Model $FCom_Core_Model_ImportExport_Model
+ * @property FCom_Core_Model_ImportExport_Site $FCom_Core_Model_ImportExport_Site
+ * @property FCom_CustomField_Main $FCom_CustomField_Main
+ * @property FCom_PushServer_Model_Channel $FCom_PushServer_Model_Channel
  */
 class FCom_Core_ImportExport extends FCom_Core_Model_Abstract
 {

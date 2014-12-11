@@ -7,16 +7,17 @@
     {% set fieldData = { model: c, settings_module: 'FCom_ShippingUps', attr: 'size="50"' } %}
     {{ forms.accordion_panel_start({label:'UPS API'|_, id:'settings-FCom_ShippingUps-group0', in:1}) }}
         {{ forms.input(fieldData, {field:'access_key', label:'Access Key'|_ }) }}
-        {{ forms.input(fieldData, {field:'account', label:'UPS Account'|_ }) }}
-        {{ forms.input(fieldData, {field:'password', label:'Password'|_ }) }}
+        {{ forms.input(fieldData, {field:'shipper_number', label:'Shipper Number'|_ }) }}
+        {{ forms.input(fieldData, {field:'user_id', label:'User ID'|_ }) }}
+        {{ forms.input(fieldData, {field:'password', label:'Password'|_, type:'password' }) }}
         {{ forms.input(fieldData, {field:'rate_api_url', label:'Rate API URL'|_ }) }}
+        {{ forms.input(fieldData, {field:'max_package_weight', label:'Max Package Weight'|_ }) }}
     {{ forms.accordion_panel_end }}
 
-    {% set fieldData = { model: c, id_prefix:'FCom_ShippingUps-services', name_prefix:'config[modules][FCom_ShippingUps][services]', get_prefix:'modules/FCom_ShippingUps/services' } %}
+    {% set fieldData = { model: c, settings_module:'FCom_ShippingUps' } %}
     {{ forms.accordion_panel_start({label:'Shipping services'|_, id:'settings-FCom_ShippingUps-group1' }) }}
-        {% for sId, sName in services %}
-            {{ forms.boolean(fieldData, {field: 's' ~ sId, label: sName }) }}
-        {% endfor %}
+        {{ forms.select(fieldData, {field:'default_service', label:'Default Service', options:services}) }}
+        {{ forms.select(fieldData, {field:'services', label:'Enabled Services', multiple:true, select2:true, options:services}) }}
     {{ forms.accordion_panel_end }}
 {{ forms.accordion_end }}
 

@@ -1,5 +1,16 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_CatalogIndex_Frontend_Controller
+ *
+ * @property FCom_CatalogIndex_Indexer $FCom_CatalogIndex_Indexer
+ * @property FCom_CatalogIndex_Model_Field $FCom_CatalogIndex_Model_Field
+ * @property FCom_Catalog_Model_Category $FCom_Catalog_Model_Category
+ * @property FCom_Catalog_Model_SearchAlias $FCom_Catalog_Model_SearchAlias
+ * @property FCom_Catalog_Model_SearchHistory $FCom_Catalog_Model_SearchHistory
+ * @property FCom_Core_Main $FCom_Core_Main
+ */
+
 class FCom_CatalogIndex_Frontend_Controller extends FCom_Frontend_Controller_Abstract
 {
     public function action_category()

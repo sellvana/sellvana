@@ -14,10 +14,10 @@ require(['jquery','underscore','backbone', 'jquery.validate', 'unique'], functio
         grid.getGridSkeleton().Views.RowView.prototype.afterRender = function() {
             this.$el.find(inputQty).addClass('unique');
             this.$el.find(selectGroupId).addClass('unique');
-        }
+        };
         grid.build();
         originIds = grid.getRows().pluck('id');
-    }
+    };
 
     var bodyPrice = $('#tier-prices tbody');
     var prices, submiting = true;

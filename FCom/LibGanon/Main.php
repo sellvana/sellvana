@@ -26,18 +26,6 @@ class FCom_LibGanon_Main extends BClass
     protected $_doc;
     protected $_html;
 
-    /**
-     * Shortcut to help with IDE autocompletion
-     *
-     * @param bool  $new
-     * @param array $args
-     * @return FCom_LibGanon_Main
-     */
-    static public function i($new = false, array $args = [])
-    {
-        return BClassRegistry::instance(__CLASS__, $args, !$new);
-    }
-
     public function onLayoutRenderAfter($args)
     {
         $this->_html = $args['output'];# : '<!DOCTYPE html><html><head></head><body></body></html>';

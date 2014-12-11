@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_IndexTank_Tests_Index_ProductTest
+ *
+ * @property FCom_IndexTank_Index_Product $FCom_IndexTank_Index_Product
+ */
+
 class FCom_IndexTank_Tests_Index_ProductTest extends PHPUnit_Framework_TestCase
 {
     private $_model = null;

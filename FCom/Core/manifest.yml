@@ -12,6 +12,8 @@ modules:
                 - [ BDbModule, FCom_Core_Model_Module ]
         views:
             - [ head, { view_class: FCom_Core_View_Head } ]
+            - [ head_script, { view_class: FCom_Core_View_Text } ]
+            - [ head_css, { view_class: FCom_Core_View_Text } ]
             - [ core/messages, { view_class: FCom_Core_View_Messages } ]
             - [ bottom_scripts, { view_class: FCom_Core_View_Head } ]
             - [ core/htmlgrid, { view_class: FCom_Core_View_HtmlGrid } ]
@@ -20,8 +22,13 @@ modules:
             - [ core/slickgrid, { view_class: FCom_Core_View_Slickgrid } ]
             - [ core/simplegrid, { view_class: FCom_Core_View_SimpleGrid } ]
             - [ core/backbonegrid, { view_class: FCom_Core_View_BackboneGrid } ]
-            - [ core/medialib, {view_class: FCom_Core_View_Abstract } ]
-            - [ core/attachmentgrid, {view_class: FCom_Core_View_Abstract } ]
+            - [ core/griddle, { view_class: FCom_Core_View_BackboneGrid } ]
+            - [ core/medialib, { view_class: FCom_Core_View_Base } ]
+            - [ core/attachmentgrid, { view_class: FCom_Core_View_Base } ]
+
+        routing:
+            - [ /initialize.js, FCom_Core_Controller_Main.initialize_js ]
+            - [ /initialize.css, FCom_Core_Controller_Main.initialize_css ]
 
         observe:
             - [ "FCom_LibTwig_Main::init", FCom_Core_Main.onTwigInit ]

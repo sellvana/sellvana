@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Cron_Controller
+ *
+ * @property FCom_Cron_Main $FCom_Cron_Main
+ */
+
 class FCom_Cron_Controller extends FCom_Core_Controller_Abstract
 {
     public function action_run()

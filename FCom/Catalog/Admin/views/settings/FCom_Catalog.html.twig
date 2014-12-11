@@ -7,6 +7,9 @@
 <h2>{{ "Catalog Settings"|_}}</h2>
 {{ forms.accordion_start({id:'settings-FCom_Catalog'}) }}
      {{ forms.accordion_panel_start({label:'Stock Management'|_, id:'settings-FCom_Catalog-group0', in:1}) }}
+       {{ forms.boolean(fieldData, {field:'separate_inventory_sku', label:'Use Separate Inventory SKU'|_ }) }}
+     {{ forms.accordion_panel_end }}
+     {{ forms.accordion_panel_start({label:'Stock Management'|_, id:'settings-FCom_Catalog-group1'}) }}
         {{ forms.boolean(fieldData, {field:'manage_stock', label:'Manage Stock'|_ }) }}
         {{ forms.select(fieldData, {field:'back_order', label:'Back Orders'|_, options: backOrders }) }}
         {{ forms.input(fieldValidate, {field:'maximum_quantity_shopping', label:'Maximum Quantity Allowed in Shopping'|_ }) }}
