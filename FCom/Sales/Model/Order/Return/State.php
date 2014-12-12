@@ -1,11 +1,14 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
-class FCom_Sales_Model_Order_Payment_State extends FCom_Core_Model_Abstract_State_Context
+class FCom_Sales_Model_Order_Return_State extends FCom_Core_Model_Abstract_State_Context
 {
+    const OVERALL = 'overall',
+        CUSTOM = 'custom';
+
     /**
      * Order linked
      *
-     * @var FCom_Sales_Model_Order_Payment
+     * @var FCom_Sales_Model_Order_Return
      */
     protected $_model;
 
@@ -15,18 +18,26 @@ class FCom_Sales_Model_Order_Payment_State extends FCom_Core_Model_Abstract_Stat
      * @var array
      */
     static protected $_defaultStateClasses = [
-        'overall' => 'FCom_Sales_Model_Order_Payment_State_Overall',
-        'custom' => 'FCom_Sales_Model_Order_Payment_State_Custom',
+        self::OVERALL => 'FCom_Sales_Model_Order_Payment_State_Overall',
+        self::CUSTOM => 'FCom_Sales_Model_Order_Payment_State_Custom',
     ];
 
+    /**
+     * @return FCom_Sales_Model_Order_Payment_State_Overall
+     * @throws BException
+     */
     public function overall()
     {
-        return $this->_getStateObject('overall');
+        return $this->_getStateObject(self::OVERALL);
     }
 
+    /**
+     * @return FCom_Sales_Model_Order_Payment_State_Custom
+     * @throws BException
+     */
     public function custom()
     {
-        return $this->_getStateObject('custom');
+        return $this->_getStateObject(self::CUSTOM);
     }
 
 }

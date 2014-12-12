@@ -2,8 +2,9 @@
 
 class FCom_Sales_Model_Cart_Total_GrandTotal extends FCom_Sales_Model_Cart_Total_Abstract
 {
-    protected $_code = 'grandtotal';
+    protected $_code = 'grand_total';
     protected $_label = 'Grand Total';
+    protected $_cartField = 'grand_total';
     protected $_sortOrder = 90;
 
     /**
@@ -12,11 +13,14 @@ class FCom_Sales_Model_Cart_Total_GrandTotal extends FCom_Sales_Model_Cart_Total
     public function calculate()
     {
         $cart = $this->_cart;
-        $total = $cart->subtotal;
-        $total += $cart->shipping_price;
-        $total += $cart->tax_amount;
-        $total -= $cart->discount_amount;
-        $this->_value = $cart->grand_total = $total;
+        $this->_value = $cart->get('grand_total');
+
+        if ($this->_value) {
+            $cart->state()->payment()->setUnpaid();
+        } else {
+            $cart->state()->payment()->setFree();
+        }
+
         return $this;
     }
 

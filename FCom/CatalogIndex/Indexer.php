@@ -4,6 +4,17 @@
  * Class FCom_CatalogIndex_Indexer
  *
  * @method static FCom_CatalogIndex_Indexer i()
+ * @property FCom_CatalogIndex_Main $FCom_CatalogIndex_Main
+ * @property FCom_CatalogIndex_Model_Doc $FCom_CatalogIndex_Model_Doc
+ * @property FCom_CatalogIndex_Model_DocSort $FCom_CatalogIndex_Model_DocSort
+ * @property FCom_CatalogIndex_Model_DocTerm $FCom_CatalogIndex_Model_DocTerm
+ * @property FCom_CatalogIndex_Model_DocValue $FCom_CatalogIndex_Model_DocValue
+ * @property FCom_CatalogIndex_Model_Field $FCom_CatalogIndex_Model_Field
+ * @property FCom_CatalogIndex_Model_FieldValue $FCom_CatalogIndex_Model_FieldValue
+ * @property FCom_CatalogIndex_Model_Term $FCom_CatalogIndex_Model_Term
+ * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
+ * @property FCom_CustomField_Main $FCom_CustomField_Main
+ * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  */
 class FCom_CatalogIndex_Indexer extends BClass
 {

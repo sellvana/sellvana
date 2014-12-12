@@ -1,5 +1,18 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Admin_Controller_Orders
+ *
+ * @property FCom_Core_Model_Seq $FCom_Core_Model_Seq
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ * @property FCom_Sales_Model_Order $FCom_Sales_Model_Order
+ * @property FCom_Sales_Model_Order_Item $FCom_Sales_Model_Order_Item
+ * @property FCom_Sales_Model_Order_State_Overall $FCom_Sales_Model_Order_State_Overall
+ * @property FCom_Sales_Model_Order_State_Payment $FCom_Sales_Model_Order_State_Payment
+ * @property FCom_Sales_Model_Order_State_Delivery $FCom_Sales_Model_Order_State_Delivery
+ * @property FCom_Sales_Model_Order_State_Custom $FCom_Sales_Model_Order_State_Custom
+ */
+
 class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_GridForm
 {
     protected static $_origClass = __CLASS__;
@@ -13,6 +26,11 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
 
     public function gridConfig()
     {
+        $overallStates = $this->FCom_Sales_Model_Order_State_Overall->getAllValueLabels();
+        $paymentStates = $this->FCom_Sales_Model_Order_State_Payment->getAllValueLabels();
+        $deliveryStates = $this->FCom_Sales_Model_Order_State_Delivery->getAllValueLabels();
+        $customStates = $this->FCom_Sales_Model_Order_State_Custom->getAllValueLabels();
+
         $config = parent::gridConfig();
         $config['columns'] = [
             ['type' => 'row_select'],
@@ -20,16 +38,33 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                 'href' => $this->BApp->href('orders/form/?id=:id')],
             ['name' => 'admin_name', 'index' => 'o.admin_id', 'label' => 'Assisted by'],
             ['name' => 'create_at', 'index' => 'o.create_at', 'label' => 'Order Date'],
-            ['name' => 'billing_name', 'label' => 'Bill to Name', 'index' => 'billing_name'],
-            ['name' => 'billing_address', 'label' => 'Bill to Address', 'index' => 'billing_address'],
+
+            ['name' => 'billing_firstname', 'label' => 'Bill First Name', 'index' => 'billing_firstname'],
+            ['name' => 'billing_lastname', 'label' => 'Bill Last Name', 'index' => 'billing_lastname'],
+            ['name' => 'billing_city', 'label' => 'Bill City', 'index' => 'billing_city'],
+            ['name' => 'billing_postcode', 'label' => 'Bill Zip', 'index' => 'billing_postcode'],
+            ['name' => 'billing_region', 'label' => 'Bill State/Province', 'index' => 'billing_region'],
+            ['name' => 'billing_country', 'label' => 'Bill Country', 'index' => 'billing_country'],
+
+            ['name' => 'shipping_firstname', 'label' => 'Ship First Name', 'index' => 'shipping_firstname'],
+            ['name' => 'shipping_lastname', 'label' => 'Ship Last Name', 'index' => 'shipping_lastname'],
+            ['name' => 'shipping_city', 'label' => 'Ship City', 'index' => 'shipping_city'],
+            ['name' => 'shipping_postcode', 'label' => 'Ship Zip', 'index' => 'shipping_postcode'],
+            ['name' => 'shipping_region', 'label' => 'Ship State/Province', 'index' => 'shipping_region'],
+            ['name' => 'shipping_country', 'label' => 'Ship Country', 'index' => 'shipping_country'],
+
             ['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'shipping_name'],
             ['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'shipping_address'],
-            ['name' => 'grandtotal', 'label' => 'Order Total', 'index' => 'o.grandtotal'],
-            ['name' => 'balance', 'label' => 'Paid', 'index' => 'o.balance'],
+            ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total'],
+            ['name' => 'amount_due', 'label' => 'Due', 'index' => 'o.amount_due'],
+            ['name' => 'amount_paid', 'label' => 'Paid', 'index' => 'o.amount_paid'],
             ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
-            //todo: confirm with Boris about status should be stored as id_status
-            ['name' => 'status', 'label' => 'Status', 'index' => 'o.status',
-                'options' => $this->FCom_Sales_Model_Order_CustomStatus->statusOptions()],
+
+            ['name' => 'state_overall', 'label' => 'Overall State', 'index' => 'o.state_overall', 'options' => $overallStates],
+            ['name' => 'state_payment', 'label' => 'Payment State', 'index' => 'o.state_payment', 'options' => $paymentStates],
+            ['name' => 'state_delivery', 'label' => 'Delivery State', 'index' => 'o.state_delivery', 'options' => $deliveryStates],
+            ['name' => 'state_custom', 'label' => 'Custom State', 'index' => 'o.state_custom', 'options' => $customStates],
+
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
             ]],
@@ -38,17 +73,13 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['field' => 'create_at', 'type' => 'date-range'],
             ['field' => 'billing_name', 'type' => 'text', 'having' => true],
             ['field' => 'shipping_name', 'type' => 'text', 'having' => true],
-            ['field' => 'grandtotal', 'type' => 'number-range'],
-            ['field' => 'status', 'type' => 'multiselect'],
+            ['field' => 'grand_total', 'type' => 'number-range'],
+            ['field' => 'state_overall', 'type' => 'multiselect'],
+            ['field' => 'state_payment', 'type' => 'multiselect'],
+            ['field' => 'state_delivery', 'type' => 'multiselect'],
+            ['field' => 'state_custom', 'type' => 'multiselect'],
         ];
 
-        //todo: check this in FCom_Admin_Controller_Abstract_GridForm
-        if (!empty($config['orm'])) {
-            if (is_string($config['orm'])) {
-                $config['orm'] = $this->{$config['orm']}->orm($this->_mainTableAlias)->select($this->_mainTableAlias . '.*');
-            }
-            $this->gridOrmConfig($config['orm']);
-        }
         return $config;
     }
 
@@ -59,19 +90,10 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
     {
         parent::gridOrmConfig($orm);
 
-        $orm->left_outer_join('FCom_Sales_Model_Order_Address', 'o.id = ab.order_id and ab.atype="billing"', 'ab') //array('o.id','=','a.order_id')
-            ->select_expr('CONCAT_WS(" ", ab.firstname,ab.lastname)', 'billing_name')
-            ->select_expr('CONCAT_WS(" \n", ab.street1,ab.city,ab.country,ab.phone)', 'billing_address');
-
-        $orm->left_outer_join('FCom_Sales_Model_Order_Address', 'o.id = as.order_id and as.atype="shipping"', 'as') //array('o.id','=','a.order_id')
-            ->select_expr('CONCAT_WS(" ", as.firstname,as.lastname)', 'shipping_name')
-            ->select_expr('CONCAT_WS(" \n", as.street1,as.city,as.country,as.phone)', 'shipping_address');
+        $orm->select($this->_mainTableAlias . '.*');
 
         $orm->left_outer_join('FCom_Admin_Model_User', 'o.admin_id = au.id', 'au')
             ->select_expr('CONCAT_WS(" ", au.firstname,au.lastname)', 'admin_name');
-
-        $orm->left_outer_join('FCom_Sales_Model_Order_CustomStatus', 'o.status = os.code', 'os')
-            ->select(['os_name' => 'os.name']);
     }
 
     public function gridViewBefore($args)
@@ -92,18 +114,6 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         $order = $this->FCom_Sales_Model_Order->load($orderId);
         if (empty($order)) {
             $order = $this->FCom_Sales_Model_Order->create();
-        }
-        $shipping = $this->FCom_Sales_Model_Order_Address->findByOrder($orderId, 'shipping');
-        $billing = $this->FCom_Sales_Model_Order_Address->findByOrder($orderId, 'billing');
-        if ($shipping) {
-            $order->shipping_name = $shipping->firstname . ' ' . $shipping->lastname;
-            $order->shipping_address = $this->FCom_Sales_Model_Order_Address->as_html($shipping);
-            $order->shipping = $shipping;
-        }
-        if ($billing) {
-            $order->billing_name = $billing->firstname . ' ' . $billing->lastname;
-            $order->billing_address = $this->FCom_Sales_Model_Order_Address->as_html($billing);
-            $order->billing = $billing;
         }
 
         if ($order->customer_id) {
@@ -170,6 +180,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         parent::formPostAfter($args);
         if ($args['do'] !== 'DELETE') {
             $order = $args['model'];
+            /*
             $addrPost = $this->BRequest->post('address');
             if (($newData = $this->BUtil->fromJson($addrPost['data_json']))) {
                 $oldModels = $this->FCom_Sales_Model_Order_Address->orm('a')->where('order_id', $order->id())
@@ -190,6 +201,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             if (($del = $this->BUtil->fromJson($addrPost['del_json']))) {
                 $this->FCom_Sales_Model_Order_Address->delete_many(['id' => $del, 'order_id' => $order->id()]);
             }
+            */
 
             $modelPost = $this->BRequest->post('model');
             $items = $modelPost['items'];
@@ -223,7 +235,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                 $product = [
                     'id'           => $item->id,
                     'product_name' => $product_info['product_name'],
-                    'local_sku'    => $product_info['local_sku'],
+                    'product_sku'    => $product_info['product_sku'],
                     'price'        => $product_info['base_price'],
                     'qty'          => $item->qty,
                     'total'        => $item->total,
@@ -243,7 +255,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
                     ['type' => 'row_select'],
                     ['name' => 'id', 'label' => 'ID', 'width' => 80, 'hidden' => true],
                     ['name' => 'product_name', 'label' => 'Name', 'width' => 400],
-                    ['name' => 'local_sku', 'label' => 'SKU', 'width' => 200],
+                    ['name' => 'product_sku', 'label' => 'SKU', 'width' => 200],
                     ['name' => 'price', 'label' => 'Price', 'width' => 100],
                     ['name' => 'qty', 'label' => 'Qty', 'width' => 100],
                     ['name' => 'total', 'label' => 'Total', 'width' => 150],
@@ -274,11 +286,11 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['name' => 'billing_address', 'label' => 'Bill to Address', 'index' => 'ab.billing_address'],
             ['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'as.shipping_name'],
             ['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'as.shipping_address'],
-            ['name' => 'grandtotal', 'label' => 'Order Total', 'index' => 'o.grandtotal'],
-            ['name' => 'balance', 'label' => 'Paid', 'index' => 'o.balance'],
+            ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total'],
+            ['name' => 'amount_due', 'label' => 'Paid', 'index' => 'o.amount_due'],
             ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
             ['name' => 'status', 'label' => 'Status', 'index' => 'o.status',
-                'options' => $this->FCom_Sales_Model_Order_CustomStatus->statusOptions()],
+                'options' => $this->FCom_Sales_Model_StateCustom->optionsByType('order')],
             ['type' => 'btn_group', 'buttons' => [
                 ['name' => 'edit'],
             ]],
@@ -287,7 +299,7 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['field' => 'create_at', 'type' => 'date-range'],
             ['field' => 'billing_name', 'type' => 'text'],
             ['field' => 'shipping_name', 'type' => 'text'],
-            ['field' => 'grandtotal', 'type' => 'number-range'],
+            ['field' => 'grand_total', 'type' => 'number-range'],
             ['field' => 'status', 'type' => 'multiselect'],
         ];
         $config['orm'] = $config['orm']->where('customer_id', $customer->id());
@@ -310,12 +322,15 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
 
     public function getOrderTotal($filter)
     {
+        /*
+        // TODO: redo the whole thing
         $orderTotal = $this->FCom_Sales_Model_Order_CustomStatus->orm('s')
             ->left_outer_join('FCom_Sales_Model_Order', ['o.status', '=', 's.name'], 'o')
             ->group_by('s.id')
             ->select_expr('COUNT(o.id)', 'order')
             ->select(['s.id', 'name']);
         $tmp = $result = $orderTotal->find_many();
+        $tmp = [];
         switch ($filter['type']) {
             case 'between':
                 $tmp = $orderTotal->where_gte('o.create_at', $filter['min'])->where_lte('o.create_at', $filter['max'])->find_many();
@@ -344,6 +359,8 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             }
             $obj->set('order', $order);
         }
+        */
+        $result = [];
         return $result;
     }
 
@@ -402,3 +419,4 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
         }
     }
 }
+

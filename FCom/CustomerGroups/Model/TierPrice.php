@@ -17,18 +17,8 @@ class FCom_CustomerGroups_Model_TierPrice
     protected static $_origClass = __CLASS__;
 
     /**
-     * @param bool  $new
-     * @param array $args
-     * @return FCom_CustomerGroups_Model_TierPrice
-     */
-    static public function i($new = false, array $args = [])
-    {
-        return parent::i($new, $args); // auto completion helper
-    }
-
-    /**
      * @param $product
-     * @return array
+     * @return FCom_CustomerGroups_Model_TierPrice[]
      * @throws BException
      */
     public function getProductTiers($product)

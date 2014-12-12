@@ -1,7 +1,7 @@
-<?php defined('BUCKYBALL_ROOT_DIR') || die();
+<?php
 
 namespace MtHaml\NodeVisitor;
-
+defined('BUCKYBALL_ROOT_DIR') || die();
 use MtHaml\Node\Tag;
 use MtHaml\Node\TagAttribute;
 use MtHaml\Node\Statement;
@@ -299,22 +299,22 @@ abstract class RendererAbstract extends NodeVisitorAbstract
 
         switch($node->getFilter()) {
         case 'javascript':
-            \$this->BApp->set('modules/FCom_LibHaml/disable_escaping', true); //ADDED: FULLERON
+            $this->BConfig->set('modules/FCom_LibHaml/disable_escaping', true); //ADDED: FULLERON
             $this->write('<script type="text/javascript">')
                 ->write('//<![CDATA[')
                 ->indent();
             break;
         case 'css':
-            \$this->BApp->set('modules/FCom_LibHaml/disable_escaping', true); //ADDED: FULLERON
+            $this->BConfig->set('modules/FCom_LibHaml/disable_escaping', true); //ADDED: FULLERON
             $this->write('<style type="text/css">')
                 ->write('/*<![CDATA[*/')
                 ->indent();
             break;
         case 'plain':
-            \$this->BApp->set('modules/FCom_LibHaml/disable_escaping', true); //ADDED: FULLERON
+            $this->BConfig->set('modules/FCom_LibHaml/disable_escaping', true); //ADDED: FULLERON
             break;
         case 'preserve':
-            \$this->BApp->set('modules/FCom_LibHaml/disable_escaping', true); //ADDED: FULLERON
+            $this->BConfig->set('modules/FCom_LibHaml/disable_escaping', true); //ADDED: FULLERON
             $this->savedIndent[] = $this->indent;
             $this->indent = 0;
             break;
@@ -327,22 +327,22 @@ abstract class RendererAbstract extends NodeVisitorAbstract
     {
         switch($node->getFilter()) {
         case 'javascript':
-            \$this->BApp->set('modules/FCom_LibHaml/disable_escaping', false); //ADDED: FULLERON
+            $this->BConfig->set('modules/FCom_LibHaml/disable_escaping', false); //ADDED: FULLERON
             $this->undent()
                 ->write('//]]>')
                 ->write('</script>');
             break;
         case 'css':
-            \$this->BApp->set('modules/FCom_LibHaml/disable_escaping', false); //ADDED: FULLERON
+            $this->BConfig->set('modules/FCom_LibHaml/disable_escaping', false); //ADDED: FULLERON
             $this->undent()
                 ->write('/*]]>*/')
                 ->write('</style>');
             break;
         case 'plain':
-            \$this->BApp->set('modules/FCom_LibHaml/disable_escaping', false); //ADDED: FULLERON
+            $this->BConfig->set('modules/FCom_LibHaml/disable_escaping', false); //ADDED: FULLERON
             break;
         case 'preserve':
-            \$this->BApp->set('modules/FCom_LibHaml/disable_escaping', false); //ADDED: FULLERON
+            $this->BConfig->set('modules/FCom_LibHaml/disable_escaping', false); //ADDED: FULLERON
             $this->indent = array_pop($this->savedIndent);
             break;
         }

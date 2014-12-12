@@ -1,8 +1,0 @@
-<address>
-    {{ address.get('firstname') ~ ' ' ~ address.get('lastname') }}<br/>
-    {{ address.get('street1') }}<br/>
-    {% if address.get('street2') %}{{ address.get('street2') }}<br/>{% endif %}
-    {% if address.get('street3') %}{{ address.get('street3') }}<br/>{% endif %}
-    {{ address.get('country') ~ ' - ' ~ address.get('region') }}<br/>
-    {{ address.get('city') ~ ' - ' ~ address.get('postcode') }}
-</address>

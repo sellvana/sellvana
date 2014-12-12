@@ -31,6 +31,7 @@
  * DI
  * @property FCom_Cms_Model_BlockHistory $FCom_Cms_Model_BlockHistory
  * @property FCom_Cms_Frontend_View_Block $FCom_Cms_Frontend_View_Block
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_Cms_Model_Block extends FCom_Core_Model_Abstract
 {

@@ -78,6 +78,8 @@
                                             case 'finish':
                                                 $logCanvas.append('<div class="alert-info">' + msg.finish + '</div>');
                                                 break;
+                                            case 'error':
+                                                $logCanvas.append('<div class="alert-danger">' + msg.details + '</div>');
                                         }
                                     }
 

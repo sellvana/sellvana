@@ -16,6 +16,7 @@
  * @property FCom_AdminChat_Model_History $FCom_AdminChat_Model_History
  * @property FCom_PushServer_Model_Client $FCom_PushServer_Model_Client
  * @property FCom_AdminChat_Model_Participant $FCom_AdminChat_Model_Participant
+ * @property FCom_Admin_Model_User $FCom_Admin_Model_User
  */
 class FCom_AdminChat_Model_Chat extends FCom_Core_Model_Abstract
 {

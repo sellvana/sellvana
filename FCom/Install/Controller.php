@@ -5,6 +5,8 @@
  *
  * @property FCom_MarketClient_RemoteApi $FCom_MarketClient_RemoteApi
  * @property FCom_Admin_Model_User $FCom_Admin_Model_User
+ * @property FCom_Core_Model_Module $FCom_Core_Model_Module
+ * @property FCom_MarketClient_Main $FCom_MarketClient_Main
  */
 class FCom_Install_Controller extends FCom_Core_Controller_Abstract
 {
@@ -148,7 +150,7 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
             $this->BApp->m('FCom_Admin')->run_status = BModule::LOADED; // for proper migration on some hosts
             $this->BDb->connect();
             $this->FCom_Core_Model_Module->init();
-            $this->BMigrate->migrateModules('FCom_Admin', true);
+            $this->BMigrate->migrateModules(['FCom_Core', 'FCom_Admin'], true);
         }
         $this->BLayout->applyLayout('/step2');
         $sData =& $this->BSession->dataToUpdate();
@@ -237,7 +239,6 @@ class FCom_Install_Controller extends FCom_Core_Controller_Abstract
                         'FCom_FreshBooks' => 'REQUESTED',
                         //'FCom_FrontendCP' => 'REQUESTED',
                         'FCom_FrontendThemeBootSimple' => 'REQUESTED',
-                        'FCom_Geo' => 'REQUESTED',
                         'FCom_MarketClient' => 'REQUESTED',
                         'FCom_MultiCurrency' => 'REQUESTED',
                         'FCom_MultiLanguage' => 'REQUESTED',

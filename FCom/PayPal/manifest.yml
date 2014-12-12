@@ -9,10 +9,21 @@ modules:
         areas:
             FCom_Admin:
                 auto_use: [ bootstrap, views, layout ]
-                routing:
-                    - [ /paypal/.action, FCom_PayPal_Frontend_Controller ]
 
             FCom_Frontend:
                 auto_use: [ bootstrap, views, layout ]
                 routing:
-                    - [ /paypal/.action, FCom_PayPal_Frontend_Controller ]
+                    - [ /paypal/.action, FCom_PayPal_Frontend_Controller_ExpressCheckout ]
+
+        default_config:
+            modules:
+                FCom_PayPal:
+                    sandbox:
+                        mode: on
+                        api_url: "https://api-3t.sandbox.paypal.com/nvp"
+                        express_checkout_url: "https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token="
+                        payment_action: Sale
+                    production:
+                        api_url: "https://api-3t.paypal.com/nvp"
+                        express_checkout_url: "https://www.paypal.com/webscr?cmd=_express-checkout&token="
+                        payment_action: Sale

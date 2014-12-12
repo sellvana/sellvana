@@ -43,47 +43,29 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             if (!$login) {
                 $login = $r->post();
             }
-            $customerModel->setLoginRules();
-            if ($customerModel->validate($login, [], 'frontend')) {
-                $user = $customerModel->authenticate($login['email'], $login['password']);
-
-                if ($user) {
-                    switch ($user->status) {
-                        case 'active':
-                            $allowLogin = true;
-                            $errorMessage = '';
-                            break;
-                        case 'review':
-                            $allowLogin = false;
-                            $errorMessage = $this->_('Your account is under review. Once approved, we\'ll notify you. Thank you for your patience.');
-                            break;
-                        case 'disabled':
-                            $allowLogin = false;
-                            $errorMessage = $this->_('Your account is disabled. Please contact us for more details.');
-                            break;
-                        default:
-                            $allowLogin = false;
-                            $errorMessage = $this->_('Your account status have problem. Please contact us for more details.');
-                            break;
-                    }
-                    if ($allowLogin) {
-                        $this->BSession->regenerateId();
-                        $user->login();
-                        if (!empty($login['remember_me'])) {
-                            $days = $this->BConfig->get('cookie/remember_days');
-                            $this->BResponse->cookie('remember_me', 1, ($days ? $days : 30) * 86400);
-                        }
-                    } else {
-                        $this->message($errorMessage, 'error', 'frontend', ['title' => '']);
-                        $this->BResponse->redirect('login');
-                        return;
-                    }
-                } else {
-                    throw new Exception($this->_('Invalid email or password.'));
-                }
-            } else {
+            if (!$customerModel->validate($login, $customerModel->getLoginRules(), 'frontend', true)) {
                 $this->formMessages();
+                $this->BResponse->redirect('login');
+                return;
             }
+
+            $user = $customerModel->authenticate($login['email'], $login['password']);
+            if (!$user) {
+                throw new Exception($this->_('Invalid email or password.'));
+            }
+
+            $statusResult = $user->validateCustomerStatus();
+            if (empty($statusResult['allow_login'])) {
+                throw new Exception($statusResult['error']['message']);
+            }
+
+            $user->login();
+
+            if (!empty($login['remember_me'])) {
+                $days = $this->BConfig->get('cookie/remember_days');
+                $this->BResponse->cookie('remember_me', 1, ($days ? $days : 30) * 86400);
+            }
+
             $url = $r->request('redirect_to');
             if (!$r->isUrlLocal($url)) {
                 $url = '';
@@ -98,7 +80,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             $this->BResponse->redirect(!empty($url) ? $url : '');
         } catch (Exception $e) {
             $this->BDebug->logException($e);
-            $this->message($e->getMessage(), 'error');
+            $this->message($e->getMessage(), 'error', 'frontend', ['title' => '']);
             $this->BResponse->redirect('login');
         }
     }
@@ -113,8 +95,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         try {
             $email = $this->BRequest->request('email');
             $customerModel = $this->FCom_Customer_Model_Customer;
-            $customerModel->setPasswordRecoverRules();
-            if ($customerModel->validate(['email' => $email], [], 'frontend')) {
+            if ($customerModel->validate(['email' => $email], $customerModel->getPasswordRecoverRules(), 'frontend', true)) {
                 $user = $customerModel->load($email, 'email');
                 if ($user) {
                     $user->recoverPassword();
@@ -167,6 +148,7 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
             return;
         }
 
+        /** @var FCom_Customer_Model_Customer $user */
         $user = $this->FCom_Customer_Model_Customer->validateResetToken($token);
         if (!$user) {
             $this->message('Invalid token', 'error');
@@ -177,7 +159,6 @@ class FCom_Customer_Frontend_Controller extends FCom_Frontend_Controller_Abstrac
         $sessData['password_reset_token'] = null;
 
         $user->resetPassword($password);
-        $this->BSession->regenerateId();
 
         $this->message('Password has been reset.');
         if ($user->status === 'review') {

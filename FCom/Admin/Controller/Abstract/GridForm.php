@@ -304,7 +304,7 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
             $data = $r->post('model');
             $args = ['id' => $id, 'do' => $r->post('do'), 'data' => &$data, 'model' => &$model];
             $this->formPostBefore($args);
-            $args['validateFailed'] = false;
+            $args['validate_failed'] = false;
             if ($r->post('do') === 'DELETE') {
                 $model->delete();
                 $this->message('The record has been deleted');
@@ -314,12 +314,12 @@ abstract class FCom_Admin_Controller_Abstract_GridForm extends FCom_Admin_Contro
                 if ($model->validate($model->as_array(), [], $formId)) {
                     $model->save();
                     $this->message('Changes have been saved');
-                    if ($r->post('do') === 'saveAndContinue') {
+                    if ($r->post('do') === 'save_and_continue') {
                         $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $model->id();
                     }
                 } else {
                     $this->message('Cannot save data, please fix above errors', 'error', 'validator-errors:' . $formId);
-                    $args['validateFailed'] = true;
+                    $args['validate_failed'] = true;
                     $redirectUrl = $this->BApp->href($this->_formHref) . '?id=' . $id;
                 }
 

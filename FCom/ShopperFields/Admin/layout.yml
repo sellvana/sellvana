@@ -1,0 +1,5 @@
+
+catalog_product_form_tabs:
+    - view: admin/form
+        do:
+            - [ addTab, shopper_fields, { label: Shopper Editable Fields, pos: 86, view: catalog/products-form/shopper_fields, async: true } ]

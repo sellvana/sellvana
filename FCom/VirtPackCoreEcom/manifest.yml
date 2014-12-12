@@ -26,7 +26,6 @@ modules:
                 FCom_FreshBooks: 0.1.0
                 FCom_Frontend: 0.1.0
                 FCom_FrontendThemeBootSimple: 0.1.0
-                FCom_Geo: 0.1.0
                 FCom_MarketClient: 0.1.0
                 FCom_MultiCurrency: 0.1.0
                 FCom_MultiLanguage: 0.1.0
@@ -47,5 +46,5 @@ modules:
                 FCom_Seo: 0.1.0
                 FCom_ShippingPlain: 0.1.0
                 FCom_ShippingUps: 0.1.0
-                FCom_Stock: 0.1.0
+                FCom_ShopperFields: 0.1.0
                 FCom_Wishlist: 0.1.0

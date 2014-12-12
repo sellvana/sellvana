@@ -8,14 +8,10 @@ interface FCom_Sales_Method_Shipping_Interface
      */
     public function getServices();
     public function getServicesSelected();
-    public function getDefaultService();
 
-    /**
-     * Return shipping rate(cost) based on service, location and package parameters
-     */
-    public function getRateCallback($cart);
+    public function fetchCartRates($cart = null);
 
-    public function getEstimate();
+    public function fetchPackageRates($package);
 
     /**
      * Return error message if getRateCallback was unsuccessefull

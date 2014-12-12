@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Customer_Frontend_Controller_Account
+ *
+ * @property FCom_Customer_Model_Customer $FCom_Customer_Model_Customer
+ */
+
 class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller_Abstract
 {
     public function beforeDispatch()
@@ -64,10 +70,9 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
             $customer = $this->FCom_Customer_Model_Customer->sessionUser();
             $r      = $this->BRequest->post('model');
             $formId = 'account-edit';
-            $customer->setAccountEditRules(false);
 
             //set rule email unique if customer update email
-            $expandRules = [];
+            $expandRules = $customer->getAccountEditRules(false);
             if ($customer->get('email') != $r['email']) {
                 $expandRules = [['email', 'FCom_Customer_Model_Customer::ruleEmailUnique', 'Email is exist']];
             }
@@ -136,9 +141,8 @@ class FCom_Customer_Frontend_Controller_Account extends FCom_Frontend_Controller
             $customer = $this->FCom_Customer_Model_Customer->load($customerId);
             $r = $this->BRequest->post('model');
             $formId = 'change-password';
-            $customer->setChangePasswordRules();
 
-            if ($customer->validate($r, [], $formId)) {
+            if ($customer->validate($r, $customer->getChangePasswordRules(), $formId, true)) {
                 if (empty($r['current_password']) || !$this->Bcrypt->verify($r['current_password'], $customer->get('password_hash'))) {
                     $this->message('Current password is not correct, please try again', 'error');
                     $this->BResponse->redirect('customer/myaccount/editpassword');

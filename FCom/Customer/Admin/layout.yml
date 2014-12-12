@@ -4,6 +4,10 @@ base:
             - [ addNav, customer, { label: Customers, pos: 300, icon_class: icon-user } ]
             - [ addNav, customer/customers, { label: Customers, href: /customers, pos: 10 } ]
             - [ addNav, customer/import, { label: Import Customers, href: /customers/import/index, pos: 40 } ]
+    - view: head
+        do:
+            - [ requireJs, fcom.griddle, @FCom_Core/js/jsx/fcom.griddle ]
+    - { include: lib_griddle }
 /customers/import:
     - { include: base }
     - { include: form }
@@ -18,7 +22,7 @@ base:
 
 /customers:
     - { include: base }
-    - { hook: main, views: ['customer/customers', 'admin/grid'] }
+    - { hook: main, views: ['customer/customers', 'admin/griddle'] }
 
 /header_search:
     - { hook: main, views: 'header-search/FCom_Customer' }

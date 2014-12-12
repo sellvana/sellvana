@@ -1,0 +1,144 @@
+{% set order = THIS.get('order') %}
+{% set orderItems = order.items %}
+{% set addresses = order.addresses %}
+
+{% import THIS.view('core/form-elements').twigName() as forms %}
+{% set mergeFieldData = { id_prefix:'merge', name_prefix:'merge' } %}
+{% set sessCustomer = APP.instance('FCom_Customer_Model_Customer').sessionUser() %}
+{% if not sessCustomer %}
+    {% set emailCustomer = APP.instance('FCom_Customer_Model_Customer').load(order.get('customer_email'), 'email') %}
+{% endif %}
+
+        <div class="row f-mb-slideout-menu">
+            <div class="col-sm-9 f-col-main">
+                <header class="f-page-header">
+                    <h1 class="f-page-title">{{"Orders" | _ }} #{{ order.get('unique_id') }}</h1>
+                    <big>{{"Status" | _ }} : {{ order.get('status') }}</big>
+                    <a href="javascript:void(0);" id="button" class="f-mb-slideout-menu-toggle btn btn-default visible-xs">Menu</a>
+                </header>
+
+                {% if orderItems %}
+                    <h4>{{"Order items" | _ }}</h4>
+                    <div class="table-responsive">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>{{"Info" | _ }}</th>
+                                <th>{{"Qty" | _ }}</th>
+                                <th>{{"Total" | _ }}</th>
+                            </tr>
+                          </thead>
+                            {% for item in orderItems %}
+                                <tr>
+                                    <td>{{ item.get('id') }}</td>
+                                    <td>{{ THIS.view('orders/item').set('product', UTIL.fromJson(item.get('product_info'))) | raw}} </td>
+                                    <td>{{ item.get('qty') }} </td>
+                                    <td>{{ item.get('total') }} </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                {% endif %}
+
+
+
+                {% if addresses %}
+                    <div class="table-responsive">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                                <th>{{ "Your billing information" |_ }}</th>
+                                <th>{{ "Your shipping information" |_ }}</th>
+                            </tr>
+                          </thead>
+                            <tr>
+                                {% for address in addresses %}
+                                    <td>{{ THIS.view('checkout/success/address').set('address', address) | raw }}</td>
+                                {% endfor %}
+                            </tr>
+                        </table>
+                    </div>
+                {% endif %}
+
+
+                <div class="table-responsive">
+                    <table class="table">
+                          <thead>
+                        <tr>
+                            <th>{{"Shipping method" | _ }}</th>
+                            <th>{{"Payment method" | _ }}</th>
+
+                        </tr>
+                          </thead>
+                        <tr>
+                            <td>{{ order.get('shipping_method') }} </td>
+                            <td>{{ order.get('payment_method') }} </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table">
+                          <thead>
+                        <tr>
+                            <th>{{"Subtotal" | _ }}</th>
+                            <th>{{"Balance" | _ }}</th>
+                            <th>{{"Grand Total" | _ }}</th>
+                        </tr>
+                          </thead>
+                        <tr>
+                            <td>{{ order.get('subtotal') }} </td>
+                            <td>{{ order.get('grand_total') }} </td>
+                            <td>{{ order.get('amount_due') }} </td>
+                        </tr>
+                    </table>
+                </div>
+
+<!-- START: Merging order into account -->
+{% if not sessCustomer %}
+    {% if emailCustomer %}
+
+        <form method="post" role="form" action="{{ APP.href('guest/merge_order') }}" class="form-horizontal">
+            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+            <fieldset>
+                {{ forms.button(mergeFieldData, { text: 'Login to merge this order' }) }}
+            </fieldset>
+        </form>
+
+    {% else %}
+
+        <form method="post" role="form" action="{{ APP.href('guest/create_account') }}" class="form-horizontal">
+            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+            <fieldset>
+                {{ forms.input(mergeFieldData, { type:'password', field:'password', attr: { required: true } }) }}
+                {{ forms.button(mergeFieldData, { label:' ', text:'Create a new account' }) }}
+            </fieldset>
+        </form>
+
+    {% endif %}
+{% else %}
+    {% if sessCustomer.id() != order.get('customer_id') %}
+
+        <form method="post" role="form" action="{{ APP.href('guest/merge_order') }}" class="form-horizontal">
+            <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
+            <fieldset>
+                {{ forms.button(mergeFieldData, { text: 'Merge with this account' }) }}
+            </fieldset>
+        </form>
+
+    {% endif %}
+{% endif %}
+<!-- END: Merging order into account -->
+
+            </div>
+            {{ THIS.view('customer/account/sidebar').set('current', 'orders') | raw }}
+        </div>
+
+<script>
+    require(['jquery'], function($) {
+        $( "#button" ).click(function() {
+            $('.f-mb-slideout-menu .f-col-sidebar').toggleClass( "open" );
+        });
+    });
+</script>

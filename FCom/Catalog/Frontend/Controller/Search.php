@@ -7,6 +7,7 @@
  * @property FCom_Catalog_Model_Product $FCom_Catalog_Model_Product
  * @property FCom_Catalog_Model_SearchAlias $FCom_Catalog_Model_SearchAlias
  * @property FCom_Catalog_Model_SearchHistory $FCom_Catalog_Model_SearchHistory
+ * @property FCom_Core_Main $FCom_Core_Main
  */
 class FCom_Catalog_Frontend_Controller_Search extends FCom_Frontend_Controller_Abstract
 {

@@ -10,6 +10,6 @@ class FCom_CatalogIndex_Model_Doc extends FCom_Core_Model_Abstract
         if (!$productIds) {
             return;
         }
-        $this->update_many(['flag_reindex' => 1], ['id' => $this->BUtil->arrayCleanIn($productIds)]);
+        $this->update_many(['flag_reindex' => 1], ['id' => $this->BUtil->arrayCleanInt($productIds)]);
     }
 }

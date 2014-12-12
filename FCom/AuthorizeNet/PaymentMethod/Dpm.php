@@ -1,5 +1,11 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_AuthorizeNet_PaymentMethod_Dpm
+ *
+ * @property FCom_Sales_Model_Order_Payment $FCom_Sales_Model_Order_Payment
+ */
+
 class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMethod_Aim
 {
 
@@ -16,35 +22,35 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
         return $this->BLayout->view('authorizenet/dpm')->set('key', static::PAYMENT_METHOD_KEY);
     }
 
-    public function payOnCheckout()
+    public function payOnCheckout(FCom_Sales_Model_Order_Payment $payment)
     {
         return [];
     }
 
     public function getOrder()
     {
-        return $this->salesEntity;
+        return $this->_order;
     }
 
     public function getCardNumber()
     {
-        if (isset($this->details['cc_num'])) {
-            return $this->details['cc_num'];
+        if (isset($this->_details['cc_num'])) {
+            return $this->_details['cc_num'];
         }
         return null;
     }
 
     public function getDetail($key)
     {
-        if (isset($this->details[$key])) {
-            return $this->details[$key];
+        if (isset($this->_details[$key])) {
+            return $this->_details[$key];
         }
         return null;
     }
 
     public function setDetail($key, $value)
     {
-        $this->details[$key] = $value;
+        $this->_details[$key] = $value;
     }
 
     /**
@@ -65,7 +71,7 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
 
     public function getPublicData()
     {
-        return $this->details;
+        return $this->_details;
     }
 
     public function asArray()
@@ -112,12 +118,9 @@ class FCom_AuthorizeNet_PaymentMethod_Dpm extends FCom_AuthorizeNet_PaymentMetho
     {
         $order = $this->getOrder();
         $data['order'] = $order->as_array();
-        if ($order->billing()) {
-            $data['billing']  = $order->billing()->as_array();
-        }
-        if ($order->shipping()) {
-            $data['shipping'] = $order->shipping()->as_array();
-        }
+        //TODO: check for duplicate fields, if necessary
+        $data['billing']  = $order->addressAsArray('billing');
+        $data['shipping'] = $order->addressAsArray('shipping');
         $data['x_fields'] = $this->hiddenFields();
         return $data;
     }

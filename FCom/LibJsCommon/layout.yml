@@ -20,10 +20,21 @@ common_js_libs:
 
             - [ requireJs, jquery.bootstrap-growl, @FCom_LibJsCommon/js/jquery.bootstrap-growl.min, { deps: [ jquery, bootstrap ] } ]
 
+            #ReactJs
+            - [ requireConfig, { jsx: { fileExtension: '.jsx', harmony: true } } ]
+            - [ requireJs, text, @FCom_LibJsCommon/js/text ]
+            - [ requireJs, JSXTransformer, @FCom_LibJsCommon/js/JSXTransformer-0.12.0 ]
+            - [ requireJs, react, @FCom_LibJsCommon/js/react-with-addons, { deps: [ JSXTransformer ] } ]
+            - [ requireJs, jsx, @FCom_LibJsCommon/js/jsx ]
+            - [ requireJs, fcom.components, @FCom_Core/jsx/fcom/fcom.components ]
+
             #- [ js_raw, require_config, { content: "requirejs.config({ urlArgs: 'bust='+(new Date()).getTime() })" } ]
             #- [ requireModulePath, FCom_Core ]
             #- [ requireJs, jquery.tools, @FCom_LibJsCommon/js/jquery.tools.min, { deps: [ jquery ] } ]
             - [ css, @FCom_LibJsCommon/js/css/ngprogress.css ]
+
+            #- [ css, "@FCom_LibJsCommon/js/css/select2.css" ]
+            #- [ requireJs, select2, "@FCom_LibJsCommon/js/select2", { deps: [ jquery ] } ]
 
 lib_visualsearch:
     - view: head
@@ -38,3 +49,18 @@ lib_tokeninput:
             - [ css, @FCom_LibJsCommon/js/css/token-input-facebook.css ]
             - [ requireJs, jquery.tokeninput, @FCom_LibJsCommon/js/jquery.tokeninput, { deps: [ jquery ] } ]
 
+lib_griddle:
+    - view: head
+        do:
+            - [ requireJs, griddle.customFormatContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customFormatContainer ]
+            - [ requireJs, griddle.customPaginationContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customPaginationContainer ]
+            - [ requireJs, griddle.customFilterContainer, @FCom_LibJsCommon/jsx/griddle/scripts/customFilterContainer ]
+            - [ requireJs, griddle.gridBody, @FCom_LibJsCommon/jsx/griddle/scripts/gridBody ]
+            - [ requireJs, griddle.gridFilter, @FCom_LibJsCommon/jsx/griddle/scripts/gridFilter ]
+            - [ requireJs, griddle.gridNoData, @FCom_LibJsCommon/jsx/griddle/scripts/gridNoData ]
+            - [ requireJs, griddle.gridPagination, @FCom_LibJsCommon/jsx/griddle/scripts/gridPagination ]
+            - [ requireJs, griddle.gridRow, @FCom_LibJsCommon/jsx/griddle/scripts/gridRow ]
+            - [ requireJs, griddle.gridRowContainer, @FCom_LibJsCommon/jsx/griddle/scripts/gridRowContainer ]
+            - [ requireJs, griddle.gridSettings, @FCom_LibJsCommon/jsx/griddle/scripts/gridSettings ]
+            - [ requireJs, griddle.gridTitle, @FCom_LibJsCommon/jsx/griddle/scripts/gridTitle ]
+            - [ requireJs, griddle, @FCom_LibJsCommon/jsx/griddle/scripts/griddle ]
