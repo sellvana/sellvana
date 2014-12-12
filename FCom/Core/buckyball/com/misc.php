@@ -3138,8 +3138,7 @@ class BDebug extends BClass
      */
     public function is($modes)
     {
-        if (is_string($modes)) $modes = explode(',', $modes);
-        return in_array(static::$_mode, $modes);
+        return is_string($modes) ? (static::$_mode === $modes) : (in_array(static::$_mode, $modes));
     }
 
     /**

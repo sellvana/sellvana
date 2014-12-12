@@ -15,15 +15,16 @@ class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
         'customerPaysOnCheckout',
         'customerStartsExternalPayment',
         'customerReturnsFromExternalPayment',
-        'customerCompletesPayment',
-        'customerFailsPayment',
+        'customerCompletesCheckoutPayment',
+        'customerFailsCheckoutPayment',
         'customerGetsPaymentError',
 
         'adminPlacesOrder',
-        'adminCancelsAuthorization',
+        'adminAuthorizesPayment',
+        'adminVoidsAuthorization',
+        'adminReAuthorizesPayment',
         'adminCapturesPayment',
         'adminRefundsPayment',
-        'adminVoidsPayment',
         'adminChangesPaymentCustomState',
     ];
 
@@ -50,15 +51,10 @@ class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
         $order = $payment->order();
         $cart = $order->cart();
 
-        $payment->state()->overall()->setProcessing();
-        $payment->state()->processor()->setExtRedirected();
-
-        $order->state()->payment()->setProcessing();
-
+        $payment->state()->overall()->setExtSent();
         $cart->state()->payment()->setExternal();
 
         $payment->save();
-        $order->save();
         $cart->save();
     }
 
@@ -67,33 +63,33 @@ class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
         /** @var FCom_Sales_Model_Order_Payment $payment */
         $payment = $args['payment'];
 
-        $payment->state()->processor()->setExtReturned();
+        $payment->state()->overall()->setExtReturned();
         $payment->save();
     }
 
-    public function customerCompletesPayment($args)
+    public function customerCompletesCheckoutPayment($args)
     {
         /** @var FCom_Sales_Model_Order_Payment $payment */
         $payment = $args['payment'];
         $order = $payment->order();
         $cart = $order->cart();
-        $infoOnly = !empty($args['info_only']); // for payment methods like COD/check/MO/PO
-        $authOnly = !empty($args['auth_only']);
+        $transType = !empty($args['transaction_type']) ? $args['transaction_type'] : null;
 
-        if ($infoOnly) {
-            $payment->state()->overall()->setPending();
-            $payment->state()->processor()->setNA();
-            $order->state()->payment()->setOutstanding();
-        } else {
-            $payment->state()->overall()->setPaid();
+        switch ($transType) {
+            case 'order':  // for payment methods like COD/check/MO/PO or paypal EC Order method
+                $payment->state()->overall()->setPending();
+                $order->state()->payment()->setOutstanding();
+                break;
 
-            if ($authOnly) {
-                $payment->state()->processor()->setAuthorized();
+            case 'auth':
+                $payment->state()->overall()->setProcessing();
                 $order->state()->payment()->setProcessing();
-            } else {
-                $payment->state()->processor()->setCaptured();
+                break;
+
+            case 'capture':
+                $payment->state()->overall()->setPaid();
                 $order->state()->payment()->setPaid();
-            }
+                break;
         }
 
         $order->state()->overall()->setPlaced();
@@ -111,7 +107,7 @@ class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
         );
     }
 
-    public function customerFailsPayment($args)
+    public function customerFailsCheckoutPayment($args)
     {
         /** @var FCom_Sales_Model_Order_Payment $payment */
         $payment = $args['payment'];
@@ -132,43 +128,60 @@ class FCom_Sales_Workflow_Payment extends FCom_Sales_Workflow_Abstract
 
     public function customerGetsPaymentError($args)
     {
+        $historyData = ['data' => $args['result']];
         /** @var FCom_Sales_Model_Order_Payment $payment */
         $payment = $args['payment'];
-        $order = $payment->order();
-        $cart = $order->cart();
+        if ($payment) {
+            $order = $payment->order();
+            $cart = $order->cart();
 
-        $payment->state()->overall()->setFailed();
-        $payment->state()->processor()->setError();
+            $payment->state()->overall()->setFailed();
+            //$payment->state()->processor()->setError();
 
-        $cart->state()->payment()->setFailed();
+            $cart->state()->payment()->setFailed();
 
-        $payment->save();
-        $cart->save();
+            $payment->save();
+            $cart->save();
 
-        $order->addHistoryEvent('error',
-            $this->BLocale->_('Customer received payment error from %s', $order->get('payment_method')),
-            ['entity_id' => $payment->id()]
-        );
+            $message = $order->get('payment_method') . ' error: ' . $args['result']['error']['message'];
+            $historyData['entity_id'] = $payment->id();
+
+            $order->addHistoryEvent('error',
+                $this->BLocale->_($message),
+                $historyData
+            );
+        } else {
+            echo "<pre>"; var_dump($args); exit;
+        }
     }
 
     public function adminPlacesOrder($args)
     {
     }
 
-    public function adminCancelsAuthorization($args)
+    public function adminAuthorizesPayment($args)
     {
+
+    }
+
+    public function adminVoidsAuthorization($args)
+    {
+
+    }
+
+    public function adminReAuthorizesPayment($args)
+    {
+
     }
 
     public function adminCapturesPayment($args)
     {
+
     }
 
     public function adminRefundsPayment($args)
     {
-    }
 
-    public function adminVoidsPayment($args)
-    {
     }
 
     public function adminChangesPaymentCustomState($args)

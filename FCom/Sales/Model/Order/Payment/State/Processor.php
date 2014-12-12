@@ -1,5 +1,10 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
+/**
+ * Class FCom_Sales_Model_Order_Payment_State_Processor
+ *
+ * @deprecated not needed with new payment/transaction structure, keeping as backup
+ */
 class FCom_Sales_Model_Order_Payment_State_Processor extends FCom_Core_Model_Abstract_State_Concrete
 {
     const NA = 'na',
@@ -9,6 +14,7 @@ class FCom_Sales_Model_Order_Payment_State_Processor extends FCom_Core_Model_Abs
         ROOT_ORDER = 'root_order',
         AUTHORIZING = 'authorizing',
         AUTHORIZED = 'authorized',
+        REAUTHORIZED = 'reauthorized',
         REFUSED = 'refused',
         EXPIRED = 'expired',
         CAPTURED = 'captured',
@@ -27,6 +33,7 @@ class FCom_Sales_Model_Order_Payment_State_Processor extends FCom_Core_Model_Abs
         self::ROOT_ORDER => 'Root Order', // not authorization or charge, a master payment to create authorizations from it
         self::AUTHORIZING => 'Authorizing', // while in process
         self::AUTHORIZED => 'Authorized',
+        self::REAUTHORIZED => 'Re-Authorized',
         self::REFUSED => 'Refused',
         self::EXPIRED => 'Expired',
         self::CAPTURED => 'Captured',
@@ -71,6 +78,11 @@ class FCom_Sales_Model_Order_Payment_State_Processor extends FCom_Core_Model_Abs
     public function setAuthorized()
     {
         return $this->changeState(self::AUTHORIZED);
+    }
+
+    public function setReAuthorized()
+    {
+        return $this->changeState(self::REAUTHORIZED);
     }
 
     public function setRefused()
