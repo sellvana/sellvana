@@ -6,6 +6,7 @@
 class FCom_PaymentCC_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
 {
     protected $_name = 'Credit Cart';
+    static protected $_methodKey = 'payment';
 
     /**
      * @return BLayout|BView
@@ -16,21 +17,17 @@ class FCom_PaymentCC_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
     }
 
     /**
+     * @param FCom_Sales_Model_Order_Payment $payment
      * @return array
      */
     public function payOnCheckout(FCom_Sales_Model_Order_Payment $payment)
     {
-        // if using external checkout like paypal
-        // $this->FCom_Sales_Main->workflowAction('customerStartsExternalPayment', ['payment' => $this->_payment]);
-
-        // call this when returning from external checkout
-        // $this->FCom_Sales_Main->workflowAction('customerReturnsFromExternalPayment', ['payment' => $payment]);
-
-        $result = $this->authorize();
+        $result = [];
         return $result;
     }
 
     /**
+     * @param FCom_Sales_Model_Order_Payment_Transaction $transaction
      * @return array
      */
     public function authorize(FCom_Sales_Model_Order_Payment_Transaction $transaction)
@@ -47,6 +44,7 @@ class FCom_PaymentCC_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
     }
 
     /**
+     * @param FCom_Sales_Model_Order_Payment_Transaction $transaction
      * @return array
      */
     public function capture(FCom_Sales_Model_Order_Payment_Transaction $transaction)
