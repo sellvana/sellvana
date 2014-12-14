@@ -22,6 +22,7 @@ class FCom_Sales_Model_StateCustom extends FCom_Core_Model_Abstract
                 static::$_optionsByType[$state->entity_type][$state->state_code] = $state->state_label;
             }
         }
+         debug_print_backtrace(); 
         return null === $type ? static::$_optionsByType : static::$_optionsByType[$type];
     }
 }
