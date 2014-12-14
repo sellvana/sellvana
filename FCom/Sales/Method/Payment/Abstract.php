@@ -9,6 +9,11 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
     FCom_Sales_Method_Payment_Interface
 {
     /**
+     * @var string
+     */
+    static protected $_methodKey = 'payment';
+
+    /**
      * @var FCom_Sales_Model_Order_Payment
      */
     protected $_payment;
@@ -77,17 +82,56 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
 
     public function asArray()
     {
-        return ["name" => $this->getName()];
+        $result = $this->_details;
+        $result['name'] = $this->getName();
+        return $result;
     }
 
-    public function set($name, $value)
+    public function set($name, $value = null)
     {
-        return $this->_details[$name] = $value;
+        if (is_array($name)) {
+            if (true === $value) {
+                $this->_details = $name;
+            } else {
+                foreach ($name as $k => $v) {
+                    $this->_details[$k] = $v;
+                }
+            }
+        } else {
+            $this->_details[$name] = $value;
+        }
+        return $this;
     }
 
     public function get($name, $default = null)
     {
         return isset($this->_details[$name]) ? $this->_details[$name] : $default;
+    }
+
+    public function getDataToSave()
+    {
+        return [];
+    }
+
+    public function getPublicData()
+    {
+        return [];
+    }
+
+    public function getCheckoutFormPrefix()
+    {
+        return static::$_methodKey;
+    }
+
+    public function getCheckoutFormView()
+    {
+        return $this->BViewEmpty;
+    }
+
+    public function setPaymentFormData(array $data)
+    {
+        $this->_details = $data;
+        return $this;
     }
 
     /**
@@ -96,7 +140,7 @@ abstract class FCom_Sales_Method_Payment_Abstract extends BClass implements
      */
     public function payOnCheckout(FCom_Sales_Model_Order_Payment $payment)
     {
-
+        return [];
     }
 
     public function authorize(FCom_Sales_Model_Order_Payment_Transaction $transaction)
