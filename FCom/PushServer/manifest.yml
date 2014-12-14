@@ -11,6 +11,7 @@ modules:
                 auto_use: [ layout, views ]
                 observe:
                     - [ "FCom_Admin_Model_User::logout", "FCom_PushServer_Main::onAdminUserLogout" ]
+                    - [ "BSession::regenerateId", "FCom_AdminChat_Admin::onRegenerateSessionId" ]
 
             FCom_PushServer:
                 auto_use: [ bootstrap ]
