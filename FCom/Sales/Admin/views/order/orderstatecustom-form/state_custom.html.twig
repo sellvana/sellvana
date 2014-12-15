@@ -1,11 +1,38 @@
-{% set fieldSetsCtrl = APP.instance('FCom_Sales_Admin_Controller_OrderStateCustom') %}
+{% set orderStateCustomCtrl = APP.instance('FCom_Sales_Admin_Controller_OrderStateCustom') %}
 <script>    
-require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], function($, _, Backbone) {
-     
+require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, Backbone) {
+    var orderCustomStateGrid;
+    var fieldForm = $('#field-modal-form');
     window.orderCustomStateGridRegister = function(grid) {
-            grid.build();
+         orderCustomStateGrid=grid;
+         
+         orderCustomStateGrid.getGridSkeleton().Views.RowView.prototype._callbackCustom = function (ev) {
+             
+                orderCustomStateGrid.getModalForm().modalType = 'editable';
+    		orderCustomStateGrid.getGridSkeleton().currentRow = this.model;
+    		orderCustomStateGrid.getModalForm().render();                 
+		$('#btn-field-grid-modal').trigger('click');
+                        
+         };    
+        
+        orderCustomStateGrid.getGridSkeleton().Views.ModalForm.prototype.el = '#field-modal-form';            
+        orderCustomStateGrid.build();             
      };
- 
+     
+     $('#add_new_field').click(function () {
+    	
+        orderCustomStateGrid.getModalForm().modalType = 'addable';
+        orderCustomStateGrid.getModalForm().render();         
+        $('#btn-field-grid-modal').trigger('click');
+    });
+    
+    $('button.field-modal-save').click(function() {
+        if (fieldForm.valid()) {
+            if (orderCustomStateGrid.getModalForm().saveChanges()) {
+            	$('button.field-modal-close').trigger('click');
+            }
+        }
+    }); 
 });
 </script>
 
@@ -17,15 +44,30 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
       </h1>
       
       <div class="btn-group">
-          <button id="add_new_field" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add a order state custom" |_ }}</span></button>
+          <button id="add_new_field" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add Order State Custom" |_ }}</span></button>
       </div>
   </div>
 
   <div class="f-admin-main">
-      {{ THIS.view('core/backbonegrid').set('grid', fieldSetsCtrl.gridConfig())| raw }}
+      {{ THIS.view('core/backbonegrid').set('grid', orderStateCustomCtrl.gridConfig())| raw }}
   </div>
 </div>
-
-
-
-
+  
+<div class='modal fade' id='field-grid-modal' tabindex='-1'>
+    <div class='modal-dialog' style='width:600px;'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
+                <h4 class='modal-title' id='field-modal-header'> {{ "Order State Custom" |_ }}</h4>
+            </div>
+            <div class='modal-body'>
+                    <form class="form form-horizontal validate-form" id="field-modal-form" novalidate="novalidate"></form>
+            </div>
+             <div class='modal-footer'>
+                <button class='btn btn-primary field-modal-save' type='button'>{{ "Save"|_ }}</button>
+                <button class='btn btn-default btn-close field-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+<a role="button" href="#field-grid-modal" data-toggle="modal" style='display:none;' id='btn-field-grid-modal'>hidden</a>
