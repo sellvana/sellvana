@@ -32,7 +32,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
 
         /** @var BORM $orm */
         $orm = $this->FCom_Catalog_Model_Product->orm('p')->select(['id', 'product_sku', 'product_name'], 'p');
-        if ($skuTerm) {
+        if ($skuTerm && $skuTerm != '*') {
             $orm->where(['OR' => [['product_sku LIKE ?', "%{$skuTerm}%"], ['product_name LIKE ?', "%{$skuTerm}%"]]]);
         }
 

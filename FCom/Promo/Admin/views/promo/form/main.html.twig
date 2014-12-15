@@ -134,49 +134,75 @@
         <div id="actions-options"></div>
 
         <div id="select2-test">
-            <input type="hidden" id="sel2-test"/>
+            <input type="hidden" id="sel2-test" class="form-control"/>
             <script type="text/javascript" charset="utf-8">
                 require(['jquery', 'select2'], function ($) {
-
+                    /**
+                     * params: {q:'', page:1, o:100}
+                     * @param params
+                     * @param url string
+                     * @param callback function
+                     **/
                     function search(params, url, callback) {
-                        params.term = params.term || '*'; // '*' means default search
+                        params.q = params.term || '*'; // '*' means default search
                         params.page = params.page || 1;
-                        params.limit = params.limit || 100;
+                        params.o = params.limit || 100;
 
                         params.searchedTerms = params.searchedTerms || {};
                         var termStatus = params.searchedTerms[params.term];
-                        if (termStatus == undefined || termStatus == 1) {
-                            if (termStatus == 1) {
-                                params.page++; // search for next page
+                        if (termStatus == undefined || (termStatus.loaded == 1 && termStatus.page < params.page)) { // if this is first load, or there are more pages and we're looking for next page
+                            if (termStatus == undefined) {
+                                params.searchedTerms[params.term] = {};
                             }
-                            $.get(url, params)
+                            $.get(url, {page: params.page, q: params.q, o: params.o})
                                     .done(function (result) {
                                         if (result.hasOwnProperty('total_count')) {
-                                            var more = params.page * params.limit < result['total_count'];
-                                            params.searchedTerms[params.term] = (more) ? 1 : 2; // 1 means more results to be fetched, 2 means all fetched
+                                            console.log(result['total_count']);
+                                            var more = params.page * params.o < result['total_count'];
+                                            params.searchedTerms[params.term].loaded = (more) ? 1 : 2; // 1 means more results to be fetched, 2 means all fetched
+                                            params.searchedTerms[params.term].page = params.page; // 1 means more results to be fetched, 2 means all fetched
                                         }
                                         callback(result, params);
                                     })
                                     .fail(function (result) {
                                         callback(result, params);
                                     });
-                        } else if (termStatus == 2) {
+                        } else if (termStatus.loaded == 2 || (termStatus.page >= params.page)) {
                             callback('local', params); // find results from local storage
                         } else {
                             console.error("UNKNOWN search status.")
                         }
                     }
 
-                    function searchLocal(term, values) {
-                        var regex = new RegExp(term, 'i');
+                    function searchLocal(term, values, page, limit) {
+                        page = page || 1;
+                        limit = limit || 100;
+                        var counted = 0;
+                        var offset = (page - 1) * limit; // offset from which to start fetching results
+                        var max = offset + limit;
+                        var regex;
+                        if (term != '*') { // * is match all, don't try to search
+                            regex = new RegExp(term, 'i');
+                        }
                         var matches = $.grep(values, function (val) {
-                            var test = regex.test(val.text);
-                            if(test) {
-                                console.log(term + ' matches ' + val);
-                            } else {
-                                console.log(term + ' does not match ' + val);
+                            if (counted >= max) { // if already reached goal, don't add any more matches
+                                return false;
                             }
-                            return test;
+
+                            var test;
+                            if (regex) {
+                                test = regex.test(val.text) || regex.test(val.sku); // if regex and it matches a term
+                                if(test) {
+//                                    console.log(term + ' matches ' + val.text);
+                                    counted++; // up the counter
+                                } else {
+//                                    console.log(term + ' does not match ' + val.text);
+                                }
+                            } else {
+                                counted++; // no regex, just return matching items by position
+                                test = true;
+                            }
+                            return test && counted >= offset && counted < max;// if term is not for this page, skip it
                         });
                         return matches;
                     }
@@ -188,6 +214,9 @@
                     function mergeResults() {
                         var result = [], bitSet = {}, arr, len;
                         var checker = arguments[arguments.length - 1]; // function to check if item is in set
+                        if(!$.isFunction(checker)) {
+                            throw "Last argument must be a function.";
+                        }
                         for(var i = 0; i < (arguments.length - 1); i++){
                             arr = arguments[i];
                             if(!arr instanceof Array) {
@@ -234,18 +263,20 @@
                             var values = $el.data('searches') || [];
                             var flags = $el.data('flags') || {};
                             var term = options.term || '*';
-                            var page = options.page;
+                            var page = options.page;console.log(page);
                             var data;
-                            if (flags[term] != undefined && flags[term] == 2) {
-                                data = {results: searchLocal(term, values), more: false};
+                            if (flags[term] != undefined && flags[term].loaded == 2) {
+                                data = {results: searchLocal(term, values, page, 100), more: (flags[term].page > page)};
                                 options.callback(data);
                             } else {
-                                search({term: term, page: page}, url, function (result, params) {
+                                search({term: term, page: page, searchedTerms: flags}, url, function (result, params) {
+                                    var more;
                                     if (result == 'local') {
-                                        data = {results: searchLocal(params.term, values), more: false};
+                                        more = (params.searchedTerms[term].page > params.page) || (params.searchedTerms[term].loaded == 1);
+                                        data = {results: searchLocal(params.term, values, params.page, params.o), more: more};
                                         options.callback(data);
                                     } else if(result.items !== undefined) {
-                                        var more = params.searchedTerms[term] === 1;
+                                        more = params.searchedTerms[term].loaded === 1;
                                         data = {results: result.items, more: more};
                                         flags[term] = params.searchedTerms[term];
                                         //todo merge values with results,

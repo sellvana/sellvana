@@ -1258,6 +1258,68 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             if(this.options.debug) {
                 console.log(msg);
             }
+        },
+        mergeResults: function () {
+            var result = [], bitSet = {}, arr, len;
+            var checker = arguments[arguments.length - 1]; // function to check if item is in set
+            if (!$.isFunction(checker)) {
+                throw "Last argument must be a function.";
+            }
+            for (var i = 0; i < (arguments.length - 1); i++) {
+                arr = arguments[i];
+                if (!arr instanceof Array) {
+                    continue;
+                }
+                len = arr.length;
+                while (len--) {
+                    var itm = arr[len];
+                    if (!checker(itm, bitSet)) {
+                        result.unshift(itm);
+                    }
+                }
+            }
+            return result;
+        },
+        searchLocal: function (term, values) {
+            var regex = new RegExp(term, 'i');
+            var matches = $.grep(values, function (val) {
+                var test = regex.test(val.text);
+                if (test) {
+                    Promo.log(term + ' matches ' + val);
+                } else {
+                    Promo.log(term + ' does not match ' + val);
+                }
+                return test;
+            });
+            return matches;
+        },
+        search: function (params, url, callback) {
+            params.term = params.term || '*'; // '*' means default search
+            params.page = params.page || 1;
+            params.limit = params.limit || 100;
+
+            params.searchedTerms = params.searchedTerms || {};
+            var termStatus = params.searchedTerms[params.term];
+            if (termStatus == undefined || termStatus == 1) {
+                if (termStatus == 1) {
+                    params.page++; // search for next page
+                }
+                $.get(url, params)
+                    .done(function (result) {
+                        if (result.hasOwnProperty('total_count')) {
+                            var more = params.page * params.limit < result['total_count'];
+                            params.searchedTerms[params.term] = (more) ? 1 : 2; // 1 means more results to be fetched, 2 means all fetched
+                        }
+                        callback(result, params);
+                    })
+                    .fail(function (result) {
+                        callback(result, params);
+                    });
+            } else if (termStatus == 2) {
+                callback('local', params); // find results from local storage
+            } else {
+                console.error("UNKNOWN search status.")
+            }
         }
     };
     return Promo;
