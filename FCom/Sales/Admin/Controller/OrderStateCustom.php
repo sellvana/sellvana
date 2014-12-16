@@ -9,7 +9,7 @@
 class FCom_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Controller_Abstract
 {
     protected $_permission = 'sales/order_custom_state';
- 
+  
     public function gridConfig()
     {
         $orm = $this->FCom_Sales_Model_StateCustom->orm('sc')->select('sc.*');
