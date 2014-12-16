@@ -97,10 +97,11 @@ class FCom_Sales_Workflow_Checkout extends FCom_Sales_Workflow_Abstract
         if (empty($args['post']['payment_method'])) {
             throw new BException('Payment method not set');
         }
-        $method = $args['post']['payment_method'];
 
-        //var_dump($method); exit;
-        $cart->set(['payment_method' => $method])->save();
+        $cart->setPaymentMethod($args['post']['payment_method']);
+        $cart->setPaymentDetails($args['post']);
+
+        $cart->save();
     }
 
     public function customerPlacesOrder($args)

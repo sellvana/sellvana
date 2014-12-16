@@ -83,21 +83,9 @@ class FCom_PaymentIdeal_PaymentMethod extends FCom_Sales_Method_Payment_Abstract
         ];
 
         $paymentModel = $this->FCom_Sales_Model_Order_Payment->create($paymentData)->save();
-        $paymentModel->setData('response', $this->getPublicData());
+        $paymentModel->setData('response', $this->getDataToSave());
         $paymentModel->save();
 
-        return $this;
-    }
-
-    /**
-     * @param array $details
-     * @return $this
-     */
-    public function setDetails($details = [])
-    {
-        if (isset($details['ideal'])) {
-            $this->_details = $details['ideal'];
-        }
         return $this;
     }
 
