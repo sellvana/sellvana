@@ -100,7 +100,8 @@ abstract class FCom_Core_Model_Abstract_State_Concrete extends BClass
         if (null === $value) {
             $value = $this->getValue();
         }
-        return !empty($this->_valueLabels[$value]) ? $this->_valueLabels[$value] : null;
+        $valueLabels = $this->getAllValueLabels();
+        return !empty($valueLabels[$value]) ? $valueLabels[$value] : null;
     }
 
     public function getAllValueLabels()

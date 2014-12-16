@@ -9,11 +9,12 @@ abstract class FCom_Sales_Model_StateCustom_ConcreteAbstract extends FCom_Core_M
 {
     protected static $_entityType;
 
-    protected function _initialize()
+    public function getAllValueLabels()
     {
-        parent::_initialize();
-
-        $this->_valueLabels = $this->FCom_Sales_Model_StateCustom->optionsByType(static::$_entityType);
+        if (!$this->_valueLabels) {
+            $this->_valueLabels = $this->FCom_Sales_Model_StateCustom->optionsByType(static::$_entityType);
+        }
+        return $this->_valueLabels;
     }
 
     public function setDefault()
