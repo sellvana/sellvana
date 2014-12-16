@@ -2,7 +2,7 @@
 <script>    
 require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, Backbone) {
     var orderCustomStateGrid;
-    var fieldForm = $('#field-modal-form');
+    var orderStateCustomForm = $('#orderstatecustom-modal-form');
     window.orderCustomStateGridRegister = function(grid) {
          orderCustomStateGrid=grid;
          
@@ -11,25 +11,25 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
                 orderCustomStateGrid.getModalForm().modalType = 'editable';
     		orderCustomStateGrid.getGridSkeleton().currentRow = this.model;
     		orderCustomStateGrid.getModalForm().render();                 
-		$('#btn-field-grid-modal').trigger('click');
+		$('#btn-orderstatecustom-grid-modal').trigger('click');
                         
          };    
         
-        orderCustomStateGrid.getGridSkeleton().Views.ModalForm.prototype.el = '#field-modal-form';            
+        orderCustomStateGrid.getGridSkeleton().Views.ModalForm.prototype.el = '#orderstatecustom-modal-form';            
         orderCustomStateGrid.build();             
      };
      
-     $('#add_new_field').click(function () {
+     $('#add_new_orderstatecustom').click(function () {
     	
         orderCustomStateGrid.getModalForm().modalType = 'addable';
         orderCustomStateGrid.getModalForm().render();         
-        $('#btn-field-grid-modal').trigger('click');
+        $('#btn-orderstatecustom-grid-modal').trigger('click');
     });
     
-    $('button.field-modal-save').click(function() {
-        if (fieldForm.valid()) {
+    $('button.orderstatecustom-modal-save').click(function() {
+        if (orderStateCustomForm.valid()) {
             if (orderCustomStateGrid.getModalForm().saveChanges()) {
-            	$('button.field-modal-close').trigger('click');
+            	$('button.orderstatecustom-modal-close').trigger('click');
             }
         }
     }); 
@@ -44,7 +44,7 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
       </h1>
       
       <div class="btn-group">
-          <button id="add_new_field" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add Order State Custom" |_ }}</span></button>
+          <button id="add_new_orderstatecustom" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add Order State Custom" |_ }}</span></button>
       </div>
   </div>
 
@@ -53,21 +53,21 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, 
   </div>
 </div>
   
-<div class='modal fade' id='field-grid-modal' tabindex='-1'>
+<div class='modal fade' id='orderstatecustom-grid-modal'>
     <div class='modal-dialog' style='width:600px;'>
         <div class='modal-content'>
             <div class='modal-header'>
                 <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
-                <h4 class='modal-title' id='field-modal-header'> {{ "Order State Custom" |_ }}</h4>
+                <h4 class='modal-title' id='orderstatecustom-modal-header'> {{ "Order State Custom" |_ }}</h4>
             </div>
             <div class='modal-body'>
-                    <form class="form form-horizontal validate-form" id="field-modal-form" novalidate="novalidate"></form>
+                    <form class="form form-horizontal validate-form" id="orderstatecustom-modal-form" novalidate="novalidate"></form>
             </div>
              <div class='modal-footer'>
-                <button class='btn btn-primary field-modal-save' type='button'>{{ "Save"|_ }}</button>
-                <button class='btn btn-default btn-close field-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
+                <button class='btn btn-primary orderstatecustom-modal-save' type='button'>{{ "Save"|_ }}</button>
+                <button class='btn btn-default btn-close orderstatecustom-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
             </div>
         </div>
     </div>
 </div>
-<a role="button" href="#field-grid-modal" data-toggle="modal" style='display:none;' id='btn-field-grid-modal'>hidden</a>
+<a role="button" href="#orderstatecustom-grid-modal" data-toggle="modal" style='display:none;' id='btn-orderstatecustom-grid-modal'>hidden</a>
