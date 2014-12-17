@@ -14,7 +14,17 @@ class FCom_Sales_Model_StateCustom extends FCom_Core_Model_Abstract
 {
     static protected $_table = 'fcom_sales_state_custom';
     protected static $_origClass = __CLASS__;
-
+    
+    protected static $_fieldOptions = [
+        'entity_type' => [
+           "order" => "Order",
+           "payment" => "Payment",
+           "shipment" => "shipment", 
+           "return" => "Return",
+           "refund" => "Refund"
+          ]
+        ];
+    
     protected static $_optionsByType;
 
     public function optionsByType($type = null)
