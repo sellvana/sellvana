@@ -12,7 +12,7 @@ function (_, React, $, Griddle, Backbone, Components) {
         console.log('config', config);
         var page_size_options = config.page_size_options;
         var totalResults = config.data.state.c;
-        var columns = ["0", "id", "firstname", "lastname", "email"];
+        var defaultColumns;
 
         var FComGriddleComponent = React.createClass({
             getDefaultProps: function () {
@@ -21,9 +21,9 @@ function (_, React, $, Griddle, Backbone, Components) {
                 }
             },
             render: function () {
-                columns = _.pluck(config.columns, 'name');
+                defaultColumns = _.pluck(config.columns, 'name');
 
-                var content = <Griddle showTableHeading={false} useCustomGrid={true} columns={columns}
+                var content = <Griddle showTableHeading={false} useCustomGrid={true} columns={defaultColumns}
                 tableClassName="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable"
                 getExternalResults={FComDataMethod} resultsPerPage={this.props.resultsPerPage}
                 useCustomPager="true" customPager={FComPager}
@@ -396,24 +396,34 @@ function (_, React, $, Griddle, Backbone, Components) {
                 }
             },
             toggleColumn: function(event) {
-                if(event.target.checked == true && _.contains(this.props.selectedColumns, event.target.dataset.name) == false){
-                    this.props.selectedColumns.push(event.target.dataset.name);
-                    this.props.setColumns(this.props.selectedColumns);
+                var selectedColumns = this.props.selectedColumns;
+                if(event.target.checked == true && _.contains(selectedColumns, event.target.dataset.name) == false){
+                    selectedColumns.push(event.target.dataset.name);
+                    var diff = _.difference(defaultColumns, selectedColumns);
+                    if (diff.length > 0) {
+                        selectedColumns = defaultColumns;
+                        for(var i=0; i < diff.length; i++) {
+                            selectedColumns = _.without(selectedColumns, diff[i]);
+                        }
+                        this.props.setColumns(selectedColumns);
+                    } else {
+                        this.props.setColumns(defaultColumns);
+                    }
                 } else {
-                    /* redraw with the selected columns minus the one just unchecked */
-                    this.props.setColumns(_.without(this.props.selectedColumns, event.target.dataset.name));
+                    /* redraw with the selected defaultColumns minus the one just unchecked */
+                    this.props.setColumns(_.without(selectedColumns, event.target.dataset.name));
                 }
             },
             render: function () {
                 var options = [];
-                for (var i = 0; i < columns.length; i++) {
-                    if (columns[i] != "0") {
-                        var checked = _.contains(this.props.selectedColumns, columns[i]);
+                for (var i = 0; i < defaultColumns.length; i++) {
+                    if (defaultColumns[i] != "0") {
+                        var checked = _.contains(this.props.selectedColumns, defaultColumns[i]);
                         options.push(
-                            <li data-id={columns[i]} className="dd-item dd3-item">
+                            <li data-id={defaultColumns[i]} className="dd-item dd3-item">
                                 <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
                                 <div className="dd3-content">
-                                    <label><input type="checkbox" checked={checked} data-id={columns[i]} name="check" data-name={columns[i]} className="showhide_column" onChange={this.toggleColumn}/> {columns[i]}</label>
+                                    <label><input type="checkbox" checked={checked} data-id={defaultColumns[i]} data-name={defaultColumns[i]} className="showhide_column" onChange={this.toggleColumn}/> {defaultColumns[i]}</label>
                                 </div>
                             </li>
                         );
