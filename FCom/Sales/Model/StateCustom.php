@@ -1,11 +1,14 @@
 <?php defined('BUCKYBALL_ROOT_DIR') || die();
 
 /**
- * @var id
- * @var entity_type
- * @var state_code
- * @var state_label
- * @var
+ * Class FCom_Sales_Model_StateCustom
+ *
+ * @property int $id
+ * @property string $entity_type
+ * @property string $state_code
+ * @property string $state_label
+ * @property string $concrete_class
+ * @property string $data_serialized
  */
 class FCom_Sales_Model_StateCustom extends FCom_Core_Model_Abstract
 {

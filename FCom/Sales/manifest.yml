@@ -22,6 +22,8 @@ modules:
                     - [ /orders/.action, FCom_Sales_Admin_Controller_Orders ]
                     - [ /orderstatus, FCom_Sales_Admin_Controller_OrderStatus.index ]
                     - [ /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]
+                    - [ /orderstatecustom, FCom_Sales_Admin_Controller_OrderStateCustom.index ]
+                    - [ /orderstatecustom/.action, FCom_Sales_Admin_Controller_OrderStateCustom ]
                 observe:
                     - [ "FCom_Admin_View_Header::getNotifications", FCom_Sales_Main.checkDefaultShippingPayment ]
                     - [ "FCom_Admin_View_Dashboard::getWidgets", FCom_Sales_Main.onGetDashboardWidgets ]

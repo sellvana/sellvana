@@ -1,4 +1,4 @@
-{% set orderCustomStateCtrl = APP.instance('FCom_Sales_Admin_Controller_StateCustom') %}
+{% set orderCustomStateCtrl = APP.instance('FCom_Sales_Admin_Controller_OrderStateCustom') %}
 
 <script>
 require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], function($, _, Backbone) {
@@ -17,14 +17,14 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
             mainGrid.getModalForm().modalType = 'editable';
             skeleton.currentRow = this.model;
             mainGrid.getModalForm().render();
-            selectedGrid.getGridView().clearSelectedRows();
+            //selectedGrid.getGridView().clearSelectedRows();
             //fetch linked field data of selected fieldset from server
-            var url = '{{ APP.href('sales/orderstatecustom/fieldset_modal_selected_grid_data?set_id=') | raw }}' + this.model.get('id');
+            /*var url = '{{ APP.href('sales/orderstatecustom/fieldset_modal_selected_grid_data?set_id=') | raw }}' + this.model.get('id');
             currentFieldSetId =  this.model.get('id');
             $.get(url, function(data) {
                 addGrid.getRows().fetch({reset: true});
                 selectedGrid.getRows().reset(data[1]);
-            });
+            });*/
 
             $('a#btn-fieldset-grid-modal').trigger('click');
         };
@@ -40,18 +40,18 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
 
     };
 
-    window.selectedFieldGridRegister = function(grid) {
+    /*window.selectedFieldGridRegister = function(grid) {
         selectedGrid = grid;
         grid.build();
 
-    };
+    };*/
 
-    window.addFieldGridRegister = function(grid) {
+    /*window.addFieldGridRegister = function(grid) {
         addGrid = grid;
         grid.build();
         $(addGrid.getGridSkeleton().AddButton).click(function() {
-            /*var sRows = addGrid.getSelectedRows().toJSON();
-            _.each(sRows, function(row) { row.selected = true;});*/
+            *//*var sRows = addGrid.getSelectedRows().toJSON();
+            _.each(sRows, function(row) { row.selected = true;});*//*
             var rowsSelectedGrid = selectedGrid.getRows();
             addGrid.getSelectedRows().each(function (row) {
                if (!rowsSelectedGrid.findWhere('id', row.get('id'))) {
@@ -75,9 +75,9 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
                 });
             });
         });
-    };
+    };*/
 
-    window.afterMassDeleteSelectedGrid = function() {
+    /*window.afterMassDeleteSelectedGrid = function() {
         var rowsAddGrid = addGrid.getRows();
         selectedGrid.getSelectedRows().forEach(function(row) {
             if (!rowsAddGrid.findWhere('id', row.get('id'))) {
@@ -85,30 +85,22 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
                 addGrid.getGridView().collection.add(row);
             }
         });
-    };
+    };*/
 
     $('#add_new_state_custom').click(function () {
         currentFieldSetId = null;
-        selectedGrid.getRows().reset();
-        selectedGrid.getGridView().clearSelectedRows();
+        //selectedGrid.getRows().reset();
+        //selectedGrid.getGridView().clearSelectedRows();
         //addGrid.getSelectedRows().reset();
-        addGrid.getGridView().clearSelectedRows();
+        //addGrid.getGridView().clearSelectedRows();
         mainGrid.getModalForm().modalType = 'addable';
         mainGrid.getModalForm().render();
         $('a#btn-fieldset-grid-modal').trigger('click');
     });
 
     $('button.fieldset-modal-save').click(function () {
-        if (currentFieldSetId != null) {
-            mainGrid.getRows().findWhere({id: currentFieldSetId}).set('num_fields', selectedGrid.getRows().length);
-        }
-        mainGrid.getGridSkeleton().modalElementVals = {field_ids: selectedGrid.getRows().pluck('id').join(',')};
         if (mainGrid.getModalForm().saveChanges()) {
-            selectedGrid.getRows().reset();
-            selectedGrid.getSelectedRows().reset();
             $('.fieldset-modal-close').trigger('click');
-            $('#fieldset_tab').trigger('click');
-            currentFieldSetId = null;
         }
 
     });
@@ -116,15 +108,19 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
 </script>
 
 <div class="f-admin-main-view">
-  <div class="page-header f-admin-page-header">
-      <h1 class="f-page-title">
-          <i class="icon-file"></i>
-          {{ "State Custom" |_ }}
-      </h1>
-      <div class="btn-group">
-          <button id="add_new_state_custom" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add State Custom" |_ }}</span></button>
-      </div>
-  </div>
+    <div class="page-header f-admin-page-header">
+        <h1 class="f-page-title">
+            <i class="icon-file"></i>
+            {{ "State Custom" |_ }}
+        </h1>
+        <div class="btn-group">
+            <button id="add_new_state_custom" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add State Custom" |_ }}</span></button>
+        </div>
+    </div>
+    <div class="f-admin-main">
+        {{ THIS.view('core/backbonegrid').set('grid', orderCustomStateCtrl.gridConfig())| raw }}
+    </div>
+    <a role="button" href="#fieldset-grid-modal" data-toggle="modal" style='display:none;' id='btn-fieldset-grid-modal'>{{ "Add"|_ }}</a>
 </div>
 
 
@@ -152,7 +148,7 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
                                     </form>
                                 </div>
                                 <div class='tab-pane' id='add_fields'>
-                                    {{ THIS.view('core/backbonegrid').set('grid', orderCustomStateCtrl.gridConfig()) | raw }}
+                                    {#{{ THIS.view('core/backbonegrid').set('grid', orderCustomStateCtrl.gridConfig()) | raw }}#}
                                 </div>
                             </div>
                         </div>
