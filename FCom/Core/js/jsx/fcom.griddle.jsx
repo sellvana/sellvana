@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
-define(['react', 'jquery', 'jsx!griddle', 'backbone', 'underscore', 'bootstrap', 'jsx!fcom.components'],
-function (React, $, Griddle, Backbone, Components) {
+define(['underscore', 'react', 'jquery', 'jsx!griddle', 'backbone', 'bootstrap', 'jsx!fcom.components'],
+function (_, React, $, Griddle, Backbone, Components) {
 
     /**
      *
@@ -9,9 +9,10 @@ function (React, $, Griddle, Backbone, Components) {
      * @constructor
      */
     FCom.Griddle = function (config) {
+        console.log('config', config);
         var page_size_options = config.page_size_options;
         var totalResults = config.data.state.c;
-        var allColumns = ["0", "id", "firstname", "lastname", "email"];
+        var columns = ["0", "id", "firstname", "lastname", "email"];
 
         var FComGriddleComponent = React.createClass({
             getDefaultProps: function () {
@@ -20,7 +21,9 @@ function (React, $, Griddle, Backbone, Components) {
                 }
             },
             render: function () {
-                var content = <Griddle showTableHeading={false} useCustomGrid={true} columns={allColumns}
+                columns = _.pluck(config.columns, 'name');
+
+                var content = <Griddle showTableHeading={false} useCustomGrid={true} columns={columns}
                 tableClassName="fcom-htmlgrid__grid data-table-column-filter table table-bordered table-striped dataTable"
                 getExternalResults={FComDataMethod} resultsPerPage={this.props.resultsPerPage}
                 useCustomPager="true" customPager={FComPager}
@@ -393,29 +396,24 @@ function (React, $, Griddle, Backbone, Components) {
                 }
             },
             toggleColumn: function(event) {
-                var selected = event.target;
-
-                var dataId = $(selected).attr("data-id");
-                $(".dataTable").find("thead tr th").each(function() {
-                    if ($(this).attr("data-id") == dataId) {
-                        if ($(selected).is(":checked")) {
-                            $(this).width($(this).width());
-                        } else {
-                            $(this).attr("beforeWidth", $(this).width());
-                            $(this).width(0);
-                        }
-                    }
-                })
+                if(event.target.checked == true && _.contains(this.props.selectedColumns, event.target.dataset.name) == false){
+                    this.props.selectedColumns.push(event.target.dataset.name);
+                    this.props.setColumns(this.props.selectedColumns);
+                } else {
+                    /* redraw with the selected columns minus the one just unchecked */
+                    this.props.setColumns(_.without(this.props.selectedColumns, event.target.dataset.name));
+                }
             },
             render: function () {
                 var options = [];
-                for (var i=0; i<allColumns.length; i++) {
-                    if (allColumns[i] != "0") {
+                for (var i = 0; i < columns.length; i++) {
+                    if (columns[i] != "0") {
+                        var checked = _.contains(this.props.selectedColumns, columns[i]);
                         options.push(
-                            <li data-id={allColumns[i]} className="dd-item dd3-item">
+                            <li data-id={columns[i]} className="dd-item dd3-item">
                                 <div className="icon-ellipsis-vertical dd-handle dd3-handle"></div>
                                 <div className="dd3-content">
-                                    <label><input type="checkbox" defaultChecked={true} data-id={allColumns[i]} className="showhide_column" onChange={this.toggleColumn}/> {allColumns[i]}</label>
+                                    <label><input type="checkbox" checked={checked} data-id={columns[i]} name="check" data-name={columns[i]} className="showhide_column" onChange={this.toggleColumn}/> {columns[i]}</label>
                                 </div>
                             </li>
                         );
