@@ -2,7 +2,7 @@
 
 <script>
 require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], function($, _, Backbone) {
-    var mainGrid, selectedGrid, addGrid, fieldAdd = [], fieldRemove = [], currentFieldSetId = null;
+    var mainGrid;
 //    var formFieldSet = $('#field-set-modal-form');
     window.orderCustomStateGridRegister = function(grid) {
         mainGrid = grid;
@@ -17,82 +17,16 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
             mainGrid.getModalForm().modalType = 'editable';
             skeleton.currentRow = this.model;
             mainGrid.getModalForm().render();
-            //selectedGrid.getGridView().clearSelectedRows();
-            //fetch linked field data of selected fieldset from server
-            /*var url = '{{ APP.href('sales/orderstatecustom/fieldset_modal_selected_grid_data?set_id=') | raw }}' + this.model.get('id');
-            currentFieldSetId =  this.model.get('id');
-            $.get(url, function(data) {
-                addGrid.getRows().fetch({reset: true});
-                selectedGrid.getRows().reset(data[1]);
-            });*/
-
+          
             $('a#btn-fieldset-grid-modal').trigger('click');
         };
 
         //important: change modal form element for rendering
         skeleton.Views.ModalForm.prototype.el = '#field-set-modal-form';
-        grid.build();
-
-        //whenever main grid row is edited or added, number of fields count should be updated.
-        /*grid.getRows().on('add change', function(ev) {
-            ev.set('num_fields', selectedGrid.getRows().length);
-        });*/
-
+        grid.build();       
     };
 
-    /*window.selectedFieldGridRegister = function(grid) {
-        selectedGrid = grid;
-        grid.build();
-
-    };*/
-
-    /*window.addFieldGridRegister = function(grid) {
-        addGrid = grid;
-        grid.build();
-        $(addGrid.getGridSkeleton().AddButton).click(function() {
-            *//*var sRows = addGrid.getSelectedRows().toJSON();
-            _.each(sRows, function(row) { row.selected = true;});*//*
-            var rowsSelectedGrid = selectedGrid.getRows();
-            addGrid.getSelectedRows().each(function (row) {
-               if (!rowsSelectedGrid.findWhere('id', row.get('id'))) {
-                   row.set('selected', true);
-                   selectedGrid.getSelectedRows().add(row.toJSON());
-                   rowsSelectedGrid.add(row.toJSON());
-                   addGrid.getGridView().collection.remove(row);
-               }
-            });
-            addGrid.getGridView().clearSelectedRows();
-            $('#selected_fields_tab').trigger('click');
-        });
-
-        //remove row already was selected
-        addGrid.getRows().bind('sync', function(){
-            selectedGrid.getRows().forEach(function (row) {
-                addGrid.getRows().forEach(function (addRow) {
-                    if (addRow.get('id') == row.get('id')) {
-                        addGrid.getGridView().collection.remove(addRow);
-                    }
-                });
-            });
-        });
-    };*/
-
-    /*window.afterMassDeleteSelectedGrid = function() {
-        var rowsAddGrid = addGrid.getRows();
-        selectedGrid.getSelectedRows().forEach(function(row) {
-            if (!rowsAddGrid.findWhere('id', row.get('id'))) {
-                row.set('selected', false);
-                addGrid.getGridView().collection.add(row);
-            }
-        });
-    };*/
-
     $('#add_new_state_custom').click(function () {
-        currentFieldSetId = null;
-        //selectedGrid.getRows().reset();
-        //selectedGrid.getGridView().clearSelectedRows();
-        //addGrid.getSelectedRows().reset();
-        //addGrid.getGridView().clearSelectedRows();
         mainGrid.getModalForm().modalType = 'addable';
         mainGrid.getModalForm().render();
         $('a#btn-fieldset-grid-modal').trigger('click');
