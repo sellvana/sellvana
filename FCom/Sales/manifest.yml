@@ -1,6 +1,6 @@
 modules:
     FCom_Sales:
-        version: 0.3.10
+        version: 0.3.11
         channel: beta
         require: { module: { FCom_Core: 0.1.0, FCom_Customer: 0.1.0 } }
         description: "Fundamental Sales functionality"
@@ -21,8 +21,8 @@ modules:
                     - [ /orders, FCom_Sales_Admin_Controller_Orders.index ]
                     - [ /orders/.action, FCom_Sales_Admin_Controller_Orders ]
                     - [ /orderstatus, FCom_Sales_Admin_Controller_OrderStatus.index ]
-                    - [ /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]
-                    - [ /orderstatecustom, FCom_Sales_Admin_Controller_OrderStateCustom.order_state_custom ]
+                    - [ /orderstatus/.action, FCom_Sales_Admin_Controller_OrderStatus ]                    
+                    - [ /orderstatecustom, FCom_Sales_Admin_Controller_OrderStateCustom.index ]
                     - [ /orderstatecustom/.action, FCom_Sales_Admin_Controller_OrderStateCustom ]
                 observe:
                     - [ "FCom_Admin_View_Header::getNotifications", FCom_Sales_Main.checkDefaultShippingPayment ]

@@ -8,11 +8,17 @@
 
 class FCom_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Controller_Abstract
 {
+
     protected $_permission = 'sales/order_custom_state';
-  
+
+    public function action_index()
+    {
+        $this->layout('/orderstatecustom');
+    }
+
     public function gridConfig()
     {
-        $orm = $this->FCom_Sales_Model_StateCustom->orm('sc')->select('sc.*');
+        $orm = $this->FCom_Sales_Model_StateCustom->orm('oscs')->select('oscs.*');
         
         $config = [
             'config' => [
@@ -30,9 +36,12 @@ class FCom_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Controller
                         'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
                     ['name' => 'state_label', 'index' => 'sc.state_label', 'label' => 'Label' ,'width' => 150, 'addable'=>true, 'editable' => true,    
                         'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
-                    ['name' => 'concrete_class', 'index' => 'sc.concrete_class', 'label' => 'Concrecte Class', 'width' => 150, 'addable'=>true, 'editable' => true,    
+                    ['name' => 'concrete_class', 'index' => 'sc.concrete_class', 'label' => 'Concrecte Class', 'width' => 150, 'addable'=>true, 'editable' => true,
                         'validation' => ['required' => true]],
-                    ['type' => 'btn_group', 'buttons' => [['name' => 'edit'], ['name' => 'delete']]]
+                    ['type' => 'btn_group', 'buttons' => [
+                        ['name' => 'edit_custom', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom'],
+                        ['name' => 'delete']]
+                    ]
                 ],
                 'actions' => [
                     'edit' => true,
@@ -43,7 +52,7 @@ class FCom_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Controller
                     ['field' => 'state_code', 'type' => 'text'],
                     ['field' => 'state_label', 'type' => 'text'],            
                 ],
-                 'grid_before_create' => 'orderCustomStateGridRegister'
+                'grid_before_create' => 'orderCustomStateGridRegister'
             ]
         ];
         
@@ -54,8 +63,10 @@ class FCom_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Controller
     {
         $this->layout('/orderstatecustom');        
     }
-    
-    
+
+    /**
+     * get data
+     */
     public function action_grid_data()
     {
         $view = $this->view('core/backbonegrid');
@@ -66,7 +77,11 @@ class FCom_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Controller
             $this->BDb->many_as_array($data['rows']),
         ]);
     }
-    
+
+    /**
+     * process POST submitted data
+     */
+
     public function action_grid_data__POST()
     {
         $this->_processGridDataPost('FCom_Sales_Model_StateCustom');
@@ -87,7 +102,6 @@ class FCom_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Controller
             $value = $data['value'];
             
             $exists = $this->FCom_Sales_Model_StateCustom->load($value, $key); 
-           
             $result = ['unique' => !$exists, 'id' => !$exists ? -1 : $exists->id()];
         } catch (Exception $e) {
             $result = ['error' => $e->getMessage()];

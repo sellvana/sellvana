@@ -1,4 +1,8 @@
-<form action="{{ APP.href('login') }}" method="post" id="login-form" role="form">
+{% set formUrl = THIS.get('form_url') ?: 'login' %}
+{% set noAccountUrl = THIS.get('no_account_url') ?: 'customer/register' %}
+{% set noAccountLabel = THIS.get('no_account_label') ?: 'Sign up now' %}
+
+<form action="{{ APP.href(formUrl) }}" method="post" id="login-form" role="form">
   <input type="hidden" name="X-CSRF-TOKEN" value="{{ SESSION.csrfToken() }}"/>
   <input type="hidden" name="redirect_to" value="{{ THIS.get('redirect_to') }}"/>
 
@@ -29,7 +33,7 @@
       <button class="btn btn-primary btn-lg" type="submit"><span>{{"Login"|_}}</span></button>
       <a href="{{ APP.href('customer/password/recover')}}" class="btn btn-link">{{ "Forgot your password?" | _ }}</a>
     </div>
-    <div class="alert alert-info">{{ "No Account? " | _ }}<strong><a href="{{ APP.href('customer/register') }}">{{"Sign up now" | _ }} &raquo;</strong></a></div>
+    <div class="alert alert-info">{{ "No Account? " | _ }}<a href="{{ APP.href(noAccountUrl) }}"><strong>{{ noAccountLabel|_ }} &raquo;</strong></a></div>
   </fieldset>
 </form>
 <script>

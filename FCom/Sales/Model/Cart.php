@@ -620,7 +620,7 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
      *
      * Check if provided code is valid payment method and apply it
      * @throws BException
-     * @param string $paymentMethod
+     * @param string $method
      * @return $this
      */
     public function setPaymentMethod($method)
@@ -637,13 +637,18 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
 
     public function setPaymentDetails($data = [])
     {
-        if (!empty($data)) {
-            $paymentMethod = $this->getPaymentMethod();
-            if ($paymentMethod) {
-                $paymentMethod->setDetails($data);
-                $this->payment_details = $this->BUtil->toJson($paymentMethod->getPublicData());
-            }
+        if (empty($data)) {
+            return $this;
         }
+        $paymentMethod = $this->getPaymentMethod();
+        if (!$paymentMethod) {
+            return $this;
+        }
+        $prefix = $paymentMethod->getCheckoutFormPrefix();
+        if (!empty($data[$prefix])) {
+            $paymentMethod->setPaymentFormData($data[$prefix]);
+        }
+        $this->setData('payment_details', $paymentMethod->getDataToSave());
         return $this;
     }
 

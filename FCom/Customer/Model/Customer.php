@@ -73,9 +73,9 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     /**
      * override default rules for login form
      */
-    public function setLoginRules()
+    public function getLoginRules()
     {
-        static::$_validationRules =  [
+        return [
             ['email', '@required'],
             ['password', '@required'],
             ['email', '@email'],
@@ -85,40 +85,42 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     /**
      * override default rules for password recover form
      */
-    public function setPasswordRecoverRules()
+    public function getPasswordRecoverRules()
     {
-        static::$_validationRules =  [
+        return [
             ['email', '@required'],
             ['email', '@email'],
         ];
     }
 
-    public function setAccountEditRules($incChangePassword = false)
+    public function getAccountEditRules($incChangePassword = false)
     {
-        static::$_validationRules = [
+        $rules = [
             ['email', '@required'],
             ['firstname', '@required'],
             ['lastname', '@required'],
         ];
 
         if ($incChangePassword) {
-            static::$_validationRules[] = ['password', '@required'];
-            static::$_validationRules[] = ['password_confirm', '@password_confirm'];
+            $rules[] = ['password', '@required'];
+            $rules[] = ['password_confirm', '@password_confirm'];
         }
+
+        return $rules;
     }
 
-    public function setChangePasswordRules()
+    public function getChangePasswordRules()
     {
-        static::$_validationRules = [
+        return [
             ['current_password', '@required'],
             ['password', '@required'],
             ['password_confirm', '@password_confirm'],
         ];
     }
 
-    public function setSimpleRegisterRules()
+    public function getSimpleRegisterRules()
     {
-        static::$_validationRules = [
+        return [
             ['email', '@required'],
             ['password', '@required'],
             ['password_confirm', '@password_confirm'],
@@ -179,6 +181,27 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
         return $user;
     }
 
+    public function validateCustomerStatus()
+    {
+        $result = ['allow_login' => false];
+        $locale = $this->BLocale;
+        switch ($this->get('status')) {
+            case 'active':
+                $result['allow_login'] = true;
+                break;
+            case 'review':
+                $result['error']['message'] = $locale->_('Your account is under review. Once approved, we\'ll notify you. Thank you for your patience.');
+                break;
+            case 'disabled':
+                $result['error']['message'] = $locale->_('Your account is disabled. Please contact us for more details.');
+                break;
+            default:
+                $result['error']['message'] = $locale->_('Your account status have problem. Please contact us for more details.');
+                break;
+        }
+        return $result;
+    }
+
     /**
      * @param $password
      * @return $this
@@ -186,6 +209,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
      */
     public function resetPassword($password)
     {
+        $this->BSession->regenerateId();
         $this->set(['token' => null, 'token_at' => null])->setPassword($password)->save();
         $this->BLayout->view('email/customer-password-reset')->set('customer', $this)->email();
         return $this;
@@ -390,6 +414,7 @@ class FCom_Customer_Model_Customer extends FCom_Core_Model_Abstract
     {
         $this->set('last_login', $this->BDb->now())->save();
 
+        $this->BSession->regenerateId();
         $this->BSession->set('customer_id', $this->id());
         static::$_sessionUser = $this;
         if ($this->locale) {

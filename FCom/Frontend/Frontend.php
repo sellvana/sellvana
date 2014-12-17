@@ -8,7 +8,7 @@ class FCom_Frontend_Frontend extends BClass
             $this->BResponse->httpSTS();
         }
 
-        if ($this->BDebug->is('RECOVERY,MIGRATION')) {
+        if ($this->BDebug->is(['RECOVERY', 'MIGRATION'])) {
             $this->BLayout->setRootView('under_construction');
             $this->BResponse->render();
         }

@@ -33,7 +33,7 @@ class FCom_CatalogIndex_Admin_Controller extends FCom_Admin_Controller_Abstract
 
     public function action_test()
     {
-        if (!$this->BDebug->is('DEBUG,DEVELOPMENT')) {
+        if (!$this->BDebug->is(['DEBUG', 'DEVELOPMENT'])) {
             echo "DENIED";
             exit;
         }

@@ -61,6 +61,47 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
         $this->layout('/checkout-simple/login');
     }
 
+    public function action_login__POST()
+    {
+        try {
+            $r = $this->BRequest;
+            /** @var FCom_Customer_Model_Customer $customerModel */
+            $customerModel = $this->FCom_Customer_Model_Customer;
+            $login = $r->post('login');
+            if (!$login) {
+                $login = $r->post();
+            }
+            if (!$customerModel->validate($login, $customerModel->getLoginRules(), 'frontend', true)) {
+                $this->formMessages();
+                $this->BResponse->redirect('checkout/login');
+                return;
+            }
+
+            $user = $customerModel->authenticate($login['email'], $login['password']);
+            if (!$user) {
+                throw new Exception($this->_('Invalid email or password.'));
+            }
+
+            $statusResult = $user->validateCustomerStatus();
+            if (empty($statusResult['allow_login'])) {
+                throw new Exception($this->_($statusResult['error']['message']));
+            }
+
+            $user->login();
+
+            if (!empty($login['remember_me'])) {
+                $days = $this->BConfig->get('cookie/remember_days');
+                $this->BResponse->cookie('remember_me', 1, ($days ? $days : 30) * 86400);
+            }
+
+            $this->BResponse->redirect('checkout');
+        } catch (Exception $e) {
+            $this->BDebug->logException($e);
+            $this->message($e->getMessage(), 'error', 'frontend', ['title' => '']);
+            $this->BResponse->redirect('checkout/login');
+        }
+    }
+
     public function action_step1()
     {
         $this->layout('/checkout-simple/step1');

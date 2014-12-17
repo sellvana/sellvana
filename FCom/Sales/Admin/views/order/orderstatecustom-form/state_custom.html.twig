@@ -1,73 +1,106 @@
-{% set orderStateCustomCtrl = APP.instance('FCom_Sales_Admin_Controller_OrderStateCustom') %}
-<script>    
-require(['jquery', 'underscore', 'backbone', 'jquery.validate'], function($, _, Backbone) {
-    var orderCustomStateGrid;
-    var orderStateCustomForm = $('#orderstatecustom-modal-form');
+{% set orderCustomStateCtrl = APP.instance('FCom_Sales_Admin_Controller_OrderStateCustom') %}
+
+<script>
+require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], function($, _, Backbone) {
+    var mainGrid;
+//    var formFieldSet = $('#field-set-modal-form');
     window.orderCustomStateGridRegister = function(grid) {
-         orderCustomStateGrid=grid;
-         
-         orderCustomStateGrid.getGridSkeleton().Views.RowView.prototype._callbackCustom = function (ev) {
-             
-                orderCustomStateGrid.getModalForm().modalType = 'editable';
-    		orderCustomStateGrid.getGridSkeleton().currentRow = this.model;
-    		orderCustomStateGrid.getModalForm().render();                 
-		$('#btn-orderstatecustom-grid-modal').trigger('click');
-                        
-         };    
-        
-        orderCustomStateGrid.getGridSkeleton().Views.ModalForm.prototype.el = '#orderstatecustom-modal-form';            
-        orderCustomStateGrid.build();             
-     };
-     
-     $('#add_new_orderstatecustom').click(function () {
-    	
-        orderCustomStateGrid.getModalForm().modalType = 'addable';
-        orderCustomStateGrid.getModalForm().render();         
-        $('#btn-orderstatecustom-grid-modal').trigger('click');
+        mainGrid = grid;
+
+        //Get BackboneGrid namespace object
+        var skeleton = mainGrid.getGridSkeleton();
+
+        //inherete custom button process function
+        skeleton.Views.RowView.prototype._callbackCustom = function() {
+
+            //generate form html from grid modal form
+            mainGrid.getModalForm().modalType = 'editable';
+            skeleton.currentRow = this.model;
+            mainGrid.getModalForm().render();
+          
+            $('a#btn-fieldset-grid-modal').trigger('click');
+        };
+
+        //important: change modal form element for rendering
+        skeleton.Views.ModalForm.prototype.el = '#field-set-modal-form';
+        grid.build();       
+    };
+
+    $('#add_new_state_custom').click(function () {
+        mainGrid.getModalForm().modalType = 'addable';
+        mainGrid.getModalForm().render();
+        $('a#btn-fieldset-grid-modal').trigger('click');
     });
-    
-    $('button.orderstatecustom-modal-save').click(function() {
-        if (orderStateCustomForm.valid()) {
-            if (orderCustomStateGrid.getModalForm().saveChanges()) {
-            	$('button.orderstatecustom-modal-close').trigger('click');
-            }
+
+    $('button.fieldset-modal-save').click(function () {
+        if (mainGrid.getModalForm().saveChanges()) {
+            $('.fieldset-modal-close').trigger('click');
         }
-    }); 
+
+    });
 });
 </script>
 
 <div class="f-admin-main-view">
-  <div class="page-header f-admin-page-header">
-      <h1 class="f-page-title">
-          {#<i class="icon-file"></i>#}
-          <span>{{ "Order State Custom" |_ }}</span>
-      </h1>
-      
-      <div class="btn-group">
-          <button id="add_new_orderstatecustom" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add Order State Custom" |_ }}</span></button>
-      </div>
-  </div>
-
-  <div class="f-admin-main">
-      {{ THIS.view('core/backbonegrid').set('grid', orderStateCustomCtrl.gridConfig())| raw }}
-  </div>
+    <div class="page-header f-admin-page-header">
+        <h1 class="f-page-title">
+            <i class="icon-file"></i>
+            {{ "State Custom" |_ }}
+        </h1>
+        <div class="btn-group">
+            <button id="add_new_state_custom" class="btn grid-new btn-primary _modal" type="button"><span>{{ "Add State Custom" |_ }}</span></button>
+        </div>
+    </div>
+    <div class="f-admin-main">
+        {{ THIS.view('core/backbonegrid').set('grid', orderCustomStateCtrl.gridConfig())| raw }}
+    </div>
+    <a role="button" href="#fieldset-grid-modal" data-toggle="modal" style='display:none;' id='btn-fieldset-grid-modal'>{{ "Add"|_ }}</a>
 </div>
-  
-<div class='modal fade' id='orderstatecustom-grid-modal'>
-    <div class='modal-dialog' style='width:600px;'>
+
+
+<div class='modal fade' id='fieldset-grid-modal' tabindex='-1'>
+    <div class='modal-dialog' style='width:800px;'>
         <div class='modal-content'>
             <div class='modal-header'>
                 <button aria-hidden='true' class='close' data-dismiss='modal' type='button'>×</button>
-                <h4 class='modal-title' id='orderstatecustom-modal-header'> {{ "Order State Custom" |_ }}</h4>
+                <h4 class='modal-title' id='myModalLabel'>{{ "State Custom"|_ }}</h4>
             </div>
             <div class='modal-body'>
-                    <form class="form form-horizontal validate-form" id="orderstatecustom-modal-form" novalidate="novalidate"></form>
+                <div class='row'>
+                    <div class='col-sm-12'>
+                        <div class='tabbable'>
+                            <ul class='nav nav-tabs prod-type f-horiz-nav-tabs'>
+                                <li class='active'>
+                                    <a data-toggle='tab' href='#edit_field_set' id='fieldset_tab'>
+                                        {{ "State Custom"|_ }}
+                                    </a>
+                                </li>                              
+                            </ul>
+                            <div class='tab-content'>
+                                <div class='tab-pane active' id='edit_field_set'>
+                                    <form class="form form-horizontal validate-form" id="field-set-modal-form" novalidate="novalidate">
+                                    </form>
+                                </div>
+                                <div class='tab-pane' id='add_fields'>
+                                    {#{{ THIS.view('core/backbonegrid').set('grid', orderCustomStateCtrl.gridConfig()) | raw }}#}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-             <div class='modal-footer'>
-                <button class='btn btn-primary orderstatecustom-modal-save' type='button'>{{ "Save"|_ }}</button>
-                <button class='btn btn-default btn-close orderstatecustom-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
+            <div class='modal-footer'>
+                <button class='btn btn-primary fieldset-modal-save' type='button'>{{ "Save"|_ }}</button>
+                <button class='btn btn-default btn-close fieldset-modal-close' data-dismiss='modal' type='button'>{{ "Close"|_ }}</button>
             </div>
         </div>
     </div>
 </div>
-<a role="button" href="#orderstatecustom-grid-modal" data-toggle="modal" style='display:none;' id='btn-orderstatecustom-grid-modal'>hidden</a>
+
+
+
+
+
+
+
+

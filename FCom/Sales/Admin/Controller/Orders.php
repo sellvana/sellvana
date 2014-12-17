@@ -56,7 +56,8 @@ class FCom_Sales_Admin_Controller_Orders extends FCom_Admin_Controller_Abstract_
             ['name' => 'shipping_name', 'label' => 'Ship to Name', 'index' => 'shipping_name'],
             ['name' => 'shipping_address', 'label' => 'Ship to Address', 'index' => 'shipping_address'],
             ['name' => 'grand_total', 'label' => 'Order Total', 'index' => 'o.grand_total'],
-            ['name' => 'amount_due', 'label' => 'Paid', 'index' => 'o.amount_due'],
+            ['name' => 'amount_due', 'label' => 'Due', 'index' => 'o.amount_due'],
+            ['name' => 'amount_paid', 'label' => 'Paid', 'index' => 'o.amount_paid'],
             ['name' => 'discount', 'label' => 'Discount', 'index' => 'o.coupon_code'],
 
             ['name' => 'state_overall', 'label' => 'Overall State', 'index' => 'o.state_overall', 'options' => $overallStates],

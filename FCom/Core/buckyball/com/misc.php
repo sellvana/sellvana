@@ -2733,9 +2733,9 @@ class BDebug extends BClass
      */
     public function registerErrorHandlers()
     {
-        set_error_handler('BDebug::errorHandler');
-        set_exception_handler('BDebug::exceptionHandler');
-        register_shutdown_function('BDebug::shutdownHandler');
+        set_error_handler([$this, 'errorHandler']);
+        set_exception_handler([$this, 'exceptionHandler']);
+        register_shutdown_function([$this, 'shutdownHandler']);
     }
 
     /**
@@ -2744,7 +2744,7 @@ class BDebug extends BClass
     public function startErrorLogger()
     {
         static::$_errorHandlerLog = [];
-        set_error_handler('BDebug::errorHandlerLogger');
+        set_error_handler([$this, 'errorHandlerLogger']);
     }
 
     /**
@@ -2752,7 +2752,7 @@ class BDebug extends BClass
      */
     public function stopErrorLogger()
     {
-        set_error_handler('BDebug::errorHandler');
+        set_error_handler([$this, 'errorHandlerLogger']);
         return static::$_errorHandlerLog;
     }
 
@@ -3138,8 +3138,7 @@ class BDebug extends BClass
      */
     public function is($modes)
     {
-        if (is_string($modes)) $modes = explode(',', $modes);
-        return in_array(static::$_mode, $modes);
+        return is_string($modes) ? (static::$_mode === $modes) : (in_array(static::$_mode, $modes));
     }
 
     /**
