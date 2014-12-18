@@ -31,13 +31,12 @@ class FCom_Sales_Admin_Controller_OrderStateCustom extends FCom_Admin_Controller
                     ['type' => 'row_select'],
                     ['name' => 'id', 'index' => 'oscs.id', 'label' => 'ID', 'width' => 40],
                     ['name' => 'entity_type', 'index' => 'sc.entity_type', 'label' => 'Entity Type','width' => 85, 'addable'=>true,'editable' => true,
+                               'editor' => 'select', 'options' => $this->FCom_Sales_Model_StateCustom->fieldOptions('entity_type'), 
+                               'validation' => ['required' => true]],
+                    ['name' => 'state_code', 'index' => 'oscs.state_code', 'label' => 'Code', 'width' =>  150, 'addable'=>true, 'editable' => true,
                         'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
-                    ['name' => 'state_code', 'index' => 'sc.state_code', 'label' => 'Code', 'width' =>  150, 'addable'=>true, 'editable' => true,
+                    ['name' => 'state_label', 'index' => 'oscs.state_label', 'label' => 'Label' ,'width' => 150, 'addable'=>true, 'editable' => true,    
                         'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
-                    ['name' => 'state_label', 'index' => 'sc.state_label', 'label' => 'Label' ,'width' => 150, 'addable'=>true, 'editable' => true,    
-                        'validation' => ['required' => true, 'unique' => $this->BApp->href('orderstatecustom/unique')]],
-                    ['name' => 'concrete_class', 'index' => 'sc.concrete_class', 'label' => 'Concrecte Class', 'width' => 150, 'addable'=>true, 'editable' => true,
-                        'validation' => ['required' => true]],
                     ['type' => 'btn_group', 'buttons' => [
                         ['name' => 'edit_custom', 'icon' => 'icon-edit-sign', 'cssClass' => 'btn-custom'],
                         ['name' => 'delete']]

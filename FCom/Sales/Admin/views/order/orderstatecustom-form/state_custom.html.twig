@@ -12,12 +12,14 @@ require(['jquery', 'underscore', 'backbone', 'jquery.validate', 'unique'], funct
 
         //inherete custom button process function
         skeleton.Views.RowView.prototype._callbackCustom = function() {
-
+            selectedRow = this.model;
+            
             //generate form html from grid modal form
             mainGrid.getModalForm().modalType = 'editable';
             skeleton.currentRow = this.model;
             mainGrid.getModalForm().render();
-          
+            
+            $("#entity_type").val(selectedRow.get('entity_type').toLowerCase())
             $('a#btn-fieldset-grid-modal').trigger('click');
         };
 
