@@ -115,9 +115,19 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
         if (!$this->FCom_Customer_Model_Customer->isLoggedIn()) {
             $this->FCom_Sales_Main->workflowAction('customerChoosesGuestCheckout', $args);
         }
+        $cart = $this->FCom_Sales_Model_Cart->sessionCart();
+        if (!$cart->hasCompleteAddress('billing')) {
+            $cart->set('same_address', 1);
+        }
         $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingAddress', $args);
 
+
         $args['cart']->calculateTotals()->saveAllDetails();
+
+        $customer = $this->FCom_Customer_Model_Customer->sessionUser();
+        if ($customer && !$customer->getDefaultShippingAddress()) {
+
+        }
 
         $this->BResponse->redirect('checkout');
     }
@@ -179,18 +189,8 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
         $result = [];
         $args = ['post' => $this->BRequest->post(), 'cart' => $this->_cart, 'result' => &$result];
         $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingAddress', $args);
-    }
 
-    public function action_xhr_shipping_method__POST()
-    {
-        if (!$this->BRequest->xhr()) {
-            $this->BResponse->redirect('checkout');
-            return;
-        }
-
-        $result = [];
-        $args = ['post' => $this->BRequest->post(), 'cart' => $this->_cart, 'result' => &$result];
-        $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingMethod', $args);
+        $this->BResponse->json([]);
     }
 
     public function action_xhr_billing_address__POST()
@@ -203,5 +203,34 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
         $result = [];
         $args = ['post' => $this->BRequest->post(), 'cart' => $this->_cart, 'result' => &$result];
         $this->FCom_Sales_Main->workflowAction('customerUpdatesBillingAddress', $args);
+
+        $this->BResponse->json([]);
+    }
+    public function action_xhr_shipping_method__POST()
+    {
+        if (!$this->BRequest->xhr()) {
+            $this->BResponse->redirect('checkout');
+            return;
+        }
+
+        $result = [];
+        $args = ['post' => $this->BRequest->post(), 'cart' => $this->_cart, 'result' => &$result];
+        $this->FCom_Sales_Main->workflowAction('customerUpdatesShippingMethod', $args);
+
+        $this->BResponse->json([]);
+    }
+
+    public function action_xhr_payment_method__POST()
+    {
+        if (!$this->BRequest->xhr()) {
+            $this->BResponse->redirect('checkout');
+            return;
+        }
+
+        $result = [];
+        $args = ['post' => $this->BRequest->post(), 'cart' => $this->_cart, 'result' => &$result];
+        $this->FCom_Sales_Main->workflowAction('customerUpdatesPaymentMethod', $args);
+
+        $this->BResponse->json($result);
     }
 }

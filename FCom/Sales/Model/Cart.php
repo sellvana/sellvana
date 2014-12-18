@@ -648,7 +648,10 @@ class FCom_Sales_Model_Cart extends FCom_Core_Model_Abstract
         if (!empty($data[$prefix])) {
             $paymentMethod->setPaymentFormData($data[$prefix]);
         }
-        $this->setData('payment_details', $paymentMethod->getDataToSave());
+        $data = $paymentMethod->getDataToSave();
+        if ($data && is_array($data)) {
+            $this->setData('payment_details', [$prefix => $data]);
+        }
         return $this;
     }
 
