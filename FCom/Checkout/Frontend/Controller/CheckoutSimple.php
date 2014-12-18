@@ -126,7 +126,7 @@ class FCom_Checkout_Frontend_Controller_CheckoutSimple extends FCom_Frontend_Con
 
         $customer = $this->FCom_Customer_Model_Customer->sessionUser();
         if ($customer && !$customer->getDefaultShippingAddress()) {
-
+            $customer->addAddress($cart->addressAsArray('shipping'), true);
         }
 
         $this->BResponse->redirect('checkout');

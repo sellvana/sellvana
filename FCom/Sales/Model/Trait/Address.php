@@ -51,19 +51,19 @@ trait FCom_Sales_Model_Trait_Address
         $country = $this->get($atype . '_country');
         $arr = [
             'atype'     => $atype,
-            'company'   => $atype . '_company',
-            'attn'      => $atype . '_attn',
-            'firstname' => $atype . '_firstname',
-            'lastname'  => $atype . '_lastname',
-            'street1'   => $atype . '_street1',
-            'street2'   => $atype . '_street2',
-            //'street3'   => $atype . '_street3',
-            'city'      => $atype . '_city',
-            'region'    => $atype . '_region',
-            'postcode'  => $atype . '_postcode',
+            'company'   => $this->get($atype . '_company'),
+            'attn'      => $this->get($atype . '_attn'),
+            'firstname' => $this->get($atype . '_firstname'),
+            'lastname'  => $this->get($atype . '_lastname'),
+            'street1'   => $this->get($atype . '_street1'),
+            'street2'   => $this->get($atype . '_street2'),
+            //'street3'   => $this->get($atype . '_street3'),
+            'city'      => $this->get($atype . '_city'),
+            'region'    => $this->get($atype . '_region'),
+            'postcode'  => $this->get($atype . '_postcode'),
             'country'   => !empty($countries[$country]) ? $countries[$country] : $country,
-            'phone'     => $atype . '_phone',
-            'fax'       => $atype . '_fax',
+            'phone'     => $this->get($atype . '_phone'),
+            'fax'       => $this->get($atype . '_fax'),
         ];
         return $arr;
     }
