@@ -75,7 +75,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
 
         /** @var BORM $orm */
         $orm = $this->FCom_Catalog_Model_Category->orm('c')->select(['id', 'full_name', 'node_name'], 'c');
-        if ($catTerm) {
+        if ($catTerm && $catTerm != '*') {
             $orm->where([['full_name LIKE ?', "%{$catTerm}%"]]);
         }
 
@@ -117,7 +117,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
 
         $orm = $this->FCom_CustomField_Model_Field->orm()->where('field_type', 'product');
 
-        if ($term) {
+        if ($term && $term != '*') {
             $orm->where(['OR' => [['field_code LIKE ?', "%{$term}%"], ['field_name LIKE ?', "%{$term}%"]]]);
         }
 
@@ -268,8 +268,13 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
      */
     protected function searchTableFields($tableName, $term)
     {
-        $term = "%{$term}%";
-        $res = BORM::i()->raw_query("SHOW FIELDS FROM `{$tableName}` WHERE Field LIKE ?", [$term])->find_many_assoc('Field');
+        $sql = "SHOW FIELDS FROM `{$tableName}`";
+        if ($term != '*') {
+            $term = "%{$term}%";
+            $sql .= "WHERE Field LIKE ?";
+        }
+        $res = BORM::i()->raw_query($sql, [$term])->find_many_assoc('Field');
+
         return $res;
     }
 }
