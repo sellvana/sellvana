@@ -282,7 +282,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
     var AddFieldButton = React.createClass({
         render: function () {
             return (
-                <Components.Button onClick={this.props.onClick} className="btn-link" type="button" style={ {paddingRight:10, paddingLeft:10} }>
+                <Components.Button onClick={this.props.onClick} className="btn-link pull-left" type="button" style={ {paddingRight:10, paddingLeft:10} }>
                     <span aria-hidden="true" className="glyphicon glyphicon glyphicon-plus-sign"></span>
                 </Components.Button>
             );
@@ -380,7 +380,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                     <ConditionsType ref="skuCollectionType" id="skuCollectionType"> of </ConditionsType>
                     <div className="col-md-2"><input type="hidden" id="skuCollectionIds" ref="skuCollectionIds" className="form-control"/></div>
                     <div className="col-md-2"><ConditionsCompare ref="skuCollectionCond" id="skuCollectionCond" /></div>
-                    <div className="col-md-1"><input className="form-control" ref="skuCollectionValue" id="skuCollectionValue" type="text"/></div>
+                    <div className="col-md-1"><input className="form-control pull-left" ref="skuCollectionValue" id="skuCollectionValue" type="text"/></div>
                 </ConditionsRow>
             );
         },
@@ -433,8 +433,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
             return (
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-5"><input type="text" readOnly="readonly" ref="attributesResume" id="attributesResume" className="form-control"/></div>
-                    <Components.Button type="button" className="btn-primary"
-                       ref={this.props.configureId} onClick={this.handleConfigure}>Configure</Components.Button>
+                    <div className="col-md-5"><Components.Button type="button" className="btn-primary"
+                       ref={this.props.configureId} onClick={this.handleConfigure}>Configure</Components.Button></div>
                 </ConditionsRow>
             );
         },
@@ -692,7 +692,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                     <ConditionsType ref="catProductsType" id="catProductsType" > of products in </ConditionsType>
                     <div className="col-md-2"><input type="hidden" id="catProductsIds" ref="catProductsIds" className="form-control"/></div>
                     <div className="col-md-2"><ConditionsCompare ref="catProductsCond" id="catProductsCond" /></div>
-                    <div className="col-md-1"><input ref="catProductsValue" id="catProductsValue" type="text" className="form-control"/></div>
+                    <div className="col-md-1"><input ref="catProductsValue" id="catProductsValue" type="text" className="form-control pull-left"/></div>
                 </ConditionsRow>
             );
         },
@@ -729,6 +729,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                     return markup;
                 }
             });
+            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
         }
     });
 
@@ -739,7 +740,7 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <ConditionsType ref="cartTotalType" id="cartTotalType" totalType={this.props.totalType}/>
                     <div className="col-md-2"><ConditionsCompare ref="cartTotalCond" id="cartTotalCond" /></div>
-                    <div className="col-md-1"><input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control"/></div>
+                    <div className="col-md-1"><input ref="cartTotalValue" id="cartTotalValue" type="text" className="form-control pull-left"/></div>
                 </ConditionsRow>
             );
         },
@@ -750,6 +751,9 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 label: "Cart Total",
                 type: 'total'
             };
+        },
+        componentDidMount: function() {
+            $('.to-select2', this.getDOMNode()).select2({minimumResultsForSearch: 15});
         }
     });
 
@@ -760,8 +764,8 @@ define(['react', 'jquery', 'jsx!griddle', 'jsx!fcom.components', 'fcom.locale', 
                 <ConditionsRow rowClass={this.props.rowClass} label={this.props.label} onDelete={this.remove}>
                     <div className="col-md-5"><textarea ref="shippingResume" id="shippingResume"
                             readOnly="readonly" value={this.state.value} className="form-control"/></div>
-                    <Components.Button type="button" className="btn-primary" ref={this.props.configureId}
-                        onClick={this.handleConfigure}>Configure</Components.Button>
+                    <div className="col-md-5"> <Components.Button type="button" className="btn-primary pull-left" ref={this.props.configureId}
+                        onClick={this.handleConfigure}>Configure</Components.Button></div>
                 </ConditionsRow>
             );
         },

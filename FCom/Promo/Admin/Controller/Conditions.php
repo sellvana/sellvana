@@ -5,10 +5,11 @@
  * User: pp
  * Date: 24.Nov14
  *
- * @property FCom_CustomField_Model_Field    $FCom_CustomField_Model_Field
- * @property FCom_Catalog_Model_Product      $FCom_Catalog_Model_Product
- * @property FCom_Catalog_Model_Category     $FCom_Catalog_Model_Category
- * @property FCom_Catalog_Model_InventorySku $FCom_Catalog_Model_InventorySku
+ * @property FCom_CustomField_Model_Field       $FCom_CustomField_Model_Field
+ * @property FCom_Catalog_Model_Product         $FCom_Catalog_Model_Product
+ * @property FCom_Catalog_Model_Category        $FCom_Catalog_Model_Category
+ * @property FCom_Catalog_Model_InventorySku    $FCom_Catalog_Model_InventorySku
+ * @property FCom_CustomField_Model_FieldOption $FCom_CustomField_Model_FieldOption
  */
 class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstract
 {
@@ -184,7 +185,7 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
         $this->BResponse->json($results);
     }
 
-    public function action_attribute_values()
+    public function action_attributes_field()
     {
         if (!$this->BRequest->xhr()) {
             $this->BResponse->status('403', 'Available only for XHR', 'Available only for XHR');
@@ -192,7 +193,29 @@ class FCom_Promo_Admin_Controller_Conditions extends FCom_Admin_Controller_Abstr
             return;
         }
 
-        $r = $this->BRequest;
+        $r         = $this->BRequest;
+        $page      = $r->get('page')?: 1;
+        $fieldCode = explode('.', $r->get('field'), 2);
+        $limit     = $r->get('o')?: 30;
+        $offset    = ($page - 1) * $limit;
+
+        $field = $this->FCom_CustomField_Model_Field->load($fieldCode[1], 'field_code');
+
+        if ($field) {
+            $options = $this->FCom_CustomField_Model_FieldOption->getListAssocbyId($field->id());
+        } else {
+            $options = [];
+        }
+
+        $result = ['more' => false, 'items' => []];
+
+        foreach ($options as $id => $label) {
+            $result['items'][] = [
+                'id'   => $id,
+                'text' => $label
+            ];
+        }
+        $this->BResponse->json($result);
     }
 
     /**
